@@ -1,0 +1,97 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Noto Sans SC', system-ui, sans-serif;
+    background-color: #F5F0E8;
+    color: #2C2C2C;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    min-width: 1280px;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: 'Noto Serif SC', Georgia, serif;
+    font-weight: 700;
+    line-height: 1.4;
+  }
+
+  code, pre, .font-mono {
+    font-family: 'JetBrains Mono', Menlo, monospace;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-sm border border-gray-200 shadow-sm;
+  }
+
+  .card-header {
+    @apply px-4 py-3 border-b border-gray-200 bg-ochre-tint;
+  }
+
+  .card-body {
+    @apply p-4;
+  }
+
+  .btn-primary {
+    @apply bg-ochre text-white rounded-sm px-4 py-2 text-sm font-medium
+           hover:bg-ochre-dark active:bg-ochre-dark transition-colors
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply border border-ochre text-ochre rounded-sm px-4 py-2 text-sm font-medium
+           hover:bg-ochre-tint active:bg-ochre-tint transition-colors
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-ghost {
+    @apply text-ink rounded-sm px-4 py-2 text-sm font-medium
+           hover:bg-gray-100 active:bg-gray-200 transition-colors
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .section-title {
+    @apply font-serif text-lg font-bold text-ink;
+  }
+
+  .input-base {
+    @apply w-full border border-gray-300 rounded-sm px-3 py-2 text-sm bg-white
+           focus:outline-none focus:ring-2 focus:ring-ochre/30 focus:border-ochre
+           disabled:bg-gray-100 disabled:cursor-not-allowed;
+  }
+
+  .select-base {
+    @apply w-full border border-gray-300 rounded-sm px-3 py-2 text-sm bg-white
+           focus:outline-none focus:ring-2 focus:ring-ochre/30 focus:border-ochre
+           disabled:bg-gray-100 disabled:cursor-not-allowed appearance-none
+           bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20fill%3D%22none%22%20stroke%3D%22%236b7280%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22m2%204%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')]
+           bg-[length:12px] bg-[right_8px_center] bg-no-repeat pr-8;
+  }
+
+  .toast {
+    @apply fixed top-4 right-4 z-50 px-4 py-3 rounded-sm shadow-lg text-sm font-medium
+           transition-all duration-300;
+  }
+
+  .toast-success {
+    @apply toast bg-resolved text-white;
+  }
+
+  .toast-error {
+    @apply toast bg-conflict text-white;
+  }
+
+  .skeleton {
+    @apply animate-pulse bg-gray-200 rounded;
+  }
+}
