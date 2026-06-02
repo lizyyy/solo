@@ -1,0 +1,8 @@
+note_id,metric,operator,threshold,stratum,description,created_at
+t1,ctr,>=,0.01,high_volume,高流量创意CTR不低于1%,2025-05-30T09:00:00
+t2,ctr,>=,0.01,mid_volume,中等流量创意CTR不低于1%,2025-05-30T09:00:00
+t3,cvr,>=,0.03,mid_volume,中等流量创意CVR不低于3%,2025-05-30T09:00:00
+t4,ctr,>=,0.005,low_volume,低流量创意CTR不低于0.5%,2025-05-30T09:00:00
+t5,cvr,>=,0.02,low_volume,低流量创意CVR不低于2%,2025-05-30T09:00:00
+t6,ctr,>=,0.005,new_creative,新创意CTR不低于0.5%,2025-05-30T09:00:00
+t7,ctr,>=,0.01,*,全局CTR不低于1%,2025-05-30T09:00:00
