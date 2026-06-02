@@ -1,0 +1,10 @@
+sample_id,annotator_id,corrected_label,correction_reason,corrected_at
+S001,A01,nodule_benign,v2.1误判恶性;影像边缘光滑无明显毛刺,2025-10-14T16:30:00
+S002,A02,meningioma,模型判断正确无需修正,2025-10-17T10:00:00
+S003,A01,pneumonia,v2.1判断正确但v2.2漏诊,2025-10-20T14:00:00
+S004,A02,hemangioma,v2.2疑似肝癌过度诊断;增强扫描呈典型海绵状血管瘤强化模式,2025-10-22T11:30:00
+S005,A01,disc_herniation,两版模型判断一致确认无误,2025-10-24T09:30:00
+S006,A02,nodule_benign,v2.2判断恶性但形态偏良性需随访,2025-11-03T15:00:00
+S008,A01,renal_cyst,模型判断正确,2025-11-12T10:00:00
+S009,A02,bronchitis,v2.2诊断为肺炎但临床表现为支气管炎,2025-11-17T14:30:00
+S010,A01,glioblastoma,模型判为胶质瘤低级别但术后病理为胶质母细胞瘤IV级,2025-11-22T16:00:00

@@ -1,0 +1,16 @@
+sample_id,model_version,predicted_label,confidence,predicted_at
+S001,v2.1,nodule_malignant,0.87,2025-10-13T09:15:00
+S001,v2.2,nodule_benign,0.72,2025-11-01T10:30:00
+S002,v2.1,meningioma,0.91,2025-10-16T11:00:00
+S002,v2.2,meningioma,0.94,2025-11-02T09:45:00
+S003,v2.1,pneumonia,0.78,2025-10-19T14:20:00
+S003,v2.2,normal,0.65,2025-11-03T08:10:00
+S004,v2.1,hemangioma,0.82,2025-10-21T10:00:00
+S004,v2.2,hcc_suspected,0.76,2025-11-04T11:30:00
+S005,v2.1,disc_herniation,0.88,2025-10-23T09:00:00
+S005,v2.2,disc_herniation,0.90,2025-11-05T10:15:00
+S006,v2.2,nodule_malignant,0.80,2025-11-02T13:00:00
+S007,v2.2,pleural_effusion,0.71,2025-11-06T09:30:00
+S008,v2.2,renal_cyst,0.85,2025-11-11T10:45:00
+S009,v2.2,pneumonia,0.69,2025-11-16T11:00:00
+S010,v2.2,glioma,0.93,2025-11-21T09:00:00

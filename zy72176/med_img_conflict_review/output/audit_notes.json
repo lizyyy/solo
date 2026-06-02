@@ -1,0 +1,26 @@
+[
+  {
+    "note_id": "587a8a0b6f95",
+    "target_id": "7dabbd295f68",
+    "target_type": "conflict",
+    "operator": "小孟",
+    "note_content": "影像科主任确认胶质母细胞瘤IV级",
+    "prev_value": "glioma",
+    "new_value": "glioblastoma",
+    "diff_description": "变更: 'glioma' → 'glioblastoma'",
+    "source": "manual_note",
+    "created_at": "2026-06-02T20:17:29.580578"
+  },
+  {
+    "note_id": "a8c926958fde",
+    "target_id": "7dabbd295f68",
+    "target_type": "conflict",
+    "operator": "小孟",
+    "note_content": "解决冲突: 采纳病理报告结论;模型需增加高级别胶质瘤分类",
+    "prev_value": "unresolved",
+    "new_value": "resolved",
+    "diff_description": "冲突状态变更: 'unresolved' → 'resolved'; 处理结论: 采纳病理报告结论;模型需增加高级别胶质瘤分类",
+    "source": "conflict_resolution",
+    "created_at": "2026-06-02T20:17:29.652031"
+  }
+]

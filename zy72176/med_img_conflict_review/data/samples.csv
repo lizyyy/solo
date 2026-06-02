@@ -1,0 +1,11 @@
+sample_id,patient_id,image_path,modality,body_part,study_date
+S001,P1001,/images/ct/lung/P1001_001.dcm,CT,lung,2025-10-12
+S002,P1002,/images/mri/brain/P1002_001.dcm,MRI,brain,2025-10-15
+S003,P1003,/images/xray/chest/P1003_001.dcm,X-ray,chest,2025-10-18
+S004,P1004,/images/ct/liver/P1004_001.dcm,CT,liver,2025-10-20
+S005,P1005,/images/mri/spine/P1005_001.dcm,MRI,spine,2025-10-22
+S006,P1001,/images/ct/lung/P1001_002.dcm,CT,lung,2025-11-01
+S007,P1006,/images/xray/chest/P1006_001.dcm,X-ray,chest,2025-11-05
+S008,P1007,/images/ct/abdomen/P1007_001.dcm,CT,abdomen,2025-11-10
+S009,P1003,/images/xray/chest/P1003_002.dcm,X-ray,chest,2025-11-15
+S010,P1008,/images/mri/brain/P1008_001.dcm,MRI,brain,2025-11-20
