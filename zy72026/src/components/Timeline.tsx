@@ -1,17 +1,22 @@
 import React, { useEffect, useRef } from 'react';
-import { History } from 'lucide-react';
+import { History, Play } from 'lucide-react';
 import { useGameStore } from '../store/useGameStore';
 import { TimelineEventItem } from './TimelineEvent';
 
 export const Timeline: React.FC = () => {
-  const { session, selectedEventId, setSelectedEventId } = useGameStore();
+  const { session, selectedEventId, setSelectedEventId, replayMode, replayEventIndex, startReplay } = useGameStore();
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (containerRef.current && session?.events.length) {
-      containerRef.current.scrollTop = containerRef.current.scrollHeight;
+      if (replayMode) {
+        const activeEl = containerRef.current.querySelector('[data-replay-active="true"]');
+        if (activeEl) activeEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      } else {
+        containerRef.current.scrollTop = containerRef.current.scrollHeight;
+      }
     }
-  }, [session?.events.length]);
+  }, [session?.events.length, replayMode, replayEventIndex]);
 
   if (!session) {
     return (
@@ -26,6 +31,10 @@ export const Timeline: React.FC = () => {
       </div>
     );
   }
+
+  const visibleEvents = replayMode
+    ? session.events.slice(0, replayEventIndex + 1)
+    : session.events;
 
   const latestProblemId = session.events
     .filter((e) => e.type === 'problem_start')
@@ -67,19 +76,32 @@ export const Timeline: React.FC = () => {
             暂无操作记录
           </div>
         ) : (
-          session.events.map((event) => (
-            <TimelineEventItem
+          visibleEvents.map((event, idx) => (
+            <div
               key={event.id}
-              event={event}
-              isSelected={selectedEventId === event.id}
-              isActive={event.problemId === latestProblemId}
-              onClick={() => setSelectedEventId(selectedEventId === event.id ? null : event.id)}
-            />
+              data-replay-active={replayMode && idx === replayEventIndex ? 'true' : undefined}
+            >
+              <TimelineEventItem
+                event={event}
+                isSelected={selectedEventId === event.id}
+                isActive={replayMode ? idx === replayEventIndex : event.problemId === latestProblemId}
+                onClick={() => setSelectedEventId(selectedEventId === event.id ? null : event.id)}
+              />
+            </div>
           ))
         )}
       </div>
 
       <div className="mt-4 pt-4 border-t border-industrial-border">
+        {session.status === 'completed' && !replayMode && session.events.length > 0 && (
+          <button
+            onClick={startReplay}
+            className="w-full industrial-button-secondary flex items-center justify-center gap-2 mb-3"
+          >
+            <Play size={16} />
+            回放演练
+          </button>
+        )}
         <div className="text-xs text-industrial-muted space-y-1">
           <div className="flex items-center gap-2">
             <span className="w-3 h-3 rounded-full bg-emerald-500" />

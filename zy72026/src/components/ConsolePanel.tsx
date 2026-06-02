@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Play, Pause, RotateCcw, FileText, StickyNote, FastForward } from 'lucide-react';
+import { Play, Pause, RotateCcw, FileText, StickyNote, FastForward, Rewind } from 'lucide-react';
 import { useGameStore } from '../store/useGameStore';
 import { levels } from '../data/levels';
 
@@ -15,6 +15,9 @@ export const ConsolePanel: React.FC = () => {
     settleSession,
     setShowNoteEditor,
     runPreRecorded,
+    startReplay,
+    replayMode,
+    exitReplay,
   } = useGameStore();
 
   const [isRunningDemo, setIsRunningDemo] = useState(false);
@@ -159,13 +162,24 @@ export const ConsolePanel: React.FC = () => {
           )}
 
           {(session?.status === 'completed' || session?.status === 'idle') && (
-            <button
-              onClick={restartSession}
-              className="industrial-button-info flex items-center justify-center gap-2 col-span-2"
-            >
-              <RotateCcw size={18} />
-              {session?.status === 'completed' ? '再来一次' : '重置'}
-            </button>
+            <>
+              <button
+                onClick={restartSession}
+                className="industrial-button-info flex items-center justify-center gap-2"
+              >
+                <RotateCcw size={18} />
+                {session?.status === 'completed' ? '再来一次' : '重置'}
+              </button>
+              {session?.status === 'completed' && session.events.length > 0 && (
+                <button
+                  onClick={startReplay}
+                  className="industrial-button-secondary flex items-center justify-center gap-2"
+                >
+                  <Rewind size={18} />
+                  回放
+                </button>
+              )}
+            </>
           )}
         </div>
 

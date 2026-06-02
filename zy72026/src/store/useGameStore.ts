@@ -78,6 +78,7 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   replayMode: false,
   replayEventIndex: 0,
+  isReplayPlaying: false,
 
   showSettlement: false,
   showNoteEditor: false,
@@ -99,6 +100,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       rules: level.rules,
       showSettlement: false,
       replayMode: false,
+      isReplayPlaying: false,
     });
   },
 
@@ -185,6 +187,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       session,
       showSettlement: false,
       replayMode: false,
+      isReplayPlaying: false,
       selectedEventId: null,
     });
   },
@@ -528,8 +531,14 @@ export const useGameStore = create<GameState>((set, get) => ({
     processNextProblem();
   },
 
-  startReplay: (sessionId: string) => {
-    set({ replayMode: true, replayEventIndex: 0 });
+  startReplay: () => {
+    const state = get();
+    if (!state.session || state.session.events.length === 0) return;
+    set({ replayMode: true, replayEventIndex: 0, isReplayPlaying: false, showSettlement: false });
+  },
+
+  exitReplay: () => {
+    set({ replayMode: false, isReplayPlaying: false });
   },
 
   replayNext: () => {
@@ -537,12 +546,35 @@ export const useGameStore = create<GameState>((set, get) => ({
     if (!state.session) return;
     const nextIndex = Math.min(state.replayEventIndex + 1, state.session.events.length - 1);
     set({ replayEventIndex: nextIndex });
+    if (nextIndex >= state.session.events.length - 1) {
+      set({ isReplayPlaying: false });
+    }
   },
 
   replayPrev: () => {
     const state = get();
     const prevIndex = Math.max(state.replayEventIndex - 1, 0);
     set({ replayEventIndex: prevIndex });
+  },
+
+  replayGoTo: (index: number) => {
+    const state = get();
+    if (!state.session) return;
+    const clamped = Math.max(0, Math.min(index, state.session.events.length - 1));
+    set({ replayEventIndex: clamped });
+  },
+
+  replayAutoPlay: () => {
+    const state = get();
+    if (!state.session || state.session.events.length === 0) return;
+    if (state.replayEventIndex >= state.session.events.length - 1) {
+      set({ replayEventIndex: 0 });
+    }
+    set({ isReplayPlaying: true });
+  },
+
+  replayPause: () => {
+    set({ isReplayPlaying: false });
   },
 
   exportReport: (format: 'json' | 'text'): string => {
@@ -573,6 +605,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       selectedEventId: null,
       replayMode: false,
       replayEventIndex: 0,
+      isReplayPlaying: false,
       settlementReport: null,
     });
   },

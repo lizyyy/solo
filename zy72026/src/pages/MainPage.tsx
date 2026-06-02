@@ -4,6 +4,7 @@ import { CountdownTimer } from '../components/CountdownTimer';
 import { ProblemArea } from '../components/ProblemArea';
 import { JudgmentBanner } from '../components/JudgmentBanner';
 import { Timeline } from '../components/Timeline';
+import { ReplayPanel } from '../components/ReplayPanel';
 import { SettlementModal } from '../components/SettlementModal';
 import { NoteEditorModal } from '../components/NoteEditorModal';
 import { useGameTimer } from '../hooks/useGameTimer';
@@ -51,6 +52,7 @@ export const MainPage: React.FC = () => {
             <div className="flex-1 overflow-y-auto scrollbar-thin pr-1">
               <ConsolePanel />
             </div>
+            <ReplayPanel />
           </div>
 
           <div className="col-span-5 flex flex-col gap-4 overflow-hidden">

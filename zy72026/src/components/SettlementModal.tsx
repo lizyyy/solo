@@ -1,12 +1,12 @@
 import React from 'react';
-import { X, Trophy, Target, Clock, AlertTriangle, TrendingUp, CheckCircle, XCircle } from 'lucide-react';
+import { X, Trophy, Target, Clock, AlertTriangle, TrendingUp, CheckCircle, XCircle, Play } from 'lucide-react';
 import { useGameStore } from '../store/useGameStore';
 import { ExportPanel } from './ExportPanel';
 import { getFailureTypeLabel } from '../utils/judgmentEngine';
 import { levels } from '../data/levels';
 
 export const SettlementModal: React.FC = () => {
-  const { showSettlement, setShowSettlement, settlementReport, currentLevelId, restartSession } = useGameStore();
+  const { showSettlement, setShowSettlement, settlementReport, currentLevelId, restartSession, startReplay, session } = useGameStore();
 
   if (!showSettlement || !settlementReport) return null;
 
@@ -233,6 +233,18 @@ export const SettlementModal: React.FC = () => {
         </div>
 
         <div className="flex items-center justify-end gap-3 p-4 border-t border-industrial-border bg-industrial-bg/50">
+          {session && session.events.length > 0 && (
+            <button
+              onClick={() => {
+                setShowSettlement(false);
+                startReplay();
+              }}
+              className="industrial-button-secondary flex items-center gap-2"
+            >
+              <Play size={18} />
+              回放演练
+            </button>
+          )}
           <button
             onClick={() => {
               setShowSettlement(false);

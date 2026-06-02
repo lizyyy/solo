@@ -156,6 +156,7 @@ export interface GameState {
 
   replayMode: boolean;
   replayEventIndex: number;
+  isReplayPlaying: boolean;
 
   showSettlement: boolean;
   showNoteEditor: boolean;
@@ -174,9 +175,13 @@ export interface GameState {
   nextProblem: () => void;
   tickTimer: () => void;
   runPreRecorded: () => void;
-  startReplay: (sessionId: string) => void;
+  startReplay: () => void;
+  exitReplay: () => void;
   replayNext: () => void;
   replayPrev: () => void;
+  replayGoTo: (index: number) => void;
+  replayAutoPlay: () => void;
+  replayPause: () => void;
   exportReport: (format: 'json' | 'text') => string;
   setShowNoteEditor: (show: boolean) => void;
   setShowSettlement: (show: boolean) => void;
