@@ -1,0 +1,413 @@
+{% extends "base.html" %}
+{% block title %}批次详情 - {{ batch_id }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2>🔍 批次详情</h2>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">批次列表</a></li>
+                <li class="breadcrumb-item active">{{ batch_id }}</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="btn-group">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
+            ▶ 重跑批次
+        </button>
+        <ul class="dropdown-menu">
+            {% for m in models %}
+            <li>
+                <a class="dropdown-item" href="#" onclick="runBatch({{ m.id }})">
+                    {{ m.version_name }} (阈值 {{ m.threshold }})
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+        <a href="/export/{{ batch_id }}" class="btn btn-success ms-2">📥 导出CSV</a>
+        <a href="/compare/{{ batch_id }}" class="btn btn-info text-white ms-2">📊 版本对比</a>
+        <a href="/conflicts?batch_id={{ batch_id }}" class="btn btn-warning ms-2">⚠️ 冲突列表</a>
+    </div>
+</div>
+
+{% if batch_info %}
+{% set m = batch_info.metrics_json if batch_info.metrics_json is mapping else {} %}
+<div class="row mb-4">
+    <div class="col-md-2">
+        <div class="card metric-card">
+            <div class="card-body text-center">
+                <h4 class="text-primary">{{ batch_info.sample_count }}</h4>
+                <small class="text-muted">总样本</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card metric-card">
+            <div class="card-body text-center">
+                <h4 class="text-danger">{{ m.positives or 0 }}</h4>
+                <small class="text-muted">侵权</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card metric-card">
+            <div class="card-body text-center">
+                <h4 class="text-success">{{ m.negatives or 0 }}</h4>
+                <small class="text-muted">非侵权</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card metric-card">
+            <div class="card-body text-center">
+                <h4 class="text-warning">{{ m.needs_review or 0 }}</h4>
+                <small class="text-muted">需人工复核</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card metric-card">
+            <div class="card-body text-center">
+                <h4 class="text-danger">{{ m.conflicts or 0 }}</h4>
+                <small class="text-muted">标签冲突</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card metric-card">
+            <div class="card-body text-center">
+                <h4 class="text-info">{{ m.skipped_protected or 0 }}</h4>
+                <small class="text-muted">受保护样本</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+        <h6 class="mb-0">📌 当前运行信息</h6>
+        <span class="text-muted small">{{ batch_info.run_at|format_dt }} · {{ batch_info.operator }}</span>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4">
+                <strong>模型版本：</strong>
+                <span class="badge bg-secondary">{{ batch_info.version_name }}</span>
+            </div>
+            <div class="col-md-4">
+                <strong>判定阈值：</strong>
+                <code>{{ batch_info.threshold }}</code>
+                <span class="text-muted ms-2">≥ 侵权，&lt; 非侵权</span>
+            </div>
+            <div class="col-md-4">
+                <strong>运行次数：</strong>
+                <span class="badge bg-info">{{ batch_runs|length }} 次</span>
+            </div>
+        </div>
+        {% if batch_info.threshold_note %}
+        <div class="alert alert-warning mt-3 mb-0">
+            <strong>📝 阈值备注：</strong>{{ batch_info.threshold_note }}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+<div class="card">
+    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">评估结果列表（按置信度降序）</h5>
+        <div class="btn-group btn-group-sm">
+            <button type="button" class="btn btn-outline-secondary" onclick="filterBy('all')">全部</button>
+            <button type="button" class="btn btn-outline-secondary" onclick="filterBy('conflict')">有冲突</button>
+            <button type="button" class="btn btn-outline-secondary" onclick="filterBy('review')">待复核</button>
+            <button type="button" class="btn btn-outline-secondary" onclick="filterBy('manual')">人工判</button>
+        </div>
+    </div>
+    <div class="card-body p-0 scrollable-table">
+        <table class="table table-hover mb-0" id="evalTable">
+            <thead class="table-light">
+                <tr>
+                    <th style="width: 80px;">样本ID</th>
+                    <th style="width: 180px;">提示词</th>
+                    <th style="width: 80px;">标签</th>
+                    <th style="width: 100px;">来源</th>
+                    <th style="width: 90px;">模型分数</th>
+                    <th style="width: 80px;">模型判定</th>
+                    <th style="width: 80px;">最终判定</th>
+                    <th style="width: 100px;">判定来源</th>
+                    <th style="width: 100px;">状态</th>
+                    <th style="width: 120px;">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ev in evals %}
+                {% set row_class = '' %}
+                {% if ev.has_conflict %}{% set row_class = 'has-conflict' %}{% endif %}
+                {% if ev.needs_review and not ev.has_conflict %}{% set row_class = 'needs-review' %}{% endif %}
+                <tr class="{{ row_class }}" data-type="{{ 'conflict' if ev.has_conflict else 'review' if ev.needs_review else ev.result_source }}">
+                    <td><code>{{ ev.sample_id }}</code></td>
+                    <td>
+                        <small class="d-inline-block text-truncate" style="max-width: 180px;" title="{{ ev.prompt }}">
+                            {{ ev.prompt }}
+                        </small>
+                    </td>
+                    <td><small class="text-muted">{{ ev.tags }}</small></td>
+                    <td><span class="badge bg-light text-dark">{{ ev.source }}</span></td>
+                    <td>
+                        {% if ev.needs_review %}
+                        <span class="text-warning fw-bold">{{ "%.2f"|format(ev.predict_score) }}</span>
+                        {% elif ev.predict_score >= ev.threshold %}
+                        <span class="text-danger fw-bold">{{ "%.2f"|format(ev.predict_score) }}</span>
+                        {% else %}
+                        <span class="text-success fw-bold">{{ "%.2f"|format(ev.predict_score) }}</span>
+                        {% endif %}
+                        <small class="text-muted">/ {{ ev.threshold }}</small>
+                    </td>
+                    <td>{{ ev.predict_result|result_label|safe }}</td>
+                    <td>{{ ev.final_result|result_label|safe }}</td>
+                    <td>
+                        {% if ev.result_source == 'manual' %}
+                        <span class="badge bg-secondary source-manual">{{ ev.reviewer }}</span>
+                            {% if ev.review_protected %}
+                            <span class="badge protected-badge">受保护</span>
+                            {% endif %}
+                        {% else %}
+                        <span class="badge bg-light text-dark source-model">模型</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if ev.has_conflict %}
+                            {% for c in ev.conflicts %}
+                                {{ c.conflict_type|conflict_type_label|safe }}
+                            {% endfor %}
+                        {% elif ev.needs_review %}
+                            <span class="badge bg-warning">⚠️ 需复核</span>
+                        {% else %}
+                            <span class="badge bg-success">✅ 正常</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            <a href="/sample/{{ ev.sample_id }}" class="btn btn-primary">详情</a>
+                            {% if not ev.review_protected %}
+                            <button type="button" class="btn btn-outline-secondary"
+                                    onclick="openReviewModal('{{ ev.sample_id }}', {{ ev.id }}, {{ ev.predict_result }})">
+                                判罚
+                            </button>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="reviewModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">人工判罚</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="review_sample_id">
+                <input type="hidden" id="review_eval_id">
+                <div class="mb-3">
+                    <label class="form-label">判定结果</label>
+                    <div class="btn-group w-100" role="group">
+                        <input type="radio" class="btn-check" name="final_result" id="res_1" value="1">
+                        <label class="btn btn-outline-danger" for="res_1">🚫 侵权</label>
+                        <input type="radio" class="btn-check" name="final_result" id="res_0" value="0">
+                        <label class="btn btn-outline-success" for="res_0">✅ 非侵权</label>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">判罚说明（必填）</label>
+                    <textarea class="form-control" id="review_note" rows="3"
+                              placeholder="请说明判罚理由，特别是与模型结果不一致的原因..."></textarea>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="override_protected" checked>
+                    <label class="form-check-label" for="override_protected">
+                        <strong>启用覆盖保护</strong>（后续模型重跑不会覆盖此判罚）
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="submitReview()">提交判罚</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="noteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">补录备注</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="note_batch_id" value="{{ batch_id }}">
+                <div class="mb-3">
+                    <label class="form-label">选择样本</label>
+                    <select class="form-select" id="note_sample_id">
+                        {% for ev in evals %}
+                        <option value="{{ ev.sample_id }}">{{ ev.sample_id }} - {{ ev.prompt[:30] }}...</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">备注类型</label>
+                    <select class="form-select" id="note_type">
+                        <option value="general">普通备注</option>
+                        <option value="caliber_update">口径更新</option>
+                        <option value="special_case">特批案例</option>
+                        <option value="data_correction">数据修正</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">备注内容</label>
+                    <textarea class="form-control" id="note_content" rows="4" placeholder="请输入备注内容..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="submitNote()">提交备注</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+    <button type="button" class="btn btn-outline-primary" onclick="openNoteModal()">📝 补录备注</button>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function filterBy(type) {
+    const rows = document.querySelectorAll('#evalTable tbody tr');
+    rows.forEach(row => {
+        if (type === 'all' || row.dataset.type === type) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+function openReviewModal(sampleId, evalId, currentResult) {
+    document.getElementById('review_sample_id').value = sampleId;
+    document.getElementById('review_eval_id').value = evalId;
+    document.getElementById('res_' + currentResult).checked = true;
+    document.getElementById('review_note').value = '';
+    const modal = new bootstrap.Modal(document.getElementById('reviewModal'));
+    modal.show();
+}
+
+function submitReview() {
+    const sampleId = document.getElementById('review_sample_id').value;
+    const evalId = document.getElementById('review_eval_id').value;
+    const finalResult = parseInt(document.querySelector('input[name="final_result"]:checked').value);
+    const reviewNote = document.getElementById('review_note').value;
+    const overrideProtected = document.getElementById('override_protected').checked;
+
+    if (!reviewNote.trim()) {
+        alert('请填写判罚说明！');
+        return;
+    }
+
+    fetch('/api/review', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            sample_id: sampleId,
+            evaluation_log_id: evalId,
+            final_result: finalResult,
+            review_note: reviewNote,
+            override_protected: overrideProtected
+        })
+    }).then(r => r.json()).then(data => {
+        if (data.success) {
+            alert('判罚提交成功！');
+            location.reload();
+        } else {
+            alert('提交失败：' + data.error);
+        }
+    });
+}
+
+function openNoteModal() {
+    const modal = new bootstrap.Modal(document.getElementById('noteModal'));
+    modal.show();
+}
+
+function submitNote() {
+    const sampleId = document.getElementById('note_sample_id').value;
+    const batchId = document.getElementById('note_batch_id').value;
+    const noteContent = document.getElementById('note_content').value;
+    const noteType = document.getElementById('note_type').value;
+
+    if (!noteContent.trim()) {
+        alert('请填写备注内容！');
+        return;
+    }
+
+    fetch('/api/note', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            sample_id: sampleId,
+            batch_id: batchId,
+            note_content: noteContent,
+            note_type: noteType
+        })
+    }).then(r => r.json()).then(data => {
+        if (data.success) {
+            alert('备注提交成功！\n\n差异说明：' + data.diff_description);
+            location.reload();
+        } else {
+            alert('提交失败：' + data.error);
+        }
+    });
+}
+
+function runBatch(modelVersionId) {
+    if (!confirm('确定要使用该模型版本重跑批次吗？受保护的人工判罚样本不会被覆盖。')) {
+        return;
+    }
+
+    fetch('/api/run_batch', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            batch_id: '{{ batch_id }}',
+            model_version_id: modelVersionId
+        })
+    }).then(r => r.json()).then(data => {
+        if (data.success) {
+            let msg = '重跑完成！\n';
+            msg += `处理样本：${data.metrics.processed} 个\n`;
+            msg += `跳过受保护：${data.metrics.skipped_protected} 个\n`;
+            msg += `发现冲突：${data.metrics.conflicts} 条\n`;
+            if (data.skipped_protected.length > 0) {
+                msg += '\n跳过的受保护样本：\n';
+                data.skipped_protected.forEach(s => {
+                    msg += `  ${s.sample_id} - ${s.reviewer}\n`;
+                });
+            }
+            alert(msg);
+            location.reload();
+        } else {
+            alert('重跑失败：' + data.error);
+        }
+    });
+}
+</script>
+{% endblock %}

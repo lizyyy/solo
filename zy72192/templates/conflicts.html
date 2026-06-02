@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% block title %}冲突告警 - AI绘画素材版权排查{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2>⚠️ 冲突告警列表</h2>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">批次列表</a></li>
+                {% if batch_id %}
+                <li class="breadcrumb-item"><a href="/batch/{{ batch_id }}">{{ batch_id }}</a></li>
+                {% endif %}
+                <li class="breadcrumb-item active">冲突告警</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="btn-group">
+        <button type="button" class="btn btn-outline-secondary" onclick="filterConflicts('all')">全部</button>
+        <button type="button" class="btn btn-warning" onclick="filterConflicts('unresolved')">待处理</button>
+        <button type="button" class="btn btn-success" onclick="filterConflicts('resolved')">已解决</button>
+    </div>
+</div>
+
+<div class="alert alert-warning">
+    <h6>💡 说明</h6>
+    <ul class="mb-0 small">
+        <li><strong>标签冲突</strong>：模型预测结果与人工标注不一致，需要重点复核判定边界</li>
+        <li><strong>样本泄漏</strong>：检测到训练样本出现在评测集中，该样本评测指标作废，不参与平均指标计算</li>
+        <li>所有冲突都会单独列出，不会被平均指标掩盖。已人工判罚的标签冲突会自动标记为已解决。</li>
+    </ul>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card bg-warning text-white">
+            <div class="card-body text-center">
+                <h3 class="display-5">{{ conflicts|selectattr('resolved', 'equalto', 0)|list|length }}</h3>
+                <p class="mb-0">待处理冲突</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-success text-white">
+            <div class="card-body text-center">
+                <h3 class="display-5">{{ conflicts|selectattr('resolved', 'equalto', 1)|list|length }}</h3>
+                <p class="mb-0">已解决冲突</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-info text-white">
+            <div class="card-body text-center">
+                <h3 class="display-5">{{ conflicts|length }}</h3>
+                <p class="mb-0">总计</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-light">
+        <h5 class="mb-0">冲突详情</h5>
+    </div>
+    <div class="card-body p-0 scrollable-table">
+        <table class="table table-hover mb-0" id="conflictTable">
+            <thead class="table-light">
+                <tr>
+                    <th>冲突类型</th>
+                    <th>样本ID</th>
+                    <th>提示词</th>
+                    <th>模型分数</th>
+                    <th>模型判定</th>
+                    <th>标注判定</th>
+                    <th>描述</th>
+                    <th>检测时间</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in conflicts %}
+                <tr class="{% if c.resolved == 0 %}table-danger{% else %}table-success{% endif %}"
+                    data-status="{{ 'unresolved' if c.resolved == 0 else 'resolved' }}">
+                    <td>{{ c.conflict_type|conflict_type_label|safe }}</td>
+                    <td><code>{{ c.sample_id }}</code></td>
+                    <td>
+                        <small class="d-inline-block text-truncate" style="max-width: 200px;" title="{{ c.prompt }}">
+                            {{ c.prompt }}
+                        </small>
+                    </td>
+                    <td>
+                        {% if c.predict_score is not none %}
+                        <span class="fw-bold">{{ "%.2f"|format(c.predict_score) }}</span>
+                        {% else %}
+                        -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if c.model_result is not none %}
+                        {{ c.model_result|result_label|safe }}
+                        {% else %}
+                        -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if c.annotation_result is not none %}
+                        {{ c.annotation_result|result_label|safe }}
+                        {% else %}
+                        -
+                        {% endif %}
+                    </td>
+                    <td>
+                        <small class="d-inline-block text-truncate" style="max-width: 250px;" title="{{ c.description }}">
+                            {{ c.description }}
+                        </small>
+                    </td>
+                    <td><small>{{ c.detected_at|format_dt }}</small></td>
+                    <td>
+                        {% if c.resolved == 1 %}
+                        <span class="badge bg-success">✅ 已解决</span>
+                        {% else %}
+                        <span class="badge bg-warning">⏳ 待处理</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="/sample/{{ c.sample_id }}" class="btn btn-sm btn-primary">查看详情</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="10" class="text-center text-muted py-4">
+                        🎉 暂无冲突记录，所有样本判定一致！
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function filterConflicts(status) {
+    const rows = document.querySelectorAll('#conflictTable tbody tr');
+    rows.forEach(row => {
+        if (status === 'all' || row.dataset.status === status) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block title %}批次列表 - AI绘画素材版权排查{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>📋 排查批次列表</h2>
+    <div>
+        <span class="text-muted">当前操作员：风控运营-老唐</span>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card metric-card bg-primary text-white">
+            <div class="card-body text-center">
+                <h5 class="display-6">{{ batches|sum(attribute='sample_count') if batches else 0 }}</h5>
+                <p class="mb-0">总样本数</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card metric-card bg-danger text-white">
+            <div class="card-body text-center">
+                <h5 class="display-6">
+                    {% set ns = namespace(pos=0) %}
+                    {% for b in batches %}
+                        {% set m = b.metrics_json %}
+                        {% if m is mapping %}
+                            {% set ns.pos = ns.pos + (m.positives or 0) %}
+                        {% endif %}
+                    {% endfor %}
+                    {{ ns.pos }}
+                </h5>
+                <p class="mb-0">侵权样本</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card metric-card bg-warning text-white">
+            <div class="card-body text-center">
+                <h5 class="display-6">
+                    {% set ns = namespace(c=0) %}
+                    {% for b in batches %}
+                        {% set m = b.metrics_json %}
+                        {% if m is mapping %}
+                            {% set ns.c = ns.c + (m.conflicts or 0) %}
+                        {% endif %}
+                    {% endfor %}
+                    {{ ns.c }}
+                </h5>
+                <p class="mb-0">标签冲突</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card metric-card bg-info text-white">
+            <div class="card-body text-center">
+                <h5 class="display-6">{{ batches|length }}</h5>
+                <p class="mb-0">排查批次</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-light">
+        <h5 class="mb-0">批次记录</h5>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>批次ID</th>
+                    <th>模型版本</th>
+                    <th>阈值</th>
+                    <th>样本数</th>
+                    <th>侵权数</th>
+                    <th>需复核</th>
+                    <th>冲突数</th>
+                    <th>操作人员</th>
+                    <th>运行时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for batch in batches %}
+                <tr>
+                    <td><code>{{ batch.batch_id }}</code></td>
+                    <td><span class="badge bg-secondary">{{ batch.version_name }}</span></td>
+                    <td>{{ batch.threshold }}</td>
+                    <td>{{ batch.sample_count }}</td>
+                    {% set m = batch.metrics_json %}
+                    {% if m is mapping %}
+                    <td><span class="badge bg-danger">{{ m.positives or 0 }}</span></td>
+                    <td><span class="badge bg-warning">{{ m.needs_review or 0 }}</span></td>
+                    <td>
+                        {% if m.conflicts %}
+                        <a href="/conflicts?batch_id={{ batch.batch_id }}" class="text-decoration-none">
+                            <span class="badge bg-danger">{{ m.conflicts }}</span>
+                        </a>
+                        {% else %}
+                        <span class="text-muted">0</span>
+                        {% endif %}
+                    </td>
+                    {% else %}
+                    <td>-</td><td>-</td><td>-</td>
+                    {% endif %}
+                    <td>{{ batch.operator }}</td>
+                    <td>{{ batch.run_at|format_dt }}</td>
+                    <td>
+                        <a href="/batch/{{ batch.batch_id }}" class="btn btn-sm btn-primary">查看详情</a>
+                        <a href="/compare/{{ batch.batch_id }}" class="btn btn-sm btn-outline-secondary">版本对比</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="10" class="text-center text-muted py-4">暂无批次记录，请先初始化样例数据</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="alert alert-info mt-4">
+    <h6>💡 系统特点</h6>
+    <ul class="mb-0 small">
+        <li><strong>版本可追溯</strong>：每批次记录模型版本、阈值、阈值备注</li>
+        <li><strong>人工改判保护</strong>：已人工判罚的样本，新模型结果不会覆盖</li>
+        <li><strong>冲突单独提示</strong>：标签冲突、样本泄漏不被平均指标掩盖</li>
+        <li><strong>导出带原因</strong>：CSV导出包含完整的侵权判定原因链</li>
+        <li><strong>重跑可分析</strong>：指标变化和样本变化分开解释，换人也能看懂</li>
+    </ul>
+</div>
+{% endblock %}

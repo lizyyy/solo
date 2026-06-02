@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AI绘画素材版权排查{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .navbar-brand { font-weight: bold; color: #2c3e50 !important; }
+        .result-card { margin-bottom: 15px; }
+        .conflict-badge { margin-right: 5px; }
+        .evidence-item { padding: 8px; margin: 5px 0; background: #f8f9fa; border-radius: 4px; }
+        .timeline { border-left: 3px solid #e9ecef; margin: 20px 0; padding-left: 20px; }
+        .timeline-item { position: relative; margin-bottom: 15px; }
+        .timeline-item::before {
+            content: ''; position: absolute; left: -26px; top: 5px;
+            width: 12px; height: 12px; border-radius: 50%;
+            background: #0d6efd; border: 2px solid #fff;
+        }
+        .protected-badge { background: linear-gradient(45deg, #ff6b6b, #ee5a24); }
+        .needs-review { background-color: #fff3cd !important; }
+        .has-conflict { background-color: #f8d7da !important; }
+        .source-model::before { content: '🤖 '; }
+        .source-manual::before { content: '👤 '; }
+        .diff-add { color: #28a745; }
+        .diff-del { color: #dc3545; }
+        .metric-card { transition: transform 0.2s; }
+        .metric-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .scrollable-table { overflow-x: auto; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 4px; font-size: 12px; }
+        .reason-text { font-size: 13px; color: #495057; line-height: 1.6; }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+    <div class="container">
+        <a class="navbar-brand" href="/">🎨 AI绘画素材版权排查</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">批次列表</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/conflicts">冲突告警</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-info">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+</div>
+
+<footer class="text-center text-muted mt-5 mb-3">
+    <small>风控算法运营 · 版权排查系统 v1.0 · 判断过程全程留痕 · 人工改判不可覆盖</small>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

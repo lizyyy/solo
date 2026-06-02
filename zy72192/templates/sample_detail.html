@@ -1,0 +1,404 @@
+{% extends "base.html" %}
+{% block title %}样本详情 - {{ sample_id }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2>📄 样本详情</h2>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">批次列表</a></li>
+                <li class="breadcrumb-item"><a href="/batch/{{ detail.sample.batch_id }}">{{ detail.sample.batch_id }}</a></li>
+                <li class="breadcrumb-item active">{{ sample_id }}</li>
+            </ol>
+        </nav>
+    </div>
+    <div>
+        {% if not detail.has_protected_review and detail.evaluations %}
+        <button type="button" class="btn btn-primary"
+                onclick="openReviewModal('{{ detail.evaluations[0].id }}', {{ detail.evaluations[0].predict_result }})">
+            ✍️ 人工判罚
+        </button>
+        {% endif %}
+        {% if detail.has_protected_review %}
+        <span class="badge protected-badge fs-6">🔒 该样本人工判罚已受保护</span>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card result-card">
+            <div class="card-header bg-light">
+                <h6 class="mb-0">📌 当前判定结果</h6>
+            </div>
+            <div class="card-body text-center">
+                {% if detail.current_result %}
+                    {% if detail.current_result.result == 1 %}
+                    <h1 class="text-danger display-4">🚫 侵权</h1>
+                    {% else %}
+                    <h1 class="text-success display-4">✅ 非侵权</h1>
+                    {% endif %}
+                    <p class="text-muted mb-2">
+                        {% if detail.current_result.source == 'manual' %}
+                        <span class="source-manual">人工判罚</span> · {{ detail.current_result.reviewer }}
+                        {% if detail.current_result.protected %}
+                        <span class="badge protected-badge ms-2">受保护</span>
+                        {% endif %}
+                        {% else %}
+                        <span class="source-model">模型判定</span> · {{ detail.current_result.version }}
+                        {% endif %}
+                    </p>
+                    <small class="text-muted">{{ detail.current_result.at|format_dt }}</small>
+                {% else %}
+                <h1 class="text-muted display-4">❓ 未判定</h1>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card result-card">
+            <div class="card-header bg-light">
+                <h6 class="mb-0">🖼️ 样本信息</h6>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0 small">
+                    <dt class="col-sm-4">样本ID</dt>
+                    <dd class="col-sm-8"><code>{{ detail.sample.sample_id }}</code></dd>
+                    <dt class="col-sm-4">来源</dt>
+                    <dd class="col-sm-8">{{ detail.sample.source }}</dd>
+                    <dt class="col-sm-4">标签</dt>
+                    <dd class="col-sm-8">{{ detail.sample.tags }}</dd>
+                    <dt class="col-sm-4">创建时间</dt>
+                    <dd class="col-sm-8">{{ detail.sample.created_at|format_dt }}</dd>
+                </dl>
+                <hr>
+                <p class="mb-1"><strong>提示词：</strong></p>
+                <p class="text-muted small mb-0">{{ detail.sample.prompt }}</p>
+            </div>
+        </div>
+
+        {% if detail.evaluations %}
+        <div class="card result-card">
+            <div class="card-header bg-light">
+                <h6 class="mb-0">🔬 最新模型评估</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>置信度分数</span>
+                        <strong class="
+                            {% if detail.evaluations[0].predict_score >= detail.evaluations[0].threshold %}text-danger
+                            {% elif detail.evaluations[0].predict_score >= detail.evaluations[0].threshold - 0.1 %}text-warning
+                            {% else %}text-success{% endif %}
+                        ">{{ "%.4f"|format(detail.evaluations[0].predict_score) }}</strong>
+                    </div>
+                    <div class="progress" style="height: 20px;">
+                        <div class="progress-bar
+                            {% if detail.evaluations[0].predict_result == 1 %}bg-danger{% else %}bg-success{% endif %}"
+                             style="width: {{ detail.evaluations[0].predict_score * 100 }}%"></div>
+                        <div class="position-absolute" style="left: {{ detail.evaluations[0].threshold * 100 }}%; top: 0;">
+                            <div style="border-left: 2px dashed #ffc107; height: 20px;"></div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between mt-1 text-muted small">
+                        <span>0.0</span>
+                        <span class="text-warning">阈值 {{ detail.evaluations[0].threshold }}</span>
+                        <span>1.0</span>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <span class="badge bg-secondary">{{ detail.evaluations[0].version_name }}</span>
+                    <small class="text-muted ms-2">{{ detail.evaluations[0].created_at|format_dt }}</small>
+                </div>
+                <p class="mb-1"><strong>判定原因：</strong></p>
+                <p class="reason-text mb-0">{{ detail.evaluations[0].reasons }}</p>
+                {% if detail.evaluations[0].threshold_note %}
+                <div class="alert alert-warning mt-2 mb-0">
+                    <small><strong>📝 阈值备注：</strong>{{ detail.evaluations[0].threshold_note }}</small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-md-8">
+        <div class="card result-card">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">📜 判断过程时间线（全程留痕，可追溯）</h6>
+                <span class="text-muted small">共 {{ detail.evaluations|length + detail.reviews|length + detail.annotations|length + detail.notes|length }} 条记录</span>
+            </div>
+            <div class="card-body">
+                <div class="timeline">
+                    {% set all_events = [] %}
+                    {% for e in detail.evaluations %}
+                        {% set _ = all_events.append({'type': 'eval', 'time': e.created_at, 'data': e}) %}
+                    {% endfor %}
+                    {% for r in detail.reviews %}
+                        {% set _ = all_events.append({'type': 'review', 'time': r.reviewed_at, 'data': r}) %}
+                    {% endfor %}
+                    {% for a in detail.annotations %}
+                        {% set _ = all_events.append({'type': 'annotation', 'time': a.annotated_at, 'data': a}) %}
+                    {% endfor %}
+                    {% for n in detail.notes %}
+                        {% set _ = all_events.append({'type': 'note', 'time': n.created_at, 'data': n}) %}
+                    {% endfor %}
+                    {% for c in detail.conflicts %}
+                        {% set _ = all_events.append({'type': 'conflict', 'time': c.detected_at, 'data': c}) %}
+                    {% endfor %}
+
+                    {% for event in all_events|sort(attribute='time', reverse=true) %}
+                    <div class="timeline-item">
+                        <div class="d-flex justify-content-between align-items-start mb-1">
+                            {% if event.type == 'eval' %}
+                            <span class="badge bg-info">🤖 模型评估</span>
+                            {% elif event.type == 'review' %}
+                            <span class="badge bg-secondary">👤 人工判罚</span>
+                            {% elif event.type == 'annotation' %}
+                            <span class="badge bg-dark">📋 标注表</span>
+                            {% elif event.type == 'note' %}
+                            <span class="badge bg-primary">📝 补录备注</span>
+                            {% elif event.type == 'conflict' %}
+                            <span class="badge bg-danger">⚠️ 冲突告警</span>
+                            {% endif %}
+                            <small class="text-muted">{{ event.time|format_dt }}</small>
+                        </div>
+
+                        {% if event.type == 'eval' %}
+                        <div class="card card-body bg-light">
+                            <p class="mb-1">
+                                <strong>模型：</strong>{{ event.data.version_name }}
+                                <strong class="ms-3">阈值：</strong>{{ event.data.threshold }}
+                                <strong class="ms-3">分数：</strong>
+                                <span class="{% if event.data.predict_result == 1 %}text-danger{% else %}text-success{% endif %} fw-bold">
+                                    {{ "%.4f"|format(event.data.predict_score) }} → {{ '侵权' if event.data.predict_result == 1 else '非侵权' }}
+                                </span>
+                            </p>
+                            <p class="mb-2 reason-text"><strong>原因：</strong>{{ event.data.reasons }}</p>
+                            {% if event.data.evidence_json %}
+                            <p class="mb-1"><small><strong>证据链：</strong></small></p>
+                            {% for ev in event.data.evidence_json %}
+                            <div class="evidence-item small">
+                                {% if ev.type == 'image_similarity' %}
+                                🔍 图像相似：匹配到「{{ ev.top1_match }}」，相似度 {{ ev.similarity }}
+                                {% elif ev.type == 'character_detection' %}
+                                👤 角色检测：检测到「{{ ev.detected }}」，置信度 {{ ev.confidence }}
+                                {% elif ev.type == 'style_classification' %}
+                                🎨 风格分类：{{ ev.top_style }}，置信度 {{ ev.confidence }}
+                                {% elif ev.type == 'text_matching' %}
+                                📝 文本匹配：{{ ev.prompt_match }}，分数 {{ ev.score }}
+                                {% elif ev.type == 'composition_match' %}
+                                🖼️ 构图匹配：分数 {{ ev.match_score }}，{{ ev.note }}
+                                {% elif ev.type == 'train_set_check' %}
+                                ⚠️ 训练集检查：{% if ev.in_train %}<span class="text-danger">样本泄漏！</span>训练集ID {{ ev.train_id }}{% else %}未在训练集{% endif %}
+                                {% else %}
+                                {{ ev.type }}: {{ ev }}
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                        {% endif %}
+
+                        {% if event.type == 'review' %}
+                        <div class="card card-body bg-light">
+                            <p class="mb-1">
+                                <strong>判罚人：</strong>{{ event.data.reviewer }}
+                                <strong class="ms-3">结果：</strong>
+                                <span class="{% if event.data.final_result == 1 %}text-danger{% else %}text-success{% endif %} fw-bold">
+                                    {{ '侵权' if event.data.final_result == 1 else '非侵权' }}
+                                </span>
+                                {% if event.data.override_protected == 1 %}
+                                <span class="badge protected-badge ms-2">🔒 已启用覆盖保护</span>
+                                {% endif %}
+                            </p>
+                            <p class="mb-0 reason-text"><strong>判罚说明：</strong>{{ event.data.review_note }}</p>
+                        </div>
+                        {% endif %}
+
+                        {% if event.type == 'annotation' %}
+                        <div class="card card-body bg-light">
+                            <p class="mb-1">
+                                <strong>标注人：</strong>{{ event.data.annotator }}
+                                <strong class="ms-3">口径版本：</strong>{{ event.data.caliber_version }}
+                                <strong class="ms-3">结果：</strong>
+                                <span class="{% if event.data.is_copyright == 1 %}text-danger{% else %}text-success{% endif %} fw-bold">
+                                    {{ '侵权' if event.data.is_copyright == 1 else '非侵权' }}
+                                </span>
+                            </p>
+                            {% if event.data.copyright_type %}
+                            <p class="mb-1"><small><strong>侵权类型：</strong>{{ event.data.copyright_type }}</small></p>
+                            {% endif %}
+                            <p class="mb-0 reason-text"><strong>口径说明：</strong>{{ event.data.note }}</p>
+                        </div>
+                        {% endif %}
+
+                        {% if event.type == 'note' %}
+                        <div class="card card-body bg-light">
+                            <p class="mb-1">
+                                <strong>操作人：</strong>{{ event.data.operator or '未知' }}
+                                <strong class="ms-3">类型：</strong>
+                                <span class="badge
+                                    {% if event.data.note_type == 'caliber_update' %}bg-warning
+                                    {% elif event.data.note_type == 'special_case' %}bg-danger
+                                    {% elif event.data.note_type == 'data_correction' %}bg-info
+                                    {% else %}bg-secondary{% endif %}
+                                ">{{ event.data.note_type }}</span>
+                            </p>
+                            <p class="mb-1 reason-text"><strong>备注内容：</strong>{{ event.data.note_content }}</p>
+                            <div class="alert alert-info mb-0 small">
+                                <strong>📊 差异说明：</strong>{{ event.data.diff_description }}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if event.type == 'conflict' %}
+                        <div class="card card-body {% if event.data.resolved == 1 %}bg-success bg-opacity-10{% else %}bg-danger bg-opacity-10{% endif %}">
+                            <p class="mb-1">
+                                {{ event.data.conflict_type|conflict_type_label|safe }}
+                                {% if event.data.resolved == 1 %}
+                                <span class="badge bg-success ms-2">✅ 已解决</span>
+                                {% else %}
+                                <span class="badge bg-warning ms-2">⏳ 待处理</span>
+                                {% endif %}
+                            </p>
+                            <p class="mb-0 reason-text">{{ event.data.description }}</p>
+                            {% if event.data.model_result is not none or event.data.annotation_result is not none %}
+                            <p class="mt-2 mb-0 small text-muted">
+                                {% if event.data.model_result is not none %}
+                                模型判定：{{ '侵权' if event.data.model_result == 1 else '非侵权' }}
+                                {% endif %}
+                                {% if event.data.annotation_result is not none %}
+                                <span class="ms-3">标注判定：{{ '侵权' if event.data.annotation_result == 1 else '非侵权' }}</span>
+                                {% endif %}
+                            </p>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-light">
+                <h6 class="mb-0">🔍 判定原因聚合</h6>
+            </div>
+            <div class="card-body">
+                {% set reasons = [] %}
+                {% if detail.current_result %}
+                    {% if detail.current_result.source == 'manual' %}
+                        {% set _ = reasons.append('👤 人工判罚（' + detail.current_result.reviewer + '）') %}
+                        {% if detail.current_result.protected %}
+                            {% set _ = reasons.append('🔒 此判罚已受保护，不可被模型覆盖') %}
+                        {% endif %}
+                        {% if detail.current_result.note %}
+                            {% set _ = reasons.append('📝 人工说明：' + detail.current_result.note) %}
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+                {% for e in detail.evaluations[:1] %}
+                    {% if e.reasons %}
+                        {% set _ = reasons.append('🤖 模型原因：' + e.reasons) %}
+                    {% endif %}
+                {% endfor %}
+                {% for a in detail.annotations[:1] %}
+                    {% set _ = reasons.append('📋 口径' + (a.caliber_version or '') + '：' + (a.note or '')) %}
+                {% endfor %}
+                {% for n in detail.notes %}
+                    {% set _ = reasons.append('📝 备注[' + n.note_type + ']：' + n.note_content) %}
+                {% endfor %}
+
+                <ol class="mb-0">
+                    {% for r in reasons %}
+                    <li class="reason-text mb-2">{{ r }}</li>
+                    {% endfor %}
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="reviewModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">人工判罚 - {{ sample_id }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="review_eval_id">
+                <div class="mb-3">
+                    <label class="form-label">判定结果</label>
+                    <div class="btn-group w-100" role="group">
+                        <input type="radio" class="btn-check" name="final_result" id="res_1" value="1">
+                        <label class="btn btn-outline-danger" for="res_1">🚫 侵权</label>
+                        <input type="radio" class="btn-check" name="final_result" id="res_0" value="0">
+                        <label class="btn btn-outline-success" for="res_0">✅ 非侵权</label>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">判罚说明（必填）</label>
+                    <textarea class="form-control" id="review_note" rows="4"
+                              placeholder="请详细说明判罚理由，特别是与模型结果不一致的原因..."></textarea>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="override_protected" checked>
+                    <label class="form-check-label" for="override_protected">
+                        <strong>启用覆盖保护</strong>（后续模型重跑不会覆盖此判罚）
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="submitReview()">提交判罚</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function openReviewModal(evalId, currentResult) {
+    document.getElementById('review_eval_id').value = evalId;
+    document.getElementById('res_' + currentResult).checked = true;
+    document.getElementById('review_note').value = '';
+    const modal = new bootstrap.Modal(document.getElementById('reviewModal'));
+    modal.show();
+}
+
+function submitReview() {
+    const evalId = document.getElementById('review_eval_id').value;
+    const finalResult = parseInt(document.querySelector('input[name="final_result"]:checked').value);
+    const reviewNote = document.getElementById('review_note').value;
+    const overrideProtected = document.getElementById('override_protected').checked;
+
+    if (!reviewNote.trim()) {
+        alert('请填写判罚说明！');
+        return;
+    }
+
+    fetch('/api/review', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            sample_id: '{{ sample_id }}',
+            evaluation_log_id: parseInt(evalId),
+            final_result: finalResult,
+            review_note: reviewNote,
+            override_protected: overrideProtected
+        })
+    }).then(r => r.json()).then(data => {
+        if (data.success) {
+            alert('判罚提交成功！');
+            location.reload();
+        } else {
+            alert('提交失败：' + data.error);
+        }
+    });
+}
+</script>
+{% endblock %}
