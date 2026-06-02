@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>老旧小区停车错峰 - 数据管理工具</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <header>
+        <h1>🅿️ 老旧小区停车错峰 · 数据管理</h1>
+        <p class="subtitle">导入 · 归并 · 审核 · 导出 · 每条记录可追来源</p>
+    </header>
+
+    <nav class="tabs">
+        <button class="tab active" data-tab="import">📥 导入</button>
+        <button class="tab" data-tab="review">📋 审核</button>
+        <button class="tab" data-tab="conflicts">⚠️ 冲突</button>
+        <button class="tab" data-tab="supplement">📝 补录</button>
+        <button class="tab" data-tab="export">📤 导出</button>
+        <button class="tab" data-tab="guide">📖 说明</button>
+    </nav>
+
+    <main>
+        <!-- 导入面板 -->
+        <section id="tab-import" class="tab-content active">
+            <div class="card">
+                <h2>快速加载样例数据</h2>
+                <p>加载"老旧小区停车错峰"样例，包含同名路口、重复投诉、坐标偏移和跨时段统计场景。</p>
+                <button id="btn-load-sample" class="btn primary">加载样例数据</button>
+                <div id="sample-result" class="result-box"></div>
+            </div>
+
+            <div class="card">
+                <h2>导入点位数据（CSV）</h2>
+                <p>CSV列：点位名称、路口名称、地址、经度、纬度、时段、容量、小区名称、来源、来源详情、备注、数据时段</p>
+                <form id="form-import-spots" enctype="multipart/form-data">
+                    <input type="file" name="file" accept=".csv" required>
+                    <button type="submit" class="btn">导入点位</button>
+                </form>
+                <div id="import-spots-result" class="result-box"></div>
+            </div>
+
+            <div class="card">
+                <h2>导入审批台账（CSV）</h2>
+                <p>CSV列：项目名称、路口名称、地址、批准时段、批准容量、审批日期、审批文号、备注、数据时段</p>
+                <form id="form-import-approval" enctype="multipart/form-data">
+                    <input type="file" name="file" accept=".csv" required>
+                    <button type="submit" class="btn">导入台账</button>
+                </form>
+                <div id="import-approval-result" class="result-box"></div>
+            </div>
+
+            <div class="card">
+                <h2>补充照片</h2>
+                <p>为指定点位补充现场照片，照片信息会记入来源详情。</p>
+                <form id="form-photo" enctype="multipart/form-data">
+                    <select id="photo-spot-id" name="spot_id" required>
+                        <option value="">选择点位</option>
+                    </select>
+                    <input type="file" name="file" accept="image/*" required>
+                    <button type="submit" class="btn">上传照片</button>
+                </form>
+                <div id="photo-result" class="result-box"></div>
+            </div>
+
+            <div class="card danger-zone">
+                <h2>⚠️ 重置数据</h2>
+                <button id="btn-reset" class="btn danger">清空所有数据</button>
+            </div>
+        </section>
+
+        <!-- 审核面板 -->
+        <section id="tab-review" class="tab-content">
+            <div class="card">
+                <h2>点位审核</h2>
+                <div class="filter-bar">
+                    <label>审核状态：</label>
+                    <select id="filter-status">
+                        <option value="">全部</option>
+                        <option value="待审核">待审核</option>
+                        <option value="已通过">已通过</option>
+                        <option value="已驳回">已驳回</option>
+                    </select>
+                    <label>搜索路口：</label>
+                    <input type="text" id="filter-intersection" placeholder="输入路口名称">
+                </div>
+                <div class="table-wrap">
+                    <table id="review-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>点位名称</th>
+                                <th>路口名称</th>
+                                <th>小区</th>
+                                <th>时段</th>
+                                <th>容量</th>
+                                <th>数据时段</th>
+                                <th>来源</th>
+                                <th>审核状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>来源追溯</h2>
+                <p>点击表格中任意行查看该点位的完整来源链和合并历史。</p>
+                <div id="trace-detail" class="trace-box">选择一条记录查看来源</div>
+            </div>
+
+            <div class="card">
+                <h2>归并报告</h2>
+                <div id="merge-report" class="report-box">暂无归并报告，请先导入数据</div>
+            </div>
+
+            <div class="card">
+                <h2>重复投诉检测</h2>
+                <div id="duplicate-report" class="report-box">暂无重复投诉</div>
+            </div>
+        </section>
+
+        <!-- 冲突面板 -->
+        <section id="tab-conflicts" class="tab-content">
+            <div class="card">
+                <h2>冲突检测报告</h2>
+                <p>审批台账与导入数据冲突时，两边证据和建议动作均列出，不做自动决定。</p>
+                <div id="conflict-list"></div>
+            </div>
+
+            <div class="card">
+                <h2>容量异常</h2>
+                <div id="overflow-list"></div>
+            </div>
+        </section>
+
+        <!-- 补录面板 -->
+        <section id="tab-supplement" class="tab-content">
+            <div class="card">
+                <h2>补录备注</h2>
+                <p>先跑一小包材料，再临时补一条备注。补录后差异会讲清楚。</p>
+                <div class="supplement-form">
+                    <select id="supplement-spot-id" required>
+                        <option value="">选择点位</option>
+                    </select>
+                    <textarea id="supplement-note" rows="3" placeholder="输入补录备注内容，例如：经现场核实，实际开放车位为12个"></textarea>
+                    <button id="btn-supplement" class="btn primary">补录</button>
+                </div>
+                <div id="supplement-result" class="result-box"></div>
+            </div>
+
+            <div class="card">
+                <h2>补录差异报告</h2>
+                <div id="diff-report" class="report-box">暂无差异报告，补录后将展示变更</div>
+            </div>
+        </section>
+
+        <!-- 导出面板 -->
+        <section id="tab-export" class="tab-content">
+            <div class="card">
+                <h2>导出公示清单</h2>
+                <p>导出时携带"老旧小区停车错峰"原因标记，冲突信息一并导出。</p>
+                <div class="filter-bar">
+                    <label>筛选状态：</label>
+                    <select id="export-status-filter">
+                        <option value="">全部</option>
+                        <option value="已通过">仅已通过</option>
+                        <option value="待审核">仅待审核</option>
+                    </select>
+                </div>
+                <button id="btn-export-public" class="btn primary">导出公示清单 (CSV)</button>
+            </div>
+
+            <div class="card">
+                <h2>导出冲突报告</h2>
+                <p>包含冲突类型、双方证据、建议动作，便于人工复核。</p>
+                <button id="btn-export-conflicts" class="btn">导出冲突报告 (CSV)</button>
+            </div>
+
+            <div class="card">
+                <h2>导出差异报告</h2>
+                <p>补录后的变更对比，含"老旧小区停车错峰"标记。</p>
+                <button id="btn-export-diff" class="btn">导出差异报告 (CSV)</button>
+            </div>
+        </section>
+
+        <!-- 说明面板 -->
+        <section id="tab-guide" class="tab-content">
+            <div class="card">
+                <h2>📖 使用说明</h2>
+                <div class="guide-content">
+                    <h3>一、导入点位数据</h3>
+                    <ol>
+                        <li>准备 CSV 文件，列头须包含：点位名称、路口名称、地址、经度、纬度、时段、容量、小区名称、来源、来源详情、备注、数据时段</li>
+                        <li>在「导入」面板选择文件并点击「导入点位」</li>
+                        <li>系统自动归并同名路口点位：距离 &lt; 50米合并，距离 &lt; 30米视为坐标偏移</li>
+                        <li>合并后来源详情会记录合并来源，确保每条都能追溯到原始材料</li>
+                    </ol>
+
+                    <h3>二、导入审批台账</h3>
+                    <ol>
+                        <li>准备 CSV 文件，列头须包含：项目名称、路口名称、地址、批准时段、批准容量、审批日期、审批文号、备注、数据时段</li>
+                        <li>在「导入」面板选择文件并点击「导入台账」</li>
+                        <li>导入后系统自动与点位数据比对，生成冲突报告</li>
+                    </ol>
+
+                    <h3>三、补充照片</h3>
+                    <ol>
+                        <li>在「导入」面板选择点位和照片文件</li>
+                        <li>照片信息记入来源详情，可追溯</li>
+                    </ol>
+
+                    <h3>四、人工审核</h3>
+                    <ol>
+                        <li>在「审核」面板查看所有点位，按状态筛选</li>
+                        <li>点击行查看来源追溯详情</li>
+                        <li>逐条通过或驳回，可添加审核备注</li>
+                    </ol>
+
+                    <h3>五、处理冲突</h3>
+                    <ol>
+                        <li>在「冲突」面板查看审批台账与导入数据的差异</li>
+                        <li>系统列出双方证据和建议动作，不做自动决定</li>
+                        <li>人工判断后标记"已处理"或"已忽略"并添加备注</li>
+                    </ol>
+
+                    <h3>六、补录备注</h3>
+                    <ol>
+                        <li>先跑一小包材料审核，再在「补录」面板临时补充备注</li>
+                        <li>补录后系统生成差异报告，讲清楚变更了什么</li>
+                    </ol>
+
+                    <h3>七、导出公示清单</h3>
+                    <ol>
+                        <li>在「导出」面板选择筛选条件</li>
+                        <li>导出的 CSV 包含"老旧小区停车错峰"原因标记、冲突标记和冲突原因</li>
+                        <li>冲突报告和差异报告也可单独导出</li>
+                    </ol>
+
+                    <h3>关键词：老旧小区停车错峰</h3>
+                    <p>本工具围绕"老旧小区停车错峰"场景设计，所有记录可追到审批台账来源。容量超限和时段冲突会用"人话"描述，导出也带着原因，不会只在页面上闪一下。</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="toast" class="toast hidden"></div>
+    <div id="modal-overlay" class="modal-overlay hidden">
+        <div class="modal">
+            <h3 id="modal-title"></h3>
+            <div id="modal-body"></div>
+            <div class="modal-actions">
+                <button id="modal-confirm" class="btn primary">确认</button>
+                <button id="modal-cancel" class="btn">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
