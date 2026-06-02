@@ -1,0 +1,30 @@
+[
+  {
+    "rule_name": "大额交易预警",
+    "threshold_value": 500000,
+    "comparison_type": ">=",
+    "description": "单笔交易金额超过50万元触发预警",
+    "model_version": "v1.0"
+  },
+  {
+    "rule_name": "夜间交易预警",
+    "threshold_value": 50000,
+    "comparison_type": ">=",
+    "description": "夜间（00:00-06:00）交易超过5万元触发预警",
+    "model_version": "v1.0"
+  },
+  {
+    "rule_name": "跨境交易预警",
+    "threshold_value": 200000,
+    "comparison_type": ">=",
+    "description": "跨境交易金额超过20万元触发预警",
+    "model_version": "v1.0"
+  },
+  {
+    "rule_name": "置信度阈值",
+    "threshold_value": 0.9,
+    "comparison_type": ">=",
+    "description": "模型输出置信度高于0.9判定为高可信",
+    "model_version": "v1.0"
+  }
+]

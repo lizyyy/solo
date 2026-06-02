@@ -1,0 +1,37 @@
+[
+  {
+    "sample_id": "sample_001",
+    "output_text": "根据《金融机构大额交易和可疑交易报告管理办法》，该交易属于异常交易规则：个人账户在夜间（00:00-06:00）发生50万元以上大额跨境转账，触发预警。置信度: 0.95",
+    "confidence": 0.95,
+    "prediction_label": "异常",
+    "raw_log": "[INFO] Processing sample_001... Rule match: 大额夜间跨境交易 [Source: 反洗钱规则v2.1, 第15条]"
+  },
+  {
+    "sample_id": "sample_002",
+    "output_text": "该交易为正常小额交易，未触发任何异常规则。置信度: 0.99",
+    "confidence": 0.99,
+    "prediction_label": "正常",
+    "raw_log": "[INFO] Processing sample_002... No rules matched."
+  },
+  {
+    "sample_id": "sample_003",
+    "output_text": "该交易触发可疑规则：个人账户在夜间向陌生账户转账超过5万元。置信度: 0.85",
+    "confidence": 0.85,
+    "prediction_label": "可疑",
+    "raw_log": "[WARN] Processing sample_003... Rule match: 夜间陌生账户转账 [无引用说明]"
+  },
+  {
+    "sample_id": "sample_004",
+    "output_text": "依据《企业账户大额交易监测规范》第8条，企业账户200万元以上大额交易需上报。置信度: 0.92",
+    "confidence": 0.92,
+    "prediction_label": "异常",
+    "raw_log": "[INFO] Processing sample_004... Rule match: 企业大额交易上报 [Source: 银监发〔2023〕12号]"
+  },
+  {
+    "sample_id": "sample_005",
+    "output_text": "小额同名账户转账，判定为正常交易。置信度: 0.97",
+    "confidence": 0.97,
+    "prediction_label": "正常",
+    "raw_log": "[INFO] Processing sample_005... Rule match passed: 同名账户小额豁免"
+  }
+]
