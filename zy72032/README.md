@@ -1,57 +1,100 @@
-# React + TypeScript + Vite
+# AI客服训练营
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+面向社团课堂的轻量级客服场景训练工具。每局 1-2 分钟，练完就能上手。投影大屏也能看清每一步，例外不丢、反馈到位。
 
-Currently, two official plugins are available:
+## 快速开始
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+```bash
+# 安装依赖
+npm install
 
-## Expanding the ESLint configuration
+# 启动开发服务器
+npm run dev
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+# 类型检查
+npm run check
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+# 构建生产版本
+npm run build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 怎么启动
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+1. 打开首页，选择一个关卡包（基础客服通关 / 情绪安抚专项 / 退换货判定）
+2. 点击「开始训练」按钮，进入训练页
+3. 逐个场景做选择，每步有倒计时
+4. 所有步骤完成后自动跳转到结算页，查看得分和扣分明细
 
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+## 怎么换一组关卡
+
+回到首页，点击不同的关卡包卡片即可切换。选中的关卡包会有亮橙色边框高亮。
+
+## 怎么看一局的历史
+
+1. 点击顶部导航「记录」，进入记录页
+2. 可以看到所有已完成的局次，按时间排列
+3. 点击任意记录的「查看详情」，即可看到：
+   - 每步选择的对比（我的选择 vs 正确答案）
+   - 逐条扣分原因（规则未理解 / 操作超时 / 选择错误）
+   - 暂停记录（第几步暂停、持续时间、原因）
+   - 补录备注与分数差异对比
+
+## 关键功能说明
+
+### 训练流程
+
+- 每步有倒计时，超时自动扣分并推进
+- 暂停按钮位于训练页右上角，暂停期间计时器停止
+- 暂停恢复后从当前步骤继续，暂停记录会被完整保留
+- 训练完成自动跳转结算页，记录不会重复创建
+
+### 失败反馈
+
+失败时不会只写「游戏结束」，而是区分两种情况：
+
+- **规则没理解**：你在多个场景选了不符合规则的答案，建议先把规则再看一遍
+- **操作偏慢**：有步骤花了太久做决定，客服场景下客户不会等你慢慢想
+
+### 补录备注
+
+老师可以在记录页对任意局次补录备注：
+
+1. 点击记录卡片右下角的「补录备注」按钮
+2. 选择备注来源：「老师备注」或「投影补录」
+3. 填写备注内容
+4. 可选：同时调整分数，系统自动重新计算通过状态
+5. 补录后在记录卡片和详情页显示差异（原值 → 新值）
+
+### 预置样例数据
+
+系统预置了 3 条样例记录，覆盖课堂常见场景：
+
+| 类型 | 得分 | 说明 |
+|------|------|------|
+| 顺利 | 95 | 全部正确，一次通过 |
+| 待确认 | 70 | 含边界选择 + 一次暂停，需人工确认 |
+| 补录 | 65 | 投影补录旧口径，分数从 80 调整为 65 |
+
+可在记录页点击「重置为样例」恢复这些数据。
+
+### 历史汇总一致性
+
+汇总页的数据从训练记录实时计算，不会出现报告和明细两套说法：
+
+- 总局数 = 记录页的记录条数
+- 通过率 = 通过局数 / 总局数
+- 平均用时 = 所有记录总用时 / 总局数
+- 异常数 = 所有暂停、超时、边界分数、补录、需确认项之和
+- 补录调整分数后，汇总页的通过率和异常数自动更新
+
+### 异常不丢
+
+暂停、超时、边界分数、补录调整、需人工确认——这些在汇总页的「异常追踪」表格中全部列出，不会在汇总数字里悄悄消失。
+
+## 技术栈
+
+- React 18 + TypeScript + Vite
+- Tailwind CSS 3
+- Zustand（状态管理 + localStorage 持久化）
+- React Router 6
+- Lucide Icons

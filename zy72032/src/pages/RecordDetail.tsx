@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom"
 import { ArrowLeft, Check, X, Pause, FileEdit } from "lucide-react"
 import { useRecordStore } from "@/stores/recordStore"
+import { useLevelStore } from "@/stores/levelStore"
 import DeductionItem from "@/components/DeductionItem"
 import DiffView from "@/components/DiffView"
 import { formatDateTime, formatTime } from "@/utils"
@@ -12,6 +13,10 @@ export default function RecordDetail() {
   const { getRecord } = useRecordStore()
 
   const record = id ? getRecord(id) : undefined
+  const levelPack = record
+    ? useLevelStore.getState().levelPacks.find((p) => p.id === record.levelPackId)
+    : undefined
+  const passingScore = levelPack?.passingScore ?? 70
 
   if (!record) {
     return (
@@ -195,9 +200,9 @@ export default function RecordDetail() {
                         {
                           name: "通过状态",
                           oldValue:
-                            supp.previousScore >= 70 ? "通过" : "未通过",
+                            supp.previousScore >= passingScore ? "通过" : "未通过",
                           newValue:
-                            supp.newScore >= 70 ? "通过" : "未通过",
+                            supp.newScore >= passingScore ? "通过" : "未通过",
                         },
                       ]
                     : undefined

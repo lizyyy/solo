@@ -24,7 +24,9 @@ export const useRecordStore = create<RecordState>()(
     (set, get) => ({
       records: sampleRecords,
       addRecord: (record) => {
-        const levelPack = useLevelStore.getState().getSelectedLevelPack()
+        const levelPack = useLevelStore.getState().levelPacks.find(
+          (p) => p.id === record.levelPackId
+        )
         const failureDiagnosis = determineFailureDiagnosis(
           record.steps,
           record.totalScore,

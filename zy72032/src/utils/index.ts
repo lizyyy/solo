@@ -119,12 +119,16 @@ export function extractExceptions(record: TrainingRecord): ExceptionItem[] {
       })
     }
 
-    if (step.isBoundaryCase) {
+    if (step.isBoundaryCase && !step.isCorrect) {
       exceptions.push({
         recordId: record.id,
         type: "边界分数",
         stepIndex: idx,
-        description: `第 ${idx + 1} 步是边界场景，扣分 5 分（规则灰色地带）`,
+        description: `第 ${idx + 1} 步是边界场景且答错，${
+          step.deduction
+            ? `扣 ${step.deduction.points} 分（${step.deduction.reason}）`
+            : "规则灰色地带"
+        }`,
         timestamp: record.startTime + idx * 30000,
       })
     }

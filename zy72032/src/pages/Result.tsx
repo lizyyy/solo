@@ -1,8 +1,8 @@
 import { useParams, useNavigate } from "react-router-dom"
-import {
-  Trophy, RotateCcw, History, Check, X } from "lucide-react"
+import { Trophy, RotateCcw, History, Check, X } from "lucide-react"
 import { useRecordStore } from "@/stores/recordStore"
 import { useLevelStore } from "@/stores/levelStore"
+import { useTrainingStore } from "@/stores/trainingStore"
 import DeductionItem from "@/components/DeductionItem"
 import FailureDiagnosis from "@/components/FailureDiagnosis"
 import { formatTime } from "@/utils"
@@ -12,7 +12,7 @@ export default function Result() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { getRecord } = useRecordStore()
-  const { getSelectedLevelPack } = useLevelStore()
+  const { resetTraining } = useTrainingStore()
 
   const record = id ? getRecord(id) : undefined
   const levelPack = record
@@ -129,7 +129,7 @@ export default function Result() {
       {record.pauses.length > 0 && (
         <div className="card p-6 border-warning/30">
           <h3 className="font-bold mb-3 text-warning">
-            ⏸️ 暂停记录 ({record.pauses.length} 次
+            ⏸️ 暂停记录 ({record.pauses.length} 次)
           </h3>
           <div className="space-y-2">
             {record.pauses.map((pause, idx) => (
@@ -178,7 +178,10 @@ export default function Result() {
 
       <div className="flex flex-wrap gap-3 justify-center pt-4">
         <button
-          onClick={() => navigate("/training")}
+          onClick={() => {
+            resetTraining()
+            navigate("/training")
+          }}
           className="btn btn-primary"
         >
           <RotateCcw className="w-4 h-4" />

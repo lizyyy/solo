@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState, useCallback, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 import { Pause, Play, Home, AlertTriangle } from "lucide-react"
 import { useTrainingStore } from "@/stores/trainingStore"
@@ -12,7 +12,7 @@ export default function Training() {
     status,
     currentStepIndex,
     stepStartTime,
-    steps,
+    completedRecordId,
     startTraining,
     selectOption,
     togglePause,
@@ -22,7 +22,7 @@ export default function Training() {
   const { getSelectedLevelPack } = useLevelStore()
 
   const [timeRemaining, setTimeRemaining] = useState(0)
-  const [lastCompletedRecordId, setLastCompletedRecordId] = useState<string | null>(null)
+  const navigatedRef = useRef(false)
 
   const levelPack = getSelectedLevelPack()
   const scenario = getCurrentScenario()
@@ -35,12 +35,19 @@ export default function Training() {
   }, [status, startTraining])
 
   useEffect(() => {
-    if (status === "completed" && steps.length > 0 && !lastCompletedRecordId) {
-      const recordId = useTrainingStore.getState().completeTraining()
-      setLastCompletedRecordId(recordId)
-      navigate(`/result/${recordId}`)
+    if (
+      status === "completed" &&
+      completedRecordId &&
+      !navigatedRef.current
+    ) {
+      navigatedRef.current = true
+      navigate(`/result/${completedRecordId}`)
     }
-  }, [status, steps.length, navigate, lastCompletedRecordId])
+  }, [status, completedRecordId, navigate])
+
+  useEffect(() => {
+    navigatedRef.current = false
+  }, [status])
 
   useEffect(() => {
     if (status !== "active" || !scenario) return
