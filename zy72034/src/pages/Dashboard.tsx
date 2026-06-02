@@ -28,17 +28,16 @@ export const Dashboard: React.FC = () => {
   } = useGameStore();
 
   const { toasts, showToast, removeToast } = useToast();
-  const [initialized, setInitialized] = useState(false);
+
+  const isGameReady = game !== null && game.status !== 'idle';
 
   const handleInit = () => {
     initGame();
-    setInitialized(true);
     showToast('info', '游戏已初始化，请开始第一回合');
   };
 
   const handleLoadSample = () => {
     loadSampleData();
-    setInitialized(true);
     showToast('success', '样例数据已加载，包含7回合历史记录');
   };
 
@@ -50,7 +49,6 @@ export const Dashboard: React.FC = () => {
   const handleReset = () => {
     if (confirm('确定要重置所有数据吗？此操作不可恢复。')) {
       loadDefaultData();
-      setInitialized(false);
       showToast('info', '数据已重置');
     }
   };
@@ -92,7 +90,7 @@ export const Dashboard: React.FC = () => {
     );
   }
 
-  if (!initialized) {
+  if (!isGameReady) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
         <div className="max-w-2xl w-full">

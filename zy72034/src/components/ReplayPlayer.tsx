@@ -19,7 +19,7 @@ export const ReplayPlayer: React.FC<ReplayPlayerProps> = ({ onClose }) => {
     isReplaying,
     replayRound,
     replaySpeed,
-    game,
+    originalMaxRound,
     rounds,
     startReplay,
     stopReplay,
@@ -30,7 +30,7 @@ export const ReplayPlayer: React.FC<ReplayPlayerProps> = ({ onClose }) => {
   const autoPlayRef = useRef<number | null>(null);
   const isPlayingRef = useRef(false);
 
-  const maxRound = game?.currentRound || 1;
+  const maxRound = originalMaxRound || 1;
   const speeds = [0.5, 1, 2];
 
   useEffect(() => {

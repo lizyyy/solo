@@ -23,12 +23,20 @@ export const Supplement: React.FC = () => {
 
   const { toasts, showToast, removeToast } = useToast();
 
-  const [selectedRound, setSelectedRound] = useState<number>(
-    game?.currentRound || 1
-  );
-  const [selectedFarmId, setSelectedFarmId] = useState<string>(
-    farms[0]?.id || ''
-  );
+  const [selectedRound, setSelectedRound] = useState<number>(1);
+  const [selectedFarmId, setSelectedFarmId] = useState<string>('');
+
+  React.useEffect(() => {
+    if (game?.currentRound) {
+      setSelectedRound(game.currentRound);
+    }
+  }, [game?.currentRound]);
+
+  React.useEffect(() => {
+    if (farms.length > 0 && !selectedFarmId) {
+      setSelectedFarmId(farms[0].id);
+    }
+  }, [farms, selectedFarmId]);
   const [fieldName, setFieldName] = useState<string>('revenue');
   const [oldValue, setOldValue] = useState<string>('');
   const [newValue, setNewValue] = useState<string>('');

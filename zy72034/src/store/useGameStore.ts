@@ -46,6 +46,18 @@ interface GameStoreState {
   replayRound: number | null;
   replaySpeed: number;
   pendingTransactions: Transaction[];
+  preReplayState: {
+    game: Game | null;
+    rounds: Round[];
+    currentRoundState: Round | null;
+    farmStates: FarmState[];
+    transactions: Transaction[];
+    pauseRecords: PauseRecord[];
+    supplementRecords: SupplementRecord[];
+    lastSettlementReason: string;
+    pendingTransactions: Transaction[];
+  } | null;
+  originalMaxRound: number | null;
   initGame: () => void;
   startGame: () => void;
   pauseGame: (reason: string) => void;
@@ -105,6 +117,8 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   replayRound: null,
   replaySpeed: 1,
   pendingTransactions: [],
+  preReplayState: null,
+  originalMaxRound: null,
 
   initGame: () => {
     set({ loading: true, error: null });
@@ -530,6 +544,9 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     difference: string,
     remark: string
   ) => {
+    const { game, farmStates, rounds, transactions, pauseRecords, supplementRecords, currentRoundState } = get();
+    if (!game) return;
+
     const supplementRecord: SupplementRecord = {
       id: generateId(),
       roundNumber,
@@ -543,7 +560,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       confirmedBy: '小林老师',
     };
 
-    const updatedFarmStates = get().farmStates.map((fs) => {
+    const updatedFarmStates = farmStates.map((fs) => {
       if (fs.roundNumber !== roundNumber || fs.farmId !== farmId) return fs;
 
       const parsedNewValue = Number(newValue);
@@ -556,18 +573,32 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       return fs;
     });
 
-    const updatedRounds = get().rounds.map((r) =>
+    const updatedRounds = rounds.map((r) =>
       r.roundNumber === roundNumber ? { ...r, isSupplemented: true } : r
     );
 
+    const newCurrentRoundState =
+      currentRoundState?.roundNumber === roundNumber
+        ? { ...currentRoundState!, isSupplemented: true }
+        : currentRoundState;
+
+    const newSupplementRecords = [...supplementRecords, supplementRecord];
+
+    const snapshot = createSnapshot(
+      game,
+      newCurrentRoundState,
+      updatedFarmStates,
+      transactions,
+      pauseRecords,
+      newSupplementRecords
+    );
+    saveGameSnapshot(snapshot);
+
     set({
-      supplementRecords: [...get().supplementRecords, supplementRecord],
+      supplementRecords: newSupplementRecords,
       farmStates: updatedFarmStates,
       rounds: updatedRounds,
-      currentRoundState:
-        get().currentRoundState?.roundNumber === roundNumber
-          ? { ...get().currentRoundState!, isSupplemented: true }
-          : get().currentRoundState,
+      currentRoundState: newCurrentRoundState,
     });
   },
 
@@ -576,6 +607,31 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   },
 
   startReplay: (fromRound = 1) => {
+    const { game, rounds, currentRoundState, farmStates, transactions, pauseRecords, supplementRecords, lastSettlementReason, pendingTransactions, isReplaying, preReplayState, originalMaxRound } = get();
+    
+    if (isReplaying && preReplayState && originalMaxRound) {
+      const snapshot = loadGameSnapshot(fromRound);
+      if (!snapshot) {
+        set({ error: `未找到第${fromRound}回合的快照` });
+        return;
+      }
+      set({
+        replayRound: fromRound,
+        game: snapshot.game,
+        currentRoundState: snapshot.currentRoundState,
+        farmStates: snapshot.farmStates,
+        transactions: snapshot.transactions,
+        pauseRecords: snapshot.pauseRecords,
+        supplementRecords: snapshot.supplementRecords,
+      });
+      return;
+    }
+
+    if (!game) {
+      set({ error: '游戏未初始化，无法开始回放' });
+      return;
+    }
+
     const snapshot = loadGameSnapshot(fromRound);
     if (!snapshot) {
       set({ error: `未找到第${fromRound}回合的快照` });
@@ -583,6 +639,18 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     }
 
     set({
+      preReplayState: {
+        game: { ...game },
+        rounds: [...rounds],
+        currentRoundState: currentRoundState ? { ...currentRoundState } : null,
+        farmStates: [...farmStates],
+        transactions: [...transactions],
+        pauseRecords: [...pauseRecords],
+        supplementRecords: [...supplementRecords],
+        lastSettlementReason,
+        pendingTransactions: [...pendingTransactions],
+      },
+      originalMaxRound: game.currentRound,
       isReplaying: true,
       replayRound: fromRound,
       game: snapshot.game,
@@ -595,19 +663,40 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   },
 
   stopReplay: () => {
+    const { preReplayState, originalMaxRound } = get();
+    if (!preReplayState) {
+      set({
+        isReplaying: false,
+        replayRound: null,
+        preReplayState: null,
+        originalMaxRound: null,
+      });
+      return;
+    }
+
     set({
       isReplaying: false,
       replayRound: null,
+      preReplayState: null,
+      originalMaxRound: null,
+      game: preReplayState.game,
+      rounds: preReplayState.rounds,
+      currentRoundState: preReplayState.currentRoundState,
+      farmStates: preReplayState.farmStates,
+      transactions: preReplayState.transactions,
+      pauseRecords: preReplayState.pauseRecords,
+      supplementRecords: preReplayState.supplementRecords,
+      lastSettlementReason: preReplayState.lastSettlementReason,
+      pendingTransactions: preReplayState.pendingTransactions,
     });
-    get().loadSampleData();
   },
 
   stepReplay: (direction: 'prev' | 'next') => {
-    const { replayRound, game } = get();
-    if (!replayRound || !game) return;
+    const { replayRound, originalMaxRound } = get();
+    if (!replayRound || !originalMaxRound) return;
 
     const targetRound = direction === 'next' ? replayRound + 1 : replayRound - 1;
-    if (targetRound < 1 || targetRound > game.currentRound) return;
+    if (targetRound < 1 || targetRound > originalMaxRound) return;
 
     const snapshot = loadGameSnapshot(targetRound);
     if (!snapshot) return;
@@ -640,6 +729,8 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       isReplaying: false,
       replayRound: null,
       pendingTransactions: [],
+      preReplayState: null,
+      originalMaxRound: null,
       error: null,
       warnings: [],
     });
