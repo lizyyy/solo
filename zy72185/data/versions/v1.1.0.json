@@ -1,0 +1,29 @@
+{
+  "version_id": "v1.1.0",
+  "release_date": "2024-04-15",
+  "release_by": "老唐",
+  "status": "archived",
+  "prompt_content": "你是一个风控审批助手，请评估用户风险等级。\n\n输出：高风险/中风险/低风险",
+  "thresholds": {
+    "high_risk_min": 0.85,
+    "medium_risk_min": 0.50,
+    "low_risk_max": 0.50
+  },
+  "release_notes": "初始版本，基础风控评估能力",
+  "metrics": {
+    "claimed_precision": 0.80,
+    "claimed_recall": 0.75,
+    "actual_precision": 0.78,
+    "actual_recall": 0.73,
+    "actual_f1": 0.75
+  },
+  "sources": [
+    {"type": "eval_log", "file": "eval_log_20240415.json", "description": "2024年4月15日评测日志"}
+  ],
+  "manual_reviews": [],
+  "data_quality": {
+    "empty_values": [],
+    "duplicate_records": [],
+    "boundary_cases": []
+  }
+}

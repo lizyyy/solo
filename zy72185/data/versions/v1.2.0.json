@@ -1,0 +1,73 @@
+{
+  "version_id": "v1.2.0",
+  "release_date": "2024-06-01",
+  "release_by": "老唐",
+  "status": "released",
+  "prompt_content": "你是一个专业的风控审批助手，请根据用户的信贷申请信息评估其风险等级。\n\n评估维度：\n1. 征信记录（逾期次数、欠款金额）\n2. 还款能力（收入、负债比）\n3. 申请行为（查询次数、申请频率）\n4. 稳定性（工作、社保、资产）\n\n输出要求：\n- 风险等级：高风险/中风险/低风险\n- 风险分数：0-1之间的浮点数\n- 主要风险点：20字以内\n\n示例：\n输入：用户近1年逾期6次，欠款5万元\n输出：高风险，0.95，历史逾期严重",
+  "thresholds": {
+    "high_risk_min": 0.80,
+    "medium_risk_min": 0.60,
+    "low_risk_max": 0.60
+  },
+  "release_notes": "本次版本主要优化了白户和边界样本的处理逻辑，根据2024年5月下旬评测结果调整阈值。\n\n【主要变更】\n1. 高风险阈值从0.85下调至0.80\n2. 中风险下限从0.50上调至0.60\n3. 新增白户处理提示词\n\n【发布记录宣称】\n- 本次版本精确率提升至0.92（注：实际评测为0.87，此处存在冲突！）\n- CASE002经人工审核后判定为高风险（注：实际标注为低风险，此处存在冲突！）\n- CASE013经人工审核后判定为低风险（注：实际标注为高风险，此处存在冲突！）\n\n【样本覆盖】\n- 训练样本：2024年1月-4月数据\n- 测试样本：2024年5月数据（注：CASE001同时出现在训练集和测试集，可能存在样本泄漏！）",
+  "metrics": {
+    "claimed_precision": 0.92,
+    "claimed_recall": 0.88,
+    "actual_precision": 0.87,
+    "actual_recall": 0.82,
+    "actual_f1": 0.84
+  },
+  "sources": [
+    {"type": "eval_log", "file": "eval_log_20240601.json", "description": "2024年6月1日评测日志"},
+    {"type": "annotation", "file": "annotation_20240601.csv", "description": "2024年6月1日标注表"},
+    {"type": "threshold_note", "file": "threshold_v1.2.0.md", "description": "v1.2.0阈值配置说明"}
+  ],
+  "manual_reviews": [
+    {
+      "case_id": "CASE002",
+      "original_label": "中风险",
+      "pred_score": 0.71,
+      "reviewed_label": "低风险",
+      "review_reason": "用户仅逾期2次且已结清，当前无欠款，近期还款表现良好，不应判定为中风险",
+      "reviewer": "老唐",
+      "review_date": "2024-05-30",
+      "source_evidence": "标注表第3行CASE002，标注人为王工"
+    },
+    {
+      "case_id": "CASE004",
+      "original_label": "中风险",
+      "pred_score": 0.68,
+      "reviewed_label": "高风险",
+      "review_reason": "1个月查询5次属于高频查询，反映近期资金需求迫切，风险较高",
+      "reviewer": "老唐",
+      "review_date": "2024-05-30",
+      "source_evidence": "标注表第5行CASE004，标注人为张工"
+    },
+    {
+      "case_id": "CASE010",
+      "original_label": "中风险",
+      "pred_score": 0.73,
+      "reviewed_label": "低风险",
+      "review_reason": "6个月查询10次但无逾期，说明用户信贷需求正常且还款意愿强",
+      "reviewer": "老唐",
+      "review_date": "2024-05-30",
+      "source_evidence": "标注表第11行CASE010，标注人为王工"
+    },
+    {
+      "case_id": "CASE013",
+      "original_label": "中风险",
+      "pred_score": 0.70,
+      "reviewed_label": "高风险",
+      "review_reason": "月收入2万申请50万贷款，债务收入比过高，还款压力大",
+      "reviewer": "老唐",
+      "review_date": "2024-05-30",
+      "source_evidence": "标注表第14行CASE013，标注人为王工"
+    }
+  ],
+  "data_quality": {
+    "empty_values": ["CASE017"],
+    "duplicate_records": ["CASE001"],
+    "boundary_cases": ["CASE016"],
+    "note": "数据中存在空值、重复项和边界样本，已单独标记处理"
+  }
+}
