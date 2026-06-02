@@ -1,0 +1,25 @@
+[
+  {
+    "record_id": "REC-004",
+    "source": "online_feedback",
+    "scheduling_decision": {
+      "warehouse_id": "WH-SZ-01",
+      "priority": 4,
+      "estimated_cost": 150.00,
+      "model_reasoning": "旧口径：基于距离优先，不考虑库存因素"
+    },
+    "ground_truth": {
+      "warehouse_id": "WH-SZ-01",
+      "priority": 4,
+      "estimated_cost": 150.00
+    },
+    "metadata": {
+      "order_id": "ORD-2024-004",
+      "category": "books",
+      "weight": 1.2,
+      "feedback_ticket_id": "TICKET-2024-0892",
+      "legacy": true,
+      "note": "线上反馈工单补录，使用旧口径评估"
+    }
+  }
+]

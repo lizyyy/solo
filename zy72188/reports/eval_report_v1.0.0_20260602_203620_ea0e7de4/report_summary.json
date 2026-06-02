@@ -1,0 +1,153 @@
+{
+  "report_id": "eval_report_v1.0.0_20260602_203620_ea0e7de4",
+  "model_version": "v1.0.0",
+  "total_records": 8,
+  "success_count": 0,
+  "needs_review_count": 0,
+  "conflict_count": 0,
+  "invalid_count": 8,
+  "legacy_count": 0,
+  "accuracy": 0.0,
+  "created_at": "2026-06-02 20:36:20.652675",
+  "conflict_records": [
+    {
+      "record_id": "REC-005",
+      "status": "invalid",
+      "reason": "warehouse_id为空",
+      "model_decision": {
+        "warehouse_id": "",
+        "priority": 5,
+        "estimated_cost": 100.0,
+        "model_reasoning": "测试空值处理"
+      },
+      "ground_truth": {
+        "warehouse_id": "WH-BJ-01",
+        "priority": 5,
+        "estimated_cost": 100.0,
+        "model_reasoning": ""
+      }
+    },
+    {
+      "record_id": "REC-001",
+      "status": "invalid",
+      "reason": "重复记录: REC-001",
+      "model_decision": {
+        "warehouse_id": "WH-BJ-01",
+        "priority": 3,
+        "estimated_cost": 125.5,
+        "model_reasoning": "这是一条重复记录，用于测试重复检测"
+      },
+      "ground_truth": {
+        "warehouse_id": "WH-BJ-01",
+        "priority": 3,
+        "estimated_cost": 123.0,
+        "model_reasoning": ""
+      }
+    },
+    {
+      "record_id": "REC-006",
+      "status": "invalid",
+      "reason": "重复记录: REC-006",
+      "model_decision": {
+        "warehouse_id": "WH-CD-01",
+        "priority": 0,
+        "estimated_cost": 0.0,
+        "model_reasoning": "边界测试：最低优先级和零成本"
+      },
+      "ground_truth": {
+        "warehouse_id": "WH-CD-01",
+        "priority": 0,
+        "estimated_cost": 0.0,
+        "model_reasoning": ""
+      }
+    },
+    {
+      "record_id": "REC-007",
+      "status": "invalid",
+      "reason": "重复记录: REC-007",
+      "model_decision": {
+        "warehouse_id": "WH-WH-01",
+        "priority": 10,
+        "estimated_cost": 9999.99,
+        "model_reasoning": "边界测试：最高优先级和高成本"
+      },
+      "ground_truth": {
+        "warehouse_id": "WH-WH-01",
+        "priority": 10,
+        "estimated_cost": 9999.99,
+        "model_reasoning": ""
+      }
+    },
+    {
+      "record_id": "REC-004",
+      "status": "invalid",
+      "reason": "重复记录: REC-004",
+      "model_decision": {
+        "warehouse_id": "WH-SZ-01",
+        "priority": 4,
+        "estimated_cost": 150.0,
+        "model_reasoning": "旧口径：基于距离优先，不考虑库存因素"
+      },
+      "ground_truth": {
+        "warehouse_id": "WH-SZ-01",
+        "priority": 4,
+        "estimated_cost": 150.0,
+        "model_reasoning": ""
+      }
+    },
+    {
+      "record_id": "REC-001",
+      "status": "invalid",
+      "reason": "重复记录: REC-001",
+      "model_decision": {
+        "warehouse_id": "WH-BJ-01",
+        "priority": 3,
+        "estimated_cost": 125.5,
+        "model_reasoning": "基于订单历史数据和当前库存水平，WH-BJ-01距离最近且成本最优"
+      },
+      "ground_truth": {
+        "warehouse_id": "WH-BJ-01",
+        "priority": 3,
+        "estimated_cost": 123.0,
+        "model_reasoning": ""
+      }
+    },
+    {
+      "record_id": "REC-002",
+      "status": "invalid",
+      "reason": "重复记录: REC-002",
+      "model_decision": {
+        "warehouse_id": "WH-SH-02",
+        "priority": 5,
+        "estimated_cost": 89.99,
+        "model_reasoning": "SH仓库有现货，虽然距离稍远但综合成本更低"
+      },
+      "ground_truth": {
+        "warehouse_id": "WH-SH-01",
+        "priority": 5,
+        "estimated_cost": 95.0,
+        "model_reasoning": ""
+      }
+    },
+    {
+      "record_id": "REC-003",
+      "status": "invalid",
+      "reason": "重复记录: REC-003",
+      "model_decision": {
+        "warehouse_id": "WH-GZ-01",
+        "priority": 7,
+        "estimated_cost": 200.0,
+        "model_reasoning": "高优先级订单，选择最快仓库"
+      },
+      "ground_truth": null
+    }
+  ],
+  "summary": {
+    "threshold_config": {},
+    "source_files": [
+      "/Users/lzy/pro/solo/workspaces/zy72188/samples/edge_cases.json",
+      "/Users/lzy/pro/solo/workspaces/zy72188/samples/online_feedback_samples.json",
+      "/Users/lzy/pro/solo/workspaces/zy72188/samples/annotation_samples.json"
+    ]
+  }
+}

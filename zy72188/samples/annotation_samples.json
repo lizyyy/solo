@@ -1,0 +1,59 @@
+[
+  {
+    "record_id": "REC-001",
+    "source": "annotation",
+    "scheduling_decision": {
+      "warehouse_id": "WH-BJ-01",
+      "priority": 3,
+      "estimated_cost": 125.50,
+      "model_reasoning": "基于订单历史数据和当前库存水平，WH-BJ-01距离最近且成本最优"
+    },
+    "ground_truth": {
+      "warehouse_id": "WH-BJ-01",
+      "priority": 3,
+      "estimated_cost": 123.00
+    },
+    "metadata": {
+      "order_id": "ORD-2024-001",
+      "category": "electronics",
+      "weight": 2.5
+    }
+  },
+  {
+    "record_id": "REC-002",
+    "source": "annotation",
+    "scheduling_decision": {
+      "warehouse_id": "WH-SH-02",
+      "priority": 5,
+      "estimated_cost": 89.99,
+      "model_reasoning": "SH仓库有现货，虽然距离稍远但综合成本更低"
+    },
+    "ground_truth": {
+      "warehouse_id": "WH-SH-01",
+      "priority": 5,
+      "estimated_cost": 95.00
+    },
+    "metadata": {
+      "order_id": "ORD-2024-002",
+      "category": "clothing",
+      "weight": 0.8
+    }
+  },
+  {
+    "record_id": "REC-003",
+    "source": "annotation",
+    "scheduling_decision": {
+      "warehouse_id": "WH-GZ-01",
+      "priority": 7,
+      "estimated_cost": 200.00,
+      "model_reasoning": "高优先级订单，选择最快仓库"
+    },
+    "ground_truth": null,
+    "metadata": {
+      "order_id": "ORD-2024-003",
+      "category": "food",
+      "weight": 5.0,
+      "note": "等待人工标注"
+    }
+  }
+]
