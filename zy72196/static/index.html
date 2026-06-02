@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>模型评测样本分层工具</title>
+<style>
+:root {
+  --bg: #f8f9fa; --card: #fff; --border: #e2e8f0; --text: #1a202c;
+  --text2: #718096; --primary: #3182ce; --primary-light: #ebf4ff;
+  --success: #38a169; --warning: #d69e2e; --danger: #e53e3e;
+  --purple: #805ad5; --orange: #dd6b20; --teal: #319795;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+.layout { display: flex; min-height: 100vh; }
+.sidebar { width: 240px; background: var(--card); border-right: 1px solid var(--border); padding: 20px 0; flex-shrink: 0; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+.sidebar h2 { font-size: 15px; color: var(--primary); padding: 0 20px 12px; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
+.nav-item { display: block; padding: 10px 20px; color: var(--text); text-decoration: none; font-size: 14px; cursor: pointer; transition: background .15s; border-left: 3px solid transparent; }
+.nav-item:hover { background: var(--primary-light); }
+.nav-item.active { background: var(--primary-light); border-left-color: var(--primary); color: var(--primary); font-weight: 600; }
+.main { flex: 1; padding: 24px 32px; max-width: 1200px; }
+.page { display: none; }
+.page.active { display: block; }
+h1 { font-size: 22px; margin-bottom: 4px; }
+.subtitle { color: var(--text2); font-size: 14px; margin-bottom: 20px; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+.card-header { font-size: 15px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 12px; font-weight: 500; }
+.badge-blue { background: #ebf4ff; color: var(--primary); }
+.badge-green { background: #f0fff4; color: var(--success); }
+.badge-yellow { background: #fefcbf; color: var(--warning); }
+.badge-red { background: #fff5f5; color: var(--danger); }
+.badge-purple { background: #faf5ff; color: var(--purple); }
+.badge-orange { background: #fffaf0; color: var(--orange); }
+.badge-teal { background: #e6fffa; color: var(--teal); }
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 6px; border: 1px solid var(--border); background: var(--card); color: var(--text); font-size: 13px; cursor: pointer; transition: all .15s; }
+.btn:hover { border-color: var(--primary); color: var(--primary); }
+.btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+.btn-primary:hover { background: #2b6cb0; }
+.btn-sm { padding: 4px 10px; font-size: 12px; }
+.btn-danger { border-color: var(--danger); color: var(--danger); }
+.btn-danger:hover { background: #fff5f5; }
+.actions { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+th { background: #f7fafc; font-weight: 600; color: var(--text2); font-size: 12px; text-transform: uppercase; letter-spacing: .5px; }
+tr:hover { background: #f7fafc; }
+.mono { font-family: "SF Mono", "Fira Code", monospace; font-size: 12px; }
+.text-sm { font-size: 13px; }
+.text-xs { font-size: 12px; }
+.text-muted { color: var(--text2); }
+.truncate { max-width: 260px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+.stat-card .label { font-size: 12px; color: var(--text2); margin-bottom: 4px; }
+.stat-card .value { font-size: 24px; font-weight: 700; }
+.stat-card .note { font-size: 11px; color: var(--text2); margin-top: 4px; }
+.evidence-box { background: #f7fafc; border: 1px solid var(--border); border-radius: 6px; padding: 12px; margin-top: 8px; font-size: 13px; }
+.evidence-box code { background: #edf2f7; padding: 1px 4px; border-radius: 3px; font-size: 12px; }
+.timeline { position: relative; padding-left: 24px; }
+.timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: var(--border); }
+.timeline-item { position: relative; padding-bottom: 16px; }
+.timeline-item::before { content: ''; position: absolute; left: -20px; top: 6px; width: 10px; height: 10px; border-radius: 50%; background: var(--primary); border: 2px solid var(--card); }
+.timeline-item .time { font-size: 11px; color: var(--text2); }
+.timeline-item .action { font-size: 13px; font-weight: 500; }
+.timeline-item .detail { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.report-content { white-space: pre-wrap; font-size: 13px; line-height: 1.8; background: #f7fafc; padding: 20px; border-radius: 8px; border: 1px solid var(--border); }
+.compare-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.compare-col { }
+.change-arrow { color: var(--danger); font-weight: 600; }
+.change-arrow.positive { color: var(--success); }
+.stratum-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin: 2px; }
+.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,.4); z-index: 100; display: flex; align-items: center; justify-content: center; }
+.modal { background: var(--card); border-radius: 10px; padding: 24px; min-width: 400px; max-width: 600px; max-height: 80vh; overflow-y: auto; }
+.modal h3 { margin-bottom: 16px; }
+.form-group { margin-bottom: 12px; }
+.form-group label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+.form-group input, .form-group textarea, .form-group select { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; }
+.tag-bar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.empty-state { text-align: center; padding: 48px 20px; color: var(--text2); }
+.empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+.stratum-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+.stratum-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+.stratum-card h4 { font-size: 14px; margin-bottom: 8px; }
+.stratum-card .count { font-size: 28px; font-weight: 700; color: var(--primary); }
+.stratum-card .pct { font-size: 14px; color: var(--text2); }
+.bar { height: 6px; background: #edf2f7; border-radius: 3px; margin-top: 8px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 3px; transition: width .3s; }
+.tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border); margin-bottom: 16px; }
+.tab { padding: 8px 16px; font-size: 13px; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; color: var(--text2); }
+.tab.active { border-bottom-color: var(--primary); color: var(--primary); font-weight: 600; }
+.metric-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="sidebar">
+    <h2>模型评测样本分层</h2>
+    <a class="nav-item active" data-page="overview">概览</a>
+    <a class="nav-item" data-page="samples">样本管理</a>
+    <a class="nav-item" data-page="stratify">分层结果</a>
+    <a class="nav-item" data-page="review">人工复核</a>
+    <a class="nav-item" data-page="compare">指标对比</a>
+    <a class="nav-item" data-page="report">分层报告</a>
+    <a class="nav-item" data-page="trace">溯源查询</a>
+  </nav>
+  <div class="main">
+
+    <div class="page active" id="page-overview">
+      <h1>概览</h1>
+      <p class="subtitle">模型评测样本分层工具——从样例到结果，全程可追溯</p>
+      <div class="actions">
+        <button class="btn btn-primary" onclick="loadDemo()">加载演示数据</button>
+        <button class="btn" onclick="loadExtra()">补录增量数据</button>
+        <button class="btn" onclick="doRerun()">重跑分层</button>
+      </div>
+      <div class="stats-grid" id="overview-stats"></div>
+      <div class="card">
+        <div class="card-header">运行历史</div>
+        <div id="run-history"></div>
+      </div>
+    </div>
+
+    <div class="page" id="page-samples">
+      <h1>样本管理</h1>
+      <p class="subtitle">查看所有样本，含重复、缺引用、人工改标签等标记</p>
+      <div class="actions">
+        <select id="sample-filter" class="btn" onchange="loadSamples()">
+          <option value="">全部</option>
+          <option value="pending">待处理</option>
+          <option value="stratified">已分层</option>
+          <option value="reviewed">已复核</option>
+          <option value="duplicate">重复</option>
+        </select>
+        <button class="btn" onclick="loadSamples()">刷新</button>
+      </div>
+      <div id="samples-table"></div>
+    </div>
+
+    <div class="page" id="page-stratify">
+      <h1>分层结果</h1>
+      <p class="subtitle">按置信度、正确性、数据质量三个维度自动分层</p>
+      <div class="actions">
+        <select id="strat-run-select" class="btn" onchange="loadStratification()"></select>
+        <button class="btn" onclick="loadStratification()">刷新</button>
+      </div>
+      <div class="tabs" id="strat-tabs">
+        <div class="tab active" data-stype="confidence" onclick="switchStratTab(this)">按置信度</div>
+        <div class="tab" data-stype="correctness" onclick="switchStratTab(this)">按正确性</div>
+        <div class="tab" data-stype="quality" onclick="switchStratTab(this)">按数据质量</div>
+      </div>
+      <div id="strat-content"></div>
+    </div>
+
+    <div class="page" id="page-review">
+      <h1>人工复核</h1>
+      <p class="subtitle">修改模型输出标签，所有变更自动记入溯源日志</p>
+      <div id="review-list"></div>
+    </div>
+
+    <div class="page" id="page-compare">
+      <h1>指标对比</h1>
+      <p class="subtitle">对比两次运行的指标和样本变化，区分指标驱动与样本驱动</p>
+      <div class="actions">
+        <select id="compare-run-a" class="btn"></select>
+        <span style="line-height:36px;font-size:13px;color:var(--text2);">对比</span>
+        <select id="compare-run-b" class="btn"></select>
+        <button class="btn btn-primary" onclick="doCompare()">对比</button>
+      </div>
+      <div id="compare-result"></div>
+    </div>
+
+    <div class="page" id="page-report">
+      <h1>分层报告</h1>
+      <p class="subtitle">同事写给同事看的分层报告，每条可追溯到证据</p>
+      <div class="actions">
+        <select id="report-run-select" class="btn" onchange="loadReport()"></select>
+        <button class="btn" onclick="loadReport()">生成报告</button>
+      </div>
+      <div id="report-content"></div>
+    </div>
+
+    <div class="page" id="page-trace">
+      <h1>溯源查询</h1>
+      <p class="subtitle">输入样本ID，查看完整处理链路和证据</p>
+      <div class="actions">
+        <input type="text" id="trace-input" placeholder="输入样本ID，如 S001" style="padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;width:240px;">
+        <button class="btn btn-primary" onclick="doTrace()">查询</button>
+      </div>
+      <div id="trace-result"></div>
+    </div>
+
+  </div>
+</div>
+
+<div id="modal-container"></div>
+
+<script>
+const API = '';
+let currentStratType = 'confidence';
+
+document.querySelectorAll('.nav-item').forEach(el => {
+  el.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    el.classList.add('active');
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + el.dataset.page).classList.add('active');
+    onPageChange(el.dataset.page);
+  });
+});
+
+function onPageChange(page) {
+  if (page === 'overview') loadOverview();
+  if (page === 'samples') loadSamples();
+  if (page === 'stratify') { loadRunSelects(); loadStratification(); }
+  if (page === 'review') loadReviewList();
+  if (page === 'compare') loadCompareSelects();
+  if (page === 'report') { loadReportSelects(); }
+}
+
+async function api(path, opts = {}) {
+  const res = await fetch(API + path, {
+    method: opts.method || 'GET',
+    headers: opts.body ? { 'Content-Type': 'application/json' } : {},
+    body: opts.body ? JSON.stringify(opts.body) : undefined,
+  });
+  return res.json();
+}
+
+async function loadOverview() {
+  const [samplesRes, runsRes] = await Promise.all([api('/api/samples'), api('/api/runs')]);
+  const samples = samplesRes.samples || [];
+  const runs = runsRes.runs || [];
+  const total = samples.length;
+  const dupes = samples.filter(s => s.is_duplicate).length;
+  const missingRef = samples.filter(s => !s.reference_result).length;
+  const reviewed = samples.filter(s => s.status === 'reviewed').length;
+  const labelModified = samples.filter(s => s.human_label && s.human_label !== s.model_output).length;
+
+  document.getElementById('overview-stats').innerHTML = `
+    <div class="stat-card"><div class="label">总样本数</div><div class="value">${total}</div></div>
+    <div class="stat-card"><div class="label">重复样本</div><div class="value" style="color:var(--warning)">${dupes}</div><div class="note">已自动标记</div></div>
+    <div class="stat-card"><div class="label">缺引用结果</div><div class="value" style="color:var(--orange)">${missingRef}</div></div>
+    <div class="stat-card"><div class="label">已人工复核</div><div class="value" style="color:var(--success)">${reviewed}</div></div>
+    <div class="stat-card"><div class="label">标签被改过</div><div class="value" style="color:var(--purple)">${labelModified}</div></div>
+    <div class="stat-card"><div class="label">运行次数</div><div class="value">${runs.length}</div></div>
+  `;
+
+  let html = '<table><tr><th>运行ID</th><th>时间</th><th>类型</th><th>样本数</th><th>操作</th></tr>';
+  for (const r of runs) {
+    const typeLabels = { initial: '首次', rerun: '重跑', incremental: '增量' };
+    html += `<tr>
+      <td class="mono">${r.id}</td>
+      <td class="text-xs">${r.run_time?.slice(0, 19).replace('T', ' ') || ''}</td>
+      <td><span class="badge badge-blue">${typeLabels[r.run_type] || r.run_type}</span></td>
+      <td>${r.sample_count || 0}</td>
+      <td><button class="btn btn-sm" onclick="viewRunDetail('${r.id}')">查看详情</button></td>
+    </tr>`;
+  }
+  html += '</table>';
+  document.getElementById('run-history').innerHTML = runs.length ? html : '<div class="empty-state"><div class="icon">📋</div>还没有运行记录，点击"加载演示数据"开始</div>';
+}
+
+async function loadDemo() {
+  const res = await api('/api/load-demo', { method: 'POST' });
+  showToast(`演示数据已加载：${res.unique_count} 条有效样本，${res.duplicate_count} 条重复`);
+  loadOverview();
+}
+
+async function loadExtra() {
+  const res = await api('/api/load-extra', { method: 'POST' });
+  showToast(`增量数据已补录：${res.new_unique} 条新增，${res.new_duplicates} 条重复`);
+  loadOverview();
+}
+
+async function doRerun() {
+  const res = await api('/api/rerun', { method: 'POST' });
+  showToast(`重跑完成：运行ID ${res.run_id}，${res.unique_count} 条样本`);
+  loadOverview();
+}
+
+function showToast(msg) {
+  const el = document.createElement('div');
+  el.style.cssText = 'position:fixed;top:20px;right:20px;background:#2d3748;color:#fff;padding:12px 20px;border-radius:8px;font-size:14px;z-index:200;box-shadow:0 4px 12px rgba(0,0,0,.15);';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 3000);
+}
+
+async function loadSamples() {
+  const status = document.getElementById('sample-filter')?.value || '';
+  const res = await api('/api/samples' + (status ? `?status=${status}` : ''));
+  const samples = res.samples || [];
+  let html = '<table><tr><th>ID</th><th>内容</th><th>领域</th><th>模型输出</th><th>置信度</th><th>引用结果</th><th>人工标签</th><th>状态</th><th>来源</th><th>操作</th></tr>';
+  for (const s of samples) {
+    const statusBadge = {
+      pending: 'badge-yellow', stratified: 'badge-blue', reviewed: 'badge-green',
+      duplicate: 'badge-red'
+    }[s.status] || 'badge-blue';
+    const conf = s.model_confidence != null ? (s.model_confidence * 100).toFixed(0) + '%' : '-';
+    const confColor = s.model_confidence >= 0.8 ? 'var(--success)' : s.model_confidence >= 0.5 ? 'var(--warning)' : 'var(--danger)';
+    html += `<tr>
+      <td class="mono">${s.id}</td>
+      <td class="truncate" title="${esc(s.content)}">${esc(s.content) || '<span class="text-muted">空</span>'}</td>
+      <td>${s.domain || '<span class="text-muted">-</span>'}</td>
+      <td>${s.model_output || '<span class="text-muted">-</span>'}</td>
+      <td style="color:${s.model_confidence != null ? confColor : 'var(--text2)'}">${conf}</td>
+      <td>${s.reference_result || '<span class="text-muted" style="color:var(--orange)">缺</span>'}</td>
+      <td>${s.human_label ? `<span style="color:var(--purple)">${esc(s.human_label)}</span>` : '-'}</td>
+      <td><span class="badge ${statusBadge}">${s.status}</span>${s.is_duplicate ? ' <span class="badge badge-red">重复</span>' : ''}</td>
+      <td class="text-xs">${s.source || '-'}</td>
+      <td><button class="btn btn-sm" onclick="viewSampleDetail('${s.id}')">溯源</button></td>
+    </tr>`;
+  }
+  html += '</table>';
+  document.getElementById('samples-table').innerHTML = samples.length ? html : '<div class="empty-state"><div class="icon">📭</div>暂无样本数据</div>';
+}
+
+async function loadRunSelects() {
+  const res = await api('/api/runs');
+  const runs = res.runs || [];
+  const sel = document.getElementById('strat-run-select');
+  sel.innerHTML = runs.map(r => `<option value="${r.id}">${r.id} - ${r.run_time?.slice(0,19).replace('T',' ')} (${r.run_type})</option>`).join('');
+}
+
+async function loadStratification() {
+  const runId = document.getElementById('strat-run-select')?.value;
+  if (!runId) { document.getElementById('strat-content').innerHTML = '<div class="empty-state">请选择运行</div>'; return; }
+  const res = await api(`/api/runs/${runId}`);
+  const strats = res.stratifications || [];
+  const metrics = res.metrics || [];
+
+  const filtered = strats.filter(s => s.stratum_type === currentStratType);
+  const byStratum = {};
+  for (const s of filtered) {
+    if (!byStratum[s.stratum]) byStratum[s.stratum] = [];
+    byStratum[s.stratum].push(s);
+  }
+
+  const colors = ['var(--primary)', 'var(--success)', 'var(--warning)', 'var(--danger)', 'var(--purple)', 'var(--orange)', 'var(--teal)'];
+  const colorMap = {};
+  let ci = 0;
+  for (const k of Object.keys(byStratum)) { colorMap[k] = colors[ci++ % colors.length]; }
+
+  const total = filtered.length;
+
+  let html = '<div class="stratum-grid">';
+  for (const [name, items] of Object.entries(byStratum)) {
+    const pct = total > 0 ? (items.length / total * 100) : 0;
+    html += `<div class="stratum-card">
+      <h4><span class="stratum-tag" style="background:${colorMap[name]}20;color:${colorMap[name]}">${esc(name)}</span></h4>
+      <div class="count">${items.length}</div>
+      <div class="pct">占比 ${pct.toFixed(1)}%</div>
+      <div class="bar"><div class="bar-fill" style="width:${pct}%;background:${colorMap[name]}"></div></div>
+      <div style="margin-top:10px;max-height:200px;overflow-y:auto;font-size:12px;">
+        ${items.slice(0, 8).map(it => `<div style="padding:3px 0;border-bottom:1px solid #f0f0f0;">
+          <span class="mono">${it.sample_id}</span> ${esc(it.content?.slice(0, 40) || '')}
+          <div class="text-xs text-muted">${esc(it.auto_reason || '')}</div>
+        </div>`).join('')}
+        ${items.length > 8 ? `<div class="text-xs text-muted" style="padding:4px 0">还有 ${items.length - 8} 条...</div>` : ''}
+      </div>
+    </div>`;
+  }
+  html += '</div>';
+  document.getElementById('strat-content').innerHTML = html || '<div class="empty-state">该维度暂无数据</div>';
+}
+
+function switchStratTab(el) {
+  document.querySelectorAll('#strat-tabs .tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  currentStratType = el.dataset.stype;
+  loadStratification();
+}
+
+async function loadReviewList() {
+  const res = await api('/api/samples');
+  const samples = (res.samples || []).filter(s => s.status === 'stratified' || s.status === 'reviewed');
+  let html = '<table><tr><th>ID</th><th>内容</th><th>模型输出</th><th>人工标签</th><th>操作</th></tr>';
+  for (const s of samples) {
+    html += `<tr>
+      <td class="mono">${s.id}</td>
+      <td class="truncate">${esc(s.content || '')}</td>
+      <td>${esc(s.model_output || '-')}</td>
+      <td>${s.human_label ? `<span style="color:var(--purple)">${esc(s.human_label)}</span>` : '-'}</td>
+      <td><button class="btn btn-sm" onclick="openReviewModal('${s.id}','${esc(s.human_label || s.model_output || '')}')">修改标签</button></td>
+    </tr>`;
+  }
+  html += '</table>';
+  document.getElementById('review-list').innerHTML = samples.length ? html : '<div class="empty-state"><div class="icon">✅</div>暂无需要复核的样本</div>';
+}
+
+function openReviewModal(sampleId, currentLabel) {
+  document.getElementById('modal-container').innerHTML = `
+    <div class="modal-overlay" onclick="closeModal(event)">
+      <div class="modal" onclick="event.stopPropagation()">
+        <h3>人工复核 — 样本 ${sampleId}</h3>
+        <div class="form-group">
+          <label>新标签</label>
+          <input type="text" id="review-label-input" value="${esc(currentLabel)}">
+        </div>
+        <div class="form-group">
+          <label>复核人</label>
+          <input type="text" id="review-operator-input" value="复核人" placeholder="请输入姓名">
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px;">
+          <button class="btn" onclick="closeModal()">取消</button>
+          <button class="btn btn-primary" onclick="submitReview('${sampleId}')">确认修改</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+async function submitReview(sampleId) {
+  const newLabel = document.getElementById('review-label-input').value;
+  const operator = document.getElementById('review-operator-input').value || '人工复核';
+  await api('/api/review', {
+    method: 'POST',
+    body: { sample_id: sampleId, new_label: newLabel, operator: operator }
+  });
+  closeModal();
+  showToast(`样本 ${sampleId} 标签已更新为「${newLabel}」`);
+  loadReviewList();
+}
+
+function closeModal(e) {
+  if (e && e.target !== e.currentTarget) return;
+  document.getElementById('modal-container').innerHTML = '';
+}
+
+async function loadCompareSelects() {
+  const res = await api('/api/runs');
+  const runs = res.runs || [];
+  const opts = runs.map(r => `<option value="${r.id}">${r.id} - ${r.run_type} (${r.run_time?.slice(0,19).replace('T',' ')})</option>`).join('');
+  document.getElementById('compare-run-a').innerHTML = opts;
+  document.getElementById('compare-run-b').innerHTML = opts;
+  if (runs.length >= 2) document.getElementById('compare-run-b').selectedIndex = 1;
+}
+
+async function doCompare() {
+  const a = document.getElementById('compare-run-a').value;
+  const b = document.getElementById('compare-run-b').value;
+  if (!a || !b) { showToast('请选择两次运行'); return; }
+  const res = await api('/api/compare', { method: 'POST', body: { run_id_a: a, run_id_b: b } });
+  renderCompare(res);
+}
+
+function renderCompare(data) {
+  const mc = data.metric_changes || {};
+  const sc = data.sample_stratum_changes || [];
+
+  let html = '<div class="card"><div class="card-header">指标变化</div>';
+  for (const [stratum, diffs] of Object.entries(mc)) {
+    html += `<div style="margin-bottom:12px;"><strong class="text-sm">${esc(stratum)}</strong>`;
+    for (const [metric, d] of Object.entries(diffs)) {
+      const changeClass = d.change > 0 ? 'positive' : '';
+      const arrow = d.change > 0.001 ? '↑' : d.change < -0.001 ? '↓' : '→';
+      html += `<div class="metric-row">
+        <span>${esc(metric)}</span>
+        <span>${d.before.toFixed(4)} → ${d.after.toFixed(4)} <span class="change-arrow ${changeClass}">${arrow} ${d.change >= 0 ? '+' : ''}${d.change.toFixed(4)}</span></span>
+      </div>`;
+    }
+    html += '</div>';
+  }
+  html += '</div>';
+
+  html += '<div class="card"><div class="card-header">样本分层变化</div>';
+  if (sc.length) {
+    html += '<table><tr><th>样本ID</th><th>分层类型</th><th>原分层</th><th>新分层</th></tr>';
+    for (const c of sc) {
+      html += `<tr><td class="mono">${c.sample_id}</td><td>${c.stratum_type}</td><td>${c.before}</td><td>${c.after}</td></tr>`;
+    }
+    html += '</table>';
+  } else {
+    html += '<p class="text-sm text-muted">已有样本的分层结果没有变化</p>';
+  }
+  html += `<p class="text-sm">新增样本分层记录：${data.new_samples_count} 条 | 移除：${data.removed_samples_count} 条</p></div>`;
+
+  html += `<div class="card"><div class="card-header">同事解读</div><div class="report-content">${esc(data.explanation || '')}</div></div>`;
+
+  document.getElementById('compare-result').innerHTML = html;
+}
+
+async function loadReportSelects() {
+  const res = await api('/api/runs');
+  const runs = res.runs || [];
+  document.getElementById('report-run-select').innerHTML = runs.map(r =>
+    `<option value="${r.id}">${r.id} - ${r.run_type} (${r.run_time?.slice(0,19).replace('T',' ')})</option>`
+  ).join('');
+}
+
+async function loadReport() {
+  const runId = document.getElementById('report-run-select')?.value;
+  if (!runId) { document.getElementById('report-content').innerHTML = '<div class="empty-state">请选择运行</div>'; return; }
+  const res = await api(`/api/report/${runId}`);
+  if (res.error) { document.getElementById('report-content').innerHTML = `<p class="text-sm" style="color:var(--danger)">${res.error}</p>`; return; }
+  document.getElementById('report-content').innerHTML = `<div class="report-content">${esc(res.readable_report || '')}</div>`;
+}
+
+async function doTrace() {
+  const sid = document.getElementById('trace-input').value.trim();
+  if (!sid) { showToast('请输入样本ID'); return; }
+  const res = await api(`/api/samples/${sid}`);
+  if (!res.sample) { document.getElementById('trace-result').innerHTML = `<p class="text-sm" style="color:var(--danger)">样本 ${sid} 不存在</p>`; return; }
+  renderTrace(res);
+}
+
+async function viewSampleDetail(sid) {
+  const res = await api(`/api/samples/${sid}`);
+  if (!res.sample) { showToast('样本不存在'); return; }
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelector('[data-page="trace"]').classList.add('active');
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-trace').classList.add('active');
+  document.getElementById('trace-input').value = sid;
+  renderTrace(res);
+}
+
+function renderTrace(data) {
+  const s = data.sample;
+  const strats = data.stratifications || [];
+  const audit = data.audit_trail || [];
+
+  let html = `<div class="card"><div class="card-header">样本信息 — ${s.id}</div>
+    <table>
+      <tr><td class="text-muted" style="width:120px">内容</td><td>${esc(s.content || '(空)')}</td></tr>
+      <tr><td class="text-muted">领域</td><td>${s.domain || '-'}</td></tr>
+      <tr><td class="text-muted">模型输出</td><td>${esc(s.model_output || '-')}</td></tr>
+      <tr><td class="text-muted">置信度</td><td>${s.model_confidence != null ? (s.model_confidence * 100).toFixed(0) + '%' : '-'}</td></tr>
+      <tr><td class="text-muted">引用结果</td><td>${s.reference_result ? esc(s.reference_result) : '<span style="color:var(--orange)">缺</span>'}</td></tr>
+      <tr><td class="text-muted">人工标签</td><td>${s.human_label ? `<span style="color:var(--purple)">${esc(s.human_label)}</span>` : '-'}${s.label_modified_by ? ` (由 ${esc(s.label_modified_by)} 修改)` : ''}</td></tr>
+      <tr><td class="text-muted">原始标签</td><td>${s.original_label ? esc(s.original_label) : '-'}</td></tr>
+      <tr><td class="text-muted">来源</td><td>${esc(s.source || '-')}</td></tr>
+      <tr><td class="text-muted">导入批次</td><td>${esc(s.import_batch || '-')}</td></tr>
+      <tr><td class="text-muted">导入时间</td><td>${s.import_time || '-'}</td></tr>
+      <tr><td class="text-muted">状态</td><td>${s.is_duplicate ? `<span class="badge badge-red">重复</span> (指向 ${s.duplicate_of})` : `<span class="badge badge-blue">${s.status}</span>`}</td></tr>
+    </table>
+  </div>`;
+
+  if (strats.length) {
+    html += '<div class="card"><div class="card-header">分层判定记录</div>';
+    for (const st of strats) {
+      html += `<div style="margin-bottom:12px;padding:10px;background:#f7fafc;border-radius:6px;border:1px solid var(--border);">
+        <div class="text-sm"><strong>${st.stratum_type}</strong> → <span class="badge badge-purple">${esc(st.stratum)}</span>
+        <span class="text-xs text-muted" style="margin-left:8px">运行 ${st.run_id} | 置信度 ${st.confidence?.toFixed(2) || '-'}</span></div>
+        <div class="text-sm" style="margin-top:4px">${esc(st.auto_reason || '')}</div>
+        <div class="evidence-box"><strong class="text-xs">证据字段：</strong><code>${esc(JSON.stringify(st.evidence || {}, null, 2))}</code></div>
+      </div>`;
+    }
+    html += '</div>';
+  }
+
+  if (audit.length) {
+    html += '<div class="card"><div class="card-header">溯源日志</div><div class="timeline">';
+    for (const a of audit) {
+      const detail = [];
+      if (a.before_value != null) detail.push(`变更前：${esc(typeof a.before_value === 'string' ? a.before_value : JSON.stringify(a.before_value))}`);
+      if (a.after_value != null) detail.push(`变更后：${esc(typeof a.after_value === 'string' ? a.after_value : JSON.stringify(a.after_value))}`);
+      if (a.evidence_ref) detail.push(`证据：${esc(a.evidence_ref)}`);
+      html += `<div class="timeline-item">
+        <div class="time">${a.timestamp || ''}</div>
+        <div class="action">${esc(a.action)} <span class="text-muted">by ${esc(a.operator)}</span></div>
+        ${detail.length ? `<div class="detail">${detail.join(' | ')}</div>` : ''}
+      </div>`;
+    }
+    html += '</div></div>';
+  }
+
+  document.getElementById('trace-result').innerHTML = html;
+}
+
+function viewRunDetail(runId) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelector('[data-page="stratify"]').classList.add('active');
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-stratify').classList.add('active');
+  loadRunSelects();
+  setTimeout(() => {
+    document.getElementById('strat-run-select').value = runId;
+    loadStratification();
+  }, 200);
+}
+
+function esc(str) {
+  if (str == null) return '';
+  const d = document.createElement('div');
+  d.textContent = String(str);
+  return d.innerHTML;
+}
+
+loadOverview();
+</script>
+</body>
+</html>
