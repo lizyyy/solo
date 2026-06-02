@@ -1,0 +1,68 @@
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Noto+Sans+SC:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: Lora, "Noto Sans SC", system-ui, sans-serif;
+  line-height: 1.6;
+  font-weight: 400;
+  color: #2c3e50;
+  background-color: #faf8f5;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-4 py-2 bg-slate-800 text-white rounded transition-all duration-150 hover:bg-slate-850 hover:shadow-md active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  
+  .btn-secondary {
+    @apply px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded transition-all duration-150 hover:bg-warm-50 hover:shadow-sm active:scale-95;
+  }
+  
+  .btn-amber {
+    @apply px-4 py-2 bg-amber-500 text-white rounded transition-all duration-150 hover:bg-amber-600 hover:shadow-md active:scale-95;
+  }
+
+  .card {
+    @apply bg-white rounded-lg shadow-sm border border-warm-100 p-6;
+  }
+
+  .input-field {
+    @apply w-full px-3 py-2 border border-warm-200 rounded focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all duration-150;
+  }
+
+  .status-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .table-header {
+    @apply px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider bg-warm-50;
+  }
+
+  .table-cell {
+    @apply px-4 py-3 text-sm text-charcoal-500;
+  }
+}
+
+/* 打印样式优化 */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  body {
+    background: white !important;
+  }
+}
