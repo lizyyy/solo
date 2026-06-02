@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>资金头寸缺口预警 - 基金会计工作台</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #f5f7fa; color: #333; font-size: 14px; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #1e3a8a, #3b82f6); color: white; padding: 20px 30px; border-radius: 12px; margin-bottom: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .header h1 { font-size: 22px; font-weight: 600; margin-bottom: 8px; }
+        .header p { opacity: 0.9; font-size: 14px; }
+        .workflow-indicator { display: flex; gap: 8px; margin-top: 16px; }
+        .step { padding: 6px 16px; border-radius: 20px; font-size: 12px; background: rgba(255,255,255,0.2); }
+        .step.active { background: #10b981; }
+        .step.completed { background: rgba(255,255,255,0.4); }
+
+        .card { background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .card-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; color: #1e293b; display: flex; align-items: center; gap: 8px; }
+        .card-title .badge { font-size: 12px; padding: 2px 10px; border-radius: 12px; background: #e0e7ff; color: #4338ca; font-weight: 500; }
+
+        .self-check-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+        .check-item { padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; }
+        .check-item.passed { border-left: 4px solid #10b981; background: #f0fdf4; }
+        .check-item.warning { border-left: 4px solid #f59e0b; background: #fffbeb; }
+        .check-item.error { border-left: 4px solid #ef4444; background: #fef2f2; }
+        .check-name { font-weight: 600; margin-bottom: 4px; }
+        .check-message { font-size: 13px; color: #64748b; }
+
+        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+        .status-pending { background: #f1f5f9; color: #475569; }
+        .status-imported { background: #dbeafe; color: #1d4ed8; }
+        .status-review { background: #fef3c7; color: #b45309; }
+        .status-confirmed { background: #d1fae5; color: #047857; }
+        .status-audit { background: #ede9fe; color: #6d28d9; }
+        .status-abnormal { background: #fee2e2; color: #b91c1c; }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 12px 16px; background: #f8fafc; font-weight: 600; color: #475569; font-size: 13px; border-bottom: 2px solid #e2e8f0; }
+        td { padding: 14px 16px; border-bottom: 1px solid #f1f5f9; }
+        tr:hover td { background: #f8fafc; }
+        .row-number { font-family: 'Monaco', monospace; background: #f1f5f9; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+        .mixed-currency { background: #fef3c7; padding: 4px 8px; border-radius: 4px; font-size: 12px; color: #92400e; }
+
+        .btn { padding: 8px 16px; border: none; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+        .btn-primary { background: #3b82f6; color: white; }
+        .btn-primary:hover { background: #2563eb; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-success:hover { background: #059669; }
+        .btn-warning { background: #f59e0b; color: white; }
+        .btn-warning:hover { background: #d97706; }
+        .btn-secondary { background: #64748b; color: white; }
+        .btn-secondary:hover { background: #475569; }
+        .btn-group { display: flex; gap: 8px; }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+        .modal.show { display: flex; }
+        .modal-content { background: white; border-radius: 12px; padding: 24px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; }
+        .modal-title { font-size: 18px; font-weight: 600; margin-bottom: 20px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: 500; color: #374151; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+        .modal-footer { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; padding-top: 16px; border-top: 1px solid #e5e7eb; }
+
+        .audit-trail { background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 8px; }
+        .audit-trail .time { font-size: 12px; color: #64748b; margin-bottom: 4px; }
+        .audit-trail .action { font-weight: 500; }
+        .audit-trail .change { font-size: 13px; color: #475569; margin-top: 4px; }
+        .diff-before { color: #dc2626; text-decoration: line-through; }
+        .diff-after { color: #059669; }
+
+        .action-links { display: flex; gap: 12px; }
+        .action-link { color: #3b82f6; cursor: pointer; font-size: 13px; }
+        .action-link:hover { text-decoration: underline; }
+
+        .tabs { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; }
+        .tab { padding: 10px 20px; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; color: #64748b; font-weight: 500; }
+        .tab.active { color: #3b82f6; border-bottom-color: #3b82f6; }
+
+        .info-box { padding: 12px 16px; background: #eff6ff; border-radius: 8px; border-left: 4px solid #3b82f6; margin-bottom: 16px; }
+        .info-box p { font-size: 13px; color: #1e40af; line-height: 1.6; }
+
+        .import-section { display: flex; gap: 12px; align-items: flex-end; }
+        .import-section .form-group { flex: 1; margin-bottom: 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>资金头寸缺口预警</h1>
+            <p>基金会计林姐与托管对接人交接工作台 - 尾差调整 & 托管确认</p>
+            <div class="workflow-indicator">
+                <span class="step" id="step1">① 导入尾差调整条</span>
+                <span class="step" id="step2">② 托管确认页复核</span>
+                <span class="step" id="step3">③ 审计明细更新</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">
+                基本自检结果
+                <span class="badge" id="checkBadge">3/4 通过</span>
+            </div>
+            <div class="self-check-grid" id="selfCheckGrid">
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">尾差调整条明细</div>
+            <div class="info-box">
+                <p><strong>操作指引：</strong>港币和人民币写在同一列的记录会标为"需托管复核"，别急着改，先让托管对接人确认。每一条都保留原始行号、人工改动痕迹、完整审计追踪，对账时能回到证据。</p>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>原始行号</th>
+                        <th>证券代码</th>
+                        <th>证券名称</th>
+                        <th>原始金额</th>
+                        <th>币种</th>
+                        <th>人工调整</th>
+                        <th>调整后金额</th>
+                        <th>当前状态</th>
+                        <th>异常标记</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="entriesTable">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <div class="card-title">快捷操作</div>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="showImportModal()">导入尾差调整条</button>
+                <button class="btn btn-success" onclick="updateAudit()">更新审计明细</button>
+                <button class="btn btn-secondary" onclick="exportData()">导出CSV</button>
+                <button class="btn btn-warning" onclick="runSelfCheck()">重新自检</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="importModal">
+        <div class="modal-content">
+            <div class="modal-title">导入尾差调整条</div>
+            <div class="info-box">
+                <p>模拟Excel导入。测试币种同列时，金额填"HKD10000/RMB8000"这类格式，系统会自动识别并标记异常。</p>
+            </div>
+            <div class="form-group">
+                <label>文件名</label>
+                <input type="text" id="importFileName" value="尾差调整表_20240603.xlsx">
+            </div>
+            <div class="form-group">
+                <label>模拟导入数据（每行一条记录）</label>
+                <textarea id="importData" rows="8" placeholder="证券代码,证券名称,金额&#10;000001,平安银行,150000&#10;600036,招商银行,HKD250000&#10;000858,五粮液,HKD80000/RMB68000"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('importModal')">取消</button>
+                <button class="btn btn-primary" onclick="doImport()">确认导入</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="adjustModal">
+        <div class="modal-content">
+            <div class="modal-title">人工调整尾差</div>
+            <div class="form-group">
+                <label>证券名称</label>
+                <input type="text" id="adjustSecurityName" readonly>
+            </div>
+            <div class="form-group">
+                <label>原始金额</label>
+                <input type="text" id="adjustOriginalAmount" readonly>
+            </div>
+            <div class="form-group">
+                <label>调整金额（正数增加，负数减少）</label>
+                <input type="number" id="adjustAmount" step="0.01" placeholder="例如: -500">
+            </div>
+            <div class="form-group">
+                <label>调整说明</label>
+                <input type="text" id="adjustRemark" placeholder="例如：托管核对后确认少计">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('adjustModal')">取消</button>
+                <button class="btn btn-primary" onclick="doAdjust()">确认调整</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="custodianModal">
+        <div class="modal-content">
+            <div class="modal-title">托管确认</div>
+            <div class="info-box">
+                <p>托管对接人复核确认。如果是币种同列的异常记录，确认后系统会自动修正币种和金额。</p>
+            </div>
+            <div class="form-group">
+                <label>证券名称</label>
+                <input type="text" id="custodianSecurityName" readonly>
+            </div>
+            <div class="form-group">
+                <label>原始金额（导入时）</label>
+                <input type="text" id="custodianOriginalAmount" readonly>
+            </div>
+            <div class="form-group">
+                <label>托管确认金额</label>
+                <input type="number" id="custodianAmount" step="0.01">
+            </div>
+            <div class="form-group">
+                <label>确认币种</label>
+                <select id="custodianCurrency">
+                    <option value="CNY">人民币 (CNY)</option>
+                    <option value="HKD">港币 (HKD)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>是否为人工修正币种同列</label>
+                <select id="custodianIsCorrection">
+                    <option value="false">否</option>
+                    <option value="true">是</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>托管对接人</label>
+                <input type="text" id="custodianOperator" value="托管对接人">
+            </div>
+            <div class="form-group">
+                <label>备注</label>
+                <input type="text" id="custodianRemark" placeholder="托管确认说明">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('custodianModal')">取消</button>
+                <button class="btn btn-success" onclick="doCustodianConfirm()">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="auditModal">
+        <div class="modal-content">
+            <div class="modal-title">审计追踪记录</div>
+            <div id="auditTrailList">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('auditModal')">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8080/api';
+        let currentWarningId = null;
+        let currentData = null;
+        let selectedEntryId = null;
+
+        async function init() {
+            await createOrGetWarning();
+            await loadData();
+        }
+
+        async function createOrGetWarning() {
+            const listRes = await fetch(`${API_BASE}/warnings`);
+            const warnings = await listRes.json();
+
+            if (warnings.length > 0) {
+                currentWarningId = warnings[0].id;
+            } else {
+                const createRes = await fetch(`${API_BASE}/warnings`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        report_date: new Date().toISOString().split('T')[0],
+                        fund_code: 'FUND001',
+                        fund_name: ' test混合基金'
+                    })
+                });
+                const result = await createRes.json();
+                currentWarningId = result.warning_id;
+            }
+        }
+
+        async function loadData() {
+            const res = await fetch(`${API_BASE}/warnings/${currentWarningId}/page-data`);
+            currentData = await res.json();
+            renderSelfCheck();
+            renderEntries();
+            updateWorkflowStatus();
+        }
+
+        function renderSelfCheck() {
+            const grid = document.getElementById('selfCheckGrid');
+            const checks = currentData.self_check_results || [];
+
+            let passed = 0, total = Math.max(checks.length, 1);
+            checks.forEach(c => { if (c.passed) passed++; });
+            document.getElementById('checkBadge').textContent = `${passed}/${total} 通过`;
+
+            if (checks.length === 0) {
+                grid.innerHTML = '<div class="check-item"><div class="check-name">暂无检查结果</div><div class="check-message">导入数据后自动运行自检</div></div>';
+                return;
+            }
+
+            grid.innerHTML = checks.map(c => `
+                <div class="check-item ${c.level}">
+                    <div class="check-name">${c.check_name}</div>
+                    <div class="check-message">${c.message}</div>
+                    ${c.details && c.details.length ? `<div style="font-size:12px;margin-top:8px;color:#666;">涉及 ${c.details.length} 条记录</div>` : ''}
+                </div>
+            `).join('');
+        }
+
+        function renderEntries() {
+            const tbody = document.getElementById('entriesTable');
+            const entries = currentData.entries || [];
+
+            if (entries.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:#999;padding:40px;">暂无数据，请导入尾差调整条</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = entries.map(e => `
+                <tr>
+                    <td><span class="row-number">${e.original_row_number}</span></td>
+                    <td>${e.security_code}</td>
+                    <td>${e.security_name}</td>
+                    <td>${e.original_amount.toLocaleString()}</td>
+                    <td>${e.original_currency} ${e.mixed_currency_note ? '<span class="mixed-currency" title="币种同列，需托管复核">⚠ 混合</span>' : ''}</td>
+                    <td>${e.manual_adjustment !== null ? e.manual_adjustment.toLocaleString() : '-'}</td>
+                    <td>${e.adjusted_amount !== null ? e.adjusted_amount.toLocaleString() : e.original_amount.toLocaleString()}</td>
+                    <td>${getStatusBadge(e.current_status)}</td>
+                    <td>${e.abnormal_types.length ? e.abnormal_types.join(', ') : '-'}</td>
+                    <td>
+                        <div class="action-links">
+                            <span class="action-link" onclick="showAdjust('${e.id}')">调整</span>
+                            <span class="action-link" onclick="showCustodian('${e.id}')">托管确认</span>
+                            <span class="action-link" onclick="showAudit('${e.id}')">审计追踪</span>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function getStatusBadge(status) {
+            const badgeClass = {
+                '待处理': 'status-pending',
+                '已导入': 'status-imported',
+                '需托管复核': 'status-review',
+                '托管已确认': 'status-confirmed',
+                '审计已更新': 'status-audit',
+                '异常': 'status-abnormal'
+            };
+            return `<span class="status-badge ${badgeClass[status] || 'status-pending'}">${status}</span>`;
+        }
+
+        function updateWorkflowStatus() {
+            const entries = currentData.entries || [];
+            if (entries.length === 0) {
+                document.getElementById('step1').className = 'step active';
+                document.getElementById('step2').className = 'step';
+                document.getElementById('step3').className = 'step';
+            } else {
+                const hasConfirmed = entries.some(e => e.current_status === '托管已确认' || e.current_status === '审计已更新');
+                const hasAudited = entries.some(e => e.current_status === '审计已更新');
+
+                document.getElementById('step1').className = 'step completed';
+                if (hasConfirmed || hasAudited) {
+                    document.getElementById('step2').className = 'step completed';
+                } else {
+                    document.getElementById('step2').className = 'step active';
+                }
+                if (hasAudited) {
+                    document.getElementById('step3').className = 'step completed';
+                } else {
+                    document.getElementById('step3').className = hasConfirmed ? 'step active' : 'step';
+                }
+            }
+        }
+
+        function showImportModal() {
+            document.getElementById('importModal').classList.add('show');
+        }
+
+        async function doImport() {
+            const fileName = document.getElementById('importFileName').value;
+            const dataText = document.getElementById('importData').value;
+
+            const rows = dataText.trim().split('\n').filter((line, idx) => idx > 0).map(line => {
+                const parts = line.split(',');
+                return {
+                    security_code: parts[0] || '',
+                    security_name: parts[1] || '',
+                    amount: parts[2] || '0'
+                };
+            });
+
+            const res = await fetch(`${API_BASE}/warnings/${currentWarningId}/import`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ rows, file_name: fileName })
+            });
+
+            const result = await res.json();
+            alert(result.message);
+            closeModal('importModal');
+            await loadData();
+        }
+
+        function showAdjust(entryId) {
+            selectedEntryId = entryId;
+            const entry = currentData.entries.find(e => e.id === entryId);
+            document.getElementById('adjustSecurityName').value = entry.security_name;
+            document.getElementById('adjustOriginalAmount').value = `${entry.original_amount} ${entry.original_currency}`;
+            document.getElementById('adjustAmount').value = '';
+            document.getElementById('adjustRemark').value = '';
+            document.getElementById('adjustModal').classList.add('show');
+        }
+
+        async function doAdjust() {
+            const adjustment = parseFloat(document.getElementById('adjustAmount').value);
+            const remark = document.getElementById('adjustRemark').value;
+
+            const res = await fetch(`${API_BASE}/warnings/${currentWarningId}/entries/${selectedEntryId}/adjust`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    operator: '林姐',
+                    adjustment_amount: adjustment,
+                    remark: remark
+                })
+            });
+
+            const result = await res.json();
+            alert(result.message);
+            closeModal('adjustModal');
+            await loadData();
+        }
+
+        function showCustodian(entryId) {
+            selectedEntryId = entryId;
+            const entry = currentData.entries.find(e => e.id === entryId);
+            document.getElementById('custodianSecurityName').value = entry.security_name;
+            document.getElementById('custodianOriginalAmount').value = `${entry.original_amount} ${entry.original_currency}`;
+            document.getElementById('custodianAmount').value = entry.original_amount;
+            document.getElementById('custodianCurrency').value = entry.original_currency === 'MIXED' ? 'CNY' : entry.original_currency;
+            document.getElementById('custodianIsCorrection').value = entry.original_currency === 'MIXED' ? 'true' : 'false';
+            document.getElementById('custodianRemark').value = '';
+            document.getElementById('custodianModal').classList.add('show');
+        }
+
+        async function doCustodianConfirm() {
+            const res = await fetch(`${API_BASE}/warnings/${currentWarningId}/entries/${selectedEntryId}/custodian-confirm`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    custodian_operator: document.getElementById('custodianOperator').value,
+                    confirmed_amount: parseFloat(document.getElementById('custodianAmount').value),
+                    confirmed_currency: document.getElementById('custodianCurrency').value,
+                    remark: document.getElementById('custodianRemark').value,
+                    is_correction: document.getElementById('custodianIsCorrection').value === 'true'
+                })
+            });
+
+            const result = await res.json();
+            alert(result.message);
+            closeModal('custodianModal');
+            await loadData();
+        }
+
+        function showAudit(entryId) {
+            const entry = currentData.entries.find(e => e.id === entryId);
+            const list = document.getElementById('auditTrailList');
+
+            list.innerHTML = entry.audit_trails.map(t => `
+                <div class="audit-trail">
+                    <div class="time">${new Date(t.timestamp).toLocaleString('zh-CN')} - ${t.operator}</div>
+                    <div class="action">${t.action}</div>
+                    ${t.before_value || t.after_value ? `<div class="change">
+                        ${t.before_value ? `<span class="diff-before">${t.before_value}</span>` : ''}
+                        ${t.before_value && t.after_value ? ' → ' : ''}
+                        ${t.after_value ? `<span class="diff-after">${t.after_value}</span>` : ''}
+                    </div>` : ''}
+                    ${t.remark ? `<div style="font-size:12px;color:#666;margin-top:4px;">备注: ${t.remark}</div>` : ''}
+                </div>
+            `).join('');
+
+            document.getElementById('auditModal').classList.add('show');
+        }
+
+        async function updateAudit() {
+            const res = await fetch(`${API_BASE}/warnings/${currentWarningId}/update-audit`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ operator: '林姐' })
+            });
+            const result = await res.json();
+            alert(result.message);
+            await loadData();
+        }
+
+        async function exportData() {
+            window.open(`${API_BASE}/warnings/${currentWarningId}/export`, '_blank');
+        }
+
+        async function runSelfCheck() {
+            const res = await fetch(`${API_BASE}/warnings/${currentWarningId}/self-check`);
+            const result = await res.json();
+            alert(`自检完成: ${result.passed_count}/${result.total_count} 通过`);
+            await loadData();
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        init();
+    </script>
+</body>
+</html>
