@@ -1,0 +1,58 @@
+[
+  {
+    "sample_id": "S001",
+    "decision": "merge",
+    "confidence": 0.95,
+    "model_version": "v2.3.1",
+    "merge_reason": "名称高度相似，同属科技行业"
+  },
+  {
+    "sample_id": "S002",
+    "decision": "not_merge",
+    "confidence": 0.98,
+    "model_version": "v2.3.1",
+    "merge_reason": "公司名称完全不同"
+  },
+  {
+    "sample_id": "S003",
+    "decision": "merge",
+    "confidence": 0.88,
+    "model_version": "v2.4.0",
+    "merge_reason": "v2.4优化：识别到北京字节跳动是字节跳动的全称"
+  },
+  {
+    "sample_id": "S004",
+    "decision": "merge",
+    "confidence": 1.0,
+    "model_version": "v2.3.1",
+    "merge_reason": "实体完全相同"
+  },
+  {
+    "sample_id": "S005",
+    "decision": "review",
+    "confidence": 0.3,
+    "model_version": "v2.3.1",
+    "merge_reason": "数据不完整，无法判断"
+  },
+  {
+    "sample_id": "S006",
+    "decision": "merge",
+    "confidence": 0.48,
+    "model_version": "v2.3.1",
+    "merge_reason": "名称有相似性，但置信度较低"
+  },
+  {
+    "sample_id": "S007",
+    "decision": "merge",
+    "confidence": 0.85,
+    "model_version": "v2.3.1",
+    "merge_reason": "简称匹配"
+  },
+  {
+    "sample_id": "S008",
+    "decision": "not_merge",
+    "confidence": 0.65,
+    "model_version": "v2.4.0",
+    "merge_reason": "v2.4优化：识别子公司关系，网易游戏是子公司不应合并"
+  }
+]

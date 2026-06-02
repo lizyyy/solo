@@ -1,0 +1,157 @@
+[
+  {
+    "sample_id": "S001",
+    "entity_a_entity_id": "E001",
+    "entity_a_entity_type": "company",
+    "entity_a_entity_value": "阿里巴巴集团控股有限公司",
+    "entity_b_entity_id": "E002",
+    "entity_b_entity_type": "company",
+    "entity_b_entity_value": "阿里巴巴集团",
+    "ground_truth": "merge",
+    "tags": [
+      "high_confidence",
+      "verified"
+    ],
+    "source": {
+      "source_system": "risk_control_db",
+      "source_batch": "batch_2024_01",
+      "source_id": "RC_001",
+      "processed_by": "auto_importer"
+    }
+  },
+  {
+    "sample_id": "S002",
+    "entity_a_entity_id": "E003",
+    "entity_a_entity_type": "company",
+    "entity_a_entity_value": "腾讯科技(深圳)有限公司",
+    "entity_b_entity_id": "E004",
+    "entity_b_entity_type": "company",
+    "entity_b_entity_value": "阿里巴巴集团",
+    "ground_truth": "not_merge",
+    "tags": [
+      "easy_case"
+    ],
+    "source": {
+      "source_system": "risk_control_db",
+      "source_batch": "batch_2024_01",
+      "source_id": "RC_002",
+      "processed_by": "auto_importer"
+    }
+  },
+  {
+    "sample_id": "S003",
+    "entity_a_entity_id": "E005",
+    "entity_a_entity_type": "company",
+    "entity_a_entity_value": "北京字节跳动科技有限公司",
+    "entity_b_entity_id": "E006",
+    "entity_b_entity_type": "company",
+    "entity_b_entity_value": "字节跳动有限公司",
+    "ground_truth": "merge",
+    "tags": [
+      "label_conflict_candidate"
+    ],
+    "is_boundary": true,
+    "source": {
+      "source_system": "manual_review",
+      "source_batch": "batch_2024_01",
+      "source_id": "MR_001",
+      "processed_by": "laotang"
+    }
+  },
+  {
+    "sample_id": "S004",
+    "entity_a_entity_id": "E007",
+    "entity_a_entity_type": "person",
+    "entity_a_entity_value": "张三",
+    "entity_b_entity_id": "E008",
+    "entity_b_entity_type": "person",
+    "entity_b_entity_value": "张三",
+    "ground_truth": "merge",
+    "tags": [
+      "duplicate_test"
+    ],
+    "source": {
+      "source_system": "customer_service",
+      "source_batch": "batch_2024_01",
+      "source_id": "CS_001",
+      "processed_by": "auto_importer"
+    }
+  },
+  {
+    "sample_id": "S005",
+    "entity_a_entity_id": "E009",
+    "entity_a_entity_type": "company",
+    "entity_a_entity_value": "",
+    "entity_b_entity_id": "E010",
+    "entity_b_entity_type": "company",
+    "entity_b_entity_value": "美团点评",
+    "ground_truth": "not_merge",
+    "tags": [
+      "missing_value_test"
+    ],
+    "source": {
+      "source_system": "api_import",
+      "source_batch": "batch_2024_01",
+      "source_id": "API_001",
+      "processed_by": "api_connector"
+    }
+  },
+  {
+    "sample_id": "S006",
+    "entity_a_entity_id": "E011",
+    "entity_a_entity_type": "company",
+    "entity_a_entity_value": "京东商城",
+    "entity_b_entity_id": "E012",
+    "entity_b_entity_type": "company",
+    "entity_b_entity_value": "京东集团",
+    "ground_truth": "merge",
+    "tags": [
+      "boundary_case"
+    ],
+    "is_boundary": true,
+    "source": {
+      "source_system": "risk_control_db",
+      "source_batch": "batch_2024_01",
+      "source_id": "RC_003",
+      "processed_by": "laotang"
+    }
+  },
+  {
+    "sample_id": "S007",
+    "entity_a_entity_id": "E013",
+    "entity_a_entity_type": "company",
+    "entity_a_entity_value": "小米科技有限责任公司",
+    "entity_b_entity_id": "E014",
+    "entity_b_entity_type": "company",
+    "entity_b_entity_value": "小米公司",
+    "ground_truth": "merge",
+    "tags": [
+      "feedback_case"
+    ],
+    "source": {
+      "source_system": "online_feedback",
+      "source_batch": "batch_2024_01",
+      "source_id": "FB_001",
+      "processed_by": "feedback_system"
+    }
+  },
+  {
+    "sample_id": "S008",
+    "entity_a_entity_id": "E015",
+    "entity_a_entity_type": "company",
+    "entity_a_entity_value": "网易公司",
+    "entity_b_entity_id": "E016",
+    "entity_b_entity_type": "company",
+    "entity_b_entity_value": "网易游戏",
+    "ground_truth": "not_merge",
+    "tags": [
+      "subsidiary_case"
+    ],
+    "source": {
+      "source_system": "risk_control_db",
+      "source_batch": "batch_2024_01",
+      "source_id": "RC_004",
+      "processed_by": "auto_importer"
+    }
+  }
+]

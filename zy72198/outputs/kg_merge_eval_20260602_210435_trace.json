@@ -1,0 +1,247 @@
+{
+  "S001": {
+    "sample_id": "S001",
+    "sample_source": {
+      "source_system": "risk_control_db",
+      "source_batch": "batch_2024_01",
+      "source_id": "RC_001",
+      "imported_at": "2026-06-02T21:04:35.095111",
+      "processed_by": "auto_importer"
+    },
+    "model_processed": true,
+    "human_corrected": false,
+    "has_feedback": false,
+    "conflict_count": 0,
+    "decision_trail": [
+      {
+        "stage": "ground_truth",
+        "decision": "merge",
+        "time": "2026-06-02T21:04:35.095101"
+      },
+      {
+        "stage": "model",
+        "decision": "merge",
+        "confidence": 0.95,
+        "time": "2026-06-02T21:04:35.095465",
+        "model_version": "v2.3.1"
+      }
+    ]
+  },
+  "S002": {
+    "sample_id": "S002",
+    "sample_source": {
+      "source_system": "risk_control_db",
+      "source_batch": "batch_2024_01",
+      "source_id": "RC_002",
+      "imported_at": "2026-06-02T21:04:35.095116",
+      "processed_by": "auto_importer"
+    },
+    "model_processed": true,
+    "human_corrected": false,
+    "has_feedback": false,
+    "conflict_count": 0,
+    "decision_trail": [
+      {
+        "stage": "ground_truth",
+        "decision": "not_merge",
+        "time": "2026-06-02T21:04:35.095115"
+      },
+      {
+        "stage": "model",
+        "decision": "not_merge",
+        "confidence": 0.98,
+        "time": "2026-06-02T21:04:35.095470",
+        "model_version": "v2.3.1"
+      }
+    ]
+  },
+  "S003": {
+    "sample_id": "S003",
+    "sample_source": {
+      "source_system": "manual_review",
+      "source_batch": "batch_2024_01",
+      "source_id": "MR_001",
+      "imported_at": "2026-06-02T21:04:35.095121",
+      "processed_by": "laotang"
+    },
+    "model_processed": true,
+    "human_corrected": true,
+    "has_feedback": true,
+    "conflict_count": 2,
+    "decision_trail": [
+      {
+        "stage": "ground_truth",
+        "decision": "merge",
+        "time": "2026-06-02T21:04:35.095119"
+      },
+      {
+        "stage": "model",
+        "decision": "not_merge",
+        "confidence": 0.52,
+        "time": "2026-06-02T21:04:35.095472",
+        "model_version": "v2.3.1"
+      },
+      {
+        "stage": "human_correction",
+        "from_decision": "not_merge",
+        "to_decision": "merge",
+        "corrected_by": "laotang",
+        "time": "2026-06-02T21:04:35.095526"
+      }
+    ]
+  },
+  "S004": {
+    "sample_id": "S004",
+    "sample_source": {
+      "source_system": "customer_service",
+      "source_batch": "batch_2024_01",
+      "source_id": "CS_001",
+      "imported_at": "2026-06-02T21:04:35.095150",
+      "processed_by": "auto_importer"
+    },
+    "model_processed": true,
+    "human_corrected": false,
+    "has_feedback": false,
+    "conflict_count": 1,
+    "decision_trail": [
+      {
+        "stage": "ground_truth",
+        "decision": "merge",
+        "time": "2026-06-02T21:04:35.095123"
+      },
+      {
+        "stage": "model",
+        "decision": "merge",
+        "confidence": 1.0,
+        "time": "2026-06-02T21:04:35.095473",
+        "model_version": "v2.3.1"
+      }
+    ]
+  },
+  "S005": {
+    "sample_id": "S005",
+    "sample_source": {
+      "source_system": "api_import",
+      "source_batch": "batch_2024_01",
+      "source_id": "API_001",
+      "imported_at": "2026-06-02T21:04:35.095295",
+      "processed_by": "api_connector"
+    },
+    "model_processed": true,
+    "human_corrected": false,
+    "has_feedback": false,
+    "conflict_count": 2,
+    "decision_trail": [
+      {
+        "stage": "ground_truth",
+        "decision": "not_merge",
+        "time": "2026-06-02T21:04:35.095274"
+      },
+      {
+        "stage": "model",
+        "decision": "review",
+        "confidence": 0.3,
+        "time": "2026-06-02T21:04:35.095474",
+        "model_version": "v2.3.1"
+      }
+    ]
+  },
+  "S006": {
+    "sample_id": "S006",
+    "sample_source": {
+      "source_system": "risk_control_db",
+      "source_batch": "batch_2024_01",
+      "source_id": "RC_003",
+      "imported_at": "2026-06-02T21:04:35.095308",
+      "processed_by": "laotang"
+    },
+    "model_processed": true,
+    "human_corrected": true,
+    "has_feedback": false,
+    "conflict_count": 2,
+    "decision_trail": [
+      {
+        "stage": "ground_truth",
+        "decision": "merge",
+        "time": "2026-06-02T21:04:35.095306"
+      },
+      {
+        "stage": "model",
+        "decision": "merge",
+        "confidence": 0.48,
+        "time": "2026-06-02T21:04:35.095475",
+        "model_version": "v2.3.1"
+      },
+      {
+        "stage": "human_correction",
+        "from_decision": "merge",
+        "to_decision": "review",
+        "corrected_by": "laotang",
+        "time": "2026-06-02T21:04:35.095531"
+      }
+    ]
+  },
+  "S007": {
+    "sample_id": "S007",
+    "sample_source": {
+      "source_system": "online_feedback",
+      "source_batch": "batch_2024_01",
+      "source_id": "FB_001",
+      "imported_at": "2026-06-02T21:04:35.095331",
+      "processed_by": "feedback_system"
+    },
+    "model_processed": true,
+    "human_corrected": false,
+    "has_feedback": true,
+    "conflict_count": 0,
+    "decision_trail": [
+      {
+        "stage": "ground_truth",
+        "decision": "merge",
+        "time": "2026-06-02T21:04:35.095312"
+      },
+      {
+        "stage": "model",
+        "decision": "merge",
+        "confidence": 0.85,
+        "time": "2026-06-02T21:04:35.095477",
+        "model_version": "v2.3.1"
+      }
+    ]
+  },
+  "S008": {
+    "sample_id": "S008",
+    "sample_source": {
+      "source_system": "risk_control_db",
+      "source_batch": "batch_2024_01",
+      "source_id": "RC_004",
+      "imported_at": "2026-06-02T21:04:35.095350",
+      "processed_by": "auto_importer"
+    },
+    "model_processed": true,
+    "human_corrected": true,
+    "has_feedback": false,
+    "conflict_count": 2,
+    "decision_trail": [
+      {
+        "stage": "ground_truth",
+        "decision": "not_merge",
+        "time": "2026-06-02T21:04:35.095345"
+      },
+      {
+        "stage": "model",
+        "decision": "merge",
+        "confidence": 0.72,
+        "time": "2026-06-02T21:04:35.095478",
+        "model_version": "v2.3.1"
+      },
+      {
+        "stage": "human_correction",
+        "from_decision": "merge",
+        "to_decision": "not_merge",
+        "corrected_by": "zhangsan",
+        "time": "2026-06-02T21:04:35.095533"
+      }
+    ]
+  }
+}

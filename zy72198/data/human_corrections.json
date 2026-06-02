@@ -1,0 +1,23 @@
+[
+  {
+    "sample_id": "S003",
+    "original_decision": "not_merge",
+    "corrected_decision": "merge",
+    "correction_reason": "北京字节跳动就是字节跳动的全称，应该合并",
+    "corrected_by": "laotang"
+  },
+  {
+    "sample_id": "S006",
+    "original_decision": "merge",
+    "corrected_decision": "review",
+    "correction_reason": "京东商城和京东集团关系需要进一步确认",
+    "corrected_by": "laotang"
+  },
+  {
+    "sample_id": "S008",
+    "original_decision": "merge",
+    "corrected_decision": "not_merge",
+    "correction_reason": "网易游戏是网易的子公司，但实体合并层面应该分开",
+    "corrected_by": "zhangsan"
+  }
+]
