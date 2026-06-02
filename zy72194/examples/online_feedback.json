@@ -1,0 +1,14 @@
+[
+  {
+    "sample_id": "S005",
+    "feedback_type": "wrong_cluster",
+    "feedback_content": "线上DBA确认这不是应用层死锁，而是数据库innodb锁升级导致的row lock冲突，应该归类为database/lock_contention而非deadlock",
+    "reporter": "DBA-张工"
+  },
+  {
+    "sample_id": "S002",
+    "feedback_type": "disagree",
+    "feedback_content": "超时的根因不是客户端问题，是支付服务侧响应慢，应该归类为upstream而不是timeout",
+    "reporter": "运维-李工"
+  }
+]

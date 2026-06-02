@@ -1,0 +1,20 @@
+[
+  {
+    "eval_id_for_sample": "S003",
+    "eval_id": "FIND_LATEST",
+    "field_corrected": "cluster_label",
+    "old_value": "null_pointer",
+    "new_value": "config_error",
+    "corrector": "小孟",
+    "reason": "NPE只是表象，真正原因是配置缺失导致client为null，应归入配置错误而非空指针"
+  },
+  {
+    "eval_id_for_sample": "S005",
+    "eval_id": "FIND_LATEST",
+    "field_corrected": "root_cause",
+    "old_value": "死锁：并发资源竞争导致循环等待",
+    "new_value": "数据库死锁导致事务超时",
+    "corrector": "小孟",
+    "reason": "这是数据库层面的死锁，需要更精确地标注为数据库问题，方便DBA快速定位"
+  }
+]

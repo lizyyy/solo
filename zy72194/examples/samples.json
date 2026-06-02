@@ -1,0 +1,51 @@
+[
+  {
+    "sample_id": "S001",
+    "raw_log": "2026-05-20 10:12:33 ERROR [pool-3-thread-1] com.app.service.TaskRunner - OutOfMemoryError: Java heap space\n  at com.app.service.TaskRunner.processBatch(TaskRunner.java:142)\n  at com.app.service.TaskRunner.run(TaskRunner.java:89)\n  Heap used: 4096MB / 4096MB, GC overhead exceeded",
+    "source": "import",
+    "metadata": {
+      "cluster_label": "memory",
+      "root_cause": "内存溢出：进程占用内存超出可用堆空间",
+      "env": "production",
+      "host": "app-server-01"
+    }
+  },
+  {
+    "sample_id": "S002",
+    "raw_log": "2026-05-20 11:05:17 WARN  [http-nio-8080-exec-5] c.a.gateway.PaymentGateway - Connection timed out after 30000ms to payment-service:8443\n2026-05-20 11:05:17 WARN  [http-nio-8080-exec-5] c.a.gateway.PaymentGateway - Retrying... attempt 2/3\n2026-05-20 11:05:47 ERROR [http-nio-8080-exec-5] c.a.gateway.PaymentGateway - All retries exhausted, deadline exceeded",
+    "source": "import",
+    "metadata": {
+      "cluster_label": "timeout",
+      "root_cause": "超时：支付网关连接远端服务超时",
+      "env": "production",
+      "host": "gateway-02"
+    }
+  },
+  {
+    "sample_id": "S003",
+    "raw_log": "2026-05-21 03:14:22 ERROR [scheduler-1] c.a.job.DataSyncJob - NullPointerException at DataSyncJob.java:256\n  at com.app.job.DataSyncJob.syncRecords(DataSyncJob.java:256)\n  at com.app.job.DataSyncJob.execute(DataSyncJob.java:78)\n  Cause: config.client was null, expected initialized client object",
+    "source": "import",
+    "metadata": {
+      "cluster_label": "config_error",
+      "root_cause": "配置缺失导致客户端未初始化"
+    }
+  },
+  {
+    "sample_id": "S004",
+    "raw_log": "2026-05-21 08:30:01 ERROR [main] c.a.startup.AppInitializer - disk write error: No space left on device /data/logs/app.log\n2026-05-21 08:30:02 FATAL [main] c.a.startup.AppInitializer - ENOSPC: Cannot create temp file, application startup aborted",
+    "source": "import",
+    "metadata": {
+      "cluster_label": "disk",
+      "root_cause": "磁盘空间不足导致写入失败"
+    }
+  },
+  {
+    "sample_id": "S005",
+    "raw_log": "2026-05-22 14:22:10 ERROR [worker-3] c.a.processor.OrderProcessor - DeadlockDetected: lock wait timeout exceeded; try restarting transaction\n  Transaction A: holds lock on orders, waiting for inventory\n  Transaction B: holds lock on inventory, waiting for orders\n  Lock wait time: 51230ms exceeds threshold 50000ms",
+    "source": "import",
+    "metadata": {
+      "cluster_label": "database",
+      "root_cause": "数据库死锁导致事务超时"
+    }
+  }
+]

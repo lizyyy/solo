@@ -1,0 +1,51 @@
+[
+  {
+    "sample_id": "S001",
+    "cluster_label": "memory",
+    "root_cause": "内存溢出：进程占用内存超出可用堆空间",
+    "confidence": 0.95,
+    "evidence": [
+      {"kind": "pattern_match", "location": "offset:51-67", "content": "OutOfMemoryError", "confidence": 0.98},
+      {"kind": "pattern_match", "location": "offset:69-79", "content": "heap space", "confidence": 0.95}
+    ]
+  },
+  {
+    "sample_id": "S002",
+    "cluster_label": "timeout",
+    "root_cause": "超时：操作未在预期时间内完成",
+    "confidence": 0.90,
+    "evidence": [
+      {"kind": "pattern_match", "location": "offset:56-66", "content": "timed out", "confidence": 0.92},
+      {"kind": "pattern_match", "location": "offset:175-193", "content": "deadline exceeded", "confidence": 0.90}
+    ]
+  },
+  {
+    "sample_id": "S003",
+    "cluster_label": "null_pointer",
+    "root_cause": "空指针异常：代码引用了未初始化的对象",
+    "confidence": 0.85,
+    "evidence": [
+      {"kind": "pattern_match", "location": "offset:49-69", "content": "NullPointerException", "confidence": 0.90}
+    ]
+  },
+  {
+    "sample_id": "S004",
+    "cluster_label": "disk",
+    "root_cause": "磁盘空间不足或IO错误",
+    "confidence": 0.93,
+    "evidence": [
+      {"kind": "pattern_match", "location": "offset:62-82", "content": "No space left on device", "confidence": 0.95},
+      {"kind": "pattern_match", "location": "offset:118-124", "content": "ENOSPC", "confidence": 0.93}
+    ]
+  },
+  {
+    "sample_id": "S005",
+    "cluster_label": "deadlock",
+    "root_cause": "死锁：并发资源竞争导致循环等待",
+    "confidence": 0.88,
+    "evidence": [
+      {"kind": "pattern_match", "location": "offset:51-68", "content": "DeadlockDetected", "confidence": 0.92},
+      {"kind": "pattern_match", "location": "offset:70-96", "content": "lock wait timeout exceeded", "confidence": 0.88}
+    ]
+  }
+]
