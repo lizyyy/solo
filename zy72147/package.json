@@ -1,0 +1,18 @@
+{
+  "name": "orchestral-score-validator",
+  "version": "1.0.0",
+  "description": "管弦乐谱页码校验系统",
+  "main": "server/index.js",
+  "scripts": {
+    "dev": "node server/index.js",
+    "start": "node server/index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "multer": "^1.4.5-lts.1",
+    "csv-parser": "^3.0.0",
+    "xlsx": "^0.18.5",
+    "cors": "^2.8.5"
+  }
+}
