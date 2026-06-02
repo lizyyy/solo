@@ -1,0 +1,32 @@
+{
+  "sample_id": "SMP-002",
+  "user_id": "USER-1002",
+  "user_profile": {
+    "level": "beginner",
+    "learning_goal": "ai_engineer",
+    "available_hours_per_week": 3,
+    "background": "市场营销转行"
+  },
+  "learning_history": [
+    {
+      "course_id": "C001",
+      "course_name": "Python 编程基础",
+      "status": "completed",
+      "score": 62,
+      "completed_at": "2026-03-01",
+      "skills": [
+        "python_basics"
+      ]
+    },
+    {
+      "course_id": "C005",
+      "course_name": "数据结构",
+      "status": "in_progress",
+      "progress": 30,
+      "skills": []
+    }
+  ],
+  "target_path": "ai_engineer",
+  "online_feedback": null,
+  "created_at": "2026-05-20T11:00:00"
+}

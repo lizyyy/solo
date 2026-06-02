@@ -1,0 +1,14 @@
+{
+  "version": "v1.0.0",
+  "threshold_config": {
+    "auto_accept_threshold": 0.85,
+    "human_review_threshold": 0.6,
+    "min_prereq_ratio": 0.7,
+    "good_score": 85,
+    "pass_score": 60,
+    "min_completed_courses": 3,
+    "min_hours_per_week": 5
+  },
+  "deployed_at": "2026-01-15T00:00:00",
+  "description": "初始版本，基于规则的学习路径推荐解释模型"
+}

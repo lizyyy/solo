@@ -1,0 +1,99 @@
+{
+  "report_id": "RPT-345C34DA",
+  "sample_id": "SMP-001",
+  "model_version": "v1.0.0",
+  "status": "auto_success",
+  "recommended_path": "data_scientist",
+  "confidence_score": 1.0,
+  "evidence_chain": [
+    {
+      "evidence_type": "user_profile",
+      "source": "user_profile:USER-1001:level",
+      "value": "intermediate",
+      "description": "用户当前等级为 intermediate",
+      "timestamp": "2026-06-02T21:01:50.585262"
+    },
+    {
+      "evidence_type": "career_goal",
+      "source": "user_profile:USER-1001:learning_goal",
+      "value": "data_scientist",
+      "description": "用户学习目标为 data_scientist",
+      "timestamp": "2026-06-02T21:01:50.585273"
+    },
+    {
+      "evidence_type": "user_profile",
+      "source": "user_profile:USER-1001:available_hours",
+      "value": 10,
+      "description": "用户每周可投入 10 小时",
+      "timestamp": "2026-06-02T21:01:50.585275"
+    },
+    {
+      "evidence_type": "learning_history",
+      "source": "learning_history:USER-1001:completed",
+      "value": 3,
+      "description": "已完成 3 门课程",
+      "timestamp": "2026-06-02T21:01:50.585281"
+    },
+    {
+      "evidence_type": "learning_history",
+      "source": "learning_history:USER-1001:avg_score",
+      "value": 91.67,
+      "description": "已完成课程平均得分 91.67",
+      "timestamp": "2026-06-02T21:01:50.585288"
+    },
+    {
+      "evidence_type": "learning_history",
+      "source": "learning_history:USER-1001:in_progress",
+      "value": 1,
+      "description": "正在学习 1 门课程",
+      "timestamp": "2026-06-02T21:01:50.585290"
+    },
+    {
+      "evidence_type": "skill_prerequisite",
+      "source": "prerequisite_check:data_scientist:python_basics",
+      "value": true,
+      "description": "目标路径 data_scientist 需要先修技能 python_basics，已掌握",
+      "timestamp": "2026-06-02T21:01:50.585297"
+    },
+    {
+      "evidence_type": "skill_prerequisite",
+      "source": "prerequisite_check:data_scientist:linear_algebra",
+      "value": true,
+      "description": "目标路径 data_scientist 需要先修技能 linear_algebra，已掌握",
+      "timestamp": "2026-06-02T21:01:50.585299"
+    },
+    {
+      "evidence_type": "skill_prerequisite",
+      "source": "prerequisite_check:data_scientist:statistics",
+      "value": true,
+      "description": "目标路径 data_scientist 需要先修技能 statistics，已掌握",
+      "timestamp": "2026-06-02T21:01:50.585300"
+    },
+    {
+      "evidence_type": "model_inference",
+      "source": "model_version:v1.0.0",
+      "value": "v1.0.0",
+      "description": "使用模型版本 v1.0.0 进行推断",
+      "timestamp": "2026-06-02T21:01:50.585303"
+    }
+  ],
+  "threshold_used": {
+    "auto_accept_threshold": 0.85,
+    "human_review_threshold": 0.6,
+    "min_prereq_ratio": 0.7,
+    "good_score": 85,
+    "pass_score": 60,
+    "min_completed_courses": 3,
+    "min_hours_per_week": 5
+  },
+  "generated_at": "2026-06-02T21:01:50.585341",
+  "generation_note": "置信度 1.0 高于自动通过阈值 0.85，无警告，自动判定通过",
+  "human_review": null,
+  "legacy_source": null,
+  "online_feedback": {
+    "click_rate": 0.35,
+    "completion_rate": 0.82,
+    "user_rating": 4.5,
+    "feedback_time": "2026-05-28"
+  }
+}

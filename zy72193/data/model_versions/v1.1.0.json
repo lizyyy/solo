@@ -1,0 +1,14 @@
+{
+  "version": "v1.1.0",
+  "threshold_config": {
+    "auto_accept_threshold": 0.8,
+    "human_review_threshold": 0.55,
+    "min_prereq_ratio": 0.65,
+    "good_score": 80,
+    "pass_score": 60,
+    "min_completed_courses": 2,
+    "min_hours_per_week": 4
+  },
+  "deployed_at": "2026-06-01T00:00:00",
+  "description": "根据线上反馈调整阈值，降低自动通过门槛以提高覆盖率"
+}

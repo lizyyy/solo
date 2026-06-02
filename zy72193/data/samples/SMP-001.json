@@ -1,0 +1,59 @@
+{
+  "sample_id": "SMP-001",
+  "user_id": "USER-1001",
+  "user_profile": {
+    "level": "intermediate",
+    "learning_goal": "data_scientist",
+    "available_hours_per_week": 10,
+    "background": "统计学本科"
+  },
+  "learning_history": [
+    {
+      "course_id": "C001",
+      "course_name": "Python 编程基础",
+      "status": "completed",
+      "score": 92,
+      "completed_at": "2026-02-15",
+      "skills": [
+        "python_basics"
+      ]
+    },
+    {
+      "course_id": "C002",
+      "course_name": "线性代数",
+      "status": "completed",
+      "score": 88,
+      "completed_at": "2026-03-20",
+      "skills": [
+        "linear_algebra"
+      ]
+    },
+    {
+      "course_id": "C003",
+      "course_name": "概率论与数理统计",
+      "status": "completed",
+      "score": 95,
+      "completed_at": "2026-04-10",
+      "skills": [
+        "statistics"
+      ]
+    },
+    {
+      "course_id": "C004",
+      "course_name": "机器学习入门",
+      "status": "in_progress",
+      "progress": 65,
+      "skills": [
+        "machine_learning"
+      ]
+    }
+  ],
+  "target_path": "data_scientist",
+  "online_feedback": {
+    "click_rate": 0.35,
+    "completion_rate": 0.82,
+    "user_rating": 4.5,
+    "feedback_time": "2026-05-28"
+  },
+  "created_at": "2026-05-20T10:30:00"
+}

@@ -1,0 +1,94 @@
+{
+  "report_id": "RPT-1D2AB8AA",
+  "sample_id": "SMP-002",
+  "model_version": "v1.1.0",
+  "status": "need_human_review",
+  "recommended_path": "ai_engineer",
+  "confidence_score": 0.4833,
+  "evidence_chain": [
+    {
+      "evidence_type": "user_profile",
+      "source": "user_profile:USER-1002:level",
+      "value": "beginner",
+      "description": "用户当前等级为 beginner",
+      "timestamp": "2026-06-02T21:01:50.591809"
+    },
+    {
+      "evidence_type": "career_goal",
+      "source": "user_profile:USER-1002:learning_goal",
+      "value": "ai_engineer",
+      "description": "用户学习目标为 ai_engineer",
+      "timestamp": "2026-06-02T21:01:50.591820"
+    },
+    {
+      "evidence_type": "user_profile",
+      "source": "user_profile:USER-1002:available_hours",
+      "value": 3,
+      "description": "用户每周可投入 3 小时",
+      "timestamp": "2026-06-02T21:01:50.591824"
+    },
+    {
+      "evidence_type": "learning_history",
+      "source": "learning_history:USER-1002:completed",
+      "value": 1,
+      "description": "已完成 1 门课程",
+      "timestamp": "2026-06-02T21:01:50.591830"
+    },
+    {
+      "evidence_type": "learning_history",
+      "source": "learning_history:USER-1002:avg_score",
+      "value": 62.0,
+      "description": "已完成课程平均得分 62.0",
+      "timestamp": "2026-06-02T21:01:50.591837"
+    },
+    {
+      "evidence_type": "learning_history",
+      "source": "learning_history:USER-1002:in_progress",
+      "value": 1,
+      "description": "正在学习 1 门课程",
+      "timestamp": "2026-06-02T21:01:50.591840"
+    },
+    {
+      "evidence_type": "skill_prerequisite",
+      "source": "prerequisite_check:ai_engineer:python_basics",
+      "value": true,
+      "description": "目标路径 ai_engineer 需要先修技能 python_basics，已掌握",
+      "timestamp": "2026-06-02T21:01:50.591845"
+    },
+    {
+      "evidence_type": "knowledge_gap",
+      "source": "prerequisite_check:ai_engineer:machine_learning",
+      "value": false,
+      "description": "目标路径 ai_engineer 需要先修技能 machine_learning，尚未掌握",
+      "timestamp": "2026-06-02T21:01:50.591848"
+    },
+    {
+      "evidence_type": "knowledge_gap",
+      "source": "prerequisite_check:ai_engineer:deep_learning",
+      "value": false,
+      "description": "目标路径 ai_engineer 需要先修技能 deep_learning，尚未掌握",
+      "timestamp": "2026-06-02T21:01:50.591854"
+    },
+    {
+      "evidence_type": "model_inference",
+      "source": "model_version:v1.1.0",
+      "value": "v1.1.0",
+      "description": "使用模型版本 v1.1.0 进行推断",
+      "timestamp": "2026-06-02T21:01:50.591858"
+    }
+  ],
+  "threshold_used": {
+    "auto_accept_threshold": 0.8,
+    "human_review_threshold": 0.55,
+    "min_prereq_ratio": 0.65,
+    "good_score": 80,
+    "pass_score": 60,
+    "min_completed_courses": 2,
+    "min_hours_per_week": 4
+  },
+  "generated_at": "2026-06-02T21:01:50.591900",
+  "generation_note": "置信度 0.4833 低于人工审核阈值 0.55，必须人工审核。警告: 先修技能满足比例 0.33 低于阈值 0.65",
+  "human_review": null,
+  "legacy_source": null,
+  "online_feedback": null
+}

@@ -1,0 +1,92 @@
+{
+  "report_id": "RPT-89FC1C7A",
+  "sample_id": "SMP-003",
+  "model_version": "v1.0.0",
+  "status": "need_human_review",
+  "recommended_path": "backend_engineer",
+  "confidence_score": 0.6333,
+  "evidence_chain": [
+    {
+      "evidence_type": "user_profile",
+      "source": "user_profile:USER-1003:level",
+      "value": "advanced",
+      "description": "用户当前等级为 advanced",
+      "timestamp": "2026-06-02T21:01:50.585742"
+    },
+    {
+      "evidence_type": "career_goal",
+      "source": "user_profile:USER-1003:learning_goal",
+      "value": "backend_engineer",
+      "description": "用户学习目标为 backend_engineer",
+      "timestamp": "2026-06-02T21:01:50.585744"
+    },
+    {
+      "evidence_type": "user_profile",
+      "source": "user_profile:USER-1003:available_hours",
+      "value": 8,
+      "description": "用户每周可投入 8 小时",
+      "timestamp": "2026-06-02T21:01:50.585745"
+    },
+    {
+      "evidence_type": "learning_history",
+      "source": "learning_history:USER-1003:completed",
+      "value": 2,
+      "description": "已完成 2 门课程",
+      "timestamp": "2026-06-02T21:01:50.585748"
+    },
+    {
+      "evidence_type": "learning_history",
+      "source": "learning_history:USER-1003:avg_score",
+      "value": 87.5,
+      "description": "已完成课程平均得分 87.5",
+      "timestamp": "2026-06-02T21:01:50.585751"
+    },
+    {
+      "evidence_type": "knowledge_gap",
+      "source": "prerequisite_check:backend_engineer:programming_basics",
+      "value": false,
+      "description": "目标路径 backend_engineer 需要先修技能 programming_basics，尚未掌握",
+      "timestamp": "2026-06-02T21:01:50.585753"
+    },
+    {
+      "evidence_type": "skill_prerequisite",
+      "source": "prerequisite_check:backend_engineer:databases",
+      "value": true,
+      "description": "目标路径 backend_engineer 需要先修技能 databases，已掌握",
+      "timestamp": "2026-06-02T21:01:50.585754"
+    },
+    {
+      "evidence_type": "knowledge_gap",
+      "source": "prerequisite_check:backend_engineer:networking",
+      "value": false,
+      "description": "目标路径 backend_engineer 需要先修技能 networking，尚未掌握",
+      "timestamp": "2026-06-02T21:01:50.585755"
+    },
+    {
+      "evidence_type": "model_inference",
+      "source": "model_version:v1.0.0",
+      "value": "v1.0.0",
+      "description": "使用模型版本 v1.0.0 进行推断",
+      "timestamp": "2026-06-02T21:01:50.585757"
+    }
+  ],
+  "threshold_used": {
+    "auto_accept_threshold": 0.85,
+    "human_review_threshold": 0.6,
+    "min_prereq_ratio": 0.7,
+    "good_score": 85,
+    "pass_score": 60,
+    "min_completed_courses": 3,
+    "min_hours_per_week": 5
+  },
+  "generated_at": "2026-06-02T21:01:50.585771",
+  "generation_note": "置信度 0.6333 在不确定区间 [0.6, 0.85)，需要人工审核。警告: 先修技能满足比例 0.33 低于阈值 0.7",
+  "human_review": null,
+  "legacy_source": null,
+  "online_feedback": {
+    "click_rate": 0.15,
+    "completion_rate": 0.45,
+    "user_rating": 3.0,
+    "feedback_time": "2026-05-15"
+  }
+}

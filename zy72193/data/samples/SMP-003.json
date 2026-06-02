@@ -1,0 +1,40 @@
+{
+  "sample_id": "SMP-003",
+  "user_id": "USER-1003",
+  "user_profile": {
+    "level": "advanced",
+    "learning_goal": "backend_engineer",
+    "available_hours_per_week": 8,
+    "background": "前端工程师转后端"
+  },
+  "learning_history": [
+    {
+      "course_id": "C006",
+      "course_name": "JavaScript 高级",
+      "status": "completed",
+      "score": 90,
+      "completed_at": "2025-11-20",
+      "skills": [
+        "javascript_basics"
+      ]
+    },
+    {
+      "course_id": "C007",
+      "course_name": "SQL 数据库",
+      "status": "completed",
+      "score": 85,
+      "completed_at": "2025-12-15",
+      "skills": [
+        "databases"
+      ]
+    }
+  ],
+  "target_path": "backend_engineer",
+  "online_feedback": {
+    "click_rate": 0.15,
+    "completion_rate": 0.45,
+    "user_rating": 3.0,
+    "feedback_time": "2026-05-15"
+  },
+  "created_at": "2026-05-20T11:30:00"
+}

@@ -1,0 +1,67 @@
+{
+  "report_id": "RPT-E402F95E",
+  "sample_id": "SMP-003",
+  "model_version": "v1.0.0",
+  "status": "legacy_from_annotation",
+  "recommended_path": "backend_engineer",
+  "confidence_score": 0.75,
+  "evidence_chain": [
+    {
+      "evidence_type": "annotation_table",
+      "source": "annotation_table:ANN-2025-Q4-0156",
+      "value": "ANN-2025-Q4-0156",
+      "description": "从标注表 ANN-2025-Q4-0156 导入历史标注",
+      "timestamp": "2026-06-02T21:01:50.588202"
+    },
+    {
+      "evidence_type": "annotation_table",
+      "source": "annotation_table:ANN-2025-Q4-0156:user_background",
+      "value": "前端转后端，已有JS基础",
+      "description": "标注表证据: user_background = 前端转后端，已有JS基础",
+      "timestamp": "2025-12-10T15:30:00"
+    },
+    {
+      "evidence_type": "annotation_table",
+      "source": "annotation_table:ANN-2025-Q4-0156:career_goal",
+      "value": "全栈工程师",
+      "description": "标注表证据: career_goal = 全栈工程师",
+      "timestamp": "2025-12-10T15:30:00"
+    },
+    {
+      "evidence_type": "annotation_table",
+      "source": "annotation_table:ANN-2025-Q4-0156:historical_performance",
+      "value": "学习积极性高，完成率80%+",
+      "description": "标注表证据: historical_performance = 学习积极性高，完成率80%+",
+      "timestamp": "2025-12-10T15:30:00"
+    },
+    {
+      "evidence_type": "annotation_table",
+      "source": "annotation_table:ANN-2025-Q4-0156:market_demand",
+      "value": "后端工程师缺口大，薪资涨幅20%",
+      "description": "标注表证据: market_demand = 后端工程师缺口大，薪资涨幅20%",
+      "timestamp": "2025-12-10T15:30:00"
+    },
+    {
+      "evidence_type": "annotation_table",
+      "source": "annotation_table:ANN-2025-Q4-0156:risk_assessment",
+      "value": "需补数据结构和网络基础",
+      "description": "标注表证据: risk_assessment = 需补数据结构和网络基础",
+      "timestamp": "2025-12-10T15:30:00"
+    }
+  ],
+  "threshold_used": {
+    "legacy_import": true,
+    "original_annotator": "AI产品经理阿宁",
+    "original_annotation_date": "2025-12-10T15:30:00"
+  },
+  "generated_at": "2026-06-02T21:01:50.588258",
+  "generation_note": "从历史标注表导入，原标注人: AI产品经理阿宁，原标注时间: 2025-12-10T15:30:00",
+  "human_review": null,
+  "legacy_source": "ANN-2025-Q4-0156",
+  "online_feedback": {
+    "click_rate": 0.15,
+    "completion_rate": 0.45,
+    "user_rating": 3.0,
+    "feedback_time": "2026-05-15"
+  }
+}
