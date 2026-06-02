@@ -1,0 +1,14 @@
+id,score,corrected_label,corrector,correction_time,correction_reason
+R001,0.85,positive,reviewer_A,2025-05-20,模型分偏低
+R002,0.12,negative,reviewer_A,2025-05-20,确认不匹配
+R003,0.70,positive,reviewer_B,2025-05-21,无调整
+R004,0.55,positive,reviewer_B,2025-05-21,模型分偏高，实际匹配度一般
+R005,0.92,positive,reviewer_A,2025-05-22,微调
+R006,0.10,negative,reviewer_C,2025-05-22,确认不匹配
+R007,0.82,positive,reviewer_A,2025-05-23,模型分偏高
+R008,,negative,reviewer_C,2025-05-23,人工分缺失
+R009,0.35,negative,reviewer_B,2025-05-24,模型严重高估
+R010,0.65,positive,reviewer_C,2025-05-24,微调
+R011,0.78,positive,reviewer_A,2025-05-25,无调整
+R013,0.20,negative,reviewer_B,2025-05-25,越界记录修正
+R014,0.60,positive,reviewer_A,2025-05-26,越界记录修正

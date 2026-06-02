@@ -1,0 +1,13 @@
+id,label,feedback_source,feedback_time,comment
+R001,positive,online_click,2025-05-25,用户点击查看
+R002,negative,online_skip,2025-05-25,用户跳过
+R003,positive,online_click,2025-05-26,用户点击查看
+R004,negative,online_skip,2025-05-26,用户跳过但模型判断为匹配
+R005,positive,online_click,2025-05-27,用户点击查看
+R006,negative,online_skip,2025-05-27,用户跳过
+R007,positive,online_click,2025-05-28,用户点击查看
+R008,negative,online_skip,2025-05-28,用户跳过
+R009,negative,online_skip,2025-05-29,用户跳过但模型判断为匹配
+R010,positive,online_click,2025-05-30,用户点击查看
+R011,positive,online_click,2025-05-30,用户点击查看
+R015,positive,online_click,2025-05-31,仅线上有反馈
