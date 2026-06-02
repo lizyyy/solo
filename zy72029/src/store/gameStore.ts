@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import type { GameState, OperationLog, Material, GameSlot, PauseRecord, SupplementNote, FloatingMessage, FailureReason } from '@/types'
 import { mockMaterialPack, presetMistakeOperations, presetPauseRecord } from '@/data/mockMaterials'
-import { validatePlacement, diagnoseFailure, isGameComplete, generateKeyDecisions } from '@/game/engine'
+import { validatePlacement, diagnoseFailure, isGameComplete, hasMisplacedMaterials, generateKeyDecisions } from '@/game/engine'
 
 function generateId(): string {
   return Math.random().toString(36).substring(2, 11)
@@ -167,11 +167,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     })
 
     const updatedState = get()
-    
+
     if (newRisk >= state.riskThreshold) {
       get().finishGame('rule_misunderstanding')
     } else if (isGameComplete(updatedState)) {
       get().finishGame()
+    } else if (Object.keys(updatedState.placedMaterials).length === updatedState.materials.length && hasMisplacedMaterials(updatedState)) {
+      get().finishGame('rule_misunderstanding')
     }
   },
 
@@ -294,13 +296,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const finalReason = reason || diagnosis.reason
     const finalDetails = diagnosis.details
 
-    const status = reason ? 'failed' : 'completed'
+    const status: 'completed' | 'failed' = reason ? 'failed' : 'completed'
 
     set({
       status,
       endTime: new Date().toISOString(),
       failureReason: status === 'failed' ? finalReason : undefined,
-      diagnosticDetails: finalDetails,
+      diagnosticDetails: status === 'completed' ? ['所有材料已正确匹配至对应槽位'] : finalDetails,
     })
   },
 

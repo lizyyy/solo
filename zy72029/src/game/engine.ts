@@ -8,21 +8,20 @@ export function validatePlacement(material: Material, slot: GameSlot, placedMate
   resourceDelta: number
   rawNote?: string
 } {
-  const isAlreadyPlaced = Object.values(placedMaterials).includes(slot.id) && 
-    !Object.keys(placedMaterials).find(k => placedMaterials[k] === slot.id && k === material.id)
+  const isSameMaterialAlreadyInSlot = placedMaterials[material.id] === slot.id
 
-  if (isAlreadyPlaced) {
+  if (isSameMaterialAlreadyInSlot) {
     return {
       isCorrect: false,
       scoreDelta: -3,
       riskDelta: 5,
       resourceDelta: 0,
-      rawNote: '【系统】该槽位已有材料，重复放置扣分',
+      rawNote: '【系统】同一材料重复放入同一槽位，重复放置扣分',
     }
   }
 
-  const isCategoryAccepted = slot.acceptedCategories.includes(material.category)
   const isCorrectSlot = material.correctSlot === slot.id
+  const isCategoryAccepted = slot.acceptedCategories.includes(material.category)
 
   if (isCorrectSlot) {
     return {
@@ -60,6 +59,19 @@ export function diagnoseFailure(state: GameState): {
   const incorrectOps = state.operationLogs.filter(op => op.isCorrect === false && op.operationType === 'place')
   const avgResponseTime = calculateAvgResponseTime(state.operationLogs)
   const errorRate = incorrectOps.length / Math.max(state.operationLogs.filter(op => op.operationType === 'place').length, 1)
+  const misplacedDetails = getMisplacedDetails(state)
+
+  if (misplacedDetails.length > 0 && Object.keys(state.placedMaterials).length === state.materials.length) {
+    details.push(`材料已全部放置，但有${misplacedDetails.length}份材料位置错误`)
+    misplacedDetails.forEach((d, i) => {
+      details.push(`错放${i + 1}：${d}`)
+    })
+    details.push('【判定依据】所有材料均已放置但存在错放，判定为对理赔材料分类规则理解不足')
+    return {
+      reason: 'rule_misunderstanding',
+      details,
+    }
+  }
 
   if (state.timeRemaining <= 0 && state.risk < state.riskThreshold) {
     details.push(`时间耗尽：总时长${state.totalTime}秒，已全部用完`)
@@ -141,7 +153,29 @@ export function checkBoundaryCondition(score: number): {
 }
 
 export function isGameComplete(state: GameState): boolean {
-  return Object.keys(state.placedMaterials).length === state.materials.length
+  if (Object.keys(state.placedMaterials).length !== state.materials.length) {
+    return false
+  }
+  return state.materials.every(m => state.placedMaterials[m.id] === m.correctSlot)
+}
+
+export function hasMisplacedMaterials(state: GameState): boolean {
+  return state.materials.some(
+    m => state.placedMaterials[m.id] && state.placedMaterials[m.id] !== m.correctSlot
+  )
+}
+
+export function getMisplacedDetails(state: GameState): string[] {
+  const details: string[] = []
+  state.materials.forEach(m => {
+    const placedSlot = state.placedMaterials[m.id]
+    if (placedSlot && placedSlot !== m.correctSlot) {
+      const slotLabel = state.slots.find(s => s.id === placedSlot)?.label || placedSlot
+      const correctLabel = state.slots.find(s => s.id === m.correctSlot)?.label || m.correctSlot
+      details.push(`"${m.title}"放在了"${slotLabel}"，正确位置应为"${correctLabel}"`)
+    }
+  })
+  return details
 }
 
 export function generateKeyDecisions(state: GameState): string[] {
