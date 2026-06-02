@@ -1,0 +1,166 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@400;500;600;700&display=swap');
+@import 'leaflet/dist/leaflet.css';
+@import 'leaflet.markercluster/dist/MarkerCluster.css';
+@import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.6;
+  font-weight: 400;
+  color: #212121;
+  background-color: #FAFAFA;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 1280px;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 600;
+}
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 text-sm font-medium rounded-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-1;
+  }
+  
+  .btn-primary {
+    @apply btn bg-primary-500 text-white hover:bg-primary-600 focus:ring-primary-500;
+  }
+  
+  .btn-secondary {
+    @apply btn border border-primary-500 text-primary-600 bg-transparent hover:bg-primary-50 focus:ring-primary-500;
+  }
+  
+  .btn-success {
+    @apply btn bg-success-500 text-white hover:bg-success-600 focus:ring-success-500;
+  }
+  
+  .btn-warning {
+    @apply btn bg-warning-500 text-white hover:bg-warning-600 focus:ring-warning-500;
+  }
+  
+  .btn-danger {
+    @apply btn bg-danger-500 text-white hover:bg-danger-600 focus:ring-danger-500;
+  }
+  
+  .btn-default {
+    @apply btn bg-neutral-100 text-neutral-700 hover:bg-neutral-200 focus:ring-neutral-400;
+  }
+  
+  .card {
+    @apply bg-white rounded-sm shadow-card border border-neutral-200;
+  }
+  
+  .badge {
+    @apply inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-sm;
+  }
+  
+  .badge-success {
+    @apply badge bg-success-50 text-success-700 border border-success-200;
+  }
+  
+  .badge-warning {
+    @apply badge bg-warning-50 text-warning-700 border border-warning-200;
+  }
+  
+  .badge-danger {
+    @apply badge bg-danger-50 text-danger-700 border border-danger-200;
+  }
+  
+  .badge-pending {
+    @apply badge bg-neutral-100 text-neutral-600 border border-neutral-300;
+  }
+  
+  .input {
+    @apply w-full px-3 py-2 text-sm border border-neutral-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200;
+  }
+  
+  .select {
+    @apply w-full px-3 py-2 text-sm border border-neutral-300 rounded-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200;
+  }
+  
+  .table-header {
+    @apply text-xs font-medium text-neutral-600 uppercase tracking-wider px-4 py-3 text-left bg-neutral-50 border-b border-neutral-200;
+  }
+  
+  .table-cell {
+    @apply px-4 py-3 text-sm text-neutral-700 border-b border-neutral-100;
+  }
+  
+  .divider {
+    @apply h-px bg-neutral-200 my-4;
+  }
+}
+
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  font-family: inherit;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 2px;
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.8);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+.marker-pulse::before {
+  content: '';
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  animation: pulse-ring 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.marker-danger::before {
+  background: rgba(198, 40, 40, 0.4);
+}
+
+.marker-warning::before {
+  background: rgba(245, 124, 0, 0.4);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f5f5f5;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #bdbdbd;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9e9e9e;
+}
