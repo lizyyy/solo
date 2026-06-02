@@ -102,6 +102,8 @@ main{flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto 1
 .round-result .card h3{margin-bottom:12px;font-size:18px}
 .round-result .card .detail{font-size:13px;color:var(--dim);line-height:1.8;text-align:left;margin:12px 0}
 .round-result .card .actions{display:flex;gap:8px;justify-content:center;margin-top:16px}
+.import-section{padding:8px 16px;background:var(--surface);border-bottom:1px solid var(--border);display:none}
+.import-section textarea{width:100%;padding:6px 10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:4px;font-size:12px;font-family:inherit;min-height:60px;resize:vertical}
 </style>
 </head>
 <body>
@@ -156,6 +158,15 @@ main{flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto 1
     </div>
   </div>
 
+  <div class="import-section" id="import-section" style="display:none">
+    <div style="font-size:12px;color:var(--dim);margin-bottom:4px">粘贴导入数据（JSON格式，含 materials 数组）</div>
+    <textarea id="import-textarea" placeholder='{"materials":[{"category":"frequency","value":"660Hz","label":"660Hz","targetSlot":"s3"}]}'></textarea>
+    <div style="margin-top:6px;display:flex;gap:6px">
+      <button class="btn" onclick="G.importData()">导入并检查冲突</button>
+      <button class="btn" onclick="UI.toggleImport()">取消</button>
+    </div>
+  </div>
+
   <div class="supplement-section" id="supplement-section" style="display:none">
     <div style="font-size:12px;color:var(--dim);margin-bottom:4px">补充材料：添加新的声波材料到当前回合</div>
     <div style="display:flex;gap:8px;margin-bottom:6px">
@@ -176,10 +187,28 @@ main{flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto 1
       <button class="tab-btn active" data-tab="records" onclick="UI.switchTab('records')">练习记录</button>
       <button class="tab-btn" data-tab="settlements" onclick="UI.switchTab('settlements')">回合结算</button>
       <button class="tab-btn" data-tab="conflicts" onclick="UI.switchTab('conflicts')">冲突(<span id="conflict-count">0</span>)</button>
+      <button class="tab-btn" data-tab="export" onclick="UI.switchTab('export')">导出</button>
     </div>
     <div class="bottom-body" id="tab-records"></div>
     <div class="bottom-body" id="tab-settlements" style="display:none"></div>
     <div class="bottom-body" id="tab-conflicts" style="display:none"></div>
+    <div class="bottom-body" id="tab-export" style="display:none;padding:12px 16px">
+      <div style="font-size:12px;color:var(--dim);margin-bottom:8px">导出练习记录、结算和冲突数据，用于交接和核验</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+        <button class="btn" onclick="G.exportAll()">📦 导出全部</button>
+        <button class="btn" onclick="G.exportRecords()">📝 仅导记录</button>
+        <button class="btn" onclick="G.exportSettlements()">🧾 仅导结算</button>
+        <button class="btn" onclick="G.exportConflicts()">⚖ 仅导冲突</button>
+      </div>
+      <textarea id="export-output" readonly placeholder="点击上方导出按钮生成数据..." style="width:100%;min-height:80px;padding:8px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:4px;font-size:11px;font-family:monospace;resize:vertical"></textarea>
+      <div style="margin-top:6px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <button class="btn" onclick="G.copyExportToClipboard()" style="font-size:12px">📋 复制</button>
+        <button class="btn" onclick="G.downloadExport()" style="font-size:12px">💾 下载</button>
+        <span style="font-size:11px;color:var(--dim)">校验和: <code id="export-checksum" style="background:var(--bg);padding:2px 6px;border-radius:3px">-</code></span>
+        <span id="export-status" style="font-size:11px"></span>
+      </div>
+      <div id="export-info" style="margin-top:8px;font-size:11px;color:var(--dim)"></div>
+    </div>
   </div>
 </main>
 
@@ -769,6 +798,170 @@ var G = {
   showError: function(msg) {
     document.getElementById('error-msg').textContent = msg;
     document.getElementById('error-overlay').classList.add('show');
+  },
+
+  _currentExport: null,
+  _exportType: null,
+
+  _hashString: function(str) {
+    var hash = 0;
+    for (var i = 0; i < str.length; i++) {
+      var char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash;
+    }
+    return Math.abs(hash).toString(16).padStart(8, '0');
+  },
+
+  _verifyExport: function(exportData, type) {
+    var stateRecords = JSON.stringify(this.state.records);
+    var stateSettlements = JSON.stringify(this.state.settlements);
+    var stateConflicts = JSON.stringify(this.state.conflicts);
+
+    var exportRecords = JSON.stringify(exportData.records || []);
+    var exportSettlements = JSON.stringify(exportData.settlements || []);
+    var exportConflicts = JSON.stringify(exportData.conflicts || []);
+
+    var issues = [];
+    if (type === 'all' || type === 'records') {
+      if (stateRecords !== exportRecords) {
+        issues.push('记录数据与页面状态不一致！');
+      }
+    }
+    if (type === 'all' || type === 'settlements') {
+      if (stateSettlements !== exportSettlements) {
+        issues.push('结算数据与页面状态不一致！');
+      }
+    }
+    if (type === 'all' || type === 'conflicts') {
+      if (stateConflicts !== exportConflicts) {
+        issues.push('冲突数据与页面状态不一致！');
+      }
+    }
+    return issues;
+  },
+
+  _setExportData: function(data, type) {
+    this._currentExport = data;
+    this._exportType = type;
+    var json = JSON.stringify(data, null, 2);
+    document.getElementById('export-output').value = json;
+    document.getElementById('export-checksum').textContent = this._hashString(json);
+
+    var issues = this._verifyExport(data, type);
+    var statusEl = document.getElementById('export-status');
+    if (issues.length === 0) {
+      statusEl.innerHTML = '<span class="ok">✓ 数据一致性验证通过</span>';
+    } else {
+      statusEl.innerHTML = '<span class="warn">⚠ ' + issues.join('; ') + '</span>';
+    }
+
+    var infoEl = document.getElementById('export-info');
+    var typeLabels = {
+      all: '全部数据',
+      records: '练习记录',
+      settlements: '回合结算',
+      conflicts: '冲突记录'
+    };
+    infoEl.innerHTML = (typeLabels[type] || type) + ' | ' +
+      '记录: ' + (data.records ? data.records.length : 0) + '条 | ' +
+      '结算: ' + (data.settlements ? data.settlements.length : 0) + '条 | ' +
+      '冲突: ' + (data.conflicts ? data.conflicts.length : 0) + '条 | ' +
+      '生成时间: ' + new Date(data.exportedAt).toLocaleString();
+  },
+
+  exportAll: function() {
+    var exportData = {
+      version: '1.0',
+      exportedAt: Date.now(),
+      tool: '声波料理节奏战',
+      state: {
+        round: this.state.round,
+        score: this.state.score,
+        energy: this.state.energy,
+        timeTokens: this.state.timeTokens,
+        risk: this.state.risk,
+        status: this.state.status
+      },
+      records: JSON.parse(JSON.stringify(this.state.records)),
+      settlements: JSON.parse(JSON.stringify(this.state.settlements)),
+      conflicts: JSON.parse(JSON.stringify(this.state.conflicts)),
+      supplementLog: JSON.parse(JSON.stringify(this.state.supplementLog))
+    };
+    this._setExportData(exportData, 'all');
+    this.addRecord('📤 导出全部数据（记录' + this.state.records.length + '条，结算' + this.state.settlements.length + '条）', 'normal');
+    this.showToast('已生成完整导出数据', 'info');
+  },
+
+  exportRecords: function() {
+    var exportData = {
+      version: '1.0',
+      exportedAt: Date.now(),
+      tool: '声波料理节奏战',
+      type: 'records',
+      records: JSON.parse(JSON.stringify(this.state.records))
+    };
+    this._setExportData(exportData, 'records');
+    this.showToast('已导出 ' + this.state.records.length + ' 条记录', 'info');
+  },
+
+  exportSettlements: function() {
+    var exportData = {
+      version: '1.0',
+      exportedAt: Date.now(),
+      tool: '声波料理节奏战',
+      type: 'settlements',
+      settlements: JSON.parse(JSON.stringify(this.state.settlements))
+    };
+    this._setExportData(exportData, 'settlements');
+    this.showToast('已导出 ' + this.state.settlements.length + ' 条结算', 'info');
+  },
+
+  exportConflicts: function() {
+    var exportData = {
+      version: '1.0',
+      exportedAt: Date.now(),
+      tool: '声波料理节奏战',
+      type: 'conflicts',
+      conflicts: JSON.parse(JSON.stringify(this.state.conflicts))
+    };
+    this._setExportData(exportData, 'conflicts');
+    this.showToast('已导出 ' + this.state.conflicts.length + ' 条冲突', 'info');
+  },
+
+  copyExportToClipboard: function() {
+    if (!this._currentExport) {
+      this.showToast('请先点击导出按钮生成数据', 'warn');
+      return;
+    }
+    var text = JSON.stringify(this._currentExport, null, 2);
+    var self = this;
+    navigator.clipboard.writeText(text).then(function() {
+      self.showToast('已复制到剪贴板（校验和: ' + self._hashString(text) + '）', 'info');
+      self.addRecord('📋 复制导出数据到剪贴板', 'normal');
+    }).catch(function() {
+      self.showToast('复制失败，请手动复制', 'err');
+    });
+  },
+
+  downloadExport: function() {
+    if (!this._currentExport) {
+      this.showToast('请先点击导出按钮生成数据', 'warn');
+      return;
+    }
+    var text = JSON.stringify(this._currentExport, null, 2);
+    var blob = new Blob([text], {type: 'application/json;charset=utf-8'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    var date = new Date().toISOString().slice(0,10);
+    a.href = url;
+    a.download = '声波料理节奏战_' + (this._exportType || 'export') + '_' + date + '_' + this._hashString(text) + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    this.showToast('已下载文件', 'info');
+    this.addRecord('💾 下载导出文件: ' + a.download, 'normal');
   }
 };
 
@@ -912,6 +1105,10 @@ var UI = {
     if (this.currentTab === 'records') this.renderRecords();
     else if (this.currentTab === 'settlements') this.renderSettlements();
     else if (this.currentTab === 'conflicts') this.renderConflicts();
+    else if (this.currentTab === 'export') {
+      var tabExport = document.getElementById('tab-export');
+      tabExport.style.display = '';
+    }
   },
 
   renderRecords: function() {
