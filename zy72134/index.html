@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>琴房预约押金结算 - 林老师专用</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- 顶部导航 -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <h1 class="logo">🎹 琴房预约押金结算</h1>
+      <span class="subtitle">林老师专用 · 排练群材料整理工具</span>
+    </div>
+    <div class="topbar-right">
+      <div class="operator-info">
+        <span>当前处理人：</span>
+        <input type="text" id="operatorName" class="operator-input" placeholder="请输入你的名字" value="小李">
+      </div>
+      <button id="loadSampleBtn" class="btn btn-secondary">📥 载入样例数据</button>
+      <button id="clearBtn" class="btn btn-danger">🗑️ 清空数据</button>
+      <button id="exportBtn" class="btn btn-primary">📤 导出JSON</button>
+    </div>
+  </header>
+
+  <!-- 主内容区 -->
+  <div class="main-container">
+    <!-- 左侧：操作区 + 列表 -->
+    <aside class="left-panel">
+      <!-- 批量导入区 -->
+      <section class="card import-section">
+        <h2 class="card-title">📁 批量导入</h2>
+        <div class="import-area">
+          <div class="import-dropzone" id="dropzone">
+            <p class="dropzone-hint">把音频文件或截图拖到这儿</p>
+            <p class="dropzone-sub">支持 .mp3 .wav .flac .jpg .png 或直接粘贴 JSON</p>
+            <input type="file" id="fileInput" class="file-input" multiple accept=".mp3,.wav,.flac,.jpg,.jpeg,.png,.json">
+            <button id="browseBtn" class="btn btn-outline">选择文件</button>
+          </div>
+          <div class="import-actions">
+            <button id="runSampleBtn" class="btn btn-primary btn-lg">▶️ 跑一遍样例（含坏文件）</button>
+            <span class="import-hint">点这个看完整流程：10条正常+1条坏文件</span>
+          </div>
+        </div>
+        <!-- 导入进度 -->
+        <div id="importProgress" class="import-progress hidden">
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+          <p class="progress-text" id="progressText">正在导入...</p>
+        </div>
+      </section>
+
+      <!-- 导入结果（失败的明面上展示） -->
+      <section id="failedSection" class="card failed-section hidden">
+        <h2 class="card-title">⚠️ 导入失败记录 <span id="failedCount" class="badge badge-danger">0</span></h2>
+        <div class="failed-list" id="failedList"></div>
+      </section>
+
+      <!-- 统计概览 -->
+      <section class="card stats-section">
+        <h2 class="card-title">📊 统计概览</h2>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-label">总计</span>
+            <span class="stat-value" id="statTotal">0</span>
+          </div>
+          <div class="stat-item stat-ok">
+            <span class="stat-label">正常过</span>
+            <span class="stat-value" id="statConfirmed">0</span>
+          </div>
+          <div class="stat-item stat-review">
+            <span class="stat-label">等人工拍板</span>
+            <span class="stat-value" id="statReview">0</span>
+          </div>
+          <div class="stat-item stat-pending">
+            <span class="stat-label">待处理</span>
+            <span class="stat-value" id="statPending">0</span>
+          </div>
+          <div class="stat-item stat-settled">
+            <span class="stat-label">已结算</span>
+            <span class="stat-value" id="statSettled">0</span>
+          </div>
+          <div class="stat-item stat-error">
+            <span class="stat-label">这条崩了</span>
+            <span class="stat-value" id="statError">0</span>
+          </div>
+        </div>
+        <div class="stats-summary">
+          <p>押金合计：<strong id="totalDeposit">¥0.00</strong></p>
+          <p>应退合计：<strong id="totalRefund">¥0.00</strong></p>
+          <p>扣款合计：<strong id="totalDeduction">¥0.00</strong></p>
+        </div>
+      </section>
+
+      <!-- 筛选器 -->
+      <section class="card filter-section">
+        <h2 class="card-title">🔍 筛选</h2>
+        <div class="filter-group">
+          <button class="filter-btn active" data-filter="all">全部</button>
+          <button class="filter-btn" data-filter="needs_review">等人工拍板</button>
+          <button class="filter-btn" data-filter="pending">待处理</button>
+          <button class="filter-btn" data-filter="has_anomaly">有异常</button>
+          <button class="filter-btn" data-filter="settled">已结算</button>
+        </div>
+        <input type="text" id="searchInput" class="search-input" placeholder="搜索曲目名、学生名、琴房号...">
+      </section>
+    </aside>
+
+    <!-- 中间：曲目列表 -->
+    <main class="center-panel">
+      <div class="list-header">
+        <h2>📋 曲目列表</h2>
+        <span class="list-count" id="listCount">共 0 条</span>
+      </div>
+      <div class="track-list" id="trackList">
+        <div class="empty-state">
+          <p class="empty-icon">🎵</p>
+          <p>还没有数据</p>
+          <p class="empty-hint">点左边的「跑一遍样例」看看效果</p>
+        </div>
+      </div>
+    </main>
+
+    <!-- 右侧：详情面板 -->
+    <aside class="right-panel" id="detailPanel">
+      <div class="detail-empty" id="detailEmpty">
+        <p class="empty-icon">👆</p>
+        <p>选一条记录看详情</p>
+      </div>
+      <div class="detail-content hidden" id="detailContent">
+        <!-- 详情内容由JS渲染 -->
+      </div>
+    </aside>
+  </div>
+
+  <!-- 结算报告模态框 -->
+  <div class="modal hidden" id="reportModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>📄 琴房预约押金结算报告</h2>
+        <button class="close-btn" id="closeReport">×</button>
+      </div>
+      <div class="modal-body" id="reportContent"></div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="copyReport">📋 复制报告</button>
+        <button class="btn btn-primary" id="closeReportBtn">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 全局提示 -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- 脚本引用 -->
+  <script src="js/data-models.js?v=3"></script>
+  <script src="js/sample-data.js?v=3"></script>
+  <script src="js/core-logic.js?v=3"></script>
+  <script src="js/storage.js?v=3"></script>
+  <script src="js/report.js?v=3"></script>
+  <script src="js/app.js?v=3"></script>
+</body>
+</html>
