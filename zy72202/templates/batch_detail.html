@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>批次详情 - ETF 篮子成分异常复盘</title>
+<link rel="stylesheet" href="/static/css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<nav class="topbar">
+  <div class="brand">ETF 篮子成分异常复盘</div>
+  <div class="nav-links">
+    <a href="/">← 总览</a>
+    <a href="/report/{{ detail.batch.batch_id }}">📄 复盘报告</a>
+  </div>
+</nav>
+
+<div class="container">
+  <section class="batch-header">
+    <h1>批次 {{ detail.batch.batch_id }}</h1>
+    <p>日期: {{ detail.batch.batch_date }} | ETF: {{ detail.batch.etf_code }} {{ detail.batch.etf_name or '' }}</p>
+  </section>
+
+  <section class="charts-row">
+    <div class="chart-box">
+      <h3>成分状态分布</h3>
+      <canvas id="statusChart" width="360" height="240"></canvas>
+    </div>
+    <div class="chart-box">
+      <h3>权重偏差</h3>
+      <canvas id="deviationChart" width="360" height="240"></canvas>
+    </div>
+  </section>
+
+  <section class="drill-section">
+    <p class="hint">💡 点击图表中的成分可下钻到清算批次号或节假日顺延说明</p>
+  </section>
+
+  <section class="component-section">
+    <h2>篮子成分</h2>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>代码</th>
+          <th>名称</th>
+          <th>预期权重</th>
+          <th>实际权重</th>
+          <th>偏差</th>
+          <th>审批人</th>
+          <th>顺延说明</th>
+          <th>状态</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in detail.components %}
+        <tr class="{{ 'row-pinyin' if c.approver_is_pinyin else ('row-missing' if c.status == 'missing_note' else 'row-normal') }}" data-component-id="{{ c.id }}">
+          <td><a href="#" class="drill-link" data-batch="{{ detail.batch.batch_id }}" data-field="batch">{{ c.component_code }}</a></td>
+          <td>{{ c.component_name }}</td>
+          <td>{{ "%.4f"|format(c.expected_weight) }}</td>
+          <td>{{ "%.4f"|format(c.actual_weight) }}</td>
+          <td class="{{ 'text-red' if c.deviation != 0 }}">{{ "%.4f"|format(c.deviation) }}</td>
+          <td>
+            {% if c.approver_is_pinyin %}
+            <span class="pinyin-badge" data-component-id="{{ c.id }}">{{ c.approver_name }}</span>
+            {% else %}
+            {{ c.approver_name }}
+            {% endif %}
+          </td>
+          <td>
+            {% if c.holiday_extension_note %}
+            {{ c.holiday_extension_note }}
+            {% else %}
+            <span class="missing-tag" data-component-id="{{ c.id }}">缺</span>
+            {% endif %}
+          </td>
+          <td>
+            <span class="status-badge status-{{ c.status }}">{{ c.status | status_label }}</span>
+          </td>
+          <td class="action-cell">
+            {% if c.approver_is_pinyin %}
+            <button class="btn btn-sm btn-confirm" data-component-id="{{ c.id }}" data-approver="{{ c.approver_name }}">确认审批人</button>
+            {% endif %}
+            {% if not c.holiday_extension_note and c.deviation != 0 %}
+            <button class="btn btn-sm btn-note" data-component-id="{{ c.id }}">补录说明</button>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <section class="balance-section">
+    <h2>余额变化表</h2>
+    <p class="hint">💡 每行说明：为何留下、缺什么材料、下一步找谁</p>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>代码</th>
+          <th>名称</th>
+          <th>变动前</th>
+          <th>变动后</th>
+          <th>变化量</th>
+          <th>为何留下</th>
+          <th>缺什么</th>
+          <th>下一步</th>
+          <th>审批人</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ch in detail.balance_changes %}
+        <tr class="{{ 'row-pinyin' if ch.approver_is_pinyin else '' }}">
+          <td>
+            <a href="#" class="drill-link" data-batch="{{ detail.batch.batch_id }}" data-field="{{ 'approver' if ch.approver_is_pinyin else 'note' }}">{{ ch.component_code }}</a>
+          </td>
+          <td>{{ ch.component_name }}</td>
+          <td>{{ "%.4f"|format(ch.before_balance) }}</td>
+          <td>{{ "%.4f"|format(ch.after_balance) }}</td>
+          <td class="{{ 'text-red' if ch.change_amount != 0 }}">{{ "%.4f"|format(ch.change_amount) }}</td>
+          <td>{{ ch.reason_kept or '-' }}</td>
+          <td>{{ ch.missing_materials or '-' }}</td>
+          <td>{{ ch.next_action or '-' }}</td>
+          <td>
+            {% if ch.approver_is_pinyin %}
+            <span class="pinyin-badge">{{ ch.approver_name }}</span>
+            {% else %}
+            {{ ch.approver_name }}
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+</div>
+
+<div id="modal" class="modal hidden">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="modalTitle"></h3>
+      <button class="modal-close" id="modalClose">&times;</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<script>
+const BATCH_ID = "{{ detail.batch.batch_id }}";
+const COMPONENTS = {{ detail.components | tojson }};
+const BALANCE_CHANGES = {{ detail.balance_changes | tojson }};
+</script>
+<script src="/static/js/batch_detail.js"></script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>复盘报告 - ETF 篮子成分异常复盘</title>
+<link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<nav class="topbar">
+  <div class="brand">ETF 篮子成分异常复盘</div>
+  <div class="nav-links">
+    <a href="/">← 总览</a>
+    <a href="/batch/{{ batch_id }}">← 批次详情</a>
+  </div>
+</nav>
+
+<div class="container">
+  <section class="report-section">
+    <div class="report-toolbar">
+      <h1>复盘报告</h1>
+      <button class="btn btn-primary" id="btnCopy">复制报告</button>
+    </div>
+    <pre class="report-content" id="reportContent">{{ report }}</pre>
+  </section>
+</div>
+
+<script>
+document.getElementById('btnCopy').addEventListener('click', function() {
+  const text = document.getElementById('reportContent').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    alert('报告已复制到剪贴板');
+  });
+});
+</script>
+</body>
+</html>

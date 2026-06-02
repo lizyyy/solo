@@ -1,0 +1,92 @@
+{
+  "batches": [
+    {
+      "batch_id": "CL-20260601-001",
+      "batch_date": "2026-06-01",
+      "etf_code": "510050",
+      "etf_name": "华夏上证50ETF",
+      "components": [
+        {
+          "component_code": "600000",
+          "component_name": "浦发银行",
+          "expected_weight": 0.0520,
+          "actual_weight": 0.0520,
+          "approver_name": "王建国",
+          "holiday_extension_note": ""
+        },
+        {
+          "component_code": "600036",
+          "component_name": "招商银行",
+          "expected_weight": 0.0830,
+          "actual_weight": 0.0795,
+          "approver_name": "zhangwei",
+          "holiday_extension_note": ""
+        },
+        {
+          "component_code": "601318",
+          "component_name": "中国平安",
+          "expected_weight": 0.0910,
+          "actual_weight": 0.0910,
+          "approver_name": "李明辉",
+          "holiday_extension_note": ""
+        },
+        {
+          "component_code": "600519",
+          "component_name": "贵州茅台",
+          "expected_weight": 0.1250,
+          "actual_weight": 0.1198,
+          "approver_name": "liuchen",
+          "holiday_extension_note": ""
+        },
+        {
+          "component_code": "601166",
+          "component_name": "兴业银行",
+          "expected_weight": 0.0280,
+          "actual_weight": 0.0310,
+          "approver_name": "赵晓峰",
+          "holiday_extension_note": "端午节顺延至6月2日清算"
+        },
+        {
+          "component_code": "600887",
+          "component_name": "伊利股份",
+          "expected_weight": 0.0210,
+          "actual_weight": 0.0245,
+          "approver_name": "wangfang",
+          "holiday_extension_note": ""
+        }
+      ]
+    },
+    {
+      "batch_id": "CL-20260530-002",
+      "batch_date": "2026-05-30",
+      "etf_code": "510300",
+      "etf_name": "华泰柏瑞沪深300ETF",
+      "components": [
+        {
+          "component_code": "000001",
+          "component_name": "平安银行",
+          "expected_weight": 0.0150,
+          "actual_weight": 0.0150,
+          "approver_name": "周强",
+          "holiday_extension_note": ""
+        },
+        {
+          "component_code": "000002",
+          "component_name": "万科A",
+          "expected_weight": 0.0120,
+          "actual_weight": 0.0108,
+          "approver_name": "sunli",
+          "holiday_extension_note": ""
+        },
+        {
+          "component_code": "600276",
+          "component_name": "恒瑞医药",
+          "expected_weight": 0.0180,
+          "actual_weight": 0.0202,
+          "approver_name": "陈思远",
+          "holiday_extension_note": "五一假期顺延至5月31日"
+        }
+      ]
+    }
+  ]
+}

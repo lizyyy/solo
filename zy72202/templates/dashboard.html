@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ETF 篮子成分异常复盘</title>
+<link rel="stylesheet" href="/static/css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<nav class="topbar">
+  <div class="brand">ETF 篮子成分异常复盘</div>
+  <div class="nav-links">
+    <a href="/">总览</a>
+  </div>
+</nav>
+
+<div class="container">
+  <section class="stats-row" id="statsRow">
+    <div class="stat-card">
+      <div class="stat-value" id="statBatches">-</div>
+      <div class="stat-label">清算批次</div>
+    </div>
+    <div class="stat-card stat-warn">
+      <div class="stat-value" id="statPinyin">-</div>
+      <div class="stat-label">拼音审批人</div>
+    </div>
+    <div class="stat-card stat-warn">
+      <div class="stat-value" id="statMissingNote">-</div>
+      <div class="stat-label">缺顺延说明</div>
+    </div>
+    <div class="stat-card stat-ok">
+      <div class="stat-value" id="statNormal">-</div>
+      <div class="stat-label">已归正常</div>
+    </div>
+    <div class="stat-card stat-alert">
+      <div class="stat-value" id="statPending">-</div>
+      <div class="stat-label">待客户经理复核</div>
+    </div>
+  </section>
+
+  <section class="charts-row">
+    <div class="chart-box">
+      <h3>异常分布</h3>
+      <canvas id="anomalyChart" width="400" height="260"></canvas>
+    </div>
+    <div class="chart-box">
+      <h3>偏差量 TOP</h3>
+      <canvas id="deviationChart" width="400" height="260"></canvas>
+    </div>
+  </section>
+
+  <section class="batch-list-section">
+    <h2>清算批次列表</h2>
+    <div class="actions-bar">
+      <button id="btnImportSample" class="btn btn-primary">导入样例数据</button>
+    </div>
+    <table class="data-table" id="batchTable">
+      <thead>
+        <tr>
+          <th>批次号</th>
+          <th>日期</th>
+          <th>ETF代码</th>
+          <th>ETF名称</th>
+          <th>状态</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody id="batchBody"></tbody>
+    </table>
+  </section>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<script src="/static/js/dashboard.js"></script>
+</body>
+</html>
