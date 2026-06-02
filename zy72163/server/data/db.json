@@ -1,0 +1,384 @@
+{
+  "db": {
+    "locations": [
+      {
+        "id": 1,
+        "createdAt": "2026-06-02T11:23:07.302Z",
+        "updatedAt": "2026-06-02T11:23:07.303Z",
+        "name": "南京西路1266号恒隆广场门口",
+        "normalizedName": "南京西1266恒隆广场门",
+        "address": "南京西路1266号",
+        "lat": 31.2304,
+        "lng": 121.4737,
+        "street": "南京西路",
+        "district": "静安区"
+      },
+      {
+        "id": 2,
+        "createdAt": "2026-06-02T11:23:07.304Z",
+        "updatedAt": "2026-06-02T11:23:07.304Z",
+        "name": "人民大道200号市政府大院",
+        "normalizedName": "人民大200市政府大院",
+        "address": "人民大道200号",
+        "lat": 31.2315,
+        "lng": 121.469,
+        "street": "人民大道",
+        "district": "黄浦区"
+      },
+      {
+        "id": 3,
+        "createdAt": "2026-06-02T11:23:07.304Z",
+        "updatedAt": "2026-06-02T11:23:07.304Z",
+        "name": "淮海中路999号环贸广场",
+        "normalizedName": "淮海中999环贸广场",
+        "address": "淮海中路999号",
+        "lat": 31.225,
+        "lng": 121.46,
+        "street": "淮海中路",
+        "district": "徐汇区"
+      },
+      {
+        "id": 4,
+        "createdAt": "2026-06-02T11:23:07.304Z",
+        "updatedAt": "2026-06-02T11:23:07.304Z",
+        "name": "世纪大道1号东方明珠",
+        "normalizedName": "世纪大1东方明珠",
+        "address": "世纪大道1号",
+        "lat": 31.2397,
+        "lng": 121.4998,
+        "street": "世纪大道",
+        "district": "浦东新区"
+      },
+      {
+        "id": 5,
+        "createdAt": "2026-06-02T11:23:07.305Z",
+        "updatedAt": "2026-06-02T11:23:07.305Z",
+        "name": "外滩中山东一路33号",
+        "normalizedName": "外滩中山东33",
+        "address": "中山东一路33号",
+        "lat": 31.24,
+        "lng": 121.49,
+        "street": "中山东一路",
+        "district": "黄浦区"
+      },
+      {
+        "id": 6,
+        "createdAt": "2026-06-02T11:23:07.305Z",
+        "updatedAt": "2026-06-02T11:23:07.305Z",
+        "name": "虹桥路1号港汇恒隆",
+        "normalizedName": "虹桥1港汇恒隆",
+        "address": "虹桥路1号",
+        "lat": 31.195,
+        "lng": 121.43,
+        "street": "虹桥路",
+        "district": "徐汇区"
+      }
+    ],
+    "location_aliases": [
+      {
+        "id": 1,
+        "createdAt": "2026-06-02T11:23:07.303Z",
+        "updatedAt": "2026-06-02T11:23:07.303Z",
+        "locationId": 1,
+        "alias": "南京西路1266号恒隆广场门口",
+        "isManual": 1
+      },
+      {
+        "id": 2,
+        "createdAt": "2026-06-02T11:23:07.303Z",
+        "updatedAt": "2026-06-02T11:23:07.303Z",
+        "locationId": 1,
+        "alias": "恒隆广场正门大树",
+        "isManual": 0
+      },
+      {
+        "id": 3,
+        "createdAt": "2026-06-02T11:23:07.304Z",
+        "updatedAt": "2026-06-02T11:23:07.304Z",
+        "locationId": 2,
+        "alias": "人民大道200号市政府大院",
+        "isManual": 1
+      },
+      {
+        "id": 4,
+        "createdAt": "2026-06-02T11:23:07.304Z",
+        "updatedAt": "2026-06-02T11:23:07.304Z",
+        "locationId": 3,
+        "alias": "淮海中路999号环贸广场",
+        "isManual": 1
+      },
+      {
+        "id": 5,
+        "createdAt": "2026-06-02T11:23:07.304Z",
+        "updatedAt": "2026-06-02T11:23:07.304Z",
+        "locationId": 4,
+        "alias": "世纪大道1号东方明珠",
+        "isManual": 1
+      },
+      {
+        "id": 6,
+        "createdAt": "2026-06-02T11:23:07.305Z",
+        "updatedAt": "2026-06-02T11:23:07.305Z",
+        "locationId": 1,
+        "alias": "南京西路1266号",
+        "isManual": 0
+      },
+      {
+        "id": 7,
+        "createdAt": "2026-06-02T11:23:07.305Z",
+        "updatedAt": "2026-06-02T11:23:07.305Z",
+        "locationId": 5,
+        "alias": "外滩中山东一路33号",
+        "isManual": 1
+      },
+      {
+        "id": 8,
+        "createdAt": "2026-06-02T11:23:07.305Z",
+        "updatedAt": "2026-06-02T11:23:07.305Z",
+        "locationId": 6,
+        "alias": "虹桥路1号港汇恒隆",
+        "isManual": 1
+      }
+    ],
+    "resident_feedbacks": [
+      {
+        "id": 1,
+        "createdAt": "2026-06-02T11:23:07.303Z",
+        "updatedAt": "2026-06-02T11:23:07.303Z",
+        "locationId": 1,
+        "feedbackNo": "FB202401001",
+        "reporter": "张女士",
+        "phone": "138****1234",
+        "feedbackDate": "2024-01-15",
+        "content": "门口那棵梧桐树树枝太长，挡到人行道了，走路要弯腰",
+        "rawContent": "【市民热线】张女士 138****1234：南京西路1266号恒隆广场门口那棵梧桐树，树枝太茂盛了，长到人行道这边来，走路都要弯腰过去，能不能修剪一下？",
+        "source": "12345市民热线",
+        "status": "pending",
+        "priority": "high",
+        "assignedTo": null
+      },
+      {
+        "id": 2,
+        "createdAt": "2026-06-02T11:23:07.303Z",
+        "updatedAt": "2026-06-02T11:23:07.303Z",
+        "locationId": 1,
+        "feedbackNo": "FB202401008",
+        "reporter": "李先生",
+        "phone": null,
+        "feedbackDate": "2024-01-18",
+        "content": "大树枝叶挡住了店铺招牌，影响生意",
+        "rawContent": "恒隆广场正门那棵大树，树枝把我们店的招牌都挡住了，客人都看不到，赶紧来剪一剪！",
+        "source": "微信公众号",
+        "status": "pending",
+        "priority": "medium",
+        "assignedTo": null
+      },
+      {
+        "id": 3,
+        "createdAt": "2026-06-02T11:23:07.304Z",
+        "updatedAt": "2026-06-02T11:23:07.304Z",
+        "locationId": 2,
+        "feedbackNo": "FB202401002",
+        "reporter": "王师傅",
+        "phone": null,
+        "feedbackDate": "2024-01-10",
+        "content": "院内香樟树有枯枝，怕掉下来砸到人",
+        "rawContent": "王师傅来电：市政府大院里的香樟树，上面有几根枯枝，看起来快要掉下来了，万一砸到人就麻烦了！",
+        "source": "电话报修",
+        "status": "pending",
+        "priority": "urgent",
+        "assignedTo": null
+      },
+      {
+        "id": 4,
+        "createdAt": "2026-06-02T11:23:07.304Z",
+        "updatedAt": "2026-06-02T11:23:07.304Z",
+        "locationId": 3,
+        "feedbackNo": "FB202401003",
+        "reporter": null,
+        "phone": null,
+        "feedbackDate": "2024-01-12",
+        "content": "",
+        "rawContent": "淮海中路999号，马路边的树需要修剪一下，树枝太长了。",
+        "source": "匿名邮件",
+        "status": "pending",
+        "priority": "low",
+        "assignedTo": null
+      },
+      {
+        "id": 5,
+        "createdAt": "2026-06-02T11:23:07.304Z",
+        "updatedAt": "2026-06-02T11:23:07.304Z",
+        "locationId": 4,
+        "feedbackNo": "FB202401004",
+        "reporter": "赵先生",
+        "phone": null,
+        "feedbackDate": "2024-01-20",
+        "content": "河边的柳树长得太密，影响观光视线",
+        "rawContent": "【随手拍】赵先生上传照片：东方明珠旁边的滨江大道，柳树长得太密了，把江景都挡住了，游客拍照都不好看。建议定期修剪。",
+        "source": "APP上报",
+        "status": "pending",
+        "priority": "medium",
+        "assignedTo": null
+      },
+      {
+        "id": 6,
+        "createdAt": "2026-06-02T11:23:07.305Z",
+        "updatedAt": "2026-06-02T11:23:07.305Z",
+        "locationId": 1,
+        "feedbackNo": "FB202401005",
+        "reporter": "陈阿姨",
+        "phone": null,
+        "feedbackDate": "2024-01-22",
+        "content": "树上面有个大马蜂窝，太危险了！",
+        "rawContent": "陈阿姨：南京西路1266号那棵树上，我看到有个马蜂窝，好大一个，蜇到人可不得了，赶紧处理一下！",
+        "source": "社区居委会",
+        "status": "pending",
+        "priority": "urgent",
+        "assignedTo": null
+      },
+      {
+        "id": 7,
+        "createdAt": "2026-06-02T11:23:07.305Z",
+        "updatedAt": "2026-06-02T11:23:07.305Z",
+        "locationId": 5,
+        "feedbackNo": "FB202401006",
+        "reporter": "孙先生",
+        "phone": null,
+        "feedbackDate": "2024-01-08",
+        "content": "梧桐树的树枝已经碰到电线了，有安全隐患",
+        "rawContent": "孙先生反映：外滩中山东一路33号附近，有一棵梧桐树的树枝已经碰到电线了，刮风的时候树枝摩擦电线，很危险，希望尽快处理。",
+        "source": "电力公司转办",
+        "status": "pending",
+        "priority": "urgent",
+        "assignedTo": null
+      },
+      {
+        "id": 8,
+        "createdAt": "2026-06-02T11:23:07.306Z",
+        "updatedAt": "2026-06-02T11:23:07.306Z",
+        "locationId": 6,
+        "feedbackNo": "FB202401007",
+        "reporter": null,
+        "phone": null,
+        "feedbackDate": "2024-01-25",
+        "content": "",
+        "rawContent": "",
+        "source": "巡检发现",
+        "status": "pending",
+        "priority": "medium",
+        "assignedTo": null
+      }
+    ],
+    "inspection_photos": [],
+    "street_notes": [
+      {
+        "id": 1,
+        "createdAt": "2026-06-02T11:23:07.306Z",
+        "updatedAt": "2026-06-02T11:23:07.306Z",
+        "locationId": 1,
+        "streetName": "南京西路",
+        "content": "南京西路全段梧桐树每年3-4月统一修剪，注意避开客流高峰时段。",
+        "author": "绿化养护队",
+        "source": "养护手册"
+      }
+    ],
+    "plan_versions": [
+      {
+        "id": 1,
+        "createdAt": "2026-06-02T11:23:57.841Z",
+        "updatedAt": "2026-06-02T11:23:57.841Z",
+        "locationId": 1,
+        "version": "1.0",
+        "title": "南京西路1266号树木修剪方案",
+        "description": "处理居民反馈的3个问题：1)树枝挡人行道 2)树枝挡招牌 3)马蜂窝问题",
+        "pruningType": "综合修剪",
+        "estimatedDate": "2024-02-15",
+        "contractor": "绿化养护一队",
+        "cost": 2500,
+        "status": "draft",
+        "createdBy": "何工",
+        "parentVersionId": null
+      }
+    ],
+    "reports": [
+      {
+        "id": 1,
+        "createdAt": "2026-06-02T11:24:02.069Z",
+        "updatedAt": "2026-06-02T11:24:02.069Z",
+        "planVersionId": 1,
+        "locationId": 1,
+        "reportNo": "TP202606026850",
+        "title": "南京西路1266号树木修剪方案 - 修剪报告",
+        "content": "# 南京西路1266号树木修剪方案 - 修剪执行报告\n\n## 一、基本信息\n- 报告编号：TP202606026850\n- 方案版本：1.0\n- 修剪类型：综合修剪\n- 计划日期：2024-02-15\n- 施工单位：绿化养护一队\n- 预计费用：¥2500\n\n## 二、居民反馈汇总\n- [2024-01-22] 陈阿姨: 树上面有个大马蜂窝，太危险了！\n- [2024-01-18] 李先生: 大树枝叶挡住了店铺招牌，影响生意\n- [2024-01-15] 张女士: 门口那棵梧桐树树枝太长，挡到人行道了，走路要弯腰\n\n## 三、修剪作业建议\n1. 现场勘查后确定具体修剪方案\n2. 注意避让电力线路及地下管线\n3. 作业前设置安全警示区域\n4. 作业后及时清理现场树枝树叶\n5. 修剪后3日内安排巡检复核\n\n## 四、现场情况（待填写）\n[此处填写现场勘查实际情况]\n\n## 五、修剪后效果\n[此处填写修剪后照片及说明]\n\n## 六、存在问题及后续措施\n[此处记录发现的问题及跟进计划]",
+        "pruningDetails": null,
+        "issuesFound": null,
+        "followUpActions": null,
+        "status": "draft",
+        "generatedBy": "何工"
+      }
+    ],
+    "data_conflicts": [
+      {
+        "id": 1,
+        "createdAt": "2026-06-02T11:23:07.304Z",
+        "updatedAt": "2026-06-02T11:23:07.304Z",
+        "locationId": 1,
+        "feedbackId": 2,
+        "relatedFeedbackId": 1,
+        "conflictType": "content_discrepancy",
+        "description": "同一点位存在不同描述的反馈内容",
+        "feedbackValue": "大树枝叶挡住了店铺招牌，影响生意",
+        "existingValue": "门口那棵梧桐树树枝太长，挡到人行道了，走路要弯腰",
+        "suggestedAction": "建议核实两个反馈是否描述同一问题，如为同一问题可合并处理，如为不同问题需分别安排",
+        "resolvedAt": null,
+        "resolvedBy": null,
+        "resolution": null
+      },
+      {
+        "id": 2,
+        "createdAt": "2026-06-02T11:23:07.305Z",
+        "updatedAt": "2026-06-02T11:23:07.305Z",
+        "locationId": 1,
+        "feedbackId": 6,
+        "relatedFeedbackId": 1,
+        "conflictType": "content_discrepancy",
+        "description": "同一点位存在不同描述的反馈内容",
+        "feedbackValue": "树上面有个大马蜂窝，太危险了！",
+        "existingValue": "门口那棵梧桐树树枝太长，挡到人行道了，走路要弯腰",
+        "suggestedAction": "建议核实两个反馈是否描述同一问题，如为同一问题可合并处理，如为不同问题需分别安排",
+        "resolvedAt": null,
+        "resolvedBy": null,
+        "resolution": null
+      },
+      {
+        "id": 3,
+        "createdAt": "2026-06-02T11:23:07.305Z",
+        "updatedAt": "2026-06-02T11:23:07.305Z",
+        "locationId": 1,
+        "feedbackId": 6,
+        "relatedFeedbackId": 2,
+        "conflictType": "content_discrepancy",
+        "description": "同一点位存在不同描述的反馈内容",
+        "feedbackValue": "树上面有个大马蜂窝，太危险了！",
+        "existingValue": "大树枝叶挡住了店铺招牌，影响生意",
+        "suggestedAction": "建议核实两个反馈是否描述同一问题，如为同一问题可合并处理，如为不同问题需分别安排",
+        "resolvedAt": null,
+        "resolvedBy": null,
+        "resolution": null
+      }
+    ],
+    "audit_logs": []
+  },
+  "idCounters": {
+    "locations": 6,
+    "location_aliases": 8,
+    "resident_feedbacks": 8,
+    "inspection_photos": 0,
+    "street_notes": 1,
+    "plan_versions": 1,
+    "reports": 1,
+    "data_conflicts": 3,
+    "audit_logs": 0
+  }
+}
