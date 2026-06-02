@@ -1,0 +1,26 @@
+[
+  {
+    "sample_id": "S004",
+    "corrected_emotion": "anxious",
+    "annotator_id": "annotator_A",
+    "correction_timestamp": "2026-05-21T14:30:00",
+    "reason": "歌词表达紧张和压力，不是兴奋",
+    "previous_emotion": "excited"
+  },
+  {
+    "sample_id": "S006",
+    "corrected_emotion": "excited",
+    "annotator_id": "annotator_B",
+    "correction_timestamp": "2026-05-21T15:10:00",
+    "reason": "虽有失真吉他但情绪内核是青春躁动而非愤怒",
+    "previous_emotion": "angry"
+  },
+  {
+    "sample_id": "S008",
+    "corrected_emotion": "nostalgic",
+    "annotator_id": "annotator_A",
+    "correction_timestamp": "2026-05-21T16:00:00",
+    "reason": "怀念亡友，核心情绪是怀旧而非快乐",
+    "previous_emotion": "happy"
+  }
+]

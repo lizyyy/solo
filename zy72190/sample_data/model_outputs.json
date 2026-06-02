@@ -1,0 +1,66 @@
+[
+  {
+    "sample_id": "S001",
+    "predicted_emotion": "happy",
+    "confidence_score": 0.92,
+    "model_version": "emotion-v2.3",
+    "inference_timestamp": "2026-05-20T10:15:00",
+    "logits": {"happy": 0.92, "excited": 0.04, "relaxed": 0.02, "neutral": 0.01, "romantic": 0.01}
+  },
+  {
+    "sample_id": "S002",
+    "predicted_emotion": "excited",
+    "confidence_score": 0.78,
+    "model_version": "emotion-v2.3",
+    "inference_timestamp": "2026-05-20T10:15:01",
+    "logits": {"excited": 0.78, "angry": 0.10, "happy": 0.07, "nostalgic": 0.03, "neutral": 0.02}
+  },
+  {
+    "sample_id": "S003",
+    "predicted_emotion": "relaxed",
+    "confidence_score": 0.88,
+    "model_version": "emotion-v2.3",
+    "inference_timestamp": "2026-05-20T10:15:02",
+    "logits": {"relaxed": 0.88, "melancholic": 0.06, "romantic": 0.03, "nostalgic": 0.02, "neutral": 0.01}
+  },
+  {
+    "sample_id": "S004",
+    "predicted_emotion": "excited",
+    "confidence_score": 0.71,
+    "model_version": "emotion-v2.3",
+    "inference_timestamp": "2026-05-20T10:15:03",
+    "logits": {"excited": 0.71, "angry": 0.15, "happy": 0.08, "anxious": 0.04, "neutral": 0.02}
+  },
+  {
+    "sample_id": "S005",
+    "predicted_emotion": "sad",
+    "confidence_score": 0.94,
+    "model_version": "emotion-v2.3",
+    "inference_timestamp": "2026-05-20T10:15:04",
+    "logits": {"sad": 0.94, "melancholic": 0.03, "nostalgic": 0.02, "romantic": 0.01, "neutral": 0.00}
+  },
+  {
+    "sample_id": "S006",
+    "predicted_emotion": "angry",
+    "confidence_score": 0.65,
+    "model_version": "emotion-v2.3",
+    "inference_timestamp": "2026-05-20T10:15:05",
+    "logits": {"angry": 0.65, "excited": 0.20, "anxious": 0.08, "happy": 0.04, "neutral": 0.03}
+  },
+  {
+    "sample_id": "S007",
+    "predicted_emotion": "relaxed",
+    "confidence_score": 0.96,
+    "model_version": "emotion-v2.3",
+    "inference_timestamp": "2026-05-20T10:15:06",
+    "logits": {"relaxed": 0.96, "neutral": 0.02, "melancholic": 0.01, "romantic": 0.01, "sad": 0.00}
+  },
+  {
+    "sample_id": "S008",
+    "predicted_emotion": "happy",
+    "confidence_score": 0.55,
+    "model_version": "emotion-v2.3",
+    "inference_timestamp": "2026-05-20T10:15:07",
+    "logits": {"happy": 0.55, "nostalgic": 0.25, "sad": 0.10, "relaxed": 0.06, "romantic": 0.04}
+  }
+]
