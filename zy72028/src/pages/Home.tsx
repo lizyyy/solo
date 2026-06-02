@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Play, Clock, User, FileText, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
+import { Play, Clock, User, FileText, CheckCircle, XCircle, AlertTriangle, ShieldAlert } from 'lucide-react';
 import { useGameStore } from '../store/gameStore';
 import { ValidationAlert } from '../components/ValidationAlert';
 import { ResourceBar } from '../components/ResourceBar';
 
 export function Home() {
   const navigate = useNavigate();
-  const { materials, validationResults, initMaterials, selectMaterial, currentMaterial } = useGameStore();
+  const { materials, validationResults, initMaterials, selectMaterial } = useGameStore();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showValidation, setShowValidation] = useState(false);
 
@@ -30,6 +30,9 @@ export function Home() {
   const selectedValidation = selectedId ? validationResults[selectedId] : null;
   const selectedMaterial = materials.find(m => m.id === selectedId);
 
+  const normalMaterials = materials.filter(m => !m.isBadConfig);
+  const badConfigMaterials = materials.filter(m => m.isBadConfig);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       <div className="max-w-5xl mx-auto px-4 py-8">
@@ -48,61 +51,38 @@ export function Home() {
             选择材料包
           </h2>
           <div className="grid gap-4 md:grid-cols-2">
-            {materials.map(material => {
-              const validation = validationResults[material.id];
-              const isSelected = selectedId === material.id;
-              const statusIcon = validation?.isValid
-                ? <CheckCircle className="w-5 h-5 text-green-500" />
-                : <XCircle className="w-5 h-5 text-red-500" />;
-
-              return (
-                <div
-                  key={material.id}
-                  onClick={() => handleSelect(material.id)}
-                  className={`
-                    relative p-5 rounded-xl cursor-pointer transition-all duration-200
-                    ${isSelected 
-                      ? 'bg-white shadow-lg border-2 border-blue-500 scale-[1.02]' 
-                      : 'bg-white/70 hover:bg-white hover:shadow-md border border-slate-200'
-                    }
-                  `}
-                >
-                  {material.isSample && (
-                    <span className="absolute top-3 right-3 px-2 py-1 bg-amber-100 text-amber-700 text-xs font-medium rounded-full">
-                      样例
-                    </span>
-                  )}
-                  
-                  <div className="flex items-start justify-between mb-3">
-                    <h3 className="font-bold text-slate-800 text-lg">{material.name}</h3>
-                    {statusIcon}
-                  </div>
-                  
-                  <p className="text-sm text-slate-600 mb-4 line-clamp-2">
-                    {material.description}
-                  </p>
-
-                  <div className="flex items-center gap-4 text-xs text-slate-500 mb-3">
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      {material.gameDuration}秒
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <FileText className="w-3 h-3" />
-                      {material.events.length}个事件
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <User className="w-3 h-3" />
-                      {material.createdBy}
-                    </span>
-                  </div>
-
-                  <ResourceBar resources={material.initialResources} showLabels={false} />
-                </div>
-              );
-            })}
+            {normalMaterials.map(material => (
+              <MaterialCard
+                key={material.id}
+                material={material}
+                validation={validationResults[material.id]}
+                isSelected={selectedId === material.id}
+                onSelect={handleSelect}
+              />
+            ))}
           </div>
         </div>
+
+        {badConfigMaterials.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-xl font-semibold text-slate-700 mb-4 flex items-center gap-2">
+              <ShieldAlert className="w-5 h-5 text-amber-500" />
+              配置验证测试
+              <span className="text-sm font-normal text-slate-500">（选择后可查看错误提示，无法开始游戏）</span>
+            </h2>
+            <div className="grid gap-4 md:grid-cols-2">
+              {badConfigMaterials.map(material => (
+                <MaterialCard
+                  key={material.id}
+                  material={material}
+                  validation={validationResults[material.id]}
+                  isSelected={selectedId === material.id}
+                  onSelect={handleSelect}
+                />
+              ))}
+            </div>
+          </div>
+        )}
 
         {showValidation && selectedValidation && (
           <div className="mb-8">
@@ -163,11 +143,93 @@ export function Home() {
             <li>• 选择一个材料包后，系统会自动验证配置是否正确</li>
             <li>• 游戏时间为 90-120 秒，需要在规定时间内完成所有调度决策</li>
             <li>• 每个事件有多个选项，请根据调度规则选择最佳方案</li>
+            <li>• 游戏中可随时暂停，进度自动保存，回来后继续</li>
             <li>• 结算页面会详细展示你的关键选择和扣分原因</li>
             <li>• 课程助教可以在结算后补录备注，系统会保留完整审计记录</li>
+            <li>• 配置验证测试区可验证系统对坏配置的提示能力</li>
           </ul>
         </div>
       </div>
+    </div>
+  );
+}
+
+interface MaterialCardProps {
+  material: {
+    id: string;
+    name: string;
+    description: string;
+    isSample: boolean;
+    isBadConfig?: boolean;
+    gameDuration: number;
+    events: { length: number };
+    createdBy: string;
+    initialResources: {
+      buses: number;
+      drivers: number;
+      budget: number;
+      reputation: number;
+    };
+  };
+  validation: { isValid: boolean } | undefined;
+  isSelected: boolean;
+  onSelect: (id: string) => void;
+}
+
+function MaterialCard({ material, validation, isSelected, onSelect }: MaterialCardProps) {
+  const statusIcon = validation?.isValid
+    ? <CheckCircle className="w-5 h-5 text-green-500" />
+    : <XCircle className="w-5 h-5 text-red-500" />;
+
+  return (
+    <div
+      onClick={() => onSelect(material.id)}
+      className={`
+        relative p-5 rounded-xl cursor-pointer transition-all duration-200
+        ${isSelected 
+          ? 'bg-white shadow-lg border-2 border-blue-500 scale-[1.02]' 
+          : material.isBadConfig
+            ? 'bg-red-50/70 hover:bg-red-50 hover:shadow-md border border-red-200'
+            : 'bg-white/70 hover:bg-white hover:shadow-md border border-slate-200'
+        }
+      `}
+    >
+      {material.isSample && !material.isBadConfig && (
+        <span className="absolute top-3 right-3 px-2 py-1 bg-amber-100 text-amber-700 text-xs font-medium rounded-full">
+          样例
+        </span>
+      )}
+      {material.isBadConfig && (
+        <span className="absolute top-3 right-3 px-2 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full">
+          坏配置
+        </span>
+      )}
+      
+      <div className="flex items-start justify-between mb-3">
+        <h3 className="font-bold text-slate-800 text-lg">{material.name}</h3>
+        {statusIcon}
+      </div>
+      
+      <p className="text-sm text-slate-600 mb-4 line-clamp-2">
+        {material.description}
+      </p>
+
+      <div className="flex items-center gap-4 text-xs text-slate-500 mb-3">
+        <span className="flex items-center gap-1">
+          <Clock className="w-3 h-3" />
+          {material.gameDuration}秒
+        </span>
+        <span className="flex items-center gap-1">
+          <FileText className="w-3 h-3" />
+          {material.events.length}个事件
+        </span>
+        <span className="flex items-center gap-1">
+          <User className="w-3 h-3" />
+          {material.createdBy}
+        </span>
+      </div>
+
+      <ResourceBar resources={material.initialResources} showLabels={false} />
     </div>
   );
 }

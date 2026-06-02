@@ -34,6 +34,8 @@ export interface MaterialPackage {
   createdAt: string;
   createdBy: string;
   isSample: boolean;
+  isBadConfig?: boolean;
+  badConfigType?: 'empty_level' | 'duplicate_event' | 'resource_out_of_bounds';
   gameDuration: number;
   initialResources: Resources;
   events: GameEvent[];
@@ -60,6 +62,7 @@ export interface GameState {
   materialName: string;
   startTime: string;
   endTime?: string;
+  pausedAt?: string;
   status: GameStatus;
   failureType?: FailureType;
   currentEventIndex: number;
@@ -67,6 +70,7 @@ export interface GameState {
   score: number;
   decisions: DecisionRecord[];
   totalTimeUsed: number;
+  gameDuration: number;
 }
 
 export interface AdjustmentItem {

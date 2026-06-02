@@ -255,27 +255,32 @@ export const sampleMaterials: MaterialPackage[] = [
   }
 ];
 
-export const badConfigExamples = {
-  emptyEvents: {
+export const allMaterials: MaterialPackage[] = [
+  ...sampleMaterials,
+  {
     id: 'bad-empty',
-    name: '空关卡示例',
-    description: '这是一个空关卡，用于测试配置验证功能',
-    source: '测试数据',
+    name: '⚠️ 空关卡示例',
+    description: '事件列表为空，用于验证系统如何检测空关卡配置。选择后可查看配置验证提示。',
+    source: '配置验证测试',
     createdAt: '2026-06-01T12:00:00.000Z',
     createdBy: '系统测试',
-    isSample: false,
+    isSample: true,
+    isBadConfig: true,
+    badConfigType: 'empty_level',
     gameDuration: 60,
     initialResources: { buses: 5, drivers: 5, budget: 1000, reputation: 50 },
     events: []
   },
-  duplicateEvents: {
+  {
     id: 'bad-duplicate',
-    name: '重复ID示例',
-    description: '包含重复事件ID的配置',
-    source: '测试数据',
+    name: '⚠️ 重复事件ID示例',
+    description: '两个事件使用了相同的ID，用于验证重复事件检测。选择后可查看配置验证提示。',
+    source: '配置验证测试',
     createdAt: '2026-06-01T12:00:00.000Z',
     createdBy: '系统测试',
-    isSample: false,
+    isSample: true,
+    isBadConfig: true,
+    badConfigType: 'duplicate_event',
     gameDuration: 60,
     initialResources: { buses: 5, drivers: 5, budget: 1000, reputation: 50 },
     events: [
@@ -295,14 +300,16 @@ export const badConfigExamples = {
       }
     ]
   },
-  outOfBounds: {
+  {
     id: 'bad-bounds',
-    name: '资源越界示例',
-    description: '资源值超出合理范围的配置',
-    source: '测试数据',
+    name: '⚠️ 资源越界示例',
+    description: '公交100辆、司机-5人、预算99999，用于验证资源边界检测。选择后可查看配置验证提示。',
+    source: '配置验证测试',
     createdAt: '2026-06-01T12:00:00.000Z',
     createdBy: '系统测试',
-    isSample: false,
+    isSample: true,
+    isBadConfig: true,
+    badConfigType: 'resource_out_of_bounds',
     gameDuration: 60,
     initialResources: { buses: 100, drivers: -5, budget: 99999, reputation: 50 },
     events: [
@@ -315,4 +322,4 @@ export const badConfigExamples = {
       }
     ]
   }
-};
+];

@@ -1,9 +1,10 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Clock, AlertCircle, CheckCircle, XCircle, Lightbulb, ArrowRight } from 'lucide-react';
+import { Clock, CheckCircle, XCircle, Lightbulb, ArrowRight, Pause, Play, ArrowLeft, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '../store/gameStore';
 import { GameEngine } from '../utils/GameEngine';
+import { ConfigValidator } from '../utils/ConfigValidator';
 import { ResourceBar } from '../components/ResourceBar';
 import type { GameEvent } from '../types';
 
@@ -11,13 +12,15 @@ export function GamePage() {
   const { materialId } = useParams<{ materialId: string }>();
   const navigate = useNavigate();
   const { 
-    materials, 
     currentGame, 
     currentMaterial,
     selectMaterial, 
     startGame, 
     processDecision,
     endGame,
+    pauseGame,
+    resumeGame,
+    restorePlayingGame,
     initMaterials
   } = useGameStore();
 
@@ -25,6 +28,8 @@ export function GamePage() {
   const [eventStartTime, setEventStartTime] = useState(Date.now());
   const [feedback, setFeedback] = useState<{ text: string; isCorrect: boolean } | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [configError, setConfigError] = useState<string | null>(null);
   const timerRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -38,51 +43,74 @@ export function GamePage() {
   }, [materialId, selectMaterial]);
 
   useEffect(() => {
-    if (currentMaterial && !currentGame) {
-      try {
-        startGame();
-      } catch (e) {
-        alert((e as Error).message);
-        navigate('/');
+    if (!currentMaterial) return;
+
+    if (currentGame) {
+      if (currentGame.pausedAt) {
+        setIsPaused(true);
+        setRemainingTime(GameEngine.getRemainingSeconds(currentGame));
       }
+      return;
     }
-  }, [currentMaterial, currentGame, startGame, navigate]);
+
+    const restored = restorePlayingGame(materialId!);
+    if (restored) {
+      return;
+    }
+
+    const validation = ConfigValidator.validate(currentMaterial);
+    if (!validation.isValid) {
+      setConfigError(ConfigValidator.formatErrors(validation.errors));
+      return;
+    }
+
+    try {
+      startGame();
+    } catch (e) {
+      setConfigError((e as Error).message);
+    }
+  }, [currentMaterial, currentGame, startGame, materialId, restorePlayingGame]);
 
   useEffect(() => {
-    if (currentGame && currentMaterial && currentGame.status === 'playing') {
-      setRemainingTime(currentMaterial.gameDuration);
+    if (currentGame && !currentGame.pausedAt && currentGame.status === 'playing' && !isPaused) {
+      const computed = GameEngine.getRemainingSeconds(currentGame);
+      setRemainingTime(computed);
     }
-  }, [currentGame, currentMaterial]);
+  }, [currentGame, isPaused]);
 
   useEffect(() => {
-    if (remainingTime > 0 && currentGame?.status === 'playing') {
-      timerRef.current = window.setInterval(() => {
-        setRemainingTime(prev => {
-          const newTime = prev - 1;
-          if (newTime <= 0) {
-            return 0;
-          }
-          return newTime;
-        });
-      }, 1000);
+    if (isPaused || currentGame?.status !== 'playing' || currentGame?.pausedAt) {
+      return;
     }
+
+    timerRef.current = window.setInterval(() => {
+      setRemainingTime(prev => {
+        const newTime = prev - 1;
+        if (newTime <= 0) {
+          return 0;
+        }
+        return newTime;
+      });
+    }, 1000);
 
     return () => {
       if (timerRef.current) {
         clearInterval(timerRef.current);
+        timerRef.current = null;
       }
     };
-  }, [remainingTime, currentGame?.status]);
+  }, [isPaused, currentGame?.status, currentGame?.pausedAt]);
 
   useEffect(() => {
-    if (remainingTime === 0 && currentGame && currentMaterial && currentGame.status === 'playing') {
+    if (remainingTime === 0 && currentGame && currentMaterial && currentGame.status === 'playing' && !isPaused) {
       handleGameEnd('timeout');
     }
-  }, [remainingTime, currentGame, currentMaterial]);
+  }, [remainingTime, currentGame, currentMaterial, isPaused]);
 
   const handleGameEnd = useCallback((failureType?: 'timeout' | 'rule_misunderstanding') => {
     if (timerRef.current) {
       clearInterval(timerRef.current);
+      timerRef.current = null;
     }
     endGame(failureType);
     setTimeout(() => {
@@ -90,8 +118,23 @@ export function GamePage() {
     }, 500);
   }, [endGame, navigate, currentGame?.id]);
 
+  const handlePause = () => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+    pauseGame();
+    setIsPaused(true);
+  };
+
+  const handleResume = () => {
+    resumeGame();
+    setIsPaused(false);
+    setEventStartTime(Date.now());
+  };
+
   const handleSelectOption = (optionId: string) => {
-    if (!currentGame || !currentMaterial || isTransitioning) return;
+    if (!currentGame || !currentMaterial || isTransitioning || isPaused) return;
 
     const timeTaken = Math.round((Date.now() - eventStartTime) / 1000);
     const result = processDecision(optionId, timeTaken);
@@ -121,7 +164,42 @@ export function GamePage() {
     }
   };
 
-  if (!currentMaterial || !currentGame) {
+  if (!currentMaterial) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-lg text-slate-600">加载中...</div>
+      </div>
+    );
+  }
+
+  if (configError) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-lg w-full text-center">
+          <AlertTriangle className="w-16 h-16 text-amber-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-slate-800 mb-3">材料包配置有误</h2>
+          <p className="text-slate-600 mb-4">
+            无法启动游戏，该材料包存在以下配置问题：
+          </p>
+          <div className="text-left p-4 bg-red-50 border border-red-200 rounded-lg mb-6">
+            <pre className="whitespace-pre-wrap text-sm text-red-700 font-sans">{configError}</pre>
+          </div>
+          <p className="text-sm text-slate-500 mb-6">
+            请联系课程助教修复配置，或选择其他材料包。
+          </p>
+          <button
+            onClick={() => navigate('/')}
+            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium flex items-center gap-2 transition-colors mx-auto"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            返回首页
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!currentGame) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-lg text-slate-600">加载中...</div>
@@ -143,11 +221,30 @@ export function GamePage() {
                 事件 {currentGame.currentEventIndex + 1} / {currentMaterial.events.length}
               </span>
             </div>
-            <div className={`flex items-center gap-2 font-mono font-bold text-lg ${
-              remainingTime <= 10 ? 'text-red-500 animate-pulse' : 'text-slate-700'
-            }`}>
-              <Clock className="w-5 h-5" />
-              {Math.floor(remainingTime / 60)}:{(remainingTime % 60).toString().padStart(2, '0')}
+            <div className="flex items-center gap-3">
+              <div className={`flex items-center gap-2 font-mono font-bold text-lg ${
+                remainingTime <= 10 ? 'text-red-500 animate-pulse' : 'text-slate-700'
+              }`}>
+                <Clock className="w-5 h-5" />
+                {Math.floor(remainingTime / 60)}:{(remainingTime % 60).toString().padStart(2, '0')}
+              </div>
+              {!isPaused ? (
+                <button
+                  onClick={handlePause}
+                  className="p-2 rounded-lg hover:bg-slate-100 transition-colors"
+                  title="暂停"
+                >
+                  <Pause className="w-5 h-5 text-slate-500" />
+                </button>
+              ) : (
+                <button
+                  onClick={handleResume}
+                  className="p-2 rounded-lg hover:bg-green-100 transition-colors"
+                  title="继续"
+                >
+                  <Play className="w-5 h-5 text-green-600" />
+                </button>
+              )}
             </div>
           </div>
           <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
@@ -167,9 +264,27 @@ export function GamePage() {
         </div>
       </div>
 
+      {isPaused && (
+        <div className="bg-amber-50 border-b border-amber-200">
+          <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+            <span className="text-amber-700 font-medium flex items-center gap-2">
+              <Pause className="w-4 h-4" />
+              游戏已暂停 — 您的选择和进度已保存
+            </span>
+            <button
+              onClick={handleResume}
+              className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-medium flex items-center gap-2 transition-colors"
+            >
+              <Play className="w-4 h-4" />
+              继续游戏
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-4xl mx-auto px-4 py-8">
         <AnimatePresence mode="wait">
-          {currentEvent && (
+          {currentEvent && !isPaused && (
             <motion.div
               key={currentEvent.id}
               initial={{ opacity: 0, x: 50 }}
@@ -186,6 +301,26 @@ export function GamePage() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {isPaused && currentEvent && (
+          <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
+            <Pause className="w-12 h-12 text-amber-500 mx-auto mb-4" />
+            <h3 className="text-xl font-bold text-slate-800 mb-2">游戏暂停中</h3>
+            <p className="text-slate-600 mb-2">
+              当前事件：{currentEvent.title}
+            </p>
+            <p className="text-sm text-slate-500">
+              已完成 {currentGame.decisions.length} 个决策，剩余时间 {Math.floor(remainingTime / 60)}:{(remainingTime % 60).toString().padStart(2, '0')}
+            </p>
+            <button
+              onClick={handleResume}
+              className="mt-6 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium flex items-center gap-2 transition-colors mx-auto"
+            >
+              <Play className="w-5 h-5" />
+              继续游戏
+            </button>
+          </div>
+        )}
       </div>
 
       <AnimatePresence>

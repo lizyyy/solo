@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { GameState, MaterialPackage, SupplementRecord, ValidationResult } from '../types';
-import { sampleMaterials } from '../data/sampleMaterials';
+import { allMaterials } from '../data/sampleMaterials';
 import { ConfigValidator } from '../utils/ConfigValidator';
 import { GameEngine } from '../utils/GameEngine';
 import { Storage } from '../utils/Storage';
@@ -19,7 +19,10 @@ interface GameStore {
   startGame: () => void;
   processDecision: (optionId: string, timeTaken: number) => { feedback: string; isCorrect: boolean } | null;
   endGame: (failureType?: 'timeout' | 'rule_misunderstanding') => void;
+  pauseGame: () => void;
+  resumeGame: () => void;
   loadGame: (gameId: string) => void;
+  restorePlayingGame: (materialId: string) => boolean;
   addSupplement: (gameId: string, notes: string, supplementedBy: string) => void;
   loadSupplements: (gameId: string) => void;
   clearCurrentGame: () => void;
@@ -35,16 +38,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   initMaterials: () => {
     const storedMaterials = Storage.getAllMaterials();
-    const allMaterials = storedMaterials.length > 0 
+    const allMats = storedMaterials.length > 0 
       ? storedMaterials 
-      : sampleMaterials;
+      : allMaterials;
     
     const validationResults: Record<string, ValidationResult> = {};
-    allMaterials.forEach(m => {
+    allMats.forEach(m => {
       validationResults[m.id] = ConfigValidator.validate(m);
     });
 
-    set({ materials: allMaterials, validationResults });
+    set({ materials: allMats, validationResults });
   },
 
   selectMaterial: (materialId: string) => {
@@ -91,6 +94,36 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const finalizedGame = GameEngine.finalizeGame(currentGame, failureType);
     Storage.saveGame(finalizedGame);
     set({ currentGame: finalizedGame });
+  },
+
+  pauseGame: () => {
+    const { currentGame } = get();
+    if (!currentGame || currentGame.status !== 'playing') return;
+    const paused = GameEngine.pauseGame(currentGame);
+    Storage.saveGame(paused);
+    set({ currentGame: paused });
+  },
+
+  resumeGame: () => {
+    const { currentGame } = get();
+    if (!currentGame || !currentGame.pausedAt) return;
+    const resumed = GameEngine.resumeGame(currentGame);
+    Storage.saveGame(resumed);
+    set({ currentGame: resumed });
+  },
+
+  restorePlayingGame: (materialId: string) => {
+    const allGames = Storage.getAllGames();
+    const playing = allGames.find(
+      g => g.materialId === materialId && g.status === 'playing'
+    );
+    if (!playing) return false;
+
+    const material = get().materials.find(m => m.id === playing.materialId);
+    const paused = playing.pausedAt ? playing : GameEngine.pauseGame(playing);
+    Storage.saveGame(paused);
+    set({ currentGame: paused, currentMaterial: material || null });
+    return true;
   },
 
   loadGame: (gameId: string) => {

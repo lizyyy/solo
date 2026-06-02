@@ -24,7 +24,8 @@ export class GameEngine {
       resources: { ...material.initialResources },
       score: 100,
       decisions: [],
-      totalTimeUsed: 0
+      totalTimeUsed: 0,
+      gameDuration: material.gameDuration
     };
   }
 
@@ -190,5 +191,41 @@ export class GameEngine {
 
   static getCriticalDecisions(gameState: GameState): DecisionRecord[] {
     return gameState.decisions.filter(d => !d.isCorrect || Math.abs(d.scoreChange) >= 10);
+  }
+
+  static pauseGame(gameState: GameState): GameState {
+    return {
+      ...gameState,
+      pausedAt: new Date().toISOString()
+    };
+  }
+
+  static resumeGame(gameState: GameState): GameState {
+    if (!gameState.pausedAt) return gameState;
+
+    const pausedMs = new Date(gameState.pausedAt).getTime();
+    const nowMs = Date.now();
+    const pauseDurationMs = nowMs - pausedMs;
+    const newStartMs = new Date(gameState.startTime).getTime() + pauseDurationMs;
+
+    const { pausedAt, ...rest } = gameState;
+    return {
+      ...rest,
+      startTime: new Date(newStartMs).toISOString()
+    };
+  }
+
+  static getRemainingSeconds(gameState: GameState): number {
+    if (gameState.status !== 'playing') return 0;
+
+    const startMs = new Date(gameState.startTime).getTime();
+    const pausedMs = gameState.pausedAt ? new Date(gameState.pausedAt).getTime() : null;
+    const nowMs = Date.now();
+
+    const elapsedSec = Math.floor(
+      ((pausedMs ?? nowMs) - startMs) / 1000
+    ) - gameState.totalTimeUsed;
+
+    return Math.max(gameState.gameDuration - elapsedSec, 0);
   }
 }
