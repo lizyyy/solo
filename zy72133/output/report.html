@@ -1,0 +1,586 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DJ曲库能量排序 - 处理报告</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f5f5f7;
+            color: #1d1d1f;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .header h1 { font-size: 28px; margin-bottom: 8px; }
+        .header p { opacity: 0.9; }
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            text-align: center;
+        }
+        .stat-card .number { font-size: 36px; font-weight: bold; }
+        .stat-card .label { color: #86868b; font-size: 14px; margin-top: 4px; }
+        .stat-card.matched .number { color: #34c759; }
+        .stat-card.exception .number { color: #ff9500; }
+        .stat-card.conflict .number { color: #ff3b30; }
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .section h2 { 
+            font-size: 20px; 
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e5e5ea;
+        }
+        .track-item {
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border-left: 4px solid #e5e5ea;
+            background: #fafafa;
+        }
+        .track-item.matched { border-left-color: #34c759; }
+        .track-item.duplicate { border-left-color: #ff9500; }
+        .track-item.old-version { border-left-color: #ffcc00; }
+        .track-item.missing-license { border-left-color: #ff3b30; }
+        .track-item.renamed { border-left-color: #5856d6; }
+        .track-item.unmatched { border-left-color: #8e8e93; }
+        .track-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .track-title { font-weight: 600; font-size: 16px; }
+        .track-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-matched { background: #d1fae5; color: #065f46; }
+        .status-duplicate { background: #fed7aa; color: #92400e; }
+        .status-old { background: #fef3c7; color: #92400e; }
+        .status-license { background: #fee2e2; color: #991b1b; }
+        .status-renamed { background: #ede9fe; color: #5b21b6; }
+        .status-unmatched { background: #e5e5ea; color: #48484a; }
+        .track-meta {
+            display: flex;
+            gap: 20px;
+            font-size: 13px;
+            color: #86868b;
+            margin-bottom: 8px;
+        }
+        .exceptions-box {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 6px;
+            padding: 12px;
+            margin-top: 10px;
+        }
+        .exceptions-box h4 {
+            color: #92400e;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+        .exception-item {
+            font-size: 13px;
+            padding: 4px 0;
+            border-bottom: 1px dashed #ffeaa7;
+        }
+        .exception-item:last-child { border-bottom: none; }
+        .exception-label { font-weight: 600; color: #92400e; }
+        .suggestion {
+            color: #78350f;
+            margin-top: 4px;
+        }
+        .conflict-box {
+            background: #fee2e2;
+            border: 1px solid #fca5a5;
+            border-radius: 6px;
+            padding: 12px;
+            margin-top: 10px;
+        }
+        .conflict-box h4 {
+            color: #991b1b;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+        .conflict-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 2fr;
+            gap: 12px;
+            padding: 8px 0;
+            font-size: 13px;
+            border-bottom: 1px dashed #fca5a5;
+        }
+        .conflict-row:last-child { border-bottom: none; }
+        .conflict-val { background: white; padding: 6px 10px; border-radius: 4px; }
+        .conflict-val.excel { border-left: 3px solid #007aff; }
+        .conflict-val.old { border-left: 3px solid #ff9500; }
+        .audit-box {
+            background: #f0f0f5;
+            border-radius: 6px;
+            padding: 12px;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+        .audit-box h4 {
+            color: #48484a;
+            margin-bottom: 8px;
+        }
+        .audit-row {
+            padding: 4px 0;
+            color: #636366;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #86868b;
+            font-size: 13px;
+        }
+        .energy-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        .energy-high { background: #fee2e2; color: #dc2626; }
+        .energy-medium { background: #fef3c7; color: #d97706; }
+        .energy-low { background: #dbeafe; color: #2563eb; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎧 DJ曲库能量排序</h1>
+            <p>曲目匹配与异常检测报告 · 生成时间: 2026-06-02 07:49:31</p>
+        </div>
+        
+        <div class="summary">
+            <div class="stat-card matched">
+                <div class="number">10</div>
+                <div class="label">总曲目数</div>
+            </div>
+            <div class="stat-card matched">
+                <div class="number">0</div>
+                <div class="label">正常匹配</div>
+            </div>
+            <div class="stat-card exception">
+                <div class="number">10</div>
+                <div class="label">需关注</div>
+            </div>
+            <div class="stat-card conflict">
+                <div class="number">0</div>
+                <div class="label">数据冲突</div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>📋 曲目清单</h2>
+            
+<div class="track-item missing-license">
+    <div class="track-header">
+        <div class="track-title">
+            深海回响
+            
+            <span class="energy-badge energy-medium">能量6</span>
+            
+        </div>
+        <span class="track-status status-license">缺授权</span>
+    </div>
+    <div class="track-meta">
+        <span>ID: TRK005</span>
+        <span>艺术家: 未知艺术家</span>
+        <span>时长: 3:58</span>
+        <span>BPM: 120.0</span>
+    </div>
+    
+    <div class="track-meta">
+        <span>文件: 深海回响_无授权.mp3</span>
+        <span>置信度: 65%</span>
+    </div>
+    
+    
+    <div class="exceptions-box">
+        <h4>🔍 异常提醒</h4>
+        
+        <div class="exception-item">
+            <span class="exception-label">人工改名:</span> 模糊匹配，可能已人工改名
+            <div class="suggestion">💡 建议: 确认是否为人工改名</div>
+        </div>
+        
+        <div class="exception-item">
+            <span class="exception-label">缺授权:</span> 授权信息不完整，请确认版权状态
+            <div class="suggestion">💡 建议: 请确认授权状态</div>
+        </div>
+        
+    </div>
+    
+    
+</div>
+
+<div class="track-item missing-license">
+    <div class="track-header">
+        <div class="track-title">
+            晨曦微光
+            
+            <span class="energy-badge energy-low">能量3</span>
+            
+        </div>
+        <span class="track-status status-license">缺授权</span>
+    </div>
+    <div class="track-meta">
+        <span>ID: TRK008</span>
+        <span>艺术家: DJ阿杰</span>
+        <span>时长: 3:30</span>
+        <span>BPM: 95.0</span>
+    </div>
+    
+    <div class="track-meta">
+        <span>文件: DJ阿杰 - 晨曦微光.mp3</span>
+        <span>置信度: 84%</span>
+    </div>
+    
+    
+    <div class="exceptions-box">
+        <h4>🔍 异常提醒</h4>
+        
+        <div class="exception-item">
+            <span class="exception-label">人工改名:</span> 模糊匹配，可能已人工改名
+            <div class="suggestion">💡 建议: 确认是否为人工改名</div>
+        </div>
+        
+        <div class="exception-item">
+            <span class="exception-label">缺授权:</span> 授权信息不完整，请确认版权状态
+            <div class="suggestion">💡 建议: 请确认授权状态</div>
+        </div>
+        
+    </div>
+    
+    
+</div>
+
+<div class="track-item renamed">
+    <div class="track-header">
+        <div class="track-title">
+            午夜节拍
+            
+            <span class="energy-badge energy-high">能量8</span>
+            
+        </div>
+        <span class="track-status status-renamed">人工改名</span>
+    </div>
+    <div class="track-meta">
+        <span>ID: TRK001</span>
+        <span>艺术家: DJ小明</span>
+        <span>时长: 3:45</span>
+        <span>BPM: 128.0</span>
+    </div>
+    
+    <div class="track-meta">
+        <span>文件: DJ小明 - 午夜节拍.mp3</span>
+        <span>置信度: 84%</span>
+    </div>
+    
+    
+    <div class="exceptions-box">
+        <h4>🔍 异常提醒</h4>
+        
+        <div class="exception-item">
+            <span class="exception-label">人工改名:</span> 模糊匹配，可能已人工改名
+            <div class="suggestion">💡 建议: 确认是否为人工改名</div>
+        </div>
+        
+    </div>
+    
+    
+</div>
+
+<div class="track-item renamed">
+    <div class="track-header">
+        <div class="track-title">
+            星空漫步
+            
+            <span class="energy-badge energy-low">能量4</span>
+            
+        </div>
+        <span class="track-status status-renamed">人工改名</span>
+    </div>
+    <div class="track-meta">
+        <span>ID: TRK002</span>
+        <span>艺术家: DJ小红</span>
+        <span>时长: 4:20</span>
+        <span>BPM: 100.0</span>
+    </div>
+    
+    <div class="track-meta">
+        <span>文件: DJ小红 - 星空漫步.wav</span>
+        <span>置信度: 84%</span>
+    </div>
+    
+    
+    <div class="exceptions-box">
+        <h4>🔍 异常提醒</h4>
+        
+        <div class="exception-item">
+            <span class="exception-label">人工改名:</span> 模糊匹配，可能已人工改名
+            <div class="suggestion">💡 建议: 确认是否为人工改名</div>
+        </div>
+        
+    </div>
+    
+    
+</div>
+
+<div class="track-item renamed">
+    <div class="track-header">
+        <div class="track-title">
+            暴风来袭 (Old Version)
+            
+            <span class="energy-badge energy-high">能量9</span>
+            
+        </div>
+        <span class="track-status status-renamed">人工改名</span>
+    </div>
+    <div class="track-meta">
+        <span>ID: TRK003</span>
+        <span>艺术家: DJ小刚</span>
+        <span>时长: 5:10</span>
+        <span>BPM: 140.0</span>
+    </div>
+    
+    <div class="track-meta">
+        <span>文件: DJ小刚 - 暴风来袭_OldVersion.mp3</span>
+        <span>置信度: 79%</span>
+    </div>
+    
+    
+    <div class="exceptions-box">
+        <h4>🔍 异常提醒</h4>
+        
+        <div class="exception-item">
+            <span class="exception-label">文件名不匹配:</span> 期望 'DJ小刚 - 暴风来袭 (Old Version)'，实际 'DJ小刚 - 暴风来袭_OldVersion.mp3'
+            <div class="suggestion">💡 建议: 检查是否人工改名</div>
+        </div>
+        
+        <div class="exception-item">
+            <span class="exception-label">人工改名:</span> 模糊匹配，可能已人工改名
+            <div class="suggestion">💡 建议: 确认是否为人工改名</div>
+        </div>
+        
+    </div>
+    
+    
+</div>
+
+<div class="track-item renamed">
+    <div class="track-header">
+        <div class="track-title">
+            暴风来袭 (Final Master)
+            
+            <span class="energy-badge energy-high">能量9</span>
+            
+        </div>
+        <span class="track-status status-renamed">人工改名</span>
+    </div>
+    <div class="track-meta">
+        <span>ID: TRK004</span>
+        <span>艺术家: DJ小刚</span>
+        <span>时长: 5:12</span>
+        <span>BPM: 140.0</span>
+    </div>
+    
+    <div class="track-meta">
+        <span>文件: DJ小刚 - 暴风来袭_FinalMaster.mp3</span>
+        <span>置信度: 79%</span>
+    </div>
+    
+    
+    <div class="exceptions-box">
+        <h4>🔍 异常提醒</h4>
+        
+        <div class="exception-item">
+            <span class="exception-label">文件名不匹配:</span> 期望 'DJ小刚 - 暴风来袭 (Final Master)'，实际 'DJ小刚 - 暴风来袭_FinalMaster.mp3'
+            <div class="suggestion">💡 建议: 检查是否人工改名</div>
+        </div>
+        
+        <div class="exception-item">
+            <span class="exception-label">人工改名:</span> 模糊匹配，可能已人工改名
+            <div class="suggestion">💡 建议: 确认是否为人工改名</div>
+        </div>
+        
+    </div>
+    
+    
+</div>
+
+<div class="track-item renamed">
+    <div class="track-header">
+        <div class="track-title">
+            霓虹之夜
+            
+            <span class="energy-badge energy-medium">能量7</span>
+            
+        </div>
+        <span class="track-status status-renamed">人工改名</span>
+    </div>
+    <div class="track-meta">
+        <span>ID: TRK006</span>
+        <span>艺术家: DJ小美</span>
+        <span>时长: 4:05</span>
+        <span>BPM: 130.0</span>
+    </div>
+    
+    <div class="track-meta">
+        <span>文件: DJ小美 - 霓虹之夜.mp3</span>
+        <span>置信度: 84%</span>
+    </div>
+    
+    
+    <div class="exceptions-box">
+        <h4>🔍 异常提醒</h4>
+        
+        <div class="exception-item">
+            <span class="exception-label">人工改名:</span> 模糊匹配，可能已人工改名
+            <div class="suggestion">💡 建议: 确认是否为人工改名</div>
+        </div>
+        
+    </div>
+    
+    
+</div>
+
+<div class="track-item renamed">
+    <div class="track-header">
+        <div class="track-title">
+            霓虹之夜_Remix
+            
+            <span class="energy-badge energy-high">能量8</span>
+            
+        </div>
+        <span class="track-status status-renamed">人工改名</span>
+    </div>
+    <div class="track-meta">
+        <span>ID: TRK007</span>
+        <span>艺术家: DJ小美</span>
+        <span>时长: 4:15</span>
+        <span>BPM: 132.0</span>
+    </div>
+    
+    <div class="track-meta">
+        <span>文件: DJ小美 - 霓虹之夜_Remix.mp3</span>
+        <span>置信度: 84%</span>
+    </div>
+    
+    
+    <div class="exceptions-box">
+        <h4>🔍 异常提醒</h4>
+        
+        <div class="exception-item">
+            <span class="exception-label">人工改名:</span> 模糊匹配，可能已人工改名
+            <div class="suggestion">💡 建议: 确认是否为人工改名</div>
+        </div>
+        
+    </div>
+    
+    
+</div>
+
+<div class="track-item renamed">
+    <div class="track-header">
+        <div class="track-title">
+            电子脉冲
+            
+            <span class="energy-badge energy-medium">能量7</span>
+            
+        </div>
+        <span class="track-status status-renamed">人工改名</span>
+    </div>
+    <div class="track-meta">
+        <span>ID: TRK009</span>
+        <span>艺术家: DJ小飞</span>
+        <span>时长: 3:55</span>
+        <span>BPM: 110.0</span>
+    </div>
+    
+    <div class="track-meta">
+        <span>文件: Electric_Pulse_人工修改.mp3</span>
+        <span>置信度: 62%</span>
+    </div>
+    
+    
+    <div class="exceptions-box">
+        <h4>🔍 异常提醒</h4>
+        
+        <div class="exception-item">
+            <span class="exception-label">文件名不匹配:</span> 期望 'DJ小飞 - 电子脉冲'，实际 'Electric_Pulse_人工修改.mp3'
+            <div class="suggestion">💡 建议: 检查是否人工改名</div>
+        </div>
+        
+        <div class="exception-item">
+            <span class="exception-label">人工改名:</span> 模糊匹配，可能已人工改名
+            <div class="suggestion">💡 建议: 确认是否为人工改名</div>
+        </div>
+        
+    </div>
+    
+    
+</div>
+
+<div class="track-item unmatched">
+    <div class="track-header">
+        <div class="track-title">
+            迷失幻境
+            
+            <span class="energy-badge energy-medium">能量6</span>
+            
+        </div>
+        <span class="track-status status-unmatched">未匹配</span>
+    </div>
+    <div class="track-meta">
+        <span>ID: TRK010</span>
+        <span>艺术家: DJ小林</span>
+        <span>时长: 4:30</span>
+        <span>BPM: 118.0</span>
+    </div>
+    
+    
+    
+</div>
+        </div>
+        
+        
+        
+        <div class="footer">
+            <p>DJ曲库能量排序工具 · 本次处理由 林老师 执行 · 报告编号: RPT-20260602074931</p>
+            <p style="margin-top: 8px;">提示：点击曲目可查看详细处理历史，有疑问请联系音乐老师</p>
+        </div>
+    </div>
+</body>
+</html>
