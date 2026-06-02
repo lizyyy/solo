@@ -171,9 +171,7 @@ export const useGameStore = create<GameState>((set, get) => {
           return {
             ...s,
             playerChoices: [...s.playerChoices, choice],
-            currentRound: action === 'hit' || action === 'wrong'
-              ? s.currentRound + 1
-              : s.currentRound,
+            currentRound: s.currentRound + 1,
           }
         }
         return s

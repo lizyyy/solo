@@ -125,9 +125,10 @@ export default function BarrageCanvas({ status, speedMultiplier, onNoteHit }: Pr
 
       for (const note of currentNotes) {
         const laneX = note.lane * laneWidth + laneWidth / 2
-        const noteY = (note.timestamp < Date.now() - 5000) ? judgeY : judgeY - ((Date.now() - note.timestamp) / 1000) * note.speed
+        const elapsed = (Date.now() - note.timestamp) / 1000
+        const noteY = elapsed * note.speed - 40
 
-        if (noteY > judgeY + hitZone * 2) {
+        if (noteY > judgeY + 50) {
           onNoteHitRef.current(note.id, 'miss')
           removeNote(note.id)
           continue
@@ -199,14 +200,16 @@ export default function BarrageCanvas({ status, speedMultiplier, onNoteHit }: Pr
       const hitZone = 30
       const closestNote = notesRef.current
         .filter(n => {
-          const noteY = jy - ((Date.now() - n.timestamp) / 1000) * n.speed
+          const elapsed = (Date.now() - n.timestamp) / 1000
+          const noteY = elapsed * n.speed - 40
           return n.lane === lane && Math.abs(noteY - jy) < hitZone * 3
         })
         .sort((a, b) => Math.abs((Date.now() - a.timestamp)) - Math.abs((Date.now() - b.timestamp)))[0]
 
       if (!closestNote) return
 
-      const noteY = jy - ((Date.now() - closestNote.timestamp) / 1000) * closestNote.speed
+      const elapsed = (Date.now() - closestNote.timestamp) / 1000
+      const noteY = elapsed * closestNote.speed - 40
       const dist = Math.abs(noteY - jy)
 
       if (dist < hitZone) {
