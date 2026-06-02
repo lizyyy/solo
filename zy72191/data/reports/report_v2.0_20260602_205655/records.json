@@ -1,0 +1,288 @@
+[
+  {
+    "record_id": "REC001",
+    "city": "北京市",
+    "district": "朝阳区",
+    "grid_id": "G001",
+    "change_type": "新增建筑",
+    "confidence": "高",
+    "verify_status": "重复记录",
+    "material_sources": [
+      "评测日志",
+      "标注表",
+      "阈值备注"
+    ],
+    "has_missing_reference": false,
+    "missing_reference_note": null,
+    "threshold_applied": "严格阈值0.9",
+    "model_version": "v2.0",
+    "eval_timestamp": "2026-06-02T20:56:55.451797",
+    "old_caliber_note": "沿用v1.0口径标注: 2024年Q1卫星影像对比确认新增",
+    "conflict_note": null,
+    "is_duplicate": true,
+    "duplicate_of": "REC001",
+    "raw_data": {
+      "record_id": "REC001",
+      "city": "北京市",
+      "district": "朝阳区",
+      "grid_id": "G001",
+      "change_type": "新增建筑",
+      "confidence": "高",
+      "confidence_score": 0.92,
+      "verify_status": "通过",
+      "material_sources": [
+        "评测日志",
+        "标注表"
+      ],
+      "eval_timestamp": "2026-06-02T20:56:55.450781"
+    }
+  },
+  {
+    "record_id": "REC002",
+    "city": "北京市",
+    "district": "海淀区",
+    "grid_id": "G002",
+    "change_type": "拆除建筑",
+    "confidence": "中",
+    "verify_status": "边界记录",
+    "material_sources": [
+      "评测日志",
+      "冲突案例"
+    ],
+    "has_missing_reference": false,
+    "missing_reference_note": null,
+    "threshold_applied": null,
+    "model_version": "v2.0",
+    "eval_timestamp": "2026-06-02T20:56:55.451800",
+    "old_caliber_note": null,
+    "conflict_note": "存在冲突案例，请人工复核",
+    "is_duplicate": false,
+    "duplicate_of": null,
+    "raw_data": {
+      "record_id": "REC002",
+      "city": "北京市",
+      "district": "海淀区",
+      "grid_id": "G002",
+      "change_type": "拆除建筑",
+      "confidence": "中",
+      "confidence_score": 0.65,
+      "verify_status": "待人工确认",
+      "material_sources": [
+        "评测日志"
+      ],
+      "eval_timestamp": "2026-06-02T20:56:55.450787"
+    }
+  },
+  {
+    "record_id": "REC003",
+    "city": "上海市",
+    "district": "浦东新区",
+    "grid_id": "G003",
+    "change_type": "扩建",
+    "confidence": "高",
+    "verify_status": "旧口径沿用",
+    "material_sources": [
+      "评测日志",
+      "标注表",
+      "阈值备注"
+    ],
+    "has_missing_reference": false,
+    "missing_reference_note": null,
+    "threshold_applied": "标准阈值0.85",
+    "model_version": "v2.0",
+    "eval_timestamp": "2026-06-02T20:56:55.451803",
+    "old_caliber_note": "沿用v1.0口径标注: 现场勘查确认扩建",
+    "conflict_note": null,
+    "is_duplicate": false,
+    "duplicate_of": null,
+    "raw_data": {
+      "record_id": "REC003",
+      "city": "上海市",
+      "district": "浦东新区",
+      "grid_id": "G003",
+      "change_type": "扩建",
+      "confidence": "高",
+      "confidence_score": 0.88,
+      "verify_status": "通过",
+      "material_sources": [
+        "评测日志",
+        "标注表"
+      ],
+      "eval_timestamp": "2026-06-02T20:56:55.450788"
+    }
+  },
+  {
+    "record_id": "REC004",
+    "city": "广州市",
+    "district": "天河区",
+    "grid_id": "G004",
+    "change_type": "改建",
+    "confidence": "低",
+    "verify_status": "待人工确认",
+    "material_sources": [
+      "评测日志"
+    ],
+    "has_missing_reference": false,
+    "missing_reference_note": null,
+    "threshold_applied": null,
+    "model_version": "v2.0",
+    "eval_timestamp": "2026-06-02T20:56:55.451805",
+    "old_caliber_note": null,
+    "conflict_note": null,
+    "is_duplicate": false,
+    "duplicate_of": null,
+    "raw_data": {
+      "record_id": "REC004",
+      "city": "广州市",
+      "district": "天河区",
+      "grid_id": "G004",
+      "change_type": "改建",
+      "confidence": "低",
+      "confidence_score": 0.45,
+      "verify_status": "待人工确认",
+      "material_sources": [
+        "评测日志"
+      ],
+      "eval_timestamp": "2026-06-02T20:56:55.450789"
+    }
+  },
+  {
+    "record_id": "REC005",
+    "city": "深圳市",
+    "district": "南山区",
+    "grid_id": "G005",
+    "change_type": "新增建筑",
+    "confidence": "中",
+    "verify_status": "边界记录",
+    "material_sources": [
+      "评测日志"
+    ],
+    "has_missing_reference": false,
+    "missing_reference_note": null,
+    "threshold_applied": null,
+    "model_version": "v2.0",
+    "eval_timestamp": "2026-06-02T20:56:55.451807",
+    "old_caliber_note": null,
+    "conflict_note": null,
+    "is_duplicate": false,
+    "duplicate_of": null,
+    "raw_data": {
+      "record_id": "REC005",
+      "city": "深圳市",
+      "district": "南山区",
+      "grid_id": "G005",
+      "change_type": "新增建筑",
+      "confidence": "中",
+      "confidence_score": 0.58,
+      "verify_status": "待人工确认",
+      "material_sources": [
+        "评测日志"
+      ],
+      "eval_timestamp": "2026-06-02T20:56:55.450790"
+    }
+  },
+  {
+    "record_id": "REC006",
+    "city": "北京市",
+    "district": "朝阳区",
+    "grid_id": "G001",
+    "change_type": "新增建筑",
+    "confidence": "高",
+    "verify_status": "重复记录",
+    "material_sources": [
+      "评测日志",
+      "阈值备注"
+    ],
+    "has_missing_reference": true,
+    "missing_reference_note": "报告结论缺少标注材料引用，请补充标注后再确认",
+    "threshold_applied": "严格阈值0.9",
+    "model_version": "v2.0",
+    "eval_timestamp": "2026-06-02T20:56:55.451809",
+    "old_caliber_note": null,
+    "conflict_note": null,
+    "is_duplicate": true,
+    "duplicate_of": "REC001",
+    "raw_data": {
+      "record_id": "REC006",
+      "city": "北京市",
+      "district": "朝阳区",
+      "grid_id": "G001",
+      "change_type": "新增建筑",
+      "confidence": "高",
+      "confidence_score": 0.9,
+      "verify_status": "通过",
+      "material_sources": [
+        "评测日志"
+      ],
+      "eval_timestamp": "2026-06-02T20:56:55.450791"
+    }
+  },
+  {
+    "record_id": "REC007",
+    "city": "",
+    "district": "未知区域",
+    "grid_id": "",
+    "change_type": "待判定",
+    "confidence": "低",
+    "verify_status": "数据缺失",
+    "material_sources": [],
+    "has_missing_reference": false,
+    "missing_reference_note": "城市信息缺失",
+    "threshold_applied": null,
+    "model_version": "v2.0",
+    "eval_timestamp": "2026-06-02T20:56:55.451812",
+    "old_caliber_note": null,
+    "conflict_note": null,
+    "is_duplicate": false,
+    "duplicate_of": null,
+    "raw_data": {
+      "record_id": "REC007",
+      "city": "",
+      "district": "未知区域",
+      "grid_id": "",
+      "change_type": "待判定",
+      "confidence": "低",
+      "confidence_score": 0.3,
+      "verify_status": "待人工确认",
+      "material_sources": [],
+      "eval_timestamp": "2026-06-02T20:56:55.450792"
+    }
+  },
+  {
+    "record_id": "REC008",
+    "city": "杭州市",
+    "district": "西湖区",
+    "grid_id": "G008",
+    "change_type": "新增建筑",
+    "confidence": "高",
+    "verify_status": "旧口径沿用",
+    "material_sources": [
+      "评测日志",
+      "标注表"
+    ],
+    "has_missing_reference": false,
+    "missing_reference_note": null,
+    "threshold_applied": null,
+    "model_version": "v2.0",
+    "eval_timestamp": "2026-06-02T20:56:55.451814",
+    "old_caliber_note": "沿用v1.0口径标注: 沿用旧口径判定",
+    "conflict_note": null,
+    "is_duplicate": false,
+    "duplicate_of": null,
+    "raw_data": {
+      "record_id": "REC008",
+      "city": "杭州市",
+      "district": "西湖区",
+      "grid_id": "G008",
+      "change_type": "新增建筑",
+      "confidence": "高",
+      "confidence_score": 0.95,
+      "verify_status": "通过",
+      "material_sources": [
+        "评测日志",
+        "标注表"
+      ],
+      "eval_timestamp": "2026-06-02T20:56:55.450793"
+    }
+  }
+]

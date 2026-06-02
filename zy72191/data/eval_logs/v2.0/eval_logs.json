@@ -1,0 +1,115 @@
+[
+  {
+    "record_id": "REC001",
+    "city": "北京市",
+    "district": "朝阳区",
+    "grid_id": "G001",
+    "change_type": "新增建筑",
+    "confidence": "高",
+    "confidence_score": 0.92,
+    "verify_status": "通过",
+    "material_sources": [
+      "评测日志",
+      "标注表"
+    ],
+    "eval_timestamp": "2026-06-02T20:56:55.450781"
+  },
+  {
+    "record_id": "REC002",
+    "city": "北京市",
+    "district": "海淀区",
+    "grid_id": "G002",
+    "change_type": "拆除建筑",
+    "confidence": "中",
+    "confidence_score": 0.65,
+    "verify_status": "待人工确认",
+    "material_sources": [
+      "评测日志"
+    ],
+    "eval_timestamp": "2026-06-02T20:56:55.450787"
+  },
+  {
+    "record_id": "REC003",
+    "city": "上海市",
+    "district": "浦东新区",
+    "grid_id": "G003",
+    "change_type": "扩建",
+    "confidence": "高",
+    "confidence_score": 0.88,
+    "verify_status": "通过",
+    "material_sources": [
+      "评测日志",
+      "标注表"
+    ],
+    "eval_timestamp": "2026-06-02T20:56:55.450788"
+  },
+  {
+    "record_id": "REC004",
+    "city": "广州市",
+    "district": "天河区",
+    "grid_id": "G004",
+    "change_type": "改建",
+    "confidence": "低",
+    "confidence_score": 0.45,
+    "verify_status": "待人工确认",
+    "material_sources": [
+      "评测日志"
+    ],
+    "eval_timestamp": "2026-06-02T20:56:55.450789"
+  },
+  {
+    "record_id": "REC005",
+    "city": "深圳市",
+    "district": "南山区",
+    "grid_id": "G005",
+    "change_type": "新增建筑",
+    "confidence": "中",
+    "confidence_score": 0.58,
+    "verify_status": "待人工确认",
+    "material_sources": [
+      "评测日志"
+    ],
+    "eval_timestamp": "2026-06-02T20:56:55.450790"
+  },
+  {
+    "record_id": "REC006",
+    "city": "北京市",
+    "district": "朝阳区",
+    "grid_id": "G001",
+    "change_type": "新增建筑",
+    "confidence": "高",
+    "confidence_score": 0.9,
+    "verify_status": "通过",
+    "material_sources": [
+      "评测日志"
+    ],
+    "eval_timestamp": "2026-06-02T20:56:55.450791"
+  },
+  {
+    "record_id": "REC007",
+    "city": "",
+    "district": "未知区域",
+    "grid_id": "",
+    "change_type": "待判定",
+    "confidence": "低",
+    "confidence_score": 0.3,
+    "verify_status": "待人工确认",
+    "material_sources": [],
+    "eval_timestamp": "2026-06-02T20:56:55.450792"
+  },
+  {
+    "record_id": "REC008",
+    "city": "杭州市",
+    "district": "西湖区",
+    "grid_id": "G008",
+    "change_type": "新增建筑",
+    "confidence": "高",
+    "confidence_score": 0.95,
+    "verify_status": "通过",
+    "material_sources": [
+      "评测日志",
+      "标注表"
+    ],
+    "eval_timestamp": "2026-06-02T20:56:55.450793"
+  }
+]
