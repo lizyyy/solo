@@ -1,0 +1,126 @@
+[
+    {
+        "sample_id": "CS_001",
+        "source": "kanban_review_20260515",
+        "features": {
+            "user_id": "U10001",
+            "item_id": "I20001",
+            "item_category": "electronics",
+            "user_history_count": 15,
+            "item_popularity": 0.72,
+            "cold_start_type": "new_item",
+            "explanation_context": "新品耳机推荐"
+        },
+        "created_at": "2026-05-15T10:30:00",
+        "processed_at": "2026-05-15T14:20:00",
+        "raw_data": {
+            "original_query": "推荐一款适合运动的耳机"
+        }
+    },
+    {
+        "sample_id": "CS_002",
+        "source": "kanban_review_20260515",
+        "features": {
+            "user_id": "U10002",
+            "item_id": "I20002",
+            "item_category": "books",
+            "user_history_count": 3,
+            "item_popularity": 0.25,
+            "cold_start_type": "new_user",
+            "explanation_context": "新书推荐给新用户"
+        },
+        "created_at": "2026-05-15T11:45:00",
+        "processed_at": "2026-05-16T09:10:00",
+        "raw_data": {
+            "original_query": "有什么好看的小说"
+        }
+    },
+    {
+        "sample_id": "CS_003",
+        "source": "kanban_review_20260516",
+        "features": {
+            "user_id": "U10003",
+            "item_id": "I20003",
+            "item_category": "fashion",
+            "user_history_count": null,
+            "item_popularity": null,
+            "cold_start_type": "new_item",
+            "explanation_context": ""
+        },
+        "created_at": "2026-05-16T08:20:00",
+        "processed_at": null,
+        "raw_data": null
+    },
+    {
+        "sample_id": "CS_004",
+        "source": "kanban_review_20260516",
+        "features": {
+            "user_id": "U10004",
+            "item_id": "I20004",
+            "item_category": "electronics",
+            "user_history_count": 15,
+            "item_popularity": 0.72,
+            "cold_start_type": "new_item",
+            "explanation_context": "新品耳机推荐"
+        },
+        "created_at": "2026-05-16T10:00:00",
+        "processed_at": "2026-05-16T15:30:00",
+        "raw_data": {
+            "original_query": "推荐一款适合运动的耳机"
+        }
+    },
+    {
+        "sample_id": "CS_005",
+        "source": "kanban_review_20260517",
+        "features": {
+            "user_id": "U10005",
+            "item_id": "I20005",
+            "item_category": "home",
+            "user_history_count": 28,
+            "item_popularity": 0.98,
+            "cold_start_type": "new_item",
+            "explanation_context": "智能家居设备推荐"
+        },
+        "created_at": "2026-05-17T09:30:00",
+        "processed_at": "2026-05-17T11:45:00",
+        "raw_data": {
+            "original_query": "想要一个智能音箱"
+        }
+    },
+    {
+        "sample_id": "CS_006",
+        "source": "kanban_review_20260517",
+        "features": {
+            "user_id": "U10006",
+            "item_id": "I20006",
+            "item_category": "beauty",
+            "user_history_count": 42,
+            "item_popularity": 0.55,
+            "cold_start_type": "new_item",
+            "explanation_context": "护肤品推荐"
+        },
+        "created_at": "2026-05-17T14:20:00",
+        "processed_at": "2026-05-18T08:30:00",
+        "raw_data": {
+            "original_query": "敏感肌用什么护肤品"
+        }
+    },
+    {
+        "sample_id": "CS_007",
+        "source": "kanban_review_20260518",
+        "features": {
+            "user_id": "U10007",
+            "item_id": "I20007",
+            "item_category": "sports",
+            "user_history_count": 0.85,
+            "item_popularity": 0.85,
+            "cold_start_type": "new_user",
+            "explanation_context": "运动装备推荐"
+        },
+        "created_at": "2026-05-18T10:00:00",
+        "processed_at": "2026-05-18T16:45:00",
+        "raw_data": {
+            "original_query": "推荐跑步装备"
+        }
+    }
+]

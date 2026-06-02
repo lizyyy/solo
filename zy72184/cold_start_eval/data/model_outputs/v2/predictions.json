@@ -1,0 +1,114 @@
+[
+    {
+        "sample_id": "CS_001",
+        "model_version": "v2",
+        "prediction": {
+            "explanation_quality": "good",
+            "feature_relevance": "high",
+            "user_understandable": "yes",
+            "explanation_text": "根据您浏览过的运动耳机记录，为您推荐这款防水运动耳机，音质清晰续航持久"
+        },
+        "score": 0.88,
+        "predicted_at": "2026-05-20T10:00:00",
+        "metadata": {
+            "model_type": "cold_start_transformer_v2",
+            "inference_latency_ms": 62
+        }
+    },
+    {
+        "sample_id": "CS_002",
+        "model_version": "v2",
+        "prediction": {
+            "explanation_quality": "good",
+            "feature_relevance": "high",
+            "user_understandable": "yes",
+            "explanation_text": "为您推荐这本热门悬疑小说，豆瓣评分8.5分，情节扣人心弦"
+        },
+        "score": 0.78,
+        "predicted_at": "2026-05-20T10:15:00",
+        "metadata": {
+            "model_type": "cold_start_transformer_v2",
+            "inference_latency_ms": 58
+        }
+    },
+    {
+        "sample_id": "CS_003",
+        "model_version": "v2",
+        "prediction": {
+            "explanation_quality": "medium",
+            "feature_relevance": "medium",
+            "user_understandable": "yes",
+            "explanation_text": "为您推荐本季流行时尚单品"
+        },
+        "score": 0.52,
+        "predicted_at": "2026-05-20T10:30:00",
+        "metadata": {
+            "model_type": "cold_start_transformer_v2",
+            "inference_latency_ms": 55
+        }
+    },
+    {
+        "sample_id": "CS_004",
+        "model_version": "v2",
+        "prediction": {
+            "explanation_quality": "good",
+            "feature_relevance": "high",
+            "user_understandable": "yes",
+            "explanation_text": "根据您浏览过的运动耳机记录，为您推荐这款防水运动耳机，音质清晰续航持久"
+        },
+        "score": 0.88,
+        "predicted_at": "2026-05-20T10:45:00",
+        "metadata": {
+            "model_type": "cold_start_transformer_v2",
+            "inference_latency_ms": 60
+        }
+    },
+    {
+        "sample_id": "CS_005",
+        "model_version": "v2",
+        "prediction": {
+            "explanation_quality": "excellent",
+            "feature_relevance": "high",
+            "user_understandable": "yes",
+            "explanation_text": "这款智能音箱是最新爆款，支持语音控制，可与您家的智能家居设备联动"
+        },
+        "score": 0.98,
+        "predicted_at": "2026-05-20T11:00:00",
+        "metadata": {
+            "model_type": "cold_start_transformer_v2",
+            "inference_latency_ms": 65
+        }
+    },
+    {
+        "sample_id": "CS_006",
+        "model_version": "v2",
+        "prediction": {
+            "explanation_quality": "good",
+            "feature_relevance": "high",
+            "user_understandable": "yes",
+            "explanation_text": "这款护肤品专为敏感肌设计，温和不刺激，添加了天然植物精华"
+        },
+        "score": 0.85,
+        "predicted_at": "2026-05-20T11:15:00",
+        "metadata": {
+            "model_type": "cold_start_transformer_v2",
+            "inference_latency_ms": 59
+        }
+    },
+    {
+        "sample_id": "CS_007",
+        "model_version": "v2",
+        "prediction": {
+            "explanation_quality": "good",
+            "feature_relevance": "high",
+            "user_understandable": "yes",
+            "explanation_text": "为您推荐这款专业跑步鞋，轻便透气，适合长距离跑步"
+        },
+        "score": 0.91,
+        "predicted_at": "2026-05-20T11:30:00",
+        "metadata": {
+            "model_type": "cold_start_transformer_v2",
+            "inference_latency_ms": 61
+        }
+    }
+]

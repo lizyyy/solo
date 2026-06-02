@@ -1,0 +1,63 @@
+[
+    {
+        "sample_id": "CS_001",
+        "feedback_type": "user_click",
+        "feedback_value": "good",
+        "feedback_source": "app_recommend_feed",
+        "collected_at": "2026-05-15T18:30:00",
+        "metadata": {
+            "user_behavior": "clicked_and_stayed_30s"
+        }
+    },
+    {
+        "sample_id": "CS_002",
+        "feedback_type": "user_click",
+        "feedback_value": "good",
+        "feedback_source": "app_recommend_feed",
+        "collected_at": "2026-05-16T20:15:00",
+        "metadata": {
+            "user_behavior": "clicked_and_added_to_favorites"
+        }
+    },
+    {
+        "sample_id": "CS_003",
+        "feedback_type": "user_skip",
+        "feedback_value": "bad",
+        "feedback_source": "app_recommend_feed",
+        "collected_at": "2026-05-16T12:00:00",
+        "metadata": {
+            "user_behavior": "skipped_immediately"
+        }
+    },
+    {
+        "sample_id": "CS_005",
+        "feedback_type": "user_purchase",
+        "feedback_value": "good",
+        "feedback_source": "app_recommend_feed",
+        "collected_at": "2026-05-17T16:45:00",
+        "metadata": {
+            "user_behavior": "purchased_after_click"
+        }
+    },
+    {
+        "sample_id": "CS_006",
+        "feedback_type": "user_click",
+        "feedback_value": "good",
+        "feedback_source": "app_recommend_feed",
+        "collected_at": "2026-05-18T19:00:00",
+        "metadata": {
+            "user_behavior": "clicked_and_viewed_details"
+        }
+    },
+    {
+        "sample_id": "CS_007",
+        "feedback_type": "user_report",
+        "feedback_value": "bad",
+        "feedback_source": "user_support_ticket",
+        "collected_at": "2026-05-18T20:30:00",
+        "metadata": {
+            "user_behavior": "reported_privacy_concern",
+            "ticket_id": "T20260518001"
+        }
+    }
+]

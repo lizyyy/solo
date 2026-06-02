@@ -1,0 +1,118 @@
+[
+    {
+        "sample_id": "CS_001",
+        "reviewer": "xiaomeng",
+        "review_status": "approved",
+        "corrected_label": {
+            "explanation_quality": "good",
+            "feature_relevance": "high",
+            "user_understandable": "yes",
+            "explanation_text": "根据您浏览过的电子产品，为您推荐这款运动耳机，音质好且防水"
+        },
+        "review_comment": "解释清晰，特征关联准确，用户容易理解。一次通过。",
+        "reviewed_at": "2026-05-15T15:30:00",
+        "review_round": 1
+    },
+    {
+        "sample_id": "CS_002",
+        "reviewer": "xiaomeng",
+        "review_status": "rework",
+        "corrected_label": null,
+        "review_comment": "解释太笼统，没有结合用户是新用户的特点，缺少具体推荐理由。需要返工补充书籍类型、受众定位等信息。",
+        "reviewed_at": "2026-05-16T10:00:00",
+        "review_round": 1
+    },
+    {
+        "sample_id": "CS_002",
+        "reviewer": "xiaomeng",
+        "review_status": "approved",
+        "corrected_label": {
+            "explanation_quality": "good",
+            "feature_relevance": "high",
+            "user_understandable": "yes",
+            "explanation_text": "为您推荐这本热门悬疑小说，豆瓣评分8.5分，适合喜欢推理题材的读者"
+        },
+        "review_comment": "返工后补充了具体信息，解释质量达标。",
+        "reviewed_at": "2026-05-16T14:30:00",
+        "review_round": 2
+    },
+    {
+        "sample_id": "CS_003",
+        "reviewer": "xiaomeng",
+        "review_status": "rejected",
+        "corrected_label": {
+            "explanation_quality": "low",
+            "feature_relevance": "low",
+            "user_understandable": "no",
+            "explanation_text": "为您推荐时尚单品"
+        },
+        "review_comment": "样本特征缺失严重，无法进行有效评测。建议退回数据收集环节。",
+        "reviewed_at": "2026-05-16T11:00:00",
+        "review_round": 1
+    },
+    {
+        "sample_id": "CS_004",
+        "reviewer": "xiaomeng",
+        "review_status": "approved",
+        "corrected_label": {
+            "explanation_quality": "good",
+            "feature_relevance": "high",
+            "user_understandable": "yes",
+            "explanation_text": "根据您浏览过的电子产品，为您推荐这款运动耳机，音质好且防水"
+        },
+        "review_comment": "与CS_001样本重复，注意去重。",
+        "reviewed_at": "2026-05-16T16:00:00",
+        "review_round": 1
+    },
+    {
+        "sample_id": "CS_005",
+        "reviewer": "xiaomeng",
+        "review_status": "approved",
+        "corrected_label": {
+            "explanation_quality": "excellent",
+            "feature_relevance": "high",
+            "user_understandable": "yes",
+            "explanation_text": "这款智能音箱是最新爆款，支持语音控制，适合您的智能家居需求"
+        },
+        "review_comment": "分数接近阈值，但解释质量确实很好，通过。",
+        "reviewed_at": "2026-05-17T13:00:00",
+        "review_round": 1
+    },
+    {
+        "sample_id": "CS_006",
+        "reviewer": "xiaomeng",
+        "review_status": "rework",
+        "corrected_label": null,
+        "review_comment": "解释没有突出'敏感肌'这个关键用户需求，需要调整表述重点。",
+        "reviewed_at": "2026-05-18T10:00:00",
+        "review_round": 1
+    },
+    {
+        "sample_id": "CS_006",
+        "reviewer": "xiaomeng",
+        "review_status": "approved",
+        "corrected_label": {
+            "explanation_quality": "good",
+            "feature_relevance": "high",
+            "user_understandable": "yes",
+            "explanation_text": "这款护肤品专为敏感肌设计，温和不刺激，添加了天然植物精华"
+        },
+        "review_comment": "返工后重点突出了敏感肌需求，通过。",
+        "reviewed_at": "2026-05-18T15:00:00",
+        "review_round": 2
+    },
+    {
+        "sample_id": "CS_007",
+        "reviewer": "xiaomeng",
+        "review_status": "rejected",
+        "corrected_label": {
+            "explanation_quality": "good",
+            "feature_relevance": "high",
+            "user_understandable": "yes",
+            "explanation_text": "为您推荐这款专业跑步鞋，轻便透气，适合长距离跑步"
+        },
+        "review_comment": "模型解释泄漏了用户特征（活跃度分数直接暴露），属于严重问题。",
+        "reviewed_at": "2026-05-18T17:00:00",
+        "review_round": 1
+    }
+]
