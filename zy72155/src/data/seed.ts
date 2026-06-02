@@ -1,0 +1,432 @@
+import type {
+  Point,
+  Feedback,
+  PlanVersion,
+  JudgmentLog,
+  AliasName,
+  MergeSuggestion,
+} from "@/types";
+
+const P1: Point = {
+  id: "p1",
+  standardName: "实验小学东门人行横道",
+  schoolName: "实验小学",
+  status: "processed",
+  latitude: 31.2304,
+  longitude: 121.4737,
+  createdAt: "2025-09-10T08:00:00Z",
+  updatedAt: "2025-10-15T14:30:00Z",
+};
+
+const P2: Point = {
+  id: "p2",
+  standardName: "育才中学南路口",
+  schoolName: "育才中学",
+  status: "pending",
+  latitude: 31.2310,
+  longitude: 121.4745,
+  createdAt: "2025-10-01T09:00:00Z",
+  updatedAt: "2025-10-20T10:00:00Z",
+};
+
+const P3: Point = {
+  id: "p3",
+  standardName: "光明小学西门慢行通道",
+  schoolName: "光明小学",
+  status: "pending",
+  latitude: 31.2350,
+  longitude: 121.4800,
+  createdAt: "2025-08-15T07:30:00Z",
+  updatedAt: "2025-10-18T16:00:00Z",
+};
+
+const P4: Point = {
+  id: "p4",
+  standardName: "育才中学南门慢行步道",
+  schoolName: "育才中学",
+  status: "pending",
+  latitude: 31.2312,
+  longitude: 121.4748,
+  createdAt: "2025-10-05T11:00:00Z",
+  updatedAt: "2025-10-22T09:00:00Z",
+};
+
+const P5: Point = {
+  id: "p5",
+  standardName: "新华路第一小学北门",
+  schoolName: "新华路第一小学",
+  status: "field_review",
+  latitude: null,
+  longitude: null,
+  createdAt: "2025-10-12T13:00:00Z",
+  updatedAt: "2025-10-25T11:00:00Z",
+};
+
+const P6: Point = {
+  id: "p6",
+  standardName: "实验小学东门人行横道",
+  schoolName: "实验小学",
+  status: "pending",
+  latitude: 31.2304,
+  longitude: 121.4737,
+  createdAt: "2025-10-20T15:00:00Z",
+  updatedAt: "2025-10-20T15:00:00Z",
+};
+
+const P7: Point = {
+  id: "p7",
+  standardName: "",
+  schoolName: "",
+  status: "pending",
+  latitude: null,
+  longitude: null,
+  createdAt: "2025-10-22T08:00:00Z",
+  updatedAt: "2025-10-22T08:00:00Z",
+};
+
+const P8: Point = {
+  id: "p8",
+  standardName: "春晖幼儿园入口",
+  schoolName: "春晖幼儿园",
+  status: "pending",
+  latitude: 31.2500,
+  longitude: 121.5000,
+  createdAt: "2025-10-23T10:00:00Z",
+  updatedAt: "2025-10-23T10:00:00Z",
+};
+
+const P9: Point = {
+  id: "p9",
+  standardName: "春晖幼囡入口",
+  schoolName: "春晖幼儿园",
+  status: "pending",
+  latitude: 31.2502,
+  longitude: 121.5003,
+  createdAt: "2025-10-24T09:00:00Z",
+  updatedAt: "2025-10-24T09:00:00Z",
+};
+
+export const SEED_POINTS: Point[] = [P1, P2, P3, P4, P5, P6, P7, P8, P9];
+
+const FEEDBACKS: Feedback[] = [
+  {
+    id: "fb1",
+    pointId: "p1",
+    originalText: "学校周边慢行安全-实验小学东门人行横道",
+    content: "人行横道标线模糊，学生过马路安全隐患大，建议重新施划",
+    sourceType: "resident_form",
+    sourceDetail: "2025年9月街道居民反馈表第3条",
+    rawRemark: "张阿姨说的  那个路口真的很危险！！！",
+    feedbackDate: "2025-09-08",
+    createdAt: "2025-09-10T08:00:00Z",
+  },
+  {
+    id: "fb2",
+    pointId: "p1",
+    originalText: "实验小学东门口斑马线",
+    content: "确认标线已重新施划，反光效果好",
+    sourceType: "field_photo",
+    sourceDetail: "2025年10月现场核查照片",
+    rawRemark: "",
+    feedbackDate: "2025-10-14",
+    createdAt: "2025-10-15T14:00:00Z",
+  },
+  {
+    id: "fb3",
+    pointId: "p1",
+    originalText: "实验小学东门人行横道改造",
+    content: "审批通过，预算3.2万，工期5天",
+    sourceType: "approval_record",
+    sourceDetail: "区城管局审批单2025-CG-0342",
+    rawRemark: "",
+    feedbackDate: "2025-09-25",
+    createdAt: "2025-09-28T10:00:00Z",
+  },
+  {
+    id: "fb4",
+    pointId: "p2",
+    originalText: "学校周边慢行安全-育才中学南路口",
+    content: "南路口无信号灯，上下学时段交通混乱",
+    sourceType: "resident_form",
+    sourceDetail: "2025年9月街道居民反馈表第7条",
+    rawRemark: "家长反映强烈  多次12345投诉  希望尽快处理（李主任批注：优先级高）",
+    feedbackDate: "2025-09-20",
+    createdAt: "2025-10-01T09:00:00Z",
+  },
+  {
+    id: "fb5",
+    pointId: "p2",
+    originalText: "育才中学南路口信号灯",
+    content: "已提交信号灯安装申请，等待交警部门审批",
+    sourceType: "approval_record",
+    sourceDetail: "交警支队申请单2025-JJ-0156",
+    rawRemark: "",
+    feedbackDate: "2025-10-15",
+    createdAt: "2025-10-18T11:00:00Z",
+  },
+  {
+    id: "fb6",
+    pointId: "p3",
+    originalText: "学校周边慢行安全——光明小学西门慢行通道（旧表）",
+    content: "西门慢行通道被占道经营堵塞，学生被迫走机动车道",
+    sourceType: "resident_form",
+    sourceDetail: "2024年12月街道居民反馈表（旧口径补录）",
+    rawRemark: "那个卖早点的大爷每天都占道  学校也管不了  家长意见很大  [备注：此条为2024年旧表补录，原始编号不明，写法与现行标准不一致]",
+    feedbackDate: "2024-12-10",
+    createdAt: "2025-08-15T07:30:00Z",
+  },
+  {
+    id: "fb7",
+    pointId: "p3",
+    originalText: "光明小学西门",
+    content: "已协调城管执法，占道经营已清理",
+    sourceType: "field_photo",
+    sourceDetail: "2025年9月现场照片",
+    rawRemark: "暂时清了  但不确定会不会反复  要持续关注",
+    feedbackDate: "2025-09-20",
+    createdAt: "2025-09-22T10:00:00Z",
+  },
+  {
+    id: "fb8",
+    pointId: "p4",
+    originalText: "学校周边慢行安全-育才中学南门慢行步道",
+    content: "南门慢行步道破损严重，下雨积水",
+    sourceType: "resident_form",
+    sourceDetail: "2025年10月街道居民反馈表第2条",
+    rawRemark: "学生家长王先生多次反映",
+    feedbackDate: "2025-10-03",
+    createdAt: "2025-10-05T11:00:00Z",
+  },
+  {
+    id: "fb9",
+    pointId: "p5",
+    originalText: "学校周边慢行安全-新华路一小北门",
+    content: "北门无减速带，车辆速度过快",
+    sourceType: "resident_form",
+    sourceDetail: "2025年10月街道居民反馈表第5条",
+    rawRemark: "",
+    feedbackDate: "2025-10-10",
+    createdAt: "2025-10-12T13:00:00Z",
+  },
+  {
+    id: "fb10",
+    pointId: "p5",
+    originalText: "新华路一小北门减速带",
+    content: "需现场确认是否具备安装条件，周边有消防通道限制",
+    sourceType: "field_photo",
+    sourceDetail: "初步踏勘记录",
+    rawRemark: "消防通道那个事情要确认一下  不能随便装减速带",
+    feedbackDate: "2025-10-20",
+    createdAt: "2025-10-22T09:00:00Z",
+  },
+  {
+    id: "fb11",
+    pointId: "p6",
+    originalText: "学校周边慢行安全 实验小学东门 人行横道（重复录入）",
+    content: "重复提交的点位，与p1相同",
+    sourceType: "resident_form",
+    sourceDetail: "2025年10月居民反馈表第1条（重复）",
+    rawRemark: "和之前的那个是同一个地方  写法不一样而已",
+    feedbackDate: "2025-10-18",
+    createdAt: "2025-10-20T15:00:00Z",
+  },
+  {
+    id: "fb12",
+    pointId: "p7",
+    originalText: "",
+    content: "",
+    sourceType: "resident_form",
+    sourceDetail: "",
+    rawRemark: "空记录 来源不明",
+    feedbackDate: "",
+    createdAt: "2025-10-22T08:00:00Z",
+  },
+  {
+    id: "fb13",
+    pointId: "p8",
+    originalText: "学校周边慢行安全-春晖幼儿园入口",
+    content: "入口处无隔离设施，电动车与行人混行",
+    sourceType: "resident_form",
+    sourceDetail: "2025年10月居民反馈表第9条",
+    rawRemark: "",
+    feedbackDate: "2025-10-22",
+    createdAt: "2025-10-23T10:00:00Z",
+  },
+  {
+    id: "fb14",
+    pointId: "p9",
+    originalText: "学校周边慢行安全 春晖幼囡入口",
+    content: "入口隔离桩缺失，需要补装",
+    sourceType: "resident_form",
+    sourceDetail: "2025年10月居民反馈表第11条",
+    rawRemark: "写的是幼囡 应该是幼儿园  这个要确认下",
+    feedbackDate: "2025-10-23",
+    createdAt: "2025-10-24T09:00:00Z",
+  },
+];
+
+export const SEED_FEEDBACKS: Feedback[] = FEEDBACKS;
+
+const PLANS: PlanVersion[] = [
+  {
+    id: "pv1",
+    pointId: "p1",
+    versionNumber: 1,
+    description: "重新施划人行横道标线，增设反光道钉",
+    changedBy: "张工",
+    changeNote: "初版方案",
+    createdAt: "2025-09-20T10:00:00Z",
+  },
+  {
+    id: "pv2",
+    pointId: "p1",
+    versionNumber: 2,
+    description: "施划标线+反光道钉+增设减速震荡标线",
+    changedBy: "张工",
+    changeNote: "根据审批意见增加减速震荡标线",
+    createdAt: "2025-09-28T14:00:00Z",
+  },
+  {
+    id: "pv3",
+    pointId: "p2",
+    versionNumber: 1,
+    description: "申请安装交通信号灯及人行横道灯",
+    changedBy: "李工",
+    changeNote: "初版方案",
+    createdAt: "2025-10-10T09:00:00Z",
+  },
+  {
+    id: "pv4",
+    pointId: "p3",
+    versionNumber: 1,
+    description: "协调城管执法清理占道经营，设置固定巡查时段",
+    changedBy: "王工",
+    changeNote: "初版方案",
+    createdAt: "2025-09-15T10:00:00Z",
+  },
+];
+
+export const SEED_PLANS: PlanVersion[] = PLANS;
+
+const JUDGMENTS: JudgmentLog[] = [
+  {
+    id: "jl1",
+    pointId: "p1",
+    fromStatus: null,
+    toStatus: "pending",
+    reason: "收到居民反馈，标线模糊需核实",
+    operator: "街道值班员-赵",
+    createdAt: "2025-09-10T08:00:00Z",
+  },
+  {
+    id: "jl2",
+    pointId: "p1",
+    fromStatus: "pending",
+    toStatus: "processed",
+    reason: "标线已重新施划，现场确认反光效果良好，审批手续齐全",
+    operator: "评估员-钱",
+    createdAt: "2025-10-15T14:30:00Z",
+  },
+  {
+    id: "jl3",
+    pointId: "p2",
+    fromStatus: null,
+    toStatus: "pending",
+    reason: "居民多次投诉，信息基本明确但信号灯安装尚未获批",
+    operator: "街道值班员-赵",
+    createdAt: "2025-10-01T09:00:00Z",
+  },
+  {
+    id: "jl4",
+    pointId: "p3",
+    fromStatus: null,
+    toStatus: "pending",
+    reason: "旧表补录，占道经营已清理但可能反复，需持续关注",
+    operator: "街道值班员-赵",
+    createdAt: "2025-08-15T07:30:00Z",
+  },
+  {
+    id: "jl5",
+    pointId: "p4",
+    fromStatus: null,
+    toStatus: "pending",
+    reason: "收到反馈，步道破损需核实范围",
+    operator: "街道值班员-赵",
+    createdAt: "2025-10-05T11:00:00Z",
+  },
+  {
+    id: "jl6",
+    pointId: "p5",
+    fromStatus: null,
+    toStatus: "pending",
+    reason: "收到减速带安装需求",
+    operator: "街道值班员-赵",
+    createdAt: "2025-10-12T13:00:00Z",
+  },
+  {
+    id: "jl7",
+    pointId: "p5",
+    fromStatus: "pending",
+    toStatus: "field_review",
+    reason: "周边有消防通道，需现场确认是否具备安装条件",
+    operator: "评估员-孙",
+    createdAt: "2025-10-25T11:00:00Z",
+  },
+  {
+    id: "jl8",
+    pointId: "p7",
+    fromStatus: null,
+    toStatus: "pending",
+    reason: "空记录，来源不明，待核实",
+    operator: "系统",
+    createdAt: "2025-10-22T08:00:00Z",
+  },
+];
+
+export const SEED_JUDGMENTS: JudgmentLog[] = JUDGMENTS;
+
+const ALIASES: AliasName[] = [
+  { id: "a1", pointId: "p1", alias: "实验小学东门口斑马线", source: "居民反馈表", createdAt: "2025-09-10T08:00:00Z" },
+  { id: "a2", pointId: "p1", alias: "实验小学东门人行横道改造", source: "审批记录", createdAt: "2025-09-28T10:00:00Z" },
+  { id: "a3", pointId: "p2", alias: "育才中学南路口信号灯", source: "审批记录", createdAt: "2025-10-18T11:00:00Z" },
+  { id: "a4", pointId: "p3", alias: "光明小学西门", source: "现场照片", createdAt: "2025-09-22T10:00:00Z" },
+  { id: "a5", pointId: "p3", alias: "学校周边慢行安全——光明小学西门慢行通道（旧表）", source: "居民反馈表(旧口径)", createdAt: "2025-08-15T07:30:00Z" },
+  { id: "a6", pointId: "p8", alias: "春晖幼囡入口", source: "居民反馈表(疑似笔误)", createdAt: "2025-10-24T09:00:00Z" },
+];
+
+export const SEED_ALIASES: AliasName[] = ALIASES;
+
+const MERGES: MergeSuggestion[] = [
+  {
+    id: "ms1",
+    sourcePointId: "p6",
+    targetPointId: "p1",
+    similarity: 0.92,
+    status: "pending",
+    resolvedBy: null,
+    resolvedAt: null,
+    createdAt: "2025-10-20T15:00:00Z",
+  },
+  {
+    id: "ms2",
+    sourcePointId: "p4",
+    targetPointId: "p2",
+    similarity: 0.78,
+    status: "pending",
+    resolvedBy: null,
+    resolvedAt: null,
+    createdAt: "2025-10-05T11:00:00Z",
+  },
+  {
+    id: "ms3",
+    sourcePointId: "p9",
+    targetPointId: "p8",
+    similarity: 0.82,
+    status: "pending",
+    resolvedBy: null,
+    resolvedAt: null,
+    createdAt: "2025-10-24T09:00:00Z",
+  },
+];
+
+export const SEED_MERGES: MergeSuggestion[] = MERGES;
