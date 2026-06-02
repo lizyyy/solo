@@ -1,0 +1,15 @@
+{"sample_id": "S001", "problem_id": "P1001", "model_output": "使用动态规划，定义dp[i]表示前i个数的最大和，状态转移方程为dp[i] = max(dp[i-1], dp[i-2] + nums[i])", "model_version": "v2.1.0", "score": 0.92, "timestamp": "2026-06-01T10:30:00"}
+{"sample_id": "S001", "problem_id": "P1001", "model_output": "使用动态规划，定义dp[i]表示前i个数的最大和，状态转移方程dp[i] = max(dp[i-1], dp[i-2] + nums[i])", "model_version": "v2.1.0", "score": 0.92, "timestamp": "2026-06-01T10:35:00"}
+{"sample_id": "S002", "problem_id": "P1002", "model_output": "深度优先搜索，从起点开始遍历所有可能路径，记录访问过的节点避免重复", "model_version": "v2.1.0", "score": 0.88, "timestamp": "2026-06-01T11:00:00"}
+{"sample_id": "S003", "problem_id": "P1003", "model_output": "双指针法，左右指针向中间移动，计算面积取最大值", "model_version": "v2.0.0", "score": 0.95, "timestamp": "2026-06-01T11:30:00"}
+{"sample_id": "S003", "problem_id": "P1003", "model_output": "双指针法，左右指针向中间移动，计算面积取最大值", "model_version": "v2.1.0", "score": 0.96, "timestamp": "2026-06-01T11:45:00"}
+{"sample_id": "S004", "problem_id": "P1004", "model_output": "哈希表统计频率，然后按频率排序取前k个高频元素", "model_version": "v2.1.0", "score": 0.75, "timestamp": "2026-06-01T12:00:00"}
+{"sample_id": "S005", "problem_id": "P1005", "model_output": "", "model_version": "v2.1.0", "score": 0.0, "timestamp": "2026-06-01T12:15:00"}
+{"sample_id": "S006", "problem_id": "P1006", "model_output": "二叉树中序遍历，递归访问左子树，根节点，右子树", "model_version": "v2.1.0", "score": 0.91, "timestamp": "2026-06-01T14:00:00"}
+{"sample_id": "S007", "problem_id": "P1007", "model_output": "快速排序选择算法，分区函数找第k大元素", "model_version": "v2.0.0", "score": 0.83, "timestamp": "2026-06-01T14:30:00"}
+{"sample_id": "S008", "problem_id": "P1008", "model_output": "使用动态规划，dp[i][j]表示字符串s前i个和t前j个的最长公共子序列长度", "model_version": "v2.1.0", "score": 0.89, "timestamp": "2026-06-01T15:00:00"}
+{"sample_id": "S009", "problem_id": "P1009", "model_output": "广度优先搜索，层序遍历二叉树，每一层节点存入结果", "model_version": "v2.1.0", "score": 0.87, "timestamp": "2026-06-01T15:30:00"}
+{"sample_id": "S001", "problem_id": "P1001", "model_output": "使用动态规划，定义dp[i]表示前i个数的最大和，状态转移方程为dp[i] = max(dp[i-1], dp[i-2] + nums[i])", "model_version": "v2.0.0", "score": 0.90, "timestamp": "2026-05-28T09:00:00"}
+{"sample_id": "S010", "problem_id": "P1010", "model_output": "贪心算法，每次选择局部最优解，最终得到全局最优", "model_version": "v2.1.0", "score": 0.68, "timestamp": "2026-06-01T16:00:00"}
+{"sample_id": "S011", "problem_id": "P1011", "model_output": "滑动窗口法，维护窗口内元素的和，向右滑动找最小子数组", "model_version": "v2.1.0", "score": 0.94, "timestamp": "2026-06-01T16:30:00"}
+{"sample_id": "S002", "problem_id": "P1002", "model_output": "DFS深度优先搜索，从起点开始遍历所有可能路径，记录访问节点避免重复访问", "model_version": "v2.0.0", "score": 0.85, "timestamp": "2026-05-29T10:00:00"}

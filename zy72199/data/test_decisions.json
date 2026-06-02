@@ -1,0 +1,12 @@
+{
+  "S005": {
+    "decision": "reject",
+    "reviewer": "小乔",
+    "notes": "确认是模型异常导致空输出，已拒绝，需要重新评测"
+  },
+  "S010": {
+    "decision": "revise",
+    "reviewer": "小乔",
+    "notes": "模型输出过于笼统，需要补充具体算法步骤，标记为revise后重新生成"
+  }
+}

@@ -1,0 +1,12 @@
+sample_id,problem_id,human_label,annotator,annotation_time,confidence,notes
+S001,P1001,accept,小乔,2026-06-01T17:00:00,high,动态规划思路正确
+S002,P1002,accept,小乔,2026-06-01T17:05:00,high,DFS描述准确
+S003,P1003,accept,小乔,2026-06-01T17:10:00,medium,双指针法标准解法
+S004,P1004,revise,小乔,2026-06-01T17:15:00,low,需要说明小顶堆优化
+S005,P1005,reject,小乔,2026-06-01T17:20:00,high,模型输出为空
+S006,P1006,accept,小乔,2026-06-01T17:25:00,high,中序遍历描述正确
+S007,P1007,revise,小乔,2026-06-01T17:30:00,medium,应说明平均时间复杂度O(n)
+S008,P1008,accept,小乔,2026-06-01T17:35:00,high,LCS标准DP解法
+S009,P1009,accept,小乔,2026-06-01T17:40:00,high,BFS层序遍历正确
+S010,P1010,reject,小乔,2026-06-01T17:45:00,medium,贪心表述过于笼统，无具体步骤
+S011,P1011,accept,小乔,2026-06-01T17:50:00,high,滑动窗口描述准确

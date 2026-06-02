@@ -1,0 +1,15 @@
+deduplication:
+  text_similarity_threshold: 0.92
+  score_diff_threshold: 0.05
+  time_window_hours: 24
+  consider_model_version: true
+  consider_problem_id: true
+
+conflict_detection:
+  label_conflict_threshold: 0.7
+  auto_flag_score_gap: 0.3
+
+report:
+  include_raw_sources: true
+  show_model_vs_human: true
+  highlight_boundary_cases: true

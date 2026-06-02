@@ -1,0 +1,37 @@
+[
+  {
+    "case_id": "C001",
+    "sample_id": "S001",
+    "description": "S001被重复评测3次（v2.0.0一次，v2.1.0两次），模型输出几乎一致，仅标点符号差异，属于典型重复评测",
+    "expected_action": "保留v2.1.0最新评测结果，标记另外两条为重复",
+    "severity": "high"
+  },
+  {
+    "case_id": "C002",
+    "sample_id": "S002",
+    "description": "S002在v2.0.0和v2.1.0各评测一次，输出描述略有不同但核心算法一致（DFS vs 深度优先搜索）",
+    "expected_action": "判定为同一语义去重，保留高分版本",
+    "severity": "medium"
+  },
+  {
+    "case_id": "C003",
+    "sample_id": "S003",
+    "description": "S003在v2.0.0和v2.1.0各评测一次，输出完全相同但分数不同（0.95 vs 0.96），属于模型版本差异",
+    "expected_action": "保留新版本，记录分数变化用于版本对比",
+    "severity": "medium"
+  },
+  {
+    "case_id": "C004",
+    "sample_id": "S005",
+    "description": "S005模型输出为空，score为0.0，属于边界空值案例",
+    "expected_action": "标记为空值，需要人工复核是否为模型异常",
+    "severity": "high"
+  },
+  {
+    "case_id": "C005",
+    "sample_id": "S010",
+    "description": "S010模型分数0.68（较低），人工标注为reject，属于边界案例（分数接近决策边界）",
+    "expected_action": "标记为边界案例，纳入人工复核清单",
+    "severity": "medium"
+  }
+]

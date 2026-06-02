@@ -1,0 +1,386 @@
+{
+  "report_version": "v4",
+  "generated_at": "2026-06-02T21:10:03.200940",
+  "metrics": {
+    "total_processed_samples": 11,
+    "original_evaluation_records": 15,
+    "duplicates_merged": 4,
+    "deduplication_rate": 26.67,
+    "status_distribution": {
+      "kept": 9,
+      "empty": 1,
+      "boundary": 1
+    },
+    "samples_needing_review": 3,
+    "review_rate": 27.27,
+    "samples_with_annotation": 11,
+    "samples_with_conflict_cases": 5,
+    "duplicate_groups_found": 3,
+    "avg_similarity_score": 0.8175,
+    "min_similarity_score": 0.625,
+    "max_similarity_score": 0.9224,
+    "model_predicted_labels": {
+      "accept": 8,
+      "revise": 2,
+      "reject": 1
+    },
+    "human_annotated_labels": {
+      "accept": 7,
+      "revise": 2,
+      "reject": 2
+    },
+    "final_decisions": {
+      "accept": 7,
+      "revise": 3,
+      "reject": 1
+    },
+    "human_decisions_overridden": 2,
+    "model_human_agreement_count": 9,
+    "model_human_disagreement_count": 2,
+    "model_human_agreement_rate": 81.82,
+    "avg_model_score": 0.7845,
+    "min_model_score": 0.0,
+    "max_model_score": 0.96,
+    "empty_samples": 1,
+    "boundary_samples": 1,
+    "conflict_samples": 0,
+    "samples_with_duplicates": 3,
+    "model_version_distribution": {
+      "v2.1.0": 10,
+      "v2.0.0": 1
+    },
+    "avg_score_by_version": {
+      "v2.1.0": 0.78,
+      "v2.0.0": 0.83
+    }
+  },
+  "data_stats": {
+    "total_records": 15,
+    "unique_samples": 11,
+    "empty_records": 1,
+    "duplicate_potential": 4,
+    "version_distribution": {
+      "v2.1.0": 11,
+      "v2.0.0": 4
+    },
+    "annotated_samples": 11,
+    "conflict_cases": 5
+  },
+  "threshold_config": {
+    "text_similarity_threshold": 0.92,
+    "score_diff_threshold": 0.05,
+    "time_window_hours": 24
+  },
+  "records": [
+    {
+      "sample_id": "S001",
+      "problem_id": "P1001",
+      "model_version": "v2.1.0",
+      "model_score": 0.92,
+      "model_output": "使用动态规划，定义dp[i]表示前i个数的最大和，状态转移方程dp[i] = max(dp[i-1], dp[i-2] + nums[i])",
+      "timestamp": "2026-06-01T10:35:00",
+      "record_id": "S001_v2.1.0_20260601103500",
+      "status": "kept",
+      "final_label": "accept",
+      "processing_reason": "合并了 2 条重复记录，保留最高分/最新版本",
+      "processed_at": "2026-06-02T21:10:03.200442",
+      "needs_review": true,
+      "review_notes": "已知冲突案例 C001: S001被重复评测3次（v2.0.0一次，v2.1.0两次），模型输出几乎一致，仅标点符号差异，属于典型重复评测。建议: 保留v2.1.0最新评测结果，标记另外两条为重复",
+      "duplicates": [
+        {
+          "record_id": "S001_v2.1.0_20260601103000",
+          "model_version": "v2.1.0",
+          "score": 0.92,
+          "timestamp": "2026-06-01T10:30:00",
+          "similarity": 0.9224
+        },
+        {
+          "record_id": "S001_v2.0.0_20260528090000",
+          "model_version": "v2.0.0",
+          "score": 0.9,
+          "timestamp": "2026-05-28T09:00:00",
+          "similarity": 0.8224
+        }
+      ],
+      "annotation": {
+        "label": "accept",
+        "annotator": "小乔",
+        "notes": "动态规划思路正确"
+      },
+      "human_override": null,
+      "source_trace": [
+        "主记录: S001_v2.1.0_20260601103500 (来源: 2026-06-01T10:35:00)",
+        "重复记录: S001_v2.1.0_20260601103000 (来源: 2026-06-01T10:30:00, 版本: v2.1.0)",
+        "重复记录: S001_v2.0.0_20260528090000 (来源: 2026-05-28T09:00:00, 版本: v2.0.0)"
+      ]
+    },
+    {
+      "sample_id": "S002",
+      "problem_id": "P1002",
+      "model_version": "v2.1.0",
+      "model_score": 0.88,
+      "model_output": "深度优先搜索，从起点开始遍历所有可能路径，记录访问过的节点避免重复",
+      "timestamp": "2026-06-01T11:00:00",
+      "record_id": "S002_v2.1.0_20260601110000",
+      "status": "kept",
+      "final_label": "accept",
+      "processing_reason": "合并了 1 条重复记录，保留最高分/最新版本",
+      "processed_at": "2026-06-02T21:10:03.200532",
+      "needs_review": true,
+      "review_notes": "已知冲突案例 C002: S002在v2.0.0和v2.1.0各评测一次，输出描述略有不同但核心算法一致（DFS vs 深度优先搜索）。建议: 判定为同一语义去重，保留高分版本",
+      "duplicates": [
+        {
+          "record_id": "S002_v2.0.0_20260529100000",
+          "model_version": "v2.0.0",
+          "score": 0.85,
+          "timestamp": "2026-05-29T10:00:00",
+          "similarity": 0.625
+        }
+      ],
+      "annotation": {
+        "label": "accept",
+        "annotator": "小乔",
+        "notes": "DFS描述准确"
+      },
+      "human_override": null,
+      "source_trace": [
+        "主记录: S002_v2.1.0_20260601110000 (来源: 2026-06-01T11:00:00)",
+        "重复记录: S002_v2.0.0_20260529100000 (来源: 2026-05-29T10:00:00, 版本: v2.0.0)"
+      ]
+    },
+    {
+      "sample_id": "S003",
+      "problem_id": "P1003",
+      "model_version": "v2.1.0",
+      "model_score": 0.96,
+      "model_output": "双指针法，左右指针向中间移动，计算面积取最大值",
+      "timestamp": "2026-06-01T11:45:00",
+      "record_id": "S003_v2.1.0_20260601114500",
+      "status": "kept",
+      "final_label": "accept",
+      "processing_reason": "合并了 1 条重复记录，保留最高分/最新版本",
+      "processed_at": "2026-06-02T21:10:03.200556",
+      "needs_review": true,
+      "review_notes": "已知冲突案例 C003: S003在v2.0.0和v2.1.0各评测一次，输出完全相同但分数不同（0.95 vs 0.96），属于模型版本差异。建议: 保留新版本，记录分数变化用于版本对比",
+      "duplicates": [
+        {
+          "record_id": "S003_v2.0.0_20260601113000",
+          "model_version": "v2.0.0",
+          "score": 0.95,
+          "timestamp": "2026-06-01T11:30:00",
+          "similarity": 0.9
+        }
+      ],
+      "annotation": {
+        "label": "accept",
+        "annotator": "小乔",
+        "notes": "双指针法标准解法"
+      },
+      "human_override": null,
+      "source_trace": [
+        "主记录: S003_v2.1.0_20260601114500 (来源: 2026-06-01T11:45:00)",
+        "重复记录: S003_v2.0.0_20260601113000 (来源: 2026-06-01T11:30:00, 版本: v2.0.0)"
+      ]
+    },
+    {
+      "sample_id": "S004",
+      "problem_id": "P1004",
+      "model_version": "v2.1.0",
+      "model_score": 0.75,
+      "model_output": "哈希表统计频率，然后按频率排序取前k个高频元素",
+      "timestamp": "2026-06-01T12:00:00",
+      "record_id": "S004_v2.1.0_20260601120000",
+      "status": "kept",
+      "final_label": "revise",
+      "processing_reason": "无重复记录，直接保留",
+      "processed_at": "2026-06-02T21:10:03.200560",
+      "needs_review": false,
+      "review_notes": "",
+      "duplicates": [],
+      "annotation": {
+        "label": "revise",
+        "annotator": "小乔",
+        "notes": "需要说明小顶堆优化"
+      },
+      "human_override": null,
+      "source_trace": [
+        "主记录: S004_v2.1.0_20260601120000 (来源: 2026-06-01T12:00:00)"
+      ]
+    },
+    {
+      "sample_id": "S005",
+      "problem_id": "P1005",
+      "model_version": "v2.1.0",
+      "model_score": 0.0,
+      "model_output": "",
+      "timestamp": "2026-06-01T12:15:00",
+      "record_id": "S005_v2.1.0_20260601121500",
+      "status": "empty",
+      "final_label": "reject",
+      "processing_reason": "模型输出为空或分数为0，需要人工复核",
+      "processed_at": "2026-06-02T21:10:03.200563",
+      "needs_review": false,
+      "review_notes": "确认是模型异常导致空输出，已拒绝，需要重新评测",
+      "duplicates": [],
+      "annotation": {
+        "label": "reject",
+        "annotator": "小乔",
+        "notes": "模型输出为空"
+      },
+      "human_override": "reject",
+      "source_trace": [
+        "主记录: S005_v2.1.0_20260601121500 (来源: 2026-06-01T12:15:00)"
+      ]
+    },
+    {
+      "sample_id": "S006",
+      "problem_id": "P1006",
+      "model_version": "v2.1.0",
+      "model_score": 0.91,
+      "model_output": "二叉树中序遍历，递归访问左子树，根节点，右子树",
+      "timestamp": "2026-06-01T14:00:00",
+      "record_id": "S006_v2.1.0_20260601140000",
+      "status": "kept",
+      "final_label": "accept",
+      "processing_reason": "无重复记录，直接保留",
+      "processed_at": "2026-06-02T21:10:03.200566",
+      "needs_review": false,
+      "review_notes": "",
+      "duplicates": [],
+      "annotation": {
+        "label": "accept",
+        "annotator": "小乔",
+        "notes": "中序遍历描述正确"
+      },
+      "human_override": null,
+      "source_trace": [
+        "主记录: S006_v2.1.0_20260601140000 (来源: 2026-06-01T14:00:00)"
+      ]
+    },
+    {
+      "sample_id": "S007",
+      "problem_id": "P1007",
+      "model_version": "v2.0.0",
+      "model_score": 0.83,
+      "model_output": "快速排序选择算法，分区函数找第k大元素",
+      "timestamp": "2026-06-01T14:30:00",
+      "record_id": "S007_v2.0.0_20260601143000",
+      "status": "kept",
+      "final_label": "revise",
+      "processing_reason": "无重复记录，直接保留",
+      "processed_at": "2026-06-02T21:10:03.200569",
+      "needs_review": false,
+      "review_notes": "",
+      "duplicates": [],
+      "annotation": {
+        "label": "revise",
+        "annotator": "小乔",
+        "notes": "应说明平均时间复杂度O(n)"
+      },
+      "human_override": null,
+      "source_trace": [
+        "主记录: S007_v2.0.0_20260601143000 (来源: 2026-06-01T14:30:00)"
+      ]
+    },
+    {
+      "sample_id": "S008",
+      "problem_id": "P1008",
+      "model_version": "v2.1.0",
+      "model_score": 0.89,
+      "model_output": "使用动态规划，dp[i][j]表示字符串s前i个和t前j个的最长公共子序列长度",
+      "timestamp": "2026-06-01T15:00:00",
+      "record_id": "S008_v2.1.0_20260601150000",
+      "status": "kept",
+      "final_label": "accept",
+      "processing_reason": "无重复记录，直接保留",
+      "processed_at": "2026-06-02T21:10:03.200572",
+      "needs_review": false,
+      "review_notes": "",
+      "duplicates": [],
+      "annotation": {
+        "label": "accept",
+        "annotator": "小乔",
+        "notes": "LCS标准DP解法"
+      },
+      "human_override": null,
+      "source_trace": [
+        "主记录: S008_v2.1.0_20260601150000 (来源: 2026-06-01T15:00:00)"
+      ]
+    },
+    {
+      "sample_id": "S009",
+      "problem_id": "P1009",
+      "model_version": "v2.1.0",
+      "model_score": 0.87,
+      "model_output": "广度优先搜索，层序遍历二叉树，每一层节点存入结果",
+      "timestamp": "2026-06-01T15:30:00",
+      "record_id": "S009_v2.1.0_20260601153000",
+      "status": "kept",
+      "final_label": "accept",
+      "processing_reason": "无重复记录，直接保留",
+      "processed_at": "2026-06-02T21:10:03.200574",
+      "needs_review": false,
+      "review_notes": "",
+      "duplicates": [],
+      "annotation": {
+        "label": "accept",
+        "annotator": "小乔",
+        "notes": "BFS层序遍历正确"
+      },
+      "human_override": null,
+      "source_trace": [
+        "主记录: S009_v2.1.0_20260601153000 (来源: 2026-06-01T15:30:00)"
+      ]
+    },
+    {
+      "sample_id": "S010",
+      "problem_id": "P1010",
+      "model_version": "v2.1.0",
+      "model_score": 0.68,
+      "model_output": "贪心算法，每次选择局部最优解，最终得到全局最优",
+      "timestamp": "2026-06-01T16:00:00",
+      "record_id": "S010_v2.1.0_20260601160000",
+      "status": "boundary",
+      "final_label": "revise",
+      "processing_reason": "存在已知冲突案例: C005",
+      "processed_at": "2026-06-02T21:10:03.200578",
+      "needs_review": false,
+      "review_notes": "模型输出过于笼统，需要补充具体算法步骤，标记为revise后重新生成",
+      "duplicates": [],
+      "annotation": {
+        "label": "reject",
+        "annotator": "小乔",
+        "notes": "贪心表述过于笼统，无具体步骤"
+      },
+      "human_override": "revise",
+      "source_trace": [
+        "主记录: S010_v2.1.0_20260601160000 (来源: 2026-06-01T16:00:00)"
+      ]
+    },
+    {
+      "sample_id": "S011",
+      "problem_id": "P1011",
+      "model_version": "v2.1.0",
+      "model_score": 0.94,
+      "model_output": "滑动窗口法，维护窗口内元素的和，向右滑动找最小子数组",
+      "timestamp": "2026-06-01T16:30:00",
+      "record_id": "S011_v2.1.0_20260601163000",
+      "status": "kept",
+      "final_label": "accept",
+      "processing_reason": "无重复记录，直接保留",
+      "processed_at": "2026-06-02T21:10:03.200580",
+      "needs_review": false,
+      "review_notes": "",
+      "duplicates": [],
+      "annotation": {
+        "label": "accept",
+        "annotator": "小乔",
+        "notes": "滑动窗口描述准确"
+      },
+      "human_override": null,
+      "source_trace": [
+        "主记录: S011_v2.1.0_20260601163000 (来源: 2026-06-01T16:30:00)"
+      ]
+    }
+  ]
+}
