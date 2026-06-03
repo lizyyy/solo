@@ -1,0 +1,35 @@
+[
+  {
+    "location": "A2O池-厌氧段东侧走廊",
+    "description": "走道护栏锈蚀松动，靠近曝气管道处有油污堆积",
+    "severity": "high",
+    "photo_refs": ["IMG_001.jpg", "IMG_002.jpg"],
+    "photo_x": 5.0,
+    "photo_y": 3.0,
+    "photo_z": 0.0,
+    "created_by": "培训教官老梁",
+    "notes": "巡检必经之路，栏杆松动有坠落风险"
+  },
+  {
+    "location": "二沉池-出水堰北侧",
+    "description": "出水堰标高指示牌被污泥遮挡，看不清刻度",
+    "severity": "medium",
+    "photo_refs": ["IMG_003.jpg"],
+    "photo_x": 12.0,
+    "photo_y": 8.0,
+    "photo_z": 1.5,
+    "created_by": "培训教官老梁",
+    "notes": "日常巡检需要读取堰上水头"
+  },
+  {
+    "location": "污泥回流泵房-地下二层",
+    "description": "楼梯转角处有临时堆放的管道支架，挡住一半通道",
+    "severity": "critical",
+    "photo_refs": ["IMG_004.jpg", "IMG_005.jpg"],
+    "photo_x": 3.0,
+    "photo_y": 15.0,
+    "photo_z": -2.0,
+    "created_by": "培训教官老梁",
+    "notes": "紧急情况撤离通道受阻，必须尽快清理"
+  }
+]

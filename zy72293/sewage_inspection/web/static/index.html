@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>污水厂池体巡检路线</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>🏭 污水厂池体巡检路线</h1>
+    <p class="subtitle">不一致检测 · 遮挡点管理 · 安全员复核</p>
+  </header>
+
+  <nav id="project-nav">
+    <button onclick="showCreateProject()">+ 新建项目</button>
+    <select id="project-select" onchange="loadProject(this.value)">
+      <option value="">— 选择项目 —</option>
+    </select>
+  </nav>
+
+  <div id="create-panel" class="panel hidden">
+    <h2>创建巡检项目</h2>
+    <label>项目名称 <input id="cp-name" type="text" placeholder="如：A2O池体巡检"></label>
+    <label>厂区名称 <input id="cp-plant" type="text" placeholder="如：城东污水处理厂"></label>
+    <button onclick="createProject()">创建</button>
+    <button onclick="hideCreateProject()">取消</button>
+  </div>
+
+  <div id="main-panel" class="hidden">
+    <div id="project-header">
+      <h2 id="project-title"></h2>
+      <span id="phase-badge" class="badge"></span>
+    </div>
+
+    <div class="workflow-steps">
+      <div class="step" id="step-1">
+        <div class="step-num">1</div>
+        <div class="step-label">障碍物备注导入</div>
+        <button class="step-btn" onclick="showImportPanel('obstacles')">导入</button>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step" id="step-2">
+        <div class="step-num">2</div>
+        <div class="step-label">老梁补看楼层剖面草图</div>
+        <button class="step-btn" onclick="showImportPanel('floor-profiles')">补录</button>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step" id="step-3">
+        <div class="step-num">3</div>
+        <div class="step-label">遮挡点清单更新</div>
+        <button class="step-btn" onclick="runStep()">推进</button>
+      </div>
+    </div>
+
+    <div id="stats-bar" class="stats-bar"></div>
+
+    <div class="tab-bar">
+      <button class="tab active" onclick="switchTab('chart')">图表展示</button>
+      <button class="tab" onclick="switchTab('3d')">3D展示</button>
+      <button class="tab" onclick="switchTab('occlusion')">遮挡点清单</button>
+      <button class="tab" onclick="switchTab('obstacles')">障碍物备注</button>
+      <button class="tab" onclick="switchTab('profiles')">楼层剖面草图</button>
+      <button class="tab" onclick="switchTab('report')">报告</button>
+    </div>
+
+    <div id="tab-chart" class="tab-content">
+      <canvas id="chart-canvas" width="800" height="500"></canvas>
+      <div id="chart-legend" class="legend"></div>
+      <div id="chart-detail" class="detail-panel hidden"></div>
+    </div>
+
+    <div id="tab-3d" class="tab-content hidden">
+      <canvas id="three-canvas" width="800" height="500"></canvas>
+      <p class="hint">3D视图：照片点位（红）与坐标表行（绿），红色无绿色配对 = 照片有点位但坐标表缺行</p>
+      <div id="three-detail" class="detail-panel hidden"></div>
+    </div>
+
+    <div id="tab-occlusion" class="tab-content hidden">
+      <div id="occlusion-list"></div>
+    </div>
+
+    <div id="tab-obstacles" class="tab-content hidden">
+      <div id="obstacle-list"></div>
+    </div>
+
+    <div id="tab-profiles" class="tab-content hidden">
+      <div id="profile-list"></div>
+    </div>
+
+    <div id="tab-report" class="tab-content hidden">
+      <button onclick="loadReport()">生成报告</button>
+      <pre id="report-content"></pre>
+    </div>
+  </div>
+
+  <div id="import-panel" class="modal hidden">
+    <div class="modal-content">
+      <h3 id="import-title"></h3>
+      <textarea id="import-json" rows="12" cols="60" placeholder='粘贴JSON数据，如：[{"location":"二沉池","description":"栏杆松动","photo_refs":["IMG_001.jpg"],"photo_x":10,"photo_y":20}]'></textarea>
+      <div class="modal-actions">
+        <button onclick="doImport()">确认导入</button>
+        <button onclick="hideImportPanel()">取消</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
