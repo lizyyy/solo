@@ -1,0 +1,43 @@
+{
+  "review_20260604_064818": {
+    "review_id": "review_20260604_064818",
+    "review_type": "multiple_answers",
+    "status": "pending",
+    "created_at": "2026-06-04T06:48:18.668027",
+    "assigned_to": [
+      "唐老师",
+      "业务运营"
+    ],
+    "data": {
+      "student_id": "STU003",
+      "versions": {
+        "CUST004_v1": [
+          {
+            "state": "active",
+            "timestamp": "2024-01-01T00:00:00"
+          },
+          {
+            "state": "at_risk",
+            "timestamp": "2024-02-01T00:00:00"
+          },
+          {
+            "state": "active",
+            "timestamp": "2024-03-01T00:00:00"
+          }
+        ]
+      },
+      "source_file": "sample_formula_data.csv",
+      "issue": "同一学生提交了多版答案，需要业务运营复核确认正确版本"
+    },
+    "comments": [
+      {
+        "timestamp": "2026-06-04T06:48:18.668028",
+        "author": "system",
+        "content": "学生STU003存在多版答案，需复核确认"
+      }
+    ],
+    "resolved_at": null,
+    "resolved_by": null,
+    "resolution": null
+  }
+}

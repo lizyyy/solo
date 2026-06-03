@@ -1,0 +1,33 @@
+system:
+  name: "Markov 客户流失转移分析系统"
+  version: "1.0.0"
+  data_dir: "./data"
+  history_dir: "./data/history"
+  import_dir: "./data/imports"
+  export_dir: "./data/exports"
+
+boundary_rules:
+  same_student_multiple_answers: "review"
+  duplicate_import_handling: "skip"
+  annotation_update_mode: "versioned"
+  auto_approve_threshold: 0.95
+
+markov_model:
+  states:
+    - "active"
+    - "at_risk"
+    - "churned"
+    - "reactivated"
+  transition_matrix_init: "uniform"
+  smoothing_factor: 0.01
+
+review:
+  require_manual_review: true
+  reviewers: ["唐老师", "业务运营"]
+  auto_approve: false
+
+visualization:
+  default_view: "2d"
+  enable_3d: true
+  show_raw_data_on_click: true
+  enable_review_link: true

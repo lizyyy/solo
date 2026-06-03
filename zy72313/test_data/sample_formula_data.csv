@@ -1,0 +1,11 @@
+customer_id,state,timestamp,student_id,answer_version,error_notes,annotations
+CUST001,active,2024-01-01,STU001,1,初始状态正常,"{""teacher"": ""张老师"", ""comment"": ""数据完整""}"
+CUST001,at_risk,2024-02-01,STU001,1,活跃度下降,"{""teacher"": ""张老师"", ""comment"": ""需关注""}"
+CUST001,churned,2024-03-01,STU001,1,已流失,"{""teacher"": ""张老师"", ""comment"": ""确认流失""}"
+CUST002,active,2024-01-01,STU001,2,初始状态正常,"{""teacher"": ""李老师"", ""comment"": ""第二版修正""}"
+CUST002,at_risk,2024-02-01,STU001,2,活跃度下降,"{""teacher"": ""李老师"", ""comment"": ""修正后数据""}"
+CUST003,active,2024-01-01,STU002,1,初始状态正常,"{""teacher"": ""王老师"", ""comment"": ""正常""}"
+CUST003,reactivated,2024-02-01,STU002,1,重新激活,"{""teacher"": ""王老师"", ""comment"": ""回流成功""}"
+CUST004,active,2024-01-01,STU003,1,,"{""teacher"": ""赵老师""}"
+CUST004,at_risk,2024-02-01,STU003,1,,"{""teacher"": ""赵老师""}"
+CUST004,active,2024-03-01,STU003,1,,"{""teacher"": ""赵老师""}"

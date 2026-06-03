@@ -1,0 +1,38 @@
+{
+  "versions": {
+    "v_20260604_064818": {
+      "version_id": "v_20260604_064818",
+      "parent_version": null,
+      "timestamp": "2026-06-04T06:48:18.667350",
+      "author": "system",
+      "description": "导入数据文件: sample_formula_data.csv, 10条记录",
+      "changes": [],
+      "data_snapshot": {
+        "type": "import",
+        "source_file": "sample_formula_data.csv",
+        "file_hash": "a831f5aedc6918c8456cc783f404a48237004aa5c2d632011ff7704030fd0aa2",
+        "record_count": 10,
+        "metadata": {
+          "status": "success",
+          "imported_count": 10,
+          "skipped_count": 0,
+          "multiple_answer_students": [
+            "STU001",
+            "STU003"
+          ],
+          "warnings": [
+            "学生 STU001 存在多版答案，需复核",
+            "学生 STU003 存在多版答案，需复核"
+          ],
+          "timestamp": "2026-06-04T06:48:18.667117",
+          "requires_review": true,
+          "review_type": "multiple_answers",
+          "file_hash": "a831f5aedc6918c8456cc783f404a48237004aa5c2d632011ff7704030fd0aa2",
+          "source_file": "sample_formula_data.csv"
+        }
+      },
+      "is_rollback": false
+    }
+  },
+  "current_version_id": "v_20260604_064818"
+}
