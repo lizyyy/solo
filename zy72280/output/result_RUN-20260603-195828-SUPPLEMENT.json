@@ -1,0 +1,122 @@
+{
+  "run_id": "RUN-20260603-195828-SUPPLEMENT",
+  "mode": "supplement",
+  "origin": {
+    "origin_id": "ORIGIN-V2026-001",
+    "description": "高架桥施工围挡视域坐标原点说明",
+    "import_date": "2026-06-01",
+    "coordinate_system": "WGS84-UTM50N",
+    "origin_point": {
+      "x": 384520.5,
+      "y": 3356780.25,
+      "z": 42.8,
+      "latitude": 30.345678,
+      "longitude": 114.234567
+    },
+    "reference_markers": [
+      {
+        "marker_id": "REF-001",
+        "name": "高架桥桥墩编号GQ-08#",
+        "relative_position": {
+          "x": 15.2,
+          "y": -8.5,
+          "z": 0.0
+        },
+        "description": "主参考点，与国家控制点联测精度±2mm"
+      },
+      {
+        "marker_id": "REF-002",
+        "name": "施工围挡西南角",
+        "relative_position": {
+          "x": -120.3,
+          "y": 45.6,
+          "z": 0.0
+        },
+        "description": "围挡基准点"
+      },
+      {
+        "marker_id": "REF-003",
+        "name": "临时水准点BM-15",
+        "description": "高程基准，海拔45.230米"
+      }
+    ],
+    "obstacle_naming_rule": "以施工围挡段号+障碍物类型+序号",
+    "notes": "坐标原点导入后，障碍物命名统一采用新口径：按《施工围挡视域障碍物命名规范V2.0》"
+  },
+  "processed_obstacles": [
+    {
+      "obstacle_id": "OBS-003-SUPP",
+      "type": "old_caliber_updated",
+      "name": "WD-C段-斜拉钢筋架-001",
+      "old_name": "东向斜拉钢筋架",
+      "new_name": "WD-C段-斜拉钢筋架-001",
+      "coordinates": {
+        "x": 384548.1,
+        "y": 3356832.4,
+        "z": 44.5
+      },
+      "dimensions": {
+        "length": 4.5,
+        "width": 0.8,
+        "height": 5.2
+      },
+      "inspection_photo_id": "INSP-20260528-0017",
+      "first_observer": "赵工",
+      "supplemented_by": "阿景",
+      "notes": "旧口径已更新为新口径：按《施工围挡视域障碍物命名规范V2.0》",
+      "processing_status": "completed",
+      "old_caliber": true,
+      "caliber_updated": true,
+      "caliber_update_date": "2026-06-02",
+      "inspection_photo_detail": {
+        "shoot_date": "2026-05-28",
+        "shoot_position": {
+          "x": 384552.3,
+          "y": 3356825.7,
+          "z": 43.2,
+          "note": "从原点向东北方向约32米处拍摄"
+        },
+        "visibility": "良好，无遮挡"
+      },
+      "old_caliber_name": "东向斜拉钢筋架",
+      "processed_at": "2026-06-03T19:58:28.286104",
+      "run_id": "RUN-20260603-195828-SUPPLEMENT",
+      "processing_result": "caliber_updated"
+    }
+  ],
+  "history": [
+    {
+      "timestamp": "2026-06-03T19:58:28.285566",
+      "action": "import_origin",
+      "description": "坐标原点说明导入完成",
+      "details": {
+        "origin_id": "ORIGIN-V2026-001",
+        "import_date": "2026-06-01",
+        "coordinate_system": "WGS84-UTM50N"
+      }
+    },
+    {
+      "timestamp": "2026-06-03T19:58:28.286080",
+      "action": "supplement_photos",
+      "description": "阿景补看巡检照片编号完成",
+      "details": {
+        "supplemented_by": "阿景",
+        "supplement_count": 1
+      }
+    },
+    {
+      "timestamp": "2026-06-03T19:58:28.286129",
+      "action": "process_obstacles",
+      "description": "三维标注视图处理完成",
+      "details": {
+        "total": 1,
+        "normal": 0,
+        "needs_review": 0,
+        "old_caliber": 0,
+        "wrong_caliber": 0,
+        "caliber_updated": 1
+      }
+    }
+  ],
+  "generated_at": "2026-06-03T19:58:28.289077"
+}

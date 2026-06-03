@@ -1,0 +1,121 @@
+{
+  "project": "高架桥施工围挡视域",
+  "purpose": "培训演示 - 供展陈设计师阿景给新人讲流程",
+  "demo_data_description": "小而真的演示数据，包含坐标原点说明、巡检照片编号、一次人工修正和一次重跑",
+  "demo_records": [
+    {
+      "type": "顺利记录",
+      "obstacle_id": "OBS-001",
+      "name": "WD-A段-混凝土墩-001",
+      "expected_result": "正常",
+      "description": "命名规范，坐标准确，直接归入正常记录"
+    },
+    {
+      "type": "同一障碍物被标了两个名字",
+      "obstacle_id": "OBS-002-A / OBS-002-B",
+      "name_1": "WD-B段-临时脚手架-001",
+      "name_2": "脚手架B区",
+      "coordinates": {
+        "x": 384562.800,
+        "y": 3356792.400,
+        "z": 46.800
+      },
+      "expected_result": "待复核",
+      "description": "坐标完全重合但命名不同，留给培训学员复核，暂不归为正常"
+    },
+    {
+      "type": "旧口径补录",
+      "obstacle_id": "OBS-003",
+      "old_name": "东向斜拉钢筋架",
+      "new_name": "WD-C段-斜拉钢筋架-001",
+      "source": "从巡检照片编号INSP-20260528-0017补来的旧口径",
+      "expected_result": "人工修正后重跑更新",
+      "description": "旧口径命名，经培训学员复核后人工修正，再重跑更新为新口径"
+    }
+  ],
+  "workflow_steps": [
+    {
+      "step": 1,
+      "name": "坐标原点说明第一次导入",
+      "description": "导入坐标原点和命名规则，障碍物命名统一采用新口径"
+    },
+    {
+      "step": 2,
+      "name": "展陈设计师阿景补看巡检照片编号",
+      "description": "阿景补充巡检照片关联信息，检测旧口径记录"
+    },
+    {
+      "step": 3,
+      "name": "三维标注视图更新",
+      "description": "生成三维标注视图，显示三种不同处理结果：正常、待复核、旧口径"
+    },
+    {
+      "step": 4,
+      "name": "一次人工修正",
+      "description": "培训学员复核后，修正OBS-003的旧口径为新口径"
+    },
+    {
+      "step": 5,
+      "name": "一次重跑",
+      "description": "应用人工修正后重新处理，更新三维标注视图"
+    }
+  ],
+  "runnable_commands": [
+    {
+      "command": "python3 src/viaduct_visual_field.py normal",
+      "description": "跑正常材料 - 包含3种记录类型的标准演示",
+      "data_file": "data/raw_observations.json",
+      "expected_results": {
+        "OBS-001": "normal",
+        "OBS-002-A": "needs_review",
+        "OBS-002-B": "needs_review",
+        "OBS-003": "old_caliber"
+      }
+    },
+    {
+      "command": "python3 src/viaduct_visual_field.py wrong",
+      "description": "跑错口径材料 - 演示错误命名被驳回",
+      "data_file": "data/wrong_caliber_observations.json",
+      "expected_results": {
+        "OBS-001-WRONG": "wrong_caliber",
+        "OBS-002-WRONG": "wrong_caliber"
+      }
+    },
+    {
+      "command": "python3 src/viaduct_visual_field.py supplement",
+      "description": "跑补录材料 - 演示从巡检照片补来的旧口径已更新",
+      "data_file": "data/supplementary_observations.json",
+      "expected_results": {
+        "OBS-003-SUPP": "caliber_updated"
+      }
+    },
+    {
+      "command": "python3 src/viaduct_visual_field.py full-demo",
+      "description": "完整演示流程（含一次人工修正+一次重跑）- 推荐培训使用",
+      "data_file": "data/raw_observations.json",
+      "workflow": "步骤1→步骤2→步骤3→人工修正OBS-003→步骤5重跑→验证"
+    }
+  ],
+  "verification_points": [
+    {
+      "check": "三维标注视图与历史记录是否一致",
+      "method": "verify_3d_view_matches_history() 自动验证",
+      "expected": "全部障碍物状态在视图和历史记录中完全一致"
+    },
+    {
+      "check": "同一障碍物被标两个名字是否留待复核",
+      "method": "检查OBS-002-A和OBS-002-B的processing_result",
+      "expected": "均为needs_review，不自动归为normal"
+    },
+    {
+      "check": "人工修正和重跑是否有记录",
+      "method": "检查history中是否有manual_correction和rerun条目",
+      "expected": "两条记录均存在，包含修正人和重跑ID"
+    }
+  ],
+  "key_output_files": {
+    "3d_annotation_view": "output/3d_annotation_view_<RUN_ID>.json",
+    "history_records": "output/history/history_<RUN_ID>.json",
+    "full_result": "output/result_<RUN_ID>.json"
+  }
+}

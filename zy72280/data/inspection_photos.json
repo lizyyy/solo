@@ -1,0 +1,66 @@
+{
+  "description": "巡检照片编号映射表 - 供展陈设计师阿景补充使用",
+  "supplemented_by": "阿景",
+  "supplement_date": "2026-06-02",
+  "photos": [
+    {
+      "photo_id": "INSP-20260528-0017",
+      "shoot_date": "2026-05-28",
+      "shoot_position": {
+        "x": 384552.300,
+        "y": 3356825.700,
+        "z": 43.200,
+        "note": "从原点向东北方向约32米处拍摄"
+      },
+      "obstacle_observed": [
+        {
+          "old_caliber_name": "东向斜拉钢筋架",
+          "coordinates": {
+            "x": 384548.100,
+            "y": 3356832.400,
+            "z": 44.500
+          },
+          "notes": "旧口径命名，来自2026-05-20现场巡检记录第17条"
+        }
+      ],
+      "camera_direction": "N35°E",
+      "visibility": "良好，无遮挡"
+    },
+    {
+      "photo_id": "INSP-20260530-0042",
+      "shoot_date": "2026-05-30",
+      "shoot_position": {
+        "x": 384505.800,
+        "y": 3356760.300,
+        "z": 42.900
+      },
+      "obstacle_observed": [
+        {
+          "obstacle_id": "OBS-001",
+          "name": "WD-A段-混凝土墩-001"
+        }
+      ],
+      "camera_direction": "S15°W",
+      "visibility": "良好，无遮挡",
+      "notes": "正常拍摄，与视域分析结果一致"
+    },
+    {
+      "photo_id": "INSP-20260531-0058",
+      "shoot_date": "2026-05-31",
+      "shoot_position": {
+        "x": 384565.200,
+        "y": 3356795.100,
+        "z": 43.500
+      },
+      "obstacle_observed": [
+        {
+          "obstacle_id": "OBS-002-A",
+          "name": "WD-B段-临时脚手架-001"
+        }
+      ],
+      "camera_direction": "N20°E",
+      "visibility": "良好，部分遮挡",
+      "notes": "同一位置障碍物，现场人员称'脚手架B区'"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "origin_id": "ORIGIN-V2026-001",
+  "description": "高架桥施工围挡视域坐标原点说明",
+  "import_date": "2026-06-01",
+  "coordinate_system": "WGS84-UTM50N",
+  "origin_point": {
+    "x": 384520.500,
+    "y": 3356780.250,
+    "z": 42.800,
+    "latitude": 30.345678,
+    "longitude": 114.234567
+  },
+  "reference_markers": [
+    {
+      "marker_id": "REF-001",
+      "name": "高架桥桥墩编号GQ-08#",
+      "relative_position": {
+        "x": 15.200,
+        "y": -8.500,
+        "z": 0.000
+      },
+      "description": "主参考点，与国家控制点联测精度±2mm"
+    },
+    {
+      "marker_id": "REF-002",
+      "name": "施工围挡西南角",
+      "relative_position": {
+        "x": -120.300,
+        "y": 45.600,
+        "z": 0.000
+      },
+      "description": "围挡基准点"
+    },
+    {
+      "marker_id": "REF-003",
+      "name": "临时水准点BM-15",
+      "description": "高程基准，海拔45.230米"
+    }
+  ],
+  "obstacle_naming_rule": "以施工围挡段号+障碍物类型+序号",
+  "notes": "坐标原点导入后，障碍物命名统一采用新口径：按《施工围挡视域障碍物命名规范V2.0》"
+}

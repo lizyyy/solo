@@ -1,0 +1,69 @@
+{
+  "run_id": "RUN-20260603-195740-RERUN",
+  "history": [
+    {
+      "timestamp": "2026-06-03T19:57:40.445167",
+      "action": "import_origin",
+      "description": "坐标原点说明导入完成",
+      "details": {
+        "origin_id": "ORIGIN-V2026-001",
+        "import_date": "2026-06-01",
+        "coordinate_system": "WGS84-UTM50N"
+      }
+    },
+    {
+      "timestamp": "2026-06-03T19:57:40.445371",
+      "action": "supplement_photos",
+      "description": "阿景补看巡检照片编号完成",
+      "details": {
+        "supplemented_by": "阿景",
+        "supplement_count": 4
+      }
+    },
+    {
+      "timestamp": "2026-06-03T19:57:40.445411",
+      "action": "process_obstacles",
+      "description": "三维标注视图处理完成",
+      "details": {
+        "total": 4,
+        "normal": 1,
+        "needs_review": 2,
+        "old_caliber": 1,
+        "wrong_caliber": 0,
+        "caliber_updated": 0
+      }
+    },
+    {
+      "timestamp": "2026-06-03T19:57:40.445760",
+      "action": "manual_correction",
+      "description": "人工修正障碍物 OBS-003",
+      "details": {
+        "obstacle_id": "OBS-003",
+        "correction_note": "经复核，旧口径'东向斜拉钢筋架'应更新为新口径'WD-C段-斜拉钢筋架-001'",
+        "corrected_name": "WD-C段-斜拉钢筋架-001"
+      }
+    },
+    {
+      "timestamp": "2026-06-03T19:57:40.445826",
+      "action": "process_obstacles",
+      "description": "三维标注视图处理完成",
+      "details": {
+        "total": 4,
+        "normal": 1,
+        "needs_review": 2,
+        "old_caliber": 1,
+        "wrong_caliber": 0,
+        "caliber_updated": 0
+      }
+    },
+    {
+      "timestamp": "2026-06-03T19:57:40.445827",
+      "action": "rerun",
+      "description": "重跑完成",
+      "details": {
+        "run_id": "RUN-20260603-195740-RERUN"
+      }
+    }
+  ],
+  "generated_at": "2026-06-03T19:57:40.446279"
+}

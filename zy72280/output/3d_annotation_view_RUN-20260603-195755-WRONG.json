@@ -1,0 +1,77 @@
+{
+  "origin": {
+    "x": 384520.5,
+    "y": 3356780.25,
+    "z": 42.8,
+    "latitude": 30.345678,
+    "longitude": 114.234567
+  },
+  "obstacles": [
+    {
+      "obstacle_id": "OBS-001-WRONG",
+      "type": "wrong_caliber",
+      "name": "桥墩1号",
+      "coordinates": {
+        "x": 384503.75,
+        "y": 3356758.2,
+        "z": 45.3
+      },
+      "dimensions": {
+        "length": 2.4,
+        "width": 2.4,
+        "height": 3.2
+      },
+      "inspection_photo_id": "INSP-20260530-0042",
+      "first_observer": "实习生",
+      "notes": "错误命名演示 - 未按《施工围挡视域障碍物命名规范V2.0》",
+      "processing_status": "rejected",
+      "wrong_caliber": true,
+      "inspection_photo_detail": {
+        "shoot_date": "2026-05-30",
+        "shoot_position": {
+          "x": 384505.8,
+          "y": 3356760.3,
+          "z": 42.9
+        },
+        "visibility": "良好，无遮挡"
+      },
+      "processed_at": "2026-06-03T19:57:55.791225",
+      "run_id": "RUN-20260603-195755-WRONG",
+      "processing_result": "wrong_caliber"
+    },
+    {
+      "obstacle_id": "OBS-002-WRONG",
+      "type": "wrong_caliber",
+      "name": "东边那个架子",
+      "coordinates": {
+        "x": 384562.8,
+        "y": 3356792.4,
+        "z": 46.8
+      },
+      "dimensions": {
+        "length": 6.0,
+        "width": 3.0,
+        "height": 8.5
+      },
+      "inspection_photo_id": "INSP-20260531-0058",
+      "first_observer": "实习生",
+      "notes": "错误命名演示 - 口语化描述",
+      "processing_status": "rejected",
+      "wrong_caliber": true,
+      "inspection_photo_detail": {
+        "shoot_date": "2026-05-31",
+        "shoot_position": {
+          "x": 384565.2,
+          "y": 3356795.1,
+          "z": 43.5
+        },
+        "visibility": "良好，部分遮挡"
+      },
+      "processed_at": "2026-06-03T19:57:55.791228",
+      "run_id": "RUN-20260603-195755-WRONG",
+      "processing_result": "wrong_caliber"
+    }
+  ],
+  "generated_at": "2026-06-03T19:57:55.791245",
+  "run_id": "RUN-20260603-195755-WRONG"
+}

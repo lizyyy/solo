@@ -1,0 +1,148 @@
+{
+  "origin": {
+    "x": 384520.5,
+    "y": 3356780.25,
+    "z": 42.8,
+    "latitude": 30.345678,
+    "longitude": 114.234567
+  },
+  "obstacles": [
+    {
+      "obstacle_id": "OBS-001",
+      "type": "normal",
+      "name": "WD-A段-混凝土墩-001",
+      "coordinates": {
+        "x": 384503.75,
+        "y": 3356758.2,
+        "z": 45.3
+      },
+      "dimensions": {
+        "length": 2.4,
+        "width": 2.4,
+        "height": 3.2
+      },
+      "inspection_photo_id": "INSP-20260530-0042",
+      "first_observer": "张工",
+      "notes": "顺利记录，命名规范，坐标准确",
+      "processing_status": "completed",
+      "inspection_photo_detail": {
+        "shoot_date": "2026-05-30",
+        "shoot_position": {
+          "x": 384505.8,
+          "y": 3356760.3,
+          "z": 42.9
+        },
+        "visibility": "良好，无遮挡"
+      },
+      "processed_at": "2026-06-03T19:57:40.445792",
+      "run_id": "RUN-20260603-195740-RERUN",
+      "processing_result": "normal"
+    },
+    {
+      "obstacle_id": "OBS-002-A",
+      "type": "dual_name",
+      "name": "WD-B段-临时脚手架-001",
+      "coordinates": {
+        "x": 384562.8,
+        "y": 3356792.4,
+        "z": 46.8
+      },
+      "dimensions": {
+        "length": 6.0,
+        "width": 3.0,
+        "height": 8.5
+      },
+      "inspection_photo_id": "INSP-20260531-0058",
+      "first_observer": "李工",
+      "notes": "同一障碍物被标了两个名字 - 另一名为'脚手架B区'，坐标完全重合",
+      "dual_name": "脚手架B区",
+      "processing_status": "review_pending",
+      "needs_review": true,
+      "review_note": "留给培训学员复核，暂不归为正常",
+      "inspection_photo_detail": {
+        "shoot_date": "2026-05-31",
+        "shoot_position": {
+          "x": 384565.2,
+          "y": 3356795.1,
+          "z": 43.5
+        },
+        "visibility": "良好，部分遮挡"
+      },
+      "processed_at": "2026-06-03T19:57:40.445797",
+      "run_id": "RUN-20260603-195740-RERUN",
+      "processing_result": "needs_review"
+    },
+    {
+      "obstacle_id": "OBS-002-B",
+      "type": "dual_name",
+      "name": "脚手架B区",
+      "coordinates": {
+        "x": 384562.8,
+        "y": 3356792.4,
+        "z": 46.8
+      },
+      "dimensions": {
+        "length": 6.0,
+        "width": 3.0,
+        "height": 8.5
+      },
+      "inspection_photo_id": "INSP-20260531-0058",
+      "first_observer": "王工",
+      "notes": "同一障碍物被标了两个名字 - 另一名为'WD-B段-临时脚手架-001'",
+      "dual_name": "WD-B段-临时脚手架-001",
+      "processing_status": "review_pending",
+      "needs_review": true,
+      "review_note": "留给培训学员复核，暂不归为正常",
+      "inspection_photo_detail": {
+        "shoot_date": "2026-05-31",
+        "shoot_position": {
+          "x": 384565.2,
+          "y": 3356795.1,
+          "z": 43.5
+        },
+        "visibility": "良好，部分遮挡"
+      },
+      "processed_at": "2026-06-03T19:57:40.445806",
+      "run_id": "RUN-20260603-195740-RERUN",
+      "processing_result": "needs_review"
+    },
+    {
+      "obstacle_id": "OBS-003",
+      "type": "old_caliber",
+      "name": "WD-C段-斜拉钢筋架-001",
+      "coordinates": {
+        "x": 384548.1,
+        "y": 3356832.4,
+        "z": 44.5
+      },
+      "dimensions": {
+        "length": 4.5,
+        "width": 0.8,
+        "height": 5.2
+      },
+      "inspection_photo_id": "INSP-20260528-0017",
+      "first_observer": "赵工",
+      "notes": "旧口径命名，需从巡检照片编号补录新口径 [已人工修正: 经复核，旧口径'东向斜拉钢筋架'应更新为新口径'WD-C段-斜拉钢筋架-001']",
+      "old_caliber": true,
+      "source": "从巡检照片编号INSP-20260528-0017补来的旧口径",
+      "processing_status": "pending_caliber_update",
+      "needs_caliber_update": true,
+      "inspection_photo_detail": {
+        "shoot_date": "2026-05-28",
+        "shoot_position": {
+          "x": 384552.3,
+          "y": 3356825.7,
+          "z": 43.2,
+          "note": "从原点向东北方向约32米处拍摄"
+        },
+        "visibility": "良好，无遮挡"
+      },
+      "old_caliber_name": "东向斜拉钢筋架",
+      "processed_at": "2026-06-03T19:57:40.445817",
+      "run_id": "RUN-20260603-195740-RERUN",
+      "processing_result": "old_caliber"
+    }
+  ],
+  "generated_at": "2026-06-03T19:57:40.445855",
+  "run_id": "RUN-20260603-195740-RERUN"
+}

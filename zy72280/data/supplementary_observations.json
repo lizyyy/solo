@@ -1,0 +1,33 @@
+{
+  "description": "补录材料 - 从巡检照片编号补来的旧口径更新",
+  "supplement_date": "2026-06-02",
+  "supplemented_by": "阿景",
+  "supplement_source": "从巡检照片编号INSP-20260528-0017补来的旧口径",
+  "obstacles": [
+    {
+      "obstacle_id": "OBS-003-SUPP",
+      "type": "old_caliber_updated",
+      "name": "WD-C段-斜拉钢筋架-001",
+      "old_name": "东向斜拉钢筋架",
+      "new_name": "WD-C段-斜拉钢筋架-001",
+      "coordinates": {
+        "x": 384548.100,
+        "y": 3356832.400,
+        "z": 44.500
+      },
+      "dimensions": {
+        "length": 4.5,
+        "width": 0.8,
+        "height": 5.2
+      },
+      "inspection_photo_id": "INSP-20260528-0017",
+      "first_observer": "赵工",
+      "supplemented_by": "阿景",
+      "notes": "旧口径已更新为新口径：按《施工围挡视域障碍物命名规范V2.0》",
+      "processing_status": "supplemented",
+      "old_caliber": true,
+      "caliber_updated": true,
+      "caliber_update_date": "2026-06-02"
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "description": "错口径材料 - 用于演示错误命名导致的处理差异",
+  "survey_date": "2026-05-31",
+  "obstacles": [
+    {
+      "obstacle_id": "OBS-001-WRONG",
+      "type": "wrong_caliber",
+      "name": "桥墩1号",
+      "coordinates": {
+        "x": 384503.750,
+        "y": 3356758.200,
+        "z": 45.300
+      },
+      "dimensions": {
+        "length": 2.4,
+        "width": 2.4,
+        "height": 3.2
+      },
+      "inspection_photo_id": "INSP-20260530-0042",
+      "first_observer": "实习生",
+      "notes": "错误命名演示 - 未按《施工围挡视域障碍物命名规范V2.0》",
+      "processing_status": "pending",
+      "wrong_caliber": true
+    },
+    {
+      "obstacle_id": "OBS-002-WRONG",
+      "type": "wrong_caliber",
+      "name": "东边那个架子",
+      "coordinates": {
+        "x": 384562.800,
+        "y": 3356792.400,
+        "z": 46.800
+      },
+      "dimensions": {
+        "length": 6.0,
+        "width": 3.0,
+        "height": 8.5
+      },
+      "inspection_photo_id": "INSP-20260531-0058",
+      "first_observer": "实习生",
+      "notes": "错误命名演示 - 口语化描述",
+      "processing_status": "pending",
+      "wrong_caliber": true
+    }
+  ]
+}

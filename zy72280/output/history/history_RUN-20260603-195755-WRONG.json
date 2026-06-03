@@ -1,0 +1,38 @@
+{
+  "run_id": "RUN-20260603-195755-WRONG",
+  "history": [
+    {
+      "timestamp": "2026-06-03T19:57:55.790994",
+      "action": "import_origin",
+      "description": "坐标原点说明导入完成",
+      "details": {
+        "origin_id": "ORIGIN-V2026-001",
+        "import_date": "2026-06-01",
+        "coordinate_system": "WGS84-UTM50N"
+      }
+    },
+    {
+      "timestamp": "2026-06-03T19:57:55.791217",
+      "action": "supplement_photos",
+      "description": "阿景补看巡检照片编号完成",
+      "details": {
+        "supplemented_by": "阿景",
+        "supplement_count": 2
+      }
+    },
+    {
+      "timestamp": "2026-06-03T19:57:55.791233",
+      "action": "process_obstacles",
+      "description": "三维标注视图处理完成",
+      "details": {
+        "total": 2,
+        "normal": 0,
+        "needs_review": 0,
+        "old_caliber": 0,
+        "wrong_caliber": 2,
+        "caliber_updated": 0
+      }
+    }
+  ],
+  "generated_at": "2026-06-03T19:57:55.791785"
+}
