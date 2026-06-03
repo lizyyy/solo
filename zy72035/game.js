@@ -86,14 +86,19 @@ let gameState = {
     scenarioTimeLeft: 15,
     isPaused: false,
     isRunning: false,
+    isTransitioning: false,
     choices: [],
     startTime: null,
     pauseTime: 0,
+    pauseStart: null,
+    pauseCount: 0,
+    pauseEvents: [],
     isNewbie: Math.random() > 0.5
 };
 
 let gameTimer = null;
 let scenarioTimer = null;
+let lastHandledTimeoutScenario = -1;
 
 const DOM = {
     score: document.getElementById('score'),
@@ -157,15 +162,21 @@ function startGame() {
         scenarioTimeLeft: SCENARIOS[0].timeLimit,
         isPaused: false,
         isRunning: true,
+        isTransitioning: false,
         choices: [],
         startTime: Date.now(),
         pauseTime: 0,
+        pauseStart: null,
+        pauseCount: 0,
+        pauseEvents: [],
         isNewbie: Math.random() > 0.5
     };
+    lastHandledTimeoutScenario = -1;
     
     DOM.startScreen.classList.add('hidden');
     DOM.scenarioScreen.classList.remove('hidden');
     DOM.resultScreen.classList.add('hidden');
+    DOM.pauseBtn.style.display = '';
     
     showScenario();
     startTimers();
@@ -174,15 +185,16 @@ function startGame() {
 
 function startTimers() {
     gameTimer = setInterval(() => {
-        if (!gameState.isPaused && gameState.isRunning) {
+        if (!gameState.isPaused && gameState.isRunning && !gameState.isTransitioning) {
             gameState.timeLeft--;
             gameState.scenarioTimeLeft--;
             
-            if (gameState.scenarioTimeLeft <= 0) {
+            if (gameState.scenarioTimeLeft <= 0 && lastHandledTimeoutScenario !== gameState.currentScenario) {
+                lastHandledTimeoutScenario = gameState.currentScenario;
                 handleTimeout();
             }
             
-            if (gameState.timeLeft <= 0) {
+            if (gameState.timeLeft <= 0 && gameState.isRunning) {
                 endGame('timeout');
             }
             
@@ -197,16 +209,28 @@ function stopTimers() {
 }
 
 function togglePause() {
+    if (!gameState.isRunning || gameState.isTransitioning) return;
+    
     gameState.isPaused = !gameState.isPaused;
     
     if (gameState.isPaused) {
         DOM.scenarioScreen.classList.add('hidden');
         DOM.pauseScreen.classList.remove('hidden');
         gameState.pauseStart = Date.now();
+        gameState.pauseCount++;
     } else {
         DOM.pauseScreen.classList.add('hidden');
         DOM.scenarioScreen.classList.remove('hidden');
-        gameState.pauseTime += Date.now() - gameState.pauseStart;
+        const pauseDuration = Date.now() - gameState.pauseStart;
+        gameState.pauseTime += pauseDuration;
+        gameState.pauseEvents.push({
+            index: gameState.pauseCount,
+            resumedAt: new Date().toISOString(),
+            durationSec: Math.round(pauseDuration / 1000),
+            scenarioIndex: gameState.currentScenario,
+            scenarioTitle: SCENARIOS[gameState.currentScenario]?.title || '未知',
+            scoreAtPause: gameState.score
+        });
     }
 }
 
@@ -229,6 +253,9 @@ function showScenario() {
 }
 
 function handleChoice(option) {
+    if (gameState.isTransitioning) return;
+    gameState.isTransitioning = true;
+    
     const scenario = SCENARIOS[gameState.currentScenario];
     const timeTaken = scenario.timeLimit - gameState.scenarioTimeLeft;
     
@@ -254,17 +281,22 @@ function handleChoice(option) {
     highlightChoice(option.id, option.correct);
     
     setTimeout(() => {
+        lastHandledTimeoutScenario = -1;
         gameState.currentScenario++;
         if (gameState.currentScenario >= SCENARIOS.length) {
             endGame('complete');
         } else {
             showScenario();
         }
+        gameState.isTransitioning = false;
         updateUI();
     }, 1000);
 }
 
 function handleTimeout() {
+    if (gameState.isTransitioning) return;
+    gameState.isTransitioning = true;
+    
     const scenario = SCENARIOS[gameState.currentScenario];
     
     const choiceRecord = {
@@ -287,12 +319,14 @@ function handleTimeout() {
     showToast('作答超时！', 'warning');
     
     setTimeout(() => {
+        lastHandledTimeoutScenario = -1;
         gameState.currentScenario++;
         if (gameState.currentScenario >= SCENARIOS.length) {
             endGame('complete');
         } else {
             showScenario();
         }
+        gameState.isTransitioning = false;
         updateUI();
     }, 1000);
 }
@@ -323,6 +357,9 @@ function endGame(reason) {
         totalTime: totalTime,
         isNewbie: gameState.isNewbie,
         choices: gameState.choices,
+        pauseCount: gameState.pauseCount,
+        pauseEvents: gameState.pauseEvents,
+        totalPauseSec: Math.round(gameState.pauseTime / 1000),
         analysis: analyzeResult()
     };
     
@@ -364,6 +401,7 @@ function showResult(result) {
     DOM.scenarioScreen.classList.add('hidden');
     DOM.pauseScreen.classList.add('hidden');
     DOM.resultScreen.classList.remove('hidden');
+    DOM.pauseBtn.style.display = 'none';
     
     const passed = result.score >= 60;
     DOM.resultTitle.textContent = passed ? '🎉 巡检通过！' : '❌ 巡检未通过';
@@ -373,6 +411,7 @@ function showResult(result) {
     
     renderChoicesLog(result.choices);
     renderFailureReasons(result);
+    renderPauseLog(result);
 }
 
 function renderChoicesLog(choices) {
@@ -450,12 +489,43 @@ function renderFailureReasons(result) {
     });
 }
 
+function renderPauseLog(result) {
+    let existing = document.getElementById('pauseLogSection');
+    if (existing) existing.remove();
+    
+    if (!result.pauseCount || result.pauseCount === 0) return;
+    
+    const section = document.createElement('div');
+    section.id = 'pauseLogSection';
+    section.className = 'result-analysis';
+    section.innerHTML = '<h3>⏸️ 暂停记录</h3>';
+    
+    const log = document.createElement('div');
+    log.className = 'choices-log';
+    
+    result.pauseEvents.forEach(evt => {
+        const item = document.createElement('div');
+        item.className = 'choice-item timeout';
+        item.innerHTML = `
+            <div class="choice-title">第${evt.index}次暂停 - ${evt.scenarioTitle}</div>
+            <div class="choice-detail">暂停时得分：${evt.scoreAtPause}分</div>
+            <div class="choice-detail">暂停时长：${evt.durationSec}秒</div>
+            <div class="choice-detail">恢复时间：${new Date(evt.resumedAt).toLocaleString('zh-CN')}</div>
+        `;
+        log.appendChild(item);
+    });
+    
+    section.appendChild(log);
+    DOM.failureReasons.parentElement.appendChild(section);
+}
+
 function resetGame() {
     stopTimers();
     DOM.startScreen.classList.remove('hidden');
     DOM.resultScreen.classList.add('hidden');
     DOM.scenarioScreen.classList.add('hidden');
     DOM.pauseScreen.classList.add('hidden');
+    DOM.pauseBtn.style.display = 'none';
     updateUI();
 }
 
@@ -467,7 +537,7 @@ function updateUI() {
 
 function exportResult() {
     const history = getHistory();
-    const latest = history[history.length - 1];
+    const latest = history[0];
     
     if (!latest) {
         showToast('没有可导出的数据', 'error');
@@ -504,16 +574,29 @@ function generateHumanReadableSummary(record) {
     summary.push(`【基本情况】
 - 参与人员：${record.isNewbie ? '新手学员' : '有经验学员'}
 - 总用时：${record.totalTime}秒
-- 正确判断：${record.analysis.correctCount}/${SCENARIOS.length}题`);
+- 正确判断：${record.analysis.correctCount}/${SCENARIOS.length}题
+- 暂停次数：${record.pauseCount || 0}次
+- 暂停总时长：${record.totalPauseSec || 0}秒`);
 
     const errors = record.choices.filter(c => !c.isCorrect);
     if (errors.length > 0) {
         summary.push(`【错误复盘】`);
         errors.forEach((e, i) => {
+            const penaltyLabel = e.penaltyType === 'rule' ? '规则理解' : e.isTimeout ? '操作超时' : '操作速度';
             summary.push(`${i + 1}. ${e.scenarioTitle}
    - 错误选择：${e.choiceText}
    - 扣分原因：${e.reason}
-   - 扣分类型：${e.penaltyType === 'rule' ? '规则理解' : '操作速度'}`);
+   - 扣分类型：${penaltyLabel}`);
+        });
+    }
+    
+    if (record.pauseEvents && record.pauseEvents.length > 0) {
+        summary.push(`【暂停记录】`);
+        record.pauseEvents.forEach((evt, i) => {
+            summary.push(`${i + 1}. 第${evt.index}次暂停 - ${evt.scenarioTitle}
+   - 暂停时得分：${evt.scoreAtPause}分
+   - 暂停时长：${evt.durationSec}秒
+   - 恢复时间：${new Date(evt.resumedAt).toLocaleString('zh-CN')}`);
         });
     }
     
@@ -732,6 +815,10 @@ function loadHistory() {
         const item = document.createElement('div');
         item.className = `history-item ${record.passed ? 'pass' : 'fail'}`;
         
+        const pauseInfo = record.pauseCount > 0
+            ? `<p>暂停：${record.pauseCount}次，共${record.totalPauseSec || 0}秒</p>`
+            : '';
+        
         item.innerHTML = `
             <div class="history-header">
                 <span class="history-score">${record.score}分</span>
@@ -745,6 +832,7 @@ function loadHistory() {
                 <p>正确：${record.analysis.correctCount}/${SCENARIOS.length}</p>
                 <p>规则错误：${record.analysis.ruleErrors}次</p>
                 <p>速度错误：${record.analysis.speedErrors}次</p>
+                ${pauseInfo}
             </details>
         `;
         
