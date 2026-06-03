@@ -1,0 +1,406 @@
+{
+  "project_id": "PRJ_20260603202311_0C35",
+  "project_name": "老旧小区楼间距复测",
+  "records": {
+    "REC_20260603202311_A408": {
+      "record_id": "REC_20260603202311_A408",
+      "community_name": "阳光花园",
+      "building_a": "1号楼",
+      "building_b": "2号楼",
+      "measured_distance": 18.5,
+      "route_points": [
+        {
+          "x": 0.0,
+          "y": 0.0
+        },
+        {
+          "x": 10.0,
+          "y": 0.0
+        },
+        {
+          "x": 10.0,
+          "y": 5.0
+        },
+        {
+          "x": 18.5,
+          "y": 5.0
+        }
+      ],
+      "route_length": 23.5,
+      "is_supplementary": false,
+      "length_recalculated": true,
+      "obstacle_remark": {
+        "record_id": "REC_20260603202311_A408",
+        "original_line_number": 2,
+        "original_content": "楼间有绿化带，需绕行测量",
+        "manual_changes": [
+          "[2026-06-03 20:23:11] 许工: 已补看1号楼楼层剖面草图: 1号楼为6层砖混结构，楼间距测量起点为单元门外侧",
+          "[2026-06-03 20:23:11] 系统: 导出明细文件: PRJ_20260603202311_0C35_楼间距复测报告.xlsx"
+        ],
+        "processing_status": "已导出",
+        "route_length": null,
+        "original_route_length": null,
+        "building_a": "1号楼",
+        "building_b": "2号楼",
+        "measured_distance": 18.5,
+        "supplement_note": null,
+        "is_duplicate": false,
+        "needs_customer_review": false,
+        "review_evidence": {},
+        "created_at": "2026-06-03 20:23:11.234429",
+        "updated_at": "2026-06-03 20:23:11.398327",
+        "updated_by": "系统"
+      },
+      "floor_sketches": [
+        {
+          "sketch_id": "SKT_20260603202311_2F37",
+          "record_id": "REC_20260603202311_A408",
+          "file_path": "data/REC_20260603202311_A408_floor_sketch.png",
+          "building": "1号楼",
+          "floors": 6,
+          "has_supplement_view": true,
+          "view_notes": [
+            "[2026-06-03 20:23:11] 许工: 1号楼为6层砖混结构，楼间距测量起点为单元门外侧"
+          ],
+          "reviewed_by": "许工",
+          "reviewed_at": "2026-06-03 20:23:11.235241",
+          "created_at": "2026-06-03 20:23:11.235219"
+        }
+      ],
+      "export_screenshots": [
+        "data/PRJ_20260603202311_0C35_楼间距复测报告.xlsx"
+      ],
+      "created_at": "2026-06-03 20:23:11.234448",
+      "updated_at": "2026-06-03 20:23:11.235243"
+    },
+    "REC_20260603202311_F9C9": {
+      "record_id": "REC_20260603202311_F9C9",
+      "community_name": "阳光花园",
+      "building_a": "2号楼",
+      "building_b": "3号楼",
+      "measured_distance": 22.3,
+      "route_points": [
+        {
+          "x": 0,
+          "y": 0
+        },
+        {
+          "x": 8,
+          "y": 0
+        },
+        {
+          "x": 8,
+          "y": 6
+        },
+        {
+          "x": 22.3,
+          "y": 6
+        }
+      ],
+      "route_length": 28.3,
+      "is_supplementary": true,
+      "length_recalculated": true,
+      "obstacle_remark": {
+        "record_id": "REC_20260603202311_F9C9",
+        "original_line_number": 3,
+        "original_content": "老旧围墙阻挡，补录绕行点",
+        "manual_changes": [
+          "[2026-06-03 20:23:11] 许工: 补录路线点: 2 -> 4个点",
+          "[2026-06-03 20:23:11] 许工: 补录备注: 楼间围墙位置更新，重新测量路线点",
+          "[2026-06-03 20:23:11] 许工: 标记为待重算: 补录记录但未重算路线长度",
+          "[2026-06-03 20:23:11] 许工: 提交客户复核: 补录路线未重算，请客户复核: 补录记录但未重算路线长度",
+          "[2026-06-03 20:23:11] 许工: 已补看2号楼楼层剖面草图: 2号楼为7层框架结构，东北角有突出阳台，影响楼间距测量",
+          "[2026-06-03 20:23:11] 系统: 导出明细文件: PRJ_20260603202311_0C35_楼间距复测报告.xlsx",
+          "[2026-06-03 20:23:11] 许工: 手动重算路线长度: 15.0 -> 28.3",
+          "[2026-06-03 20:23:11] 许工: 客户复核完成，已重算并标记为已核实"
+        ],
+        "processing_status": "已核实",
+        "route_length": 28.3,
+        "original_route_length": 15.0,
+        "building_a": "2号楼",
+        "building_b": "3号楼",
+        "measured_distance": 22.3,
+        "supplement_note": "楼间围墙位置更新，重新测量路线点",
+        "is_duplicate": false,
+        "needs_customer_review": false,
+        "review_evidence": {},
+        "created_at": "2026-06-03 20:23:11.234525",
+        "updated_at": "2026-06-03 20:23:11.405106",
+        "updated_by": "许工"
+      },
+      "floor_sketches": [
+        {
+          "sketch_id": "SKT_20260603202311_1885",
+          "record_id": "REC_20260603202311_F9C9",
+          "file_path": "data/REC_20260603202311_A408_floor_sketch.png",
+          "building": "2号楼",
+          "floors": 7,
+          "has_supplement_view": true,
+          "view_notes": [
+            "[2026-06-03 20:23:11] 许工: 2号楼为7层框架结构，东北角有突出阳台，影响楼间距测量"
+          ],
+          "reviewed_by": "许工",
+          "reviewed_at": "2026-06-03 20:23:11.235280",
+          "created_at": "2026-06-03 20:23:11.235270"
+        }
+      ],
+      "export_screenshots": [
+        "data/PRJ_20260603202311_0C35_楼间距复测报告.xlsx"
+      ],
+      "created_at": "2026-06-03 20:23:11.234529",
+      "updated_at": "2026-06-03 20:23:11.405084"
+    },
+    "REC_20260603202311_340A": {
+      "record_id": "REC_20260603202311_340A",
+      "community_name": "阳光花园",
+      "building_a": "3号楼",
+      "building_b": "4号楼",
+      "measured_distance": 15.8,
+      "route_points": [
+        {
+          "x": 0.0,
+          "y": 0.0
+        },
+        {
+          "x": 15.8,
+          "y": 0.0
+        }
+      ],
+      "route_length": 15.8,
+      "is_supplementary": false,
+      "length_recalculated": true,
+      "obstacle_remark": {
+        "record_id": "REC_20260603202311_340A",
+        "original_line_number": 4,
+        "original_content": "无障碍，直接测量",
+        "manual_changes": [
+          "[2026-06-03 20:23:11] 系统: 导出明细文件: PRJ_20260603202311_0C35_楼间距复测报告.xlsx"
+        ],
+        "processing_status": "已导出",
+        "route_length": null,
+        "original_route_length": null,
+        "building_a": "3号楼",
+        "building_b": "4号楼",
+        "measured_distance": 15.8,
+        "supplement_note": null,
+        "is_duplicate": false,
+        "needs_customer_review": false,
+        "review_evidence": {},
+        "created_at": "2026-06-03 20:23:11.234575",
+        "updated_at": "2026-06-03 20:23:11.398346",
+        "updated_by": "系统"
+      },
+      "floor_sketches": [],
+      "export_screenshots": [
+        "data/PRJ_20260603202311_0C35_楼间距复测报告.xlsx"
+      ],
+      "created_at": "2026-06-03 20:23:11.234578",
+      "updated_at": "2026-06-03 20:23:11.234579"
+    },
+    "REC_20260603202311_4813": {
+      "record_id": "REC_20260603202311_4813",
+      "community_name": "阳光花园",
+      "building_a": "1号楼",
+      "building_b": "3号楼",
+      "measured_distance": 35.2,
+      "route_points": [
+        {
+          "x": 0.0,
+          "y": 0.0
+        },
+        {
+          "x": 20.0,
+          "y": 0.0
+        }
+      ],
+      "route_length": 20.0,
+      "is_supplementary": false,
+      "length_recalculated": true,
+      "obstacle_remark": {
+        "record_id": "REC_20260603202311_4813",
+        "original_line_number": 5,
+        "original_content": "有停车场出入口，补录完整路线",
+        "manual_changes": [
+          "[2026-06-03 20:23:11] 系统: 导出明细文件: PRJ_20260603202311_0C35_楼间距复测报告.xlsx"
+        ],
+        "processing_status": "已导出",
+        "route_length": null,
+        "original_route_length": null,
+        "building_a": "1号楼",
+        "building_b": "3号楼",
+        "measured_distance": 35.2,
+        "supplement_note": null,
+        "is_duplicate": false,
+        "needs_customer_review": false,
+        "review_evidence": {},
+        "created_at": "2026-06-03 20:23:11.234620",
+        "updated_at": "2026-06-03 20:23:11.398353",
+        "updated_by": "系统"
+      },
+      "floor_sketches": [],
+      "export_screenshots": [
+        "data/PRJ_20260603202311_0C35_楼间距复测报告.xlsx"
+      ],
+      "created_at": "2026-06-03 20:23:11.234623",
+      "updated_at": "2026-06-03 20:23:11.234623"
+    },
+    "REC_20260603202311_EF78": {
+      "record_id": "REC_20260603202311_EF78",
+      "community_name": "阳光花园",
+      "building_a": "4号楼",
+      "building_b": "5号楼",
+      "measured_distance": 12.0,
+      "route_points": [
+        {
+          "x": 0.0,
+          "y": 0.0
+        },
+        {
+          "x": 12.0,
+          "y": 0.0
+        }
+      ],
+      "route_length": 12.0,
+      "is_supplementary": false,
+      "length_recalculated": true,
+      "obstacle_remark": {
+        "record_id": "REC_20260603202311_EF78",
+        "original_line_number": 6,
+        "original_content": "无障碍，直接测量",
+        "manual_changes": [
+          "[2026-06-03 20:23:11] 系统: 导出明细文件: PRJ_20260603202311_0C35_楼间距复测报告.xlsx"
+        ],
+        "processing_status": "已导出",
+        "route_length": null,
+        "original_route_length": null,
+        "building_a": "4号楼",
+        "building_b": "5号楼",
+        "measured_distance": 12.0,
+        "supplement_note": null,
+        "is_duplicate": false,
+        "needs_customer_review": false,
+        "review_evidence": {},
+        "created_at": "2026-06-03 20:23:11.234667",
+        "updated_at": "2026-06-03 20:23:11.398360",
+        "updated_by": "系统"
+      },
+      "floor_sketches": [],
+      "export_screenshots": [
+        "data/PRJ_20260603202311_0C35_楼间距复测报告.xlsx"
+      ],
+      "created_at": "2026-06-03 20:23:11.234669",
+      "updated_at": "2026-06-03 20:23:11.234669"
+    },
+    "REC_20260603202311_16DA": {
+      "record_id": "REC_20260603202311_16DA",
+      "community_name": "阳光花园",
+      "building_a": "2号楼",
+      "building_b": "3号楼",
+      "measured_distance": 22.3,
+      "route_points": [
+        {
+          "x": 0.0,
+          "y": 0.0
+        },
+        {
+          "x": 15.0,
+          "y": 0.0
+        }
+      ],
+      "route_length": 15.0,
+      "is_supplementary": false,
+      "length_recalculated": true,
+      "obstacle_remark": {
+        "record_id": "REC_20260603202311_16DA",
+        "original_line_number": 7,
+        "original_content": "重复导入测试，楼间有围墙",
+        "manual_changes": [
+          "[2026-06-03 20:23:11] 许工: 检测到重复记录: 2号楼-3号楼",
+          "[2026-06-03 20:23:11] 系统: 导出明细文件: PRJ_20260603202311_0C35_楼间距复测报告.xlsx"
+        ],
+        "processing_status": "已导出",
+        "route_length": null,
+        "original_route_length": null,
+        "building_a": "2号楼",
+        "building_b": "3号楼",
+        "measured_distance": 22.3,
+        "supplement_note": null,
+        "is_duplicate": true,
+        "needs_customer_review": false,
+        "review_evidence": {},
+        "created_at": "2026-06-03 20:23:11.234708",
+        "updated_at": "2026-06-03 20:23:11.398367",
+        "updated_by": "系统"
+      },
+      "floor_sketches": [],
+      "export_screenshots": [
+        "data/PRJ_20260603202311_0C35_楼间距复测报告.xlsx"
+      ],
+      "created_at": "2026-06-03 20:23:11.234710",
+      "updated_at": "2026-06-03 20:23:11.234711"
+    }
+  },
+  "import_history": [
+    {
+      "timestamp": "2026-06-03 20:23:11",
+      "file": "sample_obstacle_remarks.csv",
+      "total_rows": 6,
+      "imported": 5,
+      "duplicates": 1,
+      "errors": []
+    }
+  ],
+  "self_check_results": [
+    {
+      "check_name": "重复导入检测",
+      "passed": false,
+      "timestamp": "2026-06-03 20:23:11",
+      "total_records": 6,
+      "duplicate_count": 1,
+      "duplicates": [
+        {
+          "record_id": "REC_20260603202311_16DA",
+          "original_record_id": "REC_20260603202311_F9C9",
+          "key": "2号楼-3号楼-阳光花园",
+          "line_number": 7
+        }
+      ],
+      "message": "发现 1 条重复记录"
+    },
+    {
+      "check_name": "补录路线未重算检测",
+      "passed": true,
+      "timestamp": "2026-06-03 20:23:11",
+      "supplementary_count": 1,
+      "not_recalculated_count": 0,
+      "issues": [],
+      "message": "所有补录记录均已重算"
+    },
+    {
+      "check_name": "补录后重算验证",
+      "passed": true,
+      "timestamp": "2026-06-03 20:23:11",
+      "validated_count": 1,
+      "mismatch_count": 0,
+      "validated": [
+        {
+          "record_id": "REC_20260603202311_F9C9",
+          "buildings": "2号楼-3号楼",
+          "length": 28.3,
+          "point_count": 4
+        }
+      ],
+      "issues": [],
+      "message": "已验证 1 条补录记录重算正确"
+    },
+    {
+      "check_name": "导出一致性检测",
+      "passed": true,
+      "timestamp": "2026-06-03 20:23:11",
+      "checked_records": 6,
+      "inconsistency_count": 0,
+      "issues": [],
+      "message": "所有记录导出视图一致"
+    }
+  ]
+}

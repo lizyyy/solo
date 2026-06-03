@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "old-community-resurvey"
+version = "0.1.0"
+description = "老旧小区楼间距复测系统"
+requires-python = ">=3.9"
+dependencies = [
+    "pandas>=2.0.0",
+    "pydantic>=2.0.0",
+    "click>=8.1.0",
+    "fastapi>=0.100.0",
+    "uvicorn>=0.23.0",
+    "openpyxl>=3.1.0",
+]
+
+[project.scripts]
+resurvey = "resurvey.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["resurvey*"]
+exclude = ["data", "examples", "tests"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
