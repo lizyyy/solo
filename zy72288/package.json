@@ -1,0 +1,14 @@
+{
+  "name": "logistics-sorting-line-demo",
+  "version": "1.0.0",
+  "description": "物流分拣线堵点演示系统",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node tests/demo.js",
+    "self-check": "node src/selfCheck.js"
+  },
+  "keywords": ["logistics", "sorting", "3d-annotation"],
+  "author": "",
+  "license": "ISC"
+}
