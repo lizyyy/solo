@@ -1,0 +1,30 @@
+[
+  {
+    "id": "REC_001",
+    "arm_id": "A",
+    "impressions": 1000,
+    "clicks": 120,
+    "click_rate": "0.12",
+    "note": "顺利记录 - 正常小数格式",
+    "batch": "第一次导入"
+  },
+  {
+    "id": "REC_002",
+    "arm_id": "B",
+    "impressions": 1000,
+    "clicks": 85,
+    "click_rate": "8.5%",
+    "note": "百分数和小数混着出现 - 待复核",
+    "batch": "第一次导入"
+  },
+  {
+    "id": "REC_003",
+    "arm_id": "C",
+    "impressions": 1000,
+    "clicks": 150,
+    "click_rate": "0.15",
+    "note": "旧口径数据 - 需要补录修正",
+    "batch": "第一次导入",
+    "needs_old_formula": true
+  }
+]

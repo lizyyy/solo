@@ -1,0 +1,69 @@
+{
+  "history": [
+    {
+      "record_id": "REC_001",
+      "arm_id": "A",
+      "impressions": 1000,
+      "clicks": 120,
+      "click_rate_input": "0.12",
+      "click_rate_parsed": 0.12,
+      "rate_format": "decimal",
+      "score": 0.11762553267168052,
+      "formula_used": "汤普森采样",
+      "use_old_formula": false,
+      "timestamp": "2026-06-04T07:26:29.252710",
+      "note": "顺利记录 - 正常小数格式"
+    },
+    {
+      "record_id": "REC_002",
+      "arm_id": "B",
+      "impressions": 1000,
+      "clicks": 85,
+      "click_rate_input": "8.5%",
+      "click_rate_parsed": 0.085,
+      "rate_format": "percent",
+      "score": 0.09172532973888657,
+      "formula_used": "汤普森采样",
+      "use_old_formula": false,
+      "timestamp": "2026-06-04T07:26:29.252731",
+      "note": "百分数和小数混着出现 - 待复核"
+    },
+    {
+      "record_id": "REC_003",
+      "arm_id": "C",
+      "impressions": 1000,
+      "clicks": 150,
+      "click_rate_input": "0.15",
+      "click_rate_parsed": 0.15,
+      "rate_format": "decimal",
+      "score": 0.1491427178528534,
+      "formula_used": "汤普森采样",
+      "use_old_formula": false,
+      "timestamp": "2026-06-04T07:26:29.252738",
+      "note": "旧口径数据 - 需要补录修正"
+    }
+  ],
+  "correction_log": [],
+  "arms_summary": {
+    "A": {
+      "alpha": 1.0,
+      "beta": 1.0,
+      "impressions": 1000,
+      "clicks": 120
+    },
+    "B": {
+      "alpha": 1.0,
+      "beta": 1.0,
+      "impressions": 1000,
+      "clicks": 85
+    },
+    "C": {
+      "alpha": 1.0,
+      "beta": 1.0,
+      "impressions": 1000,
+      "clicks": 150
+    }
+  },
+  "run_id": "step1_first_import",
+  "saved_at": "2026-06-04T07:26:29.252866"
+}
