@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实验室危化品柜布局 - 小看板</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #f8f9fa;
+            color: #343a40;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #1864ab 0%, #339af0 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(24, 100, 171, 0.2);
+        }
+        .header h1 { font-size: 24px; margin-bottom: 8px; }
+        .header p { opacity: 0.9; font-size: 14px; }
+
+        .toolbar {
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn-primary { background: #1864ab; color: white; }
+        .btn-primary:hover { background: #1971c2; }
+        .btn-success { background: #2f9e44; color: white; }
+        .btn-success:hover { background: #37b24d; }
+        .btn-warning { background: #f59f00; color: white; }
+        .btn-warning:hover { background: #f08c00; }
+        .btn-info { background: #15aabf; color: white; }
+        .btn-info:hover { background: #1098ad; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 1200px) {
+            .grid { grid-template-columns: 1fr; }
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            margin-bottom: 20px;
+        }
+        .card h2 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            color: #343a40;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card h2::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: #1864ab;
+            border-radius: 2px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .stat-item {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #1864ab;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #868e96;
+            margin-top: 4px;
+        }
+        .stat-warning .stat-value { color: #f08c00; }
+        .stat-danger .stat-value { color: #e03131; }
+        .stat-success .stat-value { color: #2f9e44; }
+
+        .origin-info {
+            background: #e7f5ff;
+            border-left: 4px solid #339af0;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+        .origin-info h3 {
+            color: #1864ab;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+        .origin-info p {
+            font-size: 13px;
+            color: #495057;
+            line-height: 1.6;
+        }
+
+        .issue-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .issue-item {
+            background: #fff5f5;
+            border-left: 4px solid #fa5252;
+            padding: 16px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .issue-item.resolved {
+            background: #ebfbee;
+            border-left-color: #40c057;
+        }
+        .issue-item.pending-review {
+            background: #fff9db;
+            border-left-color: #fcc419;
+        }
+        .issue-item.rerun {
+            background: #e7f5ff;
+            border-left-color: #339af0;
+        }
+        .issue-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .issue-id {
+            font-weight: bold;
+            color: #c92a2a;
+        }
+        .issue-status {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-detected { background: #ffa8a8; color: #c92a2a; }
+        .status-pending { background: #ffec99; color: #e67700; }
+        .status-fixed { background: #a5d8ff; color: #1864ab; }
+        .status-rerun { background: #b2f2bb; color: #2b8a3e; }
+        .status-resolved { background: #8ce99a; color: #2b8a3e; }
+
+        .issue-desc {
+            font-size: 13px;
+            color: #495057;
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        .issue-meta {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 6px;
+            font-size: 12px;
+            color: #868e96;
+            margin-bottom: 12px;
+        }
+        .issue-meta span strong {
+            color: #495057;
+            margin-right: 4px;
+        }
+        .issue-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 6px;
+        }
+
+        .route-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .route-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+        .route-item.has-issue {
+            background: #fff5f5;
+            border: 1px solid #ffa8a8;
+        }
+        .route-name { font-weight: 500; }
+        .route-badge {
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+        }
+        .badge-supplementary { background: #ffd8a8; color: #d9480f; }
+        .badge-normal { background: #d3f9d8; color: #2b8a3e; }
+        .badge-issue { background: #ffa8a8; color: #c92a2a; }
+
+        .log-list {
+            max-height: 300px;
+            overflow-y: auto;
+            font-size: 12px;
+            font-family: 'Monaco', 'Consolas', monospace;
+        }
+        .log-item {
+            padding: 8px;
+            border-bottom: 1px solid #f1f3f5;
+            line-height: 1.5;
+        }
+        .log-time { color: #868e96; }
+        .log-operator { color: #1864ab; font-weight: bold; }
+        .log-action { color: #2f9e44; }
+
+        .steps-guide {
+            background: #fff9db;
+            border-left: 4px solid #fcc419;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .steps-guide h3 {
+            color: #e67700;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+        .step-item {
+            display: flex;
+            gap: 12px;
+            padding: 8px 0;
+            font-size: 13px;
+            align-items: flex-start;
+        }
+        .step-number {
+            width: 24px;
+            height: 24px;
+            background: #f08c00;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+        .step-content strong { color: #343a40; }
+        .step-content p { color: #868e96; font-size: 12px; margin-top: 2px; }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #868e96;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-content h3 {
+            margin-bottom: 16px;
+            color: #343a40;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        .btn-secondary {
+            background: #868e96;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #495057;
+        }
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            background: #343a40;
+            color: white;
+            border-radius: 8px;
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+        }
+        .toast.success { background: #2f9e44; }
+        .toast.error { background: #e03131; }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .screenshot-preview {
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-top: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🧪 实验室危化品柜布局分析系统</h1>
+        <p>安全半径表管理 · 补录路线检测 · 坐标原点说明 · 导出带标注的分析报告</p>
+    </div>
+
+    <div class="toolbar">
+        <button class="btn btn-primary" onclick="loadDemoData()">🚀 加载演示数据</button>
+        <button class="btn btn-success" onclick="runThreeStepProcess()">⚡ 运行标准三步流程</button>
+        <button class="btn btn-warning" onclick="showStepsGuide()">📋 查看流程说明</button>
+        <button class="btn btn-info" onclick="exportReport()">🖼️ 导出分析报告</button>
+        <span id="projectId" style="margin-left: auto; color: #868e96; font-size: 13px;"></span>
+    </div>
+
+    <div id="stepsGuide" class="steps-guide" style="display: none;">
+        <h3>📍 标准三步流程（用户必看细节）</h3>
+        <div class="step-item">
+            <div class="step-number">1</div>
+            <div class="step-content">
+                <strong>安全半径表第一次导入</strong>
+                <p>导入危化品柜位置、安全半径、路线数据，系统自动检测问题</p>
+            </div>
+        </div>
+        <div class="step-item">
+            <div class="step-number">2</div>
+            <div class="step-content">
+                <strong>园区运维小陶补看坐标原点说明</strong>
+                <p>检查坐标原点校准记录，处理检测到的问题（补录路线未重算等）</p>
+            </div>
+        </div>
+        <div class="step-item">
+            <div class="step-number">3</div>
+            <div class="step-content">
+                <strong>导出截图更新</strong>
+                <p>导出带标注的报告，说明问题原因、缺什么材料、下一步找谁</p>
+            </div>
+        </div>
+        <p style="margin-top: 12px; font-size: 12px; color: #d9480f;">
+            ⚠️ 关键细节：碰到「补录路线没有重新计算长度」时，别急着归正常，留给展陈客户复核
+        </p>
+    </div>
+
+    <div id="loading" class="loading">
+        <p>⏳ 正在加载数据...</p>
+    </div>
+
+    <div id="content" style="display: none;">
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="statCabinets">0</div>
+                <div class="stat-label">危化品柜</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="statRoutes">0</div>
+                <div class="stat-label">路线总数</div>
+            </div>
+            <div class="stat-item stat-danger">
+                <div class="stat-value" id="statIssues">0</div>
+                <div class="stat-label">问题总数</div>
+            </div>
+            <div class="stat-item stat-warning">
+                <div class="stat-value" id="statPendingClient">0</div>
+                <div class="stat-label">待客户复核</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="statPendingOps">0</div>
+                <div class="stat-label">待运维处理</div>
+            </div>
+            <div class="stat-item stat-success">
+                <div class="stat-value" id="statResolved">0</div>
+                <div class="stat-label">已解决</div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div>
+                <div class="card">
+                    <h2>📍 坐标原点说明</h2>
+                    <div id="originInfo">
+                        <p style="color: #868e96;">暂无坐标原点数据</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>🚨 问题列表</h2>
+                    <div id="issueList" class="issue-list">
+                        <p style="color: #868e96;">暂无问题</p>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="card">
+                    <h2>🛤️ 路线列表</h2>
+                    <div id="routeList" class="route-list">
+                        <p style="color: #868e96;">暂无路线数据</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>📝 操作日志</h2>
+                    <div id="logList" class="log-list">
+                        <p style="color: #868e96;">暂无操作日志</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="fixModal" class="modal">
+        <div class="modal-content">
+            <h3>🔧 人工修正问题</h3>
+            <input type="hidden" id="fixIssueId">
+            <div class="form-group">
+                <label>修正说明</label>
+                <textarea id="fixNotes" placeholder="请详细说明修正内容..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>修正后的值（可选，米）</label>
+                <input type="number" id="fixValue" step="0.01" placeholder="如：5.8">
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeModal('fixModal')">取消</button>
+                <button class="btn btn-primary" onclick="submitFix()">提交修正</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="reviewModal" class="modal">
+        <div class="modal-content">
+            <h3>👀 展陈客户复核</h3>
+            <input type="hidden" id="reviewIssueId">
+            <div class="form-group">
+                <label>复核结果</label>
+                <select id="reviewResult">
+                    <option value="true">✅ 通过</option>
+                    <option value="false">❌ 驳回</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>复核意见</label>
+                <textarea id="reviewNotes" placeholder="请填写复核意见..."></textarea>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeModal('reviewModal')">取消</button>
+                <button class="btn btn-primary" onclick="submitReview()">提交复核</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast"></div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+        let currentProjectId = null;
+
+        async function apiCall(endpoint, method = 'GET', data = null) {
+            try {
+                const options = {
+                    method,
+                    headers: { 'Content-Type': 'application/json' }
+                };
+                if (data) options.body = JSON.stringify(data);
+
+                const response = await fetch(`${API_BASE}${endpoint}`, options);
+                const result = await response.json();
+                return result;
+            } catch (error) {
+                showToast('API调用失败: ' + error.message, 'error');
+                throw error;
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            setTimeout(() => {
+                toast.className = 'toast';
+            }, 3000);
+        }
+
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function showStepsGuide() {
+            const guide = document.getElementById('stepsGuide');
+            guide.style.display = guide.style.display === 'none' ? 'block' : 'none';
+        }
+
+        async function loadDemoData() {
+            showToast('正在加载演示数据...');
+            const result = await apiCall('/project', 'POST', { use_demo: true });
+            currentProjectId = result.project_id;
+            document.getElementById('projectId').textContent = '项目ID: ' + currentProjectId;
+            renderProject(result);
+            showToast('演示数据加载成功！');
+        }
+
+        async function runThreeStepProcess() {
+            showToast('正在执行标准三步流程...');
+            const result = await apiCall('/three-step-process', 'POST', { use_demo: true, output_dir: './output' });
+            currentProjectId = result.project_id;
+            document.getElementById('projectId').textContent = '项目ID: ' + currentProjectId;
+
+            const project = await apiCall(`/project/${currentProjectId}`);
+            renderProject(project);
+
+            if (result.exported_files && result.exported_files.main_report) {
+                showToast('三步流程完成！报告已导出: ' + result.exported_files.main_report);
+            } else {
+                showToast('三步流程完成！');
+            }
+
+            console.log('三步流程结果:', result);
+        }
+
+        async function exportReport() {
+            if (!currentProjectId) {
+                showToast('请先加载或创建项目', 'error');
+                return;
+            }
+            showToast('正在生成分析报告...');
+            window.open(`${API_BASE}/project/${currentProjectId}/export/report?output_dir=./output`, '_blank');
+            showToast('报告导出中...');
+        }
+
+        function renderProject(data) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
+
+            const summary = data.summary || {};
+            document.getElementById('statCabinets').textContent = summary.cabinets_count || 0;
+            document.getElementById('statRoutes').textContent = summary.routes_count || 0;
+            document.getElementById('statIssues').textContent = summary.issues_count || 0;
+            document.getElementById('statPendingClient').textContent = summary.workflow?.pending_client || 0;
+            document.getElementById('statPendingOps').textContent = summary.workflow?.pending_ops || 0;
+            document.getElementById('statResolved').textContent = data.issues?.filter(i => i.status === '已解决').length || 0;
+
+            renderOrigin(data.coordinate_origin);
+            renderIssues(data.issues || []);
+            renderRoutes(data.routes || []);
+            renderLogs(data.operation_logs || []);
+        }
+
+        function renderOrigin(origin) {
+            const div = document.getElementById('originInfo');
+            if (!origin) {
+                div.innerHTML = '<p style="color: #868e96;">暂无坐标原点数据</p>';
+                return;
+            }
+
+            div.innerHTML = `
+                <div class="origin-info">
+                    <h3>坐标原点 v${origin.version}</h3>
+                    <p><strong>原点位置:</strong> (${origin.origin_point[0]}, ${origin.origin_point[1]}) 米</p>
+                    <p><strong>说明:</strong> ${origin.description}</p>
+                    <p><strong>校准日期:</strong> ${origin.calibration_date}</p>
+                    <p><strong>校准人:</strong> ${origin.calibrated_by}</p>
+                    ${origin.notes ? `<p><strong>备注:</strong> ${origin.notes}</p>` : ''}
+                </div>
+            `;
+        }
+
+        function renderIssues(issues) {
+            const div = document.getElementById('issueList');
+            if (issues.length === 0) {
+                div.innerHTML = '<p style="color: #868e96;">✅ 当前无问题</p>';
+                return;
+            }
+
+            div.innerHTML = issues.map(issue => {
+                const statusClass = getStatusClass(issue.status);
+                const itemClass = issue.status === '已解决' ? 'resolved' :
+                                 issue.status === '待展陈客户复核' ? 'pending-review' :
+                                 issue.status === '已重跑' ? 'rerun' : '';
+
+                const actions = [];
+                if (issue.status === '已检测' || issue.status === '已人工修正') {
+                    actions.push(`<button class="btn btn-sm btn-primary" onclick="openFixModal('${issue.issue_id}')">🔧 人工修正</button>`);
+                    actions.push(`<button class="btn btn-sm btn-info" onclick="processAfterOrigin('${issue.issue_id}')">📍 检查原点后处理</button>`);
+                }
+                if (issue.status === '已人工修正' || issue.status === '已检测') {
+                    actions.push(`<button class="btn btn-sm btn-success" onclick="rerunIssue('${issue.issue_id}')">🔄 重跑</button>`);
+                }
+                if (issue.status !== '已解决') {
+                    actions.push(`<button class="btn btn-sm btn-warning" onclick="escalateIssue('${issue.issue_id}')">📤 转客户复核</button>`);
+                }
+                if (issue.status === '待展陈客户复核' || issue.status === '已重跑') {
+                    actions.push(`<button class="btn btn-sm btn-warning" onclick="openReviewModal('${issue.issue_id}')">👀 客户复核</button>`);
+                }
+                actions.push(`<button class="btn btn-sm btn-info" onclick="exportIssueDetail('${issue.issue_id}')">🖼️ 导出详情</button>`);
+
+                return `
+                    <div class="issue-item ${itemClass}">
+                        <div class="issue-header">
+                            <span class="issue-id">${issue.issue_id} - ${issue.issue_type}</span>
+                            <span class="issue-status ${statusClass}">${issue.status}</span>
+                        </div>
+                        <div class="issue-desc">${issue.description}</div>
+                        <div class="issue-meta">
+                            <span><strong>当前处理:</strong> ${issue.current_handler}</span>
+                            <span><strong>为什么被留下:</strong> ${issue.why_kept}</span>
+                            <span><strong>还缺材料:</strong> ${issue.missing_info}</span>
+                            <span><strong>下一步:</strong> ${issue.next_step}</span>
+                        </div>
+                        <div class="issue-actions">${actions.join('')}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getStatusClass(status) {
+            const map = {
+                '已检测': 'status-detected',
+                '待展陈客户复核': 'status-pending',
+                '已人工修正': 'status-fixed',
+                '已重跑': 'status-rerun',
+                '已解决': 'status-resolved'
+            };
+            return map[status] || 'status-detected';
+        }
+
+        function renderRoutes(routes) {
+            const div = document.getElementById('routeList');
+            if (routes.length === 0) {
+                div.innerHTML = '<p style="color: #868e96;">暂无路线数据</p>';
+                return;
+            }
+
+            div.innerHTML = routes.map(route => {
+                const badges = [];
+                if (route.has_issue) badges.push('<span class="route-badge badge-issue">有问题</span>');
+                if (route.is_supplementary) badges.push('<span class="route-badge badge-supplementary">补录</span>');
+                if (!route.has_issue && !route.is_supplementary) badges.push('<span class="route-badge badge-normal">正常</span>');
+
+                const lengthInfo = [];
+                if (route.manual_input_length) lengthInfo.push(`录入:${route.manual_input_length}m`);
+                if (route.calculated_length) lengthInfo.push(`计算:${route.calculated_length}m`);
+
+                return `
+                    <div class="route-item ${route.has_issue ? 'has-issue' : ''}">
+                        <div>
+                            <span class="route-name">${route.route_id} ${route.route_name}</span>
+                            <div style="font-size: 11px; color: #868e96; margin-top: 4px;">
+                                ${lengthInfo.join(' | ')}
+                            </div>
+                        </div>
+                        <div>${badges.join(' ')}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderLogs(logs) {
+            const div = document.getElementById('logList');
+            if (logs.length === 0) {
+                div.innerHTML = '<p style="color: #868e96;">暂无操作日志</p>';
+                return;
+            }
+
+            div.innerHTML = logs.slice().reverse().map(log => `
+                <div class="log-item">
+                    <span class="log-time">${new Date(log.timestamp).toLocaleString()}</span>
+                    <span class="log-operator">[${log.operator}]</span>
+                    <span class="log-action">${log.action}:</span>
+                    <span>${log.details}</span>
+                </div>
+            `).join('');
+        }
+
+        function openFixModal(issueId) {
+            document.getElementById('fixIssueId').value = issueId;
+            document.getElementById('fixNotes').value = '';
+            document.getElementById('fixValue').value = '';
+            openModal('fixModal');
+        }
+
+        async function submitFix() {
+            const issueId = document.getElementById('fixIssueId').value;
+            const fixNotes = document.getElementById('fixNotes').value;
+            const fixValue = document.getElementById('fixValue').value;
+
+            if (!fixNotes) {
+                showToast('请填写修正说明', 'error');
+                return;
+            }
+
+            const data = { fix_notes: fixNotes };
+            if (fixValue) data.corrected_value = parseFloat(fixValue);
+
+            const result = await apiCall(`/project/${currentProjectId}/issue/${issueId}/fix`, 'POST', data);
+            closeModal('fixModal');
+            renderProject(result);
+            showToast('修正已提交！');
+        }
+
+        function openReviewModal(issueId) {
+            document.getElementById('reviewIssueId').value = issueId;
+            document.getElementById('reviewResult').value = 'true';
+            document.getElementById('reviewNotes').value = '';
+            openModal('reviewModal');
+        }
+
+        async function submitReview() {
+            const issueId = document.getElementById('reviewIssueId').value;
+            const approved = document.getElementById('reviewResult').value === 'true';
+            const notes = document.getElementById('reviewNotes').value;
+
+            if (!notes) {
+                showToast('请填写复核意见', 'error');
+                return;
+            }
+
+            const result = await apiCall(`/project/${currentProjectId}/issue/${issueId}/review`, 'POST', {
+                approved, notes
+            });
+            closeModal('reviewModal');
+            renderProject(result);
+            showToast('复核已提交！');
+        }
+
+        async function rerunIssue(issueId) {
+            showToast('正在重跑...');
+            const result = await apiCall(`/project/${currentProjectId}/issue/${issueId}/rerun`, 'POST');
+            renderProject(result);
+            showToast('重跑完成！问题已流转给展陈客户复核');
+        }
+
+        async function escalateIssue(issueId) {
+            const result = await apiCall(`/project/${currentProjectId}/issue/${issueId}/escalate`, 'POST');
+            renderProject(result);
+            showToast('已流转给展陈客户复核');
+        }
+
+        async function processAfterOrigin(issueId) {
+            showToast('正在检查坐标原点并处理...');
+            const result = await apiCall(`/project/${currentProjectId}/origin/process-issue/${issueId}`, 'POST');
+            console.log('处理结果:', result);
+
+            const project = await apiCall(`/project/${currentProjectId}`);
+            renderProject(project);
+            showToast('处理完成：' + (result.actions_taken || []).join(', '));
+        }
+
+        async function exportIssueDetail(issueId) {
+            if (!currentProjectId) return;
+            window.open(`${API_BASE}/project/${currentProjectId}/export/issue/${issueId}?output_dir=./output`, '_blank');
+            showToast('问题详情导出中...');
+        }
+
+        window.onload = async () => {
+            try {
+                const health = await apiCall('/health');
+                if (health.status === 'ok') {
+                    showToast('API服务连接正常');
+                }
+            } catch (e) {
+                showToast('请确保API服务已启动 (python -m lab_cabinet_layout.api)', 'error');
+            }
+        };
+    </script>
+</body>
+</html>
