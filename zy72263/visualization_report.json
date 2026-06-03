@@ -1,0 +1,258 @@
+{
+  "view_mode": "3d",
+  "3d_view": {
+    "view_mode": "3d",
+    "coordinate_origins": [
+      {
+        "id": "origin_001",
+        "name": "T2航站楼D10廊桥",
+        "position": {
+          "x": 125.6,
+          "y": 89.3,
+          "z": 5.2
+        },
+        "status": "manager_review",
+        "has_block": true,
+        "record_id": "preflight_9c64f189"
+      },
+      {
+        "id": "origin_002",
+        "name": "T2航站楼D12廊桥",
+        "position": {
+          "x": 156.8,
+          "y": 92.1,
+          "z": 5.2
+        },
+        "status": "photo_attached",
+        "has_block": false,
+        "record_id": "preflight_f5ecae47"
+      }
+    ],
+    "interaction": {
+      "click_handler": "navigate_to_record",
+      "back_enabled": true
+    }
+  },
+  "chart_view": {
+    "view_mode": "chart",
+    "status_distribution": {
+      "manager_review": 1,
+      "photo_attached": 1
+    },
+    "block_statistics": {
+      "total": 2,
+      "with_block": 1,
+      "without_block": 1,
+      "pending_review": 2
+    },
+    "interaction": {
+      "click_segment": "filter_records_by_status",
+      "back_enabled": true
+    }
+  },
+  "records": [
+    {
+      "record": {
+        "id": "preflight_9c64f189",
+        "coordinate_origin_id": "origin_001",
+        "status": "manager_review",
+        "review_status": "pending",
+        "block_detected": true,
+        "block_verified": null,
+        "reviewer": null,
+        "reviewed_at": null,
+        "review_comment": "",
+        "history": [
+          {
+            "timestamp": "2026-06-03T17:49:16.853328",
+            "action": "import",
+            "actor": "system_initial",
+            "details": {
+              "origin_id": "origin_001",
+              "origin_name": "T2航站楼D10廊桥"
+            }
+          },
+          {
+            "timestamp": "2026-06-03T17:49:16.853358",
+            "action": "photo_added",
+            "actor": "designer_ajing",
+            "details": {
+              "photo_id": "photo_001",
+              "photo_number": "INSP-2024-001",
+              "remark": "D10廊桥初始巡检",
+              "block_detected": false
+            }
+          },
+          {
+            "timestamp": "2026-06-03T17:49:16.853361",
+            "action": "photo_added",
+            "actor": "designer_ajing",
+            "details": {
+              "photo_id": "photo_002",
+              "photo_number": "INSP-2024-002",
+              "remark": "移动端复核截图",
+              "block_detected": true
+            }
+          },
+          {
+            "timestamp": "2026-06-03T17:49:16.853368",
+            "action": "remark_updated",
+            "actor": "designer_ajing",
+            "details": {
+              "photo_id": "photo_001",
+              "old_remark": "D10廊桥初始巡检",
+              "new_remark": "D10廊桥初始巡检 - 展陈设计师阿景复核确认"
+            }
+          },
+          {
+            "timestamp": "2026-06-03T17:49:16.853371",
+            "action": "remark_updated",
+            "actor": "designer_ajing",
+            "details": {
+              "photo_id": "photo_002",
+              "old_remark": "移动端复核截图",
+              "new_remark": "移动端复核截图 - 告警标签被遮挡，需施工经理确认"
+            }
+          },
+          {
+            "timestamp": "2026-06-03T17:49:16.853377",
+            "action": "submitted_for_review",
+            "actor": "designer_ajing",
+            "details": {
+              "photo_id": "photo_002",
+              "photo_number": "INSP-2024-002",
+              "block_detected": true
+            }
+          },
+          {
+            "timestamp": "2026-06-03T17:49:16.853443",
+            "action": "block_resolved",
+            "actor": "designer_ajing",
+            "details": {
+              "photo_id": "photo_002",
+              "resolution": "rephoto"
+            }
+          },
+          {
+            "timestamp": "2026-06-03T17:49:16.853446",
+            "action": "rollback",
+            "actor": "system",
+            "details": {
+              "rolled_back_from": {
+                "status": "manager_review",
+                "review_status": "pending",
+                "block_detected": true,
+                "block_verified": null,
+                "timestamp": "2026-06-03T17:49:16.853441"
+              }
+            }
+          }
+        ],
+        "created_at": "2026-06-03T17:49:16.853326",
+        "updated_at": "2026-06-03T17:49:16.853446"
+      },
+      "origin": {
+        "id": "origin_001",
+        "name": "T2航站楼D10廊桥",
+        "x": 125.6,
+        "y": 89.3,
+        "z": 5.2,
+        "description": "主廊桥停靠点，安全距离要求3.5米",
+        "metadata": {},
+        "created_at": "2026-06-03T17:49:16.853260",
+        "version": 1
+      },
+      "photos": [
+        {
+          "id": "photo_001",
+          "photo_number": "INSP-2024-001",
+          "coordinate_origin_id": "origin_001",
+          "url": "",
+          "remark": "D10廊桥初始巡检 - 展陈设计师阿景复核确认",
+          "has_mobile_screenshot": false,
+          "alert_label_visible": true,
+          "alert_label_area": null,
+          "metadata": {},
+          "created_at": "2026-06-03T17:49:16.853353",
+          "updated_at": "2026-06-03T17:49:16.853368"
+        },
+        {
+          "id": "photo_002",
+          "photo_number": "INSP-2024-002",
+          "coordinate_origin_id": "origin_001",
+          "url": "",
+          "remark": "移动端复核截图 - 告警标签被遮挡，需施工经理确认",
+          "has_mobile_screenshot": false,
+          "alert_label_visible": true,
+          "alert_label_area": null,
+          "metadata": {},
+          "created_at": "2026-06-03T17:49:16.853354",
+          "updated_at": "2026-06-03T17:49:16.853442"
+        }
+      ]
+    },
+    {
+      "record": {
+        "id": "preflight_f5ecae47",
+        "coordinate_origin_id": "origin_002",
+        "status": "photo_attached",
+        "review_status": "pending",
+        "block_detected": false,
+        "block_verified": null,
+        "reviewer": null,
+        "reviewed_at": null,
+        "review_comment": "",
+        "history": [
+          {
+            "timestamp": "2026-06-03T17:49:16.853343",
+            "action": "import",
+            "actor": "system_initial",
+            "details": {
+              "origin_id": "origin_002",
+              "origin_name": "T2航站楼D12廊桥"
+            }
+          },
+          {
+            "timestamp": "2026-06-03T17:49:16.853363",
+            "action": "photo_added",
+            "actor": "designer_ajing",
+            "details": {
+              "photo_id": "photo_003",
+              "photo_number": "INSP-2024-003",
+              "remark": "D12廊桥正常",
+              "block_detected": false
+            }
+          }
+        ],
+        "created_at": "2026-06-03T17:49:16.853342",
+        "updated_at": "2026-06-03T17:49:16.853362"
+      },
+      "origin": {
+        "id": "origin_002",
+        "name": "T2航站楼D12廊桥",
+        "x": 156.8,
+        "y": 92.1,
+        "z": 5.2,
+        "description": "备用廊桥停靠点",
+        "metadata": {},
+        "created_at": "2026-06-03T17:49:16.853262",
+        "version": 1
+      },
+      "photos": [
+        {
+          "id": "photo_003",
+          "photo_number": "INSP-2024-003",
+          "coordinate_origin_id": "origin_002",
+          "url": "",
+          "remark": "D12廊桥正常",
+          "has_mobile_screenshot": false,
+          "alert_label_visible": true,
+          "alert_label_area": null,
+          "metadata": {},
+          "created_at": "2026-06-03T17:49:16.853355",
+          "updated_at": "2026-06-03T17:49:16.853356"
+        }
+      ]
+    }
+  ]
+}

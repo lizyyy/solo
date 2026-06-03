@@ -1,0 +1,118 @@
+{
+  "generated_at": "2026-06-03T17:49:16.853542",
+  "total_entries": 5,
+  "entries": [
+    {
+      "timestamp": "2026-06-03T17:49:16.853251",
+      "action": "workflow_started",
+      "details": {
+        "steps": [
+          "import_origins",
+          "review_photos",
+          "update_report"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-06-03T17:49:16.853350",
+      "action": "step1_import",
+      "details": {
+        "imported_count": 2,
+        "skipped_count": 1,
+        "created_records": [
+          "preflight_9c64f189",
+          "preflight_f5ecae47"
+        ],
+        "skipped_origins": {
+          "origin_001": "duplicate_of_origin_001"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-06-03T17:49:16.853364",
+      "action": "step2_review_photos",
+      "details": {
+        "photos_added": 3,
+        "records_affected": [
+          "preflight_9c64f189",
+          "preflight_9c64f189",
+          "preflight_f5ecae47"
+        ],
+        "blocked_alerts_detected": 1,
+        "photos_with_issue": [
+          "photo_002"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-06-03T17:49:16.853379",
+      "action": "step3_update_report",
+      "details": {
+        "safety_distances_applied": {
+          "origin_001": {
+            "min_distance": 3.8,
+            "status": "compliant"
+          },
+          "origin_002": {
+            "min_distance": 4.2,
+            "status": "compliant"
+          }
+        },
+        "remarks_updated": [
+          "photo_001",
+          "photo_002"
+        ],
+        "records_submitted_for_manager_review": 1,
+        "pending_review_count": 1
+      }
+    },
+    {
+      "timestamp": "2026-06-03T17:49:16.853380",
+      "action": "workflow_completed",
+      "details": {
+        "step1_import": {
+          "imported_count": 2,
+          "skipped_count": 1,
+          "created_records": [
+            "preflight_9c64f189",
+            "preflight_f5ecae47"
+          ],
+          "skipped_origins": {
+            "origin_001": "duplicate_of_origin_001"
+          }
+        },
+        "step2_review_photos": {
+          "photos_added": 3,
+          "records_affected": [
+            "preflight_9c64f189",
+            "preflight_9c64f189",
+            "preflight_f5ecae47"
+          ],
+          "blocked_alerts_detected": 1,
+          "photos_with_issue": [
+            "photo_002"
+          ]
+        },
+        "step3_update_report": {
+          "safety_distances_applied": {
+            "origin_001": {
+              "min_distance": 3.8,
+              "status": "compliant"
+            },
+            "origin_002": {
+              "min_distance": 4.2,
+              "status": "compliant"
+            }
+          },
+          "remarks_updated": [
+            "photo_001",
+            "photo_002"
+          ],
+          "records_submitted_for_manager_review": 1,
+          "pending_review_count": 1
+        },
+        "workflow_complete": true
+      }
+    }
+  ]
+}
