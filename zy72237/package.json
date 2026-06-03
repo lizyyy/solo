@@ -1,0 +1,13 @@
+{
+  "name": "market-valuation-anomaly-alert",
+  "version": "1.0.0",
+  "description": "市值法估值异常提醒系统",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node tests/run-tests.js"
+  },
+  "dependencies": {
+    "uuid": "^9.0.0"
+  }
+}
