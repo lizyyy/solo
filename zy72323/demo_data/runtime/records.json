@@ -1,0 +1,352 @@
+[
+  {
+    "id": "a6a20854",
+    "student_id": "S001",
+    "student_name": "张明",
+    "dorm_preference": "东区-4人间",
+    "assigned_dorm": "东3-201",
+    "numerator": 85.0,
+    "denominator": 100.0,
+    "result": 0.85,
+    "result_display": "0.85",
+    "status": "verified",
+    "formula_source": "old_screenshot",
+    "annotations": [
+      {
+        "id": "90956299",
+        "author_role": "teacher",
+        "author_name": "王老师",
+        "content": "张明的数据与教务处记录一致，公式应用正确。",
+        "created_at": "2026-06-04 07:07:56.862537",
+        "is_approved": false,
+        "approved_by": null,
+        "approved_at": null
+      }
+    ],
+    "created_at": "2026-06-04 07:07:56.861354",
+    "updated_at": "2026-06-04 07:07:56.865366",
+    "reviewed_by": "吴老师",
+    "review_note": "已回看老师批注，确认教研流程合规。",
+    "run_id": "9bc51512",
+    "is_denominator_zero_issue": false
+  },
+  {
+    "id": "1e44c72f",
+    "student_id": "S002",
+    "student_name": "李华",
+    "dorm_preference": "西区-2人间",
+    "assigned_dorm": "西1-305",
+    "numerator": 92.0,
+    "denominator": 90,
+    "result": 1.0222222222222221,
+    "result_display": "1.02",
+    "status": "corrected",
+    "formula_source": "corrected",
+    "annotations": [
+      {
+        "id": "1b774b7b",
+        "author_role": "teacher",
+        "author_name": "王老师",
+        "content": "李华同学情况特殊，优先级权重数据缺失，需要联系教务处核实原始数据。截图里确实是空的，不能直接照抄结论。",
+        "created_at": "2026-06-04 07:07:56.863212",
+        "is_approved": false,
+        "approved_by": null,
+        "approved_at": null
+      },
+      {
+        "id": "514258d6",
+        "author_role": "data_checker",
+        "author_name": "数据复核员小刘",
+        "content": "分母修正: 90。备注: 联系教务处核实，李华的优先级权重应为90",
+        "created_at": "2026-06-04 07:07:56.866973",
+        "is_approved": false,
+        "approved_by": null,
+        "approved_at": null
+      }
+    ],
+    "created_at": "2026-06-04 07:07:56.861380",
+    "updated_at": "2026-06-04 07:07:56.866975",
+    "reviewed_by": "吴老师",
+    "review_note": "已回看老师批注，确认教研流程合规。",
+    "run_id": "9bc51512",
+    "is_denominator_zero_issue": false
+  },
+  {
+    "id": "e3f2b9dc",
+    "student_id": "S003",
+    "student_name": "王芳",
+    "dorm_preference": "东区-2人间",
+    "assigned_dorm": "东1-102",
+    "numerator": 78.0,
+    "denominator": 80.0,
+    "result": 0.975,
+    "result_display": "0.97",
+    "status": "verified",
+    "formula_source": "old_screenshot",
+    "annotations": [
+      {
+        "id": "bae77fa7",
+        "author_role": "teacher",
+        "author_name": "王老师",
+        "content": "王芳的数据与教务处记录一致，公式应用正确。",
+        "created_at": "2026-06-04 07:07:56.863837",
+        "is_approved": false,
+        "approved_by": null,
+        "approved_at": null
+      }
+    ],
+    "created_at": "2026-06-04 07:07:56.861425",
+    "updated_at": "2026-06-04 07:07:56.865824",
+    "reviewed_by": "吴老师",
+    "review_note": "已回看老师批注，确认教研流程合规。",
+    "run_id": "9bc51512",
+    "is_denominator_zero_issue": false
+  },
+  {
+    "id": "ea027896",
+    "student_id": "S004",
+    "student_name": "赵伟",
+    "dorm_preference": "南区-4人间",
+    "assigned_dorm": "南2-403",
+    "numerator": 65.0,
+    "denominator": 85,
+    "result": 0.7647058823529411,
+    "result_display": "0.76",
+    "status": "corrected",
+    "formula_source": "corrected",
+    "annotations": [
+      {
+        "id": "e3ddf182",
+        "author_role": "teacher",
+        "author_name": "王老师",
+        "content": "赵伟是转学生，入学数据还没同步完整。分母为0的情况需要等数据同步后再处理。",
+        "created_at": "2026-06-04 07:07:56.864678",
+        "is_approved": false,
+        "approved_by": null,
+        "approved_at": null
+      },
+      {
+        "id": "51121ace",
+        "author_role": "data_checker",
+        "author_name": "数据复核员小刘",
+        "content": "分母修正: 85。备注: 转学生数据已同步，赵伟的优先级权重为85",
+        "created_at": "2026-06-04 07:07:56.867705",
+        "is_approved": false,
+        "approved_by": null,
+        "approved_at": null
+      }
+    ],
+    "created_at": "2026-06-04 07:07:56.861439",
+    "updated_at": "2026-06-04 07:07:56.867707",
+    "reviewed_by": "吴老师",
+    "review_note": "已回看老师批注，确认教研流程合规。",
+    "run_id": "9bc51512",
+    "is_denominator_zero_issue": false
+  },
+  {
+    "id": "22ba5b61",
+    "student_id": "S005",
+    "student_name": "陈静",
+    "dorm_preference": "西区-4人间",
+    "assigned_dorm": "西2-108",
+    "numerator": 95.0,
+    "denominator": 100.0,
+    "result": 0.95,
+    "result_display": "0.95",
+    "status": "verified",
+    "formula_source": "old_screenshot",
+    "annotations": [
+      {
+        "id": "6b0198b6",
+        "author_role": "teacher",
+        "author_name": "王老师",
+        "content": "陈静的数据与教务处记录一致，公式应用正确。",
+        "created_at": "2026-06-04 07:07:56.865089",
+        "is_approved": false,
+        "approved_by": null,
+        "approved_at": null
+      }
+    ],
+    "created_at": "2026-06-04 07:07:56.861457",
+    "updated_at": "2026-06-04 07:07:56.866338",
+    "reviewed_by": "吴老师",
+    "review_note": "已回看老师批注，确认教研流程合规。",
+    "run_id": "9bc51512",
+    "is_denominator_zero_issue": false
+  },
+  {
+    "id": "45a503ef",
+    "student_id": "S001",
+    "student_name": "张明",
+    "dorm_preference": "东区-4人间",
+    "assigned_dorm": "东3-201",
+    "numerator": 85.0,
+    "denominator": 100.0,
+    "result": 0.85,
+    "result_display": "0.85",
+    "status": "verified",
+    "formula_source": "old_screenshot",
+    "annotations": [
+      {
+        "id": "90956299",
+        "author_role": "teacher",
+        "author_name": "王老师",
+        "content": "张明的数据与教务处记录一致，公式应用正确。",
+        "created_at": "2026-06-04 07:07:56.862537",
+        "is_approved": false,
+        "approved_by": null,
+        "approved_at": null
+      }
+    ],
+    "created_at": "2026-06-04 07:07:56.868313",
+    "updated_at": "2026-06-04 07:07:56.868314",
+    "reviewed_by": null,
+    "review_note": null,
+    "run_id": "b98b3b9f",
+    "is_denominator_zero_issue": false
+  },
+  {
+    "id": "7ea30a07",
+    "student_id": "S002",
+    "student_name": "李华",
+    "dorm_preference": "西区-2人间",
+    "assigned_dorm": "西1-305",
+    "numerator": 92.0,
+    "denominator": 90.0,
+    "result": 1.0222222222222221,
+    "result_display": "1.02",
+    "status": "corrected",
+    "formula_source": "corrected",
+    "annotations": [
+      {
+        "id": "1b774b7b",
+        "author_role": "teacher",
+        "author_name": "王老师",
+        "content": "李华同学情况特殊，优先级权重数据缺失，需要联系教务处核实原始数据。截图里确实是空的，不能直接照抄结论。",
+        "created_at": "2026-06-04 07:07:56.863212",
+        "is_approved": false,
+        "approved_by": null,
+        "approved_at": null
+      },
+      {
+        "id": "514258d6",
+        "author_role": "data_checker",
+        "author_name": "数据复核员小刘",
+        "content": "分母修正: 90。备注: 联系教务处核实，李华的优先级权重应为90",
+        "created_at": "2026-06-04 07:07:56.866973",
+        "is_approved": false,
+        "approved_by": null,
+        "approved_at": null
+      }
+    ],
+    "created_at": "2026-06-04 07:07:56.868324",
+    "updated_at": "2026-06-04 07:07:56.868324",
+    "reviewed_by": null,
+    "review_note": null,
+    "run_id": "b98b3b9f",
+    "is_denominator_zero_issue": false
+  },
+  {
+    "id": "11ee9e91",
+    "student_id": "S003",
+    "student_name": "王芳",
+    "dorm_preference": "东区-2人间",
+    "assigned_dorm": "东1-102",
+    "numerator": 78.0,
+    "denominator": 80.0,
+    "result": 0.975,
+    "result_display": "0.97",
+    "status": "verified",
+    "formula_source": "old_screenshot",
+    "annotations": [
+      {
+        "id": "bae77fa7",
+        "author_role": "teacher",
+        "author_name": "王老师",
+        "content": "王芳的数据与教务处记录一致，公式应用正确。",
+        "created_at": "2026-06-04 07:07:56.863837",
+        "is_approved": false,
+        "approved_by": null,
+        "approved_at": null
+      }
+    ],
+    "created_at": "2026-06-04 07:07:56.868367",
+    "updated_at": "2026-06-04 07:07:56.868368",
+    "reviewed_by": null,
+    "review_note": null,
+    "run_id": "b98b3b9f",
+    "is_denominator_zero_issue": false
+  },
+  {
+    "id": "bb4b6217",
+    "student_id": "S004",
+    "student_name": "赵伟",
+    "dorm_preference": "南区-4人间",
+    "assigned_dorm": "南2-403",
+    "numerator": 65.0,
+    "denominator": 85.0,
+    "result": 0.7647058823529411,
+    "result_display": "0.76",
+    "status": "corrected",
+    "formula_source": "corrected",
+    "annotations": [
+      {
+        "id": "e3ddf182",
+        "author_role": "teacher",
+        "author_name": "王老师",
+        "content": "赵伟是转学生，入学数据还没同步完整。分母为0的情况需要等数据同步后再处理。",
+        "created_at": "2026-06-04 07:07:56.864678",
+        "is_approved": false,
+        "approved_by": null,
+        "approved_at": null
+      },
+      {
+        "id": "51121ace",
+        "author_role": "data_checker",
+        "author_name": "数据复核员小刘",
+        "content": "分母修正: 85。备注: 转学生数据已同步，赵伟的优先级权重为85",
+        "created_at": "2026-06-04 07:07:56.867705",
+        "is_approved": false,
+        "approved_by": null,
+        "approved_at": null
+      }
+    ],
+    "created_at": "2026-06-04 07:07:56.868382",
+    "updated_at": "2026-06-04 07:07:56.868383",
+    "reviewed_by": null,
+    "review_note": null,
+    "run_id": "b98b3b9f",
+    "is_denominator_zero_issue": false
+  },
+  {
+    "id": "bd4ad392",
+    "student_id": "S005",
+    "student_name": "陈静",
+    "dorm_preference": "西区-4人间",
+    "assigned_dorm": "西2-108",
+    "numerator": 95.0,
+    "denominator": 100.0,
+    "result": 0.95,
+    "result_display": "0.95",
+    "status": "verified",
+    "formula_source": "old_screenshot",
+    "annotations": [
+      {
+        "id": "6b0198b6",
+        "author_role": "teacher",
+        "author_name": "王老师",
+        "content": "陈静的数据与教务处记录一致，公式应用正确。",
+        "created_at": "2026-06-04 07:07:56.865089",
+        "is_approved": false,
+        "approved_by": null,
+        "approved_at": null
+      }
+    ],
+    "created_at": "2026-06-04 07:07:56.868391",
+    "updated_at": "2026-06-04 07:07:56.868392",
+    "reviewed_by": null,
+    "review_note": null,
+    "run_id": "b98b3b9f",
+    "is_denominator_zero_issue": false
+  }
+]

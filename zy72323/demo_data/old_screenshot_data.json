@@ -1,0 +1,47 @@
+[
+  {
+    "student_id": "S001",
+    "student_name": "张明",
+    "dorm_preference": "东区-4人间",
+    "assigned_dorm": "东3-201",
+    "numerator": 85,
+    "denominator": 100,
+    "result_display": "0.85"
+  },
+  {
+    "student_id": "S002",
+    "student_name": "李华",
+    "dorm_preference": "西区-2人间",
+    "assigned_dorm": "西1-305",
+    "numerator": 92,
+    "denominator": 0,
+    "result_display": ""
+  },
+  {
+    "student_id": "S003",
+    "student_name": "王芳",
+    "dorm_preference": "东区-2人间",
+    "assigned_dorm": "东1-102",
+    "numerator": 78,
+    "denominator": 80,
+    "result_display": "0.98"
+  },
+  {
+    "student_id": "S004",
+    "student_name": "赵伟",
+    "dorm_preference": "南区-4人间",
+    "assigned_dorm": "南2-403",
+    "numerator": 65,
+    "denominator": 0,
+    "result_display": ""
+  },
+  {
+    "student_id": "S005",
+    "student_name": "陈静",
+    "dorm_preference": "西区-4人间",
+    "assigned_dorm": "西2-108",
+    "numerator": 95,
+    "denominator": 100,
+    "result_display": "0.95"
+  }
+]

@@ -1,0 +1,121 @@
+{
+  "run_id": "b98b3b9f",
+  "run_log": {
+    "run_id": "b98b3b9f",
+    "run_type": "rerun_with_annotations",
+    "started_at": "2026-06-04 07:07:56.868297",
+    "finished_at": "2026-06-04 07:07:56.868393",
+    "is_correction_run": true,
+    "previous_run_id": "9bc51512",
+    "operator": "吴老师",
+    "operator_role": "teaching_research_head",
+    "record_count": 5,
+    "issues_found": [],
+    "notes": "基于批注重新运行"
+  },
+  "total_records": 5,
+  "denominator_zero_issues": 0,
+  "records_with_annotations": 5,
+  "status_summary": {
+    "pending_review": 0,
+    "reviewing": 0,
+    "verified": 3,
+    "needs_correction": 0,
+    "corrected": 2
+  },
+  "issue_records": [],
+  "classroom_demo": [
+    {
+      "record_id": "45a503ef",
+      "student_name": "张明",
+      "assigned_dorm": "东3-201",
+      "formula_used": "分配得分 = 匹配度 / 优先级权重",
+      "calculation": "85.0 / 100.0",
+      "result_value": 0.85,
+      "result_display": "0.85",
+      "status": "verified",
+      "status_explanation": "已验证",
+      "why_kept": "完整通过教研流程审核",
+      "missing_materials": [],
+      "next_action": "正常使用",
+      "next_contact": "无需联系",
+      "annotations_summary": [
+        "[王老师] 张明的数据与教务处记录一致，公式应用正确。"
+      ]
+    },
+    {
+      "record_id": "7ea30a07",
+      "student_name": "李华",
+      "assigned_dorm": "西1-305",
+      "formula_used": "分配得分 = 匹配度 / 优先级权重",
+      "calculation": "92.0 / 90.0",
+      "result_value": 1.0222222222222221,
+      "result_display": "1.02",
+      "status": "corrected",
+      "status_explanation": "已修正并复核",
+      "why_kept": "数据问题已修正，批注完整，可作为课堂演示案例",
+      "missing_materials": [],
+      "next_action": "无需进一步动作，可直接用于课堂演示",
+      "next_contact": "无需联系",
+      "annotations_summary": [
+        "[王老师] 李华同学情况特殊，优先级权重数据缺失，需要联系教务处核实原始数据。截图里确实是空的，不能直接照抄结论。",
+        "[数据复核员小刘] 分母修正: 90。备注: 联系教务处核实，李华的优先级权重应为90"
+      ]
+    },
+    {
+      "record_id": "11ee9e91",
+      "student_name": "王芳",
+      "assigned_dorm": "东1-102",
+      "formula_used": "分配得分 = 匹配度 / 优先级权重",
+      "calculation": "78.0 / 80.0",
+      "result_value": 0.975,
+      "result_display": "0.97",
+      "status": "verified",
+      "status_explanation": "已验证",
+      "why_kept": "完整通过教研流程审核",
+      "missing_materials": [],
+      "next_action": "正常使用",
+      "next_contact": "无需联系",
+      "annotations_summary": [
+        "[王老师] 王芳的数据与教务处记录一致，公式应用正确。"
+      ]
+    },
+    {
+      "record_id": "bb4b6217",
+      "student_name": "赵伟",
+      "assigned_dorm": "南2-403",
+      "formula_used": "分配得分 = 匹配度 / 优先级权重",
+      "calculation": "65.0 / 85.0",
+      "result_value": 0.7647058823529411,
+      "result_display": "0.76",
+      "status": "corrected",
+      "status_explanation": "已修正并复核",
+      "why_kept": "数据问题已修正，批注完整，可作为课堂演示案例",
+      "missing_materials": [],
+      "next_action": "无需进一步动作，可直接用于课堂演示",
+      "next_contact": "无需联系",
+      "annotations_summary": [
+        "[王老师] 赵伟是转学生，入学数据还没同步完整。分母为0的情况需要等数据同步后再处理。",
+        "[数据复核员小刘] 分母修正: 85。备注: 转学生数据已同步，赵伟的优先级权重为85"
+      ]
+    },
+    {
+      "record_id": "bd4ad392",
+      "student_name": "陈静",
+      "assigned_dorm": "西2-108",
+      "formula_used": "分配得分 = 匹配度 / 优先级权重",
+      "calculation": "95.0 / 100.0",
+      "result_value": 0.95,
+      "result_display": "0.95",
+      "status": "verified",
+      "status_explanation": "已验证",
+      "why_kept": "完整通过教研流程审核",
+      "missing_materials": [],
+      "next_action": "正常使用",
+      "next_contact": "无需联系",
+      "annotations_summary": [
+        "[王老师] 陈静的数据与教务处记录一致，公式应用正确。"
+      ]
+    }
+  ]
+}

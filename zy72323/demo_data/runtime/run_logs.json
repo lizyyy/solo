@@ -1,0 +1,31 @@
+[
+  {
+    "run_id": "9bc51512",
+    "run_type": "import_screenshot",
+    "started_at": "2026-06-04 07:07:56.861281",
+    "finished_at": "2026-06-04 07:07:56.861461",
+    "is_correction_run": false,
+    "previous_run_id": null,
+    "operator": "张助教",
+    "operator_role": "teacher",
+    "record_count": 5,
+    "issues_found": [
+      "记录 李华: 分母为0，显示值为''",
+      "记录 赵伟: 分母为0，显示值为''"
+    ],
+    "notes": "从旧公式截图导入数据"
+  },
+  {
+    "run_id": "b98b3b9f",
+    "run_type": "rerun_with_annotations",
+    "started_at": "2026-06-04 07:07:56.868297",
+    "finished_at": "2026-06-04 07:07:56.868393",
+    "is_correction_run": true,
+    "previous_run_id": "9bc51512",
+    "operator": "吴老师",
+    "operator_role": "teaching_research_head",
+    "record_count": 5,
+    "issues_found": [],
+    "notes": "基于批注重新运行"
+  }
+]
