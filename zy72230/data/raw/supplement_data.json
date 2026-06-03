@@ -1,0 +1,33 @@
+{
+    "supplement_id": "SUP20260602001",
+    "supplement_date": "2026-06-02",
+    "operator": "小周",
+    "source": "税费率备注文件",
+    "source_file": "data/raw/tax_rate_remark.txt",
+    "supplemented_biz": [
+        {
+            "biz_id": "BIZ20260601003",
+            "original_tax": 400.00,
+            "original_tax_rate": 0.001,
+            "corrected_tax": 320.00,
+            "corrected_tax_rate": 0.0008,
+            "tax_diff": -80.00,
+            "remark": "旧口径补录，交易实际发生于2026-05-28，适用原税率0.08%",
+            "reviewer": "老李",
+            "review_status": "已复核"
+        }
+    ],
+    "manual_corrections": [
+        {
+            "correction_id": "COR20260602001",
+            "biz_id": "BIZ20260601002",
+            "correction_type": "拆分行标记",
+            "field": "review_status",
+            "old_value": "待复核",
+            "new_value": "拆分行待主管复核",
+            "operator": "小周",
+            "timestamp": "2026-06-02 10:15:00",
+            "remark": "同一业务号拆成手续费和本金两行，留待结算主管复核"
+        }
+    ]
+}

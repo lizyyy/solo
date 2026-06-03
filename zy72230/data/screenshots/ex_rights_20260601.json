@@ -1,0 +1,19 @@
+{
+    "screenshot_id": "SCR20260601001",
+    "source_system": "券商交易系统",
+    "capture_time": "2026-06-01 15:05:23",
+    "operator": "小周",
+    "business_date": "2026-06-01",
+    "ex_rights_date": "2026-06-01",
+    "content_summary": "除权日两融维保比例截图，共3只标的股票：贵州茅台(600519)、平安银行(000001)、中国平安(601318)",
+    "stocks": [
+        {"code": "600519", "name": "贵州茅台", "maintenance_ratio": 150.00, "status": "正常"},
+        {"code": "000001", "name": "平安银行", "maintenance_ratio": 145.00, "status": "关注"},
+        {"code": "601318", "name": "中国平安", "maintenance_ratio": 160.00, "status": "正常"}
+    ],
+    "file_format": "png",
+    "file_path": "data/screenshots/ex_rights_20260601.png",
+    "import_timestamp": "2026-06-02 09:30:00",
+    "import_batch": "BATCH2026060201",
+    "remark": "第一次导入，已存档"
+}
