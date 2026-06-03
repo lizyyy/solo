@@ -1,0 +1,212 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-primary: #0c0e15;
+    --bg-secondary: #121620;
+    --bg-tertiary: #1a1f2e;
+    --bg-card: #1f2b42;
+    --border-color: #2a3959;
+    --text-primary: #e6e9f2;
+    --text-secondary: #93a0c0;
+    --text-muted: #596b94;
+    --accent-green: #10b981;
+    --accent-orange: #f59e0b;
+    --accent-red: #ef4444;
+    --accent-blue: #3b82f6;
+    --accent-gold: #eab308;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: "Noto Sans SC", system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  #root {
+    min-height: 100vh;
+  }
+
+  /* 滚动条样式 */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #3a4b73;
+  }
+
+  /* 选中文字 */
+  ::selection {
+    background: rgba(59, 130, 246, 0.3);
+    color: var(--text-primary);
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded text-sm font-medium transition-all duration-200 cursor-pointer border-0;
+  }
+
+  .btn-primary {
+    @apply bg-custody-blue hover:bg-custody-blue-hover text-white shadow-card hover:shadow-card-hover hover:-translate-y-0.5;
+  }
+
+  .btn-success {
+    @apply bg-finance-green hover:bg-finance-green-hover text-white shadow-card hover:shadow-card-hover hover:-translate-y-0.5;
+  }
+
+  .btn-warning {
+    @apply bg-warning-orange hover:bg-warning-orange-hover text-white shadow-card hover:shadow-card-hover hover:-translate-y-0.5;
+  }
+
+  .btn-danger {
+    @apply bg-risk-red hover:bg-risk-red-hover text-white shadow-card hover:shadow-card-hover hover:-translate-y-0.5;
+  }
+
+  .btn-secondary {
+    @apply bg-carbon-700 hover:bg-carbon-600 text-carbon-100 border border-carbon-600 hover:border-carbon-500;
+  }
+
+  .btn-ghost {
+    @apply bg-transparent hover:bg-carbon-700 text-carbon-200;
+  }
+
+  .card {
+    @apply bg-carbon-700 rounded-lg border border-carbon-600 shadow-card;
+  }
+
+  .card-hover {
+    @apply transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5 hover:border-carbon-500;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium;
+  }
+
+  .badge-green {
+    @apply bg-finance-green/15 text-finance-green border border-finance-green/30;
+  }
+
+  .badge-orange {
+    @apply bg-warning-orange/15 text-warning-orange border border-warning-orange/30;
+  }
+
+  .badge-red {
+    @apply bg-risk-red/15 text-risk-red border border-risk-red/30;
+  }
+
+  .badge-blue {
+    @apply bg-custody-blue/15 text-custody-blue border border-custody-blue/30;
+  }
+
+  .badge-gold {
+    @apply bg-summary-gold/15 text-summary-gold border border-summary-gold/30;
+  }
+
+  .badge-gray {
+    @apply bg-carbon-600 text-carbon-300 border border-carbon-500;
+  }
+
+  .input-field {
+    @apply w-full px-3 py-2 bg-carbon-800 border border-carbon-600 rounded text-carbon-100 placeholder-carbon-500 focus:outline-none focus:border-custody-blue focus:ring-1 focus:ring-custody-blue/30 transition-colors;
+  }
+
+  .label {
+    @apply block text-sm font-medium text-carbon-300 mb-1;
+  }
+
+  .status-dot {
+    @apply w-2 h-2 rounded-full inline-block;
+  }
+
+  .status-green {
+    @apply bg-finance-green shadow-[0_0_8px_rgba(16,185,129,0.5)];
+  }
+
+  .status-orange {
+    @apply bg-warning-orange shadow-[0_0_8px_rgba(245,158,11,0.5)] animate-pulse-slow;
+  }
+
+  .status-red {
+    @apply bg-risk-red shadow-[0_0_8px_rgba(239,68,68,0.5)] animate-pulse-slow;
+  }
+
+  .status-blue {
+    @apply bg-custody-blue shadow-[0_0_8px_rgba(59,130,246,0.5)];
+  }
+
+  .status-gray {
+    @apply bg-carbon-500;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-custody-blue to-finance-green bg-clip-text text-transparent;
+  }
+
+  .border-gradient {
+    border-image: linear-gradient(to right, #3b82f6, #10b981) 1;
+  }
+
+  .glow-red {
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+  }
+
+  .glow-blue {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+  }
+
+  .animate-stagger-1 {
+    animation-delay: 0ms;
+  }
+
+  .animate-stagger-2 {
+    animation-delay: 50ms;
+  }
+
+  .animate-stagger-3 {
+    animation-delay: 100ms;
+  }
+
+  .animate-stagger-4 {
+    animation-delay: 150ms;
+  }
+
+  .animate-stagger-5 {
+    animation-delay: 200ms;
+  }
+
+  .font-mono-num {
+    font-family: "JetBrains Mono", monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+}
