@@ -1,0 +1,86 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: "Noto Sans SC", "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #F8FAFB;
+  color: #1E293B;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #CBD5E1 transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #CBD5E1;
+  border-radius: 3px;
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-lg border border-slate-200 shadow-sm;
+  }
+  .card-header {
+    @apply px-5 py-4 border-b border-slate-100;
+  }
+  .card-body {
+    @apply px-5 py-4;
+  }
+  .btn-primary {
+    @apply bg-frost-500 text-white px-4 py-2 rounded-lg text-sm font-medium
+      hover:bg-frost-600 hover:-translate-y-px transition-all duration-200
+      shadow-sm hover:shadow-md active:translate-y-0;
+  }
+  .btn-secondary {
+    @apply bg-white text-frost-800 px-4 py-2 rounded-lg text-sm font-medium
+      border border-slate-200 hover:bg-slate-50 hover:-translate-y-px
+      transition-all duration-200 shadow-sm active:translate-y-0;
+  }
+  .btn-danger {
+    @apply bg-rose-500 text-white px-4 py-2 rounded-lg text-sm font-medium
+      hover:bg-rose-600 hover:-translate-y-px transition-all duration-200
+      shadow-sm active:translate-y-0;
+  }
+  .btn-success {
+    @apply bg-emerald-500 text-white px-4 py-2 rounded-lg text-sm font-medium
+      hover:bg-emerald-600 hover:-translate-y-px transition-all duration-200
+      shadow-sm active:translate-y-0;
+  }
+  .input-field {
+    @apply w-full px-3 py-2 rounded-lg border border-slate-200 text-sm
+      focus:outline-none focus:ring-2 focus:ring-frost-500/30 focus:border-frost-500
+      transition-all duration-200 bg-white;
+  }
+  .status-normal {
+    @apply bg-emerald-500/10 text-emerald-600 border border-emerald-500/20;
+  }
+  .status-pending {
+    @apply bg-amber-500/10 text-amber-600 border border-amber-500/20;
+  }
+  .status-conflict {
+    @apply bg-rose-500/10 text-rose-600 border border-rose-500/20;
+  }
+  .status-supplemented {
+    @apply bg-frost-500/10 text-frost-600 border border-frost-500/20;
+  }
+  .status-rejected {
+    @apply bg-slate-500/10 text-slate-500 border border-slate-500/20;
+  }
+}
