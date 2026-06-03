@@ -8,6 +8,7 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
+  useDroppable,
   DragStartEvent,
   DragEndEvent,
   DragOverEvent,
@@ -68,14 +69,19 @@ interface ZoneDropTargetProps {
 }
 
 function ZoneDropTarget({ zone, isActive }: ZoneDropTargetProps) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: zone.id,
+  });
+
   return (
     <motion.div
+      ref={setNodeRef}
       id={zone.id}
       data-zone-id={zone.id}
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       className={`drop-zone absolute flex flex-col items-center justify-center text-white text-center p-2 transition-all duration-300 ${
-        isActive ? 'drop-zone-active' : ''
+        isActive || isOver ? 'drop-zone-active' : ''
       }`}
       style={{
         left: zone.x,

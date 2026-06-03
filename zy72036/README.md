@@ -1,57 +1,227 @@
-# React + TypeScript + Vite
+# 🛹 微积分滑板公园
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> 让课堂计分表里的乱材料能对得上
 
-Currently, two official plugins are available:
+专为培训讲师老冯设计的课堂计分管理工具。完整保留原始备注痕迹，每一步操作都留痕可追溯。
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## 🚀 快速开始
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 环境要求
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+- Node.js 18+
+- pnpm 8+
+
+### 安装依赖
+
+```bash
+pnpm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 启动开发服务器
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+pnpm run dev
 ```
+
+启动后访问显示的本地地址（通常是 `http://localhost:5173/`，端口被占用时会自动递增）。
+
+### 其他命令
+
+```bash
+pnpm check    # TypeScript 类型检查
+pnpm build    # 构建生产版本
+pnpm preview  # 预览构建结果
+```
+
+---
+
+## 📖 完整使用流程
+
+### 第一步：开始新对局
+
+1. 打开主页，顶部显示当前关卡名称
+2. 点击 **「开始新对局」** 按钮
+3. 系统自动加载该关卡的：
+   - 初始状态（资源、分数、风险）
+   - 原始备注（完整保留，不做任何清洗）
+   - 可拖拽道具和投放区域
+
+### 第二步：交互操作
+
+#### 方式一：点击快速使用
+
+- 点击左侧道具区的 **「🛹 滑板」** 或 **「🛼 轮滑」**
+- 系统自动计算并更新：资源、分数、风险
+- 操作记录实时添加到时间线
+
+#### 方式二：拖拽投放（关键路径）
+
+1. 从左侧道具区拖拽道具（鼠标按住移动 8px 以上触发拖拽）
+2. 拖到右侧滑板公园的不同区域上释放：
+   - **匀速坡道**（蓝色）：资源-10，分数+15，风险+5
+   - **加速跳台**（橙色）：资源-20，分数+35，风险+15
+   - **休息平台**（绿色）：资源+15，分数+0，风险-10
+3. 道具悬停在区域上时会高亮显示
+4. 释放后自动计算效果并记录
+
+> 💡 不同道具倍率不同：滑板 ×1，轮滑 ×1.2
+
+### 第三步：查看计算过程
+
+每条操作记录点击可展开，查看完整计算轨迹：
+- 操作前后状态对比
+- 应用的计算公式
+- 详细的计算步骤
+- 时间戳和操作ID
+
+### 第四步：补录备注
+
+1. 点击 **「补录备注」** 按钮
+2. 输入备注内容和补录原因（可选）
+3. 点击 **「保存备注」**
+4. 补录备注可编辑，每次修改自动记录：
+   - 字符级差异对比（红色删除线 = 删除，绿色下划线 = 新增）
+   - 修改人、修改时间
+   - 修改原因
+
+### 第五步：结束对局
+
+1. 点击 **「结束本局」** 按钮
+2. 对局自动保存到历史记录
+3. 可在 **「历史记录」** 页面查看
+
+---
+
+## 🧭 页面导航
+
+| 页面 | 入口 | 功能 |
+|------|------|------|
+| **滑板公园** | 顶部导航第一个链接 | 主游戏面板，进行对局操作 |
+| **历史记录** | 顶部导航第二个链接 | 查看所有已结束的对局 |
+| **使用说明** | 顶部导航第三个链接 | 完整文档 + 交接说明 |
+
+---
+
+## 🔍 核心特性验证清单
+
+### ✅ 已验证功能
+
+1. **拖拽投放关键路径**
+   - [x] 道具可拖拽（触发距离 8px）
+   - [x] 三个投放区域可接收拖拽
+   - [x] 悬停高亮反馈
+   - [x] 释放后计算效果正确
+
+2. **资源分数风险联动**
+   - [x] 每次操作实时更新
+   - [x] 负数红色警告 + 禁止继续操作
+   - [x] 数值变化动画反馈
+
+3. **备注管理**
+   - [x] 原始备注完整保留（含错别字）
+   - [x] 补录备注支持编辑
+   - [x] 字符级差异对比显示
+   - [x] 作者、时间、来源完整记录
+
+4. **操作留痕**
+   - [x] 每条操作记录时间戳
+   - [x] 完整计算过程可追溯
+   - [x] 前后状态对比
+
+5. **数据持久化**
+   - [x] LocalStorage 自动保存
+   - [x] 历史记录可查看
+   - [x] 关卡配置可导入导出
+
+---
+
+## 📦 技术栈
+
+| 技术 | 用途 |
+|------|------|
+| **React 18** | UI 框架 |
+| **TypeScript** | 类型安全 |
+| **Vite 5** | 构建工具 |
+| **TailwindCSS 3** | 样式框架 |
+| **Zustand 5** | 状态管理 |
+| **@dnd-kit** | 拖拽交互 |
+| **Framer Motion** | 动画效果 |
+| **diff** | 字符级差异对比 |
+
+---
+
+## 📂 项目结构
+
+```
+src/
+├── types/index.ts          # 核心类型定义
+├── data/mockLevels.ts      # 3组预置关卡数据
+├── utils/
+│   ├── gameEngine.ts       # 游戏计算引擎
+│   └── diffUtils.ts        # 差异对比工具
+├── store/gameStore.ts      # Zustand 状态管理
+├── components/
+│   ├── Navbar.tsx          # 导航栏
+│   ├── StatusDashboard.tsx # 状态仪表盘
+│   ├── SkatePark.tsx       # 拖拽交互区
+│   ├── OperationTimeline.tsx # 操作记录
+│   ├── NotesPanel.tsx      # 备注面板
+│   └── LevelSelector.tsx   # 关卡选择
+└── pages/
+    ├── Home.tsx            # 主游戏页面
+    ├── History.tsx         # 历史记录页面
+    └── Help.tsx            # 使用说明页面
+```
+
+---
+
+## 🔧 故障排除
+
+### 问题：端口被占用
+
+Vite 会自动尝试下一个端口，注意终端输出的实际地址。
+
+### 问题：拖拽没反应
+
+确保鼠标移动距离超过 8px 才会触发拖拽模式。
+
+### 问题：资源负数后无法操作
+
+这是正常设计！点击 **「重置状态」** 恢复初始状态，或 **「结束本局」** 保存记录。
+
+### 问题：数据丢失
+
+数据保存在浏览器 LocalStorage，清除浏览器数据会丢失。建议定期导出关卡配置备份。
+
+---
+
+## 📋 给老冯的交接说明
+
+### 数据存储位置
+
+所有数据保存在浏览器 LocalStorage，key 前缀为 `skatepark_`：
+- `skatepark_levels` - 关卡配置
+- `skatepark_current_session` - 当前对局
+- `skatepark_history` - 历史记录
+- `skatepark_operator_name` - 操作人姓名
+
+### 转移数据到其他电脑
+
+1. 在原电脑浏览器控制台执行：
+   ```javascript
+   localStorage.getItem('skatepark_levels')
+   ```
+2. 复制输出的 JSON 字符串
+3. 在新电脑主页点击 **「导入」** 按钮粘贴
+
+### 关键文件说明
+
+- 关卡配置修改：[src/data/mockLevels.ts](file:///Users/lzy/pro/solo/workspaces/zy72036/src/data/mockLevels.ts)
+- 计算规则修改：[src/utils/gameEngine.ts](file:///Users/lzy/pro/solo/workspaces/zy72036/src/utils/gameEngine.ts)
+- 使用说明修改：[src/pages/Help.tsx](file:///Users/lzy/pro/solo/workspaces/zy72036/src/pages/Help.tsx)
+
+---
+
+**版本 1.0.0** | 专为培训讲师老冯设计 🛹
