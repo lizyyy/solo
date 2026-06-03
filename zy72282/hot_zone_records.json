@@ -1,0 +1,108 @@
+{
+  "origin_points": {
+    "SHELF-A-01": {
+      "shelf_id": "SHELF-A-01",
+      "coordinates": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "description": "A区1号货架东北角立柱底部，作为测量基准点",
+      "established_at": "2026-06-03T20:19:35.142892"
+    },
+    "SHELF-B-03": {
+      "shelf_id": "SHELF-B-03",
+      "coordinates": {
+        "x": 12.5,
+        "y": 8.3,
+        "z": 0.0
+      },
+      "description": "B区3号货架西南角立柱底部，重载区基准点",
+      "established_at": "2026-06-03T20:19:35.142899"
+    },
+    "SHELF-C-02": {
+      "shelf_id": "SHELF-C-02",
+      "coordinates": {
+        "x": 25.0,
+        "y": 15.0,
+        "z": 0.0
+      },
+      "description": "C区2号货架，历史数据补录专用基准点",
+      "established_at": "2026-06-03T20:19:35.142901"
+    }
+  },
+  "records": [
+    {
+      "record_id": "REC-001",
+      "shelf_id": "SHELF-A-01",
+      "status": "正常",
+      "load_weight": 750.0,
+      "max_capacity": 1000.0,
+      "load_ratio": 0.75,
+      "safety_distance": 50.0,
+      "measured_distance": 65.5,
+      "is_safe": true,
+      "data_source": "移动端截图",
+      "inspection_photo": {
+        "photo_id": "P20260603-001",
+        "has_alarm_tag": true,
+        "alarm_tag_blocked": false,
+        "block_reason": "",
+        "data_source": "移动端截图",
+        "taken_at": "2026-06-03T18:19:35.142901"
+      },
+      "created_at": "2026-06-03T20:19:35.142910",
+      "updated_at": "2026-06-03T20:19:35.142911",
+      "correction_note": "",
+      "correction_count": 0
+    },
+    {
+      "record_id": "REC-002",
+      "shelf_id": "SHELF-B-03",
+      "status": "遮挡待确认",
+      "load_weight": 920.0,
+      "max_capacity": 1000.0,
+      "load_ratio": 0.92,
+      "safety_distance": 50.0,
+      "measured_distance": 42.3,
+      "is_safe": false,
+      "data_source": "移动端截图",
+      "inspection_photo": {
+        "photo_id": "P20260603-002",
+        "has_alarm_tag": true,
+        "alarm_tag_blocked": true,
+        "block_reason": "移动端截图角度问题，货架横梁挡住了告警标签区域",
+        "data_source": "移动端截图",
+        "taken_at": "2026-06-03T18:49:35.142915"
+      },
+      "created_at": "2026-06-03T20:19:35.142918",
+      "updated_at": "2026-06-03T20:19:35.142975",
+      "correction_note": "自动重新分析",
+      "correction_count": 2
+    },
+    {
+      "record_id": "REC-003",
+      "shelf_id": "SHELF-C-02",
+      "status": "正常",
+      "load_weight": 680.0,
+      "max_capacity": 800.0,
+      "load_ratio": 0.85,
+      "safety_distance": 50.0,
+      "measured_distance": 55.0,
+      "is_safe": true,
+      "data_source": "历史数据补录",
+      "inspection_photo": {
+        "photo_id": "P20260515-089",
+        "has_alarm_tag": true,
+        "alarm_tag_blocked": false,
+        "block_reason": "",
+        "data_source": "历史数据补录",
+        "taken_at": "2026-05-15T20:19:35.142920"
+      },
+      "created_at": "2026-06-03T20:19:35.142923",
+      "updated_at": "2026-06-03T20:19:35.142923",
+      "correction_note": "",
+      "correction_count": 0
+    }
+  ]
+}
