@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>演示数据 - 地下管廊阀门定位</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f7fa; padding: 20px; line-height: 1.6; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 12px; margin-bottom: 24px; }
+        .header h1 { font-size: 26px; margin-bottom: 8px; }
+        .header p { opacity: 0.9; font-size: 14px; }
+        .back-btn { display: inline-block; background: rgba(255,255,255,0.2); color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 14px; margin-bottom: 16px; }
+        .step-card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); margin-bottom: 20px; }
+        .step-card h2 { font-size: 18px; color: #333; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #eee; }
+        .step-number { display: inline-block; background: #667eea; color: white; width: 28px; height: 28px; border-radius: 50%; text-align: center; line-height: 28px; font-size: 14px; margin-right: 10px; }
+        .flow-diagram { background: #f8f9ff; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .flow-item { display: flex; align-items: center; padding: 12px 16px; background: white; border-radius: 6px; margin-bottom: 8px; border-left: 4px solid #667eea; }
+        .flow-item.active { border-left-color: #f57c00; background: #fff8e1; }
+        .flow-item .icon { font-size: 20px; margin-right: 12px; }
+        .flow-item .text { flex: 1; }
+        .flow-item .text strong { display: block; color: #333; }
+        .flow-item .text span { font-size: 13px; color: #666; }
+        .key-point { background: #fff3e0; border-left: 4px solid #f57c00; padding: 16px; border-radius: 0 8px 8px 0; margin-bottom: 16px; }
+        .key-point h4 { color: #e65100; margin-bottom: 8px; }
+        .key-point p { font-size: 14px; color: #e65100; }
+        .code-block { background: #263238; color: #aed581; padding: 16px; border-radius: 8px; font-family: 'SF Mono', Monaco, monospace; font-size: 13px; overflow-x: auto; }
+        .highlight { background: #ffeb3b; padding: 2px 6px; border-radius: 3px; color: #333; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .info-box { background: #fafbfc; border: 1px solid #e8eaed; border-radius: 8px; padding: 16px; }
+        .info-box h3 { font-size: 15px; color: #333; margin-bottom: 12px; }
+        .info-item { margin-bottom: 10px; font-size: 14px; }
+        .info-item label { color: #666; display: block; margin-bottom: 2px; }
+        .info-item value { color: #333; font-weight: 500; }
+        .status-blocked { color: #d32f2f; font-weight: 600; }
+        .btn { background: #667eea; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; text-decoration: none; display: inline-block; }
+        .btn:hover { background: #5a6fd6; }
+        .check-list { list-style: none; }
+        .check-list li { padding: 8px 0; padding-left: 28px; position: relative; font-size: 14px; }
+        .check-list li:before { content: "✓"; position: absolute; left: 0; color: #388e3c; font-weight: bold; }
+        .arrow-down { text-align: center; color: #667eea; font-size: 20px; padding: 4px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-btn">← 返回小看板</a>
+        
+        <div class="header">
+            <h1>🎓 地下管廊阀门定位 - 演示教学</h1>
+            <p>园区运维小陶给新人讲解：三步完整流程 + 一个关键场景</p>
+        </div>
+
+        <div class="step-card">
+            <h2><span class="step-number">0</span> 整体流程概览</h2>
+            <div class="flow-diagram">
+                <div class="flow-item">
+                    <span class="icon">📐</span>
+                    <div class="text">
+                        <strong>第一步：导入楼层剖面草图</strong>
+                        <span>上传地下管廊图纸，标记阀门位置</span>
+                    </div>
+                </div>
+                <div class="arrow-down">↓</div>
+                <div class="flow-item">
+                    <span class="icon">☁️</span>
+                    <div class="text">
+                        <strong>第二步：园区运维小陶补看点云抽稀日志</strong>
+                        <span>原始备注完整保留，不洗成干净数据</span>
+                    </div>
+                </div>
+                <div class="arrow-down">↓</div>
+                <div class="flow-item active">
+                    <span class="icon">📊</span>
+                    <div class="text">
+                        <strong>第三步：安全距离报告更新</strong>
+                        <span>说明：为什么留下、缺什么材料、下一步找谁</span>
+                    </div>
+                </div>
+            </div>
+            <div class="key-point">
+                <h4>⚠️ 关键场景：移动端截图挡住了告警标签</h4>
+                <p>别急着归正常！留给施工经理复核。V-002 阀门就是这个场景的演示。</p>
+            </div>
+        </div>
+
+        <div class="step-card">
+            <h2><span class="step-number">1</span> 第一步：楼层剖面草图导入</h2>
+            <div class="grid-2">
+                <div class="info-box">
+                    <h3>📁 导入信息</h3>
+                    <div class="info-item"><label>文件名</label><value>{{ record.floor_sketch.file_name }}</value></div>
+                    <div class="info-item"><label>楼层</label><value>{{ record.floor_sketch.floor_level }}</value></div>
+                    <div class="info-item"><label>上传人</label><value>{{ record.floor_sketch.uploaded_by }}</value></div>
+                    <div class="info-item"><label>标记阀门数</label><value>{{ record.floor_sketch.marked_valve_positions | length }} 个</value></div>
+                </div>
+                <div class="info-box">
+                    <h3>📍 标记阀门列表</h3>
+                    {% for pos in record.floor_sketch.marked_valve_positions %}
+                    <div class="info-item">
+                        <label>{{ pos.valve_id }}: {{ pos.label }}</label>
+                        <value>距离: {{ pos.distance_to_obstacle }}m / 要求: {{ pos.required_distance }}m</value>
+                        {% if pos.has_screenshot_overlay %}
+                        <span class="status-blocked">⚠️ 有截图遮挡</span>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="step-card">
+            <h2><span class="step-number">2</span> 第二步：点云抽稀日志（原始备注完整保留）</h2>
+            <div class="key-point">
+                <h4>💡 设计要点</h4>
+                <p>点云抽稀日志的备注经常比正式表还重要！<span class="highlight">原始备注不洗成一行干净数据</span>，完整保留给运维参考。</p>
+            </div>
+            {% for log in record.point_cloud_logs %}
+            <div class="code-block">
+<span style="color: #64b5f6;">// 日志ID: {{ log.log_id }} | 操作人: {{ log.operator }}</span>
+<span style="color: #ffb74d;">【原始备注完整保留】</span> {{ log.raw_remark }}
+
+<span style="color: #90a4ae;">// 附加字段</span>
+抽稀率: {{ log.thinning_ratio }}
+置信度: {{ log.confidence_level }}
+发现问题: {{ log.issues_found | join(', ') }}
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="step-card">
+            <h2><span class="step-number">3</span> 第三步：安全距离报告（关键信息说明）</h2>
+            
+            <div class="info-box" style="margin-bottom: 20px;">
+                <h3>📋 报告摘要</h3>
+                <div class="grid-2">
+                    <div class="info-item"><label>总计阀门</label><value>{{ record.safety_report.summary.total_valves }}</value></div>
+                    <div class="info-item"><label>正常</label><value style="color: #388e3c;">{{ record.safety_report.summary.normal_count }}</value></div>
+                    <div class="info-item"><label>异常</label><value style="color: #f57c00;">{{ record.safety_report.summary.abnormal_count }}</value></div>
+                    <div class="info-item"><label>截图遮挡</label><value style="color: #d32f2f;">{{ record.safety_report.summary.blocked_count }}</value></div>
+                </div>
+            </div>
+
+            <h3 style="font-size: 15px; margin-bottom: 12px;">🔍 重点看：V-002（移动端截图挡住告警标签）</h3>
+            {% set v002 = record.safety_report.issues | selectattr('valve_id', 'equalto', 'V-002') | first %}
+            {% if v002 %}
+            <div class="key-point" style="background: #ffebee; border-left-color: #d32f2f;">
+                <h4 style="color: #b71c1c;">🚫 状态：截图遮挡 - 留给施工经理复核</h4>
+                <p style="color: #c62828;">
+                    <strong>为什么留下这条记录：</strong>{{ v002.why_kept }}<br><br>
+                    <strong>缺什么材料：</strong>{{ v002.missing_materials | join('、') }}<br><br>
+                    <strong>下一步该找谁：</strong><span class="highlight">{{ v002.next_action_person.value }}</span> → {{ v002.next_action.value }}
+                </p>
+            </div>
+            {% endif %}
+
+            <h3 style="font-size: 15px; margin: 20px 0 12px;">📝 所有问题详情</h3>
+            {% for issue in record.safety_report.issues %}
+            <div class="info-box" style="margin-bottom: 12px;">
+                <h4 style="margin-bottom: 10px;">
+                    {% if issue.is_blocked_by_screenshot %}🚫{% elif issue.status.value != '正常' %}⚠️{% else %}✅{% endif %}
+                    {{ issue.valve_label }} ({{ issue.valve_id }})
+                    <span style="font-weight: normal; color: #999; font-size: 13px;">| {{ issue.status.value }}</span>
+                </h4>
+                <div class="info-item"><label>为什么留下</label><value>{{ issue.why_kept }}</value></div>
+                <div class="info-item"><label>缺什么材料</label><value>{{ issue.missing_materials | join('、') if issue.missing_materials else '无' }}</value></div>
+                <div class="info-item"><label>下一步找谁</label><value><span class="highlight">{{ issue.next_action_person.value }}</span> → {{ issue.next_action.value }}</value></div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="step-card">
+            <h2><span class="step-number">4</span> 真实复核：变更历史追踪</h2>
+            <p style="margin-bottom: 16px; color: #666; font-size: 14px;">谁改了什么、为什么改、改完影响哪些结果，都要说清楚。</p>
+            {% for change in record.change_history %}
+            <div class="info-box" style="margin-bottom: 10px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <strong style="color: #667eea;">{{ change.who }}</strong>
+                    <span style="color: #999; font-size: 13px;">{{ change.timestamp.strftime('%H:%M:%S') }}</span>
+                </div>
+                <div class="info-item"><label>改了什么</label><value>{{ change.what_changed }}</value></div>
+                <div class="info-item"><label>为什么改</label><value>{{ change.why_changed }}</value></div>
+                <div class="info-item"><label>影响哪些结果</label><value>{{ change.affected_results | join('、') }}</value></div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="step-card">
+            <h2>✅ 演示验证清单</h2>
+            <ul class="check-list">
+                <li>V-002 被标记为【截图遮挡】，没有急着归正常</li>
+                <li>点云抽稀日志原始备注完整保留，没有洗成干净数据</li>
+                <li>安全距离报告说明了：为什么留下、缺什么材料、下一步找谁</li>
+                <li>截图遮挡问题的下一步责任人是施工经理，不是小陶</li>
+                <li>补录点云抽稀日志后，安全距离报告可以更新</li>
+                <li>所有变更可追溯：谁改了什么、为什么改</li>
+                <li>新同事只看安全距离报告，就能知道截图遮挡的来源和下一步动作</li>
+            </ul>
+            <div style="margin-top: 20px; text-align: center;">
+                <a href="/record/{{ record_id }}" class="btn">查看完整记录详情 →</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

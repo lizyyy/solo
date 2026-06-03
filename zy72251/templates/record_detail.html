@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>记录详情 - 地下管廊阀门定位</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f7fa; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 24px 30px; border-radius: 12px; margin-bottom: 24px; }
+        .header h1 { font-size: 24px; }
+        .header .meta { margin-top: 12px; opacity: 0.9; font-size: 14px; display: flex; gap: 20px; }
+        .back-btn { display: inline-block; background: rgba(255,255,255,0.2); color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 14px; margin-bottom: 16px; }
+        .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); margin-bottom: 20px; }
+        .card h2 { font-size: 18px; color: #333; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .info-item { margin-bottom: 12px; }
+        .info-label { font-size: 13px; color: #666; margin-bottom: 4px; }
+        .info-value { font-size: 15px; color: #333; font-weight: 500; }
+        .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .status-normal { background: #e8f5e9; color: #388e3c; }
+        .status-abnormal { background: #fff3e0; color: #f57c00; }
+        .status-blocked { background: #ffebee; color: #d32f2f; }
+        .status-pending { background: #e3f2fd; color: #1976d2; }
+        .issue-card { background: #fafbfc; border: 1px solid #e8eaed; border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+        .issue-card.blocked { border-left: 4px solid #d32f2f; }
+        .issue-card.abnormal { border-left: 4px solid #f57c00; }
+        .issue-card.normal { border-left: 4px solid #388e3c; }
+        .issue-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .issue-title { font-weight: 600; color: #333; }
+        .issue-meta { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; font-size: 13px; margin-bottom: 12px; }
+        .issue-meta div { background: white; padding: 8px 12px; border-radius: 6px; }
+        .issue-meta span { color: #666; display: block; margin-bottom: 4px; }
+        .issue-meta strong { color: #333; }
+        .why-kept { background: #fff8e1; padding: 12px; border-radius: 6px; font-size: 14px; line-height: 1.6; margin-bottom: 12px; }
+        .why-kept strong { color: #f57c00; }
+        .missing-materials, .next-action { display: flex; align-items: center; gap: 8px; font-size: 14px; margin-bottom: 8px; }
+        .missing-materials span, .next-action span { color: #666; }
+        .tag { background: #e3f2fd; color: #1976d2; padding: 3px 10px; border-radius: 12px; font-size: 12px; }
+        .log-card { background: #f5f5f5; border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+        .log-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .log-id { font-family: monospace; color: #667eea; font-weight: 600; }
+        .log-remark { background: white; padding: 12px; border-radius: 6px; font-size: 14px; line-height: 1.6; border-left: 3px solid #667eea; }
+        .log-meta { display: flex; gap: 20px; font-size: 13px; color: #666; margin-top: 8px; }
+        .change-item { padding: 12px; border-left: 3px solid #667eea; background: #f8f9ff; margin-bottom: 8px; border-radius: 0 6px 6px 0; }
+        .change-header { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px; }
+        .change-who { font-weight: 600; color: #667eea; }
+        .change-time { color: #999; }
+        .change-what { font-size: 14px; color: #333; margin-bottom: 4px; }
+        .change-why { font-size: 13px; color: #666; }
+        .btn { background: #667eea; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; }
+        .btn:hover { background: #5a6fd6; }
+        .btn-outline { background: white; color: #667eea; border: 1px solid #667eea; }
+        .btn-outline:hover { background: #f8f9ff; }
+        textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; resize: vertical; min-height: 80px; font-family: inherit; }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; margin-bottom: 6px; font-size: 14px; color: #333; }
+        .alert-blocked { background: #ffebee; border: 1px solid #ef9a9a; padding: 16px; border-radius: 8px; margin-bottom: 16px; }
+        .alert-blocked h4 { color: #c62828; margin-bottom: 8px; }
+        .alert-blocked p { color: #c62828; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-btn">← 返回小看板</a>
+        
+        <div class="header">
+            <h1>📋 记录详情: {{ record.record_id }}</h1>
+            <div class="meta">
+                <span>创建时间: {{ record.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                <span>状态: {{ record.status }}</span>
+                <span>重跑次数: {{ record.run_count }}</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📐 楼层剖面草图</h2>
+            <div class="grid-2">
+                <div class="info-item">
+                    <div class="info-label">文件名</div>
+                    <div class="info-value">{{ record.floor_sketch.file_name }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">楼层</div>
+                    <div class="info-value">{{ record.floor_sketch.floor_level }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">上传人</div>
+                    <div class="info-value">{{ record.floor_sketch.uploaded_by }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">标记阀门数</div>
+                    <div class="info-value">{{ record.floor_sketch.marked_valve_positions | length }} 个</div>
+                </div>
+            </div>
+            {% if record.floor_sketch.has_mobile_screenshot %}
+            <div class="alert-blocked" style="margin-top: 16px;">
+                <h4>⚠️ 包含移动端截图</h4>
+                <p>此草图导入时包含移动端拍摄的截图，请注意检查告警标签是否被遮挡。</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <h2>☁️ 点云抽稀日志 ({{ record.point_cloud_logs | length }} 条)</h2>
+            {% if record.point_cloud_logs %}
+                {% for log in record.point_cloud_logs %}
+                <div class="log-card">
+                    <div class="log-header">
+                        <span class="log-id">📝 {{ log.log_id }}</span>
+                        <span style="color: #666; font-size: 13px;">{{ log.timestamp.strftime('%Y-%m-%d %H:%M') }}</span>
+                    </div>
+                    <div class="log-remark"><strong>原始备注:</strong> {{ log.raw_remark }}</div>
+                    <div class="log-meta">
+                        <span>操作人: {{ log.operator }}</span>
+                        <span>抽稀率: {{ log.thinning_ratio }}</span>
+                        <span>置信度: {{ log.confidence_level }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p style="color: #999; text-align: center; padding: 20px;">暂无点云抽稀日志</p>
+            {% endif %}
+            
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
+                <h3 style="font-size: 15px; margin-bottom: 12px;">➕ 补录点云抽稀日志</h3>
+                <div class="form-group">
+                    <label>操作人</label>
+                    <input type="text" id="operator" value="园区运维小陶" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                </div>
+                <div class="form-group">
+                    <label>日志备注 (原始内容将完整保留)</label>
+                    <textarea id="remark" placeholder="例如: 2024.3.14 现场复测确认V-001实际距离2.1m..."></textarea>
+                </div>
+                <button class="btn" onclick="addLog()">补录日志</button>
+                <button class="btn btn-outline" onclick="addLogAndRerun()">补录并重跑报告</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>
+                📊 安全距离报告
+                <button class="btn btn-outline" onclick="rerunReport()" style="font-size: 13px; padding: 6px 12px;">🔄 重跑报告</button>
+            </h2>
+            
+            {% if record.safety_report %}
+                <div class="grid-2" style="margin-bottom: 20px;">
+                    <div class="info-item">
+                        <div class="info-label">报告ID</div>
+                        <div class="info-value">{{ record.safety_report.report_id }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">生成时间</div>
+                        <div class="info-value">{{ record.safety_report.generated_at.strftime('%Y-%m-%d %H:%M') }}</div>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px;">
+                    <div style="background: #e8f5e9; padding: 16px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 28px; font-weight: bold; color: #388e3c;">{{ record.safety_report.summary.normal_count }}</div>
+                        <div style="font-size: 13px; color: #388e3c;">正常</div>
+                    </div>
+                    <div style="background: #fff3e0; padding: 16px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 28px; font-weight: bold; color: #f57c00;">{{ record.safety_report.summary.abnormal_count }}</div>
+                        <div style="font-size: 13px; color: #f57c00;">异常</div>
+                    </div>
+                    <div style="background: #ffebee; padding: 16px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 28px; font-weight: bold; color: #d32f2f;">{{ record.safety_report.summary.blocked_count }}</div>
+                        <div style="font-size: 13px; color: #d32f2f;">截图遮挡</div>
+                    </div>
+                    <div style="background: #e3f2fd; padding: 16px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 28px; font-weight: bold; color: #1976d2;">{{ record.safety_report.summary.total_valves }}</div>
+                        <div style="font-size: 13px; color: #1976d2;">总计</div>
+                    </div>
+                </div>
+
+                <h3 style="font-size: 15px; margin-bottom: 12px;">问题详情</h3>
+                {% for issue in record.safety_report.issues %}
+                <div class="issue-card {{ 'blocked' if issue.is_blocked_by_screenshot else 'abnormal' if issue.status.value != '正常' else 'normal' }}">
+                    <div class="issue-header">
+                        <span class="issue-title">
+                            {% if issue.is_blocked_by_screenshot %}🚫{% endif %}
+                            {{ issue.valve_label }} ({{ issue.valve_id }})
+                        </span>
+                        <span class="status-badge status-{{ 'blocked' if issue.is_blocked_by_screenshot else 'abnormal' if issue.status.value != '正常' else 'normal' }}">
+                            {{ issue.status.value }}
+                        </span>
+                    </div>
+                    <div class="issue-meta">
+                        <div><span>检测距离</span><strong>{{ issue.detected_distance }}m</strong></div>
+                        <div><span>要求距离</span><strong>{{ issue.required_distance }}m</strong></div>
+                        <div><span>截图遮挡</span><strong>{{ '是' if issue.is_blocked_by_screenshot else '否' }}</strong></div>
+                    </div>
+                    <div class="why-kept">
+                        <strong>🔍 为什么留下这条记录：</strong><br>
+                        {{ issue.why_kept }}
+                    </div>
+                    {% if issue.missing_materials %}
+                    <div class="missing-materials">
+                        <span>📦 还缺什么材料：</span>
+                        {% for mat in issue.missing_materials %}
+                        <span class="tag">{{ mat }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    <div class="next-action">
+                        <span>⏭️ 下一步该找谁：</span>
+                        <strong>{{ issue.next_action_person.value }}</strong>
+                        <span class="tag">{{ issue.next_action.value }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p style="color: #999; text-align: center; padding: 40px;">暂无安全距离报告</p>
+                <div style="text-align: center;">
+                    <button class="btn" onclick="rerunReport()">生成安全距离报告</button>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <h2>📜 变更历史 (真实复核：谁改了什么、为什么改)</h2>
+            {% if record.change_history %}
+                {% for change in record.change_history %}
+                <div class="change-item">
+                    <div class="change-header">
+                        <span class="change-who">{{ change.who }}</span>
+                        <span class="change-time">{{ change.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+                    </div>
+                    <div class="change-what">改了什么：{{ change.what_changed }}</div>
+                    <div class="change-why">为什么改：{{ change.why_changed }}</div>
+                    <div style="font-size: 12px; color: #999; margin-top: 4px;">影响结果：{{ change.affected_results | join(', ') }}</div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p style="color: #999; text-align: center; padding: 20px;">暂无变更记录</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        const recordId = "{{ record.record_id }}";
+        
+        async function addLog() {
+            const operator = document.getElementById('operator').value;
+            const remark = document.getElementById('remark').value;
+            if (!remark) { alert('请填写日志备注'); return; }
+            
+            const res = await fetch(`/api/record/${recordId}/add-log`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({operator, raw_remark: remark})
+            });
+            if (res.ok) { alert('日志补录成功'); location.reload(); }
+        }
+        
+        async function addLogAndRerun() {
+            await addLog();
+        }
+        
+        async function rerunReport() {
+            const form = new FormData();
+            form.append('generated_by', '园区运维小陶');
+            const res = await fetch(`/api/record/${recordId}/calculate`, {
+                method: 'POST',
+                body: form
+            });
+            if (res.ok) { alert('报告重跑成功'); location.reload(); }
+        }
+    </script>
+</body>
+</html>
