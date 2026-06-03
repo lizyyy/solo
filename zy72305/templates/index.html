@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>蒙特卡洛库存波动 - 批注追踪系统</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #333; margin-bottom: 20px; }
+        .card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .record-item { border: 1px solid #e0e0e0; border-radius: 6px; padding: 15px; margin-bottom: 10px; }
+        .record-item:hover { border-color: #2196F3; }
+        .record-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .status-badge { padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+        .status-normal { background: #C8E6C9; color: #2E7D32; }
+        .status-warning { background: #FFCDD2; color: #C62828; }
+        .status-pending { background: #FFF3E0; color: #EF6C00; }
+        .status-boundary { background: #E1BEE7; color: #6A1B9A; }
+        .line-info { color: #666; font-size: 13px; margin-bottom: 8px; }
+        .comment-text { background: #f9f9f9; padding: 10px; border-radius: 4px; font-size: 14px; color: #333; }
+        .view-detail { color: #2196F3; text-decoration: none; font-size: 14px; }
+        .view-detail:hover { text-decoration: underline; }
+        .phase-marker { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 4px; }
+        .phase-1 { background: #90CAF9; }
+        .phase-2 { background: #A5D6A7; }
+        .phase-3 { background: #FFCC80; }
+        .phases { margin-top: 10px; display: flex; gap: 15px; font-size: 12px; color: #666; }
+        .toolbar { display: flex; gap: 10px; margin-bottom: 20px; }
+        .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+        .btn-primary { background: #2196F3; color: white; }
+        .btn-secondary { background: #757575; color: white; }
+        .empty-state { text-align: center; padding: 40px; color: #999; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>蒙特卡洛库存波动 - 批注追踪</h1>
+        
+        <div class="toolbar">
+            <button class="btn btn-primary" onclick="showImportModal()">导入老师批注</button>
+            <button class="btn btn-secondary" onclick="showSamplingModal()">补录抽样名单</button>
+        </div>
+
+        <div class="card">
+            <h2 style="margin-bottom: 15px; font-size: 18px;">批注记录列表</h2>
+            
+            {% if records %}
+                {% for rec in records %}
+                {% set basic = rec.basic_info %}
+                <div class="record-item">
+                    <div class="record-header">
+                        <div>
+                            <strong>记录 #{{ basic.id }}</strong>
+                            {% if basic.is_boundary_case %}
+                            <span class="status-badge status-boundary">边界值需复核</span>
+                            {% else %}
+                                {% if basic.current_status == 'normal' %}
+                                <span class="status-badge status-normal">正常</span>
+                                {% elif basic.current_status == 'warning' %}
+                                <span class="status-badge status-warning">异常</span>
+                                {% elif basic.current_status == 'pending_teacher_review' %}
+                                <span class="status-badge status-pending">待老师复核</span>
+                                {% else %}
+                                <span class="status-badge status-pending">待处理</span>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        <a href="/record/{{ basic.id }}" class="view-detail">查看详情 →</a>
+                    </div>
+                    
+                    <div class="line-info">
+                        📄 {{ basic.source_file }} | 第 {{ basic.original_line_number }} 行
+                        {% if basic.boundary_value %}
+                        | 📊 波动值: {{ basic.boundary_value }} (阈值: {{ basic.threshold_value }})
+                        {% endif %}
+                    </div>
+                    
+                    <div class="comment-text">
+                        <strong>原文:</strong> {{ basic.original_content }}<br>
+                        <strong>批注:</strong> {{ basic.comment_text }}
+                    </div>
+                    
+                    <div class="phases">
+                        <span><span class="phase-marker phase-1"></span>批注导入</span>
+                        <span><span class="phase-marker phase-2"></span>
+                            {% if basic.sample_id %}抽样已关联 ({{ basic.sample_id }}){% else %}待补录抽样{% endif %}
+                        </span>
+                        <span><span class="phase-marker phase-3"></span>
+                            {% if basic.teacher_review_result %}已复核{% else %}待确认{% endif %}
+                        </span>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    暂无记录，点击"导入老师批注"开始
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div id="importModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000;">
+        <div style="background:white; margin:50px auto; padding:30px; max-width:600px; border-radius:8px;">
+            <h3>导入老师批注</h3>
+            <div style="margin:15px 0;">
+                <label>来源文件:</label>
+                <input type="text" id="sourceFile" value="蒙特卡洛库存波动.docx" style="width:100%; padding:8px; margin:5px 0;">
+            </div>
+            <div style="margin:15px 0;">
+                <label>操作人:</label>
+                <input type="text" id="importOperator" value="实验助理小穆" style="width:100%; padding:8px; margin:5px 0;">
+            </div>
+            <div style="margin:15px 0;">
+                <label>批注数据 (JSON格式):</label>
+                <textarea id="commentsData" rows="10" style="width:100%; padding:8px; font-family:monospace;">[
+  {"line_number": 42, "original_content": "库存波动率: 0.12", "comment_text": "波动率在正常范围内", "boundary_value": 0.12},
+  {"line_number": 56, "original_content": "库存波动率: 0.15", "comment_text": "等于阈值，需确认", "boundary_value": 0.15},
+  {"line_number": 78, "original_content": "库存波动率: 0.18", "comment_text": "波动率偏高", "boundary_value": 0.18}
+]</textarea>
+            </div>
+            <div style="text-align:right;">
+                <button class="btn btn-secondary" onclick="hideImportModal()">取消</button>
+                <button class="btn btn-primary" onclick="doImport()">确认导入</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="samplingModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000;">
+        <div style="background:white; margin:50px auto; padding:30px; max-width:600px; border-radius:8px;">
+            <h3>补录抽样名单</h3>
+            <div style="margin:15px 0;">
+                <label>操作人:</label>
+                <input type="text" id="samplingOperator" value="实验助理小穆" style="width:100%; padding:8px; margin:5px 0;">
+            </div>
+            <div style="margin:15px 0;">
+                <label>抽样数据 (JSON格式):</label>
+                <textarea id="samplingData" rows="10" style="width:100%; padding:8px; font-family:monospace;">[
+  {"sample_id": "S001", "sample_name": "A商品7月抽样", "comment_id": 1, "supplementary_note": "群内补录抽样名单"}
+]</textarea>
+            </div>
+            <div style="text-align:right;">
+                <button class="btn btn-secondary" onclick="hideSamplingModal()">取消</button>
+                <button class="btn btn-primary" onclick="doSampling()">确认补录</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showImportModal() { document.getElementById('importModal').style.display = 'block'; }
+        function hideImportModal() { document.getElementById('importModal').style.display = 'none'; }
+        function showSamplingModal() { document.getElementById('samplingModal').style.display = 'block'; }
+        function hideSamplingModal() { document.getElementById('samplingModal').style.display = 'none'; }
+        
+        async function doImport() {
+            const data = {
+                source_file: document.getElementById('sourceFile').value,
+                imported_by: document.getElementById('importOperator').value,
+                comments: JSON.parse(document.getElementById('commentsData').value)
+            };
+            
+            const res = await fetch('/api/import_comments', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            
+            const result = await res.json();
+            alert(`导入成功: ${result.success_count} 条\n跳过: ${result.skipped.length} 条`);
+            location.reload();
+        }
+        
+        async function doSampling() {
+            const data = {
+                operator: document.getElementById('samplingOperator').value,
+                samples: JSON.parse(document.getElementById('samplingData').value)
+            };
+            
+            const res = await fetch('/api/supplementary_sampling', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            
+            const result = await res.json();
+            alert(`补录完成: ${result.updated_count} 条`);
+            location.reload();
+        }
+    </script>
+</body>
+</html>
