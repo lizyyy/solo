@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}坐标原点说明 - 码头岸桥作业半径{% endblock %}
+{% block content %}
+<h2 style="margin-bottom:16px;color:#1a3a5c;">坐标原点说明</h2>
+
+<div class="actions">
+    <a href="/origin-notes/add" class="btn">补录原点说明</a>
+</div>
+
+<div class="card">
+    {% if notes %}
+    <table>
+        <thead>
+            <tr><th>编号</th><th>岸桥</th><th>关联记录</th><th>原点X</th><th>原点Y</th><th>原点Z</th><th>旧口径</th><th>补录人</th><th>已应用</th></tr>
+        </thead>
+        <tbody>
+        {% for n in notes %}
+            <tr>
+                <td>{{ n.note_no }}</td>
+                <td>{{ n.crane_no }}</td>
+                <td><a href="/radius?status=updated">{{ n.record_no }}</a></td>
+                <td>{{ n.origin_x }}</td>
+                <td>{{ n.origin_y }}</td>
+                <td>{{ n.origin_z }}</td>
+                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ n.old_caliber or '-' }}</td>
+                <td>{{ n.operator }}</td>
+                <td><span class="badge badge-{{ 'updated' if n.is_applied else 'pending' }}">{{ '已应用' if n.is_applied else '未应用' }}</span></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="color:#999;">暂无坐标原点说明</p>
+    {% endif %}
+</div>
+{% endblock %}

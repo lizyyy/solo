@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}{{ record.record_no }} - 码头岸桥作业半径{% endblock %}
+{% block content %}
+<h2 style="margin-bottom:16px;color:#1a3a5c;">记录详情：{{ record.record_no }}</h2>
+
+<div class="card">
+    <h2>安全半径数据</h2>
+    <table>
+        <tr><th>编号</th><td>{{ record.record_no }}</td></tr>
+        <tr><th>岸桥</th><td>{{ record.crane_no }}</td></tr>
+        <tr><th>作业日期</th><td>{{ record.operation_date.isoformat() }}</td></tr>
+        <tr><th>X坐标</th><td>{{ record.x }}</td></tr>
+        <tr><th>Y坐标</th><td>{{ record.y }}</td></tr>
+        <tr><th>Z坐标</th><td>{{ record.z }}</td></tr>
+        <tr><th>作业半径</th><td>{{ record.radius }}</td></tr>
+        <tr><th>Z轴方向</th><td>{{ record.z_axis_direction }}</td></tr>
+        <tr><th>Z轴是否写反</th><td>{{ '是' if record.is_z_reversed else '否' }}</td></tr>
+        <tr><th>状态</th><td><span class="badge badge-{{ record.status }}">{{ record.status }}</span></td></tr>
+        <tr><th>来源</th><td>{{ record.source }}</td></tr>
+    </table>
+</div>
+
+{% if record.is_z_reversed %}
+<div class="note-box">
+    ⚠️ 此记录Z轴方向疑似按旧习惯写反。<strong>不归正，留给现场班组复核。</strong>
+</div>
+
+<div class="card">
+    <h2>人工修正</h2>
+    <form method="post" action="/radius/{{ record.id }}/correct">
+        <div class="form-group">
+            <label>修正Z值</label>
+            <input type="number" step="0.1" name="correct_z" value="{{ record.z }}">
+        </div>
+        <div class="form-group">
+            <label>修正方向</label>
+            <select name="correct_direction">
+                <option value="up" {% if record.z_axis_direction == 'up' %}selected{% endif %}>up（向上）</option>
+                <option value="down" {% if record.z_axis_direction == 'down' %}selected{% endif %}>down（向下）</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>操作人</label>
+            <input type="text" name="operator" value="许工">
+        </div>
+        <button type="submit" class="btn btn-warning">提交修正</button>
+    </form>
+</div>
+{% endif %}
+
+{% if origin_notes %}
+<div class="card">
+    <h2>关联坐标原点说明</h2>
+    {% for note in origin_notes %}
+    <div class="origin-box">
+        <strong>{{ note.note_no }}</strong> - 补录人：{{ note.operator }}<br>
+        原点坐标：({{ note.origin_x }}, {{ note.origin_y }}, {{ note.origin_z }})<br>
+        {% if note.old_caliber %}旧口径：{{ note.old_caliber }}<br>{% endif %}
+        {% if note.z_direction_note %}Z轴备注：{{ note.z_direction_note }}<br>{% endif %}
+        应用状态：{{ '已应用' if note.is_applied else '未应用' }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if playbacks %}
+<div class="card">
+    <h2>路径回放版本</h2>
+    <table>
+        <thead>
+            <tr><th>版本</th><th>路径编号</th><th>Z轴应用</th><th>原点已应用</th><th>原点坐标</th><th>回放时间</th></tr>
+        </thead>
+        <tbody>
+        {% for pp in playbacks %}
+            <tr>
+                <td>V{{ pp.version }}</td>
+                <td>{{ pp.path_no }}</td>
+                <td>{{ pp.z_axis_applied }}</td>
+                <td>{{ '是' if pp.is_origin_applied else '否' }}</td>
+                <td>({{ pp.origin_x }}, {{ pp.origin_y }}, {{ pp.origin_z }})</td>
+                <td>{{ pp.playback_time.strftime('%m-%d %H:%M') if pp.playback_time else '' }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <div class="actions">
+        <a href="/playback/{{ record.record_no }}/compare" class="btn btn-sm">对比各版本</a>
+    </div>
+</div>
+{% endif %}
+
+<div class="actions">
+    <a href="/radius" class="btn btn-outline">返回列表</a>
+</div>
+{% endblock %}

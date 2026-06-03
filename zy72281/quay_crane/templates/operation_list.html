@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}操作记录 - 码头岸桥作业半径{% endblock %}
+{% block content %}
+<h2 style="margin-bottom:16px;color:#1a3a5c;">操作记录</h2>
+
+<div class="card">
+    {% if operations %}
+    <table>
+        <thead>
+            <tr><th>时间</th><th>类型</th><th>操作人</th><th>描述</th><th>影响数</th></tr>
+        </thead>
+        <tbody>
+        {% for op in operations %}
+            <tr>
+                <td>{{ op.operation_time.strftime('%Y-%m-%d %H:%M:%S') if op.operation_time else '' }}</td>
+                <td><span class="badge badge-{{ 'normal' if op.operation_type == 'import' else 'z_reversed' if op.operation_type == 'manual_correction' else 'updated' if op.operation_type == 'origin' else 'pending' }}">{{ op.operation_type }}</span></td>
+                <td>{{ op.operator }}</td>
+                <td>{{ op.description }}</td>
+                <td>{{ op.affected_count }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="color:#999;">暂无操作记录</p>
+    {% endif %}
+</div>
+{% endblock %}

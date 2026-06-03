@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}补录坐标原点说明 - 码头岸桥作业半径{% endblock %}
+{% block content %}
+<h2 style="margin-bottom:16px;color:#1a3a5c;">补录坐标原点说明</h2>
+
+<div class="card">
+    <form method="post" action="/origin-notes/add">
+        <div class="form-group">
+            <label>说明编号</label>
+            <input type="text" name="note_no" required placeholder="如 NOTE-002">
+        </div>
+        <div class="form-group">
+            <label>岸桥编号</label>
+            <input type="text" name="crane_no" required placeholder="如 QC-01">
+        </div>
+        <div class="form-group">
+            <label>关联记录编号</label>
+            <input type="text" name="record_no" required placeholder="如 REC-003">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+            <div class="form-group">
+                <label>原点X坐标</label>
+                <input type="number" step="0.1" name="origin_x" required>
+            </div>
+            <div class="form-group">
+                <label>原点Y坐标</label>
+                <input type="number" step="0.1" name="origin_y" required>
+            </div>
+            <div class="form-group">
+                <label>原点Z坐标</label>
+                <input type="number" step="0.1" name="origin_z" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>旧口径说明</label>
+            <textarea name="old_caliber" rows="3" placeholder="如：2020版旧口径说明..."></textarea>
+        </div>
+        <div class="form-group">
+            <label>Z轴方向备注</label>
+            <input type="text" name="z_direction_note" placeholder="如：按旧习惯向下为正">
+        </div>
+        <div class="form-group">
+            <label>补录人</label>
+            <input type="text" name="operator" value="许工">
+        </div>
+        <div class="actions">
+            <button type="submit" class="btn btn-success">提交补录</button>
+            <a href="/origin-notes" class="btn btn-outline">取消</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

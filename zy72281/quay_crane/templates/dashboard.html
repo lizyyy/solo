@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}看板 - 码头岸桥作业半径{% endblock %}
+{% block content %}
+<h2 style="margin-bottom:20px;color:#1a3a5c;">码头岸桥作业半径 - 看板</h2>
+
+<div class="stats">
+    <div class="stat-item success">
+        <div class="number">{{ normal_count }}</div>
+        <div class="label">正常记录</div>
+    </div>
+    <div class="stat-item warning">
+        <div class="number">{{ reversed_count }}</div>
+        <div class="label">Z轴写反（待复核）</div>
+    </div>
+    <div class="stat-item info">
+        <div class="number">{{ updated_count }}</div>
+        <div class="label">已补录更新</div>
+    </div>
+    <div class="stat-item">
+        <div class="number">{{ total_radius }}</div>
+        <div class="label">安全半径总记录</div>
+    </div>
+    <div class="stat-item">
+        <div class="number">{{ total_notes }}</div>
+        <div class="label">坐标原点说明</div>
+    </div>
+    <div class="stat-item info">
+        <div class="number">{{ unapplied_notes }}</div>
+        <div class="label">原点未应用</div>
+    </div>
+    <div class="stat-item">
+        <div class="number">{{ total_playbacks }}</div>
+        <div class="label">路径回放</div>
+    </div>
+</div>
+
+{% if reversed_count > 0 %}
+<div class="note-box">
+    ⚠️ 有 <strong>{{ reversed_count }}</strong> 条记录Z轴方向疑似按旧习惯写反，<strong>不归正，留给现场班组复核</strong>。
+    <a href="/radius?status=z_reversed" class="btn btn-warning btn-sm" style="margin-left:8px;">查看待复核</a>
+</div>
+{% endif %}
+
+{% if unapplied_notes > 0 %}
+<div class="origin-box">
+    📋 有 <strong>{{ unapplied_notes }}</strong> 条坐标原点说明尚未应用到路径回放。
+    <form method="post" action="/playback/rerun-with-origin" style="display:inline;margin-left:8px;">
+        <input type="hidden" name="operator" value="许工">
+        <button type="submit" class="btn btn-success btn-sm">补录后重跑回放</button>
+    </form>
+</div>
+{% endif %}
+
+<div class="card">
+    <h2>最近操作记录</h2>
+    {% if recent_ops %}
+    <table>
+        <thead>
+            <tr><th>时间</th><th>类型</th><th>操作人</th><th>描述</th><th>影响数</th></tr>
+        </thead>
+        <tbody>
+        {% for op in recent_ops %}
+            <tr>
+                <td>{{ op.operation_time.strftime('%m-%d %H:%M') if op.operation_time else '' }}</td>
+                <td><span class="badge badge-{{ 'normal' if op.operation_type == 'import' else 'z_reversed' if op.operation_type == 'manual_correction' else 'updated' }}">{{ op.operation_type }}</span></td>
+                <td>{{ op.operator }}</td>
+                <td>{{ op.description }}</td>
+                <td>{{ op.affected_count }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="color:#999;">暂无操作记录。请先通过CLI运行 <code>flask run-full-demo</code> 初始化演示数据。</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>快速操作</h2>
+    <div class="actions">
+        <a href="/radius" class="btn">查看安全半径表</a>
+        <a href="/origin-notes" class="btn btn-outline">坐标原点说明</a>
+        <a href="/playback" class="btn btn-outline">路径回放</a>
+    </div>
+</div>
+{% endblock %}

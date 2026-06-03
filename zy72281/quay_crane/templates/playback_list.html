@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}路径回放 - 码头岸桥作业半径{% endblock %}
+{% block content %}
+<h2 style="margin-bottom:16px;color:#1a3a5c;">路径回放</h2>
+
+<div class="actions">
+    <form method="post" action="/playback/generate" style="display:inline;">
+        <input type="hidden" name="operator" value="许工">
+        <input type="checkbox" name="apply_origin" checked style="display:none;">
+        <button type="submit" class="btn">生成回放</button>
+    </form>
+    <form method="post" action="/playback/rerun-with-origin" style="display:inline;">
+        <input type="hidden" name="operator" value="许工">
+        <button type="submit" class="btn btn-success">补录原点后重跑</button>
+    </form>
+</div>
+
+<div class="card">
+    {% if playbacks %}
+    <table>
+        <thead>
+            <tr><th>路径编号</th><th>关联记录</th><th>岸桥</th><th>版本</th><th>Z轴应用</th><th>原点已应用</th><th>原点坐标</th><th>回放时间</th><th>操作</th></tr>
+        </thead>
+        <tbody>
+        {% for pp in playbacks %}
+            <tr>
+                <td>{{ pp.path_no }}</td>
+                <td>{{ pp.record_no }}</td>
+                <td>{{ pp.crane_no }}</td>
+                <td>V{{ pp.version }}</td>
+                <td>{{ pp.z_axis_applied }}</td>
+                <td>{{ '是' if pp.is_origin_applied else '否' }}</td>
+                <td>({{ pp.origin_x }}, {{ pp.origin_y }}, {{ pp.origin_z }})</td>
+                <td>{{ pp.playback_time.strftime('%m-%d %H:%M') if pp.playback_time else '' }}</td>
+                <td><a href="/playback/{{ pp.record_no }}/compare" class="btn btn-sm btn-outline">对比</a></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="color:#999;">暂无路径回放记录</p>
+    {% endif %}
+</div>
+{% endblock %}

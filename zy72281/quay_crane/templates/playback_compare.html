@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}回放对比 {{ comparison.record_no }} - 码头岸桥作业半径{% endblock %}
+{% block content %}
+<h2 style="margin-bottom:16px;color:#1a3a5c;">回放对比：{{ comparison.record_no }}</h2>
+
+<div class="card">
+    <h2>安全半径记录</h2>
+    {% for sr in comparison.safety_radii %}
+    <table>
+        <tr><th>编号</th><td>{{ sr.record_no }}</td></tr>
+        <tr><th>岸桥</th><td>{{ sr.crane_no }}</td></tr>
+        <tr><th>坐标</th><td>({{ sr.x }}, {{ sr.y }}, {{ sr.z }})</td></tr>
+        <tr><th>半径</th><td>{{ sr.radius }}</td></tr>
+        <tr><th>Z轴方向</th><td>{{ sr.z_axis_direction }}</td></tr>
+        <tr><th>状态</th><td><span class="badge badge-{{ sr.status }}">{{ sr.status }}</span></td></tr>
+    </table>
+    {% endfor %}
+</div>
+
+<div class="card">
+    <h2>各版本回放对比</h2>
+    <div class="comparison-grid">
+        {% for pv in comparison.playback_versions %}
+        <div class="comparison-card">
+            <h3>版本 V{{ pv.version }} - {{ pv.path_no }}</h3>
+            <div class="detail">Z轴应用方向：<strong>{{ pv.z_axis_applied }}</strong></div>
+            <div class="detail">原点已应用：{{ '是' if pv.is_origin_applied else '否' }}</div>
+            <div class="detail">原点坐标：({{ pv.origin.0 }}, {{ pv.origin.1 }}, {{ pv.origin.2 }})</div>
+            {% if pv.start_point %}
+            <div class="detail">起点：({{ pv.start_point.x }}, {{ pv.start_point.y }}, {{ pv.start_point.z }})</div>
+            {% endif %}
+            {% if pv.end_point %}
+            <div class="detail">终点：({{ pv.end_point.x }}, {{ pv.end_point.y }}, {{ pv.end_point.z }})</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% if comparison.comparison %}
+<div class="card">
+    <h2>三种处理结果总结</h2>
+    <table>
+        <thead>
+            <tr><th>处理类型</th><th>Z轴方向</th><th>原点已应用</th><th>原点坐标</th></tr>
+        </thead>
+        <tbody>
+        {% for key, val in comparison.comparison.items() %}
+            <tr>
+                <td>
+                    {% if 'normal' in key %}✅ 顺利记录
+                    {% elif 'reversed' in key %}⚠️ Z轴写反（待复核）
+                    {% elif 'updated' in key %}📋 补录旧口径后
+                    {% else %}{{ key }}{% endif %}
+                </td>
+                <td>{{ val.z_axis }}</td>
+                <td>{{ '是' if val.origin_applied else '否' }}</td>
+                <td>({{ val.origin.0 }}, {{ val.origin.1 }}, {{ val.origin.2 }})</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+<div class="actions">
+    <a href="/playback" class="btn btn-outline">返回回放列表</a>
+</div>
+{% endblock %}

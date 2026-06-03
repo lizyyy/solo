@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}安全半径表 - 码头岸桥作业半径{% endblock %}
+{% block content %}
+<h2 style="margin-bottom:16px;color:#1a3a5c;">安全半径表</h2>
+
+<div class="actions">
+    <a href="/radius" class="btn btn-sm {% if not current_status %}btn-outline{% endif %}">全部</a>
+    <a href="/radius?status=normal" class="btn btn-sm btn-success">正常</a>
+    <a href="/radius?status=z_reversed" class="btn btn-sm btn-warning">Z轴写反</a>
+    <a href="/radius?status=updated" class="btn btn-sm">已补录</a>
+</div>
+
+<div class="card">
+    {% if records %}
+    <table>
+        <thead>
+            <tr>
+                <th>编号</th><th>岸桥</th><th>日期</th><th>X</th><th>Y</th><th>Z</th><th>半径</th><th>Z方向</th><th>状态</th><th>来源</th><th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for r in records %}
+            <tr>
+                <td><a href="/radius/{{ r.id }}">{{ r.record_no }}</a></td>
+                <td>{{ r.crane_no }}</td>
+                <td>{{ r.operation_date.isoformat() }}</td>
+                <td>{{ r.x }}</td>
+                <td>{{ r.y }}</td>
+                <td>{{ r.z }}</td>
+                <td>{{ r.radius }}</td>
+                <td>{{ r.z_axis_direction }}</td>
+                <td><span class="badge badge-{{ r.status }}">{{ r.status }}</span></td>
+                <td>{{ r.source }}</td>
+                <td><a href="/radius/{{ r.id }}" class="btn btn-sm btn-outline">详情</a></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="color:#999;">暂无记录</p>
+    {% endif %}
+</div>
+{% endblock %}
