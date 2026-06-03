@@ -1,0 +1,122 @@
+[
+  {
+    "id": "7d4a8c0b94aff068",
+    "source_file": "demo_coords.txt",
+    "original_line_number": 1,
+    "raw_content": "39.9042, 116.4074 主井1号",
+    "coordinate_type": "lat_lng",
+    "processing_status": "pending",
+    "manual_modified": true,
+    "latitude": 39.9042,
+    "longitude": 116.4074,
+    "metric_x": null,
+    "metric_y": null,
+    "remark": null,
+    "inspection_photo_id": null,
+    "site_instruction": "按坐标定位施工",
+    "import_batch": "BATCH20260603194046",
+    "version": 2,
+    "created_at": "2026-06-03T19:40:46.470368",
+    "updated_at": "2026-06-03T19:40:46.471029",
+    "change_history": [
+      {
+        "timestamp": "2026-06-03T19:40:46.471022",
+        "operator": "施工管理员",
+        "field_name": "site_instruction",
+        "old_value": null,
+        "new_value": "按坐标定位施工",
+        "reason": "更新现场施工说明"
+      }
+    ]
+  },
+  {
+    "id": "f0a83a05389d1de8",
+    "source_file": "demo_coords.txt",
+    "original_line_number": 2,
+    "raw_content": "X=100.5, Y=200.3 副井2号",
+    "coordinate_type": "metric",
+    "processing_status": "pending",
+    "manual_modified": true,
+    "latitude": null,
+    "longitude": null,
+    "metric_x": 100.5,
+    "metric_y": 200.3,
+    "remark": null,
+    "inspection_photo_id": null,
+    "site_instruction": "按坐标定位施工",
+    "import_batch": "BATCH20260603194046",
+    "version": 2,
+    "created_at": "2026-06-03T19:40:46.470412",
+    "updated_at": "2026-06-03T19:40:46.471203",
+    "change_history": [
+      {
+        "timestamp": "2026-06-03T19:40:46.471196",
+        "operator": "施工管理员",
+        "field_name": "site_instruction",
+        "old_value": null,
+        "new_value": "按坐标定位施工",
+        "reason": "更新现场施工说明"
+      }
+    ]
+  },
+  {
+    "id": "1e7232ecc06b4a5f",
+    "source_file": "demo_coords.txt",
+    "original_line_number": 3,
+    "raw_content": "39.9042, 116.4074 X=50, Y=80 混合坐标井3号",
+    "coordinate_type": "mixed",
+    "processing_status": "needs_review",
+    "manual_modified": true,
+    "latitude": 39.9042,
+    "longitude": 116.4074,
+    "metric_x": 50.0,
+    "metric_y": 80.0,
+    "remark": null,
+    "inspection_photo_id": "PHOTO-2024-001",
+    "site_instruction": null,
+    "import_batch": "BATCH20260603194046",
+    "version": 2,
+    "created_at": "2026-06-03T19:40:46.470428",
+    "updated_at": "2026-06-03T19:40:46.470894",
+    "change_history": [
+      {
+        "timestamp": "2026-06-03T19:40:46.470881",
+        "operator": "许工",
+        "field_name": "inspection_photo_id",
+        "old_value": null,
+        "new_value": "PHOTO-2024-001",
+        "reason": "补录巡检照片编号"
+      }
+    ]
+  },
+  {
+    "id": "6fe83ae76e005041",
+    "source_file": "demo_coords.txt",
+    "original_line_number": 4,
+    "raw_content": "40.0000, 117.0000 备用井4号",
+    "coordinate_type": "lat_lng",
+    "processing_status": "pending",
+    "manual_modified": true,
+    "latitude": 40.0,
+    "longitude": 117.0,
+    "metric_x": null,
+    "metric_y": null,
+    "remark": null,
+    "inspection_photo_id": null,
+    "site_instruction": "按坐标定位施工",
+    "import_batch": "BATCH20260603194046",
+    "version": 2,
+    "created_at": "2026-06-03T19:40:46.470438",
+    "updated_at": "2026-06-03T19:40:46.471362",
+    "change_history": [
+      {
+        "timestamp": "2026-06-03T19:40:46.471350",
+        "operator": "施工管理员",
+        "field_name": "site_instruction",
+        "old_value": null,
+        "new_value": "按坐标定位施工",
+        "reason": "更新现场施工说明"
+      }
+    ]
+  }
+]
