@@ -168,25 +168,15 @@ class RebalanceWorkflow:
         confirmed_name: str,
         operator: str = "client_manager",
     ) -> None:
-        old_name = record.approver_name
-        record.approver_name = confirmed_name
-        record.approver_pinyin_verdict = self.engine.detect_pinyin(confirmed_name)
-
-        record.history.append(ChangeHistory(
-            record_id=record.id,
-            field_name="approver_name",
-            old_value=old_name,
-            new_value=confirmed_name,
-            changed_by=operator,
-            change_type="pinyin_resolution",
-        ))
+        self.engine.update_approver_name(record, confirmed_name, operator)
 
         if record.approver_pinyin_verdict == PinyinVerdict.NORMAL:
+            old_status = record.status
             record.status = ReviewStatus.PENDING
             record.history.append(ChangeHistory(
                 record_id=record.id,
                 field_name="status",
-                old_value=ReviewStatus.AWAITING_CLIENT_MANAGER_REVIEW.value,
+                old_value=old_status.value,
                 new_value=ReviewStatus.PENDING.value,
                 changed_by=operator,
                 change_type="pinyin_resolution",

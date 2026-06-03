@@ -38,8 +38,11 @@ class TaxRateNote:
     source_file: str = ""
     imported_at: datetime = field(default_factory=datetime.now)
 
-    def fingerprint(self) -> str:
+    def content_fingerprint(self) -> str:
         return f"{self.tax_category}:{self.rate}:{self.remark}:{self.approver_name}"
+
+    def fingerprint(self) -> str:
+        return f"{self.id}:{self.content_fingerprint()}"
 
 
 @dataclass
