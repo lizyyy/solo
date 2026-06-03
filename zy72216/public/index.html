@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>私募持仓穿透核对系统</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="header">
+    <h1>私募持仓穿透核对系统</h1>
+    <div class="operator-info">
+      <label>操作员:</label>
+      <input type="text" id="operator" value="阿芬" placeholder="请输入操作员姓名">
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="records">核对记录</button>
+    <button class="tab-btn" data-tab="import">导入托管确认页</button>
+    <button class="tab-btn" data-tab="rules">边界规则</button>
+  </nav>
+
+  <main class="main-content">
+    <section id="tab-records" class="tab-content active">
+      <div class="toolbar">
+        <div class="filter-group">
+          <label>状态筛选:</label>
+          <select id="status-filter">
+            <option value="">全部</option>
+            <option value="IMPORTED">已导入</option>
+            <option value="SCREENSHOT_REVIEWED">已补看截图</option>
+            <option value="PENDING_MANAGER_REVIEW">待基金经理复核</option>
+            <option value="MANAGER_APPROVED">基金经理复核通过</option>
+            <option value="MANAGER_REJECTED">基金经理复核驳回</option>
+            <option value="NORMAL">正常</option>
+            <option value="REVERTED">已回滚</option>
+          </select>
+        </div>
+        <div class="action-group">
+          <button id="btn-refresh" class="btn btn-secondary">刷新</button>
+          <button id="btn-export-json" class="btn btn-secondary">导出JSON</button>
+          <button id="btn-export-excel" class="btn btn-primary">导出Excel</button>
+          <button id="btn-export-csv" class="btn btn-secondary">导出CSV</button>
+        </div>
+      </div>
+
+      <div class="summary-cards">
+        <div class="card">
+          <div class="card-title">总记录数</div>
+          <div class="card-value" id="stat-total">0</div>
+        </div>
+        <div class="card card-warning">
+          <div class="card-title">待基金经理复核</div>
+          <div class="card-value" id="stat-pending">0</div>
+        </div>
+        <div class="card card-info">
+          <div class="card-title">有人工改动</div>
+          <div class="card-value" id="stat-changed">0</div>
+        </div>
+        <div class="card card-success">
+          <div class="card-title">已正常</div>
+          <div class="card-value" id="stat-normal">0</div>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table class="data-table" id="records-table">
+          <thead>
+            <tr>
+              <th>批次号</th>
+              <th>原始行号</th>
+              <th>基金</th>
+              <th>证券</th>
+              <th>原始到账日</th>
+              <th>当前到账日</th>
+              <th>原始数量</th>
+              <th>当前数量</th>
+              <th>状态</th>
+              <th>人工改动</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="records-tbody">
+            <tr>
+              <td colspan="11" class="loading">加载中...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="tab-import" class="tab-content">
+      <div class="import-section">
+        <h2>第一步：导入托管确认页</h2>
+        <p class="hint">支持Excel(.xlsx/.xls)和CSV格式。请确保包含：原始行号、基金代码、基金名称、证券代码、证券名称、到账日、数量、金额等字段。</p>
+
+        <div class="import-options">
+          <div class="option-group">
+            <label class="radio-label">
+              <input type="radio" name="import-type" value="file" checked>
+              上传文件
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="import-type" value="demo">
+              使用演示数据
+            </label>
+          </div>
+
+          <div id="file-upload-area">
+            <div class="drop-zone" id="drop-zone">
+              <p>拖拽文件到此处，或</p>
+              <input type="file" id="file-input" accept=".xlsx,.xls,.csv" style="display: none;">
+              <button type="button" class="btn btn-secondary" onclick="document.getElementById('file-input').click()">选择文件</button>
+              <p class="file-name" id="file-name"></p>
+            </div>
+          </div>
+
+          <button id="btn-import" class="btn btn-primary btn-large">开始导入</button>
+        </div>
+
+        <div id="import-result" class="result-area" style="display: none;"></div>
+      </div>
+    </section>
+
+    <section id="tab-rules" class="tab-content">
+      <div id="rules-content">
+        <p>加载规则中...</p>
+      </div>
+    </section>
+  </main>
+
+  <div id="detail-modal" class="modal" style="display: none;">
+    <div class="modal-content modal-large">
+      <div class="modal-header">
+        <h3>记录详情</h3>
+        <button class="modal-close" onclick="closeDetailModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="detail-body"></div>
+    </div>
+  </div>
+
+  <div id="action-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="action-modal-title">操作</h3>
+        <button class="modal-close" onclick="closeActionModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="action-modal-body"></div>
+    </div>
+  </div>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>
