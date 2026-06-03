@@ -1,0 +1,36 @@
+{
+  "name": "B1层点云抽稀结果",
+  "processedAt": "2026-06-03T10:30:00Z",
+  "obstacles": [
+    {
+      "name": "混凝土柱-001",
+      "position": { "x": 5.05, "y": 1.52, "z": 4.98 },
+      "dimensions": { "width": 0.98, "height": 3.05, "depth": 1.02 }
+    },
+    {
+      "name": "混凝土柱-002",
+      "position": { "x": 9.97, "y": 1.48, "z": 5.03 },
+      "dimensions": { "width": 1.03, "height": 2.98, "depth": 0.97 }
+    },
+    {
+      "name": "消防设备-左区",
+      "position": { "x": 15.02, "y": 0.98, "z": 8.01 },
+      "dimensions": { "width": 0.78, "height": 1.95, "depth": 0.52 }
+    },
+    {
+      "name": "电气柜-B3",
+      "position": { "x": 2.98, "y": 1.53, "z": 11.97 },
+      "dimensions": { "width": 1.22, "height": 3.02, "depth": 0.58 }
+    },
+    {
+      "name": "通风管道",
+      "position": { "x": 7.95, "y": 2.48, "z": 15.05 },
+      "dimensions": { "width": 1.95, "height": 4.95, "depth": 1.03 }
+    },
+    {
+      "name": "结构柱-主",
+      "position": { "x": 11.98, "y": 2.02, "z": 9.97 },
+      "dimensions": { "width": 1.52, "height": 4.05, "depth": 1.48 }
+    }
+  ]
+}

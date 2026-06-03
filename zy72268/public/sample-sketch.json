@@ -1,0 +1,36 @@
+{
+  "name": "B1层停车场剖面草图",
+  "floor": "B1层",
+  "obstacles": [
+    {
+      "name": "立柱A1",
+      "position": { "x": 5, "y": 1.5, "z": 5 },
+      "dimensions": { "width": 1, "height": 3, "depth": 1 }
+    },
+    {
+      "name": "立柱A2",
+      "position": { "x": 10, "y": 1.5, "z": 5 },
+      "dimensions": { "width": 1, "height": 3, "depth": 1 }
+    },
+    {
+      "name": "消防栓01",
+      "position": { "x": 15, "y": 1, "z": 8 },
+      "dimensions": { "width": 0.8, "height": 2, "depth": 0.5 }
+    },
+    {
+      "name": "电箱B3",
+      "position": { "x": 3, "y": 1.5, "z": 12 },
+      "dimensions": { "width": 1.2, "height": 3, "depth": 0.6 }
+    },
+    {
+      "name": "管道组",
+      "position": { "x": 8, "y": 2.5, "z": 15 },
+      "dimensions": { "width": 2, "height": 5, "depth": 1 }
+    },
+    {
+      "name": "承重柱C1",
+      "position": { "x": 12, "y": 2, "z": 10 },
+      "dimensions": { "width": 1.5, "height": 4, "depth": 1.5 }
+    }
+  ]
+}
