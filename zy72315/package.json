@@ -1,0 +1,14 @@
+{
+  "name": "ab-experiment-early-stop",
+  "version": "1.0.0",
+  "description": "A/B 实验提前停止判断系统 - 统一证据存储、边界规则引擎、数据复核追踪",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node tests/run-tests.js",
+    "demo": "node examples/demo-workflow.js"
+  },
+  "keywords": ["ab-test", "experiment", "statistics"],
+  "author": "",
+  "license": "ISC"
+}
