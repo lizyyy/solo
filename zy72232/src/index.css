@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+
+:root {
+  --bg-primary: #0F0F1A;
+  --bg-secondary: #1A1A2E;
+  --bg-card: #222240;
+  --bg-hover: #2A2A4A;
+  --text-primary: #F0F0F5;
+  --text-secondary: #9999BB;
+  --text-muted: #666688;
+  --border: #333355;
+  --green: #00C853;
+  --orange: #FF9100;
+  --blue: #448AFF;
+  --red: #FF1744;
+  --green-bg: rgba(0, 200, 83, 0.1);
+  --orange-bg: rgba(255, 145, 0, 0.1);
+  --blue-bg: rgba(68, 138, 255, 0.1);
+  --red-bg: rgba(255, 23, 68, 0.1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Noto Sans SC', sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
