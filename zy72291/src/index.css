@@ -1,0 +1,85 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Noto Sans SC', system-ui, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer components {
+  .btn-industrial {
+    @apply px-4 py-2 bg-industrial-700 text-white border border-industrial-500 hover:bg-industrial-600 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md;
+  }
+  
+  .btn-primary {
+    @apply px-4 py-2 bg-industrial-800 text-white border border-industrial-600 hover:bg-industrial-700 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md;
+  }
+  
+  .btn-warning {
+    @apply px-4 py-2 bg-safety-orange text-white border border-amber-600 hover:bg-amber-500 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md;
+  }
+  
+  .btn-success {
+    @apply px-4 py-2 bg-safety-green text-white border border-emerald-600 hover:bg-emerald-500 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md;
+  }
+  
+  .card-industrial {
+    @apply bg-white border border-industrial-200 shadow-sm hover:shadow-md transition-shadow duration-300;
+  }
+  
+  .status-badge {
+    @apply inline-flex items-center px-2 py-1 text-xs font-medium rounded;
+  }
+  
+  .status-success {
+    @apply bg-emerald-100 text-safety-green border border-emerald-200;
+  }
+  
+  .status-pending {
+    @apply bg-amber-100 text-safety-orange border border-amber-200;
+  }
+  
+  .status-legacy {
+    @apply bg-blue-100 text-safety-blue border border-blue-200;
+  }
+  
+  .status-danger {
+    @apply bg-red-100 text-safety-red border border-red-200;
+  }
+  
+  .table-header {
+    @apply bg-industrial-50 text-industrial-700 font-medium text-left py-3 px-4 border-b border-industrial-200;
+  }
+  
+  .table-cell {
+    @apply py-3 px-4 border-b border-industrial-100;
+  }
+}
+
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f0f4f8;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #9fb3c8;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #627d98;
+}
