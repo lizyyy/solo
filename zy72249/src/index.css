@@ -1,0 +1,114 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-teal: #0F4C5C;
+  --color-teal-light: #1A6B7D;
+  --color-amber: #E36414;
+  --color-amber-dark: #C2530E;
+  --color-amber-light: #F5A66B;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --font-body: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  font-family: var(--font-body);
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 3px;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: #94a3b8;
+  }
+}
+
+@layer components {
+  .font-mono-display {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .card {
+    @apply rounded-lg border bg-white shadow-sm;
+  }
+
+  .card-hover {
+    @apply card transition-shadow hover:shadow-md;
+  }
+
+  .table-row-hover:hover {
+    @apply bg-gray-50/80;
+  }
+}
+
+@layer utilities {
+  @keyframes step-pulse {
+    0%, 100% {
+      box-shadow: 0 0 0 0 rgba(227, 100, 20, 0.3);
+    }
+    50% {
+      box-shadow: 0 0 0 8px rgba(227, 100, 20, 0);
+    }
+  }
+
+  @keyframes slide-in {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes count-up {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-step-pulse {
+    animation: step-pulse 2s ease-in-out infinite;
+  }
+
+  .animate-slide-in {
+    animation: slide-in 0.25s ease-out;
+  }
+
+  .animate-count-up {
+    animation: count-up 0.4s ease-out;
+  }
+}
