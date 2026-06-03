@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>概率抽样审计计划 - 实验助手工作台</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>概率抽样审计计划</h1>
+            <p class="subtitle">实验助理小穆 · 工作台</p>
+        </header>
+
+        <div class="workflow-indicator">
+            <div class="step active" data-step="1">
+                <div class="step-number">1</div>
+                <div class="step-label">导入边界值说明</div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step" data-step="2">
+                <div class="step-number">2</div>
+                <div class="step-label">补看评分权重表</div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step" data-step="3">
+                <div class="step-number">3</div>
+                <div class="step-label">更新边界样本报告</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="card">
+                    <h3>材料库</h3>
+                    <div class="material-list">
+                        <div class="material-item" data-type="normal">
+                            <span class="material-icon">📄</span>
+                            <div>
+                                <div class="material-name">正常材料</div>
+                                <div class="material-desc">标准口径审计样本</div>
+                            </div>
+                        </div>
+                        <div class="material-item" data-type="wrong">
+                            <span class="material-icon">⚠️</span>
+                            <div>
+                                <div class="material-name">错口径材料</div>
+                                <div class="material-desc">边界值说明旧版</div>
+                            </div>
+                        </div>
+                        <div class="material-item" data-type="supplement">
+                            <span class="material-icon">📎</span>
+                            <div>
+                                <div class="material-name">补录材料</div>
+                                <div class="material-desc">评分权重表（群内补发）</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>自检工具</h3>
+                    <button class="btn btn-secondary" onclick="runSelfCheck('duplicate')">
+                        🔍 重复导入检测
+                    </button>
+                    <button class="btn btn-secondary" onclick="runSelfCheck('negative')">
+                        ➖ 负数样本检测
+                    </button>
+                    <button class="btn btn-secondary" onclick="runSelfCheck('recalc')">
+                        🔄 补录重算验证
+                    </button>
+                    <button class="btn btn-secondary" onclick="runSelfCheck('export')">
+                        📤 导出一致性检查
+                    </button>
+                    <button class="btn btn-primary" onclick="runAllChecks()">
+                        ✅ 运行全部自检
+                    </button>
+                </div>
+
+                <div class="card">
+                    <h3>操作历史</h3>
+                    <div id="history-list" class="history-list">
+                        <div class="history-empty">暂无操作记录</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <div class="card step-content" id="step-1">
+                    <div class="card-header">
+                        <h2>第一步：导入边界值说明</h2>
+                        <span class="badge">当前步骤</span>
+                    </div>
+                    
+                    <div class="import-section">
+                        <div class="import-box">
+                            <div class="import-icon">📁</div>
+                            <p>拖放边界值说明文件到此处，或</p>
+                            <button class="btn btn-primary" onclick="importBoundaryValues()">选择文件导入</button>
+                        </div>
+                        
+                        <div class="note-box">
+                            <strong>💡 交接提示：</strong>
+                            这里导入的是最初拿到的"边界值说明"。注意：评分权重表是后来才补发到群里的，
+                            所以第一次导入时可能会有口径不一致的问题，先别急着下结论。
+                        </div>
+                    </div>
+
+                    <div id="boundary-preview" class="data-preview hidden">
+                        <h3>导入数据预览</h3>
+                        <div class="table-wrapper">
+                            <table id="boundary-table">
+                                <thead>
+                                    <tr>
+                                        <th>样本编号</th>
+                                        <th>指标名称</th>
+                                        <th>边界值</th>
+                                        <th>判定规则</th>
+                                        <th>状态</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="action-bar">
+                        <button class="btn btn-outline" onclick="resetStep(1)">重置</button>
+                        <button class="btn btn-primary" onclick="goToStep(2)" id="step1-next" disabled>
+                            下一步：补看评分权重表 →
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card step-content hidden" id="step-2">
+                    <div class="card-header">
+                        <h2>第二步：补看评分权重表</h2>
+                        <span class="badge">当前步骤</span>
+                    </div>
+
+                    <div class="weight-section">
+                        <div class="weight-intro">
+                            <p>📋 <strong>评分权重表（群内补发 · 6月2日 14:30）</strong></p>
+                            <p class="text-muted">
+                                这张表是审计计划发出去之后才补到群里的。
+                                回看时发现这里的判定标准和之前的边界值说明可能有出入，
+                                需要仔细比对。
+                            </p>
+                        </div>
+
+                        <div class="table-wrapper">
+                            <table id="weight-table">
+                                <thead>
+                                    <tr>
+                                        <th>指标名称</th>
+                                        <th>权重占比</th>
+                                        <th>合格阈值</th>
+                                        <th>边界处理规则</th>
+                                        <th>与边界值说明</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="conflict-section" class="conflict-section hidden">
+                        <h3>⚠️ 冲突检测结果</h3>
+                        <div id="conflict-list" class="conflict-list"></div>
+                        <div class="conflict-actions">
+                            <p class="text-muted">
+                                <strong>交接提示：</strong>检测到边界值说明和评分权重表存在不一致的地方。
+                                请逐条确认是沿用边界值说明，还是按照评分权重表修正。
+                                <em>不要替业务同事自动拍板。</em>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="action-bar">
+                        <button class="btn btn-outline" onclick="goToStep(1)">← 上一步</button>
+                        <button class="btn btn-primary" onclick="goToStep(3)" id="step2-next" disabled>
+                            下一步：更新边界样本报告 →
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card step-content hidden" id="step-3">
+                    <div class="card-header">
+                        <h2>第三步：更新边界样本报告</h2>
+                        <span class="badge">当前步骤</span>
+                    </div>
+
+                    <div id="negative-alert" class="alert alert-warning hidden">
+                        <h4>⚠️ 待复核：负数样本处理</h4>
+                        <p>检测到 <strong id="negative-count">0</strong> 个负数值样本，被旧版判定表标记为"缺失"。</p>
+                        <p class="text-muted">
+                            <strong>交接提示：</strong>这些负数样本先别急着归为"正常"或"异常"，
+                            留给学生助教复核后再处理。已自动标记为"待复核"状态。
+                        </p>
+                        <button class="btn btn-secondary" onclick="viewNegativeSamples()">查看待复核样本</button>
+                    </div>
+
+                    <div class="report-section">
+                        <h3>边界样本报告</h3>
+                        <div class="report-stats">
+                            <div class="stat-card">
+                                <div class="stat-number" id="stat-total">0</div>
+                                <div class="stat-label">样本总数</div>
+                            </div>
+                            <div class="stat-card stat-normal">
+                                <div class="stat-number" id="stat-normal">0</div>
+                                <div class="stat-label">正常</div>
+                            </div>
+                            <div class="stat-card stat-borderline">
+                                <div class="stat-number" id="stat-borderline">0</div>
+                                <div class="stat-label">边界值</div>
+                            </div>
+                            <div class="stat-card stat-pending">
+                                <div class="stat-number" id="stat-pending">0</div>
+                                <div class="stat-label">待复核</div>
+                            </div>
+                            <div class="stat-card stat-conflict">
+                                <div class="stat-number" id="stat-conflict">0</div>
+                                <div class="stat-label">已处理冲突</div>
+                            </div>
+                        </div>
+
+                        <div class="table-wrapper">
+                            <table id="report-table">
+                                <thead>
+                                    <tr>
+                                        <th>样本编号</th>
+                                        <th>指标名称</th>
+                                        <th>原始值</th>
+                                        <th>边界值说明判定</th>
+                                        <th>评分权重表判定</th>
+                                        <th>最终判定</th>
+                                        <th>操作记录</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="compare-section">
+                        <h3>三种材料对比运行结果</h3>
+                        <div class="compare-tabs">
+                            <button class="tab-btn active" onclick="switchCompareTab('normal')">正常材料</button>
+                            <button class="tab-btn" onclick="switchCompareTab('wrong')">错口径材料</button>
+                            <button class="tab-btn" onclick="switchCompareTab('supplement')">补录材料</button>
+                        </div>
+                        <div id="compare-content" class="compare-content">
+                            <div class="table-wrapper">
+                                <table id="compare-table">
+                                    <thead>
+                                        <tr>
+                                            <th>指标名称</th>
+                                            <th>样本数</th>
+                                            <th>正常</th>
+                                            <th>边界</th>
+                                            <th>异常</th>
+                                            <th>缺失</th>
+                                            <th>符合率</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-bar">
+                        <button class="btn btn-outline" onclick="goToStep(2)">← 上一步</button>
+                        <button class="btn btn-secondary" onclick="exportReport()">📤 导出报告</button>
+                        <button class="btn btn-primary" onclick="completeWorkflow()">✅ 完成归档</button>
+                    </div>
+                </div>
+
+                <div class="card hidden" id="self-check-result">
+                    <div class="card-header">
+                        <h2>自检结果</h2>
+                    </div>
+                    <div id="check-result-content"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modal-title">标题</h3>
+                    <button class="modal-close" onclick="closeModal()">×</button>
+                </div>
+                <div class="modal-body" id="modal-body"></div>
+                <div class="modal-footer" id="modal-footer"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
