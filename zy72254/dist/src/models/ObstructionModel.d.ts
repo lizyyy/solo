@@ -1,0 +1,22 @@
+import { Obstruction, ObstructionStatus, Point3D, BoundingBox, Coordinate, CADLayerInfo, RangefinderRecord, ConflictInfo } from '../types';
+export declare function createObstruction(params: {
+    name: string;
+    nameSource: 'cad' | 'rangefinder' | 'manual';
+    position: Point3D;
+    geometry: Coordinate[];
+    operator: string;
+    cadLayer?: CADLayerInfo;
+    isOnEvacuationRoute?: boolean;
+    hazardLevel?: 'low' | 'medium' | 'high';
+    notes?: string;
+}): Obstruction;
+export declare function addAlias(obstruction: Obstruction, name: string, source: 'cad' | 'rangefinder' | 'manual', operator: string): Obstruction;
+export declare function addCADLayer(obstruction: Obstruction, cadLayer: CADLayerInfo): Obstruction;
+export declare function addRangefinderRecord(obstruction: Obstruction, record: RangefinderRecord): Obstruction;
+export declare function setCanonicalName(obstruction: Obstruction, canonicalName: string, operator: string): Obstruction;
+export declare function updateStatus(obstruction: Obstruction, status: ObstructionStatus, operator: string, notes?: string): Obstruction;
+export declare function setConflictInfo(obstruction: Obstruction, conflictInfo: ConflictInfo): Obstruction;
+export declare function clearConflictInfo(obstruction: Obstruction): Obstruction;
+export declare function calculateBoundingBox(geometry: Coordinate[]): BoundingBox;
+export declare function getAllNames(obstruction: Obstruction): string[];
+export declare function hasName(obstruction: Obstruction, name: string): boolean;
