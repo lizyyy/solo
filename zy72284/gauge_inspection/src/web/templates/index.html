@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>轨道交通限界检查系统 - 阿景与巡检组协作看板</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🚄 轨道交通限界检查系统</h1>
+            <p class="subtitle">展陈设计师阿景 ↔ 巡检组 协作平台</p>
+        </header>
+
+        <section class="workflow-section">
+            <h2>📋 工作流程状态</h2>
+            <div class="workflow-steps" id="workflowSteps">
+                <div class="step-card pending">
+                    <div class="step-icon">📍</div>
+                    <div class="step-info">
+                        <h3>第一步</h3>
+                        <p>点云抽稀日志第一次导入</p>
+                        <span class="status-badge">待执行</span>
+                    </div>
+                </div>
+                <div class="step-arrow">→</div>
+                <div class="step-card pending">
+                    <div class="step-icon">🎨</div>
+                    <div class="step-info">
+                        <h3>第二步</h3>
+                        <p>阿景补看安全半径表</p>
+                        <span class="status-badge">待执行</span>
+                    </div>
+                </div>
+                <div class="step-arrow">→</div>
+                <div class="step-card pending">
+                    <div class="step-icon">🏗️</div>
+                    <div class="step-info">
+                        <h3>第三步</h3>
+                        <p>现场班组说明更新</p>
+                        <span class="status-badge">待执行</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="control-section">
+            <h2>🎮 操作面板</h2>
+            <div class="control-buttons">
+                <button class="btn btn-primary" onclick="loadSampleData()">📥 加载样本数据</button>
+                <button class="btn btn-success" onclick="runStep1()">📍 执行第一步：导入点云日志</button>
+                <button class="btn btn-info" onclick="runStep2()">🎨 执行第二步：阿景补安全半径</button>
+                <button class="btn btn-warning" onclick="runStep3()">🏗️  执行第三步：更新现场说明</button>
+                <button class="btn btn-secondary" onclick="refreshAll()">🔄 刷新数据</button>
+            </div>
+        </section>
+
+        <section class="display-section">
+            <div class="display-header">
+                <h2>📊 数据展示</h2>
+                <div class="display-toggle">
+                    <button class="toggle-btn active" onclick="switchView('chart')">📈 图表视图</button>
+                    <button class="toggle-btn" onclick="switchView('3d')">🎲 3D视图</button>
+                </div>
+            </div>
+
+            <div class="view-container">
+                <div id="chartView" class="view active">
+                    <canvas id="coordChart"></canvas>
+                    <div class="chart-legend">
+                        <div class="legend-item"><span class="legend-dot lonlat"></span> 经纬度坐标</div>
+                        <div class="legend-item"><span class="legend-dot meter"></span> 米制坐标</div>
+                        <div class="legend-item"><span class="legend-dot mixed"></span> ⚠️ 坐标混合</div>
+                    </div>
+                </div>
+                <div id="3dView" class="view">
+                    <div id="scene3d" class="scene-3d">
+                        <div class="axis-x">X →</div>
+                        <div class="axis-y">↑ Y</div>
+                        <div class="axis-z">Z ↗</div>
+                        <div id="points3d" class="points-3d"></div>
+                    </div>
+                    <p class="view-hint">💡 点击任一点可跳转查看原始数据（点云抽稀日志/安全半径表）</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="issues-section">
+            <h2>🔍 坐标问题列表 & 现场说明</h2>
+            <div class="issues-filter">
+                <button class="filter-btn active" onclick="filterIssues('all')">全部</button>
+                <button class="filter-btn" onclick="filterIssues('mixed')">⚠️ 坐标混合</button>
+                <button class="filter-btn" onclick="filterIssues('normal')">✅ 正常</button>
+                <button class="filter-btn" onclick="filterIssues('pending')">⏳ 待处理</button>
+            </div>
+            <div id="issuesList" class="issues-list">
+                <div class="empty-state">
+                    <p>暂无数据，请先加载样本或执行第一步</p>
+                </div>
+            </div>
+        </section>
+
+        <div id="modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modalTitle">数据详情</h3>
+                    <button class="modal-close" onclick="closeModal()">×</button>
+                </div>
+                <div class="modal-body" id="modalBody">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

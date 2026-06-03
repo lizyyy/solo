@@ -1,0 +1,742 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    padding: 30px;
+}
+
+.header {
+    text-align: center;
+    padding: 20px 0 30px;
+    border-bottom: 2px solid #f0f0f0;
+    margin-bottom: 30px;
+}
+
+.header h1 {
+    font-size: 2.5em;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    color: #666;
+    font-size: 1.1em;
+}
+
+h2 {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 1.5em;
+}
+
+.workflow-section {
+    margin-bottom: 30px;
+}
+
+.workflow-steps {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.step-card {
+    flex: 1;
+    min-width: 200px;
+    background: #f8f9fa;
+    border-radius: 15px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: all 0.3s ease;
+    border: 3px solid transparent;
+}
+
+.step-card.pending {
+    background: #fff3cd;
+    border-color: #ffc107;
+}
+
+.step-card.in_progress {
+    background: #cce5ff;
+    border-color: #007bff;
+    animation: pulse 1.5s infinite;
+}
+
+.step-card.completed {
+    background: #d4edda;
+    border-color: #28a745;
+}
+
+@keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.4); }
+    50% { box-shadow: 0 0 0 10px rgba(0, 123, 255, 0); }
+}
+
+.step-icon {
+    font-size: 2.5em;
+}
+
+.step-info h3 {
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.step-info p {
+    color: #666;
+    font-size: 0.9em;
+    margin-bottom: 8px;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+.step-card.pending .status-badge {
+    background: #ffc107;
+    color: #856404;
+}
+
+.step-card.in_progress .status-badge {
+    background: #007bff;
+    color: #fff;
+}
+
+.step-card.completed .status-badge {
+    background: #28a745;
+    color: #fff;
+}
+
+.step-arrow {
+    font-size: 2em;
+    color: #999;
+}
+
+.control-section {
+    margin-bottom: 30px;
+}
+
+.control-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #fff;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #28a745, #20c997);
+}
+
+.btn-info {
+    background: linear-gradient(135deg, #17a2b8, #007bff);
+}
+
+.btn-warning {
+    background: linear-gradient(135deg, #fd7e14, #fdb813);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #6c757d, #495057);
+}
+
+.display-section {
+    margin-bottom: 30px;
+}
+
+.display-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.display-toggle {
+    display: flex;
+    gap: 5px;
+    background: #f0f0f0;
+    padding: 5px;
+    border-radius: 10px;
+}
+
+.toggle-btn {
+    padding: 8px 20px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.95em;
+}
+
+.toggle-btn.active {
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    font-weight: bold;
+}
+
+.view-container {
+    position: relative;
+    min-height: 450px;
+}
+
+.view {
+    display: none;
+}
+
+.view.active {
+    display: block;
+}
+
+#coordChart {
+    width: 100%;
+    height: 400px;
+    background: #fafafa;
+    border-radius: 15px;
+    padding: 20px;
+}
+
+.chart-legend {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 15px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95em;
+}
+
+.legend-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+}
+
+.legend-dot.lonlat {
+    background: #4e79a7;
+}
+
+.legend-dot.meter {
+    background: #59a14f;
+}
+
+.legend-dot.mixed {
+    background: #e15759;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.scene-3d {
+    width: 100%;
+    height: 400px;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border-radius: 15px;
+    position: relative;
+    overflow: hidden;
+    perspective: 1000px;
+}
+
+.axis-x, .axis-y, .axis-z {
+    position: absolute;
+    color: #fff;
+    font-size: 14px;
+    opacity: 0.7;
+    font-weight: bold;
+}
+
+.axis-x {
+    bottom: 20px;
+    right: 30px;
+    color: #ff6b6b;
+}
+
+.axis-y {
+    top: 20px;
+    left: 30px;
+    color: #4ecdc4;
+}
+
+.axis-z {
+    bottom: 20px;
+    left: 30px;
+    color: #ffe66d;
+}
+
+.points-3d {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    animation: rotate3d 20s linear infinite;
+}
+
+@keyframes rotate3d {
+    0% { transform: rotateX(15deg) rotateY(0deg); }
+    100% { transform: rotateX(15deg) rotateY(360deg); }
+}
+
+.point-3d {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    transform-style: preserve-3d;
+}
+
+.point-3d:hover {
+    transform: scale(2) !important;
+    z-index: 100;
+}
+
+.point-3d.lonlat {
+    background: radial-gradient(circle, #4e79a7, #2c5aa0);
+    box-shadow: 0 0 15px #4e79a7;
+}
+
+.point-3d.meter {
+    background: radial-gradient(circle, #59a14f, #3d8b3d);
+    box-shadow: 0 0 15px #59a14f;
+}
+
+.point-3d.mixed {
+    background: radial-gradient(circle, #e15759, #c92a2a);
+    box-shadow: 0 0 20px #e15759;
+    animation: pulse-point 1s infinite;
+}
+
+@keyframes pulse-point {
+    0%, 100% { box-shadow: 0 0 20px #e15759; }
+    50% { box-shadow: 0 0 40px #e15759, 0 0 60px #ff6b6b; }
+}
+
+.point-label {
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-size: 11px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+}
+
+.point-3d:hover .point-label {
+    opacity: 1;
+}
+
+.view-hint {
+    text-align: center;
+    color: #666;
+    margin-top: 15px;
+    font-style: italic;
+}
+
+.issues-section {
+    margin-bottom: 20px;
+}
+
+.issues-filter {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.filter-btn {
+    padding: 8px 20px;
+    border: 2px solid #ddd;
+    background: #fff;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9em;
+}
+
+.filter-btn:hover {
+    border-color: #667eea;
+}
+
+.filter-btn.active {
+    background: #667eea;
+    color: #fff;
+    border-color: #667eea;
+}
+
+.issues-list {
+    display: grid;
+    gap: 15px;
+}
+
+.issue-card {
+    background: #fff;
+    border: 2px solid #e0e0e0;
+    border-radius: 15px;
+    padding: 20px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.issue-card:hover {
+    transform: translateX(5px);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.issue-card.mixed {
+    border-color: #e15759;
+    background: linear-gradient(135deg, #fff5f5, #fff);
+}
+
+.issue-card.normal {
+    border-color: #59a14f;
+    background: linear-gradient(135deg, #f0fff4, #fff);
+}
+
+.issue-card.pending {
+    border-color: #f59e0b;
+    background: linear-gradient(135deg, #fffbeb, #fff);
+}
+
+.issue-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.issue-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.issue-status {
+    padding: 5px 15px;
+    border-radius: 15px;
+    font-size: 0.85em;
+    font-weight: bold;
+}
+
+.issue-status.mixed {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.issue-status.normal {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.issue-status.pending {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.issue-coords {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 15px;
+    font-family: monospace;
+    font-size: 0.95em;
+    color: #555;
+    background: #f5f5f5;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.issue-coord {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.issue-note {
+    background: #f8fafc;
+    padding: 15px;
+    border-radius: 10px;
+    border-left: 4px solid #667eea;
+}
+
+.note-row {
+    margin-bottom: 8px;
+    display: flex;
+    gap: 10px;
+}
+
+.note-row:last-child {
+    margin-bottom: 0;
+}
+
+.note-label {
+    font-weight: bold;
+    color: #475569;
+    min-width: 100px;
+}
+
+.note-content {
+    color: #334155;
+    flex: 1;
+}
+
+.note-version {
+    text-align: right;
+    color: #94a3b8;
+    font-size: 0.85em;
+    margin-top: 10px;
+}
+
+.data-links {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px dashed #ddd;
+}
+
+.data-link {
+    padding: 6px 15px;
+    background: #f0f0f0;
+    border-radius: 8px;
+    font-size: 0.85em;
+    color: #667eea;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.data-link:hover {
+    background: #667eea;
+    color: #fff;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+    background: #fafafa;
+    border-radius: 15px;
+    border: 2px dashed #ddd;
+}
+
+.empty-state p {
+    font-size: 1.1em;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: #fff;
+    border-radius: 20px;
+    max-width: 800px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    border-bottom: 1px solid #eee;
+    position: sticky;
+    top: 0;
+    background: #fff;
+    border-radius: 20px 20px 0 0;
+}
+
+.modal-header h3 {
+    font-size: 1.5em;
+    color: #333;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 2em;
+    cursor: pointer;
+    color: #999;
+    line-height: 1;
+    transition: color 0.3s;
+}
+
+.modal-close:hover {
+    color: #e15759;
+}
+
+.modal-body {
+    padding: 30px;
+}
+
+.detail-section {
+    margin-bottom: 25px;
+}
+
+.detail-section h4 {
+    color: #667eea;
+    margin-bottom: 15px;
+    font-size: 1.1em;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fafafa;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.data-table th, .data-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.data-table th {
+    background: #667eea;
+    color: #fff;
+    font-weight: 600;
+}
+
+.data-table tr:last-child td {
+    border-bottom: none;
+}
+
+.data-table tr:hover td {
+    background: #f0f0ff;
+}
+
+.coord-type-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 10px;
+    font-size: 0.85em;
+    font-weight: bold;
+}
+
+.coord-type-badge.lonlat {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.coord-type-badge.meter {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.coord-type-badge.mixed {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.coord-type-badge.ambiguous {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+@media (max-width: 768px) {
+    .workflow-steps {
+        flex-direction: column;
+    }
+    
+    .step-arrow {
+        transform: rotate(90deg);
+    }
+    
+    .control-buttons {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+    }
+    
+    .display-header {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .issue-coords {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .chart-legend {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+}
