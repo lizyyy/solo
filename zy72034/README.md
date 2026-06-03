@@ -1,57 +1,134 @@
-# React + TypeScript + Vite
+# 碳交易农场经营
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+课堂碳交易模拟经营系统，告别纸质计分表。
 
-Currently, two official plugins are available:
+## 技术栈
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- React 18 + TypeScript 5 + Vite 6
+- Zustand 5（状态管理）
+- React Router DOM 7（路由）
+- TailwindCSS 3（样式）
+- pnpm（包管理）
 
-## Expanding the ESLint configuration
+## 快速开始
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+```bash
+# 安装依赖
+pnpm install
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+# 启动开发服务器
+pnpm dev
+
+# 类型检查
+pnpm check
+
+# 生产构建
+pnpm build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+启动后浏览器打开控制台输出的地址（默认 `http://localhost:5173`，若端口被占用会自动递增）。
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 页面一览
 
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+| 路由 | 页面 | 功能 |
+|------|------|------|
+| `/` | 主控台 | 游戏入口、碳价/配额/排行概览、待确认交易 |
+| `/farms` | 农场交易 | 选择农场、执行碳配额买卖 |
+| `/history` | 历史记录 | 回合时间线、交易/暂停/补录汇总 |
+| `/supplement` | 数据补录 | 从课堂计分表补录旧口径数据，差异自动高亮 |
+| `/replay` | 历史回放 | 按回合回放历史快照，支持自动/手动切换 |
+
+## 核心操作流程
+
+### 1. 加载数据
+
+首次打开显示欢迎页，提供两个入口：
+
+- **加载样例数据**：包含 7 回合完整历史，覆盖顺利交易、待确认交易、暂停记录、补录数据
+- **从头开始**：空白开局，从第 1 回合起步
+
+### 2. 主控台
+
+加载数据后进入主控台，显示当前碳价、市场总配额、农场排行、待确认交易。顶部控制栏提供继续/结算/下一回合/重开操作。
+
+### 3. 农场交易
+
+进入"农场交易"页面，点击农场卡片选中，右侧出现交易表单，可买入/卖出碳配额。游戏暂停或回放模式下交易操作禁用。
+
+### 4. 数据补录
+
+进入"数据补录"页面：
+
+1. 选择回合、农场、补录字段（碳配额/收益/土地面积/作物类型）
+2. 填入原值（旧口径）和新值（新口径），可点击"填充"自动填入当前值
+3. 填写补录备注（必填）
+4. 点击"预览差异"查看变更预览，确认后点击"确认补录"
+
+补录记录永久保存，差异高亮显示。补录后自动创建快照。
+
+### 5. 历史回放
+
+进入"历史回放"页面：
+
+1. 选择回放起点回合，点击"开始回放"
+2. 底部出现回放控制面板：速度切换（0.5x/1x/2x）、上一回合/下一回合、回合跳转、自动播放
+3. 回放模式下所有操作禁用，页面顶部显示蓝色提示条
+4. 点击关闭按钮停止回放，**游戏状态自动恢复到回放前**，不会回到初始状态
+
+## 样例数据场景
+
+样例数据包含以下典型场景：
+
+- **顺利记录**（回合 3）：青禾农场卖出 10 吨，价格 50 元/吨，盈利 500 元
+- **需人工确认**（回合 5）：绿野农庄买入 20 吨，价格波动超阈值
+- **暂停记录**（回合 7）：课堂打断场景，暂停后继续，回合数保持 7
+- **旧口径补录**（回合 2）：40 元→45 元/吨，差异清晰展示
+
+## 项目结构
+
 ```
+src/
+├── App.tsx                  # 路由与导航
+├── pages/
+│   ├── Dashboard.tsx        # 主控台
+│   ├── FarmList.tsx         # 农场交易
+│   ├── History.tsx          # 历史记录
+│   ├── Supplement.tsx       # 数据补录
+│   └── Replay.tsx           # 历史回放
+├── components/
+│   ├── ControlBar.tsx       # 顶部控制栏
+│   ├── FarmCard.tsx         # 农场卡片
+│   ├── TradeForm.tsx        # 交易表单
+│   ├── ReplayPlayer.tsx     # 回放播放器
+│   ├── DiffTable.tsx        # 差异对比表
+│   ├── Timeline.tsx         # 时间线
+│   ├── PendingTxList.tsx    # 待确认交易列表
+│   ├── AlertBox.tsx         # 提示框
+│   └── ToastContainer.tsx   # 消息提示
+├── store/
+│   └── useGameStore.ts      # Zustand 全局状态
+├── utils/
+│   ├── snapshot.ts          # 快照创建/加载
+│   ├── storage.ts           # localStorage 持久化
+│   ├── diff.ts              # 差异计算
+│   └── validate.ts          # 数据校验
+├── data/
+│   └── sampleData.ts        # 样例数据
+├── types/
+│   └── index.ts             # 类型定义
+├── hooks/
+│   ├── useToast.ts          # 消息提示 hook
+│   └── useTheme.ts          # 主题 hook
+└── lib/
+    └── utils.ts             # 通用工具函数
+```
+
+## 可用脚本
+
+| 命令 | 说明 |
+|------|------|
+| `pnpm dev` | 启动开发服务器 |
+| `pnpm build` | TypeScript 检查 + 生产构建 |
+| `pnpm check` | 仅 TypeScript 类型检查 |
+| `pnpm lint` | ESLint 检查 |
+| `pnpm preview` | 预览生产构建 |
