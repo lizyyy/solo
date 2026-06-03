@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>凸包围栏面积复核系统 - 小看板</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .stat-card .label {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-card.warning .value {
+            color: #f59e0b;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .panel {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #eee;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-body {
+            padding: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .record-item {
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .record-item:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .record-item.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .record-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .record-title {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .badge {
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-pending {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .badge-operation {
+            background: #fce7f3;
+            color: #db2777;
+        }
+
+        .badge-updated {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        .badge-approved {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .record-meta {
+            font-size: 12px;
+            color: #888;
+            display: flex;
+            gap: 15px;
+        }
+
+        .record-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .detail-section {
+            margin-bottom: 20px;
+        }
+
+        .detail-section h3 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .geometry-canvas-container {
+            background: #fafafa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        canvas {
+            width: 100%;
+            height: 300px;
+            background: white;
+            border: 1px solid #eee;
+            border-radius: 4px;
+        }
+
+        .analysis-box {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .analysis-error {
+            background: #fef2f2;
+            border-left: 4px solid #ef4444;
+        }
+
+        .analysis-next {
+            background: #f0fdf4;
+            border-left: 4px solid #22c55e;
+        }
+
+        .analysis-missing {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .evidence-tags {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .evidence-tag {
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+
+        .evidence-yes {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .evidence-no {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a67d8;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .modal-content h2 {
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .form-group textarea,
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background: #d1d5db;
+        }
+
+        .issues-list {
+            list-style: none;
+        }
+
+        .issues-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 13px;
+            color: #555;
+        }
+
+        .issues-list li:last-child {
+            border-bottom: none;
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 5px;
+        }
+
+        .view-btn {
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .view-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📐 凸包围栏面积复核系统</h1>
+        <p>整合手算反例与问卷原始行，实现精准复核</p>
+    </div>
+
+    <div class="container">
+        <div class="stats-bar">
+            <div class="stat-card">
+                <div class="label">总记录数</div>
+                <div class="value" id="stat-total">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">待处理</div>
+                <div class="value" id="stat-pending">0</div>
+            </div>
+            <div class="stat-card warning">
+                <div class="label">需运营复核</div>
+                <div class="value" id="stat-operation">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">已批准</div>
+                <div class="value" id="stat-approved">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">多版本答案</div>
+                <div class="value" id="stat-multi">0</div>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <button class="btn btn-primary" onclick="processAll()">🔄 批量复核所有答案</button>
+        </div>
+
+        <div class="main-content">
+            <div class="panel">
+                <div class="panel-header">
+                    <span>复核记录列表</span>
+                    <span style="font-size: 12px; color: #888;">点击查看详情</span>
+                </div>
+                <div class="panel-body" id="records-list">
+                    <div style="color: #888; text-align: center; padding: 40px;">
+                        暂无记录，点击上方按钮开始复核
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <span>复核详情</span>
+                    <div class="view-toggle">
+                        <button class="view-btn active" onclick="setView('2d')">2D视图</button>
+                        <button class="view-btn" onclick="setView('chart')">图表</button>
+                    </div>
+                </div>
+                <div class="panel-body" id="record-detail">
+                    <div style="color: #888; text-align: center; padding: 80px;">
+                        请从左侧选择一条记录
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="questionnaire-modal">
+        <div class="modal-content">
+            <h2>📝 补充问卷原始行</h2>
+            <div class="form-group">
+                <label>现场说法</label>
+                <textarea id="site-statement" placeholder="请输入现场说法内容..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>调查员</label>
+                <input type="text" id="interviewer" value="吴老师">
+            </div>
+            <div class="form-group">
+                <label>补充说明</label>
+                <textarea id="additional-notes" placeholder="可选，输入补充说明..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+                <button class="btn btn-primary" onclick="submitQuestionnaire()">提交</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentRecordId = null;
+        let records = [];
+        let currentView = '2d';
+
+        async function loadStats() {
+            const res = await fetch('/api/stats');
+            const stats = await res.json();
+            document.getElementById('stat-total').textContent = stats.total;
+            document.getElementById('stat-pending').textContent = stats.byStatus.pending || 0;
+            document.getElementById('stat-operation').textContent = stats.byStatus['needs-operation-review'] || 0;
+            document.getElementById('stat-approved').textContent = stats.byStatus.approved || 0;
+            document.getElementById('stat-multi').textContent = stats.hasMultipleVersions;
+        }
+
+        async function loadRecords() {
+            const res = await fetch('/api/records');
+            records = await res.json();
+            renderRecords();
+        }
+
+        function renderRecords() {
+            const container = document.getElementById('records-list');
+
+            if (records.length === 0) {
+                container.innerHTML = `
+                    <div style="color: #888; text-align: center; padding: 40px;">
+                        暂无记录，点击上方按钮开始复核
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = records.map(r => `
+                <div class="record-item ${r.id === currentRecordId ? 'selected' : ''}"
+                     onclick="selectRecord('${r.id}')">
+                    <div class="record-header">
+                        <span class="record-title">${r.studentId} - ${r.answerId}</span>
+                        <span class="badge ${getStatusClass(r.status)}">${getStatusText(r.status)}</span>
+                    </div>
+                    <div class="record-meta">
+                        <span>${r.hasMultipleVersions ? '⚠️ 多版本' : '✓ 单版本'}</span>
+                        <span>分配给: ${r.assignedTo || '-'}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getStatusClass(status) {
+            const map = {
+                'pending': 'badge-pending',
+                'needs-operation-review': 'badge-operation',
+                'updated': 'badge-updated',
+                'approved': 'badge-approved'
+            };
+            return map[status] || 'badge-pending';
+        }
+
+        function getStatusText(status) {
+            const map = {
+                'pending': '待处理',
+                'needs-operation-review': '需运营复核',
+                'updated': '已更新',
+                'approved': '已批准'
+            };
+            return map[status] || status;
+        }
+
+        async function selectRecord(id) {
+            currentRecordId = id;
+            renderRecords();
+
+            const res = await fetch(`/api/records/${id}`);
+            const data = await res.json();
+            renderDetail(data);
+        }
+
+        function renderDetail(data) {
+            const container = document.getElementById('record-detail');
+            const { record, summary } = data;
+            const geo = record.geometryAnalysis;
+
+            container.innerHTML = `
+                <div class="detail-section">
+                    <h3>📍 几何可视化</h3>
+                    <div class="geometry-canvas-container">
+                        <canvas id="geometry-canvas"></canvas>
+                    </div>
+                    ${geo && geo.problemEdges && geo.problemEdges.length > 0 ? `
+                        <div style="font-size: 12px; color: #dc2626;">
+                            ⚠️ 问题边已用红色标出
+                        </div>
+                    ` : ''}
+                </div>
+
+                <div class="detail-section">
+                    <h3>📊 面积分析</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                        <div style="padding: 10px; background: #f8f9fa; border-radius: 6px;">
+                            <div style="font-size: 12px; color: #888;">原始面积</div>
+                            <div style="font-size: 20px; font-weight: bold;">${geo ? geo.rawArea.toFixed(2) : '-'} ㎡</div>
+                        </div>
+                        <div style="padding: 10px; background: #f8f9fa; border-radius: 6px;">
+                            <div style="font-size: 12px; color: #888;">凸包面积</div>
+                            <div style="font-size: 20px; font-weight: bold;">${geo ? geo.convexArea.toFixed(2) : '-'} ㎡</div>
+                        </div>
+                    </div>
+                    ${geo && Math.abs(geo.areaDiff) > 0.01 ? `
+                        <div style="font-size: 13px; color: #f59e0b;">
+                            差值: ${geo.areaDiff.toFixed(2)} ㎡ (${(geo.areaDiffRatio * 100).toFixed(1)}%)
+                        </div>
+                    ` : ''}
+                </div>
+
+                <div class="detail-section">
+                    <h3>📋 几何问题</h3>
+                    ${geo && geo.issues && geo.issues.length > 0 ? `
+                        <ul class="issues-list">
+                            ${geo.issues.map(i => `<li>• ${i.message}</li>`).join('')}
+                        </ul>
+                    ` : '<div style="color: #10b981; font-size: 13px;">✓ 无几何问题</div>'}
+                </div>
+
+                <div class="detail-section">
+                    <h3>🔍 证据来源</h3>
+                    <div class="evidence-tags">
+                        <span class="evidence-tag ${record.manualExample ? 'evidence-yes' : 'evidence-no'}">
+                            ${record.manualExample ? '✓' : '✗'} 手算反例
+                        </span>
+                        <span class="evidence-tag ${record.questionnaire ? 'evidence-yes' : 'evidence-no'}">
+                            ${record.questionnaire ? '✓' : '✗'} 问卷原始行
+                        </span>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3>⚠️ 误差说明</h3>
+                    <div class="analysis-box analysis-error" style="font-size: 13px; white-space: pre-wrap;">
+                        ${record.errorAnalysis || '暂无'}
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3>✅ 下一步行动</h3>
+                    <div class="analysis-box analysis-next" style="font-size: 13px; white-space: pre-wrap;">
+                        ${record.nextStepDetail || '暂无'}
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    ${!record.questionnaire ? `
+                        <button class="btn btn-primary" onclick="openQuestionnaireModal()">
+                            📝 补充问卷
+                        </button>
+                    ` : ''}
+                    ${record.status !== 'approved' ? `
+                        <button class="btn btn-success" onclick="approveRecord()">
+                            ✓ 批准通过
+                        </button>
+                    ` : ''}
+                </div>
+            `;
+
+            if (geo) {
+                setTimeout(() => drawGeometry(geo), 50);
+            }
+        }
+
+        function drawGeometry(geo) {
+            const canvas = document.getElementById('geometry-canvas');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * 2;
+            canvas.height = rect.height * 2;
+            ctx.scale(2, 2);
+
+            const width = rect.width;
+            const height = rect.height;
+            const padding = 40;
+
+            const points = geo.rawPoints;
+            const problemEdges = geo.problemEdges || [];
+
+            if (points.length < 2) return;
+
+            let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+            points.forEach(p => {
+                minX = Math.min(minX, p.x);
+                maxX = Math.max(maxX, p.x);
+                minY = Math.min(minY, p.y);
+                maxY = Math.max(maxY, p.y);
+            });
+
+            const rangeX = maxX - minX || 1;
+            const rangeY = maxY - minY || 1;
+            const scaleX = (width - padding * 2) / rangeX;
+            const scaleY = (height - padding * 2) / rangeY;
+            const scale = Math.min(scaleX, scaleY);
+
+            const offsetX = padding + (width - padding * 2 - rangeX * scale) / 2;
+            const offsetY = padding + (height - padding * 2 - rangeY * scale) / 2;
+
+            function transform(p) {
+                return {
+                    x: offsetX + (p.x - minX) * scale,
+                    y: height - (offsetY + (p.y - minY) * scale)
+                };
+            }
+
+            ctx.strokeStyle = '#e5e7eb';
+            ctx.lineWidth = 1;
+            for (let x = padding; x < width - padding; x += 30) {
+                ctx.beginPath();
+                ctx.moveTo(x, padding);
+                ctx.lineTo(x, height - padding);
+                ctx.stroke();
+            }
+            for (let y = padding; y < height - padding; y += 30) {
+                ctx.beginPath();
+                ctx.moveTo(padding, y);
+                ctx.lineTo(width - padding, y);
+                ctx.stroke();
+            }
+
+            ctx.beginPath();
+            ctx.strokeStyle = '#a5b4fc';
+            ctx.lineWidth = 2;
+            points.forEach((p, i) => {
+                const tp = transform(p);
+                if (i === 0) ctx.moveTo(tp.x, tp.y);
+                else ctx.lineTo(tp.x, tp.y);
+            });
+            ctx.closePath();
+            ctx.fillStyle = 'rgba(99, 102, 241, 0.1)';
+            ctx.fill();
+            ctx.stroke();
+
+            problemEdges.forEach(edge => {
+                const startIdx = points.findIndex(p => p.x === edge.start.x && p.y === edge.start.y);
+                const endIdx = points.findIndex(p => p.x === edge.end.x && p.y === edge.end.y);
+                if (startIdx >= 0 && endIdx >= 0) {
+                    const t1 = transform(edge.start);
+                    const t2 = transform(edge.end);
+                    ctx.beginPath();
+                    ctx.strokeStyle = '#ef4444';
+                    ctx.lineWidth = 4;
+                    ctx.moveTo(t1.x, t1.y);
+                    ctx.lineTo(t2.x, t2.y);
+                    ctx.stroke();
+                }
+            });
+
+            points.forEach((p, i) => {
+                const tp = transform(p);
+                const isProblem = problemEdges.some(e =>
+                    (e.start.x === p.x && e.start.y === p.y) ||
+                    (e.end.x === p.x && e.end.y === p.y)
+                );
+
+                ctx.beginPath();
+                ctx.arc(tp.x, tp.y, 6, 0, Math.PI * 2);
+                ctx.fillStyle = isProblem ? '#ef4444' : '#6366f1';
+                ctx.fill();
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.fillStyle = '#374151';
+                ctx.font = '10px sans-serif';
+                ctx.fillText(`P${i + 1}(${p.x},${p.y})`, tp.x + 10, tp.y - 10);
+            });
+        }
+
+        async function processAll() {
+            const res = await fetch('/api/process', { method: 'POST' });
+            const data = await res.json();
+            alert(`成功创建 ${data.count} 条复核记录`);
+            await loadRecords();
+            await loadStats();
+        }
+
+        function openQuestionnaireModal() {
+            document.getElementById('questionnaire-modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('questionnaire-modal').classList.remove('active');
+        }
+
+        async function submitQuestionnaire() {
+            const record = records.find(r => r.id === currentRecordId);
+            if (!record) return;
+
+            const data = {
+                id: 'Q-' + Date.now(),
+                studentId: record.studentId,
+                answerId: record.answerId,
+                siteStatement: document.getElementById('site-statement').value,
+                interviewer: document.getElementById('interviewer').value,
+                additionalNotes: document.getElementById('additional-notes').value
+            };
+
+            await fetch(`/api/records/${currentRecordId}/questionnaire`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            closeModal();
+            await selectRecord(currentRecordId);
+            await loadRecords();
+            await loadStats();
+        }
+
+        async function approveRecord() {
+            if (!confirm('确定要批准此记录吗？')) return;
+
+            await fetch(`/api/records/${currentRecordId}/approve`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ approver: '吴老师' })
+            });
+
+            await selectRecord(currentRecordId);
+            await loadRecords();
+            await loadStats();
+        }
+
+        function setView(view) {
+            currentView = view;
+            document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        loadRecords();
+        loadStats();
+    </script>
+</body>
+</html>

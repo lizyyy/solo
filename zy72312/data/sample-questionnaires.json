@@ -1,0 +1,31 @@
+[
+  {
+    "id": "Q001",
+    "studentId": "S002",
+    "answerId": "A001",
+    "siteStatement": "学生李四现场解释：中间凹进去的地方是因为要避开一棵大树，实际测量时特意留出的空间。现场测量数据和草图都显示此区域确实有凹陷。",
+    "sitePhotos": ["photo1.jpg", "photo2.jpg"],
+    "measurementData": {
+      "perimeter": "32米",
+      "method": "激光测距仪",
+      "weather": "晴"
+    },
+    "interviewer": "陈调查员",
+    "interviewedAt": "2024-01-16T09:00:00.000Z",
+    "additionalNotes": "学生提供了现场照片，大树确实存在，坐标(5,5)处为树的位置"
+  },
+  {
+    "id": "Q002",
+    "studentId": "S004",
+    "answerId": "A001",
+    "siteStatement": "赵六说他是顺时针测量的，因为当时站在东南角开始，顺着方向走的。虽然顺序反了，但坐标点是对的。",
+    "sitePhotos": [],
+    "measurementData": {
+      "perimeter": "40米",
+      "method": "卷尺"
+    },
+    "interviewer": "王调查员",
+    "interviewedAt": "2024-01-16T10:30:00.000Z",
+    "additionalNotes": "顺时针输入但面积计算正确，只是顺序问题"
+  }
+]

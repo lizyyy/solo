@@ -1,0 +1,79 @@
+[
+  {
+    "studentId": "S001",
+    "studentName": "张三",
+    "answerId": "A001",
+    "version": 1,
+    "points": [
+      {"x": 0, "y": 0},
+      {"x": 10, "y": 0},
+      {"x": 10, "y": 10},
+      {"x": 0, "y": 10}
+    ],
+    "calculatedArea": 100,
+    "submittedAt": "2024-01-15T10:30:00.000Z",
+    "source": "系统录入"
+  },
+  {
+    "studentId": "S001",
+    "studentName": "张三",
+    "answerId": "A001",
+    "version": 2,
+    "points": [
+      {"x": 0, "y": 0},
+      {"x": 12, "y": 0},
+      {"x": 12, "y": 12},
+      {"x": 0, "y": 12}
+    ],
+    "calculatedArea": 144,
+    "submittedAt": "2024-01-15T14:20:00.000Z",
+    "source": "修改后重交"
+  },
+  {
+    "studentId": "S002",
+    "studentName": "李四",
+    "answerId": "A001",
+    "version": 1,
+    "points": [
+      {"x": 0, "y": 0},
+      {"x": 10, "y": 0},
+      {"x": 5, "y": 5},
+      {"x": 10, "y": 10},
+      {"x": 0, "y": 10}
+    ],
+    "calculatedArea": 87.5,
+    "submittedAt": "2024-01-15T09:15:00.000Z",
+    "source": "系统录入"
+  },
+  {
+    "studentId": "S003",
+    "studentName": "王五",
+    "answerId": "A001",
+    "version": 1,
+    "points": [
+      {"x": 0, "y": 0},
+      {"x": 0, "y": 0},
+      {"x": 10, "y": 0},
+      {"x": 10, "y": 10},
+      {"x": 0, "y": 10}
+    ],
+    "calculatedArea": 100,
+    "submittedAt": "2024-01-15T11:45:00.000Z",
+    "source": "系统录入"
+  },
+  {
+    "studentId": "S004",
+    "studentName": "赵六",
+    "answerId": "A001",
+    "version": 1,
+    "points": [
+      {"x": 0, "y": 10},
+      {"x": 10, "y": 10},
+      {"x": 10, "y": 0},
+      {"x": 0, "y": 0}
+    ],
+    "calculatedArea": 100,
+    "submittedAt": "2024-01-15T13:00:00.000Z",
+    "source": "系统录入"
+  }
+]

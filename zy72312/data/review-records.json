@@ -1,0 +1,391 @@
+[
+  {
+    "id": "review-S001-A001-1780527385442",
+    "studentId": "S001",
+    "answerId": "A001",
+    "status": "needs-operation-review",
+    "geometryAnalysis": {
+      "rawPoints": [
+        {
+          "x": 0,
+          "y": 0
+        },
+        {
+          "x": 10,
+          "y": 0
+        },
+        {
+          "x": 10,
+          "y": 10
+        },
+        {
+          "x": 0,
+          "y": 10
+        }
+      ],
+      "convexHull": [
+        {
+          "x": 0,
+          "y": 0,
+          "originalIndex": 0
+        },
+        {
+          "x": 10,
+          "y": 0,
+          "originalIndex": 1
+        },
+        {
+          "x": 10,
+          "y": 10,
+          "originalIndex": 2
+        },
+        {
+          "x": 0,
+          "y": 10,
+          "originalIndex": 3
+        }
+      ],
+      "rawArea": 100,
+      "convexArea": 100,
+      "areaDiff": 0,
+      "areaDiffRatio": 0,
+      "issues": [],
+      "problemEdges": [],
+      "isConvex": true,
+      "windingOrder": "counter-clockwise"
+    },
+    "manualExample": null,
+    "questionnaire": null,
+    "errorAnalysis": "• 同一学生提交了 2 版答案，需业务运营复核确认哪版为准\n【缺少材料】\n• 缺少手算反例记录，无法核对计算过程\n• 缺少问卷原始行，无现场说法佐证",
+    "nextStep": "先找业务运营",
+    "assignedTo": "先找业务运营",
+    "hasMultipleVersions": true,
+    "versions": [
+      {
+        "version": 1,
+        "submittedAt": "2024-01-15T10:30:00.000Z",
+        "source": "系统录入"
+      },
+      {
+        "version": 2,
+        "submittedAt": "2024-01-15T14:20:00.000Z",
+        "source": "修改后重交"
+      }
+    ],
+    "createdAt": "2026-06-03T22:56:25.442Z",
+    "updatedAt": "2026-06-03T22:56:25.443Z",
+    "reviewHistory": [
+      {
+        "action": "created",
+        "message": "复核记录已创建"
+      }
+    ]
+  },
+  {
+    "id": "review-S002-A001-1780527385443",
+    "studentId": "S002",
+    "answerId": "A001",
+    "status": "updated",
+    "geometryAnalysis": {
+      "rawPoints": [
+        {
+          "x": 0,
+          "y": 0
+        },
+        {
+          "x": 10,
+          "y": 0
+        },
+        {
+          "x": 5,
+          "y": 5
+        },
+        {
+          "x": 10,
+          "y": 10
+        },
+        {
+          "x": 0,
+          "y": 10
+        }
+      ],
+      "convexHull": [
+        {
+          "x": 0,
+          "y": 0,
+          "originalIndex": 0
+        },
+        {
+          "x": 10,
+          "y": 0,
+          "originalIndex": 1
+        },
+        {
+          "x": 10,
+          "y": 10,
+          "originalIndex": 3
+        },
+        {
+          "x": 0,
+          "y": 10,
+          "originalIndex": 4
+        }
+      ],
+      "rawArea": 75,
+      "convexArea": 100,
+      "areaDiff": 25,
+      "areaDiffRatio": 0.3333333333333333,
+      "issues": [
+        {
+          "type": "concave",
+          "message": "发现凹点: (5, 5) 位于多边形凹处",
+          "point": {
+            "x": 5,
+            "y": 5
+          },
+          "index": 2
+        }
+      ],
+      "problemEdges": [
+        {
+          "start": {
+            "x": 10,
+            "y": 0
+          },
+          "end": {
+            "x": 5,
+            "y": 5
+          },
+          "type": "concave-edge",
+          "message": "此边包含凹点，属于问题边"
+        },
+        {
+          "start": {
+            "x": 5,
+            "y": 5
+          },
+          "end": {
+            "x": 10,
+            "y": 10
+          },
+          "type": "concave-edge",
+          "message": "此边包含凹点，属于问题边"
+        }
+      ],
+      "isConvex": false,
+      "windingOrder": "counter-clockwise"
+    },
+    "manualExample": null,
+    "questionnaire": {
+      "id": "Q-DEMO-001",
+      "studentId": "S002",
+      "answerId": "A001",
+      "siteStatement": "学生李四现场解释：中间凹进去的地方是因为要避开一棵大树，实际测量时特意留出的空间。现场测量数据和草图都显示此区域确实有凹陷。",
+      "sitePhotos": [],
+      "measurementData": {},
+      "interviewer": "吴老师",
+      "interviewedAt": "2026-06-03T22:56:25.454Z",
+      "additionalNotes": "已核实，大树确实在现场，凹点为合理情况",
+      "sourceType": "questionnaire"
+    },
+    "errorAnalysis": "【几何问题】\n• 发现凹点: (5, 5) 位于多边形凹处\n【缺少材料】\n• 缺少手算反例记录，无法核对计算过程\n【面积差异】\n• 原始多边形面积: 75.00，凸包面积: 100.00\n• 面积差值: 25.00 (33.3%)",
+    "nextStep": "找教研负责人吴老师",
+    "assignedTo": "找教研负责人吴老师",
+    "hasMultipleVersions": false,
+    "versions": [
+      {
+        "version": 1,
+        "submittedAt": "2024-01-15T09:15:00.000Z",
+        "source": "系统录入"
+      }
+    ],
+    "createdAt": "2026-06-03T22:56:25.443Z",
+    "updatedAt": "2026-06-03T22:56:25.454Z",
+    "reviewHistory": [
+      {
+        "action": "created",
+        "message": "复核记录已创建"
+      },
+      {
+        "action": "questionnaire-added",
+        "message": "已补充问卷原始行，误差说明已更新",
+        "timestamp": "2026-06-03T22:56:25.454Z"
+      }
+    ]
+  },
+  {
+    "id": "review-S003-A001-1780527385443",
+    "studentId": "S003",
+    "answerId": "A001",
+    "status": "pending",
+    "geometryAnalysis": {
+      "rawPoints": [
+        {
+          "x": 0,
+          "y": 0
+        },
+        {
+          "x": 0,
+          "y": 0
+        },
+        {
+          "x": 10,
+          "y": 0
+        },
+        {
+          "x": 10,
+          "y": 10
+        },
+        {
+          "x": 0,
+          "y": 10
+        }
+      ],
+      "convexHull": [
+        {
+          "x": 0,
+          "y": 0,
+          "originalIndex": 0
+        },
+        {
+          "x": 10,
+          "y": 0,
+          "originalIndex": 2
+        },
+        {
+          "x": 10,
+          "y": 10,
+          "originalIndex": 3
+        },
+        {
+          "x": 0,
+          "y": 10,
+          "originalIndex": 4
+        }
+      ],
+      "rawArea": 100,
+      "convexArea": 100,
+      "areaDiff": 0,
+      "areaDiffRatio": 0,
+      "issues": [
+        {
+          "type": "duplicate",
+          "message": "发现重复坐标: (0, 0)，第2点与之前重复",
+          "point": {
+            "x": 0,
+            "y": 0
+          },
+          "index": 1
+        }
+      ],
+      "problemEdges": [],
+      "isConvex": true,
+      "windingOrder": "counter-clockwise"
+    },
+    "manualExample": null,
+    "questionnaire": null,
+    "errorAnalysis": "【几何问题】\n• 发现重复坐标: (0, 0)，第2点与之前重复\n【缺少材料】\n• 缺少手算反例记录，无法核对计算过程\n• 缺少问卷原始行，无现场说法佐证",
+    "nextStep": "找教研负责人吴老师",
+    "assignedTo": "找教研负责人吴老师",
+    "hasMultipleVersions": false,
+    "versions": [
+      {
+        "version": 1,
+        "submittedAt": "2024-01-15T11:45:00.000Z",
+        "source": "系统录入"
+      }
+    ],
+    "createdAt": "2026-06-03T22:56:25.443Z",
+    "updatedAt": "2026-06-03T22:56:25.443Z",
+    "reviewHistory": [
+      {
+        "action": "created",
+        "message": "复核记录已创建"
+      }
+    ]
+  },
+  {
+    "id": "review-S004-A001-1780527385443",
+    "studentId": "S004",
+    "answerId": "A001",
+    "status": "pending",
+    "geometryAnalysis": {
+      "rawPoints": [
+        {
+          "x": 0,
+          "y": 10
+        },
+        {
+          "x": 10,
+          "y": 10
+        },
+        {
+          "x": 10,
+          "y": 0
+        },
+        {
+          "x": 0,
+          "y": 0
+        }
+      ],
+      "convexHull": [
+        {
+          "x": 0,
+          "y": 10,
+          "originalIndex": 0
+        },
+        {
+          "x": 10,
+          "y": 10,
+          "originalIndex": 1
+        },
+        {
+          "x": 10,
+          "y": 0,
+          "originalIndex": 2
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "originalIndex": 3
+        }
+      ],
+      "rawArea": 100,
+      "convexArea": 100,
+      "areaDiff": 0,
+      "areaDiffRatio": 0,
+      "issues": [
+        {
+          "type": "winding",
+          "message": "坐标顺序为顺时针，标准应为逆时针",
+          "expected": "counter-clockwise",
+          "actual": "clockwise"
+        }
+      ],
+      "problemEdges": [],
+      "isConvex": true,
+      "windingOrder": "clockwise"
+    },
+    "manualExample": null,
+    "questionnaire": null,
+    "errorAnalysis": "【几何问题】\n• 坐标顺序为顺时针，标准应为逆时针\n【缺少材料】\n• 缺少手算反例记录，无法核对计算过程\n• 缺少问卷原始行，无现场说法佐证",
+    "nextStep": "找教研负责人吴老师",
+    "assignedTo": "找教研负责人吴老师",
+    "hasMultipleVersions": false,
+    "versions": [
+      {
+        "version": 1,
+        "submittedAt": "2024-01-15T13:00:00.000Z",
+        "source": "系统录入"
+      }
+    ],
+    "createdAt": "2026-06-03T22:56:25.443Z",
+    "updatedAt": "2026-06-03T22:56:25.443Z",
+    "reviewHistory": [
+      {
+        "action": "created",
+        "message": "复核记录已创建"
+      }
+    ]
+  }
+]
