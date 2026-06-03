@@ -1,0 +1,345 @@
+{
+  "profile_id": "8816d143",
+  "project_name": "XX路积水剖面",
+  "coordinate_origin_description": "坐标原点位于XX路与YY路交叉口中心，X轴沿道路方向，Y轴垂直道路，Z轴竖直向上",
+  "records": [
+    {
+      "record_id": "babb70c6",
+      "obstacle_id": "OBS001",
+      "obstacle_name": "凹陷点A",
+      "water_depth_mm": 120.0,
+      "position_x": 10.5,
+      "position_y": 3.2,
+      "position_z": 0.0,
+      "evidence_trail": [
+        {
+          "source": "coordinate_origin",
+          "original_line_number": 1,
+          "original_content": "OBS001 | 路面凹陷A | 120 | 10.5 | 3.2 | 0.0",
+          "photo_id": null,
+          "operator": "system",
+          "timestamp": "2026-06-03T20:52:02.713552"
+        },
+        {
+          "source": "inspection_photo",
+          "original_line_number": null,
+          "original_content": "照片中可见该处为路面凹陷，积水约12cm，现场标识为'凹陷点A'",
+          "photo_id": "IMG-20240315-001",
+          "operator": "许工",
+          "timestamp": "2026-06-03T20:52:02.713984"
+        },
+        {
+          "source": "manual",
+          "original_line_number": null,
+          "original_content": "name_changed: 路面凹陷A -> 凹陷点A",
+          "photo_id": null,
+          "operator": "许工",
+          "timestamp": "2026-06-03T20:52:02.716172"
+        }
+      ],
+      "manual_changes": [
+        {
+          "source": "manual",
+          "original_line_number": null,
+          "original_content": "name_changed: 路面凹陷A -> 凹陷点A",
+          "photo_id": null,
+          "operator": "许工",
+          "timestamp": "2026-06-03T20:52:02.716172"
+        }
+      ],
+      "status": "confirmed",
+      "conflict_ids": [
+        "conflict_OBS001"
+      ],
+      "created_at": "2026-06-03T20:52:02.713577",
+      "updated_at": "2026-06-03T20:52:02.716174"
+    },
+    {
+      "record_id": "e77df75c",
+      "obstacle_id": "OBS001",
+      "obstacle_name": "凹陷点A",
+      "water_depth_mm": 120.0,
+      "position_x": 10.5,
+      "position_y": 3.2,
+      "position_z": 0.0,
+      "evidence_trail": [
+        {
+          "source": "coordinate_origin",
+          "original_line_number": 2,
+          "original_content": "OBS001 | 凹陷点A | 120 | 10.5 | 3.2 | 0.0",
+          "photo_id": null,
+          "operator": "system",
+          "timestamp": "2026-06-03T20:52:02.713581"
+        },
+        {
+          "source": "inspection_photo",
+          "original_line_number": null,
+          "original_content": "照片中可见该处为路面凹陷，积水约12cm，现场标识为'凹陷点A'",
+          "photo_id": "IMG-20240315-001",
+          "operator": "许工",
+          "timestamp": "2026-06-03T20:52:02.713990"
+        },
+        {
+          "source": "manual",
+          "original_line_number": null,
+          "original_content": "name_changed: 凹陷点A -> 路面凹陷A",
+          "photo_id": null,
+          "operator": "许工",
+          "timestamp": "2026-06-03T20:52:02.715334"
+        },
+        {
+          "source": "manual",
+          "original_line_number": null,
+          "original_content": "name_changed: 路面凹陷A -> 凹陷点A",
+          "photo_id": null,
+          "operator": "许工",
+          "timestamp": "2026-06-03T20:52:02.716178"
+        }
+      ],
+      "manual_changes": [
+        {
+          "source": "manual",
+          "original_line_number": null,
+          "original_content": "name_changed: 凹陷点A -> 路面凹陷A",
+          "photo_id": null,
+          "operator": "许工",
+          "timestamp": "2026-06-03T20:52:02.715334"
+        },
+        {
+          "source": "manual",
+          "original_line_number": null,
+          "original_content": "name_changed: 路面凹陷A -> 凹陷点A",
+          "photo_id": null,
+          "operator": "许工",
+          "timestamp": "2026-06-03T20:52:02.716178"
+        }
+      ],
+      "status": "confirmed",
+      "conflict_ids": [
+        "conflict_OBS001"
+      ],
+      "created_at": "2026-06-03T20:52:02.713591",
+      "updated_at": "2026-06-03T20:52:02.716180"
+    },
+    {
+      "record_id": "7e7ba21c",
+      "obstacle_id": "OBS002",
+      "obstacle_name": "排水口B",
+      "water_depth_mm": 55.0,
+      "position_x": 25.0,
+      "position_y": 8.1,
+      "position_z": 0.0,
+      "evidence_trail": [
+        {
+          "source": "coordinate_origin",
+          "original_line_number": 3,
+          "original_content": "OBS002 | 排水口B | 50 | 25.0 | 8.1 | 0.0",
+          "photo_id": null,
+          "operator": "system",
+          "timestamp": "2026-06-03T20:52:02.713594"
+        },
+        {
+          "source": "inspection_photo",
+          "original_line_number": null,
+          "original_content": "排水口B正常排水，无堵塞",
+          "photo_id": "IMG-20240315-002",
+          "operator": "许工",
+          "timestamp": "2026-06-03T20:52:02.714302"
+        },
+        {
+          "source": "manual",
+          "original_line_number": null,
+          "original_content": "annotation_update: {'water_depth_mm': {'old': 50.0, 'new': 55.0}}",
+          "photo_id": null,
+          "operator": "许工",
+          "timestamp": "2026-06-03T20:52:02.714692"
+        }
+      ],
+      "manual_changes": [
+        {
+          "source": "manual",
+          "original_line_number": null,
+          "original_content": "annotation_update: {'water_depth_mm': {'old': 50.0, 'new': 55.0}}",
+          "photo_id": null,
+          "operator": "许工",
+          "timestamp": "2026-06-03T20:52:02.714692"
+        }
+      ],
+      "status": "annotation_updated",
+      "conflict_ids": [],
+      "created_at": "2026-06-03T20:52:02.713602",
+      "updated_at": "2026-06-03T20:52:02.714695"
+    },
+    {
+      "record_id": "49c08c33",
+      "obstacle_id": "OBS003",
+      "obstacle_name": "井盖缺失C",
+      "water_depth_mm": 200.0,
+      "position_x": 40.2,
+      "position_y": 12.6,
+      "position_z": -0.25,
+      "evidence_trail": [
+        {
+          "source": "coordinate_origin",
+          "original_line_number": 4,
+          "original_content": "OBS003 | 井盖缺失C | 200 | 40.0 | 12.5 | -0.3",
+          "photo_id": null,
+          "operator": "system",
+          "timestamp": "2026-06-03T20:52:02.713605"
+        },
+        {
+          "source": "manual",
+          "original_line_number": null,
+          "original_content": "annotation_update: {'position': {'old': {'x': 40.0, 'y': 12.5, 'z': -0.3}, 'new': {'x': 40.2, 'y': 12.6, 'z': -0.25}}}",
+          "photo_id": null,
+          "operator": "许工",
+          "timestamp": "2026-06-03T20:52:02.715001"
+        }
+      ],
+      "manual_changes": [
+        {
+          "source": "manual",
+          "original_line_number": null,
+          "original_content": "annotation_update: {'position': {'old': {'x': 40.0, 'y': 12.5, 'z': -0.3}, 'new': {'x': 40.2, 'y': 12.6, 'z': -0.25}}}",
+          "photo_id": null,
+          "operator": "许工",
+          "timestamp": "2026-06-03T20:52:02.715001"
+        }
+      ],
+      "status": "annotation_updated",
+      "conflict_ids": [],
+      "created_at": "2026-06-03T20:52:02.713612",
+      "updated_at": "2026-06-03T20:52:02.715004"
+    }
+  ],
+  "conflicts": [
+    {
+      "conflict_id": "conflict_OBS001",
+      "conflict_type": "duplicate_name",
+      "obstacle_id": "OBS001",
+      "names": [
+        "凹陷点A",
+        "路面凹陷A"
+      ],
+      "evidence": [
+        {
+          "source": "coordinate_origin",
+          "original_line_number": 1,
+          "original_content": "OBS001 | 路面凹陷A | 120 | 10.5 | 3.2 | 0.0",
+          "photo_id": null,
+          "operator": "system",
+          "timestamp": "2026-06-03T20:52:02.713552"
+        },
+        {
+          "source": "inspection_photo",
+          "original_line_number": null,
+          "original_content": "照片中可见该处为路面凹陷，积水约12cm，现场标识为'凹陷点A'",
+          "photo_id": "IMG-20240315-001",
+          "operator": "许工",
+          "timestamp": "2026-06-03T20:52:02.713984"
+        },
+        {
+          "source": "coordinate_origin",
+          "original_line_number": 2,
+          "original_content": "OBS001 | 凹陷点A | 120 | 10.5 | 3.2 | 0.0",
+          "photo_id": null,
+          "operator": "system",
+          "timestamp": "2026-06-03T20:52:02.713581"
+        },
+        {
+          "source": "inspection_photo",
+          "original_line_number": null,
+          "original_content": "照片中可见该处为路面凹陷，积水约12cm，现场标识为'凹陷点A'",
+          "photo_id": "IMG-20240315-001",
+          "operator": "许工",
+          "timestamp": "2026-06-03T20:52:02.713990"
+        }
+      ],
+      "resolution": "chosen_name=凹陷点A",
+      "resolved_by": "许工",
+      "resolved_at": "2026-06-03T20:52:02.716166",
+      "status": "confirmed"
+    }
+  ],
+  "audit_log": [
+    {
+      "timestamp": "2026-06-03T20:52:02.711463",
+      "action": "create_profile",
+      "detail": {
+        "project_name": "XX路积水剖面"
+      }
+    },
+    {
+      "timestamp": "2026-06-03T20:52:02.713635",
+      "action": "step1_import_origin",
+      "detail": {
+        "line_count": 4,
+        "operator": "system"
+      }
+    },
+    {
+      "timestamp": "2026-06-03T20:52:02.714004",
+      "action": "step2_review_photos",
+      "detail": {
+        "obstacle_id": "OBS001",
+        "photo_id": "IMG-20240315-001",
+        "operator": "许工"
+      }
+    },
+    {
+      "timestamp": "2026-06-03T20:52:02.714317",
+      "action": "step2_review_photos",
+      "detail": {
+        "obstacle_id": "OBS002",
+        "photo_id": "IMG-20240315-002",
+        "operator": "许工"
+      }
+    },
+    {
+      "timestamp": "2026-06-03T20:52:02.714698",
+      "action": "step3_update_annotation",
+      "detail": {
+        "obstacle_id": "OBS002",
+        "operator": "许工",
+        "changes": "{'water_depth_mm': {'old': 50.0, 'new': 55.0}}"
+      }
+    },
+    {
+      "timestamp": "2026-06-03T20:52:02.715008",
+      "action": "step3_update_annotation",
+      "detail": {
+        "obstacle_id": "OBS003",
+        "operator": "许工",
+        "changes": "{'position': {'old': {'x': 40.0, 'y': 12.5, 'z': -0.3}, 'new': {'x': 40.2, 'y': 12.6, 'z': -0.25}}}"
+      }
+    },
+    {
+      "timestamp": "2026-06-03T20:52:02.715338",
+      "action": "resolve_conflict",
+      "detail": {
+        "conflict_id": "conflict_OBS001",
+        "chosen_name": "路面凹陷A",
+        "operator": "许工"
+      }
+    },
+    {
+      "timestamp": "2026-06-03T20:52:02.715819",
+      "action": "rollback_conflict",
+      "detail": {
+        "conflict_id": "conflict_OBS001",
+        "operator": "许工"
+      }
+    },
+    {
+      "timestamp": "2026-06-03T20:52:02.716182",
+      "action": "resolve_conflict",
+      "detail": {
+        "conflict_id": "conflict_OBS001",
+        "chosen_name": "凹陷点A",
+        "operator": "许工"
+      }
+    }
+  ],
+  "created_at": "2026-06-03T20:52:02.711450",
+  "updated_at": "2026-06-03T20:52:02.716183"
+}

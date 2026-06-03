@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>道路积水深度剖面系统</title>
+<style>
+:root {
+  --bg: #0f172a; --surface: #1e293b; --border: #334155;
+  --text: #e2e8f0; --muted: #94a3b8; --accent: #38bdf8;
+  --warn: #fbbf24; --error: #f87171; --success: #34d399;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: -apple-system, "PingFang SC", sans-serif; background: var(--bg); color: var(--text); }
+.layout { display: grid; grid-template-columns: 280px 1fr 360px; grid-template-rows: 56px 1fr; height: 100vh; }
+header { grid-column: 1/-1; background: var(--surface); border-bottom: 1px solid var(--border); display:flex; align-items:center; padding:0 20px; gap:16px; }
+header h1 { font-size:16px; font-weight:600; }
+header .step-indicator { display:flex; gap:4px; margin-left:auto; }
+header .step { padding:4px 12px; border-radius:4px; font-size:12px; background:var(--border); color:var(--muted); }
+header .step.active { background:var(--accent); color:#000; }
+header .step.done { background:var(--success); color:#000; }
+.sidebar { background:var(--surface); border-right:1px solid var(--border); overflow-y:auto; padding:12px; }
+.sidebar h2 { font-size:13px; color:var(--muted); margin-bottom:8px; text-transform:uppercase; letter-spacing:1px; }
+.sidebar .profile-item { padding:8px 10px; border-radius:6px; cursor:pointer; margin-bottom:4px; font-size:13px; border:1px solid transparent; }
+.sidebar .profile-item:hover { background:var(--border); }
+.sidebar .profile-item.active { border-color:var(--accent); background:rgba(56,189,248,0.1); }
+.sidebar .conflict-item { padding:8px 10px; border-radius:6px; margin-bottom:4px; font-size:12px; background:rgba(251,191,36,0.1); border:1px solid rgba(251,191,36,0.3); }
+.sidebar .conflict-item .names { color:var(--warn); font-weight:600; }
+.main { display:flex; flex-direction:column; overflow:hidden; }
+.toolbar { padding:10px 16px; background:var(--surface); border-bottom:1px solid var(--border); display:flex; gap:8px; flex-wrap:wrap; }
+.btn { padding:6px 14px; border-radius:6px; border:1px solid var(--border); background:var(--surface); color:var(--text); cursor:pointer; font-size:12px; }
+.btn:hover { border-color:var(--accent); }
+.btn.primary { background:var(--accent); color:#000; border-color:var(--accent); }
+.btn.warn { background:var(--warn); color:#000; }
+.btn.danger { background:var(--error); color:#fff; }
+.canvas-area { flex:1; position:relative; background:#0c1222; overflow:hidden; }
+#annotationCanvas { width:100%; height:100%; }
+.right-panel { background:var(--surface); border-left:1px solid var(--border); overflow-y:auto; padding:12px; }
+.right-panel h2 { font-size:13px; color:var(--muted); margin-bottom:8px; text-transform:uppercase; letter-spacing:1px; }
+.evidence-card { background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:8px; padding:10px; margin-bottom:8px; }
+.evidence-card .source-tag { display:inline-block; font-size:10px; padding:2px 6px; border-radius:3px; margin-bottom:4px; }
+.evidence-card .source-tag.coord { background:rgba(56,189,248,0.2); color:var(--accent); }
+.evidence-card .source-tag.photo { background:rgba(52,211,153,0.2); color:var(--success); }
+.evidence-card .source-tag.manual { background:rgba(251,191,36,0.2); color:var(--warn); }
+.evidence-card .line-no { font-size:11px; color:var(--muted); }
+.evidence-card .content { font-size:12px; margin-top:4px; word-break:break-all; }
+.record-detail { margin-bottom:12px; }
+.record-detail .header { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+.record-detail .header .name { font-weight:600; font-size:14px; }
+.status-badge { font-size:10px; padding:2px 8px; border-radius:10px; }
+.status-badge.imported { background:rgba(56,189,248,0.2); color:var(--accent); }
+.status-badge.photo_reviewed { background:rgba(52,211,153,0.2); color:var(--success); }
+.status-badge.annotation_updated { background:rgba(168,85,247,0.2); color:#a855f7; }
+.status-badge.pending_review { background:rgba(251,191,36,0.2); color:var(--warn); }
+.status-badge.confirmed { background:rgba(52,211,153,0.2); color:var(--success); }
+.status-badge.rolled_back { background:rgba(248,113,113,0.2); color:var(--error); }
+.conflict-panel { background:rgba(251,191,36,0.05); border:1px solid rgba(251,191,36,0.3); border-radius:8px; padding:12px; margin-bottom:12px; }
+.conflict-panel h3 { color:var(--warn); font-size:13px; margin-bottom:8px; }
+.conflict-panel .name-options { display:flex; gap:6px; flex-wrap:wrap; margin:8px 0; }
+.conflict-panel .name-opt { padding:4px 10px; border-radius:4px; cursor:pointer; font-size:12px; border:1px solid var(--border); }
+.conflict-panel .name-opt:hover { border-color:var(--accent); }
+.conflict-panel .name-opt.selected { border-color:var(--success); background:rgba(52,211,153,0.15); }
+table.data-table { width:100%; border-collapse:collapse; font-size:12px; }
+table.data-table th { text-align:left; padding:6px 8px; border-bottom:1px solid var(--border); color:var(--muted); font-weight:500; }
+table.data-table td { padding:6px 8px; border-bottom:1px solid rgba(51,65,85,0.5); }
+.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); display:none; align-items:center; justify-content:center; z-index:100; }
+.modal-overlay.show { display:flex; }
+.modal { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:24px; width:560px; max-height:80vh; overflow-y:auto; }
+.modal h2 { margin-bottom:16px; font-size:16px; }
+.modal label { display:block; font-size:12px; color:var(--muted); margin-bottom:4px; margin-top:12px; }
+.modal input, .modal textarea { width:100%; padding:8px; border-radius:6px; border:1px solid var(--border); background:var(--bg); color:var(--text); font-size:13px; }
+.modal textarea { min-height:120px; font-family:monospace; }
+.empty-state { display:flex; align-items:center; justify-content:center; height:100%; color:var(--muted); font-size:14px; }
+.audit-log { font-size:11px; color:var(--muted); max-height:200px; overflow-y:auto; }
+.audit-log .entry { padding:4px 0; border-bottom:1px solid rgba(51,65,85,0.3); }
+</style>
+</head>
+<body>
+<div class="layout">
+  <header>
+    <h1>道路积水深度剖面</h1>
+    <div class="step-indicator">
+      <div class="step" id="step1">① 导入坐标原点说明</div>
+      <div class="step" id="step2">② 补看巡检照片</div>
+      <div class="step" id="step3">③ 更新三维标注</div>
+    </div>
+    <button class="btn" onclick="showCreateModal()">新建剖面</button>
+    <button class="btn" onclick="showImportModal()">导入原点说明</button>
+    <button class="btn" onclick="exportDetail()">导出明细</button>
+  </header>
+
+  <div class="sidebar">
+    <h2>剖面列表</h2>
+    <div id="profileList"></div>
+    <h2 style="margin-top:16px">待处理冲突</h2>
+    <div id="conflictList"></div>
+  </div>
+
+  <div class="main">
+    <div class="toolbar">
+      <button class="btn primary" onclick="showPhotoModal()">补看巡检照片</button>
+      <button class="btn primary" onclick="showAnnotationModal()">更新标注</button>
+      <button class="btn warn" onclick="refreshView()">刷新视图</button>
+    </div>
+    <div class="canvas-area">
+      <canvas id="annotationCanvas"></canvas>
+      <div class="empty-state" id="emptyState">请先新建剖面并导入坐标原点说明</div>
+    </div>
+  </div>
+
+  <div class="right-panel">
+    <h2>选中记录详情</h2>
+    <div id="recordDetail"><p style="color:var(--muted);font-size:13px">点击左侧记录查看</p></div>
+    <h2>证据追溯</h2>
+    <div id="evidenceTrail"></div>
+    <h2>冲突处理</h2>
+    <div id="conflictResolution"></div>
+    <h2>审计日志</h2>
+    <div id="auditLog" class="audit-log"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="createModal">
+  <div class="modal">
+    <h2>新建剖面</h2>
+    <label>项目名称</label>
+    <input id="createName" placeholder="例：XX路积水剖面">
+    <label>坐标原点说明</label>
+    <textarea id="createOrigin" placeholder="描述坐标原点的定义和参考基准"></textarea>
+    <div style="margin-top:16px;display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn" onclick="closeCreateModal()">取消</button>
+      <button class="btn primary" onclick="doCreate()">创建</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="importModal">
+  <div class="modal">
+    <h2>导入坐标原点说明（步骤①）</h2>
+    <label>每行格式：障碍物ID | 障碍物名称 | 积水深度mm | X | Y | Z</label>
+    <textarea id="importLines" placeholder="OBS001 | 路面凹陷A | 120 | 10.5 | 3.2 | 0.0&#10;OBS001 | 凹陷点A | 120 | 10.5 | 3.2 | 0.0&#10;OBS002 | 排水口B | 50 | 25.0 | 8.1 | 0.0"></textarea>
+    <label>操作人</label>
+    <input id="importOperator" value="system">
+    <div style="margin-top:16px;display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn" onclick="closeImportModal()">取消</button>
+      <button class="btn primary" onclick="doImport()">导入</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="photoModal">
+  <div class="modal">
+    <h2>补看巡检照片（步骤②）</h2>
+    <label>障碍物ID</label>
+    <input id="photoObstacleId" placeholder="OBS001">
+    <label>照片编号</label>
+    <input id="photoId" placeholder="IMG-20240315-001">
+    <label>照片描述/现场说法</label>
+    <textarea id="photoDesc" placeholder="照片中可见该处为路面凹陷，积水约12cm"></textarea>
+    <label>操作人</label>
+    <input id="photoOperator" value="许工">
+    <div style="margin-top:16px;display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn" onclick="closePhotoModal()">取消</button>
+      <button class="btn primary" onclick="doAttachPhoto()">确认补看</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="annotationModal">
+  <div class="modal">
+    <h2>更新三维标注（步骤③）</h2>
+    <label>障碍物ID</label>
+    <input id="annotObstacleId" placeholder="OBS001">
+    <label>新积水深度(mm)</label>
+    <input id="annotDepth" type="number" placeholder="留空不修改">
+    <label>新位置 (JSON: {"x":1,"y":2,"z":3})</label>
+    <input id="annotPosition" placeholder='留空不修改'>
+    <label>操作人</label>
+    <input id="annotOperator" value="许工">
+    <div style="margin-top:16px;display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn" onclick="closeAnnotationModal()">取消</button>
+      <button class="btn primary" onclick="doUpdateAnnotation()">更新标注</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = '';
+let currentProfileId = null;
+let currentProfile = null;
+
+async function api(method, path, body) {
+  const opts = { method, headers: { 'Content-Type': 'application/json' } };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(API + path, opts);
+  if (!res.ok) { const t = await res.text(); throw new Error(t); }
+  return res.json();
+}
+
+function showCreateModal() { document.getElementById('createModal').classList.add('show'); }
+function closeCreateModal() { document.getElementById('createModal').classList.remove('show'); }
+function showImportModal() { document.getElementById('importModal').classList.add('show'); }
+function closeImportModal() { document.getElementById('importModal').classList.remove('show'); }
+function showPhotoModal() { document.getElementById('photoModal').classList.add('show'); }
+function closePhotoModal() { document.getElementById('photoModal').classList.remove('show'); }
+function showAnnotationModal() { document.getElementById('annotationModal').classList.add('show'); }
+function closeAnnotationModal() { document.getElementById('annotationModal').classList.remove('show'); }
+
+async function doCreate() {
+  const name = document.getElementById('createName').value.trim();
+  const origin = document.getElementById('createOrigin').value.trim();
+  if (!name) return alert('请输入项目名称');
+  const p = await api('POST', '/api/profiles', { project_name: name, coordinate_origin_description: origin });
+  currentProfileId = p.profile_id;
+  closeCreateModal();
+  await loadProfiles();
+  await loadProfile();
+}
+
+async function doImport() {
+  if (!currentProfileId) return alert('请先选择或创建剖面');
+  const lines = document.getElementById('importLines').value.split('\n').filter(l => l.trim());
+  const operator = document.getElementById('importOperator').value.trim() || 'system';
+  currentProfile = await api('POST', `/api/profiles/${currentProfileId}/import-origin`, { lines, operator });
+  closeImportModal();
+  renderAll();
+}
+
+async function doAttachPhoto() {
+  if (!currentProfileId) return alert('请先选择剖面');
+  const obstacle_id = document.getElementById('photoObstacleId').value.trim();
+  const photo_id = document.getElementById('photoId').value.trim();
+  const photo_description = document.getElementById('photoDesc').value.trim();
+  const operator = document.getElementById('photoOperator').value.trim() || '许工';
+  if (!obstacle_id || !photo_id) return alert('请填写障碍物ID和照片编号');
+  currentProfile = await api('POST', `/api/profiles/${currentProfileId}/attach-photo`, { obstacle_id, photo_id, photo_description, operator });
+  closePhotoModal();
+  renderAll();
+}
+
+async function doUpdateAnnotation() {
+  if (!currentProfileId) return alert('请先选择剖面');
+  const obstacle_id = document.getElementById('annotObstacleId').value.trim();
+  const depthStr = document.getElementById('annotDepth').value.trim();
+  const posStr = document.getElementById('annotPosition').value.trim();
+  const operator = document.getElementById('annotOperator').value.trim() || '许工';
+  if (!obstacle_id) return alert('请填写障碍物ID');
+  const body = { obstacle_id, operator };
+  if (depthStr) body.new_depth = parseFloat(depthStr);
+  if (posStr) body.new_position = JSON.parse(posStr);
+  currentProfile = await api('POST', `/api/profiles/${currentProfileId}/update-annotation`, body);
+  closeAnnotationModal();
+  renderAll();
+}
+
+async function loadProfiles() {
+  const list = await api('GET', '/api/profiles');
+  const el = document.getElementById('profileList');
+  el.innerHTML = list.map(p => `<div class="profile-item ${p.profile_id===currentProfileId?'active':''}" onclick="selectProfile('${p.profile_id}')">${p.project_name} <span style="color:var(--muted);font-size:11px">(${p.record_count}条/${p.conflict_count}冲突)</span></div>`).join('');
+}
+
+async function selectProfile(id) {
+  currentProfileId = id;
+  await loadProfile();
+  await loadProfiles();
+}
+
+async function loadProfile() {
+  if (!currentProfileId) return;
+  currentProfile = await api('GET', `/api/profiles/${currentProfileId}`);
+  renderAll();
+}
+
+function statusLabel(s) {
+  const m = { imported:'已导入', photo_reviewed:'已补看照片', annotation_updated:'标注已更新', pending_review:'待处理', confirmed:'已确认', rolled_back:'已回滚' };
+  return `<span class="status-badge ${s}">${m[s]||s}</span>`;
+}
+
+function renderAll() {
+  if (!currentProfile) return;
+  document.getElementById('emptyState').style.display = currentProfile.records.length ? 'none' : 'flex';
+  renderConflicts();
+  renderRightPanel();
+  renderCanvas();
+  updateStepIndicator();
+}
+
+function updateStepIndicator() {
+  const p = currentProfile;
+  const hasImported = p.records.length > 0;
+  const hasPhoto = p.records.some(r => r.status === 'photo_reviewed' || r.status === 'annotation_updated' || r.status === 'confirmed');
+  const hasAnnotation = p.records.some(r => r.status === 'annotation_updated' || r.status === 'confirmed');
+  const s1 = document.getElementById('step1');
+  const s2 = document.getElementById('step2');
+  const s3 = document.getElementById('step3');
+  s1.className = 'step' + (hasImported ? ' done' : ' active');
+  s2.className = 'step' + (hasPhoto ? ' done' : hasImported ? ' active' : '');
+  s3.className = 'step' + (hasAnnotation ? ' done' : hasPhoto ? ' active' : '');
+}
+
+function renderConflicts() {
+  const el = document.getElementById('conflictList');
+  if (!currentProfile.conflicts.length) { el.innerHTML = '<p style="color:var(--muted);font-size:12px">无冲突</p>'; return; }
+  el.innerHTML = currentProfile.conflicts.map(c => `<div class="conflict-item">${statusLabel(c.status)} <b>${c.obstacle_id}</b><br><span class="names">${c.names.join(' / ')}</span></div>`).join('');
+}
+
+function renderRightPanel() {
+  const p = currentProfile;
+  let detailHtml = '';
+  for (const r of p.records) {
+    detailHtml += `<div class="record-detail" onclick="selectRecord('${r.record_id}')">
+      <div class="header"><span class="name">${r.obstacle_name}</span>${statusLabel(r.status)}</div>
+      <div style="font-size:12px;color:var(--muted)">ID: ${r.obstacle_id} | 深度: ${r.water_depth_mm}mm | 位置: (${r.position_x}, ${r.position_y}, ${r.position_z})</div>
+      ${r.conflict_ids.length ? '<div style="color:var(--warn);font-size:11px;margin-top:2px">⚠ 存在命名冲突</div>' : ''}
+    </div>`;
+  }
+  document.getElementById('recordDetail').innerHTML = detailHtml || '<p style="color:var(--muted);font-size:13px">暂无记录</p>';
+
+  document.getElementById('auditLog').innerHTML = (p.audit_log || []).map(a => `<div class="entry"><b>${a.action}</b> ${a.timestamp}<br><span style="font-size:10px">${JSON.stringify(a.detail)}</span></div>`).reverse().join('');
+
+  renderConflictResolution();
+}
+
+function renderConflictResolution() {
+  const p = currentProfile;
+  const pending = p.conflicts.filter(c => c.status === 'pending_review');
+  if (!pending.length) { document.getElementById('conflictResolution').innerHTML = '<p style="color:var(--muted);font-size:12px">无待处理冲突</p>'; return; }
+  let html = '';
+  for (const c of pending) {
+    html += `<div class="conflict-panel">
+      <h3>冲突: ${c.obstacle_id}</h3>
+      <p style="font-size:12px">同一障碍物被标了两个名字：</p>
+      <div class="name-options">${c.names.map(n => `<div class="name-opt" onclick="selectConflictName(this,'${n}')" data-name="${n}">${n}</div>`).join('')}</div>
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <button class="btn primary" onclick="resolveConflict('${c.conflict_id}', false)">确认选用</button>
+        <button class="btn danger" onclick="resolveConflict('${c.conflict_id}', true)">回滚</button>
+      </div>
+      <div style="margin-top:8px;font-size:11px;color:var(--muted)">证据来源：</div>
+      ${c.evidence.map(e => `<div style="font-size:10px;color:var(--muted);padding:2px 0">[${e.source}] ${e.original_line_number ? '行'+e.original_line_number+': ' : ''}${e.original_content}</div>`).join('')}
+    </div>`;
+  }
+  document.getElementById('conflictResolution').innerHTML = html;
+}
+
+let selectedConflictName = {};
+function selectConflictName(el, name) {
+  const parent = el.parentElement;
+  parent.querySelectorAll('.name-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  const panel = el.closest('.conflict-panel');
+  const cid = panel.querySelector('h3').textContent.replace('冲突: ', '');
+  selectedConflictName[cid] = name;
+}
+
+async function resolveConflict(conflictId, rollback) {
+  if (!currentProfileId) return;
+  const chosen = rollback ? '' : (selectedConflictName[conflictId] || '');
+  if (!rollback && !chosen) return alert('请先选择一个名称');
+  try {
+    currentProfile = await api('POST', `/api/profiles/${currentProfileId}/resolve-conflict`, {
+      conflict_id: conflictId, chosen_name: chosen, operator: '许工', rollback
+    });
+    renderAll();
+  } catch(e) { alert('操作失败: ' + e.message); }
+}
+
+function renderCanvas() {
+  const canvas = document.getElementById('annotationCanvas');
+  const ctx = canvas.getContext('2d');
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = rect.width;
+  canvas.height = rect.height;
+  ctx.fillStyle = '#0c1222';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  if (!currentProfile || !currentProfile.records.length) return;
+
+  const records = currentProfile.records;
+  const maxDepth = Math.max(...records.map(r => r.water_depth_mm), 1);
+  const margin = 60;
+  const w = canvas.width - margin * 2;
+  const h = canvas.height - margin * 2;
+
+  ctx.strokeStyle = '#334155';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(margin, margin);
+  ctx.lineTo(margin, canvas.height - margin);
+  ctx.lineTo(canvas.width - margin, canvas.height - margin);
+  ctx.stroke();
+
+  ctx.fillStyle = '#94a3b8';
+  ctx.font = '11px sans-serif';
+  ctx.fillText('积水深度(mm)', 10, margin - 10);
+  ctx.fillText('障碍物位置', canvas.width - margin - 60, canvas.height - margin + 20);
+
+  const points = [];
+  records.forEach((r, i) => {
+    const x = margin + (i / Math.max(records.length - 1, 1)) * w;
+    const y = canvas.height - margin - (r.water_depth_mm / maxDepth) * h;
+    points.push({ x, y, r });
+
+    const isPending = r.status === 'pending_review' || r.conflict_ids.length > 0;
+    ctx.beginPath();
+    ctx.arc(x, y, isPending ? 6 : 4, 0, Math.PI * 2);
+    ctx.fillStyle = isPending ? '#fbbf24' : r.status === 'confirmed' ? '#34d399' : '#38bdf8';
+    ctx.fill();
+
+    ctx.fillStyle = '#e2e8f0';
+    ctx.font = '10px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(r.obstacle_name, x, y - 12);
+    ctx.fillStyle = '#94a3b8';
+    ctx.fillText(r.water_depth_mm + 'mm', x, y + 16);
+  });
+
+  if (points.length > 1) {
+    ctx.beginPath();
+    ctx.strokeStyle = 'rgba(56,189,248,0.4)';
+    ctx.lineWidth = 2;
+    points.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+    ctx.stroke();
+  }
+}
+
+function selectRecord(recordId) {
+  const r = currentProfile.records.find(r => r.record_id === recordId);
+  if (!r) return;
+  let html = `<div class="record-detail"><div class="header"><span class="name">${r.obstacle_name}</span>${statusLabel(r.status)}</div>
+    <div style="font-size:12px;color:var(--muted)">ID: ${r.obstacle_id}</div>
+    <div style="font-size:12px;margin-top:4px">积水深度: ${r.water_depth_mm}mm</div>
+    <div style="font-size:12px">位置: (${r.position_x}, ${r.position_y}, ${r.position_z})</div>
+    <div style="font-size:12px;margin-top:4px">冲突: ${r.conflict_ids.length ? r.conflict_ids.join(', ') : '无'}</div>
+  </div>`;
+
+  let evHtml = '';
+  for (const e of r.evidence_trail) {
+    const cls = e.source === 'coordinate_origin' ? 'coord' : e.source === 'inspection_photo' ? 'photo' : 'manual';
+    const label = e.source === 'coordinate_origin' ? '坐标原点' : e.source === 'inspection_photo' ? '巡检照片' : '人工修改';
+    evHtml += `<div class="evidence-card">
+      <span class="source-tag ${cls}">${label}</span>
+      ${e.original_line_number ? `<span class="line-no">行${e.original_line_number}</span>` : ''}
+      ${e.photo_id ? `<span class="line-no">照片${e.photo_id}</span>` : ''}
+      <div class="content">${e.original_content}</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:2px">${e.operator} @ ${e.timestamp}</div>
+    </div>`;
+  }
+  document.getElementById('evidenceTrail').innerHTML = evHtml || '<p style="color:var(--muted);font-size:12px">无证据</p>';
+}
+
+async function exportDetail() {
+  if (!currentProfileId) return alert('请先选择剖面');
+  const data = await api('GET', `/api/profiles/${currentProfileId}/export`);
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `water_depth_profile_${currentProfileId}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+async function refreshView() {
+  if (currentProfileId) await loadProfile();
+}
+
+async function init() {
+  await loadProfiles();
+  if (currentProfileId) await loadProfile();
+  window.addEventListener('resize', () => renderCanvas());
+}
+
+init();
+</script>
+</body>
+</html>
