@@ -1,0 +1,140 @@
+{
+  "batch": {
+    "batch_id": "BATCH-2026-0530-001",
+    "batch_date": "2026-05-30",
+    "import_timestamp": "2026-05-30T19:45:00",
+    "total_amount": 2850000.00,
+    "record_count": 5,
+    "source_file": "batch_20260530_wrong_dimension.json"
+  },
+  "records": [
+    {
+      "record_id": "REC-001",
+      "supplier_id": "SUP-1001",
+      "supplier_name": "华为技术有限公司",
+      "invoice_amount": 850000.00,
+      "original_settlement_cycle": "T+1",
+      "current_settlement_cycle": "T+1",
+      "expected_arrival_date": "2026-05-31",
+      "original_arrival_date": "2026-05-31",
+      "is_manually_modified": false,
+      "holiday_deferral_applies": false,
+      "holiday_deferral_explanation": null
+    },
+    {
+      "record_id": "REC-002",
+      "supplier_id": "SUP-1002",
+      "supplier_name": "阿里巴巴云计算有限公司",
+      "invoice_amount": 520000.00,
+      "original_settlement_cycle": "T+1",
+      "current_settlement_cycle": "T+1",
+      "expected_arrival_date": "2026-05-31",
+      "original_arrival_date": "2026-05-31",
+      "is_manually_modified": false,
+      "holiday_deferral_applies": false,
+      "holiday_deferral_explanation": null
+    },
+    {
+      "record_id": "REC-003",
+      "supplier_id": "SUP-1003",
+      "supplier_name": "腾讯科技有限公司",
+      "invoice_amount": 680000.00,
+      "original_settlement_cycle": "T+1",
+      "current_settlement_cycle": "T+2",
+      "expected_arrival_date": "2026-06-03",
+      "original_arrival_date": "2026-05-31",
+      "is_manually_modified": true,
+      "modification_reason": "儿童节放假，银行不处理对公业务",
+      "modified_by": "王业务",
+      "modification_timestamp": "2026-05-30T19:30:00",
+      "holiday_deferral_applies": true,
+      "holiday_deferral_explanation": "因2026-06-01(儿童节)节假日顺延，T+1到账日顺延至2026-06-02"
+    },
+    {
+      "record_id": "REC-004",
+      "supplier_id": "SUP-1004",
+      "supplier_name": "字节跳动有限公司",
+      "invoice_amount": 450000.00,
+      "original_settlement_cycle": "T+1",
+      "current_settlement_cycle": "T+1",
+      "expected_arrival_date": "2026-05-31",
+      "original_arrival_date": "2026-05-31",
+      "is_manually_modified": false,
+      "holiday_deferral_applies": false,
+      "holiday_deferral_explanation": null
+    },
+    {
+      "record_id": "REC-005",
+      "supplier_id": "SUP-1005",
+      "supplier_name": "京东集团股份有限公司",
+      "invoice_amount": 350000.00,
+      "original_settlement_cycle": "T+1",
+      "current_settlement_cycle": "T+2",
+      "expected_arrival_date": "2026-06-03",
+      "original_arrival_date": "2026-05-31",
+      "is_manually_modified": true,
+      "modification_reason": "端午假期前最后一个工作日，手工调整为T+2",
+      "modified_by": "张业务",
+      "modification_timestamp": "2026-05-30T19:40:00",
+      "holiday_deferral_applies": true,
+      "holiday_deferral_explanation": "因2026-06-01(端午节)、2026-06-02(端午节调休)节假日顺延，T+1到账日顺延至2026-06-03"
+    }
+  ],
+  "change_history": [
+    {
+      "history_id": "HIST-001",
+      "record_id": "REC-003",
+      "field_changed": "settlement_cycle",
+      "old_value": "T+1",
+      "new_value": "T+2",
+      "changed_by": "王业务",
+      "change_timestamp": "2026-05-30T19:30:00",
+      "change_reason": "儿童节放假，银行不处理对公业务"
+    },
+    {
+      "history_id": "HIST-002",
+      "record_id": "REC-005",
+      "field_changed": "settlement_cycle",
+      "old_value": "T+1",
+      "new_value": "T+2",
+      "changed_by": "张业务",
+      "change_timestamp": "2026-05-30T19:40:00",
+      "change_reason": "端午假期前最后一个工作日，手工调整为T+2"
+    }
+  ],
+  "reconciliation_notes": [
+    {
+      "note_id": "NOTE-001",
+      "record_id": "REC-001",
+      "note_content": "华为5月服务器采购款，账期T+1，5月31日正常到账，对账无误",
+      "note_type": "manual",
+      "created_by": "李会计",
+      "created_timestamp": "2026-05-30T18:00:00",
+      "is_reconciled": true,
+      "reconciled_by": "李会计",
+      "reconciled_timestamp": "2026-05-30T18:05:00"
+    },
+    {
+      "note_id": "NOTE-002",
+      "record_id": "REC-002",
+      "note_content": "阿里云服务费，T+1正常结算，5月31日到账，对账一致",
+      "note_type": "manual",
+      "created_by": "李会计",
+      "created_timestamp": "2026-05-30T18:10:00",
+      "is_reconciled": true,
+      "reconciled_by": "李会计",
+      "reconciled_timestamp": "2026-05-30T18:15:00"
+    },
+    {
+      "note_id": "NOTE-003",
+      "record_id": "REC-004",
+      "note_content": "字节跳动广告投放款，T+1结算，5月31日到账，对账完成",
+      "note_type": "manual",
+      "created_by": "李会计",
+      "created_timestamp": "2026-05-30T18:30:00",
+      "is_reconciled": true,
+      "reconciled_by": "李会计",
+      "reconciled_timestamp": "2026-05-30T18:35:00"
+    }
+  ]
+}

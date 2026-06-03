@@ -1,0 +1,409 @@
+{
+  "material_type": "wrong_dimension",
+  "export_timestamp": "2026-06-03T07:42:22.068922",
+  "batch": {
+    "batch_id": "BATCH-2026-0530-001",
+    "batch_date": "2026-05-30",
+    "import_timestamp": "2026-05-30T19:45:00",
+    "total_amount": 2850000.0,
+    "record_count": 5,
+    "source_file": "/Users/lzy/pro/solo/workspaces/zy72219/scm-forecast/data/samples/batch_20260530_wrong_dimension.json",
+    "is_duplicate": true,
+    "duplicate_of_batch": "BATCH-2026-0530-001",
+    "import_user": "风控值班老秦"
+  },
+  "records": [
+    {
+      "record_id": "REC-001",
+      "batch_id": "BATCH-2026-0530-001",
+      "supplier_id": "SUP-1001",
+      "supplier_name": "华为技术有限公司",
+      "invoice_amount": 850000.0,
+      "original_settlement_cycle": "T+1",
+      "current_settlement_cycle": "T+1",
+      "expected_arrival_date": "2026-05-31",
+      "original_arrival_date": "2026-05-31",
+      "is_manually_modified": true,
+      "modification_reason": "潜在重复记录，疑似重复于: REC-001",
+      "modified_by": null,
+      "modification_timestamp": null,
+      "modification_status": "normal",
+      "review_note": null,
+      "holiday_deferral_applies": false,
+      "holiday_deferral_explanation": null
+    },
+    {
+      "record_id": "REC-002",
+      "batch_id": "BATCH-2026-0530-001",
+      "supplier_id": "SUP-1002",
+      "supplier_name": "阿里巴巴云计算有限公司",
+      "invoice_amount": 520000.0,
+      "original_settlement_cycle": "T+1",
+      "current_settlement_cycle": "T+1",
+      "expected_arrival_date": "2026-05-31",
+      "original_arrival_date": "2026-05-31",
+      "is_manually_modified": true,
+      "modification_reason": "潜在重复记录，疑似重复于: REC-002",
+      "modified_by": null,
+      "modification_timestamp": null,
+      "modification_status": "normal",
+      "review_note": null,
+      "holiday_deferral_applies": false,
+      "holiday_deferral_explanation": null
+    },
+    {
+      "record_id": "REC-003",
+      "batch_id": "BATCH-2026-0530-001",
+      "supplier_id": "SUP-1003",
+      "supplier_name": "腾讯科技有限公司",
+      "invoice_amount": 680000.0,
+      "original_settlement_cycle": "T+1",
+      "current_settlement_cycle": "T+1",
+      "expected_arrival_date": "2026-05-31",
+      "original_arrival_date": "2026-05-31",
+      "is_manually_modified": false,
+      "modification_reason": null,
+      "modified_by": "王业务",
+      "modification_timestamp": "2026-05-30T19:30:00",
+      "modification_status": "normal",
+      "review_note": "儿童节不是法定节假日，银行正常营业，驳回T+2修改，恢复T+1",
+      "holiday_deferral_applies": false,
+      "holiday_deferral_explanation": null
+    },
+    {
+      "record_id": "REC-004",
+      "batch_id": "BATCH-2026-0530-001",
+      "supplier_id": "SUP-1004",
+      "supplier_name": "字节跳动有限公司",
+      "invoice_amount": 450000.0,
+      "original_settlement_cycle": "T+1",
+      "current_settlement_cycle": "T+1",
+      "expected_arrival_date": "2026-05-31",
+      "original_arrival_date": "2026-05-31",
+      "is_manually_modified": true,
+      "modification_reason": "潜在重复记录，疑似重复于: REC-004",
+      "modified_by": null,
+      "modification_timestamp": null,
+      "modification_status": "normal",
+      "review_note": null,
+      "holiday_deferral_applies": false,
+      "holiday_deferral_explanation": null
+    },
+    {
+      "record_id": "REC-005",
+      "batch_id": "BATCH-2026-0530-001",
+      "supplier_id": "SUP-1005",
+      "supplier_name": "京东集团股份有限公司",
+      "invoice_amount": 350000.0,
+      "original_settlement_cycle": "T+1",
+      "current_settlement_cycle": "T+2",
+      "expected_arrival_date": "2026-06-03",
+      "original_arrival_date": "2026-05-31",
+      "is_manually_modified": true,
+      "modification_reason": "端午假期前最后一个工作日，手工调整为T+2",
+      "modified_by": "张业务",
+      "modification_timestamp": "2026-05-30T19:40:00",
+      "modification_status": "confirmed",
+      "review_note": "端午节(6月1日)及调休(6月2日)确为法定假期，银行不处理对公业务，确认T+2顺延至6月3日",
+      "holiday_deferral_applies": true,
+      "holiday_deferral_explanation": "因2026-06-01(端午节)、2026-06-02(端午节调休)节假日顺延，T+1到账日顺延至2026-06-03"
+    }
+  ],
+  "change_history": [
+    {
+      "history_id": "HIST-001",
+      "record_id": "REC-003",
+      "field_changed": "settlement_cycle",
+      "old_value": "T+1",
+      "new_value": "T+2",
+      "changed_by": "王业务",
+      "change_timestamp": "2026-05-30T19:30:00",
+      "change_reason": "儿童节放假，银行不处理对公业务",
+      "batch_id": "BATCH-2026-0530-001"
+    },
+    {
+      "history_id": "HIST-002",
+      "record_id": "REC-005",
+      "field_changed": "settlement_cycle",
+      "old_value": "T+1",
+      "new_value": "T+2",
+      "changed_by": "张业务",
+      "change_timestamp": "2026-05-30T19:40:00",
+      "change_reason": "端午假期前最后一个工作日，手工调整为T+2",
+      "batch_id": "BATCH-2026-0530-001"
+    },
+    {
+      "history_id": "hist_c70f77dd",
+      "record_id": "REC-003",
+      "field_changed": "settlement_cycle",
+      "old_value": "T+2",
+      "new_value": "T+1",
+      "changed_by": "风控值班老秦",
+      "change_timestamp": "2026-06-03T07:42:22.067796",
+      "change_reason": "风控值班老秦驳回修改，恢复T+1: 儿童节不是法定节假日，银行正常营业，驳回T+2修改，恢复T+1",
+      "batch_id": "BATCH-2026-0530-001"
+    },
+    {
+      "history_id": "hist_c53d9aca",
+      "record_id": "REC-005",
+      "field_changed": "modification_status",
+      "old_value": "pending_review",
+      "new_value": "confirmed",
+      "changed_by": "风控值班老秦",
+      "change_timestamp": "2026-06-03T07:42:22.067807",
+      "change_reason": "风控值班老秦确认修改: 端午节(6月1日)及调休(6月2日)确为法定假期，银行不处理对公业务，确认T+2顺延至6月3日",
+      "batch_id": "BATCH-2026-0530-001"
+    },
+    {
+      "history_id": "hist_963fa4a5",
+      "record_id": "REC-005",
+      "field_changed": "holiday_deferral_review",
+      "old_value": "未审核",
+      "new_value": "已审核",
+      "changed_by": "风控值班老秦",
+      "change_timestamp": "2026-06-03T07:42:22.067833",
+      "change_reason": "节假日顺延说明有效",
+      "batch_id": "BATCH-2026-0530-001"
+    },
+    {
+      "history_id": "hist_1afcb3c1",
+      "record_id": "REC-001",
+      "field_changed": "reconciliation_note",
+      "old_value": "(新增)",
+      "new_value": "对账说明自动生成 - 记录ID: REC-001\n供应商: 华为技术有限公司\n发票金额: 850,000.00\n原始账期: T+1 -> 当前账期: T+1\n原始到账日: 2026-05-31 -> ...",
+      "changed_by": "风控值班老秦",
+      "change_timestamp": "2026-06-03T07:42:22.067883",
+      "change_reason": "添加对账说明，类型: system_generated",
+      "batch_id": "BATCH-2026-0530-001"
+    },
+    {
+      "history_id": "hist_76d61813",
+      "record_id": "REC-002",
+      "field_changed": "reconciliation_note",
+      "old_value": "(新增)",
+      "new_value": "对账说明自动生成 - 记录ID: REC-002\n供应商: 阿里巴巴云计算有限公司\n发票金额: 520,000.00\n原始账期: T+1 -> 当前账期: T+1\n原始到账日: 2026-05-31 ...",
+      "changed_by": "风控值班老秦",
+      "change_timestamp": "2026-06-03T07:42:22.067899",
+      "change_reason": "添加对账说明，类型: system_generated",
+      "batch_id": "BATCH-2026-0530-001"
+    },
+    {
+      "history_id": "hist_43d04015",
+      "record_id": "REC-003",
+      "field_changed": "reconciliation_note",
+      "old_value": "(新增)",
+      "new_value": "对账说明自动生成 - 记录ID: REC-003\n供应商: 腾讯科技有限公司\n发票金额: 680,000.00\n原始账期: T+1 -> 当前账期: T+1\n原始到账日: 2026-05-31 -> ...",
+      "changed_by": "风控值班老秦",
+      "change_timestamp": "2026-06-03T07:42:22.067913",
+      "change_reason": "添加对账说明，类型: system_generated",
+      "batch_id": "BATCH-2026-0530-001"
+    },
+    {
+      "history_id": "hist_1216be60",
+      "record_id": "REC-004",
+      "field_changed": "reconciliation_note",
+      "old_value": "(新增)",
+      "new_value": "对账说明自动生成 - 记录ID: REC-004\n供应商: 字节跳动有限公司\n发票金额: 450,000.00\n原始账期: T+1 -> 当前账期: T+1\n原始到账日: 2026-05-31 -> ...",
+      "changed_by": "风控值班老秦",
+      "change_timestamp": "2026-06-03T07:42:22.067925",
+      "change_reason": "添加对账说明，类型: system_generated",
+      "batch_id": "BATCH-2026-0530-001"
+    },
+    {
+      "history_id": "hist_9077ffec",
+      "record_id": "REC-005",
+      "field_changed": "reconciliation_note",
+      "old_value": "(新增)",
+      "new_value": "对账说明自动生成 - 记录ID: REC-005\n供应商: 京东集团股份有限公司\n发票金额: 350,000.00\n原始账期: T+1 -> 当前账期: T+2\n原始到账日: 2026-05-31 -...",
+      "changed_by": "风控值班老秦",
+      "change_timestamp": "2026-06-03T07:42:22.067938",
+      "change_reason": "添加对账说明，类型: system_generated",
+      "batch_id": "BATCH-2026-0530-001"
+    }
+  ],
+  "reconciliation_notes": [
+    {
+      "note_id": "NOTE-001",
+      "batch_id": "BATCH-2026-0530-001",
+      "record_id": "REC-001",
+      "note_content": "华为5月服务器采购款，账期T+1，5月31日正常到账，对账无误",
+      "note_type": "manual",
+      "created_by": "李会计",
+      "created_timestamp": "2026-05-30T18:00:00",
+      "updated_by": null,
+      "updated_timestamp": null,
+      "is_reconciled": true,
+      "reconciled_by": "李会计",
+      "reconciled_timestamp": "2026-05-30T18:05:00"
+    },
+    {
+      "note_id": "NOTE-002",
+      "batch_id": "BATCH-2026-0530-001",
+      "record_id": "REC-002",
+      "note_content": "阿里云服务费，T+1正常结算，5月31日到账，对账一致",
+      "note_type": "manual",
+      "created_by": "李会计",
+      "created_timestamp": "2026-05-30T18:10:00",
+      "updated_by": null,
+      "updated_timestamp": null,
+      "is_reconciled": true,
+      "reconciled_by": "李会计",
+      "reconciled_timestamp": "2026-05-30T18:15:00"
+    },
+    {
+      "note_id": "NOTE-003",
+      "batch_id": "BATCH-2026-0530-001",
+      "record_id": "REC-004",
+      "note_content": "字节跳动广告投放款，T+1结算，5月31日到账，对账完成",
+      "note_type": "manual",
+      "created_by": "李会计",
+      "created_timestamp": "2026-05-30T18:30:00",
+      "updated_by": null,
+      "updated_timestamp": null,
+      "is_reconciled": true,
+      "reconciled_by": "李会计",
+      "reconciled_timestamp": "2026-05-30T18:35:00"
+    },
+    {
+      "note_id": "note_4204efa4",
+      "batch_id": "BATCH-2026-0530-001",
+      "record_id": "REC-001",
+      "note_content": "对账说明自动生成 - 记录ID: REC-001\n供应商: 华为技术有限公司\n发票金额: 850,000.00\n原始账期: T+1 -> 当前账期: T+1\n原始到账日: 2026-05-31 -> 预计到账日: 2026-05-31\n⚠️ 手工修改: 潜在重复记录，疑似重复于: REC-001\n修改人: 未知\n匹配问题: 对账说明未提及手工修改或顺延情况\n请业务同事补充说明后标记为已对账",
+      "note_type": "system_generated",
+      "created_by": "风控值班老秦",
+      "created_timestamp": "2026-06-03T07:42:22.067877",
+      "updated_by": null,
+      "updated_timestamp": null,
+      "is_reconciled": false,
+      "reconciled_by": null,
+      "reconciled_timestamp": null
+    },
+    {
+      "note_id": "note_7f226e72",
+      "batch_id": "BATCH-2026-0530-001",
+      "record_id": "REC-002",
+      "note_content": "对账说明自动生成 - 记录ID: REC-002\n供应商: 阿里巴巴云计算有限公司\n发票金额: 520,000.00\n原始账期: T+1 -> 当前账期: T+1\n原始到账日: 2026-05-31 -> 预计到账日: 2026-05-31\n⚠️ 手工修改: 潜在重复记录，疑似重复于: REC-002\n修改人: 未知\n匹配问题: 对账说明未提及手工修改或顺延情况\n请业务同事补充说明后标记为已对账",
+      "note_type": "system_generated",
+      "created_by": "风控值班老秦",
+      "created_timestamp": "2026-06-03T07:42:22.067894",
+      "updated_by": null,
+      "updated_timestamp": null,
+      "is_reconciled": false,
+      "reconciled_by": null,
+      "reconciled_timestamp": null
+    },
+    {
+      "note_id": "note_36bf3cb1",
+      "batch_id": "BATCH-2026-0530-001",
+      "record_id": "REC-003",
+      "note_content": "对账说明自动生成 - 记录ID: REC-003\n供应商: 腾讯科技有限公司\n发票金额: 680,000.00\n原始账期: T+1 -> 当前账期: T+1\n原始到账日: 2026-05-31 -> 预计到账日: 2026-05-31\n匹配问题: 无对账说明\n请业务同事补充说明后标记为已对账",
+      "note_type": "system_generated",
+      "created_by": "风控值班老秦",
+      "created_timestamp": "2026-06-03T07:42:22.067908",
+      "updated_by": null,
+      "updated_timestamp": null,
+      "is_reconciled": false,
+      "reconciled_by": null,
+      "reconciled_timestamp": null
+    },
+    {
+      "note_id": "note_9f8460a8",
+      "batch_id": "BATCH-2026-0530-001",
+      "record_id": "REC-004",
+      "note_content": "对账说明自动生成 - 记录ID: REC-004\n供应商: 字节跳动有限公司\n发票金额: 450,000.00\n原始账期: T+1 -> 当前账期: T+1\n原始到账日: 2026-05-31 -> 预计到账日: 2026-05-31\n⚠️ 手工修改: 潜在重复记录，疑似重复于: REC-004\n修改人: 未知\n匹配问题: 对账说明未提及手工修改或顺延情况\n请业务同事补充说明后标记为已对账",
+      "note_type": "system_generated",
+      "created_by": "风控值班老秦",
+      "created_timestamp": "2026-06-03T07:42:22.067921",
+      "updated_by": null,
+      "updated_timestamp": null,
+      "is_reconciled": false,
+      "reconciled_by": null,
+      "reconciled_timestamp": null
+    },
+    {
+      "note_id": "note_c50eed5f",
+      "batch_id": "BATCH-2026-0530-001",
+      "record_id": "REC-005",
+      "note_content": "对账说明自动生成 - 记录ID: REC-005\n供应商: 京东集团股份有限公司\n发票金额: 350,000.00\n原始账期: T+1 -> 当前账期: T+2\n原始到账日: 2026-05-31 -> 预计到账日: 2026-06-03\n⚠️ 手工修改: 端午假期前最后一个工作日，手工调整为T+2\n修改人: 张业务\n📅 节假日顺延: 因2026-06-01(端午节)、2026-06-02(端午节调休)节假日顺延，T+1到账日顺延至2026-06-03\n匹配问题: 无对账说明\n请业务同事补充说明后标记为已对账",
+      "note_type": "system_generated",
+      "created_by": "风控值班老秦",
+      "created_timestamp": "2026-06-03T07:42:22.067933",
+      "updated_by": null,
+      "updated_timestamp": null,
+      "is_reconciled": false,
+      "reconciled_by": null,
+      "reconciled_timestamp": null
+    }
+  ],
+  "conflicts": [
+    {
+      "conflict_id": "conflict_9b69b1b6",
+      "batch_id": "BATCH-2026-0530-001",
+      "record_id": "REC-003",
+      "conflict_type": "batch_vs_holiday_explanation",
+      "evidence_description": "清算批次号显示T+1到账被手工改为T+2，但节假日顺延说明与实际到账日期变化不一致，存在矛盾",
+      "field_a_name": "current_settlement_cycle (手工修改后)",
+      "field_a_value": "T+2",
+      "field_b_name": "holiday_deferral_explanation",
+      "field_b_value": "因2026-06-01(儿童节)节假日顺延，T+1到账日顺延至2026-06-02",
+      "resolution_status": "rejected",
+      "resolved_by": "风控值班老秦",
+      "resolved_timestamp": "2026-06-03T07:42:22.067789",
+      "resolution": "驳回修改，恢复T+1",
+      "requires_manager_review": true
+    },
+    {
+      "conflict_id": "conflict_c92d62ce",
+      "batch_id": "BATCH-2026-0530-001",
+      "record_id": "REC-005",
+      "conflict_type": "manual_modification_t1_to_t2",
+      "evidence_description": "T+1到账被手工改为T+2，需要基金经理复核确认，暂不归为正常",
+      "field_a_name": "original_settlement_cycle",
+      "field_a_value": "T+1",
+      "field_b_name": "current_settlement_cycle",
+      "field_b_value": "T+2",
+      "resolution_status": "confirmed",
+      "resolved_by": "风控值班老秦",
+      "resolved_timestamp": "2026-06-03T07:42:22.067802",
+      "resolution": "确认修改有效",
+      "requires_manager_review": true
+    }
+  ],
+  "checks_passed": {
+    "duplicate_import": false,
+    "t1_to_t2_modification": false,
+    "supplement_recalculation": true,
+    "export_consistency": true
+  },
+  "checks_detail": {
+    "duplicate_import": {
+      "severity": "high",
+      "message": "发现重复导入内容",
+      "evidence": [
+        "批次重复: 当前批次BATCH-2026-0530-001与批次BATCH-2026-0530-001内容完全一致"
+      ]
+    },
+    "t1_to_t2_modification": {
+      "severity": "critical",
+      "message": "发现1条T+1→T+2手工修改记录",
+      "evidence": [
+        "记录REC-005 (京东集团股份有限公司): 原始T+1 → 当前T+2，状态: confirmed，修改原因: 端午假期前最后一个工作日，手工调整为T+2"
+      ]
+    },
+    "supplement_recalculation": {
+      "severity": "medium",
+      "message": "补录后重算检查: 新增1条，重算1条",
+      "evidence": [
+        "补录材料新增记录1条: REC-006",
+        "记录REC-003补录后重算: T+1→T+2, 2026-05-31→2026-06-03"
+      ]
+    },
+    "export_consistency": {
+      "severity": "high",
+      "message": "导出数据与内存数据一致性检查",
+      "evidence": [
+        "导出文件/Users/lzy/pro/solo/workspaces/zy72219/scm-forecast/data/output/BATCH-2026-0530-001_wrong_dimension_20260603_074222.json与内存数据完全一致"
+      ]
+    }
+  }
+}

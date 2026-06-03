@@ -1,0 +1,220 @@
+{
+  "material_type": "normal",
+  "export_timestamp": "2026-06-03T07:39:50.371980",
+  "batch": {
+    "batch_id": "BATCH-2026-0530-001",
+    "batch_date": "2026-05-30",
+    "import_timestamp": "2026-05-30T18:30:00",
+    "total_amount": 2850000.0,
+    "record_count": 5,
+    "source_file": "/Users/lzy/pro/solo/workspaces/zy72219/scm-forecast/data/samples/batch_20260530_normal.json",
+    "is_duplicate": false,
+    "duplicate_of_batch": null,
+    "import_user": "system"
+  },
+  "records": [
+    {
+      "record_id": "REC-001",
+      "batch_id": "BATCH-2026-0530-001",
+      "supplier_id": "SUP-1001",
+      "supplier_name": "华为技术有限公司",
+      "invoice_amount": 850000.0,
+      "original_settlement_cycle": "T+1",
+      "current_settlement_cycle": "T+1",
+      "expected_arrival_date": "2026-05-31",
+      "original_arrival_date": "2026-05-31",
+      "is_manually_modified": false,
+      "modification_reason": null,
+      "modified_by": null,
+      "modification_timestamp": null,
+      "modification_status": "normal",
+      "review_note": null,
+      "holiday_deferral_applies": false,
+      "holiday_deferral_explanation": null
+    },
+    {
+      "record_id": "REC-002",
+      "batch_id": "BATCH-2026-0530-001",
+      "supplier_id": "SUP-1002",
+      "supplier_name": "阿里巴巴云计算有限公司",
+      "invoice_amount": 520000.0,
+      "original_settlement_cycle": "T+1",
+      "current_settlement_cycle": "T+1",
+      "expected_arrival_date": "2026-05-31",
+      "original_arrival_date": "2026-05-31",
+      "is_manually_modified": false,
+      "modification_reason": null,
+      "modified_by": null,
+      "modification_timestamp": null,
+      "modification_status": "normal",
+      "review_note": null,
+      "holiday_deferral_applies": false,
+      "holiday_deferral_explanation": null
+    },
+    {
+      "record_id": "REC-003",
+      "batch_id": "BATCH-2026-0530-001",
+      "supplier_id": "SUP-1003",
+      "supplier_name": "腾讯科技有限公司",
+      "invoice_amount": 680000.0,
+      "original_settlement_cycle": "T+1",
+      "current_settlement_cycle": "T+1",
+      "expected_arrival_date": "2026-05-31",
+      "original_arrival_date": "2026-05-31",
+      "is_manually_modified": false,
+      "modification_reason": null,
+      "modified_by": null,
+      "modification_timestamp": null,
+      "modification_status": "normal",
+      "review_note": null,
+      "holiday_deferral_applies": false,
+      "holiday_deferral_explanation": null
+    },
+    {
+      "record_id": "REC-004",
+      "batch_id": "BATCH-2026-0530-001",
+      "supplier_id": "SUP-1004",
+      "supplier_name": "字节跳动有限公司",
+      "invoice_amount": 450000.0,
+      "original_settlement_cycle": "T+1",
+      "current_settlement_cycle": "T+1",
+      "expected_arrival_date": "2026-05-31",
+      "original_arrival_date": "2026-05-31",
+      "is_manually_modified": false,
+      "modification_reason": null,
+      "modified_by": null,
+      "modification_timestamp": null,
+      "modification_status": "normal",
+      "review_note": null,
+      "holiday_deferral_applies": false,
+      "holiday_deferral_explanation": null
+    },
+    {
+      "record_id": "REC-005",
+      "batch_id": "BATCH-2026-0530-001",
+      "supplier_id": "SUP-1005",
+      "supplier_name": "京东集团股份有限公司",
+      "invoice_amount": 350000.0,
+      "original_settlement_cycle": "T+1",
+      "current_settlement_cycle": "T+1",
+      "expected_arrival_date": "2026-05-31",
+      "original_arrival_date": "2026-05-31",
+      "is_manually_modified": false,
+      "modification_reason": null,
+      "modified_by": null,
+      "modification_timestamp": null,
+      "modification_status": "normal",
+      "review_note": null,
+      "holiday_deferral_applies": false,
+      "holiday_deferral_explanation": null
+    }
+  ],
+  "change_history": [],
+  "reconciliation_notes": [
+    {
+      "note_id": "NOTE-001",
+      "batch_id": "BATCH-2026-0530-001",
+      "record_id": "REC-001",
+      "note_content": "华为5月服务器采购款，账期T+1，5月31日正常到账，对账无误",
+      "note_type": "manual",
+      "created_by": "李会计",
+      "created_timestamp": "2026-05-30T18:00:00",
+      "updated_by": null,
+      "updated_timestamp": null,
+      "is_reconciled": true,
+      "reconciled_by": "李会计",
+      "reconciled_timestamp": "2026-05-30T18:05:00"
+    },
+    {
+      "note_id": "NOTE-002",
+      "batch_id": "BATCH-2026-0530-001",
+      "record_id": "REC-002",
+      "note_content": "阿里云服务费，T+1正常结算，5月31日到账，对账一致",
+      "note_type": "manual",
+      "created_by": "李会计",
+      "created_timestamp": "2026-05-30T18:10:00",
+      "updated_by": null,
+      "updated_timestamp": null,
+      "is_reconciled": true,
+      "reconciled_by": "李会计",
+      "reconciled_timestamp": "2026-05-30T18:15:00"
+    },
+    {
+      "note_id": "NOTE-003",
+      "batch_id": "BATCH-2026-0530-001",
+      "record_id": "REC-003",
+      "note_content": "腾讯云服务季度款，账期T+1，5月31日到账，已与供应商确认",
+      "note_type": "manual",
+      "created_by": "李会计",
+      "created_timestamp": "2026-05-30T18:20:00",
+      "updated_by": null,
+      "updated_timestamp": null,
+      "is_reconciled": true,
+      "reconciled_by": "李会计",
+      "reconciled_timestamp": "2026-05-30T18:25:00"
+    },
+    {
+      "note_id": "NOTE-004",
+      "batch_id": "BATCH-2026-0530-001",
+      "record_id": "REC-004",
+      "note_content": "字节跳动广告投放款，T+1结算，5月31日到账，对账完成",
+      "note_type": "manual",
+      "created_by": "李会计",
+      "created_timestamp": "2026-05-30T18:30:00",
+      "updated_by": null,
+      "updated_timestamp": null,
+      "is_reconciled": true,
+      "reconciled_by": "李会计",
+      "reconciled_timestamp": "2026-05-30T18:35:00"
+    },
+    {
+      "note_id": "NOTE-005",
+      "batch_id": "BATCH-2026-0530-001",
+      "record_id": "REC-005",
+      "note_content": "京东物流服务费，账期T+1，5月31日到账，已核对发票",
+      "note_type": "manual",
+      "created_by": "李会计",
+      "created_timestamp": "2026-05-30T18:40:00",
+      "updated_by": null,
+      "updated_timestamp": null,
+      "is_reconciled": true,
+      "reconciled_by": "李会计",
+      "reconciled_timestamp": "2026-05-30T18:45:00"
+    }
+  ],
+  "conflicts": [],
+  "checks_passed": {
+    "duplicate_import": true,
+    "t1_to_t2_modification": true,
+    "supplement_recalculation": true,
+    "export_consistency": true
+  },
+  "checks_detail": {
+    "duplicate_import": {
+      "severity": "high",
+      "message": "检查是否存在重复导入的批次或记录",
+      "evidence": []
+    },
+    "t1_to_t2_modification": {
+      "severity": "critical",
+      "message": "检查T+1到账是否被手工改成T+2",
+      "evidence": []
+    },
+    "supplement_recalculation": {
+      "severity": "medium",
+      "message": "补录后重算检查: 新增1条，重算2条",
+      "evidence": [
+        "补录材料新增记录1条: REC-006",
+        "记录REC-005补录后重算: T+1→T+2, 2026-05-31→2026-06-03",
+        "记录REC-003补录后重算: T+1→T+2, 2026-05-31→2026-06-03"
+      ]
+    },
+    "export_consistency": {
+      "severity": "high",
+      "message": "导出数据与内存数据一致性检查",
+      "evidence": [
+        "导出文件/Users/lzy/pro/solo/workspaces/zy72219/scm-forecast/data/output/BATCH-2026-0530-001_normal_20260603_073950.json与内存数据完全一致"
+      ]
+    }
+  }
+}
