@@ -1,0 +1,13 @@
+[project]
+name = "combo-odds-checker"
+version = "0.1.0"
+description = "组合数抽奖赔率核对工具"
+requires-python = ">=3.9"
+dependencies = [
+    "fastapi>=0.100.0",
+    "uvicorn>=0.23.0",
+    "pydantic>=2.0",
+]
+
+[project.scripts]
+combo-odds = "combo_odds_checker.cli:main"
