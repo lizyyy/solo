@@ -1,0 +1,94 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Noto Sans SC', ui-sans-serif, system-ui, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #0f172a;
+  color: #f1f5f9;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+@layer components {
+  .card-status-normal {
+    @apply border-2 border-status-normal shadow-lg shadow-status-normal/20;
+  }
+
+  .card-status-pending {
+    @apply border-2 border-status-pending shadow-lg shadow-status-pending/30 animate-pulse-border;
+  }
+
+  .card-status-old {
+    @apply border-2 border-status-oldCaliber shadow-lg shadow-status-oldCaliber/20;
+  }
+
+  .card-status-pending-default {
+    @apply border-2 border-industrial-border;
+  }
+
+  .btn-primary {
+    @apply px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 bg-industrial-card hover:bg-industrial-border text-industrial-text border border-industrial-border rounded-lg transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-warning {
+    @apply px-4 py-2 bg-status-pending hover:bg-amber-600 text-white rounded-lg transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .data-field {
+    @apply font-mono text-sm bg-industrial-bg px-2 py-1 rounded;
+  }
+
+  .step-active {
+    @apply bg-primary-600 text-white border-primary-600;
+  }
+
+  .step-completed {
+    @apply bg-status-normal text-white border-status-normal;
+  }
+
+  .step-pending {
+    @apply bg-industrial-card text-industrial-muted border-industrial-border;
+  }
+}
