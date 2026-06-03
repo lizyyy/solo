@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+  font-family: "Outfit", system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  background: #0d0d1a;
+  color: #e8e8ef;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a2e;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2d3f63;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3d5080;
+}
+
+@layer components {
+  .data-table {
+    @apply w-full text-sm font-mono;
+  }
+  .data-table thead th {
+    @apply px-4 py-3 text-left text-text-secondary text-xs uppercase tracking-wider border-b border-surface-border bg-base-700;
+  }
+  .data-table tbody td {
+    @apply px-4 py-3 border-b border-surface-border/50;
+  }
+  .data-table tbody tr {
+    @apply transition-colors duration-150;
+  }
+  .data-table tbody tr:hover {
+    @apply bg-surface-hover;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium font-sans;
+  }
+  .badge-gold {
+    @apply badge bg-accent-gold/15 text-text-gold border border-accent-gold/30;
+  }
+  .badge-red {
+    @apply badge bg-accent-red/15 text-text-red border border-accent-red/30;
+  }
+  .badge-green {
+    @apply badge bg-accent-green/15 text-text-green border border-accent-green/30;
+  }
+  .badge-muted {
+    @apply badge bg-base-500/30 text-text-muted border border-surface-border;
+  }
+
+  .btn-primary {
+    @apply px-4 py-2 rounded text-sm font-medium border border-accent-gold/50 bg-accent-gold/10 text-text-gold hover:bg-accent-gold/20 transition-all duration-200;
+  }
+  .btn-ghost {
+    @apply px-4 py-2 rounded text-sm font-medium border border-surface-border bg-transparent text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-all duration-200;
+  }
+  .btn-danger {
+    @apply px-4 py-2 rounded text-sm font-medium border border-accent-red/50 bg-accent-red/10 text-text-red hover:bg-accent-red/20 transition-all duration-200;
+  }
+
+  .card {
+    @apply bg-surface-card border border-surface-border rounded-lg;
+  }
+}
