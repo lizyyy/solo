@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>景区缆车支架巡检管理系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f7fa; color: #333; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #2c3e50, #34495e); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .header h1 { font-size: 24px; margin-bottom: 5px; }
+        .header p { opacity: 0.8; font-size: 14px; }
+        
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab { padding: 10px 20px; background: #fff; border: 2px solid #e0e0e0; border-radius: 6px; cursor: pointer; font-weight: 500; transition: all 0.2s; }
+        .tab.active { background: #3498db; border-color: #3498db; color: white; }
+        .tab:hover:not(.active) { border-color: #3498db; }
+        
+        .card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 20px; }
+        .card h2 { font-size: 18px; margin-bottom: 15px; color: #2c3e50; border-bottom: 2px solid #ecf0f1; padding-bottom: 10px; }
+        
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .summary-item { padding: 15px; border-radius: 8px; text-align: center; }
+        .summary-item .num { font-size: 28px; font-weight: bold; }
+        .summary-item .label { font-size: 13px; color: #666; margin-top: 5px; }
+        .summary-total { background: #e8f4fd; color: #2980b9; }
+        .summary-ok { background: #e8f8f5; color: #27ae60; }
+        .summary-warn { background: #fef5e7; color: #d35400; }
+        .summary-attention { background: #fdecea; color: #c0392b; }
+
+        .workflow { display: flex; gap: 10px; align-items: center; padding: 15px; background: #f8f9fa; border-radius: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+        .step { padding: 10px 20px; border-radius: 20px; font-size: 13px; font-weight: 500; }
+        .step-1 { background: #d6eaf8; color: #2874a6; }
+        .step-2 { background: #e8daef; color: #6c3483; }
+        .step-3 { background: #d5f5e3; color: #1e8449; }
+        .arrow { color: #999; font-size: 18px; }
+
+        .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s; }
+        .btn-primary { background: #3498db; color: white; }
+        .btn-primary:hover { background: #2980b9; }
+        .btn-success { background: #27ae60; color: white; }
+        .btn-success:hover { background: #229954; }
+        .btn-warning { background: #f39c12; color: white; }
+        .btn-warning:hover { background: #e67e22; }
+        .btn-danger { background: #e74c3c; color: white; }
+        .btn-danger:hover { background: #c0392b; }
+        .btn-sm { padding: 4px 10px; font-size: 12px; }
+        
+        .upload-area { border: 2px dashed #bdc3c7; border-radius: 8px; padding: 40px; text-align: center; cursor: pointer; transition: all 0.2s; }
+        .upload-area:hover { border-color: #3498db; background: #f8f9fa; }
+        .upload-area.dragover { border-color: #3498db; background: #ebf5fb; }
+        
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ecf0f1; }
+        th { background: #f8f9fa; font-weight: 600; color: #555; }
+        tr:hover { background: #f8f9fa; }
+        
+        .badge { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 500; }
+        .badge-imported { background: #d6eaf8; color: #2874a6; }
+        .badge-coord_mixed { background: #fdebd0; color: #ca6f1e; }
+        .badge-cad_reviewed { background: #e8daef; color: #6c3483; }
+        .badge-pending_confirm { background: #fadbd8; color: #922b21; }
+        .badge-confirmed { background: #d5f5e3; color: #1e8449; }
+        .badge-source { background: #eaf2f8; color: #2e86c1; }
+        .badge-warn { background: #fdecea; color: #c0392b; }
+
+        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+        .modal-content { background: white; margin: 5% auto; padding: 25px; border-radius: 8px; max-width: 700px; max-height: 80vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .close { font-size: 24px; cursor: pointer; color: #999; }
+        .close:hover { color: #333; }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; font-size: 13px; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; }
+        .form-group textarea { min-height: 80px; }
+        
+        .history-item { padding: 12px; border-left: 3px solid #3498db; background: #f8f9fa; margin-bottom: 10px; border-radius: 0 4px 4px 0; }
+        .history-item .field { font-weight: 600; color: #2c3e50; }
+        .history-item .change { color: #7f8c8d; font-size: 12px; margin-top: 5px; }
+        .history-item .meta { font-size: 11px; color: #999; margin-top: 5px; }
+        .history-item .old { text-decoration: line-through; color: #e74c3c; }
+        .history-item .new { color: #27ae60; font-weight: 500; }
+
+        .field-view-table td { padding: 8px 12px; }
+        .field-view-table .needs-confirm { background: #fdecea; }
+        .field-view-tag { display: inline-block; padding: 2px 6px; margin-right: 4px; border-radius: 3px; font-size: 11px; }
+        .tag-photo { background: #e8f6f3; color: #117a65; }
+        .tag-cad { background: #eaf2f8; color: #2e86c1; }
+        .tag-no-cad { background: #fdecea; color: #c0392b; }
+
+        .hidden { display: none; }
+        .text-small { font-size: 12px; color: #7f8c8d; }
+        .mt-10 { margin-top: 10px; }
+        .mt-20 { margin-top: 20px; }
+        .actions { display: flex; gap: 5px; flex-wrap: wrap; }
+        
+        .coord-note { color: #e67e22; font-weight: 500; }
+        .empty-state { text-align: center; padding: 40px; color: #999; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚠 景区缆车支架巡检管理系统</h1>
+            <p>可追溯 · 可复核 · 可回滚</p>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('records')">📋 巡检记录</div>
+            <div class="tab" onclick="switchTab('field')">👷 现场班组视图</div>
+            <div class="tab" onclick="switchTab('import')">📥 导入数据</div>
+        </div>
+
+        <div id="tab-records">
+            <div class="card">
+                <h2>📊 数据概览</h2>
+                <div class="summary-grid" id="summaryGrid"></div>
+            </div>
+
+            <div class="card">
+                <h2>🔄 标准工作流程</h2>
+                <div class="workflow">
+                    <span class="step step-1">① 导入巡检照片编号</span>
+                    <span class="arrow">→</span>
+                    <span class="step step-2">② 展陈设计师补看CAD图层</span>
+                    <span class="arrow">→</span>
+                    <span class="step step-3">③ 更新现场班组说明 → 巡检组确认</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h2 style="margin-bottom: 0;">📋 巡检记录列表</h2>
+                    <div style="display: flex; gap: 10px;">
+                        <select id="statusFilter" onchange="loadRecords()" style="padding: 6px 12px; border-radius: 4px; border: 1px solid #ddd;">
+                            <option value="">全部状态</option>
+                            <option value="imported">已导入</option>
+                            <option value="coord_mixed">坐标混合待复核</option>
+                            <option value="cad_reviewed">CAD已审核</option>
+                            <option value="pending_confirm">待巡检组确认</option>
+                            <option value="confirmed">已确认</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="loadRecords()">🔄 刷新</button>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>原始行号</th>
+                            <th>照片编号</th>
+                            <th>支架编号</th>
+                            <th>坐标类型</th>
+                            <th>CAD图层</th>
+                            <th>状态</th>
+                            <th>现场说明</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recordsTable"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="tab-field" class="hidden">
+            <div class="card">
+                <h2>👷 现场班组快速视图</h2>
+                <p class="text-small" style="margin-bottom: 15px;">临时会议专用：快速了解每条记录的来源和待确认项</p>
+                <table class="field-view-table">
+                    <thead>
+                        <tr>
+                            <th>照片编号</th>
+                            <th>支架编号</th>
+                            <th>来源</th>
+                            <th>状态</th>
+                            <th>现场说明</th>
+                        </tr>
+                    </thead>
+                    <tbody id="fieldViewTable"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="tab-import" class="hidden">
+            <div class="card">
+                <h2>📥 导入巡检数据</h2>
+                <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+                    <div style="font-size: 48px; margin-bottom: 15px;">📁</div>
+                    <p style="font-size: 16px; margin-bottom: 10px;">点击或拖拽 CSV 文件到此处</p>
+                    <p class="text-small">支持字段：photo_number, latitude, longitude, metric_x, metric_y, cad_layer_name, bracket_number, field_note</p>
+                </div>
+                <input type="file" id="fileInput" accept=".csv" style="display: none;" onchange="handleFileUpload(event)">
+                <div id="importResult" class="mt-20"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📋 记录详情与历史追踪</h3>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentRecordId = null;
+
+        function switchTab(tabName) {
+            document.querySelectorAll('[id^="tab-"]').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + tabName).classList.remove('hidden');
+            event.target.classList.add('active');
+            
+            if (tabName === 'records') loadRecords();
+            if (tabName === 'field') loadFieldView();
+        }
+
+        async function loadSummary() {
+            const res = await fetch('/api/summary');
+            const data = await res.json();
+            const grid = document.getElementById('summaryGrid');
+            
+            grid.innerHTML = `
+                <div class="summary-item summary-total">
+                    <div class="num">${data.total}</div>
+                    <div class="label">总记录数</div>
+                </div>
+                <div class="summary-item summary-ok">
+                    <div class="num">${data.by_status.confirmed || 0}</div>
+                    <div class="label">已确认</div>
+                </div>
+                <div class="summary-item summary-warn">
+                    <div class="num">${data.by_status.pending_confirm || 0}</div>
+                    <div class="label">待确认</div>
+                </div>
+                <div class="summary-item summary-attention">
+                    <div class="num">${data.by_status.coord_mixed || 0}</div>
+                    <div class="label">坐标混合待复核</div>
+                </div>
+            `;
+        }
+
+        function getStatusBadge(status) {
+            const labels = {
+                'imported': '已导入',
+                'coord_mixed': '坐标混合待复核',
+                'cad_reviewed': 'CAD已审核',
+                'pending_confirm': '待巡检组确认',
+                'confirmed': '已确认'
+            };
+            return `<span class="badge badge-${status}">${labels[status] || status}</span>`;
+        }
+
+        async function loadRecords() {
+            const statusFilter = document.getElementById('statusFilter').value;
+            const url = statusFilter ? `/api/records?status=${statusFilter}` : '/api/records';
+            const res = await fetch(url);
+            const records = await res.json();
+            
+            const tbody = document.getElementById('recordsTable');
+            tbody.innerHTML = records.map(rec => `
+                <tr>
+                    <td><span class="badge badge-source">行${rec.original_line_number}</span></td>
+                    <td><strong>${rec.photo_number}</strong><br><span class="text-small">${rec.source_file}</span></td>
+                    <td>${rec.bracket_number || '-'}</td>
+                    <td>
+                        ${rec.coord_type === 'mixed' ? '<span class="coord-note">⚠️ 混合</span>' : 
+                          rec.coord_type === 'latlng' ? '经纬度' :
+                          rec.coord_type === 'metric' ? '米制' : '-'}
+                    </td>
+                    <td>${rec.cad_layer_name ? `<span class="badge badge-source">${rec.cad_layer_name}</span>` : '<span class="badge-warn">待补</span>'}</td>
+                    <td>${getStatusBadge(rec.status)}</td>
+                    <td style="max-width: 200px;">${rec.field_note || '<span class="text-small">无</span>'}</td>
+                    <td>
+                        <div class="actions">
+                            <button class="btn btn-sm btn-primary" onclick="viewDetail(${rec.id})">详情</button>
+                            ${rec.status !== 'confirmed' ? `<button class="btn btn-sm btn-warning" onclick="editCAD(${rec.id})">CAD</button>` : ''}
+                            ${rec.status !== 'confirmed' ? `<button class="btn btn-sm btn-success" onclick="editNote(${rec.id})">备注</button>` : ''}
+                            ${rec.status === 'pending_confirm' ? `<button class="btn btn-sm btn-success" onclick="confirmRecord(${rec.id})">确认</button>` : ''}
+                            ${rec.status !== 'imported' ? `<button class="btn btn-sm btn-danger" onclick="rollbackRecord(${rec.id})">回滚</button>` : ''}
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+            
+            loadSummary();
+        }
+
+        async function loadFieldView() {
+            const res = await fetch('/api/field-view');
+            const data = await res.json();
+            
+            const tbody = document.getElementById('fieldViewTable');
+            tbody.innerHTML = data.map(item => `
+                <tr class="${item.needs_confirm ? 'needs-confirm' : ''}">
+                    <td><strong>${item.photo_number}</strong></td>
+                    <td>${item.bracket_number}</td>
+                    <td>
+                        ${item.sources.split('/').map(s => 
+                            s === '照片' ? '<span class="field-view-tag tag-photo">照片</span>' :
+                            s === 'CAD' ? '<span class="field-view-tag tag-cad">CAD</span>' :
+                            '<span class="field-view-tag tag-no-cad">待CAD</span>'
+                        ).join('')}
+                    </td>
+                    <td>
+                        <strong>${item.status}</strong>
+                        ${item.coord_note ? '<br><span class="coord-note">' + item.coord_note + '</span>' : ''}
+                    </td>
+                    <td>${item.field_note || '<span class="text-small">无说明</span>'}</td>
+                </tr>
+            `).join('');
+        }
+
+        async function viewDetail(id) {
+            currentRecordId = id;
+            const res = await fetch(`/api/records/${id}`);
+            const data = await res.json();
+            const rec = data.record;
+            const history = data.history;
+            
+            document.getElementById('modalBody').innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <h4 style="margin-bottom: 15px; color: #2c3e50;">基本信息</h4>
+                    <table style="font-size: 13px;">
+                        <tr><td style="width: 120px; font-weight: 500;">照片编号</td><td><strong>${rec.photo_number}</strong></td></tr>
+                        <tr><td>原始行号</td><td><span class="badge badge-source">第 ${rec.original_line_number} 行</span></td></tr>
+                        <tr><td>来源文件</td><td>${rec.source_file}</td></tr>
+                        <tr><td>支架编号</td><td>${rec.bracket_number || '-'}</td></tr>
+                        <tr><td>经纬度</td><td>${rec.latitude ? rec.latitude + ', ' + rec.longitude : '-'}</td></tr>
+                        <tr><td>米制坐标</td><td>${rec.metric_x ? rec.metric_x + ', ' + rec.metric_y : '-'}</td></tr>
+                        <tr><td>坐标类型</td><td>${rec.coord_type === 'mixed' ? '<span class="coord-note">⚠️ 经纬度/米制混合</span>' : rec.coord_type}</td></tr>
+                        <tr><td>CAD图层</td><td>${rec.cad_layer_name || '<span class="badge-warn">待补充</span>'}</td></tr>
+                        <tr><td>当前状态</td><td>${getStatusBadge(rec.status)}</td></tr>
+                        <tr><td>现场说明</td><td>${rec.field_note || '-'}</td></tr>
+                        <tr><td>创建时间</td><td>${rec.created_at}</td></tr>
+                        <tr><td>更新时间</td><td>${rec.updated_at}</td></tr>
+                    </table>
+                </div>
+                <div>
+                    <h4 style="margin-bottom: 15px; color: #2c3e50;">📜 变更历史（可追溯）</h4>
+                    ${history.length === 0 ? '<div class="empty-state">暂无变更记录</div>' : 
+                      history.map(h => `
+                        <div class="history-item">
+                            <div class="field">${h.field_name}</div>
+                            <div class="change">
+                                <span class="old">${h.old_value || '(空)'}</span> → 
+                                <span class="new">${h.new_value || '(空)'}</span>
+                            </div>
+                            <div class="meta">
+                                操作人：${h.changed_by} | 原因：${h.change_reason} | ${h.changed_at}
+                            </div>
+                        </div>
+                      `).join('')}
+                </div>
+            `;
+            document.getElementById('detailModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').style.display = 'none';
+            currentRecordId = null;
+        }
+
+        async function editCAD(id) {
+            currentRecordId = id;
+            const res = await fetch(`/api/records/${id}`);
+            const data = await res.json();
+            const rec = data.record;
+            
+            document.getElementById('modalBody').innerHTML = `
+                <h4 style="margin-bottom: 15px;">📐 补充CAD图层名</h4>
+                <p class="text-small" style="margin-bottom: 15px;">展陈设计师阿景补看CAD后填写</p>
+                <div class="form-group">
+                    <label>当前照片编号</label>
+                    <input type="text" value="${rec.photo_number}" disabled>
+                </div>
+                <div class="form-group">
+                    <label>CAD图层名 *</label>
+                    <input type="text" id="cadLayerInput" value="${rec.cad_layer_name || ''}" placeholder="例如：BRACKET-03-LAYER">
+                </div>
+                <div class="form-group">
+                    <label>操作人</label>
+                    <input type="text" id="cadUserInput" value="阿景" placeholder="输入操作人姓名">
+                </div>
+                <div class="form-group">
+                    <label>备注说明</label>
+                    <input type="text" id="cadReasonInput" value="cad_review" placeholder="变更原因">
+                </div>
+                <div style="margin-top: 20px;">
+                    <button class="btn btn-success" onclick="saveCAD()">💾 保存</button>
+                    <button class="btn" onclick="closeModal()" style="background: #ecf0f1;">取消</button>
+                </div>
+            `;
+            document.getElementById('detailModal').style.display = 'block';
+        }
+
+        async function saveCAD() {
+            const cad_layer_name = document.getElementById('cadLayerInput').value;
+            const updated_by = document.getElementById('cadUserInput').value;
+            const reason = document.getElementById('cadReasonInput').value;
+            
+            await fetch(`/api/records/${currentRecordId}/cad`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({cad_layer_name, updated_by, reason})
+            });
+            closeModal();
+            loadRecords();
+        }
+
+        async function editNote(id) {
+            currentRecordId = id;
+            const res = await fetch(`/api/records/${id}`);
+            const data = await res.json();
+            const rec = data.record;
+            
+            document.getElementById('modalBody').innerHTML = `
+                <h4 style="margin-bottom: 15px;">📝 编辑现场说明</h4>
+                <p class="text-small" style="margin-bottom: 15px;">给现场班组看的说明，保存后进入"待巡检组确认"状态</p>
+                <div class="form-group">
+                    <label>当前照片编号</label>
+                    <input type="text" value="${rec.photo_number}" disabled>
+                </div>
+                <div class="form-group">
+                    <label>现场说明 *</label>
+                    <textarea id="noteInput" placeholder="给现场班组的说明...">${rec.field_note || ''}</textarea>
+                </div>
+                <div class="form-group">
+                    <label>操作人</label>
+                    <input type="text" id="noteUserInput" value="阿景" placeholder="输入操作人姓名">
+                </div>
+                <div class="form-group">
+                    <label>备注说明</label>
+                    <input type="text" id="noteReasonInput" value="note_update" placeholder="变更原因">
+                </div>
+                <div style="margin-top: 20px;">
+                    <button class="btn btn-success" onclick="saveNote()">💾 保存并提交确认</button>
+                    <button class="btn" onclick="closeModal()" style="background: #ecf0f1;">取消</button>
+                </div>
+            `;
+            document.getElementById('detailModal').style.display = 'block';
+        }
+
+        async function saveNote() {
+            const field_note = document.getElementById('noteInput').value;
+            const updated_by = document.getElementById('noteUserInput').value;
+            const reason = document.getElementById('noteReasonInput').value;
+            
+            await fetch(`/api/records/${currentRecordId}/note`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({field_note, updated_by, reason})
+            });
+            closeModal();
+            loadRecords();
+        }
+
+        async function confirmRecord(id) {
+            const confirmed_by = prompt('请输入巡检组确认人姓名：', '巡检组');
+            if (!confirmed_by) return;
+            
+            await fetch(`/api/records/${id}/confirm`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({confirmed_by})
+            });
+            loadRecords();
+        }
+
+        async function rollbackRecord(id) {
+            const target_status = prompt('请输入回滚目标状态：\nimported - 已导入\ncoord_mixed - 坐标混合\ncad_reviewed - CAD已审核\npending_confirm - 待确认', 'imported');
+            if (!target_status) return;
+            
+            const reason = prompt('回滚原因：', '数据修正');
+            const rolled_by = prompt('操作人：', '系统管理员');
+            
+            await fetch(`/api/records/${id}/rollback`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({target_status, rolled_by, reason})
+            });
+            loadRecords();
+        }
+
+        const uploadArea = document.getElementById('uploadArea');
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file) uploadFile(file);
+        });
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) uploadFile(file);
+        }
+
+        async function uploadFile(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('imported_by', prompt('导入人姓名：', '系统导入'));
+            
+            const res = await fetch('/api/import', {method: 'POST', body: formData});
+            const result = await res.json();
+            
+            document.getElementById('importResult').innerHTML = `
+                <div class="card" style="background: #e8f8f5; border-left: 4px solid #27ae60;">
+                    <h4 style="color: #1e8449; margin-bottom: 10px;">✅ 导入完成</h4>
+                    <table style="font-size: 13px;">
+                        <tr><td style="width: 150px;">新增记录</td><td><strong>${result.imported}</strong> 条</td></tr>
+                        <tr><td>更新记录</td><td><strong>${result.updated}</strong> 条</td></tr>
+                        <tr><td>跳过空号</td><td><strong>${result.skipped}</strong> 条</td></tr>
+                        <tr><td style="color: #d35400;">坐标混合待复核</td><td style="color: #d35400;"><strong>${result.coord_mixed}</strong> 条</td></tr>
+                    </table>
+                    <p class="text-small mt-10">注意：坐标混合的记录不会自动归为"正常"，需巡检组人工复核后确认</p>
+                </div>
+            `;
+            
+            loadRecords();
+        }
+
+        window.onclick = (e) => {
+            const modal = document.getElementById('detailModal');
+            if (e.target === modal) closeModal();
+        };
+
+        loadRecords();
+    </script>
+</body>
+</html>
