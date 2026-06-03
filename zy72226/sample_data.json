@@ -1,0 +1,50 @@
+[
+  {
+    "id": "r001",
+    "clearing_batch_no": "WL20260601001",
+    "original_line_no": 1,
+    "channel": "网联A通道",
+    "amount": 50000,
+    "remark": "正常清分"
+  },
+  {
+    "id": "r002",
+    "clearing_batch_no": "WL20260601001",
+    "original_line_no": 2,
+    "channel": "网联A通道",
+    "amount": 0,
+    "remark": "已冲正"
+  },
+  {
+    "id": "r003",
+    "clearing_batch_no": "WL20260601001",
+    "original_line_no": 3,
+    "channel": "网联B通道",
+    "amount": 120000,
+    "remark": "正常清分"
+  },
+  {
+    "id": "r004",
+    "clearing_batch_no": "WL20260602001",
+    "original_line_no": 1,
+    "channel": "网联A通道",
+    "amount": 30000,
+    "remark": "正常清分"
+  },
+  {
+    "id": "r005",
+    "clearing_batch_no": "WL20260602001",
+    "original_line_no": 2,
+    "channel": "网联C通道",
+    "amount": 0,
+    "remark": "已冲正-交易失败退款"
+  },
+  {
+    "id": "r006",
+    "clearing_batch_no": "WL20260602001",
+    "original_line_no": 1,
+    "channel": "网联A通道",
+    "amount": 30000,
+    "remark": "正常清分"
+  }
+]
