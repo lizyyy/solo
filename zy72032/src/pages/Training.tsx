@@ -30,6 +30,7 @@ export default function Training() {
 
   useEffect(() => {
     if (status === "idle") {
+      navigatedRef.current = false
       startTraining()
     }
   }, [status, startTraining])
@@ -44,10 +45,6 @@ export default function Training() {
       navigate(`/result/${completedRecordId}`)
     }
   }, [status, completedRecordId, navigate])
-
-  useEffect(() => {
-    navigatedRef.current = false
-  }, [status])
 
   useEffect(() => {
     if (status !== "active" || !scenario) return
