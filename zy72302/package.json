@@ -1,0 +1,32 @@
+{
+  "name": "queue-window-config",
+  "version": "1.0.0",
+  "description": "排队论窗口配置系统 - 整合手算反例与问卷原始行，支持边界样本复核流程",
+  "main": "dist/index.js",
+  "bin": {
+    "queue-config": "dist/cli/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/cli/index.js",
+    "dev": "ts-node src/cli/index.ts",
+    "web": "node dist/web/server.js",
+    "web:dev": "ts-node src/web/server.ts",
+    "test": "ts-node src/tests/integration.test.ts",
+    "lint": "eslint src --ext .ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "csv-parser": "^3.0.0",
+    "cli-table3": "^0.6.3"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.2",
+    "ts-node": "^10.9.1"
+  }
+}

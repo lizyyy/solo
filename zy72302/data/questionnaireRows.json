@@ -1,0 +1,28 @@
+[
+  {
+    "sampleId": "SAMPLE-001",
+    "timestamp": "2024-01-15T10:30:00",
+    "windowNumber": 1,
+    "onSiteStatement": "窗口1在10:20-10:40临时关闭处理紧急事务，实际等待时间应为15分钟，有3位同学可作证",
+    "witnessName": "张三、李四、王五",
+    "hasBreak": false,
+    "isTemporaryClosed": true,
+    "queueOverflow": false,
+    "actualWaitTime": 15,
+    "actualArrivalCount": 15,
+    "supplementaryNotes": "临时关窗原因：窗口设备故障维修"
+  },
+  {
+    "sampleId": "SAMPLE-002",
+    "timestamp": "2024-01-15T14:00:00",
+    "windowNumber": 2,
+    "onSiteStatement": "下午2点窗口2排队溢出，队伍排到门外，系统统计时可能重复计数或漏记",
+    "witnessName": "赵六",
+    "hasBreak": false,
+    "isTemporaryClosed": false,
+    "queueOverflow": true,
+    "actualWaitTime": 25,
+    "actualArrivalCount": 25,
+    "supplementaryNotes": "建议该时段增加临时窗口"
+  }
+]

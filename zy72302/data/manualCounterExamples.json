@@ -1,0 +1,55 @@
+[
+  {
+    "sampleId": "SAMPLE-001",
+    "timestamp": "2024-01-15T10:30:00",
+    "windowNumber": 1,
+    "arrivalCount": 15,
+    "serviceTime": 8,
+    "waitTime": -5,
+    "source": "old_table",
+    "notes": "旧系统导出数据异常",
+    "mainProcessEvidence": "主流程步骤3异常，系统记录等待时间为负，可能与临时关窗有关"
+  },
+  {
+    "sampleId": "SAMPLE-002",
+    "timestamp": "2024-01-15T14:00:00",
+    "windowNumber": 2,
+    "arrivalCount": -3,
+    "serviceTime": 5,
+    "waitTime": 12,
+    "source": "old_table",
+    "notes": "到达人数统计异常",
+    "mainProcessEvidence": "到达人数统计为负数，怀疑排队溢出时系统统计出错"
+  },
+  {
+    "sampleId": "SAMPLE-003",
+    "timestamp": "2024-01-15T11:00:00",
+    "windowNumber": 1,
+    "arrivalCount": 20,
+    "serviceTime": 6,
+    "waitTime": 8,
+    "source": "manual",
+    "notes": "正常样本"
+  },
+  {
+    "sampleId": "SAMPLE-004",
+    "timestamp": "2024-01-15T12:15:00",
+    "windowNumber": 3,
+    "arrivalCount": 8,
+    "serviceTime": 10,
+    "waitTime": -2,
+    "source": "old_table",
+    "notes": "午休时间数据异常",
+    "mainProcessEvidence": "午休期间窗口关闭，系统仍在统计，导致等待时间计算异常"
+  },
+  {
+    "sampleId": "SAMPLE-005",
+    "timestamp": "2024-01-15T09:30:00",
+    "windowNumber": 2,
+    "arrivalCount": 12,
+    "serviceTime": 7,
+    "waitTime": 5,
+    "source": "manual",
+    "notes": "正常样本"
+  }
+]
