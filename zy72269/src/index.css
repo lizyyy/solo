@@ -1,0 +1,113 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Noto Sans SC', system-ui, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: dark;
+  color: #F1FAEE;
+  background-color: #040E27;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 1280px;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #020713 0%, #040E27 50%, #06153A 100%);
+}
+
+@layer components {
+  .btn-industrial {
+    @apply px-4 py-2 border-2 font-mono text-sm uppercase tracking-wider transition-all duration-200;
+  }
+
+  .btn-primary {
+    @apply btn-industrial border-primary-400 bg-primary-700 text-neutral-light hover:bg-primary-600 hover:shadow-glow hover:border-primary-300;
+  }
+
+  .btn-warning {
+    @apply btn-industrial border-accent-warning bg-accent-warning/20 text-accent-warning hover:bg-accent-warning/30 hover:shadow-glow-warning;
+  }
+
+  .btn-success {
+    @apply btn-industrial border-accent-success bg-accent-success/20 text-accent-success hover:bg-accent-success/30 hover:shadow-glow-success;
+  }
+
+  .btn-secondary {
+    @apply btn-industrial border-neutral-mid bg-neutral-dark/50 text-neutral-light hover:bg-neutral-dark hover:border-neutral-light;
+  }
+
+  .card-industrial {
+    @apply bg-neutral-dark/60 border-2 border-primary-700 rounded-none backdrop-blur-sm;
+  }
+
+  .input-industrial {
+    @apply w-full px-3 py-2 bg-primary-900/50 border-2 border-primary-700 text-neutral-light font-mono text-sm focus:outline-none focus:border-primary-400 focus:shadow-glow transition-all;
+  }
+
+  .table-header {
+    @apply bg-primary-800/80 text-neutral-light font-mono text-xs uppercase tracking-wider px-4 py-3 border-b-2 border-primary-600;
+  }
+
+  .table-cell {
+    @apply px-4 py-3 border-b border-primary-800/50 text-sm;
+  }
+
+  .note-original {
+    @apply bg-primary-900/40 border-l-4 border-primary-400 pl-3 py-2 italic text-primary-200 font-mono text-sm;
+  }
+
+  .conflict-evidence {
+    @apply bg-accent-warning/10 border-2 border-accent-warning/50 p-4;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: #06153A;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #457B9D;
+    border-radius: 0;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: #73A5ED;
+  }
+}
+
+/* 3D 场景容器 */
+.canvas-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(ellipse at center, #0A2463 0%, #020713 100%);
+}
+
+/* 数据网格样式 */
+.data-grid {
+  display: grid;
+  gap: 1px;
+  background: #06153A;
+}
+
+.data-grid > div {
+  background: #040E27;
+  padding: 8px 12px;
+}
