@@ -154,7 +154,15 @@ export default function Settlement() {
                           <span className="ml-2 text-alert-400 font-medium">需确认: {tr.confirmationNote}</span>
                         )}
                         {tr.source === "projection_screen" && (
-                          <span className="ml-2 badge-projection">投影大屏补录</span>
+                          <>
+                            <span className="ml-2 badge-projection">📺 投影大屏补录</span>
+                            {tr.projectionRecordedAt && (
+                              <span className="ml-2 text-xs text-flame-400 font-mono">
+                                🕒 {new Date(tr.projectionRecordedAt).toLocaleString("zh-CN")}
+                                {tr.projectionOperator && `（${tr.projectionOperator}）`}
+                              </span>
+                            )}
+                          </>
                         )}
                         {tr.rawNote && <span className="ml-2 text-gray-500 text-xs italic">[{tr.rawNote}]</span>}
                       </td>

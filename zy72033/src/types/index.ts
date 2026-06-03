@@ -50,6 +50,9 @@ export interface TeamRound {
   confirmationNote: string
   source: DataSource
   rawNote: string
+  recordedAt: string
+  projectionRecordedAt?: string
+  projectionOperator?: string
 }
 
 export interface MatchData {

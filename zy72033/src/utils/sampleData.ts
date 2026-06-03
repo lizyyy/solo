@@ -77,6 +77,7 @@ function createSmoothMatch(): MatchData {
         confirmationNote: "",
         source: "normal",
         rawNote: "",
+        recordedAt: "2026-05-28T09:00:00",
       })
     })
   })
@@ -174,6 +175,7 @@ function createNeedsConfirmationMatch(): MatchData {
         confirmationNote,
         source: "normal",
         rawNote: tIdx === 1 && rIdx === 1 ? "投影大屏记：B组填多了" : "",
+        recordedAt: "2026-05-28T10:30:00",
       })
     })
   })
@@ -245,6 +247,9 @@ function createOldProjectionMatch(): MatchData {
         confirmationNote: "",
         source: "projection_screen",
         rawNote: tIdx === 0 && rIdx === 1 ? "投影大屏备注：红队第2轮好像多用了？不太确定-老张" : tIdx === 1 && rIdx === 1 ? "投影大屏备注：蓝队说他们选了40但写成了45？？再确认" : "",
+        recordedAt: "2026-05-20T14:00:00",
+        projectionRecordedAt: "2026-05-20T14:30:00",
+        projectionOperator: "助教小何",
       })
     })
   })

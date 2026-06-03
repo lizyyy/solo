@@ -219,6 +219,18 @@ setActiveMatchId: (id: string | null) => {
 - `projection_screen` → "投影大屏补录"
 - `manual_correction` → "手动修正"
 
+**异常判断逻辑**（修复前仅依赖 `team.hasAnomaly`，修复后三重校验）:
+```typescript
+const hasResourceOverspend = teamRecords.some(tr => tr.resourceRemaining < 0)
+const hasAnomalyRecord = teamRecords.some(tr => tr.isAnomaly || tr.needsConfirmation)
+const isAnomaly = team.hasAnomaly || hasResourceOverspend || hasAnomalyRecord
+```
+
+**异常说明格式**:
+- 超支标记: `R{轮次}超支{数值}`
+- 待确认标记: `R{轮次}待确认`
+- 多异常用分号分隔: `R3超支-17+R3待确认; R2超支-12+R2待确认`
+
 ### TXT 回放报告
 
 **像人话的格式**:
@@ -233,6 +245,7 @@ setActiveMatchId: (id: string | null) => {
   B组：选择燃料 60，消耗资源 48，剩余 52，扣分 -5（燃料配比偏差中等...）
   ⚠️ 资源为负（-36），需确认：资源超支
   📺 投影大屏补录
+  🕒 补录时间：2026/5/20 14:30:00（助教小何）
   📝 备注：乱备注原样保留
 
 ── 最终排名 ──
@@ -270,12 +283,35 @@ setActiveMatchId: (id: string | null) => {
 
 交付前需通过以下验证：
 
+### 基础功能
 - [ ] `npm install` 安装成功
 - [ ] `npm run dev` 启动成功
 - [ ] 完整流程跑通：创建 → 开始 → 录入 → 结束 → 下一轮 → 结算
 - [ ] 资源负数时弹出异常确认，阻断正常操作
 - [ ] 结算页面逐轮扣分明细正确
 - [ ] 投屏页面实时状态同步
-- [ ] 导出 CSV 文件内容完整
+- [ ] `npm run build` 构建成功
+
+### 导出文件核验（必须实际打开文件检查）
+- [ ] 导出 CSV 文件内容完整，字段与页面一致
+  - [ ] "是否异常"列正确标记（含资源超支的组应为"是"）
+  - [ ] "异常说明"列包含具体的超支和待确认信息
+  - [ ] "数据来源"列正确标记投影补录
+  - [ ] 各轮次数据与页面逐行核对一致
 - [ ] 导出 TXT 文件内容完整（像人话）
+  - [ ] 每轮数据完整可读
+  - [ ] ⚠️ 资源超支标记正确
+  - [ ] 📺 投影大屏补录标记正确
+  - [ ] 🕒 补录时间和操作人显示正确
+  - [ ] 📝 原始备注原样保留
+  - [ ] 最终排名和分数与页面一致
+
+### 补录差异真实落地
+- [ ] 投屏补录记录包含 `recordedAt` 时间戳
+- [ ] 投屏补录记录包含 `projectionRecordedAt` 补录时间
+- [ ] 投屏补录记录包含 `projectionOperator` 操作人
+- [ ] 结算页面显示补录时间和操作人
+- [ ] 导出文件包含补录元数据
+
+### 类型安全
 - [ ] `npx tsc --noEmit` 无类型错误

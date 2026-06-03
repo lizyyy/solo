@@ -255,6 +255,7 @@ export const useMatchStore = create<MatchStore>((set, get) => ({
           confirmationNote: result.confirmationNote,
           source: "normal",
           rawNote: "",
+          recordedAt: new Date().toISOString(),
         }
 
         const newTeamRounds = [...md.teamRounds, newTr]
@@ -391,6 +392,7 @@ export const useMatchStore = create<MatchStore>((set, get) => ({
 
         const result = calculateDeduction(fuelChoice, resourceRemaining, false, OPTIMAL_CHOICE)
 
+        const now = new Date()
         const newTr: TeamRound = {
           id: uid(),
           roundId: round.id,
@@ -406,6 +408,9 @@ export const useMatchStore = create<MatchStore>((set, get) => ({
           confirmationNote: result.confirmationNote,
           source: "projection_screen",
           rawNote,
+          recordedAt: now.toISOString(),
+          projectionRecordedAt: now.toISOString(),
+          projectionOperator: "助教补录",
         }
 
         const newTeamRounds = [...md.teamRounds, newTr]

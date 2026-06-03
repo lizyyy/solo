@@ -34,12 +34,28 @@ export function exportCSV(data: MatchData): string {
       manual_correction: "手动修正",
     }
 
+    const hasResourceOverspend = teamRecords.some(tr => tr.resourceRemaining < 0)
+    const hasAnomalyRecord = teamRecords.some(tr => tr.isAnomaly || tr.needsConfirmation)
+    const isAnomaly = team.hasAnomaly || hasResourceOverspend || hasAnomalyRecord
+
+    const anomalyNotes = teamRecords
+      .filter(tr => tr.resourceRemaining < 0 || tr.isAnomaly || tr.needsConfirmation)
+      .map(tr => {
+        const roundNum = rounds.find(r => r.id === tr.roundId)?.roundNumber ?? 0
+        const notes: string[] = []
+        if (tr.resourceRemaining < 0) notes.push(`R${roundNum}超支${tr.resourceRemaining}`)
+        if (tr.needsConfirmation) notes.push(`R${roundNum}待确认`)
+        return notes.join("+")
+      })
+      .filter(Boolean)
+    const anomalySummary = anomalyNotes.length > 0 ? anomalyNotes.join("; ") : team.rawNote
+
     return [
       team.name,
       String(team.totalScore),
       ...roundCells,
-      team.hasAnomaly ? "是" : "否",
-      team.rawNote,
+      isAnomaly ? "是" : "否",
+      anomalySummary,
       sourceMap[team.source] || team.source,
       team.rawNote,
     ]
@@ -97,6 +113,12 @@ export function exportTXT(data: MatchData): string {
 
       if (tr.rawNote) {
         line += `\n  📝 备注：${tr.rawNote}`
+      }
+
+      if (tr.source === "projection_screen" && tr.projectionRecordedAt) {
+        const projTime = new Date(tr.projectionRecordedAt).toLocaleString("zh-CN")
+        const operator = tr.projectionOperator || "未知"
+        line += `\n  🕒 补录时间：${projTime}（${operator}）`
       }
 
       lines.push(line)
