@@ -1,0 +1,29 @@
+{
+  "building_id": "BUILDING_A",
+  "photos": [
+    {
+      "photo_number": "INSP-2026-003",
+      "obstacle_name": "空调外机-北墙3号",
+      "type": "ac_unit",
+      "position": {
+        "x": 15.0,
+        "y": 20.0,
+        "z": 15.5
+      },
+      "taken_at": "2026-05-15T11:00:00",
+      "old_caliber": null
+    },
+    {
+      "photo_number": "INSP-2026-004",
+      "obstacle_name": "北墙空调-3号位",
+      "type": "ac_unit",
+      "position": {
+        "x": 15.0,
+        "y": 20.0,
+        "z": 15.5
+      },
+      "taken_at": "2026-05-16T14:20:00",
+      "old_caliber": null
+    }
+  ]
+}

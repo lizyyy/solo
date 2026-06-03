@@ -1,0 +1,29 @@
+{
+  "building_id": "BUILDING_A",
+  "photos": [
+    {
+      "photo_number": "INSP-2026-005",
+      "obstacle_name": "屋顶天线基座",
+      "type": "antenna",
+      "position": {
+        "x": 25.0,
+        "y": 15.0,
+        "z": 45.0
+      },
+      "taken_at": "2026-05-10T09:15:00",
+      "old_caliber": "2024年口径：楼顶信号塔底座，坐标偏移+0.5m"
+    },
+    {
+      "photo_number": "INSP-2026-006",
+      "obstacle_name": "企业标识牌-南墙",
+      "type": "sign",
+      "position": {
+        "x": 12.0,
+        "y": 0.0,
+        "z": 6.0
+      },
+      "taken_at": "2026-05-12T16:45:00",
+      "old_caliber": "2023年口径：南墙招牌，高度5.8m"
+    }
+  ]
+}

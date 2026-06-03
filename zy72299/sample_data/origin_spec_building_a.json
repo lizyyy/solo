@@ -1,0 +1,56 @@
+{
+  "building_id": "BUILDING_A",
+  "origin_point": {
+    "x": 0.0,
+    "y": 0.0,
+    "z": 0.0
+  },
+  "description": "楼宇A西南角地面控制点，WGS84坐标系",
+  "obstacles": [
+    {
+      "name": "三层西窗01",
+      "type": "window",
+      "position": {
+        "x": 5.2,
+        "y": 12.5,
+        "z": 9.0
+      }
+    },
+    {
+      "name": "三层西窗02",
+      "type": "window",
+      "position": {
+        "x": 8.5,
+        "y": 12.5,
+        "z": 9.0
+      }
+    },
+    {
+      "name": "空调外机-北墙3号",
+      "type": "ac_unit",
+      "position": {
+        "x": 15.0,
+        "y": 20.0,
+        "z": 15.5
+      }
+    },
+    {
+      "name": "屋顶天线基座",
+      "type": "antenna",
+      "position": {
+        "x": 25.0,
+        "y": 15.0,
+        "z": 45.0
+      }
+    },
+    {
+      "name": "消防立管-东墙",
+      "type": "pipe",
+      "position": {
+        "x": 30.0,
+        "y": 5.0,
+        "z": 22.0
+      }
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "building_id": "BUILDING_A",
+  "photos": [
+    {
+      "photo_number": "INSP-2026-001",
+      "obstacle_name": "三层西窗01",
+      "type": "window",
+      "position": {
+        "x": 5.2,
+        "y": 12.5,
+        "z": 9.0
+      },
+      "taken_at": "2026-05-15T10:30:00",
+      "old_caliber": null
+    },
+    {
+      "photo_number": "INSP-2026-002",
+      "obstacle_name": "三层西窗02",
+      "type": "window",
+      "position": {
+        "x": 8.5,
+        "y": 12.5,
+        "z": 9.0
+      },
+      "taken_at": "2026-05-15T10:35:00",
+      "old_caliber": null
+    }
+  ]
+}
