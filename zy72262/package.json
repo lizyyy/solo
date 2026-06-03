@@ -1,0 +1,24 @@
+{
+  "name": "hospital-robot-obstacle-avoidance",
+  "version": "1.0.0",
+  "description": "医院物流机器人避障系统 - 障碍物备注、楼层剖面草图、安全距离报告管理",
+  "main": "src/index.js",
+  "bin": {
+    "robot-obstacle": "src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/api.js",
+    "cli": "node src/cli.js",
+    "dev": "node src/api.js",
+    "test": "node tests/run-workflow.js"
+  },
+  "keywords": ["robot", "obstacle", "hospital", "logistics"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "yargs": "^17.7.2",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3"
+  }
+}

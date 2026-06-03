@@ -1,0 +1,26 @@
+[
+  {
+    "id": "obs_1780480251212_qcyf",
+    "floor": "B1",
+    "location": "西侧走廊转角",
+    "description": "消防栓突出墙体，机器人转弯时需要避让",
+    "safetyDistance": 1.2,
+    "remark": "已现场复核，告警标签确实被手遮挡，但障碍物位置描述准确",
+    "mobileScreenshot": {
+      "blockedTags": [
+        "alarm_position",
+        "distance_marker"
+      ]
+    },
+    "alarmTagBlocked": true,
+    "blockReason": "移动端截图时手挡住了告警标签",
+    "status": "tao_approved",
+    "createdAt": "2026-06-03T09:50:51.212Z",
+    "updatedAt": "2026-06-03T09:50:51.218Z",
+    "floorPlanId": "fp_1780480251218_81wr",
+    "nextAction": "所有材料已齐全，请施工经理最终确认",
+    "missingMaterials": [],
+    "assignedTo": "施工经理",
+    "reviewedByManager": true
+  }
+]

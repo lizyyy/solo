@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>医院物流机器人避障 - 小看板</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #333; }
+.header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; text-align: center; }
+.header h1 { font-size: 24px; margin-bottom: 5px; }
+.header p { opacity: 0.9; font-size: 14px; }
+.container { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+.stat-card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.stat-card .label { font-size: 14px; color: #666; margin-bottom: 8px; }
+.stat-card .value { font-size: 32px; font-weight: bold; }
+.stat-card.warning .value { color: #f59e0b; }
+.stat-card.danger .value { color: #ef4444; }
+.stat-card.success .value { color: #10b981; }
+.tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #e5e7eb; }
+.tab { padding: 12px 24px; cursor: pointer; border-bottom: 3px solid transparent; font-weight: 500; }
+.tab.active { border-bottom-color: #667eea; color: #667eea; }
+.tab:hover { background: #f3f4f6; }
+.card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 20px; }
+.card h3 { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+th { background: #f9fafb; font-weight: 600; }
+tr:hover { background: #f9fafb; }
+.badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+.badge.danger { background: #fee2e2; color: #dc2626; }
+.badge.warning { background: #fef3c7; color: #d97706; }
+.badge.success { background: #d1fae5; color: #059669; }
+.badge.info { background: #dbeafe; color: #2563eb; }
+.form-group { margin-bottom: 15px; }
+.form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
+.form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; }
+.btn-primary { background: #667eea; color: white; }
+.btn-primary:hover { background: #5a67d8; }
+.btn-success { background: #10b981; color: white; }
+.btn-success:hover { background: #059669; }
+.btn-warning { background: #f59e0b; color: white; }
+.btn-warning:hover { background: #d97706; }
+.btn-group { display: flex; gap: 10px; }
+.hidden { display: none; }
+.detail-panel { background: #f9fafb; padding: 15px; border-radius: 8px; margin-top: 10px; }
+.detail-panel h4 { margin-bottom: 10px; }
+.evidence { background: white; padding: 12px; border-radius: 6px; margin-top: 10px; border-left: 4px solid #667eea; }
+.report-content { white-space: pre-wrap; font-family: monospace; background: #f8f9fa; padding: 15px; border-radius: 6px; font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>🤖 医院物流机器人避障</h1>
+  <p>障碍物备注 · 楼层剖面草图 · 安全距离报告</p>
+</div>
+
+<div class="container">
+  <div class="stats">
+    <div class="stat-card">
+      <div class="label">障碍物总数</div>
+      <div class="value" id="totalObstacles">0</div>
+    </div>
+    <div class="stat-card danger">
+      <div class="label">告警标签遮挡</div>
+      <div class="value" id="blockedTags">0</div>
+    </div>
+    <div class="stat-card warning">
+      <div class="label">待施工经理复核</div>
+      <div class="value" id="pendingManager">0</div>
+    </div>
+    <div class="stat-card warning">
+      <div class="label">待补楼层剖面</div>
+      <div class="value" id="pendingFloorPlan">0</div>
+    </div>
+    <div class="stat-card success">
+      <div class="label">已完成</div>
+      <div class="value" id="completed">0</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="obstacles">障碍物列表</div>
+    <div class="tab" data-tab="import">导入障碍物</div>
+    <div class="tab" data-tab="floorplans">楼层剖面草图</div>
+    <div class="tab" data-tab="reports">安全距离报告</div>
+  </div>
+
+  <div id="obstacles-tab" class="tab-content">
+    <div class="card">
+      <h3>障碍物列表</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>楼层</th>
+            <th>位置</th>
+            <th>状态</th>
+            <th>告警标签</th>
+            <th>负责人</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="obstaclesTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="import-tab" class="tab-content hidden">
+    <div class="card">
+      <h3>导入障碍物</h3>
+      <form id="importForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label>楼层</label>
+            <input type="text" name="floor" required placeholder="例如：B1、3F">
+          </div>
+          <div class="form-group">
+            <label>位置</label>
+            <input type="text" name="location" required placeholder="例如：电梯口、走廊转角">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>障碍物描述</label>
+          <textarea name="description" rows="3" required placeholder="详细描述障碍物情况"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>安全距离要求（米）</label>
+            <input type="number" name="safetyDistance" step="0.1" required value="1.5">
+          </div>
+          <div class="form-group">
+            <label>告警标签是否被遮挡</label>
+            <select name="alarmTagBlocked">
+              <option value="false">正常可见</option>
+              <option value="true">移动端截图遮挡</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>障碍物备注</label>
+          <textarea name="remark" rows="2" placeholder="可选：补充说明信息"></textarea>
+        </div>
+        <div class="form-group">
+          <label>遮挡原因（如果被遮挡）</label>
+          <input type="text" name="blockReason" placeholder="例如：手挡住、光线反射">
+        </div>
+        <button type="submit" class="btn btn-primary">导入障碍物</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="floorplans-tab" class="tab-content hidden">
+    <div class="card">
+      <h3>创建楼层剖面草图</h3>
+      <form id="floorPlanForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label>楼层</label>
+            <input type="text" name="floor" required placeholder="例如：B1、3F">
+          </div>
+          <div class="form-group">
+            <label>草图名称</label>
+            <input type="text" name="name" required placeholder="例如：B1层西侧走廊">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>描述</label>
+          <textarea name="description" rows="2" placeholder="草图描述"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">创建草图</button>
+      </form>
+    </div>
+    <div class="card">
+      <h3>楼层剖面草图列表</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>楼层</th>
+            <th>名称</th>
+            <th>小陶已复核</th>
+          </tr>
+        </thead>
+        <tbody id="floorPlansTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="reports-tab" class="tab-content hidden">
+    <div class="card">
+      <h3>安全距离报告列表</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>障碍物ID</th>
+            <th>标题</th>
+            <th>状态</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="reportsTable"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_BASE = '/api';
+
+async function fetchData(endpoint) {
+  const res = await fetch(API_BASE + endpoint);
+  return res.json();
+}
+
+async function postData(endpoint, data) {
+  const res = await fetch(API_BASE + endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  return res.json();
+}
+
+async function loadStats() {
+  const stats = await fetchData('/stats');
+  document.getElementById('totalObstacles').textContent = stats.totalObstacles;
+  document.getElementById('blockedTags').textContent = stats.blockedTags;
+  document.getElementById('pendingManager').textContent = stats.pendingManagerReview;
+  document.getElementById('pendingFloorPlan').textContent = stats.pendingFloorPlan;
+  document.getElementById('completed').textContent = stats.completed;
+}
+
+function getStatusBadge(status) {
+  const map = {
+    'blocked_tag_pending_review': ['danger', '告警标签遮挡待复核'],
+    'pending_floor_plan': ['warning', '待补楼层剖面'],
+    'manager_approved': ['info', '施工经理已通过'],
+    'needs_correction': ['danger', '需修正'],
+    'floor_plan_attached': ['info', '已关联草图'],
+    'floor_plan_needs_revision': ['warning', '草图需修正'],
+    'tao_approved': ['success', '已完成']
+  };
+  const [type, text] = map[status] || ['warning', status];
+  return `<span class="badge ${type}">${text}</span>`;
+}
+
+async function loadObstacles() {
+  const obstacles = await fetchData('/obstacles');
+  const tbody = document.getElementById('obstaclesTable');
+  tbody.innerHTML = obstacles.map(o => `
+    <tr>
+      <td><code>${o.id}</code></td>
+      <td>${o.floor}</td>
+      <td>${o.location}</td>
+      <td>${getStatusBadge(o.status)}</td>
+      <td>${o.alarmTagBlocked ? '<span class="badge danger">遮挡</span>' : '<span class="badge success">正常</span>'}</td>
+      <td>${o.assignedTo || '-'}</td>
+      <td><button class="btn btn-primary" onclick="showDetail('${o.id}')">查看详情</button></td>
+    </tr>
+    <tr id="detail-${o.id}" class="hidden">
+      <td colspan="7">
+        <div class="detail-panel">
+          <h4>障碍物详情</h4>
+          <p><strong>描述：</strong>${o.description}</p>
+          <p><strong>安全距离：</strong>${o.safetyDistance}米</p>
+          <p><strong>下一步：</strong>${o.nextAction || '-'}</p>
+          <div id="evidence-${o.id}" class="evidence">
+            <strong>证据摘要加载中...</strong>
+          </div>
+          <div id="actions-${o.id}" style="margin-top:15px;"></div>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+async function showDetail(id) {
+  const row = document.getElementById(`detail-${id}`);
+  row.classList.toggle('hidden');
+  if (!row.classList.contains('hidden')) {
+    const details = await fetchData(`/obstacles/${id}`);
+    document.getElementById(`evidence-${id}`).innerHTML = `
+      <strong>📋 证据摘要</strong><br>
+      <strong>障碍物备注：</strong>${details.evidenceSummary.obstacleRemark || '(无)'}<br>
+      <strong>楼层剖面草图：</strong>${details.evidenceSummary.floorPlanSketch || '(未关联)'}<br>
+      <strong>告警标签状态：</strong>${details.evidenceSummary.alarmTagBlocked ? '❌ 被遮挡' : '✅ 正常'}
+    `;
+    
+    let actions = '';
+    if (!details.obstacle.reviewedByManager && details.obstacle.alarmTagBlocked) {
+      actions += `<button class="btn btn-success" onclick="managerReview('${id}', true)">施工经理通过</button>
+                  <button class="btn btn-warning" onclick="managerReview('${id}', false)">施工经理驳回</button>`;
+    }
+    if (details.obstacle.reviewedByManager && !details.obstacle.floorPlanId) {
+      const floorPlans = await fetchData('/floor-plans');
+      if (floorPlans.length > 0) {
+        actions += `<select id="fp-${id}" class="btn">
+          <option value="">选择楼层剖面草图</option>
+          ${floorPlans.filter(f => f.floor === details.obstacle.floor).map(f => 
+            `<option value="${f.id}">${f.name}</option>`).join('')}
+        </select>
+        <button class="btn btn-primary" onclick="attachFloorPlan('${id}')">关联草图</button>`;
+      }
+    }
+    if (details.obstacle.floorPlanId && !details.floorPlan?.reviewedByTao) {
+      actions += `<button class="btn btn-success" onclick="taoReview('${id}', true)">小陶复核通过</button>
+                  <button class="btn btn-warning" onclick="taoReview('${id}', false)">小陶复核驳回</button>`;
+    }
+    document.getElementById(`actions-${id}`).innerHTML = actions;
+    
+    if (details.reports.length > 0) {
+      const latestReport = details.reports[details.reports.length - 1];
+      document.getElementById(`actions-${id}`).innerHTML += `
+        <div style="margin-top:15px;">
+          <h4>最新安全距离报告</h4>
+          <div class="report-content">${latestReport.content}</div>
+        </div>
+      `;
+    }
+  }
+}
+
+async function managerReview(id, approved) {
+  const remark = prompt('请输入复核备注：');
+  await postData(`/obstacles/${id}/manager-review`, { approved, remark });
+  await loadObstacles();
+  await loadStats();
+}
+
+async function attachFloorPlan(id) {
+  const fpId = document.getElementById(`fp-${id}`).value;
+  if (!fpId) return alert('请选择楼层剖面草图');
+  await postData(`/obstacles/${id}/attach-floorplan`, { floorPlanId: fpId });
+  await loadObstacles();
+  await loadStats();
+}
+
+async function taoReview(id, approved) {
+  const correction = !approved ? prompt('请输入修正说明：') : '';
+  await postData(`/obstacles/${id}/tao-review`, { approved, correctionNote: correction });
+  await loadObstacles();
+  await loadStats();
+}
+
+async function loadFloorPlans() {
+  const floorPlans = await fetchData('/floor-plans');
+  document.getElementById('floorPlansTable').innerHTML = floorPlans.map(f => `
+    <tr>
+      <td><code>${f.id}</code></td>
+      <td>${f.floor}</td>
+      <td>${f.name}</td>
+      <td>${f.reviewedByTao ? '<span class="badge success">是</span>' : '<span class="badge warning">否</span>'}</td>
+    </tr>
+  `).join('');
+}
+
+async function loadReports() {
+  const reports = await fetchData('/reports');
+  document.getElementById('reportsTable').innerHTML = reports.map(r => `
+    <tr>
+      <td><code>${r.id}</code></td>
+      <td><code>${r.obstacleId}</code></td>
+      <td>${r.title}</td>
+      <td><span class="badge ${r.status === 'final' ? 'success' : 'warning'}">${r.status}</span></td>
+      <td><button class="btn btn-primary" onclick="showReport('${r.id}')">查看</button></td>
+    </tr>
+  `).join('');
+}
+
+async function showReport(id) {
+  const report = await fetchData(`/reports/${id}`);
+  alert(report.content);
+}
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.tab + '-tab').classList.remove('hidden');
+    if (tab.dataset.tab === 'floorplans') loadFloorPlans();
+    if (tab.dataset.tab === 'reports') loadReports();
+  });
+});
+
+document.getElementById('importForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+  const data = Object.fromEntries(formData);
+  data.safetyDistance = parseFloat(data.safetyDistance);
+  data.alarmTagBlocked = data.alarmTagBlocked === 'true';
+  await postData('/obstacles', data);
+  e.target.reset();
+  await loadObstacles();
+  await loadStats();
+  alert('导入成功！');
+  document.querySelector('[data-tab="obstacles"]').click();
+});
+
+document.getElementById('floorPlanForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+  const data = Object.fromEntries(formData);
+  await postData('/floor-plans', data);
+  e.target.reset();
+  await loadFloorPlans();
+  alert('创建成功！');
+});
+
+async function init() {
+  await loadStats();
+  await loadObstacles();
+}
+
+init();
+</script>
+</body>
+</html>

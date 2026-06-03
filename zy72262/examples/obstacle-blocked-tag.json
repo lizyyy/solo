@@ -1,0 +1,12 @@
+{
+  "floor": "B1",
+  "location": "西侧走廊转角",
+  "description": "消防栓突出墙体，机器人转弯时需要避让",
+  "safetyDistance": 1.2,
+  "alarmTagBlocked": true,
+  "blockReason": "移动端截图时手挡住了告警标签",
+  "remark": "现场测量突出约30cm，建议机器人走中间通道",
+  "mobileScreenshot": {
+    "blockedTags": ["alarm_position", "distance_marker"]
+  }
+}
