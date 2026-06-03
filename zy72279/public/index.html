@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>光伏板阴影遮挡试算系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2d5a87 0%, #1a3a5c 100%);
+            color: white;
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .header p {
+            opacity: 0.8;
+            margin-top: 5px;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .stat-card h3 {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .stat-card .value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2d5a87;
+        }
+
+        .stat-card.warning .value {
+            color: #e67e22;
+        }
+
+        .stat-card.danger .value {
+            color: #e74c3c;
+        }
+
+        .workflow {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .workflow h2 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #2d5a87;
+        }
+
+        .steps {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .steps::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 10%;
+            right: 10%;
+            height: 3px;
+            background: #e0e0e0;
+            z-index: 0;
+        }
+
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            color: #999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .step.active .step-number {
+            background: #2d5a87;
+            color: white;
+        }
+
+        .step.completed .step-number {
+            background: #27ae60;
+            color: white;
+        }
+
+        .step-label {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .step.active .step-label {
+            color: #2d5a87;
+            font-weight: 600;
+        }
+
+        .step-content {
+            display: none;
+        }
+
+        .step-content.active {
+            display: block;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #2d5a87;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1a3a5c;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #219a52;
+        }
+
+        .btn-warning {
+            background: #e67e22;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #d35400;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .data-section {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2d5a87;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .status-normal {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-conflict {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-missing {
+            background: #fce4ec;
+            color: #880e4f;
+        }
+
+        .status-old {
+            background: #e3f2fd;
+            color: #0d47a1;
+        }
+
+        .status-rejected {
+            background: #ffebee;
+            color: #b71c1c;
+        }
+
+        .conflict-evidence {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .conflict-evidence h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .conflict-item {
+            padding: 8px 0;
+            border-bottom: 1px dashed #ffeaa7;
+        }
+
+        .conflict-item:last-child {
+            border-bottom: none;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .tab.active {
+            color: #2d5a87;
+            border-bottom-color: #2d5a87;
+        }
+
+        .tab:hover {
+            color: #2d5a87;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .history-item {
+            padding: 12px;
+            border-left: 3px solid #2d5a87;
+            background: #f8f9fa;
+            margin-bottom: 10px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .history-item .time {
+            font-size: 11px;
+            color: #999;
+        }
+
+        .history-item .action {
+            font-weight: 600;
+            color: #2d5a87;
+        }
+
+        .history-item .details {
+            font-size: 13px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .row-select {
+            cursor: pointer;
+        }
+
+        .row-select.selected {
+            background: #e3f2fd !important;
+        }
+
+        .compare-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .compare-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+        }
+
+        .compare-box h4 {
+            color: #2d5a87;
+            margin-bottom: 10px;
+        }
+
+        .diff-highlight {
+            background: #ffebee;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .operator-info {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .operator-info input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>光伏板阴影遮挡试算系统</h1>
+        <p>追踪遮挡点、保留证据链、支持人工复核</p>
+    </div>
+
+    <div class="container">
+        <div class="operator-info">
+            <label>当前操作员：</label>
+            <input type="text" id="operatorName" placeholder="请输入您的姓名" value="展陈设计师阿景">
+            <button class="btn btn-secondary btn-sm" onclick="initSamples()">初始化测试样例</button>
+            <button class="btn btn-secondary btn-sm" onclick="refreshData()">刷新数据</button>
+        </div>
+
+        <div class="dashboard" id="dashboard">
+            <div class="stat-card">
+                <h3>巡检照片</h3>
+                <div class="value" id="statPhotos">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>CAD图层</h3>
+                <div class="value" id="statCad">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>遮挡点总数</h3>
+                <div class="value" id="statTotal">0</div>
+            </div>
+            <div class="stat-card warning">
+                <h3>待复核</h3>
+                <div class="value" id="statPending">0</div>
+            </div>
+            <div class="stat-card danger">
+                <h3>存在冲突</h3>
+                <div class="value" id="statConflict">0</div>
+            </div>
+        </div>
+
+        <div class="workflow">
+            <h2>处理流程</h2>
+            <div class="steps">
+                <div class="step active" data-step="1">
+                    <div class="step-number">1</div>
+                    <div class="step-label">导入巡检照片</div>
+                </div>
+                <div class="step" data-step="2">
+                    <div class="step-number">2</div>
+                    <div class="step-label">补看CAD图层名</div>
+                </div>
+                <div class="step" data-step="3">
+                    <div class="step-number">3</div>
+                    <div class="step-label">更新遮挡点清单</div>
+                </div>
+            </div>
+
+            <div class="step-content active" id="step1">
+                <h3 style="margin-bottom: 15px;">第一步：选择巡检照片</h3>
+                <div id="photosList"></div>
+                <div style="margin-top: 15px;">
+                    <button class="btn btn-primary" onclick="goToStep(2)">下一步：选择CAD图层</button>
+                </div>
+            </div>
+
+            <div class="step-content" id="step2">
+                <h3 style="margin-bottom: 15px;">第二步：选择对应CAD图层（可选）</h3>
+                <div id="cadList"></div>
+                <div style="margin-top: 15px; display: flex; gap: 10px;">
+                    <button class="btn btn-secondary" onclick="goToStep(1)">上一步</button>
+                    <button class="btn btn-primary" onclick="processShadowPoint()">生成遮挡点记录</button>
+                </div>
+            </div>
+
+            <div class="step-content" id="step3">
+                <h3 style="margin-bottom: 15px;">第三步：处理结果</h3>
+                <div id="processResult"></div>
+                <div style="margin-top: 15px;">
+                    <button class="btn btn-primary" onclick="goToStep(1); refreshData();">继续处理下一条</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="shadowPoints">遮挡点清单</div>
+            <div class="tab" data-tab="history">历史记录</div>
+            <div class="tab" data-tab="compare">数据对比</div>
+        </div>
+
+        <div class="tab-content active" id="shadowPoints">
+            <div class="data-section">
+                <div class="section-title">遮挡点清单</div>
+                <div id="shadowPointsTable"></div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="history">
+            <div class="data-section">
+                <div class="section-title">操作历史</div>
+                <div id="historyList"></div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="compare">
+            <div class="data-section">
+                <div class="section-title">数据对比</div>
+                <div class="compare-section">
+                    <div class="compare-box">
+                        <h4>遮挡点清单</h4>
+                        <div id="compareShadowPoints"></div>
+                    </div>
+                    <div class="compare-box">
+                        <h4>历史记录追踪</h4>
+                        <div id="compareHistory"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedPhotoId = null;
+        let selectedCadId = null;
+        let currentStep = 1;
+
+        function getOperator() {
+            return document.getElementById('operatorName').value || '系统';
+        }
+
+        async function initSamples() {
+            if (!confirm('确定要初始化测试样例吗？这将清空现有数据。')) return;
+            
+            try {
+                const res = await fetch('/api/samples/init', { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    alert('测试样例初始化成功！\n\n包含：\n- 3张巡检照片（正常/缺坐标/旧口径）\n- 1条坐标记录\n- 4个CAD图层');
+                    refreshData();
+                }
+            } catch (e) {
+                alert('初始化失败：' + e.message);
+            }
+        }
+
+        async function refreshData() {
+            await Promise.all([
+                loadDashboard(),
+                loadPhotos(),
+                loadCad(),
+                loadShadowPoints(),
+                loadHistory(),
+                loadCompareData()
+            ]);
+        }
+
+        async function loadDashboard() {
+            const res = await fetch('/api/dashboard');
+            const data = await res.json();
+            if (data.success) {
+                const s = data.data;
+                document.getElementById('statPhotos').textContent = s.totalPhotos;
+                document.getElementById('statCad').textContent = s.totalCadLayers;
+                document.getElementById('statTotal').textContent = s.totalShadowPoints;
+                document.getElementById('statPending').textContent = s.pendingReview;
+                document.getElementById('statConflict').textContent = s.statusBreakdown.conflict || 0;
+            }
+        }
+
+        async function loadPhotos() {
+            const res = await fetch('/api/photos');
+            const data = await res.json();
+            const photos = data.data || [];
+            
+            const html = photos.length === 0 ? 
+                '<div class="empty-state">暂无照片数据，请先初始化测试样例</div>' :
+                `<table>
+                    <thead>
+                        <tr>
+                            <th>选择</th>
+                            <th>照片编号</th>
+                            <th>光伏板ID</th>
+                            <th>位置</th>
+                            <th>阴影面积</th>
+                            <th>置信度</th>
+                            <th>备注</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${photos.map(p => `
+                            <tr class="row-select ${selectedPhotoId === p.id ? 'selected' : ''}" onclick="selectPhoto('${p.id}')">
+                                <td><input type="radio" name="photo" ${selectedPhotoId === p.id ? 'checked' : ''}></td>
+                                <td>${p.photoNo}</td>
+                                <td>${p.panelId || '-'}</td>
+                                <td>${p.position ? `(${p.position.x}, ${p.position.y})` : '-'}</td>
+                                <td>${p.shadowArea || '-'} m²</td>
+                                <td>${p.confidence ? (p.confidence * 100).toFixed(0) + '%' : '-'}</td>
+                                <td>${p.remark || '-'}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>`;
+            
+            document.getElementById('photosList').innerHTML = html;
+        }
+
+        async function loadCad() {
+            const res = await fetch('/api/cad');
+            const data = await res.json();
+            const layers = data.data || [];
+            
+            const html = layers.length === 0 ? 
+                '<div class="empty-state">暂无CAD图层数据</div>' :
+                `<table>
+                    <thead>
+                        <tr>
+                            <th>选择</th>
+                            <th>图层名</th>
+                            <th>光伏板ID</th>
+                            <th>坐标</th>
+                            <th>数据来源</th>
+                            <th>口径</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${layers.map(l => `
+                            <tr class="row-select ${selectedCadId === l.id ? 'selected' : ''}" onclick="selectCad('${l.id}')">
+                                <td><input type="radio" name="cad" ${selectedCadId === l.id ? 'checked' : ''}></td>
+                                <td>${l.layerName}</td>
+                                <td>${l.panelId || '-'}</td>
+                                <td>${l.coordinates ? `(${l.coordinates.x}, ${l.coordinates.y})` : '-'}</td>
+                                <td>${l.source || '-'}</td>
+                                <td>
+                                    <span class="status-badge ${l.isOldCaliber ? 'status-old' : 'status-normal'}">
+                                        ${l.isOldCaliber ? '旧口径' : '新口径'}
+                                    </span>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                <p style="margin-top: 10px; font-size: 12px; color: #999;">
+                    提示：也可以不选择CAD图层，直接用照片数据生成记录
+                </p>`;
+            
+            document.getElementById('cadList').innerHTML = html;
+        }
+
+        function selectPhoto(id) {
+            selectedPhotoId = id;
+            loadPhotos();
+        }
+
+        function selectCad(id) {
+            selectedCadId = selectedCadId === id ? null : id;
+            loadCad();
+        }
+
+        function goToStep(step) {
+            if (step === 2 && !selectedPhotoId) {
+                alert('请先选择一张巡检照片');
+                return;
+            }
+            
+            currentStep = step;
+            document.querySelectorAll('.step').forEach((el, i) => {
+                el.classList.remove('active', 'completed');
+                if (i + 1 < step) el.classList.add('completed');
+                if (i + 1 === step) el.classList.add('active');
+            });
+            
+            document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
+            document.getElementById(`step${step}`).classList.add('active');
+        }
+
+        async function processShadowPoint() {
+            if (!selectedPhotoId) {
+                alert('请选择照片');
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/shadow-points/process', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        photoId: selectedPhotoId,
+                        cadLayerId: selectedCadId,
+                        operator: getOperator()
+                    })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    displayProcessResult(data.data);
+                    goToStep(3);
+                    refreshData();
+                }
+            } catch (e) {
+                alert('处理失败：' + e.message);
+            }
+        }
+
+        function displayProcessResult(sp) {
+            const statusMap = {
+                'normal': { text: '正常', class: 'status-normal' },
+                'pending_review': { text: '待安全员复核', class: 'status-pending' },
+                'conflict': { text: '存在冲突', class: 'status-conflict' },
+                'missing_coordinate': { text: '坐标缺失', class: 'status-missing' },
+                'old_caliber': { text: '旧口径', class: 'status-old' }
+            };
+
+            const status = statusMap[sp.status] || { text: sp.status, class: '' };
+
+            let conflictHtml = '';
+            if (sp.conflicts && sp.conflicts.length > 0) {
+                conflictHtml = `
+                    <div class="conflict-evidence">
+                        <h4>⚠️ 冲突证据（请展陈设计师阿景确认）</h4>
+                        ${sp.conflicts.map(c => `
+                            <div class="conflict-item">
+                                <strong>${c.description}</strong><br>
+                                <span style="color: #666;">${c.evidence}</span><br>
+                                <small>
+                                    照片值: <span class="diff-highlight">${c.photoValue}</span> | 
+                                    CAD值: <span class="diff-highlight">${c.cadValue}</span>
+                                </small>
+                            </div>
+                        `).join('')}
+                        <div style="margin-top: 15px; display: flex; gap: 10px;">
+                            <button class="btn btn-success btn-sm" onclick="resolveConflict('${sp.id}', 'confirm')">
+                                ✓ 确认接受
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="resolveConflict('${sp.id}', 'reject')">
+                                ✗ 驳回重录
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            const html = `
+                <div style="padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <h4 style="margin-bottom: 15px;">遮挡点记录已生成</h4>
+                    <p><strong>照片编号：</strong>${sp.photoNo}</p>
+                    <p><strong>光伏板ID：</strong>${sp.panelId || '-'}</p>
+                    <p><strong>阴影面积：</strong>${sp.shadowArea || '-'} m²</p>
+                    <p><strong>状态：</strong><span class="status-badge ${status.class}">${status.text}</span></p>
+                    
+                    ${sp.statusDetails ? `
+                        <p><strong>状态详情：</strong></p>
+                        <ul style="margin: 10px 0 10px 20px;">
+                            ${sp.statusDetails.map(d => `<li>${d}</li>`).join('')}
+                        </ul>
+                    ` : ''}
+                    
+                    ${sp.isMissingCoordinate ? `
+                        <p style="color: #e67e22; margin-top: 10px;">
+                            ⚠️ 照片有点位标记，但坐标表中缺少对应行。已标记为待复核，留给安全员处理。
+                        </p>
+                    ` : ''}
+                    
+                    ${sp.isOldCaliber ? `
+                        <p style="color: #0d47a1; margin-top: 10px;">
+                            ℹ️ 该数据来自CAD旧口径图层（2023版），请留意口径差异。
+                        </p>
+                    ` : ''}
+                    
+                    ${conflictHtml}
+                    
+                    <p style="margin-top: 15px; font-size: 12px; color: #999;">
+                        处理人：${sp.processedBy} | 处理时间：${new Date(sp.processedAt).toLocaleString()}
+                    </p>
+                </div>
+            `;
+
+            document.getElementById('processResult').innerHTML = html;
+        }
+
+        async function resolveConflict(id, resolution) {
+            const action = resolution === 'confirm' ? '确认接受' : '驳回';
+            if (!confirm(`确定要${action}这条记录吗？`)) return;
+
+            try {
+                const res = await fetch(`/api/shadow-points/${id}/resolve-conflict`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        resolution,
+                        operator: getOperator()
+                    })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    alert(`${action}成功！`);
+                    refreshData();
+                }
+            } catch (e) {
+                alert('操作失败：' + e.message);
+            }
+        }
+
+        async function loadShadowPoints() {
+            const res = await fetch('/api/shadow-points');
+            const data = await res.json();
+            const points = data.data || [];
+
+            const statusMap = {
+                'normal': { text: '正常', class: 'status-normal' },
+                'pending_review': { text: '待复核', class: 'status-pending' },
+                'conflict': { text: '冲突', class: 'status-conflict' },
+                'missing_coordinate': { text: '坐标缺失', class: 'status-missing' },
+                'old_caliber': { text: '旧口径', class: 'status-old' }
+            };
+
+            const reviewMap = {
+                'pending': { text: '待处理', class: 'status-pending' },
+                'approved': { text: '已确认', class: 'status-normal' },
+                'rejected': { text: '已驳回', class: 'status-rejected' }
+            };
+
+            const html = points.length === 0 ? 
+                '<div class="empty-state">暂无遮挡点记录，请先处理照片数据</div>' :
+                `<table>
+                    <thead>
+                        <tr>
+                            <th>照片编号</th>
+                            <th>光伏板ID</th>
+                            <th>阴影面积</th>
+                            <th>状态</th>
+                            <th>复核状态</th>
+                            <th>坐标缺失</th>
+                            <th>旧口径</th>
+                            <th>处理人</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${points.map(p => {
+                            const st = statusMap[p.status] || { text: p.status, class: '' };
+                            const rv = reviewMap[p.reviewStatus] || { text: p.reviewStatus, class: '' };
+                            return `
+                                <tr>
+                                    <td>${p.photoNo}</td>
+                                    <td>${p.panelId || '-'}</td>
+                                    <td>${p.shadowArea || '-'} m²</td>
+                                    <td><span class="status-badge ${st.class}">${st.text}</span></td>
+                                    <td><span class="status-badge ${rv.class}">${rv.text}</span></td>
+                                    <td>${p.isMissingCoordinate ? '是' : '否'}</td>
+                                    <td>${p.isOldCaliber ? '是' : '否'}</td>
+                                    <td>${p.processedBy || '-'}</td>
+                                    <td class="action-buttons">
+                                        ${p.reviewStatus === 'pending' ? `
+                                            <button class="btn btn-success btn-sm" onclick="resolveConflict('${p.id}', 'confirm')">确认</button>
+                                            <button class="btn btn-danger btn-sm" onclick="resolveConflict('${p.id}', 'reject')">驳回</button>
+                                        ` : '-'}
+                                    </td>
+                                </tr>
+                                ${p.conflicts && p.conflicts.length > 0 ? `
+                                    <tr>
+                                        <td colspan="9" style="background: #fff3cd; padding: 10px 20px;">
+                                            <strong>冲突证据：</strong>
+                                            ${p.conflicts.map(c => c.evidence).join('；')}
+                                        </td>
+                                    </tr>
+                                ` : ''}
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>`;
+
+            document.getElementById('shadowPointsTable').innerHTML = html;
+        }
+
+        async function loadHistory() {
+            const res = await fetch('/api/history');
+            const data = await res.json();
+            const records = data.data || [];
+
+            const html = records.length === 0 ? 
+                '<div class="empty-state">暂无历史记录</div>' :
+                records.map(r => `
+                    <div class="history-item">
+                        <div class="time">${new Date(r.timestamp).toLocaleString()}</div>
+                        <div class="action">${r.action} - ${r.operator}</div>
+                        <div class="details">${r.details}</div>
+                    </div>
+                `).join('');
+
+            document.getElementById('historyList').innerHTML = html;
+        }
+
+        async function loadCompareData() {
+            const [spRes, histRes] = await Promise.all([
+                fetch('/api/shadow-points'),
+                fetch('/api/history')
+            ]);
+            const spData = await spRes.json();
+            const histData = await histRes.json();
+
+            const points = spData.data || [];
+            const records = histData.data || [];
+
+            document.getElementById('compareShadowPoints').innerHTML = 
+                points.length === 0 ? '<p style="color: #999;">暂无数据</p>' :
+                points.map(p => `
+                    <div style="padding: 8px 0; border-bottom: 1px solid #ddd;">
+                        <strong>${p.photoNo}</strong><br>
+                        状态: ${p.status} | 复核: ${p.reviewStatus}
+                    </div>
+                `).join('');
+
+            document.getElementById('compareHistory').innerHTML = 
+                records.length === 0 ? '<p style="color: #999;">暂无数据</p>' :
+                records.slice(0, 10).map(r => `
+                    <div style="padding: 8px 0; border-bottom: 1px solid #ddd; font-size: 12px;">
+                        <strong>${r.action}</strong> (${r.operator})<br>
+                        ${r.details}<br>
+                        <span style="color: #999;">${new Date(r.timestamp).toLocaleString()}</span>
+                    </div>
+                `).join('');
+        }
+
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        window.onload = refreshData;
+    </script>
+</body>
+</html>
