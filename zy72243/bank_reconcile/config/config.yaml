@@ -1,0 +1,19 @@
+database:
+  path: data/reconcile.db
+
+currency:
+  cny_symbol: ["CNY", "人民币", "¥"]
+  hkd_symbol: ["HKD", "港币", "HK$"]
+  mixed_column_keywords: ["金额", "交易金额", "收支金额"]
+
+roles:
+  custodian: "托管对接人"
+  operator: "对账运营阿芬"
+  auditor: "审计"
+
+audit_reasons:
+  mixed_currency: "港币和人民币写在同一列，需托管对接人复核"
+  missing_holiday_note: "缺少节假日顺延说明"
+  pending_review: "待复核"
+  reviewed: "已复核"
+  normal: "正常"

@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>交易详情 - {{ data.transaction.transaction_no }}</title>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Microsoft YaHei', sans-serif; background: #f5f7fa; padding: 20px; }
+        .breadcrumb { background: white; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .breadcrumb a { color: #667eea; text-decoration: none; }
+        .breadcrumb span { color: #666; margin: 0 8px; }
+        .container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .card.full { grid-column: 1 / -1; }
+        .card h2 { font-size: 18px; margin-bottom: 15px; color: #333; padding-bottom: 10px; border-bottom: 2px solid #f0f0f0; }
+        .info-row { display: flex; margin-bottom: 12px; }
+        .info-label { width: 140px; color: #666; font-size: 14px; }
+        .info-value { flex: 1; color: #333; font-weight: 500; }
+        .alert { padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+        .alert-danger { background: #fff5f5; border-left: 4px solid #e74c3c; }
+        .alert-warning { background: #fff9e6; border-left: 4px solid #f39c12; }
+        .alert-success { background: #e8f5e9; border-left: 4px solid #27ae60; }
+        .alert-title { font-weight: bold; margin-bottom: 8px; }
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; margin-left: 8px; }
+        .badge-danger { background: #ffebee; color: #c62828; }
+        .badge-success { background: #e8f5e9; color: #2e7d32; }
+        .badge-warning { background: #fff3e0; color: #e65100; }
+        .raw-amount { font-family: monospace; background: #f8f9fa; padding: 4px 8px; border-radius: 4px; font-size: 13px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; font-size: 13px; color: #666; }
+        .audit-table .pending { background: #fff9e6; }
+        .audit-table .resolved { background: #e8f5e9; }
+        .btn { display: inline-block; padding: 8px 16px; background: #667eea; color: white; border-radius: 6px; text-decoration: none; margin-right: 10px; border: none; cursor: pointer; font-size: 14px; }
+        .btn:hover { background: #5568d3; text-decoration: none; }
+        .btn-secondary { background: #95a5a6; }
+        .btn-danger { background: #e74c3c; }
+        .btn-success { background: #27ae60; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; color: #666; font-size: 14px; }
+        .form-group textarea, .form-group input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; font-family: inherit; }
+        .form-group textarea { min-height: 80px; }
+        .chart-container { height: 300px; }
+        .link-back { color: #667eea; text-decoration: none; font-size: 14px; }
+        .link-back:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="breadcrumb">
+        <a href="/">首页</a> <span>→</span>
+        <a href="/batch/{{ data.batch.batch_no }}">批次 {{ data.batch.batch_no }}</a> <span>→</span>
+        <span>交易 {{ data.transaction.transaction_no }}</span>
+    </div>
+
+    {% if data.transaction.has_mixed_currency %}
+    <div class="alert alert-danger">
+        <div class="alert-title">🔴 港币和人民币写在同一列，需托管对接人复核</div>
+        <div>金额列原始内容: <code class="raw-amount">{{ data.transaction.amount_column_raw }}</code></div>
+        <div style="margin-top: 10px;">
+            <a href="#batch-info" class="link-back">↓ 查看关联清算批次号</a> |
+            <a href="#holiday-info" class="link-back">↓ 查看节假日顺延说明</a>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="container">
+        <div class="card">
+            <h2>📊 交易信息</h2>
+            <div class="info-row">
+                <span class="info-label">流水号</span>
+                <span class="info-value">{{ data.transaction.transaction_no }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">交易日期</span>
+                <span class="info-value">{{ data.transaction.transaction_date }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">摘要</span>
+                <span class="info-value">{{ data.transaction.summary }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">对方账户</span>
+                <span class="info-value">{{ data.transaction.counterparty or '-' }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">金额列原始内容</span>
+                <span class="info-value"><code class="raw-amount">{{ data.transaction.amount_column_raw }}</code></span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">解析金额</span>
+                <span class="info-value">{{ "%.2f"|format(data.transaction.amount) }} {{ data.transaction.currency }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">币种混合</span>
+                <span class="info-value">
+                    {% if data.transaction.has_mixed_currency %}
+                    <span class="badge badge-danger">是 - 检测到: {{ data.transaction.detected_currencies }}</span>
+                    {% else %}
+                    <span class="badge badge-success">否</span>
+                    {% endif %}
+                </span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">已复核</span>
+                <span class="info-value">
+                    {% if data.transaction.is_reviewed %}
+                    <span class="badge badge-success">是 - {{ data.transaction.reviewed_by }}</span>
+                    {% else %}
+                    <span class="badge badge-warning">否</span>
+                    {% endif %}
+                </span>
+            </div>
+            {% if data.transaction.review_note %}
+            <div class="info-row">
+                <span class="info-label">复核意见</span>
+                <span class="info-value">{{ data.transaction.review_note }}</span>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="card" id="batch-info">
+            <h2>📦 关联清算批次</h2>
+            <div class="info-row">
+                <span class="info-label">批次号</span>
+                <span class="info-value"><a href="/batch/{{ data.batch.batch_no }}">{{ data.batch.batch_no }}</a></span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">来源文件</span>
+                <span class="info-value">{{ data.batch.source_file }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">导入时间</span>
+                <span class="info-value">{{ data.batch.import_date }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">状态</span>
+                <span class="info-value">{{ data.batch.status }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">总记录数</span>
+                <span class="info-value">{{ data.batch.total_records }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">币种混合数</span>
+                <span class="info-value {% if data.batch.mixed_currency_count > 0 %}alert-danger{% endif %}">{{ data.batch.mixed_currency_count }}</span>
+            </div>
+        </div>
+
+        <div class="card full" id="holiday-info">
+            <h2>📅 节假日顺延说明</h2>
+            {% if data.holiday_notes %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>原日期</th>
+                        <th>调整后日期</th>
+                        <th>原因</th>
+                        <th>运营备注</th>
+                        <th>操作人</th>
+                        <th>操作时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for h in data.holiday_notes %}
+                    <tr>
+                        <td>{{ h.original_date }}</td>
+                        <td>{{ h.adjusted_date }}</td>
+                        <td>{{ h.reason }}</td>
+                        <td>{{ h.operator_note or '-' }}</td>
+                        <td>{{ h.applied_by }}</td>
+                        <td>{{ h.applied_at }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="alert alert-warning">
+                <div class="alert-title">⚠️ 缺少节假日顺延说明</div>
+                <div>请对账运营阿芬补录相关说明</div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="card full">
+            <h2>📝 审计明细</h2>
+            <table class="audit-table">
+                <thead>
+                    <tr>
+                        <th>类型</th>
+                        <th>状态</th>
+                        <th>为什么被留下</th>
+                        <th>还缺什么材料</th>
+                        <th>下一步该找谁</th>
+                        <th>责任人</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for audit in data.audits %}
+                    <tr class="{% if audit.is_resolved %}resolved{% else %}pending{% endif %}">
+                        <td>
+                            {% if audit.audit_type == 'mixed_currency' %}
+                            <span class="badge badge-danger">币种混合</span>
+                            {% else %}
+                            <span class="badge badge-warning">节假日说明</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if audit.is_resolved %}
+                            <span class="badge badge-success">已解决</span>
+                            {% else %}
+                            <span class="badge badge-warning">待处理</span>
+                            {% endif %}
+                            {{ audit.status }}
+                        </td>
+                        <td>{{ audit.reason }}</td>
+                        <td>{{ audit.missing_materials or '无' }}</td>
+                        <td>{{ audit.next_action }}</td>
+                        <td>{{ audit.responsible_party }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if data.transaction.has_mixed_currency and not data.transaction.is_reviewed %}
+        <div class="card full">
+            <h2>✍️ 托管对接人复核</h2>
+            <div class="alert alert-warning">
+                <div class="alert-title">⚠️ 关键操作：别急着归正常</div>
+                <div>只有确认币种标注无误时，才标记为正常。否则仅填写复核意见，保留待复核状态。</div>
+            </div>
+            <form id="reviewForm">
+                <input type="hidden" name="transaction_id" value="{{ data.transaction.id }}">
+                <div class="form-group">
+                    <label>复核意见 *</label>
+                    <textarea name="review_note" required placeholder="请填写复核意见..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>复核人</label>
+                    <input type="text" name="reviewed_by" placeholder="默认：托管对接人">
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="mark_normal" value="true">
+                        <strong>确认标记为正常（谨慎勾选）</strong>
+                    </label>
+                </div>
+                <button type="submit" class="btn">提交复核</button>
+                <button type="submit" class="btn btn-success" onclick="document.getElementsByName('mark_normal')[0].checked=true;">复核并标记为正常</button>
+            </form>
+        </div>
+        {% endif %}
+
+        <div class="card full">
+            <h2>📊 币种分布3D视图</h2>
+            <div class="chart-container" id="currencyChart"></div>
+            <p style="margin-top: 10px; color: #666; font-size: 13px;">
+                💡 点击红色/橙色点可跳转到对应交易详情；当前交易已高亮显示
+            </p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('reviewForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            var formData = {
+                transaction_id: parseInt(this.transaction_id.value),
+                review_note: this.review_note.value,
+                reviewed_by: this.reviewed_by.value || '托管对接人',
+                mark_normal: this.mark_normal.checked
+            };
+
+            fetch('/api/review', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            }).then(r => r.json()).then(data => {
+                if (data.success) {
+                    alert('✅ 复核成功！页面将刷新');
+                    location.reload();
+                } else {
+                    alert('❌ 复核失败: ' + data.error);
+                }
+            });
+        });
+
+        var chartData = {{ chart_data | tojson }};
+        if (chartData && chartData.data) {
+            var traces = chartData.data.map(function(series) {
+                var isHighlight = false;
+                var marker = {
+                    size: series.name.indexOf('⚠️') >= 0 ? 12 : 8,
+                    color: series.color,
+                    line: { width: 2, color: 'white' }
+                };
+                return {
+                    x: series.points.map(function(p) { return p.x; }),
+                    y: series.points.map(function(p) { return p.y; }),
+                    z: series.points.map(function(p) { return p.z; }),
+                    mode: 'markers',
+                    marker: marker,
+                    name: series.name,
+                    text: series.points.map(function(p) {
+                        return p.transaction_no + '<br>金额: ' + p.y + '<br>' + (p.summary || '');
+                    }),
+                    customdata: series.points,
+                    hoverinfo: 'text'
+                };
+            });
+
+            var layout = {
+                title: chartData.title,
+                scene: {
+                    xaxis: { title: chartData.labels.x },
+                    yaxis: { title: chartData.labels.y },
+                    zaxis: { title: chartData.labels.z }
+                },
+                height: 300,
+                margin: { l: 0, r: 0, t: 40, b: 0 }
+            };
+
+            Plotly.newPlot('currencyChart', traces, layout);
+
+            document.getElementById('currencyChart').on('plotly_click', function(data) {
+                var point = data.points[0];
+                if (point && point.customdata && point.customdata.transaction_id) {
+                    window.location.href = '/transaction/' + point.customdata.transaction_id;
+                }
+            });
+        }
+    </script>
+</body>
+</html>

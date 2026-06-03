@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>银行流水摘要归并 - 小看板</title>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Microsoft YaHei', sans-serif; background: #f5f7fa; padding: 20px; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+        .header h1 { font-size: 24px; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .stat-card h3 { font-size: 14px; color: #666; margin-bottom: 10px; }
+        .stat-card .number { font-size: 32px; font-weight: bold; color: #333; }
+        .stat-card.warning .number { color: #e74c3c; }
+        .container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .card h2 { font-size: 18px; margin-bottom: 15px; color: #333; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; font-size: 13px; color: #666; }
+        tr:hover { background: #f8f9fa; }
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; }
+        .badge-danger { background: #ffebee; color: #c62828; }
+        .badge-warning { background: #fff3e0; color: #e65100; }
+        .badge-success { background: #e8f5e9; color: #2e7d32; }
+        .badge-info { background: #e3f2fd; color: #1565c0; }
+        a { color: #667eea; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .pending-item { padding: 10px; border-left: 4px solid #f39c12; margin-bottom: 10px; background: #fff9e6; border-radius: 4px; }
+        .pending-item.danger { border-left-color: #e74c3c; background: #fff5f5; }
+        .pending-item .type { font-weight: bold; font-size: 13px; }
+        .pending-item .desc { font-size: 12px; color: #666; margin-top: 5px; }
+        .pending-item .action { font-size: 12px; color: #667eea; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏦 银行流水摘要归并 - 小看板</h1>
+        <p style="margin-top: 8px; opacity: 0.9;">导入 → 检测币种混合 → 复核 → 审计报告</p>
+    </div>
+
+    <div class="stats">
+        <div class="stat-card warning">
+            <h3>待处理项</h3>
+            <div class="number">{{ pending_count }}</div>
+        </div>
+        <div class="stat-card">
+            <h3>批次总数</h3>
+            <div class="number">{{ batches|length }}</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <h2>📦 清算批次列表</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>批次号</th>
+                        <th>状态</th>
+                        <th>总记录</th>
+                        <th>币种混合</th>
+                        <th>导入时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for b in batches %}
+                    <tr>
+                        <td><a href="/batch/{{ b.batch_no }}">{{ b.batch_no }}</a></td>
+                        <td>
+                            {% if b.status == 'imported' %}
+                            <span class="badge badge-info">已导入</span>
+                            {% elif b.status == 'detected' %}
+                            <span class="badge badge-warning">已检测</span>
+                            {% elif b.status == 'holiday_applied' %}
+                            <span class="badge badge-success">节假日已补录</span>
+                            {% else %}
+                            <span class="badge">{{ b.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ b.total_records }}</td>
+                        <td>
+                            {% if b.mixed_currency_count > 0 %}
+                            <span class="badge badge-danger">{{ b.mixed_currency_count }} ⚠️</span>
+                            {% else %}
+                            <span class="badge badge-success">0</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ b.import_date }}</td>
+                        <td>
+                            <a href="/visualization/{{ b.batch_no }}">📊 图表</a> |
+                            <a href="/api/report/{{ b.batch_no }}?format=html">📄 报告</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>⏳ 待处理复核项</h2>
+            {% if pending_items %}
+                {% for item in pending_items %}
+                <div class="pending-item {% if item.audit_type == 'mixed_currency' %}danger{% endif %}">
+                    <div class="type">
+                        {% if item.audit_type == 'mixed_currency' %}
+                        🔴 港币人民币同列
+                        {% else %}
+                        🟡 缺少节假日顺延说明
+                        {% endif %}
+                    </div>
+                    <div class="desc">{{ item.reason }}</div>
+                    <div class="desc">责任人: {{ item.responsible_party }}</div>
+                    <div class="action">
+                        {% if item.transaction_id %}
+                        <a href="/transaction/{{ item.transaction_id }}">查看详情 →</a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p style="color: #666;">✅ 暂无待处理项</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

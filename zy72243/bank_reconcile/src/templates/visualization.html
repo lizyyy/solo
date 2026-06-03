@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>3D/图表展示 - {{ batch_no }}</title>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Microsoft YaHei', sans-serif; background: #f5f7fa; padding: 20px; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+        .header h1 { font-size: 22px; }
+        .header a { color: white; text-decoration: underline; }
+        .container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .card.full { grid-column: 1 / -1; }
+        .card h2 { font-size: 18px; margin-bottom: 15px; color: #333; }
+        .chart-container { height: 450px; }
+        .chart-container.small { height: 350px; }
+        .alert { padding: 15px; border-radius: 8px; margin-bottom: 15px; background: #fff9e6; border-left: 4px solid #f39c12; }
+        .alert-title { font-weight: bold; margin-bottom: 8px; }
+        .btn { display: inline-block; padding: 8px 16px; background: #667eea; color: white; border-radius: 6px; text-decoration: none; margin-right: 10px; }
+        .btn:hover { background: #5568d3; text-decoration: none; }
+        .btn-secondary { background: #95a5a6; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 3D/图表展示 - 清算批次 {{ batch_no }}</h1>
+        <p style="margin-top: 8px; opacity: 0.9;">
+            <a href="/">← 返回首页</a> |
+            <a href="/batch/{{ batch_no }}">查看批次详情</a> |
+            <a href="/api/report/{{ batch_no }}?format=html" target="_blank">查看审计报告</a>
+        </p>
+    </div>
+
+    <div class="alert">
+        <div class="alert-title">💡 图表使用说明</div>
+        <div>点击3D图中的红色/橙色点（币种混合标记），可跳转到交易详情页，查看关联的清算批次号和节假日顺延说明。</div>
+        <div style="margin-top: 8px;">⚠️ 这些币种混合的记录不会自动归为正常，需托管对接人手动复核。</div>
+    </div>
+
+    <div class="container">
+        <div class="card full">
+            <h2>🎯 币种分布3D散点图</h2>
+            <p style="color: #666; margin-bottom: 10px; font-size: 14px;">
+                X轴: 交易序号 | Y轴: 金额 | Z轴: 时间轴<br>
+                <span style="color: #e74c3c;">●</span> 红色: CNY币种混合 |
+                <span style="color: #f39c12;">●</span> 橙色: HKD币种混合 |
+                <span style="color: #2ecc71;">●</span> 绿色: CNY正常 |
+                <span style="color: #3498db;">●</span> 蓝色: HKD正常
+            </p>
+            <div class="chart-container" id="currency3dChart"></div>
+        </div>
+
+        <div class="card">
+            <h2>🥧 审计状态分布</h2>
+            <div class="chart-container small" id="auditPieChart"></div>
+        </div>
+
+        <div class="card">
+            <h2>🥧 复核状态分布</h2>
+            <div class="chart-container small" id="reviewPieChart"></div>
+        </div>
+
+        <div class="card full">
+            <h2>⏱️ 处理时间线</h2>
+            <div class="chart-container small" id="timelineChart"></div>
+        </div>
+    </div>
+
+    <script>
+        var currency3d = {{ currency_3d | tojson }};
+        var statusPie = {{ status_pie | tojson }};
+        var timeline = {{ timeline | tojson }};
+
+        if (currency3d && currency3d.data) {
+            var traces = currency3d.data.map(function(series) {
+                return {
+                    x: series.points.map(function(p) { return p.x; }),
+                    y: series.points.map(function(p) { return p.y; }),
+                    z: series.points.map(function(p) { return p.z; }),
+                    mode: 'markers',
+                    marker: {
+                        size: series.name.indexOf('⚠️') >= 0 ? 14 : 8,
+                        color: series.color,
+                        line: { width: 2, color: 'white' },
+                        opacity: series.name.indexOf('⚠️') >= 0 ? 1.0 : 0.7
+                    },
+                    name: series.name,
+                    text: series.points.map(function(p) {
+                        return p.transaction_no + '<br>金额: ' + p.y + '<br>' + (p.summary || '');
+                    }),
+                    customdata: series.points,
+                    hoverinfo: 'text'
+                };
+            });
+
+            var layout = {
+                title: currency3d.title,
+                scene: {
+                    xaxis: { title: currency3d.labels.x },
+                    yaxis: { title: currency3d.labels.y },
+                    zaxis: { title: currency3d.labels.z },
+                    camera: { eye: { x: 1.5, y: 1.5, z: 1.5 } }
+                },
+                height: 450,
+                margin: { l: 0, r: 0, t: 40, b: 0 }
+            };
+
+            Plotly.newPlot('currency3dChart', traces, layout);
+
+            document.getElementById('currency3dChart').on('plotly_click', function(data) {
+                var point = data.points[0];
+                if (point && point.customdata && point.customdata.transaction_id) {
+                    window.location.href = '/transaction/' + point.customdata.transaction_id;
+                }
+            });
+        }
+
+        if (statusPie && statusPie.audit_status) {
+            var auditTrace = {
+                type: 'pie',
+                labels: statusPie.audit_status.map(function(d) { return d.name; }),
+                values: statusPie.audit_status.map(function(d) { return d.value; }),
+                marker: { colors: statusPie.audit_status.map(function(d) { return d.color; }) },
+                textinfo: 'label+percent',
+                hole: 0.4
+            };
+            Plotly.newPlot('auditPieChart', [auditTrace], { title: '审计项完成情况', height: 350 });
+        }
+
+        if (statusPie && statusPie.review_status) {
+            var reviewTrace = {
+                type: 'pie',
+                labels: statusPie.review_status.map(function(d) { return d.name; }),
+                values: statusPie.review_status.map(function(d) { return d.value; }),
+                marker: { colors: statusPie.review_status.map(function(d) { return d.color; }) },
+                textinfo: 'label+percent',
+                hole: 0.4
+            };
+            Plotly.newPlot('reviewPieChart', [reviewTrace], { title: '交易复核情况', height: 350 });
+        }
+
+        if (timeline && timeline.events) {
+            var timelineTrace = {
+                x: timeline.events.map(function(e) { return e.date; }),
+                y: timeline.events.map(function(e, i) { return i; }),
+                mode: 'markers+text',
+                marker: {
+                    size: 15,
+                    color: timeline.events.map(function(e) { return e.color; }),
+                    line: { width: 2, color: 'white' }
+                },
+                text: timeline.events.map(function(e) { return e.title; }),
+                textposition: 'top center',
+                customdata: timeline.events,
+                hovertext: timeline.events.map(function(e) {
+                    return e.title + '<br>' + e.description + '<br>' + e.date;
+                }),
+                hoverinfo: 'text'
+            };
+
+            var shapes = timeline.events.map(function(e, i) {
+                return {
+                    type: 'line',
+                    x0: e.date, y0: -0.5, x1: e.date, y1: i,
+                    line: { color: e.color, width: 2, dash: 'dot' }
+                };
+            });
+
+            var timelineLayout = {
+                title: timeline.title,
+                height: 350,
+                showlegend: false,
+                yaxis: {
+                    showticklabels: false,
+                    range: [-1, timeline.events.length]
+                },
+                xaxis: { type: 'date' },
+                shapes: shapes,
+                margin: { l: 50, r: 50, t: 40, b: 50 }
+            };
+
+            Plotly.newPlot('timelineChart', [timelineTrace], timelineLayout);
+
+            document.getElementById('timelineChart').on('plotly_click', function(data) {
+                var point = data.points[0];
+                if (point && point.customdata && point.customdata.transaction_id) {
+                    window.location.href = '/transaction/' + point.customdata.transaction_id;
+                }
+            });
+        }
+    </script>
+</body>
+</html>

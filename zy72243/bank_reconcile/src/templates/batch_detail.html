@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>批次详情 - {{ batch.batch_no }}</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Microsoft YaHei', sans-serif; background: #f5f7fa; padding: 20px; }
+        .header { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .header h1 { font-size: 22px; color: #333; margin-bottom: 15px; }
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; }
+        .info-item { background: #f8f9fa; padding: 12px; border-radius: 6px; }
+        .info-item .label { font-size: 12px; color: #666; }
+        .info-item .value { font-size: 18px; font-weight: bold; color: #333; }
+        .danger { color: #e74c3c !important; }
+        .success { color: #27ae60 !important; }
+        .card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .card h2 { font-size: 18px; margin-bottom: 15px; color: #333; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; font-size: 13px; color: #666; }
+        tr.mixed { background: #fff5f5; }
+        tr:hover { background: #f8f9fa; }
+        tr.mixed:hover { background: #ffebee; }
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; }
+        .badge-danger { background: #ffebee; color: #c62828; }
+        .badge-success { background: #e8f5e9; color: #2e7d32; }
+        .badge-warning { background: #fff3e0; color: #e65100; }
+        a { color: #667eea; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .btn { display: inline-block; padding: 8px 16px; background: #667eea; color: white; border-radius: 6px; text-decoration: none; margin-right: 10px; }
+        .btn:hover { background: #5568d3; text-decoration: none; }
+        .btn-secondary { background: #95a5a6; }
+        .btn-danger { background: #e74c3c; }
+        .raw-amount { font-family: monospace; background: #f8f9fa; padding: 2px 6px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📦 清算批次详情: {{ batch.batch_no }}</h1>
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="label">状态</div>
+                <div class="value">{{ batch.status }}</div>
+            </div>
+            <div class="info-item">
+                <div class="label">总记录数</div>
+                <div class="value">{{ batch.total_records }}</div>
+            </div>
+            <div class="info-item">
+                <div class="label">币种混合数</div>
+                <div class="value {% if batch.mixed_currency_count > 0 %}danger{% else %}success{% endif %}">{{ batch.mixed_currency_count }}</div>
+            </div>
+            <div class="info-item">
+                <div class="label">导入时间</div>
+                <div class="value" style="font-size: 14px;">{{ batch.import_date }}</div>
+            </div>
+        </div>
+        <div style="margin-top: 20px;">
+            <a href="/" class="btn">← 返回首页</a>
+            <a href="/visualization/{{ batch.batch_no }}" class="btn btn-secondary">📊 3D图表</a>
+            <a href="/api/report/{{ batch.batch_no }}?format=html" class="btn btn-secondary" target="_blank">📄 审计报告</a>
+            <a href="/api/report/{{ batch.batch_no }}?format=text" class="btn btn-secondary" target="_blank">📝 文本报告</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>📋 交易明细</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>流水号</th>
+                    <th>日期</th>
+                    <th>摘要</th>
+                    <th>金额列原始内容</th>
+                    <th>金额</th>
+                    <th>币种</th>
+                    <th>币种混合</th>
+                    <th>已复核</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for txn in transactions %}
+                <tr class="{% if txn.has_mixed_currency %}mixed{% endif %}">
+                    <td>{{ txn.transaction_no }}</td>
+                    <td>{{ txn.transaction_date.strftime('%Y-%m-%d') if txn.transaction_date else '-' }}</td>
+                    <td>{{ txn.summary[:30] }}{% if txn.summary|length > 30 %}...{% endif %}</td>
+                    <td><code class="raw-amount">{{ txn.amount_column_raw }}</code></td>
+                    <td style="text-align: right;">{{ "%.2f"|format(txn.amount) }}</td>
+                    <td>{{ txn.currency }}</td>
+                    <td>
+                        {% if txn.has_mixed_currency %}
+                        <span class="badge badge-danger">是 ⚠️ {{ txn.detected_currencies }}</span>
+                        {% else %}
+                        <span class="badge badge-success">否</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if txn.is_reviewed %}
+                        <span class="badge badge-success">是</span>
+                        {% else %}
+                        <span class="badge badge-warning">否</span>
+                        {% endif %}
+                    </td>
+                    <td><a href="/transaction/{{ txn.id }}">查看详情 →</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
