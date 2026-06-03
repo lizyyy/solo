@@ -1,0 +1,9 @@
+﻿row_number,timestamp,metric_name,numerator,denominator,raw_denominator,ratio,anomaly_type,process_status,source_screenshot_ref,teacher_comment,manual_modifications,boundary_rule_triggered,review_note,created_at,updated_at
+1,2024-01-01,转化率A,100.0,200.0,200.0,0.5,normal,imported,,,[],,,2026-06-04T06:35:12.275272,2026-06-04T06:35:12.275509
+2,2024-01-01,转化率B,50.0,,,,normal,finalized,,分母为空需复核，可能是数据录入错误,[],zero_denominator_empty_string,确认分母应为100，录入时遗漏,2026-06-04T06:35:12.275341,2026-06-04T06:35:12.275618
+3,2024-01-01,转化率C,300.0,0.0,0.0,,abnormal,finalized,,分母为0但原始公式截图显示为空字符串,[],,分母为空字符串，按0处理，标记为异常,2026-06-04T06:35:12.275375,2026-06-04T06:35:12.275622
+4,2024-01-02,转化率A,150.0,100.0,100.0,1.5,normal,imported,,,[],,,2026-06-04T06:35:12.275404,2026-06-04T06:35:12.275522
+5,2024-01-02,转化率B,80.0,400.0,400.0,0.2,abnormal,imported,,,[],outlier_threshold,,2026-06-04T06:35:12.275428,2026-06-04T06:35:12.275526
+6,2024-01-02,转化率C,25.0,,,,boundary_case,finalized,,空值记录，待与数据源方确认,[],zero_denominator_empty_string,数据缺失，无法计算，保留边界案例标记,2026-06-04T06:35:12.275450,2026-06-04T06:35:12.275626
+7,2024-01-03,转化率A,90.0,180.0,180.0,0.5,normal,imported,,,[],,,2026-06-04T06:35:12.275472,2026-06-04T06:35:12.275533
+8,2024-01-03,转化率B,0.0,50.0,50.0,0.0,abnormal,imported,,,[],outlier_threshold,,2026-06-04T06:35:12.275494,2026-06-04T06:35:12.275536

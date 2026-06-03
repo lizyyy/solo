@@ -1,0 +1,14 @@
+{
+  "2": {
+    "review_note": "确认分母应为100，录入时遗漏",
+    "final_anomaly_type": "normal"
+  },
+  "3": {
+    "review_note": "分母为空字符串，按0处理，标记为异常",
+    "final_anomaly_type": "abnormal"
+  },
+  "6": {
+    "review_note": "数据缺失，无法计算，保留边界案例标记",
+    "final_anomaly_type": "boundary_case"
+  }
+}

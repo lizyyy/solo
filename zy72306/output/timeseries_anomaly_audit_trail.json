@@ -1,0 +1,203 @@
+[
+  {
+    "row_number": 1,
+    "action": "import",
+    "old_status": "imported",
+    "new_status": "imported",
+    "actor": "数据分析师小祁",
+    "timestamp": "2026-06-04T06:35:12.275502",
+    "details": {
+      "screenshot_ref": "screenshot_001"
+    },
+    "comment": "从旧公式截图导入数据"
+  },
+  {
+    "row_number": 2,
+    "action": "import",
+    "old_status": "imported",
+    "new_status": "imported",
+    "actor": "数据分析师小祁",
+    "timestamp": "2026-06-04T06:35:12.275513",
+    "details": {
+      "screenshot_ref": "screenshot_002"
+    },
+    "comment": "从旧公式截图导入数据"
+  },
+  {
+    "row_number": 3,
+    "action": "import",
+    "old_status": "imported",
+    "new_status": "imported",
+    "actor": "数据分析师小祁",
+    "timestamp": "2026-06-04T06:35:12.275517",
+    "details": {
+      "screenshot_ref": "screenshot_003"
+    },
+    "comment": "从旧公式截图导入数据"
+  },
+  {
+    "row_number": 4,
+    "action": "import",
+    "old_status": "imported",
+    "new_status": "imported",
+    "actor": "数据分析师小祁",
+    "timestamp": "2026-06-04T06:35:12.275521",
+    "details": {
+      "screenshot_ref": "screenshot_004"
+    },
+    "comment": "从旧公式截图导入数据"
+  },
+  {
+    "row_number": 5,
+    "action": "import",
+    "old_status": "imported",
+    "new_status": "imported",
+    "actor": "数据分析师小祁",
+    "timestamp": "2026-06-04T06:35:12.275524",
+    "details": {
+      "screenshot_ref": "screenshot_005"
+    },
+    "comment": "从旧公式截图导入数据"
+  },
+  {
+    "row_number": 6,
+    "action": "import",
+    "old_status": "imported",
+    "new_status": "imported",
+    "actor": "数据分析师小祁",
+    "timestamp": "2026-06-04T06:35:12.275528",
+    "details": {
+      "screenshot_ref": "screenshot_006"
+    },
+    "comment": "从旧公式截图导入数据"
+  },
+  {
+    "row_number": 7,
+    "action": "import",
+    "old_status": "imported",
+    "new_status": "imported",
+    "actor": "数据分析师小祁",
+    "timestamp": "2026-06-04T06:35:12.275531",
+    "details": {
+      "screenshot_ref": "screenshot_007"
+    },
+    "comment": "从旧公式截图导入数据"
+  },
+  {
+    "row_number": 8,
+    "action": "import",
+    "old_status": "imported",
+    "new_status": "imported",
+    "actor": "数据分析师小祁",
+    "timestamp": "2026-06-04T06:35:12.275534",
+    "details": {
+      "screenshot_ref": "screenshot_008"
+    },
+    "comment": "从旧公式截图导入数据"
+  },
+  {
+    "row_number": 2,
+    "action": "add_teacher_comment",
+    "old_status": "imported",
+    "new_status": "pending_review",
+    "actor": "数据分析师小祁",
+    "timestamp": "2026-06-04T06:35:12.275564",
+    "details": {
+      "comment": "分母为空需复核，可能是数据录入错误"
+    },
+    "comment": "数据分析师小祁补充老师批注，进入待复核状态"
+  },
+  {
+    "row_number": 3,
+    "action": "add_teacher_comment",
+    "old_status": "imported",
+    "new_status": "pending_review",
+    "actor": "数据分析师小祁",
+    "timestamp": "2026-06-04T06:35:12.275570",
+    "details": {
+      "comment": "分母为0但原始公式截图显示为空字符串"
+    },
+    "comment": "数据分析师小祁补充老师批注，进入待复核状态"
+  },
+  {
+    "row_number": 6,
+    "action": "add_teacher_comment",
+    "old_status": "imported",
+    "new_status": "pending_review",
+    "actor": "数据分析师小祁",
+    "timestamp": "2026-06-04T06:35:12.275576",
+    "details": {
+      "comment": "空值记录，待与数据源方确认"
+    },
+    "comment": "数据分析师小祁补充老师批注，进入待复核状态"
+  },
+  {
+    "row_number": 2,
+    "action": "review_complete",
+    "old_status": "pending_review",
+    "new_status": "reviewed",
+    "actor": "数据复核人",
+    "timestamp": "2026-06-04T06:35:12.275601",
+    "details": {
+      "review_note": "确认分母应为100，录入时遗漏",
+      "final_anomaly_type": "normal"
+    },
+    "comment": "数据复核人完成复核"
+  },
+  {
+    "row_number": 3,
+    "action": "review_complete",
+    "old_status": "pending_review",
+    "new_status": "reviewed",
+    "actor": "数据复核人",
+    "timestamp": "2026-06-04T06:35:12.275608",
+    "details": {
+      "review_note": "分母为空字符串，按0处理，标记为异常",
+      "final_anomaly_type": "abnormal"
+    },
+    "comment": "数据复核人完成复核"
+  },
+  {
+    "row_number": 6,
+    "action": "review_complete",
+    "old_status": "pending_review",
+    "new_status": "reviewed",
+    "actor": "数据复核人",
+    "timestamp": "2026-06-04T06:35:12.275614",
+    "details": {
+      "review_note": "数据缺失，无法计算，保留边界案例标记",
+      "final_anomaly_type": "boundary_case"
+    },
+    "comment": "数据复核人完成复核"
+  },
+  {
+    "row_number": 2,
+    "action": "finalize",
+    "old_status": "reviewed",
+    "new_status": "finalized",
+    "actor": "课堂演示",
+    "timestamp": "2026-06-04T06:35:12.275620",
+    "details": {},
+    "comment": "课堂演示结果更新，结果已最终确认"
+  },
+  {
+    "row_number": 3,
+    "action": "finalize",
+    "old_status": "reviewed",
+    "new_status": "finalized",
+    "actor": "课堂演示",
+    "timestamp": "2026-06-04T06:35:12.275624",
+    "details": {},
+    "comment": "课堂演示结果更新，结果已最终确认"
+  },
+  {
+    "row_number": 6,
+    "action": "finalize",
+    "old_status": "reviewed",
+    "new_status": "finalized",
+    "actor": "课堂演示",
+    "timestamp": "2026-06-04T06:35:12.275627",
+    "details": {},
+    "comment": "课堂演示结果更新，结果已最终确认"
+  }
+]
