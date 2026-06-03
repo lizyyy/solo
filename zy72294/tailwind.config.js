@@ -1,0 +1,87 @@
+/** @type {import('tailwindcss').Config} */
+
+export default {
+  darkMode: "class",
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  theme: {
+    extend: {
+      colors: {
+        industrial: {
+          50: "#f5f8fc",
+          100: "#e9eff7",
+          200: "#cdd9e9",
+          300: "#9fb5d4",
+          400: "#6a8cba",
+          500: "#446b9e",
+          600: "#2e5282",
+          700: "#1e3a5f",
+          800: "#1a3251",
+          900: "#172b44",
+          950: "#0f1d30",
+        },
+        warning: {
+          50: "#fff5f0",
+          100: "#ffe9dd",
+          200: "#ffceb7",
+          300: "#ffaa84",
+          400: "#ff8957",
+          500: "#ff6b35",
+          600: "#ed5014",
+          700: "#c43d0e",
+          800: "#9c3311",
+          900: "#7f2e14",
+          950: "#451407",
+        },
+        success: {
+          50: "#f0f7f4",
+          100: "#dbede5",
+          200: "#b9dacb",
+          300: "#8dc0a6",
+          400: "#5a9d7e",
+          500: "#397f60",
+          600: "#2d6a4f",
+          700: "#255540",
+          800: "#204436",
+          900: "#1c392e",
+          950: "#0d1f19",
+        },
+        caution: {
+          50: "#fefaf5",
+          100: "#fdf2e4",
+          200: "#f9e1c4",
+          300: "#f4c995",
+          400: "#edab5e",
+          500: "#e89139",
+          600: "#f4a261",
+          700: "#e78434",
+          800: "#bc672e",
+          900: "#98542b",
+          950: "#522914",
+        },
+      },
+      fontFamily: {
+        sans: [
+          "Noto Sans SC",
+          "Source Han Sans SC",
+          "PingFang SC",
+          "system-ui",
+          "sans-serif",
+        ],
+        mono: [
+          "JetBrains Mono",
+          "SFMono-Regular",
+          "Menlo",
+          "monospace",
+        ],
+      },
+      boxShadow: {
+        "card": "0 1px 3px rgba(0,0,0,0.05), inset 0 1px 2px rgba(255,255,255,0.5)",
+        "card-hover": "0 4px 12px rgba(0,0,0,0.08), inset 0 1px 2px rgba(255,255,255,0.5)",
+      },
+      borderRadius: {
+        industrial: "2px",
+      },
+    },
+  },
+  plugins: [],
+};
