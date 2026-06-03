@@ -1,0 +1,276 @@
+{
+  "point_cloud_logs": {
+    "PC-20260603192303": {
+      "log_id": "9aaa49ea-630b-4c5d-a1cc-ae88a65d2004",
+      "batch_id": "PC-20260603192303",
+      "file_name": "test_pc_8.csv",
+      "records": [
+        {
+          "record_id": "e21b0e9d-d7b8-46f8-8d17-2547416ffd07",
+          "original_line_number": 1,
+          "point_id": "P001",
+          "x": 100.0,
+          "y": 200.0,
+          "z": 300.0,
+          "raw_data": "P001,100.0,200.0,300.0",
+          "is_manually_modified": false,
+          "original_x": null,
+          "original_y": null,
+          "original_z": null,
+          "import_batch_id": "PC-20260603192303",
+          "created_at": "2026-06-03T19:23:03.328861",
+          "updated_at": "2026-06-03T19:23:03.328862"
+        },
+        {
+          "record_id": "c05ff4e6-0bb0-45cc-949b-5037372128b2",
+          "original_line_number": 2,
+          "point_id": "P002",
+          "x": 110.0,
+          "y": 210.0,
+          "z": 310.0,
+          "raw_data": "P002,110.0,210.0,310.0",
+          "is_manually_modified": false,
+          "original_x": null,
+          "original_y": null,
+          "original_z": null,
+          "import_batch_id": "PC-20260603192303",
+          "created_at": "2026-06-03T19:23:03.328875",
+          "updated_at": "2026-06-03T19:23:03.328876"
+        },
+        {
+          "record_id": "3780b414-5190-4674-8217-e7bc0159cff0",
+          "original_line_number": 3,
+          "point_id": "P003",
+          "x": 120.0,
+          "y": 220.0,
+          "z": 320.0,
+          "raw_data": "P003,120.0,220.0,320.0",
+          "is_manually_modified": false,
+          "original_x": null,
+          "original_y": null,
+          "original_z": null,
+          "import_batch_id": "PC-20260603192303",
+          "created_at": "2026-06-03T19:23:03.328896",
+          "updated_at": "2026-06-03T19:23:03.328897"
+        }
+      ],
+      "imported_at": "2026-06-03T19:23:03.328823",
+      "imported_by": "小陶",
+      "is_duplicate": false,
+      "duplicate_of_batch": null,
+      "checksum": "79889ae1e6d887f351e5d0bd80bff826"
+    }
+  },
+  "coordinate_tables": {
+    "PC-20260603192303": {
+      "table_id": "95e9c655-77a1-433d-aac0-46f7bf8e8bcc",
+      "batch_id": "PC-20260603192303",
+      "file_name": "coord_8.csv",
+      "records": [
+        {
+          "record_id": "742265de-afad-422a-a8ac-ebcf5c9f722c",
+          "original_line_number": 1,
+          "point_id": "P001",
+          "x": 100.0,
+          "y": 200.0,
+          "z": 300.0,
+          "is_supplemented": false,
+          "supplemented_by": "",
+          "supplemented_at": null,
+          "raw_data": "P001,100.0,200.0,300.0",
+          "created_at": "2026-06-03T19:23:03.330430",
+          "updated_at": "2026-06-03T19:23:03.330431"
+        },
+        {
+          "record_id": "7b1ee4ad-8558-4efc-a8bf-81ca830c9e26",
+          "original_line_number": 2,
+          "point_id": "P002",
+          "x": 110.0,
+          "y": 210.0,
+          "z": 310.0,
+          "is_supplemented": false,
+          "supplemented_by": "",
+          "supplemented_at": null,
+          "raw_data": "P002,110.0,210.0,310.0",
+          "created_at": "2026-06-03T19:23:03.330438",
+          "updated_at": "2026-06-03T19:23:03.330438"
+        },
+        {
+          "record_id": "392917df-40f3-432d-92e0-b27ea8061e8f",
+          "original_line_number": 3,
+          "point_id": "P003",
+          "x": 120.0,
+          "y": 220.0,
+          "z": 320.0,
+          "is_supplemented": false,
+          "supplemented_by": "",
+          "supplemented_at": null,
+          "raw_data": "P003,120.0,220.0,320.0",
+          "created_at": "2026-06-03T19:23:03.330443",
+          "updated_at": "2026-06-03T19:23:03.330443"
+        }
+      ],
+      "imported_at": "2026-06-03T19:23:03.330412",
+      "imported_by": "小陶"
+    }
+  },
+  "photo_points": {
+    "PC-20260603192303": {
+      "P001": {
+        "point_id": "P001",
+        "photo_id": "PHOTO_001",
+        "x_in_photo": 100.0,
+        "y_in_photo": 200.0,
+        "has_point": true,
+        "marked_by": "小陶",
+        "marked_at": "2026-06-03T19:23:03.329607",
+        "remark": ""
+      },
+      "P002": {
+        "point_id": "P002",
+        "photo_id": "PHOTO_001",
+        "x_in_photo": 150.0,
+        "y_in_photo": 250.0,
+        "has_point": true,
+        "marked_by": "小陶",
+        "marked_at": "2026-06-03T19:23:03.329855",
+        "remark": ""
+      },
+      "P003": {
+        "point_id": "P003",
+        "photo_id": "PHOTO_002",
+        "x_in_photo": 80.0,
+        "y_in_photo": 180.0,
+        "has_point": true,
+        "marked_by": "小陶",
+        "marked_at": "2026-06-03T19:23:03.330107",
+        "remark": ""
+      }
+    }
+  },
+  "safety_radius_tables": {},
+  "review_records": {
+    "PC-20260603192303": {
+      "P001": {
+        "review_id": "1d21be53-6577-4bf6-94c9-e35c383efcdc",
+        "batch_id": "PC-20260603192303",
+        "point_id": "P001",
+        "status": "待复核",
+        "issues": [],
+        "point_cloud_log_record_id": "e21b0e9d-d7b8-46f8-8d17-2547416ffd07",
+        "coordinate_record_id": null,
+        "photo_point_id": "P001",
+        "safety_radius_record_id": null,
+        "occlusion_record_id": null,
+        "reviewed_by": "小陶",
+        "reviewed_at": null,
+        "safety_reviewed_by": "",
+        "safety_reviewed_at": null,
+        "remarks": "",
+        "created_at": "2026-06-03T19:23:03.331237",
+        "updated_at": "2026-06-03T19:23:03.331238"
+      },
+      "P002": {
+        "review_id": "b6051c71-021e-4ea5-a52d-5bd484b32f4a",
+        "batch_id": "PC-20260603192303",
+        "point_id": "P002",
+        "status": "待复核",
+        "issues": [],
+        "point_cloud_log_record_id": "c05ff4e6-0bb0-45cc-949b-5037372128b2",
+        "coordinate_record_id": null,
+        "photo_point_id": "P002",
+        "safety_radius_record_id": null,
+        "occlusion_record_id": null,
+        "reviewed_by": "小陶",
+        "reviewed_at": null,
+        "safety_reviewed_by": "",
+        "safety_reviewed_at": null,
+        "remarks": "",
+        "created_at": "2026-06-03T19:23:03.331643",
+        "updated_at": "2026-06-03T19:23:03.331644"
+      },
+      "P003": {
+        "review_id": "1bef14c1-95aa-456b-9c0e-68ddc4d0a869",
+        "batch_id": "PC-20260603192303",
+        "point_id": "P003",
+        "status": "待复核",
+        "issues": [],
+        "point_cloud_log_record_id": "3780b414-5190-4674-8217-e7bc0159cff0",
+        "coordinate_record_id": null,
+        "photo_point_id": "P003",
+        "safety_radius_record_id": null,
+        "occlusion_record_id": null,
+        "reviewed_by": "小陶",
+        "reviewed_at": null,
+        "safety_reviewed_by": "",
+        "safety_reviewed_at": null,
+        "remarks": "",
+        "created_at": "2026-06-03T19:23:03.332052",
+        "updated_at": "2026-06-03T19:23:03.332052"
+      }
+    }
+  },
+  "occlusion_lists": {},
+  "audit_logs": [
+    {
+      "log_id": "b9738538-0872-43cc-8e80-b10c0eeaf247",
+      "action": "导入点云抽稀日志",
+      "batch_id": "PC-20260603192303",
+      "point_id": null,
+      "operator": "小陶",
+      "timestamp": "2026-06-03T19:23:03.329339",
+      "original_value": null,
+      "new_value": null,
+      "original_line_number": null,
+      "remark": "导入点云抽稀日志，共3条记录"
+    },
+    {
+      "log_id": "875ff7c5-a2b7-43c0-878b-3ce197a39d69",
+      "action": "导入坐标表",
+      "batch_id": "PC-20260603192303",
+      "point_id": null,
+      "operator": "小陶",
+      "timestamp": "2026-06-03T19:23:03.330846",
+      "original_value": null,
+      "new_value": null,
+      "original_line_number": null,
+      "remark": "导入坐标表，共3条记录"
+    },
+    {
+      "log_id": "94f3d9e4-10a2-4057-9ec0-f3420a4bd1b0",
+      "action": "导出数据",
+      "batch_id": "PC-20260603192303",
+      "point_id": null,
+      "operator": "小陶",
+      "timestamp": "2026-06-03T19:23:03.332552",
+      "original_value": null,
+      "new_value": null,
+      "original_line_number": null,
+      "remark": "导出CSV文件，共3条记录"
+    },
+    {
+      "log_id": "2187582d-1b7e-4c6e-bb39-cbbb1c85900a",
+      "action": "导出一致性检查",
+      "batch_id": "PC-20260603192303",
+      "point_id": null,
+      "operator": "小陶",
+      "timestamp": "2026-06-03T19:23:03.333074",
+      "original_value": null,
+      "new_value": null,
+      "original_line_number": null,
+      "remark": "导出一致性检查通过，API记录数3，CSV记录数3"
+    },
+    {
+      "log_id": "20aacf8d-d960-490e-8547-e4122cb7d25d",
+      "action": "导出数据",
+      "batch_id": "PC-20260603192303",
+      "point_id": null,
+      "operator": "小陶",
+      "timestamp": "2026-06-03T19:23:03.333618",
+      "original_value": null,
+      "new_value": null,
+      "original_line_number": null,
+      "remark": "导出CSV文件，共3条记录"
+    }
+  ]
+}

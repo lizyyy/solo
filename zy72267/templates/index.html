@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>城市天际线退界复核系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "Microsoft YaHei", Arial, sans-serif; background: #f5f7fa; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px; margin-bottom: 20px; }
+        .header h1 { font-size: 28px; margin-bottom: 10px; }
+        .header p { opacity: 0.9; }
+        .card { background: white; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .card h2 { font-size: 20px; margin-bottom: 15px; color: #333; border-bottom: 2px solid #667eea; padding-bottom: 10px; }
+        .batch-item { border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; margin-bottom: 15px; transition: all 0.3s; }
+        .batch-item:hover { box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .batch-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .batch-id { font-size: 16px; font-weight: bold; color: #667eea; }
+        .batch-meta { font-size: 13px; color: #999; }
+        .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .status-normal { background: #d4edda; color: #155724; }
+        .status-warning { background: #fff3cd; color: #856404; }
+        .status-error { background: #f8d7da; color: #721c24; }
+        .status-pending { background: #d1ecf1; color: #0c5460; }
+        .workflow-steps { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+        .workflow-step { font-size: 12px; padding: 6px 12px; border-radius: 5px; }
+        .step-done { background: #d4edda; color: #155724; }
+        .step-pending { background: #f0f0f0; color: #666; }
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-top: 10px; }
+        .summary-item { text-align: center; padding: 10px; background: #f8f9fa; border-radius: 5px; }
+        .summary-item .num { font-size: 24px; font-weight: bold; color: #667eea; }
+        .summary-item .label { font-size: 12px; color: #666; margin-top: 5px; }
+        .btn { display: inline-block; padding: 8px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 5px; font-size: 14px; transition: background 0.3s; }
+        .btn:hover { background: #5568d3; }
+        .warning-tag { background: #fff3cd; color: #856404; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-left: 10px; }
+        .empty-state { text-align: center; padding: 60px 20px; color: #999; }
+        .empty-state .icon { font-size: 64px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>城市天际线退界复核系统</h1>
+            <p>园区运维 · 小陶和安全员的复核工作台</p>
+        </div>
+
+        <div class="card">
+            <h2>复核批次列表</h2>
+            {% if batches %}
+                {% for batch in batches %}
+                <div class="batch-item">
+                    <div class="batch-header">
+                        <div>
+                            <span class="batch-id">{{ batch.batch_id }}</span>
+                            {% if batch.is_duplicate %}
+                            <span class="warning-tag">重复导入</span>
+                            {% endif %}
+                            <span class="batch-meta">文件：{{ batch.file_name }} | 导入人：{{ batch.imported_by }} | {{ batch.imported_at }}</span>
+                        </div>
+                        <a href="/batch/{{ batch.batch_id }}" class="btn">查看详情</a>
+                    </div>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <div class="num">{{ batch.summary.total_points }}</div>
+                            <div class="label">总点位</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="num">{{ batch.summary.point_cloud_count }}</div>
+                            <div class="label">点云记录</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="num">{{ batch.summary.coordinate_count }}</div>
+                            <div class="label">坐标记录</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="num" style="color: #dc3545;">{{ batch.workflow.pending_safety_review_count }}</div>
+                            <div class="label">待安全员复核</div>
+                        </div>
+                    </div>
+                    <div class="workflow-steps">
+                        {% for step in batch.workflow.workflow_steps %}
+                        <span class="workflow-step {{ 'step-done' if step.status == '已完成' else 'step-pending' }}">
+                            {{ step.name }} - {{ step.status }} ({{ step.count }}条)
+                        </span>
+                        {% endfor %}
+                    </div>
+                    {% if batch.summary.status_summary %}
+                    <div style="margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap;">
+                        {% for status, count in batch.summary.status_summary.items() %}
+                        <span class="status-badge 
+                            {{ 'status-normal' if '正常' in status else 'status-error' if '异常' in status else 'status-warning' if '缺' in status or '重复' in status else 'status-pending' }}">
+                            {{ status }}: {{ count }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="icon">📋</div>
+                    <p>暂无复核批次</p>
+                    <p style="font-size: 13px; margin-top: 10px;">请先导入点云抽稀日志开始复核流程</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
