@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>体育馆看台视线遮挡 — 复核管理</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app">
+  <header class="app-header">
+    <h1>体育馆看台视线遮挡 · 复核管理</h1>
+    <div class="header-info">
+      <span class="role-badge">当前角色：培训教官 老梁</span>
+      <span class="time-badge" id="currentTime"></span>
+    </div>
+  </header>
+
+  <div class="app-body">
+    <aside class="sidebar">
+      <div class="workflow-steps">
+        <h3>工作流步骤</h3>
+        <button class="step-item active" data-step="1" onclick="App.gotoStep(1)">
+          <span class="step-num">1</span>
+          <span class="step-label">楼层剖面草图导入</span>
+          <span class="step-status" id="step1Status"></span>
+        </button>
+        <button class="step-item" data-step="2" onclick="App.gotoStep(2)">
+          <span class="step-num">2</span>
+          <span class="step-label">审看点云抽稀日志</span>
+          <span class="step-status" id="step2Status"></span>
+        </button>
+        <button class="step-item" data-step="3" onclick="App.gotoStep(3)">
+          <span class="step-num">3</span>
+          <span class="step-label">现场班组说明更新</span>
+          <span class="step-status" id="step3Status"></span>
+        </button>
+      </div>
+
+      <div class="record-list">
+        <h3>样例记录</h3>
+        <div id="recordList" class="record-items"></div>
+      </div>
+
+      <div class="quick-stats">
+        <h3>快速统计</h3>
+        <div id="quickStats"></div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <div id="step1Panel" class="step-panel active">
+        <h2>第一步：楼层剖面草图导入</h2>
+        <p class="step-desc">导入楼层剖面草图数据，系统自动检测坐标体系，识别经纬度与米制坐标混用情况。</p>
+        <div class="action-bar">
+          <button class="btn btn-primary" onclick="App.loadSampleSketch('normal')">加载正常记录样例</button>
+          <button class="btn btn-warning" onclick="App.loadSampleSketch('mixed_coords')">加载混合坐标样例</button>
+          <button class="btn btn-danger" onclick="App.loadSampleSketch('supplemented')">加载补录旧口径样例</button>
+          <button class="btn btn-secondary" onclick="App.loadAllSamples()">加载全部样例</button>
+        </div>
+        <div id="sketchImportArea" class="import-area"></div>
+      </div>
+
+      <div id="step2Panel" class="step-panel">
+        <h2>第二步：审看点云抽稀日志</h2>
+        <p class="step-desc">审看点云抽稀日志，备注信息比正式表更重要。系统检测楼层剖面草图与日志之间的冲突，由培训教官老梁选择确认或驳回。</p>
+        <div id="logReviewArea" class="log-review-area"></div>
+        <div id="conflictArea" class="conflict-area"></div>
+      </div>
+
+      <div id="step3Panel" class="step-panel">
+        <h2>第三步：现场班组说明更新</h2>
+        <p class="step-desc">根据审看结果生成/更新给现场班组看的说明，确保历史记录与当前状态一致。</p>
+        <div id="fieldNoteArea" class="field-note-area"></div>
+      </div>
+    </main>
+
+    <aside class="audit-panel">
+      <h3>审计追踪</h3>
+      <p class="audit-desc">谁改了什么、为什么改、改完影响哪些结果</p>
+      <div id="auditTrail" class="audit-entries"></div>
+    </aside>
+  </div>
+</div>
+
+<div id="conflictModal" class="modal" style="display:none;">
+  <div class="modal-overlay" onclick="App.closeConflictModal()"></div>
+  <div class="modal-content">
+    <h3>⚠️ 冲突检测 — 楼层剖面草图 vs 点云抽稀日志</h3>
+    <div id="conflictEvidence" class="conflict-evidence"></div>
+    <div class="modal-actions">
+      <button class="btn btn-success" onclick="App.resolveConflict('confirmed')">✓ 确认（以日志为准）</button>
+      <button class="btn btn-danger" onclick="App.resolveConflict('rejected')">✗ 驳回（保留草图）</button>
+      <button class="btn btn-secondary" onclick="App.closeConflictModal()">暂不处理</button>
+    </div>
+  </div>
+</div>
+
+<div id="coordReviewModal" class="modal" style="display:none;">
+  <div class="modal-overlay" onclick="App.closeCoordModal()"></div>
+  <div class="modal-content">
+    <h3>🔍 混合坐标检测 — 需巡检组复核</h3>
+    <div id="coordEvidence" class="coord-evidence"></div>
+    <div class="modal-actions">
+      <button class="btn btn-warning" onclick="App.flagForInspection()">标记待巡检组复核</button>
+      <button class="btn btn-secondary" onclick="App.closeCoordModal()">暂不处理</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
