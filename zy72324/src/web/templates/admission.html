@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <h2>🎓 录取结果</h2>
+    <p style="color: #6c757d; margin-bottom: 1rem;">
+        点击"查看追溯"可查看完整数据来源
+    </p>
+    
+    {% if admissions %}
+    <table>
+        <thead>
+            <tr>
+                <th>学号</th>
+                <th>姓名</th>
+                <th>录取志愿</th>
+                <th>录取专业</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for a in admissions %}
+            <tr>
+                <td>{{ a.student_id }}</td>
+                <td>{{ a.student_name }}</td>
+                <td>第{{ a.matched_volunteer }}志愿</td>
+                <td>{{ a.matched_major }}</td>
+                <td>
+                    {% if a.is_borderline %}
+                    <span class="badge badge-warning">边界</span>
+                    {% endif %}
+                    <span class="badge badge-info">{{ a.status }}</span>
+                </td>
+                <td><a href="/sample/{{ a.sample_id }}" class="source-link">查看追溯</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="color: #6c757d;">暂无录取记录</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <h2>🔍 边界案例处理</h2>
+    
+    {% if history %}
+    <div class="alert alert-warning">
+        <strong>⚠️ 边界规则提醒：</strong>请仔细查看老师批注和抽样名单备注后再做决定
+    </div>
+
+    <div class="trace-section">
+        <h4>案例信息</h4>
+        <p><strong>案例类型：</strong>{{ history.case_info.type }}</p>
+        <p><strong>原始值：</strong><code>{{ history.case_info.original_value }}</code></p>
+        <p><strong>状态：</strong>{{ history.case_info.status }}</p>
+        <p><strong>分配给：</strong>{{ history.case_info.assigned_to }}</p>
+    </div>
+
+    {% if history.teacher_comments %}
+    <div class="trace-section">
+        <h4>💬 老师批注</h4>
+        {% for c in history.teacher_comments %}
+        <div class="version-item">
+            <p><strong>v{{ c.version }}</strong> — {{ c.teacher }}
+                {% if c.is_latest %}<span class="badge badge-success">最新</span>{% endif %}</p>
+            <p style="font-style: italic; margin-left: 1rem;">"{{ c.comment }}"</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if history.after %}
+    <div class="trace-section">
+        <h4>处理结果</h4>
+        <p><strong>处理前：</strong><span class="diff-before">分数: {{ history.before.score }}, 负数标记: {{ history.before.is_negative }}</span></p>
+        <p><strong>处理后：</strong><span class="diff-after">分数: {{ history.after.score }}, 负数标记: {{ history.after.is_negative }}</span></p>
+        <p><strong>处理方式：</strong>{{ history.resolution.resolution }}</p>
+        <p><strong>处理人：</strong>{{ history.resolution.resolved_by }}</p>
+        <p><strong>处理时间：</strong>{{ history.resolution.resolved_at }}</p>
+    </div>
+    {% else %}
+    <div class="trace-section">
+        <h4>选择处理方式</h4>
+        <form method="POST">
+            <div class="form-group">
+                <label>处理决议：</label>
+                <select name="resolution" required>
+                    <option value="">请选择</option>
+                    <option value="keep_negative">保留负数（如缺考标记）</option>
+                    <option value="convert_positive">转为正数（取绝对值）</option>
+                    <option value="mark_missing">标记为缺失</option>
+                    <option value="custom_value">使用自定义值</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>自定义分数（选择自定义值时填写）：</label>
+                <input type="text" name="custom_value" placeholder="输入分数">
+            </div>
+            <button type="submit" class="btn btn-primary">提交处理</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <p style="margin-top: 1rem;">
+        <a href="/sample/{{ case_id }}" class="source-link">← 返回边界案例列表</a>
+    </p>
+    {% else %}
+    <p>未找到该案例</p>
+    {% endif %}
+</div>
+{% endblock %}

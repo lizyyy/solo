@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <h2>抽样名单（原始数据完整保留）</h2>
+    <p style="color: #6c757d; margin-bottom: 1rem;">
+        备注信息完整保留，未做数据清洗
+    </p>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>学号</th>
+                <th>姓名</th>
+                <th>原始分数</th>
+                <th>清洗后分数</th>
+                <th>备注</th>
+                <th>标记</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in samples %}
+            <tr>
+                <td>{{ s.student_id }}</td>
+                <td>{{ s.student_name }}</td>
+                <td><code>{{ s.raw_score }}</code></td>
+                <td>
+                    {% if s.score is not none %}{{ s.score }}{% else %}<span class="badge badge-warning">缺失</span>{% endif %}
+                </td>
+                <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">{{ s.remark }}</td>
+                <td>
+                    {% if s.is_negative %}<span class="badge badge-danger">负数</span>{% endif %}
+                    {% if s.is_missing %}<span class="badge badge-warning">缺失</span>{% endif %}
+                    {% if s.needs_review %}<span class="badge badge-info">待复核</span>{% endif %}
+                </td>
+                <td><a href="/sample/{{ s.id }}" class="source-link">查看追溯</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <h2>⚠️ 边界案例复核</h2>
+    <p style="color: #6c757d; margin-bottom: 1rem;">
+        负数分数、缺失值等边界问题，分配给学生助教复核
+    </p>
+    
+    {% if cases %}
+    <table>
+        <thead>
+            <tr>
+                <th>学号</th>
+                <th>姓名</th>
+                <th>问题类型</th>
+                <th>原始值</th>
+                <th>分配给</th>
+                <th>老师批注</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for case in cases %}
+            <tr>
+                <td>{{ case.student_id }}</td>
+                <td>{{ case.student_name }}</td>
+                <td><span class="badge badge-danger">{{ case.case_type }}</span></td>
+                <td><code>{{ case.original_value }}</code></td>
+                <td>{{ case.assigned_to }}</td>
+                <td style="max-width: 150px;">
+                    {% if case.teacher_comments %}
+                    {{ case.teacher_comments[0].comment[:30] }}...
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="/borderline/{{ case.case_id }}" class="source-link">处理</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="color: #6c757d;">暂无待复核的边界案例</p>
+    {% endif %}
+</div>
+{% endblock %}

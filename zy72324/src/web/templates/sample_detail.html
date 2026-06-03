@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <h2>📋 完整数据追溯</h2>
+    
+    {% if trace %}
+    <div class="trace-section">
+        <h4>👤 学生信息</h4>
+        <p><strong>学号：</strong>{{ trace.student.id }}</p>
+        <p><strong>姓名：</strong>{{ trace.student.name }}</p>
+        <p><strong>原始分数：</strong><code>{{ trace.student.raw_score }}</code></p>
+        <p><strong>清洗后分数：</strong>{{ trace.student.cleaned_score }}</p>
+        <p><strong>抽样名单备注：</strong>{{ trace.student.remark }}</p>
+    </div>
+
+    <div class="trace-section">
+        <h4>🚩 边界标记</h4>
+        <p>
+            {% if trace.borderline_flags.is_negative %}
+            <span class="badge badge-danger">负数分数</span>
+            {% endif %}
+            {% if trace.borderline_flags.is_missing %}
+            <span class="badge badge-warning">分数缺失</span>
+            {% endif %}
+            {% if trace.borderline_flags.needs_review %}
+            <span class="badge badge-info">待复核</span>
+            {% endif %}
+            {% if not trace.borderline_flags.is_negative and not trace.borderline_flags.is_missing %}
+            <span class="badge badge-success">正常</span>
+            {% endif %}
+        </p>
+    </div>
+
+    {% if trace.admission %}
+    <div class="trace-section">
+        <h4>🎓 录取信息</h4>
+        <p><strong>录取专业：</strong>{{ trace.admission.matched_major }}</p>
+        <p><strong>第{{ trace.admission.matched_volunteer }}志愿</strong></p>
+        <p><strong>状态：</strong>{{ trace.admission.status }}</p>
+    </div>
+    {% endif %}
+
+    {% if trace.teacher_comments %}
+    <div class="trace-section">
+        <h4>💬 老师批注（历史版本）</h4>
+        <div class="version-history">
+            {% for c in trace.teacher_comments %}
+            <div class="version-item">
+                <p><strong>v{{ c.version }}</strong> 
+                    {% if c.is_latest %}<span class="badge badge-success">最新</span>{% endif %}
+                    — {{ c.teacher }}
+                </p>
+                <p style="margin-left: 1rem; font-style: italic;">"{{ c.comment }}"</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if trace.version_history %}
+    <div class="trace-section">
+        <h4>📜 录取版本历史</h4>
+        <div class="version-history">
+            {% for v in trace.version_history %}
+            <div class="version-item">
+                <p><strong>v{{ v.version }}</strong> — {{ v.changed_by }}</p>
+                <p style="margin-left: 1rem;">
+                    {{ v.matched_major }} (第{{ v.matched_volunteer }}志愿)
+                </p>
+                <p style="margin-left: 1rem; color: #6c757d;">{{ v.change_reason }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if trace.borderline_cases %}
+    <div class="trace-section">
+        <h4>⚠️ 边界案例记录</h4>
+        {% for bc in trace.borderline_cases %}
+        <div class="version-item">
+            <p><strong>{{ bc.case_type }}</strong> — {{ bc.status }}</p>
+            <p style="margin-left: 1rem;">原始值: <code>{{ bc.original_value }}</code></p>
+            <p style="margin-left: 1rem;">分配给: {{ bc.assigned_to }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="trace-section">
+        <h4>🔗 数据来源</h4>
+        <p><strong>来源文件：</strong>{{ trace.trace_source.sample_source }}</p>
+        <p><strong>导入批次：</strong>{{ trace.trace_source.import_batch }}</p>
+    </div>
+
+    {% else %}
+    <p>未找到该记录</p>
+    {% endif %}
+</div>
+{% endblock %}

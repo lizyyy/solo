@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="stats">
+    <div class="stat-card">
+        <h3>{{ total_samples }}</h3>
+        <p>抽样名单总数</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ total_admissions }}</h3>
+        <p>已录取</p>
+    </div>
+    <div class="stat-card warning">
+        <h3>{{ pending_borderline }}</h3>
+        <p>待复核边界案例</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ total_comments }}</h3>
+        <p>老师批注版本</p>
+    </div>
+</div>
+
+<div class="card">
+    <h2>快速操作</h2>
+    <button class="btn btn-primary" onclick="runMatching()">运行志愿匹配</button>
+    <a href="/borderline" class="btn btn-secondary">处理边界案例</a>
+    <script>
+        function runMatching() {
+            fetch('/run-matching', { method: 'POST' })
+                .then(r => r.json())
+                .then(data => {
+                    alert('匹配完成！\\n总数: ' + data.total + '\\n已匹配: ' + data.matched + '\\n边界跳过: ' + data.borderline);
+                    location.reload();
+                });
+        }
+    </script>
+</div>
+
+<div class="card">
+    <h2>⚠️ 待复核边界案例</h2>
+    {% if borderline_cases %}
+    <table>
+        <thead>
+            <tr>
+                <th>学号</th>
+                <th>姓名</th>
+                <th>问题类型</th>
+                <th>原始值</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for case in borderline_cases %}
+            <tr>
+                <td>{{ case.student_id }}</td>
+                <td>{{ case.student_name }}</td>
+                <td><span class="badge badge-danger">{{ case.case_type }}</span></td>
+                <td><code>{{ case.original_value }}</code></td>
+                <td><a href="/borderline/{{ case.id }}" class="source-link">处理</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="color: #6c757d;">暂无待复核的边界案例</p>
+    {% endif %}
+</div>
+
+<div class="alert alert-warning">
+    <strong>📌 边界规则提醒：</strong>
+    <ul style="margin-top: 0.5rem; margin-left: 1.5rem;">
+        <li>负数分数<strong>不</strong>自动转为正数，需人工复核</li>
+        <li>边界样本<strong>不</strong>参与自动匹配</li>
+        <li>重复导入批注<strong>不</strong>翻倍计数</li>
+        <li>所有数据均可追溯到原始来源</li>
+    </ul>
+</div>
+{% endblock %}
