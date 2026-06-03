@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "dp-replenishment-strategy"
+version = "0.1.0"
+description = "动态规划补货策略 - 数据复核追踪系统"
+authors = ["运营规划组"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+pandas = "^2.0.0"
+sqlalchemy = "^2.0.0"
+click = "^8.0.0"
+pydantic = "^2.0.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
