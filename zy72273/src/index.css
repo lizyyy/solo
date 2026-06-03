@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-bg: #0f1117;
+  --color-bg-card: #1a1d2e;
+  --color-border: #2a2d3e;
+  --color-text-primary: #e8e8e8;
+  --color-text-secondary: #8b8fa3;
+  --color-accent: #f59e0b;
+  --color-status-green: #22c55e;
+  --color-status-red: #ef4444;
+  --color-status-blue: #3b82f6;
+
+  font-family: "Noto Sans SC", sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+}
+
+@layer utilities {
+  .data-font {
+    font-family: "JetBrains Mono", monospace;
+  }
+}
