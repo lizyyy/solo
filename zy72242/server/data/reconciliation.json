@@ -1,0 +1,228 @@
+{
+  "records": [
+    {
+      "id": "demo-003",
+      "tradeDate": "2024-09-16",
+      "expectedArrivalDate": "2024-09-18",
+      "actualArrivalDate": "2024-09-19",
+      "amount": 2200000,
+      "fundCode": "FUND-001",
+      "futuresCode": "IF2409",
+      "status": "reviewing",
+      "hasManualModification": true,
+      "modificationType": "t1_to_t2",
+      "modifiedBy": "李四",
+      "modifiedAt": "2024-09-18 16:45:00",
+      "modificationReason": "中秋节假日影响",
+      "whyKept": "T+1到账（2024-09-18）被手工修改为T+2（2024-09-19），延迟1天；修改原因：中秋节假日影响；修改人：李四；已补录尾差调整条",
+      "missingMaterials": "银行交割凭证、支付平台流水单、修改授权确认书",
+      "nextAction": "请基金经理复核T+1→T+2修改原因，不急着归正常；确认后联系支付平台产品阿南",
+      "lastUpdatedBy": "系统",
+      "lastUpdatedAt": "2026-06-03 16:30:52",
+      "createdAt": "2026-06-03 16:30:52",
+      "updatedAt": "2026-06-03 16:30:52"
+    },
+    {
+      "id": "demo-001",
+      "tradeDate": "2024-04-30",
+      "expectedArrivalDate": "2024-05-06",
+      "actualArrivalDate": "2024-05-06",
+      "amount": 1500000,
+      "fundCode": "FUND-001",
+      "futuresCode": "IF2405",
+      "status": "reviewing",
+      "hasManualModification": true,
+      "modificationType": "t1_to_t2",
+      "modifiedBy": "张三",
+      "modifiedAt": "2024-05-05 14:30:00",
+      "modificationReason": "节假日顺延+手工调整",
+      "whyKept": "T+1到账（2024-05-06）被手工修改为T+2（2024-05-06），延迟0天；；修改原因：节假日顺延+手工调整；修改人：张三；已补录尾差调整条，调整金额125.50元，原因为银行手续费",
+      "missingMaterials": "银行交割凭证",
+      "nextAction": "尾差调整已完成，请基金经理最终复核；确认后联系支付平台产品阿南归档",
+      "lastUpdatedBy": "支付平台阿南",
+      "lastUpdatedAt": "2026-06-03 16:30:52",
+      "createdAt": "2026-06-03 16:30:52",
+      "updatedAt": "2026-06-03 16:30:52"
+    },
+    {
+      "id": "demo-002",
+      "tradeDate": "2024-06-08",
+      "expectedArrivalDate": "2024-06-11",
+      "actualArrivalDate": "2024-06-11",
+      "amount": 850000,
+      "fundCode": "FUND-002",
+      "futuresCode": "IC2406",
+      "status": "pending",
+      "hasManualModification": false,
+      "modificationType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "modificationReason": null,
+      "whyKept": "到账延迟0天；；延迟属于正常节假日顺延",
+      "missingMaterials": "",
+      "nextAction": "无需处理，自动标记为正常",
+      "lastUpdatedBy": "系统",
+      "lastUpdatedAt": "2026-06-03 16:30:52",
+      "createdAt": "2026-06-03 16:30:52",
+      "updatedAt": "2026-06-03 16:30:52"
+    }
+  ],
+  "adjustments": [
+    {
+      "id": "25d1a0c5-ee76-47a3-b36d-79440172370e",
+      "recordId": "demo-003",
+      "amount": 125.5,
+      "reason": "银行手续费尾差调整",
+      "adjustedBy": "支付平台阿南",
+      "adjustedAt": "2026-06-03 16:30:52",
+      "affectsReconciliation": true
+    }
+  ],
+  "auditLogs": [
+    {
+      "id": "1f60e85d-6a58-4ae8-add8-be84e560d311",
+      "recordId": "demo-001",
+      "action": "rerun",
+      "fieldName": "reconciliation",
+      "oldValue": "T+1到账（2024-05-06）被手工修改为T+2（2024-05-06），延迟0天；；修改原因：节假日顺延+手工调整；修改人：张三",
+      "newValue": "T+1到账（2024-05-06）被手工修改为T+2（2024-05-06），延迟0天；；修改原因：节假日顺延+手工调整；修改人：张三；已补录尾差调整条，调整金额125.50元，原因为银行手续费",
+      "reason": "重跑对账逻辑（演示Step3）",
+      "operator": "支付平台阿南",
+      "operatorRole": "product_manager",
+      "affectedResults": "对账说明已重新生成",
+      "timestamp": "2026-06-03 16:30:52"
+    },
+    {
+      "id": "f7ad1e29-2629-41b5-be67-37d7b86e20b2",
+      "recordId": "demo-001",
+      "action": "modify",
+      "fieldName": "reconciliation_note",
+      "oldValue": "T+1到账（2024-05-06）被手工修改为T+2（2024-05-06），延迟0天；；修改原因：节假日顺延+手工调整；修改人：张三",
+      "newValue": "T+1到账（2024-05-06）被手工修改为T+2（2024-05-06），延迟0天；；修改原因：节假日顺延+手工调整；修改人：张三；已补录尾差调整条，调整金额125.50元，原因为银行手续费",
+      "reason": "对账说明更新（演示Step3）",
+      "operator": "支付平台阿南",
+      "operatorRole": "product_manager",
+      "affectedResults": "对账说明已更新",
+      "timestamp": "2026-06-03 16:30:52"
+    },
+    {
+      "id": "4d431432-8322-4d2a-8cb8-1c60601a0d38",
+      "recordId": "demo-003",
+      "action": "adjust",
+      "reason": "银行手续费尾差调整（演示Step2）",
+      "operator": "支付平台阿南",
+      "operatorRole": "product_manager",
+      "affectedResults": "对账说明自动更新，增加尾差调整说明",
+      "timestamp": "2026-06-03 16:30:52"
+    },
+    {
+      "id": "8e24fa7a-f08e-4d11-ae1f-2885d30b4c5b",
+      "recordId": "demo-003",
+      "action": "modify",
+      "fieldName": "actual_arrival_date",
+      "oldValue": "2024-09-18",
+      "newValue": "2024-09-19",
+      "reason": "手工调整到账日（演示）",
+      "operator": "李四",
+      "operatorRole": "product_manager",
+      "affectedResults": "对账状态变为reviewing",
+      "timestamp": "2026-06-03 16:30:52"
+    },
+    {
+      "id": "2632ee4c-3fca-4411-b2c6-5083d04cfb6a",
+      "recordId": "demo-003",
+      "action": "import",
+      "reason": "导入交割数据（演示Step2）",
+      "operator": "系统",
+      "operatorRole": "system",
+      "affectedResults": "预期到账日、金额、基金代码、对账说明已生成",
+      "timestamp": "2026-06-03 16:30:52"
+    },
+    {
+      "id": "51dddcc6-d955-4f00-b013-9e9130a8aff0",
+      "recordId": "demo-002",
+      "action": "import",
+      "reason": "导入交割数据（演示Step1）",
+      "operator": "系统",
+      "operatorRole": "system",
+      "affectedResults": "预期到账日、金额、基金代码、对账说明已生成",
+      "timestamp": "2026-06-03 16:30:52"
+    },
+    {
+      "id": "86a8ba41-977b-4518-9092-e761dc544055",
+      "recordId": "demo-001",
+      "action": "modify",
+      "fieldName": "actual_arrival_date",
+      "oldValue": "2024-05-06",
+      "newValue": "2024-05-06",
+      "reason": "手工调整到账日（演示）",
+      "operator": "张三",
+      "operatorRole": "product_manager",
+      "affectedResults": "对账状态变为reviewing，触发基金经理复核",
+      "timestamp": "2026-06-03 16:30:52"
+    },
+    {
+      "id": "467f94c7-c27f-47c0-a408-4486d839b7ca",
+      "recordId": "demo-001",
+      "action": "import",
+      "reason": "导入交割数据（演示Step1）",
+      "operator": "系统",
+      "operatorRole": "system",
+      "affectedResults": "预期到账日、金额、基金代码、对账说明已生成",
+      "timestamp": "2026-06-03 16:30:52"
+    }
+  ],
+  "reviews": [],
+  "holidays": [
+    {
+      "date": "2024-05-01",
+      "name": "劳动节",
+      "type": "public_holiday"
+    },
+    {
+      "date": "2024-05-02",
+      "name": "劳动节",
+      "type": "public_holiday"
+    },
+    {
+      "date": "2024-05-03",
+      "name": "劳动节",
+      "type": "public_holiday"
+    },
+    {
+      "date": "2024-06-10",
+      "name": "端午节",
+      "type": "public_holiday"
+    },
+    {
+      "date": "2024-09-17",
+      "name": "中秋节",
+      "type": "public_holiday"
+    },
+    {
+      "date": "2024-10-01",
+      "name": "国庆节",
+      "type": "public_holiday"
+    },
+    {
+      "date": "2024-10-02",
+      "name": "国庆节",
+      "type": "public_holiday"
+    },
+    {
+      "date": "2024-10-03",
+      "name": "国庆节",
+      "type": "public_holiday"
+    },
+    {
+      "date": "2024-10-04",
+      "name": "国庆节",
+      "type": "public_holiday"
+    },
+    {
+      "date": "2024-10-07",
+      "name": "国庆节",
+      "type": "public_holiday"
+    }
+  ]
+}
