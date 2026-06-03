@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>基金销售尾佣拆分系统</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>基金销售尾佣拆分系统</h1>
+            <div class="subtitle">Fund Sales Trail Commission Splitting System</div>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="overview">概览</button>
+            <button class="tab-btn" data-tab="import">1. 导入清算批次</button>
+            <button class="tab-btn" data-tab="holiday">2. 节假日审核</button>
+            <button class="tab-btn" data-tab="balance">3. 余额变化表</button>
+            <button class="tab-btn" data-tab="selfcheck">自检报告</button>
+            <button class="tab-btn" data-tab="export">导出</button>
+        </nav>
+
+        <main>
+            <section id="overview" class="tab-content active">
+            <div class="section-header">
+                <h2>系统概览</h2>
+                <button class="btn-primary" onclick="loadOverview()">刷新</button>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-title">清算批次</div>
+                    <div class="stat-value" id="stat-batches">0</div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="stat-title">待经理复核</div>
+                    <div class="stat-value" id="stat-pending">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">余额变化记录</div>
+                    <div class="stat-value" id="stat-balance">0</div>
+                </div>
+                <div class="stat-card success">
+                    <div class="stat-title">已完成批次</div>
+                    <div class="stat-value" id="stat-completed">0</div>
+                </div>
+            </div>
+
+            <h3>清算批次列表</h3>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>批次号</th>
+                        <th>导入时间</th>
+                        <th>记录数</th>
+                        <th>总金额</th>
+                        <th>当前状态</th>
+                        <th>节假日审核</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="batches-table-body">
+                    <tr><td colspan="7" class="text-center">加载中...</td></tr>
+                </tbody>
+            </table>
+
+            <h3>余额变化汇总</h3>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                    <th>客户经理代码</th>
+                    <th>客户经理</th>
+                    <th>已确认金额</th>
+                    <th>待确认金额</th>
+                    <th>当前余额</th>
+                    <th>记录数</th>
+                </tr>
+                </thead>
+                <tbody id="balance-summary-body">
+                    <tr><td colspan="6" class="text-center">加载中...</td></tr>
+                </tbody>
+            </table>
+            </section>
+
+            <section id="import" class="tab-content">
+            <div class="section-header">
+                <h2>第一步：导入清算批次号</h2>
+            </div>
+            <div class="form-group">
+                <label>清算批次号</label>
+                <input type="text" id="batch-number" placeholder="请输入批次号，如：QY20240101">
+            </div>
+            <div class="form-group">
+                <label>导入人</label>
+                <input type="text" id="imported-by" placeholder="system" value="system">
+            </div>
+            <div class="form-group">
+                <label>选择Excel文件</label>
+                <input type="file" id="import-file" accept=".xlsx,.xls">
+            </div>
+            <button class="btn-primary" onclick="importBatch()">导入</button>
+            <div id="import-result"></div>
+
+            <h3>当前批次详情</h3>
+            <div id="current-batch"></div>
+            </section>
+
+            <section id="holiday" class="tab-content">
+            <div class="section-header">
+                <h2>第二步：风控补看节假日顺延说明</h2>
+                <div class="note">风控值班：老秦</div>
+            </div>
+            <div class="form-group">
+                <label>选择批次</label>
+                <select id="holiday-batch-select" onchange="loadWorkflowStatus()"></select>
+            </div>
+
+            <div id="workflow-status"></div>
+
+            <h3>节假日调整</h3>
+            <div id="holiday-adjustments">
+                <div class="adjustment-row">
+                    <label>原日期</label>
+                    <input type="date" id="adj-original-date">
+                    <label>调整后日期</label>
+                    <input type="date" id="adj-adjusted-date">
+                    <label>调整原因</label>
+                    <input type="text" id="adj-reason" placeholder="如：元旦假期顺延">
+                </div>
+            </div>
+            <button class="btn-secondary" onclick="addAdjustment()">添加调整</button>
+            <button class="btn-primary" onclick="submitHolidayReview()">完成节假日审核</button>
+            <div id="holiday-result"></div>
+            </section>
+
+            <section id="balance" class="tab-content">
+            <div class="section-header">
+                <h2>第三步：余额变化表</h2>
+                <div class="note">临时会议场景：10分钟快速查看</div>
+            </div>
+            <div class="form-group">
+                <label>选择批次</label>
+                <select id="balance-batch-select" onchange="loadBalanceChanges()"></select>
+            </div>
+            <div class="filter-group">
+                <label><input type="checkbox" id="include-pending" checked onchange="loadBalanceChanges()"> 包含待确认</label>
+                <label>客户经理代码：<input type="text" id="filter-manager" onkeyup="loadBalanceChanges()"></label>
+            </div>
+            <button class="btn-primary" onclick="updateBalance()">更新余额</button>
+            <button class="btn-secondary" onclick="loadBalanceChanges()">刷新</button>
+
+            <h3>余额变化明细</h3>
+            <div class="balance-legend">
+                <span class="legend-item"><span class="legend-dot source-clearing"></span>清算批次导入</span>
+                <span class="legend-item"><span class="legend-dot source-holiday"></span>节假日调整</span>
+                <span class="legend-item"><span class="legend-dot source-manual"></span>手工录入</span>
+                <span class="legend-item"><span class="legend-dot pending"></span>待确认</span>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>客户经理</th>
+                        <th>变动类型</th>
+                        <th>金额</th>
+                        <th>变动前余额</th>
+                        <th>变动后余额</th>
+                        <th>来源</th>
+                        <th>来源参考</th>
+                        <th>状态</th>
+                        <th>记录时间</th>
+                    </tr>
+                </thead>
+                <tbody id="balance-changes-body">
+                    <tr><td colspan="9" class="text-center">请选择批次查看余额变化</td></tr>
+                </tbody>
+            </table>
+            </section>
+
+            <section id="selfcheck" class="tab-content">
+            <div class="section-header">
+                <h2>自检报告</h2>
+            </div>
+            <div class="form-group">
+                <label>选择批次</label>
+                <select id="selfcheck-batch-select"></select>
+            </div>
+            <button class="btn-primary" onclick="runSelfCheck()">运行自检</button>
+
+            <div id="selfcheck-result"></div>
+
+            <h3>自检项目说明</h3>
+            <ul class="check-list">
+                <li><strong>重复导入检测</strong>：检查同一基金、同一客户、同一日期、同一金额的重复记录</li>
+                <li><strong>审批人拼音检测</strong>：检测审批人名称是否仅为拼音，需客户经理复核</li>
+                <li><strong>补录后重算验证</strong>：检查修改后金额是否正确重算</li>
+                <li><strong>导出一致性检查</strong>：确保导出、页面、接口数据一致</li>
+                <li><strong>审计追踪完整性</strong>：确保所有修改都有审计日志</li>
+                <li><strong>节假日顺延审核</strong>：检查日期调整是否经过风控审核</li>
+            </ul>
+            </section>
+
+            <section id="export" class="tab-content">
+            <div class="section-header">
+                <h2>数据导出</h2>
+            </div>
+            <div class="form-group">
+                <label>选择批次</label>
+                <select id="export-batch-select"></select>
+            </div>
+            <button class="btn-primary" onclick="exportExcel()">导出Excel</button>
+            <button class="btn-secondary" onclick="exportCSV()">导出CSV</button>
+            <button class="btn-secondary" onclick="verifyExport()">验证一致性</button>
+            <div id="export-result"></div>
+
+            <h3>记录明细</h3>
+            <table class="data-table" id="export-table">
+                <thead>
+                    <tr>
+                    <th>原始行号</th>
+                    <th>基金代码</th>
+                    <th>客户姓名</th>
+                    <th>客户经理</th>
+                    <th>审批人</th>
+                    <th>交易日期</th>
+                    <th>清算日期</th>
+                    <th>交易金额</th>
+                    <th>最终金额</th>
+                    <th>来源</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody id="records-body">
+                    <tr><td colspan="12" class="text-center">请选择批次查看记录</td></tr>
+                </tbody>
+            </table>
+            </section>
+        </main>
+    </div>
+
+    <div id="record-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>记录详情</h2>
+            <div id="record-detail"></div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
