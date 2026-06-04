@@ -84,7 +84,7 @@ export type GameAction =
   | { type: 'START'; payload: { config: GameConfig } }
   | { type: 'PAUSE'; payload: { note: string } }
   | { type: 'RESUME' }
-  | { type: 'INPUT'; payload: { value: string | number; note: string } }
+  | { type: 'INPUT'; payload: { value: string | number; note: string; source?: 'manual' | 'import' | 'test' } }
   | { type: 'RESTART' }
   | { type: 'END' }
   | { type: 'PLAYBACK_START' }

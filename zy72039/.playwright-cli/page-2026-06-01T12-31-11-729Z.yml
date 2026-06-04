@@ -1,0 +1,96 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - img [ref=e9]
+        - generic [ref=e11]:
+          - heading "桥梁载荷闯关" [level=1] [ref=e12]
+          - paragraph [ref=e13]: 活动策划阿蓝 · 课堂计分工具
+      - generic [ref=e14]:
+        - generic [ref=e15]:
+          - img [ref=e17]
+          - generic [ref=e20]: 待机
+        - navigation [ref=e21]:
+          - button "配置" [ref=e22] [cursor=pointer]:
+            - img [ref=e23]
+            - text: 配置
+          - button "游戏" [active] [ref=e26] [cursor=pointer]:
+            - img [ref=e27]
+            - text: 游戏
+          - button "记录" [ref=e29] [cursor=pointer]:
+            - img [ref=e30]
+            - text: 记录
+          - button "测试" [ref=e33] [cursor=pointer]:
+            - img [ref=e34]
+            - text: 测试
+  - main [ref=e36]:
+    - generic [ref=e98]:
+      - generic [ref=e100]:
+        - button "开始" [ref=e101] [cursor=pointer]:
+          - img [ref=e102]
+          - generic [ref=e104]: 开始
+        - button "重开" [ref=e105] [cursor=pointer]:
+          - img [ref=e106]
+          - generic [ref=e109]: 重开
+        - button "结算" [disabled] [ref=e110]:
+          - img [ref=e111]
+          - generic [ref=e113]: 结算
+        - button "回放" [disabled] [ref=e114]:
+          - img [ref=e115]
+          - generic [ref=e119]: 回放
+      - generic [ref=e120]:
+        - generic [ref=e121]:
+          - generic [ref=e123]:
+            - generic [ref=e124]:
+              - generic [ref=e125]:
+                - generic [ref=e126]:
+                  - img [ref=e127]
+                  - generic [ref=e130]: 当前回合
+                - generic [ref=e131]:
+                  - text: "1"
+                  - generic [ref=e132]: / 10
+              - generic [ref=e133]:
+                - generic [ref=e134]:
+                  - img [ref=e135]
+                  - generic [ref=e139]: 目标载荷
+                - generic [ref=e140]: 800 kg
+            - generic [ref=e141]:
+              - generic [ref=e154]: "目标: 800kg"
+              - img [ref=e155]
+            - generic [ref=e169]:
+              - generic [ref=e170]:
+                - generic [ref=e171]: "0"
+                - generic [ref=e172]: "当前: 0 kg (0.0%)"
+                - generic [ref=e173]: "1000"
+              - generic [ref=e177]: 0 / 1000 kg
+          - generic [ref=e179]:
+            - generic [ref=e181]:
+              - generic [ref=e182]: 载荷输入
+              - generic [ref=e183]:
+                - img [ref=e184]
+                - generic [ref=e186]: 5.0s
+            - generic [ref=e189]:
+              - textbox "输入载荷值 (数字)..." [disabled] [ref=e191]
+              - button "提交" [disabled] [ref=e192]:
+                - img [ref=e193]
+                - generic [ref=e196]: 提交
+            - generic [ref=e197]:
+              - img [ref=e198]
+              - textbox "原始备注（永不清洗，原样保留） - 例如：学生A回答、有人举手、老师提示过..." [disabled] [ref=e201]
+            - generic [ref=e202]: 点击「开始」按钮开始游戏
+        - generic [ref=e203]:
+          - heading "操作记录 0 条" [level=3] [ref=e204]:
+            - img [ref=e205]
+            - text: 操作记录
+            - generic [ref=e208]: 0 条
+          - generic [ref=e209]:
+            - img [ref=e210]
+            - paragraph [ref=e213]: 暂无记录
+            - paragraph [ref=e214]: 开始游戏后，提交的数据会显示在这里
+  - contentinfo [ref=e80]:
+    - generic [ref=e82]:
+      - generic [ref=e83]: 桥梁载荷闯关 · 课堂计分工具 · 给活动策划阿蓝交接用
+      - generic [ref=e84]:
+        - generic [ref=e85]: "配置版本: v1.0"
+        - generic [ref=e86]: ·
+        - generic [ref=e87]: "操作人: 课堂组织者"

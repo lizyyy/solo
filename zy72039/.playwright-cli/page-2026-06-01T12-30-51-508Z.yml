@@ -1,0 +1,70 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - img [ref=e9]
+        - generic [ref=e11]:
+          - heading "桥梁载荷闯关" [level=1] [ref=e12]
+          - paragraph [ref=e13]: 活动策划阿蓝 · 课堂计分工具
+      - generic [ref=e14]:
+        - generic [ref=e15]:
+          - img [ref=e17]
+          - generic [ref=e20]: 待机
+        - navigation [ref=e21]:
+          - button "配置" [ref=e22] [cursor=pointer]:
+            - img [ref=e23]
+            - text: 配置
+          - button "游戏" [ref=e26] [cursor=pointer]:
+            - img [ref=e27]
+            - text: 游戏
+          - button "记录" [ref=e29] [cursor=pointer]:
+            - img [ref=e30]
+            - text: 记录
+          - button "测试" [ref=e33] [cursor=pointer]:
+            - img [ref=e34]
+            - text: 测试
+  - main [ref=e36]:
+    - generic [ref=e38]:
+      - generic [ref=e39]:
+        - heading "游戏配置" [level=2] [ref=e40]:
+          - img [ref=e41]
+          - text: 游戏配置
+        - generic [ref=e44]:
+          - button "加载默认" [ref=e45] [cursor=pointer]
+          - button "测试坏配置" [ref=e46] [cursor=pointer]
+      - generic [ref=e47]:
+        - img [ref=e48]
+        - generic [ref=e51]: 配置校验通过，可以开始游戏
+      - generic [ref=e52]:
+        - generic [ref=e53]:
+          - generic [ref=e54]: 游戏名称
+          - textbox "例如：三年级二班-桥梁载荷闯关" [ref=e55]: 桥梁载荷闯关 - 标准模式
+        - generic [ref=e56]:
+          - generic [ref=e57]: 总回合数
+          - spinbutton [ref=e58]: "10"
+        - generic [ref=e59]:
+          - generic [ref=e60]: 每轮载荷增量 (kg)
+          - spinbutton [ref=e61]: "80"
+        - generic [ref=e62]:
+          - generic [ref=e63]: 最大载荷 (kg)
+          - spinbutton [ref=e64]: "1000"
+        - generic [ref=e65]:
+          - generic [ref=e66]: 目标载荷 (kg)
+          - spinbutton [ref=e67]: "800"
+        - generic [ref=e68]:
+          - generic [ref=e69]: 每轮时间限制 (毫秒)
+          - spinbutton [ref=e70]: "5000"
+        - generic [ref=e71]:
+          - generic [ref=e72]: 边界值阈值 (%)
+          - spinbutton [ref=e73]: "5"
+      - button "显示高级选项" [ref=e75] [cursor=pointer]:
+        - img [ref=e76]
+        - text: 显示高级选项
+      - button "保存配置并准备开始" [ref=e79] [cursor=pointer]
+  - contentinfo [ref=e80]:
+    - generic [ref=e82]:
+      - generic [ref=e83]: 桥梁载荷闯关 · 课堂计分工具 · 给活动策划阿蓝交接用
+      - generic [ref=e84]:
+        - generic [ref=e85]: "配置版本: v1.0"
+        - generic [ref=e86]: ·
+        - generic [ref=e87]: "操作人: 课堂组织者"

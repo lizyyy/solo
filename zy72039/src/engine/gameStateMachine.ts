@@ -1,7 +1,7 @@
 import type { GameState, GameAction, GameConfig, GameRecord } from '../types';
 import { processInput } from './dataProcessor';
 import { analyzeFailure } from './failureAnalyzer';
-import { formatTimestamp } from '../utils/timeUtils';
+import { formatTimestamp, generateId } from '../utils/timeUtils';
 
 export function createInitialState(): GameState {
   return {
@@ -48,24 +48,71 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
     case 'PAUSE': {
       if (state.status !== 'playing') return state;
+      const now = Date.now();
+      const pauseNote = action.payload.note || '未填写暂停原因';
+      
+      const pauseRecord: GameRecord = {
+        id: generateId(),
+        sequence: state.records.length + 1,
+        timestamp: now,
+        formattedTime: formatTimestamp(now),
+        source: 'manual',
+        rawValue: null,
+        processedValue: null,
+        load: state.currentLoad,
+        note: pauseNote,
+        flags: ['interrupted'],
+        isSuccess: false,
+        failureReason: null,
+        failureDetail: '',
+        processingNote: `游戏暂停 - 原因: ${pauseNote} - 当前载荷: ${state.currentLoad}kg - 当前回合: 第${state.currentRound}回合 - 给阿蓝交接用: 保留暂停时完整局面快照`,
+        operator: '课堂组织者',
+        responseTime: state.lastInputTime ? now - state.lastInputTime : null,
+        roundNumber: state.currentRound,
+      };
+
       return {
         ...state,
         status: 'paused',
-        pauseTime: Date.now(),
-        pauseNote: action.payload.note,
+        pauseTime: now,
+        pauseNote,
+        records: [...state.records, pauseRecord],
       };
     }
 
     case 'RESUME': {
       if (state.status !== 'paused' || !state.pauseTime) return state;
-      const pausedDuration = Date.now() - state.pauseTime;
+      const now = Date.now();
+      const pausedDuration = now - state.pauseTime;
+
+      const resumeRecord: GameRecord = {
+        id: generateId(),
+        sequence: state.records.length + 1,
+        timestamp: now,
+        formattedTime: formatTimestamp(now),
+        source: 'manual',
+        rawValue: null,
+        processedValue: null,
+        load: state.currentLoad,
+        note: `游戏继续 - 暂停时长: ${(pausedDuration / 1000).toFixed(1)}秒 - 暂停原因: ${state.pauseNote}`,
+        flags: ['interrupted'],
+        isSuccess: true,
+        failureReason: null,
+        failureDetail: '',
+        processingNote: `游戏继续 - 暂停时长: ${(pausedDuration / 1000).toFixed(1)}秒 - 恢复时载荷: ${state.currentLoad}kg - 恢复时回合: 第${state.currentRound}回合 - 给阿蓝交接用: 从暂停状态完整恢复`,
+        operator: '课堂组织者',
+        responseTime: pausedDuration,
+        roundNumber: state.currentRound,
+      };
+
       return {
         ...state,
         status: 'playing',
         pauseTime: null,
         totalPausedDuration: state.totalPausedDuration + pausedDuration,
-        lastInputTime: Date.now(),
+        lastInputTime: now,
         pauseNote: '',
+        records: [...state.records, resumeRecord],
       };
     }
 
@@ -74,6 +121,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
       const now = Date.now();
       const responseTime = state.lastInputTime ? now - state.lastInputTime : null;
+      const source = action.payload.source || 'manual';
 
       const { record } = processInput(
         action.payload.value,
@@ -83,7 +131,8 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         state.lastInputTime,
         state.currentRound,
         state.currentLoad,
-        responseTime
+        responseTime,
+        source
       );
 
       if (!record.isSuccess) {
