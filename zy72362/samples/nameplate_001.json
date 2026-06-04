@@ -1,0 +1,38 @@
+{
+  "equipment_id": "PUMP-2024-001",
+  "equipment_name": "主循环水泵 DN300",
+  "parameters": [
+    {
+      "name": "pipe_length",
+      "value": 500.0,
+      "unit": "m",
+      "provenance": {
+        "source": "设备铭牌参数",
+        "detail": "泵出口至一号阀门管道总长度",
+        "timestamp": "2024-01-15T09:00:00"
+      },
+      "missing_materials": ["现场实际管长复测报告"],
+      "next_action": "找设备工程师确认管长"
+    },
+    {
+      "name": "pipe_diameter",
+      "value": 0.3,
+      "unit": "m",
+      "provenance": {
+        "source": "设备铭牌参数",
+        "detail": "DN300 公称直径",
+        "timestamp": "2024-01-15T09:00:00"
+      }
+    },
+    {
+      "name": "wall_thickness",
+      "value": 0.01,
+      "unit": "m",
+      "provenance": {
+        "source": "设备铭牌参数",
+        "detail": "管道壁厚 10mm",
+        "timestamp": "2024-01-15T09:00:00"
+      }
+    }
+  ]
+}

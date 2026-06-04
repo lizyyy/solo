@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}管道水锤压力试算 - 仪表盘{% endblock %}
+{% block content %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('dashboard') }}">管道水锤压力试算</a>
+    </div>
+</nav>
+<div class="container mt-5">
+    <div class="hero-section text-center py-5 bg-light rounded-3">
+        <h1 class="display-4 mb-4">管道水锤压力试算系统</h1>
+        <p class="lead mb-5">快速准确计算管道水锤压力，保障管网安全运行</p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{{ url_for('import_nameplate') }}" class="btn btn-primary btn-lg">导入铭牌数据</a>
+            <a href="{{ url_for('import_screenshot') }}" class="btn btn-secondary btn-lg">导入维修截图</a>
+            <a href="{{ url_for('start_calculation') }}" class="btn btn-success btn-lg">开始计算</a>
+        </div>
+    </div>
+    <div class="row mt-5">
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">铭牌数据</h5>
+                    <p class="card-text display-4">{{ nameplate_count }}</p>
+                    <p class="text-muted">条记录</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">维修截图</h5>
+                    <p class="card-text display-4">{{ screenshot_count }}</p>
+                    <p class="text-muted">张图片</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">计算记录</h5>
+                    <p class="card-text display-4">{{ calculation_count }}</p>
+                    <p class="text-muted">次计算</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mt-5 text-center">
+        <a href="{{ url_for('list_calculations') }}" class="btn btn-outline-primary">查看所有计算记录</a>
+    </div>
+</div>
+{% endblock %}

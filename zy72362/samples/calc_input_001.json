@@ -1,0 +1,51 @@
+{
+  "pipe_length": 500.0,
+  "pipe_diameter": 0.3,
+  "wall_thickness": 0.01,
+  "fluid_density": 1000.0,
+  "bulk_modulus": 2.2e9,
+  "valve_closing_time": 5.0,
+  "initial_velocity": 2.5,
+  "coefficients": {
+    "friction_factor": 0.015,
+    "safety_factor": 1.2
+  },
+  "parameter_entries": [
+    {
+      "name": "pipe_length",
+      "value": 500.0,
+      "unit": "m",
+      "provenance": {
+        "source": "设备铭牌参数",
+        "detail": "泵出口至一号阀门管道总长度",
+        "timestamp": "2024-01-15T09:00:00"
+      },
+      "missing_materials": ["现场实际管长复测报告"],
+      "next_action": "找设备工程师确认管长"
+    },
+    {
+      "name": "valve_closing_time",
+      "value": 5.0,
+      "unit": "s",
+      "provenance": {
+        "source": "设备铭牌参数",
+        "detail": "阀门标称关闭时间",
+        "timestamp": "2024-01-15T09:00:00"
+      },
+      "is_manually_modified": true,
+      "missing_materials": ["阀门现场实测数据"]
+    },
+    {
+      "name": "friction_factor",
+      "value": 0.015,
+      "unit": "-",
+      "provenance": {
+        "source": "人工改系数",
+        "detail": "根据经验调整摩擦系数，原设计值 0.012",
+        "timestamp": "2024-01-16T14:30:00"
+      },
+      "is_manually_modified": true,
+      "next_action": "找设备工程师复核"
+    }
+  ]
+}
