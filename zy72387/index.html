@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>舞台烟雾扩散演示 - 质检管理系统</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app-header">
+  <div class="logo">🌫</div>
+  <h1>舞台烟雾扩散演示</h1>
+  <span class="subtitle">质检管理系统 v1.0</span>
+</div>
+
+<div class="workflow-bar" id="workflowBar">
+  <div class="wf-step active" data-step="1" onclick="App.navigateToStep(1)">
+    <span class="step-num">1</span>
+    <span>导入安全阈值表</span>
+  </div>
+  <span class="wf-arrow">→</span>
+  <div class="wf-step" data-step="2" onclick="App.navigateToStep(2)">
+    <span class="step-num">2</span>
+    <span>补看设备铭牌参数</span>
+  </div>
+  <span class="wf-arrow">→</span>
+  <div class="wf-step" data-step="3" onclick="App.navigateToStep(3)">
+    <span class="step-num">3</span>
+    <span>交接报告更新</span>
+  </div>
+</div>
+
+<div class="main-container">
+  <div class="side-panel" id="leftPanel">
+    <div class="panel-title">
+      <span>📋 自检结果</span>
+      <span class="badge" id="scBadge">0</span>
+    </div>
+    <div id="selfCheckList"></div>
+
+    <hr class="section-divider">
+
+    <div class="panel-title">
+      <span>⚡ 冲突待处理</span>
+      <span class="badge" id="conflictBadge">0</span>
+    </div>
+    <div id="conflictSummary"></div>
+
+    <hr class="section-divider">
+
+    <div class="panel-title">
+      <span>🕐 晚到材料</span>
+      <span class="badge" id="lateBadge">0</span>
+    </div>
+    <div id="lateMaterialSummary"></div>
+  </div>
+
+  <div class="center-panel" id="centerPanel"></div>
+
+  <div class="side-panel right" id="rightPanel">
+    <div class="panel-title">
+      <span>📝 参数版本追踪</span>
+    </div>
+    <div id="versionHistory"></div>
+
+    <hr class="section-divider">
+
+    <div class="panel-title">
+      <span>🔄 单源数据状态</span>
+    </div>
+    <div id="dataSourceStatus"></div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<div id="modalRoot"></div>
+
+<script src="data-manager.js"></script>
+<script src="ui.js"></script>
+<script src="app.js"></script>
+<script>App.init();</script>
+</body>
+</html>
