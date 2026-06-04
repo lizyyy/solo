@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ session.name }} - 风洞小车阻力曲线</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 50%, #1e3a5f 100%);
+        }
+        .chart-container {
+            position: relative;
+            height: 400px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 50;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .restart-marker {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="gradient-bg text-white py-8">
+        <div class="container mx-auto px-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <a href="/" class="text-blue-200 hover:text-white mb-2 inline-block">← 返回首页</a>
+                    <h1 class="text-3xl font-bold">{{ session.name }}</h1>
+                    <p class="text-lg opacity-90">实验日期: {{ session.date }}</p>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm opacity-75">记录总数</div>
+                    <div class="text-3xl font-bold">{{ session.sensor_records|length }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-6 py-8">
+        <div class="grid md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="text-sm text-gray-500 mb-1">安全提醒总数</div>
+                <div class="text-3xl font-bold text-gray-800">{{ summary.total }}</div>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="text-sm text-gray-500 mb-1">严重提醒</div>
+                <div class="text-3xl font-bold text-red-600">{{ summary.critical }}</div>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="text-sm text-gray-500 mb-1">待安全员复核</div>
+                <div class="text-3xl font-bold text-orange-600">{{ summary.pending_safety }}</div>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="text-sm text-gray-500 mb-1">已完成复核</div>
+                <div class="text-3xl font-bold text-green-600">{{ summary.reviewed }}</div>
+            </div>
+        </div>
+
+        {% if device_plate %}
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-xl font-bold mb-4 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path>
+                </svg>
+                设备铭牌参数
+            </h2>
+            <div class="grid md:grid-cols-4 gap-4">
+                <div class="bg-gray-50 p-4 rounded">
+                    <div class="text-sm text-gray-500">设备ID</div>
+                    <div class="font-semibold">{{ device_plate.device_id }}</div>
+                </div>
+                <div class="bg-gray-50 p-4 rounded">
+                    <div class="text-sm text-gray-500">设备名称</div>
+                    <div class="font-semibold">{{ device_plate.device_name }}</div>
+                </div>
+                <div class="bg-gray-50 p-4 rounded">
+                    <div class="text-sm text-gray-500">型号</div>
+                    <div class="font-semibold">{{ device_plate.model }}</div>
+                </div>
+                <div class="bg-gray-50 p-4 rounded">
+                    <div class="text-sm text-gray-500">制造商</div>
+                    <div class="font-semibold">{{ device_plate.manufacturer }}</div>
+                </div>
+                <div class="bg-gray-50 p-4 rounded">
+                    <div class="text-sm text-gray-500">校准日期</div>
+                    <div class="font-semibold">{{ device_plate.calibration_date }}</div>
+                </div>
+                <div class="bg-gray-50 p-4 rounded">
+                    <div class="text-sm text-gray-500">下次校准</div>
+                    <div class="font-semibold">{{ device_plate.next_calibration_date }}</div>
+                </div>
+                <div class="bg-gray-50 p-4 rounded">
+                    <div class="text-sm text-gray-500">传感器数量</div>
+                    <div class="font-semibold">{{ device_plate.sensor_count }}</div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-bold flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                    风洞小车阻力曲线
+                </h2>
+                <div class="flex space-x-2">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
+                        <span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                        正常数据
+                    </span>
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-red-100 text-red-800">
+                        <span class="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
+                        重启标记
+                    </span>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="dragChart"></canvas>
+            </div>
+            <p class="text-sm text-gray-500 mt-4">提示：点击图表上的红色标记点可查看该点的详细安全提醒信息</p>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-bold mb-6 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+                安全提醒列表
+            </h2>
+
+            {% if reminders %}
+            <div class="space-y-4">
+                {% for reminder in reminders %}
+                <div class="border rounded-lg p-5 hover:shadow-md transition-shadow
+                    {% if reminder.level == 'critical' %}border-red-300 bg-red-50
+                    {% elif reminder.level == 'warning' %}border-yellow-300 bg-yellow-50
+                    {% else %}border-blue-300 bg-blue-50{% endif %}">
+
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="flex items-center">
+                            <span class="px-3 py-1 rounded-full text-sm font-medium
+                                {% if reminder.level == 'critical' %}bg-red-500 text-white
+                                {% elif reminder.level == 'warning' %}bg-yellow-500 text-white
+                                {% else %}bg-blue-500 text-white{% endif %}">
+                                {% if reminder.level == 'critical' %}严重
+                                {% elif reminder.level == 'warning' %}警告
+                                {% else %}提示{% endif %}
+                            </span>
+                            <h3 class="font-semibold ml-3 text-lg">{{ reminder.title }}</h3>
+                        </div>
+                        <span class="text-sm text-gray-500">记录ID: {{ reminder.record_id[:8] }}...</span>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <div class="text-sm font-medium text-gray-600 mb-1">数据点信息</div>
+                            {% if reminder.record %}
+                            <div class="text-sm space-y-1">
+                                <div>时间: {{ reminder.record.timestamp }}</div>
+                                <div>传感器: {{ reminder.record.sensor_id }} (编号: {{ reminder.record.sensor_number }})</div>
+                                <div>风速: {{ reminder.record.wind_speed }} m/s</div>
+                                <div>阻力: {{ reminder.record.drag_force }} N</div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <div class="text-sm font-medium text-gray-600 mb-1">保留原因</div>
+                            <p class="text-sm">{{ reminder.reason_kept }}</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="text-sm font-medium text-gray-600 mb-2">缺失材料</div>
+                        <div class="flex flex-wrap gap-2">
+                            {% for material in reminder.missing_materials %}
+                            <span class="px-3 py-1 bg-gray-200 text-gray-700 rounded-full text-sm">
+                                {{ material }}
+                            </span>
+                            {% else %}
+                            <span class="px-3 py-1 bg-green-200 text-green-700 rounded-full text-sm">
+                                材料齐全 ✓
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    {% if reminder.teacher_note %}
+                    <div class="mb-4 p-3 bg-white rounded">
+                        <div class="text-sm font-medium text-gray-600 mb-1">林老师备注</div>
+                        <p class="text-sm whitespace-pre-line">{{ reminder.teacher_note }}</p>
+                    </div>
+                    {% endif %}
+
+                    {% if reminder.screenshot %}
+                    <div class="mb-4 p-3 bg-white rounded">
+                        <div class="text-sm font-medium text-gray-600 mb-2">维修群截图</div>
+                        <div class="text-sm text-gray-500">
+                            文件: {{ reminder.screenshot.filename }}<br>
+                            描述: {{ reminder.screenshot.description or '无' }}<br>
+                            上传时间: {{ reminder.screenshot.upload_time }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if reminder.reviewed_by_safety %}
+                    <div class="mb-4 p-3 bg-green-100 rounded">
+                        <div class="text-sm font-medium text-green-700 mb-1">安全员复核意见</div>
+                        <p class="text-sm text-green-800">{{ reminder.reviewer_note }}</p>
+                    </div>
+                    {% endif %}
+
+                    <div class="flex items-center justify-between pt-4 border-t border-gray-200">
+                        <div class="flex items-center">
+                            <span class="text-sm text-gray-500 mr-3">下一步行动:</span>
+                            <span class="px-3 py-1 rounded-full text-sm font-medium
+                                {% if reminder.next_action == 'contact_safety_officer' %}bg-purple-100 text-purple-700
+                                {% elif reminder.next_action == 'contact_teacher_lin' %}bg-orange-100 text-orange-700
+                                {% elif reminder.next_action == 'completed' %}bg-green-100 text-green-700
+                                {% else %}bg-gray-100 text-gray-700{% endif %}">
+                                {% if reminder.next_action == 'contact_safety_officer' %}联系安全员
+                                {% elif reminder.next_action == 'contact_teacher_lin' %}联系林老师
+                                {% elif reminder.next_action == 'completed' %}已完成
+                                {% else %}等待材料{% endif %}
+                            </span>
+                        </div>
+
+                        <div class="flex space-x-2">
+                            {% if not reminder.screenshot and not reminder.reviewed_by_safety %}
+                            <button onclick="openScreenshotModal('{{ reminder.record_id }}')"
+                                class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700">
+                                补录截图
+                            </button>
+                            {% endif %}
+                            {% if not reminder.reviewed_by_safety and reminder.next_action == 'contact_safety_officer' %}
+                            <button onclick="openReviewModal('{{ reminder.record_id }}')"
+                                class="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm hover:bg-purple-700">
+                                安全员复核
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-12 text-gray-500">
+                <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <p>暂无安全提醒，所有数据正常</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div id="screenshotModal" class="modal">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+            <h3 class="text-xl font-bold mb-4">补录维修群截图</h3>
+            <form id="screenshotForm">
+                <input type="hidden" name="record_id" id="screenshotRecordId">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">截图文件</label>
+                    <input type="file" name="file" required class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">截图描述</label>
+                    <input type="text" name="description" required class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="例如：2024-06-01 维修群讨论记录">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">林老师说明</label>
+                    <textarea name="teacher_note" required rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="说明此截图与传感器重启的关联..."></textarea>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="closeModal('screenshotModal')" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">取消</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">上传</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="reviewModal" class="modal">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+            <h3 class="text-xl font-bold mb-4">安全员复核</h3>
+            <form id="reviewForm">
+                <input type="hidden" name="record_id" id="reviewRecordId">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">复核意见</label>
+                    <textarea name="note" required rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="请填写复核意见..."></textarea>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">复核结果</label>
+                    <div class="flex space-x-4">
+                        <label class="flex items-center">
+                            <input type="radio" name="approve" value="true" checked class="mr-2">
+                            <span class="text-green-600 font-medium">通过</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="approve" value="false" class="mr-2">
+                            <span class="text-red-600 font-medium">驳回</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="closeModal('reviewModal')" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">取消</button>
+                    <button type="submit" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">提交</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const chartData = {{ chart_data|tojson }};
+        const sessionId = "{{ session.id }}";
+
+        const labels = chartData.map(d => d.timestamp);
+        const normalData = chartData.filter(d => !d.is_restart).map(d => ({
+            x: d.wind_speed,
+            y: d.drag_force,
+            id: d.id
+        }));
+        const restartData = chartData.filter(d => d.is_restart).map(d => ({
+            x: d.wind_speed,
+            y: d.drag_force,
+            id: d.id
+        }));
+
+        const ctx = document.getElementById('dragChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'scatter',
+            data: {
+                datasets: [
+                    {
+                        label: '正常数据',
+                        data: normalData,
+                        backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        borderWidth: 1,
+                        pointRadius: 5,
+                        pointHoverRadius: 8
+                    },
+                    {
+                        label: '重启标记',
+                        data: restartData,
+                        backgroundColor: 'rgba(239, 68, 68, 0.8)',
+                        borderColor: 'rgba(239, 68, 68, 1)',
+                        borderWidth: 2,
+                        pointRadius: 8,
+                        pointHoverRadius: 12,
+                        pointStyle: 'triangle'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: '风速 vs 阻力'
+                    },
+                    legend: {
+                        position: 'top'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `风速: ${context.parsed.x} m/s, 阻力: ${context.parsed.y} N`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: '风速 (m/s)'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: '阻力 (N)'
+                        }
+                    }
+                },
+                onClick: function(e, elements) {
+                    if (elements.length > 0) {
+                        const element = elements[0];
+                        if (element.datasetIndex === 1) {
+                            const point = restartData[element.index];
+                            alert(`检测到传感器重启标记\n记录ID: ${point.id}\n点击确定滚动到安全提醒详情`);
+                            document.querySelector('.space-y-4').scrollIntoView({ behavior: 'smooth' });
+                        }
+                    }
+                }
+            }
+        });
+
+        function openScreenshotModal(recordId) {
+            document.getElementById('screenshotRecordId').value = recordId;
+            document.getElementById('screenshotModal').classList.add('show');
+        }
+
+        function openReviewModal(recordId) {
+            document.getElementById('reviewRecordId').value = recordId;
+            document.getElementById('reviewModal').classList.add('show');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        document.getElementById('screenshotForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+
+            try {
+                const response = await fetch(`/api/session/${sessionId}/screenshot`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    alert('截图上传成功！安全提醒已更新。');
+                    location.reload();
+                } else {
+                    alert('上传失败');
+                }
+            } catch (error) {
+                alert('上传失败: ' + error.message);
+            }
+        });
+
+        document.getElementById('reviewForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+
+            try {
+                const response = await fetch(`/api/session/${sessionId}/review`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    alert('复核完成！');
+                    location.reload();
+                } else {
+                    alert('提交失败');
+                }
+            } catch (error) {
+                alert('提交失败: ' + error.message);
+            }
+        });
+
+        window.onclick = function(e) {
+            if (e.target.classList.contains('modal')) {
+                e.target.classList.remove('show');
+            }
+        };
+    </script>
+</body>
+</html>

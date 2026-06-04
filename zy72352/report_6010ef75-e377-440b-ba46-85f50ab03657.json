@@ -1,0 +1,65 @@
+{
+  "session": {
+    "name": "2024-06-01 风洞教学实验",
+    "date": "2024-06-01"
+  },
+  "device_plate": {
+    "device_id": "WT-2024-001",
+    "device_name": "风洞实验台A型",
+    "model": "WT-A-001",
+    "manufacturer": "航空航天设备制造厂",
+    "purchase_date": "2023-01-15",
+    "calibration_date": "2024-01-10",
+    "next_calibration_date": "2025-01-10",
+    "sensor_count": 8,
+    "remarks": "主力实验设备，用于本科生和研究生教学实验",
+    "created_at": "2026-06-04T09:07:54.537144"
+  },
+  "safety_reminders": [
+    {
+      "id": "ed5b4adb-ddb8-460f-9ff9-5051d9e5ce44",
+      "record_id": "8953cdcc-550f-4265-b18d-369a1758b43d",
+      "level": "warning",
+      "title": "传感器重启编号变更 - SENSOR_A",
+      "reason_kept": "检测到传感器 SENSOR_A 编号从 1 变为 2，可能影响风洞小车阻力曲线数据准确性。保留此记录用于安全复核，确保实验数据可追溯。",
+      "missing_materials": [],
+      "next_action": "completed",
+      "teacher_note": "林老师补录维修群截图：2024-06-01 维修群讨论记录\n说明：传感器因软件重启，编号从1变为2，王工确认属于正常现象，实验数据有效\n设备铭牌核对：设备铭牌参数核对无误，传感器编号变化与设备配置手册中软件重启行为一致",
+      "reviewed_by_safety": true,
+      "reviewer_note": "材料齐全，林老师说明清晰，确认数据有效，同意通过复核",
+      "created_at": "2026-06-04T09:07:54.537281",
+      "updated_at": "2026-06-04T09:08:30.505630"
+    },
+    {
+      "id": "27126509-d9bd-4ffc-847c-f11b3e41ed67",
+      "record_id": "e15e7bb6-7517-4ac3-b0ba-043fadc1a6f8",
+      "level": "warning",
+      "title": "传感器重启编号变更 - SENSOR_B",
+      "reason_kept": "检测到传感器 SENSOR_B 编号从 3 变为 5，可能影响风洞小车阻力曲线数据准确性。保留此记录用于安全复核，确保实验数据可追溯。",
+      "missing_materials": [
+        "维修群截图",
+        "设备铭牌参数核对记录"
+      ],
+      "next_action": "contact_teacher_lin",
+      "teacher_note": null,
+      "reviewed_by_safety": false,
+      "reviewer_note": null,
+      "created_at": "2026-06-04T09:07:54.537293",
+      "updated_at": "2026-06-04T09:07:54.537293"
+    }
+  ],
+  "restart_events": [
+    {
+      "record_id": "8953cdcc-550f-4265-b18d-369a1758b43d",
+      "timestamp": "2024-06-01T10:05:00",
+      "sensor_id": "SENSOR_A",
+      "reason": "传感器编号从 1 变为 2"
+    },
+    {
+      "record_id": "e15e7bb6-7517-4ac3-b0ba-043fadc1a6f8",
+      "timestamp": "2024-06-01T10:10:00",
+      "sensor_id": "SENSOR_B",
+      "reason": "传感器编号从 3 变为 5"
+    }
+  ]
+}
