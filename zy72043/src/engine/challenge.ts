@@ -38,11 +38,14 @@ export function evaluateChoice(
       deductions.push({ reason: rule.reason, points: rule.deduction, detail: rule.detail })
       score -= rule.deduction
     }
-  } else if (choice !== correctAnswer) {
-    const rule = rules.find((r) => r.id === 'wrong-choice')
-    if (rule) {
-      deductions.push({ reason: rule.reason, points: rule.deduction, detail: rule.detail })
-      score -= rule.deduction
+  } else {
+    const choiceKey = choice.charAt(0)
+    if (choiceKey !== correctAnswer) {
+      const rule = rules.find((r) => r.id === 'wrong-choice')
+      if (rule) {
+        deductions.push({ reason: rule.reason, points: rule.deduction, detail: rule.detail })
+        score -= rule.deduction
+      }
     }
   }
 
@@ -63,8 +66,11 @@ export function detectDuplicate(
   choice: string | null
 ): boolean {
   if (choice === null) return false
+  const choiceKey = typeof choice === 'string' && choice.length > 0 ? choice.charAt(0) : choice
   const prevRecord = records.find((r) => r.roundNumber === currentRound - 1)
-  return prevRecord !== undefined && prevRecord.playerChoice === choice
+  if (!prevRecord || !prevRecord.playerChoice) return false
+  const prevChoiceKey = prevRecord.playerChoice.charAt(0)
+  return choiceKey === prevChoiceKey
 }
 
 export function createRoundRecord(

@@ -1,0 +1,121 @@
+- generic [ref=e346]:
+  - banner [ref=e347]:
+    - generic [ref=e348]:
+      - heading "电磁炮校准挑战 — 回顾" [level=1] [ref=e349]
+      - paragraph [ref=e350]: 初级校准 · 综合得分 79 · 用时 00:47
+    - link "返回首页" [ref=e351] [cursor=pointer]:
+      - /url: /
+  - generic [ref=e352]:
+    - generic [ref=e353]:
+      - heading "回放播放器" [level=2] [ref=e354]:
+        - img [ref=e355]
+        - text: 回放播放器
+      - generic [ref=e357]:
+        - button "1" [ref=e358] [cursor=pointer]
+        - button "2" [ref=e359] [cursor=pointer]
+        - button "3" [ref=e360] [cursor=pointer]
+        - button "4" [ref=e361] [cursor=pointer]
+        - button "5" [ref=e362] [cursor=pointer]
+      - generic [ref=e363]:
+        - generic [ref=e364]:
+          - paragraph [ref=e365]: 回合参数
+          - paragraph [ref=e366]: 频率 2.4GHz · 功率 85kW · 角度 15° · 温度 22℃
+        - generic [ref=e367]:
+          - generic [ref=e368]:
+            - paragraph [ref=e369]: 学员选择
+            - paragraph [ref=e370]: （未选择）
+          - generic [ref=e371]:
+            - paragraph [ref=e372]: 正确答案
+            - paragraph [ref=e373]: A
+        - generic [ref=e375]: 得分：75
+      - generic [ref=e376]:
+        - button "上一回合" [disabled] [ref=e377] [cursor=pointer]:
+          - img [ref=e378]
+          - text: 上一回合
+        - generic [ref=e380]: 1 / 5
+        - button "下一回合" [ref=e381] [cursor=pointer]:
+          - text: 下一回合
+          - img [ref=e382]
+    - generic [ref=e384]:
+      - heading "成绩导出" [level=2] [ref=e385]:
+        - img [ref=e386]
+        - text: 成绩导出
+      - generic [ref=e389]: "═══════════════════════════════════════ 电磁炮校准挑战 — 成绩报告 ═══════════════════════════════════════ 关卡：初级校准 挑战ID：1780317109440-zmbxk5d 开始时间：2026/6/1 20:31:49 结束时间：2026/6/1 20:32:47 总用时：00:47 综合得分：79 分 ─────────────────────────────────────── 各回合详情 ─────────────────────────────────────── 【第 1 回合】 参数：频率 2.4GHz / 功率 85kW / 角度 15° / 温度 22℃ 学员选择：（未选择） 正确答案：A: 增频降压 得分：75 分 ⚠ 未选择 扣分：-25 分（未选择：学员未在规定时间内做出选择） 【第 2 回合】 参数：频率 3.6GHz / 功率 92kW / 角度 30° / 温度 25℃ 学员选择：A: 降温增角 正确答案：B: 增频调角 得分：80 分 扣分：-20 分（选择错误：校准方案选择与标准答案不符） 【第 3 回合】 参数：频率 5GHz / 功率 78kW / 角度 45° / 温度 28℃ 学员选择：A: 增频增压 正确答案：C: 维持增角 得分：80 分 扣分：-20 分（选择错误：校准方案选择与标准答案不符） 【第 4 回合】 参数：频率 4.2GHz / 功率 88kW / 角度 60° / 温度 20℃ 学员选择：A: 降温减角 正确答案：A: 降温减角 得分：80 分 扣分：-20 分（选择错误：校准方案选择与标准答案不符） 【第 5 回合】 参数：频率 1.8GHz / 功率 95kW / 角度 10° / 温度 18℃ 学员选择：B: 增频增角 正确答案：B: 增频增角 得分：80 分 扣分：-20 分（选择错误：校准方案选择与标准答案不符） ─────────────────────────────────────── 审计追踪 ─────────────────────────────────────── [2026/6/1 20:31:49] level-config | system | 开始挑战 [2026/6/1 20:31:58] player-action | player | 挑战暂停 [2026/6/1 20:32:06] player-action | player | 挑战继续 [2026/6/1 20:32:15] system-auto | system | 第1回合：学员未选择，跳过 [2026/6/1 20:32:26] player-action | player | 第2回合：学员选择 A: 降温增角 [2026/6/1 20:32:32] player-action | player | 第3回合：学员选择 A: 增频增压 [2026/6/1 20:32:39] player-action | player | 第4回合：学员选择 A: 降温减角 [2026/6/1 20:32:47] player-action | player | 第5回合：学员选择 B: 增频增角 [2026/6/1 20:32:47] system-auto | system | 挑战完成 ═══════════════════════════════════════ 报告生成时间：2026/6/1 20:33:14 ═══════════════════════════════════════"
+      - generic [ref=e390]:
+        - button "导出文本" [ref=e391] [cursor=pointer]:
+          - img [ref=e392]
+          - text: 导出文本
+        - button "导出 JSON" [ref=e395] [cursor=pointer]:
+          - img [ref=e396]
+          - text: 导出 JSON
+        - button "打印" [ref=e401] [cursor=pointer]:
+          - img [ref=e402]
+          - text: 打印
+    - generic [ref=e406]:
+      - heading "审计追踪" [level=2] [ref=e407]:
+        - img [ref=e408]
+        - text: 审计追踪
+      - generic [ref=e410]:
+        - generic [ref=e415]:
+          - generic [ref=e416]:
+            - generic [ref=e417]: 关卡配置
+            - generic [ref=e418]:
+              - img [ref=e419]
+              - text: 2026/6/1 20:31:49
+          - paragraph [ref=e422]: 开始挑战
+        - generic [ref=e427]:
+          - generic [ref=e428]:
+            - generic [ref=e429]: 学员操作
+            - generic [ref=e430]:
+              - img [ref=e431]
+              - text: 2026/6/1 20:31:58
+          - paragraph [ref=e434]: 挑战暂停
+        - generic [ref=e439]:
+          - generic [ref=e440]:
+            - generic [ref=e441]: 学员操作
+            - generic [ref=e442]:
+              - img [ref=e443]
+              - text: 2026/6/1 20:32:06
+          - paragraph [ref=e446]: 挑战继续
+        - generic [ref=e451]:
+          - generic [ref=e452]:
+            - generic [ref=e453]: 系统自动
+            - generic [ref=e454]:
+              - img [ref=e455]
+              - text: 2026/6/1 20:32:15
+          - paragraph [ref=e458]: 第1回合：学员未选择，跳过
+        - generic [ref=e463]:
+          - generic [ref=e464]:
+            - generic [ref=e465]: 学员操作
+            - generic [ref=e466]:
+              - img [ref=e467]
+              - text: 2026/6/1 20:32:26
+          - paragraph [ref=e470]: "第2回合：学员选择 A: 降温增角"
+        - generic [ref=e475]:
+          - generic [ref=e476]:
+            - generic [ref=e477]: 学员操作
+            - generic [ref=e478]:
+              - img [ref=e479]
+              - text: 2026/6/1 20:32:32
+          - paragraph [ref=e482]: "第3回合：学员选择 A: 增频增压"
+        - generic [ref=e487]:
+          - generic [ref=e488]:
+            - generic [ref=e489]: 学员操作
+            - generic [ref=e490]:
+              - img [ref=e491]
+              - text: 2026/6/1 20:32:39
+          - paragraph [ref=e494]: "第4回合：学员选择 A: 降温减角"
+        - generic [ref=e499]:
+          - generic [ref=e500]:
+            - generic [ref=e501]: 学员操作
+            - generic [ref=e502]:
+              - img [ref=e503]
+              - text: 2026/6/1 20:32:47
+          - paragraph [ref=e506]: "第5回合：学员选择 B: 增频增角"
+        - generic [ref=e510]:
+          - generic [ref=e511]:
+            - generic [ref=e512]: 系统自动
+            - generic [ref=e513]:
+              - img [ref=e514]
+              - text: 2026/6/1 20:32:47
+          - paragraph [ref=e517]: 挑战完成

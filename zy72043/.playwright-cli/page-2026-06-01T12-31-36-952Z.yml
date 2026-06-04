@@ -1,0 +1,32 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - heading "电磁炮校准挑战" [level=1] [ref=e5]
+    - paragraph [ref=e6]: 选择校准等级，开始训练
+  - generic [ref=e7]:
+    - button "初级校准 电磁炮基础参数校准，适用于入门级学员。需要根据给定参数选择正确的校准方案。 5 回合 限时 30s/回合" [ref=e8] [cursor=pointer]:
+      - generic [ref=e9]:
+        - generic [ref=e10]:
+          - heading "初级校准" [level=2] [ref=e11]
+          - paragraph [ref=e12]: 电磁炮基础参数校准，适用于入门级学员。需要根据给定参数选择正确的校准方案。
+          - generic [ref=e13]:
+            - generic [ref=e14]: 5 回合
+            - generic [ref=e15]: 限时 30s/回合
+        - img [ref=e16]
+    - button "进阶校准 电磁炮复杂参数校准，参数波动大，需要综合判断多个变量。 6 回合 限时 25s/回合" [ref=e18] [cursor=pointer]:
+      - generic [ref=e19]:
+        - generic [ref=e20]:
+          - heading "进阶校准" [level=2] [ref=e21]
+          - paragraph [ref=e22]: 电磁炮复杂参数校准，参数波动大，需要综合判断多个变量。
+          - generic [ref=e23]:
+            - generic [ref=e24]: 6 回合
+            - generic [ref=e25]: 限时 25s/回合
+        - img [ref=e26]
+    - button "极限校准 电磁炮极限参数校准，参数接近危险阈值，考验学员的判断力和果断性。 4 回合 限时 20s/回合" [ref=e28] [cursor=pointer]:
+      - generic [ref=e29]:
+        - generic [ref=e30]:
+          - heading "极限校准" [level=2] [ref=e31]
+          - paragraph [ref=e32]: 电磁炮极限参数校准，参数接近危险阈值，考验学员的判断力和果断性。
+          - generic [ref=e33]:
+            - generic [ref=e34]: 4 回合
+            - generic [ref=e35]: 限时 20s/回合
+        - img [ref=e36]

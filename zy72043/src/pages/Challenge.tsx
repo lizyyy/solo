@@ -52,13 +52,24 @@ export default function Challenge() {
   }, [instance?.status, instance?.id, instance, tick])
 
   useEffect(() => {
-    if (!instance) return
+    if (!instance) {
+      prevRound.current = null
+      return
+    }
     if (prevRound.current !== instance.currentRound) {
       setRoundStartElapsed(instance.elapsedSeconds)
       setSelectedChoice(null)
       prevRound.current = instance.currentRound
     }
   }, [instance?.currentRound, instance?.elapsedSeconds, instance])
+
+  useEffect(() => {
+    if (!instance) return
+    if (prevRound.current === null && records.length > 0) {
+      prevRound.current = instance.currentRound
+      setRoundStartElapsed(instance.elapsedSeconds)
+    }
+  }, [instance, records.length])
 
   useEffect(() => {
     if (!instance || instance.status !== 'active' || !level) return

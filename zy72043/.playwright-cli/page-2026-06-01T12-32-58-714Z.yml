@@ -1,0 +1,189 @@
+- generic [ref=e144]:
+  - banner [ref=e145]:
+    - generic [ref=e146]:
+      - img [ref=e147]
+      - heading "结算报告" [level=1] [ref=e150]
+    - paragraph [ref=e151]: "初级校准 · ID: 1780317109440-zmbxk5d"
+    - generic [ref=e152]:
+      - generic [ref=e153]:
+        - text: 综合得分
+        - paragraph [ref=e154]: "79"
+      - generic [ref=e156]:
+        - text: 总回合
+        - paragraph [ref=e157]: "5"
+      - generic [ref=e159]:
+        - text: 总扣分
+        - paragraph [ref=e160]: "-105"
+  - generic [ref=e161]:
+    - heading "选择回顾" [level=2] [ref=e162]:
+      - img [ref=e163]
+      - text: 选择回顾
+    - table [ref=e167]:
+      - rowgroup [ref=e168]:
+        - row "回合 学员选择 正确答案 得分 来源" [ref=e169]:
+          - columnheader "回合" [ref=e170]
+          - columnheader "学员选择" [ref=e171]
+          - columnheader "正确答案" [ref=e172]
+          - columnheader "得分" [ref=e173]
+          - columnheader "来源" [ref=e174]
+          - columnheader [ref=e175]
+      - rowgroup [ref=e176]:
+        - 'row "R1 未选择 A: 增频降压 75 系统" [ref=e177]':
+          - cell "R1" [ref=e178]
+          - cell "未选择" [ref=e179]:
+            - generic [ref=e180]:
+              - img [ref=e181]
+              - text: 未选择
+          - 'cell "A: 增频降压" [ref=e184]'
+          - cell "75" [ref=e185]
+          - cell "系统" [ref=e186]
+          - cell [ref=e187]
+        - 'row "R2 A: 降温增角 B: 增频调角 80 学员操作" [ref=e188]':
+          - cell "R2" [ref=e189]
+          - 'cell "A: 降温增角" [ref=e190]':
+            - generic [ref=e191]:
+              - img [ref=e192]
+              - text: "A: 降温增角"
+          - 'cell "B: 增频调角" [ref=e196]'
+          - cell "80" [ref=e197]
+          - cell "学员操作" [ref=e198]
+          - cell [ref=e199]
+        - 'row "R3 A: 增频增压 C: 维持增角 80 学员操作" [ref=e200]':
+          - cell "R3" [ref=e201]
+          - 'cell "A: 增频增压" [ref=e202]':
+            - generic [ref=e203]:
+              - img [ref=e204]
+              - text: "A: 增频增压"
+          - 'cell "C: 维持增角" [ref=e208]'
+          - cell "80" [ref=e209]
+          - cell "学员操作" [ref=e210]
+          - cell [ref=e211]
+        - 'row "R4 A: 降温减角 A: 降温减角 80 学员操作" [ref=e212]':
+          - cell "R4" [ref=e213]
+          - 'cell "A: 降温减角" [ref=e214]':
+            - generic [ref=e215]:
+              - img [ref=e216]
+              - text: "A: 降温减角"
+          - 'cell "A: 降温减角" [ref=e220]'
+          - cell "80" [ref=e221]
+          - cell "学员操作" [ref=e222]
+          - cell [ref=e223]
+        - 'row "R5 B: 增频增角 B: 增频增角 80 学员操作" [ref=e224]':
+          - cell "R5" [ref=e225]
+          - 'cell "B: 增频增角" [ref=e226]':
+            - generic [ref=e227]:
+              - img [ref=e228]
+              - text: "B: 增频增角"
+          - 'cell "B: 增频增角" [ref=e232]'
+          - cell "80" [ref=e233]
+          - cell "学员操作" [ref=e234]
+          - cell [ref=e235]
+  - generic [ref=e236]:
+    - heading "扣分明细" [level=2] [ref=e237]:
+      - img [ref=e238]
+      - text: 扣分明细
+    - table [ref=e241]:
+      - rowgroup [ref=e242]:
+        - row "回合 扣分原因 扣分值 详细说明" [ref=e243]:
+          - columnheader "回合" [ref=e244]
+          - columnheader "扣分原因" [ref=e245]
+          - columnheader "扣分值" [ref=e246]
+          - columnheader "详细说明" [ref=e247]
+      - rowgroup [ref=e248]:
+        - row "R1 未选择 -25 学员未在规定时间内做出选择" [ref=e249]:
+          - cell "R1" [ref=e250]
+          - cell "未选择" [ref=e251]
+          - cell "-25" [ref=e252]
+          - cell "学员未在规定时间内做出选择" [ref=e253]
+        - row "R2 选择错误 -20 校准方案选择与标准答案不符" [ref=e254]:
+          - cell "R2" [ref=e255]
+          - cell "选择错误" [ref=e256]
+          - cell "-20" [ref=e257]
+          - cell "校准方案选择与标准答案不符" [ref=e258]
+        - row "R3 选择错误 -20 校准方案选择与标准答案不符" [ref=e259]:
+          - cell "R3" [ref=e260]
+          - cell "选择错误" [ref=e261]
+          - cell "-20" [ref=e262]
+          - cell "校准方案选择与标准答案不符" [ref=e263]
+        - row "R4 选择错误 -20 校准方案选择与标准答案不符" [ref=e264]:
+          - cell "R4" [ref=e265]
+          - cell "选择错误" [ref=e266]
+          - cell "-20" [ref=e267]
+          - cell "校准方案选择与标准答案不符" [ref=e268]
+        - row "R5 选择错误 -20 校准方案选择与标准答案不符" [ref=e269]:
+          - cell "R5" [ref=e270]
+          - cell "选择错误" [ref=e271]
+          - cell "-20" [ref=e272]
+          - cell "校准方案选择与标准答案不符" [ref=e273]
+        - row "总扣分 -105" [ref=e274]:
+          - cell "总扣分" [ref=e275]
+          - cell "-105" [ref=e276]
+          - cell [ref=e277]
+  - generic [ref=e278]:
+    - heading "判断过程" [level=2] [ref=e279]:
+      - img [ref=e280]
+      - text: 判断过程
+    - generic [ref=e283]:
+      - generic [ref=e284]:
+        - generic [ref=e285]:
+          - generic [ref=e286]: "[2026/6/1 20:31:49]"
+          - generic [ref=e287]: 关卡配置
+        - generic [ref=e288]: 开始挑战
+        - generic [ref=e289]: "{ \"levelId\": \"level-a\", \"totalRounds\": 5 }"
+      - generic [ref=e290]:
+        - generic [ref=e291]:
+          - generic [ref=e292]: "[2026/6/1 20:31:58]"
+          - generic [ref=e293]: 学员操作
+        - generic [ref=e294]: 挑战暂停
+        - generic [ref=e295]: "{ \"pausedAt\": \"2026-06-01T12:31:58.028Z\", \"currentRound\": 1 }"
+      - generic [ref=e296]:
+        - generic [ref=e297]:
+          - generic [ref=e298]: "[2026/6/1 20:32:06]"
+          - generic [ref=e299]: 学员操作
+        - generic [ref=e300]: 挑战继续
+        - generic [ref=e301]: "{ \"resumedAt\": \"2026-06-01T12:32:06.526Z\", \"currentRound\": 1 }"
+      - generic [ref=e302]:
+        - generic [ref=e303]:
+          - generic [ref=e304]: "[2026/6/1 20:32:15]"
+          - generic [ref=e305]: 系统自动
+        - generic [ref=e306]: 第1回合：学员未选择，跳过
+        - generic [ref=e307]: "{ \"roundNumber\": 1, \"choice\": null, \"reason\": \"skipped\" }"
+      - generic [ref=e308]:
+        - generic [ref=e309]:
+          - generic [ref=e310]: "[2026/6/1 20:32:26]"
+          - generic [ref=e311]: 学员操作
+        - generic [ref=e312]: "第2回合：学员选择 A: 降温增角"
+        - generic [ref=e313]: "{ \"roundNumber\": 2, \"choice\": \"A: 降温增角\", \"isDuplicate\": false }"
+      - generic [ref=e314]:
+        - generic [ref=e315]:
+          - generic [ref=e316]: "[2026/6/1 20:32:32]"
+          - generic [ref=e317]: 学员操作
+        - generic [ref=e318]: "第3回合：学员选择 A: 增频增压"
+        - generic [ref=e319]: "{ \"roundNumber\": 3, \"choice\": \"A: 增频增压\", \"isDuplicate\": false }"
+      - generic [ref=e320]:
+        - generic [ref=e321]:
+          - generic [ref=e322]: "[2026/6/1 20:32:39]"
+          - generic [ref=e323]: 学员操作
+        - generic [ref=e324]: "第4回合：学员选择 A: 降温减角"
+        - generic [ref=e325]: "{ \"roundNumber\": 4, \"choice\": \"A: 降温减角\", \"isDuplicate\": false }"
+      - generic [ref=e326]:
+        - generic [ref=e327]:
+          - generic [ref=e328]: "[2026/6/1 20:32:47]"
+          - generic [ref=e329]: 学员操作
+        - generic [ref=e330]: "第5回合：学员选择 B: 增频增角"
+        - generic [ref=e331]: "{ \"roundNumber\": 5, \"choice\": \"B: 增频增角\", \"isDuplicate\": false }"
+      - generic [ref=e332]:
+        - generic [ref=e333]:
+          - generic [ref=e334]: "[2026/6/1 20:32:47]"
+          - generic [ref=e335]: 系统自动
+        - generic [ref=e336]: 挑战完成
+        - generic [ref=e337]: "{ \"totalRounds\": 5, \"totalScore\": 79 }"
+  - contentinfo [ref=e338]:
+    - link "查看复盘" [ref=e339] [cursor=pointer]:
+      - /url: /review/1780317109440-zmbxk5d
+      - img [ref=e340]
+      - text: 查看复盘
+    - link "返回首页" [ref=e343] [cursor=pointer]:
+      - /url: /
+      - img [ref=e344]
+      - text: 返回首页
