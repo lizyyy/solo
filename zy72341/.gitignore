@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.env
+data/*.json
+data/*.xlsx
+!data/demo_*.xlsx
+!data/demo_*.json
