@@ -5,7 +5,7 @@ import { parseJSONData, parseCSVData, getDefaultGameConfig, validateGameConfig }
 import { ImportResult, ValidationError } from '@/types/game';
 
 export const DataImport: React.FC = () => {
-  const { setConfig, config } = useGameStore();
+  const { setConfig, config, setImportConflicts } = useGameStore();
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [showRawData, setShowRawData] = useState(false);
@@ -32,18 +32,20 @@ export const DataImport: React.FC = () => {
             },
           ],
           warnings: [],
+          conflicts: [],
           rawData: content,
         };
       }
 
       setImportResult(result);
+      setImportConflicts(result.conflicts || []);
 
       if (result.config && result.errors.length === 0) {
         setConfig(result.config);
       }
     };
     reader.readAsText(file);
-  }, [setConfig]);
+  }, [setConfig, setImportConflicts]);
 
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
@@ -241,7 +243,69 @@ export const DataImport: React.FC = () => {
               </div>
             )}
 
-            {importResult.errors.length === 0 && importResult.warnings.length === 0 && (
+            {importResult.conflicts && importResult.conflicts.length > 0 && (
+              <div className="mb-4">
+                <div className="flex items-center gap-2 text-purple-400 mb-2">
+                  <AlertTriangle className="w-4 h-4" />
+                  <span className="font-medium">数据冲突 ({importResult.conflicts.length})</span>
+                </div>
+                <p className="text-slate-400 text-xs mb-3">
+                  检测到课堂计分表与导入数据存在差异，请仔细核对后再决定使用哪个值
+                </p>
+                <div className="space-y-3">
+                  {importResult.conflicts.map((conflict, index) => (
+                    <div
+                      key={index}
+                      className="p-4 bg-purple-500/10 border border-purple-500/30 rounded-lg"
+                    >
+                      <p className="text-purple-300 text-sm font-medium mb-3">
+                        字段: {conflict.field}
+                      </p>
+                      <div className="flex items-center gap-4 mb-3">
+                        <div className="flex-1 p-3 bg-slate-900/70 rounded-lg">
+                          <div className="text-xs text-slate-400 mb-1">课堂计分表值</div>
+                          <div className="text-green-400 font-mono text-sm font-medium">
+                            {conflict.scoreboardValue}
+                          </div>
+                        </div>
+                        <div className="text-slate-500 text-xl">≠</div>
+                        <div className="flex-1 p-3 bg-slate-900/70 rounded-lg">
+                          <div className="text-xs text-slate-400 mb-1">导入数据值</div>
+                          <div className="text-yellow-400 font-mono text-sm font-medium">
+                            {conflict.importedValue}
+                          </div>
+                        </div>
+                      </div>
+                      {conflict.evidence && conflict.evidence.length > 0 && (
+                        <div className="mb-3">
+                          <p className="text-xs text-slate-400 mb-2">证据记录:</p>
+                          {conflict.evidence.map((ev, i) => (
+                            <div key={i} className="text-xs text-slate-300 bg-slate-800/50 p-2 rounded mb-1">
+                              {ev.description}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      <p className="text-slate-300 text-xs flex items-center gap-1">
+                        <Info className="w-3 h-3 text-cyan-400" />
+                        <span className="text-slate-400">建议:</span> {conflict.suggestion}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+
+                {importResult.config && importResult.errors.length === 0 && (
+                  <button
+                    onClick={applyConfigWithWarnings}
+                    className="mt-3 w-full py-2 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-500 transition-all"
+                  >
+                    仍使用此配置（保留冲突记录）
+                  </button>
+                )}
+              </div>
+            )}
+
+            {importResult.errors.length === 0 && importResult.warnings.length === 0 && (!importResult.conflicts || importResult.conflicts.length === 0) && (
               <div className="p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
                 <div className="flex items-center gap-2 text-green-400">
                   <CheckCircle className="w-4 h-4" />

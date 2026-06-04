@@ -1,0 +1,59 @@
+{
+  "id": "test-conflict-detection",
+  "name": "数据冲突测试配置",
+  "levels": [
+    {
+      "id": 1,
+      "name": "第一关：基础防护",
+      "waveCount": 3,
+      "difficulty": 2,
+      "remarks": "正常关卡配置"
+    },
+    {
+      "id": 2,
+      "name": "",
+      "waveCount": 0,
+      "difficulty": 3,
+      "isEmpty": true,
+      "remarks": "空关卡 - 用于测试空关卡检测"
+    }
+  ],
+  "events": [
+    {
+      "id": "event-001",
+      "type": "attack",
+      "timestamp": 1000,
+      "description": "钓鱼邮件攻击开始",
+      "remarks": "课堂计分表备注：学员反应时间2.5秒"
+    },
+    {
+      "id": "event-001",
+      "type": "attack",
+      "timestamp": 1000,
+      "description": "钓鱼邮件攻击开始",
+      "isDuplicate": true,
+      "remarks": "重复导入的事件 - 用于测试重复检测"
+    }
+  ],
+  "resources": {
+    "maxCoins": 50000,
+    "maxHealth": 5000,
+    "startCoins": 500,
+    "startHealth": 100,
+    "outOfBounds": true,
+    "remarks": "资源值超出边界，用于测试边界检测"
+  },
+  "expectedData": {
+    "startCoins": "500",
+    "startHealth": "100",
+    "level1Difficulty": "2",
+    "totalWaves": "10"
+  },
+  "importedData": {
+    "startCoins": "600",
+    "startHealth": "120",
+    "level1Difficulty": "2",
+    "totalWaves": "8"
+  },
+  "remarks": "综合测试配置 - 包含空关卡、重复事件、边界值和数据冲突。课堂计分表备注：这是2024年春季培训班第3期的记录"
+}

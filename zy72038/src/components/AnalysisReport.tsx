@@ -47,7 +47,12 @@ const failureReasonConfig: Record<FailureReason, {
 };
 
 export const AnalysisReport: React.FC = () => {
-  const { report, actions, resetGame } = useGameStore();
+  const { report, actions, resetGame, importConflicts } = useGameStore();
+
+  const allConflicts = [
+    ...(report?.conflicts || []),
+    ...(importConflicts || []),
+  ];
 
   if (!report) {
     return (
@@ -199,14 +204,14 @@ export const AnalysisReport: React.FC = () => {
         </div>
       )}
 
-      {report.conflicts.length > 0 && (
+      {allConflicts.length > 0 && (
         <div>
           <h3 className="text-sm font-medium text-slate-400 mb-3 flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-yellow-400" />
-            数据冲突检测
+            <AlertTriangle className="w-4 h-4 text-purple-400" />
+            数据冲突检测 ({allConflicts.length})
           </h3>
           <div className="space-y-3">
-            {report.conflicts.map((conflict, index) => (
+            {allConflicts.map((conflict, index) => (
               <div
                 key={index}
                 className="p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg"

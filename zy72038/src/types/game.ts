@@ -139,5 +139,6 @@ export interface ImportResult {
   config: GameConfig | null;
   errors: ValidationError[];
   warnings: ValidationError[];
+  conflicts: DataConflict[];
   rawData: string;
 }

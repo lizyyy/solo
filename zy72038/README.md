@@ -1,57 +1,286 @@
-# React + TypeScript + Vite
+# 链上钱包防守塔
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+培训讲师老冯专用版本 - 游戏化教学工具
 
-Currently, two official plugins are available:
+## 项目概述
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+链上钱包防守塔是一款将课堂计分表转化为可交互浏览器应用的游戏化教学工具。专为培训讲师老冯设计，解决培训过程可视化、可追溯、可分析的完整解决方案。
 
-## Expanding the ESLint configuration
+- 替代手工计分表，实现培训全流程数字化
+- 支持异常情况处理，保留原始备注信息
+- 提供详细失败分析，帮助定位问题根因
+- 支持回放和证据追溯，减少重复核对
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 快速开始
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### 1. 安装依赖
+
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 2. 类型检查
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+npm run check
 ```
+
+### 3. 构建生产版本
+
+```bash
+npm run build
+```
+
+### 4. 启动开发服务器
+
+```bash
+npm run dev
+```
+
+启动后访问：**http://localhost:5173/** (如端口被占用，将自动顺延至 5174, 5175...)
+
+### 5. 预览生产构建
+
+```bash
+npm run preview
+```
+
+## 页面导航
+
+应用顶部导航栏包含三个页面标签：
+
+| 标签 | 路径 | 功能说明 |
+|------|------|----------|
+| 🎮 游戏 | `/` | 主游戏界面，包含游戏画布和控制面板 |
+| 📤 导入 | `/import` | 课堂计分表导入和数据预览校验 |
+| 📊 报告 | `/report` | 游戏结算分析、失败原因分析、证据展示 |
+
+## 核心功能
+
+### 🎮 游戏主界面
+
+**游戏画布**：10x10网格，防守塔放置区域，敌人从左侧入口向右移动攻击钱包
+
+**控制面板**：
+- 状态显示：钱包生命值、金币、当前波次、游戏时长
+- 四种防守塔可选：
+  - 🔥 防火墙 (100金币) - 基础伤害20，范围3格
+  - 🔒 加密塔 (150金币) - 伤害35，范围2格，对恶意软件额外伤害
+  - 💾 备份塔 (120金币) - 范围攻击，伤害15，范围4格
+  - 👁️ 监控塔 (80金币) - 减速敌人，伤害10，范围5格
+- 游戏控制：开始、暂停、继续、重开、结算、回放
+
+**游戏操作步骤**：
+1. 点击右侧防守塔选择要建造的类型
+2. 点击游戏画布中空白格子放置防守塔
+3. 防守塔会自动攻击范围内的敌人
+4. 守住所有波次攻击即获胜
+
+### 📤 数据导入
+
+支持导入 **JSON** 和 **CSV** 格式的课堂计分表数据。
+
+**导入流程**：
+1. 拖拽文件到上传区域，或点击选择文件
+2. 系统自动校验数据完整性
+3. 展示检测结果（错误、警告、冲突）
+4. 可选择"仍使用此配置"保留异常数据用于教学演示
+5. 原始备注信息完整保留，不会被清洗
+
+**支持的异常检测**：
+
+| 异常类型 | 检测说明 | 处理方式 |
+|---------|----------|----------|
+| 空关卡 | 检测关卡名称为空或波次数为0 | 标记为警告，可保留用于教学 |
+| 重复事件 | 基于事件ID检测重复记录 | 标记为警告，保留对比数据 |
+| 边界值 | 验证资源值（金币、生命值、难度）是否在合理范围 | 展示两边数值，不自动修复 |
+| 数据冲突 | 对比计分表期望值与导入实际值 | 展示证据，由用户决定 |
+
+### 📊 分析报告
+
+游戏结束后自动生成详细分析报告，包含：
+
+**基础数据**：
+- 最终得分
+- 完成波次/总波次
+- 游戏时长
+- 平均响应时间
+
+**失败原因分析**（精准定位，而非笼统的"游戏结束"）：
+- 🧠 **规则理解问题** - 存在违规操作（如金币不足仍强行建造、位置冲突等）
+- ⚡ **操作速度问题** - 超过30%操作响应时间超过3秒
+- ⚠️ **综合问题** - 同时存在规则和速度问题
+
+**证据展示**：
+- 每条违规操作的时间、位置、原因
+- 响应过慢操作的统计数据
+- 数据冲突的两边原始值对比
+- 所有来源可追溯到课堂计分表原始记录
+
+**改进建议**：基于失败原因提供针对性建议
+
+### 🎬 回放功能
+
+游戏结束后可点击"回放"按钮查看完整操作过程：
+
+**回放控制**：
+- ▶️ 播放/暂停
+- ⏮️ 上一步操作
+- ⏭️ 下一步操作
+- 🔄 进度条拖拽跳转
+- ⚡ 速度调节（0.5x、1x、2x、4x）
+
+**回放时间线**：
+- 按时间顺序展示所有操作记录
+- 高亮当前播放位置
+- 显示每条操作的响应时间
+- 标记违规操作（红色）
+- 显示操作备注和位置
+
+## 测试用例
+
+`public/` 目录下提供了多个测试配置文件，可直接导入验证功能：
+
+### 1. 空关卡测试
+**文件**: `test-config-empty-levels.json`
+
+包含空名称关卡和0波次关卡，测试空关卡检测功能。
+
+**预期结果**：显示2条警告，可选择"仍使用此配置"继续。
+
+### 2. 重复事件测试
+**文件**: `test-config-duplicate-events.json`
+
+包含相同ID的重复事件和负数时间戳事件。
+
+**预期结果**：检测到重复事件和边界值警告。
+
+### 3. 边界值测试
+**文件**: `test-config-out-of-bounds.json`
+
+包含超出范围的难度值（15、-3）和超边界资源配置。
+
+**预期结果**：检测到多个边界值警告，保留原始备注。
+
+### 4. 综合冲突测试
+**文件**: `test-config-conflicts.json`
+
+同时包含空关卡、重复事件、边界值和数据冲突（expectedData vs importedData）。
+
+**预期结果**：
+- 检测到空关卡警告
+- 检测到重复事件警告
+- 检测到边界值警告
+- 检测到2处数据冲突（startCoins: 500 vs 600, startHealth: 100 vs 120, totalWaves: 10 vs 8）
+- 完整保留所有备注信息
+
+### 5. CSV导入测试
+**文件**: `test-scoreboard.csv`
+
+课堂计分表格式，包含关卡数据和冲突字段。
+
+**预期结果**：
+- 成功解析3条关卡数据
+- 检测到第2行空关卡（空名称、0波次）
+- 检测到第3行难度边界值（15超出1-10范围）
+- 检测到2处数据冲突
+
+## 核心操作流程
+
+### 完整培训流程
+
+```
+1. 进入「导入」页面
+   ↓
+2. 上传课堂计分表（JSON/CSV）
+   ↓
+3. 查看校验结果（错误/警告/冲突）
+   ├─ 有错误 → 修正数据后重新导入
+   └─ 有警告/冲突 → 可选择"仍使用此配置"用于教学
+   ↓
+4. 进入「游戏」页面
+   ↓
+5. 点击「开始游戏」按钮
+   ↓
+6. 选择防守塔类型 → 点击网格放置
+   ↓
+7. 游戏过程中可随时「暂停」或「重开」
+   ↓
+8. 游戏结束或点击「结算」按钮
+   ↓
+9. 进入「报告」页面查看详细分析
+   ├─ 查看失败原因（规则/速度/综合）
+   ├─ 查看证据记录
+   ├─ 查看数据冲突对比
+   └─ 查看改进建议
+   ↓
+10. 返回「游戏」页面点击「回放」
+    ├─ 播放完整操作过程
+    ├─ 逐帧查看学员操作
+    └─ 定位学员卡壳的具体时间点
+```
+
+## 技术栈
+
+| 技术 | 版本 | 用途 |
+|------|------|------|
+| React | ^18.2.0 | 前端框架 |
+| TypeScript | ^5.5.0 | 类型安全 |
+| Vite | ^6.4.0 | 构建工具 |
+| Tailwind CSS | ^3.4.0 | 样式方案 |
+| Zustand | ^4.5.0 | 状态管理 |
+| Lucide React | ^0.400.0 | 图标库 |
+| React Router | ^7.0.0 | 路由管理 |
+
+## 项目结构
+
+```
+src/
+├── components/
+│   ├── AnalysisReport.tsx    # 分析报告组件
+│   ├── ControlPanel.tsx      # 控制面板组件
+│   ├── DataImport.tsx        # 数据导入组件
+│   ├── ErrorBoundary.tsx     # 错误边界组件
+│   ├── GameCanvas.tsx        # 游戏画布组件
+│   └── ReplayPlayer.tsx      # 回放播放器组件
+├── hooks/
+│   └── useGameEngine.ts      # 游戏引擎Hook
+├── pages/
+│   └── Home.tsx              # 主页面
+├── store/
+│   └── gameStore.ts          # 游戏状态管理
+├── types/
+│   └── game.ts               # TypeScript类型定义
+├── utils/
+│   └── gameUtils.ts          # 工具函数（校验、解析、分析）
+├── App.tsx                   # 应用入口
+└── main.tsx                  # 渲染入口
+```
+
+## 异常处理设计
+
+### 错误边界
+应用全局错误边界捕获渲染错误，坏配置不会导致白屏，而是显示：
+- 友好的错误提示
+- 可操作的"重试"和"刷新"按钮
+- 详细的技术错误信息（可折叠）
+
+### 数据处理原则
+1. **不自动修复** - 检测到数据问题时，仅展示问题和建议，不替用户做决定
+2. **保留原始数据** - 所有导入的备注、异常值完整保留
+3. **证据留存** - 冲突数据展示两边原始值和来源
+4. **警告可忽略** - 支持保留异常数据用于教学演示场景
+
+## 给培训讲师老冯的使用建议
+
+1. **首次使用**：先用默认配置试玩一遍，熟悉游戏流程
+2. **导入数据**：导入前先在Excel中整理好课堂计分表，另存为CSV格式
+3. **异常处理**：遇到空关卡或重复数据不要慌，这正是系统的亮点——保留原始记录供教学对比
+4. **学员辅导**：通过报告中的失败原因快速定位学员问题，不用再翻旧记录
+5. **证据留存**：所有冲突和异常都会保留证据，便于后续和学员一起回顾分析
+6. **回放教学**：典型错误案例可以用回放功能慢放讲解
+
+---
+
+**版本**: 1.1.0
+**最后更新**: 2024-06-04

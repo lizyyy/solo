@@ -5,6 +5,7 @@ import { ControlPanel } from '@/components/ControlPanel';
 import { DataImport } from '@/components/DataImport';
 import { AnalysisReport } from '@/components/AnalysisReport';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { ReplayPlayer } from '@/components/ReplayPlayer';
 import { useGameStore } from '@/store/gameStore';
 import { useGameEngine } from '@/hooks/useGameEngine';
 import { getDefaultGameConfig } from '@/utils/gameUtils';
@@ -241,6 +242,8 @@ export default function Home() {
             </div>
           </div>
         </footer>
+
+        <ReplayPlayer />
       </div>
     </ErrorBoundary>
   );

@@ -7,6 +7,7 @@ import {
   ActionRecord,
   TowerType,
   AnalysisReport,
+  DataConflict,
 } from '@/types/game';
 import { generateId } from '@/utils/gameUtils';
 
@@ -15,15 +16,19 @@ interface GameStore extends GameState {
   report: AnalysisReport | null;
   selectedTowerType: TowerType | null;
   lastActionTime: number | null;
+  importConflicts: DataConflict[];
+  recordedActions: ActionRecord[];
 
   setConfig: (config: GameConfig | null) => void;
   setSelectedTowerType: (type: TowerType | null) => void;
+  setImportConflicts: (conflicts: DataConflict[]) => void;
   startGame: () => void;
   pauseGame: () => void;
   resumeGame: () => void;
   resetGame: () => void;
   endGame: () => void;
   startReplay: () => void;
+  stopReplay: () => void;
   setReplayTime: (time: number) => void;
   setReplaySpeed: (speed: number) => void;
 
@@ -43,6 +48,7 @@ interface GameStore extends GameState {
   recordAction: (action: Omit<ActionRecord, 'id' | 'timestamp'>) => void;
   setReport: (report: AnalysisReport | null) => void;
   updatePlayTime: () => void;
+  clearRecordedActions: () => void;
 }
 
 const initialState: GameState = {
@@ -68,10 +74,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
   report: null,
   selectedTowerType: null,
   lastActionTime: null,
+  importConflicts: [],
+  recordedActions: [],
 
   setConfig: (config) => set({ config }),
 
   setSelectedTowerType: (type) => set({ selectedTowerType: type }),
+
+  setImportConflicts: (conflicts) => set({ importConflicts: conflicts }),
 
   startGame: () => {
     const { config } = get();
@@ -91,6 +101,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       totalPlayTime: 0,
       actions: [],
       lastActionTime: Date.now(),
+      recordedActions: [],
     });
   },
 
@@ -120,12 +131,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({
       ...initialState,
       config: get().config,
+      importConflicts: get().importConflicts,
     });
   },
 
   endGame: () => set({ status: 'ended' }),
 
   startReplay: () => set({ status: 'replaying', replayTime: 0 }),
+
+  stopReplay: () => set({ status: 'ended' }),
 
   setReplayTime: (time) => set({ replayTime: time }),
 
@@ -201,7 +215,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   recordAction: (action) => {
-    const { lastActionTime } = get();
+    const { lastActionTime, status } = get();
     const now = Date.now();
     const responseTime = lastActionTime ? now - lastActionTime : undefined;
 
@@ -214,6 +228,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     set((state) => ({
       actions: [...state.actions, newAction],
+      recordedActions: status === 'playing' ? [...state.recordedActions, newAction] : state.recordedActions,
       lastActionTime: now,
     }));
   },
@@ -228,4 +243,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
       });
     }
   },
+
+  clearRecordedActions: () => set({ recordedActions: [] }),
 }));

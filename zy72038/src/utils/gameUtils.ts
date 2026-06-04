@@ -261,6 +261,7 @@ export const validateGameConfig = (config: GameConfig): ImportResult => {
     config,
     errors,
     warnings,
+    conflicts: [],
     rawData: JSON.stringify(config, null, 2),
   };
 };
@@ -279,31 +280,132 @@ export const parseCSVData = (csvText: string): ImportResult => {
         },
       ],
       warnings: [],
+      conflicts: [],
       rawData: csvText,
     };
   }
 
+  const headers = lines[0].split(',').map(h => h.trim());
+  const dataLines = lines.slice(1);
+
+  const levels: Level[] = [];
+  const conflicts: DataConflict[] = [];
+  const events: GameEvent[] = [];
+  let remarks = '';
+
+  dataLines.forEach((line, lineIndex) => {
+    const values = line.split(',').map(v => v.trim());
+    const row: Record<string, string> = {};
+    headers.forEach((header, i) => {
+      row[header] = values[i] || '';
+    });
+
+    if (row.level_id || row.level_name) {
+      const level: Level = {
+        id: parseInt(row.level_id) || lineIndex + 1,
+        name: row.level_name || '',
+        waveCount: parseInt(row.wave_count) || 0,
+        difficulty: parseInt(row.difficulty) || 1,
+        remarks: row.remarks || undefined,
+        isEmpty: !row.level_name || parseInt(row.wave_count) <= 0,
+      };
+      levels.push(level);
+
+      if (row.scoreboard_coins && row.imported_coins && row.scoreboard_coins !== row.imported_coins) {
+        conflicts.push({
+          field: `levels[${lineIndex}].startCoins`,
+          scoreboardValue: row.scoreboard_coins,
+          importedValue: row.imported_coins,
+          suggestion: '请确认起始金币应以哪个值为准，原始备注已保留供核对',
+          evidence: [
+            {
+              id: `conflict-coin-${lineIndex}`,
+              type: 'resource',
+              description: `第 ${lineIndex + 1} 行金币数据冲突`,
+              timestamp: Date.now(),
+              source: 'CSV导入',
+              details: `计分表: ${row.scoreboard_coins}, 导入值: ${row.imported_coins}`,
+            },
+          ],
+        });
+      }
+
+      if (row.scoreboard_health && row.imported_health && row.scoreboard_health !== row.imported_health) {
+        conflicts.push({
+          field: `levels[${lineIndex}].startHealth`,
+          scoreboardValue: row.scoreboard_health,
+          importedValue: row.imported_health,
+          suggestion: '请确认起始生命值应以哪个值为准，原始备注已保留供核对',
+          evidence: [
+            {
+              id: `conflict-health-${lineIndex}`,
+              type: 'resource',
+              description: `第 ${lineIndex + 1} 行生命值数据冲突`,
+              timestamp: Date.now(),
+              source: 'CSV导入',
+              details: `计分表: ${row.scoreboard_health}, 导入值: ${row.imported_health}`,
+            },
+          ],
+        });
+      }
+
+      if (row.remarks) {
+        remarks += `第${lineIndex + 1}行备注: ${row.remarks}\n`;
+      }
+    }
+  });
+
   const config: GameConfig = {
     id: generateId(),
     name: '导入的课堂计分表',
-    levels: [],
-    events: [],
+    levels,
+    events,
     resources: {
       maxCoins: 1000,
       maxHealth: 100,
       startCoins: 500,
       startHealth: 100,
     },
-    remarks: '',
-    sourceData: { csvLines: lines },
+    remarks: remarks || undefined,
+    sourceData: { csvLines: lines, conflicts },
   };
 
-  return validateGameConfig(config);
+  const result = validateGameConfig(config);
+  result.conflicts = conflicts;
+
+  return result;
 };
 
 export const parseJSONData = (jsonText: string): ImportResult => {
   try {
     const data = JSON.parse(jsonText);
+
+    const conflicts: DataConflict[] = [];
+
+    if (data.expectedData && data.importedData) {
+      Object.keys(data.expectedData).forEach((key) => {
+        const expected = String(data.expectedData[key]);
+        const imported = String(data.importedData[key]);
+        if (expected !== imported) {
+          conflicts.push({
+            field: key,
+            scoreboardValue: expected,
+            importedValue: imported,
+            suggestion: `请确认 ${key} 应以哪个值为准，原始备注已保留供核对`,
+            evidence: [
+              {
+                id: `conflict-${key}`,
+                type: 'resource',
+                description: `${key} 数据冲突`,
+                timestamp: Date.now(),
+                source: 'JSON导入',
+                details: `计分表: ${expected}, 导入值: ${imported}`,
+              },
+            ],
+          });
+        }
+      });
+    }
 
     const config: GameConfig = {
       id: data.id || generateId(),
@@ -320,7 +422,10 @@ export const parseJSONData = (jsonText: string): ImportResult => {
       sourceData: data,
     };
 
-    return validateGameConfig(config);
+    const result = validateGameConfig(config);
+    result.conflicts = conflicts;
+
+    return result;
   } catch {
     return {
       config: null,
@@ -333,6 +438,7 @@ export const parseJSONData = (jsonText: string): ImportResult => {
         },
       ],
       warnings: [],
+      conflicts: [],
       rawData: jsonText,
     };
   }
