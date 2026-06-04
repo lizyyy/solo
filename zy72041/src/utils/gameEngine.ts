@@ -23,6 +23,7 @@ export class GameEngine {
       playerChoices: [],
       startTime: Date.now(),
       totalPauseTime: 0,
+      pauseCount: 0,
       historyGameIds: [],
       importData,
     };
@@ -38,6 +39,7 @@ export class GameEngine {
       ...state,
       status: 'paused',
       pausedAt: Date.now(),
+      pauseCount: state.pauseCount + 1,
     };
   }
 
@@ -71,9 +73,13 @@ export class GameEngine {
       playerChoices: [],
       startTime: Date.now(),
       totalPauseTime: 0,
+      pauseCount: 0,
       historyGameIds: [...state.historyGameIds, state.gameId],
       importData: state.importData,
       conflicts: state.conflicts,
+      emptyValueReports: state.emptyValueReports,
+      duplicateReports: state.duplicateReports,
+      boundaryReports: state.boundaryReports,
     };
   }
 

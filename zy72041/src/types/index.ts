@@ -61,9 +61,13 @@ export interface GameState {
   pausedAt?: number;
   resumedAt?: number;
   totalPauseTime: number;
+  pauseCount: number;
   historyGameIds: string[];
   importData?: ImportedData;
   conflicts?: DataConflict[];
+  emptyValueReports?: EmptyValueReport[];
+  duplicateReports?: DuplicateReport[];
+  boundaryReports?: BoundaryReport[];
   errorMessage?: string;
 }
 
@@ -96,6 +100,16 @@ export interface DataConflict {
   resolution?: 'use_preset' | 'use_imported';
 }
 
+export interface ConflictResolution {
+  field: string;
+  presetValue: JsonValue;
+  importedValue: JsonValue;
+  resolution: 'use_preset' | 'use_imported';
+  effectiveValue: JsonValue;
+  presetEvidence: string;
+  importedEvidence: string;
+}
+
 export interface ExportReport {
   gameId: string;
   levelTitle: string;
@@ -114,6 +128,12 @@ export interface ExportReport {
   teacherNote?: string;
   exportedAt: string;
   source: string;
+  importSource?: string;
+  importTeacherNote?: string;
+  conflictResolutions: ConflictResolution[];
+  emptyValueReports: EmptyValueReport[];
+  duplicateReports: DuplicateReport[];
+  boundaryReports: BoundaryReport[];
 }
 
 export interface KeyChoice {

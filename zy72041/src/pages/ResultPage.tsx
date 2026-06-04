@@ -15,6 +15,11 @@ import {
   ChevronUp,
   User,
   FileDown,
+  Database,
+  GitCompare,
+  AlertCircle,
+  Copy,
+  Target,
 } from 'lucide-react';
 import { useGameStore } from '@/store/gameStore';
 import { getLevelById, getDefaultLevel } from '@/data/levels';
@@ -344,6 +349,150 @@ const ResultPage: React.FC = () => {
               <p className="text-warning-800">
                 {level.teacherNote}
               </p>
+            </div>
+          </div>
+        )}
+
+        {gameState.conflicts && gameState.conflicts.filter(c => c.resolved).length > 0 && (
+          <div className="bg-white rounded-2xl shadow-lg p-6 mb-6 animate-slide-up" style={{ animationDelay: '0.35s' }}>
+            <h2 className="text-xl font-bold text-gray-800 mb-4 font-serif flex items-center gap-2">
+              <GitCompare className="w-5 h-5 text-subway-600" />
+              数据冲突解决记录
+            </h2>
+            <div className="space-y-4">
+              {gameState.conflicts.filter(c => c.resolved).map((conflict, index) => (
+                <div
+                  key={conflict.id}
+                  className="border-2 border-subway-200 bg-subway-50 rounded-xl p-4"
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="w-6 h-6 rounded-full bg-subway-500 text-white text-xs font-bold flex items-center justify-center">
+                        {index + 1}
+                      </span>
+                      <span className="font-semibold text-subway-800">
+                        {conflict.field}
+                      </span>
+                    </div>
+                    <span className="text-xs px-2 py-1 rounded-full bg-success-100 text-success-700">
+                      {conflict.resolution === 'use_preset' ? '已选择预设' : '已选择导入'}
+                    </span>
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-3 text-sm">
+                    <div className="bg-white rounded-lg p-3">
+                      <p className="text-gray-500 mb-1">预设值</p>
+                      <p className="font-mono text-gray-800">{String(conflict.presetValue)}</p>
+                      <p className="text-xs text-gray-500 mt-1">{conflict.presetEvidence}</p>
+                    </div>
+                    <div className="bg-white rounded-lg p-3">
+                      <p className="text-gray-500 mb-1">导入值</p>
+                      <p className="font-mono text-gray-800">{String(conflict.importedValue)}</p>
+                      <p className="text-xs text-gray-500 mt-1">{conflict.importedEvidence}</p>
+                    </div>
+                  </div>
+                  <p className="text-sm text-subway-700 mt-2 bg-subway-100 p-2 rounded-lg">
+                    <span className="font-semibold">最终生效值：</span>
+                    {conflict.resolution === 'use_preset' ? String(conflict.presetValue) : String(conflict.importedValue)}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {gameState.emptyValueReports && gameState.emptyValueReports.length > 0 && (
+          <div className="bg-white rounded-2xl shadow-lg p-6 mb-6 animate-slide-up" style={{ animationDelay: '0.4s' }}>
+            <h2 className="text-xl font-bold text-gray-800 mb-4 font-serif flex items-center gap-2">
+              <Database className="w-5 h-5 text-warning-600" />
+              空值补录报告
+            </h2>
+            <p className="text-sm text-gray-600 mb-4">
+              共检测到 <span className="font-bold text-warning-600">{gameState.emptyValueReports.length}</span> 个空值字段，已使用默认值填充
+            </p>
+            <div className="space-y-2">
+              {gameState.emptyValueReports.map((report, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-3 bg-warning-50 rounded-lg text-sm"
+                >
+                  <div>
+                    <span className="font-medium text-warning-800">{report.field}</span>
+                    <span className="text-warning-600 ml-2">({report.path})</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-warning-500" />
+                    <span className="font-mono text-warning-700">默认填充：{String(report.defaultValue)}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {gameState.duplicateReports && gameState.duplicateReports.length > 0 && (
+          <div className="bg-white rounded-2xl shadow-lg p-6 mb-6 animate-slide-up" style={{ animationDelay: '0.45s' }}>
+            <h2 className="text-xl font-bold text-gray-800 mb-4 font-serif flex items-center gap-2">
+              <Copy className="w-5 h-5 text-subway-600" />
+              重复项检测报告
+            </h2>
+            <p className="text-sm text-gray-600 mb-4">
+              共检测到 <span className="font-bold text-subway-600">{gameState.duplicateReports.length}</span> 组重复数据
+            </p>
+            <div className="space-y-2">
+              {gameState.duplicateReports.map((report, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-3 bg-subway-50 rounded-lg text-sm"
+                >
+                  <span className="font-medium text-subway-800">第 {index + 1} 组</span>
+                  <span className="text-subway-600">重复 {report.count} 次</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {gameState.boundaryReports && gameState.boundaryReports.length > 0 && (
+          <div className="bg-white rounded-2xl shadow-lg p-6 mb-6 animate-slide-up" style={{ animationDelay: '0.5s' }}>
+            <h2 className="text-xl font-bold text-gray-800 mb-4 font-serif flex items-center gap-2">
+              <Target className="w-5 h-5 text-danger-600" />
+              边界情况报告
+            </h2>
+            <p className="text-sm text-gray-600 mb-4">
+              共检测到 <span className="font-bold text-danger-600">{gameState.boundaryReports.length}</span> 个边界情况
+            </p>
+            <div className="space-y-3">
+              {gameState.boundaryReports.map((report, index) => {
+                const typeColors = {
+                  edge: 'bg-warning-50 border-warning-200 text-warning-800',
+                  min: 'bg-subway-50 border-subway-200 text-subway-800',
+                  max: 'bg-danger-50 border-danger-200 text-danger-800',
+                };
+                const typeLabels = {
+                  edge: '等于阈值',
+                  min: '最小值边界',
+                  max: '最大值边界',
+                };
+                return (
+                  <div
+                    key={index}
+                    className={`border-2 p-4 rounded-lg ${typeColors[report.type]}`}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <p className="font-semibold">{report.field}</p>
+                        <p className="text-sm opacity-80 mt-1">{report.message}</p>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-xs px-2 py-1 rounded-full bg-white/50">
+                          {typeLabels[report.type]}
+                        </span>
+                        <p className="font-mono mt-1">值：{String(report.value)}</p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}

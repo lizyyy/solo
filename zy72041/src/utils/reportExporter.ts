@@ -1,10 +1,10 @@
-import type { GameState, Level, ExportReport, KeyChoice, DeductionSummary } from '@/types';
+import type { GameState, Level, ExportReport, KeyChoice, DeductionSummary, ConflictResolution } from '@/types';
 import { GameEngine } from './gameEngine';
 
 export class ReportExporter {
   static generateReport(state: GameState, level: Level, playerName?: string): ExportReport {
     const correctCount = state.playerChoices.filter(c => c.isCorrect).length;
-    const pauseCount = this.countPauses(state);
+    const pauseCount = state.pauseCount || 0;
     const restartCount = state.historyGameIds.length;
 
     const keyChoices: KeyChoice[] = state.playerChoices.map((choice) => {
@@ -31,6 +31,18 @@ export class ReportExporter {
       round: d.round,
     }));
 
+    const conflictResolutions: ConflictResolution[] = (state.conflicts || [])
+      .filter(c => c.resolved && c.resolution)
+      .map(c => ({
+        field: c.field,
+        presetValue: c.presetValue,
+        importedValue: c.importedValue,
+        resolution: c.resolution as 'use_preset' | 'use_imported',
+        effectiveValue: c.resolution === 'use_preset' ? c.presetValue : c.importedValue,
+        presetEvidence: c.presetEvidence,
+        importedEvidence: c.importedEvidence,
+      }));
+
     return {
       gameId: state.gameId,
       levelTitle: level.title,
@@ -49,11 +61,17 @@ export class ReportExporter {
       teacherNote: level.teacherNote,
       exportedAt: new Date().toLocaleString('zh-CN'),
       source: '地铁客流解谜局',
+      importSource: state.importData?.source,
+      importTeacherNote: state.importData?.teacherNote,
+      conflictResolutions,
+      emptyValueReports: state.emptyValueReports || [],
+      duplicateReports: state.duplicateReports || [],
+      boundaryReports: state.boundaryReports || [],
     };
   }
 
   private static countPauses(state: GameState): number {
-    return state.pausedAt ? 1 : 0;
+    return state.pauseCount || 0;
   }
 
   static exportAsText(report: ExportReport): string {
@@ -119,6 +137,83 @@ export class ReportExporter {
       lines.push('');
       lines.push(report.teacherNote);
       lines.push('');
+    }
+
+    if (report.importSource || report.importTeacherNote) {
+      lines.push('----------------------------------------');
+      lines.push('            导入数据来源信息');
+      lines.push('----------------------------------------');
+      lines.push('');
+      if (report.importSource) {
+        lines.push(`数据来源：${report.importSource}`);
+      }
+      if (report.importTeacherNote) {
+        lines.push(`教师备注：${report.importTeacherNote}`);
+      }
+      lines.push('');
+    }
+
+    if (report.conflictResolutions.length > 0) {
+      lines.push('----------------------------------------');
+      lines.push('            数据冲突解决记录');
+      lines.push('----------------------------------------');
+      lines.push('');
+      report.conflictResolutions.forEach((cr, index) => {
+        lines.push(`${index + 1}. ${cr.field}`);
+        lines.push(`   预设值：${JSON.stringify(cr.presetValue)}`);
+        lines.push(`   导入值：${JSON.stringify(cr.importedValue)}`);
+        lines.push(`   最终选择：${cr.resolution === 'use_preset' ? '使用预设值' : '使用导入值'}`);
+        lines.push(`   生效值：${JSON.stringify(cr.effectiveValue)}`);
+        lines.push(`   预设证据：${cr.presetEvidence}`);
+        lines.push(`   导入证据：${cr.importedEvidence}`);
+        lines.push('');
+      });
+    }
+
+    if (report.emptyValueReports.length > 0) {
+      lines.push('----------------------------------------');
+      lines.push('             空值补录报告');
+      lines.push('----------------------------------------');
+      lines.push('');
+      lines.push(`共检测到 ${report.emptyValueReports.length} 个空值字段，已使用默认值填充：`);
+      lines.push('');
+      report.emptyValueReports.forEach((ev, index) => {
+        lines.push(`${index + 1}. 字段：${ev.field}`);
+        lines.push(`   路径：${ev.path}`);
+        lines.push(`   默认填充值：${JSON.stringify(ev.defaultValue)}`);
+        lines.push('');
+      });
+    }
+
+    if (report.duplicateReports.length > 0) {
+      lines.push('----------------------------------------');
+      lines.push('             重复项检测报告');
+      lines.push('----------------------------------------');
+      lines.push('');
+      lines.push(`共检测到 ${report.duplicateReports.length} 组重复数据：`);
+      lines.push('');
+      report.duplicateReports.forEach((dr, index) => {
+        lines.push(`${index + 1}. 重复 ${dr.count} 次`);
+        lines.push(`   字段特征：${dr.field.substring(0, 50)}${dr.field.length > 50 ? '...' : ''}`);
+        lines.push('');
+      });
+    }
+
+    if (report.boundaryReports.length > 0) {
+      lines.push('----------------------------------------');
+      lines.push('             边界情况报告');
+      lines.push('----------------------------------------');
+      lines.push('');
+      lines.push(`共检测到 ${report.boundaryReports.length} 个边界情况：`);
+      lines.push('');
+      report.boundaryReports.forEach((br, index) => {
+        const typeLabel = br.type === 'edge' ? '等于阈值' : br.type === 'min' ? '最小值边界' : '最大值边界';
+        lines.push(`${index + 1}. ${br.field}`);
+        lines.push(`   边界类型：${typeLabel}`);
+        lines.push(`   当前值：${JSON.stringify(br.value)}`);
+        lines.push(`   说明：${br.message}`);
+        lines.push('');
+      });
     }
 
     lines.push('========================================');

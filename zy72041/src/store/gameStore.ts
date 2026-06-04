@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { GameState, GameAction, ImportedData, DataConflict } from '@/types';
+import type { GameState, GameAction, ImportedData, DataConflict, EmptyValueReport, DuplicateReport } from '@/types';
 import { GameEngine } from '@/utils/gameEngine';
 import { PersistenceManager } from '@/utils/persistence';
 import { DataValidator } from '@/utils/dataValidator';
@@ -36,15 +36,24 @@ export const useGameStore = create<GameStore>((set) => {
     switch (action.type) {
       case 'START_GAME': {
         const newState = GameEngine.startGame(action.payload.levelId, action.payload.importData);
+        const importData = action.payload.importData;
         
-        if (action.payload.importData) {
-          const conflicts = DataValidator.detectConflicts(level, action.payload.importData);
+        if (importData) {
+          const conflicts = DataValidator.detectConflicts(level, importData);
           set({ conflicts });
           
-          const emptyValues = DataValidator.checkEmptyValues(action.payload.importData.data);
-          if (emptyValues.length > 0) {
+          const emptyValueReports = DataValidator.checkEmptyValues(importData.data);
+          if (emptyValueReports.length > 0) {
             set(state => ({
-              warnings: [...state.warnings, `检测到${emptyValues.length}个空值字段，已使用默认值填充`]
+              warnings: [...state.warnings, `检测到${emptyValueReports.length}个空值字段，已使用默认值填充`]
+            }));
+          }
+
+          const dataValues = Object.values(importData.data);
+          const duplicateReports = DataValidator.checkDuplicates(dataValues);
+          if (duplicateReports.length > 0) {
+            set(state => ({
+              warnings: [...state.warnings, `检测到${duplicateReports.length}组重复数据，已自动标记`]
             }));
           }
         }
@@ -165,6 +174,9 @@ export const useGameStore = create<GameStore>((set) => {
         }
         
         let conflicts: DataConflict[] = [];
+        let emptyValueReports: EmptyValueReport[] = [];
+        let duplicateReports: DuplicateReport[] = [];
+        
         if (importData) {
           const importValidation = DataValidator.validateImportedData(importData);
           if (!importValidation.valid) {
@@ -181,16 +193,38 @@ export const useGameStore = create<GameStore>((set) => {
           
           conflicts = DataValidator.detectConflicts(level, importData);
           set({ conflicts });
+          
+          emptyValueReports = DataValidator.checkEmptyValues(importData.data);
+          if (emptyValueReports.length > 0) {
+            set(state => ({ 
+              warnings: [...state.warnings, `检测到${emptyValueReports.length}个空值字段，已使用默认值填充`] 
+            }));
+          }
+          
+          const dataValues = Object.values(importData.data);
+          duplicateReports = DataValidator.checkDuplicates(dataValues);
+          if (duplicateReports.length > 0) {
+            set(state => ({ 
+              warnings: [...state.warnings, `检测到${duplicateReports.length}组重复数据，已自动标记`] 
+            }));
+          }
         }
         
-        const boundaryCases = DataValidator.checkBoundaryCases(level);
-        if (boundaryCases.length > 0) {
+        const boundaryReports = DataValidator.checkBoundaryCases(level);
+        if (boundaryReports.length > 0) {
           set(state => ({ 
-            warnings: [...state.warnings, `检测到${boundaryCases.length}个边界情况，请特别注意处理`] 
+            warnings: [...state.warnings, `检测到${boundaryReports.length}个边界情况，请特别注意处理`] 
           }));
         }
         
-        const initialState = GameEngine.startGame(levelId, importData);
+        let initialState = GameEngine.startGame(levelId, importData);
+        initialState = {
+          ...initialState,
+          conflicts,
+          emptyValueReports,
+          duplicateReports,
+          boundaryReports,
+        };
         PersistenceManager.saveGameState(initialState);
         
         set({ 
@@ -266,9 +300,18 @@ export const useGameStore = create<GameStore>((set) => {
           set(state => ({ warnings: [...state.warnings, '所有数据冲突已解决，可以开始游戏'] }));
         }
         
+        const newState = state.state ? {
+          ...state.state,
+          conflicts: updatedConflicts,
+        } : null;
+        
+        if (newState) {
+          PersistenceManager.saveGameState(newState);
+        }
+        
         return { 
           conflicts: updatedConflicts,
-          state: state.state ? { ...state.state, conflicts: updatedConflicts } : null,
+          state: newState,
         };
       });
     },
