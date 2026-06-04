@@ -129,6 +129,12 @@ class GameEngine {
 
     const config = this.resourceConfig[resource];
     let newValue = this.state[resource] + delta;
+    const attemptedValue = newValue;
+
+    if (attemptedValue < 0) {
+      this.hasNegativeResource = true;
+      result.warnings.push(`${resource} 出现负值: ${attemptedValue}${config.unit}，需要人工确认`);
+    }
 
     if (newValue < config.min || newValue > config.max) {
       this.hasBoundaryViolation = true;
@@ -142,11 +148,6 @@ class GameEngine {
       });
       result.warnings.push(`${resource} 超出边界: 尝试设为 ${newValue}${config.unit}，已限制为 ${clampedValue}${config.unit}`);
       newValue = clampedValue;
-    }
-
-    if (newValue < 0) {
-      this.hasNegativeResource = true;
-      result.warnings.push(`${resource} 出现负值: ${newValue}${config.unit}`);
     }
 
     this.state[resource] = newValue;
