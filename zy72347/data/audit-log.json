@@ -1,0 +1,1260 @@
+[
+  {
+    "id": "audit_1780534310726_52nmu6qa1",
+    "timestamp": 1780534310726,
+    "operator": "运营规划阿岚",
+    "action": "IMPORT_START",
+    "details": {
+      "sourceFile": "sample-data.csv",
+      "valueColumns": [
+        "转化率",
+        "完成率"
+      ],
+      "totalRows": 7,
+      "screenshotRef": "screenshots/20240101_formula_v1.png"
+    }
+  },
+  {
+    "id": "audit_1780534310727_d15nr0o26",
+    "timestamp": 1780534310727,
+    "operator": "运营规划阿岚",
+    "action": "RECORD_IMPORTED",
+    "recordId": "rec_1780534310726_gk0fh0p1u",
+    "details": {
+      "recordId": "rec_1780534310726_gk0fh0p1u",
+      "originalRowNumber": 2,
+      "hasMixedFormat": true,
+      "formatDetected": "mixed",
+      "status": "pending_review",
+      "triggeredRules": [
+        "RULE_001",
+        "RULE_005"
+      ]
+    }
+  },
+  {
+    "id": "audit_1780534310727_tduh14w18",
+    "timestamp": 1780534310727,
+    "operator": "运营规划阿岚",
+    "action": "RECORD_IMPORTED",
+    "recordId": "rec_1780534310727_91z2o50it",
+    "details": {
+      "recordId": "rec_1780534310727_91z2o50it",
+      "originalRowNumber": 3,
+      "hasMixedFormat": true,
+      "formatDetected": "mixed",
+      "status": "pending_review",
+      "triggeredRules": [
+        "RULE_001",
+        "RULE_005"
+      ]
+    }
+  },
+  {
+    "id": "audit_1780534310727_02vv63484",
+    "timestamp": 1780534310727,
+    "operator": "运营规划阿岚",
+    "action": "RECORD_IMPORTED",
+    "recordId": "rec_1780534310727_o1p4a7np0",
+    "details": {
+      "recordId": "rec_1780534310727_o1p4a7np0",
+      "originalRowNumber": 4,
+      "hasMixedFormat": false,
+      "formatDetected": "decimal",
+      "status": "normalized",
+      "triggeredRules": [
+        "RULE_002",
+        "RULE_005"
+      ]
+    }
+  },
+  {
+    "id": "audit_1780534310727_gx30p3lux",
+    "timestamp": 1780534310727,
+    "operator": "运营规划阿岚",
+    "action": "RECORD_IMPORTED",
+    "recordId": "rec_1780534310727_cex0pkgt4",
+    "details": {
+      "recordId": "rec_1780534310727_cex0pkgt4",
+      "originalRowNumber": 5,
+      "hasMixedFormat": false,
+      "formatDetected": "percentage",
+      "status": "normalized",
+      "triggeredRules": [
+        "RULE_003",
+        "RULE_005"
+      ]
+    }
+  },
+  {
+    "id": "audit_1780534310728_d1ielwqd4",
+    "timestamp": 1780534310728,
+    "operator": "运营规划阿岚",
+    "action": "RECORD_IMPORTED",
+    "recordId": "rec_1780534310727_3fkrd8jc7",
+    "details": {
+      "recordId": "rec_1780534310727_3fkrd8jc7",
+      "originalRowNumber": 6,
+      "hasMixedFormat": true,
+      "formatDetected": "mixed",
+      "status": "pending_review",
+      "triggeredRules": [
+        "RULE_001",
+        "RULE_005"
+      ]
+    }
+  },
+  {
+    "id": "audit_1780534310728_s2zhh1723",
+    "timestamp": 1780534310728,
+    "operator": "运营规划阿岚",
+    "action": "RECORD_IMPORTED",
+    "recordId": "rec_1780534310728_8rdqqinuz",
+    "details": {
+      "recordId": "rec_1780534310728_8rdqqinuz",
+      "originalRowNumber": 7,
+      "hasMixedFormat": false,
+      "formatDetected": "percentage",
+      "status": "pending_review",
+      "triggeredRules": [
+        "RULE_004",
+        "RULE_005"
+      ]
+    }
+  },
+  {
+    "id": "audit_1780534310728_qbjvb2u4k",
+    "timestamp": 1780534310728,
+    "operator": "运营规划阿岚",
+    "action": "RECORD_IMPORTED",
+    "recordId": "rec_1780534310728_bryo4d52h",
+    "details": {
+      "recordId": "rec_1780534310728_bryo4d52h",
+      "originalRowNumber": 8,
+      "hasMixedFormat": false,
+      "formatDetected": "decimal",
+      "status": "imported",
+      "triggeredRules": [
+        "RULE_005"
+      ]
+    }
+  },
+  {
+    "id": "audit_1780534310728_n6t2824bf",
+    "timestamp": 1780534310728,
+    "operator": "运营规划阿岚",
+    "action": "IMPORT_COMPLETE",
+    "details": {
+      "sourceFile": "sample-data.csv",
+      "importedCount": 7,
+      "mixedFormatCount": 3,
+      "pendingReviewCount": 4,
+      "autoNormalizedCount": 2
+    }
+  },
+  {
+    "id": "audit_1780534310747_1vryc6cme",
+    "timestamp": 1780534310747,
+    "operator": "运营规划阿岚",
+    "action": "ANNOTATION_ADDED",
+    "recordId": "rec_1780534310726_gk0fh0p1u",
+    "details": {
+      "recordId": "rec_1780534310726_gk0fh0p1u",
+      "annotationId": "ann_1780534310746_zys5e7db1",
+      "content": "老师批注：第2行数据来自旧公式截图，存在百分数和小数混合，请活动负责人复核后确认统一格式",
+      "screenshotRef": "screenshots/20240101_teacher_note_1.png"
+    }
+  },
+  {
+    "id": "audit_1780534310747_kjgpnjvoe",
+    "timestamp": 1780534310747,
+    "operator": "运营规划阿岚",
+    "action": "ANNOTATION_ADDED",
+    "recordId": "rec_1780534310727_91z2o50it",
+    "details": {
+      "recordId": "rec_1780534310727_91z2o50it",
+      "annotationId": "ann_1780534310747_c25uk3ntk",
+      "content": "老师批注：第3行数据来自旧公式截图，存在百分数和小数混合，请活动负责人复核后确认统一格式",
+      "screenshotRef": "screenshots/20240101_teacher_note_2.png"
+    }
+  },
+  {
+    "id": "audit_1780534310750_70ygc8ona",
+    "timestamp": 1780534310750,
+    "operator": "运营规划阿岚",
+    "action": "ANNOTATION_ADDED",
+    "recordId": "rec_1780534310727_3fkrd8jc7",
+    "details": {
+      "recordId": "rec_1780534310727_3fkrd8jc7",
+      "annotationId": "ann_1780534310750_b20s3ui1w",
+      "content": "老师批注：第6行数据来自旧公式截图，存在百分数和小数混合，请活动负责人复核后确认统一格式",
+      "screenshotRef": "screenshots/20240101_teacher_note_5.png"
+    }
+  },
+  {
+    "id": "audit_1780534310754_a51cf57bn",
+    "timestamp": 1780534310754,
+    "operator": "活动负责人",
+    "action": "REVIEW_COMPLETED",
+    "recordId": "rec_1780534310726_gk0fh0p1u",
+    "details": {
+      "recordId": "rec_1780534310726_gk0fh0p1u",
+      "decision": "approve",
+      "comment": "确认混合格式，统一转为小数格式（0-1范围），来源是旧公式截图第2行",
+      "targetFormat": "decimal"
+    }
+  },
+  {
+    "id": "audit_1780534310755_k3lc6yvyq",
+    "timestamp": 1780534310755,
+    "operator": "活动负责人",
+    "action": "REVIEW_COMPLETED",
+    "recordId": "rec_1780534310727_91z2o50it",
+    "details": {
+      "recordId": "rec_1780534310727_91z2o50it",
+      "decision": "approve",
+      "comment": "确认混合格式，统一转为小数格式（0-1范围），来源是旧公式截图第3行",
+      "targetFormat": "decimal"
+    }
+  },
+  {
+    "id": "audit_1780534310756_zeeqbofad",
+    "timestamp": 1780534310756,
+    "operator": "活动负责人",
+    "action": "REVIEW_COMPLETED",
+    "recordId": "rec_1780534310727_3fkrd8jc7",
+    "details": {
+      "recordId": "rec_1780534310727_3fkrd8jc7",
+      "decision": "approve",
+      "comment": "确认混合格式，统一转为小数格式（0-1范围），来源是旧公式截图第6行",
+      "targetFormat": "decimal"
+    }
+  },
+  {
+    "id": "audit_1780534310756_x4602ql3w",
+    "timestamp": 1780534310756,
+    "operator": "活动负责人",
+    "action": "REVIEW_COMPLETED",
+    "recordId": "rec_1780534310728_8rdqqinuz",
+    "details": {
+      "recordId": "rec_1780534310728_8rdqqinuz",
+      "decision": "approve",
+      "comment": "确认混合格式，统一转为小数格式（0-1范围），来源是旧公式截图第7行",
+      "targetFormat": "decimal"
+    }
+  },
+  {
+    "id": "audit_1780534310757_26kcs7ytk",
+    "timestamp": 1780534310757,
+    "operator": "运营规划阿岚",
+    "action": "RECORD_UPDATED",
+    "recordId": "rec_1780534310726_gk0fh0p1u",
+    "details": {
+      "recordId": "rec_1780534310726_gk0fh0p1u",
+      "updatedFields": [],
+      "reason": "计算明细更新 - 已完成格式统一"
+    }
+  },
+  {
+    "id": "audit_1780534310758_1vysxj5bi",
+    "timestamp": 1780534310758,
+    "operator": "运营规划阿岚",
+    "action": "RECORD_UPDATED",
+    "recordId": "rec_1780534310727_91z2o50it",
+    "details": {
+      "recordId": "rec_1780534310727_91z2o50it",
+      "updatedFields": [],
+      "reason": "计算明细更新 - 已完成格式统一"
+    }
+  },
+  {
+    "id": "audit_1780534310758_17sa7l6jl",
+    "timestamp": 1780534310758,
+    "operator": "运营规划阿岚",
+    "action": "RECORD_UPDATED",
+    "recordId": "rec_1780534310727_3fkrd8jc7",
+    "details": {
+      "recordId": "rec_1780534310727_3fkrd8jc7",
+      "updatedFields": [],
+      "reason": "计算明细更新 - 已完成格式统一"
+    }
+  },
+  {
+    "id": "audit_1780534310760_meti5xk0c",
+    "timestamp": 1780534310760,
+    "operator": "新同事张三",
+    "action": "REPLAY_START",
+    "details": {
+      "originalSessionId": "session_1780534310760_uftttb2rk",
+      "newSessionId": "replay_1780534310760_c6k2alkh5",
+      "commandCount": 12
+    }
+  },
+  {
+    "id": "audit_1780534310761_siblt215y",
+    "timestamp": 1780534310761,
+    "operator": "运营规划阿岚",
+    "action": "IMPORT_START",
+    "details": {
+      "sourceFile": "sample-data.csv",
+      "valueColumns": [
+        "转化率",
+        "完成率"
+      ],
+      "totalRows": 7,
+      "screenshotRef": "screenshots/20240101_formula_v1.png"
+    }
+  },
+  {
+    "id": "audit_1780534310761_g6905ai6e",
+    "timestamp": 1780534310761,
+    "operator": "运营规划阿岚",
+    "action": "RECORD_IMPORTED",
+    "recordId": "rec_1780534310761_rfm8qw3lb",
+    "details": {
+      "recordId": "rec_1780534310761_rfm8qw3lb",
+      "originalRowNumber": 2,
+      "hasMixedFormat": true,
+      "formatDetected": "mixed",
+      "status": "pending_review",
+      "triggeredRules": [
+        "RULE_001",
+        "RULE_005"
+      ]
+    }
+  },
+  {
+    "id": "audit_1780534310761_eg1rbvmsv",
+    "timestamp": 1780534310761,
+    "operator": "运营规划阿岚",
+    "action": "RECORD_IMPORTED",
+    "recordId": "rec_1780534310761_2k7c3e1sx",
+    "details": {
+      "recordId": "rec_1780534310761_2k7c3e1sx",
+      "originalRowNumber": 3,
+      "hasMixedFormat": true,
+      "formatDetected": "mixed",
+      "status": "pending_review",
+      "triggeredRules": [
+        "RULE_001",
+        "RULE_005"
+      ]
+    }
+  },
+  {
+    "id": "audit_1780534310762_lnofvf1qp",
+    "timestamp": 1780534310762,
+    "operator": "运营规划阿岚",
+    "action": "RECORD_IMPORTED",
+    "recordId": "rec_1780534310761_edbkq78wz",
+    "details": {
+      "recordId": "rec_1780534310761_edbkq78wz",
+      "originalRowNumber": 4,
+      "hasMixedFormat": false,
+      "formatDetected": "decimal",
+      "status": "normalized",
+      "triggeredRules": [
+        "RULE_002",
+        "RULE_005"
+      ]
+    }
+  },
+  {
+    "id": "audit_1780534310762_3fxvgd4si",
+    "timestamp": 1780534310762,
+    "operator": "运营规划阿岚",
+    "action": "RECORD_IMPORTED",
+    "recordId": "rec_1780534310762_t1pkdd0et",
+    "details": {
+      "recordId": "rec_1780534310762_t1pkdd0et",
+      "originalRowNumber": 5,
+      "hasMixedFormat": false,
+      "formatDetected": "percentage",
+      "status": "normalized",
+      "triggeredRules": [
+        "RULE_003",
+        "RULE_005"
+      ]
+    }
+  },
+  {
+    "id": "audit_1780534310762_al9wz702n",
+    "timestamp": 1780534310762,
+    "operator": "运营规划阿岚",
+    "action": "RECORD_IMPORTED",
+    "recordId": "rec_1780534310762_0qjr4wk69",
+    "details": {
+      "recordId": "rec_1780534310762_0qjr4wk69",
+      "originalRowNumber": 6,
+      "hasMixedFormat": true,
+      "formatDetected": "mixed",
+      "status": "pending_review",
+      "triggeredRules": [
+        "RULE_001",
+        "RULE_005"
+      ]
+    }
+  },
+  {
+    "id": "audit_1780534310762_g26ejcsz",
+    "timestamp": 1780534310762,
+    "operator": "运营规划阿岚",
+    "action": "RECORD_IMPORTED",
+    "recordId": "rec_1780534310762_zhtercjq2",
+    "details": {
+      "recordId": "rec_1780534310762_zhtercjq2",
+      "originalRowNumber": 7,
+      "hasMixedFormat": false,
+      "formatDetected": "percentage",
+      "status": "pending_review",
+      "triggeredRules": [
+        "RULE_004",
+        "RULE_005"
+      ]
+    }
+  },
+  {
+    "id": "audit_1780534310763_crv0mal86",
+    "timestamp": 1780534310763,
+    "operator": "运营规划阿岚",
+    "action": "RECORD_IMPORTED",
+    "recordId": "rec_1780534310762_pd1tz35yx",
+    "details": {
+      "recordId": "rec_1780534310762_pd1tz35yx",
+      "originalRowNumber": 8,
+      "hasMixedFormat": false,
+      "formatDetected": "decimal",
+      "status": "imported",
+      "triggeredRules": [
+        "RULE_005"
+      ]
+    }
+  },
+  {
+    "id": "audit_1780534310763_aheetx5zt",
+    "timestamp": 1780534310763,
+    "operator": "运营规划阿岚",
+    "action": "IMPORT_COMPLETE",
+    "details": {
+      "sourceFile": "sample-data.csv",
+      "importedCount": 7,
+      "mixedFormatCount": 3,
+      "pendingReviewCount": 4,
+      "autoNormalizedCount": 2
+    }
+  },
+  {
+    "id": "audit_1780534310763_334w1z2sc",
+    "timestamp": 1780534310763,
+    "operator": "新同事张三",
+    "action": "REPLAY_COMMAND_SUCCESS",
+    "details": {
+      "command": "import",
+      "args": {
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy72347/examples/sample-data.csv",
+        "importedBy": "运营规划阿岚",
+        "valueColumns": [
+          "转化率",
+          "完成率"
+        ],
+        "screenshotRef": "screenshots/20240101_formula_v1.png"
+      }
+    }
+  },
+  {
+    "id": "audit_1780534310764_dhcxgp0it",
+    "timestamp": 1780534310764,
+    "operator": "新同事张三",
+    "action": "REPLAY_COMMAND_FAILED",
+    "details": {
+      "command": "annotate",
+      "args": {
+        "recordId": "rec_1780534310726_gk0fh0p1u",
+        "author": "运营规划阿岚",
+        "content": "老师批注复核 1",
+        "screenshotRef": "screenshots/note_1.png"
+      },
+      "errors": [
+        "未找到记录 rec_1780534310726_gk0fh0p1u"
+      ]
+    }
+  },
+  {
+    "id": "audit_1780534555644_o4lahgi9j",
+    "timestamp": 1780534555644,
+    "operator": "运营规划阿岚",
+    "action": "IMPORT_START",
+    "details": {
+      "sourceFile": "sample-data.csv",
+      "valueColumns": [
+        "转化率",
+        "完成率"
+      ],
+      "totalRows": 7,
+      "screenshotRef": "screenshots/20240101_formula_v1.png"
+    }
+  },
+  {
+    "id": "audit_1780534555645_7s5hhhd93",
+    "timestamp": 1780534555645,
+    "operator": "运营规划阿岚",
+    "action": "RECORD_IMPORTED",
+    "recordId": "rec_1780534555644_zbs6tl5wp",
+    "details": {
+      "recordId": "rec_1780534555644_zbs6tl5wp",
+      "originalRowNumber": 2,
+      "hasMixedFormat": true,
+      "formatDetected": "mixed",
+      "status": "pending_review",
+      "triggeredRules": [
+        "RULE_001",
+        "RULE_005"
+      ]
+    }
+  },
+  {
+    "id": "audit_1780534555645_hu7sen5oe",
+    "timestamp": 1780534555645,
+    "operator": "运营规划阿岚",
+    "action": "RECORD_IMPORTED",
+    "recordId": "rec_1780534555645_fw1sv9cup",
+    "details": {
+      "recordId": "rec_1780534555645_fw1sv9cup",
+      "originalRowNumber": 3,
+      "hasMixedFormat": true,
+      "formatDetected": "mixed",
+      "status": "pending_review",
+      "triggeredRules": [
+        "RULE_001",
+        "RULE_005"
+      ]
+    }
+  },
+  {
+    "id": "audit_1780534555645_2lsq6dqw5",
+    "timestamp": 1780534555645,
+    "operator": "运营规划阿岚",
+    "action": "RECORD_IMPORTED",
+    "recordId": "rec_1780534555645_4yhbiixty",
+    "details": {
+      "recordId": "rec_1780534555645_4yhbiixty",
+      "originalRowNumber": 4,
+      "hasMixedFormat": false,
+      "formatDetected": "decimal",
+      "status": "normalized",
+      "triggeredRules": [
+        "RULE_002",
+        "RULE_005"
+      ]
+    }
+  },
+  {
+    "id": "audit_1780534555647_p3hb851xo",
+    "timestamp": 1780534555647,
+    "operator": "运营规划阿岚",
+    "action": "RECORD_IMPORTED",
+    "recordId": "rec_1780534555645_y6mkjsyte",
+    "details": {
+      "recordId": "rec_1780534555645_y6mkjsyte",
+      "originalRowNumber": 5,
+      "hasMixedFormat": false,
+      "formatDetected": "percentage",
+      "status": "normalized",
+      "triggeredRules": [
+        "RULE_003",
+        "RULE_005"
+      ]
+    }
+  },
+  {
+    "id": "audit_1780534555649_v39nj0hiu",
+    "timestamp": 1780534555649,
+    "operator": "运营规划阿岚",
+    "action": "RECORD_IMPORTED",
+    "recordId": "rec_1780534555648_7y3dtgl8t",
+    "details": {
+      "recordId": "rec_1780534555648_7y3dtgl8t",
+      "originalRowNumber": 6,
+      "hasMixedFormat": true,
+      "formatDetected": "mixed",
+      "status": "pending_review",
+      "triggeredRules": [
+        "RULE_001",
+        "RULE_005"
+      ]
+    }
+  },
+  {
+    "id": "audit_1780534555650_eccjaqb5d",
+    "timestamp": 1780534555650,
+    "operator": "运营规划阿岚",
+    "action": "RECORD_IMPORTED",
+    "recordId": "rec_1780534555649_s3jbxhvay",
+    "details": {
+      "recordId": "rec_1780534555649_s3jbxhvay",
+      "originalRowNumber": 7,
+      "hasMixedFormat": false,
+      "formatDetected": "percentage",
+      "status": "pending_review",
+      "triggeredRules": [
+        "RULE_004",
+        "RULE_005"
+      ]
+    }
+  },
+  {
+    "id": "audit_1780534555650_snjmct8lc",
+    "timestamp": 1780534555650,
+    "operator": "运营规划阿岚",
+    "action": "RECORD_IMPORTED",
+    "recordId": "rec_1780534555650_lcghh5jw1",
+    "details": {
+      "recordId": "rec_1780534555650_lcghh5jw1",
+      "originalRowNumber": 8,
+      "hasMixedFormat": false,
+      "formatDetected": "decimal",
+      "status": "imported",
+      "triggeredRules": [
+        "RULE_005"
+      ]
+    }
+  },
+  {
+    "id": "audit_1780534555650_i8ngch205",
+    "timestamp": 1780534555650,
+    "operator": "运营规划阿岚",
+    "action": "IMPORT_COMPLETE",
+    "details": {
+      "sourceFile": "sample-data.csv",
+      "importedCount": 7,
+      "mixedFormatCount": 3,
+      "pendingReviewCount": 4,
+      "autoNormalizedCount": 2
+    }
+  },
+  {
+    "id": "audit_1780534555662_182yn0nwu",
+    "timestamp": 1780534555662,
+    "operator": "运营规划阿岚",
+    "action": "ANNOTATION_ADDED",
+    "recordId": "rec_1780534555644_zbs6tl5wp",
+    "details": {
+      "recordId": "rec_1780534555644_zbs6tl5wp",
+      "annotationId": "ann_1780534555661_jjd5h9i9s",
+      "content": "老师批注：第2行数据来自旧公式截图，存在百分数和小数混合，请活动负责人复核后确认统一格式",
+      "screenshotRef": "screenshots/20240101_teacher_note_1.png"
+    }
+  },
+  {
+    "id": "audit_1780534555662_7la7qq7y9",
+    "timestamp": 1780534555662,
+    "operator": "运营规划阿岚",
+    "action": "ANNOTATION_ADDED",
+    "recordId": "rec_1780534555645_fw1sv9cup",
+    "details": {
+      "recordId": "rec_1780534555645_fw1sv9cup",
+      "annotationId": "ann_1780534555662_czmnx5gav",
+      "content": "老师批注：第3行数据来自旧公式截图，存在百分数和小数混合，请活动负责人复核后确认统一格式",
+      "screenshotRef": "screenshots/20240101_teacher_note_2.png"
+    }
+  },
+  {
+    "id": "audit_1780534555666_ptyd6v4hy",
+    "timestamp": 1780534555666,
+    "operator": "运营规划阿岚",
+    "action": "ANNOTATION_ADDED",
+    "recordId": "rec_1780534555648_7y3dtgl8t",
+    "details": {
+      "recordId": "rec_1780534555648_7y3dtgl8t",
+      "annotationId": "ann_1780534555665_qlujvpchz",
+      "content": "老师批注：第6行数据来自旧公式截图，存在百分数和小数混合，请活动负责人复核后确认统一格式",
+      "screenshotRef": "screenshots/20240101_teacher_note_5.png"
+    }
+  },
+  {
+    "id": "audit_1780534555668_4ky39r7s9",
+    "timestamp": 1780534555668,
+    "operator": "活动负责人",
+    "action": "REVIEW_COMPLETED",
+    "recordId": "rec_1780534555644_zbs6tl5wp",
+    "details": {
+      "recordId": "rec_1780534555644_zbs6tl5wp",
+      "decision": "approve",
+      "comment": "确认混合格式，统一转为小数格式（0-1范围），来源是旧公式截图第2行",
+      "targetFormat": "decimal"
+    }
+  },
+  {
+    "id": "audit_1780534555669_qygszxw94",
+    "timestamp": 1780534555669,
+    "operator": "活动负责人",
+    "action": "REVIEW_COMPLETED",
+    "recordId": "rec_1780534555645_fw1sv9cup",
+    "details": {
+      "recordId": "rec_1780534555645_fw1sv9cup",
+      "decision": "approve",
+      "comment": "确认混合格式，统一转为小数格式（0-1范围），来源是旧公式截图第3行",
+      "targetFormat": "decimal"
+    }
+  },
+  {
+    "id": "audit_1780534555669_e8yl1on5r",
+    "timestamp": 1780534555669,
+    "operator": "活动负责人",
+    "action": "REVIEW_COMPLETED",
+    "recordId": "rec_1780534555648_7y3dtgl8t",
+    "details": {
+      "recordId": "rec_1780534555648_7y3dtgl8t",
+      "decision": "approve",
+      "comment": "确认混合格式，统一转为小数格式（0-1范围），来源是旧公式截图第6行",
+      "targetFormat": "decimal"
+    }
+  },
+  {
+    "id": "audit_1780534555670_b5j3ww4i8",
+    "timestamp": 1780534555670,
+    "operator": "活动负责人",
+    "action": "REVIEW_COMPLETED",
+    "recordId": "rec_1780534555649_s3jbxhvay",
+    "details": {
+      "recordId": "rec_1780534555649_s3jbxhvay",
+      "decision": "approve",
+      "comment": "确认混合格式，统一转为小数格式（0-1范围），来源是旧公式截图第7行",
+      "targetFormat": "decimal"
+    }
+  },
+  {
+    "id": "audit_1780534555672_mwfucaxai",
+    "timestamp": 1780534555672,
+    "operator": "运营规划阿岚",
+    "action": "RECORD_UPDATED",
+    "recordId": "rec_1780534555644_zbs6tl5wp",
+    "details": {
+      "recordId": "rec_1780534555644_zbs6tl5wp",
+      "updatedFields": [],
+      "reason": "计算明细更新 - 已完成格式统一"
+    }
+  },
+  {
+    "id": "audit_1780534555674_seofb4jd8",
+    "timestamp": 1780534555674,
+    "operator": "运营规划阿岚",
+    "action": "RECORD_UPDATED",
+    "recordId": "rec_1780534555645_fw1sv9cup",
+    "details": {
+      "recordId": "rec_1780534555645_fw1sv9cup",
+      "updatedFields": [],
+      "reason": "计算明细更新 - 已完成格式统一"
+    }
+  },
+  {
+    "id": "audit_1780534555675_khar4igyw",
+    "timestamp": 1780534555675,
+    "operator": "运营规划阿岚",
+    "action": "RECORD_UPDATED",
+    "recordId": "rec_1780534555648_7y3dtgl8t",
+    "details": {
+      "recordId": "rec_1780534555648_7y3dtgl8t",
+      "updatedFields": [],
+      "reason": "计算明细更新 - 已完成格式统一"
+    }
+  },
+  {
+    "id": "audit_1780534555676_b1uxz90nn",
+    "timestamp": 1780534555676,
+    "operator": "运营规划阿岚",
+    "action": "RECORD_UPDATED",
+    "recordId": "rec_1780534555649_s3jbxhvay",
+    "details": {
+      "recordId": "rec_1780534555649_s3jbxhvay",
+      "updatedFields": [],
+      "reason": "计算明细更新 - 已完成格式统一"
+    }
+  },
+  {
+    "id": "audit_1780534555694_6xbfmhu3l",
+    "timestamp": 1780534555694,
+    "operator": "新同事张三",
+    "action": "REPLAY_START",
+    "details": {
+      "originalSessionId": "session_1780534555693_atzi34mk3",
+      "newSessionId": "replay_1780534555694_k7ja4us1b",
+      "commandCount": 12
+    }
+  },
+  {
+    "id": "audit_1780534555699_e4nx3lyzw",
+    "timestamp": 1780534555699,
+    "operator": "运营规划阿岚",
+    "action": "IMPORT_START",
+    "details": {
+      "sourceFile": "sample-data.csv",
+      "valueColumns": [
+        "转化率",
+        "完成率"
+      ],
+      "totalRows": 7,
+      "screenshotRef": "screenshots/20240101_formula_v1.png"
+    }
+  },
+  {
+    "id": "audit_1780534555703_je6kak184",
+    "timestamp": 1780534555703,
+    "operator": "运营规划阿岚",
+    "action": "RECORD_IMPORTED",
+    "recordId": "rec_1780534555702_lxo11gzet",
+    "details": {
+      "recordId": "rec_1780534555702_lxo11gzet",
+      "originalRowNumber": 2,
+      "hasMixedFormat": true,
+      "formatDetected": "mixed",
+      "status": "pending_review",
+      "triggeredRules": [
+        "RULE_001",
+        "RULE_005"
+      ]
+    }
+  },
+  {
+    "id": "audit_1780534555704_1ndez3ew1",
+    "timestamp": 1780534555704,
+    "operator": "运营规划阿岚",
+    "action": "RECORD_IMPORTED",
+    "recordId": "rec_1780534555704_w87ua7n6x",
+    "details": {
+      "recordId": "rec_1780534555704_w87ua7n6x",
+      "originalRowNumber": 3,
+      "hasMixedFormat": true,
+      "formatDetected": "mixed",
+      "status": "pending_review",
+      "triggeredRules": [
+        "RULE_001",
+        "RULE_005"
+      ]
+    }
+  },
+  {
+    "id": "audit_1780534555706_9zhx2irta",
+    "timestamp": 1780534555706,
+    "operator": "运营规划阿岚",
+    "action": "RECORD_IMPORTED",
+    "recordId": "rec_1780534555705_wchz67eta",
+    "details": {
+      "recordId": "rec_1780534555705_wchz67eta",
+      "originalRowNumber": 4,
+      "hasMixedFormat": false,
+      "formatDetected": "decimal",
+      "status": "normalized",
+      "triggeredRules": [
+        "RULE_002",
+        "RULE_005"
+      ]
+    }
+  },
+  {
+    "id": "audit_1780534555707_c0e3lr439",
+    "timestamp": 1780534555707,
+    "operator": "运营规划阿岚",
+    "action": "RECORD_IMPORTED",
+    "recordId": "rec_1780534555706_8w0st0xwc",
+    "details": {
+      "recordId": "rec_1780534555706_8w0st0xwc",
+      "originalRowNumber": 5,
+      "hasMixedFormat": false,
+      "formatDetected": "percentage",
+      "status": "normalized",
+      "triggeredRules": [
+        "RULE_003",
+        "RULE_005"
+      ]
+    }
+  },
+  {
+    "id": "audit_1780534555707_l2yl9eng7",
+    "timestamp": 1780534555707,
+    "operator": "运营规划阿岚",
+    "action": "RECORD_IMPORTED",
+    "recordId": "rec_1780534555707_k88id0pjc",
+    "details": {
+      "recordId": "rec_1780534555707_k88id0pjc",
+      "originalRowNumber": 6,
+      "hasMixedFormat": true,
+      "formatDetected": "mixed",
+      "status": "pending_review",
+      "triggeredRules": [
+        "RULE_001",
+        "RULE_005"
+      ]
+    }
+  },
+  {
+    "id": "audit_1780534555709_2sfilqzwl",
+    "timestamp": 1780534555709,
+    "operator": "运营规划阿岚",
+    "action": "RECORD_IMPORTED",
+    "recordId": "rec_1780534555708_umxg6oe8d",
+    "details": {
+      "recordId": "rec_1780534555708_umxg6oe8d",
+      "originalRowNumber": 7,
+      "hasMixedFormat": false,
+      "formatDetected": "percentage",
+      "status": "pending_review",
+      "triggeredRules": [
+        "RULE_004",
+        "RULE_005"
+      ]
+    }
+  },
+  {
+    "id": "audit_1780534555711_ikw9p09h6",
+    "timestamp": 1780534555711,
+    "operator": "运营规划阿岚",
+    "action": "RECORD_IMPORTED",
+    "recordId": "rec_1780534555710_czqblki4z",
+    "details": {
+      "recordId": "rec_1780534555710_czqblki4z",
+      "originalRowNumber": 8,
+      "hasMixedFormat": false,
+      "formatDetected": "decimal",
+      "status": "imported",
+      "triggeredRules": [
+        "RULE_005"
+      ]
+    }
+  },
+  {
+    "id": "audit_1780534555719_rt4ieiox2",
+    "timestamp": 1780534555719,
+    "operator": "运营规划阿岚",
+    "action": "IMPORT_COMPLETE",
+    "details": {
+      "sourceFile": "sample-data.csv",
+      "importedCount": 7,
+      "mixedFormatCount": 3,
+      "pendingReviewCount": 4,
+      "autoNormalizedCount": 2
+    }
+  },
+  {
+    "id": "audit_1780534555720_orrvpyd9p",
+    "timestamp": 1780534555720,
+    "operator": "新同事张三",
+    "action": "REPLAY_COMMAND_SUCCESS",
+    "details": {
+      "command": "import",
+      "args": {
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy72347/examples/sample-data.csv",
+        "importedBy": "运营规划阿岚",
+        "valueColumns": [
+          "转化率",
+          "完成率"
+        ],
+        "screenshotRef": "screenshots/20240101_formula_v1.png"
+      }
+    }
+  },
+  {
+    "id": "audit_1780534555721_6hrsmpxvs",
+    "timestamp": 1780534555721,
+    "operator": "运营规划阿岚",
+    "action": "ANNOTATION_ADDED",
+    "recordId": "rec_1780534555702_lxo11gzet",
+    "details": {
+      "recordId": "rec_1780534555702_lxo11gzet",
+      "annotationId": "ann_1780534555720_114qrky02",
+      "content": "老师批注复核 1",
+      "screenshotRef": "screenshots/note_1.png"
+    }
+  },
+  {
+    "id": "audit_1780534555721_9d9z3ay4b",
+    "timestamp": 1780534555721,
+    "operator": "新同事张三",
+    "action": "REPLAY_COMMAND_SUCCESS",
+    "details": {
+      "command": "annotate",
+      "args": {
+        "author": "运营规划阿岚",
+        "content": "老师批注复核 1",
+        "screenshotRef": "screenshots/note_1.png"
+      }
+    }
+  },
+  {
+    "id": "audit_1780534555721_l1kkakwtp",
+    "timestamp": 1780534555721,
+    "operator": "运营规划阿岚",
+    "action": "ANNOTATION_ADDED",
+    "recordId": "rec_1780534555704_w87ua7n6x",
+    "details": {
+      "recordId": "rec_1780534555704_w87ua7n6x",
+      "annotationId": "ann_1780534555721_frrfqic89",
+      "content": "老师批注复核 2",
+      "screenshotRef": "screenshots/note_2.png"
+    }
+  },
+  {
+    "id": "audit_1780534555722_fizneg1ip",
+    "timestamp": 1780534555722,
+    "operator": "新同事张三",
+    "action": "REPLAY_COMMAND_SUCCESS",
+    "details": {
+      "command": "annotate",
+      "args": {
+        "author": "运营规划阿岚",
+        "content": "老师批注复核 2",
+        "screenshotRef": "screenshots/note_2.png"
+      }
+    }
+  },
+  {
+    "id": "audit_1780534555722_7jv13yh9z",
+    "timestamp": 1780534555722,
+    "operator": "运营规划阿岚",
+    "action": "ANNOTATION_ADDED",
+    "recordId": "rec_1780534555707_k88id0pjc",
+    "details": {
+      "recordId": "rec_1780534555707_k88id0pjc",
+      "annotationId": "ann_1780534555722_r1e1offuq",
+      "content": "老师批注复核 3",
+      "screenshotRef": "screenshots/note_3.png"
+    }
+  },
+  {
+    "id": "audit_1780534555722_bav5utzle",
+    "timestamp": 1780534555722,
+    "operator": "新同事张三",
+    "action": "REPLAY_COMMAND_SUCCESS",
+    "details": {
+      "command": "annotate",
+      "args": {
+        "author": "运营规划阿岚",
+        "content": "老师批注复核 3",
+        "screenshotRef": "screenshots/note_3.png"
+      }
+    }
+  },
+  {
+    "id": "audit_1780534555723_08rwn7u6s",
+    "timestamp": 1780534555723,
+    "operator": "活动负责人",
+    "action": "REVIEW_COMPLETED",
+    "recordId": "rec_1780534555702_lxo11gzet",
+    "details": {
+      "recordId": "rec_1780534555702_lxo11gzet",
+      "decision": "approve",
+      "comment": "复核通过",
+      "targetFormat": "decimal"
+    }
+  },
+  {
+    "id": "audit_1780534555723_fs9mp1r0p",
+    "timestamp": 1780534555723,
+    "operator": "新同事张三",
+    "action": "REPLAY_COMMAND_SUCCESS",
+    "details": {
+      "command": "review",
+      "args": {
+        "reviewer": "活动负责人",
+        "decision": "approve",
+        "comment": "复核通过"
+      }
+    }
+  },
+  {
+    "id": "audit_1780534555724_857j8ayvo",
+    "timestamp": 1780534555724,
+    "operator": "活动负责人",
+    "action": "REVIEW_COMPLETED",
+    "recordId": "rec_1780534555704_w87ua7n6x",
+    "details": {
+      "recordId": "rec_1780534555704_w87ua7n6x",
+      "decision": "approve",
+      "comment": "复核通过",
+      "targetFormat": "decimal"
+    }
+  },
+  {
+    "id": "audit_1780534555724_d1ry3wn46",
+    "timestamp": 1780534555724,
+    "operator": "新同事张三",
+    "action": "REPLAY_COMMAND_SUCCESS",
+    "details": {
+      "command": "review",
+      "args": {
+        "reviewer": "活动负责人",
+        "decision": "approve",
+        "comment": "复核通过"
+      }
+    }
+  },
+  {
+    "id": "audit_1780534555724_ihbq42ea6",
+    "timestamp": 1780534555724,
+    "operator": "活动负责人",
+    "action": "REVIEW_COMPLETED",
+    "recordId": "rec_1780534555707_k88id0pjc",
+    "details": {
+      "recordId": "rec_1780534555707_k88id0pjc",
+      "decision": "approve",
+      "comment": "复核通过",
+      "targetFormat": "decimal"
+    }
+  },
+  {
+    "id": "audit_1780534555725_62zhm7h8u",
+    "timestamp": 1780534555725,
+    "operator": "新同事张三",
+    "action": "REPLAY_COMMAND_SUCCESS",
+    "details": {
+      "command": "review",
+      "args": {
+        "reviewer": "活动负责人",
+        "decision": "approve",
+        "comment": "复核通过"
+      }
+    }
+  },
+  {
+    "id": "audit_1780534555725_2h7w48eyr",
+    "timestamp": 1780534555725,
+    "operator": "活动负责人",
+    "action": "REVIEW_COMPLETED",
+    "recordId": "rec_1780534555708_umxg6oe8d",
+    "details": {
+      "recordId": "rec_1780534555708_umxg6oe8d",
+      "decision": "approve",
+      "comment": "复核通过",
+      "targetFormat": "decimal"
+    }
+  },
+  {
+    "id": "audit_1780534555726_wfrl0iwb4",
+    "timestamp": 1780534555726,
+    "operator": "新同事张三",
+    "action": "REPLAY_COMMAND_SUCCESS",
+    "details": {
+      "command": "review",
+      "args": {
+        "reviewer": "活动负责人",
+        "decision": "approve",
+        "comment": "复核通过"
+      }
+    }
+  },
+  {
+    "id": "audit_1780534555726_btwup1wg6",
+    "timestamp": 1780534555726,
+    "operator": "运营规划阿岚",
+    "action": "RECORD_UPDATED",
+    "recordId": "rec_1780534555702_lxo11gzet",
+    "details": {
+      "recordId": "rec_1780534555702_lxo11gzet",
+      "updatedFields": [],
+      "reason": "计算明细更新"
+    }
+  },
+  {
+    "id": "audit_1780534555727_wg7k9s4v1",
+    "timestamp": 1780534555727,
+    "operator": "新同事张三",
+    "action": "REPLAY_COMMAND_SUCCESS",
+    "details": {
+      "command": "update",
+      "args": {
+        "operator": "运营规划阿岚",
+        "fieldValues": {},
+        "reason": "计算明细更新"
+      }
+    }
+  },
+  {
+    "id": "audit_1780534555728_93vkuu56e",
+    "timestamp": 1780534555728,
+    "operator": "运营规划阿岚",
+    "action": "RECORD_UPDATED",
+    "recordId": "rec_1780534555704_w87ua7n6x",
+    "details": {
+      "recordId": "rec_1780534555704_w87ua7n6x",
+      "updatedFields": [],
+      "reason": "计算明细更新"
+    }
+  },
+  {
+    "id": "audit_1780534555731_0z9eo200s",
+    "timestamp": 1780534555731,
+    "operator": "新同事张三",
+    "action": "REPLAY_COMMAND_SUCCESS",
+    "details": {
+      "command": "update",
+      "args": {
+        "operator": "运营规划阿岚",
+        "fieldValues": {},
+        "reason": "计算明细更新"
+      }
+    }
+  },
+  {
+    "id": "audit_1780534555734_g6dmpye7u",
+    "timestamp": 1780534555734,
+    "operator": "运营规划阿岚",
+    "action": "RECORD_UPDATED",
+    "recordId": "rec_1780534555707_k88id0pjc",
+    "details": {
+      "recordId": "rec_1780534555707_k88id0pjc",
+      "updatedFields": [],
+      "reason": "计算明细更新"
+    }
+  },
+  {
+    "id": "audit_1780534555734_bgftpbc0y",
+    "timestamp": 1780534555734,
+    "operator": "新同事张三",
+    "action": "REPLAY_COMMAND_SUCCESS",
+    "details": {
+      "command": "update",
+      "args": {
+        "operator": "运营规划阿岚",
+        "fieldValues": {},
+        "reason": "计算明细更新"
+      }
+    }
+  },
+  {
+    "id": "audit_1780534555736_7n5omdx9s",
+    "timestamp": 1780534555736,
+    "operator": "运营规划阿岚",
+    "action": "RECORD_UPDATED",
+    "recordId": "rec_1780534555708_umxg6oe8d",
+    "details": {
+      "recordId": "rec_1780534555708_umxg6oe8d",
+      "updatedFields": [],
+      "reason": "计算明细更新"
+    }
+  },
+  {
+    "id": "audit_1780534555736_y8hih5dko",
+    "timestamp": 1780534555736,
+    "operator": "新同事张三",
+    "action": "REPLAY_COMMAND_SUCCESS",
+    "details": {
+      "command": "update",
+      "args": {
+        "operator": "运营规划阿岚",
+        "fieldValues": {},
+        "reason": "计算明细更新"
+      }
+    }
+  },
+  {
+    "id": "audit_1780534555737_me6ow846k",
+    "timestamp": 1780534555737,
+    "operator": "新同事张三",
+    "action": "REPLAY_COMPLETE",
+    "details": {
+      "originalSessionId": "session_1780534555693_atzi34mk3",
+      "newSessionId": "replay_1780534555694_k7ja4us1b",
+      "completedCommands": 12
+    }
+  }
+]

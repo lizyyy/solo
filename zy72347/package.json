@@ -1,0 +1,25 @@
+{
+  "name": "bezier-path-smoothing",
+  "version": "1.0.0",
+  "description": "贝塞尔曲线路径平滑 - 数据一致性与可追溯处理系统",
+  "main": "dist/index.js",
+  "bin": {
+    "bezier": "dist/cli/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/cli/index.js",
+    "example": "npm run build && node dist/cli/index.js run examples/sample-data.csv",
+    "replay": "npm run build && node dist/cli/index.js replay",
+    "audit": "npm run build && node dist/cli/index.js audit",
+    "test": "npm run build && node dist/tests/run-full-workflow.js"
+  },
+  "dependencies": {
+    "csv-parse": "^5.5.3",
+    "csv-stringify": "^6.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.0"
+  }
+}

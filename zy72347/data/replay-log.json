@@ -1,0 +1,288 @@
+[
+  {
+    "sessionId": "session_1780534310760_uftttb2rk",
+    "createdAt": 1780534310760,
+    "createdBy": "运营规划阿岚",
+    "description": "完整工作流测试 - 包含混合格式处理",
+    "commands": [
+      {
+        "id": "cmd_1780534310760_5jipo5e8m",
+        "timestamp": 1780534310760,
+        "command": "import",
+        "args": {
+          "filePath": "/Users/lzy/pro/solo/workspaces/zy72347/examples/sample-data.csv",
+          "importedBy": "运营规划阿岚",
+          "valueColumns": [
+            "转化率",
+            "完成率"
+          ],
+          "screenshotRef": "screenshots/20240101_formula_v1.png"
+        }
+      },
+      {
+        "id": "cmd_1780534310760_mfyk5lyq6",
+        "timestamp": 1780534310760,
+        "command": "annotate",
+        "args": {
+          "recordId": "rec_1780534310726_gk0fh0p1u",
+          "author": "运营规划阿岚",
+          "content": "老师批注复核 1",
+          "screenshotRef": "screenshots/note_1.png"
+        }
+      },
+      {
+        "id": "cmd_1780534310760_y8442pr7e",
+        "timestamp": 1780534310760,
+        "command": "annotate",
+        "args": {
+          "recordId": "rec_1780534310727_91z2o50it",
+          "author": "运营规划阿岚",
+          "content": "老师批注复核 2",
+          "screenshotRef": "screenshots/note_2.png"
+        }
+      },
+      {
+        "id": "cmd_1780534310760_7gwabof09",
+        "timestamp": 1780534310760,
+        "command": "annotate",
+        "args": {
+          "recordId": "rec_1780534310727_3fkrd8jc7",
+          "author": "运营规划阿岚",
+          "content": "老师批注复核 3",
+          "screenshotRef": "screenshots/note_3.png"
+        }
+      },
+      {
+        "id": "cmd_1780534310760_27b1hddgh",
+        "timestamp": 1780534310760,
+        "command": "review",
+        "args": {
+          "recordId": "rec_1780534310726_gk0fh0p1u",
+          "reviewer": "活动负责人",
+          "decision": "approve",
+          "comment": "复核通过"
+        }
+      },
+      {
+        "id": "cmd_1780534310760_74q9h3qf3",
+        "timestamp": 1780534310760,
+        "command": "review",
+        "args": {
+          "recordId": "rec_1780534310727_91z2o50it",
+          "reviewer": "活动负责人",
+          "decision": "approve",
+          "comment": "复核通过"
+        }
+      },
+      {
+        "id": "cmd_1780534310760_jhsari5ya",
+        "timestamp": 1780534310760,
+        "command": "review",
+        "args": {
+          "recordId": "rec_1780534310727_3fkrd8jc7",
+          "reviewer": "活动负责人",
+          "decision": "approve",
+          "comment": "复核通过"
+        }
+      },
+      {
+        "id": "cmd_1780534310760_mneipueqr",
+        "timestamp": 1780534310760,
+        "command": "review",
+        "args": {
+          "recordId": "rec_1780534310728_8rdqqinuz",
+          "reviewer": "活动负责人",
+          "decision": "approve",
+          "comment": "复核通过"
+        }
+      },
+      {
+        "id": "cmd_1780534310760_g2y8xtyvk",
+        "timestamp": 1780534310760,
+        "command": "update",
+        "args": {
+          "recordId": "rec_1780534310726_gk0fh0p1u",
+          "operator": "运营规划阿岚",
+          "fieldValues": {},
+          "reason": "计算明细更新"
+        }
+      },
+      {
+        "id": "cmd_1780534310760_4kiogzlvp",
+        "timestamp": 1780534310760,
+        "command": "update",
+        "args": {
+          "recordId": "rec_1780534310727_91z2o50it",
+          "operator": "运营规划阿岚",
+          "fieldValues": {},
+          "reason": "计算明细更新"
+        }
+      },
+      {
+        "id": "cmd_1780534310760_fd77oeyry",
+        "timestamp": 1780534310760,
+        "command": "update",
+        "args": {
+          "recordId": "rec_1780534310727_3fkrd8jc7",
+          "operator": "运营规划阿岚",
+          "fieldValues": {},
+          "reason": "计算明细更新"
+        }
+      },
+      {
+        "id": "cmd_1780534310760_pxxeqo0d0",
+        "timestamp": 1780534310760,
+        "command": "update",
+        "args": {
+          "recordId": "rec_1780534310728_8rdqqinuz",
+          "operator": "运营规划阿岚",
+          "fieldValues": {},
+          "reason": "计算明细更新"
+        }
+      }
+    ]
+  },
+  {
+    "sessionId": "session_1780534555693_atzi34mk3",
+    "createdAt": 1780534555693,
+    "createdBy": "运营规划阿岚",
+    "description": "完整工作流测试 - 包含混合格式处理",
+    "commands": [
+      {
+        "id": "cmd_1780534555692_x3npq03oo",
+        "timestamp": 1780534555692,
+        "command": "import",
+        "args": {
+          "filePath": "/Users/lzy/pro/solo/workspaces/zy72347/examples/sample-data.csv",
+          "importedBy": "运营规划阿岚",
+          "valueColumns": [
+            "转化率",
+            "完成率"
+          ],
+          "screenshotRef": "screenshots/20240101_formula_v1.png"
+        }
+      },
+      {
+        "id": "cmd_1780534555693_hmawjq1u5",
+        "timestamp": 1780534555693,
+        "command": "annotate",
+        "recordIndex": 0,
+        "args": {
+          "author": "运营规划阿岚",
+          "content": "老师批注复核 1",
+          "screenshotRef": "screenshots/note_1.png"
+        }
+      },
+      {
+        "id": "cmd_1780534555693_z9fa8lrpv",
+        "timestamp": 1780534555693,
+        "command": "annotate",
+        "recordIndex": 1,
+        "args": {
+          "author": "运营规划阿岚",
+          "content": "老师批注复核 2",
+          "screenshotRef": "screenshots/note_2.png"
+        }
+      },
+      {
+        "id": "cmd_1780534555693_2895m715j",
+        "timestamp": 1780534555693,
+        "command": "annotate",
+        "recordIndex": 4,
+        "args": {
+          "author": "运营规划阿岚",
+          "content": "老师批注复核 3",
+          "screenshotRef": "screenshots/note_3.png"
+        }
+      },
+      {
+        "id": "cmd_1780534555693_tkygibgck",
+        "timestamp": 1780534555693,
+        "command": "review",
+        "recordIndex": 0,
+        "args": {
+          "reviewer": "活动负责人",
+          "decision": "approve",
+          "comment": "复核通过"
+        }
+      },
+      {
+        "id": "cmd_1780534555693_3bvfzajks",
+        "timestamp": 1780534555693,
+        "command": "review",
+        "recordIndex": 1,
+        "args": {
+          "reviewer": "活动负责人",
+          "decision": "approve",
+          "comment": "复核通过"
+        }
+      },
+      {
+        "id": "cmd_1780534555693_rn9f7bngw",
+        "timestamp": 1780534555693,
+        "command": "review",
+        "recordIndex": 4,
+        "args": {
+          "reviewer": "活动负责人",
+          "decision": "approve",
+          "comment": "复核通过"
+        }
+      },
+      {
+        "id": "cmd_1780534555693_67s33s5kd",
+        "timestamp": 1780534555693,
+        "command": "review",
+        "recordIndex": 5,
+        "args": {
+          "reviewer": "活动负责人",
+          "decision": "approve",
+          "comment": "复核通过"
+        }
+      },
+      {
+        "id": "cmd_1780534555693_1xoynh24u",
+        "timestamp": 1780534555693,
+        "command": "update",
+        "recordIndex": 0,
+        "args": {
+          "operator": "运营规划阿岚",
+          "fieldValues": {},
+          "reason": "计算明细更新"
+        }
+      },
+      {
+        "id": "cmd_1780534555693_lkuivuowm",
+        "timestamp": 1780534555693,
+        "command": "update",
+        "recordIndex": 1,
+        "args": {
+          "operator": "运营规划阿岚",
+          "fieldValues": {},
+          "reason": "计算明细更新"
+        }
+      },
+      {
+        "id": "cmd_1780534555693_rrm9u21tf",
+        "timestamp": 1780534555693,
+        "command": "update",
+        "recordIndex": 4,
+        "args": {
+          "operator": "运营规划阿岚",
+          "fieldValues": {},
+          "reason": "计算明细更新"
+        }
+      },
+      {
+        "id": "cmd_1780534555693_mt5rpmlhl",
+        "timestamp": 1780534555693,
+        "command": "update",
+        "recordIndex": 5,
+        "args": {
+          "operator": "运营规划阿岚",
+          "fieldValues": {},
+          "reason": "计算明细更新"
+        }
+      }
+    ]
+  }
+]

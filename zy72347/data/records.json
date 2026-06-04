@@ -1,0 +1,421 @@
+[
+  {
+    "id": "rec_1780534555702_lxo11gzet",
+    "originalRowNumber": 2,
+    "sourceFile": "sample-data.csv",
+    "importTimestamp": 1780534555702,
+    "importedBy": "运营规划阿岚",
+    "rawValues": [
+      [
+        "转化率",
+        {
+          "original": "0.75",
+          "numericValue": 0.75,
+          "format": "decimal"
+        }
+      ],
+      [
+        "完成率",
+        {
+          "original": "68.5%",
+          "numericValue": 0.685,
+          "format": "percentage"
+        }
+      ]
+    ],
+    "normalizedValues": [
+      [
+        "转化率",
+        0.75
+      ],
+      [
+        "完成率",
+        0.685
+      ]
+    ],
+    "status": "completed",
+    "currentStep": "update",
+    "formatDetected": "mixed",
+    "hasMixedFormat": true,
+    "changeHistory": [
+      {
+        "id": "chg_1780534555723_9z2qhym9s",
+        "timestamp": 1780534555723,
+        "operator": "活动负责人",
+        "field": "__review_decision__",
+        "oldValue": "pending_review",
+        "newValue": "approve",
+        "reason": "复核通过",
+        "rollbackAvailable": true
+      }
+    ],
+    "annotations": [
+      {
+        "id": "ann_1780534555702_mppkqs9pv",
+        "timestamp": 1780534555702,
+        "author": "运营规划阿岚",
+        "content": "旧公式截图导入: screenshots/20240101_formula_v1.png",
+        "screenshotRef": "screenshots/20240101_formula_v1.png"
+      },
+      {
+        "id": "ann_1780534555720_114qrky02",
+        "timestamp": 1780534555720,
+        "author": "运营规划阿岚",
+        "content": "老师批注复核 1",
+        "screenshotRef": "screenshots/note_1.png"
+      }
+    ],
+    "reviewAssignee": "活动负责人",
+    "reviewDecision": "approve",
+    "reviewTimestamp": 1780534555723,
+    "completedBy": "运营规划阿岚",
+    "completedTimestamp": 1780534555726
+  },
+  {
+    "id": "rec_1780534555704_w87ua7n6x",
+    "originalRowNumber": 3,
+    "sourceFile": "sample-data.csv",
+    "importTimestamp": 1780534555704,
+    "importedBy": "运营规划阿岚",
+    "rawValues": [
+      [
+        "转化率",
+        {
+          "original": "85.3%",
+          "numericValue": 0.853,
+          "format": "percentage"
+        }
+      ],
+      [
+        "完成率",
+        {
+          "original": "0.72",
+          "numericValue": 0.72,
+          "format": "decimal"
+        }
+      ]
+    ],
+    "normalizedValues": [
+      [
+        "转化率",
+        0.853
+      ],
+      [
+        "完成率",
+        0.72
+      ]
+    ],
+    "status": "completed",
+    "currentStep": "update",
+    "formatDetected": "mixed",
+    "hasMixedFormat": true,
+    "changeHistory": [
+      {
+        "id": "chg_1780534555724_gz7w1kl8v",
+        "timestamp": 1780534555724,
+        "operator": "活动负责人",
+        "field": "__review_decision__",
+        "oldValue": "pending_review",
+        "newValue": "approve",
+        "reason": "复核通过",
+        "rollbackAvailable": true
+      }
+    ],
+    "annotations": [
+      {
+        "id": "ann_1780534555704_498cvfq99",
+        "timestamp": 1780534555704,
+        "author": "运营规划阿岚",
+        "content": "旧公式截图导入: screenshots/20240101_formula_v1.png",
+        "screenshotRef": "screenshots/20240101_formula_v1.png"
+      },
+      {
+        "id": "ann_1780534555721_frrfqic89",
+        "timestamp": 1780534555721,
+        "author": "运营规划阿岚",
+        "content": "老师批注复核 2",
+        "screenshotRef": "screenshots/note_2.png"
+      }
+    ],
+    "reviewAssignee": "活动负责人",
+    "reviewDecision": "approve",
+    "reviewTimestamp": 1780534555724,
+    "completedBy": "运营规划阿岚",
+    "completedTimestamp": 1780534555728
+  },
+  {
+    "id": "rec_1780534555705_wchz67eta",
+    "originalRowNumber": 4,
+    "sourceFile": "sample-data.csv",
+    "importTimestamp": 1780534555705,
+    "importedBy": "运营规划阿岚",
+    "rawValues": [
+      [
+        "转化率",
+        {
+          "original": "0.65",
+          "numericValue": 0.65,
+          "format": "decimal"
+        }
+      ],
+      [
+        "完成率",
+        {
+          "original": "0.82",
+          "numericValue": 0.82,
+          "format": "decimal"
+        }
+      ]
+    ],
+    "normalizedValues": [
+      [
+        "转化率",
+        0.65
+      ],
+      [
+        "完成率",
+        0.82
+      ]
+    ],
+    "status": "normalized",
+    "currentStep": "import",
+    "formatDetected": "decimal",
+    "hasMixedFormat": false,
+    "changeHistory": [],
+    "annotations": [
+      {
+        "id": "ann_1780534555705_dvpfwok6p",
+        "timestamp": 1780534555705,
+        "author": "运营规划阿岚",
+        "content": "旧公式截图导入: screenshots/20240101_formula_v1.png",
+        "screenshotRef": "screenshots/20240101_formula_v1.png"
+      }
+    ]
+  },
+  {
+    "id": "rec_1780534555706_8w0st0xwc",
+    "originalRowNumber": 5,
+    "sourceFile": "sample-data.csv",
+    "importTimestamp": 1780534555706,
+    "importedBy": "运营规划阿岚",
+    "rawValues": [
+      [
+        "转化率",
+        {
+          "original": "78.5%",
+          "numericValue": 0.785,
+          "format": "percentage"
+        }
+      ],
+      [
+        "完成率",
+        {
+          "original": "92.3%",
+          "numericValue": 0.9229999999999999,
+          "format": "percentage"
+        }
+      ]
+    ],
+    "normalizedValues": [
+      [
+        "转化率",
+        0.785
+      ],
+      [
+        "完成率",
+        0.9229999999999999
+      ]
+    ],
+    "status": "normalized",
+    "currentStep": "import",
+    "formatDetected": "percentage",
+    "hasMixedFormat": false,
+    "changeHistory": [],
+    "annotations": [
+      {
+        "id": "ann_1780534555706_q0zed6bgy",
+        "timestamp": 1780534555706,
+        "author": "运营规划阿岚",
+        "content": "旧公式截图导入: screenshots/20240101_formula_v1.png",
+        "screenshotRef": "screenshots/20240101_formula_v1.png"
+      }
+    ]
+  },
+  {
+    "id": "rec_1780534555707_k88id0pjc",
+    "originalRowNumber": 6,
+    "sourceFile": "sample-data.csv",
+    "importTimestamp": 1780534555707,
+    "importedBy": "运营规划阿岚",
+    "rawValues": [
+      [
+        "转化率",
+        {
+          "original": "0.88",
+          "numericValue": 0.88,
+          "format": "decimal"
+        }
+      ],
+      [
+        "完成率",
+        {
+          "original": "75%",
+          "numericValue": 0.75,
+          "format": "percentage"
+        }
+      ]
+    ],
+    "normalizedValues": [
+      [
+        "转化率",
+        0.88
+      ],
+      [
+        "完成率",
+        0.75
+      ]
+    ],
+    "status": "completed",
+    "currentStep": "update",
+    "formatDetected": "mixed",
+    "hasMixedFormat": true,
+    "changeHistory": [
+      {
+        "id": "chg_1780534555724_6stmqc8aj",
+        "timestamp": 1780534555724,
+        "operator": "活动负责人",
+        "field": "__review_decision__",
+        "oldValue": "pending_review",
+        "newValue": "approve",
+        "reason": "复核通过",
+        "rollbackAvailable": true
+      }
+    ],
+    "annotations": [
+      {
+        "id": "ann_1780534555707_b62hmscnb",
+        "timestamp": 1780534555707,
+        "author": "运营规划阿岚",
+        "content": "旧公式截图导入: screenshots/20240101_formula_v1.png",
+        "screenshotRef": "screenshots/20240101_formula_v1.png"
+      },
+      {
+        "id": "ann_1780534555722_r1e1offuq",
+        "timestamp": 1780534555722,
+        "author": "运营规划阿岚",
+        "content": "老师批注复核 3",
+        "screenshotRef": "screenshots/note_3.png"
+      }
+    ],
+    "reviewAssignee": "活动负责人",
+    "reviewDecision": "approve",
+    "reviewTimestamp": 1780534555724,
+    "completedBy": "运营规划阿岚",
+    "completedTimestamp": 1780534555733
+  },
+  {
+    "id": "rec_1780534555708_umxg6oe8d",
+    "originalRowNumber": 7,
+    "sourceFile": "sample-data.csv",
+    "importTimestamp": 1780534555708,
+    "importedBy": "运营规划阿岚",
+    "rawValues": [
+      [
+        "转化率",
+        {
+          "original": "N/A",
+          "numericValue": 0,
+          "format": "unknown"
+        }
+      ],
+      [
+        "完成率",
+        {
+          "original": "65%",
+          "numericValue": 0.65,
+          "format": "percentage"
+        }
+      ]
+    ],
+    "normalizedValues": [
+      [
+        "转化率",
+        0
+      ],
+      [
+        "完成率",
+        0.65
+      ]
+    ],
+    "status": "completed",
+    "currentStep": "update",
+    "formatDetected": "percentage",
+    "hasMixedFormat": false,
+    "changeHistory": [
+      {
+        "id": "chg_1780534555725_qsypj721d",
+        "timestamp": 1780534555725,
+        "operator": "活动负责人",
+        "field": "__review_decision__",
+        "oldValue": "pending_review",
+        "newValue": "approve",
+        "reason": "复核通过",
+        "rollbackAvailable": true
+      }
+    ],
+    "annotations": [
+      {
+        "id": "ann_1780534555708_sn3jowr4k",
+        "timestamp": 1780534555708,
+        "author": "运营规划阿岚",
+        "content": "旧公式截图导入: screenshots/20240101_formula_v1.png",
+        "screenshotRef": "screenshots/20240101_formula_v1.png"
+      }
+    ],
+    "reviewAssignee": "活动负责人",
+    "reviewDecision": "approve",
+    "reviewTimestamp": 1780534555725,
+    "completedBy": "运营规划阿岚",
+    "completedTimestamp": 1780534555735
+  },
+  {
+    "id": "rec_1780534555710_czqblki4z",
+    "originalRowNumber": 8,
+    "sourceFile": "sample-data.csv",
+    "importTimestamp": 1780534555710,
+    "importedBy": "运营规划阿岚",
+    "rawValues": [
+      [
+        "转化率",
+        {
+          "original": "0.95",
+          "numericValue": 0.95,
+          "format": "decimal"
+        }
+      ],
+      [
+        "完成率",
+        {
+          "original": "",
+          "numericValue": 0,
+          "format": "unknown"
+        }
+      ]
+    ],
+    "normalizedValues": [],
+    "status": "imported",
+    "currentStep": "import",
+    "formatDetected": "decimal",
+    "hasMixedFormat": false,
+    "changeHistory": [],
+    "annotations": [
+      {
+        "id": "ann_1780534555710_ek7jvtd94",
+        "timestamp": 1780534555710,
+        "author": "运营规划阿岚",
+        "content": "旧公式截图导入: screenshots/20240101_formula_v1.png",
+        "screenshotRef": "screenshots/20240101_formula_v1.png"
+      }
+    ]
+  }
+]
