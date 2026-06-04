@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGameStore } from "@/stores/gameStore";
-import { levelGroups, getLevelsByGroup } from "@/data/levels";
+import { getAllLevelGroups, getLevelsByGroup } from "@/data/levels";
 import {
   Play,
   Pause,
@@ -217,7 +217,7 @@ export default function Home() {
           <p className="text-gray-400 text-lg">选择关卡组，开始你的和弦探索之旅</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl w-full px-4">
-          {levelGroups.map((group) => {
+          {getAllLevelGroups().map((group) => {
             const groupLevels = getLevelsByGroup(group.id);
             return (
               <button

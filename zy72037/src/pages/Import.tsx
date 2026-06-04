@@ -52,13 +52,23 @@ export default function Import() {
     const data: Record<string, unknown> = {};
     if (levelJson.trim()) {
       try {
-        data.sessions = JSON.parse(levelJson).sessions ?? JSON.parse(levelJson);
+        const parsed = JSON.parse(levelJson);
+        if (Array.isArray(parsed.levelGroups) || Array.isArray(parsed.levels)) {
+          data.levelGroups = parsed.levelGroups || [];
+          data.levels = parsed.levels || [];
+        } else if (Array.isArray(parsed)) {
+          data.levels = parsed;
+        } else {
+          data.levelGroups = parsed.levelGroups || [];
+          data.levels = parsed.levels || [];
+        }
       } catch { /* empty */ }
     }
     if (recordJson.trim()) {
       try {
         const parsed = JSON.parse(recordJson);
-        data.steps = parsed.steps ?? parsed;
+        data.sessions = parsed.sessions ?? parsed;
+        data.steps = parsed.steps ?? {};
       } catch { /* empty */ }
     }
     if (noteJson.trim()) {

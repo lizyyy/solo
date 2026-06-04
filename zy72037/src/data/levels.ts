@@ -1,4 +1,5 @@
 import type { LevelGroup, Level } from "@/types";
+import { loadCustomLevelGroups, loadCustomLevels } from "@/utils/storage";
 
 export const levelGroups: LevelGroup[] = [
   { id: "beginner", name: "爵士和弦第一课", difficulty: "beginner", order: 1 },
@@ -429,9 +430,18 @@ export const levels: Level[] = [
 ];
 
 export function getLevelsByGroup(groupId: string): Level[] {
-  return levels.filter((l) => l.groupId === groupId).sort((a, b) => a.order - b.order);
+  const builtin = levels.filter((l) => l.groupId === groupId);
+  const custom = loadCustomLevels().filter((l) => l.groupId === groupId);
+  return [...builtin, ...custom].sort((a, b) => a.order - b.order);
 }
 
 export function getLevelGroupById(id: string): LevelGroup | undefined {
-  return levelGroups.find((g) => g.id === id);
+  const builtin = levelGroups.find((g) => g.id === id);
+  if (builtin) return builtin;
+  return loadCustomLevelGroups().find((g) => g.id === id);
+}
+
+export function getAllLevelGroups(): LevelGroup[] {
+  const custom = loadCustomLevelGroups();
+  return [...levelGroups, ...custom].sort((a, b) => a.order - b.order);
 }

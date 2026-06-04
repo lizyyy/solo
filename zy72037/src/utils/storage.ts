@@ -1,10 +1,12 @@
-import type { Session, SessionStep, TeacherNote, SupplementNote } from "@/types";
+import type { Session, SessionStep, TeacherNote, SupplementNote, LevelGroup, Level } from "@/types";
 
 const KEYS = {
   sessions: "jazz-chord-sessions",
   steps: "jazz-chord-steps",
   notes: "jazz-chord-notes",
   supplements: "jazz-chord-supplements",
+  customLevelGroups: "jazz-chord-custom-level-groups",
+  customLevels: "jazz-chord-custom-levels",
 };
 
 export function loadSessions(): Session[] {
@@ -57,4 +59,30 @@ export function loadSupplements(sessionId: string): SupplementNote[] {
 
 export function saveSupplements(sessionId: string, supplements: SupplementNote[]): void {
   localStorage.setItem(`${KEYS.supplements}-${sessionId}`, JSON.stringify(supplements));
+}
+
+export function loadCustomLevelGroups(): LevelGroup[] {
+  try {
+    const raw = localStorage.getItem(KEYS.customLevelGroups);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveCustomLevelGroups(groups: LevelGroup[]): void {
+  localStorage.setItem(KEYS.customLevelGroups, JSON.stringify(groups));
+}
+
+export function loadCustomLevels(): Level[] {
+  try {
+    const raw = localStorage.getItem(KEYS.customLevels);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveCustomLevels(levels: Level[]): void {
+  localStorage.setItem(KEYS.customLevels, JSON.stringify(levels));
 }

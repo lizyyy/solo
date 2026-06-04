@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import type { Session, SessionStep, GameStatus, FeedbackInfo } from "@/types";
 import { getLevelsByGroup } from "@/data/levels";
-import { loadSessions, saveSessions, loadSteps, saveSteps } from "@/utils/storage";
+import { loadSessions, saveSessions, saveSteps } from "@/utils/storage";
 
 function genId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
@@ -154,7 +154,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   selectOption: (optionId: string) => {
-    const { currentGroupId, currentLevelIndex, currentSession, sessionSteps, score, combo, maxCombo, timer, levelStartTime } = get();
+    const { currentGroupId, currentLevelIndex, currentSession, sessionSteps, score, combo, maxCombo, levelStartTime } = get();
     if (!currentGroupId || !currentSession) return;
 
     const levels = getLevelsByGroup(currentGroupId);
@@ -272,7 +272,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const levels = getLevelsByGroup(currentGroupId!);
       const level = levels[currentLevelIndex];
 
-      const { currentSession, sessionSteps, levelStartTime, combo, maxCombo } = get();
+      const { currentSession, sessionSteps, levelStartTime, maxCombo } = get();
       const timeSpent = (Date.now() - levelStartTime) / 1000;
 
       const step: SessionStep = {

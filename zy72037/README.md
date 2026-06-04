@@ -1,57 +1,154 @@
-# React + TypeScript + Vite
+# 爵士和弦寻宝
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+面向科普馆场景的浏览器端音乐教育互动游戏，帮助学生在闯关中理解爵士和弦构成与连接规则，同时为讲解员提供完整的操作记录、失败诊断与回放能力。
 
-Currently, two official plugins are available:
+## 技术栈
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- React 18 + TypeScript
+- Vite（开发与构建）
+- Tailwind CSS 3
+- Zustand（状态管理）
+- React Router DOM v7
+- Lucide React（图标）
+- localStorage（数据持久化，无需后端）
 
-## Expanding the ESLint configuration
+## 安装与启动
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+```bash
+# 安装依赖
+npm install
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+# 启动开发服务器（默认端口 5173，若被占用自动递增）
+npm run dev
+
+# 生产构建
+npm run build
+
+# 预览生产构建
+npm run preview
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+启动后浏览器打开终端输出的地址（如 `http://localhost:5173/`），即可看到关卡选择首页。
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 脚本说明
 
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
+| 命令 | 用途 |
+|------|------|
+| `npm run dev` | 启动开发服务器 |
+| `npm run build` | TypeScript 编译 + Vite 生产构建 |
+| `npm run preview` | 预览生产构建产物 |
+| `npm run lint` | ESLint 代码检查 |
+| `npm run check` | TypeScript 类型检查（不输出文件） |
+
+## 页面与路由
+
+| 路由 | 页面 | 功能 |
+|------|------|------|
+| `/` | 游戏主界面 | 选择关卡组、进行游戏、查看得分与计时 |
+| `/settlement/:sessionId` | 结算页 | 查看得分、正确率、失败诊断、跳转回放/补录 |
+| `/import` | 数据导入页 | 导入自定义关卡参数、玩家记录、评分备注 |
+| `/supplement/:sessionId` | 补录页 | 对已结束对局追加备注，查看差异 |
+| `/history` | 历史页 | 按时间查看对局列表、逐步回放操作 |
+| `/help` | 使用说明 | 6 章操作指引 |
+
+## 核心操作流程
+
+### 1. 启动一局游戏
+
+1. 打开首页，看到三个预置关卡组卡片
+2. 点击某个关卡组上的「开始挑战」
+3. 计时开始，选出目标和弦对应的正确构成音
+4. 左侧控制栏可暂停/继续/重开/提前结束
+
+### 2. 游戏中反馈
+
+- 选对：绿色弹窗 + 加分，连续正确触发连击倍率（x1.5）
+- 选错：红色弹窗，标注「规则未理解」
+- 超时：红色弹窗，标注「操作过慢」
+
+### 3. 查看结算
+
+对局结束后点击「查看结算」进入结算页，展示：
+- 总得分、正确率环形图、用时
+- 失败诊断列表，每项标注「规则未理解」或「操作过慢」，点击展开详情
+
+### 4. 回放
+
+从结算页点「回放本局」或从历史页点「开始回放」，可逐步查看每关选择、正误、用时。支持播放/暂停、上下步、1x/1.5x/2x 变速。
+
+### 5. 补录备注
+
+在结算页点「补录备注」进入补录页：
+- 输入备注内容并保存
+- 下方自动展示差异：绿色=新增、黄色+删除线=修改（旧值）、红色=与教师备注冲突
+
+### 6. 导入自定义关卡参数
+
+1. 首页点「导入数据」进入导入页
+2. 展开「关卡参数」区域，粘贴或上传 JSON
+3. 关卡 JSON 格式示例：
+
+```json
+{
+  "levelGroups": [
+    { "id": "custom1", "name": "我的自定义关卡", "difficulty": "beginner", "order": 10 }
   ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+  "levels": [
+    {
+      "id": "c1",
+      "groupId": "custom1",
+      "targetChord": "Em",
+      "targetNotes": ["E", "G", "B"],
+      "options": [
+        { "id": "c1o1", "label": "E - G - B", "notes": ["E", "G", "B"], "isCorrect": true },
+        { "id": "c1o2", "label": "E - G# - B", "notes": ["E", "G#", "B"], "isCorrect": false },
+        { "id": "c1o3", "label": "E - G - Bb", "notes": ["E", "G", "Bb"], "isCorrect": false },
+        { "id": "c1o4", "label": "F - A - C", "notes": ["F", "A", "C"], "isCorrect": false }
+      ],
+      "timeLimit": 15,
+      "hint": "E小三和弦 = E + 小三度G + 纯五度B",
+      "order": 1
+    }
+  ]
+}
+```
+
+4. 点「检查导入」，系统检测格式和冲突
+5. 如有冲突：双栏对比（原始 vs 导入），逐项选「保留原值」或「采用导入值」
+6. 确认后点「确认导入」，回到首页即可看到新增的关卡组卡片
+
+### 7. 查看历史
+
+首页点「历史记录」进入历史页，左侧按时间倒序展示所有对局，点击查看详情或回放。
+
+## 预置关卡组
+
+| 关卡组 | 难度 | 关卡数 | 内容 |
+|--------|------|--------|------|
+| 爵士和弦第一课 | 入门 | 5 | 大三/小三和弦识别 |
+| 七和弦探秘 | 进阶 | 8 | maj7, m7, dom7, dim7 |
+| 和弦进行大冒险 | 高级 | 10 | ii-V-I, I-VI-ii-V 等进行 |
+
+## 计分规则
+
+- 正确选择 +100 分
+- 50% 时间内完成额外 +50 分
+- 连续正确 2 次及以上触发 x1.5 连击倍率
+- 失败不扣分，但记录诊断标签
+
+## 项目结构
+
+```
+src/
+├── types/index.ts        # TypeScript 类型定义
+├── data/levels.ts        # 预置关卡数据 + 查询函数
+├── stores/
+│   ├── gameStore.ts      # 游戏状态机（开始/暂停/重开/结算）
+│   ├── dataStore.ts      # 导入/补录/冲突数据管理
+│   └── replayStore.ts    # 回放播放器状态
+├── utils/storage.ts      # localStorage 读写
+├── components/           # 复用 UI 组件
+├── pages/                # 页面组件
+├── App.tsx               # 路由配置
+└── main.tsx              # 入口
 ```

@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import { loadSessions, saveSessions, loadSteps, saveSteps, loadNotes, saveNotes, loadSupplements, saveSupplements } from "@/utils/storage";
-import type { Session, SessionStep, TeacherNote, SupplementNote, ConflictItem } from "@/types";
+import { loadSessions, saveSessions, loadSteps, saveSteps, loadNotes, saveNotes, loadSupplements, saveSupplements, loadCustomLevelGroups, saveCustomLevelGroups, loadCustomLevels, saveCustomLevels } from "@/utils/storage";
+import type { Session, SessionStep, TeacherNote, SupplementNote, ConflictItem, LevelGroup, Level } from "@/types";
 
 function genId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
@@ -13,7 +13,7 @@ interface DataStore {
   currentViewNotes: TeacherNote[];
   currentViewSupplements: SupplementNote[];
   conflicts: ConflictItem[];
-  pendingImport: { sessions: Session[]; steps: Record<string, SessionStep[]>; notes: TeacherNote[] } | null;
+  pendingImport: { sessions: Session[]; steps: Record<string, SessionStep[]>; notes: TeacherNote[]; levelGroups: LevelGroup[]; levels: Level[] } | null;
 
   loadAllSessions: () => void;
   viewSession: (sessionId: string) => void;
@@ -77,6 +77,8 @@ export const useDataStore = create<DataStore>((set, get) => ({
       const importedSessions: Session[] = data.sessions || [];
       const importedSteps: Record<string, SessionStep[]> = data.steps || {};
       const importedNotes: TeacherNote[] = data.notes || [];
+      const importedLevelGroups: LevelGroup[] = data.levelGroups || [];
+      const importedLevels: Level[] = data.levels || [];
 
       const existingSessions = loadSessions();
       const conflicts: ConflictItem[] = [];
@@ -103,6 +105,21 @@ export const useDataStore = create<DataStore>((set, get) => ({
         }
       }
 
+      const existingCustomGroups = loadCustomLevelGroups();
+      for (const impGroup of importedLevelGroups) {
+        const existing = existingCustomGroups.find((g) => g.id === impGroup.id);
+        if (existing) {
+          if (existing.name !== impGroup.name) {
+            conflicts.push({
+              field: `关卡组 ${impGroup.id} - 名称`,
+              originalValue: existing.name,
+              importValue: impGroup.name,
+              resolution: "unresolved",
+            });
+          }
+        }
+      }
+
       for (const impNote of importedNotes) {
         const existingNotes = loadNotes(impNote.sessionId);
         const conflict = existingNotes.find(
@@ -120,7 +137,7 @@ export const useDataStore = create<DataStore>((set, get) => ({
 
       set({
         conflicts,
-        pendingImport: { sessions: importedSessions, steps: importedSteps, notes: importedNotes },
+        pendingImport: { sessions: importedSessions, steps: importedSteps, notes: importedNotes, levelGroups: importedLevelGroups, levels: importedLevels },
       });
 
       if (conflicts.length > 0) {
@@ -194,6 +211,35 @@ export const useDataStore = create<DataStore>((set, get) => ({
         }
       }
       saveNotes(note.sessionId, existingNotes);
+    }
+
+    if (pendingImport.levelGroups.length > 0 || pendingImport.levels.length > 0) {
+      const existingGroups = loadCustomLevelGroups();
+      const existingLevels = loadCustomLevels();
+
+      for (const impGroup of pendingImport.levelGroups) {
+        const existIdx = existingGroups.findIndex((g) => g.id === impGroup.id);
+        if (existIdx >= 0) {
+          const relatedConflicts = conflicts.filter((c) => c.field.includes(impGroup.id));
+          const useImport = relatedConflicts.some((c) => c.resolution === "use_import");
+          const allResolved = relatedConflicts.every((c) => c.resolution !== "unresolved");
+          if (allResolved && useImport) {
+            existingGroups[existIdx] = impGroup;
+          }
+        } else {
+          existingGroups.push(impGroup);
+        }
+      }
+
+      for (const impLevel of pendingImport.levels) {
+        const exists = existingLevels.some((l) => l.id === impLevel.id);
+        if (!exists) {
+          existingLevels.push(impLevel);
+        }
+      }
+
+      saveCustomLevelGroups(existingGroups);
+      saveCustomLevels(existingLevels);
     }
 
     set({ pendingImport: null, conflicts: [], sessions: mergedSessions });
