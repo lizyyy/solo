@@ -78,7 +78,7 @@ export default function Supplement() {
             <h2 className="text-lg font-bold text-white">备注差异</h2>
             <div className="space-y-3">
               {currentViewSupplements.map((sup) => {
-                const hasConflict = teacherContents.some((tc) => tc === sup.content);
+                const hasConflict = teacherContents.length > 0 && !teacherContents.includes(sup.content) && sup.diffType !== "conflict";
                 return (
                   <div key={sup.id} className="bg-jazz-card rounded-xl p-4 space-y-2">
                     <div className="flex items-center gap-2 text-xs text-gray-500">

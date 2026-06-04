@@ -51,9 +51,19 @@ export const useDataStore = create<DataStore>((set, get) => ({
   addSupplement: (sessionId: string, content: string) => {
     const existing = loadSupplements(sessionId);
     const prevContent = existing.length > 0 ? existing[existing.length - 1].content : undefined;
+    const teacherNotes = loadNotes(sessionId);
+    const teacherContents = teacherNotes.map((n) => n.content);
 
     let diffType: SupplementNote["diffType"] = "added";
+    let previousContent: string | undefined;
+
     if (prevContent && prevContent !== content) {
+      previousContent = prevContent;
+    }
+
+    if (teacherContents.length > 0 && !teacherContents.includes(content)) {
+      diffType = "conflict";
+    } else if (previousContent) {
       diffType = "changed";
     }
 
@@ -63,7 +73,7 @@ export const useDataStore = create<DataStore>((set, get) => ({
       content,
       createdAt: Date.now(),
       diffType,
-      previousContent: diffType === "changed" ? prevContent : undefined,
+      previousContent,
     };
 
     existing.push(note);
