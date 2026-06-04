@@ -44,6 +44,7 @@ export default function CafeGame() {
     return () => {
       stopTimer()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
@@ -61,6 +62,7 @@ export default function CafeGame() {
       saveSession({ ...session, actions: gameActions, exceptions: gameExceptions })
       setShowDiagnosis(true)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session?.status])
 
   const level = LEVELS.find((l) => l.id === session?.levelId)

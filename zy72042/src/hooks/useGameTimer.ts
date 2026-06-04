@@ -27,6 +27,7 @@ export function useGameTimer() {
     if (session && session.status !== 'playing') {
       stopTimer()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session?.status])
 
   useEffect(() => {

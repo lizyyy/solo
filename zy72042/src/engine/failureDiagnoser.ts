@@ -1,4 +1,4 @@
-import type { FailureDiagnosis, FailReason, GameSession, LevelConfig, ActionRecord } from '@/types'
+import type { FailureDiagnosis, GameSession, LevelConfig, ActionRecord } from '@/types'
 import { FUND_ASSETS } from '@/data/funds'
 
 export function diagnoseFailure(

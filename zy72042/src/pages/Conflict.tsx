@@ -1,8 +1,9 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { AlertTriangle, CheckCircle } from 'lucide-react'
 import { useConflictStore } from '@/stores/conflictStore'
 import { useHistoryStore } from '@/stores/historyStore'
+import { useSupplementStore } from '@/stores/supplementStore'
 import { detectConflicts } from '@/engine/conflictDetector'
 import { NOTEBOOK_SAMPLES } from '@/data/notebookSamples'
 import EvidencePanel from '@/components/conflict/EvidencePanel'
@@ -13,15 +14,23 @@ export default function Conflict() {
   const navigate = useNavigate()
   const getSession = useHistoryStore((s) => s.getSession)
   const loadSessions = useHistoryStore((s) => s.loadSessions)
+  const loadSupplements = useSupplementStore((s) => s.loadAll)
+  const getSessionWithSupplements = useSupplementStore((s) => s.getSessionWithSupplements)
+  const hasSupplements = useSupplementStore((s) => s.hasSupplements)
   const addConflict = useConflictStore((s) => s.addConflict)
   const resolveConflict = useConflictStore((s) => s.resolveConflict)
   const getConflictsForSession = useConflictStore((s) => s.getConflictsForSession)
 
-  const session = sessionId ? getSession(sessionId) : undefined
+  const rawSession = sessionId ? getSession(sessionId) : undefined
+  const session = useMemo(() => {
+    if (!sessionId) return undefined
+    return getSessionWithSupplements(sessionId) ?? rawSession
+  }, [sessionId, rawSession, getSessionWithSupplements])
 
   useEffect(() => {
     loadSessions()
-  }, [])
+    loadSupplements()
+  }, [loadSessions, loadSupplements])
 
   useEffect(() => {
     if (!session) return
@@ -31,7 +40,7 @@ export default function Conflict() {
     for (const conflict of detected) {
       addConflict(conflict)
     }
-  }, [session?.id])
+  }, [session?.id, session, addConflict, getConflictsForSession])
 
   if (!session) {
     return (
@@ -45,6 +54,7 @@ export default function Conflict() {
   }
 
   const conflicts = getConflictsForSession(session.id)
+  const supplemented = hasSupplements(session.id)
 
   return (
     <div className="pt-20 bg-cafe-cream min-h-screen">
@@ -56,6 +66,7 @@ export default function Conflict() {
           </div>
           <p className="text-sm text-cafe-brown/50">
             当教师错题本与导入数据冲突时，请根据双方证据做出判断
+            {supplemented && <span className="ml-2 text-data-blue">(已应用补录数据</span>}
           </p>
         </div>
 
@@ -76,12 +87,20 @@ export default function Conflict() {
           ))
         )}
 
-        <button
-          className="btn-secondary"
-          onClick={() => navigate(`/summary/${session.id}`)}
-        >
-          返回汇总
-        </button>
+        <div className="flex gap-3">
+          <button
+            className="btn-secondary"
+            onClick={() => navigate(`/summary/${session.id}`)}
+          >
+            返回汇总
+          </button>
+          <button
+            className="btn-secondary"
+            onClick={() => navigate(`/supplement/${session.id}`)}
+          >
+            查看补录
+          </button>
+        </div>
       </div>
     </div>
   )

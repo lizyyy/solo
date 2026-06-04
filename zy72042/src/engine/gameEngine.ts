@@ -1,5 +1,4 @@
 import type { FundAsset, FundHolding, PortfolioCalcResult, LevelConfig, GameSession } from '@/types'
-import { FUND_ASSETS } from '@/data/funds'
 
 export function calculatePortfolio(holdings: FundHolding[], funds: FundAsset[]): PortfolioCalcResult {
   const fundMap = new Map(funds.map(f => [f.id, f]))

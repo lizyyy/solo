@@ -1,5 +1,7 @@
+import { useEffect, useMemo } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useHistoryStore } from '@/stores/historyStore'
+import { useSupplementStore } from '@/stores/supplementStore'
 import { LEVELS } from '@/data/levels'
 import StatsOverview from '@/components/summary/StatsOverview'
 import ExceptionTable from '@/components/summary/ExceptionTable'
@@ -9,7 +11,21 @@ export default function Summary() {
   const { sessionId } = useParams<{ sessionId: string }>()
   const navigate = useNavigate()
   const getSession = useHistoryStore((s) => s.getSession)
-  const session = sessionId ? getSession(sessionId) : undefined
+  const loadSessions = useHistoryStore((s) => s.loadSessions)
+  const loadSupplements = useSupplementStore((s) => s.loadAll)
+  const getSessionWithSupplements = useSupplementStore((s) => s.getSessionWithSupplements)
+  const hasSupplements = useSupplementStore((s) => s.hasSupplements)
+
+  const rawSession = sessionId ? getSession(sessionId) : undefined
+  const session = useMemo(() => {
+    if (!sessionId) return undefined
+    return getSessionWithSupplements(sessionId) ?? rawSession
+  }, [sessionId, rawSession, getSessionWithSupplements])
+
+  useEffect(() => {
+    loadSessions()
+    loadSupplements()
+  }, [loadSessions, loadSupplements])
 
   if (!session) {
     return (
@@ -27,6 +43,7 @@ export default function Summary() {
   const statusColor = session.status === 'completed' ? 'text-safe-green' : 'text-risk-red'
   const actions = session.actions ?? []
   const exceptions = session.exceptions ?? []
+  const supplemented = hasSupplements(session.id)
 
   return (
     <div className="pt-20 bg-cafe-cream min-h-screen">
@@ -37,9 +54,17 @@ export default function Summary() {
             <div className="flex items-center gap-3 mt-2 text-sm text-cafe-brown/60">
               <span>关卡: {level?.name ?? session.levelId}</span>
               <span>·</span>
-              <span>分数: {session.currentScore.toFixed(0)}</span>
+              <span>分数: {session.currentScore.toFixed(1)}</span>
+              <span>·</span>
+              <span>风险: {(session.currentRisk * 100).toFixed(1)}%</span>
               <span>·</span>
               <span className={statusColor}>{statusLabel}</span>
+              {supplemented && (
+                <>
+                  <span>·</span>
+                  <span className="text-data-blue">已补录</span>
+                </>
+              )}
             </div>
           </div>
         </div>
