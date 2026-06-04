@@ -1,0 +1,13 @@
+id,original_row_num,name,start_x,start_y,start_z,end_x,end_y,end_z,category,source_type,is_deleted,deleted_reason,questionnaire_row,remark
+1,1,给水管道A1,0,0,0,5,0,0,管道,hand_calculated,false,,1,
+2,2,电缆B1,2,1,-1,2,1,3,电缆,hand_calculated,false,,,,此线与A1精确相交
+3,4,暖通管C1,1,-1,2,6,3,2,暖通,hand_calculated,false,,,注意：原始行3被人工删除，此处断档
+4,5,结构梁D1,3,-2,1,3,4,1,结构,hand_calculated,false,,5,
+5,6,管道A2,0,2,0,5,2,0,管道,hand_calculated,false,,6,
+6,8,电缆B2,2,3,-1,2,3,3,电缆,hand_calculated,false,,,,原始行7被人工删除
+7,9,暖通管C2,1,1,4,6,5,4,暖通,hand_calculated,true,手算反例临时删除，待复核,9,
+8,10,结构梁D2,4,-2,2,4,4,2,结构,hand_calculated,false,,10,
+9,11,管道A3,0,4,0,5,4,0,管道,hand_calculated,false,,,
+10,13,电缆B3,2,5,-1,2,5,3,电缆,hand_calculated,false,,,,原始行12被人工删除，断档
+11,14,暖通管C3,1,3,6,6,7,6,暖通,hand_calculated,false,,14,
+12,15,结构梁D3,5,-2,3,5,4,3,结构,hand_calculated,false,,15,

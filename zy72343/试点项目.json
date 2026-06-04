@@ -1,0 +1,514 @@
+{
+  "name": "试点项目",
+  "version": 2,
+  "created_at": "2026-06-04T08:33:32.621320",
+  "updated_at": "2026-06-04T08:34:37.961681",
+  "segments": [
+    {
+      "id": 1,
+      "original_row_num": 1,
+      "name": "给水管道A1",
+      "start": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "end": {
+        "x": 5.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "category": "管道",
+      "source_type": "hand_calculated",
+      "is_deleted": false,
+      "deleted_reason": null,
+      "questionnaire_row": 1,
+      "remark": null,
+      "meta": {}
+    },
+    {
+      "id": 2,
+      "original_row_num": 2,
+      "name": "电缆B1",
+      "start": {
+        "x": 2.0,
+        "y": 1.0,
+        "z": -1.0
+      },
+      "end": {
+        "x": 2.0,
+        "y": 1.0,
+        "z": 3.0
+      },
+      "category": "电缆",
+      "source_type": "hand_calculated",
+      "is_deleted": false,
+      "deleted_reason": null,
+      "questionnaire_row": null,
+      "remark": null,
+      "meta": {}
+    },
+    {
+      "id": 3,
+      "original_row_num": 4,
+      "name": "暖通管C1",
+      "start": {
+        "x": 1.0,
+        "y": -1.0,
+        "z": 2.0
+      },
+      "end": {
+        "x": 6.0,
+        "y": 3.0,
+        "z": 2.0
+      },
+      "category": "暖通",
+      "source_type": "questionnaire_verified",
+      "is_deleted": false,
+      "deleted_reason": null,
+      "questionnaire_row": 3,
+      "remark": "注意：原始行3被人工删除，此处断档",
+      "meta": {}
+    },
+    {
+      "id": 4,
+      "original_row_num": 5,
+      "name": "结构梁D1",
+      "start": {
+        "x": 3.0,
+        "y": -2.0,
+        "z": 1.0
+      },
+      "end": {
+        "x": 3.0,
+        "y": 4.0,
+        "z": 1.0
+      },
+      "category": "结构",
+      "source_type": "hand_calculated",
+      "is_deleted": false,
+      "deleted_reason": null,
+      "questionnaire_row": 5,
+      "remark": null,
+      "meta": {}
+    },
+    {
+      "id": 5,
+      "original_row_num": 6,
+      "name": "管道A2",
+      "start": {
+        "x": 0.0,
+        "y": 2.0,
+        "z": 0.0
+      },
+      "end": {
+        "x": 5.0,
+        "y": 2.0,
+        "z": 0.0
+      },
+      "category": "管道",
+      "source_type": "hand_calculated",
+      "is_deleted": false,
+      "deleted_reason": null,
+      "questionnaire_row": 6,
+      "remark": null,
+      "meta": {}
+    },
+    {
+      "id": 6,
+      "original_row_num": 8,
+      "name": "电缆B2",
+      "start": {
+        "x": 2.0,
+        "y": 3.0,
+        "z": -1.0
+      },
+      "end": {
+        "x": 2.0,
+        "y": 3.0,
+        "z": 3.0
+      },
+      "category": "电缆",
+      "source_type": "hand_calculated",
+      "is_deleted": false,
+      "deleted_reason": null,
+      "questionnaire_row": null,
+      "remark": null,
+      "meta": {}
+    },
+    {
+      "id": 7,
+      "original_row_num": 9,
+      "name": "暖通管C2",
+      "start": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 4.0
+      },
+      "end": {
+        "x": 6.0,
+        "y": 5.0,
+        "z": 4.0
+      },
+      "category": "暖通",
+      "source_type": "hand_calculated",
+      "is_deleted": true,
+      "deleted_reason": "手算反例临时删除，待复核",
+      "questionnaire_row": 9,
+      "remark": null,
+      "meta": {}
+    },
+    {
+      "id": 8,
+      "original_row_num": 10,
+      "name": "结构梁D2",
+      "start": {
+        "x": 4.0,
+        "y": -2.0,
+        "z": 2.0
+      },
+      "end": {
+        "x": 4.0,
+        "y": 4.0,
+        "z": 2.0
+      },
+      "category": "结构",
+      "source_type": "hand_calculated",
+      "is_deleted": false,
+      "deleted_reason": null,
+      "questionnaire_row": 10,
+      "remark": null,
+      "meta": {}
+    },
+    {
+      "id": 9,
+      "original_row_num": 11,
+      "name": "管道A3",
+      "start": {
+        "x": 0.0,
+        "y": 4.0,
+        "z": 0.0
+      },
+      "end": {
+        "x": 5.0,
+        "y": 4.0,
+        "z": 0.0
+      },
+      "category": "管道",
+      "source_type": "hand_calculated",
+      "is_deleted": false,
+      "deleted_reason": null,
+      "questionnaire_row": null,
+      "remark": null,
+      "meta": {}
+    },
+    {
+      "id": 10,
+      "original_row_num": 13,
+      "name": "电缆B3",
+      "start": {
+        "x": 2.0,
+        "y": 5.0,
+        "z": -1.0
+      },
+      "end": {
+        "x": 2.0,
+        "y": 5.0,
+        "z": 3.0
+      },
+      "category": "电缆",
+      "source_type": "hand_calculated",
+      "is_deleted": false,
+      "deleted_reason": null,
+      "questionnaire_row": null,
+      "remark": null,
+      "meta": {}
+    },
+    {
+      "id": 11,
+      "original_row_num": 14,
+      "name": "暖通管C3",
+      "start": {
+        "x": 1.0,
+        "y": 3.0,
+        "z": 6.0
+      },
+      "end": {
+        "x": 6.0,
+        "y": 7.0,
+        "z": 6.0
+      },
+      "category": "暖通",
+      "source_type": "hand_calculated",
+      "is_deleted": false,
+      "deleted_reason": null,
+      "questionnaire_row": 14,
+      "remark": null,
+      "meta": {}
+    },
+    {
+      "id": 12,
+      "original_row_num": 15,
+      "name": "结构梁D3",
+      "start": {
+        "x": 5.0,
+        "y": -2.0,
+        "z": 3.0
+      },
+      "end": {
+        "x": 5.0,
+        "y": 4.0,
+        "z": 3.0
+      },
+      "category": "结构",
+      "source_type": "hand_calculated",
+      "is_deleted": false,
+      "deleted_reason": null,
+      "questionnaire_row": 15,
+      "remark": null,
+      "meta": {}
+    }
+  ],
+  "conflicts": [
+    {
+      "id": 1,
+      "segment1_id": 3,
+      "segment2_id": 8,
+      "intersection_point": {
+        "x": 4.0,
+        "y": 1.4,
+        "z": 2.0
+      },
+      "distance": 0.0,
+      "conflict_type": "exact_intersection",
+      "severity": "critical",
+      "status": "pending_review",
+      "review_note": null,
+      "reviewer": null,
+      "reviewed_at": null
+    }
+  ],
+  "gaps": [
+    {
+      "gap_start": 3,
+      "gap_end": 3,
+      "missing_count": 1,
+      "segment_before": 2,
+      "segment_after": 3,
+      "status": "supplemented",
+      "supplemented_rows": [
+        3
+      ],
+      "note": "已补录问卷原始行 3"
+    },
+    {
+      "gap_start": 7,
+      "gap_end": 7,
+      "missing_count": 1,
+      "segment_before": 5,
+      "segment_after": 6,
+      "status": "pending_supplement",
+      "supplemented_rows": [],
+      "note": null
+    },
+    {
+      "gap_start": 12,
+      "gap_end": 12,
+      "missing_count": 1,
+      "segment_before": 9,
+      "segment_after": 10,
+      "status": "pending_supplement",
+      "supplemented_rows": [],
+      "note": null
+    }
+  ],
+  "parameter_versions": [
+    {
+      "version": 1,
+      "segment_id": 1,
+      "kept_reason": "有问卷原始行支撑，保留待复核",
+      "missing_materials": [],
+      "next_owner": "教研组",
+      "status": "ready_for_review",
+      "created_at": "2026-06-04T08:33:32.621580",
+      "created_by": "系统自动生成",
+      "change_log": [
+        "初始导入，参数版本v1"
+      ]
+    },
+    {
+      "version": 1,
+      "segment_id": 2,
+      "kept_reason": "手算反例导入，暂未关联问卷原始行",
+      "missing_materials": [
+        "问卷原始行关联",
+        "数据源验证"
+      ],
+      "next_owner": "数据分析师小祁",
+      "status": "needs_supplement",
+      "created_at": "2026-06-04T08:33:32.621584",
+      "created_by": "系统自动生成",
+      "change_log": [
+        "初始导入，参数版本v1"
+      ]
+    },
+    {
+      "version": 1,
+      "segment_id": 3,
+      "kept_reason": "手算反例导入，暂未关联问卷原始行",
+      "missing_materials": [
+        "问卷原始行关联",
+        "数据源验证"
+      ],
+      "next_owner": "数据分析师小祁",
+      "status": "needs_supplement",
+      "created_at": "2026-06-04T08:33:32.621585",
+      "created_by": "系统自动生成",
+      "change_log": [
+        "初始导入，参数版本v1"
+      ]
+    },
+    {
+      "version": 1,
+      "segment_id": 4,
+      "kept_reason": "有问卷原始行支撑，保留待复核",
+      "missing_materials": [],
+      "next_owner": "教研组",
+      "status": "ready_for_review",
+      "created_at": "2026-06-04T08:33:32.621586",
+      "created_by": "系统自动生成",
+      "change_log": [
+        "初始导入，参数版本v1"
+      ]
+    },
+    {
+      "version": 1,
+      "segment_id": 5,
+      "kept_reason": "有问卷原始行支撑，保留待复核",
+      "missing_materials": [],
+      "next_owner": "教研组",
+      "status": "ready_for_review",
+      "created_at": "2026-06-04T08:33:32.621587",
+      "created_by": "系统自动生成",
+      "change_log": [
+        "初始导入，参数版本v1"
+      ]
+    },
+    {
+      "version": 1,
+      "segment_id": 6,
+      "kept_reason": "手算反例导入，暂未关联问卷原始行",
+      "missing_materials": [
+        "问卷原始行关联",
+        "数据源验证"
+      ],
+      "next_owner": "数据分析师小祁",
+      "status": "needs_supplement",
+      "created_at": "2026-06-04T08:33:32.621588",
+      "created_by": "系统自动生成",
+      "change_log": [
+        "初始导入，参数版本v1"
+      ]
+    },
+    {
+      "version": 1,
+      "segment_id": 7,
+      "kept_reason": "已标记删除，等待教研组复核后决定是否保留",
+      "missing_materials": [
+        "删除原因说明",
+        "问卷原始行验证"
+      ],
+      "next_owner": "教研组",
+      "status": "pending_review",
+      "created_at": "2026-06-04T08:33:32.621589",
+      "created_by": "系统自动生成",
+      "change_log": [
+        "初始导入，参数版本v1"
+      ]
+    },
+    {
+      "version": 1,
+      "segment_id": 8,
+      "kept_reason": "有问卷原始行支撑，保留待复核",
+      "missing_materials": [],
+      "next_owner": "教研组",
+      "status": "ready_for_review",
+      "created_at": "2026-06-04T08:33:32.621589",
+      "created_by": "系统自动生成",
+      "change_log": [
+        "初始导入，参数版本v1"
+      ]
+    },
+    {
+      "version": 1,
+      "segment_id": 9,
+      "kept_reason": "手算反例导入，暂未关联问卷原始行",
+      "missing_materials": [
+        "问卷原始行关联",
+        "数据源验证"
+      ],
+      "next_owner": "数据分析师小祁",
+      "status": "needs_supplement",
+      "created_at": "2026-06-04T08:33:32.621590",
+      "created_by": "系统自动生成",
+      "change_log": [
+        "初始导入，参数版本v1"
+      ]
+    },
+    {
+      "version": 1,
+      "segment_id": 10,
+      "kept_reason": "手算反例导入，暂未关联问卷原始行",
+      "missing_materials": [
+        "问卷原始行关联",
+        "数据源验证"
+      ],
+      "next_owner": "数据分析师小祁",
+      "status": "needs_supplement",
+      "created_at": "2026-06-04T08:33:32.621591",
+      "created_by": "系统自动生成",
+      "change_log": [
+        "初始导入，参数版本v1"
+      ]
+    },
+    {
+      "version": 1,
+      "segment_id": 11,
+      "kept_reason": "有问卷原始行支撑，保留待复核",
+      "missing_materials": [],
+      "next_owner": "教研组",
+      "status": "ready_for_review",
+      "created_at": "2026-06-04T08:33:32.621592",
+      "created_by": "系统自动生成",
+      "change_log": [
+        "初始导入，参数版本v1"
+      ]
+    },
+    {
+      "version": 1,
+      "segment_id": 12,
+      "kept_reason": "有问卷原始行支撑，保留待复核",
+      "missing_materials": [],
+      "next_owner": "教研组",
+      "status": "ready_for_review",
+      "created_at": "2026-06-04T08:33:32.621593",
+      "created_by": "系统自动生成",
+      "change_log": [
+        "初始导入，参数版本v1"
+      ]
+    },
+    {
+      "version": 2,
+      "segment_id": 3,
+      "kept_reason": "已关联问卷原始行，数据完整度提升",
+      "missing_materials": [],
+      "next_owner": "教研组",
+      "status": "ready_for_review",
+      "created_at": "2026-06-04T08:34:37.961166",
+      "created_by": "数据分析师小祁",
+      "change_log": [
+        "数据分析师小祁补录问卷原始行: 3（原: None）"
+      ]
+    }
+  ]
+}
