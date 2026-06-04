@@ -108,6 +108,7 @@ const DOM = {
     scenarioScreen: document.getElementById('scenarioScreen'),
     pauseScreen: document.getElementById('pauseScreen'),
     resultScreen: document.getElementById('resultScreen'),
+    pauseBtn: document.getElementById('pauseBtn'),
     scenarioTitle: document.getElementById('scenarioTitle'),
     scenarioDesc: document.getElementById('scenarioDesc'),
     options: document.getElementById('options'),
