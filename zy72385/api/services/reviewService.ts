@@ -1,0 +1,258 @@
+import { db, saveDb } from '../data/db.js';
+import type { ReviewTask, ExperimentReview } from '../../shared/types.js';
+import { recordChange } from './auditService.js';
+import crypto from 'crypto';
+
+export async function getReviewTasks(assignee?: string, status?: ReviewTask['status']) {
+  await db.read();
+  let tasks = [...db.data.reviewTasks];
+
+  if (assignee) {
+    tasks = tasks.filter((t) => t.assignee === assignee);
+  }
+  if (status) {
+    tasks = tasks.filter((t) => t.status === status);
+  }
+
+  return tasks.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+}
+
+export async function resolveReviewTask(
+  taskId: string,
+  resolution: string,
+  resolvedBy: string,
+  markAsNormal: boolean
+): Promise<ReviewTask | null> {
+  await db.read();
+
+  const task = db.data.reviewTasks.find((t) => t.id === taskId);
+  if (!task) return null;
+
+  task.status = markAsNormal ? 'resolved' : 'rejected';
+  task.resolvedAt = new Date().toISOString();
+  task.resolution = resolution;
+
+  const calc = db.data.calculations.find((c) => c.id === task.calculationId);
+  if (calc) {
+    if (markAsNormal) {
+      calc.status = 'completed';
+      calc.reviewComment = resolution;
+      
+      await recordChange(
+        'calculation',
+        calc.id,
+        'status',
+        'pending_review',
+        'completed',
+        `质检员复核通过: ${resolution}`,
+        resolvedBy,
+        [calc.id]
+      );
+    } else {
+      calc.status = 'draft';
+      calc.reviewComment = `复核不通过: ${resolution}`;
+      
+      await recordChange(
+        'calculation',
+        calc.id,
+        'status',
+        'pending_review',
+        'draft',
+        `质检员复核不通过: ${resolution}`,
+        resolvedBy,
+        [calc.id]
+      );
+    }
+  }
+
+  await saveDb();
+  return task;
+}
+
+export async function createReview(
+  calculationId: string,
+  decisions: ExperimentReview['decisions'],
+  reportContent: string,
+  createdBy: string
+): Promise<ExperimentReview> {
+  await db.read();
+
+  const existing = db.data.reviews.find((r) => r.calculationId === calculationId);
+  if (existing) {
+    existing.decisions = decisions;
+    existing.reportContent = reportContent;
+    existing.createdAt = new Date().toISOString();
+    existing.createdBy = createdBy;
+    await saveDb();
+    return existing;
+  }
+
+  const review: ExperimentReview = {
+    id: `review-${crypto.randomUUID().slice(0, 8)}`,
+    calculationId,
+    decisions,
+    reportContent,
+    createdAt: new Date().toISOString(),
+    createdBy,
+  };
+
+  db.data.reviews.unshift(review);
+  
+  const calc = db.data.calculations.find((c) => c.id === calculationId);
+  if (calc) {
+    calc.status = 'completed';
+    calc.updatedAt = new Date().toISOString();
+    calc.updatedBy = createdBy;
+  }
+
+  await saveDb();
+  return review;
+}
+
+export async function getReviewByCalculationId(calculationId: string) {
+  await db.read();
+  return db.data.reviews.find((r) => r.calculationId === calculationId);
+}
+
+export async function getAllReviews() {
+  await db.read();
+  return [...db.data.reviews].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
+}
+
+export function generateHumanizedReport(
+  calc: {
+    name: string;
+    riskLevel: string;
+    riskScore: number;
+    parameters: {
+      sampleTimes: string[];
+      missingIntervals: { start: string; end: string; duration: number }[];
+      pressure: number[];
+      flowRate: number[];
+    };
+    result: {
+      npshAvailable: number;
+      npshRequired: number;
+      cavitationProbability: number;
+      affectedAreas: string[];
+      recommendations: string[];
+    };
+    remark: string;
+  },
+  decisions: {
+    dataPointId: string;
+    keepReason: string;
+    missingMaterials: string[];
+    nextAction: string;
+    assignee?: string;
+  }[],
+  users: { id: string; name: string; avatar?: string }[]
+): string {
+  const riskLevelText: Record<string, string> = {
+    low: '低',
+    medium: '中等',
+    high: '高',
+    critical: '严重',
+  };
+
+  const getUser = (id: string) => users.find((u) => u.id === id);
+
+  let report = `## 实验复盘：${calc.name}\n\n`;
+
+  report += `### 数据质量评估\n`;
+  const validCount = calc.parameters.sampleTimes.length;
+  const missingCount = calc.parameters.missingIntervals.length;
+  report += `本次计算共**${validCount}个**有效数据点`;
+  if (missingCount > 0) {
+    const missingDurations = calc.parameters.missingIntervals.map((m) => m.duration).join('、');
+    report += `，缺失**${missingCount}个**采样点（共${missingDurations}分钟）`;
+  }
+  report += `。`;
+
+  if (calc.parameters.pressure.length > 1) {
+    const pStart = calc.parameters.pressure[0];
+    const pEnd = calc.parameters.pressure[calc.parameters.pressure.length - 1];
+    const trend = pEnd < pStart ? '缓慢下降' : pEnd > pStart ? '上升' : '稳定';
+    report += `整体数据趋势${trend}，压力从${pStart}MPa${trend === '稳定' ? '保持' : trend}至${pEnd}MPa，符合预期运行规律。\n\n`;
+  }
+
+  report += `### 风险分析\n`;
+  report += `汽蚀风险等级：**${riskLevelText[calc.riskLevel] || calc.riskLevel}**（风险评分${calc.riskScore}分）\n`;
+  report += `- NPSH可用值：${calc.result.npshAvailable}m\n`;
+  report += `- NPSH必需值：${calc.result.npshRequired}m\n`;
+  report += `- 汽蚀概率：${Math.round(calc.result.cavitationProbability * 100)}%\n`;
+
+  if (calc.result.affectedAreas.length > 0) {
+    report += `- 可能受影响区域：${calc.result.affectedAreas.join('、')}\n`;
+  }
+  report += '\n';
+
+  report += `### 关键决策\n`;
+  calc.parameters.sampleTimes.forEach((time, idx) => {
+    const decision = decisions.find((d) => d.dataPointId === `dp-${idx + 1}`);
+    const timeStr = new Date(time).toLocaleTimeString('zh-CN', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+    report += `${idx + 1}. **数据点${idx + 1}（${timeStr}）**：`;
+    if (decision) {
+      report += `保留。${decision.keepReason}`;
+      if (decision.missingMaterials.length > 0) {
+        report += ` 🔴 缺${decision.missingMaterials.join('、')}`;
+      }
+      report += '\n';
+    } else {
+      report += `保留。数据完整。\n`;
+    }
+  });
+  report += '\n';
+
+  const allMissingMaterials = decisions.flatMap((d) => d.missingMaterials);
+  if (allMissingMaterials.length > 0) {
+    report += `### 缺失材料\n`;
+    allMissingMaterials.forEach((m) => {
+      const decision = decisions.find((d) => d.missingMaterials.includes(m));
+      const assignee = decision?.assignee ? getUser(decision.assignee) : null;
+      report += `- ${m}`;
+      if (assignee) {
+        report += ` - 请${assignee.avatar} ${assignee.name}补充`;
+      }
+      report += '\n';
+    });
+    report += '\n';
+  }
+
+  const actions = decisions.filter((d) => d.nextAction !== 'none');
+  if (actions.length > 0) {
+    report += `### 下一步行动\n`;
+    report += `| 责任人 | 任务 | 截止时间 |\n`;
+    report += `|--------|------|----------|\n`;
+    actions.forEach((action) => {
+      const assignee = action.assignee ? getUser(action.assignee) : null;
+      if (assignee) {
+        const dueDate = new Date();
+        dueDate.setDate(dueDate.getDate() + 3);
+        const dueStr = dueDate.toISOString().split('T')[0];
+        const taskText =
+          action.nextAction === 'teacher'
+            ? '补充缺失数据或说明原因'
+            : '复核计算结果';
+        report += `| ${assignee.avatar} ${assignee.name} | ${taskText} | ${dueStr} |\n`;
+      }
+    });
+    report += '\n';
+  }
+
+  report += `### 建议措施\n`;
+  calc.result.recommendations.forEach((rec, idx) => {
+    report += `${idx + 1}. ${rec}\n`;
+  });
+
+  if (calc.remark) {
+    report += `\n### 备注\n${calc.remark}\n`;
+  }
+
+  return report;
+}
