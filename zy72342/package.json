@@ -1,0 +1,32 @@
+{
+  "name": "mutual-info-filter",
+  "version": "1.0.0",
+  "description": "互信息特征筛选系统 - 整合问卷原始行与边界值说明，支持多入口访问",
+  "main": "dist/index.js",
+  "bin": {
+    "mif": "dist/cli/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/api/index.js",
+    "start:web": "npx serve web -l 3000",
+    "cli": "node dist/cli/index.js",
+    "demo": "node dist/cli/index.js run-demo",
+    "dev": "concurrently \"npx tsc --watch\" \"node dist/api/index.js\"",
+    "test": "node dist/tests/integration.test.js"
+  },
+  "dependencies": {
+    "commander": "^11.1.0",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.10.5",
+    "@types/uuid": "^9.0.7",
+    "concurrently": "^8.2.2",
+    "typescript": "^5.3.3"
+  }
+}

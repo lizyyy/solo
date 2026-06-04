@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>互信息特征筛选系统</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    .tab-active { border-bottom: 3px solid #3b82f6; color: #3b82f6; }
+    .status-pending { background: #fef3c7; color: #92400e; }
+    .status-anomaly { background: #fee2e2; color: #991b1b; }
+    .status-normal { background: #d1fae5; color: #065f46; }
+    .status-resolved { background: #e0e7ff; color: #3730a3; }
+    .action-teacher { border-left: 4px solid #f59e0b; }
+    .action-assistant { border-left: 4px solid #8b5cf6; }
+    .action-collect { border-left: 4px solid #06b6d4; }
+    .evidence-badge { font-size: 10px; padding: 2px 6px; border-radius: 9999px; }
+    .threshold-tag { animation: pulse 2s infinite; }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <div id="app">
+    <header class="bg-white shadow-sm border-b">
+      <div class="max-w-7xl mx-auto px-4 py-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900">🔍 互信息特征筛选系统</h1>
+            <p class="text-sm text-gray-500 mt-1">整合问卷主流程与边界值说明，智能识别异常样本</p>
+          </div>
+          <div class="flex gap-3">
+            <button onclick="runDemo()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+              ▶️ 运行演示流程
+            </button>
+            <button onclick="resetData()" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition">
+              🔄 重置数据
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-4 py-4">
+      <div id="stats" class="grid grid-cols-4 gap-4 mb-6"></div>
+
+      <div class="flex gap-6 border-b mb-6">
+        <button onclick="switchTab('overview')" class="tab-btn pb-3 px-2 font-medium text-gray-600 hover:text-gray-900 tab-active" data-tab="overview">
+          📊 总览
+        </button>
+        <button onclick="switchTab('survey')" class="tab-btn pb-3 px-2 font-medium text-gray-600 hover:text-gray-900" data-tab="survey">
+          📋 问卷原始行
+        </button>
+        <button onclick="switchTab('boundary')" class="tab-btn pb-3 px-2 font-medium text-gray-600 hover:text-gray-900" data-tab="boundary">
+          🎤 边界值说明
+        </button>
+        <button onclick="switchTab('results')" class="tab-btn pb-3 px-2 font-medium text-gray-600 hover:text-gray-900" data-tab="results">
+          🔬 筛选结果
+        </button>
+        <button onclick="switchTab('counterexamples')" class="tab-btn pb-3 px-2 font-medium text-gray-600 hover:text-gray-900" data-tab="counterexamples">
+          ⚠️ 反例列表
+        </button>
+        <button onclick="switchTab('audit')" class="tab-btn pb-3 px-2 font-medium text-gray-600 hover:text-gray-900" data-tab="audit">
+          📜 审计日志
+        </button>
+      </div>
+
+      <div id="tab-content"></div>
+    </div>
+
+    <div id="toast" class="fixed bottom-4 right-4 bg-gray-900 text-white px-6 py-3 rounded-lg shadow-xl transform translate-y-20 opacity-0 transition-all duration-300"></div>
+  </div>
+
+  <script>
+    const API_BASE = 'http://localhost:3001/api';
+
+    let currentTab = 'overview';
+
+    async function fetchData(path) {
+      const res = await fetch(API_BASE + path);
+      return res.json();
+    }
+
+    async function postData(path, data) {
+      const res = await fetch(API_BASE + path, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      return res.json();
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3000);
+    }
+
+    function switchTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('tab-active');
+        if (btn.dataset.tab === tab) btn.classList.add('tab-active');
+      });
+      renderTab();
+    }
+
+    async function loadStats() {
+      const stats = await fetchData('/stats');
+      const html = `
+        <div class="bg-white rounded-xl p-5 shadow-sm border">
+          <div class="text-3xl font-bold text-gray-900">${stats.totalResults}</div>
+          <div class="text-sm text-gray-500 mt-1">总筛选结果</div>
+        </div>
+        <div class="bg-white rounded-xl p-5 shadow-sm border">
+          <div class="text-3xl font-bold text-green-600">${stats.normalCount}</div>
+          <div class="text-sm text-gray-500 mt-1">正常样本</div>
+        </div>
+        <div class="bg-white rounded-xl p-5 shadow-sm border">
+          <div class="text-3xl font-bold text-amber-600">${stats.pendingCount}</div>
+          <div class="text-sm text-gray-500 mt-1">待复核</div>
+        </div>
+        <div class="bg-white rounded-xl p-5 shadow-sm border">
+          <div class="text-3xl font-bold text-red-600">${stats.anomalyCount}</div>
+          <div class="text-sm text-gray-500 mt-1">异常样本</div>
+        </div>
+      `;
+      document.getElementById('stats').innerHTML = html;
+    }
+
+    function renderTab() {
+      loadStats();
+      switch (currentTab) {
+        case 'overview': renderOverview(); break;
+        case 'survey': renderSurvey(); break;
+        case 'boundary': renderBoundary(); break;
+        case 'results': renderResults(); break;
+        case 'counterexamples': renderCounterExamples(); break;
+        case 'audit': renderAudit(); break;
+      }
+    }
+
+    async function renderOverview() {
+      const [runs, counterExamples, stats] = await Promise.all([
+        fetchData('/filter-runs'),
+        fetchData('/counter-examples'),
+        fetchData('/stats'),
+      ]);
+
+      const openCounterExamples = counterExamples.filter(c => c.status !== 'resolved');
+      const needTeacher = openCounterExamples.filter(c => c.nextHandler === '张老师').length;
+      const needAssistant = openCounterExamples.filter(c => c.nextHandler === '小穆').length;
+
+      let runsHtml = '<div class="space-y-3">';
+      runs.slice(0, 5).forEach(run => {
+        runsHtml += `
+          <div class="bg-gray-50 rounded-lg p-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="text-sm font-medium">运行 #${run.id.slice(0, 8)}</span>
+                <span class="text-xs text-gray-500 ml-2">${run.triggeredBy} 触发</span>
+              </div>
+              <span class="text-xs bg-${run.status === 'completed' ? 'green' : 'yellow'}-100 text-${run.status === 'completed' ? 'green' : 'yellow'}-800 px-2 py-1 rounded">
+                ${run.status === 'completed' ? '已完成' : '运行中'}
+              </span>
+            </div>
+            <div class="grid grid-cols-4 gap-2 mt-3 text-center text-sm">
+              <div><span class="font-bold text-gray-900">${run.resultCount}</span><br><span class="text-gray-500 text-xs">总数</span></div>
+              <div><span class="font-bold text-green-600">${run.resultCount - run.anomalyCount - run.pendingCount}</span><br><span class="text-gray-500 text-xs">正常</span></div>
+              <div><span class="font-bold text-amber-600">${run.pendingCount}</span><br><span class="text-gray-500 text-xs">待复核</span></div>
+              <div><span class="font-bold text-red-600">${run.anomalyCount}</span><br><span class="text-gray-500 text-xs">异常</span></div>
+            </div>
+            <div class="text-xs text-gray-400 mt-2">${new Date(run.startedAt).toLocaleString('zh-CN')}</div>
+          </div>
+        `;
+      });
+      runsHtml += '</div>';
+
+      const html = `
+        <div class="grid grid-cols-3 gap-6">
+          <div class="col-span-2">
+            <h2 class="text-lg font-semibold mb-4">📌 待办事项</h2>
+            <div class="grid grid-cols-2 gap-4 mb-6">
+              <div class="bg-amber-50 border border-amber-200 rounded-xl p-5 action-teacher">
+                <div class="text-2xl font-bold text-amber-700">${needTeacher}</div>
+                <div class="text-sm text-amber-600">待任课老师处理</div>
+                <button onclick="switchTab('counterexamples')" class="mt-3 text-sm text-amber-700 hover:text-amber-900 underline">查看 →</button>
+              </div>
+              <div class="bg-purple-50 border border-purple-200 rounded-xl p-5 action-assistant">
+                <div class="text-2xl font-bold text-purple-700">${needAssistant}</div>
+                <div class="text-sm text-purple-600">待实验助理小穆处理</div>
+                <button onclick="switchTab('counterexamples')" class="mt-3 text-sm text-purple-700 hover:text-purple-900 underline">查看 →</button>
+              </div>
+            </div>
+
+            <h2 class="text-lg font-semibold mb-4">⚠️ 边界值恰好等于阈值（需人工复核）</h2>
+            ${stats.atThresholdCount > 0 ? `
+              <div class="bg-red-50 border border-red-200 rounded-xl p-5 mb-6">
+                <div class="flex items-center gap-3">
+                  <span class="threshold-tag inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                    🔴 ${stats.atThresholdCount} 条记录待复核
+                  </span>
+                  <span class="text-sm text-gray-600">按规则不自动归类，留给任课老师人工判定</span>
+                </div>
+              </div>
+            ` : `
+              <div class="bg-gray-50 border border-gray-200 rounded-xl p-5 mb-6 text-gray-500 text-sm">
+                ✅ 当前没有边界值恰好等于阈值的记录
+              </div>
+            `}
+
+            <h2 class="text-lg font-semibold mb-4">🔬 最近筛选运行</h2>
+            ${runsHtml}
+          </div>
+
+          <div>
+            <h2 class="text-lg font-semibold mb-4">⚙️ 快捷操作</h2>
+            <div class="space-y-3">
+              <button onclick="importSurveyRows()" class="w-full bg-white border-2 border-dashed border-gray-300 rounded-xl p-6 text-left hover:border-blue-400 hover:bg-blue-50 transition">
+                <div class="text-xl mb-1">📥 导入问卷原始行</div>
+                <div class="text-sm text-gray-500">批量导入问卷数据</div>
+              </button>
+              <button onclick="addBoundaryNote()" class="w-full bg-white border-2 border-dashed border-gray-300 rounded-xl p-6 text-left hover:border-purple-400 hover:bg-purple-50 transition">
+                <div class="text-xl mb-1">🎤 补录边界值说明</div>
+                <div class="text-sm text-gray-500">添加现场观察记录</div>
+              </button>
+              <button onclick="triggerFilterRun()" class="w-full bg-white border-2 border-dashed border-gray-300 rounded-xl p-6 text-left hover:border-green-400 hover:bg-green-50 transition">
+                <div class="text-xl mb-1">▶️ 运行筛选</div>
+                <div class="text-sm text-gray-500">执行互信息特征筛选</div>
+              </button>
+              <button onclick="exportReport()" class="w-full bg-white border-2 border-dashed border-gray-300 rounded-xl p-6 text-left hover:border-orange-400 hover:bg-orange-50 transition">
+                <div class="text-xl mb-1">📄 导出报告</div>
+                <div class="text-sm text-gray-500">生成带有人性化说明的报告</div>
+              </button>
+            </div>
+
+            <h2 class="text-lg font-semibold mb-4 mt-8">📈 证据来源分布</h2>
+            <div class="bg-white rounded-xl p-5 border">
+              <div class="flex items-center justify-between py-3 border-b">
+                <span class="text-sm">双边证据</span>
+                <span class="font-bold text-indigo-600">${stats.bothEvidenceCount}</span>
+              </div>
+              <div class="flex items-center justify-between py-3 border-b">
+                <span class="text-sm">仅主流程</span>
+                <span class="font-bold text-blue-600">${stats.mainProcessOnlyCount}</span>
+              </div>
+              <div class="flex items-center justify-between py-3">
+                <span class="text-sm">仅现场说法</span>
+                <span class="font-bold text-purple-600">${stats.fieldStatementOnlyCount}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      document.getElementById('tab-content').innerHTML = html;
+    }
+
+    async function renderSurvey() {
+      const rows = await fetchData('/survey-rows');
+      let html = `
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold">📋 问卷原始行（${rows.length} 条）</h2>
+          <button onclick="importSurveyRows()" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700">
+            + 导入问卷
+          </button>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+          <table class="w-full">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">问题ID</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">问题内容</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">学生</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">答案</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">分值</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">主流程说明</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">导入人</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y">
+      `;
+      rows.forEach(row => {
+        const hasMainProcess = row.mainProcess && row.mainProcess.trim().length > 0;
+        html += `
+          <tr class="hover:bg-gray-50">
+            <td class="px-4 py-3 text-sm font-mono">${row.questionId}</td>
+            <td class="px-4 py-3 text-sm max-w-xs truncate" title="${row.questionText}">${row.questionText}</td>
+            <td class="px-4 py-3 text-sm">${row.respondentName}</td>
+            <td class="px-4 py-3 text-sm">${row.answer}</td>
+            <td class="px-4 py-3 text-sm font-medium">${row.answerValue}</td>
+            <td class="px-4 py-3 text-sm">
+              ${hasMainProcess
+                ? `<span class="inline-flex items-center gap-1 text-green-600">✅ <span class="max-w-xs truncate inline-block" title="${row.mainProcess}">${row.mainProcess.slice(0, 30)}...</span></span>`
+                : '<span class="text-red-500">❌ 未填写</span>'}
+            </td>
+            <td class="px-4 py-3 text-sm text-gray-500">${row.importedBy}</td>
+          </tr>
+        `;
+      });
+      html += '</tbody></table></div>';
+      document.getElementById('tab-content').innerHTML = html;
+    }
+
+    async function renderBoundary() {
+      const notes = await fetchData('/boundary-notes');
+      let html = `
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold">🎤 边界值说明（${notes.length} 条）</h2>
+          <button onclick="addBoundaryNote()" class="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-purple-700">
+            + 补录说明
+          </button>
+        </div>
+        <div class="space-y-4">
+      `;
+      notes.forEach(note => {
+        html += `
+          <div class="bg-white rounded-xl p-5 shadow-sm border">
+            <div class="flex items-start justify-between">
+              <div class="flex-1">
+                <div class="flex items-center gap-3 mb-2">
+                  <span class="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">${note.questionId}</span>
+                  ${note.respondentId ? `<span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">针对: ${note.respondentId}</span>` : '<span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">全体适用</span>'}
+                  <span class="text-xs text-gray-500">阈值: ${note.threshold} ${note.operator}</span>
+                </div>
+                <p class="text-gray-900 font-medium">${note.fieldStatement}</p>
+                ${note.supplementary ? `<p class="text-gray-500 text-sm mt-2">💡 补充说明: ${note.supplementary}</p>` : ''}
+              </div>
+              <div class="text-right">
+                <div class="text-sm text-gray-600">${note.notedBy}</div>
+                <div class="text-xs text-gray-400">${new Date(note.notedAt).toLocaleString('zh-CN')}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      html += '</div>';
+      document.getElementById('tab-content').innerHTML = html;
+    }
+
+    async function renderResults() {
+      const results = await fetchData('/filter-results');
+      let html = `
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold">🔬 筛选结果（${results.length} 条）</h2>
+          <button onclick="triggerFilterRun()" class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700">
+            ▶️ 重新筛选
+          </button>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+          <table class="w-full">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">学生</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">问题</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">互信息得分</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">阈值</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">证据</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">状态</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y">
+      `;
+      results.forEach(r => {
+        const statusClass = r.status === 'normal' ? 'status-normal' :
+          r.status === 'pending_review' ? 'status-pending' :
+          r.status === 'anomaly' ? 'status-anomaly' : 'status-resolved';
+        const statusText = r.status === 'normal' ? '正常' :
+          r.status === 'pending_review' ? '待复核' :
+          r.status === 'anomaly' ? '异常' : '已处理';
+
+        const evidenceBadges = [];
+        if (r.evidenceType === 'both' || r.evidenceType === 'main_process') {
+          evidenceBadges.push('<span class="evidence-badge bg-blue-100 text-blue-800">📋 主流程</span>');
+        }
+        if (r.evidenceType === 'both' || r.evidenceType === 'field_statement') {
+          evidenceBadges.push('<span class="evidence-badge bg-purple-100 text-purple-800">🎤 现场说法</span>');
+        }
+
+        html += `
+          <tr class="hover:bg-gray-50 ${r.isAtThreshold ? 'bg-amber-50' : ''}">
+            <td class="px-4 py-3 text-sm">${r.respondentName}</td>
+            <td class="px-4 py-3 text-sm max-w-xs truncate" title="${r.questionText}">${r.questionText.slice(0, 20)}...</td>
+            <td class="px-4 py-3">
+              <div class="font-mono text-sm font-bold ${r.isAtThreshold ? 'text-amber-600 threshold-tag' : ''}">
+                ${r.mutualInfoScore.toFixed(4)}
+                ${r.isAtThreshold ? ' ⚠️' : ''}
+              </div>
+            </td>
+            <td class="px-4 py-3 font-mono text-sm">${r.threshold}</td>
+            <td class="px-4 py-3">${evidenceBadges.join(' ')}</td>
+            <td class="px-4 py-3">
+              <span class="${statusClass} text-xs px-2 py-1 rounded font-medium">${statusText}</span>
+            </td>
+            <td class="px-4 py-3">
+              ${r.status === 'pending_review' ? `
+                <button onclick="decideResult('${r.id}')" class="text-blue-600 hover:text-blue-800 text-sm">复核</button>
+              ` : r.decisionNote ? `
+                <span class="text-xs text-gray-500" title="${r.decisionNote}">${r.decidedBy} 已处理</span>
+              ` : '-'}
+            </td>
+          </tr>
+        `;
+      });
+      html += '</tbody></table></div>';
+      document.getElementById('tab-content').innerHTML = html;
+    }
+
+    async function renderCounterExamples() {
+      const examples = await fetchData('/counter-examples');
+      let html = `
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold">⚠️ 反例列表（${examples.length} 条）</h2>
+          <div class="text-sm text-gray-500">
+            每条说明：为什么被留下 · 缺什么材料 · 下一步找谁
+          </div>
+        </div>
+        <div class="space-y-4">
+      `;
+      examples.forEach(ex => {
+        const actionClass = ex.nextAction === 'contact_teacher' ? 'action-teacher' :
+          ex.nextAction === 'contact_assistant' ? 'action-assistant' :
+          ex.nextAction === 'collect_more' ? 'action-collect' : '';
+        const actionIcon = ex.nextAction === 'contact_teacher' ? '👨‍🏫' :
+          ex.nextAction === 'contact_assistant' ? '👩‍💼' :
+          ex.nextAction === 'collect_more' ? '📋' : '✅';
+        const actionText = ex.nextAction === 'contact_teacher' ? '找任课老师' :
+          ex.nextAction === 'contact_assistant' ? '找实验助理小穆' :
+          ex.nextAction === 'collect_more' ? '补充材料' : '已解决';
+        const statusLabel = ex.status === 'open' ? '🔴 待处理' :
+          ex.status === 'in_progress' ? '🟡 处理中' : '🟢 已解决';
+
+        html += `
+          <div class="bg-white rounded-xl shadow-sm border ${actionClass}">
+            <div class="p-5">
+              <div class="flex items-start justify-between mb-3">
+                <div>
+                  <span class="font-medium text-gray-900">${ex.respondentName}</span>
+                  <span class="text-xs text-gray-500 ml-2">${ex.questionId}</span>
+                </div>
+                <span class="text-xs">${statusLabel}</span>
+              </div>
+
+              <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                <div class="text-sm">
+                  <span class="text-gray-500">❓ 为什么被留下：</span>
+                  <span class="text-gray-900 ml-1">${ex.reasonKept}</span>
+                </div>
+              </div>
+
+              ${ex.missingMaterials.length > 0 ? `
+                <div class="mb-4">
+                  <span class="text-sm text-gray-500">📭 还缺什么材料：</span>
+                  <div class="flex flex-wrap gap-2 mt-2">
+                    ${ex.missingMaterials.map(m => `<span class="bg-red-50 text-red-700 text-xs px-3 py-1 rounded-full">${m}</span>`).join('')}
+                  </div>
+                </div>
+              ` : ''}
+
+              <div class="flex items-center justify-between">
+                <div class="text-sm">
+                  <span class="text-gray-500">➡️ 下一步：</span>
+                  <span class="font-medium ml-1">${actionIcon} ${actionText} → <span class="text-blue-600">${ex.nextHandler}</span></span>
+                </div>
+                ${ex.status !== 'resolved' ? `
+                  <button onclick="resolveCounterExample('${ex.id}')" class="text-sm text-green-600 hover:text-green-800">
+                    标记已处理
+                  </button>
+                ` : ''}
+              </div>
+
+              <div class="mt-4 pt-4 border-t text-xs">
+                <span class="text-gray-500">证据来源：</span>
+                <div class="mt-2 space-y-1">
+                  ${ex.evidence.mainProcess ? `<div class="text-blue-700">📋 主流程: ${ex.evidence.mainProcess.slice(0, 80)}${ex.evidence.mainProcess.length > 80 ? '...' : ''}</div>` : ''}
+                  ${ex.evidence.fieldStatement ? `<div class="text-purple-700">🎤 现场说法: ${ex.evidence.fieldStatement.slice(0, 80)}${ex.evidence.fieldStatement.length > 80 ? '...' : ''}</div>` : ''}
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      html += '</div>';
+      document.getElementById('tab-content').innerHTML = html;
+    }
+
+    async function renderAudit() {
+      const logs = await fetchData('/audit-logs');
+      let html = `
+        <h2 class="text-lg font-semibold mb-4">📜 审计日志（${logs.length} 条）</h2>
+        <p class="text-sm text-gray-500 mb-4">记录所有变更：谁改了什么 · 为什么改 · 影响哪些结果</p>
+        <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+          <table class="w-full">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">时间</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">操作人</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">变更说明</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">原因</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">影响</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y">
+      `;
+      logs.slice(0, 50).forEach(log => {
+        const actorEmoji = log.actorRole === 'teacher' ? '👨‍🏫' :
+          log.actorRole === 'assistant' ? '👩‍💼' : '👤';
+        const actionColor = log.action === 'import' ? 'text-blue-600' :
+          log.action === 'create' ? 'text-green-600' :
+          log.action === 'update' ? 'text-amber-600' :
+          log.action === 'decide' ? 'text-purple-600' :
+          log.action === 're_run' ? 'text-indigo-600' : 'text-red-600';
+
+        html += `
+          <tr class="hover:bg-gray-50">
+            <td class="px-4 py-3 text-xs text-gray-500 whitespace-nowrap">${new Date(log.timestamp).toLocaleString('zh-CN')}</td>
+            <td class="px-4 py-3 text-sm">${actorEmoji} ${log.actor}</td>
+            <td class="px-4 py-3 text-sm">
+              <span class="${actionColor} font-medium">${log.action}</span>
+            </td>
+            <td class="px-4 py-3 text-sm max-w-xs">${log.changeDescription}</td>
+            <td class="px-4 py-3 text-sm text-gray-600 max-w-xs">${log.reason}</td>
+            <td class="px-4 py-3 text-xs">
+              ${log.impactResults && log.impactResults.length > 0
+                ? `<span class="bg-amber-100 text-amber-800 px-2 py-1 rounded">影响 ${log.impactResults.length} 条</span>`
+                : '-'}
+            </td>
+          </tr>
+        `;
+      });
+      html += '</tbody></table></div>';
+      document.getElementById('tab-content').innerHTML = html;
+    }
+
+    async function runDemo() {
+      showToast('正在运行演示流程...');
+      const result = await postData('/demo/run', {});
+      showToast('演示流程完成！请查看各页面数据');
+      renderTab();
+    }
+
+    async function resetData() {
+      if (confirm('确定要重置所有数据吗？')) {
+        await postData('/reset', {});
+        showToast('数据已重置');
+        renderTab();
+      }
+    }
+
+    async function importSurveyRows() {
+      const file = prompt('请输入要导入的JSON数据（或留空使用演示数据）：');
+      if (file === null) return;
+      showToast('导入成功');
+      renderTab();
+    }
+
+    async function addBoundaryNote() {
+      const questionId = prompt('问题ID：', 'Q001');
+      if (!questionId) return;
+      const fieldStatement = prompt('现场说法：');
+      if (!fieldStatement) return;
+      const threshold = parseFloat(prompt('阈值：', '0.5'));
+      const supplementary = prompt('补充说明（可选）：');
+
+      await postData('/boundary-notes', {
+        questionId,
+        fieldStatement,
+        threshold,
+        operator: '>=',
+        notedBy: '小穆',
+        supplementary: supplementary || undefined,
+      });
+      showToast('边界值说明已添加，反例列表已自动更新');
+      renderTab();
+    }
+
+    async function triggerFilterRun() {
+      const actor = prompt('触发人：', '小穆');
+      if (!actor) return;
+      showToast('正在运行筛选...');
+      await postData('/filter-run', { triggeredBy: actor });
+      showToast('筛选完成');
+      renderTab();
+    }
+
+    async function decideResult(resultId) {
+      const decision = prompt('请输入决策 (approve_normal / approve_anomaly / escalate)：', 'approve_normal');
+      if (!decision) return;
+      const note = prompt('决策说明：');
+      if (!note) return;
+      const actor = prompt('决策人：', '张老师');
+
+      await postData(`/filter-results/${resultId}/decide`, {
+        decision,
+        decidedBy: actor,
+        decisionNote: note,
+      });
+      showToast('决策已记录');
+      renderTab();
+    }
+
+    async function resolveCounterExample(id) {
+      const note = prompt('处理说明：');
+      if (!note) return;
+      await postData(`/counter-examples/${id}/resolve`, { note, actor: '小穆' });
+      showToast('已标记为已处理');
+      renderTab();
+    }
+
+    async function exportReport() {
+      const report = await fetchData('/report');
+      const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `mutual-info-report-${Date.now()}.json`;
+      a.click();
+      showToast('报告已导出');
+    }
+
+    renderTab();
+  </script>
+</body>
+</html>
