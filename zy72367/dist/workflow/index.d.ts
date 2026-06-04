@@ -1,0 +1,10 @@
+import type { ImportStep } from "../types.js";
+import type { ThresholdConfig } from "../core/processor.js";
+import { firstImport, supplementTemperatureCalibration, updateUnitConversion } from "../core/importer.js";
+export declare function resetWorkflow(): void;
+export declare function getCurrentStep(): ImportStep;
+export declare function advanceStep(): ImportStep | null;
+export declare function runFirstImport(rawData: Parameters<typeof firstImport>[0], config: ThresholdConfig): import("../types.js").ImportResult;
+export declare function runTemperatureCalibrationReview(supplements: Parameters<typeof supplementTemperatureCalibration>[0], config: ThresholdConfig): import("../types.js").InspectionResult;
+export declare function runUnitConversionUpdate(conversionMap: Parameters<typeof updateUnitConversion>[0], config: ThresholdConfig): import("../types.js").InspectionResult;
+export declare function getWorkflowResult(): import("../types.js").InspectionResult;
