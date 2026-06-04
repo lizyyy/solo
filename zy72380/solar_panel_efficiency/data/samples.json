@@ -1,0 +1,106 @@
+{
+  "experiment": "太阳能集热板效率",
+  "operator": "林老师",
+  "date": "2026-06-02",
+  "records": [
+    {
+      "sensor_id": "SP-A01",
+      "sensor_type": "温度传感器",
+      "sampling_start": "2026-06-02T08:00:00",
+      "sampling_end": "2026-06-02T16:00:00",
+      "sampling_interval_min": 10,
+      "expected_points": 48,
+      "actual_points": 48,
+      "data": [
+        {"time": "08:00", "inlet_temp": 25.3, "outlet_temp": 42.1, "irradiance": 680, "flow_rate": 0.5},
+        {"time": "08:10", "inlet_temp": 25.5, "outlet_temp": 43.8, "irradiance": 695, "flow_rate": 0.5},
+        {"time": "08:20", "inlet_temp": 25.8, "outlet_temp": 45.6, "irradiance": 710, "flow_rate": 0.5},
+        {"time": "08:30", "inlet_temp": 26.1, "outlet_temp": 47.2, "irradiance": 725, "flow_rate": 0.5},
+        {"time": "08:40", "inlet_temp": 26.4, "outlet_temp": 49.0, "irradiance": 740, "flow_rate": 0.5},
+        {"time": "08:50", "inlet_temp": 26.8, "outlet_temp": 50.5, "irradiance": 758, "flow_rate": 0.5},
+        {"time": "10:00", "inlet_temp": 28.2, "outlet_temp": 58.3, "irradiance": 820, "flow_rate": 0.5},
+        {"time": "12:00", "inlet_temp": 31.0, "outlet_temp": 67.5, "irradiance": 920, "flow_rate": 0.5},
+        {"time": "14:00", "inlet_temp": 33.5, "outlet_temp": 72.1, "irradiance": 880, "flow_rate": 0.5},
+        {"time": "16:00", "inlet_temp": 30.8, "outlet_temp": 55.2, "irradiance": 620, "flow_rate": 0.5}
+      ],
+      "photo_reference": null,
+      "status": "normal",
+      "correction_log": [],
+      "note": "顺利记录：全天采样完整，48个点全部到齐"
+    },
+    {
+      "sensor_id": "SP-B03",
+      "sensor_type": "温度传感器",
+      "sampling_start": "2026-06-02T08:00:00",
+      "sampling_end": "2026-06-02T16:00:00",
+      "sampling_interval_min": 10,
+      "expected_points": 48,
+      "actual_points": 45,
+      "gap_start": "2026-06-02T10:30:00",
+      "gap_end": "2026-06-02T11:00:00",
+      "data": [
+        {"time": "08:00", "inlet_temp": 24.8, "outlet_temp": 40.5, "irradiance": 670, "flow_rate": 0.5},
+        {"time": "08:10", "inlet_temp": 25.0, "outlet_temp": 42.0, "irradiance": 685, "flow_rate": 0.5},
+        {"time": "08:20", "inlet_temp": 25.3, "outlet_temp": 43.8, "irradiance": 700, "flow_rate": 0.5},
+        {"time": "10:20", "inlet_temp": 27.5, "outlet_temp": 54.0, "irradiance": 790, "flow_rate": 0.5},
+        {"time": "11:00", "inlet_temp": 29.0, "outlet_temp": 61.2, "irradiance": 850, "flow_rate": 0.5},
+        {"time": "12:00", "inlet_temp": 30.5, "outlet_temp": 65.8, "irradiance": 910, "flow_rate": 0.5},
+        {"time": "14:00", "inlet_temp": 32.8, "outlet_temp": 70.3, "irradiance": 870, "flow_rate": 0.5},
+        {"time": "16:00", "inlet_temp": 30.2, "outlet_temp": 53.8, "irradiance": 610, "flow_rate": 0.5}
+      ],
+      "photo_reference": "工况照片_06B03_20260602_1030.jpg",
+      "status": "gap_detected",
+      "correction_log": [],
+      "note": "采样缺失半小时：10:30-11:00三个采样点丢失，已检测到间隙，待质检员复核"
+    },
+    {
+      "sensor_id": "SP-C07",
+      "sensor_type": "温度传感器",
+      "sampling_start": "2026-06-02T08:00:00",
+      "sampling_end": "2026-06-02T16:00:00",
+      "sampling_interval_min": 10,
+      "expected_points": 48,
+      "actual_points": 45,
+      "original_gap_start": "2026-06-02T10:30:00",
+      "original_gap_end": "2026-06-02T11:00:00",
+      "data": [
+        {"time": "08:00", "inlet_temp": 25.0, "outlet_temp": 41.2, "irradiance": 675, "flow_rate": 0.5},
+        {"time": "08:10", "inlet_temp": 25.2, "outlet_temp": 42.8, "irradiance": 690, "flow_rate": 0.5},
+        {"time": "10:20", "inlet_temp": 27.8, "outlet_temp": 55.0, "irradiance": 800, "flow_rate": 0.5},
+        {"time": "10:30", "inlet_temp": 28.0, "outlet_temp": 56.5, "irradiance": 810, "flow_rate": 0.5, "source": "photo_supplement", "calibration": "old"},
+        {"time": "10:40", "inlet_temp": 28.3, "outlet_temp": 58.0, "irradiance": 825, "flow_rate": 0.5, "source": "photo_supplement", "calibration": "old"},
+        {"time": "10:50", "inlet_temp": 28.6, "outlet_temp": 59.2, "irradiance": 835, "flow_rate": 0.5, "source": "photo_supplement", "calibration": "old"},
+        {"time": "11:00", "inlet_temp": 29.2, "outlet_temp": 61.5, "irradiance": 855, "flow_rate": 0.5},
+        {"time": "12:00", "inlet_temp": 30.8, "outlet_temp": 66.2, "irradiance": 915, "flow_rate": 0.5},
+        {"time": "14:00", "inlet_temp": 33.0, "outlet_temp": 71.0, "irradiance": 875, "flow_rate": 0.5},
+        {"time": "16:00", "inlet_temp": 30.5, "outlet_temp": 54.0, "irradiance": 615, "flow_rate": 0.5}
+      ],
+      "photo_reference": "工况照片_06C07_20260602_1030.jpg",
+      "status": "photo_supplemented",
+      "correction_log": [
+        {
+          "step": 1,
+          "action": "gap_detected",
+          "timestamp": "2026-06-02T16:30:00",
+          "operator": "系统",
+          "detail": "检测到10:30-11:00三个采样点缺失"
+        },
+        {
+          "step": 2,
+          "action": "photo_review",
+          "timestamp": "2026-06-02T17:15:00",
+          "operator": "林老师",
+          "detail": "从工况照片_06C07_20260602_1030.jpg中读取10:30/10:40/10:50三个时刻的温度和辐照度读数"
+        },
+        {
+          "step": 3,
+          "action": "manual_correction",
+          "timestamp": "2026-06-02T17:20:00",
+          "operator": "林老师",
+          "detail": "将工况照片中读取的旧口径数据补入采样序列，标记校准方式为old"
+        }
+      ],
+      "note": "旧口径补录：10:30-11:00三个点从工况照片人工补录，使用旧口径校准系数，效率值可能偏高约2%"
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+[
+  {
+    "sensor_id": "SP-A01",
+    "operator": "顺利记录：全天采样完整，48个点全部到齐",
+    "status": "normal",
+    "status_label": "正常",
+    "correction_steps": [],
+    "avg_efficiency": 57.46,
+    "calibration_note": "标准校准"
+  },
+  {
+    "sensor_id": "SP-B03",
+    "operator": "采样缺失半小时：10:30-11:00三个采样点丢失，已检测到间隙，待质检员复核",
+    "status": "gap_detected",
+    "status_label": "采样间隙-待质检员复核",
+    "correction_steps": [
+      {
+        "step": 1,
+        "action": "photo_review",
+        "timestamp": "2026-06-04T17:46:15",
+        "operator": "林老师",
+        "detail": "查看了工况照片_06B03_20260602_1030.jpg，照片中有旧口径仪表读数可供补录，但需质检员复核后再决定"
+      }
+    ],
+    "avg_efficiency": 58.15,
+    "calibration_note": "标准校准"
+  },
+  {
+    "sensor_id": "SP-C07",
+    "operator": "旧口径补录：10:30-11:00三个点从工况照片人工补录，使用旧口径校准系数，效率值可能偏高约2%",
+    "status": "photo_supplemented",
+    "status_label": "工况照片补录-旧口径",
+    "correction_steps": [
+      {
+        "step": 1,
+        "action": "gap_detected",
+        "timestamp": "2026-06-02T16:30:00",
+        "operator": "系统",
+        "detail": "检测到10:30-11:00三个采样点缺失"
+      },
+      {
+        "step": 2,
+        "action": "photo_review",
+        "timestamp": "2026-06-02T17:15:00",
+        "operator": "林老师",
+        "detail": "从工况照片_06C07_20260602_1030.jpg中读取10:30/10:40/10:50三个时刻的温度和辐照度读数"
+      },
+      {
+        "step": 3,
+        "action": "manual_correction",
+        "timestamp": "2026-06-02T17:20:00",
+        "operator": "林老师",
+        "detail": "将工况照片中读取的旧口径数据补入采样序列，标记校准方式为old"
+      }
+    ],
+    "avg_efficiency": 60.57,
+    "calibration_note": "旧口径(0.98)补录，效率偏高约2%"
+  }
+]

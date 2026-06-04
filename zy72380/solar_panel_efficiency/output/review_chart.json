@@ -1,0 +1,287 @@
+[
+  {
+    "sensor_id": "SP-A01",
+    "quality_status": "normal",
+    "quality_status_label": "正常",
+    "avg_efficiency": 57.46,
+    "data_points": 10,
+    "has_gap": false,
+    "has_old_calibration": false,
+    "efficiency_series": [
+      {
+        "time": "08:00",
+        "inlet_temp": 25.3,
+        "outlet_temp": 42.1,
+        "irradiance": 680,
+        "efficiency_percent": 43.09,
+        "source": "sensor",
+        "calibration": "new"
+      },
+      {
+        "time": "08:10",
+        "inlet_temp": 25.5,
+        "outlet_temp": 43.8,
+        "irradiance": 695,
+        "efficiency_percent": 45.93,
+        "source": "sensor",
+        "calibration": "new"
+      },
+      {
+        "time": "08:20",
+        "inlet_temp": 25.8,
+        "outlet_temp": 45.6,
+        "irradiance": 710,
+        "efficiency_percent": 48.64,
+        "source": "sensor",
+        "calibration": "new"
+      },
+      {
+        "time": "08:30",
+        "inlet_temp": 26.1,
+        "outlet_temp": 47.2,
+        "irradiance": 725,
+        "efficiency_percent": 50.76,
+        "source": "sensor",
+        "calibration": "new"
+      },
+      {
+        "time": "08:40",
+        "inlet_temp": 26.4,
+        "outlet_temp": 49.0,
+        "irradiance": 740,
+        "efficiency_percent": 53.27,
+        "source": "sensor",
+        "calibration": "new"
+      },
+      {
+        "time": "08:50",
+        "inlet_temp": 26.8,
+        "outlet_temp": 50.5,
+        "irradiance": 758,
+        "efficiency_percent": 54.53,
+        "source": "sensor",
+        "calibration": "new"
+      },
+      {
+        "time": "10:00",
+        "inlet_temp": 28.2,
+        "outlet_temp": 58.3,
+        "irradiance": 820,
+        "efficiency_percent": 64.02,
+        "source": "sensor",
+        "calibration": "new"
+      },
+      {
+        "time": "12:00",
+        "inlet_temp": 31.0,
+        "outlet_temp": 67.5,
+        "irradiance": 920,
+        "efficiency_percent": 69.2,
+        "source": "sensor",
+        "calibration": "new"
+      },
+      {
+        "time": "14:00",
+        "inlet_temp": 33.5,
+        "outlet_temp": 72.1,
+        "irradiance": 880,
+        "efficiency_percent": 76.51,
+        "source": "sensor",
+        "calibration": "new"
+      },
+      {
+        "time": "16:00",
+        "inlet_temp": 30.8,
+        "outlet_temp": 55.2,
+        "irradiance": 620,
+        "efficiency_percent": 68.64,
+        "source": "sensor",
+        "calibration": "new"
+      }
+    ]
+  },
+  {
+    "sensor_id": "SP-B03",
+    "quality_status": "gap_detected",
+    "quality_status_label": "采样间隙-待质检员复核",
+    "avg_efficiency": 58.15,
+    "data_points": 8,
+    "has_gap": true,
+    "has_old_calibration": false,
+    "efficiency_series": [
+      {
+        "time": "08:00",
+        "inlet_temp": 24.8,
+        "outlet_temp": 40.5,
+        "irradiance": 670,
+        "efficiency_percent": 40.87,
+        "source": "sensor",
+        "calibration": "new"
+      },
+      {
+        "time": "08:10",
+        "inlet_temp": 25.0,
+        "outlet_temp": 42.0,
+        "irradiance": 685,
+        "efficiency_percent": 43.29,
+        "source": "sensor",
+        "calibration": "new"
+      },
+      {
+        "time": "08:20",
+        "inlet_temp": 25.3,
+        "outlet_temp": 43.8,
+        "irradiance": 700,
+        "efficiency_percent": 46.1,
+        "source": "sensor",
+        "calibration": "new"
+      },
+      {
+        "time": "10:20",
+        "inlet_temp": 27.5,
+        "outlet_temp": 54.0,
+        "irradiance": 790,
+        "efficiency_percent": 58.51,
+        "source": "sensor",
+        "calibration": "new"
+      },
+      {
+        "time": "11:00",
+        "inlet_temp": 29.0,
+        "outlet_temp": 61.2,
+        "irradiance": 850,
+        "efficiency_percent": 66.07,
+        "source": "sensor",
+        "calibration": "new"
+      },
+      {
+        "time": "12:00",
+        "inlet_temp": 30.5,
+        "outlet_temp": 65.8,
+        "irradiance": 910,
+        "efficiency_percent": 67.66,
+        "source": "sensor",
+        "calibration": "new"
+      },
+      {
+        "time": "14:00",
+        "inlet_temp": 32.8,
+        "outlet_temp": 70.3,
+        "irradiance": 870,
+        "efficiency_percent": 75.18,
+        "source": "sensor",
+        "calibration": "new"
+      },
+      {
+        "time": "16:00",
+        "inlet_temp": 30.2,
+        "outlet_temp": 53.8,
+        "irradiance": 610,
+        "efficiency_percent": 67.48,
+        "source": "sensor",
+        "calibration": "new"
+      }
+    ]
+  },
+  {
+    "sensor_id": "SP-C07",
+    "quality_status": "photo_supplemented",
+    "quality_status_label": "工况照片补录-旧口径",
+    "avg_efficiency": 60.57,
+    "data_points": 10,
+    "has_gap": true,
+    "has_old_calibration": true,
+    "efficiency_series": [
+      {
+        "time": "08:00",
+        "inlet_temp": 25.0,
+        "outlet_temp": 41.2,
+        "irradiance": 675,
+        "efficiency_percent": 41.86,
+        "source": "sensor",
+        "calibration": "new"
+      },
+      {
+        "time": "08:10",
+        "inlet_temp": 25.2,
+        "outlet_temp": 42.8,
+        "irradiance": 690,
+        "efficiency_percent": 44.49,
+        "source": "sensor",
+        "calibration": "new"
+      },
+      {
+        "time": "10:20",
+        "inlet_temp": 27.8,
+        "outlet_temp": 55.0,
+        "irradiance": 800,
+        "efficiency_percent": 59.3,
+        "source": "sensor",
+        "calibration": "new"
+      },
+      {
+        "time": "10:30",
+        "inlet_temp": 28.0,
+        "outlet_temp": 56.5,
+        "irradiance": 810,
+        "efficiency_percent": 60.14,
+        "source": "photo_supplement",
+        "calibration": "old"
+      },
+      {
+        "time": "10:40",
+        "inlet_temp": 28.3,
+        "outlet_temp": 58.0,
+        "irradiance": 825,
+        "efficiency_percent": 61.53,
+        "source": "photo_supplement",
+        "calibration": "old"
+      },
+      {
+        "time": "10:50",
+        "inlet_temp": 28.6,
+        "outlet_temp": 59.2,
+        "irradiance": 835,
+        "efficiency_percent": 62.64,
+        "source": "photo_supplement",
+        "calibration": "old"
+      },
+      {
+        "time": "11:00",
+        "inlet_temp": 29.2,
+        "outlet_temp": 61.5,
+        "irradiance": 855,
+        "efficiency_percent": 65.89,
+        "source": "sensor",
+        "calibration": "new"
+      },
+      {
+        "time": "12:00",
+        "inlet_temp": 30.8,
+        "outlet_temp": 66.2,
+        "irradiance": 915,
+        "efficiency_percent": 67.48,
+        "source": "sensor",
+        "calibration": "new"
+      },
+      {
+        "time": "14:00",
+        "inlet_temp": 33.0,
+        "outlet_temp": 71.0,
+        "irradiance": 875,
+        "efficiency_percent": 75.75,
+        "source": "sensor",
+        "calibration": "new"
+      },
+      {
+        "time": "16:00",
+        "inlet_temp": 30.5,
+        "outlet_temp": 54.0,
+        "irradiance": 615,
+        "efficiency_percent": 66.65,
+        "source": "sensor",
+        "calibration": "new"
+      }
+    ]
+  }
+]
