@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>喷嘴流量系数标定系统</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f7fa; color: #333; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+    header { background: linear-gradient(135deg, #2c3e50, #3498db); color: white; padding: 20px 30px; border-radius: 8px; margin-bottom: 20px; }
+    h1 { font-size: 24px; margin-bottom: 5px; }
+    .subtitle { opacity: 0.9; font-size: 14px; }
+    .tabs { display: flex; gap: 10px; margin-bottom: 20px; background: white; padding: 10px; border-radius: 8px; }
+    .tab { padding: 10px 20px; border: none; background: #ecf0f1; border-radius: 4px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+    .tab.active { background: #3498db; color: white; }
+    .tab:hover:not(.active) { background: #d5dbdb; }
+    .panel { display: none; background: white; border-radius: 8px; padding: 20px; }
+    .panel.active { display: block; }
+    .self-check { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 20px; }
+    .check-item { padding: 15px; border-radius: 6px; border-left: 4px solid; }
+    .check-item.pass { background: #d4edda; border-color: #28a745; }
+    .check-item.fail { background: #fff3cd; border-color: #ffc107; }
+    .check-item h4 { margin-bottom: 8px; font-size: 14px; }
+    .check-item ul { font-size: 12px; color: #666; margin-left: 15px; }
+    .upload-area { border: 2px dashed #3498db; border-radius: 8px; padding: 40px; text-align: center; margin-bottom: 20px; cursor: pointer; transition: all 0.2s; }
+    .upload-area:hover { background: #f0f7ff; }
+    .upload-area.dragover { background: #e3f2fd; border-color: #2980b9; }
+    .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; margin: 5px; transition: all 0.2s; }
+    .btn-primary { background: #3498db; color: white; }
+    .btn-primary:hover { background: #2980b9; }
+    .btn-success { background: #28a745; color: white; }
+    .btn-success:hover { background: #218838; }
+    .btn-warning { background: #ffc107; color: #333; }
+    .btn-warning:hover { background: #e0a800; }
+    .btn-danger { background: #dc3545; color: white; }
+    .btn-danger:hover { background: #c82333; }
+    .samples { margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 6px; }
+    .samples h4 { margin-bottom: 10px; }
+    .sample-list { display: flex; flex-wrap: wrap; gap: 10px; }
+    .sample-btn { padding: 8px 15px; background: white; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; font-size: 12px; }
+    .sample-btn:hover { border-color: #3498db; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; }
+    th, td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; }
+    th { background: #f8f9fa; font-weight: 600; position: sticky; top: 0; }
+    tr:hover { background: #f8f9fa; }
+    .status { padding: 3px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; }
+    .status-pending { background: #e3f2fd; color: #1976d2; }
+    .status-pending_review { background: #fff3cd; color: #856404; }
+    .status-reviewed { background: #d4edda; color: #155724; }
+    .status-normal { background: #d4edda; color: #155724; }
+    .status-error { background: #f8d7da; color: #721c24; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+    .modal.active { display: flex; }
+    .modal-content { background: white; border-radius: 8px; padding: 25px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+    .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; margin-bottom: 5px; font-weight: 500; font-size: 13px; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+    .form-group textarea { min-height: 80px; resize: vertical; }
+    .change-log { background: #f8f9fa; padding: 10px; border-radius: 4px; font-size: 12px; margin-top: 10px; }
+    .change-item { padding: 5px 0; border-bottom: 1px solid #eee; }
+    .change-item:last-child { border-bottom: none; }
+    .action-btn { padding: 5px 10px; font-size: 12px; margin: 0 2px; }
+    .mix-alert { background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 6px; margin: 15px 0; }
+    .mix-alert h4 { color: #856404; margin-bottom: 8px; }
+    .handover-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+    .stat-card { padding: 20px; background: #f8f9fa; border-radius: 6px; text-align: center; }
+    .stat-value { font-size: 28px; font-weight: bold; color: #3498db; }
+    .stat-label { font-size: 13px; color: #666; margin-top: 5px; }
+    .record-detail { cursor: pointer; color: #3498db; }
+    .record-detail:hover { text-decoration: underline; }
+    .steps { display: flex; gap: 10px; margin: 20px 0; flex-wrap: wrap; }
+    .step { flex: 1; min-width: 150px; padding: 15px; background: #f8f9fa; border-radius: 6px; text-align: center; position: relative; }
+    .step.completed { background: #d4edda; }
+    .step.active { background: #e3f2fd; border: 2px solid #3498db; }
+    .step-number { width: 30px; height: 30px; border-radius: 50%; background: #bdc3c7; color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-weight: bold; }
+    .step.completed .step-number { background: #28a745; }
+    .step.active .step-number { background: #3498db; }
+    .step-title { font-weight: 500; font-size: 13px; }
+    .step-desc { font-size: 11px; color: #666; margin-top: 5px; }
+    .hidden { display: none; }
+    .badge { display: inline-block; padding: 2px 6px; background: #e74c3c; color: white; border-radius: 10px; font-size: 10px; margin-left: 5px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>喷嘴流量系数标定系统</h1>
+      <div class="subtitle">Nozzle Flow Coefficient Calibration System</div>
+    </header>
+
+    <div class="steps">
+      <div class="step active" id="step1">
+        <div class="step-number">1</div>
+        <div class="step-title">导入铭牌参数</div>
+        <div class="step-desc">上传设备铭牌CSV文件</div>
+      </div>
+      <div class="step" id="step2">
+        <div class="step-number">2</div>
+        <div class="step-title">补看维修截图</div>
+        <div class="step-desc">质检员确认补充信息</div>
+      </div>
+      <div class="step" id="step3">
+        <div class="step-number">3</div>
+        <div class="step-title">生成交接报告</div>
+        <div class="step-desc">训练教练复核后提交</div>
+      </div>
+    </div>
+
+    <div class="self-check" id="selfCheckArea"></div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="import">数据导入</button>
+      <button class="tab" data-tab="records">记录明细 <span class="badge hidden" id="mixBadge">温度混用</span></button>
+      <button class="tab" data-tab="handover">交接报告</button>
+    </div>
+
+    <div class="panel active" id="panel-import">
+      <div class="upload-area" id="uploadArea">
+        <input type="file" id="fileInput" accept=".csv" style="display: none;">
+        <h3>📁 拖拽CSV文件到这里，或点击选择文件</h3>
+        <p style="color: #666; margin-top: 10px;">支持设备铭牌参数导入，保留原始行号和处理状态</p>
+      </div>
+      <div class="samples">
+        <h4>快速体验：使用样例数据</h4>
+        <div class="sample-list" id="sampleList"></div>
+      </div>
+      <div style="margin-top: 20px;">
+        <button class="btn btn-danger" onclick="clearAllData()">清空所有数据</button>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-records">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h3>标定记录明细</h3>
+        <div>
+          <button class="btn btn-warning" onclick="recalculateAll()">🔄 补录后重算</button>
+          <button class="btn btn-success" onclick="exportData()">📊 导出CSV</button>
+        </div>
+      </div>
+      <div class="mix-alert hidden" id="mixAlert">
+        <h4>⚠️ 检测到摄氏度和开尔文混用</h4>
+        <p>以下记录温度单位不一致，已标记为待复核，请勿直接归为正常，请训练教练确认后处理。</p>
+      </div>
+      <div style="overflow-x: auto;">
+        <table id="recordsTable">
+          <thead>
+            <tr>
+              <th>原始行号</th>
+              <th>喷嘴编号</th>
+              <th>流量(L/min)</th>
+              <th>压差(kPa)</th>
+              <th>温度</th>
+              <th>单位</th>
+              <th>流量系数</th>
+              <th>状态</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-handover">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h3>交接报告</h3>
+        <button class="btn btn-primary" onclick="generateHandover()">生成/更新报告</button>
+      </div>
+      <div class="handover-summary" id="handoverSummary"></div>
+      <h4 style="margin: 20px 0 10px;">记录明细（可点击查看详情）</h4>
+      <div style="overflow-x: auto;">
+        <table id="handoverTable">
+          <thead>
+            <tr>
+              <th>喷嘴编号</th>
+              <th>温度</th>
+              <th>单位</th>
+              <th>流量系数</th>
+              <th>状态</th>
+              <th>复核备注</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="recordModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>记录详情</h3>
+        <button class="close-btn" onclick="closeModal()">&times;</button>
+      </div>
+      <div id="recordDetail"></div>
+    </div>
+  </div>
+
+  <div class="modal" id="reviewModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>教练复核</h3>
+        <button class="close-btn" onclick="closeReviewModal()">&times;</button>
+      </div>
+      <div class="form-group">
+        <label>处理状态</label>
+        <select id="reviewStatus">
+          <option value="pending_review">待复核</option>
+          <option value="normal">正常（重新计算系数）</option>
+          <option value="reviewed">已复核保留</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>复核理由（质检员小白保留此记录的原因说明）</label>
+        <textarea id="reviewNote" placeholder="请说明保留或处理此记录的原因..."></textarea>
+      </div>
+      <button class="btn btn-primary" onclick="submitReview()">提交复核</button>
+    </div>
+  </div>
+
+  <script>
+    let currentRecordId = null;
+    let allRecords = [];
+
+    async function loadSamples() {
+      const res = await fetch('/api/samples');
+      const samples = await res.json();
+      const list = document.getElementById('sampleList');
+      list.innerHTML = samples.map(s => 
+        `<button class="sample-btn" onclick="loadSample('${s}')">${s}</button>`
+      ).join('');
+    }
+
+    async function loadSample(filename) {
+      const res = await fetch(`/samples/${filename}`);
+      const csv = await res.text();
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const file = new File([blob], filename, { type: 'text/csv' });
+      await importFile(file);
+    }
+
+    async function importFile(file) {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await fetch('/api/import', { method: 'POST', body: formData });
+      const data = await res.json();
+      if (data.success) {
+        alert(`导入成功！共 ${data.records.length} 条记录`);
+        updateStep(2);
+        refreshData();
+      }
+    }
+
+    async function refreshData() {
+      const res = await fetch('/api/records');
+      const data = await res.json();
+      allRecords = data.records;
+      renderSelfCheck(data.selfCheck);
+      renderRecords(data.records);
+      updateMixBadge(data.selfCheck);
+      loadHandover();
+    }
+
+    function renderSelfCheck(check) {
+      const area = document.getElementById('selfCheckArea');
+      area.innerHTML = `
+        <div class="check-item ${check.duplicateImport.pass ? 'pass' : 'fail'}">
+          <h4>✅ 重复导入检查</h4>
+          <ul>${check.duplicateImport.details.length ? check.duplicateImport.details.map(d => `<li>${d}</li>`).join('') : '<li>无重复导入</li>'}</ul>
+        </div>
+        <div class="check-item ${check.temperatureMix.pass ? 'pass' : 'fail'}">
+          <h4>🌡️ 温度单位混用检查</h4>
+          <ul>${check.temperatureMix.details.length ? check.temperatureMix.details.map(d => `<li>${d}</li>`).join('') : '<li>温度单位一致</li>'}</ul>
+        </div>
+        <div class="check-item ${check.recalculation.pass ? 'pass' : 'fail'}">
+          <h4>🔢 补录重算检查</h4>
+          <ul>${check.recalculation.details.length ? check.recalculation.details.map(d => `<li>${d}</li>`).join('') : '<li>计算一致性正常</li>'}</ul>
+        </div>
+        <div class="check-item ${check.exportConsistency.pass ? 'pass' : 'fail'}">
+          <h4>📊 导出一致性检查</h4>
+          <ul>${check.exportConsistency.details.map(d => `<li>${d}</li>`).join('')}</ul>
+        </div>
+      `;
+    }
+
+    function renderRecords(records) {
+      const tbody = document.querySelector('#recordsTable tbody');
+      tbody.innerHTML = records.map(r => {
+        const statusClass = `status-${r.status}`;
+        const statusText = {
+          pending: '待处理',
+          pending_review: '待复核',
+          reviewed: '已复核',
+          normal: '正常',
+          error: '错误'
+        }[r.status] || r.status;
+        return `
+          <tr>
+            <td>${r.originalRowNumber}</td>
+            <td>${r.nozzleId || r['喷嘴编号'] || '-'}</td>
+            <td>${r.flowRate || r['流量'] || '-'}</td>
+            <td>${r.pressure || r['压差'] || '-'}</td>
+            <td>${r.temperature !== null && r.temperature !== '' ? r.temperature : '-'}</td>
+            <td>${r.temperatureUnit || r['温度单位'] || '-'}</td>
+            <td>${r.flowCoefficient !== null ? r.flowCoefficient : '-'}</td>
+            <td><span class="status ${statusClass}">${statusText}</span></td>
+            <td>
+              <button class="btn btn-primary action-btn" onclick="viewRecord('${r.id}')">详情</button>
+              ${r.status === 'pending_review' ? '<button class="btn btn-warning action-btn" onclick="openReview(\'' + r.id + '\')">复核</button>' : ''}
+              <button class="btn action-btn" style="background:#95a5a6;color:white;" onclick="editRecord('${r.id}')">补录</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function updateMixBadge(check) {
+      const badge = document.getElementById('mixBadge');
+      const alert = document.getElementById('mixAlert');
+      if (!check.temperatureMix.pass) {
+        badge.classList.remove('hidden');
+        alert.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+        alert.classList.add('hidden');
+      }
+    }
+
+    async function viewRecord(id) {
+      const res = await fetch(`/api/records/${id}`);
+      const record = await res.json();
+      currentRecordId = id;
+      const detail = document.getElementById('recordDetail');
+      detail.innerHTML = `
+        <div class="form-group">
+          <label>记录ID</label>
+          <input type="text" value="${record.id}" readonly>
+        </div>
+        <div class="form-group">
+          <label>原始行号</label>
+          <input type="text" value="${record.originalRowNumber}" readonly>
+        </div>
+        <div class="form-group">
+          <label>导入批次</label>
+          <input type="text" value="${record.importBatch}" readonly>
+        </div>
+        <div class="form-group">
+          <label>导入文件名</label>
+          <input type="text" value="${record.importFileName}" readonly>
+        </div>
+        <div class="form-group">
+          <label>喷嘴编号</label>
+          <input type="text" value="${record.nozzleId || record['喷嘴编号'] || ''}" readonly>
+        </div>
+        <div class="form-group">
+          <label>温度</label>
+          <input type="text" value="${record.temperature !== null ? record.temperature : ''} ${record.temperatureUnit || record['温度单位'] || ''}" readonly>
+        </div>
+        <div class="form-group">
+          <label>流量系数</label>
+          <input type="text" value="${record.flowCoefficient !== null ? record.flowCoefficient : '-'}" readonly>
+        </div>
+        <div class="form-group">
+          <label>当前状态</label>
+          <input type="text" value="${record.status}" readonly>
+        </div>
+        ${record.reviewerNote ? `
+        <div class="form-group">
+          <label>复核备注</label>
+          <textarea readonly>${record.reviewerNote}</textarea>
+        </div>
+        ` : ''}
+        ${record.manualChanges && record.manualChanges.length ? `
+        <div class="form-group">
+          <label>人工改动记录 (${record.manualChanges.length}次)</label>
+          <div class="change-log">
+            ${record.manualChanges.map(c => `
+              <div class="change-item">
+                <strong>${c.time}</strong> - ${c.operator} 修改 ${c.field}: "${c.oldValue}" → "${c.newValue}"
+              </div>
+            `).join('')}
+          </div>
+        </div>
+        ` : ''}
+      `;
+      document.getElementById('recordModal').classList.add('active');
+    }
+
+    async function editRecord(id) {
+      const res = await fetch(`/api/records/${id}`);
+      const record = await res.json();
+      currentRecordId = id;
+      const detail = document.getElementById('recordDetail');
+      detail.innerHTML = `
+        <div class="form-group">
+          <label>喷嘴编号</label>
+          <input type="text" id="edit-nozzleId" value="${record.nozzleId || record['喷嘴编号'] || ''}">
+        </div>
+        <div class="form-group">
+          <label>流量(L/min)</label>
+          <input type="number" id="edit-flowRate" value="${record.flowRate || record['流量'] || ''}">
+        </div>
+        <div class="form-group">
+          <label>压差(kPa)</label>
+          <input type="number" id="edit-pressure" value="${record.pressure || record['压差'] || ''}">
+        </div>
+        <div class="form-group">
+          <label>温度</label>
+          <input type="number" id="edit-temperature" value="${record.temperature || ''}">
+        </div>
+        <div class="form-group">
+          <label>温度单位</label>
+          <select id="edit-temperatureUnit">
+            <option value="℃" ${(record.temperatureUnit || record['温度单位']) === '℃' ? 'selected' : ''}>℃</option>
+            <option value="K" ${(record.temperatureUnit || record['温度单位']) === 'K' ? 'selected' : ''}>K</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="saveEdit()">保存补录</button>
+      `;
+      document.getElementById('recordModal').classList.add('active');
+    }
+
+    async function saveEdit() {
+      const data = {
+        nozzleId: document.getElementById('edit-nozzleId').value,
+        flowRate: document.getElementById('edit-flowRate').value,
+        pressure: document.getElementById('edit-pressure').value,
+        temperature: document.getElementById('edit-temperature').value,
+        temperatureUnit: document.getElementById('edit-temperatureUnit').value,
+        operator: '质检员小白'
+      };
+      const res = await fetch(`/api/records/${currentRecordId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const result = await res.json();
+      if (result.success) {
+        alert('补录成功！流量系数已自动重算');
+        closeModal();
+        refreshData();
+      }
+    }
+
+    function openReview(id) {
+      currentRecordId = id;
+      document.getElementById('reviewStatus').value = 'pending_review';
+      document.getElementById('reviewNote').value = '';
+      document.getElementById('reviewModal').classList.add('active');
+    }
+
+    async function submitReview() {
+      const status = document.getElementById('reviewStatus').value;
+      const note = document.getElementById('reviewNote').value;
+      const res = await fetch(`/api/records/${currentRecordId}/review`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status, reviewerNote: note })
+      });
+      const result = await res.json();
+      if (result.success) {
+        alert('复核完成！');
+        closeReviewModal();
+        updateStep(3);
+        refreshData();
+      }
+    }
+
+    async function recalculateAll() {
+      const res = await fetch('/api/recalculate', { method: 'POST' });
+      const data = await res.json();
+      alert(`重算完成！共更新 ${data.recalculated.length} 条记录`);
+      refreshData();
+    }
+
+    function exportData() {
+      window.location.href = '/api/export';
+    }
+
+    async function loadHandover() {
+      const res = await fetch('/api/handover');
+      const report = await res.json();
+      if (!report) {
+        document.getElementById('handoverSummary').innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #999;">暂无交接报告，请点击"生成/更新报告"</p>';
+        document.querySelector('#handoverTable tbody').innerHTML = '';
+        return;
+      }
+      const total = report.records.length;
+      const normal = report.records.filter(r => r.status === 'normal' || r.status === 'reviewed').length;
+      const pending = report.records.filter(r => r.status === 'pending_review').length;
+      document.getElementById('handoverSummary').innerHTML = `
+        <div class="stat-card">
+          <div class="stat-value">${total}</div>
+          <div class="stat-label">总记录数</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${normal}</div>
+          <div class="stat-label">已处理</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${pending}</div>
+          <div class="stat-label">待复核</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${report.operator}</div>
+          <div class="stat-label">操作员</div>
+        </div>
+      `;
+      const tbody = document.querySelector('#handoverTable tbody');
+      tbody.innerHTML = report.records.map(r => {
+        const statusClass = `status-${r.status}`;
+        const statusText = {
+          pending: '待处理',
+          pending_review: '待复核',
+          reviewed: '已复核保留',
+          normal: '正常'
+        }[r.status] || r.status;
+        return `
+          <tr>
+            <td class="record-detail" onclick="viewRecord('${r.id}')">${r.nozzleId}</td>
+            <td>${r.temperature}</td>
+            <td>${r.temperatureUnit}</td>
+            <td>${r.flowCoefficient !== null ? r.flowCoefficient : '-'}</td>
+            <td><span class="status ${statusClass}">${statusText}</span></td>
+            <td>${r.reviewerNote || '-'}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function generateHandover() {
+      const res = await fetch('/api/handover', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ operator: '质检员小白' })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('交接报告已生成！');
+        loadHandover();
+      }
+    }
+
+    async function clearAllData() {
+      if (confirm('确定要清空所有数据吗？此操作不可恢复！')) {
+        await fetch('/api/data', { method: 'DELETE' });
+        updateStep(1);
+        refreshData();
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('recordModal').classList.remove('active');
+    }
+
+    function closeReviewModal() {
+      document.getElementById('reviewModal').classList.remove('active');
+    }
+
+    function updateStep(step) {
+      for (let i = 1; i <= 3; i++) {
+        const el = document.getElementById('step' + i);
+        el.classList.remove('active', 'completed');
+        if (i < step) el.classList.add('completed');
+        if (i === step) el.classList.add('active');
+      }
+    }
+
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+      });
+    });
+
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+
+    uploadArea.addEventListener('click', () => fileInput.click());
+    uploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadArea.classList.add('dragover');
+    });
+    uploadArea.addEventListener('dragleave', () => {
+      uploadArea.classList.remove('dragover');
+    });
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      if (e.dataTransfer.files.length) {
+        importFile(e.dataTransfer.files[0]);
+      }
+    });
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length) {
+        importFile(e.target.files[0]);
+      }
+    });
+
+    loadSamples();
+    refreshData();
+  </script>
+</body>
+</html>
