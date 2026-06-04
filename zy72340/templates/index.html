@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>最小二乘标定台账管理系统</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 最小二乘标定台账管理系统</h1>
+            <p>用于竞赛数据标定，支持错口径修正、补录返工，参数版本与历史记录全程可追溯</p>
+        </header>
+        
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h2>🚀 快速开始</h2>
+                <button class="btn btn-primary" onclick="initDemo()">初始化演示数据</button>
+            </div>
+            <p style="color: #6b7280;">点击上方按钮初始化演示数据，包含3条典型记录：正常记录、编号断档记录、旧口径补录记录。系统将自动走完三步流程。</p>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="list" onclick="switchTab('list')">📋 台账列表</button>
+            <button class="tab-btn" data-tab="detail" onclick="switchTab('detail')">🔍 台账详情</button>
+            <button class="tab-btn" data-tab="weight" onclick="switchTab('weight')">⚖️ 评分权重表</button>
+        </div>
+        
+        <div id="tab-list" class="tab-content active">
+            <div class="card">
+                <h2>三种处理结果对比</h2>
+                <p style="color: #6b7280; margin-bottom: 16px;">三条记录使用相同的原始数据，仅因处理方式不同导致结果差异。演示了正常、断档、旧口径三种场景的区别。</p>
+                <div id="compare-cards" class="compare-grid">
+                    <div class="empty-state">
+                        <div class="icon">📊</div>
+                        <p>暂无数据，请先点击"初始化演示数据"按钮</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>台账记录列表</h2>
+                <div class="data-table-container">
+                    <table id="ledger-table" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>编号</th>
+                                <th>标题</th>
+                                <th>状态</th>
+                                <th>编号连续</th>
+                                <th>口径</th>
+                                <th>复核状态</th>
+                                <th>权重表</th>
+                                <th>创建时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="9" style="text-align: center; color: #6b7280; padding: 40px;">
+                                    暂无数据，请先点击"初始化演示数据"按钮
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div id="tab-detail" class="tab-content">
+            <div id="detail-empty" class="card empty-state">
+                <div class="icon">👆</div>
+                <p>请从台账列表中点击"查看"按钮选择一条记录</p>
+            </div>
+            
+            <div id="detail-content" style="display: none;">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h2 id="detail-title">台账详情</h2>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn btn-secondary" onclick="addScreenshot()">📸 上传旧公式截图</button>
+                            <button class="btn btn-warning" onclick="addOldCaliberItem()">📜 补录旧口径数据</button>
+                            <button class="btn btn-primary" onclick="runCalculation(window.currentLedgerId)">🔄 重跑计算</button>
+                            <button class="btn btn-secondary" onclick="switchTab('list')">← 返回列表</button>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 16px;">
+                        <div><strong>编号:</strong> <span id="detail-serial"></span></div>
+                        <div><strong>状态:</strong> <span id="detail-status"></span></div>
+                        <div><strong>创建人:</strong> <span id="detail-created-by"></span></div>
+                        <div><strong>创建时间:</strong> <span id="detail-created"></span></div>
+                    </div>
+                    
+                    <div id="detail-alerts"></div>
+                    
+                    <h3>📝 三步流程</h3>
+                    <div id="three-steps" class="three-step-flow"></div>
+                    
+                    <div class="tabs-sub">
+                        <button class="tab-sub-btn active" data-subtab="sub-overview" onclick="switchSubTab('sub-overview')">📊 概览</button>
+                        <button class="tab-sub-btn" data-subtab="sub-items" onclick="switchSubTab('sub-items')">📋 数据明细</button>
+                        <button class="tab-sub-btn" data-subtab="sub-params" onclick="switchSubTab('sub-params')">📈 参数版本</button>
+                        <button class="tab-sub-btn" data-subtab="sub-history" onclick="switchSubTab('sub-history')">📜 历史记录</button>
+                    </div>
+                    
+                    <div id="sub-overview" class="tab-sub-content active">
+                        <h3>🎯 计算结果</h3>
+                        <div id="detail-params" class="detail-grid"></div>
+                    </div>
+                    
+                    <div id="sub-items" class="tab-sub-content">
+                        <h3>📋 数据明细</h3>
+                        <div class="data-table-container">
+                            <table id="items-table" class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>序号</th>
+                                        <th>X值</th>
+                                        <th>Y值</th>
+                                        <th>计算Y</th>
+                                        <th>残差</th>
+                                        <th>来源</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                        <p style="margin-top: 12px; font-size: 13px; color: #6b7280;">
+                            <span class="badge badge-warning">旧口径</span> 黄色行表示从旧公式截图补录的数据 | 
+                            <span style="color: #dc2626; text-decoration: line-through;">删除线</span> 表示已人工删除的数据行
+                        </p>
+                    </div>
+                    
+                    <div id="sub-params" class="tab-sub-content">
+                        <h3>📈 参数版本历史</h3>
+                        <div class="data-table-container">
+                            <table id="param-versions-table" class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>版本</th>
+                                        <th>参数 (k, b, R²)</th>
+                                        <th>变更类型</th>
+                                        <th>变更说明</th>
+                                        <th>关联权重表</th>
+                                        <th>关联截图</th>
+                                        <th>操作人</th>
+                                        <th>时间</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div id="sub-history" class="tab-sub-content">
+                        <h3>📜 操作历史记录</h3>
+                        <div id="history-timeline" class="timeline"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="tab-weight" class="tab-content">
+            <div class="card">
+                <h2>新建评分权重表</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>版本号</label>
+                        <input type="text" id="wt-version" placeholder="例如: v1.0">
+                    </div>
+                    <div class="form-group">
+                        <label>名称</label>
+                        <input type="text" id="wt-name" placeholder="例如: 2025赛季评分权重表">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>X权重</label>
+                        <input type="number" step="0.01" id="wt-x" value="1.0">
+                    </div>
+                    <div class="form-group">
+                        <label>Y权重</label>
+                        <input type="number" step="0.01" id="wt-y" value="1.0">
+                    </div>
+                    <div class="form-group">
+                        <label>截距权重</label>
+                        <input type="number" step="0.01" id="wt-intercept" value="1.0">
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="createWeightTable()">创建权重表</button>
+            </div>
+            
+            <div class="card">
+                <h2>权重表列表</h2>
+                <div class="data-table-container">
+                    <table id="weight-table" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>版本</th>
+                                <th>名称</th>
+                                <th>权重配置</th>
+                                <th>创建人</th>
+                                <th>创建时间</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="6" style="text-align: center; color: #6b7280; padding: 40px;">
+                                    暂无数据，请先点击"初始化演示数据"按钮
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>新建台账</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>台账编号</label>
+                        <input type="text" id="ld-serial" placeholder="例如: LD-2026-001">
+                    </div>
+                    <div class="form-group">
+                        <label>标题</label>
+                        <input type="text" id="ld-title" placeholder="例如: 标定实验-20260601">
+                    </div>
+                    <div class="form-group">
+                        <label>关联权重表</label>
+                        <select id="weight-table-select">
+                            <option value="">请先创建权重表</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>数据点 (JSON数组格式)</label>
+                    <textarea id="ld-items" rows="3" placeholder='[{"x": 1.0, "y": 2.0}, {"x": 2.0, "y": 4.0}]'>[{"x": 1.0, "y": 2.0}, {"x": 2.0, "y": 4.0}, {"x": 3.0, "y": 6.0}]</textarea>
+                </div>
+                <button class="btn btn-primary" onclick="createLedger()">创建台账</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="review-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+        <div class="card" style="width: 90%; max-width: 500px; margin: auto;">
+            <h2>🔍 教研组复核</h2>
+            <p style="margin-bottom: 16px; color: #6b7280;">编号断档检测后需要教研组复核。请选择复核结果：</p>
+            
+            <div class="form-group">
+                <label>复核结果</label>
+                <select id="review-result">
+                    <option value="approve">✅ 通过 - 确认断档合理，可以继续计算</option>
+                    <option value="reject">❌ 驳回 - 需要补充数据或修正</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>复核意见</label>
+                <textarea id="review-note" rows="3" placeholder="请输入复核意见..."></textarea>
+            </div>
+            
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button class="btn btn-secondary" onclick="document.getElementById('review-modal').style.display='none'">取消</button>
+                <button class="btn btn-primary" onclick="submitReview()">提交复核</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/static/js/app.js"></script>
+    <script>
+        window.currentLedgerId = null;
+        
+        const originalViewLedger = viewLedger;
+        viewLedger = function(id) {
+            originalViewLedger(id);
+            document.getElementById('detail-empty').style.display = 'none';
+            document.getElementById('detail-content').style.display = 'block';
+        };
+    </script>
+</body>
+</html>
