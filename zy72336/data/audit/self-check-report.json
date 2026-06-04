@@ -1,0 +1,34 @@
+{
+  "timestamp": "2026-06-03T23:40:53.355Z",
+  "results": {
+    "duplicateImport": {
+      "pass": true,
+      "message": "重复导入检测正常工作"
+    },
+    "negativeValueHandling": {
+      "pass": true,
+      "message": "检测到1个负数样本，状态设为待复核，不会自动当成缺失值"
+    },
+    "missingValueHandling": {
+      "pass": true,
+      "message": "缺失值被标记为边界案例，正确追踪"
+    },
+    "supplementRecalculate": {
+      "pass": true,
+      "message": "补录前5个峰值，补录后3个峰值，重算功能正常"
+    },
+    "exportConsistency": {
+      "pass": true,
+      "message": "数据导出各维度计数一致"
+    },
+    "sameDataSource": {
+      "pass": true,
+      "message": "页面展示、API返回、导出明细读取同一份结果"
+    }
+  },
+  "summary": {
+    "passed": 6,
+    "failed": 0,
+    "total": 6
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "generatedAt": "2026-06-03T23:40:58.299Z",
+  "summary": {
+    "totalRecords": 15,
+    "boundaryCases": 2,
+    "negativeSamples": 1,
+    "pendingReview": 1,
+    "manualCalculationExamples": 2
+  },
+  "pendingReviewList": [
+    {
+      "originalLineNumber": 6,
+      "rawData": {
+        "id": "5",
+        "timestamp": "2024-01-01 12:00:00",
+        "flow": "-50",
+        "location": "East Gate"
+      },
+      "issues": [
+        {
+          "type": "negative_value",
+          "field": "flow",
+          "value": -50,
+          "severity": "high",
+          "message": "flow 为负数 (-50)，旧表当成缺失，需人工复核"
+        }
+      ]
+    }
+  ],
+  "manualCalculationAudit": [
+    {
+      "originalLineNumber": 6,
+      "currentStatus": "pending_review",
+      "issues": [
+        {
+          "type": "negative_value",
+          "field": "flow",
+          "value": -50,
+          "severity": "high",
+          "message": "flow 为负数 (-50)，旧表当成缺失，需人工复核"
+        }
+      ],
+      "manualEdits": [],
+      "rawData": {
+        "id": "5",
+        "timestamp": "2024-01-01 12:00:00",
+        "flow": "-50",
+        "location": "East Gate"
+      }
+    },
+    {
+      "originalLineNumber": 8,
+      "currentStatus": "boundary_case",
+      "issues": [
+        {
+          "type": "missing_value",
+          "field": "flow",
+          "value": "",
+          "severity": "medium",
+          "message": "flow 字段为空，旧表会当成缺失值"
+        }
+      ],
+      "manualEdits": [],
+      "rawData": {
+        "id": "7",
+        "timestamp": "2024-01-01 14:00:00",
+        "flow": "",
+        "location": "East Gate"
+      }
+    }
+  ]
+}

@@ -1,0 +1,721 @@
+{
+  "rawRecords": [
+    {
+      "id": "1",
+      "timestamp": "2024-01-01 08:00:00",
+      "flow": "120",
+      "location": "East Gate",
+      "_meta": {
+        "importId": "import_1780530038624_eamiq0i2b",
+        "sourceName": "初始导入-客流数据",
+        "originalLineNumber": 2,
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy72336/data/raw/sample-flow-data-part1.csv",
+        "fileHash": "385-1780529887855.7622",
+        "importTimestamp": "2026-06-03T23:40:38.624Z",
+        "status": "auto_processed",
+        "issues": [],
+        "manualEdits": []
+      }
+    },
+    {
+      "id": "2",
+      "timestamp": "2024-01-01 09:00:00",
+      "flow": "250",
+      "location": "East Gate",
+      "_meta": {
+        "importId": "import_1780530038624_eamiq0i2b",
+        "sourceName": "初始导入-客流数据",
+        "originalLineNumber": 3,
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy72336/data/raw/sample-flow-data-part1.csv",
+        "fileHash": "385-1780529887855.7622",
+        "importTimestamp": "2026-06-03T23:40:38.624Z",
+        "status": "auto_processed",
+        "issues": [],
+        "manualEdits": []
+      }
+    },
+    {
+      "id": "3",
+      "timestamp": "2024-01-01 10:00:00",
+      "flow": "380",
+      "location": "East Gate",
+      "_meta": {
+        "importId": "import_1780530038624_eamiq0i2b",
+        "sourceName": "初始导入-客流数据",
+        "originalLineNumber": 4,
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy72336/data/raw/sample-flow-data-part1.csv",
+        "fileHash": "385-1780529887855.7622",
+        "importTimestamp": "2026-06-03T23:40:38.624Z",
+        "status": "auto_processed",
+        "issues": [],
+        "manualEdits": []
+      }
+    },
+    {
+      "id": "4",
+      "timestamp": "2024-01-01 11:00:00",
+      "flow": "520",
+      "location": "East Gate",
+      "_meta": {
+        "importId": "import_1780530038624_eamiq0i2b",
+        "sourceName": "初始导入-客流数据",
+        "originalLineNumber": 5,
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy72336/data/raw/sample-flow-data-part1.csv",
+        "fileHash": "385-1780529887855.7622",
+        "importTimestamp": "2026-06-03T23:40:38.624Z",
+        "status": "auto_processed",
+        "issues": [],
+        "manualEdits": []
+      }
+    },
+    {
+      "id": "5",
+      "timestamp": "2024-01-01 12:00:00",
+      "flow": "50",
+      "location": "East Gate",
+      "_meta": {
+        "importId": "import_1780530038624_eamiq0i2b",
+        "sourceName": "初始导入-客流数据",
+        "originalLineNumber": 6,
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy72336/data/raw/sample-flow-data-part1.csv",
+        "fileHash": "385-1780529887855.7622",
+        "importTimestamp": "2026-06-03T23:40:38.624Z",
+        "status": "manual_confirmed",
+        "issues": [
+          {
+            "type": "negative_value",
+            "field": "flow",
+            "value": -50,
+            "severity": "high",
+            "message": "flow 为负数 (-50)，旧表当成缺失，需人工复核"
+          }
+        ],
+        "manualEdits": [
+          {
+            "recordIndex": 4,
+            "originalLineNumber": 6,
+            "field": "flow",
+            "oldValue": "-50",
+            "newValue": "50",
+            "reason": "问卷核对后确认应为50，原录入错误",
+            "operator": "运营规划-阿岚",
+            "timestamp": "2026-06-03T23:40:38.631Z"
+          }
+        ]
+      }
+    },
+    {
+      "id": "6",
+      "timestamp": "2024-01-01 13:00:00",
+      "flow": "480",
+      "location": "East Gate",
+      "_meta": {
+        "importId": "import_1780530038624_eamiq0i2b",
+        "sourceName": "初始导入-客流数据",
+        "originalLineNumber": 7,
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy72336/data/raw/sample-flow-data-part1.csv",
+        "fileHash": "385-1780529887855.7622",
+        "importTimestamp": "2026-06-03T23:40:38.624Z",
+        "status": "auto_processed",
+        "issues": [],
+        "manualEdits": []
+      }
+    },
+    {
+      "id": "7",
+      "timestamp": "2024-01-01 14:00:00",
+      "flow": "",
+      "location": "East Gate",
+      "_meta": {
+        "importId": "import_1780530038624_eamiq0i2b",
+        "sourceName": "初始导入-客流数据",
+        "originalLineNumber": 8,
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy72336/data/raw/sample-flow-data-part1.csv",
+        "fileHash": "385-1780529887855.7622",
+        "importTimestamp": "2026-06-03T23:40:38.624Z",
+        "status": "boundary_case",
+        "issues": [
+          {
+            "type": "missing_value",
+            "field": "flow",
+            "value": "",
+            "severity": "medium",
+            "message": "flow 字段为空，旧表会当成缺失值"
+          }
+        ],
+        "manualEdits": []
+      }
+    },
+    {
+      "id": "8",
+      "timestamp": "2024-01-01 15:00:00",
+      "flow": "320",
+      "location": "East Gate",
+      "_meta": {
+        "importId": "import_1780530038624_eamiq0i2b",
+        "sourceName": "初始导入-客流数据",
+        "originalLineNumber": 9,
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy72336/data/raw/sample-flow-data-part1.csv",
+        "fileHash": "385-1780529887855.7622",
+        "importTimestamp": "2026-06-03T23:40:38.624Z",
+        "status": "auto_processed",
+        "issues": [],
+        "manualEdits": []
+      }
+    },
+    {
+      "id": "9",
+      "timestamp": "2024-01-01 16:00:00",
+      "flow": "450",
+      "location": "East Gate",
+      "_meta": {
+        "importId": "import_1780530038624_eamiq0i2b",
+        "sourceName": "初始导入-客流数据",
+        "originalLineNumber": 10,
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy72336/data/raw/sample-flow-data-part1.csv",
+        "fileHash": "385-1780529887855.7622",
+        "importTimestamp": "2026-06-03T23:40:38.624Z",
+        "status": "auto_processed",
+        "issues": [],
+        "manualEdits": []
+      }
+    },
+    {
+      "id": "10",
+      "timestamp": "2024-01-01 17:00:00",
+      "flow": "580",
+      "location": "East Gate",
+      "_meta": {
+        "importId": "import_1780530038624_eamiq0i2b",
+        "sourceName": "初始导入-客流数据",
+        "originalLineNumber": 11,
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy72336/data/raw/sample-flow-data-part1.csv",
+        "fileHash": "385-1780529887855.7622",
+        "importTimestamp": "2026-06-03T23:40:38.624Z",
+        "status": "auto_processed",
+        "issues": [],
+        "manualEdits": []
+      }
+    },
+    {
+      "id": "11",
+      "timestamp": "2024-01-01 18:00:00",
+      "flow": "420",
+      "location": "East Gate",
+      "_meta": {
+        "importId": "import_1780530038628_2f5jjchiu",
+        "sourceName": "补录导入-问卷补充数据",
+        "originalLineNumber": 2,
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy72336/data/raw/sample-flow-data-part2-supplement.csv",
+        "fileHash": "210-1780529892385.278",
+        "importTimestamp": "2026-06-03T23:40:38.629Z",
+        "status": "auto_processed",
+        "issues": [],
+        "manualEdits": []
+      }
+    },
+    {
+      "id": "12",
+      "timestamp": "2024-01-01 19:00:00",
+      "flow": "310",
+      "location": "East Gate",
+      "_meta": {
+        "importId": "import_1780530038628_2f5jjchiu",
+        "sourceName": "补录导入-问卷补充数据",
+        "originalLineNumber": 3,
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy72336/data/raw/sample-flow-data-part2-supplement.csv",
+        "fileHash": "210-1780529892385.278",
+        "importTimestamp": "2026-06-03T23:40:38.629Z",
+        "status": "auto_processed",
+        "issues": [],
+        "manualEdits": []
+      }
+    },
+    {
+      "id": "13",
+      "timestamp": "2024-01-01 20:00:00",
+      "flow": "180",
+      "location": "East Gate",
+      "_meta": {
+        "importId": "import_1780530038628_2f5jjchiu",
+        "sourceName": "补录导入-问卷补充数据",
+        "originalLineNumber": 4,
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy72336/data/raw/sample-flow-data-part2-supplement.csv",
+        "fileHash": "210-1780529892385.278",
+        "importTimestamp": "2026-06-03T23:40:38.629Z",
+        "status": "auto_processed",
+        "issues": [],
+        "manualEdits": []
+      }
+    },
+    {
+      "id": "14",
+      "timestamp": "2024-01-01 21:00:00",
+      "flow": "90",
+      "location": "East Gate",
+      "_meta": {
+        "importId": "import_1780530038628_2f5jjchiu",
+        "sourceName": "补录导入-问卷补充数据",
+        "originalLineNumber": 5,
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy72336/data/raw/sample-flow-data-part2-supplement.csv",
+        "fileHash": "210-1780529892385.278",
+        "importTimestamp": "2026-06-03T23:40:38.629Z",
+        "status": "auto_processed",
+        "issues": [],
+        "manualEdits": []
+      }
+    },
+    {
+      "id": "15",
+      "timestamp": "2024-01-01 22:00:00",
+      "flow": "50",
+      "location": "East Gate",
+      "_meta": {
+        "importId": "import_1780530038628_2f5jjchiu",
+        "sourceName": "补录导入-问卷补充数据",
+        "originalLineNumber": 6,
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy72336/data/raw/sample-flow-data-part2-supplement.csv",
+        "fileHash": "210-1780529892385.278",
+        "importTimestamp": "2026-06-03T23:40:38.629Z",
+        "status": "auto_processed",
+        "issues": [],
+        "manualEdits": []
+      }
+    }
+  ],
+  "boundaryCases": [
+    {
+      "id": "7",
+      "timestamp": "2024-01-01 14:00:00",
+      "flow": "",
+      "location": "East Gate",
+      "_meta": {
+        "importId": "import_1780530038624_eamiq0i2b",
+        "sourceName": "初始导入-客流数据",
+        "originalLineNumber": 8,
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy72336/data/raw/sample-flow-data-part1.csv",
+        "fileHash": "385-1780529887855.7622",
+        "importTimestamp": "2026-06-03T23:40:38.624Z",
+        "status": "boundary_case",
+        "issues": [
+          {
+            "type": "missing_value",
+            "field": "flow",
+            "value": "",
+            "severity": "medium",
+            "message": "flow 字段为空，旧表会当成缺失值"
+          }
+        ],
+        "manualEdits": []
+      }
+    }
+  ],
+  "negativeSamples": [
+    {
+      "id": "5",
+      "timestamp": "2024-01-01 12:00:00",
+      "flow": "50",
+      "location": "East Gate",
+      "_meta": {
+        "importId": "import_1780530038624_eamiq0i2b",
+        "sourceName": "初始导入-客流数据",
+        "originalLineNumber": 6,
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy72336/data/raw/sample-flow-data-part1.csv",
+        "fileHash": "385-1780529887855.7622",
+        "importTimestamp": "2026-06-03T23:40:38.624Z",
+        "status": "manual_confirmed",
+        "issues": [
+          {
+            "type": "negative_value",
+            "field": "flow",
+            "value": -50,
+            "severity": "high",
+            "message": "flow 为负数 (-50)，旧表当成缺失，需人工复核"
+          }
+        ],
+        "manualEdits": [
+          {
+            "recordIndex": 4,
+            "originalLineNumber": 6,
+            "field": "flow",
+            "oldValue": "-50",
+            "newValue": "50",
+            "reason": "问卷核对后确认应为50，原录入错误",
+            "operator": "运营规划-阿岚",
+            "timestamp": "2026-06-03T23:40:38.631Z"
+          }
+        ]
+      }
+    }
+  ],
+  "manualCalculationExamples": [
+    {
+      "originalLineNumber": 6,
+      "currentStatus": "manual_confirmed",
+      "issues": [
+        {
+          "type": "negative_value",
+          "field": "flow",
+          "value": -50,
+          "severity": "high",
+          "message": "flow 为负数 (-50)，旧表当成缺失，需人工复核"
+        }
+      ],
+      "manualEdits": [
+        {
+          "recordIndex": 4,
+          "originalLineNumber": 6,
+          "field": "flow",
+          "oldValue": "-50",
+          "newValue": "50",
+          "reason": "问卷核对后确认应为50，原录入错误",
+          "operator": "运营规划-阿岚",
+          "timestamp": "2026-06-03T23:40:38.631Z"
+        }
+      ],
+      "rawData": {
+        "id": "5",
+        "timestamp": "2024-01-01 12:00:00",
+        "flow": "50",
+        "location": "East Gate"
+      }
+    },
+    {
+      "originalLineNumber": 8,
+      "currentStatus": "boundary_case",
+      "issues": [
+        {
+          "type": "missing_value",
+          "field": "flow",
+          "value": "",
+          "severity": "medium",
+          "message": "flow 字段为空，旧表会当成缺失值"
+        }
+      ],
+      "manualEdits": [],
+      "rawData": {
+        "id": "7",
+        "timestamp": "2024-01-01 14:00:00",
+        "flow": "",
+        "location": "East Gate"
+      }
+    }
+  ],
+  "importHistory": [
+    {
+      "importId": "import_1780530038624_eamiq0i2b",
+      "sourceName": "初始导入-客流数据",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy72336/data/raw/sample-flow-data-part1.csv",
+      "fileHash": "385-1780529887855.7622",
+      "timestamp": "2026-06-03T23:40:38.624Z",
+      "recordCount": 10,
+      "issueCount": 2
+    },
+    {
+      "importId": "import_1780530038628_2f5jjchiu",
+      "sourceName": "补录导入-问卷补充数据",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy72336/data/raw/sample-flow-data-part2-supplement.csv",
+      "fileHash": "210-1780529892385.278",
+      "timestamp": "2026-06-03T23:40:38.629Z",
+      "recordCount": 5,
+      "issueCount": 0
+    }
+  ],
+  "manualEdits": [
+    {
+      "recordIndex": 4,
+      "originalLineNumber": 6,
+      "field": "flow",
+      "oldValue": "-50",
+      "newValue": "50",
+      "reason": "问卷核对后确认应为50，原录入错误",
+      "operator": "运营规划-阿岚",
+      "timestamp": "2026-06-03T23:40:38.631Z"
+    }
+  ],
+  "dataIssues": [
+    {
+      "type": "negative_value",
+      "field": "flow",
+      "value": -50,
+      "severity": "high",
+      "message": "flow 为负数 (-50)，旧表当成缺失，需人工复核",
+      "importId": "import_1780530038624_eamiq0i2b",
+      "originalLineNumber": 6,
+      "recordId": 4
+    },
+    {
+      "type": "missing_value",
+      "field": "flow",
+      "value": "",
+      "severity": "medium",
+      "message": "flow 字段为空，旧表会当成缺失值",
+      "importId": "import_1780530038624_eamiq0i2b",
+      "originalLineNumber": 8,
+      "recordId": 6
+    }
+  ],
+  "calculationResults": {
+    "densityCurve": [
+      {
+        "x": -10,
+        "density": 0.00026085138967358977
+      },
+      {
+        "x": 3,
+        "density": 0.0005714658474941285
+      },
+      {
+        "x": 16,
+        "density": 0.0010471567833868888
+      },
+      {
+        "x": 29,
+        "density": 0.0016166616027491903
+      },
+      {
+        "x": 42,
+        "density": 0.0021298278427899263
+      },
+      {
+        "x": 55,
+        "density": 0.0024454726298600033
+      },
+      {
+        "x": 68,
+        "density": 0.002525061623624225
+      },
+      {
+        "x": 81,
+        "density": 0.0024340357593756437
+      },
+      {
+        "x": 94,
+        "density": 0.0022575400983389235
+      },
+      {
+        "x": 107,
+        "density": 0.0020353703774065143
+      },
+      {
+        "x": 120,
+        "density": 0.0017794788603584107
+      },
+      {
+        "x": 133,
+        "density": 0.0015250305385500033
+      },
+      {
+        "x": 146,
+        "density": 0.0013322483167290205
+      },
+      {
+        "x": 159,
+        "density": 0.0012310565048870242
+      },
+      {
+        "x": 172,
+        "density": 0.001183675708039247
+      },
+      {
+        "x": 185,
+        "density": 0.001125027746593786
+      },
+      {
+        "x": 198,
+        "density": 0.0010398086681405563
+      },
+      {
+        "x": 211,
+        "density": 0.0009801595093354642
+      },
+      {
+        "x": 224,
+        "density": 0.001000131747784998
+      },
+      {
+        "x": 237,
+        "density": 0.0010913296311254725
+      },
+      {
+        "x": 250,
+        "density": 0.0012034382742697742
+      },
+      {
+        "x": 263,
+        "density": 0.001320541497777416
+      },
+      {
+        "x": 276,
+        "density": 0.001484238050245398
+      },
+      {
+        "x": 289,
+        "density": 0.0017193093899594003
+      },
+      {
+        "x": 302,
+        "density": 0.001954551451456516
+      },
+      {
+        "x": 315,
+        "density": 0.002057355803304058
+      },
+      {
+        "x": 328,
+        "density": 0.001962758939491097
+      },
+      {
+        "x": 341,
+        "density": 0.001748900374396927
+      },
+      {
+        "x": 354,
+        "density": 0.0015688312080752742
+      },
+      {
+        "x": 367,
+        "density": 0.0015208095135312858
+      },
+      {
+        "x": 380,
+        "density": 0.001597548085382878
+      },
+      {
+        "x": 393,
+        "density": 0.0017386817675340296
+      },
+      {
+        "x": 406,
+        "density": 0.0018956500037764668
+      },
+      {
+        "x": 419,
+        "density": 0.0020431493888811397
+      },
+      {
+        "x": 432,
+        "density": 0.002159796977000481
+      },
+      {
+        "x": 445,
+        "density": 0.0022217403138698713
+      },
+      {
+        "x": 458,
+        "density": 0.0022133148618419113
+      },
+      {
+        "x": 471,
+        "density": 0.0021365338703824015
+      },
+      {
+        "x": 484,
+        "density": 0.0020091471744548405
+      },
+      {
+        "x": 497,
+        "density": 0.0018517691360463836
+      },
+      {
+        "x": 510,
+        "density": 0.0016762667332388607
+      },
+      {
+        "x": 523,
+        "density": 0.001493226689558528
+      },
+      {
+        "x": 536,
+        "density": 0.001330436020698727
+      },
+      {
+        "x": 549,
+        "density": 0.0012238799819339944
+      },
+      {
+        "x": 562,
+        "density": 0.0011734560175620688
+      },
+      {
+        "x": 575,
+        "density": 0.0011201672764426427
+      },
+      {
+        "x": 588,
+        "density": 0.0009909433070162338
+      },
+      {
+        "x": 601,
+        "density": 0.0007685552155410066
+      },
+      {
+        "x": 614,
+        "density": 0.0005067986976577907
+      },
+      {
+        "x": 627,
+        "density": 0.00028005764960414744
+      },
+      {
+        "x": 640,
+        "density": 0.00012886919797101563
+      }
+    ],
+    "peaks": [
+      {
+        "position": 68,
+        "density": 0.002525061623624225,
+        "index": 6,
+        "relativeHeight": 1
+      },
+      {
+        "position": 445,
+        "density": 0.0022217403138698713,
+        "index": 35,
+        "relativeHeight": 0.8798756802936967
+      },
+      {
+        "position": 315,
+        "density": 0.002057355803304058,
+        "index": 25,
+        "relativeHeight": 0.8147744926522356
+      }
+    ],
+    "valleys": [
+      {
+        "position": 211,
+        "density": 0.0009801595093354642,
+        "index": 17
+      },
+      {
+        "position": 367,
+        "density": 0.0015208095135312858,
+        "index": 29
+      }
+    ],
+    "summary": {
+      "totalPoints": 14,
+      "peakCount": 3,
+      "dominantPeak": {
+        "position": 68,
+        "density": 0.002525061623624225,
+        "index": 6,
+        "relativeHeight": 1
+      },
+      "bandwidth": 30
+    },
+    "valueField": "flow",
+    "validRecordCount": 14,
+    "excludedRecordCount": 1
+  },
+  "summary": {
+    "totalRecords": 15,
+    "boundaryCaseCount": 1,
+    "negativeSampleCount": 1,
+    "manualEditCount": 1,
+    "importCount": 2
+  },
+  "exportTimestamp": "2026-06-03T23:40:38.640Z",
+  "exportVersion": "1.0.0"
+}

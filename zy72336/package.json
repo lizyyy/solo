@@ -1,0 +1,21 @@
+{
+  "name": "nuclear-density-peak",
+  "version": "1.0.0",
+  "description": "核密度客流峰值分析系统 - 带完整自检和追踪功能",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "demo": "node scripts/demo.js",
+    "self-check": "node scripts/self-check.js",
+    "boundary-report": "node scripts/boundary-report.js",
+    "test": "node scripts/test-all.js"
+  },
+  "keywords": ["nuclear-density", "peak-detection", "data-audit"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "json2csv": "^6.0.0-alpha.2",
+    "lodash": "^4.17.21"
+  }
+}

@@ -1,0 +1,3 @@
+"originalLineNumber","currentStatus","issueCount","issueDetails","manualEditCount","editDetails","rawData"
+6,"manual_confirmed",1,"flow: flow 为负数 (-50)，旧表当成缺失，需人工复核",1,"flow: -50 → 50 (问卷核对后确认应为50，原录入错误)","{""id"":""5"",""timestamp"":""2024-01-01 12:00:00"",""flow"":""50"",""location"":""East Gate""}"
+8,"boundary_case",1,"flow: flow 字段为空，旧表会当成缺失值",0,"","{""id"":""7"",""timestamp"":""2024-01-01 14:00:00"",""flow"":"""",""location"":""East Gate""}"
