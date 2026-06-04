@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>弹簧疲劳寿命复核 - 小看板</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #333; margin-bottom: 20px; text-align: center; }
+        .card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .card-title { font-size: 18px; font-weight: 600; color: #333; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+        .record { display: flex; align-items: center; padding: 12px; margin-bottom: 10px; border-radius: 6px; border-left: 4px solid; }
+        .record.normal { border-left-color: #52c41a; background: #f6ffed; }
+        .record.pending { border-left-color: #faad14; background: #fffbe6; }
+        .record.manual { border-left-color: #1890ff; background: #e6f7ff; }
+        .record.reviewed { border-left-color: #722ed1; background: #f9f0ff; }
+        .status-icon { font-size: 24px; margin-right: 15px; }
+        .record-info { flex: 1; }
+        .spring-id { font-weight: 600; color: #333; }
+        .sensor-info { font-size: 14px; color: #666; margin-top: 4px; }
+        .fatigue { display: flex; flex-direction: column; align-items: flex-end; }
+        .fatigue-value { font-size: 20px; font-weight: 600; }
+        .fatigue-value.safe { color: #52c41a; }
+        .fatigue-value.warning { color: #faad14; }
+        .fatigue-value.danger { color: #ff4d4f; }
+        .fatigue-label { font-size: 12px; color: #999; }
+        .reminder { padding: 15px; border-radius: 6px; margin-bottom: 15px; }
+        .reminder.warning { background: #fffbe6; border: 1px solid #ffe58f; }
+        .reminder.danger { background: #fff2f0; border: 1px solid #ffccc7; }
+        .reminder.safe { background: #f6ffed; border: 1px solid #b7eb8f; }
+        .reminder-title { font-weight: 600; margin-bottom: 8px; }
+        .reminder-desc { font-size: 14px; color: #666; white-space: pre-line; }
+        .evidence-chain { background: #fafafa; padding: 15px; border-radius: 6px; margin-top: 10px; }
+        .evidence-item { font-size: 13px; color: #666; padding: 4px 0; padding-left: 20px; position: relative; }
+        .evidence-item:before { content: '•'; position: absolute; left: 8px; color: #1890ff; }
+        .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
+        .stat { background: white; padding: 15px; border-radius: 8px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .stat-value { font-size: 28px; font-weight: 600; }
+        .stat-label { font-size: 14px; color: #666; margin-top: 5px; }
+        .btn { background: #1890ff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; }
+        .btn:hover { background: #40a9ff; }
+        .loading { text-align: center; padding: 40px; color: #999; }
+        .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-left: 8px; }
+        .tag-normal { background: #f6ffed; color: #52c41a; }
+        .tag-pending { background: #fffbe6; color: #faad14; }
+        .tag-manual { background: #e6f7ff; color: #1890ff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 弹簧疲劳寿命复核</h1>
+        
+        <div class="card">
+            <div class="card-title">📊 复核统计</div>
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-value" id="total-count">0</div>
+                    <div class="stat-label">总记录数</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="normal-count">0</div>
+                    <div class="stat-label">正常记录</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="pending-count">0</div>
+                    <div class="stat-label">待复核</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="manual-count">0</div>
+                    <div class="stat-label">手写补录</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">🚨 安全提醒</div>
+            <div id="safety-reminder" class="loading">加载中...</div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">📋 复核记录</div>
+            <div id="records-list" class="loading">加载中...</div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">📜 证据链说明</div>
+            <div class="evidence-chain">
+                <div class="evidence-item">工况照片：每条记录都关联现场拍摄的照片路径</div>
+                <div class="evidence-item">传感器追踪：记录原始传感器编号和变化情况</div>
+                <div class="evidence-item">操作历史：完整记录导入、检测、修正、复核全过程</div>
+                <div class="evidence-item">复核痕迹：保留复核人、复核时间、复核意见</div>
+                <div class="evidence-item">数据溯源：手写备注修正标明来源和修正值</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function getFatigueClass(value) {
+            if (value < 30) return 'safe';
+            if (value < 60) return 'warning';
+            return 'danger';
+        }
+
+        function getStatusClass(status) {
+            switch(status) {
+                case 'normal': return 'normal';
+                case 'pending_review': return 'pending';
+                case 'from_manual_note': return 'manual';
+                case 'reviewed': return 'reviewed';
+                default: return 'normal';
+            }
+        }
+
+        function getStatusIcon(status) {
+            switch(status) {
+                case 'normal': return '✅';
+                case 'pending_review': return '🔍';
+                case 'from_manual_note': return '📝';
+                case 'reviewed': return '✓';
+                default: return '❓';
+            }
+        }
+
+        function getStatusTag(status) {
+            switch(status) {
+                case 'normal': return '<span class="tag tag-normal">正常</span>';
+                case 'pending_review': return '<span class="tag tag-pending">待复核</span>';
+                case 'from_manual_note': return '<span class="tag tag-manual">手写补录</span>';
+                case 'reviewed': return '<span class="tag tag-manual">已复核</span>';
+                default: return status;
+            }
+        }
+
+        fetch('/api/demo')
+            .then(res => res.json())
+            .then(data => {
+                const records = data.session.records;
+                
+                document.getElementById('total-count').textContent = records.length;
+                document.getElementById('normal-count').textContent = records.filter(r => r.status === 'normal').length;
+                document.getElementById('pending-count').textContent = records.filter(r => r.status === 'pending_review').length;
+                document.getElementById('manual-count').textContent = records.filter(r => r.status === 'from_manual_note').length;
+
+                const reminder = data.safetyReminder;
+                const reminderClass = reminder.level === 'safe' ? 'safe' : 
+                                      reminder.level === 'warning' ? 'warning' : 'danger';
+                const reminderLevelText = reminder.level === 'safe' ? '安全' :
+                                          reminder.level === 'warning' ? '警告' : '危险';
+                document.getElementById('safety-reminder').innerHTML = `
+                    <div class="reminder ${reminderClass}">
+                        <div class="reminder-title">${reminderLevelText}：${reminder.title}</div>
+                        <div class="reminder-desc">${reminder.description}</div>
+                    </div>
+                `;
+
+                const recordsHtml = records.map(record => {
+                    const statusClass = getStatusClass(record.status);
+                    const statusIcon = getStatusIcon(record.status);
+                    const displayFatigue = record.correctedFatigueValue !== null ? 
+                        record.correctedFatigueValue : record.fatigueValue;
+                    const fatigueClass = getFatigueClass(displayFatigue);
+                    
+                    let extraInfo = '';
+                    if (record.sensorRestartDetected) {
+                        extraInfo += `<div class="sensor-info">⚠️ 传感器编号变化: ${record.originalSensorId} → ${record.sensorId}</div>`;
+                    }
+                    if (record.manualNote) {
+                        const noteContent = typeof record.manualNote === 'object' ? 
+                            record.manualNote.content : record.manualNote;
+                        extraInfo += `<div class="sensor-info">📝 手写备注: ${noteContent}</div>`;
+                    }
+                    if (record.reviewComment) {
+                        extraInfo += `<div class="sensor-info">💬 复核意见: ${record.reviewComment} (${record.reviewedBy})</div>`;
+                    }
+
+                    return `
+                        <div class="record ${statusClass}">
+                            <div class="status-icon">${statusIcon}</div>
+                            <div class="record-info">
+                                <div class="spring-id">
+                                    弹簧 ${record.springId}
+                                    ${getStatusTag(record.status)}
+                                </div>
+                                <div class="sensor-info">传感器: ${record.sensorId}</div>
+                                ${extraInfo}
+                                <div class="sensor-info">📷 工况照片: ${record.photoPath}</div>
+                            </div>
+                            <div class="fatigue">
+                                <div class="fatigue-value ${fatigueClass}">
+                                    ${record.fatigueValue}
+                                    ${record.correctedFatigueValue !== null ? 
+                                        `<span style="font-size: 14px;">→ ${record.correctedFatigueValue}</span>` : ''}
+                                </div>
+                                <div class="fatigue-label">疲劳值 (运行${record.runCount}次)</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                document.getElementById('records-list').innerHTML = recordsHtml;
+            })
+            .catch(err => {
+                console.error('加载失败:', err);
+                document.getElementById('records-list').innerHTML = '加载失败，请刷新重试';
+            });
+    </script>
+</body>
+</html>

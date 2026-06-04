@@ -1,0 +1,18 @@
+{
+  "name": "spring-fatigue-review",
+  "version": "1.0.0",
+  "description": "弹簧疲劳寿命复核系统",
+  "main": "src/index.js",
+  "bin": {
+    "spring-review": "src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "demo": "node test.js",
+    "server": "node server.js",
+    "web": "node server.js"
+  },
+  "keywords": ["spring", "fatigue", "sensor", "review"],
+  "author": "",
+  "license": "ISC"
+}
