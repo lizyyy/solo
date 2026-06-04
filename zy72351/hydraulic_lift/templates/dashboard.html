@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}小看板 - 液压升降台载荷试算{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>载荷试算小看板</h1>
+    <p class="subtitle">每条记录都带着人来人往的痕迹——谁改了什么、为什么改、还缺什么</p>
+</div>
+
+{% if records %}
+<div class="records-grid">
+    {% for r in records %}
+    <a href="/record/{{ r.id }}" class="record-card {% if r.has_unresolved_flags %}flagged{% elif r.status == 'approved' %}approved{% endif %}">
+        <div class="card-header">
+            <span class="card-id">#{{ r.id }}</span>
+            <span class="status-badge status-{{ r.status }}">{{ r.status_label() }}</span>
+        </div>
+        <h3 class="card-title">{{ r.name }}</h3>
+        <div class="card-meta">
+            <span>参数 {{ r.parameters.count() }} 项</span>
+            <span>截图 {{ r.screenshots.count() }} 张</span>
+            <span>审计 {{ r.audit_entries.count() }} 条</span>
+        </div>
+        {% if r.has_unresolved_flags() %}
+        <div class="card-flag">
+            ⚠ 有人工改过系数但没写原因，需要设备工程师复核
+        </div>
+        {% endif %}
+        {% if r.conclusion %}
+        <div class="card-conclusion">{{ r.conclusion }}</div>
+        {% endif %}
+        <div class="card-time">更新于 {{ r.updated_at.strftime('%Y-%m-%d %H:%M') }}</div>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <h2>还没有试算记录</h2>
+    <p>从维修群截图导入数据，或者加载演示数据看看流程</p>
+    <div class="empty-actions">
+        <a href="/import" class="btn btn-primary">导入数据</a>
+        <button class="btn btn-secondary" onclick="loadDemo()">加载演示数据</button>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+function loadDemo() {
+    fetch('/api/demo/load', {method: 'POST'})
+        .then(r => r.json())
+        .then(data => {
+            window.location.href = '/record/' + data.id;
+        })
+        .catch(err => alert('加载失败: ' + err));
+}
+</script>
+{% endblock %}

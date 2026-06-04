@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}导入数据 - 液压升降台载荷试算{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div class="header-back">
+        <a href="/">← 返回小看板</a>
+    </div>
+    <h1>从维修群截图导入</h1>
+    <p class="subtitle">第一步：把维修群截图里的参数搬进来。人工改过的系数系统会标出来，没写原因的别急——留给设备工程师复核。</p>
+</div>
+
+<div class="import-layout">
+    <form method="POST" class="import-form" id="importForm">
+        <section class="section">
+            <h2>基本信息</h2>
+            <div class="form-group">
+                <label>试算名称</label>
+                <input type="text" name="name" value="新建液压升降台载荷试算" required>
+            </div>
+            <div class="form-group">
+                <label>截图来源群</label>
+                <input type="text" name="source_chat" value="厂区维修群" placeholder="如：厂区维修群、设备保障群">
+            </div>
+            <div class="form-group">
+                <label>截图描述</label>
+                <textarea name="description" rows="2" placeholder="简单描述截图内容，例如：3号升降台月度维保记录"></textarea>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>参数录入</h2>
+            <p class="section-desc">从截图里提取的参数填在这里。如果某个系数被人工改过，在"人工修正"列打勾并填入新值。</p>
+            <table class="param-table import-param-table">
+                <thead>
+                    <tr>
+                        <th>参数</th>
+                        <th>默认值</th>
+                        <th>单位</th>
+                        <th>人工修正</th>
+                        <th>修正值</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for key, meta in default_params.items() %}
+                    <tr>
+                        <td>
+                            <strong>{{ meta.display_name }}</strong>
+                            <input type="hidden" name="param_key_{{ loop.index }}" value="{{ key }}">
+                        </td>
+                        <td>{{ meta.value }}</td>
+                        <td>{{ meta.unit }}</td>
+                        <td>
+                            <input type="checkbox" class="override-check" data-key="{{ key }}" data-default="{{ meta.value }}">
+                        </td>
+                        <td>
+                            <input type="number" class="override-value" data-key="{{ key }}" step="any" disabled placeholder="—">
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <input type="hidden" name="params" id="paramsInput">
+            <input type="hidden" name="manual_overrides" id="overridesInput">
+        </section>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary btn-lg">导入并创建试算记录</button>
+            <a href="/" class="btn btn-secondary">取消</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const DEFAULT_PARAMS = {{ default_params | tojson }};
+
+document.querySelectorAll('.override-check').forEach(cb => {
+    cb.addEventListener('change', function() {
+        const key = this.dataset.key;
+        const valueInput = document.querySelector(`.override-value[data-key="${key}"]`);
+        valueInput.disabled = !this.checked;
+        if (!this.checked) valueInput.value = '';
+    });
+});
+
+document.getElementById('importForm').addEventListener('submit', function(e) {
+    const params = {};
+    const overrides = {};
+
+    document.querySelectorAll('.override-check').forEach(cb => {
+        const key = cb.dataset.key;
+        const defaultMeta = DEFAULT_PARAMS[key];
+        params[key] = {
+            display_name: defaultMeta.display_name,
+            value: defaultMeta.value,
+            unit: defaultMeta.unit,
+            category: defaultMeta.category || 'input'
+        };
+
+        if (cb.checked) {
+            const valueInput = document.querySelector(`.override-value[data-key="${key}"]`);
+            if (valueInput.value) {
+                overrides[key] = {
+                    display_name: defaultMeta.display_name,
+                    value: parseFloat(valueInput.value),
+                    unit: defaultMeta.unit,
+                    category: 'input'
+                };
+                params[key].value = parseFloat(valueInput.value);
+            }
+        }
+    });
+
+    document.getElementById('paramsInput').value = JSON.stringify(params);
+    document.getElementById('overridesInput').value = JSON.stringify(overrides);
+});
+</script>
+{% endblock %}

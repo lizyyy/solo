@@ -1,0 +1,341 @@
+{% extends "base.html" %}
+{% block title %}{{ record.name }} - 参数回放{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div class="header-back">
+        <a href="/">← 返回小看板</a>
+    </div>
+    <h1>{{ record.name }}</h1>
+    <div class="header-status">
+        <span class="status-badge status-{{ record.status }}">{{ record.status_label() }}</span>
+        {% if record.has_unresolved_flags() %}
+        <span class="flag-alert">⚠ 有人工改过系数但没写原因——别急着归正常，留给设备工程师复核</span>
+        {% endif %}
+    </div>
+    {% if record.conclusion %}
+    <div class="conclusion-box">{{ record.conclusion }}</div>
+    {% endif %}
+</div>
+
+<div class="replay-layout">
+    <div class="replay-main">
+        <section class="section">
+            <h2>输入参数</h2>
+            <p class="section-desc">每条参数都标注了来源和状态。人工改过的系数没写原因的会标红，补录采样间隔说明后参数状态会跟着变。</p>
+            <table class="param-table">
+                <thead>
+                    <tr>
+                        <th>参数</th>
+                        <th>当前值</th>
+                        <th>原值</th>
+                        <th>状态</th>
+                        <th>下一步</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in input_params %}
+                    <tr class="{% if p.needs_review %}row-flagged{% elif p.is_manual_override %}row-overridden{% endif %}" data-param-id="{{ p.id }}" data-param-name="{{ p.name }}">
+                        <td>
+                            <strong>{{ p.display_name }}</strong>
+                            <span class="unit">{{ p.unit }}</span>
+                        </td>
+                        <td class="value-cell">{{ p.value }}</td>
+                        <td class="original-cell">{% if p.original_value is not none %}{{ p.original_value }}{% endif %}</td>
+                        <td>
+                            {% if p.needs_review %}
+                            <span class="flag-badge flag-danger">⚠ {{ p.flag_label() }}</span>
+                            {% elif p.is_manual_override %}
+                            <span class="flag-badge flag-ok">✓ {{ p.flag_label() }}</span>
+                            {% else %}
+                            <span class="flag-badge flag-normal">系统默认</span>
+                            {% endif %}
+                        </td>
+                        <td class="next-action-cell">
+                            {% if p.next_action() %}
+                            <span class="next-action">{{ p.next_action() }}</span>
+                            {% else %}
+                            <span class="next-action text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="action-cell">
+                            {% if p.needs_review %}
+                            <button class="btn btn-sm btn-danger" onclick="openReasonModal({{ p.id }}, '{{ p.display_name }}')">补充原因</button>
+                            {% endif %}
+                            {% if not p.sampling_interval_note and p.category == 'input' %}
+                            <button class="btn btn-sm btn-secondary" onclick="openIntervalModal({{ p.id }}, '{{ p.display_name }}')">补录采样间隔</button>
+                            {% endif %}
+                            <button class="btn btn-sm" onclick="openOverrideModal({{ p.id }}, '{{ p.display_name }}', {{ p.value }})">修正</button>
+                        </td>
+                    </tr>
+                    {% if p.sampling_interval_note %}
+                    <tr class="interval-row">
+                        <td colspan="6" class="interval-note">
+                            📋 采样间隔说明：{{ p.sampling_interval_note }}
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+
+        <section class="section">
+            <h2>计算结果</h2>
+            <p class="section-desc">由输入参数自动算出。人工修正系数后需要重跑才能更新这里的结果。</p>
+            <table class="param-table result-table">
+                <thead>
+                    <tr>
+                        <th>结果项</th>
+                        <th>值</th>
+                        <th>单位</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in output_params %}
+                    <tr>
+                        <td><strong>{{ p.display_name }}</strong></td>
+                        <td class="value-cell">{{ p.value }}</td>
+                        <td>{{ p.unit }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="rerun-area">
+                <button class="btn btn-primary" onclick="rerunCalculation()">重跑试算</button>
+                <span class="rerun-hint">修正参数后需要重跑才能更新结果和结论</span>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>维修群截图</h2>
+            <p class="section-desc">数据从这里来。每张截图都记录了来源群和提取的参数摘要。</p>
+            {% for s in screenshots %}
+            <div class="screenshot-card">
+                <div class="screenshot-icon">📷</div>
+                <div class="screenshot-info">
+                    <div class="screenshot-name">{{ s.filename }}</div>
+                    <div class="screenshot-source">来源：{{ s.source_chat }}</div>
+                    <div class="screenshot-desc">{{ s.description }}</div>
+                    {% if s.extracted_summary %}
+                    <div class="screenshot-summary">提取参数：{{ s.extracted_summary }}</div>
+                    {% endif %}
+                </div>
+                <div class="screenshot-time">导入于 {{ s.imported_at.strftime('%Y-%m-%d %H:%M') }}</div>
+            </div>
+            {% endfor %}
+            {% if not screenshots %}
+            <p class="text-muted">暂无截图</p>
+            {% endif %}
+        </section>
+    </div>
+
+    <aside class="replay-sidebar">
+        <section class="section">
+            <h2>审计轨迹</h2>
+            <p class="section-desc">谁改了什么、为什么改、改完影响什么——都在这里。</p>
+            <div class="audit-timeline">
+                {% for a in audit_trail %}
+                <div class="audit-item {% if a.action == 'manual_override' and not a.reason %}audit-flagged{% endif %}">
+                    <div class="audit-time">{{ a.created_at.strftime('%m-%d %H:%M') }}</div>
+                    <div class="audit-operator">
+                        <strong>{{ a.operator }}</strong>
+                        <span class="audit-role">{{ a.role }}</span>
+                    </div>
+                    <div class="audit-action">{{ a.action_label() }}</div>
+                    {% if a.old_value and a.new_value %}
+                    <div class="audit-values">{{ a.old_value }} → {{ a.new_value }}</div>
+                    {% endif %}
+                    <div class="audit-note">{{ a.note or a.reason or '' }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+    </aside>
+</div>
+
+<div id="reasonModal" class="modal" style="display:none">
+    <div class="modal-content">
+        <h3>补充修正原因</h3>
+        <p>这条系数被人工改过但没写原因，别急着归正常——请设备工程师写明依据。</p>
+        <input type="hidden" id="reasonParamId">
+        <div class="form-group">
+            <label>参数</label>
+            <span id="reasonParamName"></span>
+        </div>
+        <div class="form-group">
+            <label>修正原因</label>
+            <textarea id="reasonText" rows="3" placeholder="请说明为什么修改这个系数，例如：根据现场实测……"></textarea>
+        </div>
+        <div class="form-group">
+            <label>操作人</label>
+            <input type="text" id="reasonOperator" value="设备工程师">
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-primary" onclick="submitReason()">提交</button>
+            <button class="btn" onclick="closeModal('reasonModal')">取消</button>
+        </div>
+    </div>
+</div>
+
+<div id="intervalModal" class="modal" style="display:none">
+    <div class="modal-content">
+        <h3>补录采样间隔说明</h3>
+        <p>训练教练老唐看过采样条件后，在这里补录说明，参数回放页会跟着变。</p>
+        <input type="hidden" id="intervalParamId">
+        <div class="form-group">
+            <label>参数</label>
+            <span id="intervalParamName"></span>
+        </div>
+        <div class="form-group">
+            <label>采样间隔说明</label>
+            <textarea id="intervalText" rows="3" placeholder="例如：设备运行稳定后采集，采样间隔200ms，连续采集30秒"></textarea>
+        </div>
+        <div class="form-group">
+            <label>操作人</label>
+            <input type="text" id="intervalOperator" value="训练教练老唐">
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-primary" onclick="submitInterval()">提交</button>
+            <button class="btn" onclick="closeModal('intervalModal')">取消</button>
+        </div>
+    </div>
+</div>
+
+<div id="overrideModal" class="modal" style="display:none">
+    <div class="modal-content">
+        <h3>人工修正系数</h3>
+        <p>修改后请务必写明原因，否则系统会标记为"待设备工程师复核"。</p>
+        <input type="hidden" id="overrideParamId">
+        <div class="form-group">
+            <label>参数</label>
+            <span id="overrideParamName"></span>
+        </div>
+        <div class="form-group">
+            <label>当前值</label>
+            <span id="overrideOldValue"></span>
+        </div>
+        <div class="form-group">
+            <label>新值</label>
+            <input type="number" id="overrideNewValue" step="any">
+        </div>
+        <div class="form-group">
+            <label>修正原因（强烈建议填写）</label>
+            <textarea id="overrideReason" rows="2" placeholder="不写原因会被标记为待复核"></textarea>
+        </div>
+        <div class="form-group">
+            <label>操作人</label>
+            <input type="text" id="overrideOperator" value="训练教练老唐">
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-primary" onclick="submitOverride()">提交</button>
+            <button class="btn" onclick="closeModal('overrideModal')">取消</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const RECORD_ID = {{ record.id }};
+
+function openReasonModal(paramId, paramName) {
+    document.getElementById('reasonParamId').value = paramId;
+    document.getElementById('reasonParamName').textContent = paramName;
+    document.getElementById('reasonText').value = '';
+    document.getElementById('reasonModal').style.display = 'flex';
+}
+
+function openIntervalModal(paramId, paramName) {
+    document.getElementById('intervalParamId').value = paramId;
+    document.getElementById('intervalParamName').textContent = paramName;
+    document.getElementById('intervalText').value = '';
+    document.getElementById('intervalModal').style.display = 'flex';
+}
+
+function openOverrideModal(paramId, paramName, currentValue) {
+    document.getElementById('overrideParamId').value = paramId;
+    document.getElementById('overrideParamName').textContent = paramName;
+    document.getElementById('overrideOldValue').textContent = currentValue;
+    document.getElementById('overrideNewValue').value = currentValue;
+    document.getElementById('overrideReason').value = '';
+    document.getElementById('overrideModal').style.display = 'flex';
+}
+
+function closeModal(id) {
+    document.getElementById(id).style.display = 'none';
+}
+
+function submitReason() {
+    const paramId = document.getElementById('reasonParamId').value;
+    const reason = document.getElementById('reasonText').value;
+    const operator = document.getElementById('reasonOperator').value;
+    fetch(`/api/records/${RECORD_ID}/add_reason`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({parameter_id: parseInt(paramId), reason, operator, role: 'equipment_engineer'})
+    }).then(r => r.json()).then(() => {
+        location.reload();
+    });
+}
+
+function submitInterval() {
+    const paramId = document.getElementById('intervalParamId').value;
+    const note = document.getElementById('intervalText').value;
+    const operator = document.getElementById('intervalOperator').value;
+    const paramName = document.getElementById('intervalParamName').textContent;
+
+    const paramNameMap = {
+        '额定载荷': 'rated_load', '平台自重': 'platform_weight',
+        '液压缸内径': 'cylinder_bore', '液压缸数量': 'cylinder_count',
+        '系统压力': 'system_pressure', '安全系数': 'safety_factor',
+        '升降行程': 'lifting_stroke', '采样间隔': 'sampling_interval'
+    };
+
+    fetch(`/api/records/${RECORD_ID}/supplement_interval`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({param_name: paramNameMap[paramName] || paramName, sampling_interval_note: note, operator, role: 'training_coach'})
+    }).then(r => r.json()).then(() => {
+        location.reload();
+    });
+}
+
+function submitOverride() {
+    const paramId = document.getElementById('overrideParamId').value;
+    const newValue = document.getElementById('overrideNewValue').value;
+    const reason = document.getElementById('overrideReason').value;
+    const operator = document.getElementById('overrideOperator').value;
+
+    fetch(`/api/records/${RECORD_ID}/parameters`, {
+        method: 'GET'
+    }).then(r => r.json()).then(params => {
+        const param = params.find(p => p.id === parseInt(paramId));
+        if (!param) return;
+        fetch(`/api/records/${RECORD_ID}/override`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({param_name: param.name, value: parseFloat(newValue), reason: reason || null, operator, role: 'training_coach'})
+        }).then(r => r.json()).then(() => {
+            location.reload();
+        });
+    });
+}
+
+function rerunCalculation() {
+    fetch(`/api/records/${RECORD_ID}/rerun`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({operator: '训练教练老唐', role: 'training_coach'})
+    }).then(r => r.json()).then(() => {
+        location.reload();
+    });
+}
+
+document.querySelectorAll('.modal').forEach(modal => {
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.style.display = 'none';
+    });
+});
+</script>
+{% endblock %}
