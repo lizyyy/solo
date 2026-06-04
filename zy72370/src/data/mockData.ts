@@ -1,0 +1,266 @@
+import type {
+  RecordData,
+  ThresholdTable,
+  NameplateParam,
+  ConflictData,
+  UnitConversion,
+  ProcessState,
+  UserRole,
+} from '../types';
+
+export const mockThresholdTable: ThresholdTable = {
+  id: 'THR-001',
+  version: 'v1.3',
+  maxAllowedSpeed: 6.0,
+  minAllowedSpeed: 1.0,
+  importDate: '2024-06-01 09:30:00',
+  importBy: '数据分析员',
+};
+
+export const mockNameplateParams: NameplateParam[] = [
+  {
+    id: 'NP-001',
+    equipmentId: 'EQ-2024-001',
+    equipmentName: '雨滴测速仪 RDS-200',
+    caliber: '0.3mm',
+    ratedSpeed: 5.5,
+    calibrationDate: '2024-03-15',
+    parameterVersion: 'v1.0',
+    manufacturer: '气象设备有限公司',
+  },
+  {
+    id: 'NP-002',
+    equipmentId: 'EQ-2024-002',
+    equipmentName: '雨滴测速仪 RDS-300',
+    caliber: '0.5mm',
+    ratedSpeed: 6.0,
+    calibrationDate: '2024-02-20',
+    parameterVersion: 'v1.2',
+    manufacturer: '气象设备有限公司',
+  },
+];
+
+export const mockConflicts: ConflictData[] = [
+  {
+    id: 'CONF-001',
+    item: '最大允许速度阈值',
+    thresholdValue: 6.0,
+    thresholdSource: '安全阈值表 v1.3',
+    thresholdVersion: 'v1.3',
+    nameplateValue: 5.5,
+    nameplateSource: '设备铭牌 #EQ-2024-001 (RDS-200)',
+    nameplateVersion: 'v1.0',
+    evidence: [
+      '阈值表导入日期：2024-06-01 09:30:00',
+      '设备铭牌校准日期：2024-03-15',
+      '差值：0.5 m/s，超出允许误差范围 ±0.2 m/s',
+      '涉及设备：RDS-200 雨滴测速仪 #EQ-2024-001',
+    ],
+    status: 'pending',
+  },
+];
+
+export const mockUnitConversion: UnitConversion = {
+  id: 'UC-001',
+  formula: 'v_terminal = sqrt((4 * g * d * (rho_water - rho_air)) / (3 * C_d * rho_air))',
+  formulaDisplay: 'v = √[(4 g d (ρ_w - ρ_a)) / (3 C_d ρ_a)]',
+  parameterVersion: 'v1.3',
+  parameterSource: 'threshold',
+  parameterSourceLabel: '安全阈值表 v1.3',
+  tradeOffReason: '待何工确认阈值冲突后更新。当前使用阈值表 v1.3 参数，如与铭牌冲突将根据决策调整。',
+  updateTime: '2024-06-01 10:00:00',
+  updatedBy: '数据分析员',
+  historyVersions: [
+    {
+      version: 'v1.2',
+      formula: 'v_terminal = sqrt((4 * g * d * (rho_water - rho_air)) / (3 * C_d * rho_air))',
+      parameterSource: '安全阈值表 v1.2',
+      updateTime: '2024-05-15 14:30:00',
+      reason: '常规版本更新',
+    },
+    {
+      version: 'v1.1',
+      formula: 'v_terminal = sqrt((4 * g * d * (rho_water - rho_air)) / (3 * C_d * rho_air))',
+      parameterSource: '安全阈值表 v1.1',
+      updateTime: '2024-04-01 11:00:00',
+      reason: '修正空气密度参数',
+    },
+  ],
+};
+
+export const mockRecords: RecordData[] = [
+  {
+    id: 'REC-001',
+    type: 'smooth',
+    typeLabel: '顺利记录',
+    measuredSpeed: 4.2,
+    averageSpeed: 4.1,
+    thresholdMax: 6.0,
+    isOverThreshold: false,
+    isOverwrittenByAverage: false,
+    caliber: '0.5mm',
+    caliberSource: 'measurement',
+    status: 'normal',
+    dataSource: 'normal',
+    dataSourceLabel: '正常材料',
+    measurementTime: '2024-06-15 14:23:45',
+    processLogs: [
+      {
+        id: 'LOG-001-1',
+        recordId: 'REC-001',
+        step: 'threshold_import',
+        operator: '数据分析员',
+        action: '导入安全阈值表 v1.3，最大阈值 6.0 m/s',
+        timestamp: '2024-06-15 14:00:00',
+      },
+      {
+        id: 'LOG-001-2',
+        recordId: 'REC-001',
+        step: 'nameplate_review',
+        operator: '何工',
+        action: '查看设备铭牌参数，口径 0.5mm 与测量一致',
+        timestamp: '2024-06-15 14:10:00',
+      },
+      {
+        id: 'LOG-001-3',
+        recordId: 'REC-001',
+        step: 'conversion_update',
+        operator: '数据分析员',
+        action: '单位换算完成，使用参数版本 v1.3',
+        timestamp: '2024-06-15 14:15:00',
+      },
+    ],
+    calculationNote: {
+      id: 'CALC-001',
+      recordId: 'REC-001',
+      conversionId: 'UC-001',
+      parameterVersion: 'v1.3',
+      calculationFormula: 'v = 4.2 m/s，通过单位换算验证',
+      tradeOffReason: '使用阈值表 v1.3 参数，无冲突。测量值 4.2 < 阈值 6.0，正常。',
+    },
+  },
+  {
+    id: 'REC-002',
+    type: 'overwritten',
+    typeLabel: '超阈值被平均值盖掉',
+    measuredSpeed: 7.8,
+    averageSpeed: 4.5,
+    thresholdMax: 6.0,
+    isOverThreshold: true,
+    isOverwrittenByAverage: true,
+    caliber: '0.5mm',
+    caliberSource: 'measurement',
+    status: 'pending_review',
+    dataSource: 'normal',
+    dataSourceLabel: '正常材料',
+    measurementTime: '2024-06-15 14:25:12',
+    processLogs: [
+      {
+        id: 'LOG-002-1',
+        recordId: 'REC-002',
+        step: 'threshold_import',
+        operator: '数据分析员',
+        action: '导入安全阈值表 v1.3，最大阈值 6.0 m/s',
+        timestamp: '2024-06-15 14:00:00',
+      },
+      {
+        id: 'LOG-002-2',
+        recordId: 'REC-002',
+        step: 'nameplate_review',
+        operator: '何工',
+        action: '查看设备铭牌参数，口径 0.5mm 与测量一致',
+        timestamp: '2024-06-15 14:10:00',
+      },
+      {
+        id: 'LOG-002-3',
+        recordId: 'REC-002',
+        step: 'conversion_update',
+        operator: '数据分析员',
+        action: '检测到测量值 7.8 > 阈值 6.0，但被平均值 4.5 覆盖，挂起待复核',
+        timestamp: '2024-06-15 14:25:30',
+      },
+    ],
+    calculationNote: {
+      id: 'CALC-002',
+      recordId: 'REC-002',
+      conversionId: 'UC-001',
+      parameterVersion: 'v1.3',
+      calculationFormula: '测量值 7.8 m/s > 阈值 6.0 m/s；平均值 4.5 m/s',
+      tradeOffReason: '测量值超阈值，但被平均值掩盖。**不归正常**，留待维修师傅复核。',
+    },
+  },
+  {
+    id: 'REC-003',
+    type: 'supplemented',
+    typeLabel: '旧口径补录（来自设备铭牌）',
+    measuredSpeed: 5.1,
+    averageSpeed: 5.0,
+    thresholdMax: 6.0,
+    isOverThreshold: false,
+    isOverwrittenByAverage: false,
+    caliber: '0.3mm',
+    caliberSource: 'nameplate',
+    status: 'normal',
+    dataSource: 'supplemented',
+    dataSourceLabel: '补录材料',
+    measurementTime: '2024-06-15 14:28:33',
+    processLogs: [
+      {
+        id: 'LOG-003-1',
+        recordId: 'REC-003',
+        step: 'threshold_import',
+        operator: '数据分析员',
+        action: '导入安全阈值表 v1.3，最大阈值 6.0 m/s',
+        timestamp: '2024-06-15 14:00:00',
+      },
+      {
+        id: 'LOG-003-2',
+        recordId: 'REC-003',
+        step: 'nameplate_review',
+        operator: '何工',
+        action: '发现测量口径缺失，从设备铭牌 #EQ-2024-001 补录旧口径 0.3mm',
+        timestamp: '2024-06-15 14:20:00',
+      },
+      {
+        id: 'LOG-003-3',
+        recordId: 'REC-003',
+        step: 'conversion_update',
+        operator: '数据分析员',
+        action: '使用补录口径 0.3mm 完成单位换算，参数版本 v1.3',
+        timestamp: '2024-06-15 14:27:00',
+      },
+    ],
+    calculationNote: {
+      id: 'CALC-003',
+      recordId: 'REC-003',
+      conversionId: 'UC-001',
+      parameterVersion: 'v1.3',
+      calculationFormula: 'v = 5.1 m/s，使用铭牌补录口径 0.3mm 计算',
+      tradeOffReason: '原始测量口径缺失，从设备铭牌 RDS-200 #EQ-2024-001 补录旧口径 0.3mm。何工于 2024-06-15 14:20 确认。',
+    },
+  },
+];
+
+export const mockProcessState: ProcessState = {
+  currentStep: 'threshold_import',
+  steps: {
+    threshold_import: 'completed',
+    nameplate_review: 'in_progress',
+    conversion_update: 'pending',
+  },
+  thresholdImported: true,
+  nameplateReviewedByHe: false,
+  conversionUpdated: false,
+};
+
+export const roleLabels: Record<UserRole, string> = {
+  engineer: '设备工程师（何工）',
+  technician: '维修师傅',
+  analyst: '数据分析员',
+};
+
+export const rolePermissions: Record<UserRole, { canDecideConflict: boolean; canReview: boolean }> = {
+  engineer: { canDecideConflict: true, canReview: false },
+  technician: { canDecideConflict: false, canReview: true },
+  analyst: { canDecideConflict: false, canReview: false },
+};
