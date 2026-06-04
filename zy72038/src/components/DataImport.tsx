@@ -70,12 +70,24 @@ export const DataImport: React.FC = () => {
     [handleFile]
   );
 
-  const loadDefaultConfig = useCallback(() => {
-    const defaultConfig = getDefaultGameConfig();
-    const result = validateGameConfig(defaultConfig);
-    setImportResult(result);
-    setConfig(defaultConfig);
-  }, [setConfig]);
+  const loadDefaultConfig = useCallback(async () => {
+    try {
+      const response = await fetch('/test-config-conflicts.json');
+      const text = await response.text();
+      const result = parseJSONData(text);
+      setImportResult(result);
+      setImportConflicts(result.conflicts || []);
+      if (result.config && result.errors.length === 0) {
+        setConfig(result.config);
+      }
+    } catch {
+      const defaultConfig = getDefaultGameConfig();
+      const result = validateGameConfig(defaultConfig);
+      setImportResult(result);
+      setImportConflicts(result.conflicts || []);
+      setConfig(defaultConfig);
+    }
+  }, [setConfig, setImportConflicts]);
 
   const applyConfigWithWarnings = useCallback(() => {
     if (importResult?.config) {

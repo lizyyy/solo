@@ -243,7 +243,10 @@ export const validateGameConfig = (config: GameConfig): ImportResult => {
 
   config.events.forEach((event, index) => {
     const eventErrors = validateEvent(event, index, config.events);
-    if (event.isDuplicate) {
+    const hasDuplicateMark = config.events.some(
+      (e, i) => i !== index && e.id === event.id && (e.isDuplicate || event.isDuplicate)
+    );
+    if (event.isDuplicate || hasDuplicateMark) {
       warnings.push(...eventErrors);
     } else {
       errors.push(...eventErrors);
