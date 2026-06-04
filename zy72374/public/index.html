@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>游泳池换热负荷系统</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #333; }
+    .header { background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%); color: white; padding: 20px 40px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .header h1 { font-size: 24px; margin-bottom: 5px; }
+    .header p { font-size: 14px; opacity: 0.8; }
+    .nav { display: flex; gap: 10px; padding: 15px 40px; background: white; border-bottom: 1px solid #e0e0e0; }
+    .nav button { padding: 8px 20px; border: none; background: #e8f0fe; color: #1e3a5f; border-radius: 6px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+    .nav button:hover, .nav button.active { background: #1e3a5f; color: white; }
+    .container { padding: 30px 40px; max-width: 1400px; margin: 0 auto; }
+    .card { background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .card-title { font-size: 18px; font-weight: 600; margin-bottom: 16px; color: #1e3a5f; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .stat-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; }
+    .stat-card.warning { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+    .stat-card.success { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+    .stat-number { font-size: 32px; font-weight: 700; }
+    .stat-label { font-size: 13px; opacity: 0.9; margin-top: 4px; }
+    .workflow-steps { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .workflow-step { flex: 1; min-width: 180px; padding: 12px 16px; background: #f0f0f0; border-radius: 8px; text-align: center; font-size: 13px; }
+    .workflow-step.active { background: #4facfe; color: white; }
+    .workflow-step.completed { background: #00f2fe; color: white; }
+    .workflow-step.warning { background: #f5576c; color: white; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #eee; }
+    th { background: #f8f9fa; font-weight: 600; font-size: 13px; color: #666; }
+    tr:hover { background: #f8f9fa; }
+    .btn { padding: 6px 14px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; margin-right: 6px; }
+    .btn-primary { background: #1e3a5f; color: white; }
+    .btn-success { background: #10b981; color: white; }
+    .btn-warning { background: #f59e0b; color: white; }
+    .btn-danger { background: #ef4444; color: white; }
+    .btn-outline { background: white; border: 1px solid #ddd; color: #666; }
+    .badge { padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 500; }
+    .badge-draft { background: #e5e7eb; color: #374151; }
+    .badge-engineering { background: #dbeafe; color: #1e40af; }
+    .badge-safety { background: #fef3c7; color: #92400e; }
+    .badge-completed { background: #d1fae5; color: #065f46; }
+    .badge-sensor { background: #fee2e2; color: #991b1b; }
+    .evidence-chain { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 12px; }
+    .evidence-item { padding: 8px 12px; background: #f0f9ff; border-radius: 6px; font-size: 12px; cursor: pointer; }
+    .evidence-item:hover { background: #e0f2fe; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+    .modal.active { display: flex; }
+    .modal-content { background: white; border-radius: 12px; max-width: 800px; width: 90%; max-height: 80vh; overflow-y: auto; }
+    .modal-header { padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+    .modal-body { padding: 24px; }
+    .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
+    .diff-view { background: #f8f9fa; padding: 16px; border-radius: 8px; font-family: monospace; font-size: 13px; }
+    .diff-line.old { color: #ef4444; text-decoration: line-through; }
+    .diff-line.new { color: #10b981; }
+    .chart-container { height: 300px; position: relative; }
+    .chart-svg { width: 100%; height: 100%; }
+    .chart-point { cursor: pointer; transition: r 0.2s; }
+    .chart-point:hover { r: 8; }
+    .tooltip { position: absolute; background: rgba(0,0,0,0.8); color: white; padding: 8px 12px; border-radius: 6px; font-size: 12px; pointer-events: none; display: none; z-index: 100; }
+    .sensor-warning { background: #fef2f2; border-left: 4px solid #ef4444; padding: 12px 16px; border-radius: 4px; margin-bottom: 16px; }
+    .tab-view { display: flex; border-bottom: 1px solid #eee; margin-bottom: 20px; }
+    .tab { padding: 10px 20px; cursor: pointer; border-bottom: 2px solid transparent; font-size: 14px; }
+    .tab.active { border-bottom-color: #1e3a5f; color: #1e3a5f; font-weight: 600; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .history-item { padding: 12px; background: #f8f9fa; border-radius: 6px; margin-bottom: 8px; font-size: 13px; }
+    .history-meta { color: #666; font-size: 12px; margin-top: 4px; }
+    .empty-state { text-align: center; padding: 60px 20px; color: #999; }
+    .empty-state-icon { font-size: 48px; margin-bottom: 16px; }
+    .trace-link { color: #3b82f6; cursor: pointer; text-decoration: underline; }
+    .view-3d { background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%); border-radius: 12px; padding: 40px; color: white; text-align: center; position: relative; overflow: hidden; }
+    .pool-3d { width: 200px; height: 100px; background: rgba(79, 172, 254, 0.3); margin: 20px auto; border-radius: 8px; transform: perspective(500px) rotateX(30deg); box-shadow: 0 20px 40px rgba(0,0,0,0.3); position: relative; }
+    .sensor-indicator { position: absolute; width: 12px; height: 12px; border-radius: 50%; background: #10b981; }
+    .sensor-indicator.warning { background: #f59e0b; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    .heat-value { font-size: 48px; font-weight: 700; margin: 20px 0; }
+    .heat-unit { font-size: 18px; opacity: 0.8; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🏊 游泳池换热负荷系统</h1>
+    <p>可追溯的换热负荷计算与审核流程</p>
+  </div>
+  
+  <div class="nav">
+    <button class="active" onclick="showPage('dashboard')">📊 总览</button>
+    <button onclick="showPage('records')">📋 换热负荷记录</button>
+    <button onclick="showPage('photos')">📷 工况照片</button>
+    <button onclick="showPage('sensors')">📡 传感器管理</button>
+  </div>
+  
+  <div class="container">
+    <div id="page-dashboard">
+      <div class="card">
+        <div class="card-title">工作流概览</div>
+        <div id="stats-container" class="stats-grid"></div>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">换热负荷趋势（可追溯）</div>
+        <div class="chart-container">
+          <svg class="chart-svg" id="chart-svg"></svg>
+          <div class="tooltip" id="chart-tooltip"></div>
+        </div>
+        <p style="margin-top: 12px; font-size: 12px; color: #666;">💡 点击数据点可追溯原始证据（工况照片、巡检备注）</p>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">3D 可视化视图</div>
+        <div class="view-3d" id="view-3d">
+          <div style="font-size: 18px; margin-bottom: 10px;">主游泳池 - 换热负荷分布</div>
+          <div class="pool-3d">
+            <div class="sensor-indicator" style="top: 20%; left: 20%;" title="进水口传感器"></div>
+            <div class="sensor-indicator" style="top: 20%; left: 80%;" title="出水口传感器"></div>
+            <div class="sensor-indicator warning" style="top: 70%; left: 50%;" title="循环泵传感器（重启过）"></div>
+          </div>
+          <div class="heat-value" id="3d-heat-value">--<span class="heat-unit"> kW</span></div>
+          <div id="3d-sensor-warnings" style="font-size: 13px; opacity: 0.9;"></div>
+        </div>
+        <p style="margin-top: 12px; font-size: 12px; color: #666;">⚠️ 闪烁点表示该传感器有重启记录，点击可查看详细追溯</p>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">待处理任务</div>
+        <div id="pending-tasks"></div>
+      </div>
+    </div>
+    
+    <div id="page-records" style="display:none;">
+      <div class="card">
+        <div class="card-title">换热负荷记录</div>
+        <div class="workflow-steps">
+          <div class="workflow-step">① 创建草稿</div>
+          <div class="workflow-step">② 工程师审核</div>
+          <div class="workflow-step">③ 安全员复核（传感器异常时）</div>
+          <div class="workflow-step">④ 完成</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>日期</th>
+              <th>泳池</th>
+              <th>换热负荷</th>
+              <th>状态</th>
+              <th>传感器异常</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="records-table"></tbody>
+        </table>
+      </div>
+    </div>
+    
+    <div id="page-photos" style="display:none;">
+      <div class="card">
+        <div class="card-title">工况照片管理</div>
+        <div id="photos-list"></div>
+      </div>
+    </div>
+    
+    <div id="page-sensors" style="display:none;">
+      <div class="card">
+        <div class="card-title">传感器管理</div>
+        <table>
+          <thead>
+            <tr>
+              <th>物理ID</th>
+              <th>当前编号</th>
+              <th>位置</th>
+              <th>重启次数</th>
+              <th>历史编号</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="sensors-table"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  
+  <div class="modal" id="detail-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-title">详情</h3>
+        <button class="close-btn" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+
+  <script>
+    let currentPage = 'dashboard';
+    let mockData = {};
+    
+    function initMockData() {
+      mockData = {
+        sensors: [
+          { id: 's1', physicalId: 'SEN-001', currentNumber: 'T-101', previousNumbers: [{ number: 'T-099', startTime: '2024-01-01', endTime: '2024-03-15' }], location: '主泳池进水口', type: 'temperature', restartCount: 1 },
+          { id: 's2', physicalId: 'SEN-002', currentNumber: 'T-102', previousNumbers: [], location: '主泳池出水口', type: 'temperature', restartCount: 0 },
+          { id: 's3', physicalId: 'SEN-003', currentNumber: 'F-201', previousNumbers: [{ number: 'F-199', startTime: '2024-01-01', endTime: '2024-02-20' }, { number: 'F-200', startTime: '2024-02-20', endTime: '2024-04-10' }], location: '循环泵', type: 'flow', restartCount: 2 }
+        ],
+        photos: [
+          { id: 'p1', fileName: '20240601_1430_pool.jpg', uploadTime: '2024-06-01T14:30:00', sensorNumbers: ['T-101', 'F-201'], status: 'approved', notes: '下午2点巡检，设备运行正常', uploadedBy: '张工' },
+          { id: 'p2', fileName: '20240602_0915_sensor.jpg', uploadTime: '2024-06-02T09:15:00', sensorNumbers: ['T-102'], status: 'pending_review', notes: '', uploadedBy: '何工' }
+        ],
+        notes: [
+          { id: 'n1', photoId: 'p1', sensorNumber: 'T-101', content: '进水温度：25.5℃\n读数稳定，无异常', author: '何工', authorRole: 'engineer', version: 1, verificationStatus: 'verified' },
+          { id: 'n2', photoId: 'p1', sensorNumber: 'F-201', content: '流量：120 m³/h\n注意：传感器于今日凌晨重启，编号从F-200变更为F-201', author: '何工', authorRole: 'engineer', version: 2, verificationStatus: 'pending', previousVersions: [{ version: 1, content: '流量：120 m³/h', editor: '何工', editedAt: '2024-06-01T15:00:00' }] }
+        ],
+        heatLoads: [
+          { id: 'h1', recordDate: '2024-06-01', poolId: 'main', poolName: '主游泳池', heatLoad: 125.6, status: 'completed', workflowStep: 4, hasSensorRestart: true, photoIds: ['p1'], noteIds: ['n1', 'n2'], history: [{ version: 1, status: 'draft', editor: '操作员A', changeDescription: '创建记录', timestamp: '2024-06-01T10:00:00' }, { version: 2, status: 'pending_engineer_review', editor: '操作员A', changeDescription: '提交审核', timestamp: '2024-06-01T11:00:00' }, { version: 3, status: 'pending_safety_review', editor: '何工', changeDescription: '工程审核通过，检测到传感器重启需安全复核', timestamp: '2024-06-01T14:00:00' }, { version: 4, status: 'completed', editor: '安全员陈', changeDescription: '安全复核通过', timestamp: '2024-06-01T16:00:00' }] },
+          { id: 'h2', recordDate: '2024-06-02', poolId: 'main', poolName: '主游泳池', heatLoad: 118.3, status: 'pending_engineer_review', workflowStep: 2, hasSensorRestart: false, photoIds: ['p2'], noteIds: [], history: [{ version: 1, status: 'draft', editor: '操作员B', changeDescription: '创建记录', timestamp: '2024-06-02T09:00:00' }] },
+          { id: 'h3', recordDate: '2024-06-03', poolId: 'main', poolName: '主游泳池', heatLoad: 132.1, status: 'draft', workflowStep: 1, hasSensorRestart: false, photoIds: [], noteIds: [], history: [] }
+        ]
+      };
+    }
+    
+    function showPage(page) {
+      currentPage = page;
+      document.querySelectorAll('.nav button').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      document.querySelectorAll('[id^="page-"]').forEach(p => p.style.display = 'none');
+      document.getElementById('page-' + page).style.display = 'block';
+      
+      if (page === 'dashboard') loadDashboard();
+      if (page === 'records') loadRecords();
+      if (page === 'photos') loadPhotos();
+      if (page === 'sensors') loadSensors();
+    }
+    
+    function loadDashboard() {
+      const stats = {
+        total: mockData.heatLoads.length,
+        draft: mockData.heatLoads.filter(r => r.workflowStep === 1).length,
+        engineering: mockData.heatLoads.filter(r => r.workflowStep === 2).length,
+        safety: mockData.heatLoads.filter(r => r.workflowStep === 3).length,
+        completed: mockData.heatLoads.filter(r => r.workflowStep === 4).length,
+        sensorRestart: mockData.heatLoads.filter(r => r.hasSensorRestart).length
+      };
+      
+      document.getElementById('stats-container').innerHTML = `
+        <div class="stat-card"><div class="stat-number">${stats.total}</div><div class="stat-label">总记录数</div></div>
+        <div class="stat-card"><div class="stat-number">${stats.draft}</div><div class="stat-label">草稿状态</div></div>
+        <div class="stat-card"><div class="stat-number">${stats.engineering}</div><div class="stat-label">待工程审核</div></div>
+        <div class="stat-card warning"><div class="stat-number">${stats.safety}</div><div class="stat-label">待安全复核</div></div>
+        <div class="stat-card success"><div class="stat-number">${stats.completed}</div><div class="stat-label">已完成</div></div>
+        <div class="stat-card warning"><div class="stat-number">${stats.sensorRestart}</div><div class="stat-label">含传感器重启</div></div>
+      `;
+      
+      renderChart();
+      
+      const latestRecord = mockData.heatLoads.find(r => r.status === 'completed');
+      if (latestRecord) {
+        document.getElementById('3d-heat-value').innerHTML = `${latestRecord.heatLoad}<span class="heat-unit"> kW</span>`;
+        document.getElementById('3d-sensor-warnings').innerHTML = latestRecord.hasSensorRestart ? '⚠️ 本记录包含传感器重启事件，已完成安全复核' : '';
+      }
+      
+      const pendingTasks = mockData.heatLoads.filter(r => r.workflowStep < 4);
+      if (pendingTasks.length === 0) {
+        document.getElementById('pending-tasks').innerHTML = '<div class="empty-state"><div class="empty-state-icon">✅</div><p>暂无待处理任务</p></div>';
+      } else {
+        document.getElementById('pending-tasks').innerHTML = pendingTasks.map(r => `
+          <div style="padding: 12px; background: #fef9c3; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <strong>${r.recordDate}</strong> - ${r.poolName}
+              ${r.hasSensorRestart ? '<span class="badge badge-sensor">传感器重启</span>' : ''}
+            </div>
+            <span class="badge ${r.workflowStep === 1 ? 'badge-draft' : r.workflowStep === 2 ? 'badge-engineering' : 'badge-safety'}">
+              ${r.workflowStep === 1 ? '草稿' : r.workflowStep === 2 ? '待工程审核' : '待安全复核'}
+            </span>
+          </div>
+        `).join('');
+      }
+    }
+    
+    function renderChart() {
+      const svg = document.getElementById('chart-svg');
+      const width = svg.clientWidth;
+      const height = svg.clientHeight;
+      const padding = { top: 30, right: 30, bottom: 40, left: 50 };
+      
+      const completedRecords = mockData.heatLoads
+        .filter(r => r.status === 'completed' || r.status === 'pending_safety_review')
+        .sort((a, b) => a.recordDate.localeCompare(b.recordDate));
+      
+      if (completedRecords.length === 0) return;
+      
+      const maxHeatLoad = Math.max(...completedRecords.map(r => r.heatLoad)) * 1.1;
+      const minHeatLoad = Math.min(...completedRecords.map(r => r.heatLoad)) * 0.9;
+      
+      const xScale = (i) => padding.left + (i / (completedRecords.length - 1)) * (width - padding.left - padding.right);
+      const yScale = (val) => height - padding.bottom - ((val - minHeatLoad) / (maxHeatLoad - minHeatLoad)) * (height - padding.top - padding.bottom);
+      
+      let svgContent = '';
+      
+      for (let i = 0; i <= 5; i++) {
+        const y = padding.top + (i / 5) * (height - padding.top - padding.bottom);
+        const value = maxHeatLoad - (i / 5) * (maxHeatLoad - minHeatLoad);
+        svgContent += `<line x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}" stroke="#eee" stroke-dasharray="4"/>`;
+        svgContent += `<text x="${padding.left - 10}" y="${y + 4}" text-anchor="end" font-size="11" fill="#666">${value.toFixed(0)}</text>`;
+      }
+      
+      const linePath = completedRecords.map((r, i) => 
+        `${i === 0 ? 'M' : 'L'} ${xScale(i)} ${yScale(r.heatLoad)}`
+      ).join(' ');
+      svgContent += `<path d="${linePath}" fill="none" stroke="#4facfe" stroke-width="2"/>`;
+      
+      completedRecords.forEach((r, i) => {
+        const x = xScale(i);
+        const y = yScale(r.heatLoad);
+        const color = r.hasSensorRestart ? '#f59e0b' : '#10b981';
+        svgContent += `<circle class="chart-point" cx="${x}" cy="${y}" r="6" fill="${color}" data-id="${r.id}" data-date="${r.recordDate}" data-value="${r.heatLoad}" data-restart="${r.hasSensorRestart}"/>`;
+        svgContent += `<text x="${x}" y="${height - 10}" text-anchor="middle" font-size="10" fill="#666">${r.recordDate.slice(5)}</text>`;
+      });
+      
+      svg.innerHTML = svgContent;
+      
+      svg.querySelectorAll('.chart-point').forEach(point => {
+        point.addEventListener('click', () => {
+          const recordId = point.getAttribute('data-id');
+          showRecordDetail(recordId);
+        });
+        
+        point.addEventListener('mouseenter', (e) => {
+          const tooltip = document.getElementById('chart-tooltip');
+          tooltip.innerHTML = `
+            <strong>${point.getAttribute('data-date')}</strong><br>
+            换热负荷: ${point.getAttribute('data-value')} kW<br>
+            ${point.getAttribute('data-restart') === 'true' ? '⚠️ 含传感器重启记录' : ''}
+            <br><small>点击查看详情</small>
+          `;
+          tooltip.style.display = 'block';
+          tooltip.style.left = e.offsetX + 10 + 'px';
+          tooltip.style.top = e.offsetY - 30 + 'px';
+        });
+        
+        point.addEventListener('mouseleave', () => {
+          document.getElementById('chart-tooltip').style.display = 'none';
+        });
+      });
+    }
+    
+    function loadRecords() {
+      const tbody = document.getElementById('records-table');
+      tbody.innerHTML = mockData.heatLoads.map(r => {
+        const badgeClass = r.workflowStep === 1 ? 'badge-draft' : r.workflowStep === 2 ? 'badge-engineering' : r.workflowStep === 3 ? 'badge-safety' : 'badge-completed';
+        const statusText = r.workflowStep === 1 ? '草稿' : r.workflowStep === 2 ? '待工程审核' : r.workflowStep === 3 ? '待安全复核' : '已完成';
+        return `
+          <tr>
+            <td>${r.recordDate}</td>
+            <td>${r.poolName}</td>
+            <td>${r.heatLoad} kW</td>
+            <td><span class="badge ${badgeClass}">${statusText}</span></td>
+            <td>${r.hasSensorRestart ? '<span class="badge badge-sensor">是</span>' : '否'}</td>
+            <td>
+              <button class="btn btn-primary" onclick="showRecordDetail('${r.id}')">查看</button>
+              ${r.workflowStep === 1 ? '<button class="btn btn-success">提交审核</button>' : ''}
+              ${r.workflowStep === 2 ? '<button class="btn btn-success">审核通过</button><button class="btn btn-danger">驳回</button>' : ''}
+              ${r.workflowStep === 3 ? '<button class="btn btn-success">复核通过</button><button class="btn btn-danger">驳回</button>' : ''}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+    
+    function showRecordDetail(id) {
+      const record = mockData.heatLoads.find(r => r.id === id);
+      if (!record) return;
+      
+      const photos = mockData.photos.filter(p => record.photoIds.includes(p.id));
+      const notes = mockData.notes.filter(n => record.noteIds.includes(n.id));
+      
+      document.getElementById('modal-title').textContent = `换热负荷记录 - ${record.recordDate}`;
+      document.getElementById('modal-body').innerHTML = `
+        ${record.hasSensorRestart ? `
+          <div class="sensor-warning">
+            ⚠️ <strong>传感器异常标记</strong>：本记录涉及传感器重启事件，需特别注意数据追溯
+          </div>
+        ` : ''}
+        
+        <div class="workflow-steps">
+          <div class="workflow-step ${record.workflowStep >= 1 ? (record.workflowStep > 1 ? 'completed' : 'active') : ''}">① 创建草稿</div>
+          <div class="workflow-step ${record.workflowStep >= 2 ? (record.workflowStep > 2 ? 'completed' : 'active') : ''}">② 工程师审核</div>
+          <div class="workflow-step ${record.hasSensorRestart ? (record.workflowStep >= 3 ? (record.workflowStep > 3 ? 'completed' : 'active') : 'warning') : ''}">③ 安全员复核 ${record.hasSensorRestart ? '(触发)' : '(跳过)'}</div>
+          <div class="workflow-step ${record.workflowStep >= 4 ? 'completed' : ''}">④ 完成</div>
+        </div>
+        
+        <div class="tab-view">
+          <div class="tab active" onclick="switchTab(this, 'basic')">基本信息</div>
+          <div class="tab" onclick="switchTab(this, 'evidence')">证据链</div>
+          <div class="tab" onclick="switchTab(this, 'history')">历史记录</div>
+        </div>
+        
+        <div class="tab-content active" id="tab-basic">
+          <table>
+            <tr><td style="width: 150px;">记录日期</td><td>${record.recordDate}</td></tr>
+            <tr><td>泳池</td><td>${record.poolName}</td></tr>
+            <tr><td>换热负荷</td><td style="font-size: 24px; font-weight: 700; color: #1e3a5f;">${record.heatLoad} kW</td></tr>
+            <tr><td>状态</td><td><span class="badge ${record.workflowStep === 1 ? 'badge-draft' : record.workflowStep === 2 ? 'badge-engineering' : record.workflowStep === 3 ? 'badge-safety' : 'badge-completed'}">${record.workflowStep === 1 ? '草稿' : record.workflowStep === 2 ? '待工程审核' : record.workflowStep === 3 ? '待安全复核' : '已完成'}</span></td></tr>
+          </table>
+        </div>
+        
+        <div class="tab-content" id="tab-evidence">
+          <h4 style="margin-bottom: 12px;">📷 工况照片 (${photos.length})</h4>
+          ${photos.length === 0 ? '<p style="color: #999;">暂无照片</p>' : photos.map(p => `
+            <div class="history-item">
+              <strong>${p.fileName}</strong>
+              <div style="margin-top: 8px;">传感器: ${p.sensorNumbers.join(', ')}</div>
+              <div style="margin-top: 4px;">上传: ${p.uploadedBy} - ${p.uploadTime}</div>
+              ${p.notes ? `<div style="margin-top: 4px; color: #666;">备注: ${p.notes}</div>` : ''}
+            </div>
+          `).join('')}
+          
+          <h4 style="margin: 20px 0 12px;">📝 巡检备注 (${notes.length})</h4>
+          ${notes.length === 0 ? '<p style="color: #999;">暂无备注</p>' : notes.map(n => `
+            <div class="history-item">
+              <div style="display: flex; justify-content: space-between;">
+                <strong>传感器 ${n.sensorNumber}</strong>
+                <span class="badge ${n.verificationStatus === 'verified' ? 'badge-completed' : 'badge-draft'}">${n.verificationStatus === 'verified' ? '已核实' : '待核实'}</span>
+              </div>
+              <pre style="margin-top: 8px; white-space: pre-wrap; font-family: inherit; background: white; padding: 8px; border-radius: 4px;">${n.content}</pre>
+              <div class="history-meta">记录人: ${n.author} | 版本: v${n.version}</div>
+              ${n.previousVersions && n.previousVersions.length > 0 ? `
+                <button class="btn btn-outline" style="margin-top: 8px;" onclick="showNoteDiff('${n.id}')">查看版本差异</button>
+              ` : ''}
+            </div>
+          `).join('')}
+          
+          <p style="margin-top: 16px; font-size: 12px; color: #666;">
+            💡 所有证据均与换热负荷计算关联，支持完整追溯
+          </p>
+        </div>
+        
+        <div class="tab-content" id="tab-history">
+          ${record.history.length === 0 ? '<p style="color: #999;">暂无历史记录</p>' : record.history.map((h, i) => `
+            <div class="history-item">
+              <div style="display: flex; justify-content: space-between;">
+                <strong>v${h.version}</strong>
+                <span class="badge ${h.status === 'completed' ? 'badge-completed' : 'badge-draft'}">${h.status}</span>
+              </div>
+              <div style="margin-top: 4px;">${h.changeDescription}</div>
+              <div class="history-meta">操作人: ${h.editor} | ${h.timestamp}</div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      
+      document.getElementById('detail-modal').classList.add('active');
+    }
+    
+    function switchTab(tab, tabName) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.getElementById('tab-' + tabName).classList.add('active');
+    }
+    
+    function showNoteDiff(noteId) {
+      const note = mockData.notes.find(n => n.id === noteId);
+      if (!note || !note.previousVersions) return;
+      
+      const current = { content: note.content, version: note.version };
+      const previous = note.previousVersions[note.previousVersions.length - 1];
+      
+      alert(`版本对比 v${previous.version} → v${current.version}\n\n旧版本:\n${previous.content}\n\n新版本:\n${current.content}\n\n(实际系统会显示更详细的行级差异)`);
+    }
+    
+    function loadPhotos() {
+      const container = document.getElementById('photos-list');
+      container.innerHTML = mockData.photos.map(p => `
+        <div class="history-item">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <strong>📷 ${p.fileName}</strong>
+            <span class="badge ${p.status === 'approved' ? 'badge-completed' : 'badge-draft'}">${p.status === 'approved' ? '已审核' : '待审核'}</span>
+          </div>
+          <div style="margin-top: 8px;">传感器编号: ${p.sensorNumbers.join(', ')}</div>
+          <div>上传人: ${p.uploadedBy} | ${p.uploadTime}</div>
+          ${p.notes ? `<div style="margin-top: 4px; color: #666;">备注: ${p.notes}</div>` : ''}
+          <div style="margin-top: 12px;">
+            <button class="btn btn-primary">查看照片</button>
+            <button class="btn btn-outline">添加备注</button>
+            ${p.status === 'pending_review' ? '<button class="btn btn-success">批准</button><button class="btn btn-danger">驳回</button>' : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    function loadSensors() {
+      const tbody = document.getElementById('sensors-table');
+      tbody.innerHTML = mockData.sensors.map(s => `
+        <tr>
+          <td><code>${s.physicalId}</code></td>
+          <td>${s.currentNumber}</td>
+          <td>${s.location}</td>
+          <td>${s.restartCount > 0 ? `<span class="badge badge-sensor">${s.restartCount} 次</span>` : '0'}</td>
+          <td>${s.previousNumbers.length > 0 ? s.previousNumbers.map(p => p.number).join(', ') : '-'}</td>
+          <td>
+            <button class="btn btn-outline" onclick="showSensorHistory('${s.id}')">历史</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+    
+    function showSensorHistory(sensorId) {
+      const sensor = mockData.sensors.find(s => s.id === sensorId);
+      if (!sensor) return;
+      
+      document.getElementById('modal-title').textContent = `传感器历史 - ${sensor.physicalId}`;
+      document.getElementById('modal-body').innerHTML = `
+        <table>
+          <tr><td style="width: 150px;">物理ID</td><td><code>${sensor.physicalId}</code></td></tr>
+          <tr><td>当前编号</td><td><strong>${sensor.currentNumber}</strong></td></tr>
+          <tr><td>位置</td><td>${sensor.location}</td></tr>
+          <tr><td>重启次数</td><td>${sensor.restartCount}</td></tr>
+        </table>
+        
+        <h4 style="margin: 20px 0 12px;">编号历史</h4>
+        ${sensor.previousNumbers.length === 0 ? '<p style="color: #999;">暂无编号变更记录</p>' : `
+          <table>
+            <thead>
+              <tr><th>编号</th><th>开始时间</th><th>结束时间</th></tr>
+            </thead>
+            <tbody>
+              ${sensor.previousNumbers.map(p => `
+                <tr><td>${p.number}</td><td>${p.startTime}</td><td>${p.endTime}</td></tr>
+              `).join('')}
+              <tr style="background: #d1fae5;"><td><strong>${sensor.currentNumber}</strong> (当前)</td><td>${sensor.previousNumbers[sensor.previousNumbers.length - 1]?.endTime || '-'}</td><td>至今</td></tr>
+            </tbody>
+          </table>
+        `}
+        
+        <div class="sensor-warning" style="margin-top: 20px;">
+          📌 <strong>边界规则</strong>：传感器重启编号变化时，历史数据将通过时间戳追溯到对应编号，确保数据可比对
+        </div>
+      `;
+      
+      document.getElementById('detail-modal').classList.add('active');
+    }
+    
+    function closeModal() {
+      document.getElementById('detail-modal').classList.remove('active');
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      initMockData();
+      loadDashboard();
+    });
+  </script>
+</body>
+</html>
