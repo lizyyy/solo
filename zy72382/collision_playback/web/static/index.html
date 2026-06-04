@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小车碰撞动量回放 - 小看板</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🚗 小车碰撞动量回放</h1>
+            <p class="subtitle">维修师傅老岑的传感器数据复盘工具</p>
+        </header>
+
+        <div class="summary-cards">
+            <div class="card summary-card">
+                <div class="card-title">总记录数</div>
+                <div class="card-value" id="total-count">0</div>
+            </div>
+            <div class="card summary-card normal">
+                <div class="card-title">✓ 正常</div>
+                <div class="card-value" id="normal-count">0</div>
+            </div>
+            <div class="card summary-card pending">
+                <div class="card-title">⚠ 待复核</div>
+                <div class="card-value" id="pending-count">0</div>
+            </div>
+            <div class="card summary-card reviewed">
+                <div class="card-title">✓ 已复核</div>
+                <div class="card-value" id="reviewed-count">0</div>
+            </div>
+            <div class="card summary-card photo">
+                <div class="card-title">📷 含照片</div>
+                <div class="card-value" id="photo-count">0</div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <button class="btn btn-primary" onclick="loadDemoData()">加载演示数据</button>
+            <button class="btn" onclick="refreshData()">刷新数据</button>
+            <button class="btn btn-warning" onclick="togglePendingFilter()">只看待复核</button>
+        </div>
+
+        <div class="main-content">
+            <div class="records-section">
+                <h2>传感器记录列表</h2>
+                <div class="records-list" id="records-list">
+                    <div class="loading">加载中...</div>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h2>记录详情 <span id="detail-sensor-no"></span></h2>
+                <div id="detail-content">
+                    <div class="empty-state">
+                        <p>← 点击左侧记录查看详情</p>
+                        <p class="hint">完整显示人工修正、工况照片、回放历史</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="commands-section">
+            <h2>📋 可重跑命令</h2>
+            <div class="commands-grid" id="commands-grid">
+                <div class="command-item">
+                    <code>python -m collision_playback list</code>
+                    <span class="command-desc">查看记录列表</span>
+                </div>
+                <div class="command-item">
+                    <code>python -m collision_playback show &lt;ID&gt;</code>
+                    <span class="command-desc">查看记录详情</span>
+                </div>
+                <div class="command-item">
+                    <code>python -m collision_playback show-by-sensor &lt;编号&gt;</code>
+                    <span class="command-desc">通过传感器查询</span>
+                </div>
+                <div class="command-item">
+                    <code>python -m collision_playback playback &lt;ID&gt;</code>
+                    <span class="command-desc">重新参数回放</span>
+                </div>
+                <div class="command-item">
+                    <code>python -m collision_playback pending</code>
+                    <span class="command-desc">列出待复核记录</span>
+                </div>
+                <div class="command-item">
+                    <code>python -m collision_playback review &lt;ID&gt;</code>
+                    <span class="command-desc">设备工程师复核</span>
+                </div>
+                <div class="command-item">
+                    <code>python -m collision_playback summary</code>
+                    <span class="command-desc">查看复盘摘要</span>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>关键细节：碰到人工改过系数但没写原因时，别急着归正常，留给设备工程师复核 ⚠</p>
+        </footer>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
