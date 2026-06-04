@@ -1,0 +1,81 @@
+{
+  "tables": [
+    {
+      "id": "table-001",
+      "importBatch": "BATCH-2026-001",
+      "version": "v1.0",
+      "importTime": "2026-06-04T10:00:00.000Z",
+      "importedBy": "小祁"
+    }
+  ],
+  "records": [
+    {
+      "id": "param-001",
+      "tableId": "table-001",
+      "productId": "PROD-001",
+      "productName": "夏季短袖T恤",
+      "alpha": 0.3,
+      "beta": 0.2,
+      "gamma": 0.1,
+      "forecastConclusion": "1200",
+      "valueFormat": "decimal",
+      "hasMixedFormat": false,
+      "createdAt": "2026-06-04T10:00:00.000Z"
+    },
+    {
+      "id": "param-002",
+      "tableId": "table-001",
+      "productId": "PROD-002",
+      "productName": "防晒遮阳帽",
+      "alpha": 0.5,
+      "beta": 0.3,
+      "gamma": 0.2,
+      "forecastConclusion": "850",
+      "valueFormat": "decimal",
+      "hasMixedFormat": false,
+      "createdAt": "2026-06-04T10:00:00.000Z"
+    },
+    {
+      "id": "param-003",
+      "tableId": "table-001",
+      "productId": "PROD-003",
+      "productName": "运动凉鞋",
+      "alpha": "70%",
+      "beta": 0.4,
+      "gamma": "25%",
+      "forecastConclusion": "650",
+      "valueFormat": "mixed",
+      "hasMixedFormat": true,
+      "rawAlpha": "70%",
+      "rawBeta": "0.4",
+      "rawGamma": "25%",
+      "createdAt": "2026-06-04T10:00:00.000Z"
+    },
+    {
+      "id": "param-004",
+      "tableId": "table-001",
+      "productId": "PROD-004",
+      "productName": "冰丝防晒衣",
+      "alpha": 0.6,
+      "beta": 0.4,
+      "gamma": 0.3,
+      "forecastConclusion": "2100",
+      "valueFormat": "decimal",
+      "hasMixedFormat": false,
+      "createdAt": "2026-06-04T10:00:00.000Z"
+    },
+    {
+      "id": "param-005",
+      "tableId": "table-001",
+      "productId": "PROD-005",
+      "productName": "速干运动短裤",
+      "alpha": 0.4,
+      "beta": 0.25,
+      "gamma": 0.15,
+      "forecastConclusion": "980",
+      "valueFormat": "decimal",
+      "hasMixedFormat": false,
+      "createdAt": "2026-06-04T10:00:00.000Z"
+    }
+  ]
+}

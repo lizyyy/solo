@@ -1,0 +1,34 @@
+[
+  {
+    "id": "conflict-001",
+    "parameterRecordId": "param-002",
+    "exampleRecordId": "ex-rec-001",
+    "productId": "PROD-002",
+    "productName": "防晒遮阳帽",
+    "parameterValue": 850,
+    "exampleValue": 1050,
+    "diffPercentage": 23.53,
+    "evidence": "参数调试表结论：850件；手算反例：1050件；差异：23.53%。手算理由：618活动期间历史同期促销拉动销量增长23%，原参数模型未考虑活动权重加成",
+    "status": "resolved",
+    "resolution": "accept_example",
+    "resolutionReason": "手算反例考虑了618活动促销权重加成，更符合实际销售情况，采纳手算结果1050件",
+    "resolvedBy": "当前用户",
+    "resolvedAt": "2026-06-04T00:09:00.108Z"
+  },
+  {
+    "id": "conflict-002",
+    "parameterRecordId": "param-004",
+    "exampleRecordId": "ex-rec-002",
+    "productId": "PROD-004",
+    "productName": "冰丝防晒衣",
+    "parameterValue": 2100,
+    "exampleValue": 1750,
+    "diffPercentage": -16.67,
+    "evidence": "参数调试表结论：2100件；手算反例：1750件；差异：-16.67%。手算理由：近期全国高温预警提前，消费者购买周期前移，季节性指数需要下调",
+    "status": "resolved",
+    "resolution": "reject_example",
+    "resolutionReason": "气温升高速度不及预期，原参数模型更保守合理，驳回手算反例",
+    "resolvedBy": "当前用户",
+    "resolvedAt": "2026-06-04T00:45:47.406Z"
+  }
+]
