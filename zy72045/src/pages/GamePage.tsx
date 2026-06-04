@@ -68,14 +68,14 @@ export default function GamePage() {
 
       <main className="max-w-7xl mx-auto px-4 py-6">
         {status === 'settled' && (
-          <div className="mb-6 p-4 bg-success-50 border border-success-200 rounded-xl flex items-center justify-between">
+          <div className="mb-6 p-4 bg-success-50 border border-success-200 rounded-xl flex items-center justify-between sticky top-[57px] z-30">
             <div>
               <h3 className="font-serif font-semibold text-success-800">对局已完成</h3>
               <p className="text-sm text-success-600">点击右侧按钮查看完整报告</p>
             </div>
             <button
               onClick={handleViewReport}
-              className="btn-success"
+              className="btn-success flex-shrink-0"
             >
               查看报告
             </button>

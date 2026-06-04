@@ -52,7 +52,7 @@ export const loadHistoryRecords = (): HistoryRecord[] => {
 
 export const loadHistoryRecordById = (id: string): HistoryRecord | undefined => {
   const records = loadHistoryRecords();
-  return records.find((r) => r.id === id);
+  return records.find((r) => r.id === id || r.gameId === id);
 };
 
 export const deleteHistoryRecord = (id: string): void => {

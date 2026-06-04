@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { X, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import type { NewsConfig, TradeAction } from '../../types/game';
 import { useGameLogic } from '../../hooks/useGameLogic';
@@ -29,24 +29,62 @@ export function TradePanel({ selectedNews, onClose }: TradePanelProps) {
   useEffect(() => {
     if (selectedNews && availableStocks.length > 0) {
       setSymbol(availableStocks[0].symbol);
+      setAction('hold');
+      setQuantity(0);
+      setPositionPercent(0);
+      setReason('');
     }
   }, [selectedNews, availableStocks]);
-
-  useEffect(() => {
-    if (action === 'buy') {
-      setQuantity(0);
-    } else if (action === 'sell') {
-      const maxSell = getMaxSellQuantity(symbol);
-      setQuantity(Math.max(0, maxSell));
-    } else {
-      setQuantity(0);
-    }
-  }, [action, symbol, getMaxSellQuantity]);
 
   const currentPrice = getCurrentPrice(symbol);
   const maxBuy = getMaxBuyQuantity(symbol);
   const maxSell = getMaxSellQuantity(symbol);
   const totalCost = quantity * currentPrice;
+
+  const calcQuantity = useCallback((act: TradeAction, pct: number): number => {
+    if (act === 'buy') {
+      return Math.floor((maxBuy * pct) / 100 / 100) * 100;
+    } else if (act === 'sell') {
+      return Math.floor((maxSell * pct) / 100 / 100) * 100;
+    }
+    return 0;
+  }, [maxBuy, maxSell]);
+
+  const handleActionChange = (newAction: TradeAction) => {
+    setAction(newAction);
+    if (newAction === 'hold') {
+      setQuantity(0);
+      setPositionPercent(0);
+    } else if (newAction === 'sell' && maxSell > 0) {
+      setPositionPercent(100);
+      setQuantity(maxSell);
+    } else {
+      setQuantity(0);
+      setPositionPercent(0);
+    }
+  };
+
+  const handleQuickPosition = (percent: number) => {
+    const currentAction = action === 'hold' ? 'buy' : action;
+    if (action === 'hold') {
+      setAction('buy');
+    }
+    setPositionPercent(percent);
+    setQuantity(calcQuantity(currentAction, percent));
+  };
+
+  const handleQuantityChange = (raw: string) => {
+    const num = Number(raw);
+    if (isNaN(num) || num < 0) {
+      setQuantity(0);
+      setPositionPercent(0);
+      return;
+    }
+    const rounded = Math.floor(num / 100) * 100;
+    setQuantity(rounded);
+    const max = action === 'buy' ? maxBuy : maxSell;
+    setPositionPercent(max > 0 ? Math.min(100, Math.round((rounded / max) * 100)) : 0);
+  };
 
   const handleSubmit = () => {
     if (!selectedNews || !canTrade) return;
@@ -66,15 +104,6 @@ export function TradePanel({ selectedNews, onClose }: TradePanelProps) {
     setQuantity(0);
     setPositionPercent(0);
     setReason('');
-  };
-
-  const handleQuickPosition = (percent: number) => {
-    setPositionPercent(percent);
-    if (action === 'buy') {
-      setQuantity(Math.floor((maxBuy * percent) / 100 / 100) * 100);
-    } else if (action === 'sell') {
-      setQuantity(Math.floor((maxSell * percent) / 100 / 100) * 100);
-    }
   };
 
   if (!selectedNews) return null;
@@ -125,7 +154,7 @@ export function TradePanel({ selectedNews, onClose }: TradePanelProps) {
             </label>
             <div className="grid grid-cols-3 gap-2">
               <button
-                onClick={() => setAction('buy')}
+                onClick={() => handleActionChange('buy')}
                 className={`py-2 px-4 rounded font-medium text-sm transition-all ${
                   action === 'buy'
                     ? 'bg-danger-500 text-white'
@@ -137,7 +166,7 @@ export function TradePanel({ selectedNews, onClose }: TradePanelProps) {
                 买入
               </button>
               <button
-                onClick={() => setAction('sell')}
+                onClick={() => handleActionChange('sell')}
                 className={`py-2 px-4 rounded font-medium text-sm transition-all ${
                   action === 'sell'
                     ? 'bg-success-500 text-white'
@@ -149,7 +178,7 @@ export function TradePanel({ selectedNews, onClose }: TradePanelProps) {
                 卖出
               </button>
               <button
-                onClick={() => setAction('hold')}
+                onClick={() => handleActionChange('hold')}
                 className={`py-2 px-4 rounded font-medium text-sm transition-all ${
                   action === 'hold'
                     ? 'bg-neutral-500 text-white'
@@ -209,15 +238,7 @@ export function TradePanel({ selectedNews, onClose }: TradePanelProps) {
                   <input
                     type="number"
                     value={quantity}
-                    onChange={(e) => {
-                      const val = Math.floor(Number(e.target.value) / 100) * 100;
-                      setQuantity(val);
-                      setPositionPercent(
-                        action === 'buy'
-                          ? maxBuy > 0 ? Math.round((val / maxBuy) * 100) : 0
-                          : maxSell > 0 ? Math.round((val / maxSell) * 100) : 0
-                      );
-                    }}
+                    onChange={(e) => handleQuantityChange(e.target.value)}
                     className="input flex-1"
                     min="0"
                     step="100"
