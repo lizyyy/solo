@@ -1,0 +1,23 @@
+{
+  "name": "street-performer-scheduling",
+  "version": "1.0.0",
+  "description": "街头艺人点位排班系统 - 曲目核对、课时管理、冲突检测",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "ts-node tests/run-all-scenarios.ts",
+    "test:normal": "ts-node tests/scenarios/normal-scenario.ts",
+    "test:wrong": "ts-node tests/scenarios/wrong-caliber-scenario.ts",
+    "test:supplement": "ts-node tests/scenarios/supplement-scenario.ts",
+    "self-check": "ts-node src/run-self-check.ts"
+  },
+  "dependencies": {
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/uuid": "^9.0.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
+  }
+}
