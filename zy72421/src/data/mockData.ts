@@ -1,0 +1,194 @@
+import { Batch, HistoryRecord, Photo, Track } from '@/types';
+
+export const mockTracks: Record<string, Track[]> = {
+  smooth: [
+    {
+      id: 't1',
+      name: '夜曲',
+      alias: 'Yeq',
+      status: 'normal',
+      standard: 'new',
+      hasMixedTickets: false,
+      ticketType: 'paid',
+      authorization: 'valid',
+      remark: '授权有效期至2027年',
+    },
+  ],
+  mixed: [
+    {
+      id: 't2',
+      name: '稻香',
+      alias: 'Daox',
+      status: 'pending_review',
+      standard: 'new',
+      hasMixedTickets: true,
+      ticketType: 'mixed',
+      authorization: 'valid',
+      remark: '同一批次含赠票和售票',
+    },
+    {
+      id: 't3',
+      name: '晴天',
+      alias: 'Qingt',
+      status: 'pending_review',
+      standard: 'new',
+      hasMixedTickets: true,
+      ticketType: 'free',
+      authorization: 'valid',
+      remark: '同一批次含赠票和售票',
+    },
+  ],
+  oldStandard: [
+    {
+      id: 't4',
+      name: '七里香',
+      alias: 'Qilx',
+      status: 'updated',
+      standard: 'old',
+      hasMixedTickets: false,
+      ticketType: 'paid',
+      authorization: 'valid',
+      remark: '从课时签到照片补录旧口径，原判断下架，现修正为保留',
+    },
+  ],
+};
+
+export const mockPhotos: Record<string, Photo[]> = {
+  smooth: [
+    {
+      id: 'p1',
+      url: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=music%20classroom%20attendance%20sheet%20with%20signatures%20warm%20lighting&image_size=square',
+      remark: '2024年春季课时签到，无特殊备注',
+      takenAt: '2024-03-15',
+      hasOldStandard: false,
+    },
+  ],
+  mixed: [
+    {
+      id: 'p2',
+      url: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=concert%20ticket%20stubs%20mixed%20free%20and%20paid%20vintage%20style&image_size=square',
+      remark: '场次签到：赠票3张，售票5张，需录音师复核',
+      takenAt: '2024-04-20',
+      hasOldStandard: false,
+    },
+  ],
+  oldStandard: [
+    {
+      id: 'p3',
+      url: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=old%20music%20sheet%20with%20handwritten%20notes%20vintage%20paper&image_size=square',
+      remark: '【旧口径备注】七里香：2023年之前入库曲目，按旧口径保留，不下架',
+      takenAt: '2023-11-08',
+      hasOldStandard: true,
+    },
+  ],
+};
+
+export const mockBatches: Batch[] = [
+  {
+    id: 'B20240601-001',
+    name: '6月上旬常规复核-顺利记录',
+    status: 'normal',
+    sceneType: 'smooth',
+    tracks: mockTracks.smooth,
+    photos: mockPhotos.smooth,
+    createdAt: '2024-06-01 09:30:00',
+    updatedAt: '2024-06-01 10:15:00',
+    operator: '许老师',
+  },
+  {
+    id: 'B20240601-002',
+    name: '6月上旬常规复核-混批待复核',
+    status: 'pending_review',
+    sceneType: 'mixed_tickets',
+    tracks: mockTracks.mixed,
+    photos: mockPhotos.mixed,
+    createdAt: '2024-06-01 10:00:00',
+    updatedAt: '2024-06-01 10:30:00',
+    operator: '许老师',
+  },
+  {
+    id: 'B20240601-003',
+    name: '6月上旬常规复核-旧口径补录',
+    status: 'supplemented',
+    sceneType: 'old_standard',
+    tracks: mockTracks.oldStandard,
+    photos: mockPhotos.oldStandard,
+    createdAt: '2024-06-01 11:00:00',
+    updatedAt: '2024-06-01 14:20:00',
+    operator: '许老师',
+  },
+];
+
+export const mockHistory: HistoryRecord[] = [
+  {
+    id: 'h1',
+    targetId: 'B20240601-001',
+    targetType: 'batch',
+    action: 'import',
+    operator: '许老师',
+    beforeValue: '-',
+    afterValue: '导入曲目别名表：夜曲(Yeq)',
+    timestamp: '2024-06-01 09:30:00',
+  },
+  {
+    id: 'h2',
+    targetId: 'B20240601-001',
+    targetType: 'batch',
+    action: 'review',
+    operator: '许老师',
+    beforeValue: '处理中',
+    afterValue: '正常通过',
+    timestamp: '2024-06-01 10:15:00',
+  },
+  {
+    id: 'h3',
+    targetId: 'B20240601-002',
+    targetType: 'batch',
+    action: 'import',
+    operator: '许老师',
+    beforeValue: '-',
+    afterValue: '导入曲目别名表：稻香(Daox)、晴天(Qingt)',
+    timestamp: '2024-06-01 10:00:00',
+  },
+  {
+    id: 'h4',
+    targetId: 'B20240601-002',
+    targetType: 'batch',
+    action: 'review',
+    operator: '系统',
+    beforeValue: '处理中',
+    afterValue: '检测到赠票售票混批，标记待录音师复核',
+    timestamp: '2024-06-01 10:30:00',
+  },
+  {
+    id: 'h5',
+    targetId: 'B20240601-003',
+    targetType: 'batch',
+    action: 'import',
+    operator: '许老师',
+    beforeValue: '-',
+    afterValue: '导入曲目别名表：七里香(Qilx)',
+    timestamp: '2024-06-01 11:00:00',
+  },
+  {
+    id: 'h6',
+    targetId: 't4',
+    targetType: 'track',
+    action: 'correct',
+    operator: '许老师',
+    beforeValue: '状态：下架，口径：新口径',
+    afterValue: '状态：保留，口径：旧口径（从签到照片补录）',
+    timestamp: '2024-06-01 14:20:00',
+  },
+];
+
+export const humanFriendlyErrors: Record<string, string> = {
+  INVALID_FORMAT: '这个文件格式不对哦，请上传包含曲目名称和别名的表格文件',
+  MIXED_TICKETS: '这批里有赠票也有售票，得麻烦录音师看过才行',
+  AUTH_EXPIRED: '这首曲子的授权快到期了，记得提醒商务续一下',
+  RERUN_CONFIRM: '确定要重新跑一遍吗？之前的修改记录会保留下来',
+  NO_PERMISSION: '你没有权限进行这个操作哦',
+  EMPTY_DATA: '没有找到数据，先导入曲目别名表吧',
+  PHOTO_NOT_FOUND: '找不到对应的签到照片，检查一下是不是传错了',
+  OLD_STANDARD_DETECTED: '在签到照片里发现了旧口径备注，记得人工复核一下',
+};

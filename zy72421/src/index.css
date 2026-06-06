@@ -1,0 +1,90 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply font-sans text-gray-800 antialiased;
+    background: linear-gradient(135deg, #1a0a0a 0%, #2d1515 50%, #1a0a0a 100%);
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-white/10 backdrop-blur-md border border-white/20 rounded-xl shadow-xl;
+  }
+  
+  .gold-border {
+    @apply border-gold-800/50;
+  }
+  
+  .status-badge {
+    @apply px-3 py-1 rounded-full text-xs font-semibold;
+  }
+  
+  .btn-primary {
+    @apply px-4 py-2 bg-wine-800 hover:bg-wine-700 text-white rounded-lg transition-all duration-200 shadow-md hover:shadow-lg active:scale-95;
+  }
+  
+  .btn-secondary {
+    @apply px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg border border-white/20 transition-all duration-200;
+  }
+  
+  .btn-gold {
+    @apply px-4 py-2 bg-gold-800 hover:bg-gold-700 text-white rounded-lg transition-all duration-200 shadow-md;
+  }
+  
+  .input-field {
+    @apply w-full px-4 py-2 bg-white/5 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-gold-800 focus:ring-1 focus:ring-gold-800;
+  }
+  
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(212, 175, 55, 0.3) transparent;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: rgba(212, 175, 55, 0.3);
+    border-radius: 3px;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(212, 175, 55, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(212, 175, 55, 0.6); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.animate-slide-in {
+  animation: slideIn 0.4s ease-out;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.text-shadow-gold {
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+}
