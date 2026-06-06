@@ -1,0 +1,276 @@
+{
+  "state": {
+    "step": 4,
+    "ticket_imported": true,
+    "amei_review_done": true,
+    "rehearsal_updated": true,
+    "copyright_review_done": false
+  },
+  "tickets": {
+    "TRK001": {
+      "track_id": "TRK001",
+      "track_name": "星辰大海",
+      "planned_hours": 8.0,
+      "actual_hours": 7.5,
+      "track_remark": "正常录制，无返工",
+      "has_rework_reason": true,
+      "rework_keywords": [
+        "返工"
+      ],
+      "import_time": "2026-06-06T23:37:33.759646"
+    },
+    "TRK002": {
+      "track_id": "TRK002",
+      "track_name": "逆光奔跑",
+      "planned_hours": 6.0,
+      "actual_hours": 9.5,
+      "track_remark": "歌手走音重录2次，副歌部分补录",
+      "has_rework_reason": true,
+      "rework_keywords": [
+        "重录",
+        "补录",
+        "走音重录"
+      ],
+      "import_time": "2026-06-06T23:37:33.759656"
+    },
+    "TRK003": {
+      "track_id": "TRK003",
+      "track_name": "夏日回忆",
+      "planned_hours": 4.0,
+      "actual_hours": 4.2,
+      "track_remark": "正常",
+      "has_rework_reason": false,
+      "rework_keywords": [],
+      "import_time": "2026-06-06T23:37:33.759660"
+    },
+    "TRK004": {
+      "track_id": "TRK004",
+      "track_name": "午夜旋律",
+      "planned_hours": 10.0,
+      "actual_hours": 14.0,
+      "track_remark": "背景噪音重录，后期返工调整，部分段落重新配音",
+      "has_rework_reason": true,
+      "rework_keywords": [
+        "返工",
+        "重录",
+        "后期返工",
+        "重新配音",
+        "噪音重录"
+      ],
+      "import_time": "2026-06-06T23:37:33.759663"
+    },
+    "TRK005": {
+      "track_id": "TRK005",
+      "track_name": "梦想起航",
+      "planned_hours": 5.0,
+      "actual_hours": 5.1,
+      "track_remark": "无异常",
+      "has_rework_reason": false,
+      "rework_keywords": [],
+      "import_time": "2026-06-06T23:37:33.759666"
+    },
+    "TRK006": {
+      "track_id": "TRK006",
+      "track_name": "风的方向",
+      "planned_hours": 7.0,
+      "actual_hours": 8.5,
+      "track_remark": "乐器瑕疵重录了一遍",
+      "has_rework_reason": true,
+      "rework_keywords": [
+        "重录",
+        "瑕疵重录"
+      ],
+      "import_time": "2026-06-06T23:37:33.759669"
+    },
+    "TRK007": {
+      "track_id": "TRK007",
+      "track_name": "青春纪念册",
+      "planned_hours": 6.0,
+      "actual_hours": 6.0,
+      "track_remark": "正常",
+      "has_rework_reason": false,
+      "rework_keywords": [],
+      "import_time": "2026-06-06T23:37:33.759671"
+    },
+    "TRK008": {
+      "track_id": "TRK008",
+      "track_name": "远方的你",
+      "planned_hours": 8.0,
+      "actual_hours": 11.0,
+      "track_remark": "情绪不对重拍，歌词修改后补录",
+      "has_rework_reason": true,
+      "rework_keywords": [
+        "补录",
+        "重拍",
+        "修改"
+      ],
+      "import_time": "2026-06-06T23:37:33.759674"
+    }
+  },
+  "audio_files": {
+    "TRK001": {
+      "track_id": "TRK001",
+      "file_name": "TRK001_星辰大海_最终版.wav",
+      "audio_remark": "音质清晰，已通过质检",
+      "reviewed_by_amei": true,
+      "review_time": "2026-06-06T23:37:33.759945"
+    },
+    "TRK002": {
+      "track_id": "TRK002",
+      "file_name": "TRK002_逆光奔跑_重录版.wav",
+      "audio_remark": "重录后音质OK，走音问题已修正，待版权确认工时",
+      "reviewed_by_amei": true,
+      "review_time": "2026-06-06T23:37:33.759952"
+    },
+    "TRK003": {
+      "track_id": "TRK003",
+      "file_name": "TRK003_夏日回忆.wav",
+      "audio_remark": "正常",
+      "reviewed_by_amei": true,
+      "review_time": "2026-06-06T23:37:33.759959"
+    },
+    "TRK004": {
+      "track_id": "TRK004",
+      "file_name": "TRK004_午夜旋律_返工V3.wav",
+      "audio_remark": "三次返工后噪音问题解决，建议版权运营重点复核工时合理性",
+      "reviewed_by_amei": true,
+      "review_time": "2026-06-06T23:37:33.759962"
+    },
+    "TRK005": {
+      "track_id": "TRK005",
+      "file_name": "TRK005_梦想起航.wav",
+      "audio_remark": "正常通过",
+      "reviewed_by_amei": true,
+      "review_time": "2026-06-06T23:37:33.759964"
+    },
+    "TRK006": {
+      "track_id": "TRK006",
+      "file_name": "TRK006_风的方向_重录.wav",
+      "audio_remark": "乐器重录后效果达标，工时差异需备注",
+      "reviewed_by_amei": true,
+      "review_time": "2026-06-06T23:37:33.759967"
+    },
+    "TRK007": {
+      "track_id": "TRK007",
+      "file_name": "TRK007_青春纪念册.wav",
+      "audio_remark": "一切正常",
+      "reviewed_by_amei": true,
+      "review_time": "2026-06-06T23:37:33.759969"
+    },
+    "TRK008": {
+      "track_id": "TRK008",
+      "file_name": "TRK008_远方的你_补录版.wav",
+      "audio_remark": "情绪和歌词调整后效果好，补录部分已标记",
+      "reviewed_by_amei": true,
+      "review_time": "2026-06-06T23:37:33.759971"
+    }
+  },
+  "rehearsal_changes": {
+    "TRK001": {
+      "track_id": "TRK001",
+      "track_name": "星辰大海",
+      "change_reason": "正常录制，无返工",
+      "kept_why": "轨道备注包含返工原因，需版权运营复核后确认",
+      "missing_materials": [
+        "版权运营复核意见"
+      ],
+      "next_contact": "版权运营",
+      "status": "pending_copyright_review",
+      "created_at": "2026-06-06T23:37:33.759951",
+      "updated_at": "2026-06-06T23:37:33.759952",
+      "notes": "票务备注: 正常录制，无返工\n音频备注: 音质清晰，已通过质检"
+    },
+    "TRK002": {
+      "track_id": "TRK002",
+      "track_name": "逆光奔跑",
+      "change_reason": "歌手走音重录2次，副歌部分补录",
+      "kept_why": "工时尾差较大(+3.5小时)，需进一步确认",
+      "missing_materials": [
+        "版权运营复核意见"
+      ],
+      "next_contact": "版权运营",
+      "status": "pending_copyright_review",
+      "created_at": "2026-06-06T23:37:33.759958",
+      "updated_at": "2026-06-06T23:37:33.759958",
+      "notes": "票务备注: 歌手走音重录2次，副歌部分补录\n音频备注: 重录后音质OK，走音问题已修正，待版权确认工时"
+    },
+    "TRK003": {
+      "track_id": "TRK003",
+      "track_name": "夏日回忆",
+      "change_reason": "正常",
+      "kept_why": "工时尾差在正常范围内，无返工记录",
+      "missing_materials": [],
+      "next_contact": "版权运营",
+      "status": "normal",
+      "created_at": "2026-06-06T23:37:33.759961",
+      "updated_at": "2026-06-06T23:37:33.759961",
+      "notes": "票务备注: 正常\n音频备注: 正常"
+    },
+    "TRK004": {
+      "track_id": "TRK004",
+      "track_name": "午夜旋律",
+      "change_reason": "背景噪音重录，后期返工调整，部分段落重新配音",
+      "kept_why": "工时尾差较大(+4.0小时)，需进一步确认",
+      "missing_materials": [
+        "版权运营复核意见"
+      ],
+      "next_contact": "版权运营",
+      "status": "pending_copyright_review",
+      "created_at": "2026-06-06T23:37:33.759964",
+      "updated_at": "2026-06-06T23:37:33.759964",
+      "notes": "票务备注: 背景噪音重录，后期返工调整，部分段落重新配音\n音频备注: 三次返工后噪音问题解决，建议版权运营重点复核工时合理性"
+    },
+    "TRK005": {
+      "track_id": "TRK005",
+      "track_name": "梦想起航",
+      "change_reason": "无异常",
+      "kept_why": "工时尾差在正常范围内，无返工记录",
+      "missing_materials": [],
+      "next_contact": "版权运营",
+      "status": "normal",
+      "created_at": "2026-06-06T23:37:33.759966",
+      "updated_at": "2026-06-06T23:37:33.759966",
+      "notes": "票务备注: 无异常\n音频备注: 正常通过"
+    },
+    "TRK006": {
+      "track_id": "TRK006",
+      "track_name": "风的方向",
+      "change_reason": "乐器瑕疵重录了一遍",
+      "kept_why": "轨道备注包含返工原因，需版权运营复核后确认",
+      "missing_materials": [
+        "版权运营复核意见"
+      ],
+      "next_contact": "版权运营",
+      "status": "pending_copyright_review",
+      "created_at": "2026-06-06T23:37:33.759968",
+      "updated_at": "2026-06-06T23:37:33.759969",
+      "notes": "票务备注: 乐器瑕疵重录了一遍\n音频备注: 乐器重录后效果达标，工时差异需备注"
+    },
+    "TRK007": {
+      "track_id": "TRK007",
+      "track_name": "青春纪念册",
+      "change_reason": "正常",
+      "kept_why": "工时尾差在正常范围内，无返工记录",
+      "missing_materials": [],
+      "next_contact": "版权运营",
+      "status": "normal",
+      "created_at": "2026-06-06T23:37:33.759971",
+      "updated_at": "2026-06-06T23:37:33.759971",
+      "notes": "票务备注: 正常\n音频备注: 一切正常"
+    },
+    "TRK008": {
+      "track_id": "TRK008",
+      "track_name": "远方的你",
+      "change_reason": "情绪不对重拍，歌词修改后补录",
+      "kept_why": "工时尾差较大(+3.0小时)，需进一步确认",
+      "missing_materials": [
+        "版权运营复核意见"
+      ],
+      "next_contact": "版权运营",
+      "status": "pending_copyright_review",
+      "created_at": "2026-06-06T23:37:33.759973",
+      "updated_at": "2026-06-06T23:37:33.759974",
+      "notes": "票务备注: 情绪不对重拍，歌词修改后补录\n音频备注: 情绪和歌词调整后效果好，补录部分已标记"
+    }
+  }
+}
