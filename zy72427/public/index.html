@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>歌单冷启动理由卡管理系统</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; padding: 20px; }
+    .container { max-width: 1400px; margin: 0 auto; }
+    h1 { color: #303133; margin-bottom: 20px; }
+    h2 { color: #606266; margin: 15px 0 10px; font-size: 18px; }
+    h3 { color: #909399; margin: 10px 0; font-size: 16px; }
+    
+    .card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
+    .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; margin: 4px; }
+    .btn-primary { background: #409eff; color: white; }
+    .btn-success { background: #67c23a; color: white; }
+    .btn-warning { background: #e6a23c; color: white; }
+    .btn-danger { background: #f56c6c; color: white; }
+    .btn-info { background: #909399; color: white; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    
+    .status-badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; }
+    .status-DRAFT { background: #f4f4f5; color: #909399; }
+    .status-ATTENDANCE_IMPORTED { background: #ecf5ff; color: #409eff; }
+    .status-TICKET_SUPPLEMENTED { background: #fdf6ec; color: #e6a23c; }
+    .status-CONFLICT_DETECTED { background: #fef0f0; color: #f56c6c; }
+    .status-CONFLICT_RESOLVED { background: #f0f9eb; color: #67c23a; }
+    .status-REVENUE_CALCULATED { background: #e1f3d8; color: #67c23a; }
+    .status-COMPLETED { background: #67c23a; color: white; }
+    .status-WITHDRAWN { background: #909399; color: white; }
+    
+    table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px; }
+    th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid #ebeef5; }
+    th { background: #fafafa; font-weight: 600; color: #606266; }
+    tr:hover { background: #f5f7fa; }
+    
+    .conflict-card { border-left: 4px solid #f56c6c; padding: 10px; margin: 8px 0; background: #fef0f0; border-radius: 4px; }
+    .warning-card { border-left: 4px solid #e6a23c; padding: 10px; margin: 8px 0; background: #fdf6ec; border-radius: 4px; }
+    .success-card { border-left: 4px solid #67c23a; padding: 10px; margin: 8px 0; background: #f0f9eb; border-radius: 4px; }
+    .info-card { border-left: 4px solid #409eff; padding: 10px; margin: 8px 0; background: #ecf5ff; border-radius: 4px; }
+    
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
+    
+    input, select { padding: 6px 10px; border: 1px solid #dcdfe6; border-radius: 4px; margin: 4px; font-size: 13px; }
+    
+    .step-indicator { display: flex; align-items: center; margin: 15px 0; }
+    .step { flex: 1; text-align: center; padding: 10px; position: relative; }
+    .step.active { color: #409eff; font-weight: 600; }
+    .step.completed { color: #67c23a; }
+    .step::after { content: ''; position: absolute; top: 50%; right: -50%; width: 100%; height: 2px; background: #dcdfe6; z-index: 0; }
+    .step:last-child::after { display: none; }
+    .step.completed::after { background: #67c23a; }
+    .step-number { display: inline-block; width: 24px; height: 24px; line-height: 24px; border-radius: 50%; background: #dcdfe6; color: white; margin-right: 8px; }
+    .step.active .step-number { background: #409eff; }
+    .step.completed .step-number { background: #67c23a; }
+    
+    .tabs { display: flex; border-bottom: 2px solid #e4e7ed; margin-bottom: 15px; }
+    .tab { padding: 10px 20px; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; color: #606266; }
+    .tab.active { color: #409eff; border-bottom-color: #409eff; font-weight: 500; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    
+    .timestamp { color: #909399; font-size: 12px; }
+    .amount { font-family: 'SF Mono', Monaco, monospace; font-weight: 600; }
+    .amount-positive { color: #67c23a; }
+    .amount-negative { color: #f56c6c; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎵 歌单冷启动理由卡管理系统</h1>
+    
+    <div class="card">
+      <h2>操作面板</h2>
+      <div style="margin-bottom: 15px;">
+        <input type="text" id="playlistName" placeholder="输入歌单名称" style="width: 250px;">
+        <input type="text" id="createdBy" placeholder="操作人（如：小段）" value="小段">
+        <button class="btn btn-primary" onclick="createCard()">新建理由卡</button>
+      </div>
+      
+      <div>
+        <label>选择理由卡：</label>
+        <select id="cardSelect" onchange="loadCardDetails()" style="width: 300px;"></select>
+        <button class="btn btn-info" onclick="refreshCardList()">刷新列表</button>
+      </div>
+    </div>
+
+    <div id="cardDetail" class="card" style="display: none;">
+      <h2>理由卡详情</h2>
+      <div id="cardInfo"></div>
+      
+      <div class="step-indicator">
+        <div class="step" id="step1">
+          <span class="step-number">1</span>导入签到
+        </div>
+        <div class="step" id="step2">
+          <span class="step-number">2</span>补充票务
+        </div>
+        <div class="step" id="step3">
+          <span class="step-number">3</span>分账更新
+        </div>
+      </div>
+
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('attendance')">课时签到</div>
+        <div class="tab" onclick="switchTab('tickets')">票务导出</div>
+        <div class="tab" onclick="switchTab('conflicts')">冲突检测</div>
+        <div class="tab" onclick="switchTab('selfcheck')">自检报告</div>
+        <div class="tab" onclick="switchTab('revenue')">分账明细</div>
+        <div class="tab" onclick="switchTab('history')">版本历史</div>
+      </div>
+
+      <div id="tab-attendance" class="tab-content active">
+        <h3>课时签到照片记录</h3>
+        <button class="btn btn-primary" onclick="importSampleAttendance()">导入示例签到数据</button>
+        <button class="btn btn-success" onclick="runSelfCheck()">运行自检</button>
+        <div id="attendanceTable"></div>
+      </div>
+
+      <div id="tab-tickets" class="tab-content">
+        <h3>票务导出表记录</h3>
+        <button class="btn btn-warning" onclick="importSampleTickets()">补充示例票务数据</button>
+        <button class="btn btn-danger" onclick="detectConflicts()">检测冲突</button>
+        <div id="ticketsTable"></div>
+      </div>
+
+      <div id="tab-conflicts" class="tab-content">
+        <h3>冲突记录</h3>
+        <div id="conflictsList"></div>
+      </div>
+
+      <div id="tab-selfcheck" class="tab-content">
+        <h3>自检报告</h3>
+        <div id="selfCheckResults"></div>
+      </div>
+
+      <div id="tab-revenue" class="tab-content">
+        <h3>分账明细</h3>
+        <button class="btn btn-success" onclick="calculateRevenue()">计算分账</button>
+        <button class="btn btn-warning" onclick="withdrawRevenue()">撤回分账版本</button>
+        <button class="btn btn-danger" onclick="withdrawCard()">撤回至上一版本</button>
+        <div id="revenueTable"></div>
+      </div>
+
+      <div id="tab-history" class="tab-content">
+        <h3>版本历史</h3>
+        <div id="versionHistory"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentCardId = null;
+    let currentTab = 'attendance';
+
+    async function api(url, method = 'GET', body = null) {
+      const options = { method, headers: { 'Content-Type': 'application/json' } };
+      if (body) options.body = JSON.stringify(body);
+      const res = await fetch('/api' + url, options);
+      return res.json();
+    }
+
+    async function createCard() {
+      const name = document.getElementById('playlistName').value;
+      const by = document.getElementById('createdBy').value;
+      if (!name) return alert('请输入歌单名称');
+      
+      const card = await api('/cards', 'POST', { playlistName: name, createdBy: by });
+      await refreshCardList();
+      document.getElementById('cardSelect').value = card.id;
+      await loadCardDetails();
+    }
+
+    async function refreshCardList() {
+      const cards = await api('/cards');
+      const select = document.getElementById('cardSelect');
+      select.innerHTML = '<option value="">-- 请选择 --</option>';
+      cards.forEach(card => {
+        const opt = document.createElement('option');
+        opt.value = card.id;
+        opt.textContent = `${card.playlistName} (v${card.currentVersion}) - ${card.status}`;
+        select.appendChild(opt);
+      });
+    }
+
+    async function loadCardDetails() {
+      const cardId = document.getElementById('cardSelect').value;
+      if (!cardId) {
+        document.getElementById('cardDetail').style.display = 'none';
+        return;
+      }
+      currentCardId = cardId;
+      const data = await api(`/cards/${cardId}/full-details`);
+      renderCardInfo(data);
+      renderAttendance(data.attendance);
+      renderTickets(data.tickets);
+      renderConflicts(data.conflicts);
+      renderSelfCheck(data.card.selfCheckResults);
+      renderRevenue(data.revenue);
+      renderVersionHistory(data.versionHistory);
+      updateStepIndicators(data.card.status);
+      document.getElementById('cardDetail').style.display = 'block';
+    }
+
+    function renderCardInfo(data) {
+      const { card } = data;
+      document.getElementById('cardInfo').innerHTML = `
+        <div class="grid-3">
+          <div><strong>歌单名称：</strong>${card.playlistName}</div>
+          <div><strong>当前版本：</strong>v${card.currentVersion}</div>
+          <div><strong>状态：</strong><span class="status-badge status-${card.status}">${card.status}</span></div>
+          <div><strong>创建人：</strong>${card.createdBy}</div>
+          <div><strong>创建时间：</strong><span class="timestamp">${card.createdAt}</span></div>
+          <div><strong>更新时间：</strong><span class="timestamp">${card.updatedAt}</span></div>
+        </div>
+      `;
+    }
+
+    function updateStepIndicators(status) {
+      const steps = ['step1', 'step2', 'step3'];
+      steps.forEach(s => document.getElementById(s).classList.remove('active', 'completed'));
+      
+      const statusOrder = ['DRAFT', 'ATTENDANCE_IMPORTED', 'TICKET_SUPPLEMENTED', 'CONFLICT_DETECTED', 'CONFLICT_RESOLVED', 'REVENUE_CALCULATED', 'COMPLETED'];
+      const idx = statusOrder.indexOf(status);
+      
+      if (idx >= 1) document.getElementById('step1').classList.add('completed');
+      if (idx >= 2) document.getElementById('step2').classList.add('completed');
+      if (idx >= 5) document.getElementById('step3').classList.add('completed');
+      
+      if (idx === 1) document.getElementById('step1').classList.add('active');
+      else if (idx >= 2 && idx < 5) document.getElementById('step2').classList.add('active');
+      else if (idx >= 5) document.getElementById('step3').classList.add('active');
+    }
+
+    function renderAttendance(records) {
+      if (!records.length) {
+        document.getElementById('attendanceTable').innerHTML = '<p style="color:#909399">暂无签到记录</p>';
+        return;
+      }
+      let html = '<table><tr><th>日期</th><th>课程</th><th>学员</th><th>状态</th><th>备注</th><th>仅群消息</th><th>导入时间</th></tr>';
+      records.forEach(r => {
+        html += `<tr>
+          <td>${r.classDate}</td>
+          <td>${r.className}</td>
+          <td>${r.studentName}</td>
+          <td>${r.status}</td>
+          <td>${r.sourceNote || '-'}</td>
+          <td>${r.isGroupMessageOnly ? '<span style="color:#e6a23c">⚠️ 是</span>' : '否'}</td>
+          <td class="timestamp">${r.importedAt}</td>
+        </tr>`;
+      });
+      html += '</table>';
+      document.getElementById('attendanceTable').innerHTML = html;
+    }
+
+    function renderTickets(records) {
+      if (!records.length) {
+        document.getElementById('ticketsTable').innerHTML = '<p style="color:#909399">暂无票务记录</p>';
+        return;
+      }
+      let html = '<table><tr><th>日期</th><th>课程</th><th>学员</th><th>票数</th><th>票种</th><th>补充说明</th><th>导出时间</th></tr>';
+      records.forEach(r => {
+        html += `<tr>
+          <td>${r.classDate}</td>
+          <td>${r.className}</td>
+          <td>${r.studentName}</td>
+          <td>${r.ticketCount}</td>
+          <td>${r.ticketType}</td>
+          <td>${r.supplementNote || '-'}</td>
+          <td class="timestamp">${r.exportedAt}</td>
+        </tr>`;
+      });
+      html += '</table>';
+      document.getElementById('ticketsTable').innerHTML = html;
+    }
+
+    function renderConflicts(conflicts) {
+      if (!conflicts.length) {
+        document.getElementById('conflictsList').innerHTML = '<div class="success-card">✅ 暂无冲突记录</div>';
+        return;
+      }
+      let html = '';
+      conflicts.forEach(c => {
+        const resolved = c.resolution ? `<span class="status-badge status-CONFLICT_RESOLVED">已解决: ${c.resolution}</span>` : '<span class="status-badge status-CONFLICT_DETECTED">待处理</span>';
+        html += `<div class="conflict-card">
+          <h4>${c.description} ${resolved}</h4>
+          <p><strong>冲突类型：</strong>${c.conflictType}</p>
+          <p><strong>签到数据：</strong><code>${JSON.stringify(c.attendanceData).substring(0, 150)}...</code></p>
+          ${c.ticketData ? `<p><strong>票务数据：</strong><code>${JSON.stringify(c.ticketData).substring(0, 150)}...</code></p>` : ''}
+          ${!c.resolution ? `
+            <div style="margin-top:8px;">
+              <button class="btn btn-success" onclick="resolveConflict('${c.id}', 'CONFIRM_ATTENDANCE')">确认以签到为准</button>
+              <button class="btn btn-warning" onclick="resolveConflict('${c.id}', 'CONFIRM_TICKET')">确认以票务为准</button>
+              <button class="btn btn-info" onclick="resolveConflict('${c.id}', 'PENDING_REVIEW')">转票务复核</button>
+            </div>
+          ` : `<p class="timestamp">解决人: ${c.resolvedBy} | 时间: ${c.resolvedAt}</p>`}
+        </div>`;
+      });
+      document.getElementById('conflictsList').innerHTML = html;
+    }
+
+    function renderSelfCheck(results) {
+      if (!results.length) {
+        document.getElementById('selfCheckResults').innerHTML = '<p style="color:#909399">尚未运行自检，请点击"运行自检"</p>';
+        return;
+      }
+      let html = '';
+      results.forEach(r => {
+        const cls = r.passed ? 'success-card' : (r.severity === 'ERROR' ? 'conflict-card' : 'warning-card');
+        html += `<div class="${cls}">
+          <h4>${r.passed ? '✅' : r.severity === 'ERROR' ? '❌' : '⚠️'} ${r.checkType}: ${r.message}</h4>
+          ${r.details ? `<pre style="font-size:12px;margin-top:8px;background:white;padding:8px;border-radius:4px;">${JSON.stringify(r.details, null, 2)}</pre>` : ''}
+        </div>`;
+      });
+      document.getElementById('selfCheckResults').innerHTML = html;
+    }
+
+    function renderRevenue(details) {
+      if (!details.length) {
+        document.getElementById('revenueTable').innerHTML = '<p style="color:#909399">暂无分账数据，请先计算分账</p>';
+        return;
+      }
+      let total = details.reduce((s, d) => s + d.finalAmount, 0);
+      let html = `<p><strong>当前分账版本：</strong>v${details[0].version} | <strong>总计：</strong><span class="amount amount-positive">¥${total.toFixed(2)}</span></p>`;
+      html += '<table><tr><th>日期</th><th>课程</th><th>学员</th><th>基础金额</th><th>调整</th><th>最终金额</th><th>公式版本</th><th>计算参数</th></tr>';
+      details.forEach(d => {
+        html += `<tr>
+          <td>${d.classDate}</td>
+          <td>${d.className}</td>
+          <td>${d.studentName}</td>
+          <td class="amount">¥${d.baseAmount.toFixed(2)}</td>
+          <td class="amount ${d.adjustmentAmount >= 0 ? 'amount-positive' : 'amount-negative'}">${d.adjustmentAmount >= 0 ? '+' : ''}¥${d.adjustmentAmount.toFixed(2)}</td>
+          <td class="amount amount-positive">¥${d.finalAmount.toFixed(2)}</td>
+          <td>${d.calculationParams.formulaVersion}</td>
+          <td><button class="btn btn-info" onclick="showParams('${encodeURIComponent(JSON.stringify(d.calculationParams))}')">查看</button></td>
+        </tr>`;
+      });
+      html += '</table>';
+      document.getElementById('revenueTable').innerHTML = html;
+    }
+
+    function showParams(encoded) {
+      const params = JSON.parse(decodeURIComponent(encoded));
+      alert(`公式版本: ${params.formulaVersion}\n\n假设条件:\n${params.assumptions.join('\n')}\n\n取舍理由:\n${params.tradeoffs.join('\n')}`);
+    }
+
+    function renderVersionHistory(history) {
+      if (!history.length) {
+        document.getElementById('versionHistory').innerHTML = '<p style="color:#909399">暂无版本记录</p>';
+        return;
+      }
+      let html = '<table><tr><th>版本</th><th>状态</th><th>操作人</th><th>时间</th><th>有分账</th></tr>';
+      history.forEach(h => {
+        html += `<tr>
+          <td>v${h.version}</td>
+          <td><span class="status-badge status-${h.status}">${h.status}</span></td>
+          <td>${h.createdBy}</td>
+          <td class="timestamp">${h.createdAt}</td>
+          <td>${h.hasRevenue ? '✅' : '❌'}</td>
+        </tr>`;
+      });
+      html += '</table>';
+      document.getElementById('versionHistory').innerHTML = html;
+    }
+
+    async function importSampleAttendance() {
+      const by = document.getElementById('createdBy').value;
+      const sampleData = [
+        { classDate: '2024-01-15', className: '声乐入门班', studentName: '张三', status: 'NORMAL' },
+        { classDate: '2024-01-15', className: '声乐入门班', studentName: '李四', status: 'NORMAL' },
+        { classDate: '2024-01-15', className: '声乐入门班', studentName: '王五', status: 'ABSENT' },
+        { classDate: '2024-01-16', className: '钢琴进阶班', studentName: '赵六', status: 'MAKEUP', sourceNote: '上周请假补录' },
+        { classDate: '2024-01-16', className: '钢琴进阶班', studentName: '钱七', status: 'TEMP_SUBSTITUTE', sourceNote: '群里说临时替孙八', isGroupMessageOnly: true },
+      ];
+      await api(`/cards/${currentCardId}/import-attendance`, 'POST', { records: sampleData, importedBy: by });
+      await loadCardDetails();
+      alert('签到数据导入成功！');
+    }
+
+    async function importSampleTickets() {
+      const by = document.getElementById('createdBy').value;
+      const sampleData = [
+        { classDate: '2024-01-15', className: '声乐入门班', studentName: '张三', ticketCount: 1, ticketType: '常规课' },
+        { classDate: '2024-01-15', className: '声乐入门班', studentName: '李四', ticketCount: 1, ticketType: '常规课' },
+        { classDate: '2024-01-15', className: '声乐入门班', studentName: '王五', ticketCount: 1, ticketType: '常规课' },
+        { classDate: '2024-01-16', className: '钢琴进阶班', studentName: '赵六', ticketCount: 1, ticketType: '补录课', supplementNote: '系统补录' },
+      ];
+      await api(`/cards/${currentCardId}/supplement-tickets`, 'POST', { records: sampleData, supplementedBy: by });
+      await loadCardDetails();
+      alert('票务数据补充成功！');
+    }
+
+    async function detectConflicts() {
+      const result = await api(`/cards/${currentCardId}/detect-conflicts`, 'POST');
+      await loadCardDetails();
+      alert(`检测完成，发现 ${result.count} 个冲突`);
+    }
+
+    async function resolveConflict(conflictId, resolution) {
+      const by = document.getElementById('createdBy').value;
+      await api(`/conflicts/${conflictId}/resolve`, 'POST', { resolution, resolvedBy: by });
+      await loadCardDetails();
+    }
+
+    async function runSelfCheck() {
+      await api(`/cards/${currentCardId}/self-check`, 'POST');
+      await loadCardDetails();
+      switchTab('selfcheck');
+    }
+
+    async function calculateRevenue() {
+      const by = document.getElementById('createdBy').value;
+      try {
+        const result = await api(`/cards/${currentCardId}/calculate-revenue`, 'POST', { calculatedBy: by });
+        if (result.error) {
+          alert('计算失败: ' + result.error);
+          return;
+        }
+        await loadCardDetails();
+        switchTab('revenue');
+        alert(`分账计算完成！版本 v${result.version}，共 ${result.details.length} 条记录`);
+      } catch (e) {
+        alert('计算失败，请先解决所有冲突');
+      }
+    }
+
+    async function withdrawRevenue() {
+      if (!confirm('确定要撤回当前分账版本吗？分账明细将恢复至上一版。')) return;
+      const by = document.getElementById('createdBy').value;
+      const result = await api(`/cards/${currentCardId}/withdraw-revenue`, 'POST', { withdrawnBy: by });
+      alert(result.message);
+      await loadCardDetails();
+    }
+
+    async function withdrawCard() {
+      if (!confirm('确定要撤回至上一版本吗？所有状态都将恢复。')) return;
+      const by = document.getElementById('createdBy').value;
+      const result = await api(`/cards/${currentCardId}/withdraw`, 'POST', { withdrawnBy: by });
+      alert(result.message);
+      await loadCardDetails();
+    }
+
+    function switchTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById('tab-' + tab).classList.add('active');
+    }
+
+    refreshCardList();
+  </script>
+</body>
+</html>

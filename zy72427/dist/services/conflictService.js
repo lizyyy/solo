@@ -1,0 +1,120 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ConflictService = void 0;
+const uuid_1 = require("uuid");
+const database_1 = require("../database");
+const importService_1 = require("./importService");
+const cardService_1 = require("./cardService");
+class ConflictService {
+    constructor() {
+        this.importService = new importService_1.ImportService();
+        this.cardService = new cardService_1.CardService();
+    }
+    detectConflicts(cardId) {
+        const attendanceRecords = this.importService.getAttendanceByCardId(cardId);
+        const ticketRecords = this.importService.getTicketsByCardId(cardId);
+        const conflicts = [];
+        const now = new Date().toISOString();
+        const ticketMap = new Map();
+        for (const ticket of ticketRecords) {
+            const key = `${ticket.classDate}_${ticket.className}_${ticket.studentName}`;
+            ticketMap.set(key, ticket);
+        }
+        for (const attendance of attendanceRecords) {
+            const key = `${attendance.classDate}_${attendance.className}_${attendance.studentName}`;
+            const ticket = ticketMap.get(key);
+            if (attendance.isGroupMessageOnly) {
+                const conflict = {
+                    id: (0, uuid_1.v4)(),
+                    cardId,
+                    attendanceId: attendance.id,
+                    ticketId: ticket?.id,
+                    conflictType: 'GROUP_MESSAGE_ONLY_SUBSTITUTE',
+                    description: '临时替补仅在群里提及，无正式票务记录，需票务同事复核',
+                    attendanceData: attendance,
+                    ticketData: ticket,
+                    createdAt: now,
+                };
+                conflicts.push(conflict);
+                continue;
+            }
+            if (!ticket) {
+                const conflict = {
+                    id: (0, uuid_1.v4)(),
+                    cardId,
+                    attendanceId: attendance.id,
+                    conflictType: 'MISSING_TICKET',
+                    description: '签到记录存在但无对应票务导出记录',
+                    attendanceData: attendance,
+                    createdAt: now,
+                };
+                conflicts.push(conflict);
+                continue;
+            }
+            if (attendance.status === 'ABSENT' && ticket.ticketCount > 0) {
+                const conflict = {
+                    id: (0, uuid_1.v4)(),
+                    cardId,
+                    attendanceId: attendance.id,
+                    ticketId: ticket.id,
+                    conflictType: 'STATUS_TICKET_MISMATCH',
+                    description: `签到状态为缺席但票务显示有${ticket.ticketCount}张票`,
+                    attendanceData: attendance,
+                    ticketData: ticket,
+                    createdAt: now,
+                };
+                conflicts.push(conflict);
+                continue;
+            }
+            if (attendance.status === 'NORMAL' || attendance.status === 'MAKEUP') {
+                if (ticket.ticketCount === 0) {
+                    const conflict = {
+                        id: (0, uuid_1.v4)(),
+                        cardId,
+                        attendanceId: attendance.id,
+                        ticketId: ticket.id,
+                        conflictType: 'STATUS_TICKET_MISMATCH',
+                        description: '签到状态为正常/补录但票务显示0张票',
+                        attendanceData: attendance,
+                        ticketData: ticket,
+                        createdAt: now,
+                    };
+                    conflicts.push(conflict);
+                }
+            }
+        }
+        if (conflicts.length > 0) {
+            (0, database_1.insertMany)('conflicts', conflicts);
+            this.cardService.updateCardStatus(cardId, 'CONFLICT_DETECTED', 'system');
+        }
+        else {
+            this.cardService.updateCardStatus(cardId, 'CONFLICT_RESOLVED', 'system');
+        }
+        return conflicts;
+    }
+    resolveConflict(conflictId, resolution, resolvedBy) {
+        const now = new Date().toISOString();
+        const updated = (0, database_1.updateOne)('conflicts', (c) => c.id === conflictId, { resolution, resolvedBy, resolvedAt: now });
+        if (!updated)
+            return null;
+        const conflict = updated;
+        const cardConflicts = this.getConflictsByCardId(conflict.cardId);
+        const unresolvedCount = cardConflicts.filter((c) => !c.resolution).length;
+        if (unresolvedCount === 0) {
+            this.cardService.updateCardStatus(conflict.cardId, 'CONFLICT_RESOLVED', resolvedBy);
+        }
+        return conflict;
+    }
+    getConflictById(conflictId) {
+        const row = (0, database_1.findOne)('conflicts', (c) => c.id === conflictId);
+        return row || null;
+    }
+    getConflictsByCardId(cardId) {
+        return (0, database_1.findMany)('conflicts', (c) => c.cardId === cardId)
+            .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    }
+    getUnresolvedConflicts(cardId) {
+        return this.getConflictsByCardId(cardId).filter((c) => !c.resolution);
+    }
+}
+exports.ConflictService = ConflictService;

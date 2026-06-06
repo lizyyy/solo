@@ -1,0 +1,510 @@
+{
+  "cards": [
+    {
+      "id": "73a6e0b6-e503-4632-92ec-e70db659661b",
+      "playlistName": "夏日清凉歌单",
+      "createdBy": "小段",
+      "createdAt": "2026-06-06T16:10:48.354Z",
+      "updatedAt": "2026-06-06T16:10:48.354Z",
+      "status": "DRAFT",
+      "currentVersion": 1,
+      "selfCheckResults": []
+    },
+    {
+      "id": "0b6b82ab-94bb-4718-8d59-ea788015074c",
+      "playlistName": "夏日清凉歌单",
+      "createdBy": "小段",
+      "createdAt": "2026-06-06T16:11:38.400Z",
+      "updatedAt": "2026-06-06T16:11:39.495Z",
+      "status": "CONFLICT_RESOLVED",
+      "currentVersion": 3,
+      "selfCheckResults": [
+        {
+          "checkType": "DUPLICATE_IMPORT",
+          "passed": true,
+          "message": "无重复导入记录",
+          "severity": "INFO"
+        },
+        {
+          "checkType": "TEMP_SUBSTITUTE_WARNING",
+          "passed": false,
+          "message": "发现1条仅在群里提及的临时替补记录，需票务同事复核",
+          "details": {
+            "records": [
+              {
+                "classDate": "2024-01-16",
+                "className": "钢琴进阶班",
+                "studentName": "钱七",
+                "sourceNote": "群里说临时替孙八"
+              }
+            ]
+          },
+          "severity": "WARNING"
+        },
+        {
+          "checkType": "MAKUP_RECALCULATION",
+          "passed": false,
+          "message": "发现1条补录记录需要确认重算",
+          "details": {
+            "issues": [
+              "2024-01-16_钢琴进阶班_赵六: 补录记录无对应票务，需确认是否需要重算"
+            ]
+          },
+          "severity": "WARNING"
+        },
+        {
+          "checkType": "EXPORT_CONSISTENCY",
+          "passed": false,
+          "message": "暂无票务导出数据，无法校验一致性",
+          "severity": "WARNING"
+        }
+      ],
+      "attendanceBatchId": "8d9922a4-2fee-40f3-a256-892e1c041c93",
+      "ticketBatchId": "f74aeacf-07ca-497c-b0d7-5224f7939874"
+    }
+  ],
+  "attendance": [
+    {
+      "id": "124b16d9-37a0-4be0-9363-f762a046edb4",
+      "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
+      "classDate": "2024-01-15",
+      "className": "声乐入门班",
+      "studentName": "张三",
+      "status": "NORMAL",
+      "isGroupMessageOnly": false,
+      "importedAt": "2026-06-06T16:11:38.570Z",
+      "importBatchId": "8d9922a4-2fee-40f3-a256-892e1c041c93"
+    },
+    {
+      "id": "5bd5adf2-e722-49fe-945d-25d24c56d1ed",
+      "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
+      "classDate": "2024-01-15",
+      "className": "声乐入门班",
+      "studentName": "李四",
+      "status": "NORMAL",
+      "isGroupMessageOnly": false,
+      "importedAt": "2026-06-06T16:11:38.570Z",
+      "importBatchId": "8d9922a4-2fee-40f3-a256-892e1c041c93"
+    },
+    {
+      "id": "b8f103d3-148d-4bb8-8366-903bd72995ff",
+      "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
+      "classDate": "2024-01-15",
+      "className": "声乐入门班",
+      "studentName": "王五",
+      "status": "ABSENT",
+      "isGroupMessageOnly": false,
+      "importedAt": "2026-06-06T16:11:38.570Z",
+      "importBatchId": "8d9922a4-2fee-40f3-a256-892e1c041c93"
+    },
+    {
+      "id": "6886111d-6c41-46d0-8c21-2f455072b1b6",
+      "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
+      "classDate": "2024-01-16",
+      "className": "钢琴进阶班",
+      "studentName": "赵六",
+      "status": "MAKEUP",
+      "sourceNote": "上周请假补录",
+      "isGroupMessageOnly": false,
+      "importedAt": "2026-06-06T16:11:38.570Z",
+      "importBatchId": "8d9922a4-2fee-40f3-a256-892e1c041c93"
+    },
+    {
+      "id": "c2c7e95a-803e-4350-9780-3290efafc527",
+      "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
+      "classDate": "2024-01-16",
+      "className": "钢琴进阶班",
+      "studentName": "钱七",
+      "status": "TEMP_SUBSTITUTE",
+      "sourceNote": "群里说临时替孙八",
+      "isGroupMessageOnly": true,
+      "importedAt": "2026-06-06T16:11:38.570Z",
+      "importBatchId": "8d9922a4-2fee-40f3-a256-892e1c041c93"
+    }
+  ],
+  "tickets": [
+    {
+      "id": "7df67370-b9a2-4b10-a99c-1996f8044910",
+      "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
+      "classDate": "2024-01-15",
+      "className": "声乐入门班",
+      "studentName": "张三",
+      "ticketCount": 1,
+      "ticketType": "常规课",
+      "exportedAt": "2026-06-06T16:11:38.792Z",
+      "exportBatchId": "f74aeacf-07ca-497c-b0d7-5224f7939874"
+    },
+    {
+      "id": "cb2d2c1b-6309-426f-99bc-68a4cadef68c",
+      "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
+      "classDate": "2024-01-15",
+      "className": "声乐入门班",
+      "studentName": "李四",
+      "ticketCount": 1,
+      "ticketType": "常规课",
+      "exportedAt": "2026-06-06T16:11:38.792Z",
+      "exportBatchId": "f74aeacf-07ca-497c-b0d7-5224f7939874"
+    },
+    {
+      "id": "c9d6a995-ec96-45f7-896a-a3d2881b8d4c",
+      "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
+      "classDate": "2024-01-15",
+      "className": "声乐入门班",
+      "studentName": "王五",
+      "ticketCount": 1,
+      "ticketType": "常规课",
+      "exportedAt": "2026-06-06T16:11:38.792Z",
+      "exportBatchId": "f74aeacf-07ca-497c-b0d7-5224f7939874"
+    },
+    {
+      "id": "964bcbc7-a809-4dab-b00b-c4ad9a27df4c",
+      "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
+      "classDate": "2024-01-16",
+      "className": "钢琴进阶班",
+      "studentName": "赵六",
+      "ticketCount": 1,
+      "ticketType": "补录课",
+      "exportedAt": "2026-06-06T16:11:38.792Z",
+      "exportBatchId": "f74aeacf-07ca-497c-b0d7-5224f7939874",
+      "supplementNote": "系统补录"
+    }
+  ],
+  "conflicts": [
+    {
+      "id": "4b00b94b-4e12-4a29-a840-131aec6d81eb",
+      "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
+      "attendanceId": "b8f103d3-148d-4bb8-8366-903bd72995ff",
+      "ticketId": "c9d6a995-ec96-45f7-896a-a3d2881b8d4c",
+      "conflictType": "STATUS_TICKET_MISMATCH",
+      "description": "签到状态为缺席但票务显示有1张票",
+      "attendanceData": {
+        "id": "b8f103d3-148d-4bb8-8366-903bd72995ff",
+        "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
+        "classDate": "2024-01-15",
+        "className": "声乐入门班",
+        "studentName": "王五",
+        "status": "ABSENT",
+        "isGroupMessageOnly": false,
+        "importedAt": "2026-06-06T16:11:38.570Z",
+        "importBatchId": "8d9922a4-2fee-40f3-a256-892e1c041c93"
+      },
+      "ticketData": {
+        "id": "c9d6a995-ec96-45f7-896a-a3d2881b8d4c",
+        "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
+        "classDate": "2024-01-15",
+        "className": "声乐入门班",
+        "studentName": "王五",
+        "ticketCount": 1,
+        "ticketType": "常规课",
+        "exportedAt": "2026-06-06T16:11:38.792Z",
+        "exportBatchId": "f74aeacf-07ca-497c-b0d7-5224f7939874"
+      },
+      "createdAt": "2026-06-06T16:11:38.856Z",
+      "resolution": "PENDING_REVIEW",
+      "resolvedBy": "小段",
+      "resolvedAt": "2026-06-06T16:11:39.174Z"
+    },
+    {
+      "id": "253a39cd-2595-429d-8a6f-f99a3eb2998b",
+      "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
+      "attendanceId": "c2c7e95a-803e-4350-9780-3290efafc527",
+      "conflictType": "GROUP_MESSAGE_ONLY_SUBSTITUTE",
+      "description": "临时替补仅在群里提及，无正式票务记录，需票务同事复核",
+      "attendanceData": {
+        "id": "c2c7e95a-803e-4350-9780-3290efafc527",
+        "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
+        "classDate": "2024-01-16",
+        "className": "钢琴进阶班",
+        "studentName": "钱七",
+        "status": "TEMP_SUBSTITUTE",
+        "sourceNote": "群里说临时替孙八",
+        "isGroupMessageOnly": true,
+        "importedAt": "2026-06-06T16:11:38.570Z",
+        "importBatchId": "8d9922a4-2fee-40f3-a256-892e1c041c93"
+      },
+      "createdAt": "2026-06-06T16:11:38.856Z",
+      "resolution": "CONFIRM_TICKET",
+      "resolvedBy": "小段",
+      "resolvedAt": "2026-06-06T16:11:39.273Z"
+    }
+  ],
+  "revenue": [
+    {
+      "id": "f383ae68-9a3a-466d-b379-2c37571a1796",
+      "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
+      "version": 1,
+      "classDate": "2024-01-15",
+      "className": "声乐入门班",
+      "studentName": "张三",
+      "baseAmount": 100,
+      "adjustmentAmount": 0,
+      "finalAmount": 100,
+      "calculationParams": {
+        "formulaVersion": "v2.1.0",
+        "assumptions": [
+          "基础费率: 100元/课时 (公式版本 v2.1.0)"
+        ],
+        "tradeoffs": []
+      },
+      "calculatedAt": "2026-06-06T16:11:39.376Z",
+      "calculatedBy": "小段",
+      "isWithdrawn": true
+    },
+    {
+      "id": "9f6aba00-47af-442c-8022-c98a0ba0f4f8",
+      "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
+      "version": 1,
+      "classDate": "2024-01-15",
+      "className": "声乐入门班",
+      "studentName": "李四",
+      "baseAmount": 100,
+      "adjustmentAmount": 0,
+      "finalAmount": 100,
+      "calculationParams": {
+        "formulaVersion": "v2.1.0",
+        "assumptions": [
+          "基础费率: 100元/课时 (公式版本 v2.1.0)"
+        ],
+        "tradeoffs": []
+      },
+      "calculatedAt": "2026-06-06T16:11:39.376Z",
+      "calculatedBy": "小段",
+      "isWithdrawn": true
+    },
+    {
+      "id": "5a90b402-25ad-4462-9ac2-68cd1b13ef8c",
+      "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
+      "version": 1,
+      "classDate": "2024-01-15",
+      "className": "声乐入门班",
+      "studentName": "王五",
+      "baseAmount": 0,
+      "adjustmentAmount": 0,
+      "finalAmount": 0,
+      "calculationParams": {
+        "formulaVersion": "v2.1.0",
+        "assumptions": [
+          "基础费率: 100元/课时 (公式版本 v2.1.0)",
+          "缺席课时不计费"
+        ],
+        "tradeoffs": []
+      },
+      "calculatedAt": "2026-06-06T16:11:39.376Z",
+      "calculatedBy": "小段",
+      "isWithdrawn": true
+    },
+    {
+      "id": "b4a69037-3d2b-4de4-baf8-94b5e008c7b2",
+      "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
+      "version": 1,
+      "classDate": "2024-01-16",
+      "className": "钢琴进阶班",
+      "studentName": "赵六",
+      "baseAmount": 120,
+      "adjustmentAmount": 0,
+      "finalAmount": 120,
+      "calculationParams": {
+        "formulaVersion": "v2.1.0",
+        "assumptions": [
+          "基础费率: 100元/课时 (公式版本 v2.1.0)",
+          "补录课时按 1.2x 倍率计算"
+        ],
+        "tradeoffs": [
+          "补录课时多计20%以补偿额外协调成本"
+        ]
+      },
+      "calculatedAt": "2026-06-06T16:11:39.376Z",
+      "calculatedBy": "小段",
+      "isWithdrawn": true
+    },
+    {
+      "id": "d1c3b2bf-5ce4-44de-a239-c95c3d300c3b",
+      "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
+      "version": 1,
+      "classDate": "2024-01-16",
+      "className": "钢琴进阶班",
+      "studentName": "钱七",
+      "baseAmount": 100,
+      "adjustmentAmount": -20,
+      "finalAmount": 80,
+      "calculationParams": {
+        "formulaVersion": "v2.1.0",
+        "assumptions": [
+          "基础费率: 100元/课时 (公式版本 v2.1.0)",
+          "临时替补扣减 20元",
+          "此记录为群内提及的临时替补，未经票务系统确认",
+          "无对应票务记录，按签到状态正常计费"
+        ],
+        "tradeoffs": [
+          "临时替补扣减以覆盖培训成本",
+          "保留异常标记，待票务同事复核后可调整"
+        ]
+      },
+      "calculatedAt": "2026-06-06T16:11:39.376Z",
+      "calculatedBy": "小段",
+      "isWithdrawn": true
+    }
+  ],
+  "snapshots": [
+    {
+      "id": "14aa82c7-9eb7-4ae4-8141-fe56a59f2e90",
+      "cardId": "73a6e0b6-e503-4632-92ec-e70db659661b",
+      "version": 1,
+      "status": "DRAFT",
+      "snapshotData": {
+        "id": "73a6e0b6-e503-4632-92ec-e70db659661b",
+        "playlistName": "夏日清凉歌单",
+        "createdBy": "小段",
+        "createdAt": "2026-06-06T16:10:48.354Z",
+        "updatedAt": "2026-06-06T16:10:48.354Z",
+        "status": "DRAFT",
+        "currentVersion": 1,
+        "selfCheckResults": []
+      },
+      "createdAt": "2026-06-06T16:10:48.354Z",
+      "createdBy": "小段"
+    },
+    {
+      "id": "d1e3a61f-58d0-4172-befd-bc246783129f",
+      "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
+      "version": 1,
+      "status": "DRAFT",
+      "snapshotData": {
+        "id": "0b6b82ab-94bb-4718-8d59-ea788015074c",
+        "playlistName": "夏日清凉歌单",
+        "createdBy": "小段",
+        "createdAt": "2026-06-06T16:11:38.400Z",
+        "updatedAt": "2026-06-06T16:11:38.400Z",
+        "status": "DRAFT",
+        "currentVersion": 1,
+        "selfCheckResults": []
+      },
+      "createdAt": "2026-06-06T16:11:38.400Z",
+      "createdBy": "小段"
+    },
+    {
+      "id": "01d4fad9-33d7-4f80-abf0-f48c93f326fe",
+      "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
+      "version": 2,
+      "status": "CONFLICT_DETECTED",
+      "attendanceBatchId": "8d9922a4-2fee-40f3-a256-892e1c041c93",
+      "ticketBatchId": "f74aeacf-07ca-497c-b0d7-5224f7939874",
+      "snapshotData": {
+        "id": "0b6b82ab-94bb-4718-8d59-ea788015074c",
+        "playlistName": "夏日清凉歌单",
+        "createdBy": "小段",
+        "createdAt": "2026-06-06T16:11:38.400Z",
+        "updatedAt": "2026-06-06T16:11:38.856Z",
+        "status": "CONFLICT_DETECTED",
+        "currentVersion": 2,
+        "selfCheckResults": [
+          {
+            "checkType": "DUPLICATE_IMPORT",
+            "passed": true,
+            "message": "无重复导入记录",
+            "severity": "INFO"
+          },
+          {
+            "checkType": "TEMP_SUBSTITUTE_WARNING",
+            "passed": false,
+            "message": "发现1条仅在群里提及的临时替补记录，需票务同事复核",
+            "details": {
+              "records": [
+                {
+                  "classDate": "2024-01-16",
+                  "className": "钢琴进阶班",
+                  "studentName": "钱七",
+                  "sourceNote": "群里说临时替孙八"
+                }
+              ]
+            },
+            "severity": "WARNING"
+          },
+          {
+            "checkType": "MAKUP_RECALCULATION",
+            "passed": false,
+            "message": "发现1条补录记录需要确认重算",
+            "details": {
+              "issues": [
+                "2024-01-16_钢琴进阶班_赵六: 补录记录无对应票务，需确认是否需要重算"
+              ]
+            },
+            "severity": "WARNING"
+          },
+          {
+            "checkType": "EXPORT_CONSISTENCY",
+            "passed": false,
+            "message": "暂无票务导出数据，无法校验一致性",
+            "severity": "WARNING"
+          }
+        ],
+        "attendanceBatchId": "8d9922a4-2fee-40f3-a256-892e1c041c93",
+        "ticketBatchId": "f74aeacf-07ca-497c-b0d7-5224f7939874"
+      },
+      "createdAt": "2026-06-06T16:11:38.856Z",
+      "createdBy": "system"
+    },
+    {
+      "id": "73ebc848-d55f-4674-8032-273cbcadb6f6",
+      "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
+      "version": 3,
+      "status": "CONFLICT_RESOLVED",
+      "attendanceBatchId": "8d9922a4-2fee-40f3-a256-892e1c041c93",
+      "ticketBatchId": "f74aeacf-07ca-497c-b0d7-5224f7939874",
+      "snapshotData": {
+        "id": "0b6b82ab-94bb-4718-8d59-ea788015074c",
+        "playlistName": "夏日清凉歌单",
+        "createdBy": "小段",
+        "createdAt": "2026-06-06T16:11:38.400Z",
+        "updatedAt": "2026-06-06T16:11:39.274Z",
+        "status": "CONFLICT_RESOLVED",
+        "currentVersion": 3,
+        "selfCheckResults": [
+          {
+            "checkType": "DUPLICATE_IMPORT",
+            "passed": true,
+            "message": "无重复导入记录",
+            "severity": "INFO"
+          },
+          {
+            "checkType": "TEMP_SUBSTITUTE_WARNING",
+            "passed": false,
+            "message": "发现1条仅在群里提及的临时替补记录，需票务同事复核",
+            "details": {
+              "records": [
+                {
+                  "classDate": "2024-01-16",
+                  "className": "钢琴进阶班",
+                  "studentName": "钱七",
+                  "sourceNote": "群里说临时替孙八"
+                }
+              ]
+            },
+            "severity": "WARNING"
+          },
+          {
+            "checkType": "MAKUP_RECALCULATION",
+            "passed": false,
+            "message": "发现1条补录记录需要确认重算",
+            "details": {
+              "issues": [
+                "2024-01-16_钢琴进阶班_赵六: 补录记录无对应票务，需确认是否需要重算"
+              ]
+            },
+            "severity": "WARNING"
+          },
+          {
+            "checkType": "EXPORT_CONSISTENCY",
+            "passed": false,
+            "message": "暂无票务导出数据，无法校验一致性",
+            "severity": "WARNING"
+          }
+        ],
+        "attendanceBatchId": "8d9922a4-2fee-40f3-a256-892e1c041c93",
+        "ticketBatchId": "f74aeacf-07ca-497c-b0d7-5224f7939874"
+      },
+      "createdAt": "2026-06-06T16:11:39.274Z",
+      "createdBy": "小段"
+    }
+  ]
+}
