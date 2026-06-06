@@ -1,0 +1,130 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+  font-weight: 400;
+  color: #1a3a3a;
+  background-color: #f8faf9;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 600;
+}
+
+.remark-preserve {
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.7;
+}
+
+.btn-primary {
+  @apply bg-primary-700 text-white px-4 py-2 rounded-md shadow-button transition-all duration-200;
+  @apply hover:bg-primary-600 hover:-translate-y-0.5 hover:shadow-md;
+  @apply active:translate-y-0 active:shadow-button;
+}
+
+.btn-secondary {
+  @apply bg-white text-primary-700 border border-primary-200 px-4 py-2 rounded-md shadow-button transition-all duration-200;
+  @apply hover:bg-primary-50 hover:-translate-y-0.5;
+  @apply active:translate-y-0;
+}
+
+.btn-danger {
+  @apply bg-danger-500 text-white px-4 py-2 rounded-md shadow-button transition-all duration-200;
+  @apply hover:bg-danger-400 hover:-translate-y-0.5;
+  @apply active:translate-y-0;
+}
+
+.btn-success {
+  @apply bg-success-500 text-white px-4 py-2 rounded-md shadow-button transition-all duration-200;
+  @apply hover:bg-success-400 hover:-translate-y-0.5;
+  @apply active:translate-y-0;
+}
+
+.card {
+  @apply bg-white rounded-lg shadow-card p-5 transition-all duration-300;
+  @apply hover:shadow-card-hover;
+}
+
+.tag {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+
+.tag-pending {
+  @apply bg-amber-50 text-amber-700 border border-amber-200;
+}
+
+.tag-approved {
+  @apply bg-success-50 text-success-600 border border-success-200;
+}
+
+.tag-rejected {
+  @apply bg-danger-50 text-danger-600 border border-danger-200;
+}
+
+.tag-normal {
+  @apply bg-primary-50 text-primary-600 border border-primary-200;
+}
+
+.input-field {
+  @apply w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent transition-all duration-200;
+}
+
+.textarea-field {
+  @apply w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent transition-all duration-200 resize-y min-h-[80px];
+}
+
+.table-header {
+  @apply bg-primary-50 text-primary-700 text-sm font-medium;
+}
+
+.table-row {
+  @apply border-b border-gray-100 hover:bg-primary-50/30 transition-colors duration-150;
+}
+
+.diff-added {
+  @apply bg-success-100 text-success-800;
+}
+
+.diff-removed {
+  @apply bg-danger-100 text-danger-800 line-through;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: #f1f5f5;
+  border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #b3d5d5;
+  border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #86b8b8;
+}
