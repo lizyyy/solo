@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>校园乐队器材维修 - 版权运营管理系统</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: #f5f7fa;
+      color: #333;
+      padding: 20px;
+    }
+    .container { max-width: 1400px; margin: 0 auto; }
+    .header { 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 24px 32px;
+      border-radius: 12px;
+      margin-bottom: 24px;
+    }
+    .header h1 { font-size: 24px; margin-bottom: 8px; }
+    .header p { opacity: 0.9; font-size: 14px; }
+    .header .data-source-tag {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      margin-top: 8px;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: #1a1a2e;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .workflow-steps {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .step {
+      flex: 1;
+      padding: 16px;
+      border-radius: 8px;
+      background: #f8f9fa;
+      border-left: 4px solid #dee2e6;
+      position: relative;
+    }
+    .step.active {
+      background: #e8f4fd;
+      border-left-color: #3498db;
+    }
+    .step.completed {
+      background: #e8f8f0;
+      border-left-color: #27ae60;
+    }
+    .step.warning {
+      background: #fef4e6;
+      border-left-color: #f39c12;
+    }
+    .step h3 { font-size: 14px; margin-bottom: 4px; }
+    .step .count { font-size: 24px; font-weight: 700; }
+    .step .label { font-size: 12px; color: #666; }
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 500;
+    }
+    .btn-primary { background: #667eea; color: white; }
+    .btn-primary:hover { background: #5a6fd8; }
+    .btn-success { background: #27ae60; color: white; }
+    .btn-success:hover { background: #229954; }
+    .btn-warning { background: #f39c12; color: white; }
+    .btn-warning:hover { background: #e67e22; }
+    .btn-secondary { background: #95a5a6; color: white; }
+    .btn-secondary:hover { background: #7f8c8d; }
+    .btn-small { padding: 6px 12px; font-size: 12px; }
+    .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
+    .self-check-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .check-item {
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
+    }
+    .check-item.pass { background: #f0fff4; border-color: #27ae60; }
+    .check-item.fail { background: #fff5f5; border-color: #e74c3c; }
+    .check-item.warning { background: #fffbeb; border-color: #f39c12; }
+    .check-name { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+    .check-result { font-size: 12px; }
+    .check-result.pass { color: #27ae60; }
+    .check-result.fail { color: #e74c3c; }
+    .check-result.warning { color: #f39c12; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    th { background: #f8f9fa; font-weight: 600; color: #555; }
+    tr:hover { background: #f8f9fa; }
+    .status-tag {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .status-imported { background: #e3f2fd; color: #1565c0; }
+    .status-tuner_reviewed { background: #e8f5e9; color: #2e7d32; }
+    .status-verification_required { background: #fff3e0; color: #e65100; }
+    .status-manager_reviewed { background: #f3e5f5; color: #6a1b9a; }
+    .status-write_off_updated { background: #e0f7fa; color: #00695c; }
+    .status-abnormal { background: #ffebee; color: #c62828; }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal.show { display: flex; }
+    .modal-content {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      max-width: 800px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #eee;
+    }
+    .modal-title { font-size: 18px; font-weight: 600; }
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #999;
+    }
+    .evidence-section { margin-bottom: 20px; }
+    .evidence-section h4 {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px dashed #ddd;
+    }
+    .change-record {
+      padding: 10px;
+      background: #f8f9fa;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      font-size: 12px;
+    }
+    .change-record .field { font-weight: 600; color: #333; }
+    .change-record .meta { color: #999; margin-top: 4px; }
+    .message-bubble {
+      padding: 12px;
+      background: #f0f7ff;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      position: relative;
+    }
+    .message-bubble .tuner { font-weight: 600; color: #1565c0; font-size: 13px; }
+    .message-bubble .content { margin: 6px 0; font-size: 13px; }
+    .message-bubble .reviewed {
+      font-size: 11px;
+      color: #27ae60;
+    }
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .detail-item { font-size: 13px; }
+    .detail-item .label { color: #888; font-size: 12px; }
+    .detail-item .value { font-weight: 500; margin-top: 2px; }
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 12px 24px;
+      background: #333;
+      color: white;
+      border-radius: 8px;
+      z-index: 2000;
+      animation: slideIn 0.3s ease;
+    }
+    .toast.success { background: #27ae60; }
+    .toast.error { background: #e74c3c; }
+    .toast.warning { background: #f39c12; }
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    .action-buttons { display: flex; gap: 6px; }
+    .pending-review-banner {
+      background: #fff3e0;
+      border: 1px solid #ffb74d;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .pending-review-banner .text { color: #e65100; font-weight: 500; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🎸 校园乐队器材维修 - 版权运营管理系统</h1>
+      <p>授权期限管理 · 调音师留言 · 课时核销 · 数据一致性保障</p>
+      <span class="data-source-tag" id="dataSourceTag">数据源ID: 加载中...</span>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📋 工作流进度</div>
+      <div class="workflow-steps" id="workflowSteps">
+        <div class="step" id="step1">
+          <h3>第一步</h3>
+          <div class="count" id="step1Count">0</div>
+          <div class="label">授权期限导入</div>
+        </div>
+        <div class="step" id="step2">
+          <h3>第二步</h3>
+          <div class="count" id="step2Count">0</div>
+          <div class="label">查看调音师留言</div>
+        </div>
+        <div class="step" id="step3">
+          <h3>第三步</h3>
+          <div class="count" id="step3Count">0</div>
+          <div class="label">课时核销更新</div>
+        </div>
+        <div class="step warning" id="stepReview">
+          <h3>待店长复核</h3>
+          <div class="count" id="stepReviewCount">0</div>
+          <div class="label">授权地区等异常</div>
+        </div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="runStep1()">① 执行第一步：导入示例数据</button>
+        <button class="btn btn-secondary" onclick="runSelfCheck()">🔍 执行自检</button>
+        <button class="btn btn-secondary" onclick="checkConsistency()">✅ 一致性校验</button>
+        <button class="btn btn-secondary" onclick="exportData()">📤 导出数据</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🔍 自检结果</div>
+      <div class="self-check-grid" id="selfCheckGrid">
+        <div class="check-item">
+          <div class="check-name">重复导入检测</div>
+          <div class="check-result">未执行</div>
+        </div>
+        <div class="check-item">
+          <div class="check-name">授权地区城市缺失</div>
+          <div class="check-result">未执行</div>
+        </div>
+        <div class="check-item">
+          <div class="check-name">补录后重算检测</div>
+          <div class="check-result">未执行</div>
+        </div>
+        <div class="check-item">
+          <div class="check-name">导出一致性检测</div>
+          <div class="check-result">未执行</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📝 授权期限列表</div>
+      <div id="pendingReviewBanner" class="pending-review-banner" style="display: none;">
+        <span class="text">⚠️ 有记录待店长复核，授权地区可能少写了城市</span>
+        <button class="btn btn-warning btn-small" onclick="showPendingReview()">查看待复核记录</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>原始行号</th>
+            <th>乐队名称</th>
+            <th>器材型号</th>
+            <th>授权地区</th>
+            <th>维修费用</th>
+            <th>状态</th>
+            <th>版本</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="termsTableBody">
+          <tr><td colspan="8" style="text-align: center; color: #999; padding: 40px;">暂无数据，请先执行第一步导入</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="modal" id="detailModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">🔍 授权期限详情（含证据链）</div>
+        <button class="close-btn" onclick="closeModal()">&times;</button>
+      </div>
+      <div id="detailContent"></div>
+    </div>
+  </div>
+
+  <script>
+    let currentTerms = [];
+
+    async function fetchAPI(url, options = {}) {
+      const res = await fetch(url, {
+        headers: { 'Content-Type': 'application/json' },
+        ...options
+      });
+      return res.json();
+    }
+
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    function getStatusText(status) {
+      const map = {
+        'pending': '待处理',
+        'imported': '已导入',
+        'tuner_reviewed': '已查看留言',
+        'verification_required': '待店长复核',
+        'manager_reviewed': '店长已复核',
+        'write_off_updated': '核销已更新',
+        'completed': '已完成',
+        'abnormal': '异常'
+      };
+      return map[status] || status;
+    }
+
+    function getStatusClass(status) {
+      return `status-tag status-${status}`;
+    }
+
+    async function loadData() {
+      try {
+        const [termsRes, progressRes, healthRes] = await Promise.all([
+          fetchAPI('/api/authorization-terms'),
+          fetchAPI('/api/workflow/progress'),
+          fetchAPI('/api/health')
+        ]);
+
+        currentTerms = termsRes.data || [];
+        
+        document.getElementById('dataSourceTag').textContent = `数据源ID: ${healthRes.dataSourceId}`;
+
+        const p = progressRes.progress;
+        document.getElementById('step1Count').textContent = p.step1;
+        document.getElementById('step2Count').textContent = p.step2;
+        document.getElementById('step3Count').textContent = p.step3;
+        document.getElementById('stepReviewCount').textContent = p.pendingReview;
+
+        if (p.step1 > 0) document.getElementById('step1').classList.add('active');
+        if (p.step2 > 0) document.getElementById('step2').classList.add('completed');
+        if (p.step3 > 0) document.getElementById('step3').classList.add('completed');
+        if (p.pendingReview > 0) {
+          document.getElementById('pendingReviewBanner').style.display = 'flex';
+        } else {
+          document.getElementById('pendingReviewBanner').style.display = 'none';
+        }
+
+        renderTermsTable();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function renderTermsTable() {
+      const tbody = document.getElementById('termsTableBody');
+      if (currentTerms.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #999; padding: 40px;">暂无数据，请先执行第一步导入</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = currentTerms.map(term => {
+        const citiesText = term.authorizedCities.map(c => `${c.province}${c.city}`).join(', ');
+        const canStep2 = term.status === 'imported' || term.status === 'verification_required';
+        const canStep3 = term.status === 'tuner_reviewed' || term.status === 'manager_reviewed';
+        const isPendingReview = term.status === 'verification_required';
+
+        return `
+          <tr>
+            <td><strong>${term.originalRowNumber}</strong></td>
+            <td>${term.bandName}</td>
+            <td>${term.equipmentModel}</td>
+            <td title="原始文本: ${term.originalAuthorizedCitiesText}">${citiesText || '<span style="color:#e74c3c">未解析</span>'}</td>
+            <td>¥${term.repairFee}</td>
+            <td><span class="${getStatusClass(term.status)}">${getStatusText(term.status)}</span></td>
+            <td>v${term.version}</td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn btn-secondary btn-small" onclick="showDetail('${term.id}')">查看证据</button>
+                ${isPendingReview ? `<button class="btn btn-warning btn-small" onclick="managerReview('${term.id}', true)">店长通过</button>` : ''}
+                ${canStep2 && !isPendingReview ? `<button class="btn btn-primary btn-small" onclick="runStep2('${term.id}')">② 查看留言</button>` : ''}
+                ${canStep3 ? `<button class="btn btn-success btn-small" onclick="runStep3('${term.id}')">③ 更新核销</button>` : ''}
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function runStep1() {
+      showToast('正在导入授权期限数据...');
+      const res = await fetchAPI('/api/workflow/step1-import', {
+        method: 'POST',
+        body: JSON.stringify({ operator: '版权运营小鹿' })
+      });
+      
+      if (res.success) {
+        showToast(res.message, 'success');
+        await loadData();
+        await runSelfCheck();
+      } else {
+        showToast(res.message, 'error');
+      }
+    }
+
+    async function runStep2(termId) {
+      const sampleMessages = [
+        { tunerName: '张调音师', content: '吉他指板有轻微磨损，建议下次保养时更换品丝。目前不影响使用。' },
+        { tunerName: '李调音师', content: '架子鼓底鼓皮有凹陷，已做临时处理，建议三个月内更换。' },
+        { tunerName: '王调音师', content: '贝斯电路接触良好，拾音器磁性正常，无需额外处理。' }
+      ];
+      const randomMsg = sampleMessages[Math.floor(Math.random() * sampleMessages.length)];
+
+      const res = await fetchAPI('/api/workflow/step2-tuner-review', {
+        method: 'POST',
+        body: JSON.stringify({
+          authorizationTermId: termId,
+          reviewer: '版权运营小鹿',
+          tunerMessageContent: randomMsg.content,
+          tunerName: randomMsg.tunerName
+        })
+      });
+
+      showToast(res.message, res.success ? 'success' : 'warning');
+      await loadData();
+    }
+
+    async function runStep3(termId) {
+      const term = currentTerms.find(t => t.id === termId);
+      const hours = Math.floor(Math.random() * 5) + 2;
+      const unitPrice = 150;
+      const writeOffNum = 'HX' + Date.now().toString().slice(-8);
+
+      const res = await fetchAPI('/api/workflow/step3-write-off', {
+        method: 'POST',
+        body: JSON.stringify({
+          authorizationTermId: termId,
+          operator: '版权运营小鹿',
+          courseHours: hours,
+          unitPrice,
+          writeOffNumber: writeOffNum
+        })
+      });
+
+      showToast(res.message, res.success ? 'success' : 'error');
+      await loadData();
+    }
+
+    async function managerReview(termId, approved) {
+      const res = await fetchAPI('/api/workflow/manager-review', {
+        method: 'POST',
+        body: JSON.stringify({
+          authorizationTermId: termId,
+          manager: '店长',
+          approved,
+          reviewComment: approved ? '授权地区确认无误，补全省份信息后通过' : '需进一步核实'
+        })
+      });
+      showToast(res.message, 'success');
+      await loadData();
+    }
+
+    async function showDetail(termId) {
+      const res = await fetchAPI(`/api/authorization-terms/${termId}`);
+      const term = res.data;
+      const evidence = res.evidence;
+
+      const citiesText = term.authorizedCities.map(c => `${c.province}${c.city}`).join(', ');
+
+      let html = `
+        <div class="detail-grid">
+          <div class="detail-item">
+            <div class="label">原始行号</div>
+            <div class="value">第 ${term.originalRowNumber} 行</div>
+          </div>
+          <div class="detail-item">
+            <div class="label">乐队名称</div>
+            <div class="value">${term.bandName}</div>
+          </div>
+          <div class="detail-item">
+            <div class="label">器材类型 / 型号</div>
+            <div class="value">${term.equipmentType} / ${term.equipmentModel}</div>
+          </div>
+          <div class="detail-item">
+            <div class="label">授权期限</div>
+            <div class="value">${term.authorizationStartDate} 至 ${term.authorizationEndDate}</div>
+          </div>
+          <div class="detail-item">
+            <div class="label">授权地区（原始文本）</div>
+            <div class="value" style="color: #e67e22;">${term.originalAuthorizedCitiesText}</div>
+          </div>
+          <div class="detail-item">
+            <div class="label">授权地区（解析后）</div>
+            <div class="value">${citiesText || '<span style="color:#e74c3c">解析失败</span>'}</div>
+          </div>
+          <div class="detail-item">
+            <div class="label">维修费用（原始）</div>
+            <div class="value">¥${term.originalRepairFee}</div>
+          </div>
+          <div class="detail-item">
+            <div class="label">维修费用（当前）</div>
+            <div class="value">¥${term.repairFee}</div>
+          </div>
+          <div class="detail-item">
+            <div class="label">当前状态</div>
+            <div class="value"><span class="${getStatusClass(term.status)}">${getStatusText(term.status)}</span></div>
+          </div>
+          <div class="detail-item">
+            <div class="label">数据版本</div>
+            <div class="value">v${term.version}（最后更新: ${new Date(term.updatedAt).toLocaleString('zh-CN')}）</div>
+          </div>
+        </div>
+      `;
+
+      if (evidence.changeRecords && evidence.changeRecords.length > 0) {
+        html += `
+          <div class="evidence-section">
+            <h4>📝 变更记录（${evidence.changeRecords.length} 条）</h4>
+            ${evidence.changeRecords.map(c => `
+              <div class="change-record">
+                <span class="field">${c.fieldName}:</span>
+                <span style="color: #e74c3c; text-decoration: line-through;">${c.oldValue}</span>
+                →
+                <span style="color: #27ae60;">${c.newValue}</span>
+                <div class="meta">变更人: ${c.changedBy} | 时间: ${new Date(c.changedAt).toLocaleString('zh-CN')} | 原因: ${c.changeReason} | 版本: v${c.version}</div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      if (evidence.tunerMessages && evidence.tunerMessages.length > 0) {
+        html += `
+          <div class="evidence-section">
+            <h4>💬 调音师留言（${evidence.tunerMessages.length} 条）</h4>
+            ${evidence.tunerMessages.map(m => `
+              <div class="message-bubble">
+                <div class="tuner">🎧 ${m.tunerName}</div>
+                <div class="content">${m.content}</div>
+                <div class="reviewed">
+                  ${m.isReviewed ? `✅ 已由 ${m.reviewedBy} 于 ${new Date(m.reviewedAt).toLocaleString('zh-CN')} 查看` : '⏳ 未查看'}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      if (evidence.writeOffRecords && evidence.writeOffRecords.length > 0) {
+        html += `
+          <div class="evidence-section">
+            <h4>💰 核销单记录（${evidence.writeOffRecords.length} 条）</h4>
+            ${evidence.writeOffRecords.map(w => `
+              <div class="change-record">
+                <span class="field">核销单号:</span> ${w.writeOffNumber}
+                <span class="field">| 课时:</span> ${w.courseHours} 课时
+                <span class="field">| 单价:</span> ¥${w.unitPrice}
+                <span class="field">| 总计:</span> <strong style="color: #e74c3c;">¥${w.totalAmount}</strong>
+                <div class="meta">操作人: ${w.operator} | 核销日期: ${w.writeOffDate}</div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      document.getElementById('detailContent').innerHTML = html;
+      document.getElementById('detailModal').classList.add('show');
+    }
+
+    function closeModal() {
+      document.getElementById('detailModal').classList.remove('show');
+    }
+
+    async function runSelfCheck() {
+      showToast('正在执行自检...');
+      const res = await fetchAPI('/api/self-check/run?operator=版权运营小鹿');
+      
+      const grid = document.getElementById('selfCheckGrid');
+      grid.innerHTML = res.results.map(r => `
+        <div class="check-item ${r.result}">
+          <div class="check-name">${r.checkName}</div>
+          <div class="check-result ${r.result}">${r.result === 'pass' ? '✅ 通过' : r.result === 'warning' ? '⚠️ 警告' : '❌ 未通过'}</div>
+          <div style="font-size: 11px; color: #666; margin-top: 4px;">${r.description}</div>
+        </div>
+      `).join('');
+      
+      showToast('自检完成', 'success');
+    }
+
+    async function checkConsistency() {
+      const res = await fetchAPI('/api/consistency/check');
+      showToast(
+        `列表${res.listCount}条, 详情${res.detailCount}条, 导出${res.exportCount}条 - ${res.isConsistent ? '✅ 一致' : '❌ 不一致'}`,
+        res.isConsistent ? 'success' : 'error'
+      );
+    }
+
+    async function exportData() {
+      const res = await fetchAPI('/api/export/authorization-terms?evidence=true');
+      console.log('导出数据:', res);
+      showToast(`已准备 ${res.data.length} 条导出数据（数据源ID: ${res.dataSourceId}）`, 'success');
+    }
+
+    function showPendingReview() {
+      const pending = currentTerms.filter(t => t.status === 'verification_required');
+      if (pending.length > 0) {
+        showDetail(pending[0].id);
+      }
+    }
+
+    document.getElementById('detailModal').addEventListener('click', (e) => {
+      if (e.target.id === 'detailModal') closeModal();
+    });
+
+    loadData();
+  </script>
+</body>
+</html>
