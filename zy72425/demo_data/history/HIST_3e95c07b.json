@@ -1,0 +1,35 @@
+{
+  "history_id": "HIST_3e95c07b",
+  "record_id": "REC_3090c641",
+  "operator": "王老师",
+  "operation": "复核通过",
+  "changes": [
+    {
+      "field_name": "review_status",
+      "old_value": "needs_review",
+      "new_value": "confirmed"
+    },
+    {
+      "field_name": "confirmed_by",
+      "old_value": null,
+      "new_value": "王老师"
+    },
+    {
+      "field_name": "confirmed_at",
+      "old_value": null,
+      "new_value": "2026-06-07T00:00:42.548252"
+    },
+    {
+      "field_name": "song_display_name",
+      "old_value": "小星星",
+      "new_value": "小星星变奏曲"
+    },
+    {
+      "field_name": "discrepancy_note",
+      "old_value": "现场名「小星星」与版权名「小星星变奏曲」不一致，需音乐老师复核 | 老周补充: 家长说孩子平时就叫小星星",
+      "new_value": "现场名「小星星」与版权名「小星星变奏曲」不一致，需音乐老师复核 | 老周补充: 家长说孩子平时就叫小星星 | 复核后统一为: 小星星变奏曲"
+    }
+  ],
+  "timestamp": "2026-06-07T00:00:42.548399",
+  "note": "已确认，以版权名为准"
+}
