@@ -1,0 +1,127 @@
+[
+  {
+    "id": "3b3f2840-0518-45c4-9c12-8ef249c2f6b9",
+    "songName": "小星星变奏曲",
+    "liveName": null,
+    "copyrightName": null,
+    "remarks": "学生作业完成度良好，节奏稳定。注意第16小节的附点节奏需要加强练习",
+    "licenseRemarks": "学生作业完成度良好，节奏稳定。注意第16小节的附点节奏需要加强练习",
+    "status": "supplemented",
+    "dataSource": "license_page",
+    "conflicts": [],
+    "createdAt": "2026-06-06T15:51:39.078Z",
+    "updatedAt": "2026-06-06T15:51:39.078Z",
+    "createdBy": "sample_loader",
+    "updatedBy": "audio_engineer_xiaoduan",
+    "reviewHistory": [
+      {
+        "id": "2a5bb861-ca76-4f2b-8a70-58db6738327b",
+        "timestamp": "2026-06-06T15:51:39.078Z",
+        "action": "supplement_license_data",
+        "field": "licenseRemarks",
+        "oldValue": "学生作业完成度良好，节奏稳定。注意第16小节的附点节奏需要加强练习",
+        "newValue": "学生作业完成度良好，节奏稳定。注意第16小节的附点节奏需要加强练习",
+        "reason": "从授权期限页补充数据",
+        "operator": "audio_engineer_xiaoduan"
+      }
+    ],
+    "rhythmScore": null,
+    "assignedTo": null
+  },
+  {
+    "id": "6199e022-0c56-431d-90c4-3ec43f7e2c15",
+    "songName": "月光奏鸣曲",
+    "liveName": "月光奏鸣曲（现场演奏版）",
+    "copyrightName": "第十四钢琴奏鸣曲「月光」",
+    "remarks": "现场录音，现场气氛很好，但是第三乐章速度偏快",
+    "licenseRemarks": "现场演出授权：北京音乐厅2024年12月25日，版权名：第十四钢琴奏鸣曲「月光」",
+    "status": "conflict",
+    "dataSource": "license_page",
+    "conflicts": [
+      {
+        "field": "remarks",
+        "audioValue": "现场录音，现场气氛很好，但是第三乐章速度偏快",
+        "licenseValue": "现场演出授权：北京音乐厅2024年12月25日，版权名：第十四钢琴奏鸣曲「月光」",
+        "description": "音频文件备注与授权期限页备注不一致"
+      }
+    ],
+    "createdAt": "2026-06-06T15:51:39.078Z",
+    "updatedAt": "2026-06-06T15:51:39.079Z",
+    "createdBy": "sample_loader",
+    "updatedBy": "audio_engineer_xiaoduan",
+    "reviewHistory": [
+      {
+        "id": "9e700a96-e1fe-4367-8437-6bcd61fb83aa",
+        "timestamp": "2026-06-06T15:51:39.078Z",
+        "action": "flag_for_review",
+        "field": "status",
+        "oldValue": "normal",
+        "newValue": "needs_review",
+        "reason": "同一首歌同时存在现场名和版权名，需音乐老师复核",
+        "operator": "system"
+      },
+      {
+        "id": "219289c9-d497-4b8d-aac3-9e64e0d0439d",
+        "timestamp": "2026-06-06T15:51:39.079Z",
+        "action": "detect_conflict",
+        "field": "conflicts",
+        "oldValue": [],
+        "newValue": [
+          {
+            "field": "remarks",
+            "audioValue": "现场录音，现场气氛很好，但是第三乐章速度偏快",
+            "licenseValue": "现场演出授权：北京音乐厅2024年12月25日，版权名：第十四钢琴奏鸣曲「月光」",
+            "description": "音频文件备注与授权期限页备注不一致"
+          }
+        ],
+        "reason": "授权期限页数据与音频备注存在冲突，需录音师小段确认",
+        "operator": "audio_engineer_xiaoduan"
+      }
+    ],
+    "rhythmScore": null,
+    "assignedTo": "audio_engineer_xiaoduan"
+  },
+  {
+    "id": "77622c8a-9550-4172-9de5-d0487724cb7b",
+    "songName": "致爱丽丝",
+    "liveName": null,
+    "copyrightName": null,
+    "remarks": "旧口径：2023年春季学期作业，节奏批改完成",
+    "licenseRemarks": "【补录】旧口径修正：原备注为2024年春季学期作业，原批改记录有误，以授权期限页为准",
+    "status": "conflict",
+    "dataSource": "license_page",
+    "conflicts": [
+      {
+        "field": "remarks",
+        "audioValue": "旧口径：2023年春季学期作业，节奏批改完成",
+        "licenseValue": "【补录】旧口径修正：原备注为2024年春季学期作业，原批改记录有误，以授权期限页为准",
+        "description": "音频文件备注与授权期限页备注不一致"
+      }
+    ],
+    "createdAt": "2026-06-06T15:51:39.078Z",
+    "updatedAt": "2026-06-06T15:51:39.079Z",
+    "createdBy": "sample_loader",
+    "updatedBy": "audio_engineer_xiaoduan",
+    "reviewHistory": [
+      {
+        "id": "aac91747-e857-48f7-bc8b-699bddbe5ddc",
+        "timestamp": "2026-06-06T15:51:39.079Z",
+        "action": "detect_conflict",
+        "field": "conflicts",
+        "oldValue": [],
+        "newValue": [
+          {
+            "field": "remarks",
+            "audioValue": "旧口径：2023年春季学期作业，节奏批改完成",
+            "licenseValue": "【补录】旧口径修正：原备注为2024年春季学期作业，原批改记录有误，以授权期限页为准",
+            "description": "音频文件备注与授权期限页备注不一致"
+          }
+        ],
+        "reason": "授权期限页数据与音频备注存在冲突，需录音师小段确认",
+        "operator": "audio_engineer_xiaoduan"
+      }
+    ],
+    "rhythmScore": null,
+    "assignedTo": "audio_engineer_xiaoduan"
+  }
+]

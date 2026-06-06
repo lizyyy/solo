@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>音乐课作业节奏批改系统</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #333; }
+    
+    .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px 40px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .header h1 { font-size: 24px; margin-bottom: 5px; }
+    .header p { opacity: 0.9; font-size: 14px; }
+    
+    .nav { background: white; padding: 0 40px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .nav button { background: none; border: none; padding: 15px 20px; font-size: 14px; cursor: pointer; color: #666; border-bottom: 3px solid transparent; transition: all 0.2s; }
+    .nav button:hover { color: #667eea; }
+    .nav button.active { color: #667eea; border-bottom-color: #667eea; font-weight: 600; }
+    
+    .container { max-width: 1400px; margin: 30px auto; padding: 0 40px; }
+    
+    .page { display: none; }
+    .page.active { display: block; }
+    
+    .card { background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .card h2 { font-size: 18px; margin-bottom: 16px; color: #333; }
+    .card h3 { font-size: 15px; margin-bottom: 12px; color: #555; }
+    
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .stat-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .stat-card .number { font-size: 32px; font-weight: 700; color: #667eea; }
+    .stat-card .label { font-size: 13px; color: #888; margin-top: 4px; }
+    .stat-card.warning .number { color: #f59e0b; }
+    .stat-card.danger .number { color: #ef4444; }
+    .stat-card.success .number { color: #10b981; }
+    
+    .btn { padding: 10px 20px; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; transition: all 0.2s; }
+    .btn-primary { background: #667eea; color: white; }
+    .btn-primary:hover { background: #5a67d8; }
+    .btn-success { background: #10b981; color: white; }
+    .btn-success:hover { background: #059669; }
+    .btn-danger { background: #ef4444; color: white; }
+    .btn-danger:hover { background: #dc2626; }
+    .btn-secondary { background: #e5e7eb; color: #374151; }
+    .btn-secondary:hover { background: #d1d5db; }
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
+    
+    .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
+    
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #e5e7eb; font-size: 14px; }
+    th { background: #f9fafb; font-weight: 600; color: #555; }
+    tr:hover { background: #f9fafb; }
+    
+    .badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+    .badge-normal { background: #d1fae5; color: #065f46; }
+    .badge-needs_review { background: #fef3c7; color: #92400e; }
+    .badge-conflict { background: #fee2e2; color: #991b1b; }
+    .badge-supplemented { background: #dbeafe; color: #1e40af; }
+    .badge-reviewed { background: #e0e7ff; color: #3730a3; }
+    
+    .conflict-box { background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+    .conflict-box h4 { color: #991b1b; margin-bottom: 12px; }
+    .conflict-evidence { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 12px; }
+    .evidence-side { background: white; padding: 12px; border-radius: 6px; }
+    .evidence-side.audio { border-left: 4px solid #667eea; }
+    .evidence-side.license { border-left: 4px solid #f59e0b; }
+    .evidence-label { font-size: 12px; color: #888; margin-bottom: 6px; }
+    .evidence-value { font-size: 14px; line-height: 1.6; }
+    
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: #555; }
+    .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; font-family: inherit; }
+    .form-group textarea { min-height: 100px; resize: vertical; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    
+    .timeline { position: relative; padding-left: 24px; }
+    .timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: #e5e7eb; }
+    .timeline-item { position: relative; padding-bottom: 20px; }
+    .timeline-item::before { content: ''; position: absolute; left: -20px; top: 4px; width: 12px; height: 12px; border-radius: 50%; background: #667eea; border: 3px solid white; box-shadow: 0 0 0 2px #667eea; }
+    .timeline-time { font-size: 12px; color: #888; margin-bottom: 4px; }
+    .timeline-content { font-size: 14px; }
+    .timeline-content .operator { color: #667eea; font-weight: 500; }
+    .timeline-content .reason { color: #666; margin-top: 4px; font-style: italic; }
+    
+    .highlight { padding: 12px 16px; border-radius: 8px; margin-bottom: 12px; font-size: 14px; }
+    .highlight-warning { background: #fef3c7; color: #92400e; }
+    .highlight-info { background: #dbeafe; color: #1e40af; }
+    .highlight-success { background: #d1fae5; color: #065f46; }
+    
+    .scenario-card { border: 2px solid #e5e7eb; border-radius: 12px; padding: 20px; margin-bottom: 16px; cursor: pointer; transition: all 0.2s; }
+    .scenario-card:hover { border-color: #667eea; background: #f5f3ff; }
+    .scenario-card h3 { color: #333; margin-bottom: 8px; }
+    .scenario-card p { color: #666; font-size: 14px; margin-bottom: 8px; }
+    .scenario-card .expected { font-size: 13px; color: #10b981; font-style: italic; }
+    
+    .alert { padding: 16px; border-radius: 8px; margin-bottom: 16px; }
+    .alert-info { background: #dbeafe; color: #1e40af; }
+    
+    .empty-state { text-align: center; padding: 60px 20px; color: #888; }
+    .empty-state p { margin-bottom: 16px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🎵 音乐课作业节奏批改系统</h1>
+    <p>备注保留 · 冲突复核 · 历史追踪 · 店长周报</p>
+  </div>
+  
+  <div class="nav">
+    <button class="active" onclick="showPage('dashboard')">仪表盘</button>
+    <button onclick="showPage('import')">数据导入</button>
+    <button onclick="showPage('review')">复核处理</button>
+    <button onclick="showPage('report')">店长周报</button>
+    <button onclick="showPage('history')">历史记录</button>
+    <button onclick="showPage('demo')">样例演示</button>
+  </div>
+  
+  <div class="container">
+    <div id="page-dashboard" class="page active">
+      <h2 style="margin-bottom: 20px;">系统概览</h2>
+      <div id="stats-container" class="stats-grid"></div>
+      
+      <div class="card">
+        <h2>待处理事项</h2>
+        <div id="pending-list"></div>
+      </div>
+      
+      <div class="card">
+        <h2>最近变更记录</h2>
+        <div id="recent-changes"></div>
+      </div>
+    </div>
+    
+    <div id="page-import" class="page">
+      <div class="card">
+        <h2>音频文件备注导入</h2>
+        <div class="form-group">
+          <label>导入人</label>
+          <input type="text" id="import-operator" placeholder="例如：录音师小段" value="system">
+        </div>
+        <div class="form-group">
+          <label>导入数据（JSON格式，数组）</label>
+          <textarea id="import-data" placeholder='[{"songName": "小星星", "remarks": "节奏良好", "liveName": "", "copyrightName": ""}]'></textarea>
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-primary" onclick="importAudioData()">导入音频备注</button>
+          <button class="btn btn-secondary" onclick="fillSampleImport()">填入样例数据</button>
+        </div>
+      </div>
+      
+      <div class="card">
+        <h2>授权期限页数据补充</h2>
+        <div class="form-group">
+          <label>操作人</label>
+          <input type="text" id="license-operator" placeholder="例如：录音师小段" value="audio_engineer_xiaoduan">
+        </div>
+        <div class="form-group">
+          <label>选择记录</label>
+          <select id="license-record-select"></select>
+        </div>
+        <div class="form-group">
+          <label>授权期限页备注</label>
+          <textarea id="license-remarks" placeholder="从授权期限页复制的备注内容"></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="applyLicenseData()">补充授权数据</button>
+      </div>
+      
+      <div class="card">
+        <h2>导入结果</h2>
+        <div id="import-result"></div>
+      </div>
+    </div>
+    
+    <div id="page-review" class="page">
+      <div class="card">
+        <h2>待我处理</h2>
+        <div class="form-group">
+          <label>当前用户</label>
+          <select id="current-user" onchange="loadPendingReviews()">
+            <option value="audio_engineer_xiaoduan">录音师小段</option>
+            <option value="music_teacher">音乐老师</option>
+            <option value="admin">管理员</option>
+          </select>
+        </div>
+        <div id="pending-reviews"></div>
+      </div>
+      
+      <div id="conflict-detail-card" class="card" style="display: none;">
+        <h2>冲突详情</h2>
+        <div id="conflict-detail"></div>
+      </div>
+    </div>
+    
+    <div id="page-report" class="page">
+      <div class="card">
+        <h2>店长周报</h2>
+        <div class="btn-group" style="margin-bottom: 20px;">
+          <button class="btn btn-primary" onclick="generateCurrentWeekReport()">生成本周周报</button>
+          <button class="btn btn-secondary" onclick="loadStoreManagerReport()">查看最新店长版</button>
+        </div>
+        <div id="report-container"></div>
+      </div>
+      
+      <div class="card">
+        <h2>历史周报</h2>
+        <div id="reports-list"></div>
+      </div>
+    </div>
+    
+    <div id="page-history" class="page">
+      <div class="card">
+        <h2>所有记录</h2>
+        <div class="btn-group" style="margin-bottom: 16px;">
+          <button class="btn btn-secondary btn-sm" onclick="filterRecords('all')">全部</button>
+          <button class="btn btn-secondary btn-sm" onclick="filterRecords('normal')">正常</button>
+          <button class="btn btn-secondary btn-sm" onclick="filterRecords('needs_review')">待复核</button>
+          <button class="btn btn-secondary btn-sm" onclick="filterRecords('conflict')">冲突</button>
+          <button class="btn btn-secondary btn-sm" onclick="filterRecords('reviewed')">已完成</button>
+        </div>
+        <div id="history-table"></div>
+      </div>
+      
+      <div id="record-detail-card" class="card" style="display: none;">
+        <h2>记录详情与复核历史</h2>
+        <div id="record-detail"></div>
+      </div>
+    </div>
+    
+    <div id="page-demo" class="page">
+      <div class="card">
+        <h2>样例场景演示</h2>
+        <p style="margin-bottom: 20px; color: #666;">系统内置三种典型场景，点击「加载样例数据」体验完整流程</p>
+        <button class="btn btn-primary" onclick="loadSampleData()" style="margin-bottom: 24px;">加载样例数据并运行演示</button>
+        
+        <h3 style="margin-bottom: 16px;">三种处理场景</h3>
+        <div id="scenarios-list"></div>
+      </div>
+      
+      <div class="card">
+        <h2>演示结果</h2>
+        <div id="demo-result"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentFilter = 'all';
+    let selectedRecordId = null;
+    
+    function showPage(pageName) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+      document.getElementById('page-' + pageName).classList.add('active');
+      event.target.classList.add('active');
+      
+      if (pageName === 'dashboard') loadDashboard();
+      if (pageName === 'import') loadRecordsForSelect();
+      if (pageName === 'review') loadPendingReviews();
+      if (pageName === 'report') loadReportsList();
+      if (pageName === 'history') loadHistory();
+      if (pageName === 'demo') loadScenarios();
+    }
+    
+    async function api(url, options = {}) {
+      const res = await fetch('/api' + url, {
+        headers: { 'Content-Type': 'application/json' },
+        ...options
+      });
+      return res.json();
+    }
+    
+    async function loadDashboard() {
+      const stats = await api('/reports/statistics');
+      const statsHtml = `
+        <div class="stat-card"><div class="number">${stats.totalRecords}</div><div class="label">总记录数</div></div>
+        <div class="stat-card success"><div class="number">${stats.byStatus.normal}</div><div class="label">正常记录</div></div>
+        <div class="stat-card warning"><div class="number">${stats.byStatus.needs_review}</div><div class="label">待音乐老师复核</div></div>
+        <div class="stat-card danger"><div class="number">${stats.byStatus.conflict}</div><div class="label">待处理冲突</div></div>
+        <div class="stat-card"><div class="number">${stats.byStatus.supplemented}</div><div class="label">已补充授权数据</div></div>
+        <div class="stat-card success"><div class="number">${stats.resolvedConflicts}/${stats.totalConflicts}</div><div class="label">已解决冲突</div></div>
+      `;
+      document.getElementById('stats-container').innerHTML = statsHtml;
+      
+      const changes = await api('/review/changes');
+      if (changes.length === 0) {
+        document.getElementById('recent-changes').innerHTML = '<div class="empty-state"><p>暂无变更记录</p></div>';
+      } else {
+        const changesHtml = changes.slice(0, 5).map(c => `
+          <div style="padding: 12px 0; border-bottom: 1px solid #eee;">
+            <div style="display: flex; justify-content: space-between;">
+              <strong>${c.songName}</strong>
+              <span class="badge badge-${c.status}">${c.status}</span>
+            </div>
+            <div style="font-size: 13px; color: #888; margin-top: 4px;">
+              ${c.lastChange.operator} - ${c.lastChange.reason}
+            </div>
+            <div style="font-size: 12px; color: #aaa; margin-top: 4px;">
+              ${new Date(c.updatedAt).toLocaleString('zh-CN')}
+            </div>
+          </div>
+        `).join('');
+        document.getElementById('recent-changes').innerHTML = changesHtml;
+      }
+      
+      const pendingHtml = `
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="highlight highlight-warning">
+            <strong>待录音师小段处理：</strong>${stats.byStatus.conflict} 条冲突记录
+          </div>
+          <div class="highlight highlight-info">
+            <strong>待音乐老师复核：</strong>${stats.byStatus.needs_review} 条双名记录
+          </div>
+        </div>
+      `;
+      document.getElementById('pending-list').innerHTML = pendingHtml;
+    }
+    
+    async function loadRecordsForSelect() {
+      const records = await api('/import/records');
+      const select = document.getElementById('license-record-select');
+      select.innerHTML = records.map(r => `<option value="${r.id}">${r.songName} (${r.status})</option>`).join('');
+    }
+    
+    function fillSampleImport() {
+      document.getElementById('import-data').value = JSON.stringify([
+        { songName: '小星星变奏曲', remarks: '学生作业完成度良好，节奏稳定。注意第16小节的附点节奏需要加强练习' },
+        { songName: '月光奏鸣曲', liveName: '月光奏鸣曲（现场演奏版）', copyrightName: '第十四钢琴奏鸣曲「月光」', remarks: '现场录音，现场气氛很好' },
+        { songName: '致爱丽丝', remarks: '旧口径：2023年春季学期作业，节奏批改完成' }
+      ], null, 2);
+    }
+    
+    async function importAudioData() {
+      const operator = document.getElementById('import-operator').value;
+      const dataStr = document.getElementById('import-data').value;
+      
+      try {
+        const records = JSON.parse(dataStr);
+        const result = await api('/import/audio', {
+          method: 'POST',
+          body: JSON.stringify({ records, importedBy: operator })
+        });
+        
+        let html = `<p><strong>成功导入：</strong>${result.success.length} 条</p>`;
+        if (result.warnings.length > 0) {
+          html += '<h4 style="margin: 12px 0 8px;">⚠️ 提醒：</h4><ul>';
+          result.warnings.forEach(w => {
+            html += `<li>${w.songName}: ${w.message}</li>`;
+          });
+          html += '</ul>';
+        }
+        if (result.failed.length > 0) {
+          html += '<h4 style="margin: 12px 0 8px; color: #dc2626;">❌ 失败：</h4><ul>';
+          result.failed.forEach(f => {
+            html += `<li>${f.data.songName || '未知'}: ${f.error}</li>`;
+          });
+          html += '</ul>';
+        }
+        
+        document.getElementById('import-result').innerHTML = html;
+        loadRecordsForSelect();
+      } catch (e) {
+        document.getElementById('import-result').innerHTML = `<p style="color: #dc2626;">数据格式错误：${e.message}</p>`;
+      }
+    }
+    
+    async function applyLicenseData() {
+      const recordId = document.getElementById('license-record-select').value;
+      const remarks = document.getElementById('license-remarks').value;
+      const operator = document.getElementById('license-operator').value;
+      
+      const result = await api('/import/license', {
+        method: 'POST',
+        body: JSON.stringify({ recordId, remarks, operator })
+      });
+      
+      if (result.hasConflict) {
+        document.getElementById('import-result').innerHTML = `
+          <div class="alert alert-info">
+            <strong>⚠️ 检测到冲突！</strong> 该记录音频备注与授权期限页数据不一致，已提交给录音师小段处理。
+          </div>
+        `;
+      } else {
+        document.getElementById('import-result').innerHTML = `
+          <p style="color: #059669;"><strong>✅ 成功补充授权数据</strong></p>
+        `;
+      }
+    }
+    
+    async function loadPendingReviews() {
+      const user = document.getElementById('current-user').value;
+      const records = await api(`/review/pending/${user}`);
+      
+      if (records.length === 0) {
+        document.getElementById('pending-reviews').innerHTML = '<div class="empty-state"><p>暂无待处理事项</p></div>';
+        document.getElementById('conflict-detail-card').style.display = 'none';
+        return;
+      }
+      
+      let html = '<table><thead><tr><th>歌曲名</th><th>状态</th><th>操作</th></tr></thead><tbody>';
+      records.forEach(r => {
+        html += `
+          <tr>
+            <td>${r.songName}</td>
+            <td><span class="badge badge-${r.status}">${r.status}</span></td>
+            <td><button class="btn btn-primary btn-sm" onclick="showConflictDetail('${r.id}')">查看详情并处理</button></td>
+          </tr>
+        `;
+      });
+      html += '</tbody></table>';
+      document.getElementById('pending-reviews').innerHTML = html;
+    }
+    
+    async function showConflictDetail(recordId) {
+      selectedRecordId = recordId;
+      const evidence = await api(`/review/evidence/${recordId}`);
+      const card = document.getElementById('conflict-detail-card');
+      card.style.display = 'block';
+      
+      let html = `
+        <p><strong>歌曲：</strong>${evidence.record.songName}</p>
+        ${evidence.record.liveName ? `<p><strong>现场名：</strong>${evidence.record.liveName}</p>` : ''}
+        ${evidence.record.copyrightName ? `<p><strong>版权名：</strong>${evidence.record.copyrightName}</p>` : ''}
+      `;
+      
+      if (evidence.conflicts.length > 0) {
+        evidence.conflicts.forEach((c, i) => {
+          html += `
+            <div class="conflict-box">
+              <h4>冲突 ${i + 1}：${c.description}</h4>
+              <div class="conflict-evidence">
+                <div class="evidence-side audio">
+                  <div class="evidence-label">🎵 音频文件备注</div>
+                  <div class="evidence-value">${c.audioValue}</div>
+                </div>
+                <div class="evidence-side license">
+                  <div class="evidence-label">📋 授权期限页</div>
+                  <div class="evidence-value">${c.licenseValue}</div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>处理理由</label>
+                <textarea id="resolve-reason-${i}" placeholder="请输入确认或驳回的理由..."></textarea>
+              </div>
+              <div class="btn-group">
+                <button class="btn btn-success btn-sm" onclick="resolveConflict(${i}, 'confirm')">✅ 确认采用授权页数据</button>
+                <button class="btn btn-danger btn-sm" onclick="resolveConflict(${i}, 'reject')">❌ 驳回，保留音频备注</button>
+              </div>
+            </div>
+          `;
+        });
+      }
+      
+      if (evidence.record.status === 'needs_review') {
+        html += `
+          <div class="card" style="background: #fef3c7; border: 1px solid #fcd34d;">
+            <h4 style="color: #92400e; margin-bottom: 12px;">🎵 歌曲名复核（留给音乐老师）</h4>
+            <p>同一首歌同时存在现场名和版权名，请选择最终使用的名称：</p>
+            <div class="form-group">
+              <label>处理理由</label>
+              <textarea id="review-reason" placeholder="请输入选择理由..."></textarea>
+            </div>
+            <div class="btn-group">
+              <button class="btn btn-primary btn-sm" onclick="reviewSongName('use_live')">采用现场名</button>
+              <button class="btn btn-primary btn-sm" onclick="reviewSongName('use_copyright')">采用版权名</button>
+              <button class="btn btn-secondary btn-sm" onclick="reviewSongName('keep_both')">保留双名</button>
+            </div>
+          </div>
+        `;
+      }
+      
+      if (evidence.reviewHistory.length > 0) {
+        html += '<h4 style="margin-top: 24px;">复核历史</h4><div class="timeline">';
+        evidence.reviewHistory.forEach(h => {
+          html += `
+            <div class="timeline-item">
+              <div class="timeline-time">${new Date(h.timestamp).toLocaleString('zh-CN')}</div>
+              <div class="timeline-content">
+                <span class="operator">${h.operator}</span> ${h.reason}
+              </div>
+            </div>
+          `;
+        });
+        html += '</div>';
+      }
+      
+      document.getElementById('conflict-detail').innerHTML = html;
+    }
+    
+    async function resolveConflict(conflictIndex, resolution) {
+      const operator = document.getElementById('current-user').value;
+      const reason = document.getElementById(`resolve-reason-${conflictIndex}`).value;
+      
+      if (!reason) {
+        alert('请输入处理理由');
+        return;
+      }
+      
+      await api('/review/conflict/resolve', {
+        method: 'POST',
+        body: JSON.stringify({ recordId: selectedRecordId, conflictIndex, resolution, operator, reason })
+      });
+      
+      alert('处理成功！');
+      loadPendingReviews();
+      showConflictDetail(selectedRecordId);
+    }
+    
+    async function reviewSongName(decision) {
+      const operator = document.getElementById('current-user').value;
+      const reason = document.getElementById('review-reason').value;
+      
+      if (!reason) {
+        alert('请输入处理理由');
+        return;
+      }
+      
+      await api('/review/song-name/review', {
+        method: 'POST',
+        body: JSON.stringify({ recordId: selectedRecordId, decision, operator, reason })
+      });
+      
+      alert('处理成功！');
+      loadPendingReviews();
+      document.getElementById('conflict-detail-card').style.display = 'none';
+    }
+    
+    async function generateCurrentWeekReport() {
+      const report = await api('/reports/weekly/current', { method: 'POST' });
+      renderReport(report);
+    }
+    
+    async function loadStoreManagerReport() {
+      const report = await api('/reports/weekly/store-manager');
+      if (report.error) {
+        document.getElementById('report-container').innerHTML = `<div class="empty-state"><p>${report.error}</p></div>`;
+        return;
+      }
+      
+      let html = `
+        <h3>${report.weekRange}</h3>
+        <p style="color: #888; margin-bottom: 16px;">生成时间：${new Date(report.generatedAt).toLocaleString('zh-CN')}</p>
+        
+        <div class="stats-grid" style="margin-bottom: 20px;">
+          <div class="stat-card"><div class="number">${report.summary.total}</div><div class="label">总记录</div></div>
+          <div class="stat-card success"><div class="number">${report.summary.normal}</div><div class="label">正常</div></div>
+          <div class="stat-card warning"><div class="number">${report.summary.pendingReview}</div><div class="label">待复核</div></div>
+          <div class="stat-card danger"><div class="number">${report.summary.conflicts}</div><div class="label">冲突</div></div>
+          <div class="stat-card"><div class="number">${report.summary.supplemented}</div><div class="label">已补充</div></div>
+        </div>
+      `;
+      
+      if (report.highlights.length > 0) {
+        html += '<h4>重点提醒</h4>';
+        report.highlights.forEach(h => {
+          html += `<div class="highlight highlight-${h.type}">${h.message}</div>`;
+        });
+      }
+      
+      if (report.attentionItems.length > 0) {
+        html += '<h4 style="margin-top: 20px;">需要关注的记录</h4><table><thead><tr><th>歌曲名</th><th>状态</th><th>是否有冲突</th><th>更新时间</th></tr></thead><tbody>';
+        report.attentionItems.forEach(item => {
+          html += `
+            <tr>
+              <td>${item.songName}</td>
+              <td><span class="badge badge-${item.status}">${item.status}</span></td>
+              <td>${item.hasConflicts ? '⚠️ 是' : '否'}</td>
+              <td>${new Date(item.lastUpdated).toLocaleString('zh-CN')}</td>
+            </tr>
+          `;
+        });
+        html += '</tbody></table>';
+      }
+      
+      document.getElementById('report-container').innerHTML = html;
+    }
+    
+    function renderReport(report) {
+      let html = `
+        <h3>${report.weekStart} 至 ${report.weekEnd}</h3>
+        <p style="color: #888; margin-bottom: 16px;">生成时间：${new Date(report.generatedAt).toLocaleString('zh-CN')}，生成人：${report.generatedBy}</p>
+        
+        <div class="stats-grid" style="margin-bottom: 20px;">
+          <div class="stat-card"><div class="number">${report.summary.totalRecords}</div><div class="label">总记录</div></div>
+          <div class="stat-card success"><div class="number">${report.summary.normalRecords}</div><div class="label">正常</div></div>
+          <div class="stat-card warning"><div class="number">${report.summary.needReviewRecords}</div><div class="label">待复核</div></div>
+          <div class="stat-card danger"><div class="number">${report.summary.conflictRecords}</div><div class="label">冲突</div></div>
+          <div class="stat-card"><div class="number">${report.summary.supplementedRecords}</div><div class="label">已补充</div></div>
+          <div class="stat-card success"><div class="number">${report.summary.reviewedRecords}</div><div class="label">已完成</div></div>
+        </div>
+      `;
+      
+      if (report.highlights.length > 0) {
+        html += '<h4>重点提醒</h4>';
+        report.highlights.forEach(h => {
+          html += `<div class="highlight highlight-${h.type}">${h.message}</div>`;
+        });
+      }
+      
+      document.getElementById('report-container').innerHTML = html;
+    }
+    
+    async function loadReportsList() {
+      const reports = await api('/reports/weekly');
+      if (reports.length === 0) {
+        document.getElementById('reports-list').innerHTML = '<div class="empty-state"><p>暂无历史周报</p></div>';
+        return;
+      }
+      
+      let html = '<table><thead><tr><th>周期</th><th>生成时间</th><th>生成人</th><th>记录数</th><th>操作</th></tr></thead><tbody>';
+      reports.forEach(r => {
+        html += `
+          <tr>
+            <td>${r.weekStart} ~ ${r.weekEnd}</td>
+            <td>${new Date(r.generatedAt).toLocaleString('zh-CN')}</td>
+            <td>${r.generatedBy}</td>
+            <td>${r.summary.totalRecords}</td>
+            <td><button class="btn btn-secondary btn-sm" onclick='renderReport(${JSON.stringify(r)})'>查看</button></td>
+          </tr>
+        `;
+      });
+      html += '</tbody></table>';
+      document.getElementById('reports-list').innerHTML = html;
+    }
+    
+    async function loadHistory() {
+      const records = await api('/reports/historical');
+      let filtered = records;
+      if (currentFilter !== 'all') {
+        filtered = records.filter(r => r.status === currentFilter);
+      }
+      
+      if (filtered.length === 0) {
+        document.getElementById('history-table').innerHTML = '<div class="empty-state"><p>暂无记录</p></div>';
+        return;
+      }
+      
+      let html = '<table><thead><tr><th>歌曲名</th><th>状态</th><th>备注</th><th>授权备注</th><th>复核次数</th><th>数据来源</th><th>操作</th></tr></thead><tbody>';
+      filtered.forEach(r => {
+        html += `
+          <tr>
+            <td>${r.songName}</td>
+            <td><span class="badge badge-${r.status}">${r.status}</span></td>
+            <td style="max-width: 200px; font-size: 12px;">${r.remarks.substring(0, 50)}${r.remarks.length > 50 ? '...' : ''}</td>
+            <td style="max-width: 200px; font-size: 12px;">${r.licenseRemarks ? r.licenseRemarks.substring(0, 50) + (r.licenseRemarks.length > 50 ? '...' : '') : '-'}</td>
+            <td>${r.reviewCount}</td>
+            <td>${r.dataSource}</td>
+            <td><button class="btn btn-secondary btn-sm" onclick="showRecordDetail('${r.id}')">查看详情</button></td>
+          </tr>
+        `;
+      });
+      html += '</tbody></table>';
+      document.getElementById('history-table').innerHTML = html;
+    }
+    
+    function filterRecords(status) {
+      currentFilter = status;
+      loadHistory();
+    }
+    
+    async function showRecordDetail(recordId) {
+      const record = await api(`/import/records/${recordId}`);
+      const history = await api(`/review/history/${recordId}`);
+      
+      const card = document.getElementById('record-detail-card');
+      card.style.display = 'block';
+      
+      let html = `
+        <h3>${record.songName}</h3>
+        <p><strong>状态：</strong><span class="badge badge-${record.status}">${record.status}</span></p>
+        ${record.liveName ? `<p><strong>现场名：</strong>${record.liveName}</p>` : ''}
+        ${record.copyrightName ? `<p><strong>版权名：</strong>${record.copyrightName}</p>` : ''}
+        <p><strong>音频备注：</strong></p>
+        <p style="background: #f9fafb; padding: 12px; border-radius: 8px; margin: 8px 0 16px;">${record.remarks || '(无)'}</p>
+        <p><strong>授权期限页备注：</strong></p>
+        <p style="background: #f9fafb; padding: 12px; border-radius: 8px; margin: 8px 0 16px;">${record.licenseRemarks || '(无)'}</p>
+        <p><strong>数据来源：</strong>${record.dataSource}</p>
+        <p><strong>创建时间：</strong>${new Date(record.createdAt).toLocaleString('zh-CN')}</p>
+        <p><strong>更新时间：</strong>${new Date(record.updatedAt).toLocaleString('zh-CN')}</p>
+      `;
+      
+      if (record.conflicts && record.conflicts.length > 0) {
+        html += '<h4 style="margin-top: 20px;">冲突记录</h4>';
+        record.conflicts.forEach((c, i) => {
+          html += `
+            <div style="padding: 12px; background: ${c.resolved ? '#f0fdf4' : '#fef2f2'}; border-radius: 8px; margin-bottom: 8px;">
+              <p><strong>冲突 ${i + 1}：</strong>${c.description}</p>
+              <p style="font-size: 13px;">音频：${c.audioValue}</p>
+              <p style="font-size: 13px;">授权：${c.licenseValue}</p>
+              ${c.resolved ? `<p style="font-size: 13px; color: #059669; margin-top: 8px;">已处理：${c.resolution === 'confirm' ? '确认采用授权页' : '驳回，保留音频'} - ${c.reason}</p>` : '<p style="font-size: 13px; color: #dc2626; margin-top: 8px;">待处理</p>'}
+            </div>
+          `;
+        });
+      }
+      
+      if (history.history && history.history.length > 0) {
+        html += '<h4 style="margin-top: 20px;">复核历史</h4><div class="timeline">';
+        history.history.forEach(h => {
+          html += `
+            <div class="timeline-item">
+              <div class="timeline-time">${new Date(h.timestamp).toLocaleString('zh-CN')}</div>
+              <div class="timeline-content">
+                <span class="operator">${h.operator}</span>
+                <div>操作：${h.action}，字段：${h.field}</div>
+                <div>变更：${h.oldValue} → ${h.newValue}</div>
+                <div class="reason">${h.reason}</div>
+              </div>
+            </div>
+          `;
+        });
+        html += '</div>';
+      }
+      
+      document.getElementById('record-detail').innerHTML = html;
+    }
+    
+    async function loadScenarios() {
+      const scenarios = await api('/sample/scenarios');
+      let html = '';
+      scenarios.forEach(s => {
+        html += `
+          <div class="scenario-card">
+            <h3>${s.id === 'normal' ? '✅' : s.id === 'dual_name' ? '⚠️' : '❌'} ${s.name}</h3>
+            <p>${s.description}</p>
+            <p><strong>涉及歌曲：</strong>${s.songName}</p>
+            <p class="expected">预期结果：${s.expectedResult}</p>
+          </div>
+        `;
+      });
+      document.getElementById('scenarios-list').innerHTML = html;
+    }
+    
+    async function loadSampleData() {
+      const result = await api('/sample/demo', { method: 'POST' });
+      
+      let html = '<h3>三种处理结果对比</h3>';
+      result.records.forEach(r => {
+        const statusMap = {
+          'normal': '正常',
+          'needs_review': '待音乐老师复核',
+          'conflict': '存在冲突待录音师小段处理',
+          'supplemented': '已补充授权数据',
+          'reviewed': '已完成复核'
+        };
+        html += `
+          <div style="padding: 16px; background: #f9fafb; border-radius: 8px; margin-bottom: 12px;">
+            <h4>${r.songName}</h4>
+            <p><strong>最终状态：</strong><span class="badge badge-${r.status}">${statusMap[r.status]}</span></p>
+            <p><strong>音频备注：</strong>${r.remarks}</p>
+            <p><strong>授权备注：</strong>${r.licenseRemarks || '(无)'}</p>
+            <p><strong>复核次数：</strong>${r.reviewHistory.length} 次</p>
+            ${r.conflicts && r.conflicts.length > 0 ? `<p><strong>冲突数量：</strong>${r.conflicts.length} 条</p>` : ''}
+          </div>
+        `;
+      });
+      
+      html += '<h3 style="margin-top: 24px;">店长周报摘要</h3>';
+      html += `
+        <div class="stats-grid">
+          <div class="stat-card"><div class="number">${result.report.summary.totalRecords}</div><div class="label">总记录</div></div>
+          <div class="stat-card success"><div class="number">${result.report.summary.normalRecords}</div><div class="label">正常</div></div>
+          <div class="stat-card warning"><div class="number">${result.report.summary.needReviewRecords}</div><div class="label">待复核</div></div>
+          <div class="stat-card danger"><div class="number">${result.report.summary.conflictRecords}</div><div class="label">冲突</div></div>
+          <div class="stat-card"><div class="number">${result.report.summary.supplementedRecords}</div><div class="label">已补充</div></div>
+        </div>
+      `;
+      
+      result.report.highlights.forEach(h => {
+        html += `<div class="highlight highlight-${h.type}">${h.message}</div>`;
+      });
+      
+      document.getElementById('demo-result').innerHTML = html;
+    }
+    
+    loadDashboard();
+  </script>
+</body>
+</html>
