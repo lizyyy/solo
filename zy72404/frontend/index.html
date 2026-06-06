@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>合唱分声部练习跟踪系统</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <h1>🎵 合唱分声部练习跟踪系统</h1>
+      <div class="user-info">
+        <span id="currentUser">许老师</span>
+      </div>
+    </header>
+
+    <nav class="sidebar">
+      <button class="nav-btn active" data-view="dashboard">📊 概览</button>
+      <button class="nav-btn" data-view="songs">🎼 曲目别名表</button>
+      <button class="nav-btn" data-view="attendance">📸 课时签到</button>
+      <button class="nav-btn" data-view="practices">📝 练习记录</button>
+      <button class="nav-btn" data-view="settlement">💰 分账明细</button>
+      <button class="nav-btn" data-view="logs">📋 操作日志</button>
+    </nav>
+
+    <main class="content">
+      <div id="view-dashboard" class="view active">
+        <div class="page-header">
+          <h2>数据概览</h2>
+          <div class="view-toggle">
+            <button class="toggle-btn active" data-chart="bar">柱状图</button>
+            <button class="toggle-btn" data-chart="pie">饼图</button>
+            <button class="toggle-btn" data-chart="3d">3D视图</button>
+          </div>
+        </div>
+
+        <div class="stats-cards">
+          <div class="stat-card">
+            <div class="stat-value" id="statTotal">0</div>
+            <div class="stat-label">总记录数</div>
+          </div>
+          <div class="stat-card verified">
+            <div class="stat-value" id="statVerified">0</div>
+            <div class="stat-label">已复核</div>
+          </div>
+          <div class="stat-card pending">
+            <div class="stat-value" id="statPending">0</div>
+            <div class="stat-label">待复核</div>
+          </div>
+          <div class="stat-card substitute">
+            <div class="stat-value" id="statSubstitute">0</div>
+            <div class="stat-label">含临时替补</div>
+          </div>
+        </div>
+
+        <div class="chart-container">
+          <canvas id="mainChart"></canvas>
+          <div id="chart3d" class="chart-3d" style="display:none;">
+            <div class="bar-3d-wrap" id="bar3dWrap"></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>待复核的临时替补记录</h3>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>日期</th>
+                  <th>曲目</th>
+                  <th>声部</th>
+                  <th>学生</th>
+                  <th>替补信息</th>
+                  <th>来源</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="pendingTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="view-songs" class="view">
+        <div class="page-header">
+          <h2>曲目别名表</h2>
+          <button class="btn primary" onclick="showSongImport()">📥 导入曲目</button>
+        </div>
+
+        <div class="filters">
+          <input type="text" id="songKeyword" placeholder="搜索曲目编号/名称/别名" oninput="loadSongs()">
+          <select id="songPartFilter" onchange="loadSongs()">
+            <option value="">全部声部</option>
+            <option value="高声部">高声部</option>
+            <option value="中声部">中声部</option>
+            <option value="低声部">低声部</option>
+          </select>
+        </div>
+
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>曲目编号</th>
+                <th>曲目名称</th>
+                <th>别名</th>
+                <th>声部</th>
+                <th>备注</th>
+                <th>版本</th>
+                <th>更新时间</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="songsTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="view-attendance" class="view">
+        <div class="page-header">
+          <h2>课时签到照片</h2>
+          <button class="btn primary" onclick="showPhotoUpload()">📤 上传照片</button>
+        </div>
+
+        <div class="filters">
+          <input type="date" id="photoDateFilter" onchange="loadPhotos()">
+        </div>
+
+        <div class="photo-grid" id="photoGrid"></div>
+      </div>
+
+      <div id="view-practices" class="view">
+        <div class="page-header">
+          <h2>练习记录</h2>
+          <button class="btn primary" onclick="showPracticeAdd()">➕ 新增记录</button>
+        </div>
+
+        <div class="filters">
+          <input type="date" id="practiceDateFilter" onchange="loadPractices()">
+          <select id="practiceVerifyFilter" onchange="loadPractices()">
+            <option value="">全部状态</option>
+            <option value="1">已复核</option>
+            <option value="0">待复核</option>
+          </select>
+          <select id="practiceSubFilter" onchange="loadPractices()">
+            <option value="">全部替补</option>
+            <option value="1">含替补</option>
+            <option value="0">无替补</option>
+          </select>
+        </div>
+
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>日期</th>
+                <th>曲目</th>
+                <th>声部</th>
+                <th>学生</th>
+                <th>签到状态</th>
+                <th>替补</th>
+                <th>复核状态</th>
+                <th>签到照片</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="practicesTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="view-settlement" class="view">
+        <div class="page-header">
+          <h2>分账明细</h2>
+          <button class="btn primary" onclick="generateSettlement()">🔄 生成分账</button>
+        </div>
+
+        <div class="filters">
+          <input type="date" id="settlementDateFilter" onchange="loadSettlement()">
+        </div>
+
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>日期</th>
+                <th>学生</th>
+                <th>曲目</th>
+                <th>声部</th>
+                <th>课时</th>
+                <th>单价</th>
+                <th>金额</th>
+                <th>状态</th>
+              </tr>
+            </thead>
+            <tbody id="settlementTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="view-logs" class="view">
+        <div class="page-header">
+          <h2>操作日志</h2>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>时间</th>
+                <th>操作</th>
+                <th>操作人</th>
+                <th>表名</th>
+                <th>记录ID</th>
+              </tr>
+            </thead>
+            <tbody id="logsTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+    <div class="modal" id="modal">
+      <div class="modal-header">
+        <h3 id="modalTitle">标题</h3>
+        <button class="modal-close" onclick="hideModal()">×</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-footer" id="modalFooter"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

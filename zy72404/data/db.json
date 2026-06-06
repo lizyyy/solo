@@ -1,0 +1,318 @@
+{
+  "tables": {
+    "song_aliases": [
+      {
+        "id": 1,
+        "song_code": "S001",
+        "song_name": "黄河大合唱",
+        "alias": "黄河",
+        "part_type": "高声部",
+        "remark": "经典曲目-改了备注",
+        "version": 2,
+        "is_deleted": 0,
+        "created_at": "2026-06-06 23:46:28",
+        "updated_at": "2026-06-06 23:47:42"
+      },
+      {
+        "id": 2,
+        "song_code": "S002",
+        "song_name": "茉莉花",
+        "alias": "",
+        "part_type": "中声部",
+        "remark": "必学曲目",
+        "version": 1,
+        "is_deleted": 0,
+        "created_at": "2026-06-06 23:46:28",
+        "updated_at": "2026-06-06 23:46:28"
+      },
+      {
+        "id": 3,
+        "song_code": "S003",
+        "song_name": "歌唱祖国",
+        "alias": "",
+        "part_type": "低声部",
+        "remark": "",
+        "version": 1,
+        "is_deleted": 0,
+        "created_at": "2026-06-06 23:46:28",
+        "updated_at": "2026-06-06 23:46:28"
+      }
+    ],
+    "song_alias_history": [
+      {
+        "id": 1,
+        "song_alias_id": 1,
+        "song_code": "S001",
+        "song_name": "黄河大合唱",
+        "alias": "黄河",
+        "part_type": "高声部",
+        "remark": "经典曲目",
+        "version": 1,
+        "change_type": "新增",
+        "changed_by": "许老师",
+        "changed_at": "2026-06-06 23:46:28"
+      },
+      {
+        "id": 2,
+        "song_alias_id": 2,
+        "song_code": "S002",
+        "song_name": "茉莉花",
+        "alias": "",
+        "part_type": "中声部",
+        "remark": "必学曲目",
+        "version": 1,
+        "change_type": "新增",
+        "changed_by": "许老师",
+        "changed_at": "2026-06-06 23:46:28"
+      },
+      {
+        "id": 3,
+        "song_alias_id": 3,
+        "song_code": "S003",
+        "song_name": "歌唱祖国",
+        "alias": "",
+        "part_type": "低声部",
+        "remark": "",
+        "version": 1,
+        "change_type": "新增",
+        "changed_by": "许老师",
+        "changed_at": "2026-06-06 23:46:28"
+      },
+      {
+        "id": 4,
+        "song_alias_id": 1,
+        "song_code": "S001",
+        "song_name": "黄河大合唱",
+        "alias": "黄河",
+        "part_type": "高声部",
+        "remark": "经典曲目",
+        "version": 1,
+        "change_type": "修改",
+        "changed_by": "许老师",
+        "changed_at": "2026-06-06 23:47:42"
+      }
+    ],
+    "attendance_photos": [],
+    "practice_records": [
+      {
+        "id": 1,
+        "practice_date": "2026-06-06",
+        "song_alias_id": 1,
+        "song_code": "S001",
+        "song_name": "黄河大合唱",
+        "part_type": "高声部",
+        "student_name": "张三",
+        "attendance_status": "正常",
+        "has_substitute": 0,
+        "is_verified": 1,
+        "verified_by": null,
+        "verified_at": null,
+        "remark": "正常上课",
+        "created_at": "2026-06-06 23:49:08",
+        "updated_at": "2026-06-06 23:49:08"
+      },
+      {
+        "id": 2,
+        "practice_date": "2026-06-06",
+        "song_alias_id": 1,
+        "song_code": "S001",
+        "song_name": "黄河大合唱",
+        "part_type": "高声部",
+        "student_name": "张三",
+        "attendance_status": "正常",
+        "has_substitute": 0,
+        "is_verified": 1,
+        "verified_by": null,
+        "verified_at": null,
+        "remark": "正常上课",
+        "created_at": "2026-06-06 23:52:53",
+        "updated_at": "2026-06-06 23:52:53"
+      },
+      {
+        "id": 3,
+        "practice_date": "2026-06-06",
+        "song_alias_id": 2,
+        "song_code": "S002",
+        "song_name": "茉莉花",
+        "part_type": "中声部",
+        "student_name": "李四",
+        "attendance_status": "正常",
+        "has_substitute": 1,
+        "substitute_info": "王五代上",
+        "substitute_source": "群消息",
+        "is_verified": 1,
+        "verified_by": "票务小王",
+        "verified_at": "2026-06-06 23:54:26",
+        "remark": "群里说的替补",
+        "created_at": "2026-06-06 23:54:02",
+        "updated_at": "2026-06-06 23:54:02"
+      }
+    ],
+    "practice_history": [
+      {
+        "id": 1,
+        "practice_id": 3,
+        "field_name": "is_verified",
+        "old_value": "0",
+        "new_value": "1",
+        "changed_by": "票务小王",
+        "changed_at": "2026-06-06 23:54:15"
+      },
+      {
+        "id": 2,
+        "practice_id": 3,
+        "field_name": "is_verified",
+        "old_value": "0",
+        "new_value": "1",
+        "changed_by": "票务小王",
+        "changed_at": "2026-06-06 23:54:26"
+      }
+    ],
+    "settlement_details": [
+      {
+        "id": 1,
+        "practice_id": 1,
+        "student_name": "张三",
+        "song_name": "黄河大合唱",
+        "part_type": "高声部",
+        "class_count": 1,
+        "unit_price": 100,
+        "total_amount": 100,
+        "status": "待结算",
+        "settlement_date": null,
+        "remark": null,
+        "created_at": "2026-06-06 23:55:10",
+        "updated_at": "2026-06-06 23:55:10"
+      },
+      {
+        "id": 2,
+        "practice_id": 2,
+        "student_name": "张三",
+        "song_name": "黄河大合唱",
+        "part_type": "高声部",
+        "class_count": 1,
+        "unit_price": 100,
+        "total_amount": 100,
+        "status": "待结算",
+        "settlement_date": null,
+        "remark": null,
+        "created_at": "2026-06-06 23:55:10",
+        "updated_at": "2026-06-06 23:55:10"
+      },
+      {
+        "id": 3,
+        "practice_id": 3,
+        "student_name": "李四",
+        "song_name": "茉莉花",
+        "part_type": "中声部",
+        "class_count": 1,
+        "unit_price": 100,
+        "total_amount": 100,
+        "status": "待结算",
+        "settlement_date": null,
+        "remark": null,
+        "created_at": "2026-06-06 23:55:10",
+        "updated_at": "2026-06-06 23:55:10"
+      }
+    ],
+    "operation_logs": [
+      {
+        "id": 1,
+        "operation_type": "批量导入曲目别名",
+        "table_name": "song_aliases",
+        "record_id": null,
+        "old_data": null,
+        "new_data": "{\"count\":3}",
+        "operator": "许老师",
+        "operation_time": "2026-06-06 23:46:28",
+        "can_rollback": 0
+      },
+      {
+        "id": 2,
+        "operation_type": "批量导入曲目别名",
+        "table_name": "song_aliases",
+        "record_id": null,
+        "old_data": null,
+        "new_data": "{\"count\":3}",
+        "operator": "许老师",
+        "operation_time": "2026-06-06 23:47:42",
+        "can_rollback": 0
+      },
+      {
+        "id": 3,
+        "operation_type": "新增练习记录",
+        "table_name": "practice_records",
+        "record_id": 1,
+        "old_data": null,
+        "new_data": "{\"practice_date\":\"2026-06-06\",\"song_code\":\"S001\",\"student_name\":\"张三\",\"remark\":\"正常上课\"}",
+        "operator": "许老师",
+        "operation_time": "2026-06-06 23:49:08",
+        "can_rollback": 1
+      },
+      {
+        "id": 4,
+        "operation_type": "新增练习记录",
+        "table_name": "practice_records",
+        "record_id": 2,
+        "old_data": null,
+        "new_data": "{\"practice_date\":\"2026-06-06\",\"song_code\":\"S001\",\"student_name\":\"张三\",\"remark\":\"正常上课\"}",
+        "operator": "许老师",
+        "operation_time": "2026-06-06 23:52:53",
+        "can_rollback": 1
+      },
+      {
+        "id": 5,
+        "operation_type": "新增练习记录",
+        "table_name": "practice_records",
+        "record_id": 3,
+        "old_data": null,
+        "new_data": "{\"practice_date\":\"2026-06-06\",\"song_code\":\"S002\",\"student_name\":\"李四\",\"has_substitute\":1,\"substitute_info\":\"王五代上\",\"substitute_source\":\"群消息\",\"remark\":\"群里说的替补\"}",
+        "operator": "许老师",
+        "operation_time": "2026-06-06 23:54:02",
+        "can_rollback": 1
+      },
+      {
+        "id": 6,
+        "operation_type": "复核替补记录",
+        "table_name": "practice_records",
+        "record_id": 3,
+        "old_data": "{\"id\":3,\"practice_date\":\"2026-06-06\",\"song_alias_id\":2,\"song_code\":\"S002\",\"song_name\":\"茉莉花\",\"part_type\":\"中声部\",\"student_name\":\"李四\",\"attendance_status\":\"正常\",\"has_substitute\":1,\"substitute_info\":\"王五代上\",\"substitute_source\":\"群消息\",\"is_verified\":0,\"verified_by\":null,\"verified_at\":null,\"remark\":\"群里说的替补\",\"created_at\":\"2026-06-06 23:54:02\",\"updated_at\":\"2026-06-06 23:54:02\",\"song_alias\":\"\"}",
+        "new_data": "{\"id\":3,\"practice_date\":\"2026-06-06\",\"song_alias_id\":2,\"song_code\":\"S002\",\"song_name\":\"茉莉花\",\"part_type\":\"中声部\",\"student_name\":\"李四\",\"attendance_status\":\"正常\",\"has_substitute\":1,\"substitute_info\":\"王五代上\",\"substitute_source\":\"群消息\",\"is_verified\":1,\"verified_by\":null,\"verified_at\":null,\"remark\":\"群里说的替补\",\"created_at\":\"2026-06-06 23:54:02\",\"updated_at\":\"2026-06-06 23:54:02\",\"song_alias\":\"\"}",
+        "operator": "许老师",
+        "operation_time": "2026-06-06 23:54:15",
+        "can_rollback": 0
+      },
+      {
+        "id": 7,
+        "operation_type": "复核替补记录",
+        "table_name": "practice_records",
+        "record_id": 3,
+        "old_data": "{\"id\":3,\"practice_date\":\"2026-06-06\",\"song_alias_id\":2,\"song_code\":\"S002\",\"song_name\":\"茉莉花\",\"part_type\":\"中声部\",\"student_name\":\"李四\",\"attendance_status\":\"正常\",\"has_substitute\":1,\"substitute_info\":\"王五代上\",\"substitute_source\":\"群消息\",\"is_verified\":1,\"verified_by\":\"票务小王\",\"verified_at\":\"2026-06-06 23:54:15\",\"remark\":\"群里说的替补\",\"created_at\":\"2026-06-06 23:54:02\",\"updated_at\":\"2026-06-06 23:54:02\",\"song_alias\":\"\"}",
+        "new_data": "{\"id\":3,\"practice_date\":\"2026-06-06\",\"song_alias_id\":2,\"song_code\":\"S002\",\"song_name\":\"茉莉花\",\"part_type\":\"中声部\",\"student_name\":\"李四\",\"attendance_status\":\"正常\",\"has_substitute\":1,\"substitute_info\":\"王五代上\",\"substitute_source\":\"群消息\",\"is_verified\":1,\"verified_by\":\"票务小王\",\"verified_at\":\"2026-06-06 23:54:15\",\"remark\":\"群里说的替补\",\"created_at\":\"2026-06-06 23:54:02\",\"updated_at\":\"2026-06-06 23:54:02\",\"song_alias\":\"\"}",
+        "operator": "许老师",
+        "operation_time": "2026-06-06 23:54:26",
+        "can_rollback": 0
+      },
+      {
+        "id": 8,
+        "operation_type": "生成分账明细",
+        "table_name": "settlement_details",
+        "record_id": null,
+        "old_data": null,
+        "new_data": "{\"practice_date\":\"2026-06-06\"}",
+        "operator": "许老师",
+        "operation_time": "2026-06-06 23:55:10",
+        "can_rollback": 0
+      }
+    ]
+  },
+  "autoIncrement": {
+    "song_aliases": 4,
+    "song_alias_history": 5,
+    "attendance_photos": 1,
+    "practice_records": 4,
+    "practice_history": 3,
+    "settlement_details": 4,
+    "operation_logs": 9
+  }
+}
