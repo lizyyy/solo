@@ -1,0 +1,331 @@
+{
+  "ticketBatches": [
+    {
+      "batchId": "BATCH_2024_001",
+      "totalCount": 5,
+      "paidCount": 3,
+      "complimentaryCount": 2,
+      "hasMixedTypes": true,
+      "importDate": "2026-06-06T15:53:03.494Z",
+      "reviewStatus": "in_review"
+    },
+    {
+      "batchId": "BATCH_2024_002",
+      "totalCount": 3,
+      "paidCount": 3,
+      "complimentaryCount": 0,
+      "hasMixedTypes": false,
+      "importDate": "2026-06-06T15:53:03.494Z",
+      "reviewStatus": "in_review"
+    },
+    {
+      "batchId": "BATCH_2024_003",
+      "totalCount": 2,
+      "paidCount": 0,
+      "complimentaryCount": 2,
+      "hasMixedTypes": false,
+      "importDate": "2026-06-06T15:53:03.494Z",
+      "reviewStatus": "in_review"
+    }
+  ],
+  "tickets": [
+    {
+      "id": 1,
+      "batchId": "BATCH_2024_001",
+      "ticketNo": "T001",
+      "ticketType": "paid",
+      "attendeeName": "张三",
+      "price": 199,
+      "purchaseDate": "2024-01-15",
+      "audioFileId": "AUDIO_001",
+      "authStatus": "needs_review",
+      "createdAt": "2026-06-06T15:53:03.494Z",
+      "updatedAt": "2026-06-06T15:54:11.980Z",
+      "audioRemark": "确认音频质量合格，采样可用"
+    },
+    {
+      "id": 2,
+      "batchId": "BATCH_2024_001",
+      "ticketNo": "T002",
+      "ticketType": "paid",
+      "attendeeName": "李四",
+      "price": 199,
+      "purchaseDate": "2024-01-15",
+      "audioFileId": "AUDIO_002",
+      "authStatus": "needs_review",
+      "createdAt": "2026-06-06T15:53:03.494Z",
+      "updatedAt": "2026-06-06T15:53:03.502Z"
+    },
+    {
+      "id": 3,
+      "batchId": "BATCH_2024_001",
+      "ticketNo": "T003",
+      "ticketType": "complimentary",
+      "attendeeName": "王嘉宾",
+      "price": 0,
+      "purchaseDate": "2024-01-10",
+      "audioFileId": "AUDIO_003",
+      "authStatus": "approved",
+      "createdAt": "2026-06-06T15:53:03.494Z",
+      "updatedAt": "2026-06-06T15:54:29.046Z"
+    },
+    {
+      "id": 4,
+      "batchId": "BATCH_2024_001",
+      "ticketNo": "T004",
+      "ticketType": "paid",
+      "attendeeName": "赵六",
+      "price": 199,
+      "purchaseDate": "2024-01-16",
+      "audioFileId": "AUDIO_004",
+      "authStatus": "needs_review",
+      "createdAt": "2026-06-06T15:53:03.494Z",
+      "updatedAt": "2026-06-06T15:53:03.502Z"
+    },
+    {
+      "id": 5,
+      "batchId": "BATCH_2024_001",
+      "ticketNo": "T005",
+      "ticketType": "complimentary",
+      "attendeeName": "刘评委",
+      "price": 0,
+      "purchaseDate": "2024-01-10",
+      "audioFileId": "AUDIO_005",
+      "authStatus": "needs_review",
+      "createdAt": "2026-06-06T15:53:03.494Z",
+      "updatedAt": "2026-06-06T15:53:03.502Z"
+    },
+    {
+      "id": 6,
+      "batchId": "BATCH_2024_002",
+      "ticketNo": "T006",
+      "ticketType": "paid",
+      "attendeeName": "孙七",
+      "price": 299,
+      "purchaseDate": "2024-01-17",
+      "audioFileId": "AUDIO_006",
+      "authStatus": "pending",
+      "createdAt": "2026-06-06T15:53:03.494Z",
+      "updatedAt": "2026-06-06T15:53:03.503Z"
+    },
+    {
+      "id": 7,
+      "batchId": "BATCH_2024_002",
+      "ticketNo": "T007",
+      "ticketType": "paid",
+      "attendeeName": "周八",
+      "price": 299,
+      "purchaseDate": "2024-01-17",
+      "audioFileId": "AUDIO_007",
+      "authStatus": "pending",
+      "createdAt": "2026-06-06T15:53:03.494Z",
+      "updatedAt": "2026-06-06T15:53:03.503Z"
+    },
+    {
+      "id": 8,
+      "batchId": "BATCH_2024_002",
+      "ticketNo": "T008",
+      "ticketType": "paid",
+      "attendeeName": "吴九",
+      "price": 299,
+      "purchaseDate": "2024-01-18",
+      "audioFileId": "AUDIO_008",
+      "authStatus": "pending",
+      "createdAt": "2026-06-06T15:53:03.494Z",
+      "updatedAt": "2026-06-06T15:53:03.503Z"
+    },
+    {
+      "id": 9,
+      "batchId": "BATCH_2024_003",
+      "ticketNo": "T009",
+      "ticketType": "complimentary",
+      "attendeeName": "郑嘉宾",
+      "price": 0,
+      "purchaseDate": "2024-01-12",
+      "audioFileId": "AUDIO_009",
+      "authStatus": "needs_review",
+      "createdAt": "2026-06-06T15:53:03.494Z",
+      "updatedAt": "2026-06-06T15:53:03.503Z"
+    },
+    {
+      "id": 10,
+      "batchId": "BATCH_2024_003",
+      "ticketNo": "T010",
+      "ticketType": "complimentary",
+      "attendeeName": "冯评委",
+      "price": 0,
+      "purchaseDate": "2024-01-12",
+      "audioFileId": "AUDIO_010",
+      "authStatus": "needs_review",
+      "createdAt": "2026-06-06T15:53:03.494Z",
+      "updatedAt": "2026-06-06T15:53:03.503Z"
+    }
+  ],
+  "audioFiles": [],
+  "authReminders": [
+    {
+      "id": 1,
+      "ticketId": 1,
+      "ticketNo": "T001",
+      "batchId": "BATCH_2024_001",
+      "status": "needs_review",
+      "reason": "音频备注已补充: \"确认音频质量合格，采样可用\"，但批次存在混排，仍需录音师最终确认",
+      "missingMaterials": [
+        "录音师最终复核确认"
+      ],
+      "nextStep": "请录音师根据音频备注确认该票授权状态",
+      "assignee": "recording_engineer",
+      "isRead": false,
+      "createdAt": "2026-06-06T15:53:03.502Z",
+      "updatedAt": "2026-06-06T15:54:11.980Z"
+    },
+    {
+      "id": 2,
+      "ticketId": 2,
+      "ticketNo": "T002",
+      "batchId": "BATCH_2024_001",
+      "status": "needs_review",
+      "reason": "该票所属批次(BATCH_2024_001)存在赠票与售票混排情况，需录音师复核确认授权边界",
+      "missingMaterials": [
+        "录音师复核确认",
+        "音频文件授权备注"
+      ],
+      "nextStep": "请录音师确认该票是否在授权范围内，补充音频文件备注后版权运营可继续处理",
+      "assignee": "recording_engineer",
+      "isRead": false,
+      "createdAt": "2026-06-06T15:53:03.502Z",
+      "updatedAt": "2026-06-06T15:53:03.502Z"
+    },
+    {
+      "id": 3,
+      "ticketId": 3,
+      "ticketNo": "T003",
+      "batchId": "BATCH_2024_001",
+      "status": "approved",
+      "reason": "录音师复核通过: \"该赠票嘉宾确认在授权范围内\"，授权确认",
+      "missingMaterials": [],
+      "nextStep": "授权已确认，可归档处理",
+      "assignee": "copyright_operations",
+      "isRead": false,
+      "createdAt": "2026-06-06T15:53:03.502Z",
+      "updatedAt": "2026-06-06T15:54:29.046Z"
+    },
+    {
+      "id": 4,
+      "ticketId": 4,
+      "ticketNo": "T004",
+      "batchId": "BATCH_2024_001",
+      "status": "needs_review",
+      "reason": "该票所属批次(BATCH_2024_001)存在赠票与售票混排情况，需录音师复核确认授权边界",
+      "missingMaterials": [
+        "录音师复核确认",
+        "音频文件授权备注"
+      ],
+      "nextStep": "请录音师确认该票是否在授权范围内，补充音频文件备注后版权运营可继续处理",
+      "assignee": "recording_engineer",
+      "isRead": false,
+      "createdAt": "2026-06-06T15:53:03.502Z",
+      "updatedAt": "2026-06-06T15:53:03.502Z"
+    },
+    {
+      "id": 5,
+      "ticketId": 5,
+      "ticketNo": "T005",
+      "batchId": "BATCH_2024_001",
+      "status": "needs_review",
+      "reason": "该票所属批次(BATCH_2024_001)存在赠票与售票混排情况，需录音师复核确认授权边界",
+      "missingMaterials": [
+        "录音师复核确认",
+        "音频文件授权备注"
+      ],
+      "nextStep": "请录音师确认该票是否在授权范围内，补充音频文件备注后版权运营可继续处理",
+      "assignee": "recording_engineer",
+      "isRead": false,
+      "createdAt": "2026-06-06T15:53:03.502Z",
+      "updatedAt": "2026-06-06T15:53:03.502Z"
+    },
+    {
+      "id": 6,
+      "ticketId": 6,
+      "ticketNo": "T006",
+      "batchId": "BATCH_2024_002",
+      "status": "pending",
+      "reason": "售票待核对音频文件备注",
+      "missingMaterials": [
+        "音频文件备注"
+      ],
+      "nextStep": "请版权运营小鹿补录音频文件备注信息",
+      "assignee": "copyright_operations",
+      "isRead": false,
+      "createdAt": "2026-06-06T15:53:03.503Z",
+      "updatedAt": "2026-06-06T15:53:03.503Z"
+    },
+    {
+      "id": 7,
+      "ticketId": 7,
+      "ticketNo": "T007",
+      "batchId": "BATCH_2024_002",
+      "status": "pending",
+      "reason": "售票待核对音频文件备注",
+      "missingMaterials": [
+        "音频文件备注"
+      ],
+      "nextStep": "请版权运营小鹿补录音频文件备注信息",
+      "assignee": "copyright_operations",
+      "isRead": false,
+      "createdAt": "2026-06-06T15:53:03.503Z",
+      "updatedAt": "2026-06-06T15:53:03.503Z"
+    },
+    {
+      "id": 8,
+      "ticketId": 8,
+      "ticketNo": "T008",
+      "batchId": "BATCH_2024_002",
+      "status": "pending",
+      "reason": "售票待核对音频文件备注",
+      "missingMaterials": [
+        "音频文件备注"
+      ],
+      "nextStep": "请版权运营小鹿补录音频文件备注信息",
+      "assignee": "copyright_operations",
+      "isRead": false,
+      "createdAt": "2026-06-06T15:53:03.503Z",
+      "updatedAt": "2026-06-06T15:53:03.503Z"
+    },
+    {
+      "id": 9,
+      "ticketId": 9,
+      "ticketNo": "T009",
+      "batchId": "BATCH_2024_003",
+      "status": "needs_review",
+      "reason": "赠票需确认是否在采样包授权范围内",
+      "missingMaterials": [
+        "赠票授权确认函",
+        "音频文件备注"
+      ],
+      "nextStep": "请版权运营小鹿核对赠票名单，确认是否需要额外授权材料",
+      "assignee": "copyright_operations",
+      "isRead": false,
+      "createdAt": "2026-06-06T15:53:03.503Z",
+      "updatedAt": "2026-06-06T15:53:03.503Z"
+    },
+    {
+      "id": 10,
+      "ticketId": 10,
+      "ticketNo": "T010",
+      "batchId": "BATCH_2024_003",
+      "status": "needs_review",
+      "reason": "赠票需确认是否在采样包授权范围内",
+      "missingMaterials": [
+        "赠票授权确认函",
+        "音频文件备注"
+      ],
+      "nextStep": "请版权运营小鹿核对赠票名单，确认是否需要额外授权材料",
+      "assignee": "copyright_operations",
+      "isRead": false,
+      "createdAt": "2026-06-06T15:53:03.503Z",
+      "updatedAt": "2026-06-06T15:53:03.503Z"
+    }
+  ],
+  "auditLogs": []
+}

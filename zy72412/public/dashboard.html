@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>采样包授权链路 - 小看板</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f7fa;
+      color: #333;
+    }
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px 40px;
+    }
+    .header h1 { font-size: 24px; }
+    .header p { opacity: 0.9; margin-top: 5px; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+    .stat-card {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .stat-card .value { font-size: 32px; font-weight: bold; margin-bottom: 5px; }
+    .stat-card .label { color: #666; font-size: 14px; }
+    .stat-card.warning .value { color: #f59e0b; }
+    .stat-card.danger .value { color: #ef4444; }
+    .stat-card.success .value { color: #10b981; }
+    .stat-card.info .value { color: #3b82f6; }
+    .section {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .section h2 {
+      font-size: 18px;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eee;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+    th { background: #f8f9fa; font-weight: 600; font-size: 13px; color: #666; }
+    tr:hover { background: #f9fafb; }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .badge-paid { background: #d1fae5; color: #065f46; }
+    .badge-complimentary { background: #fef3c7; color: #92400e; }
+    .badge-mixed { background: #fee2e2; color: #991b1b; }
+    .badge-pending { background: #e5e7eb; color: #374151; }
+    .badge-needs_review { background: #fef3c7; color: #92400e; }
+    .badge-audio_verified { background: #dbeafe; color: #1e40af; }
+    .badge-approved { background: #d1fae5; color: #065f46; }
+    .badge-rejected { background: #fee2e2; color: #991b1b; }
+    .reminder-card {
+      border-left: 4px solid #f59e0b;
+      padding: 15px;
+      margin-bottom: 10px;
+      background: #fffbeb;
+      border-radius: 0 8px 8px 0;
+    }
+    .reminder-card.recording_engineer { border-left-color: #ef4444; }
+    .reminder-card.copyright_operations { border-left-color: #3b82f6; }
+    .reminder-title { font-weight: 600; margin-bottom: 5px; }
+    .reminder-reason { color: #666; font-size: 14px; margin-bottom: 8px; }
+    .reminder-next { font-size: 13px; color: #065f46; }
+    .reminder-missing { font-size: 12px; color: #dc2626; margin-top: 5px; }
+    .btn {
+      padding: 6px 14px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      margin-right: 5px;
+    }
+    .btn-primary { background: #3b82f6; color: white; }
+    .btn-success { background: #10b981; color: white; }
+    .btn-danger { background: #ef4444; color: white; }
+    .btn:hover { opacity: 0.9; }
+    .trace-link { color: #3b82f6; cursor: pointer; text-decoration: underline; }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+    }
+    .modal-content {
+      background: white;
+      margin: 5% auto;
+      padding: 25px;
+      width: 600px;
+      max-width: 90%;
+      border-radius: 10px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .close { cursor: pointer; font-size: 24px; color: #999; }
+    .input-group { margin-bottom: 15px; }
+    .input-group label { display: block; margin-bottom: 5px; font-weight: 500; font-size: 14px; }
+    .input-group input, .input-group textarea {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    .input-group textarea { min-height: 80px; }
+    .timeline { position: relative; padding-left: 30px; }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 10px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: #e5e7eb;
+    }
+    .timeline-item {
+      position: relative;
+      margin-bottom: 20px;
+    }
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -26px;
+      top: 4px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #3b82f6;
+    }
+    .timeline-status { font-weight: 600; }
+    .timeline-time { font-size: 12px; color: #999; }
+    .timeline-reason { margin-top: 5px; color: #666; }
+    .source-ref {
+      background: #f3f4f6;
+      padding: 8px 12px;
+      border-radius: 6px;
+      margin-top: 5px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🎵 采样包授权链路</h1>
+    <p>票务导入 → 混批检测 → 授权提醒 → 录音师复核 → 归档</p>
+  </div>
+
+  <div class="container">
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card info">
+        <div class="value" id="statTotal">-</div>
+        <div class="label">总批次数</div>
+      </div>
+      <div class="stat-card danger">
+        <div class="value" id="statMixed">-</div>
+        <div class="label">混批批次</div>
+      </div>
+      <div class="stat-card warning">
+        <div class="value" id="statPending">-</div>
+        <div class="label">待处理</div>
+      </div>
+      <div class="stat-card success">
+        <div class="value" id="statApproved">-</div>
+        <div class="label">已通过</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>📋 批次列表</h2>
+      <table id="batchesTable">
+        <thead>
+          <tr>
+            <th>批次ID</th>
+            <th>总数</th>
+            <th>售票</th>
+            <th>赠票</th>
+            <th>混批</th>
+            <th>状态</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <h2>🔔 授权提醒</h2>
+      <div>
+        <button class="btn btn-primary" onclick="loadReminders('all')">全部</button>
+        <button class="btn btn-primary" onclick="loadReminders('recording_engineer')">录音师待办</button>
+        <button class="btn btn-primary" onclick="loadReminders('copyright_operations')">版权运营待办</button>
+      </div>
+      <div id="remindersList" style="margin-top: 15px;"></div>
+    </div>
+  </div>
+
+  <div id="traceModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>🔍 授权溯源</h3>
+        <span class="close" onclick="closeModal('traceModal')">&times;</span>
+      </div>
+      <div id="traceContent"></div>
+    </div>
+  </div>
+
+  <div id="remarkModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>📝 补录音频备注</h3>
+        <span class="close" onclick="closeModal('remarkModal')">&times;</span>
+      </div>
+      <div class="input-group">
+        <label>票号</label>
+        <input type="text" id="remarkTicketNo" readonly>
+      </div>
+      <div class="input-group">
+        <label>音频备注</label>
+        <textarea id="remarkContent" placeholder="请输入音频文件备注说明..."></textarea>
+      </div>
+      <button class="btn btn-success" onclick="submitRemark()">保存备注</button>
+    </div>
+  </div>
+
+  <script>
+    let currentTicketId = null;
+
+    async function loadData() {
+      await loadOverview();
+      await loadBatches();
+      await loadReminders('all');
+    }
+
+    async function loadOverview() {
+      const res = await fetch('/api/overview');
+      const data = await res.json();
+      if (data.success) {
+        document.getElementById('statTotal').textContent = data.data.chartData.datasets[0].data[0] + data.data.chartData.datasets[0].data[1];
+        document.getElementById('statMixed').textContent = data.data.chartData.datasets[0].data[0];
+        document.getElementById('statPending').textContent = data.data.chartData.datasets[0].data[2] + data.data.chartData.datasets[0].data[3];
+        document.getElementById('statApproved').textContent = data.data.statusSummary.approved || 0;
+      }
+    }
+
+    async function loadBatches() {
+      const res = await fetch('/api/batches');
+      const data = await res.json();
+      const tbody = document.querySelector('#batchesTable tbody');
+      tbody.innerHTML = '';
+      
+      data.data.forEach(batch => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>${batch.batchId}</strong></td>
+          <td>${batch.totalCount}</td>
+          <td><span class="badge badge-paid">${batch.paidCount}</span></td>
+          <td><span class="badge badge-complimentary">${batch.complimentaryCount}</span></td>
+          <td>${batch.hasMixedTypes ? '<span class="badge badge-mixed">⚠ 混批</span>' : '<span class="badge badge-paid">纯批次</span>'}</td>
+          <td>${batch.reviewStatus === 'new' ? '新建' : batch.reviewStatus === 'in_review' ? '处理中' : '已完成'}</td>
+          <td>
+            <button class="btn btn-primary" onclick="viewBatch('${batch.batchId}')">查看</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function loadReminders(role) {
+      const url = role === 'all' ? '/api/reminders' : `/api/reminders?role=${role}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      const list = document.getElementById('remindersList');
+      list.innerHTML = '';
+      
+      if (data.data.length === 0) {
+        list.innerHTML = '<p style="color: #999; padding: 20px;">暂无提醒</p>';
+        return;
+      }
+
+      data.data.forEach(r => {
+        const card = document.createElement('div');
+        card.className = `reminder-card ${r.assignee}`;
+        card.innerHTML = `
+          <div class="reminder-title">
+            [${r.ticketNo}] <span class="badge badge-${r.status}">${r.status}</span>
+            ${r.assignee === 'recording_engineer' ? '🎙️ 录音师' : '🦌 版权运营小鹿'}
+          </div>
+          <div class="reminder-reason">${r.reason}</div>
+          ${r.missingMaterials.length > 0 ? `<div class="reminder-missing">⚠ 缺少材料: ${r.missingMaterials.join(', ')}</div>` : ''}
+          <div class="reminder-next">👉 下一步: ${r.nextStep}</div>
+          <div style="margin-top: 10px;">
+            ${r.assignee === 'copyright_operations' && r.status !== 'approved' && r.status !== 'rejected' ? 
+              `<button class="btn btn-primary" onclick="openRemarkModal(${r.ticketId}, '${r.ticketNo}')">补录备注</button>` : ''}
+            ${r.assignee === 'recording_engineer' ? 
+              `<button class="btn btn-success" onclick="reviewTicket(${r.ticketId}, true)">通过</button>
+               <button class="btn btn-danger" onclick="reviewTicket(${r.ticketId}, false)">驳回</button>` : ''}
+            <button class="btn btn-primary" onclick="viewTrace(${r.ticketId})">溯源</button>
+          </div>
+        `;
+        list.appendChild(card);
+      });
+    }
+
+    async function viewBatch(batchId) {
+      const res = await fetch(`/api/batches/${batchId}`);
+      const data = await res.json();
+      alert(`批次 ${batchId} 详情:\n总数: ${data.data.totalCount}\n售票: ${data.data.paidCount}\n赠票: ${data.data.complimentaryCount}\n混批: ${data.data.hasMixedTypes ? '是' : '否'}`);
+    }
+
+    function openRemarkModal(ticketId, ticketNo) {
+      currentTicketId = ticketId;
+      document.getElementById('remarkTicketNo').value = ticketNo;
+      document.getElementById('remarkContent').value = '';
+      document.getElementById('remarkModal').style.display = 'block';
+    }
+
+    async function submitRemark() {
+      const remark = document.getElementById('remarkContent').value;
+      if (!remark) {
+        alert('请输入备注内容');
+        return;
+      }
+      const res = await fetch(`/api/tickets/${currentTicketId}/remark`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ remark, operator: 'copyright_operations' })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('备注已更新');
+        closeModal('remarkModal');
+        loadData();
+      }
+    }
+
+    async function reviewTicket(ticketId, approve) {
+      const remark = prompt(approve ? '请输入通过说明:' : '请输入驳回原因:');
+      const res = await fetch(`/api/tickets/${ticketId}/review`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ approve, remark: remark || '', operator: 'recording_engineer' })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('复核完成');
+        loadData();
+      }
+    }
+
+    async function viewTrace(ticketId) {
+      const res = await fetch(`/api/trace/${ticketId}`);
+      const data = await res.json();
+      if (!data.success) {
+        alert('找不到溯源信息');
+        return;
+      }
+      
+      const trace = data.data;
+      let html = `<p><strong>票号:</strong> ${trace.ticketNo}</p>`;
+      html += `<p><strong>批次:</strong> ${trace.batchId}</p>`;
+      html += '<h4 style="margin: 15px 0 10px;">授权轨迹</h4>';
+      html += '<div class="timeline">';
+      trace.authTrail.forEach(step => {
+        html += `
+          <div class="timeline-item">
+            <div class="timeline-status">${step.status}</div>
+            <div class="timeline-time">${new Date(step.timestamp).toLocaleString()}</div>
+            <div class="timeline-reason">${step.reason}</div>
+            <div style="font-size: 12px; color: #666; margin-top: 3px;">
+              负责人: ${step.assignee === 'recording_engineer' ? '录音师' : '版权运营小鹿'}
+            </div>
+          </div>
+        `;
+      });
+      html += '</div>';
+      
+      html += '<h4 style="margin: 15px 0 10px;">溯源参考 (可回跳)</h4>';
+      trace.sourceReferences.forEach(ref => {
+        html += `<div class="source-ref">${ref.type === 'audio_file' ? '🎵' : '📄'} <strong>${ref.reference}</strong><br>${ref.description}</div>`;
+      });
+      
+      document.getElementById('traceContent').innerHTML = html;
+      document.getElementById('traceModal').style.display = 'block';
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+      if (event.target.classList.contains('modal')) {
+        event.target.style.display = 'none';
+      }
+    };
+
+    loadData();
+  </script>
+</body>
+</html>
