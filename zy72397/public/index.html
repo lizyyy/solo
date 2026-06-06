@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>水轮机效率回放系统</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f7fa; padding: 20px; }
+    .container { max-width: 1400px; margin: 0 auto; }
+    .header { background: #1e3a5f; color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+    .header h1 { font-size: 24px; }
+    .header .subtitle { opacity: 0.8; font-size: 14px; margin-top: 5px; }
+    .stats-bar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; margin-bottom: 20px; }
+    .stat-card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .stat-card .number { font-size: 28px; font-weight: bold; color: #1e3a5f; }
+    .stat-card .label { font-size: 12px; color: #666; margin-top: 5px; }
+    .stat-card.warning .number { color: #e67e22; }
+    .workflow { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .workflow h2 { font-size: 16px; margin-bottom: 15px; color: #1e3a5f; }
+    .workflow-steps { display: flex; align-items: center; justify-content: space-between; }
+    .step { flex: 1; text-align: center; position: relative; }
+    .step .step-icon { width: 50px; height: 50px; border-radius: 50%; background: #e0e0e0; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-weight: bold; color: #999; }
+    .step.active .step-icon { background: #3498db; color: white; }
+    .step.done .step-icon { background: #27ae60; color: white; }
+    .step .step-name { font-size: 13px; color: #666; }
+    .step.active .step-name { color: #3498db; font-weight: bold; }
+    .step-line { flex: 0.5; height: 3px; background: #e0e0e0; }
+    .step-line.done { background: #27ae60; }
+    .main-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+    .panel { background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); padding: 20px; }
+    .panel h2 { font-size: 16px; margin-bottom: 15px; color: #1e3a5f; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+    .record-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .record-table th { background: #f8f9fa; padding: 10px; text-align: left; font-weight: 600; color: #555; border-bottom: 2px solid #eee; }
+    .record-table td { padding: 10px; border-bottom: 1px solid #eee; }
+    .record-table tr:hover { background: #f8f9fa; cursor: pointer; }
+    .record-table tr.selected { background: #e8f4fd; }
+    .status-badge { padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+    .status-IMPORTED { background: #e3f2fd; color: #1565c0; }
+    .status-ENGINEER_REVIEWED { background: #fff3e0; color: #e65100; }
+    .status-NEED_QC_REVIEW { background: #ffebee; color: #c62828; animation: pulse 2s infinite; }
+    .status-QC_APPROVED { background: #e8f5e9; color: #2e7d32; }
+    .status-FINALIZED { background: #f3e5f5; color: #6a1b9a; }
+    .status-SUPERSEDED { background: #eceff1; color: #546e7a; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+    .issue-badge { background: #ffebee; color: #c62828; padding: 2px 6px; border-radius: 4px; font-size: 10px; }
+    .detail-section { margin-bottom: 20px; }
+    .detail-section h3 { font-size: 14px; color: #333; margin-bottom: 10px; }
+    .timeline { border-left: 2px solid #e0e0e0; padding-left: 15px; margin-left: 10px; }
+    .timeline-item { position: relative; margin-bottom: 15px; }
+    .timeline-item::before { content: ''; position: absolute; left: -20px; top: 5px; width: 8px; height: 8px; border-radius: 50%; background: #3498db; }
+    .timeline-item .time { font-size: 11px; color: #999; }
+    .timeline-item .content { font-size: 13px; color: #333; margin-top: 2px; }
+    .timeline-item .operator { font-size: 11px; color: #666; }
+    .info-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
+    .info-row .label { color: #666; }
+    .info-row .value { color: #333; font-weight: 500; }
+    .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500; }
+    .btn-primary { background: #3498db; color: white; }
+    .btn-primary:hover { background: #2980b9; }
+    .btn-success { background: #27ae60; color: white; }
+    .btn-warning { background: #f39c12; color: white; }
+    .btn-danger { background: #e74c3c; color: white; }
+    .btn-group { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+    .rework-highlight { background: #fff3cd; border: 1px solid #ffeaa7; padding: 10px; border-radius: 4px; margin-bottom: 15px; font-size: 13px; }
+    .boundary-rule-note { background: #e8f5e9; padding: 10px; border-radius: 4px; font-size: 12px; color: #2e7d32; margin-bottom: 10px; }
+    .version-compare { background: #f8f9fa; padding: 10px; border-radius: 4px; margin-bottom: 10px; font-size: 12px; }
+    .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+    .photo-item { background: #f0f0f0; height: 60px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #666; }
+    .data-source-note { background: #e3f2fd; padding: 8px 12px; border-radius: 4px; font-size: 12px; color: #1565c0; margin-bottom: 15px; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>⚡ 水轮机效率回放系统</h1>
+      <div class="subtitle">带审计追踪的实验数据复盘平台 | 数据来源统一：页面 / API / 导出同一份</div>
+    </div>
+
+    <div class="stats-bar" id="statsBar">
+      <div class="stat-card"><div class="number" id="statTotal">0</div><div class="label">总记录数</div></div>
+      <div class="stat-card"><div class="number" id="statImported">0</div><div class="label">待工程师评审</div></div>
+      <div class="stat-card warning"><div class="number" id="statQc">0</div><div class="label">待质检员复核</div></div>
+      <div class="stat-card"><div class="number" id="statFinal">0</div><div class="label">已终态</div></div>
+      <div class="stat-card warning"><div class="number" id="statIssues">0</div><div class="label">含边界问题</div></div>
+    </div>
+
+    <div class="workflow">
+      <h2>📋 三步工作流（不能跳步，每步留痕）</h2>
+      <div class="workflow-steps">
+        <div class="step active" id="step1"><div class="step-icon">1</div><div class="step-name">传感器编号导入</div></div>
+        <div class="step-line" id="line1"></div>
+        <div class="step" id="step2"><div class="step-icon">2</div><div class="step-name">何工补看工况照片</div></div>
+        <div class="step-line" id="line2"></div>
+        <div class="step" id="step3"><div class="step-icon">3</div><div class="step-name">实验复盘图更新</div></div>
+      </div>
+    </div>
+
+    <div class="main-grid">
+      <div class="panel">
+        <h2>📊 数据记录列表（与API、导出共用同一份数据源）</h2>
+        <div class="data-source-note">
+          ✅ 单一数据源保证：页面显示、API接口、文件导出都调用 <code>dataStore.getUnifiedView()</code>
+        </div>
+        <table class="record-table" id="recordTable">
+          <thead>
+            <tr>
+              <th>记录ID</th>
+              <th>原始行号</th>
+              <th>传感器编号</th>
+              <th>采样时间</th>
+              <th>效率(%)</th>
+              <th>状态</th>
+              <th>问题</th>
+            </tr>
+          </thead>
+          <tbody id="recordTableBody"></tbody>
+        </table>
+      </div>
+
+      <div>
+        <div class="panel" id="detailPanel">
+          <h2>🔍 记录详情 & 审计追踪</h2>
+          <div id="detailEmpty" style="text-align: center; color: #999; padding: 40px;">请选择一条记录查看详情</div>
+          <div id="detailContent" class="hidden"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let selectedRecordId = null;
+    let allRecords = [];
+
+    async function loadData() {
+      const res = await fetch('/api/records');
+      const data = await res.json();
+      allRecords = data.data;
+      renderTable(allRecords);
+      updateStats();
+    }
+
+    async function loadStats() {
+      const res = await fetch('/api/statistics');
+      const data = await res.json();
+      return data.data;
+    }
+
+    function updateStats() {
+      loadStats().then(stats => {
+        document.getElementById('statTotal').textContent = stats.total_records;
+        document.getElementById('statImported').textContent = stats.by_status.IMPORTED || 0;
+        document.getElementById('statQc').textContent = stats.needs_qc_review;
+        document.getElementById('statFinal').textContent = stats.by_status.FINALIZED || 0;
+        document.getElementById('statIssues').textContent = stats.has_boundary_issues;
+      });
+    }
+
+    function renderTable(records) {
+      const tbody = document.getElementById('recordTableBody');
+      tbody.innerHTML = records.map(r => `
+        <tr class="${r.id === selectedRecordId ? 'selected' : ''}" onclick="selectRecord('${r.id}')">
+          <td><strong>${r.id}</strong></td>
+          <td>${r.original_line_no}</td>
+          <td>${r.sensor_id}</td>
+          <td style="font-size: 12px;">${r.sampling_time ? r.sampling_time.substring(5, 16) : '-'}</td>
+          <td>${r.efficiency ? r.efficiency.toFixed(1) : '-'}</td>
+          <td><span class="status-badge status-${r.current_status}">${statusLabel(r.current_status)}</span></td>
+          <td>${r.boundary_issues.length > 0 ? '<span class="issue-badge">⚠️ ' + r.boundary_issues.length + '项</span>' : '-'}</td>
+        </tr>
+      `).join('');
+    }
+
+    function statusLabel(status) {
+      const labels = {
+        'IMPORTED': '已导入',
+        'ENGINEER_REVIEWED': '工程师已评审',
+        'NEED_QC_REVIEW': '待QC复核',
+        'QC_APPROVED': 'QC已通过',
+        'QC_REJECTED': 'QC已驳回',
+        'FINALIZED': '已终态',
+        'SUPERSEDED': '已被替代'
+      };
+      return labels[status] || status;
+    }
+
+    async function selectRecord(id) {
+      selectedRecordId = id;
+      renderTable(allRecords);
+      
+      const res = await fetch(`/api/records/${id}`);
+      const data = await res.json();
+      renderDetail(data.data);
+    }
+
+    function renderDetail(record) {
+      document.getElementById('detailEmpty').classList.add('hidden');
+      const content = document.getElementById('detailContent');
+      content.classList.remove('hidden');
+
+      let boundaryIssuesHtml = '';
+      if (record.boundary_issues && record.boundary_issues.length > 0) {
+        boundaryIssuesHtml = `
+          <div class="rework-highlight">
+            <strong>⚠️ 边界规则检查发现问题（采样时间缺半小时）</strong><br>
+            <small>根据边界规则：采样间隔 > 30分钟 或 采样时长不足理论值50%，自动标记为待QC复核，不自动归正常</small><br><br>
+            ${record.boundary_issues.map(i => `<div>• ${i.message}</div>`).join('')}
+          </div>
+        `;
+      }
+
+      let versionsHtml = '';
+      if (record.previous_versions && record.previous_versions.length > 0) {
+        versionsHtml = `
+          <div class="version-compare">
+            <strong>📜 历史结论版本（返工场景对比）</strong><br>
+            ${record.previous_versions.map((v, i) => `
+              <div style="margin-top: 5px; padding-left: 10px; border-left: 3px solid #ddd;">
+                版本 ${v.conclusion_version}: ${v.conclusion || '无'}<br>
+                <small>时间: ${v.timestamp ? v.timestamp.substring(5, 16) : '-'}</small>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      let photosHtml = '';
+      if (record.work_condition_photos && record.work_condition_photos.length > 0) {
+        photosHtml = `
+          <div class="photo-grid">
+            ${record.work_condition_photos.map(p => `<div class="photo-item">📷 ${p.remark || '工况照片'}</div>`).join('')}
+          </div>
+        `;
+      }
+
+      content.innerHTML = `
+        <div class="detail-section">
+          <div class="info-row"><span class="label">记录 ID</span><span class="value">${record.id}</span></div>
+          <div class="info-row"><span class="label">原始导入行号</span><span class="value">第 ${record.original_line_no} 行</span></div>
+          <div class="info-row"><span class="label">导入批次</span><span class="value">${record.import_batch_id}</span></div>
+          <div class="info-row"><span class="label">传感器编号</span><span class="value">${record.sensor_id}</span></div>
+          <div class="info-row"><span class="label">传感器名称</span><span class="value">${record.sensor_name || '-'}</span></div>
+          <div class="info-row"><span class="label">水轮机编号</span><span class="value">${record.turbine_id || '-'}</span></div>
+          <div class="info-row"><span class="label">采样时间</span><span class="value">${record.sampling_time || '-'}</span></div>
+          <div class="info-row"><span class="label">采样开始</span><span class="value">${record.sampling_start_time || '-'}</span></div>
+          <div class="info-row"><span class="label">采样结束</span><span class="value">${record.sampling_end_time || '-'}</span></div>
+          <div class="info-row"><span class="label">效率</span><span class="value">${record.efficiency ? record.efficiency.toFixed(2) + '%' : '-'}</span></div>
+          <div class="info-row"><span class="label">当前状态</span><span class="value"><span class="status-badge status-${record.current_status}">${statusLabel(record.current_status)}</span></span></div>
+          <div class="info-row"><span class="label">结论版本</span><span class="value">v${record.conclusion_version}</span></div>
+        </div>
+
+        ${boundaryIssuesHtml}
+        ${versionsHtml}
+
+        <div class="detail-section">
+          <h3>📝 结论</h3>
+          <div style="padding: 10px; background: #f8f9fa; border-radius: 4px; font-size: 13px;">
+            ${record.conclusion || '暂无结论'}
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h3>📷 工况照片</h3>
+          ${photosHtml || '<div style="font-size: 12px; color: #999;">暂无照片</div>'}
+        </div>
+
+        <div class="detail-section">
+          <h3>⏱️ 状态流转时间线（审计追踪）</h3>
+          <div class="timeline">
+            ${record.status_history.map(s => `
+              <div class="timeline-item">
+                <div class="time">${s.timestamp.substring(5, 16)}</div>
+                <div class="content"><span class="status-badge status-${s.status}">${statusLabel(s.status)}</span></div>
+                <div class="operator">操作人: ${s.operator} | ${s.remark || ''}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h3>✏️ 人工改动记录</h3>
+          <div class="timeline">
+            ${record.manual_changes.length > 0 ? record.manual_changes.map(c => `
+              <div class="timeline-item">
+                <div class="time">${c.timestamp.substring(5, 16)}</div>
+                <div class="content">字段: ${c.field}</div>
+                <div class="operator">${c.old_value || '(空)'} → ${c.new_value} | by ${c.operator}</div>
+                <div class="operator" style="color: #666;">原因: ${c.reason || '-'}</div>
+              </div>
+            `).join('') : '<div style="font-size: 12px; color: #999;">暂无人工改动</div>'}
+          </div>
+        </div>
+
+        <div class="btn-group">
+          <button class="btn btn-primary" onclick="doEngineerReview('${record.id}')">工程师评审</button>
+          <button class="btn btn-success" onclick="doQcApprove('${record.id}')">QC通过</button>
+          <button class="btn btn-danger" onclick="doQcReject('${record.id}')">QC驳回</button>
+          <button class="btn btn-warning" onclick="doFinalize('${record.id}')">终态确认</button>
+          <button class="btn" style="background: #9b59b6; color: white;" onclick="doRework('${record.id}')">创建返工</button>
+        </div>
+      `;
+    }
+
+    async function doEngineerReview(id) {
+      const notes = prompt('请输入工程师评审备注:', '何工已核查工况数据，补充照片');
+      if (notes === null) return;
+      await fetch(`/api/records/${id}/engineer-review`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ operator: '何工', notes, photoUrls: ['photo-1.jpg', 'photo-2.jpg'] })
+      });
+      await loadData();
+      await selectRecord(id);
+      alert('工程师评审完成');
+    }
+
+    async function doQcApprove(id) {
+      const remark = prompt('请输入QC复核意见:', '数据核查无误，边界问题已确认');
+      if (remark === null) return;
+      await fetch(`/api/records/${id}/qc-approve`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ operator: '质检员', remark })
+      });
+      await loadData();
+      await selectRecord(id);
+      alert('QC复核通过');
+    }
+
+    async function doQcReject(id) {
+      const reason = prompt('请输入QC驳回原因:', '采样时间仍有疑问，需重新核查');
+      if (reason === null) return;
+      await fetch(`/api/records/${id}/qc-reject`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ operator: '质检员', reason })
+      });
+      await loadData();
+      await selectRecord(id);
+      alert('QC已驳回');
+    }
+
+    async function doFinalize(id) {
+      const conclusion = prompt('请输入最终结论:', '效率测试合格，数据真实有效');
+      if (conclusion === null) return;
+      await fetch(`/api/records/${id}/finalize`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ operator: '何工', conclusion })
+      });
+      await loadData();
+      await selectRecord(id);
+      alert('结论已确认，实验复盘图已更新');
+    }
+
+    async function doRework(id) {
+      const reason = prompt('请输入返工原因:', '现场工况照片补充，原结论需修正');
+      if (reason === null) return;
+      const res = await fetch(`/api/records/${id}/rework`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ operator: '何工', reason, photoUrls: ['rework-photo-1.jpg'] })
+      });
+      const data = await res.json();
+      await loadData();
+      alert(`返工已创建\n旧记录: ${data.data.old_record_id}\n新记录: ${data.data.new_record_id}`);
+    }
+
+    loadData();
+  </script>
+</body>
+</html>

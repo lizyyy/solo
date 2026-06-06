@@ -1,0 +1,50 @@
+[
+  {
+    "sensor_id": "SEN-2024-001",
+    "sensor_name": "1号水轮机进口压力传感器",
+    "turbine_id": "TURBINE-A-01",
+    "sampling_time": "2024-06-15T08:00:00.000Z",
+    "sampling_start_time": "2024-06-15T08:00:00.000Z",
+    "sampling_end_time": "2024-06-15T09:00:00.000Z",
+    "efficiency": 92.5,
+    "flow_rate": 45.2,
+    "head": 38.6,
+    "power": 15800
+  },
+  {
+    "sensor_id": "SEN-2024-002",
+    "sensor_name": "1号水轮机出口压力传感器",
+    "turbine_id": "TURBINE-A-01",
+    "sampling_time": "2024-06-15T10:35:00.000Z",
+    "sampling_start_time": "2024-06-15T10:35:00.000Z",
+    "sampling_end_time": "2024-06-15T10:55:00.000Z",
+    "efficiency": 91.8,
+    "flow_rate": 44.8,
+    "head": 38.2,
+    "power": 15600
+  },
+  {
+    "sensor_id": "SEN-2024-003",
+    "sensor_name": "2号水轮机进口压力传感器",
+    "turbine_id": "TURBINE-A-02",
+    "sampling_time": "2024-06-15T11:00:00.000Z",
+    "sampling_start_time": "2024-06-15T11:00:00.000Z",
+    "sampling_end_time": "2024-06-15T12:00:00.000Z",
+    "efficiency": 93.1,
+    "flow_rate": 46.5,
+    "head": 39.1,
+    "power": 16200
+  },
+  {
+    "sensor_id": "SEN-2024-004",
+    "sensor_name": "2号水轮机出口压力传感器",
+    "turbine_id": "TURBINE-A-02",
+    "sampling_time": "2024-06-15T13:00:00.000Z",
+    "sampling_start_time": "2024-06-15T13:00:00.000Z",
+    "sampling_end_time": "2024-06-15T14:00:00.000Z",
+    "efficiency": 92.7,
+    "flow_rate": 46.1,
+    "head": 38.9,
+    "power": 16000
+  }
+]

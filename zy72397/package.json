@@ -1,0 +1,19 @@
+{
+  "name": "turbine-efficiency-playback",
+  "version": "1.0.0",
+  "description": "水轮机效率回放系统 - 带审计追踪的实验数据复盘平台",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "demo": "node scripts/run-demo-scenario.js",
+    "replay": "node scripts/replay-audit-log.js",
+    "import": "node scripts/import-sensor-data.js",
+    "export": "node scripts/export-data.js",
+    "test:boundary": "node scripts/test-boundary-rules.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  }
+}
