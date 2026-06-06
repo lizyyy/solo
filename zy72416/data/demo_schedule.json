@@ -1,0 +1,3406 @@
+{
+  "65c6c49c": {
+    "id": "65c6c49c",
+    "episode_number": "EP01",
+    "track_name": "片头开场音乐(最终版)",
+    "scheduled_date": "2026-06-10",
+    "scheduled_time": "14:00",
+    "duration_minutes": 32,
+    "engineer_name": "李调音师",
+    "status": "review_rejected",
+    "abnormal_type": "leave_counted_as_consumed",
+    "abnormal_note": "请假课时被计入已消耗，需巡演统筹复核",
+    "reviewer": "巡演统筹老王",
+    "review_time": "2026-06-06T23:52:02.143527",
+    "consumed": false,
+    "is_leave": true,
+    "sources": [
+      {
+        "source_name": "调音师留言",
+        "line_number": 1,
+        "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+        "parsed_data": {
+          "episode_number": "EP01",
+          "track_name": "片头开场音乐",
+          "scheduled_date": "2026-06-10",
+          "scheduled_time": "14:00",
+          "duration_minutes": 30,
+          "engineer_name": "李调音师",
+          "consumed": true,
+          "is_leave": false
+        }
+      },
+      {
+        "source_name": "排练群接龙",
+        "line_number": 1,
+        "raw_content": "排练群接龙：小段请假，今天不来排练，下次补上",
+        "parsed_data": {
+          "raw_text": "排练群接龙：小段请假，今天不来排练，下次补上",
+          "is_leave": true
+        }
+      },
+      {
+        "source_name": "曲目核对表",
+        "line_number": 1,
+        "raw_content": "{'track_name': '片头开场音乐(最终版)', 'duration_minutes': 32}",
+        "parsed_data": {
+          "track_name": "片头开场音乐(最终版)",
+          "duration_minutes": 32
+        }
+      }
+    ],
+    "audit_logs": [
+      {
+        "timestamp": "2026-06-06T23:52:02.112771",
+        "step": "step1_import_engineer_message",
+        "operator": "系统自动导入",
+        "action": "导入调音师留言",
+        "before": null,
+        "after": {
+          "id": "65c6c49c",
+          "episode_number": "EP01",
+          "track_name": "片头开场音乐",
+          "scheduled_date": "2026-06-10",
+          "scheduled_time": "14:00",
+          "duration_minutes": 30,
+          "engineer_name": "李调音师",
+          "status": "pending",
+          "abnormal_type": null,
+          "abnormal_note": null,
+          "reviewer": null,
+          "review_time": null,
+          "consumed": true,
+          "is_leave": false,
+          "sources": [
+            {
+              "source_name": "调音师留言",
+              "line_number": 1,
+              "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+              "parsed_data": {
+                "episode_number": "EP01",
+                "track_name": "片头开场音乐",
+                "scheduled_date": "2026-06-10",
+                "scheduled_time": "14:00",
+                "duration_minutes": 30,
+                "engineer_name": "李调音师",
+                "consumed": true,
+                "is_leave": false
+              }
+            }
+          ],
+          "audit_logs": [],
+          "current_step": "step1_import_engineer_message",
+          "manual_edits": []
+        },
+        "note": "从调音师留言第1行导入"
+      },
+      {
+        "timestamp": "2026-06-06T23:52:02.114823",
+        "step": "step2_check_group_signup",
+        "operator": "录音师小段",
+        "action": "核对排练群接龙",
+        "before": {
+          "id": "65c6c49c",
+          "episode_number": "EP01",
+          "track_name": "片头开场音乐",
+          "scheduled_date": "2026-06-10",
+          "scheduled_time": "14:00",
+          "duration_minutes": 30,
+          "engineer_name": "李调音师",
+          "status": "pending",
+          "abnormal_type": null,
+          "abnormal_note": null,
+          "reviewer": null,
+          "review_time": null,
+          "consumed": true,
+          "is_leave": false,
+          "sources": [
+            {
+              "source_name": "调音师留言",
+              "line_number": 1,
+              "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+              "parsed_data": {
+                "episode_number": "EP01",
+                "track_name": "片头开场音乐",
+                "scheduled_date": "2026-06-10",
+                "scheduled_time": "14:00",
+                "duration_minutes": 30,
+                "engineer_name": "李调音师",
+                "consumed": true,
+                "is_leave": false
+              }
+            }
+          ],
+          "audit_logs": [
+            {
+              "timestamp": "2026-06-06T23:52:02.112771",
+              "step": "step1_import_engineer_message",
+              "operator": "系统自动导入",
+              "action": "导入调音师留言",
+              "before": null,
+              "after": {
+                "id": "65c6c49c",
+                "episode_number": "EP01",
+                "track_name": "片头开场音乐",
+                "scheduled_date": "2026-06-10",
+                "scheduled_time": "14:00",
+                "duration_minutes": 30,
+                "engineer_name": "李调音师",
+                "status": "pending",
+                "abnormal_type": null,
+                "abnormal_note": null,
+                "reviewer": null,
+                "review_time": null,
+                "consumed": true,
+                "is_leave": false,
+                "sources": [
+                  {
+                    "source_name": "调音师留言",
+                    "line_number": 1,
+                    "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                    "parsed_data": {
+                      "episode_number": "EP01",
+                      "track_name": "片头开场音乐",
+                      "scheduled_date": "2026-06-10",
+                      "scheduled_time": "14:00",
+                      "duration_minutes": 30,
+                      "engineer_name": "李调音师",
+                      "consumed": true,
+                      "is_leave": false
+                    }
+                  }
+                ],
+                "audit_logs": [],
+                "current_step": "step1_import_engineer_message",
+                "manual_edits": []
+              },
+              "note": "从调音师留言第1行导入"
+            }
+          ],
+          "current_step": "step1_import_engineer_message",
+          "manual_edits": []
+        },
+        "after": {
+          "id": "65c6c49c",
+          "episode_number": "EP01",
+          "track_name": "片头开场音乐",
+          "scheduled_date": "2026-06-10",
+          "scheduled_time": "14:00",
+          "duration_minutes": 30,
+          "engineer_name": "李调音师",
+          "status": "review_required",
+          "abnormal_type": "leave_counted_as_consumed",
+          "abnormal_note": "请假课时被计入已消耗，需巡演统筹复核",
+          "reviewer": null,
+          "review_time": null,
+          "consumed": true,
+          "is_leave": true,
+          "sources": [
+            {
+              "source_name": "调音师留言",
+              "line_number": 1,
+              "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+              "parsed_data": {
+                "episode_number": "EP01",
+                "track_name": "片头开场音乐",
+                "scheduled_date": "2026-06-10",
+                "scheduled_time": "14:00",
+                "duration_minutes": 30,
+                "engineer_name": "李调音师",
+                "consumed": true,
+                "is_leave": false
+              }
+            },
+            {
+              "source_name": "排练群接龙",
+              "line_number": 1,
+              "raw_content": "排练群接龙：小段请假，今天不来排练，下次补上",
+              "parsed_data": {
+                "raw_text": "排练群接龙：小段请假，今天不来排练，下次补上",
+                "is_leave": true
+              }
+            }
+          ],
+          "audit_logs": [
+            {
+              "timestamp": "2026-06-06T23:52:02.112771",
+              "step": "step1_import_engineer_message",
+              "operator": "系统自动导入",
+              "action": "导入调音师留言",
+              "before": null,
+              "after": {
+                "id": "65c6c49c",
+                "episode_number": "EP01",
+                "track_name": "片头开场音乐",
+                "scheduled_date": "2026-06-10",
+                "scheduled_time": "14:00",
+                "duration_minutes": 30,
+                "engineer_name": "李调音师",
+                "status": "pending",
+                "abnormal_type": null,
+                "abnormal_note": null,
+                "reviewer": null,
+                "review_time": null,
+                "consumed": true,
+                "is_leave": false,
+                "sources": [
+                  {
+                    "source_name": "调音师留言",
+                    "line_number": 1,
+                    "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                    "parsed_data": {
+                      "episode_number": "EP01",
+                      "track_name": "片头开场音乐",
+                      "scheduled_date": "2026-06-10",
+                      "scheduled_time": "14:00",
+                      "duration_minutes": 30,
+                      "engineer_name": "李调音师",
+                      "consumed": true,
+                      "is_leave": false
+                    }
+                  }
+                ],
+                "audit_logs": [],
+                "current_step": "step1_import_engineer_message",
+                "manual_edits": []
+              },
+              "note": "从调音师留言第1行导入"
+            }
+          ],
+          "current_step": "step2_check_group_signup",
+          "manual_edits": []
+        },
+        "note": "核对结果: 异常-待复核"
+      },
+      {
+        "timestamp": "2026-06-06T23:52:02.121405",
+        "step": "step3_update_tracklist",
+        "operator": "曲目编辑小周",
+        "action": "更新曲目核对表",
+        "before": {
+          "id": "65c6c49c",
+          "episode_number": "EP01",
+          "track_name": "片头开场音乐",
+          "scheduled_date": "2026-06-10",
+          "scheduled_time": "14:00",
+          "duration_minutes": 30,
+          "engineer_name": "李调音师",
+          "status": "review_required",
+          "abnormal_type": "leave_counted_as_consumed",
+          "abnormal_note": "请假课时被计入已消耗，需巡演统筹复核",
+          "reviewer": null,
+          "review_time": null,
+          "consumed": true,
+          "is_leave": true,
+          "sources": [
+            {
+              "source_name": "调音师留言",
+              "line_number": 1,
+              "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+              "parsed_data": {
+                "episode_number": "EP01",
+                "track_name": "片头开场音乐",
+                "scheduled_date": "2026-06-10",
+                "scheduled_time": "14:00",
+                "duration_minutes": 30,
+                "engineer_name": "李调音师",
+                "consumed": true,
+                "is_leave": false
+              }
+            },
+            {
+              "source_name": "排练群接龙",
+              "line_number": 1,
+              "raw_content": "排练群接龙：小段请假，今天不来排练，下次补上",
+              "parsed_data": {
+                "raw_text": "排练群接龙：小段请假，今天不来排练，下次补上",
+                "is_leave": true
+              }
+            }
+          ],
+          "audit_logs": [
+            {
+              "timestamp": "2026-06-06T23:52:02.112771",
+              "step": "step1_import_engineer_message",
+              "operator": "系统自动导入",
+              "action": "导入调音师留言",
+              "before": null,
+              "after": {
+                "id": "65c6c49c",
+                "episode_number": "EP01",
+                "track_name": "片头开场音乐",
+                "scheduled_date": "2026-06-10",
+                "scheduled_time": "14:00",
+                "duration_minutes": 30,
+                "engineer_name": "李调音师",
+                "status": "pending",
+                "abnormal_type": null,
+                "abnormal_note": null,
+                "reviewer": null,
+                "review_time": null,
+                "consumed": true,
+                "is_leave": false,
+                "sources": [
+                  {
+                    "source_name": "调音师留言",
+                    "line_number": 1,
+                    "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                    "parsed_data": {
+                      "episode_number": "EP01",
+                      "track_name": "片头开场音乐",
+                      "scheduled_date": "2026-06-10",
+                      "scheduled_time": "14:00",
+                      "duration_minutes": 30,
+                      "engineer_name": "李调音师",
+                      "consumed": true,
+                      "is_leave": false
+                    }
+                  }
+                ],
+                "audit_logs": [],
+                "current_step": "step1_import_engineer_message",
+                "manual_edits": []
+              },
+              "note": "从调音师留言第1行导入"
+            },
+            {
+              "timestamp": "2026-06-06T23:52:02.114823",
+              "step": "step2_check_group_signup",
+              "operator": "录音师小段",
+              "action": "核对排练群接龙",
+              "before": {
+                "id": "65c6c49c",
+                "episode_number": "EP01",
+                "track_name": "片头开场音乐",
+                "scheduled_date": "2026-06-10",
+                "scheduled_time": "14:00",
+                "duration_minutes": 30,
+                "engineer_name": "李调音师",
+                "status": "pending",
+                "abnormal_type": null,
+                "abnormal_note": null,
+                "reviewer": null,
+                "review_time": null,
+                "consumed": true,
+                "is_leave": false,
+                "sources": [
+                  {
+                    "source_name": "调音师留言",
+                    "line_number": 1,
+                    "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                    "parsed_data": {
+                      "episode_number": "EP01",
+                      "track_name": "片头开场音乐",
+                      "scheduled_date": "2026-06-10",
+                      "scheduled_time": "14:00",
+                      "duration_minutes": 30,
+                      "engineer_name": "李调音师",
+                      "consumed": true,
+                      "is_leave": false
+                    }
+                  }
+                ],
+                "audit_logs": [
+                  {
+                    "timestamp": "2026-06-06T23:52:02.112771",
+                    "step": "step1_import_engineer_message",
+                    "operator": "系统自动导入",
+                    "action": "导入调音师留言",
+                    "before": null,
+                    "after": {
+                      "id": "65c6c49c",
+                      "episode_number": "EP01",
+                      "track_name": "片头开场音乐",
+                      "scheduled_date": "2026-06-10",
+                      "scheduled_time": "14:00",
+                      "duration_minutes": 30,
+                      "engineer_name": "李调音师",
+                      "status": "pending",
+                      "abnormal_type": null,
+                      "abnormal_note": null,
+                      "reviewer": null,
+                      "review_time": null,
+                      "consumed": true,
+                      "is_leave": false,
+                      "sources": [
+                        {
+                          "source_name": "调音师留言",
+                          "line_number": 1,
+                          "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                          "parsed_data": {
+                            "episode_number": "EP01",
+                            "track_name": "片头开场音乐",
+                            "scheduled_date": "2026-06-10",
+                            "scheduled_time": "14:00",
+                            "duration_minutes": 30,
+                            "engineer_name": "李调音师",
+                            "consumed": true,
+                            "is_leave": false
+                          }
+                        }
+                      ],
+                      "audit_logs": [],
+                      "current_step": "step1_import_engineer_message",
+                      "manual_edits": []
+                    },
+                    "note": "从调音师留言第1行导入"
+                  }
+                ],
+                "current_step": "step1_import_engineer_message",
+                "manual_edits": []
+              },
+              "after": {
+                "id": "65c6c49c",
+                "episode_number": "EP01",
+                "track_name": "片头开场音乐",
+                "scheduled_date": "2026-06-10",
+                "scheduled_time": "14:00",
+                "duration_minutes": 30,
+                "engineer_name": "李调音师",
+                "status": "review_required",
+                "abnormal_type": "leave_counted_as_consumed",
+                "abnormal_note": "请假课时被计入已消耗，需巡演统筹复核",
+                "reviewer": null,
+                "review_time": null,
+                "consumed": true,
+                "is_leave": true,
+                "sources": [
+                  {
+                    "source_name": "调音师留言",
+                    "line_number": 1,
+                    "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                    "parsed_data": {
+                      "episode_number": "EP01",
+                      "track_name": "片头开场音乐",
+                      "scheduled_date": "2026-06-10",
+                      "scheduled_time": "14:00",
+                      "duration_minutes": 30,
+                      "engineer_name": "李调音师",
+                      "consumed": true,
+                      "is_leave": false
+                    }
+                  },
+                  {
+                    "source_name": "排练群接龙",
+                    "line_number": 1,
+                    "raw_content": "排练群接龙：小段请假，今天不来排练，下次补上",
+                    "parsed_data": {
+                      "raw_text": "排练群接龙：小段请假，今天不来排练，下次补上",
+                      "is_leave": true
+                    }
+                  }
+                ],
+                "audit_logs": [
+                  {
+                    "timestamp": "2026-06-06T23:52:02.112771",
+                    "step": "step1_import_engineer_message",
+                    "operator": "系统自动导入",
+                    "action": "导入调音师留言",
+                    "before": null,
+                    "after": {
+                      "id": "65c6c49c",
+                      "episode_number": "EP01",
+                      "track_name": "片头开场音乐",
+                      "scheduled_date": "2026-06-10",
+                      "scheduled_time": "14:00",
+                      "duration_minutes": 30,
+                      "engineer_name": "李调音师",
+                      "status": "pending",
+                      "abnormal_type": null,
+                      "abnormal_note": null,
+                      "reviewer": null,
+                      "review_time": null,
+                      "consumed": true,
+                      "is_leave": false,
+                      "sources": [
+                        {
+                          "source_name": "调音师留言",
+                          "line_number": 1,
+                          "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                          "parsed_data": {
+                            "episode_number": "EP01",
+                            "track_name": "片头开场音乐",
+                            "scheduled_date": "2026-06-10",
+                            "scheduled_time": "14:00",
+                            "duration_minutes": 30,
+                            "engineer_name": "李调音师",
+                            "consumed": true,
+                            "is_leave": false
+                          }
+                        }
+                      ],
+                      "audit_logs": [],
+                      "current_step": "step1_import_engineer_message",
+                      "manual_edits": []
+                    },
+                    "note": "从调音师留言第1行导入"
+                  }
+                ],
+                "current_step": "step2_check_group_signup",
+                "manual_edits": []
+              },
+              "note": "核对结果: 异常-待复核"
+            }
+          ],
+          "current_step": "step2_check_group_signup",
+          "manual_edits": []
+        },
+        "after": {
+          "id": "65c6c49c",
+          "episode_number": "EP01",
+          "track_name": "片头开场音乐(最终版)",
+          "scheduled_date": "2026-06-10",
+          "scheduled_time": "14:00",
+          "duration_minutes": 32,
+          "engineer_name": "李调音师",
+          "status": "review_required",
+          "abnormal_type": "leave_counted_as_consumed",
+          "abnormal_note": "请假课时被计入已消耗，需巡演统筹复核",
+          "reviewer": null,
+          "review_time": null,
+          "consumed": true,
+          "is_leave": true,
+          "sources": [
+            {
+              "source_name": "调音师留言",
+              "line_number": 1,
+              "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+              "parsed_data": {
+                "episode_number": "EP01",
+                "track_name": "片头开场音乐",
+                "scheduled_date": "2026-06-10",
+                "scheduled_time": "14:00",
+                "duration_minutes": 30,
+                "engineer_name": "李调音师",
+                "consumed": true,
+                "is_leave": false
+              }
+            },
+            {
+              "source_name": "排练群接龙",
+              "line_number": 1,
+              "raw_content": "排练群接龙：小段请假，今天不来排练，下次补上",
+              "parsed_data": {
+                "raw_text": "排练群接龙：小段请假，今天不来排练，下次补上",
+                "is_leave": true
+              }
+            },
+            {
+              "source_name": "曲目核对表",
+              "line_number": 1,
+              "raw_content": "{'track_name': '片头开场音乐(最终版)', 'duration_minutes': 32}",
+              "parsed_data": {
+                "track_name": "片头开场音乐(最终版)",
+                "duration_minutes": 32
+              }
+            }
+          ],
+          "audit_logs": [
+            {
+              "timestamp": "2026-06-06T23:52:02.112771",
+              "step": "step1_import_engineer_message",
+              "operator": "系统自动导入",
+              "action": "导入调音师留言",
+              "before": null,
+              "after": {
+                "id": "65c6c49c",
+                "episode_number": "EP01",
+                "track_name": "片头开场音乐",
+                "scheduled_date": "2026-06-10",
+                "scheduled_time": "14:00",
+                "duration_minutes": 30,
+                "engineer_name": "李调音师",
+                "status": "pending",
+                "abnormal_type": null,
+                "abnormal_note": null,
+                "reviewer": null,
+                "review_time": null,
+                "consumed": true,
+                "is_leave": false,
+                "sources": [
+                  {
+                    "source_name": "调音师留言",
+                    "line_number": 1,
+                    "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                    "parsed_data": {
+                      "episode_number": "EP01",
+                      "track_name": "片头开场音乐",
+                      "scheduled_date": "2026-06-10",
+                      "scheduled_time": "14:00",
+                      "duration_minutes": 30,
+                      "engineer_name": "李调音师",
+                      "consumed": true,
+                      "is_leave": false
+                    }
+                  }
+                ],
+                "audit_logs": [],
+                "current_step": "step1_import_engineer_message",
+                "manual_edits": []
+              },
+              "note": "从调音师留言第1行导入"
+            },
+            {
+              "timestamp": "2026-06-06T23:52:02.114823",
+              "step": "step2_check_group_signup",
+              "operator": "录音师小段",
+              "action": "核对排练群接龙",
+              "before": {
+                "id": "65c6c49c",
+                "episode_number": "EP01",
+                "track_name": "片头开场音乐",
+                "scheduled_date": "2026-06-10",
+                "scheduled_time": "14:00",
+                "duration_minutes": 30,
+                "engineer_name": "李调音师",
+                "status": "pending",
+                "abnormal_type": null,
+                "abnormal_note": null,
+                "reviewer": null,
+                "review_time": null,
+                "consumed": true,
+                "is_leave": false,
+                "sources": [
+                  {
+                    "source_name": "调音师留言",
+                    "line_number": 1,
+                    "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                    "parsed_data": {
+                      "episode_number": "EP01",
+                      "track_name": "片头开场音乐",
+                      "scheduled_date": "2026-06-10",
+                      "scheduled_time": "14:00",
+                      "duration_minutes": 30,
+                      "engineer_name": "李调音师",
+                      "consumed": true,
+                      "is_leave": false
+                    }
+                  }
+                ],
+                "audit_logs": [
+                  {
+                    "timestamp": "2026-06-06T23:52:02.112771",
+                    "step": "step1_import_engineer_message",
+                    "operator": "系统自动导入",
+                    "action": "导入调音师留言",
+                    "before": null,
+                    "after": {
+                      "id": "65c6c49c",
+                      "episode_number": "EP01",
+                      "track_name": "片头开场音乐",
+                      "scheduled_date": "2026-06-10",
+                      "scheduled_time": "14:00",
+                      "duration_minutes": 30,
+                      "engineer_name": "李调音师",
+                      "status": "pending",
+                      "abnormal_type": null,
+                      "abnormal_note": null,
+                      "reviewer": null,
+                      "review_time": null,
+                      "consumed": true,
+                      "is_leave": false,
+                      "sources": [
+                        {
+                          "source_name": "调音师留言",
+                          "line_number": 1,
+                          "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                          "parsed_data": {
+                            "episode_number": "EP01",
+                            "track_name": "片头开场音乐",
+                            "scheduled_date": "2026-06-10",
+                            "scheduled_time": "14:00",
+                            "duration_minutes": 30,
+                            "engineer_name": "李调音师",
+                            "consumed": true,
+                            "is_leave": false
+                          }
+                        }
+                      ],
+                      "audit_logs": [],
+                      "current_step": "step1_import_engineer_message",
+                      "manual_edits": []
+                    },
+                    "note": "从调音师留言第1行导入"
+                  }
+                ],
+                "current_step": "step1_import_engineer_message",
+                "manual_edits": []
+              },
+              "after": {
+                "id": "65c6c49c",
+                "episode_number": "EP01",
+                "track_name": "片头开场音乐",
+                "scheduled_date": "2026-06-10",
+                "scheduled_time": "14:00",
+                "duration_minutes": 30,
+                "engineer_name": "李调音师",
+                "status": "review_required",
+                "abnormal_type": "leave_counted_as_consumed",
+                "abnormal_note": "请假课时被计入已消耗，需巡演统筹复核",
+                "reviewer": null,
+                "review_time": null,
+                "consumed": true,
+                "is_leave": true,
+                "sources": [
+                  {
+                    "source_name": "调音师留言",
+                    "line_number": 1,
+                    "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                    "parsed_data": {
+                      "episode_number": "EP01",
+                      "track_name": "片头开场音乐",
+                      "scheduled_date": "2026-06-10",
+                      "scheduled_time": "14:00",
+                      "duration_minutes": 30,
+                      "engineer_name": "李调音师",
+                      "consumed": true,
+                      "is_leave": false
+                    }
+                  },
+                  {
+                    "source_name": "排练群接龙",
+                    "line_number": 1,
+                    "raw_content": "排练群接龙：小段请假，今天不来排练，下次补上",
+                    "parsed_data": {
+                      "raw_text": "排练群接龙：小段请假，今天不来排练，下次补上",
+                      "is_leave": true
+                    }
+                  }
+                ],
+                "audit_logs": [
+                  {
+                    "timestamp": "2026-06-06T23:52:02.112771",
+                    "step": "step1_import_engineer_message",
+                    "operator": "系统自动导入",
+                    "action": "导入调音师留言",
+                    "before": null,
+                    "after": {
+                      "id": "65c6c49c",
+                      "episode_number": "EP01",
+                      "track_name": "片头开场音乐",
+                      "scheduled_date": "2026-06-10",
+                      "scheduled_time": "14:00",
+                      "duration_minutes": 30,
+                      "engineer_name": "李调音师",
+                      "status": "pending",
+                      "abnormal_type": null,
+                      "abnormal_note": null,
+                      "reviewer": null,
+                      "review_time": null,
+                      "consumed": true,
+                      "is_leave": false,
+                      "sources": [
+                        {
+                          "source_name": "调音师留言",
+                          "line_number": 1,
+                          "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                          "parsed_data": {
+                            "episode_number": "EP01",
+                            "track_name": "片头开场音乐",
+                            "scheduled_date": "2026-06-10",
+                            "scheduled_time": "14:00",
+                            "duration_minutes": 30,
+                            "engineer_name": "李调音师",
+                            "consumed": true,
+                            "is_leave": false
+                          }
+                        }
+                      ],
+                      "audit_logs": [],
+                      "current_step": "step1_import_engineer_message",
+                      "manual_edits": []
+                    },
+                    "note": "从调音师留言第1行导入"
+                  }
+                ],
+                "current_step": "step2_check_group_signup",
+                "manual_edits": []
+              },
+              "note": "核对结果: 异常-待复核"
+            }
+          ],
+          "current_step": "step3_update_tracklist",
+          "manual_edits": []
+        },
+        "note": null
+      },
+      {
+        "timestamp": "2026-06-06T23:52:02.143530",
+        "step": "step3_update_tracklist",
+        "operator": "巡演统筹老王",
+        "action": "统筹复核驳回",
+        "before": {
+          "id": "65c6c49c",
+          "episode_number": "EP01",
+          "track_name": "片头开场音乐(最终版)",
+          "scheduled_date": "2026-06-10",
+          "scheduled_time": "14:00",
+          "duration_minutes": 32,
+          "engineer_name": "李调音师",
+          "status": "review_required",
+          "abnormal_type": "leave_counted_as_consumed",
+          "abnormal_note": "请假课时被计入已消耗，需巡演统筹复核",
+          "reviewer": null,
+          "review_time": null,
+          "consumed": true,
+          "is_leave": true,
+          "sources": [
+            {
+              "source_name": "调音师留言",
+              "line_number": 1,
+              "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+              "parsed_data": {
+                "episode_number": "EP01",
+                "track_name": "片头开场音乐",
+                "scheduled_date": "2026-06-10",
+                "scheduled_time": "14:00",
+                "duration_minutes": 30,
+                "engineer_name": "李调音师",
+                "consumed": true,
+                "is_leave": false
+              }
+            },
+            {
+              "source_name": "排练群接龙",
+              "line_number": 1,
+              "raw_content": "排练群接龙：小段请假，今天不来排练，下次补上",
+              "parsed_data": {
+                "raw_text": "排练群接龙：小段请假，今天不来排练，下次补上",
+                "is_leave": true
+              }
+            },
+            {
+              "source_name": "曲目核对表",
+              "line_number": 1,
+              "raw_content": "{'track_name': '片头开场音乐(最终版)', 'duration_minutes': 32}",
+              "parsed_data": {
+                "track_name": "片头开场音乐(最终版)",
+                "duration_minutes": 32
+              }
+            }
+          ],
+          "audit_logs": [
+            {
+              "timestamp": "2026-06-06T23:52:02.112771",
+              "step": "step1_import_engineer_message",
+              "operator": "系统自动导入",
+              "action": "导入调音师留言",
+              "before": null,
+              "after": {
+                "id": "65c6c49c",
+                "episode_number": "EP01",
+                "track_name": "片头开场音乐",
+                "scheduled_date": "2026-06-10",
+                "scheduled_time": "14:00",
+                "duration_minutes": 30,
+                "engineer_name": "李调音师",
+                "status": "pending",
+                "abnormal_type": null,
+                "abnormal_note": null,
+                "reviewer": null,
+                "review_time": null,
+                "consumed": true,
+                "is_leave": false,
+                "sources": [
+                  {
+                    "source_name": "调音师留言",
+                    "line_number": 1,
+                    "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                    "parsed_data": {
+                      "episode_number": "EP01",
+                      "track_name": "片头开场音乐",
+                      "scheduled_date": "2026-06-10",
+                      "scheduled_time": "14:00",
+                      "duration_minutes": 30,
+                      "engineer_name": "李调音师",
+                      "consumed": true,
+                      "is_leave": false
+                    }
+                  }
+                ],
+                "audit_logs": [],
+                "current_step": "step1_import_engineer_message",
+                "manual_edits": []
+              },
+              "note": "从调音师留言第1行导入"
+            },
+            {
+              "timestamp": "2026-06-06T23:52:02.114823",
+              "step": "step2_check_group_signup",
+              "operator": "录音师小段",
+              "action": "核对排练群接龙",
+              "before": {
+                "id": "65c6c49c",
+                "episode_number": "EP01",
+                "track_name": "片头开场音乐",
+                "scheduled_date": "2026-06-10",
+                "scheduled_time": "14:00",
+                "duration_minutes": 30,
+                "engineer_name": "李调音师",
+                "status": "pending",
+                "abnormal_type": null,
+                "abnormal_note": null,
+                "reviewer": null,
+                "review_time": null,
+                "consumed": true,
+                "is_leave": false,
+                "sources": [
+                  {
+                    "source_name": "调音师留言",
+                    "line_number": 1,
+                    "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                    "parsed_data": {
+                      "episode_number": "EP01",
+                      "track_name": "片头开场音乐",
+                      "scheduled_date": "2026-06-10",
+                      "scheduled_time": "14:00",
+                      "duration_minutes": 30,
+                      "engineer_name": "李调音师",
+                      "consumed": true,
+                      "is_leave": false
+                    }
+                  }
+                ],
+                "audit_logs": [
+                  {
+                    "timestamp": "2026-06-06T23:52:02.112771",
+                    "step": "step1_import_engineer_message",
+                    "operator": "系统自动导入",
+                    "action": "导入调音师留言",
+                    "before": null,
+                    "after": {
+                      "id": "65c6c49c",
+                      "episode_number": "EP01",
+                      "track_name": "片头开场音乐",
+                      "scheduled_date": "2026-06-10",
+                      "scheduled_time": "14:00",
+                      "duration_minutes": 30,
+                      "engineer_name": "李调音师",
+                      "status": "pending",
+                      "abnormal_type": null,
+                      "abnormal_note": null,
+                      "reviewer": null,
+                      "review_time": null,
+                      "consumed": true,
+                      "is_leave": false,
+                      "sources": [
+                        {
+                          "source_name": "调音师留言",
+                          "line_number": 1,
+                          "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                          "parsed_data": {
+                            "episode_number": "EP01",
+                            "track_name": "片头开场音乐",
+                            "scheduled_date": "2026-06-10",
+                            "scheduled_time": "14:00",
+                            "duration_minutes": 30,
+                            "engineer_name": "李调音师",
+                            "consumed": true,
+                            "is_leave": false
+                          }
+                        }
+                      ],
+                      "audit_logs": [],
+                      "current_step": "step1_import_engineer_message",
+                      "manual_edits": []
+                    },
+                    "note": "从调音师留言第1行导入"
+                  }
+                ],
+                "current_step": "step1_import_engineer_message",
+                "manual_edits": []
+              },
+              "after": {
+                "id": "65c6c49c",
+                "episode_number": "EP01",
+                "track_name": "片头开场音乐",
+                "scheduled_date": "2026-06-10",
+                "scheduled_time": "14:00",
+                "duration_minutes": 30,
+                "engineer_name": "李调音师",
+                "status": "review_required",
+                "abnormal_type": "leave_counted_as_consumed",
+                "abnormal_note": "请假课时被计入已消耗，需巡演统筹复核",
+                "reviewer": null,
+                "review_time": null,
+                "consumed": true,
+                "is_leave": true,
+                "sources": [
+                  {
+                    "source_name": "调音师留言",
+                    "line_number": 1,
+                    "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                    "parsed_data": {
+                      "episode_number": "EP01",
+                      "track_name": "片头开场音乐",
+                      "scheduled_date": "2026-06-10",
+                      "scheduled_time": "14:00",
+                      "duration_minutes": 30,
+                      "engineer_name": "李调音师",
+                      "consumed": true,
+                      "is_leave": false
+                    }
+                  },
+                  {
+                    "source_name": "排练群接龙",
+                    "line_number": 1,
+                    "raw_content": "排练群接龙：小段请假，今天不来排练，下次补上",
+                    "parsed_data": {
+                      "raw_text": "排练群接龙：小段请假，今天不来排练，下次补上",
+                      "is_leave": true
+                    }
+                  }
+                ],
+                "audit_logs": [
+                  {
+                    "timestamp": "2026-06-06T23:52:02.112771",
+                    "step": "step1_import_engineer_message",
+                    "operator": "系统自动导入",
+                    "action": "导入调音师留言",
+                    "before": null,
+                    "after": {
+                      "id": "65c6c49c",
+                      "episode_number": "EP01",
+                      "track_name": "片头开场音乐",
+                      "scheduled_date": "2026-06-10",
+                      "scheduled_time": "14:00",
+                      "duration_minutes": 30,
+                      "engineer_name": "李调音师",
+                      "status": "pending",
+                      "abnormal_type": null,
+                      "abnormal_note": null,
+                      "reviewer": null,
+                      "review_time": null,
+                      "consumed": true,
+                      "is_leave": false,
+                      "sources": [
+                        {
+                          "source_name": "调音师留言",
+                          "line_number": 1,
+                          "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                          "parsed_data": {
+                            "episode_number": "EP01",
+                            "track_name": "片头开场音乐",
+                            "scheduled_date": "2026-06-10",
+                            "scheduled_time": "14:00",
+                            "duration_minutes": 30,
+                            "engineer_name": "李调音师",
+                            "consumed": true,
+                            "is_leave": false
+                          }
+                        }
+                      ],
+                      "audit_logs": [],
+                      "current_step": "step1_import_engineer_message",
+                      "manual_edits": []
+                    },
+                    "note": "从调音师留言第1行导入"
+                  }
+                ],
+                "current_step": "step2_check_group_signup",
+                "manual_edits": []
+              },
+              "note": "核对结果: 异常-待复核"
+            },
+            {
+              "timestamp": "2026-06-06T23:52:02.121405",
+              "step": "step3_update_tracklist",
+              "operator": "曲目编辑小周",
+              "action": "更新曲目核对表",
+              "before": {
+                "id": "65c6c49c",
+                "episode_number": "EP01",
+                "track_name": "片头开场音乐",
+                "scheduled_date": "2026-06-10",
+                "scheduled_time": "14:00",
+                "duration_minutes": 30,
+                "engineer_name": "李调音师",
+                "status": "review_required",
+                "abnormal_type": "leave_counted_as_consumed",
+                "abnormal_note": "请假课时被计入已消耗，需巡演统筹复核",
+                "reviewer": null,
+                "review_time": null,
+                "consumed": true,
+                "is_leave": true,
+                "sources": [
+                  {
+                    "source_name": "调音师留言",
+                    "line_number": 1,
+                    "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                    "parsed_data": {
+                      "episode_number": "EP01",
+                      "track_name": "片头开场音乐",
+                      "scheduled_date": "2026-06-10",
+                      "scheduled_time": "14:00",
+                      "duration_minutes": 30,
+                      "engineer_name": "李调音师",
+                      "consumed": true,
+                      "is_leave": false
+                    }
+                  },
+                  {
+                    "source_name": "排练群接龙",
+                    "line_number": 1,
+                    "raw_content": "排练群接龙：小段请假，今天不来排练，下次补上",
+                    "parsed_data": {
+                      "raw_text": "排练群接龙：小段请假，今天不来排练，下次补上",
+                      "is_leave": true
+                    }
+                  }
+                ],
+                "audit_logs": [
+                  {
+                    "timestamp": "2026-06-06T23:52:02.112771",
+                    "step": "step1_import_engineer_message",
+                    "operator": "系统自动导入",
+                    "action": "导入调音师留言",
+                    "before": null,
+                    "after": {
+                      "id": "65c6c49c",
+                      "episode_number": "EP01",
+                      "track_name": "片头开场音乐",
+                      "scheduled_date": "2026-06-10",
+                      "scheduled_time": "14:00",
+                      "duration_minutes": 30,
+                      "engineer_name": "李调音师",
+                      "status": "pending",
+                      "abnormal_type": null,
+                      "abnormal_note": null,
+                      "reviewer": null,
+                      "review_time": null,
+                      "consumed": true,
+                      "is_leave": false,
+                      "sources": [
+                        {
+                          "source_name": "调音师留言",
+                          "line_number": 1,
+                          "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                          "parsed_data": {
+                            "episode_number": "EP01",
+                            "track_name": "片头开场音乐",
+                            "scheduled_date": "2026-06-10",
+                            "scheduled_time": "14:00",
+                            "duration_minutes": 30,
+                            "engineer_name": "李调音师",
+                            "consumed": true,
+                            "is_leave": false
+                          }
+                        }
+                      ],
+                      "audit_logs": [],
+                      "current_step": "step1_import_engineer_message",
+                      "manual_edits": []
+                    },
+                    "note": "从调音师留言第1行导入"
+                  },
+                  {
+                    "timestamp": "2026-06-06T23:52:02.114823",
+                    "step": "step2_check_group_signup",
+                    "operator": "录音师小段",
+                    "action": "核对排练群接龙",
+                    "before": {
+                      "id": "65c6c49c",
+                      "episode_number": "EP01",
+                      "track_name": "片头开场音乐",
+                      "scheduled_date": "2026-06-10",
+                      "scheduled_time": "14:00",
+                      "duration_minutes": 30,
+                      "engineer_name": "李调音师",
+                      "status": "pending",
+                      "abnormal_type": null,
+                      "abnormal_note": null,
+                      "reviewer": null,
+                      "review_time": null,
+                      "consumed": true,
+                      "is_leave": false,
+                      "sources": [
+                        {
+                          "source_name": "调音师留言",
+                          "line_number": 1,
+                          "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                          "parsed_data": {
+                            "episode_number": "EP01",
+                            "track_name": "片头开场音乐",
+                            "scheduled_date": "2026-06-10",
+                            "scheduled_time": "14:00",
+                            "duration_minutes": 30,
+                            "engineer_name": "李调音师",
+                            "consumed": true,
+                            "is_leave": false
+                          }
+                        }
+                      ],
+                      "audit_logs": [
+                        {
+                          "timestamp": "2026-06-06T23:52:02.112771",
+                          "step": "step1_import_engineer_message",
+                          "operator": "系统自动导入",
+                          "action": "导入调音师留言",
+                          "before": null,
+                          "after": {
+                            "id": "65c6c49c",
+                            "episode_number": "EP01",
+                            "track_name": "片头开场音乐",
+                            "scheduled_date": "2026-06-10",
+                            "scheduled_time": "14:00",
+                            "duration_minutes": 30,
+                            "engineer_name": "李调音师",
+                            "status": "pending",
+                            "abnormal_type": null,
+                            "abnormal_note": null,
+                            "reviewer": null,
+                            "review_time": null,
+                            "consumed": true,
+                            "is_leave": false,
+                            "sources": [
+                              {
+                                "source_name": "调音师留言",
+                                "line_number": 1,
+                                "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                                "parsed_data": {
+                                  "episode_number": "EP01",
+                                  "track_name": "片头开场音乐",
+                                  "scheduled_date": "2026-06-10",
+                                  "scheduled_time": "14:00",
+                                  "duration_minutes": 30,
+                                  "engineer_name": "李调音师",
+                                  "consumed": true,
+                                  "is_leave": false
+                                }
+                              }
+                            ],
+                            "audit_logs": [],
+                            "current_step": "step1_import_engineer_message",
+                            "manual_edits": []
+                          },
+                          "note": "从调音师留言第1行导入"
+                        }
+                      ],
+                      "current_step": "step1_import_engineer_message",
+                      "manual_edits": []
+                    },
+                    "after": {
+                      "id": "65c6c49c",
+                      "episode_number": "EP01",
+                      "track_name": "片头开场音乐",
+                      "scheduled_date": "2026-06-10",
+                      "scheduled_time": "14:00",
+                      "duration_minutes": 30,
+                      "engineer_name": "李调音师",
+                      "status": "review_required",
+                      "abnormal_type": "leave_counted_as_consumed",
+                      "abnormal_note": "请假课时被计入已消耗，需巡演统筹复核",
+                      "reviewer": null,
+                      "review_time": null,
+                      "consumed": true,
+                      "is_leave": true,
+                      "sources": [
+                        {
+                          "source_name": "调音师留言",
+                          "line_number": 1,
+                          "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                          "parsed_data": {
+                            "episode_number": "EP01",
+                            "track_name": "片头开场音乐",
+                            "scheduled_date": "2026-06-10",
+                            "scheduled_time": "14:00",
+                            "duration_minutes": 30,
+                            "engineer_name": "李调音师",
+                            "consumed": true,
+                            "is_leave": false
+                          }
+                        },
+                        {
+                          "source_name": "排练群接龙",
+                          "line_number": 1,
+                          "raw_content": "排练群接龙：小段请假，今天不来排练，下次补上",
+                          "parsed_data": {
+                            "raw_text": "排练群接龙：小段请假，今天不来排练，下次补上",
+                            "is_leave": true
+                          }
+                        }
+                      ],
+                      "audit_logs": [
+                        {
+                          "timestamp": "2026-06-06T23:52:02.112771",
+                          "step": "step1_import_engineer_message",
+                          "operator": "系统自动导入",
+                          "action": "导入调音师留言",
+                          "before": null,
+                          "after": {
+                            "id": "65c6c49c",
+                            "episode_number": "EP01",
+                            "track_name": "片头开场音乐",
+                            "scheduled_date": "2026-06-10",
+                            "scheduled_time": "14:00",
+                            "duration_minutes": 30,
+                            "engineer_name": "李调音师",
+                            "status": "pending",
+                            "abnormal_type": null,
+                            "abnormal_note": null,
+                            "reviewer": null,
+                            "review_time": null,
+                            "consumed": true,
+                            "is_leave": false,
+                            "sources": [
+                              {
+                                "source_name": "调音师留言",
+                                "line_number": 1,
+                                "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                                "parsed_data": {
+                                  "episode_number": "EP01",
+                                  "track_name": "片头开场音乐",
+                                  "scheduled_date": "2026-06-10",
+                                  "scheduled_time": "14:00",
+                                  "duration_minutes": 30,
+                                  "engineer_name": "李调音师",
+                                  "consumed": true,
+                                  "is_leave": false
+                                }
+                              }
+                            ],
+                            "audit_logs": [],
+                            "current_step": "step1_import_engineer_message",
+                            "manual_edits": []
+                          },
+                          "note": "从调音师留言第1行导入"
+                        }
+                      ],
+                      "current_step": "step2_check_group_signup",
+                      "manual_edits": []
+                    },
+                    "note": "核对结果: 异常-待复核"
+                  }
+                ],
+                "current_step": "step2_check_group_signup",
+                "manual_edits": []
+              },
+              "after": {
+                "id": "65c6c49c",
+                "episode_number": "EP01",
+                "track_name": "片头开场音乐(最终版)",
+                "scheduled_date": "2026-06-10",
+                "scheduled_time": "14:00",
+                "duration_minutes": 32,
+                "engineer_name": "李调音师",
+                "status": "review_required",
+                "abnormal_type": "leave_counted_as_consumed",
+                "abnormal_note": "请假课时被计入已消耗，需巡演统筹复核",
+                "reviewer": null,
+                "review_time": null,
+                "consumed": true,
+                "is_leave": true,
+                "sources": [
+                  {
+                    "source_name": "调音师留言",
+                    "line_number": 1,
+                    "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                    "parsed_data": {
+                      "episode_number": "EP01",
+                      "track_name": "片头开场音乐",
+                      "scheduled_date": "2026-06-10",
+                      "scheduled_time": "14:00",
+                      "duration_minutes": 30,
+                      "engineer_name": "李调音师",
+                      "consumed": true,
+                      "is_leave": false
+                    }
+                  },
+                  {
+                    "source_name": "排练群接龙",
+                    "line_number": 1,
+                    "raw_content": "排练群接龙：小段请假，今天不来排练，下次补上",
+                    "parsed_data": {
+                      "raw_text": "排练群接龙：小段请假，今天不来排练，下次补上",
+                      "is_leave": true
+                    }
+                  },
+                  {
+                    "source_name": "曲目核对表",
+                    "line_number": 1,
+                    "raw_content": "{'track_name': '片头开场音乐(最终版)', 'duration_minutes': 32}",
+                    "parsed_data": {
+                      "track_name": "片头开场音乐(最终版)",
+                      "duration_minutes": 32
+                    }
+                  }
+                ],
+                "audit_logs": [
+                  {
+                    "timestamp": "2026-06-06T23:52:02.112771",
+                    "step": "step1_import_engineer_message",
+                    "operator": "系统自动导入",
+                    "action": "导入调音师留言",
+                    "before": null,
+                    "after": {
+                      "id": "65c6c49c",
+                      "episode_number": "EP01",
+                      "track_name": "片头开场音乐",
+                      "scheduled_date": "2026-06-10",
+                      "scheduled_time": "14:00",
+                      "duration_minutes": 30,
+                      "engineer_name": "李调音师",
+                      "status": "pending",
+                      "abnormal_type": null,
+                      "abnormal_note": null,
+                      "reviewer": null,
+                      "review_time": null,
+                      "consumed": true,
+                      "is_leave": false,
+                      "sources": [
+                        {
+                          "source_name": "调音师留言",
+                          "line_number": 1,
+                          "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                          "parsed_data": {
+                            "episode_number": "EP01",
+                            "track_name": "片头开场音乐",
+                            "scheduled_date": "2026-06-10",
+                            "scheduled_time": "14:00",
+                            "duration_minutes": 30,
+                            "engineer_name": "李调音师",
+                            "consumed": true,
+                            "is_leave": false
+                          }
+                        }
+                      ],
+                      "audit_logs": [],
+                      "current_step": "step1_import_engineer_message",
+                      "manual_edits": []
+                    },
+                    "note": "从调音师留言第1行导入"
+                  },
+                  {
+                    "timestamp": "2026-06-06T23:52:02.114823",
+                    "step": "step2_check_group_signup",
+                    "operator": "录音师小段",
+                    "action": "核对排练群接龙",
+                    "before": {
+                      "id": "65c6c49c",
+                      "episode_number": "EP01",
+                      "track_name": "片头开场音乐",
+                      "scheduled_date": "2026-06-10",
+                      "scheduled_time": "14:00",
+                      "duration_minutes": 30,
+                      "engineer_name": "李调音师",
+                      "status": "pending",
+                      "abnormal_type": null,
+                      "abnormal_note": null,
+                      "reviewer": null,
+                      "review_time": null,
+                      "consumed": true,
+                      "is_leave": false,
+                      "sources": [
+                        {
+                          "source_name": "调音师留言",
+                          "line_number": 1,
+                          "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                          "parsed_data": {
+                            "episode_number": "EP01",
+                            "track_name": "片头开场音乐",
+                            "scheduled_date": "2026-06-10",
+                            "scheduled_time": "14:00",
+                            "duration_minutes": 30,
+                            "engineer_name": "李调音师",
+                            "consumed": true,
+                            "is_leave": false
+                          }
+                        }
+                      ],
+                      "audit_logs": [
+                        {
+                          "timestamp": "2026-06-06T23:52:02.112771",
+                          "step": "step1_import_engineer_message",
+                          "operator": "系统自动导入",
+                          "action": "导入调音师留言",
+                          "before": null,
+                          "after": {
+                            "id": "65c6c49c",
+                            "episode_number": "EP01",
+                            "track_name": "片头开场音乐",
+                            "scheduled_date": "2026-06-10",
+                            "scheduled_time": "14:00",
+                            "duration_minutes": 30,
+                            "engineer_name": "李调音师",
+                            "status": "pending",
+                            "abnormal_type": null,
+                            "abnormal_note": null,
+                            "reviewer": null,
+                            "review_time": null,
+                            "consumed": true,
+                            "is_leave": false,
+                            "sources": [
+                              {
+                                "source_name": "调音师留言",
+                                "line_number": 1,
+                                "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                                "parsed_data": {
+                                  "episode_number": "EP01",
+                                  "track_name": "片头开场音乐",
+                                  "scheduled_date": "2026-06-10",
+                                  "scheduled_time": "14:00",
+                                  "duration_minutes": 30,
+                                  "engineer_name": "李调音师",
+                                  "consumed": true,
+                                  "is_leave": false
+                                }
+                              }
+                            ],
+                            "audit_logs": [],
+                            "current_step": "step1_import_engineer_message",
+                            "manual_edits": []
+                          },
+                          "note": "从调音师留言第1行导入"
+                        }
+                      ],
+                      "current_step": "step1_import_engineer_message",
+                      "manual_edits": []
+                    },
+                    "after": {
+                      "id": "65c6c49c",
+                      "episode_number": "EP01",
+                      "track_name": "片头开场音乐",
+                      "scheduled_date": "2026-06-10",
+                      "scheduled_time": "14:00",
+                      "duration_minutes": 30,
+                      "engineer_name": "李调音师",
+                      "status": "review_required",
+                      "abnormal_type": "leave_counted_as_consumed",
+                      "abnormal_note": "请假课时被计入已消耗，需巡演统筹复核",
+                      "reviewer": null,
+                      "review_time": null,
+                      "consumed": true,
+                      "is_leave": true,
+                      "sources": [
+                        {
+                          "source_name": "调音师留言",
+                          "line_number": 1,
+                          "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                          "parsed_data": {
+                            "episode_number": "EP01",
+                            "track_name": "片头开场音乐",
+                            "scheduled_date": "2026-06-10",
+                            "scheduled_time": "14:00",
+                            "duration_minutes": 30,
+                            "engineer_name": "李调音师",
+                            "consumed": true,
+                            "is_leave": false
+                          }
+                        },
+                        {
+                          "source_name": "排练群接龙",
+                          "line_number": 1,
+                          "raw_content": "排练群接龙：小段请假，今天不来排练，下次补上",
+                          "parsed_data": {
+                            "raw_text": "排练群接龙：小段请假，今天不来排练，下次补上",
+                            "is_leave": true
+                          }
+                        }
+                      ],
+                      "audit_logs": [
+                        {
+                          "timestamp": "2026-06-06T23:52:02.112771",
+                          "step": "step1_import_engineer_message",
+                          "operator": "系统自动导入",
+                          "action": "导入调音师留言",
+                          "before": null,
+                          "after": {
+                            "id": "65c6c49c",
+                            "episode_number": "EP01",
+                            "track_name": "片头开场音乐",
+                            "scheduled_date": "2026-06-10",
+                            "scheduled_time": "14:00",
+                            "duration_minutes": 30,
+                            "engineer_name": "李调音师",
+                            "status": "pending",
+                            "abnormal_type": null,
+                            "abnormal_note": null,
+                            "reviewer": null,
+                            "review_time": null,
+                            "consumed": true,
+                            "is_leave": false,
+                            "sources": [
+                              {
+                                "source_name": "调音师留言",
+                                "line_number": 1,
+                                "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                                "parsed_data": {
+                                  "episode_number": "EP01",
+                                  "track_name": "片头开场音乐",
+                                  "scheduled_date": "2026-06-10",
+                                  "scheduled_time": "14:00",
+                                  "duration_minutes": 30,
+                                  "engineer_name": "李调音师",
+                                  "consumed": true,
+                                  "is_leave": false
+                                }
+                              }
+                            ],
+                            "audit_logs": [],
+                            "current_step": "step1_import_engineer_message",
+                            "manual_edits": []
+                          },
+                          "note": "从调音师留言第1行导入"
+                        }
+                      ],
+                      "current_step": "step2_check_group_signup",
+                      "manual_edits": []
+                    },
+                    "note": "核对结果: 异常-待复核"
+                  }
+                ],
+                "current_step": "step3_update_tracklist",
+                "manual_edits": []
+              },
+              "note": null
+            }
+          ],
+          "current_step": "step3_update_tracklist",
+          "manual_edits": []
+        },
+        "after": {
+          "id": "65c6c49c",
+          "episode_number": "EP01",
+          "track_name": "片头开场音乐(最终版)",
+          "scheduled_date": "2026-06-10",
+          "scheduled_time": "14:00",
+          "duration_minutes": 32,
+          "engineer_name": "李调音师",
+          "status": "review_rejected",
+          "abnormal_type": "leave_counted_as_consumed",
+          "abnormal_note": "请假课时被计入已消耗，需巡演统筹复核",
+          "reviewer": "巡演统筹老王",
+          "review_time": "2026-06-06T23:52:02.143527",
+          "consumed": false,
+          "is_leave": true,
+          "sources": [
+            {
+              "source_name": "调音师留言",
+              "line_number": 1,
+              "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+              "parsed_data": {
+                "episode_number": "EP01",
+                "track_name": "片头开场音乐",
+                "scheduled_date": "2026-06-10",
+                "scheduled_time": "14:00",
+                "duration_minutes": 30,
+                "engineer_name": "李调音师",
+                "consumed": true,
+                "is_leave": false
+              }
+            },
+            {
+              "source_name": "排练群接龙",
+              "line_number": 1,
+              "raw_content": "排练群接龙：小段请假，今天不来排练，下次补上",
+              "parsed_data": {
+                "raw_text": "排练群接龙：小段请假，今天不来排练，下次补上",
+                "is_leave": true
+              }
+            },
+            {
+              "source_name": "曲目核对表",
+              "line_number": 1,
+              "raw_content": "{'track_name': '片头开场音乐(最终版)', 'duration_minutes': 32}",
+              "parsed_data": {
+                "track_name": "片头开场音乐(最终版)",
+                "duration_minutes": 32
+              }
+            }
+          ],
+          "audit_logs": [
+            {
+              "timestamp": "2026-06-06T23:52:02.112771",
+              "step": "step1_import_engineer_message",
+              "operator": "系统自动导入",
+              "action": "导入调音师留言",
+              "before": null,
+              "after": {
+                "id": "65c6c49c",
+                "episode_number": "EP01",
+                "track_name": "片头开场音乐",
+                "scheduled_date": "2026-06-10",
+                "scheduled_time": "14:00",
+                "duration_minutes": 30,
+                "engineer_name": "李调音师",
+                "status": "pending",
+                "abnormal_type": null,
+                "abnormal_note": null,
+                "reviewer": null,
+                "review_time": null,
+                "consumed": true,
+                "is_leave": false,
+                "sources": [
+                  {
+                    "source_name": "调音师留言",
+                    "line_number": 1,
+                    "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                    "parsed_data": {
+                      "episode_number": "EP01",
+                      "track_name": "片头开场音乐",
+                      "scheduled_date": "2026-06-10",
+                      "scheduled_time": "14:00",
+                      "duration_minutes": 30,
+                      "engineer_name": "李调音师",
+                      "consumed": true,
+                      "is_leave": false
+                    }
+                  }
+                ],
+                "audit_logs": [],
+                "current_step": "step1_import_engineer_message",
+                "manual_edits": []
+              },
+              "note": "从调音师留言第1行导入"
+            },
+            {
+              "timestamp": "2026-06-06T23:52:02.114823",
+              "step": "step2_check_group_signup",
+              "operator": "录音师小段",
+              "action": "核对排练群接龙",
+              "before": {
+                "id": "65c6c49c",
+                "episode_number": "EP01",
+                "track_name": "片头开场音乐",
+                "scheduled_date": "2026-06-10",
+                "scheduled_time": "14:00",
+                "duration_minutes": 30,
+                "engineer_name": "李调音师",
+                "status": "pending",
+                "abnormal_type": null,
+                "abnormal_note": null,
+                "reviewer": null,
+                "review_time": null,
+                "consumed": true,
+                "is_leave": false,
+                "sources": [
+                  {
+                    "source_name": "调音师留言",
+                    "line_number": 1,
+                    "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                    "parsed_data": {
+                      "episode_number": "EP01",
+                      "track_name": "片头开场音乐",
+                      "scheduled_date": "2026-06-10",
+                      "scheduled_time": "14:00",
+                      "duration_minutes": 30,
+                      "engineer_name": "李调音师",
+                      "consumed": true,
+                      "is_leave": false
+                    }
+                  }
+                ],
+                "audit_logs": [
+                  {
+                    "timestamp": "2026-06-06T23:52:02.112771",
+                    "step": "step1_import_engineer_message",
+                    "operator": "系统自动导入",
+                    "action": "导入调音师留言",
+                    "before": null,
+                    "after": {
+                      "id": "65c6c49c",
+                      "episode_number": "EP01",
+                      "track_name": "片头开场音乐",
+                      "scheduled_date": "2026-06-10",
+                      "scheduled_time": "14:00",
+                      "duration_minutes": 30,
+                      "engineer_name": "李调音师",
+                      "status": "pending",
+                      "abnormal_type": null,
+                      "abnormal_note": null,
+                      "reviewer": null,
+                      "review_time": null,
+                      "consumed": true,
+                      "is_leave": false,
+                      "sources": [
+                        {
+                          "source_name": "调音师留言",
+                          "line_number": 1,
+                          "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                          "parsed_data": {
+                            "episode_number": "EP01",
+                            "track_name": "片头开场音乐",
+                            "scheduled_date": "2026-06-10",
+                            "scheduled_time": "14:00",
+                            "duration_minutes": 30,
+                            "engineer_name": "李调音师",
+                            "consumed": true,
+                            "is_leave": false
+                          }
+                        }
+                      ],
+                      "audit_logs": [],
+                      "current_step": "step1_import_engineer_message",
+                      "manual_edits": []
+                    },
+                    "note": "从调音师留言第1行导入"
+                  }
+                ],
+                "current_step": "step1_import_engineer_message",
+                "manual_edits": []
+              },
+              "after": {
+                "id": "65c6c49c",
+                "episode_number": "EP01",
+                "track_name": "片头开场音乐",
+                "scheduled_date": "2026-06-10",
+                "scheduled_time": "14:00",
+                "duration_minutes": 30,
+                "engineer_name": "李调音师",
+                "status": "review_required",
+                "abnormal_type": "leave_counted_as_consumed",
+                "abnormal_note": "请假课时被计入已消耗，需巡演统筹复核",
+                "reviewer": null,
+                "review_time": null,
+                "consumed": true,
+                "is_leave": true,
+                "sources": [
+                  {
+                    "source_name": "调音师留言",
+                    "line_number": 1,
+                    "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                    "parsed_data": {
+                      "episode_number": "EP01",
+                      "track_name": "片头开场音乐",
+                      "scheduled_date": "2026-06-10",
+                      "scheduled_time": "14:00",
+                      "duration_minutes": 30,
+                      "engineer_name": "李调音师",
+                      "consumed": true,
+                      "is_leave": false
+                    }
+                  },
+                  {
+                    "source_name": "排练群接龙",
+                    "line_number": 1,
+                    "raw_content": "排练群接龙：小段请假，今天不来排练，下次补上",
+                    "parsed_data": {
+                      "raw_text": "排练群接龙：小段请假，今天不来排练，下次补上",
+                      "is_leave": true
+                    }
+                  }
+                ],
+                "audit_logs": [
+                  {
+                    "timestamp": "2026-06-06T23:52:02.112771",
+                    "step": "step1_import_engineer_message",
+                    "operator": "系统自动导入",
+                    "action": "导入调音师留言",
+                    "before": null,
+                    "after": {
+                      "id": "65c6c49c",
+                      "episode_number": "EP01",
+                      "track_name": "片头开场音乐",
+                      "scheduled_date": "2026-06-10",
+                      "scheduled_time": "14:00",
+                      "duration_minutes": 30,
+                      "engineer_name": "李调音师",
+                      "status": "pending",
+                      "abnormal_type": null,
+                      "abnormal_note": null,
+                      "reviewer": null,
+                      "review_time": null,
+                      "consumed": true,
+                      "is_leave": false,
+                      "sources": [
+                        {
+                          "source_name": "调音师留言",
+                          "line_number": 1,
+                          "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                          "parsed_data": {
+                            "episode_number": "EP01",
+                            "track_name": "片头开场音乐",
+                            "scheduled_date": "2026-06-10",
+                            "scheduled_time": "14:00",
+                            "duration_minutes": 30,
+                            "engineer_name": "李调音师",
+                            "consumed": true,
+                            "is_leave": false
+                          }
+                        }
+                      ],
+                      "audit_logs": [],
+                      "current_step": "step1_import_engineer_message",
+                      "manual_edits": []
+                    },
+                    "note": "从调音师留言第1行导入"
+                  }
+                ],
+                "current_step": "step2_check_group_signup",
+                "manual_edits": []
+              },
+              "note": "核对结果: 异常-待复核"
+            },
+            {
+              "timestamp": "2026-06-06T23:52:02.121405",
+              "step": "step3_update_tracklist",
+              "operator": "曲目编辑小周",
+              "action": "更新曲目核对表",
+              "before": {
+                "id": "65c6c49c",
+                "episode_number": "EP01",
+                "track_name": "片头开场音乐",
+                "scheduled_date": "2026-06-10",
+                "scheduled_time": "14:00",
+                "duration_minutes": 30,
+                "engineer_name": "李调音师",
+                "status": "review_required",
+                "abnormal_type": "leave_counted_as_consumed",
+                "abnormal_note": "请假课时被计入已消耗，需巡演统筹复核",
+                "reviewer": null,
+                "review_time": null,
+                "consumed": true,
+                "is_leave": true,
+                "sources": [
+                  {
+                    "source_name": "调音师留言",
+                    "line_number": 1,
+                    "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                    "parsed_data": {
+                      "episode_number": "EP01",
+                      "track_name": "片头开场音乐",
+                      "scheduled_date": "2026-06-10",
+                      "scheduled_time": "14:00",
+                      "duration_minutes": 30,
+                      "engineer_name": "李调音师",
+                      "consumed": true,
+                      "is_leave": false
+                    }
+                  },
+                  {
+                    "source_name": "排练群接龙",
+                    "line_number": 1,
+                    "raw_content": "排练群接龙：小段请假，今天不来排练，下次补上",
+                    "parsed_data": {
+                      "raw_text": "排练群接龙：小段请假，今天不来排练，下次补上",
+                      "is_leave": true
+                    }
+                  }
+                ],
+                "audit_logs": [
+                  {
+                    "timestamp": "2026-06-06T23:52:02.112771",
+                    "step": "step1_import_engineer_message",
+                    "operator": "系统自动导入",
+                    "action": "导入调音师留言",
+                    "before": null,
+                    "after": {
+                      "id": "65c6c49c",
+                      "episode_number": "EP01",
+                      "track_name": "片头开场音乐",
+                      "scheduled_date": "2026-06-10",
+                      "scheduled_time": "14:00",
+                      "duration_minutes": 30,
+                      "engineer_name": "李调音师",
+                      "status": "pending",
+                      "abnormal_type": null,
+                      "abnormal_note": null,
+                      "reviewer": null,
+                      "review_time": null,
+                      "consumed": true,
+                      "is_leave": false,
+                      "sources": [
+                        {
+                          "source_name": "调音师留言",
+                          "line_number": 1,
+                          "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                          "parsed_data": {
+                            "episode_number": "EP01",
+                            "track_name": "片头开场音乐",
+                            "scheduled_date": "2026-06-10",
+                            "scheduled_time": "14:00",
+                            "duration_minutes": 30,
+                            "engineer_name": "李调音师",
+                            "consumed": true,
+                            "is_leave": false
+                          }
+                        }
+                      ],
+                      "audit_logs": [],
+                      "current_step": "step1_import_engineer_message",
+                      "manual_edits": []
+                    },
+                    "note": "从调音师留言第1行导入"
+                  },
+                  {
+                    "timestamp": "2026-06-06T23:52:02.114823",
+                    "step": "step2_check_group_signup",
+                    "operator": "录音师小段",
+                    "action": "核对排练群接龙",
+                    "before": {
+                      "id": "65c6c49c",
+                      "episode_number": "EP01",
+                      "track_name": "片头开场音乐",
+                      "scheduled_date": "2026-06-10",
+                      "scheduled_time": "14:00",
+                      "duration_minutes": 30,
+                      "engineer_name": "李调音师",
+                      "status": "pending",
+                      "abnormal_type": null,
+                      "abnormal_note": null,
+                      "reviewer": null,
+                      "review_time": null,
+                      "consumed": true,
+                      "is_leave": false,
+                      "sources": [
+                        {
+                          "source_name": "调音师留言",
+                          "line_number": 1,
+                          "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                          "parsed_data": {
+                            "episode_number": "EP01",
+                            "track_name": "片头开场音乐",
+                            "scheduled_date": "2026-06-10",
+                            "scheduled_time": "14:00",
+                            "duration_minutes": 30,
+                            "engineer_name": "李调音师",
+                            "consumed": true,
+                            "is_leave": false
+                          }
+                        }
+                      ],
+                      "audit_logs": [
+                        {
+                          "timestamp": "2026-06-06T23:52:02.112771",
+                          "step": "step1_import_engineer_message",
+                          "operator": "系统自动导入",
+                          "action": "导入调音师留言",
+                          "before": null,
+                          "after": {
+                            "id": "65c6c49c",
+                            "episode_number": "EP01",
+                            "track_name": "片头开场音乐",
+                            "scheduled_date": "2026-06-10",
+                            "scheduled_time": "14:00",
+                            "duration_minutes": 30,
+                            "engineer_name": "李调音师",
+                            "status": "pending",
+                            "abnormal_type": null,
+                            "abnormal_note": null,
+                            "reviewer": null,
+                            "review_time": null,
+                            "consumed": true,
+                            "is_leave": false,
+                            "sources": [
+                              {
+                                "source_name": "调音师留言",
+                                "line_number": 1,
+                                "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                                "parsed_data": {
+                                  "episode_number": "EP01",
+                                  "track_name": "片头开场音乐",
+                                  "scheduled_date": "2026-06-10",
+                                  "scheduled_time": "14:00",
+                                  "duration_minutes": 30,
+                                  "engineer_name": "李调音师",
+                                  "consumed": true,
+                                  "is_leave": false
+                                }
+                              }
+                            ],
+                            "audit_logs": [],
+                            "current_step": "step1_import_engineer_message",
+                            "manual_edits": []
+                          },
+                          "note": "从调音师留言第1行导入"
+                        }
+                      ],
+                      "current_step": "step1_import_engineer_message",
+                      "manual_edits": []
+                    },
+                    "after": {
+                      "id": "65c6c49c",
+                      "episode_number": "EP01",
+                      "track_name": "片头开场音乐",
+                      "scheduled_date": "2026-06-10",
+                      "scheduled_time": "14:00",
+                      "duration_minutes": 30,
+                      "engineer_name": "李调音师",
+                      "status": "review_required",
+                      "abnormal_type": "leave_counted_as_consumed",
+                      "abnormal_note": "请假课时被计入已消耗，需巡演统筹复核",
+                      "reviewer": null,
+                      "review_time": null,
+                      "consumed": true,
+                      "is_leave": true,
+                      "sources": [
+                        {
+                          "source_name": "调音师留言",
+                          "line_number": 1,
+                          "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                          "parsed_data": {
+                            "episode_number": "EP01",
+                            "track_name": "片头开场音乐",
+                            "scheduled_date": "2026-06-10",
+                            "scheduled_time": "14:00",
+                            "duration_minutes": 30,
+                            "engineer_name": "李调音师",
+                            "consumed": true,
+                            "is_leave": false
+                          }
+                        },
+                        {
+                          "source_name": "排练群接龙",
+                          "line_number": 1,
+                          "raw_content": "排练群接龙：小段请假，今天不来排练，下次补上",
+                          "parsed_data": {
+                            "raw_text": "排练群接龙：小段请假，今天不来排练，下次补上",
+                            "is_leave": true
+                          }
+                        }
+                      ],
+                      "audit_logs": [
+                        {
+                          "timestamp": "2026-06-06T23:52:02.112771",
+                          "step": "step1_import_engineer_message",
+                          "operator": "系统自动导入",
+                          "action": "导入调音师留言",
+                          "before": null,
+                          "after": {
+                            "id": "65c6c49c",
+                            "episode_number": "EP01",
+                            "track_name": "片头开场音乐",
+                            "scheduled_date": "2026-06-10",
+                            "scheduled_time": "14:00",
+                            "duration_minutes": 30,
+                            "engineer_name": "李调音师",
+                            "status": "pending",
+                            "abnormal_type": null,
+                            "abnormal_note": null,
+                            "reviewer": null,
+                            "review_time": null,
+                            "consumed": true,
+                            "is_leave": false,
+                            "sources": [
+                              {
+                                "source_name": "调音师留言",
+                                "line_number": 1,
+                                "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                                "parsed_data": {
+                                  "episode_number": "EP01",
+                                  "track_name": "片头开场音乐",
+                                  "scheduled_date": "2026-06-10",
+                                  "scheduled_time": "14:00",
+                                  "duration_minutes": 30,
+                                  "engineer_name": "李调音师",
+                                  "consumed": true,
+                                  "is_leave": false
+                                }
+                              }
+                            ],
+                            "audit_logs": [],
+                            "current_step": "step1_import_engineer_message",
+                            "manual_edits": []
+                          },
+                          "note": "从调音师留言第1行导入"
+                        }
+                      ],
+                      "current_step": "step2_check_group_signup",
+                      "manual_edits": []
+                    },
+                    "note": "核对结果: 异常-待复核"
+                  }
+                ],
+                "current_step": "step2_check_group_signup",
+                "manual_edits": []
+              },
+              "after": {
+                "id": "65c6c49c",
+                "episode_number": "EP01",
+                "track_name": "片头开场音乐(最终版)",
+                "scheduled_date": "2026-06-10",
+                "scheduled_time": "14:00",
+                "duration_minutes": 32,
+                "engineer_name": "李调音师",
+                "status": "review_required",
+                "abnormal_type": "leave_counted_as_consumed",
+                "abnormal_note": "请假课时被计入已消耗，需巡演统筹复核",
+                "reviewer": null,
+                "review_time": null,
+                "consumed": true,
+                "is_leave": true,
+                "sources": [
+                  {
+                    "source_name": "调音师留言",
+                    "line_number": 1,
+                    "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                    "parsed_data": {
+                      "episode_number": "EP01",
+                      "track_name": "片头开场音乐",
+                      "scheduled_date": "2026-06-10",
+                      "scheduled_time": "14:00",
+                      "duration_minutes": 30,
+                      "engineer_name": "李调音师",
+                      "consumed": true,
+                      "is_leave": false
+                    }
+                  },
+                  {
+                    "source_name": "排练群接龙",
+                    "line_number": 1,
+                    "raw_content": "排练群接龙：小段请假，今天不来排练，下次补上",
+                    "parsed_data": {
+                      "raw_text": "排练群接龙：小段请假，今天不来排练，下次补上",
+                      "is_leave": true
+                    }
+                  },
+                  {
+                    "source_name": "曲目核对表",
+                    "line_number": 1,
+                    "raw_content": "{'track_name': '片头开场音乐(最终版)', 'duration_minutes': 32}",
+                    "parsed_data": {
+                      "track_name": "片头开场音乐(最终版)",
+                      "duration_minutes": 32
+                    }
+                  }
+                ],
+                "audit_logs": [
+                  {
+                    "timestamp": "2026-06-06T23:52:02.112771",
+                    "step": "step1_import_engineer_message",
+                    "operator": "系统自动导入",
+                    "action": "导入调音师留言",
+                    "before": null,
+                    "after": {
+                      "id": "65c6c49c",
+                      "episode_number": "EP01",
+                      "track_name": "片头开场音乐",
+                      "scheduled_date": "2026-06-10",
+                      "scheduled_time": "14:00",
+                      "duration_minutes": 30,
+                      "engineer_name": "李调音师",
+                      "status": "pending",
+                      "abnormal_type": null,
+                      "abnormal_note": null,
+                      "reviewer": null,
+                      "review_time": null,
+                      "consumed": true,
+                      "is_leave": false,
+                      "sources": [
+                        {
+                          "source_name": "调音师留言",
+                          "line_number": 1,
+                          "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                          "parsed_data": {
+                            "episode_number": "EP01",
+                            "track_name": "片头开场音乐",
+                            "scheduled_date": "2026-06-10",
+                            "scheduled_time": "14:00",
+                            "duration_minutes": 30,
+                            "engineer_name": "李调音师",
+                            "consumed": true,
+                            "is_leave": false
+                          }
+                        }
+                      ],
+                      "audit_logs": [],
+                      "current_step": "step1_import_engineer_message",
+                      "manual_edits": []
+                    },
+                    "note": "从调音师留言第1行导入"
+                  },
+                  {
+                    "timestamp": "2026-06-06T23:52:02.114823",
+                    "step": "step2_check_group_signup",
+                    "operator": "录音师小段",
+                    "action": "核对排练群接龙",
+                    "before": {
+                      "id": "65c6c49c",
+                      "episode_number": "EP01",
+                      "track_name": "片头开场音乐",
+                      "scheduled_date": "2026-06-10",
+                      "scheduled_time": "14:00",
+                      "duration_minutes": 30,
+                      "engineer_name": "李调音师",
+                      "status": "pending",
+                      "abnormal_type": null,
+                      "abnormal_note": null,
+                      "reviewer": null,
+                      "review_time": null,
+                      "consumed": true,
+                      "is_leave": false,
+                      "sources": [
+                        {
+                          "source_name": "调音师留言",
+                          "line_number": 1,
+                          "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                          "parsed_data": {
+                            "episode_number": "EP01",
+                            "track_name": "片头开场音乐",
+                            "scheduled_date": "2026-06-10",
+                            "scheduled_time": "14:00",
+                            "duration_minutes": 30,
+                            "engineer_name": "李调音师",
+                            "consumed": true,
+                            "is_leave": false
+                          }
+                        }
+                      ],
+                      "audit_logs": [
+                        {
+                          "timestamp": "2026-06-06T23:52:02.112771",
+                          "step": "step1_import_engineer_message",
+                          "operator": "系统自动导入",
+                          "action": "导入调音师留言",
+                          "before": null,
+                          "after": {
+                            "id": "65c6c49c",
+                            "episode_number": "EP01",
+                            "track_name": "片头开场音乐",
+                            "scheduled_date": "2026-06-10",
+                            "scheduled_time": "14:00",
+                            "duration_minutes": 30,
+                            "engineer_name": "李调音师",
+                            "status": "pending",
+                            "abnormal_type": null,
+                            "abnormal_note": null,
+                            "reviewer": null,
+                            "review_time": null,
+                            "consumed": true,
+                            "is_leave": false,
+                            "sources": [
+                              {
+                                "source_name": "调音师留言",
+                                "line_number": 1,
+                                "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                                "parsed_data": {
+                                  "episode_number": "EP01",
+                                  "track_name": "片头开场音乐",
+                                  "scheduled_date": "2026-06-10",
+                                  "scheduled_time": "14:00",
+                                  "duration_minutes": 30,
+                                  "engineer_name": "李调音师",
+                                  "consumed": true,
+                                  "is_leave": false
+                                }
+                              }
+                            ],
+                            "audit_logs": [],
+                            "current_step": "step1_import_engineer_message",
+                            "manual_edits": []
+                          },
+                          "note": "从调音师留言第1行导入"
+                        }
+                      ],
+                      "current_step": "step1_import_engineer_message",
+                      "manual_edits": []
+                    },
+                    "after": {
+                      "id": "65c6c49c",
+                      "episode_number": "EP01",
+                      "track_name": "片头开场音乐",
+                      "scheduled_date": "2026-06-10",
+                      "scheduled_time": "14:00",
+                      "duration_minutes": 30,
+                      "engineer_name": "李调音师",
+                      "status": "review_required",
+                      "abnormal_type": "leave_counted_as_consumed",
+                      "abnormal_note": "请假课时被计入已消耗，需巡演统筹复核",
+                      "reviewer": null,
+                      "review_time": null,
+                      "consumed": true,
+                      "is_leave": true,
+                      "sources": [
+                        {
+                          "source_name": "调音师留言",
+                          "line_number": 1,
+                          "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                          "parsed_data": {
+                            "episode_number": "EP01",
+                            "track_name": "片头开场音乐",
+                            "scheduled_date": "2026-06-10",
+                            "scheduled_time": "14:00",
+                            "duration_minutes": 30,
+                            "engineer_name": "李调音师",
+                            "consumed": true,
+                            "is_leave": false
+                          }
+                        },
+                        {
+                          "source_name": "排练群接龙",
+                          "line_number": 1,
+                          "raw_content": "排练群接龙：小段请假，今天不来排练，下次补上",
+                          "parsed_data": {
+                            "raw_text": "排练群接龙：小段请假，今天不来排练，下次补上",
+                            "is_leave": true
+                          }
+                        }
+                      ],
+                      "audit_logs": [
+                        {
+                          "timestamp": "2026-06-06T23:52:02.112771",
+                          "step": "step1_import_engineer_message",
+                          "operator": "系统自动导入",
+                          "action": "导入调音师留言",
+                          "before": null,
+                          "after": {
+                            "id": "65c6c49c",
+                            "episode_number": "EP01",
+                            "track_name": "片头开场音乐",
+                            "scheduled_date": "2026-06-10",
+                            "scheduled_time": "14:00",
+                            "duration_minutes": 30,
+                            "engineer_name": "李调音师",
+                            "status": "pending",
+                            "abnormal_type": null,
+                            "abnormal_note": null,
+                            "reviewer": null,
+                            "review_time": null,
+                            "consumed": true,
+                            "is_leave": false,
+                            "sources": [
+                              {
+                                "source_name": "调音师留言",
+                                "line_number": 1,
+                                "raw_content": "EP01|片头开场音乐|2026-06-10|14:00|30|李调音师|已消耗",
+                                "parsed_data": {
+                                  "episode_number": "EP01",
+                                  "track_name": "片头开场音乐",
+                                  "scheduled_date": "2026-06-10",
+                                  "scheduled_time": "14:00",
+                                  "duration_minutes": 30,
+                                  "engineer_name": "李调音师",
+                                  "consumed": true,
+                                  "is_leave": false
+                                }
+                              }
+                            ],
+                            "audit_logs": [],
+                            "current_step": "step1_import_engineer_message",
+                            "manual_edits": []
+                          },
+                          "note": "从调音师留言第1行导入"
+                        }
+                      ],
+                      "current_step": "step2_check_group_signup",
+                      "manual_edits": []
+                    },
+                    "note": "核对结果: 异常-待复核"
+                  }
+                ],
+                "current_step": "step3_update_tracklist",
+                "manual_edits": []
+              },
+              "note": null
+            }
+          ],
+          "current_step": "step3_update_tracklist",
+          "manual_edits": []
+        },
+        "note": "核对证据：群接龙明确请假，调音师留言可能误标，取消消耗标记"
+      }
+    ],
+    "current_step": "step3_update_tracklist",
+    "manual_edits": []
+  },
+  "19498629": {
+    "id": "19498629",
+    "episode_number": "EP02",
+    "track_name": "过渡音效(精简版)",
+    "scheduled_date": "2026-06-11",
+    "scheduled_time": "15:30",
+    "duration_minutes": 12,
+    "engineer_name": "王调音师",
+    "status": "normal",
+    "abnormal_type": null,
+    "abnormal_note": null,
+    "reviewer": null,
+    "review_time": null,
+    "consumed": false,
+    "is_leave": false,
+    "sources": [
+      {
+        "source_name": "调音师留言",
+        "line_number": 2,
+        "raw_content": "EP02|过渡音效|2026-06-11|15:30|15|王调音师",
+        "parsed_data": {
+          "episode_number": "EP02",
+          "track_name": "过渡音效",
+          "scheduled_date": "2026-06-11",
+          "scheduled_time": "15:30",
+          "duration_minutes": 15,
+          "engineer_name": "王调音师",
+          "consumed": false,
+          "is_leave": false
+        }
+      },
+      {
+        "source_name": "排练群接龙",
+        "line_number": 1,
+        "raw_content": "排练群接龙：全体到齐",
+        "parsed_data": {
+          "raw_text": "排练群接龙：全体到齐",
+          "is_leave": false
+        }
+      },
+      {
+        "source_name": "曲目核对表",
+        "line_number": 1,
+        "raw_content": "{'track_name': '过渡音效(精简版)', 'duration_minutes': 12}",
+        "parsed_data": {
+          "track_name": "过渡音效(精简版)",
+          "duration_minutes": 12
+        }
+      }
+    ],
+    "audit_logs": [
+      {
+        "timestamp": "2026-06-06T23:52:02.113248",
+        "step": "step1_import_engineer_message",
+        "operator": "系统自动导入",
+        "action": "导入调音师留言",
+        "before": null,
+        "after": {
+          "id": "19498629",
+          "episode_number": "EP02",
+          "track_name": "过渡音效",
+          "scheduled_date": "2026-06-11",
+          "scheduled_time": "15:30",
+          "duration_minutes": 15,
+          "engineer_name": "王调音师",
+          "status": "pending",
+          "abnormal_type": null,
+          "abnormal_note": null,
+          "reviewer": null,
+          "review_time": null,
+          "consumed": false,
+          "is_leave": false,
+          "sources": [
+            {
+              "source_name": "调音师留言",
+              "line_number": 2,
+              "raw_content": "EP02|过渡音效|2026-06-11|15:30|15|王调音师",
+              "parsed_data": {
+                "episode_number": "EP02",
+                "track_name": "过渡音效",
+                "scheduled_date": "2026-06-11",
+                "scheduled_time": "15:30",
+                "duration_minutes": 15,
+                "engineer_name": "王调音师",
+                "consumed": false,
+                "is_leave": false
+              }
+            }
+          ],
+          "audit_logs": [],
+          "current_step": "step1_import_engineer_message",
+          "manual_edits": []
+        },
+        "note": "从调音师留言第2行导入"
+      },
+      {
+        "timestamp": "2026-06-06T23:52:02.116518",
+        "step": "step2_check_group_signup",
+        "operator": "录音师小段",
+        "action": "核对排练群接龙",
+        "before": {
+          "id": "19498629",
+          "episode_number": "EP02",
+          "track_name": "过渡音效",
+          "scheduled_date": "2026-06-11",
+          "scheduled_time": "15:30",
+          "duration_minutes": 15,
+          "engineer_name": "王调音师",
+          "status": "pending",
+          "abnormal_type": null,
+          "abnormal_note": null,
+          "reviewer": null,
+          "review_time": null,
+          "consumed": false,
+          "is_leave": false,
+          "sources": [
+            {
+              "source_name": "调音师留言",
+              "line_number": 2,
+              "raw_content": "EP02|过渡音效|2026-06-11|15:30|15|王调音师",
+              "parsed_data": {
+                "episode_number": "EP02",
+                "track_name": "过渡音效",
+                "scheduled_date": "2026-06-11",
+                "scheduled_time": "15:30",
+                "duration_minutes": 15,
+                "engineer_name": "王调音师",
+                "consumed": false,
+                "is_leave": false
+              }
+            }
+          ],
+          "audit_logs": [
+            {
+              "timestamp": "2026-06-06T23:52:02.113248",
+              "step": "step1_import_engineer_message",
+              "operator": "系统自动导入",
+              "action": "导入调音师留言",
+              "before": null,
+              "after": {
+                "id": "19498629",
+                "episode_number": "EP02",
+                "track_name": "过渡音效",
+                "scheduled_date": "2026-06-11",
+                "scheduled_time": "15:30",
+                "duration_minutes": 15,
+                "engineer_name": "王调音师",
+                "status": "pending",
+                "abnormal_type": null,
+                "abnormal_note": null,
+                "reviewer": null,
+                "review_time": null,
+                "consumed": false,
+                "is_leave": false,
+                "sources": [
+                  {
+                    "source_name": "调音师留言",
+                    "line_number": 2,
+                    "raw_content": "EP02|过渡音效|2026-06-11|15:30|15|王调音师",
+                    "parsed_data": {
+                      "episode_number": "EP02",
+                      "track_name": "过渡音效",
+                      "scheduled_date": "2026-06-11",
+                      "scheduled_time": "15:30",
+                      "duration_minutes": 15,
+                      "engineer_name": "王调音师",
+                      "consumed": false,
+                      "is_leave": false
+                    }
+                  }
+                ],
+                "audit_logs": [],
+                "current_step": "step1_import_engineer_message",
+                "manual_edits": []
+              },
+              "note": "从调音师留言第2行导入"
+            }
+          ],
+          "current_step": "step1_import_engineer_message",
+          "manual_edits": []
+        },
+        "after": {
+          "id": "19498629",
+          "episode_number": "EP02",
+          "track_name": "过渡音效",
+          "scheduled_date": "2026-06-11",
+          "scheduled_time": "15:30",
+          "duration_minutes": 15,
+          "engineer_name": "王调音师",
+          "status": "pending",
+          "abnormal_type": null,
+          "abnormal_note": null,
+          "reviewer": null,
+          "review_time": null,
+          "consumed": false,
+          "is_leave": false,
+          "sources": [
+            {
+              "source_name": "调音师留言",
+              "line_number": 2,
+              "raw_content": "EP02|过渡音效|2026-06-11|15:30|15|王调音师",
+              "parsed_data": {
+                "episode_number": "EP02",
+                "track_name": "过渡音效",
+                "scheduled_date": "2026-06-11",
+                "scheduled_time": "15:30",
+                "duration_minutes": 15,
+                "engineer_name": "王调音师",
+                "consumed": false,
+                "is_leave": false
+              }
+            },
+            {
+              "source_name": "排练群接龙",
+              "line_number": 1,
+              "raw_content": "排练群接龙：全体到齐",
+              "parsed_data": {
+                "raw_text": "排练群接龙：全体到齐",
+                "is_leave": false
+              }
+            }
+          ],
+          "audit_logs": [
+            {
+              "timestamp": "2026-06-06T23:52:02.113248",
+              "step": "step1_import_engineer_message",
+              "operator": "系统自动导入",
+              "action": "导入调音师留言",
+              "before": null,
+              "after": {
+                "id": "19498629",
+                "episode_number": "EP02",
+                "track_name": "过渡音效",
+                "scheduled_date": "2026-06-11",
+                "scheduled_time": "15:30",
+                "duration_minutes": 15,
+                "engineer_name": "王调音师",
+                "status": "pending",
+                "abnormal_type": null,
+                "abnormal_note": null,
+                "reviewer": null,
+                "review_time": null,
+                "consumed": false,
+                "is_leave": false,
+                "sources": [
+                  {
+                    "source_name": "调音师留言",
+                    "line_number": 2,
+                    "raw_content": "EP02|过渡音效|2026-06-11|15:30|15|王调音师",
+                    "parsed_data": {
+                      "episode_number": "EP02",
+                      "track_name": "过渡音效",
+                      "scheduled_date": "2026-06-11",
+                      "scheduled_time": "15:30",
+                      "duration_minutes": 15,
+                      "engineer_name": "王调音师",
+                      "consumed": false,
+                      "is_leave": false
+                    }
+                  }
+                ],
+                "audit_logs": [],
+                "current_step": "step1_import_engineer_message",
+                "manual_edits": []
+              },
+              "note": "从调音师留言第2行导入"
+            }
+          ],
+          "current_step": "step2_check_group_signup",
+          "manual_edits": []
+        },
+        "note": "核对结果: 正常"
+      },
+      {
+        "timestamp": "2026-06-06T23:52:02.130438",
+        "step": "step3_update_tracklist",
+        "operator": "曲目编辑小周",
+        "action": "更新曲目核对表",
+        "before": {
+          "id": "19498629",
+          "episode_number": "EP02",
+          "track_name": "过渡音效",
+          "scheduled_date": "2026-06-11",
+          "scheduled_time": "15:30",
+          "duration_minutes": 15,
+          "engineer_name": "王调音师",
+          "status": "pending",
+          "abnormal_type": null,
+          "abnormal_note": null,
+          "reviewer": null,
+          "review_time": null,
+          "consumed": false,
+          "is_leave": false,
+          "sources": [
+            {
+              "source_name": "调音师留言",
+              "line_number": 2,
+              "raw_content": "EP02|过渡音效|2026-06-11|15:30|15|王调音师",
+              "parsed_data": {
+                "episode_number": "EP02",
+                "track_name": "过渡音效",
+                "scheduled_date": "2026-06-11",
+                "scheduled_time": "15:30",
+                "duration_minutes": 15,
+                "engineer_name": "王调音师",
+                "consumed": false,
+                "is_leave": false
+              }
+            },
+            {
+              "source_name": "排练群接龙",
+              "line_number": 1,
+              "raw_content": "排练群接龙：全体到齐",
+              "parsed_data": {
+                "raw_text": "排练群接龙：全体到齐",
+                "is_leave": false
+              }
+            }
+          ],
+          "audit_logs": [
+            {
+              "timestamp": "2026-06-06T23:52:02.113248",
+              "step": "step1_import_engineer_message",
+              "operator": "系统自动导入",
+              "action": "导入调音师留言",
+              "before": null,
+              "after": {
+                "id": "19498629",
+                "episode_number": "EP02",
+                "track_name": "过渡音效",
+                "scheduled_date": "2026-06-11",
+                "scheduled_time": "15:30",
+                "duration_minutes": 15,
+                "engineer_name": "王调音师",
+                "status": "pending",
+                "abnormal_type": null,
+                "abnormal_note": null,
+                "reviewer": null,
+                "review_time": null,
+                "consumed": false,
+                "is_leave": false,
+                "sources": [
+                  {
+                    "source_name": "调音师留言",
+                    "line_number": 2,
+                    "raw_content": "EP02|过渡音效|2026-06-11|15:30|15|王调音师",
+                    "parsed_data": {
+                      "episode_number": "EP02",
+                      "track_name": "过渡音效",
+                      "scheduled_date": "2026-06-11",
+                      "scheduled_time": "15:30",
+                      "duration_minutes": 15,
+                      "engineer_name": "王调音师",
+                      "consumed": false,
+                      "is_leave": false
+                    }
+                  }
+                ],
+                "audit_logs": [],
+                "current_step": "step1_import_engineer_message",
+                "manual_edits": []
+              },
+              "note": "从调音师留言第2行导入"
+            },
+            {
+              "timestamp": "2026-06-06T23:52:02.116518",
+              "step": "step2_check_group_signup",
+              "operator": "录音师小段",
+              "action": "核对排练群接龙",
+              "before": {
+                "id": "19498629",
+                "episode_number": "EP02",
+                "track_name": "过渡音效",
+                "scheduled_date": "2026-06-11",
+                "scheduled_time": "15:30",
+                "duration_minutes": 15,
+                "engineer_name": "王调音师",
+                "status": "pending",
+                "abnormal_type": null,
+                "abnormal_note": null,
+                "reviewer": null,
+                "review_time": null,
+                "consumed": false,
+                "is_leave": false,
+                "sources": [
+                  {
+                    "source_name": "调音师留言",
+                    "line_number": 2,
+                    "raw_content": "EP02|过渡音效|2026-06-11|15:30|15|王调音师",
+                    "parsed_data": {
+                      "episode_number": "EP02",
+                      "track_name": "过渡音效",
+                      "scheduled_date": "2026-06-11",
+                      "scheduled_time": "15:30",
+                      "duration_minutes": 15,
+                      "engineer_name": "王调音师",
+                      "consumed": false,
+                      "is_leave": false
+                    }
+                  }
+                ],
+                "audit_logs": [
+                  {
+                    "timestamp": "2026-06-06T23:52:02.113248",
+                    "step": "step1_import_engineer_message",
+                    "operator": "系统自动导入",
+                    "action": "导入调音师留言",
+                    "before": null,
+                    "after": {
+                      "id": "19498629",
+                      "episode_number": "EP02",
+                      "track_name": "过渡音效",
+                      "scheduled_date": "2026-06-11",
+                      "scheduled_time": "15:30",
+                      "duration_minutes": 15,
+                      "engineer_name": "王调音师",
+                      "status": "pending",
+                      "abnormal_type": null,
+                      "abnormal_note": null,
+                      "reviewer": null,
+                      "review_time": null,
+                      "consumed": false,
+                      "is_leave": false,
+                      "sources": [
+                        {
+                          "source_name": "调音师留言",
+                          "line_number": 2,
+                          "raw_content": "EP02|过渡音效|2026-06-11|15:30|15|王调音师",
+                          "parsed_data": {
+                            "episode_number": "EP02",
+                            "track_name": "过渡音效",
+                            "scheduled_date": "2026-06-11",
+                            "scheduled_time": "15:30",
+                            "duration_minutes": 15,
+                            "engineer_name": "王调音师",
+                            "consumed": false,
+                            "is_leave": false
+                          }
+                        }
+                      ],
+                      "audit_logs": [],
+                      "current_step": "step1_import_engineer_message",
+                      "manual_edits": []
+                    },
+                    "note": "从调音师留言第2行导入"
+                  }
+                ],
+                "current_step": "step1_import_engineer_message",
+                "manual_edits": []
+              },
+              "after": {
+                "id": "19498629",
+                "episode_number": "EP02",
+                "track_name": "过渡音效",
+                "scheduled_date": "2026-06-11",
+                "scheduled_time": "15:30",
+                "duration_minutes": 15,
+                "engineer_name": "王调音师",
+                "status": "pending",
+                "abnormal_type": null,
+                "abnormal_note": null,
+                "reviewer": null,
+                "review_time": null,
+                "consumed": false,
+                "is_leave": false,
+                "sources": [
+                  {
+                    "source_name": "调音师留言",
+                    "line_number": 2,
+                    "raw_content": "EP02|过渡音效|2026-06-11|15:30|15|王调音师",
+                    "parsed_data": {
+                      "episode_number": "EP02",
+                      "track_name": "过渡音效",
+                      "scheduled_date": "2026-06-11",
+                      "scheduled_time": "15:30",
+                      "duration_minutes": 15,
+                      "engineer_name": "王调音师",
+                      "consumed": false,
+                      "is_leave": false
+                    }
+                  },
+                  {
+                    "source_name": "排练群接龙",
+                    "line_number": 1,
+                    "raw_content": "排练群接龙：全体到齐",
+                    "parsed_data": {
+                      "raw_text": "排练群接龙：全体到齐",
+                      "is_leave": false
+                    }
+                  }
+                ],
+                "audit_logs": [
+                  {
+                    "timestamp": "2026-06-06T23:52:02.113248",
+                    "step": "step1_import_engineer_message",
+                    "operator": "系统自动导入",
+                    "action": "导入调音师留言",
+                    "before": null,
+                    "after": {
+                      "id": "19498629",
+                      "episode_number": "EP02",
+                      "track_name": "过渡音效",
+                      "scheduled_date": "2026-06-11",
+                      "scheduled_time": "15:30",
+                      "duration_minutes": 15,
+                      "engineer_name": "王调音师",
+                      "status": "pending",
+                      "abnormal_type": null,
+                      "abnormal_note": null,
+                      "reviewer": null,
+                      "review_time": null,
+                      "consumed": false,
+                      "is_leave": false,
+                      "sources": [
+                        {
+                          "source_name": "调音师留言",
+                          "line_number": 2,
+                          "raw_content": "EP02|过渡音效|2026-06-11|15:30|15|王调音师",
+                          "parsed_data": {
+                            "episode_number": "EP02",
+                            "track_name": "过渡音效",
+                            "scheduled_date": "2026-06-11",
+                            "scheduled_time": "15:30",
+                            "duration_minutes": 15,
+                            "engineer_name": "王调音师",
+                            "consumed": false,
+                            "is_leave": false
+                          }
+                        }
+                      ],
+                      "audit_logs": [],
+                      "current_step": "step1_import_engineer_message",
+                      "manual_edits": []
+                    },
+                    "note": "从调音师留言第2行导入"
+                  }
+                ],
+                "current_step": "step2_check_group_signup",
+                "manual_edits": []
+              },
+              "note": "核对结果: 正常"
+            }
+          ],
+          "current_step": "step2_check_group_signup",
+          "manual_edits": []
+        },
+        "after": {
+          "id": "19498629",
+          "episode_number": "EP02",
+          "track_name": "过渡音效(精简版)",
+          "scheduled_date": "2026-06-11",
+          "scheduled_time": "15:30",
+          "duration_minutes": 12,
+          "engineer_name": "王调音师",
+          "status": "normal",
+          "abnormal_type": null,
+          "abnormal_note": null,
+          "reviewer": null,
+          "review_time": null,
+          "consumed": false,
+          "is_leave": false,
+          "sources": [
+            {
+              "source_name": "调音师留言",
+              "line_number": 2,
+              "raw_content": "EP02|过渡音效|2026-06-11|15:30|15|王调音师",
+              "parsed_data": {
+                "episode_number": "EP02",
+                "track_name": "过渡音效",
+                "scheduled_date": "2026-06-11",
+                "scheduled_time": "15:30",
+                "duration_minutes": 15,
+                "engineer_name": "王调音师",
+                "consumed": false,
+                "is_leave": false
+              }
+            },
+            {
+              "source_name": "排练群接龙",
+              "line_number": 1,
+              "raw_content": "排练群接龙：全体到齐",
+              "parsed_data": {
+                "raw_text": "排练群接龙：全体到齐",
+                "is_leave": false
+              }
+            },
+            {
+              "source_name": "曲目核对表",
+              "line_number": 1,
+              "raw_content": "{'track_name': '过渡音效(精简版)', 'duration_minutes': 12}",
+              "parsed_data": {
+                "track_name": "过渡音效(精简版)",
+                "duration_minutes": 12
+              }
+            }
+          ],
+          "audit_logs": [
+            {
+              "timestamp": "2026-06-06T23:52:02.113248",
+              "step": "step1_import_engineer_message",
+              "operator": "系统自动导入",
+              "action": "导入调音师留言",
+              "before": null,
+              "after": {
+                "id": "19498629",
+                "episode_number": "EP02",
+                "track_name": "过渡音效",
+                "scheduled_date": "2026-06-11",
+                "scheduled_time": "15:30",
+                "duration_minutes": 15,
+                "engineer_name": "王调音师",
+                "status": "pending",
+                "abnormal_type": null,
+                "abnormal_note": null,
+                "reviewer": null,
+                "review_time": null,
+                "consumed": false,
+                "is_leave": false,
+                "sources": [
+                  {
+                    "source_name": "调音师留言",
+                    "line_number": 2,
+                    "raw_content": "EP02|过渡音效|2026-06-11|15:30|15|王调音师",
+                    "parsed_data": {
+                      "episode_number": "EP02",
+                      "track_name": "过渡音效",
+                      "scheduled_date": "2026-06-11",
+                      "scheduled_time": "15:30",
+                      "duration_minutes": 15,
+                      "engineer_name": "王调音师",
+                      "consumed": false,
+                      "is_leave": false
+                    }
+                  }
+                ],
+                "audit_logs": [],
+                "current_step": "step1_import_engineer_message",
+                "manual_edits": []
+              },
+              "note": "从调音师留言第2行导入"
+            },
+            {
+              "timestamp": "2026-06-06T23:52:02.116518",
+              "step": "step2_check_group_signup",
+              "operator": "录音师小段",
+              "action": "核对排练群接龙",
+              "before": {
+                "id": "19498629",
+                "episode_number": "EP02",
+                "track_name": "过渡音效",
+                "scheduled_date": "2026-06-11",
+                "scheduled_time": "15:30",
+                "duration_minutes": 15,
+                "engineer_name": "王调音师",
+                "status": "pending",
+                "abnormal_type": null,
+                "abnormal_note": null,
+                "reviewer": null,
+                "review_time": null,
+                "consumed": false,
+                "is_leave": false,
+                "sources": [
+                  {
+                    "source_name": "调音师留言",
+                    "line_number": 2,
+                    "raw_content": "EP02|过渡音效|2026-06-11|15:30|15|王调音师",
+                    "parsed_data": {
+                      "episode_number": "EP02",
+                      "track_name": "过渡音效",
+                      "scheduled_date": "2026-06-11",
+                      "scheduled_time": "15:30",
+                      "duration_minutes": 15,
+                      "engineer_name": "王调音师",
+                      "consumed": false,
+                      "is_leave": false
+                    }
+                  }
+                ],
+                "audit_logs": [
+                  {
+                    "timestamp": "2026-06-06T23:52:02.113248",
+                    "step": "step1_import_engineer_message",
+                    "operator": "系统自动导入",
+                    "action": "导入调音师留言",
+                    "before": null,
+                    "after": {
+                      "id": "19498629",
+                      "episode_number": "EP02",
+                      "track_name": "过渡音效",
+                      "scheduled_date": "2026-06-11",
+                      "scheduled_time": "15:30",
+                      "duration_minutes": 15,
+                      "engineer_name": "王调音师",
+                      "status": "pending",
+                      "abnormal_type": null,
+                      "abnormal_note": null,
+                      "reviewer": null,
+                      "review_time": null,
+                      "consumed": false,
+                      "is_leave": false,
+                      "sources": [
+                        {
+                          "source_name": "调音师留言",
+                          "line_number": 2,
+                          "raw_content": "EP02|过渡音效|2026-06-11|15:30|15|王调音师",
+                          "parsed_data": {
+                            "episode_number": "EP02",
+                            "track_name": "过渡音效",
+                            "scheduled_date": "2026-06-11",
+                            "scheduled_time": "15:30",
+                            "duration_minutes": 15,
+                            "engineer_name": "王调音师",
+                            "consumed": false,
+                            "is_leave": false
+                          }
+                        }
+                      ],
+                      "audit_logs": [],
+                      "current_step": "step1_import_engineer_message",
+                      "manual_edits": []
+                    },
+                    "note": "从调音师留言第2行导入"
+                  }
+                ],
+                "current_step": "step1_import_engineer_message",
+                "manual_edits": []
+              },
+              "after": {
+                "id": "19498629",
+                "episode_number": "EP02",
+                "track_name": "过渡音效",
+                "scheduled_date": "2026-06-11",
+                "scheduled_time": "15:30",
+                "duration_minutes": 15,
+                "engineer_name": "王调音师",
+                "status": "pending",
+                "abnormal_type": null,
+                "abnormal_note": null,
+                "reviewer": null,
+                "review_time": null,
+                "consumed": false,
+                "is_leave": false,
+                "sources": [
+                  {
+                    "source_name": "调音师留言",
+                    "line_number": 2,
+                    "raw_content": "EP02|过渡音效|2026-06-11|15:30|15|王调音师",
+                    "parsed_data": {
+                      "episode_number": "EP02",
+                      "track_name": "过渡音效",
+                      "scheduled_date": "2026-06-11",
+                      "scheduled_time": "15:30",
+                      "duration_minutes": 15,
+                      "engineer_name": "王调音师",
+                      "consumed": false,
+                      "is_leave": false
+                    }
+                  },
+                  {
+                    "source_name": "排练群接龙",
+                    "line_number": 1,
+                    "raw_content": "排练群接龙：全体到齐",
+                    "parsed_data": {
+                      "raw_text": "排练群接龙：全体到齐",
+                      "is_leave": false
+                    }
+                  }
+                ],
+                "audit_logs": [
+                  {
+                    "timestamp": "2026-06-06T23:52:02.113248",
+                    "step": "step1_import_engineer_message",
+                    "operator": "系统自动导入",
+                    "action": "导入调音师留言",
+                    "before": null,
+                    "after": {
+                      "id": "19498629",
+                      "episode_number": "EP02",
+                      "track_name": "过渡音效",
+                      "scheduled_date": "2026-06-11",
+                      "scheduled_time": "15:30",
+                      "duration_minutes": 15,
+                      "engineer_name": "王调音师",
+                      "status": "pending",
+                      "abnormal_type": null,
+                      "abnormal_note": null,
+                      "reviewer": null,
+                      "review_time": null,
+                      "consumed": false,
+                      "is_leave": false,
+                      "sources": [
+                        {
+                          "source_name": "调音师留言",
+                          "line_number": 2,
+                          "raw_content": "EP02|过渡音效|2026-06-11|15:30|15|王调音师",
+                          "parsed_data": {
+                            "episode_number": "EP02",
+                            "track_name": "过渡音效",
+                            "scheduled_date": "2026-06-11",
+                            "scheduled_time": "15:30",
+                            "duration_minutes": 15,
+                            "engineer_name": "王调音师",
+                            "consumed": false,
+                            "is_leave": false
+                          }
+                        }
+                      ],
+                      "audit_logs": [],
+                      "current_step": "step1_import_engineer_message",
+                      "manual_edits": []
+                    },
+                    "note": "从调音师留言第2行导入"
+                  }
+                ],
+                "current_step": "step2_check_group_signup",
+                "manual_edits": []
+              },
+              "note": "核对结果: 正常"
+            }
+          ],
+          "current_step": "step3_update_tracklist",
+          "manual_edits": []
+        },
+        "note": null
+      }
+    ],
+    "current_step": "step3_update_tracklist",
+    "manual_edits": []
+  },
+  "29d92027": {
+    "id": "29d92027",
+    "episode_number": "EP03",
+    "track_name": "结尾音乐",
+    "scheduled_date": "2026-06-12",
+    "scheduled_time": "10:00",
+    "duration_minutes": 45,
+    "engineer_name": "李调音师",
+    "status": "pending",
+    "abnormal_type": null,
+    "abnormal_note": null,
+    "reviewer": null,
+    "review_time": null,
+    "consumed": true,
+    "is_leave": false,
+    "sources": [
+      {
+        "source_name": "调音师留言",
+        "line_number": 3,
+        "raw_content": "EP03|结尾音乐|2026-06-12|10:00|45|李调音师|已消耗",
+        "parsed_data": {
+          "episode_number": "EP03",
+          "track_name": "结尾音乐",
+          "scheduled_date": "2026-06-12",
+          "scheduled_time": "10:00",
+          "duration_minutes": 45,
+          "engineer_name": "李调音师",
+          "consumed": true,
+          "is_leave": false
+        }
+      }
+    ],
+    "audit_logs": [
+      {
+        "timestamp": "2026-06-06T23:52:02.113826",
+        "step": "step1_import_engineer_message",
+        "operator": "系统自动导入",
+        "action": "导入调音师留言",
+        "before": null,
+        "after": {
+          "id": "29d92027",
+          "episode_number": "EP03",
+          "track_name": "结尾音乐",
+          "scheduled_date": "2026-06-12",
+          "scheduled_time": "10:00",
+          "duration_minutes": 45,
+          "engineer_name": "李调音师",
+          "status": "pending",
+          "abnormal_type": null,
+          "abnormal_note": null,
+          "reviewer": null,
+          "review_time": null,
+          "consumed": true,
+          "is_leave": false,
+          "sources": [
+            {
+              "source_name": "调音师留言",
+              "line_number": 3,
+              "raw_content": "EP03|结尾音乐|2026-06-12|10:00|45|李调音师|已消耗",
+              "parsed_data": {
+                "episode_number": "EP03",
+                "track_name": "结尾音乐",
+                "scheduled_date": "2026-06-12",
+                "scheduled_time": "10:00",
+                "duration_minutes": 45,
+                "engineer_name": "李调音师",
+                "consumed": true,
+                "is_leave": false
+              }
+            }
+          ],
+          "audit_logs": [],
+          "current_step": "step1_import_engineer_message",
+          "manual_edits": []
+        },
+        "note": "从调音师留言第3行导入"
+      }
+    ],
+    "current_step": "step1_import_engineer_message",
+    "manual_edits": []
+  }
+}
