@@ -1,0 +1,269 @@
+{
+  "records": [
+    {
+      "record_id": "478fbea7-1b65-4419-af7a-f8db5094c128",
+      "live_name": "夜曲",
+      "copyright_name": "夜曲",
+      "region": "中国大陆",
+      "status": "imported",
+      "import_source": "group_chat_import",
+      "original_row_number": 1,
+      "import_time": "2026-06-06T23:38:30.516580",
+      "evidences": [],
+      "manual_changes": [],
+      "status_history": [
+        [
+          "imported",
+          "2026-06-06T23:38:30.516588",
+          "system"
+        ]
+      ],
+      "metadata": {}
+    },
+    {
+      "record_id": "cb969688-f67e-45f5-add8-2152b9d102a2",
+      "live_name": "七里香live",
+      "copyright_name": "七里香",
+      "region": "中国大陆",
+      "status": "name_conflict",
+      "import_source": "group_chat_import",
+      "original_row_number": 2,
+      "import_time": "2026-06-06T23:38:30.516771",
+      "evidences": [],
+      "manual_changes": [],
+      "status_history": [
+        [
+          "imported",
+          "2026-06-06T23:38:30.516773",
+          "system"
+        ],
+        [
+          "name_conflict",
+          "2026-06-06T23:38:30.516776",
+          "小助理"
+        ]
+      ],
+      "metadata": {}
+    },
+    {
+      "record_id": "35225b1d-226d-4409-9644-38c398f5f91c",
+      "live_name": "稻香",
+      "copyright_name": "稻香",
+      "region": "全球",
+      "status": "imported",
+      "import_source": "group_chat_import",
+      "original_row_number": 3,
+      "import_time": "2026-06-06T23:38:30.516940",
+      "evidences": [],
+      "manual_changes": [],
+      "status_history": [
+        [
+          "imported",
+          "2026-06-06T23:38:30.516942",
+          "system"
+        ]
+      ],
+      "metadata": {}
+    },
+    {
+      "record_id": "493425b5-5262-4a6e-9e30-22f01c583f76",
+      "live_name": "晴天(现场版)",
+      "copyright_name": "晴天",
+      "region": "中国大陆",
+      "status": "name_conflict",
+      "import_source": "group_chat_import",
+      "original_row_number": 4,
+      "import_time": "2026-06-06T23:38:30.517119",
+      "evidences": [],
+      "manual_changes": [],
+      "status_history": [
+        [
+          "imported",
+          "2026-06-06T23:38:30.517121",
+          "system"
+        ],
+        [
+          "name_conflict",
+          "2026-06-06T23:38:30.517122",
+          "小助理"
+        ]
+      ],
+      "metadata": {}
+    },
+    {
+      "record_id": "c98336de-79de-4d4f-a65c-e6e866595662",
+      "live_name": "青花瓷",
+      "copyright_name": "青花瓷",
+      "region": "中国大陆",
+      "status": "imported",
+      "import_source": "group_chat_import",
+      "original_row_number": 5,
+      "import_time": "2026-06-06T23:38:30.517345",
+      "evidences": [],
+      "manual_changes": [],
+      "status_history": [
+        [
+          "imported",
+          "2026-06-06T23:38:30.517346",
+          "system"
+        ]
+      ],
+      "metadata": {}
+    },
+    {
+      "record_id": "c42eec3b-9cd7-459d-bc57-c04d126f2539",
+      "live_name": "双截棍演唱会版",
+      "copyright_name": "双截棍",
+      "region": "中国大陆",
+      "status": "name_conflict",
+      "import_source": "group_chat_import",
+      "original_row_number": 6,
+      "import_time": "2026-06-06T23:38:30.517593",
+      "evidences": [],
+      "manual_changes": [],
+      "status_history": [
+        [
+          "imported",
+          "2026-06-06T23:38:30.517594",
+          "system"
+        ],
+        [
+          "name_conflict",
+          "2026-06-06T23:38:30.517596",
+          "小助理"
+        ]
+      ],
+      "metadata": {}
+    },
+    {
+      "record_id": "cf466640-0d8c-47ca-9d66-9b9402fa1309",
+      "live_name": "东风破",
+      "copyright_name": "东风破",
+      "region": "中国大陆及港澳台",
+      "status": "imported",
+      "import_source": "group_chat_import",
+      "original_row_number": 7,
+      "import_time": "2026-06-06T23:38:30.517873",
+      "evidences": [],
+      "manual_changes": [],
+      "status_history": [
+        [
+          "imported",
+          "2026-06-06T23:38:30.517875",
+          "system"
+        ]
+      ],
+      "metadata": {}
+    }
+  ],
+  "audit_log": [
+    {
+      "timestamp": "2026-06-06T23:38:30.516592",
+      "action": "import",
+      "record_id": "478fbea7-1b65-4419-af7a-f8db5094c128",
+      "operator": "小助理",
+      "details": {
+        "live_name": "夜曲",
+        "copyright_name": "夜曲",
+        "region": "中国大陆",
+        "original_row_number": 1,
+        "has_name_conflict": false
+      }
+    },
+    {
+      "timestamp": "2026-06-06T23:38:30.516777",
+      "action": "import",
+      "record_id": "cb969688-f67e-45f5-add8-2152b9d102a2",
+      "operator": "小助理",
+      "details": {
+        "live_name": "七里香live",
+        "copyright_name": "七里香",
+        "region": "中国大陆",
+        "original_row_number": 2,
+        "has_name_conflict": true
+      }
+    },
+    {
+      "timestamp": "2026-06-06T23:38:30.516944",
+      "action": "import",
+      "record_id": "35225b1d-226d-4409-9644-38c398f5f91c",
+      "operator": "小助理",
+      "details": {
+        "live_name": "稻香",
+        "copyright_name": "稻香",
+        "region": "全球",
+        "original_row_number": 3,
+        "has_name_conflict": false
+      }
+    },
+    {
+      "timestamp": "2026-06-06T23:38:30.517124",
+      "action": "import",
+      "record_id": "493425b5-5262-4a6e-9e30-22f01c583f76",
+      "operator": "小助理",
+      "details": {
+        "live_name": "晴天(现场版)",
+        "copyright_name": "晴天",
+        "region": "中国大陆",
+        "original_row_number": 4,
+        "has_name_conflict": true
+      }
+    },
+    {
+      "timestamp": "2026-06-06T23:38:30.517348",
+      "action": "import",
+      "record_id": "c98336de-79de-4d4f-a65c-e6e866595662",
+      "operator": "小助理",
+      "details": {
+        "live_name": "青花瓷",
+        "copyright_name": "青花瓷",
+        "region": "中国大陆",
+        "original_row_number": 5,
+        "has_name_conflict": false
+      }
+    },
+    {
+      "timestamp": "2026-06-06T23:38:30.517597",
+      "action": "import",
+      "record_id": "c42eec3b-9cd7-459d-bc57-c04d126f2539",
+      "operator": "小助理",
+      "details": {
+        "live_name": "双截棍演唱会版",
+        "copyright_name": "双截棍",
+        "region": "中国大陆",
+        "original_row_number": 6,
+        "has_name_conflict": true
+      }
+    },
+    {
+      "timestamp": "2026-06-06T23:38:30.517877",
+      "action": "import",
+      "record_id": "cf466640-0d8c-47ca-9d66-9b9402fa1309",
+      "operator": "小助理",
+      "details": {
+        "live_name": "东风破",
+        "copyright_name": "东风破",
+        "region": "中国大陆及港澳台",
+        "original_row_number": 7,
+        "has_name_conflict": false
+      }
+    },
+    {
+      "timestamp": "2026-06-06T23:38:41.515249",
+      "action": "export_weekly_report",
+      "record_id": null,
+      "operator": "system",
+      "details": {
+        "output_path": "reports/actual_weekly.json",
+        "total_records": 7
+      }
+    }
+  ],
+  "boundary_rules": {
+    "NAME_CONFLICT_REQUIRES_TEACHER_REVIEW": true,
+    "CONTRACT_EVIDENCE_OUTWEIGHS_GROUP_CHAT": true,
+    "ROLLBACK_PRESERVES_HISTORY": true,
+    "MIN_EVIDENCE_FOR_APPROVAL": 2
+  },
+  "last_saved": "2026-06-06T23:38:41.515406"
+}
