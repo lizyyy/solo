@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>项目详情 - 实验风帆升力曲线</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        warning: '#f59e0b',
+                        danger: '#dc2626',
+                        success: '#16a34a',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <header class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">⛵ 项目详情</h1>
+                    <p class="text-sm text-gray-500 mt-1">项目ID: <span id="projectId">{{ project_id }}</span></p>
+                </div>
+                <a href="/" class="text-gray-600 hover:text-gray-900 font-medium">← 返回首页</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        <!-- 步骤指示器 -->
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-8">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4">📋 当前进度</h2>
+            <div id="stepIndicator" class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <div id="step1Circle" class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold">1</div>
+                    <span class="ml-3 font-medium text-gray-700">设备铭牌参数导入</span>
+                </div>
+                <div class="flex-1 h-1 bg-gray-200 mx-4" id="line1"></div>
+                <div class="flex items-center">
+                    <div id="step2Circle" class="w-10 h-10 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-bold">2</div>
+                    <span class="ml-3 text-gray-500" id="step2Text">老岑复核维修群截图</span>
+                </div>
+                <div class="flex-1 h-1 bg-gray-200 mx-4" id="line2"></div>
+                <div class="flex items-center">
+                    <div id="step3Circle" class="w-10 h-10 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-bold">3</div>
+                    <span class="ml-3 text-gray-500" id="step3Text">单位换算说明更新</span>
+                </div>
+            </div>
+            <p id="stepDescription" class="mt-4 text-sm text-gray-600 text-center"></p>
+        </div>
+
+        <!-- 数据概览卡片 -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <p class="text-gray-500 text-sm">总记录数</p>
+                <p id="totalRecords" class="text-3xl font-bold text-gray-900 mt-1">0</p>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <p class="text-gray-500 text-sm">被平均值盖掉</p>
+                <p id="hiddenCount" class="text-3xl font-bold text-danger mt-1">0</p>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <p class="text-gray-500 text-sm">待老岑复核</p>
+                <p id="pendingCount" class="text-3xl font-bold text-warning mt-1">0</p>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <p class="text-gray-500 text-sm">已确认</p>
+                <p id="confirmedCount" class="text-3xl font-bold text-success mt-1">0</p>
+            </div>
+        </div>
+
+        <!-- 图表区域 -->
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-gray-800">📊 升力曲线可视化</h2>
+                <div class="flex space-x-2">
+                    <button onclick="switchPlot('2d')" class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium">2D曲线</button>
+                    <button onclick="switchPlot('3d')" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium">3D曲线</button>
+                    <button onclick="switchPlot('summary')" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium">数据概览</button>
+                    <a id="downloadReport" href="#" class="px-4 py-2 bg-success text-white rounded-lg text-sm font-medium">下载报告</a>
+                </div>
+            </div>
+            <div id="plotContainer" class="h-96 bg-gray-50 rounded-lg border border-gray-200 flex items-center justify-center">
+                <p class="text-gray-400">加载图表中...</p>
+            </div>
+        </div>
+
+        <!-- 超阈值记录列表 -->
+        <div class="bg-white rounded-xl shadow-sm p-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4">⚠️ 超阈值记录（被平均值盖掉）</h2>
+            <div id="thresholdList" class="space-y-4">
+                <p class="text-gray-400 text-center py-8">加载中...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- 复核模态框 -->
+    <div id="reviewModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl p-6 w-full max-w-lg mx-4">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">🔍 老岑复核记录</h3>
+            <form id="reviewForm" class="space-y-4">
+                <input type="hidden" id="reviewThresholdId">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">维修群截图引用</label>
+                    <input type="text" id="screenshotRef" placeholder="例如: wechat_group_20240615_001.png"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">复核备注</label>
+                    <textarea id="reviewNotes" rows="3" placeholder="请填写现场核实情况..."
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"></textarea>
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" id="confirmCheck" class="mr-2 w-4 h-4">
+                    <label for="confirmCheck" class="text-sm font-medium text-gray-700">确认该记录处理完毕（勾选后状态变为"老岑已确认"）</label>
+                </div>
+                <div class="flex space-x-3 pt-2">
+                    <button type="button" onclick="closeReviewModal()"
+                        class="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium">取消</button>
+                    <button type="submit"
+                        class="flex-1 px-4 py-2 bg-primary text-white rounded-lg font-medium">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 单位换算模态框 -->
+    <div id="convertModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl p-6 w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">📝 更新单位换算说明</h3>
+            <form id="convertForm" class="space-y-4">
+                <input type="hidden" id="convertThresholdId">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">原始单位</label>
+                        <input type="text" id="originalUnit" value="Cl"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">转换单位</label>
+                        <input type="text" id="convertedUnit" value="kgf"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">换算系数</label>
+                    <input type="number" step="any" id="conversionFactor" value="9.8"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">▶ 为什么被留下</label>
+                    <textarea id="whyKept" rows="2" placeholder="说明这条记录为什么保留而不是丢弃..."
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">▶ 还缺什么材料</label>
+                    <textarea id="missingMaterials" rows="2" placeholder="还需要补充哪些佐证材料..."
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">▶ 下一步该找谁</label>
+                    <textarea id="nextAction" rows="2" placeholder="下一步行动是找维修师傅还是..."
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">联系人</label>
+                    <input type="text" id="contactPerson" value="老岑"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary">
+                </div>
+                <div class="flex space-x-3 pt-2">
+                    <button type="button" onclick="closeConvertModal()"
+                        class="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium">取消</button>
+                    <button type="submit"
+                        class="flex-1 px-4 py-2 bg-primary text-white rounded-lg font-medium">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const projectId = "{{ project_id }}";
+        let currentPlotMode = '2d';
+
+        async function loadProject() {
+            const resp = await fetch(`/api/project/${projectId}`);
+            const data = await resp.json();
+            
+            document.getElementById('totalRecords').textContent = data.total_records;
+            document.getElementById('hiddenCount').textContent = data.threshold_count;
+            document.getElementById('pendingCount').textContent = data.pending_count;
+            document.getElementById('confirmedCount').textContent = data.confirmed_count;
+            document.getElementById('stepDescription').textContent = data.step_description;
+            
+            const steps = [
+                { circle: 'step1Circle', line: null, text: null },
+                { circle: 'step2Circle', line: 'line1', text: 'step2Text' },
+                { circle: 'step3Circle', line: 'line2', text: 'step3Text' },
+            ];
+            
+            for (let i = 0; i < steps.length; i++) {
+                const s = steps[i];
+                const el = document.getElementById(s.circle);
+                if (i < data.step) {
+                    el.className = 'w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold';
+                    if (s.text) {
+                        document.getElementById(s.text).className = 'ml-3 font-medium text-gray-700';
+                    }
+                    if (s.line) {
+                        document.getElementById(s.line).className = 'flex-1 h-1 bg-primary mx-4';
+                    }
+                }
+            }
+            
+            document.getElementById('downloadReport').href = `/api/project/${projectId}/report`;
+            
+            renderThresholdList(data.threshold_records);
+            loadPlot(currentPlotMode);
+        }
+
+        function renderThresholdList(records) {
+            const container = document.getElementById('thresholdList');
+            if (!records || records.length === 0) {
+                container.innerHTML = '<p class="text-gray-400 text-center py-8">暂无超阈值记录</p>';
+                return;
+            }
+            
+            container.innerHTML = records.map(t => {
+                const statusColor = t.status === '老岑已确认' ? 'bg-green-100 text-green-800' :
+                                   t.status === '待处理' ? 'bg-yellow-100 text-yellow-800' :
+                                   'bg-red-100 text-red-800';
+                return `
+                <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-3">
+                                <span class="px-2 py-1 text-xs font-medium rounded ${statusColor}">${t.status}</span>
+                                <span class="font-medium text-gray-800">${t.equipment_name}</span>
+                                <span class="text-sm text-gray-500">${t.equipment_id}</span>
+                            </div>
+                            <div class="mt-2 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                                <div>
+                                    <span class="text-gray-500">原始值:</span>
+                                    <span class="font-mono text-gray-900 ml-1">${t.raw_value.toFixed(4)}</span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-500">平均值:</span>
+                                    <span class="font-mono text-gray-900 ml-1">${t.averaged_value.toFixed(4)}</span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-500">偏离:</span>
+                                    <span class="font-mono text-danger ml-1">${t.deviation_percent.toFixed(1)}%</span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-500">截图:</span>
+                                    <span class="text-gray-900 ml-1">${t.screenshot_ref || '无'}</span>
+                                </div>
+                            </div>
+                            ${t.conversion ? `
+                            <div class="mt-3 p-3 bg-blue-50 rounded-lg text-sm">
+                                <p class="font-medium text-blue-800">📝 单位换算说明</p>
+                                <p class="text-blue-700 mt-1"><strong>为什么留下:</strong> ${t.conversion.why_kept}</p>
+                                <p class="text-blue-700"><strong>缺什么:</strong> ${t.conversion.missing_materials}</p>
+                                <p class="text-blue-700"><strong>下一步:</strong> ${t.conversion.next_action}</p>
+                                <p class="text-blue-700"><strong>联系人:</strong> ${t.conversion.contact_person}</p>
+                            </div>
+                            ` : ''}
+                        </div>
+                        <div class="flex flex-col space-y-2 ml-4">
+                            <button onclick="openReviewModal('${t.record_id}')"
+                                class="px-3 py-1.5 bg-primary text-white text-sm rounded-lg hover:bg-blue-700">
+                                老岑复核
+                            </button>
+                            <button onclick="openConvertModal('${t.record_id}')"
+                                class="px-3 py-1.5 bg-gray-600 text-white text-sm rounded-lg hover:bg-gray-700">
+                                换算说明
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        function switchPlot(mode) {
+            currentPlotMode = mode;
+            loadPlot(mode);
+            
+            document.querySelectorAll('#plotContainer + div button, .flex.space-x-2 button').forEach(btn => {
+                if (btn.textContent.includes(mode.toUpperCase()) || btn.textContent.includes(mode === 'summary' ? '数据概览' : '')) {
+                    btn.className = 'px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium';
+                } else if (btn.tagName === 'BUTTON') {
+                    btn.className = 'px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium';
+                }
+            });
+        }
+
+        async function loadPlot(mode) {
+            const container = document.getElementById('plotContainer');
+            container.innerHTML = '<iframe src="/api/project/' + projectId + '/plot/' + mode + '" class="w-full h-full rounded-lg"></iframe>';
+        }
+
+        function openReviewModal(thresholdId) {
+            document.getElementById('reviewThresholdId').value = thresholdId;
+            document.getElementById('reviewModal').classList.remove('hidden');
+        }
+
+        function closeReviewModal() {
+            document.getElementById('reviewModal').classList.add('hidden');
+            document.getElementById('reviewForm').reset();
+        }
+
+        function openConvertModal(thresholdId) {
+            document.getElementById('convertThresholdId').value = thresholdId;
+            document.getElementById('convertModal').classList.remove('hidden');
+        }
+
+        function closeConvertModal() {
+            document.getElementById('convertModal').classList.add('hidden');
+        }
+
+        document.getElementById('reviewForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData();
+            formData.append('threshold_id', document.getElementById('reviewThresholdId').value);
+            formData.append('screenshot_ref', document.getElementById('screenshotRef').value);
+            formData.append('notes', document.getElementById('reviewNotes').value);
+            formData.append('confirm', document.getElementById('confirmCheck').checked);
+            
+            const resp = await fetch(`/api/project/${projectId}/review`, { method: 'POST', body: formData });
+            const data = await resp.json();
+            
+            if (data.success) {
+                closeReviewModal();
+                loadProject();
+            } else {
+                alert('保存失败');
+            }
+        });
+
+        document.getElementById('convertForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData();
+            formData.append('threshold_id', document.getElementById('convertThresholdId').value);
+            formData.append('original_unit', document.getElementById('originalUnit').value);
+            formData.append('converted_unit', document.getElementById('convertedUnit').value);
+            formData.append('factor', document.getElementById('conversionFactor').value);
+            formData.append('why_kept', document.getElementById('whyKept').value);
+            formData.append('missing', document.getElementById('missingMaterials').value);
+            formData.append('next_action', document.getElementById('nextAction').value);
+            formData.append('contact', document.getElementById('contactPerson').value);
+            
+            const resp = await fetch(`/api/project/${projectId}/convert`, { method: 'POST', body: formData });
+            const data = await resp.json();
+            
+            if (data.success) {
+                closeConvertModal();
+                loadProject();
+            } else {
+                alert('保存失败');
+            }
+        });
+
+        loadProject();
+    </script>
+</body>
+</html>

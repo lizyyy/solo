@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sail-lift-curve"
+version = "0.1.0"
+description = "实验风帆升力曲线 - 设备铭牌参数导入、超阈值检测、老岑复核、单位换算说明"
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [
+    { name = "维护团队", email = "maintain@example.com" }
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "pandas>=2.0.0",
+    "numpy>=1.24.0",
+    "plotly>=5.15.0",
+    "click>=8.1.0",
+    "fastapi>=0.100.0",
+    "uvicorn>=0.23.0",
+    "jinja2>=3.1.0",
+    "python-multipart>=0.0.6",
+    "openpyxl>=3.1.0",
+]
+
+[project.scripts]
+sail-lift = "sail_lift_curve.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["sail_lift_curve*"]

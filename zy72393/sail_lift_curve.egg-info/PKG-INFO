@@ -1,0 +1,266 @@
+Metadata-Version: 2.4
+Name: sail-lift-curve
+Version: 0.1.0
+Summary: 实验风帆升力曲线 - 设备铭牌参数导入、超阈值检测、老岑复核、单位换算说明
+Author-email: 维护团队 <maintain@example.com>
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+Requires-Dist: pandas>=2.0.0
+Requires-Dist: numpy>=1.24.0
+Requires-Dist: plotly>=5.15.0
+Requires-Dist: click>=8.1.0
+Requires-Dist: fastapi>=0.100.0
+Requires-Dist: uvicorn>=0.23.0
+Requires-Dist: jinja2>=3.1.0
+Requires-Dist: python-multipart>=0.0.6
+Requires-Dist: openpyxl>=3.1.0
+
+# ⛵ 实验风帆升力曲线
+
+专为维修师傅设计的数据分析工具，重点解决：**超阈值记录被平均值盖掉**的问题，留足人工判断空间。
+
+---
+
+## ✨ 核心特性
+
+1. **🔍 智能检测**：自动发现被平均值"吞掉"的超阈值记录
+2. **📊 可视化展示**：2D / 3D 升力曲线，红色钻石标记问题记录
+3. **👴 老岑复核**：所有异常记录停在"待处理"，老岑确认前不自动归正常
+4. **📝 单位换算说明**：每条记录都要说明「为什么留下、缺什么材料、下一步找谁」
+5. **🔗 可追溯**：点到异常记录能回到设备铭牌参数或维修群截图
+6. **🎯 三种入口**：命令行 CLI / API / 小看板 Web 界面
+
+---
+
+## 🚀 快速开始（新人照做就能跑）
+
+### 1. 安装依赖
+
+```bash
+# 进入项目目录
+cd /path/to/project
+
+# 安装依赖
+pip install -e .
+```
+
+### 2. 一键运行完整示例
+
+```bash
+sail-lift demo
+```
+
+这会自动完成：
+- ✅ 生成样例设备铭牌数据
+- ✅ 第1步：导入并检测超阈值
+- ✅ 第2步：老岑复核（模拟）
+- ✅ 第3步：更新单位换算说明
+- ✅ 生成报告和图表
+
+输出在 `./output/` 目录下。
+
+### 3. 查看结果
+
+```bash
+# 查看文本报告
+cat ./output/demo_report_*.txt
+
+# 用浏览器打开图表
+open ./output/demo_curve_2d_*.html
+```
+
+---
+
+## 📖 完整三步流程
+
+### 第1步：导入设备铭牌参数
+
+支持 CSV / Excel 格式。列名参考：
+
+| 列名 | 说明 | 示例 |
+|------|------|------|
+| 设备ID | 设备唯一标识 | EQ-1001 |
+| 设备名称 | 设备名称 | 风帆实验组-1号 |
+| 攻角 | 攻角度数 | 5.0 |
+| 升力系数 | Cl 值 | 0.125 |
+| 风速 | 风速 m/s | 10.5 |
+| 原始值 | 原始测量值 | 0.125 |
+| 测量时间 | 测量时间 | 2024-06-15 08:00:00 |
+| 铭牌_* | 设备铭牌参数 | 铭牌_额定功率=15kW |
+
+```bash
+sail-lift import-data your_data.csv --name "我的项目"
+```
+
+### 第2步：老岑复核维修群截图
+
+先查看待处理记录：
+
+```bash
+sail-lift review --list ./output/project_*.json
+```
+
+逐条复核：
+
+```bash
+sail-lift review ./output/project_*.json \
+  --threshold-id <记录ID> \
+  --screenshot "wechat_group_20240615_001.png" \
+  --notes "现场核实，传感器漂移，已复校" \
+  --confirm
+```
+
+> ⚠️ **关键**：不使用 `--confirm` 的话，记录停在"待处理"状态。
+
+### 第3步：更新单位换算说明
+
+```bash
+sail-lift convert ./output/project_*.json \
+  --threshold-id <记录ID> \
+  --original-unit "Cl" \
+  --converted-unit "kgf" \
+  --factor 9.8 \
+  --why-kept "虽然超阈值，但老岑确认是传感器漂移，非设备问题，可用于趋势分析" \
+  --missing "还缺该时段的设备运行日志、气象条件记录" \
+  --next-action "找维修师傅补充调取运行日志" \
+  --contact "老岑"
+```
+
+---
+
+## 🖥️ 三种使用方式
+
+### 方式一：命令行 CLI
+
+```bash
+# 查看项目状态
+sail-lift status ./output/project_*.json
+
+# 生成图表
+sail-lift plot ./output/project_*.json --mode 2d
+sail-lift plot ./output/project_*.json --mode 3d
+sail-lift plot ./output/project_*.json --mode summary
+
+# 生成完整报告
+sail-lift report ./output/project_*.json
+```
+
+### 方式二：Web 小看板
+
+```bash
+# 启动服务
+python app.py
+
+# 打开浏览器访问
+open http://localhost:8000
+```
+
+功能：
+- 📁 上传设备数据文件
+- 📊 在线查看 2D/3D 图表
+- 🔍 点选异常记录查看详情
+- ✏️ 在线完成老岑复核和单位换算说明
+
+### 方式三：API 接口
+
+```bash
+# 导入数据
+curl -X POST -F "file=@data.csv" -F "name=项目名" http://localhost:8000/api/import
+
+# 获取项目详情
+curl http://localhost:8000/api/project/{project_id}
+
+# 老岑复核
+curl -X POST -F "threshold_id=xxx" -F "confirm=true" \
+  http://localhost:8000/api/project/{project_id}/review
+
+# 获取图表
+curl http://localhost:8000/api/project/{project_id}/plot/2d
+
+# 下载报告
+curl -O http://localhost:8000/api/project/{project_id}/report
+```
+
+---
+
+## 🧠 设计理念（给维修师傅看的）
+
+### 为什么不自动"修正"异常？
+
+> **维修师傅老岑说过：** 数据异常可能是设备真的有问题，也可能是测量环境变了。电脑一平均就把问题盖掉了，最后出了事还得人兜底。
+
+所以这个工具：
+1. ✅ **不自动吞掉**超阈值记录
+2. ✅ 用**红色钻石**标出来，一眼就能看到
+3. ✅ 异常记录停在**「待处理」**，必须等老岑确认
+4. ✅ 每条都写清楚「为什么留下、缺什么、找谁」
+
+### 报告不是冷冰冰的系统日志
+
+系统日志只会写：`值 0.215 超阈值 [0.100, 0.200]`
+
+这个工具的报告会写：
+
+```
+▶ 为什么被留下: 虽然超阈值 7.5%，但老岑现场确认是传感器临时漂移，
+  已复校，数据可用于趋势分析，不能丢。
+▶ 还缺什么材料: 该时段的设备运行日志、当时的气象条件记录
+▶ 下一步该找谁: 找维修师傅补充调取当时的设备运行日志，确认复校后是否正常
+▶ 联系人: 老岑
+```
+
+---
+
+## 📂 项目结构
+
+```
+.
+├── sail_lift_curve/
+│   ├── __init__.py       # 包入口
+│   ├── models.py         # 数据模型：设备记录、阈值记录、状态枚举
+│   ├── importer.py       # 数据导入 + 超阈值检测
+│   ├── visualizer.py     # 2D/3D 可视化
+│   ├── workflow.py       # 三步工作流引擎
+│   ├── cli.py            # 命令行入口
+│   └── sampledata.py     # 样例数据生成
+├── templates/
+│   ├── index.html        # 小看板首页
+│   └── project.html      # 项目详情页
+├── app.py                # FastAPI 服务
+├── requirements.txt      # 依赖列表
+├── pyproject.toml        # 安装配置
+└── README.md             # 本文档
+```
+
+---
+
+## 🔧 常见问题
+
+**Q: 支持 Excel 吗？**
+A: 支持，`.xlsx` 和 `.xls` 都可以。
+
+**Q: 图表是静态的吗？**
+A: 不是，用 Plotly 生成的交互式 HTML，鼠标悬停看详情，可放大缩小。
+
+**Q: 数据会保存吗？**
+A: 会，项目数据存在 `./output/project_<id>.json`，下次可以继续加载。
+
+**Q: 我想从代码里调用？**
+A: 可以，直接 import：
+
+```python
+from sail_lift_curve import WorkflowEngine, plot_lift_curve_2d
+
+engine = WorkflowEngine(name="测试")
+engine.step1_import_equipment("data.csv")
+# ...
+```
+
+---
+
+## 📞 联系
+
+有问题找维修师傅老岑 👴
