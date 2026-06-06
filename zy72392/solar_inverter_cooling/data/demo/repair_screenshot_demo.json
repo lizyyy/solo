@@ -1,0 +1,29 @@
+{
+  "screenshot_time": "2024-06-01 14:30:00",
+  "group_name": "光伏逆变器维修讨论群",
+  "sender": "现场王师傅",
+  "raw_text": "各位老师，今天下午测的3号逆变器散热数据有点问题，T001测点负方向温度偏高，T002测点向左散热好像不太对，T003正常。T001温度到68度了，麻烦帮忙看看。",
+  "points": [
+    {
+      "id": "T001",
+      "name": "逆变器入口散热",
+      "direction": "负方向",
+      "temperature": 68,
+      "field_mention": "现场师傅说负方向温度偏高"
+    },
+    {
+      "id": "T002",
+      "name": "IGBT模块散热",
+      "direction": "向左",
+      "temperature": 62,
+      "field_mention": "现场师傅说向左散热好像不对"
+    },
+    {
+      "id": "T003",
+      "name": "散热器出风口",
+      "direction": "正常方向",
+      "temperature": 45,
+      "field_mention": "现场师傅说正常"
+    }
+  ]
+}
