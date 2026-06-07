@@ -1,0 +1,4 @@
+﻿comment_id,store_id,original_line_no,annotator_content,annotator_sentiment,fragment_text,model_sentiment,confidence,original_sentiment,current_sentiment,drift_detected,status,reviewed_by,updated_at
+C001,S001,1,这家店的服务员态度特别好，上菜也快,正面,服务员态度特别好，上菜也快,正面,0.95,正面,正面,0,batch_rerun,,2026-06-07 03:43:12
+C002,S001,2,环境有点吵，菜量也不大,负面,环境有点吵，菜量不大,正面,0.72,负面,负面,1,reviewed,安全审核-小王,2026-06-07 03:43:12
+C003,S002,3,口味一般，性价比还行,中性,口味一般，性价比还行,中性,0.88,中性,中性,0,batch_rerun,,2026-06-07 03:43:12
