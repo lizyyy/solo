@@ -1,0 +1,208 @@
+# 智能质检漏检复盘系统
+
+## ⚠️ 边界规则（必须严格遵守）
+
+### 1. 数据完整性规则
+
+**提示词版本号备注保留原则**
+- **禁止**将 `raw_remark` 字段清洗成"干净数据"。备注是标注负责人周姐的重要工作痕迹
+- 导入时自动识别所有包含 "remark"、"备注"、"note" 关键词的列，完整保留在 `raw_remark` 字段中
+- 代码位置：[import_service.py#L150-L155](file:///Users/lzy/pro/solo/workspaces/zy72524/services/import_service.py#L150-L155)
+
+**去重导入机制**
+- 重复导入同一文件（基于 SHA256 文件哈希）会被拒绝，不会造成样本数量翻倍
+- 重新导入修改后的同名单文件，执行增量更新而非新增：
+  - 已存在的样本：对比字段变化，记录变更历史
+  - 新增的样本：正常添加
+  - 版本号自动 +1
+- 代码位置：[import_service.py#L37-L63](file:///Users/lzy/pro/solo/workspaces/zy72524/services/import_service.py#L37-L63)
+
+### 2. 低置信度样本处理规则
+
+**判定规则：被平均指标盖住的样本**
+- 当单样本置信度 < 阈值（默认 0.7），但整批平均置信度 ≥ 阈值时，标记 `masked_by_average = True`
+- 这类样本**不得**被自动归为"正常"，必须由知识库编辑人工复核
+- 代码位置：[confidence_service.py#L43-L82](file:///Users/lzy/pro/solo/workspaces/zy72524/services/confidence_service.py#L43-L82)
+
+**修改规则：知识库编辑复核**
+- 只有角色为 `kb_editor` 的用户可以对低置信度样本做最终判定
+- 复核后状态变更必须记录完整历史
+- 代码位置：[confidence_service.py#L85-L113](file:///Users/lzy/pro/solo/workspaces/zy72524/services/confidence_service.py#L85-L113)
+
+**回滚规则**
+- 任何状态变更都支持回滚
+- 回滚基于 `SampleChangeHistory` 中上一条记录的 `old_status`
+- 回滚操作本身也会被记录为一条历史
+- 代码位置：[confidence_service.py#L116-L148](file:///Users/lzy/pro/solo/workspaces/zy72524/services/confidence_service.py#L116-L148)
+
+### 3. 工作流规则（三步必须按顺序）
+
+```
+Step 1: 人工改判表导入
+    ↓ （标注人员 / 标注负责人）
+Step 2: 标注负责人补看提示词版本号
+    ↓ （必须是标注负责人周姐，且所有低置信度样本已由知识库编辑复核）
+Step 3: 模型版本对比更新
+    ↓
+完成
+```
+
+**Step 1 - 导入**
+- 角色：`annotator` 或 `lead_annotator`
+- 自动触发低置信度检测和平均掩盖检测
+
+**Step 2 - 提示词补看**
+- 角色：**仅** `lead_annotator`（标注负责人周姐）
+- **前置检查**：所有 `status = 'low_confidence'` 的样本必须已完成知识库复核
+- 代码位置：[workflow_service.py#L69-L75](file:///Users/lzy/pro/solo/workspaces/zy72524/services/workflow_service.py#L69-L75)
+
+**Step 3 - 模型更新**
+- 角色：`kb_editor` 或 `lead_annotator`
+
+### 4. 可视化证据链规则
+
+**图表 / 3D 展示必须附带追溯链接**
+- 置信度分布图中每一个柱子，点击后必须能看到该区间内的**所有样本明细**
+- 每个样本必须包含：
+  - 🔗 回到人工改判表的链接：`/api/sheets/{sheet_id}`
+  - 🔗 提示词版本号链接：`/api/prompts/{prompt_id}`
+  - 🔗 完整变更历史：`/api/samples/{id}/history`
+  - 🔗 回滚入口：`/api/samples/{id}/rollback`
+- 代码位置：[visualization_service.py#L82-L113](file:///Users/lzy/pro/solo/workspaces/zy72524/services/visualization_service.py#L82-L113)
+
+**禁止**：只展示漂亮的聚合指标，无法下钻到原始证据。
+
+### 5. 历史可追溯规则
+
+**单条备注修改可对比**
+- 当周姐只改了一条备注时，`SampleChangeHistory` 会记录 `change_type = 'remark_update'`
+- 通过 `/api/samples/{id}/history` 可以看到改前 `old_value` 和改后 `new_value` 的完整对比
+- 代码位置：[import_service.py#L206-L217](file:///Users/lzy/pro/solo/workspaces/zy72524/services/import_service.py#L206-L217)
+
+**不允许口头约定**
+- 本 README 和代码是唯一的规则来源
+- 任何流程变更必须同时更新代码和本文档
+
+---
+
+## 快速开始
+
+### 安装依赖
+
+```bash
+pip install -r requirements.txt
+```
+
+### 启动服务
+
+```bash
+python app.py
+```
+
+访问 http://localhost:5000
+
+### 测试数据准备
+
+创建一个 Excel 文件，包含以下列（列名可灵活匹配）：
+- `original_text` - 原始文本
+- `model_prediction` - 模型预测结果
+- `model_confidence` - 模型置信度（0-1）
+- `manual_label` - 人工标注
+- `备注` / `remark_*` - 任意数量的备注列（会被完整保留）
+
+---
+
+## API 参考
+
+### 导入改判表
+```
+POST /api/sheets/import
+Content-Type: multipart/form-data
+- file: Excel文件
+- sheet_name: 表名
+- imported_by: 导入人
+```
+
+### 获取样本历史
+```
+GET /api/samples/{id}/history
+```
+
+### 知识库编辑复核
+```
+POST /api/samples/{id}/kb-review
+{
+    "kb_editor": "编辑姓名",
+    "decision": "false_negative | normal | false_positive",
+    "remark": "复核意见"
+}
+```
+
+### 回滚样本状态
+```
+POST /api/samples/{id}/rollback
+{
+    "rolled_by": "操作人",
+    "reason": "回滚原因"
+}
+```
+
+### 推进工作流
+```
+POST /api/workflows/{sheet_id}/complete-step
+{
+    "step_name": "step1_import | step2_review_prompt | step3_model_update",
+    "completed_by": "操作人",
+    "user_role": "annotator | lead_annotator | kb_editor"
+}
+```
+
+### 可视化数据
+- 置信度分布：`GET /api/visualization/confidence-distribution/{sheet_id}`
+- 状态汇总：`GET /api/visualization/status-summary/{sheet_id}`
+- 被平均掩盖的样本：`GET /api/visualization/masked-samples/{sheet_id}`
+
+---
+
+## 数据模型
+
+### ManualCorrectionSheet - 人工改判表
+- `file_hash`: SHA256 文件哈希，用于去重
+- `version`: 版本号，重新导入时递增
+- `is_current`: 是否为当前版本
+
+### ReviewSample - 复盘样本
+- `unique_key`: 基于内容的 MD5，同表内唯一
+- `raw_remark`: 原始备注，**不清洗**
+- `is_low_confidence`: 是否低置信度
+- `masked_by_average`: 是否被平均指标盖住
+- `kb_reviewed`: 是否已由知识库编辑复核
+
+### SampleChangeHistory - 样本变更历史
+- 记录每一次字段修改、状态变更、回滚
+- 包含 `old_value` / `new_value` 对比
+
+### PromptVersion - 提示词版本
+- `remark`: 标注负责人的备注
+
+---
+
+## 配置项
+
+在 [config.py](file:///Users/lzy/pro/solo/workspaces/zy72524/config.py) 中修改：
+
+| 配置项 | 默认值 | 说明 |
+|--------|--------|------|
+| `LOW_CONFIDENCE_THRESHOLD` | 0.7 | 低于此值判定为低置信度 |
+| `REVIEW_WORKFLOW_STEPS` | 3步 | 工作流步骤定义 |
+
+---
+
+## 设计哲学
+
+> "我不介意界面简单，怕的是结论看着很满，追证据时断在半路。"
+
+- 证据链优先于美观
+- 可追溯优先于聚合指标
+- 明确规则优先于口头约定
+- 人工复核优先于自动判定（尤其对于低置信度样本）

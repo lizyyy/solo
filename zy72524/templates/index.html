@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能质检漏检复盘系统</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f5f5; color: #333; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        h1 { font-size: 24px; margin-bottom: 20px; color: #2c3e50; }
+        h2 { font-size: 18px; margin: 20px 0 10px; color: #34495e; border-bottom: 2px solid #3498db; padding-bottom: 5px; }
+        .card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+        .btn-primary { background: #3498db; color: white; }
+        .btn-danger { background: #e74c3c; color: white; }
+        .btn-success { background: #27ae60; color: white; }
+        .btn-warning { background: #f39c12; color: white; }
+        .btn:disabled { background: #bdc3c7; cursor: not-allowed; }
+        input, select { padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
+        .workflow-steps { display: flex; gap: 10px; margin: 15px 0; }
+        .step { flex: 1; padding: 15px; border-radius: 6px; text-align: center; background: #ecf0f1; }
+        .step.active { background: #3498db; color: white; }
+        .step.completed { background: #27ae60; color: white; }
+        .step .step-num { font-size: 24px; font-weight: bold; }
+        .step .step-label { font-size: 12px; margin-top: 5px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; font-size: 13px; }
+        th { background: #f8f9fa; font-weight: 600; }
+        tr:hover { background: #f8f9fa; }
+        .badge { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 500; }
+        .badge-low { background: #ffeaa7; color: #d35400; }
+        .badge-masked { background: #fab1a0; color: #c0392b; }
+        .badge-normal { background: #55efc4; color: #00b894; }
+        .badge-pending { background: #dfe6e9; color: #636e72; }
+        .badge-kb { background: #a29bfe; color: #6c5ce7; }
+        .chart-bar { display: flex; align-items: flex-end; gap: 5px; height: 200px; padding: 20px 0; border-bottom: 1px solid #eee; }
+        .bar { flex: 1; background: #3498db; border-radius: 4px 4px 0 0; position: relative; cursor: pointer; transition: opacity 0.2s; }
+        .bar:hover { opacity: 0.8; }
+        .bar .bar-count { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: 12px; font-weight: bold; }
+        .bar .bar-label { position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); font-size: 11px; white-space: nowrap; }
+        .bar.threshold { background: #e74c3c; }
+        .evidence-links { font-size: 12px; margin-top: 5px; }
+        .evidence-links a { color: #3498db; text-decoration: none; margin-right: 10px; }
+        .evidence-links a:hover { text-decoration: underline; }
+        .remark-box { background: #fff3cd; border: 1px solid #ffeaa7; padding: 8px; border-radius: 4px; font-size: 12px; white-space: pre-wrap; margin-top: 5px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { background: white; margin: 5% auto; padding: 20px; border-radius: 8px; max-width: 800px; max-height: 80vh; overflow-y: auto; }
+        .close { float: right; font-size: 28px; cursor: pointer; }
+        .history-item { padding: 10px; border-left: 3px solid #3498db; margin-bottom: 10px; background: #f8f9fa; }
+        .history-item .change-type { font-weight: 600; color: #2c3e50; }
+        .history-item .diff { font-family: monospace; font-size: 12px; margin-top: 5px; }
+        .history-item .diff .old { color: #e74c3c; text-decoration: line-through; }
+        .history-item .diff .new { color: #27ae60; }
+        .hidden { display: none; }
+        .tabs { display: flex; gap: 5px; margin-bottom: 15px; border-bottom: 1px solid #ddd; }
+        .tab { padding: 10px 20px; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+        .tab.active { border-bottom-color: #3498db; color: #3498db; font-weight: 500; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 智能质检漏检复盘系统</h1>
+        <p style="color: #666; margin-bottom: 20px;">证据链优先 · 可追溯优先 · 人工复核优先</p>
+
+        <div class="card">
+            <h2>📋 改判表管理</h2>
+            <div class="form-group">
+                <label>导入人工改判表（Excel）</label>
+                <input type="file" id="fileInput" accept=".xlsx,.xls">
+                <input type="text" id="importedBy" placeholder="导入人姓名" style="margin-left: 10px; width: 150px;">
+                <button class="btn btn-primary" onclick="importSheet()" style="margin-left: 10px;">导入</button>
+            </div>
+            <div id="sheetsList"></div>
+        </div>
+
+        <div id="sheetDetail" class="card hidden">
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('overview')">📊 概览</div>
+                <div class="tab" onclick="switchTab('samples')">📝 样本列表</div>
+                <div class="tab" onclick="switchTab('workflow')">🔄 工作流</div>
+                <div class="tab" onclick="switchTab('prompts')">💡 提示词版本</div>
+            </div>
+
+            <div id="tab-overview">
+                <h2>工作流进度</h2>
+                <div class="workflow-steps" id="workflowSteps"></div>
+                <button id="completeStepBtn" class="btn btn-success" onclick="completeCurrentStep()">完成当前步骤</button>
+                <span id="stepUser" style="margin-left: 10px;">
+                    操作人: <input type="text" id="currentUser" placeholder="姓名" style="width: 100px;">
+                    角色: 
+                    <select id="currentRole">
+                        <option value="annotator">标注人员</option>
+                        <option value="lead_annotator">标注负责人（周姐）</option>
+                        <option value="kb_editor">知识库编辑</option>
+                    </select>
+                </span>
+
+                <h2>置信度分布</h2>
+                <p style="font-size: 12px; color: #666;">💡 点击柱状图可查看该区间内的所有样本（带证据追溯链接）</p>
+                <div class="chart-bar" id="confidenceChart"></div>
+
+                <h2>状态汇总</h2>
+                <div id="statusSummary"></div>
+
+                <h2>⚠️ 被平均指标盖住的低置信度样本</h2>
+                <div id="maskedSamples"></div>
+            </div>
+
+            <div id="tab-samples" class="hidden">
+                <h2>样本列表</h2>
+                <div style="margin-bottom: 10px;">
+                    <button class="btn" onclick="filterSamples('all')">全部</button>
+                    <button class="btn btn-warning" onclick="filterSamples('low_confidence')">仅低置信度</button>
+                    <button class="btn btn-danger" onclick="filterSamples('masked')">被平均掩盖</button>
+                    <button class="btn btn-success" onclick="filterSamples('kb_unreviewed')">未KB复核</button>
+                </div>
+                <table id="samplesTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>原文</th>
+                            <th>模型预测</th>
+                            <th>置信度</th>
+                            <th>人工标注</th>
+                            <th>状态</th>
+                            <th>标记</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div id="tab-workflow" class="hidden">
+                <h2>工作流详情</h2>
+                <div id="workflowDetail"></div>
+            </div>
+
+            <div id="tab-prompts" class="hidden">
+                <h2>提示词版本管理</h2>
+                <div class="form-group">
+                    <label>创建新提示词版本</label>
+                    <input type="text" id="promptVersion" placeholder="版本号（如 v1.2）" style="width: 150px;">
+                    <input type="text" id="promptModel" placeholder="模型版本" style="width: 150px; margin-left: 10px;">
+                    <button class="btn btn-primary" onclick="createPrompt()" style="margin-left: 10px;">创建</button>
+                    <br>
+                    <textarea id="promptText" placeholder="提示词内容" rows="3" style="width: 100%; margin-top: 5px;"></textarea>
+                    <textarea id="promptRemark" placeholder="备注（标注负责人周姐的备注会完整保留）" rows="2" style="width: 100%; margin-top: 5px;"></textarea>
+                </div>
+                <div id="promptsList"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="sampleModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('sampleModal')">&times;</span>
+            <h2>样本详情 <span id="modalSampleId"></span></h2>
+            <div id="sampleDetail"></div>
+            <h3 style="margin-top: 20px;">📜 变更历史</h3>
+            <div id="sampleHistory"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentSheetId = null;
+        let currentTab = 'overview';
+        let currentFilter = 'all';
+
+        async function loadSheets() {
+            const res = await fetch('/api/sheets');
+            const sheets = await res.json();
+            const html = sheets.map(s => `
+                <div style="padding: 10px; border: 1px solid #eee; border-radius: 4px; margin-bottom: 5px; cursor: pointer;" onclick="openSheet(${s.id})">
+                    <strong>${s.sheet_name}</strong> (v${s.version}) - ${s.total_samples} 条样本 - 导入人: ${s.imported_by}
+                </div>
+            `).join('');
+            document.getElementById('sheetsList').innerHTML = html || '<p style="color: #999;">暂无改判表，请先导入</p>';
+        }
+
+        async function importSheet() {
+            const fileInput = document.getElementById('fileInput');
+            const importedBy = document.getElementById('importedBy').value || 'system';
+            
+            if (!fileInput.files[0]) {
+                alert('请选择文件');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            formData.append('imported_by', importedBy);
+            formData.append('sheet_name', fileInput.files[0].name);
+
+            const res = await fetch('/api/sheets/import', { method: 'POST', body: formData });
+            const result = await res.json();
+            
+            if (result.is_duplicate) {
+                alert('⚠️ ' + result.message);
+            } else if (result.success) {
+                alert('✅ ' + result.message);
+                loadSheets();
+                if (result.sheet_id) {
+                    openSheet(result.sheet_id);
+                }
+            }
+        }
+
+        async function openSheet(sheetId) {
+            currentSheetId = sheetId;
+            document.getElementById('sheetDetail').classList.remove('hidden');
+            await loadWorkflow();
+            await loadConfidenceChart();
+            await loadStatusSummary();
+            await loadMaskedSamples();
+            await loadSamples();
+            await loadPrompts();
+        }
+
+        async function loadWorkflow() {
+            const res = await fetch(`/api/workflows/${currentSheetId}`);
+            const data = await res.json();
+            
+            const stepNames = {
+                'step1_import': '1. 人工改判表导入',
+                'step2_review_prompt': '2. 周姐补看提示词版本',
+                'step3_model_update': '3. 模型版本对比更新',
+                'completed': '已完成'
+            };
+
+            const steps = ['step1_import', 'step2_review_prompt', 'step3_model_update'];
+            const currentIdx = steps.indexOf(data.current_step);
+
+            const html = steps.map((step, idx) => {
+                let cls = '';
+                if (idx < currentIdx || data.steps[idx]?.completed) cls = 'completed';
+                else if (idx === currentIdx) cls = 'active';
+                return `<div class="step ${cls}"><div class="step-num">${idx + 1}</div><div class="step-label">${stepNames[step].split('. ')[1]}</div></div>`;
+            }).join('');
+
+            document.getElementById('workflowSteps').innerHTML = html;
+            
+            const btn = document.getElementById('completeStepBtn');
+            if (data.current_step === 'completed') {
+                btn.disabled = true;
+                btn.textContent = '工作流已完成';
+            } else {
+                btn.disabled = false;
+                btn.textContent = `完成: ${stepNames[data.current_step]}`;
+            }
+        }
+
+        async function completeCurrentStep() {
+            const res = await fetch(`/api/workflows/${currentSheetId}`);
+            const data = await res.json();
+            
+            const completedBy = document.getElementById('currentUser').value || 'unknown';
+            const userRole = document.getElementById('currentRole').value;
+
+            const res2 = await fetch(`/api/workflows/${currentSheetId}/complete-step`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    step_name: data.current_step,
+                    completed_by: completedBy,
+                    user_role: userRole
+                })
+            });
+            const result = await res2.json();
+            
+            if (result.success) {
+                alert('✅ ' + result.message);
+                loadWorkflow();
+            } else {
+                alert('❌ ' + result.message);
+            }
+        }
+
+        async function loadConfidenceChart() {
+            const res = await fetch(`/api/visualization/confidence-distribution/${currentSheetId}`);
+            const data = await res.json();
+            
+            const maxCount = Math.max(...Object.values(data.bins).map(b => b.count), 1);
+            const threshold = data.threshold;
+
+            const html = Object.entries(data.bins).map(([range, binData]) => {
+                const height = (binData.count / maxCount) * 160;
+                const rangeStart = parseFloat(range.split('-')[0]);
+                const isBelowThreshold = rangeStart < threshold;
+                return `
+                    <div class="bar ${isBelowThreshold ? 'threshold' : ''}" 
+                         style="height: ${Math.max(height, 5)}px;"
+                         onclick="showBinSamples('${range}')">
+                        <div class="bar-count">${binData.count}</div>
+                        <div class="bar-label">${range}</div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('confidenceChart').innerHTML = html + `
+                <div style="position: absolute; right: 20px; top: 0; font-size: 11px; color: #e74c3c;">
+                    阈值: ${threshold}
+                </div>
+            `;
+        }
+
+        function showBinSamples(range) {
+            alert(`查看区间 ${range} 的样本：\n\n（实际环境中这里会跳转到样本列表并筛选）\n\n每个样本都带有：\n🔗 改判表链接\n🔗 提示词版本链接\n🔗 变更历史\n🔗 回滚入口`);
+        }
+
+        async function loadStatusSummary() {
+            const res = await fetch(`/api/visualization/status-summary/${currentSheetId}`);
+            const data = await res.json();
+            
+            let html = '<table><thead><tr><th>状态</th><th>数量</th><th>操作</th></tr></thead><tbody>';
+            for (const [status, info] of Object.entries(data.status_counts)) {
+                if (info.count > 0) {
+                    html += `<tr>
+                        <td><span class="badge badge-${status === 'low_confidence' ? 'low' : status === 'normal' ? 'normal' : 'pending'}">${info.label}</span></td>
+                        <td>${info.count}</td>
+                        <td><button class="btn btn-primary" onclick="filterSamples('${status}')">查看</button></td>
+                    </tr>`;
+                }
+            }
+            html += `<tr><td>⚠️ 被平均指标盖住</td><td><strong>${data.masked_by_average_count}</strong></td><td><button class="btn btn-danger" onclick="filterSamples('masked')">查看</button></td></tr>`;
+            html += '</tbody></table>';
+            document.getElementById('statusSummary').innerHTML = html;
+        }
+
+        async function loadMaskedSamples() {
+            const res = await fetch(`/api/visualization/masked-samples/${currentSheetId}`);
+            const samples = await res.json();
+            
+            if (samples.length === 0) {
+                document.getElementById('maskedSamples').innerHTML = '<p style="color: #27ae60;">✅ 没有被平均指标盖住的样本</p>';
+                return;
+            }
+
+            let html = '<table><thead><tr><th>样本ID</th><th>置信度</th><th>备注</th><th>证据链接</th></tr></thead><tbody>';
+            samples.forEach(s => {
+                html += `<tr>
+                    <td><a href="#" onclick="showSample(${s.sample_id}); return false;">#${s.sample_id}</a></td>
+                    <td>${s.model_confidence}</td>
+                    <td>${s.raw_remark ? '<div class="remark-box">' + escapeHtml(s.raw_remark) + '</div>' : '-'}</td>
+                    <td class="evidence-links">
+                        ${s.links.correction_sheet ? `<a href="#" onclick="alert('跳转到改判表'); return false;">📄 改判表</a>` : ''}
+                        ${s.links.prompt_version ? `<a href="#" onclick="alert('跳转到提示词版本'); return false;">💡 提示词</a>` : ''}
+                        <a href="#" onclick="showSample(${s.sample_id}); return false;">📜 历史</a>
+                    </td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            document.getElementById('maskedSamples').innerHTML = html;
+        }
+
+        async function loadSamples() {
+            let url = `/api/sheets/${currentSheetId}/samples?`;
+            if (currentFilter === 'low_confidence') url += 'only_low_conf=true';
+            if (currentFilter === 'masked') url += 'only_masked=true';
+            if (['normal', 'false_negative', 'false_positive', 'low_confidence', 'pending'].includes(currentFilter)) {
+                url = `/api/sheets/${currentSheetId}/samples?status=${currentFilter}`;
+            }
+            if (currentFilter === 'kb_unreviewed') url += 'status=low_confidence';
+
+            const res = await fetch(url);
+            let samples = await res.json();
+            
+            if (currentFilter === 'kb_unreviewed') {
+                samples = samples.filter(s => !s.kb_reviewed);
+            }
+
+            const badgeCls = s => {
+                if (s.masked_by_average) return 'badge-masked';
+                if (s.is_low_confidence) return 'badge-low';
+                if (s.status === 'normal') return 'badge-normal';
+                return 'badge-pending';
+            };
+
+            const tbody = document.querySelector('#samplesTable tbody');
+            tbody.innerHTML = samples.map(s => `
+                <tr>
+                    <td><a href="#" onclick="showSample(${s.id}); return false;">#${s.id}</a></td>
+                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;" title="${escapeHtml(s.original_text || '')}">${escapeHtml((s.original_text || '').substring(0, 50))}</td>
+                    <td>${escapeHtml(s.model_prediction || '-')}</td>
+                    <td>${s.model_confidence?.toFixed(3) || '-'}</td>
+                    <td>${escapeHtml(s.manual_label || '-')}</td>
+                    <td><span class="badge ${badgeCls(s)}">${s.status}</span></td>
+                    <td>
+                        ${s.masked_by_average ? '<span class="badge badge-masked">被平均掩盖</span>' : ''}
+                        ${s.kb_reviewed ? '<span class="badge badge-kb">已KB复核</span>' : ''}
+                        ${s.raw_remark ? '<div class="remark-box">' + escapeHtml(s.raw_remark.substring(0, 50)) + '</div>' : ''}
+                    </td>
+                    <td class="evidence-links">
+                        <a href="#" onclick="showSample(${s.id}); return false;">详情</a>
+                        ${s.is_low_confidence && !s.kb_reviewed ? `
+                            <button class="btn btn-success" onclick="kbReview(${s.id}, 'false_negative')" style="padding: 3px 8px; font-size: 12px;">漏检</button>
+                            <button class="btn btn-primary" onclick="kbReview(${s.id}, 'normal')" style="padding: 3px 8px; font-size: 12px;">正常</button>
+                        ` : ''}
+                        <button class="btn btn-danger" onclick="rollbackSample(${s.id})" style="padding: 3px 8px; font-size: 12px;">回滚</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function showSample(sampleId) {
+            const [detailRes, historyRes] = await Promise.all([
+                fetch(`/api/samples/${sampleId}`),
+                fetch(`/api/samples/${sampleId}/history`)
+            ]);
+            const detail = await detailRes.json();
+            const history = await historyRes.json();
+
+            document.getElementById('modalSampleId').textContent = '#' + sampleId;
+            document.getElementById('sampleDetail').innerHTML = `
+                <p><strong>原文:</strong> ${escapeHtml(detail.original_text || '-')}</p>
+                <p><strong>模型预测:</strong> ${escapeHtml(detail.model_prediction || '-')} (置信度: ${detail.model_confidence})</p>
+                <p><strong>人工标注:</strong> ${escapeHtml(detail.manual_label || '-')}</p>
+                <p><strong>状态:</strong> <span class="badge badge-${detail.is_low_confidence ? 'low' : 'normal'}">${detail.status_label}</span></p>
+                <p><strong>被平均掩盖:</strong> ${detail.masked_by_average ? '⚠️ 是' : '否'}</p>
+                <p><strong>KB复核:</strong> ${detail.kb_reviewed ? '✅ 已复核' : '⏳ 待复核'}</p>
+                ${detail.raw_remark ? `<p><strong>原始备注:</strong></p><div class="remark-box">${escapeHtml(detail.raw_remark)}</div>` : ''}
+                ${detail.prompt_version_number ? `<p><strong>关联提示词:</strong> ${detail.prompt_version_number} ${detail.prompt_remark ? '(' + escapeHtml(detail.prompt_remark) + ')' : ''}</p>` : ''}
+            `;
+
+            const changeTypeLabels = {
+                'field_update': '字段更新',
+                'remark_update': '备注更新',
+                'status_change': '状态变更',
+                'kb_review': 'KB复核',
+                'rollback': '回滚',
+                'prompt_link': '关联提示词',
+                'masking_detect': '掩盖检测'
+            };
+
+            document.getElementById('sampleHistory').innerHTML = history.map(h => `
+                <div class="history-item">
+                    <div class="change-type">
+                        ${changeTypeLabels[h.change_type] || h.change_type} - 
+                        ${h.changed_by} @ ${h.changed_at}
+                    </div>
+                    ${h.field_name ? `<div>字段: ${h.field_name}</div>` : ''}
+                    ${h.old_value !== null && h.new_value !== null ? `
+                        <div class="diff">
+                            ${h.old_value ? `<span class="old">- ${escapeHtml(h.old_value)}</span><br>` : ''}
+                            ${h.new_value ? `<span class="new">+ ${escapeHtml(h.new_value)}</span>` : ''}
+                        </div>
+                    ` : ''}
+                    ${h.old_status && h.new_status ? `
+                        <div class="diff">
+                            <span class="old">状态: ${h.old_status}</span> → 
+                            <span class="new">${h.new_status}</span>
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('') || '<p>暂无历史记录</p>';
+
+            document.getElementById('sampleModal').style.display = 'block';
+        }
+
+        async function kbReview(sampleId, decision) {
+            const kbEditor = document.getElementById('currentUser').value || 'kb_editor';
+            const res = await fetch(`/api/samples/${sampleId}/kb-review`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ kb_editor: kbEditor, decision: decision })
+            });
+            const result = await res.json();
+            if (result.success) {
+                alert('✅ 复核完成');
+                loadSamples();
+                loadStatusSummary();
+                loadMaskedSamples();
+            }
+        }
+
+        async function rollbackSample(sampleId) {
+            const reason = prompt('回滚原因：');
+            const rolledBy = document.getElementById('currentUser').value || 'unknown';
+            
+            const res = await fetch(`/api/samples/${sampleId}/rollback`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ rolled_by: rolledBy, reason: reason })
+            });
+            const result = await res.json();
+            if (result.success) {
+                alert('✅ 已回滚');
+                loadSamples();
+                loadStatusSummary();
+            } else {
+                alert('❌ ' + result.error);
+            }
+        }
+
+        async function loadPrompts() {
+            const res = await fetch('/api/prompts');
+            const prompts = await res.json();
+            
+            const html = prompts.map(p => `
+                <div style="padding: 10px; border: 1px solid #eee; border-radius: 4px; margin-bottom: 5px;">
+                    <strong>${p.version_number}</strong> (${p.model_version || '无模型版本'}) - ${p.created_by}
+                    ${p.remark ? '<div class="remark-box">备注: ' + escapeHtml(p.remark) + '</div>' : ''}
+                </div>
+            `).join('');
+            document.getElementById('promptsList').innerHTML = html || '<p style="color: #999;">暂无提示词版本</p>';
+        }
+
+        async function createPrompt() {
+            const versionNumber = document.getElementById('promptVersion').value;
+            const promptText = document.getElementById('promptText').value;
+            const remark = document.getElementById('promptRemark').value;
+            const modelVersion = document.getElementById('promptModel').value;
+            const createdBy = document.getElementById('currentUser').value || 'unknown';
+
+            if (!versionNumber || !promptText) {
+                alert('请填写版本号和提示词内容');
+                return;
+            }
+
+            const res = await fetch('/api/prompts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ version_number: versionNumber, prompt_text: promptText, remark, model_version: modelVersion, created_by: createdBy })
+            });
+            const result = await res.json();
+            if (result.success) {
+                alert('✅ 提示词版本已创建');
+                loadPrompts();
+                document.getElementById('promptVersion').value = '';
+                document.getElementById('promptText').value = '';
+                document.getElementById('promptRemark').value = '';
+                document.getElementById('promptModel').value = '';
+            }
+        }
+
+        function switchTab(tabName) {
+            currentTab = tabName;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            document.querySelectorAll('#tab-overview, #tab-samples, #tab-workflow, #tab-prompts').forEach(t => t.classList.add('hidden'));
+            document.getElementById('tab-' + tabName).classList.remove('hidden');
+        }
+
+        function filterSamples(filter) {
+            currentFilter = filter;
+            if (currentTab !== 'samples') {
+                switchTab('samples');
+            }
+            loadSamples();
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        window.onclick = function(e) {
+            if (e.target.classList.contains('modal')) {
+                e.target.style.display = 'none';
+            }
+        }
+
+        loadSheets();
+    </script>
+</body>
+</html>
