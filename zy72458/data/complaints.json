@@ -1,0 +1,150 @@
+[
+  {
+    "id": "d9a9bba6-def5-4972-b1b8-99bebadde702",
+    "complaintNo": "TS-2026-001",
+    "originalRowNo": 1,
+    "importTime": "2026-06-04T01:24:11.064Z",
+    "importBy": "阿宁",
+    "currentStep": 3,
+    "status": "resolved",
+    "intersectionPhoto": {
+      "hasPhoto": true,
+      "photoUrl": "/images/intersection-001.jpg",
+      "reviewedBy": "阿宁",
+      "reviewTime": "2026-06-04T13:24:11.064Z"
+    },
+    "residentOpinion": {
+      "hasOriginal": true,
+      "summary": "菜市场门口摊位外溢，影响通行",
+      "originalText": "我们小区门口的菜市场每天早上都有摊位摆到人行道上，老人小孩走路都不方便，还有电动车乱停乱放，希望能管一管。"
+    },
+    "reviewBy": "王书记",
+    "reviewTime": "2026-06-05T01:24:11.064Z",
+    "reviewComment": "已安排城管分队整治，情况已改善。",
+    "createdAt": "2026-06-04T01:24:11.064Z",
+    "updatedAt": "2026-06-05T01:24:11.064Z"
+  },
+  {
+    "id": "b98f3367-84f4-4670-8834-4892348b1887",
+    "complaintNo": "TS-2026-002",
+    "originalRowNo": 2,
+    "importTime": "2026-06-04T13:24:11.064Z",
+    "importBy": "阿宁",
+    "currentStep": 2,
+    "status": "pending_review",
+    "intersectionPhoto": {
+      "hasPhoto": true,
+      "photoUrl": "/images/intersection-002.jpg",
+      "reviewedBy": "阿宁",
+      "reviewTime": "2026-06-04T23:24:11.064Z"
+    },
+    "residentOpinion": {
+      "hasOriginal": true,
+      "summary": "早市噪音扰民，凌晨5点就开始吵闹",
+      "originalText": "菜市场每天凌晨5点就开始卸货、吆喝，家里有老人孩子根本没法休息，夏天开窗更吵，希望能调整开市时间。"
+    },
+    "createdAt": "2026-06-04T13:24:11.064Z",
+    "updatedAt": "2026-06-04T23:24:11.064Z"
+  },
+  {
+    "id": "84b9a0b3-1375-4fa5-bc79-51bf93b26d51",
+    "complaintNo": "TS-2026-003",
+    "originalRowNo": 3,
+    "importTime": "2026-06-05T01:24:11.064Z",
+    "importBy": "阿宁",
+    "currentStep": 2,
+    "status": "missing_opinion",
+    "intersectionPhoto": {
+      "hasPhoto": true,
+      "photoUrl": "/images/intersection-003.jpg",
+      "reviewedBy": "阿宁",
+      "reviewTime": "2026-06-05T09:24:11.064Z"
+    },
+    "residentOpinion": {
+      "hasOriginal": false,
+      "summary": "垃圾清运不及时，夏天味道大"
+    },
+    "createdAt": "2026-06-05T01:24:11.064Z",
+    "updatedAt": "2026-06-05T09:24:11.064Z"
+  },
+  {
+    "id": "67d8a0b2-e08a-443f-b96c-069ad4c87883",
+    "complaintNo": "TS-2026-004",
+    "originalRowNo": 4,
+    "importTime": "2026-06-05T13:24:11.064Z",
+    "importBy": "阿宁",
+    "currentStep": 1,
+    "status": "pending_photo",
+    "intersectionPhoto": {
+      "hasPhoto": false
+    },
+    "residentOpinion": {
+      "hasOriginal": true,
+      "summary": "消防通道被摊位占用，有安全隐患",
+      "originalText": "菜市场西边的消防通道常年被卖菜的摊位堵着，万一着火消防车都进不来，这可是人命关天的大事！"
+    },
+    "createdAt": "2026-06-05T13:24:11.064Z",
+    "updatedAt": "2026-06-05T13:24:11.064Z"
+  },
+  {
+    "id": "c15b5f94-310f-4dc8-833b-d130c47276d3",
+    "complaintNo": "TS-2026-005",
+    "originalRowNo": 5,
+    "importTime": "2026-06-06T01:24:11.064Z",
+    "importBy": "阿宁",
+    "currentStep": 2,
+    "status": "missing_opinion",
+    "intersectionPhoto": {
+      "hasPhoto": true,
+      "photoUrl": "/images/intersection-005.jpg",
+      "reviewedBy": "阿宁",
+      "reviewTime": "2026-06-06T07:24:11.064Z"
+    },
+    "residentOpinion": {
+      "hasOriginal": false,
+      "summary": "污水横流，路面打滑容易摔跤"
+    },
+    "createdAt": "2026-06-06T01:24:11.064Z",
+    "updatedAt": "2026-06-06T07:24:11.064Z"
+  },
+  {
+    "id": "3c6a8aeb-4e5b-4b99-89e1-0afd994c5719",
+    "complaintNo": "TS-2026-006",
+    "originalRowNo": 6,
+    "importTime": "2026-06-06T13:24:11.064Z",
+    "importBy": "阿宁",
+    "currentStep": 1,
+    "status": "pending_photo",
+    "intersectionPhoto": {
+      "hasPhoto": false
+    },
+    "residentOpinion": {
+      "hasOriginal": true,
+      "summary": "流动摊贩太多，影响周边商户生意",
+      "originalText": "我们是菜市场周边的正规商户，现在外面流动摊贩越来越多，都不用交租金管理费，我们这些正规经营的反而没生意了，希望能管管。"
+    },
+    "createdAt": "2026-06-06T13:24:11.064Z",
+    "updatedAt": "2026-06-06T13:24:11.064Z"
+  },
+  {
+    "id": "07422138-f745-4ab0-bf63-ef5f5f975c72",
+    "complaintNo": "TS-2026-002",
+    "originalRowNo": 7,
+    "importTime": "2026-06-06T19:24:11.064Z",
+    "importBy": "阿宁",
+    "currentStep": 1,
+    "status": "pending_photo",
+    "isDuplicate": true,
+    "duplicateOf": "b98f3367-84f4-4670-8834-4892348b1887",
+    "intersectionPhoto": {
+      "hasPhoto": false
+    },
+    "residentOpinion": {
+      "hasOriginal": true,
+      "summary": "早市噪音扰民，凌晨5点就开始吵闹（重复导入）",
+      "originalText": "重复导入的同一份投诉，内容同前。"
+    },
+    "createdAt": "2026-06-06T19:24:11.064Z",
+    "updatedAt": "2026-06-06T19:24:11.064Z"
+  }
+]

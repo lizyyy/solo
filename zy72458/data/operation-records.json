@@ -1,0 +1,32 @@
+[
+  {
+    "id": "c76f76b4-a3ca-46d8-a072-9541e493c6a3",
+    "command": "run_self_check",
+    "operator": "命令行脚本",
+    "timestamp": "2026-06-07T01:24:11.070Z",
+    "parameters": {
+      "checks": 4
+    },
+    "result": "success"
+  },
+  {
+    "id": "f77be3c5-587a-4829-a371-4c1a4ae78956",
+    "command": "export_data",
+    "operator": "命令行脚本",
+    "timestamp": "2026-06-07T01:24:17.288Z",
+    "parameters": {
+      "count": 7
+    },
+    "result": "success"
+  },
+  {
+    "id": "975fb3f7-be2e-4b43-9fb0-fcb48cd44d89",
+    "command": "run_self_check",
+    "operator": "命令行脚本",
+    "timestamp": "2026-06-07T01:24:37.647Z",
+    "parameters": {
+      "checks": 4
+    },
+    "result": "success"
+  }
+]

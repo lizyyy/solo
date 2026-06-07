@@ -1,0 +1,62 @@
+[
+  {
+    "checkId": "7308fd89-9165-4297-864a-d82226a97e58",
+    "checkType": "duplicate_import",
+    "checkName": "重复导入检测",
+    "status": "warning",
+    "message": "发现 1 个重复导入的投诉编号",
+    "details": [
+      {
+        "complaintNo": "TS-2026-002",
+        "rowNumbers": [
+          7,
+          2
+        ],
+        "count": 2
+      }
+    ],
+    "runTime": "2026-06-07T01:24:37.628Z"
+  },
+  {
+    "checkId": "7a477de4-275b-45a4-be46-3c84c73b74c0",
+    "checkType": "missing_opinion",
+    "checkName": "居民意见缺失检测",
+    "status": "error",
+    "message": "发现 2 条居民意见只剩汇总无原文，需社区书记复核",
+    "details": [
+      {
+        "id": "c15b5f94-310f-4dc8-833b-d130c47276d3",
+        "complaintNo": "TS-2026-005",
+        "originalRowNo": 5,
+        "status": "missing_opinion",
+        "summary": "污水横流，路面打滑容易摔跤"
+      },
+      {
+        "id": "84b9a0b3-1375-4fa5-bc79-51bf93b26d51",
+        "complaintNo": "TS-2026-003",
+        "originalRowNo": 3,
+        "status": "missing_opinion",
+        "summary": "垃圾清运不及时，夏天味道大"
+      }
+    ],
+    "runTime": "2026-06-07T01:24:37.629Z"
+  },
+  {
+    "checkId": "b6a80f7d-b4cd-4be7-84a1-6cc3b64f1bf9",
+    "checkType": "recalc_after_add",
+    "checkName": "补录后重算校验",
+    "status": "pass",
+    "message": "所有记录状态和步骤计算正确",
+    "details": [],
+    "runTime": "2026-06-07T01:24:37.629Z"
+  },
+  {
+    "checkId": "54a40c40-d2d9-45a6-a497-ddb507aa4579",
+    "checkType": "export_consistency",
+    "checkName": "导出一致性校验",
+    "status": "pass",
+    "message": "导出数据与当前数据一致（快照时间：2026/6/7 09:24:17）",
+    "details": [],
+    "runTime": "2026-06-07T01:24:37.646Z"
+  }
+]
