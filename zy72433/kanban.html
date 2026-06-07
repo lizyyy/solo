@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>原创歌曲 Demo 评审 - 小看板</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        .header p {
+            opacity: 0.9;
+        }
+        .toolbar {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .toolbar button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #38a169;
+        }
+        .btn-warning {
+            background: #ed8936;
+            color: white;
+        }
+        .btn-warning:hover {
+            background: #dd6b20;
+        }
+        .kanban {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        .column {
+            background: #ebecf0;
+            border-radius: 12px;
+            padding: 15px;
+        }
+        .column-header {
+            font-weight: 600;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .count {
+            background: #667eea;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .card-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        .card-meta {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        .card-status {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        .status-pending {
+            background: #fef3c7;
+            color: #d97706;
+        }
+        .status-review {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+        .status-normal {
+            background: #d1fae5;
+            color: #059669;
+        }
+        .status-completed {
+            background: #e0e7ff;
+            color: #4f46e5;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 700px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+            padding-left: 10px;
+            border-left: 3px solid #667eea;
+        }
+        .timeline {
+            position: relative;
+            padding-left: 20px;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e0e0e0;
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 15px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -26px;
+            top: 15px;
+            width: 10px;
+            height: 10px;
+            background: #667eea;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+        .timeline-reason {
+            font-size: 11px;
+            color: #667eea;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        .timeline-operator {
+            font-size: 11px;
+            color: #999;
+            margin-top: 5px;
+        }
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            font-size: 11px;
+            margin-right: 5px;
+            margin-top: 5px;
+        }
+        .tag-warning {
+            background: #fef3c7;
+            color: #d97706;
+        }
+        .tag-info {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+        .actions-bar {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            flex-wrap: wrap;
+        }
+        .rework-badge {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎵 原创歌曲 Demo 评审</h1>
+            <p>版权运营小鹿的评审工作台</p>
+        </div>
+
+        <div class="toolbar">
+            <button class="btn-primary" onclick="loadDemo('full')">加载完整演示</button>
+            <button class="btn-secondary" onclick="loadDemo('normal')">加载正常演示</button>
+            <button class="btn-secondary" onclick="loadDemo('threestep')">加载三步流程</button>
+            <button class="btn-success" onclick="loadAllReviews()">刷新列表</button>
+        </div>
+
+        <div class="kanban">
+            <div class="column">
+                <div class="column-header">
+                    <span>待复核</span>
+                    <span class="count" id="count-pending">0</span>
+                </div>
+                <div id="pending-column"></div>
+            </div>
+            <div class="column">
+                <div class="column-header">
+                    <span>待返工</span>
+                    <span class="count" id="count-rework">0</span>
+                </div>
+                <div id="rework-column"></div>
+            </div>
+            <div class="column">
+                <div class="column-header">
+                    <span>已完成</span>
+                    <span class="count" id="count-completed">0</span>
+                </div>
+                <div id="completed-column"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="detailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">评审详情</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modalBody"></div>
+            <div class="actions-bar" id="modalActions"></div>
+        </div>
+    </div>
+
+    <script>
+        let reviews = [];
+        let currentReviewId = null;
+
+        async function fetchJSON(url, method = 'GET', body = null) {
+            const options = { method, headers: { 'Content-Type': 'application/json' } };
+            if (body) options.body = JSON.stringify(body);
+            const res = await fetch(url, options);
+            return await res.json();
+        }
+
+        async function loadDemo(type) {
+            const endpoint = type === 'normal' ? '/api/demo/normal' : 
+                           type === 'threestep' ? '/api/demo/threestep' : '/api/demo';
+            const review = await fetchJSON(endpoint);
+            await loadAllReviews();
+            openModal(review.id);
+        }
+
+        async function loadAllReviews() {
+            reviews = await fetchJSON('/api/reviews');
+            renderKanban();
+        }
+
+        function getStatusClass(status) {
+            if (status === '待复核') return 'status-review';
+            if (status === '待返工') return 'status-pending';
+            if (status === '已完成') return 'status-completed';
+            return 'status-normal';
+        }
+
+        function getColumnForStatus(status) {
+            if (status === '待复核') return 'pending-column';
+            if (status === '待返工') return 'rework-column';
+            return 'completed-column';
+        }
+
+        function renderKanban() {
+            const columns = {
+                'pending-column': [],
+                'rework-column': [],
+                'completed-column': []
+            };
+
+            reviews.forEach(review => {
+                const col = getColumnForStatus(review.status);
+                columns[col].push(review);
+            });
+
+            Object.keys(columns).forEach(colId => {
+                const col = document.getElementById(colId);
+                const countId = colId.replace('-column', '').replace('pending', 'pending').replace('rework', 'rework').replace('completed', 'completed');
+                document.getElementById(`count-${countId === 'pending' ? 'pending' : countId === 'rework' ? 'rework' : 'completed'}`).textContent = columns[colId].length;
+                
+                if (columns[colId].length === 0) {
+                    col.innerHTML = '<div class="empty-state">暂无数据</div>';
+                } else {
+                    col.innerHTML = columns[colId].map(r => `
+                        <div class="card" onclick="openModal('${r.id}')">
+                            <div class="card-title">${r.song_name}</div>
+                            <div class="card-meta">
+                                ${r.tuner_comment ? r.tuner_comment.track_name : ''}
+                            </div>
+                            <span class="card-status ${getStatusClass(r.status)}">${r.status}</span>
+                            ${r.tuner_comment && r.tuner_comment.has_rework_reason ? 
+                                '<span class="rework-badge" style="margin-left:5px">⚠️ 有返工原因</span>' : ''}
+                        </div>
+                    `).join('');
+                }
+            });
+        }
+
+        async function openModal(id) {
+            currentReviewId = id;
+            const review = await fetchJSON(`/api/reviews/${id}`);
+            document.getElementById('modalTitle').textContent = review.song_name + ' - 评审详情';
+            
+            let html = '';
+
+            if (review.tuner_comment) {
+                html += `
+                    <div class="section">
+                        <div class="section-title">第一步：调音师留言</div>
+                        <div style="padding:12px;background:#f8f9fa;border-radius:8px;">
+                            <div style="margin-bottom:8px;"><strong>轨道：</strong>${review.tuner_comment.track_name}</div>
+                            <div style="margin-bottom:8px;"><strong>留言：</strong>${review.tuner_comment.comment}</div>
+                            ${review.tuner_comment.has_rework_reason ? 
+                                `<div class="rework-badge">⚠️ ${review.tuner_comment.rework_reason}</div>` : 
+                                '<span class="tag tag-info">无明显返工原因</span>'}
+                            <div style="margin-top:8px;font-size:12px;color:#999;">
+                                导入时间：${new Date(review.tuner_comment.import_time).toLocaleString('zh-CN')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (review.rehearsal_signups && review.rehearsal_signups.length > 0) {
+                html += `
+                    <div class="section">
+                        <div class="section-title">第二步：排练群接龙</div>
+                        ${review.rehearsal_signups.map(s => `
+                            <div style="padding:12px;background:#f8f9fa;border-radius:8px;margin-bottom:8px;">
+                                <div style="margin-bottom:5px;"><strong>${s.signer}</strong></div>
+                                <div>${s.remark}</div>
+                                <div style="margin-top:5px;font-size:12px;color:#999;">
+                                    ${new Date(s.signup_time).toLocaleString('zh-CN')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            if (review.change_records && review.change_records.length > 0) {
+                html += `
+                    <div class="section">
+                        <div class="section-title">第三步：排练变更记录</div>
+                        <div class="timeline">
+                            ${review.change_records.map((r, i) => `
+                                <div class="timeline-item">
+                                    <div class="timeline-reason">变更 ${i + 1}：${r.reason}</div>
+                                    <div style="margin-bottom:5px;"><strong>为什么留下：</strong>${r.why_kept}</div>
+                                    ${r.missing_materials && r.missing_materials.length > 0 ? 
+                                        `<div><strong>还缺材料：</strong>${r.missing_materials.map(m => 
+                                            `<span class="tag tag-warning">${m}</span>`).join('')}</div>` : ''}
+                                    <div style="margin-top:5px;"><strong>下一步：</strong>
+                                        <span class="tag tag-info">${r.next_step}</span>
+                                    </div>
+                                    <div class="timeline-operator">操作人：${r.operator} · ${new Date(r.created_at).toLocaleString('zh-CN')}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (review.review_report) {
+                html += `
+                    <div class="section">
+                        <div class="section-title">评审报告</div>
+                        <div style="padding:12px;background:#f0f4ff;border-radius:8px;">
+                            <div style="margin-bottom:5px;"><strong>状态：</strong>${review.review_report.status}</div>
+                            ${review.review_report.notes ? 
+                                `<div style="margin-bottom:5px;"><strong>备注：</strong>${review.review_report.notes}</div>` : ''}
+                            <div style="font-size:12px;color:#666;">
+                                调音师导入：${new Date(review.review_report.import_tuner_time).toLocaleString('zh-CN')}
+                            </div>
+                            ${review.review_report.supplement_signup_time ? 
+                                `<div style="font-size:12px;color:#666;">
+                                    接龙补录：${new Date(review.review_report.supplement_signup_time).toLocaleString('zh-CN')}
+                                </div>` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+
+            document.getElementById('modalBody').innerHTML = html;
+
+            let actionsHtml = '';
+            if (review.status === '待复核' || review.status === '待返工') {
+                actionsHtml += `
+                    <button class="btn-success" onclick="completeReview('${review.id}')">✅ 复核通过</button>
+                    <button class="btn-warning" onclick="rerunReview('${review.id}')">🔄 重跑检测</button>
+                `;
+            }
+            actionsHtml += `<button class="btn-secondary" onclick="closeModal()">关闭</button>`;
+            document.getElementById('modalActions').innerHTML = actionsHtml;
+
+            document.getElementById('detailModal').classList.add('active');
+        }
+
+        async function completeReview(id) {
+            await fetchJSON(`/api/reviews/${id}/complete`, 'POST');
+            await loadAllReviews();
+            openModal(id);
+        }
+
+        async function rerunReview(id) {
+            await fetchJSON(`/api/reviews/${id}/rerun`, 'POST');
+            await loadAllReviews();
+            openModal(id);
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').classList.remove('active');
+            currentReviewId = null;
+        }
+
+        document.getElementById('detailModal').addEventListener('click', (e) => {
+            if (e.target.id === 'detailModal') closeModal();
+        });
+
+        loadAllReviews();
+    </script>
+</body>
+</html>
