@@ -105,10 +105,14 @@ export function checkConsistency(
 
 export function getPointDisplayNote(
   point: PointLocation,
-  schemePoint?: SchemePoint
+  schemePoint?: SchemePoint,
+  anomaly?: AnomalyRecord
 ): string {
   if (schemePoint?.overrideNote && schemePoint.overrideNote.trim()) {
     return schemePoint.overrideNote;
+  }
+  if (anomaly?.processNote && anomaly.processNote.trim()) {
+    return anomaly.processNote;
   }
   return point.processNote || '';
 }

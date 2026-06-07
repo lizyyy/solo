@@ -79,7 +79,8 @@ export default function ReportPage() {
     lines.push('【点位明细】');
     points.forEach((p) => {
       const sp = currentSchemePts.find((sp) => sp.pointId === p.id);
-      const displayNote = getPointDisplayNote(p, sp);
+      const anomaly = anomalies.find((a) => a.pointId === p.id);
+      const displayNote = getPointDisplayNote(p, sp, anomaly);
       lines.push(`  [${p.id}] ${p.name}`);
       lines.push(`    状态: ${STATUS_LABELS[p.status]}`);
       lines.push(`    来源: ${p.source} — ${p.sourceDetail}`);
@@ -253,35 +254,36 @@ export default function ReportPage() {
                 </tr>
               </thead>
               <tbody>
-                {points.map((p) => {
-                  const sp = currentSchemePts.find((sp) => sp.pointId === p.id);
-                  const displayNote = getPointDisplayNote(p, sp);
-                  return (
-                    <tr key={p.id}>
-                      <td className="p-1.5 border-b border-[#111] text-[#4a90d9] font-mono">{p.id}</td>
-                      <td className="p-1.5 border-b border-[#111] text-white">{p.name}</td>
-                      <td className="p-1.5 border-b border-[#111]">
-                        <span
-                          className="px-1.5 py-0.5 rounded text-[10px]"
-                          style={{
-                            backgroundColor: STATUS_COLORS[p.status] + '22',
-                            color: STATUS_COLORS[p.status],
-                          }}
-                        >
-                          {STATUS_LABELS[p.status]}
-                        </span>
-                      </td>
-                      <td className="p-1.5 border-b border-[#111] text-[#aaa]">{p.source}</td>
-                      <td className="p-1.5 border-b border-[#111] text-[#f5a623]">{p.gisNote || '—'}</td>
-                      <td className="p-1.5 border-b border-[#111] text-[#aaa]">
-                        {displayNote || '—'}
-                      </td>
-                      <td className="p-1.5 border-b border-[#111] text-[#4a90d9]">{p.originalSource}</td>
-                      <td className="p-1.5 border-b border-[#111] text-[#666] font-mono">{p.processTime}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
+              {points.map((p) => {
+                const sp = currentSchemePts.find((sp) => sp.pointId === p.id);
+                const anomaly = anomalies.find((a) => a.pointId === p.id);
+                const displayNote = getPointDisplayNote(p, sp, anomaly);
+                return (
+                  <tr key={p.id}>
+                    <td className="p-1.5 border-b border-[#111] text-[#4a90d9] font-mono">{p.id}</td>
+                    <td className="p-1.5 border-b border-[#111] text-white">{p.name}</td>
+                    <td className="p-1.5 border-b border-[#111]">
+                      <span
+                        className="px-1.5 py-0.5 rounded text-[10px]"
+                        style={{
+                          backgroundColor: STATUS_COLORS[p.status] + '22',
+                          color: STATUS_COLORS[p.status],
+                        }}
+                      >
+                        {STATUS_LABELS[p.status]}
+                      </span>
+                    </td>
+                    <td className="p-1.5 border-b border-[#111] text-[#aaa]">{p.source}</td>
+                    <td className="p-1.5 border-b border-[#111] text-[#f5a623]">{p.gisNote || '—'}</td>
+                    <td className="p-1.5 border-b border-[#111] text-[#aaa]">
+                      {displayNote || '—'}
+                    </td>
+                    <td className="p-1.5 border-b border-[#111] text-[#4a90d9]">{p.originalSource}</td>
+                    <td className="p-1.5 border-b border-[#111] text-[#666] font-mono">{p.processTime}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
             </table>
           </div>
 

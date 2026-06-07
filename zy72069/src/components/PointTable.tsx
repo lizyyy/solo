@@ -1,7 +1,7 @@
 import { useStore } from '@/store/useStore';
 import { STATUS_LABELS, STATUS_COLORS } from '@/types';
 import type { PointStatus } from '@/types';
-import { calculateStatistics, filterPoints } from '@/utils/statistics';
+import { calculateStatistics, filterPoints, getPointDisplayNote } from '@/utils/statistics';
 
 export default function PointTable() {
   const {
@@ -13,6 +13,8 @@ export default function PointTable() {
     setFilterStatus,
     setFilterSource,
     anomalies,
+    schemePoints,
+    currentSchemeId,
   } = useStore();
 
   const filteredPoints = filterPoints(points, filterStatus, filterSource);
@@ -93,6 +95,10 @@ export default function PointTable() {
           <tbody>
             {filteredPoints.map((point) => {
               const anomaly = getAnomalyForPoint(point.id);
+              const schemePoint = schemePoints.find(
+                (sp) => sp.schemeId === currentSchemeId && sp.pointId === point.id
+              );
+              const displayNote = getPointDisplayNote(point, schemePoint, anomaly);
               const isSelected = selectedPointId === point.id;
               return (
                 <tr
@@ -121,8 +127,8 @@ export default function PointTable() {
                   <td className="p-1.5 border-b border-[#111] text-[#f5a623] max-w-[120px] truncate" title={point.gisNote}>
                     {point.gisNote || '—'}
                   </td>
-                  <td className="p-1.5 border-b border-[#111] text-[#aaa] max-w-[150px] truncate" title={anomaly ? anomaly.processNote : point.processNote}>
-                    {anomaly ? anomaly.processNote : point.processNote || '—'}
+                  <td className="p-1.5 border-b border-[#111] text-[#aaa] max-w-[150px] truncate" title={displayNote}>
+                    {displayNote || '—'}
                   </td>
                   <td className="p-1.5 border-b border-[#111] text-[#666] font-mono whitespace-nowrap">
                     {point.processTime}
