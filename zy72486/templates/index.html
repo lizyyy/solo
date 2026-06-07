@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>社区微循环公交 - 网格员巡查表管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        .header {
+            background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+            color: white;
+            padding: 20px 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .header p {
+            opacity: 0.85;
+            margin-top: 4px;
+            font-size: 14px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+        }
+        .stat-card .label {
+            font-size: 13px;
+            color: #8c8c8c;
+            margin-bottom: 8px;
+        }
+        .stat-card .value {
+            font-size: 28px;
+            font-weight: 600;
+            color: #262626;
+        }
+        .stat-card.warning .value { color: #faad14; }
+        .stat-card.danger .value { color: #ff4d4f; }
+        .stat-card.success .value { color: #52c41a; }
+        .stat-card.info .value { color: #1890ff; }
+
+        .section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+        }
+        .section h2 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #262626;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+        .upload-area {
+            border: 2px dashed #d9d9d9;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .upload-area:hover {
+            border-color: #1890ff;
+            background: #e6f7ff;
+        }
+        .upload-area.dragover {
+            border-color: #1890ff;
+            background: #e6f7ff;
+        }
+        .upload-area p {
+            color: #8c8c8c;
+            margin-top: 10px;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-primary {
+            background: #1890ff;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #40a9ff;
+        }
+        .btn-success {
+            background: #52c41a;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #73d13d;
+        }
+        .btn-default {
+            background: #fff;
+            border: 1px solid #d9d9d9;
+            color: #595959;
+        }
+        .btn-default:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+        .btn-sm {
+            padding: 4px 10px;
+            font-size: 12px;
+        }
+
+        .filters {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .filters select, .filters input {
+            padding: 6px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        th, td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        th {
+            background: #fafafa;
+            font-weight: 600;
+            color: #595959;
+        }
+        tr:hover {
+            background: #fafafa;
+        }
+        .status-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+        .status-pending { background: #e6f7ff; color: #1890ff; }
+        .status-needs_review { background: #fff7e6; color: #fa8c16; }
+        .status-reviewed { background: #f6ffed; color: #52c41a; }
+        .status-duplicate { background: #fff1f0; color: #ff4d4f; }
+
+        .badge {
+            display: inline-block;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            margin-left: 4px;
+        }
+        .badge-boundary { background: #fff2e8; color: #fa8c16; }
+        .badge-duplicate { background: #fff1f0; color: #ff4d4f; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.show {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #595959;
+            font-size: 14px;
+        }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .modal-footer {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .edit-history {
+            background: #fafafa;
+            padding: 12px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+        .edit-history-item {
+            padding: 6px 0;
+            border-bottom: 1px dashed #e8e8e8;
+        }
+        .edit-history-item:last-child {
+            border-bottom: none;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            border-radius: 4px;
+            color: white;
+            z-index: 2000;
+            animation: slideIn 0.3s;
+        }
+        .toast.success { background: #52c41a; }
+        .toast.error { background: #ff4d4f; }
+        .toast.info { background: #1890ff; }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .batch-list {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .batch-item {
+            padding: 8px 16px;
+            background: #f5f5f5;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .batch-item:hover {
+            background: #e6f7ff;
+        }
+        .batch-item.active {
+            background: #1890ff;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚍 社区微循环公交</h1>
+        <p>网格员巡查表管理系统 - 数据溯源 · 自检预警 · 流程可追溯</p>
+    </div>
+
+    <div class="container">
+        <div class="stats-grid" id="statsGrid"></div>
+
+        <div class="section">
+            <h2>📥 导入巡查表</h2>
+            <div class="upload-area" id="uploadArea">
+                <div style="font-size: 48px;">📊</div>
+                <p>点击或拖拽文件到此处上传巡查表（支持 CSV、Excel 格式）</p>
+                <p style="font-size: 12px;">系统将自动检测重复记录和街道边界点位</p>
+                <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" style="display: none;">
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📋 导入批次</h2>
+            <div class="batch-list" id="batchList">
+                <span style="color: #8c8c8c; font-size: 13px;">暂无导入记录</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🔍 巡查记录</h2>
+            <div class="filters">
+                <select id="statusFilter">
+                    <option value="">全部状态</option>
+                    <option value="pending">待处理</option>
+                    <option value="needs_review">需复核</option>
+                    <option value="reviewed">已复核</option>
+                    <option value="duplicate">重复记录</option>
+                </select>
+                <button class="btn btn-primary" onclick="loadRecords()">🔍 查询</button>
+                <button class="btn btn-success" onclick="exportRecords()">📤 导出 Excel</button>
+            </div>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>原始行号</th>
+                            <th>点位编号</th>
+                            <th>点位名称</th>
+                            <th>地址</th>
+                            <th>街道</th>
+                            <th>巡查员</th>
+                            <th>原始结论</th>
+                            <th>当前结论</th>
+                            <th>状态</th>
+                            <th>标记</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recordsTable">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">✏️ 编辑记录</div>
+            <div class="form-group">
+                <label>点位名称</label>
+                <input type="text" id="editPointName" readonly>
+            </div>
+            <div class="form-group">
+                <label>地址</label>
+                <input type="text" id="editAddress" readonly>
+            </div>
+            <div class="form-group">
+                <label>当前结论</label>
+                <textarea id="editConclusion"></textarea>
+            </div>
+            <div class="form-group">
+                <label>施工告示补充</label>
+                <textarea id="editConstructionNotice" placeholder="补录施工告示信息..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>处理状态</label>
+                <select id="editStatus">
+                    <option value="pending">待处理</option>
+                    <option value="needs_review">需复核</option>
+                    <option value="reviewed">已复核</option>
+                </select>
+            </div>
+            <div class="form-group" id="reviewCommentGroup" style="display: none;">
+                <label>复核意见</label>
+                <textarea id="editReviewComment" placeholder="请输入复核意见..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>操作人</label>
+                <input type="text" id="editUser" placeholder="请输入您的姓名">
+            </div>
+            <div class="form-group">
+                <label>修改原因</label>
+                <input type="text" id="editReason" placeholder="请输入修改原因">
+            </div>
+            <div class="edit-history" id="editHistory"></div>
+            <div class="modal-footer">
+                <button class="btn btn-default" onclick="closeModal()">取消</button>
+                <button class="btn btn-primary" onclick="saveRecord()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentRecordId = null;
+        let currentBatchId = '';
+
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        async function loadStats() {
+            const res = await fetch('/api/stats');
+            const data = await res.json();
+            document.getElementById('statsGrid').innerHTML = `
+                <div class="stat-card">
+                    <div class="label">总记录数</div>
+                    <div class="value">${data.total}</div>
+                </div>
+                <div class="stat-card info">
+                    <div class="label">待处理</div>
+                    <div class="value">${data.pending}</div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="label">需复核</div>
+                    <div class="value">${data.needs_review}</div>
+                </div>
+                <div class="stat-card success">
+                    <div class="label">已复核</div>
+                    <div class="value">${data.reviewed}</div>
+                </div>
+                <div class="stat-card danger">
+                    <div class="label">重复记录</div>
+                    <div class="value">${data.duplicate}</div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="label">边界点位</div>
+                    <div class="value">${data.boundary}</div>
+                </div>
+            `;
+        }
+
+        async function loadBatches() {
+            const res = await fetch('/api/batches');
+            const batches = await res.json();
+            const container = document.getElementById('batchList');
+            
+            if (batches.length === 0) {
+                container.innerHTML = '<span style="color: #8c8c8c; font-size: 13px;">暂无导入记录</span>';
+                return;
+            }
+
+            let html = '<div class="batch-item active" onclick="selectBatch(\'\')">全部</div>';
+            batches.forEach(batch => {
+                html += `<div class="batch-item" onclick="selectBatch('${batch.batch_id}')">
+                    ${batch.filename} (${batch.total_records}条)
+                    ${batch.boundary_count > 0 ? `<span class="badge badge-boundary">边界${batch.boundary_count}</span>` : ''}
+                    ${batch.duplicate_count > 0 ? `<span class="badge badge-duplicate">重复${batch.duplicate_count}</span>` : ''}
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function selectBatch(batchId) {
+            currentBatchId = batchId;
+            document.querySelectorAll('.batch-item').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
+            loadRecords();
+        }
+
+        async function loadRecords() {
+            const status = document.getElementById('statusFilter').value;
+            let url = '/api/records?';
+            if (status) url += `status=${status}&`;
+            if (currentBatchId) url += `batch_id=${currentBatchId}&`;
+
+            const res = await fetch(url);
+            const records = await res.json();
+            const tbody = document.getElementById('recordsTable');
+
+            if (records.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; color: #8c8c8c; padding: 40px;">暂无数据</td></tr>';
+                return;
+            }
+
+            const statusMap = {
+                'pending': '待处理',
+                'needs_review': '需复核',
+                'reviewed': '已复核',
+                'duplicate': '重复'
+            };
+
+            tbody.innerHTML = records.map(r => `
+                <tr>
+                    <td>${r.original_row_number || '-'}</td>
+                    <td>${r.point_id || '-'}</td>
+                    <td>${r.point_name || '-'}</td>
+                    <td>${r.address || '-'}</td>
+                    <td>${r.street || '-'}</td>
+                    <td>${r.inspector || '-'}</td>
+                    <td style="color: #8c8c8c;">${r.original_conclusion || '-'}</td>
+                    <td><strong>${r.current_conclusion || '-'}</strong></td>
+                    <td><span class="status-tag status-${r.status}">${statusMap[r.status] || r.status}</span></td>
+                    <td>
+                        ${r.is_boundary_point ? '<span class="badge badge-boundary">边界</span>' : ''}
+                        ${r.is_duplicate ? '<span class="badge badge-duplicate">重复</span>' : ''}
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-default" onclick="openEditModal(${r.id})">编辑</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function openEditModal(recordId) {
+            currentRecordId = recordId;
+            const res = await fetch(`/api/records?status=&batch_id=`);
+            const records = await res.json();
+            const record = records.find(r => r.id === recordId);
+            
+            if (!record) return;
+
+            document.getElementById('editPointName').value = record.point_name || '';
+            document.getElementById('editAddress').value = record.address || '';
+            document.getElementById('editConclusion').value = record.current_conclusion || '';
+            document.getElementById('editConstructionNotice').value = record.construction_notice || '';
+            document.getElementById('editStatus').value = record.status;
+            document.getElementById('editReviewComment').value = record.review_comment || '';
+
+            document.getElementById('reviewCommentGroup').style.display = 
+                record.status === 'reviewed' ? 'block' : 'none';
+
+            const changesRes = await fetch(`/api/records/${recordId}/changes`);
+            const changes = await changesRes.json();
+            
+            let historyHtml = '<div style="font-weight: 500; margin-bottom: 8px;">📝 修改历史</div>';
+            if (changes.length === 0) {
+                historyHtml += '<div style="color: #8c8c8c;">暂无修改记录</div>';
+            } else {
+                historyHtml += changes.map(c => `
+                    <div class="edit-history-item">
+                        <span style="color: #8c8c8c;">${c.change_time}</span>
+                        <span><strong>${c.changed_by}</strong> 修改了 ${c.field_name}：</span>
+                        <span style="color: #ff4d4f; text-decoration: line-through;">${c.old_value}</span>
+                        →
+                        <span style="color: #52c41a;">${c.new_value}</span>
+                        ${c.change_reason ? `<span style="color: #8c8c8c;">(${c.change_reason})</span>` : ''}
+                    </div>
+                `).join('');
+            }
+
+            if (record.manual_edits && record.manual_edits.length > 0) {
+                historyHtml += '<div style="font-weight: 500; margin: 12px 0 8px;">📋 人工改动记录</div>';
+                historyHtml += record.manual_edits.map(e => `
+                    <div class="edit-history-item">
+                        <span style="color: #8c8c8c;">${e.time}</span>
+                        <span><strong>${e.user}</strong> 修改了 ${e.field}</span>
+                        ${e.old_value !== undefined ? `: <span style="color: #ff4d4f; text-decoration: line-through;">${e.old_value}</span> → <span style="color: #52c41a;">${e.new_value}</span>` : ''}
+                    </div>
+                `).join('');
+            }
+
+            document.getElementById('editHistory').innerHTML = historyHtml;
+            document.getElementById('editModal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('editModal').classList.remove('show');
+            currentRecordId = null;
+        }
+
+        document.getElementById('editStatus').addEventListener('change', function() {
+            document.getElementById('reviewCommentGroup').style.display = 
+                this.value === 'reviewed' ? 'block' : 'none';
+        });
+
+        async function saveRecord() {
+            const conclusion = document.getElementById('editConclusion').value;
+            const constructionNotice = document.getElementById('editConstructionNotice').value;
+            const status = document.getElementById('editStatus').value;
+            const user = document.getElementById('editUser').value || '匿名';
+            const reason = document.getElementById('editReason').value;
+            const reviewComment = document.getElementById('editReviewComment').value;
+
+            if (!currentRecordId) return;
+
+            const data = {
+                current_conclusion: conclusion,
+                construction_notice: constructionNotice,
+                status: status,
+                user: user,
+                reason: reason,
+                review_comment: reviewComment
+            };
+
+            const res = await fetch(`/api/records/${currentRecordId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            const result = await res.json();
+            if (result.success) {
+                showToast('保存成功', 'success');
+                closeModal();
+                loadRecords();
+                loadStats();
+            } else {
+                showToast('保存失败', 'error');
+            }
+        }
+
+        async function exportRecords() {
+            let url = '/api/export';
+            if (currentBatchId) {
+                url += `?batch_id=${currentBatchId}`;
+            }
+            window.open(url, '_blank');
+            showToast('导出中...', 'info');
+        }
+
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file) handleFile(file);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) handleFile(file);
+        });
+
+        async function handleFile(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            showToast('正在导入...', 'info');
+
+            try {
+                const res = await fetch('/api/import', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await res.json();
+
+                if (result.error) {
+                    showToast(result.error, 'error');
+                    return;
+                }
+
+                let msg = `成功导入 ${result.total_records} 条记录`;
+                if (result.duplicate_count > 0) {
+                    msg += `，检测到 ${result.duplicate_count} 条重复`;
+                }
+                if (result.boundary_count > 0) {
+                    msg += `，${result.boundary_count} 条边界点位需复核`;
+                }
+                showToast(msg, 'success');
+
+                if (result.issues && result.issues.length > 0) {
+                    console.log('自检发现问题：', result.issues);
+                }
+
+                loadStats();
+                loadBatches();
+                loadRecords();
+            } catch (e) {
+                showToast('导入失败', 'error');
+            }
+        }
+
+        loadStats();
+        loadBatches();
+        loadRecords();
+    </script>
+</body>
+</html>
