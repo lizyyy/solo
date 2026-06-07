@@ -137,7 +137,7 @@ export function Scene3D() {
     >
       <Canvas
         camera={{ position: [30, 30, 30], fov: 60 }}
-        gl={{ antialias: true, alpha: false }}
+        gl={{ antialias: true, alpha: false, preserveDrawingBuffer: true }}
         onCreated={({ gl }) => {
           gl.setClearColor('#0a1628');
         }}
