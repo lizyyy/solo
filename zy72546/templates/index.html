@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>机器人话术版本仓库</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f5f5; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        h1 { color: #333; margin-bottom: 20px; }
+        .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .stat-card h3 { color: #666; font-size: 14px; margin-bottom: 8px; }
+        .stat-card .number { font-size: 28px; font-weight: bold; color: #1976d2; }
+        .stat-card.warning .number { color: #f57c00; }
+        .sections { display: grid; grid-template-columns: 400px 1fr; gap: 20px; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .card h2 { font-size: 16px; margin-bottom: 15px; color: #333; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; color: #555; font-size: 14px; }
+        .form-group input, .form-group select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+        button { background: #1976d2; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; }
+        button:hover { background: #1565c0; }
+        button.secondary { background: #757575; }
+        button.secondary:hover { background: #616161; }
+        button.warning { background: #f57c00; }
+        button.warning:hover { background: #ef6c00; }
+        .filter-bar { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #fafafa; font-weight: 600; color: #555; }
+        tr:hover { background: #f5f5f5; }
+        .badge { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 500; }
+        .badge-normal { background: #e8f5e9; color: #2e7d32; }
+        .badge-review { background: #fff3e0; color: #ef6c00; }
+        .badge-step1 { background: #e3f2fd; color: #1565c0; }
+        .badge-step2 { background: #f3e5f5; color: #7b1fa2; }
+        .badge-step3 { background: #e8f5e9; color: #2e7d32; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { background: white; margin: 50px auto; padding: 25px; border-radius: 8px; max-width: 900px; max-height: 80vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .close { font-size: 24px; cursor: pointer; color: #999; }
+        .close:hover { color: #333; }
+        .detail-section { margin-bottom: 20px; }
+        .detail-section h4 { margin-bottom: 10px; color: #333; }
+        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .detail-item { padding: 10px; background: #fafafa; border-radius: 4px; }
+        .detail-item label { display: block; font-size: 12px; color: #666; margin-bottom: 4px; }
+        .detail-item .value { font-size: 14px; color: #333; word-break: break-all; }
+        .version-item { padding: 15px; border-left: 3px solid #1976d2; background: #fafafa; margin-bottom: 10px; }
+        .version-item .meta { font-size: 12px; color: #666; margin-bottom: 8px; }
+        .version-item .diff { font-family: monospace; font-size: 13px; }
+        .version-item .diff .old { color: #d32f2f; text-decoration: line-through; }
+        .version-item .diff .new { color: #2e7d32; }
+        .pagination { display: flex; gap: 5px; justify-content: center; margin-top: 15px; align-items: center; }
+        .pagination button { padding: 5px 10px; font-size: 13px; }
+        .pagination span { font-size: 13px; color: #666; }
+        .action-btns { display: flex; gap: 5px; }
+        .action-btns button { padding: 5px 10px; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 机器人话术版本仓库</h1>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <h3>总记录数</h3>
+                <div class="number" id="stat-total">0</div>
+            </div>
+            <div class="stat-card warning">
+                <h3>待运营复核</h3>
+                <div class="number" id="stat-review">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>步骤1：已导入</h3>
+                <div class="number" id="stat-step1">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>步骤3：已复核</h3>
+                <div class="number" id="stat-step3">0</div>
+            </div>
+        </div>
+
+        <div class="sections">
+            <div>
+                <div class="card">
+                    <h2>📥 导入人工改判表</h2>
+                    <div class="form-group">
+                        <label>批次号（可选，留空自动生成）</label>
+                        <input type="text" id="batch-id" placeholder="例如：202401_batch01">
+                    </div>
+                    <div class="form-group">
+                        <label>操作人</label>
+                        <input type="text" id="imported-by" value="小孟">
+                    </div>
+                    <div class="form-group">
+                        <label>选择文件（Excel/CSV）</label>
+                        <input type="file" id="import-file" accept=".xlsx,.csv">
+                    </div>
+                    <button onclick="importFile()">开始导入</button>
+                </div>
+
+                <div class="card">
+                    <h2>📋 导入批次历史</h2>
+                    <div id="batch-list"></div>
+                </div>
+            </div>
+
+            <div>
+                <div class="card">
+                    <h2>🔍 记录列表</h2>
+                    <div class="filter-bar">
+                        <select id="filter-boundary">
+                            <option value="">全部边界状态</option>
+                            <option value="normal">正常</option>
+                            <option value="needs_review">待复核</option>
+                        </select>
+                        <select id="filter-workflow">
+                            <option value="">全部工作流</option>
+                            <option value="step1_imported">步骤1：已导入</option>
+                            <option value="step2_prompt_updated">步骤2：提示词已更新</option>
+                            <option value="step3_reviewed">步骤3：已复核</option>
+                        </select>
+                        <button class="secondary" onclick="loadRecords()">刷新</button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>行号</th>
+                                <th>样本编号</th>
+                                <th>模型版本</th>
+                                <th>提示词版本</th>
+                                <th>边界状态</th>
+                                <th>工作流</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="records-body"></tbody>
+                    </table>
+                    <div class="pagination" id="pagination"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="detail-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>记录详情与版本历史</h3>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div id="detail-content"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        let perPage = 20;
+
+        function loadStats() {
+            fetch('/api/statistics')
+                .then(r => r.json())
+                .then(data => {
+                    document.getElementById('stat-total').textContent = data.total;
+                    document.getElementById('stat-review').textContent = data.needs_review;
+                    document.getElementById('stat-step1').textContent = data.workflow_steps.step1_imported;
+                    document.getElementById('stat-step3').textContent = data.workflow_steps.step3_reviewed;
+                });
+        }
+
+        function loadBatches() {
+            fetch('/api/batches')
+                .then(r => r.json())
+                .then(batches => {
+                    const html = batches.map(b => `
+                        <div style="padding:10px; border-bottom:1px solid #eee; font-size:13px;">
+                            <div style="font-weight:500;">${b.batch_id}</div>
+                            <div style="color:#666;">${b.file_name} | 新增${b.new_count} 更新${b.updated_count} 重复${b.duplicate_count}</div>
+                            <div style="color:#999; font-size:12px;">${b.imported_at}</div>
+                            <button class="secondary" style="margin-top:5px; padding:3px 8px; font-size:12px;" onclick="exportBatch('${b.batch_id}')">导出</button>
+                        </div>
+                    `).join('');
+                    document.getElementById('batch-list').innerHTML = html;
+                });
+        }
+
+        function loadRecords() {
+            const boundary = document.getElementById('filter-boundary').value;
+            const workflow = document.getElementById('filter-workflow').value;
+            let url = `/api/records?page=${currentPage}&per_page=${perPage}`;
+            if (boundary) url += `&boundary=${boundary}`;
+            if (workflow) url += `&workflow=${workflow}`;
+            
+            fetch(url)
+                .then(r => r.json())
+                .then(data => {
+                    const html = data.records.map(r => {
+                        const boundaryBadge = r.boundary_status === 'needs_review' 
+                            ? '<span class="badge badge-review">待复核</span>' 
+                            : '<span class="badge badge-normal">正常</span>';
+                        const stepBadge = r.workflow_step === 'step1_imported' 
+                            ? '<span class="badge badge-step1">步骤1</span>'
+                            : r.workflow_step === 'step2_prompt_updated'
+                            ? '<span class="badge badge-step2">步骤2</span>'
+                            : '<span class="badge badge-step3">步骤3</span>';
+                        return `
+                            <tr>
+                                <td>${r.original_row_number}</td>
+                                <td>${r.sample_id}</td>
+                                <td>${r.model_version || '-'}</td>
+                                <td>${r.prompt_version || '-'}</td>
+                                <td>${boundaryBadge}</td>
+                                <td>${stepBadge}</td>
+                                <td class="action-btns">
+                                    <button onclick="viewDetail(${r.id})">详情</button>
+                                    ${r.boundary_status === 'needs_review' ? `<button class="warning" onclick="reviewRecord(${r.id})">复核</button>` : ''}
+                                </td>
+                            </tr>
+                        `;
+                    }).join('');
+                    document.getElementById('records-body').innerHTML = html;
+                    
+                    const totalPages = Math.ceil(data.total / perPage);
+                    let pagHtml = `<button onclick="changePage(-1)" ${currentPage<=1?'disabled':''}>上一页</button>`;
+                    pagHtml += `<span>第 ${currentPage} / ${totalPages} 页，共 ${data.total} 条</span>`;
+                    pagHtml += `<button onclick="changePage(1)" ${currentPage>=totalPages?'disabled':''}>下一页</button>`;
+                    document.getElementById('pagination').innerHTML = pagHtml;
+                });
+        }
+
+        function changePage(delta) {
+            currentPage += delta;
+            if (currentPage < 1) currentPage = 1;
+            loadRecords();
+        }
+
+        function importFile() {
+            const file = document.getElementById('import-file').files[0];
+            if (!file) { alert('请选择文件'); return; }
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('batch_id', document.getElementById('batch-id').value);
+            formData.append('imported_by', document.getElementById('imported-by').value);
+            
+            fetch('/api/import', { method: 'POST', body: formData })
+                .then(r => r.json())
+                .then(data => {
+                    alert(`导入完成！总计${data.total}条，新增${data.new}条，更新${data.updated}条，重复${data.duplicate}条`);
+                    loadStats();
+                    loadBatches();
+                    loadRecords();
+                });
+        }
+
+        function viewDetail(id) {
+            fetch(`/api/record/${id}`)
+                .then(r => r.json())
+                .then(data => {
+                    const r = data.record;
+                    let html = '<div class="detail-section"><h4>📌 基本信息</h4>';
+                    html += '<div class="detail-grid">';
+                    html += `<div class="detail-item"><label>原始行号</label><div class="value">${r.original_row_number}</div></div>`;
+                    html += `<div class="detail-item"><label>样本编号</label><div class="value">${r.sample_id}</div></div>`;
+                    html += `<div class="detail-item"><label>模型版本</label><div class="value">${r.model_version || '-'}</div></div>`;
+                    html += `<div class="detail-item"><label>提示词版本</label><div class="value">${r.prompt_version || '-'}</div></div>`;
+                    html += `<div class="detail-item"><label>处理状态</label><div class="value">${r.processing_status}</div></div>`;
+                    html += `<div class="detail-item"><label>边界状态</label><div class="value">${r.boundary_status}</div></div>`;
+                    html += '</div></div>';
+                    
+                    html += '<div class="detail-section"><h4>📝 内容详情</h4>';
+                    html += '<div class="detail-grid" style="grid-template-columns:1fr;">';
+                    html += `<div class="detail-item"><label>原始回答</label><div class="value">${r.original_answer || '-'}</div></div>`;
+                    html += `<div class="detail-item"><label>人工改判回答</label><div class="value">${r.manual_answer || '-'}</div></div>`;
+                    html += `<div class="detail-item"><label>人工改动说明</label><div class="value">${r.manual_changes || '-'}</div></div>`;
+                    html += `<div class="detail-item"><label>备注</label><div class="value">${r.remarks || '-'}</div></div>`;
+                    if (r.boundary_note) html += `<div class="detail-item"><label style="color:#ef6c00;">边界说明</label><div class="value" style="color:#ef6c00;">${r.boundary_note}</div></div>`;
+                    html += '</div></div>';
+                    
+                    html += '<div class="detail-section"><h4>🔧 操作</h4>';
+                    html += `<div style="display:flex; gap:10px; flex-wrap:wrap;">`;
+                    html += `<button onclick="updatePromptVersion(${r.id}, '${r.prompt_version}')">补全/修改提示词版本号</button>`;
+                    html += `<button onclick="updateRemark(${r.id}, '${r.remarks}')">修改备注</button>`;
+                    html += '</div></div>';
+                    
+                    html += '<div class="detail-section"><h4>📜 版本历史</h4>';
+                    if (data.versions.length === 0) {
+                        html += '<p style="color:#999;">暂无版本历史</p>';
+                    } else {
+                        html += data.versions.map(v => `
+                            <div class="version-item">
+                                <div class="meta">版本 ${v.version_number} | ${v.field_name} | 由 ${v.changed_by} 修改 | ${v.changed_at}</div>
+                                <div class="meta">原因：${v.change_reason || '-'}</div>
+                                <div class="diff">
+                                    <span class="old">- ${v.old_value || '(空)'}</span><br>
+                                    <span class="new">+ ${v.new_value || '(空)'}</span>
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+                    html += '</div>';
+                    
+                    document.getElementById('detail-content').innerHTML = html;
+                    document.getElementById('detail-modal').style.display = 'block';
+                });
+        }
+
+        function updatePromptVersion(id, current) {
+            const newVer = prompt('请输入提示词版本号：', current || '');
+            if (newVer === null) return;
+            fetch(`/api/record/${id}/update_prompt_version`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt_version: newVer, changed_by: '小孟' })
+            }).then(r => r.json()).then(d => {
+                alert('更新成功！');
+                closeModal();
+                loadRecords();
+                loadStats();
+            });
+        }
+
+        function updateRemark(id, current) {
+            const newRemark = prompt('请输入备注：', current || '');
+            if (newRemark === null) return;
+            fetch(`/api/record/${id}/update_remark`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ remarks: newRemark, changed_by: '小孟' })
+            }).then(r => r.json()).then(d => {
+                alert('备注已更新，版本历史已记录！');
+                closeModal();
+                loadRecords();
+            });
+        }
+
+        function reviewRecord(id) {
+            const action = confirm('确认通过复核吗？取消则打回') ? 'approve' : 'reject';
+            const note = prompt('请输入复核意见：');
+            fetch(`/api/record/${id}/review`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: action, reviewer: '运营复核人', note: note })
+            }).then(r => r.json()).then(d => {
+                alert('复核完成！');
+                loadRecords();
+                loadStats();
+            });
+        }
+
+        function exportBatch(batchId) {
+            window.open(`/api/export/${batchId}`, '_blank');
+        }
+
+        function closeModal() {
+            document.getElementById('detail-modal').style.display = 'none';
+        }
+
+        window.onclick = function(e) {
+            const modal = document.getElementById('detail-modal');
+            if (e.target === modal) closeModal();
+        }
+
+        loadStats();
+        loadBatches();
+        loadRecords();
+    </script>
+</body>
+</html>
