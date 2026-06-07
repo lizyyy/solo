@@ -2,6 +2,8 @@ import { useMemo } from "react"
 import { useSchemeStore } from "@/store/useSchemeStore"
 import { useUIStore } from "@/store/useUIStore"
 import { generateReport } from "@/utils/reportGenerator"
+import { STATUS_LABELS } from "@/types"
+import type { ItemStatus } from "@/types"
 import { X, Download, FileText } from "lucide-react"
 import html2canvas from "html2canvas"
 
@@ -18,21 +20,35 @@ export default function ReportPreview() {
     const el = document.getElementById("report-content")
     if (!el) return
     try {
-      const canvas = await html2canvas(el, { backgroundColor: "#0f172a" })
+      const canvas = await html2canvas(el, {
+        backgroundColor: "#0f172a",
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+      })
       const ctx = canvas.getContext("2d")
       if (ctx) {
-        ctx.fillStyle = "rgba(248,250,252,0.7)"
-        ctx.font = "12px DM Sans, sans-serif"
-        const filterText = filterStatus !== "all" ? `筛选条件: ${filterStatus}` : "无筛选"
-        ctx.fillText(filterText, 16, 24)
-        ctx.fillText(`${currentScheme.name} | ${new Date().toLocaleString("zh-CN")}`, canvas.width - 350, canvas.height - 16)
-        ctx.fillText("光伏园区阴影模型 v1.0", 16, canvas.height - 16)
+        ctx.fillStyle = "rgba(248,250,252,0.85)"
+        ctx.font = "bold 14px 'DM Sans', sans-serif"
+        const filterLabel = filterStatus === "all" ? "无筛选" : STATUS_LABELS[filterStatus as ItemStatus] || filterStatus
+        ctx.fillText(`筛选条件: ${filterLabel}`, 20, 30)
+
+        ctx.font = "12px 'DM Sans', sans-serif"
+        const timeStr = new Date().toLocaleString("zh-CN")
+        const rightText = `${currentScheme.name} | ${timeStr}`
+        const rightTextWidth = ctx.measureText(rightText).width
+        ctx.fillText(rightText, canvas.width - rightTextWidth - 20, canvas.height - 20)
+        ctx.fillText("光伏园区阴影模型 v1.0", 20, canvas.height - 20)
       }
       const link = document.createElement("a")
       link.download = `${currentScheme.name}-报告.png`
       link.href = canvas.toDataURL("image/png")
+      document.body.appendChild(link)
       link.click()
-    } catch { /* ignore */ }
+      document.body.removeChild(link)
+    } catch (err) {
+      console.error("导出失败", err)
+    }
   }
 
   return (

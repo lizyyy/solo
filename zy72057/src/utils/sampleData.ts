@@ -180,10 +180,10 @@ const inverters: Inverter[] = [
     x: 32,
     y: 73,
     floor: "1",
-    buildingId: "b3",
-    photoUrl: "",
+    buildingId: "",
+    photoUrl: "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=solar%20inverter%20wall%20mounted&image_size=landscape_4_3",
     status: "empty_value",
-    anomalyNote: "photoUrl为空",
+    anomalyNote: "buildingId为空，未关联建筑",
   },
 ]
 

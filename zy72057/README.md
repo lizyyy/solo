@@ -1,57 +1,236 @@
-# React + TypeScript + Vite
+# 光伏园区阴影模型
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+面向方案经理的光伏园区阴影分析工具，参数改一处、三处同步变（3D场景 / 明细表格 / 分析报告），不用手工对第二遍。
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 快速启动
 
-## Expanding the ESLint configuration
+### 1. 安装依赖
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 2. 启动开发服务器
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+npm run dev
 ```
+
+启动成功后终端会显示：
+
+```
+  VITE v6.4.3  ready in XXX ms
+
+  ➜  Local:   http://127.0.0.1:5173/
+```
+
+> 若 5173 端口被占用，Vite 会自动尝试 5174、5175 等，以终端实际显示的地址为准。
+
+### 3. 浏览器访问
+
+打开浏览器访问终端显示的地址，例如：**http://127.0.0.1:5173/**
+
+---
+
+## 页面入口与布局
+
+启动后直接进入主工作台，单页应用，四区布局：
+
+| 区域 | 位置 | 功能 |
+|------|------|------|
+| **参数面板** | 左侧固定边栏 | 编辑园区位置、时间参数、方案信息，修改实时同步 |
+| **筛选栏** | 顶部横条 | 按状态 / 类型筛选，关键字搜索 |
+| **主视图区** | 中央 | Tab切换：3D场景 / 明细表 |
+| **报告抽屉** | 右侧可展开 | 自动生成阴影分析报告，支持导出带条件水印截图 |
+| **顶部工具栏** | 最上方 | 重置样例 / 导入数据 / 方案管理 / 报告开关 |
+
+---
+
+## 核心操作步骤
+
+### 步骤 1：加载样例数据
+
+启动后默认已加载「示范园区-初始方案」样例。如果被修改过，点击顶部 **「重置样例」** 按钮恢复初始状态。
+
+样例内置 4 种典型数据问题：
+
+| 设备 | 问题类型 | 状态标记 | 说明 |
+|------|---------|---------|------|
+| 配电房 | 坐标偏移 | 🟠 坐标偏移 | X=150，超出常规园区范围约50米 |
+| 逆变器A-01 | 同名异写 | 🟠 疑似重复 | 别名「逆变A01」，可能是同一设备 |
+| 光伏板A-03 | 缺照片 | ⚪ 缺照片 | photoUrl 字段为空 |
+| 综合楼 | 跨楼层 | 🔴 边界异常 | floor 字段为「2-3」，跨两个楼层 |
+
+### 步骤 2：调整参数，观察三处联动
+
+在左侧 **参数面板** 修改任意参数：
+
+- 园区位置：纬度 / 经度（步进 0.1）
+- 时间参数：日期 / 时间 / 太阳高度角 / 太阳方位角
+- 方案信息：方案名称 / 备注
+
+修改后：
+- ✅ 3D 场景的太阳光角度和阴影实时变化
+- ✅ 明细表的遮挡率进度条同步更新
+- ✅ 报告预览的统计数字自动重算
+
+### 步骤 3：查看 3D 场景
+
+点击中央 Tab 的 **「3D场景」**：
+
+- 鼠标左键拖拽：旋转视角
+- 鼠标滚轮：缩放
+- 鼠标右键拖拽：平移
+- 右上角 **「重置视角」**：恢复默认 45° 俯视角
+- 右上角 **「截图」**：下载当前场景 PNG 图片
+- 点击建筑或光伏板：选中高亮（蓝色），明细表同步定位
+
+### 步骤 4：查看明细表格
+
+点击中央 Tab 的 **「明细表」**：
+
+- 三个子 Tab：建筑(4) / 光伏板(6) / 逆变器(3)
+- 状态徽章颜色：
+  - 🟢 绿色：正常
+  - 🟠 橙色：疑似重复 / 坐标偏移
+  - ⚪ 灰色：缺照片 / 空值
+  - 🔴 红色：边界异常
+- 光伏板 Tab 显示「遮挡率」进度条（<30%绿 / 30-50%黄 / >50%红）
+- 鼠标悬停异常行的 ⚠ 图标：显示具体异常说明
+
+### 步骤 5：筛选与搜索
+
+使用顶部筛选栏：
+
+1. **状态筛选**：下拉选择「全部状态 / 正常 / 疑似重复 / 坐标偏移 / 缺照片 / 边界异常 / 空值」
+2. **类型筛选**：下拉选择「全部类型 / 建筑 / 光伏板 / 逆变器」
+3. **搜索框**：输入设备名称关键字实时过滤
+
+筛选后：
+- 明细表只显示匹配项，Tab 右上角的数字同步更新
+- 筛选栏右侧显示橙色标签「筛选: 边界异常」
+- 报告导出时自动带上当前筛选条件水印
+
+### 步骤 6：生成与导出报告
+
+点击顶部 **「报告」** 按钮，右侧展开报告抽屉：
+
+报告内容包含：
+1. 基本概况（坐标 / 日期 / 太阳角度 / 设备数量）
+2. 阴影情况（平均遮挡率 / 高遮挡板清单）
+3. 数据质量（各类型异常数量 + 异常明细）
+4. 建议（针对高遮挡、重复设备、跨楼层等问题）
+
+导出报告截图：
+- 点击报告右上角 **下载图标**
+- 生成的 PNG 自动叠加水印：
+  - 左上角：当前筛选条件
+  - 右下角：方案名称 + 导出时间
+  - 左下角：工具版本号
+
+### 步骤 7：导入外部数据
+
+点击顶部 **「导入数据」** 按钮：
+
+支持格式：CSV / JSON
+导入类型：建筑 / 光伏板 / 逆变器
+
+操作流程：
+1. 选择格式（CSV / JSON）
+2. 选择导入类型
+3. 拖拽文件到上传区，或在文本框粘贴内容
+4. 点击 **「预览解析结果」** 查看解析后数据
+5. 点击 **「确认导入」** 写入当前方案
+
+**冲突检测**：
+- 导入数据与现有数据冲突时（坐标偏移 >30米、名称疑似重复），会弹出冲突对比面板
+- 左右分栏显示「现有数据」vs「导入数据」
+- 提供建议动作，不自动覆盖
+- 每条冲突可选：保留现有 / 采用导入 / 合并标记
+- 全部处理后点击 **「应用决策」** 生效
+
+### 步骤 8：保存与加载方案
+
+点击顶部 **「方案管理」** 按钮：
+
+- **保存当前方案**：写入浏览器 LocalStorage，支持追加备注
+- **已保存方案列表**：显示设备数量统计、更新时间
+- 操作按钮：
+  - 📂 加载：恢复到该方案状态
+  - ✏️ 重命名：修改方案名称
+  - 🗑️ 删除：移除该方案
+
+数据持久化在浏览器本地，刷新页面不丢失。
+
+---
+
+## 样例数据字段
+
+### 建筑 (Building)
+
+| 字段 | 类型 | 样例值 | 说明 |
+|------|------|--------|------|
+| id | string | b1 | 唯一标识 |
+| name | string | 车间A栋 | 设备名称 |
+| x, y | number | 0, 0 | 平面坐标（米） |
+| width, depth, height | number | 30, 15, 12 | 尺寸（米） |
+| floor | string | 1 / "2-3" | 楼层，异常值跨层 |
+| photoUrl | string | (url) / "" | 现场照片，空值标记缺照片 |
+| status | enum | normal / offset / boundary | 状态 |
+| anomalyNote | string | 坐标偏移约50米 | 异常说明 |
+
+### 光伏板 (SolarPanel)
+
+| 字段 | 类型 | 样例值 | 说明 |
+|------|------|--------|------|
+| id | string | p1 | 唯一标识 |
+| name | string | 光伏板A-01 | 设备名称 |
+| x, y | number | 5, 20 | 平面坐标（米） |
+| width, height | number | 2, 1 | 尺寸（米） |
+| tiltAngle | number | 25 | 倾角（度） |
+| azimuth | number | 180 | 方位角（度） |
+| inverterId | string | inv1 | 关联逆变器ID |
+| shadowCoverage | number | 0.15 | 阴影覆盖率 0~1 |
+| photoUrl | string | (url) / "" | 现场照片 |
+| status | enum | normal / missing_photo | 状态 |
+
+### 逆变器 (Inverter)
+
+| 字段 | 类型 | 样例值 | 说明 |
+|------|------|--------|------|
+| id | string | inv1 | 唯一标识 |
+| name | string | 逆变器A-01 | 设备名称 |
+| aliasName | string | 逆变A01 / "" | 别名，用于重复检测 |
+| x, y | number | 8, 18 | 平面坐标（米） |
+| floor | string | 1 | 楼层 |
+| buildingId | string | b1 | 关联建筑ID |
+| photoUrl | string | (url) / "" | 设备照片 |
+| status | enum | normal / duplicate / empty_value | 状态 |
+
+---
+
+## 命令参考
+
+| 命令 | 说明 |
+|------|------|
+| `npm install` | 安装依赖 |
+| `npm run dev` | 启动开发服务器（端口 5173） |
+| `npm run build` | 生产构建（先 TypeScript 检查） |
+| `npm run preview` | 预览构建产物 |
+| `npm run check` | TypeScript 类型检查（不输出） |
+| `npm run lint` | ESLint 代码检查 |
+
+---
+
+## 技术栈
+
+- **框架**：React 18 + TypeScript
+- **构建工具**：Vite 6
+- **样式**：Tailwind CSS 3
+- **状态管理**：Zustand 5
+- **3D渲染**：Three.js + @react-three/fiber + @react-three/drei
+- **报告导出**：html2canvas
+- **图标**：Lucide React
+- **路由**：React Router DOM 7
