@@ -1,57 +1,321 @@
-# React + TypeScript + Vite
+# 地铁站厅拥堵热力图 · 运维数据核对工具
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> 为运维工程师何工打造的轻量 GIS 数据核对工具。解决地铁站厅设备点位、照片、备注对不上的问题，保留原始数据，判断过程全程留痕。
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 快速开始
 
-## Expanding the ESLint configuration
+### 1. 环境要求
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Node.js >= 18
+- npm（或 pnpm）
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### 2. 安装依赖
+
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+实际输出（约 30 秒）：
 ```
+added 328 packages, and audited 329 packages in 5m
+found 0 vulnerabilities
+```
+
+### 3. 启动开发服务器
+
+```bash
+npm run dev
+```
+
+实际输出：
+```
+  VITE v6.4.3  ready in 337 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+  ➜  press h + enter to show help
+```
+
+> **注意**：若 5173 端口被占用，Vite 会自动递增端口（5174、5175...），以终端实际显示为准。
+
+### 4. 打开页面
+
+在浏览器中访问终端显示的 Local 地址（如 http://localhost:5173/），即可看到工具主界面。
+
+---
+
+## 🖥️ 页面结构
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  顶部导航栏   [logo] 地铁站厅拥堵热力图  [重置] [导出截图] │
+├──────────┬───────────────────────────────┬────────────────┤
+│          │                               │                │
+│  筛选    │        Three.js 热力图        │   详情面板     │
+│  面板    │    (站厅底图 + 热力渲染       │   (选中点位    │
+│ (240px)  │     + 设备点位标记)           │    详细信息)   │
+│          │                               │   (320px)      │
+├──────────┴───────────────────────────────┴────────────────┤
+│  底部时间轴   ◼◻◼◼◻◻◼◻◼◼◻◻◼◼◻◻◼◻   8:00 - 23:00     │
+├─────────────────────────────────────────────────────────────┤
+│  审计日志  (默认折叠，点击展开查看所有操作记录)           │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🛠️ 核心功能与操作步骤
+
+### 步骤 1：筛选数据（左侧面板）
+
+筛选条件 **实时联动** 热力图显示：
+
+| 筛选项 | 说明 | 选项 |
+|--------|------|------|
+| **楼层** | 切换查看楼层 | B1 站厅层、B2 站台层 |
+| **设备类型** | 按设备类型过滤 | 入口、出口、扶梯、电梯、闸机、通道、摄像头 |
+| **质量状态** | 按数据质量过滤 | 正常（绿）、警告（黄）、异常（红） |
+
+> 操作记录：每次筛选变更会自动写入审计日志。
+
+---
+
+### 步骤 2：点选设备查看详情（中间热力图）
+
+1. **鼠标操作**：
+   - 左键拖动：平移视图
+   - 滚轮：缩放
+   - 鼠标悬停点位：显示点位名称 + 拥挤度
+   - 左键点击点位：**选中**，右侧面板同步更新
+
+2. **点位标记说明**：
+   - 内部颜色：蓝→绿→黄→红，映射拥挤度（0%→100%）
+   - 边框颜色：数据质量状态
+     - 🟢 绿色边框：正常
+     - 🟡 黄色边框：警告（坐标偏移、疑似重名、缺照片）
+     - 🔴 红色边框：异常（跨楼层）
+   - 选中点位：白色脉冲圆环高亮
+
+---
+
+### 步骤 3：查看 & 处理点位问题（右侧面板）
+
+选中点位后，右侧面板显示 6 个区块：
+
+#### ① 基本信息
+- ID、名称、楼层、类型、坐标、拥挤度、质量状态
+
+#### ② 原始备注
+- **保留原始"乱备注"，不做任何清洗**
+- 斜体灰色显示，原样呈现
+
+#### ③ 现场照片
+- 显示文件名
+- 照片缺失 → 红色"缺失"徽章
+
+#### ④ 质量标记（核心功能）
+列出所有未处理的质量问题，可点击"处理"按钮标记已解决：
+
+| 标记类型 | 识别规则 | 可操作 |
+|----------|----------|--------|
+| 🟠 坐标偏移 | 点位超出站厅边界阈值 | 标记已处理 |
+| 🟡 疑似重名 | 名称相似度 > 80% 且同楼层 | 标记已处理 |
+| ⚪ 缺照片 | photo 字段为空 | 标记已处理 |
+| 🔴 跨楼层 | 同设备 ID 出现在多个楼层 | 标记已处理 |
+
+#### ⑤ 补录（核心功能）
+1. 选择要补录的字段：名称 / 备注 / 照片 / 楼层
+2. 输入补录内容
+3. 点击"提交补录"
+4. **自动记录差异**：旧值 → 新值，同时写入审计日志
+
+#### ⑥ 变更记录
+- 显示该点位所有历史补录的差异对比
+- 红色删除线显示旧值，绿色显示新值
+
+---
+
+### 步骤 4：切换时段（底部时间轴）
+
+- 覆盖时段：6:00 - 23:00（共 18 个时段）
+- 操作方式：
+  - 点击任意位置：跳转
+  - 拖动滑块：实时切换
+- 色带：每个时段颜色表示整体拥挤度（蓝→红）
+
+---
+
+### 步骤 5：导出截图（顶部按钮）
+
+1. 调整筛选条件和时间到目标视图
+2. 点击右上角"导出截图"按钮
+3. 自动下载 PNG 图片
+4. **图片左下角自带水印**，包含：
+   - 导出时间
+   - 当前选中楼层
+   - 当前选中设备类型
+   - 当前质量状态筛选
+   - 当前时段
+
+> 示例水印：
+> ```
+> 地铁站厅拥堵热力图 - 导出截图
+> 时间: 2026/6/7 14:30:00
+> 楼层: B1 站厅层, B2 站台层
+> 设备类型: 入口, 出口, 扶梯...
+> 质量状态: ok, warning, error
+> 时段: 8:00
+> ```
+
+---
+
+### 步骤 6：查看审计日志（底部）
+
+点击底部"审计日志 (N)"展开面板，查看所有操作记录（**不可删除，只能追加**）：
+
+| 操作类型 | 颜色 | 说明 |
+|----------|------|------|
+| 筛选 | 紫色 | 筛选条件变更 |
+| 选中 | 绿色 | 点选点位 |
+| 标注 | 黄色 | 处理质量标记 |
+| 修正 | 橙红 | 修正坐标 |
+| 导出 | 灰色 | 导出截图 |
+| 补录 | 蓝色 | 补录字段内容 |
+
+每条日志包含：时间戳、操作类型、目标ID、详情描述。
+
+---
+
+## 🔄 刷新继续处理（持久化）
+
+**核心特性**：所有操作自动保存到浏览器 localStorage，刷新页面后：
+
+- ✅ 补录的备注、照片等字段保留
+- ✅ 已处理的质量标记保留
+- ✅ 所有审计日志保留
+- ✅ 顶部显示"已缓存 N 点位数据"黄色提示
+
+### 重置数据
+
+如需从初始数据重新开始：
+1. 点击顶部导航栏的"重置"按钮
+2. 所有本地缓存将被清除，恢复为初始 Mock 数据
+
+---
+
+## 🧪 内置测试用例
+
+Mock 数据中刻意混入了以下异常场景，用于验证工具的鲁棒性：
+
+| 点位 ID | 异常类型 | 验证点 |
+|---------|----------|--------|
+| P007 / P008 | 疑似重名 | "A出口摄像头" vs "A出口摄像"，相似度 85%+ |
+| P019 / P020 / P036 | 缺照片 | photo 字段为空字符串 |
+| P021 / P022 | 坐标偏移 | 点位坐标超出站厅边界 |
+| P031 / P032 | 跨楼层异常 | 同名称出现在 B1 和 B2 两层 |
+| P022 | 复合异常 | 同时有坐标偏移 + 缺照片（边界记录） |
+| P005 / P018 | 空值 | rawNote 为空字符串 |
+
+---
+
+## 📦 构建与部署
+
+### 类型检查
+
+```bash
+npm run check
+```
+
+预期输出（exit code 0）：
+```
+> zy72056@0.0.0 check
+> tsc -b --noEmit
+```
+
+### 生产构建
+
+```bash
+npm run build
+```
+
+预期输出（exit code 0）：
+```
+> zy72056@0.0.0 build
+> tsc -b && vite build
+
+vite v6.4.3 building for production...
+✓ 2298 modules transformed.
+dist/index.html                    26.38 kB │ gzip:   6.65 kB
+dist/assets/index-*.css           14.45 kB │ gzip:   3.81 kB
+dist/assets/index-*.js         1,354.59 kB │ gzip: 356.05 kB
+✓ built in 3.43s
+```
+
+构建产物输出到 `dist/` 目录。
+
+### 本地预览构建结果
+
+```bash
+npm run preview
+```
+
+---
+
+## 📁 项目结构
+
+```
+src/
+├── components/
+│   ├── HeatmapCanvas.tsx    # Three.js 热力渲染核心（自定义 Shader + Bloom）
+│   ├── FilterPanel.tsx      # 左侧筛选面板
+│   ├── Timeline.tsx         # 底部时间轴
+│   ├── DetailPanel.tsx      # 右侧详情/补录面板
+│   ├── AuditLogPanel.tsx    # 底部审计日志面板
+│   └── ExportButton.tsx     # 截图导出按钮
+├── store/
+│   └── useAppStore.ts       # Zustand 全局状态 + localStorage 持久化
+├── data/
+│   ├── types.ts             # TypeScript 类型定义
+│   ├── mockStation.ts       # 36 个点位 Mock 数据（含 6 种异常）
+│   └── mockTimeSlots.ts     # 18 个时段的拥堵数据
+├── utils/
+│   ├── qualityDetector.ts   # 数据质量自动检测
+│   ├── diffCalculator.ts    # 补录差异计算
+│   └── watermarkRenderer.ts # 截图水印渲染
+├── pages/
+│   └── Home.tsx             # 主页面布局
+└── App.tsx                  # 应用入口
+```
+
+---
+
+## 🔧 技术栈
+
+- **框架**：React 18 + TypeScript
+- **构建**：Vite 6
+- **样式**：Tailwind CSS 3
+- **状态管理**：Zustand 5（带 localStorage 持久化）
+- **3D 渲染**：Three.js + @react-three/fiber + @react-three/drei + @react-three/postprocessing
+- **截图**：html2canvas
+- **图标**：Lucide React
+
+---
+
+## ✅ 交付验证清单
+
+| 验证项 | 命令 / 操作 | 预期结果 |
+|--------|-------------|----------|
+| 依赖安装 | `npm install` | exit code 0，0 vulnerabilities |
+| 类型检查 | `npm run check` | exit code 0，无错误 |
+| 生产构建 | `npm run build` | exit code 0，生成 dist/ |
+| 启动服务 | `npm run dev` | 显示 Local 地址，可访问 |
+| 页面加载 | 打开 Local 地址 | 页面正常渲染，无控制台错误 |
+| 点选同步 | 点击任意点位 | 右侧面板更新，审计日志 +1 |
+| 筛选同步 | 切换筛选条件 | 热力图点位变化，日志 +1 |
+| 时间轴 | 拖动滑块 | 热力图颜色变化 |
+| 补录留痕 | 选中点位 → 补录备注 → 提交 | 变更记录显示差异，日志 +1 |
+| 刷新持久化 | 补录后刷新页面 | 补录内容和日志保留 |
+| 导出截图 | 点击"导出截图" | 下载 PNG，左下角有水印 |
+| 重置功能 | 点击"重置"按钮 | 数据恢复初始状态，缓存清除 |

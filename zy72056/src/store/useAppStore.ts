@@ -3,6 +3,43 @@ import type { StationPoint, AuditLog, FilterState, QualityStatus, AuditAction, D
 import { mockStationPoints } from "@/data/mockStation"
 import { mockTimeSlots } from "@/data/mockTimeSlots"
 
+const STORAGE_KEY = "metro_heatmap_state_v1"
+
+interface PersistedState {
+  points: StationPoint[]
+  auditLogs: AuditLog[]
+  savedAt: string
+}
+
+function loadPersistedState(): { points: StationPoint[]; auditLogs: AuditLog[] } | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (!raw) return null
+    const data = JSON.parse(raw) as PersistedState
+    if (data.points && Array.isArray(data.points)) {
+      return { points: data.points, auditLogs: data.auditLogs || [] }
+    }
+    return null
+  } catch {
+    return null
+  }
+}
+
+function persistState(points: StationPoint[], auditLogs: AuditLog[]) {
+  try {
+    const data: PersistedState = { points, auditLogs, savedAt: new Date().toISOString() }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+  } catch {
+  }
+}
+
+export function resetPersistedState() {
+  try {
+    localStorage.removeItem(STORAGE_KEY)
+  } catch {
+  }
+}
+
 interface AppState {
   points: StationPoint[]
   timeSlots: typeof mockTimeSlots
@@ -13,6 +50,7 @@ interface AppState {
   filterPanelOpen: boolean
   detailPanelOpen: boolean
   previousPointSnapshot: Map<string, StationPoint>
+  hasPersistedData: boolean
 
   setFilter: (filter: Partial<FilterState>) => void
   selectPoint: (id: string | null) => void
@@ -26,10 +64,16 @@ interface AppState {
   getFilteredPoints: () => StationPoint[]
   getPointQualityStatus: (point: StationPoint) => QualityStatus
   getCongestionForHour: (pointId: string, hour: number) => number
+  resetAllData: () => void
 }
 
-export const useAppStore = create<AppState>((set, get) => ({
-  points: JSON.parse(JSON.stringify(mockStationPoints)),
+export const useAppStore = create<AppState>((set, get) => {
+  const persisted = loadPersistedState()
+  const initialPoints = persisted?.points ?? JSON.parse(JSON.stringify(mockStationPoints))
+  const initialLogs = persisted?.auditLogs ?? []
+
+  return {
+  points: initialPoints,
   timeSlots: mockTimeSlots,
   filter: {
     floors: ["B1", "B2"],
@@ -38,11 +82,12 @@ export const useAppStore = create<AppState>((set, get) => ({
     timeHour: 8,
   },
   selectedPointId: null,
-  auditLogs: [],
+  auditLogs: initialLogs,
   auditPanelOpen: false,
   filterPanelOpen: true,
   detailPanelOpen: true,
   previousPointSnapshot: new Map(),
+  hasPersistedData: !!persisted,
 
   setFilter: (partial) => {
     const newFilter = { ...get().filter, ...partial }
@@ -66,7 +111,11 @@ export const useAppStore = create<AppState>((set, get) => ({
       details,
       snapshot,
     }
-    set(state => ({ auditLogs: [...state.auditLogs, log] }))
+    set(state => {
+      const newLogs = [...state.auditLogs, log]
+      persistState(state.points, newLogs)
+      return { auditLogs: newLogs }
+    })
   },
 
   resolveQualityFlag: (pointId, flagIndex, note) => {
@@ -79,6 +128,7 @@ export const useAppStore = create<AppState>((set, get) => ({
         }
         return { ...p, qualityFlags: flags, lastModified: new Date().toISOString() }
       })
+      persistState(points, state.auditLogs)
       return { points }
     })
     get().addAuditLog("annotate", `标记质量问题已处理: ${pointId} flag[${flagIndex}] - ${note}`, pointId)
@@ -107,6 +157,7 @@ export const useAppStore = create<AppState>((set, get) => ({
           [field]: newValue,
         }
       })
+      persistState(points, state.auditLogs)
       return { points, previousPointSnapshot: prev }
     })
     get().addAuditLog("supplement", `补录 ${field}: "${oldValue}" → "${newValue}"`, pointId, {
@@ -124,6 +175,7 @@ export const useAppStore = create<AppState>((set, get) => ({
         if (p.id !== pointId) return p
         return { ...p, x: newX, y: newY, lastModified: new Date().toISOString() }
       })
+      persistState(points, state.auditLogs)
       return { points, previousPointSnapshot: prev }
     })
     get().addAuditLog("correct", `修正坐标: ${pointId} → (${newX.toFixed(1)}, ${newY.toFixed(1)})`, pointId)
@@ -157,4 +209,14 @@ export const useAppStore = create<AppState>((set, get) => ({
     const entry = slot.points.find(p => p.id === pointId)
     return entry?.congestion ?? 0
   },
-}))
+
+  resetAllData: () => {
+    resetPersistedState()
+    set({
+      points: JSON.parse(JSON.stringify(mockStationPoints)),
+      auditLogs: [],
+      hasPersistedData: false,
+      selectedPointId: null,
+    })
+  },
+}})
