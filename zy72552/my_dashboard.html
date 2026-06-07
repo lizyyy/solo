@@ -1,0 +1,301 @@
+
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>异常检测阈值漂移分析看板</title>
+            <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+                .card { background: white; padding: 20px; margin: 20px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+                h1 { color: #333; }
+                h2 { color: #555; margin-top: 30px; }
+                .record-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+                .record-table th, .record-table td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+                .record-table th { background: #f0f0f0; }
+                .one-bucket { background: #fff3cd; }
+                .multi-bucket { background: #f8d7da; }
+                .status-badge { padding: 3px 8px; border-radius: 12px; font-size: 12px; color: white; }
+                .status-pending { background: #6c757d; }
+                .status-reviewed { background: #17a2b8; }
+                .status-supplemented { background: #ffc107; color: #333; }
+                .status-normal { background: #28a745; }
+                .status-investigate { background: #dc3545; }
+            </style>
+        </head>
+        <body>
+            <h1>🔍 异常检测阈值漂移分析看板</h1>
+            <p>点击图表中的数据点可查看对应记录详情，差1桶的样本需要评测运营复核。</p>
+
+            <div class="card">
+                <h2>📊 分桶差异分布</h2>
+                <div id="chart3"><div>                            <div id="17abae0e-9ab1-41d5-b0b3-a49701e28dc8" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("17abae0e-9ab1-41d5-b0b3-a49701e28dc8")) {                    Plotly.newPlot(                        "17abae0e-9ab1-41d5-b0b3-a49701e28dc8",                        [{"marker":{"color":["green","orange","red"]},"text":["11","9","0"],"textposition":"auto","x":["同桶","差1桶","差多桶"],"y":[11,9,0],"type":"bar"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmapgl":[{"type":"heatmapgl","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"title":{"text":"分桶差异分布统计"},"yaxis":{"title":{"text":"样本数量"}},"bargap":0.4},                        {"responsive": true}                    )                };                            </script>        </div></div>
+            </div>
+
+            <div class="card">
+                <h2>📈 离线vs线上分桶分布</h2>
+                <p class="hint">💡 橙色点表示差1桶的样本，需要评测运营重点复核</p>
+                <div id="chart1"><div>                            <div id="f7e3252c-6f23-4f49-9955-b0bc6418f110" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("f7e3252c-6f23-4f49-9955-b0bc6418f110")) {                    Plotly.newPlot(                        "f7e3252c-6f23-4f49-9955-b0bc6418f110",                        [{"customdata":["59f59317-3bd3-4036-934a-9bfbd4c29070","d808801c-ea4f-4038-b0d5-1ae7b0e4323b","0e61c2a1-cb35-47aa-91c0-f173b8143bfa","bfbb0018-5ace-42a5-b7ff-033d26cdc73c","8f376f48-d749-4178-8e79-584a4b3be05f","a3bdfc81-8a0c-407c-b1e6-70db7238509c","085d5782-a549-4313-953a-a09ee3d91ae6","42768e61-5350-4a23-b373-1682e18241b3","f92f1871-31d6-4130-89dd-1c17113254ee","a110d670-3234-46e3-939f-344103040216","4399b6df-7286-4efc-9fc2-14c2c23edc8e","bf4bd57f-aac4-4bd0-a23c-34d1dcdae76b","812d2f8a-a82a-4433-b4fe-a3e8842ab742","f37f1ef2-dc43-48fa-903f-9bc4f97c36fe","317edf9b-b956-4ada-9046-498233b167ef","7c7bb8b0-cfad-4874-8e63-a8824c6d26eb","dea0535a-3116-4c60-b603-d581544753f6","ba869a5a-416a-4190-9b19-eaf5b22cd500","4b430ebb-bff8-485b-a1d4-d9c6dac43408","3392e778-8421-4204-ac75-c7a69d91544b"],"hoverinfo":"text","marker":{"color":["orange","green","green","green","green","orange","green","orange","orange","orange","green","orange","orange","green","orange","orange","green","green","green","green"],"line":{"width":1},"size":12},"mode":"markers","name":"样本点","text":["样本: S001\u003cbr\u003e离线分桶: 0\u003cbr\u003e线上分桶: 1\u003cbr\u003e差异: one_bucket\u003cbr\u003e状态: reviewed_by_op\u003cbr\u003e点击查看详情→","样本: S002\u003cbr\u003e离线分桶: 1\u003cbr\u003e线上分桶: 1\u003cbr\u003e差异: same\u003cbr\u003e状态: pending_review\u003cbr\u003e点击查看详情→","样本: S003\u003cbr\u003e离线分桶: 2\u003cbr\u003e线上分桶: 2\u003cbr\u003e差异: same\u003cbr\u003e状态: supplemented_by_algo\u003cbr\u003e点击查看详情→","样本: S004\u003cbr\u003e离线分桶: 1\u003cbr\u003e线上分桶: 1\u003cbr\u003e差异: same\u003cbr\u003e状态: pending_review\u003cbr\u003e点击查看详情→","样本: S005\u003cbr\u003e离线分桶: 3\u003cbr\u003e线上分桶: 3\u003cbr\u003e差异: same\u003cbr\u003e状态: pending_review\u003cbr\u003e点击查看详情→","样本: S006\u003cbr\u003e离线分桶: 2\u003cbr\u003e线上分桶: 3\u003cbr\u003e差异: one_bucket\u003cbr\u003e状态: supplemented_by_algo\u003cbr\u003e点击查看详情→","样本: S007\u003cbr\u003e离线分桶: 0\u003cbr\u003e线上分桶: 0\u003cbr\u003e差异: same\u003cbr\u003e状态: pending_review\u003cbr\u003e点击查看详情→","样本: S008\u003cbr\u003e离线分桶: 3\u003cbr\u003e线上分桶: 4\u003cbr\u003e差异: one_bucket\u003cbr\u003e状态: pending_review\u003cbr\u003e点击查看详情→","样本: S009\u003cbr\u003e离线分桶: 1\u003cbr\u003e线上分桶: 2\u003cbr\u003e差异: one_bucket\u003cbr\u003e状态: supplemented_by_algo\u003cbr\u003e点击查看详情→","样本: S010\u003cbr\u003e离线分桶: 3\u003cbr\u003e线上分桶: 2\u003cbr\u003e差异: one_bucket\u003cbr\u003e状态: supplemented_by_algo\u003cbr\u003e点击查看详情→","样本: S011\u003cbr\u003e离线分桶: 1\u003cbr\u003e线上分桶: 1\u003cbr\u003e差异: same\u003cbr\u003e状态: pending_review\u003cbr\u003e点击查看详情→","样本: S012\u003cbr\u003e离线分桶: 2\u003cbr\u003e线上分桶: 3\u003cbr\u003e差异: one_bucket\u003cbr\u003e状态: supplemented_by_algo\u003cbr\u003e点击查看详情→","样本: S013\u003cbr\u003e离线分桶: 0\u003cbr\u003e线上分桶: 1\u003cbr\u003e差异: one_bucket\u003cbr\u003e状态: pending_review\u003cbr\u003e点击查看详情→","样本: S014\u003cbr\u003e离线分桶: 2\u003cbr\u003e线上分桶: 2\u003cbr\u003e差异: same\u003cbr\u003e状态: supplemented_by_algo\u003cbr\u003e点击查看详情→","样本: S015\u003cbr\u003e离线分桶: 4\u003cbr\u003e线上分桶: 3\u003cbr\u003e差异: one_bucket\u003cbr\u003e状态: pending_review\u003cbr\u003e点击查看详情→","样本: S016\u003cbr\u003e离线分桶: 0\u003cbr\u003e线上分桶: 1\u003cbr\u003e差异: one_bucket\u003cbr\u003e状态: supplemented_by_algo\u003cbr\u003e点击查看详情→","样本: S017\u003cbr\u003e离线分桶: 3\u003cbr\u003e线上分桶: 3\u003cbr\u003e差异: same\u003cbr\u003e状态: supplemented_by_algo\u003cbr\u003e点击查看详情→","样本: S018\u003cbr\u003e离线分桶: 1\u003cbr\u003e线上分桶: 1\u003cbr\u003e差异: same\u003cbr\u003e状态: supplemented_by_algo\u003cbr\u003e点击查看详情→","样本: S019\u003cbr\u003e离线分桶: 2\u003cbr\u003e线上分桶: 2\u003cbr\u003e差异: same\u003cbr\u003e状态: supplemented_by_algo\u003cbr\u003e点击查看详情→","样本: S020\u003cbr\u003e离线分桶: 1\u003cbr\u003e线上分桶: 1\u003cbr\u003e差异: same\u003cbr\u003e状态: supplemented_by_algo\u003cbr\u003e点击查看详情→"],"x":[0,1,2,1,3,2,0,3,1,3,1,2,0,2,4,0,3,1,2,1],"y":[1,1,2,1,3,3,0,4,2,2,1,3,1,2,3,1,3,1,2,1],"type":"scatter"},{"line":{"color":"gray","dash":"dash"},"mode":"lines","name":"y=x (无偏差)","x":[-0.5,4.5],"y":[-0.5,4.5],"type":"scatter"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmapgl":[{"type":"heatmapgl","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"title":{"text":"离线分桶"},"tickmode":"linear","tick0":0,"dtick":1},"yaxis":{"title":{"text":"线上分桶"},"tickmode":"linear","tick0":0,"dtick":1},"title":{"text":"离线vs线上分桶分布图（橙色=差1桶，红色=差多桶）"},"showlegend":true,"clickmode":"event+select"},                        {"responsive": true}                    )                };                            </script>        </div></div>
+            </div>
+
+            <div class="card">
+                <h2>🧊 3D视图：分数×分桶差</h2>
+                <div id="chart2"><div>                            <div id="cc3118e9-ed98-4ac9-8951-d5846f44e1b2" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("cc3118e9-ed98-4ac9-8951-d5846f44e1b2")) {                    Plotly.newPlot(                        "cc3118e9-ed98-4ac9-8951-d5846f44e1b2",                        [{"customdata":["59f59317-3bd3-4036-934a-9bfbd4c29070","d808801c-ea4f-4038-b0d5-1ae7b0e4323b","0e61c2a1-cb35-47aa-91c0-f173b8143bfa","bfbb0018-5ace-42a5-b7ff-033d26cdc73c","8f376f48-d749-4178-8e79-584a4b3be05f","a3bdfc81-8a0c-407c-b1e6-70db7238509c","085d5782-a549-4313-953a-a09ee3d91ae6","42768e61-5350-4a23-b373-1682e18241b3","f92f1871-31d6-4130-89dd-1c17113254ee","a110d670-3234-46e3-939f-344103040216","4399b6df-7286-4efc-9fc2-14c2c23edc8e","bf4bd57f-aac4-4bd0-a23c-34d1dcdae76b","812d2f8a-a82a-4433-b4fe-a3e8842ab742","f37f1ef2-dc43-48fa-903f-9bc4f97c36fe","317edf9b-b956-4ada-9046-498233b167ef","7c7bb8b0-cfad-4874-8e63-a8824c6d26eb","dea0535a-3116-4c60-b603-d581544753f6","ba869a5a-416a-4190-9b19-eaf5b22cd500","4b430ebb-bff8-485b-a1d4-d9c6dac43408","3392e778-8421-4204-ac75-c7a69d91544b"],"hoverinfo":"text","marker":{"color":["orange","green","green","green","green","orange","green","orange","orange","orange","green","orange","orange","green","orange","orange","green","green","green","green"],"opacity":0.8,"size":6},"mode":"markers","text":["样本: S001\u003cbr\u003e离线分数: 0.000\u003cbr\u003e线上分数: 0.000\u003cbr\u003e分桶差: 1\u003cbr\u003e记录ID: 59f59317-3bd3-4036-934a-9bfbd4c29070","样本: S002\u003cbr\u003e离线分数: 0.000\u003cbr\u003e线上分数: 0.000\u003cbr\u003e分桶差: 0\u003cbr\u003e记录ID: d808801c-ea4f-4038-b0d5-1ae7b0e4323b","样本: S003\u003cbr\u003e离线分数: 0.000\u003cbr\u003e线上分数: 0.000\u003cbr\u003e分桶差: 0\u003cbr\u003e记录ID: 0e61c2a1-cb35-47aa-91c0-f173b8143bfa","样本: S004\u003cbr\u003e离线分数: 0.000\u003cbr\u003e线上分数: 0.000\u003cbr\u003e分桶差: 0\u003cbr\u003e记录ID: bfbb0018-5ace-42a5-b7ff-033d26cdc73c","样本: S005\u003cbr\u003e离线分数: 0.000\u003cbr\u003e线上分数: 0.000\u003cbr\u003e分桶差: 0\u003cbr\u003e记录ID: 8f376f48-d749-4178-8e79-584a4b3be05f","样本: S006\u003cbr\u003e离线分数: 0.000\u003cbr\u003e线上分数: 0.000\u003cbr\u003e分桶差: 1\u003cbr\u003e记录ID: a3bdfc81-8a0c-407c-b1e6-70db7238509c","样本: S007\u003cbr\u003e离线分数: 0.000\u003cbr\u003e线上分数: 0.000\u003cbr\u003e分桶差: 0\u003cbr\u003e记录ID: 085d5782-a549-4313-953a-a09ee3d91ae6","样本: S008\u003cbr\u003e离线分数: 0.000\u003cbr\u003e线上分数: 0.000\u003cbr\u003e分桶差: 1\u003cbr\u003e记录ID: 42768e61-5350-4a23-b373-1682e18241b3","样本: S009\u003cbr\u003e离线分数: 0.000\u003cbr\u003e线上分数: 0.000\u003cbr\u003e分桶差: 1\u003cbr\u003e记录ID: f92f1871-31d6-4130-89dd-1c17113254ee","样本: S010\u003cbr\u003e离线分数: 0.000\u003cbr\u003e线上分数: 0.000\u003cbr\u003e分桶差: 1\u003cbr\u003e记录ID: a110d670-3234-46e3-939f-344103040216","样本: S011\u003cbr\u003e离线分数: 0.000\u003cbr\u003e线上分数: 0.000\u003cbr\u003e分桶差: 0\u003cbr\u003e记录ID: 4399b6df-7286-4efc-9fc2-14c2c23edc8e","样本: S012\u003cbr\u003e离线分数: 0.000\u003cbr\u003e线上分数: 0.000\u003cbr\u003e分桶差: 1\u003cbr\u003e记录ID: bf4bd57f-aac4-4bd0-a23c-34d1dcdae76b","样本: S013\u003cbr\u003e离线分数: 0.000\u003cbr\u003e线上分数: 0.000\u003cbr\u003e分桶差: 1\u003cbr\u003e记录ID: 812d2f8a-a82a-4433-b4fe-a3e8842ab742","样本: S014\u003cbr\u003e离线分数: 0.000\u003cbr\u003e线上分数: 0.000\u003cbr\u003e分桶差: 0\u003cbr\u003e记录ID: f37f1ef2-dc43-48fa-903f-9bc4f97c36fe","样本: S015\u003cbr\u003e离线分数: 0.000\u003cbr\u003e线上分数: 0.000\u003cbr\u003e分桶差: 1\u003cbr\u003e记录ID: 317edf9b-b956-4ada-9046-498233b167ef","样本: S016\u003cbr\u003e离线分数: 0.000\u003cbr\u003e线上分数: 0.000\u003cbr\u003e分桶差: 1\u003cbr\u003e记录ID: 7c7bb8b0-cfad-4874-8e63-a8824c6d26eb","样本: S017\u003cbr\u003e离线分数: 0.000\u003cbr\u003e线上分数: 0.000\u003cbr\u003e分桶差: 0\u003cbr\u003e记录ID: dea0535a-3116-4c60-b603-d581544753f6","样本: S018\u003cbr\u003e离线分数: 0.000\u003cbr\u003e线上分数: 0.000\u003cbr\u003e分桶差: 0\u003cbr\u003e记录ID: ba869a5a-416a-4190-9b19-eaf5b22cd500","样本: S019\u003cbr\u003e离线分数: 0.000\u003cbr\u003e线上分数: 0.000\u003cbr\u003e分桶差: 0\u003cbr\u003e记录ID: 4b430ebb-bff8-485b-a1d4-d9c6dac43408","样本: S020\u003cbr\u003e离线分数: 0.000\u003cbr\u003e线上分数: 0.000\u003cbr\u003e分桶差: 0\u003cbr\u003e记录ID: 3392e778-8421-4204-ac75-c7a69d91544b"],"x":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"y":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"z":[1,0,0,0,0,1,0,1,1,1,0,1,1,0,1,1,0,0,0,0],"type":"scatter3d"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmapgl":[{"type":"heatmapgl","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"title":{"text":"3D视图：离线分数×线上分数×分桶差"},"scene":{"xaxis":{"title":{"text":"离线分数"}},"yaxis":{"title":{"text":"线上分数"}},"zaxis":{"title":{"text":"分桶差"}}},"clickmode":"event+select"},                        {"responsive": true}                    )                };                            </script>        </div></div>
+            </div>
+
+            <div class="card">
+                <h2>📋 漂移记录详情（差1桶优先展示）</h2>
+                <table class="record-table">
+                    <thead>
+                        <tr>
+                            <th>样本ID</th>
+                            <th>离线分桶</th>
+                            <th>线上分桶</th>
+                            <th>差异</th>
+                            <th>状态</th>
+                            <th>为什么留下</th>
+                            <th>缺什么材料</th>
+                            <th>下一步找谁</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                <tr class="one-bucket">
+                    <td><a href="#sample-S001">S001</a></td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>one_bucket</td>
+                    <td><span class="status-badge status-reviewed-by-op">reviewed_by_op</span></td>
+                    <td>离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常</td>
+                    <td>-</td>
+                    <td>operation</td>
+                </tr>
+                
+                <tr class="one-bucket">
+                    <td><a href="#sample-S006">S006</a></td>
+                    <td>2</td>
+                    <td>3</td>
+                    <td>one_bucket</td>
+                    <td><span class="status-badge status-supplemented-by-algo">supplemented_by_algo</span></td>
+                    <td>离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常</td>
+                    <td>复核意见待评测运营填写</td>
+                    <td>operation</td>
+                </tr>
+                
+                <tr class="one-bucket">
+                    <td><a href="#sample-S008">S008</a></td>
+                    <td>3</td>
+                    <td>4</td>
+                    <td>one_bucket</td>
+                    <td><span class="status-badge status-pending-review">pending_review</span></td>
+                    <td>离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常</td>
+                    <td>召回候选表待算法工程师小乔补录, 复核意见待评测运营填写</td>
+                    <td>operation</td>
+                </tr>
+                
+                <tr class="one-bucket">
+                    <td><a href="#sample-S009">S009</a></td>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>one_bucket</td>
+                    <td><span class="status-badge status-supplemented-by-algo">supplemented_by_algo</span></td>
+                    <td>离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常</td>
+                    <td>复核意见待评测运营填写</td>
+                    <td>operation</td>
+                </tr>
+                
+                <tr class="one-bucket">
+                    <td><a href="#sample-S010">S010</a></td>
+                    <td>3</td>
+                    <td>2</td>
+                    <td>one_bucket</td>
+                    <td><span class="status-badge status-supplemented-by-algo">supplemented_by_algo</span></td>
+                    <td>离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常</td>
+                    <td>复核意见待评测运营填写</td>
+                    <td>operation</td>
+                </tr>
+                
+                <tr class="one-bucket">
+                    <td><a href="#sample-S012">S012</a></td>
+                    <td>2</td>
+                    <td>3</td>
+                    <td>one_bucket</td>
+                    <td><span class="status-badge status-supplemented-by-algo">supplemented_by_algo</span></td>
+                    <td>离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常</td>
+                    <td>复核意见待评测运营填写</td>
+                    <td>operation</td>
+                </tr>
+                
+                <tr class="one-bucket">
+                    <td><a href="#sample-S013">S013</a></td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>one_bucket</td>
+                    <td><span class="status-badge status-pending-review">pending_review</span></td>
+                    <td>离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常</td>
+                    <td>召回候选表待算法工程师小乔补录, 复核意见待评测运营填写</td>
+                    <td>operation</td>
+                </tr>
+                
+                <tr class="one-bucket">
+                    <td><a href="#sample-S015">S015</a></td>
+                    <td>4</td>
+                    <td>3</td>
+                    <td>one_bucket</td>
+                    <td><span class="status-badge status-pending-review">pending_review</span></td>
+                    <td>离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常</td>
+                    <td>召回候选表待算法工程师小乔补录, 复核意见待评测运营填写</td>
+                    <td>operation</td>
+                </tr>
+                
+                <tr class="one-bucket">
+                    <td><a href="#sample-S016">S016</a></td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>one_bucket</td>
+                    <td><span class="status-badge status-supplemented-by-algo">supplemented_by_algo</span></td>
+                    <td>离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常</td>
+                    <td>复核意见待评测运营填写</td>
+                    <td>operation</td>
+                </tr>
+                
+                <tr class="">
+                    <td><a href="#sample-S002">S002</a></td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>same</td>
+                    <td><span class="status-badge status-pending-review">pending_review</span></td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>operation</td>
+                </tr>
+                
+                <tr class="">
+                    <td><a href="#sample-S003">S003</a></td>
+                    <td>2</td>
+                    <td>2</td>
+                    <td>same</td>
+                    <td><span class="status-badge status-supplemented-by-algo">supplemented_by_algo</span></td>
+                    <td>-</td>
+                    <td>复核意见待评测运营填写</td>
+                    <td>operation</td>
+                </tr>
+                
+                <tr class="">
+                    <td><a href="#sample-S004">S004</a></td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>same</td>
+                    <td><span class="status-badge status-pending-review">pending_review</span></td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>operation</td>
+                </tr>
+                
+                <tr class="">
+                    <td><a href="#sample-S005">S005</a></td>
+                    <td>3</td>
+                    <td>3</td>
+                    <td>same</td>
+                    <td><span class="status-badge status-pending-review">pending_review</span></td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>operation</td>
+                </tr>
+                
+                <tr class="">
+                    <td><a href="#sample-S007">S007</a></td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>same</td>
+                    <td><span class="status-badge status-pending-review">pending_review</span></td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>operation</td>
+                </tr>
+                
+                <tr class="">
+                    <td><a href="#sample-S011">S011</a></td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>same</td>
+                    <td><span class="status-badge status-pending-review">pending_review</span></td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>operation</td>
+                </tr>
+                
+                <tr class="">
+                    <td><a href="#sample-S014">S014</a></td>
+                    <td>2</td>
+                    <td>2</td>
+                    <td>same</td>
+                    <td><span class="status-badge status-supplemented-by-algo">supplemented_by_algo</span></td>
+                    <td>-</td>
+                    <td>复核意见待评测运营填写</td>
+                    <td>operation</td>
+                </tr>
+                
+                <tr class="">
+                    <td><a href="#sample-S017">S017</a></td>
+                    <td>3</td>
+                    <td>3</td>
+                    <td>same</td>
+                    <td><span class="status-badge status-supplemented-by-algo">supplemented_by_algo</span></td>
+                    <td>-</td>
+                    <td>复核意见待评测运营填写</td>
+                    <td>operation</td>
+                </tr>
+                
+                <tr class="">
+                    <td><a href="#sample-S018">S018</a></td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>same</td>
+                    <td><span class="status-badge status-supplemented-by-algo">supplemented_by_algo</span></td>
+                    <td>-</td>
+                    <td>复核意见待评测运营填写</td>
+                    <td>operation</td>
+                </tr>
+                
+                <tr class="">
+                    <td><a href="#sample-S019">S019</a></td>
+                    <td>2</td>
+                    <td>2</td>
+                    <td>same</td>
+                    <td><span class="status-badge status-supplemented-by-algo">supplemented_by_algo</span></td>
+                    <td>-</td>
+                    <td>复核意见待评测运营填写</td>
+                    <td>operation</td>
+                </tr>
+                
+                <tr class="">
+                    <td><a href="#sample-S020">S020</a></td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>same</td>
+                    <td><span class="status-badge status-supplemented-by-algo">supplemented_by_algo</span></td>
+                    <td>-</td>
+                    <td>复核意见待评测运营填写</td>
+                    <td>operation</td>
+                </tr>
+                
+                    </tbody>
+                </table>
+            </div>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const plotlyElements = document.querySelectorAll('.js-plotly-plot');
+                    plotlyElements.forEach(function(plot) {
+                        plot.on('plotly_click', function(data) {
+                            const point = data.points[0];
+                            const recordId = point.customdata;
+                            alert('点击了记录: ' + recordId + '\n可跳转到负样本列表或召回候选表查看详情');
+                        });
+                    });
+                });
+            </script>
+        </body>
+        </html>
+        

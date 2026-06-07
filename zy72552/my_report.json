@@ -1,0 +1,305 @@
+{
+  "experiment_id": "57a30164-d9f7-4695-a3d6-3446238ab00b",
+  "experiment_name": "检测_negative_samples.csv",
+  "baseline_version": "",
+  "current_version": "",
+  "total_records": 20,
+  "one_bucket_diff_count": 9,
+  "multi_bucket_diff_count": 0,
+  "pending_review": 8,
+  "reviewed_by_op": 1,
+  "supplemented_by_algo": 11,
+  "details": [
+    {
+      "record_id": "59f59317-3bd3-4036-934a-9bfbd4c29070",
+      "sample_id": "S001",
+      "offline_bucket": 0,
+      "online_bucket": 1,
+      "bucket_diff": "one_bucket",
+      "status": "reviewed_by_op",
+      "why_kept": "离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常",
+      "missing_materials": [],
+      "next_owner": "operation",
+      "recall_candidates_count": 0,
+      "review_notes": "已复核，样本S001离线和线上确实差1桶，特征无异常，待算法工程师进一步分析"
+    },
+    {
+      "record_id": "d808801c-ea4f-4038-b0d5-1ae7b0e4323b",
+      "sample_id": "S002",
+      "offline_bucket": 1,
+      "online_bucket": 1,
+      "bucket_diff": "same",
+      "status": "pending_review",
+      "why_kept": "",
+      "missing_materials": [],
+      "next_owner": "operation",
+      "recall_candidates_count": 0,
+      "review_notes": ""
+    },
+    {
+      "record_id": "0e61c2a1-cb35-47aa-91c0-f173b8143bfa",
+      "sample_id": "S003",
+      "offline_bucket": 2,
+      "online_bucket": 2,
+      "bucket_diff": "same",
+      "status": "supplemented_by_algo",
+      "why_kept": "",
+      "missing_materials": [
+        "复核意见待评测运营填写"
+      ],
+      "next_owner": "operation",
+      "recall_candidates_count": 0,
+      "review_notes": ""
+    },
+    {
+      "record_id": "bfbb0018-5ace-42a5-b7ff-033d26cdc73c",
+      "sample_id": "S004",
+      "offline_bucket": 1,
+      "online_bucket": 1,
+      "bucket_diff": "same",
+      "status": "pending_review",
+      "why_kept": "",
+      "missing_materials": [],
+      "next_owner": "operation",
+      "recall_candidates_count": 0,
+      "review_notes": ""
+    },
+    {
+      "record_id": "8f376f48-d749-4178-8e79-584a4b3be05f",
+      "sample_id": "S005",
+      "offline_bucket": 3,
+      "online_bucket": 3,
+      "bucket_diff": "same",
+      "status": "pending_review",
+      "why_kept": "",
+      "missing_materials": [],
+      "next_owner": "operation",
+      "recall_candidates_count": 0,
+      "review_notes": ""
+    },
+    {
+      "record_id": "a3bdfc81-8a0c-407c-b1e6-70db7238509c",
+      "sample_id": "S006",
+      "offline_bucket": 2,
+      "online_bucket": 3,
+      "bucket_diff": "one_bucket",
+      "status": "supplemented_by_algo",
+      "why_kept": "离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常",
+      "missing_materials": [
+        "复核意见待评测运营填写"
+      ],
+      "next_owner": "operation",
+      "recall_candidates_count": 0,
+      "review_notes": ""
+    },
+    {
+      "record_id": "085d5782-a549-4313-953a-a09ee3d91ae6",
+      "sample_id": "S007",
+      "offline_bucket": 0,
+      "online_bucket": 0,
+      "bucket_diff": "same",
+      "status": "pending_review",
+      "why_kept": "",
+      "missing_materials": [],
+      "next_owner": "operation",
+      "recall_candidates_count": 0,
+      "review_notes": ""
+    },
+    {
+      "record_id": "42768e61-5350-4a23-b373-1682e18241b3",
+      "sample_id": "S008",
+      "offline_bucket": 3,
+      "online_bucket": 4,
+      "bucket_diff": "one_bucket",
+      "status": "pending_review",
+      "why_kept": "离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常",
+      "missing_materials": [
+        "召回候选表待算法工程师小乔补录",
+        "复核意见待评测运营填写"
+      ],
+      "next_owner": "operation",
+      "recall_candidates_count": 0,
+      "review_notes": ""
+    },
+    {
+      "record_id": "f92f1871-31d6-4130-89dd-1c17113254ee",
+      "sample_id": "S009",
+      "offline_bucket": 1,
+      "online_bucket": 2,
+      "bucket_diff": "one_bucket",
+      "status": "supplemented_by_algo",
+      "why_kept": "离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常",
+      "missing_materials": [
+        "复核意见待评测运营填写"
+      ],
+      "next_owner": "operation",
+      "recall_candidates_count": 0,
+      "review_notes": ""
+    },
+    {
+      "record_id": "a110d670-3234-46e3-939f-344103040216",
+      "sample_id": "S010",
+      "offline_bucket": 3,
+      "online_bucket": 2,
+      "bucket_diff": "one_bucket",
+      "status": "supplemented_by_algo",
+      "why_kept": "离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常",
+      "missing_materials": [
+        "复核意见待评测运营填写"
+      ],
+      "next_owner": "operation",
+      "recall_candidates_count": 0,
+      "review_notes": ""
+    },
+    {
+      "record_id": "4399b6df-7286-4efc-9fc2-14c2c23edc8e",
+      "sample_id": "S011",
+      "offline_bucket": 1,
+      "online_bucket": 1,
+      "bucket_diff": "same",
+      "status": "pending_review",
+      "why_kept": "",
+      "missing_materials": [],
+      "next_owner": "operation",
+      "recall_candidates_count": 0,
+      "review_notes": ""
+    },
+    {
+      "record_id": "bf4bd57f-aac4-4bd0-a23c-34d1dcdae76b",
+      "sample_id": "S012",
+      "offline_bucket": 2,
+      "online_bucket": 3,
+      "bucket_diff": "one_bucket",
+      "status": "supplemented_by_algo",
+      "why_kept": "离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常",
+      "missing_materials": [
+        "复核意见待评测运营填写"
+      ],
+      "next_owner": "operation",
+      "recall_candidates_count": 0,
+      "review_notes": ""
+    },
+    {
+      "record_id": "812d2f8a-a82a-4433-b4fe-a3e8842ab742",
+      "sample_id": "S013",
+      "offline_bucket": 0,
+      "online_bucket": 1,
+      "bucket_diff": "one_bucket",
+      "status": "pending_review",
+      "why_kept": "离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常",
+      "missing_materials": [
+        "召回候选表待算法工程师小乔补录",
+        "复核意见待评测运营填写"
+      ],
+      "next_owner": "operation",
+      "recall_candidates_count": 0,
+      "review_notes": ""
+    },
+    {
+      "record_id": "f37f1ef2-dc43-48fa-903f-9bc4f97c36fe",
+      "sample_id": "S014",
+      "offline_bucket": 2,
+      "online_bucket": 2,
+      "bucket_diff": "same",
+      "status": "supplemented_by_algo",
+      "why_kept": "",
+      "missing_materials": [
+        "复核意见待评测运营填写"
+      ],
+      "next_owner": "operation",
+      "recall_candidates_count": 0,
+      "review_notes": ""
+    },
+    {
+      "record_id": "317edf9b-b956-4ada-9046-498233b167ef",
+      "sample_id": "S015",
+      "offline_bucket": 4,
+      "online_bucket": 3,
+      "bucket_diff": "one_bucket",
+      "status": "pending_review",
+      "why_kept": "离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常",
+      "missing_materials": [
+        "召回候选表待算法工程师小乔补录",
+        "复核意见待评测运营填写"
+      ],
+      "next_owner": "operation",
+      "recall_candidates_count": 0,
+      "review_notes": ""
+    },
+    {
+      "record_id": "7c7bb8b0-cfad-4874-8e63-a8824c6d26eb",
+      "sample_id": "S016",
+      "offline_bucket": 0,
+      "online_bucket": 1,
+      "bucket_diff": "one_bucket",
+      "status": "supplemented_by_algo",
+      "why_kept": "离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常",
+      "missing_materials": [
+        "复核意见待评测运营填写"
+      ],
+      "next_owner": "operation",
+      "recall_candidates_count": 0,
+      "review_notes": ""
+    },
+    {
+      "record_id": "dea0535a-3116-4c60-b603-d581544753f6",
+      "sample_id": "S017",
+      "offline_bucket": 3,
+      "online_bucket": 3,
+      "bucket_diff": "same",
+      "status": "supplemented_by_algo",
+      "why_kept": "",
+      "missing_materials": [
+        "复核意见待评测运营填写"
+      ],
+      "next_owner": "operation",
+      "recall_candidates_count": 0,
+      "review_notes": ""
+    },
+    {
+      "record_id": "ba869a5a-416a-4190-9b19-eaf5b22cd500",
+      "sample_id": "S018",
+      "offline_bucket": 1,
+      "online_bucket": 1,
+      "bucket_diff": "same",
+      "status": "supplemented_by_algo",
+      "why_kept": "",
+      "missing_materials": [
+        "复核意见待评测运营填写"
+      ],
+      "next_owner": "operation",
+      "recall_candidates_count": 0,
+      "review_notes": ""
+    },
+    {
+      "record_id": "4b430ebb-bff8-485b-a1d4-d9c6dac43408",
+      "sample_id": "S019",
+      "offline_bucket": 2,
+      "online_bucket": 2,
+      "bucket_diff": "same",
+      "status": "supplemented_by_algo",
+      "why_kept": "",
+      "missing_materials": [
+        "复核意见待评测运营填写"
+      ],
+      "next_owner": "operation",
+      "recall_candidates_count": 0,
+      "review_notes": ""
+    },
+    {
+      "record_id": "3392e778-8421-4204-ac75-c7a69d91544b",
+      "sample_id": "S020",
+      "offline_bucket": 1,
+      "online_bucket": 1,
+      "bucket_diff": "same",
+      "status": "supplemented_by_algo",
+      "why_kept": "",
+      "missing_materials": [
+        "复核意见待评测运营填写"
+      ],
+      "next_owner": "operation",
+      "recall_candidates_count": 0,
+      "review_notes": ""
+    }
+  ]
+}
