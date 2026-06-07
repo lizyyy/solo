@@ -1,0 +1,397 @@
+{
+  "desensitizationRules": [
+    {
+      "id": "rule_1780803969432_qxecmz",
+      "name": "Test Rule 1",
+      "remark": "Main process here",
+      "mainProcess": "Step 1, Step 2, Step 3 with RAG reference",
+      "content": "This is test content with RAG evidence",
+      "importedBy": "admin",
+      "importedAt": "2026-06-07T03:46:09.432Z",
+      "status": "imported"
+    },
+    {
+      "id": "rule_1780803969434_qhchxt",
+      "name": "Test Rule 2",
+      "remark": "",
+      "mainProcess": "",
+      "content": "Phone: 13800138000 is unmasked here",
+      "importedBy": "analyst",
+      "importedAt": "2026-06-07T03:46:09.434Z",
+      "status": "imported"
+    }
+  ],
+  "grayBatches": [
+    {
+      "id": "batch_1780803969435_nlo7cy",
+      "batchNo": "BATCH-001",
+      "sceneStatement": "Scene statement with RAG reference: see section 3.2",
+      "relatedRuleId": "rule_1780803969432_qxecmz",
+      "content": "Batch content",
+      "addedBy": "老唐",
+      "addedAt": "2026-06-07T03:46:09.435Z"
+    },
+    {
+      "id": "batch_1780803969435_fkor62",
+      "batchNo": "BATCH-002",
+      "sceneStatement": "Scene statement without RAG, phone: 13900139000",
+      "relatedRuleId": "rule_1780803969432_qxecmz",
+      "content": "Batch content",
+      "addedBy": "老唐",
+      "addedAt": "2026-06-07T03:46:09.435Z"
+    }
+  ],
+  "inspectionRecords": [
+    {
+      "id": "inspect_1780803969435_kr74m8",
+      "operator": "admin",
+      "createdAt": "2026-06-07T03:46:09.435Z",
+      "ruleCount": 2,
+      "batchCount": 2,
+      "gaps": [
+        {
+          "type": "missing_gray_batch",
+          "severity": "high",
+          "description": "该脱敏规则尚未关联任何灰度批次现场说法",
+          "missing": "灰度批次现场说法证据",
+          "nextStep": "请算法运营老唐补录对应灰度批次",
+          "owner": "算法运营老唐",
+          "ruleId": "rule_1780803969434_qhchxt",
+          "ruleName": "Test Rule 2"
+        },
+        {
+          "type": "missing_rule_remark",
+          "severity": "medium",
+          "description": "脱敏规则备注中缺少主流程说明",
+          "missing": "主流程说明",
+          "nextStep": "请补充脱敏规则的主流程备注信息",
+          "owner": "规则导入人",
+          "ruleId": "rule_1780803969434_qhchxt",
+          "ruleName": "Test Rule 2"
+        },
+        {
+          "type": "no_rag_evidence",
+          "severity": "high",
+          "description": "脱敏规则中未明确标注 RAG 引用来源",
+          "missing": "RAG 引用证据链",
+          "nextStep": "请算法同事核查并补充 RAG 引用来源",
+          "owner": "算法同事",
+          "ruleId": "rule_1780803969434_qhchxt",
+          "ruleName": "Test Rule 2"
+        }
+      ],
+      "phoneIssues": [
+        {
+          "id": "phone_1780803969435_kzkq88",
+          "phoneNumber": "13800138000",
+          "sourceType": "desensitization_rule",
+          "sourceId": "rule_1780803969434_qhchxt",
+          "sourceName": "Test Rule 2",
+          "status": "pending_review",
+          "detectedAt": "2026-06-07T03:46:09.435Z",
+          "note": "手机号在导出中漏遮，留待算法同事复核，暂不归为正常"
+        }
+      ],
+      "evidenceMap": {
+        "rule_1780803969432_qxecmz": {
+          "rule": {
+            "id": "rule_1780803969432_qxecmz",
+            "name": "Test Rule 1",
+            "remark": "Main process here",
+            "mainProcess": "Step 1, Step 2, Step 3 with RAG reference"
+          },
+          "grayBatches": [
+            {
+              "id": "batch_1780803969435_nlo7cy",
+              "batchNo": "BATCH-001",
+              "sceneStatement": "Scene statement with RAG reference: see section 3.2"
+            },
+            {
+              "id": "batch_1780803969435_fkor62",
+              "batchNo": "BATCH-002",
+              "sceneStatement": "Scene statement without RAG, phone: 13900139000"
+            }
+          ],
+          "gaps": []
+        },
+        "rule_1780803969434_qhchxt": {
+          "rule": {
+            "id": "rule_1780803969434_qhchxt",
+            "name": "Test Rule 2",
+            "remark": "",
+            "mainProcess": ""
+          },
+          "grayBatches": [],
+          "gaps": [
+            {
+              "type": "missing_gray_batch",
+              "severity": "high",
+              "description": "该脱敏规则尚未关联任何灰度批次现场说法",
+              "missing": "灰度批次现场说法证据",
+              "nextStep": "请算法运营老唐补录对应灰度批次",
+              "owner": "算法运营老唐"
+            },
+            {
+              "type": "missing_rule_remark",
+              "severity": "medium",
+              "description": "脱敏规则备注中缺少主流程说明",
+              "missing": "主流程说明",
+              "nextStep": "请补充脱敏规则的主流程备注信息",
+              "owner": "规则导入人"
+            },
+            {
+              "type": "no_rag_evidence",
+              "severity": "high",
+              "description": "脱敏规则中未明确标注 RAG 引用来源",
+              "missing": "RAG 引用证据链",
+              "nextStep": "请算法同事核查并补充 RAG 引用来源",
+              "owner": "算法同事"
+            }
+          ]
+        }
+      },
+      "options": {}
+    },
+    {
+      "id": "inspect_1780803969438_afuq79",
+      "operator": "老唐",
+      "createdAt": "2026-06-07T03:46:09.438Z",
+      "ruleCount": 2,
+      "batchCount": 2,
+      "gaps": [
+        {
+          "type": "missing_gray_batch",
+          "severity": "high",
+          "description": "该脱敏规则尚未关联任何灰度批次现场说法",
+          "missing": "灰度批次现场说法证据",
+          "nextStep": "请算法运营老唐补录对应灰度批次",
+          "owner": "算法运营老唐",
+          "ruleId": "rule_1780803969434_qhchxt",
+          "ruleName": "Test Rule 2"
+        },
+        {
+          "type": "missing_rule_remark",
+          "severity": "medium",
+          "description": "脱敏规则备注中缺少主流程说明",
+          "missing": "主流程说明",
+          "nextStep": "请补充脱敏规则的主流程备注信息",
+          "owner": "规则导入人",
+          "ruleId": "rule_1780803969434_qhchxt",
+          "ruleName": "Test Rule 2"
+        },
+        {
+          "type": "no_rag_evidence",
+          "severity": "high",
+          "description": "脱敏规则中未明确标注 RAG 引用来源",
+          "missing": "RAG 引用证据链",
+          "nextStep": "请算法同事核查并补充 RAG 引用来源",
+          "owner": "算法同事",
+          "ruleId": "rule_1780803969434_qhchxt",
+          "ruleName": "Test Rule 2"
+        }
+      ],
+      "phoneIssues": [
+        {
+          "id": "phone_1780803969438_v9cn87",
+          "phoneNumber": "13800138000",
+          "sourceType": "desensitization_rule",
+          "sourceId": "rule_1780803969434_qhchxt",
+          "sourceName": "Test Rule 2",
+          "status": "pending_review",
+          "detectedAt": "2026-06-07T03:46:09.438Z",
+          "note": "手机号在导出中漏遮，留待算法同事复核，暂不归为正常"
+        }
+      ],
+      "evidenceMap": {
+        "rule_1780803969432_qxecmz": {
+          "rule": {
+            "id": "rule_1780803969432_qxecmz",
+            "name": "Test Rule 1",
+            "remark": "Main process here",
+            "mainProcess": "Step 1, Step 2, Step 3 with RAG reference"
+          },
+          "grayBatches": [
+            {
+              "id": "batch_1780803969435_nlo7cy",
+              "batchNo": "BATCH-001",
+              "sceneStatement": "Scene statement with RAG reference: see section 3.2"
+            },
+            {
+              "id": "batch_1780803969435_fkor62",
+              "batchNo": "BATCH-002",
+              "sceneStatement": "Scene statement without RAG, phone: 13900139000"
+            }
+          ],
+          "gaps": []
+        },
+        "rule_1780803969434_qhchxt": {
+          "rule": {
+            "id": "rule_1780803969434_qhchxt",
+            "name": "Test Rule 2",
+            "remark": "",
+            "mainProcess": ""
+          },
+          "grayBatches": [],
+          "gaps": [
+            {
+              "type": "missing_gray_batch",
+              "severity": "high",
+              "description": "该脱敏规则尚未关联任何灰度批次现场说法",
+              "missing": "灰度批次现场说法证据",
+              "nextStep": "请算法运营老唐补录对应灰度批次",
+              "owner": "算法运营老唐"
+            },
+            {
+              "type": "missing_rule_remark",
+              "severity": "medium",
+              "description": "脱敏规则备注中缺少主流程说明",
+              "missing": "主流程说明",
+              "nextStep": "请补充脱敏规则的主流程备注信息",
+              "owner": "规则导入人"
+            },
+            {
+              "type": "no_rag_evidence",
+              "severity": "high",
+              "description": "脱敏规则中未明确标注 RAG 引用来源",
+              "missing": "RAG 引用证据链",
+              "nextStep": "请算法同事核查并补充 RAG 引用来源",
+              "owner": "算法同事"
+            }
+          ]
+        }
+      },
+      "options": {
+        "rerunFrom": "inspect_1780803969435_kr74m8"
+      }
+    }
+  ],
+  "exportResults": [
+    {
+      "id": "export_1780803969436_ar3gm2",
+      "inspectionId": "inspect_1780803969435_kr74m8",
+      "type": "inspection_export",
+      "content": "📋 RAG 引用缺失巡检报告\n━━━━━━━━━━━━━━━━━━━━━━\n巡检编号: inspect_1780803969435_kr74m8\n巡检时间: 2026-06-07T03:46:09.435Z\n执行人: admin\n\n🔍 本次巡检范围:\n  - 脱敏规则: 2 条\n  - 灰度批次: 2 条\n  - 发现问题: 3 个\n  - 手机号漏遮: 1 个\n\n⚠️  引用缺失问题详情:\n\n  1. [🔴 该脱敏规则尚未关联任何灰度批次现场说法\n     ❓ 为什么留下: 该脱敏规则尚未关联任何灰度批次现场说法\n     📦 还缺什么: 灰度批次现场说法证据\n     🎯 下一步找谁: 算法运营老唐\n     📝 具体行动: 请算法运营老唐补录对应灰度批次\n\n  2. [🟡 脱敏规则备注中缺少主流程说明\n     ❓ 为什么留下: 脱敏规则备注中缺少主流程说明\n     📦 还缺什么: 主流程说明\n     🎯 下一步找谁: 规则导入人\n     📝 具体行动: 请补充脱敏规则的主流程备注信息\n\n  3. [🔴 脱敏规则中未明确标注 RAG 引用来源\n     ❓ 为什么留下: 脱敏规则中未明确标注 RAG 引用来源\n     📦 还缺什么: RAG 引用证据链\n     🎯 下一步找谁: 算法同事\n     📝 具体行动: 请算法同事核查并补充 RAG 引用来源\n\n📱 手机号漏遮问题（待算法同事复核:\n\n  1. 13800138000 (来源: Test Rule 2)\n     状态: ⏳ 待算法同事复核\n     说明: 手机号在导出中漏遮，留待算法同事复核，暂不归为正常\n\n━━━━━━━━━━━━━━━━━━━━━━\n💡 提示: 所有修改操作均已记录审计日志，可追溯谁改了什么、为什么改",
+      "createdAt": "2026-06-07T03:46:09.436Z",
+      "status": "generated"
+    },
+    {
+      "id": "export_1780803969439_ycctti",
+      "inspectionId": "inspect_1780803969438_afuq79",
+      "type": "inspection_export",
+      "content": "📋 RAG 引用缺失巡检报告\n━━━━━━━━━━━━━━━━━━━━━━\n巡检编号: inspect_1780803969438_afuq79\n巡检时间: 2026-06-07T03:46:09.438Z\n执行人: 老唐\n\n🔍 本次巡检范围:\n  - 脱敏规则: 2 条\n  - 灰度批次: 2 条\n  - 发现问题: 3 个\n  - 手机号漏遮: 1 个\n\n⚠️  引用缺失问题详情:\n\n  1. [🔴 该脱敏规则尚未关联任何灰度批次现场说法\n     ❓ 为什么留下: 该脱敏规则尚未关联任何灰度批次现场说法\n     📦 还缺什么: 灰度批次现场说法证据\n     🎯 下一步找谁: 算法运营老唐\n     📝 具体行动: 请算法运营老唐补录对应灰度批次\n\n  2. [🟡 脱敏规则备注中缺少主流程说明\n     ❓ 为什么留下: 脱敏规则备注中缺少主流程说明\n     📦 还缺什么: 主流程说明\n     🎯 下一步找谁: 规则导入人\n     📝 具体行动: 请补充脱敏规则的主流程备注信息\n\n  3. [🔴 脱敏规则中未明确标注 RAG 引用来源\n     ❓ 为什么留下: 脱敏规则中未明确标注 RAG 引用来源\n     📦 还缺什么: RAG 引用证据链\n     🎯 下一步找谁: 算法同事\n     📝 具体行动: 请算法同事核查并补充 RAG 引用来源\n\n📱 手机号漏遮问题（待算法同事复核:\n\n  1. 13800138000 (来源: Test Rule 2)\n     状态: ⏳ 待算法同事复核\n     说明: 手机号在导出中漏遮，留待算法同事复核，暂不归为正常\n\n━━━━━━━━━━━━━━━━━━━━━━\n💡 提示: 所有修改操作均已记录审计日志，可追溯谁改了什么、为什么改",
+      "createdAt": "2026-06-07T03:46:09.439Z",
+      "status": "generated"
+    }
+  ],
+  "auditLogs": [
+    {
+      "id": "audit_1780803969433_0qd08q",
+      "action": "import_rule",
+      "operator": "admin",
+      "details": {
+        "ruleId": "rule_1780803969432_qxecmz",
+        "name": "Test Rule 1"
+      },
+      "timestamp": "2026-06-07T03:46:09.433Z"
+    },
+    {
+      "id": "audit_1780803969434_rhmy9y",
+      "action": "import_rule",
+      "operator": "analyst",
+      "details": {
+        "ruleId": "rule_1780803969434_qhchxt",
+        "name": "Test Rule 2"
+      },
+      "timestamp": "2026-06-07T03:46:09.434Z"
+    },
+    {
+      "id": "audit_1780803969435_771vby",
+      "action": "add_gray_batch",
+      "operator": "老唐",
+      "details": {
+        "batchId": "batch_1780803969435_nlo7cy",
+        "batchNo": "BATCH-001"
+      },
+      "timestamp": "2026-06-07T03:46:09.435Z"
+    },
+    {
+      "id": "audit_1780803969435_2pkjhe",
+      "action": "add_gray_batch",
+      "operator": "老唐",
+      "details": {
+        "batchId": "batch_1780803969435_fkor62",
+        "batchNo": "BATCH-002"
+      },
+      "timestamp": "2026-06-07T03:46:09.435Z"
+    },
+    {
+      "id": "audit_1780803969436_7gibq7",
+      "action": "run_inspection",
+      "operator": "admin",
+      "details": {
+        "inspectionId": "inspect_1780803969435_kr74m8",
+        "gapCount": 3,
+        "phoneIssueCount": 1
+      },
+      "timestamp": "2026-06-07T03:46:09.436Z"
+    },
+    {
+      "id": "audit_1780803969437_392u81",
+      "action": "update_phone_issue",
+      "operator": "算法同事小李",
+      "details": {
+        "issueId": "phone_1780803969435_kzkq88",
+        "oldStatus": "pending_review",
+        "newStatus": "confirmed",
+        "status": "confirmed",
+        "reviewedBy": "算法同事小李",
+        "reviewNote": "Confirmed issue"
+      },
+      "timestamp": "2026-06-07T03:46:09.437Z"
+    },
+    {
+      "id": "audit_1780803969438_kpt3xb",
+      "action": "rerun_inspection",
+      "operator": "老唐",
+      "details": {
+        "previousInspectionId": "inspect_1780803969435_kr74m8"
+      },
+      "timestamp": "2026-06-07T03:46:09.438Z"
+    },
+    {
+      "id": "audit_1780803969439_qlyk3x",
+      "action": "run_inspection",
+      "operator": "老唐",
+      "details": {
+        "inspectionId": "inspect_1780803969438_afuq79",
+        "gapCount": 3,
+        "phoneIssueCount": 1
+      },
+      "timestamp": "2026-06-07T03:46:09.439Z"
+    }
+  ],
+  "phoneMaskIssues": [
+    {
+      "id": "phone_1780803969435_kzkq88",
+      "phoneNumber": "13800138000",
+      "sourceType": "desensitization_rule",
+      "sourceId": "rule_1780803969434_qhchxt",
+      "sourceName": "Test Rule 2",
+      "status": "confirmed",
+      "detectedAt": "2026-06-07T03:46:09.435Z",
+      "note": "手机号在导出中漏遮，留待算法同事复核，暂不归为正常",
+      "reviewedBy": "算法同事小李",
+      "reviewNote": "Confirmed issue"
+    },
+    {
+      "id": "phone_1780803969438_v9cn87",
+      "phoneNumber": "13800138000",
+      "sourceType": "desensitization_rule",
+      "sourceId": "rule_1780803969434_qhchxt",
+      "sourceName": "Test Rule 2",
+      "status": "pending_review",
+      "detectedAt": "2026-06-07T03:46:09.438Z",
+      "note": "手机号在导出中漏遮，留待算法同事复核，暂不归为正常"
+    }
+  ]
+}
