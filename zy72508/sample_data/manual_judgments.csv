@@ -1,0 +1,9 @@
+user_feedback_id,judgment_result,judgment_reason,user_id,kb_link
+FB001,确认失效,用户反馈的链接经人工核实确实无法访问，保留记录,U001,https://kb.example.com/article/1001
+FB002,链接有效,该链接实际可以正常访问，模型误判,U002,https://kb.example.com/article/1002
+FB003,确认失效,人工核实链接失效，保留,U001,https://kb.example.com/article/1003
+FB001,重复记录,同一条用户反馈被重复导入，第二条予以剔除，但保留证据用于复盘,U001,https://kb.example.com/article/1001
+FB004,确认失效,链接无法打开，确认为失效,U003,https://kb.example.com/article/1004
+FB005,链接有效,访问正常，模型判断错误,U004,https://kb.example.com/article/1005
+FB002,不同链接,虽然是同一用户反馈，但对应不同的KB链接，两条都保留,U002,https://kb.example.com/article/1006
+FB006,确认失效,链接404，确认为失效,U005,https://kb.example.com/article/1007

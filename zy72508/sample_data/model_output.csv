@@ -1,0 +1,9 @@
+user_feedback_id,user_id,kb_link,link_status,confidence
+FB001,U001,https://kb.example.com/article/1001,invalid,0.95
+FB002,U002,https://kb.example.com/article/1002,valid,0.87
+FB003,U001,https://kb.example.com/article/1003,invalid,0.91
+FB001,U001,https://kb.example.com/article/1001,invalid,0.95
+FB004,U003,https://kb.example.com/article/1004,invalid,0.89
+FB005,U004,https://kb.example.com/article/1005,valid,0.76
+FB002,U002,https://kb.example.com/article/1006,invalid,0.88
+FB006,U005,https://kb.example.com/article/1007,invalid,0.93
