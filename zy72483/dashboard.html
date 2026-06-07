@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>公厕服务半径复核 - 小看板</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 24px 30px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .header h1 { font-size: 24px; margin-bottom: 8px; }
+        .header p { opacity: 0.85; font-size: 14px; }
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            text-align: center;
+        }
+        .stat-card .num {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 6px;
+        }
+        .stat-card .label {
+            font-size: 13px;
+            color: #7f8c8d;
+        }
+        .stat-card.warning .num { color: #f39c12; }
+        .stat-card.danger .num { color: #e74c3c; }
+        .stat-card.purple .num { color: #9b59b6; }
+        .stat-card.info .num { color: #3498db; }
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .panel {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            overflow: hidden;
+        }
+        .panel-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #ecf0f1;
+            font-weight: 600;
+            color: #2c3e50;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .panel-body { padding: 16px 20px; }
+        .point-item {
+            padding: 14px;
+            border: 1px solid #e8e8e8;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .point-item:hover {
+            border-color: #3498db;
+            background: #f8fbff;
+        }
+        .point-item.boundary {
+            border-left: 4px solid #e74c3c;
+        }
+        .point-item .p-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        .point-item .p-name { font-weight: 600; color: #2c3e50; }
+        .point-item .p-status {
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            color: white;
+        }
+        .point-item .p-addr {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-bottom: 8px;
+        }
+        .point-item .p-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+        .tag {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            background: #ecf0f1;
+            color: #7f8c8d;
+        }
+        .tag.boundary { background: #fdecea; color: #e74c3c; }
+        .tag.night { background: #e8f4fd; color: #3498db; }
+        .tag.complaint { background: #f5eefb; color: #9b59b6; }
+        .flow-step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .flow-step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: 19px;
+            top: 45px;
+            bottom: -20px;
+            width: 2px;
+            background: #ecf0f1;
+        }
+        .flow-step .step-num {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #3498db;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+            margin-right: 16px;
+        }
+        .flow-step .step-content { flex: 1; }
+        .flow-step .step-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 6px;
+        }
+        .flow-step .step-desc {
+            font-size: 13px;
+            color: #7f8c8d;
+            line-height: 1.6;
+        }
+        .flow-step .step-actor {
+            font-size: 12px;
+            color: #3498db;
+            margin-top: 6px;
+            font-weight: 500;
+        }
+        .tip-box {
+            background: #fff8e1;
+            border-left: 4px solid #f39c12;
+            padding: 14px 18px;
+            border-radius: 6px;
+            font-size: 13px;
+            line-height: 1.7;
+            color: #7f6000;
+        }
+        .tip-box strong { color: #5a4000; }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        .btn:hover { background: #2980b9; }
+        .btn.secondary {
+            background: #95a5a6;
+        }
+        .btn.secondary:hover { background: #7f8c8d; }
+        .btn-row { display: flex; gap: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚻 公厕服务半径复核 - 小看板</h1>
+            <p>点位复核、边界识别、投诉补录一站式工作台</p>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="num" id="stat-total">5</div>
+                <div class="label">总点位</div>
+            </div>
+            <div class="stat-card warning">
+                <div class="num" id="stat-pending">2</div>
+                <div class="label">待复核</div>
+            </div>
+            <div class="stat-card danger">
+                <div class="num" id="stat-boundary">2</div>
+                <div class="label">边界待项目经理确认</div>
+            </div>
+            <div class="stat-card purple">
+                <div class="num" id="stat-complaint">2</div>
+                <div class="label">关联居民投诉</div>
+            </div>
+            <div class="stat-card info">
+                <div class="num" id="stat-night">2</div>
+                <div class="label">夜间采样点</div>
+            </div>
+        </div>
+
+        <div class="main-grid">
+            <div class="panel">
+                <div class="panel-header">
+                    <span>⚠️ 重点关注点位</span>
+                    <span style="font-size:12px;color:#95a5a6">点击查看详情</span>
+                </div>
+                <div class="panel-body" id="point-list">
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <span>📋 标准复核流程</span>
+                </div>
+                <div class="panel-body">
+                    <div class="flow-step">
+                        <div class="step-num">1</div>
+                        <div class="step-content">
+                            <div class="step-title">导入夜间采样点位</div>
+                            <div class="step-desc">将夜间采集的公厕点位数据导入系统，系统自动识别点位位置和街道归属。</div>
+                            <div class="step-actor">操作人：复核员</div>
+                        </div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="step-num">2</div>
+                        <div class="step-content">
+                            <div class="step-title">边界点位自动识别</div>
+                            <div class="step-desc">系统自动检测位于两个或多个街道交界处的点位，标记为边界待确认，不急着归正常。</div>
+                            <div class="step-actor">操作人：系统自动 → 项目经理复核</div>
+                        </div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="step-num">3</div>
+                        <div class="step-content">
+                            <div class="step-title">社区书记周姐补录投诉</div>
+                            <div class="step-desc">周姐核实是否有居民投诉，补录12345热线投诉编号，地图导出会跟着更新。</div>
+                            <div class="step-actor">操作人：社区书记周姐</div>
+                        </div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="step-num">4</div>
+                        <div class="step-content">
+                            <div class="step-title">导出复核地图</div>
+                            <div class="step-desc">地图导出包含：为什么被留下、还缺什么材料、下一步该找谁的说明。</div>
+                            <div class="step-actor">操作人：复核员</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel" style="margin-bottom: 20px;">
+            <div class="panel-header">
+                <span>💡 小提示</span>
+            </div>
+            <div class="panel-body">
+                <div class="tip-box">
+                    <strong>边界点位处理原则：</strong>点位在两个街道边界上时，别急着归正常，留给项目经理复查确认归属。
+                    以前总被当成小备注跳过，现在项目经理复查「公厕服务半径复核」时最先问到这一条。<br><br>
+                    <strong>地图导出不是冷冰冰的系统日志：</strong>每条点位都要说明「为什么被留下」「还缺什么材料」「下一步找项目经理还是找周姐」。
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <span>🎯 快捷操作</span>
+            </div>
+            <div class="panel-body">
+                <div class="btn-row">
+                    <a href="output/demo_flow_result.html" class="btn">查看演示地图</a>
+                    <button class="btn secondary" onclick="runDemo()">运行演示流程</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const demoPoints = [
+            { id: 'P-001', name: '人民公园公厕', addr: '和平街道人民公园东门', status: '待复核', color: '#f39c12', type: 'normal', boundary: false, complaint: false },
+            { id: 'P-002', name: '夜市路口公厕', addr: '和平街道与建设街道交界处夜市路口', status: '人工修正', color: '#3498db', type: 'night', boundary: true, complaint: true, complaint_no: 'TS-2026-0528-001' },
+            { id: 'P-003', name: '火车站广场公厕', addr: '建设街道火车站西广场', status: '待复核', color: '#f39c12', type: 'normal', boundary: false, complaint: false },
+            { id: 'P-004', name: '老街社区公厕', addr: '胜利街道老街社区12号', status: '待复核', color: '#f39c12', type: 'normal', boundary: false, complaint: false },
+            { id: 'P-005', name: '三岔口公厕', addr: '和平、建设、胜利三街道交界三岔口', status: '重跑完成', color: '#2ecc71', type: 'night', boundary: true, complaint: true, complaint_no: 'TS-2026-0603-015' }
+        ];
+
+        function renderPoints() {
+            const container = document.getElementById('point-list');
+            const boundaryPoints = demoPoints.filter(p => p.boundary);
+
+            if (boundaryPoints.length === 0) {
+                container.innerHTML = '<div style="text-align:center;padding:30px;color:#95a5a6">暂无重点关注点位</div>';
+                return;
+            }
+
+            container.innerHTML = boundaryPoints.map(p => `
+                <div class="point-item ${p.boundary ? 'boundary' : ''}">
+                    <div class="p-title">
+                        <span class="p-name">${p.name}</span>
+                        <span class="p-status" style="background:${p.color}">${p.status}</span>
+                    </div>
+                    <div class="p-addr">${p.addr}</div>
+                    <div class="p-tags">
+                        ${p.boundary ? '<span class="tag boundary">⚠️ 边界点位</span>' : ''}
+                        ${p.type === 'night' ? '<span class="tag night">🌙 夜间采样</span>' : ''}
+                        ${p.complaint ? `<span class="tag complaint">📋 ${p.complaint_no}</span>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function runDemo() {
+            alert('请在命令行运行：python cli.py demo_flow');
+        }
+
+        renderPoints();
+    </script>
+</body>
+</html>
