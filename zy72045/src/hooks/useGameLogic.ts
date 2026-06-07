@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useGameStore } from '../store/useGameStore';
-import { defaultLevel } from '../data';
+import { defaultLevel, getLevelById } from '../data';
 import type { NewsConfig } from '../types/game';
 
 export function useGameLogic() {
@@ -17,22 +17,28 @@ export function useGameLogic() {
     isLocked,
     settlement,
     settlementReason,
+    configId,
+    currentConfig,
     nextRound,
     executeTrade,
     addNewsToHistory,
   } = useGameStore();
 
+  const config = useMemo(() => {
+    return currentConfig || getLevelById(configId) || defaultLevel;
+  }, [currentConfig, configId]);
+
   const currentRoundConfig = useMemo(() => {
-    return defaultLevel.rounds.find((r) => r.roundNumber === currentRound);
-  }, [currentRound]);
+    return config.rounds.find((r) => r.roundNumber === currentRound);
+  }, [config, currentRound]);
 
   const currentNews = useMemo(() => {
     return currentRoundConfig?.news || [];
   }, [currentRoundConfig]);
 
   const availableStocks = useMemo(() => {
-    return defaultLevel.stocks;
-  }, []);
+    return config.stocks;
+  }, [config]);
 
   const totalReturn = useMemo(() => {
     return currentCapital - initialCapital;

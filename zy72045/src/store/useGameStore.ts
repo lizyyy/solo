@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { GameState, GameConfig, Position, TradeRecord, NewsConfig, Settlement, SettleTrigger, ValidationError } from '../types/game';
 import type { HistoryRecord, HistoryRound } from '../types/history';
-import { defaultLevel } from '../data';
+import { defaultLevel, getLevelById } from '../data';
 import { generateId, clamp } from '../utils/formatters';
 import { saveHistoryRecord } from '../utils/storage';
 
@@ -10,6 +10,7 @@ interface GameStore extends GameState {
   gameId: string | null;
   settlement: Settlement | null;
   rounds: HistoryRound[];
+  currentConfig: GameConfig | null;
   loadConfig: (config: GameConfig) => void;
   startGame: () => void;
   pauseGame: () => void;
@@ -39,6 +40,7 @@ const getInitialState = (config: GameConfig = defaultLevel) => ({
   gameId: null as string | null,
   configId: config.id,
   configName: config.name,
+  currentConfig: config,
   status: 'pending' as const,
   currentRound: 1,
   totalRounds: config.totalRounds,
@@ -98,25 +100,24 @@ export const useGameStore = create<GameStore>()(
 
       restartGame: () => {
         const state = get();
-        const config = defaultLevel;
+        const config = state.currentConfig || getLevelById(state.configId) || defaultLevel;
         set({
           ...getInitialState(config),
           rounds: [],
           gameId: generateId(),
-          configId: state.configId,
-          configName: state.configName,
         });
       },
 
       nextRound: () => {
         const state = get();
         const nextRound = state.currentRound + 1;
+        const config = state.currentConfig || getLevelById(state.configId) || defaultLevel;
 
         const currentRoundData: HistoryRound = {
           roundNumber: state.currentRound,
           marketIndex: state.marketIndex,
           news: state.newsHistory.filter((n) => {
-            const roundConfig = defaultLevel.rounds.find((r) => r.roundNumber === state.currentRound);
+            const roundConfig = config.rounds.find((r) => r.roundNumber === state.currentRound);
             return roundConfig?.news.some((rn) => rn.id === n.id);
           }),
           trades: state.trades.filter((t) => t.roundNumber === state.currentRound),
@@ -128,7 +129,7 @@ export const useGameStore = create<GameStore>()(
         if (nextRound > state.totalRounds) {
           get().settleGame('round_end');
         } else {
-          const nextRoundConfig = defaultLevel.rounds.find((r) => r.roundNumber === nextRound);
+          const nextRoundConfig = config.rounds.find((r) => r.roundNumber === nextRound);
           set({
             currentRound: nextRound,
             marketIndex: nextRoundConfig?.marketIndex || state.marketIndex,
@@ -231,7 +232,9 @@ export const useGameStore = create<GameStore>()(
               profitLossPercent: (price - totalCost / totalQuantity) / (totalCost / totalQuantity),
             };
           } else {
-            const stockConfig = defaultLevel.stocks.find((s) => s.symbol === symbol);
+            const state = get();
+            const config = state.currentConfig || getLevelById(state.configId) || defaultLevel;
+            const stockConfig = config.stocks.find((s) => s.symbol === symbol);
             newPositions.push({
               symbol,
               name: stockConfig?.name || symbol,
@@ -329,7 +332,8 @@ export const useGameStore = create<GameStore>()(
       },
 
       resetAll: () => {
-        const config = defaultLevel;
+        const state = get();
+        const config = state.currentConfig || getLevelById(state.configId) || defaultLevel;
         set({
           ...getInitialState(config),
           rounds: [],
@@ -343,6 +347,7 @@ export const useGameStore = create<GameStore>()(
         gameId: state.gameId,
         configId: state.configId,
         configName: state.configName,
+        currentConfig: state.currentConfig,
         status: state.status,
         currentRound: state.currentRound,
         totalRounds: state.totalRounds,

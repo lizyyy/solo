@@ -103,6 +103,7 @@ export interface GameState {
   gameId: string | null;
   configId: string;
   configName: string;
+  currentConfig: GameConfig | null;
   status: GameStatus;
   currentRound: number;
   totalRounds: number;
