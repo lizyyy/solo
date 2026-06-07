@@ -1,0 +1,140 @@
+{
+  "slices": [
+    {
+      "slice_id": "slice_20260607_001",
+      "timestamp": "2026-06-07T11:37:06.227919",
+      "features": {
+        "user_click_rate_7d": 0.0932,
+        "user_order_rate_30d": 0.0427,
+        "item_cvr": 0.0294,
+        "item_price_level": 4,
+        "context_time_slot": "morning"
+      },
+      "reward_score": 0.8603,
+      "predicted_reward": 0.5855,
+      "context": {
+        "user_id": "user_0000",
+        "item_id": "item_0000"
+      }
+    },
+    {
+      "slice_id": "slice_20260607_002",
+      "timestamp": "2026-06-07T12:07:06.227919",
+      "features": {
+        "user_click_rate_7d": 0.1049,
+        "user_order_rate_30d": 0.0246,
+        "item_cvr": 0.0323,
+        "item_price_level": 5,
+        "context_time_slot": "evening"
+      },
+      "reward_score": 0.4336,
+      "predicted_reward": 0.2436,
+      "context": {
+        "user_id": "user_0001",
+        "item_id": "item_0001"
+      }
+    },
+    {
+      "slice_id": "slice_20260607_003",
+      "timestamp": "2026-06-07T12:37:06.227919",
+      "features": {
+        "user_click_rate_7d": null,
+        "user_order_rate_30d": 0.0399,
+        "item_cvr": 0.0106,
+        "item_price_level": 2,
+        "context_time_slot": "morning"
+      },
+      "reward_score": 1.0,
+      "predicted_reward": 0.7909,
+      "context": {
+        "user_id": "user_0002",
+        "item_id": "item_0002"
+      }
+    },
+    {
+      "slice_id": "slice_20260607_004",
+      "timestamp": "2026-06-07T13:07:06.227919",
+      "features": {
+        "user_click_rate_7d": 0.1242,
+        "user_order_rate_30d": 0.0466,
+        "item_cvr": 0.0538,
+        "item_price_level": 5,
+        "context_time_slot": "night"
+      },
+      "reward_score": 0.6547,
+      "predicted_reward": 0.541,
+      "context": {
+        "user_id": "user_0003",
+        "item_id": "item_0003"
+      }
+    },
+    {
+      "slice_id": "slice_20260607_005",
+      "timestamp": "2026-06-07T13:37:06.227919",
+      "features": {
+        "user_click_rate_7d": 0.0918,
+        "user_order_rate_30d": 0.0076,
+        "item_cvr": 0.053,
+        "item_price_level": 2,
+        "context_time_slot": "evening"
+      },
+      "reward_score": 0.2548,
+      "predicted_reward": 0.2667,
+      "context": {
+        "user_id": "user_0004",
+        "item_id": "item_0004"
+      }
+    },
+    {
+      "slice_id": "slice_20260607_006",
+      "timestamp": "2026-06-07T14:07:06.227919",
+      "features": {
+        "user_click_rate_7d": null,
+        "user_order_rate_30d": null,
+        "item_cvr": 0.0687,
+        "item_price_level": 5,
+        "context_time_slot": "afternoon"
+      },
+      "reward_score": 0.4624,
+      "predicted_reward": 0.4236,
+      "context": {
+        "user_id": "user_0005",
+        "item_id": "item_0005"
+      }
+    },
+    {
+      "slice_id": "slice_20260607_007",
+      "timestamp": "2026-06-07T14:37:06.227919",
+      "features": {
+        "user_click_rate_7d": 0.027,
+        "user_order_rate_30d": 0.0186,
+        "item_cvr": 0.0708,
+        "item_price_level": 2,
+        "context_time_slot": "night"
+      },
+      "reward_score": 0.9558,
+      "predicted_reward": 0.6908,
+      "context": {
+        "user_id": "user_0006",
+        "item_id": "item_0006"
+      }
+    },
+    {
+      "slice_id": "slice_20260607_008",
+      "timestamp": "2026-06-07T15:07:06.227919",
+      "features": {
+        "user_click_rate_7d": null,
+        "user_order_rate_30d": 0.0419,
+        "item_cvr": 0.044,
+        "item_price_level": 4,
+        "context_time_slot": "morning"
+      },
+      "reward_score": 0.6798,
+      "predicted_reward": 0.4294,
+      "context": {
+        "user_id": "user_0007",
+        "item_id": "item_0007"
+      }
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+default_values:
+  context_time_slot: unknown
+  item_cvr: 0.02
+  item_price_level: 2
+  user_click_rate_7d: 0.05
+  user_order_rate_30d: 0.01
+feature_descriptions:
+  context_time_slot: 上下文时间段
+  item_cvr: 商品转化率
+  item_price_level: 商品价格档位
+  user_click_rate_7d: 用户近7天点击率
+  user_order_rate_30d: 用户近30天下单率
+feature_list:
+- user_click_rate_7d
+- user_order_rate_30d
+- item_cvr
+- item_price_level
+- context_time_slot
+model_name: rl_recommender_v2
+param_id: example_param_001
+reward_weights:
+  item_cvr: 0.2
+  item_price_level: 0.1
+  user_click_rate_7d: 0.3
+  user_order_rate_30d: 0.4
+threshold_config:
+  user_click_rate_7d:
+    max: 1.0
+    min: 0.0
+    outlier_threshold: 3.0
+  user_order_rate_30d:
+    max: 1.0
+    min: 0.0
+    outlier_threshold: 3.0
+version: '1.0'
