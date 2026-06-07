@@ -1,0 +1,58 @@
+[
+  {
+    "ticket_id": "TK_001",
+    "user_id": "U_1001",
+    "user_feedback": "模型生成的回答中包含了我的手机号，没有按要求脱敏处理，这很不安全",
+    "submit_time": "2026-06-05T10:23:45",
+    "source_channel": "app",
+    "model_version": "v2.3.1"
+  },
+  {
+    "ticket_id": "TK_002",
+    "user_id": "U_1001",
+    "user_feedback": "AI回答里把我的手机号泄露了，没有做脱敏，这个问题很严重啊",
+    "submit_time": "2026-06-05T10:45:12",
+    "source_channel": "app",
+    "model_version": "v2.3.1"
+  },
+  {
+    "ticket_id": "TK_003",
+    "user_id": "U_1001",
+    "user_feedback": "我的手机号被模型输出了，没有脱敏，希望尽快处理这个安全问题",
+    "submit_time": "2026-06-05T11:02:33",
+    "source_channel": "web",
+    "model_version": "v2.3.1"
+  },
+  {
+    "ticket_id": "TK_004",
+    "user_id": "U_2002",
+    "user_feedback": "翻译功能的准确率有点低，专业术语翻译得不太对",
+    "submit_time": "2026-06-05T09:15:00",
+    "source_channel": "app",
+    "model_version": "v2.3.0"
+  },
+  {
+    "ticket_id": "TK_005",
+    "user_id": "U_3003",
+    "user_feedback": "页面加载速度很慢，特别是在打开大文档的时候",
+    "submit_time": "2026-06-05T14:30:22",
+    "source_channel": "web",
+    "model_version": "v2.3.1"
+  },
+  {
+    "ticket_id": "TK_006",
+    "user_id": "U_3003",
+    "user_feedback": "大文件打开的时候加载速度特别慢，能不能优化一下",
+    "submit_time": "2026-06-05T15:10:45",
+    "source_channel": "web",
+    "model_version": "v2.3.1"
+  },
+  {
+    "ticket_id": "TK_007",
+    "user_id": "U_4004",
+    "user_feedback": "建议增加暗黑模式，晚上使用的时候眼睛会舒服一些",
+    "submit_time": "2026-06-05T20:45:11",
+    "source_channel": "app",
+    "model_version": "v2.3.1"
+  }
+]

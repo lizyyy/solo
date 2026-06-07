@@ -1,0 +1,164 @@
+[
+  {
+    "review_id": "rev_0a961aaf",
+    "ticket_id": "TK_001",
+    "status": "need_more_info",
+    "duplicate_group_id": "grp_7199569a",
+    "evidence": {
+      "why_kept": "该工单与同用户 2 条其他工单（TK_002, TK_003）文本相似度达 23.51%，疑似重复计入。按规则不自动归为正常，留待标注负责人人工复核确认。",
+      "missing_materials": [
+        "缺少标注负责人的最终复核结论",
+        "缺少原始工单页面跳转链接或截图证据"
+      ],
+      "next_owner": "annotation_lead",
+      "next_action": "阿宁已补录脱敏规则，请标注负责人继续复核确认",
+      "confidence_score": 0.2351,
+      "duplicate_ticket_ids": [
+        "TK_002",
+        "TK_003"
+      ],
+      "reasoning_detail": "判定依据：同用户 + 反馈文本高度相似。编辑部校稿原则：疑似重复不得自动放行，须人工确认。当前有脱敏备注：是。"
+    },
+    "reviewed_by": null,
+    "reviewed_at": null,
+    "created_at": "2026-06-07 13:01:29.654817"
+  },
+  {
+    "review_id": "rev_7500c148",
+    "ticket_id": "TK_002",
+    "status": "duplicate_detected",
+    "duplicate_group_id": "grp_7199569a",
+    "evidence": {
+      "why_kept": "该工单与同用户 2 条其他工单（TK_001, TK_003）文本相似度达 23.51%，疑似重复计入。按规则不自动归为正常，留待标注负责人人工复核确认。",
+      "missing_materials": [
+        "缺少 AI 产品经理阿宁补录的脱敏规则备注",
+        "缺少标注负责人的最终复核结论",
+        "缺少原始工单页面跳转链接或截图证据"
+      ],
+      "next_owner": "annotation_lead",
+      "next_action": "请标注负责人核对是否确为同一用户重复反馈，确认后标记为重复或恢复正常",
+      "confidence_score": 0.2351,
+      "duplicate_ticket_ids": [
+        "TK_001",
+        "TK_003"
+      ],
+      "reasoning_detail": "判定依据：同用户 + 反馈文本高度相似。编辑部校稿原则：疑似重复不得自动放行，须人工确认。当前有脱敏备注：否。"
+    },
+    "reviewed_by": null,
+    "reviewed_at": null,
+    "created_at": "2026-06-07 13:01:29.655778"
+  },
+  {
+    "review_id": "rev_b7cf10ea",
+    "ticket_id": "TK_003",
+    "status": "duplicate_detected",
+    "duplicate_group_id": "grp_7199569a",
+    "evidence": {
+      "why_kept": "该工单与同用户 2 条其他工单（TK_001, TK_002）文本相似度达 23.51%，疑似重复计入。按规则不自动归为正常，留待标注负责人人工复核确认。",
+      "missing_materials": [
+        "缺少 AI 产品经理阿宁补录的脱敏规则备注",
+        "缺少标注负责人的最终复核结论",
+        "缺少原始工单页面跳转链接或截图证据"
+      ],
+      "next_owner": "annotation_lead",
+      "next_action": "请标注负责人核对是否确为同一用户重复反馈，确认后标记为重复或恢复正常",
+      "confidence_score": 0.2351,
+      "duplicate_ticket_ids": [
+        "TK_001",
+        "TK_002"
+      ],
+      "reasoning_detail": "判定依据：同用户 + 反馈文本高度相似。编辑部校稿原则：疑似重复不得自动放行，须人工确认。当前有脱敏备注：否。"
+    },
+    "reviewed_by": null,
+    "reviewed_at": null,
+    "created_at": "2026-06-07 13:01:29.656382"
+  },
+  {
+    "review_id": "rev_bca27167",
+    "ticket_id": "TK_004",
+    "status": "pending",
+    "duplicate_group_id": null,
+    "evidence": {
+      "why_kept": "该工单未发现同一用户重复反馈特征，暂作为正常工单记录。",
+      "missing_materials": [
+        "缺少脱敏规则备注，建议 AI 产品经理阿宁补录"
+      ],
+      "next_owner": "ai_product_manager",
+      "next_action": "建议阿宁补录脱敏规则备注后再观察",
+      "confidence_score": 0.95,
+      "duplicate_ticket_ids": [],
+      "reasoning_detail": "判定依据：未匹配到同用户高相似度反馈。脱敏备注状态：未补录。"
+    },
+    "reviewed_by": null,
+    "reviewed_at": null,
+    "created_at": "2026-06-07 13:01:29.656654"
+  },
+  {
+    "review_id": "rev_9875c5e4",
+    "ticket_id": "TK_005",
+    "status": "duplicate_detected",
+    "duplicate_group_id": "grp_088c8c90",
+    "evidence": {
+      "why_kept": "该工单与同用户 1 条其他工单（TK_006）文本相似度达 35.89%，疑似重复计入。按规则不自动归为正常，留待标注负责人人工复核确认。",
+      "missing_materials": [
+        "缺少 AI 产品经理阿宁补录的脱敏规则备注",
+        "缺少标注负责人的最终复核结论",
+        "缺少原始工单页面跳转链接或截图证据"
+      ],
+      "next_owner": "annotation_lead",
+      "next_action": "请标注负责人核对是否确为同一用户重复反馈，确认后标记为重复或恢复正常",
+      "confidence_score": 0.3589,
+      "duplicate_ticket_ids": [
+        "TK_006"
+      ],
+      "reasoning_detail": "判定依据：同用户 + 反馈文本高度相似。编辑部校稿原则：疑似重复不得自动放行，须人工确认。当前有脱敏备注：否。"
+    },
+    "reviewed_by": null,
+    "reviewed_at": null,
+    "created_at": "2026-06-07 13:01:29.657073"
+  },
+  {
+    "review_id": "rev_a538f53d",
+    "ticket_id": "TK_006",
+    "status": "duplicate_detected",
+    "duplicate_group_id": "grp_088c8c90",
+    "evidence": {
+      "why_kept": "该工单与同用户 1 条其他工单（TK_005）文本相似度达 35.89%，疑似重复计入。按规则不自动归为正常，留待标注负责人人工复核确认。",
+      "missing_materials": [
+        "缺少 AI 产品经理阿宁补录的脱敏规则备注",
+        "缺少标注负责人的最终复核结论",
+        "缺少原始工单页面跳转链接或截图证据"
+      ],
+      "next_owner": "annotation_lead",
+      "next_action": "请标注负责人核对是否确为同一用户重复反馈，确认后标记为重复或恢复正常",
+      "confidence_score": 0.3589,
+      "duplicate_ticket_ids": [
+        "TK_005"
+      ],
+      "reasoning_detail": "判定依据：同用户 + 反馈文本高度相似。编辑部校稿原则：疑似重复不得自动放行，须人工确认。当前有脱敏备注：否。"
+    },
+    "reviewed_by": null,
+    "reviewed_at": null,
+    "created_at": "2026-06-07 13:01:29.657621"
+  },
+  {
+    "review_id": "rev_3be643ae",
+    "ticket_id": "TK_007",
+    "status": "pending",
+    "duplicate_group_id": null,
+    "evidence": {
+      "why_kept": "该工单未发现同一用户重复反馈特征，暂作为正常工单记录。",
+      "missing_materials": [
+        "缺少脱敏规则备注，建议 AI 产品经理阿宁补录"
+      ],
+      "next_owner": "ai_product_manager",
+      "next_action": "建议阿宁补录脱敏规则备注后再观察",
+      "confidence_score": 0.95,
+      "duplicate_ticket_ids": [],
+      "reasoning_detail": "判定依据：未匹配到同用户高相似度反馈。脱敏备注状态：未补录。"
+    },
+    "reviewed_by": null,
+    "reviewed_at": null,
+    "created_at": "2026-06-07 13:01:29.657949"
+  }
+]
