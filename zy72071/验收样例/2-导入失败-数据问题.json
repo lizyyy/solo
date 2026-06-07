@@ -1,0 +1,63 @@
+{
+  "name": "城市雨洪淹没演练-问题数据",
+  "source": "验收测试用-问题数据样例",
+  "operator": "测试用户",
+  "status": "draft",
+  "coordinateSystems": [
+    {
+      "id": "coord-a",
+      "name": "坐标系A-WGS84",
+      "color": "#3b82f6",
+      "offset": { "x": 0, "y": 0, "z": 0 }
+    }
+  ],
+  "points": [
+    {
+      "id": "p001",
+      "name": "正常点位",
+      "deviceId": "SENSOR-001",
+      "position": { "x": 5, "y": 0, "z": 5 },
+      "coordinateSystemId": "coord-a",
+      "floor": 1,
+      "hasPhoto": false,
+      "originalData": {},
+      "anomalies": []
+    },
+    {
+      "name": "缺少ID的问题点位",
+      "deviceId": "SENSOR-002",
+      "position": { "x": 10, "y": 0, "z": 10 },
+      "coordinateSystemId": "coord-a",
+      "floor": 1,
+      "hasPhoto": true,
+      "photoUrl": "应该有照片数据但没有",
+      "originalData": {},
+      "anomalies": []
+    },
+    {
+      "id": "p003",
+      "name": "缺少坐标的点位",
+      "deviceId": "SENSOR-003",
+      "coordinateSystemId": "coord-a",
+      "floor": 1,
+      "hasPhoto": false,
+      "originalData": {},
+      "anomalies": []
+    },
+    {
+      "id": "p004",
+      "name": "号称有照片但没有数据的点位",
+      "deviceId": "SENSOR-004",
+      "position": { "x": 20, "y": 0, "z": 20 },
+      "coordinateSystemId": "coord-a",
+      "floor": 1,
+      "hasPhoto": true,
+      "originalData": {},
+      "anomalies": []
+    }
+  ],
+  "judgmentTraces": [],
+  "reviewNotes": [],
+  "importRecords": [],
+  "handoverRecords": []
+}

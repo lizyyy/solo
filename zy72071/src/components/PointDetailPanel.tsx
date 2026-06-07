@@ -14,6 +14,11 @@ const actionLabels: Record<string, { label: string; icon: string }> = {
   auto_detect: { label: '自动检测', icon: '🔍' },
   manual_judge: { label: '人工判断', icon: '✋' },
   supplement_note: { label: '补充备注', icon: '📝' },
+  import_success: { label: '导入成功', icon: '✅' },
+  import_fail: { label: '导入失败', icon: '❌' },
+  export: { label: '导出方案', icon: '📤' },
+  review_verify: { label: '复核校验', icon: '✔️' },
+  handover: { label: '交接报告', icon: '📋' },
 };
 
 interface PointDetailPanelProps {

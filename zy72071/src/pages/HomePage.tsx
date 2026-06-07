@@ -10,6 +10,9 @@ import {
   Trash2,
   Play,
   FolderOpen,
+  CheckCircle,
+  XCircle,
+  X,
 } from 'lucide-react';
 import { useProjectStore } from '../store/projectStore';
 import { createSampleProject } from '../data/sampleData';
@@ -17,9 +20,15 @@ import type { Project } from '../types';
 
 export function HomePage() {
   const navigate = useNavigate();
-  const { projects, loadProjects, addProject, deleteProject, importProject } =
-    useProjectStore();
-  const [importError, setImportError] = useState<string | null>(null);
+  const {
+    projects,
+    loadProjects,
+    addProject,
+    deleteProject,
+    importProject,
+    lastImportResult,
+    clearLastImportResult,
+  } = useProjectStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -53,15 +62,9 @@ export function HomePage() {
     reader.onload = (event) => {
       try {
         const data = JSON.parse(event.target?.result as string);
-        const result = importProject(data);
-
-        if (result.success) {
-          setImportError(null);
-        } else {
-          setImportError(result.error || '导入失败');
-        }
+        importProject(data, file.name);
       } catch (error) {
-        setImportError('文件格式错误，请确保是有效的JSON文件');
+        importProject({ invalid: true }, file.name);
       }
     };
     reader.readAsText(file);
@@ -119,11 +122,42 @@ export function HomePage() {
         </div>
       </header>
 
-      {importError && (
+      {lastImportResult && (
         <div className="max-w-6xl mx-auto px-6 mt-4">
-          <div className="bg-red-900/30 border border-red-500/50 text-red-200 px-4 py-3 rounded-lg flex items-center gap-2">
-            <AlertTriangle size={18} />
-            <span>{importError}</span>
+          <div
+            className={`px-4 py-3 rounded-lg flex items-center justify-between ${
+              lastImportResult.success
+                ? 'bg-green-900/30 border border-green-500/50 text-green-200'
+                : 'bg-red-900/30 border border-red-500/50 text-red-200'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              {lastImportResult.success ? (
+                <CheckCircle size={18} />
+              ) : (
+                <XCircle size={18} />
+              )}
+              <div>
+                <span className="font-medium">
+                  {lastImportResult.success ? '导入成功' : '导入失败'}
+                </span>
+                <span className="mx-2">·</span>
+                <span className="text-sm opacity-80">
+                  文件：{lastImportResult.filename}
+                </span>
+                {lastImportResult.error && (
+                  <div className="text-sm mt-1 whitespace-pre-line">
+                    {lastImportResult.error}
+                  </div>
+                )}
+              </div>
+            </div>
+            <button
+              onClick={clearLastImportResult}
+              className="p-1 hover:bg-white/10 rounded"
+            >
+              <X size={16} />
+            </button>
           </div>
         </div>
       )}

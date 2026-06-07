@@ -5,10 +5,10 @@ import {
   Camera,
   Download,
   FileText,
-  Layers,
   Eye,
   EyeOff,
   Save,
+  FileSpreadsheet,
 } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import { Scene3D } from '../components/Scene3D';
@@ -23,8 +23,14 @@ type ViewMode = '3d' | 'table';
 export function ProjectPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { projects, currentProject, selectedPointId, setCurrentProject } =
-    useProjectStore();
+  const {
+    projects,
+    currentProject,
+    selectedPointId,
+    setCurrentProject,
+    addJudgmentTrace,
+    generateHandoverReport,
+  } = useProjectStore();
 
   const [viewMode, setViewMode] = useState<ViewMode>('3d');
   const [showStats, setShowStats] = useState(true);
@@ -64,11 +70,38 @@ export function ProjectPage() {
       type: 'application/json',
     });
     const url = URL.createObjectURL(blob);
+    const filename = `${project.name}-${new Date().toISOString().split('T')[0]}.json`;
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${project.name}-${new Date().toISOString().split('T')[0]}.json`;
+    a.download = filename;
     a.click();
     URL.revokeObjectURL(url);
+
+    addJudgmentTrace({
+      action: 'export',
+      operator: '当前用户',
+      remark: `导出方案JSON文件：${filename}，共 ${project.points.length} 个点位`,
+    });
+  };
+
+  const handleExportHandoverReport = () => {
+    const html = generateHandoverReport();
+    if (!html) return;
+
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const filename = `${project.name}-交接报告-${new Date().toISOString().split('T')[0]}.html`;
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+
+    addJudgmentTrace({
+      action: 'handover',
+      operator: '当前用户',
+      remark: `生成交接报告：${filename}`,
+    });
   };
 
   const handleScreenshot = async () => {
@@ -176,6 +209,13 @@ export function ProjectPage() {
               截图
             </button>
 
+            <button
+              onClick={handleExportHandoverReport}
+              className="flex items-center gap-1.5 px-3 py-2 bg-orange-600 hover:bg-orange-700 rounded text-white text-sm transition-colors"
+            >
+              <FileSpreadsheet size={16} />
+              交接报告
+            </button>
             <button
               onClick={handleExportProject}
               className="flex items-center gap-1.5 px-3 py-2 bg-primary-600 hover:bg-primary-700 rounded text-white text-sm transition-colors"

@@ -310,4 +310,24 @@ export const createSampleProject = (): Project => ({
       originalContent: '补充：B1层跨楼层关联重要',
     },
   ],
+  importRecords: [
+    {
+      id: 'import-001',
+      filename: '南区演练原始数据-20240615.json',
+      importedAt: '2024-06-15T09:25:00.000Z',
+      operator: '许姐',
+      success: true,
+      sourceOrigin: '2024年6月15日现场采集 + 外协单位提供',
+    },
+  ],
+  handoverRecords: [
+    {
+      id: 'handover-001',
+      handedOverBy: '许姐',
+      receivedBy: '待接手人',
+      handedOverAt: '2024-06-15T15:00:00.000Z',
+      remarks: '方案待复核，异常点已全部标注',
+      keyDecisionsSummary: '1. 坐标系不强行合并，分开显示；2. 设备重名保留原记录不合并；3. 2号泵站维护中影响排水能力30%',
+    },
+  ],
 });

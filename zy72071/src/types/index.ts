@@ -30,11 +30,11 @@ export interface Point {
   reviewNote?: string;
 }
 
-export type JudgmentAction = 'import' | 'auto_detect' | 'manual_judge' | 'supplement_note';
+export type JudgmentAction = 'import' | 'auto_detect' | 'manual_judge' | 'supplement_note' | 'import_success' | 'import_fail' | 'export' | 'review_verify' | 'handover';
 
 export interface JudgmentTrace {
   id: string;
-  pointId: string;
+  pointId?: string;
   action: JudgmentAction;
   operator: string;
   timestamp: string;
@@ -53,6 +53,25 @@ export interface ReviewNote {
   originalContent?: string;
 }
 
+export interface ImportRecord {
+  id: string;
+  filename: string;
+  importedAt: string;
+  operator: string;
+  success: boolean;
+  errorMessage?: string;
+  sourceOrigin: string;
+}
+
+export interface HandoverRecord {
+  id: string;
+  handedOverBy: string;
+  receivedBy: string;
+  handedOverAt: string;
+  remarks: string;
+  keyDecisionsSummary: string;
+}
+
 export interface Project {
   id: string;
   name: string;
@@ -65,6 +84,8 @@ export interface Project {
   points: Point[];
   judgmentTraces: JudgmentTrace[];
   reviewNotes: ReviewNote[];
+  importRecords: ImportRecord[];
+  handoverRecords: HandoverRecord[];
 }
 
 export interface AnomalyStats {
