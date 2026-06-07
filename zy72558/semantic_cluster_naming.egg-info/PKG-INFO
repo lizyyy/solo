@@ -1,0 +1,12 @@
+Metadata-Version: 2.4
+Name: semantic-cluster-naming
+Version: 0.1.0
+Summary: 语义向量聚类命名系统 - 带自检和审计追踪的可复现聚类平台
+Requires-Python: >=3.9
+Requires-Dist: sqlalchemy>=2.0.0
+Requires-Dist: pandas>=2.0.0
+Requires-Dist: numpy>=1.24.0
+Requires-Dist: scikit-learn>=1.3.0
+Requires-Dist: click>=8.1.0
+Requires-Dist: rich>=13.0.0
+Requires-Dist: pydantic>=2.0.0
