@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>应急避难点容量校核系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #303133; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px 40px; }
+        .header h1 { font-size: 24px; margin-bottom: 5px; }
+        .header p { opacity: 0.9; font-size: 14px; }
+        .container { max-width: 1400px; margin: 20px auto; padding: 0 20px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #e4e7ed; }
+        .tab { padding: 12px 24px; cursor: pointer; border-radius: 8px 8px 0 0; font-weight: 500; transition: all 0.3s; }
+        .tab:hover { background: #e8eaef; }
+        .tab.active { background: white; color: #667eea; border-bottom: 3px solid #667eea; margin-bottom: -2px; }
+        .panel { display: none; background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+        .panel.active { display: block; }
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-bottom: 20px; }
+        .stat-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 12px; }
+        .stat-card.warning { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .stat-card.success { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .stat-card.danger { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+        .stat-card h3 { font-size: 14px; opacity: 0.9; margin-bottom: 8px; }
+        .stat-card .value { font-size: 32px; font-weight: 700; }
+        table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ebeef5; }
+        th { background: #fafafa; font-weight: 600; color: #606266; }
+        tr:hover { background: #f5f7fa; }
+        .badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .badge-normal { background: #e1f3d8; color: #67c23a; }
+        .badge-warning { background: #faecd8; color: #e6a23c; }
+        .badge-danger { background: #fde2e2; color: #f56c6c; }
+        .badge-pending { background: #d9ecff; color: #409eff; }
+        .badge-confirmed { background: #e1f3d8; color: #67c23a; }
+        .badge-rejected { background: #fde2e2; color: #f56c6c; }
+        .badge-suspended { background: #faecd8; color: #e6a23c; }
+        .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.3s; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-primary:hover { background: #5a6fd6; }
+        .btn-success { background: #67c23a; color: white; }
+        .btn-danger { background: #f56c6c; color: white; }
+        .btn-sm { padding: 4px 12px; font-size: 12px; }
+        .conflict-item { border: 1px solid #ebeef5; border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+        .conflict-item h4 { color: #667eea; margin-bottom: 8px; }
+        .conflict-evidence { background: #f5f7fa; padding: 12px; border-radius: 6px; margin: 12px 0; }
+        .conflict-evidence p { margin: 4px 0; font-size: 13px; }
+        .conflict-actions { display: flex; gap: 10px; margin-top: 12px; }
+        .workflow-step { display: flex; align-items: center; gap: 10px; padding: 16px; border: 2px solid #e4e7ed; border-radius: 8px; margin-bottom: 12px; }
+        .workflow-step.active { border-color: #667eea; background: #ecf0ff; }
+        .workflow-step.completed { border-color: #67c23a; background: #f0f9eb; }
+        .workflow-step.suspended { border-color: #e6a23c; background: #fdf6ec; }
+        .step-number { width: 36px; height: 36px; border-radius: 50%; background: #909399; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+        .workflow-step.active .step-number { background: #667eea; }
+        .workflow-step.completed .step-number { background: #67c23a; }
+        .workflow-step.suspended .step-number { background: #e6a23c; }
+        .step-info { flex: 1; }
+        .step-info h4 { margin-bottom: 4px; }
+        .step-info p { font-size: 13px; color: #909399; }
+        .param-item { padding: 16px; border-left: 4px solid #667eea; background: #f5f7fa; margin-bottom: 12px; border-radius: 0 8px 8px 0; }
+        .param-item h4 { color: #667eea; margin-bottom: 4px; }
+        .param-item .version { font-size: 12px; color: #909399; margin-bottom: 8px; }
+        .param-item .rationale { font-size: 13px; color: #606266; background: white; padding: 8px; border-radius: 4px; }
+        .check-item { padding: 16px; border-radius: 8px; margin-bottom: 12px; border: 1px solid #ebeef5; }
+        .check-item.pass { border-left: 4px solid #67c23a; }
+        .check-item.warning { border-left: 4px solid #e6a23c; }
+        .check-item.error { border-left: 4px solid #f56c6c; }
+        .check-item h4 { margin-bottom: 8px; }
+        .check-item .details { font-size: 13px; color: #606266; }
+        .section-title { font-size: 18px; font-weight: 600; margin: 24px 0 16px; padding-bottom: 8px; border-bottom: 2px solid #667eea; display: inline-block; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏘️ 应急避难点容量校核系统</h1>
+        <p>数据同源 · 冲突透明 · 流程留痕 · 改道复核</p>
+    </div>
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" data-tab="overview">总览</div>
+            <div class="tab" data-tab="capacity">容量校核</div>
+            <div class="tab" data-tab="conflicts">冲突处理</div>
+            <div class="tab" data-tab="selfcheck">系统自检</div>
+            <div class="tab" data-tab="workflow">三步流程</div>
+            <div class="tab" data-tab="params">参数说明</div>
+        </div>
+
+        <div class="panel active" id="panel-overview">
+            <h2 class="section-title">系统总览</h2>
+            <div class="card-grid" id="stats-grid"></div>
+            <h3 class="section-title">最新容量校核结果（数据同源：页面/接口/导出同一份）</h3>
+            <table id="overview-table">
+                <thead>
+                    <tr>
+                        <th>避难点名称</th>
+                        <th>设计容量</th>
+                        <th>校核容量</th>
+                        <th>偏差率</th>
+                        <th>等级</th>
+                        <th>改道影响</th>
+                        <th>居民复核</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div class="panel" id="panel-capacity">
+            <h2 class="section-title">容量校核明细</h2>
+            <button class="btn btn-primary" onclick="recalculateAll()">重新计算全部</button>
+            <table id="capacity-table">
+                <thead>
+                    <tr>
+                        <th>避难点名称</th>
+                        <th>设计容量</th>
+                        <th>校核容量</th>
+                        <th>偏差</th>
+                        <th>偏差率</th>
+                        <th>等级</th>
+                        <th>数据源</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div class="panel" id="panel-conflicts">
+            <h2 class="section-title">冲突处理（交通协管老马确认/驳回，不自动拍板）</h2>
+            <button class="btn btn-primary" onclick="detectConflicts()">重新检测冲突</button>
+            <div id="conflicts-list"></div>
+        </div>
+
+        <div class="panel" id="panel-selfcheck">
+            <h2 class="section-title">系统自检（覆盖4个易错点）</h2>
+            <button class="btn btn-primary" onclick="runSelfCheck()">运行自检</button>
+            <div id="selfcheck-list"></div>
+            <div style="margin-top: 20px;">
+                <button class="btn btn-success" onclick="verifyConsistency()">验证数据一致性</button>
+                <span id="consistency-result" style="margin-left: 12px;"></span>
+            </div>
+        </div>
+
+        <div class="panel" id="panel-workflow">
+            <h2 class="section-title">三步业务流程演示</h2>
+            <p style="margin-bottom: 16px; color: #606266;">流程：红线图备注导入 → 老马补看巡查表 → 点位清单更新。遇临时改道自动挂起，待居民代表复核。</p>
+            <div id="workflow-list"></div>
+        </div>
+
+        <div class="panel" id="panel-params">
+            <h2 class="section-title">计算参数与取舍理由（结果旁边有版本和依据）</h2>
+            <div id="params-list"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+
+        async function fetchJSON(url) {
+            const res = await fetch(API_BASE + url);
+            return await res.json();
+        }
+
+        async function postJSON(url, data = {}) {
+            const res = await fetch(API_BASE + url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            return await res.json();
+        }
+
+        function levelBadge(level) {
+            const map = { normal: 'badge-normal', warning: 'badge-warning', danger: 'badge-danger' };
+            const text = { normal: '正常', warning: '预警', danger: '危险' };
+            return `<span class="badge ${map[level]}">${text[level]}</span>`;
+        }
+
+        function statusBadge(status) {
+            const map = {
+                pending: 'badge-pending', confirmed: 'badge-confirmed', rejected: 'badge-rejected',
+                normal: 'badge-normal', suspended: 'badge-suspended', completed: 'badge-confirmed',
+                processing: 'badge-pending'
+            };
+            const text = {
+                pending: '待处理', confirmed: '已确认', rejected: '已驳回',
+                normal: '正常', suspended: '已挂起', completed: '已完成',
+                processing: '处理中'
+            };
+            return `<span class="badge ${map[status] || 'badge-pending'}">${text[status] || status}</span>`;
+        }
+
+        async function loadOverview() {
+            const res = await fetchJSON('/capacity-checks');
+            const data = res.data || [];
+            const stats = {
+                total: data.length,
+                normal: data.filter(d => d.checkLevel === 'normal').length,
+                warning: data.filter(d => d.checkLevel === 'warning').length,
+                danger: data.filter(d => d.checkLevel === 'danger').length,
+                detour: data.filter(d => d.isDetourAffected).length,
+                review: data.filter(d => d.needsResidentReview).length
+            };
+            document.getElementById('stats-grid').innerHTML = `
+                <div class="stat-card"><h3>避难点总数</h3><div class="value">${stats.total}</div></div>
+                <div class="stat-card success"><h3>正常</h3><div class="value">${stats.normal}</div></div>
+                <div class="stat-card warning"><h3>预警</h3><div class="value">${stats.warning}</div></div>
+                <div class="stat-card danger"><h3>危险</h3><div class="value">${stats.danger}</div></div>
+                <div class="stat-card warning"><h3>受改道影响</h3><div class="value">${stats.detour}</div></div>
+                <div class="stat-card success"><h3>待居民复核</h3><div class="value">${stats.review}</div></div>
+            `;
+            const tbody = document.querySelector('#overview-table tbody');
+            tbody.innerHTML = data.map(d => `
+                <tr>
+                    <td>${d.shelterName}</td>
+                    <td>${d.designedCapacity}</td>
+                    <td>${d.checkedCapacity}</td>
+                    <td style="color: ${d.deviationRate >= 0 ? '#67c23a' : '#f56c6c'}">${d.deviationRate > 0 ? '+' : ''}${d.deviationRate}%</td>
+                    <td>${levelBadge(d.checkLevel)}</td>
+                    <td>${d.isDetourAffected ? '⚠️ ' + d.detourInfo : '无'}</td>
+                    <td>${d.needsResidentReview ? '🔴 待复核' : '✅ 已通过'}</td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadCapacity() {
+            const res = await fetchJSON('/capacity-checks');
+            const data = res.data || [];
+            const tbody = document.querySelector('#capacity-table tbody');
+            tbody.innerHTML = data.map(d => `
+                <tr>
+                    <td>${d.shelterName}</td>
+                    <td>${d.designedCapacity}</td>
+                    <td>${d.checkedCapacity}</td>
+                    <td>${d.deviation > 0 ? '+' : ''}${d.deviation}</td>
+                    <td style="color: ${d.deviationRate >= 0 ? '#67c23a' : '#f56c6c'}">${d.deviationRate > 0 ? '+' : ''}${d.deviationRate}%</td>
+                    <td>${levelBadge(d.checkLevel)}</td>
+                    <td><small>${d.dataSources.join(', ')}</small></td>
+                    <td><button class="btn btn-sm btn-primary" onclick="recalculateOne('${d.shelterId}')">补录重算</button></td>
+                </tr>
+            `).join('');
+        }
+
+        async function recalculateAll() {
+            await postJSON('/capacity-checks/calculate', { checkedBy: '老马' });
+            alert('全部重算完成');
+            loadCapacity();
+            loadOverview();
+        }
+
+        async function recalculateOne(shelterId) {
+            await postJSON(`/capacity-checks/${shelterId}/recalculate`, { checkedBy: '老马' });
+            alert('重算完成');
+            loadCapacity();
+        }
+
+        async function loadConflicts() {
+            const res = await fetchJSON('/conflicts/pending');
+            const data = res.data || [];
+            const list = document.getElementById('conflicts-list');
+            if (data.length === 0) {
+                list.innerHTML = '<p style="color: #67c23a; padding: 20px;">✅ 暂无待处理冲突</p>';
+                return;
+            }
+            list.innerHTML = data.map(c => `
+                <div class="conflict-item">
+                    <h4>⚠️ ${c.description}</h4>
+                    <div style="margin: 8px 0;">
+                        ${statusBadge(c.status)}
+                        <span style="margin-left: 8px; font-size: 13px; color: #909399;">点位：${c.shelterName} | 字段：${c.fieldName}</span>
+                    </div>
+                    <div class="conflict-evidence">
+                        <p><strong>📋 红线图来源：</strong>${c.redLineSource}</p>
+                        <p>&nbsp;&nbsp;&nbsp;&nbsp;红线图取值：<strong style="color: #667eea;">${c.redLineValue}</strong></p>
+                        <p><strong>👮 网格员巡查表来源：</strong>${c.reportSource}</p>
+                        <p>&nbsp;&nbsp;&nbsp;&nbsp;巡查表取值：<strong style="color: #f56c6c;">${c.reportValue}</strong></p>
+                    </div>
+                    <div class="conflict-actions">
+                        <button class="btn btn-success" onclick="confirmConflict('${c.id}')">✅ 老马确认</button>
+                        <button class="btn btn-danger" onclick="rejectConflict('${c.id}')">❌ 老马驳回</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function confirmConflict(id) {
+            const note = prompt('请输入确认备注（可选）：') || '';
+            await postJSON(`/conflicts/${id}/confirm`, { resolvedBy: '老马', resolutionNote: note });
+            alert('已确认冲突');
+            loadConflicts();
+        }
+
+        async function rejectConflict(id) {
+            const note = prompt('请输入驳回理由（可选）：') || '';
+            await postJSON(`/conflicts/${id}/reject`, { resolvedBy: '老马', resolutionNote: note });
+            alert('已驳回冲突');
+            loadConflicts();
+        }
+
+        async function detectConflicts() {
+            await postJSON('/conflicts/detect');
+            alert('冲突检测完成');
+            loadConflicts();
+        }
+
+        async function loadSelfCheck() {
+            const res = await fetchJSON('/self-checks');
+            const data = res.data || [];
+            const list = document.getElementById('selfcheck-list');
+            list.innerHTML = data.map(c => `
+                <div class="check-item ${c.status}">
+                    <h4>${c.status === 'pass' ? '✅' : c.status === 'warning' ? '⚠️' : '❌'} ${c.checkName}</h4>
+                    <p style="margin-bottom: 8px;">${c.description}</p>
+                    <p class="details">${c.details}</p>
+                    ${c.affectedRecords.length > 0 ? `<p style="margin-top: 8px; font-size: 13px;">影响记录数：${c.affectedRecords.length}</p>` : ''}
+                </div>
+            `).join('');
+        }
+
+        async function runSelfCheck() {
+            await postJSON('/self-checks/run');
+            alert('自检完成');
+            loadSelfCheck();
+        }
+
+        async function verifyConsistency() {
+            const res = await fetchJSON('/consistency/verify');
+            const span = document.getElementById('consistency-result');
+            if (res.consistent) {
+                span.innerHTML = `<span style="color: #67c23a;">✅ 页面/接口/导出数据一致（哈希：${res.hash.substring(0, 16)}...，记录数：${res.recordCount}）</span>`;
+            } else {
+                span.innerHTML = `<span style="color: #f56c6c;">❌ 数据不一致</span>`;
+            }
+        }
+
+        async function loadWorkflow() {
+            const shelters = await fetchJSON('/shelters');
+            const list = document.getElementById('workflow-list');
+            let html = '';
+            for (const s of shelters) {
+                const wf = await fetchJSON(`/workflows/shelter/${s.id}`);
+                const steps = [
+                    { key: 'redline_import', name: '第一步：红线图备注第一次导入' },
+                    { key: 'inspector_review', name: '第二步：交通协管老马补看网格员巡查表' },
+                    { key: 'point_update', name: '第三步：点位清单更新' }
+                ];
+                html += `<div style="margin-bottom: 24px;">
+                    <h3 style="margin-bottom: 12px; color: #303133;">🏠 ${s.name} <small style="color: #909399;">${s.address}</small></h3>`;
+                if (wf) {
+                    const stepStatuses = {};
+                    const allWfs = await fetchJSON('/workflows');
+                    const shelterWfs = allWfs.filter(w => w.shelterId === s.id);
+                    for (const w of shelterWfs) {
+                        stepStatuses[w.currentStep] = w.stepStatus;
+                    }
+                    for (const step of steps) {
+                        const st = stepStatuses[step.key];
+                        const cls = st === 'completed' ? 'completed' : (st === 'suspended' ? 'suspended' : (wf.currentStep === step.key ? 'active' : ''));
+                        const num = step.key === 'redline_import' ? 1 : step.key === 'inspector_review' ? 2 : 3;
+                        html += `<div class="workflow-step ${cls}">
+                            <div class="step-number">${num}</div>
+                            <div class="step-info">
+                                <h4>${step.name}</h4>
+                                <p>${st ? statusBadge(st) : '未开始'}</p>
+                                ${st === 'suspended' ? '<p style="color: #e6a23c;">⚠️ 发现临时改道，已挂起待居民代表复核</p>' : ''}
+                            </div>
+                        </div>`;
+                    }
+                } else {
+                    html += '<p style="color: #909399;">未启动流程</p>';
+                }
+                html += '</div>';
+            }
+            list.innerHTML = html;
+        }
+
+        async function loadParams() {
+            const params = await fetchJSON('/params');
+            const list = document.getElementById('params-list');
+            list.innerHTML = params.map(p => `
+                <div class="param-item">
+                    <h4>${p.paramName} = ${p.paramValue}</h4>
+                    <div class="version">参数版本：${p.paramVersion} | 生效时间：${p.effectiveFrom.substring(0, 10)}</div>
+                    <div class="rationale"><strong>取舍理由：</strong>${p.rationale}</div>
+                </div>
+            `).join('');
+        }
+
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+                const tabName = tab.dataset.tab;
+                if (tabName === 'overview') loadOverview();
+                if (tabName === 'capacity') loadCapacity();
+                if (tabName === 'conflicts') loadConflicts();
+                if (tabName === 'selfcheck') loadSelfCheck();
+                if (tabName === 'workflow') loadWorkflow();
+                if (tabName === 'params') loadParams();
+            });
+        });
+
+        loadOverview();
+    </script>
+</body>
+</html>
