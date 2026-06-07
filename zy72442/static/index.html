@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>伴奏降噪返工记录 - 小看板</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f7fa; color: #333; }
+.container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+.header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 24px 30px; border-radius: 12px; margin-bottom: 24px; }
+.header h1 { font-size: 24px; margin-bottom: 8px; }
+.header p { opacity: 0.9; font-size: 14px; }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+.stat-card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.stat-card .num { font-size: 28px; font-weight: bold; color: #667eea; }
+.stat-card .label { font-size: 13px; color: #888; margin-top: 4px; }
+.stat-card.warning .num { color: #f59e0b; }
+.stat-card.danger .num { color: #ef4444; }
+.checklist-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 16px; }
+.card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-left: 4px solid #e5e7eb; transition: all 0.2s; cursor: pointer; }
+.card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+.card.leave-marked { border-left-color: #f59e0b; }
+.card.auth-missing { border-left-color: #3b82f6; }
+.card.auth-completed { border-left-color: #10b981; }
+.card.pending-review { border-left-color: #ef4444; }
+.card.completed { border-left-color: #10b981; opacity: 0.8; }
+.card .track-name { font-size: 16px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.badge { font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: 500; }
+.badge.leave { background: #fef3c7; color: #92400e; }
+.badge.status { background: #eef2ff; color: #4338ca; }
+.card .meta { font-size: 13px; color: #666; margin-bottom: 12px; }
+.card .section { margin-bottom: 10px; }
+.card .section-title { font-size: 12px; color: #888; margin-bottom: 4px; }
+.card .section-content { font-size: 13px; line-height: 1.6; }
+.next-owner { display: inline-block; background: #f0f9ff; color: #0369a1; padding: 4px 10px; border-radius: 12px; font-size: 12px; margin-top: 8px; }
+.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+.modal.active { display: flex; }
+.modal-content { background: white; width: 90%; max-width: 800px; max-height: 85vh; overflow-y: auto; border-radius: 12px; padding: 28px; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #eee; }
+.modal-header h2 { font-size: 20px; }
+.close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #888; }
+.detail-section { margin-bottom: 24px; }
+.detail-section h3 { font-size: 15px; margin-bottom: 12px; color: #4338ca; display: flex; align-items: center; gap: 8px; }
+.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.info-item { font-size: 13px; }
+.info-item .label { color: #888; margin-bottom: 2px; }
+.info-item .value { font-weight: 500; }
+.rework-timeline { border-left: 2px solid #e5e7eb; margin-left: 12px; padding-left: 20px; }
+.rework-item { position: relative; margin-bottom: 20px; }
+.rework-item::before { content: ''; position: absolute; left: -29px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: #667eea; border: 3px solid white; box-shadow: 0 0 0 2px #667eea; }
+.rework-item .time { font-size: 12px; color: #888; margin-bottom: 4px; }
+.rework-item .operator { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 4px; }
+.rework-item .action { font-size: 13px; background: #f3f4f6; padding: 8px 12px; border-radius: 6px; margin-bottom: 6px; }
+.rework-item .reason { font-size: 13px; color: #666; }
+.rework-item .affected { font-size: 12px; color: #059669; margin-top: 4px; }
+.field-change { font-family: monospace; font-size: 12px; background: #fffbeb; padding: 2px 6px; border-radius: 4px; color: #92400e; }
+.empty-state { text-align: center; padding: 60px 20px; color: #888; }
+.empty-state p { margin-top: 12px; }
+.loading { text-align: center; padding: 40px; color: #888; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>🎵 伴奏降噪返工记录</h1>
+    <p>曲目核对表 · 谁改了什么 · 为什么改 · 改完影响哪些结果</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat-card"><div class="num" id="stat-total">0</div><div class="label">全部曲目</div></div>
+    <div class="stat-card warning"><div class="num" id="stat-leave">0</div><div class="label">请假课时待复核</div></div>
+    <div class="stat-card"><div class="num" id="stat-auth">0</div><div class="label">缺授权期限页</div></div>
+    <div class="stat-card danger"><div class="num" id="stat-review">0</div><div class="label">待巡演统筹复核</div></div>
+  </div>
+
+  <div id="checklist-container" class="checklist-grid">
+    <div class="loading">加载中...</div>
+  </div>
+</div>
+
+<div id="modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="modal-title">曲目详情</h2>
+      <button class="close-btn" onclick="closeModal()">&times;</button>
+    </div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+async function loadData() {
+  const res = await fetch('/api/checklists');
+  const data = await res.json();
+  renderList(data);
+}
+
+function renderList(checklists) {
+  const container = document.getElementById('checklist-container');
+  
+  document.getElementById('stat-total').textContent = checklists.length;
+  document.getElementById('stat-leave').textContent = checklists.filter(c => c.status === 'leave_marked').length;
+  document.getElementById('stat-auth').textContent = checklists.filter(c => c.status === 'auth_missing').length;
+  document.getElementById('stat-review').textContent = checklists.filter(c => c.status === 'pending_review').length;
+
+  if (checklists.length === 0) {
+    container.innerHTML = '<div class="empty-state"><h3>暂无数据</h3><p>请先运行 <code>python cli.py demo-setup</code> 初始化演示数据</p></div>';
+    return;
+  }
+
+  container.innerHTML = checklists.map(cl => {
+    const statusClass = cl.status.replace('_', '-');
+    const leaveBadge = cl.has_leave_hours ? '<span class="badge leave">⚠️ 请假课时异常</span>' : '';
+    return `
+      <div class="card ${statusClass}" onclick="showDetail(${cl.audio_note_id})">
+        <div class="track-name">
+          ${cl.track_name}
+          ${leaveBadge}
+        </div>
+        <div class="meta"><span class="badge status">${cl.status_label}</span></div>
+        <div class="section">
+          <div class="section-title">为什么被留下</div>
+          <div class="section-content">${cl.reason_kept || '-'}</div>
+        </div>
+        <div class="section">
+          <div class="section-title">还缺什么材料</div>
+          <div class="section-content">${cl.missing_materials || '-'}</div>
+        </div>
+        <span class="next-owner">👉 ${cl.next_owner_label}：${cl.next_action || ''}</span>
+      </div>
+    `;
+  }).join('');
+}
+
+async function showDetail(audioNoteId) {
+  const res = await fetch(`/api/checklists/${audioNoteId}`);
+  const data = await res.json();
+  renderDetail(data);
+  document.getElementById('modal').classList.add('active');
+}
+
+function renderDetail(data) {
+  const { audio_note, checklist, authorization, rework_records } = data;
+  
+  document.getElementById('modal-title').textContent = audio_note.track_name;
+  
+  let authHtml = '';
+  if (authorization) {
+    authHtml = `
+      <div class="info-grid">
+        <div class="info-item"><div class="label">授权编号</div><div class="value">${authorization.authorization_number}</div></div>
+        <div class="info-item"><div class="label">有效期</div><div class="value">${authorization.valid_from} 至 ${authorization.valid_to}</div></div>
+        <div class="info-item" style="grid-column: 1 / -1;"><div class="label">授权内容</div><div class="value">${authorization.page_content || '-'}</div></div>
+      </div>
+    `;
+  } else {
+    authHtml = '<p style="color: #888; font-size: 13px;">暂未上传授权期限页</p>';
+  }
+
+  const reworkHtml = rework_records.length > 0 ? rework_records.map(r => {
+    let fieldChange = '';
+    if (r.field_changed) {
+      fieldChange = `<div class="field-change">${r.field_changed}: ${r.old_value} → ${r.new_value}</div>`;
+    }
+    return `
+      <div class="rework-item">
+        <div class="time">${r.created_at}</div>
+        <div class="operator">${r.operator_name}</div>
+        <div class="action">动作：${r.action_type} ${fieldChange}</div>
+        <div class="reason">原因：${r.reason}</div>
+        <div class="affected">📋 影响：${r.affected_results}</div>
+      </div>
+    `;
+  }).join('') : '<p style="color: #888; font-size: 13px;">暂无返工记录</p>';
+
+  document.getElementById('modal-body').innerHTML = `
+    <div class="detail-section">
+      <h3>📄 音频文件备注</h3>
+      <div class="info-grid">
+        <div class="info-item"><div class="label">文件路径</div><div class="value">${audio_note.file_path || '-'}</div></div>
+        <div class="info-item"><div class="label">时长</div><div class="value">${audio_note.duration} 分钟</div></div>
+        <div class="info-item" style="grid-column: 1 / -1;"><div class="label">原始备注</div><div class="value">${audio_note.original_note || '-'}</div></div>
+        ${audio_note.has_leave_hours ? `
+        <div class="info-item" style="grid-column: 1 / -1;">
+          <div class="label">⚠️ 请假课时被算入已消耗</div>
+          <div class="value" style="color: #dc2626;">${audio_note.leave_hours_count} 节，待巡演统筹复核</div>
+        </div>` : ''}
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <h3>✅ 曲目核对表</h3>
+      <div class="info-grid">
+        <div class="info-item"><div class="label">当前状态</div><div class="value">${checklist.status_label}</div></div>
+        <div class="info-item"><div class="label">下一步负责人</div><div class="value">${checklist.next_owner_label}</div></div>
+        <div class="info-item" style="grid-column: 1 / -1;"><div class="label">为什么被留下</div><div class="value">${checklist.reason_kept || '-'}</div></div>
+        <div class="info-item" style="grid-column: 1 / -1;"><div class="label">还缺什么材料</div><div class="value">${checklist.missing_materials || '-'}</div></div>
+        <div class="info-item" style="grid-column: 1 / -1;"><div class="label">下一步做什么</div><div class="value">${checklist.next_action || '-'}</div></div>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <h3>📑 授权期限页</h3>
+      ${authHtml}
+    </div>
+
+    <div class="detail-section">
+      <h3>🔄 返工记录（伴奏降噪返工记录）</h3>
+      <div class="rework-timeline">${reworkHtml}</div>
+    </div>
+  `;
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('active');
+}
+
+document.getElementById('modal').addEventListener('click', (e) => {
+  if (e.target.id === 'modal') closeModal();
+});
+
+loadData();
+</script>
+</body>
+</html>
