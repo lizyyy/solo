@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}变更历史 - 历史街区招牌整治{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>全部变更历史（共 {{ history|length }} 条）</h2>
+    {% if history %}
+    <table>
+        <thead>
+            <tr>
+                <th>时间</th>
+                <th>路口</th>
+                <th>变更类型</th>
+                <th>操作人</th>
+                <th>描述</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in history|reverse %}
+            <tr>
+                <td class="muted">{{ record.change_timestamp|datetime_format }}</td>
+                <td>
+                    <a href="{{ url_for('photo_detail', photo_id=record.photo_id) }}">
+                    {{ record.new_snapshot.intersection_name or '查看' }}
+                </a>
+            </td>
+            <td>{{ record.change_type }}</td>
+            <td>{{ record.operator }}</td>
+            <td>{{ record.description }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="muted" style="text-align: center; padding: 30px;">
+        暂无变更记录
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

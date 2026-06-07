@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}导入数据 - 历史街区招牌整治{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>导入路口照片数据</h2>
+    <p class="muted" style="margin-bottom: 15px;">
+        系统会自动根据"源文件名 + 行内容生成唯一ID，重复数据自动跳过，数量不翻倍。
+    </p>
+    
+    <div class="form-group">
+        <label>源文件名称</label>
+        <input type="text" id="sourceFile" value="路口照片批次_202401.csv">
+    </div>
+    <div class="form-group">
+        <label>操作人</label>
+        <input type="text" id="operator" value="市政巡检员-小付">
+    </div>
+    <div class="form-group">
+        <label>数据（JSON格式数组）</label>
+        <textarea id="dataInput" style="min-height: 200px; font-family: monospace; font-size: 12px;">[
+  {
+    "路口名称": "中山路与人民路交叉口",
+    "拍摄时间": "2024-01-15",
+    "招牌状态": "待整治"
+  },
+  {
+    "路口名称": "历史街区南口",
+    "拍摄时间": "2024-01-15",
+    "招牌状态": "已整治"
+  }
+]</textarea>
+    </div>
+    <button class="btn btn-primary" onclick="doImport()">开始导入</button>
+    
+    <div id="importResult" style="margin-top: 20px; display: none;"></div>
+</div>
+
+<div class="card">
+    <h2>测试去重功能</h2>
+    <p class="muted" style="margin-bottom: 10px;">
+        点击下面按钮，使用相同数据再次导入，验证不会重复计数。
+    </p>
+    <button class="btn btn-warning" onclick="doImport()">再次导入相同数据（验证去重）</button>
+</div>
+
+<script>
+function doImport() {
+    const sourceFile = document.getElementById('sourceFile').value;
+    const operator = document.getElementById('operator').value;
+    let rows;
+    
+    try {
+        rows = JSON.parse(document.getElementById('dataInput').value);
+    } catch(e) {
+        alert('JSON格式错误: ' + e.message);
+        return;
+    }
+    
+    fetch('/import', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rows: rows, source_file: sourceFile, operator: operator })
+    }).then(r => r.json()).then(data => {
+        const resultDiv = document.getElementById('importResult');
+        resultDiv.style.display = 'block';
+        resultDiv.innerHTML = `
+            <div class="alert alert-success">
+                <strong>导入完成！</strong><br>
+                成功导入: ${data.success_count} 条<br>
+                跳过重复: ${data.skipped_count} 条（${data.note}）
+            </div>
+            <a href="{{ url_for('index') }}" class="btn btn-small btn-primary">返回首页查看</a>
+        `;
+    });
+}
+</script>
+{% endblock %}

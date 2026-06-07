@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}边界规则 - 历史街区招牌整治{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>边界规则说明</h2>
+    <p class="muted" style="margin-bottom: 15px;">
+        以下规则已写入代码逻辑，同时记录在 <code>src/boundary_rules.py</code>，不靠口头约定。
+    </p>
+    
+    {% for key, rule in rules.items() %}
+    <div style="border-left: 4px solid #2196f3; padding: 15px; margin-bottom: 15px; background: #f5faff; border-radius: 4px;">
+        <h3 style="font-size: 15px; color: #1565c0; margin-bottom: 8px;">
+            {{ rule.rule_id }}: {{ rule.name }}
+        </h3>
+        <p style="margin-bottom: 8px;">{{ rule.description }}</p>
+        {% if rule.threshold is defined %}
+        <p class="muted">阈值: {{ rule.threshold|string + '%' if rule.threshold < 1 else rule.threshold }}</p>
+        {% endif %}
+        <p><strong>Required Action:</strong> {{ rule.required_action }}</p>
+        <p class="muted">支持回滚: {{ '是' if rule.rollback_supported else '否' }}</p>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="card">
+    <h2>标准三步流程</h2>
+    <ol class="steps">
+        <li><strong>步骤1：路口照片导入</strong> — 自动去重，保留原始行号、源文件、导入时间</li>
+        <li><strong>步骤2：市政巡检员补录公交刷卡时段</strong> — 记录操作人、时间、原因</li>
+        <li><strong>步骤3：生成热力图</strong> — 自动检测夜间缺采样等异常，强制进入待复核</li>
+        <li><strong>复核：</strong> 街道规划员查看热力图，给出复核意见，标记最终状态</li>
+    </ol>
+</div>
+
+<div class="card">
+    <h2>夜间缺采样判定与处理流程</h2>
+    <div class="alert alert-warning">
+        <strong>判定条件：</strong>夜间时段(22:00-次日06:00)采样点数不足日间平均的30%
+    </div>
+    <ol class="steps">
+        <li>系统检测到异常 → 自动标记"夜间缺采样导致热力图偏低"</li>
+        <li>状态自动进入"待复核"，不得直接归为正常</li>
+        <li>街道规划员查看热力图和原始数据</li>
+        <li>确认缺采样 → 标记"复核通过-夜间缺采样"，或补充数据后重新生成</li>
+        <li>支持回滚操作，清除热力图数据，重新计算</li>
+    </ol>
+</div>
+{% endblock %}

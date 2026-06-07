@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}首页 - 历史街区招牌整治{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>数据统计</h2>
+    <div style="display: flex; gap: 30px; flex-wrap: wrap;">
+        <div>
+            <div style="font-size: 24px; font-weight: bold; color: #2c3e50;">{{ stats.total_photos }}</div>
+            <div class="muted">路口照片总数</div>
+        </div>
+        <div>
+            <div style="font-size: 24px; font-weight: bold; color: #ff9800;">{{ stats.issue_distribution.get('夜间缺采样导致热力图偏低', 0) }}</div>
+            <div class="muted">夜间缺采样待复核</div>
+        </div>
+        <div>
+            <div style="font-size: 24px; font-weight: bold; color: #2196f3;">{{ stats.total_changes }}</div>
+            <div class="muted">变更记录总数</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>路口照片列表</h2>
+    {% if photos %}
+    <table>
+        <thead>
+            <tr>
+                <th>路口名称</th>
+                <th>原始行号</th>
+                <th>源文件</th>
+                <th>当前状态</th>
+                <th>热力图问题</th>
+                <th>更新时间</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for photo in photos %}
+            <tr>
+                <td>{{ photo.intersection_name }}</td>
+                <td>第 {{ photo.original_row.row_number }} 行</td>
+                <td class="muted">{{ photo.original_row.source_file }}</td>
+                <td><span class="status status-{{ photo.current_status.value }}">{{ photo.current_status.value }}</span></td>
+                <td>
+                    {% if photo.heatmap_issue.value != '无异常' %}
+                    <span style="color: #e65100;">{{ photo.heatmap_issue.value }}</span>
+                    {% else %}
+                    <span class="muted">{{ photo.heatmap_issue.value }}</span>
+                    {% endif %}
+                </td>
+                <td class="muted">{{ photo.updated_at|datetime_format }}</td>
+                <td>
+                    <a href="{{ url_for('photo_detail', photo_id=photo.photo_id) }}" class="btn btn-primary btn-small">查看详情</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="muted" style="text-align: center; padding: 30px;">
+        暂无数据，点击 <a href="{{ url_for('import_photos') }}">导入数据</a> 或 <a href="{{ url_for('run_demo') }}">一键演示</a> 开始
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

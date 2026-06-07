@@ -1,0 +1,408 @@
+[
+  {
+    "record_id": "a788b4f109ee12df",
+    "photo_id": "67e377c05dc89714",
+    "change_type": "导入",
+    "old_snapshot": {},
+    "new_snapshot": {
+      "photo_id": "67e377c05dc89714",
+      "intersection_name": "中山路与人民路交叉口",
+      "current_status": "已导入",
+      "bus_card_hours": null,
+      "heatmap_data": null,
+      "heatmap_issue": "无异常",
+      "review_note": null,
+      "remark": null,
+      "updated_at": "2026-06-07T09:18:25.124926"
+    },
+    "operator": "市政巡检员-小付",
+    "change_timestamp": "2026-06-07T09:18:25.124937",
+    "description": "从 demo_batch_1.csv 第 1 行导入路口照片数据"
+  },
+  {
+    "record_id": "e018f12aa1a480f9",
+    "photo_id": "be1b02acc82b5082",
+    "change_type": "导入",
+    "old_snapshot": {},
+    "new_snapshot": {
+      "photo_id": "be1b02acc82b5082",
+      "intersection_name": "历史街区南口",
+      "current_status": "已导入",
+      "bus_card_hours": null,
+      "heatmap_data": null,
+      "heatmap_issue": "无异常",
+      "review_note": null,
+      "remark": null,
+      "updated_at": "2026-06-07T09:18:25.124948"
+    },
+    "operator": "市政巡检员-小付",
+    "change_timestamp": "2026-06-07T09:18:25.124952",
+    "description": "从 demo_batch_1.csv 第 2 行导入路口照片数据"
+  },
+  {
+    "record_id": "896eed009c8cceb9",
+    "photo_id": "be1b02acc82b5082",
+    "change_type": "公交刷卡时段补录",
+    "old_snapshot": {
+      "photo_id": "be1b02acc82b5082",
+      "intersection_name": "历史街区南口",
+      "current_status": "已导入",
+      "bus_card_hours": null,
+      "heatmap_data": null,
+      "heatmap_issue": "无异常",
+      "review_note": null,
+      "remark": null,
+      "updated_at": "2026-06-07T09:18:25.124948"
+    },
+    "new_snapshot": {
+      "photo_id": "be1b02acc82b5082",
+      "intersection_name": "历史街区南口",
+      "current_status": "公交刷卡时段已补录",
+      "bus_card_hours": [
+        "07:30-09:30",
+        "16:30-18:30"
+      ],
+      "heatmap_data": null,
+      "heatmap_issue": "无异常",
+      "review_note": null,
+      "remark": null,
+      "updated_at": "2026-06-07T09:18:25.125489"
+    },
+    "operator": "市政巡检员-小付",
+    "change_timestamp": "2026-06-07T09:18:25.125497",
+    "description": "补录公交刷卡时段: ['07:30-09:30', '16:30-18:30']"
+  },
+  {
+    "record_id": "9e5a13c7cc39a0ac",
+    "photo_id": "be1b02acc82b5082",
+    "change_type": "热力图生成",
+    "old_snapshot": {
+      "photo_id": "be1b02acc82b5082",
+      "intersection_name": "历史街区南口",
+      "current_status": "公交刷卡时段已补录",
+      "bus_card_hours": [
+        "07:30-09:30",
+        "16:30-18:30"
+      ],
+      "heatmap_data": null,
+      "heatmap_issue": "无异常",
+      "review_note": null,
+      "remark": null,
+      "updated_at": "2026-06-07T09:18:25.125489"
+    },
+    "new_snapshot": {
+      "photo_id": "be1b02acc82b5082",
+      "intersection_name": "历史街区南口",
+      "current_status": "待复核",
+      "bus_card_hours": [
+        "07:30-09:30",
+        "16:30-18:30"
+      ],
+      "heatmap_data": {
+        "hourly_samples": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 1,
+          "6": 3,
+          "7": 90,
+          "8": 110,
+          "9": 85,
+          "10": 75,
+          "11": 70,
+          "12": 72,
+          "13": 68,
+          "14": 70,
+          "15": 72,
+          "16": 80,
+          "17": 95,
+          "18": 90,
+          "19": 30,
+          "20": 2,
+          "21": 1,
+          "22": 0,
+          "23": 0
+        }
+      },
+      "heatmap_issue": "夜间缺采样导致热力图偏低",
+      "review_note": null,
+      "remark": null,
+      "updated_at": "2026-06-07T09:18:25.126073"
+    },
+    "operator": "系统自动生成",
+    "change_timestamp": "2026-06-07T09:18:25.126081",
+    "description": "生成热力图，检测结果: 夜间缺采样导致热力图偏低，原因: 夜间平均采样 0.4，日间平均 67.3，比值 0.66% 低于 阈值 30% → 进入待复核状态（RULE_005）"
+  },
+  {
+    "record_id": "eba6b5dba0782ac8",
+    "photo_id": "be1b02acc82b5082",
+    "change_type": "字段修改",
+    "old_snapshot": {
+      "photo_id": "be1b02acc82b5082",
+      "intersection_name": "历史街区南口",
+      "current_status": "待复核",
+      "bus_card_hours": [
+        "07:30-09:30",
+        "16:30-18:30"
+      ],
+      "heatmap_data": {
+        "hourly_samples": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 1,
+          "6": 3,
+          "7": 90,
+          "8": 110,
+          "9": 85,
+          "10": 75,
+          "11": 70,
+          "12": 72,
+          "13": 68,
+          "14": 70,
+          "15": 72,
+          "16": 80,
+          "17": 95,
+          "18": 90,
+          "19": 30,
+          "20": 2,
+          "21": 1,
+          "22": 0,
+          "23": 0
+        }
+      },
+      "heatmap_issue": "夜间缺采样导致热力图偏低",
+      "review_note": null,
+      "remark": null,
+      "updated_at": "2026-06-07T09:18:25.126073"
+    },
+    "new_snapshot": {
+      "photo_id": "be1b02acc82b5082",
+      "intersection_name": "历史街区南口",
+      "current_status": "待复核",
+      "bus_card_hours": [
+        "07:30-09:30",
+        "16:30-18:30"
+      ],
+      "heatmap_data": {
+        "hourly_samples": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 1,
+          "6": 3,
+          "7": 90,
+          "8": 110,
+          "9": 85,
+          "10": 75,
+          "11": 70,
+          "12": 72,
+          "13": 68,
+          "14": 70,
+          "15": 72,
+          "16": 80,
+          "17": 95,
+          "18": 90,
+          "19": 30,
+          "20": 2,
+          "21": 1,
+          "22": 0,
+          "23": 0
+        }
+      },
+      "heatmap_issue": "夜间缺采样导致热力图偏低",
+      "review_note": null,
+      "remark": "街口招牌有松动，需要重点关注",
+      "updated_at": "2026-06-07T09:18:25.126889"
+    },
+    "operator": "市政巡检员-小付",
+    "change_timestamp": "2026-06-07T09:18:25.126897",
+    "description": "修改 remark: None → 街口招牌有松动，需要重点关注"
+  },
+  {
+    "record_id": "9a1f1e90af4b371d",
+    "photo_id": "be1b02acc82b5082",
+    "change_type": "复核完成",
+    "old_snapshot": {
+      "photo_id": "be1b02acc82b5082",
+      "intersection_name": "历史街区南口",
+      "current_status": "待复核",
+      "bus_card_hours": [
+        "07:30-09:30",
+        "16:30-18:30"
+      ],
+      "heatmap_data": {
+        "hourly_samples": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 1,
+          "6": 3,
+          "7": 90,
+          "8": 110,
+          "9": 85,
+          "10": 75,
+          "11": 70,
+          "12": 72,
+          "13": 68,
+          "14": 70,
+          "15": 72,
+          "16": 80,
+          "17": 95,
+          "18": 90,
+          "19": 30,
+          "20": 2,
+          "21": 1,
+          "22": 0,
+          "23": 0
+        }
+      },
+      "heatmap_issue": "夜间缺采样导致热力图偏低",
+      "review_note": null,
+      "remark": "街口招牌有松动，需要重点关注",
+      "updated_at": "2026-06-07T09:18:25.126889"
+    },
+    "new_snapshot": {
+      "photo_id": "be1b02acc82b5082",
+      "intersection_name": "历史街区南口",
+      "current_status": "复核通过-夜间缺采样",
+      "bus_card_hours": [
+        "07:30-09:30",
+        "16:30-18:30"
+      ],
+      "heatmap_data": {
+        "hourly_samples": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 1,
+          "6": 3,
+          "7": 90,
+          "8": 110,
+          "9": 85,
+          "10": 75,
+          "11": 70,
+          "12": 72,
+          "13": 68,
+          "14": 70,
+          "15": 72,
+          "16": 80,
+          "17": 95,
+          "18": 90,
+          "19": 30,
+          "20": 2,
+          "21": 1,
+          "22": 0,
+          "23": 0
+        }
+      },
+      "heatmap_issue": "夜间缺采样导致热力图偏低",
+      "review_note": "确认夜间采样设备故障，导致热力图偏低，非实际人流情况",
+      "remark": "街口招牌有松动，需要重点关注",
+      "updated_at": "2026-06-07T09:18:25.127318"
+    },
+    "operator": "街道规划员-张工",
+    "change_timestamp": "2026-06-07T09:18:25.127324",
+    "description": "街道规划员复核确认，标记为夜间缺采样，复核意见: 确认夜间采样设备故障，导致热力图偏低，非实际人流情况"
+  },
+  {
+    "record_id": "501c8fb606173fb1",
+    "photo_id": "be1b02acc82b5082",
+    "change_type": "回滚",
+    "old_snapshot": {
+      "photo_id": "be1b02acc82b5082",
+      "intersection_name": "历史街区南口",
+      "current_status": "复核通过-夜间缺采样",
+      "bus_card_hours": [
+        "07:30-09:30",
+        "16:30-18:30"
+      ],
+      "heatmap_data": {
+        "hourly_samples": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 1,
+          "6": 3,
+          "7": 90,
+          "8": 110,
+          "9": 85,
+          "10": 75,
+          "11": 70,
+          "12": 72,
+          "13": 68,
+          "14": 70,
+          "15": 72,
+          "16": 80,
+          "17": 95,
+          "18": 90,
+          "19": 30,
+          "20": 2,
+          "21": 1,
+          "22": 0,
+          "23": 0
+        }
+      },
+      "heatmap_issue": "夜间缺采样导致热力图偏低",
+      "review_note": "确认夜间采样设备故障，导致热力图偏低，非实际人流情况",
+      "remark": "街口招牌有松动，需要重点关注",
+      "updated_at": "2026-06-07T09:18:25.127318"
+    },
+    "new_snapshot": {
+      "photo_id": "be1b02acc82b5082",
+      "intersection_name": "历史街区南口",
+      "current_status": "复核通过-正常",
+      "bus_card_hours": [
+        "07:30-09:30",
+        "16:30-18:30"
+      ],
+      "heatmap_data": {
+        "hourly_samples": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 1,
+          "6": 3,
+          "7": 90,
+          "8": 110,
+          "9": 85,
+          "10": 75,
+          "11": 70,
+          "12": 72,
+          "13": 68,
+          "14": 70,
+          "15": 72,
+          "16": 80,
+          "17": 95,
+          "18": 90,
+          "19": 30,
+          "20": 2,
+          "21": 1,
+          "22": 0,
+          "23": 0
+        }
+      },
+      "heatmap_issue": "夜间缺采样导致热力图偏低",
+      "review_note": "确认夜间采样设备故障，导致热力图偏低，非实际人流情况",
+      "remark": "街口招牌有松动，需要重点关注",
+      "updated_at": "2026-06-07T09:18:25.127754"
+    },
+    "operator": "管理员",
+    "change_timestamp": "2026-06-07T09:18:25.127759",
+    "description": "从 复核通过-夜间缺采样 回滚至 复核通过-正常，原因: 复核意见需要调整，回滚后重新复核"
+  }
+]

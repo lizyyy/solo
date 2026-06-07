@@ -1,0 +1,307 @@
+{% extends "base.html" %}
+
+{% block title %}{{ photo.intersection_name }} - 详情{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>{{ photo.intersection_name }}</h2>
+    <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+        <div>
+            <div class="muted">当前状态</div>
+            <span class="status status-{{ photo.current_status.value }}">{{ photo.current_status.value }}</span>
+        </div>
+        <div>
+            <div class="muted">热力图问题</div>
+            {% if photo.heatmap_issue.value != '无异常' %}
+            <span style="color: #e65100; font-weight: 500;">{{ photo.heatmap_issue.value }}</span>
+            {% else %}
+            <span>{{ photo.heatmap_issue.value }}</span>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>原始数据溯源</h2>
+    <div class="details">
+        <div><strong>原始行号：</strong>第 {{ photo.original_row.row_number }} 行</div>
+        <div><strong>源文件：</strong>{{ photo.original_row.source_file }}</div>
+        <div><strong>导入时间：</strong>{{ photo.original_row.import_timestamp|datetime_format }}</div>
+        <div style="margin-top: 10px;">
+            <strong>原始行数据：</strong>
+            <pre style="background: #f5f5f5; padding: 10px; border-radius: 4px; margin-top: 5px; font-size: 12px; overflow-x: auto;">{{ photo.original_row.raw_data | tojson(indent=2, ensure_ascii=False) }}</pre>
+        </div>
+    </div>
+</div>
+
+{% if heatmap_html %}
+<div class="card">
+    <h2>热力图</h2>
+    {{ heatmap_html | safe }}
+    
+    {% if anomaly_info[0] %}
+    <div class="alert alert-warning" style="margin-top: 15px;">
+        <strong>⚠️ 检测到异常：</strong>{{ anomaly_info[1] }}
+    </div>
+    <div class="alert alert-info">
+        <strong>下一步操作：</strong>
+        <ul class="steps" style="margin-top: 8px;">
+            {% for step in next_steps %}
+            <li>{{ step }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+<div class="card">
+    <h2>操作面板</h2>
+    
+    {% if photo.current_status.value == '已导入' %}
+    <div class="section">
+        <h3 style="font-size: 14px; margin-bottom: 10px;">步骤2: 补录公交刷卡时段</h3>
+        <div class="form-group">
+            <label>公交刷卡时段（逗号分隔）</label>
+            <input type="text" id="busHours" placeholder="例如: 07:00-09:00, 17:00-19:00">
+        </div>
+        <div class="form-group">
+            <label>操作人</label>
+            <input type="text" id="busOperator" value="市政巡检员-小付">
+        </div>
+        <button class="btn btn-primary" onclick="addBusHours()">补录公交刷卡时段</button>
+    </div>
+    {% endif %}
+    
+    {% if photo.current_status.value == '公交刷卡时段已补录' %}
+    <div class="section">
+        <h3 style="font-size: 14px; margin-bottom: 10px;">步骤3: 生成热力图</h3>
+        <p class="muted" style="margin-bottom: 10px;">当前已补录时段: {{ photo.bus_card_hours | join(', ') }}</p>
+        <div class="form-group">
+            <label>操作人</label>
+            <input type="text" id="heatmapOperator" value="系统自动生成">
+        </div>
+        <button class="btn btn-success" onclick="generateHeatmap()">生成热力图</button>
+    </div>
+    {% endif %}
+    
+    {% if photo.current_status.value == '待复核' %}
+    <div class="section">
+        <h3 style="font-size: 14px; margin-bottom: 10px;">街道规划员复核</h3>
+        <div class="alert alert-warning">
+            <strong>待复核问题：</strong>{{ photo.heatmap_issue.value }}
+        </div>
+        <div class="form-group">
+            <label>复核意见</label>
+            <textarea id="reviewNote" placeholder="请填写复核意见..."></textarea>
+        </div>
+        <div class="form-group">
+            <label>操作人</label>
+            <input type="text" id="reviewOperator" value="街道规划员">
+        </div>
+        <button class="btn btn-success" onclick="review(true)">标记为正常</button>
+        <button class="btn btn-warning" onclick="review(false)">确认夜间缺采样</button>
+    </div>
+    {% endif %}
+    
+    {% if photo.current_status.value not in ['已导入', '已回滚'] %}
+    <div class="section" style="border-top: 1px solid #eee; padding-top: 15px;">
+        <h3 style="font-size: 14px; margin-bottom: 10px;">回滚操作</h3>
+        <div class="form-group">
+            <label>回滚原因</label>
+            <input type="text" id="rollbackReason" placeholder="请填写回滚原因...">
+        </div>
+        <div class="form-group">
+            <label>操作人</label>
+            <input type="text" id="rollbackOperator" value="管理员">
+        </div>
+        <button class="btn btn-danger" onclick="rollback()">回滚至上一状态</button>
+    </div>
+    {% endif %}
+    
+    <div class="section" style="border-top: 1px solid #eee; padding-top: 15px;">
+        <h3 style="font-size: 14px; margin-bottom: 10px;">修改备注</h3>
+        <div class="form-group">
+            <label>备注内容</label>
+            <textarea id="remark">{{ photo.remark or '' }}</textarea>
+        </div>
+        <div class="form-group">
+            <label>操作人</label>
+            <input type="text" id="remarkOperator" value="市政巡检员-小付">
+        </div>
+        <button class="btn btn-primary" onclick="updateRemark()">保存备注</button>
+    </div>
+</div>
+
+<div class="card">
+    <h2>变更历史（共 {{ history|length }} 条）</h2>
+    {% if history %}
+    <table>
+        <thead>
+            <tr>
+                <th>时间</th>
+                <th>变更类型</th>
+                <th>操作人</th>
+                <th>描述</th>
+                <th>改前/改后</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in history|reverse %}
+            <tr>
+                <td class="muted">{{ record.change_timestamp|datetime_format }}</td>
+                <td>{{ record.change_type }}</td>
+                <td>{{ record.operator }}</td>
+                <td>{{ record.description }}</td>
+                <td>
+                    {% if record.old_snapshot and record.new_snapshot %}
+                    <button class="btn btn-small" onclick="showDiff('{{ record.record_id }}')">查看差异</button>
+                    <div id="diff-{{ record.record_id }}" style="display: none; margin-top: 10px;">
+                        <div class="diff">
+                            <div class="diff-old">
+                                <strong>改前：</strong>
+                                <pre style="font-size: 11px;">{{ record.old_snapshot | tojson(indent=2, ensure_ascii=False) }}</pre>
+                            </div>
+                            <div class="diff-new">
+                                <strong>改后：</strong>
+                                <pre style="font-size: 11px;">{{ record.new_snapshot | tojson(indent=2, ensure_ascii=False) }}</pre>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <span class="muted">初始导入</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="muted">暂无变更记录</div>
+    {% endif %}
+</div>
+
+<script>
+function addBusHours() {
+    const hours = document.getElementById('busHours').value.split(',').map(s => s.trim()).filter(s => s);
+    const operator = document.getElementById('busOperator').value;
+    
+    if (!hours.length) {
+        alert('请输入公交刷卡时段');
+        return;
+    }
+    
+    fetch('/photo/{{ photo.photo_id }}/add_bus_hours', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bus_hours: hours, operator: operator, reason: '市政巡检员回看补录' })
+    }).then(r => r.json()).then(data => {
+        if (data.success) {
+            alert('补录成功！');
+            location.reload();
+        } else {
+            alert('失败: ' + (data.error || '未知错误'));
+        }
+    });
+}
+
+function generateHeatmap() {
+    const operator = document.getElementById('heatmapOperator').value;
+    
+    const sampleHeatmap = {
+        hourly_samples: {
+            "0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 1, "6": 3,
+            "7": 90, "8": 110, "9": 85, "10": 75, "11": 70, "12": 72,
+            "13": 68, "14": 70, "15": 72, "16": 80, "17": 95, "18": 90,
+            "19": 30, "20": 2, "21": 1, "22": 0, "23": 0
+        }
+    };
+    
+    fetch('/photo/{{ photo.photo_id }}/generate_heatmap', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ heatmap_data: sampleHeatmap, operator: operator })
+    }).then(r => r.json()).then(data => {
+        if (data.success) {
+            alert('热力图生成成功！' + (data.action_required || ''));
+            location.reload();
+        } else {
+            alert('失败: ' + (data.error || '未知错误'));
+        }
+    });
+}
+
+function review(isNormal) {
+    const note = document.getElementById('reviewNote').value;
+    const operator = document.getElementById('reviewOperator').value;
+    
+    if (!note.trim()) {
+        alert('请填写复核意见');
+        return;
+    }
+    
+    fetch('/photo/{{ photo.photo_id }}/review', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ is_normal: isNormal, review_note: note, operator: operator })
+    }).then(r => r.json()).then(data => {
+        if (data.success) {
+            alert('复核完成！');
+            location.reload();
+        } else {
+            alert('失败: ' + (data.error || '未知错误'));
+        }
+    });
+}
+
+function rollback() {
+    const reason = document.getElementById('rollbackReason').value;
+    const operator = document.getElementById('rollbackOperator').value;
+    
+    if (!reason.trim()) {
+        alert('请填写回滚原因');
+        return;
+    }
+    
+    if (!confirm('确定要回滚吗？相关数据将被清除。')) {
+        return;
+    }
+    
+    fetch('/photo/{{ photo.photo_id }}/rollback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason: reason, operator: operator })
+    }).then(r => r.json()).then(data => {
+        if (data.success) {
+            alert('回滚成功！');
+            location.reload();
+        } else {
+            alert('失败: ' + (data.error || '未知错误'));
+        }
+    });
+}
+
+function updateRemark() {
+    const remark = document.getElementById('remark').value;
+    const operator = document.getElementById('remarkOperator').value;
+    
+    fetch('/photo/{{ photo.photo_id }}/update_remark', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ remark: remark, operator: operator, reason: '修改备注' })
+    }).then(r => r.json()).then(data => {
+        if (data.success) {
+            alert('备注已更新，历史记录已留存');
+            location.reload();
+        } else {
+            alert('失败: ' + (data.error || '未知错误'));
+        }
+    });
+}
+
+function showDiff(recordId) {
+    const el = document.getElementById('diff-' + recordId);
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+</script>
+{% endblock %}
