@@ -47,52 +47,59 @@ export class PipeCapacityCalculator {
       });
     }
 
-    const anomalies = this.anomalyDetector.detectEmptyValues(data);
-    
-    if (anomalies.length > 0) {
-      const highSeverity = anomalies.filter(a => a.severity === 'high');
-      if (highSeverity.length > 0) {
-        return {
-          result: null,
-          steps,
-          anomalies,
-          failureReason: `关键字段缺失: ${highSeverity.map(a => a.field).join(', ')}`
-        };
-      }
-    }
+    let anomalies = this.anomalyDetector.detectEmptyValues(data);
 
-    if (pipeDiameterNormalized === undefined ||
+    const outlierAnomalies = this.anomalyDetector.detectOutliers(data, {
+      pipeDiameter: pipeDiameterNormalized,
+      rainfallIntensity: rainfallNormalized,
+    });
+    anomalies = [...anomalies, ...outlierAnomalies];
+    
+    const hasHighSeverityEmpty = anomalies.filter(a => a.severity === 'high' && a.type === 'empty_value');
+    let failureReason: string | undefined;
+    
+    if (hasHighSeverityEmpty.length > 0) {
+      failureReason = `关键字段缺失: ${hasHighSeverityEmpty.map(a => a.field).join(', ')}`;
+    } else if (pipeDiameterNormalized === undefined ||
         data.pipeLength === undefined ||
         rainfallNormalized === undefined ||
         data.runoffCoefficient === undefined) {
+      failureReason = '缺少必要的计算参数';
+    }
+
+    if (failureReason) {
       return {
         result: null,
         steps,
         anomalies,
-        failureReason: '缺少必要的计算参数'
+        failureReason,
       };
     }
 
-    const crossSectionalArea = Math.PI * Math.pow(pipeDiameterNormalized / 2, 2);
+    const safePipeDiameter = pipeDiameterNormalized as number;
+    const safeRainfall = rainfallNormalized as number;
+    const safeRunoff = data.runoffCoefficient as number;
+
+    const crossSectionalArea = Math.PI * Math.pow(safePipeDiameter / 2, 2);
     steps.push({
       stepId: 'step-3',
       description: '计算管道横截面积',
-      input: { diameter: pipeDiameterNormalized, unit: 'm' },
+      input: { diameter: safePipeDiameter, unit: 'm' },
       output: { area: crossSectionalArea, unit: 'm²' },
-      formula: `A = π * (d/2)² = π * (${pipeDiameterNormalized}/2)²`
+      formula: `A = π * (d/2)² = π * (${safePipeDiameter}/2)²`
     });
 
-    const flowVelocity = this.calculateFlowVelocity(crossSectionalArea, rainfallNormalized, data.runoffCoefficient);
+    const flowVelocity = this.calculateFlowVelocity(crossSectionalArea, safeRainfall, safeRunoff);
     steps.push({
       stepId: 'step-4',
       description: '计算设计流量',
       input: {
         area: crossSectionalArea,
-        rainfall: rainfallNormalized,
-        coefficient: data.runoffCoefficient
+        rainfall: safeRainfall,
+        coefficient: safeRunoff
       },
       output: { flow: flowVelocity, unit: 'm³/s' },
-      formula: `Q = A * I * ψ = ${crossSectionalArea.toFixed(4)} * ${rainfallNormalized} * ${data.runoffCoefficient}`
+      formula: `Q = A * I * ψ = ${crossSectionalArea.toFixed(4)} * ${safeRainfall} * ${safeRunoff}`
     });
 
     const capacity = flowVelocity * 3600;
@@ -123,7 +130,6 @@ export class PipeCapacityCalculator {
       ...anomalies,
       ...this.anomalyDetector.detectDuplicates(allRecords, record),
       ...this.anomalyDetector.detectUnitMismatch(record.rawData),
-      ...this.anomalyDetector.detectOutliers(record.rawData),
       ...this.anomalyDetector.detectBoundary(record.rawData),
     ];
 

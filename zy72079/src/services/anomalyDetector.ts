@@ -80,7 +80,10 @@ export class AnomalyDetector {
     return anomalies;
   }
 
-  detectOutliers(data: RawPipeData): Anomaly[] {
+  detectOutliers(data: RawPipeData, normalizedValues?: {
+    pipeDiameter?: number;
+    rainfallIntensity?: number;
+  }): Anomaly[] {
     const anomalies: Anomaly[] = [];
 
     if (data.pipeLength !== undefined) {
@@ -95,14 +98,28 @@ export class AnomalyDetector {
       }
     }
 
-    if (data.pipeDiameter !== undefined) {
-      if (data.pipeDiameter < this.parameterRanges.pipeDiameter.min ||
-          data.pipeDiameter > this.parameterRanges.pipeDiameter.max) {
+    const pipeDiameterForCheck = normalizedValues?.pipeDiameter ?? data.pipeDiameter;
+    if (pipeDiameterForCheck !== undefined) {
+      if (pipeDiameterForCheck < this.parameterRanges.pipeDiameter.min ||
+          pipeDiameterForCheck > this.parameterRanges.pipeDiameter.max) {
         anomalies.push({
           type: 'outlier',
           field: 'pipeDiameter',
-          description: `管径 ${data.pipeDiameter}m 超出正常范围 (${this.parameterRanges.pipeDiameter.min}-${this.parameterRanges.pipeDiameter.max}m)`,
+          description: `管径 ${pipeDiameterForCheck.toFixed(2)}m 超出正常范围 (${this.parameterRanges.pipeDiameter.min}-${this.parameterRanges.pipeDiameter.max}m)`,
           severity: 'medium'
+        });
+      }
+    }
+
+    const rainfallForCheck = normalizedValues?.rainfallIntensity ?? data.rainfallIntensity;
+    if (rainfallForCheck !== undefined) {
+      if (rainfallForCheck < this.parameterRanges.rainfallIntensity.min ||
+          rainfallForCheck > this.parameterRanges.rainfallIntensity.max) {
+        anomalies.push({
+          type: 'outlier',
+          field: 'rainfallIntensity',
+          description: `降雨强度 ${rainfallForCheck.toFixed(2)}mm/h 超出正常范围 (${this.parameterRanges.rainfallIntensity.min}-${this.parameterRanges.rainfallIntensity.max}mm/h)`,
+          severity: 'high'
         });
       }
     }
