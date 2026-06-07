@@ -1,0 +1,90 @@
+{
+  "scenario_name": "场景三：旧口径补录（合同截图补录）",
+  "export_time": "2026-06-07T08:21:05.243324",
+  "final_status": "已完成分账",
+  "steps": [
+    {
+      "step": "1. 创建版权到期提醒",
+      "record_id": "CR-57fd18ee"
+    },
+    {
+      "step": "2. 导入排练群接龙",
+      "status": "待处理"
+    },
+    {
+      "step": "3. 上传旧口径合同截图",
+      "status": "信息冲突待确认",
+      "conflicts": [
+        "合同截图为旧口径标准，需确认是否适用"
+      ]
+    },
+    {
+      "step": "4. 版权运营确认冲突处理",
+      "action": "确认适用旧口径",
+      "status": "已确认"
+    },
+    {
+      "step": "5. 按旧口径生成分账",
+      "amount": 2800.0,
+      "ratio": "5:5",
+      "caliber": "旧口径",
+      "status": "已完成分账"
+    }
+  ],
+  "reminder": {
+    "record_id": "CR-57fd18ee",
+    "performer_name": "王五",
+    "performance_date": "2026-06-15",
+    "program_name": "二泉映月",
+    "status": "已完成分账",
+    "review_note": "",
+    "split_details": [
+      {
+        "detail_id": "SD-1fa5dca0",
+        "amount": 2800.0,
+        "split_ratio": "5:5",
+        "payee": "某人工作室",
+        "version": 1
+      }
+    ],
+    "conflicts": [],
+    "history": [
+      {
+        "entry_id": "HIS-d0842dfe",
+        "source": "排练群接龙",
+        "action": "接龙导入",
+        "operator": "排练群管理员",
+        "timestamp": "2026-06-07T08:21:05.243190",
+        "detail": "导入排练群接龙记录: 版权到期日：2026-08-15"
+      },
+      {
+        "entry_id": "HIS-3f90c168",
+        "source": "合同页截图补录",
+        "action": "合同截图上传-发现冲突",
+        "operator": "版权运营小鹿",
+        "timestamp": "2026-06-07T08:21:05.243254",
+        "detail": "发现 1 处信息冲突，待版权运营确认"
+      },
+      {
+        "entry_id": "HIS-b7e93a6c",
+        "source": "人工确认",
+        "action": "冲突确认",
+        "operator": "版权运营小鹿",
+        "timestamp": "2026-06-07T08:21:05.243262",
+        "detail": "版权运营确认以合同截图为准。历史合同按旧口径执行"
+      },
+      {
+        "entry_id": "HIS-764a8fea",
+        "source": "人工确认",
+        "action": "分账明细更新",
+        "operator": "系统",
+        "timestamp": "2026-06-07T08:21:05.243276",
+        "detail": "旧口径计算：金额2800.0，比例5:5，收款人某人工作室"
+      }
+    ]
+  },
+  "replay_commands": {
+    "replay": "python main.py run --scenario smooth",
+    "replay_with_trace": "python main.py run --scenario smooth --trace"
+  }
+}
