@@ -1,0 +1,108 @@
+{
+  "batches": [
+    {
+      "id": "BATCH-2024-001",
+      "name": "春季巡演合成器预设包",
+      "importedAt": "2024-03-15T10:00:00",
+      "status": "completed",
+      "authorization": {
+        "licensee": "星空乐队",
+        "validFrom": "2024-03-01",
+        "validTo": "2024-06-30",
+        "ticketType": "paid",
+        "ticketCount": 120,
+        "authorizedPresets": ["复古键盘 v2", "贝斯主音 2024", "弦乐垫 A"]
+      },
+      "engineerNotes": "",
+      "history": [
+        {
+          "action": "import",
+          "timestamp": "2024-03-15T10:00:00",
+          "operator": "系统导入",
+          "note": "授权期限页第一次导入，售票批次，一切正常"
+        },
+        {
+          "action": "verify",
+          "timestamp": "2024-03-15T10:05:00",
+          "operator": "老周",
+          "note": "核对授权期限：3月1日到6月30日，120张售票，预设清单没问题"
+        }
+      ],
+      "reminder": "授权将于 2024-06-30 到期，提前两周续约"
+    },
+    {
+      "id": "BATCH-2024-002",
+      "name": "大学城校园音乐节",
+      "importedAt": "2024-04-20T14:30:00",
+      "status": "pending_review",
+      "authorization": {
+        "licensee": "大学城音乐协会",
+        "validFrom": "2024-04-15",
+        "validTo": "2024-05-15",
+        "ticketType": "mixed",
+        "ticketCount": 80,
+        "authorizedPresets": ["电钢现场版", "合成器主奏 v3", "鼓机循环 007"]
+      },
+      "engineerNotes": "",
+      "history": [
+        {
+          "action": "import",
+          "timestamp": "2024-04-20T14:30:00",
+          "operator": "系统导入",
+          "note": "授权期限页第一次导入，系统检测到赠票和售票混在一个批次"
+        },
+        {
+          "action": "flag_mixed",
+          "timestamp": "2024-04-20T14:31:00",
+          "operator": "系统",
+          "note": "⚠️ 批次内混有赠票30张+售票50张，按规则不归正常，留给录音师复核"
+        }
+      ],
+      "reminder": "⚠️ 赠票售票混批，待录音师确认后再更新授权提醒",
+      "flags": ["mixed_tickets", "needs_engineer_review"]
+    },
+    {
+      "id": "BATCH-2024-003",
+      "name": "老街酒吧驻场",
+      "importedAt": "2024-02-10T09:00:00",
+      "status": "completed_amended",
+      "authorization": {
+        "licensee": "老街酒吧",
+        "validFrom": "2024-01-01",
+        "validTo": "2024-03-31",
+        "ticketType": "paid",
+        "ticketCount": 60,
+        "authorizedPresets": ["爵士钢琴 v1", " Hammond B3", "低音贝斯垫"]
+      },
+      "engineerNotes": "补录：录音师阿凯留言说这个批次其实用的是去年的旧口径，赠票是酒吧内部招待，不算在授权计数里，按售票40张算",
+      "history": [
+        {
+          "action": "import",
+          "timestamp": "2024-02-10T09:00:00",
+          "operator": "系统导入",
+          "note": "授权期限页第一次导入，当时标了售票60张"
+        },
+        {
+          "action": "manual_correction",
+          "timestamp": "2024-02-12T16:20:00",
+          "operator": "老周",
+          "note": "补看调音师阿凯留言，发现是旧口径，20张是内部赠票不计入，人工修正为40张售票"
+        },
+        {
+          "action": "rerun",
+          "timestamp": "2024-02-12T16:25:00",
+          "operator": "老周",
+          "note": "重跑比较逻辑，按40张售票重新计算授权有效期"
+        },
+        {
+          "action": "amend_complete",
+          "timestamp": "2024-02-12T16:30:00",
+          "operator": "老周",
+          "note": "补录完成，授权提醒更新"
+        }
+      ],
+      "reminder": "原授权到2024-03-31，补录旧口径后按40张核算，实际授权余量充足",
+      "amendedFrom": "BATCH-2024-003-original"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "synth-preset-compare",
+  "version": "1.0.0",
+  "description": "合成器预设版本比较 - 琴行店长老周和录音师的得力助手",
+  "main": "index.js",
+  "bin": {
+    "synth-compare": "./cli.js"
+  },
+  "scripts": {
+    "demo": "node cli.js run-demo",
+    "import": "node cli.js import",
+    "review": "node cli.js review"
+  },
+  "keywords": ["synth", "preset", "compare"],
+  "author": "琴行店长老周",
+  "license": "MIT"
+}
