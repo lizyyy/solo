@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Camera, Download, Save, Layers, Link, FileText } from 'lucide-react';
+import { Camera, Save, Link, FileText } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 
 export const TopToolbar: React.FC = () => {
@@ -8,8 +8,6 @@ export const TopToolbar: React.FC = () => {
     setActiveFloor,
     toggleFilterStatus,
     filterStatus,
-    toggleFilterSource,
-    filterSource,
     showCrossFloorLinks,
     toggleCrossFloorLinks,
     exportScreenshot,

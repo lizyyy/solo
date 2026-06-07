@@ -8,7 +8,6 @@ import {
   MapPin,
   MessageSquare,
   User,
-  X,
 } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 import {
@@ -17,7 +16,6 @@ import {
   conflictTypeLabels,
   formatTimestamp,
   getStatusBgClass,
-  getSourceBgClass,
 } from '../../utils/helpers';
 
 export const AnomalyDetail: React.FC = () => {

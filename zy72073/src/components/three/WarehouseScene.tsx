@@ -10,10 +10,12 @@ import { CrossFloorLink } from './CrossFloorLink';
 import { Floor } from './Floor';
 import { CoordinateAxes } from './CoordinateAxes';
 
+import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
+
 const CameraController: React.FC = () => {
   const { camera } = useThree();
   const { cameraPosition, cameraTarget, setCameraState } = useStore();
-  const controlsRef = useRef<any>(null);
+  const controlsRef = useRef<OrbitControlsImpl>(null);
 
   useEffect(() => {
     camera.position.set(...cameraPosition as [number, number, number]);
@@ -49,7 +51,6 @@ const SceneContent: React.FC = () => {
     setSelectedPoint,
     activeFloor,
     showCrossFloorLinks,
-    cameraTarget,
   } = useStore();
 
   const crossFloorPairs = React.useMemo(() => {

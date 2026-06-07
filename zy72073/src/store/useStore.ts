@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { AppStore, PointData, ProcessRecord } from '../types';
+import type { AppStore, ProcessRecord, SchemeData } from '../types';
 import { mockPoints, mockPhotos, mockSchemes } from '../data/mockData';
 
 const STORAGE_KEY = 'robot-warehouse-schemes';
@@ -13,7 +13,7 @@ const loadSchemes = () => {
   }
 };
 
-const saveSchemes = (schemes: any[]) => {
+const saveSchemes = (schemes: SchemeData[]) => {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(schemes));
   } catch {

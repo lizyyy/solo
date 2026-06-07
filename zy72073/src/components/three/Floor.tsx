@@ -6,7 +6,7 @@ interface FloorProps {
   visible: boolean;
 }
 
-export const Floor: React.FC<FloorProps> = ({ floor, y, visible }) => {
+export const Floor: React.FC<FloorProps> = ({ y, visible }) => {
   if (!visible) return null;
 
   return (
