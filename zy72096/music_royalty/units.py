@@ -13,7 +13,7 @@ PLAY_COUNT_TO_TIMES = {
 PER_PLAY_TO_YUAN_PER_PLAY = {
     PerPlayUnit.YUAN_PER_PLAY: 1.0,
     PerPlayUnit.YUAN_PER_1K: 0.001,
-    PerPlayUnit.USD_PER_STREAM: 0.0072,
+    PerPlayUnit.USD_PER_STREAM: 7.25,
 }
 
 CURRENCY_TO_CNY = {

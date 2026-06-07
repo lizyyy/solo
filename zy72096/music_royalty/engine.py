@@ -1,7 +1,7 @@
-from typing import Dict, List, Optional, Tuple
+from typing import List, Optional, Tuple
 from .models import (
-    RoyaltyRecord, RoyaltyResult, AuditEntry, RevenueType,
-    PlayCountUnit, PerPlayUnit, ShareFormat, Currency
+    RoyaltyRecord, RoyaltyResult,
+    PerPlayUnit,
 )
 from .units import UnitConverter
 from .audit import AuditLogger
@@ -119,10 +119,21 @@ class RoyaltyEngine:
 
         formula_steps = [
             f"1. 播放量标准化: {record.play_count} {record.play_count_unit.value} → {play_count_times:,.0f} 次",
-            f"2. 单次收益标准化: {record.per_play_revenue} {record.per_play_revenue_unit.value} → {per_play_yuan:.6f} 元/次",
+        ]
+
+        if record.per_play_revenue_unit == PerPlayUnit.USD_PER_STREAM:
+            formula_steps.append(
+                f"2. 单次收益标准化: {record.per_play_revenue} 美元/流 × 7.25(汇率) → {per_play_yuan:.6f} 元/次"
+            )
+        else:
+            formula_steps.append(
+                f"2. 单次收益标准化: {record.per_play_revenue} {record.per_play_revenue_unit.value} → {per_play_yuan:.6f} 元/次"
+            )
+
+        formula_steps.extend([
             f"3. 衰减计算: {decay_factor}^{years:.2f}年 = {decay_multiplier:.6f}",
             f"4. 毛收益 = 播放量 × 单次收益 × 衰减 = {play_count_times:,.0f} × {per_play_yuan:.6f} × {decay_multiplier:.6f}",
-        ]
+        ])
 
         gross_revenue = play_count_times * per_play_yuan * decay_multiplier
 
@@ -147,13 +158,6 @@ class RoyaltyEngine:
         formula_steps.append(
             f"   净收益 = {remaining:,.2f} × {rights_share:.4f} = {net_revenue:,.2f} 元"
         )
-
-        if record.currency == Currency.USD:
-            net_revenue_cny = self.converter.to_cny(net_revenue, Currency.USD)
-            formula_steps.append(
-                f"8. USD→CNY: {net_revenue:,.2f} 美元 × 7.25 = {net_revenue_cny:,.2f} 元"
-            )
-            net_revenue = net_revenue_cny
 
         audit_entry = self.audit_logger.log_calculation(
             record_id=record.record_id,
