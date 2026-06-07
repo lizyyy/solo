@@ -1,57 +1,206 @@
-# React + TypeScript + Vite
+# 基金组合咖啡馆 ☕
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+一款交互式金融教育模拟游戏。通过咖啡馆经营的隐喻，让学生在课堂环境中理解基金组合配置的核心概念。
 
-Currently, two official plugins are available:
+## ✨ 核心特性
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **真实拖拽交互**：从资源架拖拽基金卡片到操作台，每次操作实时影响分数、风险和资源
+- **四种失败诊断**：区分「规则没理解」「操作慢了」「风险超限」「资源耗尽」
+- **例外不消失**：新手误操作、边界分数、暂停打断、脏数据全部留痕
+- **活动策划补录**：阿蓝专用工作台，补录后差异自动同步至所有页面
+- **冲突仲裁**：错题本与导入数据冲突时，展示双方证据，不替用户拍板
 
-## Expanding the ESLint configuration
+## 🚀 快速开始
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 1. 安装依赖
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 2. 启动开发服务器
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```bash
+npm run dev
+```
 
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+启动后访问：**http://localhost:5173/**（如端口被占用会自动递增，见终端输出）
+
+### 3. 运行检查（交付前必跑）
+
+```bash
+# TypeScript 类型检查
+npm run check
+
+# ESLint 代码检查
+npm run lint
+```
+
+---
+
+## 🎮 核心操作流程
+
+### 步骤 1：选择关卡
+
+首页展示 4 个预设关卡：
+
+| 关卡 | 特点 | 适用场景 |
+|------|------|----------|
+| **晨间拿铁** | 资源充裕，入门友好 | 顺利流程演示 |
+| **午后美式** | 资源受限，容易触发风险超限 | 返工练习 |
+| **黄昏摩卡** | 分数卡在达标边缘 | 边界分数例外测试 |
+| **深夜特调** | 自由组合，无固定答案 | 开放探索 |
+
+点击「开始挑战」进入游戏。
+
+### 步骤 2：拖拽基金构建组合 ⭐（真实拖拽）
+
+游戏页面采用三栏布局：
+
+```
+┌─────────────┬───────────────────────┬─────────────────┐
+│  资源架      │      操作台            │  分数仪表盘      │
+│  (可拖拽)    │   (放置区域 + 配比调整) │  风险条         │
+│             │                       │  暂停控制       │
+└─────────────┴───────────────────────┴─────────────────┘
+```
+
+**拖拽操作**：
+1. 从左侧「资源架」点击基金卡片左侧的拖拽手柄（⋮⋮）
+2. 按住拖拽到中间「操作台」区域
+3. 松开鼠标，基金以 20% 初始配比加入组合
+
+**备选点击方式**：
+点击操作台底部的「添加基金」按钮，从下拉菜单选择基金。
+
+### 步骤 3：调整配比
+
+操作台内的基金卡片可以：
+- 点击 `-` / `+` 调整配比（每次 ±5%）
+- 点击 `×` 从组合中移除基金
+
+**实时反馈**：
+- 右侧仪表盘实时更新分数和风险
+- 每次操作触发 Toast 通知
+- 剩余资源随操作消耗
+
+### 步骤 4：提交组合
+
+当分数 ≥ 目标分数 且 风险 ≤ 风险红线时：
+1. 点击顶部「提交组合」按钮
+2. 自动跳转至「游戏汇总」页面
+3. 查看操作统计、例外明细、完整时间线
+
+---
+
+## 📱 页面导航
+
+通过顶部导航栏可访问所有页面：
+
+| 入口 | 路径 | 说明 |
+|------|------|------|
+| **关卡选择** | `/` | 首页，选择关卡开始 |
+| **咖啡馆游戏** | `/cafe/:levelId` | 核心游戏页面 |
+| **游戏汇总** | `/summary/:sessionId` | 单局数据统计、例外明细、时间线 |
+| **历史记录** | `/history` | 所有游戏记录列表，支持删除 |
+| **补录工作台** | `/supplement/:sessionId` | 活动策划阿蓝专用 |
+| **冲突仲裁** | `/conflict/:sessionId` | 错题本 vs 导入数据对比 |
+| **操作说明** | `/guide` | 快速上手指南 |
+
+---
+
+## 👩‍💼 活动策划阿蓝工作流
+
+### 补录操作步骤
+
+1. 游戏结束后，从汇总页点击「查看补录工作台」
+2. 在补录表单中填写：
+   - **补录备注**：说明补录原因
+   - **修改字段**：得分 / 风险 / 持仓 / 失败原因
+   - **修改前值**：原始数据
+   - **修改后值**：修正后数据
+3. 点击「添加补录」
+
+### 补录效果
+
+补录添加后**自动同步至所有页面**：
+- ✅ 补录工作台：实时更新右侧差异视图
+- ✅ 游戏汇总：显示最新分数 + 「已补录」标记
+- ✅ 历史记录：列表显示最新值 + 「已补录」标签
+- ✅ 冲突仲裁：基于补录后最新数据检测
+
+### 差异视图说明
+
+补录工作台右侧展示完整差异：
+- **基线快照**：补录前的原始状态
+- **当前状态**：已应用所有补录的最新状态
+- **补录轨迹**：按时间顺序展示每条补录的修正前、修正后、原因说明
+
+---
+
+## 🧪 验证清单（交付前必跑）
+
+### 1. 环境验证
+- [ ] `npm install` 执行成功
+- [ ] `npm run dev` 启动成功，浏览器可访问
+- [ ] `npm run check` 退出码 0
+- [ ] `npm run lint` 退出码 0
+
+### 2. 核心拖拽流程验证 ⭐
+- [ ] 从资源架拖拽基金卡片到操作台，成功加入组合
+- [ ] 拖拽时有视觉反馈（卡片半透明、操作台高亮）
+- [ ] 拖拽松开后，基金以 20% 配比显示在操作台
+- [ ] 操作台内基金可点击 + / - 调整配比
+- [ ] 调整配比后，右侧分数仪表盘实时更新
+- [ ] 分数达标后，「提交组合」按钮可点击
+- [ ] 提交后成功跳转汇总页
+
+### 3. 补录流程验证
+- [ ] 从汇总页可进入补录工作台
+- [ ] 填写补录信息后可成功添加
+- [ ] 补录后返回汇总页，数值已更新
+- [ ] 历史记录页显示「已补录」标记和最新数值
+- [ ] 差异视图正确展示基线 vs 最新值对比
+
+### 4. 例外验证
+- [ ] 边界分数（接近目标）会触发例外标记
+- [ ] 暂停游戏会记录暂停时间
+- [ ] 例外明细在汇总页清晰展示，不消失
+
+### 5. 失败反馈验证
+- [ ] 超时失败：显示「操作节奏」分类
+- [ ] 风险超限：显示「风险控制」分类
+- [ ] 规则误操作：显示「规则理解」分类
+
+---
+
+## 🛠 技术栈
+
+- **框架**：React 18 + TypeScript
+- **构建**：Vite
+- **样式**：Tailwind CSS 3
+- **状态**：Zustand
+- **拖拽**：@dnd-kit/core + @dnd-kit/utilities
+- **路由**：react-router-dom
+- **存储**：localStorage（游戏记录、补录、基线快照）
+
+---
+
+## 📁 目录结构
+
+```
+src/
+├── components/          # UI 组件
+│   ├── cafe/           # 游戏核心组件
+│   ├── feedback/       # 反馈组件（Toast、失败诊断）
+│   ├── summary/        # 汇总组件（统计、例外、时间线）
+│   ├── supplement/     # 补录组件（表单、差异视图）
+│   ├── conflict/       # 冲突仲裁组件
+│   └── layout/         # 布局组件
+├── pages/              # 页面路由
+├── stores/             # Zustand 状态管理
+├── engine/             # 游戏引擎（计算、检测、诊断）
+├── data/               # 静态数据（基金、关卡、错题本）
+├── types/              # TypeScript 类型定义
+└── hooks/              # 自定义 Hooks
 ```

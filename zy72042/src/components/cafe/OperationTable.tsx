@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useDroppable } from '@dnd-kit/core'
 import { LayoutGrid, Plus } from 'lucide-react'
 import { useGameStore } from '@/stores/gameStore'
 import { FUND_ASSETS } from '@/data/funds'
@@ -11,6 +12,11 @@ export default function OperationTable() {
   const removeFundFromPortfolio = useGameStore((s) => s.removeFundFromPortfolio)
   const adjustRatio = useGameStore((s) => s.adjustRatio)
   const [showAdd, setShowAdd] = useState(false)
+
+  const { setNodeRef, isOver } = useDroppable({
+    id: 'operation-table',
+    data: { type: 'portfolio-drop-zone' },
+  })
 
   if (!session) return null
 
@@ -27,16 +33,34 @@ export default function OperationTable() {
   const ratioOverflow = totalRatio > 1
 
   return (
-    <div className="card-cafe flex-1 min-w-0 flex flex-col gap-3">
+    <div
+      ref={setNodeRef}
+      className={`card-cafe flex-1 min-w-0 flex flex-col gap-3 transition-all duration-200 ${
+        isOver ? 'ring-4 ring-data-blue/30 bg-data-blue/5' : ''
+      }`}
+    >
       <div className="flex items-center gap-2">
         <LayoutGrid className="w-5 h-5 text-cafe-brown" />
         <h2 className="font-serif text-lg font-bold text-cafe-brown">操作台</h2>
+        {isOver && (
+          <span className="text-xs bg-data-blue text-white px-2 py-0.5 rounded-full">
+            松开添加基金
+          </span>
+        )}
       </div>
 
       <div className="flex-1 flex flex-col gap-2 overflow-y-auto min-h-0">
         {session.holdings.length === 0 && (
-          <div className="flex-1 flex items-center justify-center border-2 border-dashed border-cafe-latte rounded-xl py-12">
-            <p className="text-cafe-brown/40 text-sm">从左侧资源架拖入基金</p>
+          <div
+            className={`flex-1 flex items-center justify-center border-2 border-dashed rounded-xl py-12 transition-all ${
+              isOver
+                ? 'border-data-blue bg-data-blue/10'
+                : 'border-cafe-latte'
+            }`}
+          >
+            <p className="text-cafe-brown/40 text-sm">
+              从左侧资源架拖入基金，或点击下方"添加基金"
+            </p>
           </div>
         )}
 

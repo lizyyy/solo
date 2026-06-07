@@ -1,4 +1,6 @@
-import { Minus, Plus, X } from 'lucide-react'
+import { useDraggable } from '@dnd-kit/core'
+import { CSS } from '@dnd-kit/utilities'
+import { Minus, Plus, X, GripVertical } from 'lucide-react'
 import type { FundAsset } from '@/types'
 import { FUND_CATEGORY_LABELS, FUND_CATEGORY_COLORS } from '@/data/funds'
 
@@ -11,17 +13,42 @@ interface FundCardProps {
 }
 
 export default function FundCard({ fund, inPortfolio, ratio, onRemove, onAdjust }: FundCardProps) {
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: fund.id,
+    data: { fundId: fund.id, inPortfolio },
+    disabled: inPortfolio,
+  })
+
   const categoryLabel = FUND_CATEGORY_LABELS[fund.category] ?? fund.category
   const categoryColor = FUND_CATEGORY_COLORS[fund.category] ?? '#999'
   const riskPercent = Math.round(fund.riskFactor * 100)
 
+  const dragHandleProps = inPortfolio ? {} : { ...attributes, ...listeners }
+
+  const cardStyle: React.CSSProperties = {
+    borderColor: categoryColor,
+    transform: transform ? CSS.Translate.toString(transform) : undefined,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 999 : 'auto',
+  }
+
   return (
     <div
-      className="bg-white rounded-xl p-3 border-2 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 relative flex gap-2"
-      style={{ borderColor: categoryColor }}
-      draggable={!inPortfolio}
-      data-fund-id={inPortfolio ? undefined : fund.id}
+      ref={inPortfolio ? undefined : setNodeRef}
+      style={cardStyle}
+      className={`bg-white rounded-xl p-3 border-2 transition-all duration-200 hover:shadow-lg relative flex gap-2 ${
+        !inPortfolio ? 'cursor-grab active:cursor-grabbing' : ''
+      } ${isDragging ? 'shadow-xl scale-105' : ''}`}
     >
+      {!inPortfolio && (
+        <div
+          className="w-6 flex items-center justify-center text-cafe-brown/20 hover:text-cafe-brown/40 shrink-0"
+          {...dragHandleProps}
+        >
+          <GripVertical className="w-4 h-4" />
+        </div>
+      )}
+
       <div
         className="w-1 rounded-full shrink-0"
         style={{ backgroundColor: categoryColor }}
@@ -91,7 +118,7 @@ export default function FundCard({ fund, inPortfolio, ratio, onRemove, onAdjust 
         )}
 
         {!inPortfolio && (
-          <div className="mt-2 text-xs text-center text-cafe-brown/40 py-1 border border-dashed border-cafe-latte rounded-lg">
+          <div className="mt-2 text-xs text-center text-cafe-brown/40 py-1 border border-dashed border-cafe-latte rounded-lg pointer-events-none">
             拖入操作台
           </div>
         )}
