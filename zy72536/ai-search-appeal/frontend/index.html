@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 搜索排序申诉系统</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <h1>🔍 AI 搜索排序申诉系统</h1>
+            <nav class="nav">
+                <button class="nav-btn active" data-view="tickets">工单列表</button>
+                <button class="nav-btn" data-view="compare">版本对比</button>
+                <button class="nav-btn" data-view="import">导入工单</button>
+            </nav>
+        </header>
+
+        <main class="main">
+            <div id="view-tickets" class="view active">
+                <div class="toolbar">
+                    <h2>申诉工单列表</h2>
+                    <div class="filters">
+                        <select id="status-filter">
+                            <option value="">全部状态</option>
+                            <option value="待处理">待处理</option>
+                            <option value="处理中">处理中</option>
+                            <option value="已完成">已完成</option>
+                        </select>
+                        <button onclick="loadTickets()" class="btn btn-primary">刷新</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>工单编号</th>
+                                <th>来源</th>
+                                <th>原始行号</th>
+                                <th>样本数</th>
+                                <th>状态</th>
+                                <th>处理人</th>
+                                <th>创建时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tickets-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="view-ticket-detail" class="view">
+                <div class="toolbar">
+                    <button onclick="showView('tickets')" class="btn btn-secondary">← 返回列表</button>
+                    <h2 id="detail-title">工单详情</h2>
+                    <div class="actions">
+                        <button onclick="runSelfCheck()" class="btn btn-primary">运行自检</button>
+                        <button onclick="recalculate()" class="btn btn-warning">补录重算</button>
+                        <button onclick="exportTicket()" class="btn btn-success">导出明细</button>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3>工单信息</h3>
+                    <div class="info-grid" id="ticket-info"></div>
+                </div>
+
+                <div class="detail-section">
+                    <h3>脱敏规则备注</h3>
+                    <textarea id="desensitization-note" class="textarea" placeholder="标注负责人周姐填写脱敏规则备注..."></textarea>
+                    <button onclick="saveDesensitizationNote()" class="btn btn-primary" style="margin-top: 8px;">保存备注</button>
+                </div>
+
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="samples">样本列表</button>
+                    <button class="tab-btn" data-tab="self-check">自检结果</button>
+                    <button class="tab-btn" data-tab="audit">审计追踪</button>
+                </div>
+
+                <div class="tab-content active" id="tab-samples">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>样本编号</th>
+                                    <th>查询词</th>
+                                    <th>文档标题</th>
+                                    <th>原始排名</th>
+                                    <th>当前排名</th>
+                                    <th>置信度</th>
+                                    <th>低置信度</th>
+                                    <th>被平均盖住</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="samples-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="tab-self-check">
+                    <div id="self-check-results" class="check-results"></div>
+                </div>
+
+                <div class="tab-content" id="tab-audit">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>时间</th>
+                                    <th>操作</th>
+                                    <th>操作人</th>
+                                    <th>变更前</th>
+                                    <th>变更后</th>
+                                    <th>备注</th>
+                                </tr>
+                            </thead>
+                            <tbody id="audit-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-compare" class="view">
+                <div class="toolbar">
+                    <h2>模型版本对比</h2>
+                    <div class="version-selectors">
+                        <select id="version1-select" onchange="updateCompare()"></select>
+                        <span>VS</span>
+                        <select id="version2-select" onchange="updateCompare()"></select>
+                        <button onclick="loadVersions()" class="btn btn-primary">刷新版本</button>
+                    </div>
+                </div>
+                <div class="compare-summary" id="compare-summary"></div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>样本编号</th>
+                                <th>查询词</th>
+                                <th>来源</th>
+                                <th>状态</th>
+                                <th id="v1-header">V1 排名</th>
+                                <th id="v2-header">V2 排名</th>
+                                <th>变化</th>
+                                <th>低置信度</th>
+                                <th>被平均盖住</th>
+                            </tr>
+                        </thead>
+                        <tbody id="compare-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="view-import" class="view">
+                <div class="toolbar">
+                    <h2>导入申诉工单</h2>
+                </div>
+                <div class="form-card">
+                    <form id="import-form">
+                        <div class="form-group">
+                            <label>工单编号 *</label>
+                            <input type="text" id="import-ticket-no" required placeholder="例如: FEEDBACK-2024-001">
+                        </div>
+                        <div class="form-group">
+                            <label>原始行起始号</label>
+                            <input type="number" id="import-row-start" value="1">
+                        </div>
+                        <div class="form-group">
+                            <label>操作人</label>
+                            <input type="text" id="import-operator" value="system">
+                        </div>
+                        <div class="form-group">
+                            <label>CSV 文件 *</label>
+                            <input type="file" id="import-file" accept=".csv" required>
+                            <small class="help-text">CSV 需包含列: sample_no, query, doc_title, doc_url, original_rank, confidence</small>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-large">导入工单</button>
+                    </form>
+                    <div id="import-result" class="import-result" style="display: none;"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="sample-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>编辑样本</h3>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="edit-sample-id">
+                <div class="form-group">
+                    <label>预期排名</label>
+                    <input type="number" id="edit-expected-rank">
+                </div>
+                <div class="form-group">
+                    <label>状态</label>
+                    <select id="edit-status">
+                        <option value="待复核">待复核</option>
+                        <option value="正常">正常</option>
+                        <option value="已确认">已确认</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>人工备注</label>
+                    <textarea id="edit-manual-note" class="textarea"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="edit-is-hidden"> 被平均指标盖住
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeModal()" class="btn btn-secondary">取消</button>
+                <button onclick="saveSample()" class="btn btn-primary">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

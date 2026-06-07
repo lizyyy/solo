@@ -1,0 +1,11 @@
+sample_no,query,doc_title,doc_url,original_rank,expected_rank,confidence
+S001,怎么申请离职,员工离职申请流程指引,https://example.com/hr/resign,1,,0.92
+S002,工资怎么算,薪资计算规则说明,https://example.com/hr/salary,2,,0.85
+S003,年假有多少天,员工年休假管理办法,https://example.com/hr/annual-leave,3,2,0.45
+S004,社保怎么交,社会保险缴纳指南,https://example.com/hr/social-insurance,4,,0.78
+S005,加班工资怎么算,加班工资计算方法,https://example.com/hr/overtime,5,,0.38
+S006,试用期多久,劳动合同试用期规定,https://example.com/hr/probation,6,,0.88
+S007,公积金怎么提取,住房公积金提取流程,https://example.com/hr/housing-fund,7,5,0.52
+S008,绩效考核标准,员工绩效考核管理办法,https://example.com/hr/performance,8,,0.91
+S009,请假流程,员工请假审批流程,https://example.com/hr/leave,9,,0.83
+S010,报销流程,费用报销管理规定,https://example.com/finance/reimburse,10,,0.42
