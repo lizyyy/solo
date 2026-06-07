@@ -709,3 +709,252 @@ body {
     padding: 2px 4px;
     border-radius: 3px;
 }
+
+.btn-warning {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+}
+
+.btn-warning:hover {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    transform: translateY(-1px);
+}
+
+.wide-modal {
+    max-width: 900px !important;
+}
+
+.diff-summary {
+    background: rgba(251, 191, 36, 0.1);
+    border: 1px solid rgba(251, 191, 36, 0.3);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+.diff-summary h4 {
+    color: #fbbf24;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.diff-summary-stats {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.diff-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.diff-stat-label {
+    font-size: 12px;
+    color: #888;
+}
+
+.diff-stat-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fbbf24;
+}
+
+.diff-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.diff-section h4 {
+    color: #00d4ff;
+    margin-bottom: 12px;
+    font-size: 14px;
+}
+
+.diff-table {
+    background: rgba(255,255,255,0.03);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.diff-row {
+    display: flex;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.diff-row:last-child {
+    border-bottom: none;
+}
+
+.diff-cell {
+    flex: 1;
+    padding: 12px 16px;
+    font-size: 13px;
+}
+
+.diff-cell.header {
+    background: rgba(0, 212, 255, 0.1);
+    font-weight: 600;
+    color: #00d4ff;
+}
+
+.diff-cell.field-name {
+    background: rgba(255,255,255,0.02);
+    color: #888;
+    max-width: 150px;
+}
+
+.diff-cell.old-value {
+    text-decoration: line-through;
+    color: #f87171;
+    background: rgba(239, 68, 68, 0.05);
+}
+
+.diff-cell.new-value {
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.05);
+}
+
+.diff-cell.same-value {
+    color: #888;
+}
+
+.report-content {
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+.report-section {
+    margin-bottom: 24px;
+}
+
+.report-section h4 {
+    color: #00d4ff;
+    margin-bottom: 12px;
+    font-size: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(0, 212, 255, 0.3);
+}
+
+.report-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.report-stat-card {
+    background: rgba(255,255,255,0.05);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+}
+
+.report-stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.report-stat-value.critical { color: #ef4444; }
+.report-stat-value.warning { color: #fbbf24; }
+.report-stat-value.info { color: #3b82f6; }
+.report-stat-value.total { color: #10b981; }
+
+.report-stat-label {
+    font-size: 12px;
+    color: #888;
+}
+
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 16px;
+}
+
+.report-table th,
+.report-table td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 13px;
+}
+
+.report-table th {
+    background: rgba(0, 212, 255, 0.1);
+    color: #00d4ff;
+    font-weight: 600;
+}
+
+.report-table tr:hover td {
+    background: rgba(255,255,255,0.03);
+}
+
+.report-note {
+    background: rgba(124, 58, 237, 0.1);
+    border-left: 3px solid #7c3aed;
+    padding: 12px 16px;
+    border-radius: 4px;
+    margin-bottom: 12px;
+}
+
+.report-note-time {
+    font-size: 11px;
+    color: #888;
+    margin-bottom: 4px;
+}
+
+.report-footer {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    font-size: 12px;
+    color: #666;
+    text-align: center;
+}
+
+.view-controls .view-info {
+    margin-left: auto;
+    display: flex;
+    gap: 20px;
+    font-size: 13px;
+    color: #888;
+}
+
+.export-watermark .watermark-stats {
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.note-item {
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.note-item:hover {
+    border-color: rgba(124, 58, 237, 0.5);
+    transform: translateX(4px);
+}
+
+.note-item .note-actions {
+    margin-top: 8px;
+    display: flex;
+    gap: 8px;
+}
+
+.note-item .note-action-btn {
+    padding: 4px 8px;
+    font-size: 11px;
+    background: rgba(124, 58, 237, 0.2);
+    border: none;
+    border-radius: 4px;
+    color: #a78bfa;
+    cursor: pointer;
+}
+
+.note-item .note-action-btn:hover {
+    background: rgba(124, 58, 237, 0.3);
+}

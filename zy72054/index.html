@@ -17,6 +17,7 @@
             <div class="header-right">
                 <button id="savePlanBtn" class="btn btn-primary">保存方案</button>
                 <button id="exportBtn" class="btn btn-success">导出截图</button>
+                <button id="exportReportBtn" class="btn btn-warning">导出报告</button>
                 <button id="loadPlanBtn" class="btn btn-secondary">加载方案</button>
             </div>
         </header>
@@ -171,6 +172,55 @@
                 <div class="modal-footer">
                     <button id="confirmSavePlan" class="btn btn-primary">保存</button>
                     <button id="cancelPlanBtn" class="btn btn-secondary">取消</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="diffModal" class="modal hidden">
+            <div class="modal-content wide-modal">
+                <div class="modal-header">
+                    <h3>补录差异对比</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="diff-summary" id="diffSummary">
+                    </div>
+                    <div class="diff-detail">
+                        <div class="diff-section">
+                            <h4>筛选条件差异</h4>
+                            <div id="filterDiffDisplay" class="diff-table"></div>
+                        </div>
+                        <div class="diff-section">
+                            <h4>异常数据差异</h4>
+                            <div id="anomalyDiffDisplay" class="diff-table"></div>
+                        </div>
+                        <div class="diff-section">
+                            <h4>图层设置差异</h4>
+                            <div id="layerDiffDisplay" class="diff-table"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="applyNoteFilters" class="btn btn-primary">应用备注时的筛选</button>
+                    <button id="closeDiffBtn" class="btn btn-secondary">关闭</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="reportModal" class="modal hidden">
+            <div class="modal-content wide-modal">
+                <div class="modal-header">
+                    <h3>分析报告预览</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="reportContent" class="report-content">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="downloadReportBtn" class="btn btn-primary">下载HTML报告</button>
+                    <button id="downloadReportCsvBtn" class="btn btn-success">下载CSV明细</button>
+                    <button id="closeReportBtn" class="btn btn-secondary">关闭</button>
                 </div>
             </div>
         </div>
