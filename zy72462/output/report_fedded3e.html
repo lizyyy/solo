@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>共享单车潮汐调度报告 - 东门社区早高峰共享单车潮汐调度</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; background: #f5f7fa; color: #333; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 12px; margin-bottom: 20px; }
+        .header h1 { margin: 0 0 10px 0; font-size: 24px; }
+        .header .meta { opacity: 0.9; font-size: 14px; }
+        .section { background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .section h2 { margin: 0 0 16px 0; font-size: 18px; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 8px; display: inline-block; }
+        .evidence-card { background: #f8f9fa; border-left: 4px solid #667eea; padding: 16px; margin-bottom: 12px; border-radius: 0 8px 8px 0; }
+        .evidence-source { font-weight: 600; color: #667eea; margin-bottom: 4px; }
+        .evidence-meta { font-size: 12px; color: #888; margin-bottom: 8px; }
+        .ramp-card { background: #f8f9fa; padding: 16px; margin-bottom: 12px; border-radius: 8px; }
+        .ramp-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .ramp-location { font-weight: 600; font-size: 16px; }
+        .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .status-escalated { background: #ffe0e0; color: #c0392b; }
+        .status-confirmed { background: #e0f5e0; color: #27ae60; }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .score-change { font-size: 14px; color: #555; margin-bottom: 8px; }
+        .score-no-change { color: #e74c3c; font-weight: 600; }
+        .issues { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+        .issue-tag { background: #ffeaa7; color: #856404; padding: 4px 10px; border-radius: 12px; font-size: 12px; }
+        .suggestion-card { background: #f0f4ff; border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+        .suggestion-title { font-size: 16px; font-weight: 600; margin-bottom: 12px; color: #2c3e50; }
+        .suggestion-section { margin-bottom: 12px; }
+        .suggestion-label { font-weight: 600; color: #667eea; margin-bottom: 4px; font-size: 14px; }
+        .suggestion-content { color: #555; line-height: 1.6; }
+        .missing-list { margin: 0; padding-left: 20px; }
+        .missing-list li { margin-bottom: 4px; }
+        .role-tag { display: inline-block; background: #667eea; color: white; padding: 4px 12px; border-radius: 12px; font-size: 13px; margin-top: 8px; }
+        .footer { text-align: center; padding: 20px; color: #888; font-size: 14px; line-height: 1.8; }
+        .footer .emoji { font-size: 20px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚲 共享单车潮汐调度报告</h1>
+        <div class="meta">
+            案件编号：fedded3e | 案件标题：东门社区早高峰共享单车潮汐调度<br>
+            生成时间：2026-06-07 09:31:36
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>📋 证据汇总</h2>
+        <p style="color: #666; margin-top: 0;">整合网格员巡查表与施工告示的现场说法，让每一条证据都有迹可循</p>
+
+        <div class="evidence-card">
+            <div class="evidence-source">网格员巡查表</div>
+            <div class="evidence-meta">记录人：小李 | 时间：2026-06-07 09:31</div>
+            <div>网格员 小李 巡查记录：早上8点巡查发现，共享单车堆积约30辆，挡住了无障碍坡道入口，行人通行困难。</div>
+        </div>
+
+        <div class="evidence-card">
+            <div class="evidence-source">坡道补录</div>
+            <div class="evidence-meta">记录人：社区书记周姐 | 时间：2026-06-07 09:31</div>
+            <div>坡道补录：社区书记周姐现场复核，发现确实仍有堆积，但暂时没有更好的停放点，评分从 45.0 到 35.0，有变化</div>
+        </div>
+
+        <div class="evidence-card">
+            <div class="evidence-source">施工告示</div>
+            <div class="evidence-meta">记录人：社区书记周姐 | 时间：2026-06-07 09:31</div>
+            <div>施工告示：东门片区污水管道改造工程，现场说法：施工方承诺每天下午6点清理一次通道，保证晚高峰通行。临时堆放点已协调在50米外的空地上。</div>
+        </div>
+
+    </div>
+
+    <div class="section">
+        <h2>🛤️ 坡道情况一览</h2>
+        <p style="color: #666; margin-top: 0;">点击坡道可返回巡查表或施工告示查看原始证据，不只是漂亮画面</p>
+
+        <div class="ramp-card">
+            <div class="ramp-header">
+                <span class="ramp-location">📍 东门社区入口坡道</span>
+                <span class="status-badge status-pending">待复核</span>
+            </div>
+            <div class="score-change">评分变化：45.0 → 35.0 ✓</div>
+            <div class="issues"><span class="issue-tag">共享单车堆积</span><span class="issue-tag">通道被阻挡</span><span class="issue-tag">施工影响</span></div>
+            <div style="margin-top: 8px; color: #666; font-style: italic;">补录备注：社区书记周姐现场复核，发现确实仍有堆积，但暂时没有更好的停放点</div>
+        </div>
+
+    </div>
+
+    <div class="section">
+        <h2>💡 整改建议</h2>
+        <p style="color: #666; margin-top: 0;">不是冷冰冰的系统日志，告诉你为什么、缺什么、该找谁</p>
+
+        <div class="suggestion-card">
+            <div class="suggestion-title">建议 #1：坡道 东门社区入口坡道 存在问题：共享单车堆积, 通道被阻挡, 施工影响</div>
+            
+            <div class="suggestion-section">
+                <div class="suggestion-label">💭 这条为什么被留下</div>
+                <div class="suggestion-content">结合施工告示【东门片区污水管道改造工程】的现场说法，施工期间共享单车临时堆放是客观因素，但需防止长期占道</div>
+            </div>
+            
+            <div class="suggestion-section">
+                <div class="suggestion-label">📦 还缺什么材料</div>
+                <ul class="missing-list"><li>施工结束后的清理计划</li><li>临时停放点设置方案</li></ul>
+            </div>
+            
+            <div class="suggestion-section">
+                <div class="suggestion-label">👩‍💼 下一步该找谁</div>
+                <div class="suggestion-content">请社区书记周姐协调施工方和共享单车运营方，设置临时停放区域</div>
+                <span class="role-tag">责任人：社区书记周姐</span>
+                <div style="font-size: 12px; color: #999; margin-top: 4px;">更新于 2026-06-07 09:31</div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        <p class="emoji">💪</p>
+        <p>这份报告不是冷冰冰的系统日志</p>
+        <p>每一条记录背后都是街坊邻居的日常出行</p>
+        <p>每一次整改都是为了更安全、更便利的社区环境</p>
+        <p style="margin-top: 16px;">
+            本报告共涉及 <strong>1</strong> 处坡道，
+            其中 <strong style="color: #e74c3c;">0</strong> 处需交通协管紧急复核，
+            <strong>1</strong> 条整改建议等待落实
+        </p>
+        <p>辛苦了，我们一起把社区变得更好！</p>
+    </div>
+</body>
+</html>
