@@ -1,0 +1,163 @@
+{
+  "session_id": "demo_001",
+  "created_at": "2026-06-07T12:30:31.065258",
+  "run_commands": [
+    "python -m sample_screener import-model demo_001",
+    "python -m sample_screener import-corrections demo_001",
+    "python -m sample_screener import-model demo_001",
+    "python -m sample_screener rerun demo_001 SAMPLE-001 --model-version v1.2-fix --conclusion \"待人工确认 - 边界情况\""
+  ],
+  "samples": {
+    "SAMPLE-001": {
+      "sample_id": "SAMPLE-001",
+      "first_import_time": "2026-06-07T12:30:31.065308",
+      "status": "待运营复核",
+      "next_action": "找运营复核人",
+      "missing_materials": [
+        "样本变更说明文档",
+        "新旧版本标注对照"
+      ],
+      "keep_reason": "模型版本已更新，但样本编号未变，需运营复核人确认是否为同一条样本",
+      "version_conflict": true,
+      "latest_model_version": "v1.2-fix",
+      "rerun_count": 1,
+      "model_outputs": [
+        {
+          "sample_id": "SAMPLE-001",
+          "model_version": "v1.0",
+          "conclusion": "正常样本",
+          "confidence": 0.92,
+          "output_time": "2026-06-05T12:30:00",
+          "raw_fragment": "用户输入：帮我查一下明天北京天气\n模型输出：\n{\n  \"intent\": \"weather_query\",\n  \"city\": \"北京\",\n  \"date\": \"明天\",\n  \"confidence\": 0.92,\n  \"quality_score\": 0.88\n}\n模型判断：正常样本，标注质量合格"
+        },
+        {
+          "sample_id": "SAMPLE-001",
+          "model_version": "v1.1",
+          "conclusion": "低质样本 - 标注粒度不够",
+          "confidence": 0.82,
+          "output_time": "2026-06-05T14:30:00",
+          "raw_fragment": "用户输入：帮我查一下明天北京天气\n模型输出（v1.1 新版）：\n{\n  \"intent\": \"weather_query\",\n  \"city\": \"北京\",\n  \"date\": \"明天\",\n  \"confidence\": 0.92,\n  \"quality_score\": 0.62,\n  \"granularity_check\": \"failed\"\n}\n标注内容：[{\"label\":\"天气查询\",\"value\":\"是\"}]\n模型判断：低质样本，v1.1新增粒度检查不通过，标注过于简单，未区分实况/预报/预警"
+        },
+        {
+          "sample_id": "SAMPLE-001",
+          "model_version": "v1.2-fix",
+          "conclusion": "待人工确认 - 边界情况",
+          "confidence": 0.55,
+          "output_time": "2026-06-07T12:30:31.067978",
+          "raw_fragment": "用户输入：帮我查一下明天北京天气\n模型输出（v1.2-fix 粒度算法调整后）：\n{\n  \"intent\": \"weather_query\",\n  \"city\": \"北京\",\n  \"date\": \"明天\",\n  \"confidence\": 0.92,\n  \"quality_score\": 0.70,\n  \"granularity_check\": \"borderline\"\n}\n模型判断：边界情况，建议人工确认标注粒度是否满足当前业务需求"
+        }
+      ],
+      "manual_corrections": [],
+      "review_notes": []
+    },
+    "SAMPLE-002": {
+      "sample_id": "SAMPLE-002",
+      "first_import_time": "2026-06-07T12:30:31.065332",
+      "status": "补充材料中",
+      "next_action": "找算法运营老唐",
+      "missing_materials": [
+        "原始上下文截图",
+        "标注员操作记录"
+      ],
+      "keep_reason": "人工改判表已补录，原模型结论「低质样本 - 标注不完整」不能直接照抄",
+      "version_conflict": false,
+      "latest_model_version": "v1.0",
+      "rerun_count": 0,
+      "model_outputs": [
+        {
+          "sample_id": "SAMPLE-002",
+          "model_version": "v1.0",
+          "conclusion": "低质样本 - 标注不完整",
+          "confidence": 0.78,
+          "output_time": "2026-06-05T12:31:00",
+          "raw_fragment": "用户输入：推荐一款笔记本\n模型输出：\n{\n  \"intent\": \"product_recommendation\",\n  \"category\": \"笔记本\",\n  \"confidence\": 0.85,\n  \"quality_score\": 0.45\n}\n标注内容：[{\"label\":\"推荐产品\",\"value\":\"\"}]\n模型判断：低质样本，标注为空，标注员未填写具体产品"
+        }
+      ],
+      "manual_corrections": [
+        {
+          "sample_id": "SAMPLE-002",
+          "corrected_by": "老唐",
+          "corrected_conclusion": "正常样本 - 产品名可以留空",
+          "correction_time": "2026-06-05T15:30:00",
+          "reason": "看了原始对话，用户只是泛泛问笔记本，没有具体需求，标注员空着是合理的，不算低质",
+          "source": "人工改判表-群文件6月5日版"
+        }
+      ],
+      "review_notes": [
+        {
+          "sample_id": "SAMPLE-002",
+          "reviewer": "老唐",
+          "note": "看了原始对话，用户没说具体型号，标注空着是对的，不能算低质",
+          "note_time": "2026-06-07T12:30:31.066536",
+          "tag": "复核通过"
+        }
+      ]
+    },
+    "SAMPLE-003": {
+      "sample_id": "SAMPLE-003",
+      "first_import_time": "2026-06-07T12:30:31.065339",
+      "status": "补充材料中",
+      "next_action": "找算法运营老唐",
+      "missing_materials": [
+        "原始上下文截图",
+        "标注员操作记录"
+      ],
+      "keep_reason": "人工改判表已补录，原模型结论「低质样本 - 分类错误」不能直接照抄",
+      "version_conflict": false,
+      "latest_model_version": "v1.0",
+      "rerun_count": 0,
+      "model_outputs": [
+        {
+          "sample_id": "SAMPLE-003",
+          "model_version": "v1.0",
+          "conclusion": "低质样本 - 分类错误",
+          "confidence": 0.65,
+          "output_time": "2026-06-05T12:32:00",
+          "raw_fragment": "用户输入：我要投诉你们的服务太差了\n模型输出：\n{\n  \"intent\": \"complaint\",\n  \"confidence\": 0.95,\n  \"quality_score\": 0.55\n}\n标注内容：[{\"label\":\"意图分类\",\"value\":\"咨询\"}]\n模型判断：低质样本，用户明确表达投诉，但标注为咨询"
+        }
+      ],
+      "manual_corrections": [
+        {
+          "sample_id": "SAMPLE-003",
+          "corrected_by": "老唐",
+          "corrected_conclusion": "维持低质 - 分类确实错了",
+          "correction_time": "2026-06-05T15:35:00",
+          "reason": "确认过了，用户原话就是投诉，标注员标成咨询是错的，这条维持低质",
+          "source": "人工改判表-群文件6月5日版"
+        }
+      ],
+      "review_notes": [
+        {
+          "sample_id": "SAMPLE-003",
+          "reviewer": "老唐",
+          "note": "确认标注错了，维持低质结论",
+          "note_time": "2026-06-07T12:30:31.066543",
+          "tag": "维持原判"
+        }
+      ]
+    },
+    "SAMPLE-004": {
+      "sample_id": "SAMPLE-004",
+      "first_import_time": "2026-06-07T12:30:31.067574",
+      "status": "待运营复核",
+      "next_action": null,
+      "missing_materials": [],
+      "keep_reason": null,
+      "version_conflict": false,
+      "latest_model_version": "v1.1",
+      "rerun_count": 0,
+      "model_outputs": [
+        {
+          "sample_id": "SAMPLE-004",
+          "model_version": "v1.1",
+          "conclusion": "正常样本",
+          "confidence": 0.96,
+          "output_time": "2026-06-05T14:31:00",
+          "raw_fragment": "用户输入：附近有什么好吃的川菜馆\n模型输出：\n{\n  \"intent\": \"restaurant_search\",\n  \"cuisine\": \"川菜\",\n  \"location\": \"附近\",\n  \"confidence\": 0.96,\n  \"quality_score\": 0.91\n}\n模型判断：正常样本，标注质量合格"
+        }
+      ],
+      "manual_corrections": [],
+      "review_notes": []
+    }
+  }
+}
