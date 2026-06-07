@@ -1,0 +1,26 @@
+[
+  {
+    "image_id": "IMG_SMOOTH_001",
+    "query": "红色连衣裙 夏季",
+    "offline_score": 0.86,
+    "online_score": 0.84,
+    "training_log_id": "log_v2.1_20260607",
+    "remark": "顺利记录: 离线线上均为B桶"
+  },
+  {
+    "image_id": "IMG_DIFF_002",
+    "query": "白色运动鞋 跑步",
+    "offline_score": 0.82,
+    "online_score": 0.78,
+    "training_log_id": "log_v2.1_20260607",
+    "remark": "分桶差异: 离线B桶, 线上C桶, 差一个桶"
+  },
+  {
+    "image_id": "IMG_OLD_003",
+    "query": "蓝色牛仔裤 直筒",
+    "offline_score": 0.76,
+    "online_score": 0.74,
+    "training_log_id": "log_v2.1_20260607",
+    "remark": "待补录: 后续应用旧口径"
+  }
+]

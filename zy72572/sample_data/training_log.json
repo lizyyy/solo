@@ -1,0 +1,13 @@
+{
+  "log_id": "log_v2.1_20260607",
+  "experiment_name": "图像检索模型v2.1评测集",
+  "model_version": "v2.1.0",
+  "points": [
+    {"step": 0, "train_loss": 2.5, "val_mAP": 0.52},
+    {"step": 2000, "train_loss": 1.2, "val_mAP": 0.72},
+    {"step": 4000, "train_loss": 0.5, "val_mAP": 0.82},
+    {"step": 6000, "train_loss": 0.28, "val_mAP": 0.87},
+    {"step": 8000, "train_loss": 0.18, "val_mAP": 0.885},
+    {"step": 10000, "train_loss": 0.12, "val_mAP": 0.892}
+  ]
+}
