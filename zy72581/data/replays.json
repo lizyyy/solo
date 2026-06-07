@@ -1,0 +1,107 @@
+[
+  {
+    "replay_id": "replay_b6f4d952",
+    "feature_snapshot_id": "FS-2024-001",
+    "slice_id": "SL-001",
+    "original_recall": 0.92,
+    "replayed_recall": 0.92,
+    "recall_change": 0.0,
+    "applied_threshold": {
+      "recall_bonus": 0.0,
+      "sensitivity": 1.0,
+      "min_confidence": 0.5
+    },
+    "created_at": "2026-06-07 16:34:40.238567",
+    "note": "自动回放: 主流类目-手机数码"
+  },
+  {
+    "replay_id": "replay_c46846bc",
+    "feature_snapshot_id": "FS-2024-001",
+    "slice_id": "SL-002",
+    "original_recall": 0.89,
+    "replayed_recall": 0.89,
+    "recall_change": 0.0,
+    "applied_threshold": {
+      "recall_bonus": 0.0,
+      "sensitivity": 1.0,
+      "min_confidence": 0.5
+    },
+    "created_at": "2026-06-07 16:34:40.238750",
+    "note": "自动回放: 主流类目-服装鞋包"
+  },
+  {
+    "replay_id": "replay_68caf03e",
+    "feature_snapshot_id": "FS-2024-002",
+    "slice_id": "SL-003",
+    "original_recall": 0.65,
+    "replayed_recall": 0.95,
+    "recall_change": 0.29999999999999993,
+    "applied_threshold": {
+      "recall_bonus": 0.25,
+      "sensitivity": 1.2,
+      "min_confidence": 0.3
+    },
+    "created_at": "2026-06-07 16:34:40.238920",
+    "note": "自动回放: 长尾类目-古董收藏"
+  },
+  {
+    "replay_id": "replay_5a3fb376",
+    "feature_snapshot_id": "FS-2023-045",
+    "slice_id": "SL-004",
+    "original_recall": 0.58,
+    "replayed_recall": 0.688,
+    "recall_change": 0.10799999999999998,
+    "applied_threshold": {
+      "recall_bonus": 0.15,
+      "sensitivity": 0.9,
+      "min_confidence": 0.6
+    },
+    "created_at": "2026-06-07 16:34:40.239096",
+    "note": "自动回放: 长尾类目-乐器配件"
+  },
+  {
+    "replay_id": "replay_6bfb1172",
+    "feature_snapshot_id": "FS-2024-001",
+    "slice_id": "SL-005",
+    "original_recall": 0.9,
+    "replayed_recall": 0.9,
+    "recall_change": 0.0,
+    "applied_threshold": {
+      "recall_bonus": 0.0,
+      "sensitivity": 1.0,
+      "min_confidence": 0.5
+    },
+    "created_at": "2026-06-07 16:34:40.239279",
+    "note": "自动回放: 主流类目-食品生鲜"
+  },
+  {
+    "replay_id": "replay_58b6d894",
+    "feature_snapshot_id": "FS-2024-002",
+    "slice_id": "SL-003-FIX",
+    "original_recall": 0.65,
+    "replayed_recall": 0.95,
+    "recall_change": 0.29999999999999993,
+    "applied_threshold": {
+      "recall_bonus": 0.25,
+      "sensitivity": 1.2,
+      "min_confidence": 0.3
+    },
+    "created_at": "2026-06-07 16:34:40.239473",
+    "note": "自动回放: 长尾类目-古董收藏(人工修正)"
+  },
+  {
+    "replay_id": "replay_65501f2f",
+    "feature_snapshot_id": "FS-2023-045",
+    "slice_id": "SL-004-RERUN",
+    "original_recall": 0.58,
+    "replayed_recall": 0.688,
+    "recall_change": 0.10799999999999998,
+    "applied_threshold": {
+      "recall_bonus": 0.15,
+      "sensitivity": 0.9,
+      "min_confidence": 0.6
+    },
+    "created_at": "2026-06-07 16:34:40.239712",
+    "note": "自动回放: 长尾类目-乐器配件(旧口径补录)"
+  }
+]

@@ -1,0 +1,28 @@
+[
+  {
+    "slice_id": "SL-DEMO-001",
+    "slice_name": "示例-主流类目A",
+    "category": "示例类目",
+    "total_samples": 5000,
+    "positive_samples": 4200,
+    "negative_samples": 800,
+    "recall": 0.91,
+    "precision": 0.87,
+    "source": "initial_import",
+    "feature_snapshot_id": "FS-2024-001",
+    "note": "示例数据-正常记录"
+  },
+  {
+    "slice_id": "SL-DEMO-002",
+    "slice_name": "示例-长尾少数类",
+    "category": "示例类目",
+    "total_samples": 300,
+    "positive_samples": 180,
+    "negative_samples": 120,
+    "recall": 0.62,
+    "precision": 0.70,
+    "source": "initial_import",
+    "feature_snapshot_id": null,
+    "note": "示例数据-少数类，可能被总指标掩盖"
+  }
+]

@@ -1,0 +1,72 @@
+[
+  {
+    "record_id": "gap_83fb4232",
+    "slice_id": "SL-001",
+    "total_recall": 0.8941564561734213,
+    "slice_recall": 0.92,
+    "recall_gap": -0.02584354382657872,
+    "minority_ratio": 0.3952569169960474,
+    "status": "normal",
+    "is_minority_masked": false,
+    "created_at": "2026-06-07 16:34:40.236591",
+    "feature_snapshot_id": "FS-2024-001",
+    "review_note": null,
+    "fixed_note": null
+  },
+  {
+    "record_id": "gap_a8360d62",
+    "slice_id": "SL-002",
+    "total_recall": 0.8941564561734213,
+    "slice_recall": 0.89,
+    "recall_gap": 0.004156456173421308,
+    "minority_ratio": 0.31620553359683795,
+    "status": "normal",
+    "is_minority_masked": false,
+    "created_at": "2026-06-07 16:34:40.236601",
+    "feature_snapshot_id": "FS-2024-001",
+    "review_note": null,
+    "fixed_note": null
+  },
+  {
+    "record_id": "gap_44bd3bb7",
+    "slice_id": "SL-003",
+    "total_recall": 0.8941564561734213,
+    "slice_recall": 0.65,
+    "recall_gap": 0.2441564561734213,
+    "minority_ratio": 0.03162055335968379,
+    "status": "need_review",
+    "is_minority_masked": true,
+    "created_at": "2026-06-07 16:34:40.236607",
+    "feature_snapshot_id": null,
+    "review_note": null,
+    "fixed_note": null
+  },
+  {
+    "record_id": "gap_75995e74",
+    "slice_id": "SL-004",
+    "total_recall": 0.8941564561734213,
+    "slice_recall": 0.58,
+    "recall_gap": 0.31415645617342136,
+    "minority_ratio": 0.019762845849802372,
+    "status": "need_review",
+    "is_minority_masked": true,
+    "created_at": "2026-06-07 16:34:40.236611",
+    "feature_snapshot_id": null,
+    "review_note": null,
+    "fixed_note": null
+  },
+  {
+    "record_id": "gap_33597c7a",
+    "slice_id": "SL-005",
+    "total_recall": 0.8941564561734213,
+    "slice_recall": 0.9,
+    "recall_gap": -0.005843543826578701,
+    "minority_ratio": 0.23715415019762845,
+    "status": "normal",
+    "is_minority_masked": false,
+    "created_at": "2026-06-07 16:34:40.236616",
+    "feature_snapshot_id": "FS-2024-001",
+    "review_note": null,
+    "fixed_note": null
+  }
+]

@@ -1,0 +1,38 @@
+[
+  {
+    "snapshot_id": "FS-2024-001",
+    "snapshot_name": "V1.2 基线阈值",
+    "threshold_config": {
+      "recall_bonus": 0.0,
+      "sensitivity": 1.0,
+      "min_confidence": 0.5
+    },
+    "recall_target": 0.9,
+    "created_at": "2026-06-07 16:34:40.234600",
+    "note": "基线版本，无特殊调整"
+  },
+  {
+    "snapshot_id": "FS-2024-002",
+    "snapshot_name": "V1.3 长尾优化阈值",
+    "threshold_config": {
+      "recall_bonus": 0.25,
+      "sensitivity": 1.2,
+      "min_confidence": 0.3
+    },
+    "recall_target": 0.88,
+    "created_at": "2026-06-07 16:34:40.234656",
+    "note": "针对长尾少数类做了降阈值处理，人工修正后使用"
+  },
+  {
+    "snapshot_id": "FS-2023-045",
+    "snapshot_name": "V1.1 旧口径阈值",
+    "threshold_config": {
+      "recall_bonus": 0.15,
+      "sensitivity": 0.9,
+      "min_confidence": 0.6
+    },
+    "recall_target": 0.85,
+    "created_at": "2026-06-07 16:34:40.234657",
+    "note": "2023年Q4使用的旧口径，历史数据补录时参考"
+  }
+]
