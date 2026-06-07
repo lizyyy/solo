@@ -20,6 +20,8 @@ interface GameStore {
   resumeGame: () => void;
   restartGame: () => void;
   resolveConflict: (conflictId: string, resolution: 'use_preset' | 'use_imported') => void;
+  clearConflicts: () => void;
+  detectConflictsForImport: (importData: ImportedData, levelId: string) => void;
   setPlayerName: (name: string) => void;
   loadSavedGame: (gameId: string) => void;
   clearError: () => void;
@@ -29,7 +31,7 @@ interface GameStore {
 const initialWarnings: string[] = [];
 const initialErrors: string[] = [];
 
-export const useGameStore = create<GameStore>((set) => {
+export const useGameStore = create<GameStore>((set, get) => {
   const gameReducer = (state: GameState, action: GameAction): GameState => {
     const level = getLevelById(state.levelId) || getDefaultLevel();
     
@@ -191,8 +193,13 @@ export const useGameStore = create<GameStore>((set) => {
             set(state => ({ warnings: [...state.warnings, ...importValidation.warnings] }));
           }
           
-          conflicts = DataValidator.detectConflicts(level, importData);
-          set({ conflicts });
+          const existingConflicts = get().conflicts;
+          if (existingConflicts && existingConflicts.length > 0) {
+            conflicts = existingConflicts;
+          } else {
+            conflicts = DataValidator.detectConflicts(level, importData);
+            set({ conflicts });
+          }
           
           emptyValueReports = DataValidator.checkEmptyValues(importData.data);
           if (emptyValueReports.length > 0) {
@@ -314,6 +321,16 @@ export const useGameStore = create<GameStore>((set) => {
           state: newState,
         };
       });
+    },
+    
+    clearConflicts: () => {
+      set({ conflicts: [] });
+    },
+    
+    detectConflictsForImport: (importData: ImportedData, levelId: string) => {
+      const level = getLevelById(levelId) || getDefaultLevel();
+      const conflicts = DataValidator.detectConflicts(level, importData);
+      set({ conflicts });
     },
     
     setPlayerName: (name: string) => {

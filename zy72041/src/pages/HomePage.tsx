@@ -35,6 +35,8 @@ const HomePage: React.FC = () => {
     setPlayerName,
     resolveConflict,
     loadSavedGame,
+    clearConflicts,
+    detectConflictsForImport,
   } = useGameStore();
 
   const [selectedLevelId, setSelectedLevelId] = useState<string>(levels[0]?.id || '');
@@ -46,6 +48,14 @@ const HomePage: React.FC = () => {
     const games = PersistenceManager.listSavedGames();
     setSavedGames(games.filter(g => g.status !== 'completed'));
   }, []);
+
+  useEffect(() => {
+    if (useConflictData) {
+      detectConflictsForImport(conflictingImportData, selectedLevelId);
+    } else {
+      clearConflicts();
+    }
+  }, [useConflictData, selectedLevelId, clearConflicts, detectConflictsForImport]);
 
   const handleImport = (data: ImportedData) => {
     setImportedData(data);
