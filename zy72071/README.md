@@ -1,57 +1,202 @@
-# React + TypeScript + Vite
+# 城市雨洪淹没演练评审系统
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+方案经理许姐专用的评审系统，完整保留每一条判断过程，确保方案可追溯、可复原、可交接。
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 快速开始
 
-## Expanding the ESLint configuration
+### 环境要求
+- Node.js >= 16
+- npm 或 pnpm
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### 1. 安装依赖
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### 2. 类型检查
+```bash
+npm run check
 ```
+
+### 3. 启动开发服务器
+```bash
+npm run dev
+```
+
+启动成功后，终端会显示类似以下信息（端口可能因占用情况自动调整）：
+```
+  VITE v6.4.3  ready in 1330 ms
+
+  ➜  Local:   http://localhost:5178/
+  ➜  Network: use --host to expose
+```
+
+在浏览器中打开显示的 Local 地址即可访问系统。
+
+### 4. 生产构建
+```bash
+npm run build
+```
+
+---
+
+## 核心操作流程
+
+### 第一步：加载演练样例
+1. 打开系统首页，会显示「暂无评审方案」
+2. 点击右上角 **「加载演练样例」** 按钮
+3. 系统自动加载「城市雨洪淹没演练-2024南区」样例数据，并进入方案详情页
+
+> 💡 样例数据已预置所有典型异常场景，详见下方「样例数据说明」
+
+### 第二步：查看3D空间展示
+方案详情页默认显示 **3D视图**，包含：
+- 🟦 **坐标系A（蓝色网格）**：WGS84标准坐标系，6个点位
+- 🟧 **坐标系B（橙色网格）**：当地基准坐标系，4个点位（物理偏移显示，不强行合并）
+- 🟡 **黄色脉冲发光**：坐标偏移异常（带原始位置虚线）
+- 🟣 **紫色连线**：设备重名异常
+- 🔴 **红色线框**：缺少照片异常（空心球体）
+- 🟠 **橙色虚线**：跨楼层关联异常
+
+**操作方式**：
+- 鼠标左键拖拽：旋转视角
+- 鼠标滚轮：缩放
+- 鼠标右键拖拽：平移
+- 点击任意点位：右侧弹出详情面板
+
+### 第三步：切换到评审表视图
+1. 点击顶部 **「评审表」** 按钮
+2. 查看完整的方案评审表：
+   - 原始备注完整保留，不做任何清洗
+   - 异常行淡红底色高亮
+   - 异常类型用「偏/重/缺/跨」小圆标标记
+   - 点击行首 `▶` 展开详情，可补录备注
+
+### 第四步：补录备注
+1. 在评审表中展开任意一行
+2. 点击 **「补录备注」** 按钮
+3. 输入备注内容，点击 **「保存备注」**
+4. 系统自动记录：操作人、时间、与原始数据的差异
+5. 备注会标记为「补录」，并保留原始内容对照
+
+### 第五步：点位详情与判断轨迹
+1. 在3D视图或评审表中点击任一点位
+2. 右侧详情面板显示：
+   - 点位基本信息和坐标
+   - 异常详情
+   - **判断轨迹时间线**：数据导入 → 自动检测 → 人工判断 → 补充备注
+   - 原始数据备注（完整保留）
+   - 评审结论
+
+### 第六步：导出方案
+1. 点击顶部 **「导出方案」** 按钮
+2. 浏览器自动下载 JSON 文件，文件名格式：
+   ```
+   城市雨洪淹没演练-2024南区-2024-06-15.json
+   ```
+3. 导出文件包含完整数据，可再次导入复原
+
+### 第七步：截图导出
+1. 切换到需要截图的视图（3D视图或评审表）
+2. 点击顶部 **「截图」** 按钮
+3. 浏览器自动下载 PNG 图片
+4. 截图自动带水印：方案名 + 时间 + 坐标系信息
+
+### 第八步：导入已导出的方案
+1. 回到首页（点击左上角返回箭头）
+2. 点击 **「导入方案」** 按钮
+3. 选择之前导出的 JSON 文件
+4. 系统自动检测数据完整性：
+   - ✅ 数据正常：方案导入成功，显示在列表中
+   - ❌ 数据损坏：精确提示是哪个点位或哪张照片出问题
+
+---
+
+## 样例数据说明
+
+样例方案「城市雨洪淹没演练-2024南区」包含 **10个点位**，预置以下典型异常场景：
+
+| 异常类型 | 数量 | 涉及点位 | 说明 |
+|---------|------|---------|------|
+| 坐标偏移 | 1 | p004 商业广场 | 偏移约2.3米，显示原始位置虚线 |
+| 设备重名 | 1 | p008 北门 | 与p001设备编号相似，紫色连线标记 |
+| 缺少照片 | 2 | p003 办公楼西侧、p009 中区花园 | 红色线框空心球体 |
+| 跨楼层关联 | 1 | p006 B1层走廊 | 与p002车库入口联动，橙色虚线连接 |
+
+> 📌 **重要保证**：所有异常均计入统计汇总，不会悄悄消失。许姐的所有「乱备注」完整保留，不会被清洗。
+
+---
+
+## 导出再导入验证
+
+### 导出文件包含以下关键字段
+
+| 数据项 | 数量/值 | 验证结果 |
+|-------|---------|---------|
+| 点位总数 | 10 个 | ✅ |
+| 坐标系数量 | 2 个 | ✅ |
+| 判断轨迹 | 7 条 | ✅ |
+| 评审备注 | 3 条 | ✅ |
+| 异常点位总数 | 5 个 | ✅ |
+| 坐标偏移异常 | 1 个 | ✅ |
+| 设备重名异常 | 1 个 | ✅ |
+| 缺少照片异常 | 2 个 | ✅ |
+| 跨楼层关联异常 | 1 个 | ✅ |
+| 带原始备注点位 | 9 个 | ✅ |
+| 补录备注标记 | 2 条 | ✅ |
+| 坐标系A点位 | 6 个 | ✅ |
+| 坐标系B点位 | 4 个 | ✅ |
+
+### 验证结论
+✅ **导出再导入功能正常，数据完整可复原**：
+- 异常数量统计正确，无隐藏
+- 许姐的所有备注完整保留
+- 判断轨迹可追溯
+- 补录备注标记正确
+- 坐标系数据分离，不强行合并
+
+---
+
+## 项目结构
+
+```
+src/
+├── types/
+│   └── index.ts              # TypeScript 类型定义
+├── store/
+│   └── projectStore.ts       # Zustand 状态管理（本地存储）
+├── data/
+│   └── sampleData.ts         # 城市雨洪淹没演练样例数据
+├── components/
+│   ├── Scene3D.tsx           # 3D场景组件（坐标系分离、异常高亮）
+│   ├── ReviewTable.tsx       # 方案评审表（保留原始备注）
+│   ├── PointDetailPanel.tsx  # 点位详情+判断轨迹时间线
+│   └── AnomalyStats.tsx      # 异常统计面板
+└── pages/
+    ├── HomePage.tsx          # 方案列表首页
+    └── ProjectPage.tsx       # 方案详情页
+```
+
+---
+
+## 数据存储说明
+
+- 方案数据存储于浏览器 `localStorage`
+- 刷新页面数据不会丢失
+- 建议定期使用「导出方案」功能备份
+- 清除浏览器缓存会导致本地数据丢失，请务必导出备份
+
+---
+
+## 交接给方案经理许姐的清单
+
+- [x] 坐标系不一致数据分开显示，不强行合并
+- [x] 所有异常类型明确标记，颜色可区分
+- [x] 原始备注完整保留，不做清洗
+- [x] 判断轨迹时间线可追溯，含操作人、时间、差异
+- [x] 补录备注标记明确，保留原始内容对照
+- [x] 异常统计不隐藏例外数据
+- [x] 导出JSON可再次导入，完整复原
+- [x] 截图带水印，包含方案名、时间、坐标系
