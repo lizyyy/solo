@@ -87,28 +87,42 @@ export const useAppStore = create<AppStore>((set, get) => ({
   },
 
   resolveAnomaly: (anomalyId, remark) => {
-    const { currentSolution } = get();
+    const { currentSolution, solutions } = get();
     if (!currentSolution) return;
 
     const updatedAnomalies = currentSolution.anomalies.map((a) =>
       a.id === anomalyId ? { ...a, resolved: true, remark } : a
     );
 
+    const updatedSolution = { 
+      ...currentSolution, 
+      anomalies: updatedAnomalies,
+      updatedAt: new Date().toISOString(),
+    };
+
     set({
-      currentSolution: { ...currentSolution, anomalies: updatedAnomalies },
+      currentSolution: updatedSolution,
+      solutions: solutions.map((s) =>
+        s.id === currentSolution.id ? updatedSolution : s
+      ),
     });
   },
 
   addRemark: (remark) => {
-    const { currentSolution } = get();
+    const { currentSolution, solutions } = get();
     if (!currentSolution) return;
 
+    const updatedSolution = {
+      ...currentSolution,
+      remarks: [...currentSolution.remarks, remark],
+      updatedAt: new Date().toISOString(),
+    };
+
     set({
-      currentSolution: {
-        ...currentSolution,
-        remarks: [...currentSolution.remarks, remark],
-        updatedAt: new Date().toISOString(),
-      },
+      currentSolution: updatedSolution,
+      solutions: solutions.map((s) =>
+        s.id === currentSolution.id ? updatedSolution : s
+      ),
     });
   },
 

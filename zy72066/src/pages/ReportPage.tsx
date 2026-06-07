@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import html2canvas from 'html2canvas';
 import {
@@ -12,9 +12,12 @@ import {
   CheckCircle,
   Clock,
   User,
+  History,
+  ArrowDownUp,
+  FileCheck,
 } from 'lucide-react';
 import { useAppStore } from '../store/appStore';
-import { AnomalyType, DeviceStatus } from '../types';
+import { AnomalyType, DeviceStatus, Anomaly } from '../types';
 
 const anomalyTypeLabels: Record<AnomalyType, string> = {
   coordinate_offset: '坐标偏移',
@@ -80,23 +83,53 @@ export default function ReportPage() {
 
   const totalEnergy = filteredDevices.reduce((sum, d) => sum + d.energyConsumption, 0);
   const unresolvedAnomalies = filteredAnomalies.filter((a) => !a.resolved).length;
+  const resolvedAnomalies = filteredAnomalies.filter((a) => a.resolved).length;
+
+  const anomalyResolutionStats = useMemo(() => {
+    const stats: Record<string, { total: number; resolved: number; unresolved: number }> = {};
+    filteredAnomalies.forEach((a) => {
+      if (!stats[a.type]) {
+        stats[a.type] = { total: 0, resolved: 0, unresolved: 0 };
+      }
+      stats[a.type].total++;
+      if (a.resolved) {
+        stats[a.type].resolved++;
+      } else {
+        stats[a.type].unresolved++;
+      }
+    });
+    return stats;
+  }, [filteredAnomalies]);
 
   const handleExport = async () => {
     if (!reportRef.current) return;
     setIsExporting(true);
     
     try {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       const canvas = await html2canvas(reportRef.current, {
         backgroundColor: '#ffffff',
         scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        logging: false,
       });
       
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+      const fileName = `能耗报告_${currentSolution.name}_${timestamp}.png`;
+      
       const link = document.createElement('a');
-      link.download = `能耗报告_${currentSolution.name}_${new Date().toLocaleDateString('zh-CN')}.png`;
+      link.download = fileName;
       link.href = canvas.toDataURL('image/png');
       link.click();
+      
+      console.log(`✅ 报告导出成功: ${fileName}`);
+      console.log(`📊 导出内容验证: ${filteredDevices.length} 台设备, ${filteredAnomalies.length} 条异常, ${currentSolution.remarks.length} 条备注`);
+      
     } catch (error) {
-      console.error('导出失败:', error);
+      console.error('❌ 导出失败:', error);
+      alert('导出失败，请重试');
     }
     
     setIsExporting(false);
@@ -215,12 +248,69 @@ export default function ReportPage() {
           )}
         </div>
 
-        <div className="grid grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-5 gap-4 mb-8">
           <StatCard label="设备总数" value={filteredDevices.length} icon="📊" />
           <StatCard label="总能耗" value={`${totalEnergy}kWh`} icon="⚡" />
           <StatCard label="异常总数" value={filteredAnomalies.length} icon="⚠️" warning />
+          <StatCard label="已处理" value={resolvedAnomalies} icon="✅" success />
           <StatCard label="待处理" value={unresolvedAnomalies} icon="🔴" error />
         </div>
+
+        <div className="mb-8 p-5 bg-gray-50 rounded-xl">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+            <ArrowDownUp className="w-5 h-5 text-primary-600" />
+            检测参数配置
+          </h3>
+          <div className="grid grid-cols-3 gap-6">
+            <div>
+              <p className="text-sm text-gray-500">警告阈值</p>
+              <p className="text-xl font-bold text-yellow-600">{currentConfig.energyThreshold.warning} kWh</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">错误阈值</p>
+              <p className="text-xl font-bold text-red-600">{currentConfig.energyThreshold.error} kWh</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">坐标容差</p>
+              <p className="text-xl font-bold text-gray-700">{currentConfig.coordinateTolerance} m</p>
+            </div>
+          </div>
+        </div>
+
+        {resolvedAnomalies > 0 && (
+          <div className="mb-8 p-5 bg-green-50 rounded-xl border border-green-200">
+            <h3 className="text-lg font-semibold text-green-800 mb-4 flex items-center gap-2">
+              <FileCheck className="w-5 h-5" />
+              补录处理进度
+            </h3>
+            <div className="mb-4">
+              <div className="flex justify-between text-sm mb-1">
+                <span className="text-gray-600">处理进度</span>
+                <span className="font-medium text-green-700">
+                  {resolvedAnomalies} / {filteredAnomalies.length} ({Math.round((resolvedAnomalies / filteredAnomalies.length) * 100)}%)
+                </span>
+              </div>
+              <div className="w-full bg-green-200 rounded-full h-3">
+                <div
+                  className="bg-green-500 h-3 rounded-full transition-all duration-500"
+                  style={{ width: `${(resolvedAnomalies / filteredAnomalies.length) * 100}%` }}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-4">
+              {Object.entries(anomalyResolutionStats).map(([type, stat]) => (
+                <div key={type} className="bg-white rounded-lg p-3">
+                  <p className="text-sm text-gray-600">{anomalyTypeLabels[type as AnomalyType]}</p>
+                  <p className="text-lg font-bold">
+                    <span className="text-green-600">{stat.resolved}</span>
+                    <span className="text-gray-400"> / </span>
+                    <span className="text-gray-700">{stat.total}</span>
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="mb-8">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">各楼层统计</h3>
@@ -259,7 +349,10 @@ export default function ReportPage() {
         </div>
 
         <div className="mb-8">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">异常明细</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+            <History className="w-5 h-5 text-primary-600" />
+            异常明细与处理记录
+          </h3>
           {filteredAnomalies.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -267,21 +360,25 @@ export default function ReportPage() {
                   <tr className="bg-gray-50">
                     <th className="text-left px-4 py-3 font-medium text-gray-600">设备</th>
                     <th className="text-left px-4 py-3 font-medium text-gray-600">类型</th>
-                    <th className="text-left px-4 py-3 font-medium text-gray-600">描述</th>
+                    <th className="text-left px-4 py-3 font-medium text-gray-600">异常描述</th>
                     <th className="text-left px-4 py-3 font-medium text-gray-600">严重程度</th>
                     <th className="text-left px-4 py-3 font-medium text-gray-600">状态</th>
+                    <th className="text-left px-4 py-3 font-medium text-gray-600">处理备注</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredAnomalies.map((anomaly) => {
                     const device = currentSolution.devices.find((d) => d.id === anomaly.deviceId);
                     return (
-                      <tr key={anomaly.id} className="border-b border-gray-100 hover:bg-gray-50">
+                      <tr key={anomaly.id} className={`border-b border-gray-100 hover:bg-gray-50 ${
+                        anomaly.resolved ? 'bg-green-50/30' : ''
+                      }`}>
                         <td className="px-4 py-3 font-medium text-gray-800">
                           {device?.name || '未知设备'}
+                          <span className="block text-xs text-gray-500">{device?.floor}F</span>
                         </td>
                         <td className="px-4 py-3 text-gray-600">{anomalyTypeLabels[anomaly.type]}</td>
-                        <td className="px-4 py-3 text-gray-600">{anomaly.description}</td>
+                        <td className="px-4 py-3 text-gray-600 max-w-xs">{anomaly.description}</td>
                         <td className="px-4 py-3">
                           <span className={`px-2 py-0.5 rounded-full text-xs ${
                             anomaly.severity === 'high' ? 'bg-red-100 text-red-700' :
@@ -293,13 +390,20 @@ export default function ReportPage() {
                         </td>
                         <td className="px-4 py-3">
                           {anomaly.resolved ? (
-                            <span className="flex items-center gap-1 text-green-600">
+                            <span className="flex items-center gap-1 text-green-600 font-medium">
                               <CheckCircle className="w-4 h-4" /> 已处理
                             </span>
                           ) : (
-                            <span className="flex items-center gap-1 text-red-600">
+                            <span className="flex items-center gap-1 text-red-600 font-medium">
                               <AlertTriangle className="w-4 h-4" /> 待处理
                             </span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-gray-600 max-w-xs">
+                          {anomaly.remark ? (
+                            <span className="text-sm">{anomaly.remark}</span>
+                          ) : (
+                            <span className="text-gray-400 text-xs">-</span>
                           )}
                         </td>
                       </tr>
@@ -358,16 +462,20 @@ export default function ReportPage() {
   );
 }
 
-function StatCard({ label, value, icon, warning, error }: any) {
+function StatCard({ label, value, icon, warning, error, success }: any) {
   return (
     <div className={`p-4 rounded-xl ${
       error ? 'bg-red-50 border border-red-200' :
       warning ? 'bg-orange-50 border border-orange-200' :
+      success ? 'bg-green-50 border border-green-200' :
       'bg-gray-50'
     }`}>
       <div className="text-2xl mb-1">{icon}</div>
       <p className={`text-2xl font-bold ${
-        error ? 'text-red-700' : warning ? 'text-orange-700' : 'text-gray-800'
+        error ? 'text-red-700' : 
+        warning ? 'text-orange-700' : 
+        success ? 'text-green-700' : 
+        'text-gray-800'
       }`}>
         {value}
       </p>
