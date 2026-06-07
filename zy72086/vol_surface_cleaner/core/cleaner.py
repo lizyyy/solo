@@ -91,11 +91,12 @@ class VolatilitySurfaceCleaner:
             parameters_used={"processing_time": processing_time}
         )
 
+        final_outlier_count = len([p for p in points if p.is_outlier])
         result = CleanResult(
             surface=surface,
             original_points=original_count,
             cleaned_points=len([p for p in points if not p.is_outlier]),
-            outliers_removed=outliers_removed,
+            outliers_removed=final_outlier_count,
             interpolated_points=interpolated,
             conflicts_found=conflicts,
             parameter_versions_used=param_versions,

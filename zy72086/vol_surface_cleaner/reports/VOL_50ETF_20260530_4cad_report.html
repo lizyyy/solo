@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>期权波动率曲面清洗报告 - 50ETF @ 2026-05-30</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts-gl@2.0.9/dist/echarts-gl.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif; background: #f5f7fa; color: #333; line-height: 1.6; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 12px; margin-bottom: 20px; }
+        .header h1 { font-size: 28px; margin-bottom: 10px; }
+        .header .meta { display: flex; gap: 20px; flex-wrap: wrap; opacity: 0.9; }
+        .status-badge { display: inline-block; padding: 6px 16px; border-radius: 20px; font-weight: 600; font-size: 14px; }
+        .status-success { background: #52c41a; }
+        .status-warning { background: #faad14; }
+        .status-danger { background: #ff4d4f; }
+        .status-info { background: #1890ff; }
+        .status-primary { background: #722ed1; }
+        .status-secondary { background: #8c8c8c; }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px; }
+        .stat-card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .stat-card .label { font-size: 13px; color: #8c8c8c; margin-bottom: 8px; }
+        .stat-card .value { font-size: 28px; font-weight: 700; color: #262626; }
+        .stat-card .trend { font-size: 12px; margin-top: 4px; }
+        .trend-up { color: #52c41a; }
+        .trend-down { color: #ff4d4f; }
+
+        .section { background: white; padding: 24px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .section h2 { font-size: 20px; margin-bottom: 16px; color: #262626; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; }
+        .section h3 { font-size: 16px; margin: 20px 0 12px; color: #595959; }
+
+        .chart-container { height: 400px; width: 100%; margin: 20px 0; }
+        .chart-container-3d { height: 500px; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #f0f0f0; }
+        th { background: #fafafa; font-weight: 600; color: #595959; font-size: 13px; }
+        tr:hover { background: #fafafa; }
+        .clickable { cursor: pointer; }
+        .clickable:hover { background: #e6f7ff; }
+
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; }
+        .badge-success { background: #f6ffed; color: #52c41a; border: 1px solid #b7eb8f; }
+        .badge-warning { background: #fffbe6; color: #faad14; border: 1px solid #ffe58f; }
+        .badge-danger { background: #fff1f0; color: #ff4d4f; border: 1px solid #ffa39e; }
+        .badge-info { background: #e6f7ff; color: #1890ff; border: 1px solid #91d5ff; }
+
+        .conflict-card { background: #fff1f0; border-left: 4px solid #ff4d4f; padding: 16px; margin: 12px 0; border-radius: 4px; }
+        .conflict-card h4 { color: #ff4d4f; margin-bottom: 8px; }
+        .evidence-list { margin: 8px 0; padding-left: 20px; }
+        .evidence-list li { margin: 4px 0; font-size: 13px; }
+
+        .decision-path { background: #f6ffed; border-left: 4px solid #52c41a; padding: 12px; margin: 8px 0; border-radius: 4px; font-family: 'Monaco', 'Consolas', monospace; font-size: 13px; }
+        .decision-path ol { padding-left: 20px; }
+        .decision-path li { margin: 4px 0; }
+
+        .params-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+        .param-item { background: #fafafa; padding: 12px; border-radius: 6px; border: 1px solid #f0f0f0; }
+        .param-item .name { font-weight: 600; color: #262626; }
+        .param-item .value { color: #1890ff; font-family: monospace; margin: 4px 0; }
+        .param-item .meta { font-size: 12px; color: #8c8c8c; }
+        .param-modified { border-left: 3px solid #faad14; }
+
+        .tabs { display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 2px solid #f0f0f0; }
+        .tab { padding: 10px 20px; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; font-weight: 500; }
+        .tab.active { border-bottom-color: #1890ff; color: #1890ff; }
+        .tab:hover { color: #1890ff; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; padding: 30px; border-radius: 12px; max-width: 800px; max-height: 80vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #8c8c8c; }
+
+        .confidence-bar { height: 8px; background: #f0f0f0; border-radius: 4px; overflow: hidden; }
+        .confidence-fill { height: 100%; }
+        .confidence-high { background: #52c41a; }
+        .confidence-medium { background: #faad14; }
+        .confidence-low { background: #ff4d4f; }
+
+        .source-badge { display: inline-block; padding: 3px 8px; border-radius: 3px; font-size: 11px; margin-right: 4px; }
+        .source-lecture_note { background: #f0f5ff; color: #2f54eb; }
+        .source-business_table { background: #f6ffed; color: #389e0d; }
+        .source-screenshot { background: #fffbe6; color: #d48806; }
+        .source-summary_page { background: #fff0f6; color: #c41d7f; }
+        .source-interpolation_engine { background: #f9f0ff; color: #531dab; }
+
+        .legacy-note { background: #fff0f6; padding: 16px; border-radius: 8px; margin: 16px 0; border-left: 4px solid #c41d7f; }
+        .legacy-note h4 { color: #c41d7f; margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 期权波动率曲面清洗报告</h1>
+            <div class="meta">
+                <span><strong>标的:</strong> 50ETF</span>
+                <span><strong>交易日:</strong> 2026-05-30</span>
+                <span><strong>曲面ID:</strong> VOL_50ETF_20260530_4cad</span>
+                <span><strong>版本:</strong> v853ccefc</span>
+                <span class="status-badge status-warning">
+                    ⚠ 待人工确认
+                </span>
+            </div>
+            <p style="margin-top: 15px; opacity: 0.9;">多源导入曲面 - 讲义+业务表+截图</p>
+        </div>
+
+        <div class="grid">
+            <div class="stat-card">
+                <div class="label">原始数据点</div>
+                <div class="value">18</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">有效数据点</div>
+                <div class="value" style="color: #52c41a;">18</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">异常值移除</div>
+                <div class="value" style="color: #ff4d4f;">6</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">插值补全</div>
+                <div class="value" style="color: #faad14;">6</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">待处理冲突</div>
+                <div class="value" style="color: #ff4d4f;">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">处理耗时</div>
+                <div class="value">0.029s</div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="stat-card">
+                <div class="label">高置信度 (≥0.8)</div>
+                <div class="value" style="color: #52c41a;">6</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">中置信度 (0.5-0.8)</div>
+                <div class="value" style="color: #faad14;">6</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">低置信度 (<0.5)</div>
+                <div class="value" style="color: #ff4d4f;">12</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">待人工复核</div>
+                <div class="value" style="color: #faad14;">6</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">旧口径数据</div>
+                <div class="value" style="color: #722ed1;">0</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📈 波动率曲面可视化</h2>
+
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('tab-3d')">3D曲面图</div>
+                <div class="tab" onclick="switchTab('tab-smile')">波动率微笑</div>
+                <div class="tab" onclick="switchTab('tab-term')">期限结构</div>
+            </div>
+
+            <div id="tab-3d" class="tab-content active">
+                <p style="color: #8c8c8c; margin-bottom: 10px;">💡 点击曲面上的点可查看详细决策路径</p>
+                <div id="chart-3d" class="chart-container chart-container-3d"></div>
+            </div>
+
+            <div id="tab-smile" class="tab-content">
+                <p style="color: #8c8c8c; margin-bottom: 10px;">💡 点击曲线上的点可查看详细决策路径</p>
+                <div id="chart-smile" class="chart-container"></div>
+            </div>
+
+            <div id="tab-term" class="tab-content">
+                <p style="color: #8c8c8c; margin-bottom: 10px;">💡 ATM执行价: 3.0</p>
+                <div id="chart-term" class="chart-container"></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🔍 数据详情</h2>
+            <p style="color: #8c8c8c; margin-bottom: 10px;">💡 点击任意行查看该点的完整决策路径</p>
+            <table id="points-table">
+                <thead>
+                    <tr>
+                        <th>点ID</th>
+                        <th>期限</th>
+                        <th>行权价</th>
+                        <th>类型</th>
+                        <th>原始值</th>
+                        <th>清洗后值</th>
+                        <th>来源</th>
+                        <th>置信度</th>
+                        <th>状态</th>
+                        <th>备注</th>
+                    </tr>
+                </thead>
+                <tbody id="points-tbody">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>⚠️ 冲突记录 (与汇总页对比)</h2>
+            <div class="badge badge-success">✓ 未检测到与汇总页的数据冲突</div>
+        </div>
+
+        <div class="section">
+            <h2>📜 各期限汇总</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>期限</th>
+                        <th>数据点数</th>
+                        <th>有效点数</th>
+                        <th>平均波动率</th>
+                        <th>最小波动率</th>
+                        <th>最大波动率</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+            <tr>
+                <td><strong>1M</strong></td>
+                <td>3</td>
+                <td>3</td>
+                <td>0.1726</td>
+                <td>0.1635</td>
+                <td>0.1796</td>
+            </tr>
+            
+            <tr>
+                <td><strong>2Y</strong></td>
+                <td>3</td>
+                <td>0</td>
+                <td>0.0000</td>
+                <td>0.0000</td>
+                <td>0.0000</td>
+            </tr>
+            
+            <tr>
+                <td><strong>3M</strong></td>
+                <td>3</td>
+                <td>3</td>
+                <td>0.1756</td>
+                <td>0.1665</td>
+                <td>0.1826</td>
+            </tr>
+            
+            <tr>
+                <td><strong>3Y</strong></td>
+                <td>3</td>
+                <td>0</td>
+                <td>0.0000</td>
+                <td>0.0000</td>
+                <td>0.0000</td>
+            </tr>
+            
+            <tr>
+                <td><strong>T0</strong></td>
+                <td>2</td>
+                <td>2</td>
+                <td>0.1950</td>
+                <td>0.1850</td>
+                <td>0.2050</td>
+            </tr>
+            
+            <tr>
+                <td><strong>T1</strong></td>
+                <td>2</td>
+                <td>2</td>
+                <td>0.1710</td>
+                <td>0.1620</td>
+                <td>0.1800</td>
+            </tr>
+            
+            <tr>
+                <td><strong>T2</strong></td>
+                <td>2</td>
+                <td>2</td>
+                <td>0.1890</td>
+                <td>0.1780</td>
+                <td>0.2000</td>
+            </tr>
+            
+            <tr>
+                <td><strong>T3</strong></td>
+                <td>2</td>
+                <td>2</td>
+                <td>0.2050</td>
+                <td>0.1950</td>
+                <td>0.2150</td>
+            </tr>
+            
+            <tr>
+                <td><strong>T4</strong></td>
+                <td>2</td>
+                <td>2</td>
+                <td>0.1800</td>
+                <td>0.1700</td>
+                <td>0.1900</td>
+            </tr>
+            
+            <tr>
+                <td><strong>T5</strong></td>
+                <td>2</td>
+                <td>2</td>
+                <td>0.1990</td>
+                <td>0.1880</td>
+                <td>0.2100</td>
+            </tr>
+            
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>⚙️ 参数版本记录</h2>
+            <p style="color: #8c8c8c; margin-bottom: 10px;">💡 黄色边框表示该参数被人工修改过，非系统默认值</p>
+            <div class="params-grid">
+                
+            <div class="param-item param-modified">
+                <div class="name">outlier_zscore_threshold</div>
+                <div class="value">2.5</div>
+                <div class="meta">
+                    ⚠️ 人工修改 |
+                    版本: <code>v9b19b3</code>
+                     | 修改于: 2026-06-07T22:55:07
+                </div>
+                <div class="meta" style="margin-top: 4px; color: #faad14;">备注: 近期市场波动较大，收紧异常检测阈值</div>
+                <div class="meta" style="margin-top: 4px;">默认值: <code>3.0</code></div>
+            </div>
+            
+            <div class="param-item ">
+                <div class="name">outlier_iqr_factor</div>
+                <div class="value">1.5</div>
+                <div class="meta">
+                    系统默认 |
+                    版本: <code>v884f09</code>
+                    
+                </div>
+                <div class="meta" style="margin-top: 4px; color: #faad14;">备注: 系统默认参数</div>
+                
+            </div>
+            
+            <div class="param-item ">
+                <div class="name">vol_min_valid</div>
+                <div class="value">0.01</div>
+                <div class="meta">
+                    系统默认 |
+                    版本: <code>vdd91ab</code>
+                    
+                </div>
+                <div class="meta" style="margin-top: 4px; color: #faad14;">备注: 系统默认参数</div>
+                
+            </div>
+            
+            <div class="param-item ">
+                <div class="name">vol_max_valid</div>
+                <div class="value">2.0</div>
+                <div class="meta">
+                    系统默认 |
+                    版本: <code>v8b1215</code>
+                    
+                </div>
+                <div class="meta" style="margin-top: 4px; color: #faad14;">备注: 系统默认参数</div>
+                
+            </div>
+            
+            <div class="param-item ">
+                <div class="name">arbitrage_max_spread</div>
+                <div class="value">0.05</div>
+                <div class="meta">
+                    系统默认 |
+                    版本: <code>vb214c6</code>
+                    
+                </div>
+                <div class="meta" style="margin-top: 4px; color: #faad14;">备注: 系统默认参数</div>
+                
+            </div>
+            
+            <div class="param-item ">
+                <div class="name">interpolation_method</div>
+                <div class="value">cubic</div>
+                <div class="meta">
+                    系统默认 |
+                    版本: <code>v023bde</code>
+                    
+                </div>
+                <div class="meta" style="margin-top: 4px; color: #faad14;">备注: 系统默认参数</div>
+                
+            </div>
+            
+            <div class="param-item ">
+                <div class="name">smoothness_lambda</div>
+                <div class="value">0.1</div>
+                <div class="meta">
+                    系统默认 |
+                    版本: <code>v3d2ed2</code>
+                    
+                </div>
+                <div class="meta" style="margin-top: 4px; color: #faad14;">备注: 系统默认参数</div>
+                
+            </div>
+            
+            <div class="param-item ">
+                <div class="name">confidence_weight_source</div>
+                <div class="value">{'lecture_note': 0.6, 'business_table': 0.9, 'scre...</div>
+                <div class="meta">
+                    系统默认 |
+                    版本: <code>v7dcf16</code>
+                    
+                </div>
+                <div class="meta" style="margin-top: 4px; color: #faad14;">备注: 系统默认参数</div>
+                
+            </div>
+            
+            <div class="param-item param-modified">
+                <div class="name">conflict_tolerance_pct</div>
+                <div class="value">3.0</div>
+                <div class="meta">
+                    ⚠️ 人工修改 |
+                    版本: <code>vcfd861</code>
+                     | 修改于: 2026-06-07T22:55:07
+                </div>
+                <div class="meta" style="margin-top: 4px; color: #faad14;">备注: 提高数据一致性要求</div>
+                <div class="meta" style="margin-top: 4px;">默认值: <code>5.0</code></div>
+            </div>
+            
+            <div class="param-item ">
+                <div class="name">tenor_order</div>
+                <div class="value">['1M', '3M', '6M', '1Y', '2Y', '3Y', '5Y', '10Y']</div>
+                <div class="meta">
+                    系统默认 |
+                    版本: <code>v228dc7</code>
+                    
+                </div>
+                <div class="meta" style="margin-top: 4px; color: #faad14;">备注: 系统默认参数</div>
+                
+            </div>
+            
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📁 数据来源</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>来源类型</th>
+                        <th>名称</th>
+                        <th>路径</th>
+                        <th>导入时间</th>
+                        <th>字段映射</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+            <tr>
+                <td><span class="source-badge source-lecture_note">lecture_note</span></td>
+                <td><strong>金融工程讲义-第7章</strong></td>
+                <td><code style="font-size: 11px;">-</code></td>
+                <td>2026-06-07T23:03:57</td>
+                <td style="font-size: 11px;">期限→maturity, 行权价→strike, 隐含波动率→implied_vol</td>
+            </tr>
+            
+            <tr>
+                <td><span class="source-badge source-business_table">business_table</span></td>
+                <td><strong>期权做市系统导出_20260530</strong></td>
+                <td><code style="font-size: 11px;">-</code></td>
+                <td>2026-06-07T23:03:57</td>
+                <td style="font-size: 11px;">执行价→strike, IV→implied_vol, 期权类型→option_type</td>
+            </tr>
+            
+            <tr>
+                <td><span class="source-badge source-screenshot">screenshot</span></td>
+                <td><strong>彭博终端截图_15:30</strong></td>
+                <td><code style="font-size: 11px;">-</code></td>
+                <td>2026-06-07T23:03:57</td>
+                <td style="font-size: 11px;">tenor→tenor, strike→strike, implied_vol→implied_vol, maturity→maturity</td>
+            </tr>
+            
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>📝 最近审计日志</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>时间</th>
+                        <th>操作</th>
+                        <th>曲面ID</th>
+                        <th>点ID</th>
+                        <th>原因</th>
+                        <th>操作人</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+            <tr>
+                <td style="font-size: 11px;">2026-06-07T23:03:57</td>
+                <td><strong>范围校验标记</strong></td>
+                <td><code style="font-size: 11px;">VOL_50ETF_20260530_4cad</code></td>
+                <td><code style="font-size: 11px;">cbac305c</code></td>
+                <td style="font-size: 11px; max-width: 300px;">波动率超出有效范围 [0.01, 2.0]</td>
+                <td>system</td>
+            </tr>
+            
+            <tr>
+                <td style="font-size: 11px;">2026-06-07T23:03:57</td>
+                <td><strong>范围校验标记</strong></td>
+                <td><code style="font-size: 11px;">VOL_50ETF_20260530_4cad</code></td>
+                <td><code style="font-size: 11px;">274acbde</code></td>
+                <td style="font-size: 11px; max-width: 300px;">波动率超出有效范围 [0.01, 2.0]</td>
+                <td>system</td>
+            </tr>
+            
+            <tr>
+                <td style="font-size: 11px;">2026-06-07T23:03:57</td>
+                <td><strong>范围校验标记</strong></td>
+                <td><code style="font-size: 11px;">VOL_50ETF_20260530_4cad</code></td>
+                <td><code style="font-size: 11px;">17e235b3</code></td>
+                <td style="font-size: 11px; max-width: 300px;">波动率超出有效范围 [0.01, 2.0]</td>
+                <td>system</td>
+            </tr>
+            
+            <tr>
+                <td style="font-size: 11px;">2026-06-07T23:03:57</td>
+                <td><strong>范围校验标记</strong></td>
+                <td><code style="font-size: 11px;">VOL_50ETF_20260530_4cad</code></td>
+                <td><code style="font-size: 11px;">fb2a0a32</code></td>
+                <td style="font-size: 11px; max-width: 300px;">波动率超出有效范围 [0.01, 2.0]</td>
+                <td>system</td>
+            </tr>
+            
+            <tr>
+                <td style="font-size: 11px;">2026-06-07T23:03:57</td>
+                <td><strong>范围校验标记</strong></td>
+                <td><code style="font-size: 11px;">VOL_50ETF_20260530_4cad</code></td>
+                <td><code style="font-size: 11px;">0e360498</code></td>
+                <td style="font-size: 11px; max-width: 300px;">波动率超出有效范围 [0.01, 2.0]</td>
+                <td>system</td>
+            </tr>
+            
+            <tr>
+                <td style="font-size: 11px;">2026-06-07T23:03:57</td>
+                <td><strong>范围校验标记</strong></td>
+                <td><code style="font-size: 11px;">VOL_50ETF_20260530_4cad</code></td>
+                <td><code style="font-size: 11px;">6cfc5077</code></td>
+                <td style="font-size: 11px; max-width: 300px;">波动率超出有效范围 [0.01, 2.0]</td>
+                <td>system</td>
+            </tr>
+            
+            <tr>
+                <td style="font-size: 11px;">2026-06-07T23:03:57</td>
+                <td><strong>补充期限点</strong></td>
+                <td><code style="font-size: 11px;">VOL_50ETF_20260530_4cad</code></td>
+                <td><code style="font-size: 11px;">5e07080d</code></td>
+                <td style="font-size: 11px; max-width: 300px;">补充缺失期限 1M</td>
+                <td>system</td>
+            </tr>
+            
+            <tr>
+                <td style="font-size: 11px;">2026-06-07T23:03:57</td>
+                <td><strong>补充期限点</strong></td>
+                <td><code style="font-size: 11px;">VOL_50ETF_20260530_4cad</code></td>
+                <td><code style="font-size: 11px;">05b053fc</code></td>
+                <td style="font-size: 11px; max-width: 300px;">补充缺失期限 1M</td>
+                <td>system</td>
+            </tr>
+            
+            <tr>
+                <td style="font-size: 11px;">2026-06-07T23:03:57</td>
+                <td><strong>补充期限点</strong></td>
+                <td><code style="font-size: 11px;">VOL_50ETF_20260530_4cad</code></td>
+                <td><code style="font-size: 11px;">c45ff01e</code></td>
+                <td style="font-size: 11px; max-width: 300px;">补充缺失期限 1M</td>
+                <td>system</td>
+            </tr>
+            
+            <tr>
+                <td style="font-size: 11px;">2026-06-07T23:03:57</td>
+                <td><strong>补充期限点</strong></td>
+                <td><code style="font-size: 11px;">VOL_50ETF_20260530_4cad</code></td>
+                <td><code style="font-size: 11px;">bcb26f69</code></td>
+                <td style="font-size: 11px; max-width: 300px;">补充缺失期限 3M</td>
+                <td>system</td>
+            </tr>
+            
+            <tr>
+                <td style="font-size: 11px;">2026-06-07T23:03:57</td>
+                <td><strong>补充期限点</strong></td>
+                <td><code style="font-size: 11px;">VOL_50ETF_20260530_4cad</code></td>
+                <td><code style="font-size: 11px;">0e6a53a9</code></td>
+                <td style="font-size: 11px; max-width: 300px;">补充缺失期限 3M</td>
+                <td>system</td>
+            </tr>
+            
+            <tr>
+                <td style="font-size: 11px;">2026-06-07T23:03:57</td>
+                <td><strong>补充期限点</strong></td>
+                <td><code style="font-size: 11px;">VOL_50ETF_20260530_4cad</code></td>
+                <td><code style="font-size: 11px;">988da2a2</code></td>
+                <td style="font-size: 11px; max-width: 300px;">补充缺失期限 3M</td>
+                <td>system</td>
+            </tr>
+            
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h3 style="color: #8c8c8c; font-size: 13px; text-align: center; margin-top: 30px;">
+                报告生成时间: 2026-06-07T23:03:57.329544 | 曲面ID: VOL_50ETF_20260530_4cad | 版本: v853ccefc
+            </h3>
+        </div>
+    </div>
+
+    <div id="point-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">点位详情</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        const reportData = {"version_id": "v853ccefc", "surface_id": "VOL_50ETF_20260530_4cad", "underlying": "50ETF", "trade_date": "2026-05-30T00:00:00", "generated_at": "2026-06-07T23:03:57.329544", "status": "pending_review", "status_display": {"text": "待人工确认", "class": "warning", "icon": "⚠"}, "comments": "多源导入曲面 - 讲义+业务表+截图", "summary": {"original_points": 18, "cleaned_points": 18, "outliers_removed": 6, "interpolated_points": 6, "conflicts": 0, "processing_time": 0.029, "high_confidence": 6, "medium_confidence": 6, "low_confidence": 12, "needs_review": 6, "legacy_points": 0}, "data_sources": [{"source_type": "lecture_note", "source_name": "金融工程讲义-第7章", "source_path": null, "import_time": "2026-06-07T23:03:57.251893", "field_mapping": {"期限": "maturity", "行权价": "strike", "隐含波动率": "implied_vol"}, "raw_data_hash": "6ad49ce47eb588408ac462596187ba0c"}, {"source_type": "business_table", "source_name": "期权做市系统导出_20260530", "source_path": null, "import_time": "2026-06-07T23:03:57.251963", "field_mapping": {"执行价": "strike", "IV": "implied_vol", "期权类型": "option_type"}, "raw_data_hash": "fc736f01b93a36121be37f3792a70769"}, {"source_type": "screenshot", "source_name": "彭博终端截图_15:30", "source_path": null, "import_time": "2026-06-07T23:03:57.252193", "field_mapping": {"tenor": "tenor", "strike": "strike", "implied_vol": "implied_vol", "maturity": "maturity"}, "raw_data_hash": "47bdc1e61e85a8265b751fb3e82a3ac5"}], "parameters_used": [{"version_id": "v9b19b3", "parameter_name": "outlier_zscore_threshold", "value": 2.5, "default_value": 3.0, "is_user_modified": true, "modified_at": "2026-06-07T22:55:07.487115", "modified_by": "小孟", "valid_from": "2026-06-07T22:55:07.487116", "valid_to": null, "comment": "近期市场波动较大，收紧异常检测阈值", "surface_ids_used": ["VOL_50ETF_20260528_e44a", "VOL_50ETF_20260529_8117", "VOL_50ETF_20260527_9b71", "VOL_50ETF_20260530_2eb6", "VOL_50ETF_20260528_cd3d", "VOL_50ETF_20260528_e575", "VOL_50ETF_20260529_781a", "VOL_50ETF_20260527_ffc9", "VOL_50ETF_20260530_4cad", "VOL_50ETF_20260528_cda5"]}, {"version_id": "v884f09", "parameter_name": "outlier_iqr_factor", "value": 1.5, "default_value": 1.5, "is_user_modified": false, "modified_at": null, "modified_by": "system", "valid_from": "2026-06-07T22:55:07.485709", "valid_to": null, "comment": "系统默认参数", "surface_ids_used": ["VOL_50ETF_20260528_e44a", "VOL_50ETF_20260529_8117", "VOL_50ETF_20260527_9b71", "VOL_50ETF_20260530_2eb6", "VOL_50ETF_20260528_cd3d", "VOL_50ETF_20260528_e575", "VOL_50ETF_20260529_781a", "VOL_50ETF_20260527_ffc9", "VOL_50ETF_20260530_4cad", "VOL_50ETF_20260528_cda5"]}, {"version_id": "vdd91ab", "parameter_name": "vol_min_valid", "value": 0.01, "default_value": 0.01, "is_user_modified": false, "modified_at": null, "modified_by": "system", "valid_from": "2026-06-07T22:55:07.485714", "valid_to": null, "comment": "系统默认参数", "surface_ids_used": ["VOL_50ETF_20260528_e44a", "VOL_50ETF_20260529_8117", "VOL_50ETF_20260527_9b71", "VOL_50ETF_20260530_2eb6", "VOL_50ETF_20260528_cd3d", "VOL_50ETF_20260528_e575", "VOL_50ETF_20260529_781a", "VOL_50ETF_20260527_ffc9", "VOL_50ETF_20260530_4cad", "VOL_50ETF_20260528_cda5"]}, {"version_id": "v8b1215", "parameter_name": "vol_max_valid", "value": 2.0, "default_value": 2.0, "is_user_modified": false, "modified_at": null, "modified_by": "system", "valid_from": "2026-06-07T22:55:07.485718", "valid_to": null, "comment": "系统默认参数", "surface_ids_used": ["VOL_50ETF_20260528_e44a", "VOL_50ETF_20260529_8117", "VOL_50ETF_20260527_9b71", "VOL_50ETF_20260530_2eb6", "VOL_50ETF_20260528_cd3d", "VOL_50ETF_20260528_e575", "VOL_50ETF_20260529_781a", "VOL_50ETF_20260527_ffc9", "VOL_50ETF_20260530_4cad", "VOL_50ETF_20260528_cda5"]}, {"version_id": "vb214c6", "parameter_name": "arbitrage_max_spread", "value": 0.05, "default_value": 0.05, "is_user_modified": false, "modified_at": null, "modified_by": "system", "valid_from": "2026-06-07T22:55:07.485721", "valid_to": null, "comment": "系统默认参数", "surface_ids_used": ["VOL_50ETF_20260528_e44a", "VOL_50ETF_20260529_8117", "VOL_50ETF_20260527_9b71", "VOL_50ETF_20260530_2eb6", "VOL_50ETF_20260528_cd3d", "VOL_50ETF_20260528_e575", "VOL_50ETF_20260529_781a", "VOL_50ETF_20260527_ffc9", "VOL_50ETF_20260530_4cad", "VOL_50ETF_20260528_cda5"]}, {"version_id": "v023bde", "parameter_name": "interpolation_method", "value": "cubic", "default_value": "cubic", "is_user_modified": false, "modified_at": null, "modified_by": "system", "valid_from": "2026-06-07T22:55:07.485725", "valid_to": null, "comment": "系统默认参数", "surface_ids_used": ["VOL_50ETF_20260528_e44a", "VOL_50ETF_20260529_8117", "VOL_50ETF_20260527_9b71", "VOL_50ETF_20260530_2eb6", "VOL_50ETF_20260528_cd3d", "VOL_50ETF_20260528_e575", "VOL_50ETF_20260529_781a", "VOL_50ETF_20260527_ffc9", "VOL_50ETF_20260530_4cad", "VOL_50ETF_20260528_cda5"]}, {"version_id": "v3d2ed2", "parameter_name": "smoothness_lambda", "value": 0.1, "default_value": 0.1, "is_user_modified": false, "modified_at": null, "modified_by": "system", "valid_from": "2026-06-07T22:55:07.485729", "valid_to": null, "comment": "系统默认参数", "surface_ids_used": ["VOL_50ETF_20260528_e44a", "VOL_50ETF_20260529_8117", "VOL_50ETF_20260527_9b71", "VOL_50ETF_20260530_2eb6", "VOL_50ETF_20260528_cd3d", "VOL_50ETF_20260528_e575", "VOL_50ETF_20260529_781a", "VOL_50ETF_20260527_ffc9", "VOL_50ETF_20260530_4cad", "VOL_50ETF_20260528_cda5"]}, {"version_id": "v7dcf16", "parameter_name": "confidence_weight_source", "value": {"lecture_note": 0.6, "business_table": 0.9, "screenshot": 0.4, "summary_page": 0.8}, "default_value": {"lecture_note": 0.6, "business_table": 0.9, "screenshot": 0.4, "summary_page": 0.8}, "is_user_modified": false, "modified_at": null, "modified_by": "system", "valid_from": "2026-06-07T22:55:07.485733", "valid_to": null, "comment": "系统默认参数", "surface_ids_used": ["VOL_50ETF_20260528_e44a", "VOL_50ETF_20260529_8117", "VOL_50ETF_20260527_9b71", "VOL_50ETF_20260530_2eb6", "VOL_50ETF_20260528_cd3d", "VOL_50ETF_20260528_e575", "VOL_50ETF_20260529_781a", "VOL_50ETF_20260527_ffc9", "VOL_50ETF_20260530_4cad", "VOL_50ETF_20260528_cda5"]}, {"version_id": "vcfd861", "parameter_name": "conflict_tolerance_pct", "value": 3.0, "default_value": 5.0, "is_user_modified": true, "modified_at": "2026-06-07T22:55:07.487411", "modified_by": "小孟", "valid_from": "2026-06-07T22:55:07.487412", "valid_to": null, "comment": "提高数据一致性要求", "surface_ids_used": ["VOL_50ETF_20260528_e44a", "VOL_50ETF_20260529_8117", "VOL_50ETF_20260527_9b71", "VOL_50ETF_20260530_2eb6", "VOL_50ETF_20260528_cd3d", "VOL_50ETF_20260528_e575", "VOL_50ETF_20260529_781a", "VOL_50ETF_20260527_ffc9", "VOL_50ETF_20260530_4cad", "VOL_50ETF_20260528_cda5"]}, {"version_id": "v228dc7", "parameter_name": "tenor_order", "value": ["1M", "3M", "6M", "1Y", "2Y", "3Y", "5Y", "10Y"], "default_value": ["1M", "3M", "6M", "1Y", "2Y", "3Y", "5Y", "10Y"], "is_user_modified": false, "modified_at": null, "modified_by": "system", "valid_from": "2026-06-07T22:55:07.485740", "valid_to": null, "comment": "系统默认参数", "surface_ids_used": ["VOL_50ETF_20260528_e44a", "VOL_50ETF_20260529_8117", "VOL_50ETF_20260527_9b71", "VOL_50ETF_20260530_2eb6", "VOL_50ETF_20260528_cd3d", "VOL_50ETF_20260528_e575", "VOL_50ETF_20260529_781a", "VOL_50ETF_20260527_ffc9", "VOL_50ETF_20260530_4cad", "VOL_50ETF_20260528_cda5"]}], "chart_data": {"surface": [{"x": 2.8, "y": 0.0, "z": 0.185, "tenor": "T0", "point_id": "23e3eb2f", "confidence": 0.36, "is_interpolated": false, "data_source": "lecture_note", "review_comment": ""}, {"x": 3.0, "y": 0.0, "z": 0.162, "tenor": "T1", "point_id": "ad15b8db", "confidence": 0.36, "is_interpolated": false, "data_source": "lecture_note", "review_comment": ""}, {"x": 3.2, "y": 0.0, "z": 0.17800000000000002, "tenor": "T2", "point_id": "386bed94", "confidence": 0.36, "is_interpolated": false, "data_source": "lecture_note", "review_comment": ""}, {"x": 2.8, "y": 0.0, "z": 0.195, "tenor": "T3", "point_id": "faa13417", "confidence": 0.36, "is_interpolated": false, "data_source": "lecture_note", "review_comment": ""}, {"x": 3.0, "y": 0.0, "z": 0.17, "tenor": "T4", "point_id": "b9b3ed55", "confidence": 0.36, "is_interpolated": false, "data_source": "lecture_note", "review_comment": ""}, {"x": 3.2, "y": 0.0, "z": 0.188, "tenor": "T5", "point_id": "7c2518e2", "confidence": 0.36, "is_interpolated": false, "data_source": "lecture_note", "review_comment": ""}, {"x": 2.8, "y": 1.0, "z": 0.205, "tenor": "T0", "point_id": "9f94dbfb", "confidence": 0.81, "is_interpolated": false, "data_source": "business_table", "review_comment": ""}, {"x": 3.0, "y": 1.0, "z": 0.18, "tenor": "T1", "point_id": "a0c3f8de", "confidence": 0.81, "is_interpolated": false, "data_source": "business_table", "review_comment": ""}, {"x": 3.2, "y": 1.0, "z": 0.2, "tenor": "T2", "point_id": "351459fb", "confidence": 0.81, "is_interpolated": false, "data_source": "business_table", "review_comment": ""}, {"x": 2.8, "y": 1.0, "z": 0.215, "tenor": "T3", "point_id": "b210044e", "confidence": 0.81, "is_interpolated": false, "data_source": "business_table", "review_comment": ""}, {"x": 3.0, "y": 1.0, "z": 0.19, "tenor": "T4", "point_id": "4aff9afd", "confidence": 0.81, "is_interpolated": false, "data_source": "business_table", "review_comment": ""}, {"x": 3.2, "y": 1.0, "z": 0.21, "tenor": "T5", "point_id": "89f6386e", "confidence": 0.81, "is_interpolated": false, "data_source": "business_table", "review_comment": ""}, {"x": 2.86, "y": 0.08333333333333333, "z": 0.1796, "tenor": "1M", "point_id": "5e07080d", "confidence": 0.56, "is_interpolated": true, "data_source": "interpolation_engine", "review_comment": "自动补充缺失的1M期限点"}, {"x": 3.0, "y": 0.08333333333333333, "z": 0.16349999999999998, "tenor": "1M", "point_id": "05b053fc", "confidence": 0.56, "is_interpolated": true, "data_source": "interpolation_engine", "review_comment": "自动补充缺失的1M期限点"}, {"x": 3.14, "y": 0.08333333333333333, "z": 0.1747, "tenor": "1M", "point_id": "c45ff01e", "confidence": 0.56, "is_interpolated": true, "data_source": "interpolation_engine", "review_comment": "自动补充缺失的1M期限点"}, {"x": 2.86, "y": 0.25, "z": 0.18259999999999998, "tenor": "3M", "point_id": "bcb26f69", "confidence": 0.56, "is_interpolated": true, "data_source": "interpolation_engine", "review_comment": "自动补充缺失的3M期限点"}, {"x": 3.0, "y": 0.25, "z": 0.16649999999999998, "tenor": "3M", "point_id": "0e6a53a9", "confidence": 0.56, "is_interpolated": true, "data_source": "interpolation_engine", "review_comment": "自动补充缺失的3M期限点"}, {"x": 3.14, "y": 0.25, "z": 0.1777, "tenor": "3M", "point_id": "988da2a2", "confidence": 0.56, "is_interpolated": true, "data_source": "interpolation_engine", "review_comment": "自动补充缺失的3M期限点"}], "smile_curves": {"1M": {"strikes": [2.86, 3.0, 3.14], "vols": [0.1796, 0.16349999999999998, 0.1747], "confidence": [0.56, 0.56, 0.56], "point_ids": ["5e07080d", "05b053fc", "c45ff01e"]}, "3M": {"strikes": [2.86, 3.0, 3.14], "vols": [0.18259999999999998, 0.16649999999999998, 0.1777], "confidence": [0.56, 0.56, 0.56], "point_ids": ["bcb26f69", "0e6a53a9", "988da2a2"]}, "T0": {"strikes": [2.8, 2.8], "vols": [0.185, 0.205], "confidence": [0.36, 0.81], "point_ids": ["23e3eb2f", "9f94dbfb"]}, "T1": {"strikes": [3.0, 3.0], "vols": [0.162, 0.18], "confidence": [0.36, 0.81], "point_ids": ["ad15b8db", "a0c3f8de"]}, "T2": {"strikes": [3.2, 3.2], "vols": [0.17800000000000002, 0.2], "confidence": [0.36, 0.81], "point_ids": ["386bed94", "351459fb"]}, "T3": {"strikes": [2.8, 2.8], "vols": [0.195, 0.215], "confidence": [0.36, 0.81], "point_ids": ["faa13417", "b210044e"]}, "T4": {"strikes": [3.0, 3.0], "vols": [0.17, 0.19], "confidence": [0.36, 0.81], "point_ids": ["b9b3ed55", "4aff9afd"]}, "T5": {"strikes": [3.2, 3.2], "vols": [0.188, 0.21], "confidence": [0.36, 0.81], "point_ids": ["7c2518e2", "89f6386e"]}}, "term_structure": {"1M": {"maturity": 0.08333333333333333, "atm_vol": 0.16349999999999998, "confidence": 0.56, "point_id": "05b053fc"}, "3M": {"maturity": 0.25, "atm_vol": 0.16649999999999998, "confidence": 0.56, "point_id": "0e6a53a9"}, "T0": {"maturity": 0.0, "atm_vol": 0.185, "confidence": 0.36, "point_id": "23e3eb2f"}, "T1": {"maturity": 0.0, "atm_vol": 0.162, "confidence": 0.36, "point_id": "ad15b8db"}, "T2": {"maturity": 0.0, "atm_vol": 0.17800000000000002, "confidence": 0.36, "point_id": "386bed94"}, "T3": {"maturity": 0.0, "atm_vol": 0.195, "confidence": 0.36, "point_id": "faa13417"}, "T4": {"maturity": 0.0, "atm_vol": 0.17, "confidence": 0.36, "point_id": "b9b3ed55"}, "T5": {"maturity": 0.0, "atm_vol": 0.188, "confidence": 0.36, "point_id": "7c2518e2"}}, "tenors": ["1M", "3M", "T0", "T1", "T2", "T3", "T4", "T5"], "strikes": [2.8, 2.86, 3.0, 3.14, 3.2], "atm_strike": 3.0}, "points_detail": [{"point_id": "5e07080d", "tenor": "1M", "strike": 2.86, "maturity": 0.08333333333333333, "option_type": "call", "raw_value": null, "implied_vol": 0.1796, "data_source": "interpolation_engine", "confidence": 0.56, "status": "插值补全", "status_class": "warning", "is_outlier": false, "is_interpolated": true, "outlier_reason": "", "review_comment": "自动补充缺失的1M期限点", "tags": ["synthetic_point", "interpolated"]}, {"point_id": "05b053fc", "tenor": "1M", "strike": 3.0, "maturity": 0.08333333333333333, "option_type": "call", "raw_value": null, "implied_vol": 0.16349999999999998, "data_source": "interpolation_engine", "confidence": 0.56, "status": "插值补全", "status_class": "warning", "is_outlier": false, "is_interpolated": true, "outlier_reason": "", "review_comment": "自动补充缺失的1M期限点", "tags": ["synthetic_point", "interpolated"]}, {"point_id": "c45ff01e", "tenor": "1M", "strike": 3.14, "maturity": 0.08333333333333333, "option_type": "call", "raw_value": null, "implied_vol": 0.1747, "data_source": "interpolation_engine", "confidence": 0.56, "status": "插值补全", "status_class": "warning", "is_outlier": false, "is_interpolated": true, "outlier_reason": "", "review_comment": "自动补充缺失的1M期限点", "tags": ["synthetic_point", "interpolated"]}, {"point_id": "cbac305c", "tenor": "2Y", "strike": 2.0, "maturity": 26.5, "option_type": "call", "raw_value": 2.5, "implied_vol": 2.5, "data_source": "screenshot", "confidence": 0.1, "status": "异常值", "status_class": "danger", "is_outlier": true, "is_interpolated": false, "outlier_reason": "波动率超出有效范围 [0.01, 2.0]", "review_comment": "", "tags": ["screenshot_ocr", "low_confidence"]}, {"point_id": "274acbde", "tenor": "2Y", "strike": 2.0, "maturity": 20.0, "option_type": "call", "raw_value": 3.0, "implied_vol": 3.0, "data_source": "screenshot", "confidence": 0.1, "status": "异常值", "status_class": "danger", "is_outlier": true, "is_interpolated": false, "outlier_reason": "波动率超出有效范围 [0.01, 2.0]", "review_comment": "", "tags": ["screenshot_ocr", "low_confidence"]}, {"point_id": "17e235b3", "tenor": "2Y", "strike": 2.0, "maturity": 28.0, "option_type": "call", "raw_value": 3.5, "implied_vol": 3.5, "data_source": "screenshot", "confidence": 0.1, "status": "异常值", "status_class": "danger", "is_outlier": true, "is_interpolated": false, "outlier_reason": "波动率超出有效范围 [0.01, 2.0]", "review_comment": "", "tags": ["screenshot_ocr", "low_confidence"]}, {"point_id": "bcb26f69", "tenor": "3M", "strike": 2.86, "maturity": 0.25, "option_type": "call", "raw_value": null, "implied_vol": 0.18259999999999998, "data_source": "interpolation_engine", "confidence": 0.56, "status": "插值补全", "status_class": "warning", "is_outlier": false, "is_interpolated": true, "outlier_reason": "", "review_comment": "自动补充缺失的3M期限点", "tags": ["synthetic_point", "interpolated"]}, {"point_id": "0e6a53a9", "tenor": "3M", "strike": 3.0, "maturity": 0.25, "option_type": "call", "raw_value": null, "implied_vol": 0.16649999999999998, "data_source": "interpolation_engine", "confidence": 0.56, "status": "插值补全", "status_class": "warning", "is_outlier": false, "is_interpolated": true, "outlier_reason": "", "review_comment": "自动补充缺失的3M期限点", "tags": ["synthetic_point", "interpolated"]}, {"point_id": "988da2a2", "tenor": "3M", "strike": 3.14, "maturity": 0.25, "option_type": "call", "raw_value": null, "implied_vol": 0.1777, "data_source": "interpolation_engine", "confidence": 0.56, "status": "插值补全", "status_class": "warning", "is_outlier": false, "is_interpolated": true, "outlier_reason": "", "review_comment": "自动补充缺失的3M期限点", "tags": ["synthetic_point", "interpolated"]}, {"point_id": "fb2a0a32", "tenor": "3Y", "strike": 3.0, "maturity": 27.5, "option_type": "call", "raw_value": 2.5, "implied_vol": 2.5, "data_source": "screenshot", "confidence": 0.1, "status": "异常值", "status_class": "danger", "is_outlier": true, "is_interpolated": false, "outlier_reason": "波动率超出有效范围 [0.01, 2.0]", "review_comment": "", "tags": ["screenshot_ocr", "low_confidence"]}, {"point_id": "0e360498", "tenor": "3Y", "strike": 3.0, "maturity": 21.0, "option_type": "call", "raw_value": 3.0, "implied_vol": 3.0, "data_source": "screenshot", "confidence": 0.1, "status": "异常值", "status_class": "danger", "is_outlier": true, "is_interpolated": false, "outlier_reason": "波动率超出有效范围 [0.01, 2.0]", "review_comment": "", "tags": ["screenshot_ocr", "low_confidence"]}, {"point_id": "6cfc5077", "tenor": "3Y", "strike": 3.0, "maturity": 29.0, "option_type": "call", "raw_value": 3.5, "implied_vol": 3.5, "data_source": "screenshot", "confidence": 0.1, "status": "异常值", "status_class": "danger", "is_outlier": true, "is_interpolated": false, "outlier_reason": "波动率超出有效范围 [0.01, 2.0]", "review_comment": "", "tags": ["screenshot_ocr", "low_confidence"]}, {"point_id": "23e3eb2f", "tenor": "T0", "strike": 2.8, "maturity": 0.0, "option_type": "call", "raw_value": 0.185, "implied_vol": 0.185, "data_source": "lecture_note", "confidence": 0.36, "status": "正常", "status_class": "success", "is_outlier": false, "is_interpolated": false, "outlier_reason": "", "review_comment": "", "tags": ["lecture_import"]}, {"point_id": "9f94dbfb", "tenor": "T0", "strike": 2.8, "maturity": 1.0, "option_type": "call", "raw_value": 0.205, "implied_vol": 0.205, "data_source": "business_table", "confidence": 0.81, "status": "正常", "status_class": "success", "is_outlier": false, "is_interpolated": false, "outlier_reason": "", "review_comment": "", "tags": ["business_import", "high_priority"]}, {"point_id": "ad15b8db", "tenor": "T1", "strike": 3.0, "maturity": 0.0, "option_type": "call", "raw_value": 0.162, "implied_vol": 0.162, "data_source": "lecture_note", "confidence": 0.36, "status": "正常", "status_class": "success", "is_outlier": false, "is_interpolated": false, "outlier_reason": "", "review_comment": "", "tags": ["lecture_import"]}, {"point_id": "a0c3f8de", "tenor": "T1", "strike": 3.0, "maturity": 1.0, "option_type": "call", "raw_value": 0.18, "implied_vol": 0.18, "data_source": "business_table", "confidence": 0.81, "status": "正常", "status_class": "success", "is_outlier": false, "is_interpolated": false, "outlier_reason": "", "review_comment": "", "tags": ["business_import", "high_priority"]}, {"point_id": "386bed94", "tenor": "T2", "strike": 3.2, "maturity": 0.0, "option_type": "call", "raw_value": 0.17800000000000002, "implied_vol": 0.17800000000000002, "data_source": "lecture_note", "confidence": 0.36, "status": "正常", "status_class": "success", "is_outlier": false, "is_interpolated": false, "outlier_reason": "", "review_comment": "", "tags": ["lecture_import"]}, {"point_id": "351459fb", "tenor": "T2", "strike": 3.2, "maturity": 1.0, "option_type": "call", "raw_value": 0.2, "implied_vol": 0.2, "data_source": "business_table", "confidence": 0.81, "status": "正常", "status_class": "success", "is_outlier": false, "is_interpolated": false, "outlier_reason": "", "review_comment": "", "tags": ["business_import", "high_priority"]}, {"point_id": "faa13417", "tenor": "T3", "strike": 2.8, "maturity": 0.0, "option_type": "call", "raw_value": 0.195, "implied_vol": 0.195, "data_source": "lecture_note", "confidence": 0.36, "status": "正常", "status_class": "success", "is_outlier": false, "is_interpolated": false, "outlier_reason": "", "review_comment": "", "tags": ["lecture_import"]}, {"point_id": "b210044e", "tenor": "T3", "strike": 2.8, "maturity": 1.0, "option_type": "call", "raw_value": 0.215, "implied_vol": 0.215, "data_source": "business_table", "confidence": 0.81, "status": "正常", "status_class": "success", "is_outlier": false, "is_interpolated": false, "outlier_reason": "", "review_comment": "", "tags": ["business_import", "high_priority"]}, {"point_id": "b9b3ed55", "tenor": "T4", "strike": 3.0, "maturity": 0.0, "option_type": "call", "raw_value": 0.17, "implied_vol": 0.17, "data_source": "lecture_note", "confidence": 0.36, "status": "正常", "status_class": "success", "is_outlier": false, "is_interpolated": false, "outlier_reason": "", "review_comment": "", "tags": ["lecture_import"]}, {"point_id": "4aff9afd", "tenor": "T4", "strike": 3.0, "maturity": 1.0, "option_type": "call", "raw_value": 0.19, "implied_vol": 0.19, "data_source": "business_table", "confidence": 0.81, "status": "正常", "status_class": "success", "is_outlier": false, "is_interpolated": false, "outlier_reason": "", "review_comment": "", "tags": ["business_import", "high_priority"]}, {"point_id": "7c2518e2", "tenor": "T5", "strike": 3.2, "maturity": 0.0, "option_type": "call", "raw_value": 0.188, "implied_vol": 0.188, "data_source": "lecture_note", "confidence": 0.36, "status": "正常", "status_class": "success", "is_outlier": false, "is_interpolated": false, "outlier_reason": "", "review_comment": "", "tags": ["lecture_import"]}, {"point_id": "89f6386e", "tenor": "T5", "strike": 3.2, "maturity": 1.0, "option_type": "call", "raw_value": 0.21, "implied_vol": 0.21, "data_source": "business_table", "confidence": 0.81, "status": "正常", "status_class": "success", "is_outlier": false, "is_interpolated": false, "outlier_reason": "", "review_comment": "", "tags": ["business_import", "high_priority"]}], "conflicts": [], "decision_paths": {"23e3eb2f": ["1. 原始值导入: 0.1850 (来源: lecture_note)", "2. 最终值: 0.1850 (置信度: 0.360)"], "ad15b8db": ["1. 原始值导入: 0.1620 (来源: lecture_note)", "2. 最终值: 0.1620 (置信度: 0.360)"], "386bed94": ["1. 原始值导入: 0.1780 (来源: lecture_note)", "2. 最终值: 0.1780 (置信度: 0.360)"], "faa13417": ["1. 原始值导入: 0.1950 (来源: lecture_note)", "2. 最终值: 0.1950 (置信度: 0.360)"], "b9b3ed55": ["1. 原始值导入: 0.1700 (来源: lecture_note)", "2. 最终值: 0.1700 (置信度: 0.360)"], "7c2518e2": ["1. 原始值导入: 0.1880 (来源: lecture_note)", "2. 最终值: 0.1880 (置信度: 0.360)"], "9f94dbfb": ["1. 原始值导入: 0.2050 (来源: business_table)", "2. 最终值: 0.2050 (置信度: 0.810)"], "a0c3f8de": ["1. 原始值导入: 0.1800 (来源: business_table)", "2. 最终值: 0.1800 (置信度: 0.810)"], "351459fb": ["1. 原始值导入: 0.2000 (来源: business_table)", "2. 最终值: 0.2000 (置信度: 0.810)"], "b210044e": ["1. 原始值导入: 0.2150 (来源: business_table)", "2. 最终值: 0.2150 (置信度: 0.810)"], "4aff9afd": ["1. 原始值导入: 0.1900 (来源: business_table)", "2. 最终值: 0.1900 (置信度: 0.810)"], "89f6386e": ["1. 原始值导入: 0.2100 (来源: business_table)", "2. 最终值: 0.2100 (置信度: 0.810)"], "cbac305c": ["1. 原始值导入: 2.5000 (来源: screenshot)", "2. 范围校验标记: 检查值 2.5000 - 波动率超出有效范围 [0.01, 2.0]", "3. 最终值: 2.5000 (置信度: 0.100)"], "274acbde": ["1. 原始值导入: 3.0000 (来源: screenshot)", "2. 范围校验标记: 检查值 3.0000 - 波动率超出有效范围 [0.01, 2.0]", "3. 最终值: 3.0000 (置信度: 0.100)"], "17e235b3": ["1. 原始值导入: 3.5000 (来源: screenshot)", "2. 范围校验标记: 检查值 3.5000 - 波动率超出有效范围 [0.01, 2.0]", "3. 最终值: 3.5000 (置信度: 0.100)"], "fb2a0a32": ["1. 原始值导入: 2.5000 (来源: screenshot)", "2. 范围校验标记: 检查值 2.5000 - 波动率超出有效范围 [0.01, 2.0]", "3. 最终值: 2.5000 (置信度: 0.100)"], "0e360498": ["1. 原始值导入: 3.0000 (来源: screenshot)", "2. 范围校验标记: 检查值 3.0000 - 波动率超出有效范围 [0.01, 2.0]", "3. 最终值: 3.0000 (置信度: 0.100)"], "6cfc5077": ["1. 原始值导入: 3.5000 (来源: screenshot)", "2. 范围校验标记: 检查值 3.5000 - 波动率超出有效范围 [0.01, 2.0]", "3. 最终值: 3.5000 (置信度: 0.100)"], "5e07080d": ["1. 数据来源: interpolation_engine (无原始值记录)", "2. 补充期限点: 补充缺失期限 1M", "3. 最终值: 0.1796 (置信度: 0.560)"], "05b053fc": ["1. 数据来源: interpolation_engine (无原始值记录)", "2. 补充期限点: 补充缺失期限 1M", "3. 最终值: 0.1635 (置信度: 0.560)"], "c45ff01e": ["1. 数据来源: interpolation_engine (无原始值记录)", "2. 补充期限点: 补充缺失期限 1M", "3. 最终值: 0.1747 (置信度: 0.560)"], "bcb26f69": ["1. 数据来源: interpolation_engine (无原始值记录)", "2. 补充期限点: 补充缺失期限 3M", "3. 最终值: 0.1826 (置信度: 0.560)"], "0e6a53a9": ["1. 数据来源: interpolation_engine (无原始值记录)", "2. 补充期限点: 补充缺失期限 3M", "3. 最终值: 0.1665 (置信度: 0.560)"], "988da2a2": ["1. 数据来源: interpolation_engine (无原始值记录)", "2. 补充期限点: 补充缺失期限 3M", "3. 最终值: 0.1777 (置信度: 0.560)"]}, "audit_trail": [{"log_id": "673087a7", "timestamp": "2026-06-07T23:03:57.264000", "action": "范围校验标记", "surface_id": "VOL_50ETF_20260530_4cad", "point_id": "cbac305c", "old_value": 2.5, "new_value": null, "operator": "system", "reason": "波动率超出有效范围 [0.01, 2.0]", "parameters_used": {"vol_min": 0.01, "vol_max": 2.0}}, {"log_id": "2968172c", "timestamp": "2026-06-07T23:03:57.273776", "action": "范围校验标记", "surface_id": "VOL_50ETF_20260530_4cad", "point_id": "274acbde", "old_value": 3.0, "new_value": null, "operator": "system", "reason": "波动率超出有效范围 [0.01, 2.0]", "parameters_used": {"vol_min": 0.01, "vol_max": 2.0}}, {"log_id": "074f2442", "timestamp": "2026-06-07T23:03:57.274967", "action": "范围校验标记", "surface_id": "VOL_50ETF_20260530_4cad", "point_id": "17e235b3", "old_value": 3.5, "new_value": null, "operator": "system", "reason": "波动率超出有效范围 [0.01, 2.0]", "parameters_used": {"vol_min": 0.01, "vol_max": 2.0}}, {"log_id": "5b9ca61a", "timestamp": "2026-06-07T23:03:57.276014", "action": "范围校验标记", "surface_id": "VOL_50ETF_20260530_4cad", "point_id": "fb2a0a32", "old_value": 2.5, "new_value": null, "operator": "system", "reason": "波动率超出有效范围 [0.01, 2.0]", "parameters_used": {"vol_min": 0.01, "vol_max": 2.0}}, {"log_id": "27a4b14b", "timestamp": "2026-06-07T23:03:57.277574", "action": "范围校验标记", "surface_id": "VOL_50ETF_20260530_4cad", "point_id": "0e360498", "old_value": 3.0, "new_value": null, "operator": "system", "reason": "波动率超出有效范围 [0.01, 2.0]", "parameters_used": {"vol_min": 0.01, "vol_max": 2.0}}, {"log_id": "d311c94f", "timestamp": "2026-06-07T23:03:57.279233", "action": "范围校验标记", "surface_id": "VOL_50ETF_20260530_4cad", "point_id": "6cfc5077", "old_value": 3.5, "new_value": null, "operator": "system", "reason": "波动率超出有效范围 [0.01, 2.0]", "parameters_used": {"vol_min": 0.01, "vol_max": 2.0}}, {"log_id": "32fa7d94", "timestamp": "2026-06-07T23:03:57.280868", "action": "补充期限点", "surface_id": "VOL_50ETF_20260530_4cad", "point_id": "5e07080d", "old_value": null, "new_value": 0.1796, "operator": "system", "reason": "补充缺失期限 1M", "parameters_used": {"method": "linear", "tenor": "1M"}}, {"log_id": "ae17f8a2", "timestamp": "2026-06-07T23:03:57.282274", "action": "补充期限点", "surface_id": "VOL_50ETF_20260530_4cad", "point_id": "05b053fc", "old_value": null, "new_value": 0.16349999999999998, "operator": "system", "reason": "补充缺失期限 1M", "parameters_used": {"method": "linear", "tenor": "1M"}}, {"log_id": "afe9a858", "timestamp": "2026-06-07T23:03:57.283509", "action": "补充期限点", "surface_id": "VOL_50ETF_20260530_4cad", "point_id": "c45ff01e", "old_value": null, "new_value": 0.1747, "operator": "system", "reason": "补充缺失期限 1M", "parameters_used": {"method": "linear", "tenor": "1M"}}, {"log_id": "dfa03f5c", "timestamp": "2026-06-07T23:03:57.284759", "action": "补充期限点", "surface_id": "VOL_50ETF_20260530_4cad", "point_id": "bcb26f69", "old_value": null, "new_value": 0.18259999999999998, "operator": "system", "reason": "补充缺失期限 3M", "parameters_used": {"method": "linear", "tenor": "3M"}}, {"log_id": "06d64a5f", "timestamp": "2026-06-07T23:03:57.286189", "action": "补充期限点", "surface_id": "VOL_50ETF_20260530_4cad", "point_id": "0e6a53a9", "old_value": null, "new_value": 0.16649999999999998, "operator": "system", "reason": "补充缺失期限 3M", "parameters_used": {"method": "linear", "tenor": "3M"}}, {"log_id": "a46218a7", "timestamp": "2026-06-07T23:03:57.287678", "action": "补充期限点", "surface_id": "VOL_50ETF_20260530_4cad", "point_id": "988da2a2", "old_value": null, "new_value": 0.1777, "operator": "system", "reason": "补充缺失期限 3M", "parameters_used": {"method": "linear", "tenor": "3M"}}], "by_tenor_summary": {"T0": {"count": 2, "valid_count": 2, "avg_vol": 0.195, "min_vol": 0.185, "max_vol": 0.205}, "T1": {"count": 2, "valid_count": 2, "avg_vol": 0.171, "min_vol": 0.162, "max_vol": 0.18}, "T2": {"count": 2, "valid_count": 2, "avg_vol": 0.189, "min_vol": 0.178, "max_vol": 0.2}, "T3": {"count": 2, "valid_count": 2, "avg_vol": 0.205, "min_vol": 0.195, "max_vol": 0.215}, "T4": {"count": 2, "valid_count": 2, "avg_vol": 0.18, "min_vol": 0.17, "max_vol": 0.19}, "T5": {"count": 2, "valid_count": 2, "avg_vol": 0.199, "min_vol": 0.188, "max_vol": 0.21}, "2Y": {"count": 3, "valid_count": 0, "avg_vol": 0.0, "min_vol": 0.0, "max_vol": 0.0}, "3Y": {"count": 3, "valid_count": 0, "avg_vol": 0.0, "min_vol": 0.0, "max_vol": 0.0}, "1M": {"count": 3, "valid_count": 3, "avg_vol": 0.1726, "min_vol": 0.1635, "max_vol": 0.1796}, "3M": {"count": 3, "valid_count": 3, "avg_vol": 0.1756, "min_vol": 0.1665, "max_vol": 0.1826}}};
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+
+            if (tabId === 'tab-3d') init3DChart();
+            else if (tabId === 'tab-smile') initSmileChart();
+            else if (tabId === 'tab-term') initTermChart();
+        }
+
+        function getConfidenceClass(conf) {
+            if (conf >= 0.8) return 'confidence-high';
+            if (conf >= 0.5) return 'confidence-medium';
+            return 'confidence-low';
+        }
+
+        function getSourceClass(source) {
+            return 'source-' + source;
+        }
+
+        function renderPointsTable() {
+            const tbody = document.getElementById('points-tbody');
+            tbody.innerHTML = '';
+            reportData.points_detail.forEach(p => {
+                const tr = document.createElement('tr');
+                tr.className = 'clickable';
+                tr.onclick = () => showPointDetail(p.point_id);
+                tr.innerHTML = `
+                    <td><code>${p.point_id}</code></td>
+                    <td><strong>${p.tenor}</strong></td>
+                    <td>${p.strike.toFixed(2)}</td>
+                    <td>${p.option_type === 'call' ? '看涨' : '看跌'}</td>
+                    <td>${p.raw_value ? p.raw_value.toFixed(4) : '-'}</td>
+                    <td><strong>${p.implied_vol.toFixed(4)}</strong></td>
+                    <td><span class="source-badge ${getSourceClass(p.data_source)}">${p.data_source}</span></td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div class="confidence-bar" style="width: 60px;">
+                                <div class="confidence-fill ${getConfidenceClass(p.confidence)}" style="width: ${p.confidence * 100}%;"></div>
+                            </div>
+                            <span>${p.confidence.toFixed(2)}</span>
+                        </div>
+                    </td>
+                    <td><span class="badge badge-${p.status_class}">${p.status}</span></td>
+                    <td style="max-width: 200px; font-size: 12px; color: #8c8c8c;">${p.review_comment || p.outlier_reason || '-'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function showPointDetail(pointId) {
+            const point = reportData.points_detail.find(p => p.point_id === pointId);
+            const decisionPath = reportData.decision_paths[pointId];
+            const modal = document.getElementById('point-modal');
+            const title = document.getElementById('modal-title');
+            const body = document.getElementById('modal-body');
+
+            title.textContent = `点位详情 - ${point.tenor} @ K=${point.strike.toFixed(2)}`;
+
+            let html = `
+                <div class="stat-card" style="margin-bottom: 20px;">
+                    <div class="grid" style="grid-template-columns: repeat(4, 1fr);">
+                        <div>
+                            <div class="label">点ID</div>
+                            <div class="value" style="font-size: 16px;"><code>${point.point_id}</code></div>
+                        </div>
+                        <div>
+                            <div class="label">原始值</div>
+                            <div class="value" style="font-size: 18px;">${point.raw_value ? point.raw_value.toFixed(4) : '-'}</div>
+                        </div>
+                        <div>
+                            <div class="label">清洗后值</div>
+                            <div class="value" style="font-size: 18px; color: #1890ff;">${point.implied_vol.toFixed(4)}</div>
+                        </div>
+                        <div>
+                            <div class="label">置信度</div>
+                            <div class="value" style="font-size: 18px;">${point.confidence.toFixed(2)}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>基本信息</h3>
+                <table style="margin-bottom: 20px;">
+                    <tr><th>期限</th><td>${point.tenor}</td></tr>
+                    <tr><th>行权价</th><td>${point.strike.toFixed(4)}</td></tr>
+                    <tr><th>期权类型</th><td>${point.option_type === 'call' ? '看涨' : '看跌'}</td></tr>
+                    <tr><th>数据来源</th><td><span class="source-badge ${getSourceClass(point.data_source)}">${point.data_source}</span></td></tr>
+                    <tr><th>状态</th><td><span class="badge badge-${point.status_class}">${point.status}</span></td></tr>
+                    <tr><th>是否异常值</th><td>${point.is_outlier ? '是' : '否'}</td></tr>
+                    <tr><th>是否插值</th><td>${point.is_interpolated ? '是' : '否'}</td></tr>
+                    <tr><th>标签</th><td>${point.tags.join(', ') || '-'}</td></tr>
+                    ${point.review_comment ? `<tr><th>复核备注</th><td style="color: #faad14;">${point.review_comment}</td></tr>` : ''}
+                    ${point.outlier_reason ? `<tr><th>异常原因</th><td style="color: #ff4d4f;">${point.outlier_reason}</td></tr>` : ''}
+                </table>
+            `;
+
+            if (decisionPath) {
+                html += `
+                    <h3>决策路径</h3>
+                    <div class="decision-path">
+                        <ol>
+                            ${decisionPath.map(step => `<li>${step}</li>`).join('')}
+                        </ol>
+                    </div>
+                `;
+            }
+
+            const logs = reportData.audit_trail.filter(l => l.point_id === pointId);
+            if (logs.length > 0) {
+                html += `
+                    <h3>处理日志</h3>
+                    <table>
+                        <thead>
+                            <tr><th>时间</th><th>操作</th><th>旧值</th><th>新值</th><th>原因</th></tr>
+                        </thead>
+                        <tbody>
+                            ${logs.map(log => `
+                                <tr>
+                                    <td style="font-size: 12px;">${log.timestamp.slice(11, 19)}</td>
+                                    <td>${log.action}</td>
+                                    <td>${log.old_value !== null ? log.old_value.toFixed(4) : '-'}</td>
+                                    <td>${log.new_value !== null ? log.new_value.toFixed(4) : '-'}</td>
+                                    <td style="font-size: 12px;">${log.reason}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            }
+
+            body.innerHTML = html;
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('point-modal').classList.remove('active');
+        }
+
+        document.getElementById('point-modal').onclick = function(e) {
+            if (e.target.id === 'point-modal') closeModal();
+        }
+
+        function init3DChart() {
+            const chart = echarts.init(document.getElementById('chart-3d'));
+            const data = reportData.chart_data.surface;
+
+            const option = {
+                tooltip: {
+                    formatter: function(params) {
+                        const d = params.data;
+                        return `
+                            <div style="padding: 8px;">
+                                <strong>${d.tenor} @ K=${d.x.toFixed(2)}</strong><br/>
+                                波动率: <strong>${d.z.toFixed(4)}</strong><br/>
+                                置信度: ${d.confidence.toFixed(2)}<br/>
+                                来源: ${d.data_source}<br/>
+                                <span style="color: #1890ff;">点击查看详情 →</span>
+                            </div>
+                        `;
+                    }
+                },
+                grid3D: {
+                    viewControl: {
+                        projection: 'perspective',
+                        autoRotate: false,
+                        distance: 200
+                    },
+                    boxWidth: 120,
+                    boxDepth: 60,
+                    boxHeight: 80,
+                    light: {
+                        main: { intensity: 1.2, shadow: true },
+                        ambient: { intensity: 0.3 }
+                    }
+                },
+                xAxis3D: {
+                    type: 'value',
+                    name: '行权价 (K)',
+                    nameTextStyle: { fontSize: 12 }
+                },
+                yAxis3D: {
+                    type: 'value',
+                    name: '期限 (年)',
+                    nameTextStyle: { fontSize: 12 }
+                },
+                zAxis3D: {
+                    type: 'value',
+                    name: '隐含波动率',
+                    nameTextStyle: { fontSize: 12 },
+                    min: 0,
+                    max: 0.5
+                },
+                series: [{
+                    type: 'surface',
+                    data: data.map(d => [d.x, d.y, d.z, d]),
+                    shading: 'color',
+                    wireframe: { show: false },
+                    itemStyle: {
+                        opacity: 0.9
+                    },
+                    emphasis: {
+                        itemStyle: {
+                            color: '#ffeb3b'
+                        }
+                    }
+                }]
+            };
+
+            chart.setOption(option);
+            chart.off('click');
+            chart.on('click', function(params) {
+                if (params.data && params.data[3]) {
+                    showPointDetail(params.data[3].point_id);
+                }
+            });
+        }
+
+        function initSmileChart() {
+            const chart = echarts.init(document.getElementById('chart-smile'));
+            const smileCurves = reportData.chart_data.smile_curves;
+            const tenors = reportData.chart_data.tenors;
+
+            const series = tenors.map((tenor, idx) => {
+                const curve = smileCurves[tenor];
+                const colors = ['#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de', '#3ba272'];
+                return {
+                    name: tenor,
+                    type: 'line',
+                    data: curve.strikes.map((s, i) => ({
+                        value: [s, curve.vols[i]],
+                        pointId: curve.point_ids[i],
+                        confidence: curve.confidence[i]
+                    })),
+                    smooth: true,
+                    symbol: 'circle',
+                    symbolSize: 8,
+                    lineStyle: {
+                        width: 2,
+                        color: colors[idx % colors.length]
+                    },
+                    itemStyle: {
+                        color: colors[idx % colors.length]
+                    },
+                    emphasis: {
+                        itemStyle: {
+                            borderWidth: 3,
+                            borderColor: '#ffeb3b'
+                        }
+                    }
+                };
+            });
+
+            const option = {
+                tooltip: {
+                    trigger: 'item',
+                    formatter: function(params) {
+                        const d = params.data;
+                        return `
+                            <div style="padding: 8px;">
+                                <strong>${params.seriesName} @ K=${d.value[0].toFixed(2)}</strong><br/>
+                                波动率: <strong>${d.value[1].toFixed(4)}</strong><br/>
+                                置信度: ${d.confidence.toFixed(2)}<br/>
+                                <span style="color: #1890ff;">点击查看详情 →</span>
+                            </div>
+                        `;
+                    }
+                },
+                legend: {
+                    data: tenors,
+                    top: 0
+                },
+                grid: {
+                    top: 40,
+                    left: 60,
+                    right: 20,
+                    bottom: 50
+                },
+                xAxis: {
+                    type: 'value',
+                    name: '行权价 (K)',
+                    nameLocation: 'middle',
+                    nameGap: 30,
+                    nameTextStyle: { fontSize: 13 }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: '隐含波动率',
+                    nameLocation: 'middle',
+                    nameGap: 40,
+                    nameTextStyle: { fontSize: 13 },
+                    min: 0,
+                    max: 0.4
+                },
+                series: series
+            };
+
+            chart.setOption(option);
+            chart.off('click');
+            chart.on('click', function(params) {
+                if (params.data && params.data.pointId) {
+                    showPointDetail(params.data.pointId);
+                }
+            });
+        }
+
+        function initTermChart() {
+            const chart = echarts.init(document.getElementById('chart-term'));
+            const termStruct = reportData.chart_data.term_structure;
+            const tenors = reportData.chart_data.tenors;
+
+            const maturities = [];
+            const vols = [];
+            const pointIds = [];
+            const confidences = [];
+
+            tenors.forEach(tenor => {
+                if (termStruct[tenor]) {
+                    maturities.push(termStruct[tenor].maturity);
+                    vols.push(termStruct[tenor].atm_vol);
+                    pointIds.push(termStruct[tenor].point_id);
+                    confidences.push(termStruct[tenor].confidence);
+                }
+            });
+
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    formatter: function(params) {
+                        const idx = params[0].dataIndex;
+                        return `
+                            <div style="padding: 8px;">
+                                <strong>${tenors[idx]}</strong><br/>
+                                到期时间: ${maturities[idx].toFixed(2)}年<br/>
+                                ATM波动率: <strong>${vols[idx].toFixed(4)}</strong><br/>
+                                置信度: ${confidences[idx].toFixed(2)}<br/>
+                                <span style="color: #1890ff;">点击查看详情 →</span>
+                            </div>
+                        `;
+                    }
+                },
+                grid: {
+                    top: 20,
+                    left: 60,
+                    right: 20,
+                    bottom: 50
+                },
+                xAxis: {
+                    type: 'category',
+                    data: tenors,
+                    name: '期限',
+                    nameLocation: 'middle',
+                    nameGap: 30,
+                    nameTextStyle: { fontSize: 13 }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: 'ATM隐含波动率',
+                    nameLocation: 'middle',
+                    nameGap: 40,
+                    nameTextStyle: { fontSize: 13 },
+                    min: 0,
+                    max: 0.3
+                },
+                series: [{
+                    type: 'line',
+                    data: vols.map((v, i) => ({
+                        value: v,
+                        pointId: pointIds[i],
+                        confidence: confidences[i]
+                    })),
+                    smooth: true,
+                    symbol: 'circle',
+                    symbolSize: 12,
+                    lineStyle: {
+                        width: 3,
+                        color: '#667eea'
+                    },
+                    itemStyle: {
+                        color: '#667eea',
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    },
+                    areaStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            { offset: 0, color: 'rgba(102, 126, 234, 0.4)' },
+                            { offset: 1, color: 'rgba(102, 126, 234, 0.05)' }
+                        ])
+                    },
+                    emphasis: {
+                        itemStyle: {
+                            borderWidth: 4,
+                            borderColor: '#ffeb3b'
+                        }
+                    }
+                }]
+            };
+
+            chart.setOption(option);
+            chart.off('click');
+            chart.on('click', function(params) {
+                if (params.data && params.data.pointId) {
+                    showPointDetail(params.data.pointId);
+                }
+            });
+        }
+
+        renderPointsTable();
+        init3DChart();
+
+        window.addEventListener('resize', function() {
+            const chart3d = echarts.getInstanceByDom(document.getElementById('chart-3d'));
+            const chartSmile = echarts.getInstanceByDom(document.getElementById('chart-smile'));
+            const chartTerm = echarts.getInstanceByDom(document.getElementById('chart-term'));
+            if (chart3d) chart3d.resize();
+            if (chartSmile) chartSmile.resize();
+            if (chartTerm) chartTerm.resize();
+        });
+    </script>
+</body>
+</html>
