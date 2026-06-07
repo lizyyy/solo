@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MIDI 控制器映射备份系统</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f7; color: #1d1d1f; }
+.header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px 30px; }
+.header h1 { font-size: 24px; font-weight: 600; }
+.header p { opacity: 0.9; margin-top: 4px; font-size: 14px; }
+.container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+.workflow-bar { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.steps { display: flex; justify-content: space-between; align-items: center; }
+.step { flex: 1; text-align: center; position: relative; }
+.step:not(:last-child)::after { content: ''; position: absolute; top: 18px; left: 60%; right: -10%; height: 2px; background: #e5e5ea; z-index: 0; }
+.step.active:not(:last-child)::after { background: #667eea; }
+.step-num { width: 36px; height: 36px; border-radius: 50%; background: #e5e5ea; color: #8e8e93; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; font-weight: 600; position: relative; z-index: 1; }
+.step.active .step-num { background: #667eea; color: white; }
+.step.done .step-num { background: #34c759; color: white; }
+.step-name { font-size: 13px; color: #8e8e93; }
+.step.active .step-name { color: #667eea; font-weight: 600; }
+.step.done .step-name { color: #34c759; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 20px; }
+.card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.card h3 { font-size: 16px; margin-bottom: 12px; color: #1d1d1f; display: flex; align-items: center; gap: 8px; }
+.card h3 .badge { background: #667eea; color: white; font-size: 12px; padding: 2px 8px; border-radius: 10px; font-weight: 500; }
+.stat-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f0f0f5; font-size: 14px; }
+.stat-row:last-child { border-bottom: none; }
+.stat-label { color: #8e8e93; }
+.stat-value { font-weight: 600; }
+.stat-value.warn { color: #ff9500; }
+.stat-value.error { color: #ff3b30; }
+.section { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.section-title { font-size: 18px; font-weight: 600; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+.btn { padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+.btn-primary { background: #667eea; color: white; }
+.btn-primary:hover { background: #5a6fd6; }
+.btn-success { background: #34c759; color: white; }
+.btn-danger { background: #ff3b30; color: white; }
+.btn-secondary { background: #e5e5ea; color: #1d1d1f; }
+.btn-secondary:hover { background: #d1d1d6; }
+.btn-sm { padding: 4px 10px; font-size: 12px; }
+.btn-group { display: flex; gap: 8px; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { padding: 12px; text-align: left; border-bottom: 1px solid #f0f0f5; }
+th { background: #f9f9fb; font-weight: 600; color: #8e8e93; font-size: 13px; }
+tr:hover { background: #f9f9fb; }
+.tag { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 500; }
+.tag-warning { background: #fff3cd; color: #856404; }
+.tag-error { background: #f8d7da; color: #721c24; }
+.tag-info { background: #d1ecf1; color: #0c5460; }
+.tag-success { background: #d4edda; color: #155724; }
+.conflict-item { padding: 16px; border: 1px solid #f0f0f5; border-radius: 8px; margin-bottom: 12px; }
+.conflict-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+.conflict-msg { font-weight: 500; margin-bottom: 8px; }
+.conflict-evidence { background: #f9f9fb; padding: 10px; border-radius: 6px; font-size: 13px; color: #8e8e93; margin-bottom: 12px; }
+.conflict-actions { display: flex; gap: 8px; }
+.empty-state { text-align: center; padding: 40px; color: #8e8e93; }
+.empty-state svg { width: 64px; height: 64px; margin-bottom: 12px; opacity: 0.5; }
+.tabs { display: flex; gap: 4px; margin-bottom: 16px; background: #f0f0f5; padding: 4px; border-radius: 8px; }
+.tab { flex: 1; padding: 10px; border: none; background: transparent; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; color: #8e8e93; }
+.tab.active { background: white; color: #667eea; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.history-item { padding: 10px 0; border-bottom: 1px solid #f0f0f5; font-size: 13px; }
+.history-time { color: #8e8e93; margin-right: 8px; }
+.history-op { font-weight: 500; margin-right: 8px; }
+.selfcheck-item { padding: 12px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+.selfcheck-item.pass { background: #d4edda; }
+.selfcheck-item.fail { background: #f8d7da; }
+textarea { width: 100%; padding: 12px; border: 1px solid #e5e5ea; border-radius: 8px; font-size: 13px; font-family: monospace; resize: vertical; min-height: 120px; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>🎹 MIDI 控制器映射备份系统</h1>
+  <p>曲目别名表 · 课时签到核对 · 分账明细管理</p>
+</div>
+
+<div class="container">
+  <div class="workflow-bar">
+    <div class="steps">
+      <div class="step" id="step1">
+        <div class="step-num">1</div>
+        <div class="step-name">导入曲目别名表</div>
+      </div>
+      <div class="step" id="step2">
+        <div class="step-num">2</div>
+        <div class="step-name">核对课时签到照片</div>
+      </div>
+      <div class="step" id="step3">
+        <div class="step-num">3</div>
+        <div class="step-name">生成分账明细</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <h3>曲目别名表 <span class="badge" id="trackCount">0</span></h3>
+      <div class="stat-row"><span class="stat-label">已导入</span><span class="stat-value" id="trackImported">0 首</span></div>
+      <div class="stat-row"><span class="stat-label">重复导入</span><span class="stat-value" id="trackDup">0 首</span></div>
+    </div>
+    <div class="card">
+      <h3>课时签到 <span class="badge" id="checkinCount">0</span></h3>
+      <div class="stat-row"><span class="stat-label">已导入</span><span class="stat-value" id="checkinImported">0 条</span></div>
+      <div class="stat-row"><span class="stat-label">待复核替补</span><span class="stat-value warn" id="pendingSub">0 条</span></div>
+    </div>
+    <div class="card">
+      <h3>分账明细 <span class="badge" id="splitCount">0</span></h3>
+      <div class="stat-row"><span class="stat-label">已生成</span><span class="stat-value" id="splitCountVal">0 条</span></div>
+      <div class="stat-row"><span class="stat-label">总金额</span><span class="stat-value" id="splitTotal">¥0</span></div>
+    </div>
+    <div class="card">
+      <h3>冲突告警 <span class="badge" id="conflictCount">0</span></h3>
+      <div class="stat-row"><span class="stat-label">待处理</span><span class="stat-value error" id="pendingConflict">0 条</span></div>
+      <div class="stat-row"><span class="stat-label">已解决</span><span class="stat-value" id="resolvedConflict">0 条</span></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">
+      <span>操作面板</span>
+      <div class="btn-group">
+        <button class="btn btn-secondary btn-sm" onclick="loadSample('normal')">加载正常示例</button>
+        <button class="btn btn-secondary btn-sm" onclick="loadSample('conflict')">加载冲突示例</button>
+        <button class="btn btn-danger btn-sm" onclick="clearAll()">清空所有</button>
+      </div>
+    </div>
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('import')">数据导入</button>
+      <button class="tab" onclick="switchTab('conflict')">冲突处理</button>
+      <button class="tab" onclick="switchTab('selfcheck')">系统自检</button>
+      <button class="tab" onclick="switchTab('history')">操作历史</button>
+    </div>
+
+    <div id="tab-import">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div>
+          <h4 style="margin-bottom: 8px;">第一步：导入曲目别名表 (JSON数组)</h4>
+          <textarea id="aliasInput" placeholder='[{"trackName":"夜曲","artist":"周杰伦","fee":200,"aliasNames":["Nocturne"]}]'></textarea>
+          <div style="margin-top: 8px; text-align: right;">
+            <button class="btn btn-primary" onclick="importAlias()">导入曲目别名表</button>
+          </div>
+        </div>
+        <div>
+          <h4 style="margin-bottom: 8px;">第二步：导入课时签到照片 (JSON数组)</h4>
+          <textarea id="checkinInput" placeholder='[{"photoId":"p1","trackName":"夜曲","studentName":"小明","classDate":"2026-06-01"}]'></textarea>
+          <div style="margin-top: 8px; text-align: right;">
+            <button class="btn btn-primary" onclick="importCheckin()">导入签到记录</button>
+            <button class="btn btn-success" onclick="calculateSplit()">第三步：生成分账</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-conflict" style="display:none;">
+      <div id="conflictList"></div>
+    </div>
+
+    <div id="tab-selfcheck" style="display:none;">
+      <button class="btn btn-primary" style="margin-bottom: 16px;" onclick="runSelfCheck()">运行自检</button>
+      <div id="selfcheckResults"></div>
+    </div>
+
+    <div id="tab-history" style="display:none;">
+      <div id="historyList"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">
+      <span>曲目别名表</span>
+    </div>
+    <div id="trackTable"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">
+      <span>课时签到记录</span>
+    </div>
+    <div id="checkinTable"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">
+      <span>分账明细</span>
+      <button class="btn btn-primary btn-sm" onclick="exportData()">导出数据</button>
+    </div>
+    <div id="splitTable"></div>
+  </div>
+</div>
+
+<script>
+let currentTab = 'import';
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  ['import', 'conflict', 'selfcheck', 'history'].forEach(t => {
+    document.getElementById('tab-' + t).style.display = t === tab ? 'block' : 'none';
+  });
+}
+
+async function fetchState() {
+  const res = await fetch('/api/state');
+  const data = await res.json();
+  renderState(data);
+}
+
+function renderState(data) {
+  const wf = data.workflow;
+  for (let i = 1; i <= 3; i++) {
+    const el = document.getElementById('step' + i);
+    el.classList.remove('active', 'done');
+    if (i < wf.step) el.classList.add('done');
+    if (i === wf.step) el.classList.add('active');
+  }
+
+  document.getElementById('trackCount').textContent = data.tracks.length;
+  document.getElementById('trackImported').textContent = data.tracks.length + ' 首';
+  document.getElementById('checkinCount').textContent = data.checkins.length;
+  document.getElementById('checkinImported').textContent = data.checkins.length + ' 条';
+  document.getElementById('pendingSub').textContent = wf.pendingSubstitutes + ' 条';
+  document.getElementById('splitCount').textContent = data.splits.length;
+  document.getElementById('splitCountVal').textContent = data.splits.length + ' 条';
+  document.getElementById('splitTotal').textContent = '¥' + data.splits.reduce((s, x) => s + x.totalFee, 0);
+  document.getElementById('conflictCount').textContent = data.conflicts.length;
+  document.getElementById('pendingConflict').textContent = data.conflicts.filter(c => !c.resolved).length + ' 条';
+  document.getElementById('resolvedConflict').textContent = data.conflicts.filter(c => c.resolved).length + ' 条';
+
+  renderTracks(data.tracks);
+  renderCheckins(data.checkins);
+  renderSplits(data.splits);
+  renderConflicts(data.conflicts);
+  renderHistory(data.history);
+}
+
+function renderTracks(tracks) {
+  if (tracks.length === 0) {
+    document.getElementById('trackTable').innerHTML = '<div class="empty-state">还没有导入曲目别名表</div>';
+    return;
+  }
+  let html = '<table><thead><tr><th>曲目名称</th><th>艺术家</th><th>时长(秒)</th><th>费用(元)</th><th>别名</th></tr></thead><tbody>';
+  tracks.forEach(t => {
+    html += `<tr><td>${t.trackName}</td><td>${t.artist}</td><td>${t.duration}</td><td>¥${t.fee}</td><td>${t.aliasNames.join(', ') || '-'}</td></tr>`;
+  });
+  html += '</tbody></table>';
+  document.getElementById('trackTable').innerHTML = html;
+}
+
+function renderCheckins(checkins) {
+  if (checkins.length === 0) {
+    document.getElementById('checkinTable').innerHTML = '<div class="empty-state">还没有导入签到记录</div>';
+    return;
+  }
+  let html = '<table><thead><tr><th>曲目</th><th>学生</th><th>老师</th><th>上课日期</th><th>来源</th><th>状态</th><th>操作</th></tr></thead><tbody>';
+  checkins.forEach(c => {
+    let statusTag = '<span class="tag tag-success">正常</span>';
+    if (c.isSubstitute) {
+      statusTag = c.verified ? '<span class="tag tag-success">替补已复核</span>' : '<span class="tag tag-warning">替补待复核</span>';
+    }
+    const verifyBtn = c.isSubstitute && !c.verified ? `<button class="btn btn-success btn-sm" onclick="verifySub('${c.id}')">票务复核</button>` : '';
+    html += `<tr><td>${c.trackName || '-'}</td><td>${c.studentName}</td><td>${c.teacherName}</td><td>${c.classDate}</td><td>${c.source === 'wechat-group' ? '微信群' : '正式系统'}</td><td>${statusTag}</td><td>${verifyBtn}</td></tr>`;
+  });
+  html += '</tbody></table>';
+  document.getElementById('checkinTable').innerHTML = html;
+}
+
+function renderSplits(splits) {
+  if (splits.length === 0) {
+    document.getElementById('splitTable').innerHTML = '<div class="empty-state">还没有生成分账明细</div>';
+    return;
+  }
+  let html = '<table><thead><tr><th>曲目</th><th>学生</th><th>老师</th><th>日期</th><th>基础费用</th><th>教师分成</th><th>平台分成</th><th>替补调整</th><th>实收</th><th>版本</th></tr></thead><tbody>';
+  splits.forEach(s => {
+    html += `<tr><td>${s.trackName}</td><td>${s.studentName}</td><td>${s.teacherName}</td><td>${s.classDate}</td><td>¥${s.baseFee}</td><td>¥${s.teacherShare}</td><td>¥${s.platformShare}</td><td style="color:${s.substituteAdjustment < 0 ? '#ff3b30' : '#34c759'}">${s.substituteAdjustment !== 0 ? '¥' + s.substituteAdjustment : '-'}</td><td><strong>¥${s.totalFee}</strong></td><td>v${s.version}</td></tr>`;
+  });
+  html += '</tbody></table>';
+  document.getElementById('splitTable').innerHTML = html;
+}
+
+function renderConflicts(conflicts) {
+  const unresolved = conflicts.filter(c => !c.resolved);
+  if (unresolved.length === 0) {
+    document.getElementById('conflictList').innerHTML = '<div class="empty-state">没有待处理的冲突 🎉</div>';
+    return;
+  }
+  let html = '';
+  unresolved.forEach(c => {
+    const sevTag = c.severity === 'error' ? 'tag-error' : c.severity === 'warning' ? 'tag-warning' : 'tag-info';
+    html += `<div class="conflict-item">
+      <div class="conflict-header">
+        <span class="tag ${sevTag}">${c.severity === 'error' ? '错误' : c.severity === 'warning' ? '警告' : '提示'}</span>
+      </div>
+      <div class="conflict-msg">⚠️ ${c.message}</div>
+      <div class="conflict-evidence">证据: ${JSON.stringify(c.evidence)}</div>
+      <div class="conflict-actions">
+        <button class="btn btn-success btn-sm" onclick="resolveConflict('${c.id}', 'confirm')">录音师确认</button>
+        <button class="btn btn-danger btn-sm" onclick="resolveConflict('${c.id}', 'reject')">驳回</button>
+      </div>
+    </div>`;
+  });
+  document.getElementById('conflictList').innerHTML = html;
+}
+
+function renderHistory(history) {
+  if (history.length === 0) {
+    document.getElementById('historyList').innerHTML = '<div class="empty-state">还没有操作记录</div>';
+    return;
+  }
+  let html = '';
+  history.forEach(h => {
+    const time = new Date(h.time).toLocaleString();
+    html += `<div class="history-item"><span class="history-time">${time}</span><span class="history-op">${h.operator}</span>${h.detail}</div>`;
+  });
+  document.getElementById('historyList').innerHTML = html;
+}
+
+async function importAlias() {
+  const input = document.getElementById('aliasInput').value;
+  try {
+    const data = JSON.parse(input);
+    const res = await fetch('/api/import/alias', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    const result = await res.json();
+    alert(`导入完成！成功 ${result.imported} 条，重复 ${result.duplicates} 条，冲突 ${result.conflicts.length} 条`);
+    fetchState();
+  } catch (e) {
+    alert('JSON格式错误：' + e.message);
+  }
+}
+
+async function importCheckin() {
+  const input = document.getElementById('checkinInput').value;
+  try {
+    const data = JSON.parse(input);
+    const res = await fetch('/api/import/checkin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    const result = await res.json();
+    alert(`导入完成！成功 ${result.imported} 条，冲突 ${result.conflicts.length} 条\n${result.warnings.join('\n')}`);
+    fetchState();
+  } catch (e) {
+    alert('JSON格式错误：' + e.message);
+  }
+}
+
+async function calculateSplit() {
+  const res = await fetch('/api/split/calculate', { method: 'POST' });
+  const data = await res.json();
+  alert(`生成了 ${data.splits.length} 条分账明细`);
+  fetchState();
+}
+
+async function resolveConflict(id, resolution) {
+  await fetch('/api/conflict/' + id + '/resolve', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ resolution })
+  });
+  fetchState();
+}
+
+async function verifySub(id) {
+  await fetch('/api/checkin/' + id + '/verify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ operator: '票务同事' })
+  });
+  fetchState();
+}
+
+async function runSelfCheck() {
+  const res = await fetch('/api/selfcheck');
+  const data = await res.json();
+  let html = '';
+  data.results.forEach(r => {
+    html += `<div class="selfcheck-item ${r.passed ? 'pass' : 'fail'}">
+      <span>${r.passed ? '✅' : '❌'} ${r.name}: ${r.message}</span>
+    </div>`;
+    if (r.detail && (Array.isArray(r.detail) ? r.detail.length > 0 : Object.keys(r.detail).length > 0)) {
+      html += `<div style="padding: 8px 16px; font-size: 13px; color: #666;">详情: ${JSON.stringify(r.detail)}</div>`;
+    }
+  });
+  document.getElementById('selfcheckResults').innerHTML = html;
+}
+
+async function loadSample(type) {
+  const res = await fetch('/api/sample/' + type);
+  const data = await res.json();
+  document.getElementById('aliasInput').value = JSON.stringify(data.alias, null, 2);
+  document.getElementById('checkinInput').value = JSON.stringify(data.checkin, null, 2);
+}
+
+async function exportData() {
+  const res = await fetch('/api/export');
+  const data = await res.json();
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'midi-backup-export.json';
+  a.click();
+}
+
+async function clearAll() {
+  if (!confirm('确定要清空所有数据吗？')) return;
+  await fetch('/api/clear', { method: 'POST' });
+  fetchState();
+}
+
+fetchState();
+</script>
+</body>
+</html>
