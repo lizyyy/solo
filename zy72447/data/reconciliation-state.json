@@ -1,0 +1,670 @@
+{
+  "groupRecords": [
+    {
+      "originalRowNumber": 1,
+      "rawContent": "1. 张三 - 月光奏鸣曲",
+      "performerName": "张三",
+      "songName": "月光奏鸣曲",
+      "isTemporarySubstitute": false,
+      "importBatchId": "0a82bfe9-ab6d-4fe8-9d97-206a72d66a2f",
+      "id": "21420295-8672-416e-a655-a91c501e228d",
+      "importedAt": "2026-06-07T00:27:08.654Z",
+      "status": "imported",
+      "manualEdits": []
+    },
+    {
+      "originalRowNumber": 2,
+      "rawContent": "2. 李四 - 致爱丽丝",
+      "performerName": "李四",
+      "songName": "致爱丽丝",
+      "isTemporarySubstitute": false,
+      "importBatchId": "0a82bfe9-ab6d-4fe8-9d97-206a72d66a2f",
+      "id": "20f69dc3-39a9-4ffb-ba16-7b8e8bd22607",
+      "importedAt": "2026-06-07T00:27:08.654Z",
+      "status": "imported",
+      "manualEdits": []
+    },
+    {
+      "originalRowNumber": 3,
+      "rawContent": "3. 王五（替补）- 临时替上 - 小星星",
+      "performerName": "王五（替补）-",
+      "songName": "临时替上",
+      "isTemporarySubstitute": true,
+      "substituteNote": "替补",
+      "importBatchId": "0a82bfe9-ab6d-4fe8-9d97-206a72d66a2f",
+      "id": "d3191956-e395-4141-965e-9ededa18e18f",
+      "importedAt": "2026-06-07T00:27:08.654Z",
+      "status": "imported",
+      "manualEdits": []
+    },
+    {
+      "originalRowNumber": 4,
+      "rawContent": "4. 赵六 - 欢乐颂",
+      "performerName": "赵六",
+      "songName": "欢乐颂",
+      "isTemporarySubstitute": false,
+      "importBatchId": "0a82bfe9-ab6d-4fe8-9d97-206a72d66a2f",
+      "id": "a0d26604-52c0-497f-b8c8-ec28b6778fb4",
+      "importedAt": "2026-06-07T00:27:08.654Z",
+      "status": "imported",
+      "manualEdits": []
+    },
+    {
+      "originalRowNumber": 5,
+      "rawContent": "5. 钱七 - 替补，代班 - 土耳其进行曲",
+      "performerName": "钱七",
+      "songName": "替补",
+      "isTemporarySubstitute": true,
+      "substituteNote": "替补",
+      "importBatchId": "0a82bfe9-ab6d-4fe8-9d97-206a72d66a2f",
+      "id": "8ef2f366-083f-4f8f-86f4-328ab4bbe596",
+      "importedAt": "2026-06-07T00:27:08.654Z",
+      "status": "imported",
+      "manualEdits": []
+    },
+    {
+      "originalRowNumber": 6,
+      "rawContent": "6. 孙八 - 蓝色多瑙河",
+      "performerName": "孙八",
+      "songName": "蓝色多瑙河",
+      "isTemporarySubstitute": false,
+      "importBatchId": "0a82bfe9-ab6d-4fe8-9d97-206a72d66a2f",
+      "id": "5be2eeac-5469-4873-8ee6-86caa58adfba",
+      "importedAt": "2026-06-07T00:27:08.654Z",
+      "status": "imported",
+      "manualEdits": []
+    }
+  ],
+  "contractRecords": [
+    {
+      "rawContent": "表演者:张三  曲目:月光奏鸣曲  合同号:HT2024001  日期:2024-06-15",
+      "performerName": "张三",
+      "songName": "月光奏鸣曲",
+      "contractReference": "HT2024001",
+      "performanceDate": "2024-06-15",
+      "importBatchId": "852a7de0-7bda-45d3-bf45-90f4449cc490",
+      "sourceFileName": "/Users/lzy/pro/solo/workspaces/zy72447/examples/contract-part1.txt",
+      "id": "d64b9b5c-25ee-45a2-9341-f986e32dc499",
+      "importedAt": "2026-06-07T00:27:23.536Z",
+      "status": "imported",
+      "manualEdits": []
+    },
+    {
+      "rawContent": "表演者:李四  曲目:致爱丽丝  合同号:HT2024002  日期:2024-06-15",
+      "performerName": "李四",
+      "songName": "致爱丽丝",
+      "contractReference": "HT2024002",
+      "performanceDate": "2024-06-15",
+      "importBatchId": "852a7de0-7bda-45d3-bf45-90f4449cc490",
+      "sourceFileName": "/Users/lzy/pro/solo/workspaces/zy72447/examples/contract-part1.txt",
+      "id": "21f2b957-a303-42b8-893f-d64fc4c1c5f2",
+      "importedAt": "2026-06-07T00:27:23.536Z",
+      "status": "imported",
+      "manualEdits": []
+    },
+    {
+      "rawContent": "表演者:赵六  曲目:欢乐颂  合同号:HT2024004  日期:2024-06-15",
+      "performerName": "赵六",
+      "songName": "欢乐颂",
+      "contractReference": "HT2024004",
+      "performanceDate": "2024-06-15",
+      "importBatchId": "852a7de0-7bda-45d3-bf45-90f4449cc490",
+      "sourceFileName": "/Users/lzy/pro/solo/workspaces/zy72447/examples/contract-part1.txt",
+      "id": "2db3074c-35aa-411c-94fc-811412e54ebe",
+      "importedAt": "2026-06-07T00:27:23.536Z",
+      "status": "imported",
+      "manualEdits": []
+    },
+    {
+      "rawContent": "表演者:孙八  曲目:蓝色多瑙河  合同号:HT2024006  日期:2024-06-15",
+      "performerName": "孙八",
+      "songName": "蓝色多瑙河",
+      "contractReference": "HT2024006",
+      "performanceDate": "2024-06-15",
+      "importBatchId": "680eadbd-6040-47af-8f23-41a2060149f7",
+      "sourceFileName": "/Users/lzy/pro/solo/workspaces/zy72447/examples/contract-part2-late.txt",
+      "id": "d0c411d0-6731-4c48-b5cc-894cefa83588",
+      "importedAt": "2026-06-07T00:28:00.516Z",
+      "status": "imported",
+      "manualEdits": []
+    }
+  ],
+  "results": [
+    {
+      "groupRecordId": "21420295-8672-416e-a655-a91c501e228d",
+      "contractRecordId": "d64b9b5c-25ee-45a2-9341-f986e32dc499",
+      "matchedPerformerName": "张三",
+      "matchedSongName": "月光奏鸣曲",
+      "status": "confirmed",
+      "reviewReasons": [],
+      "isLateContractRefresh": false,
+      "id": "8e78b459-dbb9-4e9c-b61c-86d93a671a84",
+      "createdAt": "2026-06-07T00:27:23.672Z",
+      "updatedAt": "2026-06-07T00:27:53.771Z",
+      "reviewedBy": "票务同事A",
+      "reviewedAt": "2026-06-07T00:27:53.770Z",
+      "reviewNotes": "核对无误"
+    },
+    {
+      "groupRecordId": "20f69dc3-39a9-4ffb-ba16-7b8e8bd22607",
+      "contractRecordId": "21f2b957-a303-42b8-893f-d64fc4c1c5f2",
+      "matchedPerformerName": "李四",
+      "matchedSongName": "致爱丽丝",
+      "status": "needs_review",
+      "reviewReasons": [
+        "contract_missing"
+      ],
+      "isLateContractRefresh": true,
+      "id": "4a86ab1c-e6f3-48db-b828-c2491addecad",
+      "createdAt": "2026-06-07T00:27:23.673Z",
+      "updatedAt": "2026-06-07T00:28:12.807Z"
+    },
+    {
+      "groupRecordId": "d3191956-e395-4141-965e-9ededa18e18f",
+      "matchedPerformerName": "王五（替补）-",
+      "matchedSongName": "临时替上",
+      "status": "needs_review",
+      "reviewReasons": [
+        "contract_missing",
+        "temp_substitute_only_in_group"
+      ],
+      "isLateContractRefresh": true,
+      "id": "59957aa8-e52e-4ed2-b2aa-d5cd38b38ac3",
+      "createdAt": "2026-06-07T00:27:23.673Z",
+      "updatedAt": "2026-06-07T00:28:12.811Z"
+    },
+    {
+      "groupRecordId": "a0d26604-52c0-497f-b8c8-ec28b6778fb4",
+      "contractRecordId": "2db3074c-35aa-411c-94fc-811412e54ebe",
+      "matchedPerformerName": "赵六",
+      "matchedSongName": "欢乐颂",
+      "status": "needs_review",
+      "reviewReasons": [
+        "contract_missing"
+      ],
+      "isLateContractRefresh": true,
+      "id": "94c1b6de-58aa-464a-803a-24376bbd46f0",
+      "createdAt": "2026-06-07T00:27:23.674Z",
+      "updatedAt": "2026-06-07T00:28:12.812Z"
+    },
+    {
+      "groupRecordId": "8ef2f366-083f-4f8f-86f4-328ab4bbe596",
+      "matchedPerformerName": "钱七",
+      "matchedSongName": "替补",
+      "status": "needs_review",
+      "reviewReasons": [
+        "contract_missing",
+        "temp_substitute_only_in_group"
+      ],
+      "isLateContractRefresh": true,
+      "id": "ad6464e0-3c64-462f-ac19-1d585c0a8528",
+      "createdAt": "2026-06-07T00:27:23.674Z",
+      "updatedAt": "2026-06-07T00:28:12.812Z"
+    },
+    {
+      "groupRecordId": "5be2eeac-5469-4873-8ee6-86caa58adfba",
+      "matchedPerformerName": "孙八",
+      "matchedSongName": "蓝色多瑙河",
+      "status": "matched",
+      "reviewReasons": [
+        "contract_missing"
+      ],
+      "isLateContractRefresh": true,
+      "id": "ca201ed0-90f5-493a-bca6-ddd11bbfc4c7",
+      "createdAt": "2026-06-07T00:27:23.674Z",
+      "updatedAt": "2026-06-07T00:28:12.813Z",
+      "contractRecordId": "d0c411d0-6731-4c48-b5cc-894cefa83588"
+    }
+  ],
+  "logs": [
+    {
+      "id": "34390f6f-64bf-4262-a8e6-26831fda9359",
+      "operationType": "CREATE_BATCH",
+      "entityType": "ImportBatch",
+      "entityId": "0a82bfe9-ab6d-4fe8-9d97-206a72d66a2f",
+      "newState": {
+        "source": "group_signup",
+        "fileName": "/Users/lzy/pro/solo/workspaces/zy72447/examples/group-signup.txt",
+        "recordCount": 0,
+        "operator": "票务同事A",
+        "id": "0a82bfe9-ab6d-4fe8-9d97-206a72d66a2f",
+        "importedAt": "2026-06-07T00:27:08.652Z"
+      },
+      "operator": "票务同事A",
+      "timestamp": "2026-06-07T00:27:08.652Z"
+    },
+    {
+      "id": "d5614014-c41f-4033-b0c9-8495726aa1b2",
+      "operationType": "BULK_IMPORT",
+      "entityType": "GroupSignupRecord",
+      "newState": {
+        "count": 6
+      },
+      "operator": "票务同事A",
+      "timestamp": "2026-06-07T00:27:08.654Z",
+      "batchId": "0a82bfe9-ab6d-4fe8-9d97-206a72d66a2f"
+    },
+    {
+      "id": "45c02f0a-440b-470e-ab88-5c5ffdcd419c",
+      "operationType": "CREATE_BATCH",
+      "entityType": "ImportBatch",
+      "entityId": "852a7de0-7bda-45d3-bf45-90f4449cc490",
+      "newState": {
+        "source": "contract_screenshot",
+        "fileName": "/Users/lzy/pro/solo/workspaces/zy72447/examples/contract-part1.txt",
+        "recordCount": 0,
+        "operator": "老周",
+        "id": "852a7de0-7bda-45d3-bf45-90f4449cc490",
+        "importedAt": "2026-06-07T00:27:23.535Z"
+      },
+      "operator": "老周",
+      "timestamp": "2026-06-07T00:27:23.535Z"
+    },
+    {
+      "id": "51cda41e-89da-476c-a881-1a3de74e589e",
+      "operationType": "BULK_IMPORT",
+      "entityType": "ContractRecord",
+      "newState": {
+        "count": 3
+      },
+      "operator": "老周",
+      "timestamp": "2026-06-07T00:27:23.536Z",
+      "batchId": "852a7de0-7bda-45d3-bf45-90f4449cc490"
+    },
+    {
+      "id": "c18bac36-fc39-4910-a0f2-a28a9566b689",
+      "operationType": "CREATE_RESULT",
+      "entityType": "ReconciliationResult",
+      "entityId": "8e78b459-dbb9-4e9c-b61c-86d93a671a84",
+      "newState": {
+        "groupRecordId": "21420295-8672-416e-a655-a91c501e228d",
+        "contractRecordId": "d64b9b5c-25ee-45a2-9341-f986e32dc499",
+        "matchedPerformerName": "张三",
+        "matchedSongName": "月光奏鸣曲",
+        "status": "matched",
+        "reviewReasons": [],
+        "isLateContractRefresh": false,
+        "id": "8e78b459-dbb9-4e9c-b61c-86d93a671a84",
+        "createdAt": "2026-06-07T00:27:23.672Z",
+        "updatedAt": "2026-06-07T00:27:23.672Z"
+      },
+      "operator": "系统",
+      "timestamp": "2026-06-07T00:27:23.673Z"
+    },
+    {
+      "id": "703673ef-fc00-4fb7-ac8f-7a3fabadc631",
+      "operationType": "CREATE_RESULT",
+      "entityType": "ReconciliationResult",
+      "entityId": "4a86ab1c-e6f3-48db-b828-c2491addecad",
+      "newState": {
+        "groupRecordId": "20f69dc3-39a9-4ffb-ba16-7b8e8bd22607",
+        "contractRecordId": "21f2b957-a303-42b8-893f-d64fc4c1c5f2",
+        "matchedPerformerName": "李四",
+        "matchedSongName": "致爱丽丝",
+        "status": "matched",
+        "reviewReasons": [],
+        "isLateContractRefresh": false,
+        "id": "4a86ab1c-e6f3-48db-b828-c2491addecad",
+        "createdAt": "2026-06-07T00:27:23.673Z",
+        "updatedAt": "2026-06-07T00:27:23.673Z"
+      },
+      "operator": "系统",
+      "timestamp": "2026-06-07T00:27:23.673Z"
+    },
+    {
+      "id": "d54a4a84-3ec3-42da-963a-44e121f23247",
+      "operationType": "CREATE_RESULT",
+      "entityType": "ReconciliationResult",
+      "entityId": "59957aa8-e52e-4ed2-b2aa-d5cd38b38ac3",
+      "newState": {
+        "groupRecordId": "d3191956-e395-4141-965e-9ededa18e18f",
+        "matchedPerformerName": "王五（替补）-",
+        "matchedSongName": "临时替上",
+        "status": "needs_review",
+        "reviewReasons": [
+          "contract_missing",
+          "temp_substitute_only_in_group"
+        ],
+        "isLateContractRefresh": false,
+        "id": "59957aa8-e52e-4ed2-b2aa-d5cd38b38ac3",
+        "createdAt": "2026-06-07T00:27:23.673Z",
+        "updatedAt": "2026-06-07T00:27:23.673Z"
+      },
+      "operator": "系统",
+      "timestamp": "2026-06-07T00:27:23.673Z"
+    },
+    {
+      "id": "3d31c878-8ab5-435e-a17a-04c5d48fd302",
+      "operationType": "CREATE_RESULT",
+      "entityType": "ReconciliationResult",
+      "entityId": "94c1b6de-58aa-464a-803a-24376bbd46f0",
+      "newState": {
+        "groupRecordId": "a0d26604-52c0-497f-b8c8-ec28b6778fb4",
+        "contractRecordId": "2db3074c-35aa-411c-94fc-811412e54ebe",
+        "matchedPerformerName": "赵六",
+        "matchedSongName": "欢乐颂",
+        "status": "matched",
+        "reviewReasons": [],
+        "isLateContractRefresh": false,
+        "id": "94c1b6de-58aa-464a-803a-24376bbd46f0",
+        "createdAt": "2026-06-07T00:27:23.674Z",
+        "updatedAt": "2026-06-07T00:27:23.674Z"
+      },
+      "operator": "系统",
+      "timestamp": "2026-06-07T00:27:23.674Z"
+    },
+    {
+      "id": "7499e43d-d838-4149-bfcd-df2ac1e5ed9b",
+      "operationType": "CREATE_RESULT",
+      "entityType": "ReconciliationResult",
+      "entityId": "ad6464e0-3c64-462f-ac19-1d585c0a8528",
+      "newState": {
+        "groupRecordId": "8ef2f366-083f-4f8f-86f4-328ab4bbe596",
+        "matchedPerformerName": "钱七",
+        "matchedSongName": "替补",
+        "status": "needs_review",
+        "reviewReasons": [
+          "contract_missing",
+          "temp_substitute_only_in_group"
+        ],
+        "isLateContractRefresh": false,
+        "id": "ad6464e0-3c64-462f-ac19-1d585c0a8528",
+        "createdAt": "2026-06-07T00:27:23.674Z",
+        "updatedAt": "2026-06-07T00:27:23.674Z"
+      },
+      "operator": "系统",
+      "timestamp": "2026-06-07T00:27:23.674Z"
+    },
+    {
+      "id": "a1b5f57b-31f8-45a0-86f7-61bf4e32db7f",
+      "operationType": "CREATE_RESULT",
+      "entityType": "ReconciliationResult",
+      "entityId": "ca201ed0-90f5-493a-bca6-ddd11bbfc4c7",
+      "newState": {
+        "groupRecordId": "5be2eeac-5469-4873-8ee6-86caa58adfba",
+        "matchedPerformerName": "孙八",
+        "matchedSongName": "蓝色多瑙河",
+        "status": "needs_review",
+        "reviewReasons": [
+          "contract_missing"
+        ],
+        "isLateContractRefresh": false,
+        "id": "ca201ed0-90f5-493a-bca6-ddd11bbfc4c7",
+        "createdAt": "2026-06-07T00:27:23.674Z",
+        "updatedAt": "2026-06-07T00:27:23.674Z"
+      },
+      "operator": "系统",
+      "timestamp": "2026-06-07T00:27:23.674Z"
+    },
+    {
+      "id": "992dbc30-66ec-4ddb-a88b-5356a43c4f29",
+      "operationType": "UPDATE_RESULT",
+      "entityType": "ReconciliationResult",
+      "entityId": "8e78b459-dbb9-4e9c-b61c-86d93a671a84",
+      "oldState": {
+        "groupRecordId": "21420295-8672-416e-a655-a91c501e228d",
+        "contractRecordId": "d64b9b5c-25ee-45a2-9341-f986e32dc499",
+        "matchedPerformerName": "张三",
+        "matchedSongName": "月光奏鸣曲",
+        "status": "matched",
+        "reviewReasons": [],
+        "isLateContractRefresh": false,
+        "id": "8e78b459-dbb9-4e9c-b61c-86d93a671a84",
+        "createdAt": "2026-06-07T00:27:23.672Z",
+        "updatedAt": "2026-06-07T00:27:23.672Z"
+      },
+      "newState": {
+        "groupRecordId": "21420295-8672-416e-a655-a91c501e228d",
+        "contractRecordId": "d64b9b5c-25ee-45a2-9341-f986e32dc499",
+        "matchedPerformerName": "张三",
+        "matchedSongName": "月光奏鸣曲",
+        "status": "confirmed",
+        "reviewReasons": [],
+        "isLateContractRefresh": false,
+        "id": "8e78b459-dbb9-4e9c-b61c-86d93a671a84",
+        "createdAt": "2026-06-07T00:27:23.672Z",
+        "updatedAt": "2026-06-07T00:27:53.771Z",
+        "reviewedBy": "票务同事A",
+        "reviewedAt": "2026-06-07T00:27:53.770Z",
+        "reviewNotes": "核对无误"
+      },
+      "operator": "票务同事A",
+      "timestamp": "2026-06-07T00:27:53.771Z",
+      "notes": "票务同事复核确认"
+    },
+    {
+      "id": "0daed450-7899-423e-b261-27efe49901c8",
+      "operationType": "CREATE_BATCH",
+      "entityType": "ImportBatch",
+      "entityId": "680eadbd-6040-47af-8f23-41a2060149f7",
+      "newState": {
+        "source": "contract_screenshot",
+        "fileName": "/Users/lzy/pro/solo/workspaces/zy72447/examples/contract-part2-late.txt",
+        "recordCount": 0,
+        "operator": "老周",
+        "id": "680eadbd-6040-47af-8f23-41a2060149f7",
+        "importedAt": "2026-06-07T00:28:00.515Z"
+      },
+      "operator": "老周",
+      "timestamp": "2026-06-07T00:28:00.515Z"
+    },
+    {
+      "id": "d44fbbe5-dc78-4f63-98c6-2f2ecf502247",
+      "operationType": "BULK_IMPORT",
+      "entityType": "ContractRecord",
+      "newState": {
+        "count": 1
+      },
+      "operator": "老周",
+      "timestamp": "2026-06-07T00:28:00.516Z",
+      "batchId": "680eadbd-6040-47af-8f23-41a2060149f7"
+    },
+    {
+      "id": "53d09dd1-f5ad-4458-8cdb-c4daa56ad9e0",
+      "operationType": "UPDATE_RESULT",
+      "entityType": "ReconciliationResult",
+      "entityId": "4a86ab1c-e6f3-48db-b828-c2491addecad",
+      "oldState": {
+        "groupRecordId": "20f69dc3-39a9-4ffb-ba16-7b8e8bd22607",
+        "contractRecordId": "21f2b957-a303-42b8-893f-d64fc4c1c5f2",
+        "matchedPerformerName": "李四",
+        "matchedSongName": "致爱丽丝",
+        "status": "matched",
+        "reviewReasons": [],
+        "isLateContractRefresh": false,
+        "id": "4a86ab1c-e6f3-48db-b828-c2491addecad",
+        "createdAt": "2026-06-07T00:27:23.673Z",
+        "updatedAt": "2026-06-07T00:27:23.673Z"
+      },
+      "newState": {
+        "groupRecordId": "20f69dc3-39a9-4ffb-ba16-7b8e8bd22607",
+        "contractRecordId": "21f2b957-a303-42b8-893f-d64fc4c1c5f2",
+        "matchedPerformerName": "李四",
+        "matchedSongName": "致爱丽丝",
+        "status": "needs_review",
+        "reviewReasons": [
+          "contract_missing"
+        ],
+        "isLateContractRefresh": true,
+        "id": "4a86ab1c-e6f3-48db-b828-c2491addecad",
+        "createdAt": "2026-06-07T00:27:23.673Z",
+        "updatedAt": "2026-06-07T00:28:12.807Z"
+      },
+      "operator": "系统",
+      "timestamp": "2026-06-07T00:28:12.810Z",
+      "notes": "晚到合同材料刷新"
+    },
+    {
+      "id": "52983d25-8889-4b60-9c8e-807248169a53",
+      "operationType": "UPDATE_RESULT",
+      "entityType": "ReconciliationResult",
+      "entityId": "59957aa8-e52e-4ed2-b2aa-d5cd38b38ac3",
+      "oldState": {
+        "groupRecordId": "d3191956-e395-4141-965e-9ededa18e18f",
+        "matchedPerformerName": "王五（替补）-",
+        "matchedSongName": "临时替上",
+        "status": "needs_review",
+        "reviewReasons": [
+          "contract_missing",
+          "temp_substitute_only_in_group"
+        ],
+        "isLateContractRefresh": false,
+        "id": "59957aa8-e52e-4ed2-b2aa-d5cd38b38ac3",
+        "createdAt": "2026-06-07T00:27:23.673Z",
+        "updatedAt": "2026-06-07T00:27:23.673Z"
+      },
+      "newState": {
+        "groupRecordId": "d3191956-e395-4141-965e-9ededa18e18f",
+        "matchedPerformerName": "王五（替补）-",
+        "matchedSongName": "临时替上",
+        "status": "needs_review",
+        "reviewReasons": [
+          "contract_missing",
+          "temp_substitute_only_in_group"
+        ],
+        "isLateContractRefresh": true,
+        "id": "59957aa8-e52e-4ed2-b2aa-d5cd38b38ac3",
+        "createdAt": "2026-06-07T00:27:23.673Z",
+        "updatedAt": "2026-06-07T00:28:12.811Z"
+      },
+      "operator": "系统",
+      "timestamp": "2026-06-07T00:28:12.811Z",
+      "notes": "晚到合同材料刷新"
+    },
+    {
+      "id": "1acb80ae-1fb9-4940-abfb-457031c876c6",
+      "operationType": "UPDATE_RESULT",
+      "entityType": "ReconciliationResult",
+      "entityId": "94c1b6de-58aa-464a-803a-24376bbd46f0",
+      "oldState": {
+        "groupRecordId": "a0d26604-52c0-497f-b8c8-ec28b6778fb4",
+        "contractRecordId": "2db3074c-35aa-411c-94fc-811412e54ebe",
+        "matchedPerformerName": "赵六",
+        "matchedSongName": "欢乐颂",
+        "status": "matched",
+        "reviewReasons": [],
+        "isLateContractRefresh": false,
+        "id": "94c1b6de-58aa-464a-803a-24376bbd46f0",
+        "createdAt": "2026-06-07T00:27:23.674Z",
+        "updatedAt": "2026-06-07T00:27:23.674Z"
+      },
+      "newState": {
+        "groupRecordId": "a0d26604-52c0-497f-b8c8-ec28b6778fb4",
+        "contractRecordId": "2db3074c-35aa-411c-94fc-811412e54ebe",
+        "matchedPerformerName": "赵六",
+        "matchedSongName": "欢乐颂",
+        "status": "needs_review",
+        "reviewReasons": [
+          "contract_missing"
+        ],
+        "isLateContractRefresh": true,
+        "id": "94c1b6de-58aa-464a-803a-24376bbd46f0",
+        "createdAt": "2026-06-07T00:27:23.674Z",
+        "updatedAt": "2026-06-07T00:28:12.812Z"
+      },
+      "operator": "系统",
+      "timestamp": "2026-06-07T00:28:12.812Z",
+      "notes": "晚到合同材料刷新"
+    },
+    {
+      "id": "a35fe733-7c8f-4091-9fea-918b32cf4b3a",
+      "operationType": "UPDATE_RESULT",
+      "entityType": "ReconciliationResult",
+      "entityId": "ad6464e0-3c64-462f-ac19-1d585c0a8528",
+      "oldState": {
+        "groupRecordId": "8ef2f366-083f-4f8f-86f4-328ab4bbe596",
+        "matchedPerformerName": "钱七",
+        "matchedSongName": "替补",
+        "status": "needs_review",
+        "reviewReasons": [
+          "contract_missing",
+          "temp_substitute_only_in_group"
+        ],
+        "isLateContractRefresh": false,
+        "id": "ad6464e0-3c64-462f-ac19-1d585c0a8528",
+        "createdAt": "2026-06-07T00:27:23.674Z",
+        "updatedAt": "2026-06-07T00:27:23.674Z"
+      },
+      "newState": {
+        "groupRecordId": "8ef2f366-083f-4f8f-86f4-328ab4bbe596",
+        "matchedPerformerName": "钱七",
+        "matchedSongName": "替补",
+        "status": "needs_review",
+        "reviewReasons": [
+          "contract_missing",
+          "temp_substitute_only_in_group"
+        ],
+        "isLateContractRefresh": true,
+        "id": "ad6464e0-3c64-462f-ac19-1d585c0a8528",
+        "createdAt": "2026-06-07T00:27:23.674Z",
+        "updatedAt": "2026-06-07T00:28:12.812Z"
+      },
+      "operator": "系统",
+      "timestamp": "2026-06-07T00:28:12.812Z",
+      "notes": "晚到合同材料刷新"
+    },
+    {
+      "id": "05423a38-87e0-428f-8801-6d55198b76c1",
+      "operationType": "UPDATE_RESULT",
+      "entityType": "ReconciliationResult",
+      "entityId": "ca201ed0-90f5-493a-bca6-ddd11bbfc4c7",
+      "oldState": {
+        "groupRecordId": "5be2eeac-5469-4873-8ee6-86caa58adfba",
+        "matchedPerformerName": "孙八",
+        "matchedSongName": "蓝色多瑙河",
+        "status": "needs_review",
+        "reviewReasons": [
+          "contract_missing"
+        ],
+        "isLateContractRefresh": false,
+        "id": "ca201ed0-90f5-493a-bca6-ddd11bbfc4c7",
+        "createdAt": "2026-06-07T00:27:23.674Z",
+        "updatedAt": "2026-06-07T00:27:23.674Z"
+      },
+      "newState": {
+        "groupRecordId": "5be2eeac-5469-4873-8ee6-86caa58adfba",
+        "matchedPerformerName": "孙八",
+        "matchedSongName": "蓝色多瑙河",
+        "status": "matched",
+        "reviewReasons": [
+          "contract_missing"
+        ],
+        "isLateContractRefresh": true,
+        "id": "ca201ed0-90f5-493a-bca6-ddd11bbfc4c7",
+        "createdAt": "2026-06-07T00:27:23.674Z",
+        "updatedAt": "2026-06-07T00:28:12.813Z",
+        "contractRecordId": "d0c411d0-6731-4c48-b5cc-894cefa83588"
+      },
+      "operator": "系统",
+      "timestamp": "2026-06-07T00:28:12.813Z",
+      "notes": "晚到合同材料刷新"
+    }
+  ],
+  "batches": [
+    {
+      "source": "group_signup",
+      "fileName": "/Users/lzy/pro/solo/workspaces/zy72447/examples/group-signup.txt",
+      "recordCount": 0,
+      "operator": "票务同事A",
+      "id": "0a82bfe9-ab6d-4fe8-9d97-206a72d66a2f",
+      "importedAt": "2026-06-07T00:27:08.652Z"
+    },
+    {
+      "source": "contract_screenshot",
+      "fileName": "/Users/lzy/pro/solo/workspaces/zy72447/examples/contract-part1.txt",
+      "recordCount": 0,
+      "operator": "老周",
+      "id": "852a7de0-7bda-45d3-bf45-90f4449cc490",
+      "importedAt": "2026-06-07T00:27:23.535Z"
+    },
+    {
+      "source": "contract_screenshot",
+      "fileName": "/Users/lzy/pro/solo/workspaces/zy72447/examples/contract-part2-late.txt",
+      "recordCount": 0,
+      "operator": "老周",
+      "id": "680eadbd-6040-47af-8f23-41a2060149f7",
+      "importedAt": "2026-06-07T00:28:00.515Z"
+    }
+  ],
+  "lastUpdated": "2026-06-07T00:28:12.813Z"
+}

@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>音频母带交付核对系统</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; padding: 20px; }
+    .container { max-width: 1400px; margin: 0 auto; }
+    h1 { color: #333; margin-bottom: 20px; }
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px; }
+    .stat-card { background: white; padding: 18px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .stat-value { font-size: 28px; font-weight: bold; color: #2563eb; }
+    .stat-label { color: #666; font-size: 14px; margin-top: 5px; }
+    .toolbar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+    .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+    .btn-primary { background: #2563eb; color: white; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-success { background: #059669; color: white; }
+    .btn-success:hover { background: #047857; }
+    .btn-danger { background: #dc2626; color: white; }
+    .btn-danger:hover { background: #b91c1c; }
+    .btn-warning { background: #d97706; color: white; }
+    .btn-warning:hover { background: #b45309; }
+    .btn-secondary { background: #6b7280; color: white; }
+    .btn-secondary:hover { background: #4b5563; }
+    select { padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; }
+    .table-container { background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; font-size: 14px; }
+    th { background: #f9fafb; font-weight: 600; color: #374151; }
+    tr:hover { background: #f9fafb; }
+    .status { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; display: inline-block; }
+    .status-matched { background: #dbeafe; color: #1e40af; }
+    .status-needs_review { background: #fef3c7; color: #92400e; }
+    .status-confirmed { background: #d1fae5; color: #065f46; }
+    .status-rejected { background: #fee2e2; color: #991b1b; }
+    .reason-tag { display: inline-block; padding: 2px 8px; background: #fef3c7; color: #92400e; border-radius: 4px; font-size: 12px; margin: 2px; }
+    .reason-temp { background: #ede9fe; color: #5b21b6; }
+    .action-btns { display: flex; gap: 6px; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+    .modal.active { display: flex; }
+    .modal-content { background: white; padding: 24px; border-radius: 8px; max-width: 700px; width: 90%; max-height: 80vh; overflow-y: auto; }
+    .modal-title { font-size: 18px; font-weight: 600; margin-bottom: 16px; }
+    .detail-row { display: flex; margin-bottom: 10px; font-size: 14px; }
+    .detail-label { width: 120px; color: #6b7280; flex-shrink: 0; }
+    .detail-value { color: #1f2937; }
+    .detail-section { margin-top: 16px; padding-top: 16px; border-top: 1px solid #e5e7eb; }
+    .detail-section h4 { margin-bottom: 10px; color: #374151; }
+    .log-entry { padding: 8px; background: #f9fafb; border-radius: 4px; margin-bottom: 8px; font-size: 13px; }
+    .log-time { color: #6b7280; font-size: 12px; }
+    textarea { width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px; resize: vertical; font-family: inherit; }
+    .form-group { margin-bottom: 12px; }
+    .form-group label { display: block; margin-bottom: 4px; font-size: 14px; color: #374151; }
+    .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; }
+    .edit-history { background: #f9fafb; padding: 8px; border-radius: 4px; margin-bottom: 6px; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎵 音频母带交付核对系统</h1>
+
+    <div class="stats" id="stats">
+      <div class="stat-card">
+        <div class="stat-value" id="stat-total">-</div>
+        <div class="stat-label">总记录</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-confirmed" style="color:#059669">-</div>
+        <div class="stat-label">已确认</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-review" style="color:#d97706">-</div>
+        <div class="stat-label">待复核</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-matched" style="color:#2563eb">-</div>
+        <div class="stat-label">已匹配</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-rejected" style="color:#dc2626">-</div>
+        <div class="stat-label">已驳回</div>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <select id="filter-status">
+        <option value="">全部状态</option>
+        <option value="needs_review">待复核</option>
+        <option value="matched">已匹配</option>
+        <option value="confirmed">已确认</option>
+        <option value="rejected">已驳回</option>
+      </select>
+      <button class="btn btn-primary" onclick="runReconcile()">执行核对</button>
+      <button class="btn btn-secondary" onclick="refreshData()">刷新数据</button>
+    </div>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>状态</th>
+            <th>表演者</th>
+            <th>曲目</th>
+            <th>接龙行号</th>
+            <th>复核原因</th>
+            <th>晚到材料</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="results-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="modal" id="detail-modal">
+    <div class="modal-content">
+      <div class="modal-title">详情</div>
+      <div id="detail-content"></div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal()">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="confirm-modal">
+    <div class="modal-content">
+      <div class="modal-title" id="confirm-title">确认操作</div>
+      <div class="form-group">
+        <label>备注</label>
+        <textarea id="confirm-notes" rows="3" placeholder="请输入备注..."></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeConfirmModal()">取消</button>
+        <button class="btn btn-primary" id="confirm-submit-btn" onclick="submitConfirm()">确认</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentResults = [];
+    let pendingAction = null;
+    let pendingId = null;
+
+    const REASON_LABELS = {
+      temp_substitute_only_in_group: '临时替补仅在群里提及',
+      contract_missing: '缺少合同页截图',
+      group_record_missing: '缺少排练群接龙记录',
+      info_mismatch: '信息不一致',
+      manual_review_required: '需人工复核'
+    };
+
+    const STATUS_LABELS = {
+      matched: '已匹配',
+      needs_review: '待复核',
+      confirmed: '已确认',
+      rejected: '已驳回'
+    };
+
+    async function loadStatus() {
+      const res = await fetch('/api/status');
+      const data = await res.json();
+      document.getElementById('stat-total').textContent = data.results;
+      document.getElementById('stat-confirmed').textContent = data.byStatus.confirmed || 0;
+      document.getElementById('stat-review').textContent = data.byStatus.needs_review || 0;
+      document.getElementById('stat-matched').textContent = data.byStatus.matched || 0;
+      document.getElementById('stat-rejected').textContent = data.byStatus.rejected || 0;
+    }
+
+    async function loadResults() {
+      const status = document.getElementById('filter-status').value;
+      const url = status ? `/api/results?status=${status}` : '/api/results';
+      const res = await fetch(url);
+      currentResults = await res.json();
+      renderResults();
+    }
+
+    function renderResults() {
+      const tbody = document.getElementById('results-body');
+      if (currentResults.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#999">暂无数据，请先导入文件并执行核对</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = currentResults.map((item) => {
+        const { result, groupRecord, contractRecord } = item;
+        const reasons = result.reviewReasons.map(r => 
+          `<span class="reason-tag ${r === 'temp_substitute_only_in_group' ? 'reason-temp' : ''}">${REASON_LABELS[r] || r}</span>`
+        ).join('');
+
+        return `
+          <tr>
+            <td><span class="status status-${result.status}">${STATUS_LABELS[result.status] || result.status}</span></td>
+            <td>${result.matchedPerformerName || '-'}</td>
+            <td>${result.matchedSongName || '-'}</td>
+            <td>${groupRecord ? '#' + groupRecord.originalRowNumber : '-'}</td>
+            <td>${reasons || '-'}</td>
+            <td>${result.isLateContractRefresh ? '是' : '-'}</td>
+            <td>
+              <div class="action-btns">
+                <button class="btn btn-secondary" style="padding:4px 10px;font-size:12px" onclick="viewDetail('${result.id}')">详情</button>
+                ${result.status !== 'confirmed' && result.status !== 'rejected' ? `
+                  <button class="btn btn-success" style="padding:4px 10px;font-size:12px" onclick="openConfirm('${result.id}', 'confirm')">确认</button>
+                  <button class="btn btn-danger" style="padding:4px 10px;font-size:12px" onclick="openConfirm('${result.id}', 'reject')">驳回</button>
+                ` : `
+                  <button class="btn btn-warning" style="padding:4px 10px;font-size:12px" onclick="openConfirm('${result.id}', 'rollback')">回滚</button>
+                `}
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function viewDetail(id) {
+      const res = await fetch(`/api/results/${id}`);
+      const data = await res.json();
+      const { result, groupRecord, contractRecord, logs } = data;
+
+      let html = `
+        <div class="detail-row">
+          <span class="detail-label">状态</span>
+          <span class="detail-value"><span class="status status-${result.status}">${STATUS_LABELS[result.status] || result.status}</span></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">表演者</span>
+          <span class="detail-value">${result.matchedPerformerName || '-'}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">曲目</span>
+          <span class="detail-value">${result.matchedSongName || '-'}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">复核原因</span>
+          <span class="detail-value">${result.reviewReasons.map(r => REASON_LABELS[r] || r).join('、') || '-'}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">复核备注</span>
+          <span class="detail-value">${result.reviewNotes || '-'}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">复核人</span>
+          <span class="detail-value">${result.reviewedBy || '-'}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">晚到材料</span>
+          <span class="detail-value">${result.isLateContractRefresh ? '是' : '否'}</span>
+        </div>
+      `;
+
+      if (groupRecord) {
+        html += `
+          <div class="detail-section">
+            <h4>📋 排练群接龙证据</h4>
+            <div class="detail-row">
+              <span class="detail-label">原始行号</span>
+              <span class="detail-value">第 ${groupRecord.originalRowNumber} 行</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">原始内容</span>
+              <span class="detail-value" style="word-break:break-all">${groupRecord.rawContent}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">解析姓名</span>
+              <span class="detail-value">${groupRecord.performerName || '-'}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">解析曲目</span>
+              <span class="detail-value">${groupRecord.songName || '-'}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">临时替补</span>
+              <span class="detail-value">${groupRecord.isTemporarySubstitute ? '是' : '否'}</span>
+            </div>
+            ${groupRecord.substituteNote ? `
+            <div class="detail-row">
+              <span class="detail-label">替补备注</span>
+              <span class="detail-value">${groupRecord.substituteNote}</span>
+            </div>` : ''}
+            <div class="detail-row">
+              <span class="detail-label">导入时间</span>
+              <span class="detail-value">${new Date(groupRecord.importedAt).toLocaleString()}</span>
+            </div>
+            ${groupRecord.manualEdits.length > 0 ? `
+              <div class="detail-row">
+                <span class="detail-label">人工改动</span>
+                <span class="detail-value">
+                  ${groupRecord.manualEdits.map(e => `
+                    <div class="edit-history">
+                      ${e.fieldName}: ${e.oldValue} → ${e.newValue}<br>
+                      <small style="color:#666">${e.editedBy} · ${new Date(e.editedAt).toLocaleString()}${e.reason ? ' · ' + e.reason : ''}</small>
+                    </div>
+                  `).join('')}
+                </span>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }
+
+      if (contractRecord) {
+        html += `
+          <div class="detail-section">
+            <h4>📄 合同页截图证据</h4>
+            <div class="detail-row">
+              <span class="detail-label">原始内容</span>
+              <span class="detail-value" style="word-break:break-all">${contractRecord.rawContent}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">解析姓名</span>
+              <span class="detail-value">${contractRecord.performerName || '-'}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">解析曲目</span>
+              <span class="detail-value">${contractRecord.songName || '-'}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">合同编号</span>
+              <span class="detail-value">${contractRecord.contractReference || '-'}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">演出日期</span>
+              <span class="detail-value">${contractRecord.performanceDate || '-'}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">导入时间</span>
+              <span class="detail-value">${new Date(contractRecord.importedAt).toLocaleString()}</span>
+            </div>
+            ${contractRecord.manualEdits.length > 0 ? `
+              <div class="detail-row">
+                <span class="detail-label">人工改动</span>
+                <span class="detail-value">
+                  ${contractRecord.manualEdits.map(e => `
+                    <div class="edit-history">
+                      ${e.fieldName}: ${e.oldValue} → ${e.newValue}<br>
+                      <small style="color:#666">${e.editedBy} · ${new Date(e.editedAt).toLocaleString()}${e.reason ? ' · ' + e.reason : ''}</small>
+                    </div>
+                  `).join('')}
+                </span>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }
+
+      if (logs && logs.length > 0) {
+        html += `
+          <div class="detail-section">
+            <h4>📝 操作日志（可复盘）</h4>
+            ${logs.map(log => `
+              <div class="log-entry">
+                <div><strong>${log.operationType}</strong> - ${log.entityType}</div>
+                <div class="log-time">${log.operator} · ${new Date(log.timestamp).toLocaleString()}${log.notes ? ' · ' + log.notes : ''}</div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      document.getElementById('detail-content').innerHTML = html;
+      document.getElementById('detail-modal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('detail-modal').classList.remove('active');
+    }
+
+    function openConfirm(id, action) {
+      pendingId = id;
+      pendingAction = action;
+      const titles = { confirm: '确认通过', reject: '驳回', rollback: '回滚状态' };
+      document.getElementById('confirm-title').textContent = titles[action] || '确认操作';
+      document.getElementById('confirm-notes').value = '';
+      document.getElementById('confirm-modal').classList.add('active');
+    }
+
+    function closeConfirmModal() {
+      document.getElementById('confirm-modal').classList.remove('active');
+      pendingId = null;
+      pendingAction = null;
+    }
+
+    async function submitConfirm() {
+      if (!pendingId || !pendingAction) return;
+      const notes = document.getElementById('confirm-notes').value;
+      
+      const urlMap = {
+        confirm: `/api/results/${pendingId}/confirm`,
+        reject: `/api/results/${pendingId}/reject`,
+        rollback: `/api/results/${pendingId}/rollback`
+      };
+
+      await fetch(urlMap[pendingAction], {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ operator: 'web', notes, reason: notes })
+      });
+
+      closeConfirmModal();
+      refreshData();
+    }
+
+    async function runReconcile() {
+      if (!confirm('确定要执行核对吗？')) return;
+      await fetch('/api/reconcile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ operator: 'web' })
+      });
+      refreshData();
+    }
+
+    function refreshData() {
+      loadStatus();
+      loadResults();
+    }
+
+    document.getElementById('filter-status').addEventListener('change', loadResults);
+
+    refreshData();
+  </script>
+</body>
+</html>
