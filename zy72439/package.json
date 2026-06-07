@@ -1,0 +1,9 @@
+{
+  "name": "music-page-repair-demo",
+  "version": "1.0.0",
+  "description": "谱库页码错版修复演示系统",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 -m http.server 8080"
+  }
+}

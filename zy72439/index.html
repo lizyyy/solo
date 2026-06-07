@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>谱库页码错版修复 - 演示系统</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎵 谱库页码错版修复演示</h1>
+      <p class="subtitle">版权运营小鹿 & 票务同事 交接专用</p>
+    </header>
+
+    <div class="scenario-tabs">
+      <button class="tab-btn active" data-scenario="all">全部场景对比</button>
+      <button class="tab-btn" data-scenario="smooth">✅ 顺利记录</button>
+      <button class="tab-btn" data-scenario="group">💬 群内临时替补</button>
+      <button class="tab-btn" data-scenario="supplement">📝 调音师留言补录</button>
+    </div>
+
+    <div class="main-content">
+      <div class="songs-panel">
+        <h2>曲目列表</h2>
+        <div id="songsList" class="songs-list"></div>
+      </div>
+
+      <div class="detail-panel">
+        <div class="current-song">
+          <h2 id="currentSongName">选择曲目开始演示</h2>
+          <div class="status-badge" id="currentStatus"></div>
+        </div>
+
+        <div class="step-indicator">
+          <div class="step" id="step1">
+            <div class="step-number">1</div>
+            <div class="step-label">授权期限页导入</div>
+          </div>
+          <div class="step-line"></div>
+          <div class="step" id="step2">
+            <div class="step-number">2</div>
+            <div class="step-label">核对调音师留言</div>
+          </div>
+          <div class="step-line"></div>
+          <div class="step" id="step3">
+            <div class="step-number">3</div>
+            <div class="step-label">分账明细更新</div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="nextStepBtn" class="btn-primary">下一步</button>
+          <button id="resetBtn" class="btn-secondary">重置演示</button>
+          <button id="runAllBtn" class="btn-tertiary">一键跑完所有曲目</button>
+        </div>
+
+        <div class="info-sections">
+          <div class="info-card">
+            <h3>📄 授权期限页</h3>
+            <div id="authInfo" class="info-content">-</div>
+          </div>
+          <div class="info-card">
+            <h3>🎧 调音师留言</h3>
+            <div id="noteInfo" class="info-content note-content">-</div>
+          </div>
+          <div class="info-card group-card" id="groupCard" style="display:none;">
+            <h3>💬 群内临时消息</h3>
+            <div id="groupInfo" class="info-content group-content">-</div>
+          </div>
+        </div>
+
+        <div class="revenue-section">
+          <h3>💰 分账明细</h3>
+          <table id="revenueTable">
+            <thead>
+              <tr>
+                <th>角色</th>
+                <th>比例</th>
+                <th>金额（元）</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>作曲</td>
+                <td id="composerPercent">-</td>
+                <td id="composerAmount">-</td>
+              </tr>
+              <tr>
+                <td>作词</td>
+                <td id="lyricistPercent">-</td>
+                <td id="lyricistAmount">-</td>
+              </tr>
+              <tr>
+                <td>发行</td>
+                <td id="publisherPercent">-</td>
+                <td id="publisherAmount">-</td>
+              </tr>
+              <tr class="total-row">
+                <td colspan="2">合计</td>
+                <td id="totalAmount">-</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="history-section">
+      <h2>📋 操作历史记录</h2>
+      <div id="historyList" class="history-list"></div>
+    </div>
+
+    <div class="summary-section">
+      <h2>🔍 三种场景处理结果对比</h2>
+      <div class="summary-cards">
+        <div class="summary-card smooth-card">
+          <h4>✅ 顺利记录</h4>
+          <p>授权页导入 → 留言核对无误 → 分账正常更新</p>
+          <p class="result">结果：<strong>正常流程，无需干预</strong></p>
+        </div>
+        <div class="summary-card group-card">
+          <h4>💬 群内临时替补</h4>
+          <p>授权页导入 → 发现群消息 → 转票务复核 → 人工修正 → 重跑</p>
+          <p class="result">结果：<strong>票务复核后修正，留痕可查</strong></p>
+        </div>
+        <div class="summary-card supplement-card">
+          <h4>📝 留言补录旧口径</h4>
+          <p>授权页导入 → 发现留言补记 → 按留言修正 → 更新分账</p>
+          <p class="result">结果：<strong>以调音师留言为准，修正旧口径</strong></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
