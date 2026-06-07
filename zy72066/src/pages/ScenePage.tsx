@@ -1,11 +1,36 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, Suspense, Component, ReactNode } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { useNavigate } from 'react-router-dom';
-import { AlertTriangle, CheckCircle, Camera, ChevronRight, X, Zap, MapPin } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Camera, ChevronRight, X, Zap, MapPin, Loader2 } from 'lucide-react';
 import { useAppStore } from '../store/appStore';
 import { DeviceData, Anomaly } from '../types';
+
+class SceneErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean; error: string | null }> {
+  constructor(props: { children: ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error: error.message };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="w-full h-full flex flex-col items-center justify-center bg-gray-900 rounded-2xl">
+          <AlertTriangle className="w-12 h-12 text-yellow-500 mb-4" />
+          <h3 className="text-white font-medium mb-2">3D场景加载异常</h3>
+          <p className="text-gray-400 text-sm mb-4">可以在右侧列表查看和处理异常</p>
+          <p className="text-gray-500 text-xs">{this.state.error?.slice(0, 50)}...</p>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 function FloorMesh({ floor, isSelected, hasAnomaly, onClick, position }: any) {
   const meshRef = useRef<THREE.Mesh>(null);
@@ -201,14 +226,23 @@ export default function ScenePage() {
           </div>
         )}
 
-        <Canvas
-          camera={{ position: [15, 12, 15], fov: 50 }}
-          style={{ width: '100%', height: '100%' }}
-        >
-          <color attach="background" args={['#111827']} />
-          <fog attach="fog" args={['#111827', 20, 40]} />
-          <BuildingScene />
-        </Canvas>
+        <SceneErrorBoundary>
+          <Suspense fallback={
+            <div className="w-full h-full flex items-center justify-center bg-gray-900">
+              <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+            </div>
+          }>
+            <Canvas
+              camera={{ position: [15, 12, 15], fov: 50 }}
+              style={{ width: '100%', height: '100%' }}
+              gl={{ antialias: true, alpha: false }}
+            >
+              <color attach="background" args={['#111827']} />
+              <fog attach="fog" args={['#111827', 20, 40]} />
+              <BuildingScene />
+            </Canvas>
+          </Suspense>
+        </SceneErrorBoundary>
       </div>
 
       <div className="w-96 flex flex-col gap-4">

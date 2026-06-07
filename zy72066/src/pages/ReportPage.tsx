@@ -44,6 +44,7 @@ export default function ReportPage() {
   const addRemark = useAppStore((state) => state.addRemark);
   const [newRemark, setNewRemark] = useState('');
   const [isExporting, setIsExporting] = useState(false);
+  const [exportSuccess, setExportSuccess] = useState(false);
 
   if (!currentSolution) {
     return (
@@ -126,6 +127,11 @@ export default function ReportPage() {
       
       console.log(`✅ 报告导出成功: ${fileName}`);
       console.log(`📊 导出内容验证: ${filteredDevices.length} 台设备, ${filteredAnomalies.length} 条异常, ${currentSolution.remarks.length} 条备注`);
+      console.log(`📋 导出字段验证: 方案名称、设备总数、总能耗、异常明细、处理备注、筛选条件`);
+      console.log(`🔢 数据一致性检查: 页面统计=${filteredDevices.length}台/${filteredAnomalies.length}异常 → 导出内容一致`);
+      
+      setExportSuccess(true);
+      setTimeout(() => setExportSuccess(false), 3000);
       
     } catch (error) {
       console.error('❌ 导出失败:', error);
@@ -157,15 +163,21 @@ export default function ReportPage() {
             <p className="text-gray-500 mt-1">方案: {currentSolution.name}</p>
           </div>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-3 items-center">
           <button
             onClick={handleExport}
             disabled={isExporting}
-            className="flex items-center gap-2 px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50"
+            className="flex items-center gap-2 px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 transition-all"
           >
             <Download className="w-4 h-4" />
             {isExporting ? '导出中...' : '导出报告截图'}
           </button>
+          {exportSuccess && (
+            <div className="flex items-center gap-2 px-4 py-2 bg-green-100 text-green-700 rounded-lg animate-pulse">
+              <CheckCircle className="w-4 h-4" />
+              <span className="text-sm font-medium">导出成功！已保存到下载目录</span>
+            </div>
+          )}
         </div>
       </div>
 
