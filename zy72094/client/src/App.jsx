@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import ConflictList from './components/ConflictList'
 import ParamsPanel from './components/ParamsPanel'
 import Statistics from './components/Statistics'
@@ -14,11 +14,19 @@ function App() {
   const [selections, setSelections] = useState([])
   const [analysisResult, setAnalysisResult] = useState(null)
   const [loading, setLoading] = useState(false)
-  const [traceData, setTraceData] = useState(null)
   const [showTrace, setShowTrace] = useState(false)
   const [filterOptions, setFilterOptions] = useState({})
-  const [beforeNotes, setBeforeNotes] = useState({})
   const [noteChanges, setNoteChanges] = useState([])
+
+  const filteredConflicts = useMemo(() => {
+    const all = analysisResult?.conflicts || []
+    return all.filter(c => {
+      if (filterOptions.studentId && c.studentId !== filterOptions.studentId) return false
+      if (filterOptions.conflictType && c.type !== filterOptions.conflictType) return false
+      if (filterOptions.severity && c.severity !== filterOptions.severity) return false
+      return true
+    })
+  }, [analysisResult?.conflicts, filterOptions])
 
   useEffect(() => {
     loadParams()
@@ -78,14 +86,13 @@ function App() {
         beforeNotesSnapshot[id] = data.notes
       } catch (e) {}
     }
-    setBeforeNotes(beforeNotesSnapshot)
 
     setLoading(true)
     try {
       const res = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ courses, selections, filterOptions })
+        body: JSON.stringify({ courses, selections, filterOptions: {} })
       })
       const data = await res.json()
       setAnalysisResult(data)
@@ -122,14 +129,26 @@ function App() {
     if (!analysisResult) return
     
     try {
+      const notesMap = {}
+      for (const conflict of filteredConflicts) {
+        try {
+          const res = await fetch(`/api/notes/${conflict.id}`)
+          const data = await res.json()
+          if (data.notes && data.notes.length > 0) {
+            notesMap[conflict.id] = data.notes
+          }
+        } catch (e) {}
+      }
+
       const res = await fetch(`/api/export/${format}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          conflicts: analysisResult.conflicts,
+          conflicts: filteredConflicts,
           courses,
           selections,
-          filterOptions
+          filterOptions,
+          notesMap
         })
       })
       
@@ -254,7 +273,7 @@ function App() {
         <FilterBar 
           filterOptions={filterOptions}
           setFilterOptions={setFilterOptions}
-          conflicts={analysisResult.conflicts || []}
+          conflicts={filteredConflicts}
         />
       )}
 
@@ -272,7 +291,7 @@ function App() {
 
       {activeTab === 'conflicts' && (
         <ConflictList 
-          conflicts={analysisResult?.conflicts || []}
+          conflicts={filteredConflicts}
           loading={loading}
         />
       )}
@@ -280,7 +299,7 @@ function App() {
       {activeTab === 'statistics' && (
         <Statistics 
           statistics={analysisResult?.statistics}
-          conflicts={analysisResult?.conflicts || []}
+          conflicts={filteredConflicts}
         />
       )}
 
@@ -302,14 +321,7 @@ function App() {
         />
       )}
 
-      {showTrace && traceData && (
-        <TraceModal 
-          trace={traceData}
-          onClose={() => setShowTrace(false)}
-        />
-      )}
-
-      {showTrace && analysisResult?.trace && !traceData && (
+      {showTrace && analysisResult?.trace && (
         <TraceModal 
           trace={analysisResult.trace}
           onClose={() => setShowTrace(false)}

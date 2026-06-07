@@ -8,9 +8,9 @@ function validateData(courses, selections) {
 
   courses.forEach((course, index) => {
     if (!course.id || course.id.trim() === '') {
-      errors.push({
+      warnings.push({
         type: 'MISSING_COURSE_ID',
-        message: `第 ${index + 1} 条课程记录缺少课程编号`,
+        message: `第 ${index + 1} 条课程记录缺少课程编号（该记录将被跳过）`,
         source: `courses[${index}]`,
         severity: 'high'
       });
@@ -48,18 +48,18 @@ function validateData(courses, selections) {
 
   selections.forEach((selection, index) => {
     if (!selection.studentId || selection.studentId === '') {
-      errors.push({
+      warnings.push({
         type: 'MISSING_STUDENT_ID',
-        message: `第 ${index + 1} 条选课记录缺少学号`,
+        message: `第 ${index + 1} 条选课记录缺少学号（该记录将被跳过）`,
         source: `selections[${index}]`,
         severity: 'high'
       });
     }
 
     if (!selection.courseId || selection.courseId === '') {
-      errors.push({
+      warnings.push({
         type: 'MISSING_COURSE_ID_SELECTION',
-        message: `第 ${index + 1} 条选课记录缺少课程编号`,
+        message: `第 ${index + 1} 条选课记录缺少课程编号（该记录将被跳过）`,
         source: `selections[${index}]`,
         severity: 'high'
       });
@@ -123,10 +123,12 @@ function detectConflicts(courses, selections, params, filterOptions = {}) {
 
   courses.forEach(course => {
     if (course.id) {
-      courseMap.set(course.id, {
-        ...course,
-        parsedTime: parseTime(course.time)
-      });
+      if (!courseMap.has(course.id)) {
+        courseMap.set(course.id, {
+          ...course,
+          parsedTime: parseTime(course.time)
+        });
+      }
     }
   });
 
@@ -314,10 +316,16 @@ function detectConflicts(courses, selections, params, filterOptions = {}) {
     }
 
     const validCourses = studentCourses.filter(sc => sc.course && sc.course.parsedTime);
+    const reportedTimePairs = new Set();
     for (let i = 0; i < validCourses.length; i++) {
       for (let j = i + 1; j < validCourses.length; j++) {
         const course1 = validCourses[i];
         const course2 = validCourses[j];
+        
+        if (course1.courseId === course2.courseId) continue;
+        
+        const pairKey = [course1.courseId, course2.courseId].sort().join('|');
+        if (reportedTimePairs.has(pairKey)) continue;
         
         const overlap = calculateOverlap(
           course1.course.parsedTime,
@@ -326,6 +334,7 @@ function detectConflicts(courses, selections, params, filterOptions = {}) {
 
         if (overlap.minutes > params.timeConflictTolerance.value) {
           if (!filterOptions.conflictType || filterOptions.conflictType === 'TIME_CONFLICT') {
+            reportedTimePairs.add(pairKey);
             conflicts.push({
               id: `TIME_${studentId}_${course1.courseId}_${course2.courseId}`,
               type: 'TIME_CONFLICT',

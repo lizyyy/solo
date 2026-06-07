@@ -39,14 +39,6 @@ app.post('/api/analyze', (req, res) => {
   
   const validation = validateData(courses, selections);
   
-  if (!validation.valid) {
-    return res.json({
-      success: false,
-      errors: validation.errors,
-      warnings: validation.warnings
-    });
-  }
-  
   const result = detectConflicts(courses, selections, params, filterOptions);
   
   res.json({
@@ -78,9 +70,9 @@ app.delete('/api/notes/:noteId', (req, res) => {
 });
 
 app.post('/api/export/excel', (req, res) => {
-  const { conflicts, courses, selections, filterOptions } = req.body;
+  const { conflicts, courses, selections, filterOptions, notesMap } = req.body;
   try {
-    const buffer = exportToExcel(conflicts, courses, selections, filterOptions);
+    const buffer = exportToExcel(conflicts, courses, selections, filterOptions, notesMap);
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.setHeader('Content-Disposition', 'attachment; filename=conflict-analysis.xlsx');
     res.send(buffer);
@@ -90,9 +82,9 @@ app.post('/api/export/excel', (req, res) => {
 });
 
 app.post('/api/export/csv', (req, res) => {
-  const { conflicts, courses, selections, filterOptions } = req.body;
+  const { conflicts, courses, selections, filterOptions, notesMap } = req.body;
   try {
-    const csv = exportToCSV(conflicts, courses, selections, filterOptions);
+    const csv = exportToCSV(conflicts, courses, selections, filterOptions, notesMap);
     res.setHeader('Content-Type', 'text/csv; charset=utf-8');
     res.setHeader('Content-Disposition', 'attachment; filename=conflict-analysis.csv');
     res.send('\uFEFF' + csv);

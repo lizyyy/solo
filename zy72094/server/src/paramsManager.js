@@ -68,7 +68,7 @@ function loadParams() {
   try {
     if (fs.existsSync(PARAMS_FILE)) {
       const saved = JSON.parse(fs.readFileSync(PARAMS_FILE, 'utf8'));
-      const merged = { ...DEFAULT_PARAMS };
+      const merged = getDefaultParams();
       
       for (const key in saved) {
         if (merged[key] && saved[key].value !== undefined) {
