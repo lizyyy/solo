@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>时间窗特征穿越检查系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f7fa; color: #333; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 12px; margin-bottom: 24px; }
+        .header h1 { font-size: 28px; margin-bottom: 8px; }
+        .header p { opacity: 0.9; }
+        .card { background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .card h2 { font-size: 18px; margin-bottom: 16px; color: #1a1a2e; border-bottom: 2px solid #e8ecf1; padding-bottom: 12px; }
+        .steps { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+        .step { flex: 1; min-width: 200px; padding: 16px; border-radius: 8px; text-align: center; background: #e8ecf1; position: relative; }
+        .step.active { background: #667eea; color: white; }
+        .step.completed { background: #48bb78; color: white; }
+        .step-number { width: 28px; height: 28px; border-radius: 50%; background: white; color: #667eea; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; margin-bottom: 8px; }
+        .step.active .step-number { color: #667eea; }
+        .step.completed .step-number { color: #48bb78; }
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-primary:hover { background: #5a67d8; }
+        .btn-success { background: #48bb78; color: white; }
+        .btn-success:hover { background: #38a169; }
+        .btn-warning { background: #ed8936; color: white; }
+        .btn-warning:hover { background: #dd6b20; }
+        .btn-danger { background: #f56565; color: white; }
+        .btn-danger:hover { background: #e53e3e; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: 500; color: #4a5568; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; }
+        .form-group textarea { min-height: 100px; resize: vertical; }
+        .status-badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+        .status-normal { background: #c6f6d5; color: #22543d; }
+        .status-abnormal { background: #fed7d7; color: #742a2a; }
+        .status-feature-missing { background: #fefcbf; color: #744210; }
+        .status-pending { background: #bee3f8; color: #2a4365; }
+        .status-conflict { background: #feb2b2; color: #742a2a; }
+        table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 13px; }
+        th { background: #f7fafc; font-weight: 600; color: #4a5568; }
+        tr:hover { background: #f7fafc; }
+        .conflict-card { background: #fff5f5; border-left: 4px solid #f56565; padding: 16px; border-radius: 8px; margin-bottom: 12px; }
+        .conflict-card h4 { color: #c53030; margin-bottom: 8px; }
+        .conflict-actions { display: flex; gap: 8px; margin-top: 12px; }
+        .param-info { background: #ebf8ff; border-left: 4px solid #4299e1; padding: 12px; border-radius: 8px; margin-bottom: 16px; }
+        .param-info h4 { color: #2b6cb0; margin-bottom: 8px; }
+        .param-tag { display: inline-block; background: #bee3f8; color: #2c5282; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-right: 8px; }
+        .self-check-item { padding: 12px; border-radius: 8px; margin-bottom: 8px; }
+        .self-check-pass { background: #f0fff4; border-left: 4px solid #48bb78; }
+        .self-check-fail { background: #fff5f5; border-left: 4px solid #f56565; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-bottom: 20px; }
+        .stat-card { background: #f7fafc; padding: 16px; border-radius: 8px; text-align: center; }
+        .stat-value { font-size: 28px; font-weight: bold; color: #667eea; }
+        .stat-label { font-size: 13px; color: #718096; margin-top: 4px; }
+        .hidden { display: none; }
+        .alert { padding: 16px; border-radius: 8px; margin-bottom: 16px; }
+        .alert-warning { background: #fffaf0; border-left: 4px solid #ed8936; color: #7c2d12; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⏱ 时间窗特征穿越检查系统</h1>
+            <p>线上实验桶与负样本列表一致性检查，特征穿越检测，专业结果可追溯</p>
+        </div>
+
+        <div id="sessionInfo" class="card hidden">
+            <h2>会话信息</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="statTotal">-</div>
+                    <div class="stat-label">总记录数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statBucket">-</div>
+                    <div class="stat-label">实验桶记录</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statNegative">-</div>
+                    <div class="stat-label">负样本记录</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statConflict">-</div>
+                    <div class="stat-label">冲突数</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="stepContainer" class="card hidden">
+            <h2>检查流程</h2>
+            <div class="steps">
+                <div class="step" id="step1">
+                    <div class="step-number">1</div>
+                    <div>导入线上实验桶</div>
+                </div>
+                <div class="step" id="step2">
+                    <div class="step-number">2</div>
+                    <div>补看负样本列表</div>
+                </div>
+                <div class="step" id="step3">
+                    <div class="step-number">3</div>
+                    <div>更新可解释摘要</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>开始检查</h2>
+            <div class="form-group">
+                <label>操作人</label>
+                <input type="text" id="createdBy" value="xiaomeng" placeholder="评测运营小孟">
+            </div>
+            <button class="btn btn-primary" onclick="createSession()">创建新检查会话</button>
+        </div>
+
+        <div id="step1Panel" class="card hidden">
+            <h2>步骤1：导入线上实验桶</h2>
+            <div class="param-info">
+                <h4>🔧 检查参数配置</h4>
+                <div>
+                    <span class="param-tag">参数版本: v1.0</span>
+                    <span class="param-tag">时间窗间隔: 24小时</span>
+                    <span class="param-tag">穿越阈值: 0.8</span>
+                    <span class="param-tag">填充策略: zero</span>
+                </div>
+                <p style="margin-top: 8px; font-size: 13px; color: #2c5282;">
+                    <strong>取舍理由：</strong>基于历史实验数据，24小时间隔可有效避免特征穿越
+                </p>
+            </div>
+            <div class="alert alert-warning">
+                ⚠️ 若检测到线上特征缺失却给了默认分，系统将标记为待复核，不会自动归为正常，需推荐负责人确认
+            </div>
+            <div class="form-group">
+                <label>粘贴JSON格式的实验桶数据（或使用示例数据）</label>
+                <textarea id="bucketData" placeholder='[{"feature_id":"f001","feature_name":"用户点击量","bucket_id":"exp_01","sample_id":"s001","feature_value":100,"default_value_used":false,"time_window_start":"2024-01-01T00:00:00","time_window_end":"2024-01-02T00:00:00","feature_timestamp":"2024-01-01T12:00:00"}]'></textarea>
+            </div>
+            <button class="btn btn-warning" onclick="fillSampleBucketData()">使用示例数据</button>
+            <button class="btn btn-success" onclick="step1Import()" style="margin-left: 8px;">导入并检测</button>
+        </div>
+
+        <div id="step2Panel" class="card hidden">
+            <h2>步骤2：补看负样本列表</h2>
+            <div class="alert alert-warning">
+                ⚠️ 导入后系统将自动检测冲突。若线上实验桶和负样本列表互相矛盾，系统将列出冲突证据，请手动选择确认或驳回，系统不会替业务同事自动拍板
+            </div>
+            <div class="form-group">
+                <label>粘贴JSON格式的负样本数据</label>
+                <textarea id="negativeData" placeholder='[{"feature_id":"f001","feature_name":"用户点击量","bucket_id":"neg_01","sample_id":"s001","feature_value":150,"default_value_used":false,"time_window_start":"2024-01-01T00:00:00","time_window_end":"2024-01-02T00:00:00","feature_timestamp":"2024-01-01T12:00:00"}]'></textarea>
+            </div>
+            <button class="btn btn-warning" onclick="fillSampleNegativeData()">使用示例数据</button>
+            <button class="btn btn-success" onclick="step2Import()" style="margin-left: 8px;">导入负样本并检测冲突</button>
+        </div>
+
+        <div id="conflictsPanel" class="card hidden">
+            <h2>⚠️ 冲突证据列表（请人工确认或驳回）</h2>
+            <div id="conflictsList"></div>
+        </div>
+
+        <div id="selfCheckPanel" class="card hidden">
+            <h2>✅ 自检结果</h2>
+            <div id="selfCheckList"></div>
+        </div>
+
+        <div id="step3Panel" class="card hidden">
+            <h2>步骤3：更新可解释摘要</h2>
+            <div class="form-group">
+                <label>推荐负责人（复核特征缺失记录时填写）</label>
+                <input type="text" id="reviewer" placeholder="如：zhang_leader">
+            </div>
+            <div class="form-group">
+                <label>检查摘要</label>
+                <textarea id="summary" placeholder="本次检查的结论说明..."></textarea>
+            </div>
+            <button class="btn btn-success" onclick="step3Update()">完成检查并锁定</button>
+        </div>
+
+        <div id="recordsPanel" class="card hidden">
+            <h2>📋 检查明细（页面/接口/导出使用同一份数据）</h2>
+            <button class="btn btn-primary" onclick="exportExcel()" style="margin-bottom: 12px;">导出Excel</button>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>样本ID</th>
+                            <th>特征名称</th>
+                            <th>桶ID</th>
+                            <th>特征值</th>
+                            <th>用了默认值</th>
+                            <th>是否穿越</th>
+                            <th>状态</th>
+                            <th>备注</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recordsTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let sessionId = null;
+        let currentStep = null;
+
+        const API_BASE = '/api';
+
+        async function apiCall(url, options = {}) {
+            const res = await fetch(API_BASE + url, {
+                headers: { 'Content-Type': 'application/json' },
+                ...options
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.detail || '请求失败');
+            return data;
+        }
+
+        function updateStepUI(step) {
+            ['step1', 'step2', 'step3'].forEach((s, i) => {
+                const el = document.getElementById(s);
+                el.className = 'step';
+                if (i < step) el.classList.add('completed');
+                if (i === step) el.classList.add('active');
+            });
+        }
+
+        function showElement(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function getStatusClass(status) {
+            const map = {
+                'normal': 'status-normal',
+                'abnormal': 'status-abnormal',
+                'feature_missing_default': 'status-feature-missing',
+                'pending_review': 'status-pending',
+                'conflict': 'status-conflict'
+            };
+            return map[status] || 'status-normal';
+        }
+
+        function getStatusText(status) {
+            const map = {
+                'normal': '正常',
+                'abnormal': '异常(穿越)',
+                'feature_missing_default': '特征缺失(默认分)',
+                'pending_review': '待复核',
+                'conflict': '冲突'
+            };
+            return map[status] || status;
+        }
+
+        async function createSession() {
+            const createdBy = document.getElementById('createdBy').value;
+            const data = await apiCall(`/sessions?created_by=${encodeURIComponent(createdBy)}`, { method: 'POST' });
+            sessionId = data.session_id;
+            alert(`会话创建成功: ${sessionId}`);
+            showElement('sessionInfo');
+            showElement('stepContainer');
+            showElement('step1Panel');
+            showElement('recordsPanel');
+            updateStepUI(0);
+            await refreshSession();
+        }
+
+        async function refreshSession() {
+            if (!sessionId) return;
+            const data = await apiCall(`/sessions/${sessionId}`);
+            document.getElementById('statTotal').textContent = data.total_records;
+            document.getElementById('statBucket').textContent = data.bucket_count;
+            document.getElementById('statNegative').textContent = data.negative_count;
+            document.getElementById('statConflict').textContent = data.conflict_count;
+
+            const stepMap = { 'step1_import': 0, 'step2_review_negatives': 1, 'step3_update_summary': 2 };
+            updateStepUI(stepMap[data.current_step] || 0);
+            currentStep = data.current_step;
+
+            if (data.self_check_results && data.self_check_results.length > 0) {
+                showElement('selfCheckPanel');
+                renderSelfCheck(data.self_check_results);
+            }
+
+            if (currentStep === 'step2_review_negatives' || currentStep === 'step3_update_summary') {
+                showElement('step3Panel');
+            }
+
+            await refreshRecords();
+            await refreshConflicts();
+        }
+
+        function renderSelfCheck(results) {
+            const html = results.map(r => `
+                <div class="self-check-item ${r.passed ? 'self-check-pass' : 'self-check-fail'}">
+                    <strong>${r.check_type}:</strong> ${r.passed ? '✅ 通过' : '❌ 未通过'}
+                    ${r.found_issues > 0 ? ` (发现${r.found_issues}个问题)` : ''}
+                    <br><small>${r.details}</small>
+                </div>
+            `).join('');
+            document.getElementById('selfCheckList').innerHTML = html;
+        }
+
+        function fillSampleBucketData() {
+            const sample = [
+                {
+                    feature_id: "f001", feature_name: "用户7天点击量", bucket_id: "exp_01",
+                    sample_id: "s001", feature_value: 120, default_value_used: false,
+                    time_window_start: "2024-01-01T00:00:00", time_window_end: "2024-01-08T00:00:00",
+                    feature_timestamp: "2024-01-05T12:00:00"
+                },
+                {
+                    feature_id: "f002", feature_name: "用户转化率", bucket_id: "exp_01",
+                    sample_id: "s002", feature_value: null, default_value_used: true,
+                    time_window_start: "2024-01-01T00:00:00", time_window_end: "2024-01-08T00:00:00",
+                    feature_timestamp: null
+                },
+                {
+                    feature_id: "f003", feature_name: "用户停留时长", bucket_id: "exp_01",
+                    sample_id: "s003", feature_value: 300, default_value_used: false,
+                    time_window_start: "2024-01-01T00:00:00", time_window_end: "2024-01-08T00:00:00",
+                    feature_timestamp: "2024-01-08T01:00:00"
+                },
+                {
+                    feature_id: "f001", feature_name: "用户7天点击量", bucket_id: "exp_01",
+                    sample_id: "s004", feature_value: 85, default_value_used: false,
+                    time_window_start: "2024-01-01T00:00:00", time_window_end: "2024-01-08T00:00:00",
+                    feature_timestamp: "2024-01-02T08:00:00"
+                }
+            ];
+            document.getElementById('bucketData').value = JSON.stringify(sample, null, 2);
+        }
+
+        function fillSampleNegativeData() {
+            const sample = [
+                {
+                    feature_id: "f001", feature_name: "用户7天点击量", bucket_id: "neg_01",
+                    sample_id: "s001", feature_value: 120, default_value_used: false,
+                    time_window_start: "2024-01-01T00:00:00", time_window_end: "2024-01-08T00:00:00",
+                    feature_timestamp: "2024-01-05T12:00:00"
+                },
+                {
+                    feature_id: "f002", feature_name: "用户转化率", bucket_id: "neg_01",
+                    sample_id: "s002", feature_value: 0.05, default_value_used: false,
+                    time_window_start: "2024-01-01T00:00:00", time_window_end: "2024-01-08T00:00:00",
+                    feature_timestamp: "2024-01-03T10:00:00"
+                },
+                {
+                    feature_id: "f003", feature_name: "用户停留时长", bucket_id: "neg_01",
+                    sample_id: "s003", feature_value: 280, default_value_used: false,
+                    time_window_start: "2024-01-01T00:00:00", time_window_end: "2024-01-08T00:00:00",
+                    feature_timestamp: "2024-01-04T15:00:00"
+                },
+                {
+                    feature_id: "f005", feature_name: "新增特征", bucket_id: "neg_01",
+                    sample_id: "s005", feature_value: 50, default_value_used: false,
+                    time_window_start: "2024-01-01T00:00:00", time_window_end: "2024-01-08T00:00:00",
+                    feature_timestamp: "2024-01-03T09:00:00"
+                }
+            ];
+            document.getElementById('negativeData').value = JSON.stringify(sample, null, 2);
+        }
+
+        async function step1Import() {
+            try {
+                const records = JSON.parse(document.getElementById('bucketData').value);
+                const data = await apiCall(`/sessions/${sessionId}/step1/import`, {
+                    method: 'POST',
+                    body: JSON.stringify(records)
+                });
+                alert(data.message);
+                showElement('step2Panel');
+                await refreshSession();
+            } catch (e) {
+                alert('导入失败: ' + e.message);
+            }
+        }
+
+        async function step2Import() {
+            try {
+                const records = JSON.parse(document.getElementById('negativeData').value);
+                const data = await apiCall(`/sessions/${sessionId}/step2/negatives`, {
+                    method: 'POST',
+                    body: JSON.stringify(records)
+                });
+                alert(data.message);
+                await refreshSession();
+            } catch (e) {
+                alert('导入失败: ' + e.message);
+            }
+        }
+
+        async function refreshRecords() {
+            const data = await apiCall(`/sessions/${sessionId}/records`);
+            const html = data.records.map(r => `
+                <tr>
+                    <td>${r.sample_id}</td>
+                    <td>${r.feature_name}</td>
+                    <td>${r.bucket_id}</td>
+                    <td>${r.feature_value ?? 'NULL'}</td>
+                    <td>${r.default_value_used ? '是' : '否'}</td>
+                    <td>${r.is_leakage === null ? '未判定' : (r.is_leakage ? '是' : '否')}</td>
+                    <td><span class="status-badge ${getStatusClass(r.status)}">${getStatusText(r.status)}</span></td>
+                    <td><small>${r.notes || '-'}</small></td>
+                </tr>
+            `).join('');
+            document.getElementById('recordsTable').innerHTML = html;
+        }
+
+        async function refreshConflicts() {
+            const data = await apiCall(`/sessions/${sessionId}/conflicts`);
+            if (data.conflicts.length === 0) {
+                document.getElementById('conflictsPanel').classList.add('hidden');
+                return;
+            }
+            showElement('conflictsPanel');
+            const html = data.conflicts.map(c => `
+                <div class="conflict-card">
+                    <h4>🔴 样本 ${c.record_id}</h4>
+                    <p>${c.description}</p>
+                    <p><strong>线上实验桶值:</strong> ${c.bucket_value ?? '缺失'} | <strong>负样本值:</strong> ${c.negative_value ?? '缺失'}</p>
+                    <p><strong>当前状态:</strong> ${c.resolution === 'pending' ? '⏳ 待处理' : (c.resolution === 'confirm' ? '✅ 已确认' : '❌ 已驳回')}</p>
+                    ${c.resolution === 'pending' ? `
+                    <div class="conflict-actions">
+                        <button class="btn btn-success" onclick="resolveConflict('${c.record_id}', 'confirm')">确认冲突，以线上为准</button>
+                        <button class="btn btn-danger" onclick="resolveConflict('${c.record_id}', 'reject')">驳回，数据异常</button>
+                    </div>
+                    ` : ''}
+                </div>
+            `).join('');
+            document.getElementById('conflictsList').innerHTML = html;
+        }
+
+        async function resolveConflict(recordId, resolution) {
+            const resolvedBy = document.getElementById('createdBy').value || 'xiaomeng';
+            try {
+                await apiCall(`/sessions/${sessionId}/conflicts/${recordId}/resolve?resolution=${resolution}&resolved_by=${encodeURIComponent(resolvedBy)}`, {
+                    method: 'POST'
+                });
+                await refreshSession();
+            } catch (e) {
+                alert('处理失败: ' + e.message);
+            }
+        }
+
+        async function step3Update() {
+            const summary = document.getElementById('summary').value;
+            const reviewer = document.getElementById('reviewer').value || null;
+            try {
+                const data = await apiCall(`/sessions/${sessionId}/step3/summary?summary=${encodeURIComponent(summary)}${reviewer ? `&reviewer=${encodeURIComponent(reviewer)}` : ''}`, {
+                    method: 'POST'
+                });
+                alert(data.message);
+                await refreshSession();
+            } catch (e) {
+                alert('更新失败: ' + e.message);
+            }
+        }
+
+        function exportExcel() {
+            window.open(`${API_BASE}/sessions/${sessionId}/export`, '_blank');
+        }
+    </script>
+</body>
+</html>
