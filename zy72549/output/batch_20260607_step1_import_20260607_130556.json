@@ -1,0 +1,23 @@
+{
+  "step": "step1_import_model_output",
+  "batch_id": "batch_20260607",
+  "timestamp": "2026-06-07T13:05:56.429268",
+  "total_processed": 2,
+  "conflict_count": 2,
+  "conflicts": [
+    {
+      "faq_id": "faq_002",
+      "field": "question",
+      "model_value": "如何开票？",
+      "manual_value": "如何申请开具发票？开票流程是什么？",
+      "description": "问题字段冲突：模型输出为 '如何开票？...'，人工改判为 '如何申请开具发票？开票流程是什么？...'"
+    },
+    {
+      "faq_id": "faq_002",
+      "field": "answer",
+      "model_value": "在订单详情页申请开票即可。",
+      "manual_value": "登录后进入【我的订单】，找到对应订单点击【申请发票】，填写发票信息后提交，一般3-5个工作日开出。电子发票将发送至您的邮箱，纸质发票将快递寄出。",
+      "description": "回答字段冲突：模型输出为 '在订单详情页申请开票即可。...'，人工改判为 '登录后进入【我的订单】，找到对应订单点击【申请发票】，填写发...'"
+    }
+  ]
+}

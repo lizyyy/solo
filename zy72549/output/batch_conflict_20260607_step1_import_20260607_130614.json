@@ -1,0 +1,23 @@
+{
+  "step": "step1_import_model_output",
+  "batch_id": "batch_conflict_20260607",
+  "timestamp": "2026-06-07T13:06:14.564101",
+  "total_processed": 1,
+  "conflict_count": 2,
+  "conflicts": [
+    {
+      "faq_id": "faq_004",
+      "field": "question",
+      "model_value": "会员有什么权益？",
+      "manual_value": "VIP会员享有哪些专属权益？",
+      "description": "问题字段冲突：模型输出为 '会员有什么权益？...'，人工改判为 'VIP会员享有哪些专属权益？...'"
+    },
+    {
+      "faq_id": "faq_004",
+      "field": "answer",
+      "model_value": "会员享受全场9折优惠，每月可领优惠券，还有优先发货服务。",
+      "manual_value": "VIP会员专享：1）全场9折优惠；2）每月5张优惠券；3）专属客服通道；4）生日双倍积分；5）优先发货。",
+      "description": "回答字段冲突：模型输出为 '会员享受全场9折优惠，每月可领优惠券，还有优先发货服务。...'，人工改判为 'VIP会员专享：1）全场9折优惠；2）每月5张优惠券；3）专...'"
+    }
+  ]
+}

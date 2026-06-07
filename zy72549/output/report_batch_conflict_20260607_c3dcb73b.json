@@ -1,0 +1,46 @@
+{
+  "report_id": "report_batch_conflict_20260607_c3dcb73b",
+  "batch_id": "batch_conflict_20260607",
+  "generate_time": "2026-06-07T13:06:14.564492",
+  "statistics": {
+    "total_records": 1,
+    "normal_count": 0,
+    "manual_corrected_count": 1,
+    "overwritten_count": 0,
+    "supplemented_count": 0,
+    "conflict_count": 0,
+    "pending_review_count": 0
+  },
+  "details": [
+    {
+      "faq_id": "faq_004",
+      "question": "VIP会员享有哪些专属权益？",
+      "status": "manual_corrected",
+      "source": "manual_correction",
+      "remarks": [
+        "[冲突警告] 模型输出与人工改判存在2处冲突，请算法运营老唐确认或驳回",
+        "[冲突1] 字段：question | 模型值：会员有什么权益？... | 人工值：VIP会员享有哪些专属权益？... | 详情：问题字段冲突：模型输出为 '会员有什么权益？...'，人工改判为 'VIP会员享有哪些专属权益？...'",
+        "[冲突2] 字段：answer | 模型值：会员享受全场9折优惠，每月可领优惠券，还有优先发货服务。... | 人工值：VIP会员专享：1）全场9折优惠；2）每月5张优惠券；3）专属客服通道；4）生日双倍积分；5）优先发... | 详情：回答字段冲突：模型输出为 '会员享受全场9折优惠，每月可领优惠券，还有优先发货服务。...'，人工改判为 'VIP会员专享：1）全场9折优惠；2）每月5张优惠券；3）专...'",
+        "[人工改判备注] 模型漏了专属客服和生日积分权益，必须改全 (操作人：老唐)",
+        "[冲突解决备注] 模型确实漏了两个权益，确认采用人工改判的完整版本"
+      ],
+      "history": [
+        {
+          "action": "detect_conflict",
+          "operator": "system",
+          "detail": "检测到2处冲突，等待算法运营确认",
+          "time": "2026-06-07T13:06:14.564098"
+        },
+        {
+          "action": "resolve_conflict",
+          "operator": "老唐",
+          "detail": "算法运营老唐确认采用人工改判",
+          "time": "2026-06-07T13:06:14.564329"
+        }
+      ],
+      "has_manual_correction": true,
+      "review_required": false
+    }
+  ],
+  "summary": "批次 batch_conflict_20260607 评测报告\n共处理 1 条记录\n- 正常记录：0 条\n- 人工改判：1 条\n- 被覆盖待复核：0 条\n- 补录旧口径：0 条\n- 待解决冲突：0 条\n- 待安全审核：0 条"
+}

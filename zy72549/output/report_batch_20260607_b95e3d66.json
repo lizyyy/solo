@@ -1,0 +1,74 @@
+{
+  "report_id": "report_batch_20260607_b95e3d66",
+  "batch_id": "batch_20260607",
+  "generate_time": "2026-06-07T13:05:56.429706",
+  "statistics": {
+    "total_records": 3,
+    "normal_count": 1,
+    "manual_corrected_count": 0,
+    "overwritten_count": 1,
+    "supplemented_count": 1,
+    "conflict_count": 0,
+    "pending_review_count": 1
+  },
+  "details": [
+    {
+      "faq_id": "faq_001",
+      "question": "怎么修改收货地址？",
+      "status": "normal",
+      "source": "model_output",
+      "remarks": [],
+      "history": [
+        {
+          "action": "import_model_output",
+          "operator": "system",
+          "detail": "从批次 batch_20260607 导入模型输出，标记为正常记录",
+          "time": "2026-06-07T13:05:56.429246"
+        }
+      ],
+      "has_manual_correction": false,
+      "review_required": false
+    },
+    {
+      "faq_id": "faq_002",
+      "question": "如何开票？",
+      "status": "overwritten",
+      "source": "merged",
+      "remarks": [
+        "[人工改判备注] 用户经常找不到开票入口，需要把路径写得更详细，补充电子发票和纸质发票的区别 (操作人：老唐，时间：2026-06-06 13:05:56)",
+        "[覆盖警告] 该人工改判（批次batch_20260606）已被当前批次batch_20260607覆盖，需安全审核同事复核"
+      ],
+      "history": [
+        {
+          "action": "detect_overwritten_correction",
+          "operator": "system",
+          "detail": "检测到人工改判（批次batch_20260606）被当前批次batch_20260607覆盖，标记为待复核",
+          "time": "2026-06-07T13:05:56.429266"
+        }
+      ],
+      "has_manual_correction": true,
+      "review_required": true
+    },
+    {
+      "faq_id": "faq_003",
+      "question": "申请退款后多久能到账？",
+      "status": "supplemented",
+      "source": "supplement",
+      "remarks": [
+        "[补录来源] 从人工改判表补录旧口径，原批次：batch_20260604，操作人：老王，时间：2026-06-04 13:05:56",
+        "[原改判备注] 旧口径：统一说3个工作日。新口径要区分支付渠道，补充联系客服的指引。这是从历史人工改判表补录的旧口径数据"
+      ],
+      "history": [
+        {
+          "action": "supplement_from_manual",
+          "operator": "system",
+          "detail": "从人工改判表（批次batch_20260604）补录旧口径到当前批次batch_20260607",
+          "time": "2026-06-07T13:05:56.429590"
+        }
+      ],
+      "has_manual_correction": true,
+      "review_required": false
+    }
+  ],
+  "summary": "批次 batch_20260607 评测报告\n共处理 3 条记录\n- 正常记录：1 条\n- 人工改判：0 条\n- 被覆盖待复核：1 条\n- 补录旧口径：1 条\n- 待解决冲突：0 条\n- 待安全审核：1 条\n⚠️  有 1 条人工改判被覆盖，需安全审核同事复核"
+}
