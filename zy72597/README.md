@@ -1,0 +1,226 @@
+# 线上离线打分差异分析工具
+
+## 概述
+
+本工具用于管理线上模型打分与离线打分之间的差异分析，支持完整的审计追踪、三步工作流和可复现的命令执行。
+
+## 核心设计原则
+
+### 单一数据源 (Single Source of Truth)
+- **导出明细**、**页面展示**、**API 返回** 都读取同一份存储结果
+- 禁止各自计算或缓存，确保一致性
+- 写入使用原子操作（临时文件+重命名），避免中间状态
+
+### 证据留存
+- 特征快照编号的**原始行号**完整保留
+- **人工改动**记录变更前值、变更后值、操作人、时间、原因
+- **阈值变更**单独记录，标记报告是否仍显示旧值
+- 所有状态变更写入**审计日志**，不可删除
+
+### 人工判断空间
+- 阈值改过但报告仍写旧值的记录，**不会自动归为正常**
+- 数据科学家（林姐）确认前，记录停在 **待处理** 状态
+- 支持回滚到任意历史状态
+
+## 边界规则 (Boundary Rules)
+
+以下规则同时写在代码和文档中，禁止仅靠口头约定：
+
+### 1. threshold_report_mismatch - 阈值-报告不匹配
+**规则**：阈值已更改但报告仍显示旧值时，自动标记为 `THRESHOLD_MISMATCH`，必须由数据科学家确认才能转为终态。禁止自动归为正常。
+
+**怎么判**：当 `ThresholdChange.report_still_shows_old = True` 时，触发此规则。
+
+**怎么改**：通过 `add-threshold-change` 命令或 API 记录阈值变更，设置 `--report-still-old` 标志。
+
+**怎么回滚**：使用 `rollback` 命令回滚到之前的状态，或由数据科学家确认为正常/异常。
+
+### 2. original_line_preservation - 原始行号保留
+**规则**：特征快照的原始行号必须完整保留在导出、页面、API返回中，任何处理步骤不得丢弃该信息。
+
+**怎么判**：检查所有输出中是否包含 `original_line_number` 字段。
+
+**怎么改**：导入时必须提供 `--line-number` 参数。
+
+### 3. manual_change_audit - 人工改动审计
+**规则**：所有人工改动必须记录变更前值、变更后值、操作人、时间、原因，写入审计日志且不可删除。
+
+**怎么判**：每条 ManualChange 记录必须包含 `old_value`、`new_value`、`changed_by`、`change_timestamp`。
+
+**怎么改**：使用 `add-manual-change` 方法或命令。
+
+### 4. pending_before_confirm - 确认前待处理
+**规则**：数据科学家（林姐）确认前，所有存在疑问的记录必须停在待处理状态，禁止自动流转到终态。
+
+**怎么判**：存在阈值不匹配或标记为 NEEDS_REVIEW 的记录，不能自动转为 CONFIRMED_NORMAL。
+
+**怎么改**：使用 `confirm` 命令由数据科学家显式确认。
+
+### 5. single_source_of_truth - 单一数据源
+**规则**：导出明细、页面展示、API返回必须读取同一份存储结果，禁止各自计算或缓存。
+
+**怎么判**：所有读写必须通过 `ResultStore` 类进行。
+
+## 三步工作流
+
+```
+步骤1: 特征快照第一次导入
+   ↓ (IMPORTED)
+步骤2: 数据科学家林姐补看训练日志曲线
+   ↓ (LOGS_REVIEWED)
+步骤3: 分层指标更新
+   ↓ (METRICS_UPDATED)
+数据科学家确认 → 终态 (CONFIRMED_NORMAL / CONFIRMED_ABNORMAL)
+```
+
+**特殊情况**：任一步骤中发现阈值改过但报告仍写旧值，自动转为 `THRESHOLD_MISMATCH`，等待数据科学家复核。
+
+## 状态说明
+
+| 状态 | 说明 | 是否终态 |
+|------|------|----------|
+| `pending` | 初始待处理 | 否 |
+| `imported` | 步骤1完成：快照已导入 | 否 |
+| `logs_reviewed` | 步骤2完成：训练日志已审核 | 否 |
+| `metrics_updated` | 步骤3完成：分层指标已更新 | 否 |
+| `threshold_mismatch` | 阈值-报告不匹配，待复核 | 否 |
+| `needs_review` | 需人工复核 | 否 |
+| `confirmed_normal` | 数据科学家确认为正常 | 是 |
+| `confirmed_abnormal` | 数据科学家确认为异常 | 是 |
+
+## 命令行使用
+
+### 查看边界规则
+```bash
+python -m online_offline_diff boundary-rules
+```
+
+### 步骤1: 导入特征快照
+```bash
+python -m online_offline_diff import \
+  --snapshot-id SNAP-001 \
+  --line-number 42 \
+  --main-flow "用户注册→风控A→决策B" \
+  --online-score 0.85 \
+  --offline-score 0.82 \
+  --raw-data '{"feature1": 0.5, "feature2": 0.3}' \
+  --imported-by "系统自动导入"
+```
+
+### 步骤2: 审核训练日志
+```bash
+python -m online_offline_diff review-logs \
+  --record-id <记录ID> \
+  --on-site-statement "现场确认曲线符合预期" \
+  --curve-data '{"auc": [0.8, 0.82, 0.85], "loss": [0.3, 0.25, 0.2]}' \
+  --reviewed-by "林姐" \
+  --notes "训练过程稳定，无异常"
+```
+
+### 步骤3: 更新分层指标
+```bash
+python -m online_offline_diff update-metrics \
+  --record-id <记录ID> \
+  --tier-metrics '{"precision@top100": 0.92, "recall@top100": 0.45}' \
+  --updated-by "林姐"
+```
+
+### 记录阈值变更（报告仍显示旧值）
+```bash
+python -m online_offline_diff add-threshold-change \
+  --record-id <记录ID> \
+  --field-name "score_threshold" \
+  --old-value 0.8 \
+  --new-value 0.85 \
+  --changed-by "张三" \
+  --reason "业务方要求提高通过率" \
+  --report-still-old
+```
+
+### 数据科学家确认
+```bash
+python -m online_offline_diff confirm \
+  --record-id <记录ID> \
+  --status normal \
+  --confirmed-by "林姐" \
+  --notes "阈值变更已同步，差异在可接受范围内"
+```
+
+### 查看记录列表
+```bash
+python -m online_offline_diff list
+python -m online_offline_diff list --status threshold_mismatch
+```
+
+### 查看记录详情和审计日志
+```bash
+python -m online_offline_diff show --record-id <记录ID>
+```
+
+### 导出明细
+```bash
+python -m online_offline_diff export --output ./export/2024-01-01.json
+```
+
+### 回滚状态
+```bash
+python -m online_offline_diff rollback \
+  --record-id <记录ID> \
+  --target-status imported \
+  --rolled-back-by "林姐" \
+  --reason "数据有误，需要重新导入"
+```
+
+### 查看汇总统计
+```bash
+python -m online_offline_diff summary
+```
+
+## 数据结构
+
+所有数据存储在 `--data-dir` 指定的目录下（默认 `./data`）：
+
+- `scoring_records.json` - 打分差异记录（单一数据源）
+- `audit_logs.json` - 审计日志（只追加）
+
+## 复盘与重跑
+
+### 复盘
+使用 `show` 命令查看完整的记录详情和审计日志，可追溯每一步操作：
+```bash
+python -m online_offline_diff show --record-id <记录ID>
+```
+
+### 重跑
+每条命令执行后都会输出可重新执行的完整命令行。也可通过审计日志还原操作序列。
+
+## API 集成
+
+页面和 API 应通过相同的 `ResultStore` 类访问数据，确保一致性：
+
+```python
+from online_offline_diff import ResultStore, ProcessingStatus
+
+store = ResultStore(data_dir="./data")
+
+# 页面展示用
+for record in store.list_records():
+    print(record.snapshot_id, record.current_status.value)
+
+# API 返回用
+for record_dict in store.iterate_records_for_api():
+    # 直接返回给前端，无需二次处理
+    pass
+```
+
+## 代码中的边界规则
+
+边界规则同时定义在 `DiffEngine.BOUNDARY_RULES` 中，可通过代码访问：
+
+```python
+from online_offline_diff import DiffEngine
+
+rules = DiffEngine.get_boundary_rules()
+for name, desc in rules.items():
+    print(f"{name}: {desc}")
+```
