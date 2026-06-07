@@ -70,18 +70,22 @@ class AI_Observatory {
         document.getElementById('layerGIS').addEventListener('change', (e) => {
             this.layers.gis = e.target.checked;
             this.render();
+            this.saveState();
         });
         document.getElementById('layerDevices').addEventListener('change', (e) => {
             this.layers.devices = e.target.checked;
             this.render();
+            this.saveState();
         });
         document.getElementById('layerAnomalies').addEventListener('change', (e) => {
             this.layers.anomalies = e.target.checked;
             this.render();
+            this.saveState();
         });
         document.getElementById('layer3D').addEventListener('change', (e) => {
             this.layers.layer3d = e.target.checked;
             this.render();
+            this.saveState();
         });
         
         document.getElementById('floorFilter').addEventListener('change', (e) => {
@@ -157,6 +161,7 @@ class AI_Observatory {
     onMouseUp() {
         this.viewState.isDragging = false;
         this.canvas.style.cursor = 'grab';
+        this.saveState();
     }
     
     onClick(e) {
@@ -194,6 +199,7 @@ class AI_Observatory {
         this.viewState.scale *= delta;
         this.viewState.scale = Math.max(0.5, Math.min(3, this.viewState.scale));
         this.render();
+        this.saveState();
     }
     
     checkHover(e) {
@@ -260,6 +266,7 @@ class AI_Observatory {
         this.selectedDevice = device;
         this.updateSelectedDeviceInfo();
         this.render();
+        this.saveState();
     }
     
     selectAnomaly(anomaly) {
@@ -270,6 +277,7 @@ class AI_Observatory {
             this.updateSelectedDeviceInfo();
         }
         this.render();
+        this.saveState();
     }
     
     updateSelectedDeviceInfo() {
@@ -620,6 +628,14 @@ class AI_Observatory {
         document.getElementById('floorFilter').value = this.filters.floor;
         document.getElementById('deviceTypeFilter').value = this.filters.deviceType;
         document.getElementById('anomalyLevelFilter').value = this.filters.anomalyLevel;
+        
+        document.getElementById('layerGIS').checked = this.layers.gis;
+        document.getElementById('layerDevices').checked = this.layers.devices;
+        document.getElementById('layerAnomalies').checked = this.layers.anomalies;
+        document.getElementById('layer3D').checked = this.layers.layer3d;
+        
+        document.getElementById('view2D').classList.toggle('active', !this.is3DView);
+        document.getElementById('view3D').classList.toggle('active', this.is3DView);
     }
     
     updateViewInfo() {
@@ -1179,6 +1195,7 @@ class AI_Observatory {
         this.updateUI();
         this.updateSelectedDeviceInfo();
         this.render();
+        this.saveState();
     }
     
     deletePlan(planId) {
@@ -1210,6 +1227,18 @@ class AI_Observatory {
         if (state.is3DView !== undefined) this.is3DView = state.is3DView;
         if (state.notes) this.notes = state.notes;
         if (state.resolvedConflicts) this.resolvedConflicts = state.resolvedConflicts;
+        
+        document.getElementById('floorFilter').value = this.filters.floor;
+        document.getElementById('deviceTypeFilter').value = this.filters.deviceType;
+        document.getElementById('anomalyLevelFilter').value = this.filters.anomalyLevel;
+        
+        document.getElementById('layerGIS').checked = this.layers.gis;
+        document.getElementById('layerDevices').checked = this.layers.devices;
+        document.getElementById('layerAnomalies').checked = this.layers.anomalies;
+        document.getElementById('layer3D').checked = this.layers.layer3d;
+        
+        document.getElementById('view2D').classList.toggle('active', !this.is3DView);
+        document.getElementById('view3D').classList.toggle('active', this.is3DView);
     }
     
     exportScreenshot() {
