@@ -1,0 +1,117 @@
+{
+  "run_id": "run_220944c5",
+  "generated_at": "2026-06-07T16:54:45.491019",
+  "params": {
+    "dedup_threshold": 0.85,
+    "minority_weight": 1.2,
+    "overall_metric_weight": 1.0,
+    "minority_boost_enabled": true,
+    "min_minority_ratio": 0.4
+  },
+  "total_samples": 6,
+  "passed_count": 5,
+  "removed_count": 1,
+  "minority_masked_count": 2,
+  "items": [
+    {
+      "sample_id": "S001",
+      "content": "如何使用Python进行数据分析？",
+      "category": "编程开发",
+      "original_score": 0.92,
+      "adjusted_score": 0.92,
+      "threshold": 0.85,
+      "passed": true,
+      "status": "normal",
+      "explanation": "语义相似度得分0.920 ≥ 阈值0.85，通过去重检测",
+      "missing_materials": [],
+      "next_action": "无需处理",
+      "is_minority": false,
+      "minority_note": null
+    },
+    {
+      "sample_id": "S002",
+      "content": "机器学习入门教程推荐",
+      "category": "人工智能",
+      "original_score": 0.88,
+      "adjusted_score": 0.88,
+      "threshold": 0.85,
+      "passed": true,
+      "status": "normal",
+      "explanation": "语义相似度得分0.880 ≥ 阈值0.85，通过去重检测",
+      "missing_materials": [],
+      "next_action": "无需处理",
+      "is_minority": false,
+      "minority_note": null
+    },
+    {
+      "sample_id": "S003",
+      "content": "量子计算在密码学中的应用",
+      "category": "量子计算",
+      "original_score": 0.72,
+      "adjusted_score": 0.864,
+      "threshold": 0.85,
+      "passed": true,
+      "status": "minority_masked",
+      "explanation": "少数类样本（量子计算），当前少数类占比33.3%低于阈值40.0%，应用加权系数1.2提升得分",
+      "missing_materials": [
+        "补充该类别标注样本量数据",
+        "确认少数类加权策略合理性"
+      ],
+      "next_action": "算法工程师",
+      "is_minority": true,
+      "minority_note": "⚠️ 该样本为少数类，已被总指标盖住，需算法工程师复核确认是否保留"
+    },
+    {
+      "sample_id": "S004",
+      "content": "前端框架Vue和React对比",
+      "category": "前端开发",
+      "original_score": 0.86,
+      "adjusted_score": 0.86,
+      "threshold": 0.85,
+      "passed": true,
+      "status": "normal",
+      "explanation": "语义相似度得分0.860 ≥ 阈值0.85，通过去重检测",
+      "missing_materials": [],
+      "next_action": "无需处理",
+      "is_minority": false,
+      "minority_note": null
+    },
+    {
+      "sample_id": "S005",
+      "content": "生物信息学中的序列比对算法",
+      "category": "生物信息",
+      "original_score": 0.7,
+      "adjusted_score": 0.84,
+      "threshold": 0.85,
+      "passed": false,
+      "status": "minority_masked",
+      "explanation": "少数类样本（生物信息），当前少数类占比33.3%低于阈值40.0%，应用加权系数1.2提升得分",
+      "missing_materials": [
+        "补充该类别标注样本量数据",
+        "确认少数类加权策略合理性"
+      ],
+      "next_action": "算法工程师",
+      "is_minority": true,
+      "minority_note": "⚠️ 该样本为少数类，已被总指标盖住，需算法工程师复核确认是否保留"
+    },
+    {
+      "sample_id": "S006",
+      "content": "数据库索引优化最佳实践",
+      "category": "数据库",
+      "original_score": 0.9,
+      "adjusted_score": 0.9,
+      "threshold": 0.85,
+      "passed": true,
+      "status": "normal",
+      "explanation": "语义相似度得分0.900 ≥ 阈值0.85，通过去重检测",
+      "missing_materials": [],
+      "next_action": "无需处理",
+      "is_minority": false,
+      "minority_note": null
+    }
+  ],
+  "summary": "本次试算共处理 6 条样本，通过阈值：5 条（83.3%），被过滤：1 条（16.7%），⚠️ 注意：有 2 条少数类样本被总指标盖住，需算法工程师复核。",
+  "next_steps": [
+    "联系算法工程师复核 2 条被总指标盖住的少数类样本"
+  ]
+}

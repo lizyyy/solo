@@ -1,0 +1,5 @@
+dedup_threshold: 0.85
+min_minority_ratio: 0.4
+minority_boost_enabled: true
+minority_weight: 1.2
+overall_metric_weight: 1.0

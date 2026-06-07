@@ -1,0 +1,111 @@
+{
+  "run_id": "rerun_395c9e97",
+  "generated_at": "2026-06-07T16:54:45.491964",
+  "params": {
+    "dedup_threshold": 0.82,
+    "minority_weight": 1.3,
+    "overall_metric_weight": 1.0,
+    "minority_boost_enabled": true,
+    "min_minority_ratio": 0.3
+  },
+  "total_samples": 6,
+  "passed_count": 4,
+  "removed_count": 2,
+  "minority_masked_count": 0,
+  "items": [
+    {
+      "sample_id": "S001",
+      "content": "如何使用Python进行数据分析？",
+      "category": "编程开发",
+      "original_score": 0.92,
+      "adjusted_score": 0.92,
+      "threshold": 0.82,
+      "passed": true,
+      "status": "normal",
+      "explanation": "语义相似度得分0.920 ≥ 阈值0.82，通过去重检测",
+      "missing_materials": [],
+      "next_action": "无需处理",
+      "is_minority": false,
+      "minority_note": null
+    },
+    {
+      "sample_id": "S002",
+      "content": "机器学习入门教程推荐",
+      "category": "人工智能",
+      "original_score": 0.88,
+      "adjusted_score": 0.88,
+      "threshold": 0.82,
+      "passed": true,
+      "status": "normal",
+      "explanation": "语义相似度得分0.880 ≥ 阈值0.82，通过去重检测",
+      "missing_materials": [],
+      "next_action": "无需处理",
+      "is_minority": false,
+      "minority_note": null
+    },
+    {
+      "sample_id": "S003",
+      "content": "量子计算在密码学中的应用",
+      "category": "量子计算",
+      "original_score": 0.72,
+      "adjusted_score": 0.72,
+      "threshold": 0.82,
+      "passed": false,
+      "status": "normal",
+      "explanation": "少数类样本（量子计算），但少数类占比33.3%达标，按原得分计算",
+      "missing_materials": [],
+      "next_action": "无需处理",
+      "is_minority": true,
+      "minority_note": "ℹ️ 该样本为少数类，当前占比达标，按正常流程处理"
+    },
+    {
+      "sample_id": "S004",
+      "content": "前端框架Vue和React对比",
+      "category": "前端开发",
+      "original_score": 0.86,
+      "adjusted_score": 0.86,
+      "threshold": 0.82,
+      "passed": true,
+      "status": "normal",
+      "explanation": "语义相似度得分0.860 ≥ 阈值0.82，通过去重检测",
+      "missing_materials": [],
+      "next_action": "无需处理",
+      "is_minority": false,
+      "minority_note": null
+    },
+    {
+      "sample_id": "S005",
+      "content": "生物信息学中的序列比对算法",
+      "category": "生物信息",
+      "original_score": 0.7,
+      "adjusted_score": 0.7,
+      "threshold": 0.82,
+      "passed": false,
+      "status": "normal",
+      "explanation": "少数类样本（生物信息），但少数类占比33.3%达标，按原得分计算",
+      "missing_materials": [],
+      "next_action": "无需处理",
+      "is_minority": true,
+      "minority_note": "ℹ️ 该样本为少数类，当前占比达标，按正常流程处理"
+    },
+    {
+      "sample_id": "S006",
+      "content": "数据库索引优化最佳实践",
+      "category": "数据库",
+      "original_score": 0.9,
+      "adjusted_score": 0.9,
+      "threshold": 0.82,
+      "passed": true,
+      "status": "normal",
+      "explanation": "语义相似度得分0.900 ≥ 阈值0.82，通过去重检测",
+      "missing_materials": [],
+      "next_action": "无需处理",
+      "is_minority": false,
+      "minority_note": null
+    }
+  ],
+  "summary": "本次试算共处理 6 条样本，通过阈值：4 条（66.7%），被过滤：2 条（33.3%）。",
+  "next_steps": [
+    "所有样本处理完毕，可确认最终结果"
+  ]
+}
