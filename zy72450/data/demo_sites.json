@@ -1,0 +1,90 @@
+[
+    {
+        "id": "site-001",
+        "site_name": "幸福小区南侧绿地",
+        "address": "幸福路123号南侧",
+        "area_sqm": 850.0,
+        "accessibility_ramp": {
+            "id": "ramp-001",
+            "location": "幸福路入口处",
+            "has_ramp": true,
+            "notes": "坡道坡度适中，轮椅可通行"
+        },
+        "opinions": [
+            {
+                "id": "op-001",
+                "resident_name": "张大妈",
+                "address": "幸福小区3号楼",
+                "summary": "希望多放些休息长椅，方便老人聊天",
+                "original_text": "我每天都要带小孙子出来玩，这块地要是能改成公园就太好了！能不能多放几条长椅啊？我们这些老头老太太累了能坐下来歇会儿，聊聊天。最好能有个遮阳的地方，夏天太晒了。",
+                "status": "完整"
+            },
+            {
+                "id": "op-002",
+                "resident_name": "李先生",
+                "address": "幸福小区5号楼",
+                "summary": "建议增加健身器材",
+                "original_text": "作为一个上班族，平时下班了想锻炼一下，家附近要是有个小公园就方便多了。建议装一些单杠、漫步机之类的健身器材，满足我们年轻人的需求。",
+                "status": "完整"
+            }
+        ],
+        "source": "日间走访",
+        "status": "正常"
+    },
+    {
+        "id": "site-002",
+        "site_name": "和平里街角空地",
+        "address": "和平街与建设路交叉口西北角",
+        "area_sqm": 520.0,
+        "accessibility_ramp": {
+            "id": "ramp-002",
+            "location": "和平街一侧",
+            "has_ramp": false,
+            "notes": "当前为台阶入口，需改造"
+        },
+        "opinions": [
+            {
+                "id": "op-003",
+                "resident_name": "王阿姨",
+                "address": "和平里2号楼",
+                "summary": "居民普遍支持建口袋公园，反映无噪音问题",
+                "original_text": "",
+                "status": "完整"
+            },
+            {
+                "id": "op-004",
+                "resident_name": "赵师傅",
+                "address": "和平里4号楼",
+                "summary": "担心停车问题，建议不要占用现有停车位",
+                "original_text": "这块地旁边本来就不好停车，要是改成公园的话，停车的地方更少了。能不能考虑一下我们有车一族的需求？公园我是支持的，但别把我们的停车位占了。",
+                "status": "完整"
+            }
+        ],
+        "source": "日间走访",
+        "status": "正常"
+    },
+    {
+        "id": "site-003",
+        "site_name": "阳光社区东侧废弃花池",
+        "address": "阳光大道456号东侧",
+        "area_sqm": 680.0,
+        "accessibility_ramp": {
+            "id": "ramp-003",
+            "location": "阳光大道入口",
+            "has_ramp": true,
+            "notes": "原有坡道完好"
+        },
+        "opinions": [
+            {
+                "id": "op-005",
+                "resident_name": "陈奶奶",
+                "address": "阳光社区1号楼",
+                "summary": "支持改建，希望种些花草",
+                "original_text": "这地方荒了好多年了，太可惜了！改成公园多好啊，种点花花草草的，看着也舒服。我年纪大了，也走不远，家门口有个小公园就知足了。",
+                "status": "完整"
+            }
+        ],
+        "source": "日间走访",
+        "status": "正常"
+    }
+]
