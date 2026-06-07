@@ -1,0 +1,53 @@
+{
+  "ticket_id": "TICKET-20260601-002",
+  "source": "online_feedback",
+  "created_at": "2026-06-01T10:15:00",
+  "title": "电子发票导出包含完整银行卡号",
+  "description": "财务部门反馈，在批量导出电子发票OCR数据时，发现部分发票的银行账户字段完整显示，未按规定脱敏。",
+  "fields": [
+    {
+      "field_name": "invoice_number",
+      "field_value": "87654321",
+      "is_masked": false,
+      "mask_pattern": null,
+      "ocr_confidence": 0.96,
+      "leak_detected": false,
+      "leak_note": null
+    },
+    {
+      "field_name": "seller_bank_account",
+      "field_value": "6222021234567890123",
+      "is_masked": false,
+      "mask_pattern": null,
+      "ocr_confidence": 0.65,
+      "leak_detected": false,
+      "leak_note": null
+    },
+    {
+      "field_name": "seller_name",
+      "field_value": "某某贸易有限公司",
+      "is_masked": false,
+      "mask_pattern": null,
+      "ocr_confidence": 0.93,
+      "leak_detected": false,
+      "leak_note": null
+    },
+    {
+      "field_name": "contact_email",
+      "field_value": "contact@example.com",
+      "is_masked": false,
+      "mask_pattern": null,
+      "ocr_confidence": 0.88,
+      "leak_detected": false,
+      "leak_note": null
+    }
+  ],
+  "status": "imported",
+  "assignee": null,
+  "rule_notes": [],
+  "algorithm_notes": [],
+  "export_history": [],
+  "ocr_confidence_score": 0.85,
+  "updated_at": "2026-06-07T12:16:31.262521",
+  "metadata": {}
+}

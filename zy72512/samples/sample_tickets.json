@@ -1,0 +1,133 @@
+[
+  {
+    "ticket_id": "TICKET-20260601-001",
+    "source": "online_feedback",
+    "created_at": "2026-06-01T09:30:00",
+    "title": "发票OCR识别结果中手机号未脱敏",
+    "description": "用户反馈导出的发票OCR识别结果中，购买方联系电话字段未进行脱敏处理，存在数据泄露风险。",
+    "fields": [
+      {
+        "field_name": "invoice_number",
+        "field_value": "12345678",
+        "is_masked": false,
+        "ocr_confidence": 0.98,
+        "leak_detected": false
+      },
+      {
+        "field_name": "buyer_name",
+        "field_value": "某某科技有限公司",
+        "is_masked": false,
+        "ocr_confidence": 0.95,
+        "leak_detected": false
+      },
+      {
+        "field_name": "buyer_phone",
+        "field_value": "13812345678",
+        "is_masked": false,
+        "ocr_confidence": 0.82,
+        "leak_detected": false,
+        "leak_note": null
+      },
+      {
+        "field_name": "buyer_tax_id",
+        "field_value": "91110108MA0123456X",
+        "is_masked": false,
+        "ocr_confidence": 0.78,
+        "leak_detected": false
+      },
+      {
+        "field_name": "amount",
+        "field_value": "￥12,500.00",
+        "is_masked": false,
+        "ocr_confidence": 0.99,
+        "leak_detected": false
+      },
+      {
+        "field_name": "seller_phone",
+        "field_value": "联系电话: 13987654321",
+        "is_masked": false,
+        "ocr_confidence": 0.71,
+        "leak_detected": false,
+        "leak_note": null
+      }
+    ],
+    "ocr_confidence_score": 0.87
+  },
+  {
+    "ticket_id": "TICKET-20260601-002",
+    "source": "online_feedback",
+    "created_at": "2026-06-01T10:15:00",
+    "title": "电子发票导出包含完整银行卡号",
+    "description": "财务部门反馈，在批量导出电子发票OCR数据时，发现部分发票的银行账户字段完整显示，未按规定脱敏。",
+    "fields": [
+      {
+        "field_name": "invoice_number",
+        "field_value": "87654321",
+        "is_masked": false,
+        "ocr_confidence": 0.96,
+        "leak_detected": false
+      },
+      {
+        "field_name": "seller_bank_account",
+        "field_value": "6222021234567890123",
+        "is_masked": false,
+        "ocr_confidence": 0.65,
+        "leak_detected": false
+      },
+      {
+        "field_name": "seller_name",
+        "field_value": "某某贸易有限公司",
+        "is_masked": false,
+        "ocr_confidence": 0.93,
+        "leak_detected": false
+      },
+      {
+        "field_name": "contact_email",
+        "field_value": "contact@example.com",
+        "is_masked": false,
+        "ocr_confidence": 0.88,
+        "leak_detected": false
+      }
+    ],
+    "ocr_confidence_score": 0.85
+  },
+  {
+    "ticket_id": "TICKET-20260601-003",
+    "source": "internal_audit",
+    "created_at": "2026-06-01T14:00:00",
+    "title": "OCR置信度较低字段复核",
+    "description": "内审部门抽查发现，部分OCR置信度低于0.7的字段直接导出，未经过人工复核流程。",
+    "fields": [
+      {
+        "field_name": "invoice_number",
+        "field_value": "11223344",
+        "is_masked": false,
+        "ocr_confidence": 0.97,
+        "leak_detected": false
+      },
+      {
+        "field_name": "buyer_id_card",
+        "field_value": "110101199001011234",
+        "is_masked": false,
+        "ocr_confidence": 0.58,
+        "leak_detected": false
+      },
+      {
+        "field_name": "buyer_phone",
+        "field_value": "13511112222",
+        "is_masked": true,
+        "mask_pattern": "135****2222",
+        "ocr_confidence": 0.83,
+        "leak_detected": false
+      },
+      {
+        "field_name": "remarks",
+        "field_value": "客户备注: 请联系18600001111确认",
+        "is_masked": false,
+        "ocr_confidence": 0.72,
+        "leak_detected": false
+      }
+    ],
+    "ocr_confidence_score": 0.77
+  }
+]

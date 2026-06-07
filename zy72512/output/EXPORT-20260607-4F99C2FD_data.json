@@ -1,0 +1,72 @@
+{
+  "export_id": "EXPORT-20260607-4F99C2FD",
+  "ticket_id": "TICKET-20260601-001",
+  "generated_at": "2026-06-07T12:19:28.185790",
+  "generated_by": "system",
+  "status": "generated",
+  "summary": {
+    "total_fields": 6,
+    "masked_fields": 2,
+    "leak_fields": 0,
+    "needs_algorithm": 0,
+    "needs_operation": 0,
+    "ticket_status": "reviewed_by_operation"
+  },
+  "fields": [
+    {
+      "field_name": "invoice_number",
+      "value": "1234********5678",
+      "is_masked": false,
+      "leak_risk": "none",
+      "explanation": "该字段未检测到敏感数据，无需脱敏",
+      "next_step": "可直接导出",
+      "responsible_role": ""
+    },
+    {
+      "field_name": "buyer_name",
+      "value": "某某科技********有限公司",
+      "is_masked": false,
+      "leak_risk": "none",
+      "explanation": "该字段未检测到敏感数据，无需脱敏",
+      "next_step": "可直接导出",
+      "responsible_role": ""
+    },
+    {
+      "field_name": "buyer_phone",
+      "value": "138*********5678",
+      "is_masked": true,
+      "leak_risk": "none",
+      "explanation": "该字段检测到敏感数据泄露风险，已由人工复核并标记处理，脱敏已生效",
+      "next_step": "已完成复核处理，可确认导出",
+      "responsible_role": ""
+    },
+    {
+      "field_name": "buyer_tax_id",
+      "value": "9111********456X",
+      "is_masked": false,
+      "leak_risk": "none",
+      "explanation": "该字段未检测到敏感数据，无需脱敏",
+      "next_step": "可直接导出",
+      "responsible_role": ""
+    },
+    {
+      "field_name": "amount",
+      "value": "￥12,********0.00",
+      "is_masked": false,
+      "leak_risk": "none",
+      "explanation": "该字段未检测到敏感数据，无需脱敏",
+      "next_step": "可直接导出",
+      "responsible_role": ""
+    },
+    {
+      "field_name": "seller_phone",
+      "value": "联系电话********4321",
+      "is_masked": true,
+      "leak_risk": "none",
+      "explanation": "该字段检测到敏感数据泄露风险，已由人工复核并标记处理，脱敏已生效",
+      "next_step": "已完成复核处理，可确认导出",
+      "responsible_role": ""
+    }
+  ],
+  "audit_notes": []
+}

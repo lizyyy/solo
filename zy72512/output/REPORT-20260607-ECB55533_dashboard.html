@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>发票 OCR 置信度复核 - 数据看板</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        .stat-card { transition: all 0.2s; }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .chart-container { min-height: 300px; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <nav class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-xl font-bold text-gray-800">🔍 发票 OCR 置信度复核</h1>
+                    <p class="text-sm text-gray-500">报告编号: REPORT-20260607-ECB55533 | 生成时间: 2026-06-07 12:16:31</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="window.print()" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm">打印报告</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 py-6">
+        <!-- 统计卡片 -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="stat-card bg-white rounded-lg shadow p-5">
+                <div class="text-sm text-gray-500 mb-1">总工单数</div>
+                <div class="text-3xl font-bold text-gray-800">3</div>
+                <div class="text-xs text-gray-400 mt-1">累计导入</div>
+            </div>
+            <div class="stat-card bg-white rounded-lg shadow p-5">
+                <div class="text-sm text-gray-500 mb-1">泄露工单</div>
+                <div class="text-3xl font-bold text-red-600">2</div>
+                <div class="text-xs text-red-400 mt-1">泄露率 66.67%</div>
+            </div>
+            <div class="stat-card bg-white rounded-lg shadow p-5">
+                <div class="text-sm text-gray-500 mb-1">泄露字段</div>
+                <div class="text-3xl font-bold text-orange-600">3</div>
+                <div class="text-xs text-gray-400 mt-1">共 14 个字段</div>
+            </div>
+            <div class="stat-card bg-white rounded-lg shadow p-5">
+                <div class="text-sm text-gray-500 mb-1">平均OCR置信度</div>
+                <div class="text-3xl font-bold text-blue-600">0.83</div>
+                <div class="text-xs text-gray-400 mt-1">基于置信度评分</div>
+            </div>
+        </div>
+
+        <!-- 图表区域 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <div class="bg-white rounded-lg shadow p-5">
+                <h3 class="font-semibold text-gray-700 mb-3">📊 工单状态分布</h3>
+                <div id="statusChart" class="chart-container"></div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-5">
+                <h3 class="font-semibold text-gray-700 mb-3">🔒 泄露类型分布</h3>
+                <div id="leakChart" class="chart-container"></div>
+            </div>
+        </div>
+
+        <!-- 趋势图 -->
+        <div class="bg-white rounded-lg shadow p-5 mb-6">
+            <h3 class="font-semibold text-gray-700 mb-3">📈 每日泄露趋势 & OCR置信度</h3>
+            <div id="trendChart" style="height: 350px;"></div>
+        </div>
+
+        <!-- 工单列表 -->
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+            <div class="px-5 py-4 border-b">
+                <h3 class="font-semibold text-gray-700">📋 工单列表 (点击查看详情)</h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">工单编号</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">标题</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">状态</th>
+                            <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">泄露字段</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">OCR置信度</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">创建时间</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y">
+                        
+            <tr class="hover:bg-gray-50 cursor-pointer" onclick="showTicketDetail('TICKET-20260601-003')">
+                <td class="px-4 py-3 text-sm font-mono text-blue-600">TICKET-20260601-003</td>
+                <td class="px-4 py-3 text-sm">OCR置********字段复核</td>
+                <td class="px-4 py-3">
+                    <span class="px-2 py-1 text-xs rounded-full text-white" style="background-color: #f59e0b">
+                        review_pending
+                    </span>
+                </td>
+                <td class="px-4 py-3 text-sm text-center">
+                    <span class="text-red-600 font-bold">1</span>
+                </td>
+                <td class="px-4 py-3 text-sm">
+                    0.77
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-500">06-01 14:00</td>
+            </tr>
+            
+            <tr class="hover:bg-gray-50 cursor-pointer" onclick="showTicketDetail('TICKET-20260601-002')">
+                <td class="px-4 py-3 text-sm font-mono text-blue-600">TICKET-20260601-002</td>
+                <td class="px-4 py-3 text-sm">电子发票********银行卡号</td>
+                <td class="px-4 py-3">
+                    <span class="px-2 py-1 text-xs rounded-full text-white" style="background-color: #3b82f6">
+                        imported
+                    </span>
+                </td>
+                <td class="px-4 py-3 text-sm text-center">
+                    0
+                </td>
+                <td class="px-4 py-3 text-sm">
+                    0.85
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-500">06-01 10:15</td>
+            </tr>
+            
+            <tr class="hover:bg-gray-50 cursor-pointer" onclick="showTicketDetail('TICKET-20260601-001')">
+                <td class="px-4 py-3 text-sm font-mono text-blue-600">TICKET-20260601-001</td>
+                <td class="px-4 py-3 text-sm">发票OC********号未脱敏</td>
+                <td class="px-4 py-3">
+                    <span class="px-2 py-1 text-xs rounded-full text-white" style="background-color: #ef4444">
+                        detected_leak
+                    </span>
+                </td>
+                <td class="px-4 py-3 text-sm text-center">
+                    <span class="text-red-600 font-bold">2</span>
+                </td>
+                <td class="px-4 py-3 text-sm">
+                    0.87
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-500">06-01 09:30</td>
+            </tr>
+            
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 说明区域 -->
+        <div class="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-5">
+            <h3 class="font-semibold text-blue-800 mb-2">📖 说明</h3>
+            <ul class="text-sm text-blue-700 space-y-1">
+                <li>• <strong>点到工单</strong>：点击任意工单可追溯到原始线上反馈工单和脱敏规则备注</li>
+                <li>• <strong>泄露风险</strong>：手机号等敏感数据未脱敏时会被标记为高风险，不自动归为"正常"</li>
+                <li>• <strong>责任分工</strong>：OCR置信度低的找<strong>算法同事</strong>，规则配置问题找<strong>运营老唐</strong></li>
+                <li>• <strong>脱敏复查</strong>：本报告所有输出均已自动脱敏，不会留存原始手机号</li>
+            </ul>
+        </div>
+    </main>
+
+    <script>
+        // 状态饼图
+        var statusChart = echarts.init(document.getElementById('statusChart'));
+        statusChart.setOption({
+            tooltip: { trigger: 'item' },
+            legend: { bottom: 0 },
+            series: [{
+                type: 'pie',
+                radius: ['40%', '70%'],
+                avoidLabelOverlap: false,
+                itemStyle: { borderRadius: 10, borderColor: '#fff', borderWidth: 2 },
+                label: { show: false },
+                emphasis: { label: { show: true, fontSize: 14, fontWeight: 'bold' } },
+                data: [{"name": "review_pending", "value": 1}, {"name": "imported", "value": 1}, {"name": "detected_leak", "value": 1}]
+            }]
+        });
+
+        // 泄露类型饼图
+        var leakChart = echarts.init(document.getElementById('leakChart'));
+        leakChart.setOption({
+            tooltip: { trigger: 'item' },
+            legend: { bottom: 0 },
+            series: [{
+                type: 'pie',
+                radius: ['40%', '70%'],
+                itemStyle: { borderRadius: 10, borderColor: '#fff', borderWidth: 2 },
+                data: [{"name": "phone", "value": 3}]
+            }]
+        });
+
+        // 趋势图
+        var trendChart = echarts.init(document.getElementById('trendChart'));
+        trendChart.setOption({
+            tooltip: { trigger: 'axis' },
+            legend: { data: ['泄露率(%)', 'OCR置信度'], top: 0 },
+            grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+            xAxis: { type: 'category', data: ["2026-06-01"] },
+            yAxis: [
+                { type: 'value', name: '泄露率(%)', min: 0, max: 100 },
+                { type: 'value', name: '置信度', min: 0, max: 1 }
+            ],
+            series: [
+                {
+                    name: '泄露率(%)',
+                    type: 'line',
+                    smooth: true,
+                    itemStyle: { color: '#ef4444' },
+                    areaStyle: { opacity: 0.1 },
+                    data: [66.67]
+                },
+                {
+                    name: 'OCR置信度',
+                    type: 'line',
+                    smooth: true,
+                    yAxisIndex: 1,
+                    itemStyle: { color: '#3b82f6' },
+                    areaStyle: { opacity: 0.1 },
+                    data: [0.83]
+                }
+            ]
+        });
+
+        function showTicketDetail(ticketId) {
+            alert('正在打开工单: ' + ticketId + '\n\n实际场景中会跳转到: 线上反馈工单系统 / 脱敏规则配置页面');
+        }
+
+        window.addEventListener('resize', function() {
+            statusChart.resize();
+            leakChart.resize();
+            trendChart.resize();
+        });
+    </script>
+</body>
+</html>

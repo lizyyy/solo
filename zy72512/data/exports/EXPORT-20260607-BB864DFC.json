@@ -1,0 +1,91 @@
+{
+  "export_id": "EXPORT-20260607-BB864DFC",
+  "ticket_id": "TICKET-20260601-001",
+  "generated_at": "2026-06-07T12:16:35.522259",
+  "generated_by": "system",
+  "fields": [
+    {
+      "field_name": "invoice_number",
+      "original_value": "12345678",
+      "masked_value": "12345678",
+      "is_masked": false,
+      "mask_rule_applied": null,
+      "leak_risk": "none",
+      "explanation": "该字段未检测到敏感数据，无需脱敏",
+      "next_step": "可直接导出",
+      "responsible_role": ""
+    },
+    {
+      "field_name": "buyer_name",
+      "original_value": "某某科技有限公司",
+      "masked_value": "某某科技有限公司",
+      "is_masked": false,
+      "mask_rule_applied": null,
+      "leak_risk": "none",
+      "explanation": "该字段未检测到敏感数据，无需脱敏",
+      "next_step": "可直接导出",
+      "responsible_role": ""
+    },
+    {
+      "field_name": "buyer_phone",
+      "original_value": "13812345678",
+      "masked_value": "138*********5678",
+      "is_masked": true,
+      "mask_rule_applied": "中国大陆手机号脱敏",
+      "leak_risk": "high",
+      "explanation": "该字段检测到敏感数据但未完成复核。检测到phone泄露: 应使用规则 中国大陆手机号脱敏 进行脱敏",
+      "next_step": "请运营老唐补充脱敏规则备注，确认后再导出",
+      "responsible_role": "operation"
+    },
+    {
+      "field_name": "buyer_tax_id",
+      "original_value": "91110108MA0123456X",
+      "masked_value": "91110108MA0123456X",
+      "is_masked": false,
+      "mask_rule_applied": null,
+      "leak_risk": "none",
+      "explanation": "该字段未检测到敏感数据，无需脱敏",
+      "next_step": "可直接导出",
+      "responsible_role": ""
+    },
+    {
+      "field_name": "amount",
+      "original_value": "￥12,500.00",
+      "masked_value": "￥12,500.00",
+      "is_masked": false,
+      "mask_rule_applied": null,
+      "leak_risk": "none",
+      "explanation": "该字段未检测到敏感数据，无需脱敏",
+      "next_step": "可直接导出",
+      "responsible_role": ""
+    },
+    {
+      "field_name": "seller_phone",
+      "original_value": "联系电话: 13987654321",
+      "masked_value": "联系电话********4321",
+      "is_masked": true,
+      "mask_rule_applied": "中国大陆手机号脱敏",
+      "leak_risk": "high",
+      "explanation": "该字段检测到敏感数据但未完成复核。检测到phone泄露: 应使用规则 中国大陆手机号脱敏 进行脱敏",
+      "next_step": "请运营老唐补充脱敏规则备注，确认后再导出",
+      "responsible_role": "operation"
+    }
+  ],
+  "status": "generated",
+  "audit_notes": [],
+  "summary": {
+    "total_fields": 6,
+    "masked_fields": 2,
+    "leak_fields": 2,
+    "needs_algorithm": 0,
+    "needs_operation": 2,
+    "ticket_status": "detected_leak"
+  },
+  "output_paths": {
+    "json": "output/EXPORT-20260607-BB864DFC_data.json",
+    "report": "output/EXPORT-20260607-BB864DFC_report.txt",
+    "summary": "output/EXPORT-20260607-BB864DFC_summary.txt"
+  },
+  "mask_version": "1.0",
+  "metadata": {}
+}

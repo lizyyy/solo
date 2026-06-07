@@ -1,0 +1,88 @@
+{
+  "ticket_id": "TICKET-20260601-001",
+  "source": "online_feedback",
+  "created_at": "2026-06-01T09:30:00",
+  "title": "发票OCR识别结果中手机号未脱敏",
+  "description": "用户反馈导出的发票OCR识别结果中，购买方联系电话字段未进行脱敏处理，存在数据泄露风险。",
+  "fields": [
+    {
+      "field_name": "invoice_number",
+      "field_value": "12345678",
+      "is_masked": false,
+      "mask_pattern": null,
+      "ocr_confidence": 0.98,
+      "leak_detected": false,
+      "leak_note": null
+    },
+    {
+      "field_name": "buyer_name",
+      "field_value": "某某科技有限公司",
+      "is_masked": false,
+      "mask_pattern": null,
+      "ocr_confidence": 0.95,
+      "leak_detected": false,
+      "leak_note": null
+    },
+    {
+      "field_name": "buyer_phone",
+      "field_value": "13812345678",
+      "is_masked": true,
+      "mask_pattern": "138****5678",
+      "ocr_confidence": 0.82,
+      "leak_detected": true,
+      "leak_note": "检测到phone泄露: 应使用规则 中国大陆手机号脱敏 进行脱敏 | 运营备注: 已补充脱敏规则，该字段按手机号规则配置完成"
+    },
+    {
+      "field_name": "buyer_tax_id",
+      "field_value": "91110108MA0123456X",
+      "is_masked": false,
+      "mask_pattern": null,
+      "ocr_confidence": 0.78,
+      "leak_detected": false,
+      "leak_note": null
+    },
+    {
+      "field_name": "amount",
+      "field_value": "￥12,500.00",
+      "is_masked": false,
+      "mask_pattern": null,
+      "ocr_confidence": 0.99,
+      "leak_detected": false,
+      "leak_note": null
+    },
+    {
+      "field_name": "seller_phone",
+      "field_value": "联系电话: 13987654321",
+      "is_masked": true,
+      "mask_pattern": "联系电话: 139****4321",
+      "ocr_confidence": 0.71,
+      "leak_detected": true,
+      "leak_note": "检测到phone泄露: 应使用规则 中国大陆手机号脱敏 进行脱敏 | 运营备注: 已补充脱敏规则，文本中的手机号也纳入遮蔽范围"
+    }
+  ],
+  "status": "reviewed_by_operation",
+  "assignee": "operation",
+  "rule_notes": [
+    {
+      "note": "已补充脱敏规则，该字段按手机号规则配置完成",
+      "author": "老唐",
+      "field_name": "buyer_phone",
+      "timestamp": "2026-06-07T12:19:00.487331"
+    },
+    {
+      "note": "已补充脱敏规则，文本中的手机号也纳入遮蔽范围",
+      "author": "老唐",
+      "field_name": "seller_phone",
+      "timestamp": "2026-06-07T12:19:00.487341"
+    }
+  ],
+  "algorithm_notes": [],
+  "export_history": [
+    "EXPORT-20260607-BB864DFC",
+    "EXPORT-20260607-2D9CE2BE",
+    "EXPORT-20260607-4F99C2FD"
+  ],
+  "ocr_confidence_score": 0.87,
+  "updated_at": "2026-06-07T12:19:00.487347",
+  "metadata": {}
+}

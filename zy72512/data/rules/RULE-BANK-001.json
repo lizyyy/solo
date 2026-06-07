@@ -1,0 +1,20 @@
+{
+  "rule_id": "RULE-BANK-001",
+  "rule_type": "bank_card",
+  "rule_name": "银行卡号脱敏",
+  "pattern": "(?<!\\d)(\\d{16,19})(?!\\d)",
+  "mask_template": "****",
+  "status": "active",
+  "description": "对16-19位银行卡号进行脱敏",
+  "created_at": "2026-06-07T12:16:31.261647",
+  "updated_at": "2026-06-07T12:16:31.261648",
+  "created_by": "system",
+  "priority": 80,
+  "field_restriction": [
+    "bank_account",
+    "bank_card",
+    "card_number",
+    "seller_bank_account"
+  ],
+  "metadata": {}
+}
