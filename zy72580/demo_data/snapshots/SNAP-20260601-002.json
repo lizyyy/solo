@@ -1,0 +1,13 @@
+{
+  "snapshot_id": "SNAP-20260601-002",
+  "import_time": "2026-06-07 16:34:47",
+  "feature_name": "user_purchase_prob",
+  "ps_value": 0.88,
+  "drift_value": 0.12,
+  "missing_rate": 0.03,
+  "tier": "green",
+  "status": "pending_review",
+  "note": "阈值改过但报告仍写旧值，v2阈值PS_medium=0.90但报告用v1的0.85；分层判定: PS偏高；人工修正: 确认阈值已更新为v2，PS=0.88按新标准应为正常",
+  "threshold_version": "v1",
+  "source": "import"
+}

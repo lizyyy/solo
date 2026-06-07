@@ -1,0 +1,13 @@
+{
+  "snapshot_id": "SNAP-20260601-003",
+  "import_time": "2026-06-07 16:34:47",
+  "feature_name": "item_exposure_count",
+  "ps_value": 0.96,
+  "drift_value": 0.25,
+  "missing_rate": 0.08,
+  "tier": "green",
+  "status": "finalized_with_supplement",
+  "note": "阈值改过但报告仍写旧值，需要从训练日志曲线补旧口径；分层判定: PS过高、漂移偏高；已从训练日志曲线补来旧口径",
+  "threshold_version": "v1",
+  "source": "log_supplement"
+}

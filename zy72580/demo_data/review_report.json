@@ -1,0 +1,194 @@
+{
+  "生成时间": "2026-06-07 16:34:47",
+  "特征快照统计": {
+    "总数": 3,
+    "green": 3,
+    "yellow": 0,
+    "red": 0,
+    "pending_review": 1
+  },
+  "快照详情": [
+    {
+      "snapshot_id": "SNAP-20260601-001",
+      "import_time": "2026-06-07 16:34:47",
+      "feature_name": "user_click_rate_7d",
+      "ps_value": 0.82,
+      "drift_value": 0.08,
+      "missing_rate": 0.05,
+      "tier": "green",
+      "status": "finalized",
+      "note": "正常",
+      "threshold_version": "v1",
+      "source": "import"
+    },
+    {
+      "snapshot_id": "SNAP-20260601-002",
+      "import_time": "2026-06-07 16:34:47",
+      "feature_name": "user_purchase_prob",
+      "ps_value": 0.88,
+      "drift_value": 0.12,
+      "missing_rate": 0.03,
+      "tier": "green",
+      "status": "pending_review",
+      "note": "阈值改过但报告仍写旧值，v2阈值PS_medium=0.90但报告用v1的0.85；分层判定: PS偏高；人工修正: 确认阈值已更新为v2，PS=0.88按新标准应为正常",
+      "threshold_version": "v1",
+      "source": "import"
+    },
+    {
+      "snapshot_id": "SNAP-20260601-003",
+      "import_time": "2026-06-07 16:34:47",
+      "feature_name": "item_exposure_count",
+      "ps_value": 0.96,
+      "drift_value": 0.25,
+      "missing_rate": 0.08,
+      "tier": "green",
+      "status": "finalized_with_supplement",
+      "note": "阈值改过但报告仍写旧值，需要从训练日志曲线补旧口径；分层判定: PS过高、漂移偏高；已从训练日志曲线补来旧口径",
+      "threshold_version": "v1",
+      "source": "log_supplement"
+    }
+  ],
+  "复核记录": [
+    {
+      "record_id": "REV-20260607163447",
+      "snapshot_id": "SNAP-20260601-003",
+      "reviewer": "小乔",
+      "review_time": "2026-06-07 16:34:47",
+      "action": "训练日志补录旧口径",
+      "old_tier": "red",
+      "new_tier": "green",
+      "old_status": "imported",
+      "new_status": "log_reviewed",
+      "comment": "从训练日志曲线v20260525补录旧口径PS值: 0.82"
+    },
+    {
+      "record_id": "REV-20260607163447",
+      "snapshot_id": "SNAP-20260601-002",
+      "reviewer": "小乔",
+      "review_time": "2026-06-07 16:34:47",
+      "action": "人工修正",
+      "old_tier": "yellow",
+      "new_tier": "green",
+      "old_status": "log_reviewed",
+      "new_status": "manual_corrected",
+      "comment": "确认阈值已更新为v2，PS=0.88按新标准应为正常"
+    },
+    {
+      "record_id": "REV-20260607163447",
+      "snapshot_id": "SNAP-20260601-001",
+      "reviewer": "数据科学家",
+      "review_time": "2026-06-07 16:34:47",
+      "action": "分层指标更新",
+      "old_tier": "green",
+      "new_tier": "green",
+      "old_status": "rerun",
+      "new_status": "finalized",
+      "comment": "快照 SNAP-20260601-001 分层指标更新完成: green -> green，状态: finalized"
+    },
+    {
+      "record_id": "REV-20260607163447",
+      "snapshot_id": "SNAP-20260601-002",
+      "reviewer": "数据科学家",
+      "review_time": "2026-06-07 16:34:47",
+      "action": "分层指标更新",
+      "old_tier": "green",
+      "new_tier": "green",
+      "old_status": "manual_corrected",
+      "new_status": "pending_review",
+      "comment": "快照 SNAP-20260601-002 存在阈值口径问题，已标记为 pending_review，留给数据科学家复核，暂不归为正常"
+    },
+    {
+      "record_id": "REV-20260607163447",
+      "snapshot_id": "SNAP-20260601-003",
+      "reviewer": "数据科学家",
+      "review_time": "2026-06-07 16:34:47",
+      "action": "分层指标更新",
+      "old_tier": "green",
+      "new_tier": "green",
+      "old_status": "log_reviewed",
+      "new_status": "finalized_with_supplement",
+      "comment": "快照 SNAP-20260601-003 已从训练日志补录旧口径，分层指标更新完成，状态: finalized_with_supplement"
+    }
+  ],
+  "重跑记录": [
+    {
+      "rerun_id": "RERUN-20260607163447",
+      "snapshot_id": "SNAP-20260601-001",
+      "rerun_time": "2026-06-07 16:34:47",
+      "trigger": "验证分层指标稳定性",
+      "before_tier": "green",
+      "after_tier": "green",
+      "command": "python run_pollution_check.py --snapshot SNAP-20260601-001 --rerun --threshold-version v1"
+    }
+  ],
+  "工作流历史": [
+    {
+      "current_step": 1,
+      "message": "快照 SNAP-20260601-001 导入完成，分层: green, 备注: 正常"
+    },
+    {
+      "current_step": 1,
+      "message": "快照 SNAP-20260601-002 导入完成，分层: yellow, 备注: 阈值改过但报告仍写旧值，v2阈值PS_medium=0.90但报告用v1的0.85；分层判定: PS偏高"
+    },
+    {
+      "current_step": 1,
+      "message": "快照 SNAP-20260601-003 导入完成，分层: red, 备注: 阈值改过但报告仍写旧值，需要从训练日志曲线补旧口径；分层判定: PS过高、漂移偏高"
+    },
+    {
+      "current_step": 2,
+      "message": "训练日志查看完成，SNAP-20260601-001 状态更新为 log_reviewed"
+    },
+    {
+      "current_step": 2,
+      "message": "训练日志查看完成，SNAP-20260601-002 状态更新为 log_reviewed"
+    },
+    {
+      "current_step": 2,
+      "message": "训练日志查看完成，SNAP-20260601-003 从 red 更新为 green，来源: 训练日志补录"
+    },
+    {
+      "current_step": -1,
+      "message": "人工修正完成: SNAP-20260601-002 yellow -> green"
+    },
+    {
+      "current_step": -1,
+      "message": "重跑完成: SNAP-20260601-001 green -> green，重跑ID: RERUN-20260607163447"
+    },
+    {
+      "current_step": 3,
+      "message": "快照 SNAP-20260601-001 分层指标更新完成: green -> green，状态: finalized"
+    },
+    {
+      "current_step": 3,
+      "message": "快照 SNAP-20260601-002 存在阈值口径问题，已标记为 pending_review，留给数据科学家复核，暂不归为正常"
+    },
+    {
+      "current_step": 3,
+      "message": "快照 SNAP-20260601-003 已从训练日志补录旧口径，分层指标更新完成，状态: finalized_with_supplement"
+    }
+  ],
+  "阈值配置": {
+    "ps_high": 0.95,
+    "ps_medium": 0.85,
+    "drift_high": 0.3,
+    "drift_medium": 0.15,
+    "missing_rate_high": 0.2,
+    "missing_rate_medium": 0.1
+  },
+  "审计日志": [
+    "[2026-06-07 16:34:47] 工具初始化完成",
+    "[2026-06-07 16:34:47] 步骤1: 导入特征快照 SNAP-20260601-001",
+    "[2026-06-07 16:34:47] 步骤1: 导入特征快照 SNAP-20260601-002",
+    "[2026-06-07 16:34:47] 步骤1: 导入特征快照 SNAP-20260601-003",
+    "[2026-06-07 16:34:47] 步骤2: 算法工程师小乔补看训练日志 LOG-20260601-001",
+    "[2026-06-07 16:34:47] 步骤2: 算法工程师小乔补看训练日志 LOG-20260601-002",
+    "[2026-06-07 16:34:47] 步骤2: 算法工程师小乔补看训练日志 LOG-20260601-003",
+    "[2026-06-07 16:34:47] 人工修正: 快照 SNAP-20260601-002 -> green",
+    "[2026-06-07 16:34:47] 重跑: 快照 SNAP-20260601-001，触发原因: 验证分层指标稳定性",
+    "[2026-06-07 16:34:47] 步骤3: 更新分层指标 - 快照 SNAP-20260601-001",
+    "[2026-06-07 16:34:47] 步骤3: 更新分层指标 - 快照 SNAP-20260601-002",
+    "[2026-06-07 16:34:47] 步骤3: 更新分层指标 - 快照 SNAP-20260601-003",
+    "[2026-06-07 16:34:47] 复盘报告已生成: demo_data/review_report.json",
+    "[2026-06-07 16:34:47] 可重跑命令已导出: demo_data/rerun_commands.sh"
+  ]
+}

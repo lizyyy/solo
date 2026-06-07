@@ -1,0 +1,9 @@
+{
+  "rerun_id": "RERUN-20260607163447",
+  "snapshot_id": "SNAP-20260601-001",
+  "rerun_time": "2026-06-07 16:34:47",
+  "trigger": "验证分层指标稳定性",
+  "before_tier": "green",
+  "after_tier": "green",
+  "command": "python run_pollution_check.py --snapshot SNAP-20260601-001 --rerun --threshold-version v1"
+}
