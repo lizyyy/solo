@@ -1,0 +1,47 @@
+[
+  {
+    "record_id": "rec_47eef7ab854a",
+    "result_id": "result_exp_bucket_2026_001_930bcfec",
+    "reviewer": "系统自动导入",
+    "decision": "pending",
+    "comment": "第一步：线上实验桶导入完成",
+    "reviewed_at": "2026-06-07 16:25:05.780552",
+    "step": 1
+  },
+  {
+    "record_id": "rec_439ea744daf6",
+    "result_id": "result_exp_bucket_2026_001_930bcfec",
+    "reviewer": "阿越",
+    "decision": "pending",
+    "comment": "第二步：负样本列表补录完成，已检测冲突",
+    "reviewed_at": "2026-06-07 16:25:05.781436",
+    "step": 2
+  },
+  {
+    "record_id": "rec_54b9ad7991eb",
+    "result_id": "result_exp_bucket_2026_001_930bcfec",
+    "reviewer": "阿越",
+    "decision": "pending",
+    "comment": "第三步：分层指标更新完成，等待人工确认",
+    "reviewed_at": "2026-06-07 16:25:05.782727",
+    "step": 3
+  },
+  {
+    "record_id": "rec_9c600abcab10",
+    "result_id": "result_exp_bucket_2026_001_930bcfec",
+    "reviewer": "阿越",
+    "decision": "needs_data_scientist",
+    "comment": "我看了下，样本s001标签确实错了，其他没问题（阈值不一致，自动转数据科学家）",
+    "reviewed_at": "2026-06-07 16:25:05.782827",
+    "step": 3
+  },
+  {
+    "record_id": "rec_8e518eb3112a",
+    "result_id": "result_exp_bucket_2026_001_930bcfec",
+    "reviewer": "数据科学家",
+    "decision": "confirmed",
+    "comment": "阈值0.6是对的，报告里的0.5是笔误，已修正。其他确认无误。",
+    "reviewed_at": "2026-06-07 16:25:05.784759",
+    "step": 4
+  }
+]

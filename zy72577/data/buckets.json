@@ -1,0 +1,71 @@
+[
+  {
+    "bucket_id": "exp_bucket_2026_001",
+    "name": "半监督伪标签实验桶-06月",
+    "imported_at": "2026-06-07 16:25:05.779658",
+    "imported_by": "系统自动导入",
+    "samples": [
+      {
+        "sample_id": "s001",
+        "predicted_label": 1,
+        "predicted_score": 0.85,
+        "true_label": null,
+        "source": "traffic_layer_a",
+        "model_version": "model_v2.3",
+        "params_version": "v2.3.1",
+        "params_reason": "选择v2.3.1版本参数，因在验证集上F1提升2.1%，牺牲1.5%召回率换更高精确率"
+      },
+      {
+        "sample_id": "s002",
+        "predicted_label": 1,
+        "predicted_score": 0.72,
+        "true_label": null,
+        "source": "traffic_layer_a",
+        "model_version": "model_v2.3",
+        "params_version": "v2.3.1",
+        "params_reason": "选择v2.3.1版本参数，因在验证集上F1提升2.1%，牺牲1.5%召回率换更高精确率"
+      },
+      {
+        "sample_id": "s003",
+        "predicted_label": 0,
+        "predicted_score": 0.31,
+        "true_label": null,
+        "source": "traffic_layer_b",
+        "model_version": "model_v2.3",
+        "params_version": "v2.3.1",
+        "params_reason": "选择v2.3.1版本参数，因在验证集上F1提升2.1%，牺牲1.5%召回率换更高精确率"
+      },
+      {
+        "sample_id": "s004",
+        "predicted_label": 1,
+        "predicted_score": 0.91,
+        "true_label": null,
+        "source": "traffic_layer_b",
+        "model_version": "model_v2.3",
+        "params_version": "v2.3.1",
+        "params_reason": "选择v2.3.1版本参数，因在验证集上F1提升2.1%，牺牲1.5%召回率换更高精确率"
+      },
+      {
+        "sample_id": "s005",
+        "predicted_label": 0,
+        "predicted_score": 0.22,
+        "true_label": null,
+        "source": "traffic_layer_a",
+        "model_version": "model_v2.3",
+        "params_version": "v2.3.1",
+        "params_reason": "选择v2.3.1版本参数，因在验证集上F1提升2.1%，牺牲1.5%召回率换更高精确率"
+      }
+    ],
+    "threshold_history": [
+      {
+        "threshold": 0.6,
+        "report_value": 0.5,
+        "changed_at": "2026-06-07 16:25:05.779667",
+        "changed_by": "系统自动导入",
+        "reason": "初始导入阈值配置"
+      }
+    ],
+    "current_threshold": 0.6,
+    "is_supplemented": true
+  }
+]

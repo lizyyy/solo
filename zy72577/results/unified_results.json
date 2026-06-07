@@ -1,0 +1,175 @@
+[
+  {
+    "result_id": "result_exp_bucket_2026_001_930bcfec",
+    "generated_at": "2026-06-07 16:25:05.780174",
+    "experiment_bucket_id": "exp_bucket_2026_001",
+    "samples": [
+      {
+        "sample_id": "s001",
+        "predicted_label": 1,
+        "predicted_score": 0.85,
+        "true_label": 0,
+        "source": "traffic_layer_a",
+        "model_version": "model_v2.3",
+        "params_version": "v2.3.1",
+        "params_reason": "选择v2.3.1版本参数，因在验证集上F1提升2.1%，牺牲1.5%召回率换更高精确率"
+      },
+      {
+        "sample_id": "s002",
+        "predicted_label": 1,
+        "predicted_score": 0.72,
+        "true_label": 1,
+        "source": "traffic_layer_a",
+        "model_version": "model_v2.3",
+        "params_version": "v2.3.1",
+        "params_reason": "选择v2.3.1版本参数，因在验证集上F1提升2.1%，牺牲1.5%召回率换更高精确率"
+      },
+      {
+        "sample_id": "s003",
+        "predicted_label": 0,
+        "predicted_score": 0.31,
+        "true_label": 0,
+        "source": "traffic_layer_b",
+        "model_version": "model_v2.3",
+        "params_version": "v2.3.1",
+        "params_reason": "选择v2.3.1版本参数，因在验证集上F1提升2.1%，牺牲1.5%召回率换更高精确率"
+      },
+      {
+        "sample_id": "s004",
+        "predicted_label": 1,
+        "predicted_score": 0.91,
+        "true_label": null,
+        "source": "traffic_layer_b",
+        "model_version": "model_v2.3",
+        "params_version": "v2.3.1",
+        "params_reason": "选择v2.3.1版本参数，因在验证集上F1提升2.1%，牺牲1.5%召回率换更高精确率"
+      },
+      {
+        "sample_id": "s005",
+        "predicted_label": 0,
+        "predicted_score": 0.22,
+        "true_label": null,
+        "source": "traffic_layer_a",
+        "model_version": "model_v2.3",
+        "params_version": "v2.3.1",
+        "params_reason": "选择v2.3.1版本参数，因在验证集上F1提升2.1%，牺牲1.5%召回率换更高精确率"
+      }
+    ],
+    "stratified_metrics": {
+      "traffic_layer_a": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6666666666666666,
+        "accuracy": 0.3333333333333333,
+        "total_samples": 3,
+        "tp": 1,
+        "fp": 1,
+        "fn": 0,
+        "tn": 0
+      },
+      "traffic_layer_b": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "accuracy": 0.5,
+        "total_samples": 2,
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "tn": 1
+      }
+    },
+    "threshold": 0.6,
+    "threshold_report_value": 0.5,
+    "self_check_results": [
+      {
+        "check_name": "duplicate_import",
+        "passed": true,
+        "message": "无重复导入",
+        "details": {
+          "duplicate_count": 1
+        }
+      },
+      {
+        "check_name": "threshold_report_mismatch",
+        "passed": false,
+        "message": "阈值改过但报告仍写旧值: 实际=0.6, 报告=0.5",
+        "details": {
+          "actual_threshold": 0.6,
+          "report_threshold": 0.5,
+          "needs_data_scientist": true
+        }
+      },
+      {
+        "check_name": "recalc_after_supplement",
+        "passed": true,
+        "message": "已补录负样本并重新计算",
+        "details": {
+          "is_supplemented": true
+        }
+      },
+      {
+        "check_name": "export_consistency",
+        "passed": true,
+        "message": "明细、页面、接口使用同一份结果数据",
+        "details": {
+          "data_hash": "e44c42091897875abcb07f64b5c7f261",
+          "unified_source": true,
+          "result_id": "result_exp_bucket_2026_001_930bcfec"
+        }
+      }
+    ],
+    "conflicts": [
+      {
+        "sample_id": "s001",
+        "conflict_type": "label_mismatch",
+        "experiment_value": 1,
+        "negative_value": 0,
+        "description": "实验桶预测标签=1，负样本列表真实标签=0"
+      },
+      {
+        "sample_id": "s001",
+        "conflict_type": "threshold_mismatch",
+        "experiment_value": 0.6,
+        "negative_value": 0.5,
+        "description": "阈值实际=0.6，但报告写=0.5，需要数据科学家复核"
+      },
+      {
+        "sample_id": "s002",
+        "conflict_type": "threshold_mismatch",
+        "experiment_value": 0.6,
+        "negative_value": 0.5,
+        "description": "阈值实际=0.6，但报告写=0.5，需要数据科学家复核"
+      },
+      {
+        "sample_id": "s003",
+        "conflict_type": "threshold_mismatch",
+        "experiment_value": 0.6,
+        "negative_value": 0.5,
+        "description": "阈值实际=0.6，但报告写=0.5，需要数据科学家复核"
+      },
+      {
+        "sample_id": "s005",
+        "conflict_type": "sample_missing",
+        "experiment_value": "存在",
+        "negative_value": "缺失",
+        "description": "样本在实验桶中存在，但负样本列表中缺失"
+      },
+      {
+        "sample_id": "s004",
+        "conflict_type": "sample_missing",
+        "experiment_value": "存在",
+        "negative_value": "缺失",
+        "description": "样本在实验桶中存在，但负样本列表中缺失"
+      }
+    ],
+    "review_status": "confirmed",
+    "reviewer": "阿越",
+    "reviewed_at": "2026-06-07 16:25:05.784706",
+    "review_comment": "我看了下，样本s001标签确实错了，其他没问题（注意：存在阈值不一致，已转数据科学家复核，请勿直接归为正常）",
+    "needs_data_scientist": false,
+    "data_scientist_comment": "阈值0.6是对的，报告里的0.5是笔误，已修正。其他确认无误。",
+    "params_version": "v2.3.1",
+    "params_reason": "选择v2.3.1版本参数，因在验证集上F1提升2.1%，牺牲1.5%召回率换更高精确率"
+  }
+]
