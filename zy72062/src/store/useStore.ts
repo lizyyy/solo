@@ -35,10 +35,10 @@ interface AppState {
   setSelectedEntityId: (id: string | null) => void
   setAnomalyFilter: (filter: AnomalyType | null) => void
   importData: (data: {
-    entities?: Omit<Entity, 'id'>[]
-    equityLinks?: Omit<EquityLink, 'id'>[]
+    entities?: Entity[]
+    equityLinks?: EquityLink[]
     sourceFile: string
-  }) => void
+  }) => { idMap: Map<string, string>; entities: Entity[] }
   mergeEntities: (sourceId: string, targetId: string) => void
   exportData: () => {
     entities: Entity[]
@@ -46,6 +46,7 @@ interface AppState {
     supplements: Supplement[]
     equityLinks: EquityLink[]
   }
+  resetData: () => void
 }
 
 export const useStore = create<AppState>()(
@@ -205,13 +206,17 @@ export const useStore = create<AppState>()(
       },
 
       importData: (data) => {
-        const newEntities: Entity[] = (data.entities ?? []).map((e) => ({
-          ...e,
-          id: crypto.randomUUID(),
-        }))
+        const idMap = new Map<string, string>()
+        const newEntities: Entity[] = (data.entities ?? []).map((e) => {
+          const newId = crypto.randomUUID()
+          idMap.set(e.id, newId)
+          return { ...e, id: newId }
+        })
         const newLinks: EquityLink[] = (data.equityLinks ?? []).map((l) => ({
           ...l,
           id: crypto.randomUUID(),
+          sourceId: idMap.get(l.sourceId) ?? l.sourceId,
+          targetId: idMap.get(l.targetId) ?? l.targetId,
         }))
         set((state) => ({
           entities: [...state.entities, ...newEntities],
@@ -222,6 +227,7 @@ export const useStore = create<AppState>()(
           targetId: data.sourceFile,
           detail: `导入数据: ${newEntities.length} 个实体, ${newLinks.length} 条股权关系`,
         })
+        return { idMap, entities: newEntities }
       },
 
       mergeEntities: (sourceId, targetId) => {
@@ -258,6 +264,25 @@ export const useStore = create<AppState>()(
       exportData: () => {
         const { entities, anomalies, supplements, equityLinks } = get()
         return { entities, anomalies, supplements, equityLinks }
+      },
+
+      resetData: () => {
+        set({
+          entities: [],
+          anomalies: [],
+          supplements: [],
+          operationLogs: [],
+          viewSnapshots: [],
+          equityLinks: [],
+          currentView: { zoom: 1, panX: 0, panY: 0 },
+          selectedEntityId: null,
+          anomalyFilter: null,
+        })
+        get().addOperationLog({
+          action: 'import',
+          targetId: 'reset',
+          detail: '重置所有数据',
+        })
       },
     }),
     {

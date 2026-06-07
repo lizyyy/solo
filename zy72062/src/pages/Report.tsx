@@ -61,6 +61,7 @@ export default function Report() {
   const operationLogs = useStore((s) => s.operationLogs)
   const updateAnomalyStatus = useStore((s) => s.updateAnomalyStatus)
   const exportData = useStore((s) => s.exportData)
+  const resetData = useStore((s) => s.resetData)
 
   const [expandedSources, setExpandedSources] = useState<Set<string>>(new Set())
   const [expandedTimeline, setExpandedTimeline] = useState(false)
@@ -115,12 +116,20 @@ export default function Report() {
     <div className="min-h-screen bg-[#0f1219] text-gray-200 p-6 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-[#d4a543]">审计报告</h1>
-        <button
-          onClick={handleExport}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#d4a543]/15 text-[#d4a543] hover:bg-[#d4a543]/25 transition-colors"
-        >
-          <Download size={16} /> 导出JSON
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => { if (confirm('确定要重置所有数据吗？此操作不可撤销。')) resetData() }}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-900/30 text-red-400 hover:bg-red-900/50 transition-colors text-sm"
+          >
+            重置数据
+          </button>
+          <button
+            onClick={handleExport}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#d4a543]/15 text-[#d4a543] hover:bg-[#d4a543]/25 transition-colors"
+          >
+            <Download size={16} /> 导出JSON
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">

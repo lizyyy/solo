@@ -208,13 +208,19 @@ export default function StarMap() {
   }, [entitiesKey, linksKey, anomalyKey])
 
   const handleImport = () => {
-    importData({
-      entities: mockEntities.map(({ id: _id, ...rest }) => rest),
-      equityLinks: mockEquityLinks.map(({ id: _id, ...rest }) => rest),
+    const result = importData({
+      entities: mockEntities,
+      equityLinks: mockEquityLinks,
       sourceFile: '材料包A-股权数据.xlsx',
     })
+    const idMap = result.idMap
     const detected = runAllDetections(mockEntities, '材料包A-股权数据.xlsx')
-    detected.forEach((a) => addAnomaly(a))
+    detected.forEach((a) => {
+      addAnomaly({
+        ...a,
+        entityId: idMap.get(a.entityId) ?? a.entityId,
+      })
+    })
   }
 
   const handleSaveView = () => {

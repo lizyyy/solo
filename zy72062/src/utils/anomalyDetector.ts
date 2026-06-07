@@ -89,9 +89,13 @@ export function detectDuplicateNames(
 
       const dist = levenshtein(a.name, b.name)
       const contains =
-        a.name.includes(b.name) || b.name.includes(a.name)
+        (a.name.includes(b.name) && Math.abs(a.name.length - b.name.length) >= 2) ||
+        (b.name.includes(a.name) && Math.abs(a.name.length - b.name.length) >= 2)
 
-      if (dist < 3 || contains) {
+      const exactOrNear = dist <= 1
+      const isDuplicate = exactOrNear || contains
+
+      if (isDuplicate) {
         reported.add(key)
         anomalies.push(
           createAnomaly(
