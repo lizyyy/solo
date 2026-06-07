@@ -29,17 +29,23 @@ class FractalPattern:
     unit: Optional[UnitType] = None
     color_palette: Optional[str] = None
     complexity_score: Optional[float] = None
-    
+
     def to_dict(self) -> Dict[str, Any]:
         data = asdict(self)
         if self.unit:
             data['unit'] = self.unit.value
         return data
-    
+
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'FractalPattern':
-        if data.get('unit'):
-            data['unit'] = UnitType(data['unit'])
+        if not isinstance(data, dict):
+            raise ValueError(f"FractalPattern.from_dict 期望 dict，收到 {type(data).__name__}")
+        data = dict(data)
+        if data.get('unit') and isinstance(data['unit'], str):
+            try:
+                data['unit'] = UnitType(data['unit'])
+            except ValueError:
+                data['unit'] = None
         return cls(**data)
 
 
@@ -66,7 +72,7 @@ class FractalRecord:
     override_at: Optional[datetime] = None
     notes: Optional[str] = None
     raw_input: Dict[str, Any] = field(default_factory=dict)
-    
+
     def to_dict(self) -> Dict[str, Any]:
         return {
             'record_id': self.record_id,
@@ -83,14 +89,66 @@ class FractalRecord:
             'notes': self.notes,
             'raw_input': self.raw_input
         }
-    
+
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'FractalRecord':
-        data['pattern'] = FractalPattern.from_dict(data['pattern'])
-        data['status'] = FractalStatus(data['status'])
-        data['processed_at'] = datetime.fromisoformat(data['processed_at'])
-        data['created_at'] = datetime.fromisoformat(data['created_at'])
-        data['validation_issues'] = [ValidationIssue(**issue) for issue in data['validation_issues']]
-        if data.get('override_at'):
-            data['override_at'] = datetime.fromisoformat(data['override_at'])
+        if not isinstance(data, dict):
+            raise ValueError(f"FractalRecord.from_dict 期望 dict，收到 {type(data).__name__}")
+
+        data = dict(data)
+
+        pattern_data = data.get('pattern')
+        if isinstance(pattern_data, dict):
+            data['pattern'] = FractalPattern.from_dict(pattern_data)
+        elif isinstance(pattern_data, FractalPattern):
+            pass
+        else:
+            data['pattern'] = FractalPattern()
+
+        status_val = data.get('status')
+        if isinstance(status_val, str):
+            try:
+                data['status'] = FractalStatus(status_val)
+            except ValueError:
+                data['status'] = FractalStatus.ERROR
+        elif not isinstance(status_val, FractalStatus):
+            data['status'] = FractalStatus.ERROR
+
+        for dt_field in ('processed_at', 'created_at'):
+            val = data.get(dt_field)
+            if isinstance(val, str):
+                try:
+                    data[dt_field] = datetime.fromisoformat(val)
+                except (ValueError, TypeError):
+                    data[dt_field] = datetime.now()
+            elif not isinstance(val, datetime):
+                data[dt_field] = datetime.now()
+
+        override_at_val = data.get('override_at')
+        if isinstance(override_at_val, str):
+            try:
+                data['override_at'] = datetime.fromisoformat(override_at_val)
+            except (ValueError, TypeError):
+                data['override_at'] = None
+        elif not isinstance(override_at_val, datetime) and override_at_val is not None:
+            data['override_at'] = None
+
+        issues_data = data.get('validation_issues', [])
+        if isinstance(issues_data, list):
+            parsed_issues = []
+            for issue in issues_data:
+                if isinstance(issue, dict):
+                    try:
+                        parsed_issues.append(ValidationIssue(**issue))
+                    except Exception:
+                        pass
+                elif isinstance(issue, ValidationIssue):
+                    parsed_issues.append(issue)
+            data['validation_issues'] = parsed_issues
+        else:
+            data['validation_issues'] = []
+
+        if not isinstance(data.get('raw_input'), dict):
+            data['raw_input'] = {}
+
         return cls(**data)
