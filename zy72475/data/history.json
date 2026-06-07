@@ -1,0 +1,92 @@
+[
+  {
+    "history_id": "hist_f130665d076f",
+    "complaint_id": "TS20260001",
+    "field_name": "status",
+    "old_value": null,
+    "new_value": "pending_import",
+    "changed_by": "admin",
+    "changed_at": "2026-06-07T09:56:16.668825",
+    "change_reason": "初始导入"
+  },
+  {
+    "history_id": "hist_fd6dbf1d6b22",
+    "complaint_id": "TS20260002",
+    "field_name": "status",
+    "old_value": null,
+    "new_value": "pending_import",
+    "changed_by": "admin",
+    "changed_at": "2026-06-07T09:56:16.668861",
+    "change_reason": "初始导入"
+  },
+  {
+    "history_id": "hist_3b36da842dcf",
+    "complaint_id": "TS20260003",
+    "field_name": "status",
+    "old_value": null,
+    "new_value": "needs_review",
+    "changed_by": "admin",
+    "changed_at": "2026-06-07T09:56:16.668870",
+    "change_reason": "初始导入"
+  },
+  {
+    "history_id": "hist_9ee106a98127",
+    "complaint_id": "TS20260004",
+    "field_name": "status",
+    "old_value": null,
+    "new_value": "pending_import",
+    "changed_by": "admin",
+    "changed_at": "2026-06-07T09:56:16.668899",
+    "change_reason": "初始导入"
+  },
+  {
+    "history_id": "hist_3bde3cf18d22",
+    "complaint_id": "TS20260001",
+    "field_name": "status",
+    "old_value": "pending_import",
+    "new_value": "photo_reviewed",
+    "changed_by": "anning",
+    "changed_at": "2026-06-07T09:56:17.690901",
+    "change_reason": "城更项目经理补看路口照片"
+  },
+  {
+    "history_id": "hist_6da905b8f9d2",
+    "complaint_id": "TS20260001",
+    "field_name": "remark",
+    "old_value": "居民反映北门地下通道无导视牌",
+    "new_value": "照片确认2个缺口",
+    "changed_by": "anning",
+    "changed_at": "2026-06-07T09:56:17.691542",
+    "change_reason": "照片复核补充备注"
+  },
+  {
+    "history_id": "hist_ca8f5365dd41",
+    "complaint_id": "TS20260001",
+    "field_name": "remark",
+    "old_value": "照片确认2个缺口",
+    "new_value": "照片确认2个缺口，靠近北门",
+    "changed_by": "anning",
+    "changed_at": "2026-06-07T09:56:18.194610",
+    "change_reason": "补充位置说明"
+  },
+  {
+    "history_id": "hist_b258892596f0",
+    "complaint_id": "TS20260001",
+    "field_name": "status",
+    "old_value": "photo_reviewed",
+    "new_value": "summary_updated",
+    "changed_by": "anning",
+    "changed_at": "2026-06-07T09:56:18.644060",
+    "change_reason": "街道会看摘要已更新"
+  },
+  {
+    "history_id": "hist_95ec18334137",
+    "complaint_id": "TS20260001",
+    "field_name": "remark",
+    "old_value": "照片确认2个缺口，靠近北门",
+    "new_value": "已纳入本季度整改计划",
+    "changed_by": "anning",
+    "changed_at": "2026-06-07T09:56:18.647747",
+    "change_reason": "街道会看摘要补充"
+  }
+]

@@ -1,0 +1,58 @@
+{
+  "TS20260001": {
+    "complaint_id": "TS20260001",
+    "community_name": "阳光花园",
+    "original_line_number": 2,
+    "import_timestamp": "2026-06-07T09:56:16.668785",
+    "gap_count": 2,
+    "status": "summary_updated",
+    "remark": "已纳入本季度整改计划",
+    "created_by": "admin",
+    "updated_by": "anning",
+    "updated_at": "2026-06-07T09:56:18.647752",
+    "flags": {}
+  },
+  "TS20260002": {
+    "complaint_id": "TS20260002",
+    "community_name": "翠苑小区",
+    "original_line_number": 3,
+    "import_timestamp": "2026-06-07T09:56:16.668785",
+    "gap_count": 3,
+    "status": "pending_import",
+    "remark": "三处出入口均缺失导视",
+    "created_by": "admin",
+    "updated_by": "admin",
+    "updated_at": "2026-06-07T09:56:16.668785",
+    "flags": {}
+  },
+  "TS20260003": {
+    "complaint_id": "TS20260003",
+    "community_name": "阳光花园一期",
+    "original_line_number": 4,
+    "import_timestamp": "2026-06-07T09:56:16.668785",
+    "gap_count": 1,
+    "status": "needs_review",
+    "remark": "西门地下通道导视模糊",
+    "created_by": "admin",
+    "updated_by": "admin",
+    "updated_at": "2026-06-07T09:56:16.668785",
+    "flags": {
+      "possible_duplicate_community": true,
+      "matched_with": "TS20260001",
+      "match_reason": "精确匹配别名映射"
+    }
+  },
+  "TS20260004": {
+    "complaint_id": "TS20260004",
+    "community_name": "和平家园",
+    "original_line_number": 5,
+    "import_timestamp": "2026-06-07T09:56:16.668785",
+    "gap_count": 2,
+    "status": "pending_import",
+    "remark": "两处通道无方向指示",
+    "created_by": "admin",
+    "updated_by": "admin",
+    "updated_at": "2026-06-07T09:56:16.668785",
+    "flags": {}
+  }
+}

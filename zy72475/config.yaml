@@ -1,0 +1,45 @@
+boundary_rules:
+  same_community_detection:
+    enabled: true
+    similarity_threshold: 0.8
+    alias_mapping:
+      "阳光花园": "阳光花园一期"
+      "阳光花园二期": "阳光花园二期"
+      "翠苑小区": "翠苑社区"
+      "翠苑社区": "翠苑社区"
+
+  status_workflow:
+    initial: "pending_import"
+    steps:
+      pending_import:
+        next: ["photo_reviewed"]
+        allowed_roles: ["admin", "project_manager"]
+      photo_reviewed:
+        next: ["summary_updated", "needs_review"]
+        allowed_roles: ["project_manager"]
+      needs_review:
+        next: ["summary_updated", "rejected"]
+        allowed_roles: ["inspector"]
+      summary_updated:
+        next: []
+        allowed_roles: ["project_manager"]
+      rejected:
+        next: ["photo_reviewed"]
+        allowed_roles: ["project_manager"]
+
+  fields:
+    immutable_after_import:
+      - complaint_id
+      - original_line_number
+      - import_timestamp
+    track_history:
+      - community_name
+      - status
+      - remark
+      - gap_count
+
+data_paths:
+  complaints_db: "data/complaints.json"
+  history_db: "data/history.json"
+  import_dir: "imports/"
+  export_dir: "exports/"
