@@ -1,0 +1,56 @@
+[
+  {
+    "batch_id": "GRAY_20260601_001",
+    "name": "2026年6月第1批灰度-客服知识片段",
+    "records": [
+      {
+        "session_id": "SESS_001",
+        "knowledge_id": "K_001",
+        "original_question": "退款多久到账？",
+        "current_answer": "亲，退款一般3-5个工作日到账哦，请耐心等待~",
+        "status": "pending",
+        "raw_text": "",
+        "created_at": "2026-06-07 13:03:34"
+      },
+      {
+        "session_id": "SESS_002",
+        "knowledge_id": "K_002",
+        "original_question": "怎么联系人工客服？",
+        "current_answer": "您可以拨打我们的客服电话13812345678，工作时间9:00-18:00",
+        "status": "pending",
+        "raw_text": "",
+        "created_at": "2026-06-07 13:03:34"
+      },
+      {
+        "session_id": "SESS_003",
+        "knowledge_id": "K_003",
+        "original_question": "会员有什么权益？",
+        "current_answer": "旧版会员可享受95折优惠，还有积分兑换活动",
+        "status": "pending",
+        "raw_text": "",
+        "created_at": "2026-06-07 13:03:34"
+      },
+      {
+        "session_id": "SESS_004",
+        "knowledge_id": "K_004",
+        "original_question": "物流几天能到？",
+        "current_answer": "一般发货后3-4天送达，偏远地区可能延迟",
+        "status": "pending",
+        "raw_text": "",
+        "created_at": "2026-06-07 13:03:34"
+      },
+      {
+        "session_id": "SESS_005",
+        "knowledge_id": "K_005",
+        "original_question": "发票怎么开？",
+        "current_answer": "下单后联系客服开票，需要提供开票信息",
+        "status": "pending",
+        "raw_text": "",
+        "created_at": "2026-06-07 13:03:34"
+      }
+    ],
+    "created_by": "算法平台",
+    "created_at": "2026-06-07 13:03:34",
+    "processed": true
+  }
+]

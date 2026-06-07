@@ -1,0 +1,38 @@
+[
+  {
+    "annotation_id": "ANN_001",
+    "session_id": "SESS_003",
+    "knowledge_id": "K_003",
+    "annotator": "小李",
+    "on_site_statement": "现场确认：最新口径已经改成会员权益升级了，现在是9折+免运费，之前的旧版规则已变更，这是现场说法哦",
+    "old_answer": "旧版会员可享受95折优惠",
+    "remark": "5月刚更新的政策，知识库还没同步",
+    "created_at": "2026-06-07 13:03:34",
+    "reviewed_by": "周姐",
+    "reviewed_at": "2026-06-07 13:03:34"
+  },
+  {
+    "annotation_id": "ANN_002",
+    "session_id": "SESS_004",
+    "knowledge_id": "K_004",
+    "annotator": "小王",
+    "on_site_statement": "618期间物流调整了，实际操作是发货后5-7天送达，最新口径已调整",
+    "old_answer": null,
+    "remark": "大促期间物流时效变化",
+    "created_at": "2026-06-07 13:03:34",
+    "reviewed_by": "周姐",
+    "reviewed_at": "2026-06-07 13:03:34"
+  },
+  {
+    "annotation_id": "ANN_003",
+    "session_id": "SESS_005",
+    "knowledge_id": "K_005",
+    "annotator": "小张",
+    "on_site_statement": "现场说法：开票政策改了，现在可以自助开票，不需要联系客服了，最新口径已更新",
+    "old_answer": "下单后联系客服开票",
+    "remark": "开票系统升级后流程变了",
+    "created_at": "2026-06-07 13:03:34",
+    "reviewed_by": "周姐",
+    "reviewed_at": "2026-06-07 13:03:34"
+  }
+]

@@ -1,0 +1,188 @@
+[
+  {
+    "result_id": "res_9ff97442",
+    "batch_id": "GRAY_20260601_001",
+    "session_id": "SESS_001",
+    "knowledge_id": "K_001",
+    "original_question": "退款多久到账？",
+    "current_answer": "亲，退款一般3-5个工作日到账哦，请耐心等待~",
+    "annotation_remark": "",
+    "on_site_statement": "",
+    "alert_status": "正常",
+    "desensitization_status": "脱敏通过",
+    "evidence_source": "灰度批次",
+    "processed_by": "system",
+    "processed_at": "2026-06-07 13:03:34",
+    "version": 1,
+    "history": [
+      {
+        "action": "首次检测通过",
+        "operator": "system",
+        "detail": "脱敏和知识口径均正常",
+        "time": "2026-06-07 13:03:34",
+        "version": 1
+      }
+    ],
+    "raw_phone_found": [],
+    "created_at": "2026-06-07 13:03:34"
+  },
+  {
+    "result_id": "res_d8e3fc73",
+    "batch_id": "GRAY_20260601_001",
+    "session_id": "SESS_002",
+    "knowledge_id": "K_002",
+    "original_question": "怎么联系人工客服？",
+    "current_answer": "您可以拨打我们的客服电话13812345678，工作时间9:00-18:00",
+    "annotation_remark": "",
+    "on_site_statement": "",
+    "alert_status": "待算法复核",
+    "desensitization_status": "手机号漏遮",
+    "evidence_source": "灰度批次",
+    "processed_by": "system",
+    "processed_at": "2026-06-07 13:03:34",
+    "version": 1,
+    "history": [
+      {
+        "action": "检测到手机号漏遮",
+        "operator": "system",
+        "detail": "发现1个未脱敏手机号: ['13812345678']",
+        "time": "2026-06-07 13:03:34",
+        "version": 1
+      }
+    ],
+    "raw_phone_found": [
+      "13812345678"
+    ],
+    "created_at": "2026-06-07 13:03:34"
+  },
+  {
+    "result_id": "res_fbbacd49",
+    "batch_id": "GRAY_20260601_001",
+    "session_id": "SESS_003",
+    "knowledge_id": "K_003",
+    "original_question": "会员有什么权益？",
+    "current_answer": "旧版会员可享受95折优惠，还有积分兑换活动",
+    "annotation_remark": "5月刚更新的政策，知识库还没同步",
+    "on_site_statement": "现场确认：最新口径已经改成会员权益升级了，现在是9折+免运费，之前的旧版规则已变更，这是现场说法哦",
+    "alert_status": "知识过期",
+    "desensitization_status": "脱敏通过",
+    "evidence_source": "双证据",
+    "processed_by": "周姐",
+    "processed_at": "2026-06-07 13:03:34",
+    "version": 2,
+    "history": [
+      {
+        "action": "检测到知识过期",
+        "operator": "system",
+        "detail": "答案中包含过期标识: 旧版",
+        "time": "2026-06-07 13:03:34",
+        "version": 1
+      },
+      {
+        "action": "补录标注员留言",
+        "operator": "周姐",
+        "detail": "标注员: 小李, 现场说法: 现场确认：最新口径已经改成会员权益升级了，现在是9折+免运费，之前的旧版规则已变更，这是现场说法哦...",
+        "time": "2026-06-07 13:03:34",
+        "version": 1
+      },
+      {
+        "action": "标注员留言触发过期预警",
+        "operator": "周姐",
+        "detail": "标注员留言提示有新口径: 现场确认",
+        "time": "2026-06-07 13:03:34",
+        "version": 1
+      }
+    ],
+    "raw_phone_found": [],
+    "created_at": "2026-06-07 13:03:34"
+  },
+  {
+    "result_id": "res_05143c05",
+    "batch_id": "GRAY_20260601_001",
+    "session_id": "SESS_004",
+    "knowledge_id": "K_004",
+    "original_question": "物流几天能到？",
+    "current_answer": "一般发货后3-4天送达，偏远地区可能延迟",
+    "annotation_remark": "大促期间物流时效变化",
+    "on_site_statement": "618期间物流调整了，实际操作是发货后5-7天送达，最新口径已调整",
+    "alert_status": "知识过期",
+    "desensitization_status": "脱敏通过",
+    "evidence_source": "双证据",
+    "processed_by": "周姐",
+    "processed_at": "2026-06-07 13:03:34",
+    "version": 2,
+    "history": [
+      {
+        "action": "首次检测通过",
+        "operator": "system",
+        "detail": "脱敏和知识口径均正常",
+        "time": "2026-06-07 13:03:34",
+        "version": 1
+      },
+      {
+        "action": "补录标注员留言",
+        "operator": "周姐",
+        "detail": "标注员: 小王, 现场说法: 618期间物流调整了，实际操作是发货后5-7天送达，最新口径已调整...",
+        "time": "2026-06-07 13:03:34",
+        "version": 1
+      },
+      {
+        "action": "标注员留言触发过期预警",
+        "operator": "周姐",
+        "detail": "标注员留言提示有新口径: 实际操作",
+        "time": "2026-06-07 13:03:34",
+        "version": 1
+      }
+    ],
+    "raw_phone_found": [],
+    "created_at": "2026-06-07 13:03:34"
+  },
+  {
+    "result_id": "res_3acd2d3b",
+    "batch_id": "GRAY_20260601_001",
+    "session_id": "SESS_005",
+    "knowledge_id": "K_005",
+    "original_question": "发票怎么开？",
+    "current_answer": "您好，现在可以自助开票啦！进入订单详情，点击'申请开票'按钮即可，电子发票10分钟内发送到您的邮箱~",
+    "annotation_remark": "开票系统升级后流程变了",
+    "on_site_statement": "现场说法：开票政策改了，现在可以自助开票，不需要联系客服了，最新口径已更新",
+    "alert_status": "返工修正",
+    "desensitization_status": "脱敏通过",
+    "evidence_source": "双证据",
+    "processed_by": "周姐",
+    "processed_at": "2026-06-07 13:03:34",
+    "version": 3,
+    "history": [
+      {
+        "action": "首次检测通过",
+        "operator": "system",
+        "detail": "脱敏和知识口径均正常",
+        "time": "2026-06-07 13:03:34",
+        "version": 1
+      },
+      {
+        "action": "补录标注员留言",
+        "operator": "周姐",
+        "detail": "标注员: 小张, 现场说法: 现场说法：开票政策改了，现在可以自助开票，不需要联系客服了，最新口径已更新...",
+        "time": "2026-06-07 13:03:34",
+        "version": 1
+      },
+      {
+        "action": "标注员留言触发过期预警",
+        "operator": "周姐",
+        "detail": "标注员留言提示有新口径: 最新口径",
+        "time": "2026-06-07 13:03:34",
+        "version": 1
+      },
+      {
+        "action": "返工处理",
+        "operator": "周姐",
+        "detail": "原状态: 知识过期, 标注员: 小张, 现场说法补充后重新判定",
+        "time": "2026-06-07 13:03:34",
+        "version": 2
+      }
+    ],
+    "raw_phone_found": [],
+    "created_at": "2026-06-07 13:03:34"
+  }
+]

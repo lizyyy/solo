@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客服知识片段过期预警 - 小看板</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #333; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { font-size: 22px; font-weight: 600; }
+        .header .subtitle { font-size: 13px; opacity: 0.9; margin-top: 4px; }
+        .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+        .btn-primary { background: white; color: #667eea; font-weight: 500; }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+        .btn-success { background: #52c41a; color: white; }
+        .btn-warning { background: #faad14; color: white; }
+        .btn-danger { background: #ff4d4f; color: white; }
+        .btn-small { padding: 4px 10px; font-size: 12px; }
+
+        .container { max-width: 1400px; margin: 24px auto; padding: 0 20px; }
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .stat-card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .stat-card .label { font-size: 13px; color: #888; margin-bottom: 8px; }
+        .stat-card .value { font-size: 28px; font-weight: 600; }
+        .stat-card .value.normal { color: #52c41a; }
+        .stat-card .value.expired { color: #faad14; }
+        .stat-card .value.review { color: #ff4d4f; }
+        .stat-card .value.reworked { color: #722ed1; }
+
+        .main-grid { display: grid; grid-template-columns: 350px 1fr; gap: 20px; }
+        .panel { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .panel h3 { font-size: 16px; margin-bottom: 16px; color: #333; padding-bottom: 12px; border-bottom: 1px solid #eee; }
+
+        .batch-list { list-style: none; }
+        .batch-item { padding: 12px; border-radius: 6px; cursor: pointer; margin-bottom: 8px; border: 1px solid #eee; transition: all 0.2s; }
+        .batch-item:hover { background: #f0f5ff; border-color: #667eea; }
+        .batch-item.active { background: #e6f7ff; border-color: #1890ff; }
+        .batch-item .name { font-weight: 500; font-size: 14px; }
+        .batch-item .meta { font-size: 12px; color: #888; margin-top: 4px; }
+        .batch-item .tag { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; margin-left: 8px; }
+        .tag-processed { background: #f6ffed; color: #52c41a; }
+        .tag-pending { background: #fff7e6; color: #faad14; }
+
+        .result-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .result-table th { background: #fafafa; padding: 12px; text-align: left; font-weight: 500; border-bottom: 1px solid #eee; }
+        .result-table td { padding: 12px; border-bottom: 1px solid #f0f0f0; }
+        .result-table tr:hover { background: #fafafa; }
+        .status-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; }
+        .status-正常 { background: #f6ffed; color: #52c41a; }
+        .status-知识过期 { background: #fff7e6; color: #faad14; }
+        .status-待算法复核 { background: #fff1f0; color: #ff4d4f; }
+        .status-已更新口径 { background: #e6f7ff; color: #1890ff; }
+        .status-返工修正 { background: #f9f0ff; color: #722ed1; }
+        .desens-脱敏通过 { background: #f6ffed; color: #52c41a; }
+        .desens-手机号漏遮 { background: #fff1f0; color: #ff4d4f; }
+        .desens-已修复 { background: #e6f7ff; color: #1890ff; }
+        .evidence-灰度批次 { background: #e6f7ff; color: #1890ff; }
+        .evidence-标注员留言 { background: #fff7e6; color: #faad14; }
+        .evidence-双证据 { background: #f6ffed; color: #52c41a; }
+
+        .detail-view { margin-top: 20px; }
+        .detail-row { display: grid; grid-template-columns: 120px 1fr; gap: 12px; padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
+        .detail-row .label { color: #888; font-size: 13px; }
+        .detail-row .value { font-size: 13px; line-height: 1.6; }
+        .history-list { margin-top: 12px; }
+        .history-item { padding: 10px; background: #fafafa; border-radius: 6px; margin-bottom: 8px; font-size: 12px; }
+        .history-item .time { color: #888; margin-bottom: 4px; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: white; border-radius: 10px; padding: 24px; width: 500px; max-width: 90%; }
+        .modal h3 { margin-bottom: 16px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 500; }
+        .form-group input, .form-group textarea { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+        .form-group textarea { min-height: 80px; resize: vertical; }
+        .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+        .btn-default { background: #f0f0f0; color: #333; }
+
+        .phone-alert { background: #fff1f0; border: 1px solid #ffa39e; padding: 10px; border-radius: 6px; margin-bottom: 12px; font-size: 13px; color: #cf1322; }
+        .action-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1>🔔 客服知识片段过期预警</h1>
+            <div class="subtitle">灰度批次 + 标注员留言 · 双证据联动</div>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn btn-primary" onclick="loadDemo()">📦 加载演示数据</button>
+            <button class="btn btn-success" onclick="exportData()">📥 导出脱敏结果</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="label">总记录数</div>
+                <div class="value" id="stat-total">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">正常</div>
+                <div class="value normal" id="stat-normal">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">知识过期</div>
+                <div class="value expired" id="stat-expired">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">待算法复核</div>
+                <div class="value review" id="stat-review">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">返工修正</div>
+                <div class="value reworked" id="stat-reworked">0</div>
+            </div>
+        </div>
+
+        <div class="main-grid">
+            <div class="panel">
+                <h3>📦 灰度批次</h3>
+                <ul class="batch-list" id="batch-list"></ul>
+                <div style="margin-top: 16px;">
+                    <button class="btn btn-small btn-primary" onclick="processBatch()">▶ 处理选中批次</button>
+                    <button class="btn btn-small btn-warning" onclick="rerunBatch()">🔄 重跑批次</button>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h3>📋 预警结果 <span id="result-count" style="font-size: 13px; color: #888; font-weight: normal;"></span></h3>
+                <div style="overflow-x: auto;">
+                    <table class="result-table">
+                        <thead>
+                            <tr>
+                                <th>会话ID</th>
+                                <th>原始问题</th>
+                                <th>预警状态</th>
+                                <th>脱敏状态</th>
+                                <th>证据来源</th>
+                                <th>版本</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="result-list"></tbody>
+                    </table>
+                </div>
+
+                <div class="detail-view" id="detail-view" style="display: none;">
+                    <h4 style="margin: 20px 0 12px;">📝 详情</h4>
+                    <div id="detail-content"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="annotation-modal">
+        <div class="modal">
+            <h3>补录标注员留言</h3>
+            <div class="form-group">
+                <label>标注员</label>
+                <input type="text" id="ann-annotator" value="小李">
+            </div>
+            <div class="form-group">
+                <label>现场说法</label>
+                <textarea id="ann-onsite" placeholder="输入现场确认的最新口径..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>备注</label>
+                <textarea id="ann-remark" placeholder="可选备注..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" onclick="closeModal('annotation-modal')">取消</button>
+                <button class="btn btn-primary" onclick="submitAnnotation()">提交</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="fix-modal">
+        <div class="modal">
+            <h3>修复脱敏 / 更新口径</h3>
+            <div class="form-group">
+                <label>修正后的答案</label>
+                <textarea id="fix-answer" placeholder="输入脱敏并修正后的答案..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" onclick="closeModal('fix-modal')">取消</button>
+                <button class="btn btn-success" onclick="submitFix()">提交修复</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentBatchId = null;
+        let currentResultId = null;
+        let allResults = [];
+
+        async function fetchStats() {
+            const res = await fetch('/api/stats');
+            const data = await res.json();
+            document.getElementById('stat-total').textContent = data.total;
+            document.getElementById('stat-normal').textContent = data.alert_status['正常'] || 0;
+            document.getElementById('stat-expired').textContent = data.alert_status['知识过期'] || 0;
+            document.getElementById('stat-review').textContent = data.alert_status['待算法复核'] || 0;
+            document.getElementById('stat-reworked').textContent = data.alert_status['返工修正'] || 0;
+        }
+
+        async function fetchBatches() {
+            const res = await fetch('/api/batches');
+            const data = await res.json();
+            const list = document.getElementById('batch-list');
+            list.innerHTML = data.map(b => `
+                <li class="batch-item ${b.batch_id === currentBatchId ? 'active' : ''}" onclick="selectBatch('${b.batch_id}')">
+                    <div class="name">${b.name}
+                        <span class="tag ${b.processed ? 'tag-processed' : 'tag-pending'}">${b.processed ? '已处理' : '待处理'}</span>
+                    </div>
+                    <div class="meta">${b.batch_id} · ${b.record_count}条记录 · ${b.created_at}</div>
+                </li>
+            `).join('');
+        }
+
+        async function fetchResults(batchId = null) {
+            const url = batchId ? `/api/results?batch_id=${batchId}` : '/api/results';
+            const res = await fetch(url);
+            allResults = await res.json();
+            document.getElementById('result-count').textContent = `(共${allResults.length}条)`;
+            renderResults(allResults);
+        }
+
+        function renderResults(results) {
+            const tbody = document.getElementById('result-list');
+            tbody.innerHTML = results.map(r => `
+                <tr>
+                    <td>${r.session_id}</td>
+                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${r.original_question}">${r.original_question}</td>
+                    <td><span class="status-badge status-${r.alert_status}">${r.alert_status}</span></td>
+                    <td><span class="status-badge desens-${r.desensitization_status}">${r.desensitization_status}</span></td>
+                    <td><span class="status-badge evidence-${r.evidence_source}">${r.evidence_source}</span></td>
+                    <td>v${r.version}</td>
+                    <td>
+                        <button class="btn btn-small btn-primary" onclick="showDetail('${r.result_id}')">查看</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function selectBatch(batchId) {
+            currentBatchId = batchId;
+            fetchBatches();
+            fetchResults(batchId);
+        }
+
+        async function showDetail(resultId) {
+            currentResultId = resultId;
+            const res = await fetch(`/api/results/${resultId}`);
+            const r = await res.json();
+
+            let phoneAlert = '';
+            if (r.raw_phone_found && r.raw_phone_found.length > 0) {
+                phoneAlert = `<div class="phone-alert">⚠ 发现未脱敏手机号: ${r.raw_phone_found.join(', ')} — 请交给算法同事复核，别急着归正常！</div>`;
+            }
+
+            const html = `
+                ${phoneAlert}
+                <div class="detail-row">
+                    <div class="label">批次号</div>
+                    <div class="value">${r.batch_id}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="label">会话ID</div>
+                    <div class="value">${r.session_id}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="label">原始问题</div>
+                    <div class="value">${r.original_question}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="label">当前口径</div>
+                    <div class="value">${r.current_answer}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="label">标注员留言</div>
+                    <div class="value">${r.annotation_remark || '-'}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="label">现场说法</div>
+                    <div class="value" style="color: ${r.on_site_statement ? '#1890ff' : '#888'};">${r.on_site_statement || '-'}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="label">处理人</div>
+                    <div class="value">${r.processed_by || '-'}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="label">处理时间</div>
+                    <div class="value">${r.processed_at || '-'}</div>
+                </div>
+
+                <div class="action-buttons" style="margin-top: 16px;">
+                    <button class="btn btn-small btn-warning" onclick="openAnnotationModal()">📝 补录标注员留言</button>
+                    <button class="btn btn-small btn-danger" onclick="openFixModal()">🔧 修复脱敏/更新口径</button>
+                    <button class="btn btn-small btn-success" onclick="reworkRecord()">🔄 返工处理</button>
+                </div>
+
+                <h4 style="margin: 20px 0 12px;">📜 操作历史</h4>
+                <div class="history-list">
+                    ${r.history.map(h => `
+                        <div class="history-item">
+                            <div class="time">v${h.version} · ${h.time} · ${h.operator}</div>
+                            <div><strong>${h.action}</strong>: ${h.detail}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            document.getElementById('detail-content').innerHTML = html;
+            document.getElementById('detail-view').style.display = 'block';
+        }
+
+        async function loadDemo() {
+            if (!confirm('确定要加载演示数据吗？这会清空现有数据。')) return;
+            await fetch('/api/demo/load', { method: 'POST' });
+            refreshAll();
+        }
+
+        async function processBatch() {
+            if (!currentBatchId) { alert('请先选择一个批次'); return; }
+            await fetch(`/api/batches/${currentBatchId}/process`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ operator: '周姐' })
+            });
+            refreshAll();
+        }
+
+        async function rerunBatch() {
+            if (!currentBatchId) { alert('请先选择一个批次'); return; }
+            await fetch(`/api/batches/${currentBatchId}/rerun`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ operator: '周姐' })
+            });
+            refreshAll();
+        }
+
+        function openAnnotationModal() {
+            document.getElementById('annotation-modal').classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        async function submitAnnotation() {
+            const result = allResults.find(r => r.result_id === currentResultId);
+            if (!result) return;
+
+            const data = {
+                session_id: result.session_id,
+                knowledge_id: result.knowledge_id,
+                annotator: document.getElementById('ann-annotator').value,
+                on_site_statement: document.getElementById('ann-onsite').value,
+                remark: document.getElementById('ann-remark').value,
+                operator: '周姐'
+            };
+
+            await fetch(`/api/results/${currentResultId}/apply-annotation`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            closeModal('annotation-modal');
+            refreshAll();
+            showDetail(currentResultId);
+        }
+
+        function openFixModal() {
+            document.getElementById('fix-modal').classList.add('active');
+        }
+
+        async function submitFix() {
+            const answer = document.getElementById('fix-answer').value;
+            const result = allResults.find(r => r.result_id === currentResultId);
+
+            if (result && result.desensitization_status === '手机号漏遮') {
+                await fetch(`/api/results/${currentResultId}/fix-masking`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ masked_answer: answer, operator: '周姐' })
+                });
+            } else {
+                await fetch(`/api/results/${currentResultId}/update-knowledge`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ new_answer: answer, operator: '周姐' })
+                });
+            }
+
+            closeModal('fix-modal');
+            refreshAll();
+            showDetail(currentResultId);
+        }
+
+        async function reworkRecord() {
+            if (!confirm('确定要对这条记录执行返工处理吗？')) return;
+            const result = allResults.find(r => r.result_id === currentResultId);
+            if (!result) return;
+
+            const onsite = prompt('请输入标注员的现场说法：', result.on_site_statement || '');
+            if (!onsite) return;
+
+            const newAnswer = prompt('请输入修正后的新口径：', result.current_answer);
+            if (!newAnswer) return;
+
+            const data = {
+                session_id: result.session_id,
+                knowledge_id: result.knowledge_id,
+                annotator: '标注员',
+                on_site_statement: onsite,
+                old_answer: result.current_answer,
+                remark: '返工修正',
+                new_answer: newAnswer,
+                operator: '周姐'
+            };
+
+            await fetch(`/api/results/${currentResultId}/rework`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            refreshAll();
+            showDetail(currentResultId);
+        }
+
+        function exportData() {
+            const url = currentBatchId ? `/api/export?batch_id=${currentBatchId}` : '/api/export';
+            window.open(url, '_blank');
+        }
+
+        function refreshAll() {
+            fetchStats();
+            fetchBatches();
+            fetchResults(currentBatchId);
+        }
+
+        refreshAll();
+    </script>
+</body>
+</html>
