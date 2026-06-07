@@ -1,0 +1,82 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.418,
+          39.912
+        ]
+      },
+      "properties": {
+        "id": "point_001",
+        "name": "解放路小学路口",
+        "streets": [
+          "解放路街道"
+        ],
+        "is_boundary": false,
+        "boundary_streets": [
+          "解放路街道"
+        ],
+        "score_total": 82.7,
+        "score_level": "优秀",
+        "score_method": "new_caliber",
+        "bus_added": true,
+        "status": "completed"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.41,
+          39.9125
+        ]
+      },
+      "properties": {
+        "id": "point_002",
+        "name": "朝阳解放交界路口",
+        "streets": [],
+        "is_boundary": true,
+        "boundary_streets": [
+          "朝阳路街道",
+          "解放路街道"
+        ],
+        "score_total": 52.6,
+        "score_level": "合格",
+        "score_method": "new_caliber",
+        "bus_added": true,
+        "status": "pending_review"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.402,
+          39.91
+        ]
+      },
+      "properties": {
+        "id": "point_003",
+        "name": "朝阳路三小路口",
+        "streets": [
+          "朝阳路街道"
+        ],
+        "is_boundary": false,
+        "boundary_streets": [
+          "朝阳路街道"
+        ],
+        "score_total": 59.9,
+        "score_level": "合格",
+        "score_method": "old_caliber",
+        "bus_added": true,
+        "status": "bus_added"
+      }
+    }
+  ]
+}

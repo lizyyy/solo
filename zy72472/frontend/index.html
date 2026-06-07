@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>儿童友好街区评分</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f7fa; color: #333; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px 30px; }
+        .header h1 { font-size: 24px; margin-bottom: 5px; }
+        .header p { opacity: 0.9; font-size: 14px; }
+        .container { display: flex; height: calc(100vh - 90px); }
+        .sidebar { width: 380px; background: white; border-right: 1px solid #e0e0e0; overflow-y: auto; }
+        .map-container { flex: 1; position: relative; }
+        #map { width: 100%; height: 100%; }
+        .toolbar { padding: 15px 20px; border-bottom: 1px solid #eee; display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; transition: all 0.2s; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-primary:hover { background: #5a6fd8; }
+        .btn-success { background: #48bb78; color: white; }
+        .btn-success:hover { background: #38a169; }
+        .btn-warning { background: #ed8936; color: white; }
+        .btn-warning:hover { background: #dd6b20; }
+        .btn-secondary { background: #e2e8f0; color: #4a5568; }
+        .btn-secondary:hover { background: #cbd5e0; }
+        .stats-bar { padding: 15px 20px; background: #f7fafc; border-bottom: 1px solid #eee; display: flex; gap: 20px; }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 20px; font-weight: bold; color: #667eea; }
+        .stat-label { font-size: 12px; color: #718096; margin-top: 2px; }
+        .point-list { padding: 10px; }
+        .point-card { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; }
+        .point-card:hover { border-color: #667eea; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15); }
+        .point-card.active { border-color: #667eea; background: #f0f4ff; }
+        .point-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px; }
+        .point-name { font-weight: 600; font-size: 15px; }
+        .badge { padding: 3px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; }
+        .badge-boundary { background: #fef3c7; color: #d97706; }
+        .badge-normal { background: #d1fae5; color: #065f46; }
+        .badge-old { background: #fee2e2; color: #991b1b; }
+        .point-meta { font-size: 12px; color: #718096; margin-bottom: 10px; }
+        .score-row { display: flex; justify-content: space-between; align-items: center; }
+        .score-value { font-size: 18px; font-weight: bold; }
+        .score-level { font-size: 12px; padding: 2px 8px; border-radius: 4px; }
+        .level-excellent { background: #d1fae5; color: #065f46; }
+        .level-good { background: #dbeafe; color: #1e40af; }
+        .level-pass { background: #fef3c7; color: #92400e; }
+        .level-bad { background: #fee2e2; color: #991b1b; }
+        .detail-panel { position: absolute; top: 20px; right: 20px; width: 400px; max-height: calc(100% - 40px); background: white; border-radius: 10px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); z-index: 1000; overflow-y: auto; display: none; }
+        .detail-panel.show { display: block; }
+        .detail-header { padding: 20px; border-bottom: 1px solid #eee; position: sticky; top: 0; background: white; z-index: 1; }
+        .detail-close { position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 20px; cursor: pointer; color: #999; }
+        .detail-body { padding: 20px; }
+        .section { margin-bottom: 20px; }
+        .section-title { font-weight: 600; font-size: 14px; color: #2d3748; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .photo-placeholder { width: 100%; height: 180px; background: #f0f0f0; border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .photo-placeholder img { width: 100%; height: 100%; object-fit: cover; }
+        .score-bars { display: flex; flex-direction: column; gap: 8px; }
+        .score-bar-item { display: flex; align-items: center; gap: 10px; }
+        .score-bar-label { width: 80px; font-size: 12px; color: #718096; }
+        .score-bar-track { flex: 1; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+        .score-bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s; }
+        .score-bar-value { width: 40px; text-align: right; font-size: 12px; font-weight: 500; }
+        .bus-info { background: #ebf8ff; border-radius: 8px; padding: 12px; font-size: 13px; }
+        .history-item { padding: 10px; border-left: 3px solid #667eea; background: #f7fafc; margin-bottom: 8px; font-size: 12px; border-radius: 0 6px 6px 0; }
+        .history-time { color: #718096; margin-bottom: 4px; }
+        .action-buttons { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 15px; }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 2000; display: none; align-items: center; justify-content: center; }
+        .modal-overlay.show { display: flex; }
+        .modal { background: white; border-radius: 10px; width: 500px; max-width: 90%; max-height: 80vh; overflow-y: auto; }
+        .modal-header { padding: 20px; border-bottom: 1px solid #eee; }
+        .modal-body { padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 5px; color: #4a5568; }
+        .form-group input, .form-group textarea { width: 100%; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; }
+        .form-row { display: flex; gap: 10px; }
+        .form-row .form-group { flex: 1; }
+        .modal-footer { padding: 15px 20px; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 10px; }
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 12px 24px; border-radius: 8px; z-index: 3000; opacity: 0; transition: opacity 0.3s; }
+        .toast.show { opacity: 1; }
+        .toast.success { background: #48bb78; }
+        .toast.error { background: #f56565; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚸 儿童友好街区评分</h1>
+        <p>点位导入 · 边界检测 · 公交补录 · 人工复核 · 地图导出</p>
+    </div>
+    <div class="container">
+        <div class="sidebar">
+            <div class="toolbar">
+                <button class="btn btn-primary" onclick="openImportModal()">导入点位</button>
+                <button class="btn btn-success" onclick="exportMap()">导出地图</button>
+                <button class="btn btn-secondary" onclick="loadPoints()">刷新</button>
+            </div>
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-value" id="statTotal">0</div>
+                    <div class="stat-label">总点位</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="statBoundary" style="color: #d97706;">0</div>
+                    <div class="stat-label">边界待复核</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="statBus" style="color: #48bb78;">0</div>
+                    <div class="stat-label">已补公交</div>
+                </div>
+            </div>
+            <div class="point-list" id="pointList"></div>
+        </div>
+        <div class="map-container">
+            <div id="map"></div>
+            <div class="detail-panel" id="detailPanel">
+                <div class="detail-header">
+                    <h3 id="detailTitle">点位详情</h3>
+                    <button class="detail-close" onclick="closeDetail()">×</button>
+                </div>
+                <div class="detail-body" id="detailBody"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="importModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>导入点位数据</h3>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>JSON 数据</label>
+                    <textarea id="importData" rows="8" placeholder='{"points": [{"id": "point_004", "name": "...", "lng": 116.4, "lat": 39.9, "cross_road": "..."}]}'></textarea>
+                </div>
+                <p style="font-size: 12px; color: #718096;">系统将自动检测街道边界，边界点位将标记待项目经理复核</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('importModal')">取消</button>
+                <button class="btn btn-primary" onclick="doImport()">确认导入</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="correctModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>人工修正评分</h3>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="correctPointId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>交通安全</label>
+                        <input type="number" id="corrTraffic" step="0.1" placeholder="0-100">
+                    </div>
+                    <div class="form-group">
+                        <label>步行设施</label>
+                        <input type="number" id="corrPedestrian" step="0.1" placeholder="0-100">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>公交可达</label>
+                        <input type="number" id="corrBus" step="0.1" placeholder="0-100">
+                    </div>
+                    <div class="form-group">
+                        <label>游戏空间</label>
+                        <input type="number" id="corrPlay" step="0.1" placeholder="0-100">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>修正原因</label>
+                    <input type="text" id="corrReason" placeholder="例如：项目经理复核确认归属">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('correctModal')">取消</button>
+                <button class="btn btn-primary" onclick="doCorrect()">确认修正</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="busModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>补录公交刷卡时段</h3>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="busPointId">
+                <div class="form-group">
+                    <label>选择公交数据</label>
+                    <select id="busSelect" class="form-control"></select>
+                </div>
+                <p style="font-size: 12px; color: #718096;">补录后将自动重跑评分，地图导出数据将同步更新</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('busModal')">取消</button>
+                <button class="btn btn-primary" onclick="doAddBus()">确认补录</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let map;
+        let markers = {};
+        let allPoints = [];
+        let allBusData = [];
+        let allStreets = [];
+
+        function initMap() {
+            map = L.map('map').setView([39.9175, 116.410], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
+            loadStreets();
+            loadBusData();
+            loadPoints();
+        }
+
+        function showToast(msg, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.className = 'toast show ' + type;
+            setTimeout(() => toast.className = 'toast', 2500);
+        }
+
+        function openModal(id) {
+            document.getElementById(id).classList.add('show');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('show');
+        }
+
+        function openImportModal() {
+            openModal('importModal');
+        }
+
+        function getLevelClass(level) {
+            const map = { '优秀': 'level-excellent', '良好': 'level-good', '合格': 'level-pass', '待改进': 'level-bad', '待评': 'level-bad' };
+            return map[level] || 'level-bad';
+        }
+
+        function getScoreColor(score) {
+            if (score >= 80) return '#48bb78';
+            if (score >= 65) return '#4299e1';
+            if (score >= 50) return '#ed8936';
+            return '#f56565';
+        }
+
+        function loadStreets() {
+            fetch('/api/streets')
+                .then(r => r.json())
+                .then(data => {
+                    allStreets = data;
+                    data.forEach(street => {
+                        const coords = street.boundary.coordinates[0].map(c => [c[1], c[0]]);
+                        L.polygon(coords, { color: '#667eea', weight: 1, fillOpacity: 0.05 }).addTo(map);
+                    });
+                });
+        }
+
+        function loadBusData() {
+            fetch('/api/bus-data')
+                .then(r => r.json())
+                .then(data => {
+                    allBusData = data;
+                    const select = document.getElementById('busSelect');
+                    select.innerHTML = data.map(b => `<option value="${b.id}">${b.route} - ${b.stop_name} (${b.old_calculation ? '旧口径' : '新口径'})</option>`).join('');
+                });
+        }
+
+        function loadPoints() {
+            fetch('/api/points')
+                .then(r => r.json())
+                .then(data => {
+                    allPoints = data;
+                    renderPointList(data);
+                    renderMarkers(data);
+                    updateStats(data);
+                });
+        }
+
+        function updateStats(points) {
+            document.getElementById('statTotal').textContent = points.length;
+            document.getElementById('statBoundary').textContent = points.filter(p => p.is_boundary).length;
+            document.getElementById('statBus').textContent = points.filter(p => p.bus_swipes_added).length;
+        }
+
+        function renderPointList(points) {
+            const list = document.getElementById('pointList');
+            list.innerHTML = points.map(p => {
+                const badge = p.is_boundary 
+                    ? '<span class="badge badge-boundary">边界待复核</span>'
+                    : (p.score.method === 'old_caliber' 
+                        ? '<span class="badge badge-old">旧口径</span>' 
+                        : '<span class="badge badge-normal">正常</span>');
+                return `
+                    <div class="point-card" onclick="showDetail('${p.id}')" id="card-${p.id}">
+                        <div class="point-header">
+                            <span class="point-name">${p.name}</span>
+                            ${badge}
+                        </div>
+                        <div class="point-meta">${p.cross_road}</div>
+                        <div class="point-meta">${p.is_boundary ? '涉及: ' + p.boundary_streets.join('、') : '街道: ' + p.streets.join('、')}</div>
+                        <div class="score-row">
+                            <span class="score-value" style="color: ${getScoreColor(p.score.total)}">${p.score.total}</span>
+                            <span class="score-level ${getLevelClass(p.score.level)}">${p.score.level}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderMarkers(points) {
+            Object.values(markers).forEach(m => map.removeLayer(m));
+            markers = {};
+
+            points.forEach(p => {
+                let iconColor = p.is_boundary ? '#f59e0b' : (p.score.method === 'old_caliber' ? '#ef4444' : '#10b981');
+                const icon = L.divIcon({
+                    className: 'custom-marker',
+                    html: `<div style="background:${iconColor};color:white;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3)">${p.score.total}</div>`,
+                    iconSize: [32, 32],
+                    iconAnchor: [16, 16]
+                });
+                const marker = L.marker([p.lat, p.lng], { icon }).addTo(map);
+                marker.bindPopup(`<b>${p.name}</b><br>${p.cross_road}<br>评分: ${p.score.total} (${p.score.level})`);
+                marker.on('click', () => showDetail(p.id));
+                markers[p.id] = marker;
+            });
+        }
+
+        function showDetail(pointId) {
+            document.querySelectorAll('.point-card').forEach(c => c.classList.remove('active'));
+            const card = document.getElementById('card-' + pointId);
+            if (card) card.classList.add('active');
+
+            fetch('/api/points/' + pointId)
+                .then(r => r.json())
+                .then(p => {
+                    const panel = document.getElementById('detailPanel');
+                    panel.classList.add('show');
+                    document.getElementById('detailTitle').textContent = p.name;
+
+                    const boundaryInfo = p.is_boundary 
+                        ? `<div style="background:#fef3c7;padding:10px;border-radius:6px;margin-bottom:15px;"><strong style="color:#d97706">⚠️ 点位位于街道边界</strong><br>涉及街道: ${p.boundary_streets.join('、')}<br>需项目经理复核确认</div>`
+                        : `<div style="background:#d1fae5;padding:10px;border-radius:6px;margin-bottom:15px;"><strong style="color:#065f46">✅ 街道归属明确</strong><br>所属街道: ${p.streets.join('、')}</div>`;
+
+                    const busInfo = p.bus_data 
+                        ? `<div class="bus-info">
+                            <strong>🚌 公交数据</strong><br>
+                            线路: ${p.bus_data.route} | 站点: ${p.bus_data.stop_name}<br>
+                            刷卡时段: ${p.bus_data.swipe_hours.join(', ')}<br>
+                            高峰儿童数: ${p.bus_data.peak_children_count} 人<br>
+                            统计口径: ${p.bus_data.old_calculation ? '<span style="color:#dc2626">旧口径（待更新）</span>' : '<span style="color:#059669">新口径（精准统计）</span>'}<br>
+                            ${p.bus_data.note ? '备注: ' + p.bus_data.note : ''}
+                           </div>`
+                        : `<div style="background:#f3f4f6;padding:12px;border-radius:8px;font-size:13px;color:#6b7280">暂无公交刷卡数据，点击下方按钮补录</div>`;
+
+                    const historyHtml = p.score_history.length > 0 
+                        ? p.score_history.slice().reverse().map((h, i) => `
+                            <div class="history-item">
+                                <div class="history-time">${h.calculated_at ? h.calculated_at.slice(0, 19).replace('T', ' ') : ''}</div>
+                                <div><strong>${h.total} 分 (${h.level})</strong> | 方法: ${h.method}</div>
+                                ${h.note ? '<div style="color:#718096;margin-top:3px">' + h.note + '</div>' : ''}
+                            </div>
+                        `).join('')
+                        : '<div style="color:#999;font-size:12px">暂无历史记录</div>';
+
+                    const actions = [];
+                    if (!p.bus_data) {
+                        actions.push(`<button class="btn btn-success" onclick="openBusModal('${p.id}')">补录公交时段</button>`);
+                    }
+                    if (p.is_boundary) {
+                        actions.push(`<button class="btn btn-warning" onclick="openCorrectModal('${p.id}')">人工修正</button>`);
+                    }
+                    actions.push(`<button class="btn btn-secondary" onclick="rerunScore('${p.id}')">重跑评分</button>`);
+
+                    document.getElementById('detailBody').innerHTML = `
+                        ${boundaryInfo}
+
+                        <div class="section">
+                            <div class="section-title">📷 路口照片</div>
+                            <div class="photo-placeholder">
+                                ${p.photo_path ? `<img src="/${p.photo_path}" alt="路口照片">` : '<span style="color:#999">暂无照片</span>'}
+                            </div>
+                            <div style="margin-top:8px;font-size:12px;color:#718096">路口: ${p.cross_road} | 坐标: ${p.lng}, ${p.lat}</div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">📊 当前评分 (${p.current_score.method})</div>
+                            <div style="text-align:center;margin-bottom:15px">
+                                <span style="font-size:36px;font-weight:bold;color:${getScoreColor(p.current_score.total)}">${p.current_score.total}</span>
+                                <span class="score-level ${getLevelClass(p.current_score.level)}" style="margin-left:10px;font-size:16px;padding:4px 12px">${p.current_score.level}</span>
+                            </div>
+                            <div class="score-bars">
+                                <div class="score-bar-item">
+                                    <span class="score-bar-label">交通安全</span>
+                                    <div class="score-bar-track"><div class="score-bar-fill" style="width:${p.current_score.traffic_safety}%;background:#667eea"></div></div>
+                                    <span class="score-bar-value">${p.current_score.traffic_safety}</span>
+                                </div>
+                                <div class="score-bar-item">
+                                    <span class="score-bar-label">步行设施</span>
+                                    <div class="score-bar-track"><div class="score-bar-fill" style="width:${p.current_score.pedestrian_facility}%;background:#48bb78"></div></div>
+                                    <span class="score-bar-value">${p.current_score.pedestrian_facility}</span>
+                                </div>
+                                <div class="score-bar-item">
+                                    <span class="score-bar-label">公交可达</span>
+                                    <div class="score-bar-track"><div class="score-bar-fill" style="width:${p.current_score.bus_access}%;background:#ed8936"></div></div>
+                                    <span class="score-bar-value">${p.current_score.bus_access}</span>
+                                </div>
+                                <div class="score-bar-item">
+                                    <span class="score-bar-label">游戏空间</span>
+                                    <div class="score-bar-track"><div class="score-bar-fill" style="width:${p.current_score.play_space}%;background:#f56565"></div></div>
+                                    <span class="score-bar-value">${p.current_score.play_space}</span>
+                                </div>
+                            </div>
+                            ${p.current_score.note ? `<div style="margin-top:10px;font-size:12px;color:#718096">📝 ${p.current_score.note}</div>` : ''}
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">🚌 公交刷卡时段</div>
+                            ${busInfo}
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">📜 评分历史</div>
+                            ${historyHtml}
+                        </div>
+
+                        ${p.manual_correction ? `<div class="section"><div class="section-title">✏️ 人工修正</div><div style="font-size:13px;padding:10px;background:#fef3c7;border-radius:6px">原因: ${p.manual_correction.reason || '-'}</div></div>` : ''}
+
+                        <div class="action-buttons">
+                            ${actions.join('')}
+                        </div>
+                    `;
+
+                    if (markers[pointId]) {
+                        map.panTo(markers[pointId].getLatLng());
+                    }
+                });
+        }
+
+        function closeDetail() {
+            document.getElementById('detailPanel').classList.remove('show');
+            document.querySelectorAll('.point-card').forEach(c => c.classList.remove('active'));
+        }
+
+        function openCorrectModal(pointId) {
+            document.getElementById('correctPointId').value = pointId;
+            document.getElementById('corrTraffic').value = '';
+            document.getElementById('corrPedestrian').value = '';
+            document.getElementById('corrBus').value = '';
+            document.getElementById('corrPlay').value = '';
+            document.getElementById('corrReason').value = '';
+            openModal('correctModal');
+        }
+
+        function doCorrect() {
+            const pointId = document.getElementById('correctPointId').value;
+            const override = {};
+            const traffic = document.getElementById('corrTraffic').value;
+            const pedestrian = document.getElementById('corrPedestrian').value;
+            const bus = document.getElementById('corrBus').value;
+            const play = document.getElementById('corrPlay').value;
+            const reason = document.getElementById('corrReason').value;
+
+            if (traffic) override.traffic_safety = parseFloat(traffic);
+            if (pedestrian) override.pedestrian_facility = parseFloat(pedestrian);
+            if (bus) override.bus_access = parseFloat(bus);
+            if (play) override.play_space = parseFloat(play);
+
+            if (Object.keys(override).length === 0) {
+                showToast('请至少填写一项修正分数', 'error');
+                return;
+            }
+
+            fetch('/api/points/' + pointId + '/manual-correct', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ override, reason })
+            }).then(r => r.json()).then(data => {
+                if (data.success) {
+                    showToast('人工修正成功');
+                    closeModal('correctModal');
+                    loadPoints();
+                    showDetail(pointId);
+                }
+            });
+        }
+
+        function openBusModal(pointId) {
+            document.getElementById('busPointId').value = pointId;
+            openModal('busModal');
+        }
+
+        function doAddBus() {
+            const pointId = document.getElementById('busPointId').value;
+            const busId = document.getElementById('busSelect').value;
+
+            fetch('/api/points/' + pointId + '/add-bus', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ bus_data_id: busId })
+            }).then(r => r.json()).then(data => {
+                if (data.success) {
+                    showToast('公交时段补录成功，评分已更新');
+                    closeModal('busModal');
+                    loadPoints();
+                    showDetail(pointId);
+                }
+            });
+        }
+
+        function rerunScore(pointId) {
+            fetch('/api/points/' + pointId + '/rerun', {
+                method: 'POST'
+            }).then(r => r.json()).then(data => {
+                if (data.success) {
+                    showToast('重跑评分成功，新评分: ' + data.new_score);
+                    loadPoints();
+                    showDetail(pointId);
+                }
+            });
+        }
+
+        function doImport() {
+            const dataStr = document.getElementById('importData').value.trim();
+            try {
+                const data = JSON.parse(dataStr);
+                fetch('/api/points/import', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                }).then(r => r.json()).then(res => {
+                    showToast('成功导入 ' + res.imported.length + ' 个点位');
+                    closeModal('importModal');
+                    loadPoints();
+                });
+            } catch (e) {
+                showToast('JSON 格式错误', 'error');
+            }
+        }
+
+        function exportMap() {
+            fetch('/api/export-map', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ format: 'geojson' })
+            }).then(r => r.json()).then(data => {
+                const blob = new Blob([JSON.stringify(data.geojson, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = data.filename || 'child_friendly_map.geojson';
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('地图数据已导出');
+            });
+        }
+
+        initMap();
+    </script>
+</body>
+</html>

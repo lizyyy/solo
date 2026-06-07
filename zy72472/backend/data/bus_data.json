@@ -1,0 +1,37 @@
+{
+  "bus_records": [
+    {
+      "id": "bus_001",
+      "point_id": "point_003",
+      "route": "12路",
+      "stop_name": "朝阳路口北",
+      "swipe_hours": ["07:00-09:00", "16:30-18:30"],
+      "peak_children_count": 45,
+      "old_calculation": true,
+      "note": "旧口径统计：按全天刷卡量估算，未区分时段",
+      "updated_at": "2026-05-15"
+    },
+    {
+      "id": "bus_002",
+      "point_id": "point_001",
+      "route": "8路",
+      "stop_name": "解放路小学",
+      "swipe_hours": ["07:15-08:45", "16:00-17:45"],
+      "peak_children_count": 78,
+      "old_calculation": false,
+      "note": "新口径：已按上下学时段精准统计",
+      "updated_at": "2026-06-01"
+    },
+    {
+      "id": "bus_003",
+      "point_id": "point_002",
+      "route": "25路",
+      "stop_name": "和平路口",
+      "swipe_hours": ["07:00-08:30", "16:30-18:00"],
+      "peak_children_count": 32,
+      "old_calculation": false,
+      "note": "边界点位，公交数据归属待确认",
+      "updated_at": "2026-06-03"
+    }
+  ]
+}

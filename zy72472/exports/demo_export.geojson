@@ -1,0 +1,56 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.418,
+          39.912
+        ]
+      },
+      "properties": {
+        "id": "point_001",
+        "name": "解放路小学路口",
+        "is_boundary": false,
+        "score": 82.7,
+        "level": "优秀"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.41,
+          39.9125
+        ]
+      },
+      "properties": {
+        "id": "point_002",
+        "name": "朝阳解放交界路口",
+        "is_boundary": true,
+        "score": 52.6,
+        "level": "合格"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.402,
+          39.91
+        ]
+      },
+      "properties": {
+        "id": "point_003",
+        "name": "朝阳路三小路口",
+        "is_boundary": false,
+        "score": 59.9,
+        "level": "合格"
+      }
+    }
+  ]
+}

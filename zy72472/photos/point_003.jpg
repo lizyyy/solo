@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400">
+  <rect width="600" height="400" fill="#e3f2fd"/>
+  <rect x="0" y="280" width="600" height="120" fill="#555"/>
+  <rect x="50" y="150" width="80" height="130" fill="#fff3e0"/>
+  <rect x="60" y="200" width="20" height="80" fill="#8d6e63"/>
+  <text x="90" y="180" text-anchor="middle" fill="#666" font-size="12">公交站</text>
+  <rect x="470" y="200" width="80" height="40" fill="#2196f3"/>
+  <text x="510" y="225" text-anchor="middle" fill="white" font-size="12">12路</text>
+  <circle cx="520" cy="310" r="20" fill="#4caf50"/>
+  <text x="520" y="317" text-anchor="middle" fill="white" font-size="14">🚌</text>
+  <text x="300" y="50" text-anchor="middle" fill="#333" font-size="20" font-weight="bold">朝阳路三小路口</text>
+  <text x="300" y="80" text-anchor="middle" fill="#ff9800" font-size="14">点位编号: point_003 | 公交: 旧口径待更新</text>
+  <rect x="150" y="100" width="300" height="40" fill="#fff9c4" rx="5"/>
+  <text x="300" y="125" text-anchor="middle" fill="#f57f17" font-size="13">📋 已补录公交刷卡时段，需重跑评分</text>
+</svg>
