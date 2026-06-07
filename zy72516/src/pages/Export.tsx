@@ -1,0 +1,184 @@
+import { useState } from 'react';
+import { Download, FileJson, FileSpreadsheet, Eye, Check } from 'lucide-react';
+import { useRecordStore } from '../store/useRecordStore';
+import { exportToCsv, exportToJson, defaultExportFields, getExportPreview } from '../utils/exportUtil';
+import { StatusBadge } from '../components/common/StatusBadge';
+
+export default function Export() {
+  const { records } = useRecordStore();
+  const [format, setFormat] = useState<'csv' | 'json'>('csv');
+  const [showPreview, setShowPreview] = useState(false);
+
+  const preview = getExportPreview(records);
+
+  const handleExport = () => {
+    if (format === 'csv') {
+      exportToCsv(records);
+    } else {
+      exportToJson(records);
+    }
+  };
+
+  const stats = {
+    total: records.length,
+    hasAbnormal: records.filter(r => r.abnormalType !== 'none').length
+  };
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-slate-900">数据导出</h1>
+        <p className="text-slate-500 mt-1">统一数据源导出，页面展示、导出明细、接口返回同一份结果</p>
+      </div>
+
+      <div className="grid grid-cols-3 gap-6">
+        <div className="col-span-2 space-y-6">
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <h2 className="text-lg font-semibold text-slate-900 mb-4">导出配置</h2>
+
+            <div className="space-y-6">
+              <div>
+                <label className="text-sm font-medium text-slate-700 mb-3 block">导出格式</label>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setFormat('csv')}
+                    className={`flex-1 flex items-center justify-center gap-3 p-4 rounded-xl border-2 transition-all ${
+                      format === 'csv'
+                        ? 'border-slate-900 bg-slate-50'
+                        : 'border-slate-200 hover:border-slate-300'
+                    }`}
+                  >
+                    <FileSpreadsheet className={`w-6 h-6 ${format === 'csv' ? 'text-slate-900' : 'text-slate-400'}`} />
+                    <div className="text-left">
+                      <p className={`font-medium ${format === 'csv' ? 'text-slate-900' : 'text-slate-600'}`}>CSV 格式</p>
+                      <p className="text-xs text-slate-400">适合Excel打开查看</p>
+                    </div>
+                    {format === 'csv' && <Check className="w-5 h-5 text-slate-900 ml-auto" />}
+                  </button>
+
+                  <button
+                    onClick={() => setFormat('json')}
+                    className={`flex-1 flex items-center justify-center gap-3 p-4 rounded-xl border-2 transition-all ${
+                      format === 'json'
+                        ? 'border-slate-900 bg-slate-50'
+                        : 'border-slate-200 hover:border-slate-300'
+                    }`}
+                  >
+                    <FileJson className={`w-6 h-6 ${format === 'json' ? 'text-slate-900' : 'text-slate-400'}`} />
+                    <div className="text-left">
+                      <p className={`font-medium ${format === 'json' ? 'text-slate-900' : 'text-slate-600'}`}>JSON 格式</p>
+                      <p className="text-xs text-slate-400">适合程序接口调用</p>
+                    </div>
+                    {format === 'json' && <Check className="w-5 h-5 text-slate-900 ml-auto" />}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-slate-700 mb-3 block">
+                  导出字段（共 {defaultExportFields.length} 个字段）
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {defaultExportFields.map((field) => (
+                    <div key={field.key} className="flex items-center gap-2 p-2 rounded-lg bg-slate-50">
+                      <Check className="w-4 h-4 text-emerald-500" />
+                      <span className="text-sm text-slate-700">{field.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {showPreview && (
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+              <div className="px-6 py-4 border-b border-slate-100">
+                <h3 className="text-sm font-semibold text-slate-900">导出预览（前5条）</h3>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-slate-50">
+                    <tr>
+                      {defaultExportFields.slice(0, 5).map((field) => (
+                        <th key={field.key} className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">
+                          {field.label}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {preview.map((row, idx) => (
+                      <tr key={idx}>
+                        {defaultExportFields.slice(0, 5).map((field) => (
+                          <td key={field.key} className="px-4 py-3 text-slate-700">
+                            {String(row[field.label])}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-4">
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <h3 className="text-sm font-semibold text-slate-900 mb-4">导出概览</h3>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-slate-500">总记录数</span>
+                <span className="text-lg font-bold text-slate-900">{stats.total}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-slate-500">含异常记录</span>
+                <span className="text-lg font-bold text-amber-600">{stats.hasAbnormal}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-slate-500">导出字段</span>
+                <span className="text-lg font-bold text-slate-900">{defaultExportFields.length}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl shadow-lg p-6 text-white">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center">
+                <Download className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="font-semibold">准备导出</p>
+                <p className="text-xs text-slate-400">点击下方按钮开始下载</p>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <button
+                onClick={handleExport}
+                className="w-full py-3 bg-white text-slate-900 rounded-lg font-medium hover:bg-slate-100 transition-colors flex items-center justify-center gap-2"
+              >
+                <Download className="w-4 h-4" />
+                导出 {format.toUpperCase()} 文件
+              </button>
+              <button
+                onClick={() => setShowPreview(!showPreview)}
+                className="w-full py-2 bg-white/10 text-white rounded-lg text-sm font-medium hover:bg-white/20 transition-colors flex items-center justify-center gap-2"
+              >
+                <Eye className="w-4 h-4" />
+                {showPreview ? '隐藏预览' : '预览数据'}
+              </button>
+            </div>
+          </div>
+
+          <div className="bg-sky-50 border border-sky-200 rounded-xl p-4">
+            <p className="text-xs text-sky-700">
+              <strong>数据源一致性说明：</strong>
+              本系统所有展示页面、导出功能、接口返回均读取同一份 Zustand Store 数据，确保引用链接404仍被判通过等异常记录在各处显示完全一致，不会出现一个地方显示异常、另一个地方消失的情况。
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
