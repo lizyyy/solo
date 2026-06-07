@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>推荐探索率周报系统</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #333; }
+.header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 20px 40px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+.header h1 { font-size: 24px; font-weight: 600; }
+.header p { opacity: 0.9; margin-top: 4px; font-size: 14px; }
+.container { max-width: 1400px; margin: 24px auto; padding: 0 24px; }
+.card { background: #fff; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.card h2 { font-size: 18px; margin-bottom: 16px; color: #1a1a2e; display: flex; align-items: center; gap: 8px; }
+.btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+.btn-primary { background: #667eea; color: #fff; }
+.btn-primary:hover { background: #5568d3; }
+.btn-secondary { background: #e0e7ff; color: #4338ca; }
+.btn-secondary:hover { background: #c7d2fe; }
+.btn-success { background: #10b981; color: #fff; }
+.btn-success:hover { background: #059669; }
+.btn-warning { background: #f59e0b; color: #fff; }
+.btn-warning:hover { background: #d97706; }
+.btn-danger { background: #ef4444; color: #fff; }
+.btn-outline { background: #fff; border: 1px solid #d1d5db; color: #374151; }
+.btn-outline:hover { background: #f9fafb; }
+.btn-sm { padding: 4px 10px; font-size: 12px; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #f0f0f0; }
+th { background: #f8fafc; font-weight: 600; color: #475569; }
+tr:hover { background: #f8fafc; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 500; }
+.badge-success { background: #d1fae5; color: #065f46; }
+.badge-warning { background: #fef3c7; color: #92400e; }
+.badge-danger { background: #fee2e2; color: #991b1b; }
+.badge-info { background: #dbeafe; color: #1e40af; }
+.badge-default { background: #f3f4f6; color: #374151; }
+.status-step { display: flex; align-items: center; gap: 8px; padding: 12px; border-radius: 8px; background: #f8fafc; margin-bottom: 8px; }
+.status-step.active { background: #dbeafe; border: 1px solid #93c5fd; }
+.status-step.done { background: #d1fae5; border: 1px solid #6ee7b7; }
+.step-number { width: 28px; height: 28px; border-radius: 50%; background: #667eea; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; flex-shrink: 0; }
+.status-step.done .step-number { background: #10b981; }
+.step-content { flex: 1; }
+.step-title { font-weight: 600; font-size: 14px; }
+.step-desc { font-size: 12px; color: #64748b; margin-top: 2px; }
+.summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.summary-item { padding: 16px; border-radius: 8px; background: #f8fafc; text-align: center; }
+.summary-value { font-size: 28px; font-weight: 700; color: #667eea; }
+.summary-label { font-size: 12px; color: #64748b; margin-top: 4px; }
+.anomaly-row { background: #fff1f0 !important; }
+.audit-log { padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 12px; }
+.audit-log:last-child { border-bottom: none; }
+.audit-action { font-weight: 600; color: #4338ca; }
+.audit-time { color: #94a3b8; margin-left: 8px; }
+.audit-detail { color: #64748b; margin-top: 2px; }
+.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
+.modal-overlay.show { display: flex; }
+.modal { background: #fff; border-radius: 12px; padding: 24px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; }
+.modal h3 { margin-bottom: 16px; font-size: 18px; }
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 500; color: #374151; }
+.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; }
+.form-group textarea { resize: vertical; min-height: 80px; }
+.modal-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; padding-top: 16px; border-top: 1px solid #f0f0f0; }
+.tabs { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 1px solid #e5e7eb; }
+.tab { padding: 10px 20px; cursor: pointer; font-size: 14px; font-weight: 500; color: #6b7280; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.tab.active { color: #667eea; border-bottom-color: #667eea; }
+.tab:hover { color: #4f46e5; }
+.check-item { padding: 12px; border-radius: 8px; margin-bottom: 8px; border: 1px solid #e5e7eb; }
+.check-item.passed { background: #f0fdf4; border-color: #86efac; }
+.check-item.failed { background: #fef2f2; border-color: #fca5a5; }
+.check-item.info { background: #eff6ff; border-color: #93c5fd; }
+.check-header { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+.check-detail { font-size: 12px; color: #64748b; margin-top: 4px; margin-left: 28px; }
+.report-list-item { padding: 16px; border-radius: 8px; border: 1px solid #e5e7eb; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; display: flex; justify-content: space-between; align-items: center; }
+.report-list-item:hover { border-color: #667eea; background: #f5f3ff; }
+.report-info h3 { font-size: 16px; margin-bottom: 4px; }
+.report-info p { font-size: 12px; color: #64748b; }
+.report-meta { display: flex; gap: 16px; align-items: center; }
+.empty-state { text-align: center; padding: 60px 20px; color: #94a3b8; }
+.empty-state-icon { font-size: 48px; margin-bottom: 12px; }
+.filters { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>📊 推荐探索率周报系统</h1>
+  <p>负样本追踪 · 自检复核 · 全链路审计</p>
+</div>
+
+<div class="container">
+  <div id="app"></div>
+</div>
+
+<div class="modal-overlay" id="modal">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<script>
+const API = '/api';
+let currentView = 'list';
+let currentReportId = null;
+let currentTab = 'samples';
+
+async function api(url, options = {}) {
+  const res = await fetch(API + url, {
+    headers: { 'Content-Type': 'application/json' },
+    ...options
+  });
+  return res.json();
+}
+
+function showModal(content) {
+  document.getElementById('modalContent').innerHTML = content;
+  document.getElementById('modal').classList.add('show');
+}
+function hideModal() {
+  document.getElementById('modal').classList.remove('show');
+}
+document.getElementById('modal').addEventListener('click', (e) => {
+  if (e.target.id === 'modal') hideModal();
+});
+
+function statusLabel(status) {
+  const map = {
+    'draft': ['草稿', 'badge-default'],
+    'step1_imported': ['已导入负样本', 'badge-info'],
+    'step2_recall_added': ['已补录召回候选', 'badge-warning'],
+    'step3_experiment_updated': ['实验对比已更新', 'badge-success'],
+    'reviewing': ['评测运营复核中', 'badge-warning'],
+    'completed': ['已完成', 'badge-success']
+  };
+  const [text, cls] = map[status] || [status, 'badge-default'];
+  return `<span class="badge ${cls}">${text}</span>`;
+}
+
+function processingStatusLabel(status) {
+  const map = {
+    'pending': ['待处理', 'badge-default'],
+    'imported': ['已导入', 'badge-info'],
+    'reviewing': ['复核中', 'badge-warning'],
+    'reviewed': ['已复核', 'badge-success'],
+    'normal': ['正常', 'badge-success'],
+    'confirmed_anomaly': ['确认异常', 'badge-danger']
+  };
+  const [text, cls] = map[status] || [status, 'badge-default'];
+  return `<span class="badge ${cls}">${text}</span>`;
+}
+
+function render() {
+  const app = document.getElementById('app');
+  if (currentView === 'list') {
+    renderReportList(app);
+  } else if (currentView === 'detail') {
+    renderReportDetail(app);
+  }
+}
+
+async function renderReportList(container) {
+  const reports = await api('/reports');
+  container.innerHTML = `
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <h2 style="margin: 0;">周报列表</h2>
+      <button class="btn btn-primary" onclick="createReport()">+ 新建周报</button>
+    </div>
+    ${reports.length === 0 ? `
+      <div class="empty-state">
+        <div class="empty-state-icon">📋</div>
+        <p>暂无周报，点击右上角新建</p>
+        <p style="font-size: 12px; margin-top: 8px;">或执行 <code>npm run init-data</code> 加载样例数据</p>
+      </div>
+    ` : reports.map(r => `
+      <div class="report-list-item" onclick="openReport(${r.id})">
+        <div class="report-info">
+          <h3>${r.title}</h3>
+          <p>周次: ${r.week_number} · 创建: ${r.created_by} · ${r.created_at}</p>
+        </div>
+        <div class="report-meta">
+          <span style="font-size: 12px; color: #64748b;">${r.sample_count} 条样本 · ${r.recall_count} 条召回</span>
+          ${statusLabel(r.status)}
+        </div>
+      </div>
+    `).join('')}
+  `;
+}
+
+async function renderReportDetail(container) {
+  const [report, summary, samples, recalls, checkResults] = await Promise.all([
+    api(`/reports/${currentReportId}`),
+    api(`/reports/${currentReportId}/summary`),
+    api(`/reports/${currentReportId}/samples`),
+    api(`/reports/${currentReportId}/recalls`),
+    api(`/reports/${currentReportId}/self-check/latest`)
+  ]);
+
+  container.innerHTML = `
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <div>
+        <button class="btn btn-outline btn-sm" onclick="goBack()">&larr; 返回列表</button>
+        <h2 style="margin-top: 12px;">${report.title}</h2>
+        <p style="font-size: 13px; color: #64748b; margin-top: 4px;">周次: ${report.week_number} · ${statusLabel(report.status)}</p>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button class="btn btn-secondary btn-sm" onclick="runSelfCheck()">🔍 运行自检</button>
+        <button class="btn btn-success btn-sm" onclick="exportCSV()">⬇️ 导出CSV</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>📌 工作流进度</h2>
+      <div class="status-step ${report.status === 'draft' ? 'active' : (['step1_imported','step2_recall_added','step3_experiment_updated'].includes(report.status) ? 'done' : '')}">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <div class="step-title">导入负样本列表</div>
+          <div class="step-desc">初次导入负样本原始数据，保留原始行号和原始数据</div>
+        </div>
+        ${report.status === 'draft' ? `<button class="btn btn-primary btn-sm" onclick="step1Import()">开始导入</button>` : ''}
+      </div>
+      <div class="status-step ${report.status === 'step1_imported' ? 'active' : (['step2_recall_added','step3_experiment_updated'].includes(report.status) ? 'done' : '')}">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <div class="step-title">数据科学家林姐补看召回候选表</div>
+          <div class="step-desc">林姐补充召回候选数据，关联到对应负样本后重算</div>
+        </div>
+        ${report.status === 'step1_imported' ? `<button class="btn btn-primary btn-sm" onclick="step2Recall()">补录召回</button>` : ''}
+      </div>
+      <div class="status-step ${report.status === 'step2_recall_added' ? 'active' : (report.status === 'step3_experiment_updated' ? 'done' : '')}">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <div class="step-title">实验对比更新</div>
+          <div class="step-desc">更新实验结果，异常记录留待评测运营复核</div>
+        </div>
+        ${report.status === 'step2_recall_added' ? `<button class="btn btn-primary btn-sm" onclick="step3Experiment()">更新实验</button>` : ''}
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>📈 数据概览</h2>
+      <div class="summary-grid">
+        <div class="summary-item">
+          <div class="summary-value">${summary.total_samples}</div>
+          <div class="summary-label">负样本总数</div>
+        </div>
+        <div class="summary-item" style="color: #ef4444;">
+          <div class="summary-value" style="color: #ef4444;">${summary.bucket_anomalies}</div>
+          <div class="summary-label">分差一桶异常</div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-value">${summary.pending_review}</div>
+          <div class="summary-label">待复核</div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-value">${summary.reviewed}</div>
+          <div class="summary-label">已复核</div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-value">${summary.recall_candidates}</div>
+          <div class="summary-label">召回候选数</div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-value">${summary.samples_with_recall}</div>
+          <div class="summary-label">已关联召回</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>✅ 自检结果</h2>
+      ${Object.keys(checkResults).length === 0 ? '<p style="color: #94a3b8; font-size: 13px;">尚未运行自检，点击右上角"运行自检"开始</p>' : `
+        ${renderCheckItem('duplicate_import', '重复导入检测', checkResults.duplicate_import)}
+        ${renderCheckItem('bucket_diff', '离线线上分差一桶检测', checkResults.bucket_diff, true)}
+        ${renderCheckItem('recalc_after_supplement', '补录后重算检测', checkResults.recalc_after_supplement)}
+        ${renderCheckItem('export_consistency', '导出一致性校验', checkResults.export_consistency)}
+      `}
+    </div>
+
+    <div class="card">
+      <div class="tabs">
+        <div class="tab ${currentTab === 'samples' ? 'active' : ''}" onclick="switchTab('samples')">负样本列表</div>
+        <div class="tab ${currentTab === 'recalls' ? 'active' : ''}" onclick="switchTab('recalls')">召回候选表</div>
+      </div>
+      ${currentTab === 'samples' ? renderSamplesTab(samples) : renderRecallsTab(recalls, samples)}
+    </div>
+  `;
+}
+
+function renderCheckItem(type, title, result, isInfo = false) {
+  if (!result) return '';
+  const cls = isInfo ? 'info' : (result.check_passed ? 'passed' : 'failed');
+  const icon = isInfo ? 'ℹ️' : (result.check_passed ? '✅' : '⚠️');
+  return `
+    <div class="check-item ${cls}">
+      <div class="check-header">
+        <span>${icon}</span>
+        <span>${title}</span>
+      </div>
+      <div class="check-detail">${result.details}</div>
+    </div>
+  `;
+}
+
+function renderSamplesTab(samples) {
+  return `
+    <div class="filters">
+      <button class="btn btn-outline btn-sm" onclick="filterSamples('all')">全部</button>
+      <button class="btn btn-outline btn-sm" onclick="filterSamples('anomaly')">仅显示分差一桶异常</button>
+      <span style="font-size: 12px; color: #64748b; margin-left: auto;">红色高亮 = 分差一桶异常，需评测运营复核</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>原始行号</th>
+          <th>物料ID</th>
+          <th>标题</th>
+          <th>离线分</th>
+          <th>线上分</th>
+          <th>离线桶</th>
+          <th>线上桶</th>
+          <th>桶差</th>
+          <th>处理状态</th>
+          <th>关联召回</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${samples.map(s => `
+          <tr class="${s.is_bucket_diff_anomaly ? 'anomaly-row' : ''}">
+            <td><strong>#${s.original_line_no}</strong></td>
+            <td>${s.item_id}</td>
+            <td>${s.item_title}</td>
+            <td>${s.offline_score?.toFixed(2) || '-'}</td>
+            <td>${s.online_score?.toFixed(2) || '-'}</td>
+            <td>${s.offline_bucket || '-'}</td>
+            <td>${s.online_bucket || '-'}</td>
+            <td>${s.bucket_diff != null ? s.bucket_diff : '-'}</td>
+            <td>${processingStatusLabel(s.processing_status)}</td>
+            <td>${s.recall_candidate_added ? '<span class="badge badge-success">已关联</span>' : '<span class="badge badge-default">未关联</span>'}</td>
+            <td><button class="btn btn-outline btn-sm" onclick="viewSampleDetail(${s.id})">查看</button></td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+function renderRecallsTab(recalls, samples) {
+  return `
+    <div style="margin-bottom: 12px;">
+      <button class="btn btn-primary btn-sm" onclick="showAddRecallModal()">+ 添加召回候选</button>
+      <button class="btn btn-secondary btn-sm" onclick="recalcAfterRecall()">🔄 关联后重算</button>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>物料ID</th>
+          <th>标题</th>
+          <th>召回来源</th>
+          <th>召回分数</th>
+          <th>添加人</th>
+          <th>添加时间</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${recalls.length === 0 ? '<tr><td colspan="6" style="text-align: center; color: #94a3b8; padding: 40px;">暂无召回候选数据</td></tr>' : recalls.map(r => `
+          <tr>
+            <td>${r.item_id}</td>
+            <td>${r.item_title}</td>
+            <td>${r.recall_source || '-'}</td>
+            <td>${r.recall_score?.toFixed(2) || '-'}</td>
+            <td>${r.added_by}</td>
+            <td>${r.added_at}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+async function viewSampleDetail(sampleId) {
+  const [sample, audits] = await Promise.all([
+    api(`/samples/${sampleId}`).catch(() => null),
+    api(`/samples/${sampleId}/audit`)
+  ]);
+
+  let sampleData;
+  if (!sample) {
+    const samples = await api(`/reports/${currentReportId}/samples`);
+    sampleData = samples.find(s => s.id === sampleId);
+  } else {
+    sampleData = sample;
+  }
+
+  showModal(`
+    <h3>样本详情 - ${sampleData.item_id}</h3>
+    <div style="margin-bottom: 16px;">
+      <p style="margin-bottom: 8px;"><strong>原始行号:</strong> #${sampleData.original_line_no}</p>
+      <p style="margin-bottom: 8px;"><strong>标题:</strong> ${sampleData.item_title}</p>
+      <p style="margin-bottom: 8px;"><strong>离线分数:</strong> ${sampleData.offline_score?.toFixed(2) || '-'} (桶 ${sampleData.offline_bucket || '-'})</p>
+      <p style="margin-bottom: 8px;"><strong>线上分数:</strong> ${sampleData.online_score?.toFixed(2) || '-'} (桶 ${sampleData.online_bucket || '-'})</p>
+      <p style="margin-bottom: 8px;"><strong>桶差值:</strong> ${sampleData.bucket_diff != null ? sampleData.bucket_diff : '-'} 
+        ${sampleData.is_bucket_diff_anomaly ? '<span class="badge badge-danger">分差一桶异常</span>' : ''}</p>
+      <p style="margin-bottom: 8px;"><strong>当前处理状态:</strong> ${processingStatusLabel(sampleData.processing_status)}</p>
+      <p style="margin-bottom: 8px;"><strong>人工备注:</strong> ${sampleData.manual_remark || '（无）'}</p>
+    </div>
+
+    <div class="form-group">
+      <label>更新处理状态</label>
+      <select id="updateStatus">
+        <option value="imported" ${sampleData.processing_status === 'imported' ? 'selected' : ''}>已导入</option>
+        <option value="reviewing" ${sampleData.processing_status === 'reviewing' ? 'selected' : ''}>复核中</option>
+        <option value="reviewed" ${sampleData.processing_status === 'reviewed' ? 'selected' : ''}>已复核</option>
+        <option value="normal" ${sampleData.processing_status === 'normal' ? 'selected' : ''}>正常</option>
+        <option value="confirmed_anomaly" ${sampleData.processing_status === 'confirmed_anomaly' ? 'selected' : ''}>确认异常</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>人工备注（评测运营追问时留证）</label>
+      <textarea id="updateRemark" placeholder="输入备注...">${sampleData.manual_remark || ''}</textarea>
+    </div>
+
+    <h4 style="margin: 20px 0 12px; font-size: 14px;">📜 审计追踪（${audits.length} 条记录）</h4>
+    <div style="max-height: 200px; overflow-y: auto; border: 1px solid #f0f0f0; border-radius: 6px; padding: 8px;">
+      ${audits.length === 0 ? '<p style="color: #94a3b8; text-align: center; padding: 20px;">暂无审计记录</p>' : 
+        audits.map(a => `
+          <div class="audit-log">
+            <div>
+              <span class="audit-action">${a.action}</span>
+              <span class="audit-time">${a.created_at} · ${a.operator}</span>
+            </div>
+            ${a.remark ? `<div class="audit-detail">${a.remark}</div>` : ''}
+            ${a.old_value != null || a.new_value != null ? `
+              <div class="audit-detail">
+                ${a.old_value != null ? `旧值: ${a.old_value}` : ''}
+                ${a.old_value != null && a.new_value != null ? ' → ' : ''}
+                ${a.new_value != null ? `新值: ${a.new_value}` : ''}
+              </div>
+            ` : ''}
+          </div>
+        `).join('')
+      }
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="hideModal()">关闭</button>
+      <button class="btn btn-primary" onclick="updateSample(${sampleId})">保存修改</button>
+    </div>
+  `);
+}
+
+async function updateSample(sampleId) {
+  const status = document.getElementById('updateStatus').value;
+  const remark = document.getElementById('updateRemark').value;
+  await api(`/samples/${sampleId}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ processing_status: status, manual_remark: remark, operator: 'current_user' })
+  });
+  hideModal();
+  render();
+}
+
+function createReport() {
+  showModal(`
+    <h3>新建周报</h3>
+    <div class="form-group">
+      <label>周次（如 2024-W23）</label>
+      <input id="newWeek" placeholder="2024-W24">
+    </div>
+    <div class="form-group">
+      <label>标题</label>
+      <input id="newTitle" placeholder="2024年第24周推荐探索率周报">
+    </div>
+    <div class="form-group">
+      <label>创建人</label>
+      <input id="newCreator" placeholder="your_name">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="hideModal()">取消</button>
+      <button class="btn btn-primary" onclick="submitCreateReport()">创建</button>
+    </div>
+  `);
+}
+
+async function submitCreateReport() {
+  const week_number = document.getElementById('newWeek').value;
+  const title = document.getElementById('newTitle').value;
+  const created_by = document.getElementById('newCreator').value;
+  if (!week_number || !title) { alert('请填写周次和标题'); return; }
+  const result = await api('/reports', {
+    method: 'POST',
+    body: JSON.stringify({ week_number, title, created_by })
+  });
+  if (result.error) { alert(result.error); return; }
+  hideModal();
+  openReport(result.id);
+}
+
+function openReport(id) {
+  currentReportId = id;
+  currentView = 'detail';
+  currentTab = 'samples';
+  render();
+}
+
+function goBack() {
+  currentView = 'list';
+  currentReportId = null;
+  render();
+}
+
+function switchTab(tab) {
+  currentTab = tab;
+  render();
+}
+
+async function filterSamples(type) {
+  const url = type === 'anomaly' 
+    ? `/reports/${currentReportId}/samples?anomaly_only=1`
+    : `/reports/${currentReportId}/samples`;
+  const samples = await api(url);
+  document.querySelector('.card:nth-of-type(4) tbody').parentNode.parentNode.innerHTML = renderSamplesTab(samples);
+}
+
+async function runSelfCheck() {
+  const results = await api(`/reports/${currentReportId}/self-check`, { method: 'POST' });
+  alert('自检完成！\n\n' + Object.entries(results).map(([k, v]) => `${k}: ${v.details}`).join('\n'));
+  render();
+}
+
+function exportCSV() {
+  window.open(`${API}/reports/${currentReportId}/export?exported_by=current_user`, '_blank');
+}
+
+async function step1Import() {
+  const samples = [
+    { item_id: 'TEST001', item_title: '测试导入样本1', offline_score: 0.35, online_score: 0.44 },
+    { item_id: 'TEST002', item_title: '测试导入样本2', offline_score: 0.55, online_score: 0.48 }
+  ];
+  showModal(`
+    <h3>第一步：导入负样本</h3>
+    <p style="color: #64748b; font-size: 13px; margin-bottom: 16px;">
+      实际使用时上传CSV，这里演示用内置样例数据。<br>
+      系统会自动：①保留原始行号 ②计算分桶 ③标记分差一桶异常 ④写入审计日志
+    </p>
+    <div class="form-group">
+      <label>导入数据预览</label>
+      <textarea style="height: 150px; font-family: monospace; font-size: 12px;" readonly>${JSON.stringify(samples, null, 2)}</textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="hideModal()">取消</button>
+      <button class="btn btn-primary" onclick="doStep1Import()">确认导入</button>
+    </div>
+  `);
+}
+
+async function doStep1Import() {
+  const samples = [
+    { original_line_no: 1, item_id: 'STEP1_001', item_title: '导入演示-连衣裙', offline_score: 0.32, online_score: 0.41 },
+    { original_line_no: 2, item_id: 'STEP1_002', item_title: '导入演示-运动鞋', offline_score: 0.58, online_score: 0.52 },
+    { original_line_no: 3, item_id: 'STEP1_003', item_title: '导入演示-智能手表', offline_score: 0.75, online_score: 0.68 }
+  ];
+  await api(`/reports/${currentReportId}/samples/import`, {
+    method: 'POST',
+    body: JSON.stringify({ samples, operator: 'operator_zhang' })
+  });
+  await api(`/reports/${currentReportId}/status`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status: 'step1_imported' })
+  });
+  hideModal();
+  render();
+}
+
+function step2Recall() {
+  showModal(`
+    <h3>第二步：林姐补录召回候选</h3>
+    <p style="color: #64748b; font-size: 13px; margin-bottom: 16px;">
+      数据科学家林姐回看周报时补充召回候选表。<br>
+      补充后需要关联负样本并重算，异常不急着归正常。
+    </p>
+    <div class="form-group">
+      <label>召回候选数据（林姐补录）</label>
+      <textarea id="recallData" style="height: 150px; font-family: monospace; font-size: 12px;">[
+  { "item_id": "REC001", "item_title": "补录-碎花上衣", "recall_source": "通道A", "recall_score": 0.65 },
+  { "item_id": "REC002", "item_title": "补录-休闲凉鞋", "recall_source": "通道B", "recall_score": 0.58 }
+]</textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="hideModal()">取消</button>
+      <button class="btn btn-primary" onclick="doStep2Recall()">确认补录</button>
+    </div>
+  `);
+}
+
+async function doStep2Recall() {
+  let items;
+  try {
+    items = JSON.parse(document.getElementById('recallData').value);
+  } catch(e) { alert('JSON格式错误'); return; }
+  
+  await api(`/reports/${currentReportId}/recalls`, {
+    method: 'POST',
+    body: JSON.stringify({ items, added_by: 'linjie' })
+  });
+  await api(`/reports/${currentReportId}/status`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status: 'step2_recall_added' })
+  });
+  hideModal();
+  render();
+}
+
+async function recalcAfterRecall() {
+  if (!confirm('关联召回候选后重算分桶？异常状态会保留给评测运营复核。')) return;
+  await api(`/reports/${currentReportId}/recalc`, {
+    method: 'POST',
+    body: JSON.stringify({ operator: 'linjie' })
+  });
+  render();
+}
+
+function showAddRecallModal() {
+  showModal(`
+    <h3>添加召回候选</h3>
+    <div class="form-group">
+      <label>物料ID</label>
+      <input id="recItemId">
+    </div>
+    <div class="form-group">
+      <label>标题</label>
+      <input id="recTitle">
+    </div>
+    <div class="form-group">
+      <label>召回来源</label>
+      <input id="recSource" placeholder="如：召回通道A">
+    </div>
+    <div class="form-group">
+      <label>召回分数</label>
+      <input id="recScore" type="number" step="0.01">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="hideModal()">取消</button>
+      <button class="btn btn-primary" onclick="doAddRecall()">添加</button>
+    </div>
+  `);
+}
+
+async function doAddRecall() {
+  const item = {
+    item_id: document.getElementById('recItemId').value,
+    item_title: document.getElementById('recTitle').value,
+    recall_source: document.getElementById('recSource').value,
+    recall_score: parseFloat(document.getElementById('recScore').value)
+  };
+  if (!item.item_id) { alert('请输入物料ID'); return; }
+  await api(`/reports/${currentReportId}/recalls`, {
+    method: 'POST',
+    body: JSON.stringify({ items: [item], added_by: 'linjie' })
+  });
+  hideModal();
+  render();
+}
+
+function step3Experiment() {
+  showModal(`
+    <h3>第三步：实验对比更新</h3>
+    <p style="color: #64748b; font-size: 13px; margin-bottom: 16px;">
+      更新实验对比结果。<br>
+      <strong style="color: #ef4444;">重要：离线和线上分数差了一个桶的记录，别急着归正常，留给评测运营复核。</strong>
+    </p>
+    <div class="form-group">
+      <label>更新后的状态</label>
+      <select id="newStatus">
+        <option value="step3_experiment_updated">实验对比已更新（待运营复核）</option>
+        <option value="reviewing">评测运营复核中</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="hideModal()">取消</button>
+      <button class="btn btn-primary" onclick="doStep3Experiment()">确认更新</button>
+    </div>
+  `);
+}
+
+async function doStep3Experiment() {
+  const status = document.getElementById('newStatus').value;
+  await api(`/reports/${currentReportId}/status`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status })
+  });
+  hideModal();
+  render();
+}
+
+render();
+</script>
+</body>
+</html>

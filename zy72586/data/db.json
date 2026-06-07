@@ -1,0 +1,392 @@
+{
+  "weekly_reports": [
+    {
+      "id": 1,
+      "week_number": "2024-W23",
+      "title": "2024年第23周推荐探索率周报",
+      "created_at": "2026-06-07 08:45:15"
+    }
+  ],
+  "negative_samples": [
+    {
+      "id": 1,
+      "report_id": 1,
+      "original_line_no": 1,
+      "item_id": "ITEM001",
+      "item_title": "夏季新款连衣裙",
+      "offline_score": 0.32,
+      "online_score": 0.41,
+      "offline_bucket": 4,
+      "online_bucket": 5,
+      "bucket_diff": 1,
+      "is_bucket_diff_anomaly": 1,
+      "raw_data": "{\"original_line_no\":1,\"item_id\":\"ITEM001\",\"item_title\":\"夏季新款连衣裙\",\"offline_score\":0.32,\"online_score\":0.41}",
+      "processing_status": "imported",
+      "created_at": "2026-06-07 08:45:15"
+    },
+    {
+      "id": 1,
+      "report_id": 1,
+      "original_line_no": 2,
+      "item_id": "ITEM002",
+      "item_title": "男士休闲运动鞋",
+      "offline_score": 0.58,
+      "online_score": 0.52,
+      "offline_bucket": 6,
+      "online_bucket": 6,
+      "bucket_diff": 0,
+      "is_bucket_diff_anomaly": 0,
+      "raw_data": "{\"original_line_no\":2,\"item_id\":\"ITEM002\",\"item_title\":\"男士休闲运动鞋\",\"offline_score\":0.58,\"online_score\":0.52}",
+      "processing_status": "imported",
+      "created_at": "2026-06-07 08:45:15"
+    },
+    {
+      "id": 1,
+      "report_id": 1,
+      "original_line_no": 3,
+      "item_id": "ITEM003",
+      "item_title": "智能手表Pro版",
+      "offline_score": 0.75,
+      "online_score": 0.68,
+      "offline_bucket": 8,
+      "online_bucket": 7,
+      "bucket_diff": 1,
+      "is_bucket_diff_anomaly": 1,
+      "raw_data": "{\"original_line_no\":3,\"item_id\":\"ITEM003\",\"item_title\":\"智能手表Pro版\",\"offline_score\":0.75,\"online_score\":0.68}",
+      "processing_status": "imported",
+      "created_at": "2026-06-07 08:45:15"
+    },
+    {
+      "id": 1,
+      "report_id": 1,
+      "original_line_no": 4,
+      "item_id": "ITEM004",
+      "item_title": "无线蓝牙耳机",
+      "offline_score": 0.44,
+      "online_score": 0.51,
+      "offline_bucket": 5,
+      "online_bucket": 6,
+      "bucket_diff": 1,
+      "is_bucket_diff_anomaly": 1,
+      "raw_data": "{\"original_line_no\":4,\"item_id\":\"ITEM004\",\"item_title\":\"无线蓝牙耳机\",\"offline_score\":0.44,\"online_score\":0.51}",
+      "processing_status": "imported",
+      "created_at": "2026-06-07 08:45:15"
+    },
+    {
+      "id": 1,
+      "report_id": 1,
+      "original_line_no": 5,
+      "item_id": "ITEM005",
+      "item_title": "家用空气净化器",
+      "offline_score": 0.21,
+      "online_score": 0.29,
+      "offline_bucket": 3,
+      "online_bucket": 3,
+      "bucket_diff": 0,
+      "is_bucket_diff_anomaly": 0,
+      "raw_data": "{\"original_line_no\":5,\"item_id\":\"ITEM005\",\"item_title\":\"家用空气净化器\",\"offline_score\":0.21,\"online_score\":0.29}",
+      "processing_status": "imported",
+      "created_at": "2026-06-07 08:45:15"
+    },
+    {
+      "id": 1,
+      "report_id": 1,
+      "original_line_no": 6,
+      "item_id": "ITEM006",
+      "item_title": "便携充电宝20000mAh",
+      "offline_score": 0.62,
+      "online_score": 0.71,
+      "offline_bucket": 7,
+      "online_bucket": 8,
+      "bucket_diff": 1,
+      "is_bucket_diff_anomaly": 1,
+      "raw_data": "{\"original_line_no\":6,\"item_id\":\"ITEM006\",\"item_title\":\"便携充电宝20000mAh\",\"offline_score\":0.62,\"online_score\":0.71}",
+      "processing_status": "imported",
+      "created_at": "2026-06-07 08:45:15"
+    },
+    {
+      "id": 1,
+      "report_id": 1,
+      "original_line_no": 7,
+      "item_id": "ITEM007",
+      "item_title": "机械键盘青轴",
+      "offline_score": 0.38,
+      "online_score": 0.47,
+      "offline_bucket": 4,
+      "online_bucket": 5,
+      "bucket_diff": 1,
+      "is_bucket_diff_anomaly": 1,
+      "raw_data": "{\"original_line_no\":7,\"item_id\":\"ITEM007\",\"item_title\":\"机械键盘青轴\",\"offline_score\":0.38,\"online_score\":0.47}",
+      "processing_status": "imported",
+      "created_at": "2026-06-07 08:45:15"
+    },
+    {
+      "id": 1,
+      "report_id": 1,
+      "original_line_no": 8,
+      "item_id": "ITEM008",
+      "item_title": "人体工学办公椅",
+      "offline_score": 0.81,
+      "online_score": 0.83,
+      "offline_bucket": 9,
+      "online_bucket": 9,
+      "bucket_diff": 0,
+      "is_bucket_diff_anomaly": 0,
+      "raw_data": "{\"original_line_no\":8,\"item_id\":\"ITEM008\",\"item_title\":\"人体工学办公椅\",\"offline_score\":0.81,\"online_score\":0.83}",
+      "processing_status": "imported",
+      "created_at": "2026-06-07 08:45:15"
+    },
+    {
+      "id": 1,
+      "report_id": 1,
+      "original_line_no": 9,
+      "item_id": "ITEM009",
+      "item_title": "高清投影仪家用",
+      "offline_score": 0.15,
+      "online_score": 0.24,
+      "offline_bucket": 2,
+      "online_bucket": 3,
+      "bucket_diff": 1,
+      "is_bucket_diff_anomaly": 1,
+      "raw_data": "{\"original_line_no\":9,\"item_id\":\"ITEM009\",\"item_title\":\"高清投影仪家用\",\"offline_score\":0.15,\"online_score\":0.24}",
+      "processing_status": "imported",
+      "created_at": "2026-06-07 08:45:15"
+    },
+    {
+      "id": 1,
+      "report_id": 1,
+      "original_line_no": 10,
+      "item_id": "ITEM010",
+      "item_title": "电动牙刷声波震动",
+      "offline_score": 0.49,
+      "online_score": 0.58,
+      "offline_bucket": 5,
+      "online_bucket": 6,
+      "bucket_diff": 1,
+      "is_bucket_diff_anomaly": 1,
+      "raw_data": "{\"original_line_no\":10,\"item_id\":\"ITEM010\",\"item_title\":\"电动牙刷声波震动\",\"offline_score\":0.49,\"online_score\":0.58}",
+      "processing_status": "imported",
+      "created_at": "2026-06-07 08:45:15"
+    }
+  ],
+  "sample_audit_logs": [
+    {
+      "id": 1,
+      "sample_id": 1,
+      "action": "import",
+      "old_value": null,
+      "new_value": "{\"original_line_no\":1,\"item_id\":\"ITEM001\",\"item_title\":\"夏季新款连衣裙\",\"offline_score\":0.32,\"online_score\":0.41}",
+      "operator": "operator_zhang",
+      "remark": "第一次导入负样本",
+      "created_at": "2026-06-07 08:45:15"
+    },
+    {
+      "id": 1,
+      "sample_id": 1,
+      "action": "import",
+      "old_value": null,
+      "new_value": "{\"original_line_no\":2,\"item_id\":\"ITEM002\",\"item_title\":\"男士休闲运动鞋\",\"offline_score\":0.58,\"online_score\":0.52}",
+      "operator": "operator_zhang",
+      "remark": "第一次导入负样本",
+      "created_at": "2026-06-07 08:45:15"
+    },
+    {
+      "id": 1,
+      "sample_id": 1,
+      "action": "import",
+      "old_value": null,
+      "new_value": "{\"original_line_no\":3,\"item_id\":\"ITEM003\",\"item_title\":\"智能手表Pro版\",\"offline_score\":0.75,\"online_score\":0.68}",
+      "operator": "operator_zhang",
+      "remark": "第一次导入负样本",
+      "created_at": "2026-06-07 08:45:15"
+    },
+    {
+      "id": 1,
+      "sample_id": 1,
+      "action": "import",
+      "old_value": null,
+      "new_value": "{\"original_line_no\":4,\"item_id\":\"ITEM004\",\"item_title\":\"无线蓝牙耳机\",\"offline_score\":0.44,\"online_score\":0.51}",
+      "operator": "operator_zhang",
+      "remark": "第一次导入负样本",
+      "created_at": "2026-06-07 08:45:15"
+    },
+    {
+      "id": 1,
+      "sample_id": 1,
+      "action": "import",
+      "old_value": null,
+      "new_value": "{\"original_line_no\":5,\"item_id\":\"ITEM005\",\"item_title\":\"家用空气净化器\",\"offline_score\":0.21,\"online_score\":0.29}",
+      "operator": "operator_zhang",
+      "remark": "第一次导入负样本",
+      "created_at": "2026-06-07 08:45:15"
+    },
+    {
+      "id": 1,
+      "sample_id": 1,
+      "action": "import",
+      "old_value": null,
+      "new_value": "{\"original_line_no\":6,\"item_id\":\"ITEM006\",\"item_title\":\"便携充电宝20000mAh\",\"offline_score\":0.62,\"online_score\":0.71}",
+      "operator": "operator_zhang",
+      "remark": "第一次导入负样本",
+      "created_at": "2026-06-07 08:45:15"
+    },
+    {
+      "id": 1,
+      "sample_id": 1,
+      "action": "import",
+      "old_value": null,
+      "new_value": "{\"original_line_no\":7,\"item_id\":\"ITEM007\",\"item_title\":\"机械键盘青轴\",\"offline_score\":0.38,\"online_score\":0.47}",
+      "operator": "operator_zhang",
+      "remark": "第一次导入负样本",
+      "created_at": "2026-06-07 08:45:15"
+    },
+    {
+      "id": 1,
+      "sample_id": 1,
+      "action": "import",
+      "old_value": null,
+      "new_value": "{\"original_line_no\":8,\"item_id\":\"ITEM008\",\"item_title\":\"人体工学办公椅\",\"offline_score\":0.81,\"online_score\":0.83}",
+      "operator": "operator_zhang",
+      "remark": "第一次导入负样本",
+      "created_at": "2026-06-07 08:45:15"
+    },
+    {
+      "id": 1,
+      "sample_id": 1,
+      "action": "import",
+      "old_value": null,
+      "new_value": "{\"original_line_no\":9,\"item_id\":\"ITEM009\",\"item_title\":\"高清投影仪家用\",\"offline_score\":0.15,\"online_score\":0.24}",
+      "operator": "operator_zhang",
+      "remark": "第一次导入负样本",
+      "created_at": "2026-06-07 08:45:15"
+    },
+    {
+      "id": 1,
+      "sample_id": 1,
+      "action": "import",
+      "old_value": null,
+      "new_value": "{\"original_line_no\":10,\"item_id\":\"ITEM010\",\"item_title\":\"电动牙刷声波震动\",\"offline_score\":0.49,\"online_score\":0.58}",
+      "operator": "operator_zhang",
+      "remark": "第一次导入负样本",
+      "created_at": "2026-06-07 08:45:15"
+    }
+  ],
+  "recall_candidates": [
+    {
+      "id": 1,
+      "report_id": 1,
+      "sample_id": null,
+      "item_id": "ITEM101",
+      "item_title": "碎花雪纺上衣",
+      "recall_source": "召回通道A",
+      "recall_score": 0.65,
+      "added_by": "linjie",
+      "created_at": "2026-06-07 08:45:15"
+    },
+    {
+      "id": 1,
+      "report_id": 1,
+      "sample_id": null,
+      "item_id": "ITEM102",
+      "item_title": "休闲凉鞋女款",
+      "recall_source": "召回通道B",
+      "recall_score": 0.58,
+      "added_by": "linjie",
+      "created_at": "2026-06-07 08:45:15"
+    },
+    {
+      "id": 1,
+      "report_id": 1,
+      "sample_id": null,
+      "item_id": "ITEM103",
+      "item_title": "运动速干T恤",
+      "recall_source": "召回通道A",
+      "recall_score": 0.72,
+      "added_by": "linjie",
+      "created_at": "2026-06-07 08:45:15"
+    }
+  ],
+  "self_check_results": [
+    {
+      "id": 1,
+      "report_id": 1,
+      "check_type": "duplicate_import",
+      "check_passed": 1,
+      "details": "无重复导入",
+      "created_at": "2026-06-07 08:49:47"
+    },
+    {
+      "id": 1,
+      "report_id": 1,
+      "check_type": "bucket_diff",
+      "check_passed": 1,
+      "details": "检测到 7 条离线线上分差一个桶的记录（需评测运营复核）",
+      "created_at": "2026-06-07 08:49:47"
+    },
+    {
+      "id": 1,
+      "report_id": 1,
+      "check_type": "export_consistency",
+      "check_passed": 0,
+      "details": "尚未导出过，无法校验一致性",
+      "created_at": "2026-06-07 08:49:47"
+    },
+    {
+      "id": 1,
+      "report_id": 1,
+      "check_type": "recalc_after_supplement",
+      "check_passed": 0,
+      "details": "存在召回候选补录但未关联到负样本，需要重算",
+      "created_at": "2026-06-07 08:49:47"
+    },
+    {
+      "id": 1,
+      "report_id": 1,
+      "check_type": "duplicate_import",
+      "check_passed": 1,
+      "details": "无重复导入",
+      "created_at": "2026-06-07 08:50:43"
+    },
+    {
+      "id": 1,
+      "report_id": 1,
+      "check_type": "bucket_diff",
+      "check_passed": 1,
+      "details": "检测到 7 条离线线上分差一个桶的记录（需评测运营复核）",
+      "created_at": "2026-06-07 08:50:43"
+    },
+    {
+      "id": 1,
+      "report_id": 1,
+      "check_type": "export_consistency",
+      "check_passed": 0,
+      "details": "尚未导出过，无法校验一致性",
+      "created_at": "2026-06-07 08:50:43"
+    },
+    {
+      "id": 1,
+      "report_id": 1,
+      "check_type": "recalc_after_supplement",
+      "check_passed": 0,
+      "details": "存在召回候选补录但未关联到负样本，需要重算",
+      "created_at": "2026-06-07 08:50:43"
+    }
+  ],
+  "export_records": [
+    {
+      "id": 1,
+      "report_id": 1,
+      "export_type": "5f0f68e66a7ea2218777a472a874f61e",
+      "content_hash": "system",
+      "created_at": "2026-06-07 08:53:29"
+    }
+  ],
+  "_counters": {
+    "weekly_reports": 0,
+    "negative_samples": 0,
+    "sample_audit_logs": 0,
+    "recall_candidates": 0,
+    "self_check_results": 0,
+    "export_records": 0
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "recommendation-exploration-weekly",
+  "version": "1.0.0",
+  "description": "推荐探索率周报系统",
+  "main": "server/index.js",
+  "scripts": {
+    "server": "node server/index.js",
+    "dev": "node server/index.js",
+    "init-data": "node server/scripts/initSampleData.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "json2csv": "^6.0.0-alpha.2"
+  }
+}
