@@ -1,0 +1,17 @@
+{
+  "ticket": {
+    "ticket_id": "FB20240601001",
+    "original_line_no": 42,
+    "raw_content": "用户反馈英语翻译不准确",
+    "source_language": "zh",
+    "target_language": "en",
+    "feedback_type": "translation_error",
+    "reported_at": "2024-06-01T10:30:00",
+    "reporter": "customer_service_01",
+    "original_translation": "Hello, how can I help you?",
+    "customer_text": "您好，请问我的订单什么时候发货？"
+  },
+  "sample_no": "SAMPLE-001",
+  "model_version": "v2.1.0",
+  "model_translation": "Hello, could you tell me when my order will be shipped?"
+}

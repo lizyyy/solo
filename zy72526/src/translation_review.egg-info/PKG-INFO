@@ -1,0 +1,11 @@
+Metadata-Version: 2.4
+Name: translation-review
+Version: 0.1.0
+Summary: 多语言客服翻译回看系统 - 线上反馈工单与脱敏规则备注的统一管理平台
+Requires-Python: >=3.9
+Requires-Dist: pydantic>=2.0.0
+Requires-Dist: fastapi>=0.100.0
+Requires-Dist: uvicorn>=0.23.0
+Requires-Dist: click>=8.0.0
+Requires-Dist: pandas>=2.0.0
+Requires-Dist: python-dateutil>=2.8.0

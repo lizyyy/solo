@@ -1,0 +1,70 @@
+[
+  {
+    "ticket": {
+      "ticket_id": "FB20240601001",
+      "original_line_no": 42,
+      "raw_content": "用户反馈英语翻译不准确",
+      "source_language": "zh",
+      "target_language": "en",
+      "feedback_type": "translation_error",
+      "reported_at": "2024-06-01T10:30:00",
+      "reporter": "customer_service_01",
+      "original_translation": "Hello, how can I help you?",
+      "customer_text": "您好，请问我的订单什么时候发货？"
+    },
+    "sample_no": "SAMPLE-001",
+    "model_version": "v2.1.0",
+    "model_translation": "Hello, could you tell me when my order will be shipped?"
+  },
+  {
+    "ticket": {
+      "ticket_id": "FB20240601002",
+      "original_line_no": 43,
+      "raw_content": "用户反馈日语翻译不通顺",
+      "source_language": "zh",
+      "target_language": "ja",
+      "feedback_type": "unnatural",
+      "reported_at": "2024-06-01T11:15:00",
+      "reporter": "customer_service_02",
+      "original_translation": "こんにちは、何をお探しですか？",
+      "customer_text": "请问这个商品有货吗？"
+    },
+    "sample_no": "SAMPLE-002",
+    "model_version": "v2.1.0",
+    "model_translation": "すみません、この商品は在庫がありますか？"
+  },
+  {
+    "ticket": {
+      "ticket_id": "FB20240601003",
+      "original_line_no": 44,
+      "raw_content": "用户反馈包含敏感词",
+      "source_language": "zh",
+      "target_language": "en",
+      "feedback_type": "sensitive_content",
+      "reported_at": "2024-06-01T14:00:00",
+      "reporter": "customer_service_01",
+      "original_translation": "This is a test message.",
+      "customer_text": "我要投诉你们的服务太差了"
+    },
+    "sample_no": "SAMPLE-003",
+    "model_version": "v2.1.0",
+    "model_translation": "I want to complain about your terrible service."
+  },
+  {
+    "ticket": {
+      "ticket_id": "FB20240601001",
+      "original_line_no": 42,
+      "raw_content": "用户反馈英语翻译不准确（重复导入测试）",
+      "source_language": "zh",
+      "target_language": "en",
+      "feedback_type": "translation_error",
+      "reported_at": "2024-06-01T10:30:00",
+      "reporter": "customer_service_01",
+      "original_translation": "Hello, how can I help you?",
+      "customer_text": "您好，请问我的订单什么时候发货？"
+    },
+    "sample_no": "SAMPLE-001",
+    "model_version": "v2.2.0",
+    "model_translation": "Hello, may I ask when my order will be dispatched?"
+  }
+]

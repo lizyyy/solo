@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "translation-review"
+version = "0.1.0"
+description = "多语言客服翻译回看系统 - 线上反馈工单与脱敏规则备注的统一管理平台"
+requires-python = ">=3.9"
+dependencies = [
+    "pydantic>=2.0.0",
+    "fastapi>=0.100.0",
+    "uvicorn>=0.23.0",
+    "click>=8.0.0",
+    "pandas>=2.0.0",
+    "python-dateutil>=2.8.0",
+]
+
+[project.scripts]
+trans-review = "translation_review.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
