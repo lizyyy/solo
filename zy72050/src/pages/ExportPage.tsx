@@ -18,6 +18,7 @@ export default function ExportPage() {
   const filters = useAppStore(s => s.filters);
   const filtered = useFilteredData();
   const supplementalDiff = useAppStore(s => s.supplementalDiff);
+  const canvasDataUrl = useAppStore(s => s.canvasDataUrl);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const reportRef = useRef<HTMLDivElement>(null);
 
@@ -26,7 +27,13 @@ export default function ExportPage() {
 
   const anomalies = useMemo(() => data.filter(r => r.anomaly.isAnomaly), [data]);
   const withNotes = useMemo(() => data.filter(r => r.notes.length > 0), [data]);
-  const withSupplemental = useMemo(() => Object.keys(supplementalDiff), [supplementalDiff]);
+  const withSupplemental = useMemo(() => {
+    return Object.keys(supplementalDiff).filter(recId => {
+      const rec = data.find(r => r.id === recId);
+      const diff = supplementalDiff[recId];
+      return rec && diff && rec.notes.length > diff.beforeNoteCount;
+    });
+  }, [data, supplementalDiff]);
 
   useEffect(() => {
     if (data.length === 0) {
@@ -120,10 +127,29 @@ export default function ExportPage() {
 
   const handleDownloadScreenshot = async () => {
     try {
-      const glCanvas = document.querySelector('.react-three-fiber-canvas canvas') as HTMLCanvasElement;
-      if (!glCanvas) {
-        alert('请先到 3D 云台页调整好视角再回来导出');
+      let glCanvas = document.querySelector('.react-three-fiber-canvas canvas') as HTMLCanvasElement;
+
+      if (!glCanvas && canvasDataUrl) {
+        const img = new (window.Image as any)();
+        img.src = canvasDataUrl;
+        await new Promise(resolve => { img.onload = resolve; });
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = img.width;
+        tempCanvas.height = img.height;
+        const ctx = tempCanvas.getContext('2d')!;
+        ctx.drawImage(img, 0, 0);
+        glCanvas = tempCanvas;
+      }
+
+      if (!glCanvas && data.length > 0) {
+        alert('请先到 3D 云台页调整好视角，点击"导出报告"按钮后再回来');
         navigate('/cloud');
+        return;
+      }
+
+      if (!glCanvas) {
+        alert('没有可导出的 3D 画面，请先导入数据');
+        navigate('/import');
         return;
       }
 

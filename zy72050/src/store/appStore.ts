@@ -19,6 +19,9 @@ interface AppState {
   axisMapping: { x: 'delta'; y: 'gamma'; z: 'vega' }
   lastLoadedSchemeId: string | null
   supplementalDiff: Record<string, { beforeNoteCount: number; modifiedAt: string }>
+  baselineMarked: boolean
+  baselineTime: string | null
+  canvasDataUrl: string | null
 
   importData: (raw: Record<string, unknown>[], mapping: FieldMapping, sourceInfo: SourceInfo) => void
   addNote: (recordId: string, content: string, author?: string) => void
@@ -30,6 +33,8 @@ interface AppState {
   loadScheme: (id: string) => void
   setCamera: (camera: CameraState) => void
   clearData: () => void
+  markBaseline: () => void
+  setCanvasDataUrl: (url: string | null) => void
 }
 
 const defaultFilters: FilterState = {
@@ -57,6 +62,9 @@ export const useAppStore = create<AppState>()(
       axisMapping: { x: 'delta', y: 'gamma', z: 'vega' },
       lastLoadedSchemeId: null,
       supplementalDiff: {},
+      baselineMarked: false,
+      baselineTime: null,
+      canvasDataUrl: null,
 
       importData: (raw, mapping, sourceInfo) => {
         const records = raw.map(r => buildDataRecord(r, mapping, sourceInfo));
@@ -70,6 +78,9 @@ export const useAppStore = create<AppState>()(
             thetaRange: ranges.theta,
             vegaRange: ranges.vega,
           },
+          baselineMarked: false,
+          baselineTime: null,
+          supplementalDiff: {},
         });
       },
 
@@ -170,8 +181,29 @@ export const useAppStore = create<AppState>()(
           filters: defaultFilters,
           camera: defaultCamera,
           supplementalDiff: {},
+          baselineMarked: false,
+          baselineTime: null,
+          canvasDataUrl: null,
         });
       },
+
+      markBaseline: () => {
+        const now = new Date().toISOString();
+        const diffSnapshot: Record<string, { beforeNoteCount: number; modifiedAt: string }> = {};
+        for (const rec of get().data) {
+          diffSnapshot[rec.id] = {
+            beforeNoteCount: rec.notes.length,
+            modifiedAt: now,
+          };
+        }
+        set({
+          baselineMarked: true,
+          baselineTime: now,
+          supplementalDiff: diffSnapshot,
+        });
+      },
+
+      setCanvasDataUrl: (url) => set({ canvasDataUrl: url }),
     }),
     {
       name: 'greek-cloud-store',
@@ -180,6 +212,9 @@ export const useAppStore = create<AppState>()(
         schemes: state.schemes,
         filters: state.filters,
         supplementalDiff: state.supplementalDiff,
+        baselineMarked: state.baselineMarked,
+        baselineTime: state.baselineTime,
+        canvasDataUrl: state.canvasDataUrl,
       }),
     }
   )

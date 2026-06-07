@@ -1,11 +1,12 @@
-import { useCallback, useState, useEffect } from 'react';
+import { useCallback, useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Save, FileText, Layers, Database } from 'lucide-react';
+import { Save, FileText, Layers, Database, Flag, Camera } from 'lucide-react';
 import Scene3D from '@/components/Scene3D';
 import TracePanel from '@/components/TracePanel';
 import FilterBar from '@/components/FilterBar';
 import { useAppStore, useFilteredData } from '@/store/appStore';
 import type { GreekAxis, CameraState } from '@/types';
+import { formatDateTime } from '@/utils/data';
 
 const axisOptions: { label: string; value: GreekAxis }[] = [
   { label: 'Delta', value: 'delta' },
@@ -26,9 +27,14 @@ export default function CloudPage() {
   const saveScheme = useAppStore(s => s.saveScheme);
   const resetFiltersToFullRange = useAppStore(s => s.resetFiltersToFullRange);
   const lastLoadedSchemeId = useAppStore(s => s.lastLoadedSchemeId);
+  const baselineMarked = useAppStore(s => s.baselineMarked);
+  const baselineTime = useAppStore(s => s.baselineTime);
+  const markBaseline = useAppStore(s => s.markBaseline);
+  const setCanvasDataUrl = useAppStore(s => s.setCanvasDataUrl);
 
   const filtered = useFilteredData();
   const selectedRecord = data.find(r => r.id === selectedId) || null;
+  const cloudContainerRef = useRef<HTMLDivElement>(null);
 
   const [axisMapping, setAxisMapping] = useState<{ x: GreekAxis; y: GreekAxis; z: GreekAxis }>({
     x: 'delta',
@@ -49,6 +55,21 @@ export default function CloudPage() {
     }
   }, [data, navigate]);
 
+  const captureCanvas = () => {
+    const canvas = document.querySelector('.react-three-fiber-canvas canvas') as HTMLCanvasElement;
+    if (canvas) {
+      try {
+        const dataUrl = canvas.toDataURL('image/png');
+        setCanvasDataUrl(dataUrl);
+        return dataUrl;
+      } catch (e) {
+        console.error('Canvas capture failed:', e);
+        return null;
+      }
+    }
+    return null;
+  };
+
   const handleSaveScheme = () => {
     if (!schemeName.trim()) return;
     saveScheme(schemeName.trim());
@@ -57,11 +78,14 @@ export default function CloudPage() {
   };
 
   const handleExportScreenshot = () => {
-    navigate('/export');
+    captureCanvas();
+    setTimeout(() => {
+      navigate('/export');
+    }, 100);
   };
 
   return (
-    <div className="h-full flex flex-col">
+    <div ref={cloudContainerRef} className="h-full flex flex-col">
       <FilterBar
         filters={filters}
         onChange={setFilters}
@@ -87,6 +111,13 @@ export default function CloudPage() {
           ))}
         </div>
 
+        {baselineMarked && baselineTime && (
+          <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/30 flex items-center gap-1">
+            <Flag size={10} />
+            基准已标记 · {formatDateTime(baselineTime)}
+          </span>
+        )}
+
         {lastLoadedSchemeId && (
           <span className="text-[10px] text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/30">
             已加载方案
@@ -94,6 +125,18 @@ export default function CloudPage() {
         )}
 
         <div className="ml-auto flex items-center gap-2">
+          <button
+            onClick={markBaseline}
+            title="标记当前状态为基准（对应先跑一小包材料）"
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md transition-all ${
+              baselineMarked
+                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                : 'bg-slate-700/50 text-slate-300 border border-slate-600/50 hover:bg-slate-700'
+            }`}
+          >
+            <Flag size={12} />
+            {baselineMarked ? '已标记基准' : '标记基准状态'}
+          </button>
           <button
             onClick={() => navigate('/import')}
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-md transition-all"
@@ -112,7 +155,7 @@ export default function CloudPage() {
             onClick={handleExportScreenshot}
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-gradient-to-r from-cyan-500/80 to-blue-600/80 text-white hover:from-cyan-400 hover:to-blue-500 rounded-md transition-all"
           >
-            <FileText size={13} />
+            <Camera size={13} />
             导出报告
           </button>
         </div>

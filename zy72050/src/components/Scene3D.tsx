@@ -175,12 +175,13 @@ export default function Scene3D({ data, selectedId, onSelect, axisMapping, onCam
   }, []);
 
   return (
-    <Canvas
-      camera={{ position: initialCamera.position, fov: 50 }}
-      style={{ background: 'linear-gradient(180deg, #0f1320 0%, #1a1f36 100%)' }}
-      gl={{ antialias: true, preserveDrawingBuffer: true }}
-      onClick={() => onSelect(null)}
-    >
+    <div className="w-full h-full react-three-fiber-canvas">
+      <Canvas
+        camera={{ position: initialCamera.position, fov: 50 }}
+        style={{ background: 'linear-gradient(180deg, #0f1320 0%, #1a1f36 100%)' }}
+        gl={{ antialias: true, preserveDrawingBuffer: true }}
+        onClick={() => onSelect(null)}
+      >
       <ambientLight intensity={0.4} />
       <directionalLight position={[5, 10, 5]} intensity={0.8} color="#e2e8f0" />
       <directionalLight position={[-5, 5, -5]} intensity={0.3} color="#94a3b8" />
@@ -221,6 +222,7 @@ export default function Scene3D({ data, selectedId, onSelect, axisMapping, onCam
       <EffectComposer>
         <Bloom luminanceThreshold={0.2} luminanceSmoothing={0.9} height={300} intensity={0.8} />
       </EffectComposer>
-    </Canvas>
+      </Canvas>
+    </div>
   );
 }

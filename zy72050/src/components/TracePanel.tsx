@@ -24,6 +24,7 @@ export default function TracePanel({ record, onClose }: TracePanelProps) {
   const sourceInfo = sourceTypeLabels[record.source.type];
   const SourceIcon = sourceInfo.icon;
   const diff = supplementalDiff[record.id];
+  const hasActualDiff = diff && record.notes.length > diff.beforeNoteCount;
 
   const handleAddNote = () => {
     if (!newNote.trim()) return;
@@ -135,14 +136,14 @@ export default function TracePanel({ record, onClose }: TracePanelProps) {
         <div className="bg-slate-900/50 rounded-lg p-3 border border-slate-700/50">
           <div className="text-xs text-slate-400 mb-3 font-medium flex items-center justify-between">
             <span className="flex items-center gap-1.5">
-              <User size={12} />
-              处理备注
-              {diff && (
-                <span className="ml-2 px-1.5 py-0.5 bg-amber-500/20 text-amber-400 text-[9px] rounded border border-amber-500/30">
-                  补录后 {record.notes.length - diff.beforeNoteCount} 条新增
-                </span>
-              )}
-            </span>
+                <User size={12} />
+                处理备注
+                {hasActualDiff && (
+                  <span className="ml-2 px-1.5 py-0.5 bg-amber-500/20 text-amber-400 text-[9px] rounded border border-amber-500/30">
+                    补录后 {record.notes.length - diff.beforeNoteCount} 条新增
+                  </span>
+                )}
+              </span>
           </div>
 
           {record.notes.length === 0 ? (
@@ -200,7 +201,7 @@ export default function TracePanel({ record, onClose }: TracePanelProps) {
                 追加
               </button>
             </div>
-            {diff && (
+            {hasActualDiff && (
               <div className="mt-2 text-[10px] text-amber-400/80 bg-amber-500/10 border border-amber-500/20 rounded px-2 py-1">
                 ⚠ 这条记录在"先跑一小包材料"后有补录，导出报告时会标注差异
               </div>
