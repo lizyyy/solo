@@ -1,0 +1,6 @@
+﻿检查项,是否通过,严重程度,消息,详情
+重复导入检测,是,info,未发现重复导入,{'batch_counts': {'BATCH_20260607121135': 5}}
+引用链接404仍被判通过检测,是,info,未发现链接问题,{}
+补录后重算检测,是,info,补录工单重算逻辑正常,{'supplementary_count': 2}
+导出一致性检测,是,info,数据引用一致,"{'work_order_count': 5, 'remark_count': 4, 'conflict_count': 2}"
+冲突样本表与历史记录一致性,是,info,冲突样本表与工单状态一致,{}

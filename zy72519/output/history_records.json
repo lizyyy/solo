@@ -1,0 +1,622 @@
+[
+  {
+    "id": "HIS_20260607121135_d58567d5",
+    "operation_type": "import",
+    "operator": "system",
+    "operate_time": "2026-06-07T12:11:35.199857",
+    "target_id": "WO_001",
+    "target_type": "work_order",
+    "before_state": null,
+    "after_state": {
+      "id": "WO_001",
+      "title": "用户反馈APP登录异常",
+      "content": "多位用户反馈在iOS系统上无法正常登录APP，提示网络错误。经初步排查可能与最新版本SSL证书配置有关。",
+      "category": "功能异常",
+      "source": "线上反馈",
+      "feedback_time": "2026-06-01T10:30:00",
+      "import_time": "2026-06-07T12:11:35.199778",
+      "status": "pending",
+      "reference_links": [
+        "https://example.com/ticket/12345",
+        "https://example.com/wiki/login-issue"
+      ],
+      "original_raw_data": {
+        "id": "WO_001",
+        "title": "用户反馈APP登录异常",
+        "content": "多位用户反馈在iOS系统上无法正常登录APP，提示网络错误。经初步排查可能与最新版本SSL证书配置有关。",
+        "category": "功能异常",
+        "source": "线上反馈",
+        "feedback_time": "2026-06-01T10:30:00",
+        "reference_links": "https://example.com/ticket/12345|https://example.com/wiki/login-issue",
+        "original_note": "客户投诉级别：P2，影响范围：约5%用户"
+      },
+      "import_batch": "BATCH_20260607121135",
+      "is_supplementary": false,
+      "reviewer": null,
+      "review_time": null,
+      "review_notes": ""
+    },
+    "notes": "批次 BATCH_20260607121135, 导入类型: normal"
+  },
+  {
+    "id": "HIS_20260607121135_5d345e0d",
+    "operation_type": "import",
+    "operator": "system",
+    "operate_time": "2026-06-07T12:11:35.199898",
+    "target_id": "WO_002",
+    "target_type": "work_order",
+    "before_state": null,
+    "after_state": {
+      "id": "WO_002",
+      "title": "支付页面加载缓慢",
+      "content": "用户反映在支付环节页面加载需要10秒以上，部分用户因此放弃支付。需要优化支付网关响应速度。",
+      "category": "性能问题",
+      "source": "线上反馈",
+      "feedback_time": "2026-06-02T14:20:00",
+      "import_time": "2026-06-07T12:11:35.199877",
+      "status": "pending",
+      "reference_links": [
+        "https://example.com/ticket/12346"
+      ],
+      "original_raw_data": {
+        "id": "WO_002",
+        "title": "支付页面加载缓慢",
+        "content": "用户反映在支付环节页面加载需要10秒以上，部分用户因此放弃支付。需要优化支付网关响应速度。",
+        "category": "性能问题",
+        "source": "线上反馈",
+        "feedback_time": "2026-06-02T14:20:00",
+        "reference_links": "https://example.com/ticket/12346",
+        "original_note": "涉及金额敏感，需要谨慎处理相关日志"
+      },
+      "import_batch": "BATCH_20260607121135",
+      "is_supplementary": false,
+      "reviewer": null,
+      "review_time": null,
+      "review_notes": ""
+    },
+    "notes": "批次 BATCH_20260607121135, 导入类型: normal"
+  },
+  {
+    "id": "HIS_20260607121135_dbce783b",
+    "operation_type": "import",
+    "operator": "system",
+    "operate_time": "2026-06-07T12:11:35.199924",
+    "target_id": "WO_003",
+    "target_type": "work_order",
+    "before_state": null,
+    "after_state": {
+      "id": "WO_003",
+      "title": "商品详情页图片显示错误",
+      "content": "部分商品详情页的图片显示为占位图，用户无法正常查看商品信息。",
+      "category": "展示问题",
+      "source": "线上反馈",
+      "feedback_time": "2026-06-03T09:15:00",
+      "import_time": "2026-06-07T12:11:35.199907",
+      "status": "pending",
+      "reference_links": [],
+      "original_raw_data": {
+        "id": "WO_003",
+        "title": "商品详情页图片显示错误",
+        "content": "部分商品详情页的图片显示为占位图，用户无法正常查看商品信息。",
+        "category": "展示问题",
+        "source": "线上反馈",
+        "feedback_time": "2026-06-03T09:15:00",
+        "reference_links": "",
+        "original_note": ""
+      },
+      "import_batch": "BATCH_20260607121135",
+      "is_supplementary": false,
+      "reviewer": null,
+      "review_time": null,
+      "review_notes": ""
+    },
+    "notes": "批次 BATCH_20260607121135, 导入类型: normal"
+  },
+  {
+    "id": "HIS_20260607121135_ae7e2b4c",
+    "operation_type": "import",
+    "operator": "system",
+    "operate_time": "2026-06-07T12:11:35.200490",
+    "target_id": "WO_004",
+    "target_type": "work_order",
+    "before_state": null,
+    "after_state": {
+      "id": "WO_004",
+      "title": "客服态度问题投诉",
+      "content": "用户投诉客服人员在处理退款问题时态度恶劣，要求道歉和赔偿。",
+      "category": "功能异常",
+      "source": "线上反馈",
+      "feedback_time": "2026-06-04T16:45:00",
+      "import_time": "2026-06-07T12:11:35.200459",
+      "status": "pending",
+      "reference_links": [
+        "https://example.com/ticket/12348"
+      ],
+      "original_raw_data": {
+        "id": "WO_004",
+        "title": "客服态度问题投诉",
+        "content": "用户投诉客服人员在处理退款问题时态度恶劣，要求道歉和赔偿。",
+        "category": "功能异常",
+        "source": "线上反馈",
+        "feedback_time": "2026-06-04T16:45:00",
+        "reference_links": "https://example.com/ticket/12348",
+        "original_note": "此工单被错误归类为功能异常，实际应为服务投诉"
+      },
+      "import_batch": "BATCH_20260607121135",
+      "is_supplementary": false,
+      "reviewer": null,
+      "review_time": null,
+      "review_notes": ""
+    },
+    "notes": "批次 BATCH_20260607121135, 导入类型: wrong_caliber"
+  },
+  {
+    "id": "HIS_20260607121135_84eb2b3a",
+    "operation_type": "supplementary_import",
+    "operator": "system",
+    "operate_time": "2026-06-07T12:11:35.200868",
+    "target_id": "WO_001",
+    "target_type": "work_order",
+    "before_state": {
+      "id": "WO_001",
+      "title": "用户反馈APP登录异常",
+      "content": "多位用户反馈在iOS系统上无法正常登录APP，提示网络错误。经初步排查可能与最新版本SSL证书配置有关。",
+      "category": "功能异常",
+      "source": "线上反馈",
+      "feedback_time": "2026-06-01T10:30:00",
+      "import_time": "2026-06-07T12:11:35.199778",
+      "status": "pending",
+      "reference_links": [
+        "https://example.com/ticket/12345",
+        "https://example.com/wiki/login-issue"
+      ],
+      "original_raw_data": {
+        "id": "WO_001",
+        "title": "用户反馈APP登录异常",
+        "content": "多位用户反馈在iOS系统上无法正常登录APP，提示网络错误。经初步排查可能与最新版本SSL证书配置有关。",
+        "category": "功能异常",
+        "source": "线上反馈",
+        "feedback_time": "2026-06-01T10:30:00",
+        "reference_links": "https://example.com/ticket/12345|https://example.com/wiki/login-issue",
+        "original_note": "客户投诉级别：P2，影响范围：约5%用户"
+      },
+      "import_batch": "BATCH_20260607121135",
+      "is_supplementary": false,
+      "reviewer": null,
+      "review_time": null,
+      "review_notes": ""
+    },
+    "after_state": {
+      "id": "WO_001",
+      "title": "用户反馈APP登录异常-补充",
+      "content": "补充信息：问题仅出现在iOS 15.0以下版本，升级系统后可恢复。影响用户数约2000人。",
+      "category": "功能异常",
+      "source": "补录",
+      "feedback_time": "2026-06-01T10:30:00",
+      "import_time": "2026-06-07T12:11:35.199778",
+      "status": "pending",
+      "reference_links": [
+        "https://example.com/ticket/12345",
+        "https://example.com/wiki/login-issue"
+      ],
+      "original_raw_data": {
+        "id": "WO_001",
+        "title": "用户反馈APP登录异常-补充",
+        "content": "补充信息：问题仅出现在iOS 15.0以下版本，升级系统后可恢复。影响用户数约2000人。",
+        "category": "功能异常",
+        "source": "补录",
+        "feedback_time": "2026-06-01T10:30:00",
+        "reference_links": "https://example.com/ticket/12345|https://example.com/wiki/login-issue",
+        "original_note": "补充了版本信息和影响范围"
+      },
+      "import_batch": "BATCH_20260607121135",
+      "is_supplementary": true,
+      "reviewer": null,
+      "review_time": null,
+      "review_notes": ""
+    },
+    "notes": "批次 BATCH_20260607121135, 导入类型: supplementary"
+  },
+  {
+    "id": "HIS_20260607121135_ecb02b2d",
+    "operation_type": "supplementary_import",
+    "operator": "system",
+    "operate_time": "2026-06-07T12:11:35.200886",
+    "target_id": "WO_005",
+    "target_type": "work_order",
+    "before_state": null,
+    "after_state": {
+      "id": "WO_005",
+      "title": "新用户注册收不到验证码",
+      "content": "部分新用户反馈注册时收不到短信验证码，检查发现短信服务商API限流。",
+      "category": "功能异常",
+      "source": "补录",
+      "feedback_time": "2026-06-05T11:00:00",
+      "import_time": "2026-06-07T12:11:35.200876",
+      "status": "pending",
+      "reference_links": [],
+      "original_raw_data": {
+        "id": "WO_005",
+        "title": "新用户注册收不到验证码",
+        "content": "部分新用户反馈注册时收不到短信验证码，检查发现短信服务商API限流。",
+        "category": "功能异常",
+        "source": "补录",
+        "feedback_time": "2026-06-05T11:00:00",
+        "reference_links": "",
+        "original_note": "遗漏工单补录"
+      },
+      "import_batch": "BATCH_20260607121135",
+      "is_supplementary": true,
+      "reviewer": null,
+      "review_time": null,
+      "review_notes": ""
+    },
+    "notes": "批次 BATCH_20260607121135, 导入类型: supplementary"
+  },
+  {
+    "id": "HIS_20260607121135_c923769c",
+    "operation_type": "review_remark",
+    "operator": "周姐",
+    "operate_time": "2026-06-07T12:11:35.201601",
+    "target_id": "DR_001",
+    "target_type": "desensitization_remark",
+    "before_state": null,
+    "after_state": {
+      "id": "DR_001",
+      "work_order_id": "WO_001",
+      "remark_content": "此工单涉及用户登录日志，包含手机号等敏感信息。导出时需脱敏处理，不对外公开原始数据。重要：此问题涉及的用户信息属于用户隐私，分类需谨慎。",
+      "owner": "周姐",
+      "create_time": "2026-06-01T15:00:00",
+      "update_time": null,
+      "tags": [
+        "隐私",
+        "敏感数据",
+        "需注意"
+      ],
+      "is_important": true,
+      "related_rules": [
+        "R001",
+        " R003"
+      ],
+      "reviewer": null
+    },
+    "notes": "脱敏规则备注导入/更新"
+  },
+  {
+    "id": "HIS_20260607121135_aed3a822",
+    "operation_type": "review_remark",
+    "operator": "周姐",
+    "operate_time": "2026-06-07T12:11:35.201623",
+    "target_id": "DR_002",
+    "target_type": "desensitization_remark",
+    "before_state": null,
+    "after_state": {
+      "id": "DR_002",
+      "work_order_id": "WO_002",
+      "remark_content": "支付相关工单，涉及交易金额和用户银行卡信息（已脱敏）。注意：此工单分类错误，应为'资金安全'而非'性能问题'。分类不符，需要重新判定。",
+      "owner": "周姐",
+      "create_time": "2026-06-02T17:30:00",
+      "update_time": null,
+      "tags": [
+        "支付安全",
+        "分类不符"
+      ],
+      "is_important": true,
+      "related_rules": [
+        "R002",
+        " R004"
+      ],
+      "reviewer": null
+    },
+    "notes": "脱敏规则备注导入/更新"
+  },
+  {
+    "id": "HIS_20260607121135_88c96f69",
+    "operation_type": "review_remark",
+    "operator": "周姐",
+    "operate_time": "2026-06-07T12:11:35.201722",
+    "target_id": "DR_003",
+    "target_type": "desensitization_remark",
+    "before_state": null,
+    "after_state": {
+      "id": "DR_003",
+      "work_order_id": "WO_004",
+      "remark_content": "此工单分类错误，应为'服务投诉'而非'功能异常'。分类不符，需要更正。",
+      "owner": "周姐",
+      "create_time": "2026-06-04T18:00:00",
+      "update_time": null,
+      "tags": [
+        "分类错误"
+      ],
+      "is_important": false,
+      "related_rules": [
+        "R005"
+      ],
+      "reviewer": null
+    },
+    "notes": "脱敏规则备注导入/更新"
+  },
+  {
+    "id": "HIS_20260607121135_388f6e1c",
+    "operation_type": "review_remark",
+    "operator": "周姐",
+    "operate_time": "2026-06-07T12:11:35.201817",
+    "target_id": "DR_004",
+    "target_type": "desensitization_remark",
+    "before_state": null,
+    "after_state": {
+      "id": "DR_004",
+      "work_order_id": "WO_005",
+      "remark_content": "补录工单，涉及短信验证码发送记录，不包含用户敏感信息。可正常导出。",
+      "owner": "周姐",
+      "create_time": "2026-06-05T14:00:00",
+      "update_time": null,
+      "tags": [
+        "补录",
+        "无敏感"
+      ],
+      "is_important": false,
+      "related_rules": [],
+      "reviewer": null
+    },
+    "notes": "脱敏规则备注导入/更新"
+  },
+  {
+    "id": "HIS_20260607121135_92ffeba5",
+    "operation_type": "review_remark",
+    "operator": "周姐",
+    "operate_time": "2026-06-07T12:11:35.201864",
+    "target_id": "WO_001",
+    "target_type": "work_order",
+    "before_state": {
+      "id": "WO_001",
+      "title": "用户反馈APP登录异常-补充",
+      "content": "补充信息：问题仅出现在iOS 15.0以下版本，升级系统后可恢复。影响用户数约2000人。",
+      "category": "功能异常",
+      "source": "补录",
+      "feedback_time": "2026-06-01T10:30:00",
+      "import_time": "2026-06-07T12:11:35.199778",
+      "status": "pending",
+      "reference_links": [
+        "https://example.com/ticket/12345",
+        "https://example.com/wiki/login-issue"
+      ],
+      "original_raw_data": {
+        "id": "WO_001",
+        "title": "用户反馈APP登录异常-补充",
+        "content": "补充信息：问题仅出现在iOS 15.0以下版本，升级系统后可恢复。影响用户数约2000人。",
+        "category": "功能异常",
+        "source": "补录",
+        "feedback_time": "2026-06-01T10:30:00",
+        "reference_links": "https://example.com/ticket/12345|https://example.com/wiki/login-issue",
+        "original_note": "补充了版本信息和影响范围"
+      },
+      "import_batch": "BATCH_20260607121135",
+      "is_supplementary": true,
+      "reviewer": null,
+      "review_time": null,
+      "review_notes": ""
+    },
+    "after_state": {
+      "id": "WO_001",
+      "title": "用户反馈APP登录异常-补充",
+      "content": "补充信息：问题仅出现在iOS 15.0以下版本，升级系统后可恢复。影响用户数约2000人。",
+      "category": "功能异常",
+      "source": "补录",
+      "feedback_time": "2026-06-01T10:30:00",
+      "import_time": "2026-06-07T12:11:35.199778",
+      "status": "need_review",
+      "reference_links": [
+        "https://example.com/ticket/12345",
+        "https://example.com/wiki/login-issue"
+      ],
+      "original_raw_data": {
+        "id": "WO_001",
+        "title": "用户反馈APP登录异常-补充",
+        "content": "补充信息：问题仅出现在iOS 15.0以下版本，升级系统后可恢复。影响用户数约2000人。",
+        "category": "功能异常",
+        "source": "补录",
+        "feedback_time": "2026-06-01T10:30:00",
+        "reference_links": "https://example.com/ticket/12345|https://example.com/wiki/login-issue",
+        "original_note": "补充了版本信息和影响范围"
+      },
+      "import_batch": "BATCH_20260607121135",
+      "is_supplementary": true,
+      "reviewer": "周姐",
+      "review_time": "2026-06-07T12:11:35.201850",
+      "review_notes": "周姐已审阅，重要备注: 此工单涉及用户登录日志，包含手机号等敏感信息。导出时需脱敏处理，不对外公开原始数据。重要：此问题涉及..."
+    },
+    "notes": "审阅备注 DR_001"
+  },
+  {
+    "id": "HIS_20260607121135_f535c0a7",
+    "operation_type": "review_remark",
+    "operator": "周姐",
+    "operate_time": "2026-06-07T12:11:35.201876",
+    "target_id": "WO_002",
+    "target_type": "work_order",
+    "before_state": {
+      "id": "WO_002",
+      "title": "支付页面加载缓慢",
+      "content": "用户反映在支付环节页面加载需要10秒以上，部分用户因此放弃支付。需要优化支付网关响应速度。",
+      "category": "性能问题",
+      "source": "线上反馈",
+      "feedback_time": "2026-06-02T14:20:00",
+      "import_time": "2026-06-07T12:11:35.199877",
+      "status": "pending",
+      "reference_links": [
+        "https://example.com/ticket/12346"
+      ],
+      "original_raw_data": {
+        "id": "WO_002",
+        "title": "支付页面加载缓慢",
+        "content": "用户反映在支付环节页面加载需要10秒以上，部分用户因此放弃支付。需要优化支付网关响应速度。",
+        "category": "性能问题",
+        "source": "线上反馈",
+        "feedback_time": "2026-06-02T14:20:00",
+        "reference_links": "https://example.com/ticket/12346",
+        "original_note": "涉及金额敏感，需要谨慎处理相关日志"
+      },
+      "import_batch": "BATCH_20260607121135",
+      "is_supplementary": false,
+      "reviewer": null,
+      "review_time": null,
+      "review_notes": ""
+    },
+    "after_state": {
+      "id": "WO_002",
+      "title": "支付页面加载缓慢",
+      "content": "用户反映在支付环节页面加载需要10秒以上，部分用户因此放弃支付。需要优化支付网关响应速度。",
+      "category": "性能问题",
+      "source": "线上反馈",
+      "feedback_time": "2026-06-02T14:20:00",
+      "import_time": "2026-06-07T12:11:35.199877",
+      "status": "need_review",
+      "reference_links": [
+        "https://example.com/ticket/12346"
+      ],
+      "original_raw_data": {
+        "id": "WO_002",
+        "title": "支付页面加载缓慢",
+        "content": "用户反映在支付环节页面加载需要10秒以上，部分用户因此放弃支付。需要优化支付网关响应速度。",
+        "category": "性能问题",
+        "source": "线上反馈",
+        "feedback_time": "2026-06-02T14:20:00",
+        "reference_links": "https://example.com/ticket/12346",
+        "original_note": "涉及金额敏感，需要谨慎处理相关日志"
+      },
+      "import_batch": "BATCH_20260607121135",
+      "is_supplementary": false,
+      "reviewer": "周姐",
+      "review_time": "2026-06-07T12:11:35.201869",
+      "review_notes": "周姐已审阅，重要备注: 支付相关工单，涉及交易金额和用户银行卡信息（已脱敏）。注意：此工单分类错误，应为'资金安全'而非'性..."
+    },
+    "notes": "审阅备注 DR_002"
+  },
+  {
+    "id": "HIS_20260607121135_00969539",
+    "operation_type": "review_remark",
+    "operator": "周姐",
+    "operate_time": "2026-06-07T12:11:35.201887",
+    "target_id": "WO_004",
+    "target_type": "work_order",
+    "before_state": {
+      "id": "WO_004",
+      "title": "客服态度问题投诉",
+      "content": "用户投诉客服人员在处理退款问题时态度恶劣，要求道歉和赔偿。",
+      "category": "功能异常",
+      "source": "线上反馈",
+      "feedback_time": "2026-06-04T16:45:00",
+      "import_time": "2026-06-07T12:11:35.200459",
+      "status": "pending",
+      "reference_links": [
+        "https://example.com/ticket/12348"
+      ],
+      "original_raw_data": {
+        "id": "WO_004",
+        "title": "客服态度问题投诉",
+        "content": "用户投诉客服人员在处理退款问题时态度恶劣，要求道歉和赔偿。",
+        "category": "功能异常",
+        "source": "线上反馈",
+        "feedback_time": "2026-06-04T16:45:00",
+        "reference_links": "https://example.com/ticket/12348",
+        "original_note": "此工单被错误归类为功能异常，实际应为服务投诉"
+      },
+      "import_batch": "BATCH_20260607121135",
+      "is_supplementary": false,
+      "reviewer": null,
+      "review_time": null,
+      "review_notes": ""
+    },
+    "after_state": {
+      "id": "WO_004",
+      "title": "客服态度问题投诉",
+      "content": "用户投诉客服人员在处理退款问题时态度恶劣，要求道歉和赔偿。",
+      "category": "功能异常",
+      "source": "线上反馈",
+      "feedback_time": "2026-06-04T16:45:00",
+      "import_time": "2026-06-07T12:11:35.200459",
+      "status": "pending",
+      "reference_links": [
+        "https://example.com/ticket/12348"
+      ],
+      "original_raw_data": {
+        "id": "WO_004",
+        "title": "客服态度问题投诉",
+        "content": "用户投诉客服人员在处理退款问题时态度恶劣，要求道歉和赔偿。",
+        "category": "功能异常",
+        "source": "线上反馈",
+        "feedback_time": "2026-06-04T16:45:00",
+        "reference_links": "https://example.com/ticket/12348",
+        "original_note": "此工单被错误归类为功能异常，实际应为服务投诉"
+      },
+      "import_batch": "BATCH_20260607121135",
+      "is_supplementary": false,
+      "reviewer": "周姐",
+      "review_time": "2026-06-07T12:11:35.201880",
+      "review_notes": ""
+    },
+    "notes": "审阅备注 DR_003"
+  },
+  {
+    "id": "HIS_20260607121135_859a40cb",
+    "operation_type": "review_remark",
+    "operator": "周姐",
+    "operate_time": "2026-06-07T12:11:35.201909",
+    "target_id": "WO_005",
+    "target_type": "work_order",
+    "before_state": {
+      "id": "WO_005",
+      "title": "新用户注册收不到验证码",
+      "content": "部分新用户反馈注册时收不到短信验证码，检查发现短信服务商API限流。",
+      "category": "功能异常",
+      "source": "补录",
+      "feedback_time": "2026-06-05T11:00:00",
+      "import_time": "2026-06-07T12:11:35.200876",
+      "status": "pending",
+      "reference_links": [],
+      "original_raw_data": {
+        "id": "WO_005",
+        "title": "新用户注册收不到验证码",
+        "content": "部分新用户反馈注册时收不到短信验证码，检查发现短信服务商API限流。",
+        "category": "功能异常",
+        "source": "补录",
+        "feedback_time": "2026-06-05T11:00:00",
+        "reference_links": "",
+        "original_note": "遗漏工单补录"
+      },
+      "import_batch": "BATCH_20260607121135",
+      "is_supplementary": true,
+      "reviewer": null,
+      "review_time": null,
+      "review_notes": ""
+    },
+    "after_state": {
+      "id": "WO_005",
+      "title": "新用户注册收不到验证码",
+      "content": "部分新用户反馈注册时收不到短信验证码，检查发现短信服务商API限流。",
+      "category": "功能异常",
+      "source": "补录",
+      "feedback_time": "2026-06-05T11:00:00",
+      "import_time": "2026-06-07T12:11:35.200876",
+      "status": "pending",
+      "reference_links": [],
+      "original_raw_data": {
+        "id": "WO_005",
+        "title": "新用户注册收不到验证码",
+        "content": "部分新用户反馈注册时收不到短信验证码，检查发现短信服务商API限流。",
+        "category": "功能异常",
+        "source": "补录",
+        "feedback_time": "2026-06-05T11:00:00",
+        "reference_links": "",
+        "original_note": "遗漏工单补录"
+      },
+      "import_batch": "BATCH_20260607121135",
+      "is_supplementary": true,
+      "reviewer": "周姐",
+      "review_time": "2026-06-07T12:11:35.201892",
+      "review_notes": ""
+    },
+    "notes": "审阅备注 DR_004"
+  }
+]

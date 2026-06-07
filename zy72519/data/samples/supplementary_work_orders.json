@@ -1,0 +1,22 @@
+[
+  {
+    "id": "WO_001",
+    "title": "用户反馈APP登录异常-补充",
+    "content": "补充信息：问题仅出现在iOS 15.0以下版本，升级系统后可恢复。影响用户数约2000人。",
+    "category": "功能异常",
+    "source": "补录",
+    "feedback_time": "2026-06-01T10:30:00",
+    "reference_links": "https://example.com/ticket/12345|https://example.com/wiki/login-issue",
+    "original_note": "补充了版本信息和影响范围"
+  },
+  {
+    "id": "WO_005",
+    "title": "新用户注册收不到验证码",
+    "content": "部分新用户反馈注册时收不到短信验证码，检查发现短信服务商API限流。",
+    "category": "功能异常",
+    "source": "补录",
+    "feedback_time": "2026-06-05T11:00:00",
+    "reference_links": "",
+    "original_note": "遗漏工单补录"
+  }
+]

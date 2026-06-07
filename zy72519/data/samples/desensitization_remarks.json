@@ -1,0 +1,42 @@
+[
+  {
+    "id": "DR_001",
+    "work_order_id": "WO_001",
+    "remark_content": "此工单涉及用户登录日志，包含手机号等敏感信息。导出时需脱敏处理，不对外公开原始数据。重要：此问题涉及的用户信息属于用户隐私，分类需谨慎。",
+    "owner": "周姐",
+    "create_time": "2026-06-01T15:00:00",
+    "tags": "隐私|敏感数据|需注意",
+    "is_important": "true",
+    "related_rules": "R001| R003"
+  },
+  {
+    "id": "DR_002",
+    "work_order_id": "WO_002",
+    "remark_content": "支付相关工单，涉及交易金额和用户银行卡信息（已脱敏）。注意：此工单分类错误，应为'资金安全'而非'性能问题'。分类不符，需要重新判定。",
+    "owner": "周姐",
+    "create_time": "2026-06-02T17:30:00",
+    "tags": "支付安全|分类不符",
+    "is_important": "true",
+    "related_rules": "R002| R004"
+  },
+  {
+    "id": "DR_003",
+    "work_order_id": "WO_004",
+    "remark_content": "此工单分类错误，应为'服务投诉'而非'功能异常'。分类不符，需要更正。",
+    "owner": "周姐",
+    "create_time": "2026-06-04T18:00:00",
+    "tags": "分类错误",
+    "is_important": "false",
+    "related_rules": "R005"
+  },
+  {
+    "id": "DR_004",
+    "work_order_id": "WO_005",
+    "remark_content": "补录工单，涉及短信验证码发送记录，不包含用户敏感信息。可正常导出。",
+    "owner": "周姐",
+    "create_time": "2026-06-05T14:00:00",
+    "tags": "补录|无敏感",
+    "is_important": "false",
+    "related_rules": ""
+  }
+]

@@ -1,0 +1,57 @@
+{
+  "check_time": "2026-06-07T12:11:37.237805",
+  "summary": {
+    "total": 5,
+    "passed": 5,
+    "failed": 0,
+    "errors": 0,
+    "warnings": 0
+  },
+  "results": [
+    {
+      "check_name": "重复导入检测",
+      "passed": true,
+      "message": "未发现重复导入",
+      "severity": "info",
+      "details": {
+        "batch_counts": {
+          "BATCH_20260607121135": 5
+        }
+      }
+    },
+    {
+      "check_name": "引用链接404仍被判通过检测",
+      "passed": true,
+      "message": "未发现链接问题",
+      "severity": "info",
+      "details": {}
+    },
+    {
+      "check_name": "补录后重算检测",
+      "passed": true,
+      "message": "补录工单重算逻辑正常",
+      "severity": "info",
+      "details": {
+        "supplementary_count": 2
+      }
+    },
+    {
+      "check_name": "导出一致性检测",
+      "passed": true,
+      "message": "数据引用一致",
+      "severity": "info",
+      "details": {
+        "work_order_count": 5,
+        "remark_count": 4,
+        "conflict_count": 2
+      }
+    },
+    {
+      "check_name": "冲突样本表与历史记录一致性",
+      "passed": true,
+      "message": "冲突样本表与工单状态一致",
+      "severity": "info",
+      "details": {}
+    }
+  ]
+}

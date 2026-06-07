@@ -1,0 +1,50 @@
+[
+  {
+    "id": "CONF_20260607121136_dd40fceb",
+    "work_order_id": "WO_002",
+    "conflict_type": "category_mismatch",
+    "status": "confirmed",
+    "evidence": [
+      {
+        "type": "category_mismatch",
+        "description": "工单分类 '性能问题' 与脱敏规则备注冲突",
+        "source": "desensitization_remark",
+        "details": {
+          "work_order_category": "性能问题",
+          "remark_id": "DR_002",
+          "remark_content": "支付相关工单，涉及交易金额和用户银行卡信息（已脱敏）。注意：此工单分类错误，应为'资金安全'而非'性能问题'。分类不符，需要重新判定。",
+          "remark_owner": "周姐"
+        }
+      }
+    ],
+    "detect_time": "2026-06-07T12:11:36.349694",
+    "handler": "周姐",
+    "handle_time": "2026-06-07T12:11:37.236130",
+    "handle_notes": "经核实，此冲突确实存在，需要重新分类",
+    "resolution": null
+  },
+  {
+    "id": "CONF_20260607121136_210ee48c",
+    "work_order_id": "WO_004",
+    "conflict_type": "category_mismatch",
+    "status": "rejected",
+    "evidence": [
+      {
+        "type": "category_mismatch",
+        "description": "工单分类 '功能异常' 与脱敏规则备注冲突",
+        "source": "desensitization_remark",
+        "details": {
+          "work_order_category": "功能异常",
+          "remark_id": "DR_003",
+          "remark_content": "此工单分类错误，应为'服务投诉'而非'功能异常'。分类不符，需要更正。",
+          "remark_owner": "周姐"
+        }
+      }
+    ],
+    "detect_time": "2026-06-07T12:11:36.800135",
+    "handler": "周姐",
+    "handle_time": "2026-06-07T12:11:37.236717",
+    "handle_notes": "经核实，分类是正确的，备注描述有误",
+    "resolution": null
+  }
+]
