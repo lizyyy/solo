@@ -1,0 +1,8 @@
+originalRowNumber,userId,itemId,predictedProb,calibratedProb,label,user_age,user_gender,item_category,item_price,user_hist_click_cnt
+1,u10001,i20001,0.72,0.68,0,28,M,3C,2999,156
+2,u10002,i20002,0.50,0.50,0,,,,,
+3,u10003,i20003,0.31,0.25,1,35,F,美妆,199,42
+4,u10004,i20004,0.85,0.80,0,22,F,服装,399,89
+5,u10002,i20002,0.50,0.50,0,,,,,
+6,u10005,i20005,0.50,0.50,0,45,,食品,59,
+7,u10006,i20006,0.63,0.58,1,30,M,运动,799,234

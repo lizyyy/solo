@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>分桶校准概率回看系统</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif; background: #f5f7fa; color: #333; }
+
+.header { background: #1e293b; color: white; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; }
+.header h1 { font-size: 20px; font-weight: 600; }
+.header .run-info { font-size: 13px; opacity: 0.8; }
+
+.container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+
+.workflow-bar { background: white; border-radius: 8px; padding: 20px 24px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.step-indicator { display: flex; justify-content: space-between; position: relative; max-width: 800px; margin: 0 auto; }
+.step-indicator::before { content: ''; position: absolute; top: 20px; left: 0; right: 0; height: 2px; background: #e2e8f0; z-index: 0; }
+.step { flex: 1; text-align: center; position: relative; z-index: 1; }
+.step-circle { width: 42px; height: 42px; border-radius: 50%; background: #e2e8f0; color: #94a3b8; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; font-weight: 600; font-size: 16px; transition: all 0.3s; }
+.step.active .step-circle { background: #3b82f6; color: white; }
+.step.done .step-circle { background: #10b981; color: white; }
+.step-label { font-size: 13px; color: #64748b; }
+.step.active .step-label { color: #3b82f6; font-weight: 600; }
+.step.done .step-label { color: #10b981; }
+
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.stat-card { background: white; border-radius: 8px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.stat-card .value { font-size: 28px; font-weight: 700; color: #1e293b; }
+.stat-card .label { font-size: 12px; color: #64748b; margin-top: 4px; }
+.stat-card.warning .value { color: #f59e0b; }
+.stat-card.danger .value { color: #ef4444; }
+.stat-card.success .value { color: #10b981; }
+
+.toolbar { background: white; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.btn { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+.btn-primary { background: #3b82f6; color: white; }
+.btn-primary:hover { background: #2563eb; }
+.btn-success { background: #10b981; color: white; }
+.btn-success:hover { background: #059669; }
+.btn-warning { background: #f59e0b; color: white; }
+.btn-warning:hover { background: #d97706; }
+.btn-danger { background: #ef4444; color: white; }
+.btn-danger:hover { background: #dc2626; }
+.btn-secondary { background: #e2e8f0; color: #475569; }
+.btn-secondary:hover { background: #cbd5e1; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.filter-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.filter-row select, .filter-row input { padding: 7px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 13px; outline: none; }
+.filter-row select:focus, .filter-row input:focus { border-color: #3b82f6; }
+
+.table-container { background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); overflow: hidden; }
+table { width: 100%; border-collapse: collapse; }
+th { background: #f8fafc; padding: 12px 14px; text-align: left; font-size: 12px; font-weight: 600; color: #64748b; border-bottom: 1px solid #e2e8f0; text-transform: uppercase; letter-spacing: 0.5px; }
+td { padding: 12px 14px; font-size: 13px; border-bottom: 1px solid #f1f5f9; }
+tr:hover td { background: #f8fafc; }
+
+.badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+.badge-pending { background: #fef3c7; color: #92400e; }
+.badge-review { background: #dbeafe; color: #1e40af; }
+.badge-normal { background: #dcfce7; color: #166534; }
+.badge-abnormal { background: #fee2e2; color: #991b1b; }
+.badge-missing { background: #fecaca; color: #991b1b; animation: pulse 2s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+.row-number { font-family: 'SF Mono', Monaco, monospace; color: #64748b; font-weight: 600; }
+.prob { font-family: 'SF Mono', Monaco, monospace; }
+
+.self-check-panel { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-top: 20px; }
+.self-check-panel h3 { margin-bottom: 16px; color: #1e293b; }
+.check-item { padding: 12px; border: 1px solid #e2e8f0; border-radius: 6px; margin-bottom: 10px; }
+.check-item.passed { border-left: 4px solid #10b981; }
+.check-item.failed { border-left: 4px solid #ef4444; }
+.check-header { display: flex; justify-content: space-between; align-items: center; }
+.check-name { font-weight: 600; font-size: 14px; }
+.check-status { font-size: 12px; font-weight: 600; }
+.check-status.passed { color: #10b981; }
+.check-status.failed { color: #ef4444; }
+.check-details { margin-top: 8px; font-size: 12px; color: #64748b; }
+.check-issues { margin-top: 8px; font-size: 12px; color: #ef4444; }
+
+.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
+.modal-overlay.active { display: flex; }
+.modal { background: white; border-radius: 12px; max-width: 800px; width: 90%; max-height: 85vh; overflow-y: auto; }
+.modal-header { padding: 20px 24px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+.modal-header h3 { font-size: 18px; }
+.modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: #94a3b8; }
+.modal-body { padding: 24px; }
+.modal-footer { padding: 16px 24px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 10px; }
+
+.detail-section { margin-bottom: 20px; }
+.detail-section h4 { font-size: 14px; color: #64748b; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+.detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.detail-item { background: #f8fafc; padding: 12px; border-radius: 6px; }
+.detail-item .label { font-size: 11px; color: #94a3b8; text-transform: uppercase; }
+.detail-item .value { font-size: 14px; font-weight: 500; margin-top: 4px; word-break: break-all; }
+
+.edit-history { background: #f8fafc; padding: 12px; border-radius: 6px; margin-bottom: 8px; }
+.edit-history .edit-time { font-size: 11px; color: #94a3b8; }
+.edit-history .edit-content { font-size: 13px; margin-top: 4px; }
+
+textarea { width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 13px; font-family: inherit; resize: vertical; min-height: 80px; }
+textarea:focus { outline: none; border-color: #3b82f6; }
+
+.alert { padding: 12px 16px; border-radius: 6px; margin-bottom: 12px; font-size: 13px; }
+.alert-warning { background: #fffbeb; border: 1px solid #fcd34d; color: #92400e; }
+.alert-danger { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+.alert-info { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+
+.empty-state { text-align: center; padding: 60px 20px; color: #94a3b8; }
+.empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+.empty-state p { font-size: 14px; }
+
+.tabs { display: flex; gap: 0; border-bottom: 1px solid #e2e8f0; margin-bottom: 16px; }
+.tab { padding: 10px 20px; cursor: pointer; font-size: 14px; font-weight: 500; color: #64748b; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.tab.active { color: #3b82f6; border-bottom-color: #3b82f6; }
+.tab:hover { color: #3b82f6; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+.evidence-tag { display: inline-block; padding: 2px 8px; background: #fef3c7; color: #92400e; border-radius: 4px; font-size: 11px; margin-right: 4px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📊 分桶校准概率回看系统</h1>
+  <div class="run-info" id="runInfo">未选择任务</div>
+</div>
+
+<div class="container">
+  <div class="workflow-bar">
+    <div class="step-indicator" id="stepIndicator">
+      <div class="step active" data-step="0"><div class="step-circle">1</div><div class="step-label">导入负样本</div></div>
+      <div class="step" data-step="1"><div class="step-circle">2</div><div class="step-label">补看召回候选表</div></div>
+      <div class="step" data-step="2"><div class="step-circle">3</div><div class="step-label">更新可解释摘要</div></div>
+    </div>
+  </div>
+
+  <div class="stats-grid" id="statsGrid"></div>
+
+  <div class="toolbar">
+    <button class="btn btn-primary" onclick="showCreateRunModal()">+ 新建任务</button>
+    <button class="btn btn-secondary" onclick="loadSampleData()">加载样例数据</button>
+    <button class="btn btn-success" onclick="runSelfCheck()">🔍 执行自检</button>
+    <button class="btn btn-warning" onclick="exportData()">📥 导出CSV</button>
+    <button class="btn btn-secondary" onclick="advanceStep()">下一步 ▶</button>
+    <div style="flex:1"></div>
+    <div class="filter-row">
+      <select id="filterStatus" onchange="loadSamples()">
+        <option value="">全部状态</option>
+        <option value="pending_review">待负责人复核</option>
+        <option value="imported">已导入</option>
+        <option value="reviewed">已复核</option>
+        <option value="recomputed">已重算</option>
+        <option value="normal">正常</option>
+        <option value="abnormal">异常</option>
+      </select>
+      <select id="filterMissing" onchange="loadSamples()">
+        <option value="">特征状态</option>
+        <option value="true">特征缺失/默认分</option>
+        <option value="false">特征正常</option>
+      </select>
+      <input type="text" id="searchInput" placeholder="搜索用户/物品ID..." oninput="loadSamples()">
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="list" onclick="switchTab('list')">负样本列表</div>
+    <div class="tab" data-tab="check" onclick="switchTab('check')">自检结果</div>
+  </div>
+
+  <div class="tab-content active" id="tab-list">
+    <div class="table-container">
+      <table id="samplesTable">
+        <thead>
+          <tr>
+            <th>原始行号</th>
+            <th>用户ID</th>
+            <th>物品ID</th>
+            <th>预测概率</th>
+            <th>校准概率</th>
+            <th>特征状态</th>
+            <th>默认分</th>
+            <th>处理状态</th>
+            <th>召回复核</th>
+            <th>摘要</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="samplesBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tab-check">
+    <div class="self-check-panel" id="selfCheckPanel">
+      <h3>自检结果</h3>
+      <div id="checkResults"><p style="color:#94a3b8">点击「执行自检」按钮开始检测...</p></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="detailModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>样本详情 - <span id="detailRowNum"></span></h3>
+      <button class="modal-close" onclick="closeModal('detailModal')">×</button>
+    </div>
+    <div class="modal-body" id="detailBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('detailModal')">关闭</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="createRunModal">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header">
+      <h3>新建校准任务</h3>
+      <button class="modal-close" onclick="closeModal('createRunModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="detail-section">
+        <h4>任务名称</h4>
+        <input type="text" id="runNameInput" placeholder="例如：2024Q2模型校准回看" style="width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:6px;font-size:13px">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('createRunModal')">取消</button>
+      <button class="btn btn-primary" onclick="createRun()">创建</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="recomputeModal">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-header">
+      <h3>补录特征并重算</h3>
+      <button class="modal-close" onclick="closeModal('recomputeModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-warning">补录特征后，系统将标记为"已重算"，后续需推荐负责人最终确认状态。</div>
+      <div class="detail-section">
+        <h4>特征补录（JSON格式）</h4>
+        <textarea id="recomputeFeatures" placeholder='{"user_age": 28, "user_gender": "M", "item_category": "3C", "item_price": 2999, "user_hist_click_cnt": 156}'></textarea>
+      </div>
+      <div class="detail-section">
+        <h4>校准后概率（可选）</h4>
+        <input type="number" step="0.01" id="recomputeCalibratedProb" placeholder="例如：0.72" style="width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:6px;font-size:13px">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('recomputeModal')">取消</button>
+      <button class="btn btn-primary" onclick="submitRecompute()">提交重算</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="summaryModal">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-header">
+      <h3>更新可解释摘要</h3>
+      <button class="modal-close" onclick="closeModal('summaryModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <textarea id="summaryText" placeholder="请输入该负样本的可解释性分析摘要，例如：用户为年轻女性，历史点击美妆类较多，该物品为男装，预测分偏高可能因为冷启物品特征不全..."></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('summaryModal')">取消</button>
+      <button class="btn btn-primary" onclick="submitSummary()">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentRunId = null;
+let currentSampleId = null;
+let allSamples = [];
+
+async function init() {
+  const runs = await api('/api/runs');
+  if (runs.data && runs.data.length > 0) {
+    currentRunId = runs.data[runs.data.length - 1].id;
+    refreshAll();
+  }
+}
+
+async function api(url, method = 'GET', body = null) {
+  const options = { method, headers: { 'Content-Type': 'application/json' } };
+  if (body) options.body = JSON.stringify(body);
+  const res = await fetch(url, options);
+  return await res.json();
+}
+
+async function createRun() {
+  const name = document.getElementById('runNameInput').value || `校准任务-${new Date().toLocaleDateString()}`;
+  const res = await api('/api/runs', 'POST', { name });
+  if (res.success) {
+    currentRunId = res.data.id;
+    closeModal('createRunModal');
+    refreshAll();
+  }
+}
+
+async function loadSampleData() {
+  if (!currentRunId) {
+    const run = await api('/api/runs', 'POST', { name: '样例校准任务' });
+    currentRunId = run.data.id;
+  }
+  
+  const samples = generateSampleData();
+  await api(`/api/runs/${currentRunId}/import`, 'POST', { samples });
+  refreshAll();
+}
+
+function generateSampleData() {
+  return [
+    { userId: 'u10001', itemId: 'i20001', predictedProb: 0.72, calibratedProb: 0.68, label: 0, features: { user_age: 28, user_gender: 'M', item_category: '3C', item_price: 2999, user_hist_click_cnt: 156 } },
+    { userId: 'u10002', itemId: 'i20002', predictedProb: 0.50, calibratedProb: 0.50, label: 0, features: { user_age: null, user_gender: '', item_category: '', item_price: 0, user_hist_click_cnt: NaN }, usedDefaultScore: true },
+    { userId: 'u10003', itemId: 'i20003', predictedProb: 0.31, calibratedProb: 0.25, label: 1, features: { user_age: 35, user_gender: 'F', item_category: '美妆', item_price: 199, user_hist_click_cnt: 42 } },
+    { userId: 'u10004', itemId: 'i20004', predictedProb: 0.85, calibratedProb: 0.80, label: 0, features: { user_age: 22, user_gender: 'F', item_category: '服装', item_price: 399, user_hist_click_cnt: 89 } },
+    { userId: 'u10002', itemId: 'i20002', predictedProb: 0.50, calibratedProb: 0.50, label: 0, features: { user_age: null, user_gender: '', item_category: '', item_price: 0, user_hist_click_cnt: NaN } },
+    { userId: 'u10005', itemId: 'i20005', predictedProb: 0.50, calibratedProb: 0.50, label: 0, features: { user_age: 45, user_gender: null, item_category: '食品', item_price: 59, user_hist_click_cnt: undefined } },
+    { userId: 'u10006', itemId: 'i20006', predictedProb: 0.63, calibratedProb: 0.58, label: 1, features: { user_age: 30, user_gender: 'M', item_category: '运动', item_price: 799, user_hist_click_cnt: 234 } }
+  ];
+}
+
+async function refreshAll() {
+  updateRunInfo();
+  loadWorkflowState();
+  loadSamples();
+  loadSelfCheckResults();
+}
+
+async function updateRunInfo() {
+  if (!currentRunId) {
+    document.getElementById('runInfo').textContent = '未选择任务';
+    return;
+  }
+  const run = await api(`/api/runs/${currentRunId}`);
+  if (run.success && run.data) {
+    document.getElementById('runInfo').textContent = `当前任务: ${run.data.name}`;
+  }
+}
+
+async function loadWorkflowState() {
+  if (!currentRunId) return;
+  const res = await api(`/api/runs/${currentRunId}/workflow`);
+  if (res.success && res.data) {
+    const state = res.data;
+    document.querySelectorAll('.step').forEach((el, idx) => {
+      el.classList.remove('active', 'done');
+      if (idx < state.currentStep) el.classList.add('done');
+      else if (idx === state.currentStep) el.classList.add('active');
+    });
+    
+    const stats = state.stats;
+    document.getElementById('statsGrid').innerHTML = `
+      <div class="stat-card"><div class="value">${stats.total}</div><div class="label">总样本数</div></div>
+      <div class="stat-card danger"><div class="value">${stats.pendingReview}</div><div class="label">待负责人复核</div></div>
+      <div class="stat-card warning"><div class="value">${stats.hasMissingFeatures}</div><div class="label">特征缺失</div></div>
+      <div class="stat-card warning"><div class="value">${stats.usedDefaultScore}</div><div class="label">使用默认分</div></div>
+      <div class="stat-card"><div class="value">${stats.recomputed}</div><div class="label">已重算</div></div>
+      <div class="stat-card success"><div class="value">${stats.normal}</div><div class="label">正常</div></div>
+      <div class="stat-card danger"><div class="value">${stats.abnormal}</div><div class="label">异常</div></div>
+    `;
+  }
+}
+
+async function loadSamples() {
+  if (!currentRunId) {
+    document.getElementById('samplesBody').innerHTML = '<tr><td colspan="11"><div class="empty-state"><div class="icon">📭</div><p>暂无校准任务，请先新建或加载样例数据</p></div></td></tr>';
+    return;
+  }
+  
+  const status = document.getElementById('filterStatus').value;
+  const hasMissing = document.getElementById('filterMissing').value;
+  const search = document.getElementById('searchInput').value;
+  
+  let url = `/api/runs/${currentRunId}/samples?`;
+  if (status) url += `status=${status}&`;
+  if (hasMissing) url += `hasMissingFeatures=${hasMissing}&`;
+  if (search) url += `search=${encodeURIComponent(search)}&`;
+  
+  const res = await api(url);
+  if (res.success && res.data) {
+    allSamples = res.data.data;
+    renderSamples(allSamples);
+  }
+}
+
+function renderSamples(samples) {
+  const tbody = document.getElementById('samplesBody');
+  if (samples.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="11"><div class="empty-state"><div class="icon">🔍</div><p>没有匹配的样本</p></div></td></tr>';
+    return;
+  }
+  
+  tbody.innerHTML = samples.map(s => `
+    <tr>
+      <td><span class="row-number">L${s.originalRowNumber}</span></td>
+      <td>${s.userId}</td>
+      <td>${s.itemId}</td>
+      <td class="prob">${s.predictedProb?.toFixed(4) ?? '-'}</td>
+      <td class="prob">${s.calibratedProb?.toFixed(4) ?? '-'}</td>
+      <td>${s.hasMissingFeatures ? '<span class="badge badge-missing">⚠️ 特征缺失</span>' : '<span class="badge badge-normal">正常</span>'}</td>
+      <td>${s.usedDefaultScore ? '<span class="badge badge-missing">是</span>' : '<span class="badge badge-normal">否</span>'}</td>
+      <td>${renderStatusBadge(s.status)}</td>
+      <td>${s.recallCandidatesReviewed ? '✅' : '⬜'}</td>
+      <td>${s.hasExplainableSummary ? '✅' : '⬜'}</td>
+      <td>
+        <button class="btn btn-secondary" style="padding:4px 8px;font-size:12px" onclick="showDetail('${s.id}')">详情</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderStatusBadge(status) {
+  const map = {
+    'imported': ['badge-secondary', '已导入'],
+    'pending_review': ['badge-review', '待负责人复核'],
+    'reviewed': ['badge-pending', '已复核'],
+    'recomputed': ['badge-pending', '已重算'],
+    'normal': ['badge-normal', '正常'],
+    'abnormal': ['badge-abnormal', '异常']
+  };
+  const [cls, text] = map[status] || ['badge-secondary', status];
+  return `<span class="badge ${cls}">${text}</span>`;
+}
+
+async function showDetail(sampleId) {
+  currentSampleId = sampleId;
+  const res = await api(`/api/samples/${sampleId}`);
+  if (res.success && res.data) {
+    const s = res.data;
+    document.getElementById('detailRowNum').textContent = `L${s.originalRowNumber}`;
+    
+    let html = '';
+    
+    if (s.hasMissingFeatures || s.usedDefaultScore) {
+      html += `<div class="alert alert-danger">
+        <strong>⚠️ 注意：</strong>此样本${s.hasMissingFeatures ? '存在特征缺失' : ''}${s.hasMissingFeatures && s.usedDefaultScore ? '、' : ''}${s.usedDefaultScore ? '使用了默认分' : ''}，需推荐负责人复核，不可直接标记为正常。
+      </div>`;
+    }
+    
+    html += `
+      <div class="detail-section">
+        <h4>基本信息</h4>
+        <div class="detail-grid">
+          <div class="detail-item"><div class="label">原始行号</div><div class="value row-number">L${s.originalRowNumber}</div></div>
+          <div class="detail-item"><div class="label">用户ID</div><div class="value">${s.userId}</div></div>
+          <div class="detail-item"><div class="label">物品ID</div><div class="value">${s.itemId}</div></div>
+          <div class="detail-item"><div class="label">标签</div><div class="value">${s.label}</div></div>
+        </div>
+      </div>
+      
+      <div class="detail-section">
+        <h4>概率信息</h4>
+        <div class="detail-grid">
+          <div class="detail-item"><div class="label">预测概率</div><div class="value prob">${s.predictedProb?.toFixed(4) ?? '-'}</div></div>
+          <div class="detail-item"><div class="label">校准后概率</div><div class="value prob">${s.calibratedProb?.toFixed(4) ?? '-'}</div></div>
+        </div>
+      </div>
+      
+      <div class="detail-section">
+        <h4>特征状态 ${s.hasMissingFeatures ? '<span class="evidence-tag">有证据</span>' : ''}</h4>
+        <div class="detail-grid">
+          <div class="detail-item"><div class="label">特征状态</div><div class="value">${s.featureStatus === 'ok' ? '正常' : '缺失'}</div></div>
+          <div class="detail-item"><div class="label">使用默认分</div><div class="value">${s.usedDefaultScore ? '是' : '否'}</div></div>
+          <div class="detail-item" style="grid-column: span 2"><div class="label">缺失特征列表</div><div class="value">${s.missingFeatureList.length > 0 ? s.missingFeatureList.join(', ') : '无'}</div></div>
+        </div>
+        <div style="margin-top:10px;padding:10px;background:#f8fafc;border-radius:6px">
+          <div style="font-size:11px;color:#94a3b8;margin-bottom:4px">原始特征数据</div>
+          <pre style="font-size:12px;color:#475569;overflow-x:auto">${JSON.stringify(s.features, null, 2)}</pre>
+        </div>
+      </div>
+      
+      <div class="detail-section">
+        <h4>处理状态</h4>
+        <div class="detail-grid">
+          <div class="detail-item"><div class="label">当前状态</div><div class="value">${renderStatusBadge(s.status)}</div></div>
+          <div class="detail-item"><div class="label">召回候选复核</div><div class="value">${s.recallCandidatesReviewed ? '已完成' : '未完成'}</div></div>
+        </div>
+      </div>
+      
+      <div class="detail-section">
+        <h4>人工改动记录 ${s.manualEdits.length > 0 ? '<span class="evidence-tag">有证据</span>' : ''}</h4>
+        ${s.manualEdits.length === 0 ? '<p style="color:#94a3b8;font-size:13px">暂无改动</p>' : s.manualEdits.map(e => `
+          <div class="edit-history">
+            <div class="edit-time">${new Date(e.timestamp).toLocaleString()} - 操作人: ${e.operator || '未知'}</div>
+            <div class="edit-content">字段 <code>${e.field}</code>: ${JSON.stringify(e.oldValue)} → ${JSON.stringify(e.newValue)}</div>
+          </div>
+        `).join('')}
+      </div>
+      
+      <div class="detail-section">
+        <h4>可解释摘要</h4>
+        ${s.explainableSummary ? `<div style="padding:12px;background:#f8fafc;border-radius:6px;font-size:13px">${s.explainableSummary}</div>` : '<p style="color:#94a3b8;font-size:13px">暂无摘要</p>'}
+      </div>
+      
+      <div class="detail-section">
+        <h4>操作</h4>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-warning" onclick="showRecomputeModal()">补录重算</button>
+          <button class="btn btn-primary" onclick="showSummaryModal()">更新摘要</button>
+          <button class="btn btn-success" onclick="markReviewed()">标记召回已复核</button>
+          <button class="btn btn-success" onclick="markNormal()" ${(s.hasMissingFeatures || s.usedDefaultScore) ? 'disabled' : ''}>标记正常</button>
+          <button class="btn btn-danger" onclick="markAbnormal()">标记异常</button>
+        </div>
+      </div>
+    `;
+    
+    document.getElementById('detailBody').innerHTML = html;
+    document.getElementById('detailModal').classList.add('active');
+  }
+}
+
+function showRecomputeModal() {
+  document.getElementById('recomputeModal').classList.add('active');
+}
+
+async function submitRecompute() {
+  let features;
+  try {
+    features = JSON.parse(document.getElementById('recomputeFeatures').value);
+  } catch (e) {
+    alert('特征JSON格式错误');
+    return;
+  }
+  const calibratedProb = document.getElementById('recomputeCalibratedProb').value;
+  
+  const newValues = { features };
+  if (calibratedProb) newValues.calibratedProb = parseFloat(calibratedProb);
+  
+  await api(`/api/samples/${currentSampleId}/recompute`, 'POST', {
+    runId: currentRunId,
+    newValues,
+    operator: '当前用户'
+  });
+  
+  closeModal('recomputeModal');
+  closeModal('detailModal');
+  refreshAll();
+}
+
+function showSummaryModal() {
+  document.getElementById('summaryModal').classList.add('active');
+}
+
+async function submitSummary() {
+  const summary = document.getElementById('summaryText').value;
+  await api(`/api/samples/${currentSampleId}/update-summary`, 'POST', {
+    runId: currentRunId,
+    summary
+  });
+  closeModal('summaryModal');
+  closeModal('detailModal');
+  refreshAll();
+}
+
+async function markReviewed() {
+  await api(`/api/samples/${currentSampleId}/review-recall`, 'POST', {
+    runId: currentRunId,
+    recallCandidates: []
+  });
+  closeModal('detailModal');
+  refreshAll();
+}
+
+async function markNormal() {
+  try {
+    await api(`/api/samples/${currentSampleId}/mark-normal`, 'POST', {
+      runId: currentRunId,
+      operator: '当前用户'
+    });
+    closeModal('detailModal');
+    refreshAll();
+  } catch (e) {
+    alert('存在特征缺失或默认分的样本需先复核，不能直接标记为正常');
+  }
+}
+
+async function markAbnormal() {
+  const reason = prompt('请输入标记异常的原因：');
+  if (!reason) return;
+  await api(`/api/samples/${currentSampleId}/mark-abnormal`, 'POST', {
+    runId: currentRunId,
+    reason,
+    operator: '当前用户'
+  });
+  closeModal('detailModal');
+  refreshAll();
+}
+
+async function runSelfCheck() {
+  if (!currentRunId) { alert('请先创建或选择任务'); return; }
+  const res = await api(`/api/runs/${currentRunId}/self-check`);
+  if (res.success) {
+    renderSelfCheckResults(res.data.results);
+    switchTab('check');
+  }
+}
+
+async function loadSelfCheckResults() {
+  if (!currentRunId) return;
+  const res = await api(`/api/runs/${currentRunId}/self-check/latest`);
+  if (res.success && res.data && res.data.length > 0) {
+    renderSelfCheckResults(res.data);
+  }
+}
+
+function renderSelfCheckResults(results) {
+  const panel = document.getElementById('checkResults');
+  const nameMap = {
+    'duplicate_import': '重复导入检测',
+    'missing_feature_default': '特征缺失/默认分检测',
+    'recompute_after_fill': '补录后重算检测',
+    'export_consistency': '导出一致性检测'
+  };
+  
+  panel.innerHTML = results.map(r => `
+    <div class="check-item ${r.passed ? 'passed' : 'failed'}">
+      <div class="check-header">
+        <span class="check-name">${nameMap[r.checkType] || r.checkType}</span>
+        <span class="check-status ${r.passed ? 'passed' : 'failed'}">${r.passed ? '✅ 通过' : '❌ 未通过'}</span>
+      </div>
+      <div class="check-details">
+        ${Object.entries(r.details).map(([k, v]) => `${k}: ${JSON.stringify(v)}`).join(' | ')}
+      </div>
+      ${r.issues && r.issues.length > 0 ? `
+        <div class="check-issues">
+          ⚠️ 发现 ${r.issues.length} 个问题:
+          <ul style="margin-top:4px;padding-left:20px">
+            ${r.issues.slice(0, 5).map(i => `<li>${JSON.stringify(i).slice(0, 150)}</li>`).join('')}
+            ${r.issues.length > 5 ? `<li>...还有 ${r.issues.length - 5} 个问题</li>` : ''}
+          </ul>
+        </div>
+      ` : ''}
+    </div>
+  `).join('');
+}
+
+async function advanceStep() {
+  if (!currentRunId) { alert('请先创建任务'); return; }
+  try {
+    await api(`/api/runs/${currentRunId}/advance-step`, 'POST');
+    refreshAll();
+  } catch (e) {
+    alert('当前步骤未完成，无法推进');
+  }
+}
+
+async function exportData() {
+  if (!currentRunId) { alert('请先创建任务'); return; }
+  window.open(`/api/runs/${currentRunId}/export?format=csv`, '_blank');
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.querySelector(`.tab[data-tab="${tab}"]`).classList.add('active');
+  document.getElementById(`tab-${tab}`).classList.add('active');
+}
+
+function showCreateRunModal() { document.getElementById('createRunModal').classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('active'); });
+});
+
+init();
+</script>
+</body>
+</html>
