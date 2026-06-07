@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>评测切片详情 - 冷启动相似用户扩展系统</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="/">首页</a> / 评测切片详情
+        </div>
+
+        <div class="header">
+            <h1>评测切片详情</h1>
+            <p id="sliceTitle">加载中...</p>
+        </div>
+
+        <div class="step-indicator" id="stepIndicator">
+            <div class="step" id="step1">
+                <div class="step-number">1</div>
+                <div class="step-label">导入切片</div>
+            </div>
+            <div class="step" id="step2">
+                <div class="step-number">2</div>
+                <div class="step-label">补看快照编号</div>
+            </div>
+            <div class="step" id="step3">
+                <div class="step-number">3</div>
+                <div class="step-label">异常样本页</div>
+            </div>
+        </div>
+
+        <div class="stats-grid" id="statsGrid"></div>
+
+        <div class="card">
+            <h2>基本信息</h2>
+            <div id="basicInfo"></div>
+        </div>
+
+        <div class="card" id="conflictCard" style="display:none">
+            <h2>⚠️ 待处理冲突</h2>
+            <div id="conflictList"></div>
+        </div>
+
+        <div class="card">
+            <h2>步骤操作</h2>
+            
+            <div id="step2Section" style="display:none">
+                <h3 style="margin-bottom:16px;font-size:15px;">第二步：补看特征快照编号</h3>
+                <div class="form-row">
+                    <div class="form-group" style="max-width:400px">
+                        <label>选择特征快照编号</label>
+                        <select id="snapshotSelect"></select>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="supplementSnapshot()">确认补录</button>
+                <hr style="margin:20px 0;border:none;border-top:1px solid #eee">
+            </div>
+
+            <div id="expandSection" style="display:none">
+                <h3 style="margin-bottom:16px;font-size:15px;">执行相似用户扩展</h3>
+                <button class="btn btn-success" onclick="runExpand()">开始扩展</button>
+                <p style="margin-top:12px;font-size:13px;color:#888">扩展完成后将自动执行自检，并生成异常样本列表</p>
+                <hr style="margin:20px 0;border:none;border-top:1px solid #eee">
+            </div>
+
+            <div id="checkSection" style="display:none">
+                <h3 style="margin-bottom:16px;font-size:15px;">自检报告</h3>
+                <div id="selfCheckList"></div>
+                <button class="btn btn-primary btn-small" onclick="runSelfCheck()" style="margin-top:12px">重新自检</button>
+                <hr style="margin:20px 0;border:none;border-top:1px solid #eee">
+            </div>
+
+            <div id="exportSection" style="display:none">
+                <h3 style="margin-bottom:16px;font-size:15px;">导出数据</h3>
+                <button class="btn btn-primary btn-small" onclick="exportResults()">导出全部结果</button>
+                <button class="btn btn-warning btn-small" onclick="exportAbnormal()">仅导出异常样本</button>
+            </div>
+        </div>
+
+        <div class="card" id="resultCard" style="display:none">
+            <h2>扩展结果</h2>
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('results')">全部结果</button>
+                <button class="tab-btn" onclick="switchTab('abnormal')">异常样本</button>
+            </div>
+
+            <div id="tab-results" class="tab-content active">
+                <div id="resultsTable"></div>
+                <div id="resultsPagination" class="pagination"></div>
+            </div>
+
+            <div id="tab-abnormal" class="tab-content">
+                <div style="margin-bottom:12px">
+                    <label style="font-size:13px;color:#666">
+                        <input type="checkbox" id="onlyNeedReview" onchange="loadAbnormalSamples()">
+                        只显示待复核样本
+                    </label>
+                </div>
+                <div id="abnormalTable"></div>
+                <div id="abnormalPagination" class="pagination"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+        const SLICE_ID = {{ slice_id }};
+        
+        let currentResultPage = 1;
+        let currentAbnormalPage = 1;
+        let sliceData = null;
+
+        const STATUS_STEP_MAP = {
+            'pending': 1,
+            'imported': 1,
+            'snapshot_supplemented': 2,
+            'expand_completed': 3
+        };
+
+        async function loadDetail() {
+            try {
+                const res = await fetch(`${API_BASE}/slices/${SLICE_ID}`);
+                sliceData = await res.json();
+                renderDetail(sliceData);
+            } catch (e) {
+                console.error('加载详情失败', e);
+            }
+        }
+
+        function renderDetail(data) {
+            const s = data.data;
+            document.getElementById('sliceTitle').textContent = `${s.slice_name} (${s.slice_id})`;
+
+            const step = STATUS_STEP_MAP[s.status] || 1;
+            for (let i = 1; i <= 3; i++) {
+                const el = document.getElementById(`step${i}`);
+                el.classList.remove('active', 'completed');
+                if (i < step) el.classList.add('completed');
+                else if (i === step) el.classList.add('active');
+            }
+
+            document.getElementById('statsGrid').innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-value">${s.total_users}</div>
+                    <div class="stat-label">种子用户数</div>
+                </div>
+                <div class="stat-card success">
+                    <div class="stat-value">${s.results_count}</div>
+                    <div class="stat-label">扩展结果数</div>
+                </div>
+                <div class="stat-card danger">
+                    <div class="stat-value">${s.abnormal_count}</div>
+                    <div class="stat-label">异常样本数</div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="stat-value">${s.need_review_count}</div>
+                    <div class="stat-label">待复核数</div>
+                </div>
+            `;
+
+            const statusMap = {
+                'pending': '待处理',
+                'imported': '已导入',
+                'snapshot_supplemented': '已补录快照',
+                'expand_completed': '扩展完成'
+            };
+
+            document.getElementById('basicInfo').innerHTML = `
+                <div class="form-row">
+                    <div><strong>评测切片ID:</strong> ${s.slice_id}</div>
+                    <div><strong>名称:</strong> ${s.slice_name}</div>
+                    <div><strong>状态:</strong> <span class="status-badge status-${s.status}">${statusMap[s.status] || s.status}</span></div>
+                    <div><strong>特征快照编号:</strong> ${s.feature_snapshot_id || '<span style="color:#e74c3c">未设置</span>'}</div>
+                    <div><strong>时间窗:</strong> ${s.time_window_start ? new Date(s.time_window_start).toLocaleDateString('zh-CN') : '未设置'} ~ ${s.time_window_end ? new Date(s.time_window_end).toLocaleDateString('zh-CN') : '未设置'}</div>
+                    <div><strong>导入人:</strong> ${s.imported_by}</div>
+                </div>
+            `;
+
+            if (data.pending_conflicts && data.pending_conflicts.length > 0) {
+                document.getElementById('conflictCard').style.display = 'block';
+                renderConflicts(data.pending_conflicts);
+            } else {
+                document.getElementById('conflictCard').style.display = 'none';
+            }
+
+            if (data.self_checks && data.self_checks.length > 0) {
+                document.getElementById('checkSection').style.display = 'block';
+                renderSelfChecks(data.self_checks);
+            }
+
+            if (s.status === 'imported' || s.status === 'pending') {
+                document.getElementById('step2Section').style.display = 'block';
+                loadSnapshots();
+            } else {
+                document.getElementById('step2Section').style.display = 'none';
+            }
+
+            if (s.status === 'snapshot_supplemented') {
+                document.getElementById('expandSection').style.display = 'block';
+            } else {
+                document.getElementById('expandSection').style.display = 'none';
+            }
+
+            if (s.status === 'expand_completed') {
+                document.getElementById('resultCard').style.display = 'block';
+                document.getElementById('checkSection').style.display = 'block';
+                document.getElementById('exportSection').style.display = 'block';
+                loadResults();
+                loadAbnormalSamples();
+            } else {
+                document.getElementById('resultCard').style.display = 'none';
+                document.getElementById('exportSection').style.display = 'none';
+            }
+        }
+
+        function renderConflicts(conflicts) {
+            let html = '';
+            conflicts.forEach(c => {
+                html += `
+                    <div class="conflict-alert">
+                        <h4>⚠️ ${c.description}</h4>
+                        <p><strong>冲突类型:</strong> ${c.conflict_type}</p>
+                        <div class="conflict-evidence">${JSON.stringify(c.evidence, null, 2)}</div>
+                        <p style="color:#e74c3c;font-size:13px;font-weight:500">请评测运营小孟确认或驳回，系统不会自动处理</p>
+                        <div class="conflict-actions">
+                            <button class="btn btn-success btn-small" onclick="resolveConflict(${c.id}, 'confirmed')">确认（按此执行）</button>
+                            <button class="btn btn-danger btn-small" onclick="resolveConflict(${c.id}, 'rejected')">驳回（重新设置）</button>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('conflictList').innerHTML = html;
+        }
+
+        function renderSelfChecks(checks) {
+            let html = '';
+            checks.forEach(c => {
+                html += `
+                    <div class="check-item">
+                        <div class="check-icon ${c.passed ? 'check-pass' : 'check-fail'}">${c.passed ? '✓' : '✗'}</div>
+                        <div class="check-info">
+                            <h4>${c.check_name}</h4>
+                            <p>${c.passed ? '检查通过' : `发现 ${c.error_count} 个问题`}
+                            ${c.details && c.details.warning ? ' - ' + c.details.warning : ''}</p>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('selfCheckList').innerHTML = html;
+        }
+
+        async function loadSnapshots() {
+            try {
+                const res = await fetch(`${API_BASE}/snapshots`);
+                const data = await res.json();
+                const select = document.getElementById('snapshotSelect');
+                select.innerHTML = '<option value="">-- 请选择 --</option>';
+                data.data.forEach(s => {
+                    const opt = document.createElement('option');
+                    opt.value = s.snapshot_id;
+                    opt.textContent = `${s.snapshot_id} - ${s.snapshot_name} (${new Date(s.snapshot_time).toLocaleDateString('zh-CN')})`;
+                    select.appendChild(opt);
+                });
+            } catch (e) {
+                console.error('加载快照失败', e);
+            }
+        }
+
+        async function supplementSnapshot() {
+            const snapshotId = document.getElementById('snapshotSelect').value;
+            if (!snapshotId) {
+                showToast('请选择特征快照编号', 'error');
+                return;
+            }
+
+            try {
+                const params = new URLSearchParams({
+                    feature_snapshot_id: snapshotId,
+                    operator: '小孟'
+                });
+                const res = await fetch(`${API_BASE}/slices/${SLICE_ID}/supplement-snapshot?${params}`, { method: 'POST' });
+                const data = await res.json();
+                
+                if (data.success) {
+                    showToast('特征快照编号补录成功');
+                    if (data.conflicts && data.conflicts.length > 0) {
+                        showToast(`检测到 ${data.conflicts.length} 个冲突，请处理`, 'warning');
+                    }
+                    loadDetail();
+                } else {
+                    showToast(data.detail || '操作失败', 'error');
+                }
+            } catch (e) {
+                showToast('操作失败: ' + e.message, 'error');
+            }
+        }
+
+        async function resolveConflict(conflictId, resolution) {
+            try {
+                const params = new URLSearchParams({ resolution, operator: '小孟' });
+                const res = await fetch(`${API_BASE}/conflicts/${conflictId}/resolve?${params}`, { method: 'POST' });
+                const data = await res.json();
+                
+                if (data.success) {
+                    showToast('冲突处理成功');
+                    loadDetail();
+                } else {
+                    showToast(data.detail || '处理失败', 'error');
+                }
+            } catch (e) {
+                showToast('处理失败: ' + e.message, 'error');
+            }
+        }
+
+        async function runExpand() {
+            if (!confirm('确认执行相似用户扩展？这将生成扩展结果并执行自检。')) return;
+            
+            try {
+                showToast('正在执行扩展，请稍候...', 'info');
+                const res = await fetch(`${API_BASE}/slices/${SLICE_ID}/run-expand?operator=小孟`, { method: 'POST' });
+                const data = await res.json();
+                
+                if (data.success) {
+                    showToast(`扩展完成！生成 ${data.data.total_results} 条结果，${data.data.abnormal_count} 条异常`);
+                    loadDetail();
+                } else {
+                    showToast(data.detail || '扩展失败', 'error');
+                }
+            } catch (e) {
+                showToast('扩展失败: ' + e.message, 'error');
+            }
+        }
+
+        async function runSelfCheck() {
+            try {
+                const res = await fetch(`${API_BASE}/slices/${SLICE_ID}/self-check`, { method: 'POST' });
+                const data = await res.json();
+                
+                if (data.success) {
+                    showToast('自检完成');
+                    renderSelfChecks(data.data);
+                } else {
+                    showToast(data.detail || '自检失败', 'error');
+                }
+            } catch (e) {
+                showToast('自检失败: ' + e.message, 'error');
+            }
+        }
+
+        async function loadResults() {
+            try {
+                const res = await fetch(`${API_BASE}/slices/${SLICE_ID}/results?page=${currentResultPage}&page_size=50`);
+                const data = await res.json();
+                renderResultsTable(data);
+                renderPagination('resultsPagination', data.total, currentResultPage, 50, (p) => {
+                    currentResultPage = p;
+                    loadResults();
+                });
+            } catch (e) {
+                console.error('加载结果失败', e);
+            }
+        }
+
+        function renderResultsTable(data) {
+            let html = '<table><thead><tr><th>用户ID</th><th>种子用户</th><th>相似度</th><th>是否异常</th><th>异常类型</th><th>待复核</th><th>复核状态</th></tr></thead><tbody>';
+            data.results.forEach(r => {
+                const rowClass = r.is_abnormal ? 'abnormal-row' : (r.need_review ? 'need-review-row' : '');
+                html += `
+                    <tr class="${rowClass}">
+                        <td>${r.user_id}</td>
+                        <td>${r.seed_user_id || '-'}</td>
+                        <td>${r.similarity_score}</td>
+                        <td>${r.is_abnormal ? '<span style="color:#e74c3c">是</span>' : '否'}</td>
+                        <td>${r.abnormal_type || '-'}</td>
+                        <td>${r.need_review ? '<span style="color:#f39c12">是</span>' : '否'}</td>
+                        <td>${r.review_status || '-'}</td>
+                    </tr>
+                `;
+            });
+            html += '</tbody></table>';
+            document.getElementById('resultsTable').innerHTML = html;
+        }
+
+        async function loadAbnormalSamples() {
+            const onlyNeedReview = document.getElementById('onlyNeedReview').checked;
+            try {
+                const res = await fetch(`${API_BASE}/slices/${SLICE_ID}/abnormal-samples?page=${currentAbnormalPage}&page_size=50&only_need_review=${onlyNeedReview}`);
+                const data = await res.json();
+                renderAbnormalTable(data);
+                renderPagination('abnormalPagination', data.total, currentAbnormalPage, 50, (p) => {
+                    currentAbnormalPage = p;
+                    loadAbnormalSamples();
+                });
+            } catch (e) {
+                console.error('加载异常样本失败', e);
+            }
+        }
+
+        function renderAbnormalTable(data) {
+            if (data.total === 0) {
+                document.getElementById('abnormalTable').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">✅</div>
+                        <p>暂无异常样本</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '<table><thead><tr><th>用户ID</th><th>相似度</th><th>异常原因</th><th>复核状态</th><th>操作</th></tr></thead><tbody>';
+            data.samples.forEach(r => {
+                const reviewActions = r.need_review && r.review_status === 'pending' ? `
+                    <button class="btn btn-success btn-small" onclick="reviewSample(${r.id}, 'confirmed_normal')">标记正常</button>
+                    <button class="btn btn-danger btn-small" onclick="reviewSample(${r.id}, 'confirmed_abnormal')">确认异常</button>
+                ` : '-';
+                
+                html += `
+                    <tr class="abnormal-row">
+                        <td>${r.user_id}</td>
+                        <td>${r.similarity_score}</td>
+                        <td style="max-width:300px;font-size:12px">${r.abnormal_reason || '-'}</td>
+                        <td>${r.review_status === 'pending' ? '<span style="color:#f39c12">待复核</span>' : r.review_status}</td>
+                        <td>${reviewActions}</td>
+                    </tr>
+                `;
+            });
+            html += '</tbody></table>';
+            html += '<p style="margin-top:12px;font-size:12px;color:#888">💡 时间窗穿越导致效果虚高的样本，请留给实验平台负责人复核，不要直接标记为正常</p>';
+            document.getElementById('abnormalTable').innerHTML = html;
+        }
+
+        async function reviewSample(resultId, status) {
+            const operator = prompt('请输入操作人姓名:', '实验平台负责人');
+            if (!operator) return;
+
+            try {
+                const params = new URLSearchParams({ review_status: status, operator });
+                const res = await fetch(`${API_BASE}/results/${resultId}/review?${params}`, { method: 'POST' });
+                const data = await res.json();
+                
+                if (data.success) {
+                    showToast('复核成功');
+                    loadAbnormalSamples();
+                    loadDetail();
+                } else {
+                    showToast(data.detail || '操作失败', 'error');
+                }
+            } catch (e) {
+                showToast('操作失败: ' + e.message, 'error');
+            }
+        }
+
+        function renderPagination(containerId, total, currentPage, pageSize, onChange) {
+            const totalPages = Math.ceil(total / pageSize);
+            let html = '';
+            
+            html += `<button ${currentPage === 1 ? 'disabled' : ''} onclick="(${onChange})(${currentPage - 1})">上一页</button>`;
+            
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+                    html += `<button class="${i === currentPage ? 'active' : ''}" onclick="(function(p){${onChange.toString().match(/\{([\s\S]*)\}/)[1]}})(${i})">${i}</button>`;
+                } else if (i === currentPage - 3 || i === currentPage + 3) {
+                    html += '<span>...</span>';
+                }
+            }
+            
+            html += `<button ${currentPage === totalPages ? 'disabled' : ''} onclick="(${onChange})(${currentPage + 1})">下一页</button>`;
+            
+            document.getElementById(containerId).innerHTML = html;
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            if (tab === 'results') {
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                document.getElementById('tab-results').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.getElementById('tab-abnormal').classList.add('active');
+            }
+        }
+
+        function exportResults() {
+            window.open(`${API_BASE}/slices/${SLICE_ID}/export?abnormal_only=false`, '_blank');
+        }
+
+        function exportAbnormal() {
+            window.open(`${API_BASE}/slices/${SLICE_ID}/export?abnormal_only=true`, '_blank');
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        loadDetail();
+    </script>
+</body>
+</html>
