@@ -1,0 +1,201 @@
+import type { Street, Point, BusTimeSlot, RedlineRemark, StallRotation, User } from '@/types';
+
+export const mockStreets: Street[] = [
+  {
+    id: 'st1',
+    name: '幸福街道',
+    boundary: [
+      [116.30, 39.90],
+      [116.40, 39.90],
+      [116.40, 40.00],
+      [116.30, 40.00],
+    ],
+  },
+  {
+    id: 'st2',
+    name: '光明街道',
+    boundary: [
+      [116.40, 39.90],
+      [116.50, 39.90],
+      [116.50, 40.00],
+      [116.40, 40.00],
+    ],
+  },
+];
+
+export const mockPoints: Point[] = [
+  {
+    id: 'p1',
+    name: '早市入口1号点位',
+    lng: 116.35,
+    lat: 39.95,
+    streetIds: ['st1'],
+    isBoundary: false,
+    boundaryStatus: 'normal',
+  },
+  {
+    id: 'p2',
+    name: '两街交界点位A',
+    lng: 116.40,
+    lat: 39.95,
+    streetIds: ['st1', 'st2'],
+    isBoundary: true,
+    boundaryStatus: 'pending',
+  },
+  {
+    id: 'p3',
+    name: '两街交界点位B',
+    lng: 116.40,
+    lat: 39.96,
+    streetIds: ['st1', 'st2'],
+    isBoundary: true,
+    boundaryStatus: 'pending',
+  },
+  {
+    id: 'p4',
+    name: '早市中段点位',
+    lng: 116.45,
+    lat: 39.95,
+    streetIds: ['st2'],
+    isBoundary: false,
+    boundaryStatus: 'normal',
+  },
+  {
+    id: 'p5',
+    name: '早市出口点位',
+    lng: 116.45,
+    lat: 39.98,
+    streetIds: ['st2'],
+    isBoundary: false,
+    boundaryStatus: 'normal',
+  },
+];
+
+export const mockBusTimeSlots: BusTimeSlot[] = [
+  {
+    id: 'bt1',
+    routeName: '1路',
+    date: '2026-06-07',
+    startTime: '06:00',
+    endTime: '06:30',
+    passengerCount: 45,
+    relatedPointIds: ['p1', 'p2'],
+    importBatchId: 'batch-001',
+    createdAt: '2026-06-07T08:00:00Z',
+    updatedAt: '2026-06-07T08:00:00Z',
+  },
+  {
+    id: 'bt2',
+    routeName: '1路',
+    date: '2026-06-07',
+    startTime: '06:30',
+    endTime: '07:00',
+    passengerCount: 68,
+    relatedPointIds: ['p2', 'p3'],
+    importBatchId: 'batch-001',
+    createdAt: '2026-06-07T08:00:00Z',
+    updatedAt: '2026-06-07T08:00:00Z',
+  },
+  {
+    id: 'bt3',
+    routeName: '5路',
+    date: '2026-06-07',
+    startTime: '06:15',
+    endTime: '06:45',
+    passengerCount: 32,
+    relatedPointIds: ['p4', 'p5'],
+    importBatchId: 'batch-001',
+    createdAt: '2026-06-07T08:00:00Z',
+    updatedAt: '2026-06-07T08:00:00Z',
+  },
+];
+
+export const mockRedlineRemarks: RedlineRemark[] = [
+  {
+    id: 'r1',
+    pointId: 'p1',
+    content: '此点位靠近小区出入口，注意人流疏导，禁止摆放大型摊位',
+    version: 1,
+    createdBy: 'u1',
+    createdByName: '周姐',
+    createdAt: '2026-06-05T10:00:00Z',
+  },
+  {
+    id: 'r2',
+    pointId: 'p2',
+    content: '两街交界点位，暂归幸福街道管理，待最终确认',
+    version: 1,
+    createdBy: 'u1',
+    createdByName: '周姐',
+    createdAt: '2026-06-05T11:00:00Z',
+  },
+  {
+    id: 'r3',
+    pointId: 'p2',
+    content: '两街交界点位，经初步沟通暂归光明街道管理，待项目经理复核',
+    version: 2,
+    createdBy: 'u1',
+    createdByName: '周姐',
+    createdAt: '2026-06-06T09:00:00Z',
+    previousId: 'r2',
+    diff: {
+      content: {
+        before: '两街交界点位，暂归幸福街道管理，待最终确认',
+        after: '两街交界点位，经初步沟通暂归光明街道管理，待项目经理复核',
+      },
+    },
+  },
+];
+
+export const mockStallRotations: StallRotation[] = [
+  {
+    id: 's1',
+    pointId: 'p1',
+    stallNumber: 'A001',
+    rotationDate: '2026-06-07',
+    vendorName: '张大爷蔬菜摊',
+    status: 'active',
+    busTimeSlotIds: ['bt1'],
+    remarkId: 'r1',
+  },
+  {
+    id: 's2',
+    pointId: 'p2',
+    stallNumber: 'B001',
+    rotationDate: '2026-06-07',
+    vendorName: '李阿姨水果摊',
+    status: 'active',
+    busTimeSlotIds: ['bt1', 'bt2'],
+    remarkId: 'r3',
+  },
+  {
+    id: 's3',
+    pointId: 'p4',
+    stallNumber: 'B002',
+    rotationDate: '2026-06-07',
+    vendorName: '王大哥早点摊',
+    status: 'active',
+    busTimeSlotIds: ['bt3'],
+  },
+];
+
+export const mockUsers: User[] = [
+  {
+    id: 'u1',
+    name: '周姐',
+    role: 'staff',
+    username: 'zhoujie',
+  },
+  {
+    id: 'u2',
+    name: '陈经理',
+    role: 'manager',
+    username: 'chenjl',
+  },
+  {
+    id: 'u3',
+    name: '系统管理员',
+    role: 'admin',
+    username: 'admin',
+  },
+];
