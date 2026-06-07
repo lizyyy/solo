@@ -1,0 +1,5 @@
+﻿id,client_id,client_name,account_id,collateral_code,collateral_name,skip_reason,skip_detail,market_value,available_collateral,trade_date,settlement_date,is_refund
+5,C004,赵六,A004001,600519,贵州茅台,caliber_mismatch,口径不一致: 计算值 540000.00 != 上报值 500000.00,900000.0,500000.0,2024-01-15,2024-01-16,False
+1,C001,张三,A001001,600000,浦发银行,multi_account,"同一客户2个账号: A001001, A001002",85000.0,59500.0,2024-01-15,2024-01-16,False
+3,C001,张三,A001002,601318,中国平安,multi_account,"同一客户2个账号: A001001, A001002",96000.0,67200.0,2024-01-15,2024-01-16,False
+7,C005,孙七,A005001,601398,工商银行,cross_settlement_refund,"退款跨清算日: 交易日=2024-01-13, 清算日=2024-01-15",90000.0,67500.0,2024-01-13,2024-01-15,True
