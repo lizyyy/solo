@@ -157,6 +157,8 @@ class SpaceRecyclingGame {
         this.pendingConfirmations = [];
         this.currentRecord = null;
         this.replayState = null;
+        this.pauseStartTime = null;
+        this.currentPausePendingId = null;
         this.init();
     }
 
@@ -231,13 +233,28 @@ class SpaceRecyclingGame {
         clearInterval(this.timerInterval);
         clearInterval(this.spawnInterval);
         
-        this.logEvent(EventType.WARNING, '⏸️ 活动暂停');
+        this.pauseStartTime = Date.now();
+        
+        const resourcesBeforePause = { ...this.resources };
+        const debrisCountBeforePause = this.debrisList.filter(d => !d.collected).length;
+        
+        this.logEvent(EventType.WARNING, '⏸️ 活动暂停', null, {
+            fuel: resourcesBeforePause.fuel,
+            oxygen: resourcesBeforePause.oxygen,
+            score: resourcesBeforePause.score,
+            debrisOnField: debrisCountBeforePause
+        });
         
         const pendingId = `pause_${Date.now()}`;
+        this.currentPausePendingId = pendingId;
         this.pendingConfirmations.push({
             id: pendingId,
             type: 'pause',
             time: this.elapsedTime,
+            pauseStartTime: this.pauseStartTime,
+            pauseDuration: 0,
+            resourcesBeforePause,
+            debrisCountBeforePause,
             message: '这次暂停是否要从总时间里扣除？'
         });
         this.logEvent(EventType.PENDING, '⏳ 暂停记录待确认：是否扣除暂停时间？', 'pending', { pendingId });
@@ -248,11 +265,31 @@ class SpaceRecyclingGame {
     resume() {
         if (this.state !== GameState.PAUSED) return;
         
+        const pauseEndTime = Date.now();
+        const pauseDurationMs = pauseEndTime - (this.pauseStartTime || pauseEndTime);
+        const pauseDurationSeconds = Math.round(pauseDurationMs / 1000);
+        
+        const pendingPause = this.pendingConfirmations.find(p => p.id === this.currentPausePendingId);
+        if (pendingPause) {
+            pendingPause.pauseDuration = pauseDurationSeconds;
+            pendingPause.pauseEndTime = pauseEndTime;
+            pendingPause.message = `这次暂停了 ${pauseDurationSeconds} 秒，是否要从总时间里扣除？`;
+        }
+        
         this.state = GameState.RUNNING;
         this.timerInterval = setInterval(() => this.tick(), 1000);
         this.spawnInterval = setInterval(() => this.spawnDebris(), 6000);
         
-        this.logEvent(EventType.INFO, '▶ 活动继续');
+        const debrisCountNow = this.debrisList.filter(d => !d.collected).length;
+        this.logEvent(EventType.INFO, `▶ 活动继续（暂停了 ${pauseDurationSeconds} 秒）`, null, {
+            pauseDuration: pauseDurationSeconds,
+            fuel: this.resources.fuel,
+            oxygen: this.resources.oxygen,
+            score: this.resources.score,
+            debrisOnField: debrisCountNow
+        });
+        
+        this.pauseStartTime = null;
         this.updateUI();
     }
 
@@ -526,12 +563,42 @@ class SpaceRecyclingGame {
         const pending = this.pendingConfirmations.find(p => p.id === pendingId);
         if (!pending) return;
         
+        let extraInfo = '';
+        if (pending.type === 'pause') {
+            extraInfo = `
+                <p><strong>暂停时长：</strong>${pending.pauseDuration > 0 ? pending.pauseDuration + ' 秒' : '待继续后确定'}</p>
+                <p><strong>暂停前状态：</strong></p>
+                <ul style="margin:4px 0 8px 20px;font-size:12px;color:#9ca3af;">
+                    <li>燃料：${pending.resourcesBeforePause?.fuel?.toFixed(0) || '?'}</li>
+                    <li>氧气：${pending.resourcesBeforePause?.oxygen?.toFixed(0) || '?'}</li>
+                    <li>得分：${pending.resourcesBeforePause?.score?.toFixed(0) || '?'}</li>
+                    <li>场上垃圾：${pending.debrisCountBeforePause || 0} 件</li>
+                </ul>
+                ${pending.pauseDuration > 0 ? '<p style="color:#f59e0b;">💡 通过后会从总时间里扣除 ' + pending.pauseDuration + ' 秒</p>' : ''}
+            `;
+        } else if (pending.type === 'negative') {
+            extraInfo = `
+                <p style="color:#ef4444;">⚠️ 资源变成负数了，不能假装没看见</p>
+            `;
+        } else if (pending.type === 'boundary') {
+            extraInfo = `
+                <p style="color:#f59e0b;">⚠️ 刚好卡在边界线上，需要人来拍板</p>
+            `;
+        }
+        
         this.showModal(
             '人工确认',
             `
+                <p><strong>类型：</strong>${
+                    pending.type === 'pause' ? '暂停记录' :
+                    pending.type === 'negative' ? '资源负数异常' :
+                    pending.type === 'boundary' ? '边界分数' :
+                    pending.type === 'manual' ? '操作争议' : '待确认'
+                }</p>
                 <p><strong>时间点：</strong>${this.formatTime(pending.time)}</p>
                 <p><strong>问题：</strong>${pending.message}</p>
-                <p><strong>你的处理意见：</strong></p>
+                ${extraInfo}
+                <p style="margin-top:12px;"><strong>你的处理意见：</strong></p>
                 <textarea id="confirmNote" placeholder="写点什么，比如'算，给孩子们一次机会'或者'不算，按规则来'"></textarea>
             `,
             [
@@ -560,9 +627,20 @@ class SpaceRecyclingGame {
         pending.approved = approved;
         pending.note = note;
         
+        let effectText = '';
+        if (pending.type === 'pause' && approved && pending.pauseDuration > 0) {
+            const oldTime = this.elapsedTime;
+            this.elapsedTime = Math.max(0, this.elapsedTime - pending.pauseDuration);
+            effectText = `（已扣除 ${pending.pauseDuration} 秒：${this.formatTime(oldTime)} → ${this.formatTime(this.elapsedTime)}）`;
+            
+            if (this.currentRecord) {
+                this.currentRecord.metadata.totalPauseDeducted = (this.currentRecord.metadata.totalPauseDeducted || 0) + pending.pauseDuration;
+            }
+        }
+        
         this.logEvent(
             EventType.NOTE,
-            `📝 补录备注：${approved ? '✅ 通过' : '❌ 驳回'} - ${note || '（无备注）'}`,
+            `📝 人工确认：${approved ? '✅ 通过' : '❌ 驳回'} - ${note || '（无备注）'} ${effectText}`,
             'confirmed'
         );
         
@@ -1151,6 +1229,24 @@ function loadSample(sampleName) {
     game.resources = { ...sample.finalResources };
     game.elapsedTime = sample.metadata.duration;
     game.state = GameState.SETTLED;
+    
+    game.pendingConfirmations = [];
+    sample.events.forEach(event => {
+        if (event.type === 'pending' && event.pendingId) {
+            game.pendingConfirmations.push({
+                id: event.pendingId,
+                type: event.pendingId?.startsWith('pause') ? 'pause' :
+                      event.pendingId?.startsWith('fuel') ? 'negative' :
+                      event.pendingId?.startsWith('score') ? 'boundary' : 'manual',
+                time: event.time,
+                message: event.text.replace('⏳ ', '').replace('待确认：', ''),
+                pauseDuration: event.pendingId?.startsWith('pause') ? 5 : 0,
+                resolved: false,
+                resourcesBeforePause: { fuel: 78, oxygen: 75, score: 23 },
+                debrisCountBeforePause: 2
+            });
+        }
+    });
     
     const eventsList = document.getElementById('eventsList');
     eventsList.innerHTML = '';
