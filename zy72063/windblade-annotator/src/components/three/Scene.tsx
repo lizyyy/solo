@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
-import { OrbitControls, Grid, Environment, ContactShadows } from '@react-three/drei';
+import { OrbitControls, Grid, ContactShadows } from '@react-three/drei';
 import * as THREE from 'three';
 import { Blade3D } from './Blade3D';
 import { CrackMarker } from './CrackMarker';
@@ -141,8 +141,6 @@ const SceneContent = () => {
         followCamera={false}
         infiniteGrid
       />
-
-      <Environment preset="night" />
     </>
   );
 };

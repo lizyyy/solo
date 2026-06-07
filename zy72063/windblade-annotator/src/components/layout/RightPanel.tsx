@@ -15,6 +15,7 @@ import {
   Link2,
   Copy
 } from 'lucide-react';
+import { RemarkDialog } from '../dialogs/RemarkDialog';
 import { useAppStore, useSelectedRecord } from '../../store/useAppStore';
 import { StatusBadge } from '../common/StatusBadge';
 import { SourceIcon } from '../common/SourceIcon';
@@ -26,6 +27,8 @@ import {
   type RecordStatus
 } from '../../types';
 import { copyToClipboard } from '../../utils/export';
+import { formatDiffForDisplay } from '../../utils/diff';
+import type { DiffField } from '../../types';
 
 const STATUS_OPTIONS: RecordStatus[] = ['pending', 'processing', 'completed', 'confirmed'];
 
@@ -44,6 +47,7 @@ const ActionIcon = ({ action }: { action: string }) => {
 export const RightPanel = () => {
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [editingStatus, setEditingStatus] = useState(false);
+  const [showRemarkDialog, setShowRemarkDialog] = useState(false);
 
   const {
     rightPanelCollapsed,
@@ -72,9 +76,12 @@ export const RightPanel = () => {
   };
 
   const handleAddRemark = () => {
-    const remark = prompt('请输入备注内容：');
-    if (remark && record) {
-      addRemark(record.id, remark);
+    setShowRemarkDialog(true);
+  };
+
+  const handleSubmitRemark = (remark: string, operator: string) => {
+    if (record) {
+      addRemark(record.id, remark, operator);
     }
   };
 
@@ -315,14 +322,26 @@ export const RightPanel = () => {
                     <p className="text-sm text-gray-400">{h.detail}</p>
                     {h.diff && h.diff.length > 0 && (
                       <div className="mt-2 space-y-1">
-                        {h.diff.map((d, i) => (
-                          <div key={i} className="text-xs diff-modify pl-2 py-1 rounded">
-                            <span className="text-gray-500">{d.field}:</span>
-                            <span className="text-red-400 line-through mx-1">{d.oldValue}</span>
-                            <span className="text-gray-500">→</span>
-                            <span className="text-success-400 ml-1">{d.newValue}</span>
-                          </div>
-                        ))}
+                        {h.diff.map((d: DiffField, i: number) => {
+                          const formatted = formatDiffForDisplay(d);
+                          return (
+                            <div key={i} className={`text-xs pl-2 py-1 rounded ${
+                              formatted.type === 'add' ? 'diff-add' :
+                              formatted.type === 'remove' ? 'diff-remove' : 'diff-modify'
+                            }`}>
+                              <span className="text-gray-500">{formatted.fieldLabel}:</span>
+                              {formatted.type !== 'add' && (
+                                <span className="text-red-400 line-through mx-1">{formatted.oldValue || '(空)'}</span>
+                              )}
+                              {formatted.type === 'modify' && (
+                                <span className="text-gray-500">→</span>
+                              )}
+                              {formatted.type !== 'remove' && (
+                                <span className="text-success-400 ml-1">{formatted.newValue || '(空)'}</span>
+                              )}
+                            </div>
+                          );
+                        })}
                       </div>
                     )}
                   </div>
@@ -332,6 +351,13 @@ export const RightPanel = () => {
           </div>
         </div>
       </div>
+
+      <RemarkDialog
+        isOpen={showRemarkDialog}
+        onClose={() => setShowRemarkDialog(false)}
+        onSubmit={handleSubmitRemark}
+        recordCode={record?.code}
+      />
     </div>
   );
 };

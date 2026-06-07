@@ -319,3 +319,7 @@ export const useRecordsByStatus = () => {
     confirmed: records.filter(r => r.status === 'confirmed')
   };
 };
+
+if (typeof window !== 'undefined') {
+  (window as any).__APP_STORE__ = useAppStore;
+}

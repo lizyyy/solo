@@ -9,10 +9,13 @@ import {
   RefreshCw,
   ChevronRight,
   Menu,
-  AlertTriangle
+  AlertTriangle,
+  Download,
+  FileText,
+  FileJson
 } from 'lucide-react';
 import { useAppStore } from '../../store/useAppStore';
-import { exportScreenshot, exportSchemeAsJSON } from '../../utils/export';
+import { exportScreenshot, exportSchemeAsJSON, exportAllRecordsAsJSON, exportReportAsText } from '../../utils/export';
 import type { Scheme } from '../../types';
 
 interface ToolbarProps {
@@ -23,6 +26,7 @@ interface ToolbarProps {
 export const Toolbar = ({ onImportClick, onSaveSchemeClick }: ToolbarProps) => {
   const [showSchemeMenu, setShowSchemeMenu] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [showExportMenu, setShowExportMenu] = useState(false);
 
   const {
     showCompleted,
@@ -34,22 +38,36 @@ export const Toolbar = ({ onImportClick, onSaveSchemeClick }: ToolbarProps) => {
     resetToMockData,
     toggleDiffPanel,
     showDiffPanel,
-    activeSchemeId
+    activeSchemeId,
+    records
   } = useAppStore();
 
   const handleExportScreenshot = async () => {
     try {
       await exportScreenshot('main-canvas');
+      setShowExportMenu(false);
     } catch (e) {
       console.error('Export failed:', e);
     }
   };
 
-  const handleExportJSON = () => {
+  const handleExportSchemeJSON = () => {
     const activeScheme = schemes.find(s => s.id === activeSchemeId);
     if (activeScheme) {
       exportSchemeAsJSON(activeScheme);
     }
+    setShowExportMenu(false);
+  };
+
+  const handleExportAllRecordsJSON = () => {
+    exportAllRecordsAsJSON(records);
+    setShowExportMenu(false);
+  };
+
+  const handleExportReport = () => {
+    const activeScheme = schemes.find(s => s.id === activeSchemeId);
+    exportReportAsText(records, activeScheme?.name);
+    setShowExportMenu(false);
   };
 
   const handleLoadScheme = (scheme: Scheme) => {
@@ -140,7 +158,7 @@ export const Toolbar = ({ onImportClick, onSaveSchemeClick }: ToolbarProps) => {
                 </div>
                 <div className="p-2 border-t border-white/10">
                   <button
-                    onClick={handleExportJSON}
+                    onClick={handleExportSchemeJSON}
                     className="w-full text-center text-xs text-primary-400 hover:text-primary-300 py-1"
                     disabled={!activeSchemeId}
                   >
@@ -159,14 +177,69 @@ export const Toolbar = ({ onImportClick, onSaveSchemeClick }: ToolbarProps) => {
 
           <div className="w-px h-6 bg-white/10 mx-2" />
 
-          <button
-            onClick={handleExportScreenshot}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-dark-600 hover:bg-dark-500 text-white text-sm font-medium transition-colors"
-            title="导出截图"
-          >
-            <Camera className="w-4 h-4" />
-            截图导出
-          </button>
+          <div className="relative">
+            <button
+              onClick={() => setShowExportMenu(!showExportMenu)}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-dark-600 hover:bg-dark-500 text-white text-sm font-medium transition-colors"
+              title="导出"
+            >
+              <Download className="w-4 h-4" />
+              导出
+              <ChevronRight className="w-3 h-3 ml-1" style={{ transform: showExportMenu ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }} />
+            </button>
+
+            {showExportMenu && (
+              <div className="absolute top-full right-0 mt-2 w-56 glass rounded-lg shadow-xl overflow-hidden z-50">
+                <div className="p-2 border-b border-white/10">
+                  <p className="text-xs text-gray-400">导出选项</p>
+                </div>
+                <div className="p-1">
+                  <button
+                    onClick={handleExportScreenshot}
+                    className="w-full text-left px-3 py-2 hover:bg-white/10 transition-colors rounded flex items-center gap-2 text-sm text-gray-200"
+                  >
+                    <Camera className="w-4 h-4 text-primary-400" />
+                    <div>
+                      <p>导出截图</p>
+                      <p className="text-xs text-gray-500">保存当前3D视图为PNG图片</p>
+                    </div>
+                  </button>
+                  <button
+                    onClick={handleExportReport}
+                    className="w-full text-left px-3 py-2 hover:bg-white/10 transition-colors rounded flex items-center gap-2 text-sm text-gray-200"
+                  >
+                    <FileText className="w-4 h-4 text-success-400" />
+                    <div>
+                      <p>导出文本报告</p>
+                      <p className="text-xs text-gray-500">含统计汇总和全部记录详情</p>
+                    </div>
+                  </button>
+                  <button
+                    onClick={handleExportAllRecordsJSON}
+                    className="w-full text-left px-3 py-2 hover:bg-white/10 transition-colors rounded flex items-center gap-2 text-sm text-gray-200"
+                  >
+                    <FileJson className="w-4 h-4 text-warning-400" />
+                    <div>
+                      <p>导出全部记录JSON</p>
+                      <p className="text-xs text-gray-500">原始数据格式，可重新导入</p>
+                    </div>
+                  </button>
+                  {activeSchemeId && (
+                    <button
+                      onClick={handleExportSchemeJSON}
+                      className="w-full text-left px-3 py-2 hover:bg-white/10 transition-colors rounded flex items-center gap-2 text-sm text-gray-200 border-t border-white/10 mt-1 pt-2"
+                    >
+                      <FolderOpen className="w-4 h-4 text-gray-400" />
+                      <div>
+                        <p>导出当前方案</p>
+                        <p className="text-xs text-gray-500">含记录、视角、状态</p>
+                      </div>
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
 
           <button
             onClick={() => toggleDiffPanel()}
