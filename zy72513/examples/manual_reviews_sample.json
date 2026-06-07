@@ -1,0 +1,23 @@
+[
+  {
+    "model_output_id": "MODEL_001",
+    "review_id": "REVIEW_001",
+    "review_content": "人工改判备注：该生编程基础较弱，建议先补充计算机导论，学习周期延长2周。手机号已确认是咨询热线，需要脱敏处理。",
+    "remark": "基础薄弱，建议调整学习节奏",
+    "comment": "小孟复核：确认学习路径合理，但需补充前置课程"
+  },
+  {
+    "model_output_id": "MODEL_002",
+    "review_id": "REVIEW_002",
+    "review_content": "人工改判备注：前端学习路径可以增加 TypeScript 环节，放在 React 之前学习效果更好。",
+    "remark": "增加 TypeScript 学习环节",
+    "comment": "小孟复核：建议优化学习顺序"
+  },
+  {
+    "model_output_id": "MODEL_003",
+    "review_id": "REVIEW_003",
+    "review_content": "人工改判备注：算法学习路径正常，无需调整。可推荐 LeetCode 刷题辅助。",
+    "remark": "无需调整，推荐刷题辅助",
+    "comment": "小孟复核：学习路径合理"
+  }
+]
