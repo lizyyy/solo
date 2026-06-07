@@ -3,6 +3,7 @@ import { Search, ChevronDown, ChevronUp, Filter, AlertTriangle, Database, User }
 import { useGaitStore } from '../../store/useGaitStore';
 import { BONE_GROUP_LABELS, DATA_SOURCE_LABELS, BoneGroup, DataSource } from '../../types';
 import StatisticsPanel from './StatisticsPanel';
+import ActionLogPanel from './ActionLogPanel';
 
 export default function FilterPanel() {
   const { filters, toggleBoneGroupFilter, toggleDataSourceFilter, setShowAnomalyOnly, setSearchQuery } = useGaitStore();
@@ -106,6 +107,7 @@ export default function FilterPanel() {
       </div>
 
       <StatisticsPanel />
+      <ActionLogPanel />
     </div>
   );
 }

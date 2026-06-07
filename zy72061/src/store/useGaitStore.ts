@@ -15,6 +15,8 @@ import {
   AnomalyStatusDiff,
   ChangeRecord,
   ChangeType,
+  ActionLog,
+  ActionType,
 } from '../types';
 import { MOCK_FRAMES } from '../data/mockData';
 
@@ -29,6 +31,7 @@ interface GaitState {
   isPlaying: boolean;
   playSpeed: number;
   snapshots: Snapshot[];
+  actionLogs: ActionLog[];
   importReport: {
     fileName: string;
     importedAt: string;
@@ -36,7 +39,7 @@ interface GaitState {
     warnings: string[];
   } | null;
 
-  setFrames: (frames: GaitFrame[]) => void;
+  setFrames: (frames: GaitFrame[], author?: string) => void;
   setCurrentFrameIndex: (index: number) => void;
   setSelectedPointId: (id: string | null) => void;
   setCameraState: (state: CameraState) => void;
@@ -52,7 +55,7 @@ interface GaitState {
   updatePointCoordinates: (pointId: string, x: number, y: number, z: number, author: string, reason?: string) => void;
 
   createSnapshot: (name: string, description: string, author: string) => void;
-  restoreSnapshot: (snapshotId: string) => void;
+  restoreSnapshot: (snapshotId: string, author?: string) => void;
   deleteSnapshot: (snapshotId: string) => void;
 
   setImportReport: (report: { fileName: string; importedAt: string; totalPoints: number; warnings: string[] } | null) => void;
@@ -62,6 +65,7 @@ interface GaitState {
   getFilteredPoints: () => SkeletonPoint[];
   getStatistics: () => Statistics;
   getPointHistory: (pointName: string) => ProcessNote[];
+  getActionLogs: () => ActionLog[];
 }
 
 const initialCameraState: CameraState = {
@@ -123,6 +127,24 @@ const updatePointModificationStats = (
   return stats;
 };
 
+const addActionLog = (
+  state: GaitState,
+  actionType: ActionType,
+  description: string,
+  author: string,
+  details?: ActionLog['details'],
+): ActionLog[] => {
+  const newLog: ActionLog = {
+    id: generateId(),
+    actionType,
+    timestamp: new Date().toISOString(),
+    author,
+    description,
+    details,
+  };
+  return [newLog, ...state.actionLogs].slice(0, 200);
+};
+
 export const useGaitStore = create<GaitState>()(
   persist(
     (set, get) => ({
@@ -134,14 +156,26 @@ export const useGaitStore = create<GaitState>()(
       isPlaying: false,
       playSpeed: 1,
       snapshots: [],
+      actionLogs: [],
       importReport: null,
 
-      setFrames: (frames) => set({ frames }),
+      setFrames: (frames, author = '系统') =>
+        set((state) => ({
+          frames,
+          actionLogs: addActionLog(state, 'import_data', `导入 ${frames.length} 帧数据`, author),
+        })),
 
-      setCurrentFrameIndex: (index) => {
-        const maxIndex = get().frames.length - 1;
-        set({ currentFrameIndex: Math.max(0, Math.min(index, maxIndex)) });
-      },
+      setCurrentFrameIndex: (index) =>
+        set((state) => {
+          const maxIndex = state.frames.length - 1;
+          const newIndex = Math.max(0, Math.min(index, maxIndex));
+          return {
+            currentFrameIndex: newIndex,
+            actionLogs: addActionLog(state, 'change_frame', `切换到第 ${newIndex + 1} 帧`, '系统', {
+              frameNumber: newIndex,
+            }),
+          };
+        }),
 
       setSelectedPointId: (id) => set({ selectedPointId: id }),
 
@@ -152,7 +186,16 @@ export const useGaitStore = create<GaitState>()(
           const groups = state.filters.boneGroups.includes(group)
             ? state.filters.boneGroups.filter((g) => g !== group)
             : [...state.filters.boneGroups, group];
-          return { filters: { ...state.filters, boneGroups: groups } };
+          return {
+            filters: { ...state.filters, boneGroups: groups },
+            actionLogs: addActionLog(
+              state,
+              'update_filter',
+              `${state.filters.boneGroups.includes(group) ? '取消' : '添加'}部位筛选：${group}`,
+              '系统',
+              { previousValue: state.filters.boneGroups, newValue: groups },
+            ),
+          };
         }),
 
       toggleDataSourceFilter: (source) =>
@@ -160,14 +203,34 @@ export const useGaitStore = create<GaitState>()(
           const sources = state.filters.dataSources.includes(source)
             ? state.filters.dataSources.filter((s) => s !== source)
             : [...state.filters.dataSources, source];
-          return { filters: { ...state.filters, dataSources: sources } };
+          return {
+            filters: { ...state.filters, dataSources: sources },
+            actionLogs: addActionLog(
+              state,
+              'update_filter',
+              `${state.filters.dataSources.includes(source) ? '取消' : '添加'}来源筛选：${source}`,
+              '系统',
+              { previousValue: state.filters.dataSources, newValue: sources },
+            ),
+          };
         }),
 
       setShowAnomalyOnly: (show) =>
-        set((state) => ({ filters: { ...state.filters, showAnomalyOnly: show } })),
+        set((state) => ({
+          filters: { ...state.filters, showAnomalyOnly: show },
+          actionLogs: addActionLog(
+            state,
+            'update_filter',
+            show ? '开启仅显示异常' : '关闭仅显示异常',
+            '系统',
+            { previousValue: state.filters.showAnomalyOnly, newValue: show },
+          ),
+        })),
 
       setSearchQuery: (query) =>
-        set((state) => ({ filters: { ...state.filters, searchQuery: query } })),
+        set((state) => ({
+          filters: { ...state.filters, searchQuery: query },
+        })),
 
       setIsPlaying: (playing) => set({ isPlaying: playing }),
 
@@ -175,13 +238,13 @@ export const useGaitStore = create<GaitState>()(
 
       togglePointAnomaly: (pointId, anomalyType, anomalyNote, reason = '', author = '当前用户') =>
         set((state) => {
-          const currentFrameIdx = state.currentFrameIndex;
           const pointName = pointId.split('_frame')[0];
+          const currentFrameIdx = state.currentFrameIndex;
 
           const newFrames = state.frames.map((frame) => ({
             ...frame,
             points: frame.points.map((point) => {
-              if (point.id === pointId || point.name === pointName) {
+              if (point.name === pointName) {
                 const isNowAnomaly = !point.isAnomaly;
                 const changes: ChangeRecord[] = [
                   {
@@ -223,7 +286,7 @@ export const useGaitStore = create<GaitState>()(
                   frameNumber: frame.frameNumber,
                   content: isNowAnomaly
                     ? `标记为异常：${anomalyType || '未指定类型'}${anomalyNote ? ' - ' + anomalyNote : ''}`
-                    : '取消异常标记',
+                    : '取消异常标记，复核确认正常',
                   author,
                   createdAt: new Date().toISOString(),
                   changeType: 'anomaly_status',
@@ -248,7 +311,26 @@ export const useGaitStore = create<GaitState>()(
             }),
           }));
 
-          return { frames: newFrames };
+          const samplePoint = state.frames[currentFrameIdx]?.points.find((p) => p.name === pointName);
+          const wasAnomaly = samplePoint?.isAnomaly || false;
+
+          return {
+            frames: newFrames,
+            actionLogs: addActionLog(
+              state,
+              'toggle_anomaly',
+              `${pointName} ${wasAnomaly ? '取消异常标记' : '标记为异常'}`,
+              author,
+              {
+                pointName,
+                pointId,
+                frameNumber: currentFrameIdx,
+                previousValue: wasAnomaly,
+                newValue: !wasAnomaly,
+                reason: reason || undefined,
+              },
+            ),
+          };
         }),
 
       addNoteToPoint: (pointId, content, author, reason = '') =>
@@ -258,7 +340,7 @@ export const useGaitStore = create<GaitState>()(
           const newFrames = state.frames.map((frame) => ({
             ...frame,
             points: frame.points.map((point) => {
-              if (point.id === pointId || point.name === pointName) {
+              if (point.name === pointName) {
                 const changes: ChangeRecord[] = [
                   {
                     field: 'note',
@@ -292,14 +374,24 @@ export const useGaitStore = create<GaitState>()(
             }),
           }));
 
-          return { frames: newFrames };
+          return {
+            frames: newFrames,
+            actionLogs: addActionLog(state, 'add_note', `${pointName} 添加备注：${content.slice(0, 30)}`, author, {
+              pointName,
+              pointId,
+              frameNumber: state.currentFrameIndex,
+              newValue: content,
+              reason: reason || undefined,
+            }),
+          };
         }),
 
       updatePointCoordinates: (pointId, x, y, z, author, reason = '') =>
         set((state) => {
-          const currentPoint = state.frames
-            .flatMap((f) => f.points)
-            .find((p) => p.id === pointId);
+          const pointName = pointId.split('_frame')[0];
+          const currentFrameIdx = state.currentFrameIndex;
+
+          const currentPoint = state.frames[currentFrameIdx]?.points.find((p) => p.name === pointName);
 
           if (!currentPoint) return state;
 
@@ -317,8 +409,8 @@ export const useGaitStore = create<GaitState>()(
           const newNote: ProcessNote = {
             id: generateId(),
             pointId,
-            frameNumber: state.currentFrameIndex,
-            content: `坐标修正：原值(${currentPoint.x.toFixed(4)}, ${currentPoint.y.toFixed(4)}, ${currentPoint.z.toFixed(4)}) → 新值(${x.toFixed(4)}, ${y.toFixed(4)}, ${z.toFixed(4)})，偏移量：${coordinateDiff.delta.distance.toFixed(4)}`,
+            frameNumber: currentFrameIdx,
+            content: `坐标修正：原值(${currentPoint.x.toFixed(4)}, ${currentPoint.y.toFixed(4)}, ${currentPoint.z.toFixed(4)}) → 新值(${x.toFixed(4)}, ${y.toFixed(4)}, ${z.toFixed(4)})，偏移距离：${coordinateDiff.delta.distance.toFixed(4)}`,
             author,
             createdAt: new Date().toISOString(),
             changeType: 'coordinate',
@@ -331,12 +423,12 @@ export const useGaitStore = create<GaitState>()(
           const newFrames = state.frames.map((frame) => ({
             ...frame,
             points: frame.points.map((point) => {
-              if (point.id === pointId) {
+              if (point.name === pointName) {
                 return {
                   ...point,
-                  x,
-                  y,
-                  z,
+                  x: x + (point.x - currentPoint.x),
+                  y: y + (point.y - currentPoint.y),
+                  z: z + (point.z - currentPoint.z),
                   source: 'manual_edit' as DataSource,
                   notes: [...point.notes, newNote],
                   modificationStats: updatePointModificationStats(point, 'coordinate', author),
@@ -348,7 +440,23 @@ export const useGaitStore = create<GaitState>()(
             }),
           }));
 
-          return { frames: newFrames };
+          return {
+            frames: newFrames,
+            actionLogs: addActionLog(
+              state,
+              'update_coordinates',
+              `${pointName} 坐标修正，偏移：${coordinateDiff.delta.distance.toFixed(4)}`,
+              author,
+              {
+                pointName,
+                pointId,
+                frameNumber: currentFrameIdx,
+                previousValue: { x: currentPoint.x, y: currentPoint.y, z: currentPoint.z },
+                newValue: { x, y, z },
+                reason: reason || undefined,
+              },
+            ),
+          };
         }),
 
       createSnapshot: (name, description, author) =>
@@ -372,10 +480,15 @@ export const useGaitStore = create<GaitState>()(
               0,
             ),
           };
-          return { snapshots: [...state.snapshots, snapshot] };
+          return {
+            snapshots: [...state.snapshots, snapshot],
+            actionLogs: addActionLog(state, 'create_snapshot', `创建快照：${name}`, author, {
+              snapshotName: name,
+            }),
+          };
         }),
 
-      restoreSnapshot: (snapshotId) =>
+      restoreSnapshot: (snapshotId, author = '当前用户') =>
         set((state) => {
           const snapshot = state.snapshots.find((s) => s.id === snapshotId);
           if (!snapshot) return state;
@@ -385,6 +498,9 @@ export const useGaitStore = create<GaitState>()(
             filters: { ...snapshot.filters },
             currentFrameIndex: 0,
             selectedPointId: null,
+            actionLogs: addActionLog(state, 'restore_snapshot', `恢复快照：${snapshot.name}`, author, {
+              snapshotName: snapshot.name,
+            }),
           };
         }),
 
@@ -472,16 +588,20 @@ export const useGaitStore = create<GaitState>()(
           pointsByBoneGroup[p.boneGroup] = (pointsByBoneGroup[p.boneGroup] || 0) + 1;
         });
 
+        const totalCoordinateChanges = firstFramePoints.reduce(
+          (sum, p) => sum + p.modificationStats.coordinateChanges,
+          0,
+        );
+
+        const totalNotes = allPoints.reduce((sum, p) => sum + p.notes.length, 0);
+
         return {
           totalFrames: state.frames.length,
           totalPoints: firstFramePoints.length,
           anomalyPoints: firstFramePoints.filter((p) => p.isAnomaly).length,
           anomalyByType,
-          totalNotes: allPoints.reduce((sum, p) => sum + p.notes.length, 0),
-          totalCoordinateChanges: firstFramePoints.reduce(
-            (sum, p) => sum + p.modificationStats.coordinateChanges,
-            0,
-          ),
+          totalNotes,
+          totalCoordinateChanges,
           pointsBySource,
           pointsByBoneGroup,
         };
@@ -499,9 +619,13 @@ export const useGaitStore = create<GaitState>()(
         });
         return notes.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
       },
+
+      getActionLogs: () => {
+        return get().actionLogs;
+      },
     }),
     {
-      name: 'gait-skeleton-storage-v2',
+      name: 'gait-skeleton-storage-v3',
       partialize: (state) => ({
         frames: state.frames,
         currentFrameIndex: state.currentFrameIndex,
@@ -511,6 +635,7 @@ export const useGaitStore = create<GaitState>()(
         playSpeed: state.playSpeed,
         importReport: state.importReport,
         snapshots: state.snapshots,
+        actionLogs: state.actionLogs,
       }),
     },
   ),

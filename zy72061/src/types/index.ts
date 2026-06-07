@@ -131,6 +131,25 @@ export interface DataQualityReport {
   warnings: string[];
 }
 
+export type ActionType = 'add_note' | 'update_coordinates' | 'toggle_anomaly' | 'import_data' | 'create_snapshot' | 'restore_snapshot' | 'update_filter' | 'change_frame';
+
+export interface ActionLog {
+  id: string;
+  actionType: ActionType;
+  timestamp: string;
+  author: string;
+  description: string;
+  details?: {
+    pointName?: string;
+    pointId?: string;
+    frameNumber?: number;
+    previousValue?: any;
+    newValue?: any;
+    reason?: string;
+    snapshotName?: string;
+  };
+}
+
 export interface ImportResult {
   frames: GaitFrame[];
   report: DataQualityReport;
