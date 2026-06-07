@@ -1,0 +1,39 @@
+experiments:
+  - record_id: EXP-001
+    experiment_name: "召回模型v2.3-基线"
+    data_batch_id: BATCH-2024-06-01
+    feature_version: FEAT-v2.1
+    model_version: MODEL-v2.3
+    training_date: "2024-06-01"
+    params:
+      learning_rate: 0.001
+      batch_size: 256
+      embedding_dim: 64
+      negative_sample: 10
+    notes: "第一次训练，正常流程"
+
+  - record_id: EXP-002
+    experiment_name: "召回模型v2.3-调优1"
+    data_batch_id: BATCH-2024-06-01
+    feature_version: FEAT-v2.1
+    model_version: MODEL-v2.3
+    training_date: "2024-06-02"
+    params:
+      learning_rate: 0.001
+      batch_size: 256
+      embedding_dim: 64
+      negative_sample: 10
+    notes: "不小心重跑了一次，参数一模一样"
+
+  - record_id: EXP-003
+    experiment_name: "召回模型v2.3-调优2"
+    data_batch_id: BATCH-2024-06-01
+    feature_version: FEAT-v2.1
+    model_version: MODEL-v2.3
+    training_date: "2024-06-02"
+    params:
+      learning_rate: 0.0005
+      batch_size: 512
+      embedding_dim: 64
+      negative_sample: 10
+    notes: "调整了学习率和batch size，正常参数调优"

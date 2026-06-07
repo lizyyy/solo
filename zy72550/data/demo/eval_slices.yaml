@@ -1,0 +1,42 @@
+eval_slices:
+  - slice_id: SLICE-001
+    slice_name: "首页推荐-通用人群"
+    data_batch_id: BATCH-2024-06-01
+    eval_date: "2024-06-03"
+    metrics:
+      recall@10: 0.452
+      precision@10: 0.231
+      ndcg@10: 0.356
+      click_through_rate: 0.128
+    feature_version: FEAT-v2.1
+    is_backfill: false
+    source: EVAL_PLATFORM
+    notes: "当日正常产出的评测切片"
+
+  - slice_id: SLICE-002
+    slice_name: "首页推荐-高价值用户"
+    data_batch_id: BATCH-2024-06-01
+    eval_date: "2024-06-03"
+    metrics:
+      recall@10: 0.523
+      precision@10: 0.287
+      ndcg@10: 0.412
+      click_through_rate: 0.156
+    feature_version: FEAT-v2.1
+    is_backfill: false
+    source: EVAL_PLATFORM
+    notes: "当日正常产出的评测切片"
+
+  - slice_id: SLICE-003-BACKFILL
+    slice_name: "首页推荐-通用人群-旧口径补录"
+    data_batch_id: BATCH-2024-05-15
+    eval_date: "2024-06-04"
+    metrics:
+      recall@10: 0.421
+      precision@10: 0.215
+      ndcg@10: 0.334
+      click_through_rate: 0.119
+    feature_version: FEAT-v2.0-LEGACY
+    is_backfill: true
+    source: EVAL_PLATFORM_BACKFILL
+    notes: "6月4号才补录的5月15号数据，用的是旧特征口径v2.0"

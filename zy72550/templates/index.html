@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>推荐召回候选去重 - 小看板</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            padding: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 24px 32px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border-left: 4px solid #667eea;
+        }
+        
+        .stat-card.warning {
+            border-left-color: #f59e0b;
+        }
+        
+        .stat-card.success {
+            border-left-color: #10b981;
+        }
+        
+        .stat-card.info {
+            border-left-color: #3b82f6;
+        }
+        
+        .stat-label {
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 10px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: #667eea;
+            border-radius: 2px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        th {
+            background: #f9fafb;
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        tr:hover {
+            background: #f9fafb;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .badge-unique {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .badge-duplicate {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .badge-approved {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .badge-rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .badge-pending {
+            background: #f3e8ff;
+            color: #6b21a8;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        
+        .badge-backfill {
+            background: #fce7f3;
+            color: #9d174d;
+        }
+        
+        .badge-active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .badge-inactive {
+            background: #e5e7eb;
+            color: #374151;
+        }
+        
+        .review-btn {
+            background: #f59e0b;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .review-btn:hover {
+            background: #d97706;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            font-weight: 500;
+            color: #6b7280;
+            transition: all 0.2s;
+        }
+        
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .tab:hover {
+            color: #667eea;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #9ca3af;
+        }
+        
+        .flow-diagram {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .flow-step {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .flow-step-icon {
+            width: 48px;
+            height: 48px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 18px;
+            margin: 0 auto 8px;
+        }
+        
+        .flow-step.active .flow-step-icon {
+            background: #10b981;
+        }
+        
+        .flow-step-title {
+            font-size: 13px;
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        .flow-arrow {
+            font-size: 24px;
+            color: #9ca3af;
+            padding: 0 10px;
+        }
+        
+        .metric-tag {
+            display: inline-block;
+            background: #f3f4f6;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            margin: 2px;
+            color: #4b5563;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔍 推荐召回候选去重</h1>
+        <p>实验平台负责人: 阿越 | 让重复训练和口径问题留在明面上</p>
+    </div>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">实验记录</div>
+            <div class="stat-value" id="stat-records">-</div>
+        </div>
+        <div class="stat-card info">
+            <div class="stat-label">评测切片</div>
+            <div class="stat-value" id="stat-slices">-</div>
+        </div>
+        <div class="stat-card success">
+            <div class="stat-label">特征版本</div>
+            <div class="stat-value" id="stat-fv">-</div>
+        </div>
+        <div class="stat-card warning">
+            <div class="stat-label">待策略复核</div>
+            <div class="stat-value" id="stat-pending">-</div>
+        </div>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">标准处理流程</div>
+        <div class="flow-diagram">
+            <div class="flow-step active">
+                <div class="flow-step-icon">1</div>
+                <div class="flow-step-title">导入参数YAML</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">
+                <div class="flow-step-icon">2</div>
+                <div class="flow-step-title">去重检测</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">
+                <div class="flow-step-icon">3</div>
+                <div class="flow-step-title">策略产品复核</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">
+                <div class="flow-step-icon">4</div>
+                <div class="flow-step-title">评测切片补录</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">
+                <div class="flow-step-icon">5</div>
+                <div class="flow-step-title">特征版本更新</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="section">
+        <div class="tabs">
+            <div class="tab active" data-tab="records">实验记录</div>
+            <div class="tab" data-tab="slices">评测切片</div>
+            <div class="tab" data-tab="features">特征版本表</div>
+        </div>
+        
+        <div class="tab-content active" id="tab-records">
+            <table>
+                <thead>
+                    <tr>
+                        <th>记录ID</th>
+                        <th>实验名称</th>
+                        <th>数据批次</th>
+                        <th>特征版本</th>
+                        <th>训练日期</th>
+                        <th>去重状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="records-body">
+                    <tr><td colspan="7" class="empty-state">加载中...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="tab-content" id="tab-slices">
+            <table>
+                <thead>
+                    <tr>
+                        <th>切片ID</th>
+                        <th>切片名称</th>
+                        <th>数据批次</th>
+                        <th>评测日期</th>
+                        <th>特征版本</th>
+                        <th>来源</th>
+                        <th>指标</th>
+                    </tr>
+                </thead>
+                <tbody id="slices-body">
+                    <tr><td colspan="7" class="empty-state">加载中...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="tab-content" id="tab-features">
+            <table>
+                <thead>
+                    <tr>
+                        <th>版本ID</th>
+                        <th>版本名称</th>
+                        <th>状态</th>
+                        <th>生效日期</th>
+                        <th>特征数</th>
+                        <th>创建人</th>
+                        <th>备注</th>
+                    </tr>
+                </thead>
+                <tbody id="features-body">
+                    <tr><td colspan="7" class="empty-state">加载中...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <script>
+        const statusBadgeClass = {
+            'UNIQUE': 'badge-unique',
+            'DUPLICATE': 'badge-duplicate',
+            'APPROVED_DUPLICATE': 'badge-approved',
+            'REJECTED': 'badge-rejected',
+            'NEW_VERSION': 'badge-approved',
+            'PENDING_REVIEW': 'badge-pending'
+        };
+        
+        const statusText = {
+            'UNIQUE': '正常唯一',
+            'DUPLICATE': '重复待复核',
+            'APPROVED_DUPLICATE': '复核通过',
+            'REJECTED': '复核拒绝',
+            'NEW_VERSION': '标记新版本',
+            'PENDING_REVIEW': '待复核'
+        };
+        
+        function getBadgeClass(status) {
+            if (status.review_required) return 'badge-pending';
+            return statusBadgeClass[status.dedup_status] || 'badge-unique';
+        }
+        
+        function getStatusText(status) {
+            if (status.review_required) return '待策略复核';
+            return statusText[status.dedup_status] || status.dedup_status;
+        }
+        
+        async function loadData() {
+            try {
+                const [statusRes, recordsRes, slicesRes, fvRes] = await Promise.all([
+                    fetch('/api/status'),
+                    fetch('/api/records'),
+                    fetch('/api/slices'),
+                    fetch('/api/feature-versions')
+                ]);
+                
+                const status = await statusRes.json();
+                const records = await recordsRes.json();
+                const slices = await slicesRes.json();
+                const fv = await fvRes.json();
+                
+                document.getElementById('stat-records').textContent = status.records_count;
+                document.getElementById('stat-slices').textContent = status.slices_count;
+                document.getElementById('stat-fv').textContent = status.feature_versions_count;
+                document.getElementById('stat-pending').textContent = status.pending_review;
+                
+                renderRecords(records);
+                renderSlices(slices);
+                renderFeatures(fv);
+            } catch (e) {
+                console.error('加载数据失败:', e);
+            }
+        }
+        
+        function renderRecords(records) {
+            const tbody = document.getElementById('records-body');
+            if (records.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">暂无记录</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = records.map(r => `
+                <tr>
+                    <td><code>${r.record_id}</code></td>
+                    <td>${r.experiment_name}</td>
+                    <td>${r.data_batch_id}</td>
+                    <td>${r.feature_version}</td>
+                    <td>${r.training_date}</td>
+                    <td>
+                        <span class="badge ${getBadgeClass(r)}">${getStatusText(r)}</span>
+                        ${r.duplicate_of ? `<br><small style="color:#6b7280">重复于: ${r.duplicate_of}</small>` : ''}
+                    </td>
+                    <td>
+                        ${r.review_required ? `<button class="review-btn" onclick="handleReview('${r.record_id}')">复核</button>` : '-'}
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        function renderSlices(slices) {
+            const tbody = document.getElementById('slices-body');
+            if (slices.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">暂无切片</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = slices.map(s => `
+                <tr>
+                    <td><code>${s.slice_id}</code></td>
+                    <td>${s.slice_name} ${s.is_backfill ? '<span class="badge badge-backfill">补录</span>' : ''}</td>
+                    <td>${s.data_batch_id}</td>
+                    <td>${s.eval_date}</td>
+                    <td>${s.feature_version}</td>
+                    <td>${s.source}</td>
+                    <td>
+                        ${Object.entries(s.metrics).map(([k, v]) => 
+                            `<span class="metric-tag">${k}: ${v}</span>`
+                        ).join('')}
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        function renderFeatures(features) {
+            const tbody = document.getElementById('features-body');
+            if (features.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">暂无特征版本</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = features.map(f => `
+                <tr>
+                    <td><code>${f.version_id}</code></td>
+                    <td>${f.version_name}</td>
+                    <td>
+                        <span class="badge ${f.is_active ? 'badge-active' : 'badge-inactive'}">
+                            ${f.is_active ? '活跃' : '历史'}
+                        </span>
+                    </td>
+                    <td>${f.effective_date}</td>
+                    <td>${f.feature_list.length} 个</td>
+                    <td>${f.created_by}</td>
+                    <td><small>${f.notes || '-'}</small></td>
+                </tr>
+            `).join('');
+        }
+        
+        function handleReview(recordId) {
+            const reviewer = prompt('请输入复核人姓名:');
+            if (!reviewer) return;
+            
+            const decision = prompt('请输入决定 (APPROVE=通过, REJECT=拒绝, NEW_VERSION=标记新版本):');
+            if (!decision || !['APPROVE', 'REJECT', 'NEW_VERSION'].includes(decision)) {
+                alert('无效的决定');
+                return;
+            }
+            
+            const comment = prompt('请输入复核意见 (可选):');
+            
+            fetch('/api/review', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ record_id: recordId, reviewer, decision, comment })
+            }).then(res => res.json())
+              .then(data => {
+                  if (data.success) {
+                      alert('复核完成!');
+                      loadData();
+                  } else {
+                      alert('复核失败: ' + data.error);
+                  }
+              });
+        }
+        
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+            });
+        });
+        
+        loadData();
+    </script>
+</body>
+</html>

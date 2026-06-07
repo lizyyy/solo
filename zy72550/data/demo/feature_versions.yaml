@@ -1,0 +1,29 @@
+feature_versions:
+  - version_id: FEAT-v2.1
+    version_name: "特征工程v2.1-生产版本"
+    feature_list:
+      - user_click_7d
+      - user_purchase_30d
+      - item_popularity
+      - item_category_embedding
+      - user_item_cf_score
+      - context_time_slot
+    data_source: feature_store_prod
+    effective_date: "2024-05-20"
+    is_active: true
+    created_by: feature_team
+    notes: "当前生产环境在用的特征版本，新增了context_time_slot特征"
+
+  - version_id: FEAT-v2.0
+    version_name: "特征工程v2.0-历史版本"
+    feature_list:
+      - user_click_7d
+      - user_purchase_30d
+      - item_popularity
+      - item_category_embedding
+      - user_item_cf_score
+    data_source: feature_store_prod
+    effective_date: "2024-04-01"
+    is_active: false
+    created_by: feature_team
+    notes: "已被v2.1替代，仅用于历史数据回溯"
