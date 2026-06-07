@@ -1,0 +1,56 @@
+[
+  {
+    "id": "mq2mtjolwy56cs",
+    "songId": "mq2mtjol17syph",
+    "status": "flagged",
+    "hasNameConflict": true,
+    "missingMaterials": [
+      "音乐老师确认曲名一致性"
+    ],
+    "nextAction": "ask_music_teacher",
+    "reason": "同一首歌出现两个名字：现场叫\"秋叶\"，版权登记是\"Autumn Leaves\"。先别归正常，留给音乐老师确认是不是同一首。",
+    "createdAt": "2026-06-06T17:33:33.285Z",
+    "updatedAt": "2026-06-06T17:33:33.285Z",
+    "reviewedBy": null
+  },
+  {
+    "id": "mq2mtjolyjru4r",
+    "songId": "mq2mtjolf9ymy3",
+    "status": "pending_review",
+    "hasNameConflict": false,
+    "missingMaterials": [
+      "未关联现场演出名称"
+    ],
+    "nextAction": "ask_amei",
+    "reason": "刚从授权期限页导入，版权名已登记，但还没对上现场叫什么名字",
+    "createdAt": "2026-06-06T17:33:33.285Z",
+    "updatedAt": "2026-06-06T17:33:33.285Z",
+    "reviewedBy": null
+  },
+  {
+    "id": "mq2mtjolv1be2s",
+    "songId": "mq2mtjolip4dtf",
+    "status": "flagged",
+    "hasNameConflict": true,
+    "missingMaterials": [
+      "音乐老师确认曲名一致性"
+    ],
+    "nextAction": "ask_music_teacher",
+    "reason": "同一首歌出现两个名字：现场叫\"那又怎样\"，版权登记是\"So What\"。先别归正常，留给音乐老师确认是不是同一首。",
+    "createdAt": "2026-06-06T17:33:33.285Z",
+    "updatedAt": "2026-06-06T17:33:33.285Z",
+    "reviewedBy": null
+  },
+  {
+    "id": "mq2mtjolii4yma",
+    "songId": "mq2mtjolm1giuy",
+    "status": "pending_review",
+    "hasNameConflict": false,
+    "missingMaterials": [],
+    "nextAction": "ask_music_teacher",
+    "reason": "",
+    "createdAt": "2026-06-06T17:33:33.285Z",
+    "updatedAt": "2026-06-06T17:33:33.285Z",
+    "reviewedBy": null
+  }
+]

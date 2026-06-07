@@ -1,0 +1,10 @@
+🎷 爵士即兴段落标注系统已启动
+   Web看板: http://localhost:3001
+   API文档:
+     GET  /api/annotations              - 列出标注
+     GET  /api/annotations/:id          - 标注详情（含授权页和调音师留言）
+     POST /api/import/licenses          - 导入授权期限页
+     POST /api/import/notes             - 导入调音师留言
+     POST /api/annotations/:id/review   - 音乐老师复核
+     GET  /api/report/weekly            - 店长周报
+

@@ -1,0 +1,15 @@
+{
+  "name": "jazz-improv-annotation",
+  "version": "1.0.0",
+  "description": "爵士即兴段落标注系统 - 巡演统筹阿梅的好帮手",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "cli": "node src/cli.js",
+    "report": "node src/cli.js report"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "chalk": "^4.1.2"
+  }
+}
