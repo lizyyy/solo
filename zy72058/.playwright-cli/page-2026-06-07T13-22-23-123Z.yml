@@ -1,0 +1,194 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - button "切换构件库面板" [ref=e7] [cursor=pointer]:
+          - img [ref=e8]
+        - button "切换详情面板" [ref=e12] [cursor=pointer]:
+          - img [ref=e13]
+      - button "保存方案" [ref=e19] [cursor=pointer]:
+        - img [ref=e20]
+        - text: 保存方案
+      - button "加载方案 1" [ref=e24] [cursor=pointer]:
+        - img [ref=e25]
+        - text: 加载方案
+        - generic [ref=e27]: "1"
+    - generic [ref=e28]:
+      - generic [ref=e29]:
+        - generic [ref=e30]: 共 12 条
+        - generic [ref=e31]:
+          - img [ref=e32]
+          - text: 4 异常
+        - generic [ref=e34]: 2 空值
+        - generic [ref=e35]: 1 重复
+      - generic [ref=e37]:
+        - generic [ref=e38]: "坐标系:"
+        - generic [ref=e39]:
+          - button "CAD-2000" [ref=e40] [cursor=pointer]
+          - button "现场测量" [ref=e41] [cursor=pointer]
+          - button "手绘草图" [ref=e42] [cursor=pointer]
+      - button "重置视角" [ref=e44] [cursor=pointer]:
+        - img [ref=e45]
+      - button "导出" [ref=e49] [cursor=pointer]:
+        - img [ref=e50]
+        - img [ref=e53]
+  - generic [ref=e55]:
+    - generic [ref=e56]:
+      - generic [ref=e57]:
+        - heading "古建筑修缮构件库" [level=2] [ref=e58]
+        - generic [ref=e59]:
+          - img [ref=e60]
+          - textbox "搜索构件名称、来源..." [ref=e63]
+        - button "筛选条件" [ref=e64] [cursor=pointer]:
+          - img [ref=e65]
+          - text: 筛选条件
+          - img [ref=e67]
+      - generic [ref=e70]:
+        - generic [ref=e71]: 共 12 条记录
+        - generic [ref=e72]:
+          - img [ref=e73]
+          - text: 4 异常
+      - generic [ref=e76]:
+        - generic [ref=e78] [cursor=pointer]:
+          - generic [ref=e79]:
+            - generic [ref=e81]: 斗拱-正殿明间左
+            - generic [ref=e82]:
+              - generic [ref=e83]: CAD-2000
+              - generic [ref=e84]:
+                - img [ref=e85]
+                - text: 点位表
+          - button [ref=e88]:
+            - img [ref=e89]
+        - generic [ref=e93] [cursor=pointer]:
+          - generic [ref=e94]:
+            - generic [ref=e96]: 斗拱-正殿明间右
+            - generic [ref=e97]:
+              - generic [ref=e98]: CAD-2000
+              - generic [ref=e99]:
+                - img [ref=e100]
+                - text: 点位表
+          - button [ref=e103]:
+            - img [ref=e104]
+        - generic [ref=e108] [cursor=pointer]:
+          - generic [ref=e109]:
+            - generic [ref=e111]: 额枋-东次间
+            - generic [ref=e112]:
+              - generic [ref=e113]: CAD-2000
+              - generic [ref=e114]:
+                - img [ref=e115]
+                - text: 点位表
+          - button [ref=e118]:
+            - img [ref=e119]
+        - generic [ref=e122] [cursor=pointer]:
+          - generic [ref=e123]:
+            - generic [ref=e124]:
+              - generic [ref=e126]: 脊瓜柱-正殿
+              - generic [ref=e127]:
+                - generic [ref=e128]: 现场测量
+                - generic [ref=e129]:
+                  - img [ref=e130]
+                  - text: 现场照片
+            - button [ref=e134]:
+              - img [ref=e135]
+          - paragraph [ref=e138]: 现场实测高度与CAD有差异
+        - generic [ref=e140] [cursor=pointer]:
+          - generic [ref=e141]:
+            - generic [ref=e143]: 檐椽-西翼角
+            - generic [ref=e144]:
+              - generic [ref=e145]: 现场测量
+              - generic [ref=e146]:
+                - img [ref=e147]
+                - text: 现场照片
+          - button [ref=e151]:
+            - img [ref=e152]
+        - generic [ref=e155] [cursor=pointer]:
+          - generic [ref=e156]:
+            - generic [ref=e157]:
+              - generic [ref=e159]: 角梁-东南角
+              - generic [ref=e161]:
+                - generic [ref=e162]: 现场测量
+                - generic [ref=e163]:
+                  - img [ref=e164]
+                  - text: 手改坐标
+            - button [ref=e166]:
+              - img [ref=e167]
+          - paragraph [ref=e170]: 同事手改，与CAD坐标系不一致，需复核
+        - generic [ref=e171] [cursor=pointer]:
+          - generic [ref=e172]:
+            - generic [ref=e173]:
+              - generic [ref=e175]: 普拍枋-后檐
+              - generic [ref=e177]:
+                - generic [ref=e178]: CAD-2000
+                - generic [ref=e179]:
+                  - img [ref=e180]
+                  - text: 方案备注
+              - generic [ref=e182]: 空值
+            - button [ref=e183]:
+              - img [ref=e184]
+          - paragraph [ref=e187]: 坐标缺失，需补充测量
+        - generic [ref=e188] [cursor=pointer]:
+          - generic [ref=e189]:
+            - generic [ref=e190]:
+              - generic [ref=e192]: 斗拱-正殿明间左(重复)
+              - generic [ref=e194]:
+                - generic [ref=e195]: CAD-2000
+                - generic [ref=e196]:
+                  - img [ref=e197]
+                  - text: 点位表
+              - generic [ref=e200]: 重复
+            - button [ref=e201]:
+              - img [ref=e202]
+          - paragraph [ref=e205]: 与c-001坐标完全重复，疑似重复导入
+        - generic [ref=e206] [cursor=pointer]:
+          - generic [ref=e207]:
+            - generic [ref=e208]:
+              - generic [ref=e210]: 吻兽-正脊东端
+              - generic [ref=e211]:
+                - generic [ref=e212]: CAD-2000
+                - generic [ref=e213]:
+                  - img [ref=e214]
+                  - text: 点位表
+              - generic [ref=e217]: 边界
+            - button [ref=e218]:
+              - img [ref=e219]
+          - paragraph [ref=e222]: 位于测绘边界，精度可能较低
+        - generic [ref=e223] [cursor=pointer]:
+          - generic [ref=e224]:
+            - generic [ref=e225]:
+              - generic [ref=e227]: 垂兽-南垂脊
+              - generic [ref=e228]:
+                - generic [ref=e229]: 手绘草图
+                - generic [ref=e230]:
+                  - img [ref=e231]
+                  - text: 手改坐标
+            - button [ref=e233]:
+              - img [ref=e234]
+          - paragraph [ref=e237]: 来自手绘草图，坐标系独立
+        - generic [ref=e239] [cursor=pointer]:
+          - generic [ref=e240]:
+            - generic [ref=e242]: 山花板-东山墙
+            - generic [ref=e243]:
+              - generic [ref=e244]: 现场测量
+              - generic [ref=e245]:
+                - img [ref=e246]
+                - text: 方案备注
+          - button [ref=e248]:
+            - img [ref=e249]
+        - generic [ref=e252] [cursor=pointer]:
+          - generic [ref=e253]:
+            - generic [ref=e254]:
+              - generic [ref=e256]: 博风板-西山
+              - generic [ref=e258]:
+                - generic [ref=e259]: 手绘草图
+                - generic [ref=e260]:
+                  - img [ref=e261]
+                  - text: 手改坐标
+              - generic [ref=e263]: 空值
+            - button [ref=e264]:
+              - img [ref=e265]
+          - paragraph [ref=e268]: X坐标缺失
+    - generic [ref=e275]: "鼠标左键: 旋转视角 | 滚轮: 缩放 | 右键: 平移"
+    - generic [ref=e277]:
+      - img [ref=e278]
+      - paragraph [ref=e281]: 点击左侧构件查看详情
+      - paragraph [ref=e282]: 或在3D场景中点击构件点

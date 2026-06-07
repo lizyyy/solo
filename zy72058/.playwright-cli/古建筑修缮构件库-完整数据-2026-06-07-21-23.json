@@ -1,0 +1,496 @@
+{
+  "components": [
+    {
+      "id": "c-001",
+      "name": "斗拱-正殿明间左",
+      "x": 0,
+      "y": 3.5,
+      "z": -2,
+      "coordinateSystem": "CAD-2000",
+      "source": "2024-Q1-点位表.xlsx",
+      "sourceType": "point_table",
+      "status": "normal",
+      "isAnomaly": false,
+      "remark": "",
+      "createdAt": "2026-06-07T13:21:22.515Z",
+      "updatedAt": "2026-06-07T13:21:22.515Z",
+      "metadata": {
+        "layer": "A-结构层"
+      }
+    },
+    {
+      "id": "c-002",
+      "name": "斗拱-正殿明间右",
+      "x": 2.4,
+      "y": 3.5,
+      "z": -2,
+      "coordinateSystem": "CAD-2000",
+      "source": "2024-Q1-点位表.xlsx",
+      "sourceType": "point_table",
+      "status": "normal",
+      "isAnomaly": false,
+      "remark": "",
+      "createdAt": "2026-06-07T13:21:22.515Z",
+      "updatedAt": "2026-06-07T13:21:22.515Z",
+      "metadata": {
+        "layer": "A-结构层"
+      }
+    },
+    {
+      "id": "c-003",
+      "name": "额枋-东次间",
+      "x": -3.2,
+      "y": 3.2,
+      "z": -1.5,
+      "coordinateSystem": "CAD-2000",
+      "source": "2024-Q1-点位表.xlsx",
+      "sourceType": "point_table",
+      "status": "normal",
+      "isAnomaly": false,
+      "remark": "",
+      "createdAt": "2026-06-07T13:21:22.515Z",
+      "updatedAt": "2026-06-07T13:21:22.515Z",
+      "metadata": {
+        "layer": "A-结构层"
+      }
+    },
+    {
+      "id": "c-004",
+      "name": "脊瓜柱-正殿",
+      "x": 1.2,
+      "y": 6.8,
+      "z": -1,
+      "coordinateSystem": "现场测量",
+      "source": "IMG_20240315_现场照片.jpg",
+      "sourceType": "photo",
+      "status": "normal",
+      "isAnomaly": false,
+      "remark": "现场实测高度与CAD有差异",
+      "createdAt": "2026-06-07T13:21:22.515Z",
+      "updatedAt": "2026-06-07T13:21:22.515Z",
+      "metadata": {
+        "photoRef": "IMG_20240315_1423"
+      }
+    },
+    {
+      "id": "c-005",
+      "name": "檐椽-西翼角",
+      "x": -5.5,
+      "y": 4.2,
+      "z": 1.8,
+      "coordinateSystem": "现场测量",
+      "source": "IMG_20240315_现场照片.jpg",
+      "sourceType": "photo",
+      "status": "normal",
+      "isAnomaly": false,
+      "remark": "",
+      "createdAt": "2026-06-07T13:21:22.515Z",
+      "updatedAt": "2026-06-07T13:21:22.515Z",
+      "metadata": {
+        "photoRef": "IMG_20240315_1430"
+      }
+    },
+    {
+      "id": "c-006",
+      "name": "角梁-东南角",
+      "x": 4.8,
+      "y": 4.5,
+      "z": 2.1,
+      "coordinateSystem": "现场测量",
+      "source": "王工-手改坐标-20240320.jpg",
+      "sourceType": "manual_edit",
+      "status": "normal",
+      "isAnomaly": true,
+      "remark": "同事手改，与CAD坐标系不一致，需复核",
+      "createdAt": "2026-06-07T13:21:22.515Z",
+      "updatedAt": "2026-06-07T13:21:22.515Z",
+      "metadata": {
+        "editedBy": "王工",
+        "editDate": "2024-03-20"
+      }
+    },
+    {
+      "id": "c-007",
+      "name": "普拍枋-后檐",
+      "x": null,
+      "y": null,
+      "z": null,
+      "coordinateSystem": "CAD-2000",
+      "source": "方案V2备注.docx",
+      "sourceType": "remark",
+      "status": "empty",
+      "isAnomaly": true,
+      "remark": "坐标缺失，需补充测量",
+      "createdAt": "2026-06-07T13:21:22.515Z",
+      "updatedAt": "2026-06-07T13:21:22.515Z",
+      "metadata": {
+        "needsMeasurement": true
+      }
+    },
+    {
+      "id": "c-008",
+      "name": "斗拱-正殿明间左(重复)",
+      "x": 0,
+      "y": 3.5,
+      "z": -2,
+      "coordinateSystem": "CAD-2000",
+      "source": "旧点位表-2023版.xlsx",
+      "sourceType": "point_table",
+      "status": "duplicate",
+      "isAnomaly": true,
+      "remark": "与c-001坐标完全重复，疑似重复导入",
+      "createdAt": "2026-06-07T13:21:22.515Z",
+      "updatedAt": "2026-06-07T13:21:22.515Z",
+      "metadata": {
+        "duplicateOf": "c-001"
+      }
+    },
+    {
+      "id": "c-009",
+      "name": "吻兽-正脊东端",
+      "x": 10.2,
+      "y": 7.5,
+      "z": -1,
+      "coordinateSystem": "CAD-2000",
+      "source": "2024-Q1-点位表.xlsx",
+      "sourceType": "point_table",
+      "status": "boundary",
+      "isAnomaly": false,
+      "remark": "位于测绘边界，精度可能较低",
+      "createdAt": "2026-06-07T13:21:22.515Z",
+      "updatedAt": "2026-06-07T13:21:22.515Z",
+      "metadata": {
+        "boundary": true,
+        "accuracy": "low"
+      }
+    },
+    {
+      "id": "c-010",
+      "name": "垂兽-南垂脊",
+      "x": 3.5,
+      "y": 5.8,
+      "z": 1.2,
+      "coordinateSystem": "手绘草图",
+      "source": "李工手绘草图-20240318.pdf",
+      "sourceType": "manual_edit",
+      "status": "normal",
+      "isAnomaly": false,
+      "remark": "来自手绘草图，坐标系独立",
+      "createdAt": "2026-06-07T13:21:22.515Z",
+      "updatedAt": "2026-06-07T13:21:22.515Z",
+      "metadata": {
+        "sketch": true
+      }
+    },
+    {
+      "id": "c-011",
+      "name": "山花板-东山墙",
+      "x": -6.2,
+      "y": 5,
+      "z": 0,
+      "coordinateSystem": "现场测量",
+      "source": "方案V1备注.docx",
+      "sourceType": "remark",
+      "status": "normal",
+      "isAnomaly": false,
+      "remark": "",
+      "createdAt": "2026-06-07T13:21:22.515Z",
+      "updatedAt": "2026-06-07T13:21:22.515Z",
+      "metadata": {}
+    },
+    {
+      "id": "c-012",
+      "name": "博风板-西山",
+      "x": null,
+      "y": 5.2,
+      "z": 0.5,
+      "coordinateSystem": "手绘草图",
+      "source": "李工手绘草图-20240318.pdf",
+      "sourceType": "manual_edit",
+      "status": "empty",
+      "isAnomaly": true,
+      "remark": "X坐标缺失",
+      "createdAt": "2026-06-07T13:21:22.515Z",
+      "updatedAt": "2026-06-07T13:21:22.515Z",
+      "metadata": {
+        "missingCoord": "X"
+      }
+    }
+  ],
+  "schemes": [
+    {
+      "id": "scheme-1780838529561",
+      "name": "QC导出验证方案",
+      "description": "质检临时验证方案保存和刷新持久化",
+      "componentIds": [
+        "c-001",
+        "c-002",
+        "c-003",
+        "c-004",
+        "c-005",
+        "c-006",
+        "c-007",
+        "c-008",
+        "c-009",
+        "c-010",
+        "c-011",
+        "c-012"
+      ],
+      "cameraState": {
+        "position": [
+          15,
+          12,
+          15
+        ],
+        "target": [
+          0,
+          3,
+          0
+        ]
+      },
+      "componentSnapshots": [
+        {
+          "id": "c-001",
+          "name": "斗拱-正殿明间左",
+          "x": 0,
+          "y": 3.5,
+          "z": -2,
+          "coordinateSystem": "CAD-2000",
+          "source": "2024-Q1-点位表.xlsx",
+          "sourceType": "point_table",
+          "status": "normal",
+          "isAnomaly": false,
+          "remark": "",
+          "createdAt": "2026-06-07T13:21:22.515Z",
+          "updatedAt": "2026-06-07T13:21:22.515Z",
+          "metadata": {
+            "layer": "A-结构层"
+          }
+        },
+        {
+          "id": "c-002",
+          "name": "斗拱-正殿明间右",
+          "x": 2.4,
+          "y": 3.5,
+          "z": -2,
+          "coordinateSystem": "CAD-2000",
+          "source": "2024-Q1-点位表.xlsx",
+          "sourceType": "point_table",
+          "status": "normal",
+          "isAnomaly": false,
+          "remark": "",
+          "createdAt": "2026-06-07T13:21:22.515Z",
+          "updatedAt": "2026-06-07T13:21:22.515Z",
+          "metadata": {
+            "layer": "A-结构层"
+          }
+        },
+        {
+          "id": "c-003",
+          "name": "额枋-东次间",
+          "x": -3.2,
+          "y": 3.2,
+          "z": -1.5,
+          "coordinateSystem": "CAD-2000",
+          "source": "2024-Q1-点位表.xlsx",
+          "sourceType": "point_table",
+          "status": "normal",
+          "isAnomaly": false,
+          "remark": "",
+          "createdAt": "2026-06-07T13:21:22.515Z",
+          "updatedAt": "2026-06-07T13:21:22.515Z",
+          "metadata": {
+            "layer": "A-结构层"
+          }
+        },
+        {
+          "id": "c-004",
+          "name": "脊瓜柱-正殿",
+          "x": 1.2,
+          "y": 6.8,
+          "z": -1,
+          "coordinateSystem": "现场测量",
+          "source": "IMG_20240315_现场照片.jpg",
+          "sourceType": "photo",
+          "status": "normal",
+          "isAnomaly": false,
+          "remark": "现场实测高度与CAD有差异",
+          "createdAt": "2026-06-07T13:21:22.515Z",
+          "updatedAt": "2026-06-07T13:21:22.515Z",
+          "metadata": {
+            "photoRef": "IMG_20240315_1423"
+          }
+        },
+        {
+          "id": "c-005",
+          "name": "檐椽-西翼角",
+          "x": -5.5,
+          "y": 4.2,
+          "z": 1.8,
+          "coordinateSystem": "现场测量",
+          "source": "IMG_20240315_现场照片.jpg",
+          "sourceType": "photo",
+          "status": "normal",
+          "isAnomaly": false,
+          "remark": "",
+          "createdAt": "2026-06-07T13:21:22.515Z",
+          "updatedAt": "2026-06-07T13:21:22.515Z",
+          "metadata": {
+            "photoRef": "IMG_20240315_1430"
+          }
+        },
+        {
+          "id": "c-006",
+          "name": "角梁-东南角",
+          "x": 4.8,
+          "y": 4.5,
+          "z": 2.1,
+          "coordinateSystem": "现场测量",
+          "source": "王工-手改坐标-20240320.jpg",
+          "sourceType": "manual_edit",
+          "status": "normal",
+          "isAnomaly": true,
+          "remark": "同事手改，与CAD坐标系不一致，需复核",
+          "createdAt": "2026-06-07T13:21:22.515Z",
+          "updatedAt": "2026-06-07T13:21:22.515Z",
+          "metadata": {
+            "editedBy": "王工",
+            "editDate": "2024-03-20"
+          }
+        },
+        {
+          "id": "c-007",
+          "name": "普拍枋-后檐",
+          "x": null,
+          "y": null,
+          "z": null,
+          "coordinateSystem": "CAD-2000",
+          "source": "方案V2备注.docx",
+          "sourceType": "remark",
+          "status": "empty",
+          "isAnomaly": true,
+          "remark": "坐标缺失，需补充测量",
+          "createdAt": "2026-06-07T13:21:22.515Z",
+          "updatedAt": "2026-06-07T13:21:22.515Z",
+          "metadata": {
+            "needsMeasurement": true
+          }
+        },
+        {
+          "id": "c-008",
+          "name": "斗拱-正殿明间左(重复)",
+          "x": 0,
+          "y": 3.5,
+          "z": -2,
+          "coordinateSystem": "CAD-2000",
+          "source": "旧点位表-2023版.xlsx",
+          "sourceType": "point_table",
+          "status": "duplicate",
+          "isAnomaly": true,
+          "remark": "与c-001坐标完全重复，疑似重复导入",
+          "createdAt": "2026-06-07T13:21:22.515Z",
+          "updatedAt": "2026-06-07T13:21:22.515Z",
+          "metadata": {
+            "duplicateOf": "c-001"
+          }
+        },
+        {
+          "id": "c-009",
+          "name": "吻兽-正脊东端",
+          "x": 10.2,
+          "y": 7.5,
+          "z": -1,
+          "coordinateSystem": "CAD-2000",
+          "source": "2024-Q1-点位表.xlsx",
+          "sourceType": "point_table",
+          "status": "boundary",
+          "isAnomaly": false,
+          "remark": "位于测绘边界，精度可能较低",
+          "createdAt": "2026-06-07T13:21:22.515Z",
+          "updatedAt": "2026-06-07T13:21:22.515Z",
+          "metadata": {
+            "boundary": true,
+            "accuracy": "low"
+          }
+        },
+        {
+          "id": "c-010",
+          "name": "垂兽-南垂脊",
+          "x": 3.5,
+          "y": 5.8,
+          "z": 1.2,
+          "coordinateSystem": "手绘草图",
+          "source": "李工手绘草图-20240318.pdf",
+          "sourceType": "manual_edit",
+          "status": "normal",
+          "isAnomaly": false,
+          "remark": "来自手绘草图，坐标系独立",
+          "createdAt": "2026-06-07T13:21:22.515Z",
+          "updatedAt": "2026-06-07T13:21:22.515Z",
+          "metadata": {
+            "sketch": true
+          }
+        },
+        {
+          "id": "c-011",
+          "name": "山花板-东山墙",
+          "x": -6.2,
+          "y": 5,
+          "z": 0,
+          "coordinateSystem": "现场测量",
+          "source": "方案V1备注.docx",
+          "sourceType": "remark",
+          "status": "normal",
+          "isAnomaly": false,
+          "remark": "",
+          "createdAt": "2026-06-07T13:21:22.515Z",
+          "updatedAt": "2026-06-07T13:21:22.515Z",
+          "metadata": {}
+        },
+        {
+          "id": "c-012",
+          "name": "博风板-西山",
+          "x": null,
+          "y": 5.2,
+          "z": 0.5,
+          "coordinateSystem": "手绘草图",
+          "source": "李工手绘草图-20240318.pdf",
+          "sourceType": "manual_edit",
+          "status": "empty",
+          "isAnomaly": true,
+          "remark": "X坐标缺失",
+          "createdAt": "2026-06-07T13:21:22.515Z",
+          "updatedAt": "2026-06-07T13:21:22.515Z",
+          "metadata": {
+            "missingCoord": "X"
+          }
+        }
+      ],
+      "createdAt": "2026-06-07T13:22:09.562Z",
+      "updatedAt": "2026-06-07T13:22:09.562Z"
+    }
+  ],
+  "exportTime": "2026-06-07T13:23:52.929Z",
+  "stats": {
+    "totalComponents": 12,
+    "anomalyCount": 4,
+    "emptyCount": 2,
+    "duplicateCount": 1,
+    "boundaryCount": 1,
+    "normalCount": 8,
+    "coordinateSystems": {
+      "CAD-2000": 6,
+      "现场测量": 4,
+      "手绘草图": 2
+    },
+    "sourceTypes": {
+      "point_table": 5,
+      "photo": 2,
+      "manual_edit": 3,
+      "remark": 2
+    },
+    "exportTime": "2026/6/7 21:23:52"
+  },
+  "version": "1.0.0",
+  "generatedBy": "古建筑修缮构件库系统"
+}
