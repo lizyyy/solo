@@ -1,0 +1,106 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Noto Sans SC', system-ui, sans-serif;
+  line-height: 1.6;
+  font-weight: 400;
+  color: #102a43;
+  background-color: #f8fafc;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-4 py-2 bg-primary-800 text-white rounded-lg font-medium 
+           transition-all duration-200 hover:bg-primary-700 
+           active:scale-[0.98] shadow-card hover:shadow-card-hover;
+  }
+  
+  .btn-outline {
+    @apply px-4 py-2 border-2 border-primary-800 text-primary-800 rounded-lg font-medium 
+           transition-all duration-200 hover:bg-primary-50 
+           active:scale-[0.98];
+  }
+  
+  .btn-success {
+    @apply px-4 py-2 bg-success text-white rounded-lg font-medium 
+           transition-all duration-200 hover:bg-green-600 
+           active:scale-[0.98] shadow-card;
+  }
+  
+  .btn-danger {
+    @apply px-4 py-2 bg-danger text-white rounded-lg font-medium 
+           transition-all duration-200 hover:bg-red-600 
+           active:scale-[0.98] shadow-card;
+  }
+  
+  .btn-warning {
+    @apply px-4 py-2 bg-warning text-white rounded-lg font-medium 
+           transition-all duration-200 hover:bg-amber-600 
+           active:scale-[0.98] shadow-card;
+  }
+  
+  .card {
+    @apply bg-white rounded-xl shadow-card p-6 transition-all duration-300
+           hover:shadow-card-hover;
+  }
+  
+  .card-border {
+    @apply bg-white rounded-xl border border-gray-200 p-6 transition-all duration-300
+           hover:shadow-card-hover hover:border-gray-300;
+  }
+  
+  .tag {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  
+  .tag-success {
+    @apply tag bg-green-100 text-green-800;
+  }
+  
+  .tag-warning {
+    @apply tag bg-amber-100 text-amber-800;
+  }
+  
+  .tag-danger {
+    @apply tag bg-red-100 text-red-800;
+  }
+  
+  .tag-info {
+    @apply tag bg-blue-100 text-blue-800;
+  }
+  
+  .tag-accent {
+    @apply tag bg-accent-100 text-accent-800;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
