@@ -42,7 +42,7 @@ export const useStore = create<StoreState>((set, get) => ({
   currentOperator: '阿乔',
 
   setParams: (newParams, reason = '参数调整') => {
-    const { params: oldParams, currentOperator } = get();
+    const { params: oldParams, currentOperator, detectAnomalies } = get();
     const updatedParams = { ...oldParams, ...newParams };
 
     const changedFields: string[] = [];
@@ -67,6 +67,12 @@ export const useStore = create<StoreState>((set, get) => ({
         params: updatedParams,
         operationLogs: [...state.operationLogs, log],
       }));
+
+      if (updatedParams.autoDetect) {
+        setTimeout(() => {
+          detectAnomalies();
+        }, 0);
+      }
     }
   },
 

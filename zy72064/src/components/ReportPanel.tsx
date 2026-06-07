@@ -5,7 +5,7 @@ import { ANOMALY_LABELS } from '@/types';
 import type { AnalysisReport } from '@/types';
 
 export function ReportPanel() {
-  const { generateReport, exportData, currentOperator, params } = useStore();
+  const { generateReport, exportData, currentOperator, params, points } = useStore();
   const [report, setReport] = useState<AnalysisReport | null>(null);
   const [copied, setCopied] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -21,7 +21,7 @@ export function ReportPanel() {
 
   useEffect(() => {
     handleGenerate();
-  }, [params, handleGenerate]);
+  }, [params, points, handleGenerate]);
 
   const handleExport = (format: 'json' | 'csv') => {
     const content = exportData(format);
