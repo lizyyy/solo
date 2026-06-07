@@ -11,6 +11,23 @@ function normalizeName(name: string): string {
     .toLowerCase();
 }
 
+function sortedNameChars(name: string): string {
+  const normalized = normalizeName(name);
+  return normalized.split('').sort().join('');
+}
+
+function nameSimilarity(s1: string, s2: string): number {
+  const n1 = normalizeName(s1);
+  const n2 = normalizeName(s2);
+  if (n1 === n2) return 1.0;
+  
+  const sorted1 = sortedNameChars(s1);
+  const sorted2 = sortedNameChars(s2);
+  if (sorted1 === sorted2) return 0.95;
+  
+  return stringSimilarity(n1, n2);
+}
+
 function calculateDistance(p1: Position, p2: Position): number {
   return Math.sqrt(
     Math.pow(p1.x - p2.x, 2) +
@@ -89,26 +106,36 @@ export function detectCoordinateOffset(records: InspectionRecord[]): Array<{ ano
   return results;
 }
 
-export function detectDuplicateNames(records: InspectionRecord[]): Array<{ names: string[]; anomalyIds: string[] }> {
-  const nameMap = new Map<string, Array<{ record: InspectionRecord; originalName: string }>>();
+export function detectDuplicateNames(records: InspectionRecord[]): Array<{ names: string[]; recordIds: string[]; anomalyIds: string[] }> {
+  const results: Array<{ names: string[]; recordIds: string[]; anomalyIds: string[] }> = [];
+  const processed = new Set<string>();
   
-  records.forEach(record => {
-    const normalized = normalizeName(record.deviceName);
-    if (!nameMap.has(normalized)) {
-      nameMap.set(normalized, []);
+  for (let i = 0; i < records.length; i++) {
+    if (processed.has(records[i].id)) continue;
+    
+    const group: Array<{ record: InspectionRecord; originalName: string }> = [
+      { record: records[i], originalName: records[i].deviceName }
+    ];
+    
+    for (let j = i + 1; j < records.length; j++) {
+      if (processed.has(records[j].id)) continue;
+      
+      const sim = nameSimilarity(records[i].deviceName, records[j].deviceName);
+      if (sim >= 0.9) {
+        group.push({ record: records[j], originalName: records[j].deviceName });
+      }
     }
-    nameMap.get(normalized)!.push({ record, originalName: record.deviceName });
-  });
-  
-  const results: Array<{ names: string[]; anomalyIds: string[] }> = [];
-  
-  nameMap.forEach(group => {
+    
     const uniqueNames = [...new Set(group.map(g => g.originalName))];
     if (uniqueNames.length > 1) {
       const anomalyIds = group.map(() => generateId());
-      results.push({ names: uniqueNames, anomalyIds });
+      const recordIds = group.map(g => g.record.id);
+      results.push({ names: uniqueNames, recordIds, anomalyIds });
+      group.forEach(g => processed.add(g.record.id));
+    } else {
+      processed.add(records[i].id);
     }
-  });
+  }
   
   return results;
 }
@@ -221,6 +248,7 @@ export function detectBoundaryRecords(records: InspectionRecord[]): Anomaly[] {
 export function createAnomaliesFromRecords(records: InspectionRecord[]): Anomaly[] {
   const anomalies: Anomaly[] = [];
   const offsetResults = detectCoordinateOffset(records);
+  const duplicateNames = detectDuplicateNames(records);
   const missingPhotos = detectMissingPhotos(records);
   const crossFloor = detectCrossFloor(records);
   const nullValues = detectNullValues(records);
@@ -231,6 +259,27 @@ export function createAnomaliesFromRecords(records: InspectionRecord[]): Anomaly
   missingPhotos.forEach(a => anomalies.push(a));
   crossFloor.forEach(a => anomalies.push(a));
   boundaryRecords.forEach(a => anomalies.push(a));
+  
+  duplicateNames.forEach(d => {
+    d.anomalyIds.forEach((id, index) => {
+      const recordId = d.recordIds[index];
+      const record = records.find(r => r.id === recordId);
+      if (record) {
+        anomalies.push({
+          id,
+          recordId: record.id,
+          type: 'duplicate_name',
+          severity: 'warning',
+          status: 'pending',
+          reportedPosition: { x: record.x, y: record.y, z: record.z },
+          isCrossFloor: false,
+          relatedAnomalyIds: d.anomalyIds.filter(aid => aid !== id),
+          duplicateNames: d.names,
+          notes: [],
+        });
+      }
+    });
+  });
   
   nullValues.forEach(nv => {
     const existing = anomalies.find(a => a.recordId === nv.recordId);

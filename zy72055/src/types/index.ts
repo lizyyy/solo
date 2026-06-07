@@ -59,6 +59,7 @@ export interface Anomaly {
   relatedAnomalyIds: string[];
   isDuplicate?: boolean;
   duplicateOf?: string;
+  duplicateNames?: string[];
   notes: ProcessNote[];
   nullField?: string;
 }
@@ -86,7 +87,7 @@ export interface Scheme {
 
 export interface DataCheckResult {
   coordinateOffsets: Array<{ anomaly: Anomaly; distance: number }>;
-  duplicateNames: Array<{ names: string[]; anomalyIds: string[] }>;
+  duplicateNames: Array<{ names: string[]; recordIds: string[]; anomalyIds: string[] }>;
   missingPhotos: Anomaly[];
   crossFloor: Anomaly[];
   nullValues: Array<{ recordId: string; field: string }>;

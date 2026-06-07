@@ -3,17 +3,59 @@ export interface DiffSegment {
   content: string;
 }
 
+function tokenize(str: string): string[] {
+  const tokens: string[] = [];
+  let current = '';
+  let isChinese = false;
+  
+  for (const char of str) {
+    const charCode = char.charCodeAt(0);
+    const isCharChinese = charCode >= 0x4e00 && charCode <= 0x9fff;
+    const isWhitespace = /\s/.test(char);
+    const isPunctuation = /[，。、；：""''（）【】《》！？,.!?;:"'()[\]<>]/.test(char);
+    
+    if (isWhitespace || isPunctuation) {
+      if (current) {
+        tokens.push(current);
+        current = '';
+      }
+      tokens.push(char);
+      isChinese = false;
+    } else if (isCharChinese) {
+      if (current && !isChinese) {
+        tokens.push(current);
+        current = '';
+      }
+      tokens.push(char);
+      isChinese = true;
+    } else {
+      if (current && isChinese) {
+        tokens.push(current);
+        current = '';
+      }
+      current += char;
+      isChinese = false;
+    }
+  }
+  
+  if (current) {
+    tokens.push(current);
+  }
+  
+  return tokens;
+}
+
 export function diffStrings(oldStr: string, newStr: string): DiffSegment[] {
-  const oldWords = oldStr.split(/(\s+)/);
-  const newWords = newStr.split(/(\s+)/);
+  const oldTokens = tokenize(oldStr);
+  const newTokens = tokenize(newStr);
   
   const dp: number[][] = [];
-  for (let i = 0; i <= oldWords.length; i++) {
+  for (let i = 0; i <= oldTokens.length; i++) {
     dp[i] = [];
-    for (let j = 0; j <= newWords.length; j++) {
+    for (let j = 0; j <= newTokens.length; j++) {
       if (i === 0 || j === 0) {
         dp[i][j] = 0;
-      } else if (oldWords[i - 1] === newWords[j - 1]) {
+      } else if (oldTokens[i - 1] === newTokens[j - 1]) {
         dp[i][j] = dp[i - 1][j - 1] + 1;
       } else {
         dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
@@ -22,19 +64,19 @@ export function diffStrings(oldStr: string, newStr: string): DiffSegment[] {
   }
   
   const segments: DiffSegment[] = [];
-  let i = oldWords.length;
-  let j = newWords.length;
+  let i = oldTokens.length;
+  let j = newTokens.length;
   
   while (i > 0 || j > 0) {
-    if (i > 0 && j > 0 && oldWords[i - 1] === newWords[j - 1]) {
-      segments.unshift({ type: 'unchanged', content: oldWords[i - 1] });
+    if (i > 0 && j > 0 && oldTokens[i - 1] === newTokens[j - 1]) {
+      segments.unshift({ type: 'unchanged', content: oldTokens[i - 1] });
       i--;
       j--;
     } else if (j > 0 && (i === 0 || dp[i][j - 1] >= dp[i - 1][j])) {
-      segments.unshift({ type: 'added', content: newWords[j - 1] });
+      segments.unshift({ type: 'added', content: newTokens[j - 1] });
       j--;
     } else if (i > 0) {
-      segments.unshift({ type: 'removed', content: oldWords[i - 1] });
+      segments.unshift({ type: 'removed', content: oldTokens[i - 1] });
       i--;
     }
   }
