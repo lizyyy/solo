@@ -48,7 +48,8 @@ export const checkNegativeResources = (resources: {
 
 export const handleDragAction = (
   currentResources: ResourceState,
-  obstacle: Obstacle
+  obstacle: Obstacle,
+  alreadyNegative: boolean = false
 ): {
   newResources: ResourceState;
   description: string;
@@ -68,13 +69,16 @@ export const handleDragAction = (
     time: newTime,
   });
 
-  const scoreDelta = negativeCheck.isNegative ? 0 : obstacle.scoreBonus;
+  const isScoringPaused = alreadyNegative || negativeCheck.isNegative;
+  const scoreDelta = isScoringPaused ? 0 : obstacle.scoreBonus;
   const newScore = currentResources.score + scoreDelta;
 
   const riskLevel = calculateRiskLevel(
     { energy: newEnergy, compute: newCompute, time: newTime },
     obstacle.riskWeight
   );
+
+  const pauseNotice = isScoringPaused && scoreDelta === 0 ? ' [计分已暂停]' : '';
 
   return {
     newResources: {
@@ -83,16 +87,20 @@ export const handleDragAction = (
       time: newTime,
       score: newScore,
       riskLevel,
-      ...negativeCheck,
+      isNegative: alreadyNegative || negativeCheck.isNegative,
+      negativeWarning: alreadyNegative
+        ? currentResources.negativeWarning
+        : negativeCheck.warning,
     },
-    description: `拖拽避开障碍物 ${obstacle.id}，消耗能源${Math.abs(energyDelta)}、算力${Math.abs(computeDelta)}、时间${Math.abs(timeDelta)}${scoreDelta > 0 ? `，获得${scoreDelta}分` : ''}`,
+    description: `拖拽避开障碍物 ${obstacle.id}，消耗能源${Math.abs(energyDelta)}、算力${Math.abs(computeDelta)}、时间${Math.abs(timeDelta)}${scoreDelta > 0 ? `，获得${scoreDelta}分` : ''}${pauseNotice}`,
     scoreDelta,
   };
 };
 
 export const handleClickAction = (
   currentResources: ResourceState,
-  obstacle: Obstacle
+  obstacle: Obstacle,
+  alreadyNegative: boolean = false
 ): {
   newResources: ResourceState;
   description: string;
@@ -112,15 +120,16 @@ export const handleClickAction = (
     time: newTime,
   });
 
-  const scoreDelta = negativeCheck.isNegative
-    ? 0
-    : Math.round(obstacle.scoreBonus * 0.8);
+  const isScoringPaused = alreadyNegative || negativeCheck.isNegative;
+  const scoreDelta = isScoringPaused ? 0 : Math.round(obstacle.scoreBonus * 0.8);
   const newScore = currentResources.score + scoreDelta;
 
   const riskLevel = calculateRiskLevel(
     { energy: newEnergy, compute: newCompute, time: newTime },
     obstacle.riskWeight
   );
+
+  const pauseNotice = isScoringPaused && scoreDelta === 0 ? ' [计分已暂停]' : '';
 
   return {
     newResources: {
@@ -129,9 +138,12 @@ export const handleClickAction = (
       time: newTime,
       score: newScore,
       riskLevel,
-      ...negativeCheck,
+      isNegative: alreadyNegative || negativeCheck.isNegative,
+      negativeWarning: alreadyNegative
+        ? currentResources.negativeWarning
+        : negativeCheck.warning,
     },
-    description: `点击绕过障碍物 ${obstacle.id}，消耗能源${Math.abs(energyDelta)}、算力${Math.abs(computeDelta)}、时间${Math.abs(timeDelta)}${scoreDelta > 0 ? `，获得${scoreDelta}分` : ''}`,
+    description: `点击绕过障碍物 ${obstacle.id}，消耗能源${Math.abs(energyDelta)}、算力${Math.abs(computeDelta)}、时间${Math.abs(timeDelta)}${scoreDelta > 0 ? `，获得${scoreDelta}分` : ''}${pauseNotice}`,
     scoreDelta,
   };
 };

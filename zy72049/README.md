@@ -1,57 +1,189 @@
-# React + TypeScript + Vite
+# 无人车避障训练场
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+面向学生的交互式训练平台，通过真实的练习记录模拟无人车避障决策过程，让学生在操作中直观理解资源消耗、风险评估和分数计算的业务逻辑。
 
-Currently, two official plugins are available:
+## 快速开始
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 1. 安装依赖
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 2. 启动开发服务器
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```bash
+npm run dev
+```
 
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+服务器启动后访问：**http://localhost:5173/**
+
+### 3. 类型检查
+
+```bash
+npm run check
+```
+
+### 4. 生产构建
+
+```bash
+npm run build
+```
+
+构建产物输出到 `dist/` 目录。
+
+---
+
+## 页面路由
+
+| 路径 | 页面 | 说明 |
+|------|------|------|
+| `/` | 练习记录列表 | 首页，展示所有训练记录 |
+| `/train/:recordId` | 训练主界面 | 进行避障操作，实时计算资源/分数/风险 |
+| `/conflict/:recordId` | 冲突处理面板 | 处理学生记录与系统数据的差异 |
+| `/report/:recordId` | 结果报告页 | 查看决策过程追溯和分数明细 |
+
+---
+
+## 操作流程
+
+### 流程一：正常训练（以顺利记录 #001 为例）
+
+1. **首页** → 点击「顺利记录 #001 - 标准避障场景」卡片上的「开始训练」
+2. **训练界面** → 点击或拖拽障碍物执行避障操作：
+   - **拖拽**障碍物：消耗更多能源和时间，获得满分
+   - **点击**障碍物：消耗更多算力，获得 80% 分数
+3. 每步操作后左侧面板实时更新：
+   - 能源 / 算力 / 时间 进度条（颜色随剩余量变化）
+   - 当前分数
+   - 风险等级（低/中/高/极高）
+4. 右侧「操作日志」记录每一步详情
+5. 可随时点击「暂停」按钮，操作日志会记录「人为中断记录」
+6. 点击右上角「完成训练」进入报告页
+7. **报告页** 展示：
+   - 最终分数、剩余资源统计
+   - 垂直时间线追溯每一步决策
+   - 结果汇总（基础分 + 操作加分 + 操作减分 = 最终得分）
+   - 底部校验行确认数据一致性
+
+### 流程二：冲突处理（以待确认记录 #002 为例）
+
+1. **首页** → 点击「待确认记录 #002」卡片上的「处理冲突」
+2. **冲突处理面板** 左右分栏对比：
+   - 左侧：学生报告的分数和资源
+   - 右侧：系统计算的分数和资源
+   - 中间：分数差异提示
+3. 下方「证据列表」按序号展示双方证据，标注来源（学生方/系统方）
+4. 「处理建议」给出业务同事可执行的建议动作
+5. 点击「确认处理」标记冲突已解决，自动跳转报告页
+
+### 流程三：资源负数场景验证
+
+1. 选择任意记录开始训练
+2. 连续操作障碍物直到某一项资源变为负数
+3. 页面顶部出现红色业务提醒条，格式为：
+   `[业务提醒] XX不足，请检查操作策略或补充XX。当前操作已计入日志但暂停自动计分。`
+4. 继续执行后续操作：
+   - 资源消耗正常扣除（可能继续变负）
+   - **分数不再增加**（所有操作 scoreDelta 为 0）
+   - 操作日志会标注「[计分已暂停]」
+5. 查看报告页：
+   - 结果汇总中「操作加分」不包含负数后的操作
+   - 每步明细中分数变化为 0 时标注「(暂停计分)」
+
+---
+
+## 三条样例记录
+
+| 记录 ID | 标题 | 类型 | 特点 |
+|---------|------|------|------|
+| `record-001` | 顺利记录 #001 - 标准避障场景 | 系统生成 | 3个障碍物，初始资源各100，用于正常训练演示 |
+| `record-002` | 待确认记录 #002 - 数据冲突场景 | 学生导入 | 2个障碍物，含4条证据和3条处理建议，用于冲突处理演示 |
+| `record-003` | 旧口径记录 #003 - 历史数据导入 | 学生导入 | 4个障碍物，基础分50（旧口径），标注「旧口径」标签 |
+
+---
+
+## 核心业务规则
+
+### 资源计算规则
+
+| 操作 | 能源消耗 | 算力消耗 | 时间消耗 | 分数奖励 |
+|------|----------|----------|----------|----------|
+| 拖拽障碍物 | 障碍物 energyCost × 100% | 障碍物 computeCost × 50% | 障碍物 timeCost × 100% | 满分 scoreBonus |
+| 点击障碍物 | 障碍物 energyCost × 30% | 障碍物 computeCost × 100% | 障碍物 timeCost × 40% | scoreBonus × 80% |
+
+### 分数计算规则
+
+- 成功避开障碍物：按上表加分
+- **资源负数后**：后续所有操作 scoreDelta = 0，暂停自动计分
+- 暂停记录：操作日志标记「人为中断记录」，分数冻结
+- 边界情况（资源刚好为0）：正常计分
+
+### 风险评估规则
+
+| 条件 | 风险等级 |
+|------|----------|
+| 平均资源 ≥ 60% + 无高风险障碍 | 低风险（0） |
+| 平均资源 30%-60% + 低风险障碍 | 中风险（1） |
+| 平均资源 < 30% 或 中风险障碍 | 高风险（2） |
+| 平均资源 < 30% + 高风险障碍 | 极高风险（3） |
+
+### 冲突处理规则
+
+- 学生记录与系统数据冲突时：并排展示，**不自动裁决**
+- 建议动作格式：`建议{动作}，依据是{证据来源}显示{具体内容}`
+- 人工确认后：状态记入报告，保持可追溯
+
+---
+
+## 数据一致性保证
+
+报告页与明细的数据来源统一：
+
+1. **最终得分** = 记录基础分 + Σ(所有决策步骤的 scoreDelta)
+2. **最终资源** = 记录初始资源 + Σ(所有决策步骤的 resourceDelta)
+3. 报告页底部显示校验行：`基础分 X + 操作变化合计 Y = 最终得分 Z`
+4. 所有统计数字（操作次数、拖拽/点击计数）均从 decisionHistory 数组直接统计
+
+---
+
+## 异常处理
+
+- **坏配置/白屏**：错误边界组件捕获异常，展示友好提示页，包含错误信息和「返回首页」按钮
+- **404 页面**：访问不存在路径时展示 404 页面
+- **资源负数**：红色顶部提醒条 + 操作日志标注 + 分数暂停机制
+
+---
+
+## 技术栈
+
+- **框架**: React 18 + TypeScript
+- **构建**: Vite 6
+- **样式**: TailwindCSS 3
+- **状态管理**: Zustand 5
+- **路由**: React Router DOM 7
+- **图标**: Lucide React
+
+## 项目结构
+
+```
+src/
+├── components/
+│   └── ErrorBoundary.tsx    # 错误边界组件
+├── data/
+│   └── mockRecords.ts       # 三条样例记录数据
+├── pages/
+│   ├── Home.tsx             # 首页 - 记录列表
+│   ├── Train.tsx            # 训练主界面
+│   ├── Conflict.tsx         # 冲突处理面板
+│   └── Report.tsx           # 结果报告页
+├── store/
+│   └── trainingStore.ts     # Zustand 状态管理
+├── types/
+│   └── index.ts             # TypeScript 类型定义
+├── utils/
+│   └── businessEngine.ts    # 业务规则引擎
+├── App.tsx                  # 路由配置
+├── index.css                # 全局样式
+└── main.tsx                 # 入口文件
 ```

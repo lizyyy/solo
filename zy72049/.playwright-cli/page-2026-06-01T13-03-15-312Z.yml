@@ -1,0 +1,96 @@
+- generic [ref=e4]:
+  - banner [ref=e5]:
+    - heading "无人车避障训练场" [level=1] [ref=e6]
+    - paragraph [ref=e7]: 选择练习记录开始训练，每次操作都会影响资源、分数和风险
+  - generic [ref=e8]:
+    - generic [ref=e9]:
+      - generic [ref=e10]:
+        - generic [ref=e11]:
+          - generic [ref=e12]:
+            - 'heading "顺利记录 #001 - 标准避障场景" [level=2] [ref=e13]'
+            - generic [ref=e14]:
+              - img [ref=e15]
+              - text: 顺利
+          - paragraph [ref=e18]: 标准城市道路场景，包含静态障碍物和移动行人，适合新手练习
+        - generic [ref=e19]: 2026-05-28 14:30:00
+      - generic [ref=e20]:
+        - generic [ref=e21]:
+          - img [ref=e22]
+          - generic [ref=e24]: "能源:"
+          - generic [ref=e25]: "100"
+        - generic [ref=e26]:
+          - img [ref=e27]
+          - generic [ref=e30]: "算力:"
+          - generic [ref=e31]: "100"
+        - generic [ref=e32]:
+          - img [ref=e33]
+          - generic [ref=e36]: "时间:"
+          - generic [ref=e37]: "100"
+        - generic [ref=e38]: "障碍物: 3"
+      - generic [ref=e39]:
+        - link "开始训练" [ref=e40] [cursor=pointer]:
+          - /url: /train/record-001
+        - link "查看报告" [ref=e41] [cursor=pointer]:
+          - /url: /report/record-001
+    - generic [ref=e42]:
+      - generic [ref=e43]:
+        - generic [ref=e44]:
+          - generic [ref=e45]:
+            - 'heading "待确认记录 #002 - 数据冲突场景" [level=2] [ref=e46]'
+            - generic [ref=e47]:
+              - img [ref=e48]
+              - text: 待确认
+            - generic [ref=e50]: 学生导入
+          - paragraph [ref=e51]: 学生提交的练习记录与系统计算结果存在差异，需要人工确认
+        - generic [ref=e52]: 2026-05-29 09:15:00
+      - generic [ref=e53]:
+        - generic [ref=e54]:
+          - img [ref=e55]
+          - generic [ref=e57]: "能源:"
+          - generic [ref=e58]: "80"
+        - generic [ref=e59]:
+          - img [ref=e60]
+          - generic [ref=e63]: "算力:"
+          - generic [ref=e64]: "90"
+        - generic [ref=e65]:
+          - img [ref=e66]
+          - generic [ref=e69]: "时间:"
+          - generic [ref=e70]: "70"
+        - generic [ref=e71]: "障碍物: 2"
+      - generic [ref=e72]:
+        - link "开始训练" [ref=e73] [cursor=pointer]:
+          - /url: /train/record-002
+        - link "查看报告" [ref=e74] [cursor=pointer]:
+          - /url: /report/record-002
+        - link "处理冲突" [ref=e75] [cursor=pointer]:
+          - /url: /conflict/record-002
+    - generic [ref=e76]:
+      - generic [ref=e77]:
+        - generic [ref=e78]:
+          - generic [ref=e79]:
+            - 'heading "旧口径记录 #003 - 历史数据导入" [level=2] [ref=e80]'
+            - generic [ref=e81]:
+              - img [ref=e82]
+              - text: 旧口径
+            - generic [ref=e85]: 学生导入
+          - paragraph [ref=e86]: 从旧系统导入的学生练习记录，采用历史评分口径
+        - generic [ref=e87]: 2026-03-15 16:45:00
+      - generic [ref=e88]:
+        - generic [ref=e89]:
+          - img [ref=e90]
+          - generic [ref=e92]: "能源:"
+          - generic [ref=e93]: "100"
+        - generic [ref=e94]:
+          - img [ref=e95]
+          - generic [ref=e98]: "算力:"
+          - generic [ref=e99]: "100"
+        - generic [ref=e100]:
+          - img [ref=e101]
+          - generic [ref=e104]: "时间:"
+          - generic [ref=e105]: "100"
+        - generic [ref=e106]: "障碍物: 4"
+      - generic [ref=e107]:
+        - link "开始训练" [ref=e108] [cursor=pointer]:
+          - /url: /train/record-003
+        - link "查看报告" [ref=e109] [cursor=pointer]:
+          - /url: /report/record-003

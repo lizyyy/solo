@@ -62,7 +62,11 @@ export const useTrainingStore = create<TrainingStore>((set, get) => ({
     const { resources, obstacles, currentRecordId } = get();
     if (!currentRecordId) return;
 
-    const result = handleDragAction(resources, obstacle);
+    const adjustedResources = resources.isNegative
+      ? { ...resources, score: resources.score }
+      : resources;
+
+    const result = handleDragAction(adjustedResources, obstacle, resources.isNegative);
     const step: DecisionStep = {
       id: `step-${Date.now()}`,
       timestamp: Date.now(),
@@ -91,7 +95,11 @@ export const useTrainingStore = create<TrainingStore>((set, get) => ({
     const { resources, obstacles, currentRecordId } = get();
     if (!currentRecordId) return;
 
-    const result = handleClickAction(resources, obstacle);
+    const adjustedResources = resources.isNegative
+      ? { ...resources, score: resources.score }
+      : resources;
+
+    const result = handleClickAction(adjustedResources, obstacle, resources.isNegative);
     const step: DecisionStep = {
       id: `step-${Date.now()}`,
       timestamp: Date.now(),

@@ -1,0 +1,106 @@
+- generic [ref=e471]:
+  - banner [ref=e472]:
+    - generic [ref=e473]:
+      - button [ref=e474] [cursor=pointer]:
+        - img [ref=e475]
+      - generic [ref=e477]:
+        - 'heading "冲突处理 - 待确认记录 #002 - 数据冲突场景" [level=1] [ref=e478]'
+        - paragraph [ref=e479]: 学生练习记录与系统导入数据存在差异，请人工确认
+  - generic [ref=e480]:
+    - generic [ref=e481]:
+      - generic [ref=e482]:
+        - generic [ref=e483]:
+          - img [ref=e484]
+          - heading "学生报告" [level=2] [ref=e487]
+        - paragraph [ref=e488]: 学生报告：成功避开所有障碍物，操作过程流畅
+        - generic [ref=e489]:
+          - generic [ref=e490]:
+            - generic [ref=e491]: 报告分数
+            - generic [ref=e492]: "180"
+          - generic [ref=e493]:
+            - generic [ref=e494]:
+              - generic [ref=e495]: 能源
+              - generic [ref=e496]: "45"
+            - generic [ref=e497]:
+              - generic [ref=e498]: 算力
+              - generic [ref=e499]: "35"
+            - generic [ref=e500]:
+              - generic [ref=e501]: 时间
+              - generic [ref=e502]: "48"
+      - generic [ref=e503]:
+        - generic [ref=e504]:
+          - img [ref=e505]
+          - heading "系统计算" [level=2] [ref=e507]
+        - paragraph [ref=e508]: 系统计算：检测到一次碰撞，分数已扣除
+        - generic [ref=e509]:
+          - generic [ref=e510]:
+            - generic [ref=e511]: 计算分数
+            - generic [ref=e512]: "140"
+          - generic [ref=e513]:
+            - generic [ref=e514]:
+              - generic [ref=e515]: 能源
+              - generic [ref=e516]: "37"
+            - generic [ref=e517]:
+              - generic [ref=e518]: 算力
+              - generic [ref=e519]: "28"
+            - generic [ref=e520]:
+              - generic [ref=e521]: 时间
+              - generic [ref=e522]: "42"
+    - generic [ref=e523]:
+      - generic [ref=e524]:
+        - img [ref=e525]
+        - heading "分数差异" [level=3] [ref=e527]
+      - paragraph [ref=e528]:
+        - text: 学生报告分数 180 与 系统计算分数 140 存在
+        - generic [ref=e529]: "40"
+        - text: 分的差异。以下证据供参考，请勿自动裁决。
+    - generic [ref=e530]:
+      - generic [ref=e531]:
+        - img [ref=e532]
+        - heading "证据列表" [level=2] [ref=e535]
+      - generic [ref=e536]:
+        - generic [ref=e537]:
+          - generic [ref=e538]: "1"
+          - generic [ref=e539]:
+            - generic [ref=e540]:
+              - generic [ref=e541]: 学生方
+              - generic [ref=e542]: 2026-05-29 09:15:22
+            - paragraph [ref=e543]: 学生操作日志显示：两次拖拽操作，间隔2.3秒，路径平滑
+        - generic [ref=e544]:
+          - generic [ref=e545]: "2"
+          - generic [ref=e546]:
+            - generic [ref=e547]:
+              - generic [ref=e548]: 系统方
+              - generic [ref=e549]: 2026-05-29 09:15:23
+            - paragraph [ref=e550]: 系统碰撞检测：obs-004区域在1.8秒时检测到轨迹重叠
+        - generic [ref=e551]:
+          - generic [ref=e552]: "3"
+          - generic [ref=e553]:
+            - generic [ref=e554]:
+              - generic [ref=e555]: 学生方
+              - generic [ref=e556]: 2026-05-29 10:02:15
+            - paragraph [ref=e557]: 学生申诉：当时屏幕卡顿，障碍物显示位置不准确
+        - generic [ref=e558]:
+          - generic [ref=e559]: "4"
+          - generic [ref=e560]:
+            - generic [ref=e561]:
+              - generic [ref=e562]: 系统方
+              - generic [ref=e563]: 2026-05-29 10:05:00
+            - paragraph [ref=e564]: 系统帧率记录：操作期间帧率稳定在58-60fps
+    - generic [ref=e565]:
+      - heading "处理建议" [level=2] [ref=e566]
+      - generic [ref=e567]:
+        - generic [ref=e568]:
+          - generic [ref=e569]: "建议1:"
+          - paragraph [ref=e570]: 建议查看操作录像回放，确认碰撞是否真实发生
+        - generic [ref=e571]:
+          - generic [ref=e572]: "建议2:"
+          - paragraph [ref=e573]: 建议检查obs-004的碰撞检测参数设置
+        - generic [ref=e574]:
+          - generic [ref=e575]: "建议3:"
+          - paragraph [ref=e576]: 建议与学生沟通了解具体操作细节
+    - generic [ref=e577]:
+      - button "返回训练" [ref=e578] [cursor=pointer]
+      - button "确认处理" [ref=e579] [cursor=pointer]:
+        - img [ref=e580]
+        - text: 确认处理

@@ -33,9 +33,24 @@ const Report = () => {
   }
 
   const hasTrainingData = decisionHistory.length > 0;
-  const finalScore = hasTrainingData ? resources.score : record.baseScore;
+
+  const totalScoreDeltaFromHistory = decisionHistory.reduce((sum, step) => sum + step.scoreDelta, 0);
+  const finalScore = record.baseScore + totalScoreDeltaFromHistory;
+
+  const totalEnergyDeltaFromHistory = decisionHistory.reduce((sum, step) => sum + step.resourceDelta.energy, 0);
+  const totalComputeDeltaFromHistory = decisionHistory.reduce((sum, step) => sum + step.resourceDelta.compute, 0);
+  const totalTimeDeltaFromHistory = decisionHistory.reduce((sum, step) => sum + step.resourceDelta.time, 0);
+
   const finalResources = hasTrainingData
-    ? resources
+    ? {
+        energy: record.initialResources.energy + totalEnergyDeltaFromHistory,
+        compute: record.initialResources.compute + totalComputeDeltaFromHistory,
+        time: record.initialResources.time + totalTimeDeltaFromHistory,
+        score: finalScore,
+        riskLevel: decisionHistory.length > 0 ? decisionHistory[decisionHistory.length - 1].riskLevel : 0 as const,
+        isNegative: resources.isNegative,
+        negativeWarning: resources.negativeWarning,
+      }
     : {
         energy: record.initialResources.energy,
         compute: record.initialResources.compute,
@@ -74,12 +89,7 @@ const Report = () => {
   };
 
   const totalScoreDelta = decisionHistory.reduce((sum, step) => sum + step.scoreDelta, 0);
-  const hasNegativeResource = decisionHistory.some(
-    (step) =>
-      step.resourceDelta.energy < 0 ||
-      step.resourceDelta.compute < 0 ||
-      step.resourceDelta.time < 0
-  );
+  const hasNegativeResource = finalResources.energy < 0 || finalResources.compute < 0 || finalResources.time < 0;
 
   return (
     <div className="min-h-screen bg-zinc-900 text-white">
@@ -360,9 +370,14 @@ const Report = () => {
             </div>
             <div className="flex items-center justify-between p-3 bg-zinc-900/50 rounded border border-amber-500/30">
               <span className="text-amber-400 font-medium">最终得分</span>
-              <span className="font-mono text-xl font-bold text-amber-400">{finalScore}</span>
+              <span className="font-mono text-xl font-bold text-amber-400">
+                {record.baseScore + decisionHistory.reduce((sum, s) => sum + s.scoreDelta, 0)}
+              </span>
             </div>
           </div>
+          <p className="text-xs text-zinc-500 mt-3">
+            校验：基础分 {record.baseScore} + 操作变化合计 {decisionHistory.reduce((sum, s) => sum + s.scoreDelta, 0) >= 0 ? '+' : ''}{decisionHistory.reduce((sum, s) => sum + s.scoreDelta, 0)} = {finalScore}
+          </p>
         </div>
 
         <div className="flex items-center justify-between pt-4 border-t border-zinc-700">
