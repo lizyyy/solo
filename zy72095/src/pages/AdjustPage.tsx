@@ -242,6 +242,7 @@ export default function AdjustPage() {
                 <th className="px-3 py-2.5 text-center">绿信比</th>
                 <th className="px-3 py-2.5 text-center">偏移量(s)</th>
                 <th className="px-3 py-2.5 text-center">方向</th>
+                <th className="px-3 py-2.5 text-center">来源</th>
               </tr>
             </thead>
             <tbody>
@@ -263,11 +264,12 @@ export default function AdjustPage() {
                     {renderEditableCell(item, "offset", item.offset)}
                   </td>
                   <td className="px-3 py-2 text-center">{item.direction}</td>
+                  <td className="px-3 py-2 text-center text-xs text-gray-500">{item.sourceFile}:L{item.sourceRow}</td>
                 </tr>
               ))}
               {filteredIntersections.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-3 py-8 text-center text-gray-500">
+                  <td colSpan={8} className="px-3 py-8 text-center text-gray-500">
                     暂无路口数据
                   </td>
                 </tr>

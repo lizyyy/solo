@@ -208,6 +208,11 @@ export default function CalculatePage() {
                   <div className="text-xs text-gray-500 mt-2">
                     距离 {result.distance}m
                   </div>
+                  {intersections.find((i) => i.name === result.fromIntersection)?.sourceFile && (
+                    <div className="text-xs text-gray-600 mt-1">
+                      来源：{intersections.find((i) => i.name === result.fromIntersection)?.sourceFile}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

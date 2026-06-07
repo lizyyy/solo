@@ -1,4 +1,5 @@
-import { RawImportRow, IntersectionData, ValidationResult, ConflictChoice } from "./types"
+import * as XLSX from "xlsx"
+import { RawImportRow, IntersectionData, ValidationResult, ConflictChoice, ColumnMapping, FieldKey, FIELD_DEFINITIONS } from "./types"
 
 const DEFAULT_CYCLE = 120
 
@@ -13,40 +14,87 @@ export function convertUnit(value: string): number {
   return parseFloat(trimmed)
 }
 
-export function parseRawText(text: string): RawImportRow[] {
+export function parseExcelFile(buffer: ArrayBuffer, fileName: string): { headers: string[]; rows: Record<string, string>[] } {
+  const wb = XLSX.read(buffer, { type: "array" })
+  const ws = wb.Sheets[wb.SheetNames[0]]
+  const json = XLSX.utils.sheet_to_json<Record<string, unknown>>(ws, { defval: "" })
+  if (json.length === 0) return { headers: [], rows: [] }
+  const headers = Object.keys(json[0])
+  const rows = json.map((row) => {
+    const out: Record<string, string> = {}
+    for (const h of headers) {
+      const v = row[h]
+      out[h] = v == null ? "" : String(v)
+    }
+    return out
+  })
+  return { headers, rows }
+}
+
+export function parseCSVText(text: string, fileName: string): { headers: string[]; rows: Record<string, string>[] } {
   const lines = text.trim().split(/\r?\n/).filter((l) => l.trim() !== "")
-  if (lines.length < 2) return []
+  if (lines.length < 2) return { headers: [], rows: [] }
 
   const header = lines[0]
-  let delimiter = "\t"
-  if (header.includes(",")) delimiter = ","
+  let delimiter = ","
+  if (header.includes("\t")) delimiter = "\t"
   else if (header.includes(";")) delimiter = ";"
 
   const headers = header.split(delimiter).map((h) => h.trim())
-
-  const idIdx = headers.findIndex((h) => h.includes("编号") || h.toLowerCase() === "id")
-  const nameIdx = headers.findIndex((h) => h.includes("名称") || h.toLowerCase() === "name")
-  const distIdx = headers.findIndex((h) => h.includes("距起点") || h.toLowerCase().includes("distance"))
-  const cycleIdx = headers.findIndex((h) => h.includes("周期") || h.toLowerCase() === "cycle")
-  const greenIdx = headers.findIndex((h) => h.includes("绿信比") || h.toLowerCase().includes("greenratio") || h.toLowerCase().includes("green"))
-  const offsetIdx = headers.findIndex((h) => h.includes("偏移") || h.toLowerCase() === "offset")
-  const dirIdx = headers.findIndex((h) => h.includes("方向") || h.toLowerCase().includes("direction"))
-
-  const rows: RawImportRow[] = []
+  const rows: Record<string, string>[] = []
   for (let i = 1; i < lines.length; i++) {
     const cols = lines[i].split(delimiter).map((c) => c.trim())
-    rows.push({
-      id: idIdx >= 0 ? (cols[idIdx] ?? "") : "",
-      name: nameIdx >= 0 ? (cols[nameIdx] ?? "") : "",
-      distanceFromStart: distIdx >= 0 ? (cols[distIdx] ?? "") : "",
-      cycle: cycleIdx >= 0 ? (cols[cycleIdx] ?? "") : "",
-      greenRatio: greenIdx >= 0 ? (cols[greenIdx] ?? "") : "",
-      offset: offsetIdx >= 0 ? (cols[offsetIdx] ?? "") : "",
-      direction: dirIdx >= 0 ? (cols[dirIdx] ?? "") : "",
+    const row: Record<string, string> = {}
+    headers.forEach((h, idx) => {
+      row[h] = cols[idx] ?? ""
     })
+    rows.push(row)
   }
+  return { headers, rows }
+}
 
-  return rows
+export function guessColumnMapping(headers: string[]): ColumnMapping[] {
+  return headers.map((h) => {
+    const normalized = h.replace(/[\s()（）]/g, "").toLowerCase()
+    for (const def of FIELD_DEFINITIONS) {
+      if (normalized === def.label.replace(/[\s()（）]/g, "").toLowerCase()) {
+        return { fileColumn: h, fieldKey: def.key }
+      }
+      if (def.aliases.some((a) => normalized === a.replace(/[\s()（）]/g, "").toLowerCase())) {
+        return { fileColumn: h, fieldKey: def.key }
+      }
+      if (normalized.includes(def.label.replace(/[\s()（）]/g, "").toLowerCase())) {
+        return { fileColumn: h, fieldKey: def.key }
+      }
+      if (def.aliases.some((a) => normalized.includes(a.replace(/[\s()（）]/g, "").toLowerCase()))) {
+        return { fileColumn: h, fieldKey: def.key }
+      }
+    }
+    return { fileColumn: h, fieldKey: "" as FieldKey | "" }
+  })
+}
+
+export function applyMapping(rows: Record<string, string>[], mapping: ColumnMapping[], fileName: string): RawImportRow[] {
+  const fieldKeys = mapping.map((m) => m.fieldKey)
+  return rows.map((row, idx) => {
+    const mapped: Record<string, string> = {}
+    mapping.forEach((m, i) => {
+      if (m.fieldKey) {
+        mapped[m.fieldKey] = row[m.fileColumn] ?? ""
+      }
+    })
+    return {
+      id: mapped.id ?? "",
+      name: mapped.name ?? "",
+      distanceFromStart: mapped.distanceFromStart ?? "",
+      cycle: mapped.cycle ?? "",
+      greenRatio: mapped.greenRatio ?? "",
+      offset: mapped.offset ?? "",
+      direction: mapped.direction ?? "",
+      sourceRow: idx + 2,
+      sourceFile: fileName,
+    }
+  })
 }
 
 export function validateData(rows: RawImportRow[]): {
@@ -63,56 +111,41 @@ export function validateData(rows: RawImportRow[]): {
 
     if (!row.id || row.id.trim() === "") {
       validationResults.push({
-        id: `empty-id-${i}`,
-        type: "empty",
-        rowIndex: i,
-        field: "id",
-        message: `第${i + 1}行路口编号为空`,
+        id: `empty-id-${i}`, type: "empty", rowIndex: i, field: "id",
+        message: `来源行${row.sourceRow}路口编号为空`,
         suggestion: "请补充路口编号",
       })
     }
 
     if (!row.name || row.name.trim() === "") {
       validationResults.push({
-        id: `empty-name-${i}`,
-        type: "empty",
-        rowIndex: i,
-        field: "name",
-        message: `第${i + 1}行路口名称为空`,
+        id: `empty-name-${i}`, type: "empty", rowIndex: i, field: "name",
+        message: `来源行${row.sourceRow}路口名称为空`,
         suggestion: "请补充路口名称",
       })
     }
 
     if (!row.distanceFromStart || row.distanceFromStart.trim() === "") {
       validationResults.push({
-        id: `empty-distance-${i}`,
-        type: "empty",
-        rowIndex: i,
-        field: "distanceFromStart",
-        message: `第${i + 1}行距起点距离为空`,
+        id: `empty-distance-${i}`, type: "empty", rowIndex: i, field: "distanceFromStart",
+        message: `来源行${row.sourceRow}距起点距离为空`,
         suggestion: "请补充距起点距离",
       })
-    } else if (/km$/i.test(row.distanceFromStart.trim())) {
+    } else if (/km$/i.test(row.distanceFromStart.trim()) && !/km\/h$/i.test(row.distanceFromStart.trim())) {
       const val = convertUnit(row.distanceFromStart)
       if (!isNaN(val)) {
         converted.distanceFromStart = String(val)
         validationResults.push({
-          id: `unit-distance-${i}`,
-          type: "unit_mismatch",
-          rowIndex: i,
-          field: "distanceFromStart",
-          message: `第${i + 1}行距起点距离含km后缀，已自动转换为${val}m`,
+          id: `unit-distance-${i}`, type: "unit_mismatch", rowIndex: i, field: "distanceFromStart",
+          message: `来源行${row.sourceRow}距起点距离含km后缀，已自动转换为${val}m`,
           importedValue: row.distanceFromStart,
           suggestion: "已自动将km转换为m",
         })
       }
     } else if (isNaN(parseFloat(row.distanceFromStart))) {
       validationResults.push({
-        id: `empty-distance-${i}`,
-        type: "empty",
-        rowIndex: i,
-        field: "distanceFromStart",
-        message: `第${i + 1}行距起点距离无法解析为数值`,
+        id: `empty-distance-${i}`, type: "empty", rowIndex: i, field: "distanceFromStart",
+        message: `来源行${row.sourceRow}距起点距离无法解析为数值`,
         importedValue: row.distanceFromStart,
         suggestion: "请检查距起点距离格式",
       })
@@ -120,22 +153,16 @@ export function validateData(rows: RawImportRow[]): {
 
     if (!row.greenRatio || row.greenRatio.trim() === "") {
       validationResults.push({
-        id: `empty-greenRatio-${i}`,
-        type: "empty",
-        rowIndex: i,
-        field: "greenRatio",
-        message: `第${i + 1}行绿信比为空`,
+        id: `empty-greenRatio-${i}`, type: "empty", rowIndex: i, field: "greenRatio",
+        message: `来源行${row.sourceRow}绿信比为空`,
         suggestion: "请补充绿信比",
       })
     } else {
       const gr = parseFloat(converted.greenRatio)
       if (gr === 0) {
         validationResults.push({
-          id: `boundary-greenRatio-${i}`,
-          type: "boundary",
-          rowIndex: i,
-          field: "greenRatio",
-          message: `第${i + 1}行绿信比为0，将导致绿波带宽为0`,
+          id: `boundary-greenRatio-${i}`, type: "boundary", rowIndex: i, field: "greenRatio",
+          message: `来源行${row.sourceRow}绿信比为0，将导致绿波带宽为0`,
           importedValue: row.greenRatio,
           suggestion: "请调整绿信比为合理正值",
         })
@@ -144,11 +171,8 @@ export function validateData(rows: RawImportRow[]): {
 
     if (!row.offset || row.offset.trim() === "") {
       validationResults.push({
-        id: `empty-offset-${i}`,
-        type: "empty",
-        rowIndex: i,
-        field: "offset",
-        message: `第${i + 1}行偏移量为空`,
+        id: `empty-offset-${i}`, type: "empty", rowIndex: i, field: "offset",
+        message: `来源行${row.sourceRow}偏移量为空`,
         suggestion: "请补充偏移量",
       })
     }
@@ -157,11 +181,8 @@ export function validateData(rows: RawImportRow[]): {
       if (seenIds.has(row.id)) {
         const prevIdx = seenIds.get(row.id)!
         validationResults.push({
-          id: `duplicate-${row.id}-${i}`,
-          type: "duplicate",
-          rowIndex: i,
-          field: "id",
-          message: `路口编号${row.id}在第${prevIdx + 1}行和第${i + 1}行重复`,
+          id: `duplicate-${row.id}-${i}`, type: "duplicate", rowIndex: i, field: "id",
+          message: `路口编号${row.id}在来源行${rows[prevIdx].sourceRow}和${row.sourceRow}重复`,
           suggestion: "请修改重复的路口编号或删除多余行",
         })
       } else {
@@ -172,11 +193,8 @@ export function validateData(rows: RawImportRow[]): {
     const cycleVal = parseFloat(converted.cycle)
     if (!isNaN(cycleVal) && cycleVal !== DEFAULT_CYCLE) {
       validationResults.push({
-        id: `conflict-cycle-${i}`,
-        type: "conflict",
-        rowIndex: i,
-        field: "cycle",
-        message: `第${i + 1}行周期为${cycleVal}，与参数表默认值${DEFAULT_CYCLE}不一致`,
+        id: `conflict-cycle-${i}`, type: "conflict", rowIndex: i, field: "cycle",
+        message: `来源行${row.sourceRow}周期为${cycleVal}，与参数表默认值${DEFAULT_CYCLE}不一致`,
         paramTableValue: String(DEFAULT_CYCLE),
         importedValue: row.cycle,
         suggestion: `选择使用参数表默认值${DEFAULT_CYCLE}或保留导入值${cycleVal}`,
@@ -213,16 +231,15 @@ export function validateData(rows: RawImportRow[]): {
       greenRatio,
       offset,
       direction: direction as "上行" | "下行",
+      sourceRow: row.sourceRow,
+      sourceFile: row.sourceFile,
     })
   }
 
   return { validData, validationResults }
 }
 
-export function resolveConflicts(
-  rows: RawImportRow[],
-  conflicts: ConflictChoice[]
-): RawImportRow[] {
+export function resolveConflicts(rows: RawImportRow[], conflicts: ConflictChoice[]): RawImportRow[] {
   const result = rows.map((row, i) => {
     const updated = { ...row }
     conflicts.forEach((choice) => {
@@ -235,6 +252,5 @@ export function resolveConflicts(
     })
     return updated
   })
-
   return result
 }
