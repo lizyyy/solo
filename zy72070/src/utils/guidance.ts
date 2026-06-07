@@ -9,7 +9,8 @@ export function calculateDistance(x1: number, y1: number, x2: number, y2: number
 export function evaluateDevice(
   device: Device,
   cadPoints: CadPoint[],
-  params: Params
+  params: Params,
+  allDevices: Device[] = []
 ): {
   status: DeviceStatus;
   score: number;
@@ -18,14 +19,31 @@ export function evaluateDevice(
   const reasons: string[] = [];
   let score = 100;
 
+  if (!device.matchedCadId) {
+    const hasNameMatch = allDevices.some(d => 
+      d.id !== device.id && 
+      (d.name === device.name || d.alias === device.name || d.name === device.alias)
+    );
+    if (hasNameMatch) {
+      score -= 42;
+      reasons.push('与其他设备存在命名冲突，建议合并或区分');
+    } else {
+      reasons.push('暂未匹配到对应CAD点位');
+      return { status: 'pending', score, reasons };
+    }
+  }
+
   if (device.matchedCadId) {
     const cadPoint = cadPoints.find(c => c.id === device.matchedCadId);
     if (cadPoint) {
       if (device.coordSystem === cadPoint.coordSystem) {
         const offset = calculateDistance(device.x, device.y, cadPoint.x, cadPoint.y);
         if (offset > params.coordTolerance) {
-          score -= 40;
+          score -= 45;
           reasons.push(`坐标偏移 ${offset.toFixed(2)}m，超过容差 ${params.coordTolerance}m`);
+        } else if (offset > params.coordTolerance * 0.7) {
+          score -= 22;
+          reasons.push(`坐标偏移 ${offset.toFixed(2)}m，接近容差阈值`);
         } else {
           reasons.push(`坐标偏移 ${offset.toFixed(2)}m，在容差范围内`);
         }
@@ -34,24 +52,25 @@ export function evaluateDevice(
       }
 
       if (device.floor !== cadPoint.floor) {
-        score -= 30;
+        score -= 48;
         reasons.push(`楼层标记不符（设备:${device.floor} / CAD:${cadPoint.floor}）`);
       }
     }
   }
 
   if (!device.hasPhoto) {
-    score -= 20;
+    score -= 32;
     reasons.push('缺少现场照片佐证');
   }
 
   if (device.coordSystem !== 'A') {
+    score -= 18;
     reasons.push(`使用坐标系 ${device.coordSystem}（非标准A系）`);
   }
 
   let status: DeviceStatus;
-  if (score >= 80) status = 'normal';
-  else if (score >= 50) status = 'warning';
+  if (score >= 75) status = 'normal';
+  else if (score >= 53) status = 'warning';
   else status = 'error';
 
   return { status, score, reasons };

@@ -1,19 +1,108 @@
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '@/store/useAppStore';
-import { Upload, Database, FileJson, ChevronRight, Info } from 'lucide-react';
+import { Upload, Database, FileJson, ChevronRight, Info, AlertCircle, Check, Download, X } from 'lucide-react';
+import { useRef, useState } from 'react';
+import { parseJsonImport, parseCsvImport, generateSampleExportJson } from '@/utils/import';
+import type { ImportResult } from '@/utils/import';
 
 export function ImportPage() {
   const navigate = useNavigate();
   const loadSampleData = useAppStore((state) => state.loadSampleData);
+  const importData = useAppStore((state) => state.importData);
+  const clearAll = useAppStore((state) => state.clearAll);
   const devices = useAppStore((state) => state.devices);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [importResult, setImportResult] = useState<ImportResult | null>(null);
+  const [importError, setImportError] = useState<string | null>(null);
 
   const handleLoadSample = () => {
+    clearAll();
     loadSampleData();
     navigate('/workspace');
   };
 
   const handleContinue = () => {
     navigate('/workspace');
+  };
+
+  const handleFileSelect = (file: File) => {
+    setImportError(null);
+    setImportResult(null);
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const content = e.target?.result as string;
+      const ext = file.name.split('.').pop()?.toLowerCase();
+
+      let result: ImportResult;
+      if (ext === 'json') {
+        result = parseJsonImport(content);
+      } else if (ext === 'csv') {
+        result = parseCsvImport(content);
+      } else {
+        setImportError(`不支持的文件格式: .${ext}，请使用 JSON 或 CSV`);
+        return;
+      }
+
+      if (result.warnings.length > 0 && result.devices.length === 0 && result.cadPoints.length === 0) {
+        setImportError(result.warnings[0]);
+        return;
+      }
+
+      setImportResult(result);
+    };
+    reader.onerror = () => {
+      setImportError('文件读取失败，请重试');
+    };
+    reader.readAsText(file);
+  };
+
+  const handleConfirmImport = () => {
+    if (importResult) {
+      importData({
+        devices: importResult.devices,
+        cadPoints: importResult.cadPoints,
+      });
+      setImportResult(null);
+      navigate('/workspace');
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      handleFileSelect(files[0]);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      handleFileSelect(files[0]);
+    }
+  };
+
+  const handleDownloadTemplate = () => {
+    const content = generateSampleExportJson();
+    const blob = new Blob([content], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = '地下停车诱导模型-导入模板.json';
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -76,23 +165,130 @@ export function ImportPage() {
 
           <section className="bg-bg-secondary rounded-lg border border-border-subtle overflow-hidden">
             <div className="p-6 border-b border-border-subtle">
-              <div className="flex items-center gap-3">
-                <Upload className="w-6 h-6 text-accent-green" />
-                <div>
-                  <h2 className="text-lg font-semibold text-text-primary">导入数据</h2>
-                  <p className="text-sm text-text-muted">上传您的CAD点位和现场采集数据</p>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Upload className="w-6 h-6 text-accent-green" />
+                  <div>
+                    <h2 className="text-lg font-semibold text-text-primary">导入数据</h2>
+                    <p className="text-sm text-text-muted">上传您的CAD点位和现场采集数据</p>
+                  </div>
                 </div>
+                <button
+                  onClick={handleDownloadTemplate}
+                  className="flex items-center gap-2 px-3 py-1.5 bg-bg-tertiary hover:bg-border-subtle rounded text-xs text-text-secondary transition-colors"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  下载模板
+                </button>
               </div>
             </div>
             <div className="p-6">
-              <div className="border-2 border-dashed border-border-subtle rounded-lg p-8 text-center hover:border-accent-blue/50 transition-colors">
-                <Upload className="w-12 h-12 text-text-muted mx-auto mb-4" />
-                <p className="text-text-secondary">拖拽文件到此处，或</p>
-                <button className="mt-2 px-4 py-2 bg-bg-tertiary hover:bg-border-subtle rounded text-sm text-text-primary transition-colors">
-                  选择文件
-                </button>
-                <p className="text-xs text-text-muted mt-4">支持 JSON、CSV 格式</p>
-              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".json,.csv"
+                onChange={handleInputChange}
+                className="hidden"
+              />
+
+              {!importResult && !importError && (
+                <div
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  onClick={() => fileInputRef.current?.click()}
+                  className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
+                    isDragging
+                      ? 'border-accent-blue bg-accent-blue/5'
+                      : 'border-border-subtle hover:border-accent-blue/50'
+                  }`}
+                >
+                  <Upload className="w-12 h-12 text-text-muted mx-auto mb-4" />
+                  <p className="text-text-secondary">拖拽文件到此处，或点击选择</p>
+                  <p className="text-xs text-text-muted mt-4">支持 JSON、CSV 格式</p>
+                </div>
+              )}
+
+              {importError && (
+                <div className="p-4 bg-accent-red/10 border border-accent-red/30 rounded-lg">
+                  <div className="flex items-start gap-3">
+                    <AlertCircle className="w-5 h-5 text-accent-red flex-shrink-0 mt-0.5" />
+                    <div className="flex-1">
+                      <p className="text-sm text-accent-red font-medium">导入失败</p>
+                      <p className="text-sm text-text-secondary mt-1">{importError}</p>
+                    </div>
+                    <button
+                      onClick={() => { setImportError(null); setImportResult(null); }}
+                      className="p-1 text-text-muted hover:text-text-primary"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <button
+                    onClick={() => { setImportError(null); setImportResult(null); }}
+                    className="mt-3 px-3 py-1.5 bg-bg-tertiary hover:bg-border-subtle rounded text-xs text-text-primary transition-colors"
+                  >
+                    重新选择
+                  </button>
+                </div>
+              )}
+
+              {importResult && (
+                <div className="space-y-4">
+                  <div className="p-4 bg-accent-green/10 border border-accent-green/30 rounded-lg">
+                    <div className="flex items-start gap-3">
+                      <Check className="w-5 h-5 text-accent-green flex-shrink-0 mt-0.5" />
+                      <div className="flex-1">
+                        <p className="text-sm text-accent-green font-medium">文件解析成功</p>
+                        <div className="mt-2 grid grid-cols-2 gap-3 text-sm">
+                          <div className="p-2 bg-bg-tertiary rounded">
+                            <span className="text-text-muted">设备数据</span>
+                            <span className="ml-2 font-mono text-text-primary">{importResult.devices.length} 条</span>
+                          </div>
+                          <div className="p-2 bg-bg-tertiary rounded">
+                            <span className="text-text-muted">CAD点位</span>
+                            <span className="ml-2 font-mono text-text-primary">{importResult.cadPoints.length} 条</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {importResult.warnings.length > 0 && (
+                    <div className="p-4 bg-accent-yellow/10 border border-accent-yellow/30 rounded-lg">
+                      <div className="flex items-start gap-3">
+                        <AlertCircle className="w-5 h-5 text-accent-yellow flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-sm text-accent-yellow font-medium">有 {importResult.warnings.length} 条提示</p>
+                          <ul className="mt-2 space-y-1">
+                            {importResult.warnings.slice(0, 3).map((w, i) => (
+                              <li key={i} className="text-xs text-text-secondary">• {w}</li>
+                            ))}
+                            {importResult.warnings.length > 3 && (
+                              <li className="text-xs text-text-muted">... 还有 {importResult.warnings.length - 3} 条</li>
+                            )}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => { setImportResult(null); setImportError(null); }}
+                      className="flex-1 px-4 py-2 bg-bg-tertiary hover:bg-border-subtle rounded text-sm text-text-primary transition-colors"
+                    >
+                      重新选择
+                    </button>
+                    <button
+                      onClick={handleConfirmImport}
+                      className="flex-1 px-4 py-2 bg-accent-green hover:bg-accent-green/90 text-white rounded text-sm font-medium transition-colors"
+                    >
+                      确认导入
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </section>
 

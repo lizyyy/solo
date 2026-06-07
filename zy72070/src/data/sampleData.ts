@@ -23,7 +23,7 @@ export const sampleDevices: Device[] = [
     name: '超声波传感器-B1-02',
     type: 'sensor',
     floor: 'B1',
-    x: 205,
+    x: 207,
     y: 150,
     coordSystem: 'A',
     hasPhoto: true,

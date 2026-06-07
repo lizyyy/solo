@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { shallow } from 'zustand/shallow';
 
-import type { AppState, Decision, Params, ViewState, ProjectMeta } from '@/types';
+import type { AppState, Device, CadPoint, Decision, Params, ViewState, ProjectMeta } from '@/types';
 import { evaluateDevice, detectConflicts } from '@/utils/guidance';
 import { sampleDevices, sampleCadPoints, sampleProject } from '@/data/sampleData';
 
@@ -23,6 +23,8 @@ const defaultView: ViewState = {
 
 interface AppStore extends AppState {
   loadSampleData: () => void;
+  importData: (data: { devices?: Device[]; cadPoints?: CadPoint[] }) => void;
+  clearAll: () => void;
   setParams: (params: Partial<Params>) => void;
   setView: (view: Partial<ViewState>) => void;
   setSelectedDevice: (deviceId: string | null) => void;
@@ -48,7 +50,7 @@ export const useAppStore = create<AppStore>()(
         loadSampleData: () => {
           const { params } = get();
           const evaluatedDevices = sampleDevices.map(device => {
-            const result = evaluateDevice(device, sampleCadPoints, params);
+            const result = evaluateDevice(device, sampleCadPoints, params, sampleDevices);
             return {
               ...device,
               status: result.status,
@@ -64,6 +66,46 @@ export const useAppStore = create<AppStore>()(
             conflicts,
             decisions: [],
             view: { ...defaultView, currentFloor: 'B1' },
+            project: { ...sampleProject, updatedAt: new Date().toISOString() },
+          });
+        },
+
+        importData: (data) => {
+          const { params, devices: existingDevices, cadPoints: existingCadPoints } = get();
+          const newDevices = [...existingDevices, ...(data.devices || [])];
+          const newCadPoints = [...existingCadPoints, ...(data.cadPoints || [])];
+
+          const evaluatedDevices = newDevices.map(device => {
+            const result = evaluateDevice(device, newCadPoints, params, newDevices);
+            return {
+              ...device,
+              status: result.status,
+              score: result.score,
+              reasons: result.reasons,
+            };
+          });
+          const conflicts = detectConflicts(evaluatedDevices, newCadPoints, params);
+
+          const allFloors = [...new Set([...evaluatedDevices.map(d => d.floor), ...newCadPoints.map(c => c.floor)])];
+          const defaultFloor = allFloors.sort()[0] || 'B1';
+
+          set({
+            devices: evaluatedDevices,
+            cadPoints: newCadPoints,
+            conflicts,
+            view: { ...defaultView, currentFloor: defaultFloor },
+            project: { ...get().project, updatedAt: new Date().toISOString() },
+          });
+        },
+
+        clearAll: () => {
+          set({
+            devices: [],
+            cadPoints: [],
+            conflicts: [],
+            decisions: [],
+            view: { ...defaultView, currentFloor: 'B1' },
+            project: { ...sampleProject, updatedAt: new Date().toISOString() },
           });
         },
 
@@ -71,7 +113,7 @@ export const useAppStore = create<AppStore>()(
           set((state) => {
             const updatedParams = { ...state.params, ...newParams };
             const evaluatedDevices = state.devices.map(device => {
-              const result = evaluateDevice(device, state.cadPoints, updatedParams);
+              const result = evaluateDevice(device, state.cadPoints, updatedParams, state.devices);
               return {
                 ...device,
                 status: result.status,
@@ -139,7 +181,7 @@ export const useAppStore = create<AppStore>()(
         recalculateAll: () => {
           const { devices, cadPoints, params } = get();
           const evaluatedDevices = devices.map(device => {
-            const result = evaluateDevice(device, cadPoints, params);
+            const result = evaluateDevice(device, cadPoints, params, devices);
             return {
               ...device,
               status: result.status,
