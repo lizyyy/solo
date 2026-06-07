@@ -250,9 +250,8 @@ src/
 │   └── useAppStore.ts
 ├── types/             # TypeScript 类型
 ├── utils/             # 工具函数
-│   ├── guidance.ts    # 诱导模型评分算法
-│   ├── import.ts      # 文件导入解析
-│   └── export.ts    # 报告生成
+│   ├── guidance.ts    # 诱导模型评分算法 & 报告生成
+│   └── import.ts      # 文件导入解析
 ├── data/              # 样例数据
 └── App.tsx           # 路由配置
 ```
