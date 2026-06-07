@@ -1,0 +1,25 @@
+{
+  "slice_id": "eval_slice_old_caliber_feb",
+  "slice_name": "2月旧口径回补样本",
+  "created_at": "2024-03-20T10:00:00",
+  "raw_remark": "林姐备注：这是2月份按旧口径定义的欺诈样本，3月15号我们调整了label口径（把疑似欺诈也算成正例了），这批是后来从历史数据里回捞出来的。注意：这批数据的label是旧口径，和现在训练用的新口径不一致，不能直接混进训练集。但评测的时候可以单独拉出来看，对比新旧口径下模型的表现差异。2024-03-21 补充：刚才跟张老板对齐过，这批数据先不进训练，先放评测切片里观察两周，看看新模型在旧口径上的退化情况。",
+  "tags": ["旧口径", "回补数据", "观察期"],
+  "data_points": [
+    {
+      "sample_id": "oldcal_001",
+      "txn_time": "2024-02-15T09:30:00",
+      "amount": 5600.00,
+      "is_fraud_old_caliber": 1,
+      "is_fraud_new_caliber": 0,
+      "remark": "旧口径算欺诈，新口径下调为疑似，不计入正例"
+    },
+    {
+      "sample_id": "oldcal_002",
+      "txn_time": "2024-02-20T16:45:00",
+      "amount": 12000.00,
+      "is_fraud_old_caliber": 1,
+      "is_fraud_new_caliber": 1,
+      "remark": "新旧口径都算欺诈，没问题"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+# 增量训练参数 v1.0
+# 林姐 2024-03-15 初版，测试窗口前移方案
+
+model:
+  name: xgboost_incremental_v3
+  objective: binary:logistic
+  max_depth: 7
+  learning_rate: 0.08
+  n_estimators: 250
+
+data:
+  training_window:
+    start: "2024-01-01"
+    end: "2024-02-28"
+  eval_window:
+    start: "2024-03-01"
+    end: "2024-03-10"
+  label_column: is_fraud
+  feature_columns:
+    - amount_log
+    - hour_of_day
+    - day_of_week
+    - merchant_risk_score
+    - user_history_7d
+
+training:
+  early_stopping_rounds: 30
+  eval_metric: auc
+  random_seed: 42
+
+notes: >
+  本次尝试缩短训练窗口到2个月，之前用3个月。
+  评测窗口用3月上旬，注意避开3月8号大促数据（已单独切片）。
+  预计AUC能到0.89，上一版是0.875。
