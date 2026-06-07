@@ -1,0 +1,362 @@
+{
+  "track_4083eef6": {
+    "track_id": "track_4083eef6",
+    "snapshot_id": "snap_20260601_001",
+    "feature_snapshot": {
+      "snapshot_id": "snap_20260601_001",
+      "version": "v2.3.1",
+      "create_time": "2026-06-01T16:57:49.778330",
+      "weight_threshold": 0.65,
+      "weight_threshold_version": "caliber_2026_q2",
+      "features": {
+        "user_activeness": 0.82,
+        "item_quality": 0.75,
+        "context_relevance": 0.68
+      },
+      "source": "feature_platform_daily"
+    },
+    "training_log": {
+      "log_id": "log_20260601_001",
+      "snapshot_id": "snap_20260601_001",
+      "train_time": "2026-06-01T16:57:49.778343",
+      "metric_name": "weight_curve",
+      "metric_values": [
+        0.45,
+        0.52,
+        0.58,
+        0.62,
+        0.65,
+        0.65,
+        0.65
+      ],
+      "epochs": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "final_weight": 0.65,
+      "weight_caliber": "caliber_2026_q2",
+      "remarks": ""
+    },
+    "status": "normal",
+    "stratified_metrics": [
+      {
+        "metric_name": "sample_weight",
+        "segment": "high_value_users",
+        "value": 0.72,
+        "confidence": 0.95,
+        "caliber": "caliber_2026_q2",
+        "update_time": "2026-06-07T16:57:49.778346",
+        "source": "feature_snapshot"
+      },
+      {
+        "metric_name": "sample_weight",
+        "segment": "mid_value_users",
+        "value": 0.61,
+        "confidence": 0.92,
+        "caliber": "caliber_2026_q2",
+        "update_time": "2026-06-07T16:57:49.778348",
+        "source": "feature_snapshot"
+      },
+      {
+        "metric_name": "sample_weight",
+        "segment": "low_value_users",
+        "value": 0.48,
+        "confidence": 0.88,
+        "caliber": "caliber_2026_q2",
+        "update_time": "2026-06-07T16:57:49.778349",
+        "source": "feature_snapshot"
+      }
+    ],
+    "history": [
+      {
+        "step": "step1_import_snapshot",
+        "action": "导入特征快照",
+        "operator": "data_engineer",
+        "detail": "导入特征快照 snap_20260601_001 (版本 v2.3.1)，阈值版本 caliber_2026_q2",
+        "time": "2026-06-07T16:57:49.778405"
+      },
+      {
+        "step": "step2_check_training_log",
+        "action": "补看训练日志曲线",
+        "operator": "推荐策略老唐",
+        "detail": "关联训练日志 log_20260601_001，权重口径 caliber_2026_q2",
+        "time": "2026-06-07T16:57:49.778593"
+      },
+      {
+        "step": "step3_update_stratified_metrics",
+        "action": "更新分层指标",
+        "operator": "system",
+        "detail": "更新 3 条分层指标，口径：caliber_2026_q2",
+        "time": "2026-06-07T16:57:49.778723"
+      }
+    ],
+    "conflicts": [],
+    "review_decision": "pending",
+    "reviewer": null,
+    "review_time": null,
+    "review_comment": "",
+    "create_time": "2026-06-07T16:57:49.778403",
+    "update_time": "2026-06-07T16:57:49.778727"
+  },
+  "track_ffd0ab90": {
+    "track_id": "track_ffd0ab90",
+    "snapshot_id": "snap_20260603_002",
+    "feature_snapshot": {
+      "snapshot_id": "snap_20260603_002",
+      "version": "v2.3.1",
+      "create_time": "2026-06-03T16:57:49.779159",
+      "weight_threshold": 0.7,
+      "weight_threshold_version": "caliber_2026_q2_v2",
+      "features": {
+        "user_activeness": 0.78,
+        "item_quality": 0.72,
+        "context_relevance": 0.7
+      },
+      "source": "feature_platform_daily"
+    },
+    "training_log": {
+      "log_id": "log_20260603_002",
+      "snapshot_id": "snap_20260603_002",
+      "train_time": "2026-06-03T16:57:49.779162",
+      "metric_name": "weight_curve",
+      "metric_values": [
+        0.48,
+        0.55,
+        0.6,
+        0.65,
+        0.7,
+        0.7,
+        0.7
+      ],
+      "epochs": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "final_weight": 0.7,
+      "weight_caliber": "caliber_2026_q2",
+      "remarks": "阈值已更新但报告未同步，当天早上紧急调整阈值，报告脚本未更新版本号"
+    },
+    "status": "threshold_changed_report_old",
+    "stratified_metrics": [
+      {
+        "metric_name": "sample_weight",
+        "segment": "high_value_users",
+        "value": 0.76,
+        "confidence": 0.94,
+        "caliber": "caliber_2026_q2_v2",
+        "update_time": "2026-06-07T16:57:49.779164",
+        "source": "feature_snapshot"
+      },
+      {
+        "metric_name": "sample_weight",
+        "segment": "mid_value_users",
+        "value": 0.67,
+        "confidence": 0.91,
+        "caliber": "caliber_2026_q2_v2",
+        "update_time": "2026-06-07T16:57:49.779165",
+        "source": "feature_snapshot"
+      },
+      {
+        "metric_name": "sample_weight",
+        "segment": "low_value_users",
+        "value": 0.52,
+        "confidence": 0.87,
+        "caliber": "caliber_2026_q2_v2",
+        "update_time": "2026-06-07T16:57:49.779165",
+        "source": "feature_snapshot"
+      }
+    ],
+    "history": [
+      {
+        "step": "step1_import_snapshot",
+        "action": "导入特征快照",
+        "operator": "data_engineer",
+        "detail": "导入特征快照 snap_20260603_002 (版本 v2.3.1)，阈值版本 caliber_2026_q2_v2",
+        "time": "2026-06-07T16:57:49.779178"
+      },
+      {
+        "step": "step2_check_training_log",
+        "action": "补看训练日志曲线",
+        "operator": "推荐策略老唐",
+        "detail": "关联训练日志 log_20260603_002，权重口径 caliber_2026_q2",
+        "time": "2026-06-07T16:57:49.779360"
+      },
+      {
+        "step": "step2_check_training_log",
+        "action": "检测到冲突，待人工确认",
+        "operator": "推荐策略老唐",
+        "detail": "发现 2 处冲突，请推荐策略老唐确认或驳回",
+        "time": "2026-06-07T16:57:49.779373"
+      },
+      {
+        "step": "conflict_resolution",
+        "action": "确认阈值改报告旧值状态",
+        "operator": "数据科学家A",
+        "detail": "数据科学家确认：阈值改过但报告仍写旧值，留档待复核。备注：确认阈值版本不匹配为报告同步延迟导致",
+        "time": "2026-06-07T16:57:49.779601"
+      },
+      {
+        "step": "step3_update_stratified_metrics",
+        "action": "更新分层指标",
+        "operator": "system",
+        "detail": "更新 3 条分层指标，口径：caliber_2026_q2_v2",
+        "time": "2026-06-07T16:57:49.779801"
+      }
+    ],
+    "conflicts": [
+      {
+        "field": "weight_caliber",
+        "snapshot_value": "caliber_2026_q2_v2",
+        "log_value": "caliber_2026_q2",
+        "description": "特征快照的阈值版本与训练日志的权重口径不一致"
+      },
+      {
+        "field": "threshold_remark",
+        "snapshot_value": "caliber_2026_q2_v2",
+        "log_value": "阈值已更新但报告未同步，当天早上紧急调整阈值，报告脚本未更新版本号",
+        "description": "训练日志备注表明阈值已更新但报告未同步"
+      }
+    ],
+    "review_decision": "confirm",
+    "reviewer": "数据科学家A",
+    "review_time": "2026-06-07T16:57:49.779600",
+    "review_comment": "确认阈值版本不匹配为报告同步延迟导致",
+    "create_time": "2026-06-07T16:57:49.779176",
+    "update_time": "2026-06-07T16:57:49.779803"
+  },
+  "track_5f156a36": {
+    "track_id": "track_5f156a36",
+    "snapshot_id": "snap_20260525_003",
+    "feature_snapshot": {
+      "snapshot_id": "snap_20260525_003",
+      "version": "v2.3.0",
+      "create_time": "2026-05-25T16:57:49.780180",
+      "weight_threshold": 0.6,
+      "weight_threshold_version": "caliber_2026_q1",
+      "features": {
+        "user_activeness": 0.75,
+        "item_quality": 0.7,
+        "context_relevance": 0.62
+      },
+      "source": "feature_platform_daily"
+    },
+    "training_log": {
+      "log_id": "log_20260525_003",
+      "snapshot_id": "snap_20260525_003",
+      "train_time": "2026-05-25T16:57:49.780184",
+      "metric_name": "weight_curve",
+      "metric_values": [
+        0.42,
+        0.48,
+        0.53,
+        0.57,
+        0.6,
+        0.6,
+        0.6
+      ],
+      "epochs": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "final_weight": 0.6,
+      "weight_caliber": "caliber_2026_q1",
+      "remarks": "从历史训练曲线补录，原特征快照丢失，从TensorBoard日志回溯"
+    },
+    "status": "from_training_log",
+    "stratified_metrics": [
+      {
+        "metric_name": "sample_weight",
+        "segment": "high_value_users",
+        "value": 0.68,
+        "confidence": 0.9,
+        "caliber": "caliber_2026_q1",
+        "update_time": "2026-06-07T16:57:49.780185",
+        "source": "training_log_backfill"
+      },
+      {
+        "metric_name": "sample_weight",
+        "segment": "mid_value_users",
+        "value": 0.58,
+        "confidence": 0.87,
+        "caliber": "caliber_2026_q1",
+        "update_time": "2026-06-07T16:57:49.780186",
+        "source": "training_log_backfill"
+      },
+      {
+        "metric_name": "sample_weight",
+        "segment": "low_value_users",
+        "value": 0.45,
+        "confidence": 0.82,
+        "caliber": "caliber_2026_q1",
+        "update_time": "2026-06-07T16:57:49.780187",
+        "source": "training_log_backfill"
+      }
+    ],
+    "history": [
+      {
+        "step": "step1_import_snapshot",
+        "action": "导入特征快照",
+        "operator": "data_engineer",
+        "detail": "导入特征快照 snap_20260525_003 (版本 v2.3.0)，阈值版本 caliber_2026_q1",
+        "time": "2026-06-07T16:57:49.780200"
+      },
+      {
+        "step": "step2_check_training_log",
+        "action": "补看训练日志曲线",
+        "operator": "推荐策略老唐",
+        "detail": "关联训练日志 log_20260525_003，权重口径 caliber_2026_q1",
+        "time": "2026-06-07T16:57:49.780448"
+      },
+      {
+        "step": "step2_check_training_log",
+        "action": "检测到冲突，待人工确认",
+        "operator": "推荐策略老唐",
+        "detail": "发现 1 处冲突，请推荐策略老唐确认或驳回",
+        "time": "2026-06-07T16:57:49.780463"
+      },
+      {
+        "step": "conflict_resolution",
+        "action": "确认从训练日志补录",
+        "operator": "数据科学家B",
+        "detail": "数据科学家确认：从训练日志曲线补录的旧口径数据。备注：确认从TensorBoard回溯补录，口径与当时一致",
+        "time": "2026-06-07T16:57:49.780771"
+      },
+      {
+        "step": "step3_update_stratified_metrics",
+        "action": "更新分层指标",
+        "operator": "system",
+        "detail": "更新 3 条分层指标，口径：caliber_2026_q1",
+        "time": "2026-06-07T16:57:49.781029"
+      }
+    ],
+    "conflicts": [
+      {
+        "field": "data_source",
+        "snapshot_value": "特征快照导入",
+        "log_value": "从历史训练曲线补录",
+        "description": "该条记录为从训练日志曲线补录的旧口径数据"
+      }
+    ],
+    "review_decision": "confirm",
+    "reviewer": "数据科学家B",
+    "review_time": "2026-06-07T16:57:49.780769",
+    "review_comment": "确认从TensorBoard回溯补录，口径与当时一致",
+    "create_time": "2026-06-07T16:57:49.780199",
+    "update_time": "2026-06-07T16:57:49.781031"
+  }
+}
