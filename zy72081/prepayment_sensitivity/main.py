@@ -11,6 +11,7 @@ from src import (
     ConflictDetector,
     HistoryManager,
     ReportGenerator,
+    Exporter,
     RunHistory,
     generate_id,
 )
@@ -38,12 +39,14 @@ def main():
     conflict_detector = ConflictDetector(tolerance_pct=5.0)
     history_manager = HistoryManager(data_dir)
     report_generator = ReportGenerator(output_dir)
+    exporter = Exporter(output_dir)
 
     print("   ✅ 参数管理器")
     print("   ✅ 异常检测器")
     print("   ✅ 冲突检测器")
     print("   ✅ 历史记录管理器")
     print("   ✅ 报告生成器")
+    print("   ✅ 数据导出器")
     print()
 
     print("⚙️  检查参数版本...")
@@ -203,6 +206,17 @@ def main():
         history_summary,
     )
     print(f"   ✅ 报告已生成: {report_path}")
+
+    print("\n📤 导出数据文件（可复查）...")
+    export_files = exporter.export_all(
+        merged_results,
+        merged_conflicts,
+        run_id,
+        anomaly_summary,
+        conflict_summary,
+    )
+    for key, filepath in export_files.items():
+        print(f"   ✅ {key}: {os.path.basename(filepath)}")
 
     print("\n" + "=" * 60)
     print("✅ 贷款提前还款敏感性分析完成！")

@@ -39,6 +39,7 @@ class HistoryManager:
         anomalies = [AnomalyFlag(**a) for a in data["anomalies"]]
         return SensitivityResult(
             sample_id=data["sample_id"],
+            loan_id=data.get("loan_id", ""),
             sensitivity_score=data["sensitivity_score"],
             risk_level=data["risk_level"],
             calculation_steps=steps,
@@ -46,7 +47,10 @@ class HistoryManager:
             parameter_version_id=data["parameter_version_id"],
             anomalies=anomalies,
             needs_manual_review=data["needs_manual_review"],
+            review_status=data.get("review_status", "pending" if data.get("needs_manual_review") else "not_applicable"),
             review_note=data.get("review_note", ""),
+            reviewed_by=data.get("reviewed_by", ""),
+            reviewed_at=data.get("reviewed_at", ""),
             calculated_at=data["calculated_at"],
         )
 
@@ -79,9 +83,13 @@ class HistoryManager:
             if result.needs_manual_review:
                 pending.append({
                     "sample_id": result.sample_id,
+                    "loan_id": result.loan_id,
                     "run_id": run_history.run_id,
                     "status": "pending",
                     "review_note": result.review_note,
+                    "review_status": result.review_status,
+                    "reviewed_by": result.reviewed_by,
+                    "reviewed_at": result.reviewed_at,
                     "created_at": result.calculated_at,
                 })
 
@@ -169,27 +177,57 @@ class HistoryManager:
             versions.add(h["parameter_version_id"])
         return sorted(list(versions))
 
+    def get_previous_results_by_loan(self) -> Dict[str, SensitivityResult]:
+        history = self._load_json(self.history_file)
+        results_by_loan = {}
+        for h in reversed(history):
+            for r in h["results"]:
+                loan_id = r.get("loan_id", "")
+                if loan_id and loan_id not in results_by_loan:
+                    results_by_loan[loan_id] = self._dict_to_result(r)
+        return results_by_loan
+
+    def get_previous_conflicts_by_loan_field(self) -> Dict[str, DataConflict]:
+        history = self._load_json(self.history_file)
+        conflicts_by_key = {}
+        for h in reversed(history):
+            for c in h["conflicts"]:
+                key = f"{c['loan_id']}_{c['field_name']}"
+                if key not in conflicts_by_key:
+                    conflicts_by_key[key] = self._dict_to_conflict(c)
+        return conflicts_by_key
+
     def merge_with_previous_results(
         self,
         new_results: List[SensitivityResult],
         new_conflicts: List[DataConflict],
     ) -> tuple:
-        prev_results = self.get_previous_results()
-        prev_conflicts = self.get_previous_conflicts()
+        prev_results_by_loan = self.get_previous_results_by_loan()
+        prev_conflicts_by_key = self.get_previous_conflicts_by_loan_field()
 
         merged_results = []
         for r in new_results:
-            if r.sample_id in prev_results and not r.review_note:
-                prev_r = prev_results[r.sample_id]
-                r.review_note = prev_r.review_note
+            if r.loan_id and r.loan_id in prev_results_by_loan:
+                prev_r = prev_results_by_loan[r.loan_id]
+                if prev_r.review_note:
+                    r.review_note = prev_r.review_note
+                if prev_r.review_status and prev_r.review_status != "pending":
+                    r.review_status = prev_r.review_status
+                if prev_r.reviewed_by:
+                    r.reviewed_by = prev_r.reviewed_by
+                if prev_r.reviewed_at:
+                    r.reviewed_at = prev_r.reviewed_at
             merged_results.append(r)
 
         merged_conflicts = []
         for c in new_conflicts:
-            if c.conflict_id in prev_conflicts:
-                prev_c = prev_conflicts[c.conflict_id]
-                c.resolved = prev_c.resolved
-                c.resolution_note = prev_c.resolution_note
+            key = f"{c.loan_id}_{c.field_name}"
+            if key in prev_conflicts_by_key:
+                prev_c = prev_conflicts_by_key[key]
+                if prev_c.resolved:
+                    c.resolved = prev_c.resolved
+                if prev_c.resolution_note:
+                    c.resolution_note = prev_c.resolution_note
             merged_conflicts.append(c)
 
         return merged_results, merged_conflicts

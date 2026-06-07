@@ -83,6 +83,7 @@ class CalculationStep:
 @dataclass
 class SensitivityResult:
     sample_id: str
+    loan_id: str
     sensitivity_score: float
     risk_level: str
     calculation_steps: List[CalculationStep]
@@ -90,12 +91,16 @@ class SensitivityResult:
     parameter_version_id: str
     anomalies: List[AnomalyFlag]
     needs_manual_review: bool
+    review_status: str = "pending"
     review_note: str = ""
+    reviewed_by: str = ""
+    reviewed_at: str = ""
     calculated_at: str = field(default_factory=lambda: datetime.now().isoformat())
 
     def to_dict(self) -> Dict:
         return {
             "sample_id": self.sample_id,
+            "loan_id": self.loan_id,
             "sensitivity_score": self.sensitivity_score,
             "risk_level": self.risk_level,
             "calculation_steps": [s.to_dict() for s in self.calculation_steps],
@@ -103,7 +108,10 @@ class SensitivityResult:
             "parameter_version_id": self.parameter_version_id,
             "anomalies": [a.to_dict() for a in self.anomalies],
             "needs_manual_review": self.needs_manual_review,
+            "review_status": self.review_status,
             "review_note": self.review_note,
+            "reviewed_by": self.reviewed_by,
+            "reviewed_at": self.reviewed_at,
             "calculated_at": self.calculated_at,
         }
 

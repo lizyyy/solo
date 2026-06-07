@@ -16,6 +16,7 @@ from .anomaly_detector import AnomalyDetector
 from .conflict_detector import ConflictDetector
 from .history_manager import HistoryManager
 from .report_generator import ReportGenerator
+from .exporter import Exporter
 
 __all__ = [
     "Parameter",
@@ -34,4 +35,5 @@ __all__ = [
     "ConflictDetector",
     "HistoryManager",
     "ReportGenerator",
+    "Exporter",
 ]

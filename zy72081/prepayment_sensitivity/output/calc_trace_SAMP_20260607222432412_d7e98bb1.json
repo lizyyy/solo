@@ -1,0 +1,199 @@
+{
+  "sample_id": "SAMP_20260607222432412_d7e98bb1",
+  "final_score": 0.2192,
+  "risk_level": "low",
+  "parameter_version": "PARAM_20260601225945522",
+  "calculation_steps": [
+    {
+      "step_name": "rate_component",
+      "formula": "normalized_rate * rate_sensitivity_value",
+      "input_values": {
+        "raw_rate": 18.5,
+        "normalized_rate": 1.0
+      },
+      "parameter_used": {
+        "rate_sensitivity_value": 0.4
+      },
+      "result": 0.4
+    },
+    {
+      "step_name": "rate_weighted",
+      "formula": "rate_component_score * rate_sensitivity_weight",
+      "input_values": {
+        "rate_component_score": 0.4
+      },
+      "parameter_used": {
+        "rate_sensitivity_weight": 0.35
+      },
+      "result": 0.14
+    },
+    {
+      "step_name": "term_component",
+      "formula": "normalized_term * term_sensitivity_value",
+      "input_values": {
+        "raw_term": 480,
+        "normalized_term": 0.0
+      },
+      "parameter_used": {
+        "term_sensitivity_value": 0.25
+      },
+      "result": 0.0
+    },
+    {
+      "step_name": "term_weighted",
+      "formula": "term_component_score * term_sensitivity_weight",
+      "input_values": {
+        "term_component_score": 0.0
+      },
+      "parameter_used": {
+        "term_sensitivity_weight": 0.2
+      },
+      "result": 0.0
+    },
+    {
+      "step_name": "fico_component",
+      "formula": "normalized_fico * fico_sensitivity_value",
+      "input_values": {
+        "raw_fico": 250,
+        "normalized_fico": 1.0
+      },
+      "parameter_used": {
+        "fico_sensitivity_value": 0.25
+      },
+      "result": 0.25
+    },
+    {
+      "step_name": "fico_weighted",
+      "formula": "fico_component_score * fico_sensitivity_weight",
+      "input_values": {
+        "fico_component_score": 0.25
+      },
+      "parameter_used": {
+        "fico_sensitivity_weight": 0.2
+      },
+      "result": 0.05
+    },
+    {
+      "step_name": "dti_component",
+      "formula": "normalized_dti * dti_sensitivity_value",
+      "input_values": {
+        "raw_dti": 95.0,
+        "normalized_dti": 1.0
+      },
+      "parameter_used": {
+        "dti_sensitivity_value": 0.15
+      },
+      "result": 0.15
+    },
+    {
+      "step_name": "dti_weighted",
+      "formula": "dti_component_score * dti_sensitivity_weight",
+      "input_values": {
+        "dti_component_score": 0.15
+      },
+      "parameter_used": {
+        "dti_sensitivity_weight": 0.15
+      },
+      "result": 0.0225
+    },
+    {
+      "step_name": "ltv_component",
+      "formula": "normalized_ltv * ltv_sensitivity_value",
+      "input_values": {
+        "raw_ltv": 140.0,
+        "normalized_ltv": 1.0
+      },
+      "parameter_used": {
+        "ltv_sensitivity_value": 0.1
+      },
+      "result": 0.1
+    },
+    {
+      "step_name": "ltv_weighted",
+      "formula": "ltv_component_score * ltv_sensitivity_weight",
+      "input_values": {
+        "ltv_component_score": 0.1
+      },
+      "parameter_used": {
+        "ltv_sensitivity_weight": 0.1
+      },
+      "result": 0.01
+    },
+    {
+      "step_name": "age_component",
+      "formula": "normalized_age * age_sensitivity_value",
+      "input_values": {
+        "raw_age": 152,
+        "normalized_age": 0.7
+      },
+      "parameter_used": {
+        "age_sensitivity_value": 0.15
+      },
+      "result": 0.105
+    },
+    {
+      "step_name": "age_weighted",
+      "formula": "age_component_score * age_sensitivity_weight",
+      "input_values": {
+        "age_component_score": 0.105
+      },
+      "parameter_used": {
+        "age_sensitivity_weight": 0.1
+      },
+      "result": 0.0105
+    },
+    {
+      "step_name": "history_component",
+      "formula": "normalized_history * history_sensitivity_value",
+      "input_values": {
+        "raw_history": true,
+        "normalized_history": 1.0
+      },
+      "parameter_used": {
+        "history_sensitivity_value": 0.3
+      },
+      "result": 0.3
+    },
+    {
+      "step_name": "history_weighted",
+      "formula": "history_component_score * history_sensitivity_weight",
+      "input_values": {
+        "history_component_score": 0.3
+      },
+      "parameter_used": {
+        "history_sensitivity_weight": 0.1
+      },
+      "result": 0.03
+    },
+    {
+      "step_name": "final_aggregation",
+      "formula": "sum(weighted_scores) / total_weight",
+      "input_values": {
+        "rate_weighted": 0.14,
+        "term_weighted": 0.0,
+        "fico_weighted": 0.05,
+        "dti_weighted": 0.0225,
+        "ltv_weighted": 0.01,
+        "age_weighted": 0.0105,
+        "history_weighted": 0.03,
+        "total_weight": 1.2
+      },
+      "parameter_used": {},
+      "result": 0.2192
+    },
+    {
+      "step_name": "risk_level_determination",
+      "formula": "if score >= high_threshold: 'high' elif score >= medium_threshold: 'medium' else 'low'",
+      "input_values": {
+        "final_score": 0.2192,
+        "high_threshold": 0.7,
+        "medium_threshold": 0.4
+      },
+      "parameter_used": {
+        "high_risk_threshold_value": 0.7,
+        "medium_risk_threshold_value": 0.4
+      },
+      "result": 0.0
+    }
+  ]
+}

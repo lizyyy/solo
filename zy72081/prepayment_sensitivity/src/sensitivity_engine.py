@@ -164,6 +164,7 @@ class SensitivityEngine:
 
         return SensitivityResult(
             sample_id=sample.sample_id,
+            loan_id=sample.loan_id,
             sensitivity_score=round(raw_score, 4),
             risk_level=risk_level,
             calculation_steps=steps,
@@ -171,6 +172,7 @@ class SensitivityEngine:
             parameter_version_id=self.parameter_version_id,
             anomalies=anomalies,
             needs_manual_review=needs_manual_review,
+            review_status="pending" if needs_manual_review else "not_applicable",
         )
 
     def calculate_batch(

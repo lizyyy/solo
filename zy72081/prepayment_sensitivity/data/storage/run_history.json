@@ -1571,5 +1571,3199 @@
       }
     ],
     "status": "completed"
+  },
+  {
+    "run_id": "RUN_20260607222337262",
+    "timestamp": "2026-06-07T22:23:37.262672",
+    "parameter_version_id": "PARAM_20260601225945522",
+    "sample_count": 6,
+    "anomaly_count": 16,
+    "conflict_count": 7,
+    "manual_review_count": 2,
+    "results": [
+      {
+        "sample_id": "SAMP_20260607222337259_2b18a796",
+        "loan_id": "LOAN-001",
+        "sensitivity_score": 0.0933,
+        "risk_level": "low",
+        "calculation_steps": [
+          {
+            "step_name": "rate_component",
+            "input_values": {
+              "raw_rate": 4.25,
+              "normalized_rate": 0.425
+            },
+            "formula": "normalized_rate * rate_sensitivity_value",
+            "result": 0.17,
+            "parameter_used": {
+              "rate_sensitivity_value": 0.4
+            }
+          },
+          {
+            "step_name": "rate_weighted",
+            "input_values": {
+              "rate_component_score": 0.17
+            },
+            "formula": "rate_component_score * rate_sensitivity_weight",
+            "result": 0.0595,
+            "parameter_used": {
+              "rate_sensitivity_weight": 0.35
+            }
+          },
+          {
+            "step_name": "term_component",
+            "input_values": {
+              "raw_term": 240,
+              "normalized_term": 0.3333
+            },
+            "formula": "normalized_term * term_sensitivity_value",
+            "result": 0.0833,
+            "parameter_used": {
+              "term_sensitivity_value": 0.25
+            }
+          },
+          {
+            "step_name": "term_weighted",
+            "input_values": {
+              "term_component_score": 0.0833
+            },
+            "formula": "term_component_score * term_sensitivity_weight",
+            "result": 0.0167,
+            "parameter_used": {
+              "term_sensitivity_weight": 0.2
+            }
+          },
+          {
+            "step_name": "fico_component",
+            "input_values": {
+              "raw_fico": 720,
+              "normalized_fico": 0.2364
+            },
+            "formula": "normalized_fico * fico_sensitivity_value",
+            "result": 0.0591,
+            "parameter_used": {
+              "fico_sensitivity_value": 0.25
+            }
+          },
+          {
+            "step_name": "fico_weighted",
+            "input_values": {
+              "fico_component_score": 0.0591
+            },
+            "formula": "fico_component_score * fico_sensitivity_weight",
+            "result": 0.0118,
+            "parameter_used": {
+              "fico_sensitivity_weight": 0.2
+            }
+          },
+          {
+            "step_name": "dti_component",
+            "input_values": {
+              "raw_dti": 32.0,
+              "normalized_dti": 0.5333
+            },
+            "formula": "normalized_dti * dti_sensitivity_value",
+            "result": 0.08,
+            "parameter_used": {
+              "dti_sensitivity_value": 0.15
+            }
+          },
+          {
+            "step_name": "dti_weighted",
+            "input_values": {
+              "dti_component_score": 0.08
+            },
+            "formula": "dti_component_score * dti_sensitivity_weight",
+            "result": 0.012,
+            "parameter_used": {
+              "dti_sensitivity_weight": 0.15
+            }
+          },
+          {
+            "step_name": "ltv_component",
+            "input_values": {
+              "raw_ltv": 75.0,
+              "normalized_ltv": 0.75
+            },
+            "formula": "normalized_ltv * ltv_sensitivity_value",
+            "result": 0.075,
+            "parameter_used": {
+              "ltv_sensitivity_value": 0.1
+            }
+          },
+          {
+            "step_name": "ltv_weighted",
+            "input_values": {
+              "ltv_component_score": 0.075
+            },
+            "formula": "ltv_component_score * ltv_sensitivity_weight",
+            "result": 0.0075,
+            "parameter_used": {
+              "ltv_sensitivity_weight": 0.1
+            }
+          },
+          {
+            "step_name": "age_component",
+            "input_values": {
+              "raw_age": 38,
+              "normalized_age": 0.3
+            },
+            "formula": "normalized_age * age_sensitivity_value",
+            "result": 0.045,
+            "parameter_used": {
+              "age_sensitivity_value": 0.15
+            }
+          },
+          {
+            "step_name": "age_weighted",
+            "input_values": {
+              "age_component_score": 0.045
+            },
+            "formula": "age_component_score * age_sensitivity_weight",
+            "result": 0.0045,
+            "parameter_used": {
+              "age_sensitivity_weight": 0.1
+            }
+          },
+          {
+            "step_name": "history_component",
+            "input_values": {
+              "raw_history": false,
+              "normalized_history": 0.0
+            },
+            "formula": "normalized_history * history_sensitivity_value",
+            "result": 0.0,
+            "parameter_used": {
+              "history_sensitivity_value": 0.3
+            }
+          },
+          {
+            "step_name": "history_weighted",
+            "input_values": {
+              "history_component_score": 0.0
+            },
+            "formula": "history_component_score * history_sensitivity_weight",
+            "result": 0.0,
+            "parameter_used": {
+              "history_sensitivity_weight": 0.1
+            }
+          },
+          {
+            "step_name": "final_aggregation",
+            "input_values": {
+              "rate_weighted": 0.0595,
+              "term_weighted": 0.0167,
+              "fico_weighted": 0.0118,
+              "dti_weighted": 0.012,
+              "ltv_weighted": 0.0075,
+              "age_weighted": 0.0045,
+              "history_weighted": 0.0,
+              "total_weight": 1.2
+            },
+            "formula": "sum(weighted_scores) / total_weight",
+            "result": 0.0933,
+            "parameter_used": {}
+          },
+          {
+            "step_name": "risk_level_determination",
+            "input_values": {
+              "final_score": 0.0933,
+              "high_threshold": 0.7,
+              "medium_threshold": 0.4
+            },
+            "formula": "if score >= high_threshold: 'high' elif score >= medium_threshold: 'medium' else 'low'",
+            "result": 0.0,
+            "parameter_used": {
+              "high_risk_threshold_value": 0.7,
+              "medium_risk_threshold_value": 0.4
+            }
+          }
+        ],
+        "parameters_used": {
+          "rate_sensitivity_value": 0.4,
+          "rate_sensitivity_weight": 0.35,
+          "term_sensitivity_value": 0.25,
+          "term_sensitivity_weight": 0.2,
+          "fico_sensitivity_value": 0.25,
+          "fico_sensitivity_weight": 0.2,
+          "dti_sensitivity_value": 0.15,
+          "dti_sensitivity_weight": 0.15,
+          "ltv_sensitivity_value": 0.1,
+          "ltv_sensitivity_weight": 0.1,
+          "history_sensitivity_value": 0.3,
+          "history_sensitivity_weight": 0.1,
+          "age_sensitivity_value": 0.15,
+          "age_sensitivity_weight": 0.1,
+          "high_risk_threshold_value": 0.7,
+          "high_risk_threshold_weight": 0.0,
+          "medium_risk_threshold_value": 0.4,
+          "medium_risk_threshold_weight": 0.0
+        },
+        "parameter_version_id": "PARAM_20260601225945522",
+        "anomalies": [],
+        "needs_manual_review": false,
+        "review_status": "not_applicable",
+        "review_note": "",
+        "reviewed_by": "",
+        "reviewed_at": "",
+        "calculated_at": "2026-06-07T22:23:37.260326"
+      },
+      {
+        "sample_id": "SAMP_20260607222337259_d7e98bb1",
+        "loan_id": "LOAN-002",
+        "sensitivity_score": 0.2192,
+        "risk_level": "low",
+        "calculation_steps": [
+          {
+            "step_name": "rate_component",
+            "input_values": {
+              "raw_rate": 18.5,
+              "normalized_rate": 1.0
+            },
+            "formula": "normalized_rate * rate_sensitivity_value",
+            "result": 0.4,
+            "parameter_used": {
+              "rate_sensitivity_value": 0.4
+            }
+          },
+          {
+            "step_name": "rate_weighted",
+            "input_values": {
+              "rate_component_score": 0.4
+            },
+            "formula": "rate_component_score * rate_sensitivity_weight",
+            "result": 0.14,
+            "parameter_used": {
+              "rate_sensitivity_weight": 0.35
+            }
+          },
+          {
+            "step_name": "term_component",
+            "input_values": {
+              "raw_term": 480,
+              "normalized_term": 0.0
+            },
+            "formula": "normalized_term * term_sensitivity_value",
+            "result": 0.0,
+            "parameter_used": {
+              "term_sensitivity_value": 0.25
+            }
+          },
+          {
+            "step_name": "term_weighted",
+            "input_values": {
+              "term_component_score": 0.0
+            },
+            "formula": "term_component_score * term_sensitivity_weight",
+            "result": 0.0,
+            "parameter_used": {
+              "term_sensitivity_weight": 0.2
+            }
+          },
+          {
+            "step_name": "fico_component",
+            "input_values": {
+              "raw_fico": 250,
+              "normalized_fico": 1.0
+            },
+            "formula": "normalized_fico * fico_sensitivity_value",
+            "result": 0.25,
+            "parameter_used": {
+              "fico_sensitivity_value": 0.25
+            }
+          },
+          {
+            "step_name": "fico_weighted",
+            "input_values": {
+              "fico_component_score": 0.25
+            },
+            "formula": "fico_component_score * fico_sensitivity_weight",
+            "result": 0.05,
+            "parameter_used": {
+              "fico_sensitivity_weight": 0.2
+            }
+          },
+          {
+            "step_name": "dti_component",
+            "input_values": {
+              "raw_dti": 95.0,
+              "normalized_dti": 1.0
+            },
+            "formula": "normalized_dti * dti_sensitivity_value",
+            "result": 0.15,
+            "parameter_used": {
+              "dti_sensitivity_value": 0.15
+            }
+          },
+          {
+            "step_name": "dti_weighted",
+            "input_values": {
+              "dti_component_score": 0.15
+            },
+            "formula": "dti_component_score * dti_sensitivity_weight",
+            "result": 0.0225,
+            "parameter_used": {
+              "dti_sensitivity_weight": 0.15
+            }
+          },
+          {
+            "step_name": "ltv_component",
+            "input_values": {
+              "raw_ltv": 140.0,
+              "normalized_ltv": 1.0
+            },
+            "formula": "normalized_ltv * ltv_sensitivity_value",
+            "result": 0.1,
+            "parameter_used": {
+              "ltv_sensitivity_value": 0.1
+            }
+          },
+          {
+            "step_name": "ltv_weighted",
+            "input_values": {
+              "ltv_component_score": 0.1
+            },
+            "formula": "ltv_component_score * ltv_sensitivity_weight",
+            "result": 0.01,
+            "parameter_used": {
+              "ltv_sensitivity_weight": 0.1
+            }
+          },
+          {
+            "step_name": "age_component",
+            "input_values": {
+              "raw_age": 152,
+              "normalized_age": 0.7
+            },
+            "formula": "normalized_age * age_sensitivity_value",
+            "result": 0.105,
+            "parameter_used": {
+              "age_sensitivity_value": 0.15
+            }
+          },
+          {
+            "step_name": "age_weighted",
+            "input_values": {
+              "age_component_score": 0.105
+            },
+            "formula": "age_component_score * age_sensitivity_weight",
+            "result": 0.0105,
+            "parameter_used": {
+              "age_sensitivity_weight": 0.1
+            }
+          },
+          {
+            "step_name": "history_component",
+            "input_values": {
+              "raw_history": true,
+              "normalized_history": 1.0
+            },
+            "formula": "normalized_history * history_sensitivity_value",
+            "result": 0.3,
+            "parameter_used": {
+              "history_sensitivity_value": 0.3
+            }
+          },
+          {
+            "step_name": "history_weighted",
+            "input_values": {
+              "history_component_score": 0.3
+            },
+            "formula": "history_component_score * history_sensitivity_weight",
+            "result": 0.03,
+            "parameter_used": {
+              "history_sensitivity_weight": 0.1
+            }
+          },
+          {
+            "step_name": "final_aggregation",
+            "input_values": {
+              "rate_weighted": 0.14,
+              "term_weighted": 0.0,
+              "fico_weighted": 0.05,
+              "dti_weighted": 0.0225,
+              "ltv_weighted": 0.01,
+              "age_weighted": 0.0105,
+              "history_weighted": 0.03,
+              "total_weight": 1.2
+            },
+            "formula": "sum(weighted_scores) / total_weight",
+            "result": 0.2192,
+            "parameter_used": {}
+          },
+          {
+            "step_name": "risk_level_determination",
+            "input_values": {
+              "final_score": 0.2192,
+              "high_threshold": 0.7,
+              "medium_threshold": 0.4
+            },
+            "formula": "if score >= high_threshold: 'high' elif score >= medium_threshold: 'medium' else 'low'",
+            "result": 0.0,
+            "parameter_used": {
+              "high_risk_threshold_value": 0.7,
+              "medium_risk_threshold_value": 0.4
+            }
+          }
+        ],
+        "parameters_used": {
+          "rate_sensitivity_value": 0.4,
+          "rate_sensitivity_weight": 0.35,
+          "term_sensitivity_value": 0.25,
+          "term_sensitivity_weight": 0.2,
+          "fico_sensitivity_value": 0.25,
+          "fico_sensitivity_weight": 0.2,
+          "dti_sensitivity_value": 0.15,
+          "dti_sensitivity_weight": 0.15,
+          "ltv_sensitivity_value": 0.1,
+          "ltv_sensitivity_weight": 0.1,
+          "history_sensitivity_value": 0.3,
+          "history_sensitivity_weight": 0.1,
+          "age_sensitivity_value": 0.15,
+          "age_sensitivity_weight": 0.1,
+          "high_risk_threshold_value": 0.7,
+          "high_risk_threshold_weight": 0.0,
+          "medium_risk_threshold_value": 0.4,
+          "medium_risk_threshold_weight": 0.0
+        },
+        "parameter_version_id": "PARAM_20260601225945522",
+        "anomalies": [
+          {
+            "sample_id": "SAMP_20260607222337259_d7e98bb1",
+            "field_name": "principal",
+            "expected_range": "10,000 - 2,000,000",
+            "actual_value": 2800000.0,
+            "severity": "critical",
+            "description": "贷款本金应在合理范围内"
+          },
+          {
+            "sample_id": "SAMP_20260607222337259_d7e98bb1",
+            "field_name": "interest_rate",
+            "expected_range": "0.5% - 15.0%",
+            "actual_value": 18.5,
+            "severity": "critical",
+            "description": "利率应在合理范围内"
+          },
+          {
+            "sample_id": "SAMP_20260607222337259_d7e98bb1",
+            "field_name": "remaining_term",
+            "expected_range": "1 - 360个月",
+            "actual_value": 480,
+            "severity": "critical",
+            "description": "剩余期限应在1-360个月之间"
+          },
+          {
+            "sample_id": "SAMP_20260607222337259_d7e98bb1",
+            "field_name": "borrower_age",
+            "expected_range": "18 - 100岁",
+            "actual_value": 152,
+            "severity": "warning",
+            "description": "借款人年龄应在合理范围内"
+          },
+          {
+            "sample_id": "SAMP_20260607222337259_d7e98bb1",
+            "field_name": "fico_score",
+            "expected_range": "300 - 850",
+            "actual_value": 250,
+            "severity": "critical",
+            "description": "FICO评分应在300-850之间"
+          },
+          {
+            "sample_id": "SAMP_20260607222337259_d7e98bb1",
+            "field_name": "dti_ratio",
+            "expected_range": "0 - 80%",
+            "actual_value": 95.0,
+            "severity": "warning",
+            "description": "DTI比率通常不超过80%"
+          },
+          {
+            "sample_id": "SAMP_20260607222337259_d7e98bb1",
+            "field_name": "ltv_ratio",
+            "expected_range": "0 - 125%",
+            "actual_value": 140.0,
+            "severity": "warning",
+            "description": "LTV比率通常不超过125%"
+          },
+          {
+            "sample_id": "SAMP_20260607222337259_d7e98bb1",
+            "field_name": "overall",
+            "expected_range": "最多2个严重异常",
+            "actual_value": "4个严重异常",
+            "severity": "critical",
+            "description": "样本存在多个严重异常，建议人工复核完整数据来源"
+          }
+        ],
+        "needs_manual_review": true,
+        "review_status": "pending",
+        "review_note": "",
+        "reviewed_by": "",
+        "reviewed_at": "",
+        "calculated_at": "2026-06-07T22:23:37.260413"
+      },
+      {
+        "sample_id": "SAMP_20260607222337259_65e9d105",
+        "loan_id": "LOAN-003",
+        "sensitivity_score": 0.1483,
+        "risk_level": "low",
+        "calculation_steps": [
+          {
+            "step_name": "rate_component",
+            "input_values": {
+              "raw_rate": 5.75,
+              "normalized_rate": 0.575
+            },
+            "formula": "normalized_rate * rate_sensitivity_value",
+            "result": 0.23,
+            "parameter_used": {
+              "rate_sensitivity_value": 0.4
+            }
+          },
+          {
+            "step_name": "rate_weighted",
+            "input_values": {
+              "rate_component_score": 0.23
+            },
+            "formula": "rate_component_score * rate_sensitivity_weight",
+            "result": 0.0805,
+            "parameter_used": {
+              "rate_sensitivity_weight": 0.35
+            }
+          },
+          {
+            "step_name": "term_component",
+            "input_values": {
+              "raw_term": 180,
+              "normalized_term": 0.5
+            },
+            "formula": "normalized_term * term_sensitivity_value",
+            "result": 0.125,
+            "parameter_used": {
+              "term_sensitivity_value": 0.25
+            }
+          },
+          {
+            "step_name": "term_weighted",
+            "input_values": {
+              "term_component_score": 0.125
+            },
+            "formula": "term_component_score * term_sensitivity_weight",
+            "result": 0.025,
+            "parameter_used": {
+              "term_sensitivity_weight": 0.2
+            }
+          },
+          {
+            "step_name": "fico_component",
+            "input_values": {
+              "raw_fico": 680,
+              "normalized_fico": 0.3091
+            },
+            "formula": "normalized_fico * fico_sensitivity_value",
+            "result": 0.0773,
+            "parameter_used": {
+              "fico_sensitivity_value": 0.25
+            }
+          },
+          {
+            "step_name": "fico_weighted",
+            "input_values": {
+              "fico_component_score": 0.0773
+            },
+            "formula": "fico_component_score * fico_sensitivity_weight",
+            "result": 0.0155,
+            "parameter_used": {
+              "fico_sensitivity_weight": 0.2
+            }
+          },
+          {
+            "step_name": "dti_component",
+            "input_values": {
+              "raw_dti": 38.0,
+              "normalized_dti": 0.6333
+            },
+            "formula": "normalized_dti * dti_sensitivity_value",
+            "result": 0.095,
+            "parameter_used": {
+              "dti_sensitivity_value": 0.15
+            }
+          },
+          {
+            "step_name": "dti_weighted",
+            "input_values": {
+              "dti_component_score": 0.095
+            },
+            "formula": "dti_component_score * dti_sensitivity_weight",
+            "result": 0.0142,
+            "parameter_used": {
+              "dti_sensitivity_weight": 0.15
+            }
+          },
+          {
+            "step_name": "ltv_component",
+            "input_values": {
+              "raw_ltv": 82.0,
+              "normalized_ltv": 0.82
+            },
+            "formula": "normalized_ltv * ltv_sensitivity_value",
+            "result": 0.082,
+            "parameter_used": {
+              "ltv_sensitivity_value": 0.1
+            }
+          },
+          {
+            "step_name": "ltv_weighted",
+            "input_values": {
+              "ltv_component_score": 0.082
+            },
+            "formula": "ltv_component_score * ltv_sensitivity_weight",
+            "result": 0.0082,
+            "parameter_used": {
+              "ltv_sensitivity_weight": 0.1
+            }
+          },
+          {
+            "step_name": "age_component",
+            "input_values": {
+              "raw_age": 45,
+              "normalized_age": 0.3
+            },
+            "formula": "normalized_age * age_sensitivity_value",
+            "result": 0.045,
+            "parameter_used": {
+              "age_sensitivity_value": 0.15
+            }
+          },
+          {
+            "step_name": "age_weighted",
+            "input_values": {
+              "age_component_score": 0.045
+            },
+            "formula": "age_component_score * age_sensitivity_weight",
+            "result": 0.0045,
+            "parameter_used": {
+              "age_sensitivity_weight": 0.1
+            }
+          },
+          {
+            "step_name": "history_component",
+            "input_values": {
+              "raw_history": true,
+              "normalized_history": 1.0
+            },
+            "formula": "normalized_history * history_sensitivity_value",
+            "result": 0.3,
+            "parameter_used": {
+              "history_sensitivity_value": 0.3
+            }
+          },
+          {
+            "step_name": "history_weighted",
+            "input_values": {
+              "history_component_score": 0.3
+            },
+            "formula": "history_component_score * history_sensitivity_weight",
+            "result": 0.03,
+            "parameter_used": {
+              "history_sensitivity_weight": 0.1
+            }
+          },
+          {
+            "step_name": "final_aggregation",
+            "input_values": {
+              "rate_weighted": 0.0805,
+              "term_weighted": 0.025,
+              "fico_weighted": 0.0155,
+              "dti_weighted": 0.0142,
+              "ltv_weighted": 0.0082,
+              "age_weighted": 0.0045,
+              "history_weighted": 0.03,
+              "total_weight": 1.2
+            },
+            "formula": "sum(weighted_scores) / total_weight",
+            "result": 0.1483,
+            "parameter_used": {}
+          },
+          {
+            "step_name": "risk_level_determination",
+            "input_values": {
+              "final_score": 0.1483,
+              "high_threshold": 0.7,
+              "medium_threshold": 0.4
+            },
+            "formula": "if score >= high_threshold: 'high' elif score >= medium_threshold: 'medium' else 'low'",
+            "result": 0.0,
+            "parameter_used": {
+              "high_risk_threshold_value": 0.7,
+              "medium_risk_threshold_value": 0.4
+            }
+          }
+        ],
+        "parameters_used": {
+          "rate_sensitivity_value": 0.4,
+          "rate_sensitivity_weight": 0.35,
+          "term_sensitivity_value": 0.25,
+          "term_sensitivity_weight": 0.2,
+          "fico_sensitivity_value": 0.25,
+          "fico_sensitivity_weight": 0.2,
+          "dti_sensitivity_value": 0.15,
+          "dti_sensitivity_weight": 0.15,
+          "ltv_sensitivity_value": 0.1,
+          "ltv_sensitivity_weight": 0.1,
+          "history_sensitivity_value": 0.3,
+          "history_sensitivity_weight": 0.1,
+          "age_sensitivity_value": 0.15,
+          "age_sensitivity_weight": 0.1,
+          "high_risk_threshold_value": 0.7,
+          "high_risk_threshold_weight": 0.0,
+          "medium_risk_threshold_value": 0.4,
+          "medium_risk_threshold_weight": 0.0
+        },
+        "parameter_version_id": "PARAM_20260601225945522",
+        "anomalies": [],
+        "needs_manual_review": false,
+        "review_status": "not_applicable",
+        "review_note": "",
+        "reviewed_by": "",
+        "reviewed_at": "",
+        "calculated_at": "2026-06-07T22:23:37.260483"
+      },
+      {
+        "sample_id": "SAMP_20260607222337259_83a7fa02",
+        "loan_id": "LOAN-004",
+        "sensitivity_score": 0.0768,
+        "risk_level": "low",
+        "calculation_steps": [
+          {
+            "step_name": "rate_component",
+            "input_values": {
+              "raw_rate": 3.85,
+              "normalized_rate": 0.385
+            },
+            "formula": "normalized_rate * rate_sensitivity_value",
+            "result": 0.154,
+            "parameter_used": {
+              "rate_sensitivity_value": 0.4
+            }
+          },
+          {
+            "step_name": "rate_weighted",
+            "input_values": {
+              "rate_component_score": 0.154
+            },
+            "formula": "rate_component_score * rate_sensitivity_weight",
+            "result": 0.0539,
+            "parameter_used": {
+              "rate_sensitivity_weight": 0.35
+            }
+          },
+          {
+            "step_name": "term_component",
+            "input_values": {
+              "raw_term": 300,
+              "normalized_term": 0.1667
+            },
+            "formula": "normalized_term * term_sensitivity_value",
+            "result": 0.0417,
+            "parameter_used": {
+              "term_sensitivity_value": 0.25
+            }
+          },
+          {
+            "step_name": "term_weighted",
+            "input_values": {
+              "term_component_score": 0.0417
+            },
+            "formula": "term_component_score * term_sensitivity_weight",
+            "result": 0.0083,
+            "parameter_used": {
+              "term_sensitivity_weight": 0.2
+            }
+          },
+          {
+            "step_name": "fico_component",
+            "input_values": {
+              "raw_fico": 760,
+              "normalized_fico": 0.1636
+            },
+            "formula": "normalized_fico * fico_sensitivity_value",
+            "result": 0.0409,
+            "parameter_used": {
+              "fico_sensitivity_value": 0.25
+            }
+          },
+          {
+            "step_name": "fico_weighted",
+            "input_values": {
+              "fico_component_score": 0.0409
+            },
+            "formula": "fico_component_score * fico_sensitivity_weight",
+            "result": 0.0082,
+            "parameter_used": {
+              "fico_sensitivity_weight": 0.2
+            }
+          },
+          {
+            "step_name": "dti_component",
+            "input_values": {
+              "raw_dti": 28.0,
+              "normalized_dti": 0.4667
+            },
+            "formula": "normalized_dti * dti_sensitivity_value",
+            "result": 0.07,
+            "parameter_used": {
+              "dti_sensitivity_value": 0.15
+            }
+          },
+          {
+            "step_name": "dti_weighted",
+            "input_values": {
+              "dti_component_score": 0.07
+            },
+            "formula": "dti_component_score * dti_sensitivity_weight",
+            "result": 0.0105,
+            "parameter_used": {
+              "dti_sensitivity_weight": 0.15
+            }
+          },
+          {
+            "step_name": "ltv_component",
+            "input_values": {
+              "raw_ltv": 68.0,
+              "normalized_ltv": 0.68
+            },
+            "formula": "normalized_ltv * ltv_sensitivity_value",
+            "result": 0.068,
+            "parameter_used": {
+              "ltv_sensitivity_value": 0.1
+            }
+          },
+          {
+            "step_name": "ltv_weighted",
+            "input_values": {
+              "ltv_component_score": 0.068
+            },
+            "formula": "ltv_component_score * ltv_sensitivity_weight",
+            "result": 0.0068,
+            "parameter_used": {
+              "ltv_sensitivity_weight": 0.1
+            }
+          },
+          {
+            "step_name": "age_component",
+            "input_values": {
+              "raw_age": 42,
+              "normalized_age": 0.3
+            },
+            "formula": "normalized_age * age_sensitivity_value",
+            "result": 0.045,
+            "parameter_used": {
+              "age_sensitivity_value": 0.15
+            }
+          },
+          {
+            "step_name": "age_weighted",
+            "input_values": {
+              "age_component_score": 0.045
+            },
+            "formula": "age_component_score * age_sensitivity_weight",
+            "result": 0.0045,
+            "parameter_used": {
+              "age_sensitivity_weight": 0.1
+            }
+          },
+          {
+            "step_name": "history_component",
+            "input_values": {
+              "raw_history": false,
+              "normalized_history": 0.0
+            },
+            "formula": "normalized_history * history_sensitivity_value",
+            "result": 0.0,
+            "parameter_used": {
+              "history_sensitivity_value": 0.3
+            }
+          },
+          {
+            "step_name": "history_weighted",
+            "input_values": {
+              "history_component_score": 0.0
+            },
+            "formula": "history_component_score * history_sensitivity_weight",
+            "result": 0.0,
+            "parameter_used": {
+              "history_sensitivity_weight": 0.1
+            }
+          },
+          {
+            "step_name": "final_aggregation",
+            "input_values": {
+              "rate_weighted": 0.0539,
+              "term_weighted": 0.0083,
+              "fico_weighted": 0.0082,
+              "dti_weighted": 0.0105,
+              "ltv_weighted": 0.0068,
+              "age_weighted": 0.0045,
+              "history_weighted": 0.0,
+              "total_weight": 1.2
+            },
+            "formula": "sum(weighted_scores) / total_weight",
+            "result": 0.0768,
+            "parameter_used": {}
+          },
+          {
+            "step_name": "risk_level_determination",
+            "input_values": {
+              "final_score": 0.0768,
+              "high_threshold": 0.7,
+              "medium_threshold": 0.4
+            },
+            "formula": "if score >= high_threshold: 'high' elif score >= medium_threshold: 'medium' else 'low'",
+            "result": 0.0,
+            "parameter_used": {
+              "high_risk_threshold_value": 0.7,
+              "medium_risk_threshold_value": 0.4
+            }
+          }
+        ],
+        "parameters_used": {
+          "rate_sensitivity_value": 0.4,
+          "rate_sensitivity_weight": 0.35,
+          "term_sensitivity_value": 0.25,
+          "term_sensitivity_weight": 0.2,
+          "fico_sensitivity_value": 0.25,
+          "fico_sensitivity_weight": 0.2,
+          "dti_sensitivity_value": 0.15,
+          "dti_sensitivity_weight": 0.15,
+          "ltv_sensitivity_value": 0.1,
+          "ltv_sensitivity_weight": 0.1,
+          "history_sensitivity_value": 0.3,
+          "history_sensitivity_weight": 0.1,
+          "age_sensitivity_value": 0.15,
+          "age_sensitivity_weight": 0.1,
+          "high_risk_threshold_value": 0.7,
+          "high_risk_threshold_weight": 0.0,
+          "medium_risk_threshold_value": 0.4,
+          "medium_risk_threshold_weight": 0.0
+        },
+        "parameter_version_id": "PARAM_20260601225945522",
+        "anomalies": [],
+        "needs_manual_review": false,
+        "review_status": "not_applicable",
+        "review_note": "",
+        "reviewed_by": "",
+        "reviewed_at": "",
+        "calculated_at": "2026-06-07T22:23:37.260546"
+      },
+      {
+        "sample_id": "SAMP_20260607222337259_97cf52a2",
+        "loan_id": "LOAN-005",
+        "sensitivity_score": 0.1037,
+        "risk_level": "low",
+        "calculation_steps": [
+          {
+            "step_name": "rate_component",
+            "input_values": {
+              "raw_rate": 0.1,
+              "normalized_rate": 0.01
+            },
+            "formula": "normalized_rate * rate_sensitivity_value",
+            "result": 0.004,
+            "parameter_used": {
+              "rate_sensitivity_value": 0.4
+            }
+          },
+          {
+            "step_name": "rate_weighted",
+            "input_values": {
+              "rate_component_score": 0.004
+            },
+            "formula": "rate_component_score * rate_sensitivity_weight",
+            "result": 0.0014,
+            "parameter_used": {
+              "rate_sensitivity_weight": 0.35
+            }
+          },
+          {
+            "step_name": "term_component",
+            "input_values": {
+              "raw_term": 0,
+              "normalized_term": 1.0
+            },
+            "formula": "normalized_term * term_sensitivity_value",
+            "result": 0.25,
+            "parameter_used": {
+              "term_sensitivity_value": 0.25
+            }
+          },
+          {
+            "step_name": "term_weighted",
+            "input_values": {
+              "term_component_score": 0.25
+            },
+            "formula": "term_component_score * term_sensitivity_weight",
+            "result": 0.05,
+            "parameter_used": {
+              "term_sensitivity_weight": 0.2
+            }
+          },
+          {
+            "step_name": "fico_component",
+            "input_values": {
+              "raw_fico": 900,
+              "normalized_fico": 0.0
+            },
+            "formula": "normalized_fico * fico_sensitivity_value",
+            "result": 0.0,
+            "parameter_used": {
+              "fico_sensitivity_value": 0.25
+            }
+          },
+          {
+            "step_name": "fico_weighted",
+            "input_values": {
+              "fico_component_score": 0.0
+            },
+            "formula": "fico_component_score * fico_sensitivity_weight",
+            "result": 0.0,
+            "parameter_used": {
+              "fico_sensitivity_weight": 0.2
+            }
+          },
+          {
+            "step_name": "dti_component",
+            "input_values": {
+              "raw_dti": 150.0,
+              "normalized_dti": 1.0
+            },
+            "formula": "normalized_dti * dti_sensitivity_value",
+            "result": 0.15,
+            "parameter_used": {
+              "dti_sensitivity_value": 0.15
+            }
+          },
+          {
+            "step_name": "dti_weighted",
+            "input_values": {
+              "dti_component_score": 0.15
+            },
+            "formula": "dti_component_score * dti_sensitivity_weight",
+            "result": 0.0225,
+            "parameter_used": {
+              "dti_sensitivity_weight": 0.15
+            }
+          },
+          {
+            "step_name": "ltv_component",
+            "input_values": {
+              "raw_ltv": 200.0,
+              "normalized_ltv": 1.0
+            },
+            "formula": "normalized_ltv * ltv_sensitivity_value",
+            "result": 0.1,
+            "parameter_used": {
+              "ltv_sensitivity_value": 0.1
+            }
+          },
+          {
+            "step_name": "ltv_weighted",
+            "input_values": {
+              "ltv_component_score": 0.1
+            },
+            "formula": "ltv_component_score * ltv_sensitivity_weight",
+            "result": 0.01,
+            "parameter_used": {
+              "ltv_sensitivity_weight": 0.1
+            }
+          },
+          {
+            "step_name": "age_component",
+            "input_values": {
+              "raw_age": 105,
+              "normalized_age": 0.7
+            },
+            "formula": "normalized_age * age_sensitivity_value",
+            "result": 0.105,
+            "parameter_used": {
+              "age_sensitivity_value": 0.15
+            }
+          },
+          {
+            "step_name": "age_weighted",
+            "input_values": {
+              "age_component_score": 0.105
+            },
+            "formula": "age_component_score * age_sensitivity_weight",
+            "result": 0.0105,
+            "parameter_used": {
+              "age_sensitivity_weight": 0.1
+            }
+          },
+          {
+            "step_name": "history_component",
+            "input_values": {
+              "raw_history": true,
+              "normalized_history": 1.0
+            },
+            "formula": "normalized_history * history_sensitivity_value",
+            "result": 0.3,
+            "parameter_used": {
+              "history_sensitivity_value": 0.3
+            }
+          },
+          {
+            "step_name": "history_weighted",
+            "input_values": {
+              "history_component_score": 0.3
+            },
+            "formula": "history_component_score * history_sensitivity_weight",
+            "result": 0.03,
+            "parameter_used": {
+              "history_sensitivity_weight": 0.1
+            }
+          },
+          {
+            "step_name": "final_aggregation",
+            "input_values": {
+              "rate_weighted": 0.0014,
+              "term_weighted": 0.05,
+              "fico_weighted": 0.0,
+              "dti_weighted": 0.0225,
+              "ltv_weighted": 0.01,
+              "age_weighted": 0.0105,
+              "history_weighted": 0.03,
+              "total_weight": 1.2
+            },
+            "formula": "sum(weighted_scores) / total_weight",
+            "result": 0.1037,
+            "parameter_used": {}
+          },
+          {
+            "step_name": "risk_level_determination",
+            "input_values": {
+              "final_score": 0.1037,
+              "high_threshold": 0.7,
+              "medium_threshold": 0.4
+            },
+            "formula": "if score >= high_threshold: 'high' elif score >= medium_threshold: 'medium' else 'low'",
+            "result": 0.0,
+            "parameter_used": {
+              "high_risk_threshold_value": 0.7,
+              "medium_risk_threshold_value": 0.4
+            }
+          }
+        ],
+        "parameters_used": {
+          "rate_sensitivity_value": 0.4,
+          "rate_sensitivity_weight": 0.35,
+          "term_sensitivity_value": 0.25,
+          "term_sensitivity_weight": 0.2,
+          "fico_sensitivity_value": 0.25,
+          "fico_sensitivity_weight": 0.2,
+          "dti_sensitivity_value": 0.15,
+          "dti_sensitivity_weight": 0.15,
+          "ltv_sensitivity_value": 0.1,
+          "ltv_sensitivity_weight": 0.1,
+          "history_sensitivity_value": 0.3,
+          "history_sensitivity_weight": 0.1,
+          "age_sensitivity_value": 0.15,
+          "age_sensitivity_weight": 0.1,
+          "high_risk_threshold_value": 0.7,
+          "high_risk_threshold_weight": 0.0,
+          "medium_risk_threshold_value": 0.4,
+          "medium_risk_threshold_weight": 0.0
+        },
+        "parameter_version_id": "PARAM_20260601225945522",
+        "anomalies": [
+          {
+            "sample_id": "SAMP_20260607222337259_97cf52a2",
+            "field_name": "principal",
+            "expected_range": "10,000 - 2,000,000",
+            "actual_value": 9500000.0,
+            "severity": "critical",
+            "description": "贷款本金应在合理范围内"
+          },
+          {
+            "sample_id": "SAMP_20260607222337259_97cf52a2",
+            "field_name": "interest_rate",
+            "expected_range": "0.5% - 15.0%",
+            "actual_value": 0.1,
+            "severity": "critical",
+            "description": "利率应在合理范围内"
+          },
+          {
+            "sample_id": "SAMP_20260607222337259_97cf52a2",
+            "field_name": "remaining_term",
+            "expected_range": "1 - 360个月",
+            "actual_value": 0,
+            "severity": "critical",
+            "description": "剩余期限应在1-360个月之间"
+          },
+          {
+            "sample_id": "SAMP_20260607222337259_97cf52a2",
+            "field_name": "borrower_age",
+            "expected_range": "18 - 100岁",
+            "actual_value": 105,
+            "severity": "warning",
+            "description": "借款人年龄应在合理范围内"
+          },
+          {
+            "sample_id": "SAMP_20260607222337259_97cf52a2",
+            "field_name": "fico_score",
+            "expected_range": "300 - 850",
+            "actual_value": 900,
+            "severity": "critical",
+            "description": "FICO评分应在300-850之间"
+          },
+          {
+            "sample_id": "SAMP_20260607222337259_97cf52a2",
+            "field_name": "dti_ratio",
+            "expected_range": "0 - 80%",
+            "actual_value": 150.0,
+            "severity": "warning",
+            "description": "DTI比率通常不超过80%"
+          },
+          {
+            "sample_id": "SAMP_20260607222337259_97cf52a2",
+            "field_name": "ltv_ratio",
+            "expected_range": "0 - 125%",
+            "actual_value": 200.0,
+            "severity": "warning",
+            "description": "LTV比率通常不超过125%"
+          },
+          {
+            "sample_id": "SAMP_20260607222337259_97cf52a2",
+            "field_name": "overall",
+            "expected_range": "最多2个严重异常",
+            "actual_value": "4个严重异常",
+            "severity": "critical",
+            "description": "样本存在多个严重异常，建议人工复核完整数据来源"
+          }
+        ],
+        "needs_manual_review": true,
+        "review_status": "pending",
+        "review_note": "",
+        "reviewed_by": "",
+        "reviewed_at": "",
+        "calculated_at": "2026-06-07T22:23:37.260639"
+      },
+      {
+        "sample_id": "SAMP_20260607222337259_3de645af",
+        "loan_id": "LOAN-006",
+        "sensitivity_score": 0.1542,
+        "risk_level": "low",
+        "calculation_steps": [
+          {
+            "step_name": "rate_component",
+            "input_values": {
+              "raw_rate": 6.25,
+              "normalized_rate": 0.625
+            },
+            "formula": "normalized_rate * rate_sensitivity_value",
+            "result": 0.25,
+            "parameter_used": {
+              "rate_sensitivity_value": 0.4
+            }
+          },
+          {
+            "step_name": "rate_weighted",
+            "input_values": {
+              "rate_component_score": 0.25
+            },
+            "formula": "rate_component_score * rate_sensitivity_weight",
+            "result": 0.0875,
+            "parameter_used": {
+              "rate_sensitivity_weight": 0.35
+            }
+          },
+          {
+            "step_name": "term_component",
+            "input_values": {
+              "raw_term": 220,
+              "normalized_term": 0.3889
+            },
+            "formula": "normalized_term * term_sensitivity_value",
+            "result": 0.0972,
+            "parameter_used": {
+              "term_sensitivity_value": 0.25
+            }
+          },
+          {
+            "step_name": "term_weighted",
+            "input_values": {
+              "term_component_score": 0.0972
+            },
+            "formula": "term_component_score * term_sensitivity_weight",
+            "result": 0.0194,
+            "parameter_used": {
+              "term_sensitivity_weight": 0.2
+            }
+          },
+          {
+            "step_name": "fico_component",
+            "input_values": {
+              "raw_fico": 640,
+              "normalized_fico": 0.3818
+            },
+            "formula": "normalized_fico * fico_sensitivity_value",
+            "result": 0.0955,
+            "parameter_used": {
+              "fico_sensitivity_value": 0.25
+            }
+          },
+          {
+            "step_name": "fico_weighted",
+            "input_values": {
+              "fico_component_score": 0.0955
+            },
+            "formula": "fico_component_score * fico_sensitivity_weight",
+            "result": 0.0191,
+            "parameter_used": {
+              "fico_sensitivity_weight": 0.2
+            }
+          },
+          {
+            "step_name": "dti_component",
+            "input_values": {
+              "raw_dti": 42.0,
+              "normalized_dti": 0.7
+            },
+            "formula": "normalized_dti * dti_sensitivity_value",
+            "result": 0.105,
+            "parameter_used": {
+              "dti_sensitivity_value": 0.15
+            }
+          },
+          {
+            "step_name": "dti_weighted",
+            "input_values": {
+              "dti_component_score": 0.105
+            },
+            "formula": "dti_component_score * dti_sensitivity_weight",
+            "result": 0.0158,
+            "parameter_used": {
+              "dti_sensitivity_weight": 0.15
+            }
+          },
+          {
+            "step_name": "ltv_component",
+            "input_values": {
+              "raw_ltv": 88.0,
+              "normalized_ltv": 0.88
+            },
+            "formula": "normalized_ltv * ltv_sensitivity_value",
+            "result": 0.088,
+            "parameter_used": {
+              "ltv_sensitivity_value": 0.1
+            }
+          },
+          {
+            "step_name": "ltv_weighted",
+            "input_values": {
+              "ltv_component_score": 0.088
+            },
+            "formula": "ltv_component_score * ltv_sensitivity_weight",
+            "result": 0.0088,
+            "parameter_used": {
+              "ltv_sensitivity_weight": 0.1
+            }
+          },
+          {
+            "step_name": "age_component",
+            "input_values": {
+              "raw_age": 52,
+              "normalized_age": 0.3
+            },
+            "formula": "normalized_age * age_sensitivity_value",
+            "result": 0.045,
+            "parameter_used": {
+              "age_sensitivity_value": 0.15
+            }
+          },
+          {
+            "step_name": "age_weighted",
+            "input_values": {
+              "age_component_score": 0.045
+            },
+            "formula": "age_component_score * age_sensitivity_weight",
+            "result": 0.0045,
+            "parameter_used": {
+              "age_sensitivity_weight": 0.1
+            }
+          },
+          {
+            "step_name": "history_component",
+            "input_values": {
+              "raw_history": true,
+              "normalized_history": 1.0
+            },
+            "formula": "normalized_history * history_sensitivity_value",
+            "result": 0.3,
+            "parameter_used": {
+              "history_sensitivity_value": 0.3
+            }
+          },
+          {
+            "step_name": "history_weighted",
+            "input_values": {
+              "history_component_score": 0.3
+            },
+            "formula": "history_component_score * history_sensitivity_weight",
+            "result": 0.03,
+            "parameter_used": {
+              "history_sensitivity_weight": 0.1
+            }
+          },
+          {
+            "step_name": "final_aggregation",
+            "input_values": {
+              "rate_weighted": 0.0875,
+              "term_weighted": 0.0194,
+              "fico_weighted": 0.0191,
+              "dti_weighted": 0.0158,
+              "ltv_weighted": 0.0088,
+              "age_weighted": 0.0045,
+              "history_weighted": 0.03,
+              "total_weight": 1.2
+            },
+            "formula": "sum(weighted_scores) / total_weight",
+            "result": 0.1542,
+            "parameter_used": {}
+          },
+          {
+            "step_name": "risk_level_determination",
+            "input_values": {
+              "final_score": 0.1542,
+              "high_threshold": 0.7,
+              "medium_threshold": 0.4
+            },
+            "formula": "if score >= high_threshold: 'high' elif score >= medium_threshold: 'medium' else 'low'",
+            "result": 0.0,
+            "parameter_used": {
+              "high_risk_threshold_value": 0.7,
+              "medium_risk_threshold_value": 0.4
+            }
+          }
+        ],
+        "parameters_used": {
+          "rate_sensitivity_value": 0.4,
+          "rate_sensitivity_weight": 0.35,
+          "term_sensitivity_value": 0.25,
+          "term_sensitivity_weight": 0.2,
+          "fico_sensitivity_value": 0.25,
+          "fico_sensitivity_weight": 0.2,
+          "dti_sensitivity_value": 0.15,
+          "dti_sensitivity_weight": 0.15,
+          "ltv_sensitivity_value": 0.1,
+          "ltv_sensitivity_weight": 0.1,
+          "history_sensitivity_value": 0.3,
+          "history_sensitivity_weight": 0.1,
+          "age_sensitivity_value": 0.15,
+          "age_sensitivity_weight": 0.1,
+          "high_risk_threshold_value": 0.7,
+          "high_risk_threshold_weight": 0.0,
+          "medium_risk_threshold_value": 0.4,
+          "medium_risk_threshold_weight": 0.0
+        },
+        "parameter_version_id": "PARAM_20260601225945522",
+        "anomalies": [],
+        "needs_manual_review": false,
+        "review_status": "not_applicable",
+        "review_note": "",
+        "reviewed_by": "",
+        "reviewed_at": "",
+        "calculated_at": "2026-06-07T22:23:37.260733"
+      }
+    ],
+    "conflicts": [
+      {
+        "conflict_id": "CONFLICT_20260607222337260",
+        "loan_id": "LOAN-002",
+        "sample_value": 0.2192,
+        "chart_value": 0.45,
+        "field_name": "sensitivity_score",
+        "sample_source": "样本ID: SAMP_20260607222337259_d7e98bb1, 来源: manual_input_data_entry",
+        "chart_source": "复盘图表, 报告期: 2026-Q1, 来源: manual_review_excel",
+        "difference": 23.08,
+        "suggested_action": "建议：新系统计算值(0.2192)低于复盘图表值(0.4500)，差异23.08%。请核对样本数据是否有更新，或确认复盘图表是否为人工调整值。",
+        "resolved": false,
+        "resolution_note": ""
+      },
+      {
+        "conflict_id": "CONFLICT_20260607222337260",
+        "loan_id": "LOAN-002",
+        "sample_value": "low",
+        "chart_value": "medium",
+        "field_name": "risk_level",
+        "sample_source": "样本ID: SAMP_20260607222337259_d7e98bb1, 来源: manual_input_data_entry",
+        "chart_source": "复盘图表, 报告期: 2026-Q1, 来源: manual_review_excel",
+        "difference": 0,
+        "suggested_action": "风险等级不一致：系统判定low，复盘图表记录medium。请核对风险阈值参数或是否存在人工调整记录。",
+        "resolved": false,
+        "resolution_note": ""
+      },
+      {
+        "conflict_id": "CONFLICT_20260607222337260",
+        "loan_id": "LOAN-002",
+        "sample_value": 2800000.0,
+        "chart_value": 280000.0,
+        "field_name": "principal",
+        "sample_source": "样本ID: SAMP_20260607222337259_d7e98bb1, 来源: manual_input_data_entry",
+        "chart_source": "复盘图表备注, 报告期: 2026-Q1",
+        "difference": 900.0,
+        "suggested_action": "本金不一致：样本2,800,000，复盘图表280,000，差异900.00%。请以最新数据为准。",
+        "resolved": false,
+        "resolution_note": ""
+      },
+      {
+        "conflict_id": "CONFLICT_20260607222337260",
+        "loan_id": "LOAN-003",
+        "sample_value": 0.1483,
+        "chart_value": 0.38,
+        "field_name": "sensitivity_score",
+        "sample_source": "样本ID: SAMP_20260607222337259_65e9d105, 来源: historical_backfill_2025",
+        "chart_source": "复盘图表, 报告期: 2025-Q4, 来源: historical_review",
+        "difference": 23.17,
+        "suggested_action": "建议：新系统计算值(0.1483)低于复盘图表值(0.3800)，差异23.17%。请核对样本数据是否有更新，或确认复盘图表是否为人工调整值。",
+        "resolved": false,
+        "resolution_note": ""
+      },
+      {
+        "conflict_id": "CONFLICT_20260607222337260",
+        "loan_id": "LOAN-003",
+        "sample_value": 420000.0,
+        "chart_value": 450000.0,
+        "field_name": "principal",
+        "sample_source": "样本ID: SAMP_20260607222337259_65e9d105, 来源: historical_backfill_2025",
+        "chart_source": "复盘图表备注, 报告期: 2025-Q4",
+        "difference": 6.67,
+        "suggested_action": "本金不一致：样本420,000，复盘图表450,000，差异6.67%。请以最新数据为准。",
+        "resolved": false,
+        "resolution_note": ""
+      },
+      {
+        "conflict_id": "CONFLICT_20260607222337260",
+        "loan_id": "LOAN-006",
+        "sample_value": 0.1542,
+        "chart_value": 0.52,
+        "field_name": "sensitivity_score",
+        "sample_source": "样本ID: SAMP_20260607222337259_3de645af, 来源: core_system_2026q2",
+        "chart_source": "复盘图表, 报告期: 2026-Q1, 来源: quarterly_review",
+        "difference": 36.58,
+        "suggested_action": "建议：新系统计算值(0.1542)低于复盘图表值(0.5200)，差异36.58%。请核对样本数据是否有更新，或确认复盘图表是否为人工调整值。",
+        "resolved": false,
+        "resolution_note": ""
+      },
+      {
+        "conflict_id": "CONFLICT_20260607222337260",
+        "loan_id": "LOAN-006",
+        "sample_value": "low",
+        "chart_value": "medium",
+        "field_name": "risk_level",
+        "sample_source": "样本ID: SAMP_20260607222337259_3de645af, 来源: core_system_2026q2",
+        "chart_source": "复盘图表, 报告期: 2026-Q1, 来源: quarterly_review",
+        "difference": 0,
+        "suggested_action": "风险等级不一致：系统判定low，复盘图表记录medium。请核对风险阈值参数或是否存在人工调整记录。",
+        "resolved": false,
+        "resolution_note": ""
+      }
+    ],
+    "status": "completed"
+  },
+  {
+    "run_id": "RUN_20260607222432413",
+    "timestamp": "2026-06-07T22:24:32.413586",
+    "parameter_version_id": "PARAM_20260601225945522",
+    "sample_count": 6,
+    "anomaly_count": 16,
+    "conflict_count": 7,
+    "manual_review_count": 2,
+    "results": [
+      {
+        "sample_id": "SAMP_20260607222432412_2b18a796",
+        "loan_id": "LOAN-001",
+        "sensitivity_score": 0.0933,
+        "risk_level": "low",
+        "calculation_steps": [
+          {
+            "step_name": "rate_component",
+            "input_values": {
+              "raw_rate": 4.25,
+              "normalized_rate": 0.425
+            },
+            "formula": "normalized_rate * rate_sensitivity_value",
+            "result": 0.17,
+            "parameter_used": {
+              "rate_sensitivity_value": 0.4
+            }
+          },
+          {
+            "step_name": "rate_weighted",
+            "input_values": {
+              "rate_component_score": 0.17
+            },
+            "formula": "rate_component_score * rate_sensitivity_weight",
+            "result": 0.0595,
+            "parameter_used": {
+              "rate_sensitivity_weight": 0.35
+            }
+          },
+          {
+            "step_name": "term_component",
+            "input_values": {
+              "raw_term": 240,
+              "normalized_term": 0.3333
+            },
+            "formula": "normalized_term * term_sensitivity_value",
+            "result": 0.0833,
+            "parameter_used": {
+              "term_sensitivity_value": 0.25
+            }
+          },
+          {
+            "step_name": "term_weighted",
+            "input_values": {
+              "term_component_score": 0.0833
+            },
+            "formula": "term_component_score * term_sensitivity_weight",
+            "result": 0.0167,
+            "parameter_used": {
+              "term_sensitivity_weight": 0.2
+            }
+          },
+          {
+            "step_name": "fico_component",
+            "input_values": {
+              "raw_fico": 720,
+              "normalized_fico": 0.2364
+            },
+            "formula": "normalized_fico * fico_sensitivity_value",
+            "result": 0.0591,
+            "parameter_used": {
+              "fico_sensitivity_value": 0.25
+            }
+          },
+          {
+            "step_name": "fico_weighted",
+            "input_values": {
+              "fico_component_score": 0.0591
+            },
+            "formula": "fico_component_score * fico_sensitivity_weight",
+            "result": 0.0118,
+            "parameter_used": {
+              "fico_sensitivity_weight": 0.2
+            }
+          },
+          {
+            "step_name": "dti_component",
+            "input_values": {
+              "raw_dti": 32.0,
+              "normalized_dti": 0.5333
+            },
+            "formula": "normalized_dti * dti_sensitivity_value",
+            "result": 0.08,
+            "parameter_used": {
+              "dti_sensitivity_value": 0.15
+            }
+          },
+          {
+            "step_name": "dti_weighted",
+            "input_values": {
+              "dti_component_score": 0.08
+            },
+            "formula": "dti_component_score * dti_sensitivity_weight",
+            "result": 0.012,
+            "parameter_used": {
+              "dti_sensitivity_weight": 0.15
+            }
+          },
+          {
+            "step_name": "ltv_component",
+            "input_values": {
+              "raw_ltv": 75.0,
+              "normalized_ltv": 0.75
+            },
+            "formula": "normalized_ltv * ltv_sensitivity_value",
+            "result": 0.075,
+            "parameter_used": {
+              "ltv_sensitivity_value": 0.1
+            }
+          },
+          {
+            "step_name": "ltv_weighted",
+            "input_values": {
+              "ltv_component_score": 0.075
+            },
+            "formula": "ltv_component_score * ltv_sensitivity_weight",
+            "result": 0.0075,
+            "parameter_used": {
+              "ltv_sensitivity_weight": 0.1
+            }
+          },
+          {
+            "step_name": "age_component",
+            "input_values": {
+              "raw_age": 38,
+              "normalized_age": 0.3
+            },
+            "formula": "normalized_age * age_sensitivity_value",
+            "result": 0.045,
+            "parameter_used": {
+              "age_sensitivity_value": 0.15
+            }
+          },
+          {
+            "step_name": "age_weighted",
+            "input_values": {
+              "age_component_score": 0.045
+            },
+            "formula": "age_component_score * age_sensitivity_weight",
+            "result": 0.0045,
+            "parameter_used": {
+              "age_sensitivity_weight": 0.1
+            }
+          },
+          {
+            "step_name": "history_component",
+            "input_values": {
+              "raw_history": false,
+              "normalized_history": 0.0
+            },
+            "formula": "normalized_history * history_sensitivity_value",
+            "result": 0.0,
+            "parameter_used": {
+              "history_sensitivity_value": 0.3
+            }
+          },
+          {
+            "step_name": "history_weighted",
+            "input_values": {
+              "history_component_score": 0.0
+            },
+            "formula": "history_component_score * history_sensitivity_weight",
+            "result": 0.0,
+            "parameter_used": {
+              "history_sensitivity_weight": 0.1
+            }
+          },
+          {
+            "step_name": "final_aggregation",
+            "input_values": {
+              "rate_weighted": 0.0595,
+              "term_weighted": 0.0167,
+              "fico_weighted": 0.0118,
+              "dti_weighted": 0.012,
+              "ltv_weighted": 0.0075,
+              "age_weighted": 0.0045,
+              "history_weighted": 0.0,
+              "total_weight": 1.2
+            },
+            "formula": "sum(weighted_scores) / total_weight",
+            "result": 0.0933,
+            "parameter_used": {}
+          },
+          {
+            "step_name": "risk_level_determination",
+            "input_values": {
+              "final_score": 0.0933,
+              "high_threshold": 0.7,
+              "medium_threshold": 0.4
+            },
+            "formula": "if score >= high_threshold: 'high' elif score >= medium_threshold: 'medium' else 'low'",
+            "result": 0.0,
+            "parameter_used": {
+              "high_risk_threshold_value": 0.7,
+              "medium_risk_threshold_value": 0.4
+            }
+          }
+        ],
+        "parameters_used": {
+          "rate_sensitivity_value": 0.4,
+          "rate_sensitivity_weight": 0.35,
+          "term_sensitivity_value": 0.25,
+          "term_sensitivity_weight": 0.2,
+          "fico_sensitivity_value": 0.25,
+          "fico_sensitivity_weight": 0.2,
+          "dti_sensitivity_value": 0.15,
+          "dti_sensitivity_weight": 0.15,
+          "ltv_sensitivity_value": 0.1,
+          "ltv_sensitivity_weight": 0.1,
+          "history_sensitivity_value": 0.3,
+          "history_sensitivity_weight": 0.1,
+          "age_sensitivity_value": 0.15,
+          "age_sensitivity_weight": 0.1,
+          "high_risk_threshold_value": 0.7,
+          "high_risk_threshold_weight": 0.0,
+          "medium_risk_threshold_value": 0.4,
+          "medium_risk_threshold_weight": 0.0
+        },
+        "parameter_version_id": "PARAM_20260601225945522",
+        "anomalies": [],
+        "needs_manual_review": false,
+        "review_status": "not_applicable",
+        "review_note": "",
+        "reviewed_by": "",
+        "reviewed_at": "",
+        "calculated_at": "2026-06-07T22:24:32.412221"
+      },
+      {
+        "sample_id": "SAMP_20260607222432412_d7e98bb1",
+        "loan_id": "LOAN-002",
+        "sensitivity_score": 0.2192,
+        "risk_level": "low",
+        "calculation_steps": [
+          {
+            "step_name": "rate_component",
+            "input_values": {
+              "raw_rate": 18.5,
+              "normalized_rate": 1.0
+            },
+            "formula": "normalized_rate * rate_sensitivity_value",
+            "result": 0.4,
+            "parameter_used": {
+              "rate_sensitivity_value": 0.4
+            }
+          },
+          {
+            "step_name": "rate_weighted",
+            "input_values": {
+              "rate_component_score": 0.4
+            },
+            "formula": "rate_component_score * rate_sensitivity_weight",
+            "result": 0.14,
+            "parameter_used": {
+              "rate_sensitivity_weight": 0.35
+            }
+          },
+          {
+            "step_name": "term_component",
+            "input_values": {
+              "raw_term": 480,
+              "normalized_term": 0.0
+            },
+            "formula": "normalized_term * term_sensitivity_value",
+            "result": 0.0,
+            "parameter_used": {
+              "term_sensitivity_value": 0.25
+            }
+          },
+          {
+            "step_name": "term_weighted",
+            "input_values": {
+              "term_component_score": 0.0
+            },
+            "formula": "term_component_score * term_sensitivity_weight",
+            "result": 0.0,
+            "parameter_used": {
+              "term_sensitivity_weight": 0.2
+            }
+          },
+          {
+            "step_name": "fico_component",
+            "input_values": {
+              "raw_fico": 250,
+              "normalized_fico": 1.0
+            },
+            "formula": "normalized_fico * fico_sensitivity_value",
+            "result": 0.25,
+            "parameter_used": {
+              "fico_sensitivity_value": 0.25
+            }
+          },
+          {
+            "step_name": "fico_weighted",
+            "input_values": {
+              "fico_component_score": 0.25
+            },
+            "formula": "fico_component_score * fico_sensitivity_weight",
+            "result": 0.05,
+            "parameter_used": {
+              "fico_sensitivity_weight": 0.2
+            }
+          },
+          {
+            "step_name": "dti_component",
+            "input_values": {
+              "raw_dti": 95.0,
+              "normalized_dti": 1.0
+            },
+            "formula": "normalized_dti * dti_sensitivity_value",
+            "result": 0.15,
+            "parameter_used": {
+              "dti_sensitivity_value": 0.15
+            }
+          },
+          {
+            "step_name": "dti_weighted",
+            "input_values": {
+              "dti_component_score": 0.15
+            },
+            "formula": "dti_component_score * dti_sensitivity_weight",
+            "result": 0.0225,
+            "parameter_used": {
+              "dti_sensitivity_weight": 0.15
+            }
+          },
+          {
+            "step_name": "ltv_component",
+            "input_values": {
+              "raw_ltv": 140.0,
+              "normalized_ltv": 1.0
+            },
+            "formula": "normalized_ltv * ltv_sensitivity_value",
+            "result": 0.1,
+            "parameter_used": {
+              "ltv_sensitivity_value": 0.1
+            }
+          },
+          {
+            "step_name": "ltv_weighted",
+            "input_values": {
+              "ltv_component_score": 0.1
+            },
+            "formula": "ltv_component_score * ltv_sensitivity_weight",
+            "result": 0.01,
+            "parameter_used": {
+              "ltv_sensitivity_weight": 0.1
+            }
+          },
+          {
+            "step_name": "age_component",
+            "input_values": {
+              "raw_age": 152,
+              "normalized_age": 0.7
+            },
+            "formula": "normalized_age * age_sensitivity_value",
+            "result": 0.105,
+            "parameter_used": {
+              "age_sensitivity_value": 0.15
+            }
+          },
+          {
+            "step_name": "age_weighted",
+            "input_values": {
+              "age_component_score": 0.105
+            },
+            "formula": "age_component_score * age_sensitivity_weight",
+            "result": 0.0105,
+            "parameter_used": {
+              "age_sensitivity_weight": 0.1
+            }
+          },
+          {
+            "step_name": "history_component",
+            "input_values": {
+              "raw_history": true,
+              "normalized_history": 1.0
+            },
+            "formula": "normalized_history * history_sensitivity_value",
+            "result": 0.3,
+            "parameter_used": {
+              "history_sensitivity_value": 0.3
+            }
+          },
+          {
+            "step_name": "history_weighted",
+            "input_values": {
+              "history_component_score": 0.3
+            },
+            "formula": "history_component_score * history_sensitivity_weight",
+            "result": 0.03,
+            "parameter_used": {
+              "history_sensitivity_weight": 0.1
+            }
+          },
+          {
+            "step_name": "final_aggregation",
+            "input_values": {
+              "rate_weighted": 0.14,
+              "term_weighted": 0.0,
+              "fico_weighted": 0.05,
+              "dti_weighted": 0.0225,
+              "ltv_weighted": 0.01,
+              "age_weighted": 0.0105,
+              "history_weighted": 0.03,
+              "total_weight": 1.2
+            },
+            "formula": "sum(weighted_scores) / total_weight",
+            "result": 0.2192,
+            "parameter_used": {}
+          },
+          {
+            "step_name": "risk_level_determination",
+            "input_values": {
+              "final_score": 0.2192,
+              "high_threshold": 0.7,
+              "medium_threshold": 0.4
+            },
+            "formula": "if score >= high_threshold: 'high' elif score >= medium_threshold: 'medium' else 'low'",
+            "result": 0.0,
+            "parameter_used": {
+              "high_risk_threshold_value": 0.7,
+              "medium_risk_threshold_value": 0.4
+            }
+          }
+        ],
+        "parameters_used": {
+          "rate_sensitivity_value": 0.4,
+          "rate_sensitivity_weight": 0.35,
+          "term_sensitivity_value": 0.25,
+          "term_sensitivity_weight": 0.2,
+          "fico_sensitivity_value": 0.25,
+          "fico_sensitivity_weight": 0.2,
+          "dti_sensitivity_value": 0.15,
+          "dti_sensitivity_weight": 0.15,
+          "ltv_sensitivity_value": 0.1,
+          "ltv_sensitivity_weight": 0.1,
+          "history_sensitivity_value": 0.3,
+          "history_sensitivity_weight": 0.1,
+          "age_sensitivity_value": 0.15,
+          "age_sensitivity_weight": 0.1,
+          "high_risk_threshold_value": 0.7,
+          "high_risk_threshold_weight": 0.0,
+          "medium_risk_threshold_value": 0.4,
+          "medium_risk_threshold_weight": 0.0
+        },
+        "parameter_version_id": "PARAM_20260601225945522",
+        "anomalies": [
+          {
+            "sample_id": "SAMP_20260607222432412_d7e98bb1",
+            "field_name": "principal",
+            "expected_range": "10,000 - 2,000,000",
+            "actual_value": 2800000.0,
+            "severity": "critical",
+            "description": "贷款本金应在合理范围内"
+          },
+          {
+            "sample_id": "SAMP_20260607222432412_d7e98bb1",
+            "field_name": "interest_rate",
+            "expected_range": "0.5% - 15.0%",
+            "actual_value": 18.5,
+            "severity": "critical",
+            "description": "利率应在合理范围内"
+          },
+          {
+            "sample_id": "SAMP_20260607222432412_d7e98bb1",
+            "field_name": "remaining_term",
+            "expected_range": "1 - 360个月",
+            "actual_value": 480,
+            "severity": "critical",
+            "description": "剩余期限应在1-360个月之间"
+          },
+          {
+            "sample_id": "SAMP_20260607222432412_d7e98bb1",
+            "field_name": "borrower_age",
+            "expected_range": "18 - 100岁",
+            "actual_value": 152,
+            "severity": "warning",
+            "description": "借款人年龄应在合理范围内"
+          },
+          {
+            "sample_id": "SAMP_20260607222432412_d7e98bb1",
+            "field_name": "fico_score",
+            "expected_range": "300 - 850",
+            "actual_value": 250,
+            "severity": "critical",
+            "description": "FICO评分应在300-850之间"
+          },
+          {
+            "sample_id": "SAMP_20260607222432412_d7e98bb1",
+            "field_name": "dti_ratio",
+            "expected_range": "0 - 80%",
+            "actual_value": 95.0,
+            "severity": "warning",
+            "description": "DTI比率通常不超过80%"
+          },
+          {
+            "sample_id": "SAMP_20260607222432412_d7e98bb1",
+            "field_name": "ltv_ratio",
+            "expected_range": "0 - 125%",
+            "actual_value": 140.0,
+            "severity": "warning",
+            "description": "LTV比率通常不超过125%"
+          },
+          {
+            "sample_id": "SAMP_20260607222432412_d7e98bb1",
+            "field_name": "overall",
+            "expected_range": "最多2个严重异常",
+            "actual_value": "4个严重异常",
+            "severity": "critical",
+            "description": "样本存在多个严重异常，建议人工复核完整数据来源"
+          }
+        ],
+        "needs_manual_review": true,
+        "review_status": "pending",
+        "review_note": "",
+        "reviewed_by": "",
+        "reviewed_at": "",
+        "calculated_at": "2026-06-07T22:24:32.412249"
+      },
+      {
+        "sample_id": "SAMP_20260607222432412_65e9d105",
+        "loan_id": "LOAN-003",
+        "sensitivity_score": 0.1483,
+        "risk_level": "low",
+        "calculation_steps": [
+          {
+            "step_name": "rate_component",
+            "input_values": {
+              "raw_rate": 5.75,
+              "normalized_rate": 0.575
+            },
+            "formula": "normalized_rate * rate_sensitivity_value",
+            "result": 0.23,
+            "parameter_used": {
+              "rate_sensitivity_value": 0.4
+            }
+          },
+          {
+            "step_name": "rate_weighted",
+            "input_values": {
+              "rate_component_score": 0.23
+            },
+            "formula": "rate_component_score * rate_sensitivity_weight",
+            "result": 0.0805,
+            "parameter_used": {
+              "rate_sensitivity_weight": 0.35
+            }
+          },
+          {
+            "step_name": "term_component",
+            "input_values": {
+              "raw_term": 180,
+              "normalized_term": 0.5
+            },
+            "formula": "normalized_term * term_sensitivity_value",
+            "result": 0.125,
+            "parameter_used": {
+              "term_sensitivity_value": 0.25
+            }
+          },
+          {
+            "step_name": "term_weighted",
+            "input_values": {
+              "term_component_score": 0.125
+            },
+            "formula": "term_component_score * term_sensitivity_weight",
+            "result": 0.025,
+            "parameter_used": {
+              "term_sensitivity_weight": 0.2
+            }
+          },
+          {
+            "step_name": "fico_component",
+            "input_values": {
+              "raw_fico": 680,
+              "normalized_fico": 0.3091
+            },
+            "formula": "normalized_fico * fico_sensitivity_value",
+            "result": 0.0773,
+            "parameter_used": {
+              "fico_sensitivity_value": 0.25
+            }
+          },
+          {
+            "step_name": "fico_weighted",
+            "input_values": {
+              "fico_component_score": 0.0773
+            },
+            "formula": "fico_component_score * fico_sensitivity_weight",
+            "result": 0.0155,
+            "parameter_used": {
+              "fico_sensitivity_weight": 0.2
+            }
+          },
+          {
+            "step_name": "dti_component",
+            "input_values": {
+              "raw_dti": 38.0,
+              "normalized_dti": 0.6333
+            },
+            "formula": "normalized_dti * dti_sensitivity_value",
+            "result": 0.095,
+            "parameter_used": {
+              "dti_sensitivity_value": 0.15
+            }
+          },
+          {
+            "step_name": "dti_weighted",
+            "input_values": {
+              "dti_component_score": 0.095
+            },
+            "formula": "dti_component_score * dti_sensitivity_weight",
+            "result": 0.0142,
+            "parameter_used": {
+              "dti_sensitivity_weight": 0.15
+            }
+          },
+          {
+            "step_name": "ltv_component",
+            "input_values": {
+              "raw_ltv": 82.0,
+              "normalized_ltv": 0.82
+            },
+            "formula": "normalized_ltv * ltv_sensitivity_value",
+            "result": 0.082,
+            "parameter_used": {
+              "ltv_sensitivity_value": 0.1
+            }
+          },
+          {
+            "step_name": "ltv_weighted",
+            "input_values": {
+              "ltv_component_score": 0.082
+            },
+            "formula": "ltv_component_score * ltv_sensitivity_weight",
+            "result": 0.0082,
+            "parameter_used": {
+              "ltv_sensitivity_weight": 0.1
+            }
+          },
+          {
+            "step_name": "age_component",
+            "input_values": {
+              "raw_age": 45,
+              "normalized_age": 0.3
+            },
+            "formula": "normalized_age * age_sensitivity_value",
+            "result": 0.045,
+            "parameter_used": {
+              "age_sensitivity_value": 0.15
+            }
+          },
+          {
+            "step_name": "age_weighted",
+            "input_values": {
+              "age_component_score": 0.045
+            },
+            "formula": "age_component_score * age_sensitivity_weight",
+            "result": 0.0045,
+            "parameter_used": {
+              "age_sensitivity_weight": 0.1
+            }
+          },
+          {
+            "step_name": "history_component",
+            "input_values": {
+              "raw_history": true,
+              "normalized_history": 1.0
+            },
+            "formula": "normalized_history * history_sensitivity_value",
+            "result": 0.3,
+            "parameter_used": {
+              "history_sensitivity_value": 0.3
+            }
+          },
+          {
+            "step_name": "history_weighted",
+            "input_values": {
+              "history_component_score": 0.3
+            },
+            "formula": "history_component_score * history_sensitivity_weight",
+            "result": 0.03,
+            "parameter_used": {
+              "history_sensitivity_weight": 0.1
+            }
+          },
+          {
+            "step_name": "final_aggregation",
+            "input_values": {
+              "rate_weighted": 0.0805,
+              "term_weighted": 0.025,
+              "fico_weighted": 0.0155,
+              "dti_weighted": 0.0142,
+              "ltv_weighted": 0.0082,
+              "age_weighted": 0.0045,
+              "history_weighted": 0.03,
+              "total_weight": 1.2
+            },
+            "formula": "sum(weighted_scores) / total_weight",
+            "result": 0.1483,
+            "parameter_used": {}
+          },
+          {
+            "step_name": "risk_level_determination",
+            "input_values": {
+              "final_score": 0.1483,
+              "high_threshold": 0.7,
+              "medium_threshold": 0.4
+            },
+            "formula": "if score >= high_threshold: 'high' elif score >= medium_threshold: 'medium' else 'low'",
+            "result": 0.0,
+            "parameter_used": {
+              "high_risk_threshold_value": 0.7,
+              "medium_risk_threshold_value": 0.4
+            }
+          }
+        ],
+        "parameters_used": {
+          "rate_sensitivity_value": 0.4,
+          "rate_sensitivity_weight": 0.35,
+          "term_sensitivity_value": 0.25,
+          "term_sensitivity_weight": 0.2,
+          "fico_sensitivity_value": 0.25,
+          "fico_sensitivity_weight": 0.2,
+          "dti_sensitivity_value": 0.15,
+          "dti_sensitivity_weight": 0.15,
+          "ltv_sensitivity_value": 0.1,
+          "ltv_sensitivity_weight": 0.1,
+          "history_sensitivity_value": 0.3,
+          "history_sensitivity_weight": 0.1,
+          "age_sensitivity_value": 0.15,
+          "age_sensitivity_weight": 0.1,
+          "high_risk_threshold_value": 0.7,
+          "high_risk_threshold_weight": 0.0,
+          "medium_risk_threshold_value": 0.4,
+          "medium_risk_threshold_weight": 0.0
+        },
+        "parameter_version_id": "PARAM_20260601225945522",
+        "anomalies": [],
+        "needs_manual_review": false,
+        "review_status": "not_applicable",
+        "review_note": "",
+        "reviewed_by": "",
+        "reviewed_at": "",
+        "calculated_at": "2026-06-07T22:24:32.412275"
+      },
+      {
+        "sample_id": "SAMP_20260607222432412_83a7fa02",
+        "loan_id": "LOAN-004",
+        "sensitivity_score": 0.0768,
+        "risk_level": "low",
+        "calculation_steps": [
+          {
+            "step_name": "rate_component",
+            "input_values": {
+              "raw_rate": 3.85,
+              "normalized_rate": 0.385
+            },
+            "formula": "normalized_rate * rate_sensitivity_value",
+            "result": 0.154,
+            "parameter_used": {
+              "rate_sensitivity_value": 0.4
+            }
+          },
+          {
+            "step_name": "rate_weighted",
+            "input_values": {
+              "rate_component_score": 0.154
+            },
+            "formula": "rate_component_score * rate_sensitivity_weight",
+            "result": 0.0539,
+            "parameter_used": {
+              "rate_sensitivity_weight": 0.35
+            }
+          },
+          {
+            "step_name": "term_component",
+            "input_values": {
+              "raw_term": 300,
+              "normalized_term": 0.1667
+            },
+            "formula": "normalized_term * term_sensitivity_value",
+            "result": 0.0417,
+            "parameter_used": {
+              "term_sensitivity_value": 0.25
+            }
+          },
+          {
+            "step_name": "term_weighted",
+            "input_values": {
+              "term_component_score": 0.0417
+            },
+            "formula": "term_component_score * term_sensitivity_weight",
+            "result": 0.0083,
+            "parameter_used": {
+              "term_sensitivity_weight": 0.2
+            }
+          },
+          {
+            "step_name": "fico_component",
+            "input_values": {
+              "raw_fico": 760,
+              "normalized_fico": 0.1636
+            },
+            "formula": "normalized_fico * fico_sensitivity_value",
+            "result": 0.0409,
+            "parameter_used": {
+              "fico_sensitivity_value": 0.25
+            }
+          },
+          {
+            "step_name": "fico_weighted",
+            "input_values": {
+              "fico_component_score": 0.0409
+            },
+            "formula": "fico_component_score * fico_sensitivity_weight",
+            "result": 0.0082,
+            "parameter_used": {
+              "fico_sensitivity_weight": 0.2
+            }
+          },
+          {
+            "step_name": "dti_component",
+            "input_values": {
+              "raw_dti": 28.0,
+              "normalized_dti": 0.4667
+            },
+            "formula": "normalized_dti * dti_sensitivity_value",
+            "result": 0.07,
+            "parameter_used": {
+              "dti_sensitivity_value": 0.15
+            }
+          },
+          {
+            "step_name": "dti_weighted",
+            "input_values": {
+              "dti_component_score": 0.07
+            },
+            "formula": "dti_component_score * dti_sensitivity_weight",
+            "result": 0.0105,
+            "parameter_used": {
+              "dti_sensitivity_weight": 0.15
+            }
+          },
+          {
+            "step_name": "ltv_component",
+            "input_values": {
+              "raw_ltv": 68.0,
+              "normalized_ltv": 0.68
+            },
+            "formula": "normalized_ltv * ltv_sensitivity_value",
+            "result": 0.068,
+            "parameter_used": {
+              "ltv_sensitivity_value": 0.1
+            }
+          },
+          {
+            "step_name": "ltv_weighted",
+            "input_values": {
+              "ltv_component_score": 0.068
+            },
+            "formula": "ltv_component_score * ltv_sensitivity_weight",
+            "result": 0.0068,
+            "parameter_used": {
+              "ltv_sensitivity_weight": 0.1
+            }
+          },
+          {
+            "step_name": "age_component",
+            "input_values": {
+              "raw_age": 42,
+              "normalized_age": 0.3
+            },
+            "formula": "normalized_age * age_sensitivity_value",
+            "result": 0.045,
+            "parameter_used": {
+              "age_sensitivity_value": 0.15
+            }
+          },
+          {
+            "step_name": "age_weighted",
+            "input_values": {
+              "age_component_score": 0.045
+            },
+            "formula": "age_component_score * age_sensitivity_weight",
+            "result": 0.0045,
+            "parameter_used": {
+              "age_sensitivity_weight": 0.1
+            }
+          },
+          {
+            "step_name": "history_component",
+            "input_values": {
+              "raw_history": false,
+              "normalized_history": 0.0
+            },
+            "formula": "normalized_history * history_sensitivity_value",
+            "result": 0.0,
+            "parameter_used": {
+              "history_sensitivity_value": 0.3
+            }
+          },
+          {
+            "step_name": "history_weighted",
+            "input_values": {
+              "history_component_score": 0.0
+            },
+            "formula": "history_component_score * history_sensitivity_weight",
+            "result": 0.0,
+            "parameter_used": {
+              "history_sensitivity_weight": 0.1
+            }
+          },
+          {
+            "step_name": "final_aggregation",
+            "input_values": {
+              "rate_weighted": 0.0539,
+              "term_weighted": 0.0083,
+              "fico_weighted": 0.0082,
+              "dti_weighted": 0.0105,
+              "ltv_weighted": 0.0068,
+              "age_weighted": 0.0045,
+              "history_weighted": 0.0,
+              "total_weight": 1.2
+            },
+            "formula": "sum(weighted_scores) / total_weight",
+            "result": 0.0768,
+            "parameter_used": {}
+          },
+          {
+            "step_name": "risk_level_determination",
+            "input_values": {
+              "final_score": 0.0768,
+              "high_threshold": 0.7,
+              "medium_threshold": 0.4
+            },
+            "formula": "if score >= high_threshold: 'high' elif score >= medium_threshold: 'medium' else 'low'",
+            "result": 0.0,
+            "parameter_used": {
+              "high_risk_threshold_value": 0.7,
+              "medium_risk_threshold_value": 0.4
+            }
+          }
+        ],
+        "parameters_used": {
+          "rate_sensitivity_value": 0.4,
+          "rate_sensitivity_weight": 0.35,
+          "term_sensitivity_value": 0.25,
+          "term_sensitivity_weight": 0.2,
+          "fico_sensitivity_value": 0.25,
+          "fico_sensitivity_weight": 0.2,
+          "dti_sensitivity_value": 0.15,
+          "dti_sensitivity_weight": 0.15,
+          "ltv_sensitivity_value": 0.1,
+          "ltv_sensitivity_weight": 0.1,
+          "history_sensitivity_value": 0.3,
+          "history_sensitivity_weight": 0.1,
+          "age_sensitivity_value": 0.15,
+          "age_sensitivity_weight": 0.1,
+          "high_risk_threshold_value": 0.7,
+          "high_risk_threshold_weight": 0.0,
+          "medium_risk_threshold_value": 0.4,
+          "medium_risk_threshold_weight": 0.0
+        },
+        "parameter_version_id": "PARAM_20260601225945522",
+        "anomalies": [],
+        "needs_manual_review": false,
+        "review_status": "not_applicable",
+        "review_note": "",
+        "reviewed_by": "",
+        "reviewed_at": "",
+        "calculated_at": "2026-06-07T22:24:32.412298"
+      },
+      {
+        "sample_id": "SAMP_20260607222432412_97cf52a2",
+        "loan_id": "LOAN-005",
+        "sensitivity_score": 0.1037,
+        "risk_level": "low",
+        "calculation_steps": [
+          {
+            "step_name": "rate_component",
+            "input_values": {
+              "raw_rate": 0.1,
+              "normalized_rate": 0.01
+            },
+            "formula": "normalized_rate * rate_sensitivity_value",
+            "result": 0.004,
+            "parameter_used": {
+              "rate_sensitivity_value": 0.4
+            }
+          },
+          {
+            "step_name": "rate_weighted",
+            "input_values": {
+              "rate_component_score": 0.004
+            },
+            "formula": "rate_component_score * rate_sensitivity_weight",
+            "result": 0.0014,
+            "parameter_used": {
+              "rate_sensitivity_weight": 0.35
+            }
+          },
+          {
+            "step_name": "term_component",
+            "input_values": {
+              "raw_term": 0,
+              "normalized_term": 1.0
+            },
+            "formula": "normalized_term * term_sensitivity_value",
+            "result": 0.25,
+            "parameter_used": {
+              "term_sensitivity_value": 0.25
+            }
+          },
+          {
+            "step_name": "term_weighted",
+            "input_values": {
+              "term_component_score": 0.25
+            },
+            "formula": "term_component_score * term_sensitivity_weight",
+            "result": 0.05,
+            "parameter_used": {
+              "term_sensitivity_weight": 0.2
+            }
+          },
+          {
+            "step_name": "fico_component",
+            "input_values": {
+              "raw_fico": 900,
+              "normalized_fico": 0.0
+            },
+            "formula": "normalized_fico * fico_sensitivity_value",
+            "result": 0.0,
+            "parameter_used": {
+              "fico_sensitivity_value": 0.25
+            }
+          },
+          {
+            "step_name": "fico_weighted",
+            "input_values": {
+              "fico_component_score": 0.0
+            },
+            "formula": "fico_component_score * fico_sensitivity_weight",
+            "result": 0.0,
+            "parameter_used": {
+              "fico_sensitivity_weight": 0.2
+            }
+          },
+          {
+            "step_name": "dti_component",
+            "input_values": {
+              "raw_dti": 150.0,
+              "normalized_dti": 1.0
+            },
+            "formula": "normalized_dti * dti_sensitivity_value",
+            "result": 0.15,
+            "parameter_used": {
+              "dti_sensitivity_value": 0.15
+            }
+          },
+          {
+            "step_name": "dti_weighted",
+            "input_values": {
+              "dti_component_score": 0.15
+            },
+            "formula": "dti_component_score * dti_sensitivity_weight",
+            "result": 0.0225,
+            "parameter_used": {
+              "dti_sensitivity_weight": 0.15
+            }
+          },
+          {
+            "step_name": "ltv_component",
+            "input_values": {
+              "raw_ltv": 200.0,
+              "normalized_ltv": 1.0
+            },
+            "formula": "normalized_ltv * ltv_sensitivity_value",
+            "result": 0.1,
+            "parameter_used": {
+              "ltv_sensitivity_value": 0.1
+            }
+          },
+          {
+            "step_name": "ltv_weighted",
+            "input_values": {
+              "ltv_component_score": 0.1
+            },
+            "formula": "ltv_component_score * ltv_sensitivity_weight",
+            "result": 0.01,
+            "parameter_used": {
+              "ltv_sensitivity_weight": 0.1
+            }
+          },
+          {
+            "step_name": "age_component",
+            "input_values": {
+              "raw_age": 105,
+              "normalized_age": 0.7
+            },
+            "formula": "normalized_age * age_sensitivity_value",
+            "result": 0.105,
+            "parameter_used": {
+              "age_sensitivity_value": 0.15
+            }
+          },
+          {
+            "step_name": "age_weighted",
+            "input_values": {
+              "age_component_score": 0.105
+            },
+            "formula": "age_component_score * age_sensitivity_weight",
+            "result": 0.0105,
+            "parameter_used": {
+              "age_sensitivity_weight": 0.1
+            }
+          },
+          {
+            "step_name": "history_component",
+            "input_values": {
+              "raw_history": true,
+              "normalized_history": 1.0
+            },
+            "formula": "normalized_history * history_sensitivity_value",
+            "result": 0.3,
+            "parameter_used": {
+              "history_sensitivity_value": 0.3
+            }
+          },
+          {
+            "step_name": "history_weighted",
+            "input_values": {
+              "history_component_score": 0.3
+            },
+            "formula": "history_component_score * history_sensitivity_weight",
+            "result": 0.03,
+            "parameter_used": {
+              "history_sensitivity_weight": 0.1
+            }
+          },
+          {
+            "step_name": "final_aggregation",
+            "input_values": {
+              "rate_weighted": 0.0014,
+              "term_weighted": 0.05,
+              "fico_weighted": 0.0,
+              "dti_weighted": 0.0225,
+              "ltv_weighted": 0.01,
+              "age_weighted": 0.0105,
+              "history_weighted": 0.03,
+              "total_weight": 1.2
+            },
+            "formula": "sum(weighted_scores) / total_weight",
+            "result": 0.1037,
+            "parameter_used": {}
+          },
+          {
+            "step_name": "risk_level_determination",
+            "input_values": {
+              "final_score": 0.1037,
+              "high_threshold": 0.7,
+              "medium_threshold": 0.4
+            },
+            "formula": "if score >= high_threshold: 'high' elif score >= medium_threshold: 'medium' else 'low'",
+            "result": 0.0,
+            "parameter_used": {
+              "high_risk_threshold_value": 0.7,
+              "medium_risk_threshold_value": 0.4
+            }
+          }
+        ],
+        "parameters_used": {
+          "rate_sensitivity_value": 0.4,
+          "rate_sensitivity_weight": 0.35,
+          "term_sensitivity_value": 0.25,
+          "term_sensitivity_weight": 0.2,
+          "fico_sensitivity_value": 0.25,
+          "fico_sensitivity_weight": 0.2,
+          "dti_sensitivity_value": 0.15,
+          "dti_sensitivity_weight": 0.15,
+          "ltv_sensitivity_value": 0.1,
+          "ltv_sensitivity_weight": 0.1,
+          "history_sensitivity_value": 0.3,
+          "history_sensitivity_weight": 0.1,
+          "age_sensitivity_value": 0.15,
+          "age_sensitivity_weight": 0.1,
+          "high_risk_threshold_value": 0.7,
+          "high_risk_threshold_weight": 0.0,
+          "medium_risk_threshold_value": 0.4,
+          "medium_risk_threshold_weight": 0.0
+        },
+        "parameter_version_id": "PARAM_20260601225945522",
+        "anomalies": [
+          {
+            "sample_id": "SAMP_20260607222432412_97cf52a2",
+            "field_name": "principal",
+            "expected_range": "10,000 - 2,000,000",
+            "actual_value": 9500000.0,
+            "severity": "critical",
+            "description": "贷款本金应在合理范围内"
+          },
+          {
+            "sample_id": "SAMP_20260607222432412_97cf52a2",
+            "field_name": "interest_rate",
+            "expected_range": "0.5% - 15.0%",
+            "actual_value": 0.1,
+            "severity": "critical",
+            "description": "利率应在合理范围内"
+          },
+          {
+            "sample_id": "SAMP_20260607222432412_97cf52a2",
+            "field_name": "remaining_term",
+            "expected_range": "1 - 360个月",
+            "actual_value": 0,
+            "severity": "critical",
+            "description": "剩余期限应在1-360个月之间"
+          },
+          {
+            "sample_id": "SAMP_20260607222432412_97cf52a2",
+            "field_name": "borrower_age",
+            "expected_range": "18 - 100岁",
+            "actual_value": 105,
+            "severity": "warning",
+            "description": "借款人年龄应在合理范围内"
+          },
+          {
+            "sample_id": "SAMP_20260607222432412_97cf52a2",
+            "field_name": "fico_score",
+            "expected_range": "300 - 850",
+            "actual_value": 900,
+            "severity": "critical",
+            "description": "FICO评分应在300-850之间"
+          },
+          {
+            "sample_id": "SAMP_20260607222432412_97cf52a2",
+            "field_name": "dti_ratio",
+            "expected_range": "0 - 80%",
+            "actual_value": 150.0,
+            "severity": "warning",
+            "description": "DTI比率通常不超过80%"
+          },
+          {
+            "sample_id": "SAMP_20260607222432412_97cf52a2",
+            "field_name": "ltv_ratio",
+            "expected_range": "0 - 125%",
+            "actual_value": 200.0,
+            "severity": "warning",
+            "description": "LTV比率通常不超过125%"
+          },
+          {
+            "sample_id": "SAMP_20260607222432412_97cf52a2",
+            "field_name": "overall",
+            "expected_range": "最多2个严重异常",
+            "actual_value": "4个严重异常",
+            "severity": "critical",
+            "description": "样本存在多个严重异常，建议人工复核完整数据来源"
+          }
+        ],
+        "needs_manual_review": true,
+        "review_status": "pending",
+        "review_note": "",
+        "reviewed_by": "",
+        "reviewed_at": "",
+        "calculated_at": "2026-06-07T22:24:32.412324"
+      },
+      {
+        "sample_id": "SAMP_20260607222432412_3de645af",
+        "loan_id": "LOAN-006",
+        "sensitivity_score": 0.1542,
+        "risk_level": "low",
+        "calculation_steps": [
+          {
+            "step_name": "rate_component",
+            "input_values": {
+              "raw_rate": 6.25,
+              "normalized_rate": 0.625
+            },
+            "formula": "normalized_rate * rate_sensitivity_value",
+            "result": 0.25,
+            "parameter_used": {
+              "rate_sensitivity_value": 0.4
+            }
+          },
+          {
+            "step_name": "rate_weighted",
+            "input_values": {
+              "rate_component_score": 0.25
+            },
+            "formula": "rate_component_score * rate_sensitivity_weight",
+            "result": 0.0875,
+            "parameter_used": {
+              "rate_sensitivity_weight": 0.35
+            }
+          },
+          {
+            "step_name": "term_component",
+            "input_values": {
+              "raw_term": 220,
+              "normalized_term": 0.3889
+            },
+            "formula": "normalized_term * term_sensitivity_value",
+            "result": 0.0972,
+            "parameter_used": {
+              "term_sensitivity_value": 0.25
+            }
+          },
+          {
+            "step_name": "term_weighted",
+            "input_values": {
+              "term_component_score": 0.0972
+            },
+            "formula": "term_component_score * term_sensitivity_weight",
+            "result": 0.0194,
+            "parameter_used": {
+              "term_sensitivity_weight": 0.2
+            }
+          },
+          {
+            "step_name": "fico_component",
+            "input_values": {
+              "raw_fico": 640,
+              "normalized_fico": 0.3818
+            },
+            "formula": "normalized_fico * fico_sensitivity_value",
+            "result": 0.0955,
+            "parameter_used": {
+              "fico_sensitivity_value": 0.25
+            }
+          },
+          {
+            "step_name": "fico_weighted",
+            "input_values": {
+              "fico_component_score": 0.0955
+            },
+            "formula": "fico_component_score * fico_sensitivity_weight",
+            "result": 0.0191,
+            "parameter_used": {
+              "fico_sensitivity_weight": 0.2
+            }
+          },
+          {
+            "step_name": "dti_component",
+            "input_values": {
+              "raw_dti": 42.0,
+              "normalized_dti": 0.7
+            },
+            "formula": "normalized_dti * dti_sensitivity_value",
+            "result": 0.105,
+            "parameter_used": {
+              "dti_sensitivity_value": 0.15
+            }
+          },
+          {
+            "step_name": "dti_weighted",
+            "input_values": {
+              "dti_component_score": 0.105
+            },
+            "formula": "dti_component_score * dti_sensitivity_weight",
+            "result": 0.0158,
+            "parameter_used": {
+              "dti_sensitivity_weight": 0.15
+            }
+          },
+          {
+            "step_name": "ltv_component",
+            "input_values": {
+              "raw_ltv": 88.0,
+              "normalized_ltv": 0.88
+            },
+            "formula": "normalized_ltv * ltv_sensitivity_value",
+            "result": 0.088,
+            "parameter_used": {
+              "ltv_sensitivity_value": 0.1
+            }
+          },
+          {
+            "step_name": "ltv_weighted",
+            "input_values": {
+              "ltv_component_score": 0.088
+            },
+            "formula": "ltv_component_score * ltv_sensitivity_weight",
+            "result": 0.0088,
+            "parameter_used": {
+              "ltv_sensitivity_weight": 0.1
+            }
+          },
+          {
+            "step_name": "age_component",
+            "input_values": {
+              "raw_age": 52,
+              "normalized_age": 0.3
+            },
+            "formula": "normalized_age * age_sensitivity_value",
+            "result": 0.045,
+            "parameter_used": {
+              "age_sensitivity_value": 0.15
+            }
+          },
+          {
+            "step_name": "age_weighted",
+            "input_values": {
+              "age_component_score": 0.045
+            },
+            "formula": "age_component_score * age_sensitivity_weight",
+            "result": 0.0045,
+            "parameter_used": {
+              "age_sensitivity_weight": 0.1
+            }
+          },
+          {
+            "step_name": "history_component",
+            "input_values": {
+              "raw_history": true,
+              "normalized_history": 1.0
+            },
+            "formula": "normalized_history * history_sensitivity_value",
+            "result": 0.3,
+            "parameter_used": {
+              "history_sensitivity_value": 0.3
+            }
+          },
+          {
+            "step_name": "history_weighted",
+            "input_values": {
+              "history_component_score": 0.3
+            },
+            "formula": "history_component_score * history_sensitivity_weight",
+            "result": 0.03,
+            "parameter_used": {
+              "history_sensitivity_weight": 0.1
+            }
+          },
+          {
+            "step_name": "final_aggregation",
+            "input_values": {
+              "rate_weighted": 0.0875,
+              "term_weighted": 0.0194,
+              "fico_weighted": 0.0191,
+              "dti_weighted": 0.0158,
+              "ltv_weighted": 0.0088,
+              "age_weighted": 0.0045,
+              "history_weighted": 0.03,
+              "total_weight": 1.2
+            },
+            "formula": "sum(weighted_scores) / total_weight",
+            "result": 0.1542,
+            "parameter_used": {}
+          },
+          {
+            "step_name": "risk_level_determination",
+            "input_values": {
+              "final_score": 0.1542,
+              "high_threshold": 0.7,
+              "medium_threshold": 0.4
+            },
+            "formula": "if score >= high_threshold: 'high' elif score >= medium_threshold: 'medium' else 'low'",
+            "result": 0.0,
+            "parameter_used": {
+              "high_risk_threshold_value": 0.7,
+              "medium_risk_threshold_value": 0.4
+            }
+          }
+        ],
+        "parameters_used": {
+          "rate_sensitivity_value": 0.4,
+          "rate_sensitivity_weight": 0.35,
+          "term_sensitivity_value": 0.25,
+          "term_sensitivity_weight": 0.2,
+          "fico_sensitivity_value": 0.25,
+          "fico_sensitivity_weight": 0.2,
+          "dti_sensitivity_value": 0.15,
+          "dti_sensitivity_weight": 0.15,
+          "ltv_sensitivity_value": 0.1,
+          "ltv_sensitivity_weight": 0.1,
+          "history_sensitivity_value": 0.3,
+          "history_sensitivity_weight": 0.1,
+          "age_sensitivity_value": 0.15,
+          "age_sensitivity_weight": 0.1,
+          "high_risk_threshold_value": 0.7,
+          "high_risk_threshold_weight": 0.0,
+          "medium_risk_threshold_value": 0.4,
+          "medium_risk_threshold_weight": 0.0
+        },
+        "parameter_version_id": "PARAM_20260601225945522",
+        "anomalies": [],
+        "needs_manual_review": false,
+        "review_status": "not_applicable",
+        "review_note": "",
+        "reviewed_by": "",
+        "reviewed_at": "",
+        "calculated_at": "2026-06-07T22:24:32.412350"
+      }
+    ],
+    "conflicts": [
+      {
+        "conflict_id": "CONFLICT_20260607222432412",
+        "loan_id": "LOAN-002",
+        "sample_value": 0.2192,
+        "chart_value": 0.45,
+        "field_name": "sensitivity_score",
+        "sample_source": "样本ID: SAMP_20260607222432412_d7e98bb1, 来源: manual_input_data_entry",
+        "chart_source": "复盘图表, 报告期: 2026-Q1, 来源: manual_review_excel",
+        "difference": 23.08,
+        "suggested_action": "建议：新系统计算值(0.2192)低于复盘图表值(0.4500)，差异23.08%。请核对样本数据是否有更新，或确认复盘图表是否为人工调整值。",
+        "resolved": false,
+        "resolution_note": ""
+      },
+      {
+        "conflict_id": "CONFLICT_20260607222432412",
+        "loan_id": "LOAN-002",
+        "sample_value": "low",
+        "chart_value": "medium",
+        "field_name": "risk_level",
+        "sample_source": "样本ID: SAMP_20260607222432412_d7e98bb1, 来源: manual_input_data_entry",
+        "chart_source": "复盘图表, 报告期: 2026-Q1, 来源: manual_review_excel",
+        "difference": 0,
+        "suggested_action": "风险等级不一致：系统判定low，复盘图表记录medium。请核对风险阈值参数或是否存在人工调整记录。",
+        "resolved": false,
+        "resolution_note": ""
+      },
+      {
+        "conflict_id": "CONFLICT_20260607222432412",
+        "loan_id": "LOAN-002",
+        "sample_value": 2800000.0,
+        "chart_value": 280000.0,
+        "field_name": "principal",
+        "sample_source": "样本ID: SAMP_20260607222432412_d7e98bb1, 来源: manual_input_data_entry",
+        "chart_source": "复盘图表备注, 报告期: 2026-Q1",
+        "difference": 900.0,
+        "suggested_action": "本金不一致：样本2,800,000，复盘图表280,000，差异900.00%。请以最新数据为准。",
+        "resolved": false,
+        "resolution_note": ""
+      },
+      {
+        "conflict_id": "CONFLICT_20260607222432412",
+        "loan_id": "LOAN-003",
+        "sample_value": 0.1483,
+        "chart_value": 0.38,
+        "field_name": "sensitivity_score",
+        "sample_source": "样本ID: SAMP_20260607222432412_65e9d105, 来源: historical_backfill_2025",
+        "chart_source": "复盘图表, 报告期: 2025-Q4, 来源: historical_review",
+        "difference": 23.17,
+        "suggested_action": "建议：新系统计算值(0.1483)低于复盘图表值(0.3800)，差异23.17%。请核对样本数据是否有更新，或确认复盘图表是否为人工调整值。",
+        "resolved": false,
+        "resolution_note": ""
+      },
+      {
+        "conflict_id": "CONFLICT_20260607222432412",
+        "loan_id": "LOAN-003",
+        "sample_value": 420000.0,
+        "chart_value": 450000.0,
+        "field_name": "principal",
+        "sample_source": "样本ID: SAMP_20260607222432412_65e9d105, 来源: historical_backfill_2025",
+        "chart_source": "复盘图表备注, 报告期: 2025-Q4",
+        "difference": 6.67,
+        "suggested_action": "本金不一致：样本420,000，复盘图表450,000，差异6.67%。请以最新数据为准。",
+        "resolved": false,
+        "resolution_note": ""
+      },
+      {
+        "conflict_id": "CONFLICT_20260607222432412",
+        "loan_id": "LOAN-006",
+        "sample_value": 0.1542,
+        "chart_value": 0.52,
+        "field_name": "sensitivity_score",
+        "sample_source": "样本ID: SAMP_20260607222432412_3de645af, 来源: core_system_2026q2",
+        "chart_source": "复盘图表, 报告期: 2026-Q1, 来源: quarterly_review",
+        "difference": 36.58,
+        "suggested_action": "建议：新系统计算值(0.1542)低于复盘图表值(0.5200)，差异36.58%。请核对样本数据是否有更新，或确认复盘图表是否为人工调整值。",
+        "resolved": false,
+        "resolution_note": ""
+      },
+      {
+        "conflict_id": "CONFLICT_20260607222432412",
+        "loan_id": "LOAN-006",
+        "sample_value": "low",
+        "chart_value": "medium",
+        "field_name": "risk_level",
+        "sample_source": "样本ID: SAMP_20260607222432412_3de645af, 来源: core_system_2026q2",
+        "chart_source": "复盘图表, 报告期: 2026-Q1, 来源: quarterly_review",
+        "difference": 0,
+        "suggested_action": "风险等级不一致：系统判定low，复盘图表记录medium。请核对风险阈值参数或是否存在人工调整记录。",
+        "resolved": false,
+        "resolution_note": ""
+      }
+    ],
+    "status": "completed"
   }
 ]

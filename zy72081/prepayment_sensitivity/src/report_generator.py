@@ -316,11 +316,19 @@ class ReportGenerator:
         function scrollToSample(sampleId) {{
             const element = document.getElementById('detail-' + sampleId);
             if (element) {{
-                element.scrollIntoView({{ behavior: 'smooth', block: 'start' }});
                 const content = document.getElementById('content-' + sampleId);
                 const icon = document.getElementById('icon-' + sampleId);
                 content.classList.add('active');
                 icon.classList.add('active');
+                const offsetTop = element.offsetTop - 60;
+                try {{
+                    element.scrollIntoView({{ behavior: 'smooth', block: 'start' }});
+                }} catch(e) {{
+                    window.scrollTo({{ top: offsetTop, behavior: 'smooth' }});
+                }}
+                if (window.innerHeight <= 0) {{
+                    window.scrollTo(0, offsetTop);
+                }}
             }}
         }}
 
@@ -504,7 +512,11 @@ class ReportGenerator:
             risk_badge = f'<span class="badge badge-{result.risk_level}">{risk_label}</span>'
 
             review_badge = ""
-            if result.needs_manual_review:
+            if hasattr(result, 'review_status') and result.review_status == "approved":
+                review_badge = '<span class="badge" style="background: #059669; color: white;">✅ 已复核</span>'
+            elif hasattr(result, 'review_status') and result.review_status == "rejected":
+                review_badge = '<span class="badge" style="background: #dc2626; color: white;">❌ 已驳回</span>'
+            elif result.needs_manual_review:
                 review_badge = '<span class="badge badge-review">需人工复核</span>'
 
             sample_type = ""
@@ -609,10 +621,24 @@ class ReportGenerator:
                 """
 
             review_note_html = ""
+            review_info = []
+            if hasattr(result, 'review_status') and result.review_status and result.review_status not in ["pending", "not_applicable"]:
+                status_label = {"approved": "已通过", "rejected": "已驳回"}.get(result.review_status, result.review_status)
+                review_info.append(f"<strong>复核状态：</strong>{status_label}")
+            if hasattr(result, 'reviewed_by') and result.reviewed_by:
+                review_info.append(f"<strong>复核人：</strong>{result.reviewed_by}")
+            if hasattr(result, 'reviewed_at') and result.reviewed_at:
+                review_info.append(f"<strong>复核时间：</strong>{result.reviewed_at}")
             if result.review_note:
+                review_info.append(f"<strong>复核意见：</strong>{result.review_note}")
+
+            if review_info:
                 review_note_html = f"""
                     <div class="history-note" style="margin-top: 16px;">
-                        <strong>✅ 上次复核意见：</strong>{result.review_note}
+                        <h4 style="color: #065f46; margin-bottom: 8px;">✅ 上次复核记录</h4>
+                        <div style="font-size: 13px; line-height: 1.8;">
+                            {'<br>'.join(review_info)}
+                        </div>
                     </div>
                 """
 
