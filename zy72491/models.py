@@ -1,0 +1,70 @@
+from dataclasses import dataclass, field
+from datetime import datetime
+from typing import List, Optional, Dict
+from enum import Enum
+
+
+class RecordStatus(str, Enum):
+    SMOOTH = "顺利"
+    RAMP_NO_CHANGE = "坡道补录评分未变"
+    NIGHT_SUPPLEMENT = "夜间采样补录"
+    PENDING_REVIEW = "待交通协管复核"
+    NORMAL = "正常"
+
+
+class DataSource(str, Enum):
+    DAY_FORMAL = "白天正式表"
+    NIGHT_SAMPLING = "夜间采样点"
+    RAMP_SUPPLEMENT = "坡道补录"
+    MANUAL_CORRECTION = "人工修正"
+    RERUN = "重跑"
+
+
+@dataclass
+class SamplingPoint:
+    id: str
+    name: str
+    data_source: DataSource
+    permeability_rate: float
+    has_remarks: bool = False
+    remarks: Optional[str] = None
+    collected_at: Optional[datetime] = None
+
+
+@dataclass
+class RampRecord:
+    id: str
+    location: str
+    has_ramp: bool
+    ramp_slope: Optional[float] = None
+    ramp_remarks: Optional[str] = None
+
+
+@dataclass
+class EvaluationRecord:
+    id: str
+    road_name: str
+    district: str
+    score: float
+    previous_score: Optional[float] = None
+    status: RecordStatus = RecordStatus.SMOOTH
+    sampling_points: List[SamplingPoint] = field(default_factory=list)
+    ramp: Optional[RampRecord] = None
+    rectification_suggestions: List[str] = field(default_factory=list)
+    previous_suggestions: List[str] = field(default_factory=list)
+    data_source_notes: Dict[DataSource, str] = field(default_factory=dict)
+    created_at: datetime = field(default_factory=datetime.now)
+    updated_at: datetime = field(default_factory=datetime.now)
+    version: int = 1
+    is_rerun: bool = False
+    has_manual_correction: bool = False
+    review_night_supplemented: bool = False
+
+
+@dataclass
+class ProcessLog:
+    record_id: str
+    action: str
+    timestamp: datetime = field(default_factory=datetime.now)
+    operator: str = "系统"
+    details: str = ""

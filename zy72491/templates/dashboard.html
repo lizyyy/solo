@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>海绵城市透水铺装 - 城更项目小看板</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #2c5282, #2b6cb0);
+            color: white;
+            padding: 24px 32px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 12px rgba(44, 82, 130, 0.15);
+        }
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        .header .subtitle {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 12px;
+        }
+        .header .badge {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .stat-card .label {
+            font-size: 13px;
+            color: #718096;
+            margin-bottom: 8px;
+        }
+        .stat-card .value {
+            font-size: 28px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+        .stat-card .trend {
+            font-size: 12px;
+            margin-top: 4px;
+        }
+        .trend.up { color: #38a169; }
+        .trend.down { color: #e53e3e; }
+        .trend.same { color: #718096; }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            overflow: hidden;
+        }
+        .card-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            font-weight: 600;
+            font-size: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-body {
+            padding: 20px;
+        }
+
+        .record-item {
+            padding: 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .record-item:hover {
+            border-color: #4299e1;
+            background: #f7fafc;
+        }
+        .record-item.selected {
+            border-color: #3182ce;
+            background: #ebf8ff;
+        }
+        .record-item .record-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .record-item .record-id {
+            font-weight: 600;
+            color: #2d3748;
+        }
+        .record-item .record-road {
+            font-size: 14px;
+            color: #4a5568;
+            margin-bottom: 8px;
+        }
+        .record-item .record-meta {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            font-size: 13px;
+        }
+        .score {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        .score.high { color: #38a169; }
+        .score.mid { color: #d69e2e; }
+        .score.low { color: #e53e3e; }
+
+        .status-tag {
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-SMOOTH { background: #c6f6d5; color: #22543d; }
+        .status-RAMP_NO_CHANGE { background: #feebc8; color: #744210; }
+        .status-NIGHT_SUPPLEMENT { background: #bee3f8; color: #2a4365; }
+        .status-PENDING_REVIEW { background: #fed7d7; color: #742a2a; }
+        .status-NORMAL { background: #c6f6d5; color: #22543d; }
+
+        .detail-section {
+            margin-bottom: 20px;
+        }
+        .detail-section h4 {
+            font-size: 14px;
+            color: #4a5568;
+            margin-bottom: 10px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .point-item {
+            padding: 10px 12px;
+            background: #f7fafc;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        .point-item .point-name {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        .point-item .point-meta {
+            display: flex;
+            gap: 12px;
+            color: #718096;
+            font-size: 12px;
+        }
+        .point-item .point-remark {
+            margin-top: 6px;
+            padding: 8px;
+            background: #fffaf0;
+            border-left: 3px solid #ed8936;
+            border-radius: 4px;
+            color: #744210;
+            font-size: 12px;
+        }
+        .src-tag {
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+        .src-tag.night { background: #e9d8fd; color: #553c9a; }
+        .src-tag.day { background: #c6f6d5; color: #22543d; }
+
+        .suggestion-item {
+            padding: 10px 12px;
+            background: #fff5f5;
+            border-radius: 6px;
+            margin-bottom: 6px;
+            font-size: 13px;
+            border-left: 3px solid #fc8181;
+        }
+        .suggestion-item.remark {
+            background: #fffff0;
+            border-left-color: #ecc94b;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn-primary { background: #3182ce; color: white; }
+        .btn-primary:hover { background: #2b6cb0; }
+        .btn-warning { background: #d69e2e; color: white; }
+        .btn-warning:hover { background: #b7791f; }
+        .btn-success { background: #38a169; color: white; }
+        .btn-success:hover { background: #2f855a; }
+        .btn-secondary { background: #718096; color: white; }
+        .btn-secondary:hover { background: #4a5568; }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .log-item {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 13px;
+        }
+        .log-item:last-child { border-bottom: none; }
+        .log-item .log-time {
+            font-size: 11px;
+            color: #a0aec0;
+            margin-bottom: 4px;
+        }
+        .log-item .log-main {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .log-item .log-operator {
+            font-weight: 500;
+            color: #4a5568;
+        }
+        .log-item .log-action {
+            color: #2d3748;
+        }
+        .log-item .log-details {
+            margin-top: 4px;
+            color: #718096;
+            font-size: 12px;
+            padding-left: 12px;
+        }
+
+        .version-info {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            font-size: 12px;
+            color: #718096;
+            margin-top: 8px;
+        }
+        .ver-tag {
+            padding: 2px 8px;
+            background: #edf2f7;
+            border-radius: 10px;
+            font-size: 11px;
+        }
+        .ver-tag.manual { background: #fefcbf; color: #744210; }
+        .ver-tag.rerun { background: #e2e8f0; color: #4a5568; }
+        .ver-tag.night { background: #bee3f8; color: #2a4365; }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #a0aec0;
+            font-size: 14px;
+        }
+
+        .score-change {
+            font-size: 12px;
+            margin-left: 6px;
+        }
+        .score-change.up { color: #38a169; }
+        .score-change.down { color: #e53e3e; }
+        .score-change.same { color: #718096; }
+
+        .ramp-info {
+            padding: 10px 12px;
+            background: #f0fff4;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+        .ramp-info.none {
+            background: #fff5f5;
+        }
+        .ramp-info .ramp-loc {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        .ramp-info .ramp-remark {
+            color: #718096;
+            font-size: 12px;
+        }
+
+        .flow-hint {
+            background: #ebf8ff;
+            border-left: 4px solid #3182ce;
+            padding: 12px 16px;
+            border-radius: 4px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: #2a4365;
+        }
+        .flow-hint strong {
+            color: #2c5282;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🌊 海绵城市透水铺装 - 城更项目小看板</h1>
+        <p>城更项目经理阿宁的工作台 · 夜间采样备注不丢失 · 坡道补录留复核</p>
+        <div class="subtitle">
+            <span class="badge">演示模式</span>
+            <span class="badge" id="resetHint">数据已重置</span>
+            <button class="btn btn-secondary" style="margin-left: auto; padding: 6px 12px; font-size: 12px;" onclick="resetData()">重置演示数据</button>
+        </div>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-card">
+            <div class="label">评估记录总数</div>
+            <div class="value" id="statTotal">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="label">顺利通过</div>
+            <div class="value" id="statSmooth" style="color: #38a169;">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="label">待复核（坡道补录评分未变）</div>
+            <div class="value" id="statRamp" style="color: #d69e2e;">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="label">含夜间采样补录</div>
+            <div class="value" id="statNight" style="color: #3182ce;">0</div>
+        </div>
+    </div>
+
+    <div class="flow-hint">
+        <strong>💡 阿宁的三步流程提示：</strong>
+        点左边的记录 → 坡道补录（看评分会不会变）→ 补夜间采样（看整改建议更新）→ 坡道评分没变的别急着归正常，留交通协管复核
+    </div>
+
+    <div class="main-grid">
+        <div>
+            <div class="card">
+                <div class="card-header">
+                    <span>评估记录列表</span>
+                    <span style="font-size: 12px; color: #718096;">点击查看详情</span>
+                </div>
+                <div class="card-body" id="recordList">
+                    <div class="empty-state">加载中...</div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div class="card" style="margin-bottom: 24px;">
+                <div class="card-header">
+                    <span>记录详情</span>
+                </div>
+                <div class="card-body" id="recordDetail">
+                    <div class="empty-state">请选择一条记录</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span>处理日志</span>
+                </div>
+                <div class="card-body" id="logList" style="max-height: 400px; overflow-y: auto;">
+                    <div class="empty-state">暂无操作日志</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentRecordId = null;
+        let allRecords = [];
+
+        async function loadRecords() {
+            const res = await fetch('/api/records');
+            allRecords = await res.json();
+            renderRecordList();
+            updateStats();
+        }
+
+        async function loadLogs() {
+            const res = await fetch('/api/logs');
+            const logs = await res.json();
+            renderLogs(logs);
+        }
+
+        function updateStats() {
+            document.getElementById('statTotal').textContent = allRecords.length;
+            document.getElementById('statSmooth').textContent = allRecords.filter(r => 
+                r.status_code === 'SMOOTH' || r.status_code === 'NORMAL'
+            ).length;
+            document.getElementById('statRamp').textContent = allRecords.filter(r => 
+                r.status_code === 'RAMP_NO_CHANGE'
+            ).length;
+            document.getElementById('statNight').textContent = allRecords.filter(r => 
+                r.review_night_supplemented
+            ).length;
+        }
+
+        function renderRecordList() {
+            const container = document.getElementById('recordList');
+            if (allRecords.length === 0) {
+                container.innerHTML = '<div class="empty-state">暂无记录</div>';
+                return;
+            }
+
+            container.innerHTML = allRecords.map(r => {
+                const scoreClass = r.score >= 70 ? 'high' : r.score >= 50 ? 'mid' : 'low';
+                const selected = r.id === currentRecordId ? 'selected' : '';
+                let changeHtml = '';
+                if (r.previous_score !== null) {
+                    const diff = r.score - r.previous_score;
+                    if (diff > 0) changeHtml = `<span class="score-change up">↑+${diff.toFixed(1)}</span>`;
+                    else if (diff < 0) changeHtml = `<span class="score-change down">↓${diff.toFixed(1)}</span>`;
+                    else changeHtml = `<span class="score-change same">→无变化</span>`;
+                }
+                return `
+                    <div class="record-item ${selected}" onclick="selectRecord('${r.id}')">
+                        <div class="record-top">
+                            <span class="record-id">${r.id}</span>
+                            <span class="status-tag status-${r.status_code}">${r.status}</span>
+                        </div>
+                        <div class="record-road">${r.road_name}（${r.district}）</div>
+                        <div class="record-meta">
+                            <span class="score ${scoreClass}">${r.score.toFixed(1)}分</span>
+                            ${changeHtml}
+                            <span style="color: #a0aec0;">v${r.version}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function selectRecord(id) {
+            currentRecordId = id;
+            renderRecordList();
+            
+            const res = await fetch(`/api/records/${id}`);
+            const record = await res.json();
+            renderDetail(record);
+        }
+
+        function renderDetail(r) {
+            const container = document.getElementById('recordDetail');
+            
+            const scoreClass = r.score >= 70 ? 'high' : r.score >= 50 ? 'mid' : 'low';
+            const verTags = [];
+            if (r.is_rerun) verTags.push('<span class="ver-tag rerun">已重跑</span>');
+            if (r.has_manual_correction) verTags.push('<span class="ver-tag manual">含人工修正</span>');
+            if (r.review_night_supplemented) verTags.push('<span class="ver-tag night">已补夜间采样</span>');
+
+            let changeHtml = '';
+            if (r.previous_score !== null) {
+                const diff = r.score - r.previous_score;
+                if (diff > 0) changeHtml = `<span class="score-change up">(较上版 +${diff.toFixed(1)})</span>`;
+                else if (diff < 0) changeHtml = `<span class="score-change down">(较上版 ${diff.toFixed(1)})</span>`;
+                else changeHtml = `<span class="score-change same">(较上版无变化)</span>`;
+            }
+
+            const pointsHtml = r.sampling_points.map(p => {
+                const srcClass = p.data_source === '夜间采样点' ? 'night' : 'day';
+                const remarkHtml = p.remarks ? `<div class="point-remark">📝 ${p.remarks}</div>` : '';
+                return `
+                    <div class="point-item">
+                        <div class="point-name">${p.name}</div>
+                        <div class="point-meta">
+                            <span class="src-tag ${srcClass}">${p.data_source}</span>
+                            <span>透水率: ${p.permeability_rate.toFixed(2)}</span>
+                            ${p.collected_at ? `<span>${p.collected_at}</span>` : ''}
+                        </div>
+                        ${remarkHtml}
+                    </div>
+                `;
+            }).join('');
+
+            let rampHtml = '';
+            if (r.ramp) {
+                const rampClass = r.ramp.has_ramp ? '' : 'none';
+                const rampStatus = r.ramp.has_ramp ? '✅ 有无障碍坡道' : '❌ 无坡道';
+                const slopeHtml = r.ramp.ramp_slope ? `<div style="margin-top:4px;">坡度: ${r.ramp.ramp_slope}%</div>` : '';
+                const remarkHtml = r.ramp.ramp_remarks ? `<div class="ramp-remark">${r.ramp.ramp_remarks}</div>` : '';
+                rampHtml = `
+                    <div class="ramp-info ${rampClass}">
+                        <div class="ramp-loc">${r.ramp.location} - ${rampStatus}</div>
+                        ${slopeHtml}
+                        ${remarkHtml}
+                    </div>
+                `;
+            }
+
+            const suggHtml = r.rectification_suggestions.map((s, i) => {
+                const isRemark = s.includes('夜间采样备注');
+                return `<div class="suggestion-item ${isRemark ? 'remark' : ''}">${i + 1}. ${s}</div>`;
+            }).join('');
+
+            let prevSuggHtml = '';
+            if (r.previous_suggestions && r.previous_suggestions.length > 0 && 
+                JSON.stringify(r.previous_suggestions) !== JSON.stringify(r.rectification_suggestions)) {
+                prevSuggHtml = `
+                    <div class="detail-section">
+                        <h4>📋 上版整改建议（已更新）</h4>
+                        ${r.previous_suggestions.map((s, i) => `<div class="suggestion-item" style="opacity:0.6;">${i + 1}. ${s}</div>`).join('')}
+                    </div>
+                `;
+            }
+
+            const canSupplementRamp = r.status_code !== 'RAMP_NO_CHANGE' && !r.review_night_supplemented;
+            const canSupplementNight = !r.review_night_supplemented;
+            const canConfirm = r.status_code === 'RAMP_NO_CHANGE';
+
+            container.innerHTML = `
+                <div style="margin-bottom: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <h3 style="font-size: 18px;">${r.road_name}</h3>
+                        <span class="status-tag status-${r.status_code}">${r.status}</span>
+                    </div>
+                    <div style="color: #718096; font-size: 13px; margin-bottom: 8px;">${r.district} · ${r.id}</div>
+                    <div style="display: flex; align-items: baseline; gap: 8px;">
+                        <span class="score ${scoreClass}" style="font-size: 24px;">${r.score.toFixed(1)}分</span>
+                        ${changeHtml}
+                    </div>
+                    <div class="version-info">
+                        <span>版本 v${r.version}</span>
+                        ${verTags.join('')}
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h4>📍 采样点 (${r.sampling_points.length})</h4>
+                    ${pointsHtml}
+                </div>
+
+                <div class="detail-section">
+                    <h4>♿ 无障碍坡道</h4>
+                    ${rampHtml}
+                </div>
+
+                <div class="detail-section">
+                    <h4>⚠️ 当前整改建议</h4>
+                    ${suggHtml || '<div style="color:#a0aec0; font-size:13px;">暂无整改建议</div>'}
+                </div>
+
+                ${prevSuggHtml}
+
+                <div class="btn-row">
+                    <button class="btn btn-warning" ${canSupplementRamp ? '' : 'disabled'} onclick="doSupplementRamp('${r.id}')">补录坡道</button>
+                    <button class="btn btn-primary" ${canSupplementNight ? '' : 'disabled'} onclick="doSupplementNight('${r.id}')">补夜间采样点</button>
+                    <button class="btn btn-success" ${canConfirm ? '' : 'disabled'} onclick="doConfirmReview('${r.id}')">交通协管复核通过</button>
+                    <button class="btn btn-secondary" onclick="doRerun('${r.id}')">重跑评分</button>
+                </div>
+            `;
+        }
+
+        function renderLogs(logs) {
+            const container = document.getElementById('logList');
+            if (logs.length === 0) {
+                container.innerHTML = '<div class="empty-state">暂无操作日志</div>';
+                return;
+            }
+            container.innerHTML = logs.slice().reverse().map(log => `
+                <div class="log-item">
+                    <div class="log-time">${log.timestamp}</div>
+                    <div class="log-main">
+                        <span class="log-operator">${log.operator}:</span>
+                        <span class="log-action">${log.action}</span>
+                        <span style="color:#a0aec0; font-size:11px;">${log.record_id}</span>
+                    </div>
+                    ${log.details ? `<div class="log-details">${log.details}</div>` : ''}
+                </div>
+            `).join('');
+        }
+
+        async function doSupplementRamp(id) {
+            const res = await fetch(`/api/records/${id}/supplement-ramp`, { method: 'POST' });
+            if (res.ok) {
+                await loadRecords();
+                await loadLogs();
+                await selectRecord(id);
+            }
+        }
+
+        async function doSupplementNight(id) {
+            const res = await fetch(`/api/records/${id}/supplement-night`, { method: 'POST' });
+            if (res.ok) {
+                await loadRecords();
+                await loadLogs();
+                await selectRecord(id);
+            }
+        }
+
+        async function doConfirmReview(id) {
+            const res = await fetch(`/api/records/${id}/confirm-review`, { method: 'POST' });
+            if (res.ok) {
+                await loadRecords();
+                await loadLogs();
+                await selectRecord(id);
+            }
+        }
+
+        async function doRerun(id) {
+            const res = await fetch(`/api/records/${id}/rerun`, { method: 'POST' });
+            if (res.ok) {
+                await loadRecords();
+                await loadLogs();
+                await selectRecord(id);
+            }
+        }
+
+        async function resetData() {
+            await fetch('/api/reset', { method: 'POST' });
+            currentRecordId = null;
+            await loadRecords();
+            await loadLogs();
+            document.getElementById('recordDetail').innerHTML = '<div class="empty-state">请选择一条记录</div>';
+            document.getElementById('resetHint').textContent = '数据已重置';
+            setTimeout(() => {
+                document.getElementById('resetHint').textContent = '演示模式';
+            }, 2000);
+        }
+
+        loadRecords();
+        loadLogs();
+    </script>
+</body>
+</html>
