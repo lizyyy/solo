@@ -1,0 +1,71 @@
+[
+  {
+    "complaint_id": "TS-2024-0315-001",
+    "intersection_id": "XK-007",
+    "location": "幸福路与安康街交叉口",
+    "timestamp": "2026-06-07T10:06:15.105710",
+    "step": "import",
+    "operator": "街道规划员小姜",
+    "wait_time": 120,
+    "source": "居民投诉导入",
+    "raw_data": {
+      "complaint_id": "TS-2024-0315-001",
+      "complaint_date": "2024-03-15",
+      "location": "幸福路与安康街交叉口",
+      "intersection_id": "XK-007",
+      "reported_wait_time": 120,
+      "complainant": "张阿姨",
+      "description": "绿灯时间太短，老年人走一半就变红灯了",
+      "map_sync": true,
+      "has_construction": false
+    },
+    "status": "正常"
+  },
+  {
+    "complaint_id": "TS-2024-0315-002",
+    "intersection_id": "RM-012",
+    "location": "人民路与建设大街交叉口",
+    "timestamp": "2026-06-07T10:06:15.105763",
+    "step": "import",
+    "operator": "街道规划员小姜",
+    "wait_time": 150,
+    "source": "居民投诉导入",
+    "raw_data": {
+      "complaint_id": "TS-2024-0315-002",
+      "complaint_date": "2024-03-15",
+      "location": "人民路与建设大街交叉口",
+      "intersection_id": "RM-012",
+      "reported_wait_time": 150,
+      "complainant": "李大爷",
+      "description": "等了三个红绿灯才过去，路边施工占了人行道",
+      "map_sync": false,
+      "has_construction": true,
+      "construction_note": "施工临时改道未同步到地图系统"
+    },
+    "status": "待居民代表复核",
+    "note": "施工临时改道未同步到地图，待居民代表复核"
+  },
+  {
+    "complaint_id": "TS-2024-0315-003",
+    "intersection_id": "HP-004",
+    "location": "和平路与育才巷交叉口",
+    "timestamp": "2026-06-07T10:06:15.105776",
+    "step": "import",
+    "operator": "街道规划员小姜",
+    "wait_time": 95,
+    "source": "居民投诉导入",
+    "raw_data": {
+      "complaint_id": "TS-2024-0315-003",
+      "complaint_date": "2024-03-15",
+      "location": "和平路与育才巷交叉口",
+      "intersection_id": "HP-004",
+      "reported_wait_time": 95,
+      "complainant": "王奶奶",
+      "description": "斑马线看不清，路口标识被树挡了",
+      "map_sync": true,
+      "has_construction": false,
+      "old_caliber_note": "此路口2023年测过等待时间75秒，口径与本次不同"
+    },
+    "status": "正常"
+  }
+]

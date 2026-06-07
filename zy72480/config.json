@@ -1,0 +1,25 @@
+{
+  "project_name": "老年人过街等待时间",
+  "version": "1.0.0",
+  "operator": "街道规划员小姜",
+  "reviewer": "居民代表",
+  "data_rules": {
+    "wait_time_threshold": 90,
+    "status": {
+      "normal": "正常",
+      "pending_review": "待居民代表复核",
+      "supplemented": "已补录修正"
+    },
+    "source_types": {
+      "complaint": "居民投诉导入",
+      "photo": "路口照片补录",
+      "manual": "人工修正"
+    }
+  },
+  "paths": {
+    "raw_data": "data/raw/",
+    "photos": "data/photos/",
+    "history": "output/history/",
+    "points": "output/points/"
+  }
+}

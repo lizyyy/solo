@@ -1,0 +1,45 @@
+[
+  {
+    "photo_id": "PHO-2024-0316-001",
+    "complaint_id": "TS-2024-0315-001",
+    "intersection_id": "XK-007",
+    "shoot_time": "2024-03-16 09:30:00",
+    "photographer": "小姜",
+    "description": "幸福路安康街路口，绿灯时长25秒，实测老年人过街需35秒",
+    "supplements": {
+      "actual_green_time": 25,
+      "measured_walk_time": 35,
+      "crosswalk_width": 18
+    }
+  },
+  {
+    "photo_id": "PHO-2024-0316-002",
+    "complaint_id": "TS-2024-0315-002",
+    "intersection_id": "RM-012",
+    "shoot_time": "2024-03-16 10:15:00",
+    "photographer": "小姜",
+    "description": "人民路建设大街路口，北侧施工围挡占用人行道，行人需绕到机动车道",
+    "supplements": {
+      "construction_exists": true,
+      "detour_required": true,
+      "map_detour_missing": true,
+      "actual_wait_time": 145
+    }
+  },
+  {
+    "photo_id": "PHO-2024-0316-003",
+    "complaint_id": "TS-2024-0315-003",
+    "intersection_id": "HP-004",
+    "shoot_time": "2024-03-16 14:20:00",
+    "photographer": "小姜",
+    "description": "和平路育才巷路口，照片显示2023年标志牌还在，等待时间口径当时按高峰期算，现在是平峰期测的",
+    "supplements": {
+      "old_caliber_found": true,
+      "old_caliber_period": "早高峰7:30-8:30",
+      "old_caliber_value": 75,
+      "new_caliber_period": "平峰10:00-11:00",
+      "new_caliber_value": 95,
+      "caliber_diff_note": "测量时段不同导致数据差异"
+    }
+  }
+]

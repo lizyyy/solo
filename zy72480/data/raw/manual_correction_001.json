@@ -1,0 +1,23 @@
+{
+  "correction_id": "COR-2024-0317-001",
+  "operator": "小姜",
+  "correction_time": "2024-03-17 16:45:00",
+  "correction_type": "口径补录修正",
+  "target_complaint_id": "TS-2024-0315-003",
+  "target_intersection_id": "HP-004",
+  "before_correction": {
+    "wait_time": 95,
+    "caliber_period": "平峰10:00-11:00",
+    "source_note": "居民投诉导入"
+  },
+  "after_correction": {
+    "wait_time": 95,
+    "caliber_period": "平峰10:00-11:00",
+    "old_caliber_wait_time": 75,
+    "old_caliber_period": "早高峰7:30-8:30",
+    "source_note": "路口照片补录-旧口径补充说明",
+    "data_source": "photo"
+  },
+  "correction_reason": "从路口照片中发现2023年旧口径记录，补充到该点位档案中，便于居民代表对比查看",
+  "evidence_photo_id": "PHO-2024-0316-003"
+}

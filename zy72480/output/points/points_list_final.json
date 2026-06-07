@@ -1,0 +1,40 @@
+[
+  {
+    "intersection_id": "XK-007",
+    "location": "幸福路与安康街交叉口",
+    "latest_wait_time": 120,
+    "status": "正常",
+    "complaint_ids": [
+      "TS-2024-0315-001"
+    ],
+    "last_updated": "2026-06-07T10:06:15.107777",
+    "has_photos": true
+  },
+  {
+    "intersection_id": "RM-012",
+    "location": "人民路与建设大街交叉口",
+    "latest_wait_time": 150,
+    "status": "待居民代表复核",
+    "complaint_ids": [
+      "TS-2024-0315-002"
+    ],
+    "last_updated": "2026-06-07T10:06:15.108047",
+    "has_photos": true
+  },
+  {
+    "intersection_id": "HP-004",
+    "location": "和平路与育才巷交叉口",
+    "latest_wait_time": 95,
+    "status": "已补录修正",
+    "complaint_ids": [
+      "TS-2024-0315-003"
+    ],
+    "last_updated": "2026-06-07T10:06:15.111121",
+    "old_caliber": {
+      "wait_time": 75,
+      "period": "早高峰7:30-8:30"
+    },
+    "correction_id": "COR-2024-0317-001",
+    "has_photos": true
+  }
+]
