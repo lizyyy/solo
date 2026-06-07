@@ -90,7 +90,7 @@ export interface DataCheckResult {
   missingPhotos: Anomaly[];
   crossFloor: Anomaly[];
   nullValues: Array<{ recordId: string; field: string }>;
-  duplicates: Array<{ anomalyIds: string[]; similarity: number }>;
+  duplicates: Array<{ recordIds: string[]; anomalyIds: string[]; similarity: number }>;
   boundaryRecords: Anomaly[];
 }
 

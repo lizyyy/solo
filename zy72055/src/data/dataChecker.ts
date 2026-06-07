@@ -162,8 +162,8 @@ export function detectNullValues(records: InspectionRecord[]): Array<{ recordId:
   return results;
 }
 
-export function detectDuplicateRecords(records: InspectionRecord[]): Array<{ anomalyIds: string[]; similarity: number }> {
-  const results: Array<{ anomalyIds: string[]; similarity: number }> = [];
+export function detectDuplicateRecords(records: InspectionRecord[]): Array<{ recordIds: string[]; anomalyIds: string[]; similarity: number }> {
+  const results: Array<{ recordIds: string[]; anomalyIds: string[]; similarity: number }> = [];
   const processed = new Set<string>();
   
   for (let i = 0; i < records.length; i++) {
@@ -180,8 +180,9 @@ export function detectDuplicateRecords(records: InspectionRecord[]): Array<{ ano
       const overallSim = (sim1 + sim2) / 2;
       
       if (overallSim > 0.9 && posDist < 0.5) {
-        const anomalyIds = [records[i].id, records[j].id].map(() => generateId());
-        results.push({ anomalyIds, similarity: overallSim });
+        const recordIds = [records[i].id, records[j].id];
+        const anomalyIds = recordIds.map(() => generateId());
+        results.push({ recordIds, anomalyIds, similarity: overallSim });
         processed.add(records[i].id);
         processed.add(records[j].id);
       }
@@ -256,8 +257,7 @@ export function createAnomaliesFromRecords(records: InspectionRecord[]): Anomaly
   
   duplicates.forEach(d => {
     d.anomalyIds.forEach((id, index) => {
-      const recordId = d.anomalyIds.length === 2 ? 
-        (index === 0 ? records[0].id : records[1].id) : records[0].id;
+      const recordId = d.recordIds[index];
       const record = records.find(r => r.id === recordId);
       if (record) {
         anomalies.push({

@@ -153,8 +153,8 @@ export const sampleRecords: InspectionRecord[] = [
   },
 ];
 
-export const sampleInitialNotes: Record<string, { status: string; notes: Array<{ content: string; isSupplement: boolean; operator: string }> }> = {
-  'ANO-001': {
+export const sampleInitialNotes: Record<string, { status: string; notes: Array<{ content: string; isSupplement: boolean; operator: string; previousContent?: string }> }> = {
+  'REC-001': {
     status: 'completed',
     notes: [
       {
@@ -164,7 +164,7 @@ export const sampleInitialNotes: Record<string, { status: string; notes: Array<{
       },
     ],
   },
-  'ANO-002': {
+  'REC-002': {
     status: 'rework',
     notes: [
       {
@@ -173,8 +173,9 @@ export const sampleInitialNotes: Record<string, { status: string; notes: Array<{
         operator: '阿乔',
       },
       {
-        content: '重新定位，使用全站仪校准，等待二次复核',
-        isSupplement: false,
+        content: '重新定位，使用全站仪校准，偏差控制在0.5cm内',
+        isSupplement: true,
+        previousContent: '重新定位，使用全站仪校准，等待二次复核',
         operator: '阿乔',
       },
     ],

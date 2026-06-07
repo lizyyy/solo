@@ -78,7 +78,7 @@ export const useStore = create<AppState>()(
         const anomalies = createAnomaliesFromRecords(records);
         
         anomalies.forEach(anomaly => {
-          const initialNote = sampleInitialNotes[anomaly.id];
+          const initialNote = sampleInitialNotes[anomaly.recordId];
           if (initialNote) {
             anomaly.status = initialNote.status as AnomalyStatus;
             anomaly.notes = initialNote.notes.map((n, i) => ({
@@ -88,6 +88,7 @@ export const useStore = create<AppState>()(
               operator: n.operator,
               timestamp: format(new Date(Date.now() - (initialNote.notes.length - i) * 3600000), 'yyyy-MM-dd HH:mm:ss'),
               isSupplement: n.isSupplement,
+              previousContent: n.previousContent,
               statusChange: i === 0 ? (initialNote.status as AnomalyStatus) : undefined,
             }));
           }
