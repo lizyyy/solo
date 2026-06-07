@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "model-distillation-review"
+version = "0.1.0"
+description = "模型蒸馏质量复核工具 - 整合负样本与召回候选，检测时间窗穿越问题"
+requires-python = ">=3.8"
+dependencies = [
+    "fastapi>=0.104.0",
+    "uvicorn>=0.24.0",
+    "jinja2>=3.1.0",
+    "python-multipart>=0.0.6",
+]
+
+[project.scripts]
+review = "review_engine.cli.main:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

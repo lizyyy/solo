@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>模型蒸馏质量复核 - 小看板</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f7fa; color: #333; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 24px 32px; }
+        .header h1 { font-size: 24px; margin-bottom: 8px; }
+        .header p { opacity: 0.9; font-size: 14px; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 24px 32px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .stat-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .stat-card .label { font-size: 13px; color: #666; margin-bottom: 8px; }
+        .stat-card .value { font-size: 28px; font-weight: 600; color: #333; }
+        .stat-card.warning .value { color: #e53e3e; }
+        .stat-card.info .value { color: #3182ce; }
+        .toolbar { background: white; border-radius: 12px; padding: 16px 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .toolbar label { font-size: 14px; color: #666; }
+        .toolbar select, .toolbar input { padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; }
+        .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-primary:hover { background: #5a67d8; }
+        .btn-secondary { background: #edf2f7; color: #4a5568; }
+        .btn-secondary:hover { background: #e2e8f0; }
+        .table-container { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f7fafc; text-align: left; padding: 14px 16px; font-size: 13px; font-weight: 600; color: #4a5568; border-bottom: 1px solid #e2e8f0; }
+        td { padding: 14px 16px; border-bottom: 1px solid #edf2f7; font-size: 14px; }
+        tr:hover { background: #f7fafc; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 9999px; font-size: 12px; font-weight: 500; }
+        .badge-pending { background: #fef3c7; color: #92400e; }
+        .badge-imported { background: #dbeafe; color: #1e40af; }
+        .badge-recall-added { background: #d1fae5; color: #065f46; }
+        .badge-expert-approved { background: #c6f6d5; color: #22543d; }
+        .badge-expert-rejected { background: #fed7d7; color: #742a2a; }
+        .badge-archived { background: #e2e8f0; color: #4a5568; }
+        .badge-time-window { background: #fed7d7; color: #c53030; }
+        .badge-ok { background: #c6f6d5; color: #22543d; }
+        .tag { display: inline-block; padding: 2px 8px; background: #edf2f7; color: #4a5568; border-radius: 4px; font-size: 12px; margin-right: 4px; }
+        .tag-danger { background: #fed7d7; color: #c53030; }
+        .tag-warning { background: #fef3c7; color: #92400e; }
+        .tag-success { background: #c6f6d5; color: #22543d; }
+        a { color: #667eea; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .owner { font-size: 13px; color: #666; }
+        .empty { text-align: center; padding: 60px 20px; color: #999; }
+        .upload-section { display: flex; gap: 8px; align-items: center; margin-left: auto; }
+        .file-input { display: none; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔍 模型蒸馏质量复核</h1>
+        <p>整合负样本与召回候选，检测时间窗穿越导致的效果虚高</p>
+    </div>
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="label">异常样本总数</div>
+                <div class="value">{{ stats.total_anomalies }}</div>
+            </div>
+            <div class="stat-card warning">
+                <div class="label">时间窗穿越问题</div>
+                <div class="value">{{ stats.with_time_window_issues }}</div>
+            </div>
+            <div class="stat-card info">
+                <div class="label">已补召回候选</div>
+                <div class="value">{{ stats.with_recall_candidates }}</div>
+            </div>
+            <div class="stat-card warning">
+                <div class="label">待实验平台复核</div>
+                <div class="value">{{ stats.pending_expert_review }}</div>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <label>状态过滤:</label>
+            <select id="statusFilter" onchange="filterAnomalies()">
+                <option value="">全部</option>
+                {% for s in status_options %}
+                <option value="{{ s }}">{{ s }}</option>
+                {% endfor %}
+            </select>
+            <label>
+                <input type="checkbox" id="timeWindowFilter" onchange="filterAnomalies()"> 只看时间窗问题
+            </label>
+            <button class="btn btn-secondary" onclick="refreshData()">刷新</button>
+            <div class="upload-section">
+                <label class="btn btn-primary" for="negativeFile">导入负样本</label>
+                <input type="file" id="negativeFile" class="file-input" accept=".json" onchange="importNegative()">
+                <label class="btn btn-secondary" for="recallFile">补录召回候选</label>
+                <input type="file" id="recallFile" class="file-input" accept=".json" onchange="importRecall()">
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>异常ID</th>
+                        <th>主流程</th>
+                        <th>状态</th>
+                        <th>时间窗</th>
+                        <th>召回候选</th>
+                        <th>标签</th>
+                        <th>下一步负责人</th>
+                        <th>更新时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="anomalyTable">
+                    {% for a in anomalies %}
+                    <tr class="anomaly-row" data-status="{{ a.status }}" data-timewindow="{{ a.has_time_window_issue }}">
+                        <td>{{ a.anomaly_id }}</td>
+                        <td>{{ a.main_process_name }}</td>
+                        <td>
+                            {% set status_class = a.status.replace('_', '-') %}
+                            <span class="badge badge-{{ status_class }}">{{ a.status }}</span>
+                        </td>
+                        <td>
+                            {% if a.has_time_window_issue %}
+                            <span class="badge badge-time-window">🕐 {{ a.time_window_issue_count }}个问题</span>
+                            {% else %}
+                            <span class="badge badge-ok">✓ 正常</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ a.recall_count }} 条</td>
+                        <td>
+                            {% for tag in a.tags %}
+                            {% if '时间窗' in tag or '复核' in tag %}
+                            <span class="tag tag-danger">{{ tag }}</span>
+                            {% elif '已补' in tag %}
+                            <span class="tag tag-success">{{ tag }}</span>
+                            {% else %}
+                            <span class="tag">{{ tag }}</span>
+                            {% endif %}
+                            {% endfor %}
+                        </td>
+                        <td class="owner">{{ a.next_action_owner }}</td>
+                        <td class="owner">{{ a.updated_at[:16] }}</td>
+                        <td><a href="/anomaly/{{ a.anomaly_id }}">查看详情</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% if not anomalies %}
+            <div class="empty">暂无异常样本，点击"导入负样本"开始</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        function filterAnomalies() {
+            const status = document.getElementById('statusFilter').value;
+            const timeWindowOnly = document.getElementById('timeWindowFilter').checked;
+            const rows = document.querySelectorAll('.anomaly-row');
+            rows.forEach(row => {
+                const rowStatus = row.dataset.status;
+                const hasTW = row.dataset.timewindow === 'True';
+                let show = true;
+                if (status && rowStatus !== status) show = false;
+                if (timeWindowOnly && !hasTW) show = false;
+                row.style.display = show ? '' : 'none';
+            });
+        }
+
+        function refreshData() {
+            location.reload();
+        }
+
+        async function importNegative() {
+            const file = document.getElementById('negativeFile').files[0];
+            if (!file) return;
+            const formData = new FormData();
+            formData.append('file', file);
+            try {
+                const res = await fetch('/api/import/negative', { method: 'POST', body: formData });
+                const data = await res.json();
+                alert(`成功导入 ${data.imported_count} 条负样本，生成 ${data.new_anomalies_count} 条异常记录`);
+                location.reload();
+            } catch (e) {
+                alert('导入失败: ' + e.message);
+            }
+        }
+
+        async function importRecall() {
+            const file = document.getElementById('recallFile').files[0];
+            if (!file) return;
+            const formData = new FormData();
+            formData.append('file', file);
+            try {
+                const res = await fetch('/api/import/recall', { method: 'POST', body: formData });
+                const data = await res.json();
+                alert(`成功补录 ${data.imported_count} 条召回候选，更新 ${data.updated_anomalies_count} 条异常记录`);
+                location.reload();
+            } catch (e) {
+                alert('补录失败: ' + e.message);
+            }
+        }
+    </script>
+</body>
+</html>

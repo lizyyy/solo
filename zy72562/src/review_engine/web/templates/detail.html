@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>异常样本详情 - {{ anomaly.anomaly_id }}</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f7fa; color: #333; line-height: 1.6; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px 32px; display: flex; align-items: center; gap: 16px; }
+        .header a { color: white; text-decoration: none; font-size: 14px; opacity: 0.9; }
+        .header a:hover { opacity: 1; }
+        .header h1 { font-size: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 24px 32px; }
+        .back-link { display: inline-flex; align-items: center; gap: 6px; color: #667eea; text-decoration: none; margin-bottom: 16px; font-size: 14px; }
+        .card { background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .card h2 { font-size: 16px; margin-bottom: 16px; color: #2d3748; display: flex; align-items: center; gap: 8px; }
+        .card h2 .icon { font-size: 18px; }
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+        .info-item { }
+        .info-item .label { font-size: 12px; color: #718096; margin-bottom: 4px; }
+        .info-item .value { font-size: 14px; color: #2d3748; font-weight: 500; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 9999px; font-size: 12px; font-weight: 500; }
+        .badge-pending { background: #fef3c7; color: #92400e; }
+        .badge-imported { background: #dbeafe; color: #1e40af; }
+        .badge-recall-added { background: #d1fae5; color: #065f46; }
+        .badge-expert-approved { background: #c6f6d5; color: #22543d; }
+        .badge-expert-rejected { background: #fed7d7; color: #742a2a; }
+        .badge-archived { background: #e2e8f0; color: #4a5568; }
+        .section-negative { border-left: 4px solid #e53e3e; padding-left: 16px; }
+        .section-recall { border-left: 4px solid #38a169; padding-left: 16px; }
+        .section-tw { border-left: 4px solid #dd6b20; padding-left: 16px; }
+        .recall-item { padding: 16px; background: #f7fafc; border-radius: 8px; margin-bottom: 12px; }
+        .recall-item:last-child { margin-bottom: 0; }
+        .recall-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .recall-title { font-weight: 600; font-size: 14px; }
+        .recall-score { font-size: 12px; color: #718096; }
+        .tw-issue { padding: 14px; background: #fffaf0; border-radius: 8px; margin-bottom: 12px; border: 1px solid #feebc8; }
+        .tw-issue.critical { background: #fff5f5; border-color: #fed7d7; }
+        .tw-issue.high { background: #fffaf0; border-color: #feebc8; }
+        .tw-issue-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .tw-severity { font-size: 12px; font-weight: 600; }
+        .tw-severity.critical { color: #c53030; }
+        .tw-severity.high { color: #c05621; }
+        .tw-severity.medium { color: #b7791f; }
+        .tw-severity.low { color: #2f855a; }
+        .why-kept { background: #ebf8ff; padding: 16px; border-radius: 8px; border-left: 4px solid #3182ce; }
+        .missing-materials { background: #fffbeb; padding: 16px; border-radius: 8px; border-left: 4px solid #d69e2e; }
+        .missing-materials ul { margin-left: 20px; margin-top: 8px; }
+        .missing-materials li { margin-bottom: 4px; font-size: 14px; }
+        .next-action { background: #f0fff4; padding: 16px; border-radius: 8px; border-left: 4px solid #38a169; }
+        .next-action .owner { font-size: 16px; font-weight: 600; color: #22543d; margin-bottom: 4px; }
+        .next-action .desc { font-size: 14px; color: #2d3748; }
+        .next-action .deadline { font-size: 12px; color: #718096; margin-top: 8px; }
+        .evidence-box { background: #f7fafc; padding: 16px; border-radius: 8px; }
+        .evidence-summary { font-size: 14px; margin-bottom: 12px; }
+        .evidence-points { display: flex; gap: 24px; flex-wrap: wrap; }
+        .evidence-support, .evidence-conflict { flex: 1; min-width: 250px; }
+        .evidence-support h4 { color: #22543d; font-size: 13px; margin-bottom: 8px; }
+        .evidence-conflict h4 { color: #742a2a; font-size: 13px; margin-bottom: 8px; }
+        .evidence-support li { color: #22543d; font-size: 13px; margin-bottom: 4px; }
+        .evidence-conflict li { color: #742a2a; font-size: 13px; margin-bottom: 4px; }
+        .review-form { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; margin-top: 16px; padding-top: 16px; border-top: 1px solid #e2e8f0; }
+        .review-form input, .review-form textarea { padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; font-family: inherit; }
+        .review-form textarea { flex: 1; min-width: 300px; resize: vertical; }
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+        .btn-success { background: #38a169; color: white; }
+        .btn-success:hover { background: #2f855a; }
+        .btn-danger { background: #e53e3e; color: white; }
+        .btn-danger:hover { background: #c53030; }
+        .history-item { padding: 12px 0; border-bottom: 1px solid #edf2f7; }
+        .history-item:last-child { border-bottom: none; }
+        .history-header { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px; }
+        .history-reviewer { font-weight: 600; color: #2d3748; }
+        .history-time { color: #a0aec0; }
+        .history-action { font-size: 13px; color: #4a5568; }
+        .history-comment { font-size: 13px; color: #718096; margin-top: 4px; }
+        .tag { display: inline-block; padding: 2px 8px; background: #edf2f7; color: #4a5568; border-radius: 4px; font-size: 12px; margin-right: 4px; }
+        .tag-danger { background: #fed7d7; color: #c53030; }
+        .tag-warning { background: #fef3c7; color: #92400e; }
+        .tag-success { background: #c6f6d5; color: #22543d; }
+        .empty { text-align: center; padding: 40px; color: #a0aec0; font-size: 14px; }
+        .metrics { display: flex; gap: 24px; margin-top: 8px; }
+        .metric { font-size: 13px; }
+        .metric .m-label { color: #718096; }
+        .metric .m-value { font-weight: 600; color: #c53030; }
+        pre { background: #1a202c; color: #e2e8f0; padding: 12px; border-radius: 6px; font-size: 12px; overflow-x: auto; margin-top: 8px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="/">← 返回列表</a>
+        <h1>异常样本详情</h1>
+    </div>
+    <div class="container">
+        <a href="/" class="back-link">← 返回异常列表</a>
+
+        <div class="card">
+            <h2><span class="icon">📋</span> 基本信息</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="label">异常ID</div>
+                    <div class="value">{{ anomaly.anomaly_id }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">样本ID</div>
+                    <div class="value">{{ anomaly.sample_id }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">状态</div>
+                    <div class="value">
+                        {% set status_class = anomaly.status.replace('_', '-') %}
+                        <span class="badge badge-{{ status_class }}">{{ anomaly.status }}</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="label">检测时间</div>
+                    <div class="value">{{ anomaly.detected_at[:19] }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">更新时间</div>
+                    <div class="value">{{ anomaly.updated_at[:19] }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">标签</div>
+                    <div class="value">
+                        {% for tag in anomaly.tags %}
+                        {% if '时间窗' in tag or '复核' in tag %}
+                        <span class="tag tag-danger">{{ tag }}</span>
+                        {% elif '已补' in tag %}
+                        <span class="tag tag-success">{{ tag }}</span>
+                        {% else %}
+                        <span class="tag">{{ tag }}</span>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card section-negative">
+            <h2><span class="icon">🔴</span> 负样本信息（主流程证据）</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="label">主流程ID</div>
+                    <div class="value">{{ anomaly.negative_sample.main_process_id }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">主流程名称</div>
+                    <div class="value">{{ anomaly.negative_sample.main_process_name }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">时间戳</div>
+                    <div class="value">{{ anomaly.negative_sample.timestamp[:19] }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">模型预测分</div>
+                    <div class="value" style="color: {{ '#e53e3e' if anomaly.negative_sample.model_prediction_score > 0.8 else '#38a169' }};">
+                        {{ "%.3f"|format(anomaly.negative_sample.model_prediction_score) }}
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="label">真实标签</div>
+                    <div class="value">{{ anomaly.negative_sample.ground_truth_label }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">来源</div>
+                    <div class="value">{{ anomaly.negative_sample.source or '未知' }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">时间窗标记</div>
+                    <div class="value">{{ anomaly.negative_sample.time_window_tag or '无' }}</div>
+                </div>
+            </div>
+            {% if anomaly.negative_sample.feature_values %}
+            <div style="margin-top: 16px;">
+                <div class="label" style="font-size: 12px; color: #718096; margin-bottom: 4px;">特征值</div>
+                <pre>{{ anomaly.negative_sample.feature_values | tojson(indent=2, ensure_ascii=False) }}</pre>
+            </div>
+            {% endif %}
+            {% if anomaly.negative_sample.notes %}
+            <div style="margin-top: 12px; font-size: 14px; color: #4a5568;">
+                <strong>备注:</strong> {{ anomaly.negative_sample.notes }}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="card section-recall">
+            <h2><span class="icon">🟢</span> 召回候选信息（现场说法证据） - 共 {{ anomaly.recall_candidates | length }} 条</h2>
+            {% if anomaly.recall_candidates %}
+            {% for rc in anomaly.recall_candidates %}
+            <div class="recall-item">
+                <div class="recall-header">
+                    <span class="recall-title">{{ loop.index }}. {{ rc.scene_description }}</span>
+                    <span class="recall-score">置信度: {{ "%.2f"|format(rc.confidence_score) }}</span>
+                </div>
+                <div class="info-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-top: 8px;">
+                    <div class="info-item">
+                        <div class="label">候选ID</div>
+                        <div class="value">{{ rc.candidate_id }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="label">时间戳</div>
+                        <div class="value">{{ rc.timestamp[:19] }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="label">召回来源</div>
+                        <div class="value">{{ rc.recall_source or '未知' }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="label">补录人</div>
+                        <div class="value">{{ rc.added_by or '未知' }}</div>
+                    </div>
+                </div>
+                {% if rc.field_evidence %}
+                <div style="margin-top: 10px; font-size: 14px;">
+                    <strong style="color: #2f855a;">现场证据:</strong> {{ rc.field_evidence }}
+                </div>
+                {% endif %}
+                {% if rc.scene_context %}
+                <div style="margin-top: 8px;">
+                    <div class="label" style="font-size: 12px; color: #718096;">场景上下文</div>
+                    <pre>{{ rc.scene_context | tojson(indent=2, ensure_ascii=False) }}</pre>
+                </div>
+                {% endif %}
+                {% if rc.notes %}
+                <div style="margin-top: 8px; font-size: 13px; color: #4a5568;">
+                    <strong>备注:</strong> {{ rc.notes }}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="empty">暂无召回候选，请推荐策略老唐补录现场说法</div>
+            {% endif %}
+        </div>
+
+        {% if anomaly.evidence_merge %}
+        <div class="card">
+            <h2><span class="icon">🔗</span> 证据合并结果</h2>
+            <div class="evidence-box">
+                <div class="evidence-summary"><strong>摘要:</strong> {{ anomaly.evidence_merge.summary }}</div>
+                <div class="evidence-points">
+                    {% if anomaly.evidence_merge.supporting_points %}
+                    <div class="evidence-support">
+                        <h4>✓ 支持点</h4>
+                        <ul>
+                            {% for p in anomaly.evidence_merge.supporting_points %}
+                            <li>{{ p }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    {% if anomaly.evidence_merge.conflicting_points %}
+                    <div class="evidence-conflict">
+                        <h4>✗ 冲突点</h4>
+                        <ul>
+                            {% for p in anomaly.evidence_merge.conflicting_points %}
+                            <li>{{ p }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if anomaly.time_window_issues %}
+        <div class="card section-tw">
+            <h2><span class="icon">🕐</span> 时间窗穿越问题 - 共 {{ anomaly.time_window_issues | length }} 个（效果可能虚高，需实验平台复核）</h2>
+            {% for tw in anomaly.time_window_issues %}
+            <div class="tw-issue {{ tw.severity }}">
+                <div class="tw-issue-header">
+                    <span><strong>{{ loop.index }}. {{ tw.description }}</strong></span>
+                    <span class="tw-severity {{ tw.severity }}">{{ tw.severity | upper }}</span>
+                </div>
+                {% if tw.window_start and tw.window_end %}
+                <div style="font-size: 13px; color: #718096; margin-top: 4px;">
+                    时间窗: {{ tw.window_start[:19] }} ~ {{ tw.window_end[:19] }}
+                </div>
+                {% endif %}
+                <div class="metrics">
+                    <div class="metric">
+                        <span class="m-label">影响指标: </span>
+                        <span class="m-value" style="color: #718096;">{{ tw.affected_metrics | join(', ') }}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="m-label">效果虚高估计: </span>
+                        <span class="m-value">{{ "%.1f%%"|format(tw.inflated_effect_estimate * 100) }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="card">
+            <h2><span class="icon">❓</span> 为什么这条被留下</h2>
+            <div class="why-kept">
+                {{ anomaly.why_kept }}
+            </div>
+        </div>
+
+        <div class="card">
+            <h2><span class="icon">📦</span> 还缺什么材料</h2>
+            {% if anomaly.missing_materials %}
+            <div class="missing-materials">
+                <strong>以下材料缺失，补齐后可进入下一环节:</strong>
+                <ul>
+                    {% for m in anomaly.missing_materials %}
+                    <li>{{ m }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% else %}
+            <div style="background: #f0fff4; padding: 16px; border-radius: 8px; border-left: 4px solid #38a169;">
+                ✓ 材料齐全，可进行复核
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <h2><span class="icon">👤</span> 下一步该找谁</h2>
+            {% if anomaly.next_action %}
+            <div class="next-action">
+                <div class="owner">{{ anomaly.next_action_owner }}</div>
+                <div class="desc">{{ anomaly.next_action.action_description }}</div>
+                {% if anomaly.next_action.deadline_hint %}
+                <div class="deadline">建议期限: {{ anomaly.next_action.deadline_hint }}</div>
+                {% endif %}
+                {% if anomaly.next_action.contact_info %}
+                <div class="deadline">联系方式: {{ anomaly.next_action.contact_info }}</div>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="empty">暂未分配下一步行动</div>
+            {% endif %}
+
+            {% if anomaly.status == 'pending_expert_review' %}
+            <form class="review-form" id="reviewForm" onsubmit="submitReview(event)">
+                <input type="text" id="reviewer" placeholder="复核人姓名" required style="width: 150px;">
+                <textarea id="comment" placeholder="复核意见（必填）" rows="1" required></textarea>
+                <input type="hidden" id="anomalyId" value="{{ anomaly.anomaly_id }}">
+                <button type="button" class="btn btn-success" onclick="doReview(true)">✓ 通过复核</button>
+                <button type="button" class="btn btn-danger" onclick="doReview(false)">✗ 驳回</button>
+            </form>
+            {% endif %}
+        </div>
+
+        {% if anomaly.review_comments %}
+        <div class="card">
+            <h2><span class="icon">💬</span> 复核评论</h2>
+            {% for c in anomaly.review_comments %}
+            <div style="padding: 8px 0; border-bottom: 1px solid #edf2f7; font-size: 14px;">
+                {{ c }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if history %}
+        <div class="card">
+            <h2><span class="icon">📜</span> 操作历史</h2>
+            {% for h in history %}
+            <div class="history-item">
+                <div class="history-header">
+                    <span class="history-reviewer">{{ h.reviewer }}</span>
+                    <span class="history-time">{{ h.timestamp[:19] }}</span>
+                </div>
+                <div class="history-action">
+                    动作: {{ h.action }}
+                    {% if h.old_status %}
+                    | {{ h.old_status }} → {{ h.new_status }}
+                    {% else %}
+                    | → {{ h.new_status }}
+                    {% endif %}
+                </div>
+                {% if h.comment %}
+                <div class="history-comment">{{ h.comment }}</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        async function doReview(approved) {
+            const reviewer = document.getElementById('reviewer').value.trim();
+            const comment = document.getElementById('comment').value.trim();
+            const anomalyId = document.getElementById('anomalyId').value;
+
+            if (!reviewer || !comment) {
+                alert('请填写复核人和复核意见');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('reviewer', reviewer);
+            formData.append('approved', approved);
+            formData.append('comment', comment);
+
+            try {
+                const res = await fetch(`/api/anomalies/${anomalyId}/review`, {
+                    method: 'POST',
+                    body: formData
+                });
+                if (res.ok) {
+                    alert('复核提交成功');
+                    location.reload();
+                } else {
+                    alert('提交失败');
+                }
+            } catch (e) {
+                alert('提交失败: ' + e.message);
+            }
+        }
+    </script>
+</body>
+</html>

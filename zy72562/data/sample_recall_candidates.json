@@ -1,0 +1,53 @@
+[
+  {
+    "candidate_id": "recall_001",
+    "sample_id": "sample_001",
+    "scene_description": "用户当日晚些时候点击了同品类商品，存在时间窗穿越可能",
+    "timestamp": "2024-06-16T10:00:00",
+    "recall_source": "用户行为序列回查",
+    "scene_context": {
+      "click_time": "2024-06-15T22:30:00",
+      "same_category": true,
+      "time_gap_hours": 8
+    },
+    "field_evidence": "用户在曝光后8小时点击了同品类商品，该行为特征被错误地用于该样本的预测",
+    "confidence_score": 0.85,
+    "added_by": "recommend_strategy_tang",
+    "added_at": "2024-06-16T11:00:00",
+    "notes": "老唐补录的现场说法"
+  },
+  {
+    "candidate_id": "recall_002",
+    "sample_id": "sample_002",
+    "scene_description": "搜索query含品牌词，结果页展示了竞品广告",
+    "timestamp": "2024-06-15T10:15:00",
+    "recall_source": "搜索日志回溯",
+    "scene_context": {
+      "query": "华为手机",
+      "ad_position": 0,
+      "ad_brand": "苹果"
+    },
+    "field_evidence": "用户搜索华为手机，但首条展示苹果广告，用户未点击属正常行为",
+    "confidence_score": 0.92,
+    "added_by": "recommend_strategy_tang",
+    "added_at": "2024-06-16T11:30:00",
+    "notes": "该样本实际上是正常负样本，无时间窗问题"
+  },
+  {
+    "candidate_id": "recall_003",
+    "sample_id": "sample_003",
+    "scene_description": "该样本特征中包含了曝光后的行为数据",
+    "timestamp": "2024-06-17T09:00:00",
+    "recall_source": "特征平台审计",
+    "scene_context": {
+      "feature_name": "user_7d_click_count",
+      "window_end": "2024-06-15T23:59:59",
+      "exposure_time": "2024-06-15T20:45:00"
+    },
+    "field_evidence": "7天点击特征的统计窗口包含了曝光后的3小时数据，存在信息泄漏",
+    "confidence_score": 0.95,
+    "added_by": "recommend_strategy_tang",
+    "added_at": "2024-06-17T10:00:00",
+    "notes": "确认是时间窗穿越问题，需实验平台修复"
+  }
+]

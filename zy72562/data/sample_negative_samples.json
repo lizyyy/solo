@@ -1,0 +1,72 @@
+[
+  {
+    "sample_id": "sample_001",
+    "main_process_id": "mp_home_feed_v2",
+    "main_process_name": "首页推荐流主流程",
+    "timestamp": "2024-06-15T14:30:00",
+    "feature_values": {
+      "user_age": 28,
+      "item_category": "科技数码",
+      "exposure_position": 3,
+      "click_history_count": 15
+    },
+    "ground_truth_label": "negative",
+    "model_prediction_score": 0.92,
+    "source": "线上A/B实验组A",
+    "time_window_tag": "疑似时间窗穿越导致预测分虚高",
+    "notes": "模型在该样本上预测分异常高，但实际无点击",
+    "imported_at": "2024-06-16T09:00:00"
+  },
+  {
+    "sample_id": "sample_002",
+    "main_process_id": "mp_search_rank",
+    "main_process_name": "搜索排序主流程",
+    "timestamp": "2024-06-15T10:15:00",
+    "feature_values": {
+      "query_length": 4,
+      "item_price": 299,
+      "match_score": 0.78
+    },
+    "ground_truth_label": "negative",
+    "model_prediction_score": 0.55,
+    "source": "线上全量流量",
+    "time_window_tag": "",
+    "notes": "普通负样本，待补召回候选",
+    "imported_at": "2024-06-16T09:00:00"
+  },
+  {
+    "sample_id": "sample_003",
+    "main_process_id": "mp_home_feed_v2",
+    "main_process_name": "首页推荐流主流程",
+    "timestamp": "2024-06-15T20:45:00",
+    "feature_values": {
+      "user_age": 35,
+      "item_category": "母婴用品",
+      "exposure_position": 1,
+      "is_new_user": false
+    },
+    "ground_truth_label": "negative",
+    "model_prediction_score": 0.87,
+    "source": "线上A/B实验组B",
+    "time_window_tag": "cross_window_inflation_detected",
+    "notes": "特征穿越了未来时间窗信息",
+    "imported_at": "2024-06-16T09:00:00"
+  },
+  {
+    "sample_id": "sample_004",
+    "main_process_id": "mp_video_recommend",
+    "main_process_name": "视频推荐主流程",
+    "timestamp": "2024-06-15T18:20:00",
+    "feature_values": {
+      "video_duration": 180,
+      "author_follower_count": 50000,
+      "video_tag": ["搞笑", "生活"]
+    },
+    "ground_truth_label": "negative",
+    "model_prediction_score": 0.45,
+    "source": "历史采样",
+    "time_window_tag": "",
+    "notes": "正常负样本",
+    "imported_at": "2024-06-16T09:00:00"
+  }
+]
