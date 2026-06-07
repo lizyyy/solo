@@ -230,6 +230,24 @@ class ProgressCalculator:
                 )
                 all_alerts.extend(alerts)
                 converted_record[field_name] = converted
+            elif field_name == "difficulty" and isinstance(value, str):
+                # 自动检测字母等级（A-G）
+                str_value = value.strip().upper()
+                if str_value in {"A", "B", "C", "D", "E", "F", "G"}:
+                    all_alerts.append(
+                        f"[智能识别] 记录{record_id}: 检测到字母难度等级 '{value}'，自动使用A-G体系转换"
+                    )
+                    actual_scale = "A-G"
+                elif scale:
+                    actual_scale = scale
+                else:
+                    actual_scale = "1-10"
+
+                converted, alerts = self.converter.convert_difficulty(
+                    value, actual_scale, "1-10", record_id
+                )
+                all_alerts.extend(alerts)
+                converted_record[field_name] = converted
             elif scale and isinstance(value, (str, int, float)):
                 converted, alerts = self.converter.convert_difficulty(
                     value, scale, "1-10", record_id
