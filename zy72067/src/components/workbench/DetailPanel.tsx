@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { X, Table, Camera, Image, FileText, PenTool } from 'lucide-react';
+import { X, Table, Camera, Image, FileText, PenTool, Edit3 } from 'lucide-react';
 import { useStore } from '@/store/useStore';
 import type { SourceType } from '@/types';
 import { cn } from '@/lib/utils';
@@ -19,7 +19,7 @@ const severityLabel: Record<string, { text: string; color: string }> = {
 };
 
 export default function DetailPanel() {
-  const { selectedRecord, selectRecord, sourcesByRecord, fetchSources, conflicts, resolveConflict } = useStore();
+  const { selectedRecord, selectRecord, sourcesByRecord, fetchSources, conflicts, resolveConflict, setCorrectionPanelOpen } = useStore();
 
   useEffect(() => {
     if (selectedRecord) {
@@ -61,6 +61,13 @@ export default function DetailPanel() {
         <div className="text-gray-400">
           状态: <span className="text-gray-200">{selectedRecord.status}</span>
         </div>
+        <button
+          onClick={() => setCorrectionPanelOpen(true)}
+          className="mt-2 flex items-center gap-1 rounded bg-amber-500 px-2 py-1 text-[10px] font-medium text-gray-900 hover:bg-amber-400 transition-colors"
+        >
+          <Edit3 size={12} />
+          补录
+        </button>
       </div>
 
       <div className="flex-1 flex flex-col gap-1 overflow-y-auto">

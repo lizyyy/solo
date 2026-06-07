@@ -86,6 +86,41 @@ CREATE TABLE IF NOT EXISTS source_conflicts (
 );
 CREATE INDEX IF NOT EXISTS idx_conflicts_record ON source_conflicts(record_id);
 CREATE INDEX IF NOT EXISTS idx_conflicts_severity ON source_conflicts(severity);
+
+CREATE TABLE IF NOT EXISTS correction_snapshots (
+  id TEXT PRIMARY KEY,
+  record_id TEXT NOT NULL REFERENCES hot_spot_records(id),
+  field_name TEXT NOT NULL,
+  old_value TEXT NOT NULL,
+  new_value TEXT NOT NULL,
+  reason TEXT NOT NULL,
+  corrected_by TEXT NOT NULL,
+  corrected_at TEXT NOT NULL DEFAULT (datetime('now')),
+  snapshot_data TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_snapshots_record ON correction_snapshots(record_id);
+CREATE INDEX IF NOT EXISTS idx_snapshots_time ON correction_snapshots(corrected_at);
+
+CREATE TABLE IF NOT EXISTS import_error_logs (
+  id TEXT PRIMARY KEY,
+  scheme_id TEXT NOT NULL REFERENCES schemes(id),
+  source_type TEXT NOT NULL CHECK(source_type IN ('point_table', 'photo', 'meeting_screenshot', 'plan_note', 'manual_coordinate')),
+  source_ref TEXT NOT NULL,
+  source_name TEXT NOT NULL,
+  error_type TEXT NOT NULL CHECK(error_type IN ('data_corrupted', 'format_invalid', 'missing_required', 'out_of_range', 'coordinate_mismatch')),
+  error_message TEXT NOT NULL,
+  field_detail TEXT,
+  row_number INTEGER,
+  photo_number TEXT,
+  status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending', 'fixed', 'ignored')),
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  resolved_at TEXT,
+  resolved_by TEXT,
+  resolution TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_errors_scheme ON import_error_logs(scheme_id);
+CREATE INDEX IF NOT EXISTS idx_errors_type ON import_error_logs(source_type);
+CREATE INDEX IF NOT EXISTS idx_errors_status ON import_error_logs(status);
 `)
 
 const existingDemo = db.prepare("SELECT id FROM schemes WHERE id = 'demo-001'").get()
@@ -94,6 +129,13 @@ if (!existingDemo) {
     db.prepare(`
       INSERT INTO schemes (id, name, description, warning_threshold, critical_threshold, coordinate_system, temperature_unit) VALUES
       ('demo-001', '芯片封装热斑立方-样例', '许姐负责的芯片封装热斑分析样例方案，包含点位表、现场照片和周会截图多源数据', 85.0, 100.0, 'chip_local', 'celsius')
+    `).run()
+
+    db.prepare(`
+      INSERT INTO import_error_logs (id, scheme_id, source_type, source_ref, source_name, error_type, error_message, field_detail, row_number, photo_number, status) VALUES
+      ('err-001', 'demo-001', 'point_table', '点位表v2.3-行18', '点位表v2.3', 'data_corrupted', '点位表第18行温度值缺失小数点，解析失败', 'temperature字段', 18, NULL, 'pending'),
+      ('err-002', 'demo-001', 'photo', 'PHOTO_20251114_037', '现场照片037号', 'data_corrupted', '红外照片037号元数据损坏，无法解析温度矩阵', 'EXIF温度字段', NULL, 'PHOTO_037', 'pending'),
+      ('err-003', 'demo-001', 'manual_coordinate', '手改坐标-王工-20251114', '王工手改坐标', 'format_invalid', '王工手改坐标格式不符合规范，坐标值超出芯片边界', 'coordinate_x/y字段', NULL, NULL, 'fixed')
     `).run()
 
     db.prepare(`

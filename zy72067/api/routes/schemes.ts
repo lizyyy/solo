@@ -124,6 +124,22 @@ router.get('/:id/dashboard', (req: Request, res: Response) => {
     WHERE record_id IN (SELECT id FROM hot_spot_records WHERE scheme_id = ?)
   `).get(req.params.id) as any
 
+  const resolvedConflictCount = db.prepare(`
+    SELECT COUNT(*) as count FROM source_conflicts
+    WHERE record_id IN (SELECT id FROM hot_spot_records WHERE scheme_id = ?)
+      AND resolved_at IS NOT NULL
+  `).get(req.params.id) as any
+
+  const pendingErrors = db.prepare(`
+    SELECT COUNT(*) as count FROM import_error_logs
+    WHERE scheme_id = ? AND status = 'pending'
+  `).get(req.params.id) as any
+
+  const recentChanges = db.prepare(`
+    SELECT COUNT(*) as count FROM parameter_changes
+    WHERE scheme_id = ? AND changed_at >= datetime('now', '-7 days')
+  `).get(req.params.id) as any
+
   const abnormalCount = (severityStats.find((s: any) => s.severity === 'warning')?.count || 0)
     + (severityStats.find((s: any) => s.severity === 'critical')?.count || 0)
 
@@ -144,10 +160,39 @@ router.get('/:id/dashboard', (req: Request, res: Response) => {
       totalRecords: totalRecords.count,
       abnormalCount,
       conflictCount: conflictCount.count,
+      resolvedConflictCount: resolvedConflictCount.count,
+      pendingErrors: pendingErrors.count,
+      recentChanges: recentChanges.count,
       severityStats: severityMap,
       statusStats: statusMap,
     }
   })
+})
+
+router.get('/:schemeId/errors', (req: Request, res: Response) => {
+  const { schemeId } = req.params
+  const { status, sourceType } = req.query
+  let sql = 'SELECT * FROM import_error_logs WHERE scheme_id = ?'
+  const params: any[] = [schemeId]
+  if (status) { sql += ' AND status = ?'; params.push(status) }
+  if (sourceType) { sql += ' AND source_type = ?'; params.push(sourceType) }
+  sql += ' ORDER BY created_at DESC'
+  const errors = db.prepare(sql).all(...params)
+  res.json({ success: true, data: errors })
+})
+
+router.put('/errors/:errorId', (req: Request, res: Response) => {
+  const { errorId } = req.params
+  const { status, resolution, resolvedBy } = req.body
+  const err = db.prepare('SELECT * FROM import_error_logs WHERE id = ?').get(errorId)
+  if (!err) { res.status(404).json({ success: false, error: '错误日志不存在' }); return }
+  db.prepare(`
+    UPDATE import_error_logs 
+    SET status = ?, resolution = ?, resolved_by = ?, resolved_at = datetime('now')
+    WHERE id = ?
+  `).run(status, resolution, resolvedBy, errorId)
+  const updated = db.prepare('SELECT * FROM import_error_logs WHERE id = ?').get(errorId)
+  res.json({ success: true, data: updated })
 })
 
 export default router

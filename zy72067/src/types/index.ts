@@ -75,6 +75,7 @@ export interface DashboardData {
   unresolvedConflicts: number;
   recentChanges: number;
   lastUpdatedAt: string;
+  pendingErrors: number;
 }
 
 export interface ExportOptions {
@@ -82,4 +83,52 @@ export interface ExportOptions {
   includeChangelog: boolean;
   includeConflicts: boolean;
   includeSourceChain: boolean;
+}
+
+export type ErrorType = 'data_corrupted' | 'format_invalid' | 'missing_required' | 'out_of_range' | 'coordinate_mismatch';
+export type ErrorStatus = 'pending' | 'fixed' | 'ignored';
+
+export interface CorrectionSnapshot {
+  id: string;
+  recordId: string;
+  fieldName: string;
+  oldValue: string;
+  newValue: string;
+  reason: string;
+  correctedBy: string;
+  correctedAt: string;
+  snapshotData: string;
+}
+
+export interface ImportErrorLog {
+  id: string;
+  schemeId: string;
+  sourceType: SourceType;
+  sourceRef: string;
+  sourceName: string;
+  errorType: ErrorType;
+  errorMessage: string;
+  fieldDetail?: string;
+  rowNumber?: number;
+  photoNumber?: string;
+  status: ErrorStatus;
+  createdAt: string;
+  resolvedAt?: string;
+  resolvedBy?: string;
+  resolution?: string;
+}
+
+export interface CreateSnapshotRequest {
+  fieldName: string;
+  oldValue: string | number;
+  newValue: string | number;
+  reason: string;
+  correctedBy: string;
+  snapshotData?: Record<string, any>;
+}
+
+export interface ResolveErrorRequest {
+  status: ErrorStatus;
+  resolution: string;
+  resolvedBy: string;
 }

@@ -7,6 +7,10 @@ import type {
   ParameterChange,
   DashboardData,
   ExportOptions,
+  CorrectionSnapshot,
+  ImportErrorLog,
+  CreateSnapshotRequest,
+  ResolveErrorRequest,
 } from '@/types';
 import { snakeToCamel } from '@/utils/transform';
 
@@ -22,6 +26,10 @@ interface AppState {
   detailPanelOpen: boolean;
   sourcePopover: { recordId: string; x: number; y: number } | null;
   exportPanelOpen: boolean;
+  snapshotsByRecord: Record<string, CorrectionSnapshot[]>;
+  importErrors: ImportErrorLog[];
+  errorPanelOpen: boolean;
+  correctionPanelOpen: boolean;
   loading: boolean;
   error: string | null;
 
@@ -40,6 +48,12 @@ interface AppState {
   setDetailPanelOpen: (open: boolean) => void;
   setSourcePopover: (popover: { recordId: string; x: number; y: number } | null) => void;
   setExportPanelOpen: (open: boolean) => void;
+  fetchSnapshots: (recordId: string) => Promise<void>;
+  createSnapshot: (recordId: string, data: CreateSnapshotRequest) => Promise<void>;
+  fetchImportErrors: (schemeId: string, filters?: { status?: string; sourceType?: string }) => Promise<void>;
+  resolveImportError: (errorId: string, data: ResolveErrorRequest) => Promise<void>;
+  setErrorPanelOpen: (open: boolean) => void;
+  setCorrectionPanelOpen: (open: boolean) => void;
   clearError: () => void;
 }
 
@@ -53,6 +67,7 @@ function mapDashboardData(raw: any): DashboardData {
     unresolvedConflicts: (raw.conflictCount ?? 0) - (raw.resolvedConflictCount ?? 0),
     recentChanges: raw.recentChanges ?? 0,
     lastUpdatedAt: raw.scheme?.updatedAt ?? raw.scheme?.updated_at ?? new Date().toISOString(),
+    pendingErrors: raw.pendingErrors ?? 0,
   }
 }
 
@@ -68,6 +83,10 @@ export const useStore = create<AppState>((set, get) => ({
   detailPanelOpen: false,
   sourcePopover: null,
   exportPanelOpen: false,
+  snapshotsByRecord: {},
+  importErrors: [],
+  errorPanelOpen: false,
+  correctionPanelOpen: false,
   loading: false,
   error: null,
 
@@ -236,5 +255,81 @@ export const useStore = create<AppState>((set, get) => ({
   setDetailPanelOpen: (open) => set({ detailPanelOpen: open }),
   setSourcePopover: (popover) => set({ sourcePopover: popover }),
   setExportPanelOpen: (open) => set({ exportPanelOpen: open }),
+
+  fetchSnapshots: async (recordId) => {
+    set({ error: null });
+    try {
+      const res = await fetch(`/api/records/${recordId}/snapshots`);
+      if (!res.ok) throw new Error(`Failed to fetch snapshots: ${res.status}`);
+      const json = await res.json();
+      const data: CorrectionSnapshot[] = snakeToCamel(json.data ?? json);
+      set((state) => ({
+        snapshotsByRecord: { ...state.snapshotsByRecord, [recordId]: data },
+      }));
+    } catch (err) {
+      set({ error: (err as Error).message });
+    }
+  },
+
+  createSnapshot: async (recordId, data) => {
+    set({ loading: true, error: null });
+    try {
+      const res = await fetch(`/api/records/${recordId}/snapshots`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) throw new Error(`Failed to create snapshot: ${res.status}`);
+      const schemeId = get().currentScheme?.id;
+      if (schemeId) {
+        await get().fetchRecords(schemeId);
+        await get().fetchDashboard(schemeId);
+        await get().fetchSnapshots(recordId);
+      }
+      set({ loading: false });
+    } catch (err) {
+      set({ error: (err as Error).message, loading: false });
+    }
+  },
+
+  fetchImportErrors: async (schemeId, filters) => {
+    set({ error: null });
+    try {
+      const params = new URLSearchParams();
+      if (filters?.status) params.set('status', filters.status);
+      if (filters?.sourceType) params.set('sourceType', filters.sourceType);
+      const qs = params.toString();
+      const url = `/api/schemes/${schemeId}/errors${qs ? `?${qs}` : ''}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`Failed to fetch import errors: ${res.status}`);
+      const json = await res.json();
+      const data: ImportErrorLog[] = snakeToCamel(json.data ?? json);
+      set({ importErrors: data });
+    } catch (err) {
+      set({ error: (err as Error).message });
+    }
+  },
+
+  resolveImportError: async (errorId, data) => {
+    set({ error: null });
+    try {
+      const res = await fetch(`/api/schemes/errors/${errorId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) throw new Error(`Failed to resolve error: ${res.status}`);
+      const schemeId = get().currentScheme?.id;
+      if (schemeId) {
+        await get().fetchImportErrors(schemeId);
+      }
+    } catch (err) {
+      set({ error: (err as Error).message });
+    }
+  },
+
+  setErrorPanelOpen: (open) => set({ errorPanelOpen: open }),
+  setCorrectionPanelOpen: (open) => set({ correctionPanelOpen: open }),
+
   clearError: () => set({ error: null }),
 }));

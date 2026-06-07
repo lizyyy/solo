@@ -33,6 +33,9 @@ router.post('/', (req: Request, res: Response) => {
 
   const coordinateSystems = [...new Set(records.map(r => r.coordinate_system))]
 
+  const correctionSnapshots = db.prepare('SELECT * FROM correction_snapshots cs INNER JOIN hot_spot_records r ON cs.record_id = r.id WHERE r.scheme_id = ?').all(schemeId)
+  const importErrors = db.prepare('SELECT * FROM import_error_logs WHERE scheme_id = ?').all(schemeId)
+
   const report = {
     export_time: new Date().toISOString(),
     scheme: {
@@ -62,6 +65,9 @@ router.post('/', (req: Request, res: Response) => {
       system: cs,
       record_count: records.filter(r => r.coordinate_system === cs).length,
     })),
+    correctionSnapshots,
+    importErrors,
+    coordinateSystemNotes: '包含坐标系标注说明：substrate_global与chip_local坐标系数据不合并，分别独立存储和展示',
   }
 
   res.json({ success: true, data: report })

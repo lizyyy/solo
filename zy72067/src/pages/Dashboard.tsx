@@ -8,10 +8,12 @@ import {
   Wrench,
   FileSearch,
   Download,
+  AlertOctagon,
 } from 'lucide-react'
 import { useStore } from '@/store/useStore'
 import { cn } from '@/lib/utils'
 import type { HotSpotRecord, SourceConflict } from '@/types'
+import ErrorBanner from '@/components/ErrorBanner'
 
 function StatCard({
   icon: Icon,
@@ -198,23 +200,26 @@ function ConflictItem({ conflict }: { conflict: SourceConflict }) {
 
 export default function Dashboard() {
   const navigate = useNavigate()
-  const { dashboardData, records, conflicts, loading, error, fetchDashboard, fetchRecords, fetchConflicts, clearError } = useStore()
+  const { dashboardData, records, conflicts, loading, error, fetchDashboard, fetchRecords, fetchConflicts, fetchImportErrors, clearError } = useStore()
 
   useEffect(() => {
     fetchDashboard('demo-001')
     fetchRecords('demo-001')
     fetchConflicts('demo-001')
-  }, [fetchDashboard, fetchRecords, fetchConflicts])
+    fetchImportErrors('demo-001')
+  }, [fetchDashboard, fetchRecords, fetchConflicts, fetchImportErrors])
 
   const unresolvedConflicts = conflicts.filter((c) => !c.resolvedAt)
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <h1 className="text-2xl font-bold font-[JetBrains_Mono,monospace] mb-6 text-amber-500">
-        总览面板
-      </h1>
+    <div>
+      <ErrorBanner />
+      <div className="p-6 max-w-7xl mx-auto">
+        <h1 className="text-2xl font-bold font-[JetBrains_Mono,monospace] mb-6 text-amber-500">
+          总览面板
+        </h1>
 
-      {error && (
+        {error && (
         <div className="mb-4 px-4 py-3 rounded-lg bg-red-500/15 border border-red-500/30 text-red-400 text-sm flex items-center justify-between">
           <span>{error}</span>
           <button onClick={clearError} className="text-red-300 hover:text-red-100 ml-4 cursor-pointer">
@@ -223,9 +228,10 @@ export default function Dashboard() {
         </div>
       )}
 
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-5 gap-4 mb-6">
         {loading && !dashboardData ? (
           <>
+            <SkeletonCard />
             <SkeletonCard />
             <SkeletonCard />
             <SkeletonCard />
@@ -256,6 +262,12 @@ export default function Dashboard() {
               label="未解决冲突"
               value={dashboardData?.unresolvedConflicts ?? 0}
               color="var(--blue)"
+            />
+            <StatCard
+              icon={AlertOctagon}
+              label="数据错误"
+              value={dashboardData?.pendingErrors ?? 0}
+              color="#ef4444"
             />
           </>
         )}
@@ -332,6 +344,7 @@ export default function Dashboard() {
           <Download className="w-4 h-4" />
           导出报告
         </button>
+      </div>
       </div>
     </div>
   )

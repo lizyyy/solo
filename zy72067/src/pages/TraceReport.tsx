@@ -4,14 +4,17 @@ import { useStore } from '@/store/useStore'
 import Timeline from '@/components/trace/Timeline'
 import ConflictCompare from '@/components/trace/ConflictCompare'
 import ExportPanel from '@/components/trace/ExportPanel'
+import CorrectionDiff from '@/components/trace/CorrectionDiff'
+import { GitCompare } from 'lucide-react'
 
 const SCHEME_ID = 'demo-001'
 
 const TABS = [
-  { key: 'timeline', label: '证据链时间线' },
-  { key: 'conflicts', label: '冲突处理' },
-  { key: 'export', label: '导出报告' },
-] as const
+  { key: 'timeline' as const, label: '证据链时间线', icon: undefined },
+  { key: 'conflicts' as const, label: '冲突处理', icon: undefined },
+  { key: 'export' as const, label: '导出报告', icon: undefined },
+  { key: 'corrections' as const, label: '补录差异', icon: GitCompare },
+]
 
 type TabKey = typeof TABS[number]['key']
 
@@ -21,8 +24,10 @@ export default function TraceReport() {
   const fetchConflicts = useStore(s => s.fetchConflicts)
   const fetchParameterChanges = useStore(s => s.fetchParameterChanges)
   const fetchSources = useStore(s => s.fetchSources)
+  const fetchSnapshots = useStore(s => s.fetchSnapshots)
   const records = useStore(s => s.records)
   const sourcesByRecord = useStore(s => s.sourcesByRecord)
+  const snapshotsByRecord = useStore(s => s.snapshotsByRecord)
   const loading = useStore(s => s.loading)
   const error = useStore(s => s.error)
 
@@ -37,28 +42,35 @@ export default function TraceReport() {
       if (!sourcesByRecord[record.id]) {
         fetchSources(record.id)
       }
+      if (!snapshotsByRecord[record.id]) {
+        fetchSnapshots(record.id)
+      }
     }
-  }, [records, sourcesByRecord, fetchSources])
+  }, [records, sourcesByRecord, snapshotsByRecord, fetchSources, fetchSnapshots])
 
   return (
     <div className="min-h-screen bg-[#1a1a2e] text-gray-100">
       <div className="border-b border-gray-700/50 px-6 pt-4">
         <h1 className="text-lg font-semibold text-gray-100 mb-4">追溯与报告</h1>
         <div className="flex gap-1">
-          {TABS.map(tab => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              className={cn(
-                'px-4 py-2 text-sm font-medium rounded-t-lg transition-colors',
-                activeTab === tab.key
-                  ? 'bg-gray-800/60 text-amber-400 border-b-2 border-amber-500'
-                  : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/30',
-              )}
-            >
-              {tab.label}
-            </button>
-          ))}
+          {TABS.map(tab => {
+            const Icon = tab.icon
+            return (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={cn(
+                  'px-4 py-2 text-sm font-medium rounded-t-lg transition-colors flex items-center gap-2',
+                  activeTab === tab.key
+                    ? 'bg-gray-800/60 text-amber-400 border-b-2 border-amber-500'
+                    : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/30',
+                )}
+              >
+                {Icon && <Icon className="w-4 h-4" />}
+                {tab.label}
+              </button>
+            )
+          })}
         </div>
       </div>
 
@@ -83,6 +95,9 @@ export default function TraceReport() {
         </div>
         <div className={cn(activeTab !== 'export' && 'hidden')}>
           <ExportPanel />
+        </div>
+        <div className={cn(activeTab !== 'corrections' && 'hidden')}>
+          <CorrectionDiff />
         </div>
       </div>
     </div>

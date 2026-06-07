@@ -122,4 +122,48 @@ router.put('/:id', (req: Request, res: Response) => {
   res.json({ success: true, data: updated })
 })
 
+router.get('/:recordId/snapshots', (req: Request, res: Response) => {
+  const { recordId } = req.params
+  const snapshots = db.prepare('SELECT * FROM correction_snapshots WHERE record_id = ? ORDER BY corrected_at DESC').all(recordId)
+  res.json({ success: true, data: snapshots })
+})
+
+router.post('/:recordId/snapshots', (req: Request, res: Response) => {
+  const { recordId } = req.params
+  const { fieldName, oldValue, newValue, reason, correctedBy, snapshotData } = req.body
+  const record = db.prepare('SELECT * FROM hot_spot_records WHERE id = ?').get(recordId) as any
+  if (!record) { res.status(404).json({ success: false, error: '记录不存在' }); return }
+  const id = 'snap-' + Date.now()
+  db.prepare(`
+    INSERT INTO correction_snapshots (id, record_id, field_name, old_value, new_value, reason, corrected_by, snapshot_data)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(id, recordId, fieldName, String(oldValue), String(newValue), reason, correctedBy, JSON.stringify(snapshotData || {}))
+  const upd: any = {}
+  if (fieldName === 'temperature') {
+    upd.temperature = parseFloat(newValue)
+  } else if (fieldName === 'name') {
+    upd.name = newValue
+  } else if (fieldName === 'coordinateX') {
+    upd.coordinate_x = parseFloat(newValue)
+  } else if (fieldName === 'coordinateY') {
+    upd.coordinate_y = parseFloat(newValue)
+  }
+  if (Object.keys(upd).length > 0) {
+    const setClauses = Object.keys(upd).map(k => `${k} = ?`).join(', ')
+    const setParams = [...Object.values(upd), recordId]
+    if (fieldName === 'temperature') {
+      const scheme = db.prepare('SELECT * FROM schemes WHERE id = ?').get(record.scheme_id) as any
+      let severity = 'normal'
+      if (upd.temperature >= scheme.critical_threshold) severity = 'critical'
+      else if (upd.temperature >= scheme.warning_threshold) severity = 'warning'
+      db.prepare(`UPDATE hot_spot_records SET ${setClauses}, severity = ?, updated_at = datetime('now') WHERE id = ?`)
+        .run(...Object.values(upd), severity, recordId)
+    } else {
+      db.prepare(`UPDATE hot_spot_records SET ${setClauses}, updated_at = datetime('now') WHERE id = ?`).run(...setParams)
+    }
+  }
+  const snapshot = db.prepare('SELECT * FROM correction_snapshots WHERE id = ?').get(id)
+  res.json({ success: true, data: snapshot })
+})
+
 export default router
