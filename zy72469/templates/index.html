@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>养老驿站配送路线 - 城更数据平台</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏘️ 养老驿站配送路线</h1>
+            <div class="user-info">
+                <span>当前用户：<span id="currentUser">网格员</span></span>
+                <select id="roleSelector">
+                    <option value="grid_inspector">网格员</option>
+                    <option value="project_manager">城更项目经理（阿宁）</option>
+                    <option value="street_planner">街道规划员</option>
+                </select>
+            </div>
+        </header>
+
+        <div class="workflow-steps">
+            <div class="step active" data-step="1">
+                <div class="step-number">1</div>
+                <div class="step-title">网格员巡查表导入</div>
+                <div class="step-desc">上传或加载巡查数据</div>
+            </div>
+            <div class="step" data-step="2">
+                <div class="step-number">2</div>
+                <div class="step-title">项目经理审核施工告示</div>
+                <div class="step-desc">冲突检测与确认</div>
+            </div>
+            <div class="step" data-step="3">
+                <div class="step-number">3</div>
+                <div class="step-title">热力图更新与复核</div>
+                <div class="step-desc">生成配送路线热力图</div>
+            </div>
+        </div>
+
+        <div class="step-content">
+            <div class="step-panel active" id="step1">
+                <div class="panel">
+                    <h2>📋 第一步：导入网格员巡查表</h2>
+                    
+                    <div class="quick-actions">
+                        <h3>快速加载样例数据</h3>
+                        <div class="sample-buttons">
+                            <button class="btn btn-secondary" onclick="loadSample('inspection', 'normal')">
+                                📊 正常材料
+                            </button>
+                            <button class="btn btn-warning" onclick="loadSample('inspection', 'alternate')">
+                                ⚠️ 错口径材料
+                            </button>
+                            <button class="btn btn-info" onclick="loadSample('inspection', 'supplement')">
+                                ➕ 补录材料
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="upload-section">
+                        <h3>上传自定义文件</h3>
+                        <div class="upload-area">
+                            <input type="file" id="fileInput" accept=".xlsx,.xls,.csv">
+                            <select id="importType">
+                                <option value="normal">正常导入</option>
+                                <option value="supplement">补录导入</option>
+                            </select>
+                            <button class="btn btn-primary" onclick="uploadFile()">上传导入</button>
+                        </div>
+                    </div>
+
+                    <div class="data-preview">
+                        <h3>已导入数据 <span id="inspectionCount">0</span> 条</h3>
+                        <div class="table-container">
+                            <table id="inspectionTable">
+                                <thead>
+                                    <tr>
+                                        <th>网格员</th>
+                                        <th>日期</th>
+                                        <th>地点</th>
+                                        <th>是否通行</th>
+                                        <th>备注</th>
+                                        <th>数据类型</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="import-history">
+                        <h3>导入历史</h3>
+                        <div class="table-container">
+                            <table id="importHistoryTable">
+                                <thead>
+                                    <tr>
+                                        <th>文件名</th>
+                                        <th>类型</th>
+                                        <th>总数</th>
+                                        <th>成功</th>
+                                        <th>重复</th>
+                                        <th>状态</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="step-actions">
+                        <button class="btn btn-success btn-large" onclick="goToStep(2)">
+                            下一步：审核施工告示 →
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-panel" id="step2">
+                <div class="panel">
+                    <h2>📝 第二步：城更项目经理审核施工告示</h2>
+                    
+                    <div class="quick-actions">
+                        <h3>加载施工告示样例</h3>
+                        <div class="sample-buttons">
+                            <button class="btn btn-secondary" onclick="loadSample('notice', 'normal')">
+                                🏗️ 正常施工告示
+                            </button>
+                            <button class="btn btn-warning" onclick="loadSample('notice', 'alternate')">
+                                ⚠️ 错口径告示
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="upload-section">
+                        <h3>上传施工告示文件</h3>
+                        <div class="upload-area">
+                            <input type="file" id="noticeFileInput" accept=".xlsx,.xls,.csv">
+                            <button class="btn btn-primary" onclick="uploadNotice()">上传导入</button>
+                        </div>
+                    </div>
+
+                    <div class="conflict-section">
+                        <div class="conflict-stats">
+                            <div class="stat-card">
+                                <span class="stat-value" id="totalConflicts">0</span>
+                                <span class="stat-label">总冲突</span>
+                            </div>
+                            <div class="stat-card warning">
+                                <span class="stat-value" id="pendingConflicts">0</span>
+                                <span class="stat-label">待处理</span>
+                            </div>
+                            <div class="stat-card success">
+                                <span class="stat-value" id="resolvedConflicts">0</span>
+                                <span class="stat-label">已确认</span>
+                            </div>
+                            <div class="stat-card info">
+                                <span class="stat-value" id="rejectedConflicts">0</span>
+                                <span class="stat-label">已驳回</span>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary" onclick="detectConflicts()">
+                            🔍 检测网格员巡查表与施工告示冲突
+                        </button>
+                    </div>
+
+                    <div class="conflict-list">
+                        <h3>冲突列表</h3>
+                        <div id="conflictContainer">
+                            <p class="empty-hint">点击"检测冲突"按钮开始检测</p>
+                        </div>
+                    </div>
+
+                    <div class="notices-preview">
+                        <h3>已导入施工告示 <span id="noticeCount">0</span> 条</h3>
+                        <div class="table-container">
+                            <table id="noticeTable">
+                                <thead>
+                                    <tr>
+                                        <th>工程名称</th>
+                                        <th>地点</th>
+                                        <th>施工日期</th>
+                                        <th>是否封路</th>
+                                        <th>备注</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="step-actions">
+                        <button class="btn btn-secondary" onclick="goToStep(1)">← 上一步</button>
+                        <button class="btn btn-success btn-large" onclick="goToStep(3)">
+                            下一步：生成热力图 →
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-panel" id="step3">
+                <div class="panel">
+                    <h2>🗺️ 第三步：热力图更新与路线规划</h2>
+                    
+                    <div class="heatmap-actions">
+                        <button class="btn btn-primary btn-large" onclick="generateHeatmap()">
+                            🔥 生成热力图
+                        </button>
+                    </div>
+
+                    <div class="heatmap-stats">
+                        <div class="stat-card">
+                            <span class="stat-value" id="totalGrids">0</span>
+                            <span class="stat-label">网格总数</span>
+                        </div>
+                        <div class="stat-card warning">
+                            <span class="stat-value" id="needsReview">0</span>
+                            <span class="stat-label">需复核</span>
+                        </div>
+                        <div class="stat-card danger">
+                            <span class="stat-value" id="eveningGap">0</span>
+                            <span class="stat-label">晚间缺口</span>
+                        </div>
+                        <div class="stat-card success">
+                            <span class="stat-value" id="reviewed">0</span>
+                            <span class="stat-label">已复核</span>
+                        </div>
+                    </div>
+
+                    <div class="heatmap-visual">
+                        <h3>热力图可视化</h3>
+                        <div class="heatmap-container" id="heatmapContainer">
+                            <p class="empty-hint">点击"生成热力图"按钮查看热力图</p>
+                        </div>
+                        <div class="heatmap-legend">
+                            <span>低</span>
+                            <div class="legend-bar"></div>
+                            <span>高</span>
+                            <span class="legend-note">🔴 晚间缺口待复核</span>
+                        </div>
+                    </div>
+
+                    <div class="self-check-section">
+                        <h3>🔧 系统自检</h3>
+                        <button class="btn btn-secondary" onclick="runSelfCheck()">运行自检</button>
+                        <div id="selfCheckResults"></div>
+                    </div>
+
+                    <div class="export-section">
+                        <h3>📤 数据导出</h3>
+                        <div class="export-buttons">
+                            <button class="btn btn-secondary" onclick="exportData('inspections')">导出巡查表</button>
+                            <button class="btn btn-secondary" onclick="exportData('notices')">导出施工告示</button>
+                            <button class="btn btn-secondary" onclick="exportData('heatmap')">导出热力图</button>
+                            <button class="btn btn-secondary" onclick="exportData('conflicts')">导出冲突记录</button>
+                            <button class="btn btn-primary" onclick="exportData('report')">生成完整报告</button>
+                        </div>
+                    </div>
+
+                    <div class="step-actions">
+                        <button class="btn btn-secondary" onclick="goToStep(2)">← 上一步</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
