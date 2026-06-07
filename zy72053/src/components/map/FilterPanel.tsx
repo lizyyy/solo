@@ -7,6 +7,7 @@ import {
 } from '@/types'
 import type { Severity, Source, PointStatus } from '@/types'
 import { X, RotateCcw } from 'lucide-react'
+import FilterPresetBar from './FilterPresetBar'
 
 interface FilterPanelProps {
   open: boolean
@@ -62,6 +63,10 @@ export default function FilterPanel({ open, onClose }: FilterPanelProps) {
         <button onClick={onClose} className="text-gray-400 hover:text-white">
           <X size={18} />
         </button>
+      </div>
+
+      <div className="border-b border-white/10 px-4 py-3">
+        <FilterPresetBar />
       </div>
 
       <div className="space-y-5 px-4 py-4">

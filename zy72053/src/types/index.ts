@@ -1,7 +1,7 @@
 export type Severity = 'none' | 'minor' | 'moderate' | 'severe' | 'critical'
 export type Source = 'gis' | 'inspection' | 'excel'
 export type PointStatus = 'normal' | 'anomaly' | 'exception'
-export type QCIssueType = 'null_value' | 'duplicate' | 'boundary' | 'conflict'
+export type QCIssueType = 'null_value' | 'duplicate' | 'boundary' | 'conflict' | 'invalid_format' | 'out_of_range'
 export type JudgmentType = 'conflict_resolution' | 'anomaly_confirm' | 'data_correction'
 export type ConflictResolution = 'pending' | 'data_side' | 'photo_side' | 'manual_override'
 
@@ -86,6 +86,23 @@ export interface FilterState {
   status: PointStatus[]
 }
 
+export interface FilterPreset {
+  id: string
+  name: string
+  filters: FilterState
+  createdAt: string
+}
+
+export interface ImportError {
+  id: string
+  rowNumber?: number
+  field?: string
+  value?: string
+  errorType: 'missing_field' | 'invalid_format' | 'out_of_range' | 'duplicate_id' | 'unknown_pipe'
+  message: string
+  sourceFile: string
+}
+
 export const SEVERITY_COLORS: Record<Severity, string> = {
   none: '#22C55E',
   minor: '#84CC16',
@@ -119,6 +136,8 @@ export const QC_ISSUE_LABELS: Record<QCIssueType, string> = {
   duplicate: '重复项',
   boundary: '边界越界',
   conflict: '冲突',
+  invalid_format: '格式错误',
+  out_of_range: '范围越界',
 }
 
 export const JUDGMENT_TYPE_LABELS: Record<JudgmentType, string> = {

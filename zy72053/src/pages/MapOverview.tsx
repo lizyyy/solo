@@ -5,6 +5,7 @@ import StatsBar from '@/components/map/StatsBar'
 import FilterPanel from '@/components/map/FilterPanel'
 import PointDetail from '@/components/map/PointDetail'
 import ScreenshotExport from '@/components/map/ScreenshotExport'
+import ReportExport from '@/components/map/ReportExport'
 
 export default function MapOverview() {
   const sidebarOpen = useStore((s) => s.sidebarOpen)
@@ -40,7 +41,8 @@ export default function MapOverview() {
         </div>
       )}
 
-      <div className="absolute bottom-6 right-6 z-30">
+      <div className="absolute bottom-6 right-6 z-30 flex gap-3">
+        <ReportExport />
         <ScreenshotExport />
       </div>
     </div>
