@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# 城中村门牌归并重跑脚本
+# 会话ID: SESS-SUPP-20260607103307
+# 生成时间: 2026-06-07 10:33:07
+
+# 使用方法:
+#   chmod +x 重跑命令_*.sh
+#   ./重跑命令_*.sh
+
+set -e
+
+echo "开始重跑城中村门牌归并流程..."
+echo "会话ID: SESS-SUPP-20260607103307"
+
+# [2026-06-07 10:33:07] python main.py import --session SESS-SUPP-20260607103307
+# [2026-06-07 10:33:07] # 已导入 1 条居民投诉记录
+# [2026-06-07 10:33:07] python main.py review-photos --session SESS-SUPP-20260607103307 --reviewer 周姐
+# [2026-06-07 10:33:07] # 已审核 1 条路口照片
+# [2026-06-07 10:33:07] python main.py update-points --session SESS-SUPP-20260607103307
+# [2026-06-07 10:33:07] # 点位清单更新完成，共处理 1 条记录
+
+echo "归并流程重跑完成！"
+echo "请查看 output/ 目录下的复盘记录"
