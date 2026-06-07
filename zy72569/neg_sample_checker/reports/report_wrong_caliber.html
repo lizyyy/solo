@@ -1,0 +1,549 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>序列推荐负采样检查 - 检查报告</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #333; border-bottom: 3px solid #007bff; padding-bottom: 10px; }
+        h2 { color: #007bff; margin-top: 30px; border-left: 4px solid #007bff; padding-left: 10px; }
+        h3 { color: #555; }
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .summary-card { background: #f8f9fa; padding: 15px; border-radius: 6px; border-left: 4px solid #007bff; }
+        .summary-card.warning { border-left-color: #ffc107; }
+        .summary-card.error { border-left-color: #dc3545; }
+        .summary-card.success { border-left-color: #28a745; }
+        .card-title { font-size: 0.9em; color: #666; margin-bottom: 5px; }
+        .card-value { font-size: 1.5em; font-weight: bold; color: #333; }
+        .step-section { margin: 20px 0; padding: 20px; background: #fafafa; border-radius: 6px; }
+        .check-item { margin: 15px 0; padding: 15px; background: white; border-radius: 4px; border: 1px solid #e0e0e0; }
+        .check-item.passed { border-left: 4px solid #28a745; }
+        .check-item.warning { border-left: 4px solid #ffc107; }
+        .check-item.error { border-left: 4px solid #dc3545; }
+        .check-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .check-name { font-weight: bold; font-size: 1.1em; }
+        .badge { padding: 4px 10px; border-radius: 12px; font-size: 0.85em; font-weight: bold; }
+        .badge.passed { background: #d4edda; color: #155724; }
+        .badge.warning { background: #fff3cd; color: #856404; }
+        .badge.error { background: #f8d7da; color: #721c24; }
+        .badge.pending { background: #e2e3e5; color: #383d41; }
+        .suggestion { margin-top: 10px; padding: 10px; background: #fff3cd; border-radius: 4px; color: #856404; }
+        .conflict-item { margin: 10px 0; padding: 12px; background: #fff5f5; border-radius: 4px; border: 1px solid #feb2b2; }
+        .conflict-header { font-weight: bold; color: #c53030; margin-bottom: 8px; }
+        .conflict-data { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .conflict-side { padding: 8px; background: white; border-radius: 4px; }
+        .resolution-buttons { margin-top: 10px; }
+        .resolution-buttons button { padding: 6px 12px; margin-right: 8px; border: none; border-radius: 4px; cursor: pointer; }
+        .btn-confirm { background: #28a745; color: white; }
+        .btn-reject { background: #dc3545; color: white; }
+        .details-box { margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 4px; font-family: monospace; font-size: 0.9em; overflow-x: auto; }
+        .meta-info { color: #666; font-size: 0.9em; margin-bottom: 20px; }
+        .history-section { margin-top: 30px; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #e0e0e0; }
+        th { background: #f8f9fa; font-weight: bold; }
+        .warning-note { background: #fff3cd; border: 1px solid #ffeeba; padding: 15px; border-radius: 4px; margin: 20px 0; }
+        .warning-note h4 { color: #856404; margin-top: 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>序列推荐负采样检查</h1>
+        <div class="meta-info">
+            <p><strong>报告生成时间：</strong>2026-06-07 16:00:48</p>
+            <p><strong>版本：</strong>1.0.0</p>
+            <p><strong>当前阈值：</strong>0.5</p>
+        </div>
+
+        <h2>概览</h2>
+        <div class="summary-grid">
+            <div class="summary-card success">
+                <div class="card-title">步骤总数</div>
+                <div class="card-value">3</div>
+            </div>
+            <div class="summary-card success">
+                <div class="card-title">已完成步骤</div>
+                <div class="card-value">3</div>
+            </div>
+            <div class="summary-card warning">
+                <div class="card-title">警告数</div>
+                <div class="card-value">3</div>
+            </div>
+            <div class="summary-card error">
+                <div class="card-title">错误数</div>
+                <div class="card-value">0</div>
+            </div>
+            <div class="summary-card warning">
+                <div class="card-title">待处理冲突</div>
+                <div class="card-value">5</div>
+            </div>
+        </div>
+
+        
+        <div class="warning-note">
+            <h4>⚠️ 重要提示</h4>
+            <p>检测到需要人工复核的内容。少数类样本被总指标盖住时，<strong>请勿直接归为正常</strong>，请留给算法工程师复核。负样本列表与召回候选表存在冲突时，请数据科学家林姐<strong>确认或驳回</strong>，不要替业务同事自动拍板。</p>
+        </div>
+        
+
+        
+        <div class="step-section">
+            <h2>步骤1：负样本列表导入 
+                <span class="badge passed">
+                    completed
+                </span>
+            </h2>
+            <p><small>数据版本：initial</small></p>
+
+            
+            <h3>检查结果</h3>
+            
+            <div class="check-item info">
+                <div class="check-header">
+                    <span class="check-name">重复导入检查</span>
+                    <span class="badge passed">
+                        通过
+                    </span>
+                </div>
+                
+                <details class="details-box">
+                    <summary>查看详情</summary>
+                    <pre>{
+  "total_rows": 33,
+  "duplicate_count": 0
+}</pre>
+                </details>
+            </div>
+            
+            <div class="check-item warning">
+                <div class="check-header">
+                    <span class="check-name">少数类样本被总指标盖住检查</span>
+                    <span class="badge warning">
+                        警告
+                    </span>
+                </div>
+                
+                <div class="suggestion">💡 少数类样本指标与总指标差异较大，请勿直接归为正常，留给算法工程师复核</div>
+                
+                <details class="details-box">
+                    <summary>查看详情</summary>
+                    <pre>{
+  "label_distribution": {
+    "0": 0.5757575757575758,
+    "1": 0.3939393939393939,
+    "2": 0.030303030303030304
+  },
+  "total_metrics": {
+    "click_rate": 0.2412121212121212,
+    "conversion_rate": 0.0873030303030303
+  },
+  "per_label_metrics": {
+    "click_rate": {
+      "0": 0.10421052631578948,
+      "1": 0.4584615384615385,
+      "2": 0.02
+    },
+    "conversion_rate": {
+      "0": 0.020526315789473684,
+      "1": 0.19153846153846155,
+      "2": 0.001
+    }
+  },
+  "masking_cases": [
+    {
+      "label": 2,
+      "metric": "click_rate",
+      "label_value": 0.02,
+      "total_value": 0.2412121212121212,
+      "diff_percent": 91.70853891158069,
+      "label_ratio": 0.030303030303030304
+    },
+    {
+      "label": 2,
+      "metric": "conversion_rate",
+      "label_value": 0.001,
+      "total_value": 0.0873030303030303,
+      "diff_percent": 98.85455306421295,
+      "label_ratio": 0.030303030303030304
+    }
+  ]
+}</pre>
+                </details>
+            </div>
+            
+            
+
+            
+        </div>
+        
+        <div class="step-section">
+            <h2>步骤2：召回候选表对比 
+                <span class="badge passed">
+                    completed
+                </span>
+            </h2>
+            <p><small>数据版本：initial</small></p>
+
+            
+            <h3>检查结果</h3>
+            
+            <div class="check-item warning">
+                <div class="check-header">
+                    <span class="check-name">负样本与召回候选表一致性检查</span>
+                    <span class="badge warning">
+                        警告
+                    </span>
+                </div>
+                
+                <div class="suggestion">💡 检测到标签冲突，请数据科学家林姐确认或驳回，不要自动拍板</div>
+                
+                <details class="details-box">
+                    <summary>查看详情</summary>
+                    <pre>{
+  "conflict_count": 5,
+  "sample_conflicts": [
+    {
+      "id": "conflict_1",
+      "description": "标签冲突：{'user_id': 1001, 'item_id': 2003}"
+    },
+    {
+      "id": "conflict_2",
+      "description": "标签冲突：{'user_id': 1002, 'item_id': 2005}"
+    },
+    {
+      "id": "conflict_5",
+      "description": "标签冲突：{'user_id': 1005, 'item_id': 2004}"
+    },
+    {
+      "id": "conflict_7",
+      "description": "标签冲突：{'user_id': 1007, 'item_id': 2014}"
+    },
+    {
+      "id": "conflict_9",
+      "description": "标签冲突：{'user_id': 5001, 'item_id': 9001}"
+    }
+  ]
+}</pre>
+                </details>
+            </div>
+            
+            
+
+            
+            <h3>冲突证据（5 条）</h3>
+            
+            <div class="conflict-item">
+                <div class="conflict-header">
+                    标签冲突：{'user_id': 1001, 'item_id': 2003}
+                    <span class="badge pending">
+                        待处理
+                    </span>
+                </div>
+                <div class="conflict-data">
+                    <div class="conflict-side">
+                        <strong>负样本列表：</strong>
+                        <pre>{
+  "label": 1
+}</pre>
+                    </div>
+                    <div class="conflict-side">
+                        <strong>召回候选表：</strong>
+                        <pre>{
+  "label": 0
+}</pre>
+                    </div>
+                </div>
+                
+                <div class="resolution-buttons">
+                    <button class="btn-confirm">✅ 林姐确认</button>
+                    <button class="btn-reject">❌ 林姐驳回</button>
+                </div>
+                
+            </div>
+            
+            <div class="conflict-item">
+                <div class="conflict-header">
+                    标签冲突：{'user_id': 1002, 'item_id': 2005}
+                    <span class="badge pending">
+                        待处理
+                    </span>
+                </div>
+                <div class="conflict-data">
+                    <div class="conflict-side">
+                        <strong>负样本列表：</strong>
+                        <pre>{
+  "label": 1
+}</pre>
+                    </div>
+                    <div class="conflict-side">
+                        <strong>召回候选表：</strong>
+                        <pre>{
+  "label": 0
+}</pre>
+                    </div>
+                </div>
+                
+                <div class="resolution-buttons">
+                    <button class="btn-confirm">✅ 林姐确认</button>
+                    <button class="btn-reject">❌ 林姐驳回</button>
+                </div>
+                
+            </div>
+            
+            <div class="conflict-item">
+                <div class="conflict-header">
+                    标签冲突：{'user_id': 1005, 'item_id': 2004}
+                    <span class="badge pending">
+                        待处理
+                    </span>
+                </div>
+                <div class="conflict-data">
+                    <div class="conflict-side">
+                        <strong>负样本列表：</strong>
+                        <pre>{
+  "label": 1
+}</pre>
+                    </div>
+                    <div class="conflict-side">
+                        <strong>召回候选表：</strong>
+                        <pre>{
+  "label": 0
+}</pre>
+                    </div>
+                </div>
+                
+                <div class="resolution-buttons">
+                    <button class="btn-confirm">✅ 林姐确认</button>
+                    <button class="btn-reject">❌ 林姐驳回</button>
+                </div>
+                
+            </div>
+            
+            <div class="conflict-item">
+                <div class="conflict-header">
+                    标签冲突：{'user_id': 1007, 'item_id': 2014}
+                    <span class="badge pending">
+                        待处理
+                    </span>
+                </div>
+                <div class="conflict-data">
+                    <div class="conflict-side">
+                        <strong>负样本列表：</strong>
+                        <pre>{
+  "label": 1
+}</pre>
+                    </div>
+                    <div class="conflict-side">
+                        <strong>召回候选表：</strong>
+                        <pre>{
+  "label": 0
+}</pre>
+                    </div>
+                </div>
+                
+                <div class="resolution-buttons">
+                    <button class="btn-confirm">✅ 林姐确认</button>
+                    <button class="btn-reject">❌ 林姐驳回</button>
+                </div>
+                
+            </div>
+            
+            <div class="conflict-item">
+                <div class="conflict-header">
+                    标签冲突：{'user_id': 5001, 'item_id': 9001}
+                    <span class="badge pending">
+                        待处理
+                    </span>
+                </div>
+                <div class="conflict-data">
+                    <div class="conflict-side">
+                        <strong>负样本列表：</strong>
+                        <pre>{
+  "label": 2
+}</pre>
+                    </div>
+                    <div class="conflict-side">
+                        <strong>召回候选表：</strong>
+                        <pre>{
+  "label": 1
+}</pre>
+                    </div>
+                </div>
+                
+                <div class="resolution-buttons">
+                    <button class="btn-confirm">✅ 林姐确认</button>
+                    <button class="btn-reject">❌ 林姐驳回</button>
+                </div>
+                
+            </div>
+            
+            
+        </div>
+        
+        <div class="step-section">
+            <h2>步骤3：阈值回放更新 
+                <span class="badge passed">
+                    completed
+                </span>
+            </h2>
+            <p><small>数据版本：N/A</small></p>
+
+            
+            <h3>检查结果</h3>
+            
+            <div class="check-item info">
+                <div class="check-header">
+                    <span class="check-name">阈值回放检查</span>
+                    <span class="badge passed">
+                        通过
+                    </span>
+                </div>
+                
+                <details class="details-box">
+                    <summary>查看详情</summary>
+                    <pre>{
+  "old_threshold": 0.5,
+  "new_threshold": 0.5,
+  "current_metrics": {
+    "threshold": 0.5,
+    "precision": 1.0,
+    "recall": 1.0,
+    "positive_count": 14,
+    "negative_count": 19
+  },
+  "history_count": 2,
+  "history_metrics": [
+    {
+      "timestamp": "2026-06-07 16:00:48",
+      "threshold": 0.5,
+      "metrics": {
+        "threshold": 0.5,
+        "precision": 1.0,
+        "recall": 1.0,
+        "positive_count": 14,
+        "negative_count": 19
+      }
+    },
+    {
+      "timestamp": "2026-06-07 16:00:48",
+      "threshold": 0.5,
+      "metrics": {
+        "threshold": 0.5,
+        "precision": 1.0,
+        "recall": 1.0,
+        "positive_count": 14,
+        "negative_count": 19
+      }
+    }
+  ],
+  "minority_sample_count": 1,
+  "minority_samples": [
+    {
+      "user_id": 5001,
+      "item_id": 9001,
+      "timestamp": 1717250000,
+      "label": 2,
+      "score": 0.95,
+      "click_rate": 0.02,
+      "conversion_rate": 0.001
+    }
+  ]
+}</pre>
+                </details>
+            </div>
+            
+            <div class="check-item warning">
+                <div class="check-header">
+                    <span class="check-name">少数类样本复核提醒</span>
+                    <span class="badge warning">
+                        警告
+                    </span>
+                </div>
+                
+                <div class="suggestion">💡 少数类样本请勿直接归为正常，留给算法工程师复核</div>
+                
+                <details class="details-box">
+                    <summary>查看详情</summary>
+                    <pre>{
+  "count": 1,
+  "samples": [
+    {
+      "user_id": 5001,
+      "item_id": 9001,
+      "timestamp": 1717250000,
+      "label": 2,
+      "score": 0.95,
+      "click_rate": 0.02,
+      "conversion_rate": 0.001
+    }
+  ]
+}</pre>
+                </details>
+            </div>
+            
+            
+
+            
+        </div>
+        
+
+        
+        <div class="history-section">
+            <h2>历史记录</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>时间</th>
+                        <th>数据源</th>
+                        <th>阈值</th>
+                        <th>Precision</th>
+                        <th>Recall</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                    <tr>
+                        <td>2026-06-07 16:00:48</td>
+                        <td>/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/neg_samples.csv</td>
+                        <td>0.5</td>
+                        <td>1.0</td>
+                        <td>1.0</td>
+                    </tr>
+                    
+                    <tr>
+                        <td>2026-06-07 16:00:48</td>
+                        <td>/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/recall_candidates.csv</td>
+                        <td>0.5</td>
+                        <td>1.0</td>
+                        <td>1.0</td>
+                    </tr>
+                    
+                    <tr>
+                        <td>2026-06-07 16:00:48</td>
+                        <td>threshold_0.5</td>
+                        <td>0.5</td>
+                        <td>1.0</td>
+                        <td>1.0</td>
+                    </tr>
+                    
+                </tbody>
+            </table>
+        </div>
+        
+    </div>
+    <script>
+        document.querySelectorAll('.btn-confirm, .btn-reject').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const isConfirm = this.classList.contains('btn-confirm');
+                const badge = this.closest('.conflict-item').querySelector('.badge');
+                badge.textContent = isConfirm ? '已确认' : '已驳回';
+                badge.className = 'badge passed';
+                this.parentElement.remove();
+            });
+        });
+    </script>
+</body>
+</html>

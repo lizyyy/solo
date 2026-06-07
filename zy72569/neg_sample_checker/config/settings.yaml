@@ -1,0 +1,40 @@
+project:
+  name: "序列推荐负采样检查"
+  version: "1.0.0"
+
+checks:
+  duplicate_detection:
+    enabled: true
+    key_fields: ["user_id", "item_id", "timestamp"]
+  
+  minority_class_detection:
+    enabled: true
+    minority_threshold: 0.05
+    metric_fields: ["click_rate", "conversion_rate"]
+  
+  supplement_recalc:
+    enabled: true
+    auto_confirm: false
+  
+  export_consistency:
+    enabled: true
+    check_fields: ["user_id", "item_id", "label"]
+
+workflow:
+  steps:
+    - name: "负样本列表导入"
+      id: "step1_import"
+    - name: "召回候选表对比"
+      id: "step2_compare"
+    - name: "阈值回放更新"
+      id: "step3_playback"
+
+threshold:
+  default: 0.5
+  minority_override: true
+  require_manual_review: true
+
+report:
+  output_dir: "reports"
+  format: ["html", "json"]
+  include_history: true

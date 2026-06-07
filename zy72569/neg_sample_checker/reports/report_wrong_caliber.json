@@ -1,0 +1,298 @@
+{
+  "project_name": "序列推荐负采样检查",
+  "version": "1.0.0",
+  "generated_at": "2026-06-07 16:00:48",
+  "current_threshold": 0.5,
+  "total_steps": 3,
+  "completed_steps": 3,
+  "total_warnings": 3,
+  "total_errors": 0,
+  "pending_conflicts": 5,
+  "steps": {
+    "step1_import": {
+      "step_name": "负样本列表导入",
+      "status": "completed",
+      "data_version": "initial",
+      "results": [
+        {
+          "check_name": "重复导入检查",
+          "passed": true,
+          "severity": "info",
+          "suggestion": "",
+          "details": {
+            "total_rows": 33,
+            "duplicate_count": 0
+          }
+        },
+        {
+          "check_name": "少数类样本被总指标盖住检查",
+          "passed": false,
+          "severity": "warning",
+          "suggestion": "少数类样本指标与总指标差异较大，请勿直接归为正常，留给算法工程师复核",
+          "details": {
+            "label_distribution": {
+              "0": 0.5757575757575758,
+              "1": 0.3939393939393939,
+              "2": 0.030303030303030304
+            },
+            "total_metrics": {
+              "click_rate": 0.2412121212121212,
+              "conversion_rate": 0.0873030303030303
+            },
+            "per_label_metrics": {
+              "click_rate": {
+                "0": 0.10421052631578948,
+                "1": 0.4584615384615385,
+                "2": 0.02
+              },
+              "conversion_rate": {
+                "0": 0.020526315789473684,
+                "1": 0.19153846153846155,
+                "2": 0.001
+              }
+            },
+            "masking_cases": [
+              {
+                "label": 2,
+                "metric": "click_rate",
+                "label_value": 0.02,
+                "total_value": 0.2412121212121212,
+                "diff_percent": 91.70853891158069,
+                "label_ratio": 0.030303030303030304
+              },
+              {
+                "label": 2,
+                "metric": "conversion_rate",
+                "label_value": 0.001,
+                "total_value": 0.0873030303030303,
+                "diff_percent": 98.85455306421295,
+                "label_ratio": 0.030303030303030304
+              }
+            ]
+          }
+        }
+      ],
+      "conflicts": []
+    },
+    "step2_compare": {
+      "step_name": "召回候选表对比",
+      "status": "completed",
+      "data_version": "initial",
+      "results": [
+        {
+          "check_name": "负样本与召回候选表一致性检查",
+          "passed": false,
+          "severity": "warning",
+          "suggestion": "检测到标签冲突，请数据科学家林姐确认或驳回，不要自动拍板",
+          "details": {
+            "conflict_count": 5,
+            "sample_conflicts": [
+              {
+                "id": "conflict_1",
+                "description": "标签冲突：{'user_id': 1001, 'item_id': 2003}"
+              },
+              {
+                "id": "conflict_2",
+                "description": "标签冲突：{'user_id': 1002, 'item_id': 2005}"
+              },
+              {
+                "id": "conflict_5",
+                "description": "标签冲突：{'user_id': 1005, 'item_id': 2004}"
+              },
+              {
+                "id": "conflict_7",
+                "description": "标签冲突：{'user_id': 1007, 'item_id': 2014}"
+              },
+              {
+                "id": "conflict_9",
+                "description": "标签冲突：{'user_id': 5001, 'item_id': 9001}"
+              }
+            ]
+          }
+        }
+      ],
+      "conflicts": [
+        {
+          "conflict_id": "conflict_1",
+          "description": "标签冲突：{'user_id': 1001, 'item_id': 2003}",
+          "neg_sample_data": {
+            "label": 1
+          },
+          "recall_candidate_data": {
+            "label": 0
+          },
+          "field": "label",
+          "resolution": "pending"
+        },
+        {
+          "conflict_id": "conflict_2",
+          "description": "标签冲突：{'user_id': 1002, 'item_id': 2005}",
+          "neg_sample_data": {
+            "label": 1
+          },
+          "recall_candidate_data": {
+            "label": 0
+          },
+          "field": "label",
+          "resolution": "pending"
+        },
+        {
+          "conflict_id": "conflict_5",
+          "description": "标签冲突：{'user_id': 1005, 'item_id': 2004}",
+          "neg_sample_data": {
+            "label": 1
+          },
+          "recall_candidate_data": {
+            "label": 0
+          },
+          "field": "label",
+          "resolution": "pending"
+        },
+        {
+          "conflict_id": "conflict_7",
+          "description": "标签冲突：{'user_id': 1007, 'item_id': 2014}",
+          "neg_sample_data": {
+            "label": 1
+          },
+          "recall_candidate_data": {
+            "label": 0
+          },
+          "field": "label",
+          "resolution": "pending"
+        },
+        {
+          "conflict_id": "conflict_9",
+          "description": "标签冲突：{'user_id': 5001, 'item_id': 9001}",
+          "neg_sample_data": {
+            "label": 2
+          },
+          "recall_candidate_data": {
+            "label": 1
+          },
+          "field": "label",
+          "resolution": "pending"
+        }
+      ]
+    },
+    "step3_playback": {
+      "step_name": "阈值回放更新",
+      "status": "completed",
+      "data_version": "",
+      "results": [
+        {
+          "check_name": "阈值回放检查",
+          "passed": true,
+          "severity": "info",
+          "suggestion": "",
+          "details": {
+            "old_threshold": 0.5,
+            "new_threshold": 0.5,
+            "current_metrics": {
+              "threshold": 0.5,
+              "precision": 1.0,
+              "recall": 1.0,
+              "positive_count": 14,
+              "negative_count": 19
+            },
+            "history_count": 2,
+            "history_metrics": [
+              {
+                "timestamp": "2026-06-07 16:00:48",
+                "threshold": 0.5,
+                "metrics": {
+                  "threshold": 0.5,
+                  "precision": 1.0,
+                  "recall": 1.0,
+                  "positive_count": 14,
+                  "negative_count": 19
+                }
+              },
+              {
+                "timestamp": "2026-06-07 16:00:48",
+                "threshold": 0.5,
+                "metrics": {
+                  "threshold": 0.5,
+                  "precision": 1.0,
+                  "recall": 1.0,
+                  "positive_count": 14,
+                  "negative_count": 19
+                }
+              }
+            ],
+            "minority_sample_count": 1,
+            "minority_samples": [
+              {
+                "user_id": 5001,
+                "item_id": 9001,
+                "timestamp": 1717250000,
+                "label": 2,
+                "score": 0.95,
+                "click_rate": 0.02,
+                "conversion_rate": 0.001
+              }
+            ]
+          }
+        },
+        {
+          "check_name": "少数类样本复核提醒",
+          "passed": false,
+          "severity": "warning",
+          "suggestion": "少数类样本请勿直接归为正常，留给算法工程师复核",
+          "details": {
+            "count": 1,
+            "samples": [
+              {
+                "user_id": 5001,
+                "item_id": 9001,
+                "timestamp": 1717250000,
+                "label": 2,
+                "score": 0.95,
+                "click_rate": 0.02,
+                "conversion_rate": 0.001
+              }
+            ]
+          }
+        }
+      ],
+      "conflicts": []
+    }
+  },
+  "history": [
+    {
+      "timestamp": "2026-06-07 16:00:48",
+      "data_source": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/neg_samples.csv",
+      "threshold": 0.5,
+      "metrics": {
+        "threshold": 0.5,
+        "precision": 1.0,
+        "recall": 1.0,
+        "positive_count": 14,
+        "negative_count": 19
+      }
+    },
+    {
+      "timestamp": "2026-06-07 16:00:48",
+      "data_source": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/recall_candidates.csv",
+      "threshold": 0.5,
+      "metrics": {
+        "threshold": 0.5,
+        "precision": 1.0,
+        "recall": 1.0,
+        "positive_count": 14,
+        "negative_count": 19
+      }
+    },
+    {
+      "timestamp": "2026-06-07 16:00:48",
+      "data_source": "threshold_0.5",
+      "threshold": 0.5,
+      "metrics": {
+        "threshold": 0.5,
+        "precision": 1.0,
+        "recall": 1.0,
+        "positive_count": 14,
+        "negative_count": 19
+      }
+    }
+  ]
+}

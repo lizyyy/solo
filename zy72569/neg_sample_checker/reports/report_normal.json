@@ -1,0 +1,155 @@
+{
+  "project_name": "序列推荐负采样检查",
+  "version": "1.0.0",
+  "generated_at": "2026-06-07 16:00:48",
+  "current_threshold": 0.5,
+  "total_steps": 3,
+  "completed_steps": 3,
+  "total_warnings": 0,
+  "total_errors": 0,
+  "pending_conflicts": 0,
+  "steps": {
+    "step1_import": {
+      "step_name": "负样本列表导入",
+      "status": "completed",
+      "data_version": "initial",
+      "results": [
+        {
+          "check_name": "重复导入检查",
+          "passed": true,
+          "severity": "info",
+          "suggestion": "",
+          "details": {
+            "total_rows": 20,
+            "duplicate_count": 0
+          }
+        },
+        {
+          "check_name": "少数类样本被总指标盖住检查",
+          "passed": true,
+          "severity": "info",
+          "suggestion": "",
+          "details": {
+            "label_distribution": {
+              "0": 0.65,
+              "1": 0.35
+            },
+            "total_metrics": {
+              "click_rate": 0.22749999999999995,
+              "conversion_rate": 0.07949999999999999
+            },
+            "minority_labels": []
+          }
+        }
+      ],
+      "conflicts": []
+    },
+    "step2_compare": {
+      "step_name": "召回候选表对比",
+      "status": "completed",
+      "data_version": "initial",
+      "results": [
+        {
+          "check_name": "负样本与召回候选表一致性检查",
+          "passed": true,
+          "severity": "info",
+          "suggestion": "",
+          "details": {
+            "message": "未检测到标签冲突"
+          }
+        }
+      ],
+      "conflicts": []
+    },
+    "step3_playback": {
+      "step_name": "阈值回放更新",
+      "status": "completed",
+      "data_version": "",
+      "results": [
+        {
+          "check_name": "阈值回放检查",
+          "passed": true,
+          "severity": "info",
+          "suggestion": "",
+          "details": {
+            "old_threshold": 0.5,
+            "new_threshold": 0.5,
+            "current_metrics": {
+              "threshold": 0.5,
+              "precision": 1.0,
+              "recall": 1.0,
+              "positive_count": 7,
+              "negative_count": 13
+            },
+            "history_count": 2,
+            "history_metrics": [
+              {
+                "timestamp": "2026-06-07 16:00:48",
+                "threshold": 0.5,
+                "metrics": {
+                  "threshold": 0.5,
+                  "precision": 1.0,
+                  "recall": 1.0,
+                  "positive_count": 7,
+                  "negative_count": 13
+                }
+              },
+              {
+                "timestamp": "2026-06-07 16:00:48",
+                "threshold": 0.5,
+                "metrics": {
+                  "threshold": 0.5,
+                  "precision": 1.0,
+                  "recall": 1.0,
+                  "positive_count": 7,
+                  "negative_count": 13
+                }
+              }
+            ],
+            "minority_sample_count": 0,
+            "minority_samples": []
+          }
+        }
+      ],
+      "conflicts": []
+    }
+  },
+  "history": [
+    {
+      "timestamp": "2026-06-07 16:00:48",
+      "data_source": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv",
+      "threshold": 0.5,
+      "metrics": {
+        "threshold": 0.5,
+        "precision": 1.0,
+        "recall": 1.0,
+        "positive_count": 7,
+        "negative_count": 13
+      }
+    },
+    {
+      "timestamp": "2026-06-07 16:00:48",
+      "data_source": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/recall_candidates.csv",
+      "threshold": 0.5,
+      "metrics": {
+        "threshold": 0.5,
+        "precision": 1.0,
+        "recall": 1.0,
+        "positive_count": 7,
+        "negative_count": 13
+      }
+    },
+    {
+      "timestamp": "2026-06-07 16:00:48",
+      "data_source": "threshold_0.5",
+      "threshold": 0.5,
+      "metrics": {
+        "threshold": 0.5,
+        "precision": 1.0,
+        "recall": 1.0,
+        "positive_count": 7,
+        "negative_count": 13
+      }
+    }
+  ]
+}
