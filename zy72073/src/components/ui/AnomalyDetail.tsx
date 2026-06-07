@@ -60,12 +60,6 @@ export const AnomalyDetail: React.FC = () => {
 
   const handleStatusChange = (status: 'normal' | 'warning' | 'error' | 'pending') => {
     updatePointStatus(selectedPoint.id, status);
-    addProcessRecord(selectedPoint.id, {
-      operator: '阿乔',
-      action: '状态更新',
-      remark: `状态变更为「${statusLabels[status]}」`,
-      status,
-    });
     setShowStatusSelect(false);
   };
 

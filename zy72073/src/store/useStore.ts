@@ -117,6 +117,21 @@ export const useStore = create<AppStore>((set, get) => ({
           ? {
               ...p,
               status,
+              processHistory: [
+                ...p.processHistory,
+                {
+                  id: `proc-${Date.now()}`,
+                  timestamp: new Date().toISOString(),
+                  operator: '阿乔',
+                  action: '状态更新',
+                  remark: `状态变更为「${
+                    status === 'normal' ? '正常' :
+                    status === 'warning' ? '警告' :
+                    status === 'error' ? '异常' : '待确认'
+                  }」`,
+                  status,
+                } as ProcessRecord,
+              ],
               updatedAt: new Date().toISOString(),
             }
           : p

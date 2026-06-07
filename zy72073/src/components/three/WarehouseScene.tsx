@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { Canvas, useThree } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import { useStore, useFilteredPoints } from '../../store/useStore';
@@ -9,6 +9,7 @@ import { PointMarker } from './PointMarker';
 import { CrossFloorLink } from './CrossFloorLink';
 import { Floor } from './Floor';
 import { CoordinateAxes } from './CoordinateAxes';
+import * as THREE from 'three';
 
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 
@@ -16,14 +17,32 @@ const CameraController: React.FC = () => {
   const { camera } = useThree();
   const { cameraPosition, cameraTarget, setCameraState } = useStore();
   const controlsRef = useRef<OrbitControlsImpl>(null);
+  const targetPos = useRef(new THREE.Vector3(...cameraPosition as [number, number, number]));
+  const targetLookAt = useRef(new THREE.Vector3(...cameraTarget as [number, number, number]));
+  const isAnimating = useRef(false);
 
   useEffect(() => {
-    camera.position.set(...cameraPosition as [number, number, number]);
-    if (controlsRef.current) {
-      controlsRef.current.target.set(...cameraTarget as [number, number, number]);
+    targetPos.current.set(...cameraPosition as [number, number, number]);
+    targetLookAt.current.set(...cameraTarget as [number, number, number]);
+    isAnimating.current = true;
+  }, [cameraPosition, cameraTarget]);
+
+  useFrame((_, delta) => {
+    if (isAnimating.current && controlsRef.current) {
+      camera.position.lerp(targetPos.current, Math.min(delta * 3, 1));
+      controlsRef.current.target.lerp(targetLookAt.current, Math.min(delta * 3, 1));
       controlsRef.current.update();
+
+      const posDist = camera.position.distanceTo(targetPos.current);
+      const targetDist = controlsRef.current.target.distanceTo(targetLookAt.current);
+      if (posDist < 0.01 && targetDist < 0.01) {
+        isAnimating.current = false;
+        camera.position.copy(targetPos.current);
+        controlsRef.current.target.copy(targetLookAt.current);
+        controlsRef.current.update();
+      }
     }
-  }, [camera, cameraPosition, cameraTarget]);
+  });
 
   return (
     <OrbitControls
@@ -33,7 +52,7 @@ const CameraController: React.FC = () => {
       maxDistance={60}
       maxPolarAngle={Math.PI / 2.1}
       onEnd={() => {
-        if (controlsRef.current) {
+        if (controlsRef.current && !isAnimating.current) {
           setCameraState(
             [camera.position.x, camera.position.y, camera.position.z],
             [controlsRef.current.target.x, controlsRef.current.target.y, controlsRef.current.target.z]
@@ -70,7 +89,7 @@ const SceneContent: React.FC = () => {
   }, [filteredPoints]);
 
   return (
-    <>
+    <group>
       <ambientLight intensity={0.3} />
       <directionalLight position={[10, 20, 10]} intensity={0.8} castShadow />
       <pointLight position={[0, 15, 0]} intensity={0.4} color="#06B6D4" />
@@ -123,7 +142,7 @@ const SceneContent: React.FC = () => {
       <EffectComposer>
         <Bloom luminanceThreshold={0.2} luminanceSmoothing={0.9} intensity={1.5} />
       </EffectComposer>
-    </>
+    </group>
   );
 };
 

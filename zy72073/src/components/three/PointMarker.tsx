@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import type { PointData } from '../../types';
 import { statusColors } from '../../utils/helpers';
+import { markPointClicked } from '../../utils/clickGuard';
 import * as THREE from 'three';
 
 interface PointMarkerProps {
@@ -43,6 +44,7 @@ export const PointMarker: React.FC<PointMarkerProps> = ({ point, isSelected, onC
         ref={meshRef}
         onClick={(e) => {
           e.stopPropagation();
+          markPointClicked();
           onClick();
         }}
         onPointerOver={(e) => {
