@@ -1,0 +1,17 @@
+{
+  "name": "few-shot-eval-system",
+  "version": "1.0.0",
+  "description": "小样本 few-shot 评测系统",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "jest",
+    "dev": "node src/index.js"
+  },
+  "dependencies": {
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}
