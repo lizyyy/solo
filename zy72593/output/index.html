@@ -1,0 +1,138 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>候选集截断影响评估报告</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #333; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; border-radius: 12px; margin-bottom: 30px; }
+        h1 { font-size: 28px; margin-bottom: 10px; }
+        .subtitle { opacity: 0.9; font-size: 16px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: white; padding: 24px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .stat-number { font-size: 36px; font-weight: bold; color: #667eea; }
+        .stat-label { color: #666; margin-top: 8px; }
+        .stat-number.danger { color: #ef553b; }
+        .alert { padding: 20px; border-radius: 12px; margin-bottom: 30px; }
+        .alert-danger { background: #ffe5e5; border: 1px solid #ffcccc; color: #c53030; }
+        .alert-danger strong { font-size: 18px; }
+        .alert-danger p { margin-top: 8px; }
+        .section { background: white; padding: 30px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .section h2 { font-size: 22px; margin-bottom: 20px; color: #333; }
+        .steps-container { display: flex; flex-direction: column; gap: 16px; }
+        .step-card { display: flex; align-items: center; padding: 20px; border-radius: 10px; background: #f8f9fa; border-left: 4px solid #ddd; transition: all 0.3s; }
+        .step-card.completed { border-left-color: #00cc96; background: #f0fff9; }
+        .step-card.pending { border-left-color: #ffa500; }
+        .step-number { width: 48px; height: 48px; border-radius: 50%; background: #667eea; color: white; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; margin-right: 20px; flex-shrink: 0; }
+        .step-card.completed .step-number { background: #00cc96; }
+        .step-content { flex: 1; }
+        .step-content h3 { font-size: 18px; margin-bottom: 6px; }
+        .step-content p { color: #666; }
+        .step-status { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; margin-top: 8px; }
+        .step-card.completed .step-status { background: #00cc96; color: white; }
+        .step-card.pending .step-status { background: #ffa500; color: white; }
+        .chart-links { list-style: none; }
+        .chart-links li { padding: 12px 0; border-bottom: 1px solid #eee; }
+        .chart-links li:last-child { border-bottom: none; }
+        .chart-links a { color: #667eea; text-decoration: none; font-weight: 500; }
+        .chart-links a:hover { text-decoration: underline; }
+        .data-files { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; }
+        .file-item { padding: 16px; background: #f8f9fa; border-radius: 8px; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 候选集截断影响评估报告</h1>
+            <p class="subtitle">生成时间: 2026-06-07 17:01:42</p>
+        </header>
+
+        
+            <div class="alert alert-danger">
+                <strong>⚠️ 检测到 6 组重复训练数据！</strong>
+                <p>共涉及 15 条记录，已标记为「待策略产品复核」，请勿自动归为正常。</p>
+            </div>
+            
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">20</div>
+                <div class="stat-label">负样本总数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">25</div>
+                <div class="stat-label">召回候选总数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">32</div>
+                <div class="stat-label">特征版本总数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number danger">15</div>
+                <div class="stat-label">重复训练条数</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🛤️ 评估流程</h2>
+            <div class="steps-container">
+                
+            <div class="step-card completed">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3>步骤1：负样本列表导入</h3>
+                    <p>导入负样本列表，自动检测重复训练</p>
+                    <span class="step-status">已完成</span>
+                </div>
+            </div>
+            
+            <div class="step-card completed">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3>步骤2：召回候选表复核（阿越）</h3>
+                    <p>实验平台负责人阿越补看召回候选表</p>
+                    <span class="step-status">已完成</span>
+                </div>
+            </div>
+            
+            <div class="step-card completed">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3>步骤3：特征版本表更新</h3>
+                    <p>同步负样本和召回候选状态到特征版本表</p>
+                    <span class="step-status">已完成</span>
+                </div>
+            </div>
+            
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📈 可视化图表</h2>
+            <ul class="chart-links">
+                <li><a href="charts/negative_status_distribution.html" target="_blank">负样本状态分布</a></li>
+<li><a href="charts/recall_status_distribution.html" target="_blank">召回候选状态分布</a></li>
+<li><a href="charts/recall_3d_scatter.html" target="_blank">3D数据分布</a></li>
+<li><a href="charts/batch_comparison.html" target="_blank">批次对比</a></li>
+<li><a href="charts/duplicate_bar_chart.html" target="_blank">重复训练分组</a></li>
+<li><a href="charts/feature_status_distribution.html" target="_blank">特征版本状态分布</a></li>
+
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>📁 输出数据文件</h2>
+            <div class="data-files">
+                <div class="file-item">negative_samples_processed.csv</div>
+                <div class="file-item">recall_candidates_processed.csv</div>
+                <div class="file-item">feature_versions_updated.csv</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+        

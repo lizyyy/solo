@@ -1,0 +1,333 @@
+{
+  "generated_at": "2026-06-07T17:01:41.750653",
+  "workflow_summary": {
+    "steps_completed": {
+      "step1_import_negative": true,
+      "step2_review_recall": true,
+      "step3_update_feature": true
+    },
+    "negative_samples_count": 20,
+    "recall_candidates_count": 25,
+    "feature_versions_count": 32,
+    "duplicate_summary": {
+      "total_duplicate_groups": 6,
+      "total_duplicate_items": 15,
+      "duplicate_groups": [
+        {
+          "group_key": "batch_B002_item_ITEM0107",
+          "batch_id": "B002",
+          "item_id": "ITEM0107",
+          "count": 2,
+          "sample_ids": [
+            "S0002",
+            "S0005"
+          ],
+          "indices": [
+            1,
+            4
+          ]
+        },
+        {
+          "group_key": "batch_B001_item_ITEM0117",
+          "batch_id": "B001",
+          "item_id": "ITEM0117",
+          "count": 3,
+          "sample_ids": [
+            "S0003",
+            "S0006",
+            "S0014"
+          ],
+          "indices": [
+            2,
+            5,
+            13
+          ]
+        },
+        {
+          "group_key": "batch_B001_item_ITEM0105",
+          "batch_id": "B001",
+          "item_id": "ITEM0105",
+          "count": 3,
+          "candidate_ids": [
+            "C0003",
+            "C0004",
+            "C0010"
+          ],
+          "indices": [
+            2,
+            3,
+            9
+          ]
+        },
+        {
+          "group_key": "batch_B003_item_ITEM0112",
+          "batch_id": "B003",
+          "item_id": "ITEM0112",
+          "count": 3,
+          "sample_ids": [
+            "S0011",
+            "S0016",
+            "S0019"
+          ],
+          "indices": [
+            10,
+            15,
+            18
+          ]
+        },
+        {
+          "group_key": "batch_B001_item_ITEM0108",
+          "batch_id": "B001",
+          "item_id": "ITEM0108",
+          "count": 2,
+          "candidate_ids": [
+            "C0001",
+            "C0025"
+          ],
+          "indices": [
+            0,
+            24
+          ]
+        },
+        {
+          "group_key": "batch_B002_item_ITEM0108",
+          "batch_id": "B002",
+          "item_id": "ITEM0108",
+          "count": 2,
+          "candidate_ids": [
+            "C0013",
+            "C0021"
+          ],
+          "indices": [
+            12,
+            20
+          ]
+        }
+      ]
+    }
+  },
+  "step_results": {
+    "step1": {
+      "total_imported": 20,
+      "duplicate_groups": 4,
+      "duplicate_items": 10,
+      "output_path": "output/negative_samples_processed.csv",
+      "duplicates": [
+        {
+          "group_key": "batch_B002_item_ITEM0107",
+          "batch_id": "B002",
+          "item_id": "ITEM0107",
+          "count": 2,
+          "sample_ids": [
+            "S0002",
+            "S0005"
+          ],
+          "indices": [
+            1,
+            4
+          ]
+        },
+        {
+          "group_key": "batch_B001_item_ITEM0117",
+          "batch_id": "B001",
+          "item_id": "ITEM0117",
+          "count": 3,
+          "sample_ids": [
+            "S0003",
+            "S0006",
+            "S0014"
+          ],
+          "indices": [
+            2,
+            5,
+            13
+          ]
+        },
+        {
+          "group_key": "batch_B001_item_ITEM0105",
+          "batch_id": "B001",
+          "item_id": "ITEM0105",
+          "count": 2,
+          "sample_ids": [
+            "S0004",
+            "S0008"
+          ],
+          "indices": [
+            3,
+            7
+          ]
+        },
+        {
+          "group_key": "batch_B003_item_ITEM0112",
+          "batch_id": "B003",
+          "item_id": "ITEM0112",
+          "count": 3,
+          "sample_ids": [
+            "S0011",
+            "S0016",
+            "S0019"
+          ],
+          "indices": [
+            10,
+            15,
+            18
+          ]
+        }
+      ]
+    },
+    "step2": {
+      "total_imported": 25,
+      "duplicate_groups": 3,
+      "duplicate_items": 7,
+      "cross_duplicates": 7,
+      "output_path": "output/recall_candidates_processed.csv",
+      "duplicates": [
+        {
+          "group_key": "batch_B001_item_ITEM0108",
+          "batch_id": "B001",
+          "item_id": "ITEM0108",
+          "count": 2,
+          "candidate_ids": [
+            "C0001",
+            "C0025"
+          ],
+          "indices": [
+            0,
+            24
+          ]
+        },
+        {
+          "group_key": "batch_B001_item_ITEM0105",
+          "batch_id": "B001",
+          "item_id": "ITEM0105",
+          "count": 3,
+          "candidate_ids": [
+            "C0003",
+            "C0004",
+            "C0010"
+          ],
+          "indices": [
+            2,
+            3,
+            9
+          ]
+        },
+        {
+          "group_key": "batch_B002_item_ITEM0108",
+          "batch_id": "B002",
+          "item_id": "ITEM0108",
+          "count": 2,
+          "candidate_ids": [
+            "C0013",
+            "C0021"
+          ],
+          "indices": [
+            12,
+            20
+          ]
+        }
+      ],
+      "cross_duplicate_details": [
+        {
+          "batch_id": "B001",
+          "item_id": "ITEM0105",
+          "negative_sample_count": 2,
+          "recall_candidate_count": 3,
+          "total_count": 5,
+          "sample_ids": [
+            "S0004",
+            "S0008"
+          ],
+          "candidate_ids": [
+            "C0003",
+            "C0004",
+            "C0010"
+          ]
+        },
+        {
+          "batch_id": "B001",
+          "item_id": "ITEM0100",
+          "negative_sample_count": 1,
+          "recall_candidate_count": 1,
+          "total_count": 2,
+          "sample_ids": [
+            "S0001"
+          ],
+          "candidate_ids": [
+            "C0024"
+          ]
+        },
+        {
+          "batch_id": "B003",
+          "item_id": "ITEM0112",
+          "negative_sample_count": 3,
+          "recall_candidate_count": 0,
+          "total_count": 3,
+          "sample_ids": [
+            "S0011",
+            "S0016",
+            "S0019"
+          ],
+          "candidate_ids": []
+        },
+        {
+          "batch_id": "B001",
+          "item_id": "ITEM0117",
+          "negative_sample_count": 3,
+          "recall_candidate_count": 0,
+          "total_count": 3,
+          "sample_ids": [
+            "S0003",
+            "S0006",
+            "S0014"
+          ],
+          "candidate_ids": []
+        },
+        {
+          "batch_id": "B002",
+          "item_id": "ITEM0108",
+          "negative_sample_count": 1,
+          "recall_candidate_count": 2,
+          "total_count": 3,
+          "sample_ids": [
+            "S0020"
+          ],
+          "candidate_ids": [
+            "C0013",
+            "C0021"
+          ]
+        },
+        {
+          "batch_id": "B001",
+          "item_id": "ITEM0108",
+          "negative_sample_count": 0,
+          "recall_candidate_count": 2,
+          "total_count": 2,
+          "sample_ids": [],
+          "candidate_ids": [
+            "C0001",
+            "C0025"
+          ]
+        },
+        {
+          "batch_id": "B002",
+          "item_id": "ITEM0107",
+          "negative_sample_count": 2,
+          "recall_candidate_count": 0,
+          "total_count": 2,
+          "sample_ids": [
+            "S0002",
+            "S0005"
+          ],
+          "candidate_ids": []
+        }
+      ]
+    },
+    "step3": {
+      "total_versions": 32,
+      "pending_review": 6,
+      "needs_ayue_review": 27,
+      "output_path": "output/feature_versions_updated.csv"
+    }
+  }
+}
