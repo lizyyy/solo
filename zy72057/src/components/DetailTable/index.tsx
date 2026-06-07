@@ -2,9 +2,10 @@ import { useState, useMemo } from "react"
 import { useSchemeStore } from "@/store/useSchemeStore"
 import { useUIStore } from "@/store/useUIStore"
 import { STATUS_LABELS, STATUS_COLORS } from "@/types"
-import type { ItemStatus } from "@/types"
+import type { ItemStatus, Building, SolarPanel, Inverter } from "@/types"
 
 type TabKey = "building" | "panel" | "inverter"
+type TableRow = Building | SolarPanel | Inverter
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: "building", label: "建筑" },
@@ -128,7 +129,7 @@ export default function DetailTable() {
             </tr>
           </thead>
           <tbody>
-            {rowData.map((item: any) => {
+            {rowData.map((item: TableRow) => {
               const isSelected = selectedItemId === item.id
               const isAbnormal = item.status !== "normal"
               return (
@@ -140,52 +141,67 @@ export default function DetailTable() {
                   }`}
                 >
                   {activeTab === "building" && (
-                    <>
-                      <td className="px-2 py-1 truncate max-w-[80px]">{item.name}</td>
-                      <td className="px-2 py-1 text-right font-mono">{item.x.toFixed(1)}</td>
-                      <td className="px-2 py-1 text-right font-mono">{item.y.toFixed(1)}</td>
-                      <td className="px-2 py-1 text-right font-mono">{item.width.toFixed(1)}</td>
-                      <td className="px-2 py-1 text-right font-mono">{item.depth.toFixed(1)}</td>
-                      <td className="px-2 py-1 text-right font-mono">{item.height.toFixed(1)}</td>
-                      <td className="px-2 py-1">{(item as any).floor || <span className="text-slate-500">—</span>}</td>
-                      <td className="px-2 py-1">
-                        <StatusBadge status={item.status} />
-                        {isAbnormal && (
-                          <span className="ml-1 text-[10px] text-slate-500" title={item.anomalyNote}>⚠</span>
-                        )}
-                      </td>
-                    </>
+                    (() => {
+                      const b = item as Building
+                      return (
+                        <>
+                          <td className="px-2 py-1 truncate max-w-[80px]">{b.name}</td>
+                          <td className="px-2 py-1 text-right font-mono">{b.x.toFixed(1)}</td>
+                          <td className="px-2 py-1 text-right font-mono">{b.y.toFixed(1)}</td>
+                          <td className="px-2 py-1 text-right font-mono">{b.width.toFixed(1)}</td>
+                          <td className="px-2 py-1 text-right font-mono">{b.depth.toFixed(1)}</td>
+                          <td className="px-2 py-1 text-right font-mono">{b.height.toFixed(1)}</td>
+                          <td className="px-2 py-1">{b.floor || <span className="text-slate-500">—</span>}</td>
+                          <td className="px-2 py-1">
+                            <StatusBadge status={b.status} />
+                            {isAbnormal && (
+                              <span className="ml-1 text-[10px] text-slate-500" title={b.anomalyNote}>⚠</span>
+                            )}
+                          </td>
+                        </>
+                      )
+                    })()
                   )}
                   {activeTab === "panel" && (
-                    <>
-                      <td className="px-2 py-1 truncate max-w-[80px]">{item.name}</td>
-                      <td className="px-2 py-1 text-right font-mono">{item.x.toFixed(1)}</td>
-                      <td className="px-2 py-1 text-right font-mono">{item.y.toFixed(1)}</td>
-                      <td className="px-2 py-1 text-right font-mono">{(item as any).tiltAngle?.toFixed(1) ?? "—"}</td>
-                      <td className="px-2 py-1 text-right font-mono">{(item as any).azimuth?.toFixed(1) ?? "—"}</td>
-                      <td className="px-2 py-1"><ShadowBar value={(item as any).shadowCoverage ?? 0} /></td>
-                      <td className="px-2 py-1">
-                        <StatusBadge status={item.status} />
-                        {isAbnormal && (
-                          <span className="ml-1 text-[10px] text-slate-500" title={item.anomalyNote}>⚠</span>
-                        )}
-                      </td>
-                    </>
+                    (() => {
+                      const p = item as SolarPanel
+                      return (
+                        <>
+                          <td className="px-2 py-1 truncate max-w-[80px]">{p.name}</td>
+                          <td className="px-2 py-1 text-right font-mono">{p.x.toFixed(1)}</td>
+                          <td className="px-2 py-1 text-right font-mono">{p.y.toFixed(1)}</td>
+                          <td className="px-2 py-1 text-right font-mono">{p.tiltAngle?.toFixed(1) ?? "—"}</td>
+                          <td className="px-2 py-1 text-right font-mono">{p.azimuth?.toFixed(1) ?? "—"}</td>
+                          <td className="px-2 py-1"><ShadowBar value={p.shadowCoverage ?? 0} /></td>
+                          <td className="px-2 py-1">
+                            <StatusBadge status={p.status} />
+                            {isAbnormal && (
+                              <span className="ml-1 text-[10px] text-slate-500" title={p.anomalyNote}>⚠</span>
+                            )}
+                          </td>
+                        </>
+                      )
+                    })()
                   )}
                   {activeTab === "inverter" && (
-                    <>
-                      <td className="px-2 py-1 truncate max-w-[80px]">{item.name}</td>
-                      <td className="px-2 py-1">{(item as any).aliasName || <span className="text-slate-500">—</span>}</td>
-                      <td className="px-2 py-1 text-right font-mono">{item.x.toFixed(1)}</td>
-                      <td className="px-2 py-1 text-right font-mono">{item.y.toFixed(1)}</td>
-                      <td className="px-2 py-1">{(item as any).floor || <span className="text-slate-500">—</span>}</td>
-                      <td className="px-2 py-1">
-                        <StatusBadge status={item.status} />
-                        {isAbnormal && (
-                          <span className="ml-1 text-[10px] text-slate-500" title={item.anomalyNote}>⚠</span>
-                        )}
-                      </td>
-                    </>
+                    (() => {
+                      const inv = item as Inverter
+                      return (
+                        <>
+                          <td className="px-2 py-1 truncate max-w-[80px]">{inv.name}</td>
+                          <td className="px-2 py-1">{inv.aliasName || <span className="text-slate-500">—</span>}</td>
+                          <td className="px-2 py-1 text-right font-mono">{inv.x.toFixed(1)}</td>
+                          <td className="px-2 py-1 text-right font-mono">{inv.y.toFixed(1)}</td>
+                          <td className="px-2 py-1">{inv.floor || <span className="text-slate-500">—</span>}</td>
+                          <td className="px-2 py-1">
+                            <StatusBadge status={inv.status} />
+                            {isAbnormal && (
+                              <span className="ml-1 text-[10px] text-slate-500" title={inv.anomalyNote}>⚠</span>
+                            )}
+                          </td>
+                        </>
+                      )
+                    })()
                   )}
                 </tr>
               )

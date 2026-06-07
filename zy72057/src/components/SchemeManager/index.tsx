@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { useSchemeStore } from "@/store/useSchemeStore"
 import { useUIStore } from "@/store/useUIStore"
-import { Save, FolderOpen, Trash2, Edit3, Check, X, Plus } from "lucide-react"
+import { Save, FolderOpen, Trash2, Edit3, Check, X } from "lucide-react"
 
 export default function SchemeManager() {
   const { currentScheme, savedSchemes, saveScheme, loadScheme, deleteScheme, renameScheme, loadFromLocalStorage } = useSchemeStore()

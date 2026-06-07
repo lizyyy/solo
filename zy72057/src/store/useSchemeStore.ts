@@ -1,5 +1,5 @@
 import { create } from "zustand"
-import type { Scheme, Building, SolarPanel, Inverter, ConflictRecord, ItemStatus } from "@/types"
+import type { Scheme, Building, SolarPanel, Inverter, ConflictRecord } from "@/types"
 import { sampleScheme } from "@/utils/sampleData"
 import { validateBuilding, validatePanel, validateInverter } from "@/utils/dataValidator"
 

@@ -83,7 +83,7 @@ export function findDuplicates(inverters: Inverter[]): Map<string, string[]> {
     }
   })
   const dupes = new Map<string, string[]>()
-  nameMap.forEach((ids, _norm) => {
+  nameMap.forEach((ids) => {
     const uniqueIds = [...new Set(ids)]
     if (uniqueIds.length > 1) {
       uniqueIds.forEach((id) => dupes.set(id, uniqueIds.filter((i) => i !== id)))
