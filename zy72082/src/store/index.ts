@@ -30,7 +30,7 @@ interface AppStore {
 
   loadData: () => Promise<void>
   addDataSource: (ds: Omit<DataSource, 'id'>) => Promise<number>
-  addRecords: (recs: Omit<UnifiedRecord, 'id'>[]) => Promise<void>
+  addRecords: (recs: Omit<UnifiedRecord, 'id'>[]) => Promise<UnifiedRecord[]>
   updateRecord: (id: number, changes: Partial<UnifiedRecord>) => Promise<void>
   addFieldMapping: (mapping: Omit<FieldMapping, 'id'>) => Promise<void>
   addUnitConversion: (conv: Omit<UnitConversion, 'id'>) => Promise<void>
@@ -111,11 +111,14 @@ export const useStore = create<AppStore>((set, get) => ({
   },
 
   addRecords: async (recs) => {
-    await db.unifiedRecords.bulkAdd(recs as UnifiedRecord[])
+    const ids = await db.unifiedRecords.bulkAdd(recs as UnifiedRecord[])
     await addAuditLog('data', '添加记录', `共 ${recs.length} 条`, '')
-    set((s) => ({
-      records: [...s.records, ...recs.map((r, i) => ({ ...r, id: s.records.length + i + 1 }))],
+    const inserted = recs.map((r, i) => ({
+      ...r,
+      id: Array.isArray(ids) ? (ids[i] as number) : (ids as number) + i,
     }))
+    set((s) => ({ records: [...s.records, ...inserted] }))
+    return inserted
   },
 
   updateRecord: async (id, changes) => {
