@@ -14,9 +14,7 @@ export default function SchemePanel() {
     addAnomaly,
     updatePointStatus,
     updateScheme,
-    updateSchemePoint,
     selectedPointId,
-    setSelectedPointId,
   } = useStore();
 
   const [editingSchemeNote, setEditingSchemeNote] = useState<string>('');

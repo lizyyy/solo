@@ -1,12 +1,12 @@
-import { useRef, useEffect, useCallback } from 'react';
+import { useRef, useCallback } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import FieldScene from './FieldScene';
 import { useStore } from '@/store/useStore';
-import type { PointLocation } from '@/types';
+import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 
 export default function Scene3D() {
-  const controlsRef = useRef<any>(null);
+  const controlsRef = useRef<OrbitControlsImpl>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
   const {
     points,

@@ -1,6 +1,7 @@
 import { useStore } from '@/store/useStore';
 import { STATUS_LABELS, STATUS_COLORS } from '@/types';
 import type { PointStatus } from '@/types';
+import { calculateStatistics, filterPoints } from '@/utils/statistics';
 
 export default function PointTable() {
   const {
@@ -14,9 +15,8 @@ export default function PointTable() {
     anomalies,
   } = useStore();
 
-  const filteredPoints = points.filter(
-    (p) => filterStatus.includes(p.status) && filterSource.includes(p.source)
-  );
+  const filteredPoints = filterPoints(points, filterStatus, filterSource);
+  const stats = calculateStatistics(points, anomalies);
 
   const toggleStatusFilter = (status: PointStatus) => {
     if (filterStatus.includes(status)) {
@@ -135,7 +135,7 @@ export default function PointTable() {
       </div>
 
       <div className="p-2 border-t border-[#1a3a5c] text-[#555] text-[10px]">
-        共 {filteredPoints.length} / {points.length} 条 · 异常 {points.filter((p) => p.status !== 'pass').length} 条
+        共 {filteredPoints.length} / {stats.totalPoints} 条 · 未解决异常 {stats.unresolvedAnomalies} 条
       </div>
     </div>
   );

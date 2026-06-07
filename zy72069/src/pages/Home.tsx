@@ -2,7 +2,7 @@ import Scene3D from '@/components/Scene3D';
 import PointTable from '@/components/PointTable';
 import SchemePanel from '@/components/SchemePanel';
 import { useStore } from '@/store/useStore';
-import { STATUS_LABELS, STATUS_COLORS } from '@/types';
+import { calculateStatistics, filterPoints } from '@/utils/statistics';
 import { useNavigate } from 'react-router-dom';
 
 export default function Home() {
@@ -10,13 +10,8 @@ export default function Home() {
   const navigate = useNavigate();
 
   const currentScheme = schemes.find((s) => s.id === currentSchemeId);
-  const passCount = points.filter((p) => p.status === 'pass').length;
-  const confirmCount = points.filter((p) => p.status === 'confirm').length;
-  const legacyCount = points.filter((p) => p.status === 'legacy').length;
-  const unresolvedCount = anomalies.filter((a) => !a.resolved).length;
-  const filteredCount = points.filter(
-    (p) => filterStatus.includes(p.status) && filterSource.includes(p.source)
-  ).length;
+  const stats = calculateStatistics(points, anomalies);
+  const filteredPoints = filterPoints(points, filterStatus, filterSource);
 
   return (
     <div className="h-screen flex flex-col bg-[#0a0a1a] text-white overflow-hidden">
@@ -28,13 +23,13 @@ export default function Home() {
           </span>
         </div>
         <div className="flex items-center gap-3 text-[10px]">
-          <span className="text-[#16c79a]">通过 {passCount}</span>
-          <span className="text-[#f5a623]">确认 {confirmCount}</span>
-          <span className="text-[#e94560]">旧口径 {legacyCount}</span>
+          <span className="text-[#16c79a]">通过 {stats.passCount}</span>
+          <span className="text-[#f5a623]">确认 {stats.confirmCount}</span>
+          <span className="text-[#e94560]">旧口径 {stats.legacyCount}</span>
           <span className="text-[#888]">|</span>
-          <span className="text-[#e94560]">异常 {unresolvedCount}</span>
+          <span className="text-[#e94560]">异常 {stats.unresolvedAnomalies}</span>
           <span className="text-[#888]">|</span>
-          <span className="text-[#4a90d9]">显示 {filteredCount}/{points.length}</span>
+          <span className="text-[#4a90d9]">显示 {filteredPoints.length}/{stats.totalPoints}</span>
           <button
             onClick={() => navigate('/report')}
             className="ml-2 px-3 py-1 bg-[#0f3460] hover:bg-[#1a4a80] text-white text-[10px] rounded transition-colors"
