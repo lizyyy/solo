@@ -42,7 +42,7 @@ export function analyzeFailure(
     suggestions.push('建议：指导学生输入有效的数字，避免空值或文字');
   }
 
-  if (record.responseTime !== null && record.responseTime > config.slowOperationThreshold) {
+  if (record.responseTime !== null && record.responseTime >= config.slowOperationThreshold) {
     isSpeedIssue = true;
     const timeUsed = (record.responseTime / 1000).toFixed(1);
     const timeLimit = (config.timeLimitPerRound / 1000).toFixed(0);

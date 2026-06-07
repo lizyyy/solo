@@ -11,7 +11,7 @@ export const DEFAULT_CONFIG: GameConfig = {
   boundaryThreshold: 5,
   duplicateWindow: 3000,
   misoperationThreshold: 300,
-  slowOperationThreshold: 5000,
+  slowOperationThreshold: 4000,
   ruleViolationPatterns: ['超过', '超了', '不对', '错', '违规', '无效'],
   createdBy: '系统默认',
   createdAt: Date.now(),
