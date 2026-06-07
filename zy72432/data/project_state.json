@@ -1,0 +1,1233 @@
+{
+  "bookings": [
+    {
+      "id": "bk_9218cb24",
+      "room_name": "一号鼓房",
+      "date": "2026-06-10",
+      "time_slot": "14:00-16:00",
+      "band_name": "电波乐队",
+      "contact": "小李 138****1234",
+      "ticket_type": "售票",
+      "batch_id": "BATCH-001",
+      "status": "正常",
+      "contract_screenshot": null,
+      "contract_ticket_type": null,
+      "auth_reminder": "无需提醒",
+      "notes": [],
+      "created_at": "2026-06-07T01:32:17.737641",
+      "updated_at": "2026-06-07T01:32:17.750779"
+    },
+    {
+      "id": "bk_9b1cb22c",
+      "room_name": "一号鼓房",
+      "date": "2026-06-10",
+      "time_slot": "16:00-18:00",
+      "band_name": "电波乐队",
+      "contact": "小李 138****1234",
+      "ticket_type": "售票",
+      "batch_id": "BATCH-001",
+      "status": "正常",
+      "contract_screenshot": null,
+      "contract_ticket_type": null,
+      "auth_reminder": "无需提醒",
+      "notes": [],
+      "created_at": "2026-06-07T01:32:17.737659",
+      "updated_at": "2026-06-07T01:32:17.750790"
+    },
+    {
+      "id": "bk_70ee4cd6",
+      "room_name": "二号鼓房",
+      "date": "2026-06-11",
+      "time_slot": "19:00-21:00",
+      "band_name": "迷雾乐队",
+      "contact": "小王 139****5678",
+      "ticket_type": "售票",
+      "batch_id": "BATCH-002",
+      "status": "已解决",
+      "contract_screenshot": null,
+      "contract_ticket_type": null,
+      "auth_reminder": "无需提醒",
+      "notes": [
+        "批次BATCH-002存在赠票售票混批，待人工复核",
+        "人工复核: 已核实，赠票为乐队内部福利，售票为对外场次，分开处理"
+      ],
+      "created_at": "2026-06-07T01:32:17.737669",
+      "updated_at": "2026-06-07T01:32:17.743141"
+    },
+    {
+      "id": "bk_0b5cacfc",
+      "room_name": "二号鼓房",
+      "date": "2026-06-11",
+      "time_slot": "21:00-23:00",
+      "band_name": "迷雾乐队(赠)",
+      "contact": "小王 139****5678",
+      "ticket_type": "赠票",
+      "batch_id": "BATCH-002",
+      "status": "已解决",
+      "contract_screenshot": null,
+      "contract_ticket_type": null,
+      "auth_reminder": "无需提醒",
+      "notes": [
+        "批次BATCH-002存在赠票售票混批，待人工复核",
+        "人工复核: 已核实，赠票为乐队内部福利，售票为对外场次，分开处理"
+      ],
+      "created_at": "2026-06-07T01:32:17.737678",
+      "updated_at": "2026-06-07T01:32:17.746884"
+    },
+    {
+      "id": "bk_48cdb295",
+      "room_name": "三号鼓房",
+      "date": "2026-06-12",
+      "time_slot": "15:00-17:00",
+      "band_name": "旧时光乐队",
+      "contact": "小张 137****9012",
+      "ticket_type": "赠票",
+      "batch_id": "BATCH-003",
+      "status": "正常",
+      "contract_screenshot": "data/contract_旧时光乐队_BATCH-003.txt",
+      "contract_ticket_type": "赠票",
+      "auth_reminder": "无需提醒",
+      "notes": [
+        "补录合同页截图: data/contract_旧时光乐队_BATCH-003.txt，合同标注为赠票",
+        "接龙票种(售票)与合同票种(赠票)不一致，以合同为准"
+      ],
+      "created_at": "2026-06-07T01:32:17.737687",
+      "updated_at": "2026-06-07T01:32:17.750816"
+    }
+  ],
+  "batches": [
+    {
+      "batch_id": "BATCH-001",
+      "date": "2026-06-10",
+      "ticket_types": [
+        "售票"
+      ],
+      "bookings": [
+        "bk_9218cb24",
+        "bk_9b1cb22c"
+      ],
+      "is_mixed": false
+    },
+    {
+      "batch_id": "BATCH-002",
+      "date": "2026-06-11",
+      "ticket_types": [
+        "售票",
+        "赠票"
+      ],
+      "bookings": [
+        "bk_70ee4cd6",
+        "bk_0b5cacfc"
+      ],
+      "is_mixed": true
+    },
+    {
+      "batch_id": "BATCH-003",
+      "date": "2026-06-12",
+      "ticket_types": [
+        "赠票"
+      ],
+      "bookings": [
+        "bk_48cdb295"
+      ],
+      "is_mixed": false
+    }
+  ],
+  "sessions": [
+    {
+      "session_id": "sess_120df32e",
+      "started_at": "2026-06-07T01:32:17.737389",
+      "ended_at": "2026-06-07T01:32:17.737914",
+      "command": "import data/demo_bookings.json",
+      "records": [
+        {
+          "step": "导入接龙",
+          "timestamp": "2026-06-07T01:32:17.737650",
+          "booking_id": "bk_9218cb24",
+          "details": "导入预约: 电波乐队 2026-06-10 14:00-16:00",
+          "operator": "录音师小段",
+          "before_status": null,
+          "after_status": "待处理"
+        },
+        {
+          "step": "导入接龙",
+          "timestamp": "2026-06-07T01:32:17.737663",
+          "booking_id": "bk_9b1cb22c",
+          "details": "导入预约: 电波乐队 2026-06-10 16:00-18:00",
+          "operator": "录音师小段",
+          "before_status": null,
+          "after_status": "待处理"
+        },
+        {
+          "step": "导入接龙",
+          "timestamp": "2026-06-07T01:32:17.737672",
+          "booking_id": "bk_70ee4cd6",
+          "details": "导入预约: 迷雾乐队 2026-06-11 19:00-21:00",
+          "operator": "录音师小段",
+          "before_status": null,
+          "after_status": "待处理"
+        },
+        {
+          "step": "导入接龙",
+          "timestamp": "2026-06-07T01:32:17.737680",
+          "booking_id": "bk_0b5cacfc",
+          "details": "导入预约: 迷雾乐队(赠) 2026-06-11 21:00-23:00",
+          "operator": "录音师小段",
+          "before_status": null,
+          "after_status": "待处理"
+        },
+        {
+          "step": "导入接龙",
+          "timestamp": "2026-06-07T01:32:17.737690",
+          "booking_id": "bk_48cdb295",
+          "details": "导入预约: 旧时光乐队 2026-06-12 15:00-17:00",
+          "operator": "录音师小段",
+          "before_status": null,
+          "after_status": "待处理"
+        },
+        {
+          "step": "检测混批",
+          "timestamp": "2026-06-07T01:32:17.737862",
+          "booking_id": "bk_70ee4cd6",
+          "details": "检测到混批: 批次BATCH-002包含赠票和售票",
+          "operator": "系统",
+          "before_status": "待处理",
+          "after_status": "赠票售票混批待复核"
+        },
+        {
+          "step": "检测混批",
+          "timestamp": "2026-06-07T01:32:17.737873",
+          "booking_id": "bk_0b5cacfc",
+          "details": "检测到混批: 批次BATCH-002包含赠票和售票",
+          "operator": "系统",
+          "before_status": "待处理",
+          "after_status": "赠票售票混批待复核"
+        },
+        {
+          "step": "检测混批",
+          "timestamp": "2026-06-07T01:32:17.737884",
+          "booking_id": "bk_9218cb24",
+          "details": "批次BATCH-001正常，无混批",
+          "operator": "系统",
+          "before_status": "待处理",
+          "after_status": "正常"
+        },
+        {
+          "step": "检测混批",
+          "timestamp": "2026-06-07T01:32:17.737892",
+          "booking_id": "bk_9b1cb22c",
+          "details": "批次BATCH-001正常，无混批",
+          "operator": "系统",
+          "before_status": "待处理",
+          "after_status": "正常"
+        },
+        {
+          "step": "检测混批",
+          "timestamp": "2026-06-07T01:32:17.737901",
+          "booking_id": "bk_48cdb295",
+          "details": "批次BATCH-003正常，无混批",
+          "operator": "系统",
+          "before_status": "待处理",
+          "after_status": "正常"
+        }
+      ],
+      "bookings_before": [],
+      "bookings_after": [
+        {
+          "id": "bk_9218cb24",
+          "room_name": "一号鼓房",
+          "date": "2026-06-10",
+          "time_slot": "14:00-16:00",
+          "band_name": "电波乐队",
+          "contact": "小李 138****1234",
+          "ticket_type": "售票",
+          "batch_id": "BATCH-001",
+          "status": "正常",
+          "contract_screenshot": null,
+          "contract_ticket_type": null,
+          "auth_reminder": "无需提醒",
+          "notes": [],
+          "created_at": "2026-06-07T01:32:17.737641",
+          "updated_at": "2026-06-07T01:32:17.737880"
+        },
+        {
+          "id": "bk_9b1cb22c",
+          "room_name": "一号鼓房",
+          "date": "2026-06-10",
+          "time_slot": "16:00-18:00",
+          "band_name": "电波乐队",
+          "contact": "小李 138****1234",
+          "ticket_type": "售票",
+          "batch_id": "BATCH-001",
+          "status": "正常",
+          "contract_screenshot": null,
+          "contract_ticket_type": null,
+          "auth_reminder": "无需提醒",
+          "notes": [],
+          "created_at": "2026-06-07T01:32:17.737659",
+          "updated_at": "2026-06-07T01:32:17.737889"
+        },
+        {
+          "id": "bk_70ee4cd6",
+          "room_name": "二号鼓房",
+          "date": "2026-06-11",
+          "time_slot": "19:00-21:00",
+          "band_name": "迷雾乐队",
+          "contact": "小王 139****5678",
+          "ticket_type": "售票",
+          "batch_id": "BATCH-002",
+          "status": "赠票售票混批待复核",
+          "contract_screenshot": null,
+          "contract_ticket_type": null,
+          "auth_reminder": "警告",
+          "notes": [
+            "批次BATCH-002存在赠票售票混批，待人工复核",
+            "人工复核: 已核实，赠票为乐队内部福利，售票为对外场次，分开处理"
+          ],
+          "created_at": "2026-06-07T01:32:17.737669",
+          "updated_at": "2026-06-07T01:32:17.737857"
+        },
+        {
+          "id": "bk_0b5cacfc",
+          "room_name": "二号鼓房",
+          "date": "2026-06-11",
+          "time_slot": "21:00-23:00",
+          "band_name": "迷雾乐队(赠)",
+          "contact": "小王 139****5678",
+          "ticket_type": "赠票",
+          "batch_id": "BATCH-002",
+          "status": "赠票售票混批待复核",
+          "contract_screenshot": null,
+          "contract_ticket_type": null,
+          "auth_reminder": "警告",
+          "notes": [
+            "批次BATCH-002存在赠票售票混批，待人工复核",
+            "人工复核: 已核实，赠票为乐队内部福利，售票为对外场次，分开处理"
+          ],
+          "created_at": "2026-06-07T01:32:17.737678",
+          "updated_at": "2026-06-07T01:32:17.737868"
+        },
+        {
+          "id": "bk_48cdb295",
+          "room_name": "三号鼓房",
+          "date": "2026-06-12",
+          "time_slot": "15:00-17:00",
+          "band_name": "旧时光乐队",
+          "contact": "小张 137****9012",
+          "ticket_type": "售票",
+          "batch_id": "BATCH-003",
+          "status": "正常",
+          "contract_screenshot": null,
+          "contract_ticket_type": null,
+          "auth_reminder": "无需提醒",
+          "notes": [
+            "补录合同页截图: data/contract_旧时光乐队_BATCH-003.txt，合同标注为赠票",
+            "接龙票种(售票)与合同票种(赠票)不一致，以合同为准"
+          ],
+          "created_at": "2026-06-07T01:32:17.737687",
+          "updated_at": "2026-06-07T01:32:17.737898"
+        }
+      ]
+    },
+    {
+      "session_id": "sess_3f1400ce",
+      "started_at": "2026-06-07T01:32:17.741038",
+      "ended_at": "2026-06-07T01:32:17.741101",
+      "command": "add-contract bk_48cdb295 data/contract_旧时光乐队_BATCH-003.txt 赠票",
+      "records": [
+        {
+          "step": "补录合同页",
+          "timestamp": "2026-06-07T01:32:17.741072",
+          "booking_id": "bk_48cdb295",
+          "details": "补录合同页: data/contract_旧时光乐队_BATCH-003.txt, 合同票种: 赠票",
+          "operator": "录音师小段",
+          "before_status": "正常",
+          "after_status": "待处理"
+        },
+        {
+          "step": "更新授权提醒",
+          "timestamp": "2026-06-07T01:32:17.741098",
+          "booking_id": "bk_48cdb295",
+          "details": "授权提醒从无需提醒更新为警告",
+          "operator": "系统",
+          "before_status": null,
+          "after_status": null
+        }
+      ],
+      "bookings_before": [
+        {
+          "id": "bk_9218cb24",
+          "room_name": "一号鼓房",
+          "date": "2026-06-10",
+          "time_slot": "14:00-16:00",
+          "band_name": "电波乐队",
+          "contact": "小李 138****1234",
+          "ticket_type": "售票",
+          "batch_id": "BATCH-001",
+          "status": "正常",
+          "contract_screenshot": null,
+          "contract_ticket_type": null,
+          "auth_reminder": "无需提醒",
+          "notes": [],
+          "created_at": "2026-06-07T01:32:17.737641",
+          "updated_at": "2026-06-07T01:32:17.737880"
+        },
+        {
+          "id": "bk_9b1cb22c",
+          "room_name": "一号鼓房",
+          "date": "2026-06-10",
+          "time_slot": "16:00-18:00",
+          "band_name": "电波乐队",
+          "contact": "小李 138****1234",
+          "ticket_type": "售票",
+          "batch_id": "BATCH-001",
+          "status": "正常",
+          "contract_screenshot": null,
+          "contract_ticket_type": null,
+          "auth_reminder": "无需提醒",
+          "notes": [],
+          "created_at": "2026-06-07T01:32:17.737659",
+          "updated_at": "2026-06-07T01:32:17.737889"
+        },
+        {
+          "id": "bk_70ee4cd6",
+          "room_name": "二号鼓房",
+          "date": "2026-06-11",
+          "time_slot": "19:00-21:00",
+          "band_name": "迷雾乐队",
+          "contact": "小王 139****5678",
+          "ticket_type": "售票",
+          "batch_id": "BATCH-002",
+          "status": "赠票售票混批待复核",
+          "contract_screenshot": null,
+          "contract_ticket_type": null,
+          "auth_reminder": "警告",
+          "notes": [
+            "批次BATCH-002存在赠票售票混批，待人工复核",
+            "人工复核: 已核实，赠票为乐队内部福利，售票为对外场次，分开处理"
+          ],
+          "created_at": "2026-06-07T01:32:17.737669",
+          "updated_at": "2026-06-07T01:32:17.737857"
+        },
+        {
+          "id": "bk_0b5cacfc",
+          "room_name": "二号鼓房",
+          "date": "2026-06-11",
+          "time_slot": "21:00-23:00",
+          "band_name": "迷雾乐队(赠)",
+          "contact": "小王 139****5678",
+          "ticket_type": "赠票",
+          "batch_id": "BATCH-002",
+          "status": "赠票售票混批待复核",
+          "contract_screenshot": null,
+          "contract_ticket_type": null,
+          "auth_reminder": "警告",
+          "notes": [
+            "批次BATCH-002存在赠票售票混批，待人工复核",
+            "人工复核: 已核实，赠票为乐队内部福利，售票为对外场次，分开处理"
+          ],
+          "created_at": "2026-06-07T01:32:17.737678",
+          "updated_at": "2026-06-07T01:32:17.737868"
+        },
+        {
+          "id": "bk_48cdb295",
+          "room_name": "三号鼓房",
+          "date": "2026-06-12",
+          "time_slot": "15:00-17:00",
+          "band_name": "旧时光乐队",
+          "contact": "小张 137****9012",
+          "ticket_type": "售票",
+          "batch_id": "BATCH-003",
+          "status": "正常",
+          "contract_screenshot": null,
+          "contract_ticket_type": null,
+          "auth_reminder": "无需提醒",
+          "notes": [
+            "补录合同页截图: data/contract_旧时光乐队_BATCH-003.txt，合同标注为赠票",
+            "接龙票种(售票)与合同票种(赠票)不一致，以合同为准"
+          ],
+          "created_at": "2026-06-07T01:32:17.737687",
+          "updated_at": "2026-06-07T01:32:17.737898"
+        }
+      ],
+      "bookings_after": [
+        {
+          "id": "bk_9218cb24",
+          "room_name": "一号鼓房",
+          "date": "2026-06-10",
+          "time_slot": "14:00-16:00",
+          "band_name": "电波乐队",
+          "contact": "小李 138****1234",
+          "ticket_type": "售票",
+          "batch_id": "BATCH-001",
+          "status": "正常",
+          "contract_screenshot": null,
+          "contract_ticket_type": null,
+          "auth_reminder": "无需提醒",
+          "notes": [],
+          "created_at": "2026-06-07T01:32:17.737641",
+          "updated_at": "2026-06-07T01:32:17.737880"
+        },
+        {
+          "id": "bk_9b1cb22c",
+          "room_name": "一号鼓房",
+          "date": "2026-06-10",
+          "time_slot": "16:00-18:00",
+          "band_name": "电波乐队",
+          "contact": "小李 138****1234",
+          "ticket_type": "售票",
+          "batch_id": "BATCH-001",
+          "status": "正常",
+          "contract_screenshot": null,
+          "contract_ticket_type": null,
+          "auth_reminder": "无需提醒",
+          "notes": [],
+          "created_at": "2026-06-07T01:32:17.737659",
+          "updated_at": "2026-06-07T01:32:17.737889"
+        },
+        {
+          "id": "bk_70ee4cd6",
+          "room_name": "二号鼓房",
+          "date": "2026-06-11",
+          "time_slot": "19:00-21:00",
+          "band_name": "迷雾乐队",
+          "contact": "小王 139****5678",
+          "ticket_type": "售票",
+          "batch_id": "BATCH-002",
+          "status": "赠票售票混批待复核",
+          "contract_screenshot": null,
+          "contract_ticket_type": null,
+          "auth_reminder": "警告",
+          "notes": [
+            "批次BATCH-002存在赠票售票混批，待人工复核",
+            "人工复核: 已核实，赠票为乐队内部福利，售票为对外场次，分开处理"
+          ],
+          "created_at": "2026-06-07T01:32:17.737669",
+          "updated_at": "2026-06-07T01:32:17.737857"
+        },
+        {
+          "id": "bk_0b5cacfc",
+          "room_name": "二号鼓房",
+          "date": "2026-06-11",
+          "time_slot": "21:00-23:00",
+          "band_name": "迷雾乐队(赠)",
+          "contact": "小王 139****5678",
+          "ticket_type": "赠票",
+          "batch_id": "BATCH-002",
+          "status": "赠票售票混批待复核",
+          "contract_screenshot": null,
+          "contract_ticket_type": null,
+          "auth_reminder": "警告",
+          "notes": [
+            "批次BATCH-002存在赠票售票混批，待人工复核",
+            "人工复核: 已核实，赠票为乐队内部福利，售票为对外场次，分开处理"
+          ],
+          "created_at": "2026-06-07T01:32:17.737678",
+          "updated_at": "2026-06-07T01:32:17.737868"
+        },
+        {
+          "id": "bk_48cdb295",
+          "room_name": "三号鼓房",
+          "date": "2026-06-12",
+          "time_slot": "15:00-17:00",
+          "band_name": "旧时光乐队",
+          "contact": "小张 137****9012",
+          "ticket_type": "赠票",
+          "batch_id": "BATCH-003",
+          "status": "待处理",
+          "contract_screenshot": "data/contract_旧时光乐队_BATCH-003.txt",
+          "contract_ticket_type": "赠票",
+          "auth_reminder": "警告",
+          "notes": [
+            "补录合同页截图: data/contract_旧时光乐队_BATCH-003.txt，合同标注为赠票",
+            "接龙票种(售票)与合同票种(赠票)不一致，以合同为准"
+          ],
+          "created_at": "2026-06-07T01:32:17.737687",
+          "updated_at": "2026-06-07T01:32:17.741093"
+        }
+      ]
+    },
+    {
+      "session_id": "sess_e7ca4397",
+      "started_at": "2026-06-07T01:32:17.743101",
+      "ended_at": "2026-06-07T01:32:17.743219",
+      "command": "review bk_70ee4cd6 已解决",
+      "records": [
+        {
+          "step": "人工复核",
+          "timestamp": "2026-06-07T01:32:17.743158",
+          "booking_id": "bk_70ee4cd6",
+          "details": "人工复核: 已解决, 备注: 已核实，赠票为乐队内部福利，售票为对外场次，分开处理",
+          "operator": "录音师小段",
+          "before_status": "赠票售票混批待复核",
+          "after_status": "已解决"
+        },
+        {
+          "step": "更新授权提醒",
+          "timestamp": "2026-06-07T01:32:17.743189",
+          "booking_id": "bk_70ee4cd6",
+          "details": "授权提醒从警告更新为无需提醒",
+          "operator": "系统",
+          "before_status": null,
+          "after_status": null
+        },
+        {
+          "step": "更新授权提醒",
+          "timestamp": "2026-06-07T01:32:17.743214",
+          "booking_id": "bk_48cdb295",
+          "details": "授权提醒从警告更新为无需提醒",
+          "operator": "系统",
+          "before_status": null,
+          "after_status": null
+        }
+      ],
+      "bookings_before": [
+        {
+          "id": "bk_9218cb24",
+          "room_name": "一号鼓房",
+          "date": "2026-06-10",
+          "time_slot": "14:00-16:00",
+          "band_name": "电波乐队",
+          "contact": "小李 138****1234",
+          "ticket_type": "售票",
+          "batch_id": "BATCH-001",
+          "status": "正常",
+          "contract_screenshot": null,
+          "contract_ticket_type": null,
+          "auth_reminder": "无需提醒",
+          "notes": [],
+          "created_at": "2026-06-07T01:32:17.737641",
+          "updated_at": "2026-06-07T01:32:17.737880"
+        },
+        {
+          "id": "bk_9b1cb22c",
+          "room_name": "一号鼓房",
+          "date": "2026-06-10",
+          "time_slot": "16:00-18:00",
+          "band_name": "电波乐队",
+          "contact": "小李 138****1234",
+          "ticket_type": "售票",
+          "batch_id": "BATCH-001",
+          "status": "正常",
+          "contract_screenshot": null,
+          "contract_ticket_type": null,
+          "auth_reminder": "无需提醒",
+          "notes": [],
+          "created_at": "2026-06-07T01:32:17.737659",
+          "updated_at": "2026-06-07T01:32:17.737889"
+        },
+        {
+          "id": "bk_70ee4cd6",
+          "room_name": "二号鼓房",
+          "date": "2026-06-11",
+          "time_slot": "19:00-21:00",
+          "band_name": "迷雾乐队",
+          "contact": "小王 139****5678",
+          "ticket_type": "售票",
+          "batch_id": "BATCH-002",
+          "status": "赠票售票混批待复核",
+          "contract_screenshot": null,
+          "contract_ticket_type": null,
+          "auth_reminder": "警告",
+          "notes": [
+            "批次BATCH-002存在赠票售票混批，待人工复核",
+            "人工复核: 已核实，赠票为乐队内部福利，售票为对外场次，分开处理"
+          ],
+          "created_at": "2026-06-07T01:32:17.737669",
+          "updated_at": "2026-06-07T01:32:17.737857"
+        },
+        {
+          "id": "bk_0b5cacfc",
+          "room_name": "二号鼓房",
+          "date": "2026-06-11",
+          "time_slot": "21:00-23:00",
+          "band_name": "迷雾乐队(赠)",
+          "contact": "小王 139****5678",
+          "ticket_type": "赠票",
+          "batch_id": "BATCH-002",
+          "status": "赠票售票混批待复核",
+          "contract_screenshot": null,
+          "contract_ticket_type": null,
+          "auth_reminder": "警告",
+          "notes": [
+            "批次BATCH-002存在赠票售票混批，待人工复核",
+            "人工复核: 已核实，赠票为乐队内部福利，售票为对外场次，分开处理"
+          ],
+          "created_at": "2026-06-07T01:32:17.737678",
+          "updated_at": "2026-06-07T01:32:17.737868"
+        },
+        {
+          "id": "bk_48cdb295",
+          "room_name": "三号鼓房",
+          "date": "2026-06-12",
+          "time_slot": "15:00-17:00",
+          "band_name": "旧时光乐队",
+          "contact": "小张 137****9012",
+          "ticket_type": "赠票",
+          "batch_id": "BATCH-003",
+          "status": "待处理",
+          "contract_screenshot": "data/contract_旧时光乐队_BATCH-003.txt",
+          "contract_ticket_type": "赠票",
+          "auth_reminder": "警告",
+          "notes": [
+            "补录合同页截图: data/contract_旧时光乐队_BATCH-003.txt，合同标注为赠票",
+            "接龙票种(售票)与合同票种(赠票)不一致，以合同为准"
+          ],
+          "created_at": "2026-06-07T01:32:17.737687",
+          "updated_at": "2026-06-07T01:32:17.741093"
+        }
+      ],
+      "bookings_after": [
+        {
+          "id": "bk_9218cb24",
+          "room_name": "一号鼓房",
+          "date": "2026-06-10",
+          "time_slot": "14:00-16:00",
+          "band_name": "电波乐队",
+          "contact": "小李 138****1234",
+          "ticket_type": "售票",
+          "batch_id": "BATCH-001",
+          "status": "正常",
+          "contract_screenshot": null,
+          "contract_ticket_type": null,
+          "auth_reminder": "无需提醒",
+          "notes": [],
+          "created_at": "2026-06-07T01:32:17.737641",
+          "updated_at": "2026-06-07T01:32:17.737880"
+        },
+        {
+          "id": "bk_9b1cb22c",
+          "room_name": "一号鼓房",
+          "date": "2026-06-10",
+          "time_slot": "16:00-18:00",
+          "band_name": "电波乐队",
+          "contact": "小李 138****1234",
+          "ticket_type": "售票",
+          "batch_id": "BATCH-001",
+          "status": "正常",
+          "contract_screenshot": null,
+          "contract_ticket_type": null,
+          "auth_reminder": "无需提醒",
+          "notes": [],
+          "created_at": "2026-06-07T01:32:17.737659",
+          "updated_at": "2026-06-07T01:32:17.737889"
+        },
+        {
+          "id": "bk_70ee4cd6",
+          "room_name": "二号鼓房",
+          "date": "2026-06-11",
+          "time_slot": "19:00-21:00",
+          "band_name": "迷雾乐队",
+          "contact": "小王 139****5678",
+          "ticket_type": "售票",
+          "batch_id": "BATCH-002",
+          "status": "已解决",
+          "contract_screenshot": null,
+          "contract_ticket_type": null,
+          "auth_reminder": "无需提醒",
+          "notes": [
+            "批次BATCH-002存在赠票售票混批，待人工复核",
+            "人工复核: 已核实，赠票为乐队内部福利，售票为对外场次，分开处理"
+          ],
+          "created_at": "2026-06-07T01:32:17.737669",
+          "updated_at": "2026-06-07T01:32:17.743141"
+        },
+        {
+          "id": "bk_0b5cacfc",
+          "room_name": "二号鼓房",
+          "date": "2026-06-11",
+          "time_slot": "21:00-23:00",
+          "band_name": "迷雾乐队(赠)",
+          "contact": "小王 139****5678",
+          "ticket_type": "赠票",
+          "batch_id": "BATCH-002",
+          "status": "赠票售票混批待复核",
+          "contract_screenshot": null,
+          "contract_ticket_type": null,
+          "auth_reminder": "警告",
+          "notes": [
+            "批次BATCH-002存在赠票售票混批，待人工复核",
+            "人工复核: 已核实，赠票为乐队内部福利，售票为对外场次，分开处理"
+          ],
+          "created_at": "2026-06-07T01:32:17.737678",
+          "updated_at": "2026-06-07T01:32:17.737868"
+        },
+        {
+          "id": "bk_48cdb295",
+          "room_name": "三号鼓房",
+          "date": "2026-06-12",
+          "time_slot": "15:00-17:00",
+          "band_name": "旧时光乐队",
+          "contact": "小张 137****9012",
+          "ticket_type": "赠票",
+          "batch_id": "BATCH-003",
+          "status": "正常",
+          "contract_screenshot": "data/contract_旧时光乐队_BATCH-003.txt",
+          "contract_ticket_type": "赠票",
+          "auth_reminder": "无需提醒",
+          "notes": [
+            "补录合同页截图: data/contract_旧时光乐队_BATCH-003.txt，合同标注为赠票",
+            "接龙票种(售票)与合同票种(赠票)不一致，以合同为准"
+          ],
+          "created_at": "2026-06-07T01:32:17.737687",
+          "updated_at": "2026-06-07T01:32:17.743206"
+        }
+      ]
+    },
+    {
+      "session_id": "sess_8675ca7e",
+      "started_at": "2026-06-07T01:32:17.746763",
+      "ended_at": "2026-06-07T01:32:17.746977",
+      "command": "review bk_0b5cacfc 已解决",
+      "records": [
+        {
+          "step": "人工复核",
+          "timestamp": "2026-06-07T01:32:17.746931",
+          "booking_id": "bk_0b5cacfc",
+          "details": "人工复核: 已解决, 备注: 已核实，赠票为乐队内部福利，售票为对外场次，分开处理",
+          "operator": "录音师小段",
+          "before_status": "赠票售票混批待复核",
+          "after_status": "已解决"
+        },
+        {
+          "step": "更新授权提醒",
+          "timestamp": "2026-06-07T01:32:17.746966",
+          "booking_id": "bk_0b5cacfc",
+          "details": "授权提醒从警告更新为无需提醒",
+          "operator": "系统",
+          "before_status": null,
+          "after_status": null
+        }
+      ],
+      "bookings_before": [
+        {
+          "id": "bk_9218cb24",
+          "room_name": "一号鼓房",
+          "date": "2026-06-10",
+          "time_slot": "14:00-16:00",
+          "band_name": "电波乐队",
+          "contact": "小李 138****1234",
+          "ticket_type": "售票",
+          "batch_id": "BATCH-001",
+          "status": "正常",
+          "contract_screenshot": null,
+          "contract_ticket_type": null,
+          "auth_reminder": "无需提醒",
+          "notes": [],
+          "created_at": "2026-06-07T01:32:17.737641",
+          "updated_at": "2026-06-07T01:32:17.737880"
+        },
+        {
+          "id": "bk_9b1cb22c",
+          "room_name": "一号鼓房",
+          "date": "2026-06-10",
+          "time_slot": "16:00-18:00",
+          "band_name": "电波乐队",
+          "contact": "小李 138****1234",
+          "ticket_type": "售票",
+          "batch_id": "BATCH-001",
+          "status": "正常",
+          "contract_screenshot": null,
+          "contract_ticket_type": null,
+          "auth_reminder": "无需提醒",
+          "notes": [],
+          "created_at": "2026-06-07T01:32:17.737659",
+          "updated_at": "2026-06-07T01:32:17.737889"
+        },
+        {
+          "id": "bk_70ee4cd6",
+          "room_name": "二号鼓房",
+          "date": "2026-06-11",
+          "time_slot": "19:00-21:00",
+          "band_name": "迷雾乐队",
+          "contact": "小王 139****5678",
+          "ticket_type": "售票",
+          "batch_id": "BATCH-002",
+          "status": "已解决",
+          "contract_screenshot": null,
+          "contract_ticket_type": null,
+          "auth_reminder": "无需提醒",
+          "notes": [
+            "批次BATCH-002存在赠票售票混批，待人工复核",
+            "人工复核: 已核实，赠票为乐队内部福利，售票为对外场次，分开处理"
+          ],
+          "created_at": "2026-06-07T01:32:17.737669",
+          "updated_at": "2026-06-07T01:32:17.743141"
+        },
+        {
+          "id": "bk_0b5cacfc",
+          "room_name": "二号鼓房",
+          "date": "2026-06-11",
+          "time_slot": "21:00-23:00",
+          "band_name": "迷雾乐队(赠)",
+          "contact": "小王 139****5678",
+          "ticket_type": "赠票",
+          "batch_id": "BATCH-002",
+          "status": "赠票售票混批待复核",
+          "contract_screenshot": null,
+          "contract_ticket_type": null,
+          "auth_reminder": "警告",
+          "notes": [
+            "批次BATCH-002存在赠票售票混批，待人工复核",
+            "人工复核: 已核实，赠票为乐队内部福利，售票为对外场次，分开处理"
+          ],
+          "created_at": "2026-06-07T01:32:17.737678",
+          "updated_at": "2026-06-07T01:32:17.737868"
+        },
+        {
+          "id": "bk_48cdb295",
+          "room_name": "三号鼓房",
+          "date": "2026-06-12",
+          "time_slot": "15:00-17:00",
+          "band_name": "旧时光乐队",
+          "contact": "小张 137****9012",
+          "ticket_type": "赠票",
+          "batch_id": "BATCH-003",
+          "status": "正常",
+          "contract_screenshot": "data/contract_旧时光乐队_BATCH-003.txt",
+          "contract_ticket_type": "赠票",
+          "auth_reminder": "无需提醒",
+          "notes": [
+            "补录合同页截图: data/contract_旧时光乐队_BATCH-003.txt，合同标注为赠票",
+            "接龙票种(售票)与合同票种(赠票)不一致，以合同为准"
+          ],
+          "created_at": "2026-06-07T01:32:17.737687",
+          "updated_at": "2026-06-07T01:32:17.743206"
+        }
+      ],
+      "bookings_after": [
+        {
+          "id": "bk_9218cb24",
+          "room_name": "一号鼓房",
+          "date": "2026-06-10",
+          "time_slot": "14:00-16:00",
+          "band_name": "电波乐队",
+          "contact": "小李 138****1234",
+          "ticket_type": "售票",
+          "batch_id": "BATCH-001",
+          "status": "正常",
+          "contract_screenshot": null,
+          "contract_ticket_type": null,
+          "auth_reminder": "无需提醒",
+          "notes": [],
+          "created_at": "2026-06-07T01:32:17.737641",
+          "updated_at": "2026-06-07T01:32:17.737880"
+        },
+        {
+          "id": "bk_9b1cb22c",
+          "room_name": "一号鼓房",
+          "date": "2026-06-10",
+          "time_slot": "16:00-18:00",
+          "band_name": "电波乐队",
+          "contact": "小李 138****1234",
+          "ticket_type": "售票",
+          "batch_id": "BATCH-001",
+          "status": "正常",
+          "contract_screenshot": null,
+          "contract_ticket_type": null,
+          "auth_reminder": "无需提醒",
+          "notes": [],
+          "created_at": "2026-06-07T01:32:17.737659",
+          "updated_at": "2026-06-07T01:32:17.737889"
+        },
+        {
+          "id": "bk_70ee4cd6",
+          "room_name": "二号鼓房",
+          "date": "2026-06-11",
+          "time_slot": "19:00-21:00",
+          "band_name": "迷雾乐队",
+          "contact": "小王 139****5678",
+          "ticket_type": "售票",
+          "batch_id": "BATCH-002",
+          "status": "已解决",
+          "contract_screenshot": null,
+          "contract_ticket_type": null,
+          "auth_reminder": "无需提醒",
+          "notes": [
+            "批次BATCH-002存在赠票售票混批，待人工复核",
+            "人工复核: 已核实，赠票为乐队内部福利，售票为对外场次，分开处理"
+          ],
+          "created_at": "2026-06-07T01:32:17.737669",
+          "updated_at": "2026-06-07T01:32:17.743141"
+        },
+        {
+          "id": "bk_0b5cacfc",
+          "room_name": "二号鼓房",
+          "date": "2026-06-11",
+          "time_slot": "21:00-23:00",
+          "band_name": "迷雾乐队(赠)",
+          "contact": "小王 139****5678",
+          "ticket_type": "赠票",
+          "batch_id": "BATCH-002",
+          "status": "已解决",
+          "contract_screenshot": null,
+          "contract_ticket_type": null,
+          "auth_reminder": "无需提醒",
+          "notes": [
+            "批次BATCH-002存在赠票售票混批，待人工复核",
+            "人工复核: 已核实，赠票为乐队内部福利，售票为对外场次，分开处理"
+          ],
+          "created_at": "2026-06-07T01:32:17.737678",
+          "updated_at": "2026-06-07T01:32:17.746884"
+        },
+        {
+          "id": "bk_48cdb295",
+          "room_name": "三号鼓房",
+          "date": "2026-06-12",
+          "time_slot": "15:00-17:00",
+          "band_name": "旧时光乐队",
+          "contact": "小张 137****9012",
+          "ticket_type": "赠票",
+          "batch_id": "BATCH-003",
+          "status": "正常",
+          "contract_screenshot": "data/contract_旧时光乐队_BATCH-003.txt",
+          "contract_ticket_type": "赠票",
+          "auth_reminder": "无需提醒",
+          "notes": [
+            "补录合同页截图: data/contract_旧时光乐队_BATCH-003.txt，合同标注为赠票",
+            "接龙票种(售票)与合同票种(赠票)不一致，以合同为准"
+          ],
+          "created_at": "2026-06-07T01:32:17.737687",
+          "updated_at": "2026-06-07T01:32:17.746973"
+        }
+      ]
+    },
+    {
+      "session_id": "sess_a774d26e",
+      "started_at": "2026-06-07T01:32:17.750708",
+      "ended_at": "2026-06-07T01:32:17.750820",
+      "command": "rerun",
+      "records": [
+        {
+          "step": "重跑处理",
+          "timestamp": "2026-06-07T01:32:17.750731",
+          "booking_id": null,
+          "details": "重新运行全流程处理",
+          "operator": "录音师小段",
+          "before_status": null,
+          "after_status": null
+        },
+        {
+          "step": "检测混批",
+          "timestamp": "2026-06-07T01:32:17.750784",
+          "booking_id": "bk_9218cb24",
+          "details": "批次BATCH-001正常，无混批",
+          "operator": "系统",
+          "before_status": "待处理",
+          "after_status": "正常"
+        },
+        {
+          "step": "检测混批",
+          "timestamp": "2026-06-07T01:32:17.750794",
+          "booking_id": "bk_9b1cb22c",
+          "details": "批次BATCH-001正常，无混批",
+          "operator": "系统",
+          "before_status": "待处理",
+          "after_status": "正常"
+        },
+        {
+          "step": "检测混批",
+          "timestamp": "2026-06-07T01:32:17.750803",
+          "booking_id": "bk_48cdb295",
+          "details": "批次BATCH-003正常，无混批",
+          "operator": "系统",
+          "before_status": "待处理",
+          "after_status": "正常"
+        }
+      ],
+      "bookings_before": [
+        {
+          "id": "bk_9218cb24",
+          "room_name": "一号鼓房",
+          "date": "2026-06-10",
+          "time_slot": "14:00-16:00",
+          "band_name": "电波乐队",
+          "contact": "小李 138****1234",
+          "ticket_type": "售票",
+          "batch_id": "BATCH-001",
+          "status": "正常",
+          "contract_screenshot": null,
+          "contract_ticket_type": null,
+          "auth_reminder": "无需提醒",
+          "notes": [],
+          "created_at": "2026-06-07T01:32:17.737641",
+          "updated_at": "2026-06-07T01:32:17.737880"
+        },
+        {
+          "id": "bk_9b1cb22c",
+          "room_name": "一号鼓房",
+          "date": "2026-06-10",
+          "time_slot": "16:00-18:00",
+          "band_name": "电波乐队",
+          "contact": "小李 138****1234",
+          "ticket_type": "售票",
+          "batch_id": "BATCH-001",
+          "status": "正常",
+          "contract_screenshot": null,
+          "contract_ticket_type": null,
+          "auth_reminder": "无需提醒",
+          "notes": [],
+          "created_at": "2026-06-07T01:32:17.737659",
+          "updated_at": "2026-06-07T01:32:17.737889"
+        },
+        {
+          "id": "bk_70ee4cd6",
+          "room_name": "二号鼓房",
+          "date": "2026-06-11",
+          "time_slot": "19:00-21:00",
+          "band_name": "迷雾乐队",
+          "contact": "小王 139****5678",
+          "ticket_type": "售票",
+          "batch_id": "BATCH-002",
+          "status": "已解决",
+          "contract_screenshot": null,
+          "contract_ticket_type": null,
+          "auth_reminder": "无需提醒",
+          "notes": [
+            "批次BATCH-002存在赠票售票混批，待人工复核",
+            "人工复核: 已核实，赠票为乐队内部福利，售票为对外场次，分开处理"
+          ],
+          "created_at": "2026-06-07T01:32:17.737669",
+          "updated_at": "2026-06-07T01:32:17.743141"
+        },
+        {
+          "id": "bk_0b5cacfc",
+          "room_name": "二号鼓房",
+          "date": "2026-06-11",
+          "time_slot": "21:00-23:00",
+          "band_name": "迷雾乐队(赠)",
+          "contact": "小王 139****5678",
+          "ticket_type": "赠票",
+          "batch_id": "BATCH-002",
+          "status": "已解决",
+          "contract_screenshot": null,
+          "contract_ticket_type": null,
+          "auth_reminder": "无需提醒",
+          "notes": [
+            "批次BATCH-002存在赠票售票混批，待人工复核",
+            "人工复核: 已核实，赠票为乐队内部福利，售票为对外场次，分开处理"
+          ],
+          "created_at": "2026-06-07T01:32:17.737678",
+          "updated_at": "2026-06-07T01:32:17.746884"
+        },
+        {
+          "id": "bk_48cdb295",
+          "room_name": "三号鼓房",
+          "date": "2026-06-12",
+          "time_slot": "15:00-17:00",
+          "band_name": "旧时光乐队",
+          "contact": "小张 137****9012",
+          "ticket_type": "赠票",
+          "batch_id": "BATCH-003",
+          "status": "正常",
+          "contract_screenshot": "data/contract_旧时光乐队_BATCH-003.txt",
+          "contract_ticket_type": "赠票",
+          "auth_reminder": "无需提醒",
+          "notes": [
+            "补录合同页截图: data/contract_旧时光乐队_BATCH-003.txt，合同标注为赠票",
+            "接龙票种(售票)与合同票种(赠票)不一致，以合同为准"
+          ],
+          "created_at": "2026-06-07T01:32:17.737687",
+          "updated_at": "2026-06-07T01:32:17.746973"
+        }
+      ],
+      "bookings_after": [
+        {
+          "id": "bk_9218cb24",
+          "room_name": "一号鼓房",
+          "date": "2026-06-10",
+          "time_slot": "14:00-16:00",
+          "band_name": "电波乐队",
+          "contact": "小李 138****1234",
+          "ticket_type": "售票",
+          "batch_id": "BATCH-001",
+          "status": "正常",
+          "contract_screenshot": null,
+          "contract_ticket_type": null,
+          "auth_reminder": "无需提醒",
+          "notes": [],
+          "created_at": "2026-06-07T01:32:17.737641",
+          "updated_at": "2026-06-07T01:32:17.750779"
+        },
+        {
+          "id": "bk_9b1cb22c",
+          "room_name": "一号鼓房",
+          "date": "2026-06-10",
+          "time_slot": "16:00-18:00",
+          "band_name": "电波乐队",
+          "contact": "小李 138****1234",
+          "ticket_type": "售票",
+          "batch_id": "BATCH-001",
+          "status": "正常",
+          "contract_screenshot": null,
+          "contract_ticket_type": null,
+          "auth_reminder": "无需提醒",
+          "notes": [],
+          "created_at": "2026-06-07T01:32:17.737659",
+          "updated_at": "2026-06-07T01:32:17.750790"
+        },
+        {
+          "id": "bk_70ee4cd6",
+          "room_name": "二号鼓房",
+          "date": "2026-06-11",
+          "time_slot": "19:00-21:00",
+          "band_name": "迷雾乐队",
+          "contact": "小王 139****5678",
+          "ticket_type": "售票",
+          "batch_id": "BATCH-002",
+          "status": "已解决",
+          "contract_screenshot": null,
+          "contract_ticket_type": null,
+          "auth_reminder": "无需提醒",
+          "notes": [
+            "批次BATCH-002存在赠票售票混批，待人工复核",
+            "人工复核: 已核实，赠票为乐队内部福利，售票为对外场次，分开处理"
+          ],
+          "created_at": "2026-06-07T01:32:17.737669",
+          "updated_at": "2026-06-07T01:32:17.743141"
+        },
+        {
+          "id": "bk_0b5cacfc",
+          "room_name": "二号鼓房",
+          "date": "2026-06-11",
+          "time_slot": "21:00-23:00",
+          "band_name": "迷雾乐队(赠)",
+          "contact": "小王 139****5678",
+          "ticket_type": "赠票",
+          "batch_id": "BATCH-002",
+          "status": "已解决",
+          "contract_screenshot": null,
+          "contract_ticket_type": null,
+          "auth_reminder": "无需提醒",
+          "notes": [
+            "批次BATCH-002存在赠票售票混批，待人工复核",
+            "人工复核: 已核实，赠票为乐队内部福利，售票为对外场次，分开处理"
+          ],
+          "created_at": "2026-06-07T01:32:17.737678",
+          "updated_at": "2026-06-07T01:32:17.746884"
+        },
+        {
+          "id": "bk_48cdb295",
+          "room_name": "三号鼓房",
+          "date": "2026-06-12",
+          "time_slot": "15:00-17:00",
+          "band_name": "旧时光乐队",
+          "contact": "小张 137****9012",
+          "ticket_type": "赠票",
+          "batch_id": "BATCH-003",
+          "status": "正常",
+          "contract_screenshot": "data/contract_旧时光乐队_BATCH-003.txt",
+          "contract_ticket_type": "赠票",
+          "auth_reminder": "无需提醒",
+          "notes": [
+            "补录合同页截图: data/contract_旧时光乐队_BATCH-003.txt，合同标注为赠票",
+            "接龙票种(售票)与合同票种(赠票)不一致，以合同为准"
+          ],
+          "created_at": "2026-06-07T01:32:17.737687",
+          "updated_at": "2026-06-07T01:32:17.750816"
+        }
+      ]
+    }
+  ],
+  "current_session_id": null
+}
