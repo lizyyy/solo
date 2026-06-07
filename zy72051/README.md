@@ -1,57 +1,262 @@
-# React + TypeScript + Vite
+# 城市天际线日照沙盘
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+面向设计院的日照分析可视化工具，解决 GIS 底图筛选与截图条件不一致、异常数据易丢失的问题。通过 3D 可视化与多维度交互同步，让日照分析从样例到结果全程可追溯。
 
-Currently, two official plugins are available:
+## ✨ 核心特性
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **3D 沙盘可视化**：Three.js 渲染城市天际线，真实日照光影模拟
+- **全链路同步**：筛选条件 → 3D 场景 → 侧边面板 → 状态栏 → 本地存储，五处实时同步
+- **异常不丢失**：6 种异常类型独立标记，统计数量单独显示
+- **条件可追溯**：导出截图自带筛选条件水印，评审一目了然
+- **交接零歧义**：刷新页面后所有标记、视角、筛选条件完整保留
+- **边界不模糊**：空值、边界值、重复项都有特殊标记和单独计数
 
-## Expanding the ESLint configuration
+## 🚀 快速开始
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 环境要求
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+- Node.js >= 18
+- npm >= 9
+
+### 安装依赖
+
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 启动开发服务器
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+npm run dev
 ```
+
+启动后访问：**http://localhost:5173**（如端口冲突，Vite会自动选择下一个可用端口）
+
+### 构建生产版本
+
+```bash
+npm run build
+```
+
+构建产物输出到 `dist/` 目录。
+
+### 预览生产构建
+
+```bash
+npm run preview
+```
+
+### 类型检查
+
+```bash
+npm run check
+```
+
+## 📖 使用指南
+
+### 1. 界面布局
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  顶部筛选栏  [区域] [异常类型] [楼层] [日照]  条件标签  导出按钮  │
+├──────────────────┬──────────────────────────────────┬──────────┤
+│                  │  标题: 城市天际线日照沙盘         │          │
+│  左侧状态栏      │                                  │  右侧    │
+│  - 筛选结果数    │       3D 沙盘主视口              │  信息    │
+│  - 异常数量      │  (建筑、光影、点选交互)           │  面板    │
+│  - 待确认数量    │                                  │          │
+│  - 空值/边界等   │                                  │          │
+├──────────────────┴──────────────────────────────────┴──────────┤
+│  底部时间轴  [播放控制] [速度] [滑动条 00:00 - 24:00]           │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 2. 核心操作流程
+
+#### 步骤 1: 浏览 3D 场景
+- **鼠标左键拖动**：旋转视角
+- **鼠标滚轮**：缩放场景
+- **鼠标右键拖动**：平移视角
+- **点击建筑**：选中并查看详情
+
+#### 步骤 2: 设置筛选条件
+在顶部筛选栏可以设置：
+- **区域**：中心商务区 / 科技园区 / 住宅区 / 文化区 / 工业区
+- **异常类型**：坐标偏移 / 重名设备 / 缺照片 / 跨楼层 / 需人工确认 / 旧 GIS 口径
+- **楼层范围**：输入最小和最大楼层数
+- **日照时长范围**：输入最小和最大日照小时数
+
+**效果**：
+- 3D 场景中不符合条件的建筑变为半透明
+- 左侧状态栏实时更新计数
+- 筛选条件以标签形式显示，可点击 × 单独移除
+
+#### 步骤 3: 调整日照时间
+使用底部时间轴：
+- **拖动滑块**：直接跳转到指定时间
+- **播放按钮 ▶**：自动播放 24 小时日照变化
+- **速度按钮**：0.5x / 1x / 2x / 4x 倍速
+- **快进/快退**：每次跳转 1 小时
+- **重置**：回到正午 12:00
+
+**效果**：
+- 太阳位置和颜色随时间实时变化
+- 天空背景渐变同步变化
+- 建筑阴影方向和长度实时更新
+
+#### 步骤 4: 查看建筑详情
+点击任意建筑，右侧面板显示：
+- 建筑基本信息：名称、ID、区域、楼层、日照、照片、GIS 口径
+- 数据异常标记：该建筑存在的所有异常类型
+- 坐标偏移：如有偏移，显示具体偏移量
+- 关联设备：列出该建筑的所有设备
+- 重名提示：如检测到重名设备，显示关联建筑
+- 用户操作区：可标记异常、输入备注、人工确认
+
+#### 步骤 5: 导出截图
+点击右上角 **「截图导出」** 按钮：
+- 自动截取当前 3D 场景 + 筛选条件
+- 右下角添加水印，包含：
+  - 筛选条件摘要
+  - 当前日照时间
+  - 导出时间戳
+- 文件自动下载到本地
+
+#### 步骤 6: 验证状态保留
+1. 标记几个建筑为异常 / 确认
+2. 调整视角和筛选条件
+3. 按 **F5 刷新页面**
+4. 验证：所有标记、视角、筛选条件完整恢复
+
+## 🧪 样例数据说明
+
+项目内置 12 栋样例建筑，覆盖所有测试场景：
+
+| ID | 名称 | 异常类型 | 测试场景 |
+|----|------|----------|----------|
+| B001 | 国贸中心大厦 | - | ✅ 顺利记录 |
+| B002 | 科技创业园 A 座 | 坐标偏移 | 📍 GIS 坐标偏移 5 米 |
+| B003 | 金茂商务楼 | 重名设备 | 🔄 "冷却塔 A" 和 "冷却塔_A" |
+| B004 | 阳光花园 3 号楼 | 缺照片 | 📷 建筑立面照片缺失 |
+| B005 | 文化艺术中心 | 跨楼层异常 | 🔴 设备跨 3-5 层 |
+| B006 | 智能制造厂房 | 需人工确认 | ⚠️ 日照临界值 2h |
+| B007 | 老城区商业楼 | 旧 GIS 口径 | 📜 2020 版底图导入 |
+| B008 | 待建地块综合楼 | 空值 | ∅ 日照时长为 null |
+| B009 | 滨河居住区 5 号楼 | 边界值 | 🎯 日照 = 标准值 2h |
+| B010 | 金茂商务楼-副楼 | 重复项 | 🔗 与 B003 共用设备名 |
+| B011 | 科技园孵化楼 B | - | 正常对照 |
+| B012 | 滨江国际大厦 | - | 正常对照 |
+
+## 🎨 颜色图例
+
+| 颜色 | 含义 |
+|------|------|
+| 🔵 青蓝色 `#4a90a0` | 正常建筑 |
+| 🟠 橙色 `#ffb347` | 低于标准 / 坐标偏移 |
+| 🔴 红色 `#ff6b6b` | 跨楼层异常 |
+| 🟡 黄色 `#ffd93d` | 待确认 / 边界值 |
+| ⚪ 灰色 `#5a6a7a` | 待测算 / 缺照片 |
+| 🟣 紫色 `#9b59b6` | 旧 GIS 口径 |
+
+## 🛠 技术栈
+
+| 层级 | 技术 | 版本 |
+|------|------|------|
+| 构建工具 | Vite | ^6.3.5 |
+| 前端框架 | React | ^18.3.1 |
+| 语言 | TypeScript | ~5.8.3 |
+| 3D 引擎 | three | ^0.160.0 |
+| React 绑定 | @react-three/fiber | ^8.17.10 |
+| 3D 组件库 | @react-three/drei | ^9.114.0 |
+| 后处理 | @react-three/postprocessing | ^2.16.3 |
+| 状态管理 | zustand | ^5.0.3 |
+| 样式方案 | Tailwind CSS | ^3.4.17 |
+| 截图导出 | html2canvas | ^1.4.1 |
+| 图标库 | lucide-react | ^0.511.0 |
+
+## 📁 项目结构
+
+```
+src/
+├── components/
+│   ├── ui/                    # UI 组件
+│   │   ├── FilterBar.tsx      # 顶部筛选栏
+│   │   ├── Timeline.tsx       # 底部时间轴
+│   │   ├── SidePanel.tsx      # 右侧信息面板
+│   │   └── StatusBar.tsx      # 左侧状态栏
+│   └── three/                 # 3D 组件
+│       ├── Scene.tsx          # 3D 场景容器
+│       ├── Buildings.tsx      # 建筑群组
+│       ├── BuildingMesh.tsx   # 单栋建筑网格
+│       ├── SunLight.tsx       # 太阳光与环境光
+│       └── Ground.tsx         # 地面与网格
+├── store/
+│   └── useSandboxStore.ts     # 全局状态管理 + 持久化
+├── data/
+│   ├── types.ts               # TypeScript 类型定义
+│   └── mockBuildings.ts       # 样例建筑数据
+├── utils/
+│   ├── sunPosition.ts         # 太阳位置计算算法
+│   ├── filter.ts              # 建筑筛选与统计
+│   ├── storage.ts             # LocalStorage 封装
+│   ├── export.ts              # 截图导出工具
+│   └── validate.test.ts       # 测试验证脚本
+├── App.tsx                    # 根组件
+├── main.tsx                   # 应用入口
+└── index.css                  # 全局样式
+```
+
+## ✅ 验证清单
+
+交付前请确认以下所有项：
+
+### 安装启动
+- [x] `npm install` 无报错（327 packages, 0 vulnerabilities）
+- [x] `npm run check` 类型检查 0 错误
+- [x] `npm run dev` 正常启动（默认端口 5173，冲突时自动递增）
+- [x] 浏览器访问页面正常加载
+
+### 核心功能
+- [x] 3D 场景正常渲染，12 栋建筑可见
+- [x] 鼠标拖拽可旋转视角，滚轮可缩放
+- [x] 点击建筑可选中，高亮 + 脉冲动画
+- [x] 顶部筛选条件变化时，3D 场景实时过滤
+- [x] 左侧状态栏计数与筛选条件同步
+- [x] 底部时间轴拖动时，太阳位置和光影实时变化
+- [x] 播放按钮可自动播放日照变化
+- [x] 右侧面板显示选中建筑的完整信息
+- [x] 可标记异常、输入备注、人工确认
+
+### 导出功能
+- [x] 点击「截图导出」生成 PNG 文件
+- [x] 截图包含 3D 场景 + 水印
+- [x] 水印包含：筛选条件、日照时间、导出时间戳
+- [x] 「导出数据」生成合法 JSON 文件（含元数据）
+
+### 持久化
+- [x] 标记异常后刷新页面，标记保留（LocalStorage 自动存储）
+- [x] 人工确认后刷新页面，状态保留
+- [x] 调整视角后刷新页面，视角恢复
+- [x] 设置筛选条件后刷新页面，条件保留
+
+### 边界场景
+- [x] B008（空值）显示「待测算」，不参与平均值统计，单独计数
+- [x] B009（边界值）有特殊「边界值」标记
+- [x] B003/B010（重名）自动检测关联建筑
+- [x] 所有异常类型在状态栏单独计数
+
+## 📝 交接说明
+
+本项目为设计院日照分析专用工具，交付时请注意：
+
+1. **数据安全**：所有用户标记仅存储在浏览器 LocalStorage，无后端上传
+2. **状态保留**：刷新 / 关闭浏览器后重新打开，所有标记和视角完整保留
+3. **截图规范**：导出的截图自带筛选条件水印，可直接用于评审会议
+4. **异常追溯**：所有异常数据在状态栏单独计数，不会在汇总数字中消失
+5. **样例覆盖**：内置 12 栋样例覆盖所有异常场景，可直接用于演示和培训
+
+---
+
+**版本**: v1.0  
+**最后更新**: 2026-06-07  
+**维护人**: 项目交付组
