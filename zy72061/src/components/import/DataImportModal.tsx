@@ -115,21 +115,38 @@ export default function DataImportModal({ isOpen, onClose }: DataImportModalProp
           photo_estimate: 'photo_estimate',
         };
 
+        const x = parseFloat(point.x as string) || 0;
+        const y = parseFloat(point.y as string) || 0;
+        const z = parseFloat(point.z as string) || 0;
+        const source = sourceMap[point.source?.toLowerCase() || ''] || 'cad_export';
+        const sourceRow = parseInt(point.source_row as string) || index + 2;
+        const sourceFile = 'imported.csv';
+
         return {
           id: `${point.point_name}_frame0`,
           name: point.point_name || `point_${index}`,
           nameCn: point.point_name || `点位${index + 1}`,
           boneGroup,
-          x: parseFloat(point.x as string) || 0,
-          y: parseFloat(point.y as string) || 0,
-          z: parseFloat(point.z as string) || 0,
-          source: sourceMap[point.source?.toLowerCase() || ''] || 'cad_export',
-          sourceRow: parseInt(point.source_row as string) || index + 2,
-          sourceFile: 'imported.csv',
+          x,
+          y,
+          z,
+          source,
+          sourceRow,
+          sourceFile,
+          originalValues: { x, y, z, source, sourceRow, sourceFile },
           isAnomaly: point.is_anomaly === '1' || point.is_anomaly === 1,
           anomalyType: point.anomaly_type as any,
           anomalyNote: '',
           notes: [],
+          modificationStats: {
+            totalChanges: 0,
+            coordinateChanges: 0,
+            anomalyStatusChanges: 0,
+            noteAdditions: 0,
+            sourceChanges: 0,
+            lastModifiedAt: new Date().toISOString(),
+            modifiedBy: [],
+          },
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           processedBy: '当前用户',

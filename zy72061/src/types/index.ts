@@ -4,16 +4,51 @@ export type DataSource = 'cad_export' | 'manual_edit' | 'photo_estimate';
 
 export type AnomalyType = 'coordinate_error' | 'missing_data' | 'outlier' | 'suspicious';
 
+export type ChangeType = 'coordinate' | 'anomaly_status' | 'anomaly_type' | 'note' | 'source';
+
+export interface CoordinateDiff {
+  previous: { x: number; y: number; z: number };
+  current: { x: number; y: number; z: number };
+  delta: { x: number; y: number; z: number; distance: number };
+}
+
+export interface AnomalyStatusDiff {
+  previous: boolean;
+  current: boolean;
+  previousType?: AnomalyType;
+  currentType?: AnomalyType;
+}
+
+export interface ChangeRecord {
+  field: string;
+  previous: any;
+  current: any;
+  reason?: string;
+}
+
 export interface ProcessNote {
   id: string;
   pointId: string;
+  frameNumber: number;
   content: string;
   author: string;
   createdAt: string;
-  diff?: {
-    previous?: Partial<SkeletonPoint>;
-    current?: Partial<SkeletonPoint>;
-  };
+  changeType?: ChangeType;
+  changes?: ChangeRecord[];
+  coordinateDiff?: CoordinateDiff;
+  anomalyDiff?: AnomalyStatusDiff;
+  originalSourceRow?: number;
+  originalSourceFile?: string;
+}
+
+export interface ModificationStats {
+  totalChanges: number;
+  coordinateChanges: number;
+  anomalyStatusChanges: number;
+  noteAdditions: number;
+  sourceChanges: number;
+  lastModifiedAt: string;
+  modifiedBy: string[];
 }
 
 export interface SkeletonPoint {
@@ -27,10 +62,19 @@ export interface SkeletonPoint {
   source: DataSource;
   sourceRow?: number;
   sourceFile?: string;
+  originalValues: {
+    x: number;
+    y: number;
+    z: number;
+    source: DataSource;
+    sourceRow?: number;
+    sourceFile?: string;
+  };
   isAnomaly: boolean;
   anomalyType?: AnomalyType;
   anomalyNote?: string;
   notes: ProcessNote[];
+  modificationStats: ModificationStats;
   createdAt: string;
   updatedAt: string;
   processedBy?: string;
@@ -42,6 +86,20 @@ export interface GaitFrame {
   timestamp: number;
   points: SkeletonPoint[];
   source: string;
+}
+
+export interface Snapshot {
+  id: string;
+  name: string;
+  description: string;
+  createdAt: string;
+  createdBy: string;
+  frames: GaitFrame[];
+  cameraState: CameraState;
+  filters: FilterState;
+  anomalyCount: number;
+  totalPoints: number;
+  noteCount: number;
 }
 
 export interface CameraState {
@@ -80,6 +138,17 @@ export interface ImportResult {
   importedAt: string;
 }
 
+export interface Statistics {
+  totalFrames: number;
+  totalPoints: number;
+  anomalyPoints: number;
+  anomalyByType: Record<AnomalyType, number>;
+  totalNotes: number;
+  totalCoordinateChanges: number;
+  pointsBySource: Record<DataSource, number>;
+  pointsByBoneGroup: Record<BoneGroup, number>;
+}
+
 export const BONE_GROUP_LABELS: Record<BoneGroup, string> = {
   head: '头部',
   spine: '躯干',
@@ -100,6 +169,14 @@ export const ANOMALY_TYPE_LABELS: Record<AnomalyType, string> = {
   missing_data: '数据缺失',
   outlier: '离群值',
   suspicious: '可疑数据',
+};
+
+export const CHANGE_TYPE_LABELS: Record<ChangeType, string> = {
+  coordinate: '坐标修改',
+  anomaly_status: '异常状态',
+  anomaly_type: '异常类型',
+  note: '添加备注',
+  source: '来源变更',
 };
 
 export const ANOMALY_TYPE_SUGGESTIONS: Record<AnomalyType, string> = {

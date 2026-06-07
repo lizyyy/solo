@@ -1,4 +1,4 @@
-import { GaitFrame, SkeletonPoint, BoneGroup, DataSource } from '../types';
+import { GaitFrame, SkeletonPoint, BoneGroup, DataSource, ModificationStats } from '../types';
 
 const generateId = () => Math.random().toString(36).substring(2, 11);
 
@@ -87,22 +87,38 @@ const getAnomalyInfo = (pointName: string): { isAnomaly: boolean; anomalyType?: 
   return { isAnomaly: false };
 };
 
-const getInitialNotes = (pointName: string) => {
+const createModificationStats = (hasNotes: boolean, hasAnomaly: boolean): ModificationStats => {
+  return {
+    totalChanges: hasNotes ? (hasAnomaly ? 2 : 1) : 0,
+    coordinateChanges: 0,
+    anomalyStatusChanges: hasAnomaly ? 1 : 0,
+    noteAdditions: hasNotes ? 1 : 0,
+    sourceChanges: 0,
+    lastModifiedAt: new Date().toISOString(),
+    modifiedBy: hasNotes ? ['阿乔'] : [],
+  };
+};
+
+const getInitialNotes = (pointName: string, frameNumber: number) => {
   const notesMap: Record<string, { content: string; author: string }[]> = {
     left_wrist: [
-      { content: '2024-06-15 阿乔：已核对CAD原始文件第23行，确认坐标系问题', author: '阿乔' },
-      { content: '2024-06-15 阿乔：已手动修正Y轴方向，翻转后数据正常', author: '阿乔' },
+      { content: '已核对CAD原始文件第23行，确认坐标系问题，Y轴方向翻转', author: '阿乔' },
+      { content: '已手动修正Y轴方向，翻转后数据范围恢复正常', author: '阿乔' },
     ],
     right_knee: [
-      { content: '2024-06-14 阿乔：第5帧数据异常，已标记待核实', author: '阿乔' },
+      { content: '第5帧数据异常，已标记待核实，后续需对照现场照片', author: '阿乔' },
     ],
   };
-  return notesMap[pointName]?.map((n) => ({
+  return notesMap[pointName]?.map((n, idx) => ({
     id: generateId(),
-    pointId: pointName,
+    pointId: `${pointName}_frame${frameNumber}`,
+    frameNumber,
     content: n.content,
     author: n.author,
-    createdAt: new Date().toISOString(),
+    createdAt: new Date(Date.now() - (idx + 1) * 3600000).toISOString(),
+    changeType: 'note' as const,
+    originalSourceRow: 20 + Math.floor(Math.random() * 10),
+    originalSourceFile: 'gait_2024_06_15.csv',
   })) || [];
 };
 
@@ -114,20 +130,34 @@ export const generateMockFrames = (frameCount: number = 10): GaitFrame[] => {
       const offset = getGaitOffset(frameIndex, config.name);
       const anomalyInfo = getAnomalyInfo(config.name);
       const sourceRow = Math.floor(Math.random() * 50) + 1;
+      const hasNotes = ['left_wrist', 'right_knee'].includes(config.name);
+      const source = dataSources[config.name];
+      const baseX = config.basePos[0] + offset[0];
+      const baseY = config.basePos[1] + offset[1];
+      const baseZ = config.basePos[2] + offset[2];
 
       return {
         id: `${config.name}_frame${frameIndex}`,
         name: config.name,
         nameCn: config.nameCn,
         boneGroup: config.boneGroup,
-        x: config.basePos[0] + offset[0],
-        y: config.basePos[1] + offset[1],
-        z: config.basePos[2] + offset[2],
-        source: dataSources[config.name],
+        x: baseX,
+        y: baseY,
+        z: baseZ,
+        source,
         sourceRow,
         sourceFile: 'gait_2024_06_15.csv',
+        originalValues: {
+          x: baseX,
+          y: baseY,
+          z: baseZ,
+          source,
+          sourceRow,
+          sourceFile: 'gait_2024_06_15.csv',
+        },
         ...anomalyInfo,
-        notes: getInitialNotes(config.name),
+        notes: getInitialNotes(config.name, frameIndex),
+        modificationStats: createModificationStats(hasNotes, anomalyInfo.isAnomaly),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         processedBy: '阿乔',

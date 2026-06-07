@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Search, ChevronDown, ChevronUp, Filter, AlertTriangle, Database, User } from 'lucide-react';
 import { useGaitStore } from '../../store/useGaitStore';
 import { BONE_GROUP_LABELS, DATA_SOURCE_LABELS, BoneGroup, DataSource } from '../../types';
+import StatisticsPanel from './StatisticsPanel';
 
 export default function FilterPanel() {
   const { filters, toggleBoneGroupFilter, toggleDataSourceFilter, setShowAnomalyOnly, setSearchQuery } = useGaitStore();
@@ -104,11 +105,7 @@ export default function FilterPanel() {
         </div>
       </div>
 
-      <div className="p-4 border-t border-gray-200 bg-gray-50">
-        <div className="text-xs text-gray-500">
-          <div>提示：点击3D视图中的点位可查看详情</div>
-        </div>
-      </div>
+      <StatisticsPanel />
     </div>
   );
 }

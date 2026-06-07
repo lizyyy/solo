@@ -1,19 +1,22 @@
 import { useState } from 'react';
-import { Upload, RotateCcw, Download, AlertCircle } from 'lucide-react';
+import { Upload, RotateCcw, Download, AlertCircle, Save } from 'lucide-react';
 import FilterPanel from '../components/sidebar/FilterPanel';
 import DetailPanel from '../components/sidebar/DetailPanel';
 import SkeletonViewer from '../components/viewer/SkeletonViewer';
 import Timeline from '../components/timeline/Timeline';
 import DataImportModal from '../components/import/DataImportModal';
+import SnapshotModal from '../components/sidebar/SnapshotModal';
 import { useGaitStore } from '../store/useGaitStore';
 
 export default function Home() {
   const [importModalOpen, setImportModalOpen] = useState(false);
-  const { importReport, frames, setFrames } = useGaitStore();
+  const [snapshotModalOpen, setSnapshotModalOpen] = useState(false);
+  const { importReport, frames, setFrames, snapshots } = useGaitStore();
 
   const handleReset = () => {
     if (confirm('确定要重置所有数据吗？这将清除所有标记的异常和备注。')) {
       localStorage.removeItem('gait-skeleton-storage');
+      localStorage.removeItem('gait-skeleton-storage-v2');
       window.location.reload();
     }
   };
@@ -72,6 +75,23 @@ export default function Home() {
 
           <div className="flex items-center gap-2">
             <button
+              onClick={() => setSnapshotModalOpen(true)}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                snapshots.length > 0
+                  ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+              title="快照管理"
+            >
+              <Save size={16} />
+              快照
+              {snapshots.length > 0 && (
+                <span className="bg-green-600 text-white text-xs px-1.5 rounded-full">
+                  {snapshots.length}
+                </span>
+              )}
+            </button>
+            <button
               onClick={() => setImportModalOpen(true)}
               className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
             >
@@ -108,6 +128,7 @@ export default function Home() {
       </div>
 
       <DataImportModal isOpen={importModalOpen} onClose={() => setImportModalOpen(false)} />
+      <SnapshotModal isOpen={snapshotModalOpen} onClose={() => setSnapshotModalOpen(false)} />
     </div>
   );
 }
