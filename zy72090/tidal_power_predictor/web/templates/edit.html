@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}编辑记录 - 潮汐发电功率预测{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>✏️ 编辑/补录记录</h2>
+    
+    <div class="alert alert-info">
+        <strong>记录ID：</strong>{{ record.record_id }}
+        <br>
+        修改数据后点击保存，来源行信息会自动保留
+    </div>
+    
+    <form method="POST">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;">
+            {% for key, label in target_columns.items() %}
+            <div class="form-group">
+                <label for="{{ key }}">{{ label }}</label>
+                {% if key == 'notes' %}
+                <textarea id="{{ key }}" name="{{ key }}" rows="2">{{ record.get(key, '') }}</textarea>
+                {% elif key == 'timestamp' %}
+                <input type="text" id="{{ key }}" name="{{ key }}" value="{{ record.get(key, '') }}">
+                {% elif key == 'data_source' %}
+                <input type="text" id="{{ key }}" name="{{ key }}" value="{{ record.get(key, 'imported') }}">
+                {% else %}
+                <input type="text" id="{{ key }}" name="{{ key }}" value="{{ record.get(key, '') if record.get(key) is not none else '' }}">
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="actions">
+            <button type="submit" class="btn btn-primary">保存修改</button>
+            <a href="{{ url_for('preview_data') }}" class="btn btn-secondary">取消返回</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

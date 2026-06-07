@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}数据预览 - 潮汐发电功率预测{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>📋 导入数据预览</h2>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value">{{ import_stats.imported if import_stats else 0 }}</div>
+            <div class="stat-label">成功导入</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ import_stats.skipped if import_stats else 0 }}</div>
+            <div class="stat-label">跳过</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" style="color: #f59e0b;">
+                {{ results | selectattr('status', 'equalto', 'needs_review') | list | length }}
+            </div>
+            <div class="stat-label">需人工确认</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" style="color: #ef4444;">
+                {{ results | selectattr('status', 'equalto', 'failed') | list | length }}
+            </div>
+            <div class="stat-label">计算失败</div>
+        </div>
+    </div>
+    
+    {% if import_warnings %}
+    <div class="alert alert-warning">
+        <strong>导入警告 ({{ import_warnings | length }} 条):</strong>
+        <ul style="margin-top: 10px; padding-left: 20px;">
+            {% for warning in import_warnings %}
+            <li>{{ warning }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>🔍 数据明细与验证结果</h2>
+    
+    <div style="margin-bottom: 15px;">
+        <strong>提示：</strong>点击"编辑"可以补录或修正数据，所有修改都会保留来源行信息
+    </div>
+    
+    <div style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>记录ID</th>
+                    <th>测站</th>
+                    <th>潮差</th>
+                    <th>流量</th>
+                    <th>预测功率</th>
+                    <th>状态</th>
+                    <th>问题</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in results %}
+                <tr>
+                    <td><strong>{{ item.record.record_id }}</strong></td>
+                    <td>{{ item.record.station_name or '-' }}</td>
+                    <td>
+                        {% if item.record.tidal_range %}
+                            {{ item.record.tidal_range }} {{ item.record.tidal_range_unit }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if item.record.flow_rate %}
+                            {{ item.record.flow_rate }} {{ item.record.flow_rate_unit }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if item.predicted_power %}
+                            <strong style="color: #1e40af;">{{ item.predicted_power }} kW</strong>
+                        {% else %}
+                            <span style="color: #9ca3af;">N/A</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="status-badge {{ item.status }}">
+                            {{ item.status_text }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if item.issues %}
+                            <span style="color: {{ '#ef4444' if item.issues | selectattr('level', 'equalto', 'error') | list | length > 0 else '#f59e0b' }};">
+                                {{ item.issues | length }} 项
+                            </span>
+                        {% else %}
+                            <span style="color: #10b981;">✓ 正常</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ url_for('edit_record', record_id=item.record.record_id) }}" 
+                           class="btn btn-sm btn-warning">编辑/补录</a>
+                    </td>
+                </tr>
+                {% if item.issues %}
+                <tr>
+                    <td colspan="8" style="background: #fefce8; padding: 10px 20px;">
+                        <details>
+                            <summary style="cursor: pointer; color: #92400e;">查看问题详情</summary>
+                            <ul style="margin: 10px 0 0 20px;">
+                                {% for issue in item.issues %}
+                                <li style="margin-bottom: 5px;">
+                                    <strong style="color: {{ '#ef4444' if issue.level == 'error' else '#f59e0b' }};">
+                                        [{{ '错误' if issue.level == 'error' else '警告' }}] {{ issue.field }}:
+                                    </strong>
+                                    {{ issue.message }}
+                                    {% if issue.suggestion %}
+                                    <br><span style="color: #6b7280; font-size: 0.9rem;">💡 建议: {{ issue.suggestion }}</span>
+                                    {% endif %}
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </details>
+                    </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="actions">
+        <a href="{{ url_for('calculate_all') }}" class="btn btn-success">批量计算并生成报告</a>
+        <a href="{{ url_for('upload') }}" class="btn btn-secondary">重新上传</a>
+    </div>
+</div>
+{% endblock %}

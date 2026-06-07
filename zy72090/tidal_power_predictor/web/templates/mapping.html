@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}列名映射 - 潮汐发电功率预测{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>🔗 列名映射配置</h2>
+    
+    <div class="alert alert-info">
+        <strong>文件：</strong>{{ preview.filename }}
+        <br>
+        <strong>共 {{ preview.total_rows }} 行，{{ preview.total_columns }} 列</strong>
+        <br>
+        系统已自动推荐映射关系，请检查并调整，确认后继续导入
+    </div>
+    
+    {% if error %}
+    <div class="alert alert-error">
+        {{ error }}
+    </div>
+    {% endif %}
+    
+    <form method="POST">
+        <table>
+            <thead>
+                <tr>
+                    <th>原始列名</th>
+                    <th>样例数据</th>
+                    <th>映射到标准字段</th>
+                    <th>匹配度</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mapping in preview.suggested_mappings %}
+                <tr>
+                    <td><code>{{ mapping.source_column }}</code></td>
+                    <td style="color: #6b7280; font-size: 0.85rem;">
+                        {% if preview.sample_data and preview.sample_data[0] %}
+                            {{ preview.sample_data[0].get(mapping.source_column, '-') }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        <select name="mapping_{{ mapping.source_column }}">
+                            <option value="">-- 不映射 --</option>
+                            {% for key, label in target_columns %}
+                            <option value="{{ key }}" {% if mapping.target_column == key %}selected{% endif %}>
+                                {{ label }} ({{ key }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        {% if mapping.confidence > 0 %}
+                            {% if mapping.confidence == 1.0 %}
+                                <span style="color: #10b981;">✓ 精确匹配</span>
+                            {% elif mapping.confidence >= 0.7 %}
+                                <span style="color: #f59e0b;">~ {{ (mapping.confidence * 100) | round(0) }}%</span>
+                            {% else %}
+                                <span style="color: #6b7280;">低</span>
+                            {% endif %}
+                        {% else %}
+                            <span style="color: #9ca3af;">未匹配</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <div class="actions">
+            <button type="submit" class="btn btn-primary">确认映射并导入</button>
+            <a href="{{ url_for('upload') }}" class="btn btn-secondary">返回重新上传</a>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <h2>📊 数据预览（前3行）</h2>
+    <pre style="background: #f9fafb; padding: 15px; border-radius: 8px; overflow-x: auto; font-size: 0.85rem;">{{ preview.raw_preview }}</pre>
+</div>
+{% endblock %}

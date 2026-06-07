@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}文件上传 - 潮汐发电功率预测{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>📁 上传数据文件</h2>
+    
+    <div class="alert alert-info">
+        <strong>支持格式：</strong> CSV (.csv)、Excel (.xlsx, .xls)
+        <br>
+        <strong>样例文件：</strong>可以在 samples 目录下找到测试用的台账文件
+    </div>
+    
+    {% if error %}
+    <div class="alert alert-error">
+        {{ error }}
+    </div>
+    {% endif %}
+    
+    <form method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="file">选择文件</label>
+            <input type="file" id="file" name="file" accept=".csv,.xlsx,.xls" required>
+        </div>
+        
+        <div class="actions">
+            <button type="submit" class="btn btn-primary">上传并预览</button>
+            <a href="{{ url_for('load_sample') }}" class="btn btn-secondary">或者直接加载内置样例</a>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <h2>📋 可用的样例文件</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>文件名</th>
+                <th>说明</th>
+                <th>记录数</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>潮汐发电功率预测台账_样例.csv</code></td>
+                <td>标准台账格式，包含10条记录，覆盖各种边界场景</td>
+                <td>10条</td>
+            </tr>
+            <tr>
+                <td><code>老板汇总页_旧口径.csv</code></td>
+                <td>旧系统导出格式，列名不标准，需要映射</td>
+                <td>3条</td>
+            </tr>
+            <tr>
+                <td>内置样例数据</td>
+                <td>点击上方按钮直接加载，无需上传</td>
+                <td>8条</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="card">
+    <h2>📐 支持的标准字段</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 10px;">
+        <div class="stat-card">
+            <div style="font-weight: 600;">记录编号</div>
+            <div style="font-size: 0.85rem; color: #6b7280;">record_id</div>
+        </div>
+        <div class="stat-card">
+            <div style="font-weight: 600;">测站名称</div>
+            <div style="font-size: 0.85rem; color: #6b7280;">station_name</div>
+        </div>
+        <div class="stat-card">
+            <div style="font-weight: 600;">观测时间</div>
+            <div style="font-size: 0.85rem; color: #6b7280;">timestamp</div>
+        </div>
+        <div class="stat-card">
+            <div style="font-weight: 600;">潮差数值</div>
+            <div style="font-size: 0.85rem; color: #6b7280;">tidal_range</div>
+        </div>
+        <div class="stat-card">
+            <div style="font-weight: 600;">流量数值</div>
+            <div style="font-size: 0.85rem; color: #6b7280;">flow_rate</div>
+        </div>
+        <div class="stat-card">
+            <div style="font-weight: 600;">水流速度</div>
+            <div style="font-size: 0.85rem; color: #6b7280;">water_velocity</div>
+        </div>
+        <div class="stat-card">
+            <div style="font-weight: 600;">过流面积</div>
+            <div style="font-size: 0.85rem; color: #6b7280;">cross_sectional_area</div>
+        </div>
+        <div class="stat-card">
+            <div style="font-weight: 600;">水轮机效率</div>
+            <div style="font-size: 0.85rem; color: #6b7280;">turbine_efficiency</div>
+        </div>
+    </div>
+</div>
+{% endblock %}

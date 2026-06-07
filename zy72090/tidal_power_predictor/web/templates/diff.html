@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}差异对比 - 潮汐发电功率预测{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>🔍 差异对比 - 与历史汇总数据校验</h2>
+    
+    <div class="alert alert-info">
+        上传老板汇总页的旧口径数据，与当前计算结果进行对比，确保报告和汇总不会变成两套说法
+    </div>
+    
+    {% if error %}
+    <div class="alert alert-error">
+        {{ error }}
+    </div>
+    {% endif %}
+    
+    <form method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="baseline_file">选择基线文件（老板汇总页的旧数据）</label>
+            <input type="file" id="baseline_file" name="baseline_file" accept=".csv,.xlsx,.xls" required>
+        </div>
+        
+        <div class="actions">
+            <button type="submit" class="btn btn-primary">上传并对比</button>
+            <a href="{{ url_for('results') }}" class="btn btn-secondary">返回结果</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

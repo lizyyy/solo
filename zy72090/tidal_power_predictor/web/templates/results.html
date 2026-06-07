@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}计算结果 - 潮汐发电功率预测{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>📊 批量计算结果汇总</h2>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value">{{ summary.total_records if summary else 0 }}</div>
+            <div class="stat-label">总记录数</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" style="color: #10b981;">{{ summary.success_count if summary else 0 }}</div>
+            <div class="stat-label">计算成功 ✓</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" style="color: #f59e0b;">{{ summary.needs_review_count if summary else 0 }}</div>
+            <div class="stat-label">待人工确认 ⚠</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" style="color: #ef4444;">{{ summary.failed_count if summary else 0 }}</div>
+            <div class="stat-label">计算失败 ✕</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" style="color: #3b82f6;">{{ summary.old_portal_count if summary else 0 }}</div>
+            <div class="stat-label">旧口径数据 📜</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" style="color: #8b5cf6;">{{ summary.total_power_kwh if summary else 0 }} kW</div>
+            <div class="stat-label">成功记录总功率</div>
+        </div>
+    </div>
+    
+    {% if summary and summary.duplicates %}
+    <div class="alert alert-warning">
+        <strong>检测到 {{ summary.duplicate_count }} 组重复记录：</strong>
+        <ul style="margin-top: 10px; padding-left: 20px;">
+            {% for dup in summary.duplicates %}
+            <li>{{ dup.primary_record_id }} 的重复项: {{ dup.duplicate_record_ids | join(', ') }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>📋 详细结果</h2>
+    
+    <div style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>记录ID</th>
+                    <th>测站</th>
+                    <th>时间</th>
+                    <th>预测功率</th>
+                    <th>计算方法</th>
+                    <th>状态</th>
+                    <th>置信度</th>
+                    <th>处理备注</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in results %}
+                <tr>
+                    <td><strong>{{ result.record_id }}</strong></td>
+                    <td>{{ result.station_name or '-' }}</td>
+                    <td>{{ result.timestamp }}</td>
+                    <td>
+                        {% if result.predicted_power %}
+                            <strong style="color: #1e40af;">{{ result.predicted_power }} {{ result.power_unit }}</strong>
+                        {% else %}
+                            <span style="color: #9ca3af;">N/A</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ result.calculation_method or '-' }}</td>
+                    <td>
+                        <span class="status-badge {{ result.status }}">
+                            {{ result.status_text }}
+                        </span>
+                    </td>
+                    <td>{{ result.confidence_score }}%</td>
+                    <td style="font-size: 0.85rem; color: #6b7280;">{{ result.processing_notes or '-' }}</td>
+                </tr>
+                {% if result.issues %}
+                <tr>
+                    <td colspan="8" style="background: #fefce8; padding: 10px 20px;">
+                        <details>
+                            <summary style="cursor: pointer; color: #92400e;">查看问题详情 ({{ result.issues | length }} 项)</summary>
+                            <ul style="margin: 10px 0 0 20px;">
+                                {% for issue in result.issues %}
+                                <li style="margin-bottom: 5px;">
+                                    <strong style="color: {{ '#ef4444' if issue.level == 'error' else '#f59e0b' }};">
+                                        [{{ '错误' if issue.level == 'error' else '警告' }}] {{ issue.field }}:
+                                    </strong>
+                                    {{ issue.message }}
+                                    {% if issue.suggestion %}
+                                    <br><span style="color: #6b7280; font-size: 0.9rem;">💡 建议: {{ issue.suggestion }}</span>
+                                    {% endif %}
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </details>
+                    </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="actions">
+        <a href="{{ url_for('generate_report') }}" class="btn btn-success">📄 生成HTML报告</a>
+        <a href="{{ url_for('export_csv') }}" class="btn btn-primary">📊 导出CSV结果</a>
+        <a href="{{ url_for('diff_view') }}" class="btn btn-warning">🔍 差异对比</a>
+        <a href="{{ url_for('preview_data') }}" class="btn btn-secondary">返回预览</a>
+    </div>
+</div>
+{% endblock %}
