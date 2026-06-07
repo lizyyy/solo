@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>街道家具破损派单系统</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        .header {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
+            color: white;
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header h1 { font-size: 24px; margin-bottom: 5px; }
+        .header p { opacity: 0.9; font-size: 14px; }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .stat-card .label { font-size: 13px; color: #666; margin-bottom: 8px; }
+        .stat-card .value { font-size: 28px; font-weight: 600; color: #1e3a5f; }
+        .stat-card .sub { font-size: 12px; color: #999; margin-top: 5px; }
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            overflow: hidden;
+        }
+        .card-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-body { padding: 15px 20px; }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        .btn-primary { background: #2d5a87; color: white; }
+        .btn-primary:hover { background: #1e3a5f; }
+        .btn-success { background: #2e7d32; color: white; }
+        .btn-warning { background: #ed6c02; color: white; }
+        .btn-outline { background: white; border: 1px solid #ddd; color: #333; }
+        .btn-outline:hover { background: #f5f5f5; }
+        .heatmap-cell {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            transition: all 0.2s;
+        }
+        .heatmap-cell:hover { transform: translateX(3px); }
+        .heatmap-bar {
+            height: 24px;
+            border-radius: 4px;
+            min-width: 30px;
+            margin-right: 12px;
+            transition: width 0.3s ease;
+        }
+        .heatmap-info { flex: 1; }
+        .heatmap-name { font-weight: 500; font-size: 14px; }
+        .heatmap-meta { font-size: 12px; color: #888; margin-top: 3px; }
+        .heatmap-score { font-weight: 600; font-size: 16px; margin-right: 10px; }
+        .status-badge {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        .status-normal { background: #e8f5e9; color: #2e7d32; }
+        .status-low { background: #fff3e0; color: #ed6c02; }
+        .status-pending { background: #e3f2fd; color: #1565c0; }
+        .status-supplemented { background: #f3e5f5; color: #7b1fa2; }
+        .status-corrected { background: #e0f7fa; color: #00838f; }
+        .order-item {
+            padding: 12px;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .order-item:hover { border-color: #2d5a87; background: #f8fafc; }
+        .order-title { font-weight: 500; margin-bottom: 5px; }
+        .order-reason { font-size: 12px; color: #666; }
+        .order-meta { display: flex; gap: 10px; margin-top: 8px; font-size: 12px; color: #888; }
+        .reason-note {
+            background: #fff8e1;
+            border-left: 3px solid #ffc107;
+            padding: 10px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+        .audit-log {
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 13px;
+        }
+        .audit-log:last-child { border-bottom: none; }
+        .audit-time { color: #888; font-size: 12px; }
+        .audit-operator { font-weight: 500; color: #1e3a5f; }
+        .audit-action { margin: 0 8px; }
+        .audit-reason { color: #666; margin-top: 4px; }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-body { padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-size: 13px; font-weight: 500; }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .form-group textarea { min-height: 80px; resize: vertical; }
+        .form-row { display: flex; gap: 10px; }
+        .form-row .form-group { flex: 1; }
+        .tag { display: inline-block; padding: 2px 6px; background: #f0f0f0; border-radius: 4px; font-size: 11px; }
+        .workflow-steps {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .workflow-step {
+            flex: 1;
+            min-width: 120px;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 12px;
+        }
+        .workflow-step.active {
+            background: #e3f2fd;
+            color: #1565c0;
+            font-weight: 500;
+        }
+        .workflow-step.done {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏘️ 街道家具破损派单系统</h1>
+        <p>热力图分析 · 派单管理 · 变更审计</p>
+    </div>
+
+    <div class="container">
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="label">街道点</div>
+                <div class="value" id="stat-points">0</div>
+                <div class="sub">个监测点</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">派单数量</div>
+                <div class="value" id="stat-orders">0</div>
+                <div class="sub">条记录</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">热力图版本</div>
+                <div class="value" id="stat-heatmap">0</div>
+                <div class="sub">v<span id="heatmap-version">0</span></div>
+            </div>
+            <div class="stat-card">
+                <div class="label">待复核</div>
+                <div class="value" id="stat-pending">0</div>
+                <div class="sub">条需街道规划员处理</div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 20px;">
+            <div class="card-header">
+                <span>📋 快速操作</span>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn btn-primary" onclick="initDemo()">初始化演示数据</button>
+                    <button class="btn btn-success" onclick="openImportModal()">导入施工告示</button>
+                    <button class="btn btn-warning" onclick="rerunHeatmap()">重跑热力图</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-grid">
+            <div class="card">
+                <div class="card-header">
+                    <span>🗺️ 热力图</span>
+                    <span class="tag" id="heatmap-tag">v0</span>
+                </div>
+                <div class="card-body" id="heatmap-container">
+                    <p style="color: #999; text-align: center; padding: 40px 0;">暂无数据，请先初始化演示数据</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span>📑 派单列表</span>
+                </div>
+                <div class="card-body" id="orders-container">
+                    <p style="color: #999; text-align: center; padding: 40px 0;">暂无数据</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top: 20px;">
+            <div class="card-header">
+                <span>📜 变更审计日志</span>
+            </div>
+            <div class="card-body" id="audit-container">
+                <p style="color: #999; text-align: center; padding: 20px 0;">暂无数据</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="order-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>派单详情</span>
+                <button class="close-btn" onclick="closeOrderModal()">×</button>
+            </div>
+            <div class="modal-body" id="order-detail-content"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="import-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>导入施工告示</span>
+                <button class="close-btn" onclick="closeImportModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>街道点</label>
+                    <select id="import-point">
+                        <option value="">请选择</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>派单标题</label>
+                    <input type="text" id="import-title" placeholder="如：人民广场街道座椅破损">
+                </div>
+                <div class="form-group">
+                    <label>派单描述</label>
+                    <textarea id="import-desc" placeholder="详细描述破损情况"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>操作人</label>
+                    <input type="text" id="import-operator" value="系统导入">
+                </div>
+                <button class="btn btn-primary" style="width: 100%;" onclick="doImport()">确认导入</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentOrderId = null;
+
+        function statusClass(status) {
+            const map = {
+                '正常': 'status-normal',
+                '晚上缺采样导致热力图偏低': 'status-low',
+                '待街道规划员复核': 'status-pending',
+                '已补录': 'status-supplemented',
+                '人工修正': 'status-corrected'
+            };
+            return map[status] || 'status-normal';
+        }
+
+        function statusLabel(status) {
+            return status;
+        }
+
+        function fetchData() {
+            Promise.all([
+                fetch('/api/orders').then(r => r.json()),
+                fetch('/api/heatmap').then(r => r.json()),
+                fetch('/api/audit-logs').then(r => r.json()),
+                fetch('/api/points').then(r => r.json())
+            ]).then(([orders, heatmap, audit, points]) => {
+                renderStats(orders, heatmap);
+                renderHeatmap(heatmap);
+                renderOrders(orders);
+                renderAudit(audit);
+                renderPointOptions(points);
+            });
+        }
+
+        function renderStats(orders, heatmap) {
+            document.getElementById('stat-points').textContent = Object.keys(heatmap.cells || []).length;
+            document.getElementById('stat-orders').textContent = orders.length;
+            document.getElementById('stat-heatmap').textContent = heatmap.version || 0;
+            document.getElementById('heatmap-version').textContent = heatmap.version || 0;
+            document.getElementById('heatmap-tag').textContent = 'v' + (heatmap.version || 0);
+
+            const pending = orders.filter(o => o.status === '待街道规划员复核' || o.status === '晚上缺采样导致热力图偏低').length;
+            document.getElementById('stat-pending').textContent = pending;
+        }
+
+        function renderHeatmap(heatmap) {
+            const container = document.getElementById('heatmap-container');
+            if (!heatmap.cells || heatmap.cells.length === 0) {
+                container.innerHTML = '<p style="color: #999; text-align: center; padding: 40px 0;">暂无数据，请先初始化演示数据</p>';
+                return;
+            }
+
+            let html = '';
+            if (heatmap.notes && heatmap.notes.length > 0) {
+                html += '<div class="reason-note" style="margin-bottom: 15px;">⚠️ 热力图提示：<br>';
+                heatmap.notes.forEach(note => {
+                    html += `• ${note}<br>`;
+                });
+                html += '</div>';
+            }
+
+            heatmap.cells.forEach(cell => {
+                const scorePct = Math.max(cell.score * 100, 5);
+                const barColor = cell.score >= 0.7 ? '#4caf50' : cell.score >= 0.5 ? '#ff9800' : '#f44336';
+                const dayMark = cell.has_day_coverage ? '☀️' : '❌';
+                const nightMark = cell.has_night_coverage ? '🌙' : '❌';
+
+                html += `
+                    <div class="heatmap-cell" style="background: ${cell.status.includes('偏低') ? '#fff8e1' : cell.status.includes('复核') ? '#e3f2fd' : '#fafafa'};">
+                        <div class="heatmap-bar" style="width: ${scorePct}%; background: ${barColor};"></div>
+                        <div class="heatmap-info">
+                            <div class="heatmap-name">${cell.point_name || cell.point_id}</div>
+                            <div class="heatmap-meta">
+                                采样: 白天${dayMark} 晚间${nightMark}
+                                ${cell.related_orders.length > 0 ? ` | 关联派单: ${cell.related_orders.length}条` : ''}
+                            </div>
+                            ${cell.reason ? `<div class="reason-note" style="margin-top: 8px;">💡 ${cell.reason}</div>` : ''}
+                        </div>
+                        <div style="text-align: right;">
+                            <div class="heatmap-score">${cell.score.toFixed(2)}</div>
+                            <span class="status-badge ${statusClass(cell.status)}">${statusLabel(cell.status)}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function renderOrders(orders) {
+            const container = document.getElementById('orders-container');
+            if (orders.length === 0) {
+                container.innerHTML = '<p style="color: #999; text-align: center; padding: 40px 0;">暂无派单</p>';
+                return;
+            }
+
+            let html = '';
+            orders.forEach(order => {
+                html += `
+                    <div class="order-item" onclick="showOrderDetail('${order.id}')">
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <div class="order-title">${order.title}</div>
+                            <span class="status-badge ${statusClass(order.status)}">${statusLabel(order.status)}</span>
+                        </div>
+                        <div class="order-reason">${order.missing_reason || '暂无说明'}</div>
+                        <div class="order-meta">
+                            <span>ID: ${order.id}</span>
+                            <span>得分: ${order.heatmap_score}</span>
+                            <span>负责人: ${order.responsible_person || '-'}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function renderAudit(logs) {
+            const container = document.getElementById('audit-container');
+            if (logs.length === 0) {
+                container.innerHTML = '<p style="color: #999; text-align: center; padding: 20px 0;">暂无审计记录</p>';
+                return;
+            }
+
+            let html = '';
+            logs.slice(0, 10).forEach(log => {
+                const time = new Date(log.timestamp).toLocaleString('zh-CN');
+                html += `
+                    <div class="audit-log">
+                        <span class="audit-time">${time}</span>
+                        <span class="audit-operator">${log.operator}</span>
+                        <span class="audit-action tag">${log.action}</span>
+                        ${log.order_id ? `<span class="tag">派单: ${log.order_id}</span>` : ''}
+                        <div class="audit-reason">${log.reason || ''}</div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function renderPointOptions(points) {
+            const select = document.getElementById('import-point');
+            select.innerHTML = '<option value="">请选择</option>';
+            points.forEach(p => {
+                select.innerHTML += `<option value="${p.id}">${p.name} (${p.district})</option>`;
+            });
+        }
+
+        function showOrderDetail(orderId) {
+            currentOrderId = orderId;
+            fetch(`/api/orders/${orderId}`)
+                .then(r => r.json())
+                .then(detail => {
+                    const order = detail.order;
+                    const records = detail.records || [];
+                    const audit = detail.audit_logs || [];
+
+                    let html = `
+                        <div class="workflow-steps">
+                            <div class="workflow-step done">① 施工告示导入</div>
+                            <div class="workflow-step ${records.length > 1 ? 'done' : 'active'}">② 补录坡道记录</div>
+                            <div class="workflow-step ${order.status === '正常' ? 'done' : 'active'}">③ 热力图更新/复核</div>
+                        </div>
+
+                        <h3 style="margin-bottom: 10px;">${order.title}</h3>
+                        <p style="color: #666; margin-bottom: 15px;">${order.description}</p>
+
+                        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                            <span class="status-badge ${statusClass(order.status)}">${statusLabel(order.status)}</span>
+                            <span class="tag">得分: ${order.heatmap_score}</span>
+                            <span class="tag">负责人: ${order.responsible_person || '-'}</span>
+                        </div>
+
+                        <div class="reason-note">
+                            <strong>状态说明：</strong>${order.missing_reason || '无'}<br>
+                            <strong>下一步：</strong>${order.next_action || '无'}
+                        </div>
+
+                        <h4 style="margin: 20px 0 10px;">📋 采样记录 (${records.length})</h4>
+                    `;
+
+                    records.forEach(r => {
+                        html += `
+                            <div style="padding: 8px; background: #f9f9f9; border-radius: 4px; margin-bottom: 6px; font-size: 13px;">
+                                <span class="tag">${r.sampling_time}</span>
+                                <span class="tag">${r.record_type}</span>
+                                <span style="margin-left: 8px;">得分: ${r.score}</span>
+                            </div>
+                        `;
+                    });
+
+                    html += `
+                        <h4 style="margin: 20px 0 10px;">📜 变更历史</h4>
+                    `;
+
+                    audit.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp)).forEach(log => {
+                        const time = new Date(log.timestamp).toLocaleString('zh-CN');
+                        html += `
+                            <div class="audit-log">
+                                <span class="audit-time">${time}</span>
+                                <span class="audit-operator">${log.operator}</span>
+                                <span class="tag">${log.action}</span>
+                                <div class="audit-reason">${log.reason || ''}</div>
+                            </div>
+                        `;
+                    });
+
+                    html += `
+                        <div style="margin-top: 20px; display: flex; gap: 10px;">
+                            <button class="btn btn-success" onclick="openSupplementModal()">补录无障碍坡道</button>
+                            <button class="btn btn-warning" onclick="openCorrectModal()">人工修正</button>
+                            <button class="btn btn-primary" onclick="openReviewModal()">街道规划员复核</button>
+                        </div>
+                    `;
+
+                    document.getElementById('order-detail-content').innerHTML = html;
+                    document.getElementById('order-modal').classList.add('active');
+                });
+        }
+
+        function closeOrderModal() {
+            document.getElementById('order-modal').classList.remove('active');
+        }
+
+        function openSupplementModal() {
+            const desc = prompt('请输入无障碍坡道记录描述：', '坡道完好，扶手齐全，防滑条有效');
+            if (!desc) return;
+            const isNight = confirm('是否为晚间采样？(确定=晚间，取消=白天)');
+
+            fetch(`/api/orders/${currentOrderId}/supplement-ramp`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ramp_description: desc,
+                    operator: '市政巡检员小付',
+                    is_night: isNight
+                })
+            }).then(r => r.json()).then(res => {
+                if (res.success) {
+                    alert('补录成功！');
+                    closeOrderModal();
+                    fetchData();
+                }
+            });
+        }
+
+        function openCorrectModal() {
+            const note = prompt('请输入人工修正说明：', '现场核实后修正');
+            if (!note) return;
+
+            fetch(`/api/orders/${currentOrderId}/correct`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    correction_note: note,
+                    operator: '市政巡检员小付',
+                    status: '正常'
+                })
+            }).then(r => r.json()).then(res => {
+                if (res.success) {
+                    alert('修正成功！');
+                    closeOrderModal();
+                    fetchData();
+                }
+            });
+        }
+
+        function openReviewModal() {
+            const approved = confirm('是否通过复核？(确定=通过，取消=不通过)');
+            const note = prompt('请输入复核意见：', approved ? '复核通过，数据完整' : '需补充晚间采样数据');
+            if (!note) return;
+
+            fetch(`/api/orders/${currentOrderId}/review`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    approved: approved,
+                    review_note: note,
+                    reviewer: '街道规划员'
+                })
+            }).then(r => r.json()).then(res => {
+                if (res.success) {
+                    alert('复核完成！');
+                    closeOrderModal();
+                    fetchData();
+                }
+            });
+        }
+
+        function initDemo() {
+            fetch('/api/init-demo', { method: 'POST' })
+                .then(r => r.json())
+                .then(res => {
+                    alert(res.message);
+                    fetchData();
+                });
+        }
+
+        function rerunHeatmap() {
+            fetch('/api/heatmap/rerun', { method: 'POST' })
+                .then(r => r.json())
+                .then(res => {
+                    alert(`热力图重跑完成！版本: v${res.version}\n提示: ${res.notes.join('\\n')}`);
+                    fetchData();
+                });
+        }
+
+        function openImportModal() {
+            document.getElementById('import-modal').classList.add('active');
+        }
+
+        function closeImportModal() {
+            document.getElementById('import-modal').classList.remove('active');
+        }
+
+        function doImport() {
+            const pointId = document.getElementById('import-point').value;
+            const title = document.getElementById('import-title').value;
+            const desc = document.getElementById('import-desc').value;
+            const operator = document.getElementById('import-operator').value;
+
+            if (!pointId || !title || !desc) {
+                alert('请填写完整信息');
+                return;
+            }
+
+            fetch('/api/orders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ point_id: pointId, title, description: desc, operator })
+            }).then(r => r.json()).then(res => {
+                if (res.success) {
+                    alert('导入成功！');
+                    closeImportModal();
+                    fetchData();
+                }
+            });
+        }
+
+        fetchData();
+        setInterval(fetchData, 10000);
+    </script>
+</body>
+</html>

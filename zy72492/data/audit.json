@@ -1,0 +1,103 @@
+[
+  {
+    "id": "a6b30231",
+    "order_id": "d6578c1f",
+    "action": "导入",
+    "operator": "系统导入",
+    "timestamp": "2026-06-07 10:25:49.283477",
+    "changes": {
+      "record_added": "c74a8614",
+      "order_created": "d6578c1f"
+    },
+    "reason": "导入施工告示"
+  },
+  {
+    "id": "e3a9d645",
+    "order_id": null,
+    "action": "重跑",
+    "operator": "系统导入",
+    "timestamp": "2026-06-07 10:25:49.283840",
+    "changes": {
+      "heatmap_version": 1,
+      "notes_count": 1
+    },
+    "reason": "导入施工告示: 人民广场街道座椅破损"
+  },
+  {
+    "id": "34784529",
+    "order_id": "d6578c1f",
+    "action": "补录",
+    "operator": "市政巡检员小付",
+    "timestamp": "2026-06-07 10:25:49.284318",
+    "changes": {
+      "record_added": "45ccb1c8",
+      "old_status": "晚上缺采样导致热力图偏低",
+      "new_status": "晚上缺采样导致热力图偏低",
+      "old_reason": "施工告示已导入，但缺少晚间采样和无障碍坡道记录",
+      "new_reason": "已补录无障碍坡道记录，但仍缺少晚间采样，热力图偏低"
+    },
+    "reason": "补录无障碍坡道记录（白天）"
+  },
+  {
+    "id": "e4c4fc31",
+    "order_id": null,
+    "action": "重跑",
+    "operator": "市政巡检员小付",
+    "timestamp": "2026-06-07 10:25:49.284578",
+    "changes": {
+      "heatmap_version": 2,
+      "notes_count": 1
+    },
+    "reason": "补录无障碍坡道记录: 地铁站3号出口无障碍坡道完好，坡度1:12，扶手齐全，防滑条"
+  },
+  {
+    "id": "979c58ac",
+    "order_id": null,
+    "action": "重跑",
+    "operator": "市政巡检员小付",
+    "timestamp": "2026-06-07 10:25:49.284957",
+    "changes": {
+      "heatmap_version": 3,
+      "notes_count": 1
+    },
+    "reason": "流程验证重跑"
+  },
+  {
+    "id": "bef32269",
+    "order_id": "d6578c1f",
+    "action": "人工修正",
+    "operator": "市政巡检员小付",
+    "timestamp": "2026-06-07 10:25:49.285293",
+    "changes": {
+      "old_status": "晚上缺采样导致热力图偏低",
+      "new_status": "人工修正",
+      "old_reason": "已补录无障碍坡道记录，但仍缺少晚间采样，热力图偏低",
+      "new_reason": "经现场核实，该点位晚间有路灯照明，可视条件良好，无需额外晚间采样"
+    },
+    "reason": "现场核实：人民广场地铁站出口24小时有照明，晚间采样条件满足"
+  },
+  {
+    "id": "73d83ab5",
+    "order_id": null,
+    "action": "重跑",
+    "operator": "市政巡检员小付",
+    "timestamp": "2026-06-07 10:25:49.285701",
+    "changes": {
+      "heatmap_version": 4,
+      "notes_count": 1
+    },
+    "reason": "人工修正: 现场核实：人民广场地铁站出口24小时有照明，晚间采样条件满足"
+  },
+  {
+    "id": "cb62e72a",
+    "order_id": null,
+    "action": "重跑",
+    "operator": "系统",
+    "timestamp": "2026-06-07 10:25:49.286135",
+    "changes": {
+      "heatmap_version": 5,
+      "notes_count": 1
+    },
+    "reason": "人工修正后重跑"
+  }
+]
