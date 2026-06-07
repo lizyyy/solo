@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>低碳街区出行账本</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; 
+               background: #f5f7fa; color: #333; }
+        .header { background: linear-gradient(135deg, #2d5a27, #4a7c43); color: white; 
+                  padding: 16px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .header h1 { font-size: 22px; }
+        .header p { font-size: 13px; opacity: 0.9; margin-top: 4px; }
+        .nav { display: flex; gap: 8px; padding: 12px 24px; background: white; 
+               border-bottom: 1px solid #e4e7ed; flex-wrap: wrap; }
+        .nav button { padding: 8px 16px; border: none; background: #f0f2f5; 
+                      border-radius: 6px; cursor: pointer; font-size: 14px; }
+        .nav button.active { background: #2d5a27; color: white; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px 24px; }
+        .card { background: white; border-radius: 8px; padding: 20px; 
+                margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .card h2 { font-size: 16px; margin-bottom: 16px; color: #2d5a27; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); 
+                      gap: 16px; }
+        .stat-card { background: #f8faf8; border-left: 4px solid #2d5a27; 
+                     padding: 16px; border-radius: 6px; }
+        .stat-card .num { font-size: 28px; font-weight: bold; color: #2d5a27; }
+        .stat-card .label { font-size: 13px; color: #666; margin-top: 4px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8faf8; font-weight: 600; color: #2d5a27; }
+        tr:hover { background: #f8faf8; }
+        .tag { display: inline-block; padding: 2px 8px; border-radius: 10px; 
+               font-size: 12px; }
+        .tag-imported { background: #e8f5e9; color: #2e7d32; }
+        .tag-needs_recalc { background: #fff3e0; color: #e65100; }
+        .tag-recalculated { background: #e3f2fd; color: #1565c0; }
+        .tag-pending { background: #fce4ec; color: #c2185b; }
+        .tag-reviewed { background: #e8f5e9; color: #2e7d32; }
+        .btn { padding: 6px 14px; border: none; border-radius: 4px; 
+               cursor: pointer; font-size: 13px; }
+        .btn-primary { background: #2d5a27; color: white; }
+        .btn-warning { background: #f57c00; color: white; }
+        .btn-danger { background: #c62828; color: white; }
+        .form-row { display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+        .form-group { flex: 1; min-width: 150px; }
+        .form-group label { display: block; font-size: 13px; margin-bottom: 4px; color: #555; }
+        .form-group input, .form-group select, .form-group textarea { 
+            width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; 
+            font-size: 14px; }
+        .section { display: none; }
+        .section.active { display: block; }
+        .check-result { padding: 12px; border-radius: 6px; margin-bottom: 10px; }
+        .check-pass { background: #e8f5e9; border-left: 4px solid #2e7d32; }
+        .check-fail { background: #ffebee; border-left: 4px solid #c62828; }
+        .step-indicator { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+        .step { flex: 1; min-width: 140px; padding: 12px; background: #f0f2f5; 
+                border-radius: 6px; text-align: center; font-size: 13px; }
+        .step.done { background: #c8e6c9; color: #2e7d32; }
+        .step.current { background: #2d5a27; color: white; }
+        .alert { padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; font-size: 14px; }
+        .alert-warn { background: #fff3e0; border-left: 4px solid #f57c00; }
+        .log-entry { padding: 8px; border-bottom: 1px solid #eee; font-size: 12px; 
+                     font-family: monospace; }
+        .highlight { background: #fff9c4; padding: 2px 4px; border-radius: 2px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🌿 低碳街区出行账本</h1>
+        <p>市政巡检员专用 · 数据可追溯 · 证据链完整</p>
+    </div>
+    
+    <div class="nav">
+        <button class="active" onclick="showSection('summary')">📊 摘要看板</button>
+        <button onclick="showSection('import')">📥 导入数据</button>
+        <button onclick="showSection('communities')">🏘️ 小区复核</button>
+        <button onclick="showSection('records')">📋 巡查明细</button>
+        <button onclick="showSection('notices')">🚧 施工告示</button>
+        <button onclick="showSection('check')">✅ 自检中心</button>
+        <button onclick="showSection('logs')">📜 操作日志</button>
+        <button class="btn-primary" style="margin-left:auto" onclick="exportData()">📤 导出账本</button>
+    </div>
+    
+    <div class="container">
+        <div class="step-indicator">
+            <div class="step" id="step1">第一步<br>导入巡查表</div>
+            <div class="step" id="step2">第二步<br>补看施工告示</div>
+            <div class="step" id="step3">第三步<br>街道会摘要</div>
+        </div>
+        
+        <div id="section-summary" class="section active">
+            <div class="card">
+                <h2>📊 数据概览</h2>
+                <div class="stats-grid" id="statsGrid"></div>
+            </div>
+            <div class="card">
+                <h2>🏆 低碳得分排名（前10）</h2>
+                <table id="topCommunitiesTable">
+                    <thead><tr><th>排名</th><th>小区名称</th><th>出行次数</th><th>低碳得分</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="section-import" class="section">
+            <div class="card">
+                <h2>📥 导入网格员巡查表</h2>
+                <div class="alert alert-warn">
+                    ⚠️ 导入前请确认：Excel包含「小区名称、出行方式、出行次数、低碳得分、巡查日期、网格员」列。同一小区有新旧两个名字的记录<strong>不会自动合并</strong>，将留在复核环节由您确认。
+                </div>
+                <input type="file" id="fileInput" accept=".xlsx,.xls" style="margin-bottom:12px">
+                <br>
+                <button class="btn btn-primary" onclick="importFile()">开始导入</button>
+                <div id="importResult" style="margin-top:16px"></div>
+            </div>
+        </div>
+        
+        <div id="section-communities" class="section">
+            <div class="card">
+                <h2>🏘️ 小区名称复核（新旧名关联）</h2>
+                <div class="alert alert-warn">
+                    ⚠️ 发现疑似同一小区的新旧名称，请手动确认关联。确认后明细、导出、接口将读取同一关联结果。
+                </div>
+                <table id="communitiesTable">
+                    <thead><tr><th>ID</th><th>小区名称</th><th>记录数</th><th>关联别名</th><th>状态</th><th>操作</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div class="card" id="aliasPanel" style="display:none">
+                <h2>🔗 设置别名关联</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>当前小区</label>
+                        <input type="text" id="aliasFromName" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>关联到（同一小区的另一个名字）</label>
+                        <select id="aliasToSelect"></select>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="confirmAlias()">确认关联</button>
+                <button class="btn" onclick="cancelAlias()">取消</button>
+            </div>
+        </div>
+        
+        <div id="section-records" class="section">
+            <div class="card">
+                <h2>📋 巡查明细（含原始行号、改动标记、状态）</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>按状态筛选</label>
+                        <select id="recordStatusFilter" onchange="loadRecords()">
+                            <option value="">全部</option>
+                            <option value="imported">已导入</option>
+                            <option value="needs_recalc">需重算</option>
+                            <option value="recalculated">已重算</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>小区筛选</label>
+                        <select id="recordCommunityFilter" onchange="loadRecords()">
+                            <option value="">全部</option>
+                        </select>
+                    </div>
+                </div>
+                <table id="recordsTable">
+                    <thead><tr>
+                        <th>原始行号</th><th>小区名称</th><th>出行方式</th>
+                        <th>出行次数</th><th>低碳得分</th><th>巡查日期</th>
+                        <th>网格员</th><th>人工改动</th><th>处理状态</th><th>操作</th>
+                    </tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div class="card" id="editPanel" style="display:none">
+                <h2>✏️ 编辑记录</h2>
+                <input type="hidden" id="editRecordId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>出行次数</label>
+                        <input type="number" id="editTripCount">
+                    </div>
+                    <div class="form-group">
+                        <label>低碳得分</label>
+                        <input type="number" step="0.1" id="editScore">
+                    </div>
+                    <div class="form-group">
+                        <label>出行方式</label>
+                        <input type="text" id="editTravelMode">
+                    </div>
+                    <div class="form-group">
+                        <label>处理状态</label>
+                        <select id="editStatus">
+                            <option value="imported">已导入</option>
+                            <option value="needs_recalc">需重算</option>
+                            <option value="recalculated">已重算</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group" style="flex:2">
+                        <label>备注</label>
+                        <textarea id="editNotes" rows="2"></textarea>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="saveRecord()">保存修改</button>
+                <button class="btn" onclick="cancelEdit()">取消</button>
+            </div>
+        </div>
+        
+        <div id="section-notices" class="section">
+            <div class="card">
+                <h2>🚧 施工告示补录（市政巡检员小付）</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>小区</label>
+                        <select id="noticeCommunity"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>告示标题</label>
+                        <input type="text" id="noticeTitle" placeholder="如：XX路管线改造">
+                    </div>
+                    <div class="form-group">
+                        <label>告示日期</label>
+                        <input type="date" id="noticeDate">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group" style="flex:2">
+                        <label>告示内容</label>
+                        <textarea id="noticeContent" rows="2"></textarea>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>影响出行次数（增量）</label>
+                        <input type="number" id="noticeTripImpact" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>影响低碳得分（增量）</label>
+                        <input type="number" step="0.1" id="noticeScoreImpact" value="0">
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="addNotice()">添加告示并标记重算</button>
+            </div>
+            <div class="card">
+                <h2>📝 已录入施工告示</h2>
+                <table id="noticesTable">
+                    <thead><tr>
+                        <th>小区</th><th>标题</th><th>日期</th><th>影响出行</th>
+                        <th>影响得分</th><th>录入人</th><th>时间</th>
+                    </tr></thead>
+                    <tbody></tbody>
+                </table>
+                <div style="margin-top:12px">
+                    <button class="btn btn-warning" onclick="recalcAll()">🔄 执行重算（应用施工告示影响）</button>
+                    <span id="recalcResult" style="margin-left:12px"></span>
+                </div>
+            </div>
+        </div>
+        
+        <div id="section-check" class="section">
+            <div class="card">
+                <h2>✅ 自检中心</h2>
+                <p style="margin-bottom:12px">覆盖最容易出错的四个场景：重复导入、同一小区新旧名、补录后重算、导出一致性。</p>
+                <button class="btn btn-primary" onclick="runSelfCheck()">运行自检</button>
+                <div id="checkResults" style="margin-top:16px"></div>
+            </div>
+        </div>
+        
+        <div id="section-logs" class="section">
+            <div class="card">
+                <h2>📜 操作日志（证据链）</h2>
+                <div id="logsList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API = 'http://localhost:5000/api';
+        let currentAliasFrom = null;
+
+        function showSection(name) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById('section-' + name).classList.add('active');
+            document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (name === 'summary') loadSummary();
+            if (name === 'communities') loadCommunities();
+            if (name === 'records') loadRecords();
+            if (name === 'notices') { loadNotices(); loadCommunitySelects(); }
+            if (name === 'check') loadLogs();
+            if (name === 'logs') loadLogs();
+        }
+
+        async function api(path, method = 'GET', body = null) {
+            const opts = { method, headers: {} };
+            if (body && !(body instanceof FormData)) {
+                opts.headers['Content-Type'] = 'application/json';
+                opts.body = JSON.stringify(body);
+            } else if (body) {
+                opts.body = body;
+            }
+            const res = await fetch(API + path, opts);
+            return await res.json();
+        }
+
+        async function loadSummary() {
+            const data = await api('/summary');
+            document.getElementById('statsGrid').innerHTML = `
+                <div class="stat-card"><div class="num">${data.total_records}</div><div class="label">巡查记录数</div></div>
+                <div class="stat-card"><div class="num">${data.total_communities}</div><div class="label">小区总数</div></div>
+                <div class="stat-card"><div class="num">${data.reviewed_communities}</div><div class="label">已复核小区</div></div>
+                <div class="stat-card"><div class="num">${data.total_trips}</div><div class="label">总出行次数</div></div>
+                <div class="stat-card"><div class="num">${data.total_score}</div><div class="label">总低碳得分</div></div>
+                <div class="stat-card"><div class="num">${data.notice_count}</div><div class="label">施工告示数</div></div>
+                <div class="stat-card" style="border-left-color:${data.needs_recalc > 0 ? '#f57c00' : '#2d5a27'}">
+                    <div class="num" style="color:${data.needs_recalc > 0 ? '#f57c00' : '#2d5a27'}">${data.needs_recalc}</div>
+                    <div class="label">待重算记录</div>
+                </div>
+            `;
+            
+            const tbody = document.querySelector('#topCommunitiesTable tbody');
+            tbody.innerHTML = data.top_communities.map((c, i) => `
+                <tr><td>${i+1}</td><td>${c.community_name}</td><td>${c.trips}</td><td>${c.score}</td></tr>
+            `).join('');
+            
+            updateSteps(data);
+        }
+
+        function updateSteps(data) {
+            const s1 = document.getElementById('step1');
+            const s2 = document.getElementById('step2');
+            const s3 = document.getElementById('step3');
+            s1.className = 'step'; s2.className = 'step'; s3.className = 'step';
+            
+            if (data.total_records > 0) {
+                s1.classList.add('done');
+                if (data.notice_count > 0 || data.needs_recalc > 0) {
+                    s2.classList.add('done');
+                    s3.classList.add('current');
+                } else {
+                    s2.classList.add('current');
+                }
+            } else {
+                s1.classList.add('current');
+            }
+        }
+
+        async function importFile() {
+            const file = document.getElementById('fileInput').files[0];
+            if (!file) { alert('请选择文件'); return; }
+            const fd = new FormData();
+            fd.append('file', file);
+            const result = await api('/import', 'POST', fd);
+            document.getElementById('importResult').innerHTML = 
+                `<div class="alert check-pass">✅ 导入成功！批次号：${result.batch_id}，记录数：${result.record_count}</div>`;
+            loadSummary();
+        }
+
+        async function loadCommunities() {
+            const data = await api('/communities');
+            const tbody = document.querySelector('#communitiesTable tbody');
+            tbody.innerHTML = data.map(c => `
+                <tr>
+                    <td>${c.id}</td>
+                    <td class="${c.alias_id ? 'highlight' : ''}">${c.name}</td>
+                    <td>${c.record_count}</td>
+                    <td>${c.alias_name || '-'}</td>
+                    <td><span class="tag tag-${c.status}">${c.status === 'reviewed' ? '已复核' : '待复核'}</span></td>
+                    <td><button class="btn" onclick="openAlias(${c.id}, '${c.name}')">设置别名</button></td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadCommunitySelects() {
+            const data = await api('/communities');
+            const opts = data.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            document.getElementById('noticeCommunity').innerHTML = opts;
+            document.getElementById('recordCommunityFilter').innerHTML = '<option value="">全部</option>' + opts;
+            document.getElementById('aliasToSelect').innerHTML = '<option value="">-- 请选择 --</option>' + 
+                data.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+        }
+
+        function openAlias(id, name) {
+            currentAliasFrom = id;
+            document.getElementById('aliasFromName').value = name;
+            document.getElementById('aliasPanel').style.display = 'block';
+            loadCommunitySelects();
+        }
+
+        function cancelAlias() {
+            currentAliasFrom = null;
+            document.getElementById('aliasPanel').style.display = 'none';
+        }
+
+        async function confirmAlias() {
+            const aliasId = document.getElementById('aliasToSelect').value;
+            if (!aliasId) { alert('请选择要关联的小区'); return; }
+            if (parseInt(aliasId) === currentAliasFrom) { alert('不能关联到自己'); return; }
+            await api(`/communities/${currentAliasFrom}/alias`, 'POST', { alias_id: parseInt(aliasId), operator: '小付' });
+            alert('关联成功！');
+            cancelAlias();
+            loadCommunities();
+            loadSummary();
+        }
+
+        async function loadRecords() {
+            const status = document.getElementById('recordStatusFilter').value;
+            const cid = document.getElementById('recordCommunityFilter').value;
+            let url = '/records';
+            const params = [];
+            if (status) params.push(`status=${status}`);
+            if (cid) params.push(`community_id=${cid}`);
+            if (params.length) url += '?' + params.join('&');
+            const data = await api(url);
+            
+            const tbody = document.querySelector('#recordsTable tbody');
+            tbody.innerHTML = data.map(r => `
+                <tr>
+                    <td><strong>${r.original_row}</strong></td>
+                    <td>${r.community_name}</td>
+                    <td>${r.travel_mode}</td>
+                    <td>${r.trip_count}</td>
+                    <td>${r.low_carbon_score}</td>
+                    <td>${r.patrol_date}</td>
+                    <td>${r.grid_member}</td>
+                    <td>${r.manual_edited ? '🔴 已改动' : '⚪ 原始'}</td>
+                    <td><span class="tag tag-${r.processing_status}">${getStatusText(r.processing_status)}</span></td>
+                    <td><button class="btn" onclick="openEdit(${r.id})">编辑</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function getStatusText(s) {
+            return { imported: '已导入', needs_recalc: '需重算', recalculated: '已重算' }[s] || s;
+        }
+
+        async function openEdit(id) {
+            const records = await api('/records');
+            const r = records.find(x => x.id === id);
+            if (!r) return;
+            document.getElementById('editRecordId').value = id;
+            document.getElementById('editTripCount').value = r.trip_count;
+            document.getElementById('editScore').value = r.low_carbon_score;
+            document.getElementById('editTravelMode').value = r.travel_mode || '';
+            document.getElementById('editStatus').value = r.processing_status;
+            document.getElementById('editNotes').value = r.notes || '';
+            document.getElementById('editPanel').style.display = 'block';
+        }
+
+        function cancelEdit() {
+            document.getElementById('editPanel').style.display = 'none';
+        }
+
+        async function saveRecord() {
+            const id = document.getElementById('editRecordId').value;
+            await api(`/records/${id}`, 'PUT', {
+                trip_count: parseInt(document.getElementById('editTripCount').value),
+                low_carbon_score: parseFloat(document.getElementById('editScore').value),
+                travel_mode: document.getElementById('editTravelMode').value,
+                processing_status: document.getElementById('editStatus').value,
+                notes: document.getElementById('editNotes').value,
+                operator: '小付'
+            });
+            alert('保存成功');
+            cancelEdit();
+            loadRecords();
+            loadSummary();
+        }
+
+        async function loadNotices() {
+            const data = await api('/construction-notices');
+            const tbody = document.querySelector('#noticesTable tbody');
+            tbody.innerHTML = data.map(n => `
+                <tr>
+                    <td>${n.community_name}</td>
+                    <td>${n.notice_title}</td>
+                    <td>${n.notice_date}</td>
+                    <td>+${n.impact_trip_count}</td>
+                    <td>+${n.impact_low_carbon_score}</td>
+                    <td>${n.added_by}</td>
+                    <td>${n.created_at}</td>
+                </tr>
+            `).join('');
+        }
+
+        async function addNotice() {
+            const cid = document.getElementById('noticeCommunity').value;
+            const cname = document.getElementById('noticeCommunity').selectedOptions[0].text;
+            await api('/construction-notices', 'POST', {
+                community_id: parseInt(cid),
+                community_name: cname,
+                notice_title: document.getElementById('noticeTitle').value,
+                notice_content: document.getElementById('noticeContent').value,
+                notice_date: document.getElementById('noticeDate').value,
+                impact_trip_count: parseInt(document.getElementById('noticeTripImpact').value) || 0,
+                impact_low_carbon_score: parseFloat(document.getElementById('noticeScoreImpact').value) || 0,
+                operator: '小付'
+            });
+            alert('告示已添加，相关记录已标记为需重算');
+            document.getElementById('noticeTitle').value = '';
+            document.getElementById('noticeContent').value = '';
+            document.getElementById('noticeTripImpact').value = '0';
+            document.getElementById('noticeScoreImpact').value = '0';
+            loadNotices();
+            loadRecords();
+            loadSummary();
+        }
+
+        async function recalcAll() {
+            const r = await api('/recalc', 'POST', { operator: '小付' });
+            document.getElementById('recalcResult').textContent = `✅ 已重算 ${r.recalculated} 条记录`;
+            loadRecords();
+            loadSummary();
+        }
+
+        async function runSelfCheck() {
+            const results = await api('/self-check');
+            const div = document.getElementById('checkResults');
+            div.innerHTML = results.map(r => `
+                <div class="check-result ${r.passed ? 'check-pass' : 'check-fail'}">
+                    <strong>${r.check_type}</strong>：${r.passed ? '✅ 通过' : '❌ 发现问题'}
+                    <br><small>${JSON.stringify(r)}</small>
+                </div>
+            `).join('');
+        }
+
+        async function loadLogs() {
+            const data = await api('/operation-logs?limit=200');
+            document.getElementById('logsList').innerHTML = data.map(l => `
+                <div class="log-entry">
+                    [${l.created_at}] ${l.operator} - ${l.operation_type} 
+                    ${l.old_value ? `| 旧: ${l.old_value}` : ''} 
+                    ${l.new_value ? `| 新: ${l.new_value}` : ''}
+                </div>
+            `).join('');
+        }
+
+        function exportData() {
+            window.open(API + '/export', '_blank');
+        }
+
+        loadSummary();
+        loadCommunitySelects();
+    </script>
+</body>
+</html>
