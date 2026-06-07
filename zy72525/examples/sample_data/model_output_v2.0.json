@@ -1,0 +1,16 @@
+[
+  {
+    "sample_id": "S001",
+    "original_line_number": 15,
+    "raw_content": "您好，感谢您的来信。我是自动回复助手，您的邮件已收到，我们会尽快处理。",
+    "is_auto_reply_risk": false,
+    "risk_score": 35
+  },
+  {
+    "sample_id": "S001",
+    "original_line_number": 45,
+    "raw_content": "新的邮件片段内容...",
+    "is_auto_reply_risk": true,
+    "risk_score": 78
+  }
+]

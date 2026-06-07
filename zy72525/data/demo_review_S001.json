@@ -1,0 +1,143 @@
+{
+  "step": "step3_product_review",
+  "timestamp": "2026-06-07T04:31:55.304993",
+  "generated_by": "system",
+  "sample_id": "S001",
+  "timeline": {
+    "sample_id": "S001",
+    "fragments_count": 4,
+    "model_versions": [
+      "v1.0",
+      "v2.0"
+    ],
+    "change_history": [
+      {
+        "change_id": 1,
+        "change_type": "import",
+        "changed_by": "系统导入",
+        "changed_at": "2026-06-07T04:31:55.257490",
+        "original_line_number": 15,
+        "model_version_before": null,
+        "model_version_after": "v1.0",
+        "is_risk_before": null,
+        "is_risk_after": true,
+        "status_before": null,
+        "status_after": "pending_import",
+        "remark": "首次导入模型v1.0输出",
+        "batch_id": "batch_v1_001"
+      },
+      {
+        "change_id": 2,
+        "change_type": "import",
+        "changed_by": "系统导入",
+        "changed_at": "2026-06-07T04:31:55.262677",
+        "original_line_number": 23,
+        "model_version_before": null,
+        "model_version_after": "v1.0",
+        "is_risk_before": null,
+        "is_risk_after": false,
+        "status_before": null,
+        "status_after": "pending_import",
+        "remark": "首次导入模型v1.0输出",
+        "batch_id": "batch_v1_001"
+      },
+      {
+        "change_id": 4,
+        "change_type": "model_version_change",
+        "changed_by": "系统导入",
+        "changed_at": "2026-06-07T04:31:55.275357",
+        "original_line_number": 15,
+        "model_version_before": null,
+        "model_version_after": "v2.0",
+        "is_risk_before": null,
+        "is_risk_after": false,
+        "status_before": null,
+        "status_after": "needs_recheck",
+        "remark": "检测到模型版本变更：旧版本=['v1.0'], 新版本=v2.0，状态置为 NEEDS_RECHECK，待运营复核人确认",
+        "batch_id": "batch_v2_001"
+      },
+      {
+        "change_id": 5,
+        "change_type": "import",
+        "changed_by": "系统导入",
+        "changed_at": "2026-06-07T04:31:55.275360",
+        "original_line_number": 15,
+        "model_version_before": null,
+        "model_version_after": "v2.0",
+        "is_risk_before": null,
+        "is_risk_after": false,
+        "status_before": null,
+        "status_after": "needs_recheck",
+        "remark": "导入模型v2.0输出，同一样本编号S001",
+        "batch_id": "batch_v2_001"
+      },
+      {
+        "change_id": 6,
+        "change_type": "model_version_change",
+        "changed_by": "系统导入",
+        "changed_at": "2026-06-07T04:31:55.280065",
+        "original_line_number": 45,
+        "model_version_before": null,
+        "model_version_after": "v2.0",
+        "is_risk_before": null,
+        "is_risk_after": true,
+        "status_before": null,
+        "status_after": "needs_recheck",
+        "remark": "检测到模型版本变更：旧版本=['v1.0'], 新版本=v2.0，状态置为 NEEDS_RECHECK，待运营复核人确认",
+        "batch_id": "batch_v2_001"
+      },
+      {
+        "change_id": 7,
+        "change_type": "import",
+        "changed_by": "系统导入",
+        "changed_at": "2026-06-07T04:31:55.280067",
+        "original_line_number": 45,
+        "model_version_before": null,
+        "model_version_after": "v2.0",
+        "is_risk_before": null,
+        "is_risk_after": true,
+        "status_before": null,
+        "status_after": "needs_recheck",
+        "remark": "导入模型v2.0输出，同一样本编号S001",
+        "batch_id": "batch_v2_001"
+      },
+      {
+        "change_id": 8,
+        "change_type": "manual_edit",
+        "changed_by": "周姐",
+        "changed_at": "2026-06-07T04:31:55.301241",
+        "original_line_number": 15,
+        "model_version_before": "v1.0",
+        "model_version_after": "v1.0",
+        "is_risk_before": true,
+        "is_risk_after": false,
+        "status_before": "batch_v1_001",
+        "status_after": "normal",
+        "remark": "周姐人工确认：这不是自动回复，是客户真实回复，语气和之前有差异",
+        "batch_id": "review_batch_001"
+      }
+    ],
+    "summary_history": [
+      {
+        "model_version": "v2.0",
+        "total_fragments": 2,
+        "risk_count": 1,
+        "normal_count": 1,
+        "pending_count": 0,
+        "needs_recheck_count": 0,
+        "last_updated": "2026-06-07T04:31:55.289199",
+        "last_updated_by": "系统导入"
+      },
+      {
+        "model_version": "v1.0",
+        "total_fragments": 2,
+        "risk_count": 0,
+        "normal_count": 2,
+        "pending_count": 0,
+        "needs_recheck_count": 0,
+        "last_updated": "2026-06-07T04:31:55.302143",
+        "last_updated_by": "周姐"
+      }
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+[
+  {
+    "sample_id": "S001",
+    "original_line_number": 15,
+    "raw_content": "您好，感谢您的来信。我是自动回复助手，您的邮件已收到，我们会尽快处理。",
+    "is_auto_reply_risk": true,
+    "risk_score": 85
+  },
+  {
+    "sample_id": "S001",
+    "original_line_number": 23,
+    "raw_content": "关于您咨询的产品问题，详细说明如下：...",
+    "is_auto_reply_risk": false,
+    "risk_score": 20
+  },
+  {
+    "sample_id": "S002",
+    "original_line_number": 8,
+    "raw_content": "系统自动回复：您的订单已发货，请注意查收。",
+    "is_auto_reply_risk": true,
+    "risk_score": 92
+  }
+]
