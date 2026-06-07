@@ -1,0 +1,16 @@
+{
+  "record_id": "audit_ceb91b2e",
+  "timestamp": "2026-06-07 15:39:29",
+  "operator": "推荐策略老唐",
+  "action": "运行异常检测",
+  "target_type": "detection",
+  "target_id": "2026-06-07 15:39:29",
+  "change_summary": "检出 3 条异常样本",
+  "reason": "标出时间窗穿越导致的效果虚高，避免结论出错",
+  "impacted_results": [
+    "检测到 3 条「时间窗穿越」异常，效果可能虚高，需复核",
+    "⚠️ 这些样本不急着归正常，留给实验平台负责人复核",
+    "其余 0 条其他类型异常"
+  ],
+  "metadata": {}
+}

@@ -1,0 +1,79 @@
+{
+  "sample_id": "anom_2bd0318a",
+  "candidate_id": "cand_010",
+  "candidate": {
+    "candidate_id": "cand_010",
+    "strategy_name": "再营销",
+    "arm_id": "arm_kappa",
+    "impression": 18000,
+    "click": 720,
+    "ctr": 0.04,
+    "cost": 1440.0,
+    "budget_utilization": 0.76,
+    "time_window_start": "2026-06-01 12:00:00",
+    "time_window_end": "2026-06-02 11:59:59",
+    "metrics": {
+      "revenue": 4500.0,
+      "conversion": 160
+    },
+    "is_anomaly": true,
+    "anomaly_tags": [
+      "time_window_cross"
+    ],
+    "anomaly_notes": ""
+  },
+  "detected_at": "2026-06-07 15:39:29",
+  "anomaly_type": "time_window_cross",
+  "severity": "high",
+  "reason_description": "候选 [cand_010] 策略 [再营销] 存在时间窗穿越问题：\n时间范围：2026-06-01 12:00:00 ~ 2026-06-02 11:59:59\n- 时间窗口跨天：从 2026-06-01 穿越到 2026-06-02\n当前CTR=0.0400，曝光=18000，可能因时间窗穿越导致效果虚高，结论不可直接使用",
+  "missing_materials": [
+    "该时间窗口对应的活动排期表",
+    "数据上报的时间戳对齐记录",
+    "是否存在手动补数据的操作记录",
+    "同期其他策略是否也有类似穿越"
+  ],
+  "next_step_owner": "实验平台负责人",
+  "next_step_action": "复核时间窗口配置，确认是否为真实跨天活动",
+  "is_verified": false,
+  "verified_by": "",
+  "verified_at": "",
+  "correction_notes": "",
+  "correction_history": [],
+  "params_snapshot": {
+    "version": "1.0.0",
+    "time_window_size_hours": 24,
+    "min_impression_threshold": 10000,
+    "ctr_significance_threshold": 0.005,
+    "cost_ceiling": 5000.0,
+    "budget_allocation": {
+      "冷启动探索": 0.2,
+      "爆款追投": 0.4,
+      "长尾精准": 0.15,
+      "新用户召回": 0.15,
+      "再营销": 0.1
+    },
+    "anomaly_detection_rules": [
+      {
+        "name": "时间窗穿越检测",
+        "rule_type": "time_window_cross",
+        "description": "检测时间窗口是否跨天或跨统计周期，可能导致效果虚高",
+        "enabled": true
+      },
+      {
+        "name": "CTR异常偏高检测",
+        "rule_type": "ctr_outlier",
+        "threshold": 0.08,
+        "description": "CTR超过阈值可能存在作弊或统计异常",
+        "enabled": true
+      },
+      {
+        "name": "预算超支检测",
+        "rule_type": "budget_overrun",
+        "threshold": 0.95,
+        "description": "预算利用率超过阈值需要预警",
+        "enabled": true
+      }
+    ],
+    "owner": "推荐策略老唐"
+  }
+}

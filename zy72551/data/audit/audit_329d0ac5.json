@@ -1,0 +1,15 @@
+{
+  "record_id": "audit_329d0ac5",
+  "timestamp": "2026-06-07 15:39:29",
+  "operator": "实验平台负责人",
+  "action": "人工修正异常样本",
+  "target_type": "anomaly",
+  "target_id": "anom_d5c9221a",
+  "change_summary": "标记为已复核; 下一步负责人从 实验平台负责人 改为 推荐策略老唐; 补充修正备注：已确认该时间窗对应618大促跨天活动，数据已对齐，效果可信",
+  "reason": "已确认该时间窗对应618大促跨天活动，数据已对齐，效果可信",
+  "impacted_results": [
+    "异常样本页 anom_d5c9221a 已更新",
+    "汇总报告同步刷新"
+  ],
+  "metadata": {}
+}

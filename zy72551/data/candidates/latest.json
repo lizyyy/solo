@@ -1,0 +1,198 @@
+[
+  {
+    "candidate_id": "cand_001",
+    "strategy_name": "冷启动探索",
+    "arm_id": "arm_alpha",
+    "impression": 15000,
+    "click": 450,
+    "ctr": 0.03,
+    "cost": 1200.5,
+    "budget_utilization": 0.72,
+    "time_window_start": "2026-06-01 00:00:00",
+    "time_window_end": "2026-06-01 23:59:59",
+    "metrics": {
+      "revenue": 3500.0,
+      "conversion": 120
+    },
+    "is_anomaly": false,
+    "anomaly_tags": [],
+    "anomaly_notes": ""
+  },
+  {
+    "candidate_id": "cand_002",
+    "strategy_name": "冷启动探索",
+    "arm_id": "arm_beta",
+    "impression": 12000,
+    "click": 384,
+    "ctr": 0.032,
+    "cost": 950.0,
+    "budget_utilization": 0.68,
+    "time_window_start": "2026-06-01 00:00:00",
+    "time_window_end": "2026-06-01 23:59:59",
+    "metrics": {
+      "revenue": 2800.0,
+      "conversion": 95
+    },
+    "is_anomaly": false,
+    "anomaly_tags": [],
+    "anomaly_notes": ""
+  },
+  {
+    "candidate_id": "cand_003",
+    "strategy_name": "爆款追投",
+    "arm_id": "arm_gamma",
+    "impression": 58000,
+    "click": 2320,
+    "ctr": 0.04,
+    "cost": 4200.0,
+    "budget_utilization": 0.95,
+    "time_window_start": "2026-06-01 06:00:00",
+    "time_window_end": "2026-06-02 05:59:59",
+    "metrics": {
+      "revenue": 12500.0,
+      "conversion": 420
+    },
+    "is_anomaly": true,
+    "anomaly_tags": [
+      "time_window_cross"
+    ],
+    "anomaly_notes": ""
+  },
+  {
+    "candidate_id": "cand_004",
+    "strategy_name": "爆款追投",
+    "arm_id": "arm_delta",
+    "impression": 42000,
+    "click": 1470,
+    "ctr": 0.035,
+    "cost": 3100.0,
+    "budget_utilization": 0.82,
+    "time_window_start": "2026-06-01 00:00:00",
+    "time_window_end": "2026-06-01 23:59:59",
+    "metrics": {
+      "revenue": 8900.0,
+      "conversion": 310
+    },
+    "is_anomaly": false,
+    "anomaly_tags": [],
+    "anomaly_notes": ""
+  },
+  {
+    "candidate_id": "cand_005",
+    "strategy_name": "长尾精准",
+    "arm_id": "arm_epsilon",
+    "impression": 8000,
+    "click": 120,
+    "ctr": 0.015,
+    "cost": 320.0,
+    "budget_utilization": 0.45,
+    "time_window_start": "2026-06-01 00:00:00",
+    "time_window_end": "2026-06-01 23:59:59",
+    "metrics": {
+      "revenue": 720.0,
+      "conversion": 28
+    },
+    "is_anomaly": false,
+    "anomaly_tags": [],
+    "anomaly_notes": ""
+  },
+  {
+    "candidate_id": "cand_006",
+    "strategy_name": "长尾精准",
+    "arm_id": "arm_zeta",
+    "impression": 6500,
+    "click": 91,
+    "ctr": 0.014,
+    "cost": 260.0,
+    "budget_utilization": 0.38,
+    "time_window_start": "2026-06-01 00:00:00",
+    "time_window_end": "2026-06-01 23:59:59",
+    "metrics": {
+      "revenue": 580.0,
+      "conversion": 22
+    },
+    "is_anomaly": false,
+    "anomaly_tags": [],
+    "anomaly_notes": ""
+  },
+  {
+    "candidate_id": "cand_007",
+    "strategy_name": "新用户召回",
+    "arm_id": "arm_eta",
+    "impression": 25000,
+    "click": 875,
+    "ctr": 0.035,
+    "cost": 1850.0,
+    "budget_utilization": 0.78,
+    "time_window_start": "2026-05-31 18:00:00",
+    "time_window_end": "2026-06-01 17:59:59",
+    "metrics": {
+      "revenue": 5200.0,
+      "conversion": 185
+    },
+    "is_anomaly": true,
+    "anomaly_tags": [
+      "time_window_cross"
+    ],
+    "anomaly_notes": ""
+  },
+  {
+    "candidate_id": "cand_008",
+    "strategy_name": "新用户召回",
+    "arm_id": "arm_theta",
+    "impression": 22000,
+    "click": 660,
+    "ctr": 0.03,
+    "cost": 1500.0,
+    "budget_utilization": 0.71,
+    "time_window_start": "2026-06-01 00:00:00",
+    "time_window_end": "2026-06-01 23:59:59",
+    "metrics": {
+      "revenue": 4100.0,
+      "conversion": 142
+    },
+    "is_anomaly": false,
+    "anomaly_tags": [],
+    "anomaly_notes": ""
+  },
+  {
+    "candidate_id": "cand_009",
+    "strategy_name": "再营销",
+    "arm_id": "arm_iota",
+    "impression": 35000,
+    "click": 1750,
+    "ctr": 0.05,
+    "cost": 2800.0,
+    "budget_utilization": 0.89,
+    "time_window_start": "2026-06-01 00:00:00",
+    "time_window_end": "2026-06-01 23:59:59",
+    "metrics": {
+      "revenue": 9800.0,
+      "conversion": 350
+    },
+    "is_anomaly": false,
+    "anomaly_tags": [],
+    "anomaly_notes": ""
+  },
+  {
+    "candidate_id": "cand_010",
+    "strategy_name": "再营销",
+    "arm_id": "arm_kappa",
+    "impression": 18000,
+    "click": 720,
+    "ctr": 0.04,
+    "cost": 1440.0,
+    "budget_utilization": 0.76,
+    "time_window_start": "2026-06-01 12:00:00",
+    "time_window_end": "2026-06-02 11:59:59",
+    "metrics": {
+      "revenue": 4500.0,
+      "conversion": 160
+    },
+    "is_anomaly": true,
+    "anomaly_tags": [
+      "time_window_cross"
+    ],
+    "anomaly_notes": ""
+  }
+]

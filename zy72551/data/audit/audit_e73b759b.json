@@ -1,0 +1,15 @@
+{
+  "record_id": "audit_e73b759b",
+  "timestamp": "2026-06-07 15:39:29",
+  "operator": "推荐策略老唐",
+  "action": "重跑检测",
+  "target_type": "detection",
+  "target_id": "rerun_2026-06-07 15:39:29",
+  "change_summary": "使用最新参数重新执行异常检测",
+  "reason": "参数或候选表更新后，需要重新评估",
+  "impacted_results": [
+    "所有异常样本将重新生成",
+    "报告页同步刷新"
+  ],
+  "metadata": {}
+}

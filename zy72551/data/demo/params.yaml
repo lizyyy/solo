@@ -1,0 +1,27 @@
+version: "1.0.0"
+time_window_size_hours: 24
+min_impression_threshold: 10000
+ctr_significance_threshold: 0.005
+cost_ceiling: 5000.0
+budget_allocation:
+  冷启动探索: 0.2
+  爆款追投: 0.4
+  长尾精准: 0.15
+  新用户召回: 0.15
+  再营销: 0.1
+anomaly_detection_rules:
+  - name: "时间窗穿越检测"
+    rule_type: "time_window_cross"
+    description: "检测时间窗口是否跨天或跨统计周期，可能导致效果虚高"
+    enabled: true
+  - name: "CTR异常偏高检测"
+    rule_type: "ctr_outlier"
+    threshold: 0.08
+    description: "CTR超过阈值可能存在作弊或统计异常"
+    enabled: true
+  - name: "预算超支检测"
+    rule_type: "budget_overrun"
+    threshold: 0.95
+    description: "预算利用率超过阈值需要预警"
+    enabled: true
+owner: "推荐策略老唐"

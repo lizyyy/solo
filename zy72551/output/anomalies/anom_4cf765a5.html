@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>异常样本 - anom_4cf765a5</title>
+    <style>
+        body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; max-width: 900px; margin: 0 auto; padding: 30px; background: #f8fafc; color: #1e293b; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .severity-badge { padding: 6px 14px; border-radius: 20px; font-weight: 600; color: #dc2626; background: #fef2f2; }
+        .verified-badge { padding: 6px 14px; border-radius: 20px; font-weight: 500; color: #059669; background: #ecfdf5; font-size: 14px; }
+        h1 { font-size: 24px; margin: 0; }
+        h2 { font-size: 18px; color: #334155; border-left: 4px solid #3b82f6; padding-left: 12px; margin-top: 28px; }
+        h3 { font-size: 16px; color: #475569; margin-top: 20px; }
+        .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .info-table { width: 100%; border-collapse: collapse; }
+        .info-table th { text-align: left; padding: 8px 12px; background: #f1f5f9; font-weight: 500; width: 140px; }
+        .info-table td { padding: 8px 12px; border-bottom: 1px solid #e2e8f0; }
+        .highlight { font-weight: 600; color: #dc2626; }
+        .reason-text { white-space: pre-line; line-height: 1.8; background: #fffbeb; padding: 16px; border-radius: 8px; border-left: 4px solid #f59e0b; }
+        .missing-list, .correction-list { line-height: 2; color: #475569; }
+        .next-step { background: #eff6ff; padding: 16px; border-radius: 8px; border-left: 4px solid #3b82f6; margin-top: 16px; }
+        .next-step .owner { font-weight: 600; color: #1d4ed8; }
+        .meta { color: #94a3b8; font-size: 13px; margin-top: 8px; }
+        .type-label { display: inline-block; padding: 4px 10px; background: #f1f5f9; border-radius: 6px; font-size: 14px; margin-right: 10px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1>异常样本详情</h1>
+            <div class="meta">样本ID: anom_4cf765a5 | 检测时间: 2026-06-07 15:39:29</div>
+        </div>
+        <div>
+            <span class="type-label">时间窗穿越（效果虚高）</span>
+            <span class="severity-badge">高风险</span>
+            
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>❓ 为什么这条被留下</h2>
+        <div class="reason-text">候选 [cand_007] 策略 [新用户召回] 存在时间窗穿越问题：
+时间范围：2026-05-31 18:00:00 ~ 2026-06-01 17:59:59
+- 时间窗口跨天：从 2026-05-31 穿越到 2026-06-01
+当前CTR=0.0350，曝光=25000，可能因时间窗穿越导致效果虚高，结论不可直接使用</div>
+    </div>
+
+    
+            <div class="candidate-card">
+                <h3>关联召回候选</h3>
+                <table class="info-table">
+                    <tr><th>候选ID</th><td>cand_007</td></tr>
+                    <tr><th>策略名称</th><td>新用户召回</td></tr>
+                    <tr><th>臂ID</th><td>arm_eta</td></tr>
+                    <tr><th>曝光量</th><td>25,000</td></tr>
+                    <tr><th>点击量</th><td>875</td></tr>
+                    <tr><th>CTR</th><td class="highlight">0.0350</td></tr>
+                    <tr><th>消耗</th><td>¥1,850.00</td></tr>
+                    <tr><th>预算利用率</th><td>78.00%</td></tr>
+                    <tr><th>时间窗口</th><td>2026-05-31 18:00:00<br>~ 2026-06-01 17:59:59</td></tr>
+                </table>
+            </div>
+            
+
+    
+            <div class="missing-section">
+                <h3>🔍 还缺什么材料</h3>
+                <ul class="missing-list"><li>该时间窗口对应的活动排期表</li><li>数据上报的时间戳对齐记录</li><li>是否存在手动补数据的操作记录</li><li>同期其他策略是否也有类似穿越</li></ul>
+            </div>
+            
+
+    <div class="card next-step">
+        <h3>🎯 下一步该找谁</h3>
+        <p><span class="owner">负责人：实验平台负责人</span></p>
+        <p>行动：复核时间窗口配置，确认是否为真实跨天活动</p>
+        
+    </div>
+
+    
+
+    <div class="meta" style="text-align:center; margin-top:40px;">
+        多臂老虎机预算分流 · 异常样本页 · 生成于 2026-06-07 15:39:29
+    </div>
+</body>
+</html>

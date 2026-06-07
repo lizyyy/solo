@@ -1,0 +1,15 @@
+{
+  "record_id": "audit_a36eeb72",
+  "timestamp": "2026-06-07 15:39:29",
+  "operator": "推荐策略老唐",
+  "action": "补录参数YAML",
+  "target_type": "params",
+  "target_id": "1.0.0",
+  "change_summary": "从 /Users/lzy/pro/solo/workspaces/zy72551/mab_budget/../data/demo/params.yaml 加载参数配置 v1.0.0",
+  "reason": "检测异常需要使用参数配置做参照",
+  "impacted_results": [
+    "异常检测规则已同步更新",
+    "后续检测将使用新参数"
+  ],
+  "metadata": {}
+}

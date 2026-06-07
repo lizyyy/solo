@@ -1,0 +1,14 @@
+{
+  "record_id": "audit_4e18a6dd",
+  "timestamp": "2026-06-07 15:39:29",
+  "operator": "推荐策略老唐",
+  "action": "导入召回候选表",
+  "target_type": "candidates",
+  "target_id": "latest",
+  "change_summary": "导入 10 条召回候选记录",
+  "reason": "实验平台负责人催结果，需要快速翻表",
+  "impacted_results": [
+    "候选表共 10 条记录已入库"
+  ],
+  "metadata": {}
+}
