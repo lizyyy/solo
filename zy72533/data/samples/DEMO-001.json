@@ -1,0 +1,67 @@
+{
+  "sample_id": "DEMO-001",
+  "original_text": "市民张先生（身份证号110101199001011234来电反映：位于朝阳区建国路88号小区物业乱收费，物业电话010-12345678，要求相关部门尽快处理",
+  "hotline_number": "12345",
+  "call_time": "2024-01-15T09:30:00",
+  "model_outputs": [
+    {
+      "model_version": "v1.0",
+      "summary": "市民反映小区收费问题",
+      "confidence": 0.92,
+      "entities": [
+        {
+          "type": "location",
+          "value": "朝阳区"
+        }
+      ],
+      "mask_details": [],
+      "timestamp": "2024-01-15T09:35:00",
+      "raw_output": "model_v1_output_xxx"
+    },
+    {
+      "model_version": "v2.0",
+      "summary": "市民反映朝阳区建国路88号小区物业乱收费",
+      "confidence": 0.52,
+      "entities": [
+        {
+          "type": "location",
+          "value": "朝阳区建国路88号"
+        }
+      ],
+      "mask_details": [
+        {
+          "type": "id_card",
+          "masked": "110***********1234"
+        }
+      ],
+      "timestamp": "2024-01-15T10:00:00",
+      "raw_output": "model_v2_output_xxx"
+    }
+  ],
+  "annotations": [
+    {
+      "annotator": "标注员小王",
+      "corrected_summary": "市民反映朝阳区建国路88号小区物业乱收费问题，已记录诉求。",
+      "comment": "v2版本摘要太简略，关键信息有遗漏，身份证号未完全脱敏。",
+      "timestamp": "2024-01-15T14:00:00",
+      "error_type": "信息遗漏+脱敏不完整"
+    }
+  ],
+  "supplements": [
+    {
+      "operator": "算法运营老唐",
+      "model_output_snippet": "[ENTITY:朝阳区建国路88号] [MASK:IDCARD:110***********1234]",
+      "reason": "补录v2版本模型输出片段，确认身份证脱敏情况",
+      "timestamp": "2026-06-07T12:45:16.881546",
+      "additional_notes": "发现身份证号脱敏规则不完整"
+    }
+  ],
+  "status": "supplemented",
+  "confidence_level": "low",
+  "hidden_by_avg": false,
+  "next_action": null,
+  "review_notes": null,
+  "tags": [],
+  "created_at": "2026-06-07T12:44:53.532797",
+  "updated_at": "2026-06-07T12:45:16.881563"
+}

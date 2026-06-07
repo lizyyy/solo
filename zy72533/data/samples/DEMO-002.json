@@ -1,0 +1,62 @@
+{
+  "sample_id": "DEMO-002",
+  "original_text": "李女士（手机号13800138000）投诉：海淀区中关村大街1号楼下噪音扰民，每天晚上施工到11点，影响休息",
+  "hotline_number": "12345",
+  "call_time": "2024-01-15T10:15:00",
+  "model_outputs": [
+    {
+      "model_version": "v1.0",
+      "summary": "市民投诉噪音扰民问题",
+      "confidence": 0.88,
+      "entities": [],
+      "mask_details": [],
+      "timestamp": "2024-01-15T10:20:00",
+      "raw_output": null
+    },
+    {
+      "model_version": "v2.0",
+      "summary": "李女士投诉海淀区中关村大街1号夜间施工噪音扰民",
+      "confidence": 0.48,
+      "entities": [
+        {
+          "type": "location",
+          "value": "海淀区中关村大街1号"
+        }
+      ],
+      "mask_details": [
+        {
+          "type": "phone",
+          "masked": "138****8000"
+        }
+      ],
+      "timestamp": "2024-01-15T10:25:00",
+      "raw_output": null
+    }
+  ],
+  "annotations": [
+    {
+      "annotator": "标注员小李",
+      "corrected_summary": "市民李女士反映海淀区中关村大街1号夜间施工噪音扰民，建议转城管部门处理。",
+      "comment": "摘要内容基本准确，但置信度偏低，需要模型优化。",
+      "timestamp": "2024-01-15T15:30:00",
+      "error_type": null
+    }
+  ],
+  "supplements": [
+    {
+      "operator": "算法运营老唐",
+      "model_output_snippet": "[ENTITY: 海淀区中关村大街1号 [MASK:PHONE:138****8000",
+      "reason": "补录v2版本原始输出片段，确认脱敏规则命中情况",
+      "timestamp": "2024-01-16T09:00:00",
+      "additional_notes": "模型在位置实体识别上有提升，但整体置信度下降明显"
+    }
+  ],
+  "status": "needs_review",
+  "confidence_level": "hidden_by_avg",
+  "hidden_by_avg": true,
+  "next_action": "to_algo_oper",
+  "review_notes": "知识库编辑复核：确认该样本确实存在低置信度被掩盖问题，已标注脱敏规则需优化，转交算法运营处理",
+  "tags": [],
+  "created_at": "2026-06-07T12:44:53.532797",
+  "updated_at": "2026-06-07T12:45:21.303138"
+}

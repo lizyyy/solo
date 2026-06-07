@@ -1,0 +1,189 @@
+{
+  "name": "政务热线摘要脱敏演示数据集",
+  "description": "包含标注员留言、模型输出片段、一次人工修正和一次重跑的完整演示流程",
+  "samples": [
+    {
+      "sample_id": "DEMO-001",
+      "original_text": "市民张先生（身份证号110101199001011234来电反映：位于朝阳区建国路88号小区物业乱收费，物业电话010-12345678，要求相关部门尽快处理",
+      "hotline_number": "12345",
+      "call_time": "2024-01-15T09:30:00",
+      "model_outputs": [
+        {
+          "model_version": "v1.0",
+          "summary": "市民反映小区收费问题",
+          "confidence": 0.92,
+          "entities": [
+            {
+              "type": "location",
+              "value": "朝阳区"
+            }
+          ],
+          "mask_details": [],
+          "timestamp": "2024-01-15T09:35:00",
+          "raw_output": "model_v1_output_xxx"
+        },
+        {
+          "model_version": "v2.0",
+          "summary": "市民反映朝阳区建国路88号小区物业乱收费",
+          "confidence": 0.52,
+          "entities": [
+            {
+              "type": "location",
+              "value": "朝阳区建国路88号"
+            }
+          ],
+          "mask_details": [
+            {
+              "type": "id_card",
+              "masked": "110***********1234"
+            }
+          ],
+          "timestamp": "2024-01-15T10:00:00",
+          "raw_output": "model_v2_output_xxx"
+        }
+      ],
+      "annotations": [
+        {
+          "annotator": "标注员小王",
+          "corrected_summary": "市民反映朝阳区建国路88号小区物业乱收费问题，已记录诉求。",
+          "comment": "v2版本摘要太简略，关键信息有遗漏，身份证号未完全脱敏。",
+          "error_type": "信息遗漏+脱敏不完整",
+          "timestamp": "2024-01-15T14:00:00"
+        }
+      ],
+      "supplements": [],
+      "status": "imported",
+      "confidence_level": "medium",
+      "hidden_by_avg": false,
+      "next_action": null,
+      "review_notes": null,
+      "tags": [],
+      "created_at": "2026-06-07T12:44:53.532797",
+      "updated_at": "2026-06-07T12:44:53.532797"
+    },
+    {
+      "sample_id": "DEMO-002",
+      "original_text": "李女士（手机号13800138000）投诉：海淀区中关村大街1号楼下噪音扰民，每天晚上施工到11点，影响休息",
+      "hotline_number": "12345",
+      "call_time": "2024-01-15T10:15:00",
+      "model_outputs": [
+        {
+          "model_version": "v1.0",
+          "summary": "市民投诉噪音扰民问题",
+          "confidence": 0.88,
+          "entities": [],
+          "mask_details": [],
+          "timestamp": "2024-01-15T10:20:00"
+        },
+        {
+          "model_version": "v2.0",
+          "summary": "李女士投诉海淀区中关村大街1号夜间施工噪音扰民",
+          "confidence": 0.48,
+          "entities": [
+            {
+              "type": "location",
+              "value": "海淀区中关村大街1号"
+            }
+          ],
+          "mask_details": [
+            {
+              "type": "phone",
+              "masked": "138****8000"
+            }
+          ],
+          "timestamp": "2024-01-15T10:25:00"
+        }
+      ],
+      "annotations": [
+        {
+          "annotator": "标注员小李",
+          "corrected_summary": "市民李女士反映海淀区中关村大街1号夜间施工噪音扰民，建议转城管部门处理。",
+          "comment": "摘要内容基本准确，但置信度偏低，需要模型优化。",
+          "timestamp": "2024-01-15T15:30:00"
+        }
+      ],
+      "supplements": [
+        {
+          "operator": "算法运营老唐",
+          "model_output_snippet": "[ENTITY: 海淀区中关村大街1号 [MASK:PHONE:138****8000",
+          "reason": "补录v2版本原始输出片段，确认脱敏规则命中情况",
+          "additional_notes": "模型在位置实体识别上有提升，但整体置信度下降明显",
+          "timestamp": "2024-01-16T09:00:00"
+        }
+      ],
+      "status": "imported",
+      "confidence_level": "medium",
+      "hidden_by_avg": false,
+      "next_action": null,
+      "review_notes": null,
+      "tags": [],
+      "created_at": "2026-06-07T12:44:53.532797",
+      "updated_at": "2026-06-07T12:44:53.532797"
+    },
+    {
+      "sample_id": "DEMO-003",
+      "original_text": "王先生来电感谢：西城区西单北大街100号井盖缺失，存在安全隐患，希望尽快修复",
+      "hotline_number": "12345",
+      "call_time": "2024-01-15T11:00:00",
+      "model_outputs": [
+        {
+          "model_version": "v2.0",
+          "summary": "市民反映西城区西单北大街100号井盖缺失问题",
+          "confidence": 0.95,
+          "entities": [
+            {
+              "type": "location",
+              "value": "西城区西单北大街100号"
+            }
+          ],
+          "mask_details": [],
+          "timestamp": "2024-01-15T11:05:00"
+        }
+      ],
+      "annotations": [],
+      "supplements": [],
+      "status": "imported",
+      "confidence_level": "medium",
+      "hidden_by_avg": false,
+      "next_action": null,
+      "review_notes": null,
+      "tags": [],
+      "created_at": "2026-06-07T12:44:53.532797",
+      "updated_at": "2026-06-07T12:44:53.532797"
+    }
+  ],
+  "workflow_steps": [
+    {
+      "step_name": "第一步：数据导入",
+      "operator": "系统自动",
+      "timestamp": "2024-01-15T09:00:00",
+      "action": "导入3条政务热线样本",
+      "notes": "系统自动检测到2条低置信度样本，其中1条被平均指标掩盖"
+    },
+    {
+      "step_name": "第二步：标注员标注",
+      "operator": "标注员小王、小李",
+      "timestamp": "2024-01-15T16:00:00",
+      "action": "完成3条样本的人工标注和留言",
+      "notes": "DEMO-001标注为信息遗漏+脱敏不完整"
+    },
+    {
+      "step_name": "第三步：算法运营补录",
+      "operator": "算法运营老唐",
+      "timestamp": "2024-01-16T10:00:00",
+      "action": "补录模型输出原始片段",
+      "notes": "重点查看被平均指标掩盖的低置信度样本"
+    },
+    {
+      "step_name": "第四步：模型版本对比",
+      "operator": "系统自动",
+      "timestamp": "2024-01-16T11:00:00",
+      "action": "生成v1.0 vs v2.0版本对比报告",
+      "notes": "DEMO-001需要知识库编辑复核，DEMO-002需要模型重训优化"
+    }
+  ],
+  "model_versions": [
+    "v1.0",
+    "v2.0"
+  ]
+}
