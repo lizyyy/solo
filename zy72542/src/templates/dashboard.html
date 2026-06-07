@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>法律问答免责声明检查 - 小看板</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #333; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 24px 32px; }
+        .header h1 { font-size: 24px; margin-bottom: 8px; }
+        .header p { opacity: 0.9; font-size: 14px; }
+        .container { max-width: 1400px; margin: 24px auto; padding: 0 24px; }
+        .stats { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; margin-bottom: 24px; }
+        .stat-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .stat-card .label { font-size: 13px; color: #666; margin-bottom: 8px; }
+        .stat-card .value { font-size: 28px; font-weight: 600; }
+        .stat-card.total .value { color: #333; }
+        .stat-card.pending .value { color: #f59e0b; }
+        .stat-card.passed .value { color: #10b981; }
+        .stat-card.failed .value { color: #ef4444; }
+        .stat-card.conflict .value { color: #f97316; }
+        .stat-card.manual_fixed .value { color: #8b5cf6; }
+        .section { background: white; border-radius: 12px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .section-title { font-size: 18px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .badge-pending { background: #fef3c7; color: #92400e; }
+        .badge-passed { background: #d1fae5; color: #065f46; }
+        .badge-failed { background: #fee2e2; color: #991b1b; }
+        .badge-conflict { background: #ffedd5; color: #9a3412; }
+        .badge-manual_fixed { background: #ede9fe; color: #5b21b6; }
+        .badge-pm { background: #dbeafe; color: #1e40af; }
+        .badge-editor { background: #dcfce7; color: #166534; }
+        .badge-complete { background: #f3f4f6; color: #374151; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
+        th { background: #f9fafb; font-weight: 600; color: #555; }
+        tr:hover { background: #f9fafb; }
+        .btn { padding: 6px 14px; border-radius: 6px; border: none; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-primary:hover { background: #5a67d8; }
+        .btn-warning { background: #f59e0b; color: white; }
+        .btn-warning:hover { background: #d97706; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-success:hover { background: #059669; }
+        .btn-sm { padding: 4px 10px; font-size: 12px; }
+        .action-btns { display: flex; gap: 6px; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+        .modal-content { background: white; margin: 5% auto; padding: 28px; border-radius: 12px; width: 90%; max-width: 700px; max-height: 80vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #eee; }
+        .modal-header h3 { font-size: 18px; }
+        .close { color: #999; font-size: 24px; cursor: pointer; }
+        .close:hover { color: #333; }
+        .detail-row { display: flex; padding: 10px 0; border-bottom: 1px solid #f5f5f5; }
+        .detail-label { width: 120px; color: #666; flex-shrink: 0; }
+        .detail-value { flex: 1; }
+        .log-item { padding: 12px; background: #f9fafb; border-radius: 8px; margin-bottom: 8px; }
+        .log-time { font-size: 12px; color: #999; margin-bottom: 4px; }
+        .log-content { font-size: 14px; }
+        .log-content strong { color: #667eea; }
+        .highlight-conflict { background: #fff7ed; border-left: 3px solid #f97316; }
+        .input-group { margin-bottom: 16px; }
+        .input-group label { display: block; margin-bottom: 6px; font-size: 14px; font-weight: 500; }
+        .input-group input, .input-group select, .input-group textarea { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
+        .input-group textarea { min-height: 80px; resize: vertical; }
+        .demo-note { background: #fef3c7; border: 1px solid #fcd34d; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>⚖️ 法律问答免责声明检查</h1>
+        <p>冲突样本表 · 灰度批次跟踪 · 复核流程管理</p>
+    </div>
+    <div class="container">
+        <div class="demo-note">
+            <strong>📌 演示提示：</strong>本系统包含演示数据，可查看完整流程：脱敏规则备注导入 → 链接404标记冲突 → 补录灰度批次 → 人工修正 → 重跑验证
+        </div>
+
+        <div class="stats">
+            <div class="stat-card total">
+                <div class="label">总记录数</div>
+                <div class="value">{{ stats.total }}</div>
+            </div>
+            <div class="stat-card pending">
+                <div class="label">待检查</div>
+                <div class="value">{{ stats.pending }}</div>
+            </div>
+            <div class="stat-card passed">
+                <div class="label">通过</div>
+                <div class="value">{{ stats.passed }}</div>
+            </div>
+            <div class="stat-card failed">
+                <div class="label">未通过</div>
+                <div class="value">{{ stats.failed }}</div>
+            </div>
+            <div class="stat-card conflict">
+                <div class="label">冲突待复核</div>
+                <div class="value">{{ stats.conflict }}</div>
+            </div>
+            <div class="stat-card manual_fixed">
+                <div class="label">人工修正</div>
+                <div class="value">{{ stats.manual_fixed }}</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span>📋 冲突样本表</span>
+                <button class="btn btn-primary btn-sm" onclick="runBatchCheck()">重新执行批量检查</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>状态</th>
+                        <th>问题摘要</th>
+                        <th>免责声明</th>
+                        <th>链接状态</th>
+                        <th>灰度批次</th>
+                        <th>脱敏备注</th>
+                        <th>冲突原因</th>
+                        <th>下一步</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in records %}
+                    <tr class="{% if r.status == 'conflict' %}highlight-conflict{% endif %}">
+                        <td>{{ r.id }}</td>
+                        <td>
+                            {% if r.status == 'pending' %}<span class="badge badge-pending">待检查</span>
+                            {% elif r.status == 'passed' %}<span class="badge badge-passed">通过</span>
+                            {% elif r.status == 'failed' %}<span class="badge badge-failed">未通过</span>
+                            {% elif r.status == 'conflict' %}<span class="badge badge-conflict">冲突</span>
+                            {% elif r.status == 'manual_fixed' %}<span class="badge badge-manual_fixed">人工修正</span>
+                            {% endif %}
+                        </td>
+                        <td style="max-width: 200px;">{{ r.question[:30] }}{% if r.question|length > 30 %}...{% endif %}</td>
+                        <td>{% if r.has_disclaimer %}✅ 有{% else %}❌ 无{% endif %}</td>
+                        <td>
+                            {% if r.reference_url %}
+                                {% if r.url_status == 'valid' %}✅ 正常
+                                {% elif r.url_status == 'invalid' %}❌ {{ r.url_error }}
+                                {% else %}⏳ 未检查{% endif %}
+                            {% else %}-{% endif %}
+                        </td>
+                        <td>{{ r.gray_batch or '-' }}</td>
+                        <td style="max-width: 100px; font-size: 12px;">{{ r.desensitization_notes or '-' }}</td>
+                        <td style="max-width: 200px; font-size: 12px;">{{ r.conflict_reason or '-' }}</td>
+                        <td>
+                            {% if r.next_action == 'pm_review' %}<span class="badge badge-pm">产品经理复核</span>
+                            {% elif r.next_action == 'editor_review' %}<span class="badge badge-editor">知识库编辑</span>
+                            {% elif r.next_action == 'complete' %}<span class="badge badge-complete">已完成</span>
+                            {% else %}-{% endif %}
+                        </td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="btn btn-primary btn-sm" onclick="showDetail({{ r.id }})">详情</button>
+                                {% if not r.gray_batch and r.status == 'conflict' %}
+                                <button class="btn btn-warning btn-sm" onclick="showSetGray({{ r.id }})">补录灰度</button>
+                                {% endif %}
+                                {% if r.status in ['conflict', 'failed'] %}
+                                <button class="btn btn-success btn-sm" onclick="showFix({{ r.id }})">人工修正</button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>记录详情</h3>
+                <span class="close" onclick="closeModal('detailModal')">&times;</span>
+            </div>
+            <div id="detailBody"></div>
+        </div>
+    </div>
+
+    <div id="grayModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>补录灰度批次</h3>
+                <span class="close" onclick="closeModal('grayModal')">&times;</span>
+            </div>
+            <div class="input-group">
+                <label>灰度批次名称</label>
+                <input type="text" id="grayBatch" placeholder="例如：gray_202406_w1">
+            </div>
+            <div class="input-group">
+                <label>操作人</label>
+                <input type="text" id="grayOperator" value="小乔">
+            </div>
+            <div class="input-group">
+                <label>备注（可选）</label>
+                <input type="text" id="grayReason" placeholder="变更原因说明">
+            </div>
+            <button class="btn btn-primary" onclick="submitGray()">确认提交</button>
+        </div>
+    </div>
+
+    <div id="fixModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>人工修正</h3>
+                <span class="close" onclick="closeModal('fixModal')">&times;</span>
+            </div>
+            <div class="input-group">
+                <label>设置状态</label>
+                <select id="fixStatus">
+                    <option value="">不修改</option>
+                    <option value="manual_fixed">人工修正</option>
+                    <option value="passed">标记通过</option>
+                    <option value="failed">标记未通过</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>复核意见</label>
+                <textarea id="fixComment" placeholder="输入复核意见..."></textarea>
+            </div>
+            <div class="input-group">
+                <label>下一步流向</label>
+                <select id="fixNext">
+                    <option value="">不修改</option>
+                    <option value="pm_review">转给产品经理复核</option>
+                    <option value="editor_review">转给知识库编辑</option>
+                    <option value="complete">流程结束</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>操作人 *</label>
+                <input type="text" id="fixOperator" placeholder="请输入操作人姓名">
+            </div>
+            <div class="input-group">
+                <label>修正原因</label>
+                <input type="text" id="fixReason" placeholder="为什么做此修改">
+            </div>
+            <button class="btn btn-success" onclick="submitFix()">确认修正</button>
+        </div>
+    </div>
+
+    <script>
+        let currentRecordId = null;
+
+        function showDetail(id) {
+            fetch(`/api/records/${id}`)
+                .then(r => r.json())
+                .then(data => {
+                    const r = data.record;
+                    const statusMap = { pending: '待检查', passed: '通过', failed: '未通过', conflict: '冲突', manual_fixed: '人工修正' };
+                    const nextMap = { pm_review: '产品经理复核', editor_review: '知识库编辑', complete: '已完成' };
+                    const urlStatusMap = { valid: '正常', invalid: '异常', unknown: '未检查' };
+
+                    let html = `
+                        <div class="detail-row"><div class="detail-label">记录ID</div><div class="detail-value">${r.id}</div></div>
+                        <div class="detail-row"><div class="detail-label">当前状态</div><div class="detail-value">${statusMap[r.status] || r.status}</div></div>
+                        <div class="detail-row"><div class="detail-label">来源批次</div><div class="detail-value">${r.source_batch || '-'}</div></div>
+                        <div class="detail-row"><div class="detail-label">灰度批次</div><div class="detail-value">${r.gray_batch || '-'}</div></div>
+                        <div class="detail-row"><div class="detail-label">脱敏规则备注</div><div class="detail-value">${r.desensitization_notes || '-'}</div></div>
+                        <div class="detail-row"><div class="detail-label">问题</div><div class="detail-value">${r.question}</div></div>
+                        <div class="detail-row"><div class="detail-label">回答</div><div class="detail-value" style="white-space: pre-wrap;">${r.answer}</div></div>
+                        <div class="detail-row"><div class="detail-label">免责声明</div><div class="detail-value">${r.has_disclaimer ? '✅ 包含' : '❌ 不包含'} (${r.disclaimer_text || '-'})</div></div>
+                        <div class="detail-row"><div class="detail-label">引用链接</div><div class="detail-value">${r.reference_url ? `<a href="${r.reference_url}" target="_blank">${r.reference_url}</a>` : '-'}</div></div>
+                        <div class="detail-row"><div class="detail-label">链接状态</div><div class="detail-value">${r.url_status ? urlStatusMap[r.url_status] : '-' } (${r.url_error || '-'})</div></div>
+                        <div class="detail-row"><div class="detail-label">冲突原因</div><div class="detail-value">${r.conflict_reason || '-'}</div></div>
+                        <div class="detail-row"><div class="detail-label">缺少材料</div><div class="detail-value">${r.missing_materials || '-'}</div></div>
+                        <div class="detail-row"><div class="detail-label">下一步</div><div class="detail-value">${nextMap[r.next_action] || '-'}</div></div>
+                        <div class="detail-row"><div class="detail-label">复核人</div><div class="detail-value">${r.reviewer || '-'}</div></div>
+                        <div class="detail-row"><div class="detail-label">复核意见</div><div class="detail-value">${r.review_comment || '-'}</div></div>
+                    `;
+
+                    if (data.logs && data.logs.length > 0) {
+                        html += '<div class="detail-row" style="margin-top: 16px;"><div class="detail-label"><strong>操作历史</strong></div><div class="detail-value"></div></div>';
+                        data.logs.forEach(log => {
+                            let change = '';
+                            if (log.old_value || log.new_value) {
+                                change = `<br>字段: ${log.field_name || '-'} | ${log.old_value || '-'} → ${log.new_value || '-'}`;
+                            }
+                            html += `<div class="log-item">
+                                <div class="log-time">${new Date(log.created_at).toLocaleString('zh-CN')} · ${log.operator}</div>
+                                <div class="log-content"><strong>[${log.operation_type}]</strong> ${log.reason || ''}${change}</div>
+                            </div>`;
+                        });
+                    }
+
+                    html += `<div style="margin-top: 20px; display: flex; gap: 10px;">
+                        <button class="btn btn-primary" onclick="runSingleCheck(${r.id})">重新执行检查</button>
+                    </div>`;
+
+                    document.getElementById('detailBody').innerHTML = html;
+                    document.getElementById('detailModal').style.display = 'block';
+                });
+        }
+
+        function showSetGray(id) {
+            currentRecordId = id;
+            document.getElementById('grayModal').style.display = 'block';
+        }
+
+        function submitGray() {
+            const grayBatch = document.getElementById('grayBatch').value;
+            const operator = document.getElementById('grayOperator').value;
+            const reason = document.getElementById('grayReason').value;
+
+            if (!grayBatch) {
+                alert('请输入灰度批次');
+                return;
+            }
+
+            fetch(`/api/records/${currentRecordId}/gray`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ gray_batch: grayBatch, operator, reason })
+            }).then(r => r.json()).then(() => {
+                closeModal('grayModal');
+                location.reload();
+            });
+        }
+
+        function showFix(id) {
+            currentRecordId = id;
+            document.getElementById('fixModal').style.display = 'block';
+        }
+
+        function submitFix() {
+            const newStatus = document.getElementById('fixStatus').value;
+            const comment = document.getElementById('fixComment').value;
+            const nextAction = document.getElementById('fixNext').value;
+            const operator = document.getElementById('fixOperator').value;
+            const reason = document.getElementById('fixReason').value;
+
+            if (!operator) {
+                alert('请输入操作人');
+                return;
+            }
+
+            fetch(`/api/records/${currentRecordId}/fix`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    new_status: newStatus || null,
+                    review_comment: comment || null,
+                    next_action: nextAction || null,
+                    operator,
+                    reason: reason || null
+                })
+            }).then(r => r.json()).then(() => {
+                closeModal('fixModal');
+                location.reload();
+            });
+        }
+
+        function runSingleCheck(id) {
+            fetch(`/api/records/${id}/check`, { method: 'POST' })
+                .then(r => r.json()).then(() => location.reload());
+        }
+
+        function runBatchCheck() {
+            if (confirm('确认要重新执行所有记录的检查吗？')) {
+                fetch('/api/check/batch', { method: 'POST' })
+                    .then(r => r.json()).then(data => {
+                        alert('批量检查完成，run_id: ' + data.run_id);
+                        location.reload();
+                    });
+            }
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
