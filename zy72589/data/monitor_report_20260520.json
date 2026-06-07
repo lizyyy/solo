@@ -1,0 +1,77 @@
+{
+  "report_date": "2026-05-20",
+  "model_version": "recall_v2.3",
+  "threshold_version_claimed": "v1",
+  "records": [
+    {
+      "record_id": "REC-001",
+      "segment": "overall",
+      "metric": "ctr",
+      "value": 0.082,
+      "threshold_used": 0.08,
+      "status": "normal",
+      "source": "auto_monitor",
+      "timestamp": "2026-05-20T08:00:00"
+    },
+    {
+      "record_id": "REC-002",
+      "segment": "new_user",
+      "metric": "ctr",
+      "value": 0.047,
+      "threshold_used": 0.05,
+      "status": "normal",
+      "source": "auto_monitor",
+      "timestamp": "2026-05-20T08:00:00"
+    },
+    {
+      "record_id": "REC-003",
+      "segment": "old_user",
+      "metric": "ctr",
+      "value": 0.105,
+      "threshold_used": 0.10,
+      "status": "normal",
+      "source": "auto_monitor",
+      "timestamp": "2026-05-20T08:00:00"
+    },
+    {
+      "record_id": "REC-004",
+      "segment": "overall",
+      "metric": "cvr",
+      "value": 0.026,
+      "threshold_used": 0.025,
+      "status": "normal",
+      "source": "auto_monitor",
+      "timestamp": "2026-05-20T08:00:00"
+    },
+    {
+      "record_id": "REC-005",
+      "segment": "new_user",
+      "metric": "cvr",
+      "value": 0.016,
+      "threshold_used": 0.015,
+      "status": "normal",
+      "source": "auto_monitor",
+      "timestamp": "2026-05-20T08:00:00"
+    },
+    {
+      "record_id": "REC-006",
+      "segment": "ios",
+      "metric": "ctr",
+      "value": 0.092,
+      "threshold_used": 0.09,
+      "status": "normal",
+      "source": "auto_monitor",
+      "timestamp": "2026-05-20T08:00:00"
+    },
+    {
+      "record_id": "REC-007",
+      "segment": "android",
+      "metric": "ctr",
+      "value": 0.077,
+      "threshold_used": 0.075,
+      "status": "normal",
+      "source": "auto_monitor",
+      "timestamp": "2026-05-20T08:00:00"
+    }
+  ]
+}

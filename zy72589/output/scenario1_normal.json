@@ -1,0 +1,194 @@
+{
+  "export_time": "2026-06-07T16:40:20.414421",
+  "threshold_version": "v1",
+  "records": [
+    {
+      "record_id": "REC-001",
+      "segment": "overall",
+      "metric": "ctr",
+      "value": 0.082,
+      "threshold_used": 0.08,
+      "status": "normal",
+      "source": "auto_monitor",
+      "timestamp": "2026-05-20T08:00:00",
+      "attribution_status": "consistent",
+      "issues": [],
+      "final_status": "normal",
+      "corrected_by": null,
+      "correction_note": null
+    },
+    {
+      "record_id": "REC-002",
+      "segment": "new_user",
+      "metric": "ctr",
+      "value": 0.047,
+      "threshold_used": 0.05,
+      "status": "normal",
+      "source": "auto_monitor",
+      "timestamp": "2026-05-20T08:00:00",
+      "attribution_status": "consistent",
+      "issues": [],
+      "final_status": "warning",
+      "corrected_by": null,
+      "correction_note": null
+    },
+    {
+      "record_id": "REC-003",
+      "segment": "old_user",
+      "metric": "ctr",
+      "value": 0.105,
+      "threshold_used": 0.1,
+      "status": "normal",
+      "source": "auto_monitor",
+      "timestamp": "2026-05-20T08:00:00",
+      "attribution_status": "consistent",
+      "issues": [],
+      "final_status": "normal",
+      "corrected_by": null,
+      "correction_note": null
+    },
+    {
+      "record_id": "REC-004",
+      "segment": "overall",
+      "metric": "cvr",
+      "value": 0.026,
+      "threshold_used": 0.025,
+      "status": "normal",
+      "source": "auto_monitor",
+      "timestamp": "2026-05-20T08:00:00",
+      "attribution_status": "consistent",
+      "issues": [],
+      "final_status": "normal",
+      "corrected_by": null,
+      "correction_note": null
+    },
+    {
+      "record_id": "REC-005",
+      "segment": "new_user",
+      "metric": "cvr",
+      "value": 0.016,
+      "threshold_used": 0.015,
+      "status": "normal",
+      "source": "auto_monitor",
+      "timestamp": "2026-05-20T08:00:00",
+      "attribution_status": "consistent",
+      "issues": [],
+      "final_status": "normal",
+      "corrected_by": null,
+      "correction_note": null
+    },
+    {
+      "record_id": "REC-006",
+      "segment": "ios",
+      "metric": "ctr",
+      "value": 0.092,
+      "threshold_used": 0.09,
+      "status": "normal",
+      "source": "auto_monitor",
+      "timestamp": "2026-05-20T08:00:00",
+      "attribution_status": "consistent",
+      "issues": [],
+      "final_status": "normal",
+      "corrected_by": null,
+      "correction_note": null
+    },
+    {
+      "record_id": "REC-007",
+      "segment": "android",
+      "metric": "ctr",
+      "value": 0.077,
+      "threshold_used": 0.075,
+      "status": "normal",
+      "source": "auto_monitor",
+      "timestamp": "2026-05-20T08:00:00",
+      "attribution_status": "consistent",
+      "issues": [],
+      "final_status": "normal",
+      "corrected_by": null,
+      "correction_note": null
+    }
+  ],
+  "history": [
+    {
+      "timestamp": "2026-06-07T16:40:20.414240",
+      "action": "STEP1_IMPORT_YAML",
+      "details": {
+        "yaml_path": "config/threshold_v1.yaml",
+        "version": "v1"
+      }
+    },
+    {
+      "timestamp": "2026-06-07T16:40:20.414381",
+      "action": "STEP2_CHECK_EVAL_SLICES",
+      "details": {
+        "eval_path": "data/eval_slices_20260520.json",
+        "issues_found": 0,
+        "records_analyzed": 7
+      }
+    },
+    {
+      "timestamp": "2026-06-07T16:40:20.414419",
+      "action": "STEP4_RERUN_UPDATE",
+      "details": {
+        "segmented_metrics": {
+          "overall": {
+            "ctr": {
+              "value": 0.082,
+              "threshold": 0.08,
+              "status": "normal",
+              "attribution": "consistent"
+            },
+            "cvr": {
+              "value": 0.026,
+              "threshold": 0.025,
+              "status": "normal",
+              "attribution": "consistent"
+            }
+          },
+          "new_user": {
+            "ctr": {
+              "value": 0.047,
+              "threshold": 0.05,
+              "status": "warning",
+              "attribution": "consistent"
+            },
+            "cvr": {
+              "value": 0.016,
+              "threshold": 0.015,
+              "status": "normal",
+              "attribution": "consistent"
+            }
+          },
+          "old_user": {
+            "ctr": {
+              "value": 0.105,
+              "threshold": 0.1,
+              "status": "normal",
+              "attribution": "consistent"
+            }
+          },
+          "ios": {
+            "ctr": {
+              "value": 0.092,
+              "threshold": 0.09,
+              "status": "normal",
+              "attribution": "consistent"
+            }
+          },
+          "android": {
+            "ctr": {
+              "value": 0.077,
+              "threshold": 0.075,
+              "status": "normal",
+              "attribution": "consistent"
+            }
+          }
+        },
+        "status_summary": {
+          "consistent": 7
+        }
+      }
+    }
+  ],
+  "manual_corrections": []
+}

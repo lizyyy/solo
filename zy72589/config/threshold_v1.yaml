@@ -1,0 +1,48 @@
+# 模型监控阈值配置 v1 - 原始版本
+# 配置日期: 2026-05-01
+model:
+  name: "recall_v2.3"
+  version: "v1"
+
+metrics:
+  # 整体指标阈值
+  overall:
+    ctr:
+      warning: 0.08
+      critical: 0.06
+    cvr:
+      warning: 0.025
+      critical: 0.018
+    ucost:
+      warning: 15.0
+      critical: 18.0
+
+  # 分层切片阈值
+  segments:
+    new_user:
+      ctr:
+        warning: 0.05
+        critical: 0.035
+      cvr:
+        warning: 0.015
+        critical: 0.01
+    old_user:
+      ctr:
+        warning: 0.10
+        critical: 0.08
+      cvr:
+        warning: 0.03
+        critical: 0.022
+    ios:
+      ctr:
+        warning: 0.09
+        critical: 0.07
+    android:
+      ctr:
+        warning: 0.075
+        critical: 0.055
+
+# 延迟归因配置
+attribution:
+  max_delay_hours: 24
+  auto_approve_threshold: 0.95

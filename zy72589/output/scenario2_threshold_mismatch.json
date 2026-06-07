@@ -1,0 +1,248 @@
+{
+  "export_time": "2026-06-07T16:40:20.416506",
+  "threshold_version": "v2",
+  "records": [
+    {
+      "record_id": "REC-001",
+      "segment": "overall",
+      "metric": "ctr",
+      "value": 0.082,
+      "threshold_used": 0.08,
+      "status": "normal",
+      "source": "auto_monitor",
+      "timestamp": "2026-05-20T08:00:00",
+      "attribution_status": "pending_datascience_review",
+      "issues": [
+        {
+          "type": "THRESHOLD_MISMATCH",
+          "severity": "high",
+          "expected": 0.075,
+          "actual": 0.08,
+          "description": "报告使用阈值0.08，但YAML当前版本为0.075"
+        }
+      ],
+      "final_status": "PENDING_REVIEW",
+      "corrected_by": "laotang",
+      "correction_note": "整体CTR：YAML v2阈值0.075，但报告用0.08，待数据科学家确认采用哪个口径"
+    },
+    {
+      "record_id": "REC-002",
+      "segment": "new_user",
+      "metric": "ctr",
+      "value": 0.047,
+      "threshold_used": 0.05,
+      "status": "normal",
+      "source": "auto_monitor",
+      "timestamp": "2026-05-20T08:00:00",
+      "attribution_status": "pending_datascience_review",
+      "issues": [
+        {
+          "type": "THRESHOLD_MISMATCH",
+          "severity": "high",
+          "expected": 0.045,
+          "actual": 0.05,
+          "description": "报告使用阈值0.05，但YAML当前版本为0.045"
+        }
+      ],
+      "final_status": "PENDING_REVIEW",
+      "corrected_by": "laotang",
+      "correction_note": "新用户CTR：YAML v2阈值0.045，但报告用0.05，待数据科学家确认采用哪个口径"
+    },
+    {
+      "record_id": "REC-003",
+      "segment": "old_user",
+      "metric": "ctr",
+      "value": 0.105,
+      "threshold_used": 0.1,
+      "status": "normal",
+      "source": "auto_monitor",
+      "timestamp": "2026-05-20T08:00:00",
+      "attribution_status": "consistent",
+      "issues": [],
+      "final_status": "normal",
+      "corrected_by": null,
+      "correction_note": null
+    },
+    {
+      "record_id": "REC-004",
+      "segment": "overall",
+      "metric": "cvr",
+      "value": 0.026,
+      "threshold_used": 0.025,
+      "status": "normal",
+      "source": "auto_monitor",
+      "timestamp": "2026-05-20T08:00:00",
+      "attribution_status": "consistent",
+      "issues": [],
+      "final_status": "normal",
+      "corrected_by": null,
+      "correction_note": null
+    },
+    {
+      "record_id": "REC-005",
+      "segment": "new_user",
+      "metric": "cvr",
+      "value": 0.016,
+      "threshold_used": 0.015,
+      "status": "normal",
+      "source": "auto_monitor",
+      "timestamp": "2026-05-20T08:00:00",
+      "attribution_status": "consistent",
+      "issues": [],
+      "final_status": "normal",
+      "corrected_by": null,
+      "correction_note": null
+    },
+    {
+      "record_id": "REC-006",
+      "segment": "ios",
+      "metric": "ctr",
+      "value": 0.092,
+      "threshold_used": 0.09,
+      "status": "normal",
+      "source": "auto_monitor",
+      "timestamp": "2026-05-20T08:00:00",
+      "attribution_status": "consistent",
+      "issues": [],
+      "final_status": "normal",
+      "corrected_by": null,
+      "correction_note": null
+    },
+    {
+      "record_id": "REC-007",
+      "segment": "android",
+      "metric": "ctr",
+      "value": 0.077,
+      "threshold_used": 0.075,
+      "status": "normal",
+      "source": "auto_monitor",
+      "timestamp": "2026-05-20T08:00:00",
+      "attribution_status": "consistent",
+      "issues": [],
+      "final_status": "normal",
+      "corrected_by": null,
+      "correction_note": null
+    }
+  ],
+  "history": [
+    {
+      "timestamp": "2026-06-07T16:40:20.416312",
+      "action": "STEP1_IMPORT_YAML",
+      "details": {
+        "yaml_path": "config/threshold_v2.yaml",
+        "version": "v2"
+      }
+    },
+    {
+      "timestamp": "2026-06-07T16:40:20.416449",
+      "action": "STEP2_CHECK_EVAL_SLICES",
+      "details": {
+        "eval_path": "data/eval_slices_20260520.json",
+        "issues_found": 2,
+        "records_analyzed": 7
+      }
+    },
+    {
+      "timestamp": "2026-06-07T16:40:20.416464",
+      "action": "STEP3_MANUAL_CORRECTION",
+      "details": {
+        "record_id": "REC-001",
+        "action": "confirm_mismatch",
+        "old_status": "needs_review",
+        "new_status": "pending_datascience_review"
+      }
+    },
+    {
+      "timestamp": "2026-06-07T16:40:20.416473",
+      "action": "STEP3_MANUAL_CORRECTION",
+      "details": {
+        "record_id": "REC-002",
+        "action": "confirm_mismatch",
+        "old_status": "needs_review",
+        "new_status": "pending_datascience_review"
+      }
+    },
+    {
+      "timestamp": "2026-06-07T16:40:20.416505",
+      "action": "STEP4_RERUN_UPDATE",
+      "details": {
+        "segmented_metrics": {
+          "overall": {
+            "ctr": {
+              "value": 0.082,
+              "threshold": 0.075,
+              "status": "PENDING_REVIEW",
+              "attribution": "pending_datascience_review"
+            },
+            "cvr": {
+              "value": 0.026,
+              "threshold": 0.025,
+              "status": "normal",
+              "attribution": "consistent"
+            }
+          },
+          "new_user": {
+            "ctr": {
+              "value": 0.047,
+              "threshold": 0.045,
+              "status": "PENDING_REVIEW",
+              "attribution": "pending_datascience_review"
+            },
+            "cvr": {
+              "value": 0.016,
+              "threshold": 0.015,
+              "status": "normal",
+              "attribution": "consistent"
+            }
+          },
+          "old_user": {
+            "ctr": {
+              "value": 0.105,
+              "threshold": 0.1,
+              "status": "normal",
+              "attribution": "consistent"
+            }
+          },
+          "ios": {
+            "ctr": {
+              "value": 0.092,
+              "threshold": 0.09,
+              "status": "normal",
+              "attribution": "consistent"
+            }
+          },
+          "android": {
+            "ctr": {
+              "value": 0.077,
+              "threshold": 0.075,
+              "status": "normal",
+              "attribution": "consistent"
+            }
+          }
+        },
+        "status_summary": {
+          "pending_datascience_review": 2,
+          "consistent": 5
+        }
+      }
+    }
+  ],
+  "manual_corrections": [
+    {
+      "record_id": "REC-001",
+      "action": "confirm_mismatch",
+      "old_status": "needs_review",
+      "new_status": "pending_datascience_review",
+      "timestamp": "2026-06-07T16:40:20.416463",
+      "note": "整体CTR：YAML v2阈值0.075，但报告用0.08，待数据科学家确认采用哪个口径"
+    },
+    {
+      "record_id": "REC-002",
+      "action": "confirm_mismatch",
+      "old_status": "needs_review",
+      "new_status": "pending_datascience_review",
+      "timestamp": "2026-06-07T16:40:20.416472",
+      "note": "新用户CTR：YAML v2阈值0.045，但报告用0.05，待数据科学家确认采用哪个口径"
+    }
+  ]
+}
