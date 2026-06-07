@@ -66,6 +66,15 @@ export default function Review() {
   const currentParam = level.parameters.find(
     (p) => p.roundNumber === (currentRecord?.roundNumber ?? 1)
   )
+  const currentChoiceLabel = currentRecord?.playerChoice
+    ? level.options[currentRecord.roundNumber]?.find((o) => o.startsWith(currentRecord.playerChoice!)) ?? currentRecord.playerChoice
+    : '（未选择）'
+  const currentCorrectLabel = currentRecord
+    ? level.options[currentRecord.roundNumber]?.find((o) => o.startsWith(currentRecord.correctAnswer)) ?? currentRecord.correctAnswer
+    : ''
+  const isChoiceCorrect = currentRecord?.playerChoice
+    ? currentRecord.playerChoice.charAt(0) === currentRecord.correctAnswer
+    : false
 
   const handleExportText = () => {
     downloadBlob(exportedText, `challenge-${instance.id}.txt`, 'text/plain')
@@ -126,16 +135,16 @@ export default function Review() {
                 )}
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <div className="p-3 rounded" style={{ background: 'rgba(255,171,0,0.06)', border: '1px solid var(--border-dim)' }}>
-                  <p className="text-xs mb-1" style={{ color: 'var(--accent-amber)' }}>学员选择</p>
+                <div className="p-3 rounded" style={{ background: currentRecord?.playerChoice === null ? 'rgba(255,171,0,0.06)' : isChoiceCorrect ? 'rgba(76,175,80,0.06)' : 'rgba(239,83,80,0.06)', border: '1px solid var(--border-dim)' }}>
+                  <p className="text-xs mb-1" style={{ color: currentRecord?.playerChoice === null ? 'var(--accent-amber)' : isChoiceCorrect ? 'var(--accent-green)' : 'var(--accent-red)' }}>学员选择</p>
                   <p className="font-mono-display text-sm" style={{ color: 'var(--text-primary)' }}>
-                    {currentRecord.playerChoice ?? '（未选择）'}
+                    {currentChoiceLabel}
                   </p>
                 </div>
-                <div className="p-3 rounded" style={{ background: 'rgba(0,229,255,0.06)', border: '1px solid var(--border-dim)' }}>
-                  <p className="text-xs mb-1" style={{ color: 'var(--accent-cyan)' }}>正确答案</p>
+                <div className="p-3 rounded" style={{ background: 'rgba(76,175,80,0.06)', border: '1px solid var(--border-dim)' }}>
+                  <p className="text-xs mb-1" style={{ color: 'var(--accent-green)' }}>正确答案</p>
                   <p className="font-mono-display text-sm" style={{ color: 'var(--text-primary)' }}>
-                    {currentRecord.correctAnswer}
+                    {currentCorrectLabel}
                   </p>
                 </div>
               </div>

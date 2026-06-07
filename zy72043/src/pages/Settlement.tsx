@@ -35,14 +35,16 @@ function getChoiceLabel(record: RoundRecord, options: Record<number, string[]>) 
 
 function getChoiceColor(record: RoundRecord) {
   if (record.playerChoice === null) return 'var(--accent-amber)'
-  return record.playerChoice === record.correctAnswer
-    ? 'var(--accent-cyan)'
+  const choiceKey = record.playerChoice.charAt(0)
+  return choiceKey === record.correctAnswer
+    ? 'var(--accent-green)'
     : 'var(--accent-red)'
 }
 
 function getChoiceIcon(record: RoundRecord) {
   if (record.playerChoice === null) return <Clock size={14} />
-  return record.playerChoice === record.correctAnswer
+  const choiceKey = record.playerChoice.charAt(0)
+  return choiceKey === record.correctAnswer
     ? <CheckCircle size={14} />
     : <XCircle size={14} />
 }
