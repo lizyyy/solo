@@ -317,14 +317,27 @@ export default function ExportPage() {
                 <div className="text-[11px] font-mono text-cyan-400">{getFilterSummary()}</div>
               </div>
             </div>
-            <div className="flex-1 flex items-center justify-center bg-[#0f1320] p-6">
-              <div className="text-center">
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-cyan-500/10 to-blue-600/10 border border-cyan-500/20 flex items-center justify-center mx-auto mb-4">
-                  <Image size={36} className="text-cyan-400/70" />
+            <div className="flex-1 flex items-center justify-center bg-[#0f1320] p-6 overflow-hidden">
+              {canvasDataUrl ? (
+                <div className="relative w-full h-full flex items-center justify-center">
+                  <img
+                    src={canvasDataUrl}
+                    alt="3D 场景预览"
+                    className="max-w-full max-h-full object-contain rounded-lg border border-slate-700/50 shadow-lg"
+                  />
+                  <div className="absolute bottom-3 right-3 text-[10px] text-slate-400 bg-black/50 px-2 py-1 rounded">
+                    预览图 · 下载时会添加筛选条件标注
+                  </div>
                 </div>
-                <p className="text-sm text-slate-300">点击"下载 PNG"导出带标注的截图</p>
-                <p className="text-xs text-slate-500 mt-1">截图会带上 3D 云台当前的视角和筛选条件</p>
-              </div>
+              ) : (
+                <div className="text-center">
+                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-cyan-500/10 to-blue-600/10 border border-cyan-500/20 flex items-center justify-center mx-auto mb-4">
+                    <Image size={36} className="text-cyan-400/70" />
+                  </div>
+                  <p className="text-sm text-slate-300">点击"下载 PNG"导出带标注的截图</p>
+                  <p className="text-xs text-slate-500 mt-1">截图会带上 3D 云台当前的视角和筛选条件</p>
+                </div>
+              )}
             </div>
           </div>
         )}

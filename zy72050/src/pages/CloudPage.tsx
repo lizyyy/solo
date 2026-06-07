@@ -78,10 +78,12 @@ export default function CloudPage() {
   };
 
   const handleExportScreenshot = () => {
-    captureCanvas();
+    setTimeout(() => {
+      captureCanvas();
+    }, 50);
     setTimeout(() => {
       navigate('/export');
-    }, 100);
+    }, 200);
   };
 
   return (

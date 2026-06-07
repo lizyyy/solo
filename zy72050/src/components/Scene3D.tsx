@@ -14,16 +14,27 @@ interface PointProps {
   isSelected: boolean
   onClick: () => void
   hasSupplemental: boolean
+  ranges: Record<GreekAxis, [number, number]>
 }
 
-function DataPoint({ record, xAxis, yAxis, zAxis, isSelected, onClick, hasSupplemental }: PointProps) {
+function DataPoint({ record, xAxis, yAxis, zAxis, isSelected, onClick, hasSupplemental, ranges }: PointProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const [hovered, setHovered] = useState(false);
   const { camera } = useThree();
 
-  const x = (record.mapped[xAxis] as number) || 0;
-  const y = (record.mapped[yAxis] as number) || 0;
-  const z = (record.mapped[zAxis] as number) || 0;
+  const normalize = (val: number, range: [number, number]) => {
+    const [min, max] = range;
+    if (max === min) return 0;
+    return ((val - min) / (max - min)) * 6 - 3;
+  };
+
+  const rawX = (record.mapped[xAxis] as number) || 0;
+  const rawY = (record.mapped[yAxis] as number) || 0;
+  const rawZ = (record.mapped[zAxis] as number) || 0;
+
+  const x = normalize(rawX, ranges[xAxis]);
+  const y = normalize(rawY, ranges[yAxis]);
+  const z = normalize(rawZ, ranges[zAxis]);
 
   const isAnomaly = record.anomaly.isAnomaly;
 
@@ -168,6 +179,30 @@ export default function Scene3D({ data, selectedId, onSelect, axisMapping, onCam
     return new Set(Object.keys(diff));
   }, []);
 
+  const ranges = useMemo(() => {
+    const r: Record<GreekAxis, [number, number]> = {
+      delta: [Infinity, -Infinity],
+      gamma: [Infinity, -Infinity],
+      theta: [Infinity, -Infinity],
+      vega: [Infinity, -Infinity],
+    };
+    for (const rec of data) {
+      for (const greek of ['delta', 'gamma', 'theta', 'vega'] as GreekAxis[]) {
+        const v = rec.mapped[greek];
+        if (typeof v === 'number' && !isNaN(v)) {
+          r[greek][0] = Math.min(r[greek][0], v);
+          r[greek][1] = Math.max(r[greek][1], v);
+        }
+      }
+    }
+    for (const greek of ['delta', 'gamma', 'theta', 'vega'] as GreekAxis[]) {
+      if (r[greek][0] === Infinity) {
+        r[greek] = [-1, 1];
+      }
+    }
+    return r;
+  }, [data]);
+
   useEffect(() => {
     const saved = JSON.parse(localStorage.getItem('greek-cloud-store') || '{}');
     if (saved?.state?.camera) {
@@ -214,6 +249,7 @@ export default function Scene3D({ data, selectedId, onSelect, axisMapping, onCam
           isSelected={selectedId === rec.id}
           onClick={() => onSelect(rec.id)}
           hasSupplemental={supplementalIds.has(rec.id) || rec.notes.some(n => n.isSupplemental)}
+          ranges={ranges}
         />
       ))}
 
