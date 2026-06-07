@@ -1,0 +1,247 @@
+[
+  {
+    "id": "mq39krf929n4fg01l23",
+    "batchId": "mq39krf9ud1sqirqkz",
+    "originalLineNumber": 2,
+    "questionText": "产品退款流程是什么",
+    "userId": "user001",
+    "userName": "张三",
+    "feedbackTime": "2024-12-01 10:23:45",
+    "originalData": {
+      "question": "产品退款流程是什么",
+      "user_id": "user001",
+      "user_name": "张三",
+      "feedback_time": "2024-12-01 10:23:45"
+    },
+    "status": "needs_review",
+    "statusUpdatedAt": "2026-06-07T04:11:36.089Z",
+    "statusUpdatedBy": "老唐",
+    "manualChanges": [
+      {
+        "field": "status",
+        "oldValue": "duplicate_user",
+        "newValue": "needs_review",
+        "changedAt": "2026-06-07T04:11:36.089Z",
+        "changedBy": "老唐"
+      },
+      {
+        "field": "annotatorComment",
+        "oldValue": "",
+        "newValue": "群里标注员补充：这个用户确实反馈了两次，一次是上午一次是下午，需要确认是否是同一问题",
+        "changedAt": "2026-06-07T04:11:36.089Z",
+        "changedBy": "老唐"
+      }
+    ],
+    "mergedIntoId": null,
+    "mergedFromIds": [],
+    "annotatorComment": "群里标注员补充：这个用户确实反馈了两次，一次是上午一次是下午，需要确认是否是同一问题",
+    "reviewComment": ""
+  },
+  {
+    "id": "mq39krf98g2zom04uuh",
+    "batchId": "mq39krf9ud1sqirqkz",
+    "originalLineNumber": 3,
+    "questionText": "产品退款流程是什么",
+    "userId": "user001",
+    "userName": "张三",
+    "feedbackTime": "2024-12-01 10:25:12",
+    "originalData": {
+      "question": "产品退款流程是什么",
+      "user_id": "user001",
+      "user_name": "张三",
+      "feedback_time": "2024-12-01 10:25:12"
+    },
+    "status": "duplicate_user",
+    "statusUpdatedAt": "2026-06-07T04:10:34.582Z",
+    "statusUpdatedBy": "system_auto_check",
+    "manualChanges": [],
+    "mergedIntoId": null,
+    "mergedFromIds": [],
+    "annotatorComment": "",
+    "reviewComment": ""
+  },
+  {
+    "id": "mq39krf94ta9i8qed63",
+    "batchId": "mq39krf9ud1sqirqkz",
+    "originalLineNumber": 4,
+    "questionText": "怎么联系客服",
+    "userId": "user002",
+    "userName": "李四",
+    "feedbackTime": "2024-12-01 11:00:00",
+    "originalData": {
+      "question": "怎么联系客服",
+      "user_id": "user002",
+      "user_name": "李四",
+      "feedback_time": "2024-12-01 11:00:00"
+    },
+    "status": "duplicate_user",
+    "statusUpdatedAt": "2026-06-07T04:10:34.582Z",
+    "statusUpdatedBy": "system_auto_check",
+    "manualChanges": [],
+    "mergedIntoId": null,
+    "mergedFromIds": [],
+    "annotatorComment": "",
+    "reviewComment": ""
+  },
+  {
+    "id": "mq39krf91ewg0pc0ilt",
+    "batchId": "mq39krf9ud1sqirqkz",
+    "originalLineNumber": 5,
+    "questionText": "订单什么时候发货",
+    "userId": "user003",
+    "userName": "王五",
+    "feedbackTime": "2024-12-01 11:30:00",
+    "originalData": {
+      "question": "订单什么时候发货",
+      "user_id": "user003",
+      "user_name": "王五",
+      "feedback_time": "2024-12-01 11:30:00"
+    },
+    "status": "duplicate_user",
+    "statusUpdatedAt": "2026-06-07T04:10:34.582Z",
+    "statusUpdatedBy": "system_auto_check",
+    "manualChanges": [],
+    "mergedIntoId": null,
+    "mergedFromIds": [],
+    "annotatorComment": "",
+    "reviewComment": ""
+  },
+  {
+    "id": "mq39krf9xy6d263ul2",
+    "batchId": "mq39krf9ud1sqirqkz",
+    "originalLineNumber": 6,
+    "questionText": "怎么修改收货地址",
+    "userId": "user004",
+    "userName": "赵六",
+    "feedbackTime": "2024-12-01 12:00:00",
+    "originalData": {
+      "question": "怎么修改收货地址",
+      "user_id": "user004",
+      "user_name": "赵六",
+      "feedback_time": "2024-12-01 12:00:00"
+    },
+    "status": "pending",
+    "statusUpdatedAt": "2026-06-07T04:10:34.581Z",
+    "statusUpdatedBy": "system_import",
+    "manualChanges": [],
+    "mergedIntoId": null,
+    "mergedFromIds": [],
+    "annotatorComment": "",
+    "reviewComment": ""
+  },
+  {
+    "id": "mq39krf9ervv6p65pwr",
+    "batchId": "mq39krf9ud1sqirqkz",
+    "originalLineNumber": 7,
+    "questionText": "订单什么时候发货",
+    "userId": "user003",
+    "userName": "王五",
+    "feedbackTime": "2024-12-01 12:15:00",
+    "originalData": {
+      "question": "订单什么时候发货",
+      "user_id": "user003",
+      "user_name": "王五",
+      "feedback_time": "2024-12-01 12:15:00"
+    },
+    "status": "duplicate_user",
+    "statusUpdatedAt": "2026-06-07T04:10:34.582Z",
+    "statusUpdatedBy": "system_auto_check",
+    "manualChanges": [],
+    "mergedIntoId": null,
+    "mergedFromIds": [],
+    "annotatorComment": "",
+    "reviewComment": ""
+  },
+  {
+    "id": "mq39krf9nredlky52vm",
+    "batchId": "mq39krf9ud1sqirqkz",
+    "originalLineNumber": 8,
+    "questionText": "优惠券怎么使用",
+    "userId": "user005",
+    "userName": "孙七",
+    "feedbackTime": "2024-12-01 13:00:00",
+    "originalData": {
+      "question": "优惠券怎么使用",
+      "user_id": "user005",
+      "user_name": "孙七",
+      "feedback_time": "2024-12-01 13:00:00"
+    },
+    "status": "pending",
+    "statusUpdatedAt": "2026-06-07T04:10:34.581Z",
+    "statusUpdatedBy": "system_import",
+    "manualChanges": [],
+    "mergedIntoId": null,
+    "mergedFromIds": [],
+    "annotatorComment": "",
+    "reviewComment": ""
+  },
+  {
+    "id": "mq39krf9hv3wsrxjuop",
+    "batchId": "mq39krf9ud1sqirqkz",
+    "originalLineNumber": 9,
+    "questionText": "产品质量有问题怎么办",
+    "userId": "user006",
+    "userName": "周八",
+    "feedbackTime": "2024-12-01 14:00:00",
+    "originalData": {
+      "question": "产品质量有问题怎么办",
+      "user_id": "user006",
+      "user_name": "周八",
+      "feedback_time": "2024-12-01 14:00:00"
+    },
+    "status": "pending",
+    "statusUpdatedAt": "2026-06-07T04:10:34.581Z",
+    "statusUpdatedBy": "system_import",
+    "manualChanges": [],
+    "mergedIntoId": null,
+    "mergedFromIds": [],
+    "annotatorComment": "",
+    "reviewComment": ""
+  },
+  {
+    "id": "mq39krf9c75ufqgwmyb",
+    "batchId": "mq39krf9ud1sqirqkz",
+    "originalLineNumber": 10,
+    "questionText": "怎么申请售后",
+    "userId": "user007",
+    "userName": "吴九",
+    "feedbackTime": "2024-12-01 15:00:00",
+    "originalData": {
+      "question": "怎么申请售后",
+      "user_id": "user007",
+      "user_name": "吴九",
+      "feedback_time": "2024-12-01 15:00:00"
+    },
+    "status": "pending",
+    "statusUpdatedAt": "2026-06-07T04:10:34.581Z",
+    "statusUpdatedBy": "system_import",
+    "manualChanges": [],
+    "mergedIntoId": null,
+    "mergedFromIds": [],
+    "annotatorComment": "",
+    "reviewComment": ""
+  },
+  {
+    "id": "mq39krf9iixmlxqx0i",
+    "batchId": "mq39krf9ud1sqirqkz",
+    "originalLineNumber": 11,
+    "questionText": "怎么联系客服",
+    "userId": "user002",
+    "userName": "李四",
+    "feedbackTime": "2024-12-01 15:30:00",
+    "originalData": {
+      "question": "怎么联系客服",
+      "user_id": "user002",
+      "user_name": "李四",
+      "feedback_time": "2024-12-01 15:30:00"
+    },
+    "status": "duplicate_user",
+    "statusUpdatedAt": "2026-06-07T04:10:34.582Z",
+    "statusUpdatedBy": "system_auto_check",
+    "manualChanges": [],
+    "mergedIntoId": null,
+    "mergedFromIds": [],
+    "annotatorComment": "",
+    "reviewComment": ""
+  }
+]
