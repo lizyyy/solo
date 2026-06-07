@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>巡演酒店房型联动系统</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; color: #333; }
+.container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+.header { background: #1a1a2e; color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+.header h1 { font-size: 24px; margin-bottom: 10px; }
+.header .subtitle { color: #aaa; font-size: 14px; }
+.tabs { display: flex; gap: 4px; margin-bottom: 20px; background: white; border-radius: 8px; padding: 4px; }
+.tab { padding: 12px 24px; border: none; background: transparent; cursor: pointer; border-radius: 6px; font-size: 14px; color: #666; }
+.tab.active { background: #1a1a2e; color: white; }
+.tab:hover:not(.active) { background: #f0f0f0; }
+.card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.card h3 { margin-bottom: 16px; color: #1a1a2e; }
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
+.stat-card { padding: 16px; border-radius: 8px; background: #f8f9fa; border-left: 4px solid #1a1a2e; }
+.stat-card .number { font-size: 28px; font-weight: bold; color: #1a1a2e; }
+.stat-card .label { font-size: 13px; color: #666; margin-top: 4px; }
+.stat-card.pending { border-left-color: #ffc107; }
+.stat-card.normal { border-left-color: #28a745; }
+.stat-card.no-alias { border-left-color: #dc3545; }
+.btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+.btn-primary { background: #1a1a2e; color: white; }
+.btn-primary:hover { background: #2d2d5a; }
+.btn-success { background: #28a745; color: white; }
+.btn-warning { background: #ffc107; color: #333; }
+.btn-danger { background: #dc3545; color: white; }
+.btn-sm { padding: 4px 12px; font-size: 12px; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+th { background: #f8f9fa; font-weight: 600; }
+tr:hover { background: #f8f9fa; }
+.badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; }
+.badge-imported { background: #e3f2fd; color: #1565c0; }
+.badge-pending-review { background: #fff3cd; color: #856404; }
+.badge-normal { background: #d4edda; color: #155724; }
+.badge-no-alias { background: #f8d7da; color: #721c24; }
+.badge-confirmed { background: #d1ecf1; color: #0c5460; }
+.badge-pending { background: #e2e3e5; color: #383d41; }
+.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+.modal.show { display: flex; align-items: center; justify-content: center; }
+.modal-content { background: white; padding: 24px; border-radius: 8px; max-width: 800px; width: 90%; max-height: 80vh; overflow-y: auto; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.close { font-size: 24px; cursor: pointer; color: #999; }
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; margin-bottom: 6px; font-size: 14px; font-weight: 500; }
+.form-group input, .form-group textarea, .form-group select { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.workflow-steps { display: flex; gap: 8px; margin-bottom: 16px; }
+.workflow-step { flex: 1; padding: 12px; border-radius: 6px; text-align: center; font-size: 13px; background: #f0f0f0; }
+.workflow-step.completed { background: #d4edda; color: #155724; }
+.workflow-step.current { background: #fff3cd; color: #856404; font-weight: 600; }
+.history-item { padding: 12px; border-left: 3px solid #1a1a2e; margin-bottom: 8px; background: #f8f9fa; }
+.history-item .time { font-size: 12px; color: #999; }
+.history-item .operator { font-weight: 600; color: #1a1a2e; }
+.history-item .detail { font-size: 13px; margin-top: 4px; }
+.diff { font-family: monospace; font-size: 12px; }
+.diff .old { color: #dc3545; text-decoration: line-through; }
+.diff .new { color: #28a745; }
+.empty { text-align: center; padding: 40px; color: #999; }
+.filters { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+.filters input, .filters select { padding: 6px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; }
+.alert { padding: 12px; border-radius: 4px; margin-bottom: 16px; }
+.alert-warning { background: #fff3cd; border: 1px solid #ffeeba; color: #856404; }
+.conflict-detail { background: #fff3cd; padding: 12px; border-radius: 4px; margin-top: 8px; font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>巡演酒店房型联动系统</h1>
+    <div class="subtitle">追踪合同截图 → 曲目别名 → 房型联动的完整证据链</div>
+  </div>
+
+  <div class="stats-grid" id="stats"></div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="linkages">房型联动</button>
+    <button class="tab" data-tab="contracts">合同截图</button>
+    <button class="tab" data-tab="aliases">曲目别名</button>
+    <button class="tab" data-tab="weekly">店长周报</button>
+    <button class="tab" data-tab="import">导入数据</button>
+  </div>
+
+  <div id="tab-content"></div>
+</div>
+
+<div id="modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="modal-title">详情</h3>
+      <span class="close" onclick="closeModal()">&times;</span>
+    </div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+let currentTab = 'linkages';
+let currentPage = 1;
+
+async function api(path, options = {}) {
+  const res = await fetch('/api' + path, {
+    headers: { 'Content-Type': 'application/json' },
+    ...options
+  });
+  return res.json();
+}
+
+async function loadStats() {
+  const res = await api('/stats');
+  if (res.success) {
+    const s = res.data;
+    document.getElementById('stats').innerHTML = `
+      <div class="stat-card"><div class="number">${s.total_contracts}</div><div class="label">合同截图总数</div></div>
+      <div class="stat-card"><div class="number">${s.total_linkages}</div><div class="label">联动记录总数</div></div>
+      <div class="stat-card pending"><div class="number">${s.pending_review}</div><div class="label">待音乐老师复核</div></div>
+      <div class="stat-card normal"><div class="number">${s.normal}</div><div class="label">正常联动</div></div>
+      <div class="stat-card no-alias"><div class="number">${s.no_alias}</div><div class="label">缺少别名</div></div>
+      <div class="stat-card"><div class="number">${s.total_aliases}</div><div class="label">曲目别名数</div></div>
+    `;
+  }
+}
+
+function statusBadge(status) {
+  const map = {
+    'imported': ['badge-imported', '已导入'],
+    'confirmed': ['badge-confirmed', '已确认'],
+    'pending': ['badge-pending', '待处理'],
+    'pending_review': ['badge-pending-review', '待复核'],
+    'normal': ['badge-normal', '正常'],
+    'no_alias': ['badge-no-alias', '缺别名'],
+    'name_conflict': ['badge-pending-review', '名称冲突'],
+    'completed': ['badge-normal', '已完成']
+  };
+  const [cls, text] = map[status] || ['badge-pending', status];
+  return `<span class="badge ${cls}">${text}</span>`;
+}
+
+async function loadLinkages() {
+  const status = document.getElementById('filter-status')?.value || '';
+  const song = document.getElementById('filter-song')?.value || '';
+  const res = await api(`/linkages?linkage_status=${status}&song_name=${song}&page=${currentPage}`);
+  if (!res.success) return;
+  
+  const { linkages } = res.data;
+  document.getElementById('tab-content').innerHTML = `
+    <div class="card">
+      <h3>房型联动列表</h3>
+      <div class="filters">
+        <select id="filter-status" onchange="currentPage=1;loadLinkages()">
+          <option value="">全部状态</option>
+          <option value="pending_review">待复核</option>
+          <option value="normal">正常</option>
+          <option value="no_alias">缺别名</option>
+          <option value="name_conflict">名称冲突</option>
+        </select>
+        <input id="filter-song" placeholder="搜索歌曲名..." onkeyup="if(event.key==='Enter'){currentPage=1;loadLinkages()}">
+      </div>
+      ${linkages.length === 0 ? '<div class="empty">暂无数据</div>' : `
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>原始行号</th>
+            <th>原始歌名</th>
+            <th>规范歌名</th>
+            <th>酒店</th>
+            <th>房型</th>
+            <th>房间数</th>
+            <th>状态</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${linkages.map(l => `
+          <tr>
+            <td>${l.id}</td>
+            <td>${l.original_row_number}</td>
+            <td>${l.original_song_name}</td>
+            <td>${l.song_canonical_name || '-'}</td>
+            <td>${l.hotel_name}</td>
+            <td>${l.room_type}</td>
+            <td>${l.room_count}</td>
+            <td>${statusBadge(l.linkage_status)}</td>
+            <td>
+              <button class="btn btn-sm btn-primary" onclick="viewContract(${l.contract_screenshot_id})">查看证据</button>
+              ${l.linkage_status === 'pending_review' ? `<button class="btn btn-sm btn-success" onclick="reviewLinkage(${l.id})">复核</button>` : ''}
+            </td>
+          </tr>
+          ${l.conflict_detail ? `<tr><td colspan="9"><div class="conflict-detail">⚠️ ${JSON.parse(l.conflict_detail).detail}</div></td></tr>` : ''}
+          `).join('')}
+        </tbody>
+      </table>
+      `}
+    </div>
+  `;
+  document.getElementById('filter-status').value = status;
+  document.getElementById('filter-song').value = song;
+}
+
+async function loadContracts() {
+  const res = await api(`/contracts?page=${currentPage}`);
+  if (!res.success) return;
+  
+  const { contracts } = res.data;
+  document.getElementById('tab-content').innerHTML = `
+    <div class="card">
+      <h3>合同截图记录</h3>
+      ${contracts.length === 0 ? '<div class="empty">暂无数据</div>' : `
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>导入批次</th>
+            <th>原始行号</th>
+            <th>歌曲名</th>
+            <th>酒店</th>
+            <th>房型</th>
+            <th>来源文件</th>
+            <th>状态</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${contracts.map(c => `
+          <tr>
+            <td>${c.id}</td>
+            <td><code>${c.import_batch_id.slice(0, 15)}...</code></td>
+            <td>${c.original_row_number}</td>
+            <td>${c.song_name}</td>
+            <td>${c.hotel_name}</td>
+            <td>${c.room_type}</td>
+            <td>${c.source_file}</td>
+            <td>${statusBadge(c.status)}</td>
+            <td>
+              <button class="btn btn-sm btn-primary" onclick="viewContract(${c.id})">详情</button>
+              <button class="btn btn-sm btn-warning" onclick="editRemarks(${c.id})">改备注</button>
+            </td>
+          </tr>
+          `).join('')}
+        </tbody>
+      </table>
+      `}
+    </div>
+  `;
+}
+
+async function loadAliases() {
+  const res = await api('/aliases');
+  if (!res.success) return;
+  
+  const aliases = res.data;
+  document.getElementById('tab-content').innerHTML = `
+    <div class="card">
+      <h3>曲目别名表</h3>
+      <div style="margin-bottom:16px">
+        <button class="btn btn-primary" onclick="showAddAlias()">+ 添加别名</button>
+      </div>
+      ${aliases.length === 0 ? '<div class="empty">暂无别名</div>' : `
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>规范歌名</th>
+            <th>别名</th>
+            <th>类型</th>
+            <th>来源</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${aliases.map(a => `
+          <tr>
+            <td>${a.id}</td>
+            <td>${a.canonical_name}</td>
+            <td>${a.alias_name}</td>
+            <td>${a.alias_type === 'live_name' ? '现场名' : a.alias_type === 'copyright_name' ? '版权名' : a.alias_type}</td>
+            <td>${a.source || '-'}</td>
+          </tr>
+          `).join('')}
+        </tbody>
+      </table>
+      `}
+    </div>
+  `;
+}
+
+async function loadWeeklyReport() {
+  const res = await api('/weekly-report');
+  if (!res.success) return;
+  
+  const data = res.data;
+  document.getElementById('tab-content').innerHTML = `
+    <div class="card">
+      <h3>店长周报 - 房型联动汇总</h3>
+      <div class="alert alert-warning">
+        ⚠️ 注意：标记为"待复核"或"名称冲突"的数据已单独列出，请音乐老师确认后再给店长
+      </div>
+      ${data.length === 0 ? '<div class="empty">暂无数据</div>' : `
+      <table>
+        <thead>
+          <tr>
+            <th>规范歌名</th>
+            <th>原始歌名列表</th>
+            <th>酒店</th>
+            <th>房型</th>
+            <th>总房间数</th>
+            <th>状态</th>
+            <th>涉及批次</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${data.map(d => `
+          <tr>
+            <td>${d.song_canonical_name}</td>
+            <td>${d.original_names}</td>
+            <td>${d.hotel_name}</td>
+            <td>${d.room_type}</td>
+            <td><strong>${d.total_rooms}</strong></td>
+            <td>${statusBadge(d.linkage_status)}</td>
+            <td><code>${d.batches}</code></td>
+          </tr>
+          ${d.conflict_detail ? `<tr><td colspan="7"><div class="conflict-detail">⚠️ ${JSON.parse(d.conflict_detail).detail}</div></td></tr>` : ''}
+          `).join('')}
+        </tbody>
+      </table>
+      `}
+    </div>
+  `;
+}
+
+function loadImport() {
+  document.getElementById('tab-content').innerHTML = `
+    <div class="card">
+      <h3>导入合同页截图</h3>
+      <div class="alert alert-warning">
+        💡 重复导入同一批文件不会重复创建记录，系统会根据文件内容哈希去重
+      </div>
+      <div class="form-group">
+        <label>选择CSV文件</label>
+        <input type="file" id="csv-file" accept=".csv">
+      </div>
+      <div class="form-group">
+        <label>操作人</label>
+        <input type="text" id="operator" value="阿梅">
+      </div>
+      <button class="btn btn-primary" onclick="importCSV()">上传CSV</button>
+      
+      <h4 style="margin:24px 0 16px">或使用示例数据测试</h4>
+      <button class="btn btn-warning" onclick="importDemo()">导入演示数据</button>
+    </div>
+  `;
+}
+
+async function importCSV() {
+  const file = document.getElementById('csv-file').files[0];
+  if (!file) { alert('请选择文件'); return; }
+  
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('operator', document.getElementById('operator').value);
+  
+  const res = await fetch('/api/import/csv', { method: 'POST', body: formData });
+  const data = await res.json();
+  if (data.success) {
+    alert(`导入成功！新增 ${data.data.imported_rows} 条，跳过重复 ${data.data.duplicate_rows} 条`);
+    loadStats();
+    switchTab('linkages');
+  } else {
+    alert('导入失败: ' + data.error);
+  }
+}
+
+async function importDemo() {
+  const demoData = {
+    rows: [
+      { song_name: '七里香 (Live)', hotel_name: '希尔顿酒店', room_type: '标准间', room_count: 5, original_row_number: 3 },
+      { song_name: '七里香', hotel_name: '希尔顿酒店', room_type: '标准间', room_count: 5, original_row_number: 7 },
+      { song_name: '晴天', hotel_name: '万豪酒店', room_type: '大床房', room_count: 3, original_row_number: 12 },
+      { song_name: '晴天 (演唱会版)', hotel_name: '万豪酒店', room_type: '大床房', room_count: 3, original_row_number: 15 },
+      { song_name: '稻香', hotel_name: '洲际酒店', room_type: '套房', room_count: 2, original_row_number: 22 }
+    ],
+    source_file: '合同截图202406_页1-20.csv',
+    operator: '阿梅'
+  };
+  
+  const res = await api('/import/json', { method: 'POST', body: JSON.stringify(demoData) });
+  const data = await res.json();
+  if (data.success) {
+    alert(`演示数据导入成功！新增 ${data.data.imported_rows} 条`);
+    loadStats();
+    
+    await api('/aliases', { method: 'POST', body: JSON.stringify({
+      canonical_name: '七里香', alias_name: '七里香 (Live)', alias_type: 'live_name', source: '曲目别名表V3', operator: '阿梅'
+    })});
+    await api('/aliases', { method: 'POST', body: JSON.stringify({
+      canonical_name: '七里香', alias_name: '七里香', alias_type: 'copyright_name', source: '版权合同', operator: '阿梅'
+    })});
+    await api('/aliases', { method: 'POST', body: JSON.stringify({
+      canonical_name: '晴天', alias_name: '晴天 (演唱会版)', alias_type: 'live_name', source: '曲目别名表V3', operator: '阿梅'
+    })});
+    
+    loadStats();
+    switchTab('linkages');
+  }
+}
+
+async function viewContract(id) {
+  const res = await api(`/contracts/${id}`);
+  if (!res.success) return;
+  
+  const { contract, linkage, workflow, history } = res.data;
+  
+  document.getElementById('modal-title').textContent = `合同截图 #${contract.id} 详情`;
+  document.getElementById('modal-body').innerHTML = `
+    <div class="workflow-steps">
+      ${workflow.map(w => `
+        <div class="workflow-step ${w.step_status === 'completed' ? 'completed' : ''}">
+          <div>${w.label}</div>
+          <div style="font-size:11px;margin-top:4px">${w.step_status === 'completed' ? '✓ 完成' : '○ 待处理'}</div>
+        </div>
+      `).join('')}
+    </div>
+    
+    <h4 style="margin:16px 0 8px">合同原始信息</h4>
+    <div class="form-row">
+      <div class="form-group">
+        <label>原始行号</label>
+        <input type="text" value="${contract.original_row_number}" readonly>
+      </div>
+      <div class="form-group">
+        <label>导入批次</label>
+        <input type="text" value="${contract.import_batch_id}" readonly>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>歌曲名（合同上的）</label>
+        <input type="text" value="${contract.song_name}" readonly>
+      </div>
+      <div class="form-group">
+        <label>规范歌名</label>
+        <input type="text" value="${linkage?.song_canonical_name || '-'}" readonly>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>酒店</label>
+        <input type="text" value="${contract.hotel_name}" readonly>
+      </div>
+      <div class="form-group">
+        <label>房型 / 房间数</label>
+        <input type="text" value="${contract.room_type} / ${contract.room_count}间" readonly>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>备注</label>
+      <textarea readonly rows="2">${contract.remarks || ''}</textarea>
+    </div>
+    <div class="form-group">
+      <label>来源文件</label>
+      <input type="text" value="${contract.source_file}" readonly>
+    </div>
+    
+    ${linkage?.conflict_detail ? `
+    <div class="conflict-detail">
+      <strong>⚠️ 冲突详情：</strong>${JSON.parse(linkage.conflict_detail).detail}
+      <br><small>这一步卡着，请音乐老师复核后才能继续</small>
+    </div>
+    ` : ''}
+    
+    <h4 style="margin:24px 0 8px">操作历史（改前改后都在这）</h4>
+    ${history.length === 0 ? '<div class="empty">暂无历史记录</div>' : 
+      history.map(h => `
+        <div class="history-item">
+          <div>
+            <span class="operator">${h.operator}</span>
+            <span class="time"> · ${h.created_at}</span>
+            <span style="float:right">${h.operation_type}</span>
+          </div>
+          <div class="detail">${h.operation_note || ''}</div>
+          ${h.field_name ? `<div class="detail diff">字段：${h.field_name}
+            ${h.old_value ? `<br><span class="old">改前：${h.old_value}</span>` : ''}
+            ${h.new_value ? `<br><span class="new">改后：${h.new_value}</span>` : ''}
+          </div>` : ''}
+        </div>
+      `).join('')
+    }
+    
+    <div style="margin-top:20px;display:flex;gap:8px;flex-wrap:wrap">
+      ${workflow.find(w => w.step_name === 'alias_check')?.step_status !== 'completed' ?
+        `<button class="btn btn-success" onclick="markWorkflowStep(${contract.id}, 'alias_check', 'completed')">✓ 已核对曲目别名表</button>` : ''}
+      ${workflow.find(w => w.step_name === 'weekly_report')?.step_status !== 'completed' && workflow.find(w => w.step_name === 'alias_check')?.step_status === 'completed' ?
+        `<button class="btn btn-success" onclick="markWorkflowStep(${contract.id}, 'weekly_report', 'completed')">✓ 已更新周报</button>` : ''}
+      <button class="btn btn-warning" onclick="editRemarks(${contract.id})">修改备注</button>
+    </div>
+  `;
+  document.getElementById('modal').classList.add('show');
+}
+
+async function markWorkflowStep(contractId, step, status) {
+  const res = await api(`/contracts/${contractId}/workflow/${step}`, {
+    method: 'PUT',
+    body: JSON.stringify({ status, operator: '阿梅' })
+  });
+  if (res.success) {
+    viewContract(contractId);
+    loadStats();
+    loadLinkages();
+  } else {
+    alert('操作失败: ' + res.error);
+  }
+}
+
+async function editRemarks(contractId) {
+  const res = await api(`/contracts/${contractId}`);
+  if (!res.success) return;
+  
+  const currentRemarks = res.data.contract.remarks || '';
+  const newRemarks = prompt('修改备注：', currentRemarks);
+  if (newRemarks === null) return;
+  
+  const updateRes = await api(`/contracts/${contractId}/remarks`, {
+    method: 'PUT',
+    body: JSON.stringify({ remarks: newRemarks, operator: '阿梅' })
+  });
+  if (updateRes.success) {
+    alert('备注已更新，历史记录已保存');
+    viewContract(contractId);
+    loadContracts();
+  }
+}
+
+async function reviewLinkage(linkageId) {
+  const decision = prompt('复核决定：\n1 = 确认正常 (confirm_normal)\n2 = 标记冲突 (mark_conflict)\n\n请输入数字：', '1');
+  if (!decision) return;
+  
+  const decisionMap = { '1': 'confirm_normal', '2': 'mark_conflict' };
+  const reviewNote = prompt('复核意见：', '');
+  
+  const res = await api(`/linkages/${linkageId}/review`, {
+    method: 'PUT',
+    body: JSON.stringify({ 
+      review_decision: decisionMap[decision], 
+      review_note: reviewNote, 
+      operator: '音乐老师' 
+    })
+  });
+  if (res.success) {
+    alert('复核完成');
+    loadStats();
+    loadLinkages();
+  } else {
+    alert('操作失败: ' + res.error);
+  }
+}
+
+function showAddAlias() {
+  document.getElementById('modal-title').textContent = '添加曲目别名';
+  document.getElementById('modal-body').innerHTML = `
+    <div class="form-group">
+      <label>规范歌名（版权名）</label>
+      <input type="text" id="alias-canonical" placeholder="例如：七里香">
+    </div>
+    <div class="form-group">
+      <label>别名（现场名/其他名称）</label>
+      <input type="text" id="alias-name" placeholder="例如：七里香 (Live)">
+    </div>
+    <div class="form-group">
+      <label>类型</label>
+      <select id="alias-type">
+        <option value="live_name">现场名</option>
+        <option value="copyright_name">版权名</option>
+        <option value="other">其他</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>来源</label>
+      <input type="text" id="alias-source" placeholder="例如：曲目别名表V3">
+    </div>
+    <div style="margin-top:16px">
+      <button class="btn btn-primary" onclick="submitAlias()">保存</button>
+    </div>
+  `;
+  document.getElementById('modal').classList.add('show');
+}
+
+async function submitAlias() {
+  const res = await api('/aliases', {
+    method: 'POST',
+    body: JSON.stringify({
+      canonical_name: document.getElementById('alias-canonical').value,
+      alias_name: document.getElementById('alias-name').value,
+      alias_type: document.getElementById('alias-type').value,
+      source: document.getElementById('alias-source').value,
+      operator: '阿梅'
+    })
+  });
+  if (res.success) {
+    closeModal();
+    loadStats();
+    loadAliases();
+    loadLinkages();
+  } else {
+    alert('保存失败: ' + res.error);
+  }
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('show');
+}
+
+function switchTab(tab) {
+  currentTab = tab;
+  currentPage = 1;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+  
+  switch (tab) {
+    case 'linkages': loadLinkages(); break;
+    case 'contracts': loadContracts(); break;
+    case 'aliases': loadAliases(); break;
+    case 'weekly': loadWeeklyReport(); break;
+    case 'import': loadImport(); break;
+  }
+}
+
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => switchTab(t.dataset.tab));
+});
+
+document.getElementById('modal').addEventListener('click', (e) => {
+  if (e.target.id === 'modal') closeModal();
+});
+
+loadStats();
+loadLinkages();
+</script>
+</body>
+</html>
