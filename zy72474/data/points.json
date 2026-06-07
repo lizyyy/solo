@@ -1,0 +1,3047 @@
+[
+  {
+    "id": "c0733a4a-d257-4314-9906-de5f6417d7bf",
+    "name": "测试点位-和平路口",
+    "lat": 39.9042,
+    "lng": 116.4074,
+    "streets": [
+      "和平街道",
+      "新华街道"
+    ],
+    "boundaryStatus": "boundary_pending",
+    "assignedStreet": null,
+    "photos": [],
+    "busCardPeriods": [
+      {
+        "id": "916969f0-808a-4d90-8c5a-62c83ef50cef",
+        "pointId": "c0733a4a-d257-4314-9906-de5f6417d7bf",
+        "period": "早高峰 7:00-9:00",
+        "passengerVolume": "1200人次",
+        "notes": "阿宁原始备注：周一到周五早高峰特别明显，老年人买菜、年轻人上班都挤在这个时段，建议和周边小区错峰共享停车",
+        "rawText": "阿宁原始备注：周一到周五早高峰特别明显，老年人买菜、年轻人上班都挤在这个时段，建议和周边小区错峰共享停车",
+        "supplementedAt": "2026-06-07T01:52:33.664Z",
+        "supplementedBy": "阿宁"
+      }
+    ],
+    "notes": "阿宁备注：这个路口在两个街道边界上，早高峰特别堵，公交刷卡数据显示7-9点人流量最大",
+    "rawMaterials": {
+      "originalPhotos": [],
+      "originalBusCardData": [
+        {
+          "periodId": "916969f0-808a-4d90-8c5a-62c83ef50cef",
+          "rawText": "阿宁原始备注：周一到周五早高峰特别明显，老年人买菜、年轻人上班都挤在这个时段，建议和周边小区错峰共享停车",
+          "notes": "阿宁原始备注：周一到周五早高峰特别明显，老年人买菜、年轻人上班都挤在这个时段，建议和周边小区错峰共享停车",
+          "supplementedAt": "2026-06-07T01:52:33.664Z"
+        }
+      ]
+    },
+    "workflowStage": "bus_card_supplemented",
+    "versions": [
+      {
+        "versionId": "527bae06-f3a7-4d26-af19-4b99b35f0d13",
+        "timestamp": "2026-06-07T01:52:10.260Z",
+        "action": "create",
+        "reason": "初始创建",
+        "previous": null,
+        "current": {
+          "name": "测试点位-和平路口",
+          "streets": [
+            "和平街道",
+            "新华街道"
+          ],
+          "boundaryStatus": "boundary_pending",
+          "assignedStreet": null,
+          "notes": "阿宁备注：这个路口在两个街道边界上，早高峰特别堵，公交刷卡数据显示7-9点人流量最大",
+          "busCardPeriods": [],
+          "matchCount": 0
+        },
+        "modifiedBy": "system"
+      },
+      {
+        "versionId": "24a18ae9-d183-4a02-a812-8df504403725",
+        "timestamp": "2026-06-07T01:52:33.664Z",
+        "action": "add_bus_card",
+        "reason": "补充公交刷卡时段: 早高峰 7:00-9:00",
+        "previous": {
+          "id": "c0733a4a-d257-4314-9906-de5f6417d7bf",
+          "name": "测试点位-和平路口",
+          "lat": 39.9042,
+          "lng": 116.4074,
+          "streets": [
+            "和平街道",
+            "新华街道"
+          ],
+          "boundaryStatus": "boundary_pending",
+          "assignedStreet": null,
+          "photos": [],
+          "busCardPeriods": [],
+          "notes": "阿宁备注：这个路口在两个街道边界上，早高峰特别堵，公交刷卡数据显示7-9点人流量最大",
+          "rawMaterials": {
+            "originalPhotos": [],
+            "originalBusCardData": []
+          },
+          "workflowStage": "photo_imported",
+          "versions": [
+            {
+              "versionId": "527bae06-f3a7-4d26-af19-4b99b35f0d13",
+              "timestamp": "2026-06-07T01:52:10.260Z",
+              "action": "create",
+              "reason": "初始创建",
+              "previous": null,
+              "current": {
+                "name": "测试点位-和平路口",
+                "streets": [
+                  "和平街道",
+                  "新华街道"
+                ],
+                "boundaryStatus": "boundary_pending",
+                "assignedStreet": null,
+                "notes": "阿宁备注：这个路口在两个街道边界上，早高峰特别堵，公交刷卡数据显示7-9点人流量最大",
+                "busCardPeriods": [],
+                "matchCount": 0
+              },
+              "modifiedBy": "system"
+            }
+          ],
+          "createdAt": "2026-06-07T01:52:10.260Z",
+          "updatedAt": "2026-06-07T01:52:10.260Z",
+          "createdBy": "阿宁",
+          "matchCount": 0,
+          "isDeleted": false
+        },
+        "current": {
+          "name": "测试点位-和平路口",
+          "streets": [
+            "和平街道",
+            "新华街道"
+          ],
+          "boundaryStatus": "boundary_pending",
+          "assignedStreet": null,
+          "notes": "阿宁备注：这个路口在两个街道边界上，早高峰特别堵，公交刷卡数据显示7-9点人流量最大",
+          "busCardPeriods": [
+            {
+              "id": "916969f0-808a-4d90-8c5a-62c83ef50cef",
+              "pointId": "c0733a4a-d257-4314-9906-de5f6417d7bf",
+              "period": "早高峰 7:00-9:00",
+              "passengerVolume": "1200人次",
+              "notes": "阿宁原始备注：周一到周五早高峰特别明显，老年人买菜、年轻人上班都挤在这个时段，建议和周边小区错峰共享停车",
+              "rawText": "阿宁原始备注：周一到周五早高峰特别明显，老年人买菜、年轻人上班都挤在这个时段，建议和周边小区错峰共享停车",
+              "supplementedAt": "2026-06-07T01:52:33.664Z",
+              "supplementedBy": "阿宁"
+            }
+          ],
+          "matchCount": 0
+        },
+        "modifiedBy": "system"
+      },
+      {
+        "versionId": "d7fb7f0f-42b1-4935-943c-10ce22acca6a",
+        "timestamp": "2026-06-07T01:52:33.665Z",
+        "action": "workflow_advance",
+        "reason": "补充公交刷卡时段后自动推进工作流",
+        "previous": {
+          "id": "c0733a4a-d257-4314-9906-de5f6417d7bf",
+          "name": "测试点位-和平路口",
+          "lat": 39.9042,
+          "lng": 116.4074,
+          "streets": [
+            "和平街道",
+            "新华街道"
+          ],
+          "boundaryStatus": "boundary_pending",
+          "assignedStreet": null,
+          "photos": [],
+          "busCardPeriods": [
+            {
+              "id": "916969f0-808a-4d90-8c5a-62c83ef50cef",
+              "pointId": "c0733a4a-d257-4314-9906-de5f6417d7bf",
+              "period": "早高峰 7:00-9:00",
+              "passengerVolume": "1200人次",
+              "notes": "阿宁原始备注：周一到周五早高峰特别明显，老年人买菜、年轻人上班都挤在这个时段，建议和周边小区错峰共享停车",
+              "rawText": "阿宁原始备注：周一到周五早高峰特别明显，老年人买菜、年轻人上班都挤在这个时段，建议和周边小区错峰共享停车",
+              "supplementedAt": "2026-06-07T01:52:33.664Z",
+              "supplementedBy": "阿宁"
+            }
+          ],
+          "notes": "阿宁备注：这个路口在两个街道边界上，早高峰特别堵，公交刷卡数据显示7-9点人流量最大",
+          "rawMaterials": {
+            "originalPhotos": [],
+            "originalBusCardData": [
+              {
+                "periodId": "916969f0-808a-4d90-8c5a-62c83ef50cef",
+                "rawText": "阿宁原始备注：周一到周五早高峰特别明显，老年人买菜、年轻人上班都挤在这个时段，建议和周边小区错峰共享停车",
+                "notes": "阿宁原始备注：周一到周五早高峰特别明显，老年人买菜、年轻人上班都挤在这个时段，建议和周边小区错峰共享停车",
+                "supplementedAt": "2026-06-07T01:52:33.664Z"
+              }
+            ]
+          },
+          "workflowStage": "photo_imported",
+          "versions": [
+            {
+              "versionId": "527bae06-f3a7-4d26-af19-4b99b35f0d13",
+              "timestamp": "2026-06-07T01:52:10.260Z",
+              "action": "create",
+              "reason": "初始创建",
+              "previous": null,
+              "current": {
+                "name": "测试点位-和平路口",
+                "streets": [
+                  "和平街道",
+                  "新华街道"
+                ],
+                "boundaryStatus": "boundary_pending",
+                "assignedStreet": null,
+                "notes": "阿宁备注：这个路口在两个街道边界上，早高峰特别堵，公交刷卡数据显示7-9点人流量最大",
+                "busCardPeriods": [],
+                "matchCount": 0
+              },
+              "modifiedBy": "system"
+            },
+            {
+              "versionId": "24a18ae9-d183-4a02-a812-8df504403725",
+              "timestamp": "2026-06-07T01:52:33.664Z",
+              "action": "add_bus_card",
+              "reason": "补充公交刷卡时段: 早高峰 7:00-9:00",
+              "previous": {
+                "id": "c0733a4a-d257-4314-9906-de5f6417d7bf",
+                "name": "测试点位-和平路口",
+                "lat": 39.9042,
+                "lng": 116.4074,
+                "streets": [
+                  "和平街道",
+                  "新华街道"
+                ],
+                "boundaryStatus": "boundary_pending",
+                "assignedStreet": null,
+                "photos": [],
+                "busCardPeriods": [],
+                "notes": "阿宁备注：这个路口在两个街道边界上，早高峰特别堵，公交刷卡数据显示7-9点人流量最大",
+                "rawMaterials": {
+                  "originalPhotos": [],
+                  "originalBusCardData": []
+                },
+                "workflowStage": "photo_imported",
+                "versions": [
+                  {
+                    "versionId": "527bae06-f3a7-4d26-af19-4b99b35f0d13",
+                    "timestamp": "2026-06-07T01:52:10.260Z",
+                    "action": "create",
+                    "reason": "初始创建",
+                    "previous": null,
+                    "current": {
+                      "name": "测试点位-和平路口",
+                      "streets": [
+                        "和平街道",
+                        "新华街道"
+                      ],
+                      "boundaryStatus": "boundary_pending",
+                      "assignedStreet": null,
+                      "notes": "阿宁备注：这个路口在两个街道边界上，早高峰特别堵，公交刷卡数据显示7-9点人流量最大",
+                      "busCardPeriods": [],
+                      "matchCount": 0
+                    },
+                    "modifiedBy": "system"
+                  }
+                ],
+                "createdAt": "2026-06-07T01:52:10.260Z",
+                "updatedAt": "2026-06-07T01:52:10.260Z",
+                "createdBy": "阿宁",
+                "matchCount": 0,
+                "isDeleted": false
+              },
+              "current": {
+                "name": "测试点位-和平路口",
+                "streets": [
+                  "和平街道",
+                  "新华街道"
+                ],
+                "boundaryStatus": "boundary_pending",
+                "assignedStreet": null,
+                "notes": "阿宁备注：这个路口在两个街道边界上，早高峰特别堵，公交刷卡数据显示7-9点人流量最大",
+                "busCardPeriods": [
+                  {
+                    "id": "916969f0-808a-4d90-8c5a-62c83ef50cef",
+                    "pointId": "c0733a4a-d257-4314-9906-de5f6417d7bf",
+                    "period": "早高峰 7:00-9:00",
+                    "passengerVolume": "1200人次",
+                    "notes": "阿宁原始备注：周一到周五早高峰特别明显，老年人买菜、年轻人上班都挤在这个时段，建议和周边小区错峰共享停车",
+                    "rawText": "阿宁原始备注：周一到周五早高峰特别明显，老年人买菜、年轻人上班都挤在这个时段，建议和周边小区错峰共享停车",
+                    "supplementedAt": "2026-06-07T01:52:33.664Z",
+                    "supplementedBy": "阿宁"
+                  }
+                ],
+                "matchCount": 0
+              },
+              "modifiedBy": "system"
+            }
+          ],
+          "createdAt": "2026-06-07T01:52:10.260Z",
+          "updatedAt": "2026-06-07T01:52:33.664Z",
+          "createdBy": "阿宁",
+          "matchCount": 0,
+          "isDeleted": false
+        },
+        "current": {
+          "name": "测试点位-和平路口",
+          "streets": [
+            "和平街道",
+            "新华街道"
+          ],
+          "boundaryStatus": "boundary_pending",
+          "assignedStreet": null,
+          "notes": "阿宁备注：这个路口在两个街道边界上，早高峰特别堵，公交刷卡数据显示7-9点人流量最大",
+          "busCardPeriods": [
+            {
+              "id": "916969f0-808a-4d90-8c5a-62c83ef50cef",
+              "pointId": "c0733a4a-d257-4314-9906-de5f6417d7bf",
+              "period": "早高峰 7:00-9:00",
+              "passengerVolume": "1200人次",
+              "notes": "阿宁原始备注：周一到周五早高峰特别明显，老年人买菜、年轻人上班都挤在这个时段，建议和周边小区错峰共享停车",
+              "rawText": "阿宁原始备注：周一到周五早高峰特别明显，老年人买菜、年轻人上班都挤在这个时段，建议和周边小区错峰共享停车",
+              "supplementedAt": "2026-06-07T01:52:33.664Z",
+              "supplementedBy": "阿宁"
+            }
+          ],
+          "matchCount": 0
+        },
+        "modifiedBy": "阿宁"
+      }
+    ],
+    "createdAt": "2026-06-07T01:52:10.260Z",
+    "updatedAt": "2026-06-07T01:52:33.665Z",
+    "createdBy": "阿宁",
+    "matchCount": 0,
+    "isDeleted": false,
+    "updatedBy": "阿宁"
+  },
+  {
+    "id": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+    "name": "测试路口-文化路交口",
+    "lat": 39.91,
+    "lng": 116.42,
+    "streets": [
+      "文化路街道",
+      "建设路街道"
+    ],
+    "boundaryStatus": "boundary_pending",
+    "assignedStreet": "文化路街道",
+    "photos": [],
+    "busCardPeriods": [
+      {
+        "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+        "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+        "period": "晚高峰 17:30-19:30",
+        "passengerVolume": "1500人次",
+        "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+        "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+        "supplementedAt": "2026-06-07T01:53:25.698Z",
+        "supplementedBy": "阿宁"
+      }
+    ],
+    "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+    "rawMaterials": {
+      "originalPhotos": [],
+      "originalBusCardData": [
+        {
+          "periodId": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+          "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+          "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+          "supplementedAt": "2026-06-07T01:53:25.698Z"
+        }
+      ]
+    },
+    "workflowStage": "map_exported",
+    "versions": [
+      {
+        "versionId": "ba738c3f-4938-46fb-b85b-bd9bffb7092c",
+        "timestamp": "2026-06-07T01:53:25.697Z",
+        "action": "create",
+        "reason": "初始创建",
+        "previous": null,
+        "current": {
+          "name": "测试路口-文化路交口",
+          "streets": [
+            "文化路街道",
+            "建设路街道"
+          ],
+          "boundaryStatus": "boundary_pending",
+          "assignedStreet": null,
+          "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+          "busCardPeriods": [],
+          "matchCount": 0
+        },
+        "modifiedBy": "system"
+      },
+      {
+        "versionId": "5afe51e1-7e2d-401e-95e8-8fa47a155124",
+        "timestamp": "2026-06-07T01:53:25.699Z",
+        "action": "add_bus_card",
+        "reason": "补充公交刷卡时段: 晚高峰 17:30-19:30",
+        "previous": {
+          "id": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+          "name": "测试路口-文化路交口",
+          "lat": 39.91,
+          "lng": 116.42,
+          "streets": [
+            "文化路街道",
+            "建设路街道"
+          ],
+          "boundaryStatus": "boundary_pending",
+          "assignedStreet": null,
+          "photos": [],
+          "busCardPeriods": [],
+          "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+          "rawMaterials": {
+            "originalPhotos": [],
+            "originalBusCardData": []
+          },
+          "workflowStage": "photo_imported",
+          "versions": [
+            {
+              "versionId": "ba738c3f-4938-46fb-b85b-bd9bffb7092c",
+              "timestamp": "2026-06-07T01:53:25.697Z",
+              "action": "create",
+              "reason": "初始创建",
+              "previous": null,
+              "current": {
+                "name": "测试路口-文化路交口",
+                "streets": [
+                  "文化路街道",
+                  "建设路街道"
+                ],
+                "boundaryStatus": "boundary_pending",
+                "assignedStreet": null,
+                "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                "busCardPeriods": [],
+                "matchCount": 0
+              },
+              "modifiedBy": "system"
+            }
+          ],
+          "createdAt": "2026-06-07T01:53:25.697Z",
+          "updatedAt": "2026-06-07T01:53:25.697Z",
+          "createdBy": "阿宁",
+          "matchCount": 0,
+          "isDeleted": false
+        },
+        "current": {
+          "name": "测试路口-文化路交口",
+          "streets": [
+            "文化路街道",
+            "建设路街道"
+          ],
+          "boundaryStatus": "boundary_pending",
+          "assignedStreet": null,
+          "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+          "busCardPeriods": [
+            {
+              "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+              "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+              "period": "晚高峰 17:30-19:30",
+              "passengerVolume": "1500人次",
+              "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+              "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+              "supplementedAt": "2026-06-07T01:53:25.698Z",
+              "supplementedBy": "阿宁"
+            }
+          ],
+          "matchCount": 0
+        },
+        "modifiedBy": "system"
+      },
+      {
+        "versionId": "e82d3313-eb54-4e2a-98ca-13b38cca41f6",
+        "timestamp": "2026-06-07T01:53:25.699Z",
+        "action": "workflow_advance",
+        "reason": "补充公交刷卡时段后自动推进工作流",
+        "previous": {
+          "id": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+          "name": "测试路口-文化路交口",
+          "lat": 39.91,
+          "lng": 116.42,
+          "streets": [
+            "文化路街道",
+            "建设路街道"
+          ],
+          "boundaryStatus": "boundary_pending",
+          "assignedStreet": null,
+          "photos": [],
+          "busCardPeriods": [
+            {
+              "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+              "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+              "period": "晚高峰 17:30-19:30",
+              "passengerVolume": "1500人次",
+              "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+              "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+              "supplementedAt": "2026-06-07T01:53:25.698Z",
+              "supplementedBy": "阿宁"
+            }
+          ],
+          "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+          "rawMaterials": {
+            "originalPhotos": [],
+            "originalBusCardData": [
+              {
+                "periodId": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                "supplementedAt": "2026-06-07T01:53:25.698Z"
+              }
+            ]
+          },
+          "workflowStage": "photo_imported",
+          "versions": [
+            {
+              "versionId": "ba738c3f-4938-46fb-b85b-bd9bffb7092c",
+              "timestamp": "2026-06-07T01:53:25.697Z",
+              "action": "create",
+              "reason": "初始创建",
+              "previous": null,
+              "current": {
+                "name": "测试路口-文化路交口",
+                "streets": [
+                  "文化路街道",
+                  "建设路街道"
+                ],
+                "boundaryStatus": "boundary_pending",
+                "assignedStreet": null,
+                "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                "busCardPeriods": [],
+                "matchCount": 0
+              },
+              "modifiedBy": "system"
+            },
+            {
+              "versionId": "5afe51e1-7e2d-401e-95e8-8fa47a155124",
+              "timestamp": "2026-06-07T01:53:25.699Z",
+              "action": "add_bus_card",
+              "reason": "补充公交刷卡时段: 晚高峰 17:30-19:30",
+              "previous": {
+                "id": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                "name": "测试路口-文化路交口",
+                "lat": 39.91,
+                "lng": 116.42,
+                "streets": [
+                  "文化路街道",
+                  "建设路街道"
+                ],
+                "boundaryStatus": "boundary_pending",
+                "assignedStreet": null,
+                "photos": [],
+                "busCardPeriods": [],
+                "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                "rawMaterials": {
+                  "originalPhotos": [],
+                  "originalBusCardData": []
+                },
+                "workflowStage": "photo_imported",
+                "versions": [
+                  {
+                    "versionId": "ba738c3f-4938-46fb-b85b-bd9bffb7092c",
+                    "timestamp": "2026-06-07T01:53:25.697Z",
+                    "action": "create",
+                    "reason": "初始创建",
+                    "previous": null,
+                    "current": {
+                      "name": "测试路口-文化路交口",
+                      "streets": [
+                        "文化路街道",
+                        "建设路街道"
+                      ],
+                      "boundaryStatus": "boundary_pending",
+                      "assignedStreet": null,
+                      "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                      "busCardPeriods": [],
+                      "matchCount": 0
+                    },
+                    "modifiedBy": "system"
+                  }
+                ],
+                "createdAt": "2026-06-07T01:53:25.697Z",
+                "updatedAt": "2026-06-07T01:53:25.697Z",
+                "createdBy": "阿宁",
+                "matchCount": 0,
+                "isDeleted": false
+              },
+              "current": {
+                "name": "测试路口-文化路交口",
+                "streets": [
+                  "文化路街道",
+                  "建设路街道"
+                ],
+                "boundaryStatus": "boundary_pending",
+                "assignedStreet": null,
+                "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                "busCardPeriods": [
+                  {
+                    "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                    "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                    "period": "晚高峰 17:30-19:30",
+                    "passengerVolume": "1500人次",
+                    "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                    "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                    "supplementedAt": "2026-06-07T01:53:25.698Z",
+                    "supplementedBy": "阿宁"
+                  }
+                ],
+                "matchCount": 0
+              },
+              "modifiedBy": "system"
+            }
+          ],
+          "createdAt": "2026-06-07T01:53:25.697Z",
+          "updatedAt": "2026-06-07T01:53:25.699Z",
+          "createdBy": "阿宁",
+          "matchCount": 0,
+          "isDeleted": false
+        },
+        "current": {
+          "name": "测试路口-文化路交口",
+          "streets": [
+            "文化路街道",
+            "建设路街道"
+          ],
+          "boundaryStatus": "boundary_pending",
+          "assignedStreet": null,
+          "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+          "busCardPeriods": [
+            {
+              "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+              "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+              "period": "晚高峰 17:30-19:30",
+              "passengerVolume": "1500人次",
+              "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+              "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+              "supplementedAt": "2026-06-07T01:53:25.698Z",
+              "supplementedBy": "阿宁"
+            }
+          ],
+          "matchCount": 0
+        },
+        "modifiedBy": "阿宁"
+      },
+      {
+        "versionId": "52da7358-0f39-4c89-890a-d8ce8cc821e0",
+        "timestamp": "2026-06-07T01:53:25.702Z",
+        "action": "boundary_confirm",
+        "reason": "项目经理确认边界点位，归属街道: 文化路街道",
+        "previous": {
+          "id": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+          "name": "测试路口-文化路交口",
+          "lat": 39.91,
+          "lng": 116.42,
+          "streets": [
+            "文化路街道",
+            "建设路街道"
+          ],
+          "boundaryStatus": "boundary_pending",
+          "assignedStreet": null,
+          "photos": [],
+          "busCardPeriods": [
+            {
+              "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+              "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+              "period": "晚高峰 17:30-19:30",
+              "passengerVolume": "1500人次",
+              "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+              "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+              "supplementedAt": "2026-06-07T01:53:25.698Z",
+              "supplementedBy": "阿宁"
+            }
+          ],
+          "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+          "rawMaterials": {
+            "originalPhotos": [],
+            "originalBusCardData": [
+              {
+                "periodId": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                "supplementedAt": "2026-06-07T01:53:25.698Z"
+              }
+            ]
+          },
+          "workflowStage": "bus_card_supplemented",
+          "versions": [
+            {
+              "versionId": "ba738c3f-4938-46fb-b85b-bd9bffb7092c",
+              "timestamp": "2026-06-07T01:53:25.697Z",
+              "action": "create",
+              "reason": "初始创建",
+              "previous": null,
+              "current": {
+                "name": "测试路口-文化路交口",
+                "streets": [
+                  "文化路街道",
+                  "建设路街道"
+                ],
+                "boundaryStatus": "boundary_pending",
+                "assignedStreet": null,
+                "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                "busCardPeriods": [],
+                "matchCount": 0
+              },
+              "modifiedBy": "system"
+            },
+            {
+              "versionId": "5afe51e1-7e2d-401e-95e8-8fa47a155124",
+              "timestamp": "2026-06-07T01:53:25.699Z",
+              "action": "add_bus_card",
+              "reason": "补充公交刷卡时段: 晚高峰 17:30-19:30",
+              "previous": {
+                "id": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                "name": "测试路口-文化路交口",
+                "lat": 39.91,
+                "lng": 116.42,
+                "streets": [
+                  "文化路街道",
+                  "建设路街道"
+                ],
+                "boundaryStatus": "boundary_pending",
+                "assignedStreet": null,
+                "photos": [],
+                "busCardPeriods": [],
+                "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                "rawMaterials": {
+                  "originalPhotos": [],
+                  "originalBusCardData": []
+                },
+                "workflowStage": "photo_imported",
+                "versions": [
+                  {
+                    "versionId": "ba738c3f-4938-46fb-b85b-bd9bffb7092c",
+                    "timestamp": "2026-06-07T01:53:25.697Z",
+                    "action": "create",
+                    "reason": "初始创建",
+                    "previous": null,
+                    "current": {
+                      "name": "测试路口-文化路交口",
+                      "streets": [
+                        "文化路街道",
+                        "建设路街道"
+                      ],
+                      "boundaryStatus": "boundary_pending",
+                      "assignedStreet": null,
+                      "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                      "busCardPeriods": [],
+                      "matchCount": 0
+                    },
+                    "modifiedBy": "system"
+                  }
+                ],
+                "createdAt": "2026-06-07T01:53:25.697Z",
+                "updatedAt": "2026-06-07T01:53:25.697Z",
+                "createdBy": "阿宁",
+                "matchCount": 0,
+                "isDeleted": false
+              },
+              "current": {
+                "name": "测试路口-文化路交口",
+                "streets": [
+                  "文化路街道",
+                  "建设路街道"
+                ],
+                "boundaryStatus": "boundary_pending",
+                "assignedStreet": null,
+                "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                "busCardPeriods": [
+                  {
+                    "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                    "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                    "period": "晚高峰 17:30-19:30",
+                    "passengerVolume": "1500人次",
+                    "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                    "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                    "supplementedAt": "2026-06-07T01:53:25.698Z",
+                    "supplementedBy": "阿宁"
+                  }
+                ],
+                "matchCount": 0
+              },
+              "modifiedBy": "system"
+            },
+            {
+              "versionId": "e82d3313-eb54-4e2a-98ca-13b38cca41f6",
+              "timestamp": "2026-06-07T01:53:25.699Z",
+              "action": "workflow_advance",
+              "reason": "补充公交刷卡时段后自动推进工作流",
+              "previous": {
+                "id": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                "name": "测试路口-文化路交口",
+                "lat": 39.91,
+                "lng": 116.42,
+                "streets": [
+                  "文化路街道",
+                  "建设路街道"
+                ],
+                "boundaryStatus": "boundary_pending",
+                "assignedStreet": null,
+                "photos": [],
+                "busCardPeriods": [
+                  {
+                    "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                    "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                    "period": "晚高峰 17:30-19:30",
+                    "passengerVolume": "1500人次",
+                    "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                    "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                    "supplementedAt": "2026-06-07T01:53:25.698Z",
+                    "supplementedBy": "阿宁"
+                  }
+                ],
+                "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                "rawMaterials": {
+                  "originalPhotos": [],
+                  "originalBusCardData": [
+                    {
+                      "periodId": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                      "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                      "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                      "supplementedAt": "2026-06-07T01:53:25.698Z"
+                    }
+                  ]
+                },
+                "workflowStage": "photo_imported",
+                "versions": [
+                  {
+                    "versionId": "ba738c3f-4938-46fb-b85b-bd9bffb7092c",
+                    "timestamp": "2026-06-07T01:53:25.697Z",
+                    "action": "create",
+                    "reason": "初始创建",
+                    "previous": null,
+                    "current": {
+                      "name": "测试路口-文化路交口",
+                      "streets": [
+                        "文化路街道",
+                        "建设路街道"
+                      ],
+                      "boundaryStatus": "boundary_pending",
+                      "assignedStreet": null,
+                      "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                      "busCardPeriods": [],
+                      "matchCount": 0
+                    },
+                    "modifiedBy": "system"
+                  },
+                  {
+                    "versionId": "5afe51e1-7e2d-401e-95e8-8fa47a155124",
+                    "timestamp": "2026-06-07T01:53:25.699Z",
+                    "action": "add_bus_card",
+                    "reason": "补充公交刷卡时段: 晚高峰 17:30-19:30",
+                    "previous": {
+                      "id": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                      "name": "测试路口-文化路交口",
+                      "lat": 39.91,
+                      "lng": 116.42,
+                      "streets": [
+                        "文化路街道",
+                        "建设路街道"
+                      ],
+                      "boundaryStatus": "boundary_pending",
+                      "assignedStreet": null,
+                      "photos": [],
+                      "busCardPeriods": [],
+                      "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                      "rawMaterials": {
+                        "originalPhotos": [],
+                        "originalBusCardData": []
+                      },
+                      "workflowStage": "photo_imported",
+                      "versions": [
+                        {
+                          "versionId": "ba738c3f-4938-46fb-b85b-bd9bffb7092c",
+                          "timestamp": "2026-06-07T01:53:25.697Z",
+                          "action": "create",
+                          "reason": "初始创建",
+                          "previous": null,
+                          "current": {
+                            "name": "测试路口-文化路交口",
+                            "streets": [
+                              "文化路街道",
+                              "建设路街道"
+                            ],
+                            "boundaryStatus": "boundary_pending",
+                            "assignedStreet": null,
+                            "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                            "busCardPeriods": [],
+                            "matchCount": 0
+                          },
+                          "modifiedBy": "system"
+                        }
+                      ],
+                      "createdAt": "2026-06-07T01:53:25.697Z",
+                      "updatedAt": "2026-06-07T01:53:25.697Z",
+                      "createdBy": "阿宁",
+                      "matchCount": 0,
+                      "isDeleted": false
+                    },
+                    "current": {
+                      "name": "测试路口-文化路交口",
+                      "streets": [
+                        "文化路街道",
+                        "建设路街道"
+                      ],
+                      "boundaryStatus": "boundary_pending",
+                      "assignedStreet": null,
+                      "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                      "busCardPeriods": [
+                        {
+                          "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                          "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                          "period": "晚高峰 17:30-19:30",
+                          "passengerVolume": "1500人次",
+                          "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                          "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                          "supplementedAt": "2026-06-07T01:53:25.698Z",
+                          "supplementedBy": "阿宁"
+                        }
+                      ],
+                      "matchCount": 0
+                    },
+                    "modifiedBy": "system"
+                  }
+                ],
+                "createdAt": "2026-06-07T01:53:25.697Z",
+                "updatedAt": "2026-06-07T01:53:25.699Z",
+                "createdBy": "阿宁",
+                "matchCount": 0,
+                "isDeleted": false
+              },
+              "current": {
+                "name": "测试路口-文化路交口",
+                "streets": [
+                  "文化路街道",
+                  "建设路街道"
+                ],
+                "boundaryStatus": "boundary_pending",
+                "assignedStreet": null,
+                "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                "busCardPeriods": [
+                  {
+                    "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                    "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                    "period": "晚高峰 17:30-19:30",
+                    "passengerVolume": "1500人次",
+                    "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                    "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                    "supplementedAt": "2026-06-07T01:53:25.698Z",
+                    "supplementedBy": "阿宁"
+                  }
+                ],
+                "matchCount": 0
+              },
+              "modifiedBy": "阿宁"
+            }
+          ],
+          "createdAt": "2026-06-07T01:53:25.697Z",
+          "updatedAt": "2026-06-07T01:53:25.699Z",
+          "createdBy": "阿宁",
+          "matchCount": 0,
+          "isDeleted": false,
+          "updatedBy": "阿宁"
+        },
+        "current": {
+          "name": "测试路口-文化路交口",
+          "streets": [
+            "文化路街道",
+            "建设路街道"
+          ],
+          "boundaryStatus": "boundary_confirmed",
+          "assignedStreet": "文化路街道",
+          "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+          "busCardPeriods": [
+            {
+              "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+              "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+              "period": "晚高峰 17:30-19:30",
+              "passengerVolume": "1500人次",
+              "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+              "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+              "supplementedAt": "2026-06-07T01:53:25.698Z",
+              "supplementedBy": "阿宁"
+            }
+          ],
+          "matchCount": 0
+        },
+        "modifiedBy": "阿宁"
+      },
+      {
+        "versionId": "2fb103b8-b809-4260-9506-f2a57124a865",
+        "timestamp": "2026-06-07T01:53:25.707Z",
+        "action": "workflow_advance",
+        "reason": "工作流推进到: map_exported",
+        "previous": {
+          "id": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+          "name": "测试路口-文化路交口",
+          "lat": 39.91,
+          "lng": 116.42,
+          "streets": [
+            "文化路街道",
+            "建设路街道"
+          ],
+          "boundaryStatus": "boundary_confirmed",
+          "assignedStreet": "文化路街道",
+          "photos": [],
+          "busCardPeriods": [
+            {
+              "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+              "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+              "period": "晚高峰 17:30-19:30",
+              "passengerVolume": "1500人次",
+              "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+              "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+              "supplementedAt": "2026-06-07T01:53:25.698Z",
+              "supplementedBy": "阿宁"
+            }
+          ],
+          "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+          "rawMaterials": {
+            "originalPhotos": [],
+            "originalBusCardData": [
+              {
+                "periodId": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                "supplementedAt": "2026-06-07T01:53:25.698Z"
+              }
+            ]
+          },
+          "workflowStage": "bus_card_supplemented",
+          "versions": [
+            {
+              "versionId": "ba738c3f-4938-46fb-b85b-bd9bffb7092c",
+              "timestamp": "2026-06-07T01:53:25.697Z",
+              "action": "create",
+              "reason": "初始创建",
+              "previous": null,
+              "current": {
+                "name": "测试路口-文化路交口",
+                "streets": [
+                  "文化路街道",
+                  "建设路街道"
+                ],
+                "boundaryStatus": "boundary_pending",
+                "assignedStreet": null,
+                "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                "busCardPeriods": [],
+                "matchCount": 0
+              },
+              "modifiedBy": "system"
+            },
+            {
+              "versionId": "5afe51e1-7e2d-401e-95e8-8fa47a155124",
+              "timestamp": "2026-06-07T01:53:25.699Z",
+              "action": "add_bus_card",
+              "reason": "补充公交刷卡时段: 晚高峰 17:30-19:30",
+              "previous": {
+                "id": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                "name": "测试路口-文化路交口",
+                "lat": 39.91,
+                "lng": 116.42,
+                "streets": [
+                  "文化路街道",
+                  "建设路街道"
+                ],
+                "boundaryStatus": "boundary_pending",
+                "assignedStreet": null,
+                "photos": [],
+                "busCardPeriods": [],
+                "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                "rawMaterials": {
+                  "originalPhotos": [],
+                  "originalBusCardData": []
+                },
+                "workflowStage": "photo_imported",
+                "versions": [
+                  {
+                    "versionId": "ba738c3f-4938-46fb-b85b-bd9bffb7092c",
+                    "timestamp": "2026-06-07T01:53:25.697Z",
+                    "action": "create",
+                    "reason": "初始创建",
+                    "previous": null,
+                    "current": {
+                      "name": "测试路口-文化路交口",
+                      "streets": [
+                        "文化路街道",
+                        "建设路街道"
+                      ],
+                      "boundaryStatus": "boundary_pending",
+                      "assignedStreet": null,
+                      "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                      "busCardPeriods": [],
+                      "matchCount": 0
+                    },
+                    "modifiedBy": "system"
+                  }
+                ],
+                "createdAt": "2026-06-07T01:53:25.697Z",
+                "updatedAt": "2026-06-07T01:53:25.697Z",
+                "createdBy": "阿宁",
+                "matchCount": 0,
+                "isDeleted": false
+              },
+              "current": {
+                "name": "测试路口-文化路交口",
+                "streets": [
+                  "文化路街道",
+                  "建设路街道"
+                ],
+                "boundaryStatus": "boundary_pending",
+                "assignedStreet": null,
+                "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                "busCardPeriods": [
+                  {
+                    "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                    "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                    "period": "晚高峰 17:30-19:30",
+                    "passengerVolume": "1500人次",
+                    "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                    "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                    "supplementedAt": "2026-06-07T01:53:25.698Z",
+                    "supplementedBy": "阿宁"
+                  }
+                ],
+                "matchCount": 0
+              },
+              "modifiedBy": "system"
+            },
+            {
+              "versionId": "e82d3313-eb54-4e2a-98ca-13b38cca41f6",
+              "timestamp": "2026-06-07T01:53:25.699Z",
+              "action": "workflow_advance",
+              "reason": "补充公交刷卡时段后自动推进工作流",
+              "previous": {
+                "id": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                "name": "测试路口-文化路交口",
+                "lat": 39.91,
+                "lng": 116.42,
+                "streets": [
+                  "文化路街道",
+                  "建设路街道"
+                ],
+                "boundaryStatus": "boundary_pending",
+                "assignedStreet": null,
+                "photos": [],
+                "busCardPeriods": [
+                  {
+                    "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                    "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                    "period": "晚高峰 17:30-19:30",
+                    "passengerVolume": "1500人次",
+                    "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                    "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                    "supplementedAt": "2026-06-07T01:53:25.698Z",
+                    "supplementedBy": "阿宁"
+                  }
+                ],
+                "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                "rawMaterials": {
+                  "originalPhotos": [],
+                  "originalBusCardData": [
+                    {
+                      "periodId": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                      "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                      "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                      "supplementedAt": "2026-06-07T01:53:25.698Z"
+                    }
+                  ]
+                },
+                "workflowStage": "photo_imported",
+                "versions": [
+                  {
+                    "versionId": "ba738c3f-4938-46fb-b85b-bd9bffb7092c",
+                    "timestamp": "2026-06-07T01:53:25.697Z",
+                    "action": "create",
+                    "reason": "初始创建",
+                    "previous": null,
+                    "current": {
+                      "name": "测试路口-文化路交口",
+                      "streets": [
+                        "文化路街道",
+                        "建设路街道"
+                      ],
+                      "boundaryStatus": "boundary_pending",
+                      "assignedStreet": null,
+                      "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                      "busCardPeriods": [],
+                      "matchCount": 0
+                    },
+                    "modifiedBy": "system"
+                  },
+                  {
+                    "versionId": "5afe51e1-7e2d-401e-95e8-8fa47a155124",
+                    "timestamp": "2026-06-07T01:53:25.699Z",
+                    "action": "add_bus_card",
+                    "reason": "补充公交刷卡时段: 晚高峰 17:30-19:30",
+                    "previous": {
+                      "id": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                      "name": "测试路口-文化路交口",
+                      "lat": 39.91,
+                      "lng": 116.42,
+                      "streets": [
+                        "文化路街道",
+                        "建设路街道"
+                      ],
+                      "boundaryStatus": "boundary_pending",
+                      "assignedStreet": null,
+                      "photos": [],
+                      "busCardPeriods": [],
+                      "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                      "rawMaterials": {
+                        "originalPhotos": [],
+                        "originalBusCardData": []
+                      },
+                      "workflowStage": "photo_imported",
+                      "versions": [
+                        {
+                          "versionId": "ba738c3f-4938-46fb-b85b-bd9bffb7092c",
+                          "timestamp": "2026-06-07T01:53:25.697Z",
+                          "action": "create",
+                          "reason": "初始创建",
+                          "previous": null,
+                          "current": {
+                            "name": "测试路口-文化路交口",
+                            "streets": [
+                              "文化路街道",
+                              "建设路街道"
+                            ],
+                            "boundaryStatus": "boundary_pending",
+                            "assignedStreet": null,
+                            "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                            "busCardPeriods": [],
+                            "matchCount": 0
+                          },
+                          "modifiedBy": "system"
+                        }
+                      ],
+                      "createdAt": "2026-06-07T01:53:25.697Z",
+                      "updatedAt": "2026-06-07T01:53:25.697Z",
+                      "createdBy": "阿宁",
+                      "matchCount": 0,
+                      "isDeleted": false
+                    },
+                    "current": {
+                      "name": "测试路口-文化路交口",
+                      "streets": [
+                        "文化路街道",
+                        "建设路街道"
+                      ],
+                      "boundaryStatus": "boundary_pending",
+                      "assignedStreet": null,
+                      "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                      "busCardPeriods": [
+                        {
+                          "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                          "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                          "period": "晚高峰 17:30-19:30",
+                          "passengerVolume": "1500人次",
+                          "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                          "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                          "supplementedAt": "2026-06-07T01:53:25.698Z",
+                          "supplementedBy": "阿宁"
+                        }
+                      ],
+                      "matchCount": 0
+                    },
+                    "modifiedBy": "system"
+                  }
+                ],
+                "createdAt": "2026-06-07T01:53:25.697Z",
+                "updatedAt": "2026-06-07T01:53:25.699Z",
+                "createdBy": "阿宁",
+                "matchCount": 0,
+                "isDeleted": false
+              },
+              "current": {
+                "name": "测试路口-文化路交口",
+                "streets": [
+                  "文化路街道",
+                  "建设路街道"
+                ],
+                "boundaryStatus": "boundary_pending",
+                "assignedStreet": null,
+                "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                "busCardPeriods": [
+                  {
+                    "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                    "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                    "period": "晚高峰 17:30-19:30",
+                    "passengerVolume": "1500人次",
+                    "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                    "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                    "supplementedAt": "2026-06-07T01:53:25.698Z",
+                    "supplementedBy": "阿宁"
+                  }
+                ],
+                "matchCount": 0
+              },
+              "modifiedBy": "阿宁"
+            },
+            {
+              "versionId": "52da7358-0f39-4c89-890a-d8ce8cc821e0",
+              "timestamp": "2026-06-07T01:53:25.702Z",
+              "action": "boundary_confirm",
+              "reason": "项目经理确认边界点位，归属街道: 文化路街道",
+              "previous": {
+                "id": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                "name": "测试路口-文化路交口",
+                "lat": 39.91,
+                "lng": 116.42,
+                "streets": [
+                  "文化路街道",
+                  "建设路街道"
+                ],
+                "boundaryStatus": "boundary_pending",
+                "assignedStreet": null,
+                "photos": [],
+                "busCardPeriods": [
+                  {
+                    "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                    "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                    "period": "晚高峰 17:30-19:30",
+                    "passengerVolume": "1500人次",
+                    "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                    "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                    "supplementedAt": "2026-06-07T01:53:25.698Z",
+                    "supplementedBy": "阿宁"
+                  }
+                ],
+                "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                "rawMaterials": {
+                  "originalPhotos": [],
+                  "originalBusCardData": [
+                    {
+                      "periodId": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                      "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                      "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                      "supplementedAt": "2026-06-07T01:53:25.698Z"
+                    }
+                  ]
+                },
+                "workflowStage": "bus_card_supplemented",
+                "versions": [
+                  {
+                    "versionId": "ba738c3f-4938-46fb-b85b-bd9bffb7092c",
+                    "timestamp": "2026-06-07T01:53:25.697Z",
+                    "action": "create",
+                    "reason": "初始创建",
+                    "previous": null,
+                    "current": {
+                      "name": "测试路口-文化路交口",
+                      "streets": [
+                        "文化路街道",
+                        "建设路街道"
+                      ],
+                      "boundaryStatus": "boundary_pending",
+                      "assignedStreet": null,
+                      "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                      "busCardPeriods": [],
+                      "matchCount": 0
+                    },
+                    "modifiedBy": "system"
+                  },
+                  {
+                    "versionId": "5afe51e1-7e2d-401e-95e8-8fa47a155124",
+                    "timestamp": "2026-06-07T01:53:25.699Z",
+                    "action": "add_bus_card",
+                    "reason": "补充公交刷卡时段: 晚高峰 17:30-19:30",
+                    "previous": {
+                      "id": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                      "name": "测试路口-文化路交口",
+                      "lat": 39.91,
+                      "lng": 116.42,
+                      "streets": [
+                        "文化路街道",
+                        "建设路街道"
+                      ],
+                      "boundaryStatus": "boundary_pending",
+                      "assignedStreet": null,
+                      "photos": [],
+                      "busCardPeriods": [],
+                      "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                      "rawMaterials": {
+                        "originalPhotos": [],
+                        "originalBusCardData": []
+                      },
+                      "workflowStage": "photo_imported",
+                      "versions": [
+                        {
+                          "versionId": "ba738c3f-4938-46fb-b85b-bd9bffb7092c",
+                          "timestamp": "2026-06-07T01:53:25.697Z",
+                          "action": "create",
+                          "reason": "初始创建",
+                          "previous": null,
+                          "current": {
+                            "name": "测试路口-文化路交口",
+                            "streets": [
+                              "文化路街道",
+                              "建设路街道"
+                            ],
+                            "boundaryStatus": "boundary_pending",
+                            "assignedStreet": null,
+                            "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                            "busCardPeriods": [],
+                            "matchCount": 0
+                          },
+                          "modifiedBy": "system"
+                        }
+                      ],
+                      "createdAt": "2026-06-07T01:53:25.697Z",
+                      "updatedAt": "2026-06-07T01:53:25.697Z",
+                      "createdBy": "阿宁",
+                      "matchCount": 0,
+                      "isDeleted": false
+                    },
+                    "current": {
+                      "name": "测试路口-文化路交口",
+                      "streets": [
+                        "文化路街道",
+                        "建设路街道"
+                      ],
+                      "boundaryStatus": "boundary_pending",
+                      "assignedStreet": null,
+                      "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                      "busCardPeriods": [
+                        {
+                          "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                          "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                          "period": "晚高峰 17:30-19:30",
+                          "passengerVolume": "1500人次",
+                          "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                          "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                          "supplementedAt": "2026-06-07T01:53:25.698Z",
+                          "supplementedBy": "阿宁"
+                        }
+                      ],
+                      "matchCount": 0
+                    },
+                    "modifiedBy": "system"
+                  },
+                  {
+                    "versionId": "e82d3313-eb54-4e2a-98ca-13b38cca41f6",
+                    "timestamp": "2026-06-07T01:53:25.699Z",
+                    "action": "workflow_advance",
+                    "reason": "补充公交刷卡时段后自动推进工作流",
+                    "previous": {
+                      "id": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                      "name": "测试路口-文化路交口",
+                      "lat": 39.91,
+                      "lng": 116.42,
+                      "streets": [
+                        "文化路街道",
+                        "建设路街道"
+                      ],
+                      "boundaryStatus": "boundary_pending",
+                      "assignedStreet": null,
+                      "photos": [],
+                      "busCardPeriods": [
+                        {
+                          "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                          "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                          "period": "晚高峰 17:30-19:30",
+                          "passengerVolume": "1500人次",
+                          "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                          "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                          "supplementedAt": "2026-06-07T01:53:25.698Z",
+                          "supplementedBy": "阿宁"
+                        }
+                      ],
+                      "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                      "rawMaterials": {
+                        "originalPhotos": [],
+                        "originalBusCardData": [
+                          {
+                            "periodId": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                            "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                            "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                            "supplementedAt": "2026-06-07T01:53:25.698Z"
+                          }
+                        ]
+                      },
+                      "workflowStage": "photo_imported",
+                      "versions": [
+                        {
+                          "versionId": "ba738c3f-4938-46fb-b85b-bd9bffb7092c",
+                          "timestamp": "2026-06-07T01:53:25.697Z",
+                          "action": "create",
+                          "reason": "初始创建",
+                          "previous": null,
+                          "current": {
+                            "name": "测试路口-文化路交口",
+                            "streets": [
+                              "文化路街道",
+                              "建设路街道"
+                            ],
+                            "boundaryStatus": "boundary_pending",
+                            "assignedStreet": null,
+                            "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                            "busCardPeriods": [],
+                            "matchCount": 0
+                          },
+                          "modifiedBy": "system"
+                        },
+                        {
+                          "versionId": "5afe51e1-7e2d-401e-95e8-8fa47a155124",
+                          "timestamp": "2026-06-07T01:53:25.699Z",
+                          "action": "add_bus_card",
+                          "reason": "补充公交刷卡时段: 晚高峰 17:30-19:30",
+                          "previous": {
+                            "id": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                            "name": "测试路口-文化路交口",
+                            "lat": 39.91,
+                            "lng": 116.42,
+                            "streets": [
+                              "文化路街道",
+                              "建设路街道"
+                            ],
+                            "boundaryStatus": "boundary_pending",
+                            "assignedStreet": null,
+                            "photos": [],
+                            "busCardPeriods": [],
+                            "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                            "rawMaterials": {
+                              "originalPhotos": [],
+                              "originalBusCardData": []
+                            },
+                            "workflowStage": "photo_imported",
+                            "versions": [
+                              {
+                                "versionId": "ba738c3f-4938-46fb-b85b-bd9bffb7092c",
+                                "timestamp": "2026-06-07T01:53:25.697Z",
+                                "action": "create",
+                                "reason": "初始创建",
+                                "previous": null,
+                                "current": {
+                                  "name": "测试路口-文化路交口",
+                                  "streets": [
+                                    "文化路街道",
+                                    "建设路街道"
+                                  ],
+                                  "boundaryStatus": "boundary_pending",
+                                  "assignedStreet": null,
+                                  "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                                  "busCardPeriods": [],
+                                  "matchCount": 0
+                                },
+                                "modifiedBy": "system"
+                              }
+                            ],
+                            "createdAt": "2026-06-07T01:53:25.697Z",
+                            "updatedAt": "2026-06-07T01:53:25.697Z",
+                            "createdBy": "阿宁",
+                            "matchCount": 0,
+                            "isDeleted": false
+                          },
+                          "current": {
+                            "name": "测试路口-文化路交口",
+                            "streets": [
+                              "文化路街道",
+                              "建设路街道"
+                            ],
+                            "boundaryStatus": "boundary_pending",
+                            "assignedStreet": null,
+                            "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                            "busCardPeriods": [
+                              {
+                                "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                                "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                                "period": "晚高峰 17:30-19:30",
+                                "passengerVolume": "1500人次",
+                                "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                                "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                                "supplementedAt": "2026-06-07T01:53:25.698Z",
+                                "supplementedBy": "阿宁"
+                              }
+                            ],
+                            "matchCount": 0
+                          },
+                          "modifiedBy": "system"
+                        }
+                      ],
+                      "createdAt": "2026-06-07T01:53:25.697Z",
+                      "updatedAt": "2026-06-07T01:53:25.699Z",
+                      "createdBy": "阿宁",
+                      "matchCount": 0,
+                      "isDeleted": false
+                    },
+                    "current": {
+                      "name": "测试路口-文化路交口",
+                      "streets": [
+                        "文化路街道",
+                        "建设路街道"
+                      ],
+                      "boundaryStatus": "boundary_pending",
+                      "assignedStreet": null,
+                      "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                      "busCardPeriods": [
+                        {
+                          "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                          "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                          "period": "晚高峰 17:30-19:30",
+                          "passengerVolume": "1500人次",
+                          "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                          "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                          "supplementedAt": "2026-06-07T01:53:25.698Z",
+                          "supplementedBy": "阿宁"
+                        }
+                      ],
+                      "matchCount": 0
+                    },
+                    "modifiedBy": "阿宁"
+                  }
+                ],
+                "createdAt": "2026-06-07T01:53:25.697Z",
+                "updatedAt": "2026-06-07T01:53:25.699Z",
+                "createdBy": "阿宁",
+                "matchCount": 0,
+                "isDeleted": false,
+                "updatedBy": "阿宁"
+              },
+              "current": {
+                "name": "测试路口-文化路交口",
+                "streets": [
+                  "文化路街道",
+                  "建设路街道"
+                ],
+                "boundaryStatus": "boundary_confirmed",
+                "assignedStreet": "文化路街道",
+                "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                "busCardPeriods": [
+                  {
+                    "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                    "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                    "period": "晚高峰 17:30-19:30",
+                    "passengerVolume": "1500人次",
+                    "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                    "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                    "supplementedAt": "2026-06-07T01:53:25.698Z",
+                    "supplementedBy": "阿宁"
+                  }
+                ],
+                "matchCount": 0
+              },
+              "modifiedBy": "阿宁"
+            }
+          ],
+          "createdAt": "2026-06-07T01:53:25.697Z",
+          "updatedAt": "2026-06-07T01:53:25.702Z",
+          "createdBy": "阿宁",
+          "matchCount": 0,
+          "isDeleted": false,
+          "updatedBy": "阿宁"
+        },
+        "current": {
+          "name": "测试路口-文化路交口",
+          "streets": [
+            "文化路街道",
+            "建设路街道"
+          ],
+          "boundaryStatus": "boundary_pending",
+          "assignedStreet": "文化路街道",
+          "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+          "busCardPeriods": [
+            {
+              "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+              "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+              "period": "晚高峰 17:30-19:30",
+              "passengerVolume": "1500人次",
+              "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+              "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+              "supplementedAt": "2026-06-07T01:53:25.698Z",
+              "supplementedBy": "阿宁"
+            }
+          ],
+          "matchCount": 0
+        },
+        "modifiedBy": "阿宁"
+      },
+      {
+        "versionId": "dbf62cf5-dda4-49ec-81ea-c0b811ac97fe",
+        "timestamp": "2026-06-07T01:53:25.709Z",
+        "action": "map_export",
+        "reason": "地图导出，匹配计数+1",
+        "previous": {
+          "id": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+          "name": "测试路口-文化路交口",
+          "lat": 39.91,
+          "lng": 116.42,
+          "streets": [
+            "文化路街道",
+            "建设路街道"
+          ],
+          "boundaryStatus": "boundary_pending",
+          "assignedStreet": "文化路街道",
+          "photos": [],
+          "busCardPeriods": [
+            {
+              "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+              "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+              "period": "晚高峰 17:30-19:30",
+              "passengerVolume": "1500人次",
+              "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+              "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+              "supplementedAt": "2026-06-07T01:53:25.698Z",
+              "supplementedBy": "阿宁"
+            }
+          ],
+          "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+          "rawMaterials": {
+            "originalPhotos": [],
+            "originalBusCardData": [
+              {
+                "periodId": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                "supplementedAt": "2026-06-07T01:53:25.698Z"
+              }
+            ]
+          },
+          "workflowStage": "map_exported",
+          "versions": [
+            {
+              "versionId": "ba738c3f-4938-46fb-b85b-bd9bffb7092c",
+              "timestamp": "2026-06-07T01:53:25.697Z",
+              "action": "create",
+              "reason": "初始创建",
+              "previous": null,
+              "current": {
+                "name": "测试路口-文化路交口",
+                "streets": [
+                  "文化路街道",
+                  "建设路街道"
+                ],
+                "boundaryStatus": "boundary_pending",
+                "assignedStreet": null,
+                "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                "busCardPeriods": [],
+                "matchCount": 0
+              },
+              "modifiedBy": "system"
+            },
+            {
+              "versionId": "5afe51e1-7e2d-401e-95e8-8fa47a155124",
+              "timestamp": "2026-06-07T01:53:25.699Z",
+              "action": "add_bus_card",
+              "reason": "补充公交刷卡时段: 晚高峰 17:30-19:30",
+              "previous": {
+                "id": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                "name": "测试路口-文化路交口",
+                "lat": 39.91,
+                "lng": 116.42,
+                "streets": [
+                  "文化路街道",
+                  "建设路街道"
+                ],
+                "boundaryStatus": "boundary_pending",
+                "assignedStreet": null,
+                "photos": [],
+                "busCardPeriods": [],
+                "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                "rawMaterials": {
+                  "originalPhotos": [],
+                  "originalBusCardData": []
+                },
+                "workflowStage": "photo_imported",
+                "versions": [
+                  {
+                    "versionId": "ba738c3f-4938-46fb-b85b-bd9bffb7092c",
+                    "timestamp": "2026-06-07T01:53:25.697Z",
+                    "action": "create",
+                    "reason": "初始创建",
+                    "previous": null,
+                    "current": {
+                      "name": "测试路口-文化路交口",
+                      "streets": [
+                        "文化路街道",
+                        "建设路街道"
+                      ],
+                      "boundaryStatus": "boundary_pending",
+                      "assignedStreet": null,
+                      "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                      "busCardPeriods": [],
+                      "matchCount": 0
+                    },
+                    "modifiedBy": "system"
+                  }
+                ],
+                "createdAt": "2026-06-07T01:53:25.697Z",
+                "updatedAt": "2026-06-07T01:53:25.697Z",
+                "createdBy": "阿宁",
+                "matchCount": 0,
+                "isDeleted": false
+              },
+              "current": {
+                "name": "测试路口-文化路交口",
+                "streets": [
+                  "文化路街道",
+                  "建设路街道"
+                ],
+                "boundaryStatus": "boundary_pending",
+                "assignedStreet": null,
+                "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                "busCardPeriods": [
+                  {
+                    "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                    "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                    "period": "晚高峰 17:30-19:30",
+                    "passengerVolume": "1500人次",
+                    "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                    "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                    "supplementedAt": "2026-06-07T01:53:25.698Z",
+                    "supplementedBy": "阿宁"
+                  }
+                ],
+                "matchCount": 0
+              },
+              "modifiedBy": "system"
+            },
+            {
+              "versionId": "e82d3313-eb54-4e2a-98ca-13b38cca41f6",
+              "timestamp": "2026-06-07T01:53:25.699Z",
+              "action": "workflow_advance",
+              "reason": "补充公交刷卡时段后自动推进工作流",
+              "previous": {
+                "id": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                "name": "测试路口-文化路交口",
+                "lat": 39.91,
+                "lng": 116.42,
+                "streets": [
+                  "文化路街道",
+                  "建设路街道"
+                ],
+                "boundaryStatus": "boundary_pending",
+                "assignedStreet": null,
+                "photos": [],
+                "busCardPeriods": [
+                  {
+                    "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                    "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                    "period": "晚高峰 17:30-19:30",
+                    "passengerVolume": "1500人次",
+                    "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                    "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                    "supplementedAt": "2026-06-07T01:53:25.698Z",
+                    "supplementedBy": "阿宁"
+                  }
+                ],
+                "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                "rawMaterials": {
+                  "originalPhotos": [],
+                  "originalBusCardData": [
+                    {
+                      "periodId": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                      "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                      "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                      "supplementedAt": "2026-06-07T01:53:25.698Z"
+                    }
+                  ]
+                },
+                "workflowStage": "photo_imported",
+                "versions": [
+                  {
+                    "versionId": "ba738c3f-4938-46fb-b85b-bd9bffb7092c",
+                    "timestamp": "2026-06-07T01:53:25.697Z",
+                    "action": "create",
+                    "reason": "初始创建",
+                    "previous": null,
+                    "current": {
+                      "name": "测试路口-文化路交口",
+                      "streets": [
+                        "文化路街道",
+                        "建设路街道"
+                      ],
+                      "boundaryStatus": "boundary_pending",
+                      "assignedStreet": null,
+                      "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                      "busCardPeriods": [],
+                      "matchCount": 0
+                    },
+                    "modifiedBy": "system"
+                  },
+                  {
+                    "versionId": "5afe51e1-7e2d-401e-95e8-8fa47a155124",
+                    "timestamp": "2026-06-07T01:53:25.699Z",
+                    "action": "add_bus_card",
+                    "reason": "补充公交刷卡时段: 晚高峰 17:30-19:30",
+                    "previous": {
+                      "id": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                      "name": "测试路口-文化路交口",
+                      "lat": 39.91,
+                      "lng": 116.42,
+                      "streets": [
+                        "文化路街道",
+                        "建设路街道"
+                      ],
+                      "boundaryStatus": "boundary_pending",
+                      "assignedStreet": null,
+                      "photos": [],
+                      "busCardPeriods": [],
+                      "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                      "rawMaterials": {
+                        "originalPhotos": [],
+                        "originalBusCardData": []
+                      },
+                      "workflowStage": "photo_imported",
+                      "versions": [
+                        {
+                          "versionId": "ba738c3f-4938-46fb-b85b-bd9bffb7092c",
+                          "timestamp": "2026-06-07T01:53:25.697Z",
+                          "action": "create",
+                          "reason": "初始创建",
+                          "previous": null,
+                          "current": {
+                            "name": "测试路口-文化路交口",
+                            "streets": [
+                              "文化路街道",
+                              "建设路街道"
+                            ],
+                            "boundaryStatus": "boundary_pending",
+                            "assignedStreet": null,
+                            "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                            "busCardPeriods": [],
+                            "matchCount": 0
+                          },
+                          "modifiedBy": "system"
+                        }
+                      ],
+                      "createdAt": "2026-06-07T01:53:25.697Z",
+                      "updatedAt": "2026-06-07T01:53:25.697Z",
+                      "createdBy": "阿宁",
+                      "matchCount": 0,
+                      "isDeleted": false
+                    },
+                    "current": {
+                      "name": "测试路口-文化路交口",
+                      "streets": [
+                        "文化路街道",
+                        "建设路街道"
+                      ],
+                      "boundaryStatus": "boundary_pending",
+                      "assignedStreet": null,
+                      "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                      "busCardPeriods": [
+                        {
+                          "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                          "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                          "period": "晚高峰 17:30-19:30",
+                          "passengerVolume": "1500人次",
+                          "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                          "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                          "supplementedAt": "2026-06-07T01:53:25.698Z",
+                          "supplementedBy": "阿宁"
+                        }
+                      ],
+                      "matchCount": 0
+                    },
+                    "modifiedBy": "system"
+                  }
+                ],
+                "createdAt": "2026-06-07T01:53:25.697Z",
+                "updatedAt": "2026-06-07T01:53:25.699Z",
+                "createdBy": "阿宁",
+                "matchCount": 0,
+                "isDeleted": false
+              },
+              "current": {
+                "name": "测试路口-文化路交口",
+                "streets": [
+                  "文化路街道",
+                  "建设路街道"
+                ],
+                "boundaryStatus": "boundary_pending",
+                "assignedStreet": null,
+                "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                "busCardPeriods": [
+                  {
+                    "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                    "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                    "period": "晚高峰 17:30-19:30",
+                    "passengerVolume": "1500人次",
+                    "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                    "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                    "supplementedAt": "2026-06-07T01:53:25.698Z",
+                    "supplementedBy": "阿宁"
+                  }
+                ],
+                "matchCount": 0
+              },
+              "modifiedBy": "阿宁"
+            },
+            {
+              "versionId": "52da7358-0f39-4c89-890a-d8ce8cc821e0",
+              "timestamp": "2026-06-07T01:53:25.702Z",
+              "action": "boundary_confirm",
+              "reason": "项目经理确认边界点位，归属街道: 文化路街道",
+              "previous": {
+                "id": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                "name": "测试路口-文化路交口",
+                "lat": 39.91,
+                "lng": 116.42,
+                "streets": [
+                  "文化路街道",
+                  "建设路街道"
+                ],
+                "boundaryStatus": "boundary_pending",
+                "assignedStreet": null,
+                "photos": [],
+                "busCardPeriods": [
+                  {
+                    "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                    "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                    "period": "晚高峰 17:30-19:30",
+                    "passengerVolume": "1500人次",
+                    "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                    "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                    "supplementedAt": "2026-06-07T01:53:25.698Z",
+                    "supplementedBy": "阿宁"
+                  }
+                ],
+                "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                "rawMaterials": {
+                  "originalPhotos": [],
+                  "originalBusCardData": [
+                    {
+                      "periodId": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                      "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                      "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                      "supplementedAt": "2026-06-07T01:53:25.698Z"
+                    }
+                  ]
+                },
+                "workflowStage": "bus_card_supplemented",
+                "versions": [
+                  {
+                    "versionId": "ba738c3f-4938-46fb-b85b-bd9bffb7092c",
+                    "timestamp": "2026-06-07T01:53:25.697Z",
+                    "action": "create",
+                    "reason": "初始创建",
+                    "previous": null,
+                    "current": {
+                      "name": "测试路口-文化路交口",
+                      "streets": [
+                        "文化路街道",
+                        "建设路街道"
+                      ],
+                      "boundaryStatus": "boundary_pending",
+                      "assignedStreet": null,
+                      "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                      "busCardPeriods": [],
+                      "matchCount": 0
+                    },
+                    "modifiedBy": "system"
+                  },
+                  {
+                    "versionId": "5afe51e1-7e2d-401e-95e8-8fa47a155124",
+                    "timestamp": "2026-06-07T01:53:25.699Z",
+                    "action": "add_bus_card",
+                    "reason": "补充公交刷卡时段: 晚高峰 17:30-19:30",
+                    "previous": {
+                      "id": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                      "name": "测试路口-文化路交口",
+                      "lat": 39.91,
+                      "lng": 116.42,
+                      "streets": [
+                        "文化路街道",
+                        "建设路街道"
+                      ],
+                      "boundaryStatus": "boundary_pending",
+                      "assignedStreet": null,
+                      "photos": [],
+                      "busCardPeriods": [],
+                      "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                      "rawMaterials": {
+                        "originalPhotos": [],
+                        "originalBusCardData": []
+                      },
+                      "workflowStage": "photo_imported",
+                      "versions": [
+                        {
+                          "versionId": "ba738c3f-4938-46fb-b85b-bd9bffb7092c",
+                          "timestamp": "2026-06-07T01:53:25.697Z",
+                          "action": "create",
+                          "reason": "初始创建",
+                          "previous": null,
+                          "current": {
+                            "name": "测试路口-文化路交口",
+                            "streets": [
+                              "文化路街道",
+                              "建设路街道"
+                            ],
+                            "boundaryStatus": "boundary_pending",
+                            "assignedStreet": null,
+                            "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                            "busCardPeriods": [],
+                            "matchCount": 0
+                          },
+                          "modifiedBy": "system"
+                        }
+                      ],
+                      "createdAt": "2026-06-07T01:53:25.697Z",
+                      "updatedAt": "2026-06-07T01:53:25.697Z",
+                      "createdBy": "阿宁",
+                      "matchCount": 0,
+                      "isDeleted": false
+                    },
+                    "current": {
+                      "name": "测试路口-文化路交口",
+                      "streets": [
+                        "文化路街道",
+                        "建设路街道"
+                      ],
+                      "boundaryStatus": "boundary_pending",
+                      "assignedStreet": null,
+                      "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                      "busCardPeriods": [
+                        {
+                          "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                          "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                          "period": "晚高峰 17:30-19:30",
+                          "passengerVolume": "1500人次",
+                          "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                          "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                          "supplementedAt": "2026-06-07T01:53:25.698Z",
+                          "supplementedBy": "阿宁"
+                        }
+                      ],
+                      "matchCount": 0
+                    },
+                    "modifiedBy": "system"
+                  },
+                  {
+                    "versionId": "e82d3313-eb54-4e2a-98ca-13b38cca41f6",
+                    "timestamp": "2026-06-07T01:53:25.699Z",
+                    "action": "workflow_advance",
+                    "reason": "补充公交刷卡时段后自动推进工作流",
+                    "previous": {
+                      "id": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                      "name": "测试路口-文化路交口",
+                      "lat": 39.91,
+                      "lng": 116.42,
+                      "streets": [
+                        "文化路街道",
+                        "建设路街道"
+                      ],
+                      "boundaryStatus": "boundary_pending",
+                      "assignedStreet": null,
+                      "photos": [],
+                      "busCardPeriods": [
+                        {
+                          "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                          "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                          "period": "晚高峰 17:30-19:30",
+                          "passengerVolume": "1500人次",
+                          "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                          "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                          "supplementedAt": "2026-06-07T01:53:25.698Z",
+                          "supplementedBy": "阿宁"
+                        }
+                      ],
+                      "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                      "rawMaterials": {
+                        "originalPhotos": [],
+                        "originalBusCardData": [
+                          {
+                            "periodId": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                            "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                            "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                            "supplementedAt": "2026-06-07T01:53:25.698Z"
+                          }
+                        ]
+                      },
+                      "workflowStage": "photo_imported",
+                      "versions": [
+                        {
+                          "versionId": "ba738c3f-4938-46fb-b85b-bd9bffb7092c",
+                          "timestamp": "2026-06-07T01:53:25.697Z",
+                          "action": "create",
+                          "reason": "初始创建",
+                          "previous": null,
+                          "current": {
+                            "name": "测试路口-文化路交口",
+                            "streets": [
+                              "文化路街道",
+                              "建设路街道"
+                            ],
+                            "boundaryStatus": "boundary_pending",
+                            "assignedStreet": null,
+                            "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                            "busCardPeriods": [],
+                            "matchCount": 0
+                          },
+                          "modifiedBy": "system"
+                        },
+                        {
+                          "versionId": "5afe51e1-7e2d-401e-95e8-8fa47a155124",
+                          "timestamp": "2026-06-07T01:53:25.699Z",
+                          "action": "add_bus_card",
+                          "reason": "补充公交刷卡时段: 晚高峰 17:30-19:30",
+                          "previous": {
+                            "id": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                            "name": "测试路口-文化路交口",
+                            "lat": 39.91,
+                            "lng": 116.42,
+                            "streets": [
+                              "文化路街道",
+                              "建设路街道"
+                            ],
+                            "boundaryStatus": "boundary_pending",
+                            "assignedStreet": null,
+                            "photos": [],
+                            "busCardPeriods": [],
+                            "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                            "rawMaterials": {
+                              "originalPhotos": [],
+                              "originalBusCardData": []
+                            },
+                            "workflowStage": "photo_imported",
+                            "versions": [
+                              {
+                                "versionId": "ba738c3f-4938-46fb-b85b-bd9bffb7092c",
+                                "timestamp": "2026-06-07T01:53:25.697Z",
+                                "action": "create",
+                                "reason": "初始创建",
+                                "previous": null,
+                                "current": {
+                                  "name": "测试路口-文化路交口",
+                                  "streets": [
+                                    "文化路街道",
+                                    "建设路街道"
+                                  ],
+                                  "boundaryStatus": "boundary_pending",
+                                  "assignedStreet": null,
+                                  "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                                  "busCardPeriods": [],
+                                  "matchCount": 0
+                                },
+                                "modifiedBy": "system"
+                              }
+                            ],
+                            "createdAt": "2026-06-07T01:53:25.697Z",
+                            "updatedAt": "2026-06-07T01:53:25.697Z",
+                            "createdBy": "阿宁",
+                            "matchCount": 0,
+                            "isDeleted": false
+                          },
+                          "current": {
+                            "name": "测试路口-文化路交口",
+                            "streets": [
+                              "文化路街道",
+                              "建设路街道"
+                            ],
+                            "boundaryStatus": "boundary_pending",
+                            "assignedStreet": null,
+                            "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                            "busCardPeriods": [
+                              {
+                                "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                                "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                                "period": "晚高峰 17:30-19:30",
+                                "passengerVolume": "1500人次",
+                                "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                                "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                                "supplementedAt": "2026-06-07T01:53:25.698Z",
+                                "supplementedBy": "阿宁"
+                              }
+                            ],
+                            "matchCount": 0
+                          },
+                          "modifiedBy": "system"
+                        }
+                      ],
+                      "createdAt": "2026-06-07T01:53:25.697Z",
+                      "updatedAt": "2026-06-07T01:53:25.699Z",
+                      "createdBy": "阿宁",
+                      "matchCount": 0,
+                      "isDeleted": false
+                    },
+                    "current": {
+                      "name": "测试路口-文化路交口",
+                      "streets": [
+                        "文化路街道",
+                        "建设路街道"
+                      ],
+                      "boundaryStatus": "boundary_pending",
+                      "assignedStreet": null,
+                      "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                      "busCardPeriods": [
+                        {
+                          "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                          "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                          "period": "晚高峰 17:30-19:30",
+                          "passengerVolume": "1500人次",
+                          "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                          "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                          "supplementedAt": "2026-06-07T01:53:25.698Z",
+                          "supplementedBy": "阿宁"
+                        }
+                      ],
+                      "matchCount": 0
+                    },
+                    "modifiedBy": "阿宁"
+                  }
+                ],
+                "createdAt": "2026-06-07T01:53:25.697Z",
+                "updatedAt": "2026-06-07T01:53:25.699Z",
+                "createdBy": "阿宁",
+                "matchCount": 0,
+                "isDeleted": false,
+                "updatedBy": "阿宁"
+              },
+              "current": {
+                "name": "测试路口-文化路交口",
+                "streets": [
+                  "文化路街道",
+                  "建设路街道"
+                ],
+                "boundaryStatus": "boundary_confirmed",
+                "assignedStreet": "文化路街道",
+                "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                "busCardPeriods": [
+                  {
+                    "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                    "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                    "period": "晚高峰 17:30-19:30",
+                    "passengerVolume": "1500人次",
+                    "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                    "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                    "supplementedAt": "2026-06-07T01:53:25.698Z",
+                    "supplementedBy": "阿宁"
+                  }
+                ],
+                "matchCount": 0
+              },
+              "modifiedBy": "阿宁"
+            },
+            {
+              "versionId": "2fb103b8-b809-4260-9506-f2a57124a865",
+              "timestamp": "2026-06-07T01:53:25.707Z",
+              "action": "workflow_advance",
+              "reason": "工作流推进到: map_exported",
+              "previous": {
+                "id": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                "name": "测试路口-文化路交口",
+                "lat": 39.91,
+                "lng": 116.42,
+                "streets": [
+                  "文化路街道",
+                  "建设路街道"
+                ],
+                "boundaryStatus": "boundary_confirmed",
+                "assignedStreet": "文化路街道",
+                "photos": [],
+                "busCardPeriods": [
+                  {
+                    "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                    "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                    "period": "晚高峰 17:30-19:30",
+                    "passengerVolume": "1500人次",
+                    "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                    "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                    "supplementedAt": "2026-06-07T01:53:25.698Z",
+                    "supplementedBy": "阿宁"
+                  }
+                ],
+                "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                "rawMaterials": {
+                  "originalPhotos": [],
+                  "originalBusCardData": [
+                    {
+                      "periodId": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                      "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                      "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                      "supplementedAt": "2026-06-07T01:53:25.698Z"
+                    }
+                  ]
+                },
+                "workflowStage": "bus_card_supplemented",
+                "versions": [
+                  {
+                    "versionId": "ba738c3f-4938-46fb-b85b-bd9bffb7092c",
+                    "timestamp": "2026-06-07T01:53:25.697Z",
+                    "action": "create",
+                    "reason": "初始创建",
+                    "previous": null,
+                    "current": {
+                      "name": "测试路口-文化路交口",
+                      "streets": [
+                        "文化路街道",
+                        "建设路街道"
+                      ],
+                      "boundaryStatus": "boundary_pending",
+                      "assignedStreet": null,
+                      "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                      "busCardPeriods": [],
+                      "matchCount": 0
+                    },
+                    "modifiedBy": "system"
+                  },
+                  {
+                    "versionId": "5afe51e1-7e2d-401e-95e8-8fa47a155124",
+                    "timestamp": "2026-06-07T01:53:25.699Z",
+                    "action": "add_bus_card",
+                    "reason": "补充公交刷卡时段: 晚高峰 17:30-19:30",
+                    "previous": {
+                      "id": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                      "name": "测试路口-文化路交口",
+                      "lat": 39.91,
+                      "lng": 116.42,
+                      "streets": [
+                        "文化路街道",
+                        "建设路街道"
+                      ],
+                      "boundaryStatus": "boundary_pending",
+                      "assignedStreet": null,
+                      "photos": [],
+                      "busCardPeriods": [],
+                      "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                      "rawMaterials": {
+                        "originalPhotos": [],
+                        "originalBusCardData": []
+                      },
+                      "workflowStage": "photo_imported",
+                      "versions": [
+                        {
+                          "versionId": "ba738c3f-4938-46fb-b85b-bd9bffb7092c",
+                          "timestamp": "2026-06-07T01:53:25.697Z",
+                          "action": "create",
+                          "reason": "初始创建",
+                          "previous": null,
+                          "current": {
+                            "name": "测试路口-文化路交口",
+                            "streets": [
+                              "文化路街道",
+                              "建设路街道"
+                            ],
+                            "boundaryStatus": "boundary_pending",
+                            "assignedStreet": null,
+                            "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                            "busCardPeriods": [],
+                            "matchCount": 0
+                          },
+                          "modifiedBy": "system"
+                        }
+                      ],
+                      "createdAt": "2026-06-07T01:53:25.697Z",
+                      "updatedAt": "2026-06-07T01:53:25.697Z",
+                      "createdBy": "阿宁",
+                      "matchCount": 0,
+                      "isDeleted": false
+                    },
+                    "current": {
+                      "name": "测试路口-文化路交口",
+                      "streets": [
+                        "文化路街道",
+                        "建设路街道"
+                      ],
+                      "boundaryStatus": "boundary_pending",
+                      "assignedStreet": null,
+                      "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                      "busCardPeriods": [
+                        {
+                          "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                          "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                          "period": "晚高峰 17:30-19:30",
+                          "passengerVolume": "1500人次",
+                          "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                          "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                          "supplementedAt": "2026-06-07T01:53:25.698Z",
+                          "supplementedBy": "阿宁"
+                        }
+                      ],
+                      "matchCount": 0
+                    },
+                    "modifiedBy": "system"
+                  },
+                  {
+                    "versionId": "e82d3313-eb54-4e2a-98ca-13b38cca41f6",
+                    "timestamp": "2026-06-07T01:53:25.699Z",
+                    "action": "workflow_advance",
+                    "reason": "补充公交刷卡时段后自动推进工作流",
+                    "previous": {
+                      "id": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                      "name": "测试路口-文化路交口",
+                      "lat": 39.91,
+                      "lng": 116.42,
+                      "streets": [
+                        "文化路街道",
+                        "建设路街道"
+                      ],
+                      "boundaryStatus": "boundary_pending",
+                      "assignedStreet": null,
+                      "photos": [],
+                      "busCardPeriods": [
+                        {
+                          "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                          "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                          "period": "晚高峰 17:30-19:30",
+                          "passengerVolume": "1500人次",
+                          "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                          "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                          "supplementedAt": "2026-06-07T01:53:25.698Z",
+                          "supplementedBy": "阿宁"
+                        }
+                      ],
+                      "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                      "rawMaterials": {
+                        "originalPhotos": [],
+                        "originalBusCardData": [
+                          {
+                            "periodId": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                            "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                            "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                            "supplementedAt": "2026-06-07T01:53:25.698Z"
+                          }
+                        ]
+                      },
+                      "workflowStage": "photo_imported",
+                      "versions": [
+                        {
+                          "versionId": "ba738c3f-4938-46fb-b85b-bd9bffb7092c",
+                          "timestamp": "2026-06-07T01:53:25.697Z",
+                          "action": "create",
+                          "reason": "初始创建",
+                          "previous": null,
+                          "current": {
+                            "name": "测试路口-文化路交口",
+                            "streets": [
+                              "文化路街道",
+                              "建设路街道"
+                            ],
+                            "boundaryStatus": "boundary_pending",
+                            "assignedStreet": null,
+                            "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                            "busCardPeriods": [],
+                            "matchCount": 0
+                          },
+                          "modifiedBy": "system"
+                        },
+                        {
+                          "versionId": "5afe51e1-7e2d-401e-95e8-8fa47a155124",
+                          "timestamp": "2026-06-07T01:53:25.699Z",
+                          "action": "add_bus_card",
+                          "reason": "补充公交刷卡时段: 晚高峰 17:30-19:30",
+                          "previous": {
+                            "id": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                            "name": "测试路口-文化路交口",
+                            "lat": 39.91,
+                            "lng": 116.42,
+                            "streets": [
+                              "文化路街道",
+                              "建设路街道"
+                            ],
+                            "boundaryStatus": "boundary_pending",
+                            "assignedStreet": null,
+                            "photos": [],
+                            "busCardPeriods": [],
+                            "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                            "rawMaterials": {
+                              "originalPhotos": [],
+                              "originalBusCardData": []
+                            },
+                            "workflowStage": "photo_imported",
+                            "versions": [
+                              {
+                                "versionId": "ba738c3f-4938-46fb-b85b-bd9bffb7092c",
+                                "timestamp": "2026-06-07T01:53:25.697Z",
+                                "action": "create",
+                                "reason": "初始创建",
+                                "previous": null,
+                                "current": {
+                                  "name": "测试路口-文化路交口",
+                                  "streets": [
+                                    "文化路街道",
+                                    "建设路街道"
+                                  ],
+                                  "boundaryStatus": "boundary_pending",
+                                  "assignedStreet": null,
+                                  "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                                  "busCardPeriods": [],
+                                  "matchCount": 0
+                                },
+                                "modifiedBy": "system"
+                              }
+                            ],
+                            "createdAt": "2026-06-07T01:53:25.697Z",
+                            "updatedAt": "2026-06-07T01:53:25.697Z",
+                            "createdBy": "阿宁",
+                            "matchCount": 0,
+                            "isDeleted": false
+                          },
+                          "current": {
+                            "name": "测试路口-文化路交口",
+                            "streets": [
+                              "文化路街道",
+                              "建设路街道"
+                            ],
+                            "boundaryStatus": "boundary_pending",
+                            "assignedStreet": null,
+                            "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                            "busCardPeriods": [
+                              {
+                                "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                                "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                                "period": "晚高峰 17:30-19:30",
+                                "passengerVolume": "1500人次",
+                                "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                                "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                                "supplementedAt": "2026-06-07T01:53:25.698Z",
+                                "supplementedBy": "阿宁"
+                              }
+                            ],
+                            "matchCount": 0
+                          },
+                          "modifiedBy": "system"
+                        }
+                      ],
+                      "createdAt": "2026-06-07T01:53:25.697Z",
+                      "updatedAt": "2026-06-07T01:53:25.699Z",
+                      "createdBy": "阿宁",
+                      "matchCount": 0,
+                      "isDeleted": false
+                    },
+                    "current": {
+                      "name": "测试路口-文化路交口",
+                      "streets": [
+                        "文化路街道",
+                        "建设路街道"
+                      ],
+                      "boundaryStatus": "boundary_pending",
+                      "assignedStreet": null,
+                      "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                      "busCardPeriods": [
+                        {
+                          "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                          "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                          "period": "晚高峰 17:30-19:30",
+                          "passengerVolume": "1500人次",
+                          "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                          "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                          "supplementedAt": "2026-06-07T01:53:25.698Z",
+                          "supplementedBy": "阿宁"
+                        }
+                      ],
+                      "matchCount": 0
+                    },
+                    "modifiedBy": "阿宁"
+                  },
+                  {
+                    "versionId": "52da7358-0f39-4c89-890a-d8ce8cc821e0",
+                    "timestamp": "2026-06-07T01:53:25.702Z",
+                    "action": "boundary_confirm",
+                    "reason": "项目经理确认边界点位，归属街道: 文化路街道",
+                    "previous": {
+                      "id": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                      "name": "测试路口-文化路交口",
+                      "lat": 39.91,
+                      "lng": 116.42,
+                      "streets": [
+                        "文化路街道",
+                        "建设路街道"
+                      ],
+                      "boundaryStatus": "boundary_pending",
+                      "assignedStreet": null,
+                      "photos": [],
+                      "busCardPeriods": [
+                        {
+                          "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                          "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                          "period": "晚高峰 17:30-19:30",
+                          "passengerVolume": "1500人次",
+                          "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                          "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                          "supplementedAt": "2026-06-07T01:53:25.698Z",
+                          "supplementedBy": "阿宁"
+                        }
+                      ],
+                      "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                      "rawMaterials": {
+                        "originalPhotos": [],
+                        "originalBusCardData": [
+                          {
+                            "periodId": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                            "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                            "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                            "supplementedAt": "2026-06-07T01:53:25.698Z"
+                          }
+                        ]
+                      },
+                      "workflowStage": "bus_card_supplemented",
+                      "versions": [
+                        {
+                          "versionId": "ba738c3f-4938-46fb-b85b-bd9bffb7092c",
+                          "timestamp": "2026-06-07T01:53:25.697Z",
+                          "action": "create",
+                          "reason": "初始创建",
+                          "previous": null,
+                          "current": {
+                            "name": "测试路口-文化路交口",
+                            "streets": [
+                              "文化路街道",
+                              "建设路街道"
+                            ],
+                            "boundaryStatus": "boundary_pending",
+                            "assignedStreet": null,
+                            "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                            "busCardPeriods": [],
+                            "matchCount": 0
+                          },
+                          "modifiedBy": "system"
+                        },
+                        {
+                          "versionId": "5afe51e1-7e2d-401e-95e8-8fa47a155124",
+                          "timestamp": "2026-06-07T01:53:25.699Z",
+                          "action": "add_bus_card",
+                          "reason": "补充公交刷卡时段: 晚高峰 17:30-19:30",
+                          "previous": {
+                            "id": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                            "name": "测试路口-文化路交口",
+                            "lat": 39.91,
+                            "lng": 116.42,
+                            "streets": [
+                              "文化路街道",
+                              "建设路街道"
+                            ],
+                            "boundaryStatus": "boundary_pending",
+                            "assignedStreet": null,
+                            "photos": [],
+                            "busCardPeriods": [],
+                            "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                            "rawMaterials": {
+                              "originalPhotos": [],
+                              "originalBusCardData": []
+                            },
+                            "workflowStage": "photo_imported",
+                            "versions": [
+                              {
+                                "versionId": "ba738c3f-4938-46fb-b85b-bd9bffb7092c",
+                                "timestamp": "2026-06-07T01:53:25.697Z",
+                                "action": "create",
+                                "reason": "初始创建",
+                                "previous": null,
+                                "current": {
+                                  "name": "测试路口-文化路交口",
+                                  "streets": [
+                                    "文化路街道",
+                                    "建设路街道"
+                                  ],
+                                  "boundaryStatus": "boundary_pending",
+                                  "assignedStreet": null,
+                                  "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                                  "busCardPeriods": [],
+                                  "matchCount": 0
+                                },
+                                "modifiedBy": "system"
+                              }
+                            ],
+                            "createdAt": "2026-06-07T01:53:25.697Z",
+                            "updatedAt": "2026-06-07T01:53:25.697Z",
+                            "createdBy": "阿宁",
+                            "matchCount": 0,
+                            "isDeleted": false
+                          },
+                          "current": {
+                            "name": "测试路口-文化路交口",
+                            "streets": [
+                              "文化路街道",
+                              "建设路街道"
+                            ],
+                            "boundaryStatus": "boundary_pending",
+                            "assignedStreet": null,
+                            "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                            "busCardPeriods": [
+                              {
+                                "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                                "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                                "period": "晚高峰 17:30-19:30",
+                                "passengerVolume": "1500人次",
+                                "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                                "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                                "supplementedAt": "2026-06-07T01:53:25.698Z",
+                                "supplementedBy": "阿宁"
+                              }
+                            ],
+                            "matchCount": 0
+                          },
+                          "modifiedBy": "system"
+                        },
+                        {
+                          "versionId": "e82d3313-eb54-4e2a-98ca-13b38cca41f6",
+                          "timestamp": "2026-06-07T01:53:25.699Z",
+                          "action": "workflow_advance",
+                          "reason": "补充公交刷卡时段后自动推进工作流",
+                          "previous": {
+                            "id": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                            "name": "测试路口-文化路交口",
+                            "lat": 39.91,
+                            "lng": 116.42,
+                            "streets": [
+                              "文化路街道",
+                              "建设路街道"
+                            ],
+                            "boundaryStatus": "boundary_pending",
+                            "assignedStreet": null,
+                            "photos": [],
+                            "busCardPeriods": [
+                              {
+                                "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                                "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                                "period": "晚高峰 17:30-19:30",
+                                "passengerVolume": "1500人次",
+                                "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                                "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                                "supplementedAt": "2026-06-07T01:53:25.698Z",
+                                "supplementedBy": "阿宁"
+                              }
+                            ],
+                            "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                            "rawMaterials": {
+                              "originalPhotos": [],
+                              "originalBusCardData": [
+                                {
+                                  "periodId": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                                  "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                                  "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                                  "supplementedAt": "2026-06-07T01:53:25.698Z"
+                                }
+                              ]
+                            },
+                            "workflowStage": "photo_imported",
+                            "versions": [
+                              {
+                                "versionId": "ba738c3f-4938-46fb-b85b-bd9bffb7092c",
+                                "timestamp": "2026-06-07T01:53:25.697Z",
+                                "action": "create",
+                                "reason": "初始创建",
+                                "previous": null,
+                                "current": {
+                                  "name": "测试路口-文化路交口",
+                                  "streets": [
+                                    "文化路街道",
+                                    "建设路街道"
+                                  ],
+                                  "boundaryStatus": "boundary_pending",
+                                  "assignedStreet": null,
+                                  "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                                  "busCardPeriods": [],
+                                  "matchCount": 0
+                                },
+                                "modifiedBy": "system"
+                              },
+                              {
+                                "versionId": "5afe51e1-7e2d-401e-95e8-8fa47a155124",
+                                "timestamp": "2026-06-07T01:53:25.699Z",
+                                "action": "add_bus_card",
+                                "reason": "补充公交刷卡时段: 晚高峰 17:30-19:30",
+                                "previous": {
+                                  "id": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                                  "name": "测试路口-文化路交口",
+                                  "lat": 39.91,
+                                  "lng": 116.42,
+                                  "streets": [
+                                    "文化路街道",
+                                    "建设路街道"
+                                  ],
+                                  "boundaryStatus": "boundary_pending",
+                                  "assignedStreet": null,
+                                  "photos": [],
+                                  "busCardPeriods": [],
+                                  "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                                  "rawMaterials": {
+                                    "originalPhotos": [],
+                                    "originalBusCardData": []
+                                  },
+                                  "workflowStage": "photo_imported",
+                                  "versions": [
+                                    {
+                                      "versionId": "ba738c3f-4938-46fb-b85b-bd9bffb7092c",
+                                      "timestamp": "2026-06-07T01:53:25.697Z",
+                                      "action": "create",
+                                      "reason": "初始创建",
+                                      "previous": null,
+                                      "current": {
+                                        "name": "测试路口-文化路交口",
+                                        "streets": [
+                                          "文化路街道",
+                                          "建设路街道"
+                                        ],
+                                        "boundaryStatus": "boundary_pending",
+                                        "assignedStreet": null,
+                                        "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                                        "busCardPeriods": [],
+                                        "matchCount": 0
+                                      },
+                                      "modifiedBy": "system"
+                                    }
+                                  ],
+                                  "createdAt": "2026-06-07T01:53:25.697Z",
+                                  "updatedAt": "2026-06-07T01:53:25.697Z",
+                                  "createdBy": "阿宁",
+                                  "matchCount": 0,
+                                  "isDeleted": false
+                                },
+                                "current": {
+                                  "name": "测试路口-文化路交口",
+                                  "streets": [
+                                    "文化路街道",
+                                    "建设路街道"
+                                  ],
+                                  "boundaryStatus": "boundary_pending",
+                                  "assignedStreet": null,
+                                  "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                                  "busCardPeriods": [
+                                    {
+                                      "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                                      "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                                      "period": "晚高峰 17:30-19:30",
+                                      "passengerVolume": "1500人次",
+                                      "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                                      "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                                      "supplementedAt": "2026-06-07T01:53:25.698Z",
+                                      "supplementedBy": "阿宁"
+                                    }
+                                  ],
+                                  "matchCount": 0
+                                },
+                                "modifiedBy": "system"
+                              }
+                            ],
+                            "createdAt": "2026-06-07T01:53:25.697Z",
+                            "updatedAt": "2026-06-07T01:53:25.699Z",
+                            "createdBy": "阿宁",
+                            "matchCount": 0,
+                            "isDeleted": false
+                          },
+                          "current": {
+                            "name": "测试路口-文化路交口",
+                            "streets": [
+                              "文化路街道",
+                              "建设路街道"
+                            ],
+                            "boundaryStatus": "boundary_pending",
+                            "assignedStreet": null,
+                            "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                            "busCardPeriods": [
+                              {
+                                "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                                "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                                "period": "晚高峰 17:30-19:30",
+                                "passengerVolume": "1500人次",
+                                "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                                "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                                "supplementedAt": "2026-06-07T01:53:25.698Z",
+                                "supplementedBy": "阿宁"
+                              }
+                            ],
+                            "matchCount": 0
+                          },
+                          "modifiedBy": "阿宁"
+                        }
+                      ],
+                      "createdAt": "2026-06-07T01:53:25.697Z",
+                      "updatedAt": "2026-06-07T01:53:25.699Z",
+                      "createdBy": "阿宁",
+                      "matchCount": 0,
+                      "isDeleted": false,
+                      "updatedBy": "阿宁"
+                    },
+                    "current": {
+                      "name": "测试路口-文化路交口",
+                      "streets": [
+                        "文化路街道",
+                        "建设路街道"
+                      ],
+                      "boundaryStatus": "boundary_confirmed",
+                      "assignedStreet": "文化路街道",
+                      "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                      "busCardPeriods": [
+                        {
+                          "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                          "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                          "period": "晚高峰 17:30-19:30",
+                          "passengerVolume": "1500人次",
+                          "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                          "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                          "supplementedAt": "2026-06-07T01:53:25.698Z",
+                          "supplementedBy": "阿宁"
+                        }
+                      ],
+                      "matchCount": 0
+                    },
+                    "modifiedBy": "阿宁"
+                  }
+                ],
+                "createdAt": "2026-06-07T01:53:25.697Z",
+                "updatedAt": "2026-06-07T01:53:25.702Z",
+                "createdBy": "阿宁",
+                "matchCount": 0,
+                "isDeleted": false,
+                "updatedBy": "阿宁"
+              },
+              "current": {
+                "name": "测试路口-文化路交口",
+                "streets": [
+                  "文化路街道",
+                  "建设路街道"
+                ],
+                "boundaryStatus": "boundary_pending",
+                "assignedStreet": "文化路街道",
+                "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+                "busCardPeriods": [
+                  {
+                    "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+                    "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+                    "period": "晚高峰 17:30-19:30",
+                    "passengerVolume": "1500人次",
+                    "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                    "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+                    "supplementedAt": "2026-06-07T01:53:25.698Z",
+                    "supplementedBy": "阿宁"
+                  }
+                ],
+                "matchCount": 0
+              },
+              "modifiedBy": "阿宁"
+            }
+          ],
+          "createdAt": "2026-06-07T01:53:25.697Z",
+          "updatedAt": "2026-06-07T01:53:25.707Z",
+          "createdBy": "阿宁",
+          "matchCount": 0,
+          "isDeleted": false,
+          "updatedBy": "阿宁"
+        },
+        "current": {
+          "name": "测试路口-文化路交口",
+          "streets": [
+            "文化路街道",
+            "建设路街道"
+          ],
+          "boundaryStatus": "boundary_pending",
+          "assignedStreet": "文化路街道",
+          "notes": "阿宁备注：这个点位正好在两个街道分界线的交叉口，需要特别注意",
+          "busCardPeriods": [
+            {
+              "id": "40d76ef1-0c8c-4293-bd24-7d1b08f1066f",
+              "pointId": "be89c4df-febd-42bb-91d7-5f2666c2514d",
+              "period": "晚高峰 17:30-19:30",
+              "passengerVolume": "1500人次",
+              "notes": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+              "rawText": "阿宁原始备注：晚高峰比早高峰还堵，主要是接孩子的家长，建议和对面小学错峰，另外公交刷卡数据里看到有很多老年人是去跳广场舞的，可以考虑和周边公园的停车资源匹配",
+              "supplementedAt": "2026-06-07T01:53:25.698Z",
+              "supplementedBy": "阿宁"
+            }
+          ],
+          "matchCount": 1
+        },
+        "modifiedBy": "阿宁"
+      }
+    ],
+    "createdAt": "2026-06-07T01:53:25.697Z",
+    "updatedAt": "2026-06-07T01:53:25.709Z",
+    "createdBy": "阿宁",
+    "matchCount": 1,
+    "isDeleted": false,
+    "updatedBy": "阿宁"
+  }
+]
