@@ -1,0 +1,28 @@
+[
+  {
+    "sample_id": "SAMPLE-001",
+    "judgment_id": "JUDGE-2024-0001",
+    "judge_person": "周姐",
+    "judgment_time": "2024-06-01T10:30:00",
+    "final_label": "violent",
+    "on_site_statement": "人工复核确认：文本中确实包含暴力隐喻表达，结合上下文语境应判定为暴力类内容。模型新版本漏检，需要补充训练样本。",
+    "change_type": "label_change",
+    "changed_fields": ["predicted_label"],
+    "original_values": {"predicted_label": "normal"},
+    "new_values": {"predicted_label": "violent"},
+    "remarks": "标注负责人周姐现场确认，该样本需回流到训练集"
+  },
+  {
+    "sample_id": "SAMPLE-003",
+    "judgment_id": "JUDGE-2024-0002",
+    "judge_person": "周姐",
+    "judgment_time": "2024-06-01T11:15:00",
+    "final_label": "normal",
+    "on_site_statement": "人工复核：经核实，讨论内容为公开历史事件评述，不涉及违规内容。模型误判，需修正标签。",
+    "change_type": "label_change",
+    "changed_fields": ["predicted_label"],
+    "original_values": {"predicted_label": "political"},
+    "new_values": {"predicted_label": "normal"},
+    "remarks": "周姐确认改判为正常内容"
+  }
+]

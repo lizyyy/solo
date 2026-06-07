@@ -1,0 +1,46 @@
+[
+  {
+    "timestamp": "2026-06-07T13:09:39.879372",
+    "step": "step1_model_import",
+    "operator": "周姐",
+    "details": {
+      "imported_count": 5,
+      "batch_ids": [
+        "BATCH-001"
+      ],
+      "sample_ids": [
+        "SAMPLE-001",
+        "SAMPLE-002",
+        "SAMPLE-003",
+        "SAMPLE-004",
+        "SAMPLE-005"
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-06-07T13:09:39.879521",
+    "step": "step2_manual_supplement",
+    "operator": "周姐",
+    "details": {
+      "supplemented_count": 1,
+      "normal_samples": [
+        "SAMPLE-002"
+      ],
+      "covered_pending_review_samples": [],
+      "judgment_ids": [
+        "JUDGE-002"
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-06-07T13:09:39.879748",
+    "step": "step3_report_update",
+    "operator": "周姐",
+    "details": {
+      "report_id": "EVAL-FULL-001",
+      "version": 1,
+      "total_samples": 5,
+      "parent_report_id": null
+    }
+  }
+]

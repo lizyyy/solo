@@ -1,0 +1,60 @@
+{
+  "report_id": "EVAL-FULL-001",
+  "version": 1,
+  "generated_time": "2026-06-07 13:09:39.879618",
+  "generated_by": "周姐",
+  "total_samples": 5,
+  "label_distribution": {
+    "violent": 2,
+    "normal": 2,
+    "political": 1
+  },
+  "items": [
+    {
+      "sample_id": "SAMPLE-001",
+      "label": "violent",
+      "source": "model",
+      "evidence_count": 1,
+      "status": "model_imported",
+      "has_manual_judgment": false,
+      "is_covered": false
+    },
+    {
+      "sample_id": "SAMPLE-002",
+      "label": "normal",
+      "source": "manual",
+      "evidence_count": 2,
+      "status": "manual_supplemented",
+      "has_manual_judgment": true,
+      "is_covered": false
+    },
+    {
+      "sample_id": "SAMPLE-003",
+      "label": "normal",
+      "source": "model",
+      "evidence_count": 1,
+      "status": "model_imported",
+      "has_manual_judgment": false,
+      "is_covered": false
+    },
+    {
+      "sample_id": "SAMPLE-004",
+      "label": "violent",
+      "source": "model",
+      "evidence_count": 1,
+      "status": "model_imported",
+      "has_manual_judgment": false,
+      "is_covered": false
+    },
+    {
+      "sample_id": "SAMPLE-005",
+      "label": "political",
+      "source": "model",
+      "evidence_count": 1,
+      "status": "model_imported",
+      "has_manual_judgment": false,
+      "is_covered": false
+    }
+  ],
+  "parent_report_id": null
+}

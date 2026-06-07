@@ -1,0 +1,30 @@
+[
+  {
+    "sample_id": "SAMPLE-001",
+    "original_line_number": 5,
+    "batch_id": "BATCH-2024-002",
+    "model_version": "v2.4.0",
+    "content": "这是一段测试文本内容，包含敏感词检测",
+    "predicted_label": "normal",
+    "confidence": 0.945,
+    "risk_tags": [],
+    "evidence_snippets": [
+      "新版模型优化后未检测到敏感词",
+      "上下文语境评估为正常内容"
+    ]
+  },
+  {
+    "sample_id": "SAMPLE-004",
+    "original_line_number": 6,
+    "batch_id": "BATCH-2024-002",
+    "model_version": "v2.4.0",
+    "content": "色情低俗内容描述",
+    "predicted_label": "porn",
+    "confidence": 0.918,
+    "risk_tags": ["色情", "低俗"],
+    "evidence_snippets": [
+      "检测到低俗描述词汇",
+      "整体内容倾向色情"
+    ]
+  }
+]
