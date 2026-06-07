@@ -266,6 +266,9 @@ class CalculationEngine:
 
     def run_full_calculation(self, df: pd.DataFrame) -> Dict[str, Any]:
         """运行全套计算，返回所有结果"""
+        self.param_version = self.param_manager.get_current_version_tag()
+        self.weights = self.param_manager.get_effective_weights()
+        self.thresholds = self.param_manager.get_thresholds()
         df = df.copy()
         df = df[df["人员"].notna() & (df["人员"] != "")].copy()
         df = df.reset_index(drop=True)

@@ -253,6 +253,7 @@ class AnomalyDetector:
 
     def run_all_detections(self, df: pd.DataFrame, trend_df: Optional[pd.DataFrame] = None) -> Dict[str, Any]:
         """运行所有异常检测"""
+        self.thresholds = self.param_manager.get_thresholds()
         cursor = self.db.conn.cursor()
         cursor.execute(f"DELETE FROM {ANOMALIES_TABLE} WHERE batch_id = ?", (self.batch_id,))
         self.db.conn.commit()

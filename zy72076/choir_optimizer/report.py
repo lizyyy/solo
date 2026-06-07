@@ -44,6 +44,11 @@ class ReportGenerator:
             "保持状态": "#2ecc71"
         }.get(priority, "#333333")
 
+    def _ensure_charts_loaded(self):
+        """确保图表数据已加载（从数据库）"""
+        if not self.chart_generator.charts:
+            self.chart_generator.load_charts_from_db()
+
     def generate_text_report(self, calc_results: Dict[str, Any],
                             anomaly_summary: Dict,
                             conflict_summary: Dict,
@@ -51,6 +56,7 @@ class ReportGenerator:
                             sources: List[Dict],
                             param_diff: Dict) -> str:
         """生成文本格式报告 - 给不看代码的人用"""
+        self._ensure_charts_loaded()
         lines = []
         lines.append("=" * 70)
         lines.append("  合唱声部排练优化分析报告")
@@ -200,6 +206,7 @@ class ReportGenerator:
                             sources: List[Dict],
                             param_diff: Dict) -> str:
         """生成HTML交互式报告 - 图表可点击查看明细"""
+        self._ensure_charts_loaded()
         personal_df = calc_results.get("personal_scores", pd.DataFrame())
         section_metrics = calc_results.get("section_metrics", pd.DataFrame())
         html = f"""<!DOCTYPE html>

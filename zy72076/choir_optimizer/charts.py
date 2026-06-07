@@ -390,12 +390,34 @@ class ChartGenerator:
                 ]
         return pd.DataFrame()
 
+    def load_charts_from_db(self) -> List[Dict]:
+        """从数据库加载本批次的图表数据"""
+        cursor = self.db.conn.cursor()
+        cursor.execute(
+            f"SELECT * FROM {CHARTS_TABLE} WHERE batch_id = ? ORDER BY created_at",
+            (self.batch_id,)
+        )
+        rows = cursor.fetchall()
+        charts = []
+        for row in rows:
+            charts.append({
+                "id": row["id"],
+                "chart_type": row["chart_type"],
+                "chart_title": row["chart_title"],
+                "file_path": row["file_path"],
+                "drilldown_config": json.loads(row["drilldown_config"]) if row["drilldown_config"] else {}
+            })
+        self.charts = charts
+        return charts
+
     def export_charts_data(self, output_dir: Optional[str] = None) -> str:
         """导出图表数据和下钻配置，用于复查"""
         import json
         if output_dir is None:
             from .config import EXPORTS_DIR
             output_dir = str(EXPORTS_DIR)
+        if not self.charts:
+            self.load_charts_from_db()
         output_path = Path(output_dir) / f"{self.batch_id}_charts_data.json"
         export_data = {
             "batch_id": self.batch_id,
