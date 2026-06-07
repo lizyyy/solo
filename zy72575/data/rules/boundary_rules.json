@@ -1,0 +1,26 @@
+{
+  "afc397ca-6bf7-42e9-ae13-4f05a1598703": {
+    "rule_type": "missing_feature_default_score",
+    "name": "线上特征缺失却给了默认分",
+    "description": "当特征快照中存在缺失特征，且点击偏差分数使用了默认值时触发",
+    "condition": "record.missing_features and record.default_score_applied",
+    "action": "record.status = ProcessingStatus.NEEDS_REVIEW; record.assigned_to = '推荐负责人'",
+    "rule_id": "afc397ca-6bf7-42e9-ae13-4f05a1598703",
+    "rollback_action": "record.status = ProcessingStatus.IMPORTED; record.assigned_to = None",
+    "enabled": true,
+    "created_at": "2026-06-07T16:30:04.824001",
+    "created_by": "system"
+  },
+  "20b96fb1-0957-4a3f-acc1-277e78f38161": {
+    "rule_type": "click_bias_inconsistent",
+    "name": "排名学习点击偏差前后不一致",
+    "description": "当同一特征快照编号多次导入的点击偏差分数差异超过阈值时触发",
+    "condition": "context.get('old_score') is not None and context.get('new_score') is not None and abs(context['new_score'] - context['old_score']) > 0.1",
+    "action": "record.status = ProcessingStatus.NEEDS_REVIEW; record.notes = '点击偏差分数前后不一致'",
+    "rule_id": "20b96fb1-0957-4a3f-acc1-277e78f38161",
+    "rollback_action": "record.status = ProcessingStatus.IMPORTED",
+    "enabled": true,
+    "created_at": "2026-06-07T16:30:04.824009",
+    "created_by": "system"
+  }
+}

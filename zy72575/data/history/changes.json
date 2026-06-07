@@ -1,0 +1,183 @@
+{
+  "SNAP001": [
+    {
+      "snapshot_id": "SNAP001",
+      "field_name": "notes",
+      "old_value": "",
+      "new_value": "CLI测试导入",
+      "changed_by": "林姐",
+      "change_id": "1b98cf3d-bc41-46b8-b073-26f64bf31d88",
+      "changed_at": "2026-06-07T16:30:04.951683",
+      "change_reason": "完成第一步：特征快照导入"
+    },
+    {
+      "snapshot_id": "SNAP001",
+      "field_name": "workflow_state",
+      "old_value": "in_progress",
+      "new_value": "completed",
+      "changed_by": "林姐",
+      "change_id": "e60e3409-69c0-4b37-bc1e-a4742d198956",
+      "changed_at": "2026-06-07T16:30:04.951907",
+      "change_reason": "完成第一步：特征快照导入"
+    },
+    {
+      "snapshot_id": "SNAP001",
+      "field_name": "status",
+      "old_value": "imported",
+      "new_value": "logs_reviewed",
+      "changed_by": "林姐",
+      "change_id": "653249f4-254a-453a-9dc7-9e2a7132c832",
+      "changed_at": "2026-06-07T16:30:05.012216",
+      "change_reason": "完成第二步：训练日志曲线审阅"
+    },
+    {
+      "snapshot_id": "SNAP001",
+      "field_name": "workflow_step",
+      "old_value": "step_1_import",
+      "new_value": "step_2_review_logs",
+      "changed_by": "林姐",
+      "change_id": "df2f3592-5cdb-4374-8a75-826d58d0b9e3",
+      "changed_at": "2026-06-07T16:30:05.012534",
+      "change_reason": "完成第二步：训练日志曲线审阅"
+    },
+    {
+      "snapshot_id": "SNAP001",
+      "field_name": "custom_fields",
+      "old_value": {
+        "import_source": "cli_test",
+        "imported_by": "林姐"
+      },
+      "new_value": {
+        "import_source": "cli_test",
+        "imported_by": "林姐",
+        "training_log_analysis": "训练曲线正常收敛，AUC稳定在0.85",
+        "curve_findings": "loss无异常波动",
+        "logs_reviewed_by": "林姐",
+        "logs_reviewed_at": "2026-06-07T16:30:05.012131"
+      },
+      "changed_by": "林姐",
+      "change_id": "f2c20fa7-391b-4537-89e4-1f6cbd3ff49e",
+      "changed_at": "2026-06-07T16:30:05.012831",
+      "change_reason": "完成第二步：训练日志曲线审阅"
+    },
+    {
+      "snapshot_id": "SNAP001",
+      "field_name": "status",
+      "old_value": "logs_reviewed",
+      "new_value": "needs_review",
+      "changed_by": "林姐",
+      "change_id": "c319abd3-1e35-4afa-8fb6-205c6c9e4391",
+      "changed_at": "2026-06-07T16:30:05.072337",
+      "change_reason": "完成第三步：可解释摘要更新"
+    },
+    {
+      "snapshot_id": "SNAP001",
+      "field_name": "click_bias_score",
+      "old_value": null,
+      "new_value": 0.15,
+      "changed_by": "林姐",
+      "change_id": "d0bac60f-aa52-4978-92c5-b459125e01cb",
+      "changed_at": "2026-06-07T16:30:05.072825",
+      "change_reason": "完成第三步：可解释摘要更新"
+    },
+    {
+      "snapshot_id": "SNAP001",
+      "field_name": "default_score_applied",
+      "old_value": false,
+      "new_value": true,
+      "changed_by": "林姐",
+      "change_id": "71f3dcd1-6334-4097-92d9-14a0bf9aee50",
+      "changed_at": "2026-06-07T16:30:05.073301",
+      "change_reason": "完成第三步：可解释摘要更新"
+    },
+    {
+      "snapshot_id": "SNAP001",
+      "field_name": "missing_features",
+      "old_value": [],
+      "new_value": [
+        "feature_003"
+      ],
+      "changed_by": "林姐",
+      "change_id": "7cbbd951-09b4-4fb2-abad-cf6179119a12",
+      "changed_at": "2026-06-07T16:30:05.073787",
+      "change_reason": "完成第三步：可解释摘要更新"
+    },
+    {
+      "snapshot_id": "SNAP001",
+      "field_name": "assigned_to",
+      "old_value": null,
+      "new_value": "推荐负责人",
+      "changed_by": "林姐",
+      "change_id": "ea947e1a-ace7-487b-a653-d9a3a70f49f0",
+      "changed_at": "2026-06-07T16:30:05.074231",
+      "change_reason": "完成第三步：可解释摘要更新"
+    },
+    {
+      "snapshot_id": "SNAP001",
+      "field_name": "workflow_step",
+      "old_value": "step_2_review_logs",
+      "new_value": "step_3_update_summary",
+      "changed_by": "林姐",
+      "change_id": "9ade9a7a-426b-4199-aa70-ca6a76bf93f0",
+      "changed_at": "2026-06-07T16:30:05.074716",
+      "change_reason": "完成第三步：可解释摘要更新"
+    },
+    {
+      "snapshot_id": "SNAP001",
+      "field_name": "custom_fields",
+      "old_value": {
+        "import_source": "cli_test",
+        "imported_by": "林姐",
+        "training_log_analysis": "训练曲线正常收敛，AUC稳定在0.85",
+        "curve_findings": "loss无异常波动",
+        "logs_reviewed_by": "林姐",
+        "logs_reviewed_at": "2026-06-07T16:30:05.012131"
+      },
+      "new_value": {
+        "import_source": "cli_test",
+        "imported_by": "林姐",
+        "training_log_analysis": "训练曲线正常收敛，AUC稳定在0.85",
+        "curve_findings": "loss无异常波动",
+        "logs_reviewed_by": "林姐",
+        "logs_reviewed_at": "2026-06-07T16:30:05.012131",
+        "explainable_summary": "位置偏置贡献60%，时间因素30%",
+        "summary_updated_by": "林姐",
+        "summary_updated_at": "2026-06-07T16:30:05.072181"
+      },
+      "changed_by": "林姐",
+      "change_id": "3df0cd20-b7c0-4ad7-b231-084127f18bb0",
+      "changed_at": "2026-06-07T16:30:05.075185",
+      "change_reason": "完成第三步：可解释摘要更新"
+    },
+    {
+      "snapshot_id": "SNAP001",
+      "field_name": "status",
+      "old_value": "needs_review",
+      "new_value": "normal",
+      "changed_by": "推荐负责人",
+      "change_id": "0d3709ea-224f-4091-9c6c-2103da65780d",
+      "changed_at": "2026-06-07T16:30:05.252603",
+      "change_reason": "复核通过"
+    },
+    {
+      "snapshot_id": "SNAP001",
+      "field_name": "notes",
+      "old_value": "CLI测试导入",
+      "new_value": "已确认，同意标记为正常",
+      "changed_by": "推荐负责人",
+      "change_id": "b13a4f44-815f-4097-9bc4-d0370b613e2e",
+      "changed_at": "2026-06-07T16:30:05.253388",
+      "change_reason": "复核通过"
+    },
+    {
+      "snapshot_id": "SNAP001",
+      "field_name": "reviewed_by",
+      "old_value": null,
+      "new_value": "推荐负责人",
+      "changed_by": "推荐负责人",
+      "change_id": "9063ef8d-68fc-492e-bf62-b2596b5f3cae",
+      "changed_at": "2026-06-07T16:30:05.254111",
+      "change_reason": "复核通过"
+    }
+  ]
+}

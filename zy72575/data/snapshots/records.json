@@ -1,0 +1,98 @@
+{
+  "SNAP001": {
+    "snapshot_id": "SNAP001",
+    "original_line_number": 1,
+    "raw_data": {
+      "snapshot_id": "SNAP001",
+      "feature_001": 0.52,
+      "feature_002": 0.78,
+      "feature_003": null,
+      "feature_004": 0.34,
+      "source": "online_traffic",
+      "date": "2026-06-01"
+    },
+    "imported_at": "2026-06-07T16:30:04.824278",
+    "import_batch_id": "51ad70df-7429-4cd4-ab62-d188af4e9796",
+    "status": "normal",
+    "notes": "已确认，同意标记为正常",
+    "click_bias_score": 0.15,
+    "default_score_applied": true,
+    "missing_features": [
+      "feature_003"
+    ],
+    "assigned_to": "推荐负责人",
+    "reviewed_by": "推荐负责人",
+    "reviewed_at": "2026-06-07T16:30:05.252516",
+    "workflow_step": "step_3_update_summary",
+    "workflow_state": "completed",
+    "custom_fields": {
+      "import_source": "cli_test",
+      "imported_by": "林姐",
+      "training_log_analysis": "训练曲线正常收敛，AUC稳定在0.85",
+      "curve_findings": "loss无异常波动",
+      "logs_reviewed_by": "林姐",
+      "logs_reviewed_at": "2026-06-07T16:30:05.012131",
+      "explainable_summary": "位置偏置贡献60%，时间因素30%",
+      "summary_updated_by": "林姐",
+      "summary_updated_at": "2026-06-07T16:30:05.072181"
+    }
+  },
+  "SNAP002": {
+    "snapshot_id": "SNAP002",
+    "original_line_number": 2,
+    "raw_data": {
+      "snapshot_id": "SNAP002",
+      "feature_001": 0.45,
+      "feature_002": 0.62,
+      "feature_003": 0.89,
+      "feature_004": 0.51,
+      "source": "online_traffic",
+      "date": "2026-06-01"
+    },
+    "imported_at": "2026-06-07T16:30:04.824287",
+    "import_batch_id": "c49c4abb-aa8d-470f-a132-9abc316b7108",
+    "status": "imported",
+    "notes": "",
+    "click_bias_score": null,
+    "default_score_applied": false,
+    "missing_features": [],
+    "assigned_to": null,
+    "reviewed_by": null,
+    "reviewed_at": null,
+    "workflow_step": "step_1_import",
+    "workflow_state": "in_progress",
+    "custom_fields": {
+      "import_source": "cli_test",
+      "imported_by": "林姐"
+    }
+  },
+  "SNAP003": {
+    "snapshot_id": "SNAP003",
+    "original_line_number": 3,
+    "raw_data": {
+      "snapshot_id": "SNAP003",
+      "feature_001": 0.31,
+      "feature_002": 0.94,
+      "feature_003": 0.22,
+      "feature_004": null,
+      "source": "offline_test",
+      "date": "2026-06-01"
+    },
+    "imported_at": "2026-06-07T16:30:04.824293",
+    "import_batch_id": "353ba7e4-666c-4c4e-8b26-0c0d046e7b7b",
+    "status": "imported",
+    "notes": "",
+    "click_bias_score": null,
+    "default_score_applied": false,
+    "missing_features": [],
+    "assigned_to": null,
+    "reviewed_by": null,
+    "reviewed_at": null,
+    "workflow_step": "step_1_import",
+    "workflow_state": "in_progress",
+    "custom_fields": {
+      "import_source": "cli_test",
+      "imported_by": "林姐"
+    }
+  }
+}

@@ -1,0 +1,29 @@
+[
+    {
+        "snapshot_id": "SNAP001",
+        "feature_001": 0.52,
+        "feature_002": 0.78,
+        "feature_003": null,
+        "feature_004": 0.34,
+        "source": "online_traffic",
+        "date": "2026-06-01"
+    },
+    {
+        "snapshot_id": "SNAP002",
+        "feature_001": 0.45,
+        "feature_002": 0.62,
+        "feature_003": 0.89,
+        "feature_004": 0.51,
+        "source": "online_traffic",
+        "date": "2026-06-01"
+    },
+    {
+        "snapshot_id": "SNAP003",
+        "feature_001": 0.31,
+        "feature_002": 0.94,
+        "feature_003": 0.22,
+        "feature_004": null,
+        "source": "offline_test",
+        "date": "2026-06-01"
+    }
+]
