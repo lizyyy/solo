@@ -1,0 +1,36 @@
+# Embedding 版本对比参数
+# v2 → v3 兼容性检查
+embedding_version_a: "v2-202405"
+embedding_version_b: "v3-202406"
+
+features:
+  - name: user_click_emb
+    score_a: 0.823
+    score_b: 0.845
+    feature_present_online: true
+    used_default_score: false
+
+  - name: user_search_emb
+    score_a: 0.756
+    score_b: 0.778
+    feature_present_online: true
+    used_default_score: false
+
+  - name: item_tag_emb
+    score_a: 0.500
+    score_b: 0.500
+    feature_present_online: false
+    used_default_score: true
+    default_score_value: 0.5
+
+  - name: item_category_emb
+    score_a: 0.912
+    score_b: 0.908
+    feature_present_online: true
+    used_default_score: false
+
+  - name: user_profile_emb
+    score_a: 0.634
+    score_b: 0.652
+    feature_present_online: true
+    used_default_score: false

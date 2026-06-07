@@ -1,0 +1,6 @@
+feature_name,embedding_version_a,embedding_version_b,score_a,score_b,score_diff,feature_present_online,used_default_score,default_score_value,anomaly_type,anomaly_description,status,linji_review_note,lead_review_note,summary_note,record_id
+user_click_emb,v2-202405,v3-202406,0.823,0.845,0.022,True,False,,none,,summary_updated,用户点击emb分布正常，v3 AUC略高,,v3相比v2，用户点击行为embedding优化了负采样策略，AUC提升约0.022,7cec91b2-b6e8-41ae-80a5-5bf0f7612444
+user_search_emb,v2-202405,v3-202406,0.756,0.778,0.022,True,False,,none,,summary_updated,搜索行为emb覆盖度提升，正常,,搜索行为embedding新增query语义特征，覆盖度提升8%,a6cf61c0-2adf-4257-8689-5f032aabf4ea
+item_tag_emb,v2-202405,v3-202406,0.5,0.5,0.0,False,True,0.5,default_score_missing_feature,特征[item_tag_emb]线上缺失，但使用了默认分（默认分=0.5），需推荐负责人复核,summary_updated,这个特征v3还没全量上线，但用了默认分0.5，等负责人看,历史遗留默认分，短期内无影响，后续版本下线这个特征,标签embedding v3尚未全量线上，当前使用默认分0.5，计划7月全量,4f0b4088-2c1a-4004-a725-2953489a104a
+item_category_emb,v2-202405,v3-202406,0.912,0.908,-0.004,True,False,,none,,summary_updated,品类emb稳定，v2和v3差异很小,,品类embedding稳定，v2/v3差异在0.004以内，无业务影响,fc7742f1-a5be-4136-ad7a-0ce3b44c7d4c
+user_profile_emb,v2-202405,v3-202406,0.634,0.652,0.018,True,False,,none,,summary_updated,画像emb正常更新,,用户画像embedding更新了年龄段和消费水平特征，更准,7c43506c-684e-4419-ae1b-8afdddfeee7d

@@ -1,0 +1,855 @@
+{
+  "summary": {
+    "session_id": "f5706996-6ad8-490c-bd6d-9bc00bde88f8",
+    "session_name": "v2-vs-v3-202406-批次1",
+    "version_a": "v2-202405",
+    "version_b": "v3-202406",
+    "total_records": 5,
+    "status_counts": {
+      "summary_updated": 4,
+      "lead_approved": 1
+    },
+    "anomaly_counts": {
+      "none": 4,
+      "default_score_missing_feature": 1
+    },
+    "pending_lead_count": 0,
+    "default_score_missing_count": 1,
+    "created_at": "2026-06-07T15:57:08.980210",
+    "created_by": "小明"
+  },
+  "records": [
+    {
+      "record_id": "7cec91b2-b6e8-41ae-80a5-5bf0f7612444",
+      "feature_name": "user_click_emb",
+      "embedding_version_a": "v2-202405",
+      "embedding_version_b": "v3-202406",
+      "score_a": 0.823,
+      "score_b": 0.845,
+      "score_diff": 0.022,
+      "feature_present_online": true,
+      "used_default_score": false,
+      "default_score_value": null,
+      "anomaly_type": "none",
+      "anomaly_description": "",
+      "status": "summary_updated",
+      "status_history": [
+        "imported",
+        "linji_reviewed"
+      ],
+      "yaml_source_lines": [
+        {
+          "line_number": 7,
+          "raw_content": "  - name: user_click_emb",
+          "parsed_key": "name",
+          "parsed_value": "user_click_emb",
+          "is_modified": false,
+          "modified_by": null,
+          "modified_at": null,
+          "original_content": null,
+          "modification_note": null
+        },
+        {
+          "line_number": 8,
+          "raw_content": "    score_a: 0.823",
+          "parsed_key": "score_a",
+          "parsed_value": 0.823,
+          "is_modified": false,
+          "modified_by": null,
+          "modified_at": null,
+          "original_content": null,
+          "modification_note": null
+        },
+        {
+          "line_number": 9,
+          "raw_content": "    score_b: 0.845",
+          "parsed_key": "score_b",
+          "parsed_value": 0.845,
+          "is_modified": false,
+          "modified_by": null,
+          "modified_at": null,
+          "original_content": null,
+          "modification_note": null
+        },
+        {
+          "line_number": 10,
+          "raw_content": "    feature_present_online: true",
+          "parsed_key": "feature_present_online",
+          "parsed_value": true,
+          "is_modified": false,
+          "modified_by": null,
+          "modified_at": null,
+          "original_content": null,
+          "modification_note": null
+        },
+        {
+          "line_number": 11,
+          "raw_content": "    used_default_score: false",
+          "parsed_key": "used_default_score",
+          "parsed_value": false,
+          "is_modified": false,
+          "modified_by": null,
+          "modified_at": null,
+          "original_content": null,
+          "modification_note": null
+        },
+        {
+          "line_number": 12,
+          "raw_content": "",
+          "parsed_key": null,
+          "parsed_value": null,
+          "is_modified": false,
+          "modified_by": null,
+          "modified_at": null,
+          "original_content": null,
+          "modification_note": null
+        }
+      ],
+      "audit_logs": [
+        {
+          "timestamp": "2026-06-07T15:57:08.980341",
+          "actor": "linjie",
+          "action": "status_change",
+          "record_id": "7cec91b2-b6e8-41ae-80a5-5bf0f7612444",
+          "previous_status": "imported",
+          "new_status": "linji_reviewed",
+          "details": "林姐评测切片查看完成，备注：用户点击emb分布正常，v3 AUC略高",
+          "field_changed": "",
+          "old_value": "",
+          "new_value": ""
+        },
+        {
+          "timestamp": "2026-06-07T15:57:08.980366",
+          "actor": "linjie",
+          "action": "status_change",
+          "record_id": "7cec91b2-b6e8-41ae-80a5-5bf0f7612444",
+          "previous_status": "linji_reviewed",
+          "new_status": "summary_updated",
+          "details": "可解释摘要更新完成",
+          "field_changed": "",
+          "old_value": "",
+          "new_value": ""
+        }
+      ],
+      "linji_review_note": "用户点击emb分布正常，v3 AUC略高",
+      "linji_reviewed_at": "2026-06-07T15:57:08.980339",
+      "linji_reviewed_by": "linjie",
+      "lead_review_note": "",
+      "lead_reviewed_at": null,
+      "lead_reviewed_by": "",
+      "summary_note": "v3相比v2，用户点击行为embedding优化了负采样策略，AUC提升约0.022",
+      "summary_updated_at": "2026-06-07T15:57:08.980364",
+      "summary_updated_by": "linjie",
+      "created_at": "2026-06-07T15:57:08.980259",
+      "updated_at": "2026-06-07T15:57:08.980365"
+    },
+    {
+      "record_id": "a6cf61c0-2adf-4257-8689-5f032aabf4ea",
+      "feature_name": "user_search_emb",
+      "embedding_version_a": "v2-202405",
+      "embedding_version_b": "v3-202406",
+      "score_a": 0.756,
+      "score_b": 0.778,
+      "score_diff": 0.022,
+      "feature_present_online": true,
+      "used_default_score": false,
+      "default_score_value": null,
+      "anomaly_type": "none",
+      "anomaly_description": "",
+      "status": "summary_updated",
+      "status_history": [
+        "imported",
+        "linji_reviewed"
+      ],
+      "yaml_source_lines": [
+        {
+          "line_number": 13,
+          "raw_content": "  - name: user_search_emb",
+          "parsed_key": "name",
+          "parsed_value": "user_search_emb",
+          "is_modified": false,
+          "modified_by": null,
+          "modified_at": null,
+          "original_content": null,
+          "modification_note": null
+        },
+        {
+          "line_number": 14,
+          "raw_content": "    score_a: 0.756",
+          "parsed_key": "score_a",
+          "parsed_value": 0.756,
+          "is_modified": false,
+          "modified_by": null,
+          "modified_at": null,
+          "original_content": null,
+          "modification_note": null
+        },
+        {
+          "line_number": 15,
+          "raw_content": "    score_b: 0.778",
+          "parsed_key": "score_b",
+          "parsed_value": 0.778,
+          "is_modified": false,
+          "modified_by": null,
+          "modified_at": null,
+          "original_content": null,
+          "modification_note": null
+        },
+        {
+          "line_number": 16,
+          "raw_content": "    feature_present_online: true",
+          "parsed_key": "feature_present_online",
+          "parsed_value": true,
+          "is_modified": false,
+          "modified_by": null,
+          "modified_at": null,
+          "original_content": null,
+          "modification_note": null
+        },
+        {
+          "line_number": 17,
+          "raw_content": "    used_default_score: false",
+          "parsed_key": "used_default_score",
+          "parsed_value": false,
+          "is_modified": false,
+          "modified_by": null,
+          "modified_at": null,
+          "original_content": null,
+          "modification_note": null
+        },
+        {
+          "line_number": 18,
+          "raw_content": "",
+          "parsed_key": null,
+          "parsed_value": null,
+          "is_modified": false,
+          "modified_by": null,
+          "modified_at": null,
+          "original_content": null,
+          "modification_note": null
+        }
+      ],
+      "audit_logs": [
+        {
+          "timestamp": "2026-06-07T15:57:08.980344",
+          "actor": "linjie",
+          "action": "status_change",
+          "record_id": "a6cf61c0-2adf-4257-8689-5f032aabf4ea",
+          "previous_status": "imported",
+          "new_status": "linji_reviewed",
+          "details": "林姐评测切片查看完成，备注：搜索行为emb覆盖度提升，正常",
+          "field_changed": "",
+          "old_value": "",
+          "new_value": ""
+        },
+        {
+          "timestamp": "2026-06-07T15:57:08.980368",
+          "actor": "linjie",
+          "action": "status_change",
+          "record_id": "a6cf61c0-2adf-4257-8689-5f032aabf4ea",
+          "previous_status": "linji_reviewed",
+          "new_status": "summary_updated",
+          "details": "可解释摘要更新完成",
+          "field_changed": "",
+          "old_value": "",
+          "new_value": ""
+        }
+      ],
+      "linji_review_note": "搜索行为emb覆盖度提升，正常",
+      "linji_reviewed_at": "2026-06-07T15:57:08.980343",
+      "linji_reviewed_by": "linjie",
+      "lead_review_note": "",
+      "lead_reviewed_at": null,
+      "lead_reviewed_by": "",
+      "summary_note": "搜索行为embedding新增query语义特征，覆盖度提升8%",
+      "summary_updated_at": "2026-06-07T15:57:08.980367",
+      "summary_updated_by": "linjie",
+      "created_at": "2026-06-07T15:57:08.980278",
+      "updated_at": "2026-06-07T15:57:08.980368"
+    },
+    {
+      "record_id": "4f0b4088-2c1a-4004-a725-2953489a104a",
+      "feature_name": "item_tag_emb",
+      "embedding_version_a": "v2-202405",
+      "embedding_version_b": "v3-202406",
+      "score_a": 0.5,
+      "score_b": 0.5,
+      "score_diff": 0.0,
+      "feature_present_online": false,
+      "used_default_score": true,
+      "default_score_value": 0.5,
+      "anomaly_type": "default_score_missing_feature",
+      "anomaly_description": "特征[item_tag_emb]线上缺失，但使用了默认分（默认分=0.5），需推荐负责人复核",
+      "status": "lead_approved",
+      "status_history": [
+        "imported",
+        "pending_lead_review",
+        "pending_lead_review"
+      ],
+      "yaml_source_lines": [
+        {
+          "line_number": 19,
+          "raw_content": "  - name: item_tag_emb",
+          "parsed_key": "name",
+          "parsed_value": "item_tag_emb",
+          "is_modified": false,
+          "modified_by": null,
+          "modified_at": null,
+          "original_content": null,
+          "modification_note": null
+        },
+        {
+          "line_number": 20,
+          "raw_content": "    score_a: 0.500",
+          "parsed_key": "score_a",
+          "parsed_value": 0.5,
+          "is_modified": false,
+          "modified_by": null,
+          "modified_at": null,
+          "original_content": null,
+          "modification_note": null
+        },
+        {
+          "line_number": 21,
+          "raw_content": "    score_b: 0.500",
+          "parsed_key": "score_b",
+          "parsed_value": 0.5,
+          "is_modified": false,
+          "modified_by": null,
+          "modified_at": null,
+          "original_content": null,
+          "modification_note": null
+        },
+        {
+          "line_number": 22,
+          "raw_content": "    feature_present_online: false",
+          "parsed_key": "feature_present_online",
+          "parsed_value": false,
+          "is_modified": false,
+          "modified_by": null,
+          "modified_at": null,
+          "original_content": null,
+          "modification_note": null
+        },
+        {
+          "line_number": 23,
+          "raw_content": "    used_default_score: true",
+          "parsed_key": "used_default_score",
+          "parsed_value": true,
+          "is_modified": false,
+          "modified_by": null,
+          "modified_at": null,
+          "original_content": null,
+          "modification_note": null
+        },
+        {
+          "line_number": 24,
+          "raw_content": "    default_score_value: 0.5",
+          "parsed_key": "default_score_value",
+          "parsed_value": 0.5,
+          "is_modified": false,
+          "modified_by": null,
+          "modified_at": null,
+          "original_content": null,
+          "modification_note": null
+        },
+        {
+          "line_number": 25,
+          "raw_content": "",
+          "parsed_key": null,
+          "parsed_value": null,
+          "is_modified": false,
+          "modified_by": null,
+          "modified_at": null,
+          "original_content": null,
+          "modification_note": null
+        }
+      ],
+      "audit_logs": [
+        {
+          "timestamp": "2026-06-07T15:57:08.980298",
+          "actor": "system",
+          "action": "status_change",
+          "record_id": "4f0b4088-2c1a-4004-a725-2953489a104a",
+          "previous_status": "imported",
+          "new_status": "pending_lead_review",
+          "details": "自动检测：线上特征缺失却给了默认分",
+          "field_changed": "",
+          "old_value": "",
+          "new_value": ""
+        },
+        {
+          "timestamp": "2026-06-07T15:57:08.980347",
+          "actor": "linjie",
+          "action": "status_change",
+          "record_id": "4f0b4088-2c1a-4004-a725-2953489a104a",
+          "previous_status": "pending_lead_review",
+          "new_status": "pending_lead_review",
+          "details": "林姐评测切片查看完成，备注：这个特征v3还没全量上线，但用了默认分0.5，等负责人看",
+          "field_changed": "",
+          "old_value": "",
+          "new_value": ""
+        },
+        {
+          "timestamp": "2026-06-07T15:57:08.980361",
+          "actor": "张负责人",
+          "action": "status_change",
+          "record_id": "4f0b4088-2c1a-4004-a725-2953489a104a",
+          "previous_status": "pending_lead_review",
+          "new_status": "lead_approved",
+          "details": "推荐负责人复核通过：历史遗留默认分，短期内无影响，后续版本下线这个特征",
+          "field_changed": "",
+          "old_value": "",
+          "new_value": ""
+        },
+        {
+          "timestamp": "2026-06-07T15:57:08.980370",
+          "actor": "linjie",
+          "action": "status_change",
+          "record_id": "4f0b4088-2c1a-4004-a725-2953489a104a",
+          "previous_status": "lead_approved",
+          "new_status": "summary_updated",
+          "details": "可解释摘要更新完成",
+          "field_changed": "",
+          "old_value": "",
+          "new_value": ""
+        },
+        {
+          "timestamp": "2026-06-07T15:57:08.980605",
+          "actor": "linjie",
+          "action": "rollback",
+          "record_id": "4f0b4088-2c1a-4004-a725-2953489a104a",
+          "previous_status": "lead_approved",
+          "new_status": "lead_approved",
+          "details": "测试回滚功能",
+          "field_changed": "",
+          "old_value": "",
+          "new_value": ""
+        }
+      ],
+      "linji_review_note": "这个特征v3还没全量上线，但用了默认分0.5，等负责人看",
+      "linji_reviewed_at": "2026-06-07T15:57:08.980346",
+      "linji_reviewed_by": "linjie",
+      "lead_review_note": "历史遗留默认分，短期内无影响，后续版本下线这个特征",
+      "lead_reviewed_at": "2026-06-07T15:57:08.980359",
+      "lead_reviewed_by": "张负责人",
+      "summary_note": "标签embedding v3尚未全量线上，当前使用默认分0.5，计划7月全量",
+      "summary_updated_at": "2026-06-07T15:57:08.980369",
+      "summary_updated_by": "linjie",
+      "created_at": "2026-06-07T15:57:08.980287",
+      "updated_at": "2026-06-07T15:57:08.980604"
+    },
+    {
+      "record_id": "fc7742f1-a5be-4136-ad7a-0ce3b44c7d4c",
+      "feature_name": "item_category_emb",
+      "embedding_version_a": "v2-202405",
+      "embedding_version_b": "v3-202406",
+      "score_a": 0.912,
+      "score_b": 0.908,
+      "score_diff": -0.004,
+      "feature_present_online": true,
+      "used_default_score": false,
+      "default_score_value": null,
+      "anomaly_type": "none",
+      "anomaly_description": "",
+      "status": "summary_updated",
+      "status_history": [
+        "imported",
+        "linji_reviewed"
+      ],
+      "yaml_source_lines": [
+        {
+          "line_number": 26,
+          "raw_content": "  - name: item_category_emb",
+          "parsed_key": "name",
+          "parsed_value": "item_category_emb",
+          "is_modified": false,
+          "modified_by": null,
+          "modified_at": null,
+          "original_content": null,
+          "modification_note": null
+        },
+        {
+          "line_number": 27,
+          "raw_content": "    score_a: 0.912",
+          "parsed_key": "score_a",
+          "parsed_value": 0.912,
+          "is_modified": false,
+          "modified_by": null,
+          "modified_at": null,
+          "original_content": null,
+          "modification_note": null
+        },
+        {
+          "line_number": 28,
+          "raw_content": "    score_b: 0.908",
+          "parsed_key": "score_b",
+          "parsed_value": 0.908,
+          "is_modified": false,
+          "modified_by": null,
+          "modified_at": null,
+          "original_content": null,
+          "modification_note": null
+        },
+        {
+          "line_number": 29,
+          "raw_content": "    feature_present_online: true",
+          "parsed_key": "feature_present_online",
+          "parsed_value": true,
+          "is_modified": false,
+          "modified_by": null,
+          "modified_at": null,
+          "original_content": null,
+          "modification_note": null
+        },
+        {
+          "line_number": 30,
+          "raw_content": "    used_default_score: false",
+          "parsed_key": "used_default_score",
+          "parsed_value": false,
+          "is_modified": false,
+          "modified_by": null,
+          "modified_at": null,
+          "original_content": null,
+          "modification_note": null
+        },
+        {
+          "line_number": 31,
+          "raw_content": "",
+          "parsed_key": null,
+          "parsed_value": null,
+          "is_modified": false,
+          "modified_by": null,
+          "modified_at": null,
+          "original_content": null,
+          "modification_note": null
+        }
+      ],
+      "audit_logs": [
+        {
+          "timestamp": "2026-06-07T15:57:08.980349",
+          "actor": "linjie",
+          "action": "status_change",
+          "record_id": "fc7742f1-a5be-4136-ad7a-0ce3b44c7d4c",
+          "previous_status": "imported",
+          "new_status": "linji_reviewed",
+          "details": "林姐评测切片查看完成，备注：品类emb稳定，v2和v3差异很小",
+          "field_changed": "",
+          "old_value": "",
+          "new_value": ""
+        },
+        {
+          "timestamp": "2026-06-07T15:57:08.980372",
+          "actor": "linjie",
+          "action": "status_change",
+          "record_id": "fc7742f1-a5be-4136-ad7a-0ce3b44c7d4c",
+          "previous_status": "linji_reviewed",
+          "new_status": "summary_updated",
+          "details": "可解释摘要更新完成",
+          "field_changed": "",
+          "old_value": "",
+          "new_value": ""
+        }
+      ],
+      "linji_review_note": "品类emb稳定，v2和v3差异很小",
+      "linji_reviewed_at": "2026-06-07T15:57:08.980348",
+      "linji_reviewed_by": "linjie",
+      "lead_review_note": "",
+      "lead_reviewed_at": null,
+      "lead_reviewed_by": "",
+      "summary_note": "品类embedding稳定，v2/v3差异在0.004以内，无业务影响",
+      "summary_updated_at": "2026-06-07T15:57:08.980372",
+      "summary_updated_by": "linjie",
+      "created_at": "2026-06-07T15:57:08.980309",
+      "updated_at": "2026-06-07T15:57:08.980372"
+    },
+    {
+      "record_id": "7c43506c-684e-4419-ae1b-8afdddfeee7d",
+      "feature_name": "user_profile_emb",
+      "embedding_version_a": "v2-202405",
+      "embedding_version_b": "v3-202406",
+      "score_a": 0.634,
+      "score_b": 0.652,
+      "score_diff": 0.018,
+      "feature_present_online": true,
+      "used_default_score": false,
+      "default_score_value": null,
+      "anomaly_type": "none",
+      "anomaly_description": "",
+      "status": "summary_updated",
+      "status_history": [
+        "imported",
+        "linji_reviewed"
+      ],
+      "yaml_source_lines": [
+        {
+          "line_number": 32,
+          "raw_content": "  - name: user_profile_emb",
+          "parsed_key": "name",
+          "parsed_value": "user_profile_emb",
+          "is_modified": false,
+          "modified_by": null,
+          "modified_at": null,
+          "original_content": null,
+          "modification_note": null
+        },
+        {
+          "line_number": 33,
+          "raw_content": "    score_a: 0.634",
+          "parsed_key": "score_a",
+          "parsed_value": 0.634,
+          "is_modified": false,
+          "modified_by": null,
+          "modified_at": null,
+          "original_content": null,
+          "modification_note": null
+        },
+        {
+          "line_number": 34,
+          "raw_content": "    score_b: 0.652",
+          "parsed_key": "score_b",
+          "parsed_value": 0.652,
+          "is_modified": false,
+          "modified_by": null,
+          "modified_at": null,
+          "original_content": null,
+          "modification_note": null
+        },
+        {
+          "line_number": 35,
+          "raw_content": "    feature_present_online: true",
+          "parsed_key": "feature_present_online",
+          "parsed_value": true,
+          "is_modified": false,
+          "modified_by": null,
+          "modified_at": null,
+          "original_content": null,
+          "modification_note": null
+        },
+        {
+          "line_number": 36,
+          "raw_content": "    used_default_score: false",
+          "parsed_key": "used_default_score",
+          "parsed_value": false,
+          "is_modified": false,
+          "modified_by": null,
+          "modified_at": null,
+          "original_content": null,
+          "modification_note": null
+        }
+      ],
+      "audit_logs": [
+        {
+          "timestamp": "2026-06-07T15:57:08.980351",
+          "actor": "linjie",
+          "action": "status_change",
+          "record_id": "7c43506c-684e-4419-ae1b-8afdddfeee7d",
+          "previous_status": "imported",
+          "new_status": "linji_reviewed",
+          "details": "林姐评测切片查看完成，备注：画像emb正常更新",
+          "field_changed": "",
+          "old_value": "",
+          "new_value": ""
+        },
+        {
+          "timestamp": "2026-06-07T15:57:08.980375",
+          "actor": "linjie",
+          "action": "status_change",
+          "record_id": "7c43506c-684e-4419-ae1b-8afdddfeee7d",
+          "previous_status": "linji_reviewed",
+          "new_status": "summary_updated",
+          "details": "可解释摘要更新完成",
+          "field_changed": "",
+          "old_value": "",
+          "new_value": ""
+        }
+      ],
+      "linji_review_note": "画像emb正常更新",
+      "linji_reviewed_at": "2026-06-07T15:57:08.980350",
+      "linji_reviewed_by": "linjie",
+      "lead_review_note": "",
+      "lead_reviewed_at": null,
+      "lead_reviewed_by": "",
+      "summary_note": "用户画像embedding更新了年龄段和消费水平特征，更准",
+      "summary_updated_at": "2026-06-07T15:57:08.980374",
+      "summary_updated_by": "linjie",
+      "created_at": "2026-06-07T15:57:08.980317",
+      "updated_at": "2026-06-07T15:57:08.980374"
+    }
+  ],
+  "pending_lead_records": [],
+  "default_score_missing": [
+    {
+      "record_id": "4f0b4088-2c1a-4004-a725-2953489a104a",
+      "feature_name": "item_tag_emb",
+      "embedding_version_a": "v2-202405",
+      "embedding_version_b": "v3-202406",
+      "score_a": 0.5,
+      "score_b": 0.5,
+      "score_diff": 0.0,
+      "feature_present_online": false,
+      "used_default_score": true,
+      "default_score_value": 0.5,
+      "anomaly_type": "default_score_missing_feature",
+      "anomaly_description": "特征[item_tag_emb]线上缺失，但使用了默认分（默认分=0.5），需推荐负责人复核",
+      "status": "lead_approved",
+      "status_history": [
+        "imported",
+        "pending_lead_review",
+        "pending_lead_review"
+      ],
+      "yaml_source_lines": [
+        {
+          "line_number": 19,
+          "raw_content": "  - name: item_tag_emb",
+          "parsed_key": "name",
+          "parsed_value": "item_tag_emb",
+          "is_modified": false,
+          "modified_by": null,
+          "modified_at": null,
+          "original_content": null,
+          "modification_note": null
+        },
+        {
+          "line_number": 20,
+          "raw_content": "    score_a: 0.500",
+          "parsed_key": "score_a",
+          "parsed_value": 0.5,
+          "is_modified": false,
+          "modified_by": null,
+          "modified_at": null,
+          "original_content": null,
+          "modification_note": null
+        },
+        {
+          "line_number": 21,
+          "raw_content": "    score_b: 0.500",
+          "parsed_key": "score_b",
+          "parsed_value": 0.5,
+          "is_modified": false,
+          "modified_by": null,
+          "modified_at": null,
+          "original_content": null,
+          "modification_note": null
+        },
+        {
+          "line_number": 22,
+          "raw_content": "    feature_present_online: false",
+          "parsed_key": "feature_present_online",
+          "parsed_value": false,
+          "is_modified": false,
+          "modified_by": null,
+          "modified_at": null,
+          "original_content": null,
+          "modification_note": null
+        },
+        {
+          "line_number": 23,
+          "raw_content": "    used_default_score: true",
+          "parsed_key": "used_default_score",
+          "parsed_value": true,
+          "is_modified": false,
+          "modified_by": null,
+          "modified_at": null,
+          "original_content": null,
+          "modification_note": null
+        },
+        {
+          "line_number": 24,
+          "raw_content": "    default_score_value: 0.5",
+          "parsed_key": "default_score_value",
+          "parsed_value": 0.5,
+          "is_modified": false,
+          "modified_by": null,
+          "modified_at": null,
+          "original_content": null,
+          "modification_note": null
+        },
+        {
+          "line_number": 25,
+          "raw_content": "",
+          "parsed_key": null,
+          "parsed_value": null,
+          "is_modified": false,
+          "modified_by": null,
+          "modified_at": null,
+          "original_content": null,
+          "modification_note": null
+        }
+      ],
+      "audit_logs": [
+        {
+          "timestamp": "2026-06-07T15:57:08.980298",
+          "actor": "system",
+          "action": "status_change",
+          "record_id": "4f0b4088-2c1a-4004-a725-2953489a104a",
+          "previous_status": "imported",
+          "new_status": "pending_lead_review",
+          "details": "自动检测：线上特征缺失却给了默认分",
+          "field_changed": "",
+          "old_value": "",
+          "new_value": ""
+        },
+        {
+          "timestamp": "2026-06-07T15:57:08.980347",
+          "actor": "linjie",
+          "action": "status_change",
+          "record_id": "4f0b4088-2c1a-4004-a725-2953489a104a",
+          "previous_status": "pending_lead_review",
+          "new_status": "pending_lead_review",
+          "details": "林姐评测切片查看完成，备注：这个特征v3还没全量上线，但用了默认分0.5，等负责人看",
+          "field_changed": "",
+          "old_value": "",
+          "new_value": ""
+        },
+        {
+          "timestamp": "2026-06-07T15:57:08.980361",
+          "actor": "张负责人",
+          "action": "status_change",
+          "record_id": "4f0b4088-2c1a-4004-a725-2953489a104a",
+          "previous_status": "pending_lead_review",
+          "new_status": "lead_approved",
+          "details": "推荐负责人复核通过：历史遗留默认分，短期内无影响，后续版本下线这个特征",
+          "field_changed": "",
+          "old_value": "",
+          "new_value": ""
+        },
+        {
+          "timestamp": "2026-06-07T15:57:08.980370",
+          "actor": "linjie",
+          "action": "status_change",
+          "record_id": "4f0b4088-2c1a-4004-a725-2953489a104a",
+          "previous_status": "lead_approved",
+          "new_status": "summary_updated",
+          "details": "可解释摘要更新完成",
+          "field_changed": "",
+          "old_value": "",
+          "new_value": ""
+        },
+        {
+          "timestamp": "2026-06-07T15:57:08.980605",
+          "actor": "linjie",
+          "action": "rollback",
+          "record_id": "4f0b4088-2c1a-4004-a725-2953489a104a",
+          "previous_status": "lead_approved",
+          "new_status": "lead_approved",
+          "details": "测试回滚功能",
+          "field_changed": "",
+          "old_value": "",
+          "new_value": ""
+        }
+      ],
+      "linji_review_note": "这个特征v3还没全量上线，但用了默认分0.5，等负责人看",
+      "linji_reviewed_at": "2026-06-07T15:57:08.980346",
+      "linji_reviewed_by": "linjie",
+      "lead_review_note": "历史遗留默认分，短期内无影响，后续版本下线这个特征",
+      "lead_reviewed_at": "2026-06-07T15:57:08.980359",
+      "lead_reviewed_by": "张负责人",
+      "summary_note": "标签embedding v3尚未全量线上，当前使用默认分0.5，计划7月全量",
+      "summary_updated_at": "2026-06-07T15:57:08.980369",
+      "summary_updated_by": "linjie",
+      "created_at": "2026-06-07T15:57:08.980287",
+      "updated_at": "2026-06-07T15:57:08.980604"
+    }
+  ]
+}
