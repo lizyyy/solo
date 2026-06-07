@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>口袋篮球场噪声缓冲</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f7fa; color: #333; }
+.header { background: linear-gradient(135deg, #1e3c72, #2a5298); color: white; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
+.header h1 { font-size: 20px; font-weight: 600; }
+.header .subtitle { font-size: 12px; opacity: 0.8; margin-top: 2px; }
+.container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+.grid { display: grid; grid-template-columns: 1fr 350px; gap: 20px; }
+.card { background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); padding: 20px; margin-bottom: 20px; }
+.card h2 { font-size: 16px; margin-bottom: 16px; color: #1e3c72; border-bottom: 2px solid #e8ecf3; padding-bottom: 8px; }
+.warning-box { background: #fff3cd; border-left: 4px solid #ffc107; padding: 12px 16px; margin-bottom: 16px; border-radius: 4px; }
+.warning-box h3 { font-size: 14px; color: #856404; margin-bottom: 8px; }
+.warning-box ul { margin-left: 20px; font-size: 13px; color: #856404; }
+.warning-box li { margin-bottom: 4px; }
+.heatmap-container { position: relative; width: 100%; height: 420px; background: #f0f4f8; border-radius: 6px; overflow: hidden; }
+.heatmap-svg { width: 100%; height: 100%; }
+.legend { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 12px; }
+.legend-bar { width: 200px; height: 16px; border-radius: 8px; background: linear-gradient(to right, #4ecdc4, #44a08d, #f9ca24, #f0932b, #eb4d4b); }
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+.stat-item { background: #f8fafc; padding: 12px; border-radius: 6px; text-align: center; }
+.stat-value { font-size: 24px; font-weight: 600; color: #1e3c72; }
+.stat-label { font-size: 12px; color: #64748b; margin-top: 4px; }
+.sample-list { max-height: 300px; overflow-y: auto; }
+.sample-item { padding: 10px 12px; border-radius: 6px; margin-bottom: 8px; background: #f8fafc; border-left: 4px solid #4ecdc4; cursor: pointer; transition: all 0.2s; }
+.sample-item:hover { background: #eef2f7; }
+.sample-item.low-confidence { border-left-color: #f0932b; background: #fff8e1; }
+.sample-item.corrected { border-left-color: #6c5ce7; background: #f3f0ff; }
+.sample-item.from-complaint { border-left-color: #e17055; background: #fff0ed; }
+.sample-item.selected { background: #e8f0fe; border-left-color: #1e3c72; }
+.sample-loc { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+.sample-meta { font-size: 12px; color: #64748b; }
+.sample-noise { float: right; font-size: 18px; font-weight: 600; color: #1e3c72; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; margin-right: 4px; }
+.badge-normal { background: #d4edda; color: #155724; }
+.badge-low { background: #ffeeba; color: #856404; }
+.badge-corrected { background: #d1c4e9; color: #4527a0; }
+.badge-complaint { background: #ffccbc; color: #bf360c; }
+.badge-night { background: #bbdefb; color: #0d47a1; }
+.form-group { margin-bottom: 12px; }
+.form-group label { display: block; font-size: 13px; margin-bottom: 4px; color: #475569; }
+.form-group input, .form-group textarea { width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 13px; }
+.form-group textarea { resize: vertical; min-height: 60px; }
+.btn { padding: 8px 16px; border: none; border-radius: 4px; font-size: 13px; cursor: pointer; transition: all 0.2s; }
+.btn-primary { background: #1e3c72; color: white; }
+.btn-primary:hover { background: #2a5298; }
+.btn-warning { background: #f0932b; color: white; }
+.btn-warning:hover { background: #e58020; }
+.btn-secondary { background: #64748b; color: white; }
+.btn-secondary:hover { background: #475569; }
+.btn-sm { padding: 4px 10px; font-size: 12px; }
+.btn-group { display: flex; gap: 8px; }
+.complaint-list { max-height: 200px; overflow-y: auto; }
+.complaint-item { padding: 8px 10px; border-radius: 4px; margin-bottom: 6px; background: #f8fafc; font-size: 12px; cursor: pointer; }
+.complaint-item:hover { background: #eef2f7; }
+.complaint-no { font-weight: 600; color: #1e3c72; }
+.complaint-desc { color: #64748b; margin-top: 2px; }
+.correction-list { max-height: 150px; overflow-y: auto; }
+.correction-item { padding: 8px 10px; border-radius: 4px; margin-bottom: 6px; background: #f3f0ff; font-size: 12px; border-left: 3px solid #6c5ce7; }
+.correction-op { font-weight: 500; color: #4527a0; }
+.correction-reason { color: #64748b; margin-top: 2px; }
+.tooltip { position: absolute; background: rgba(0,0,0,0.8); color: white; padding: 6px 10px; border-radius: 4px; font-size: 12px; pointer-events: none; z-index: 100; }
+.empty { text-align: center; color: #94a3b8; padding: 20px; font-size: 13px; }
+.step-indicator { display: flex; gap: 4px; margin-bottom: 16px; }
+.step { flex: 1; padding: 8px; text-align: center; font-size: 12px; border-radius: 4px; background: #e2e8f0; color: #64748b; }
+.step.active { background: #1e3c72; color: white; }
+.step.done { background: #4ecdc4; color: white; }
+</style>
+</head>
+<body>
+<div class="header">
+  <div>
+    <h1>🏀 口袋篮球场噪声缓冲</h1>
+    <div class="subtitle">城更项目经理阿宁专用 · 十分钟会议版</div>
+  </div>
+  <div>
+    <button class="btn btn-secondary btn-sm" onclick="resetData()">重置演示数据</button>
+  </div>
+</div>
+
+<div class="container">
+  <div class="step-indicator">
+    <div class="step active" id="step1">第一步：导入采样点</div>
+    <div class="step" id="step2">第二步：看热力图找问题</div>
+    <div class="step" id="step3">第三步：补投诉编号更新</div>
+  </div>
+
+  <div id="warnings"></div>
+
+  <div class="grid">
+    <div>
+      <div class="card">
+        <h2>📊 噪声热力图</h2>
+        <div class="heatmap-container" id="heatmapContainer">
+          <svg class="heatmap-svg" id="heatmapSvg" viewBox="0 0 600 420"></svg>
+          <div class="tooltip" id="tooltip" style="display:none;"></div>
+        </div>
+        <div class="legend">
+          <span>45dB</span>
+          <div class="legend-bar"></div>
+          <span>75dB</span>
+          <span style="margin-left:20px;">⚠️ 虚框=低可信度（晚上缺采样）</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>📋 数据统计</h2>
+        <div class="stats-grid" id="statsGrid"></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <h2>📍 采样点列表</h2>
+        <div class="sample-list" id="sampleList"></div>
+      </div>
+
+      <div class="card">
+        <h2>🔗 补录居民投诉编号</h2>
+        <div class="form-group">
+          <label>选中采样点</label>
+          <input type="text" id="selectedSample" readonly placeholder="点击上方采样点选择">
+        </div>
+        <div class="form-group">
+          <label>居民投诉编号</label>
+          <input type="text" id="complaintNo" placeholder="例如: TS-20240315-001">
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-primary" onclick="linkComplaint()">关联投诉并重算</button>
+        </div>
+        <div style="margin-top:12px;">
+          <small style="color:#64748b;">可选投诉编号：</small>
+          <div class="complaint-list" id="complaintList"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>✏️ 人工修正</h2>
+        <div class="form-group">
+          <label>修正后噪声值 (dB)</label>
+          <input type="number" id="newNoise" placeholder="例如: 68">
+        </div>
+        <div class="form-group">
+          <label>修正原因</label>
+          <textarea id="correctReason" placeholder="说明修正依据..."></textarea>
+        </div>
+        <button class="btn btn-warning" onclick="manualCorrect()">人工修正并重算</button>
+      </div>
+
+      <div class="card">
+        <h2>📝 修正历史</h2>
+        <div class="correction-list" id="correctionList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let selectedSampleId = null;
+let heatmapData = [];
+
+function noiseColor(level, isLowConfidence) {
+  const min = 45, max = 75;
+  const ratio = Math.max(0, Math.min(1, (level - min) / (max - min)));
+  const colors = [
+    { pos: 0, r: 78, g: 205, b: 196 },
+    { pos: 0.5, r: 249, g: 202, b: 36 },
+    { pos: 0.75, r: 240, g: 147, b: 43 },
+    { pos: 1, r: 235, g: 77, b: 75 }
+  ];
+  let r, g, b;
+  for (let i = 0; i < colors.length - 1; i++) {
+    if (ratio <= colors[i + 1].pos) {
+      const localRatio = (ratio - colors[i].pos) / (colors[i + 1].pos - colors[i].pos);
+      r = Math.round(colors[i].r + (colors[i + 1].r - colors[i].r) * localRatio);
+      g = Math.round(colors[i].g + (colors[i + 1].g - colors[i].g) * localRatio);
+      b = Math.round(colors[i].b + (colors[i + 1].b - colors[i].b) * localRatio);
+      break;
+    }
+  }
+  let alpha = isLowConfidence ? 0.5 : 0.85;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function statusBadge(status) {
+  const map = {
+    'normal': ['正常', 'badge-normal'],
+    'low_confidence': ['低可信度', 'badge-low'],
+    'corrected': ['已修正', 'badge-corrected'],
+    'from_complaint': ['投诉补录', 'badge-complaint'],
+    'linked': ['已关联', 'badge-corrected']
+  };
+  const [text, cls] = map[status] || [status, 'badge-normal'];
+  return `<span class="badge ${cls}">${text}</span>`;
+}
+
+async function loadData() {
+  const [summary, samples, heatmap, corrections] = await Promise.all([
+    fetch('/api/summary').then(r => r.json()),
+    fetch('/api/samples').then(r => r.json()),
+    fetch('/api/heatmap').then(r => r.json()),
+    fetch('/api/corrections').then(r => r.json())
+  ]);
+
+  renderWarnings(summary.warnings);
+  renderStats(summary.summary);
+  renderHeatmap(heatmap.cells);
+  renderSamples(samples.samples);
+  renderComplaints(samples.complaints);
+  renderCorrections(corrections.corrections);
+  heatmapData = heatmap;
+}
+
+function renderWarnings(warnings) {
+  const el = document.getElementById('warnings');
+  if (warnings.length === 0) {
+    el.innerHTML = '';
+    return;
+  }
+  el.innerHTML = `
+    <div class="warning-box">
+      <h3>⚠️ 需要街道规划员复核</h3>
+      <ul>${warnings.map(w => `<li>${w}</li>`).join('')}</ul>
+    </div>
+  `;
+  document.getElementById('step2').classList.add('active');
+}
+
+function renderStats(summary) {
+  const el = document.getElementById('statsGrid');
+  el.innerHTML = `
+    <div class="stat-item"><div class="stat-value">${summary.total}</div><div class="stat-label">总采样点</div></div>
+    <div class="stat-item"><div class="stat-value">${summary.night}</div><div class="stat-label">夜间采样</div></div>
+    <div class="stat-item"><div class="stat-value" style="color:#f0932b">${summary.low_confidence}</div><div class="stat-label">低可信度</div></div>
+    <div class="stat-item"><div class="stat-value" style="color:#6c5ce7">${summary.corrected + summary.from_complaint}</div><div class="stat-label">补录/修正</div></div>
+  `;
+}
+
+function renderHeatmap(cells) {
+  const svg = document.getElementById('heatmapSvg');
+  const cellSize = 54;
+  const offsetX = 10, offsetY = 10;
+
+  let html = '';
+
+  cells.forEach(cell => {
+    const x = offsetX + cell.x * cellSize;
+    const y = offsetY + cell.y * cellSize;
+    const color = noiseColor(cell.noise_level, cell.is_low_confidence);
+    const stroke = cell.is_low_confidence ? '#f0932b' : 'none';
+    const strokeDasharray = cell.is_low_confidence ? '4,4' : 'none';
+    const strokeWidth = cell.is_low_confidence ? 2 : 0;
+
+    html += `<rect x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" 
+      fill="${color}" stroke="${stroke}" stroke-width="${strokeWidth}"
+      stroke-dasharray="${strokeDasharray}" rx="4"
+      data-noise="${cell.noise_level}" data-count="${cell.sample_count}"
+      data-reason="${cell.reason || ''}" data-low="${cell.is_low_confidence}"
+      class="heatmap-cell"/>`;
+  });
+
+  const labels = [
+    { x: 2, y: 2, name: 'A区', color: '#fff' },
+    { x: 5, y: 3, name: 'B区', color: '#fff' },
+    { x: 8, y: 5, name: 'C区', color: '#fff' }
+  ];
+  labels.forEach(l => {
+    const x = offsetX + l.x * cellSize + cellSize / 2;
+    const y = offsetY + l.y * cellSize + cellSize / 2;
+    html += `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="middle" 
+      fill="${l.color}" font-size="14" font-weight="600" pointer-events="none">${l.name}</text>`;
+  });
+
+  svg.innerHTML = html;
+
+  svg.querySelectorAll('.heatmap-cell').forEach(cell => {
+    cell.addEventListener('mouseenter', (e) => {
+      const tooltip = document.getElementById('tooltip');
+      const noise = cell.dataset.noise;
+      const count = cell.dataset.count;
+      const reason = cell.dataset.reason;
+      const isLow = cell.dataset.low === 'true';
+      let text = `<strong>${noise} dB</strong><br>采样点: ${count}个`;
+      if (isLow) text += `<br>⚠️ 低可信度: ${reason || '晚上缺采样'}`;
+      tooltip.innerHTML = text;
+      tooltip.style.display = 'block';
+      tooltip.style.left = (e.offsetX + 10) + 'px';
+      tooltip.style.top = (e.offsetY + 10) + 'px';
+    });
+    cell.addEventListener('mousemove', (e) => {
+      const tooltip = document.getElementById('tooltip');
+      tooltip.style.left = (e.offsetX + 10) + 'px';
+      tooltip.style.top = (e.offsetY + 10) + 'px';
+    });
+    cell.addEventListener('mouseleave', () => {
+      document.getElementById('tooltip').style.display = 'none';
+    });
+  });
+}
+
+function renderSamples(samples) {
+  const el = document.getElementById('sampleList');
+  el.innerHTML = samples.map(s => {
+    const cls = ['sample-item'];
+    if (s.status === 'low_confidence') cls.push('low-confidence');
+    if (s.status === 'corrected' || s.status === 'linked') cls.push('corrected');
+    if (s.status === 'from_complaint') cls.push('from-complaint');
+    if (s.id === selectedSampleId) cls.push('selected');
+    
+    return `
+      <div class="${cls.join(' ')}" onclick="selectSample('${s.id}')">
+        <span class="sample-noise">${s.noise_level}dB</span>
+        <div class="sample-loc">${s.location_name}</div>
+        <div class="sample-meta">
+          ${s.is_night ? '<span class="badge badge-night">夜间</span>' : ''}
+          ${statusBadge(s.status)}
+          ${s.time_slot} · ${s.source === 'on_site_survey' ? '现场' : s.source === 'estimated' ? '估算' : '补录'}
+        </div>
+        ${s.notes ? `<div class="sample-meta" style="margin-top:4px;color:#f0932b;">💡 ${s.notes.split('|')[0]}</div>` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+function renderComplaints(complaints) {
+  const el = document.getElementById('complaintList');
+  el.innerHTML = complaints.map(c => `
+    <div class="complaint-item" onclick="fillComplaint('${c.complaint_no}')">
+      <div class="complaint-no">${c.complaint_no} · ${c.noise_level}dB</div>
+      <div class="complaint-desc">${c.location_name}: ${c.description}</div>
+    </div>
+  `).join('');
+}
+
+function renderCorrections(corrections) {
+  const el = document.getElementById('correctionList');
+  if (corrections.length === 0) {
+    el.innerHTML = '<div class="empty">暂无修正记录</div>';
+    return;
+  }
+  el.innerHTML = corrections.map(c => `
+    <div class="correction-item">
+      <div class="correction-op">${c.operator} · ${c.old_noise_level}→${c.new_noise_level}dB</div>
+      <div class="correction-reason">${c.reason}</div>
+    </div>
+  `).join('');
+}
+
+function selectSample(id) {
+  selectedSampleId = id;
+  document.getElementById('selectedSample').value = id.substring(0, 8) + '...';
+  renderSamples(JSON.parse(document.getElementById('sampleList').dataset.samples || '[]'));
+  fetch('/api/samples').then(r => r.json()).then(data => {
+    document.getElementById('sampleList').dataset.samples = JSON.stringify(data.samples);
+    renderSamples(data.samples);
+  });
+}
+
+function fillComplaint(no) {
+  document.getElementById('complaintNo').value = no;
+}
+
+async function linkComplaint() {
+  if (!selectedSampleId) {
+    alert('请先选择一个采样点');
+    return;
+  }
+  const complaintNo = document.getElementById('complaintNo').value.trim();
+  if (!complaintNo) {
+    alert('请输入居民投诉编号');
+    return;
+  }
+
+  const res = await fetch('/api/complaints/link', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ sample_id: selectedSampleId, complaint_no: complaintNo })
+  });
+  const data = await res.json();
+  if (data.status === 'ok') {
+    document.getElementById('step3').classList.add('done');
+    await loadData();
+    alert('关联成功！热力图已更新');
+  } else {
+    alert(data.message || '关联失败');
+  }
+}
+
+async function manualCorrect() {
+  if (!selectedSampleId) {
+    alert('请先选择一个采样点');
+    return;
+  }
+  const newNoise = parseFloat(document.getElementById('newNoise').value);
+  const reason = document.getElementById('correctReason').value.trim();
+  if (!newNoise || !reason) {
+    alert('请输入修正后噪声值和原因');
+    return;
+  }
+
+  const res = await fetch('/api/samples/correct', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ sample_id: selectedSampleId, new_noise_level: newNoise, reason })
+  });
+  const data = await res.json();
+  if (data.status === 'ok') {
+    await loadData();
+    alert('修正成功！热力图已更新');
+    document.getElementById('newNoise').value = '';
+    document.getElementById('correctReason').value = '';
+  } else {
+    alert(data.message || '修正失败');
+  }
+}
+
+async function resetData() {
+  if (confirm('确定要重置为演示数据吗？')) {
+    await fetch('/api/reset', { method: 'POST' });
+    selectedSampleId = null;
+    document.getElementById('selectedSample').value = '';
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active', 'done'));
+    document.getElementById('step1').classList.add('active');
+    await loadData();
+  }
+}
+
+loadData();
+</script>
+</body>
+</html>
