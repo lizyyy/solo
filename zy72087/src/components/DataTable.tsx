@@ -122,16 +122,16 @@ export default function DataTable() {
                 <td className="px-3 py-2 font-mono">{s.date}</td>
                 <td className="px-3 py-2">{s.timePeriod}</td>
                 <td className="px-3 py-2 font-mono">
-                  {s.actualInterval !== null
+                  {s.actualInterval != null && s.actualInterval !== undefined
                     ? formatInterval(
                         s.actualIntervalUnit === 'min'
                           ? s.actualInterval * 60
                           : s.actualInterval,
                       )
-                    : '—'}
+                    : <span className="inline-block rounded bg-red-100 text-red-700 text-xs px-1.5 py-0.5">空值</span>}
                 </td>
                 <td className="px-3 py-2">
-                  {s.passengerCount !== null ? (
+                  {s.passengerCount != null && s.passengerCount !== undefined ? (
                     <span className="font-mono">{s.passengerCount}</span>
                   ) : (
                     <span className="inline-block rounded bg-red-100 text-red-700 text-xs px-1.5 py-0.5">
@@ -140,7 +140,7 @@ export default function DataTable() {
                   )}
                 </td>
                 <td className="px-3 py-2 font-mono">
-                  {s.onTimeRate !== null
+                  {s.onTimeRate != null && s.onTimeRate !== undefined
                     ? `${(s.onTimeRate * 100).toFixed(1)}%`
                     : '—'}
                 </td>

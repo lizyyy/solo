@@ -12,7 +12,7 @@ import { paramConfigs, historicalSamples } from '@/data/mockData';
 import { validateData } from '@/engine/validator';
 import { generateReasoningChains } from '@/engine/optimizer';
 
-function buildDerivedState(samples: HistoricalSample[], configs: ParamConfig[]) {
+export function buildDerivedState(samples: HistoricalSample[], configs: ParamConfig[]) {
   const issues = validateData(samples, configs);
 
   const nullSampleIds = new Set<string>();
@@ -45,12 +45,15 @@ interface AppState {
   reviews: ManualReview[];
   filter: FilterState;
   caliberLabel: string;
+  importHistory: { fileName: string; count: number; timestamp: string }[];
 
   setFilter: (f: Partial<FilterState>) => void;
   submitReview: (sampleId: string, action: ReviewAction, note: string, operator: string) => void;
+  importSamples: (newSamples: HistoricalSample[], fileName: string) => void;
+  resetSamples: () => void;
 }
 
-export const useStore = create<AppState>((set) => ({
+export const useStore = create<AppState>((set, get) => ({
   samples: historicalSamples,
   configs: paramConfigs,
   issues: initial.issues,
@@ -64,6 +67,7 @@ export const useStore = create<AppState>((set) => ({
     issueType: '',
   },
   caliberLabel: '全部数据',
+  importHistory: [],
 
   setFilter: (f) => {
     set((state) => {
@@ -95,5 +99,39 @@ export const useStore = create<AppState>((set) => ({
         },
       ],
     }));
+  },
+
+  importSamples: (newSamples, fileName) => {
+    set((state) => {
+      const combined = [...state.samples, ...newSamples];
+      const derived = buildDerivedState(combined, state.configs);
+      return {
+        samples: combined,
+        issues: derived.issues,
+        chains: derived.chains,
+        importHistory: [
+          { fileName, count: newSamples.length, timestamp: new Date().toISOString() },
+          ...state.importHistory,
+        ],
+      };
+    });
+  },
+
+  resetSamples: () => {
+    const derived = buildDerivedState(historicalSamples, paramConfigs);
+    set({
+      samples: historicalSamples,
+      issues: derived.issues,
+      chains: derived.chains,
+      importHistory: [],
+      filter: {
+        lineId: '',
+        timePeriod: '',
+        dateRange: ['', ''],
+        source: '',
+        issueType: '',
+      },
+      caliberLabel: '全部数据',
+    });
   },
 }));

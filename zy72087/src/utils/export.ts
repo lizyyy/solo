@@ -38,7 +38,7 @@ export function exportReportCSV(
     const sample = samples.find((s) => s.id === chain.sampleId);
     if (!sample) continue;
     const review = reviews.find((r) => r.sampleId === chain.sampleId);
-    const interval = sample.actualInterval !== null
+    const interval = sample.actualInterval != null && sample.actualInterval !== undefined
       ? formatInterval(toSeconds(sample.actualInterval, sample.actualIntervalUnit))
       : '空值';
     const reviewStatus = review ? (review.action === 'approved' ? '通过' : review.action === 'rejected' ? '驳回' : '待定') : '未审核';
@@ -94,7 +94,7 @@ export function exportDetailCSV(
   for (const s of samples) {
     const sampleIssues = issues.filter((i) => i.sampleIds.includes(s.id));
     const issueDesc = sampleIssues.map((i) => i.message).join('；');
-    const intervalSec = s.actualInterval !== null ? toSeconds(s.actualInterval, s.actualIntervalUnit) : '';
+    const intervalSec = s.actualInterval != null && s.actualInterval !== undefined ? toSeconds(s.actualInterval, s.actualIntervalUnit) : '';
     rows.push([
       s.id,
       s.lineName,
@@ -103,7 +103,7 @@ export function exportDetailCSV(
       intervalSec,
       s.passengerCount ?? '',
       s.costPerTrip ?? '',
-      s.onTimeRate !== null ? s.onTimeRate : '',
+      s.onTimeRate != null && s.onTimeRate !== undefined ? s.onTimeRate : '',
       s.source,
       `"${s.remarks}"`,
       s.caliberTag,

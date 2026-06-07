@@ -19,6 +19,24 @@ function findConfig(
   );
 }
 
+function makeDefaultConfig(sample: HistoricalSample): ParamConfig {
+  const isPeak = sample.timePeriod === '早高峰' || sample.timePeriod === '晚高峰';
+  return {
+    id: `DEFAULT_${sample.lineId}_${sample.timePeriod}`,
+    lineId: sample.lineId,
+    lineName: sample.lineName,
+    timePeriod: sample.timePeriod,
+    minIntervalSec: isPeak ? 180 : 300,
+    maxIntervalSec: isPeak ? 420 : 600,
+    targetLoadRate: isPeak ? 0.75 : 0.55,
+    weightPassenger: 0.45,
+    weightCost: 0.30,
+    weightReliability: 0.25,
+    unit: 'sec',
+    caliberTag: sample.caliberTag,
+  };
+}
+
 function buildReasoningChain(
   sample: HistoricalSample,
   config: ParamConfig,
@@ -33,13 +51,15 @@ function buildReasoningChain(
     ? toSeconds(sample.actualInterval, sample.actualIntervalUnit)
     : null;
 
+  const isDefaultConfig = config.id.startsWith('DEFAULT_');
+
   steps.push({
     stepType: 'param_ref',
-    description: `引用参数配置 ${config.id}：${sample.lineName} ${sample.timePeriod}，口径 ${config.caliberTag}`,
+    description: `引用参数配置 ${config.id}：${sample.lineName} ${sample.timePeriod}，口径 ${config.caliberTag}${isDefaultConfig ? '（默认配置，该线路未录入参数表）' : ''}`,
     parameterReferenced: config.id,
     calculatedValue: null,
     thresholdCompared: '',
-    conclusion: `最小间隔=${formatInterval(config.minIntervalSec)}，最大间隔=${formatInterval(config.maxIntervalSec)}，目标载客率=${(config.targetLoadRate * 100).toFixed(0)}%`,
+    conclusion: `最小间隔=${formatInterval(config.minIntervalSec)}，最大间隔=${formatInterval(config.maxIntervalSec)}，目标载客率=${(config.targetLoadRate * 100).toFixed(0)}%${isDefaultConfig ? '，⚠使用默认值' : ''}`,
   });
 
   steps.push({
@@ -196,7 +216,7 @@ export function generateReasoningChains(
 ): ReasoningChain[] {
   return samples.map((sample) => {
     const config = findConfig(sample, configs);
-    const fallbackConfig = config || configs[0];
+    const fallbackConfig = config || makeDefaultConfig(sample);
     const hasNullFields = nullSampleIds.has(sample.id);
     const isOverBounds = overBoundsSampleIds.has(sample.id);
     const isAtBoundary = boundarySampleIds.has(sample.id);
