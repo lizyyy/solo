@@ -1,0 +1,33 @@
+{
+  "scenario": "case_001_normal",
+  "saved_at": "2026-06-07T12:40:33.696516",
+  "actions": [
+    {
+      "timestamp": "2026-06-07T12:40:33.695965",
+      "action": "IMPORT_MODEL_OUTPUT",
+      "details": {
+        "batch_id": "BATCH_001_20260607",
+        "file": "model_output_batch_001.json",
+        "record_count": 1
+      }
+    },
+    {
+      "timestamp": "2026-06-07T12:40:33.696201",
+      "action": "APPLY_MANUAL_JUDGMENT",
+      "details": {
+        "batch_id": "BATCH_001_20260607",
+        "judgment_file": "manual_judgment_batch_001.json",
+        "judgment_count": 1,
+        "reviewed_by": "小孟"
+      }
+    },
+    {
+      "timestamp": "2026-06-07T12:40:33.696434",
+      "action": "GENERATE_REPORT",
+      "details": {
+        "batch_id": "BATCH_001_20260607",
+        "output_file": "report_case_001_normal.json"
+      }
+    }
+  ]
+}

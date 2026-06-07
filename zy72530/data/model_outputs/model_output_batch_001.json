@@ -1,0 +1,15 @@
+{
+  "batch_id": "BATCH_001_20260607",
+  "model_version": "v2.1.0",
+  "generated_at": "2026-06-07T10:00:00",
+  "records": [
+    {
+      "record_id": "REC_001_001",
+      "question_id": "MATH_2026_001",
+      "student_answer": "因为3×4=12，所以答案是12",
+      "model_correction_suggestion": "解题步骤正确，但缺少单位说明。建议补充：'12个'",
+      "model_score": 85,
+      "model_judgment": "部分正确"
+    }
+  ]
+}

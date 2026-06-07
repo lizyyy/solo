@@ -1,0 +1,54 @@
+{
+  "report_id": "REPORT_BATCH_001_20260607_20260607124033",
+  "generated_at": "2026-06-07T12:40:33.696232",
+  "batch_id": "BATCH_001_20260607",
+  "model_version": "v2.1.0",
+  "batch_status": "reviewed",
+  "summary": {
+    "total_records": 1,
+    "records_with_manual_judgment": 1,
+    "confirmed_count": 1,
+    "modified_count": 0,
+    "total_abs_score_diff": 0,
+    "has_overwrites": false,
+    "has_supplements": false,
+    "needs_safety_review": false
+  },
+  "records": [
+    {
+      "record_id": "REC_001_001",
+      "question_id": "MATH_2026_001",
+      "model_score": 85,
+      "model_judgment": "部分正确",
+      "has_manual_judgment": true,
+      "manual_score": 85,
+      "manual_judgment": "部分正确",
+      "agree_with_model": true,
+      "judgment_status": "confirmed",
+      "manual_comment": "模型建议合理，学生确实缺少单位说明",
+      "is_supplement": false,
+      "score_diff": 0
+    }
+  ],
+  "history_snapshot": [
+    {
+      "timestamp": "2026-06-07T12:40:33.695965",
+      "action": "IMPORT_MODEL_OUTPUT",
+      "details": {
+        "batch_id": "BATCH_001_20260607",
+        "file": "model_output_batch_001.json",
+        "record_count": 1
+      }
+    },
+    {
+      "timestamp": "2026-06-07T12:40:33.696201",
+      "action": "APPLY_MANUAL_JUDGMENT",
+      "details": {
+        "batch_id": "BATCH_001_20260607",
+        "judgment_file": "manual_judgment_batch_001.json",
+        "judgment_count": 1,
+        "reviewed_by": "小孟"
+      }
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "supplement_id": "SUPP_003_20260607",
+  "source": "历史人工改判表补录",
+  "original_batch_id": "BATCH_003_20260605",
+  "supplemented_by": "小孟",
+  "supplemented_at": "2026-06-07T16:00:00",
+  "note": "此批次为6月5日旧口径，当时人工改判表丢失，今日从备份中找回补录",
+  "judgments": [
+    {
+      "record_id": "REC_003_001",
+      "question_id": "ENG_2026_128",
+      "agree_with_model": true,
+      "manual_score": 60,
+      "manual_judgment": "错误",
+      "manual_comment": "时态错误明确，模型判断正确，符合6月5日当时的评分口径",
+      "status": "confirmed",
+      "is_supplement": true,
+      "original_review_date": "2026-06-05"
+    }
+  ]
+}

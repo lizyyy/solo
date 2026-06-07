@@ -1,0 +1,16 @@
+{
+  "batch_id": "BATCH_001_20260607",
+  "reviewed_by": "小孟",
+  "reviewed_at": "2026-06-07T14:30:00",
+  "judgments": [
+    {
+      "record_id": "REC_001_001",
+      "question_id": "MATH_2026_001",
+      "agree_with_model": true,
+      "manual_score": 85,
+      "manual_judgment": "部分正确",
+      "manual_comment": "模型建议合理，学生确实缺少单位说明",
+      "status": "confirmed"
+    }
+  ]
+}

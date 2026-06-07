@@ -1,0 +1,66 @@
+{
+  "scenario": "case_002_overwritten",
+  "saved_at": "2026-06-07T12:40:33.697237",
+  "actions": [
+    {
+      "timestamp": "2026-06-07T12:40:33.696735",
+      "action": "IMPORT_MODEL_OUTPUT",
+      "details": {
+        "batch_id": "BATCH_002_20260607_V1",
+        "file": "model_output_batch_002.json",
+        "record_count": 1
+      }
+    },
+    {
+      "timestamp": "2026-06-07T12:40:33.696882",
+      "action": "APPLY_MANUAL_JUDGMENT",
+      "details": {
+        "batch_id": "BATCH_002_20260607_V1",
+        "judgment_file": "manual_judgment_batch_002.json",
+        "judgment_count": 1,
+        "reviewed_by": "小孟"
+      }
+    },
+    {
+      "timestamp": "2026-06-07T12:40:33.697020",
+      "action": "BATCH_OVERWRITE_DETECTED",
+      "details": {
+        "original_batch_id": "BATCH_002_20260607_V1",
+        "new_batch_id": "BATCH_002_20260607_V2",
+        "had_manual_modifications": true,
+        "conflict_records_count": 1,
+        "conflict_records": [
+          {
+            "record_id": "REC_002_001",
+            "original_manual_judgment": {
+              "record_id": "REC_002_001",
+              "question_id": "CHN_2026_045",
+              "agree_with_model": false,
+              "manual_score": 90,
+              "manual_judgment": "优秀",
+              "manual_comment": "学生概括简洁到位，原文确实只要求概括中心思想，不需要过度展开。模型打分偏低，已修正。",
+              "status": "modified"
+            },
+            "new_model_output": {
+              "record_id": "REC_002_001",
+              "question_id": "CHN_2026_045",
+              "student_answer": "这篇文章的中心思想是赞美大自然",
+              "model_correction_suggestion": "中心思想概括基本正确，但表述可以更精炼",
+              "model_score": 80,
+              "model_judgment": "良好"
+            }
+          }
+        ],
+        "needs_safety_review": true
+      }
+    },
+    {
+      "timestamp": "2026-06-07T12:40:33.697167",
+      "action": "GENERATE_REPORT",
+      "details": {
+        "batch_id": "BATCH_002_20260607_V2",
+        "output_file": "report_case_002_overwritten.json"
+      }
+    }
+  ]
+}

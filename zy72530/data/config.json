@@ -1,0 +1,29 @@
+{
+  "project": "教学批改建议复核",
+  "version": "1.0.0",
+  "demo_scenarios": {
+    "case_001_normal": {
+      "description": "顺利记录：模型输出→人工复核通过→评测报告生成",
+      "model_output_file": "model_output_batch_001.json",
+      "manual_judgment_file": "manual_judgment_batch_001.json",
+      "expected_result": "评测报告与人工改判一致"
+    },
+    "case_002_overwritten": {
+      "description": "人工改判被下一次批跑覆盖：第一次人工改判→第二次批跑覆盖→需安全审核复核",
+      "model_output_file": "model_output_batch_002.json",
+      "manual_judgment_file": "manual_judgment_batch_002.json",
+      "second_batch_file": "model_output_batch_002_v2.json",
+      "expected_result": "人工改判被覆盖，标记待安全审核"
+    },
+    "case_003_supplement": {
+      "description": "从人工改判表补录旧口径：旧批次模型输出→补录历史人工改判→更新评测报告",
+      "model_output_file": "model_output_batch_003.json",
+      "supplement_file": "supplement_manual_judgment_003.json",
+      "expected_result": "补录旧口径后评测报告更新"
+    }
+  },
+  "reviewers": {
+    "model_engineer": "小孟",
+    "safety_auditor": "安全审核同事"
+  }
+}

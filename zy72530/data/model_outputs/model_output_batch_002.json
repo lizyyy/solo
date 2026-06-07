@@ -1,0 +1,15 @@
+{
+  "batch_id": "BATCH_002_20260607_V1",
+  "model_version": "v2.1.0",
+  "generated_at": "2026-06-07T09:00:00",
+  "records": [
+    {
+      "record_id": "REC_002_001",
+      "question_id": "CHN_2026_045",
+      "student_answer": "这篇文章的中心思想是赞美大自然",
+      "model_correction_suggestion": "中心思想概括准确，但可以更具体：赞美大自然的生命力和美好",
+      "model_score": 70,
+      "model_judgment": "需改进"
+    }
+  ]
+}

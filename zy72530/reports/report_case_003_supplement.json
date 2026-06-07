@@ -1,0 +1,55 @@
+{
+  "report_id": "REPORT_BATCH_003_20260605_20260607124033",
+  "generated_at": "2026-06-07T12:40:33.697705",
+  "batch_id": "BATCH_003_20260605",
+  "model_version": "v2.0.5",
+  "batch_status": "supplemented",
+  "summary": {
+    "total_records": 1,
+    "records_with_manual_judgment": 1,
+    "confirmed_count": 1,
+    "modified_count": 0,
+    "total_abs_score_diff": 0,
+    "has_overwrites": false,
+    "has_supplements": true,
+    "needs_safety_review": false
+  },
+  "records": [
+    {
+      "record_id": "REC_003_001",
+      "question_id": "ENG_2026_128",
+      "model_score": 60,
+      "model_judgment": "错误",
+      "has_manual_judgment": true,
+      "manual_score": 60,
+      "manual_judgment": "错误",
+      "agree_with_model": true,
+      "judgment_status": "confirmed",
+      "manual_comment": "时态错误明确，模型判断正确，符合6月5日当时的评分口径",
+      "is_supplement": true,
+      "score_diff": 0
+    }
+  ],
+  "history_snapshot": [
+    {
+      "timestamp": "2026-06-07T12:40:33.697516",
+      "action": "IMPORT_MODEL_OUTPUT",
+      "details": {
+        "batch_id": "BATCH_003_20260605",
+        "file": "model_output_batch_003.json",
+        "record_count": 1
+      }
+    },
+    {
+      "timestamp": "2026-06-07T12:40:33.697686",
+      "action": "APPLY_SUPPLEMENT",
+      "details": {
+        "batch_id": "BATCH_003_20260605",
+        "supplement_file": "supplement_manual_judgment_003.json",
+        "supplement_id": "SUPP_003_20260607",
+        "judgment_count": 1,
+        "note": "此批次为6月5日旧口径，当时人工改判表丢失，今日从备份中找回补录"
+      }
+    }
+  ]
+}

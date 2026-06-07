@@ -1,0 +1,16 @@
+{
+  "batch_id": "BATCH_003_20260605",
+  "model_version": "v2.0.5",
+  "generated_at": "2026-06-05T16:00:00",
+  "note": "旧批次，初版模型输出，当时未完成人工复核",
+  "records": [
+    {
+      "record_id": "REC_003_001",
+      "question_id": "ENG_2026_128",
+      "student_answer": "I go to school yesterday",
+      "model_correction_suggestion": "语法错误：go应改为went，过去时态",
+      "model_score": 60,
+      "model_judgment": "错误"
+    }
+  ]
+}
