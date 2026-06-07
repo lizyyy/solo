@@ -64,6 +64,13 @@ python3 cli.py show-formulas
 python3 cli.py export-abnormal examples/sample_data.csv -o output/only_abnormal.csv
 ```
 
+### 7. 查看帮助
+
+```bash
+python3 cli.py --help
+python3 cli.py calculate --help  # 查看具体命令的帮助
+```
+
 ## 输入格式
 
 ### CSV/Excel 字段说明

@@ -323,7 +323,7 @@ def generate_examples(output_dir):
     click.echo("  1-3: 正常计算示例")
     click.echo("  4: 与讲义冲突示例")
     click.echo("  5-8: 越界错误示例")
-    click.echo(f"\n使用命令: python cli.py batch {example_file} -o results.csv -ao abnormal.csv")
+    click.echo(f"\n使用命令: python3 cli.py batch {example_file} -o results.csv -ao abnormal.csv")
     click.echo("")
 
 
