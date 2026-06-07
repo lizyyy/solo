@@ -1,0 +1,325 @@
+{
+  "trial_id": "trial_313e9e4d",
+  "created_at": "2026-06-07 16:13:49",
+  "status": "completed",
+  "snapshot": {
+    "snapshot_id": "snap_demo_20260601",
+    "imported_at": "2026-06-07 16:13:49",
+    "features": [
+      {
+        "name": "teacher_confidence",
+        "value": 0.85,
+        "is_default": false,
+        "source": "online_feature_store",
+        "line_no": 12
+      },
+      {
+        "name": "student_variance",
+        "value": 0.3,
+        "is_default": false,
+        "source": "online_feature_store",
+        "line_no": 15
+      },
+      {
+        "name": "user_ctr_7d",
+        "value": 0.5,
+        "is_default": true,
+        "source": "default_value",
+        "line_no": 18
+      },
+      {
+        "name": "label_smooth",
+        "value": 0.1,
+        "is_default": false,
+        "source": "model_config",
+        "line_no": 22
+      },
+      {
+        "name": "item_heat_score",
+        "value": 0.0,
+        "is_default": true,
+        "source": "default_value",
+        "line_no": 25
+      }
+    ],
+    "raw_data": {
+      "snapshot_id": "snap_demo_20260601",
+      "features": [
+        {
+          "name": "teacher_confidence",
+          "value": 0.85,
+          "is_default": false,
+          "source": "online_feature_store",
+          "line_no": 12
+        },
+        {
+          "name": "student_variance",
+          "value": 0.3,
+          "is_default": false,
+          "source": "online_feature_store",
+          "line_no": 15
+        },
+        {
+          "name": "user_ctr_7d",
+          "value": 0.5,
+          "is_default": true,
+          "source": "default_value",
+          "line_no": 18
+        },
+        {
+          "name": "label_smooth",
+          "value": 0.1,
+          "is_default": false,
+          "source": "model_config",
+          "line_no": 22
+        },
+        {
+          "name": "item_heat_score",
+          "value": 0.0,
+          "is_default": true,
+          "source": "default_value",
+          "line_no": 25
+        }
+      ],
+      "note": "演示用特征快照，包含2个使用默认值的特征"
+    },
+    "source_file": "/Users/lzy/pro/solo/workspaces/zy72573/data/demo/feature_snapshot.json"
+  },
+  "training_log": {
+    "log_id": "log_3a430be4",
+    "snapshot_id": "snap_demo_20260601",
+    "imported_at": "2026-06-07 16:13:49",
+    "points": [
+      {
+        "step": 100,
+        "loss": 2.345,
+        "temperature": 2.5,
+        "accuracy": 0.42,
+        "timestamp": "2026-06-01 10:00:00"
+      },
+      {
+        "step": 200,
+        "loss": 1.876,
+        "temperature": 2.2,
+        "accuracy": 0.55,
+        "timestamp": "2026-06-01 10:15:00"
+      },
+      {
+        "step": 300,
+        "loss": 1.543,
+        "temperature": 1.9,
+        "accuracy": 0.68,
+        "timestamp": "2026-06-01 10:30:00"
+      },
+      {
+        "step": 400,
+        "loss": 1.234,
+        "temperature": 1.6,
+        "accuracy": 0.78,
+        "timestamp": "2026-06-01 10:45:00"
+      },
+      {
+        "step": 500,
+        "loss": 1.012,
+        "temperature": 1.4,
+        "accuracy": 0.85,
+        "timestamp": "2026-06-01 11:00:00"
+      },
+      {
+        "step": 600,
+        "loss": 0.876,
+        "temperature": 1.25,
+        "accuracy": 0.89,
+        "timestamp": "2026-06-01 11:15:00"
+      },
+      {
+        "step": 700,
+        "loss": 0.789,
+        "temperature": 1.15,
+        "accuracy": 0.91,
+        "timestamp": "2026-06-01 11:30:00"
+      },
+      {
+        "step": 800,
+        "loss": 0.723,
+        "temperature": 1.08,
+        "accuracy": 0.93,
+        "timestamp": "2026-06-01 11:45:00"
+      }
+    ],
+    "source_file": "/Users/lzy/pro/solo/workspaces/zy72573/data/demo/training_log.json"
+  },
+  "corrections": [
+    {
+      "correction_id": "corr_b0139694",
+      "snapshot_id": "snap_demo_20260601",
+      "corrected_by": "推荐策略老唐",
+      "corrected_at": "2026-06-07 16:13:49",
+      "corrections": {
+        "teacher_confidence": 0.92
+      },
+      "reason": "回看训练日志后发现教师模型实际置信度更高"
+    }
+  ],
+  "summaries": [
+    {
+      "summary_id": "sum_0ff7df6d",
+      "snapshot_id": "snap_demo_20260601",
+      "generated_at": "2026-06-07 16:13:49",
+      "version": 1,
+      "has_training_log": false,
+      "has_correction": false,
+      "default_features": [
+        "user_ctr_7d",
+        "item_heat_score"
+      ],
+      "conclusion": "特征快照导入完成，但有 2 个特征使用默认值，结论暂不可直接照抄；训练日志待补录",
+      "next_action": "请先找推荐负责人复核缺失特征，同时找推荐策略老唐补训练日志",
+      "reviewer": null,
+      "temperature_result": 0.8275,
+      "confidence": "low",
+      "missing_materials": [
+        "线上特征真实值（当前使用默认值）",
+        "训练日志曲线"
+      ],
+      "notes": [
+        "检测到 2 个特征使用了默认值: user_ctr_7d, item_heat_score",
+        "线上特征缺失但给了默认分，需推荐负责人复核，不归入正常",
+        "训练日志尚未补录，温度计算仅基于特征快照"
+      ]
+    },
+    {
+      "summary_id": "sum_10a34382",
+      "snapshot_id": "snap_demo_20260601",
+      "generated_at": "2026-06-07 16:13:49",
+      "version": 2,
+      "has_training_log": true,
+      "has_correction": false,
+      "default_features": [
+        "user_ctr_7d",
+        "item_heat_score"
+      ],
+      "conclusion": "特征快照导入完成，但有 2 个特征使用默认值，结论暂不可直接照抄；训练日志已补录，温度计算已结合训练曲线",
+      "next_action": "请先找推荐负责人复核缺失特征，再由推荐策略老唐最终确认",
+      "reviewer": null,
+      "temperature_result": 0.9539,
+      "confidence": "medium",
+      "missing_materials": [
+        "线上特征真实值（当前使用默认值）"
+      ],
+      "notes": [
+        "检测到 2 个特征使用了默认值: user_ctr_7d, item_heat_score",
+        "线上特征缺失但给了默认分，需推荐负责人复核，不归入正常",
+        "训练日志已补录，共 8 个记录点",
+        "最新训练步: step=800, acc=0.9300, temp=1.0800",
+        "摘要版本更新: v1 -> v2"
+      ]
+    },
+    {
+      "summary_id": "sum_c10e16fa",
+      "snapshot_id": "snap_demo_20260601",
+      "generated_at": "2026-06-07 16:13:49",
+      "version": 3,
+      "has_training_log": true,
+      "has_correction": true,
+      "default_features": [
+        "user_ctr_7d",
+        "item_heat_score"
+      ],
+      "conclusion": "特征快照导入完成，但有 2 个特征使用默认值，结论暂不可直接照抄；训练日志已补录，温度计算已结合训练曲线；已应用人工修正",
+      "next_action": "请先找推荐负责人复核缺失特征，再由推荐策略老唐最终确认",
+      "reviewer": null,
+      "temperature_result": 0.9637,
+      "confidence": "medium",
+      "missing_materials": [
+        "线上特征真实值（当前使用默认值）"
+      ],
+      "notes": [
+        "检测到 2 个特征使用了默认值: user_ctr_7d, item_heat_score",
+        "线上特征缺失但给了默认分，需推荐负责人复核，不归入正常",
+        "训练日志已补录，共 8 个记录点",
+        "最新训练步: step=800, acc=0.9300, temp=1.0800",
+        "已进行人工修正（由 推荐策略老唐）: 回看训练日志后发现教师模型实际置信度更高",
+        "摘要版本更新: v2 -> v3"
+      ]
+    },
+    {
+      "summary_id": "sum_56c9df6c",
+      "snapshot_id": "snap_demo_20260601",
+      "generated_at": "2026-06-07 16:13:49",
+      "version": 4,
+      "has_training_log": true,
+      "has_correction": true,
+      "default_features": [
+        "user_ctr_7d",
+        "item_heat_score"
+      ],
+      "conclusion": "特征快照导入完成，但有 2 个特征使用默认值，结论暂不可直接照抄；训练日志已补录，温度计算已结合训练曲线；已应用人工修正",
+      "next_action": "请先找推荐负责人复核缺失特征，再由推荐策略老唐最终确认",
+      "reviewer": null,
+      "temperature_result": 0.9637,
+      "confidence": "medium",
+      "missing_materials": [
+        "线上特征真实值（当前使用默认值）"
+      ],
+      "notes": [
+        "检测到 2 个特征使用了默认值: user_ctr_7d, item_heat_score",
+        "线上特征缺失但给了默认分，需推荐负责人复核，不归入正常",
+        "训练日志已补录，共 8 个记录点",
+        "最新训练步: step=800, acc=0.9300, temp=1.0800",
+        "已进行人工修正（由 推荐策略老唐）: 回看训练日志后发现教师模型实际置信度更高",
+        "摘要版本更新: v3 -> v4"
+      ]
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "run_e3f89065",
+      "snapshot_id": "snap_demo_20260601",
+      "run_at": "2026-06-07 16:13:49",
+      "run_type": "import_snapshot",
+      "temperature": null,
+      "parameters": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy72573/data/demo/feature_snapshot.json"
+      },
+      "status": "completed"
+    },
+    {
+      "run_id": "run_00905c75",
+      "snapshot_id": "snap_demo_20260601",
+      "run_at": "2026-06-07 16:13:49",
+      "run_type": "add_training_log",
+      "temperature": 0.9539,
+      "parameters": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy72573/data/demo/training_log.json"
+      },
+      "status": "completed"
+    },
+    {
+      "run_id": "run_26fe9a1d",
+      "snapshot_id": "snap_demo_20260601",
+      "run_at": "2026-06-07 16:13:49",
+      "run_type": "manual_correction",
+      "temperature": 0.9637,
+      "parameters": {
+        "corrections": {
+          "teacher_confidence": 0.92
+        },
+        "by": "推荐策略老唐",
+        "reason": "回看训练日志后发现教师模型实际置信度更高"
+      },
+      "status": "completed"
+    },
+    {
+      "run_id": "run_19161a0f",
+      "snapshot_id": "snap_demo_20260601",
+      "run_at": "2026-06-07 16:13:49",
+      "run_type": "rerun",
+      "temperature": 0.9637,
+      "parameters": {
+        "note": "人工修正后重跑验证"
+      },
+      "status": "completed"
+    }
+  ]
+}

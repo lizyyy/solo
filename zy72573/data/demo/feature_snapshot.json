@@ -1,0 +1,41 @@
+{
+  "snapshot_id": "snap_demo_20260601",
+  "features": [
+    {
+      "name": "teacher_confidence",
+      "value": 0.85,
+      "is_default": false,
+      "source": "online_feature_store",
+      "line_no": 12
+    },
+    {
+      "name": "student_variance",
+      "value": 0.3,
+      "is_default": false,
+      "source": "online_feature_store",
+      "line_no": 15
+    },
+    {
+      "name": "user_ctr_7d",
+      "value": 0.5,
+      "is_default": true,
+      "source": "default_value",
+      "line_no": 18
+    },
+    {
+      "name": "label_smooth",
+      "value": 0.1,
+      "is_default": false,
+      "source": "model_config",
+      "line_no": 22
+    },
+    {
+      "name": "item_heat_score",
+      "value": 0.0,
+      "is_default": true,
+      "source": "default_value",
+      "line_no": 25
+    }
+  ],
+  "note": "演示用特征快照，包含2个使用默认值的特征"
+}

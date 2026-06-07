@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>知识蒸馏温度试算 - 小看板</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            padding: 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .card h2 {
+            color: #34495e;
+            margin-bottom: 15px;
+            font-size: 18px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 8px;
+        }
+        .status-bar {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .status-item {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px;
+            background: #ecf0f1;
+            border-radius: 6px;
+            text-align: center;
+        }
+        .status-item .label {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-bottom: 5px;
+        }
+        .status-item .value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .status-item.completed .value { color: #27ae60; }
+        .status-item.pending .value { color: #e67e22; }
+        .status-item.warning .value { color: #e74c3c; }
+
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #bdc3c7;
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -25px;
+            top: 20px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #3498db;
+            border: 2px solid white;
+            box-shadow: 0 0 0 2px #3498db;
+        }
+        .timeline-item.done::before { background: #27ae60; box-shadow: 0 0 0 2px #27ae60; }
+        .timeline-item.warning::before { background: #e67e22; box-shadow: 0 0 0 2px #e67e22; }
+        .timeline-item .time { font-size: 12px; color: #95a5a6; margin-bottom: 5px; }
+        .timeline-item .title { font-weight: bold; color: #2c3e50; margin-bottom: 5px; }
+        .timeline-item .desc { font-size: 14px; color: #555; }
+        .timeline-item .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            font-size: 12px;
+            border-radius: 10px;
+            margin-right: 5px;
+            margin-top: 5px;
+        }
+        .tag-default { background: #fdecea; color: #e74c3c; }
+        .tag-normal { background: #eafaf1; color: #27ae60; }
+        .tag-log { background: #e8f4fd; color: #3498db; }
+        .tag-correction { background: #fef5e7; color: #e67e22; }
+
+        .summary-card {
+            border-left: 4px solid #3498db;
+        }
+        .summary-card .confidence {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .confidence-high { background: #d5f5e3; color: #1e8449; }
+        .confidence-medium { background: #fef9e7; color: #b7950b; }
+        .confidence-low { background: #fadbd8; color: #c0392b; }
+        .summary-card .temp {
+            font-size: 36px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 10px 0;
+        }
+        .summary-card .conclusion {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+        .summary-card .next-action {
+            background: #e8f4fd;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 10px 0;
+            border-left: 3px solid #3498db;
+        }
+        .summary-card .notes {
+            margin-top: 15px;
+        }
+        .summary-card .notes li {
+            margin-left: 20px;
+            margin-bottom: 5px;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .feature-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .feature-table th, .feature-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .feature-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        .feature-table tr.default-row {
+            background: #fdecea;
+        }
+        .feature-table .badge {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .badge-default { background: #e74c3c; color: white; }
+        .badge-normal { background: #27ae60; color: white; }
+
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+        canvas { width: 100%; height: 100%; }
+
+        .upload-area {
+            border: 2px dashed #bdc3c7;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .upload-area:hover {
+            border-color: #3498db;
+            background: #f8f9fa;
+        }
+        .upload-area p { color: #7f8c8d; }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .btn-primary { background: #3498db; color: white; }
+        .btn-primary:hover { background: #2980b9; }
+        .btn-success { background: #27ae60; color: white; }
+        .btn-success:hover { background: #1e8449; }
+
+        .missing-materials {
+            background: #fdecea;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+        .missing-materials strong { color: #c0392b; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 知识蒸馏温度试算 小看板</h1>
+
+        <div class="card">
+            <h2>📊 总体状态</h2>
+            <div class="status-bar" id="statusBar">
+                <div class="status-item">
+                    <div class="label">试算ID</div>
+                    <div class="value" id="trialId">-</div>
+                </div>
+                <div class="status-item">
+                    <div class="label">特征快照</div>
+                    <div class="value" id="snapshotStatus">未导入</div>
+                </div>
+                <div class="status-item">
+                    <div class="label">训练日志</div>
+                    <div class="value" id="logStatus">未补录</div>
+                </div>
+                <div class="status-item">
+                    <div class="label">摘要版本</div>
+                    <div class="value" id="summaryVersion">0</div>
+                </div>
+                <div class="status-item">
+                    <div class="label">推荐温度</div>
+                    <div class="value" id="currentTemp">-</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📋 操作记录（时间线）</h2>
+            <div class="timeline" id="timeline">
+                <div class="timeline-item">
+                    <div class="title">等待导入数据...</div>
+                    <div class="desc">请先导入特征快照开始试算流程</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card summary-card" id="summaryCard" style="display: none;">
+            <h2>📝 可解释摘要 <span class="confidence confidence-medium" id="confidenceBadge">medium</span></h2>
+            <div class="temp" id="tempDisplay">-</div>
+            <div id="missingMaterials" style="display: none;" class="missing-materials">
+                <strong>⚠️ 缺失材料：</strong><span id="missingList"></span>
+            </div>
+            <div class="conclusion" id="conclusionText"></div>
+            <div class="next-action">
+                <strong>👉 下一步：</strong><span id="nextAction"></span>
+            </div>
+            <div class="notes">
+                <strong>📌 备注：</strong>
+                <ul id="notesList"></ul>
+            </div>
+        </div>
+
+        <div class="card" id="featuresCard" style="display: none;">
+            <h2>🔍 特征快照详情</h2>
+            <table class="feature-table">
+                <thead>
+                    <tr>
+                        <th>特征名</th>
+                        <th>值</th>
+                        <th>状态</th>
+                        <th>来源</th>
+                        <th>行号</th>
+                    </tr>
+                </thead>
+                <tbody id="featuresTableBody">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card" id="logCard" style="display: none;">
+            <h2>📈 训练日志曲线</h2>
+            <div class="chart-container">
+                <canvas id="logChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>💾 数据导入</h2>
+            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 300px;">
+                    <h3 style="margin-bottom: 10px; font-size: 14px; color: #555;">导入试算记录（JSON）</h3>
+                    <div class="upload-area" onclick="document.getElementById('trialFile').click()">
+                        <p>点击选择 demo_trial.json 文件</p>
+                        <p style="font-size: 12px;">或拖拽文件到此处</p>
+                    </div>
+                    <input type="file" id="trialFile" accept=".json" style="display: none;" onchange="loadTrialFile(event)">
+                </div>
+                <div style="flex: 1; min-width: 300px;">
+                    <h3 style="margin-bottom: 10px; font-size: 14px; color: #555;">快捷操作</h3>
+                    <button class="btn btn-primary" onclick="loadDemoData()" style="margin-bottom: 10px; width: 100%;">加载演示数据</button>
+                    <button class="btn btn-success" onclick="refreshSummary()" style="width: 100%;">重新生成摘要</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let currentTrial = null;
+        let chart = null;
+
+        function loadDemoData() {
+            fetch('demo_trial.json')
+                .then(r => r.json())
+                .then(data => {
+                    currentTrial = data;
+                    renderDashboard();
+                })
+                .catch(err => {
+                    alert('请先运行 python3 cli.py demo 生成演示数据');
+                });
+        }
+
+        function loadTrialFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    currentTrial = JSON.parse(e.target.result);
+                    renderDashboard();
+                } catch (err) {
+                    alert('JSON 文件格式错误');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function renderDashboard() {
+            if (!currentTrial) return;
+
+            document.getElementById('trialId').textContent = currentTrial.trial_id.substring(0, 15) + '...';
+
+            const hasSnapshot = !!currentTrial.snapshot;
+            const hasLog = !!currentTrial.training_log;
+
+            document.getElementById('snapshotStatus').textContent = hasSnapshot ? '已导入' : '未导入';
+            document.getElementById('snapshotStatus').parentElement.className = 'status-item ' + (hasSnapshot ? 'completed' : 'pending');
+
+            document.getElementById('logStatus').textContent = hasLog ? '已补录' : '未补录';
+            document.getElementById('logStatus').parentElement.className = 'status-item ' + (hasLog ? 'completed' : 'pending');
+
+            document.getElementById('summaryVersion').textContent = currentTrial.summaries.length;
+
+            if (currentTrial.summaries.length > 0) {
+                const latest = currentTrial.summaries[currentTrial.summaries.length - 1];
+                document.getElementById('currentTemp').textContent = latest.temperature_result;
+            }
+
+            renderTimeline();
+            renderSummary();
+            renderFeatures();
+            renderLogChart();
+        }
+
+        function renderTimeline() {
+            const timeline = document.getElementById('timeline');
+            timeline.innerHTML = '';
+
+            if (!currentTrial) return;
+
+            const items = [];
+
+            items.push({
+                time: currentTrial.created_at,
+                title: '创建试算记录',
+                desc: `试算ID: ${currentTrial.trial_id}`,
+                type: 'done'
+            });
+
+            if (currentTrial.snapshot) {
+                const snap = currentTrial.snapshot;
+                const defaultCount = snap.features.filter(f => f.is_default).length;
+                items.push({
+                    time: snap.imported_at,
+                    title: '导入特征快照',
+                    desc: `${snap.snapshot_id}，共 ${snap.features.length} 个特征` + (defaultCount > 0 ? `，其中 ${defaultCount} 个使用默认值` : ''),
+                    type: defaultCount > 0 ? 'warning' : 'done',
+                    tags: defaultCount > 0 ? [`${defaultCount}个默认值`] : []
+                });
+            }
+
+            if (currentTrial.training_log) {
+                const log = currentTrial.training_log;
+                items.push({
+                    time: log.imported_at,
+                    title: '补录训练日志（推荐策略老唐）',
+                    desc: `共 ${log.points.length} 个记录点`,
+                    type: 'done',
+                    tags: ['训练日志']
+                });
+            }
+
+            currentTrial.corrections.forEach(corr => {
+                items.push({
+                    time: corr.corrected_at,
+                    title: `人工修正（${corr.corrected_by}）`,
+                    desc: corr.reason + '：' + JSON.stringify(corr.corrections),
+                    type: 'done',
+                    tags: ['人工修正']
+                });
+            });
+
+            currentTrial.summaries.forEach((sum, idx) => {
+                items.push({
+                    time: sum.generated_at,
+                    title: `生成可解释摘要 v${sum.version}`,
+                    desc: `置信度: ${sum.confidence}, 温度: ${sum.temperature_result}`,
+                    type: sum.confidence === 'high' ? 'done' : (sum.confidence === 'low' ? 'warning' : 'done')
+                });
+            });
+
+            currentTrial.runs.forEach(run => {
+                items.push({
+                    time: run.run_at,
+                    title: `运行: ${run.run_type}`,
+                    desc: run.temperature ? `温度: ${run.temperature}` : '',
+                    type: 'done'
+                });
+            });
+
+            items.sort((a, b) => new Date(a.time) - new Date(b.time));
+
+            items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'timeline-item ' + item.type;
+                let tagsHtml = '';
+                if (item.tags) {
+                    item.tags.forEach(t => {
+                        const cls = t.includes('默认') ? 'tag-default' : (t.includes('日志') ? 'tag-log' : (t.includes('修正') ? 'tag-correction' : 'tag-normal'));
+                        tagsHtml += `<span class="tag ${cls}">${t}</span>`;
+                    });
+                }
+                div.innerHTML = `
+                    <div class="time">${item.time}</div>
+                    <div class="title">${item.title}</div>
+                    <div class="desc">${item.desc}</div>
+                    ${tagsHtml}
+                `;
+                timeline.appendChild(div);
+            });
+        }
+
+        function renderSummary() {
+            const card = document.getElementById('summaryCard');
+            if (!currentTrial || currentTrial.summaries.length === 0) {
+                card.style.display = 'none';
+                return;
+            }
+            card.style.display = 'block';
+
+            const latest = currentTrial.summaries[currentTrial.summaries.length - 1];
+
+            const badge = document.getElementById('confidenceBadge');
+            badge.textContent = latest.confidence;
+            badge.className = 'confidence confidence-' + latest.confidence;
+
+            document.getElementById('tempDisplay').textContent = '推荐温度: ' + latest.temperature_result;
+            document.getElementById('conclusionText').textContent = latest.conclusion;
+            document.getElementById('nextAction').textContent = latest.next_action;
+
+            const missingDiv = document.getElementById('missingMaterials');
+            if (latest.missing_materials && latest.missing_materials.length > 0) {
+                missingDiv.style.display = 'block';
+                document.getElementById('missingList').textContent = latest.missing_materials.join('、');
+            } else {
+                missingDiv.style.display = 'none';
+            }
+
+            const notesList = document.getElementById('notesList');
+            notesList.innerHTML = '';
+            if (latest.notes) {
+                latest.notes.forEach(note => {
+                    const li = document.createElement('li');
+                    li.textContent = note;
+                    notesList.appendChild(li);
+                });
+            }
+        }
+
+        function renderFeatures() {
+            const card = document.getElementById('featuresCard');
+            if (!currentTrial || !currentTrial.snapshot) {
+                card.style.display = 'none';
+                return;
+            }
+            card.style.display = 'block';
+
+            const tbody = document.getElementById('featuresTableBody');
+            tbody.innerHTML = '';
+
+            currentTrial.snapshot.features.forEach(f => {
+                const tr = document.createElement('tr');
+                if (f.is_default) tr.className = 'default-row';
+                tr.innerHTML = `
+                    <td><code>${f.name}</code></td>
+                    <td>${f.value}</td>
+                    <td><span class="badge ${f.is_default ? 'badge-default' : 'badge-normal'}">${f.is_default ? '默认值' : '正常值'}</span></td>
+                    <td>${f.source}</td>
+                    <td>${f.line_no || '-'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderLogChart() {
+            const card = document.getElementById('logCard');
+            if (!currentTrial || !currentTrial.training_log) {
+                card.style.display = 'none';
+                return;
+            }
+            card.style.display = 'block';
+
+            const points = currentTrial.training_log.points;
+            const ctx = document.getElementById('logChart').getContext('2d');
+
+            if (chart) chart.destroy();
+
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: points.map(p => 'Step ' + p.step),
+                    datasets: [
+                        {
+                            label: '准确率 (Accuracy)',
+                            data: points.map(p => p.accuracy),
+                            borderColor: '#27ae60',
+                            backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                            yAxisID: 'y',
+                            tension: 0.3
+                        },
+                        {
+                            label: '温度 (Temperature)',
+                            data: points.map(p => p.temperature),
+                            borderColor: '#3498db',
+                            backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                            yAxisID: 'y1',
+                            tension: 0.3
+                        },
+                        {
+                            label: '损失 (Loss)',
+                            data: points.map(p => p.loss),
+                            borderColor: '#e74c3c',
+                            backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                            yAxisID: 'y2',
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    interaction: { mode: 'index', intersect: false },
+                    scales: {
+                        y: { type: 'linear', position: 'left', title: { display: true, text: '准确率' } },
+                        y1: { type: 'linear', position: 'right', title: { display: true, text: '温度' }, grid: { drawOnChartArea: false } },
+                        y2: { type: 'linear', position: 'right', title: { display: true, text: '损失' }, grid: { drawOnChartArea: false } }
+                    }
+                }
+            });
+        }
+
+        function refreshSummary() {
+            alert('摘要刷新功能需配合后端API使用');
+        }
+    </script>
+</body>
+</html>
