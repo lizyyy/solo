@@ -1,0 +1,146 @@
+{
+  "complaints": [
+    {
+      "id": "b0a2e91e",
+      "complaint_no": "TS20260607-001",
+      "community_name": "阳光花园",
+      "content": "农贸市场北入口凌晨装卸货噪音大",
+      "raw_conclusion": "系统自动判定：正常时段，投诉不成立（已人工修正：实际时段不在规定范围内）",
+      "status": "need_muni_review",
+      "has_photo": true,
+      "need_review": true,
+      "review_note": "小区名'阳光花园'存在新旧名称映射，需市政巡检员复核",
+      "created_at": "2026-06-07T09:45:25.353977",
+      "updated_at": "2026-06-07T09:45:25.356178"
+    },
+    {
+      "id": "1e0348f4",
+      "complaint_no": "TS20260607-002",
+      "community_name": "阳光花园",
+      "content": "另一条投诉",
+      "raw_conclusion": "测试",
+      "status": "imported",
+      "has_photo": false,
+      "need_review": false,
+      "review_note": "",
+      "created_at": "2026-06-07T09:45:25.358102",
+      "updated_at": "2026-06-07T09:45:25.358104"
+    }
+  ],
+  "photos": [
+    {
+      "id": "ac680691",
+      "complaint_id": "b0a2e91e",
+      "file_name": "路口照片_20260607.jpg",
+      "uploaded_by": "周姐",
+      "uploaded_at": "2026-06-07T09:45:25.354318"
+    }
+  ],
+  "communities": {
+    "阳光花园->阳光佳苑": {
+      "new_name": "阳光佳苑",
+      "old_name": "阳光花园",
+      "confirmed": true
+    }
+  },
+  "audit_log": [
+    {
+      "id": "bf5c26cb",
+      "action": "import",
+      "complaint_id": "b0a2e91e",
+      "operator": "小李",
+      "detail": "导入投诉 TS20260607-001，小区：阳光花园",
+      "timestamp": "2026-06-07T09:45:25.354145"
+    },
+    {
+      "id": "db08bc32",
+      "action": "add_photo",
+      "complaint_id": "b0a2e91e",
+      "operator": "周姐",
+      "detail": "补录路口照片：路口照片_20260607.jpg",
+      "timestamp": "2026-06-07T09:45:25.355499"
+    },
+    {
+      "id": "1a507aed",
+      "action": "generate_summary",
+      "complaint_id": "b0a2e91e",
+      "operator": "system",
+      "detail": "生成摘要 v1，下一步：请市政巡检员核实小区新旧名称对应关系，对接：市政巡检员",
+      "timestamp": "2026-06-07T09:45:25.355929"
+    },
+    {
+      "id": "18c365c2",
+      "action": "rerun_summary",
+      "complaint_id": "b0a2e91e",
+      "operator": "system",
+      "detail": "重跑摘要，照片状态：已补",
+      "timestamp": "2026-06-07T09:45:25.356047"
+    },
+    {
+      "id": "72ecd54b",
+      "action": "manual_correct",
+      "complaint_id": "b0a2e91e",
+      "operator": "周姐",
+      "detail": "人工修正 raw_conclusion: '系统自动判定：正常时段，投诉不成立' → '系统自动判定：正常时段，投诉不成立（已人工修正：实际时段不在规定范围内）'",
+      "timestamp": "2026-06-07T09:45:25.356308"
+    },
+    {
+      "id": "d5de38e8",
+      "action": "generate_summary",
+      "complaint_id": "b0a2e91e",
+      "operator": "system",
+      "detail": "生成摘要 v2，下一步：请市政巡检员核实小区新旧名称对应关系，对接：市政巡检员",
+      "timestamp": "2026-06-07T09:45:25.356785"
+    },
+    {
+      "id": "e5657eb1",
+      "action": "rerun_summary",
+      "complaint_id": "b0a2e91e",
+      "operator": "system",
+      "detail": "重跑摘要，照片状态：已补",
+      "timestamp": "2026-06-07T09:45:25.356934"
+    },
+    {
+      "id": "9b4745aa",
+      "action": "confirm_alias",
+      "complaint_id": "system",
+      "operator": "市政巡检员",
+      "detail": "确认小区别名：阳光花园 = 阳光佳苑",
+      "timestamp": "2026-06-07T09:45:25.357915"
+    },
+    {
+      "id": "8aed2d39",
+      "action": "import",
+      "complaint_id": "1e0348f4",
+      "operator": "小李",
+      "detail": "导入投诉 TS20260607-002，小区：阳光花园",
+      "timestamp": "2026-06-07T09:45:25.359012"
+    }
+  ],
+  "summaries": [
+    {
+      "id": "6316722a",
+      "complaint_id": "b0a2e91e",
+      "why_kept": "小区名'阳光花园'存在新旧名称映射，需复核；已有路口照片佐证，需结合照片重新判断",
+      "missing_materials": [
+        "市政巡检员对小区名称的复核确认"
+      ],
+      "next_step": "请市政巡检员核实小区新旧名称对应关系",
+      "next_contact": "市政巡检员",
+      "version": 1,
+      "created_at": "2026-06-07T09:45:25.355738"
+    },
+    {
+      "id": "f50045d0",
+      "complaint_id": "b0a2e91e",
+      "why_kept": "小区名'阳光花园'存在新旧名称映射，需复核；已有路口照片佐证，需结合照片重新判断",
+      "missing_materials": [
+        "市政巡检员对小区名称的复核确认"
+      ],
+      "next_step": "请市政巡检员核实小区新旧名称对应关系",
+      "next_contact": "市政巡检员",
+      "version": 2,
+      "created_at": "2026-06-07T09:45:25.356422"
+    }
+  ]
+}
