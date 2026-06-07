@@ -30,6 +30,7 @@ export interface Scheme {
   description: string;
   componentIds: string[];
   cameraState: CameraState;
+  componentSnapshots?: HeritageComponent[];
   createdAt: string;
   updatedAt: string;
 }
@@ -51,6 +52,7 @@ export interface AppState {
   cameraState: CameraState;
   leftPanelOpen: boolean;
   rightPanelOpen: boolean;
+  threeCanvasRef: HTMLCanvasElement | null;
 }
 
 export interface AppActions {
@@ -66,8 +68,11 @@ export interface AppActions {
   toggleLeftPanel: () => void;
   toggleRightPanel: () => void;
   resetCamera: () => void;
+  setThreeCanvas: (canvas: HTMLCanvasElement | null) => void;
   exportScreenshot: () => Promise<void>;
   exportData: () => void;
+  exportCSV: () => void;
+  getStats: () => { totalComponents: number; anomalyCount: number; emptyCount: number; duplicateCount: number; boundaryCount: number; normalCount: number; coordinateSystems: Record<string, number>; sourceTypes: Record<string, number>; exportTime: string; };
 }
 
 export const COORDINATE_COLORS: Record<string, string> = {

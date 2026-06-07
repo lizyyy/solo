@@ -88,7 +88,12 @@ export function ThreeScene({
         camera={{ position: [15, 12, 15], fov: 50 }}
         shadows
         onClick={() => onSelectComponent(null)}
-        gl={{ antialias: true, alpha: false }}
+        gl={{ 
+          antialias: true, 
+          alpha: false, 
+          preserveDrawingBuffer: true,
+          powerPreference: 'high-performance'
+        }}
       >
         <color attach="background" args={['#1a1f2e']} />
         <fog attach="fog" args={['#1a1f2e', 20, 60]} />

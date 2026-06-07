@@ -2,15 +2,32 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { HeritageComponent, Scheme, FilterState, CameraState, AppState, AppActions } from '@/types';
 import { mockComponents, initialCameraState } from '@/data/mockData';
+import { exportJSONData, exportReportCSV, calculateStats } from '@/utils/export';
 
 type Store = AppState & AppActions;
 
-const STORAGE_KEY = 'heritage-component-library';
+const STORAGE_KEY = 'heritage-component-library-v2';
+
+const initializeComponents = (): HeritageComponent[] => {
+  if (typeof window === 'undefined') return mockComponents;
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if (stored) {
+    try {
+      const parsed = JSON.parse(stored);
+      if (parsed.state?.components && parsed.state.components.length > 0) {
+        return parsed.state.components;
+      }
+    } catch (e) {
+      console.warn('Failed to parse stored components, using defaults');
+    }
+  }
+  return JSON.parse(JSON.stringify(mockComponents));
+};
 
 export const useStore = create<Store>()(
   persist(
     (set, get) => ({
-      components: mockComponents,
+      components: initializeComponents(),
       selectedComponentId: null,
       currentScheme: null,
       schemes: [],
@@ -18,6 +35,7 @@ export const useStore = create<Store>()(
       cameraState: initialCameraState,
       leftPanelOpen: true,
       rightPanelOpen: true,
+      threeCanvasRef: null,
 
       setSelectedComponent: (id: string | null) => {
         set({ selectedComponentId: id });
@@ -57,6 +75,7 @@ export const useStore = create<Store>()(
           description,
           componentIds: get().components.map((c) => c.id),
           cameraState: get().cameraState,
+          componentSnapshots: JSON.parse(JSON.stringify(get().components)),
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };
@@ -69,10 +88,14 @@ export const useStore = create<Store>()(
       loadScheme: (schemeId: string) => {
         const scheme = get().schemes.find((s) => s.id === schemeId);
         if (scheme) {
-          set({
-            currentScheme: scheme,
+          const updates: Partial<Scheme> = {
+            updatedAt: new Date().toISOString(),
+          };
+          set((state) => ({
+            currentScheme: { ...scheme, ...updates },
             cameraState: scheme.cameraState,
-          });
+            components: scheme.componentSnapshots || state.components,
+          }));
         }
       },
 
@@ -100,34 +123,52 @@ export const useStore = create<Store>()(
         set({ cameraState: initialCameraState });
       },
 
+      setThreeCanvas: (canvas: HTMLCanvasElement | null) => {
+        set({ threeCanvasRef: canvas });
+      },
+
       exportScreenshot: async () => {
-        const html2canvas = (await import('html2canvas')).default;
-        const element = document.getElementById('app-container');
-        if (element) {
-          const canvas = await html2canvas(element, {
-            backgroundColor: '#1a1f2e',
-            scale: 2,
+        const canvas = document.querySelector('canvas[data-engine="three.js"]') as HTMLCanvasElement;
+        if (!canvas) {
+          alert('无法找到3D画布，请确保场景已加载');
+          return;
+        }
+
+        try {
+          const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
+          if (gl) {
+            const preserveDrawingBuffer = gl.getContextAttributes()?.preserveDrawingBuffer;
+            if (!preserveDrawingBuffer) {
+              console.warn('WebGL context does not preserve drawing buffer, trying anyway');
+            }
+          }
+
+          const { exportScreenshotFromCanvas } = await import('@/utils/export');
+          const stats = calculateStats(get().components);
+          await exportScreenshotFromCanvas(canvas, {
+            title: '古建筑修缮构件库 - 3D场景截图',
+            stats,
           });
-          const link = document.createElement('a');
-          link.download = `古建筑修缮构件库-${new Date().toISOString().slice(0, 10)}.png`;
-          link.href = canvas.toDataURL();
-          link.click();
+        } catch (e) {
+          console.error('截图导出失败:', e);
+          alert('截图导出失败，请重试');
         }
       },
 
       exportData: () => {
-        const data = {
+        exportJSONData({
           components: get().components,
           schemes: get().schemes,
           exportTime: new Date().toISOString(),
-        };
-        const blob = new Blob([JSON.stringify(data, null, 2)], {
-          type: 'application/json',
         });
-        const link = document.createElement('a');
-        link.download = `古建筑修缮构件库-数据-${new Date().toISOString().slice(0, 10)}.json`;
-        link.href = URL.createObjectURL(blob);
-        link.click();
+      },
+
+      exportCSV: () => {
+        exportReportCSV(get().components);
+      },
+
+      getStats: () => {
+        return calculateStats(get().components);
       },
     }),
     {
@@ -141,6 +182,14 @@ export const useStore = create<Store>()(
         leftPanelOpen: state.leftPanelOpen,
         rightPanelOpen: state.rightPanelOpen,
       }),
+      onRehydrateStorage: () => (state) => {
+        console.log('[持久化] 状态已从 localStorage 恢复');
+        if (state) {
+          console.log('[持久化] 构件数量:', state.components.length);
+          console.log('[持久化] 方案数量:', state.schemes.length);
+          console.log('[持久化] 异常数量:', state.components.filter(c => c.isAnomaly).length);
+        }
+      },
     }
   )
 );
@@ -180,4 +229,9 @@ export const useCoordinateSystems = () => {
 export const useSelectedComponent = () => {
   const { components, selectedComponentId } = useStore();
   return components.find((c) => c.id === selectedComponentId) || null;
+};
+
+export const useStats = () => {
+  const components = useStore((state) => state.components);
+  return calculateStats(components);
 };
