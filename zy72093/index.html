@@ -525,15 +525,29 @@ function reRunAnalysis() {
   var params = loadParams();
   var unlockedCount = 0;
   var lockedCount = 0;
+  var adjustedUnlocked = [];
 
   for (var key in params) {
     if (!params[key].locked) {
-      params[key].value = params[key].default_value;
-      params[key].manually_adjusted = false;
-      params[key].note = '';
+      if (params[key].manually_adjusted) {
+        adjustedUnlocked.push(key + '(' + params[key].value + '→' + params[key].default_value + ')');
+      }
       unlockedCount++;
     } else {
       lockedCount++;
+    }
+  }
+
+  if (adjustedUnlocked.length > 0) {
+    var proceed = confirm('以下参数已手动调整但未锁定，重新运行将恢复为默认值：\n\n' + adjustedUnlocked.join('\n') + '\n\n如需保留请先锁定，或点"取消"返回锁定。');
+    if (!proceed) return;
+  }
+
+  for (var key2 in params) {
+    if (!params[key2].locked) {
+      params[key2].value = params[key2].default_value;
+      params[key2].manually_adjusted = false;
+      params[key2].note = '';
     }
   }
 
@@ -546,7 +560,7 @@ function reRunAnalysis() {
       timestamp: now(),
       operator: '系统',
       action: 'rerun',
-      detail: '重新运行分析' + (lockedCount > 0 ? '，' + lockedCount + '个锁定参数保持不变' : '') + (unlockedCount > 0 ? '，' + unlockedCount + '个未锁定参数恢复默认' : '')
+      detail: '重新运行分析' + (lockedCount > 0 ? '，锁定参数保持：' + Object.keys(params).filter(function(k){return params[k].locked;}).join(', ') : '') + (adjustedUnlocked.length > 0 ? '，未锁定调整参数已恢复默认：' + adjustedUnlocked.join(', ') : '')
     });
     r.last_processed_at = now();
   });
