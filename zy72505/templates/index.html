@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="number">{{ stats.total_records }}</div>
+        <div class="label">总记录数</div>
+    </div>
+    <div class="stat-card">
+        <div class="number">{{ stats.total_batches }}</div>
+        <div class="label">导入批次</div>
+    </div>
+    <div class="stat-card">
+        <div class="number">{{ stats.total_conflicts }}</div>
+        <div class="label">冲突样本</div>
+    </div>
+    <div class="stat-card">
+        <div class="number">{{ stats.by_status.get('pending_prompt', 0) }}</div>
+        <div class="label">待补充提示词版本</div>
+    </div>
+    <div class="stat-card">
+        <div class="number">{{ stats.by_status.get('pending_product_review', 0) }}</div>
+        <div class="label">待产品经理复核</div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>📋 边界规则（代码固化，不只靠口头约定）</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>规则编码</th>
+                <th>规则名称</th>
+                <th>触发条件</th>
+                <th>处理策略</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for rule in rules %}
+            <tr>
+                <td><code>{{ rule.rule_code }}</code></td>
+                <td>{{ rule.rule_name }}</td>
+                <td>{{ rule.description }}</td>
+                <td style="color: #e74c3c; font-weight: 500;">{{ rule.handling_strategy }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="card">
+    <h2>📦 导入批次</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>批次ID</th>
+                <th>文件名</th>
+                <th>记录数</th>
+                <th>导入人</th>
+                <th>导入时间</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for batch in batches %}
+            <tr>
+                <td><code>{{ batch.batch_id }}</code></td>
+                <td>{{ batch.file_name }}</td>
+                <td>{{ batch.total_records }}</td>
+                <td>{{ batch.imported_by }}</td>
+                <td>{{ batch.imported_at }}</td>
+                <td><a href="{{ url_for('records', batch_id=batch.batch_id) }}" class="btn btn-primary">查看记录</a></td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" style="text-align: center; color: #999;">暂无导入批次，点击"导入"开始</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="card">
+    <h2>⚠️ 状态说明</h2>
+    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+        <span class="status status-pending-prompt">pending_prompt - 待补充提示词版本</span>
+        <span class="status status-pending-review">pending_review - 待审核</span>
+        <span class="status status-pending-product-review">pending_product_review - 待产品经理复核</span>
+        <span class="status status-pending-conflict-review">pending_conflict_review - 待冲突审核</span>
+        <span class="status status-reviewed">reviewed - 已复核</span>
+        <span class="status status-rejected">rejected - 已驳回</span>
+    </div>
+</div>
+
+{% endblock %}

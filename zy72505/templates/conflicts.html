@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card">
+    <h2>⚔️ 冲突样本表（产品经理复核区）</h2>
+    <div class="filter-bar">
+        <form method="get" style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+            <select name="batch_id" onchange="this.form.submit()">
+                <option value="">所有批次</option>
+                {% for batch in batches %}
+                <option value="{{ batch.batch_id }}" {% if selected_batch == batch.batch_id %}selected{% endif %}>
+                    {{ batch.batch_id }}
+                </option>
+                {% endfor %}
+            </select>
+            <select name="product_status" onchange="this.form.submit()">
+                <option value="">所有复核状态</option>
+                <option value="pending" {% if selected_status == 'pending' %}selected{% endif %}>待复核</option>
+                <option value="approved" {% if selected_status == 'approved' %}selected{% endif %}>已通过</option>
+                <option value="rejected" {% if selected_status == 'rejected' %}selected{% endif %}>已驳回</option>
+            </select>
+        </form>
+    </div>
+    <div style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>冲突类型</th>
+                    <th>批次/行号</th>
+                    <th>问题</th>
+                    <th>原结论</th>
+                    <th>人工结论</th>
+                    <th>链接</th>
+                    <th>复核状态</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sample in samples %}
+                <tr>
+                    <td>
+                        {% if sample.conflict_type == 'REF_404_PASS' %}
+                        <span class="badge badge-danger">REF_404_PASS</span><br>
+                        <small style="color: #666;">链接404但结论通过</small>
+                        {% elif sample.conflict_type == 'CONCLUSION_CONFLICT' %}
+                        <span class="badge badge-warning">CONCLUSION_CONFLICT</span><br>
+                        <small style="color: #666;">原结论与人工结论不一致</small>
+                        {% else %}
+                        <span class="badge badge-warning">{{ sample.conflict_type }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <code>{{ sample.batch_id }}</code><br>
+                        <span class="badge badge-info">行{{ sample.original_row_number }}</span>
+                    </td>
+                    <td style="max-width: 200px; font-size: 0.8rem;">{{ sample.question }}</td>
+                    <td>{{ sample.original_conclusion }}</td>
+                    <td>
+                        {{ sample.manual_conclusion }}
+                        {% if sample.original_conclusion != sample.manual_conclusion %}
+                        <span class="badge badge-warning">改判</span>
+                        {% endif %}
+                    </td>
+                    <td style="font-size: 0.75rem;">
+                        {% if sample.reference_url %}
+                        <a href="{{ sample.reference_url }}" target="_blank">{{ sample.reference_url[:30] }}...</a><br>
+                        <span class="badge badge-danger">{{ sample.reference_url_status }}</span>
+                        {% else %}
+                        无
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if sample.product_review_status == 'pending' %}
+                        <span class="status status-pending-product-review">待复核</span>
+                        {% elif sample.product_review_status == 'approved' %}
+                        <span class="status status-reviewed">已通过</span>
+                        {% elif sample.product_review_status == 'rejected' %}
+                        <span class="status status-rejected">已驳回</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-primary" onclick="document.getElementById('review-form-{{ sample.id }}').style.display='block'">
+                            复核
+                        </button>
+                    </td>
+                </tr>
+                <tr id="review-form-{{ sample.id }}" style="display: none;">
+                    <td colspan="8" style="background: #f8f9fa;">
+                        <form method="post" action="{{ url_for('review_conflict', conflict_id=sample.id) }}" style="padding: 1rem;">
+                            <p><strong>问题：</strong>{{ sample.question }}</p>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div class="form-group">
+                                    <label>复核结论</label>
+                                    <select name="status" required>
+                                        <option value="pending">待定</option>
+                                        <option value="approved">确认通过</option>
+                                        <option value="rejected">驳回</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>产品经理备注</label>
+                                    <input type="text" name="remark" placeholder="复核意见...">
+                                </div>
+                                <div class="form-group">
+                                    <label>操作人</label>
+                                    <input type="text" name="operator" value="产品经理" placeholder="您的姓名">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success">提交复核</button>
+                            <button type="button" class="btn" onclick="document.getElementById('review-form-{{ sample.id }}').style.display='none'">取消</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="8" style="text-align: center; color: #999;">暂无冲突样本</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

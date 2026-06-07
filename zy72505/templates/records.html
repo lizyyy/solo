@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card">
+    <h2>📝 人工改判记录</h2>
+    <div class="filter-bar">
+        <form method="get" style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+            <select name="batch_id" onchange="this.form.submit()">
+                <option value="">所有批次</option>
+                {% for batch in batches %}
+                <option value="{{ batch.batch_id }}" {% if selected_batch == batch.batch_id %}selected{% endif %}>
+                    {{ batch.batch_id }}
+                </option>
+                {% endfor %}
+            </select>
+            <select name="status" onchange="this.form.submit()">
+                <option value="">所有状态</option>
+                <option value="pending_prompt" {% if selected_status == 'pending_prompt' %}selected{% endif %}>待补充提示词版本</option>
+                <option value="pending_review" {% if selected_status == 'pending_review' %}selected{% endif %}>待审核</option>
+                <option value="pending_product_review" {% if selected_status == 'pending_product_review' %}selected{% endif %}>待产品经理复核</option>
+                <option value="pending_conflict_review" {% if selected_status == 'pending_conflict_review' %}selected{% endif %}>待冲突审核</option>
+                <option value="reviewed" {% if selected_status == 'reviewed' %}selected{% endif %}>已复核</option>
+                <option value="rejected" {% if selected_status == 'rejected' %}selected{% endif %}>已驳回</option>
+            </select>
+            <a href="{{ url_for('import_batch') }}" class="btn btn-primary">+ 导入新批次</a>
+        </form>
+    </div>
+    <div style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>原始行号</th>
+                    <th>批次</th>
+                    <th>问题ID</th>
+                    <th>问题</th>
+                    <th>原结论</th>
+                    <th>人工结论</th>
+                    <th>提示词版本</th>
+                    <th>链接状态</th>
+                    <th>状态</th>
+                    <th>更新时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in records %}
+                <tr>
+                    <td><span class="badge badge-info">行{{ record.original_row_number }}</span></td>
+                    <td><code>{{ record.batch_id }}</code></td>
+                    <td>{{ record.question_id }}</td>
+                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ record.question }}</td>
+                    <td>{{ record.original_conclusion }}</td>
+                    <td>
+                        {{ record.manual_conclusion }}
+                        {% if record.original_conclusion != record.manual_conclusion %}
+                        <span class="badge badge-warning">改判</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if record.prompt_version %}
+                        <span class="badge badge-info">{{ record.prompt_version }}</span>
+                        {% else %}
+                        <span class="badge badge-danger">缺失</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if record.reference_url_status == '404' %}
+                        <span class="badge badge-danger">404</span>
+                        {% elif record.reference_url_status == '200' %}
+                        <span class="badge badge-info">200</span>
+                        {% else %}
+                        <span class="badge badge-warning">{{ record.reference_url_status }}</span>
+                        {% endif %}
+                    </td>
+                    <td><span class="status status-{{ record.current_status.replace('_', '-') }}">{{ record.current_status }}</span></td>
+                    <td style="font-size: 0.75rem;">{{ record.updated_at }}</td>
+                    <td><a href="{{ url_for('record_detail', record_id=record.id) }}" class="btn btn-primary">查看证据</a></td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="11" style="text-align: center; color: #999;">暂无记录</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

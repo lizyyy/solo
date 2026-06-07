@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>医疗问答安全回放</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f7fa; color: #333; }
+        .header { background: #2c3e50; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { font-size: 1.25rem; font-weight: 600; }
+        .nav { display: flex; gap: 1.5rem; }
+        .nav a { color: #bdc3c7; text-decoration: none; font-size: 0.9rem; }
+        .nav a:hover, .nav a.active { color: white; }
+        .container { max-width: 1400px; margin: 2rem auto; padding: 0 1rem; }
+        .card { background: white; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .card h2 { font-size: 1.1rem; margin-bottom: 1rem; color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 0.5rem; }
+        .btn { display: inline-block; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none; font-size: 0.9rem; border: none; cursor: pointer; }
+        .btn-primary { background: #3498db; color: white; }
+        .btn-primary:hover { background: #2980b9; }
+        .btn-success { background: #27ae60; color: white; }
+        .btn-warning { background: #f39c12; color: white; }
+        .btn-danger { background: #e74c3c; color: white; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; font-weight: 600; color: #555; }
+        tr:hover { background: #f8f9fa; }
+        .status { padding: 0.25rem 0.5rem; border-radius: 3px; font-size: 0.75rem; font-weight: 500; }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-pending-prompt { background: #cce5ff; color: #004085; }
+        .status-pending-review { background: #ffeeba; color: #856404; }
+        .status-pending-product-review { background: #f8d7da; color: #721c24; }
+        .status-pending-conflict-review { background: #e2e3e5; color: #383d41; }
+        .status-reviewed { background: #d4edda; color: #155724; }
+        .status-rejected { background: #f8d7da; color: #721c24; }
+        .flash { padding: 0.75rem 1rem; border-radius: 4px; margin-bottom: 1rem; }
+        .flash-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .flash-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+        .stat-card { background: white; padding: 1rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .stat-card .number { font-size: 1.75rem; font-weight: 700; color: #2c3e50; }
+        .stat-card .label { font-size: 0.85rem; color: #7f8c8d; margin-top: 0.25rem; }
+        .filter-bar { display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; align-items: center; }
+        .filter-bar select, .filter-bar input { padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem; }
+        .badge { display: inline-block; padding: 0.125rem 0.5rem; border-radius: 3px; font-size: 0.7rem; font-weight: 500; }
+        .badge-warning { background: #fff3cd; color: #856404; }
+        .badge-danger { background: #f8d7da; color: #721c24; }
+        .badge-info { background: #d1ecf1; color: #0c5460; }
+        .workflow-step { display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; border-left: 3px solid #3498db; margin-bottom: 1rem; background: #f8f9fa; }
+        .workflow-step .step-number { background: #3498db; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; flex-shrink: 0; }
+        .workflow-step .step-content { flex: 1; }
+        .workflow-step h3 { font-size: 1rem; margin-bottom: 0.5rem; }
+        .workflow-step p { font-size: 0.85rem; color: #666; line-height: 1.5; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔍 医疗问答安全回放</h1>
+        <nav class="nav">
+            <a href="{{ url_for('index') }}" {% if request.path == '/' %}class="active"{% endif %}>概览</a>
+            <a href="{{ url_for('import_batch') }}" {% if request.path == '/import' %}class="active"{% endif %}>导入</a>
+            <a href="{{ url_for('records') }}" {% if request.path == '/records' %}class="active"{% endif %}>记录</a>
+            <a href="{{ url_for('conflicts') }}" {% if request.path == '/conflicts' %}class="active"{% endif %}>冲突样本</a>
+            <a href="{{ url_for('workflow') }}" {% if request.path == '/workflow' %}class="active"{% endif %}>三步流程</a>
+        </nav>
+    </div>
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

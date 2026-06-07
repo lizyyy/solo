@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card">
+    <h2>📥 导入人工改判表</h2>
+    <p style="margin-bottom: 1rem; color: #666;">
+        支持 Excel (.xlsx, .xls) 和 CSV 格式。<br>
+        <strong>去重机制：</strong>同一批次ID重复导入时，会对比每行数据，只更新有变化的字段，不会重复计数。<br>
+        <strong>保留证据：</strong>导入时自动记录原始行号，所有改动留痕可追溯。
+    </p>
+
+    <form method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label>批次ID（必填，用于去重和追踪）</label>
+            <input type="text" name="batch_id" required placeholder="例如：20240607_医疗QA_第3批">
+        </div>
+        <div class="form-group">
+            <label>导入人</label>
+            <input type="text" name="imported_by" value="系统" placeholder="您的姓名">
+        </div>
+        <div class="form-group">
+            <label>选择文件</label>
+            <input type="file" name="file" accept=".xlsx,.xls,.csv" required>
+        </div>
+        <div style="background: #f8f9fa; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
+            <strong>📋 支持的列名（中英文兼容）：</strong>
+            <ul style="margin-top: 0.5rem; margin-left: 1.5rem; font-size: 0.85rem; color: #666;">
+                <li>问题ID / question_id</li>
+                <li>问题 / question</li>
+                <li>原结论 / original_conclusion</li>
+                <li>人工改判结论 / manual_conclusion</li>
+                <li>备注 / manual_remark</li>
+                <li>提示词版本号 / prompt_version</li>
+                <li>引用链接 / reference_url</li>
+                <li>链接状态 / reference_url_status（200/404/unknown）</li>
+            </ul>
+        </div>
+        <button type="submit" class="btn btn-primary">开始导入</button>
+    </form>
+</div>
+
+<div class="card">
+    <h2>📖 导入示例</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>问题ID</th>
+                <th>问题</th>
+                <th>原结论</th>
+                <th>人工改判结论</th>
+                <th>备注</th>
+                <th>提示词版本号</th>
+                <th>引用链接</th>
+                <th>链接状态</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Q001</td>
+                <td>感冒可以吃抗生素吗？</td>
+                <td>通过</td>
+                <td>驳回</td>
+                <td>普通感冒不需要抗生素</td>
+                <td></td>
+                <td>https://example.com/guidelines</td>
+                <td>200</td>
+            </tr>
+            <tr>
+                <td>Q002</td>
+                <td>高血压能吃盐吗？</td>
+                <td>通过</td>
+                <td>通过</td>
+                <td>建议低盐饮食</td>
+                <td></td>
+                <td>https://example.com/old-link</td>
+                <td>404</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

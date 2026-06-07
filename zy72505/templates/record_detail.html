@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card">
+    <h2>🔍 记录详情 - 证据链完整可追溯</h2>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+        <div>
+            <p><strong>批次ID：</strong><code>{{ record.batch_id }}</code></p>
+            <p><strong>原始行号：</strong><span class="badge badge-info">Excel 行 {{ record.original_row_number }}</span></p>
+            <p><strong>问题ID：</strong>{{ record.question_id }}</p>
+            <p><strong>问题：</strong>{{ record.question }}</p>
+        </div>
+        <div>
+            <p><strong>原结论：</strong>{{ record.original_conclusion }}</p>
+            <p><strong>人工改判结论：</strong>{{ record.manual_conclusion }}</p>
+            <p><strong>人工备注：</strong>{{ record.manual_remark or '无' }}</p>
+            <p><strong>提示词版本：</strong>
+                {% if record.prompt_version %}
+                <span class="badge badge-info">{{ record.prompt_version }}</span>
+                {% else %}
+                <span class="badge badge-danger">缺失（小乔补看后补充）</span>
+                {% endif %}
+            </p>
+            <p><strong>引用链接：</strong>
+                {% if record.reference_url %}
+                <a href="{{ record.reference_url }}" target="_blank">{{ record.reference_url }}</a>
+                {% else %}
+                无
+                {% endif %}
+            </p>
+            <p><strong>链接状态：</strong>
+                {% if record.reference_url_status == '404' %}
+                <span class="badge badge-danger">404 - 需产品经理复核</span>
+                {% elif record.reference_url_status == '200' %}
+                <span class="badge badge-info">200</span>
+                {% else %}
+                <span class="badge badge-warning">{{ record.reference_url_status }}</span>
+                {% endif %}
+            </p>
+            <p><strong>当前状态：</strong><span class="status status-{{ record.current_status.replace('_', '-') }}">{{ record.current_status }}</span></p>
+        </div>
+    </div>
+
+    {% if record.reference_url_status == '404' and record.manual_conclusion == '通过' %}
+    <div style="background: #f8d7da; border: 1px solid #f5c6cb; border-radius: 4px; padding: 1rem; margin-bottom: 1.5rem;">
+        <strong>⚠️ 边界规则触发：REF_404_PASS</strong><br>
+        引用链接返回 404，但人工改判结论标记为"通过"。<br>
+        根据规则，此样本已自动标记为 <strong>待产品经理复核</strong>，暂不归入正常样本。
+    </div>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>✏️ 编辑记录（知识库编辑小乔操作）</h2>
+    <form method="post" action="{{ url_for('edit_record', record_id=record.id) }}">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+                <label>人工备注</label>
+                <textarea name="manual_remark" rows="2">{{ record.manual_remark or '' }}</textarea>
+            </div>
+            <div class="form-group">
+                <label>提示词版本号（小乔补看后填写）</label>
+                <input type="text" name="prompt_version" value="{{ record.prompt_version or '' }}" placeholder="例如：v2.3.1">
+            </div>
+            <div class="form-group">
+                <label>人工改判结论</label>
+                <select name="manual_conclusion">
+                    <option value="">不修改</option>
+                    <option value="通过" {% if record.manual_conclusion == '通过' %}selected{% endif %}>通过</option>
+                    <option value="驳回" {% if record.manual_conclusion == '驳回' %}selected{% endif %}>驳回</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>链接状态</label>
+                <select name="reference_url_status">
+                    <option value="">不修改</option>
+                    <option value="200" {% if record.reference_url_status == '200' %}selected{% endif %}>200 - 正常</option>
+                    <option value="404" {% if record.reference_url_status == '404' %}selected{% endif %}>404 - 失效</option>
+                    <option value="unknown" {% if record.reference_url_status == 'unknown' %}selected{% endif %}>未知</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>操作人</label>
+                <input type="text" name="operator" value="小乔" placeholder="操作人姓名">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">保存修改</button>
+    </form>
+</div>
+
+<div class="card">
+    <h2>📜 历史变更记录（改前改后完整留存，产品经理追问可回溯）</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>时间</th>
+                <th>操作人</th>
+                <th>变更字段</th>
+                <th>改前值</th>
+                <th>改后值</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for h in history %}
+            <tr>
+                <td style="font-size: 0.8rem;">{{ h.changed_at }}</td>
+                <td>{{ h.operator }}</td>
+                <td><code>{{ h.field_name }}</code></td>
+                <td style="color: #e74c3c; font-family: monospace;">{{ h.old_value or '(空)' }}</td>
+                <td style="color: #27ae60; font-family: monospace;">{{ h.new_value or '(空)' }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5" style="text-align: center; color: #999;">暂无变更记录</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

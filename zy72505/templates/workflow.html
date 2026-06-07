@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card">
+    <h2>🔄 三步标准流程</h2>
+    <p style="margin-bottom: 1.5rem; color: #666;">
+        完整走完以下三步，确保每一步都有证据可追溯。碰到引用链接 404 仍被判通过时，不急着归正常，留给产品经理复核。
+    </p>
+
+    <div class="workflow-step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+            <h3>第一次导入人工改判表</h3>
+            <p>
+                <strong>操作：</strong>点击「导入」，填写批次ID，上传 Excel/CSV 文件。<br>
+                <strong>系统自动处理：</strong>
+                <br>• 记录每条数据的<strong>原始行号</strong>（对应 Excel 行号）
+                <br>• 检查提示词版本号，缺失则标记为 <code>pending_prompt</code>
+                <br>• 检查引用链接状态，404 且结论为"通过"的，自动标记为 <code>pending_product_review</code>
+                <br>• 检查原结论与人工结论是否冲突，冲突则归入<strong>冲突样本表</strong>
+                <br>• 所有导入记录写入 <code>review_history</code> 表，留痕可追溯
+                <br><br>
+                <strong>注意：</strong>重复导入同一批次不会翻倍，只会更新有变化的字段。
+            </p>
+            <a href="{{ url_for('import_batch') }}" class="btn btn-primary">去导入</a>
+        </div>
+    </div>
+
+    <div class="workflow-step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+            <h3>知识库编辑小乔补看提示词版本号</h3>
+            <p>
+                <strong>操作：</strong>在「记录」页筛选状态为 <code>pending_prompt</code> 的记录，逐条点击「查看证据」。
+                <br>在详情页的「编辑记录」区域补充<strong>提示词版本号</strong>，操作人填"小乔"，保存。
+                <br><br>
+                <strong>系统自动处理：</strong>
+                <br>• 记录状态自动从 <code>pending_prompt</code> 流转为 <code>pending_review</code>
+                <br>• <code>review_history</code> 表记录：改前值（空）→ 改后值（版本号），操作人小乔
+                <br>• 如果此时发现引用链接是 404，系统会自动标记为待产品经理复核
+                <br><br>
+                <strong>仅改了一条备注怎么办？</strong>没关系，历史记录里会完整保留改前改后的差别，产品经理追问时可回溯。
+            </p>
+            <a href="{{ url_for('records', status='pending_prompt') }}" class="btn btn-warning">去补填提示词版本</a>
+        </div>
+    </div>
+
+    <div class="workflow-step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+            <h3>冲突样本表更新（产品经理复核）</h3>
+            <p>
+                <strong>操作：</strong>点击「冲突样本」，查看所有需要复核的样本。
+                <br>每条样本可点击「复核」，填写复核结论和备注。
+                <br><br>
+                <strong>⚠️ 关键边界规则：</strong>
+                <br>• 引用链接 404 但原结论为"通过"的样本，<strong>不许直接归正常</strong>，必须产品经理手动复核
+                <br>• 原结论与人工结论不一致的样本，必须产品经理确认
+                <br>• 复核通过 → 状态变为 <code>reviewed</code>；复核驳回 → 状态变为 <code>rejected</code>
+                <br><br>
+                <strong>回滚怎么办？</strong>所有操作都有历史记录，想回滚直接查看历史，手动改回去即可，每一步都留痕。
+            </p>
+            <a href="{{ url_for('conflicts') }}" class="btn btn-success">去复核冲突样本</a>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>❓ 常见问题</h2>
+    <div style="line-height: 1.8;">
+        <p><strong>Q: 重复导入同一批人工改判表，数量会翻倍吗？</strong></p>
+        <p>A: 不会。系统用 <code>批次ID + 原始行号</code> 做唯一键，重复导入时只更新有变化的字段，不会新增重复记录。</p>
+
+        <p><strong>Q: 小乔只改了一条备注，历史能看出来吗？</strong></p>
+        <p>A: 能。每条记录的「历史变更记录」里会完整显示改前值、改后值、操作人、时间，产品经理追问时可直接回溯。</p>
+
+        <p><strong>Q: 引用链接 404 但人工判了通过，系统怎么处理？</strong></p>
+        <p>A: 自动标记为 <code>pending_product_review</code>，归入冲突样本表，<strong>绝不</strong>直接归为正常样本。必须等产品经理手动复核。</p>
+
+        <p><strong>Q: 人工改判表里的结论能直接照抄吗？</strong></p>
+        <p>A: 不能直接照抄作为最终结论。系统保留了原始行号、人工改动、处理状态，产品经理可以回到证据，每一步都可追溯。</p>
+
+        <p><strong>Q: 边界规则写在哪里？</strong></p>
+        <p>A: 写在代码里（<code>models.py</code> 的 <code>_determine_initial_status</code> 和 <code>_is_conflict</code> 函数），也写在 README 里。不是口头约定，是代码固化。</p>
+    </div>
+</div>
+
+{% endblock %}
