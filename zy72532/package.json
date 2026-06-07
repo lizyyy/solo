@@ -1,0 +1,20 @@
+{
+  "name": "qa-hit-rate-weekly",
+  "version": "1.0.0",
+  "description": "问答命中率周报 - 保留人工改判痕迹的脱敏导出工具",
+  "main": "src/index.js",
+  "bin": {
+    "qa-weekly": "src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "demo": "node src/cli.js run --demo",
+    "replay": "node src/cli.js replay"
+  },
+  "dependencies": {
+    "commander": "^11.1.0",
+    "csv-parse": "^5.5.3",
+    "csv-stringify": "^6.4.5",
+    "chalk": "^4.1.2"
+  }
+}

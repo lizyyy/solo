@@ -1,0 +1,27 @@
+{
+  "runId": "20260607_ezg3",
+  "runTime": "2026-06-07T04:40:57.435Z",
+  "inputs": {
+    "modelOutput": "/Users/lzy/pro/solo/workspaces/zy72532/data/model_output_raw.csv",
+    "manualReview": "/Users/lzy/pro/solo/workspaces/zy72532/data/manual_review_sheet.csv",
+    "correctionLog": "/Users/lzy/pro/solo/workspaces/zy72532/data/manual_correction_log.json"
+  },
+  "stats": {
+    "total": 3,
+    "hitCount": 3,
+    "hitRate": "100.00%",
+    "manualReviewed": 1,
+    "changedCount": 1,
+    "privacyIssues": 1
+  },
+  "recordCount": 3,
+  "outputs": {
+    "sanitizedExport": "/Users/lzy/pro/solo/workspaces/zy72532/output/sanitized_export_20260607_ezg3.csv",
+    "weeklyReport": "/Users/lzy/pro/solo/workspaces/zy72532/output/weekly_report_20260607_ezg3.md"
+  },
+  "notes": [
+    "手机号漏遮问题已标记，未自动修复，留给算法同事复核",
+    "人工改判表备注完整保留在导出和周报中",
+    "所有变更历史可追溯"
+  ]
+}

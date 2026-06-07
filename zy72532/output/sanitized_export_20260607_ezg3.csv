@@ -1,0 +1,4 @@
+id,question,model_answer,hit_original,hit_final,hit_source,phone,user_name,create_time,has_manual_review,review_note,old_caliber_info,change_count,change_details,privacy_warning,privacy_warning_details
+Q001,如何查询订单物流状态,您可以在订单详情页查看物流信息,命中,命中,model,138****1234,张先生,2026-06-01 10:23:45,否,,,0,,否,
+Q002,退款多久能到账,退款一般3-5个工作日到账,命中,命中,model,13912345678,李女士,2026-06-02 14:15:30,否,,,0,,是,手机号字段未脱敏 [pending_algorithm_review]
+Q003,客服电话是多少,客服热线是400-888-8888,未命中,命中,manual_correction,137****9876,王先生,2026-06-03 09:08:12,是,按旧口径算：用户问的是客服电话，模型给出了正确号码，应该算命中。之前新口径要求必须推荐自助服务才算命中，但本周周报沿用旧口径统计。补充：用户后续反馈该回答解决了问题。,旧口径：回答正确即命中,2,hit: 未命中 → 命中 (人工改判表补录) | hit: 未命中 → 命中 (人工改判表补录，按旧口径统计),否,

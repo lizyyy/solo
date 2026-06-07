@@ -1,0 +1,16 @@
+{
+  "correction_id": "CORR_20260604_001",
+  "operator": "阿宁",
+  "correction_time": "2026-06-04 17:00:00",
+  "description": "第一次人工修正：补录Q003的人工改判结果",
+  "changes": [
+    {
+      "record_id": "Q003",
+      "field": "hit",
+      "old_value": "未命中",
+      "new_value": "命中",
+      "reason": "人工改判表补录，按旧口径统计"
+    }
+  ],
+  "note": "手机号脱敏问题（Q002）暂不处理，留给算法同事复核"
+}
