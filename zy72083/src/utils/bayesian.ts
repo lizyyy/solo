@@ -225,6 +225,7 @@ export function supplementNote(
 ): SupplementDiff {
   const allObs = [...previousResult.observations, newObs]
   const afterResult = bayesianUpdate(prior, allObs, boundary, previousResult.batchId)
+  afterResult.computeId = previousResult.computeId
 
   const changedFields: ChangedField[] = []
 

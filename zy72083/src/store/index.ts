@@ -217,8 +217,15 @@ export const useStore = create<AppStore>((set, get) => ({
     const computations = state.computations.map(c =>
       c.computeId === computeId ? diff.after : c
     )
-    set({ supplements, computations })
-    saveData({ ...get(), supplements, computations })
+    
+    const batches = state.batches.map(b =>
+      b.batchId === prevResult.batchId
+        ? { ...b, observations: [...b.observations, newObs] }
+        : b
+    )
+    
+    set({ supplements, computations, batches })
+    saveData({ ...get(), supplements, computations, batches })
     return diff
   },
 
