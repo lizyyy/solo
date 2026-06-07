@@ -1,0 +1,147 @@
+[
+  {
+    "point_id": "P001",
+    "name": "阳光花园3号楼",
+    "address": "和平区阳光路88号",
+    "lng": 116.405,
+    "lat": 39.911,
+    "status": "项目经理已复核",
+    "located_streets": [
+      "和平街道",
+      "团结街道"
+    ],
+    "is_boundary": true,
+    "missing_materials": [],
+    "next_action": "找居委会协商",
+    "review_notes": "经核实，该小区大门在和平街道，主体在团结街道，按双街道协同处理",
+    "created_at": "2026-06-07T09:16:35.204679",
+    "updated_at": "2026-06-07T09:16:50.193392",
+    "history": [
+      {
+        "time": "2026-06-07T09:16:35.204718",
+        "action": "导入巡查表",
+        "operator": "网格员",
+        "note": ""
+      },
+      {
+        "time": "2026-06-07T09:16:44.854385",
+        "action": "补录施工告示",
+        "operator": "街道规划员小姜",
+        "note": "告示编号: N001"
+      },
+      {
+        "time": "2026-06-07T09:16:50.193385",
+        "action": "项目经理复核",
+        "operator": "项目经理",
+        "note": "经核实，该小区大门在和平街道，主体在团结街道，按双街道协同处理"
+      }
+    ],
+    "inspection": {
+      "record_id": "R001",
+      "point_id": "P001",
+      "inspector": "王网格员",
+      "inspection_date": "2024-01-10",
+      "community_name": "阳光花园",
+      "building_number": "3号楼",
+      "unit_count": 3,
+      "resident_count": 42,
+      "support_rate": 0.78,
+      "issues": [
+        "楼道灯光昏暗",
+        "消防通道堵塞"
+      ]
+    },
+    "notice": {
+      "notice_id": "N001",
+      "point_id": "P001",
+      "construction_unit": "XX建筑工程有限公司",
+      "notice_date": "2024-01-15",
+      "content": "阳光花园3号楼电梯加装施工告示，公示期7天",
+      "attachment_urls": []
+    }
+  },
+  {
+    "point_id": "P002",
+    "name": "幸福里5号楼",
+    "address": "团结区幸福街12号",
+    "lng": 116.408,
+    "lat": 39.91,
+    "status": "已导入",
+    "located_streets": [
+      "团结街道"
+    ],
+    "is_boundary": false,
+    "missing_materials": [
+      "施工告示",
+      "问题排查记录"
+    ],
+    "next_action": "找街道规划员小姜补录",
+    "review_notes": "",
+    "created_at": "2026-06-07T09:16:35.204725",
+    "updated_at": "2026-06-07T09:16:35.204739",
+    "history": [
+      {
+        "time": "2026-06-07T09:16:35.204738",
+        "action": "导入巡查表",
+        "operator": "网格员",
+        "note": ""
+      }
+    ],
+    "inspection": {
+      "record_id": "R002",
+      "point_id": "P002",
+      "inspector": "李网格员",
+      "inspection_date": "2024-01-11",
+      "community_name": "幸福里",
+      "building_number": "5号楼",
+      "unit_count": 2,
+      "resident_count": 28,
+      "support_rate": 0.85,
+      "issues": []
+    },
+    "notice": null
+  },
+  {
+    "point_id": "P003",
+    "name": "新华小区2号楼",
+    "address": "新华区新华路56号",
+    "lng": 116.4,
+    "lat": 39.918,
+    "status": "已导入",
+    "located_streets": [
+      "新华街道"
+    ],
+    "is_boundary": false,
+    "missing_materials": [
+      "施工告示",
+      "居民同意书补充"
+    ],
+    "next_action": "找街道规划员小姜补录",
+    "review_notes": "",
+    "created_at": "2026-06-07T09:16:35.204744",
+    "updated_at": "2026-06-07T09:16:35.204756",
+    "history": [
+      {
+        "time": "2026-06-07T09:16:35.204755",
+        "action": "导入巡查表",
+        "operator": "网格员",
+        "note": ""
+      }
+    ],
+    "inspection": {
+      "record_id": "R003",
+      "point_id": "P003",
+      "inspector": "张网格员",
+      "inspection_date": "2024-01-12",
+      "community_name": "新华小区",
+      "building_number": "2号楼",
+      "unit_count": 4,
+      "resident_count": 56,
+      "support_rate": 0.65,
+      "issues": [
+        "低楼层居民反对"
+      ]
+    },
+    "notice": null
+  }
+]
