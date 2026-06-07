@@ -1,0 +1,3 @@
+﻿complaint_id,original_row_number,location,complaint_content,current_status,abnormal_type,abnormal_note,photo_count,confirmed_by,confirmed_at,created_at,updated_at,imported_by,manual_changes_count
+COMP-2024-001,1,幸福路与文明街交叉口东北角,消防通道被杂物堆放，通行受阻,confirmed_abnormal,other,确认杂物堆积，需立即清理,1,居民代表陈阿姨,2026-06-07T10:35:26.442451,2026-06-07T10:35:26.441149,2026-06-07T10:35:26.442451,数据录入员,0
+COMP-2024-002,2,人民路88号门口,施工临时改道，地图未同步更新，找不到消防通道入口，居民代表需现场核实后再确认,pending_review,temporary_detour_not_synced,需居民代表复核，暂不归为正常,1,,,2026-06-07T10:35:26.441170,2026-06-07T10:35:26.442957,数据录入员,1

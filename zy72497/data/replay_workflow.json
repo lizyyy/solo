@@ -1,0 +1,77 @@
+{
+  "description": "街巷消防通道清障 - 自动生成的可复现工作流",
+  "created_at": "2026-06-07T10:36:05.911267",
+  "replayable": true,
+  "steps": [
+    {
+      "name": "导入投诉 COMP-2024-001",
+      "action": "import",
+      "params": {
+        "data": [
+          {
+            "complaint_id": "COMP-2024-001",
+            "location": "幸福路与文明街交叉口东北角",
+            "content": "消防通道被杂物堆放，通行受阻",
+            "source": "12345热线",
+            "reporter": "张居民"
+          }
+        ],
+        "operator": "数据录入员"
+      }
+    },
+    {
+      "name": "补录照片 PHOTO-001",
+      "action": "review_photo",
+      "params": {
+        "complaint_id": "COMP-2024-001",
+        "photo_data": {
+          "photo_id": "PHOTO-001",
+          "photo_url": "/photos/comp-001-1.jpg",
+          "location": "幸福路与文明街交叉口东北角",
+          "scene_description": "现场可见旧家具堆放在通道口，有明显堵塞情况"
+        },
+        "operator": "阿宁"
+      }
+    },
+    {
+      "name": "确认 COMP-2024-001",
+      "action": "confirm",
+      "params": {
+        "complaint_id": "COMP-2024-001",
+        "operator": "居民代表陈阿姨",
+        "is_normal": true,
+        "note": "确认杂物堆积，需立即清理"
+      }
+    },
+    {
+      "name": "导入投诉 COMP-2024-002",
+      "action": "import",
+      "params": {
+        "data": [
+          {
+            "complaint_id": "COMP-2024-002",
+            "location": "人民路88号门口",
+            "content": "施工临时改道，地图未同步更新，找不到消防通道入口",
+            "source": "社区上报",
+            "reporter": "李主任"
+          }
+        ],
+        "operator": "数据录入员"
+      }
+    },
+    {
+      "name": "补录照片 PHOTO-002",
+      "action": "review_photo",
+      "params": {
+        "complaint_id": "COMP-2024-002",
+        "photo_data": {
+          "photo_id": "PHOTO-002",
+          "photo_url": "/photos/comp-002-1.jpg",
+          "location": "人民路88号门口",
+          "scene_description": "现场确实有施工围挡，道路临时改道绕行，地图上未标注新路线"
+        },
+        "operator": "阿宁"
+      }
+    }
+  ]
+}
