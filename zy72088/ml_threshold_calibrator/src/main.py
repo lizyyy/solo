@@ -198,11 +198,12 @@ def demo(output_dir):
         if path:
             click.echo(f"   {key}: {path}")
     
-    click.echo(f"\n✨ 演示包含了三种典型情况:")
-    click.echo(f"   1. 顺利通过的记录 (如: 用户注册转化率)")
-    click.echo(f"   2. 需要人工确认的记录 (如: 页面加载时间、投诉率)")
+    click.echo(f"\n✨ 演示包含了五种典型情况:")
+    click.echo(f"   1. 顺利通过的记录 (如: 订单取消率)")
+    click.echo(f"   2. 需人工确认的记录 (如: 客单价、用户注册转化率)")
     click.echo(f"   3. 从参数表补来的旧口径 (如: 复购率)")
-    click.echo(f"   4. 参数冲突待裁决的记录 (如: 用户注册转化率、DAU日活用户)")
+    click.echo(f"   4. 样本越界的记录 (如: 页面加载时间、投诉率)")
+    click.echo(f"   5. 参数冲突待裁决的记录 (如: DAU日活用户)")
 
 
 if __name__ == '__main__':

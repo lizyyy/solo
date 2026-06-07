@@ -14,24 +14,31 @@
 
 ```bash
 cd ml_threshold_calibrator
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 ```
+
+> 如果你的环境里 `pip3` 不可用，试试 `python3 -m pip install -r requirements.txt`
 
 ## 🚀 快速开始
 
 ### 1. 运行演示（推荐先看这个）
 
 ```bash
-python -m src.main demo
+python3 -m src.main demo
 ```
 
-这个演示会用示例数据跑一遍完整流程，让你看看输出长啥样。
+这个演示会用示例数据跑一遍完整流程，输出五种典型状态：
+- **顺利通过**：订单取消率（人工调整过，保持原值）
+- **需人工确认**：客单价、用户注册转化率（样本略超阈值）
+- **历史口径补全**：复购率（参数表无备注，从历史记录补来）
+- **样本越界**：页面加载时间、投诉率（样本超出阈值150%）
+- **参数冲突待裁决**：DAU日活用户（参数表和导入数据阈值不一致）
 
 ### 2. 执行校准
 
 ```bash
-# 基础用法
-python -m src.main calibrate \
+# 完整用法（加载所有数据源）
+python3 -m src.main calibrate \
   --param-table data/parameter_table.csv \
   --historical data/historical_records.csv \
   --manual-notes data/manual_notes.csv \
@@ -39,22 +46,22 @@ python -m src.main calibrate \
   --import-data data/import_conflict_data.csv
 
 # 最简用法（只需要参数表）
-python -m src.main calibrate -p data/parameter_table.csv
+python3 -m src.main calibrate -p data/parameter_table.csv
 
 # 指定输出目录和前缀
-python -m src.main calibrate -p data/parameter_table.csv -o my_output --prefix my_run
+python3 -m src.main calibrate -p data/parameter_table.csv -o my_output --prefix my_run
 ```
 
 ### 3. 更新参数表
 
 ```bash
 # 用校准结果更新参数表（默认保留人工调整的参数）
-python -m src.main update_params \
+python3 -m src.main update-params \
   --results output/calibration_results_latest.xlsx \
   --original-param data/parameter_table.csv
 
 # 强制更新所有参数（不保留人工调整）
-python -m src.main update_params \
+python3 -m src.main update-params \
   -r output/calibration_results_latest.xlsx \
   -p data/parameter_table.csv \
   --no-preserve-manual
@@ -75,9 +82,11 @@ python -m src.main update_params \
 示例：
 ```csv
 指标名称,当前阈值,机器学习阈值校准,人工调整过,最后更新时间
-用户注册转化率,0.05,2024Q1校准备忘：当时大促期间数据偏高,false,2024-03-15
-订单取消率,0.08,[历史遗留备注]2023年供应链问题,true,2024-01-10
+用户注册转化率,0.05,"2024Q1校准备忘：当时大促期间数据偏高",false,2024-03-15
+订单取消率,0.08,"[历史遗留备注]2023年供应链问题",true,2024-01-10
 ```
+
+> 注意：如果备注内容含逗号，请用英文双引号括起来，否则CSV会列错位。
 
 ### 2. 历史记录 (historical_records.csv) - 可选
 
@@ -102,7 +111,7 @@ python -m src.main update_params \
 |------|------|
 | 指标名称 | 要和参数表里的一致 |
 | 样本值 | 实际观测到的数据 |
-| 是否越界 | true/false，标记这个样本是不是异常 |
+| 是否越界 | true/false，标记这个样本是否已被确认为越界（工具会自动检测所有样本是否超出阈值，此列为辅助参考） |
 | 样本日期 | 什么时候的样本 |
 
 ### 5. 导入对比数据 (import_conflict_data.csv) - 可选
@@ -119,30 +128,23 @@ python -m src.main update_params \
 
 校准完成后会生成 `*_anomalies_latest.xlsx` 文件，里面列了所有需要你人工看的：
 
-### 异常类型说明
+### 状态类型说明
 
-1. **需人工确认**
-   - 有样本超出阈值但不严重
-   - 工具会给你建议阈值，你可以选要不要用
-   - 看证据数据里的样本分布再决定
-
-2. **样本越界**
-   - 样本值超出当前阈值的150%
-   - 工具建议按99分位+上浮20%的保守策略
-   - 先去看看这些越界样本是不是真的正常
-
-3. **参数冲突待裁决**
-   - 参数表和导入数据的阈值不一样
-   - 工具会把两边的证据都列出来
-   - **你得自己选哪个是对的**，工具不会替你拍板
+| 状态 | 含义 | 工具行为 |
+|------|------|----------|
+| 顺利通过 | 样本正常或人工已调整 | 给出建议阈值但保留原值 |
+| 需人工确认 | 有样本超出阈值但不严重（不到150%） | 按P95分位建议，你可以选要不要用 |
+| 历史口径补全 | 参数表无备注，从历史记录补来 | 沿用历史阈值 |
+| 样本越界 | 样本值超出当前阈值的150% | 按99分位+上浮20%保守建议 |
+| 参数冲突待裁决 | 参数表和导入数据的阈值不一致 | 不替你拍板，两边证据都列出来 |
 
 ### 建议操作怎么看
 
 每个异常记录都有"建议操作"列，照着做就行：
 
-- 参数冲突：先核对两边数据来源 → 确认业务口径变了没 → 在参数表里更新
-- 样本越界：先查是不是异常值 → 正常就采纳建议 → 异常就标记样本
-- 需确认：看样本分布 → 根据业务容忍度选 → 确定后标记人工调整
+- **参数冲突**：先核对两边数据来源 → 确认业务口径变了没 → 在参数表里更新
+- **样本越界**：先查是不是异常值 → 正常就采纳建议 → 异常就标记样本
+- **需人工确认**：看样本分布 → 根据业务容忍度选 → 确定后标记人工调整
 
 ## 📊 输出文件说明
 
@@ -154,7 +156,7 @@ python -m src.main update_params \
    - "机器学习阈值校准"列的原始备注都会保留
 
 2. **异常清单** (`*_anomalies_*.xlsx`)
-   - 只列需要人工处理的记录
+   - 只列需要人工处理的记录（需确认、越界、冲突）
    - 告诉你异常类型、警告内容、该做什么
 
 3. **参数冲突** (`*_conflicts_*.xlsx`)
@@ -211,6 +213,9 @@ A: 因为工具不知道哪边的数据来源更靠谱啊！把两边证据都�
 **Q: 我就想看看不想真的改参数表怎么办？**
 A: 那就只跑 calibrate 命令不跑 update_params，先看结果文件再说。
 
+**Q: 样本数据里的"是否越界"列有什么用？**
+A: 这是辅助标记。工具会自动检测所有样本是否超出当前阈值——超出但不到150%的标为"需人工确认"，超过150%的标为"样本越界"。你标记的"是否越界"可以作为额外参考。
+
 ---
 
-*给阿乔的交接说明：先跑 demo 看看效果，然后把你们的参数表拿来替换 data 目录里的示例文件就行。有问题喊我！*
+*给阿乔的交接说明：先跑 `python3 -m src.main demo` 看看效果，然后把你们的参数表拿来替换 data 目录里的示例文件就行。有问题喊我！*

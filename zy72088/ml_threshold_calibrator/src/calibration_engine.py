@@ -4,6 +4,27 @@ from datetime import datetime
 from typing import Dict, List, Tuple, Optional
 from dataclasses import dataclass, field
 from enum import Enum
+import math
+
+
+def _safe_str(value) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, float) and math.isnan(value):
+        return ""
+    result = str(value).strip()
+    if result.lower() in ["nan", "none", "null"]:
+        return ""
+    return result
+
+
+def _safe_bool(value) -> bool:
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (int, float)):
+        return bool(value)
+    str_val = str(value).strip().lower()
+    return str_val in ["true", "1", "yes", "是", "y", "t"]
 
 
 class RecordStatus(Enum):
@@ -44,16 +65,16 @@ class CalibrationEngine:
 
     def load_parameter_table(self, param_df: pd.DataFrame) -> None:
         for _, row in param_df.iterrows():
-            metric_name = str(row.get('指标名称', row.get('metric_name', '')))
+            metric_name = _safe_str(row.get('指标名称', row.get('metric_name', '')))
             if not metric_name:
                 continue
 
             record = ThresholdRecord(
                 metric_name=metric_name,
                 current_threshold=float(row.get('当前阈值', row.get('current_threshold', 0))),
-                ml_calibration_note=str(row.get('机器学习阈值校准', row.get('ml_note', ''))),
-                manual_adjusted=bool(row.get('人工调整过', row.get('manual_adjusted', False))),
-                last_updated=str(row.get('最后更新时间', row.get('last_updated', '')))
+                ml_calibration_note=_safe_str(row.get('机器学习阈值校准', row.get('ml_note', ''))),
+                manual_adjusted=_safe_bool(row.get('人工调整过', row.get('manual_adjusted', False))),
+                last_updated=_safe_str(row.get('最后更新时间', row.get('last_updated', '')))
             )
 
             if record.ml_calibration_note:
@@ -63,12 +84,12 @@ class CalibrationEngine:
 
     def load_historical_records(self, hist_df: pd.DataFrame) -> None:
         for _, row in hist_df.iterrows():
-            metric_name = str(row.get('指标名称', row.get('metric_name', '')))
+            metric_name = _safe_str(row.get('指标名称', row.get('metric_name', '')))
             if metric_name in self.records:
                 record = self.records[metric_name]
                 record.historical_threshold = float(row.get('历史阈值', row.get('historical_threshold', record.current_threshold)))
 
-                hist_note = str(row.get('机器学习阈值校准备注', ''))
+                hist_note = _safe_str(row.get('机器学习阈值校准备注', ''))
                 if hist_note and not record.ml_calibration_note:
                     record.ml_calibration_note = hist_note
                     record.status = RecordStatus.FROM_HISTORY
@@ -76,10 +97,10 @@ class CalibrationEngine:
 
     def load_manual_notes(self, notes_df: pd.DataFrame) -> None:
         for _, row in notes_df.iterrows():
-            metric_name = str(row.get('指标名称', row.get('metric_name', '')))
+            metric_name = _safe_str(row.get('指标名称', row.get('metric_name', '')))
             if metric_name in self.records:
                 record = self.records[metric_name]
-                manual_note = str(row.get('人工备注', row.get('manual_note', '')))
+                manual_note = _safe_str(row.get('人工备注', row.get('manual_note', '')))
                 if manual_note:
                     if record.ml_calibration_note:
                         record.ml_calibration_note = f"{record.ml_calibration_note} | [人工]{manual_note}"
@@ -89,15 +110,12 @@ class CalibrationEngine:
 
     def load_sample_data(self, sample_df: pd.DataFrame) -> None:
         for _, row in sample_df.iterrows():
-            metric_name = str(row.get('指标名称', row.get('metric_name', '')))
+            metric_name = _safe_str(row.get('指标名称', row.get('metric_name', '')))
             if metric_name in self.records:
                 record = self.records[metric_name]
                 sample_value = float(row.get('样本值', row.get('sample_value', 0)))
                 record.sample_data.append(sample_value)
-
-                is_bound_issue = bool(row.get('是否越界', row.get('is_out_of_bound', False)))
-                if is_bound_issue:
-                    self._check_out_of_bound(record, sample_value)
+                self._check_out_of_bound(record, sample_value)
 
     def _check_out_of_bound(self, record: ThresholdRecord, sample_value: float) -> None:
         if sample_value > record.current_threshold * 1.5:
@@ -117,7 +135,7 @@ class CalibrationEngine:
     def detect_conflicts(self, import_df: pd.DataFrame) -> List[Dict]:
         conflicts = []
         for _, row in import_df.iterrows():
-            metric_name = str(row.get('指标名称', row.get('metric_name', '')))
+            metric_name = _safe_str(row.get('指标名称', row.get('metric_name', '')))
             if metric_name in self.records:
                 record = self.records[metric_name]
                 imported_threshold = float(row.get('阈值', row.get('threshold', 0)))
