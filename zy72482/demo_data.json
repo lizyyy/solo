@@ -1,0 +1,29 @@
+[
+  {
+    "complaint_id": "TS2024001",
+    "location": "人民路与建设路交叉口东北角",
+    "photo_urls": ["photo_001_1.jpg", "photo_001_2.jpg"],
+    "photo_remarks": "路口视野开阔，快递柜已安装在人行道旁，周边通行顺畅，轮椅可通过",
+    "ramp_exist": null,
+    "ramp_remarks": "",
+    "_demo_scenario": "顺利记录：导入后评分正常，照片备注完整，无需额外补录"
+  },
+  {
+    "complaint_id": "TS2024002",
+    "location": "中山大道56号社区门口",
+    "photo_urls": ["photo_002_1.jpg"],
+    "photo_remarks": "居民反映轮椅取件困难",
+    "ramp_exist": null,
+    "ramp_remarks": "",
+    "_demo_scenario": "坡道补录后评分没变化：首次评分45，补录坡道存在但问题很多后评分42，变化仅3分，触发人工复核"
+  },
+  {
+    "complaint_id": "TS2024003",
+    "location": "解放大道与沿河大道交叉口",
+    "photo_urls": ["photo_003_1.jpg", "photo_003_2.jpg"],
+    "photo_remarks": "",
+    "ramp_exist": null,
+    "ramp_remarks": "",
+    "_demo_scenario": "旧口径记录：首次导入无照片备注，后续老马补看照片后发现适用2019年旧口径标准"
+  }
+]
