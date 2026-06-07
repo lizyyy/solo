@@ -1,0 +1,23 @@
+{
+  "sample_id": "samp_6501d034",
+  "snapshot_id": "SNAP-2026-001",
+  "log_id": "LOG-2026-001",
+  "detected_at": "2026-06-07T16:35:45.865155",
+  "status": "corrected",
+  "metrics": {
+    "auc": 0.82,
+    "f1": 0.76,
+    "task_a_acc": 0.85,
+    "task_b_acc": 0.78
+  },
+  "original_metrics": {
+    "auc": 0.82,
+    "f1": 0.76,
+    "task_a_acc": 0.85,
+    "task_b_acc": 0.78
+  },
+  "flags": [],
+  "review_note": "\u4eba\u5de5\u786e\u8ba4\u6570\u636e\u6b63\u5e38\uff0c\u4efb\u52a1\u6743\u91cd\u8c03\u4f18\u540e\u6548\u679c\u7b26\u5408\u9884\u671f\uff0c\u6807\u8bb0\u4e3a\u5df2\u4fee\u6b63\u3002",
+  "corrected_by": "\u963f\u8d8a",
+  "corrected_at": "2026-06-07T16:35:45.866253"
+}

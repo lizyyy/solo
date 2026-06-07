@@ -1,0 +1,202 @@
+{
+  "log_id": "LOG-2026-003",
+  "experiment_name": "old_metric_run",
+  "data_source": "on_site",
+  "points": [
+    {
+      "timestamp": "2026-03-19T15:08:00",
+      "epoch": 1,
+      "loss": 0.892,
+      "metrics": {
+        "auc": 0.686,
+        "f1": 0.607
+      },
+      "task_weights": {
+        "task_a": 0.5,
+        "task_b": 0.5
+      }
+    },
+    {
+      "timestamp": "2026-03-19T15:16:00",
+      "epoch": 2,
+      "loss": 0.864,
+      "metrics": {
+        "auc": 0.6920000000000001,
+        "f1": 0.614
+      },
+      "task_weights": {
+        "task_a": 0.5,
+        "task_b": 0.5
+      }
+    },
+    {
+      "timestamp": "2026-03-19T15:24:00",
+      "epoch": 3,
+      "loss": 0.8360000000000001,
+      "metrics": {
+        "auc": 0.6980000000000001,
+        "f1": 0.621
+      },
+      "task_weights": {
+        "task_a": 0.5,
+        "task_b": 0.5
+      }
+    },
+    {
+      "timestamp": "2026-03-19T15:32:00",
+      "epoch": 4,
+      "loss": 0.808,
+      "metrics": {
+        "auc": 0.7040000000000001,
+        "f1": 0.628
+      },
+      "task_weights": {
+        "task_a": 0.5,
+        "task_b": 0.5
+      }
+    },
+    {
+      "timestamp": "2026-03-19T15:40:00",
+      "epoch": 5,
+      "loss": 0.78,
+      "metrics": {
+        "auc": 0.7100000000000001,
+        "f1": 0.635
+      },
+      "task_weights": {
+        "task_a": 0.5,
+        "task_b": 0.5
+      }
+    },
+    {
+      "timestamp": "2026-03-19T15:48:00",
+      "epoch": 6,
+      "loss": 0.752,
+      "metrics": {
+        "auc": 0.7160000000000001,
+        "f1": 0.642
+      },
+      "task_weights": {
+        "task_a": 0.5,
+        "task_b": 0.5
+      }
+    },
+    {
+      "timestamp": "2026-03-19T15:56:00",
+      "epoch": 7,
+      "loss": 0.724,
+      "metrics": {
+        "auc": 0.7220000000000001,
+        "f1": 0.649
+      },
+      "task_weights": {
+        "task_a": 0.5,
+        "task_b": 0.5
+      }
+    },
+    {
+      "timestamp": "2026-03-19T16:04:00",
+      "epoch": 8,
+      "loss": 0.6960000000000001,
+      "metrics": {
+        "auc": 0.7280000000000001,
+        "f1": 0.656
+      },
+      "task_weights": {
+        "task_a": 0.5,
+        "task_b": 0.5
+      }
+    },
+    {
+      "timestamp": "2026-03-19T16:12:00",
+      "epoch": 9,
+      "loss": 0.668,
+      "metrics": {
+        "auc": 0.7340000000000001,
+        "f1": 0.663
+      },
+      "task_weights": {
+        "task_a": 0.5,
+        "task_b": 0.5
+      }
+    },
+    {
+      "timestamp": "2026-03-19T16:20:00",
+      "epoch": 10,
+      "loss": 0.64,
+      "metrics": {
+        "auc": 0.74,
+        "f1": 0.6699999999999999
+      },
+      "task_weights": {
+        "task_a": 0.5,
+        "task_b": 0.5
+      }
+    },
+    {
+      "timestamp": "2026-03-19T16:28:00",
+      "epoch": 11,
+      "loss": 0.6120000000000001,
+      "metrics": {
+        "auc": 0.746,
+        "f1": 0.6769999999999999
+      },
+      "task_weights": {
+        "task_a": 0.5,
+        "task_b": 0.5
+      }
+    },
+    {
+      "timestamp": "2026-03-19T16:36:00",
+      "epoch": 12,
+      "loss": 0.5840000000000001,
+      "metrics": {
+        "auc": 0.752,
+        "f1": 0.6839999999999999
+      },
+      "task_weights": {
+        "task_a": 0.5,
+        "task_b": 0.5
+      }
+    },
+    {
+      "timestamp": "2026-03-19T16:44:00",
+      "epoch": 13,
+      "loss": 0.556,
+      "metrics": {
+        "auc": 0.758,
+        "f1": 0.691
+      },
+      "task_weights": {
+        "task_a": 0.5,
+        "task_b": 0.5
+      }
+    },
+    {
+      "timestamp": "2026-03-19T16:52:00",
+      "epoch": 14,
+      "loss": 0.528,
+      "metrics": {
+        "auc": 0.764,
+        "f1": 0.698
+      },
+      "task_weights": {
+        "task_a": 0.5,
+        "task_b": 0.5
+      }
+    },
+    {
+      "timestamp": "2026-03-19T17:00:00",
+      "epoch": 15,
+      "loss": 0.5,
+      "metrics": {
+        "auc": 0.77,
+        "f1": 0.705
+      },
+      "task_weights": {
+        "task_a": 0.5,
+        "task_b": 0.5
+      }
+    }
+  ]
+}

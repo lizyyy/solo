@@ -1,0 +1,20 @@
+{
+  "snapshot_id": "SNAP-2026-003",
+  "created_at": "2026-04-13T15:00:00",
+  "features": {
+    "feature_version": "v3.1.0",
+    "task_weights": {
+      "task_a": 0.5,
+      "task_b": 0.5
+    },
+    "expected_metrics": {
+      "auc": 0.78,
+      "f1": 0.71,
+      "task_a_acc": 0.8,
+      "task_b_acc": 0.73
+    }
+  },
+  "data_range_start": "2026-03-09T15:00:00",
+  "data_range_end": "2026-04-08T15:00:00",
+  "source": "main_flow"
+}

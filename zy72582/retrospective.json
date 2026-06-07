@@ -1,0 +1,182 @@
+{
+  "generated_at": "2026-06-07T16:35:56.581934",
+  "summary": {
+    "status_distribution": {
+      "pending": 1,
+      "old_metric": 1,
+      "need_review": 1,
+      "corrected": 1
+    },
+    "total_samples": 4,
+    "total_snapshots": 3,
+    "total_logs": 3
+  },
+  "feature_snapshots": [
+    {
+      "snapshot_id": "SNAP-2026-001",
+      "created_at": "2026-06-06T13:00:00",
+      "data_range": "2026-05-08T15:00:00 ~ 2026-06-06T15:00:00",
+      "source": "main_flow"
+    },
+    {
+      "snapshot_id": "SNAP-2026-003",
+      "created_at": "2026-04-13T15:00:00",
+      "data_range": "2026-03-09T15:00:00 ~ 2026-04-08T15:00:00",
+      "source": "main_flow"
+    },
+    {
+      "snapshot_id": "SNAP-2026-002",
+      "created_at": "2026-06-03T15:00:00",
+      "data_range": "2026-05-13T15:00:00 ~ 2026-06-02T15:00:00",
+      "source": "main_flow"
+    }
+  ],
+  "training_logs": [
+    {
+      "log_id": "LOG-2026-001",
+      "experiment_name": "baseline_run_normal",
+      "points_count": 20,
+      "data_source": "on_site"
+    },
+    {
+      "log_id": "LOG-2026-002",
+      "experiment_name": "weighted_run_leaked",
+      "points_count": 20,
+      "data_source": "on_site"
+    },
+    {
+      "log_id": "LOG-2026-003",
+      "experiment_name": "old_metric_run",
+      "points_count": 15,
+      "data_source": "on_site"
+    }
+  ],
+  "anomaly_samples": [
+    {
+      "sample_id": "samp_6604fd5f",
+      "snapshot_id": "SNAP-2026-002",
+      "log_id": null,
+      "status": "pending",
+      "status_label": "等待补录",
+      "metrics": {
+        "auc": 0.91,
+        "f1": 0.88,
+        "task_a_acc": 0.94,
+        "task_b_acc": 0.72
+      },
+      "original_metrics": {
+        "auc": 0.91,
+        "f1": 0.88,
+        "task_a_acc": 0.94,
+        "task_b_acc": 0.72
+      },
+      "flags": [
+        "awaiting_log"
+      ],
+      "review_note": "等待补录训练日志曲线",
+      "snapshot_created": "2026-06-03T15:00:00",
+      "log_points_count": 0,
+      "detected_at": "2026-06-07T16:35:45.866374",
+      "corrected_by": null,
+      "corrected_at": null
+    },
+    {
+      "sample_id": "samp_07283751",
+      "snapshot_id": "SNAP-2026-003",
+      "log_id": "LOG-2026-003",
+      "status": "old_metric",
+      "status_label": "旧口径数据",
+      "metrics": {
+        "auc": 0.78,
+        "f1": 0.71,
+        "task_a_acc": 0.8,
+        "task_b_acc": 0.73
+      },
+      "original_metrics": {
+        "auc": 0.78,
+        "f1": 0.71,
+        "task_a_acc": 0.8,
+        "task_b_acc": 0.73
+      },
+      "flags": [
+        "old_metric"
+      ],
+      "review_note": "训练日志起始时间 2026-03-19 早于参考时间 2026-06-07 超过30天（间隔 79 天），属于旧口径数据",
+      "snapshot_created": "2026-04-13T15:00:00",
+      "log_points_count": 15,
+      "detected_at": "2026-06-07T16:35:45.865414",
+      "corrected_by": null,
+      "corrected_at": null
+    },
+    {
+      "sample_id": "samp_80db2bcb",
+      "snapshot_id": "SNAP-2026-002",
+      "log_id": "LOG-2026-002",
+      "status": "need_review",
+      "status_label": "待复核",
+      "metrics": {
+        "auc": 0.91,
+        "f1": 0.88,
+        "task_a_acc": 0.94,
+        "task_b_acc": 0.72
+      },
+      "original_metrics": {
+        "auc": 0.91,
+        "f1": 0.88,
+        "task_a_acc": 0.94,
+        "task_b_acc": 0.72
+      },
+      "flags": [
+        "time_window_leak",
+        "inflated_performance",
+        "reviewer_flagged"
+      ],
+      "review_note": "确认存在时间窗穿越，训练数据泄露了测试期信息，效果虚高，需要重新划分数据集后重跑。",
+      "snapshot_created": "2026-06-03T15:00:00",
+      "log_points_count": 20,
+      "detected_at": "2026-06-07T16:35:45.865289",
+      "corrected_by": null,
+      "corrected_at": null
+    },
+    {
+      "sample_id": "samp_6501d034",
+      "snapshot_id": "SNAP-2026-001",
+      "log_id": "LOG-2026-001",
+      "status": "corrected",
+      "status_label": "已修正",
+      "metrics": {
+        "auc": 0.82,
+        "f1": 0.76,
+        "task_a_acc": 0.85,
+        "task_b_acc": 0.78
+      },
+      "original_metrics": {
+        "auc": 0.82,
+        "f1": 0.76,
+        "task_a_acc": 0.85,
+        "task_b_acc": 0.78
+      },
+      "flags": [],
+      "review_note": "人工确认数据正常，任务权重调优后效果符合预期，标记为已修正。",
+      "snapshot_created": "2026-06-06T13:00:00",
+      "log_points_count": 20,
+      "detected_at": "2026-06-07T16:35:45.865155",
+      "corrected_by": "阿越",
+      "corrected_at": "2026-06-07T16:35:45.866253"
+    }
+  ],
+  "action_log": [],
+  "replay_commands": [
+    "python -m multi_task_tuner import-snapshot --id SNAP-2026-001 --start '2026-05-08T15:00:00' --end '2026-06-06T15:00:00'",
+    "python -m multi_task_tuner import-snapshot --id SNAP-2026-002 --start '2026-05-13T15:00:00' --end '2026-06-02T15:00:00'",
+    "python -m multi_task_tuner import-snapshot --id SNAP-2026-003 --start '2026-03-09T15:00:00' --end '2026-04-08T15:00:00'",
+    "python -m multi_task_tuner import-log --id LOG-2026-001 --experiment 'baseline_run_normal'",
+    "python -m multi_task_tuner import-log --id LOG-2026-002 --experiment 'weighted_run_leaked'",
+    "python -m multi_task_tuner import-log --id LOG-2026-003 --experiment 'old_metric_run'",
+    "python -m multi_task_tuner supplement-log --sample samp_07283751 --log LOG-2026-003",
+    "python -m multi_task_tuner supplement-log --sample samp_6501d034 --log LOG-2026-001",
+    "python -m multi_task_tuner supplement-log --sample samp_80db2bcb --log LOG-2026-002",
+    "python -m multi_task_tuner anomaly-page",
+    "python -m multi_task_tuner retrospective"
+  ]
+}
