@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>合同条款抽取复核</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f7fa; color: #333; }
+  .header { background: #1a365d; color: white; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; }
+  .header h1 { font-size: 20px; }
+  .header .actions { display: flex; gap: 12px; }
+  .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+  .btn-primary { background: #3182ce; color: white; }
+  .btn-success { background: #38a169; color: white; }
+  .btn-warning { background: #d69e2e; color: white; }
+  .btn-danger { background: #e53e3e; color: white; }
+  .btn-outline { background: transparent; border: 1px solid #cbd5e0; color: #4a5568; }
+  .btn:hover { opacity: 0.9; }
+  .container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .stat-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  .stat-card .label { font-size: 13px; color: #718096; margin-bottom: 8px; }
+  .stat-card .value { font-size: 28px; font-weight: bold; }
+  .stat-card.warning .value { color: #d69e2e; }
+  .stat-card.danger .value { color: #e53e3e; }
+  .tabs { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; }
+  .tab { padding: 12px 24px; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; font-weight: 500; }
+  .tab.active { border-color: #3182ce; color: #3182ce; }
+  .tab:hover { background: #edf2f7; }
+  .tab .badge { margin-left: 8px; padding: 2px 8px; border-radius: 10px; background: #edf2f7; font-size: 12px; }
+  .tab.active .badge { background: #bee3f8; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .filters { display: flex; gap: 12px; margin-bottom: 16px; align-items: center; flex-wrap: wrap; }
+  .filters select, .filters input { padding: 8px 12px; border: 1px solid #cbd5e0; border-radius: 4px; font-size: 14px; }
+  .sample-list { background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); overflow: hidden; }
+  .sample-item { padding: 16px 20px; border-bottom: 1px solid #e2e8f0; display: grid; grid-template-columns: 120px 1fr 120px 100px 140px 120px; gap: 16px; align-items: center; cursor: pointer; }
+  .sample-item:hover { background: #f7fafc; }
+  .sample-item.masked { background: #fffaf0; border-left: 4px solid #d69e2e; }
+  .sample-item.selected { background: #ebf8ff; }
+  .sample-id { font-family: monospace; font-weight: 500; color: #2d3748; }
+  .sample-name { font-weight: 500; }
+  .confidence-bar { height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+  .confidence-bar .fill { height: 100%; background: #38a169; }
+  .confidence-bar .fill.low { background: #e53e3e; }
+  .confidence-bar .fill.medium { background: #d69e2e; }
+  .tag { padding: 2px 8px; border-radius: 4px; font-size: 12px; display: inline-block; }
+  .tag-warning { background: #fefcbf; color: #744210; }
+  .tag-danger { background: #fed7d7; color: #742a2a; }
+  .tag-info { background: #bee3f8; color: #2a4365; }
+  .tag-success { background: #c6f6d5; color: #22543d; }
+  .detail-panel { background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 24px; }
+  .detail-panel h2 { font-size: 18px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #e2e8f0; }
+  .detail-section { margin-bottom: 20px; }
+  .detail-section h3 { font-size: 14px; color: #4a5568; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .info-item { background: #f7fafc; padding: 12px; border-radius: 6px; }
+  .info-item .k { font-size: 12px; color: #718096; margin-bottom: 4px; }
+  .info-item .v { font-weight: 500; }
+  .clause-item { padding: 12px; border: 1px solid #e2e8f0; border-radius: 6px; margin-bottom: 8px; }
+  .clause-item.low { border-left: 4px solid #e53e3e; background: #fff5f5; }
+  .clause-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .clause-type { font-weight: 500; }
+  .clause-content { color: #4a5568; font-size: 14px; line-height: 1.6; }
+  .form-row { display: flex; gap: 12px; margin-bottom: 12px; }
+  .form-row textarea, .form-row input { flex: 1; padding: 10px 12px; border: 1px solid #cbd5e0; border-radius: 4px; font-size: 14px; font-family: inherit; }
+  .form-row textarea { min-height: 80px; resize: vertical; }
+  .compare-form { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; }
+  .compare-result { background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 24px; }
+  .compare-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .compare-item-row { padding: 12px; border-bottom: 1px solid #e2e8f0; display: grid; grid-template-columns: 100px 1fr 100px 100px 1fr 120px; gap: 12px; align-items: center; }
+  .compare-item-row.masked { background: #fffaf0; border-left: 4px solid #d69e2e; }
+  .change-up { color: #38a169; }
+  .change-down { color: #e53e3e; }
+  .next-action { font-size: 12px; color: #4a5568; }
+  .next-owner { font-size: 12px; font-weight: 500; }
+  .owner-knowledge { color: #805ad5; }
+  .owner-model { color: #3182ce; }
+  .text-report { background: #1a202c; color: #e2e8f0; padding: 20px; border-radius: 8px; font-family: monospace; font-size: 13px; white-space: pre-wrap; line-height: 1.6; max-height: 600px; overflow-y: auto; }
+  .empty-state { text-align: center; padding: 60px 20px; color: #a0aec0; }
+  .empty-state .icon { font-size: 48px; margin-bottom: 16px; }
+  .loading { text-align: center; padding: 40px; color: #a0aec0; }
+  .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
+  .modal-overlay.active { display: flex; }
+  .modal { background: white; border-radius: 8px; padding: 24px; max-width: 500px; width: 90%; }
+  .modal h3 { margin-bottom: 16px; }
+  .alert { padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; }
+  .alert-warning { background: #fffaf0; border: 1px solid #f6e05e; color: #744210; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📋 合同条款抽取复核</h1>
+  <div class="actions">
+    <button class="btn btn-outline" onclick="loadDemoData()">生成演示数据</button>
+    <button class="btn btn-primary" onclick="refreshAll()">刷新数据</button>
+  </div>
+</div>
+
+<div class="container">
+  <div class="stats">
+    <div class="stat-card">
+      <div class="label">总样本数</div>
+      <div class="value" id="stat-total">0</div>
+    </div>
+    <div class="stat-card warning">
+      <div class="label">被平均值掩盖 ⚠️</div>
+      <div class="value" id="stat-masked">0</div>
+    </div>
+    <div class="stat-card warning">
+      <div class="label">低置信度样本</div>
+      <div class="value" id="stat-low">0</div>
+    </div>
+    <div class="stat-card danger">
+      <div class="label">待复核</div>
+      <div class="value" id="stat-pending">0</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="samples" onclick="switchTab('samples')">
+      样本列表 <span class="badge" id="badge-samples">0</span>
+    </div>
+    <div class="tab" data-tab="compare" onclick="switchTab('compare')">
+      版本对比
+    </div>
+  </div>
+
+  <div class="panel active" id="panel-samples">
+    <div class="filters">
+      <select id="filter-version" onchange="loadSamples()">
+        <option value="">所有版本</option>
+      </select>
+      <label style="display: flex; align-items: center; gap: 6px;">
+        <input type="checkbox" id="filter-masked" onchange="loadSamples()">
+        只看被平均值掩盖的
+      </label>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+      <div>
+        <div class="sample-list" id="sample-list">
+          <div class="loading">加载中...</div>
+        </div>
+      </div>
+      <div id="detail-area">
+        <div class="detail-panel empty-state">
+          <div class="icon">👈</div>
+          <p>点击左侧样本查看详情</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-compare">
+    <div class="compare-form">
+      <h3 style="margin-bottom: 16px;">模型版本对比</h3>
+      <div class="form-row">
+        <select id="compare-v1">
+          <option value="">选择旧版本</option>
+        </select>
+        <span style="align-self: center;">→</span>
+        <select id="compare-v2">
+          <option value="">选择新版本</option>
+        </select>
+        <input id="compare-by" placeholder="生成人" value="小孟">
+        <button class="btn btn-primary" onclick="runCompare()">生成对比报告</button>
+      </div>
+    </div>
+    <div id="compare-result"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-note">
+  <div class="modal">
+    <h3>补录脱敏规则备注（小孟）</h3>
+    <div class="form-row">
+      <textarea id="note-content" placeholder="输入脱敏规则备注..."></textarea>
+    </div>
+    <div class="form-row">
+      <input id="note-by" value="小孟" placeholder="添加人">
+    </div>
+    <div style="text-align: right;">
+      <button class="btn btn-outline" onclick="closeModal('modal-note')">取消</button>
+      <button class="btn btn-primary" onclick="submitNote()">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-ticket">
+  <div class="modal">
+    <h3>关联线上反馈工单</h3>
+    <div class="form-row">
+      <input id="ticket-title" placeholder="工单标题">
+    </div>
+    <div class="form-row">
+      <textarea id="ticket-desc" placeholder="问题描述..."></textarea>
+    </div>
+    <div class="form-row">
+      <input id="ticket-reporter" value="知识库编辑" placeholder="报告人">
+    </div>
+    <div style="text-align: right;">
+      <button class="btn btn-outline" onclick="closeModal('modal-ticket')">取消</button>
+      <button class="btn btn-primary" onclick="submitTicket()">创建工单</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentSampleId = null;
+let currentNoteSampleId = null;
+let currentTicketSampleId = null;
+
+async function api(url, options = {}) {
+  const res = await fetch(url, {
+    headers: { 'Content-Type': 'application/json' },
+    ...options,
+    body: options.body ? JSON.stringify(options.body) : undefined
+  });
+  return res.json();
+}
+
+async function refreshAll() {
+  await Promise.all([
+    loadVersions(),
+    loadSamples(),
+    updateStats()
+  ]);
+}
+
+async function loadVersions() {
+  const versions = await api('/api/versions');
+  const selects = ['#filter-version', '#compare-v1', '#compare-v2'];
+  selects.forEach(sel => {
+    const el = document.querySelector(sel);
+    const current = el.value;
+    el.innerHTML = sel === '#filter-version' ? '<option value="">所有版本</option>' : '<option value="">选择版本</option>';
+    versions.forEach(v => {
+      const opt = document.createElement('option');
+      opt.value = v;
+      opt.textContent = v;
+      if (v === current) opt.selected = true;
+      el.appendChild(opt);
+    });
+  });
+}
+
+async function updateStats() {
+  const samples = await api('/api/samples');
+  const masked = samples.filter(s => s.is_masked_by_avg).length;
+  const low = samples.filter(s => s.low_confidence_count > 0).length;
+  const pending = samples.filter(s => s.review_status === 'pending').length;
+  document.getElementById('stat-total').textContent = samples.length;
+  document.getElementById('stat-masked').textContent = masked;
+  document.getElementById('stat-low').textContent = low;
+  document.getElementById('stat-pending').textContent = pending;
+  document.getElementById('badge-samples').textContent = samples.length;
+}
+
+async function loadSamples() {
+  const version = document.getElementById('filter-version').value;
+  const maskedOnly = document.getElementById('filter-masked').checked;
+  let url = '/api/samples?';
+  if (version) url += `version=${version}&`;
+  if (maskedOnly) url += 'masked_only=true';
+
+  const samples = await api(url);
+  const list = document.getElementById('sample-list');
+
+  if (samples.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="icon">📭</div><p>暂无样本数据<br><button class="btn btn-primary" onclick="loadDemoData()">生成演示数据</button></p></div>';
+    return;
+  }
+
+  list.innerHTML = samples.map(s => {
+    const maskedClass = s.is_masked_by_avg ? 'masked' : '';
+    const selectedClass = s.sample_id === currentSampleId ? 'selected' : '';
+    const confClass = s.overall_confidence >= 0.9 ? '' : s.overall_confidence >= 0.7 ? 'medium' : 'low';
+    const statusTag = s.review_status === 'pending'
+      ? '<span class="tag tag-warning">待复核</span>'
+      : s.review_status === 'approved'
+        ? '<span class="tag tag-success">已通过</span>'
+        : '<span class="tag tag-danger">已拒绝</span>';
+    const maskedTag = s.is_masked_by_avg ? '<span class="tag tag-danger">被平均掩盖⚠️</span>' : '';
+
+    return `
+      <div class="sample-item ${maskedClass} ${selectedClass}" onclick="showDetail('${s.sample_id}')">
+        <div class="sample-id">${s.sample_id}</div>
+        <div>
+          <div class="sample-name">${s.contract_name}</div>
+          <div style="font-size: 12px; color: #718096; margin-top: 4px;">
+            [${s.model_version}] 条款 ${s.clause_count} 个
+          </div>
+        </div>
+        <div>
+          <div style="font-size: 12px; margin-bottom: 4px;">${(s.overall_confidence * 100).toFixed(1)}%</div>
+          <div class="confidence-bar"><div class="fill ${confClass}" style="width:${s.overall_confidence * 100}%"></div></div>
+        </div>
+        <div style="text-align: center;">
+          ${s.low_confidence_count > 0 ? `<span class="tag tag-danger">${s.low_confidence_count}低</span>` : '<span style="color:#a0aec0;">-</span>'}
+        </div>
+        <div>${statusTag} ${maskedTag}</div>
+        <div style="font-size: 12px; color: #718096;">
+          ${s.has_ticket ? '📋工单' : ''} ${s.has_desensitization_note ? '📝备注' : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function showDetail(sampleId) {
+  currentSampleId = sampleId;
+  loadSamples();
+
+  const data = await api(`/api/samples/${sampleId}`);
+  const area = document.getElementById('detail-area');
+
+  const ownerClass = data.review_status === 'pending'
+    ? (data.is_masked_by_avg || data.low_confidence_count > 0 ? 'owner-knowledge' : 'owner-model')
+    : '';
+
+  let nextAction = '';
+  let nextOwner = '';
+  if (data.review_status === 'pending') {
+    if (data.is_masked_by_avg) {
+      nextAction = '提交知识库编辑复核低置信度样本';
+      nextOwner = '知识库编辑';
+    } else if (data.low_confidence_count > 0) {
+      nextAction = '知识库编辑复核低置信度条款';
+      nextOwner = '知识库编辑';
+    } else if (!data.desensitization_note) {
+      nextAction = '模型评测同事补录脱敏规则备注';
+      nextOwner = '模型评测同事-小孟';
+    } else {
+      nextAction = '继续复核流程';
+      nextOwner = '知识库编辑';
+    }
+  }
+
+  const clausesHtml = data.extracted_clauses.map(c => {
+    const lowClass = c.confidence < 0.7 ? 'low' : '';
+    const lowTag = c.confidence < 0.7 ? '<span class="tag tag-danger">低置信度</span>' : '';
+    return `
+      <div class="clause-item ${lowClass}">
+        <div class="clause-header">
+          <span class="clause-type">${c.clause_type}</span>
+          <span>
+            ${lowTag}
+            <span class="tag tag-info">置信度 ${(c.confidence * 100).toFixed(1)}%</span>
+          </span>
+        </div>
+        <div class="clause-content">${c.content}</div>
+      </div>
+    `;
+  }).join('');
+
+  const ticketsHtml = data.tickets.length > 0
+    ? data.tickets.map(t => `
+        <div class="clause-item">
+          <div class="clause-header">
+            <span class="clause-type">${t.ticket_id} - ${t.title}</span>
+            <span class="tag tag-warning">${t.status}</span>
+          </div>
+          <div class="clause-content">${t.description || '无描述'}</div>
+          <div style="font-size: 12px; color: #718096; margin-top: 8px;">报告人: ${t.reporter} | ${t.created_at}</div>
+        </div>
+      `).join('')
+    : '<p style="color: #a0aec0; padding: 20px; text-align: center;">暂无关联工单</p>';
+
+  area.innerHTML = `
+    <div class="detail-panel">
+      <h2>${data.sample_id} - ${data.contract_name}</h2>
+
+      ${data.is_masked_by_avg ? `
+        <div class="alert alert-warning">
+          ⚠️ <strong>注意：</strong>该样本的低置信度条款被高置信度条款的平均值掩盖，整体置信度看起来正常但实际有问题，需要知识库编辑重点复核！
+        </div>
+      ` : ''}
+
+      <div class="detail-section">
+        <h3>基本信息</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="k">模型版本</div>
+            <div class="v">${data.model_version}</div>
+          </div>
+          <div class="info-item">
+            <div class="k">整体置信度</div>
+            <div class="v">${(data.overall_confidence * 100).toFixed(2)}%</div>
+          </div>
+          <div class="info-item">
+            <div class="k">复核状态</div>
+            <div class="v">${data.review_status}</div>
+          </div>
+          <div class="info-item">
+            <div class="k">条款总数</div>
+            <div class="v">${data.clause_count}</div>
+          </div>
+          <div class="info-item">
+            <div class="k">低置信度条款</div>
+            <div class="v" style="color: ${data.low_confidence_count > 0 ? '#e53e3e' : 'inherit'}">${data.low_confidence_count} 个</div>
+          </div>
+          <div class="info-item">
+            <div class="k">被平均掩盖</div>
+            <div class="v" style="color: ${data.is_masked_by_avg ? '#d69e2e' : 'inherit'}">${data.is_masked_by_avg ? '是 ⚠️' : '否'}</div>
+          </div>
+        </div>
+      </div>
+
+      ${nextAction ? `
+      <div class="detail-section">
+        <h3>下一步行动</h3>
+        <div class="info-grid">
+          <div class="info-item" style="grid-column: span 2;">
+            <div class="k">行动</div>
+            <div class="v">${nextAction}</div>
+          </div>
+          <div class="info-item">
+            <div class="k">负责人</div>
+            <div class="v ${ownerClass}">${nextOwner}</div>
+          </div>
+        </div>
+      </div>
+      ` : ''}
+
+      <div class="detail-section">
+        <h3>抽取条款明细</h3>
+        ${clausesHtml}
+      </div>
+
+      <div class="detail-section">
+        <h3>关联工单</h3>
+        ${ticketsHtml}
+        <button class="btn btn-outline" style="margin-top: 8px;" onclick="openTicketModal('${data.sample_id}')">+ 关联工单</button>
+      </div>
+
+      <div class="detail-section">
+        <h3>脱敏规则备注</h3>
+        ${data.desensitization_note ? `<div class="clause-item"><div class="clause-content">${data.desensitization_note}</div></div>` : '<p style="color: #a0aec0; padding: 20px; text-align: center;">暂无脱敏备注</p>'}
+        <button class="btn btn-success" style="margin-top: 8px;" onclick="openNoteModal('${data.sample_id}')">📝 小孟补录脱敏备注</button>
+      </div>
+
+      <div class="detail-section">
+        <h3>操作</h3>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn btn-success" onclick="updateStatus('${data.sample_id}', 'approved')">通过</button>
+          <button class="btn btn-danger" onclick="updateStatus('${data.sample_id}', 'rejected')">拒绝</button>
+          <button class="btn btn-warning" onclick="updateStatus('${data.sample_id}', 'pending')">重置为待复核</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+async function updateStatus(sampleId, status) {
+  await api(`/api/samples/${sampleId}`, {
+    method: 'PUT',
+    body: { review_status: status }
+  });
+  await refreshAll();
+  if (currentSampleId === sampleId) {
+    showDetail(sampleId);
+  }
+}
+
+function openNoteModal(sampleId) {
+  currentNoteSampleId = sampleId;
+  document.getElementById('note-content').value = '';
+  document.getElementById('modal-note').classList.add('active');
+}
+
+function openTicketModal(sampleId) {
+  currentTicketSampleId = sampleId;
+  document.getElementById('ticket-title').value = '';
+  document.getElementById('ticket-desc').value = '';
+  document.getElementById('modal-ticket').classList.add('active');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('active');
+}
+
+async function submitNote() {
+  const note = document.getElementById('note-content').value;
+  const by = document.getElementById('note-by').value;
+  if (!note.trim()) return;
+
+  await api(`/api/samples/${currentNoteSampleId}/notes`, {
+    method: 'POST',
+    body: { note, added_by: by }
+  });
+  closeModal('modal-note');
+  await refreshAll();
+  showDetail(currentNoteSampleId);
+}
+
+async function submitTicket() {
+  const title = document.getElementById('ticket-title').value;
+  const desc = document.getElementById('ticket-desc').value;
+  const reporter = document.getElementById('ticket-reporter').value;
+  if (!title.trim()) return;
+
+  await api(`/api/samples/${currentTicketSampleId}/tickets`, {
+    method: 'POST',
+    body: { title, description: desc, reporter }
+  });
+  closeModal('modal-ticket');
+  await refreshAll();
+  showDetail(currentTicketSampleId);
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelector(`.tab[data-tab="${name}"]`).classList.add('active');
+  document.getElementById(`panel-${name}`).classList.add('active');
+}
+
+async function runCompare() {
+  const v1 = document.getElementById('compare-v1').value;
+  const v2 = document.getElementById('compare-v2').value;
+  const by = document.getElementById('compare-by').value;
+
+  if (!v1 || !v2) {
+    alert('请选择两个版本');
+    return;
+  }
+
+  const resultEl = document.getElementById('compare-result');
+  resultEl.innerHTML = '<div class="loading">正在生成对比报告...</div>';
+
+  const [report, textReport] = await Promise.all([
+    api('/api/compare', { method: 'POST', body: { v1, v2, generated_by: by } }),
+    api('/api/compare/text', { method: 'POST', body: { v1, v2, generated_by: by } })
+  ]);
+
+  const itemsHtml = report.items.map(item => {
+    const maskedClass = item.was_masked_in_v1 || item.was_masked_in_v2 ? 'masked' : '';
+    const change = item.confidence_change > 0
+      ? `<span class="change-up">↑ ${item.confidence_change.toFixed(3)}</span>`
+      : item.confidence_change < 0
+        ? `<span class="change-down">↓ ${Math.abs(item.confidence_change).toFixed(3)}</span>`
+        : '<span>-</span>';
+    const ownerClass = item.next_owner === '知识库编辑' ? 'owner-knowledge' : 'owner-model';
+
+    return `
+      <div class="compare-item-row ${maskedClass}">
+        <div class="sample-id">${item.sample_id}</div>
+        <div>${item.contract_name}</div>
+        <div>${item.v1_confidence ? (item.v1_confidence * 100).toFixed(1) + '%' : '-'}</div>
+        <div>${item.v2_confidence ? (item.v2_confidence * 100).toFixed(1) + '%' : '-'}</div>
+        <div>
+          <div class="next-action">${item.next_action}</div>
+          ${item.was_masked_in_v1 || item.was_masked_in_v2 ? '<span class="tag tag-danger">被平均掩盖⚠️</span>' : ''}
+          ${item.has_ticket ? '<span class="tag tag-info">有工单</span>' : ''}
+        </div>
+        <div class="next-owner ${ownerClass}">${item.next_owner}</div>
+      </div>
+    `;
+  }).join('');
+
+  resultEl.innerHTML = `
+    <div class="compare-result">
+      <h3 style="margin-bottom: 16px;">版本对比报告: ${v1} → ${v2}</h3>
+
+      <div class="compare-summary">
+        <div class="stat-card">
+          <div class="label">样本数变化</div>
+          <div class="value">${report.summary.total_v1} → ${report.summary.total_v2}</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">置信度提升</div>
+          <div class="value" style="color: #38a169;">${report.summary.improved} 个</div>
+        </div>
+        <div class="stat-card warning">
+          <div class="label">被平均掩盖</div>
+          <div class="value">${report.summary.masked_v1} → ${report.summary.masked_v2}</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">待知识库编辑复核</div>
+          <div class="value" style="color: #805ad5;">${report.summary.need_knowledge_review} 个</div>
+        </div>
+      </div>
+
+      <h4 style="margin: 20px 0 12px;">样本明细</h4>
+      <div style="border: 1px solid #e2e8f0; border-radius: 6px; overflow: hidden;">
+        <div style="padding: 12px; background: #f7fafc; font-weight: 500; display: grid; grid-template-columns: 100px 1fr 100px 100px 1fr 120px; gap: 12px; border-bottom: 1px solid #e2e8f0;">
+          <span>样本ID</span>
+          <span>合同名称</span>
+          <span>${v1}置信度</span>
+          <span>${v2}置信度</span>
+          <span>下一步行动</span>
+          <span>负责人</span>
+        </div>
+        ${itemsHtml}
+      </div>
+
+      <h4 style="margin: 24px 0 12px;">完整文字报告</h4>
+      <div class="text-report">${textReport.text}</div>
+    </div>
+  `;
+}
+
+async function loadDemoData() {
+  if (!confirm('将生成 v1.0.0 和 v1.1.0 两个版本的演示数据，继续吗？')) return;
+
+  await api('/api/import/demo', { method: 'POST', body: { version: '1.0.0', count: 5 } });
+  await api('/api/import/demo', { method: 'POST', body: { version: '1.1.0', count: 5 } });
+
+  await refreshAll();
+  alert('演示数据已生成！包含两个版本，可在"版本对比"中查看差异。');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  refreshAll();
+});
+</script>
+</body>
+</html>

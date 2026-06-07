@@ -1,0 +1,230 @@
+[
+  {
+    "sample_id": "SDEMO001",
+    "contract_name": "采购合同-2024-001",
+    "model_version": "1.0.0",
+    "overall_confidence": 0.82,
+    "ticket_id": null,
+    "desensitization_note": "[R1C78C1E6] desensitization: 此样本涉及客户公司名称脱敏，违约责任条款置信度低因脱敏后语义特征缺失",
+    "review_status": "pending",
+    "reviewer": null,
+    "created_at": "2026-06-07T11:49:56.275172",
+    "updated_at": "2026-06-07T11:49:56.279877",
+    "is_masked_by_avg": true,
+    "low_confidence_count": 1,
+    "clause_count": 3,
+    "extracted_clauses": [
+      {
+        "clause_id": "C001",
+        "clause_type": "payment",
+        "content": "甲方应于收货后30日内支付全部货款",
+        "confidence": 0.95,
+        "start_pos": 0,
+        "end_pos": 22,
+        "is_correct": null
+      },
+      {
+        "clause_id": "C002",
+        "clause_type": "delivery",
+        "content": "乙方应于合同签订后15日内完成交货",
+        "confidence": 0.92,
+        "start_pos": 23,
+        "end_pos": 45,
+        "is_correct": null
+      },
+      {
+        "clause_id": "C003",
+        "clause_type": "liability",
+        "content": "违约方应赔偿对方全部损失",
+        "confidence": 0.55,
+        "start_pos": 46,
+        "end_pos": 65,
+        "is_correct": null
+      }
+    ]
+  },
+  {
+    "sample_id": "SDEMO002",
+    "contract_name": "服务协议-2024-056",
+    "model_version": "1.0.0",
+    "overall_confidence": 0.78,
+    "ticket_id": null,
+    "desensitization_note": "",
+    "review_status": "pending",
+    "reviewer": null,
+    "created_at": "2026-06-07T11:49:56.275621",
+    "updated_at": "2026-06-07T11:49:56.275630",
+    "is_masked_by_avg": false,
+    "low_confidence_count": 1,
+    "clause_count": 2,
+    "extracted_clauses": [
+      {
+        "clause_id": "C004",
+        "clause_type": "term",
+        "content": "本协议有效期为一年",
+        "confidence": 0.94,
+        "start_pos": 0,
+        "end_pos": 12,
+        "is_correct": null
+      },
+      {
+        "clause_id": "C005",
+        "clause_type": "confidential",
+        "content": "保密期限为协议终止后五年",
+        "confidence": 0.6,
+        "start_pos": 13,
+        "end_pos": 30,
+        "is_correct": null
+      }
+    ]
+  },
+  {
+    "sample_id": "SDEMO003",
+    "contract_name": "劳动合同-T003",
+    "model_version": "1.0.0",
+    "overall_confidence": 0.65,
+    "ticket_id": null,
+    "desensitization_note": "",
+    "review_status": "pending",
+    "reviewer": null,
+    "created_at": "2026-06-07T11:49:56.276188",
+    "updated_at": "2026-06-07T11:49:56.276192",
+    "is_masked_by_avg": false,
+    "low_confidence_count": 2,
+    "clause_count": 2,
+    "extracted_clauses": [
+      {
+        "clause_id": "C006",
+        "clause_type": "salary",
+        "content": "月薪8000元人民币",
+        "confidence": 0.58,
+        "start_pos": 0,
+        "end_pos": 10,
+        "is_correct": null
+      },
+      {
+        "clause_id": "C007",
+        "clause_type": "probation",
+        "content": "试用期为三个月",
+        "confidence": 0.62,
+        "start_pos": 11,
+        "end_pos": 21,
+        "is_correct": null
+      }
+    ]
+  },
+  {
+    "sample_id": "SDEMO001_V2",
+    "contract_name": "采购合同-2024-001",
+    "model_version": "1.1.0",
+    "overall_confidence": 0.85,
+    "ticket_id": null,
+    "desensitization_note": "[RE9F68B56] desensitization: 此样本涉及客户公司名称脱敏，违约责任条款置信度低因脱敏后语义特征缺失",
+    "review_status": "pending",
+    "reviewer": null,
+    "created_at": "2026-06-07T11:49:56.277369",
+    "updated_at": "2026-06-07T11:49:56.281165",
+    "is_masked_by_avg": true,
+    "low_confidence_count": 1,
+    "clause_count": 3,
+    "extracted_clauses": [
+      {
+        "clause_id": "C001",
+        "clause_type": "payment",
+        "content": "甲方应于收货后30日内支付全部货款",
+        "confidence": 0.96,
+        "start_pos": 0,
+        "end_pos": 22,
+        "is_correct": null
+      },
+      {
+        "clause_id": "C002",
+        "clause_type": "delivery",
+        "content": "乙方应于合同签订后15日内完成交货",
+        "confidence": 0.94,
+        "start_pos": 23,
+        "end_pos": 45,
+        "is_correct": null
+      },
+      {
+        "clause_id": "C003",
+        "clause_type": "liability",
+        "content": "违约方应赔偿对方全部损失",
+        "confidence": 0.62,
+        "start_pos": 46,
+        "end_pos": 65,
+        "is_correct": null
+      }
+    ]
+  },
+  {
+    "sample_id": "SDEMO002_V2",
+    "contract_name": "服务协议-2024-056",
+    "model_version": "1.1.0",
+    "overall_confidence": 0.82,
+    "ticket_id": null,
+    "desensitization_note": "",
+    "review_status": "pending",
+    "reviewer": null,
+    "created_at": "2026-06-07T11:49:56.278228",
+    "updated_at": "2026-06-07T11:49:56.278239",
+    "is_masked_by_avg": false,
+    "low_confidence_count": 1,
+    "clause_count": 2,
+    "extracted_clauses": [
+      {
+        "clause_id": "C004",
+        "clause_type": "term",
+        "content": "本协议有效期为一年",
+        "confidence": 0.95,
+        "start_pos": 0,
+        "end_pos": 12,
+        "is_correct": null
+      },
+      {
+        "clause_id": "C005",
+        "clause_type": "confidential",
+        "content": "保密期限为协议终止后五年",
+        "confidence": 0.68,
+        "start_pos": 13,
+        "end_pos": 30,
+        "is_correct": null
+      }
+    ]
+  },
+  {
+    "sample_id": "SDEMO003_V2",
+    "contract_name": "劳动合同-T003",
+    "model_version": "1.1.0",
+    "overall_confidence": 0.72,
+    "ticket_id": null,
+    "desensitization_note": "",
+    "review_status": "pending",
+    "reviewer": null,
+    "created_at": "2026-06-07T11:49:56.278809",
+    "updated_at": "2026-06-07T11:49:56.278814",
+    "is_masked_by_avg": false,
+    "low_confidence_count": 1,
+    "clause_count": 2,
+    "extracted_clauses": [
+      {
+        "clause_id": "C006",
+        "clause_type": "salary",
+        "content": "月薪8000元人民币",
+        "confidence": 0.68,
+        "start_pos": 0,
+        "end_pos": 10,
+        "is_correct": null
+      },
+      {
+        "clause_id": "C007",
+        "clause_type": "probation",
+        "content": "试用期为三个月",
+        "confidence": 0.75,
+        "start_pos": 11,
+        "end_pos": 21,
+        "is_correct": null
+      }
+    ]
+  }
+]

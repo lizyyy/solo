@@ -1,0 +1,24 @@
+[
+  {
+    "rule_id": "R1C78C1E6",
+    "sample_id": "SDEMO001",
+    "clause_id": null,
+    "rule_type": "desensitization",
+    "pattern": "公司全称",
+    "replacement": "甲方",
+    "note": "此样本涉及客户公司名称脱敏，违约责任条款置信度低因脱敏后语义特征缺失",
+    "added_by": "小孟",
+    "created_at": "2026-06-07T11:49:56.279858"
+  },
+  {
+    "rule_id": "RE9F68B56",
+    "sample_id": "SDEMO001_V2",
+    "clause_id": null,
+    "rule_type": "desensitization",
+    "pattern": "公司全称",
+    "replacement": "甲方",
+    "note": "此样本涉及客户公司名称脱敏，违约责任条款置信度低因脱敏后语义特征缺失",
+    "added_by": "小孟",
+    "created_at": "2026-06-07T11:49:56.281157"
+  }
+]

@@ -1,0 +1,33 @@
+[
+  {
+    "sample_id": "SDEMO001",
+    "contract_name": "采购合同-2024-001",
+    "overall_confidence": 0.82,
+    "review_status": "pending",
+    "extracted_clauses": [
+      {"clause_id": "C001", "clause_type": "payment", "content": "甲方应于收货后30日内支付全部货款", "confidence": 0.95, "start_pos": 0, "end_pos": 22},
+      {"clause_id": "C002", "clause_type": "delivery", "content": "乙方应于合同签订后15日内完成交货", "confidence": 0.92, "start_pos": 23, "end_pos": 45},
+      {"clause_id": "C003", "clause_type": "liability", "content": "违约方应赔偿对方全部损失", "confidence": 0.55, "start_pos": 46, "end_pos": 65}
+    ]
+  },
+  {
+    "sample_id": "SDEMO002",
+    "contract_name": "服务协议-2024-056",
+    "overall_confidence": 0.78,
+    "review_status": "pending",
+    "extracted_clauses": [
+      {"clause_id": "C004", "clause_type": "term", "content": "本协议有效期为一年", "confidence": 0.94, "start_pos": 0, "end_pos": 12},
+      {"clause_id": "C005", "clause_type": "confidential", "content": "保密期限为协议终止后五年", "confidence": 0.60, "start_pos": 13, "end_pos": 30}
+    ]
+  },
+  {
+    "sample_id": "SDEMO003",
+    "contract_name": "劳动合同-T003",
+    "overall_confidence": 0.65,
+    "review_status": "pending",
+    "extracted_clauses": [
+      {"clause_id": "C006", "clause_type": "salary", "content": "月薪8000元人民币", "confidence": 0.58, "start_pos": 0, "end_pos": 10},
+      {"clause_id": "C007", "clause_type": "probation", "content": "试用期为三个月", "confidence": 0.62, "start_pos": 11, "end_pos": 21}
+    ]
+  }
+]
