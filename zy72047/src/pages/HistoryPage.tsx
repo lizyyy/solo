@@ -173,8 +173,8 @@ export default function HistoryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-vinyl-900 via-vinyl-800 to-vinyl-900 p-6">
-      <div className="max-w-7xl mx-auto h-[calc(100vh-3rem)]">
+    <div className="p-6">
+      <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
             <History className="text-gold-500" size={40} />
@@ -194,7 +194,7 @@ export default function HistoryPage() {
           )}
         </div>
 
-        <div className="grid grid-cols-12 gap-6 h-[calc(100%-6rem)]">
+        <div className="grid grid-cols-12 gap-6 min-h-[600px]">
           <div className="col-span-4 bg-vinyl-800/80 backdrop-blur rounded-xl border border-vinyl-700 flex flex-col overflow-hidden">
             <div className="p-4 border-b border-vinyl-700">
               <h2 className="font-semibold text-vinyl-200">比赛局列表</h2>

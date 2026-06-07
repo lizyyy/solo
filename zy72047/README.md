@@ -1,57 +1,194 @@
-# React + TypeScript + Vite
+# 黑胶节拍修复赛 - 计分系统
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+社团老师小林专用的比赛计分和数据冲突处理工具。深褐色+金色黑胶唱片主题，支持拖拽/点击操作实时计分、历史回放、冲突人工裁决、同事风格交接报告。
 
-Currently, two official plugins are available:
+## 快速开始
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 环境要求
+- Node.js >= 16
+- pnpm 或 npm
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### 安装依赖
+```bash
+pnpm install
+# 或
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### 启动开发服务器
+```bash
+pnpm run dev
+# 或
+npm run dev
 ```
+
+启动后访问：**http://localhost:5173/** （如端口被占用，会自动递增到 5174、5175 等）
+
+### 构建生产版本
+```bash
+pnpm run build
+# 或
+npm run build
+```
+
+构建产物输出到 `dist/` 目录。
+
+## 页面功能说明
+
+### 1. 比赛控制台（/dashboard）
+核心操作页面，用于进行一局比赛。
+
+**操作步骤：**
+1. 选择关卡（默认：入门训练·第一期）
+2. 输入玩家姓名
+3. 点击「开始比赛」
+4. 进行操作：
+   - **拖拽黑胶元素**：拖动不同颜色的黑胶唱片到操作区，产生不同效果
+   - **点击功能按钮**：加速⚡、修复🔧、高风险🔥、安全🛡️、赌博🎲、彩蛋✨
+5. 实时查看「裁决追踪」面板，确认每步操作的判断逻辑
+6. 点击「结束比赛」保存记录
+
+**关键特性：**
+- 每次操作真实影响资源、分数、风险值
+- 资源不足时自动拦截消耗操作，按钮变灰
+- 负数资源时显示红色警告
+- 所有操作自动记录来源和时间戳
+
+### 2. 关卡管理（/levels）
+管理和配置比赛关卡。
+
+**功能：**
+- 查看 4 个预设关卡：入门训练、进阶挑战、专家模式、特别活动
+- 点击「查看详情」查看关卡规则和黑胶元素配置
+- 点击「编辑」修改关卡参数
+- 点击「新增关卡」创建自定义关卡
+- 「导入」/「导出」JSON 格式关卡配置
+- 「重置」恢复为默认关卡
+
+**切换关卡方法：**
+- 在比赛控制台的「关卡选择」下拉框切换（比赛进行中不可切换）
+- 或在关卡管理页面编辑/新增关卡后，回到控制台选择
+
+### 3. 历史记录（/history）
+查看和回放历史比赛记录。
+
+**查看一局历史：**
+1. 左侧列表显示所有比赛局，按时间倒序排列
+2. 点击任意一局，右侧显示：
+   - 比赛基本信息（玩家、关卡、时长、最终分数）
+   - 操作时间线（每一步操作的资源/分数/风险变化）
+3. 使用回放控制：
+   - ⏪ 回到开始
+   - ⏮️ 上一步
+   - ▶️ 播放/暂停
+   - ⏭️ 下一步
+   - ⏩ 跳到结尾
+   - 速度调节：0.5x / 1x / 2x / 4x
+4. 回放时同步更新资源/分数/风险状态，完整复现比赛过程
+
+### 4. 冲突处理（/conflicts）
+处理课堂计分表与导入数据的冲突。
+
+**处理流程：**
+1. 列表显示所有冲突，支持按状态筛选（全部/待处理/已解决）
+2. 点击冲突项查看「证据对比」：
+   - 左侧：课堂计分表数据 + 备注
+   - 右侧：导入数据 + 来源标记
+   - 系统自动分析并给出建议动作
+3. 人工裁决：
+   - 采信课堂计分表
+   - 采信导入数据
+   - 填写裁决理由
+4. 裁决结果自动保留，不覆盖原始数据
+
+**重要原则：**
+- 系统只提供建议，不自动裁决
+- 所有原始备注完整保留，不会因整理数据被洗掉
+- 冲突来源和处理时间完整记录，方便交接追溯
+
+### 5. 报告生成（/reports）
+生成同事风格的交接报告。
+
+**使用方法：**
+1. 下拉框选择要生成报告的比赛局
+2. 点击「生成交接报告」
+3. 预览 Markdown 格式报告，包含：
+   - 比赛概况表格
+   - 本局总结（同事语气描述）
+   - 完整操作时间线
+   - 异常情况说明
+   - 交接建议
+4. 点击「复制内容」复制到剪贴板
+5. 点击「下载文件」保存为 `.md` 文件
+
+## 核心设计原则
+
+### 数据真实性
+- 每次拖拽或点击必须真实影响资源、分数或风险
+- 资源变成负数时红色警示，不假装正常
+- 例外情况在汇总数字中明确标出，不悄悄消失
+
+### 可追溯性
+- 每条记录保留：原始来源、处理时间、操作人
+- "黑胶节拍修复赛"来源标记全程保留
+- 课堂计分表的原始备注完整保留，不自动清洗
+
+### 冲突处理
+- 课堂计分表与导入数据冲突时，展示两边证据
+- 系统只给建议，不替用户拍板
+- 人工裁决时需要填写理由，留痕可查
+
+## 技术栈
+
+- **框架**：React 18 + TypeScript
+- **构建工具**：Vite 6
+- **样式**：TailwindCSS 3
+- **状态管理**：Zustand
+- **拖拽**：@dnd-kit/core
+- **动画**：Framer Motion
+- **图标**：Lucide React
+- **存储**：localStorage（无需后端）
+
+## 项目结构
+
+```
+src/
+├── components/          # 共享组件
+│   ├── console/        # 比赛控制台组件
+│   ├── Navbar.tsx      # 导航栏
+│   └── ...
+├── pages/              # 页面
+│   ├── ConsolePage.tsx    # 比赛控制台
+│   ├── LevelsPage.tsx     # 关卡管理
+│   ├── HistoryPage.tsx    # 历史记录
+│   ├── ConflictsPage.tsx  # 冲突处理
+│   └── ReportsPage.tsx    # 报告生成
+├── engine/             # 核心引擎
+│   ├── GameEngine.ts      # 游戏核心逻辑
+│   ├── ConflictDetector.ts # 冲突检测
+│   ├── HistoryReplayer.ts  # 历史回放
+│   └── ReportGenerator.ts  # 报告生成
+├── store/              # 状态管理
+│   ├── useGameStore.ts    # 游戏状态
+│   ├── useLevelStore.ts   # 关卡状态
+│   └── useHistoryStore.ts # 历史记录状态
+├── types/              # 类型定义
+├── utils/              # 工具函数
+├── hooks/              # 自定义 Hooks
+├── data/               # 预设数据
+└── lib/                # 通用库
+```
+
+## 常见问题
+
+**Q: 数据存在哪里？**
+A: 全部存在浏览器 localStorage 中，无需后端。更换浏览器或清理缓存会丢失数据，建议定期导出备份。
+
+**Q: 如何备份数据？**
+A: 在关卡管理页面点击「导出」保存关卡配置。历史记录可通过生成报告备份。
+
+**Q: 端口被占用怎么办？**
+A: Vite 会自动尝试下一个端口（5173→5174→5175...），终端会显示实际端口。
+
+**Q: 交接时如何让新老师快速上手？**
+A: 给 TA 看这份 README，然后演示：开一局比赛 → 结束 → 去历史记录回放 → 生成报告。

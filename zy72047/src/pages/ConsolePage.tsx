@@ -115,7 +115,7 @@ export default function ConsolePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-vinyl-900 via-vinyl-800 to-vinyl-900 p-6" onMouseMove={handleDragMove} onMouseUp={handleDragEnd} onMouseLeave={handleDragEnd}>
+    <div className="p-6" onMouseMove={handleDragMove} onMouseUp={handleDragEnd} onMouseLeave={handleDragEnd}>
       <AnimatePresence>
         {error && (
           <motion.div
