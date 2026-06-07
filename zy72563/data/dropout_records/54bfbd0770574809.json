@@ -1,0 +1,29 @@
+{
+  "record_id": "54bfbd0770574809",
+  "client_id": "client_B",
+  "round_num": 1,
+  "detected_at": "2026-06-07T15:52:18.800275",
+  "status": "pending_review",
+  "snapshot_ids": [
+    "test_snap_002"
+  ],
+  "log_ids": [
+    "test_log_001"
+  ],
+  "remarks": "修改后的备注2",
+  "detected_by": "tester",
+  "reviewed_by": null,
+  "reviewed_at": null,
+  "review_notes": "",
+  "anomaly_score": 0.5,
+  "time_window_crossed": true,
+  "time_window_details": {
+    "min_time": "2026-06-06T13:52:18.799784",
+    "max_time": "2026-06-07T13:52:18.799893",
+    "time_span_hours": 24.00000003027778,
+    "allowed_window_hours": 24,
+    "snapshot_count": 1,
+    "log_count": 1,
+    "crossed": true
+  }
+}
