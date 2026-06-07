@@ -1,0 +1,123 @@
+{
+  "inspections": {
+    "INS-20260607102409": {
+      "id": "INS-20260607102409",
+      "inspector": "王网格员",
+      "inspection_date": "2026-06-07T10:24:09.761737",
+      "location": "古城东大街",
+      "heritage_site": "开元寺钟楼",
+      "opinions": [
+        {
+          "id": "OP-INS-20260607102409-001",
+          "location": "古城东大街",
+          "summary": "居民反映施工围挡挡住了钟楼视线",
+          "original_text": "东大街12号居民李阿姨说：\"这围挡搭起来后，我在家就看不到钟楼了，以前每天开窗都能看见的。\"",
+          "reporter": "李阿姨",
+          "report_time": "2026-06-07T10:24:09.761726",
+          "status": "有原文可追溯",
+          "source_type": "巡查表",
+          "source_id": "INS-20260607102409"
+        },
+        {
+          "id": "OP-INS-20260607102409-002",
+          "location": "古城东大街",
+          "summary": "商户反映招牌被遮挡，只剩汇总无原文",
+          "original_text": null,
+          "reporter": "张老板",
+          "report_time": "2026-06-07T10:24:09.761731",
+          "status": "已复核确认",
+          "source_type": "巡查表",
+          "source_id": "INS-20260607102409"
+        },
+        {
+          "id": "OP-INS-20260607102409-003",
+          "location": "古城东大街",
+          "summary": "居民担心施工破坏道路古树",
+          "original_text": "交叉口附近住的赵大爷说：\"这两棵老槐树有几十年了，施工可别伤着它们。\"",
+          "reporter": "赵大爷",
+          "report_time": "2026-06-07T10:24:09.761733",
+          "status": "有原文可追溯",
+          "source_type": "巡查表",
+          "source_id": "INS-20260607102409"
+        },
+        {
+          "id": "OP-INS-20260607102409-004",
+          "location": "古城东大街",
+          "summary": "有住户反映夜间施工噪音，只剩汇总无原文",
+          "original_text": null,
+          "reporter": "刘女士",
+          "report_time": "2026-06-07T10:24:09.761734",
+          "status": "只剩汇总无原文",
+          "source_type": "巡查表",
+          "source_id": "INS-20260607102409"
+        },
+        {
+          "id": "OP-INS-20260607102409-005",
+          "location": "古城东大街",
+          "summary": "居民反映广场宣传栏被施工占用",
+          "original_text": "广场晨练的陈师傅说：\"我们每天看的宣传栏被围起来了，能不能挪个地方？\"",
+          "reporter": "陈师傅",
+          "report_time": "2026-06-07T10:24:09.761735",
+          "status": "有原文可追溯",
+          "source_type": "巡查表",
+          "source_id": "INS-20260607102409"
+        }
+      ],
+      "notes": ""
+    }
+  },
+  "notices": {
+    "NOT-20260607102409": {
+      "id": "NOT-20260607102409",
+      "project_name": "东大街地下管网改造工程",
+      "location": "古城东大街（文庙街至钟楼段）",
+      "start_date": "2026-06-10T00:00:00",
+      "end_date": "2026-08-25T00:00:00",
+      "construction_type": "市政管网改造",
+      "impact_on_heritage": "施工围挡沿道路红线设置，临时占用部分人行道，对开元寺钟楼视廊有轻度遮挡，施工完成后恢复原貌。施工期间采取降噪措施，严格控制作业时间。",
+      "publisher": "市市政工程管理处",
+      "related_opinion_ids": [
+        "OP-INS-20260607102409-001",
+        "OP-INS-20260607102409-004"
+      ]
+    }
+  },
+  "conflicts": {
+    "CF-OP-INS-20260607102409-002": {
+      "id": "CF-OP-INS-20260607102409-002",
+      "opinion_id": "OP-INS-20260607102409-002",
+      "opinion_summary": "商户反映招牌被遮挡，只剩汇总无原文",
+      "location": "古城东大街",
+      "conflict_reason": "居民意见仅汇总无原文，需社区书记复核确认",
+      "missing_materials": [
+        "居民意见原文",
+        "现场照片（如有）",
+        "相关佐证材料"
+      ],
+      "next_action": "处理完成",
+      "conflict_level": "中",
+      "is_resolved": true,
+      "resolution_note": "社区书记确认: 情况属实，已确认",
+      "created_at": "2026-06-07T10:24:09.761745",
+      "updated_at": "2026-06-07T10:24:09.762205"
+    },
+    "CF-OP-INS-20260607102409-004": {
+      "id": "CF-OP-INS-20260607102409-004",
+      "opinion_id": "OP-INS-20260607102409-004",
+      "opinion_summary": "有住户反映夜间施工噪音，只剩汇总无原文",
+      "location": "古城东大街",
+      "conflict_reason": "居民意见仅汇总无原文，需社区书记复核确认；施工告示显示：施工围挡沿道路红线设置，临时占用部分人行道，对开元寺钟楼视廊有轻度遮挡，施工完成后恢复原貌。施工期间采取降噪措施，严格控制作业时间。",
+      "missing_materials": [
+        "居民意见原文",
+        "现场照片（如有）",
+        "相关佐证材料"
+      ],
+      "next_action": "交通协管老马补充",
+      "conflict_level": "高",
+      "is_resolved": false,
+      "resolution_note": "",
+      "created_at": "2026-06-07T10:24:09.761747",
+      "updated_at": "2026-06-07T10:24:09.762114"
+    }
+  }
+}
