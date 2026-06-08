@@ -1,7 +1,7 @@
 import type { PlanVersion, DiffResult, TraceNode } from '@/types';
 import { mockPlans } from '@/mocks/plans';
 
-let plansData: PlanVersion[] = [...mockPlans];
+const plansData: PlanVersion[] = [...mockPlans];
 
 function delay(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));

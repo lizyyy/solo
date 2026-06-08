@@ -22,7 +22,7 @@ export default function PointsMerge() {
 
   useEffect(() => {
     loadCandidates();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadCandidates = async () => {
     setLoadingCandidates(true);

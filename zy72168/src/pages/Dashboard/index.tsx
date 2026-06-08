@@ -12,8 +12,6 @@ import {
   Circle,
   ArrowRight,
   TrendingUp,
-  Users,
-  Clock,
   Database,
   GitBranch,
   FileOutput,
@@ -150,10 +148,15 @@ export default function Dashboard() {
   const [isDemoPlaying, setIsDemoPlaying] = useState(false);
 
   useEffect(() => {
-    fetchPoints();
-    fetchFeedbacks();
-    fetchPlans();
-    fetchCrossPeriodData();
+    const loadData = async () => {
+      await Promise.all([
+        fetchPoints(),
+        fetchFeedbacks(),
+        fetchPlans(),
+      ]);
+      await fetchCrossPeriodData();
+    };
+    loadData();
   }, [fetchPoints, fetchFeedbacks, fetchPlans, fetchCrossPeriodData]);
 
   useEffect(() => {
