@@ -67,32 +67,78 @@ function initTables(d: Database.Database) {
   `)
 }
 
+const SAMPLE_RECORDS = [
+  { id: 'sample-001', track_name: '夏夜晚风', artist: '回声乐队', revenue: 12000, share_ratio: 0.50, share_amount: 6000, status: 'smooth', source: 'excel', original_note: '', current_note: '' },
+  { id: 'sample-002', track_name: '深巷', artist: '锈色吉他', revenue: 8000, share_ratio: null, share_amount: null, status: 'needs_confirmation', source: 'excel', original_note: '比例未定 待核实', current_note: '比例未定 待核实' },
+  { id: 'sample-003', track_name: '旧日之光', artist: '老王', revenue: 5000, share_ratio: 0.40, share_amount: 2000, status: 'old_standard', source: 'excel', original_note: '按老规矩分', current_note: '按老规矩分（旧口径比例60%，当前40%）' },
+]
+
+const SAMPLE_JUDGMENTS = [
+  { id: 'j-001-1', record_id: 'sample-001', step: 1, type: 'system_auto', description: '系统匹配到合同分账比例', result: '分账比例50%，分账金额6000元，状态标记为顺利' },
+  { id: 'j-002-1', record_id: 'sample-002', step: 1, type: 'system_auto', description: '系统未找到合同分账比例', result: '分账比例缺失，状态标记为待确认' },
+  { id: 'j-003-1', record_id: 'sample-003', step: 1, type: 'system_auto', description: '来自旧Excel，检测到比例与当前标准不一致', result: '旧口径比例60%与当前标准50%不一致，标记为旧口径' },
+  { id: 'j-003-2', record_id: 'sample-003', step: 2, type: 'diff_detected', description: '补录备注后对比差异', result: '比例从旧口径60%调整为当前40%，差异原因：按新标准执行' },
+]
+
 function seedSampleData(d: Database.Database) {
   const count = d.prepare('SELECT COUNT(*) as cnt FROM records').get() as { cnt: number }
-  if (count.cnt > 0) return
 
-  const now = new Date().toISOString().replace('T', ' ').replace(/\.\d+Z$/, '')
+  if (count.cnt === 0) {
+    const now = new Date().toISOString().replace('T', ' ').replace(/\.\d+Z$/, '')
+    const insertRecord = d.prepare(`
+      INSERT INTO records (id, track_name, artist, revenue, share_ratio, share_amount, status, source, original_note, current_note, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `)
+    const insertJudgment = d.prepare(`
+      INSERT INTO judgment_logs (id, record_id, step, type, description, result, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `)
+    const transaction = d.transaction(() => {
+      for (const r of SAMPLE_RECORDS) {
+        insertRecord.run(r.id, r.track_name, r.artist, r.revenue, r.share_ratio, r.share_amount, r.status, r.source, r.original_note, r.current_note, now, now)
+      }
+      for (const j of SAMPLE_JUDGMENTS) {
+        insertJudgment.run(j.id, j.record_id, j.step, j.type, j.description, j.result, now)
+      }
+    })
+    transaction()
+    return
+  }
 
-  const insertRecord = d.prepare(`
-    INSERT INTO records (id, track_name, artist, revenue, share_ratio, share_amount, status, source, original_note, current_note, created_at, updated_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  const resetRecord = d.prepare(`
+    UPDATE records SET
+      track_name = ?, artist = ?, revenue = ?, share_ratio = ?, share_amount = ?,
+      status = ?, source = ?, original_note = ?, current_note = ?,
+      updated_at = datetime('now', 'localtime')
+    WHERE id = ?
+  `)
+  const resetJudgment = d.prepare(`
+    INSERT OR REPLACE INTO judgment_logs (id, record_id, step, type, description, result, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, datetime('now', 'localtime'))
   `)
 
-  const insertJudgment = d.prepare(`
-    INSERT INTO judgment_logs (id, record_id, step, type, description, result, created_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-  `)
+  const sampleIds = SAMPLE_RECORDS.map(r => r.id)
+  const sampleJudgmentIds = SAMPLE_JUDGMENTS.map(j => j.id)
+  const jidPlaceholders = sampleJudgmentIds.length > 0 ? sampleJudgmentIds.map(() => '?').join(',') : 'SELECT NULL'
 
   const transaction = d.transaction(() => {
-    insertRecord.run('sample-001', '夏夜晚风', '回声乐队', 12000, 0.50, 6000, 'smooth', 'excel', '', '', now, now)
-    insertRecord.run('sample-002', '深巷', '锈色吉他', 8000, null, null, 'needs_confirmation', 'excel', '比例未定 待核实', '比例未定 待核实', now, now)
-    insertRecord.run('sample-003', '旧日之光', '老王', 5000, 0.40, 2000, 'old_standard', 'excel', '按老规矩分', '按老规矩分（旧口径比例60%，当前40%）', now, now)
-
-    insertJudgment.run('j-001-1', 'sample-001', 1, 'system_auto', '系统匹配到合同分账比例', '分账比例50%，分账金额6000元，状态标记为顺利', now)
-    insertJudgment.run('j-002-1', 'sample-002', 1, 'system_auto', '系统未找到合同分账比例', '分账比例缺失，状态标记为待确认', now)
-    insertJudgment.run('j-003-1', 'sample-003', 1, 'system_auto', '来自旧Excel，检测到比例与当前标准不一致', '旧口径比例60%与当前标准50%不一致，标记为旧口径', now)
-    insertJudgment.run('j-003-2', 'sample-003', 2, 'diff_detected', '补录备注后对比差异', '比例从旧口径60%调整为当前40%，差异原因：按新标准执行', now)
+    for (const rid of sampleIds) {
+      d.prepare(`DELETE FROM judgment_logs WHERE record_id = ? AND id NOT IN (${jidPlaceholders})`).run(rid, ...sampleJudgmentIds)
+    }
+    for (const r of SAMPLE_RECORDS) {
+      const existing = d.prepare('SELECT id FROM records WHERE id = ?').get(r.id)
+      if (existing) {
+        resetRecord.run(r.track_name, r.artist, r.revenue, r.share_ratio, r.share_amount, r.status, r.source, r.original_note, r.current_note, r.id)
+      } else {
+        d.prepare(`
+          INSERT INTO records (id, track_name, artist, revenue, share_ratio, share_amount, status, source, original_note, current_note, created_at, updated_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'), datetime('now', 'localtime'))
+        `).run(r.id, r.track_name, r.artist, r.revenue, r.share_ratio, r.share_amount, r.status, r.source, r.original_note, r.current_note)
+      }
+    }
+    for (const j of SAMPLE_JUDGMENTS) {
+      resetJudgment.run(j.id, j.record_id, j.step, j.type, j.description, j.result)
+    }
   })
-
   transaction()
 }

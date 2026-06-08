@@ -2,6 +2,7 @@ import { Router, type Request, type Response } from 'express'
 import { v4 as uuidv4 } from 'uuid'
 import multer from 'multer'
 import * as xlsx from 'xlsx'
+import fs from 'fs'
 import { getDb } from '../db.js'
 
 const upload = multer({ dest: 'uploads/' })
@@ -121,6 +122,29 @@ router.post('/', upload.array('files', 50), (req: Request, res: Response) => {
           INSERT INTO judgment_logs (id, record_id, step, type, description, result, created_at)
           VALUES (?, ?, ?, ?, ?, ?, ?)
         `).run(uuidv4(), id, 1, 'system_auto', '合同截图导入，缺少分账信息', '标记为待确认，需人工提取合同内容', now)
+
+        const record = db.prepare('SELECT * FROM records WHERE id = ?').get(id)
+        importedRecords.push(record)
+        successCount++
+      } else if (ext === 'txt') {
+        const id = uuidv4()
+        const fileName = file.originalname || 'unknown'
+        const content = fs.readFileSync(file.path, 'utf-8').trim()
+        const lines = content.split(/\r?\n/).filter(l => l.trim())
+        const firstLine = lines[0] || fileName
+        const trackName = firstLine.length > 50 ? firstLine.slice(0, 50) + '…' : firstLine
+        const note = lines.length > 1 ? lines.slice(1).join('；') : `群聊批注：${fileName}`
+        const judgment = determineStatus(null, note)
+
+        db.prepare(`
+          INSERT INTO records (id, track_name, artist, revenue, share_ratio, share_amount, status, source, original_note, current_note, created_at, updated_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `).run(id, trackName, '待补充', 0, null, null, judgment.status, 'chat_annotation', note, note, now, now)
+
+        db.prepare(`
+          INSERT INTO judgment_logs (id, record_id, step, type, description, result, created_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?)
+        `).run(uuidv4(), id, 1, 'system_auto', judgment.description, judgment.result, now)
 
         const record = db.prepare('SELECT * FROM records WHERE id = ?').get(id)
         importedRecords.push(record)
