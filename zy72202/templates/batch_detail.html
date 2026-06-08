@@ -71,8 +71,10 @@
           <td>
             {% if c.holiday_extension_note %}
             {{ c.holiday_extension_note }}
-            {% else %}
+            {% elif c.deviation != 0 %}
             <span class="missing-tag" data-component-id="{{ c.id }}">缺</span>
+            {% else %}
+            —
             {% endif %}
           </td>
           <td>

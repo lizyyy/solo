@@ -81,7 +81,13 @@ def api_import():
     if not data or "filepath" not in data:
         return jsonify({"error": "缺少 filepath 参数"}), 400
     try:
-        result = import_from_file(data["filepath"])
+        from etf_review.services import SAMPLE_DATA_PATH
+        filepath = data["filepath"]
+        if filepath == "sample_data.json":
+            filepath = str(SAMPLE_DATA_PATH)
+        elif not Path(filepath).is_absolute():
+            filepath = str(BASE_DIR / filepath)
+        result = import_from_file(filepath)
         return jsonify(result)
     except Exception as e:
         return jsonify({"error": str(e)}), 500

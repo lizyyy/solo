@@ -138,7 +138,7 @@ def generate_report(batch_id: str) -> str:
             desc_parts.append(ch["reason_kept"])
         if ch.get("missing_materials") and ch["missing_materials"] != "无":
             desc_parts.append(f"缺: {ch['missing_materials']}")
-        if ch.get("next_action"):
+        if ch.get("next_action") and ch["next_action"] != "无需操作":
             desc_parts.append(f"→ {ch['next_action']}")
         line += "；".join(desc_parts)
         lines.append(line)

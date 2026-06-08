@@ -123,8 +123,8 @@ def insert_component(
         VALUES (?,?,?,?,?,?,?,?)""",
         (component_id, expected_weight, actual_weight, deviation,
          _build_reason_kept(approver_is_pinyin, holiday_extension_note, deviation),
-         _build_missing_materials(approver_is_pinyin, holiday_extension_note),
-         _build_next_action(approver_is_pinyin),
+         _build_missing_materials(approver_is_pinyin, holiday_extension_note, deviation),
+         _build_next_action(approver_is_pinyin, deviation, holiday_extension_note),
          now),
     )
     conn.commit()
@@ -133,6 +133,8 @@ def insert_component(
 
 
 def _build_reason_kept(is_pinyin: bool, note: str, deviation: float) -> str:
+    if not is_pinyin and deviation == 0:
+        return "权重无偏差，审批人已确认，正常"
     parts = []
     if is_pinyin:
         parts.append("审批人仅留拼音，身份未确认，暂留待客户经理复核")
@@ -140,24 +142,26 @@ def _build_reason_kept(is_pinyin: bool, note: str, deviation: float) -> str:
         parts.append("权重偏差且缺少节假日顺延说明")
     if deviation != 0 and note:
         parts.append(f"权重偏差已有顺延说明：{note}")
-    if deviation == 0:
+    if deviation == 0 and is_pinyin:
         parts.append("权重无偏差")
     return "；".join(parts) if parts else "待复核"
 
 
-def _build_missing_materials(is_pinyin: bool, note: str) -> str:
+def _build_missing_materials(is_pinyin: bool, note: str, deviation: float) -> str:
     parts = []
     if is_pinyin:
         parts.append("审批人中文全名")
-    if not note:
+    if deviation != 0 and not note:
         parts.append("节假日顺延说明")
     return "；".join(parts) if parts else "无"
 
 
-def _build_next_action(is_pinyin: bool) -> str:
+def _build_next_action(is_pinyin: bool, deviation: float, note: str) -> str:
     if is_pinyin:
         return "找客户经理确认审批人身份"
-    return "找投研助理小周补充材料"
+    if deviation != 0 and not note:
+        return "找投研助理小周补充材料"
+    return "无需操作"
 
 
 def update_holiday_note(component_id: int, note: str) -> dict:
@@ -168,13 +172,13 @@ def update_holiday_note(component_id: int, note: str) -> dict:
         conn.close()
         return {"error": "成分记录不存在"}
 
-    new_status = "normal" if not comp["approver_is_pinyin"] and note else comp["status"]
+    deviation = comp["deviation"]
+    new_status = "normal" if not comp["approver_is_pinyin"] and (note or deviation == 0) else comp["status"]
     conn.execute(
         "UPDATE basket_component SET holiday_extension_note=?, status=?, updated_at=? WHERE id=?",
         (note, new_status, now, component_id),
     )
 
-    deviation = comp["deviation"]
     bc = conn.execute("SELECT * FROM balance_change WHERE component_id=?", (component_id,)).fetchone()
     if bc:
         conn.execute(
@@ -183,8 +187,8 @@ def update_holiday_note(component_id: int, note: str) -> dict:
             WHERE component_id=?""",
             (
                 _build_reason_kept(bool(comp["approver_is_pinyin"]), note, deviation),
-                _build_missing_materials(bool(comp["approver_is_pinyin"]), note),
-                _build_next_action(bool(comp["approver_is_pinyin"])),
+                _build_missing_materials(bool(comp["approver_is_pinyin"]), note, deviation),
+                _build_next_action(bool(comp["approver_is_pinyin"]), deviation, note),
                 now,
                 component_id,
             ),
@@ -197,8 +201,8 @@ def update_holiday_note(component_id: int, note: str) -> dict:
             VALUES (?,?,?,?,?,?,?,?)""",
             (component_id, comp["expected_weight"], comp["actual_weight"], deviation,
              _build_reason_kept(bool(comp["approver_is_pinyin"]), note, deviation),
-             _build_missing_materials(bool(comp["approver_is_pinyin"]), note),
-             _build_next_action(bool(comp["approver_is_pinyin"])),
+             _build_missing_materials(bool(comp["approver_is_pinyin"]), note, deviation),
+             _build_next_action(bool(comp["approver_is_pinyin"]), deviation, note),
              now),
         )
     conn.commit()
@@ -214,14 +218,15 @@ def confirm_approver(component_id: int, real_name: str) -> dict:
         conn.close()
         return {"error": "成分记录不存在"}
 
-    new_status = "normal" if comp["holiday_extension_note"] else "missing_note"
+    deviation = comp["deviation"]
+    has_note = bool(comp["holiday_extension_note"])
+    new_status = "normal" if (has_note or deviation == 0) else "missing_note"
     conn.execute(
         "UPDATE basket_component SET approver_name=?, approver_is_pinyin=0, status=?, flag_reason='', updated_at=? WHERE id=?",
         (real_name, new_status, now, component_id),
     )
 
-    deviation = comp["deviation"]
-    has_note = bool(comp["holiday_extension_note"])
+    note_text = comp["holiday_extension_note"] or ""
     bc = conn.execute("SELECT * FROM balance_change WHERE component_id=?", (component_id,)).fetchone()
     if bc:
         conn.execute(
@@ -229,9 +234,9 @@ def confirm_approver(component_id: int, real_name: str) -> dict:
             reason_kept=?, missing_materials=?, next_action=?, updated_at=?
             WHERE component_id=?""",
             (
-                _build_reason_kept(False, comp["holiday_extension_note"] or "", deviation),
-                _build_missing_materials(False, comp["holiday_extension_note"] or ""),
-                _build_next_action(False),
+                _build_reason_kept(False, note_text, deviation),
+                _build_missing_materials(False, note_text, deviation),
+                _build_next_action(False, deviation, note_text),
                 now,
                 component_id,
             ),
