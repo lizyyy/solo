@@ -74,38 +74,41 @@ def get_sample_detail(sample_id: str) -> Dict[str, Any]:
     }
 
 
-def get_batch_list(batch_id: Optional[str] = None) -> List[Dict[str, Any]]:
+def get_batch_list() -> List[Dict[str, Any]]:
     conn = get_conn()
     c = conn.cursor()
-
-    if batch_id:
-        c.execute('''SELECT b.*, m.version_name, m.threshold
-                     FROM batch_runs b
-                     JOIN model_versions m ON b.model_version_id = m.id
-                     WHERE b.batch_id = ?
-                     ORDER BY b.run_at DESC''', (batch_id,))
-    else:
-        c.execute('''SELECT b.*, m.version_name, m.threshold
-                     FROM batch_runs b
-                     JOIN model_versions m ON b.model_version_id = m.id
-                     ORDER BY b.run_at DESC''')
-
+    c.execute('''SELECT b.*, m.version_name, m.threshold
+                 FROM batch_runs b
+                 JOIN model_versions m ON b.model_version_id = m.id
+                 WHERE b.id IN (
+                     SELECT MAX(id) FROM batch_runs GROUP BY batch_id
+                 )
+                 ORDER BY b.run_at DESC''')
     batches = rows_to_dicts(c.fetchall())
     conn.close()
     return batches
+
+
+def _get_latest_run_id(conn, batch_id: str) -> Optional[int]:
+    c = conn.cursor()
+    c.execute('SELECT id FROM batch_runs WHERE batch_id = ? ORDER BY run_at DESC LIMIT 1', (batch_id,))
+    row = c.fetchone()
+    return row['id'] if row else None
 
 
 def get_evaluation_list(batch_id: str) -> List[Dict[str, Any]]:
     conn = get_conn()
     c = conn.cursor()
 
+    latest_run_id = _get_latest_run_id(conn, batch_id)
+
     c.execute('''SELECT e.*, s.image_url, s.prompt, s.source, s.tags,
                         m.version_name, m.threshold
                  FROM evaluation_logs e
                  JOIN samples s ON e.sample_id = s.sample_id
                  JOIN model_versions m ON e.model_version_id = m.id
-                 WHERE e.batch_id = ?
-                 ORDER BY e.predict_score DESC''', (batch_id,))
+                 WHERE e.batch_run_id = ?
+                 ORDER BY e.predict_score DESC''', (latest_run_id,))
 
     evals = rows_to_dicts(c.fetchall())
 
@@ -166,7 +169,6 @@ def detect_conflicts(eval_id: int, sample_id: str, predict_result: int,
     conflicts = []
     now = datetime.now().isoformat()
 
-    # 检测样本泄漏
     for ev in evidence:
         if ev.get('type') == 'train_set_check' and ev.get('in_train'):
             conflict_desc = f'检测到训练样本泄漏，与训练集{ev.get("train_id")}相似度{ev.get("similarity", 0.98)}，该样本评测指标作废'
@@ -179,7 +181,6 @@ def detect_conflicts(eval_id: int, sample_id: str, predict_result: int,
             ))
             conflicts.append({'type': 'sample_leakage', 'description': conflict_desc, 'severity': 'high'})
 
-    # 检测与标注表冲突
     c.execute('''SELECT * FROM annotation_table WHERE sample_id = ? AND caliber_version LIKE 'v2.0%'
                  ORDER BY annotated_at DESC LIMIT 1''', (sample_id,))
     anno = row_to_dict(c.fetchone())
@@ -208,7 +209,6 @@ def submit_manual_review(sample_id: str, evaluation_log_id: int,
     conn = get_conn()
     c = conn.cursor()
 
-    # 检查是否已有受保护的人工判罚
     c.execute('''SELECT * FROM manual_reviews 
                  WHERE sample_id = ? AND override_protected = 1
                  ORDER BY reviewed_at DESC LIMIT 1''', (sample_id,))
@@ -230,7 +230,6 @@ def submit_manual_review(sample_id: str, evaluation_log_id: int,
         review_note, 1 if override_protected else 0
     ))
 
-    # 自动解决关联的冲突
     c.execute('''UPDATE label_conflicts SET resolved = 1 
                  WHERE sample_id = ? AND conflict_type = 'model_vs_annotation' AND resolved = 0''', (sample_id,))
 
@@ -244,7 +243,6 @@ def add_supplementary_note(sample_id: str, batch_id: str, note_content: str,
     conn = get_conn()
     c = conn.cursor()
 
-    # 获取补录前状态，生成差异描述
     detail = get_sample_detail(sample_id)
     old_status_parts = []
     if detail['current_result']:
@@ -254,7 +252,7 @@ def add_supplementary_note(sample_id: str, batch_id: str, note_content: str,
     if detail['notes']:
         old_status_parts.append(f'已有备注{len(detail["notes"])}条')
     if detail['conflicts']:
-        unresolved = [c for c in detail['conflicts'] if c.get('resolved') == 0]
+        unresolved = [cf for cf in detail['conflicts'] if cf.get('resolved') == 0]
         if unresolved:
             old_status_parts.append(f'未解决冲突{len(unresolved)}条')
 
@@ -332,6 +330,15 @@ def run_batch_evaluation(batch_id: str, model_version_id: int, operator: str,
         return {'success': False, 'error': '批次无样本'}
 
     now = datetime.now().isoformat()
+
+    c.execute('''INSERT INTO batch_runs
+        (batch_id, model_version_id, run_at, operator, metrics_json, sample_count)
+        VALUES (?, ?, ?, ?, ?, ?)''', (
+        batch_id, model_version_id, now, operator,
+        json.dumps({}), len(samples)
+    ))
+    batch_run_id = c.lastrowid
+
     results = []
     skipped_protected = []
     conflicts_found = []
@@ -339,7 +346,6 @@ def run_batch_evaluation(batch_id: str, model_version_id: int, operator: str,
     for sample in samples:
         sid = sample['sample_id']
 
-        # 检查人工改判保护
         c.execute('''SELECT * FROM manual_reviews 
                      WHERE sample_id = ? AND override_protected = 1''', (sid,))
         protected = row_to_dict(c.fetchone())
@@ -351,24 +357,22 @@ def run_batch_evaluation(batch_id: str, model_version_id: int, operator: str,
             })
             continue
 
-        # 模拟预测
         pred = simulate_model_predict(sid, model_version_id, threshold)
 
         c.execute('''INSERT INTO evaluation_logs
-            (sample_id, model_version_id, batch_id, predict_score, predict_result,
+            (sample_id, model_version_id, batch_id, batch_run_id, predict_score, predict_result,
              evidence_json, reasons, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)''', (
-            sid, model_version_id, batch_id,
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''', (
+            sid, model_version_id, batch_id, batch_run_id,
             pred['score'], pred['result'],
             json.dumps(pred['evidence']), pred['reasons'], now
         ))
         eval_id = c.lastrowid
 
-        # 检测冲突
         conflicts = detect_conflicts(eval_id, sid, pred['result'], pred['score'],
                                      pred['evidence'], threshold)
         if conflicts:
-            conflicts_found.extend([{'sample_id': sid, **c} for c in conflicts])
+            conflicts_found.extend([{'sample_id': sid, **cf} for cf in conflicts])
 
         results.append({
             'sample_id': sid,
@@ -376,7 +380,6 @@ def run_batch_evaluation(batch_id: str, model_version_id: int, operator: str,
             'result': pred['result']
         })
 
-    # 统计指标
     total = len(samples)
     processed = len(results)
     positives = sum(1 for r in results if r['result'] == 1)
@@ -395,12 +398,8 @@ def run_batch_evaluation(batch_id: str, model_version_id: int, operator: str,
         'positive_rate': positives / processed if processed > 0 else 0
     }
 
-    c.execute('''INSERT INTO batch_runs
-        (batch_id, model_version_id, run_at, operator, metrics_json, sample_count)
-        VALUES (?, ?, ?, ?, ?, ?)''', (
-        batch_id, model_version_id, now, operator,
-        json.dumps(metrics), total
-    ))
+    c.execute('''UPDATE batch_runs SET metrics_json = ?, sample_count = ? WHERE id = ?''',
+              (json.dumps(metrics), total, batch_run_id))
 
     conn.commit()
     conn.close()
@@ -408,6 +407,7 @@ def run_batch_evaluation(batch_id: str, model_version_id: int, operator: str,
     return {
         'success': True,
         'batch_id': batch_id,
+        'batch_run_id': batch_run_id,
         'run_at': now,
         'metrics': metrics,
         'skipped_protected': skipped_protected,
@@ -437,20 +437,13 @@ def compare_batch_runs(batch_id: str, run1_id: int, run2_id: int) -> Dict[str, A
     metrics2 = run2['metrics_json'] if isinstance(run2['metrics_json'], dict) else json.loads(run2['metrics_json'])
 
     c.execute('''SELECT sample_id, predict_score, predict_result FROM evaluation_logs
-                 WHERE batch_id = ? AND id IN (SELECT max(id) FROM evaluation_logs 
-                                              WHERE batch_id = ? GROUP BY sample_id)''',
-              (batch_id, batch_id))
-    current_evals = {e['sample_id']: row_to_dict(e) for e in c.fetchall()}
+                 WHERE batch_run_id = ?''', (run2_id,))
+    new_evals = {e['sample_id']: row_to_dict(e) for e in c.fetchall()}
 
-    c.execute('''SELECT e.sample_id, e.predict_score, e.predict_result
-                 FROM evaluation_logs e
-                 WHERE e.batch_id = ? AND e.created_at <= ?
-                 AND e.id IN (SELECT max(id) FROM evaluation_logs 
-                              WHERE sample_id = e.sample_id AND created_at <= ?)''',
-              (batch_id, run1['run_at'], run1['run_at']))
+    c.execute('''SELECT sample_id, predict_score, predict_result FROM evaluation_logs
+                 WHERE batch_run_id = ?''', (run1_id,))
     old_evals = {e['sample_id']: row_to_dict(e) for e in c.fetchall()}
 
-    # 分开解释：指标变化 vs 样本变化
     metric_changes = {}
     for k in set(list(metrics1.keys()) + list(metrics2.keys())):
         if k in metrics1 and k in metrics2:
@@ -463,10 +456,10 @@ def compare_batch_runs(batch_id: str, run1_id: int, run2_id: int) -> Dict[str, A
                 }
 
     sample_changes = []
-    all_samples = set(list(current_evals.keys()) + list(old_evals.keys()))
+    all_samples = set(list(new_evals.keys()) + list(old_evals.keys()))
     for sid in sorted(all_samples):
         old = old_evals.get(sid)
-        new = current_evals.get(sid)
+        new = new_evals.get(sid)
         change = None
         if old and new:
             if old['predict_result'] != new['predict_result']:
@@ -490,7 +483,6 @@ def compare_batch_runs(batch_id: str, run1_id: int, run2_id: int) -> Dict[str, A
                 'change': change
             })
 
-    # 指标变化归因
     metric_explanations = []
     if metric_changes.get('positives', {}).get('change_type') == 'up':
         metric_explanations.append(
@@ -504,7 +496,6 @@ def compare_batch_runs(batch_id: str, run1_id: int, run2_id: int) -> Dict[str, A
             f"请检查冲突列表确认是否为标注问题或模型边界问题"
         )
 
-    # 样本变化归因
     sample_explanations = []
     result_flips = [s for s in sample_changes if s['change'] == 'result_flip']
     score_shifts = [s for s in sample_changes if s['change'] == 'score_shift']
@@ -554,6 +545,19 @@ def get_batch_runs(batch_id: str) -> List[Dict[str, Any]]:
     runs = rows_to_dicts(c.fetchall())
     conn.close()
     return runs
+
+
+def get_latest_batch_info(batch_id: str) -> Optional[Dict[str, Any]]:
+    conn = get_conn()
+    c = conn.cursor()
+    c.execute('''SELECT b.*, m.version_name, m.threshold, m.threshold_note
+                 FROM batch_runs b
+                 JOIN model_versions m ON b.model_version_id = m.id
+                 WHERE b.batch_id = ?
+                 ORDER BY b.run_at DESC LIMIT 1''', (batch_id,))
+    info = row_to_dict(c.fetchone())
+    conn.close()
+    return info
 
 
 def export_batch_results(batch_id: str, operator: str,

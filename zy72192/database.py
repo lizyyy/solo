@@ -56,12 +56,14 @@ def init_db():
         sample_id TEXT NOT NULL,
         model_version_id INTEGER NOT NULL,
         batch_id TEXT NOT NULL,
+        batch_run_id INTEGER,
         predict_score REAL NOT NULL,
         predict_result INTEGER NOT NULL,
         evidence_json TEXT,
         reasons TEXT,
         created_at TEXT NOT NULL,
-        FOREIGN KEY (model_version_id) REFERENCES model_versions(id)
+        FOREIGN KEY (model_version_id) REFERENCES model_versions(id),
+        FOREIGN KEY (batch_run_id) REFERENCES batch_runs(id)
     )''')
 
     c.execute('''CREATE TABLE IF NOT EXISTS manual_reviews (
@@ -89,7 +91,7 @@ def init_db():
 
     c.execute('''CREATE TABLE IF NOT EXISTS batch_runs (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        batch_id TEXT UNIQUE NOT NULL,
+        batch_id TEXT NOT NULL,
         model_version_id INTEGER NOT NULL,
         run_at TEXT NOT NULL,
         operator TEXT,

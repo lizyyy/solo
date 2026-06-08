@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request, jsonify, Response, abort
-import json
 import csv
 from io import StringIO
 from datetime import datetime
@@ -8,7 +7,7 @@ from services import (
     get_sample_detail, get_batch_list, get_evaluation_list,
     get_conflicts_list, submit_manual_review, add_supplementary_note,
     run_batch_evaluation, compare_batch_runs, get_batch_runs,
-    export_batch_results, get_model_versions
+    export_batch_results, get_model_versions, get_latest_batch_info
 )
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
@@ -52,13 +51,13 @@ def index():
 @app.route('/batch/<batch_id>')
 def batch_detail(batch_id):
     evals = get_evaluation_list(batch_id)
-    batch_info = get_batch_list(batch_id)
+    batch_info = get_latest_batch_info(batch_id)
     batch_runs = get_batch_runs(batch_id)
     models = get_model_versions()
     return render_template('batch_detail.html',
                            batch_id=batch_id,
                            evals=evals,
-                           batch_info=batch_info[0] if batch_info else None,
+                           batch_info=batch_info,
                            batch_runs=batch_runs,
                            models=models)
 
