@@ -6,7 +6,9 @@ import {
   StudentAnswer,
   ScoringResult,
   ConflictRecord,
-  ErrorExplanation
+  ErrorExplanation,
+  AuditLogEntry,
+  KeyNoteItem
 } from '../types';
 
 class SystemStore {
@@ -21,7 +23,8 @@ class SystemStore {
       studentAnswers: [],
       scoringResults: [],
       conflictRecords: [],
-      errorExplanations: []
+      errorExplanations: [],
+      auditLogs: []
     };
   }
 
@@ -42,6 +45,10 @@ class SystemStore {
 
   public getWeightBatches(): ImportBatch[] {
     return [...this.state.weightBatches];
+  }
+
+  public getWeightBatchById(batchId: string): ImportBatch | undefined {
+    return this.state.weightBatches.find(b => b.id === batchId);
   }
 
   public addScoringWeights(weights: ScoringWeightItem[]): void {
@@ -68,6 +75,14 @@ class SystemStore {
     return sorted[0];
   }
 
+  public updateScoringWeight(weight: ScoringWeightItem): void {
+    const index = this.state.scoringWeights.findIndex(w => w.id === weight.id);
+    if (index !== -1) {
+      weight.updatedAt = new Date();
+      this.state.scoringWeights[index] = weight;
+    }
+  }
+
   public addFormulaScreenshot(screenshot: FormulaScreenshot): void {
     this.state.formulaScreenshots.push(screenshot);
   }
@@ -80,10 +95,28 @@ class SystemStore {
     return this.state.formulaScreenshots.find(s => s.isActive);
   }
 
+  public getFormulaScreenshotById(id: string): FormulaScreenshot | undefined {
+    return this.state.formulaScreenshots.find(s => s.id === id);
+  }
+
   public setActiveFormulaScreenshot(id: string): void {
     this.state.formulaScreenshots.forEach(s => {
       s.isActive = s.id === id;
     });
+  }
+
+  public updateFormulaScreenshot(screenshot: FormulaScreenshot): void {
+    const index = this.state.formulaScreenshots.findIndex(s => s.id === screenshot.id);
+    if (index !== -1) {
+      this.state.formulaScreenshots[index] = screenshot;
+    }
+  }
+
+  public addKeyNoteToScreenshot(screenshotId: string, keyNote: KeyNoteItem): void {
+    const screenshot = this.state.formulaScreenshots.find(s => s.id === screenshotId);
+    if (screenshot) {
+      screenshot.keyNotes.push(keyNote);
+    }
   }
 
   public addStudentAnswer(answer: StudentAnswer): void {
@@ -132,6 +165,13 @@ class SystemStore {
     }
   }
 
+  public getLatestScoringResultBySubmission(submissionId: string): ScoringResult | undefined {
+    const results = this.state.scoringResults
+      .filter(r => r.submissionId === submissionId)
+      .sort((a, b) => b.version - a.version);
+    return results[0];
+  }
+
   public addConflictRecord(conflict: ConflictRecord): void {
     this.state.conflictRecords.push(conflict);
   }
@@ -142,6 +182,16 @@ class SystemStore {
 
   public getPendingConflicts(): ConflictRecord[] {
     return this.state.conflictRecords.filter(c => c.status === 'pending');
+  }
+
+  public getConflictById(id: string): ConflictRecord | undefined {
+    return this.state.conflictRecords.find(c => c.id === id);
+  }
+
+  public getConflictsByEntity(entityType: string, entityId: string): ConflictRecord[] {
+    return this.state.conflictRecords.filter(
+      c => c.relatedEntityType === entityType && c.relatedEntityId === entityId
+    );
   }
 
   public updateConflictRecord(conflict: ConflictRecord): void {
@@ -159,11 +209,29 @@ class SystemStore {
     return [...this.state.errorExplanations];
   }
 
+  public getErrorExplanationsByBatch(batchId: string): ErrorExplanation[] {
+    return this.state.errorExplanations.filter(e => e.batchId === batchId);
+  }
+
   public updateErrorExplanation(explanation: ErrorExplanation): void {
     const index = this.state.errorExplanations.findIndex(e => e.id === explanation.id);
     if (index !== -1) {
       this.state.errorExplanations[index] = explanation;
     }
+  }
+
+  public addAuditLog(log: AuditLogEntry): void {
+    this.state.auditLogs.push(log);
+  }
+
+  public getAuditLogs(): AuditLogEntry[] {
+    return [...this.state.auditLogs];
+  }
+
+  public getAuditLogsByEntity(entityType: string, entityId: string): AuditLogEntry[] {
+    return this.state.auditLogs
+      .filter(l => l.entityType === entityType && l.entityId === entityId)
+      .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
   }
 
   public clearAll(): void {
@@ -174,7 +242,8 @@ class SystemStore {
       studentAnswers: [],
       scoringResults: [],
       conflictRecords: [],
-      errorExplanations: []
+      errorExplanations: [],
+      auditLogs: []
     };
   }
 }

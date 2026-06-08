@@ -4,7 +4,14 @@ import studentAnswerService from './services/studentAnswerService';
 import scoringEngine from './services/scoringEngine';
 import dataExportService from './services/dataExportService';
 import selfCheckService from './services/selfCheckService';
-import { ConflictStatus, AnswerReviewStatus } from './types';
+import unifiedDataService from './services/unifiedDataService';
+import {
+  ConflictStatus,
+  AnswerReviewStatus,
+  ConflictType,
+  DataSource,
+  AuditAction
+} from './types';
 
 export {
   weightImportService,
@@ -13,8 +20,12 @@ export {
   scoringEngine,
   dataExportService,
   selfCheckService,
+  unifiedDataService,
   ConflictStatus,
-  AnswerReviewStatus
+  AnswerReviewStatus,
+  ConflictType,
+  DataSource,
+  AuditAction
 };
 
 export default {
@@ -23,5 +34,6 @@ export default {
   studentAnswerService,
   scoringEngine,
   dataExportService,
-  selfCheckService
+  selfCheckService,
+  unifiedDataService
 };
