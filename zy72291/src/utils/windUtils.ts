@@ -24,7 +24,7 @@ export const getWindRoseData = (
       requiredDistance: version === 'new' ? newRadius : legacyRadius,
       newRadius,
       legacyRadius,
-    } as WindDataPoint & { directionLabel: string; newRadius: number; legacyRadius: number };
+    };
   });
 };
 

@@ -7,6 +7,7 @@ export type ReportStatus = 'draft' | 'pending_review' | 'approved' | 'rejected';
 export type RecordType = 'success' | 'blocked' | 'legacy';
 export type RadiusVersionReport = 'new' | 'legacy' | 'mixed';
 export type UserRole = 'engineer' | 'manager';
+export type ComplianceStatus = 'compliant' | 'warning' | 'non_compliant' | 'pending';
 
 export interface Position {
   x: number;
@@ -23,6 +24,17 @@ export interface Alert {
   position: Position;
 }
 
+export interface ManualCorrection {
+  id: string;
+  logId: string;
+  field: string;
+  oldValue: string | number;
+  newValue: string | number;
+  operator: string;
+  timestamp: string;
+  reason: string;
+}
+
 export interface PointCloudLog {
   id: string;
   timestamp: string;
@@ -35,7 +47,14 @@ export interface PointCloudLog {
   hasScreenshotOcclusion: boolean;
   screenshotNote?: string;
   manualCorrection?: string;
+  manualCorrections?: ManualCorrection[];
   rerunCount: number;
+  windDirection?: number;
+  windSpeed?: number;
+  measuredDistance?: number;
+  occlusionArea?: number;
+  operator?: string;
+  notes?: string;
 }
 
 export interface SafetyRadius {
@@ -60,16 +79,42 @@ export interface ReportResult {
   windSpeed: WindSpeed;
 }
 
+export interface ReportItem {
+  logId: string;
+  batchNo: string;
+  status: LogStatus;
+  windDirection: number;
+  windSpeed: number;
+  measuredDistance: number;
+  requiredDistance: number;
+  diff: number;
+  compliance: ComplianceStatus;
+  hasScreenshotOcclusion: boolean;
+  occlusionArea: number;
+  version: string;
+  notes: string;
+}
+
 export interface SafetyReport {
   id: string;
   generatedAt: string;
+  generatedBy?: string;
   logIds: string[];
   radiusVersion: RadiusVersionReport;
   results: ReportResult[];
+  items?: ReportItem[];
+  stats?: {
+    total: number;
+    compliant: number;
+    warning: number;
+    nonCompliant: number;
+    pendingReview: number;
+  };
   status: ReportStatus;
   reviewedBy?: string;
   reviewedAt?: string;
   notes: string;
+  summary?: string;
 }
 
 export interface OperationLog {
@@ -84,9 +129,12 @@ export interface OperationLog {
 
 export interface WindDataPoint {
   direction: number;
+  directionLabel?: string;
   frequency: number;
   safetyDistance: number;
   requiredDistance: number;
+  newRadius?: number;
+  legacyRadius?: number;
 }
 
 export interface ProcessStep {
