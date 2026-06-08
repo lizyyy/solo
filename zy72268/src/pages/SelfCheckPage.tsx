@@ -15,6 +15,7 @@ import {
   Clock,
 } from 'lucide-react';
 import { useAppStore } from '../store';
+import { db } from '../db';
 import {
   runAllChecks,
   getLatestCheckResults,
@@ -67,7 +68,13 @@ export const SelfCheckPage: React.FC = () => {
     if (!currentSketch) return;
     setIsRunning(true);
     try {
-      const results = await runAllChecks([currentSketch], obstacles, conflicts);
+      const allSketches = await db.floorSketches.toArray();
+      const results = await runAllChecks(
+        allSketches,
+        obstacles,
+        conflicts,
+        currentSketch
+      );
       setSelfCheckResults(results);
     } finally {
       setIsRunning(false);

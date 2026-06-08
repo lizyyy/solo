@@ -130,15 +130,31 @@ export const useAppStore = create<AppStore>((set, get) => ({
       );
 
       const newConflicts = detectAllConflicts(obstacles);
+      const conflictedIds = new Set<string>();
+      for (const c of newConflicts) {
+        for (const oid of c.obstacleIds) {
+          conflictedIds.add(oid);
+        }
+      }
+      const obstaclesWithFlag = obstacles.map(o => ({
+        ...o,
+        isConflicted: conflictedIds.has(o.id),
+      }));
+
       if (newConflicts.length > 0) {
         for (const conflict of newConflicts) {
           await db.conflicts.add(conflict);
         }
+        await db.transaction('rw', [db.obstacles], async () => {
+          for (const o of obstaclesWithFlag) {
+            await db.obstacles.put(o);
+          }
+        });
       }
 
       set({
         currentSketch: sketch,
-        obstacles,
+        obstacles: obstaclesWithFlag,
         conflicts: newConflicts,
         isLoading: false,
       });
@@ -210,15 +226,31 @@ export const useAppStore = create<AppStore>((set, get) => ({
       const sketchObstacles = obstacles.filter(o => o.source === 'sketch');
       const newConflicts = detectAllConflicts(sketchObstacles, pcObstacles);
 
+      const conflictedIds = new Set<string>();
+      for (const c of newConflicts) {
+        for (const oid of c.obstacleIds) {
+          conflictedIds.add(oid);
+        }
+      }
+      const allObstaclesWithFlag = allObstacles.map(o => ({
+        ...o,
+        isConflicted: conflictedIds.has(o.id) ? true : o.isConflicted,
+      }));
+
       if (newConflicts.length > 0) {
         for (const conflict of newConflicts) {
           await db.conflicts.add(conflict);
         }
+        await db.transaction('rw', [db.obstacles], async () => {
+          for (const o of allObstaclesWithFlag) {
+            await db.obstacles.put(o);
+          }
+        });
       }
 
       set(state => ({
         pointCloudLogs: [...state.pointCloudLogs, pointCloudLog],
-        obstacles: allObstacles,
+        obstacles: allObstaclesWithFlag,
         conflicts: [...state.conflicts, ...newConflicts],
         isLoading: false,
       }));
@@ -443,22 +475,27 @@ export const useAppStore = create<AppStore>((set, get) => ({
   loadAllData: async () => {
     set({ isLoading: true });
 
-    const [sketches, obstacles, logs, conflicts, auditLogs] = await Promise.all([
-      db.floorSketches.toArray(),
-      db.obstacles.toArray(),
-      db.pointCloudLogs.toArray(),
-      db.conflicts.toArray(),
-      db.auditLogs.reverse().sortBy('createdAt'),
-    ]);
+    try {
+      const [sketches, obstacles, logs, conflicts, auditLogs] = await Promise.all([
+        db.floorSketches.toArray(),
+        db.obstacles.toArray(),
+        db.pointCloudLogs.toArray(),
+        db.conflicts.toArray(),
+        db.auditLogs.orderBy('createdAt').reverse().toArray(),
+      ]);
 
-    set({
-      currentSketch: sketches[0] || null,
-      obstacles,
-      pointCloudLogs: logs,
-      conflicts,
-      auditLogs,
-      isLoading: false,
-    });
+      set({
+        currentSketch: sketches[0] || null,
+        obstacles,
+        pointCloudLogs: logs,
+        conflicts,
+        auditLogs,
+        isLoading: false,
+      });
+    } catch (error) {
+      console.error('loadAllData failed:', error);
+      set({ isLoading: false });
+    }
   },
 
   addConflicts: (conflicts) => {

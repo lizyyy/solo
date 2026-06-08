@@ -6,14 +6,18 @@ import { ConflictsPage } from "@/pages/ConflictsPage";
 import { SelfCheckPage } from "@/pages/SelfCheckPage";
 import { AuditPage } from "@/pages/AuditPage";
 import { useAppStore } from "@/store";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 function AppContent() {
   const location = useLocation();
-  const { loadAllData } = useAppStore();
+  const loadAllData = useAppStore((s) => s.loadAllData);
+  const loadedRef = useRef(false);
 
   useEffect(() => {
-    loadAllData();
+    if (!loadedRef.current) {
+      loadedRef.current = true;
+      loadAllData();
+    }
   }, [loadAllData]);
 
   const isWorkbench = location.pathname === "/workbench";

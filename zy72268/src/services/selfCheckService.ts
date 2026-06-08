@@ -141,13 +141,36 @@ export async function checkExportConsistency(
 export async function runAllChecks(
   sketches: FloorSketch[],
   obstacles: Obstacle[],
-  conflicts: Conflict[]
+  conflicts: Conflict[],
+  currentSketch: FloorSketch | null = null
 ): Promise<SelfCheckResult[]> {
   const results: SelfCheckResult[] = [];
 
   results.push(await checkDuplicateImports(sketches));
   results.push(await checkMultipleNames(obstacles));
   results.push(await checkRecalculateConsistency(obstacles, conflicts));
+
+  if (currentSketch) {
+    const exportPayload: Record<string, unknown> = {
+      obstacles,
+      conflicts,
+      sketch: currentSketch,
+    };
+    results.push(await checkExportConsistency(exportPayload, {
+      sketch: currentSketch,
+      obstacles,
+      conflicts,
+    }));
+  } else {
+    results.push({
+      id: generateId(),
+      type: 'export-consistency',
+      status: 'warning',
+      message: '无当前草图，跳过导出一致性校验',
+      details: { skipped: true },
+      checkedAt: new Date(),
+    });
+  }
 
   return results;
 }
