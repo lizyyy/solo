@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { CustodyRepo } from '../db/repositories/CustodyRepo.js';
 import { AdjustmentRepo } from '../db/repositories/AdjustmentRepo.js';
 import { ProcessService } from './ProcessService.js';
-import type { CustodyConfirmation, TailAdjustment } from '../../shared/types.js';
+import type { CustodyConfirmation, TailAdjustment, CustodyDiffSnapshot, CustodyDiffField, CustodyCreateResult } from '../../shared/types.js';
 
 const CreateCustodySchema = z.object({
   adjustmentId: z.string().min(1, '调整条ID不能为空'),
@@ -17,6 +17,72 @@ const CreateCustodySchema = z.object({
 });
 
 const UpdateCustodySchema = CreateCustodySchema.partial().omit({ adjustmentId: true });
+
+function buildDiffSnapshot(
+  adjustmentBefore: TailAdjustment,
+  adjustmentAfter: TailAdjustment,
+  custody: CustodyConfirmation,
+  operator: string
+): CustodyDiffSnapshot {
+  const fields: CustodyDiffField[] = [
+    {
+      field: 'status',
+      label: '状态',
+      original: adjustmentBefore.status,
+      corrected: adjustmentAfter.status,
+      reason: adjustmentBefore.hasZeroAmountButReversed
+        ? '冲正记录补录托管确认页后，自动流转至待风控复核，不归正常'
+        : '补录托管确认页，状态流转',
+    },
+    {
+      field: 'custodyConfirmId',
+      label: '托管确认页ID',
+      original: adjustmentBefore.custodyConfirmId ?? null,
+      corrected: custody.id,
+      reason: '补录托管确认页后关联',
+    },
+    {
+      field: 'voucherNo',
+      label: '凭证编号',
+      original: null,
+      corrected: custody.voucherNo,
+      reason: '托管确认页凭证号',
+    },
+    {
+      field: 'custodyAmount',
+      label: '托管金额',
+      original: adjustmentBefore.amount,
+      corrected: custody.amount,
+      reason: adjustmentBefore.amount === 0 && custody.amount > 0
+        ? '原调整金额为0（冲正），托管页记录实际发生额'
+        : '托管金额与调整金额一致',
+    },
+    {
+      field: 'handler',
+      label: '经办人',
+      original: null,
+      corrected: custody.handler,
+      reason: '托管确认页经办人签字',
+    },
+    {
+      field: 'hasScannedCopy',
+      label: '已上传扫描件',
+      original: null,
+      corrected: custody.hasScannedCopy,
+      reason: custody.hasScannedCopy ? '已上传凭证扫描件' : '尚未上传扫描件',
+    },
+  ];
+
+  return {
+    adjustmentId: adjustmentBefore.id,
+    adjustmentNo: adjustmentBefore.adjustmentNo,
+    beforeStatus: adjustmentBefore.status,
+    afterStatus: adjustmentAfter.status,
+    fields,
+    snapshotTime: new Date().toISOString().replace('T', ' ').substring(0, 19),
+    operator,
+  };
+}
 
 export const CustodyService = {
   getByAdjustmentId(adjustmentId: string): CustodyConfirmation | undefined {
@@ -34,11 +100,11 @@ export const CustodyService = {
   createCustody(
     data: z.infer<typeof CreateCustodySchema>,
     operator: string = '小周'
-  ): { custody: CustodyConfirmation; adjustment: TailAdjustment } {
+  ): CustodyCreateResult {
     const validated = CreateCustodySchema.parse(data);
-    
-    const adjustment = AdjustmentRepo.findById(validated.adjustmentId);
-    if (!adjustment) {
+
+    const adjustmentBefore = AdjustmentRepo.findById(validated.adjustmentId);
+    if (!adjustmentBefore) {
       throw new Error('调整条不存在');
     }
 
@@ -59,9 +125,11 @@ export const CustodyService = {
 
     ProcessService.recordCustody(validated.adjustmentId, operator, validated.voucherNo);
 
-    const updatedAdjustment = AdjustmentRepo.findById(validated.adjustmentId)!;
+    const adjustmentAfter = AdjustmentRepo.findById(validated.adjustmentId)!;
 
-    return { custody, adjustment: updatedAdjustment };
+    const diffSnapshot = buildDiffSnapshot(adjustmentBefore, adjustmentAfter, custody, operator);
+
+    return { custody, adjustment: adjustmentAfter, diffSnapshot };
   },
 
   updateCustody(
@@ -69,7 +137,7 @@ export const CustodyService = {
     data: z.infer<typeof UpdateCustodySchema>
   ): CustodyConfirmation {
     const validated = UpdateCustodySchema.parse(data);
-    
+
     const existing = CustodyRepo.findById(id);
     if (!existing) {
       throw new Error('托管确认页不存在');

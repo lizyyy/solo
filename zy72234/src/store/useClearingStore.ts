@@ -9,6 +9,8 @@ import type {
   UserRole,
   ExecutiveSummaryItem,
   ReviewRequest,
+  CustodyCreateResult,
+  CustodyDiffSnapshot,
 } from '@shared/types';
 import { generateSummary, isZeroReversed } from '@shared/types';
 import { api } from '@/services/api';
@@ -19,6 +21,7 @@ interface ClearingState {
   processNodes: ProcessNode[];
   chart3DData: ChartDataPoint[];
   pieChartData: PieChartData[];
+  diffSnapshots: CustodyDiffSnapshot[];
   currentUser: string;
   currentRole: UserRole;
   loading: boolean;
@@ -32,10 +35,12 @@ interface ClearingState {
   getProcessNodesByAdjustmentId: (adjustmentId: string) => ProcessNode[];
   getOverviewStats: () => OverviewStats;
   getExecutiveSummary: () => ExecutiveSummaryItem[];
+  getDiffSnapshotByAdjustmentId: (adjustmentId: string) => CustodyDiffSnapshot | undefined;
   updateAdjustmentStatus: (id: string, status: TailAdjustment['status']) => void;
   addProcessNode: (node: Omit<ProcessNode, 'id'>) => void;
   submitReview: (adjustmentId: string, request: ReviewRequest) => void;
   updateCustody: (custody: CustodyConfirmation) => void;
+  applyCustodyCreateResult: (result: CustodyCreateResult) => void;
   addAdjustments: (adjustments: TailAdjustment[]) => void;
   navigateToAdjustmentOrCustody: (adjustmentId: string, navigate: (path: string) => void) => void;
 }
@@ -46,6 +51,7 @@ export const useClearingStore = create<ClearingState>((set, get) => ({
   processNodes: [],
   chart3DData: [],
   pieChartData: [],
+  diffSnapshots: [],
   currentUser: '小周',
   currentRole: 'assistant',
   loading: false,
@@ -128,6 +134,10 @@ export const useClearingStore = create<ClearingState>((set, get) => ({
       });
   },
 
+  getDiffSnapshotByAdjustmentId: (adjustmentId) => {
+    return get().diffSnapshots.find((s) => s.adjustmentId === adjustmentId);
+  },
+
   updateAdjustmentStatus: (id, status) => {
     set((state) => ({
       adjustments: state.adjustments.map((a) =>
@@ -192,7 +202,7 @@ export const useClearingStore = create<ClearingState>((set, get) => ({
     set((state) => {
       const existingIndex = state.custodyConfirmations.findIndex((c) => c.id === custody.id);
       let newCustodyConfirmations;
-      
+
       if (existingIndex >= 0) {
         newCustodyConfirmations = state.custodyConfirmations.map((c, i) =>
           i === existingIndex ? custody : c
@@ -224,6 +234,54 @@ export const useClearingStore = create<ClearingState>((set, get) => ({
       operatorRole: get().currentRole,
       action: `补录托管确认页，凭证号 ${custody.voucherNo}`,
       timestamp: new Date().toISOString().replace('T', ' ').slice(0, 19),
+    });
+  },
+
+  applyCustodyCreateResult: (result) => {
+    const { custody, adjustment, diffSnapshot } = result;
+
+    set((state) => {
+      const existingIndex = state.custodyConfirmations.findIndex((c) => c.id === custody.id);
+      let newCustodyConfirmations;
+
+      if (existingIndex >= 0) {
+        newCustodyConfirmations = state.custodyConfirmations.map((c, i) =>
+          i === existingIndex ? custody : c
+        );
+      } else {
+        newCustodyConfirmations = [...state.custodyConfirmations, custody];
+      }
+
+      const newAdjustments = state.adjustments.map((a) =>
+        a.id === adjustment.id ? adjustment : a
+      );
+
+      const existingSnapshotIndex = state.diffSnapshots.findIndex(
+        (s) => s.adjustmentId === diffSnapshot.adjustmentId
+      );
+      let newDiffSnapshots;
+      if (existingSnapshotIndex >= 0) {
+        newDiffSnapshots = state.diffSnapshots.map((s, i) =>
+          i === existingSnapshotIndex ? diffSnapshot : s
+        );
+      } else {
+        newDiffSnapshots = [...state.diffSnapshots, diffSnapshot];
+      }
+
+      return {
+        custodyConfirmations: newCustodyConfirmations,
+        adjustments: newAdjustments,
+        diffSnapshots: newDiffSnapshots,
+      };
+    });
+
+    get().addProcessNode({
+      adjustmentId: custody.adjustmentId,
+      step: 'custody',
+      operator: diffSnapshot.operator,
+      operatorRole: 'assistant',
+      action: `补录托管确认页，凭证号 ${custody.voucherNo}，状态从 ${diffSnapshot.beforeStatus} 变更为 ${diffSnapshot.afterStatus}`,
+      timestamp: diffSnapshot.snapshotTime,
     });
   },
 

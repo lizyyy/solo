@@ -26,6 +26,7 @@ export default function CustodyConfirm() {
   const {
     getCustodyById,
     getAdjustmentById,
+    applyCustodyCreateResult,
     updateCustody,
     currentUser,
     currentRole,
@@ -101,7 +102,6 @@ export default function CustodyConfirm() {
 
     setSaving(true);
     try {
-      const now = new Date().toISOString().replace('T', ' ').slice(0, 19);
       const custodyBase = {
         adjustmentId,
         voucherNo: formData.voucherNo,
@@ -113,23 +113,24 @@ export default function CustodyConfirm() {
         supplementaryFields: formData.supplementaryFields,
       };
 
-      let savedCustody: CustodyConfirmation;
       if (existingCustody) {
+        const now = new Date().toISOString().replace('T', ' ').slice(0, 19);
         const updateData: CustodyConfirmation = {
           ...custodyBase,
           id: existingCustody.id,
           createTime: existingCustody.createTime,
           updateTime: now,
         };
-        savedCustody = await api.updateCustody(updateData);
+        const savedCustody = await api.updateCustody(updateData);
+        updateCustody(savedCustody);
       } else {
-        savedCustody = await api.createCustody({
+        const result = await api.createCustody({
           ...custodyBase,
           operator: currentUser || '小周',
         });
+        applyCustodyCreateResult(result);
       }
       
-      updateCustody(savedCustody);
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (e) {

@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, FileCheck, ShieldCheck, Clock, User, FileText, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, FileCheck, ShieldCheck, Clock, User, FileText, AlertTriangle, GitCompare } from 'lucide-react';
 import { useClearingStore } from '@/store/useClearingStore';
 import StatusBadge from '@/components/common/StatusBadge';
 import AmountDisplay from '@/components/common/AmountDisplay';
@@ -17,12 +17,13 @@ const statusSteps = [
 export default function AdjustmentDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { getAdjustmentById, getProcessNodesByAdjustmentId, getCustodyByAdjustmentId, currentRole } =
+  const { getAdjustmentById, getProcessNodesByAdjustmentId, getCustodyByAdjustmentId, getDiffSnapshotByAdjustmentId, currentRole } =
     useClearingStore();
 
   const adjustment = getAdjustmentById(id || '');
   const processNodes = getProcessNodesByAdjustmentId(id || '');
   const custody = getCustodyByAdjustmentId(id || '');
+  const diffSnapshot = getDiffSnapshotByAdjustmentId(id || '');
 
   if (!adjustment) {
     return (
@@ -183,6 +184,53 @@ export default function AdjustmentDetail() {
             </h2>
             <ProcessTimeline nodes={processNodes} />
           </div>
+
+          {diffSnapshot && diffSnapshot.fields.length > 0 && (
+            <div className="bg-white rounded-xl p-6 shadow-card border-l-4 border-summary-gold">
+              <h2 className="text-lg font-semibold text-carbon-800 mb-2 flex items-center gap-2">
+                <GitCompare className="w-5 h-5 text-summary-gold" />
+                补录差异快照
+              </h2>
+              <p className="text-sm text-carbon-500 mb-4">
+                操作人：{diffSnapshot.operator} · 快照时间：{diffSnapshot.snapshotTime}
+              </p>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-carbon-200">
+                      <th className="text-left py-2 px-3 text-carbon-500 font-medium">字段</th>
+                      <th className="text-left py-2 px-3 text-carbon-500 font-medium">补录前</th>
+                      <th className="text-left py-2 px-3 text-carbon-500 font-medium">补录后</th>
+                      <th className="text-left py-2 px-3 text-carbon-500 font-medium">原因</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {diffSnapshot.fields.map((f, i) => (
+                      <tr key={i} className="border-b border-carbon-100 last:border-0">
+                        <td className="py-2 px-3 font-medium text-carbon-800">{f.label}</td>
+                        <td className="py-2 px-3 text-carbon-500 font-mono">
+                          {f.original === null ? '—' : String(f.original)}
+                        </td>
+                        <td className="py-2 px-3 text-carbon-800 font-mono">
+                          {String(f.corrected)}
+                        </td>
+                        <td className="py-2 px-3 text-carbon-600">{f.reason}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div className="mt-4 p-3 bg-carbon-50 rounded-lg text-sm text-carbon-600">
+                <span className="font-medium">状态变更：</span>
+                <span className="text-warning-orange">{STATUS_LABELS[diffSnapshot.beforeStatus]}</span>
+                {' → '}
+                <span className="text-risk-red">{STATUS_LABELS[diffSnapshot.afterStatus]}</span>
+                {diffSnapshot.afterStatus === 'pending_review' && (
+                  <span className="ml-2 text-risk-red">（冲正记录不自动归正常，留给风控复核）</span>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="space-y-6">

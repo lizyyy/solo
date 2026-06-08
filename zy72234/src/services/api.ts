@@ -8,6 +8,8 @@ import type {
   ImportResult,
   ReviewRequest,
   ExecutiveSummaryItem,
+  CustodyCreateResult,
+  CustodyDiffSnapshot,
 } from '@shared/types';
 import {
   mockAdjustments,
@@ -243,7 +245,7 @@ export const api = {
     return delay({ ...custody, updateTime: new Date().toISOString().replace('T', ' ').slice(0, 19) });
   },
 
-  async createCustody(custody: Omit<CustodyConfirmation, 'id' | 'createTime' | 'updateTime'> & { operator?: string }): Promise<CustodyConfirmation> {
+  async createCustody(custody: Omit<CustodyConfirmation, 'id' | 'createTime' | 'updateTime'> & { operator?: string }): Promise<CustodyCreateResult> {
     try {
       const res = await fetch(`${API_BASE}/custody`, {
         method: 'POST',
@@ -258,11 +260,24 @@ export const api = {
       console.log('使用mock数据: create custody');
     }
     const now = new Date().toISOString().replace('T', ' ').slice(0, 19);
-    return delay({
+    const newCustody: CustodyConfirmation = {
       ...custody,
       id: `cust_${Date.now()}`,
       createTime: now,
       updateTime: now,
-    } as CustodyConfirmation);
+    } as CustodyConfirmation;
+    return delay({
+      custody: newCustody,
+      adjustment: mockAdjustments.find((a) => a.id === custody.adjustmentId)!,
+      diffSnapshot: {
+        adjustmentId: custody.adjustmentId,
+        adjustmentNo: '',
+        beforeStatus: 'pending_custody' as const,
+        afterStatus: 'pending_review' as const,
+        fields: [],
+        snapshotTime: now,
+        operator: custody.operator || '小周',
+      },
+    });
   },
 };

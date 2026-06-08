@@ -102,6 +102,30 @@ export interface ReviewRequest {
   operator: string;
 }
 
+export interface CustodyDiffField {
+  field: string;
+  label: string;
+  original: string | number | boolean | null;
+  corrected: string | number | boolean | null;
+  reason: string;
+}
+
+export interface CustodyDiffSnapshot {
+  adjustmentId: string;
+  adjustmentNo: string;
+  beforeStatus: AdjustmentStatus;
+  afterStatus: AdjustmentStatus;
+  fields: CustodyDiffField[];
+  snapshotTime: string;
+  operator: string;
+}
+
+export interface CustodyCreateResult {
+  custody: CustodyConfirmation;
+  adjustment: TailAdjustment;
+  diffSnapshot: CustodyDiffSnapshot;
+}
+
 export const STATUS_LABELS: Record<AdjustmentStatus, string> = {
   imported: '已导入',
   pending_custody: '待补托管页',
