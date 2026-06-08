@@ -259,6 +259,9 @@ const DrumRoomApp = (function() {
 
         tbody.querySelectorAll('input, select').forEach(input => {
             input.addEventListener('change', handleDataChange);
+            if (input.type === 'number') {
+                input.addEventListener('focus', function() { this.select(); });
+            }
         });
 
         const qualityReport = checkDataQuality();
@@ -1081,6 +1084,9 @@ const DrumRoomApp = (function() {
             freqMap.set(r.frequency, existing);
         });
 
+        const versionA = recordA.params.version;
+        const versionB = recordB.params.version;
+
         freqMap.forEach((pair, freq) => {
             const a = pair.a;
             const b = pair.b;
@@ -1107,10 +1113,10 @@ const DrumRoomApp = (function() {
                 <td><strong>${freq}Hz</strong></td>
                 <td>${tlA !== null ? tlA.toFixed(1) : '--'}</td>
                 <td>${a ? `<span class="${a.judgmentClass}">${a.judgment}</span>` : '--'}</td>
-                <td>${a ? a.params.version : '--'}</td>
+                <td>${versionA}</td>
                 <td>${tlB !== null ? tlB.toFixed(1) : '--'}</td>
                 <td>${b ? `<span class="${b.judgmentClass}">${b.judgment}</span>` : '--'}</td>
-                <td>${b ? b.params.version : '--'}</td>
+                <td>${versionB}</td>
                 <td class="${deltaClass}">${deltaText} dB</td>
             `;
             tbody.appendChild(tr);
@@ -1490,6 +1496,10 @@ const DrumRoomApp = (function() {
 
         document.getElementById('btnSaveParams').addEventListener('click', saveNewParamVersion);
         document.getElementById('btnRestoreParams').addEventListener('click', restoreSelectedParamVersion);
+
+        document.querySelectorAll('#tab-params input[type="number"]').forEach(input => {
+            input.addEventListener('focus', function() { this.select(); });
+        });
 
         document.getElementById('btnCalculate').addEventListener('click', handleCalculate);
 
