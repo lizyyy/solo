@@ -4,7 +4,9 @@
   "description": "融资融券利息日切系统 - 托管确认页处理、除权日校验、余额更新",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "rm -rf dist && tsc",
+    "start": "node dist/cli.js",
+    "demo": "node dist/cli.js",
     "test": "jest",
     "lint": "eslint src/**/*.ts"
   },
