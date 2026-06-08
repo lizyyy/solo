@@ -3,6 +3,7 @@ import Layout from "@/components/Layout"
 import Workspace from "@/pages/Workspace"
 import Conflict from "@/pages/Conflict"
 import SelfCheck from "@/pages/SelfCheck"
+import RowDetailDrawer from "@/components/RowDetailDrawer"
 
 export default function App() {
   return (
@@ -14,6 +15,7 @@ export default function App() {
           <Route path="/check" element={<SelfCheck />} />
         </Route>
       </Routes>
+      <RowDetailDrawer />
     </Router>
   )
 }
