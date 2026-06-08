@@ -5,6 +5,7 @@ import { useAppStore } from '../store';
 import StatsCard from '../components/StatsCard';
 import StatusBadge from '../components/StatusBadge';
 import ImportModal from '../components/ImportModal';
+import type { ImportPointData } from '../utils/importExport';
 import type { PointStatus, PointSource } from '../types';
 
 const PointList = () => {
@@ -33,7 +34,7 @@ const PointList = () => {
     completed: points.filter((p) => p.status === 'completed').length,
   };
 
-  const handleImport = (data: Array<{ name: string; location: string; hospital: string; source: PointSource; sourceDesc?: string; rawNote: string; status: PointStatus; createdBy: string }>) => {
+  const handleImport = (data: ImportPointData[]) => {
     importPoints(data);
   };
 

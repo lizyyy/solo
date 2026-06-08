@@ -128,7 +128,7 @@ const Report = () => {
               </ol>
               <div className="mt-3 p-2 bg-amber-50 rounded text-xs text-amber-700">
                 <AlertCircle className="w-3 h-3 inline mr-1" />
-                注意：原始备注字段会完整保留，不会进行任何清洗处理
+                注意：原始备注字段会完整保留，不会进行任何清洗处理。来源列支持中文自动映射：街道表格→街道表格、现场巡检→现场巡检、审批记录→审批记录，无法识别的归为"其他来源"。
               </div>
             </div>
 

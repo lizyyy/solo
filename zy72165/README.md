@@ -1,57 +1,106 @@
-# React + TypeScript + Vite
+# 医院周边停车诱导 — 巡检数据全链路追踪工具
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+专为市政设计师打造的医院周边停车诱导巡检管理工具，让点位、照片、反馈、方案版本和报告能互相追踪，不用手工对第二遍。
 
-Currently, two official plugins are available:
+## 安装
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 启动
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+npm run dev
 ```
+
+启动后浏览器打开 http://localhost:5173/ 即可使用。
+
+## 完整操作流程
+
+### 1. 导入点位数据
+
+1. 在"点位总览"页点击 **导入点位** 按钮
+2. 选择 `.xlsx` / `.xls` 格式的 Excel 文件
+3. 预览数据，确认来源列映射正确后点击 **确认导入**
+
+**Excel 列名支持：**
+
+| 列名（中文） | 列名（英文） | 说明 |
+|---|---|---|
+| 点位名称 | name | 必填 |
+| 位置 | location | |
+| 所属医院 | hospital | |
+| 来源 | source | 见下方映射规则 |
+| 来源说明 | — | 可选，备注来源出处 |
+| 原始备注 / 备注 | rawNote | 保留原样，不清洗 |
+| 状态 | status | 支持中英文 |
+| 创建人 | createdBy | 默认"老曹" |
+
+**来源列自动映射：**
+
+| Excel 中填写 | 归为 | 页面显示 |
+|---|---|---|
+| 街道表格 / 街道 / street | street | 街道表格 |
+| 现场巡检 / 现场 / 巡检 / onsite | onsite | 现场巡检 |
+| 审批记录 / 审批 / approval | approval | 审批记录 |
+| 其他值 | other | 其他来源 |
+
+> 如果中文来源被映射，原始值会自动记录在"来源说明"字段，不丢失。
+
+### 2. 快速体验（示例点位）
+
+点击 **示例点位** 按钮，自动添加一条样例数据，无需 Excel 文件即可体验完整功能。
+
+### 3. 补充照片
+
+1. 在点位列表点击点位名称进入详情页
+2. 切换到 **照片** 标签页
+3. 点击 **上传照片** 选择图片（支持多选）
+4. 在每张照片下方输入原始备注（可选，保留照片中的乱备注原样）
+
+### 4. 编制方案
+
+1. 在点位详情页切换到 **方案版本** 标签页
+2. 点击 **新建方案**
+3. 填写方案内容、历史意见/备注
+4. 保存后自动递增版本号（V1 → V2 → …）
+5. 旧方案永不删除，历史意见完整保留
+
+### 5. 标记冲突
+
+1. 在点位详情页切换到 **冲突记录** 标签页
+2. 点击 **标记冲突**
+3. 选择冲突类型，分别填写照片/现场证据和导入/表格数据
+4. 系统不会替用户拍板，只展示双边证据和建议动作
+5. 确认后可输入解决说明，标记为已解决
+
+### 6. 导出报告
+
+1. 在点位总览页设置筛选条件（搜索、状态、来源、医院）
+2. 进入 **报告与说明** 页面
+3. 点击 **导出筛选 Excel** 或 **导出全部 Excel**
+4. 导出的 Excel 包含四个工作表：点位、照片记录、方案版本、冲突记录
+
+## 设计原则
+
+- **原始数据不清洗**：巡检照片中的乱备注完整保留
+- **方案历史不删除**：旧方案和意见完整保留，可追溯
+- **冲突不自动处理**：只展示双边证据，由人判断
+- **来源映射可追溯**：中文来源自动归类，原始值保留在来源说明中
+- **数据本地存储**：所有数据保存在浏览器 LocalStorage，建议定期导出备份
+
+## 技术栈
+
+- React 18 + TypeScript + Vite
+- TailwindCSS 3 + Zustand
+- SheetJS (xlsx) 处理 Excel 导入导出
+- 数据持久化：浏览器 LocalStorage
+
+## 构建
+
+```bash
+npm run build
+```
+
+产物在 `dist/` 目录，可直接部署为静态站点。

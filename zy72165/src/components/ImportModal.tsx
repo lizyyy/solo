@@ -1,13 +1,13 @@
 import { useState, useRef } from 'react';
 import { X, Upload, FileSpreadsheet, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { parseExcelFile, type ImportPointData } from '../utils/importExport';
+import { parseExcelFile, type ImportPointData, sourceToLabel, statusToLabel } from '../utils/importExport';
 import type { PointSource, PointStatus } from '../types';
 
 interface ImportModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onImport: (points: Array<{ name: string; location: string; hospital: string; source: PointSource; sourceDesc?: string; rawNote: string; status: PointStatus; createdBy: string }>) => void;
+  onImport: (points: ImportPointData[]) => void;
 }
 
 const ImportModal = ({ isOpen, onClose, onImport }: ImportModalProps) => {
@@ -37,12 +37,7 @@ const ImportModal = ({ isOpen, onClose, onImport }: ImportModalProps) => {
   };
 
   const handleConfirm = () => {
-    const mappedData = preview.map((p) => ({
-      ...p,
-      source: (['street', 'onsite', 'approval', 'other'].includes(p.source) ? p.source : 'other') as PointSource,
-      status: (['pending', 'processing', 'conflict', 'completed'].includes(p.status) ? p.status : 'pending') as PointStatus,
-    }));
-    onImport(mappedData);
+    onImport(preview);
     handleClose();
   };
 
@@ -124,6 +119,7 @@ const ImportModal = ({ isOpen, onClose, onImport }: ImportModalProps) => {
                           <th className="px-3 py-2 text-left text-slate-600 font-medium">点位名称</th>
                           <th className="px-3 py-2 text-left text-slate-600 font-medium">位置</th>
                           <th className="px-3 py-2 text-left text-slate-600 font-medium">医院</th>
+                          <th className="px-3 py-2 text-left text-slate-600 font-medium">来源</th>
                           <th className="px-3 py-2 text-left text-slate-600 font-medium">原始备注</th>
                         </tr>
                       </thead>
@@ -133,6 +129,11 @@ const ImportModal = ({ isOpen, onClose, onImport }: ImportModalProps) => {
                             <td className="px-3 py-2 text-slate-800">{row.name || '-'}</td>
                             <td className="px-3 py-2 text-slate-600">{row.location || '-'}</td>
                             <td className="px-3 py-2 text-slate-600">{row.hospital || '-'}</td>
+                            <td className="px-3 py-2">
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700">
+                                {sourceToLabel(row.source)}
+                              </span>
+                            </td>
                             <td className="px-3 py-2 text-slate-600 max-w-xs truncate">{row.rawNote || '-'}</td>
                           </tr>
                         ))}
@@ -149,7 +150,9 @@ const ImportModal = ({ isOpen, onClose, onImport }: ImportModalProps) => {
 
               <div className="mt-4 p-3 bg-amber-50 rounded-lg">
                 <p className="text-sm text-amber-700">
-                  <strong>提示：</strong>导入时会保留原始备注字段，不会进行清洗处理。支持的列名包括：点位名称/name、位置/location、所属医院/hospital、来源/source、原始备注/备注/rawNote。
+                  <strong>提示：</strong>导入时会保留原始备注字段，不会进行清洗处理。
+                  来源列会自动映射：街道表格/街道→街道表格，现场巡检/现场/巡检→现场巡检，审批记录/审批→审批记录。无法识别的来源归为"其他来源"。
+                  原始来源值会保留在"来源说明"字段中。
                 </p>
               </div>
             </div>

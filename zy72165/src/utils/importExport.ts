@@ -1,14 +1,67 @@
 import * as XLSX from 'xlsx';
-import type { Point, Photo, SchemeVersion, Conflict } from '../types';
+import type { Point, Photo, SchemeVersion, Conflict, PointSource, PointStatus } from '../types';
+
+const SOURCE_MAP: Record<string, PointSource> = {
+  street: 'street',
+  onsite: 'onsite',
+  approval: 'approval',
+  other: 'other',
+  '街道表格': 'street',
+  '街道': 'street',
+  '现场巡检': 'onsite',
+  '现场': 'onsite',
+  '巡检': 'onsite',
+  '审批记录': 'approval',
+  '审批': 'approval',
+};
+
+const STATUS_MAP: Record<string, PointStatus> = {
+  pending: 'pending',
+  processing: 'processing',
+  conflict: 'conflict',
+  completed: 'completed',
+  '待处理': 'pending',
+  '处理中': 'processing',
+  '有冲突': 'conflict',
+  '已完成': 'completed',
+};
+
+export const normalizeSource = (raw: string): PointSource => {
+  return SOURCE_MAP[raw.trim()] || 'other';
+};
+
+export const normalizeStatus = (raw: string): PointStatus => {
+  return STATUS_MAP[raw.trim()] || 'pending';
+};
+
+export const sourceToLabel = (source: PointSource): string => {
+  const labels: Record<PointSource, string> = {
+    street: '街道表格',
+    onsite: '现场巡检',
+    approval: '审批记录',
+    other: '其他来源',
+  };
+  return labels[source];
+};
+
+export const statusToLabel = (status: PointStatus): string => {
+  const labels: Record<PointStatus, string> = {
+    pending: '待处理',
+    processing: '处理中',
+    conflict: '有冲突',
+    completed: '已完成',
+  };
+  return labels[status];
+};
 
 export interface ImportPointData {
   name: string;
   location: string;
   hospital: string;
-  source: string;
+  source: PointSource;
   sourceDesc?: string;
   rawNote: string;
-  status: string;
+  status: PointStatus;
   createdBy: string;
 }
 
@@ -23,16 +76,21 @@ export const parseExcelFile = (file: File): Promise<ImportPointData[]> => {
         const worksheet = workbook.Sheets[sheetName];
         const jsonData = XLSX.utils.sheet_to_json(worksheet) as Record<string, unknown>[];
         
-        const points: ImportPointData[] = jsonData.map((row) => ({
-          name: String(row['点位名称'] || row['name'] || ''),
-          location: String(row['位置'] || row['location'] || ''),
-          hospital: String(row['所属医院'] || row['hospital'] || ''),
-          source: String(row['来源'] || row['source'] || 'other'),
-          sourceDesc: row['来源说明'] ? String(row['来源说明']) : undefined,
-          rawNote: String(row['原始备注'] || row['备注'] || row['rawNote'] || ''),
-          status: String(row['状态'] || row['status'] || 'pending'),
-          createdBy: String(row['创建人'] || row['createdBy'] || '老曹'),
-        }));
+        const points: ImportPointData[] = jsonData.map((row) => {
+          const rawSource = String(row['来源'] || row['source'] || 'other');
+          const rawStatus = String(row['状态'] || row['status'] || 'pending');
+          const sourceDesc = row['来源说明'] ? String(row['来源说明']) : undefined;
+          return {
+            name: String(row['点位名称'] || row['name'] || ''),
+            location: String(row['位置'] || row['location'] || ''),
+            hospital: String(row['所属医院'] || row['hospital'] || ''),
+            source: normalizeSource(rawSource),
+            sourceDesc: sourceDesc || (rawSource !== normalizeSource(rawSource) ? `原始来源: ${rawSource}` : undefined),
+            rawNote: String(row['原始备注'] || row['备注'] || row['rawNote'] || ''),
+            status: normalizeStatus(rawStatus),
+            createdBy: String(row['创建人'] || row['createdBy'] || '老曹'),
+          };
+        });
         
         resolve(points);
       } catch (error) {
@@ -58,10 +116,10 @@ export const exportToExcel = (
     点位名称: p.name,
     位置: p.location,
     所属医院: p.hospital,
-    来源: p.source,
+    来源: sourceToLabel(p.source),
     来源说明: p.sourceDesc || '',
     原始备注: p.rawNote,
-    状态: p.status,
+    状态: statusToLabel(p.status),
     创建时间: new Date(p.createdAt).toLocaleString('zh-CN'),
     更新时间: new Date(p.updatedAt).toLocaleString('zh-CN'),
     创建人: p.createdBy,
