@@ -86,6 +86,7 @@ class DiffComparator:
             ("authorized", "已授权"),
             ("version", "版本"),
             ("notes", "备注"),
+            ("supplementary_notes", "补录备注"),
             ("status", "状态"),
             ("audio_file", "音频文件")
         ]

@@ -3,15 +3,15 @@ from pathlib import Path
 from datetime import datetime
 from typing import List, Dict
 from .models import TrackRecord, BatchSummary, AnomalyType
-from .conflict_detector import ConflictResult
-from .note_manager import TrackDiff
+from .conflict_detector import ConflictResult, ConflictEvidence
+from .note_manager import TrackDiff, DiffItem
 
 class ReportGenerator:
     def __init__(self, output_dir: str):
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
-    
-    def generate_full_report(self, 
+
+    def generate_full_report(self,
                             tracks: List[TrackRecord],
                             summary: BatchSummary,
                             conflicts: Dict[str, ConflictResult] = None,
@@ -22,28 +22,31 @@ class ReportGenerator:
             base_name = f"{report_name}_{timestamp}"
         else:
             base_name = f"评分报告_{timestamp}"
-        
+
         excel_path = self.output_dir / f"{base_name}_明细.xlsx"
         summary_path = self.output_dir / f"{base_name}_汇总.txt"
         html_path = self.output_dir / f"{base_name}_报告.html"
-        
-        self._generate_excel_detail(tracks, excel_path)
+
+        self._generate_excel_detail(tracks, conflicts, diffs, excel_path)
         self._generate_summary_text(tracks, summary, conflicts, diffs, summary_path)
         self._generate_html_report(tracks, summary, conflicts, diffs, html_path)
-        
+
         return {
             "excel": str(excel_path),
             "summary": str(summary_path),
             "html": str(html_path)
         }
-    
-    def _generate_excel_detail(self, tracks: List[TrackRecord], output_path: Path):
+
+    def _generate_excel_detail(self, tracks: List[TrackRecord],
+                               conflicts: Dict[str, ConflictResult],
+                               diffs: List[TrackDiff],
+                               output_path: Path):
         data = [track.to_dict() for track in tracks]
         df = pd.DataFrame(data)
-        
+
         with pd.ExcelWriter(output_path, engine='openpyxl') as writer:
             df.to_excel(writer, sheet_name="曲目明细", index=False)
-            
+
             anomaly_data = []
             for track in tracks:
                 for i, anomaly in enumerate(track.anomalies):
@@ -53,11 +56,52 @@ class ReportGenerator:
                         "异常类型": anomaly.value,
                         "异常详情": track.anomaly_details[i] if i < len(track.anomaly_details) else ""
                     })
-            
             if anomaly_data:
                 df_anomaly = pd.DataFrame(anomaly_data)
                 df_anomaly.to_excel(writer, sheet_name="异常清单", index=False)
-    
+
+            notes_data = []
+            for track in tracks:
+                if track.supplementary_notes:
+                    notes_data.append({
+                        "曲目编号": track.track_id,
+                        "曲目名称": track.track_name,
+                        "补录备注": track.supplementary_notes
+                    })
+            if notes_data:
+                df_notes = pd.DataFrame(notes_data)
+                df_notes.to_excel(writer, sheet_name="补录备注", index=False)
+
+            conflict_rows = []
+            if conflicts:
+                for track_id, cr in conflicts.items():
+                    for c in cr.conflicts:
+                        conflict_rows.append({
+                            "曲目编号": track_id,
+                            "冲突字段": c.field_name,
+                            "Excel值": c.excel_value,
+                            "导入值": c.import_value,
+                            "建议动作": c.suggestion
+                        })
+            if conflict_rows:
+                df_conflict = pd.DataFrame(conflict_rows)
+                df_conflict.to_excel(writer, sheet_name="数据冲突", index=False)
+
+            diff_rows = []
+            if diffs:
+                for diff in diffs:
+                    for change in diff.changes:
+                        diff_rows.append({
+                            "曲目编号": diff.track_id,
+                            "变更类型": change.change_type,
+                            "字段": change.field,
+                            "旧值": change.old_value,
+                            "新值": change.new_value
+                        })
+            if diff_rows:
+                df_diff = pd.DataFrame(diff_rows)
+                df_diff.to_excel(writer, sheet_name="补录差异", index=False)
+
     def _generate_summary_text(self,
                                tracks: List[TrackRecord],
                                summary: BatchSummary,
@@ -85,15 +129,25 @@ class ReportGenerator:
         lines.append("异常统计")
         lines.append("-" * 60)
         lines.append(f"总异常数: {summary.total_anomalies}")
-        
+
         for anomaly_type, count in sorted(summary.anomaly_counts.items(), key=lambda x: -x[1]):
             lines.append(f"  - {anomaly_type.value}: {count} 条")
-        
+
         lines.append("")
-        
+
+        notes_tracks = [t for t in tracks if t.supplementary_notes]
+        if notes_tracks:
+            lines.append("-" * 60)
+            lines.append("补录备注")
+            lines.append("-" * 60)
+            for track in notes_tracks:
+                lines.append(f"曲目 {track.track_id} ({track.track_name}):")
+                lines.append(f"   {track.supplementary_notes}")
+            lines.append("")
+
         if conflicts:
             lines.append("-" * 60)
-            lines.append("数据冲突详情")
+            lines.append("数据冲突详情（需人工确认）")
             lines.append("-" * 60)
             for track_id, conflict in conflicts.items():
                 lines.append(f"曲目 {track_id}:")
@@ -103,7 +157,7 @@ class ReportGenerator:
                     lines.append(f"    导入值: {c.import_value}")
                     lines.append(f"    建议: {c.suggestion}")
             lines.append("")
-        
+
         if diffs:
             lines.append("-" * 60)
             lines.append("补录差异详情")
@@ -115,11 +169,11 @@ class ReportGenerator:
                     lines.append(f"    旧值: {change.old_value or '(空)'}")
                     lines.append(f"    新值: {change.new_value or '(空)'}")
             lines.append("")
-        
+
         lines.append("-" * 60)
         lines.append("需要关注的曲目")
         lines.append("-" * 60)
-        
+
         attention_tracks = [t for t in tracks if t.anomalies or t.status.value in ["待审核", "数据冲突", "处理失败"]]
         if attention_tracks:
             for track in attention_tracks:
@@ -129,13 +183,15 @@ class ReportGenerator:
                 if track.anomaly_details:
                     for detail in track.anomaly_details:
                         lines.append(f"   - {detail}")
+                if track.supplementary_notes:
+                    lines.append(f"   补录备注: {track.supplementary_notes}")
                 lines.append("")
         else:
             lines.append("无需要特别关注的曲目")
-        
+
         with open(output_path, 'w', encoding='utf-8') as f:
             f.write("\n".join(lines))
-    
+
     def _generate_html_report(self,
                                tracks: List[TrackRecord],
                                summary: BatchSummary,
@@ -172,15 +228,17 @@ class ReportGenerator:
         .badge-info {{ background: #3498db; color: white; }}
         .conflict {{ background: #fdecea; border-left: 4px solid #e74c3c; padding: 15px; margin: 10px 0; border-radius: 4px; }}
         .diff {{ background: #e8f4fd; border-left: 4px solid #3498db; padding: 15px; margin: 10px 0; border-radius: 4px; }}
+        .note {{ background: #fef9e7; border-left: 4px solid #f39c12; padding: 15px; margin: 10px 0; border-radius: 4px; }}
         .evidence {{ background: #fff; padding: 10px; margin: 8px 0; border-radius: 4px; border: 1px solid #ddd; }}
         .timestamp {{ color: #7f8c8d; font-size: 0.9em; }}
+        .arrow {{ color: #e74c3c; font-weight: bold; margin: 0 8px; }}
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🥁 少儿打击乐课堂评分报告</h1>
         <p class="timestamp">生成时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
-        
+
         <h2>📊 处理概览</h2>
         <div class="stats">
             <div class="stat-card">
@@ -205,7 +263,7 @@ class ReportGenerator:
             </div>
         </div>
 """
-        
+
         if summary.anomaly_counts:
             html_content += """
         <h2>⚠️ 异常分布</h2>
@@ -215,7 +273,16 @@ class ReportGenerator:
             for anomaly_type, count in sorted(summary.anomaly_counts.items(), key=lambda x: -x[1]):
                 html_content += f"<tr><td>{anomaly_type.value}</td><td>{count}</td></tr>\n"
             html_content += "</table>\n"
-        
+
+        notes_tracks = [t for t in tracks if t.supplementary_notes]
+        if notes_tracks:
+            html_content += "<h2>📝 补录备注</h2>\n"
+            for track in notes_tracks:
+                html_content += f'<div class="note">\n'
+                html_content += f"<h3>{track.track_id} - {track.track_name} ({track.student_name})</h3>\n"
+                html_content += f"<p>{track.supplementary_notes}</p>\n"
+                html_content += "</div>\n"
+
         if conflicts:
             html_content += "<h2>🔀 数据冲突（需人工确认）</h2>\n"
             for track_id, conflict in conflicts.items():
@@ -231,41 +298,35 @@ class ReportGenerator:
                     html_content += f"💡 建议: {c.suggestion}\n"
                     html_content += "</div>\n"
                 html_content += "</div>\n"
-        
+
         if diffs:
-            html_content += "<h2>📝 补录差异</h2>\n"
+            html_content += "<h2>� 补录差异</h2>\n"
+            html_content += """<table>
+            <tr><th>曲目编号</th><th>变更类型</th><th>字段</th><th>旧值</th><th></th><th>新值</th></tr>
+"""
             for diff in diffs:
                 track = next((t for t in tracks if t.track_id == diff.track_id), None)
-                track_name = track.track_name if track else "未知"
-                html_content += f'<div class="diff">\n'
-                html_content += f"<h3>{diff.track_id} - {track_name}</h3>\n"
                 for change in diff.changes:
-                    badge_class = "badge-success" if change.change_type == "新增" else "badge-danger" if change.change_type == "删除" else "badge-warning"
-                    html_content += f'<span class="badge {badge_class}">{change.change_type}</span>\n'
-                    html_content += f'<div class="evidence">\n'
-                    html_content += f"<strong>{change.field}</strong><br>\n"
-                    if change.old_value:
-                        html_content += f"旧: {change.old_value}<br>\n"
-                    if change.new_value:
-                        html_content += f"新: {change.new_value}\n"
-                    html_content += "</div>\n"
-                html_content += "</div>\n"
-        
+                    badge_class = "badge-success" if change.change_type == "新增" or change.change_type == "新增异常" else "badge-danger" if change.change_type in ["删除", "删除曲目", "移除异常"] else "badge-warning"
+                    html_content += f"<tr><td>{diff.track_id}</td><td><span class='badge {badge_class}'>{change.change_type}</span></td><td>{change.field}</td><td>{change.old_value or '(空)'}</td><td class='arrow'>→</td><td>{change.new_value or '(空)'}</td></tr>\n"
+            html_content += "</table>\n"
+
         html_content += """
         <h2>📋 曲目明细</h2>
         <table>
-            <tr><th>曲目编号</th><th>名称</th><th>学生</th><th>状态</th><th>异常</th></tr>
+            <tr><th>曲目编号</th><th>名称</th><th>学生</th><th>状态</th><th>补录备注</th><th>异常</th></tr>
 """
         for track in tracks:
             status_badge = "badge-success" if track.status.value == "已匹配" else "badge-warning" if track.status.value == "待审核" else "badge-danger"
             anomaly_badges = "".join([f'<span class="badge badge-danger">{a.value}</span>' for a in track.anomalies])
-            html_content += f"<tr><td>{track.track_id}</td><td>{track.track_name}</td><td>{track.student_name}</td><td><span class='badge {status_badge}'>{track.status.value}</span></td><td>{anomaly_badges}</td></tr>\n"
-        
+            note_text = track.supplementary_notes[:30] + "..." if len(track.supplementary_notes) > 30 else track.supplementary_notes
+            html_content += f"<tr><td>{track.track_id}</td><td>{track.track_name}</td><td>{track.student_name}</td><td><span class='badge {status_badge}'>{track.status.value}</span></td><td>{note_text}</td><td>{anomaly_badges}</td></tr>\n"
+
         html_content += """
         </table>
     </div>
 </body>
 </html>"""
-        
+
         with open(output_path, 'w', encoding='utf-8') as f:
             f.write(html_content)

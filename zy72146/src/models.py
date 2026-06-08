@@ -35,6 +35,7 @@ class TrackRecord:
     audio_file: Optional[str] = None
     anomalies: List[AnomalyType] = field(default_factory=list)
     anomaly_details: List[str] = field(default_factory=list)
+    supplementary_notes: str = ""
     process_log: List[str] = field(default_factory=list)
     extra: Dict[str, Any] = field(default_factory=dict)
 
@@ -57,6 +58,7 @@ class TrackRecord:
             "已授权": "是" if self.authorized else "否",
             "版本": self.version,
             "备注": self.notes,
+            "补录备注": self.supplementary_notes,
             "状态": self.status.value,
             "音频文件": self.audio_file or "",
             "异常类型": "|".join([a.value for a in self.anomalies]) if self.anomalies else "",
