@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>犬只疫苗异常提醒系统 · 宠物医院</title>
+<link rel="stylesheet" href="css/style.css" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="logo">🐾</span>
+    <div>
+      <h1>犬只疫苗异常提醒</h1>
+      <p class="subtitle">宠物医院前台工作台 · 评审版 v1.0</p>
+    </div>
+  </div>
+  <div class="summary-cards" id="summaryCards"></div>
+  <div class="ops">
+    <button class="btn btn-primary" id="btnRunDetect">▶ 重新运行检测</button>
+    <button class="btn btn-ghost" id="btnGuide">📖 操作指引</button>
+    <button class="btn btn-ghost" id="btnExport">📥 导出复核表</button>
+  </div>
+</header>
+
+<main class="layout">
+  <aside class="sidebar">
+    <section class="panel">
+      <h3>🔎 筛选器</h3>
+      <div class="filter-group">
+        <label>处理状态</label>
+        <div class="chip-row" id="statusFilter">
+          <button class="chip active" data-status="all">全部 <span id="cnt-all">0</span></button>
+          <button class="chip chip-warn" data-status="pending">待补件 <span id="cnt-pending">0</span></button>
+          <button class="chip chip-ok" data-status="confirmed">已确认 <span id="cnt-confirmed">0</span></button>
+          <button class="chip chip-danger" data-status="returned">退回 <span id="cnt-returned">0</span></button>
+        </div>
+      </div>
+      <div class="filter-group">
+        <label>异常级别</label>
+        <div class="chip-row">
+          <button class="chip chip-level active" data-level="all">全级别</button>
+          <button class="chip chip-level" data-level="high">🔴 高</button>
+          <button class="chip chip-level" data-level="mid">🟡 中</button>
+          <button class="chip chip-level" data-level="low">🔵 低</button>
+        </div>
+      </div>
+      <div class="filter-group">
+        <label>关键词</label>
+        <input type="text" id="keyword" class="input" placeholder="犬名 / 疫苗名 / 备注" />
+      </div>
+    </section>
+
+    <section class="panel" id="calcPanel">
+      <h3>🧮 本次计算口径</h3>
+      <ul class="ruled-list" id="ruleList"></ul>
+    </section>
+
+    <section class="panel">
+      <h3>📅 节假日影响标注</h3>
+      <div id="holidayImpact"></div>
+    </section>
+  </aside>
+
+  <section class="content">
+    <div class="toolbar">
+      <h2>异常提醒列表</h2>
+      <div class="legend">
+        <span><i class="dot dot-high"></i>高风险</span>
+        <span><i class="dot dot-mid"></i>中风险</span>
+        <span><i class="dot dot-low"></i>低风险</span>
+        <span><i class="strike"></i>已撤回原始记录</span>
+      </div>
+    </div>
+
+    <div class="alert-list" id="alertList"></div>
+  </section>
+</main>
+
+<!-- 追溯弹窗 -->
+<div class="modal" id="traceModal" style="display:none">
+  <div class="modal-content modal-lg">
+    <div class="modal-header">
+      <h3 id="traceTitle">追溯详情</h3>
+      <button class="close" onclick="App.closeTrace()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="tabs">
+        <button class="tab active" data-tab="chart">📈 体重曲线</button>
+        <button class="tab" data-tab="calc">🧮 计算口径</button>
+        <button class="tab" data-tab="source">📄 来源材料</button>
+        <button class="tab" data-tab="boarding">🏠 寄养/节假日</button>
+      </div>
+      <div class="tab-content" id="tab-chart">
+        <canvas id="weightChart"></canvas>
+        <div id="chartFootnote" class="footnote"></div>
+      </div>
+      <div class="tab-content" id="tab-calc" style="display:none">
+        <div id="calcDetail"></div>
+      </div>
+      <div class="tab-content" id="tab-source" style="display:none">
+        <div id="sourceDetail"></div>
+      </div>
+      <div class="tab-content" id="tab-boarding" style="display:none">
+        <div id="boardingDetail"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 备注编辑弹窗 -->
+<div class="modal" id="noteModal" style="display:none">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>编辑备注 & 变更状态</h3>
+      <button class="close" onclick="App.closeNote()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <label>当前状态</label>
+        <select id="noteStatus" class="input">
+          <option value="pending">待补件</option>
+          <option value="confirmed">已确认</option>
+          <option value="returned">退回</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>备注</label>
+        <textarea id="noteText" class="input" rows="5" placeholder="请输入处理备注..."></textarea>
+      </div>
+      <div class="form-row">
+        <label>历史备注</label>
+        <div id="noteHistory" class="history-box"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="App.closeNote()">取消</button>
+        <button class="btn btn-primary" onclick="App.saveNote()">💾 保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 指引弹窗 -->
+<div class="modal" id="guideModal" style="display:none">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>📖 操作指引（运营主管请先阅读）</h3>
+      <button class="close" onclick="document.getElementById('guideModal').style.display='none'">×</button>
+    </div>
+    <div class="modal-body guide-body">
+      <ol>
+        <li><b>运行检测：</b>点击右上角「▶ 重新运行检测」，系统会自动扫描全部犬只的体重曲线、疫苗记录和寄养记录。</li>
+        <li><b>查看异常：</b>左侧可按「处理状态 / 异常级别 / 关键词」筛选，异常卡片按级别以颜色区分。</li>
+        <li><b>追溯原因：</b>点击异常卡片上的「追溯」按钮，可在弹窗中切换查看：
+          <ul>
+            <li>📈 体重曲线（鼠标悬浮查看数值）</li>
+            <li>🧮 本次判定使用的计算口径与规则</li>
+            <li>📄 参与计算的所有来源材料行（撤回记录会显式标注）</li>
+            <li>🏠 是否跨节假日寄养，具体影响范围</li>
+          </ul>
+        </li>
+        <li><b>处理异常：</b>点击「处理」按钮可修改状态（待补件 / 已确认 / 退回）并写备注，历史备注自动留存。</li>
+        <li><b>月底复核：</b>使用左侧状态筛选器切换已确认 / 待补件 / 退回三类，点击「📥 导出复核表」保存为JSON。</li>
+        <li><b>重启不丢数据：</b>所有状态、备注保存在浏览器本地存储（localStorage），刷新后自动恢复。</li>
+      </ol>
+      <div class="tip-box">
+        💡 材料说明：体重记录、疫苗记录、寄养记录均保存在浏览器本地数据库。需要重置演示数据请清除浏览器站点数据。
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast"></div>
+
+<script src="js/storage.js"></script>
+<script src="js/data.js"></script>
+<script src="js/calendar.js"></script>
+<script src="js/detector.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
