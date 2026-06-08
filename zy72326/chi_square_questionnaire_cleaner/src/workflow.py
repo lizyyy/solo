@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+from typing import Any, Optional
 from .evidence import EvidenceChain, ProcessingStatus
 from .result_store import ResultStore
 from .chi_square_cleaner import ChiSquareCleaner
@@ -68,23 +69,34 @@ class Workflow:
             "records": review_data,
         }
 
-    def step2_supplement(self, evidence_id: str, new_values: dict) -> dict:
-        self._add_log("step2_supplement", "start", f"evidence_id={evidence_id}, new_values={new_values}")
+    def step2_supplement(self, evidence_id: str, new_values: dict, supplemented_by: str = "实验助理") -> dict:
+        self._add_log("step2_supplement", "start", f"evidence_id={evidence_id}, new_values={new_values}, by={supplemented_by}")
 
         rec = self.evidence.get_by_id(evidence_id)
         if rec is None:
             return {"error": f"Evidence {evidence_id} not found"}
 
-        if rec.current_status not in (ProcessingStatus.PENDING_REVIEW, ProcessingStatus.AUTO_FLAGGED):
+        if rec.current_status not in (ProcessingStatus.PENDING_REVIEW, ProcessingStatus.AUTO_FLAGGED, ProcessingStatus.SUPPLEMENTED):
             return {"error": f"Evidence {evidence_id} status is {rec.current_status.value}, not pending review"}
 
         if rec.anomaly_type == "denominator_zero_empty_string":
+            if rec.original_statement is None:
+                den_field = rec.field_name
+                row = self.cleaner.view_original_row(rec.original_row) or {}
+                self.evidence.update_status(
+                    evidence_id,
+                    rec.current_status,
+                    original_statement=(
+                        f"原始CSV第{rec.original_row}行: '{den_field}'字段填了空字符串，"
+                        f"但计数字段求和为0; 原始行快照: {row}"
+                    ),
+                )
             self._add_log(
                 "step2_supplement", "note",
                 f"分母为0空字符串记录(evidence_id={evidence_id})，补录后不自动归正常，仍留给数据复核人复核",
             )
 
-        result = self.cleaner.supplement_row(evidence_id, new_values, self.evidence)
+        result = self.cleaner.supplement_row(evidence_id, new_values, self.evidence, supplemented_by=supplemented_by)
         self._add_log("step2_supplement", "complete", json.dumps(result, ensure_ascii=False))
         return result
 
@@ -121,11 +133,47 @@ class Workflow:
             "by_status": by_status,
         }
 
-    def reviewer_confirm(self, evidence_id: str, confirmed: bool, note: str = "") -> dict:
+    def reviewer_confirm(self, evidence_id: str, confirmed: bool, note: str = "", reviewer: str = "数据复核人") -> dict:
         rec = self.evidence.get_by_id(evidence_id)
         if rec is None:
             return {"error": f"Evidence {evidence_id} not found"}
-        new_status = ProcessingStatus.CONFIRMED_NORMAL if confirmed else ProcessingStatus.CONFIRMED_ANOMALY
-        self.evidence.update_status(evidence_id, new_status, manual_change=note or f"Reviewer confirmed: {'normal' if confirmed else 'anomaly'}")
-        self._add_log("reviewer_confirm", "complete", f"evidence_id={evidence_id}, status={new_status.value}")
-        return {"evidence_id": evidence_id, "new_status": new_status.value}
+
+        result = self.cleaner.reviewer_confirm_move(
+            evidence_id,
+            confirmed_normal=confirmed,
+            evidence=self.evidence,
+            reviewer=reviewer,
+            review_reason=note,
+        )
+
+        self._add_log(
+            "reviewer_confirm",
+            "complete",
+            f"evidence_id={evidence_id}, confirmed_normal={confirmed}, reviewer={reviewer}, result={result}",
+        )
+        return result
+
+    def get_evidence_full_detail(self, evidence_id: str) -> Optional[dict]:
+        rec = self.evidence.get_by_id(evidence_id)
+        if rec is None:
+            return None
+        row_snapshot = self.cleaner.view_original_row(rec.original_row)
+
+        anomaly_rows = self.store.get_anomaly_rows()
+        current_row = None
+        for r in anomaly_rows:
+            if r.get("_original_row") == rec.original_row:
+                current_row = dict(r)
+                break
+        if current_row is None:
+            for r in self.store.get_cleaned_rows():
+                if r.get("_original_row") == rec.original_row:
+                    current_row = dict(r)
+                    break
+
+        return {
+            "record": rec.to_dict(),
+            "original_row_snapshot": row_snapshot,
+            "current_row": current_row,
+            "row_history": [r.to_dict() for r in self.evidence.get_by_row(rec.original_row)],
+        }

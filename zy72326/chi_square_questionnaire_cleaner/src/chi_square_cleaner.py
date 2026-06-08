@@ -143,46 +143,119 @@ class ChiSquareCleaner:
         self.store.set_summary(result)
         return result
 
-    def supplement_row(self, evidence_id: str, new_values: dict, evidence: EvidenceChain) -> dict:
+    def supplement_row(self, evidence_id: str, new_values: dict, evidence: EvidenceChain, supplemented_by: str = "") -> dict:
         rec = evidence.get_by_id(evidence_id)
         if rec is None:
             return {"error": f"Evidence {evidence_id} not found"}
-        if rec.anomaly_type != ANOMALY_DENOMINATOR_ZERO_EMPTY:
-            return {"error": f"Evidence {evidence_id} is not a denominator_zero_empty_string anomaly"}
 
+        anomaly_rows = self.store.get_anomaly_rows()
         target_row = None
-        for row in self.store.get_anomaly_rows():
+        idx = None
+        for i, row in enumerate(anomaly_rows):
             if row.get("_original_row") == rec.original_row:
                 target_row = dict(row)
+                idx = i
                 break
 
+        cleaned_rows = self.store.get_cleaned_rows()
         if target_row is None:
-            return {"error": f"Anomaly row with original_row={rec.original_row} not found in anomaly store"}
+            for i, row in enumerate(cleaned_rows):
+                if row.get("_original_row") == rec.original_row:
+                    target_row = dict(row)
+                    break
 
+        if target_row is None:
+            return {"error": f"Row with original_row={rec.original_row} not found in store"}
+
+        target_row["_supplemented"] = "1"
         for k, v in new_values.items():
             target_row[k] = str(v)
-
-        target_row.pop("_anomaly", None)
-        target_row.pop("_anomaly_field", None)
 
         evidence.update_status(
             evidence_id,
             ProcessingStatus.SUPPLEMENTED,
             manual_change=f"Supplemented fields: {list(new_values.keys())} with values {new_values}",
+            supplemented_by=supplemented_by or "unknown",
+            supplemented_values=dict(new_values),
+            next_step="交由数据复核人（通常为组长）复核确认，确认无误后移入正常结果",
         )
 
-        self._rebuild_after_supplement(target_row)
-        self._recalculate_chi_square()
-        return {"status": "supplemented", "evidence_id": evidence_id, "original_row": rec.original_row}
+        if idx is not None:
+            anomaly_rows[idx] = target_row
+            self.store.set_anomaly_rows(anomaly_rows)
+        else:
+            anomaly_rows.append(target_row)
+            new_cleaned = [r for r in cleaned_rows if r.get("_original_row") != rec.original_row]
+            self.store.set_cleaned_rows(new_cleaned)
+            self.store.set_anomaly_rows(anomaly_rows)
 
-    def _rebuild_after_supplement(self, fixed_row: dict):
-        cleaned = self.store.get_cleaned_rows()
-        anomaly = self.store.get_anomaly_rows()
-        original_row = fixed_row.get("_original_row")
-        anomaly = [r for r in anomaly if r.get("_original_row") != original_row]
-        cleaned.append(fixed_row)
-        self.store.set_cleaned_rows(cleaned)
-        self.store.set_anomaly_rows(anomaly)
+        self._recalculate_chi_square()
+        return {"status": "supplemented_pending_review", "evidence_id": evidence_id, "original_row": rec.original_row}
+
+    def reviewer_confirm_move(self, evidence_id: str, confirmed_normal: bool, evidence: EvidenceChain, reviewer: str = "", review_reason: str = "") -> dict:
+        rec = evidence.get_by_id(evidence_id)
+        if rec is None:
+            return {"error": f"Evidence {evidence_id} not found"}
+        if rec.current_status not in (
+            ProcessingStatus.SUPPLEMENTED,
+            ProcessingStatus.PENDING_REVIEW,
+            ProcessingStatus.AUTO_FLAGGED,
+        ):
+            return {"error": f"Evidence {evidence_id} status is {rec.current_status.value}, not reviewable"}
+
+        anomaly_rows = self.store.get_anomaly_rows()
+        cleaned_rows = self.store.get_cleaned_rows()
+
+        target_row = None
+        idx = None
+        for i, row in enumerate(anomaly_rows):
+            if row.get("_original_row") == rec.original_row:
+                target_row = dict(row)
+                idx = i
+                break
+
+        if target_row is None:
+            return {"error": f"Anomaly row original_row={rec.original_row} not found"}
+
+        if confirmed_normal:
+            target_row.pop("_anomaly", None)
+            target_row.pop("_anomaly_field", None)
+            target_row.pop("_review_reason", None)
+            target_row["_reviewer"] = reviewer or "unknown"
+            target_row["_review_status"] = "confirmed_normal"
+            cleaned_rows.append(target_row)
+            del anomaly_rows[idx]
+            self.store.set_cleaned_rows(cleaned_rows)
+            self.store.set_anomaly_rows(anomaly_rows)
+            evidence.update_status(
+                evidence_id,
+                ProcessingStatus.CONFIRMED_NORMAL,
+                reviewer=reviewer or "unknown",
+                review_reason=review_reason or f"复核人确认数据正常，移入卡方计算正常结果",
+                next_step="已归入正常结果，参与卡方检验",
+                corrected_value=target_row.get(rec.field_name),
+            )
+        else:
+            target_row["_review_status"] = "confirmed_anomaly"
+            target_row["_reviewer"] = reviewer or "unknown"
+            target_row["_review_reason"] = review_reason or f"复核人确认仍为异常，从正常结果中排除"
+            anomaly_rows[idx] = target_row
+            self.store.set_anomaly_rows(anomaly_rows)
+            evidence.update_status(
+                evidence_id,
+                ProcessingStatus.CONFIRMED_ANOMALY,
+                reviewer=reviewer or "unknown",
+                review_reason=review_reason or f"复核人确认仍为异常，不参与卡方计算",
+                next_step="该条记录保留在异常区，不进入卡方检验；如需修正请重新补录并再复核",
+                corrected_value=None,
+            )
+
+        self._recalculate_chi_square()
+        return {
+            "status": "ok",
+            "evidence_id": evidence_id,
+            "new_status": (ProcessingStatus.CONFIRMED_NORMAL if confirmed_normal else ProcessingStatus.CONFIRMED_ANOMALY).value,
+        }
 
     def _recalculate_chi_square(self):
         cleaned = self.store.get_cleaned_rows()

@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>卡方检验问卷清洗 · Web 交互计算器</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; background: #f6f7fb; color: #222; }
+  header { background: #2d3a56; color: #fff; padding: 14px 22px; display:flex; align-items: center; justify-content: space-between; }
+  header h1 { margin: 0; font-size: 18px; font-weight: 600; }
+  header .badges { display:flex; gap: 8px; }
+  .badge { background: rgba(255,255,255,.15); padding: 3px 10px; border-radius: 999px; font-size: 12px; }
+  main { max-width: 1360px; margin: 0 auto; padding: 18px; display: grid; grid-template-columns: 360px 1fr; gap: 18px; }
+  .card { background: #fff; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,.06); padding: 16px; }
+  .card h2 { margin: 0 0 12px; font-size: 15px; color: #2d3a56; display:flex; align-items: center; gap: 8px; }
+  .card h2 .tag { font-size: 11px; background: #eef1fa; color: #3b5bdb; padding: 2px 8px; border-radius: 4px; font-weight: 400; }
+  .section + .section { margin-top: 20px; }
+  label { font-size: 13px; color: #555; display: block; margin: 8px 0 4px; }
+  input, textarea, select { width: 100%; padding: 8px 10px; border: 1px solid #d5d9e3; border-radius: 6px; font-size: 13px; font-family: inherit; }
+  textarea { resize: vertical; min-height: 80px; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; }
+  button { background: #3b5bdb; color: #fff; border: 0; border-radius: 6px; padding: 9px 14px; font-size: 13px; cursor: pointer; font-family: inherit; }
+  button:hover { background: #2f4cc1; }
+  button.secondary { background: #6c757d; }
+  button.danger { background: #d9534f; }
+  button.success { background: #28a745; }
+  button:disabled { background: #aeb5c4; cursor: not-allowed; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+
+  .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+  .summary-box { background: #f8f9ff; border: 1px solid #e3e7f2; padding: 10px 12px; border-radius: 8px; }
+  .summary-box .k { font-size: 11px; color: #7a8299; text-transform: uppercase; letter-spacing: .5px; }
+  .summary-box .v { font-size: 20px; font-weight: 600; color: #2d3a56; margin-top: 3px; }
+
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid #e5e8f0; margin-bottom: 14px; }
+  .tab { padding: 8px 14px; border-bottom: 2px solid transparent; cursor: pointer; font-size: 13px; color: #666; }
+  .tab.active { border-color: #3b5bdb; color: #2d3a56; font-weight: 600; }
+  .tabview { display: none; }
+  .tabview.active { display: block; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid #eef0f6; vertical-align: top; }
+  th { background: #fafbff; color: #555; font-weight: 600; }
+  tr:hover td { background: #f8faff; }
+
+  .status-pill { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 500; }
+  .status-pending_review { background: #fff4e5; color: #d46b08; }
+  .status-auto_flagged { background: #e6f7ff; color: #0958d9; }
+  .status-supplemented { background: #f6ffed; color: #389e0d; }
+  .status-confirmed_normal { background: #e6ffed; color: #237804; }
+  .status-confirmed_anomaly { background: #fff1f0; color: #cf1322; }
+
+  .detail-block { background: #fafbff; border: 1px solid #e8eaf4; border-radius: 8px; padding: 12px; margin-top: 10px; }
+  .detail-block h3 { margin: 0 0 8px; font-size: 13px; color: #2d3a56; }
+  .kv { display: grid; grid-template-columns: 120px 1fr; row-gap: 5px; font-size: 12px; }
+  .kv .k { color: #7a8299; }
+  .kv .v { color: #222; word-break: break-all; }
+  .kv .v code { background: #eef1fa; padding: 1px 5px; border-radius: 3px; }
+
+  .log-line { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 11px; padding: 3px 0; border-bottom: 1px dashed #eef0f6; color: #444; }
+  .log-line .step { color: #3b5bdb; font-weight: 600; }
+  .log-line .ts { color: #999; margin-right: 6px; }
+
+  .empty { color: #999; font-size: 12px; padding: 20px; text-align: center; }
+  .row-clickable { cursor: pointer; }
+  .muted { color: #888; font-size: 12px; }
+  .chi-result { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-top: 10px; }
+  .chi-box { padding: 10px; background: #f0f4ff; border-radius: 8px; text-align:center; }
+  .chi-box .k { font-size: 11px; color: #7a8299; }
+  .chi-box .v { font-size: 18px; font-weight: 600; color: #2d3a56; }
+
+  .flash { position: fixed; top: 20px; right: 20px; background: #28a745; color: #fff; padding: 10px 18px; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,.15); z-index: 9999; opacity: 0; transform: translateY(-10px); transition: all .25s ease; pointer-events: none; }
+  .flash.show { opacity: 1; transform: translateY(0); }
+  .flash.err { background: #d9534f; }
+
+  .supplement-form { margin-top: 10px; padding: 12px; border: 1px dashed #cfd4e0; border-radius: 8px; background: #fcfcff; }
+</style>
+</head>
+<body>
+<header>
+  <h1>卡方检验问卷清洗 · Web 交互计算器</h1>
+  <div class="badges">
+    <span class="badge" id="badge-evidence">证据 0</span>
+    <span class="badge" id="badge-pending">待复核 0</span>
+    <span class="badge" id="badge-cleaned">正常 0</span>
+  </div>
+</header>
+
+<main>
+  <aside>
+    <div class="card section">
+      <h2>① 数据输入 <span class="tag">导入 / 手填</span></h2>
+      <label>样例数据（一键触发问题输入）</label>
+      <div class="actions" style="margin-top:4px">
+        <button onclick="importSample()">导入样例 CSV</button>
+        <button class="secondary" onclick="resetAll()">重置</button>
+      </div>
+
+      <label style="margin-top:14px">或上传 CSV</label>
+      <form id="csv-form">
+        <input type="file" name="file" accept=".csv" id="csv-file" />
+        <div class="row" style="margin-top:10px">
+          <div>
+            <label>分母字段（逗号分隔）</label>
+            <input type="text" name="denominator_fields" value="denominator" />
+          </div>
+          <div>
+            <label>计数字段（逗号分隔）</label>
+            <input type="text" name="count_fields" value="count_a,count_b" />
+          </div>
+        </div>
+        <button type="submit" class="secondary" style="margin-top:10px">上传并导入</button>
+      </form>
+
+      <label style="margin-top:14px">或手填 JSON 行（每行一个对象）</label>
+      <textarea id="manual-rows" placeholder='[{"group":"A","count_a":"10","count_b":"5","denominator":""}]'></textarea>
+      <div class="actions">
+        <button class="secondary" onclick="importManualRows()">导入手工输入的行</button>
+      </div>
+    </div>
+
+    <div class="card section">
+      <h2>② 摘要 &amp; 卡方结果 <span class="tag">统一数据源</span></h2>
+      <div class="summary-grid">
+        <div class="summary-box"><div class="k">原始行</div><div class="v" id="sum-total">0</div></div>
+        <div class="summary-box"><div class="k">正常</div><div class="v" id="sum-cleaned">0</div></div>
+        <div class="summary-box"><div class="k">异常</div><div class="v" id="sum-anomaly">0</div></div>
+        <div class="summary-box"><div class="k">重复导入</div><div class="v" id="sum-dup">0</div></div>
+      </div>
+      <div class="chi-result">
+        <div class="chi-box"><div class="k">χ²</div><div class="v" id="chi-x2">—</div></div>
+        <div class="chi-box"><div class="k">df</div><div class="v" id="chi-df">—</div></div>
+        <div class="chi-box"><div class="k">p</div><div class="v" id="chi-p">—</div></div>
+      </div>
+      <div class="muted" id="chi-err" style="margin-top:8px"></div>
+    </div>
+
+    <div class="card section">
+      <h2>③ 导出 &amp; 报告 <span class="tag">与展示一致</span></h2>
+      <div class="actions" style="margin:0">
+        <button class="secondary" onclick="exportKind('cleaned_csv')">正常明细 CSV</button>
+        <button class="secondary" onclick="exportKind('anomaly_csv')">异常明细 CSV</button>
+      </div>
+      <div class="actions" style="margin-top:8px">
+        <button class="secondary" onclick="exportKind('result_json')">完整结果 JSON</button>
+        <button onclick="exportKind('report')">生成复核报告</button>
+      </div>
+    </div>
+  </aside>
+
+  <section>
+    <div class="card">
+      <div class="tabs">
+        <div class="tab active" data-tab="anomaly">异常列表（待复核）</div>
+        <div class="tab" data-tab="cleaned">正常结果</div>
+        <div class="tab" data-tab="evidence">证据清单</div>
+        <div class="tab" data-tab="history">历史记录</div>
+        <div class="tab" data-tab="selfcheck">自检结果</div>
+        <div class="tab" data-tab="detail">记录详情</div>
+      </div>
+
+      <div class="tabview active" id="tab-anomaly">
+        <h2 style="display:none"></h2>
+        <table id="tbl-anomaly">
+          <thead><tr>
+            <th>原始行号</th><th>异常类型</th><th>字段</th><th>原始值</th><th>当前值</th>
+            <th>状态</th><th>补录人/复核人</th><th>下一步</th>
+          </tr></thead>
+          <tbody><tr><td colspan="8" class="empty">尚无异常记录，请先导入数据。</td></tr></tbody>
+        </table>
+      </div>
+
+      <div class="tabview" id="tab-cleaned">
+        <table id="tbl-cleaned">
+          <thead><tr id="tbl-cleaned-head"></tr></thead>
+          <tbody><tr><td class="empty">尚无正常结果</td></tr></tbody>
+        </table>
+      </div>
+
+      <div class="tabview" id="tab-evidence">
+        <table id="tbl-evidence">
+          <thead><tr>
+            <th>证据ID</th><th>原始行号</th><th>异常类型</th><th>字段</th><th>原始值</th><th>改后值</th>
+            <th>状态</th><th>处理原因</th>
+          </tr></thead>
+          <tbody><tr><td colspan="8" class="empty">尚无证据记录</td></tr></tbody>
+        </table>
+      </div>
+
+      <div class="tabview" id="tab-history">
+        <div id="history-list"><div class="empty">尚无历史记录</div></div>
+      </div>
+
+      <div class="tabview" id="tab-selfcheck">
+        <table id="tbl-selfcheck">
+          <thead><tr><th>检查项</th><th>状态</th><th>说明</th><th>关联证据</th></tr></thead>
+          <tbody><tr><td colspan="4" class="empty">请点击「运行自检」</td></tr></tbody>
+        </table>
+        <div class="actions">
+          <button onclick="runSelfCheck()">运行自检</button>
+        </div>
+      </div>
+
+      <div class="tabview" id="tab-detail">
+        <div id="detail-content">
+          <div class="empty">点击异常列表或证据清单中的一行查看详情、补录或复核。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="flash" class="flash"></div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

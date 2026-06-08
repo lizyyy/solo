@@ -25,6 +25,13 @@ class EvidenceRecord:
     anomaly_type: str
     timestamp: str
     detail: str = ""
+    original_statement: Optional[str] = None
+    corrected_value: Optional[Any] = None
+    review_reason: Optional[str] = None
+    next_step: Optional[str] = None
+    reviewer: Optional[str] = None
+    supplemented_by: Optional[str] = None
+    supplemented_values: Optional[dict] = None
 
     def to_dict(self) -> dict:
         return {
@@ -37,6 +44,13 @@ class EvidenceRecord:
             "anomaly_type": self.anomaly_type,
             "timestamp": self.timestamp,
             "detail": self.detail,
+            "original_statement": self.original_statement,
+            "corrected_value": self.corrected_value,
+            "review_reason": self.review_reason,
+            "next_step": self.next_step,
+            "reviewer": self.reviewer,
+            "supplemented_by": self.supplemented_by,
+            "supplemented_values": self.supplemented_values,
         }
 
     @classmethod
@@ -64,6 +78,13 @@ class EvidenceChain:
         detail: str = "",
         manual_change: Optional[str] = None,
         status: ProcessingStatus = ProcessingStatus.AUTO_FLAGGED,
+        original_statement: Optional[str] = None,
+        corrected_value: Optional[Any] = None,
+        review_reason: Optional[str] = None,
+        next_step: Optional[str] = None,
+        reviewer: Optional[str] = None,
+        supplemented_by: Optional[str] = None,
+        supplemented_values: Optional[dict] = None,
     ) -> EvidenceRecord:
         rec = EvidenceRecord(
             evidence_id=self._next_id(),
@@ -75,17 +96,50 @@ class EvidenceChain:
             anomaly_type=anomaly_type,
             timestamp=datetime.now().isoformat(),
             detail=detail,
+            original_statement=original_statement,
+            corrected_value=corrected_value,
+            review_reason=review_reason,
+            next_step=next_step,
+            reviewer=reviewer,
+            supplemented_by=supplemented_by,
+            supplemented_values=supplemented_values,
         )
         self._records.append(rec)
         return rec
 
-    def update_status(self, evidence_id: str, new_status: ProcessingStatus, manual_change: Optional[str] = None) -> Optional[EvidenceRecord]:
+    def update_status(
+        self,
+        evidence_id: str,
+        new_status: ProcessingStatus,
+        manual_change: Optional[str] = None,
+        review_reason: Optional[str] = None,
+        next_step: Optional[str] = None,
+        reviewer: Optional[str] = None,
+        corrected_value: Optional[Any] = None,
+        supplemented_by: Optional[str] = None,
+        supplemented_values: Optional[dict] = None,
+        original_statement: Optional[str] = None,
+    ) -> Optional[EvidenceRecord]:
         for rec in self._records:
             if rec.evidence_id == evidence_id:
                 rec.current_status = new_status
                 rec.timestamp = datetime.now().isoformat()
                 if manual_change is not None:
                     rec.manual_change = manual_change
+                if review_reason is not None:
+                    rec.review_reason = review_reason
+                if next_step is not None:
+                    rec.next_step = next_step
+                if reviewer is not None:
+                    rec.reviewer = reviewer
+                if corrected_value is not None:
+                    rec.corrected_value = corrected_value
+                if supplemented_by is not None:
+                    rec.supplemented_by = supplemented_by
+                if supplemented_values is not None:
+                    rec.supplemented_values = supplemented_values
+                if original_statement is not None:
+                    rec.original_statement = original_statement
                 return rec
         return None
 

@@ -163,12 +163,22 @@ class TestChiSquareCleaner(unittest.TestCase):
         eid = dz_records[0].evidence_id
 
         result = self.cleaner.supplement_row(eid, {"count_a": "3", "count_b": "4", "denominator": "7"}, self.ev)
-        self.assertEqual(result["status"], "supplemented")
+        self.assertEqual(result["status"], "supplemented_pending_review")
 
         anomaly = self.store.get_anomaly_rows()
-        self.assertEqual(len(anomaly), 0)
+        self.assertEqual(len(anomaly), 1, "补录后仍留在异常列表，等复核人确认")
         cleaned = self.store.get_cleaned_rows()
-        self.assertEqual(len(cleaned), 2)
+        self.assertEqual(len(cleaned), 1, "补录后不提前归入正常结果")
+
+        confirm_result = self.cleaner.reviewer_confirm_move(
+            eid, confirmed_normal=True, evidence=self.ev, reviewer="测试复核人",
+            review_reason="确认数据正确",
+        )
+        self.assertEqual(confirm_result["new_status"], "confirmed_normal")
+        anomaly2 = self.store.get_anomaly_rows()
+        cleaned2 = self.store.get_cleaned_rows()
+        self.assertEqual(len(anomaly2), 0, "复核通过后，异常列表被清空")
+        self.assertEqual(len(cleaned2), 2, "复核通过后，记录移入正常结果")
 
     def test_view_original_row(self):
         rows = [
@@ -260,7 +270,21 @@ class TestWorkflow(unittest.TestCase):
         target_eid = next(r.evidence_id for r in dz_records if r.original_row == 3)
 
         supp_result = self.wf.step2_supplement(target_eid, {"count_a": "3", "count_b": "4", "denominator": "7"})
-        self.assertEqual(supp_result["status"], "supplemented")
+        self.assertEqual(supp_result["status"], "supplemented_pending_review")
+
+        rec_after_supp = self.wf.evidence.get_by_id(target_eid)
+        self.assertEqual(rec_after_supp.current_status, ProcessingStatus.SUPPLEMENTED)
+        self.assertIsNotNone(rec_after_supp.original_statement)
+        self.assertIsNotNone(rec_after_supp.next_step)
+
+        confirm_result = self.wf.reviewer_confirm(
+            target_eid, confirmed=True, note="对照确认数据", reviewer="复核人A",
+        )
+        self.assertEqual(confirm_result["new_status"], "confirmed_normal")
+        rec_after_rev = self.wf.evidence.get_by_id(target_eid)
+        self.assertEqual(rec_after_rev.reviewer, "复核人A")
+        self.assertIsNotNone(rec_after_rev.review_reason)
+        self.assertIsNotNone(rec_after_rev.corrected_value)
 
         demo = self.wf.step3_update_demo()
         self.assertIsNotNone(demo["chi_square_result"])
