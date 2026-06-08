@@ -12,11 +12,12 @@ from .audit import (
     record_rerun,
     format_audit_trail,
 )
-from .engine import run_sensitivity
+from .engine import run_sensitivity, merge_sensitivity_into_existing
 from .error_explainer import generate_explanations, refresh_explanations
 from .duplicate_detector import detect_duplicate_students
 from .models import (
     BoundaryValueNote,
+    CorrectionRecord,
     ErrorExplanation,
     QuestionnaireRawRow,
     ReviewStatus,
@@ -28,6 +29,16 @@ from .models import (
 class WorkflowSession:
     def __init__(self, session_id: str | None = None):
         self.state = WorkflowState(session_id=session_id or str(uuid.uuid4())[:8])
+
+    @staticmethod
+    def _display_value(value, field: str) -> str:
+        if isinstance(value, ReviewStatus):
+            return value.value
+        return str(value)
+
+    @staticmethod
+    def _serialize_value(value, field: str) -> str:
+        return WorkflowSession._display_value(value, field)
 
     def step1_import_questionnaire(
         self,
@@ -62,9 +73,13 @@ class WorkflowSession:
         self.state.boundary_notes = notes
         self.state.step2_boundary_reviewed = True
 
-        self.state.results = run_sensitivity(
-            self.state.questionnaire_rows, notes
-        )
+        fresh = run_sensitivity(self.state.questionnaire_rows, notes)
+        if self.state.results:
+            self.state.results = merge_sensitivity_into_existing(
+                fresh, self.state.results
+            )
+        else:
+            self.state.results = fresh
 
         self.state.explanations = refresh_explanations(
             self.state.results, self.state.explanations
@@ -133,10 +148,26 @@ class WorkflowSession:
         else:
             new_value = new_value_str
 
-        old_display = old_value.value if isinstance(old_value, ReviewStatus) else str(old_value)
-        new_display = new_value.value if isinstance(new_value, ReviewStatus) else str(new_value)
+        old_display = self._display_value(old_value, field)
+        new_display = self._display_value(new_value, field)
 
-        updated = result.model_copy(update={field: new_value})
+        updated_corrected_fields = dict(result.corrected_fields)
+        updated_corrected_fields[field] = self._serialize_value(new_value, field)
+
+        new_history_entry = CorrectionRecord(
+            field=field,
+            original_value=old_display,
+            corrected_value=new_display,
+            reason=reason,
+            operator=operator,
+        )
+        updated_history = list(result.corrections_history) + [new_history_entry]
+
+        updated = result.model_copy(update={
+            field: new_value,
+            "corrected_fields": updated_corrected_fields,
+            "corrections_history": updated_history,
+        })
         self.state.results[target_idx] = updated
 
         cascaded = []
@@ -160,9 +191,16 @@ class WorkflowSession:
         reason: str = "人工修正后重跑",
         operator: str = "教研负责人吴老师",
     ) -> list[SensitivityResult]:
-        self.state.results = run_sensitivity(
+        fresh = run_sensitivity(
             self.state.questionnaire_rows, self.state.boundary_notes
         )
+        if self.state.results:
+            self.state.results = merge_sensitivity_into_existing(
+                fresh, self.state.results
+            )
+        else:
+            self.state.results = fresh
+
         self.state.explanations = refresh_explanations(
             self.state.results, self.state.explanations
         )
@@ -221,13 +259,24 @@ class WorkflowSession:
 
         lines.append("试算结果：")
         for r in self.state.results:
-            dup_tag = " ⚠两版" if r.is_duplicate else ""
+            dup_tag = " ⚠两版待复核" if r.is_duplicate else ""
+            corr_tag = " ✔人工复核" if r.corrections_history else ""
+            tags = f"{dup_tag}{corr_tag}"
             lines.append(
                 f"  [{r.result_id}] 学生{r.student_id} 题目{r.question_id}"
                 f" → 后验均值{r.posterior_mean:.2f}"
                 f" 敏感性{r.sensitivity_range:.2f}"
-                f" 状态={r.status.value}{dup_tag}"
+                f" 状态={r.status.value}{tags}"
             )
+            if r.corrections_history:
+                lines.append(f"      修正历史：")
+                for c in r.corrections_history:
+                    ts = c.corrected_at.strftime("%m-%d %H:%M")
+                    lines.append(
+                        f"      · [{ts} {c.operator}] {c.field}"
+                        f"「{c.original_value}→{c.corrected_value}」"
+                        f"（原因：{c.reason}）"
+                    )
         lines.append("")
 
         lines.append("误差说明：")

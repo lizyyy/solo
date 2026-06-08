@@ -1,0 +1,417 @@
+{
+  "session_id": "demo001",
+  "current_step": 3,
+  "step1_imported": true,
+  "step2_boundary_reviewed": true,
+  "step3_error_updated": true,
+  "questionnaire_rows": [
+    {
+      "row_id": "R001",
+      "student_id": "S001",
+      "student_name": "张三",
+      "question_id": "Q01",
+      "answer": "选B",
+      "score": 0.8,
+      "max_score": 1.0,
+      "submitted_at": "2026-05-20T10:30:00",
+      "version": 1,
+      "source": "问卷原始行",
+      "raw_text": "张三,Q01,B,0.8"
+    },
+    {
+      "row_id": "R002",
+      "student_id": "S002",
+      "student_name": "李四",
+      "question_id": "Q01",
+      "answer": "选A",
+      "score": 1.0,
+      "max_score": 1.0,
+      "submitted_at": "2026-05-20T10:31:00",
+      "version": 1,
+      "source": "问卷原始行",
+      "raw_text": "李四,Q01,A,1.0"
+    },
+    {
+      "row_id": "R003",
+      "student_id": "S003",
+      "student_name": "王五",
+      "question_id": "Q01",
+      "answer": "选C",
+      "score": 0.0,
+      "max_score": 1.0,
+      "submitted_at": "2026-05-20T10:32:00",
+      "version": 1,
+      "source": "问卷原始行",
+      "raw_text": "王五,Q01,C,0.0"
+    },
+    {
+      "row_id": "R004",
+      "student_id": "S001",
+      "student_name": "张三",
+      "question_id": "Q02",
+      "answer": "选A",
+      "score": 1.0,
+      "max_score": 1.0,
+      "submitted_at": "2026-05-20T10:35:00",
+      "version": 1,
+      "source": "问卷原始行",
+      "raw_text": "张三,Q02,A,1.0"
+    },
+    {
+      "row_id": "R005",
+      "student_id": "S002",
+      "student_name": "李四",
+      "question_id": "Q02",
+      "answer": "选B",
+      "score": 0.5,
+      "max_score": 1.0,
+      "submitted_at": "2026-05-20T10:36:00",
+      "version": 1,
+      "source": "问卷原始行",
+      "raw_text": "李四,Q02,B,0.5"
+    },
+    {
+      "row_id": "R006",
+      "student_id": "S002",
+      "student_name": "李四",
+      "question_id": "Q02",
+      "answer": "选C",
+      "score": 0.7,
+      "max_score": 1.0,
+      "submitted_at": "2026-05-20T10:50:00",
+      "version": 2,
+      "source": "问卷原始行",
+      "raw_text": "李四,Q02,C,0.7"
+    },
+    {
+      "row_id": "R007",
+      "student_id": "S003",
+      "student_name": "王五",
+      "question_id": "Q02",
+      "answer": "选A",
+      "score": 0.9,
+      "max_score": 1.0,
+      "submitted_at": "2026-05-20T10:37:00",
+      "version": 1,
+      "source": "问卷原始行",
+      "raw_text": "王五,Q02,A,0.9"
+    }
+  ],
+  "boundary_notes": [
+    {
+      "note_id": "BN001",
+      "student_id": "S001",
+      "question_id": "Q01",
+      "field_observation": "考试时该生坐窗边，有阳光直射答题卡，可能影响涂卡识别",
+      "prior_alpha_low": 1.0,
+      "prior_alpha_high": 3.0,
+      "prior_beta_low": 1.0,
+      "prior_beta_high": 2.0,
+      "submitted_at": "2026-06-09T00:07:16.179902",
+      "source": "边界值说明"
+    },
+    {
+      "note_id": "BN002",
+      "student_id": "S002",
+      "question_id": null,
+      "field_observation": "该生中途换了笔，第二题重答了一版，两版都交了上来",
+      "prior_alpha_low": 1.0,
+      "prior_alpha_high": 2.0,
+      "prior_beta_low": 1.0,
+      "prior_beta_high": 2.0,
+      "submitted_at": "2026-06-09T00:07:16.180296",
+      "source": "边界值说明"
+    },
+    {
+      "note_id": "BN003",
+      "student_id": "S003",
+      "question_id": "Q01",
+      "field_observation": "该题出题时选项C表述有歧义，教研组讨论后认为可能误导学生",
+      "prior_alpha_low": 0.5,
+      "prior_alpha_high": 4.0,
+      "prior_beta_low": 0.5,
+      "prior_beta_high": 4.0,
+      "submitted_at": "2026-06-09T00:07:16.180369",
+      "source": "边界值说明"
+    }
+  ],
+  "results": [
+    {
+      "result_id": "3683b3c2",
+      "student_id": "S001",
+      "question_id": "Q01",
+      "questionnaire_evidence": "学生S001，题目Q01；提交1版答案；得分0.8",
+      "boundary_evidence": "现场说法：「考试时该生坐窗边，有阳光直射答题卡，可能影响涂卡识别」；先验α范围[1.0, 3.0]；先验β范围[1.0, 2.0]",
+      "posterior_mean": 0.6667,
+      "posterior_std": 0.201,
+      "sensitivity_range": 0.3,
+      "is_duplicate": false,
+      "duplicate_versions": [],
+      "status": "已确认",
+      "calculated_at": "2026-06-09T00:07:16.395388",
+      "corrected_fields": {
+        "status": "已确认"
+      },
+      "corrections_history": [
+        {
+          "field": "status",
+          "original_value": "待复核",
+          "corrected_value": "已确认",
+          "reason": "教研负责人吴老师现场确认阳光影响可控，该结果可采信",
+          "operator": "教研负责人吴老师",
+          "corrected_at": "2026-06-09T00:07:16.362457"
+        }
+      ]
+    },
+    {
+      "result_id": "2903988e",
+      "student_id": "S001",
+      "question_id": "Q02",
+      "questionnaire_evidence": "学生S001，题目Q02；提交1版答案；得分1.0",
+      "boundary_evidence": "无边值说明",
+      "posterior_mean": 0.6667,
+      "posterior_std": 0.2357,
+      "sensitivity_range": 0.0,
+      "is_duplicate": false,
+      "duplicate_versions": [],
+      "status": "待补看边界值",
+      "calculated_at": "2026-06-09T00:07:16.422862",
+      "corrected_fields": {},
+      "corrections_history": []
+    },
+    {
+      "result_id": "fd23106a",
+      "student_id": "S002",
+      "question_id": "Q01",
+      "questionnaire_evidence": "学生S002，题目Q01；提交1版答案；得分1.0",
+      "boundary_evidence": "现场说法：「该生中途换了笔，第二题重答了一版，两版都交了上来」；先验α范围[1.0, 2.0]；先验β范围[1.0, 2.0]",
+      "posterior_mean": 0.625,
+      "posterior_std": 0.2165,
+      "sensitivity_range": 0.25,
+      "is_duplicate": false,
+      "duplicate_versions": [],
+      "status": "待复核",
+      "calculated_at": "2026-06-09T00:07:16.453203",
+      "corrected_fields": {},
+      "corrections_history": []
+    },
+    {
+      "result_id": "96d90df3",
+      "student_id": "S002",
+      "question_id": "Q02",
+      "questionnaire_evidence": "学生S002，题目Q02；提交了2版答案（版本1,2）；得分0.5,0.7",
+      "boundary_evidence": "现场说法：「该生中途换了笔，第二题重答了一版，两版都交了上来」；先验α范围[1.0, 2.0]；先验β范围[1.0, 2.0]",
+      "posterior_mean": 0.5,
+      "posterior_std": 0.2041,
+      "sensitivity_range": 0.2,
+      "is_duplicate": true,
+      "duplicate_versions": [
+        1,
+        2
+      ],
+      "status": "两版答案待复核",
+      "calculated_at": "2026-06-09T00:07:16.475032",
+      "corrected_fields": {},
+      "corrections_history": []
+    },
+    {
+      "result_id": "7f5b8dc2",
+      "student_id": "S003",
+      "question_id": "Q01",
+      "questionnaire_evidence": "学生S003，题目Q01；提交1版答案；得分0.0",
+      "boundary_evidence": "现场说法：「该题出题时选项C表述有歧义，教研组讨论后认为可能误导学生」；先验α范围[0.5, 4.0]；先验β范围[0.5, 4.0]",
+      "posterior_mean": 0.4091,
+      "posterior_std": 0.1928,
+      "sensitivity_range": 0.6364,
+      "is_duplicate": false,
+      "duplicate_versions": [],
+      "status": "待复核",
+      "calculated_at": "2026-06-09T00:07:16.495502",
+      "corrected_fields": {},
+      "corrections_history": []
+    },
+    {
+      "result_id": "f4520632",
+      "student_id": "S003",
+      "question_id": "Q02",
+      "questionnaire_evidence": "学生S003，题目Q02；提交1版答案；得分0.9",
+      "boundary_evidence": "无边值说明",
+      "posterior_mean": 0.6667,
+      "posterior_std": 0.2357,
+      "sensitivity_range": 0.0,
+      "is_duplicate": false,
+      "duplicate_versions": [],
+      "status": "待补看边界值",
+      "calculated_at": "2026-06-09T00:07:16.509930",
+      "corrected_fields": {},
+      "corrections_history": []
+    }
+  ],
+  "explanations": [
+    {
+      "explanation_id": "97c2ef63",
+      "result_id": "3683b3c2",
+      "student_id": "S001",
+      "why_kept": "该结果已发生人工复核：[06-09 00:07 教研负责人吴老师] 字段status：原值「待复核」→ 改后「已确认」（原因：教研负责人吴老师现场确认阳光影响可控，该结果可采信）（重跑时将保留修正值，不再自动归为默认状态）；先验敏感性范围达0.30，说明后验对先验选择较敏感，不能简单按单一先验下结论，需保留供进一步审查；当前状态「已确认」为人工复核结论，仍保留在误差说明列表以便追溯，不再参与自动归并",
+      "missing_materials": [
+        "更窄的先验范围约束，当前先验区间太宽导致敏感性高"
+      ],
+      "next_action": "无需操作",
+      "next_action_detail": "学生S001题目Q01已由教研负责人吴老师确认为「已确认」，可沿用；若后续边界值说明变更再同步复核",
+      "is_duplicate_flag": false,
+      "generated_at": "2026-06-09T00:07:16.510045"
+    },
+    {
+      "explanation_id": "1a37e96a",
+      "result_id": "2903988e",
+      "student_id": "S001",
+      "why_kept": "学生S001在题目Q02的后验均值为0.67；目前缺少边界值说明的现场证据，无法判断先验约束是否合理，故保留",
+      "missing_materials": [
+        "学生S001题目Q02的边界值说明（现场说法）",
+        "更多样本数据以降低后验不确定性"
+      ],
+      "next_action": "补录边界值说明",
+      "next_action_detail": "学生S001题目Q02尚无边值说明，请补录后再更新误差说明",
+      "is_duplicate_flag": false,
+      "generated_at": "2026-06-09T00:07:16.510060"
+    },
+    {
+      "explanation_id": "78252134",
+      "result_id": "fd23106a",
+      "student_id": "S002",
+      "why_kept": "学生S002在题目Q01的后验均值为0.62；先验敏感性范围达0.25，说明后验对先验选择较敏感，不能简单按单一先验下结论，需保留供进一步审查",
+      "missing_materials": [
+        "更窄的先验范围约束，当前先验区间太宽导致敏感性高",
+        "更多样本数据以降低后验不确定性"
+      ],
+      "next_action": "找教研负责人吴老师确认",
+      "next_action_detail": "学生S002题目Q01敏感性范围0.25，先验选择对结论影响大，需教研负责人吴老师确认先验范围是否合理",
+      "is_duplicate_flag": false,
+      "generated_at": "2026-06-09T00:07:16.510069"
+    },
+    {
+      "explanation_id": "b9bf77a4",
+      "result_id": "96d90df3",
+      "student_id": "S002",
+      "why_kept": "学生S002对题目Q02提交了第1版、第2版答案，两版答案差异尚未经业务运营复核，不能自动归为正常，必须保留等待人工判断；先验敏感性范围达0.20，说明后验对先验选择较敏感，不能简单按单一先验下结论，需保留供进一步审查",
+      "missing_materials": [
+        "学生S002两版答案的差异原因说明与业务运营签字确认",
+        "更窄的先验范围约束，当前先验区间太宽导致敏感性高",
+        "更多样本数据以降低后验不确定性"
+      ],
+      "next_action": "找业务运营复核",
+      "next_action_detail": "学生S002对题目Q02提交了两版答案（版本1,2），请业务运营确认以哪版为准，不要自动归为正常",
+      "is_duplicate_flag": true,
+      "generated_at": "2026-06-09T00:07:16.510077"
+    },
+    {
+      "explanation_id": "3dea87c7",
+      "result_id": "7f5b8dc2",
+      "student_id": "S003",
+      "why_kept": "学生S003在题目Q01的后验均值为0.41；先验敏感性范围达0.64，说明后验对先验选择较敏感，不能简单按单一先验下结论，需保留供进一步审查",
+      "missing_materials": [
+        "更窄的先验范围约束，当前先验区间太宽导致敏感性高"
+      ],
+      "next_action": "找教研负责人吴老师确认",
+      "next_action_detail": "学生S003题目Q01敏感性范围0.64，先验选择对结论影响大，需教研负责人吴老师确认先验范围是否合理",
+      "is_duplicate_flag": false,
+      "generated_at": "2026-06-09T00:07:16.510083"
+    },
+    {
+      "explanation_id": "013d007d",
+      "result_id": "f4520632",
+      "student_id": "S003",
+      "why_kept": "学生S003在题目Q02的后验均值为0.67；目前缺少边界值说明的现场证据，无法判断先验约束是否合理，故保留",
+      "missing_materials": [
+        "学生S003题目Q02的边界值说明（现场说法）",
+        "更多样本数据以降低后验不确定性"
+      ],
+      "next_action": "补录边界值说明",
+      "next_action_detail": "学生S003题目Q02尚无边值说明，请补录后再更新误差说明",
+      "is_duplicate_flag": false,
+      "generated_at": "2026-06-09T00:07:16.510088"
+    }
+  ],
+  "audit_trail": [
+    {
+      "entry_id": "741b0792",
+      "operator": "系统自动导入",
+      "action": "导入了7条问卷原始行",
+      "reason": "首次导入问卷原始行数据",
+      "before_snapshot": "",
+      "after_snapshot": "",
+      "affected_result_ids": [
+        "3683b3c2",
+        "2903988e",
+        "fd23106a",
+        "96d90df3",
+        "7f5b8dc2",
+        "f4520632"
+      ],
+      "timestamp": "2026-06-09T00:07:16.273483"
+    },
+    {
+      "entry_id": "fad3f2ec",
+      "operator": "教研负责人吴老师",
+      "action": "补看了3条边界值说明",
+      "reason": "教研负责人补录现场说法与先验约束",
+      "before_snapshot": "",
+      "after_snapshot": "",
+      "affected_result_ids": [
+        "3683b3c2",
+        "2903988e",
+        "fd23106a",
+        "96d90df3",
+        "7f5b8dc2",
+        "f4520632"
+      ],
+      "timestamp": "2026-06-09T00:07:16.354623"
+    },
+    {
+      "entry_id": "786a5fdb",
+      "operator": "系统",
+      "action": "更新了6条误差说明",
+      "reason": "边界值说明变更后重新生成误差说明",
+      "before_snapshot": "",
+      "after_snapshot": "",
+      "affected_result_ids": [
+        "3683b3c2",
+        "2903988e",
+        "fd23106a",
+        "96d90df3",
+        "7f5b8dc2",
+        "f4520632"
+      ],
+      "timestamp": "2026-06-09T00:07:16.357978"
+    },
+    {
+      "entry_id": "57c61fe4",
+      "operator": "教研负责人吴老师",
+      "action": "人工修正：结果3683b3c2的status从「待复核」改为「已确认」",
+      "reason": "教研负责人吴老师现场确认阳光影响可控，该结果可采信",
+      "before_snapshot": "status=待复核",
+      "after_snapshot": "status=已确认",
+      "affected_result_ids": [
+        "3683b3c2"
+      ],
+      "timestamp": "2026-06-09T00:07:16.362567"
+    },
+    {
+      "entry_id": "c1cd42d3",
+      "operator": "教研负责人吴老师",
+      "action": "重跑试算，共6条结果",
+      "reason": "人工修正后重跑，验证结果一致性",
+      "before_snapshot": "",
+      "after_snapshot": "",
+      "affected_result_ids": [
+        "3683b3c2",
+        "2903988e",
+        "fd23106a",
+        "96d90df3",
+        "7f5b8dc2",
+        "f4520632"
+      ],
+      "timestamp": "2026-06-09T00:07:16.510097"
+    }
+  ]
+}

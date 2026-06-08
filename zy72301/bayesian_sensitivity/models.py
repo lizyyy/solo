@@ -54,6 +54,15 @@ class BoundaryValueNote(BaseModel):
     source: EvidenceSource = Field(default=EvidenceSource.BOUNDARY_NOTE)
 
 
+class CorrectionRecord(BaseModel):
+    field: str = Field(description="被修正的字段名")
+    original_value: str = Field(description="修正前的值(显示用)")
+    corrected_value: str = Field(description="修正后的值(显示用)")
+    reason: str = Field(description="修正原因")
+    operator: str = Field(description="操作人")
+    corrected_at: datetime = Field(default_factory=datetime.now)
+
+
 class SensitivityResult(BaseModel):
     result_id: str = Field(description="结果ID")
     student_id: str = Field(description="学生ID")
@@ -67,6 +76,14 @@ class SensitivityResult(BaseModel):
     duplicate_versions: list[int] = Field(default_factory=list, description="重复版本号")
     status: ReviewStatus = Field(default=ReviewStatus.PENDING_IMPORT)
     calculated_at: datetime = Field(default_factory=datetime.now)
+    corrected_fields: dict[str, str] = Field(
+        default_factory=dict,
+        description="人工修正过的字段 → 修正后值(序列化字符串)，重跑时不被覆盖",
+    )
+    corrections_history: list[CorrectionRecord] = Field(
+        default_factory=list,
+        description="该结果上发生的全部人工修正痕迹",
+    )
 
 
 class ErrorExplanation(BaseModel):

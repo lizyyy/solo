@@ -9,6 +9,7 @@ from scipy import stats
 
 from .models import (
     BoundaryValueNote,
+    CorrectionRecord,
     EvidenceSource,
     QuestionnaireRawRow,
     ReviewStatus,
@@ -19,6 +20,20 @@ from .models import (
 _DEFAULT_PRIOR_ALPHA = 1.0
 _DEFAULT_PRIOR_BETA = 1.0
 _SENSITIVITY_GRID_POINTS = 5
+_PURE_COMPUTED_FIELDS = {
+    "posterior_mean",
+    "posterior_std",
+    "sensitivity_range",
+    "questionnaire_evidence",
+    "boundary_evidence",
+    "calculated_at",
+}
+
+
+def _display_value(value, field: str) -> str:
+    if isinstance(value, ReviewStatus):
+        return value.value
+    return str(value)
 
 
 def _extract_likelihood(rows: list[QuestionnaireRawRow]) -> dict[str, dict[str, dict]]:
@@ -190,3 +205,80 @@ def run_sensitivity(
             )
 
     return results
+
+
+def _reconstruct_value(field: str, serialized: str, type_hint):
+    if type_hint is bool:
+        return serialized.lower() in ("true", "1", "yes")
+    if type_hint is int:
+        return int(serialized)
+    if type_hint is float:
+        return float(serialized)
+    if type_hint is ReviewStatus:
+        return ReviewStatus(serialized)
+    return serialized
+
+
+def merge_sensitivity_into_existing(
+    fresh: list[SensitivityResult],
+    existing: list[SensitivityResult],
+) -> list[SensitivityResult]:
+    """
+    把新计算的结果合并进已有结果列表：
+    - 按 (student_id, question_id) 稳定匹配；
+    - 保留原 result_id、corrected_fields、corrections_history、is_duplicate、duplicate_versions；
+    - 人工修正过的字段不被覆盖，按 corrected_fields 中存储的值复原；
+    - 只覆盖纯计算字段：后验均值/标准差/敏感性、证据摘要、calculated_at；
+    - 两版答案标记永远以"数据里有多个版本"为准，不被引擎状态覆盖。
+    """
+    existing_map = {
+        (r.student_id, r.question_id): r for r in existing
+    }
+    merged: list[SensitivityResult] = []
+    for f in fresh:
+        key = (f.student_id, f.question_id)
+        if key not in existing_map:
+            merged.append(f)
+            continue
+        old = existing_map[key]
+
+        base = f.model_copy(update={
+            "result_id": old.result_id,
+            "corrected_fields": dict(old.corrected_fields),
+            "corrections_history": list(old.corrections_history),
+        })
+
+        if old.is_duplicate:
+            base.is_duplicate = True
+            if old.duplicate_versions:
+                base.duplicate_versions = old.duplicate_versions
+
+        if old.corrected_fields:
+            raw_model = SensitivityResult.model_fields
+            for field, serialized_value in old.corrected_fields.items():
+                if field not in raw_model:
+                    continue
+                type_hint = raw_model[field].annotation
+                try:
+                    restored = _reconstruct_value(
+                        field, serialized_value, type_hint
+                    )
+                    setattr(base, field, restored)
+                except Exception:
+                    setattr(base, field, serialized_value)
+
+        merged.append(base)
+
+    return merged
+
+
+def build_computation_only_results(
+    questionnaire_rows: list[QuestionnaireRawRow],
+    boundary_notes: list[BoundaryValueNote],
+) -> list[SensitivityResult]:
+    """
+    仅产出计算结果，不考虑已有修正痕迹，供 workflow 内部 merge 使用。
+    逻辑上等价于原 run_sensitivity，但不再决定最终业务状态。
+    """
+    return run_sensitivity(questionnaire_rows, boundary_notes)
+
