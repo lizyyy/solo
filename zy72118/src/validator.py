@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 import sys
 sys.path.append(str(Path(__file__).parent.parent))
-from config import VALID_DIRECTIONS, WARNING_MESSAGES
+from config import VALID_DIRECTIONS, WARNING_MESSAGES, DIRECTION_ALIASES
 
 
 class DataValidator:
@@ -58,22 +58,45 @@ class DataValidator:
     
     def check_direction(self, df: pd.DataFrame, direction_col: str) -> Dict:
         if direction_col not in df.columns:
-            return {'valid': True, 'ambiguous_count': 0, 'ambiguous_values': []}
+            return {'valid': True, 'ambiguous_count': 0, 'ambiguous_values': [], 'alias_hints': []}
             
         directions = df[direction_col].astype(str).str.strip()
-        ambiguous = directions[~directions.isin(VALID_DIRECTIONS) & (directions != '') & (directions != 'nan')]
+        non_empty = directions[(directions != '') & (directions != 'nan')]
+        
+        truly_unknown = []
+        alias_values = []
+        for val in non_empty.unique():
+            if val in VALID_DIRECTIONS and val not in DIRECTION_ALIASES:
+                continue
+            elif val in DIRECTION_ALIASES:
+                alias_values.append(val)
+            else:
+                truly_unknown.append(val)
+        
+        alias_hints = []
+        for val in alias_values:
+            alias_hints.append(f"'{val}' → '{DIRECTION_ALIASES[val]}'")
         
         result = {
-            'valid': len(ambiguous) == 0,
-            'ambiguous_count': len(ambiguous),
-            'ambiguous_values': ambiguous.unique().tolist()
+            'valid': len(truly_unknown) == 0,
+            'ambiguous_count': len(truly_unknown),
+            'ambiguous_values': truly_unknown,
+            'alias_values': alias_values,
+            'alias_hints': alias_hints
         }
         
-        if not result['valid']:
+        if alias_values:
             self.warnings.append({
                 'type': 'direction_ambiguous',
                 'message': WARNING_MESSAGES['direction_ambiguous'],
-                'details': f"无法识别的方向值: {', '.join(result['ambiguous_values'])}"
+                'details': f"非标准方向值已自动映射: {', '.join(alias_hints)}"
+            })
+        
+        if truly_unknown:
+            self.warnings.append({
+                'type': 'direction_ambiguous',
+                'message': WARNING_MESSAGES['direction_ambiguous'],
+                'details': f"无法识别的方向值: {', '.join(truly_unknown)}"
             })
             
         return result

@@ -12,7 +12,29 @@ UNITS = {
     }
 }
 
-VALID_DIRECTIONS = ['正向', '反向', '正', '反', '+', '-']
+VALID_DIRECTIONS = ['正向', '反向', '正', '反', '+', '-', 'CW', 'CCW', 'cw', 'ccw']
+
+DIRECTION_ALIASES = {
+    'CW': '正向',
+    'cw': '正向',
+    'CCW': '反向',
+    'ccw': '反向',
+    '+': '正向',
+    '-': '反向',
+    '正': '正向',
+    '反': '反向',
+    'FWD': '正向',
+    'REV': '反向',
+    'fwd': '正向',
+    'rev': '反向',
+    'FORWARD': '正向',
+    'REVERSE': '反向',
+}
+
+DIRECTION_GROUPS = {
+    '正向': ['正向', '正', '+', 'CW', 'cw', 'FWD', 'fwd', 'FORWARD'],
+    '反向': ['反向', '反', '-', 'CCW', 'ccw', 'REV', 'rev', 'REVERSE'],
+}
 
 COLUMN_MAPPINGS = {
     'timestamp': ['时间', 'timestamp', 'time', '时刻', '测量时间'],

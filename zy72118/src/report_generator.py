@@ -240,7 +240,9 @@ class ReportGenerator:
                            calibration_result,
                            validation_report: Dict,
                            conflict_report: Dict = None,
-                           filename: str = None) -> str:
+                           filename: str = None,
+                           raw_col: str = None,
+                           ref_col: str = None) -> str:
         if filename is None:
             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
             filename = f'calibration_report_{timestamp}.xlsx'
@@ -259,22 +261,61 @@ class ReportGenerator:
                     calibration_result.mae,
                     calibration_result.max_error,
                     calibration_result.r_squared
-                ]
+                ],
+                '单位': ['mm', '', 'mm', 'mm', 'mm', '']
             })
             summary_df.to_excel(writer, sheet_name='校准结果', index=False)
             
-            if 'corrected_values' in data_df.columns:
+            raw_col_name = raw_col if raw_col else '原始值'
+            ref_col_name = ref_col if ref_col else '标准值'
+            
+            n_data = len(data_df)
+            n_corrected = len(calibration_result.corrected_values)
+            
+            if raw_col_name in data_df.columns and ref_col_name in data_df.columns:
+                raw_arr = pd.to_numeric(data_df[raw_col_name], errors='coerce')
+                ref_arr = pd.to_numeric(data_df[ref_col_name], errors='coerce')
+                
+                if n_corrected == n_data:
+                    detail_df = pd.DataFrame({
+                        raw_col_name: raw_arr.values,
+                        ref_col_name: ref_arr.values,
+                        '校准后': calibration_result.corrected_values,
+                        '残差': calibration_result.residuals
+                    })
+                else:
+                    full_corrected = [np.nan] * n_data
+                    full_residuals = [np.nan] * n_data
+                    valid_mask = ~np.isnan(raw_arr.values) & ~np.isnan(ref_arr.values)
+                    valid_indices = np.where(valid_mask)[0]
+                    for i, orig_idx in enumerate(valid_indices):
+                        if i < n_corrected:
+                            full_corrected[orig_idx] = calibration_result.corrected_values[i]
+                            full_residuals[orig_idx] = calibration_result.residuals[i]
+                    detail_df = pd.DataFrame({
+                        raw_col_name: raw_arr.values,
+                        ref_col_name: ref_arr.values,
+                        '校准后': full_corrected,
+                        '残差': full_residuals
+                    })
+            else:
                 detail_df = pd.DataFrame({
-                    '原始值': data_df.get('raw_values', ''),
-                    '标准值': data_df.get('reference_values', ''),
                     '校准后': calibration_result.corrected_values,
                     '残差': calibration_result.residuals
                 })
-                detail_df.to_excel(writer, sheet_name='校准明细', index=False)
+            detail_df.to_excel(writer, sheet_name='校准明细', index=False)
             
             warnings_data = []
             for warn_type, warn_data in validation_report.items():
-                if isinstance(warn_data, dict) and warn_data.get('has_empty' if warn_type == 'empty_values' else 'has_duplicates' if warn_type == 'duplicates' else False):
+                if not isinstance(warn_data, dict):
+                    continue
+                has_issue = (
+                    warn_data.get('has_empty') or
+                    warn_data.get('has_duplicates') or
+                    warn_data.get('has_boundary') or
+                    not warn_data.get('valid', True)
+                )
+                if has_issue:
                     warnings_data.append({
                         '警告类型': warn_type,
                         '详情': str(warn_data)

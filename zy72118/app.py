@@ -256,7 +256,7 @@ elif page == "⚖️ 冲突检测":
 哦不对，应该是10.5cm！"""
         )
         
-        col1, col2 = st.columns(2)
+        col1, col2, col3 = st.columns(3)
         
         with col1:
             data_value_col = st.selectbox(
@@ -270,6 +270,13 @@ elif page == "⚖️ 冲突检测":
                 "数据时间列",
                 options=['(无)'] + df.columns.tolist(),
                 index=df.columns.tolist().index(st.session_state.column_mapping.get('timestamp', '')) + 1 if st.session_state.column_mapping.get('timestamp') in df.columns else 0
+            )
+        
+        with col3:
+            data_direction_col = st.selectbox(
+                "数据方向列",
+                options=['(无)'] + df.columns.tolist(),
+                index=df.columns.tolist().index(st.session_state.column_mapping.get('direction', '')) + 1 if st.session_state.column_mapping.get('direction') in df.columns else 0
             )
         
         if st.button("检测冲突", type="primary"):
@@ -292,10 +299,10 @@ elif page == "⚖️ 冲突检测":
                     data_time_col if data_time_col != '(无)' else None
                 )
                 
-                if data_value_col in df.columns:
+                if data_direction_col != '(无)':
                     dir_conflicts = st.session_state.conflict_detector.compare_direction(
                         df,
-                        data_value_col,
+                        data_direction_col,
                         data_time_col if data_time_col != '(无)' else None
                     )
                     conflicts.extend(dir_conflicts)
@@ -505,7 +512,9 @@ elif page == "📊 报告生成":
                 else:
                     report_path = st.session_state.report_generator.export_report_data(
                         df, result, 
-                        st.session_state.validation_report or {}
+                        st.session_state.validation_report or {},
+                        raw_col=raw_col,
+                        ref_col=ref_col
                     )
                 
                 st.success(f"✅ 报告已生成: {report_path}")

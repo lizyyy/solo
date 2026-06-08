@@ -16,9 +16,9 @@ def generate_sample_data():
     
     raw_values = (reference_values - bias) / scale_error + np.random.normal(0, noise_std, n_points)
     
-    directions = ['正向', '反向'] * (n_points // 2)
+    directions = ['CW', 'CCW'] * (n_points // 2)
     if n_points % 2:
-        directions.append('正向')
+        directions.append('CW')
     
     timestamps = pd.date_range('2024-01-15 10:00:00', periods=n_points, freq='2min')
     
@@ -44,7 +44,7 @@ def generate_sample_data():
     df.loc[25, '原始值'] = 495.0
     df.loc[26, '原始值'] = 12.0
     
-    df.loc[15, '方向'] = '未知'
+    df.loc[15, '方向'] = 'UNKNOWN'
     
     output_path = Path('data') / 'laser_calibration_sample.xlsx'
     df.to_excel(output_path, index=False)
@@ -62,7 +62,7 @@ def generate_sample_data():
 
 def generate_wechat_sample():
     wechat_text = """何工 10:10:15
-刚才测的第5点距离是105mm，正向
+刚才测的第5点距离是105mm，DIR=CW
 
 张工 10:12:20
 收到，我这边记录是100mm，是不是单位错了？
@@ -71,13 +71,19 @@ def generate_wechat_sample():
 哦不对，应该是10.5cm！
 
 何工 10:30:30
-第10点距离200.5mm，正向，温度有点高
+第10点距离200.5mm，DIR=CW，温度有点高
 
 李工 10:35:00
-@何工 第15点我测的反向是300mm，你那边多少？
+@何工 第15点我测的DIR=CCW是300mm，你那边多少？
 
 何工 10:40:00
-第15点反向310mm，差了10mm啊
+第15点DIR=CCW 310mm，差了10mm啊
+
+赵工 10:50:00
+第20点我记的是正向250mm
+
+何工 10:52:00
+第20点我们数据里是CCW方向，不是正向吧？
 """
     
     output_path = Path('data') / 'wechat_sample.txt'

@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from pathlib import Path
 import sys
 sys.path.append(str(Path(__file__).parent.parent))
+from config import DIRECTION_GROUPS, DIRECTION_ALIASES
 
 
 @dataclass
@@ -142,7 +143,7 @@ class LaserRangeCalibrator:
         
         result = CalibrationResult(
             bias=np.mean([m['bias'] for m in self.segment_models]),
-            scale=np.mean([m['scale'] for m in self.segment_models]),
+            scale_factor=np.mean([m['scale'] for m in self.segment_models]),
             rmse=rmse,
             mae=mae,
             max_error=max_error,
@@ -155,6 +156,7 @@ class LaserRangeCalibrator:
         )
         
         self.calibration_result = result
+        self.correction_model = {'scale': result.scale_factor, 'bias': result.bias}
         return result
     
     def apply_correction(self, raw_value: float) -> float:
@@ -220,8 +222,19 @@ class LaserRangeCalibrator:
         
         result = {}
         
-        positive_mask = np.array([d in ['正向', '正', '+'] for d in directions])
-        negative_mask = np.array([d in ['反向', '反', '-'] for d in directions])
+        positive_set = set(DIRECTION_GROUPS.get('正向', []))
+        negative_set = set(DIRECTION_GROUPS.get('反向', []))
+        
+        def normalize_dir(d):
+            mapped = DIRECTION_ALIASES.get(d, d)
+            if mapped in positive_set or d in positive_set:
+                return '正向'
+            if mapped in negative_set or d in negative_set:
+                return '反向'
+            return None
+        
+        positive_mask = np.array([normalize_dir(d) == '正向' for d in directions])
+        negative_mask = np.array([normalize_dir(d) == '反向' for d in directions])
         
         if np.any(positive_mask):
             pos_errors = reference_values[positive_mask] - raw_values[positive_mask]

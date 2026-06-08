@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from pathlib import Path
 import sys
 sys.path.append(str(Path(__file__).parent.parent))
-from config import WARNING_MESSAGES
+from config import WARNING_MESSAGES, DIRECTION_GROUPS, DIRECTION_ALIASES
 
 
 @dataclass
@@ -26,6 +26,24 @@ class ConflictDetector:
     def __init__(self):
         self.conflicts = []
         self.wechat_records = []
+        self._seen_conflict_keys = set()
+        
+    def _make_conflict_key(self, conflict_type: str, timestamp: str, **kwargs) -> str:
+        parts = [conflict_type, timestamp]
+        for k, v in sorted(kwargs.items()):
+            parts.append(f"{k}={v}")
+        return "|".join(str(p) for p in parts)
+        
+    def _add_conflict_if_new(self, conflict: ConflictRecord):
+        key = self._make_conflict_key(
+            conflict.conflict_type,
+            conflict.timestamp,
+            data_value=conflict.data_value,
+            wechat_value=conflict.wechat_value
+        )
+        if key not in self._seen_conflict_keys:
+            self._seen_conflict_keys.add(key)
+            self.conflicts.append(conflict)
         
     def add_wechat_record(self, timestamp: str, content: str, 
                           distance: float = None, direction: str = None,
@@ -39,6 +57,7 @@ class ConflictDetector:
         })
     
     def parse_wechat_text(self, wechat_text: str) -> List[Dict]:
+        import re
         records = []
         lines = wechat_text.strip().split('\n')
         
@@ -53,7 +72,6 @@ class ConflictDetector:
                 continue
                 
             if any(key in line for key in ['距离', 'mm', 'cm', 'm', '误差', '偏差']):
-                import re
                 numbers = re.findall(r'[-+]?\d*\.?\d+', line)
                 if numbers:
                     current_record['distance'] = float(numbers[0])
@@ -64,10 +82,13 @@ class ConflictDetector:
                     elif 'm' in line:
                         current_record['unit'] = 'm'
                         
-            if '正向' in line or '反向' in line or '+' in line or '-' in line:
-                if '正向' in line or '+' in line:
+            dir_match = re.search(r'DIR\s*=\s*(CW|CCW|cw|ccw|正向|反向|FWD|REV|fwd|rev)', line, re.IGNORECASE)
+            if dir_match:
+                current_record['direction'] = dir_match.group(1)
+            elif any(d in line for d in ['正向', '反向']):
+                if '正向' in line:
                     current_record['direction'] = '正向'
-                else:
+                elif '反向' in line:
                     current_record['direction'] = '反向'
                     
             if ':' in line and any(char.isdigit() for char in line.split(':')[0]):
@@ -149,7 +170,8 @@ class ConflictDetector:
                             severity='medium'
                         ))
                         
-        self.conflicts.extend(conflicts)
+        for c in conflicts:
+            self._add_conflict_if_new(c)
         return conflicts
     
     def compare_direction(self, data_df: pd.DataFrame, 
@@ -157,11 +179,16 @@ class ConflictDetector:
                            data_time_col: str = None) -> List[ConflictRecord]:
         conflicts = []
         
+        positive_set = set(DIRECTION_GROUPS.get('正向', []))
+        negative_set = set(DIRECTION_GROUPS.get('反向', []))
+        
         for wechat_rec in self.wechat_records:
             if 'direction' not in wechat_rec:
                 continue
                 
             wechat_direction = wechat_rec['direction']
+            wechat_mapped = DIRECTION_ALIASES.get(wechat_direction, wechat_direction)
+            wechat_is_positive = wechat_mapped in positive_set or wechat_direction in positive_set
             
             if data_time_col and data_time_col in data_df.columns and 'timestamp' in wechat_rec:
                 try:
@@ -172,10 +199,9 @@ class ConflictDetector:
                     
                     if time_diff[closest_idx] < 300:
                         data_direction = str(data_df.iloc[closest_idx][data_direction_col]).strip()
-                        
-                        data_is_positive = data_direction in ['正向', '正', '+']
-                        data_is_negative = data_direction in ['反向', '反', '-']
-                        wechat_is_positive = wechat_direction in ['正向', '正', '+']
+                        data_mapped = DIRECTION_ALIASES.get(data_direction, data_direction)
+                        data_is_positive = data_mapped in positive_set or data_direction in positive_set
+                        data_is_negative = data_mapped in negative_set or data_direction in negative_set
                         
                         if (data_is_positive or data_is_negative) and (data_is_positive != wechat_is_positive):
                             conflicts.append(ConflictRecord(
@@ -193,7 +219,8 @@ class ConflictDetector:
                 except:
                     pass
                     
-        self.conflicts.extend(conflicts)
+        for c in conflicts:
+            self._add_conflict_if_new(c)
         return conflicts
     
     def get_conflict_summary(self) -> Dict:
@@ -237,3 +264,4 @@ class ConflictDetector:
     def clear_conflicts(self):
         self.conflicts = []
         self.wechat_records = []
+        self._seen_conflict_keys = set()
