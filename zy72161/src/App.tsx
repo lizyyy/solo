@@ -3,10 +3,11 @@ import { MapPage } from '@/pages/MapPage';
 import { ConflictPage } from '@/pages/ConflictPage';
 import { ReportPage } from '@/pages/ReportPage';
 import { ReportModal } from '@/components/report/ReportModal';
+import { ImportDialog } from '@/components/import/ImportDialog';
 import { useUIStore } from '@/store/uiStore';
 
 export default function App() {
-  const { activeTab, showReportModal } = useUIStore();
+  const { activeTab, showReportModal, showImportDialog } = useUIStore();
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100">
@@ -19,6 +20,7 @@ export default function App() {
       </main>
 
       {showReportModal && <ReportModal />}
+      {showImportDialog && <ImportDialog />}
     </div>
   );
 }

@@ -5,6 +5,7 @@ interface UIState {
   showTimeline: boolean;
   showConflictCenter: boolean;
   showReportModal: boolean;
+  showImportDialog: boolean;
   detailPanelShelterId: string | null;
   activeTab: 'map' | 'conflicts' | 'report';
 }
@@ -16,6 +17,8 @@ interface UIActions {
   setActiveTab: (tab: 'map' | 'conflicts' | 'report') => void;
   openReportModal: () => void;
   closeReportModal: () => void;
+  openImportDialog: () => void;
+  closeImportDialog: () => void;
 }
 
 export const useUIStore = create<UIState & UIActions>((set) => ({
@@ -23,6 +26,7 @@ export const useUIStore = create<UIState & UIActions>((set) => ({
   showTimeline: true,
   showConflictCenter: false,
   showReportModal: false,
+  showImportDialog: false,
   detailPanelShelterId: null,
   activeTab: 'map',
 
@@ -43,5 +47,8 @@ export const useUIStore = create<UIState & UIActions>((set) => ({
   setActiveTab: (tab) => set({ activeTab: tab }),
 
   openReportModal: () => set({ showReportModal: true }),
-  closeReportModal: () => set({ showReportModal: false })
+  closeReportModal: () => set({ showReportModal: false }),
+
+  openImportDialog: () => set({ showImportDialog: true }),
+  closeImportDialog: () => set({ showImportDialog: false })
 }));

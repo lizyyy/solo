@@ -1,12 +1,13 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { ShelterPoint, ProcessRecord, ShelterStatus, ConflictType, ConflictItem } from '../types';
+import { ShelterPoint, ProcessRecord, ShelterStatus, ConflictType, ConflictItem, ImportPreviewItem, FeedbackSource } from '../types';
 import { mockSheltersWithAnalysis } from '../data/shelters';
 import { mockFeedbacks } from '../data/feedbacks';
 import { mockRecords } from '../data/records';
 import { generateCapacityAnalysis, generateConflictSuggestion } from '../utils/nlGenerator';
 import { normalizeLocationName, getAliases } from '../utils/deduplicate';
 import { checkCoordinateOffset } from '../utils/geo';
+import { buildSheltersFromImport } from '../utils/csvImport';
 
 interface ShelterState {
   shelters: ShelterPoint[];
@@ -33,6 +34,12 @@ interface ShelterActions {
   getShelterRecords: (shelterId: string) => ProcessRecord[];
   getUnresolvedConflicts: () => ConflictItem[];
   reanalyzeShelter: (shelterId: string) => void;
+  importFromCsv: (previews: ImportPreviewItem[], operator?: string) => {
+    addedCount: number;
+    updatedCount: number;
+    feedbackCount: number;
+  };
+  resetToDefault: () => void;
 }
 
 function detectConflicts(shelters: ShelterPoint[]): ConflictItem[] {
@@ -252,12 +259,57 @@ export const useShelterStore = create<ShelterState & ShelterActions>()(
               : s
           )
         }));
+      },
+
+      importFromCsv: (previews, operator = '阿宁') => {
+        const result = buildSheltersFromImport(previews, get().shelters, operator);
+
+        set(state => {
+          const finalShelters = [...result.updatedShelters, ...result.newShelters];
+          const finalFeedbacks = [...state.feedbacks, ...result.newFeedbacks];
+          const finalRecords = [
+            ...state.records,
+            ...result.newRecords.map(r => ({
+              ...r,
+              id: `r${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+              operateTime: new Date().toLocaleString('zh-CN'),
+            })),
+          ];
+
+          return {
+            shelters: finalShelters,
+            feedbacks: finalFeedbacks,
+            records: finalRecords,
+            conflicts: detectConflicts(finalShelters),
+          };
+        });
+
+        return {
+          addedCount: result.newShelters.length,
+          updatedCount: result.updatedShelters.filter(
+            (s, i) => get().shelters[i]?.id === s.id && s.updatedAt !== get().shelters[i]?.updatedAt
+          ).length,
+          feedbackCount: result.newFeedbacks.length,
+        };
+      },
+
+      resetToDefault: () => {
+        set({
+          shelters: mockSheltersWithAnalysis,
+          feedbacks: mockFeedbacks,
+          records: mockRecords,
+          conflicts: detectConflicts(mockSheltersWithAnalysis),
+          selectedShelterId: null,
+          filterStatus: 'all',
+          searchKeyword: '',
+        });
       }
     }),
     {
       name: 'shelter-storage',
       partialize: (state) => ({
         shelters: state.shelters,
+        feedbacks: state.feedbacks,
         records: state.records,
         conflicts: state.conflicts
       })

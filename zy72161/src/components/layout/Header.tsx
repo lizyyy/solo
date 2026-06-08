@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { Map, AlertTriangle, FileText, Search, Filter, Download, Layers, X } from 'lucide-react';
+import { Map, AlertTriangle, FileText, Search, Filter, Download, Layers, X, Upload, RotateCcw } from 'lucide-react';
 import { useUIStore } from '@/store/uiStore';
 import { useShelter } from '@/hooks/useShelter';
 import { ShelterStatus, shelterStatusLabels } from '@/types';
 import { cn } from '@/lib/utils';
 
 export const Header: React.FC = () => {
-  const { activeTab, setActiveTab, openReportModal } = useUIStore();
-  const { filterStatus, searchKeyword, setFilterStatus, setSearchKeyword, is3DMode, toggle3DMode, stats } = useShelter();
+  const { activeTab, setActiveTab, openReportModal, openImportDialog } = useUIStore();
+  const { filterStatus, searchKeyword, setFilterStatus, setSearchKeyword, is3DMode, toggle3DMode, stats, resetToDefault } = useShelter();
   const [showFilters, setShowFilters] = useState(false);
 
   const navItems = [
@@ -139,6 +139,14 @@ export const Header: React.FC = () => {
             </>
           )}
 
+          <button
+            onClick={openImportDialog}
+            className="flex items-center gap-2 rounded-lg border border-green-500/50 bg-green-500/10 px-3 py-2 text-sm font-medium text-green-400 transition-all duration-200 hover:bg-green-500/20"
+          >
+            <Upload className="h-4 w-4" />
+            <span className="hidden md:inline">导入台账</span>
+          </button>
+
           {(activeTab === 'map' || activeTab === 'report') && (
             <button
               onClick={openReportModal}
@@ -148,6 +156,18 @@ export const Header: React.FC = () => {
               导出报告
             </button>
           )}
+
+          <button
+            onClick={() => {
+              if (confirm('确定要重置为默认样例数据吗？导入的数据将被清除。')) {
+                resetToDefault();
+              }
+            }}
+            className="flex items-center gap-1 rounded-lg border border-gray-700 px-2 py-2 text-xs text-gray-500 transition-all hover:border-gray-600 hover:text-gray-400"
+            title="重置为默认数据"
+          >
+            <RotateCcw className="h-3.5 w-3.5" />
+          </button>
         </div>
       </div>
     </header>

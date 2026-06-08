@@ -1,5 +1,5 @@
 import { useShelterStore } from '../store/shelterStore';
-import { ShelterStatus } from '../types';
+import { ShelterStatus, ImportPreviewItem } from '../types';
 
 export function useShelter() {
   const {
@@ -18,7 +18,9 @@ export function useShelter() {
     getFilteredShelters,
     getShelterFeedbacks,
     getShelterRecords,
-    reanalyzeShelter
+    reanalyzeShelter,
+    importFromCsv,
+    resetToDefault
   } = useShelterStore();
 
   const selectedShelter = shelters.find(s => s.id === selectedShelterId) || null;
@@ -52,6 +54,8 @@ export function useShelter() {
     addSupplementMaterial,
     getShelterFeedbacks,
     getShelterRecords,
-    reanalyzeShelter
+    reanalyzeShelter,
+    importFromCsv,
+    resetToDefault
   };
 }
