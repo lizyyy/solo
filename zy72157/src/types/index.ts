@@ -28,6 +28,9 @@ export interface MealPoint {
   mergeHistory: string[];
   notes: string;
   auditTrail: AuditRecord[];
+  sourceRow: Record<string, string>;
+  fileName: string;
+  sourceRowNumber: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -54,6 +57,39 @@ export interface AppState {
   suggestions: MergeSuggestion[];
   currentStep: 'import' | 'merge' | 'review' | 'export';
 }
+
+export interface ColumnMapping {
+  name: string;
+  address: string;
+  lat: string;
+  lng: string;
+  source: string;
+  notes: string;
+}
+
+export const SYSTEM_FIELDS: { key: keyof ColumnMapping; label: string; required: boolean }[] = [
+  { key: 'name', label: '点位名称', required: true },
+  { key: 'address', label: '详细地址', required: true },
+  { key: 'lat', label: '纬度', required: false },
+  { key: 'lng', label: '经度', required: false },
+  { key: 'source', label: '数据来源', required: false },
+  { key: 'notes', label: '备注', required: false },
+];
+
+export const SOURCE_ALIASES: Record<string, PointSource> = {
+  'GIS点位': 'GIS',
+  'GIS': 'GIS',
+  'gis': 'GIS',
+  '居民反馈': 'feedback',
+  'feedback': 'feedback',
+  '巡检记录': 'inspection',
+  'inspection': 'inspection',
+  '巡检': 'inspection',
+  '街道备注': 'street',
+  'street': 'street',
+  '街道': 'street',
+  '街道手改': 'street',
+};
 
 export interface AppContextType extends AppState {
   addPoints: (points: MealPoint[]) => void;

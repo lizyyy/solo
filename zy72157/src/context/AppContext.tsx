@@ -249,7 +249,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   const exportToCSV = (): string => {
-    const headers = ['点位名称', '地址', '纬度', '经度', '数据来源', '状态', '类型', '备注', '审核记录数'];
+    const headers = ['点位名称', '地址', '纬度', '经度', '数据来源', '状态', '类型', '备注', '来源文件', '原始行号', '原始行数据', '审核记录数'];
     const rows = state.points.map((p) => [
       p.name || '(空)',
       p.address,
@@ -259,6 +259,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
       p.status,
       p.type,
       p.notes,
+      p.fileName,
+      p.sourceRowNumber,
+      Object.entries(p.sourceRow).map(([k, v]) => `${k}=${v}`).join('; '),
       p.auditTrail.length,
     ]);
 

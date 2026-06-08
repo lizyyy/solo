@@ -27,6 +27,9 @@ export const sampleMealPoints: MealPoint[] = [
     type: 'smooth',
     mergeHistory: [],
     notes: '',
+    sourceRow: { 序号: '1', 点位名称: '幸福街道社区助餐点', 详细地址: '幸福路123号幸福社区服务中心1楼', 纬度: '31.2304', 经度: '121.4737', 数据来源: 'GIS点位', 备注: '', 服务时间: '周一至周五', 所属街道: '幸福街道', '面积㎡': '120', 核定人数: '50' },
+    fileName: '样例数据',
+    sourceRowNumber: 2,
     auditTrail: [createAuditRecord('import', '从GIS点位导入')],
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -42,6 +45,9 @@ export const sampleMealPoints: MealPoint[] = [
     type: 'duplicate',
     mergeHistory: [],
     notes: '',
+    sourceRow: { 序号: '2', 点位名称: '幸福街道社区食堂', 详细地址: '幸福路123号', 纬度: '31.2305', 经度: '121.4738', 数据来源: 'GIS点位', 备注: '', 服务时间: '周一至周日', 所属街道: '幸福街道' },
+    fileName: '样例数据',
+    sourceRowNumber: 3,
     auditTrail: [createAuditRecord('import', '从GIS点位导入')],
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -57,6 +63,9 @@ export const sampleMealPoints: MealPoint[] = [
     type: 'review',
     mergeHistory: [],
     notes: '',
+    sourceRow: { 序号: '3', 点位名称: '阳光社区老年助餐服务点', 详细地址: '阳光花园23栋', 纬度: '31.2350', 经度: '121.4800', 数据来源: '居民反馈', 备注: '居民多次来电反映需要', 服务时间: '', 所属街道: '阳光街道', '面积㎡': '80', 核定人数: '30' },
+    fileName: '样例数据',
+    sourceRowNumber: 4,
     auditTrail: [createAuditRecord('import', '从居民反馈导入')],
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -72,6 +81,9 @@ export const sampleMealPoints: MealPoint[] = [
     type: 'review',
     mergeHistory: [],
     notes: '街道手改：本点位为新增，服务时间为周一至周五11:00-13:00',
+    sourceRow: { 序号: '4', 点位名称: '阳光社区助餐点', 详细地址: '阳光花园内23栋1单元', 纬度: '31.2351', 经度: '121.4801', 数据来源: '街道备注', 备注: '街道手改：本点位为新增，服务时间为周一至周五11:00-13:00', 服务时间: '周一至周五', 所属街道: '阳光街道' },
+    fileName: '样例数据',
+    sourceRowNumber: 5,
     auditTrail: [createAuditRecord('import', '从街道手改备注导入')],
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -87,6 +99,9 @@ export const sampleMealPoints: MealPoint[] = [
     type: 'legacy',
     mergeHistory: [],
     notes: '旧口径数据，需确认是否仍在使用',
+    sourceRow: { 序号: '5', 点位名称: '和平街道老年人助餐中心（旧）', 详细地址: '和平路456号（2023年前使用）', 纬度: '31.2400', 经度: '121.4680', 数据来源: 'GIS点位', 备注: '旧口径数据，需确认是否仍在使用', 服务时间: '', 所属街道: '和平街道', '面积㎡': '200', 核定人数: '80' },
+    fileName: '样例数据',
+    sourceRowNumber: 6,
     auditTrail: [createAuditRecord('import', '从GIS点位导入（旧口径）')],
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -102,6 +117,9 @@ export const sampleMealPoints: MealPoint[] = [
     type: 'empty',
     mergeHistory: [],
     notes: '名称为空，需补充',
+    sourceRow: { 序号: '6', 点位名称: '', 详细地址: '南京路789号', 纬度: '31.2380', 经度: '121.4750', 数据来源: 'GIS点位', 备注: '名称为空，需补充', 服务时间: '', 所属街道: '南京街道' },
+    fileName: '样例数据',
+    sourceRowNumber: 7,
     auditTrail: [createAuditRecord('import', '从GIS点位导入（名称空值）')],
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -117,6 +135,9 @@ export const sampleMealPoints: MealPoint[] = [
     type: 'boundary',
     mergeHistory: [],
     notes: '边界记录：位于两街道交界处，需确认归属',
+    sourceRow: { 序号: '7', 点位名称: '河滨社区助餐点A', 详细地址: '河滨路1号（与江湾街道交界处）', 纬度: '31.2330', 经度: '121.4850', 数据来源: '巡检记录', 备注: '边界记录：位于两街道交界处，需确认归属', 服务时间: '', 所属街道: '河滨街道', '面积㎡': '60', 核定人数: '20' },
+    fileName: '样例数据',
+    sourceRowNumber: 8,
     auditTrail: [createAuditRecord('import', '从巡检记录导入（边界点位）')],
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -132,6 +153,9 @@ export const sampleMealPoints: MealPoint[] = [
     type: 'boundary',
     mergeHistory: [],
     notes: '相邻点位：与A点距离约50米，需确认是否合并',
+    sourceRow: { 序号: '8', 点位名称: '河滨社区助餐点B', 详细地址: '河滨路3号（与江湾街道交界处）', 纬度: '31.2332', 经度: '121.4852', 数据来源: '街道备注', 备注: '相邻点位：与A点距离约50米，需确认是否合并', 服务时间: '', 所属街道: '河滨街道' },
+    fileName: '样例数据',
+    sourceRowNumber: 9,
     auditTrail: [createAuditRecord('import', '从街道手改备注导入（相邻点位）')],
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -147,6 +171,9 @@ export const sampleMealPoints: MealPoint[] = [
     type: 'smooth',
     mergeHistory: [],
     notes: '',
+    sourceRow: { 序号: '9', 点位名称: '康乐街道助餐服务中心', 详细地址: '康乐路88号', 纬度: '31.2280', 经度: '121.4650', 数据来源: 'GIS点位', 备注: '', 服务时间: '周一至周五', 所属街道: '康乐街道', '面积㎡': '150', 核定人数: '60' },
+    fileName: '样例数据',
+    sourceRowNumber: 10,
     auditTrail: [createAuditRecord('import', '从GIS点位导入')],
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -162,30 +189,11 @@ export const sampleMealPoints: MealPoint[] = [
     type: 'smooth',
     mergeHistory: [],
     notes: '居民反馈：饭菜质量好，服务态度佳',
+    sourceRow: { 序号: '10', 点位名称: '康乐社区食堂', 详细地址: '康乐路88号康乐街道办事处旁', 纬度: '31.2281', 经度: '121.4651', 数据来源: '居民反馈', 备注: '居民反馈：饭菜质量好，服务态度佳', 服务时间: '周一至周日', 所属街道: '康乐街道' },
+    fileName: '样例数据',
+    sourceRowNumber: 11,
     auditTrail: [createAuditRecord('import', '从居民反馈导入')],
     createdAt: new Date(),
     updatedAt: new Date(),
   },
 ];
-
-export const sampleDataDescription = `
-## 样例数据说明
-
-本样例数据模拟了"社区养老助餐配送"的真实场景，包含以下类型：
-
-### 1. 顺利记录（可自动归并）
-- **幸福街道社区助餐点**（GIS）与**幸福街道社区食堂**（GIS）：同一地点不同写法，地址高度相似
-- **康乐街道助餐服务中心**（GIS）与**康乐社区食堂**（反馈）：同一地点不同来源
-
-### 2. 需人工确认记录
-- **阳光社区老年助餐服务点**（居民反馈）与**阳光社区助餐点**（街道备注）：名称和地址有差异，需人工确认
-
-### 3. 旧口径记录
-- **和平街道老年人助餐中心（旧）**：标注为旧口径数据，需人工确认有效性
-
-### 4. 空值记录
-- **（名称为空）南京路789号**：名称字段为空，需人工补充
-
-### 5. 边界记录（相邻点位）
-- **河滨社区助餐点A**与**河滨社区助餐点B**：相距约50米，位于街道交界处，需人工判断是否合并
-`;

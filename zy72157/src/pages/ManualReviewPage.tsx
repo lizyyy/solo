@@ -261,6 +261,8 @@ function ReviewPointCard({
                 {point.notes && (
                   <p><span className="text-gray-500">备注：</span>{point.notes}</p>
                 )}
+                <p><span className="text-gray-500">来源文件：</span>{point.fileName || '未知'}</p>
+                <p><span className="text-gray-500">原始行号：</span>第 {point.sourceRowNumber} 行</p>
               </div>
             </div>
             <div>
@@ -269,7 +271,7 @@ function ReviewPointCard({
                 判断过程留痕 ({point.auditTrail.length} 条)
               </h5>
               <div className="max-h-32 overflow-y-auto space-y-2">
-                {point.auditTrail.map((record, index) => (
+                {point.auditTrail.map((record) => (
                   <div key={record.id} className="text-xs bg-gray-50 p-2 rounded">
                     <div className="flex items-center justify-between">
                       <span className="font-medium text-gray-700">{record.operator}</span>
@@ -283,6 +285,24 @@ function ReviewPointCard({
               </div>
             </div>
           </div>
+
+          {Object.keys(point.sourceRow).length > 0 && (
+            <div className="mb-4">
+              <h5 className="text-sm font-medium text-gray-700 mb-2">原始行数据（{point.fileName} 第{point.sourceRowNumber}行）</h5>
+              <div className="bg-gray-50 rounded-lg p-3 overflow-x-auto">
+                <table className="text-xs w-full">
+                  <tbody>
+                    {Object.entries(point.sourceRow).map(([key, value]) => (
+                      <tr key={key} className="border-b border-gray-200 last:border-0">
+                        <td className="py-1.5 pr-4 text-gray-500 font-medium whitespace-nowrap w-24">{key}</td>
+                        <td className="py-1.5 text-gray-800">{value || <span className="text-gray-300">(空)</span>}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
 
           <div className="flex items-center gap-2 mb-4">
             <input

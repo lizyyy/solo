@@ -187,6 +187,9 @@ export function PublicExportPage() {
                               <StatusBadge type="status" value={point.status} />
                               <StatusBadge type="pointType" value={point.type} />
                             </div>
+                            <p className="text-xs text-gray-400 mb-1">
+                              来源：{point.fileName || '未知'} L{point.sourceRowNumber}
+                            </p>
                             {point.notes && (
                               <p className="text-xs text-gray-500 mt-2 pt-2 border-t">
                                 备注：{point.notes}
@@ -224,6 +227,7 @@ export function PublicExportPage() {
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">地址</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">坐标</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">来源</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">来源文件</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">状态</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">类型</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">备注</th>
@@ -241,6 +245,10 @@ export function PublicExportPage() {
                       </td>
                       <td className="px-4 py-3">
                         <StatusBadge type="source" value={point.source} />
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-500">
+                        {point.fileName || '-'}
+                        {point.sourceRowNumber > 0 && <span className="text-xs text-gray-400 ml-1">L{point.sourceRowNumber}</span>}
                       </td>
                       <td className="px-4 py-3">
                         <StatusBadge type="status" value={point.status} />
