@@ -1,0 +1,10 @@
+{
+  "name": "pet-foster-alert",
+  "version": "1.0.0",
+  "description": "宠物寄养异常提醒系统 - 含微信备注关联、用药变更留痕、Markdown导出、汇总下钻等",
+  "main": "server.py",
+  "scripts": {
+    "start": "python3 server.py",
+    "dev": "python3 server.py"
+  }
+}
