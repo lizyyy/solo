@@ -11,6 +11,7 @@ export default function DisplayPage() {
   const getAuditLogsForRecord = useGateStore((s) => s.getAuditLogsForRecord);
   const getDetectionsForRecord = useGateStore((s) => s.getDetectionsForRecord);
   const transitionRecord = useGateStore((s) => s.transitionRecord);
+  const manualCorrectZAxis = useGateStore((s) => s.manualCorrectZAxis);
 
   const [selectedRecord, setSelectedRecord] = useState<string | null>(null);
   const [showTimeline, setShowTimeline] = useState(false);
@@ -24,14 +25,15 @@ export default function DisplayPage() {
     const record = records.find((r) => r.id === recordId);
     if (!record) return;
 
-    let detail = "";
     if (action === "field_confirm_correct") {
-      detail = `现场班组确认第${record.originalRowNumber}行需更正Z轴方向`;
+      const success = manualCorrectZAxis(recordId);
+      if (!success) {
+        transitionRecord(recordId, action, `现场班组确认第${record.originalRowNumber}行需更正Z轴方向`);
+      }
     } else {
-      detail = `现场班组确认第${record.originalRowNumber}行无需更正`;
+      const detail = `现场班组确认第${record.originalRowNumber}行无需更正`;
+      transitionRecord(recordId, action, detail);
     }
-
-    transitionRecord(recordId, action, detail);
   };
 
   const handleRollback = (recordId: string) => {
@@ -273,6 +275,11 @@ export default function DisplayPage() {
                         <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>
                           {log.detail}
                         </p>
+                        {log.action === "manual_correction" && (
+                          <p className="text-xs mt-0.5 font-bold" style={{ color: "var(--color-success)" }}>
+                            ✓ Z轴值已人工更正
+                          </p>
+                        )}
                         <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>
                           {log.operator} · {new Date(log.timestamp).toLocaleString()}
                         </p>

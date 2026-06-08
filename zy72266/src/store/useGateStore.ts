@@ -9,7 +9,7 @@ import type {
   AuditAction,
   OperatorRole,
 } from "@/types";
-import { applyZAxisDetection } from "@/services/zAxisDetection";
+import { applyZAxisDetection, createDetectionResult } from "@/services/zAxisDetection";
 import {
   validateTransition,
   getNextStatus,
@@ -27,6 +27,7 @@ interface GateStore {
   importRecords: (rows: Omit<SafetyRadiusRecord, "id" | "status" | "createdAt" | "updatedAt" | "zAxisDirection">[]) => void;
   transitionRecord: (recordId: string, action: AuditAction, detail: string) => boolean;
   rollbackRecord: (recordId: string, reason: string) => boolean;
+  manualCorrectZAxis: (recordId: string) => boolean;
   getRecordById: (id: string) => SafetyRadiusRecord | undefined;
   getAuditLogsForRecord: (recordId: string) => AuditLog[];
   getDetectionsForRecord: (recordId: string) => ZAxisDetectionResult | undefined;
@@ -175,6 +176,65 @@ export const useGateStore = create<GateStore>()(
           ),
           auditLogs: [...state.auditLogs, log],
           rollbackSnapshots: [...state.rollbackSnapshots, newSnapshot],
+        }));
+
+        return true;
+      },
+
+      manualCorrectZAxis: (recordId) => {
+        const state = get();
+        const record = state.records.find((r) => r.id === recordId);
+        if (!record) return false;
+        if (record.status !== "pending_field_review") return false;
+        if (record.zAxisValue === null) return false;
+
+        const oldZValue = record.zAxisValue;
+        const oldDirection = record.zAxisDirection;
+        const newZValue = Math.abs(oldZValue);
+        const now = new Date().toISOString();
+        const currentUser = state.currentUser;
+
+        const snapshot = createRollbackSnapshot(recordId, record.status, record);
+
+        const newDetection = createDetectionResult(recordId, newZValue);
+
+        const log = createAuditLog(
+          recordId,
+          "manual_correction",
+          currentUser?.name ?? "系统",
+          currentUser?.role ?? "field_team",
+          record.status,
+          "corrected",
+          `人工更正Z轴: ${oldZValue} → ${newZValue}，方向: ${oldDirection} → positive`
+        );
+
+        const statusLog = createAuditLog(
+          recordId,
+          "field_confirm_correct",
+          currentUser?.name ?? "系统",
+          currentUser?.role ?? "field_team",
+          record.status,
+          "corrected",
+          `现场班组确认第${record.originalRowNumber}行需更正Z轴方向，原值 ${oldZValue} 更正为 ${newZValue}`
+        );
+
+        set((state) => ({
+          records: state.records.map((r) =>
+            r.id === recordId
+              ? {
+                  ...r,
+                  status: "corrected" as RecordStatus,
+                  zAxisValue: newZValue,
+                  zAxisDirection: "positive" as const,
+                  updatedAt: now,
+                }
+              : r
+          ),
+          auditLogs: [...state.auditLogs, statusLog, log],
+          rollbackSnapshots: [...state.rollbackSnapshots, snapshot],
+          detections: state.detections.map((d) =>
+            d.recordId === recordId ? newDetection : d
+          ),
         }));
 
         return true;

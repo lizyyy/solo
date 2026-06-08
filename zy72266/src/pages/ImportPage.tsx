@@ -1,6 +1,6 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { useGateStore } from "@/store/useGateStore";
-import { Upload, FileSpreadsheet, AlertTriangle, CheckCircle, X } from "lucide-react";
+import { Upload, FileSpreadsheet, AlertTriangle, CheckCircle, X, FileText } from "lucide-react";
 import StatusBadge from "@/components/StatusBadge";
 import { RULE_LABELS } from "@/types";
 import type { SafetyRadiusRecord } from "@/types";
@@ -32,11 +32,88 @@ function detectDirection(val: number | null) {
   return { direction: "positive" as const, ruleCode: "ZR-002" as const };
 }
 
+function parseCsvLine(line: string): string[] {
+  const result: string[] = [];
+  let current = "";
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (inQuotes) {
+      if (ch === '"') {
+        if (i + 1 < line.length && line[i + 1] === '"') {
+          current += '"';
+          i++;
+        } else {
+          inQuotes = false;
+        }
+      } else {
+        current += ch;
+      }
+    } else {
+      if (ch === '"') {
+        inQuotes = true;
+      } else if (ch === ",") {
+        result.push(current.trim());
+        current = "";
+      } else {
+        current += ch;
+      }
+    }
+  }
+  result.push(current.trim());
+  return result;
+}
+
+function parseCsvText(text: string): PreviewRow[] {
+  const lines = text.split(/\r?\n/).filter((l) => l.trim().length > 0);
+  if (lines.length < 2) return [];
+
+  const header = parseCsvLine(lines[0]).map((h) => h.replace(/^["']|["']$/g, "").trim());
+  const colIdx = {
+    row: header.findIndex((h) => /原始行号|行号|row/i.test(h)),
+    opening: header.findIndex((h) => /闸门开度|开度|opening/i.test(h)),
+    radius: header.findIndex((h) => /安全半径|半径|radius/i.test(h)),
+    zAxis: header.findIndex((h) => /z\s*轴|zaxis|z_axis|z-axis/i.test(h)),
+    origin: header.findIndex((h) => /坐标原点|原点|origin|coordinate/i.test(h)),
+  };
+
+  const rows: PreviewRow[] = [];
+  for (let i = 1; i < lines.length; i++) {
+    const cells = parseCsvLine(lines[i]);
+    const rowNumber = colIdx.row >= 0 ? parseInt(cells[colIdx.row], 10) : i;
+    const gateOpening = colIdx.opening >= 0 ? parseFloat(cells[colIdx.opening]) : NaN;
+    const safetyRadius = colIdx.radius >= 0 ? parseFloat(cells[colIdx.radius]) : NaN;
+    const zRaw = colIdx.zAxis >= 0 ? cells[colIdx.zAxis].replace(/^["']|["']$/g, "").trim() : "";
+    const zAxisValue = zRaw === "" || zRaw === "-" || zRaw.toLowerCase() === "null" || zRaw.toLowerCase() === "缺失"
+      ? null
+      : parseFloat(zRaw);
+    const coordinateOrigin = colIdx.origin >= 0 ? cells[colIdx.origin].replace(/^["']|["']$/g, "") : "";
+
+    if (isNaN(gateOpening) && isNaN(safetyRadius)) continue;
+
+    const det = detectDirection(zAxisValue);
+    rows.push({
+      originalRowNumber: isNaN(rowNumber) ? i : rowNumber,
+      gateOpening: isNaN(gateOpening) ? 0 : gateOpening,
+      safetyRadius: isNaN(safetyRadius) ? 0 : safetyRadius,
+      zAxisValue,
+      coordinateOrigin,
+      zAxisDirection: det.direction,
+      ruleCode: det.ruleCode,
+    });
+  }
+  return rows;
+}
+
 export default function ImportPage() {
   const importRecords = useGateStore((s) => s.importRecords);
   const [previewRows, setPreviewRows] = useState<PreviewRow[]>([]);
   const [showPreview, setShowPreview] = useState(false);
   const [importSuccess, setImportSuccess] = useState(false);
+  const [fileName, setFileName] = useState("");
+  const [parseError, setParseError] = useState("");
+  const [isDragOver, setIsDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDemoImport = useCallback(() => {
     const rows: PreviewRow[] = DEMO_DATA.map((d) => {
@@ -52,8 +129,64 @@ export default function ImportPage() {
       };
     });
     setPreviewRows(rows);
+    setFileName("演示数据");
+    setParseError("");
     setShowPreview(true);
     setImportSuccess(false);
+  }, []);
+
+  const handleFileContent = useCallback((text: string, name: string) => {
+    try {
+      const rows = parseCsvText(text);
+      if (rows.length === 0) {
+        setParseError(`文件 "${name}" 中未找到有效数据行。请确认 CSV 包含表头行（原始行号,闸门开度,安全半径,Z轴值,坐标原点）`);
+        return;
+      }
+      setPreviewRows(rows);
+      setFileName(name);
+      setParseError("");
+      setShowPreview(true);
+      setImportSuccess(false);
+    } catch {
+      setParseError(`文件 "${name}" 解析失败，请确认格式为 CSV`);
+    }
+  }, []);
+
+  const handleFileSelect = useCallback((file: File) => {
+    setParseError("");
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target?.result;
+      if (typeof text === "string") {
+        handleFileContent(text, file.name);
+      }
+    };
+    reader.onerror = () => {
+      setParseError(`文件 "${file.name}" 读取失败`);
+    };
+    reader.readAsText(file, "utf-8");
+  }, [handleFileContent]);
+
+  const handleFileInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) handleFileSelect(file);
+    e.target.value = "";
+  }, [handleFileSelect]);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) handleFileSelect(file);
+  }, [handleFileSelect]);
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  }, []);
+
+  const handleDragLeave = useCallback(() => {
+    setIsDragOver(false);
   }, []);
 
   const handleConfirmImport = useCallback(() => {
@@ -73,6 +206,8 @@ export default function ImportPage() {
     setPreviewRows([]);
     setShowPreview(false);
     setImportSuccess(false);
+    setFileName("");
+    setParseError("");
   }, []);
 
   const anomalyCount = previewRows.filter(
@@ -91,30 +226,71 @@ export default function ImportPage() {
       </div>
 
       {!showPreview && !importSuccess && (
-        <div className="rounded-xl border-2 border-dashed p-16 text-center"
-          style={{ borderColor: "var(--color-border)", backgroundColor: "var(--color-surface)" }}>
-          <Upload size={48} style={{ color: "var(--color-text-muted)" }} className="mx-auto mb-4" />
-          <p className="text-base font-medium mb-2" style={{ color: "var(--color-text)" }}>
-            拖拽安全半径表文件至此处
-          </p>
-          <p className="text-sm mb-6" style={{ color: "var(--color-text-muted)" }}>
-            支持 CSV、Excel 格式，系统将自动解析并保留原始行号
-          </p>
-          <div className="flex gap-3 justify-center">
-            <button
-              onClick={handleDemoImport}
-              className="px-6 py-2.5 rounded-lg text-sm font-bold transition-all"
-              style={{ backgroundColor: "var(--color-steel)", color: "#fff" }}
-              onMouseEnter={(e) => { e.currentTarget.style.opacity = "0.85"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.opacity = "1"; }}
-            >
-              <FileSpreadsheet size={16} className="inline mr-2" />
-              使用演示数据导入
-            </button>
+        <div>
+          <div
+            className="rounded-xl border-2 border-dashed p-16 text-center transition-colors"
+            style={{
+              borderColor: isDragOver ? "var(--color-steel)" : "var(--color-border)",
+              backgroundColor: isDragOver ? "rgba(70, 130, 180, 0.08)" : "var(--color-surface)",
+            }}
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+          >
+            <Upload size={48} style={{ color: "var(--color-text-muted)" }} className="mx-auto mb-4" />
+            <p className="text-base font-medium mb-2" style={{ color: "var(--color-text)" }}>
+              拖拽安全半径表文件至此处
+            </p>
+            <p className="text-sm mb-4" style={{ color: "var(--color-text-muted)" }}>
+              支持 CSV 格式，系统将自动解析并保留原始行号
+            </p>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".csv,text/csv,text/plain"
+              onChange={handleFileInput}
+              className="hidden"
+            />
+            <div className="flex gap-3 justify-center">
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="px-6 py-2.5 rounded-lg text-sm font-bold transition-all"
+                style={{ backgroundColor: "var(--color-steel)", color: "#fff" }}
+                onMouseEnter={(e) => { e.currentTarget.style.opacity = "0.85"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.opacity = "1"; }}
+              >
+                <FileText size={16} className="inline mr-2" />
+                选择 CSV 文件
+              </button>
+              <button
+                onClick={handleDemoImport}
+                className="px-6 py-2.5 rounded-lg text-sm font-bold transition-all border"
+                style={{ borderColor: "var(--color-border)", color: "var(--color-text-muted)", backgroundColor: "transparent" }}
+                onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--color-steel)"; e.currentTarget.style.color = "var(--color-text)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--color-border)"; e.currentTarget.style.color = "var(--color-text-muted)"; }}
+              >
+                <FileSpreadsheet size={16} className="inline mr-2" />
+                使用演示数据导入
+              </button>
+            </div>
+            <p className="text-xs mt-4" style={{ color: "var(--color-text-muted)" }}>
+              CSV 表头格式：原始行号, 闸门开度, 安全半径, Z轴值, 坐标原点
+            </p>
+            <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>
+              演示数据包含8条记录，其中3条Z轴方向按旧习惯写反、1条数据缺失
+            </p>
           </div>
-          <p className="text-xs mt-4" style={{ color: "var(--color-text-muted)" }}>
-            演示数据包含8条记录，其中3条Z轴方向按旧习惯写反、1条数据缺失
-          </p>
+
+          {parseError && (
+            <div className="mt-4 p-4 rounded-lg border flex items-start gap-3"
+              style={{ backgroundColor: "#FEE2E2", borderColor: "#EF4444" }}>
+              <AlertTriangle size={18} style={{ color: "#EF4444", flexShrink: 0, marginTop: 2 }} />
+              <div>
+                <p className="text-sm font-bold" style={{ color: "#991B1B" }}>文件解析失败</p>
+                <p className="text-sm mt-1" style={{ color: "#991B1B" }}>{parseError}</p>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -125,6 +301,11 @@ export default function ImportPage() {
               <h2 className="text-lg font-bold" style={{ color: "var(--color-text)" }}>
                 导入预览
               </h2>
+              <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full"
+                style={{ backgroundColor: "var(--color-bg)", color: "var(--color-text-muted)" }}>
+                <FileText size={12} />
+                {fileName}
+              </span>
               {anomalyCount > 0 && (
                 <span className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold"
                   style={{ backgroundColor: "#FEE2E2", color: "#991B1B" }}>
@@ -233,7 +414,7 @@ export default function ImportPage() {
             导入成功
           </h2>
           <p className="text-sm mb-2" style={{ color: "var(--color-text-muted)" }}>
-            已导入 {previewRows.length} 条安全半径表记录
+            已从「{fileName}」导入 {previewRows.length} 条安全半径表记录
           </p>
           <p className="text-sm mb-6" style={{ color: "var(--color-text-muted)" }}>
             Z轴方向异常记录已标记为"待复核"，请前往坐标原点说明审核页进行审核
