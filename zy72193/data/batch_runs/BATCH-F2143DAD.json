@@ -1,0 +1,60 @@
+{
+  "run_id": "BATCH-F2143DAD",
+  "run_timestamp": "2026-06-08T19:00:27.447069",
+  "model_version": "v1.1.0",
+  "sample_count": 3,
+  "report_ids": [
+    "RPT-46B4F26F",
+    "RPT-4DC97BE4",
+    "RPT-2EF44A90"
+  ],
+  "metrics": {
+    "total_samples": 3,
+    "avg_confidence": 0.7389,
+    "auto_success_rate": 0.3333,
+    "need_human_review_rate": 0.6667,
+    "legacy_rate": 0.0,
+    "count_auto_success": 1,
+    "count_need_human_review": 2
+  },
+  "sample_changes": [
+    {
+      "sample_id": "SMP-003",
+      "old_report_id": "RPT-90315EF1",
+      "new_report_id": "RPT-2EF44A90",
+      "change_type": "status_or_path_changed"
+    }
+  ],
+  "report_snapshots": {
+    "SMP-001": {
+      "report_id": "RPT-46B4F26F",
+      "status": "auto_success",
+      "recommended_path": "data_scientist",
+      "confidence_score": 1.0,
+      "model_version": "v1.1.0",
+      "generated_at": "2026-06-08T19:00:27.443409",
+      "legacy_source": null,
+      "has_human_review": false
+    },
+    "SMP-002": {
+      "report_id": "RPT-4DC97BE4",
+      "status": "need_human_review",
+      "recommended_path": "ai_engineer",
+      "confidence_score": 0.4833,
+      "model_version": "v1.1.0",
+      "generated_at": "2026-06-08T19:00:27.443592",
+      "legacy_source": null,
+      "has_human_review": false
+    },
+    "SMP-003": {
+      "report_id": "RPT-2EF44A90",
+      "status": "need_human_review",
+      "recommended_path": "backend_engineer",
+      "confidence_score": 0.7333,
+      "model_version": "v1.1.0",
+      "generated_at": "2026-06-08T19:00:27.443738",
+      "legacy_source": null,
+      "has_human_review": false
+    }
+  }
+}

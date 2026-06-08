@@ -214,6 +214,7 @@ class BatchRun:
     report_ids: List[str]
     metrics: Dict[str, float]
     sample_changes: List[Dict[str, str]]
+    report_snapshots: Dict[str, Dict[str, Any]] = field(default_factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -224,6 +225,7 @@ class BatchRun:
             "report_ids": self.report_ids,
             "metrics": self.metrics,
             "sample_changes": self.sample_changes,
+            "report_snapshots": self.report_snapshots,
         }
 
     @classmethod
@@ -236,4 +238,5 @@ class BatchRun:
             report_ids=data["report_ids"],
             metrics=data["metrics"],
             sample_changes=data.get("sample_changes", []),
+            report_snapshots=data.get("report_snapshots", {}),
         )

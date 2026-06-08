@@ -1,17 +1,32 @@
 {
-  "old_run": "BATCH-3A09D423",
-  "new_run": "BATCH-3D962D07",
+  "old_run": "BATCH-85FB3339",
+  "new_run": "BATCH-F2143DAD",
   "old_model_version": "v1.0.0",
   "new_model_version": "v1.1.0",
   "metric_diffs": {
+    "count_need_human_review": {
+      "old": 2,
+      "new": 2,
+      "diff": 0
+    },
     "need_human_review_rate": {
       "old": 0.6667,
       "new": 0.6667,
       "diff": 0.0
     },
+    "avg_confidence": {
+      "old": 0.7055,
+      "new": 0.7389,
+      "diff": 0.033399999999999985
+    },
     "count_auto_success": {
       "old": 1,
       "new": 1,
+      "diff": 0
+    },
+    "total_samples": {
+      "old": 3,
+      "new": 3,
       "diff": 0
     },
     "legacy_rate": {
@@ -19,52 +34,47 @@
       "new": 0.0,
       "diff": 0.0
     },
-    "count_need_human_review": {
-      "old": 2,
-      "new": 2,
-      "diff": 0
-    },
     "auto_success_rate": {
       "old": 0.3333,
       "new": 0.3333,
       "diff": 0.0
-    },
-    "total_samples": {
-      "old": 3,
-      "new": 3,
-      "diff": 0
-    },
-    "avg_confidence": {
-      "old": 0.7055,
-      "new": 0.7389,
-      "diff": 0.033399999999999985
     }
   },
   "sample_changes": [
     {
       "sample_id": "SMP-001",
       "change_type": "unchanged",
-      "details": {}
+      "details": {},
+      "attribution": "none"
     },
     {
       "sample_id": "SMP-002",
       "change_type": "unchanged",
-      "details": {}
+      "details": {},
+      "attribution": "none"
     },
     {
       "sample_id": "SMP-003",
-      "change_type": "unchanged",
+      "change_type": "confidence_changed",
       "details": {
         "old_confidence": 0.6333,
         "new_confidence": 0.7333
-      }
+      },
+      "attribution": "model_or_threshold"
     }
   ],
   "summary": {
     "total_samples": 3,
     "added": 0,
     "removed": 0,
-    "changed": 0,
-    "unchanged": 3
+    "status_or_path_changed": 0,
+    "confidence_changed": 1,
+    "unchanged": 2,
+    "attribution": {
+      "sample_set": 0,
+      "model_or_threshold": 1,
+      "human_review": 0,
+      "none": 2
+    }
   }
 }

@@ -445,6 +445,19 @@ class ExplanationGenerator:
             report_ids=[r.report_id for r in reports],
             metrics=metrics,
             sample_changes=sample_changes,
+            report_snapshots={
+                r.sample_id: {
+                    "report_id": r.report_id,
+                    "status": r.status.value,
+                    "recommended_path": r.recommended_path,
+                    "confidence_score": r.confidence_score,
+                    "model_version": r.model_version,
+                    "generated_at": r.generated_at,
+                    "legacy_source": r.legacy_source,
+                    "has_human_review": r.human_review is not None,
+                }
+                for r in reports
+            },
         )
 
         self.storage.save_batch_run(batch_run)

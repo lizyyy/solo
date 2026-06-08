@@ -128,7 +128,9 @@ class ReportExporter:
         if not batch_run:
             raise ValueError(f"Batch run {run_id} not found")
 
-        reports = [self.storage.load_report(rid) for rid in batch_run.report_ids]
+        snapshots = batch_run.report_snapshots
+        report_ids = list(set(s["report_id"] for s in snapshots.values()))
+        reports = [self.storage.load_report(rid) for rid in report_ids]
         reports = [r for r in reports if r]
 
         lines = []
@@ -151,65 +153,30 @@ class ReportExporter:
                 lines.append(f"  {k}: {v}")
         lines.append("")
 
-        if batch_run.sample_changes:
-            lines.append("-" * 100)
-            lines.append(f"样本变化记录 (共 {len(batch_run.sample_changes)} 条)")
-            lines.append("-" * 100)
-            for change in batch_run.sample_changes:
-                lines.append(
-                    f"  样本 {change['sample_id']}: {change['change_type']} "
-                    f"(报告 {change['old_report_id']} → {change['new_report_id']})"
-                )
-            lines.append("")
-
         lines.append("-" * 100)
         lines.append("报告明细索引 (与明细报告一一对应)")
         lines.append("-" * 100)
-        for i, r in enumerate(reports, 1):
+        for sample_id in sorted(snapshots.keys()):
+            s = snapshots[sample_id]
+            status_display = self._format_status(ExplanationStatus(s["status"]))
             lines.append(
-                f"  [{i}] {r.report_id} | 样本: {r.sample_id} | "
-                f"状态: {self._format_status(r.status)} | "
-                f"路径: {r.recommended_path} | "
-                f"置信度: {r.confidence_score:.2%}"
+                f"  样本 {sample_id} | 报告 {s['report_id']} | "
+                f"状态: {status_display} | "
+                f"路径: {s['recommended_path']} | "
+                f"置信度: {s['confidence_score']:.2%}"
             )
         lines.append("")
 
         lines.append("-" * 100)
-        lines.append("指标变化 vs 样本变化 分解")
+        lines.append("汇总数据来源声明")
         lines.append("-" * 100)
-
-        if len(batch_run.sample_changes) > 0:
-            changed_sample_ids = {c["sample_id"] for c in batch_run.sample_changes}
-            changed_reports = [r for r in reports if r.sample_id in changed_sample_ids]
-            unchanged_reports = [r for r in reports if r.sample_id not in changed_sample_ids]
-
-            lines.append(f"  变化样本数: {len(changed_sample_ids)}")
-            lines.append(f"  不变样本数: {len(unchanged_reports)}")
-
-            if unchanged_reports:
-                unchanged_avg_conf = sum(r.confidence_score for r in unchanged_reports) / len(unchanged_reports)
-                lines.append(f"  不变样本平均置信度: {unchanged_avg_conf:.2%}")
-                lines.append(
-                    f"  不变样本自动通过率: {sum(1 for r in unchanged_reports if r.status == ExplanationStatus.AUTO_SUCCESS) / len(unchanged_reports):.2%}"
-                )
-
-            if changed_reports:
-                lines.append(f"  变化样本列表: {sorted(changed_sample_ids)}")
-
-            lines.append("")
-            lines.append("  结论:")
-            lines.append(
-                f"    - 因样本本身变化导致的指标变动: {len(changed_sample_ids) / len(reports):.2%}"
-            )
-            lines.append(
-                f"    - 因模型/阈值变化导致的指标变动: {(len(reports) - len(changed_sample_ids)) / len(reports):.2%}"
-            )
-        else:
-            lines.append("  本次运行无样本变化，所有指标变动均来自模型或阈值调整")
+        lines.append(f"  本报告指标与上述明细来自同一批次快照，无两套说法")
+        lines.append(f"  快照时间: {batch_run.run_timestamp}")
+        lines.append(f"  快照样本数: {len(snapshots)}")
         lines.append("")
 
         lines.append("=" * 100)
-        lines.append(f"共 {len(reports)} 份明细报告，数据来源一致，无两套说法")
+        lines.append(f"共 {len(snapshots)} 份明细，数据来源一致，无两套说法")
         lines.append("=" * 100)
 
         summary_text = "\n".join(lines)
@@ -268,63 +235,50 @@ class ReportExporter:
         lines.append("")
 
         lines.append("-" * 100)
-        lines.append("变化汇总")
+        lines.append("样本级变化明细")
         lines.append("-" * 100)
         s = comparison["summary"]
         lines.append(f"  总样本数: {s['total_samples']}")
         lines.append(f"  新增样本: {s['added']}")
         lines.append(f"  移除样本: {s['removed']}")
-        lines.append(f"  发生变化: {s['changed']}")
-        lines.append(f"  保持不变: {s['unchanged']}")
+        lines.append(f"  状态/路径变化: {s['status_or_path_changed']}")
+        lines.append(f"  仅置信度变化: {s['confidence_changed']}")
+        lines.append(f"  完全不变: {s['unchanged']}")
         lines.append("")
 
         lines.append("-" * 100)
-        lines.append("指标变化 vs 样本变化 归因分析")
+        lines.append("归因分析")
         lines.append("-" * 100)
 
-        pure_model_changes = [
-            c
-            for c in comparison["sample_changes"]
-            if c["change_type"] in ["status_changed", "path_changed", "both_changed"]
-        ]
-        sample_only_changes = [
-            c
-            for c in comparison["sample_changes"]
-            if c["change_type"] in ["added", "removed"]
-        ]
-
-        lines.append(
-            f"  仅因样本集变化导致 (新增/移除): {len(sample_only_changes)} 个样本"
-        )
-        lines.append(
-            f"  因模型/阈值变化导致 (状态/路径改变): {len(pure_model_changes)} 个样本"
-        )
-        lines.append(f"  无变化: {s['unchanged']} 个样本")
+        attr = s["attribution"]
+        lines.append(f"  样本集变动 (新增/移除): {attr['sample_set']} 个样本")
+        lines.append(f"  模型/阈值变动: {attr['model_or_threshold']} 个样本")
+        lines.append(f"  人工审核变动: {attr['human_review']} 个样本")
+        lines.append(f"  无归因 (完全不变): {attr['none']} 个样本")
         lines.append("")
 
-        if pure_model_changes:
-            lines.append("  模型/阈值导致的变化明细:")
-            for c in pure_model_changes:
-                details = c["details"]
-                lines.append(f"    样本 {c['sample_id']}: {c['change_type']}")
-                if "old_status" in details:
-                    lines.append(
-                        f"      状态: {details['old_status']} → {details['new_status']}"
-                    )
-                if "old_path" in details:
-                    lines.append(
-                        f"      路径: {details['old_path']} → {details['new_path']}"
-                    )
-                if "old_confidence" in details:
-                    lines.append(
-                        f"      置信度: {details['old_confidence']:.2%} → {details['new_confidence']:.2%}"
-                    )
-            lines.append("")
+        for c in comparison["sample_changes"]:
+            if c["change_type"] == "unchanged":
+                continue
 
-        if sample_only_changes:
-            lines.append("  样本集变化明细:")
-            for c in sample_only_changes:
-                lines.append(f"    样本 {c['sample_id']}: {c['change_type']}")
+            lines.append(f"  样本 {c['sample_id']}: {c['change_type']} [归因: {c['attribution']}]")
+            details = c["details"]
+            if "old_status" in details:
+                lines.append(
+                    f"    状态: {details['old_status']} → {details['new_status']}"
+                )
+            if "old_path" in details:
+                lines.append(
+                    f"    路径: {details['old_path']} → {details['new_path']}"
+                )
+            if "old_confidence" in details:
+                lines.append(
+                    f"    置信度: {details['old_confidence']:.2%} → {details['new_confidence']:.2%}"
+                )
+            if "attribution_note" in details:
+                lines.append(
+                    f"    归因说明: {details['attribution_note']}"
+                )
             lines.append("")
 
         lines.append("-" * 100)
@@ -333,10 +287,17 @@ class ReportExporter:
         total = comparison["summary"]["total_samples"]
         if total > 0:
             lines.append(
-                f"  样本集变动贡献: {len(sample_only_changes) / total:.2%}"
+                f"  样本集变动贡献: {attr['sample_set'] / total:.2%}"
             )
             lines.append(
-                f"  模型/阈值变动贡献: {len(pure_model_changes) / total:.2%}"
+                f"  模型/阈值变动贡献: {attr['model_or_threshold'] / total:.2%}"
+            )
+            lines.append(
+                f"  人工审核变动贡献: {attr['human_review'] / total:.2%}"
+            )
+            model_plus_human = attr['model_or_threshold'] + attr['human_review']
+            lines.append(
+                f"  模型/阈值 + 人工审核合计: {model_plus_human / total:.2%}"
             )
         else:
             lines.append("  无样本可对比")

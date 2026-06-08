@@ -1,10 +1,10 @@
 ================================================================================
 学习路径推荐解释报告
 ================================================================================
-报告ID: RPT-6FF1233A
+报告ID: RPT-2EF44A90
 样本ID: SMP-003
 模型版本: v1.1.0
-生成时间: 2026-06-02T21:01:50.592212
+生成时间: 2026-06-08T19:00:27.443738
 状态: 待人工审核
 推荐路径: backend_engineer
 置信度: 73.33%
@@ -32,55 +32,55 @@
       来源: user_profile:USER-1003:level
       取值: advanced
       描述: 用户当前等级为 advanced
-      时间: 2026-06-02T21:01:50.592165
+      时间: 2026-06-08T19:00:27.443716
 
   [2] 类型: career_goal
       来源: user_profile:USER-1003:learning_goal
       取值: backend_engineer
       描述: 用户学习目标为 backend_engineer
-      时间: 2026-06-02T21:01:50.592169
+      时间: 2026-06-08T19:00:27.443717
 
   [3] 类型: user_profile
       来源: user_profile:USER-1003:available_hours
       取值: 8
       描述: 用户每周可投入 8 小时
-      时间: 2026-06-02T21:01:50.592171
+      时间: 2026-06-08T19:00:27.443718
 
   [4] 类型: learning_history
       来源: learning_history:USER-1003:completed
       取值: 2
       描述: 已完成 2 门课程
-      时间: 2026-06-02T21:01:50.592175
+      时间: 2026-06-08T19:00:27.443720
 
   [5] 类型: learning_history
       来源: learning_history:USER-1003:avg_score
       取值: 87.5
       描述: 已完成课程平均得分 87.5
-      时间: 2026-06-02T21:01:50.592180
+      时间: 2026-06-08T19:00:27.443722
 
   [6] 类型: knowledge_gap
       来源: prerequisite_check:backend_engineer:programming_basics
       取值: False
       描述: 目标路径 backend_engineer 需要先修技能 programming_basics，尚未掌握
-      时间: 2026-06-02T21:01:50.592183
+      时间: 2026-06-08T19:00:27.443724
 
   [7] 类型: skill_prerequisite
       来源: prerequisite_check:backend_engineer:databases
       取值: True
       描述: 目标路径 backend_engineer 需要先修技能 databases，已掌握
-      时间: 2026-06-02T21:01:50.592184
+      时间: 2026-06-08T19:00:27.443725
 
   [8] 类型: knowledge_gap
       来源: prerequisite_check:backend_engineer:networking
       取值: False
       描述: 目标路径 backend_engineer 需要先修技能 networking，尚未掌握
-      时间: 2026-06-02T21:01:50.592186
+      时间: 2026-06-08T19:00:27.443726
 
   [9] 类型: model_inference
       来源: model_version:v1.1.0
       取值: v1.1.0
       描述: 使用模型版本 v1.1.0 进行推断
-      时间: 2026-06-02T21:01:50.592187
+      时间: 2026-06-08T19:00:27.443727
 
 --------------------------------------------------------------------------------
 线上反馈

@@ -1,10 +1,10 @@
 ================================================================================
 学习路径推荐解释报告
 ================================================================================
-报告ID: RPT-D644C17B
+报告ID: RPT-46B4F26F
 样本ID: SMP-001
 模型版本: v1.1.0
-生成时间: 2026-06-02T21:01:50.591260
+生成时间: 2026-06-08T19:00:27.443409
 状态: 自动通过
 推荐路径: data_scientist
 置信度: 100.00%
@@ -32,61 +32,61 @@
       来源: user_profile:USER-1001:level
       取值: intermediate
       描述: 用户当前等级为 intermediate
-      时间: 2026-06-02T21:01:50.591169
+      时间: 2026-06-08T19:00:27.443380
 
   [2] 类型: career_goal
       来源: user_profile:USER-1001:learning_goal
       取值: data_scientist
       描述: 用户学习目标为 data_scientist
-      时间: 2026-06-02T21:01:50.591178
+      时间: 2026-06-08T19:00:27.443381
 
   [3] 类型: user_profile
       来源: user_profile:USER-1001:available_hours
       取值: 10
       描述: 用户每周可投入 10 小时
-      时间: 2026-06-02T21:01:50.591182
+      时间: 2026-06-08T19:00:27.443383
 
   [4] 类型: learning_history
       来源: learning_history:USER-1001:completed
       取值: 3
       描述: 已完成 3 门课程
-      时间: 2026-06-02T21:01:50.591191
+      时间: 2026-06-08T19:00:27.443385
 
   [5] 类型: learning_history
       来源: learning_history:USER-1001:avg_score
       取值: 91.67
       描述: 已完成课程平均得分 91.67
-      时间: 2026-06-02T21:01:50.591201
+      时间: 2026-06-08T19:00:27.443388
 
   [6] 类型: learning_history
       来源: learning_history:USER-1001:in_progress
       取值: 1
       描述: 正在学习 1 门课程
-      时间: 2026-06-02T21:01:50.591204
+      时间: 2026-06-08T19:00:27.443390
 
   [7] 类型: skill_prerequisite
       来源: prerequisite_check:data_scientist:python_basics
       取值: True
       描述: 目标路径 data_scientist 需要先修技能 python_basics，已掌握
-      时间: 2026-06-02T21:01:50.591213
+      时间: 2026-06-08T19:00:27.443392
 
   [8] 类型: skill_prerequisite
       来源: prerequisite_check:data_scientist:linear_algebra
       取值: True
       描述: 目标路径 data_scientist 需要先修技能 linear_algebra，已掌握
-      时间: 2026-06-02T21:01:50.591216
+      时间: 2026-06-08T19:00:27.443393
 
   [9] 类型: skill_prerequisite
       来源: prerequisite_check:data_scientist:statistics
       取值: True
       描述: 目标路径 data_scientist 需要先修技能 statistics，已掌握
-      时间: 2026-06-02T21:01:50.591219
+      时间: 2026-06-08T19:00:27.443395
 
   [10] 类型: model_inference
       来源: model_version:v1.1.0
       取值: v1.1.0
       描述: 使用模型版本 v1.1.0 进行推断
-      时间: 2026-06-02T21:01:50.591224
+      时间: 2026-06-08T19:00:27.443396
 
 --------------------------------------------------------------------------------
 线上反馈

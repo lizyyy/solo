@@ -109,13 +109,19 @@ class Storage:
         if not os.path.exists(reports_dir):
             return None
 
+        candidates = []
         for root, _, files in os.walk(reports_dir):
             for f in files:
                 if f.startswith(report_id) and f.endswith(".json"):
-                    data = self._read_json(os.path.join(root, f))
-                    if data:
-                        return ExplanationReport.from_dict(data)
-        return None
+                    path = os.path.join(root, f)
+                    candidates.append((path, os.path.getmtime(path)))
+
+        if not candidates:
+            return None
+
+        candidates.sort(key=lambda x: x[1], reverse=True)
+        data = self._read_json(candidates[0][0])
+        return ExplanationReport.from_dict(data) if data else None
 
     def list_reports_for_sample(
         self, sample_id: str, model_version: Optional[str] = None
@@ -249,15 +255,10 @@ class Storage:
         if not old_run or not new_run:
             return {"error": "One or both batch runs not found"}
 
-        old_reports = [self.load_report(rid) for rid in old_run.report_ids]
-        new_reports = [self.load_report(rid) for rid in new_run.report_ids]
-        old_reports = [r for r in old_reports if r]
-        new_reports = [r for r in new_reports if r]
+        old_snapshots = old_run.report_snapshots
+        new_snapshots = new_run.report_snapshots
 
-        old_by_sample = {r.sample_id: r for r in old_reports}
-        new_by_sample = {r.sample_id: r for r in new_reports}
-
-        all_samples = set(old_by_sample.keys()) | set(new_by_sample.keys())
+        all_samples = set(old_snapshots.keys()) | set(new_snapshots.keys())
 
         sample_changes = []
         metric_diffs = {}
@@ -272,36 +273,95 @@ class Storage:
             }
 
         for sample_id in sorted(all_samples):
-            old_r = old_by_sample.get(sample_id)
-            new_r = new_by_sample.get(sample_id)
+            old_s = old_snapshots.get(sample_id)
+            new_s = new_snapshots.get(sample_id)
 
             change_type = "unchanged"
             details = {}
+            attribution = "none"
 
-            if old_r and not new_r:
+            if old_s and not new_s:
                 change_type = "removed"
-            elif not old_r and new_r:
+                attribution = "sample_set"
+            elif not old_s and new_s:
                 change_type = "added"
+                attribution = "sample_set"
             else:
-                if old_r.status != new_r.status:
+                status_changed = old_s["status"] != new_s["status"]
+                path_changed = old_s["recommended_path"] != new_s["recommended_path"]
+                confidence_changed = (
+                    abs(old_s["confidence_score"] - new_s["confidence_score"]) > 1e-6
+                )
+
+                if status_changed and path_changed:
+                    change_type = "both_changed"
+                elif status_changed:
                     change_type = "status_changed"
-                    details["old_status"] = old_r.status.value
-                    details["new_status"] = new_r.status.value
-                if old_r.recommended_path != new_r.recommended_path:
-                    change_type = "path_changed" if change_type == "unchanged" else "both_changed"
-                    details["old_path"] = old_r.recommended_path
-                    details["new_path"] = new_r.recommended_path
-                if old_r.confidence_score != new_r.confidence_score:
-                    details["old_confidence"] = old_r.confidence_score
-                    details["new_confidence"] = new_r.confidence_score
+                elif path_changed:
+                    change_type = "path_changed"
+                elif confidence_changed:
+                    change_type = "confidence_changed"
+
+                if status_changed:
+                    details["old_status"] = old_s["status"]
+                    details["new_status"] = new_s["status"]
+                    if old_s.get("has_human_review") and not new_s.get("has_human_review"):
+                        attribution = "human_review_reverted"
+                        details["attribution_note"] = (
+                            f"旧报告 {old_s['report_id']} 经人工审核为 {old_s['status']}，"
+                            f"新报告 {new_s['report_id']} 未经人工审核为 {new_s['status']}，"
+                            f"此状态差异源自人工审核，非模型/阈值变化"
+                        )
+                    elif not old_s.get("has_human_review") and new_s.get("has_human_review"):
+                        attribution = "human_review_applied"
+                        details["attribution_note"] = (
+                            f"新报告 {new_s['report_id']} 经人工审核为 {new_s['status']}，"
+                            f"旧报告 {old_s['report_id']} 未经人工审核为 {old_s['status']}，"
+                            f"此状态差异源自人工审核，非模型/阈值变化"
+                        )
+                    else:
+                        attribution = "model_or_threshold"
+
+                if path_changed:
+                    details["old_path"] = old_s["recommended_path"]
+                    details["new_path"] = new_s["recommended_path"]
+                    if attribution == "none":
+                        attribution = "model_or_threshold"
+
+                if confidence_changed:
+                    details["old_confidence"] = old_s["confidence_score"]
+                    details["new_confidence"] = new_s["confidence_score"]
+                    if attribution == "none":
+                        attribution = "model_or_threshold"
+
+                if change_type == "unchanged":
+                    attribution = "none"
 
             sample_changes.append(
                 {
                     "sample_id": sample_id,
                     "change_type": change_type,
                     "details": details,
+                    "attribution": attribution,
                 }
             )
+
+        sample_set_count = len(
+            [c for c in sample_changes if c["attribution"] == "sample_set"]
+        )
+        model_threshold_count = len(
+            [c for c in sample_changes if c["attribution"] == "model_or_threshold"]
+        )
+        human_review_count = len(
+            [
+                c
+                for c in sample_changes
+                if c["attribution"] in ["human_review_reverted", "human_review_applied"]
+            ]
+        )
+        unchanged_count = len(
+            [c for c in sample_changes if c["change_type"] == "unchanged"]
+        )
 
         return {
             "old_run": run_id_old,
@@ -314,15 +374,22 @@ class Storage:
                 "total_samples": len(all_samples),
                 "added": len([c for c in sample_changes if c["change_type"] == "added"]),
                 "removed": len([c for c in sample_changes if c["change_type"] == "removed"]),
-                "changed": len(
+                "status_or_path_changed": len(
                     [
                         c
                         for c in sample_changes
                         if c["change_type"] in ["status_changed", "path_changed", "both_changed"]
                     ]
                 ),
-                "unchanged": len(
-                    [c for c in sample_changes if c["change_type"] == "unchanged"]
+                "confidence_changed": len(
+                    [c for c in sample_changes if c["change_type"] == "confidence_changed"]
                 ),
+                "unchanged": unchanged_count,
+                "attribution": {
+                    "sample_set": sample_set_count,
+                    "model_or_threshold": model_threshold_count,
+                    "human_review": human_review_count,
+                    "none": len(all_samples) - sample_set_count - model_threshold_count - human_review_count,
+                },
             },
         }

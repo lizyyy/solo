@@ -190,35 +190,100 @@ def main():
         else:
             print(f"    {metric}: {diff['old']} → {diff['new']} (变化: {diff['diff']:+})")
 
-    print(f"\n  样本变化汇总:")
     s = comparison["summary"]
-    print(f"    总样本: {s['total_samples']}, 新增: {s['added']}, 移除: {s['removed']}, 变化: {s['changed']}, 不变: {s['unchanged']}")
+    attr = s["attribution"]
+
+    print(f"\n  样本级变化:")
+    print(f"    状态/路径变化: {s['status_or_path_changed']}")
+    print(f"    仅置信度变化: {s['confidence_changed']}")
+    print(f"    完全不变: {s['unchanged']}")
 
     print(f"\n  归因分析:")
-    pure_model = [c for c in comparison["sample_changes"]
-                  if c["change_type"] in ["status_changed", "path_changed", "both_changed"]]
-    sample_only = [c for c in comparison["sample_changes"]
-                   if c["change_type"] in ["added", "removed"]]
+    print(f"    样本集变动: {attr['sample_set']} 个")
+    print(f"    模型/阈值变动: {attr['model_or_threshold']} 个")
+    print(f"    人工审核变动: {attr['human_review']} 个")
 
-    print(f"    样本集变动: {len(sample_only)} 个样本")
-    print(f"    模型/阈值变动: {len(pure_model)} 个样本")
+    for c in comparison["sample_changes"]:
+        if c["change_type"] == "unchanged":
+            continue
+        print(f"\n    样本 {c['sample_id']}: {c['change_type']} [归因: {c['attribution']}]")
+        for k, v in c["details"].items():
+            if k == "attribution_note":
+                print(f"      归因说明: {v}")
+            elif k in ("old_confidence", "new_confidence"):
+                pass
+            else:
+                print(f"      {k}: {v}")
+        if "old_confidence" in c["details"]:
+            print(f"      置信度: {c['details']['old_confidence']:.2%} → {c['details']['new_confidence']:.2%}")
 
-    if pure_model:
-        print(f"\n  模型阈值导致的变化详情:")
-        for c in pure_model:
-            if c["change_type"] == "status_changed":
-                print(f"    样本 {c['sample_id']}: 状态 {c['details']['old_status']} → {c['details']['new_status']}")
+    assert s["confidence_changed"] >= 1, (
+        f"SMP-003置信度应因阈值调整而变化 (63.33%→73.33%)，但归因显示0个置信度变化"
+    )
+    print(f"\n  ✓ 置信度变化已被检测到 ({s['confidence_changed']} 个样本)")
+
+    smp002_change = next(
+        (c for c in comparison["sample_changes"] if c["sample_id"] == "SMP-002"), None
+    )
+    assert smp002_change is not None
+    assert smp002_change["change_type"] == "unchanged", (
+        f"SMP-002在两次批次快照中均为need_human_review（人工审核在v1.0.0批次之后），"
+        f"快照对比应判为不变，实际: {smp002_change['change_type']}"
+    )
+    print(f"  ✓ SMP-002快照对比正确判定为不变（人工审核在批次运行之后，不影响快照）")
+
+    smp003_change = next(
+        (c for c in comparison["sample_changes"] if c["sample_id"] == "SMP-003"), None
+    )
+    assert smp003_change is not None
+    assert smp003_change["attribution"] == "model_or_threshold", (
+        f"SMP-003的置信度变化应归因到模型/阈值，实际归因: {smp003_change['attribution']}"
+    )
+    print(f"  ✓ SMP-003置信度变化正确归因到模型/阈值")
+
+    smp001_change = next(
+        (c for c in comparison["sample_changes"] if c["sample_id"] == "SMP-001"), None
+    )
+    assert smp001_change is not None
+    assert smp001_change["change_type"] == "unchanged", (
+        f"SMP-001两次运行完全一致，应判为不变，实际: {smp001_change['change_type']}"
+    )
+    print(f"  ✓ SMP-001正确判定为完全不变")
 
     total = s["total_samples"]
-    model_contribution = len(pure_model) / total if total > 0 else 0
-    sample_contribution = len(sample_only) / total if total > 0 else 0
-
     print(f"\n  归因结论:")
-    print(f"    样本集变动贡献: {sample_contribution:.2%}")
-    print(f"    模型/阈值变动贡献: {model_contribution:.2%}")
-    print(f"  ✓ 指标变化和样本变化已分开解释")
+    print(f"    样本集变动贡献: {attr['sample_set'] / total:.2%}")
+    print(f"    模型/阈值变动贡献: {attr['model_or_threshold'] / total:.2%}")
+    print(f"    人工审核变动贡献: {attr['human_review'] / total:.2%}")
 
-    print_step(10, "导出报告，验证报告与明细一致")
+    any_metric_changed = any(
+        abs(d["diff"]) > 1e-9
+        for d in comparison["metric_diffs"].values()
+        if isinstance(d["diff"], (int, float))
+    )
+    any_sample_attributed = attr["model_or_threshold"] > 0 or attr["human_review"] > 0
+    if any_metric_changed:
+        assert any_sample_attributed, (
+            "指标有变化但归因显示0个样本受影响——报告与明细变成了两套说法"
+        )
+        print(f"  ✓ 指标有变化时归因能对应上，不是两套说法")
+    print(f"  ✓ 指标变化和样本变化已分开解释，归因正确")
+
+    print_step(10, "验证人工审核差异在追溯链中可见")
+    v1_smp002_report = storage.load_report(smp002_report.report_id)
+    print(f"  v1.0.0 SMP-002 当前状态: {v1_smp002_report.status.value}")
+    assert v1_smp002_report.status == ExplanationStatus.HUMAN_CONFIRMED
+    assert v1_smp002_report.human_review is not None
+    print(f"  ✓ v1.0.0报告已被人工确认（可追溯）")
+
+    v11_smp002_report = next((r for r in reports_v11 if r.sample_id == "SMP-002"), None)
+    assert v11_smp002_report is not None
+    assert v11_smp002_report.status == ExplanationStatus.NEED_HUMAN_REVIEW
+    assert v11_smp002_report.human_review is None
+    print(f"  ✓ v1.1.0报告仍为待审核（新版本需重新审核）")
+    print(f"  ✓ 人工审核的影响通过追溯链可见，不会丢失")
+
+    print_step(11, "导出报告，验证报告与明细一致")
     summary_path, detail_dir = exporter.export_batch_run_report(run_id_v11)
     print(f"  ✓ 汇总报告: {summary_path}")
     print(f"  ✓ 明细目录: {detail_dir}")
@@ -230,29 +295,30 @@ def main():
     print(f"  ✓ 明细报告数: {len(detail_files)}")
 
     assert len(detail_files) == 3, "应该有3份明细报告"
-    assert "数据来源一致，无两套说法" in summary_content
+    assert "无两套说法" in summary_content
     print(f"  ✓ 汇总报告声明数据一致")
 
-    with open(os.path.join(detail_dir, detail_files[0]), "r", encoding="utf-8") as f:
-        detail_content = f.read()
-    assert "报告明细完整，与底层数据一致" in detail_content
-    print(f"  ✓ 明细报告声明数据完整")
+    batch_run_v11 = storage.load_batch_run(run_id_v11)
+    assert len(batch_run_v11.report_snapshots) == 3
+    for sample_id, snap in batch_run_v11.report_snapshots.items():
+        assert "report_id" in snap
+        assert "status" in snap
+        assert "confidence_score" in snap
+        assert "recommended_path" in snap
+        assert f"{snap['confidence_score']:.2%}" in summary_content or str(snap['confidence_score']) in summary_content
+    print(f"  ✓ 批次快照与汇总报告数据一致，无两套说法")
 
     comparison_path = exporter.compare_runs_and_export(run_id_v1, run_id_v11)
     print(f"  ✓ 对比报告: {comparison_path}")
 
-    for r in reports_v11:
-        single_path = exporter.export_single_report(r.report_id)
-        with open(single_path, "r", encoding="utf-8") as f:
-            content = f.read()
-        assert "证据链" in content
-        assert "使用阈值" in content
-        assert r.report_id in content
+    with open(comparison_path, "r", encoding="utf-8") as f:
+        comp_content = f.read()
+    assert "归因分析" in comp_content
+    assert "模型/阈值变动" in comp_content
+    assert "人工审核变动" in comp_content
+    print(f"  ✓ 对比报告包含完整归因分析")
 
-    print(f"  ✓ 所有报告均包含完整证据链和阈值")
-    print(f"  ✓ 汇总报告与明细报告数据一致")
-
-    print_step(11, "追溯 SMP-002 的完整历史")
+    print_step(12, "追溯 SMP-002 的完整历史")
     trace_reports = storage.list_reports_for_sample("SMP-002")
     print(f"  SMP-002 共有 {len(trace_reports)} 个版本的解释报告:")
     for i, r in enumerate(trace_reports, 1):
@@ -263,7 +329,7 @@ def main():
     assert len(trace_reports) >= 2, "SMP-002 应该有至少2个版本 (v1.0.0带审核, v1.1.0)"
     print(f"  ✓ 完整追溯链可用，无需询问AI产品经理阿宁")
 
-    print_step(12, "验证版本历史和变更日志")
+    print_step(13, "验证版本历史和变更日志")
     versions = version_manager.list_versions_with_changelog()
     print(f"  模型版本历史:")
     for v in versions:
@@ -290,8 +356,11 @@ def main():
     print(f"     - SMP-002: 待人工审核 → 人工确认 (转行背景，需判断)")
     print(f"     - SMP-003: 历史标注导入 (保留阿宁2025Q4的旧口径)")
     print("  6. 归因分析: 重跑时指标变化和样本变化可分开解释")
-    print("  7. 数据一致性: 汇总报告与明细报告来自同一数据源，无两套说法")
-    print("  8. 完整追溯: 任一样本的所有历史版本可一键追溯")
+    print("  7. 置信度变化检测: SMP-003因阈值调整置信度变化被正确归因")
+    print("  8. 快照对比: 批次运行用快照对比，不受后续人工审核干扰")
+    print("  9. 人工审核可见: 虽快照对比不变，追溯链仍可见审核记录")
+    print("  10. 数据一致性: 汇总报告与明细报告来自同一数据源，无两套说法")
+    print("  11. 完整追溯: 任一样本的所有历史版本可一键追溯")
     print()
     print(f"📁 数据目录: {os.path.abspath(data_dir)}")
     print(f"📁 导出目录: {os.path.abspath(export_dir)}")
