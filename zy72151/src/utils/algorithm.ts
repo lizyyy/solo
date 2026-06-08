@@ -59,7 +59,7 @@ export function haversineDistance(
 }
 
 export function standardizeName(name: string): string {
-  let result = name
+  const result = name
     .replace(/公交站|公交车站|站|站点|站台|站牌/g, '')
     .replace(/路口|交叉口|十字路口/g, '路口')
     .replace(/大道|大街|路|街|巷|弄/g, (match) => match)

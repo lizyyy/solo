@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { AppStore, BusStop, ProcessRecord, PointStatus } from '@/types';
+import { AppStore, ProcessRecord, PointStatus } from '@/types';
 import { generateId } from '@/utils/algorithm';
 import { generateSampleData } from '@/data/sampleData';
 

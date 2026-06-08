@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Filter, AlertCircle, MapPin, ChevronDown, ChevronUp } from 'lucide-react';
+import { Search, Filter, AlertCircle, MapPin } from 'lucide-react';
 import { useStore, useFilteredBusStops } from '@/store/useStore';
 import { statusLabels, statusColors, PointStatus } from '@/types';
 

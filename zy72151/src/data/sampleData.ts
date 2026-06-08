@@ -11,7 +11,7 @@ interface RawBusStopData {
   isBoundary?: boolean;
   needsReview?: boolean;
   hasEmptyFields?: boolean;
-  rawData?: Record<string, any>;
+  rawData?: Record<string, string>;
   fileName?: string;
 }
 

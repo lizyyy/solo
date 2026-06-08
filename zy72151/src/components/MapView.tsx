@@ -3,8 +3,8 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useStore } from '@/store/useStore';
-import { statusColors, statusLabels } from '@/types';
-import { AlertCircle, GitMerge } from 'lucide-react';
+import { statusColors, statusLabels, BusStop } from '@/types';
+import { AlertCircle } from 'lucide-react';
 
 function createCustomIcon(status: string, needsReview: boolean, isBoundary: boolean) {
   const color = statusColors[status as keyof typeof statusColors] || '#6b7280';
@@ -58,7 +58,7 @@ function createCustomIcon(status: string, needsReview: boolean, isBoundary: bool
 
 function MapController({ selectedBusStopId, busStops }: {
   selectedBusStopId: string | null;
-  busStops: any[];
+  busStops: BusStop[];
 }) {
   const map = useMap();
   const hasCentered = useRef(false);

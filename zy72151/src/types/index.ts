@@ -34,7 +34,7 @@ export interface DataSource {
   busStopId: string;
   type: SourceType;
   rawName: string;
-  rawData: Record<string, any>;
+  rawData: Record<string, string>;
   fileName?: string;
   importedAt: string;
 }
