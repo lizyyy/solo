@@ -385,7 +385,9 @@ class Store:
         self, creative_id: str, arm_name: str, run_id: str
     ) -> Optional[EvalResult]:
         row = self.conn.execute(
-            "SELECT * FROM eval_results WHERE creative_id = ? AND arm_name = ? AND run_id = ?",
+            """SELECT * FROM eval_results
+            WHERE creative_id = ? AND arm_name = ? AND run_id = ?
+            ORDER BY is_duplicate ASC, evaluated_at DESC""",
             (creative_id, arm_name, run_id),
         ).fetchone()
         if row is None:

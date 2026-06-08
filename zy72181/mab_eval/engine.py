@@ -98,7 +98,7 @@ class Engine:
         for fp, group in grouped.items():
             sorted_group = sorted(
                 group,
-                key=lambda x: x.log_timestamp or x.ingested_at,
+                key=lambda x: (x.log_timestamp is not None, x.log_timestamp or x.ingested_at),
                 reverse=True,
             )
             latest_logs.append(sorted_group[0])

@@ -43,6 +43,7 @@ def _make_log(
     ctr=0.02,
     cvr=0.05,
     source_file="test.csv",
+    log_timestamp=None,
 ) -> EvalLog:
     return EvalLog(
         log_id=log_id,
@@ -55,7 +56,7 @@ def _make_log(
         ctr=ctr,
         cvr=cvr,
         source_file=source_file,
-        log_timestamp=datetime(2025, 1, 1, 12, 0, 0),
+        log_timestamp=log_timestamp if log_timestamp is not None else datetime(2025, 1, 1, 12, 0, 0),
     )
 
 
@@ -390,6 +391,186 @@ class TestRerunDiff:
         diff = engine.rerun_diff(current_run_id="run_2", previous_run_id="run_1")
         assert diff.summary["samples_added_count"] >= 1
         assert "c2:arm_a" in diff.sample_added
+
+
+class TestSupersedeLatestWins:
+    def test_newer_timestamp_beats_null_timestamp(self, engine, tmp_db):
+        log_old = EvalLog(
+            log_id="l_old",
+            creative_id="c1",
+            arm_name="arm_a",
+            impressions=0,
+            clicks=None,
+            conversions=None,
+            revenue=None,
+            ctr=None,
+            cvr=None,
+            source_file="v1.csv",
+            log_timestamp=None,
+        )
+        log_new = EvalLog(
+            log_id="l_new",
+            creative_id="c1",
+            arm_name="arm_a",
+            impressions=2000,
+            clicks=40,
+            conversions=1.6,
+            revenue=12.8,
+            ctr=0.02,
+            cvr=0.04,
+            source_file="v2.csv",
+            log_timestamp=datetime(2025, 6, 15, 10, 0, 0),
+        )
+
+        engine.ingest_eval_log(log_old)
+        engine.ingest_eval_log(log_new)
+        engine.ingest_threshold_note(_make_threshold())
+
+        summary = engine.evaluate(run_id="test_null_ts_loses")
+        results = tmp_db.list_results_by_run("test_null_ts_loses")
+
+        active = [r for r in results if not r.is_duplicate and r.creative_id == "c1"]
+        assert len(active) == 1
+        r = active[0]
+
+        assert r.source_log_id == "l_new"
+        assert r.metric_values["ctr"] == 0.02
+        assert r.judgement != Judgement.SKIPPED
+
+        superseded = [r for r in results if r.is_duplicate and r.creative_id == "c1"]
+        assert len(superseded) == 1
+        assert superseded[0].source_log_id == "l_old"
+        assert superseded[0].judgement == Judgement.SKIPPED
+
+    def test_later_timestamp_beats_earlier(self, engine, tmp_db):
+        log_v1 = _make_log(
+            log_id="l_v1",
+            ctr=0.005,
+            log_timestamp=datetime(2025, 6, 1, 10, 0, 0),
+        )
+        log_v2 = _make_log(
+            log_id="l_v2",
+            ctr=0.02,
+            log_timestamp=datetime(2025, 6, 15, 10, 0, 0),
+        )
+
+        engine.ingest_eval_log(log_v1)
+        engine.ingest_eval_log(log_v2)
+        engine.ingest_threshold_note(_make_threshold())
+
+        summary = engine.evaluate(run_id="test_later_ts_wins")
+        results = tmp_db.list_results_by_run("test_later_ts_wins")
+
+        active = [r for r in results if not r.is_duplicate and r.creative_id == "c1"]
+        assert len(active) == 1
+        r = active[0]
+
+        assert r.source_log_id == "l_v2"
+        assert r.metric_values["ctr"] == 0.02
+
+    def test_both_null_timestamp_uses_ingested_at(self, engine, tmp_db):
+        log_first = EvalLog(
+            log_id="l_first",
+            creative_id="c1",
+            arm_name="arm_a",
+            impressions=50000,
+            clicks=1000,
+            conversions=50.0,
+            revenue=500.0,
+            ctr=0.005,
+            cvr=0.05,
+            source_file="first.csv",
+            log_timestamp=None,
+        )
+        log_second = EvalLog(
+            log_id="l_second",
+            creative_id="c1",
+            arm_name="arm_a",
+            impressions=50000,
+            clicks=1000,
+            conversions=50.0,
+            revenue=500.0,
+            ctr=0.02,
+            cvr=0.05,
+            source_file="second.csv",
+            log_timestamp=None,
+        )
+
+        engine.ingest_eval_log(log_first)
+        engine.ingest_eval_log(log_second)
+        engine.ingest_threshold_note(_make_threshold())
+
+        summary = engine.evaluate(run_id="test_both_null_ts")
+        results = tmp_db.list_results_by_run("test_both_null_ts")
+
+        active = [r for r in results if not r.is_duplicate and r.creative_id == "c1"]
+        assert len(active) == 1
+        r = active[0]
+
+        assert r.source_log_id == "l_second"
+        assert r.metric_values["ctr"] == 0.02
+
+    def test_ad004_scenario_v1_null_then_v2_real_data(self, engine, tmp_db):
+        log_v1 = EvalLog(
+            log_id="l4",
+            creative_id="ad_004",
+            arm_name="exploration",
+            impressions=0,
+            clicks=0,
+            conversions=None,
+            revenue=None,
+            ctr=None,
+            cvr=None,
+            source_file="demo_eval_log.csv",
+            log_timestamp=datetime(2025, 6, 1, 10, 0, 0),
+        )
+        log_v2 = EvalLog(
+            log_id="l4_v2",
+            creative_id="ad_004",
+            arm_name="exploration",
+            impressions=2000,
+            clicks=40,
+            conversions=1.6,
+            revenue=12.8,
+            ctr=0.02,
+            cvr=0.04,
+            source_file="demo_eval_log_v2.csv",
+            log_timestamp=datetime(2025, 6, 15, 10, 0, 0),
+        )
+
+        engine.ingest_eval_log(log_v1)
+        engine.ingest_threshold_note(
+            _make_threshold(note_id="t4", metric="ctr", threshold=0.005, stratum="new_creative")
+        )
+        engine.ingest_threshold_note(
+            _make_threshold(note_id="t5", metric="cvr", threshold=0.02, stratum="new_creative")
+        )
+        engine.ingest_threshold_note(
+            _make_threshold(note_id="t4b", metric="ctr", threshold=0.005, stratum="low_volume")
+        )
+        engine.ingest_threshold_note(
+            _make_threshold(note_id="t5b", metric="cvr", threshold=0.02, stratum="low_volume")
+        )
+        engine.evaluate(run_id="run_v1")
+
+        engine.ingest_eval_log(log_v2)
+        engine.evaluate(run_id="run_v2")
+
+        diff = engine.rerun_diff(current_run_id="run_v2", previous_run_id="run_v1")
+        ad004_changed = [
+            c for c in diff.sample_changed if c.get("creative_id") == "ad_004"
+        ]
+        assert len(ad004_changed) >= 1
+
+        v2_results = tmp_db.list_results_by_run("run_v2")
+        active = [r for r in v2_results if r.creative_id == "ad_004" and not r.is_duplicate]
+        assert len(active) == 1
+        r = active[0]
+        assert r.source_log_id == "l4_v2"
+        assert r.metric_values["ctr"] == 0.02
+        assert r.metric_values["cvr"] == 0.04
+        assert r.stratum == Stratum.LOW_VOLUME
+        assert r.judgement == Judgement.PASS
 
 
 class TestSourceAndTimestampPreserved:
