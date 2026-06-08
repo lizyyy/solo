@@ -1,5 +1,6 @@
 import { Outlet, NavLink } from 'react-router-dom';
-import { Upload, ClipboardCheck, History, Download, User } from 'lucide-react';
+import { Upload, ClipboardCheck, History, Download, User, Repeat } from 'lucide-react';
+import { useStore } from '@/store/useStore';
 
 const navItems = [
   { to: '/import', icon: Upload, label: '导入工作台' },
@@ -8,7 +9,18 @@ const navItems = [
   { to: '/export', icon: Download, label: '导出与归档' },
 ];
 
+const roleLabels: Record<string, string> = {
+  engineer: '设备工程师',
+  client: '展陈客户',
+};
+
 export default function Layout() {
+  const { currentUser, switchUser } = useStore();
+
+  const toggleRole = () => {
+    switchUser(currentUser.role === 'engineer' ? 'client' : 'engineer');
+  };
+
   return (
     <div className="flex h-screen">
       <aside className="w-64 bg-tunnel-surface border-r border-tunnel-border flex flex-col">
@@ -36,12 +48,21 @@ export default function Layout() {
           ))}
         </nav>
 
-        <div className="p-4 border-t border-tunnel-border flex items-center gap-3">
-          <User className="w-5 h-5 text-tunnel-muted" />
-          <div>
-            <p className="text-sm text-tunnel-fg font-medium">许工</p>
-            <p className="text-xs text-tunnel-muted">设备工程师</p>
+        <div className="p-4 border-t border-tunnel-border">
+          <div className="flex items-center gap-3">
+            <User className="w-5 h-5 text-tunnel-muted" />
+            <div>
+              <p className="text-sm text-tunnel-fg font-medium">{currentUser.name}</p>
+              <p className="text-xs text-tunnel-muted">{roleLabels[currentUser.role]}</p>
+            </div>
           </div>
+          <button
+            onClick={toggleRole}
+            className="mt-2 flex items-center gap-1.5 px-2.5 py-1.5 rounded text-xs text-tunnel-muted bg-tunnel-card border border-tunnel-border hover:text-tunnel-fg hover:border-tunnel-accent transition-colors w-full justify-center"
+          >
+            <Repeat className="w-3 h-3" />
+            切换为{currentUser.role === 'engineer' ? '展陈客户' : '设备工程师'}
+          </button>
         </div>
       </aside>
 

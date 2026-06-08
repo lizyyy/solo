@@ -7,7 +7,7 @@ import type {
   CoordinateOriginDoc,
   RowStatus,
 } from '../types';
-import { generateRowKey, checkDuplicate, detectLengthMismatch } from '../utils/boundaryRules';
+import { generateRowKey, checkDuplicate, detectLengthMismatch, canArchive, canUnarchive } from '../utils/boundaryRules';
 
 interface StoreState {
   rows: SafetyRadiusRow[];
@@ -34,8 +34,9 @@ interface StoreActions {
   ) => void;
   rollbackChange: (changeRecordId: string, changedBy: string) => void;
   updateRowStatus: (rowId: string, newStatus: RowStatus) => void;
-  archiveRow: (rowId: string) => void;
-  unarchiveRow: (rowId: string) => void;
+  archiveRow: (rowId: string) => boolean;
+  unarchiveRow: (rowId: string) => boolean;
+  switchUser: (role: 'engineer' | 'client') => void;
 }
 
 export const useStore = create<StoreState & StoreActions>()(
@@ -178,6 +179,9 @@ export const useStore = create<StoreState & StoreActions>()(
 
       archiveRow: (rowId) => {
         const state = get();
+        const row = state.rows.find((r) => r.id === rowId);
+        if (!row) return false;
+        if (!canArchive(row, state.currentUser.role)) return false;
         set({
           rows: state.rows.map((r) =>
             r.id === rowId
@@ -185,10 +189,12 @@ export const useStore = create<StoreState & StoreActions>()(
               : r
           ),
         });
+        return true;
       },
 
       unarchiveRow: (rowId) => {
         const state = get();
+        if (!canUnarchive(state.currentUser.role)) return false;
         set({
           rows: state.rows.map((r) =>
             r.id === rowId
@@ -196,6 +202,16 @@ export const useStore = create<StoreState & StoreActions>()(
               : r
           ),
         });
+        return true;
+      },
+
+      switchUser: (role) => {
+        const state = get();
+        const userMap = {
+          engineer: { id: 'xg001', name: '许工', role: 'engineer' as const },
+          client: { id: 'zz002', name: '张展陈', role: 'client' as const },
+        };
+        set({ currentUser: userMap[role] });
       },
     }),
     {

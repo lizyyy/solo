@@ -37,6 +37,19 @@ export function canEdit(row: SafetyRadiusRow): boolean {
   return row.status !== 'archived';
 }
 
+export function canArchive(
+  row: SafetyRadiusRow,
+  userRole: 'engineer' | 'client'
+): boolean {
+  if (row.status === 'archived') return false;
+  if (row.status === 'review' && userRole === 'engineer') return false;
+  return true;
+}
+
+export function canUnarchive(userRole: 'engineer' | 'client'): boolean {
+  return userRole === 'client';
+}
+
 export function canRollback(_changeRecord: ChangeRecord): boolean {
   return true;
 }
@@ -92,11 +105,13 @@ export const BOUNDARY_RULES_DOC = {
   dedupKey:
     '去重规则：以"原始行号+隧道名称+坐标原点"组合作为唯一标识，导入时自动检测重复行并跳过',
   lengthMismatch:
-    '长度异常检测：若实际长度与计算长度不一致，标记为"待审核"状态，原因：补录路线没有重新计算长度',
+    '长度异常检测：若实际长度与计算长度不一致，标记为"待复核"状态，原因：补录路线没有重新计算长度',
   importStatus:
     '导入状态判定：长度正常的行默认状态为"待处理"，长度异常的行默认状态为"待审核"',
   editRestriction:
     '编辑限制：已归档的行不可编辑，需先取消归档才能修改',
+  archiveRestriction:
+    '归档权限：待复核（review）行仅展陈客户（client角色）可归档，设备工程师不可直接归档待复核行；已归档行仅展陈客户可解锁',
   rollback:
     '回滚规则：所有变更记录均可回滚，回滚操作将字段值恢复为变更前的值，并生成回滚记录',
   validation:

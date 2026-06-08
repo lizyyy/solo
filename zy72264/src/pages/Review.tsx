@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import {
   ClipboardCheck, Eye, Edit3, Save, X, AlertTriangle,
-  MapPin, ChevronRight, ChevronLeft, Search, Filter,
+  MapPin, ChevronRight, ChevronLeft, Search, Filter, ShieldAlert,
 } from 'lucide-react';
 import { useStore } from '@/store/useStore';
 import { canEdit, detectLengthMismatch } from '@/utils/boundaryRules';
@@ -188,7 +188,15 @@ export default function Review() {
                   <td className="px-3 py-2">
                     {changes.length > 0 && <span className="inline-block w-2.5 h-2.5 rounded-full bg-tunnel-accent" />}
                   </td>
-                  <td className="px-3 py-2"><StatusBadge status={row.status} /></td>
+                  <td className="px-3 py-2">
+                    <StatusBadge status={row.status} />
+                    {row.status === 'review' && currentUser.role === 'engineer' && (
+                      <span className="flex items-center gap-0.5 mt-0.5 text-[10px] text-tunnel-danger opacity-80">
+                        <ShieldAlert className="w-2.5 h-2.5" />
+                        需展陈客户确认
+                      </span>
+                    )}
+                  </td>
                   <td className="px-3 py-2">
                     <div className="flex items-center gap-1 relative">
                       <button

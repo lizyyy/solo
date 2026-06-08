@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useStore } from '@/store/useStore';
 import type { RowStatus } from '@/types';
+import { canArchive, canUnarchive } from '@/utils/boundaryRules';
 import { StatusBadge } from '@/components/StatusBadge';
 import {
   Download,
@@ -11,6 +12,7 @@ import {
   CheckCircle2,
   AlertTriangle,
   Eye,
+  ShieldAlert,
 } from 'lucide-react';
 import html2canvas from 'html2canvas';
 
@@ -226,36 +228,43 @@ export default function Export() {
                   </td>
                   <td className="p-3">
                     {row.status !== 'archived' ? (
-                      <>
-                        {archiveConfirmId === row.id ? (
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs text-tunnel-danger">
-                              确认归档？归档后需展陈客户确认才能解锁
-                            </span>
+                      canArchive(row, currentUser.role) ? (
+                        <>
+                          {archiveConfirmId === row.id ? (
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-tunnel-danger">
+                                确认归档？归档后需展陈客户确认才能解锁
+                              </span>
+                              <button
+                                onClick={() => handleArchive(row.id)}
+                                className="px-2 py-1 bg-tunnel-danger text-white rounded text-xs hover:opacity-90"
+                              >
+                                确认
+                              </button>
+                              <button
+                                onClick={() => setArchiveConfirmId(null)}
+                                className="px-2 py-1 bg-tunnel-border text-tunnel-fg rounded text-xs hover:opacity-90"
+                              >
+                                取消
+                              </button>
+                            </div>
+                          ) : (
                             <button
                               onClick={() => handleArchive(row.id)}
-                              className="px-2 py-1 bg-tunnel-danger text-white rounded text-xs hover:opacity-90"
+                              className="flex items-center gap-1 px-2 py-1 bg-tunnel-accent/20 text-tunnel-accent rounded text-xs hover:bg-tunnel-accent/30 transition-colors"
                             >
-                              确认
+                              <Lock className="w-3 h-3" />
+                              归档
                             </button>
-                            <button
-                              onClick={() => setArchiveConfirmId(null)}
-                              className="px-2 py-1 bg-tunnel-border text-tunnel-fg rounded text-xs hover:opacity-90"
-                            >
-                              取消
-                            </button>
-                          </div>
-                        ) : (
-                          <button
-                            onClick={() => handleArchive(row.id)}
-                            className="flex items-center gap-1 px-2 py-1 bg-tunnel-accent/20 text-tunnel-accent rounded text-xs hover:bg-tunnel-accent/30 transition-colors"
-                          >
-                            <Lock className="w-3 h-3" />
-                            归档
-                          </button>
-                        )}
-                      </>
-                    ) : (
+                          )}
+                        </>
+                      ) : (
+                        <span className="flex items-center gap-1 text-xs text-tunnel-danger opacity-80">
+                          <ShieldAlert className="w-3 h-3" />
+                          需展陈客户确认
+                        </span>
+                      )
+                    ) : canUnarchive(currentUser.role) ? (
                       <button
                         onClick={() => unarchiveRow(row.id)}
                         className="flex items-center gap-1 px-2 py-1 bg-tunnel-success/20 text-tunnel-success rounded text-xs hover:bg-tunnel-success/30 transition-colors"
@@ -263,6 +272,11 @@ export default function Export() {
                         <Unlock className="w-3 h-3" />
                         取消归档
                       </button>
+                    ) : (
+                      <span className="flex items-center gap-1 text-xs text-tunnel-muted opacity-60">
+                        <Lock className="w-3 h-3" />
+                        已归档
+                      </span>
                     )}
                   </td>
                 </tr>
@@ -296,7 +310,7 @@ export default function Export() {
                     归档时间: {new Date(row.updatedAt).toLocaleString('zh-CN')}
                   </div>
                 </div>
-                {currentUser.role === 'client' && (
+                {canUnarchive(currentUser.role) && (
                   <button
                     onClick={() => unarchiveRow(row.id)}
                     className="flex items-center gap-1 px-2 py-1 bg-tunnel-success/20 text-tunnel-success rounded text-xs hover:bg-tunnel-success/30 transition-colors"
