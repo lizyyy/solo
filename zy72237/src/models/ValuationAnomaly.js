@@ -34,6 +34,7 @@ class ValuationAnomaly {
     this.calculationParams = null;
     this.selfCheckResults = {};
     
+    this.summary = null;
     this.workflowStep = 1;
     this.workflowHistory = [];
     
@@ -164,6 +165,7 @@ class ValuationAnomaly {
       conflicts: this.conflicts,
       calculationParams: this.calculationParams,
       selfCheckResults: this.selfCheckResults,
+      summary: this.summary,
       workflowStep: this.workflowStep,
       workflowHistory: this.workflowHistory,
       createdAt: this.createdAt,

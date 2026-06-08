@@ -75,6 +75,18 @@ class WorkflowService {
       };
     }
 
+    if (conflicts.length === 0 && anomaly.isZeroWithReversal) {
+      anomaly.status = STATUS.AWAITING_RISK_REVIEW;
+      this.dataStore.update(anomaly);
+      return {
+        anomaly: anomaly.toJSON(),
+        workflowStep: 2,
+        hasConflicts: false,
+        nextStep: 'risk_review',
+        message: '清算批次号导入完成，未发现冲突，但金额为0且备注已冲正，需风控同事复核'
+      };
+    }
+
     return {
       anomaly: anomaly.toJSON(),
       workflowStep: 2,
@@ -107,9 +119,9 @@ class WorkflowService {
       return {
         anomaly: anomaly.toJSON(),
         allConflictsResolved: true,
-        nextStep: 'step3_generateSummary',
+        nextStep: anomaly.isZeroWithReversal ? 'risk_review' : 'step3_generateSummary',
         message: anomaly.isZeroWithReversal 
-          ? '冲突已解决，但该记录金额为0且备注已冲正，请风控同事复核后再确定最终状态' 
+          ? '冲突已解决，但该记录金额为0且备注已冲正，请风控同事复核' 
           : '所有冲突已解决，可继续生成负责人摘要'
       };
     }
@@ -133,21 +145,18 @@ class WorkflowService {
       throw new Error(`还有 ${unresolvedConflicts.length} 个冲突未解决，无法生成摘要`);
     }
 
-    if (anomaly.isZeroWithReversal && anomaly.status !== STATUS.CONFIRMED) {
+    if (anomaly.status === STATUS.AWAITING_RISK_REVIEW) {
       return {
         anomaly: anomaly.toJSON(),
         warning: '该记录金额为0且备注已冲正，需风控复核确认后才能生成最终摘要',
-        requiresRiskReview: true
+        requiresRiskReview: true,
+        nextStep: 'risk_review'
       };
     }
 
     anomaly.advanceWorkflow(summaryData, operator);
 
-    if (anomaly.isZeroWithReversal) {
-      anomaly.status = STATUS.AWAITING_RISK_REVIEW;
-    } else {
-      anomaly.status = STATUS.CONFIRMED;
-    }
+    anomaly.status = STATUS.NORMAL;
 
     await this.selfCheckService.runAllChecks(anomalyId);
 
@@ -157,9 +166,7 @@ class WorkflowService {
       anomaly: anomaly.toJSON(),
       workflowStep: 3,
       completed: true,
-      message: anomaly.isZeroWithReversal 
-        ? '摘要已生成，但需风控同事最终复核确认' 
-        : '三步流程已完成，摘要已生成'
+      message: '三步流程已完成，摘要已生成'
     };
   }
 
@@ -173,7 +180,11 @@ class WorkflowService {
       throw new Error('该记录不需要风控复核');
     }
 
-    anomaly.status = decision === 'confirm' ? STATUS.NORMAL : STATUS.CONFIRMED;
+    if (anomaly.status !== STATUS.AWAITING_RISK_REVIEW) {
+      throw new Error('该记录当前状态不需要风控复核');
+    }
+
+    anomaly.status = decision === 'confirm' ? STATUS.CONFIRMED : STATUS.REJECTED;
     
     anomaly.workflowHistory.push({
       action: 'risk_review',
@@ -188,8 +199,9 @@ class WorkflowService {
 
     return {
       anomaly: anomaly.toJSON(),
+      nextStep: decision === 'confirm' ? 'step3_generateSummary' : null,
       message: decision === 'confirm' 
-        ? '风控已确认，冲正有效，记录归为正常' 
+        ? '风控已确认，冲正有效，可继续生成负责人摘要' 
         : '风控已驳回，冲正无效，记录保持异常状态'
     };
   }

@@ -79,6 +79,7 @@ class SelfCheckService {
   }
 
   async checkZeroWithReversal(anomaly) {
+    const { STATUS } = require('../models/ValuationAnomaly');
     const result = {
       pass: true,
       warnings: [],
@@ -87,14 +88,25 @@ class SelfCheckService {
     };
 
     if (anomaly.marketValue === 0 && anomaly.remark && anomaly.remark.includes('已冲正')) {
-      result.pass = false;
-      result.requiresRiskReview = true;
-      result.warnings.push('金额为0但备注显示已冲正，需要风控复核');
-      result.details = {
-        marketValue: anomaly.marketValue,
-        remark: anomaly.remark,
-        suggestion: '请风控同事确认该笔冲正交易是否有效，不可自动归为正常'
-      };
+      const riskConfirmed = anomaly.status === STATUS.CONFIRMED || anomaly.status === STATUS.NORMAL;
+      if (riskConfirmed) {
+        result.pass = true;
+        result.warnings.push('金额为0且备注已冲正，风控已复核确认');
+        result.details = {
+          marketValue: anomaly.marketValue,
+          remark: anomaly.remark,
+          riskReviewCompleted: true
+        };
+      } else {
+        result.pass = false;
+        result.requiresRiskReview = true;
+        result.warnings.push('金额为0但备注显示已冲正，需要风控复核');
+        result.details = {
+          marketValue: anomaly.marketValue,
+          remark: anomaly.remark,
+          suggestion: '请风控同事确认该笔冲正交易是否有效，不可自动归为正常'
+        };
+      }
     }
 
     return result;
