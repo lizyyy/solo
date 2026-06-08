@@ -22,7 +22,7 @@ interface ConflictListProps {
 
 export default function ConflictList({ conflicts, onResolved }: ConflictListProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [decisionRemark, setDecisionRemark] = useState<string>('');
+  const [remarkMap, setRemarkMap] = useState<Record<string, string>>({});
   const [processingId, setProcessingId] = useState<string | null>(null);
 
   const updateConflict = useAppStore((s) => s.updateConflict);
@@ -37,7 +37,8 @@ export default function ConflictList({ conflicts, onResolved }: ConflictListProp
     conflict: ConflictRecord,
     decision: 'confirmed' | 'rejected'
   ) => {
-    if (!decisionRemark.trim()) {
+    const remark = remarkMap[conflict.id] || '';
+    if (!remark.trim()) {
       alert('请填写处理备注，说明决策理由');
       return;
     }
@@ -47,7 +48,7 @@ export default function ConflictList({ conflicts, onResolved }: ConflictListProp
       const updated = await resolveConflict(
         conflict.id,
         decision,
-        decisionRemark,
+        remark,
         operator
       );
 
@@ -75,7 +76,11 @@ export default function ConflictList({ conflicts, onResolved }: ConflictListProp
           });
         }
 
-        setDecisionRemark('');
+        setRemarkMap((prev) => {
+          const next = { ...prev };
+          delete next[conflict.id];
+          return next;
+        });
         onResolved?.();
       }
     } catch (error) {
@@ -251,8 +256,13 @@ export default function ConflictList({ conflicts, onResolved }: ConflictListProp
                         className="input-field"
                         rows={2}
                         placeholder="请说明决策理由，作为后续追溯依据..."
-                        value={processingId === conflict.id ? decisionRemark : ''}
-                        onChange={(e) => setDecisionRemark(e.target.value)}
+                        value={remarkMap[conflict.id] || ''}
+                        onChange={(e) =>
+                          setRemarkMap((prev) => ({
+                            ...prev,
+                            [conflict.id]: e.target.value,
+                          }))
+                        }
                         disabled={processingId === conflict.id}
                       />
                     </div>

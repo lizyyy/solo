@@ -156,7 +156,14 @@ export async function parseSafetyRadiusTable(
     const versionMatch = content.match(/version[^\d]*([\d.]+)/i);
     if (versionMatch) version = `v${versionMatch[1]}`;
   } else if (file.name.endsWith('.csv')) {
-    const result = Papa.parse(content, { header: true, skipEmptyLines: true });
+    let csvContent = content;
+    const versionLineMatch = csvContent.match(/^version[^\n]*\n?/im);
+    if (versionLineMatch) {
+      const versionNumMatch = versionLineMatch[0].match(/(\d+\.\d+)/);
+      if (versionNumMatch) version = `v${versionNumMatch[1]}`;
+      csvContent = csvContent.replace(versionLineMatch[0], '');
+    }
+    const result = Papa.parse(csvContent, { header: true, skipEmptyLines: true });
     const rows = result.data as any[];
     
     exhibits = rows

@@ -20,7 +20,7 @@ interface ReviewPanelProps {
 }
 
 export default function ReviewPanel({ routes, onReviewed }: ReviewPanelProps) {
-  const [reviewRemark, setReviewRemark] = useState<string>('');
+  const [remarkMap, setRemarkMap] = useState<Record<string, string>>({});
   const [reviewerName, setReviewerName] = useState<string>('展陈客户');
   const [processingId, setProcessingId] = useState<string | null>(null);
 
@@ -36,7 +36,8 @@ export default function ReviewPanel({ routes, onReviewed }: ReviewPanelProps) {
     routeId: string,
     decision: 'approved' | 'rejected'
   ) => {
-    if (!reviewRemark.trim()) {
+    const remark = remarkMap[routeId] || '';
+    if (!remark.trim()) {
       alert('请填写复核意见，说明确认或驳回的理由');
       return;
     }
@@ -46,7 +47,7 @@ export default function ReviewPanel({ routes, onReviewed }: ReviewPanelProps) {
       const now = new Date().toISOString();
       const updates: Partial<Route> = {
         reviewStatus: decision,
-        reviewRemark,
+        reviewRemark: remark,
         reviewer: reviewerName,
         reviewTime: now,
         lengthRecalculated: decision === 'approved',
@@ -77,7 +78,11 @@ export default function ReviewPanel({ routes, onReviewed }: ReviewPanelProps) {
       });
       setSelfChecks(updatedChecks);
 
-      setReviewRemark('');
+      setRemarkMap((prev) => {
+        const next = { ...prev };
+        delete next[routeId];
+        return next;
+      });
       onReviewed?.();
     } catch (error) {
       console.error('Review failed:', error);
@@ -217,8 +222,13 @@ export default function ReviewPanel({ routes, onReviewed }: ReviewPanelProps) {
                   className="input-field"
                   rows={2}
                   placeholder="请说明确认或驳回的理由..."
-                  value={processingId === route.id ? reviewRemark : ''}
-                  onChange={(e) => setReviewRemark(e.target.value)}
+                  value={remarkMap[route.id] || ''}
+                  onChange={(e) =>
+                    setRemarkMap((prev) => ({
+                      ...prev,
+                      [route.id]: e.target.value,
+                    }))
+                  }
                   disabled={processingId === route.id}
                 />
               </div>
