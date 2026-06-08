@@ -1,0 +1,258 @@
+{
+  "3e07a9fa": {
+    "record_id": "3e07a9fa",
+    "created_at": "2026-06-08T20:30:35.520376",
+    "floor_sketch": {
+      "sketch_id": "15ee70eb",
+      "import_time": "2026-06-08T20:30:35.520073",
+      "file_name": "台站B1层管廊剖面.dwg",
+      "floor_level": "B1",
+      "uploaded_by": "园区运维小陶",
+      "marked_valve_positions": [
+        {
+          "valve_id": "V-001",
+          "label": "阀门1",
+          "distance_to_obstacle": 1.5,
+          "required_distance": 2.0,
+          "has_screenshot_overlay": true,
+          "label_visibility": 20
+        },
+        {
+          "valve_id": "V-002",
+          "label": "阀门2",
+          "distance_to_obstacle": 1.8,
+          "required_distance": 2.0
+        },
+        {
+          "valve_id": "V-003",
+          "label": "阀门3",
+          "distance_to_obstacle": 2.1,
+          "required_distance": 2.0
+        }
+      ],
+      "has_mobile_screenshot": true
+    },
+    "point_cloud_logs": [
+      {
+        "log_id": "959bd28d",
+        "timestamp": "2026-06-08T20:30:43.912105",
+        "operator": "园区运维小陶",
+        "raw_remark": "台站复测:V-002距离2.1m,截图遮挡需施工经理现场核实",
+        "thinning_ratio": 0.75,
+        "confidence_level": 0.85,
+        "issues_found": [],
+        "original_coordinates": null
+      },
+      {
+        "log_id": "f249e168",
+        "timestamp": "2026-06-08T20:31:23.369967",
+        "operator": "园区运维小陶",
+        "raw_remark": "Web端补录：截图遮挡标签确认为【禁止关闭】",
+        "thinning_ratio": 0.75,
+        "confidence_level": 0.85,
+        "issues_found": [],
+        "original_coordinates": null
+      }
+    ],
+    "safety_report": {
+      "report_id": "de3ab49d",
+      "generated_at": "2026-06-08T20:31:23.371375",
+      "generated_by": "园区运维小陶",
+      "issues": [
+        {
+          "issue_id": "ff993398",
+          "valve_id": "V-001",
+          "valve_label": "阀门1",
+          "detected_distance": 1.5,
+          "required_distance": 2.0,
+          "status": "截图遮挡",
+          "why_kept": "移动端截图挡住了告警标签: 移动端截图覆盖在告警标签区域，标签内容不可见。不归为正常，留给施工经理复核。",
+          "missing_materials": [
+            "清晰的告警标签照片",
+            "无遮挡的现场图片"
+          ],
+          "next_action": "联系施工经理",
+          "next_action_person": "施工经理",
+          "evidence_photos": [],
+          "point_cloud_logs_ref": [
+            "959bd28d",
+            "f249e168"
+          ],
+          "is_blocked_by_screenshot": true
+        },
+        {
+          "issue_id": "e5b196f2",
+          "valve_id": "V-002",
+          "valve_label": "阀门2",
+          "detected_distance": 1.8,
+          "required_distance": 2.0,
+          "status": "异常",
+          "why_kept": "检测距离1.8m小于要求2.0m。点云抽稀日志备注: Web端补录：截图遮挡标签确认为【禁止关闭】",
+          "missing_materials": [],
+          "next_action": "现场复核",
+          "next_action_person": "园区运维小陶",
+          "evidence_photos": [],
+          "point_cloud_logs_ref": [
+            "959bd28d",
+            "f249e168"
+          ],
+          "is_blocked_by_screenshot": false
+        },
+        {
+          "issue_id": "1ad58341",
+          "valve_id": "V-003",
+          "valve_label": "阀门3",
+          "detected_distance": 2.1,
+          "required_distance": 2.0,
+          "status": "正常",
+          "why_kept": "检测距离2.1m符合要求2.0m。",
+          "missing_materials": [],
+          "next_action": "归档",
+          "next_action_person": "系统",
+          "evidence_photos": [],
+          "point_cloud_logs_ref": [
+            "959bd28d",
+            "f249e168"
+          ],
+          "is_blocked_by_screenshot": false
+        }
+      ],
+      "summary": {
+        "total_valves": 3,
+        "normal_count": 1,
+        "abnormal_count": 1,
+        "blocked_count": 1,
+        "needs_attention": 2,
+        "has_point_cloud_logs": true
+      },
+      "change_history": [
+        {
+          "change_id": "9476964e",
+          "timestamp": "2026-06-08T20:30:35.521066",
+          "who": "园区运维小陶",
+          "what_changed": "生成/更新安全距离报告: a675a134",
+          "why_changed": "计算完成或点云日志更新后重跑",
+          "affected_results": [
+            "发现1个截图遮挡",
+            "发现0个距离异常",
+            "报告ID: a675a134"
+          ],
+          "old_value": "旧报告ID: 无",
+          "new_value": "新报告ID: a675a134"
+        },
+        {
+          "change_id": "ff6e4d45",
+          "timestamp": "2026-06-08T20:30:43.912124",
+          "who": "园区运维小陶",
+          "what_changed": "添加点云抽稀日志: 959bd28d",
+          "why_changed": "台站复测:V-002距离2.1m,截图遮挡需施工经理现场核实",
+          "affected_results": [
+            "记录ID: 3e07a9fa",
+            "安全距离报告待更新"
+          ],
+          "old_value": "日志数量: 0",
+          "new_value": "日志数量: 1"
+        },
+        {
+          "change_id": "5dd2595f",
+          "timestamp": "2026-06-08T20:30:43.913149",
+          "who": "园区运维小陶",
+          "what_changed": "生成/更新安全距离报告: 06637752",
+          "why_changed": "计算完成或点云日志更新后重跑",
+          "affected_results": [
+            "发现1个截图遮挡",
+            "发现1个距离异常",
+            "报告ID: 06637752"
+          ],
+          "old_value": "旧报告ID: a675a134",
+          "new_value": "新报告ID: 06637752"
+        },
+        {
+          "change_id": "26c7d14d",
+          "timestamp": "2026-06-08T20:31:23.370001",
+          "who": "园区运维小陶",
+          "what_changed": "添加点云抽稀日志: f249e168",
+          "why_changed": "Web端补录：截图遮挡标签确认为【禁止关闭】",
+          "affected_results": [
+            "记录ID: 3e07a9fa",
+            "安全距离报告待更新"
+          ],
+          "old_value": "日志数量: 1",
+          "new_value": "日志数量: 2"
+        }
+      ]
+    },
+    "change_history": [
+      {
+        "change_id": "9476964e",
+        "timestamp": "2026-06-08T20:30:35.521066",
+        "who": "园区运维小陶",
+        "what_changed": "生成/更新安全距离报告: a675a134",
+        "why_changed": "计算完成或点云日志更新后重跑",
+        "affected_results": [
+          "发现1个截图遮挡",
+          "发现0个距离异常",
+          "报告ID: a675a134"
+        ],
+        "old_value": "旧报告ID: 无",
+        "new_value": "新报告ID: a675a134"
+      },
+      {
+        "change_id": "ff6e4d45",
+        "timestamp": "2026-06-08T20:30:43.912124",
+        "who": "园区运维小陶",
+        "what_changed": "添加点云抽稀日志: 959bd28d",
+        "why_changed": "台站复测:V-002距离2.1m,截图遮挡需施工经理现场核实",
+        "affected_results": [
+          "记录ID: 3e07a9fa",
+          "安全距离报告待更新"
+        ],
+        "old_value": "日志数量: 0",
+        "new_value": "日志数量: 1"
+      },
+      {
+        "change_id": "5dd2595f",
+        "timestamp": "2026-06-08T20:30:43.913149",
+        "who": "园区运维小陶",
+        "what_changed": "生成/更新安全距离报告: 06637752",
+        "why_changed": "计算完成或点云日志更新后重跑",
+        "affected_results": [
+          "发现1个截图遮挡",
+          "发现1个距离异常",
+          "报告ID: 06637752"
+        ],
+        "old_value": "旧报告ID: a675a134",
+        "new_value": "新报告ID: 06637752"
+      },
+      {
+        "change_id": "26c7d14d",
+        "timestamp": "2026-06-08T20:31:23.370001",
+        "who": "园区运维小陶",
+        "what_changed": "添加点云抽稀日志: f249e168",
+        "why_changed": "Web端补录：截图遮挡标签确认为【禁止关闭】",
+        "affected_results": [
+          "记录ID: 3e07a9fa",
+          "安全距离报告待更新"
+        ],
+        "old_value": "日志数量: 1",
+        "new_value": "日志数量: 2"
+      },
+      {
+        "change_id": "5f74c222",
+        "timestamp": "2026-06-08T20:31:23.371445",
+        "who": "园区运维小陶",
+        "what_changed": "生成/更新安全距离报告: de3ab49d",
+        "why_changed": "计算完成或点云日志更新后重跑",
+        "affected_results": [
+          "发现1个截图遮挡",
+          "发现1个距离异常",
+          "报告ID: de3ab49d"
+        ],
+        "old_value": "旧报告ID: 06637752",
+        "new_value": "新报告ID: de3ab49d"
+      }
+    ],
+    "status": "安全距离报告已生成",
+    "run_count": 4
+  }
+}

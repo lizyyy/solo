@@ -1,0 +1,82 @@
+[
+  {
+    "change_id": "b2c11f68",
+    "timestamp": "2026-06-08T20:30:35.520387",
+    "who": "园区运维小陶",
+    "what_changed": "导入楼层剖面草图: 台站B1层管廊剖面.dwg",
+    "why_changed": "开始阀门定位流程",
+    "affected_results": [
+      "记录ID: 3e07a9fa"
+    ],
+    "old_value": null,
+    "new_value": null
+  },
+  {
+    "change_id": "9476964e",
+    "timestamp": "2026-06-08T20:30:35.521066",
+    "who": "园区运维小陶",
+    "what_changed": "生成/更新安全距离报告: a675a134",
+    "why_changed": "计算完成或点云日志更新后重跑",
+    "affected_results": [
+      "发现1个截图遮挡",
+      "发现0个距离异常",
+      "报告ID: a675a134"
+    ],
+    "old_value": "旧报告ID: 无",
+    "new_value": "新报告ID: a675a134"
+  },
+  {
+    "change_id": "ff6e4d45",
+    "timestamp": "2026-06-08T20:30:43.912124",
+    "who": "园区运维小陶",
+    "what_changed": "添加点云抽稀日志: 959bd28d",
+    "why_changed": "台站复测:V-002距离2.1m,截图遮挡需施工经理现场核实",
+    "affected_results": [
+      "记录ID: 3e07a9fa",
+      "安全距离报告待更新"
+    ],
+    "old_value": "日志数量: 0",
+    "new_value": "日志数量: 1"
+  },
+  {
+    "change_id": "5dd2595f",
+    "timestamp": "2026-06-08T20:30:43.913149",
+    "who": "园区运维小陶",
+    "what_changed": "生成/更新安全距离报告: 06637752",
+    "why_changed": "计算完成或点云日志更新后重跑",
+    "affected_results": [
+      "发现1个截图遮挡",
+      "发现1个距离异常",
+      "报告ID: 06637752"
+    ],
+    "old_value": "旧报告ID: a675a134",
+    "new_value": "新报告ID: 06637752"
+  },
+  {
+    "change_id": "26c7d14d",
+    "timestamp": "2026-06-08T20:31:23.370001",
+    "who": "园区运维小陶",
+    "what_changed": "添加点云抽稀日志: f249e168",
+    "why_changed": "Web端补录：截图遮挡标签确认为【禁止关闭】",
+    "affected_results": [
+      "记录ID: 3e07a9fa",
+      "安全距离报告待更新"
+    ],
+    "old_value": "日志数量: 1",
+    "new_value": "日志数量: 2"
+  },
+  {
+    "change_id": "5f74c222",
+    "timestamp": "2026-06-08T20:31:23.371445",
+    "who": "园区运维小陶",
+    "what_changed": "生成/更新安全距离报告: de3ab49d",
+    "why_changed": "计算完成或点云日志更新后重跑",
+    "affected_results": [
+      "发现1个截图遮挡",
+      "发现1个距离异常",
+      "报告ID: de3ab49d"
+    ],
+    "old_value": "旧报告ID: 06637752",
+    "new_value": "新报告ID: de3ab49d"
+  }
+]

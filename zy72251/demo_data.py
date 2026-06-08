@@ -3,7 +3,7 @@ from models import ValveStatus, NextAction
 
 
 def create_demo_scenario():
-    service = ValvePositioningService()
+    service = ValvePositioningService(persist=False)
     
     print("=" * 60)
     print("  地下管廊阀门定位 - 演示数据创建")

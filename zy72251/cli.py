@@ -5,14 +5,20 @@ from models import ValveStatus, NextAction
 from demo_data import create_demo_scenario
 
 
+def _get_service() -> ValvePositioningService:
+    return ValvePositioningService(persist=True)
+
+
 def cmd_demo(args):
     print("\n🚀 运行地下管廊阀门定位演示场景\n")
     service, record_id = create_demo_scenario()
     print(f"\n📝 演示完成！记录ID: {record_id}")
+    print(f"💡 此演示使用独立内存服务，不影响持久化数据。")
+    print(f"💡 若需将演示数据写入持久化存储，请在Web小看板的 /demo 页面操作。")
 
 
 def cmd_import(args):
-    service = ValvePositioningService()
+    service = _get_service()
     print(f"\n📂 导入楼层剖面草图: {args.file}")
     
     valve_positions = [
@@ -51,10 +57,14 @@ def cmd_import(args):
         if issue.missing_materials:
             print(f"      缺材料: {', '.join(issue.missing_materials)}")
         print(f"      下一步: {issue.next_action.value} → {issue.next_action_person.value}")
+    
+    print(f"\n💾 记录已持久化，可用以下命令继续操作:")
+    print(f"   python3 cli.py add-log -r {record.record_id} -u 小陶 -m \"备注\" --rerun")
+    print(f"   python3 cli.py report -r {record.record_id} --rerun")
 
 
 def cmd_add_log(args):
-    service = ValvePositioningService()
+    service = _get_service()
     print(f"\n📝 补录点云抽稀日志到记录: {args.record_id}")
     
     log = service.add_point_cloud_log(
@@ -72,18 +82,24 @@ def cmd_add_log(args):
         if args.rerun:
             print("\n🔄 重跑安全距离报告...")
             report = service.calculate_safety_distance(args.record_id, args.user)
-            print(f"✅ 报告已更新: {report.report_id}")
+            if report:
+                print(f"✅ 报告已更新: {report.report_id}")
+                print(f"   正常: {report.summary['normal_count']} | 异常: {report.summary['abnormal_count']} | 截图遮挡: {report.summary['blocked_count']}")
+            else:
+                print(f"❌ 重跑失败")
     else:
         print(f"❌ 记录不存在: {args.record_id}")
+        print(f"💡 请确认记录ID，使用 python3 cli.py import 创建新记录")
 
 
 def cmd_report(args):
-    service = ValvePositioningService()
+    service = _get_service()
     print(f"\n📊 安全距离报告 - 记录ID: {args.record_id}")
     
     record = service.get_record(args.record_id)
     if not record:
         print(f"❌ 记录不存在")
+        print(f"💡 请确认记录ID，使用 python3 cli.py import 创建新记录")
         return
     
     if args.rerun:
@@ -121,7 +137,7 @@ def cmd_report(args):
 
 
 def cmd_changes(args):
-    service = ValvePositioningService()
+    service = _get_service()
     print("\n📜 所有变更记录")
     print("=" * 60)
     
@@ -137,17 +153,34 @@ def cmd_changes(args):
         print(f"  影响: {change.affected_results}")
 
 
+def cmd_list(args):
+    service = _get_service()
+    print("\n📋 所有记录")
+    print("=" * 60)
+    
+    if not service.records:
+        print("暂无记录，使用 python3 cli.py import 创建")
+        return
+    
+    for record in service.records.values():
+        report_status = "有报告" if record.safety_report else "无报告"
+        blocked = record.safety_report.summary.get('blocked_count', 0) if record.safety_report else 0
+        print(f"\n  ID: {record.record_id} | {record.floor_sketch.file_name} | {record.status} | {report_status} | 截图遮挡: {blocked}")
+        print(f"  创建: {record.created_at.strftime('%Y-%m-%d %H:%M')} | 阀门: {len(record.floor_sketch.marked_valve_positions)} | 日志: {len(record.point_cloud_logs)}")
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="地下管廊阀门定位系统",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 示例:
-  python cli.py demo                          # 运行演示场景
-  python cli.py import -f B1.dwg -l B1 -u 小陶 -v 3 --screenshot
-  python cli.py add-log -r <record_id> -u 小陶 -m "现场复测确认"
-  python cli.py report -r <record_id> --rerun
-  python cli.py web                           # 启动Web小看板
+  python3 cli.py demo                          # 运行演示场景（不影响持久化数据）
+  python3 cli.py import -f B1.dwg -l B1 -u 小陶 -v 3 --screenshot
+  python3 cli.py list                          # 查看所有记录ID
+  python3 cli.py add-log -r <record_id> -u 小陶 -m "现场复测确认" --rerun
+  python3 cli.py report -r <record_id> --rerun
+  python3 cli.py web                           # 启动Web小看板
         """
     )
     subparsers = parser.add_subparsers(dest="command", help="可用命令")
@@ -160,6 +193,8 @@ def main():
     import_parser.add_argument("-u", "--user", default="园区运维小陶", help="操作人")
     import_parser.add_argument("-v", "--valve-count", type=int, default=3, help="阀门数量")
     import_parser.add_argument("--screenshot", action="store_true", dest="has_screenshot", help="包含移动端截图")
+    
+    list_parser = subparsers.add_parser("list", help="查看所有记录")
     
     log_parser = subparsers.add_parser("add-log", help="补录点云抽稀日志")
     log_parser.add_argument("-r", "--record-id", required=True, help="记录ID")
@@ -192,6 +227,8 @@ def main():
         cmd_report(args)
     elif args.command == "changes":
         cmd_changes(args)
+    elif args.command == "list":
+        cmd_list(args)
     elif args.command == "web":
         print(f"\n🌐 启动Web小看板: http://localhost:{args.port}")
         import uvicorn

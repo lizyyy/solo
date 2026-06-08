@@ -1,4 +1,6 @@
 import uuid
+import json
+import os
 from datetime import datetime
 from typing import List, Optional, Tuple
 from models import (
@@ -7,14 +9,39 @@ from models import (
     ValveStatus, Role, NextAction
 )
 
+DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+RECORDS_FILE = os.path.join(DATA_DIR, "records.json")
+CHANGES_FILE = os.path.join(DATA_DIR, "changes.json")
+
 
 class ValvePositioningService:
-    def __init__(self):
+    def __init__(self, persist: bool = True):
         self.records: dict = {}
         self.change_records: List[ChangeRecord] = []
+        self._persist = persist
+        if persist:
+            self._load()
 
     def _generate_id(self) -> str:
         return str(uuid.uuid4())[:8]
+
+    def _load(self):
+        os.makedirs(DATA_DIR, exist_ok=True)
+        if os.path.exists(RECORDS_FILE):
+            with open(RECORDS_FILE, "r", encoding="utf-8") as f:
+                raw = json.load(f)
+                self.records = {k: ValvePositioningRecord(**v) for k, v in raw.items()}
+        if os.path.exists(CHANGES_FILE):
+            with open(CHANGES_FILE, "r", encoding="utf-8") as f:
+                raw = json.load(f)
+                self.change_records = [ChangeRecord(**c) for c in raw]
+
+    def _save(self):
+        os.makedirs(DATA_DIR, exist_ok=True)
+        with open(RECORDS_FILE, "w", encoding="utf-8") as f:
+            json.dump({k: v.model_dump(mode="json") for k, v in self.records.items()}, f, ensure_ascii=False, indent=2, default=str)
+        with open(CHANGES_FILE, "w", encoding="utf-8") as f:
+            json.dump([c.model_dump(mode="json") for c in self.change_records], f, ensure_ascii=False, indent=2, default=str)
 
     def _record_change(self, who: str, what_changed: str, why_changed: str, 
                        affected_results: List[str], old_value=None, new_value=None) -> ChangeRecord:
@@ -58,7 +85,8 @@ class ValvePositioningService:
             why_changed="开始阀门定位流程",
             affected_results=[f"记录ID: {record.record_id}"]
         )
-        
+        if self._persist:
+            self._save()
         return record
 
     def add_point_cloud_log(self, record_id: str, operator: str, raw_remark: str,
@@ -94,6 +122,8 @@ class ValvePositioningService:
         )
         record.change_history.append(self.change_records[-1])
         
+        if self._persist:
+            self._save()
         return log
 
     def _detect_screenshot_blocking(self, valve_position: dict) -> Tuple[bool, str]:
@@ -216,6 +246,8 @@ class ValvePositioningService:
         )
         record.change_history.append(self.change_records[-1])
         
+        if self._persist:
+            self._save()
         return report
 
     def manual_correct_issue(self, record_id: str, issue_id: str, corrected_by: str,
@@ -248,6 +280,8 @@ class ValvePositioningService:
                 )
                 record.change_history.append(self.change_records[-1])
                 
+                if self._persist:
+                    self._save()
                 return True
         
         return False

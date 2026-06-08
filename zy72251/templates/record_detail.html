@@ -256,7 +256,24 @@
         }
         
         async function addLogAndRerun() {
-            await addLog();
+            const operator = document.getElementById('operator').value;
+            const remark = document.getElementById('remark').value;
+            if (!remark) { alert('请填写日志备注'); return; }
+            
+            const res = await fetch(`/api/record/${recordId}/add-log`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({operator, raw_remark: remark, rerun: true})
+            });
+            if (res.ok) {
+                const data = await res.json();
+                if (data.report_id) {
+                    alert('日志补录成功，安全距离报告已更新！');
+                } else {
+                    alert('日志补录成功，但报告更新失败');
+                }
+                location.reload();
+            }
         }
         
         async function rerunReport() {

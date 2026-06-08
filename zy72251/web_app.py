@@ -1,23 +1,16 @@
 from fastapi import FastAPI, Request, Form, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-from typing import Optional, List
-import os
+from typing import Optional
 
 from valve_service import ValvePositioningService
-from models import ValveStatus, NextAction, Role
-from demo_data import create_demo_scenario
 
 app = FastAPI(title="地下管廊阀门定位系统")
 
 templates = Jinja2Templates(directory="templates")
 
-service = ValvePositioningService()
-demo_service, demo_record_id = create_demo_scenario()
-service.records.update(demo_service.records)
-service.change_records.extend(demo_service.change_records)
+service = ValvePositioningService(persist=True)
 
 
 class PointCloudLogRequest(BaseModel):
@@ -25,6 +18,7 @@ class PointCloudLogRequest(BaseModel):
     raw_remark: str
     thinning_ratio: Optional[float] = 0.75
     confidence_level: Optional[float] = 0.85
+    rerun: bool = False
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -66,7 +60,16 @@ async def api_add_log(record_id: str, log_request: PointCloudLogRequest):
     )
     if not log:
         raise HTTPException(status_code=404, detail="记录不存在")
-    return {"status": "success", "log": log}
+    
+    result = {"status": "success", "log_id": log.log_id}
+    
+    if log_request.rerun:
+        report = service.calculate_safety_distance(record_id, log_request.operator)
+        if report:
+            result["report_id"] = report.report_id
+            result["report_summary"] = report.summary
+    
+    return result
 
 
 @app.post("/api/record/{record_id}/calculate")
@@ -74,7 +77,7 @@ async def api_calculate(record_id: str, generated_by: str = Form("园区运维�
     report = service.calculate_safety_distance(record_id, generated_by)
     if not report:
         raise HTTPException(status_code=404, detail="记录不存在")
-    return {"status": "success", "report": report}
+    return {"status": "success", "report_id": report.report_id, "report_summary": report.summary}
 
 
 @app.get("/api/changes")
@@ -84,8 +87,10 @@ async def api_changes():
 
 @app.get("/demo", response_class=HTMLResponse)
 async def demo_page(request: Request):
-    record = service.get_record(demo_record_id)
+    from demo_data import create_demo_scenario
+    demo_service, demo_record_id = create_demo_scenario()
+    demo_record = demo_service.get_record(demo_record_id)
     return templates.TemplateResponse(
         "demo.html",
-        {"request": request, "record": record, "record_id": demo_record_id}
+        {"request": request, "record": demo_record, "record_id": demo_record_id}
     )
