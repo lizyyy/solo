@@ -115,6 +115,8 @@ def _reconstruct_records_from_json(records_json: dict):
         HumanCorrection,
         FeedbackRecord,
         SourceInfo,
+        ConflictAlert,
+        ConflictType,
     )
 
     records = {}
@@ -186,11 +188,33 @@ def _reconstruct_records_from_json(records_json: dict):
                 )
             )
 
+        conflicts = []
+        for c_data in data.get("conflicts", []):
+            conflicts.append(
+                ConflictAlert(
+                    conflict_type=ConflictType(c_data["conflict_type"]),
+                    sample_id=c_data["sample_id"],
+                    severity=c_data["severity"],
+                    message=c_data["message"],
+                    details=c_data.get("details", {}),
+                )
+            )
+
+        final_decision = None
+        if data.get("final_decision"):
+            final_decision = MergeDecision(data["final_decision"])
+        elif human_correction:
+            final_decision = human_correction.corrected_decision
+        elif model_output:
+            final_decision = model_output.decision
+
         record = MergedRecord(
             sample=sample,
             model_output=model_output,
             human_correction=human_correction,
             feedback=feedback,
+            conflicts=conflicts,
+            final_decision=final_decision,
         )
         records[sample_id] = record
 

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-02T21:04:35.097286",
+  "generated_at": "2026-06-08T19:19:58.986361",
   "metrics": {
     "overall": {
       "sample_count": 8,
@@ -248,6 +248,25 @@
           "<0.5": 0.4
         }
       },
+      "conflict_boundary_case": {
+        "stratum_name": "conflict_boundary_case",
+        "sample_count": 3,
+        "accuracy": 0.3333333333333333,
+        "precision": 0.5,
+        "recall": 0.5,
+        "f1_score": 0.5,
+        "true_positives": 1,
+        "true_negatives": 0,
+        "false_positives": 1,
+        "false_negatives": 1,
+        "avg_confidence": 0.5733333333333334,
+        "confidence_distribution": {
+          ">=0.9": 0.0,
+          "0.7-0.9": 0.3333333333333333,
+          "0.5-0.7": 0.3333333333333333,
+          "<0.5": 0.3333333333333333
+        }
+      },
       "conflict_label_conflict": {
         "stratum_name": "conflict_label_conflict",
         "sample_count": 4,
@@ -267,18 +286,18 @@
           "<0.5": 0.5
         }
       },
-      "conflict_boundary_case": {
-        "stratum_name": "conflict_boundary_case",
+      "severity_high": {
+        "stratum_name": "severity_high",
         "sample_count": 3,
-        "accuracy": 0.3333333333333333,
-        "precision": 0.5,
-        "recall": 0.5,
-        "f1_score": 0.5,
-        "true_positives": 1,
+        "accuracy": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1_score": 0.0,
+        "true_positives": 0,
         "true_negatives": 0,
         "false_positives": 1,
         "false_negatives": 1,
-        "avg_confidence": 0.5733333333333334,
+        "avg_confidence": 0.5133333333333333,
         "confidence_distribution": {
           ">=0.9": 0.0,
           "0.7-0.9": 0.3333333333333333,
@@ -303,25 +322,6 @@
           "0.7-0.9": 0.25,
           "0.5-0.7": 0.25,
           "<0.5": 0.25
-        }
-      },
-      "severity_high": {
-        "stratum_name": "severity_high",
-        "sample_count": 3,
-        "accuracy": 0.0,
-        "precision": 0.0,
-        "recall": 0.0,
-        "f1_score": 0.0,
-        "true_positives": 0,
-        "true_negatives": 0,
-        "false_positives": 1,
-        "false_negatives": 1,
-        "avg_confidence": 0.5133333333333333,
-        "confidence_distribution": {
-          ">=0.9": 0.0,
-          "0.7-0.9": 0.3333333333333333,
-          "0.5-0.7": 0.3333333333333333,
-          "<0.5": 0.3333333333333333
         }
       },
       "conflict_duplicate": {
@@ -535,10 +535,10 @@
     "decision_changed": 3,
     "has_feedback": 2,
     "has_conflicts": 5,
-    "conflict_label_conflict": 4,
     "conflict_boundary_case": 3,
-    "severity_medium": 4,
+    "conflict_label_conflict": 4,
     "severity_high": 3,
+    "severity_medium": 4,
     "conflict_duplicate": 1,
     "entity_type_person": 1,
     "model_review": 1,
@@ -568,12 +568,12 @@
           "source": null
         },
         "ground_truth": "merge",
-        "created_at": "2026-06-02T21:04:35.095101",
+        "created_at": "2026-06-08T19:19:58.978013",
         "source": {
           "source_system": "risk_control_db",
           "source_batch": "batch_2024_01",
           "source_id": "RC_001",
-          "imported_at": "2026-06-02T21:04:35.095111",
+          "imported_at": "2026-06-08T19:19:58.978192",
           "processed_by": "auto_importer"
         },
         "tags": [
@@ -589,7 +589,7 @@
         "model_version": "v2.3.1",
         "merge_reason": "名称高度相似，同属科技行业",
         "predicted_cluster_id": null,
-        "processed_at": "2026-06-02T21:04:35.095465",
+        "processed_at": "2026-06-08T19:19:58.978872",
         "execution_time_ms": null
       },
       "human_correction": null,
@@ -615,12 +615,12 @@
           "source": null
         },
         "ground_truth": "not_merge",
-        "created_at": "2026-06-02T21:04:35.095115",
+        "created_at": "2026-06-08T19:19:58.978239",
         "source": {
           "source_system": "risk_control_db",
           "source_batch": "batch_2024_01",
           "source_id": "RC_002",
-          "imported_at": "2026-06-02T21:04:35.095116",
+          "imported_at": "2026-06-08T19:19:58.978242",
           "processed_by": "auto_importer"
         },
         "tags": [
@@ -635,7 +635,7 @@
         "model_version": "v2.3.1",
         "merge_reason": "公司名称完全不同",
         "predicted_cluster_id": null,
-        "processed_at": "2026-06-02T21:04:35.095470",
+        "processed_at": "2026-06-08T19:19:58.978894",
         "execution_time_ms": null
       },
       "human_correction": null,
@@ -661,12 +661,12 @@
           "source": null
         },
         "ground_truth": "merge",
-        "created_at": "2026-06-02T21:04:35.095119",
+        "created_at": "2026-06-08T19:19:58.978274",
         "source": {
           "source_system": "manual_review",
           "source_batch": "batch_2024_01",
           "source_id": "MR_001",
-          "imported_at": "2026-06-02T21:04:35.095121",
+          "imported_at": "2026-06-08T19:19:58.978276",
           "processed_by": "laotang"
         },
         "tags": [
@@ -681,7 +681,7 @@
         "model_version": "v2.3.1",
         "merge_reason": "名称相似度中等，需要人工确认",
         "predicted_cluster_id": null,
-        "processed_at": "2026-06-02T21:04:35.095472",
+        "processed_at": "2026-06-08T19:19:58.978897",
         "execution_time_ms": null
       },
       "human_correction": {
@@ -690,7 +690,7 @@
         "corrected_decision": "merge",
         "correction_reason": "北京字节跳动就是字节跳动的全称，应该合并",
         "corrected_by": "laotang",
-        "corrected_at": "2026-06-02T21:04:35.095526",
+        "corrected_at": "2026-06-08T19:19:58.979618",
         "is_overridden": false,
         "override_note": null
       },
@@ -701,10 +701,10 @@
           "feedback_content": "合并正确，确认是同一家公司",
           "feedback_channel": "internal_review",
           "feedback_by": "reviewer_001",
-          "feedback_at": "2026-06-02T21:04:35.095576",
+          "feedback_at": "2026-06-08T19:19:58.979940",
           "resolved": true,
           "resolved_by": null,
-          "resolved_at": "2026-06-02T21:04:35.095576",
+          "resolved_at": "2026-06-08T19:19:58.979941",
           "resolution_note": null
         }
       ],
@@ -755,12 +755,12 @@
           "source": null
         },
         "ground_truth": "merge",
-        "created_at": "2026-06-02T21:04:35.095123",
+        "created_at": "2026-06-08T19:19:58.978279",
         "source": {
           "source_system": "customer_service",
           "source_batch": "batch_2024_01",
           "source_id": "CS_001",
-          "imported_at": "2026-06-02T21:04:35.095150",
+          "imported_at": "2026-06-08T19:19:58.978280",
           "processed_by": "auto_importer"
         },
         "tags": [
@@ -775,7 +775,7 @@
         "model_version": "v2.3.1",
         "merge_reason": "实体完全相同",
         "predicted_cluster_id": null,
-        "processed_at": "2026-06-02T21:04:35.095473",
+        "processed_at": "2026-06-08T19:19:58.978901",
         "execution_time_ms": null
       },
       "human_correction": null,
@@ -814,12 +814,12 @@
           "source": null
         },
         "ground_truth": "not_merge",
-        "created_at": "2026-06-02T21:04:35.095274",
+        "created_at": "2026-06-08T19:19:58.978298",
         "source": {
           "source_system": "api_import",
           "source_batch": "batch_2024_01",
           "source_id": "API_001",
-          "imported_at": "2026-06-02T21:04:35.095295",
+          "imported_at": "2026-06-08T19:19:58.978299",
           "processed_by": "api_connector"
         },
         "tags": [
@@ -834,7 +834,7 @@
         "model_version": "v2.3.1",
         "merge_reason": "数据不完整，无法判断",
         "predicted_cluster_id": null,
-        "processed_at": "2026-06-02T21:04:35.095474",
+        "processed_at": "2026-06-08T19:19:58.978904",
         "execution_time_ms": null
       },
       "human_correction": null,
@@ -884,12 +884,12 @@
           "source": null
         },
         "ground_truth": "merge",
-        "created_at": "2026-06-02T21:04:35.095306",
+        "created_at": "2026-06-08T19:19:58.978303",
         "source": {
           "source_system": "risk_control_db",
           "source_batch": "batch_2024_01",
           "source_id": "RC_003",
-          "imported_at": "2026-06-02T21:04:35.095308",
+          "imported_at": "2026-06-08T19:19:58.978304",
           "processed_by": "laotang"
         },
         "tags": [
@@ -904,7 +904,7 @@
         "model_version": "v2.3.1",
         "merge_reason": "名称有相似性，但置信度较低",
         "predicted_cluster_id": null,
-        "processed_at": "2026-06-02T21:04:35.095475",
+        "processed_at": "2026-06-08T19:19:58.978907",
         "execution_time_ms": null
       },
       "human_correction": {
@@ -913,7 +913,7 @@
         "corrected_decision": "review",
         "correction_reason": "京东商城和京东集团关系需要进一步确认",
         "corrected_by": "laotang",
-        "corrected_at": "2026-06-02T21:04:35.095531",
+        "corrected_at": "2026-06-08T19:19:58.979705",
         "is_overridden": false,
         "override_note": null
       },
@@ -964,12 +964,12 @@
           "source": null
         },
         "ground_truth": "merge",
-        "created_at": "2026-06-02T21:04:35.095312",
+        "created_at": "2026-06-08T19:19:58.978315",
         "source": {
           "source_system": "online_feedback",
           "source_batch": "batch_2024_01",
           "source_id": "FB_001",
-          "imported_at": "2026-06-02T21:04:35.095331",
+          "imported_at": "2026-06-08T19:19:58.978316",
           "processed_by": "feedback_system"
         },
         "tags": [
@@ -984,7 +984,7 @@
         "model_version": "v2.3.1",
         "merge_reason": "简称匹配",
         "predicted_cluster_id": null,
-        "processed_at": "2026-06-02T21:04:35.095477",
+        "processed_at": "2026-06-08T19:19:58.978910",
         "execution_time_ms": null
       },
       "human_correction": null,
@@ -995,10 +995,10 @@
           "feedback_content": "小米科技和小米公司可能不是同一个实体",
           "feedback_channel": "customer_service",
           "feedback_by": "customer_001",
-          "feedback_at": "2026-06-02T21:04:35.095572",
+          "feedback_at": "2026-06-08T19:19:58.979925",
           "resolved": false,
           "resolved_by": null,
-          "resolved_at": "2026-06-02T21:04:35.095572",
+          "resolved_at": "2026-06-08T19:19:58.979929",
           "resolution_note": null
         }
       ],
@@ -1023,12 +1023,12 @@
           "source": null
         },
         "ground_truth": "not_merge",
-        "created_at": "2026-06-02T21:04:35.095345",
+        "created_at": "2026-06-08T19:19:58.978319",
         "source": {
           "source_system": "risk_control_db",
           "source_batch": "batch_2024_01",
           "source_id": "RC_004",
-          "imported_at": "2026-06-02T21:04:35.095350",
+          "imported_at": "2026-06-08T19:19:58.978320",
           "processed_by": "auto_importer"
         },
         "tags": [
@@ -1043,7 +1043,7 @@
         "model_version": "v2.3.1",
         "merge_reason": "名称前缀相同",
         "predicted_cluster_id": null,
-        "processed_at": "2026-06-02T21:04:35.095478",
+        "processed_at": "2026-06-08T19:19:58.978987",
         "execution_time_ms": null
       },
       "human_correction": {
@@ -1052,7 +1052,7 @@
         "corrected_decision": "not_merge",
         "correction_reason": "网易游戏是网易的子公司，但实体合并层面应该分开",
         "corrected_by": "zhangsan",
-        "corrected_at": "2026-06-02T21:04:35.095533",
+        "corrected_at": "2026-06-08T19:19:58.979712",
         "is_overridden": false,
         "override_note": null
       },

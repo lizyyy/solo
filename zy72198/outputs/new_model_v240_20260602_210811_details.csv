@@ -1,9 +1,0 @@
-﻿sample_id,entity_a_id,entity_a_type,entity_a_value,entity_b_id,entity_b_type,entity_b_value,ground_truth,model_decision,model_confidence,model_version,has_human_correction,corrected_decision,corrected_by,correction_reason,final_decision,conflict_count,conflict_types,source_system,source_batch,created_at,feedback_count,has_unresolved_feedback,is_boundary
-S001,E001,company,阿里巴巴集团控股有限公司,E002,company,阿里巴巴集团,merge,merge,0.9500,v2.3.1,否,,,,merge,0,,risk_control_db,batch_2024_01,2026-06-02T21:08:11.347045,0,否,否
-S002,E003,company,腾讯科技(深圳)有限公司,E004,company,阿里巴巴集团,not_merge,not_merge,0.9800,v2.3.1,否,,,,not_merge,0,,risk_control_db,batch_2024_01,2026-06-02T21:08:11.347088,0,否,否
-S003,E005,company,北京字节跳动科技有限公司,E006,company,字节跳动有限公司,merge,merge,0.8800,v2.4.0,是,merge,laotang,北京字节跳动就是字节跳动的全称，应该合并,merge,1,boundary_case,manual_review,batch_2024_01,2026-06-02T21:08:11.347098,1,否,是
-S004,E007,person,张三,E008,person,张三,merge,merge,1.0000,v2.3.1,否,,,,merge,1,duplicate,customer_service,batch_2024_01,2026-06-02T21:08:11.347108,0,否,否
-S005,E009,company,,E010,company,美团点评,not_merge,review,0.3000,v2.3.1,否,,,,review,2,label_conflict;missing_data,api_import,batch_2024_01,2026-06-02T21:08:11.347116,0,否,否
-S006,E011,company,京东商城,E012,company,京东集团,merge,merge,0.4800,v2.3.1,是,review,laotang,京东商城和京东集团关系需要进一步确认,review,2,label_conflict;boundary_case,risk_control_db,batch_2024_01,2026-06-02T21:08:11.347142,0,否,是
-S007,E013,company,小米科技有限责任公司,E014,company,小米公司,merge,merge,0.8500,v2.3.1,否,,,,merge,0,,online_feedback,batch_2024_01,2026-06-02T21:08:11.347148,1,是,否
-S008,E015,company,网易公司,E016,company,网易游戏,not_merge,not_merge,0.6500,v2.4.0,是,not_merge,zhangsan,网易游戏是网易的子公司，但实体合并层面应该分开,not_merge,1,boundary_case,risk_control_db,batch_2024_01,2026-06-02T21:08:11.347153,0,否,否
