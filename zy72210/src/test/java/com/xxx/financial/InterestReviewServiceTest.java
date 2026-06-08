@@ -258,9 +258,7 @@ public class InterestReviewServiceTest {
                 false, "经核实托管数据正确，驳回尾差调整");
         printResult("冲突处理", resolve);
 
-        System.out.println("\n【补录正确尾差调整后重算】");
-        context.getTailAdjustment().setAdjustmentAmount(
-                TestDataBuilder.buildNormalTrusteeConfirmation().getConfirmedInterest());
+        System.out.println("\n【补录后重算验证】");
         List<SelfCheckResult> selfCheck = reviewService.getSelfCheckService().runAllChecks(context);
         System.out.println(reviewService.getSelfCheckService().formatSelfCheckReport(selfCheck));
 
