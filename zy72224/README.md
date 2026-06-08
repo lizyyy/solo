@@ -145,16 +145,17 @@ except PinyinInterceptError:
 
 ## 历史变更追踪
 
-单条备注修改时，历史记录会显示改前改后的完整信息，包含 content_fingerprint 变化：
+单条备注修改时，历史记录会显示改前改后：
 
 ```python
 history = engine.update_note_remark(record, note_id, "新备注", operator="老秦")
-# history.old_value = "旧备注 (fp:增值税:0.06:旧备注:张三)"
-# history.new_value = "新备注 (fp:增值税:0.06:新备注:张三)"
+# history.target_id = note_id  （被修改的备注ID，回滚时精确定位）
+# history.old_value = "旧备注"
+# history.new_value = "新备注"
 
 # 查看完整差异
 diffs = engine.get_history_diff(record)
-# ["[remark] '旧备注 (fp:增值税:0.06:旧备注:张三)' -> '新备注 (fp:增值税:0.06:新备注:张三)' (by 老秦)", ...]
+# ["[remark] (target=abc123) '旧备注' -> '新备注' (by 老秦)", ...]
 ```
 
 **即使风控值班老秦只改了一条备注，"投顾组合再平衡审核"历史里也能清晰看出改前改后的差别。**
@@ -166,8 +167,9 @@ diffs = engine.get_history_diff(record)
 | 字段 | 说明 |
 |------|------|
 | `field_name` | 变更的字段名 |
-| `old_value` | 变更前的值（含 fingerprint） |
-| `new_value` | 变更后的值（含 fingerprint） |
+| `target_id` | 被修改对象的 ID（如 note_id），回滚时用于精确定位 |
+| `old_value` | 变更前的值 |
+| `new_value` | 变更后的值 |
 | `changed_by` | 操作人 |
 | `change_type` | 变更类型：`add`/`update`/`transition`/`intercept`/`pinyin_resolution`/`rollback` |
 

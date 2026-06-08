@@ -85,6 +85,7 @@ class TestHistoryDiff:
         assert history is not None
         assert history.old_value == "旧备注"
         assert history.new_value == "新备注"
+        assert history.target_id == note.id
         assert history.changed_by == "老秦"
 
     def test_history_diff_shows_change(self):
@@ -110,8 +111,24 @@ class TestRollback:
         h1 = self.engine.update_note_remark(self.record, note.id, "第一次改", "老秦")
         h2 = self.engine.update_note_remark(self.record, note.id, "第二次改", "老秦")
 
+        assert note.remark == "第二次改"
+
         assert self.engine.rollback_record(self.record, h1.id, "管理员")
         assert self.record.status == ReviewStatus.ROLLED_BACK
+        assert note.remark == "第一次改"
+
+    def test_rollback_multiple_steps_restores_correct_version(self):
+        note = TaxRateNote(tax_category="增值税", rate=0.06, remark="原始备注", approver_name="张三")
+        self.engine.import_tax_notes(self.record, [note], "老秦")
+
+        h1 = self.engine.update_note_remark(self.record, note.id, "第一次改", "老秦")
+        self.engine.update_note_remark(self.record, note.id, "第二次改", "老秦")
+        self.engine.update_note_remark(self.record, note.id, "第三次改", "老秦")
+
+        assert note.remark == "第三次改"
+
+        self.engine.rollback_record(self.record, h1.id, "管理员")
+        assert note.remark == "第一次改"
 
 
 class TestWorkflowThreeSteps:

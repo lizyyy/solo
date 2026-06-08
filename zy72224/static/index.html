@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>投顾组合再平衡审核系统</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f7fa; color: #2c3e50; line-height: 1.6; }
+.header { background: linear-gradient(135deg, #1a237e, #283593); color: white; padding: 24px 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+.header h1 { font-size: 22px; font-weight: 600; }
+.header p { font-size: 13px; opacity: 0.8; margin-top: 4px; }
+.container { max-width: 1200px; margin: 0 auto; padding: 20px; display: grid; grid-template-columns: 280px 1fr; gap: 20px; }
+.sidebar { display: flex; flex-direction: column; gap: 12px; }
+.card { background: white; border-radius: 8px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+.card h2 { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #1a237e; border-bottom: 2px solid #e8eaf6; padding-bottom: 8px; }
+.btn { display: block; width: 100%; padding: 10px 14px; border: none; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; text-align: left; margin-bottom: 6px; }
+.btn-primary { background: #1a237e; color: white; }
+.btn-primary:hover { background: #283593; }
+.btn-success { background: #2e7d32; color: white; }
+.btn-success:hover { background: #388e3c; }
+.btn-warning { background: #e65100; color: white; }
+.btn-warning:hover { background: #ef6c00; }
+.btn-danger { background: #b71c1c; color: white; }
+.btn-danger:hover { background: #c62828; }
+.btn-info { background: #0277bd; color: white; }
+.btn-info:hover { background: #0288d1; }
+.btn-outline { background: white; color: #1a237e; border: 1px solid #c5cae9; }
+.btn-outline:hover { background: #e8eaf6; }
+.main { display: flex; flex-direction: column; gap: 16px; }
+.status-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.status-item { background: white; border-radius: 8px; padding: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); text-align: center; }
+.status-item .label { font-size: 11px; color: #78909c; text-transform: uppercase; letter-spacing: 0.5px; }
+.status-item .value { font-size: 16px; font-weight: 600; margin-top: 4px; }
+.status-item .value.pending { color: #f57f17; }
+.status-item .value.approved { color: #2e7d32; }
+.status-item .value.flagged { color: #e65100; }
+.status-item .value.rolled_back { color: #b71c1c; }
+.status-item .value.normal { color: #2e7d32; }
+.status-item .value.pinyin_only { color: #b71c1c; }
+.result-area { background: white; border-radius: 8px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); min-height: 300px; }
+.result-area h2 { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #1a237e; border-bottom: 2px solid #e8eaf6; padding-bottom: 8px; }
+pre { background: #263238; color: #eeffff; padding: 14px; border-radius: 6px; font-size: 12px; line-height: 1.5; overflow-x: auto; white-space: pre-wrap; word-break: break-all; max-height: 600px; overflow-y: auto; }
+.log-entry { padding: 8px 12px; border-left: 3px solid #c5cae9; margin-bottom: 6px; background: #f5f5f5; border-radius: 0 4px 4px 0; font-size: 12px; }
+.log-entry.error { border-left-color: #b71c1c; background: #fbe9e7; }
+.log-entry.success { border-left-color: #2e7d32; background: #e8f5e9; }
+.log-entry.warning { border-left-color: #e65100; background: #fff3e0; }
+.log-entry .time { color: #78909c; font-size: 11px; }
+.log-entry .msg { margin-top: 2px; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid #e0e0e0; }
+th { background: #e8eaf6; color: #1a237e; font-weight: 600; }
+tr:hover { background: #f5f5f5; }
+.tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; }
+.tag-normal { background: #e8f5e9; color: #2e7d32; }
+.tag-pinyin { background: #fbe9e7; color: #b71c1c; }
+.tag-ambiguous { background: #fff3e0; color: #e65100; }
+.tag-pending { background: #fff8e1; color: #f57f17; }
+.tag-approved { background: #e8f5e9; color: #2e7d32; }
+.tag-rolled-back { background: #fce4ec; color: #b71c1c; }
+.tag-flagged { background: #fff3e0; color: #e65100; }
+.tag-awaiting { background: #fbe9e7; color: #d84315; }
+.highlight { background: #fff9c4; padding: 2px 4px; border-radius: 2px; }
+.rollback-result { padding: 16px; border: 2px solid #2e7d32; border-radius: 8px; background: #e8f5e9; margin-top: 12px; }
+.rollback-result.fail { border-color: #b71c1c; background: #fbe9e7; }
+.rollback-result h3 { font-size: 14px; margin-bottom: 8px; }
+.evidence-chain { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
+.evidence-node { background: #e8eaf6; color: #1a237e; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; }
+.evidence-arrow { color: #78909c; font-size: 16px; }
+</style>
+</head>
+<body>
+<div class="header">
+<h1>投顾组合再平衡审核系统</h1>
+<p>边界规则写在代码和 README 里 | 审批人拼音判定 | 备注回滚 | 证据链溯源</p>
+</div>
+
+<div class="container">
+<div class="sidebar">
+<div class="card">
+<h2>📋 快速操作</h2>
+<button class="btn btn-primary" onclick="loadSample()">1. 载入样例数据</button>
+<button class="btn btn-info" onclick="runRollbackDemo()">2. 走回滚操作路</button>
+<button class="btn btn-success" onclick="runFullWorkflowDemo()">3. 完整三步工作流</button>
+<button class="btn btn-warning" onclick="runPinyinDemo()">4. 拼音拦截演示</button>
+<button class="btn btn-outline" onclick="clearAll()">清空重置</button>
+</div>
+
+<div class="card">
+<h2>🔍 边界规则检查</h2>
+<input type="text" id="nameInput" placeholder="输入审批人姓名" style="width:100%;padding:8px;border:1px solid #c5cae9;border-radius:4px;font-size:13px;margin-bottom:8px;">
+<button class="btn btn-primary" onclick="checkBoundary()">检查判定</button>
+<div id="boundaryResult" style="margin-top:8px;font-size:12px;"></div>
+</div>
+
+<div class="card">
+<h2>📝 当前记录</h2>
+<div id="recordList" style="font-size:12px;color:#78909c;">暂无记录</div>
+</div>
+</div>
+
+<div class="main">
+<div class="status-bar">
+<div class="status-item">
+<div class="label">审核状态</div>
+<div class="value" id="statusValue">-</div>
+</div>
+<div class="status-item">
+<div class="label">工作流阶段</div>
+<div class="value" id="phaseValue">-</div>
+</div>
+<div class="status-item">
+<div class="label">审批人判定</div>
+<div class="value" id="verdictValue">-</div>
+</div>
+<div class="status-item">
+<div class="label">备注条数</div>
+<div class="value" id="notesCount">0</div>
+</div>
+</div>
+
+<div class="result-area">
+<h2>操作日志</h2>
+<div id="logArea"><div class="log-entry"><span class="time">系统就绪</span><div class="msg">点击左侧按钮开始操作</div></div></div>
+</div>
+
+<div class="result-area">
+<h2>详情数据</h2>
+<pre id="detailArea">等待操作...</pre>
+</div>
+</div>
+</div>
+
+<script>
+let currentRecordId = null;
+
+function log(msg, type = '') {
+    const area = document.getElementById('logArea');
+    const now = new Date().toLocaleTimeString();
+    const entry = document.createElement('div');
+    entry.className = 'log-entry ' + type;
+    entry.innerHTML = `<span class="time">${now}</span><div class="msg">${msg}</div>`;
+    area.prepend(entry);
+}
+
+function showDetail(data) {
+    document.getElementById('detailArea').textContent = JSON.stringify(data, null, 2);
+}
+
+function updateStatus(record) {
+    const statusEl = document.getElementById('statusValue');
+    const phaseEl = document.getElementById('phaseValue');
+    const verdictEl = document.getElementById('verdictValue');
+    const notesEl = document.getElementById('notesCount');
+
+    const statusMap = {
+        'pending': ['待审核', 'pending'],
+        'approved': ['已通过', 'approved'],
+        'rejected': ['已拒绝', 'flagged'],
+        'rolled_back': ['已回滚', 'rolled_back'],
+        'pinyin_flagged': ['拼音存疑', 'flagged'],
+        'awaiting_client_manager_review': ['待客户经理复核', 'awaiting'],
+    };
+    const verdictMap = {
+        'normal': ['正常', 'normal'],
+        'pinyin_only': ['仅拼音', 'pinyin_only'],
+        'ambiguous': ['模糊', 'flagged'],
+    };
+    const phaseMap = {
+        'tax_rate_import': '税费率导入',
+        'counter_transaction_check': '柜台流水补看',
+        'balance_update': '余额更新',
+        'completed': '已完成',
+    };
+
+    const [sText, sClass] = statusMap[record.status] || [record.status, ''];
+    const [vText, vClass] = verdictMap[record.approver_pinyin_verdict] || [record.approver_pinyin_verdict, ''];
+    statusEl.textContent = sText;
+    statusEl.className = 'value ' + sClass;
+    phaseEl.textContent = phaseMap[record.workflow_phase] || record.workflow_phase;
+    verdictEl.textContent = vText;
+    verdictEl.className = 'value ' + vClass;
+    notesEl.textContent = record.tax_notes.length;
+}
+
+async function api(method, path, body) {
+    const opts = { method, headers: { 'Content-Type': 'application/json' } };
+    if (body) opts.body = JSON.stringify(body);
+    const res = await fetch('/api' + path, opts);
+    return res.json();
+}
+
+async function loadSample() {
+    log('载入样例数据...');
+    const res = await api('POST', '/records', { portfolio_name: '组合A', approver_name: '张三' });
+    currentRecordId = res.id;
+    updateStatus(res);
+    log(`创建记录: ${res.portfolio_name}, 审批人: ${res.approver_name}`, 'success');
+
+    const noteRes = await api('POST', `/records/${currentRecordId}/import-tax-notes`, {
+        notes: [
+            { tax_category: '增值税', rate: 0.06, remark: '普通税率', approver_name: '张三', source_file: 'tax_2024.xlsx' },
+            { tax_category: '印花税', rate: 0.001, remark: '交易印花税', approver_name: '张三', source_file: 'tax_2024.xlsx' },
+        ],
+        operator: '老秦',
+    });
+    if (noteRes.record) {
+        updateStatus(noteRes.record);
+        log(`导入税费率备注: 新增 ${noteRes.added_count} 条`, 'success');
+    }
+    showDetail(noteRes.record || noteRes);
+}
+
+async function runRollbackDemo() {
+    log('===== 回滚操作路演示 =====', 'warning');
+    log('步骤1: 创建审核记录并导入一条备注');
+    const res = await api('POST', '/records', { portfolio_name: '回滚测试组合', approver_name: '张三' });
+    currentRecordId = res.id;
+    updateStatus(res);
+    log(`创建记录: ${res.portfolio_name}, 审批人: ${res.approver_name}`, 'success');
+
+    const importRes = await api('POST', `/records/${currentRecordId}/import-tax-notes`, {
+        notes: [{ tax_category: '增值税', rate: 0.06, remark: '原始备注', approver_name: '张三' }],
+        operator: '老秦',
+    });
+    if (importRes.record) updateStatus(importRes.record);
+    log(`导入备注: "原始备注"`, 'success');
+
+    const noteId = importRes.record.tax_notes[0].id;
+
+    log('步骤2: 修改备注为"第一次改"');
+    const h1Res = await api('POST', `/records/${currentRecordId}/update-remark`, {
+        note_id: noteId, new_remark: '第一次改', operator: '老秦',
+    });
+    const h1Id = h1Res.history.id;
+    log(`历史记录 h1: "${h1Res.history.old_value}" → "${h1Res.history.new_value}" (id=${h1Id})`, 'success');
+
+    log('步骤3: 修改备注为"第二次改"');
+    const h2Res = await api('POST', `/records/${currentRecordId}/update-remark`, {
+        note_id: noteId, new_remark: '第二次改', operator: '老秦',
+    });
+    log(`历史记录 h2: "${h2Res.history.old_value}" → "${h2Res.history.new_value}"`, 'success');
+    log(`当前备注内容: "${h2Res.record.tax_notes[0].remark}"`, 'warning');
+
+    log('步骤4: 回滚到 h1 (rollback_record → h1.id)');
+    const rbRes = await api('POST', `/records/${currentRecordId}/rollback`, {
+        history_id: h1Id, operator: '管理员',
+    });
+
+    log(`回滚结果: ${rbRes.success ? '成功' : '失败'}`, rbRes.remark_correctly_restored ? 'success' : 'error');
+    log(`回滚前备注: "${rbRes.remark_before_rollback}"`, '');
+    log(`回滚后备注: "${rbRes.remark_after_rollback}"`, '');
+    log(`期望备注: "${rbRes.expected_remark_after}"`, '');
+    log(`备注是否正确恢复: ${rbRes.remark_correctly_restored ? '✅ 是' : '❌ 否'}`, rbRes.remark_correctly_restored ? 'success' : 'error');
+    log(`状态: ${rbRes.status_after}`, rbRes.status_after === 'rolled_back' ? 'success' : 'warning');
+
+    if (rbRes.state_after) updateStatus(rbRes.state_after);
+    showDetail(rbRes);
+}
+
+async function runFullWorkflowDemo() {
+    log('===== 完整三步工作流演示 =====', 'warning');
+    log('Phase 1: 税费率备注导入');
+    const res = await api('POST', '/records', { portfolio_name: '完整流程组合', approver_name: '张三' });
+    currentRecordId = res.id;
+
+    const step1 = await api('POST', `/records/${currentRecordId}/import-tax-notes`, {
+        notes: [{ tax_category: '增值税', rate: 0.06, remark: '普通税率', approver_name: '张三' }],
+        operator: '老秦',
+    });
+    if (step1.record) updateStatus(step1.record);
+    log(`Phase 1 完成 → ${step1.record?.workflow_phase || 'ERROR'}`, step1.record ? 'success' : 'error');
+
+    const noteId = step1.record.tax_notes[0].id;
+
+    log('Phase 2: 风控补看柜台流水尾号');
+    const step2 = await api('POST', `/records/${currentRecordId}/check-counter-transactions`, {
+        transactions: [{ tail_number: '8899', amount: 100000, linked_tax_note_id: noteId, description: '转账流水' }],
+        operator: '老秦',
+    });
+    if (step2.record) updateStatus(step2.record);
+    log(`Phase 2 完成 → ${step2.record?.workflow_phase || 'ERROR'}`, step2.record ? 'success' : 'error');
+
+    const txId = step2.record.counter_transactions[0].id;
+
+    log('Phase 3: 余额变化表更新');
+    const step3 = await api('POST', `/records/${currentRecordId}/update-balance`, {
+        entries: [{ account: 'A001', before_balance: 500000, after_balance: 600000, linked_counter_tx_id: txId, change_reason: '税费调整' }],
+        operator: '老秦',
+    });
+    if (step3.record) updateStatus(step3.record);
+    log(`Phase 3 完成 → ${step3.record?.workflow_phase || 'ERROR'}`, step3.record ? 'success' : 'error');
+
+    log('溯源: 余额变化 → 柜台流水 → 税费率备注');
+    const traceRes = await api('GET', `/records/${currentRecordId}/trace?from_type=balance_entry&from_id=${step3.record.balance_entries[0].id}`);
+    if (traceRes.chain) {
+        traceRes.chain.forEach(link => {
+            log(`  → ${link.display_type}: ${link.label}`, 'success');
+        });
+    }
+
+    showDetail(step3.record);
+}
+
+async function runPinyinDemo() {
+    log('===== 拼音拦截演示 =====', 'warning');
+    log('创建审批人仅留拼音的记录');
+    const res = await api('POST', '/records', { portfolio_name: '拼音测试组合', approver_name: 'zhangsan' });
+    currentRecordId = res.id;
+
+    log('尝试导入税费率备注...');
+    const step1 = await api('POST', `/records/${currentRecordId}/import-tax-notes`, {
+        notes: [{ tax_category: '增值税', rate: 0.06, remark: '普通税率', approver_name: 'zhangsan' }],
+        operator: '老秦',
+    });
+
+    if (step1.intercepted) {
+        log(`⛔ 拦截! ${step1.error}`, 'error');
+        log('审批人仅留拼音，不可直接归正常，留给客户经理复核', 'warning');
+        if (step1.record) updateStatus(step1.record);
+    }
+
+    log('客户经理复核: 确认审批人姓名为"张三"');
+    const resolveRes = await api('POST', `/records/${currentRecordId}/resolve-pinyin`, {
+        confirmed_name: '张三', operator: '客户经理',
+    });
+    if (resolveRes.record) updateStatus(resolveRes.record);
+    log(`复核完成: 审批人 = ${resolveRes.record.approver_name}, 判定 = ${resolveRes.record.approver_pinyin_verdict}`, 'success');
+
+    log('从拦截处继续推进 Phase 1...');
+    const contRes = await api('POST', `/records/${currentRecordId}/import-tax-notes`, { notes: [], operator: '老秦' });
+    if (contRes.record) updateStatus(contRes.record);
+    log(`Phase 1 继续 → ${contRes.record?.workflow_phase || 'ERROR'}`, 'success');
+
+    showDetail(resolveRes.record);
+}
+
+async function checkBoundary() {
+    const name = document.getElementById('nameInput').value.trim();
+    if (!name) return;
+    const res = await api('GET', `/boundary/${encodeURIComponent(name)}`);
+    const resultDiv = document.getElementById('boundaryResult');
+    const verdictMap = {
+        'normal': ['正常 ✅', 'tag-normal'],
+        'pinyin_only': ['仅拼音 ⚠️ 需客户经理复核', 'tag-pinyin'],
+        'ambiguous': ['模糊 ❓ 需人工确认', 'tag-ambiguous'],
+    };
+    const [text, cls] = verdictMap[res.verdict] || [res.verdict, ''];
+    resultDiv.innerHTML = `<p><span class="tag ${cls}">${text}</span></p><p style="margin-top:4px;color:#546e7a;">${res.description}</p>`;
+}
+
+function clearAll() {
+    document.getElementById('logArea').innerHTML = '';
+    document.getElementById('detailArea').textContent = '等待操作...';
+    document.getElementById('statusValue').textContent = '-';
+    document.getElementById('statusValue').className = 'value';
+    document.getElementById('phaseValue').textContent = '-';
+    document.getElementById('verdictValue').textContent = '-';
+    document.getElementById('notesCount').textContent = '0';
+    currentRecordId = null;
+    log('已清空，重新开始', '');
+}
+</script>
+</body>
+</html>

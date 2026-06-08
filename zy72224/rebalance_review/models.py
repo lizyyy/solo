@@ -83,6 +83,7 @@ class ChangeHistory:
     id: str = field(default_factory=lambda: uuid.uuid4().hex[:12])
     record_id: str = ""
     field_name: str = ""
+    target_id: str = ""
     old_value: str = ""
     new_value: str = ""
     changed_by: str = ""
@@ -90,7 +91,8 @@ class ChangeHistory:
     change_type: str = ""
 
     def diff_summary(self) -> str:
-        return f"[{self.field_name}] '{self.old_value}' -> '{self.new_value}' (by {self.changed_by})"
+        target_info = f" (target={self.target_id})" if self.target_id else ""
+        return f"[{self.field_name}]{target_info} '{self.old_value}' -> '{self.new_value}' (by {self.changed_by})"
 
 
 @dataclass

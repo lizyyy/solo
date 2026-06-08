@@ -158,14 +158,13 @@ class RebalanceReviewEngine:
         for note in record.tax_notes:
             if note.id == note_id:
                 old_remark = note.remark
-                old_fp = note.content_fingerprint()
                 note.remark = new_remark
-                new_fp = note.content_fingerprint()
                 history_entry = ChangeHistory(
                     record_id=record.id,
                     field_name="remark",
-                    old_value=f"{old_remark} (fp:{old_fp})",
-                    new_value=f"{new_remark} (fp:{new_fp})",
+                    target_id=note_id,
+                    old_value=old_remark,
+                    new_value=new_remark,
                     changed_by=operator,
                     change_type="update",
                 )
@@ -193,10 +192,11 @@ class RebalanceReviewEngine:
         return history_entry
 
     def handle_remark_rollback(self, record: ReviewRecord, history: ChangeHistory) -> None:
+        if not history.target_id:
+            return
         for note in record.tax_notes:
-            if history.old_value.startswith(f"{note.remark} (fp:"):
-                old_remark = history.old_value.split(" (fp:")[0]
-                note.remark = old_remark
+            if note.id == history.target_id:
+                note.remark = history.old_value
                 return
 
     def handle_approver_name_rollback(self, record: ReviewRecord, history: ChangeHistory) -> None:
