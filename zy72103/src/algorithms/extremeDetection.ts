@@ -43,14 +43,14 @@ export function detectByIQR(
 
 export function detectExtremeValues(
   values: number[],
-  stdDevK: number = 3,
+  stdDevK: number = 2,
   iqrK: number = 1.5,
 ): ExtremeDetectionResult {
   const stdResult = detectByStdDev(values, stdDevK);
   const iqrResult = detectByIQR(values, iqrK);
 
   const flags = stdResult.flags.map(
-    (flag, i) => flag && iqrResult.flags[i],
+    (flag, i) => flag || iqrResult.flags[i],
   );
 
   const validValues = values.filter(
@@ -66,7 +66,7 @@ export function detectExtremeValues(
 
   return {
     flags,
-    method: 'both',
+    method: 'any',
     meanWithExtremes,
     meanWithoutExtremes,
     excludedCount,

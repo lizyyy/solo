@@ -5,7 +5,7 @@ export const DEFAULT_THRESHOLD_CONFIG: ThresholdConfig = {
   temperatureWarning: 60,
   voltageDanger: 4.5,
   voltageWarning: 4.3,
-  extremeStdDev: 3,
+  extremeStdDev: 2,
   extremeIQR: 1.5,
 };
 

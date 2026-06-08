@@ -2,25 +2,14 @@ import { useDataStore } from '@/store/useDataStore';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { formatDateTime } from '@/utils/csvParser';
 import { Flame, TrendingUp, AlertTriangle, Calculator } from 'lucide-react';
-import { detectExtremeValues } from '@/algorithms/extremeDetection';
 import { DEFAULT_THRESHOLD_CONFIG, FIELD_UNITS } from '@/config/thresholds';
 
 export function ExtremeValuesCard() {
   const { records, currentAnalysis } = useDataStore();
 
-  if (records.length === 0) {
+  if (records.length === 0 || !currentAnalysis) {
     return null;
   }
-
-  const temperatures = records
-    .map((r) => r.temperature)
-    .filter((v): v is number => v !== null);
-
-  const extremeResult = detectExtremeValues(
-    temperatures,
-    DEFAULT_THRESHOLD_CONFIG.extremeStdDev,
-    DEFAULT_THRESHOLD_CONFIG.extremeIQR,
-  );
 
   const extremeRecords = records.filter((r) => r.dataQuality.isExtreme);
 
@@ -49,20 +38,20 @@ export function ExtremeValuesCard() {
               <div className="flex items-center justify-between">
                 <span className="text-slate-400 text-sm">含极端值平均值</span>
                 <span className="font-mono text-lg text-slate-300 line-through opacity-50">
-                  {extremeResult.meanWithExtremes.toFixed(1)}{FIELD_UNITS.temperature}
+                  {currentAnalysis.meanTemperatureWithExtremes.toFixed(1)}{FIELD_UNITS.temperature}
                 </span>
               </div>
               <div className="h-px bg-slate-700" />
               <div className="flex items-center justify-between">
                 <span className="text-slate-300 text-sm font-medium">排除极端值后平均值</span>
                 <span className="font-mono text-xl font-bold text-emerald-400">
-                  {extremeResult.meanWithoutExtremes.toFixed(1)}{FIELD_UNITS.temperature}
+                  {currentAnalysis.meanTemperature.toFixed(1)}{FIELD_UNITS.temperature}
                 </span>
               </div>
               <div className="flex items-center gap-2 text-xs text-amber-400 mt-2">
                 <TrendingUp className="w-4 h-4" />
                 <span>
-                  差值 {(extremeResult.meanWithExtremes - extremeResult.meanWithoutExtremes).toFixed(1)}{FIELD_UNITS.temperature}
+                  差值 {(currentAnalysis.meanTemperatureWithExtremes - currentAnalysis.meanTemperature).toFixed(1)}{FIELD_UNITS.temperature}
                   ，极端值拉高了平均值
                 </span>
               </div>
@@ -78,12 +67,12 @@ export function ExtremeValuesCard() {
               <div>
                 <span className="text-slate-500">标准差法</span>
                 <div className="text-slate-300 font-mono">±{DEFAULT_THRESHOLD_CONFIG.extremeStdDev}σ</div>
-                <div className="text-xs text-slate-500">σ = {extremeResult.stdDev?.toFixed(1)}</div>
+                <div className="text-xs text-slate-500">σ = {currentAnalysis.stdDev?.toFixed(1)}</div>
               </div>
               <div>
                 <span className="text-slate-500">四分位距法</span>
                 <div className="text-slate-300 font-mono">{DEFAULT_THRESHOLD_CONFIG.extremeIQR}×IQR</div>
-                <div className="text-xs text-slate-500">IQR = {extremeResult.iqr?.toFixed(1)}</div>
+                <div className="text-xs text-slate-500">IQR = {currentAnalysis.iqr?.toFixed(1)}</div>
               </div>
             </div>
           </div>

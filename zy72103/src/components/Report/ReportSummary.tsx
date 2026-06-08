@@ -10,8 +10,6 @@ import {
   Calendar,
   User,
 } from 'lucide-react';
-import { detectExtremeValues } from '@/algorithms/extremeDetection';
-import { DEFAULT_THRESHOLD_CONFIG } from '@/config/thresholds';
 import { formatDateTime } from '@/utils/csvParser';
 
 export function ReportSummary() {
@@ -20,16 +18,6 @@ export function ReportSummary() {
   if (!currentAnalysis || records.length === 0) {
     return null;
   }
-
-  const temperatures = records
-    .map((r) => r.temperature)
-    .filter((v): v is number => v !== null);
-
-  const extremeResult = detectExtremeValues(
-    temperatures,
-    DEFAULT_THRESHOLD_CONFIG.extremeStdDev,
-    DEFAULT_THRESHOLD_CONFIG.extremeIQR,
-  );
 
   const riskColor = {
     low: 'success',
@@ -95,7 +83,7 @@ export function ReportSummary() {
             <span className="text-sm font-normal ml-1">{FIELD_UNITS.temperature}</span>
           </div>
           <div className="text-xs text-slate-500 mt-2 line-through">
-            含极端值: {extremeResult.meanWithExtremes.toFixed(1)}{FIELD_UNITS.temperature}
+            含极端值: {currentAnalysis.meanTemperatureWithExtremes.toFixed(1)}{FIELD_UNITS.temperature}
           </div>
         </div>
 

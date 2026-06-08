@@ -52,9 +52,14 @@ export interface BatteryRecord {
 export interface AnalysisResult {
   meanTemperature: number;
   meanVoltage: number;
+  meanTemperatureWithExtremes: number;
   extremeCount: number;
   riskLevel: RiskLevelType;
   excludedRecords: string[];
+  stdDev?: number;
+  iqr?: number;
+  q1?: number;
+  q3?: number;
 }
 
 export interface ThresholdConfig {
@@ -68,7 +73,7 @@ export interface ThresholdConfig {
 
 export interface ExtremeDetectionResult {
   flags: boolean[];
-  method: 'stddev' | 'iqr' | 'both';
+  method: 'stddev' | 'iqr' | 'any';
   meanWithExtremes: number;
   meanWithoutExtremes: number;
   excludedCount: number;

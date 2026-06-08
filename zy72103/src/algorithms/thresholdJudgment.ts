@@ -100,22 +100,49 @@ export function analyzeRecords(
   records: BatteryRecord[],
   config: ThresholdConfig = DEFAULT_THRESHOLD_CONFIG,
 ): { records: BatteryRecord[]; result: AnalysisResult } {
-  const temperatures = records.map((r) => r.temperature).filter((v): v is number => v !== null);
-  const voltages = records.map((r) => r.voltage).filter((v): v is number => v !== null);
+  const temperatures: (number | null)[] = records.map((r) => r.temperature);
+
+  const validTemperatures = temperatures.filter((v): v is number => v !== null);
 
   const tempExtremeResult = detectExtremeValues(
-    temperatures,
+    validTemperatures,
     config.extremeStdDev,
     config.extremeIQR,
   );
 
-  const processedRecords = records.map((record, index) => {
-    const newRecord = { ...record, detectionSteps: [...record.detectionSteps] };
-    const tempIndex = temperatures.indexOf(record.temperature ?? NaN);
+  const tempFlagMap = new Map<number, boolean[]>();
+  temperatures.forEach((t) => {
+    if (t === null) return;
+    const arr = tempFlagMap.get(t) || [];
+    arr.push(false);
+    tempFlagMap.set(t, arr);
+  });
+  tempExtremeResult.flags.forEach((flag, i) => {
+    const t = validTemperatures[i];
+    const arr = tempFlagMap.get(t);
+    if (arr) {
+      const nextUnused = arr.findIndex((v) => !v);
+      if (nextUnused >= 0) arr[nextUnused] = flag;
+    }
+  });
 
-    if (record.temperature !== null && tempIndex >= 0) {
-      if (tempExtremeResult.flags[tempIndex]) {
-        newRecord.dataQuality.isExtreme = true;
+  const flagIterator = new Map<number, number>();
+  function getExtremeFlag(temp: number | null): boolean {
+    if (temp === null) return false;
+    const arr = tempFlagMap.get(temp);
+    if (!arr) return false;
+    const idx = flagIterator.get(temp) || 0;
+    flagIterator.set(temp, idx + 1);
+    return arr[idx] || false;
+  }
+
+  const processedRecords = records.map((record) => {
+    const newRecord = { ...record, detectionSteps: [...record.detectionSteps] };
+    const isExtreme = getExtremeFlag(record.temperature);
+
+    if (record.temperature !== null) {
+      if (isExtreme) {
+        newRecord.dataQuality = { ...newRecord.dataQuality, isExtreme: true };
       }
 
       newRecord.detectionSteps.push(
@@ -127,12 +154,19 @@ export function analyzeRecords(
         ),
       );
 
+      const isStdDevExtreme = tempExtremeResult.stdDev !== undefined &&
+        Math.abs(record.temperature - tempExtremeResult.meanWithExtremes) >
+        config.extremeStdDev * tempExtremeResult.stdDev;
+      const isIQRExtreme = tempExtremeResult.q3 !== undefined &&
+        tempExtremeResult.iqr !== undefined &&
+        record.temperature > tempExtremeResult.q3 + config.extremeIQR * tempExtremeResult.iqr;
+
       newRecord.detectionSteps.push(
         createDetectionStep(
           'extremeDetection',
           record.temperature,
           config.extremeStdDev,
-          `标准差法: |${record.temperature} - ${tempExtremeResult.meanWithExtremes.toFixed(1)}| > ${config.extremeStdDev} × ${tempExtremeResult.stdDev?.toFixed(1)} = ${(config.extremeStdDev * (tempExtremeResult.stdDev ?? 0)).toFixed(1)}`,
+          `极端值检测: ${record.temperature}°C → 标准差法(${isStdDevExtreme ? '命中' : '未命中'}: |${record.temperature} - ${tempExtremeResult.meanWithExtremes.toFixed(1)}| ${isStdDevExtreme ? '>' : '≤'} ${config.extremeStdDev}×${tempExtremeResult.stdDev?.toFixed(1)}) ∪ IQR法(${isIQRExtreme ? '命中' : '未命中'}: ${record.temperature} ${isIQRExtreme ? '>' : '≤'} ${tempExtremeResult.q3?.toFixed(1)} + ${config.extremeIQR}×${tempExtremeResult.iqr?.toFixed(1)}) = ${isExtreme ? '极端值' : '正常'}`,
         ),
       );
 
@@ -157,11 +191,12 @@ export function analyzeRecords(
     return newRecord;
   });
 
-  const validTemperatures = temperatures.filter(
-    (_, i) => !tempExtremeResult.flags[i],
-  );
+  const validTempsForMean = temperatures.filter(
+    (t, i) => t !== null && !processedRecords[i].dataQuality.isExtreme,
+  ) as number[];
   const meanTemperature =
-    validTemperatures.reduce((a, b) => a + b, 0) / validTemperatures.length;
+    validTempsForMean.reduce((a, b) => a + b, 0) / validTempsForMean.length;
+  const voltages = records.map((r) => r.voltage).filter((v): v is number => v !== null);
   const meanVoltage = voltages.reduce((a, b) => a + b, 0) / voltages.length;
 
   const extremeCount = processedRecords.filter(
@@ -190,9 +225,14 @@ export function analyzeRecords(
   const result: AnalysisResult = {
     meanTemperature,
     meanVoltage,
+    meanTemperatureWithExtremes: tempExtremeResult.meanWithExtremes,
     extremeCount,
     riskLevel,
     excludedRecords,
+    stdDev: tempExtremeResult.stdDev,
+    iqr: tempExtremeResult.iqr,
+    q1: tempExtremeResult.q1,
+    q3: tempExtremeResult.q3,
   };
 
   return { records: processedRecords, result };

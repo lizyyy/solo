@@ -8,30 +8,22 @@ import {
   ResponsiveContainer,
   Scatter,
   ScatterChart,
-  ReferenceLine,
 } from 'recharts';
-import { detectExtremeValues } from '@/algorithms/extremeDetection';
-import { DEFAULT_THRESHOLD_CONFIG, FIELD_UNITS } from '@/config/thresholds';
+import { FIELD_UNITS } from '@/config/thresholds';
 import { BarChart3 } from 'lucide-react';
 
 export function BoxPlotChartComponent() {
   const { records } = useDataStore();
 
   const boxPlotData = useMemo(() => {
-    const temperatures = records
-      .filter((r) => r.temperature !== null)
+    const normalTemps = records
+      .filter((r) => r.temperature !== null && !r.dataQuality.isExtreme)
+      .map((r) => r.temperature!);
+    const extremeTemps = records
+      .filter((r) => r.temperature !== null && r.dataQuality.isExtreme)
       .map((r) => r.temperature!);
 
-    if (temperatures.length === 0) return [];
-
-    const extremeResult = detectExtremeValues(
-      temperatures,
-      DEFAULT_THRESHOLD_CONFIG.extremeStdDev,
-      DEFAULT_THRESHOLD_CONFIG.extremeIQR,
-    );
-
-    const normalTemps = temperatures.filter((_, i) => !extremeResult.flags[i]);
-    const extremeTemps = temperatures.filter((_, i) => extremeResult.flags[i]);
+    if (normalTemps.length === 0) return [];
 
     const sorted = [...normalTemps].sort((a, b) => a - b);
     const q1 = sorted[Math.floor(sorted.length * 0.25)];
