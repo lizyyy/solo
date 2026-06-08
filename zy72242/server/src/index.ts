@@ -62,7 +62,6 @@ let db: DbData = loadData();
 
 import { v4 as uuidv4 } from 'uuid';
 import { addDays, differenceInDays, parseISO, format } from 'date-fns';
-import { zhCN } from 'date-fns/locale';
 
 function calculateExpectedArrivalDate(tradeDate: string): string {
   const date = parseISO(tradeDate);
@@ -354,35 +353,42 @@ app.get('/api/demo/init', (req, res) => {
   if (step === '1' || !step) {
     const tradeDate = '2024-04-30';
     const expectedDate = calculateExpectedArrivalDate(tradeDate);
-    const holidayExp = getHolidayExplanation(expectedDate, '2024-05-06');
+    const actualDate = '2024-05-07';
+    const delayDays1 = differenceInDays(parseISO(actualDate), parseISO(expectedDate));
+    const holidayExp1 = getHolidayExplanation(expectedDate, actualDate);
     
+    const r1Base = {
+      id: 'demo-001', tradeDate, expectedArrivalDate: expectedDate, actualArrivalDate: actualDate,
+      amount: 1500000, fundCode: 'FUND-001', futuresCode: 'IF2405',
+      hasManualModification: true, modificationType: 't1_to_t2',
+      modifiedBy: '张三', modifiedAt: '2024-05-05 14:30:00',
+      modificationReason: '节假日顺延后再延迟1天到账'
+    };
+    const note1 = generateReconciliationNote(r1Base, false);
     const r1 = {
-      id: 'demo-001', tradeDate, expectedArrivalDate: expectedDate, actualArrivalDate: '2024-05-06',
-      amount: 1500000, fundCode: 'FUND-001', futuresCode: 'IF2405', status: 'reviewing',
-      hasManualModification: true, modificationType: 't1_to_t2', modifiedBy: '张三',
-      modifiedAt: '2024-05-05 14:30:00', modificationReason: '节假日顺延+手工调整',
-      whyKept: `T+1到账（${expectedDate}）被手工修改为T+2（2024-05-06），延迟${differenceInDays(parseISO('2024-05-06'), parseISO(expectedDate))}天；${holidayExp}；修改原因：节假日顺延+手工调整；修改人：张三`,
-      missingMaterials: '银行交割凭证、支付平台流水单、修改授权确认书',
-      nextAction: '请基金经理复核T+1→T+2修改原因，不急着归正常；确认后联系支付平台产品阿南',
+      ...r1Base, status: 'reviewing',
+      whyKept: note1.whyKept, missingMaterials: note1.missingMaterials, nextAction: note1.nextAction,
       lastUpdatedBy: '支付平台阿南', lastUpdatedAt: '2024-05-05 15:00:00', createdAt: now, updatedAt: now
     };
 
     const tradeDate2 = '2024-06-08';
     const expectedDate2 = calculateExpectedArrivalDate(tradeDate2);
-    const holidayExp2 = getHolidayExplanation(expectedDate2, '2024-06-11');
+    const r2Base = {
+      id: 'demo-002', tradeDate: tradeDate2, expectedArrivalDate: expectedDate2, actualArrivalDate: expectedDate2,
+      amount: 850000, fundCode: 'FUND-002', futuresCode: 'IC2406',
+      hasManualModification: false, modificationType: null as any, modifiedBy: null as any, modifiedAt: null as any, modificationReason: null as any
+    };
+    const note2 = generateReconciliationNote(r2Base, false);
     const r2 = {
-      id: 'demo-002', tradeDate: tradeDate2, expectedArrivalDate: expectedDate2, actualArrivalDate: '2024-06-11',
-      amount: 850000, fundCode: 'FUND-002', futuresCode: 'IC2406', status: 'pending',
-      hasManualModification: false, modificationType: null, modifiedBy: null, modifiedAt: null, modificationReason: null,
-      whyKept: `到账延迟0天；${holidayExp2}；延迟属于正常节假日顺延`,
-      missingMaterials: '', nextAction: '无需处理，自动标记为正常',
+      ...r2Base, status: 'pending',
+      whyKept: note2.whyKept, missingMaterials: note2.missingMaterials, nextAction: note2.nextAction,
       lastUpdatedBy: '系统', lastUpdatedAt: now, createdAt: now, updatedAt: now
     };
 
     if (!db.records.find((r: any) => r.id === 'demo-001')) {
       db.records.unshift(r1, r2);
       addAuditLog({ recordId: r1.id, action: 'import', reason: '导入交割数据（演示Step1）', operator: '系统', operatorRole: 'system', affectedResults: '预期到账日、金额、基金代码、对账说明已生成' });
-      addAuditLog({ recordId: r1.id, action: 'modify', fieldName: 'actual_arrival_date', oldValue: expectedDate, newValue: '2024-05-06', reason: '手工调整到账日（演示）', operator: '张三', operatorRole: 'product_manager', affectedResults: '对账状态变为reviewing，触发基金经理复核' });
+      addAuditLog({ recordId: r1.id, action: 'modify', fieldName: 'actual_arrival_date', oldValue: expectedDate, newValue: actualDate, reason: '手工调整到账日（演示）', operator: '张三', operatorRole: 'product_manager', affectedResults: `预期${expectedDate}→实际${actualDate}，延迟${delayDays1}天，对账状态变为reviewing，触发基金经理复核` });
       addAuditLog({ recordId: r2.id, action: 'import', reason: '导入交割数据（演示Step1）', operator: '系统', operatorRole: 'system', affectedResults: '预期到账日、金额、基金代码、对账说明已生成' });
     }
     saveData(db);
@@ -391,32 +397,36 @@ app.get('/api/demo/init', (req, res) => {
   if (step === '2' || !step) {
     const tradeDate3 = '2024-09-16';
     const expectedDate3 = calculateExpectedArrivalDate(tradeDate3);
-    const holidayExp3 = getHolidayExplanation(expectedDate3, '2024-09-19');
+    const actualDate3 = '2024-09-19';
+    const delayDays3 = differenceInDays(parseISO(actualDate3), parseISO(expectedDate3));
     
+    const r3Base = {
+      id: 'demo-003', tradeDate: tradeDate3, expectedArrivalDate: expectedDate3, actualArrivalDate: actualDate3,
+      amount: 2200000, fundCode: 'FUND-001', futuresCode: 'IF2409',
+      hasManualModification: true, modificationType: 't1_to_t2',
+      modifiedBy: '李四', modifiedAt: '2024-09-18 16:45:00',
+      modificationReason: '中秋节假日影响'
+    };
+    const note3 = generateReconciliationNote(r3Base, false);
     const r3 = {
-      id: 'demo-003', tradeDate: tradeDate3, expectedArrivalDate: expectedDate3, actualArrivalDate: '2024-09-19',
-      amount: 2200000, fundCode: 'FUND-001', futuresCode: 'IF2409', status: 'reviewing',
-      hasManualModification: true, modificationType: 't1_to_t2', modifiedBy: '李四',
-      modifiedAt: '2024-09-18 16:45:00', modificationReason: '中秋节假日影响',
-      whyKept: `T+1到账（${expectedDate3}）被手工修改为T+2（2024-09-19），延迟1天；${holidayExp3}；修改原因：中秋节假日影响；修改人：李四`,
-      missingMaterials: '交割确认书',
-      nextAction: '请基金经理复核T+1→T+2修改原因，不急着归正常；确认后联系支付平台产品阿南',
+      ...r3Base, status: 'reviewing',
+      whyKept: note3.whyKept, missingMaterials: note3.missingMaterials, nextAction: note3.nextAction,
       lastUpdatedBy: '支付平台阿南', lastUpdatedAt: now, createdAt: now, updatedAt: now
     };
 
     if (!db.records.find((r: any) => r.id === 'demo-003')) {
       db.records.unshift(r3);
       addAuditLog({ recordId: r3.id, action: 'import', reason: '导入交割数据（演示Step2）', operator: '系统', operatorRole: 'system', affectedResults: '预期到账日、金额、基金代码、对账说明已生成' });
-      addAuditLog({ recordId: r3.id, action: 'modify', fieldName: 'actual_arrival_date', oldValue: expectedDate3, newValue: '2024-09-19', reason: '手工调整到账日（演示）', operator: '李四', operatorRole: 'product_manager', affectedResults: '对账状态变为reviewing' });
+      addAuditLog({ recordId: r3.id, action: 'modify', fieldName: 'actual_arrival_date', oldValue: expectedDate3, newValue: actualDate3, reason: '手工调整到账日（演示）', operator: '李四', operatorRole: 'product_manager', affectedResults: `预期${expectedDate3}→实际${actualDate3}，延迟${delayDays3}天，对账状态变为reviewing` });
     }
 
-    if (!db.adjustments.find((a: any) => a.recordId === 'demo-003' || (r3 && a.recordId === r3.id))) {
+    if (!db.adjustments.find((a: any) => a.recordId === 'demo-003')) {
       const adj = { id: uuidv4(), recordId: r3.id, amount: 125.50, reason: '银行手续费尾差调整', adjustedBy: '支付平台阿南', adjustedAt: now, affectsReconciliation: true };
       db.adjustments.unshift(adj);
       addAuditLog({ recordId: r3.id, action: 'adjust', reason: '银行手续费尾差调整（演示Step2）', operator: '支付平台阿南', operatorRole: 'product_manager', affectedResults: '对账说明自动更新，增加尾差调整说明' });
       
-      const note = generateReconciliationNote(r3, true);
-      Object.assign(r3, { whyKept: note.whyKept, missingMaterials: note.missingMaterials, nextAction: note.nextAction, lastUpdatedBy: '系统', lastUpdatedAt: now });
+      const updatedNote3 = generateReconciliationNote(r3, true);
+      Object.assign(r3, { whyKept: updatedNote3.whyKept, missingMaterials: updatedNote3.missingMaterials, nextAction: updatedNote3.nextAction, lastUpdatedBy: '系统', lastUpdatedAt: now });
     }
     saveData(db);
   }
@@ -425,8 +435,14 @@ app.get('/api/demo/init', (req, res) => {
     const record = db.records.find((r: any) => r.id === 'demo-001');
     if (record) {
       const oldWhyKept = record.whyKept;
-      const note = generateReconciliationNote(record, db.adjustments.some((a: any) => a.recordId === 'demo-001'));
-      Object.assign(record, { whyKept: `${oldWhyKept}；已补录尾差调整条，调整金额125.50元，原因为银行手续费`, missingMaterials: '银行交割凭证', nextAction: '尾差调整已完成，请基金经理最终复核；确认后联系支付平台产品阿南归档', lastUpdatedBy: '支付平台阿南', lastUpdatedAt: now, updatedAt: now });
+      const hasAdj = db.adjustments.some((a: any) => a.recordId === 'demo-001');
+      if (!hasAdj) {
+        const adj = { id: uuidv4(), recordId: 'demo-001', amount: 125.50, reason: '银行手续费尾差调整', adjustedBy: '支付平台阿南', adjustedAt: now, affectsReconciliation: true };
+        db.adjustments.unshift(adj);
+        addAuditLog({ recordId: 'demo-001', action: 'adjust', reason: '银行手续费尾差调整（演示Step3）', operator: '支付平台阿南', operatorRole: 'product_manager', affectedResults: '对账说明自动更新，增加尾差调整说明' });
+      }
+      const note = generateReconciliationNote(record, true);
+      Object.assign(record, { whyKept: note.whyKept, missingMaterials: note.missingMaterials, nextAction: note.nextAction, lastUpdatedBy: '支付平台阿南', lastUpdatedAt: now, updatedAt: now });
       addAuditLog({ recordId: record.id, action: 'modify', fieldName: 'reconciliation_note', oldValue: oldWhyKept, newValue: record.whyKept, reason: '对账说明更新（演示Step3）', operator: '支付平台阿南', operatorRole: 'product_manager', affectedResults: '对账说明已更新' });
       addAuditLog({ recordId: record.id, action: 'rerun', fieldName: 'reconciliation', oldValue: oldWhyKept, newValue: record.whyKept, reason: '重跑对账逻辑（演示Step3）', operator: '支付平台阿南', operatorRole: 'product_manager', affectedResults: '对账说明已重新生成' });
     }
