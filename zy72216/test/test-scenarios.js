@@ -418,12 +418,19 @@ setTimeout(() => {
           assertEqual(exportRecord['处理状态'], '正常', '导出状态应为正常');
           assertTrue(exportRecord['人工改动记录'].includes('T+1'), '导出应包含改动记录');
           assertTrue(exportRecord['人工改动记录'].includes('阿芬'), '导出应包含操作员');
+          assertTrue(!!exportRecord['对账说明'] && exportRecord['对账说明'].length > 0, '导出对账说明不应为空');
+          assertTrue(exportRecord['对账说明'].includes('托管确认页显示T+1'), '导出对账说明应包含内容');
+
+          assertTrue(Array.isArray(apiData.reconciliation_notes), 'API数据应包含reconciliation_notes数组');
+          assertTrue(apiData.reconciliation_notes.length > 0, 'API数据对账说明不应为空');
+          assertEqual(apiData.reconciliation_notes[0].note_content, exportRecord['对账说明'].split('; ')[0], 'API和导出的对账说明应一致');
 
           console.log(`   ✅ API数据和导出数据完全一致`);
           console.log(`      原始到账日: ${exportRecord['原始到账日']}`);
           console.log(`      当前到账日: ${exportRecord['当前到账日']}`);
           console.log(`      处理状态: ${exportRecord['处理状态']}`);
           console.log(`      人工改动记录: ${exportRecord['人工改动记录']}`);
+          console.log(`      对账说明: ${exportRecord['对账说明']}`);
           done();
         } catch (e) { done(e); }
       });

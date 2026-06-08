@@ -55,16 +55,25 @@ function getAllRecordsWithDetails(callback) {
 
     Promise.all(enriched.map(record =>
       new Promise((resolve, reject) => {
-        ManualChangeLog.getLogsByRecordId(record.id, (err, logs) => {
-          if (err) reject(err);
-          else {
-            record.change_logs = logs.map(enrichChangeLog);
-            resolve(record);
-          }
-        });
+        Promise.all([
+          new Promise((res, rej) => {
+            ManualChangeLog.getLogsByRecordId(record.id, (e, logs) => {
+              if (e) rej(e); else res(logs);
+            });
+          }),
+          new Promise((res, rej) => {
+            ReconciliationNote.getNotesByRecordId(record.id, (e, notes) => {
+              if (e) rej(e); else res(notes);
+            });
+          })
+        ]).then(([logs, notes]) => {
+          record.change_logs = logs.map(enrichChangeLog);
+          record.reconciliation_notes = notes;
+          resolve(record);
+        }).catch(reject);
       })
-    )).then(recordsWithLogs => {
-      callback(null, recordsWithLogs);
+    )).then(recordsWithDetails => {
+      callback(null, recordsWithDetails);
     }).catch(callback);
   });
 }
@@ -77,16 +86,25 @@ function getRecordsByBatchWithDetails(batchId, callback) {
 
     Promise.all(enriched.map(record =>
       new Promise((resolve, reject) => {
-        ManualChangeLog.getLogsByRecordId(record.id, (err, logs) => {
-          if (err) reject(err);
-          else {
-            record.change_logs = logs.map(enrichChangeLog);
-            resolve(record);
-          }
-        });
+        Promise.all([
+          new Promise((res, rej) => {
+            ManualChangeLog.getLogsByRecordId(record.id, (e, logs) => {
+              if (e) rej(e); else res(logs);
+            });
+          }),
+          new Promise((res, rej) => {
+            ReconciliationNote.getNotesByRecordId(record.id, (e, notes) => {
+              if (e) rej(e); else res(notes);
+            });
+          })
+        ]).then(([logs, notes]) => {
+          record.change_logs = logs.map(enrichChangeLog);
+          record.reconciliation_notes = notes;
+          resolve(record);
+        }).catch(reject);
       })
-    )).then(recordsWithLogs => {
-      callback(null, recordsWithLogs);
+    )).then(recordsWithDetails => {
+      callback(null, recordsWithDetails);
     }).catch(callback);
   });
 }
