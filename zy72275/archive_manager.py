@@ -144,28 +144,62 @@ class ArchiveManager:
         self._save_points()
         return True
 
-    def rollback_point(self, point_id: str, operator: str) -> bool:
+    def rollback_point(self, point_id: str, operator: str, steps: int = 0) -> Optional[Dict]:
         if point_id not in self._points:
-            return False
+            return None
         
         point = self._points[point_id]
         if not point.change_history:
-            return False
+            return None
         
-        point.processing_status = 'rollbacked'
-        change = ChangeRecord(
+        target_steps = steps if steps > 0 else len(point.change_history)
+        target_steps = min(target_steps, len(point.change_history))
+        
+        reverted_fields = {}
+        for i in range(target_steps):
+            change = point.change_history[-(i + 1)]
+            current_val = getattr(point, change.field_name, None)
+            reverted_fields[change.field_name] = {
+                'before_rollback': current_val,
+                'after_rollback': change.old_value,
+                'original_change_operator': change.operator,
+                'original_change_time': change.timestamp.isoformat()
+            }
+            setattr(point, change.field_name, change.old_value)
+        
+        recalculated_status = CoordinateValidator.determine_processing_status(point.coordinate_type)
+        if point.processing_status != recalculated_status:
+            reverted_fields['processing_status'] = {
+                'before_rollback': point.processing_status,
+                'after_rollback': recalculated_status,
+                'original_change_operator': '系统',
+                'original_change_time': datetime.now().isoformat()
+            }
+            point.processing_status = recalculated_status
+        
+        rollback_record = ChangeRecord(
             operator=operator,
-            field_name='processing_status',
-            old_value=point.processing_status,
-            new_value='rollbacked',
-            reason='执行回滚操作'
+            field_name='_rollback',
+            old_value=f'reverted {target_steps} changes',
+            new_value=json.dumps(reverted_fields, ensure_ascii=False, default=str),
+            reason=f'回滚 {target_steps} 步变更'
         )
-        point.change_history.append(change)
+        point.change_history.append(rollback_record)
+        point.manual_modified = any(
+            getattr(point, f, None) is not None
+            for f in ['remark', 'inspection_photo_id', 'site_instruction']
+        )
         point.version += 1
         point.updated_at = datetime.now()
         
         self._save_points()
-        return True
+        return {
+            'point_id': point_id,
+            'steps_reverted': target_steps,
+            'reverted_fields': reverted_fields,
+            'current_status': point.processing_status,
+            'current_coordinate_type': point.coordinate_type
+        }
 
     def get_point(self, point_id: str) -> Optional[OriginPoint]:
         return self._points.get(point_id)

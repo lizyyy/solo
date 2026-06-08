@@ -55,6 +55,23 @@
 - 可通过 `history` 命令查看完整变更历史
 - 支持 `rollback` 回滚操作
 
+### 规则5: 回滚必须恢复所有人工改动字段（CRITICAL）
+
+**代码实现位置**：[archive_manager.py](file:///Users/lzy/pro/solo/workspaces/zy72275/archive_manager.py#L147-L202)
+
+回滚不是只改一个状态标记，而是按 `change_history` 逆向恢复每个被改动的字段：
+
+| 回滚行为 | 旧逻辑（已修复） | 新逻辑 |
+|---------|----------------|--------|
+| `processing_status` | 仅标成 `rollbacked` | 按 `coordinate_type` 重算（mixed→needs_review, lat_lng→pending） |
+| `inspection_photo_id` | 不恢复 | 恢复到许工改之前的值（如 None） |
+| `site_instruction` | 不恢复 | 恢复到改之前的值 |
+| `remark` | 不恢复 | 恢复到改之前的值 |
+| `coordinate_type` | 不变 | 不变（回滚不改坐标类型） |
+| 回滚记录 | 无细节 | 记录每个字段的回滚前后值和原改动人 |
+
+**关键点**：回滚后 `processing_status` 不是 `'rollbacked'`，而是根据 `coordinate_type` 重新计算的状态，保证与同一份最新坐标类型结果一致。
+
 ---
 
 ## 快速开始
@@ -159,10 +176,27 @@ python cli.py history <point_id>
 }
 ```
 
-### 5. 回滚记录
+### 5. 回滚记录（恢复所有人工改动字段）
 
 ```bash
+# 回滚全部变更
 python cli.py rollback <point_id> --operator 管理员
+
+# 回滚最近1步变更
+python cli.py rollback <point_id> --operator 管理员 --steps 1
+```
+
+**输出示例**：
+```
+回滚成功: 1e7232ecc06b4a5f
+回滚步数: 1
+当前状态: needs_review (坐标类型: mixed)
+
+恢复字段详情:
+  inspection_photo_id:
+    回滚前: PHOTO-2024-001
+    回滚后: None
+    原改动人: 许工
 ```
 
 ### 6. 查看汇总统计
@@ -272,8 +306,9 @@ python cli.py update <point_id> site_instruction "现场按坐标定位" --opera
 
 | 规则 | 文件 | 行号 |
 |------|------|------|
-| 坐标类型检测 | [coordinate_validator.py](file:///Users/lzy/pro/solo/workspaces/zy72275/coordinate_validator.py) | L15-L57 |
-| 处理状态判定 | [coordinate_validator.py](file:///Users/lzy/pro/solo/workspaces/zy72275/coordinate_validator.py) | L59-L68 |
-| 边界规则文档 | [coordinate_validator.py](file:///Users/lzy/pro/solo/workspaces/zy72275/coordinate_validator.py) | L70-L88 |
+| 坐标类型检测 | [coordinate_validator.py](file:///Users/lzy/pro/solo/workspaces/zy72275/coordinate_validator.py) | L15-L68 |
+| 处理状态判定 | [coordinate_validator.py](file:///Users/lzy/pro/solo/workspaces/zy72275/coordinate_validator.py) | L70-L79 |
+| 边界规则文档 | [coordinate_validator.py](file:///Users/lzy/pro/solo/workspaces/zy72275/coordinate_validator.py) | L81-L99 |
 | 重复导入去重 | [archive_manager.py](file:///Users/lzy/pro/solo/workspaces/zy72275/archive_manager.py) | L72-L82 |
 | 变更历史记录 | [archive_manager.py](file:///Users/lzy/pro/solo/workspaces/zy72275/archive_manager.py) | L114-L145 |
+| 回滚字段恢复 | [archive_manager.py](file:///Users/lzy/pro/solo/workspaces/zy72275/archive_manager.py) | L147-L202 |

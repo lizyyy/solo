@@ -41,12 +41,21 @@ def cmd_update(args):
 
 def cmd_rollback(args):
     manager = ArchiveManager()
-    success = manager.rollback_point(args.point_id, args.operator)
-    if success:
-        print(f"回滚成功: {args.point_id}")
-    else:
+    result = manager.rollback_point(args.point_id, args.operator, steps=args.steps or 0)
+    if result is None:
         print(f"回滚失败: 记录不存在或无变更历史")
         sys.exit(1)
+    
+    print(f"回滚成功: {result['point_id']}")
+    print(f"回滚步数: {result['steps_reverted']}")
+    print(f"当前状态: {result['current_status']} (坐标类型: {result['current_coordinate_type']})")
+    print()
+    print("恢复字段详情:")
+    for field, detail in result['reverted_fields'].items():
+        print(f"  {field}:")
+        print(f"    回滚前: {detail['before_rollback']}")
+        print(f"    回滚后: {detail['after_rollback']}")
+        print(f"    原改动人: {detail['original_change_operator']}")
 
 
 def cmd_history(args):
@@ -191,6 +200,71 @@ X=100.5, Y=200.3 副井2号
     
     print()
     print("=" * 60)
+    print("回放复盘: 回滚mixed记录，验证人工改动字段被恢复")
+    print("=" * 60)
+    
+    if mixed_point:
+        p_before = manager.get_point(mixed_point.id)
+        print(f"回滚前状态:")
+        print(f"  processing_status  = {p_before.processing_status}")
+        print(f"  inspection_photo_id = {p_before.inspection_photo_id}")
+        print(f"  remark             = {p_before.remark}")
+        print(f"  site_instruction   = {p_before.site_instruction}")
+        print(f"  coordinate_type    = {p_before.coordinate_type}")
+        print()
+        
+        rollback_result = manager.rollback_point(mixed_point.id, '巡检组管理员')
+        
+        p_after = manager.get_point(mixed_point.id)
+        print(f"回滚后状态 (回滚 {rollback_result['steps_reverted']} 步):")
+        print(f"  processing_status  = {p_after.processing_status}")
+        print(f"  inspection_photo_id = {p_after.inspection_photo_id}")
+        print(f"  remark             = {p_after.remark}")
+        print(f"  site_instruction   = {p_after.site_instruction}")
+        print(f"  coordinate_type    = {p_after.coordinate_type}")
+        print()
+        
+        print("字段恢复详情:")
+        for field, detail in rollback_result['reverted_fields'].items():
+            print(f"  {field}: {detail['before_rollback']} -> {detail['after_rollback']} (原改动人: {detail['original_change_operator']})")
+        print()
+        
+        assert p_after.inspection_photo_id is None, f"回滚失败: inspection_photo_id 未恢复, 仍为 {p_after.inspection_photo_id}"
+        assert p_after.processing_status == 'needs_review', f"回滚失败: processing_status 应为 needs_review, 实为 {p_after.processing_status}"
+        assert p_after.coordinate_type == 'mixed', f"回滚失败: coordinate_type 被改掉了, 实为 {p_after.coordinate_type}"
+        print("✓ 断言通过: inspection_photo_id 已恢复为 None")
+        print("✓ 断言通过: processing_status 按坐标类型重算为 needs_review (mixed → needs_review)")
+        print("✓ 断言通过: coordinate_type 未被改动，仍为 mixed")
+    
+    print()
+    print("=" * 60)
+    print("回放复盘: 回滚normal坐标记录，验证现场说明被恢复")
+    print("=" * 60)
+    
+    normal_points = [p for p in manager.get_all_points() if p.coordinate_type != 'mixed']
+    if normal_points:
+        np = normal_points[0]
+        p_before = manager.get_point(np.id)
+        print(f"回滚前 ({np.id}):")
+        print(f"  site_instruction   = {p_before.site_instruction}")
+        print(f"  processing_status  = {p_before.processing_status}")
+        print()
+        
+        rollback_result = manager.rollback_point(np.id, '巡检组管理员')
+        
+        p_after = manager.get_point(np.id)
+        print(f"回滚后:")
+        print(f"  site_instruction   = {p_after.site_instruction}")
+        print(f"  processing_status  = {p_after.processing_status}")
+        print()
+        
+        assert p_after.site_instruction is None, f"回滚失败: site_instruction 未恢复, 仍为 {p_after.site_instruction}"
+        assert p_after.processing_status == 'pending', f"回滚失败: processing_status 应为 pending, 实为 {p_after.processing_status}"
+        print("✓ 断言通过: site_instruction 已恢复为 None")
+        print("✓ 断言通过: processing_status 按坐标类型重算为 pending (lat_lng → pending)")
+    
+    print()
+    print("=" * 60)
     print("导出巡检组复核数据 (mixed坐标不自动归为normal)")
     print("=" * 60)
     inspection = manager.export_for_inspection()
@@ -221,6 +295,7 @@ def main():
     rollback_parser = subparsers.add_parser('rollback', help='回滚记录')
     rollback_parser.add_argument('point_id', help='记录ID')
     rollback_parser.add_argument('--operator', required=True, help='操作人')
+    rollback_parser.add_argument('--steps', type=int, default=0, help='回滚步数(0=全部)')
     
     history_parser = subparsers.add_parser('history', help='查看记录历史')
     history_parser.add_argument('point_id', help='记录ID')
