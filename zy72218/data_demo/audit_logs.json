@@ -1,0 +1,308 @@
+[
+  {
+    "log_id": "d939014e-239b-4795-bbbe-ae78a36a16bb",
+    "business_no": "BIZ_DEMO_001",
+    "operator": "业务同事",
+    "action": "创建差异项",
+    "field_changed": "discrepancy",
+    "old_value": null,
+    "new_value": "拆分行待复核",
+    "reason": "同一业务号拆分为本金和手续费，系统不自动归正常，留待主管复核",
+    "affected_record_ids": [
+      "bcef5d92-afb0-476d-9cbc-769bf45aa535",
+      "dfbae5af-ea6c-4c28-a12a-8d12a5756dc0"
+    ],
+    "affected_calculation_fields": [
+      "status"
+    ],
+    "timestamp": "2026-06-08T20:08:03.680179"
+  },
+  {
+    "log_id": "e6c85255-cb91-438d-80ec-322638a81dee",
+    "business_no": "BIZ_DEMO_001",
+    "operator": "投研助理小周",
+    "action": "启动业务流程",
+    "field_changed": "workflow_step",
+    "old_value": null,
+    "new_value": "第一步：导入节假日顺延说明",
+    "reason": "开始处理发票池融资匹配三步流程",
+    "affected_record_ids": [
+      "bcef5d92-afb0-476d-9cbc-769bf45aa535",
+      "dfbae5af-ea6c-4c28-a12a-8d12a5756dc0"
+    ],
+    "affected_calculation_fields": [
+      "status"
+    ],
+    "timestamp": "2026-06-08T20:08:03.681110"
+  },
+  {
+    "log_id": "4d334661-9225-4a7d-84d7-ed7f88eac769",
+    "business_no": "BIZ_DEMO_001",
+    "operator": "投研助理小周",
+    "action": "更新匹配记录",
+    "field_changed": "holiday_extension_applied",
+    "old_value": false,
+    "new_value": true,
+    "reason": "导入节假日顺延说明，顺延 5 天：春节假期顺延",
+    "affected_record_ids": [
+      "bcef5d92-afb0-476d-9cbc-769bf45aa535",
+      "dfbae5af-ea6c-4c28-a12a-8d12a5756dc0"
+    ],
+    "affected_calculation_fields": [
+      "status",
+      "holiday_extension_applied"
+    ],
+    "timestamp": "2026-06-08T20:08:03.687136"
+  },
+  {
+    "log_id": "5ef9d02b-0063-42aa-ac34-f7460997f902",
+    "business_no": "BIZ_DEMO_001",
+    "operator": "投研助理小周",
+    "action": "更新匹配记录",
+    "field_changed": "status",
+    "old_value": "待主管复核",
+    "new_value": "待主管复核",
+    "reason": "导入节假日顺延说明，顺延 5 天：春节假期顺延",
+    "affected_record_ids": [
+      "bcef5d92-afb0-476d-9cbc-769bf45aa535",
+      "dfbae5af-ea6c-4c28-a12a-8d12a5756dc0"
+    ],
+    "affected_calculation_fields": [
+      "status",
+      "holiday_extension_applied"
+    ],
+    "timestamp": "2026-06-08T20:08:03.688044"
+  },
+  {
+    "log_id": "b34fb55c-6e4a-4b1b-9167-e673336f4a8c",
+    "business_no": "BIZ_DEMO_001",
+    "operator": "投研助理小周",
+    "action": "更新匹配记录",
+    "field_changed": "holiday_extension_applied",
+    "old_value": false,
+    "new_value": true,
+    "reason": "导入节假日顺延说明，顺延 5 天：春节假期顺延",
+    "affected_record_ids": [
+      "dfbae5af-ea6c-4c28-a12a-8d12a5756dc0",
+      "bcef5d92-afb0-476d-9cbc-769bf45aa535"
+    ],
+    "affected_calculation_fields": [
+      "status",
+      "holiday_extension_applied"
+    ],
+    "timestamp": "2026-06-08T20:08:03.690038"
+  },
+  {
+    "log_id": "81c98abd-1647-4f5a-9ec5-f450b9a7afb7",
+    "business_no": "BIZ_DEMO_001",
+    "operator": "投研助理小周",
+    "action": "更新匹配记录",
+    "field_changed": "status",
+    "old_value": "待主管复核",
+    "new_value": "待主管复核",
+    "reason": "导入节假日顺延说明，顺延 5 天：春节假期顺延",
+    "affected_record_ids": [
+      "dfbae5af-ea6c-4c28-a12a-8d12a5756dc0",
+      "bcef5d92-afb0-476d-9cbc-769bf45aa535"
+    ],
+    "affected_calculation_fields": [
+      "status",
+      "holiday_extension_applied"
+    ],
+    "timestamp": "2026-06-08T20:08:03.690877"
+  },
+  {
+    "log_id": "ab9ead8e-1ea4-410e-a66b-67f9dff950b6",
+    "business_no": "batch_manual",
+    "operator": "投研助理小周",
+    "action": "导入节假日顺延说明",
+    "field_changed": "import",
+    "old_value": null,
+    "new_value": "导入 1 条记录",
+    "reason": "批量导入节假日顺延说明",
+    "affected_record_ids": [],
+    "affected_calculation_fields": [],
+    "timestamp": "2026-06-08T20:08:03.691599"
+  },
+  {
+    "log_id": "e1a8b215-9d6b-415e-a05d-db2616d426bb",
+    "business_no": "BIZ_DEMO_001",
+    "operator": "投研助理小周",
+    "action": "更新匹配记录",
+    "field_changed": "tail_adjustment_applied",
+    "old_value": false,
+    "new_value": true,
+    "reason": "补录尾差调整条，调整金额 300.00 元：尾差调整",
+    "affected_record_ids": [
+      "bcef5d92-afb0-476d-9cbc-769bf45aa535",
+      "dfbae5af-ea6c-4c28-a12a-8d12a5756dc0"
+    ],
+    "affected_calculation_fields": [
+      "status",
+      "tail_adjustment_applied"
+    ],
+    "timestamp": "2026-06-08T20:08:03.703599"
+  },
+  {
+    "log_id": "f86cd185-550f-4902-8940-e8733db935f7",
+    "business_no": "BIZ_DEMO_001",
+    "operator": "投研助理小周",
+    "action": "更新匹配记录",
+    "field_changed": "status",
+    "old_value": "待主管复核",
+    "new_value": "待主管复核",
+    "reason": "补录尾差调整条，调整金额 300.00 元：尾差调整",
+    "affected_record_ids": [
+      "bcef5d92-afb0-476d-9cbc-769bf45aa535",
+      "dfbae5af-ea6c-4c28-a12a-8d12a5756dc0"
+    ],
+    "affected_calculation_fields": [
+      "status",
+      "tail_adjustment_applied"
+    ],
+    "timestamp": "2026-06-08T20:08:03.706567"
+  },
+  {
+    "log_id": "1561150e-d4b6-4cd9-9266-b0a2ec0e7036",
+    "business_no": "BIZ_DEMO_001",
+    "operator": "投研助理小周",
+    "action": "更新匹配记录",
+    "field_changed": "tail_adjustment_applied",
+    "old_value": false,
+    "new_value": true,
+    "reason": "补录尾差调整条，调整金额 300.00 元：尾差调整",
+    "affected_record_ids": [
+      "dfbae5af-ea6c-4c28-a12a-8d12a5756dc0",
+      "bcef5d92-afb0-476d-9cbc-769bf45aa535"
+    ],
+    "affected_calculation_fields": [
+      "status",
+      "tail_adjustment_applied"
+    ],
+    "timestamp": "2026-06-08T20:08:03.711230"
+  },
+  {
+    "log_id": "c73e674e-e010-4487-8b63-2de333bcca69",
+    "business_no": "BIZ_DEMO_001",
+    "operator": "投研助理小周",
+    "action": "更新匹配记录",
+    "field_changed": "status",
+    "old_value": "待主管复核",
+    "new_value": "待主管复核",
+    "reason": "补录尾差调整条，调整金额 300.00 元：尾差调整",
+    "affected_record_ids": [
+      "dfbae5af-ea6c-4c28-a12a-8d12a5756dc0",
+      "bcef5d92-afb0-476d-9cbc-769bf45aa535"
+    ],
+    "affected_calculation_fields": [
+      "status",
+      "tail_adjustment_applied"
+    ],
+    "timestamp": "2026-06-08T20:08:03.713861"
+  },
+  {
+    "log_id": "63d6cb42-d5ab-4d84-8fe4-c63cd793a535",
+    "business_no": "batch_manual",
+    "operator": "投研助理小周",
+    "action": "导入尾差调整条",
+    "field_changed": "import",
+    "old_value": null,
+    "new_value": "导入 1 条记录",
+    "reason": "批量导入尾差调整条",
+    "affected_record_ids": [],
+    "affected_calculation_fields": [],
+    "timestamp": "2026-06-08T20:08:03.718622"
+  },
+  {
+    "log_id": "b7f4ddc5-9c1e-44d5-b9bb-12a57c0bbffb",
+    "business_no": "BIZ_DEMO_001",
+    "operator": "投研助理小周",
+    "action": "冲突解决",
+    "field_changed": "resolution",
+    "old_value": "未解决",
+    "new_value": "已确认",
+    "reason": "尾差调整条有业务确认邮件",
+    "affected_record_ids": [
+      "bcef5d92-afb0-476d-9cbc-769bf45aa535",
+      "dfbae5af-ea6c-4c28-a12a-8d12a5756dc0"
+    ],
+    "affected_calculation_fields": [
+      "matched_amount",
+      "status"
+    ],
+    "timestamp": "2026-06-08T20:08:03.729130"
+  },
+  {
+    "log_id": "a9ead166-2c33-4264-bca9-ce7309eb9ed1",
+    "business_no": "BIZ_DEMO_001",
+    "operator": "结算主管老王",
+    "action": "更新匹配记录",
+    "field_changed": "status",
+    "old_value": "存在差异",
+    "new_value": "已匹配",
+    "reason": "结算主管复核拆分行：本金95000+手续费5000，拆分正确",
+    "affected_record_ids": [
+      "bcef5d92-afb0-476d-9cbc-769bf45aa535",
+      "dfbae5af-ea6c-4c28-a12a-8d12a5756dc0"
+    ],
+    "affected_calculation_fields": [
+      "status"
+    ],
+    "timestamp": "2026-06-08T20:08:03.754909"
+  },
+  {
+    "log_id": "12c9230a-f61e-4c7e-9c5e-5693b8bd260e",
+    "business_no": "BIZ_DEMO_001",
+    "operator": "结算主管老王",
+    "action": "更新匹配记录",
+    "field_changed": "status",
+    "old_value": "存在差异",
+    "new_value": "已匹配",
+    "reason": "结算主管复核拆分行：本金95000+手续费5000，拆分正确",
+    "affected_record_ids": [
+      "dfbae5af-ea6c-4c28-a12a-8d12a5756dc0",
+      "bcef5d92-afb0-476d-9cbc-769bf45aa535"
+    ],
+    "affected_calculation_fields": [
+      "status"
+    ],
+    "timestamp": "2026-06-08T20:08:03.756515"
+  },
+  {
+    "log_id": "c4e32131-0daf-4b59-b4e6-9d2a2622192d",
+    "business_no": "BIZ_DEMO_001",
+    "operator": "结算主管老王",
+    "action": "处理差异项",
+    "field_changed": "status",
+    "old_value": "已解决",
+    "new_value": "已解决",
+    "reason": "本金95000+手续费5000，拆分正确",
+    "affected_record_ids": [
+      "bcef5d92-afb0-476d-9cbc-769bf45aa535",
+      "dfbae5af-ea6c-4c28-a12a-8d12a5756dc0"
+    ],
+    "affected_calculation_fields": [
+      "matched_amount",
+      "status"
+    ],
+    "timestamp": "2026-06-08T20:08:03.759343"
+  },
+  {
+    "log_id": "b8e08391-61e5-4ac9-8397-359dc095edd8",
+    "business_no": "BIZ_DEMO_001",
+    "operator": "结算主管老王",
+    "action": "结算主管复核完成",
+    "field_changed": "workflow_step",
+    "old_value": "第三步：更新差异清单",
+    "new_value": "流程完成",
+    "reason": "主管复核拆分行：本金95000+手续费5000，拆分正确",
+    "affected_record_ids": [
+      "bcef5d92-afb0-476d-9cbc-769bf45aa535",
+      "dfbae5af-ea6c-4c28-a12a-8d12a5756dc0"
+    ],
+    "affected_calculation_fields": [
+      "status"
+    ],
+    "timestamp": "2026-06-08T20:08:03.771305"
+  }
+]

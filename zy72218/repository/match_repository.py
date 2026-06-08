@@ -1,3 +1,5 @@
+import json
+import os
 from typing import Dict, List, Optional, Any
 from collections import defaultdict
 from datetime import datetime
@@ -15,19 +17,23 @@ from models import (
     MatchStatus,
     RecordType,
     DiscrepancyStatus,
+    entity_to_dict,
+    dict_to_entity,
 )
 
 
 class MatchRepository:
-    _instance = None
+    _instances: Dict[Optional[str], "MatchRepository"] = {}
 
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super().__new__(cls)
-            cls._instance._initialize()
-        return cls._instance
+    def __new__(cls, data_dir: Optional[str] = None):
+        if data_dir not in cls._instances:
+            instance = super().__new__(cls)
+            instance._initialize(data_dir)
+            cls._instances[data_dir] = instance
+        return cls._instances[data_dir]
 
-    def _initialize(self):
+    def _initialize(self, data_dir: Optional[str] = None):
+        self._data_dir = data_dir
         self._match_records: Dict[str, FundMatchRecord] = {}
         self._invoices: Dict[str, Invoice] = {}
         self._holiday_extensions: Dict[str, HolidayExtension] = {}
@@ -39,11 +45,67 @@ class MatchRepository:
         self._self_check_results: List[SelfCheckResult] = []
         self._import_batches: Dict[str, List[str]] = defaultdict(list)
         self._business_no_to_records: Dict[str, List[str]] = defaultdict(list)
+        if data_dir:
+            os.makedirs(data_dir, exist_ok=True)
+            self._load_from_disk()
+
+    def _load_from_disk(self):
+        if not self._data_dir:
+            return
+        try:
+            self._invoices = {i.invoice_id: i for i in self._load_list("invoices.json", "Invoice")}
+            self._match_records = {r.record_id: r for r in self._load_list("match_records.json", "FundMatchRecord")}
+            self._holiday_extensions = {e.extension_id: e for e in self._load_list("holiday_extensions.json", "HolidayExtension")}
+            self._tail_adjustments = {a.adjustment_id: a for a in self._load_list("tail_adjustments.json", "TailAdjustment")}
+            self._discrepancies = {d.discrepancy_id: d for d in self._load_list("discrepancies.json", "DiscrepancyItem")}
+            self._audit_logs = self._load_list("audit_logs.json", "AuditLog")
+            ce_list = self._load_list("conflict_evidences.json", "ConflictEvidence")
+            self._conflict_evidences = {c.business_no: c for c in ce_list}
+            cr_list = self._load_list("conflict_resolutions.json", "ConflictResolution")
+            self._conflict_resolutions = {c.business_no: c for c in cr_list}
+            self._self_check_results = self._load_list("self_check_results.json", "SelfCheckResult")
+            for record in self._match_records.values():
+                self._business_no_to_records[record.business_no].append(record.record_id)
+        except (FileNotFoundError, json.JSONDecodeError):
+            pass
+
+    def _load_list(self, filename: str, class_name: str) -> list:
+        if not self._data_dir:
+            return []
+        filepath = os.path.join(self._data_dir, filename)
+        if not os.path.exists(filepath):
+            return []
+        with open(filepath, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return [dict_to_entity(class_name, item) for item in data]
+
+    def save_to_disk(self):
+        if not self._data_dir:
+            return
+        os.makedirs(self._data_dir, exist_ok=True)
+        self._save_list("invoices.json", list(self._invoices.values()), "Invoice")
+        self._save_list("match_records.json", list(self._match_records.values()), "FundMatchRecord")
+        self._save_list("holiday_extensions.json", list(self._holiday_extensions.values()), "HolidayExtension")
+        self._save_list("tail_adjustments.json", list(self._tail_adjustments.values()), "TailAdjustment")
+        self._save_list("discrepancies.json", list(self._discrepancies.values()), "DiscrepancyItem")
+        self._save_list("audit_logs.json", self._audit_logs, "AuditLog")
+        self._save_list("conflict_evidences.json", list(self._conflict_evidences.values()), "ConflictEvidence")
+        self._save_list("conflict_resolutions.json", list(self._conflict_resolutions.values()), "ConflictResolution")
+        self._save_list("self_check_results.json", self._self_check_results, "SelfCheckResult")
+
+    def _save_list(self, filename: str, items: list, class_name: str):
+        if not self._data_dir:
+            return
+        filepath = os.path.join(self._data_dir, filename)
+        data = [entity_to_dict(item) for item in items]
+        with open(filepath, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2, default=str)
 
     def add_match_record(self, record: FundMatchRecord) -> None:
         self._match_records[record.record_id] = record
         self._business_no_to_records[record.business_no].append(record.record_id)
         record.updated_at = datetime.now()
+        self.save_to_disk()
 
     def get_match_record(self, record_id: str) -> Optional[FundMatchRecord]:
         return self._match_records.get(record_id)
@@ -94,6 +156,7 @@ class MatchRepository:
         self._invoices[invoice.invoice_id] = invoice
         if invoice.import_batch:
             self._import_batches[invoice.import_batch].append(invoice.invoice_id)
+        self.save_to_disk()
 
     def get_invoice(self, invoice_id: str) -> Optional[Invoice]:
         return self._invoices.get(invoice_id)
@@ -109,6 +172,7 @@ class MatchRepository:
         self._holiday_extensions[extension.extension_id] = extension
         if extension.import_batch:
             self._import_batches[extension.import_batch].append(f"holiday_{extension.extension_id}")
+        self.save_to_disk()
 
     def get_holiday_extension(self, extension_id: str) -> Optional[HolidayExtension]:
         return self._holiday_extensions.get(extension_id)
@@ -126,6 +190,7 @@ class MatchRepository:
         self._tail_adjustments[adjustment.adjustment_id] = adjustment
         if adjustment.import_batch:
             self._import_batches[adjustment.import_batch].append(f"tail_{adjustment.adjustment_id}")
+        self.save_to_disk()
 
     def get_tail_adjustment(self, adjustment_id: str) -> Optional[TailAdjustment]:
         return self._tail_adjustments.get(adjustment_id)
@@ -141,6 +206,7 @@ class MatchRepository:
 
     def add_discrepancy(self, discrepancy: DiscrepancyItem) -> None:
         self._discrepancies[discrepancy.discrepancy_id] = discrepancy
+        self.save_to_disk()
 
     def get_discrepancy(self, discrepancy_id: str) -> Optional[DiscrepancyItem]:
         return self._discrepancies.get(discrepancy_id)
@@ -164,11 +230,13 @@ class MatchRepository:
             discrepancy.resolved_at = datetime.now()
             discrepancy.resolved_by = operator
             discrepancy.resolution_notes = notes
+            self.save_to_disk()
             return discrepancy
         return None
 
     def add_audit_log(self, log: AuditLog) -> None:
         self._audit_logs.append(log)
+        self.save_to_disk()
 
     def get_audit_logs_by_business_no(self, business_no: str) -> List[AuditLog]:
         return [log for log in self._audit_logs if log.business_no == business_no]
@@ -178,6 +246,7 @@ class MatchRepository:
 
     def add_conflict_evidence(self, evidence: ConflictEvidence) -> None:
         self._conflict_evidences[evidence.business_no] = evidence
+        self.save_to_disk()
 
     def get_conflict_evidence(self, business_no: str) -> Optional[ConflictEvidence]:
         return self._conflict_evidences.get(business_no)
@@ -208,9 +277,25 @@ class MatchRepository:
 
     def add_self_check_result(self, result: SelfCheckResult) -> None:
         self._self_check_results.append(result)
+        self.save_to_disk()
 
     def get_self_check_results(self) -> List[SelfCheckResult]:
         return list(self._self_check_results)
 
     def clear_all(self) -> None:
-        self._initialize()
+        self._match_records.clear()
+        self._invoices.clear()
+        self._holiday_extensions.clear()
+        self._tail_adjustments.clear()
+        self._discrepancies.clear()
+        self._audit_logs.clear()
+        self._conflict_evidences.clear()
+        self._conflict_resolutions.clear()
+        self._self_check_results.clear()
+        self._import_batches.clear()
+        self._business_no_to_records.clear()
+        self.save_to_disk()
+
+    @classmethod
+    def reset_instances(cls):
+        cls._instances.clear()

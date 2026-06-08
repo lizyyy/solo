@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>差异清单</h1>
+<div class="card">
+    {% if discrepancies %}
+    <table>
+        <thead>
+            <tr>
+                <th>差异ID</th>
+                <th>业务号</th>
+                <th>差异类型</th>
+                <th>描述</th>
+                <th>预期值</th>
+                <th>实际值</th>
+                <th>状态</th>
+                <th>拆分行</th>
+                <th>需主管复核</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for d in discrepancies %}
+            <tr class="{% if d.is_split_record %}split-row{% endif %}">
+                <td>{{ d.discrepancy_id[:8] }}...</td>
+                <td>{{ d.business_no }}</td>
+                <td>{{ d.discrepancy_type }}</td>
+                <td>{{ d.description }}</td>
+                <td>{{ "%.2f"|format(d.expected_value) if d.expected_value else '-' }}</td>
+                <td>{{ "%.2f"|format(d.actual_value) if d.actual_value else '-' }}</td>
+                <td>
+                    <span class="badge {% if '待处理' in d.status.value %}badge-pending{% elif '已解决' in d.status.value %}badge-matched{% else %}badge-discrepancy{% endif %}">
+                        {{ d.status.value }}
+                    </span>
+                </td>
+                <td>{{ '是' if d.is_split_record else '否' }}</td>
+                <td>{{ '是' if d.requires_supervisor_review else '否' }}</td>
+                <td>
+                    <a href="/audit/{{ d.business_no }}" class="btn btn-warning" style="font-size:12px;padding:4px 8px;">审计</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>暂无差异项。</p>
+    {% endif %}
+</div>
+{% endblock %}

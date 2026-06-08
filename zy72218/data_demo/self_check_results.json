@@ -1,0 +1,326 @@
+[
+  {
+    "check_type": "重复导入检测",
+    "passed": true,
+    "business_no": null,
+    "message": "未检测到重复导入记录",
+    "details": {},
+    "checked_at": "2026-06-08T20:08:03.692407"
+  },
+  {
+    "check_type": "同一业务号拆分检测",
+    "passed": true,
+    "business_no": "BIZ_DEMO_001",
+    "message": "业务号 BIZ_DEMO_001 拆分为 2 行记录：本金 95000.00 元，手续费 5000.00 元，合并 0.00 元。 结构正常，待主管复核。",
+    "details": {
+      "record_count": 2,
+      "has_principal": true,
+      "has_fee": true,
+      "principal_amount": 95000.0,
+      "fee_amount": 5000.0,
+      "combined_amount": 0,
+      "total_amount": 100000.0,
+      "record_ids": [
+        "bcef5d92-afb0-476d-9cbc-769bf45aa535",
+        "dfbae5af-ea6c-4c28-a12a-8d12a5756dc0"
+      ],
+      "record_types": [
+        "本金",
+        "手续费"
+      ],
+      "requires_supervisor_review": true
+    },
+    "checked_at": "2026-06-08T20:08:03.692425"
+  },
+  {
+    "check_type": "补录后重算校验",
+    "passed": false,
+    "business_no": "BIZ_DEMO_001",
+    "message": "业务号 BIZ_DEMO_001 补录后需要重算：存在补录的节假日顺延或尾差调整，金额已变更",
+    "details": {
+      "reason": "存在补录的节假日顺延或尾差调整，金额已变更",
+      "original_amount": 100000.0,
+      "current_amount": 100000.0,
+      "expected_amount": 100499.99999999999,
+      "difference": 499.99999999998545,
+      "affected_record_ids": [
+        "bcef5d92-afb0-476d-9cbc-769bf45aa535",
+        "dfbae5af-ea6c-4c28-a12a-8d12a5756dc0"
+      ],
+      "supplementary_data": [
+        "节假日顺延 5 天"
+      ]
+    },
+    "checked_at": "2026-06-08T20:08:03.692432"
+  },
+  {
+    "check_type": "导出一致性校验",
+    "passed": true,
+    "business_no": null,
+    "message": "导出明细、页面展示、接口返回共 2 条记录完全一致",
+    "details": {
+      "record_count": 2
+    },
+    "checked_at": "2026-06-08T20:08:03.692451"
+  },
+  {
+    "check_type": "重复导入检测",
+    "passed": true,
+    "business_no": null,
+    "message": "未检测到重复导入记录",
+    "details": {},
+    "checked_at": "2026-06-08T20:08:03.724530"
+  },
+  {
+    "check_type": "同一业务号拆分检测",
+    "passed": true,
+    "business_no": "BIZ_DEMO_001",
+    "message": "业务号 BIZ_DEMO_001 拆分为 2 行记录：本金 95000.00 元，手续费 5000.00 元，合并 0.00 元。 结构正常，待主管复核。",
+    "details": {
+      "record_count": 2,
+      "has_principal": true,
+      "has_fee": true,
+      "principal_amount": 95000.0,
+      "fee_amount": 5000.0,
+      "combined_amount": 0,
+      "total_amount": 100000.0,
+      "record_ids": [
+        "bcef5d92-afb0-476d-9cbc-769bf45aa535",
+        "dfbae5af-ea6c-4c28-a12a-8d12a5756dc0"
+      ],
+      "record_types": [
+        "本金",
+        "手续费"
+      ],
+      "requires_supervisor_review": true
+    },
+    "checked_at": "2026-06-08T20:08:03.724549"
+  },
+  {
+    "check_type": "补录后重算校验",
+    "passed": false,
+    "business_no": "BIZ_DEMO_001",
+    "message": "业务号 BIZ_DEMO_001 补录后需要重算：存在补录的节假日顺延或尾差调整，金额已变更",
+    "details": {
+      "reason": "存在补录的节假日顺延或尾差调整，金额已变更",
+      "original_amount": 100000.0,
+      "current_amount": 100000.0,
+      "expected_amount": 100799.99999999999,
+      "difference": 799.9999999999854,
+      "affected_record_ids": [
+        "bcef5d92-afb0-476d-9cbc-769bf45aa535",
+        "dfbae5af-ea6c-4c28-a12a-8d12a5756dc0"
+      ],
+      "supplementary_data": [
+        "节假日顺延 5 天",
+        "尾差调整 300.00 元"
+      ]
+    },
+    "checked_at": "2026-06-08T20:08:03.724557"
+  },
+  {
+    "check_type": "导出一致性校验",
+    "passed": true,
+    "business_no": null,
+    "message": "导出明细、页面展示、接口返回共 2 条记录完全一致",
+    "details": {
+      "record_count": 2
+    },
+    "checked_at": "2026-06-08T20:08:03.724575"
+  },
+  {
+    "check_type": "重复导入检测",
+    "passed": true,
+    "business_no": null,
+    "message": "未检测到重复导入记录",
+    "details": {},
+    "checked_at": "2026-06-08T20:08:03.730328"
+  },
+  {
+    "check_type": "同一业务号拆分检测",
+    "passed": true,
+    "business_no": "BIZ_DEMO_001",
+    "message": "业务号 BIZ_DEMO_001 拆分为 2 行记录：本金 95000.00 元，手续费 5000.00 元，合并 0.00 元。 结构正常，待主管复核。",
+    "details": {
+      "record_count": 2,
+      "has_principal": true,
+      "has_fee": true,
+      "principal_amount": 95000.0,
+      "fee_amount": 5000.0,
+      "combined_amount": 0,
+      "total_amount": 100000.0,
+      "record_ids": [
+        "bcef5d92-afb0-476d-9cbc-769bf45aa535",
+        "dfbae5af-ea6c-4c28-a12a-8d12a5756dc0"
+      ],
+      "record_types": [
+        "本金",
+        "手续费"
+      ],
+      "requires_supervisor_review": true
+    },
+    "checked_at": "2026-06-08T20:08:03.730339"
+  },
+  {
+    "check_type": "补录后重算校验",
+    "passed": false,
+    "business_no": "BIZ_DEMO_001",
+    "message": "业务号 BIZ_DEMO_001 补录后需要重算：存在补录的节假日顺延或尾差调整，金额已变更",
+    "details": {
+      "reason": "存在补录的节假日顺延或尾差调整，金额已变更",
+      "original_amount": 100300.0,
+      "current_amount": 100300.0,
+      "expected_amount": 100799.99999999999,
+      "difference": 499.99999999998545,
+      "affected_record_ids": [
+        "bcef5d92-afb0-476d-9cbc-769bf45aa535",
+        "dfbae5af-ea6c-4c28-a12a-8d12a5756dc0"
+      ],
+      "supplementary_data": [
+        "节假日顺延 5 天",
+        "尾差调整 300.00 元"
+      ]
+    },
+    "checked_at": "2026-06-08T20:08:03.730344"
+  },
+  {
+    "check_type": "导出一致性校验",
+    "passed": true,
+    "business_no": null,
+    "message": "导出明细、页面展示、接口返回共 2 条记录完全一致",
+    "details": {
+      "record_count": 2
+    },
+    "checked_at": "2026-06-08T20:08:03.730361"
+  },
+  {
+    "check_type": "重复导入检测",
+    "passed": true,
+    "business_no": null,
+    "message": "未检测到重复导入记录",
+    "details": {},
+    "checked_at": "2026-06-08T20:08:03.738864"
+  },
+  {
+    "check_type": "同一业务号拆分检测",
+    "passed": true,
+    "business_no": "BIZ_DEMO_001",
+    "message": "业务号 BIZ_DEMO_001 拆分为 2 行记录：本金 95000.00 元，手续费 5000.00 元，合并 0.00 元。 结构正常，待主管复核。",
+    "details": {
+      "record_count": 2,
+      "has_principal": true,
+      "has_fee": true,
+      "principal_amount": 95000.0,
+      "fee_amount": 5000.0,
+      "combined_amount": 0,
+      "total_amount": 100000.0,
+      "record_ids": [
+        "bcef5d92-afb0-476d-9cbc-769bf45aa535",
+        "dfbae5af-ea6c-4c28-a12a-8d12a5756dc0"
+      ],
+      "record_types": [
+        "本金",
+        "手续费"
+      ],
+      "requires_supervisor_review": true
+    },
+    "checked_at": "2026-06-08T20:08:03.738876"
+  },
+  {
+    "check_type": "补录后重算校验",
+    "passed": false,
+    "business_no": "BIZ_DEMO_001",
+    "message": "业务号 BIZ_DEMO_001 补录后需要重算：存在补录的节假日顺延或尾差调整，金额已变更",
+    "details": {
+      "reason": "存在补录的节假日顺延或尾差调整，金额已变更",
+      "original_amount": 100300.0,
+      "current_amount": 100300.0,
+      "expected_amount": 100799.99999999999,
+      "difference": 499.99999999998545,
+      "affected_record_ids": [
+        "bcef5d92-afb0-476d-9cbc-769bf45aa535",
+        "dfbae5af-ea6c-4c28-a12a-8d12a5756dc0"
+      ],
+      "supplementary_data": [
+        "节假日顺延 5 天",
+        "尾差调整 300.00 元"
+      ]
+    },
+    "checked_at": "2026-06-08T20:08:03.738882"
+  },
+  {
+    "check_type": "导出一致性校验",
+    "passed": true,
+    "business_no": null,
+    "message": "导出明细、页面展示、接口返回共 2 条记录完全一致",
+    "details": {
+      "record_count": 2
+    },
+    "checked_at": "2026-06-08T20:08:03.738900"
+  },
+  {
+    "check_type": "重复导入检测",
+    "passed": true,
+    "business_no": null,
+    "message": "未检测到重复导入记录",
+    "details": {},
+    "checked_at": "2026-06-08T20:08:03.761543"
+  },
+  {
+    "check_type": "同一业务号拆分检测",
+    "passed": true,
+    "business_no": "BIZ_DEMO_001",
+    "message": "业务号 BIZ_DEMO_001 拆分为 2 行记录：本金 95000.00 元，手续费 5000.00 元，合并 0.00 元。 结构正常，待主管复核。",
+    "details": {
+      "record_count": 2,
+      "has_principal": true,
+      "has_fee": true,
+      "principal_amount": 95000.0,
+      "fee_amount": 5000.0,
+      "combined_amount": 0,
+      "total_amount": 100000.0,
+      "record_ids": [
+        "bcef5d92-afb0-476d-9cbc-769bf45aa535",
+        "dfbae5af-ea6c-4c28-a12a-8d12a5756dc0"
+      ],
+      "record_types": [
+        "本金",
+        "手续费"
+      ],
+      "requires_supervisor_review": true
+    },
+    "checked_at": "2026-06-08T20:08:03.761562"
+  },
+  {
+    "check_type": "补录后重算校验",
+    "passed": false,
+    "business_no": "BIZ_DEMO_001",
+    "message": "业务号 BIZ_DEMO_001 补录后需要重算：存在补录的节假日顺延或尾差调整，金额已变更",
+    "details": {
+      "reason": "存在补录的节假日顺延或尾差调整，金额已变更",
+      "original_amount": 100300.0,
+      "current_amount": 100300.0,
+      "expected_amount": 100799.99999999999,
+      "difference": 499.99999999998545,
+      "affected_record_ids": [
+        "bcef5d92-afb0-476d-9cbc-769bf45aa535",
+        "dfbae5af-ea6c-4c28-a12a-8d12a5756dc0"
+      ],
+      "supplementary_data": [
+        "节假日顺延 5 天",
+        "尾差调整 300.00 元"
+      ]
+    },
+    "checked_at": "2026-06-08T20:08:03.761570"
+  },
+  {
+    "check_type": "导出一致性校验",
+    "passed": true,
+    "business_no": null,
+    "message": "导出明细、页面展示、接口返回共 2 条记录完全一致",
+    "details": {
+      "record_count": 2
+    },
+    "checked_at": "2026-06-08T20:08:03.761590"
+  }
+]

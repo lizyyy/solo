@@ -25,6 +25,7 @@ from services import (
 
 class TestConflictDetection(unittest.TestCase):
     def setUp(self):
+        MatchRepository.reset_instances()
         self.repo = MatchRepository()
         self.repo.clear_all()
         self.conflict_detector = ConflictDetector(self.repo)
@@ -171,6 +172,7 @@ class TestConflictDetection(unittest.TestCase):
 
 class TestSelfChecks(unittest.TestCase):
     def setUp(self):
+        MatchRepository.reset_instances()
         self.repo = MatchRepository()
         self.repo.clear_all()
         self.self_checker = SelfChecker(self.repo)
@@ -363,6 +365,7 @@ class TestSelfChecks(unittest.TestCase):
 
 class TestAuditTrail(unittest.TestCase):
     def setUp(self):
+        MatchRepository.reset_instances()
         self.repo = MatchRepository()
         self.repo.clear_all()
         self.audit_service = AuditService(self.repo)
@@ -472,6 +475,7 @@ class TestAuditTrail(unittest.TestCase):
 
 class TestThreeStepWorkflow(unittest.TestCase):
     def setUp(self):
+        MatchRepository.reset_instances()
         self.repo = MatchRepository()
         self.repo.clear_all()
         self.workflow = WorkflowEngine(self.repo)

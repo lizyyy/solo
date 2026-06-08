@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>审计追踪 - {{ business_no }}</h1>
+
+<div class="card">
+    <h2>影响范围分析</h2>
+    <dl>
+        <dt>业务号</dt><dd>{{ impact.business_no }}</dd>
+        <dt>总变更次数</dt><dd>{{ impact.total_changes }}</dd>
+        <dt>操作人</dt><dd>{{ impact.unique_operators|join(', ') }}</dd>
+        <dt>受影响记录</dt><dd>{{ impact.affected_record_ids|length }} 条</dd>
+        <dt>受影响计算字段</dt><dd>{{ impact.affected_calculation_fields|join(', ') }}</dd>
+    </dl>
+</div>
+
+<div class="card">
+    <h2>变更时间线</h2>
+    {% if impact.change_timeline %}
+    <table>
+        <thead>
+            <tr>
+                <th>时间</th>
+                <th>操作人</th>
+                <th>操作</th>
+                <th>修改字段</th>
+                <th>旧值</th>
+                <th>新值</th>
+                <th>原因</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in impact.change_timeline %}
+            <tr>
+                <td>{{ log.timestamp[:19] }}</td>
+                <td>{{ log.operator }}</td>
+                <td>{{ log.action }}</td>
+                <td>{{ log.field_changed }}</td>
+                <td>{{ log.old_value }}</td>
+                <td>{{ log.new_value }}</td>
+                <td>{{ log.reason }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>暂无变更记录。</p>
+    {% endif %}
+</div>
+
+<div class="actions">
+    <a href="/api/export/audit/{{ business_no }}/excel" class="btn btn-primary">导出审计日志Excel</a>
+</div>
+{% endblock %}

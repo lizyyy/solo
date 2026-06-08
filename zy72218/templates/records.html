@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>匹配记录明细</h1>
+<div class="card">
+    {% if records %}
+    <table>
+        <thead>
+            <tr>
+                <th>记录ID</th>
+                <th>业务号</th>
+                <th>记录类型</th>
+                <th>预期金额</th>
+                <th>匹配金额</th>
+                <th>匹配日期</th>
+                <th>状态</th>
+                <th>拆分行</th>
+                <th>节假日顺延</th>
+                <th>尾差调整</th>
+                <th>对应行类型</th>
+                <th>合并金额</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in records %}
+            <tr class="{% if r.is_split_record %}split-row{% elif '冲突' in r.status %}conflict-row{% endif %}">
+                <td>{{ r.record_id[:8] }}...</td>
+                <td>{{ r.business_no }}</td>
+                <td>{{ r.record_type }}</td>
+                <td>{{ "%.2f"|format(r.expected_amount) }}</td>
+                <td>{{ "%.2f"|format(r.matched_amount) }}</td>
+                <td>{{ r.match_date or '-' }}</td>
+                <td>
+                    {% if '冲突' in r.status %}<span class="badge badge-conflict">{{ r.status }}</span>
+                    {% elif '差异' in r.status %}<span class="badge badge-discrepancy">{{ r.status }}</span>
+                    {% elif '复核' in r.status %}<span class="badge badge-review">{{ r.status }}</span>
+                    {% elif '已匹配' in r.status %}<span class="badge badge-matched">{{ r.status }}</span>
+                    {% else %}<span class="badge badge-pending">{{ r.status }}</span>
+                    {% endif %}
+                </td>
+                <td>{{ '是' if r.is_split_record else '否' }}</td>
+                <td>{{ '是' if r.holiday_extension_applied else '否' }}</td>
+                <td>{{ '是' if r.tail_adjustment_applied else '否' }}</td>
+                <td>{{ r.counterpart_type or '-' }}</td>
+                <td>{{ "%.2f"|format(r.combined_amount) if r.combined_amount else '-' }}</td>
+                <td>
+                    <a href="/audit/{{ r.business_no }}" class="btn btn-warning" style="font-size:12px;padding:4px 8px;">审计</a>
+                    {% if '冲突' in r.status %}
+                    <a href="/conflict/{{ r.business_no }}" class="btn btn-danger" style="font-size:12px;padding:4px 8px;">冲突</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>暂无匹配记录。</p>
+    {% endif %}
+</div>
+{% endblock %}

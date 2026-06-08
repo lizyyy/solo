@@ -1,0 +1,36 @@
+[
+  {
+    "record_id": "bcef5d92-afb0-476d-9cbc-769bf45aa535",
+    "business_no": "BIZ_DEMO_001",
+    "record_type": "本金",
+    "expected_amount": 95000.0,
+    "matched_amount": 95285.0,
+    "match_date": "2026-06-08",
+    "status": "已匹配",
+    "related_record_id": "dfbae5af-ea6c-4c28-a12a-8d12a5756dc0",
+    "invoice_ids": [],
+    "calculation_details": {},
+    "holiday_extension_applied": true,
+    "tail_adjustment_applied": true,
+    "created_at": "2026-06-08T20:08:03.678357",
+    "updated_at": "2026-06-08T20:08:03.754864",
+    "updated_by": "结算主管老王"
+  },
+  {
+    "record_id": "dfbae5af-ea6c-4c28-a12a-8d12a5756dc0",
+    "business_no": "BIZ_DEMO_001",
+    "record_type": "手续费",
+    "expected_amount": 5000.0,
+    "matched_amount": 5015.0,
+    "match_date": "2026-06-08",
+    "status": "已匹配",
+    "related_record_id": "bcef5d92-afb0-476d-9cbc-769bf45aa535",
+    "invoice_ids": [],
+    "calculation_details": {},
+    "holiday_extension_applied": true,
+    "tail_adjustment_applied": true,
+    "created_at": "2026-06-08T20:08:03.678368",
+    "updated_at": "2026-06-08T20:08:03.756495",
+    "updated_by": "结算主管老王"
+  }
+]

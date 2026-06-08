@@ -11,6 +11,7 @@ from models import (
     ConflictEvidence,
     MatchStatus,
     DiscrepancyStatus,
+    entity_to_dict,
 )
 from repository import MatchRepository
 from services.matching_engine import MatchingEngine
@@ -160,7 +161,7 @@ class WorkflowEngine:
             "tail_adjustment": adjustment,
             "affected_records": len(records),
             "conflicts_found": len(conflicts),
-            "conflict_evidence": [asdict(c) for c in conflicts] if conflicts else [],
+            "conflict_evidence": [entity_to_dict(c) for c in conflicts] if conflicts else [],
             "self_check_results": [
                 {"type": r.check_type.value, "passed": r.passed, "message": r.message}
                 for r in check_results
@@ -487,8 +488,3 @@ class WorkflowEngine:
             warnings.append("存在金额差异记录，请在更新差异清单时处理。")
 
         return warnings
-
-
-def asdict(obj):
-    from dataclasses import asdict
-    return asdict(obj)

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>冲突决策 - {{ decision.business_no }}</h1>
+
+<div class="conflict-box">
+    <h3>⚠️ 检测到规则冲突</h3>
+    <p>{{ decision.description }}</p>
+    <div class="warning">
+        <strong>{{ decision.warning }}</strong>
+    </div>
+
+    <h2>冲突证据</h2>
+    <table class="evidence-table">
+        <thead>
+            <tr>
+                <th>数据来源</th>
+                <th>来源详情</th>
+                <th>结论/规则</th>
+                <th>计算金额</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for e in decision.conflict_evidence %}
+            <tr>
+                <td><strong>{{ e.source }}</strong></td>
+                <td>{{ e.source_detail }}</td>
+                <td>{{ e.conclusion }}</td>
+                <td>{{ "%.2f"|format(e.calculated_amount) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <p><strong>差异金额：</strong>{{ "%.2f"|format(decision.difference) }} 元</p>
+
+    <h2>请手动选择</h2>
+    <div class="actions">
+        <form method="POST" action="/api/resolve-conflict" style="display:inline;">
+            <input type="hidden" name="business_no" value="{{ decision.business_no }}">
+            <input type="hidden" name="action" value="confirm_holiday">
+            <button type="submit" class="btn btn-primary">确认采用节假日顺延说明结论</button>
+        </form>
+        <form method="POST" action="/api/resolve-conflict" style="display:inline;">
+            <input type="hidden" name="business_no" value="{{ decision.business_no }}">
+            <input type="hidden" name="action" value="confirm_tail">
+            <button type="submit" class="btn btn-success">确认采用尾差调整条结论</button>
+        </form>
+        <form method="POST" action="/api/resolve-conflict" style="display:inline;">
+            <input type="hidden" name="business_no" value="{{ decision.business_no }}">
+            <input type="hidden" name="action" value="reject_both">
+            <button type="submit" class="btn btn-danger">驳回两者，要求业务重新提供</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

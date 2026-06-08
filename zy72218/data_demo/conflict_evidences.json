@@ -1,0 +1,13 @@
+[
+  {
+    "business_no": "BIZ_DEMO_001",
+    "holiday_conclusion": "顺延5天，按日利率0.1%计息",
+    "tail_adjustment_rule": "尾差调整300元",
+    "holiday_amount": 100499.99999999999,
+    "tail_adjustment_amount": 100300.0,
+    "difference": 199.99999999998545,
+    "description": "业务号 BIZ_DEMO_001 存在规则冲突：节假日顺延说明结论金额 100500.00 与尾差调整条计算金额 100300.00 不一致，差异 200.00 元。",
+    "holiday_source": "节假日顺延说明 [f4a42ca0-8b35-4dbb-84b4-e01f5e7fda8e]，导入批次：None",
+    "tail_adjustment_source": "尾差调整条 [3a64b065-8dd7-491c-a601-68ac813e291a]，导入批次：None"
+  }
+]

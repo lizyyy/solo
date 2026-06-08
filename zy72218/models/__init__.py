@@ -13,6 +13,7 @@ from .entities import (
     SelfCheckResult,
     SelfCheckType,
 )
+from .serialization import entity_to_dict, dict_to_entity, save_to_json, load_from_json
 
 __all__ = [
     "Invoice",
@@ -28,4 +29,8 @@ __all__ = [
     "ConflictResolution",
     "SelfCheckResult",
     "SelfCheckType",
+    "entity_to_dict",
+    "dict_to_entity",
+    "save_to_json",
+    "load_from_json",
 ]

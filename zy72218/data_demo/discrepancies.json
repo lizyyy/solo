@@ -1,0 +1,21 @@
+[
+  {
+    "discrepancy_id": "ad460971-7fc5-4a1a-ae40-5f081d63ad19",
+    "business_no": "BIZ_DEMO_001",
+    "discrepancy_type": "拆分行复核",
+    "description": "同一业务号拆分为本金和手续费两行，待结算主管复核",
+    "expected_value": 100000.0,
+    "actual_value": 100000.0,
+    "status": "已解决",
+    "related_record_ids": [
+      "bcef5d92-afb0-476d-9cbc-769bf45aa535",
+      "dfbae5af-ea6c-4c28-a12a-8d12a5756dc0"
+    ],
+    "is_split_record": true,
+    "requires_supervisor_review": true,
+    "created_at": "2026-06-08T20:08:03.679618",
+    "resolved_at": "2026-06-08T20:08:03.757923",
+    "resolved_by": "结算主管老王",
+    "resolution_notes": "本金95000+手续费5000，拆分正确"
+  }
+]

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>业务流程 - {{ business_no }}</h1>
+
+{% if state %}
+<div class="card">
+    <h2>当前步骤</h2>
+    <dl>
+        <dt>业务号</dt><dd>{{ state.business_no }}</dd>
+        <dt>当前步骤</dt><dd>{{ state.current_step.value }}</dd>
+        <dt>是否有拆分行</dt><dd>{{ '是' if state.has_split_records else '否' }}</dd>
+        <dt>是否有冲突</dt><dd>{{ '是' if state.has_conflict else '否' }}</dd>
+        <dt>冲突已解决</dt><dd>{{ '是' if state.conflict_resolved else '否' }}</dd>
+        <dt>需要主管复核</dt><dd>{{ '是' if state.requires_supervisor_review else '否' }}</dd>
+    </dl>
+</div>
+{% endif %}
+
+{% if records %}
+<div class="card">
+    <h2>匹配记录</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>记录类型</th>
+                <th>预期金额</th>
+                <th>匹配金额</th>
+                <th>状态</th>
+                <th>拆分行</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in records %}
+            <tr class="{% if r.is_split_record() %}split-row{% endif %}">
+                <td>{{ r.record_type.value }}</td>
+                <td>{{ "%.2f"|format(r.expected_amount) }}</td>
+                <td>{{ "%.2f"|format(r.matched_amount) }}</td>
+                <td>{{ r.status.value }}</td>
+                <td>{{ '是' if r.is_split_record() else '否' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endblock %}
