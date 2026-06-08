@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>犬只疫苗回访追踪</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+  body { background: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; }
+  .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+  .fade-in { animation: fadeIn .25s ease-out; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:none; } }
+  .timeline-dot { box-shadow: 0 0 0 4px rgba(59,130,246,.15); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useMemo, useCallback, useRef } = React;
+
+/* ============================================================
+ *  本地存储工具：筛选条件 / 人工备注 / 页面摘要 刷新后同步
+ * ============================================================ */
+const STORAGE_KEY = 'dog_vaccine_tracker_v1';
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  return null;
+}
+function saveState(partial) {
+  const cur = loadState() || {};
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...cur, ...partial }));
+}
+
+/* ============================================================
+ *  演示数据（含后补备注 + 体重单位混写的"不干净样例"）
+ * ============================================================ */
+const DEMO_DOGS = [
+  {
+    id: 'D2024-001',
+    name: '大黄',
+    chip: '900123456700001',
+    breed: '中华田园犬',
+    age: 3,
+    rescueDate: '2024-03-12',
+    weightRecords: [
+      { date: '2024-03-12', value: 15.2, unit: 'kg', source: '入站体检' },
+      { date: '2024-06-20', value: 16000, unit: 'g',  source: '病历手写单-李' },
+      { date: '2024-09-15', value: 34,    unit: '斤', source: '临时称重-小乔' },
+    ],
+    vaccines: [
+      { date: '2024-03-15', type: '狂犬疫苗', batch: 'RV2024A-031', dose: '1头份', site: '右后肢', givenBy: '王医生', source: '系统录入' },
+      { date: '2024-04-20', type: '四联疫苗', batch: 'DHP2024B-117', dose: '1头份', site: '颈背',   givenBy: '王医生', source: '系统录入' },
+      { date: '2024-07-20', type: '四联疫苗', batch: 'DHP2024B-242', dose: '1头份', site: '颈背',   givenBy: '李医生', source: '病历手写单' },
+    ],
+    followUps: [
+      { date: '2024-03-22', type: '疫苗后反应', content: '精神良好，食欲正常，注射部位无肿胀。', conclusion: '无异常', by: '小乔' },
+      { date: '2024-04-27', type: '疫苗后回访', content: '活泼，排便成型。', conclusion: '无异常', by: '小乔' },
+      { date: '2024-07-27', type: '疫苗后回访', content: '略嗜睡半天，次日恢复。', conclusion: '轻度反应-无碍', by: '小乔' },
+    ],
+    status: 'processed',
+    handNotes: [
+      { id: 'N1', time: '2024-07-21 09:12', author: '小乔', content: '李医生手写四联单日期模糊，对照7月疫苗出库台账确认为7月20日接种。', isSupplementary: false, changedJudgments: [] },
+      { id: 'N2', time: '2024-09-16 17:48', author: '小乔', content: '下午换班前补：9月15日称重记录原为"34"无单位，结合救助站惯例及前后变化，确认单位为"斤"（=17kg），体重呈稳定增长趋势，不影响下次疫苗接种判断。',
+        isSupplementary: true,
+        changedJudgments: [
+          { field: '体重判断', before: '数据缺失单位，无法判断是否达标16kg接种建议阈值', after: '确认17kg，满足体重要求，接种前无需额外观察' },
+          { field: '下次疫苗窗口', before: '因体重单位不明，暂缓排期', after: '可按常规排期（2025-01月四联+狂犬加强）' },
+        ]
+      },
+    ],
+    blockReason: null,
+    evidenceMissing: [],
+  },
+  {
+    id: 'D2024-002',
+    name: '小黑',
+    chip: '900123456700002',
+    breed: '拉布拉多串',
+    age: 1,
+    rescueDate: '2024-05-01',
+    weightRecords: [
+      { date: '2024-05-01', value: 8.5,  unit: 'kg', source: '入站体检' },
+      { date: '2024-08-02', value: 14200,unit: 'g',  source: '病历手写单-王' },
+    ],
+    vaccines: [
+      { date: '2024-05-05', type: '二联疫苗', batch: 'DP2024A-078', dose: '1头份', site: '颈背', givenBy: '王医生', source: '系统录入' },
+      { date: '2024-06-10', type: '四联疫苗', batch: 'DHP2024B-103', dose: '1头份', site: '颈背', givenBy: '王医生', source: '系统录入' },
+    ],
+    followUps: [
+      { date: '2024-05-12', type: '疫苗后回访', content: '轻微发热39.1℃，24h后退。', conclusion: '轻度反应-无碍', by: '小赵' },
+      { date: '2024-06-17', type: '疫苗后回访', content: '一切正常。', conclusion: '无异常', by: '小乔' },
+    ],
+    status: 'evidence',
+    handNotes: [
+      { id: 'N3', time: '2024-08-05 10:00', author: '小乔', content: '8月2日四联加强接种有手写记录，但系统未录入，且疫苗批号缺失。', isSupplementary: false, changedJudgments: [] },
+    ],
+    blockReason: null,
+    evidenceMissing: ['缺少8月2日四联疫苗的批号及兽医签字扫描件', '缺少8月疫苗后回访记录'],
+  },
+  {
+    id: 'D2024-003',
+    name: '豆豆',
+    chip: '900123456700003',
+    breed: '博美',
+    age: 5,
+    rescueDate: '2023-11-20',
+    weightRecords: [
+      { date: '2023-11-20', value: 4.2, unit: 'kg', source: '入站体检' },
+      { date: '2024-02-10', value: 3900,unit: 'g',  source: '病历手写单-李' },
+      { date: '2024-06-01', value: 4.5, unit: 'kg', source: '系统称重' },
+    ],
+    vaccines: [
+      { date: '2023-11-25', type: '狂犬疫苗', batch: 'RV2023A-221', dose: '1头份', site: '右后肢', givenBy: '李医生', source: '系统录入' },
+      { date: '2023-12-20', type: '六联疫苗', batch: 'DHLPP2023-145', dose: '1头份', site: '颈背', givenBy: '李医生', source: '系统录入' },
+      { date: '2024-06-15', type: '六联疫苗', batch: 'DHLPP2024-088', dose: '1头份', site: '颈背', givenBy: '王医生', source: '系统录入' },
+    ],
+    followUps: [
+      { date: '2023-12-02', type: '疫苗后回访', content: '无异常。', conclusion: '无异常', by: '小乔' },
+      { date: '2024-01-05', type: '月度体检', content: '心率正常，牙齿有少量结石。', conclusion: '建议洁牙', by: '王医生' },
+      { date: '2024-06-22', type: '疫苗后回访', content: '注射部位出现直径约2cm硬结。', conclusion: '留观-需复查', by: '小乔' },
+      { date: '2024-07-01', type: '硬结复查', content: '硬结仍在，大小未变，无红肿破溃。', conclusion: '卡壳-建议送检', by: '李医生' },
+    ],
+    status: 'blocked',
+    handNotes: [
+      { id: 'N4', time: '2024-07-02 09:30', author: '李医生', content: '硬结持续16天不消退，建议细针抽吸送检，与领养人沟通后暂拒绝有创操作，目前观察中。', isSupplementary: false, changedJudgments: [] },
+    ],
+    blockReason: '疫苗后硬结持续不退，待确认是否需要送检或继续观察',
+    evidenceMissing: [],
+  },
+  {
+    id: 'D2024-004',
+    name: '花花',
+    chip: '900123456700004',
+    breed: '边牧',
+    age: 2,
+    rescueDate: '2024-01-18',
+    weightRecords: [
+      { date: '2024-01-18', value: 18.5, unit: 'kg', source: '入站体检' },
+      { date: '2024-04-20', value: 42,   unit: '斤', source: '病历手写单-乔' },
+      { date: '2024-07-10', value: 22.1, unit: 'kg', source: '系统称重' },
+    ],
+    vaccines: [
+      { date: '2024-01-22', type: '狂犬疫苗', batch: 'RV2024A-005', dose: '1头份', site: '右后肢', givenBy: '王医生', source: '系统录入' },
+      { date: '2024-02-25', type: '六联疫苗', batch: 'DHLPP2024-022', dose: '1头份', site: '颈背', givenBy: '王医生', source: '系统录入' },
+      { date: '2024-04-26', type: '六联疫苗', batch: 'DHLPP2024-055', dose: '1头份', site: '颈背', givenBy: '李医生', source: '系统录入' },
+      { date: '2024-07-20', type: '狂犬疫苗', batch: 'RV2024B-078', dose: '1头份', site: '左后肢', givenBy: '李医生', source: '系统录入' },
+    ],
+    followUps: [
+      { date: '2024-01-29', type: '疫苗后回访', content: '无异常。', conclusion: '无异常', by: '小赵' },
+      { date: '2024-03-03', type: '疫苗后回访', content: '无异常。', conclusion: '无异常', by: '小乔' },
+      { date: '2024-05-02', type: '疫苗后回访', content: '无异常。', conclusion: '无异常', by: '小乔' },
+      { date: '2024-07-27', type: '疫苗后回访', content: '无异常。', conclusion: '无异常', by: '小乔' },
+    ],
+    status: 'processed',
+    handNotes: [],
+    blockReason: null,
+    evidenceMissing: [],
+  },
+  {
+    id: 'D2024-005',
+    name: '小白',
+    chip: '900123456700005',
+    breed: '比熊',
+    age: 4,
+    rescueDate: '2024-02-02',
+    weightRecords: [
+      { date: '2024-02-02', value: 6800, unit: 'g',  source: '入站体检' },
+      { date: '2024-05-02', value: 7.1,  unit: 'kg', source: '系统称重' },
+    ],
+    vaccines: [
+      { date: '2024-02-10', type: '狂犬疫苗', batch: 'RV2024A-044', dose: '1头份', site: '右后肢', givenBy: '王医生', source: '系统录入' },
+      { date: '2024-03-15', type: '六联疫苗', batch: 'DHLPP2024-033', dose: '1头份', site: '颈背', givenBy: '王医生', source: '系统录入' },
+    ],
+    followUps: [
+      { date: '2024-02-17', type: '疫苗后回访', content: '无异常。', conclusion: '无异常', by: '小乔' },
+      { date: '2024-03-22', type: '疫苗后回访', content: '无异常。', conclusion: '无异常', by: '小赵' },
+    ],
+    status: 'evidence',
+    handNotes: [
+      { id: 'N5', time: '2024-06-01 14:00', author: '小乔', content: '6联加强应于5月15日接种，但未找到手写记录或系统记录。', isSupplementary: false, changedJudgments: [] },
+    ],
+    blockReason: null,
+    evidenceMissing: ['5月15日六联加强疫苗接种记录（系统+手写）', '接种人签字'],
+  },
+];
+
+/* 后续导入用的"重复数据"（部分重复 + 人工备注保护验证用） */
+const DEMO_IMPORT_BATCH = [
+  {
+    id: 'D2024-001',
+    name: '大黄',
+    weightRecords: [
+      { date: '2024-09-15', value: 34, unit: '斤', source: '临时称重-小乔' },
+      { date: '2024-11-01', value: 17.8, unit: 'kg', source: '系统称重' },
+    ],
+    vaccines: [
+      { date: '2024-07-20', type: '四联疫苗', batch: 'DHP2024B-242', dose: '1头份', site: '颈背', givenBy: '李医生', source: '重复导入测试' },
+    ],
+    followUps: [],
+  },
+  {
+    id: 'D2024-006',
+    name: '阿黄（新）',
+    chip: '900123456700006',
+    breed: '金毛串',
+    age: 2,
+    rescueDate: '2024-08-10',
+    weightRecords: [
+      { date: '2024-08-10', value: 21.3, unit: 'kg', source: '入站体检' },
+    ],
+    vaccines: [
+      { date: '2024-08-15', type: '狂犬疫苗', batch: 'RV2024B-021', dose: '1头份', site: '右后肢', givenBy: '李医生', source: '导入' },
+    ],
+    followUps: [],
+    status: 'evidence',
+    handNotes: [],
+    blockReason: null,
+    evidenceMissing: ['缺少首次六联疫苗接种记录'],
+  },
+];
+
+/* ============================================================
+ *  工具函数
+ * ============================================================ */
+function toKg(value, unit) {
+  if (unit === 'kg') return Number(value);
+  if (unit === 'g')  return Number(value) / 1000;
+  if (unit === '斤') return Number(value) / 2;
+  return Number(value);
+}
+function fmtWeightKg(v) {
+  if (v == null) return '—';
+  return `${v.toFixed(2)} kg`;
+}
+function hasWeightUnitMix(records) {
+  if (!records || records.length < 2) return false;
+  const units = new Set(records.map(r => r.unit).filter(Boolean));
+  return units.size > 1;
+}
+function weightAdvice(records) {
+  if (!hasWeightUnitMix(records)) return null;
+  const noUnit = records.filter(r => !r.unit);
+  if (noUnit.length) {
+    const earliest = [...noUnit].sort((a,b)=>a.date.localeCompare(b.date))[0];
+    return { level: 'danger', text: `发现 ${noUnit.length} 条无单位记录，最先需补：${earliest.date} 的称重记录（来源：${earliest.source || '未知'}）` };
+  }
+  const units = [...new Set(records.map(r=>r.unit))];
+  const latest = [...records].sort((a,b)=>b.date.localeCompare(a.date))[0];
+  return { level: 'warn', text: `体重记录混用单位：${units.join(' / ')}。建议先补「${latest.date}（${latest.source}）」的确认记录，统一以 kg 归档。` };
+}
+
+const STATUS_META = {
+  processed: { label: '已处理',   color: 'bg-emerald-500', light: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+  evidence:  { label: '待补证据', color: 'bg-amber-500',   light: 'bg-amber-50 text-amber-700 border-amber-200' },
+  blocked:   { label: '卡壳中',   color: 'bg-rose-500',    light: 'bg-rose-50 text-rose-700 border-rose-200' },
+};
+
+/* ============================================================
+ *  主组件
+ * ============================================================ */
+function App() {
+  const initial = loadState();
+
+  const [dogs, setDogs] = useState(DEMO_DOGS);
+  const [activeTab, setActiveTab] = useState(initial?.activeTab || 'all');
+  const [filters, setFilters] = useState(initial?.filters || {
+    keyword: '',
+    vaccineType: '',
+    conclusion: '',
+    onlyWeightMix: false,
+    onlySupplementary: false,
+  });
+  const [pageSummary, setPageSummary] = useState(initial?.pageSummary || '');
+  const [pageSummaryBy, setPageSummaryBy] = useState(initial?.pageSummaryBy || '小乔');
+  const [selectedDogId, setSelectedDogId] = useState(null);
+  const [showAddNote, setShowAddNote] = useState(false);
+  const [showImport, setShowImport] = useState(false);
+  const [importReport, setImportReport] = useState(null);
+  const [toast, setToast] = useState(null);
+
+  /* 持久化关键状态 */
+  useEffect(() => { saveState({ activeTab, filters, pageSummary, pageSummaryBy }); }, [activeTab, filters, pageSummary, pageSummaryBy]);
+
+  /* 自动摘要草稿 */
+  const autoSummary = useMemo(() => {
+    const total = dogs.length;
+    const p = dogs.filter(d => d.status === 'processed').length;
+    const e = dogs.filter(d => d.status === 'evidence').length;
+    const b = dogs.filter(d => d.status === 'blocked').length;
+    const mixCount = dogs.filter(d => hasWeightUnitMix(d.weightRecords)).length;
+    const supplCount = dogs.reduce((n, d) => n + d.handNotes.filter(h => h.isSupplementary).length, 0);
+    return `本批次共 ${total} 只，已处理 ${p} 只，待补证据 ${e} 只，卡壳中 ${b} 只。其中 ${mixCount} 只存在体重单位混写需要核实，共 ${supplCount} 条为换班临时后补备注，请优先查看判断变更项。`;
+  }, [dogs]);
+
+  /* 筛选后的犬只列表 */
+  const filtered = useMemo(() => {
+    return dogs.filter(d => {
+      if (activeTab !== 'all' && d.status !== activeTab) return false;
+      if (filters.keyword) {
+        const k = filters.keyword.toLowerCase();
+        if (!(`${d.name}${d.id}${d.chip}${d.breed}`.toLowerCase().includes(k))) return false;
+      }
+      if (filters.vaccineType && !d.vaccines.some(v => v.type === filters.vaccineType)) return false;
+      if (filters.conclusion && !d.followUps.some(f => f.conclusion === filters.conclusion)) return false;
+      if (filters.onlyWeightMix && !hasWeightUnitMix(d.weightRecords)) return false;
+      if (filters.onlySupplementary && !d.handNotes.some(h => h.isSupplementary)) return false;
+      return true;
+    });
+  }, [dogs, activeTab, filters]);
+
+  const selectedDog = dogs.find(d => d.id === selectedDogId) || null;
+
+  /* ============== 操作函数 ============== */
+  const showToast = (msg, type='success') => {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 2600);
+  };
+
+  const addNote = (dogId, notePayload) => {
+    setDogs(prev => prev.map(d => d.id === dogId ? {
+      ...d,
+      handNotes: [...d.handNotes, { id: 'N' + Date.now(), time: new Date().toLocaleString('zh-CN', { hour12: false }).replace(/\//g,'-'), ...notePayload }],
+    } : d));
+    showToast('备注已添加');
+  };
+
+  const doImport = () => {
+    const report = { added: 0, skippedDuplicate: 0, noteProtected: 0, merged: 0 };
+    const dogsMap = new Map(dogs.map(d => [d.id, { ...d, vaccines: [...d.vaccines], followUps: [...d.followUps], weightRecords: [...d.weightRecords] }]));
+    const existingNotes = new Map(dogs.map(d => [d.id, d.handNotes.length]));
+
+    DEMO_IMPORT_BATCH.forEach(incoming => {
+      const existed = dogsMap.get(incoming.id);
+      if (!existed) {
+        dogsMap.set(incoming.id, {
+          evidenceMissing: [], handNotes: [], blockReason: null, status: 'evidence',
+          ...incoming,
+        });
+        report.added++;
+        return;
+      }
+      /* 合并疫苗（按日期+类型+批号去重） */
+      const vacKey = v => `${v.date}|${v.type}|${v.batch}`;
+      const oldVacs = new Set(existed.vaccines.map(vacKey));
+      let vacAdded = 0;
+      (incoming.vaccines || []).forEach(v => {
+        if (!oldVacs.has(vacKey(v))) { existed.vaccines.push(v); vacAdded++; }
+      });
+      /* 合并体重记录（去重） */
+      const wtKey = w => `${w.date}|${w.value}|${w.unit}`;
+      const oldWt = new Set(existed.weightRecords.map(wtKey));
+      (incoming.weightRecords || []).forEach(w => {
+        if (!oldWt.has(wtKey(w))) existed.weightRecords.push(w);
+      });
+      /* 合并回访（去重） */
+      const fuKey = f => `${f.date}|${f.type}|${f.content}`;
+      const oldFu = new Set(existed.followUps.map(fuKey));
+      (incoming.followUps || []).forEach(f => {
+        if (!oldFu.has(fuKey(f))) existed.followUps.push(f);
+      });
+      /* 人工备注：保留原有的，绝不覆盖（即使传入也忽略） */
+      const noteCountBefore = existed.handNotes.length;
+      /* existed.handNotes 不做任何替换 */
+      report.skippedDuplicate++;
+      if (vacAdded > 0 || (incoming.weightRecords || []).length > 0) report.merged++;
+      if (existingNotes.get(incoming.id) > 0 && existed.handNotes.length === noteCountBefore) {
+        report.noteProtected++;
+      }
+    });
+    setDogs(Array.from(dogsMap.values()));
+    setImportReport(report);
+    showToast('导入完成');
+  };
+
+  /* ============== 渲染 ============== */
+  return (
+    <div className="min-h-screen">
+      {/* 顶部标题 + 页面摘要 */}
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-20 shadow-sm">
+        <div className="max-w-[1280px] mx-auto px-6 py-4">
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div>
+              <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+                <span className="w-2 h-6 bg-blue-600 rounded-sm"/>
+                犬只疫苗回访追踪
+              </h1>
+              <p className="text-xs text-slate-500 mt-1">救助站 · 病历手写单 / 系统记录 合并校对</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={() => setShowImport(true)}
+                className="px-3.5 py-2 rounded-lg bg-white border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-50 flex items-center gap-1.5">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                导入演示数据
+              </button>
+              <button onClick={() => setShowAddNote(true)}
+                className="px-3.5 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 flex items-center gap-1.5 shadow-sm">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                换班前补备注
+              </button>
+            </div>
+          </div>
+
+          {/* 页面摘要区 —— 筛选条件/人工备注/页面摘要三者联动，刷新不丢失 */}
+          <div className="mt-4 p-3.5 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100">
+            <div className="flex items-start gap-3">
+              <div className="mt-0.5 text-blue-600">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs font-semibold text-blue-900 tracking-wide">页面摘要（筛选 · 备注 · 摘要同步持久化）</label>
+                  <div className="flex items-center gap-2">
+                    <input value={pageSummaryBy} onChange={e => setPageSummaryBy(e.target.value)}
+                      className="w-20 text-xs px-2 py-1 rounded border border-blue-200 bg-white/70 outline-none focus:ring-1 focus:ring-blue-400"
+                      placeholder="记录人"/>
+                    <button onClick={() => { setPageSummary(autoSummary); showToast('已填入自动摘要'); }}
+                      className="text-xs px-2.5 py-1 rounded-md bg-white/80 text-blue-700 border border-blue-200 hover:bg-white">使用自动摘要</button>
+                  </div>
+                </div>
+                <textarea value={pageSummary} onChange={e => setPageSummary(e.target.value)}
+                  rows="2"
+                  placeholder="这里填写给负责人看的整体进展说明，刷新后与筛选条件、人工备注一起保留……"
+                  className="w-full text-sm text-slate-700 px-3 py-2 rounded-lg bg-white/80 border border-blue-100 outline-none focus:ring-2 focus:ring-blue-200 resize-none scrollbar-thin"/>
+                {pageSummary && <p className="mt-1 text-[11px] text-blue-600/70">· 已自动保存至本地，刷新页面不丢失</p>}
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-[1280px] mx-auto px-6 py-6">
+        {/* 分类标签 + 统计 */}
+        <div className="grid grid-cols-4 gap-3 mb-5">
+          <StatusCard label="全部记录" count={dogs.length} color="bg-slate-600" active={activeTab==='all'} onClick={()=>setActiveTab('all')}/>
+          <StatusCard label="已处理"   count={dogs.filter(d=>d.status==='processed').length} color="bg-emerald-500" active={activeTab==='processed'} onClick={()=>setActiveTab('processed')}/>
+          <StatusCard label="待补证据" count={dogs.filter(d=>d.status==='evidence').length}  color="bg-amber-500"   active={activeTab==='evidence'}  onClick={()=>setActiveTab('evidence')}/>
+          <StatusCard label="卡壳中"   count={dogs.filter(d=>d.status==='blocked').length}   color="bg-rose-500"    active={activeTab==='blocked'}   onClick={()=>setActiveTab('blocked')}/>
+        </div>
+
+        {/* 筛选条件 */}
+        <div className="bg-white rounded-xl border border-slate-200 p-4 mb-5 shadow-sm">
+          <div className="flex items-center gap-2 mb-3">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+            <span className="text-sm font-medium text-slate-700">筛选条件（刷新后保留）</span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+            <div>
+              <label className="text-[11px] text-slate-500">关键字</label>
+              <input value={filters.keyword} onChange={e=>setFilters({...filters, keyword:e.target.value})}
+                placeholder="姓名 / 编号 / 芯片 / 品种"
+                className="w-full mt-1 px-3 py-2 text-sm rounded-lg border border-slate-200 outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100"/>
+            </div>
+            <div>
+              <label className="text-[11px] text-slate-500">疫苗类型</label>
+              <select value={filters.vaccineType} onChange={e=>setFilters({...filters, vaccineType:e.target.value})}
+                className="w-full mt-1 px-3 py-2 text-sm rounded-lg border border-slate-200 outline-none focus:border-blue-400 bg-white">
+                <option value="">全部</option>
+                <option>狂犬疫苗</option><option>二联疫苗</option><option>四联疫苗</option>
+                <option>六联疫苗</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-[11px] text-slate-500">回访结论</label>
+              <select value={filters.conclusion} onChange={e=>setFilters({...filters, conclusion:e.target.value})}
+                className="w-full mt-1 px-3 py-2 text-sm rounded-lg border border-slate-200 outline-none focus:border-blue-400 bg-white">
+                <option value="">全部</option>
+                <option>无异常</option><option>轻度反应-无碍</option>
+                <option>留观-需复查</option><option>卡壳-建议送检</option><option>建议洁牙</option>
+              </select>
+            </div>
+            <label className="flex items-end gap-2 lg:col-span-1">
+              <input type="checkbox" checked={filters.onlyWeightMix}
+                onChange={e=>setFilters({...filters, onlyWeightMix:e.target.checked})}
+                className="w-4 h-4 rounded text-amber-600 focus:ring-amber-400"/>
+              <span className="text-sm text-slate-700">仅看体重单位混写</span>
+            </label>
+            <label className="flex items-end gap-2 lg:col-span-1">
+              <input type="checkbox" checked={filters.onlySupplementary}
+                onChange={e=>setFilters({...filters, onlySupplementary:e.target.checked})}
+                className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-400"/>
+              <span className="text-sm text-slate-700">仅看含后补备注</span>
+            </label>
+          </div>
+          <div className="mt-3 flex items-center justify-between">
+            <p className="text-xs text-slate-500">
+              结果：<span className="font-semibold text-slate-700">{filtered.length}</span> / {dogs.length} 条
+            </p>
+            <button onClick={()=>setFilters({ keyword:'', vaccineType:'', conclusion:'', onlyWeightMix:false, onlySupplementary:false })}
+              className="text-xs text-slate-500 hover:text-slate-700 underline underline-offset-2">重置筛选</button>
+          </div>
+        </div>
+
+        {/* 记录列表 */}
+        <div className="space-y-4">
+          {filtered.length === 0 && (
+            <div className="bg-white rounded-xl border border-dashed border-slate-300 p-10 text-center text-slate-500 text-sm">
+              没有符合条件的记录
+            </div>
+          )}
+          {filtered.map(dog => (
+            <DogCard key={dog.id} dog={dog} onOpen={() => setSelectedDogId(dog.id)} />
+          ))}
+        </div>
+
+        <p className="mt-8 text-[11px] text-slate-400 text-center">
+          演示数据说明：内置 5 条初始数据（含 1 条后补备注 + 多条体重单位混写案例）。点击「导入演示数据」可验证重复导入去重与人工备注保护机制。
+        </p>
+      </main>
+
+      {/* 详情抽屉 */}
+      {selectedDog && (
+        <DetailDrawer dog={selectedDog} onClose={() => setSelectedDogId(null)}
+          onAddNote={(payload) => addNote(selectedDog.id, payload)} />
+      )}
+
+      {/* 补备注弹窗 */}
+      {showAddNote && (
+        <AddNoteModal
+          dogs={dogs}
+          onClose={() => setShowAddNote(false)}
+          onConfirm={(dogId, payload) => { addNote(dogId, payload); setShowAddNote(false); }}
+        />
+      )}
+
+      {/* 导入弹窗 */}
+      {showImport && (
+        <ImportModal
+          onClose={() => { setShowImport(false); setImportReport(null); }}
+          onRun={() => doImport()}
+          report={importReport}
+          preview={DEMO_IMPORT_BATCH}
+        />
+      )}
+
+      {/* Toast */}
+      {toast && (
+        <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 px-4 py-2.5 rounded-lg shadow-lg text-sm text-white fade-in z-50 ${
+          toast.type==='success' ? 'bg-slate-800' : toast.type==='warn' ? 'bg-amber-600' : 'bg-rose-600'
+        }`}>{toast.msg}</div>
+      )}
+    </div>
+  );
+}
+
+/* ============================================================
+ *  小组件
+ * ============================================================ */
+function StatusCard({ label, count, color, active, onClick }) {
+  return (
+    <button onClick={onClick}
+      className={`text-left p-4 rounded-xl border transition-all ${
+        active
+          ? 'bg-white border-slate-300 shadow-md ring-2 ring-blue-100'
+          : 'bg-white border-slate-200 hover:border-slate-300 hover:shadow-sm'
+      }`}>
+      <div className="flex items-center gap-3">
+        <span className={`inline-block w-2.5 h-2.5 rounded-full ${color}`}></span>
+        <span className="text-sm text-slate-600">{label}</span>
+      </div>
+      <div className="mt-2 text-2xl font-bold text-slate-800">{count}</div>
+    </button>
+  );
+}
+
+function DogCard({ dog, onOpen }) {
+  const status = STATUS_META[dog.status];
+  const mix = hasWeightUnitMix(dog.weightRecords);
+  const advice = weightAdvice(dog.weightRecords);
+  const lastVaccine = [...dog.vaccines].sort((a,b)=>b.date.localeCompare(a.date))[0];
+  const lastFollowUp = [...dog.followUps].sort((a,b)=>b.date.localeCompare(a.date))[0];
+  const hasSuppl = dog.handNotes.some(h => h.isSupplementary);
+  const latestWt = [...dog.weightRecords].sort((a,b)=>b.date.localeCompare(a.date))[0];
+
+  return (
+    <div className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow overflow-hidden fade-in">
+      <div className="p-5">
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3 className="text-lg font-bold text-slate-800">{dog.name}</h3>
+              <span className={`text-xs px-2 py-0.5 rounded-full border ${status.light}`}>{status.label}</span>
+              {hasSuppl && (
+                <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 flex items-center gap-1">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
+                  含后补备注
+                </span>
+              )}
+              {mix && (
+                <span className={`text-xs px-2 py-0.5 rounded-full border flex items-center gap-1 ${
+                  advice?.level==='danger' ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-amber-50 text-amber-700 border-amber-200'
+                }`}>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                  体重单位混写
+                </span>
+              )}
+            </div>
+            <div className="mt-2 text-xs text-slate-500 flex items-center gap-3 flex-wrap">
+              <span>编号 <span className="text-slate-700 font-mono">{dog.id}</span></span>
+              <span>芯片 <span className="text-slate-700 font-mono">{dog.chip}</span></span>
+              <span>品种 <span className="text-slate-700">{dog.breed}</span></span>
+              <span>年龄 <span className="text-slate-700">{dog.age} 岁</span></span>
+              <span>入站 <span className="text-slate-700">{dog.rescueDate}</span></span>
+            </div>
+          </div>
+          <button onClick={onOpen}
+            className="px-3.5 py-2 rounded-lg bg-slate-50 border border-slate-200 text-slate-700 text-sm font-medium hover:bg-slate-100 flex items-center gap-1">
+            查看时间线
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+
+        {/* 关键信息横栏 */}
+        <div className="mt-4 grid grid-cols-1 md:grid-cols-4 gap-3">
+          <InfoTile label="最近一次疫苗" value={lastVaccine ? `${lastVaccine.date} ${lastVaccine.type}` : '—'} sub={lastVaccine?.batch || ''}/>
+          <InfoTile label="最近一次回访" value={lastFollowUp ? `${lastFollowUp.date} ${lastFollowUp.type}` : '—'} sub={lastFollowUp?.conclusion || ''}/>
+          <InfoTile label="最近体重（原始）"
+            value={latestWt ? `${latestWt.value} ${latestWt.unit}` : '—'}
+            sub={latestWt ? `折合 ${fmtWeightKg(toKg(latestWt.value, latestWt.unit))}` : ''}/>
+          <InfoTile label="手写单备注" value={`${dog.handNotes.length} 条`}
+            sub={dog.handNotes.length ? `最近：${dog.handNotes[dog.handNotes.length-1].time.slice(5,16)}` : '暂无'}/>
+        </div>
+
+        {/* 体重单位混写提示 */}
+        {advice && (
+          <div className={`mt-4 p-3 rounded-lg border text-sm flex items-start gap-2 ${
+            advice.level==='danger' ? 'bg-rose-50 border-rose-200 text-rose-800' : 'bg-amber-50 border-amber-200 text-amber-800'
+          }`}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="mt-0.5 flex-shrink-0"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <div>
+              <div className="font-semibold mb-0.5">体重单位混写提示（接手人请先处理）</div>
+              <div className="text-sm opacity-95">{advice.text}</div>
+            </div>
+          </div>
+        )}
+
+        {/* 卡壳原因 / 待补证据 */}
+        {dog.status === 'blocked' && dog.blockReason && (
+          <div className="mt-3 p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-sm">
+            <span className="font-semibold">卡壳原因：</span>{dog.blockReason}
+          </div>
+        )}
+        {dog.status === 'evidence' && dog.evidenceMissing?.length > 0 && (
+          <div className="mt-3 p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-sm">
+            <div className="font-semibold mb-1">待补证据清单：</div>
+            <ul className="list-disc list-inside space-y-0.5 text-sm">
+              {dog.evidenceMissing.map((it, i) => <li key={i}>{it}</li>)}
+            </ul>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function InfoTile({ label, value, sub }) {
+  return (
+    <div className="p-3 rounded-lg bg-slate-50 border border-slate-100">
+      <div className="text-[11px] text-slate-500 tracking-wide">{label}</div>
+      <div className="mt-1 text-sm font-semibold text-slate-800 truncate">{value}</div>
+      {sub && <div className="mt-0.5 text-[11px] text-slate-500 truncate">{sub}</div>}
+    </div>
+  );
+}
+
+/* ============================================================
+ *  详情抽屉 —— 时间线（系统 + 手写单主线拼合）
+ * ============================================================ */
+function DetailDrawer({ dog, onClose, onAddNote }) {
+  const mix = hasWeightUnitMix(dog.weightRecords);
+  const advice = weightAdvice(dog.weightRecords);
+  const [showAdd, setShowAdd] = useState(false);
+  const [noteText, setNoteText] = useState('');
+  const [isSupplementary, setIsSupplementary] = useState(true);
+  const [author, setAuthor] = useState('小乔');
+  const [changes, setChanges] = useState([{ field: '', before: '', after: '' }]);
+
+  const timeline = useMemo(() => {
+    const arr = [];
+    dog.weightRecords.forEach(w => arr.push({ date: w.date, kind: 'weight', data: w }));
+    dog.vaccines.forEach(v => arr.push({ date: v.date, kind: 'vaccine', data: v }));
+    dog.followUps.forEach(f => arr.push({ date: f.date, kind: 'followup', data: f }));
+    return arr.sort((a,b) => a.date.localeCompare(b.date));
+  }, [dog]);
+
+  const submit = () => {
+    if (!noteText.trim()) return;
+    const changedJudgments = changes.filter(c => c.field.trim() && c.after.trim());
+    onAddNote({
+      author, content: noteText.trim(), isSupplementary, changedJudgments,
+    });
+    setShowAdd(false); setNoteText(''); setChanges([{ field:'', before:'', after:'' }]);
+  };
+
+  return (
+    <div className="fixed inset-0 z-40 flex justify-end fade-in" onClick={onClose}>
+      <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"/>
+      <div className="relative w-full max-w-[640px] bg-white shadow-2xl flex flex-col h-full overflow-hidden" onClick={e=>e.stopPropagation()}>
+        {/* 头部 */}
+        <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+              {dog.name}
+              <span className={`text-xs px-2 py-0.5 rounded-full border ${STATUS_META[dog.status].light}`}>{STATUS_META[dog.status].label}</span>
+            </h2>
+            <p className="text-xs text-slate-500 mt-0.5 font-mono">{dog.id} · {dog.chip}</p>
+          </div>
+          <button onClick={onClose} className="p-2 rounded-lg hover:bg-slate-100 text-slate-500">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto scrollbar-thin p-6">
+          {/* 体重列表 + 混写提示 */}
+          <Section title="体重记录" icon="⚖️" count={dog.weightRecords.length}>
+            {advice && (
+              <div className={`mb-3 p-3 rounded-lg border text-xs flex items-start gap-2 ${
+                advice.level==='danger' ? 'bg-rose-50 border-rose-200 text-rose-800' : 'bg-amber-50 border-amber-200 text-amber-800'
+              }`}>
+                <span>⚠️</span>
+                <div>
+                  <div className="font-semibold mb-0.5">体重单位混写提醒</div>
+                  <div>{advice.text}</div>
+                </div>
+              </div>
+            )}
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="text-slate-500 border-b border-slate-100">
+                  <th className="text-left py-2 font-normal">日期</th>
+                  <th className="text-left py-2 font-normal">原始记录</th>
+                  <th className="text-left py-2 font-normal">折合 kg</th>
+                  <th className="text-left py-2 font-normal">来源</th>
+                </tr>
+              </thead>
+              <tbody>
+                {dog.weightRecords.map((w,i) => (
+                  <tr key={i} className="border-b border-slate-50">
+                    <td className="py-2 text-slate-700">{w.date}</td>
+                    <td className="py-2">
+                      <span className={`px-1.5 py-0.5 rounded font-mono ${w.unit === 'kg' ? 'bg-slate-100 text-slate-700' : w.unit === 'g' ? 'bg-blue-50 text-blue-700' : w.unit === '斤' ? 'bg-purple-50 text-purple-700' : 'bg-rose-50 text-rose-700'}`}>
+                        {w.value} {w.unit || '?'}
+                      </span>
+                    </td>
+                    <td className="py-2 text-slate-600 font-mono">{fmtWeightKg(toKg(w.value, w.unit))}</td>
+                    <td className="py-2 text-slate-500">{w.source || '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Section>
+
+          {/* 疫苗时间线 + 回访合并 */}
+          <Section title="时间线（系统/手写单 合并拼合）" icon="🕒" count={timeline.length}>
+            <ol className="relative border-l-2 border-slate-100 ml-2">
+              {timeline.map((item, i) => (
+                <li key={i} className="ml-5 pb-5 last:pb-0">
+                  <span className={`absolute -left-[9px] w-4 h-4 rounded-full timeline-dot flex items-center justify-center border-2 border-white ${
+                    item.kind==='vaccine' ? 'bg-blue-500' : item.kind==='followup' ? 'bg-emerald-500' : 'bg-purple-500'
+                  }`}>
+                    <span className="w-1 h-1 bg-white rounded-full"/>
+                  </span>
+                  <div className="text-[11px] text-slate-500">{item.date}</div>
+                  <div className="mt-1 p-3 rounded-lg bg-slate-50 border border-slate-100">
+                    {item.kind === 'vaccine' && (
+                      <div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-xs px-2 py-0.5 rounded bg-blue-100 text-blue-700 font-semibold">💉 {item.data.type}</span>
+                          {item.data.source === '病历手写单' && <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">手写单来源</span>}
+                        </div>
+                        <div className="mt-2 text-xs text-slate-600 space-y-0.5">
+                          <div>批号：<span className="font-mono text-slate-700">{item.data.batch}</span></div>
+                          <div>剂量 / 部位：{item.data.dose} · {item.data.site}</div>
+                          <div>接种人：{item.data.givenBy}</div>
+                        </div>
+                      </div>
+                    )}
+                    {item.kind === 'followup' && (
+                      <div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-xs px-2 py-0.5 rounded bg-emerald-100 text-emerald-700 font-semibold">📋 {item.data.type}</span>
+                          <span className={`text-xs px-2 py-0.5 rounded ${
+                            item.data.conclusion === '无异常' ? 'bg-slate-100 text-slate-600' :
+                            item.data.conclusion.includes('卡壳') ? 'bg-rose-100 text-rose-700' :
+                            item.data.conclusion.includes('留观') ? 'bg-amber-100 text-amber-700' :
+                            'bg-slate-100 text-slate-600'
+                          }`}>结论：{item.data.conclusion}</span>
+                        </div>
+                        <div className="mt-2 text-xs text-slate-700">{item.data.content}</div>
+                        <div className="mt-1 text-[11px] text-slate-500">回访人：{item.data.by}</div>
+                      </div>
+                    )}
+                    {item.kind === 'weight' && (
+                      <div>
+                        <span className="text-xs px-2 py-0.5 rounded bg-purple-100 text-purple-700 font-semibold">⚖️ 称重记录</span>
+                        <div className="mt-2 text-xs text-slate-700">
+                          <span className="mr-2 font-mono bg-white px-1.5 py-0.5 rounded border border-slate-200">
+                            {item.data.value} {item.data.unit}
+                          </span>
+                          <span className="text-slate-500">= {fmtWeightKg(toKg(item.data.value, item.data.unit))}</span>
+                          <span className="ml-2 text-slate-400">· {item.data.source}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </Section>
+
+          {/* 人工备注（含后补标记 + 判断变更） */}
+          <Section title="病历手写单 / 人工备注" icon="📝" count={dog.handNotes.length}>
+            {dog.handNotes.length === 0 && <p className="text-xs text-slate-400 py-2">暂无备注</p>}
+            <div className="space-y-3">
+              {dog.handNotes.map(n => (
+                <div key={n.id} className={`p-3 rounded-lg border text-sm ${
+                  n.isSupplementary ? 'bg-indigo-50 border-indigo-200' : 'bg-slate-50 border-slate-200'
+                }`}>
+                  <div className="flex items-center gap-2 flex-wrap mb-2">
+                    <span className="text-xs font-semibold text-slate-700">{n.author}</span>
+                    <span className="text-[11px] text-slate-500">{n.time}</span>
+                    {n.isSupplementary && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-200 text-indigo-800 font-semibold">换班后补</span>
+                    )}
+                  </div>
+                  <div className="text-slate-800 text-sm leading-relaxed">{n.content}</div>
+                  {n.changedJudgments?.length > 0 && (
+                    <div className="mt-3 p-2.5 rounded-md bg-white border border-indigo-100">
+                      <div className="text-[11px] font-semibold text-indigo-700 mb-1.5">📌 本备注改变了以下判断</div>
+                      <ul className="space-y-2">
+                        {n.changedJudgments.map((c, i) => (
+                          <li key={i} className="text-xs">
+                            <div className="font-semibold text-slate-700">「{c.field}」</div>
+                            <div className="mt-0.5 flex items-start gap-1.5">
+                              <span className="inline-block mt-1 px-1 py-0.5 rounded text-[10px] bg-rose-100 text-rose-700 flex-shrink-0">前</span>
+                              <span className="text-slate-600">{c.before}</span>
+                            </div>
+                            <div className="mt-0.5 flex items-start gap-1.5">
+                              <span className="inline-block mt-1 px-1 py-0.5 rounded text-[10px] bg-emerald-100 text-emerald-700 flex-shrink-0">后</span>
+                              <span className="text-slate-700">{c.after}</span>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* 抽屉内添加备注 */}
+            {!showAdd ? (
+              <button onClick={() => setShowAdd(true)}
+                className="mt-3 w-full py-2 rounded-lg border border-dashed border-slate-300 text-sm text-slate-500 hover:border-indigo-400 hover:text-indigo-600 hover:bg-indigo-50/40 transition-colors">
+                + 为本犬追加备注
+              </button>
+            ) : (
+              <div className="mt-3 p-3 rounded-lg bg-white border border-indigo-200 space-y-2.5">
+                <div className="flex items-center gap-2 text-xs">
+                  <input className="w-20 px-2 py-1 rounded border border-slate-200 outline-none" value={author} onChange={e=>setAuthor(e.target.value)} placeholder="记录人"/>
+                  <label className="flex items-center gap-1 ml-auto">
+                    <input type="checkbox" checked={isSupplementary} onChange={e=>setIsSupplementary(e.target.checked)} className="w-3.5 h-3.5"/>
+                    <span className="text-slate-600">标记为换班后补备注</span>
+                  </label>
+                </div>
+                <textarea value={noteText} onChange={e=>setNoteText(e.target.value)} rows="3"
+                  placeholder="备注内容……"
+                  className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm outline-none focus:border-indigo-400 resize-none scrollbar-thin"/>
+                {isSupplementary && (
+                  <div>
+                    <div className="text-[11px] font-semibold text-indigo-700 mb-1.5">判断变更对比（如该备注改变了结论，请填写）</div>
+                    <div className="space-y-1.5">
+                      {changes.map((c, i) => (
+                        <div key={i} className="grid grid-cols-12 gap-1.5 text-xs">
+                          <input value={c.field} onChange={e => { const n=[...changes]; n[i]={...c, field:e.target.value}; setChanges(n); }}
+                            placeholder="字段名" className="col-span-3 px-2 py-1 rounded border border-slate-200 outline-none"/>
+                          <input value={c.before} onChange={e => { const n=[...changes]; n[i]={...c, before:e.target.value}; setChanges(n); }}
+                            placeholder="判断前" className="col-span-4 px-2 py-1 rounded border border-slate-200 outline-none"/>
+                          <input value={c.after} onChange={e => { const n=[...changes]; n[i]={...c, after:e.target.value}; setChanges(n); }}
+                            placeholder="判断后" className="col-span-4 px-2 py-1 rounded border border-slate-200 outline-none"/>
+                          <button onClick={() => setChanges(changes.length>1 ? changes.filter((_,j)=>j!==i) : [{field:'',before:'',after:''}])}
+                            className="col-span-1 px-1 py-1 rounded border border-slate-200 text-slate-400 hover:bg-slate-50 text-xs">×</button>
+                        </div>
+                      ))}
+                      <button onClick={() => setChanges([...changes, {field:'',before:'',after:''}])}
+                        className="text-[11px] text-indigo-600 hover:underline">+ 增加一组对比</button>
+                    </div>
+                  </div>
+                )}
+                <div className="flex items-center gap-2 justify-end pt-1">
+                  <button onClick={() => { setShowAdd(false); setNoteText(''); setChanges([{field:'',before:'',after:''}]); }}
+                    className="px-3 py-1.5 rounded-lg text-sm text-slate-600 hover:bg-slate-100">取消</button>
+                  <button onClick={submit}
+                    className="px-3 py-1.5 rounded-lg text-sm bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm">添加备注</button>
+                </div>
+              </div>
+            )}
+          </Section>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Section({ title, icon, count, children }) {
+  return (
+    <section className="mb-6 last:mb-0">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-sm font-bold text-slate-800 flex items-center gap-1.5">
+          <span>{icon}</span>{title}
+          <span className="text-[11px] font-normal text-slate-500 ml-1">({count})</span>
+        </h3>
+      </div>
+      {children}
+    </section>
+  );
+}
+
+/* ============================================================
+ *  全局补备注弹窗（换班前）
+ * ============================================================ */
+function AddNoteModal({ dogs, onClose, onConfirm }) {
+  const [dogId, setDogId] = useState(dogs[0]?.id || '');
+  const [author, setAuthor] = useState('小乔');
+  const [content, setContent] = useState('');
+  const [isSupplementary, setIsSupplementary] = useState(true);
+  const [changes, setChanges] = useState([{ field: '', before: '', after: '' }]);
+
+  const submit = () => {
+    if (!dogId || !content.trim()) return;
+    const changedJudgments = changes.filter(c => c.field.trim() && c.after.trim());
+    onConfirm(dogId, { author, content: content.trim(), isSupplementary, changedJudgments });
+  };
+
+  return (
+    <div className="fixed inset-0 z-40 flex items-center justify-center fade-in" onClick={onClose}>
+      <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"/>
+      <div className="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden" onClick={e=>e.stopPropagation()}>
+        <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+          <h2 className="text-lg font-bold text-slate-800">补病历手写单备注</h2>
+          <button onClick={onClose} className="p-2 rounded-lg hover:bg-slate-100 text-slate-500">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div className="p-6 space-y-4 max-h-[75vh] overflow-y-auto scrollbar-thin">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs text-slate-500">选择犬只</label>
+              <select value={dogId} onChange={e=>setDogId(e.target.value)}
+                className="w-full mt-1 px-3 py-2 text-sm rounded-lg border border-slate-200 outline-none focus:border-indigo-400 bg-white">
+                {dogs.map(d => <option key={d.id} value={d.id}>{d.name}（{d.id}）</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="text-xs text-slate-500">记录人</label>
+              <input value={author} onChange={e=>setAuthor(e.target.value)}
+                className="w-full mt-1 px-3 py-2 text-sm rounded-lg border border-slate-200 outline-none focus:border-indigo-400"/>
+            </div>
+          </div>
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" checked={isSupplementary} onChange={e=>setIsSupplementary(e.target.checked)}
+              className="w-4 h-4 rounded text-indigo-600"/>
+            <span className="text-slate-700">标记为「换班后补」（将高亮并可单独筛选）</span>
+          </label>
+          <div>
+            <label className="text-xs text-slate-500">备注内容</label>
+            <textarea value={content} onChange={e=>setContent(e.target.value)} rows="4"
+              placeholder="说明补充了什么病历手写单内容，必要时附判断变更……"
+              className="w-full mt-1 px-3 py-2 text-sm rounded-lg border border-slate-200 outline-none focus:border-indigo-400 resize-none scrollbar-thin"/>
+          </div>
+          {isSupplementary && (
+            <div className="p-3 rounded-xl bg-indigo-50/60 border border-indigo-100">
+              <div className="text-[11px] font-semibold text-indigo-700 mb-2">📌 本备注改变了哪些判断？（接手的人会先看这里）</div>
+              <div className="space-y-1.5">
+                {changes.map((c, i) => (
+                  <div key={i} className="grid grid-cols-12 gap-1.5 text-xs">
+                    <input value={c.field} onChange={e => { const n=[...changes]; n[i]={...c, field:e.target.value}; setChanges(n); }}
+                      placeholder="判断字段" className="col-span-3 px-2 py-1.5 rounded border border-indigo-200 bg-white outline-none"/>
+                    <input value={c.before} onChange={e => { const n=[...changes]; n[i]={...c, before:e.target.value}; setChanges(n); }}
+                      placeholder="补备注前的判断" className="col-span-4 px-2 py-1.5 rounded border border-rose-200 bg-white outline-none"/>
+                    <input value={c.after} onChange={e => { const n=[...changes]; n[i]={...c, after:e.target.value}; setChanges(n); }}
+                      placeholder="补备注后的判断" className="col-span-4 px-2 py-1.5 rounded border border-emerald-200 bg-white outline-none"/>
+                    <button onClick={() => setChanges(changes.length>1 ? changes.filter((_,j)=>j!==i) : [{field:'',before:'',after:''}])}
+                      className="col-span-1 px-1 py-1 rounded border border-slate-200 bg-white text-slate-400 hover:bg-slate-50">×</button>
+                  </div>
+                ))}
+                <button onClick={() => setChanges([...changes, {field:'',before:'',after:''}])}
+                  className="text-[11px] text-indigo-600 hover:underline">+ 增加一组判断对比</button>
+              </div>
+            </div>
+          )}
+        </div>
+        <div className="px-6 py-3 border-t border-slate-200 flex items-center justify-end gap-2 bg-slate-50">
+          <button onClick={onClose} className="px-4 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-200">取消</button>
+          <button onClick={submit} disabled={!content.trim()}
+            className="px-4 py-2 rounded-lg text-sm bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">保存备注</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+ *  导入弹窗（验证重复去重 + 人工备注保护）
+ * ============================================================ */
+function ImportModal({ onClose, onRun, report, preview }) {
+  return (
+    <div className="fixed inset-0 z-40 flex items-center justify-center fade-in" onClick={onClose}>
+      <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"/>
+      <div className="relative w-full max-w-xl bg-white rounded-2xl shadow-2xl overflow-hidden" onClick={e=>e.stopPropagation()}>
+        <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+          <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            导入演示数据
+          </h2>
+          <button onClick={onClose} className="p-2 rounded-lg hover:bg-slate-100 text-slate-500">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div className="p-6 space-y-4 max-h-[75vh] overflow-y-auto scrollbar-thin">
+          <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600">
+            <div className="font-semibold text-slate-700 mb-1">导入规则说明：</div>
+            <ul className="list-disc list-inside space-y-0.5">
+              <li>相同编号犬只的<b className="text-slate-800">疫苗记录</b>按「日期+类型+批号」去重，不重复录入</li>
+              <li><b className="text-slate-800">体重 / 回访记录</b>同理合并，避免翻倍</li>
+              <li>已存在的<b className="text-indigo-700">人工备注绝不覆盖</b>，无论导入文件中是否携带</li>
+              <li>本批次中，<span className="font-mono">D2024-001 大黄</span>是已有记录，其中 2024-07-20 四联疫苗是完全重复的条目，应被跳过</li>
+            </ul>
+          </div>
+
+          <div>
+            <div className="text-xs font-semibold text-slate-700 mb-2">待导入预览（{preview.length} 条）</div>
+            <div className="space-y-2">
+              {preview.map((p,i) => (
+                <div key={i} className="p-2.5 rounded-lg border border-slate-200 text-xs">
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-slate-800">{p.id} · {p.name}</span>
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">
+                      疫苗 {p.vaccines?.length||0} · 体重 {p.weightRecords?.length||0}
+                    </span>
+                  </div>
+                  <div className="mt-1 text-slate-500">
+                    品种：{p.breed || '—'}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {report && (
+            <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 fade-in">
+              <div className="text-sm font-bold text-emerald-800 mb-2">✅ 导入完成报告</div>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <Stat label="新增犬只" value={report.added} color="bg-emerald-100 text-emerald-700"/>
+                <Stat label="重复跳过" value={report.skippedDuplicate} color="bg-slate-100 text-slate-700"/>
+                <Stat label="字段合并" value={report.merged} color="bg-blue-100 text-blue-700"/>
+                <Stat label="人工备注被保护" value={report.noteProtected} color="bg-indigo-100 text-indigo-700"/>
+              </div>
+            </div>
+          )}
+        </div>
+        <div className="px-6 py-3 border-t border-slate-200 flex items-center justify-end gap-2 bg-slate-50">
+          <button onClick={onClose} className="px-4 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-200">关闭</button>
+          {!report && (
+            <button onClick={onRun}
+              className="px-4 py-2 rounded-lg text-sm bg-blue-600 text-white hover:bg-blue-700 shadow-sm">执行导入</button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Stat({ label, value, color }) {
+  return (
+    <div className="flex items-center gap-2 p-2 rounded-lg bg-white border border-emerald-100">
+      <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold ${color}`}>{value}</span>
+      <span className="text-slate-600">{label}</span>
+    </div>
+  );
+}
+
+/* ============================================================
+ *  挂载
+ * ============================================================ */
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+</script>
+</body>
+</html>
