@@ -8,7 +8,10 @@ from .models import (
     FormulaScreenshot,
     RecordStatus,
     AbnormalType,
+    BatchImport,
+    ChangeType,
 )
+from .normalizer import record_to_dict, batch_summary
 
 
 class BoundaryRuleEngine:
@@ -20,7 +23,10 @@ class BoundaryRuleEngine:
         session = SessionLocal()
         try:
             db_rules = (
-                session.query(BoundaryRule).filter_by(is_active=True).all()
+                session.query(BoundaryRule)
+                .filter_by(is_active=True)
+                .order_by(BoundaryRule.priority.desc(), BoundaryRule.id)
+                .all()
             )
             for rule in db_rules:
                 self.rules.append(
@@ -29,6 +35,7 @@ class BoundaryRuleEngine:
                         "rule_type": rule.rule_type,
                         "condition": rule.condition,
                         "action": rule.action,
+                        "priority": rule.priority,
                         "description": rule.description,
                     }
                 )
@@ -42,6 +49,7 @@ class BoundaryRuleEngine:
         condition: Dict[str, Any],
         action: Dict[str, Any],
         description: str = "",
+        priority: int = 0,
     ):
         session = SessionLocal()
         try:
@@ -53,6 +61,7 @@ class BoundaryRuleEngine:
                 existing.condition = condition
                 existing.action = action
                 existing.description = description
+                existing.priority = priority
                 existing.is_active = True
             else:
                 new_rule = BoundaryRule(
@@ -61,6 +70,7 @@ class BoundaryRuleEngine:
                     condition=condition,
                     action=action,
                     description=description,
+                    priority=priority,
                     is_active=True,
                 )
                 session.add(new_rule)
@@ -81,8 +91,19 @@ class BoundaryRuleEngine:
         operators = {
             "equals": lambda rv, v: rv == v,
             "not_equals": lambda rv, v: rv != v,
-            "is_empty": lambda rv, v: rv is None or str(rv).strip() == "",
-            "is_zero": lambda rv, v: rv == 0 or rv == 0.0,
+            "is_empty": lambda rv, v: rv is None
+            or (isinstance(rv, str) and rv.strip() == "")
+            or (isinstance(rv, str) and rv.lower() == "nan"),
+            "is_zero": lambda rv, v: rv == 0
+            or rv == 0.0
+            or (isinstance(rv, float) and abs(rv - 0.0) < 1e-9),
+            "is_zero_or_empty_result": lambda rv, v: (
+                rv is None
+                or (isinstance(rv, str) and rv.strip() == "")
+                or (isinstance(rv, str) and rv.lower() == "nan")
+                or rv == 0
+                or rv == 0.0
+            ),
             "greater_than": lambda rv, v: rv > v if rv is not None else False,
             "less_than": lambda rv, v: rv < v if rv is not None else False,
             "contains": lambda rv, v: v in str(rv) if rv is not None else False,
@@ -103,28 +124,37 @@ class BoundaryRuleEngine:
 
         if action_type == "set_status":
             old_status = record.status
-            record.status = params.get("status", RecordStatus.PENDING.value)
-            result["changes"] = {"status": {"old": old_status, "new": record.status}}
-            result["applied"] = True
+            new_status = params.get("status", RecordStatus.PENDING.value)
+            if old_status != new_status:
+                record.status = new_status
+                result["changes"] = {"status": {"old": old_status, "new": new_status}}
+                result["applied"] = True
 
         elif action_type == "set_abnormal":
             old_type = record.abnormal_type
             old_note = record.abnormal_note
-            record.abnormal_type = params.get("abnormal_type")
-            record.abnormal_note = params.get("abnormal_note", "")
-            result["changes"] = {
-                "abnormal_type": {"old": old_type, "new": record.abnormal_type},
-                "abnormal_note": {"old": old_note, "new": record.abnormal_note},
-            }
-            result["applied"] = True
+            new_type = params.get("abnormal_type")
+            new_note = params.get("abnormal_note", "")
+            changes = {}
+            if old_type != new_type:
+                changes["abnormal_type"] = {"old": old_type, "new": new_type}
+            if old_note != new_note:
+                changes["abnormal_note"] = {"old": old_note, "new": new_note}
+            record.abnormal_type = new_type
+            record.abnormal_note = new_note
+            if changes:
+                result["changes"] = changes
+                result["applied"] = True
 
         elif action_type == "set_result":
             old_result = record.result_value
-            record.result_value = params.get("result_value")
-            result["changes"] = {
-                "result_value": {"old": old_result, "new": record.result_value}
-            }
-            result["applied"] = True
+            new_result = params.get("result_value")
+            if old_result != new_result:
+                record.result_value = new_result
+                result["changes"] = {
+                    "result_value": {"old": old_result, "new": new_result}
+                }
+                result["applied"] = True
 
         return result
 
@@ -139,6 +169,7 @@ class BoundaryRuleEngine:
                         {
                             "rule_name": rule["rule_name"],
                             "rule_type": rule["rule_type"],
+                            "priority": rule.get("priority", 0),
                             "changes": action_result["changes"],
                         }
                     )
@@ -151,7 +182,7 @@ def init_boundary_rules():
 
     rules = [
         {
-            "rule_name": "分母为0空字符串检测",
+            "rule_name": "分母为0空字符串组合检测",
             "rule_type": "abnormal_detection",
             "condition": {
                 "field": "denominator_value",
@@ -161,11 +192,12 @@ def init_boundary_rules():
             "action": {
                 "type": "set_abnormal",
                 "params": {
-                    "abnormal_type": AbnormalType.ZERO_DENOMINATOR.value,
-                    "abnormal_note": "边界规则触发: 分母为0，需数据复核人确认",
+                    "abnormal_type": AbnormalType.ZERO_DENOMINATOR_EMPTY_RESULT.value,
+                    "abnormal_note": "边界规则触发: 分母为0且结果异常，需数据复核人确认",
                 },
             },
-            "description": "检测分母为0的情况，标记为异常状态待复核",
+            "description": "检测分母为0的情况，标记为zero_denominator_empty_result",
+            "priority": 100,
         },
         {
             "rule_name": "结果空字符串检测",
@@ -183,20 +215,22 @@ def init_boundary_rules():
                 },
             },
             "description": "检测结果为空字符串的情况",
+            "priority": 80,
         },
         {
-            "rule_name": "分母为0结果异常标记",
+            "rule_name": "分母为0异常状态设置",
             "rule_type": "abnormal_detection",
             "condition": {
-                "field": "result_value",
-                "operator": "is_empty",
-                "value": "",
+                "field": "denominator_value",
+                "operator": "is_zero",
+                "value": 0,
             },
             "action": {
                 "type": "set_status",
                 "params": {"status": RecordStatus.ABNORMAL.value},
             },
-            "description": "分母为0且结果异常时设置状态为异常",
+            "description": "分母为0时设置状态为异常待复核",
+            "priority": 90,
         },
     ]
 
@@ -207,14 +241,16 @@ def init_boundary_rules():
             rule["condition"],
             rule["action"],
             rule["description"],
+            rule.get("priority", 0),
         )
 
     return engine
 
 
-def rollback_batch(batch_id: str, rollback_note: str, rollback_by: str) -> Dict[str, Any]:
-    from .models import BatchImport, FormulaScreenshot, RecordStatus, FormulaHistory, ChangeType
-    from .importer import record_to_dict, create_history_record
+def rollback_batch(
+    batch_id: str, rollback_note: str, rollback_by: str
+) -> Dict[str, Any]:
+    from .importer import _refresh_batch_counts, create_history_record
 
     session = SessionLocal()
     try:
@@ -229,6 +265,7 @@ def rollback_batch(batch_id: str, rollback_note: str, rollback_by: str) -> Dict[
                 "success": False,
                 "message": f"批次已回滚: {batch_id}",
                 "rollback_time": batch.rollback_time,
+                "batch_summary": batch_summary(batch),
             }
 
         screenshots = (
@@ -240,6 +277,7 @@ def rollback_batch(batch_id: str, rollback_note: str, rollback_by: str) -> Dict[
             screenshot.is_latest = False
             screenshot.status = RecordStatus.ROLLBACKED.value
             after_data = record_to_dict(screenshot)
+            screenshot.current_version += 1
 
             create_history_record(
                 session,
@@ -254,7 +292,9 @@ def rollback_batch(batch_id: str, rollback_note: str, rollback_by: str) -> Dict[
         batch.is_rollbacked = True
         batch.rollback_time = datetime.now()
         batch.rollback_note = rollback_note
+        session.flush()
 
+        batch = _refresh_batch_counts(session, batch_id)
         session.commit()
 
         return {
@@ -262,6 +302,7 @@ def rollback_batch(batch_id: str, rollback_note: str, rollback_by: str) -> Dict[
             "batch_id": batch_id,
             "records_rollbacked": len(screenshots),
             "rollback_time": batch.rollback_time.isoformat(),
+            "batch_summary": batch_summary(batch),
             "message": f"成功回滚批次 {batch_id}，共 {len(screenshots)} 条记录",
         }
 
@@ -273,31 +314,6 @@ def rollback_batch(batch_id: str, rollback_note: str, rollback_by: str) -> Dict[
 
 
 def get_abnormal_records(batch_id: Optional[str] = None) -> List[Dict[str, Any]]:
-    session = SessionLocal()
-    try:
-        query = session.query(FormulaScreenshot).filter_by(
-            status=RecordStatus.ABNORMAL.value
-        )
-        if batch_id:
-            query = query.filter_by(batch_id=batch_id)
+    from .importer import get_abnormal_records as _impl
 
-        records = query.all()
-        return [
-            {
-                "id": r.id,
-                "batch_id": r.batch_id,
-                "original_row_number": r.original_row_number,
-                "sku_code": r.sku_code,
-                "product_name": r.product_name,
-                "denominator_value": r.denominator_value,
-                "numerator_value": r.numerator_value,
-                "result_value": r.result_value,
-                "original_result": r.original_result,
-                "abnormal_type": r.abnormal_type,
-                "abnormal_note": r.abnormal_note,
-                "current_version": r.current_version,
-            }
-            for r in records
-        ]
-    finally:
-        session.close()
+    return _impl(batch_id)
