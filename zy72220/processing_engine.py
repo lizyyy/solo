@@ -368,12 +368,22 @@ class ProcessingEngine:
                 is_old_caliber=False
             )
             record.professional_calcs.append(calc)
-            record.final_currency = settle.currency
-            record.final_rate = calc.calc_result
-            record.final_effective_date = settle.effective_date
+            if record.final_currency is None:
+                record.final_currency = settle.currency
+            if record.final_rate is None:
+                record.final_rate = calc.calc_result
+            if record.final_effective_date is None:
+                record.final_effective_date = settle.effective_date
             record.status = RecordStatus.SETTLEMENT_CHECKED
             if record.processing_result is None:
                 record.processing_result = ProcessingResult.SMOOTH
+
+            custodian_note = ""
+            if record.custodian_review_result is True and record.final_currency != settle.currency:
+                custodian_note = (
+                    f"（托管对接人已复核确认币种为{record.final_currency.value}，"
+                    f"保留复核结论，不采用清算批次币种{settle.currency.value}）"
+                )
 
             self._add_history(
                 record=record,
@@ -387,7 +397,8 @@ class ProcessingEngine:
 
             change_msg = (
                 f"补看清算批次{settle.batch_no}，与邮件数据核对一致，"
-                f"已完成专业计算，最终费率{calc.calc_result*100:.4f}%"
+                f"已完成专业计算，最终费率{record.final_rate*100:.4f}%"
+                f"{custodian_note}"
             )
             self._add_audit(
                 record=record,
@@ -397,7 +408,7 @@ class ProcessingEngine:
                 after_status=record.status,
                 change_content=change_msg,
                 professional_calc=calc,
-                currency_verified=True
+                currency_verified=(record.final_currency == settle.currency)
             )
 
         return record

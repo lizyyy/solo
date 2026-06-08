@@ -112,6 +112,10 @@ def scenario_2_mixed_currency():
     
     print("\n>>> 重新执行第二步和第三步（完成完整流程）")
     record = engine.step2_check_settlement(record)
+    assert record.final_currency == Currency.HKD, (
+        f"阻断性偏差：托管复核确认HKD后，final_currency被覆盖为{record.final_currency.value}"
+    )
+    print(f"✓  复核结论一致性检查通过：final_currency={record.final_currency.value}（与托管对接人复核选择一致）")
     record = engine.step3_update_audit(record)
     
     print_record_summary(record, "场景二：港币人民币同列")
