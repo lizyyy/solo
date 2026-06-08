@@ -324,14 +324,24 @@ function renderRightPanel() {
 function renderConflictResolution() {
   const p = currentProfile;
   const pending = p.conflicts.filter(c => c.status === 'pending_review');
-  if (!pending.length) { document.getElementById('conflictResolution').innerHTML = '<p style="color:var(--muted);font-size:12px">无待处理冲突</p>'; return; }
+  const resolved = p.conflicts.filter(c => c.status !== 'pending_review');
   let html = '';
+
+  if (!pending.length && !resolved.length) {
+    document.getElementById('conflictResolution').innerHTML = '<p style="color:var(--muted);font-size:12px">无冲突</p>';
+    return;
+  }
+
   for (const c of pending) {
-    html += `<div class="conflict-panel">
-      <h3>冲突: ${c.obstacle_id}</h3>
+    html += `<div class="conflict-panel" data-conflict-id="${c.conflict_id}">
+      <h3>冲突: ${c.obstacle_id} <span style="font-size:10px;color:var(--muted)">(${c.conflict_id})</span></h3>
       <p style="font-size:12px">同一障碍物被标了两个名字：</p>
-      <div class="name-options">${c.names.map(n => `<div class="name-opt" onclick="selectConflictName(this,'${n}')" data-name="${n}">${n}</div>`).join('')}</div>
-      <div style="display:flex;gap:6px;margin-top:8px">
+      <div class="name-options">${c.names.map(n => `<div class="name-opt" onclick="selectConflictName(this, '${c.conflict_id}', '${n}')" data-name="${n}">${n}</div>`).join('')}</div>
+      <label style="display:block;font-size:11px;color:var(--muted);margin-top:8px">处理原因（为何选用此名称）</label>
+      <input type="text" class="conflict-reason" data-conflict-id="${c.conflict_id}" placeholder="例：巡检照片中现场标识为该名称" style="width:100%;padding:4px 8px;border-radius:4px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;margin-top:2px">
+      <label style="display:block;font-size:11px;color:var(--muted);margin-top:6px">下一步复核人</label>
+      <input type="text" class="conflict-reviewer" data-conflict-id="${c.conflict_id}" placeholder="例：培训学员张三" style="width:100%;padding:4px 8px;border-radius:4px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;margin-top:2px">
+      <div style="display:flex;gap:6px;margin-top:10px">
         <button class="btn primary" onclick="resolveConflict('${c.conflict_id}', false)">确认选用</button>
         <button class="btn danger" onclick="resolveConflict('${c.conflict_id}', true)">回滚</button>
       </div>
@@ -339,27 +349,49 @@ function renderConflictResolution() {
       ${c.evidence.map(e => `<div style="font-size:10px;color:var(--muted);padding:2px 0">[${e.source}] ${e.original_line_number ? '行'+e.original_line_number+': ' : ''}${e.original_content}</div>`).join('')}
     </div>`;
   }
+
+  for (const c of resolved) {
+    html += `<div class="conflict-panel" style="border-color:rgba(52,211,153,0.3);background:rgba(52,211,153,0.03)">
+      <h3 style="color:var(--success)">已处理: ${c.obstacle_id} <span style="font-size:10px;color:var(--muted)">(${c.conflict_id})</span></h3>
+      <p style="font-size:12px">选用名称: <b>${c.resolution || ''}</b></p>
+      ${c.original_names && c.original_names.length ? `<p style="font-size:11px;color:var(--muted)">原始名称: ${c.original_names.join(' / ')}</p>` : ''}
+      ${c.reason ? `<p style="font-size:11px;color:var(--muted)">处理原因: ${c.reason}</p>` : ''}
+      ${c.next_reviewer ? `<p style="font-size:11px;color:var(--muted)">下一步复核: ${c.next_reviewer}</p>` : ''}
+      <p style="font-size:11px;color:var(--muted)">处理人: ${c.resolved_by || '-'} @ ${c.resolved_at || '-'}</p>
+      <p style="font-size:11px">状态: ${statusLabel(c.status)}</p>
+    </div>`;
+  }
+
   document.getElementById('conflictResolution').innerHTML = html;
 }
 
 let selectedConflictName = {};
-function selectConflictName(el, name) {
+function selectConflictName(el, conflictId, name) {
   const parent = el.parentElement;
   parent.querySelectorAll('.name-opt').forEach(o => o.classList.remove('selected'));
   el.classList.add('selected');
-  const panel = el.closest('.conflict-panel');
-  const cid = panel.querySelector('h3').textContent.replace('冲突: ', '');
-  selectedConflictName[cid] = name;
+  selectedConflictName[conflictId] = name;
 }
 
 async function resolveConflict(conflictId, rollback) {
   if (!currentProfileId) return;
   const chosen = rollback ? '' : (selectedConflictName[conflictId] || '');
   if (!rollback && !chosen) return alert('请先选择一个名称');
+  const panel = document.querySelector(`.conflict-panel[data-conflict-id="${conflictId}"]`);
+  let reason = '';
+  let nextReviewer = '';
+  if (panel) {
+    const reasonInput = panel.querySelector('.conflict-reason');
+    const reviewerInput = panel.querySelector('.conflict-reviewer');
+    if (reasonInput) reason = reasonInput.value.trim();
+    if (reviewerInput) nextReviewer = reviewerInput.value.trim();
+  }
   try {
     currentProfile = await api('POST', `/api/profiles/${currentProfileId}/resolve-conflict`, {
-      conflict_id: conflictId, chosen_name: chosen, operator: '许工', rollback
+      conflict_id: conflictId, chosen_name: chosen, operator: '许工', rollback,
+      reason: reason, next_reviewer: nextReviewer,
     });
+    delete selectedConflictName[conflictId];
     renderAll();
   } catch(e) { alert('操作失败: ' + e.message); }
 }

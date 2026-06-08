@@ -1,0 +1,173 @@
+{
+  "profile_id": "e74508c2",
+  "project_name": "API一致性测试V3",
+  "coordinate_origin_description": "测试原点",
+  "records": [
+    {
+      "record_id": "67904373",
+      "obstacle_id": "OBS001",
+      "obstacle_name": "凹陷点A",
+      "water_depth_mm": 120.0,
+      "position_x": 10.5,
+      "position_y": 3.2,
+      "position_z": 0.0,
+      "evidence_trail": [
+        {
+          "source": "coordinate_origin",
+          "original_line_number": 1,
+          "original_content": "OBS001 | 路面凹陷A | 120 | 10.5 | 3.2 | 0.0",
+          "photo_id": null,
+          "operator": "system",
+          "timestamp": "2026-06-08T23:57:35.422575"
+        },
+        {
+          "source": "manual",
+          "original_line_number": null,
+          "original_content": "name_changed: 路面凹陷A -> 凹陷点A",
+          "photo_id": null,
+          "operator": "许工",
+          "timestamp": "2026-06-08T23:57:35.425642"
+        }
+      ],
+      "manual_changes": [
+        {
+          "source": "manual",
+          "original_line_number": null,
+          "original_content": "name_changed: 路面凹陷A -> 凹陷点A",
+          "photo_id": null,
+          "operator": "许工",
+          "timestamp": "2026-06-08T23:57:35.425642"
+        }
+      ],
+      "status": "confirmed",
+      "conflict_ids": [
+        "conflict_OBS001"
+      ],
+      "created_at": "2026-06-08T23:57:35.422619",
+      "updated_at": "2026-06-08T23:57:35.425645"
+    },
+    {
+      "record_id": "512b2685",
+      "obstacle_id": "OBS001",
+      "obstacle_name": "凹陷点A",
+      "water_depth_mm": 120.0,
+      "position_x": 10.5,
+      "position_y": 3.2,
+      "position_z": 0.0,
+      "evidence_trail": [
+        {
+          "source": "coordinate_origin",
+          "original_line_number": 2,
+          "original_content": "OBS001 | 凹陷点A | 120 | 10.5 | 3.2 | 0.0",
+          "photo_id": null,
+          "operator": "system",
+          "timestamp": "2026-06-08T23:57:35.422623"
+        }
+      ],
+      "manual_changes": [],
+      "status": "confirmed",
+      "conflict_ids": [
+        "conflict_OBS001"
+      ],
+      "created_at": "2026-06-08T23:57:35.422633",
+      "updated_at": "2026-06-08T23:57:35.425647"
+    },
+    {
+      "record_id": "ba1db02a",
+      "obstacle_id": "OBS002",
+      "obstacle_name": "排水口B",
+      "water_depth_mm": 50.0,
+      "position_x": 25.0,
+      "position_y": 8.1,
+      "position_z": 0.0,
+      "evidence_trail": [
+        {
+          "source": "coordinate_origin",
+          "original_line_number": 3,
+          "original_content": "OBS002 | 排水口B | 50 | 25.0 | 8.1 | 0.0",
+          "photo_id": null,
+          "operator": "system",
+          "timestamp": "2026-06-08T23:57:35.422636"
+        }
+      ],
+      "manual_changes": [],
+      "status": "imported",
+      "conflict_ids": [],
+      "created_at": "2026-06-08T23:57:35.422649",
+      "updated_at": "2026-06-08T23:57:35.422649"
+    }
+  ],
+  "conflicts": [
+    {
+      "conflict_id": "conflict_OBS001",
+      "conflict_type": "duplicate_name",
+      "obstacle_id": "OBS001",
+      "names": [
+        "凹陷点A",
+        "路面凹陷A"
+      ],
+      "original_names": [
+        "凹陷点A",
+        "路面凹陷A"
+      ],
+      "evidence": [
+        {
+          "source": "coordinate_origin",
+          "original_line_number": 1,
+          "original_content": "OBS001 | 路面凹陷A | 120 | 10.5 | 3.2 | 0.0",
+          "photo_id": null,
+          "operator": "system",
+          "timestamp": "2026-06-08T23:57:35.422575"
+        },
+        {
+          "source": "coordinate_origin",
+          "original_line_number": 2,
+          "original_content": "OBS001 | 凹陷点A | 120 | 10.5 | 3.2 | 0.0",
+          "photo_id": null,
+          "operator": "system",
+          "timestamp": "2026-06-08T23:57:35.422623"
+        }
+      ],
+      "resolution": "chosen_name=凹陷点A",
+      "reason": "巡检照片现场说法为凹陷点A",
+      "resolved_by": "许工",
+      "resolved_at": "2026-06-08T23:57:35.425624",
+      "next_reviewer": "培训学员李四",
+      "status": "confirmed"
+    }
+  ],
+  "audit_log": [
+    {
+      "timestamp": "2026-06-08T23:57:35.420037",
+      "action": "create_profile",
+      "detail": {
+        "project_name": "API一致性测试V3"
+      }
+    },
+    {
+      "timestamp": "2026-06-08T23:57:35.422707",
+      "action": "step1_import_origin",
+      "detail": {
+        "line_count": 3,
+        "operator": "system"
+      }
+    },
+    {
+      "timestamp": "2026-06-08T23:57:35.425649",
+      "action": "resolve_conflict",
+      "detail": {
+        "conflict_id": "conflict_OBS001",
+        "chosen_name": "凹陷点A",
+        "operator": "许工",
+        "reason": "巡检照片现场说法为凹陷点A",
+        "next_reviewer": "培训学员李四",
+        "original_names": [
+          "凹陷点A",
+          "路面凹陷A"
+        ]
+      }
+    }
+  ],
+  "created_at": "2026-06-08T23:57:35.420027",
+  "updated_at": "2026-06-08T23:57:35.425650"
+}

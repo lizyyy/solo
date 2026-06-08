@@ -90,6 +90,8 @@ profile = resolve_conflict(
     conflict_id="conflict_OBS001",
     chosen_name="路面凹陷A",
     operator="许工",
+    reason="巡检照片IMG-20240315-001中现场标识为'凹陷点A'，但坐标原点说明中为'路面凹陷A'，按原点说明选用",
+    next_reviewer="培训学员张三",
 )
 print("  许工选择名称: '路面凹陷A'")
 print("  冲突已解决:")
@@ -101,6 +103,10 @@ for r in profile.records:
 
 for c in profile.conflicts:
     print(f"    冲突 {c.conflict_id}: status={c.status}, resolution={c.resolution}")
+    if c.reason:
+        print(f"      处理原因: {c.reason}")
+    if c.next_reviewer:
+        print(f"      下一步复核: {c.next_reviewer}")
 
 print("\n【回滚演示】许工回滚冲突决定")
 profile = resolve_conflict(
@@ -109,6 +115,7 @@ profile = resolve_conflict(
     chosen_name="",
     operator="许工",
     rollback=True,
+    reason="培训学员反馈需进一步核实原始资料后再确认",
 )
 print("  冲突已回滚:")
 for c in profile.conflicts:
@@ -123,6 +130,8 @@ profile = resolve_conflict(
     conflict_id="conflict_OBS001",
     chosen_name="凹陷点A",
     operator="许工",
+    reason="核实现场巡检照片IMG-20240315-001，现场确认为'凹陷点A'",
+    next_reviewer="培训学员张三（复核通过后归档）",
 )
 for r in profile.records:
     if r.obstacle_id == "OBS001":

@@ -39,10 +39,13 @@ class NameConflict(BaseModel):
     conflict_type: ConflictType
     obstacle_id: str
     names: list[str]
+    original_names: list[str] = []
     evidence: list[EvidenceEntry]
     resolution: Optional[str] = None
+    reason: Optional[str] = None
     resolved_by: Optional[str] = None
     resolved_at: Optional[datetime] = None
+    next_reviewer: Optional[str] = None
     status: RecordStatus = RecordStatus.PENDING_REVIEW
 
 

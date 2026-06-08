@@ -229,6 +229,7 @@ def _detect_name_conflicts(profile: WaterDepthProfile) -> None:
                 conflict_type=ConflictType.DUPLICATE_NAME,
                 obstacle_id=obstacle_id,
                 names=names,
+                original_names=list(names),
                 evidence=all_evidence,
                 status=RecordStatus.PENDING_REVIEW,
             )
@@ -249,6 +250,8 @@ def resolve_conflict(
     chosen_name: str,
     operator: str,
     rollback: bool = False,
+    reason: str = "",
+    next_reviewer: str = "",
 ) -> WaterDepthProfile:
     profile = _load_profile(profile_id)
     conflict = next((c for c in profile.conflicts if c.conflict_id == conflict_id), None)
@@ -258,6 +261,7 @@ def resolve_conflict(
     if rollback:
         conflict.status = RecordStatus.ROLLED_BACK
         conflict.resolution = f"rolled_back by {operator}"
+        conflict.reason = reason if reason else None
         conflict.resolved_by = operator
         conflict.resolved_at = datetime.now()
         for record in profile.records:
@@ -266,7 +270,7 @@ def resolve_conflict(
         _add_audit(
             profile,
             "rollback_conflict",
-            {"conflict_id": conflict_id, "operator": operator},
+            {"conflict_id": conflict_id, "operator": operator, "reason": reason},
         )
     else:
         if chosen_name not in conflict.names:
@@ -275,8 +279,10 @@ def resolve_conflict(
             )
         conflict.status = RecordStatus.CONFIRMED
         conflict.resolution = f"chosen_name={chosen_name}"
+        conflict.reason = reason if reason else None
         conflict.resolved_by = operator
         conflict.resolved_at = datetime.now()
+        conflict.next_reviewer = next_reviewer if next_reviewer else None
         for record in profile.records:
             if conflict.conflict_id in record.conflict_ids:
                 old_name = record.obstacle_name
@@ -298,6 +304,9 @@ def resolve_conflict(
                 "conflict_id": conflict_id,
                 "chosen_name": chosen_name,
                 "operator": operator,
+                "reason": reason,
+                "next_reviewer": next_reviewer,
+                "original_names": conflict.original_names,
             },
         )
 

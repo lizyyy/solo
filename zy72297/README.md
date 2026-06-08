@@ -43,10 +43,16 @@ IMPORTED ──补看照片──→ PHOTO_REVIEWED ──更新标注──→ 
 
 ### 修改规则
 
-1. 设备工程师许工在"冲突处理"面板选择一个名称
-2. 系统将同一 `obstacle_id` 下所有记录的 `obstacle_name` 统一为选定名称
-3. 名称变更作为 `MANUAL` 类型证据追加到 `evidence_trail` 和 `manual_changes`
-4. 记录状态变为 `CONFIRMED`
+1. 设备工程师许工在"冲突处理"面板点击一个候选名称，系统以 **`conflict_id`（如 `conflict_OBS001`）作为 key 记录选择**，避免与 `obstacle_id` 混淆
+2. 许工填写"处理原因"（为何选此名称）和"下一步复核人"（培训学员谁来复核）
+3. 点击"确认选用"后系统完成以下动作：
+   - 同一 `obstacle_id` 下所有记录的 `obstacle_name` 统一为选定名称
+   - 名称变更作为 `MANUAL` 类型证据追加到 `evidence_trail` 和 `manual_changes`
+   - 冲突对象写入：`resolution`、`reason`、`resolved_by`、`resolved_at`、`next_reviewer`
+   - 记录状态变为 `CONFIRMED`
+   - 审计日志追加含 `original_names`、`reason`、`next_reviewer` 的完整记录
+   - 冲突处理区、列表、详情、摘要、画布、导出、接口全部重渲染为同一份新结果
+4. 如果未选名称就点确认，弹出"请先选择一个名称"（由后端 `ValueError` 和前端双重保障）
 
 ### 回滚规则
 

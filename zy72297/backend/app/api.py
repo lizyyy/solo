@@ -48,6 +48,8 @@ class ResolveConflictRequest(PydanticModel):
     chosen_name: str
     operator: str
     rollback: bool = False
+    reason: str = ""
+    next_reviewer: str = ""
 
 
 STATIC_DIR = Path(__file__).resolve().parent.parent.parent / "static"
@@ -107,7 +109,8 @@ async def api_update_annotation(profile_id: str, req: UpdateAnnotationRequest):
 async def api_resolve_conflict(profile_id: str, req: ResolveConflictRequest):
     try:
         return resolve_conflict(
-            profile_id, req.conflict_id, req.chosen_name, req.operator, req.rollback
+            profile_id, req.conflict_id, req.chosen_name, req.operator, req.rollback,
+            reason=req.reason, next_reviewer=req.next_reviewer,
         ).model_dump(mode="json")
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail="Profile not found")
