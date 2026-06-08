@@ -1,12 +1,17 @@
 import { Music2, Download } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { FilterBar } from '../components/FilterBar';
 import { RecordsTable } from '../components/RecordsTable';
 import { useRecordStore } from '../store/useRecordStore';
 
 export default function Home() {
   const navigate = useNavigate();
-  const { exportCsv } = useRecordStore();
+  const { exportCsv, initializeRecords } = useRecordStore();
+
+  useEffect(() => {
+    initializeRecords();
+  }, [initializeRecords]);
 
   const handleExport = () => {
     exportCsv();

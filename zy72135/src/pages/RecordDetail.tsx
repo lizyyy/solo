@@ -9,7 +9,7 @@ import { statusLabels, type RecordStatus } from '../../shared/types';
 export default function RecordDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { currentRecord, versionHistory, loading, saveStatus, fetchRecord, fetchVersionHistory, updateRecordNote, updateRecordStatus, clearSaveStatus } = useRecordStore();
+  const { currentRecord, versionHistories, loading, saveStatus, fetchRecord, updateRecordNote, updateRecordStatus, clearSaveStatus } = useRecordStore();
   
   const [note, setNote] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<RecordStatus | ''>('');
@@ -17,10 +17,9 @@ export default function RecordDetail() {
   useEffect(() => {
     if (id) {
       fetchRecord(id);
-      fetchVersionHistory(id);
     }
     return () => clearSaveStatus();
-  }, [id, fetchRecord, fetchVersionHistory, clearSaveStatus]);
+  }, [id, fetchRecord, clearSaveStatus]);
 
   useEffect(() => {
     if (currentRecord) {
@@ -51,6 +50,8 @@ export default function RecordDetail() {
     if (currentRecord.isRenamed) tags.push({ label: `人工改名(原:${currentRecord.originalTrackName})`, color: 'bg-purple-100 text-purple-600' });
     return tags;
   };
+
+  const versionHistory = id ? (versionHistories[id] || []) : [];
 
   if (loading && !currentRecord) {
     return (
