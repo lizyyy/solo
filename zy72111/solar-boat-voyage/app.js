@@ -54,6 +54,7 @@
                 var vm = p.unit.match(/(\d+)\s*v/);
                 return p.value * (vm ? parseFloat(vm[1]) : 48) / 1000;
             }
+            if (p.unit.indexOf('kwh') >= 0) return p.value;
             if (p.unit.indexOf('wh') >= 0) return p.value / 1000;
             return p.value;
         },
@@ -136,22 +137,54 @@
         return gaps;
     }
 
+    var PHOTO_NOTE_LABEL_MAP = {
+        '\u8f90\u7167\u5ea6': 'irradiance',
+        '\u8f90\u7167': 'irradiance',
+        '\u7535\u6c60\u6e29\u5ea6': 'batteryTemp',
+        '\u7535\u6c60\u6e29': 'batteryTemp',
+        '\u98ce\u901f': 'windSpeed',
+        '\u6d6a\u9ad8': 'waveHeight',
+        '\u822a\u901f': 'boatSpeed',
+        '\u7535\u673a\u529f\u7387': 'motorPower'
+    };
+
+    function parsePhotoNoteFields(note) {
+        if (!note) return [];
+        var results = [];
+        var pattern = /(\u8f90\u7167\u5ea6|\u8f90\u7167|\u7535\u6c60\u6e29\u5ea6|\u7535\u6c60\u6e29|\u98ce\u901f|\u6d6a\u9ad8|\u822a\u901f|\u7535\u673a\u529f\u7387)\s*([\d.]+)/g;
+        var match;
+        while ((match = pattern.exec(note)) !== null) {
+            var fieldKey = PHOTO_NOTE_LABEL_MAP[match[1]];
+            var numVal = parseFloat(match[2]);
+            if (fieldKey && !isNaN(numVal)) {
+                results.push({ label: match[1], field: fieldKey, value: numVal });
+            }
+        }
+        return results;
+    }
+
+    var CONFLICT_TIME_WINDOW_MS = 7200000;
+
     function detectConflicts(records) {
         var conflicts = [];
         var photoRecs = records.filter(function (r) { return r.dataSource === '\u73b0\u573a\u7167\u7247' && r.photoNote; });
         var otherRecs = records.filter(function (r) { return r.dataSource !== '\u73b0\u573a\u7167\u7247'; });
 
         photoRecs.forEach(function (photo) {
+            var photoFields = parsePhotoNoteFields(photo.photoNote);
+            if (!photoFields.length) return;
             otherRecs.forEach(function (other) {
-                if (Math.abs(new Date(photo.sampleTime) - new Date(other.sampleTime)) > 1800000) return;
-                var pp = parseNumberWithUnit(photo.photoNote);
-                if (!pp) return;
-                var fields = ['irradiance', 'batteryTemp', 'motorPower', 'boatSpeed', 'windSpeed'];
-                fields.forEach(function (f) {
-                    if (other[f] !== null && other[f] !== undefined) {
-                        var ratio = Math.abs(pp.value - other[f]) / Math.max(Math.abs(other[f]), 0.01);
+                if (Math.abs(new Date(photo.sampleTime) - new Date(other.sampleTime)) > CONFLICT_TIME_WINDOW_MS) return;
+                photoFields.forEach(function (pf) {
+                    if (other[pf.field] !== null && other[pf.field] !== undefined) {
+                        var ratio = Math.abs(pf.value - other[pf.field]) / Math.max(Math.abs(other[pf.field]), 0.01);
                         if (ratio > 0.15) {
-                            conflicts.push({ photoRecord: photo, dataRecord: other, field: f, photoValue: pp.value, dataValue: other[f] });
+                            var dup = conflicts.some(function (c) {
+                                return c.photoRecord.id === photo.id && c.dataRecord.id === other.id && c.field === pf.field;
+                            });
+                            if (!dup) {
+                                conflicts.push({ photoRecord: photo, dataRecord: other, field: pf.field, photoLabel: pf.label, photoValue: pf.value, dataValue: other[pf.field] });
+                            }
                         }
                     }
                 });
@@ -162,10 +195,10 @@
         manualRecs.forEach(function (manual) {
             records.forEach(function (other) {
                 if (other.id === manual.id) return;
-                if (Math.abs(new Date(manual.sampleTime) - new Date(other.sampleTime)) > 1800000) return;
+                if (Math.abs(new Date(manual.sampleTime) - new Date(other.sampleTime)) > CONFLICT_TIME_WINDOW_MS) return;
                 if (manual.remarks && other.remarks && manual.remarks !== other.remarks) {
                     var dup = conflicts.some(function (c) {
-                        return c.photoRecord && ((c.photoRecord.id === manual.id && c.dataRecord.id === other.id) || (c.photoRecord.id === other.id && c.dataRecord.id === manual.id));
+                        return c.isRemark && ((c.manualRecord.id === manual.id && c.dataRecord.id === other.id) || (c.manualRecord.id === other.id && c.dataRecord.id === manual.id));
                     });
                     if (!dup) {
                         conflicts.push({ manualRecord: manual, dataRecord: other, field: 'remarks', manualValue: manual.remarks, dataValue: other.remarks, isRemark: true });
@@ -258,7 +291,7 @@
             if (c.isRemark) {
                 html += '<div class="conflict-item"><div class="conflict-title">\u26a0 \u5907\u6ce8\u51b2\u7a81</div><div class="conflict-evidence"><div class="evidence-box evidence-photo"><div class="evidence-label">\u4eba\u5de5\u5907\u6ce8</div>' + c.manualValue + '</div><div class="evidence-box evidence-import"><div class="evidence-label">\u5176\u4ed6\u6765\u6e90</div>' + c.dataValue + '</div></div><div class="conflict-suggestion">\ud83d\udca1 \u4e24\u6761\u5907\u6ce8\u5185\u5bb9\u4e0d\u4e00\u81f4\uff0c\u5efa\u8bae\u6838\u5bf9\u539f\u59cb\u8bb0\u5f55\u518d\u786e\u8ba4\u4ee5\u54ea\u6761\u4e3a\u51c6</div></div>';
             } else {
-                var fl = THRESHOLDS[c.field] ? THRESHOLDS[c.field].label : c.field;
+                var fl = c.photoLabel || (THRESHOLDS[c.field] ? THRESHOLDS[c.field].label : c.field);
                 html += '<div class="conflict-item"><div class="conflict-title">\u26a0 \u6570\u636e\u51b2\u7a81: ' + fl + '</div><div class="conflict-evidence"><div class="evidence-box evidence-photo"><div class="evidence-label">\ud83d\udcf7 \u73b0\u573a\u7167\u7247</div>' + c.photoValue + '</div><div class="evidence-box evidence-import"><div class="evidence-label">\ud83d\udccb \u5bfc\u5165\u6570\u636e</div>' + c.dataValue + '</div></div><div class="conflict-suggestion">\ud83d\udca1 \u7167\u7247\u548c\u5bfc\u5165\u6570\u636e\u5bf9\u4e0d\u4e0a\uff0c\u5efa\u8bae\u56de\u770b\u539f\u59cb\u7167\u7247\u786e\u8ba4\u8bfb\u6570\uff0c\u518d\u51b3\u5b9a\u4ee5\u54ea\u8fb9\u4e3a\u51c6</div></div>';
             }
         });
@@ -620,7 +653,7 @@
                     '<br>\u4eba\u5de5\u5907\u6ce8: ' + c.manualValue + ' vs \u5176\u4ed6\u6765\u6e90: ' + c.dataValue +
                     '<br><span style="font-size:11px;color:var(--text-secondary)">\u5efa\u8bae: \u6838\u5bf9\u539f\u59cb\u8bb0\u5f55\u518d\u786e\u8ba4\u4ee5\u54ea\u6761\u4e3a\u51c6</span></div>';
             } else {
-                var fl = THRESHOLDS[c.field] ? THRESHOLDS[c.field].label : c.field;
+                var fl = c.photoLabel || (THRESHOLDS[c.field] ? THRESHOLDS[c.field].label : c.field);
                 html += '<div class="report-summary-item" style="background:var(--warning-light);padding:6px 8px;border-radius:4px;margin-bottom:4px">' +
                     '\u26a0 <strong>' + fl + ' \u6570\u636e\u51b2\u7a81</strong>' +
                     '<br>\u73b0\u573a\u7167\u7247: ' + c.photoValue + ' vs \u5bfc\u5165\u6570\u636e: ' + c.dataValue +
