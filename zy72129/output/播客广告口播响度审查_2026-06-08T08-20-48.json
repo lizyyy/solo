@@ -1,18 +1,18 @@
 {
-  "exportedAt": "2026-06-01T23:20:20.219Z",
+  "exportedAt": "2026-06-08T08:20:48.764Z",
   "summary": {
-    "总记录数": 6,
-    "处理时间": "2026-06-01T23:20:20.219Z",
+    "总记录数": 7,
+    "处理时间": "2026-06-08T08:20:48.764Z",
     "失败": 2,
+    "需人工确认": 2,
     "通过": 1,
-    "需人工确认": 1,
     "旧口径": 2
   },
   "records": [
     {
-      "trackId": "",
-      "title": "",
-      "artist": "",
+      "trackId": "B001",
+      "title": "活动开场",
+      "artist": "赵老师",
       "fileName": "corrupted_file.mp3",
       "status": "失败",
       "loudness": null,
@@ -20,9 +20,21 @@
       "reviewReasons": [
         "文件过小 (1字节)，可能损坏"
       ],
-      "notes": [],
-      "source": "文件验证",
-      "processedAt": "2026-06-01T23:20:20.215Z",
+      "notes": [
+        {
+          "note": "返工件，上次响度不够",
+          "source": "sample_tracklist.csv"
+        },
+        {
+          "trackId": "B001",
+          "note": "返工第三次，这次请张老师帮忙听一下",
+          "author": "小李",
+          "createdAt": "2024-12-16T14:20:00Z",
+          "source": "内部协作群"
+        }
+      ],
+      "source": "sample_tracklist.csv",
+      "processedAt": "2026-06-08T08:20:48.755Z",
       "isInvalid": true
     },
     {
@@ -38,8 +50,44 @@
       ],
       "notes": [],
       "source": "文件验证",
-      "processedAt": "2026-06-01T23:20:20.215Z",
+      "processedAt": "2026-06-08T08:20:48.755Z",
       "isInvalid": true
+    },
+    {
+      "trackId": "A003",
+      "title": "结尾促销语",
+      "artist": "张老师",
+      "fileName": "ad_ending_quiet.mp3",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy72129/data/audio/ad_ending_quiet.mp3",
+      "status": "需人工确认",
+      "loudness": {
+        "inputLUFS": -22,
+        "inputLRA": 3,
+        "inputPeak": -3,
+        "inputThresh": -32
+      },
+      "metadata": {
+        "format": "mp3",
+        "duration": 54.80042134073558,
+        "size": 129068,
+        "bitRate": 128000,
+        "sampleRate": 44100,
+        "channels": 2
+      },
+      "reviewReasons": [
+        "响度偏差 6.0 LUFS，目标 -16 LUFS",
+        "音量过低 (-22.0 LUFS)，低于最低阈值 -20 LUFS"
+      ],
+      "notes": [
+        {
+          "note": "录制环境较安静",
+          "source": "sample_tracklist.csv"
+        }
+      ],
+      "source": "sample_tracklist.csv",
+      "processedAt": "2026-06-08T08:20:48.755Z",
+      "simulated": true,
+      "fallbackReason": null
     },
     {
       "trackId": "A001",
@@ -56,8 +104,8 @@
       },
       "metadata": {
         "format": "mp3",
-        "duration": 67.95862175014315,
-        "size": 18,
+        "duration": 73.25142151490883,
+        "size": 160940,
         "bitRate": 128000,
         "sampleRate": 44100,
         "channels": 2
@@ -70,7 +118,9 @@
         }
       ],
       "source": "sample_tracklist.csv",
-      "processedAt": "2026-06-01T23:20:20.215Z"
+      "processedAt": "2026-06-08T08:20:48.755Z",
+      "simulated": true,
+      "fallbackReason": null
     },
     {
       "trackId": "A002",
@@ -87,8 +137,8 @@
       },
       "metadata": {
         "format": "mp3",
-        "duration": 42.91057494278806,
-        "size": 10,
+        "duration": 71.87319081128045,
+        "size": 160940,
         "bitRate": 128000,
         "sampleRate": 44100,
         "channels": 2
@@ -112,7 +162,9 @@
         }
       ],
       "source": "sample_tracklist.csv",
-      "processedAt": "2026-06-01T23:20:20.215Z"
+      "processedAt": "2026-06-08T08:20:48.755Z",
+      "simulated": true,
+      "fallbackReason": null
     },
     {
       "trackId": "L001",
@@ -142,7 +194,7 @@
         "duration": 180,
         "format": "mp3"
       },
-      "processedAt": "2026-06-01T23:20:20.215Z"
+      "processedAt": "2026-06-08T08:20:48.756Z"
     },
     {
       "trackId": "L002",
@@ -172,7 +224,7 @@
         "duration": 45,
         "format": "mp3"
       },
-      "processedAt": "2026-06-01T23:20:20.215Z"
+      "processedAt": "2026-06-08T08:20:48.756Z"
     }
   ]
 }

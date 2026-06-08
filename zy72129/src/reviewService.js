@@ -34,20 +34,23 @@ class ReviewService {
     const filePaths = this.batchProcessor.scanDirectory(audioDir);
     const { validFiles, invalidFiles } = this.batchProcessor.validateAndFilterFiles(filePaths);
     
-    const invalidResults = invalidFiles.map(file => ({
-      trackId: '',
-      title: '',
-      artist: '',
-      fileName: file.fileName,
-      status: config.review.statuses.FAILED,
-      loudness: null,
-      metadata: null,
-      reviewReasons: [file.reason],
-      notes: [],
-      source: '文件验证',
-      processedAt: new Date().toISOString(),
-      isInvalid: true
-    }));
+    const invalidResults = invalidFiles.map(file => {
+      const trackInfo = this.tracklistManager.findTrackByFileName(file.fileName);
+      return {
+        trackId: trackInfo?.trackId || '',
+        title: trackInfo?.title || '',
+        artist: trackInfo?.artist || '',
+        fileName: file.fileName,
+        status: config.review.statuses.FAILED,
+        loudness: null,
+        metadata: null,
+        reviewReasons: [file.reason],
+        notes: trackInfo?.notes || [],
+        source: trackInfo?.source || '文件验证',
+        processedAt: new Date().toISOString(),
+        isInvalid: true
+      };
+    });
     
     const batchResult = await this.batchProcessor.processFiles(
       validFiles,
@@ -55,24 +58,25 @@ class ReviewService {
     );
     
     const processedResults = batchResult.results.map(result => {
+      const trackInfo = this.tracklistManager.findTrackByFileName(result.fileName);
+
       if (result.status === 'error') {
         return {
-          trackId: '',
-          title: '',
-          artist: '',
+          trackId: trackInfo?.trackId || '',
+          title: trackInfo?.title || '',
+          artist: trackInfo?.artist || '',
           fileName: result.fileName,
           filePath: result.filePath,
           status: config.review.statuses.FAILED,
           loudness: null,
           metadata: null,
           reviewReasons: [result.error],
-          notes: [],
-          source: '音频分析',
+          notes: trackInfo?.notes || [],
+          source: trackInfo?.source || '音频分析',
           processedAt: result.processedAt
         };
       }
       
-      const trackInfo = this.tracklistManager.findTrackByFileName(result.fileName);
       const analysis = result.data;
       
       return {
@@ -87,7 +91,9 @@ class ReviewService {
         reviewReasons: analysis.assessment.reasons,
         notes: trackInfo?.notes || [],
         source: trackInfo?.source || '音频目录',
-        processedAt: result.processedAt
+        processedAt: result.processedAt,
+        simulated: analysis.simulated || false,
+        fallbackReason: analysis.fallbackReason || null
       };
     });
     

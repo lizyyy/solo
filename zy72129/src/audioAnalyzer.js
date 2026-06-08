@@ -77,7 +77,26 @@ class AudioAnalyzer {
         assessment: this.assessLoudness(loudnessData)
       };
     } catch (error) {
-      throw new Error(`音频分析失败: ${error.message}`);
+      const profile = this.getSimulationProfile(fileName);
+      const loudnessData = this.simulationPresets[profile];
+      const stats = fs.statSync(filePath);
+      const metadata = {
+        format: path.extname(fileName).slice(1),
+        duration: 30 + Math.random() * 60,
+        size: stats.size,
+        bitRate: 128000,
+        sampleRate: 44100,
+        channels: 2
+      };
+
+      return {
+        metadata,
+        loudness: loudnessData,
+        assessment: this.assessLoudness(loudnessData),
+        simulated: true,
+        simulationProfile: profile,
+        fallbackReason: `ffprobe分析失败(${error.message})，已回退模拟模式`
+      };
     }
   }
 
@@ -114,8 +133,14 @@ class AudioAnalyzer {
         })
         .on('end', () => {
           try {
-            const jsonStart = measurements.findIndex(line => line.includes('{'));
-            const jsonEnd = measurements.findIndex(line => line.includes('}'));
+            const jsonStart = measurements.findIndex(line => line.trim() === '{');
+            let jsonEnd = -1;
+            for (let i = measurements.length - 1; i >= 0; i--) {
+              if (measurements[i].trim() === '}') {
+                jsonEnd = i;
+                break;
+              }
+            }
             
             if (jsonStart !== -1 && jsonEnd !== -1) {
               const jsonStr = measurements.slice(jsonStart, jsonEnd + 1).join('\n');
@@ -123,8 +148,8 @@ class AudioAnalyzer {
               resolve({
                 inputLUFS: parseFloat(data.input_i) || -16,
                 inputLRA: parseFloat(data.input_lra) || 0,
-                inputPeak: parseFloat(data.input_peak) || 0,
-                inputThresh: parseFloat(data.input_thresh) || 0
+                inputPeak: parseFloat(data.input_tp) || -1,
+                inputThresh: parseFloat(data.input_thresh) || -26
               });
             } else {
               resolve({

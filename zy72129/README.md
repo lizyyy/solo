@@ -9,13 +9,14 @@
 - 📊 **多格式导出**：CSV / JSON / Excel，带完整审查信息
 - 📜 **旧口径支持**：从舞台通道表导入历史数据，保留上下文
 - ⚠️ **异常标注**：需人工确认的记录清晰标记
+- 🔄 **自动回退**：ffprobe 分析失败时自动回退模拟模式，不丢弃曲目关联
 
 ## 目录结构
 
 ```
 .
 ├── data/
-│   ├── audio/          # 样例音频文件放这里
+│   ├── audio/          # 音频文件放这里（含样例）
 │   ├── tracklists/     # 曲目表（CSV/Excel）
 │   └── notes/          # 群聊补充批注
 ├── src/                # 源代码
@@ -31,7 +32,20 @@
 npm install
 ```
 
-### 2. 运行完整演示
+### 2. 扫描样例音频（真实 ffprobe 分析）
+
+```bash
+npm run scan -- --tracklist data/tracklists/sample_tracklist.csv --notes data/notes/sample_notes.json --export
+```
+
+这条命令会：
+1. 加载曲目表（`sample_tracklist.csv`）
+2. 加载群聊批注（`sample_notes.json`）并合并到曲目
+3. 扫描 `data/audio/` 目录中的音频文件
+4. 用 ffprobe 分析真实响度
+5. 导出 CSV/JSON/Excel 报告到 `output/` 目录
+
+### 3. 运行模拟演示（不需要真实音频）
 
 ```bash
 node src/demo.js
@@ -46,13 +60,6 @@ node src/demo.js
 | 旧口径 | 舞台通道表历史数据，2024年10月批次 | 📜 旧口径 |
 | 坏文件 | 空文件、损坏文件，不影响其他文件处理 | ❌ 失败 |
 
-### 3. 扫描实际音频
-
-```bash
-# 扫描音频目录，自动关联曲目表和批注
-node src/cli.js scan --tracklist data/tracklists/sample_tracklist.csv --notes data/notes/sample_notes.json --export
-```
-
 ## 样例音频存放位置
 
 所有音频文件放在 `data/audio/` 目录下，支持格式：
@@ -66,10 +73,11 @@ node src/cli.js scan --tracklist data/tracklists/sample_tracklist.csv --notes da
 
 | 文件名 | 说明 | 预期结果 |
 |--------|------|----------|
-| `ad_opening_normal.mp3` | 正常响度的开场口播 | 通过 |
-| `ad_product_loud.mp3` | 音量偏高的产品口播 | 需人工确认 |
-| `corrupted_file.mp3` | 损坏文件（模拟） | 失败 |
-| `empty_file.wav` | 空文件（模拟） | 失败 |
+| `ad_opening_normal.mp3` | 正常响度 (~-16 LUFS) 的开场口播 | ✅ 通过 |
+| `ad_product_loud.mp3` | 音量偏高的产品口播 (~-10 LUFS) | ⚠️ 需人工确认 |
+| `ad_ending_quiet.mp3` | 音量偏低的结尾口播 (~-22 LUFS) | ⚠️ 需人工确认 |
+| `corrupted_file.mp3` | 损坏文件（模拟） | ❌ 失败 |
+| `empty_file.wav` | 空文件（模拟） | ❌ 失败 |
 
 ## 曲目表格式
 
@@ -101,7 +109,7 @@ node src/cli.js scan --tracklist data/tracklists/sample_tracklist.csv --notes da
 
 ## 报告导出
 
-运行扫描后，报告自动导出到 `output/` 目录：
+运行扫描加 `--export` 参数，报告自动导出到 `output/` 目录：
 
 ### 导出的报告包含
 
@@ -147,26 +155,26 @@ loudness: {
 - 空文件 → 标记失败，不影响其他文件
 - 损坏文件 → 标记失败，记录错误原因
 - 格式不支持 → 提前过滤
+- ffprobe 解析失败 → 自动回退模拟模式，保留曲目关联
 - 曲目表与音频不匹配 → 音频单独处理，保留文件名关联
 
-## 使用示例
+## 命令参考
 
-```javascript
-const ReviewService = require('./src/reviewService');
+```bash
+# 扫描音频并导出完整报告
+npm run scan -- --tracklist <曲目表路径> --notes <批注路径> --export
 
-const service = new ReviewService();
+# 仅扫描不导出
+npm run scan -- --tracklist data/tracklists/sample_tracklist.csv
 
-// 1. 加载曲目表
-await service.loadTracklist('data/tracklists/sample_tracklist.csv');
+# 指定音频目录
+npm run scan -- --audio-dir /path/to/audio --export
 
-// 2. 加载批注
-await service.loadNotes('data/notes/sample_notes.json');
+# 指定导出格式
+npm run scan -- --export --format csv
 
-// 3. 扫描音频目录
-await service.scanAudioDirectory();
-
-// 4. 导出报告
-await service.exportReports('all', '播客广告口播响度审查');
+# 运行模拟演示
+node src/demo.js
 ```
 
 ---

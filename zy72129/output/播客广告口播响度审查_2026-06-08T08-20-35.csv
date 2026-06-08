@@ -1,0 +1,6 @@
+序号,曲目,表演者,文件名,审查状态,响度(LUFS),峰值(dB),审查原因,批注,数据来源,处理时间,时长(秒)
+B001,活动开场,赵老师,corrupted_file.mp3,失败,,,文件过小 (1字节)，可能损坏,[sample_tracklist.csv] 返工件，上次响度不够 | [内部协作群] 返工第三次，这次请张老师帮忙听一下,sample_tracklist.csv,2026-06-08T08:20:26.061Z,
+,,,empty_file.wav,失败,,,文件为空 (0字节),,文件验证,2026-06-08T08:20:26.061Z,
+A003,结尾促销语,张老师,ad_ending_quiet.mp3,需人工确认,-22.45,-18.65,响度偏差 6.4 LUFS，目标 -16 LUFS; 音量过低 (-22.4 LUFS)，低于最低阈值 -20 LUFS,[sample_tracklist.csv] 录制环境较安静,sample_tracklist.csv,2026-06-08T08:20:35.285Z,8.0
+A001,品牌开场口播,李老师,ad_opening_normal.mp3,通过,-16.45,-12.72,正常,[sample_tracklist.csv] 客户确认版本，语速正常,sample_tracklist.csv,2026-06-08T08:20:35.639Z,10.0
+A002,产品介绍口播,王老师,ad_product_loud.mp3,需人工确认,-10.45,-7.15,响度偏差 5.6 LUFS，目标 -16 LUFS; 音量过高 (-10.4 LUFS)，高于最高阈值 -12 LUFS,[sample_tracklist.csv] 音量可能偏高，需确认 | [微信群聊] 群里王老师说这个版本是专门给老年听众录的，音量稍大是故意的,sample_tracklist.csv,2026-06-08T08:20:35.891Z,10.0

@@ -137,12 +137,11 @@ class ReportExporter {
     };
   }
 
-  exportAll(reviewData, fileNamePrefix = 'loudness_review') {
-    return {
-      csv: this.exportToCsv(reviewData, fileNamePrefix),
-      json: this.exportToJson(reviewData, fileNamePrefix),
-      excel: this.exportToExcel(reviewData, fileNamePrefix)
-    };
+  async exportAll(reviewData, fileNamePrefix = 'loudness_review') {
+    const csv = await this.exportToCsv(reviewData, fileNamePrefix);
+    const json = this.exportToJson(reviewData, fileNamePrefix);
+    const excel = this.exportToExcel(reviewData, fileNamePrefix);
+    return { csv, json, excel };
   }
 }
 

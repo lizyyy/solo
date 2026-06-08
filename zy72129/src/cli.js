@@ -72,6 +72,7 @@ async function main() {
 async function handleScan(argv) {
   const service = new ReviewService();
   
+  console.log('');
   console.log('=== 播客广告口播响度审查系统');
   console.log('================================');
   
@@ -83,30 +84,67 @@ async function handleScan(argv) {
   if (argv.notes) {
     console.log(`加载批注: ${argv.notes}`);
     await service.loadNotes(argv.notes);
+    
+    const tracklistName = path.basename(argv.tracklist || '');
+    const notesName = path.basename(argv.notes);
+    if (tracklistName && service.tracklistManager.tracklists.has(tracklistName)) {
+      service.mergeNotes(tracklistName, notesName);
+      console.log(`已合并批注到曲目表`);
+    }
   }
   
   console.log(`扫描音频目录: ${argv.audioDir}`);
   const result = await service.scanAudioDirectory(argv.audioDir);
   
-  console.log('\n=== 扫描结果 ===');
+  console.log('');
+  console.log('=== 扫描结果 ===');
   console.log(`总文件数: ${result.summary.total}`);
   console.log(`成功处理: ${result.summary.success}`);
   console.log(`失败: ${result.summary.failed}`);
   console.log(`成功率: ${result.summary.successRate}%`);
   
-  console.log('\n=== 审查结果摘要 ===');
+  console.log('');
+  console.log('=== 审查结果详情 ===');
   result.results.forEach((r, i) => {
-    const statusIcon = r.status === '通过' ? '✓' : r.status === '失败' ? '✗' : '⚠';
-    console.log(`${statusIcon} [${r.status}] ${r.fileName}`);
+    const icons = {
+      '通过': '✅',
+      '需人工确认': '⚠️ ',
+      '旧口径': '📜',
+      '失败': '❌',
+      '待处理': '⏳'
+    };
+    
+    console.log('');
+    console.log(`${icons[r.status] || '•'} ${i + 1}. ${r.title || r.fileName}`);
+    console.log(`   状态: ${r.status}`);
+    console.log(`   文件名: ${r.fileName}`);
+    if (r.trackId) console.log(`   曲目ID: ${r.trackId}`);
+    if (r.source) console.log(`   来源: ${r.source}`);
+    if (r.loudness) {
+      console.log(`   响度: ${r.loudness.inputLUFS?.toFixed(1)} LUFS`);
+    }
     if (r.reviewReasons && r.reviewReasons.length > 0) {
-      r.reviewReasons.forEach(reason => console.log(`   - ${reason}`));
+      r.reviewReasons.forEach(reason => console.log(`   原因: ${reason}`));
+    }
+    if (r.fallbackReason) {
+      console.log(`   ⚠ 回退: ${r.fallbackReason}`);
+    }
+    if (r.notes && r.notes.length > 0) {
+      r.notes.forEach(note => {
+        const src = note.source ? `[${note.source}]` : '';
+        console.log(`   批注: ${src} ${note.note || note}`);
+      });
     }
   });
   
   if (argv.export) {
-    console.log('\n=== 导出报告 ===');
+    console.log('');
+    console.log('=== 导出报告 ===');
     const exports = await service.exportReports(argv.format);
-    console.log('报告已导出至:', config.paths.output);
+    if (exports.csv) console.log(`CSV:   ${exports.csv.fileName}`);
+    if (exports.json) console.log(`JSON:  ${exports.json.fileName}`);
+    if (exports.excel) console.log(`Excel: ${exports.excel.fileName}`);
+    console.log(`报告目录: ${config.paths.output}`);
   }
 }
 
