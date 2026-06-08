@@ -58,6 +58,16 @@ class RepairRecordResponse(BaseModel):
     is_boundary_equal_threshold: bool
     instructor_reviewed: bool
     rollback_reason: Optional[str]
+    original_value_before: Optional[float]
+    original_value_after: Optional[float]
+    interpolated_value_before: Optional[float]
+    interpolated_value_after: Optional[float]
+    threshold_before: Optional[float]
+    threshold_after: Optional[float]
+    action_type: Optional[str]
+    change_reason: Optional[str]
+    changed_by: str
+    next_action_owner: Optional[str]
     created_at: datetime
 
     class Config:
@@ -127,3 +137,19 @@ class ExportDetailResponse(BaseModel):
     row: WeightRowResponse
     audit_trails: List[AuditTrailResponse]
     repair_records: List[RepairRecordResponse]
+
+
+class BatchSummaryResponse(BaseModel):
+    import_batch_id: str
+    current_phase: ImportPhase
+    total_rows: int
+    boundary_equal_threshold_count: int
+    wrong_caliber_count: int
+    supplementary_rework_count: int
+    pending_count: int
+    reviewing_count: int
+    boundary_pending_review_count: int
+    confirmed_count: int
+    rolled_back_count: int
+    created_at: datetime
+    updated_at: datetime

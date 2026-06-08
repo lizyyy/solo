@@ -9,8 +9,16 @@ from interpolation_gauge.models.schemas import (
 from interpolation_gauge.models.payloads import (
     WeightRowImportItem, WeightRowResponse, AuditTrailResponse,
     RepairRecordResponse, WorkflowStateResponse, ExportDetailResponse,
+    BatchSummaryResponse,
 )
 from interpolation_gauge.services.interpolation import judge_boundary, piecewise_linear_interpolate
+
+
+DEFAULT_BREAKPOINTS_FACTOR = [(0.0, 0.0), (0.5, 0.5), (1.0, 1.0), (1.5, 1.5)]
+
+
+def _default_breakpoints(threshold: float) -> list:
+    return [(t * threshold, v) for t, v in DEFAULT_BREAKPOINTS_FACTOR]
 
 
 def _record_audit(
@@ -38,14 +46,168 @@ def _record_audit(
     return trail
 
 
+def _record_repair(
+    db: Session,
+    row: ScoringWeightRow,
+    phase: ImportPhase,
+    action_type: str,
+    change_reason: Optional[str] = None,
+    changed_by: str = "system",
+    next_action_owner: Optional[str] = None,
+    old_formula_screenshot_ref: Optional[str] = None,
+    counterexample_note: Optional[str] = None,
+    rollback_reason: Optional[str] = None,
+    interpolated_curve_data: Optional[dict] = None,
+    original_value_before: Optional[float] = None,
+    original_value_after: Optional[float] = None,
+    interpolated_value_before: Optional[float] = None,
+    interpolated_value_after: Optional[float] = None,
+    threshold_before: Optional[float] = None,
+    threshold_after: Optional[float] = None,
+    instructor_reviewed: Optional[int] = None,
+) -> RepairRecord:
+    is_boundary = row.boundary_judgment == BoundaryJudgment.EQUAL_THRESHOLD
+    ir = instructor_reviewed
+    if ir is None:
+        ir = 0 if is_boundary else 1
+        if is_boundary and phase == ImportPhase.COUNTEREXAMPLE_UPDATED and action_type == "counterexample_update":
+            ir = 0
+    repair = RepairRecord(
+        row_id=row.id,
+        import_batch_id=row.import_batch_id,
+        phase=phase,
+        boundary_judgment=row.boundary_judgment,
+        interpolated_curve_data=interpolated_curve_data,
+        old_formula_screenshot_ref=old_formula_screenshot_ref,
+        counterexample_note=counterexample_note,
+        is_boundary_equal_threshold=1 if is_boundary else 0,
+        instructor_reviewed=ir,
+        rollback_reason=rollback_reason,
+        original_value_before=original_value_before,
+        original_value_after=original_value_after,
+        interpolated_value_before=interpolated_value_before,
+        interpolated_value_after=interpolated_value_after,
+        threshold_before=threshold_before,
+        threshold_after=threshold_after,
+        action_type=action_type,
+        change_reason=change_reason,
+        changed_by=changed_by,
+        next_action_owner=next_action_owner,
+        created_at=datetime.utcnow(),
+    )
+    db.add(repair)
+    db.flush()
+    return repair
+
+
+def _recompute_value_and_status(
+    row: ScoringWeightRow,
+    new_original_value: Optional[float],
+    new_threshold: Optional[float] = None,
+) -> dict:
+    """
+    改值重算：重新计算边界判定 + 插值 + 状态初判。
+    返回改动前后快照。
+    """
+    old_original = row.original_value
+    old_interpolated = row.interpolated_value
+    old_threshold = row.threshold
+
+    if new_threshold is not None:
+        row.threshold = new_threshold
+    if new_original_value is not None:
+        row.original_value = new_original_value
+
+    if row.original_value is not None and row.threshold is not None:
+        bps = _default_breakpoints(row.threshold)
+        row.interpolated_value = piecewise_linear_interpolate(row.original_value, bps)
+        row.boundary_judgment = judge_boundary(row.original_value, row.threshold)
+    else:
+        row.interpolated_value = None
+        row.boundary_judgment = None
+
+    return {
+        "original_value_before": old_original,
+        "original_value_after": row.original_value,
+        "interpolated_value_before": old_interpolated,
+        "interpolated_value_after": row.interpolated_value,
+        "threshold_before": old_threshold,
+        "threshold_after": row.threshold,
+        "interpolated_curve_data": {
+            "breakpoints_used": "default",
+            "breakpoints": [list(x) for x in _default_breakpoints(row.threshold)] if row.threshold else [],
+        },
+    }
+
+
+def _refresh_workflow_counts(db: Session, import_batch_id: str) -> WorkflowState:
+    """
+    每次改动后重新统计工作流计数，确保摘要/列表/导出一致。
+    """
+    workflow = db.query(WorkflowState).filter(WorkflowState.import_batch_id == import_batch_id).first()
+    if not workflow:
+        raise ValueError(f"import_batch_id={import_batch_id} 不存在")
+
+    rows = db.query(ScoringWeightRow).filter(ScoringWeightRow.import_batch_id == import_batch_id).all()
+    workflow.total_rows = len(rows)
+    workflow.boundary_equal_threshold_count = sum(
+        1 for r in rows if r.boundary_judgment == BoundaryJudgment.EQUAL_THRESHOLD
+        and r.processing_status != ProcessingStatus.ROLLED_BACK
+    )
+    workflow.wrong_caliber_count = sum(1 for r in rows if r.error_type == ErrorType.WRONG_CALIBER)
+    workflow.supplementary_rework_count = sum(1 for r in rows if r.error_type == ErrorType.SUPPLEMENTARY_REWORK)
+    workflow.updated_at = datetime.utcnow()
+    db.flush()
+    return workflow
+
+
+def _determine_phase_after_action(db: Session, import_batch_id: str, action_type: str) -> None:
+    """
+    阶段推进规则（链路稳定关键）：
+    - 所有行都有 OLD_FORMULA_REVIEWED 阶段的修补记录 → 批次推进到 old_formula_reviewed
+    - 所有行都有 COUNTEREXAMPLE_UPDATED 阶段的修补记录 → 批次推进到 counterexample_updated
+    """
+    workflow = db.query(WorkflowState).filter(WorkflowState.import_batch_id == import_batch_id).first()
+    if not workflow:
+        return
+
+    rows = db.query(ScoringWeightRow).filter(ScoringWeightRow.import_batch_id == import_batch_id).all()
+    if not rows:
+        return
+    row_ids = {r.id for r in rows}
+
+    records = db.query(RepairRecord).filter(
+        RepairRecord.import_batch_id == import_batch_id,
+        RepairRecord.row_id.in_(row_ids),
+    ).all()
+    by_row_phase = {}
+    for r in records:
+        by_row_phase.setdefault(r.row_id, set()).add(r.phase)
+
+    all_done_formula = all(ImportPhase.OLD_FORMULA_REVIEWED in by_row_phase.get(rid, set()) for rid in row_ids)
+    all_done_counter = all(ImportPhase.COUNTEREXAMPLE_UPDATED in by_row_phase.get(rid, set()) for rid in row_ids)
+
+    if all_done_counter and workflow.current_phase != ImportPhase.COUNTEREXAMPLE_UPDATED:
+        workflow.current_phase = ImportPhase.COUNTEREXAMPLE_UPDATED
+        workflow.updated_at = datetime.utcnow()
+    elif all_done_formula and workflow.current_phase == ImportPhase.WEIGHT_TABLE_IMPORTED:
+        workflow.current_phase = ImportPhase.OLD_FORMULA_REVIEWED
+        workflow.updated_at = datetime.utcnow()
+    db.flush()
+
+
+def _next_owner_after(row: ScoringWeightRow) -> Optional[str]:
+    if row.boundary_judgment == BoundaryJudgment.EQUAL_THRESHOLD and \
+       row.processing_status in (ProcessingStatus.BOUNDARY_PENDING_REVIEW, ProcessingStatus.PENDING):
+        return "instructor"
+    if row.processing_status in (ProcessingStatus.PENDING, ProcessingStatus.REVIEWING):
+        return "analyst_qi"
+    return None
+
+
 def import_weight_table(db: Session, rows: List[WeightRowImportItem]) -> WorkflowStateResponse:
-    """
-    第一步：评分权重表导入。
-    对每一行执行边界值判定，等于阈值时标记 boundary_pending_review。
-    """
     batch_id = str(uuid.uuid4())[:8]
     boundary_count = 0
-    created_rows = []
 
     for item in rows:
         boundary_judgment = None
@@ -57,14 +219,8 @@ def import_weight_table(db: Session, rows: List[WeightRowImportItem]) -> Workflo
             if boundary_judgment == BoundaryJudgment.EQUAL_THRESHOLD:
                 processing_status = ProcessingStatus.BOUNDARY_PENDING_REVIEW
                 boundary_count += 1
-
-            default_breakpoints = [
-                (0.0, 0.0),
-                (item.threshold * 0.5, 0.5),
-                (item.threshold, 1.0),
-                (item.threshold * 1.5, 1.5),
-            ]
-            interpolated_value = piecewise_linear_interpolate(item.original_value, default_breakpoints)
+            bps = _default_breakpoints(item.threshold)
+            interpolated_value = piecewise_linear_interpolate(item.original_value, bps)
 
         row = ScoringWeightRow(
             import_batch_id=batch_id,
@@ -79,27 +235,33 @@ def import_weight_table(db: Session, rows: List[WeightRowImportItem]) -> Workflo
         )
         db.add(row)
         db.flush()
-        created_rows.append(row)
 
         _record_audit(
-            db=db,
-            row_id=row.id,
-            original_row_number=row.original_row_number,
-            field_name="import",
-            old_value=None,
-            new_value=f"row={item.original_row_number}, indicator={item.indicator_name}",
+            db=db, row_id=row.id, original_row_number=row.original_row_number,
+            field_name="import", old_value=None,
+            new_value=f"row={item.original_row_number}, indicator={item.indicator_name}, val={item.original_value}, th={item.threshold}",
             change_reason="评分权重表首次导入",
         )
 
-        repair = RepairRecord(
-            row_id=row.id,
-            import_batch_id=batch_id,
-            phase=ImportPhase.WEIGHT_TABLE_IMPORTED,
-            boundary_judgment=boundary_judgment,
-            interpolated_curve_data={"breakpoints_used": "default"},
-            is_boundary_equal_threshold=1 if boundary_judgment == BoundaryJudgment.EQUAL_THRESHOLD else 0,
+        is_boundary = boundary_judgment == BoundaryJudgment.EQUAL_THRESHOLD
+        _record_repair(
+            db=db, row=row, phase=ImportPhase.WEIGHT_TABLE_IMPORTED,
+            action_type="import",
+            change_reason="评分权重表首次导入",
+            changed_by="system",
+            next_action_owner="instructor" if is_boundary else "analyst_qi",
+            interpolated_curve_data={
+                "breakpoints_used": "default",
+                "breakpoints": [list(x) for x in _default_breakpoints(item.threshold)],
+            },
+            original_value_before=None,
+            original_value_after=item.original_value,
+            interpolated_value_before=None,
+            interpolated_value_after=interpolated_value,
+            threshold_before=None,
+            threshold_after=item.threshold,
+            instructor_reviewed=0 if is_boundary else 1,
         )
-        db.add(repair)
 
     workflow = WorkflowState(
         import_batch_id=batch_id,
@@ -121,45 +283,41 @@ def review_old_formula(
     note: Optional[str] = None,
     changed_by: str = "analyst_qi",
 ) -> RepairRecordResponse:
-    """
-    第二步：数据分析师小祁补看旧公式截图。
-    在修补记录中留下截图引用和备注，审计轨迹记录操作。
-    """
     row = db.query(ScoringWeightRow).filter(ScoringWeightRow.id == row_id).first()
     if not row:
         raise ValueError(f"row_id={row_id} 不存在")
 
-    repair = RepairRecord(
-        row_id=row_id,
-        import_batch_id=import_batch_id,
-        phase=ImportPhase.OLD_FORMULA_REVIEWED,
-        boundary_judgment=row.boundary_judgment,
-        old_formula_screenshot_ref=screenshot_ref,
-        is_boundary_equal_threshold=1 if row.boundary_judgment == BoundaryJudgment.EQUAL_THRESHOLD else 0,
-        counterexample_note=note,
-    )
-    db.add(repair)
-
     if row.processing_status == ProcessingStatus.PENDING:
         row.processing_status = ProcessingStatus.REVIEWING
-        row.updated_at = datetime.utcnow()
 
-    _record_audit(
-        db=db,
-        row_id=row_id,
-        original_row_number=row.original_row_number,
-        field_name="old_formula_screenshot_ref",
-        old_value=None,
-        new_value=screenshot_ref,
-        change_reason=f"补看旧公式截图{f'，备注：{note}' if note else ''}",
+    row.updated_at = datetime.utcnow()
+    db.flush()
+
+    reason = f"补看旧公式截图{f'，备注：{note}' if note else ''}"
+    repair = _record_repair(
+        db=db, row=row, phase=ImportPhase.OLD_FORMULA_REVIEWED,
+        action_type="old_formula_review",
+        change_reason=reason,
         changed_by=changed_by,
+        next_action_owner=_next_owner_after(row),
+        old_formula_screenshot_ref=screenshot_ref,
+        counterexample_note=note,
+        original_value_before=row.original_value,
+        original_value_after=row.original_value,
+        interpolated_value_before=row.interpolated_value,
+        interpolated_value_after=row.interpolated_value,
+        threshold_before=row.threshold,
+        threshold_after=row.threshold,
     )
 
-    workflow = db.query(WorkflowState).filter(WorkflowState.import_batch_id == import_batch_id).first()
-    if workflow and workflow.current_phase == ImportPhase.WEIGHT_TABLE_IMPORTED:
-        workflow.current_phase = ImportPhase.OLD_FORMULA_REVIEWED
-        workflow.updated_at = datetime.utcnow()
+    _record_audit(
+        db=db, row_id=row_id, original_row_number=row.original_row_number,
+        field_name="old_formula_screenshot_ref", old_value=None, new_value=screenshot_ref,
+        change_reason=reason, changed_by=changed_by,
+    )
 
+    _refresh_workflow_counts(db, import_batch_id)
+    _determine_phase_after_action(db, import_batch_id, "old_formula_review")
     db.commit()
     db.refresh(repair)
     return RepairRecordResponse.from_orm_with_bool(repair)
@@ -172,49 +330,46 @@ def update_counterexample(
     counterexample_note: str,
     changed_by: str = "analyst_qi",
 ) -> RepairRecordResponse:
-    """
-    第三步：反例列表更新。
-    如果该行边界值等于阈值，则 instructor_reviewed=0，等待任课老师复核。
-    """
     row = db.query(ScoringWeightRow).filter(ScoringWeightRow.id == row_id).first()
     if not row:
         raise ValueError(f"row_id={row_id} 不存在")
 
     is_boundary = row.boundary_judgment == BoundaryJudgment.EQUAL_THRESHOLD
-
-    repair = RepairRecord(
-        row_id=row_id,
-        import_batch_id=import_batch_id,
-        phase=ImportPhase.COUNTEREXAMPLE_UPDATED,
-        boundary_judgment=row.boundary_judgment,
-        counterexample_note=counterexample_note,
-        is_boundary_equal_threshold=1 if is_boundary else 0,
-        instructor_reviewed=0 if is_boundary else 1,
-    )
-    db.add(repair)
-
     if is_boundary:
         row.processing_status = ProcessingStatus.BOUNDARY_PENDING_REVIEW
+        reason_prefix = "反例列表更新，边界值等于阈值，留待任课老师复核"
+        next_owner = "instructor"
     else:
         row.processing_status = ProcessingStatus.CONFIRMED
+        reason_prefix = "反例列表更新，无边界问题"
+        next_owner = None
     row.updated_at = datetime.utcnow()
+    db.flush()
 
-    _record_audit(
-        db=db,
-        row_id=row_id,
-        original_row_number=row.original_row_number,
-        field_name="counterexample_note",
-        old_value=None,
-        new_value=counterexample_note,
-        change_reason=f"反例列表更新{'，边界值等于阈值，留待任课老师复核' if is_boundary else ''}",
+    repair = _record_repair(
+        db=db, row=row, phase=ImportPhase.COUNTEREXAMPLE_UPDATED,
+        action_type="counterexample_update",
+        change_reason=f"{reason_prefix}：{counterexample_note}",
         changed_by=changed_by,
+        next_action_owner=next_owner,
+        counterexample_note=counterexample_note,
+        original_value_before=row.original_value,
+        original_value_after=row.original_value,
+        interpolated_value_before=row.interpolated_value,
+        interpolated_value_after=row.interpolated_value,
+        threshold_before=row.threshold,
+        threshold_after=row.threshold,
+        instructor_reviewed=0 if is_boundary else 1,
     )
 
-    workflow = db.query(WorkflowState).filter(WorkflowState.import_batch_id == import_batch_id).first()
-    if workflow and workflow.current_phase == ImportPhase.OLD_FORMULA_REVIEWED:
-        workflow.current_phase = ImportPhase.COUNTEREXAMPLE_UPDATED
-        workflow.updated_at = datetime.utcnow()
+    _record_audit(
+        db=db, row_id=row_id, original_row_number=row.original_row_number,
+        field_name="counterexample_note", old_value=None, new_value=counterexample_note,
+        change_reason=f"{reason_prefix}：{counterexample_note}", changed_by=changed_by,
+    )
 
+    _refresh_workflow_counts(db, import_batch_id)
+    _determine_phase_after_action(db, import_batch_id, "counterexample_update")
     db.commit()
     db.refresh(repair)
     return RepairRecordResponse.from_orm_with_bool(repair)
@@ -228,39 +383,63 @@ def manual_override(
     change_reason: str,
     changed_by: str = "analyst_qi",
 ) -> AuditTrailResponse:
-    """
-    人工改动：修改某行某字段，记录审计轨迹。
-    """
     row = db.query(ScoringWeightRow).filter(ScoringWeightRow.id == row_id).first()
     if not row:
         raise ValueError(f"row_id={row_id} 不存在")
 
-    old_val = str(getattr(row, field_name, ""))
-    setattr(row, field_name, new_value)
+    old_val_raw = getattr(row, field_name, None)
+    old_val = str(old_val_raw) if old_val_raw is not None else None
 
-    if field_name == "original_value" and row.threshold is not None:
+    recompute_snapshot = None
+    if field_name in ("original_value", "threshold"):
         try:
-            new_float = float(new_value)
-            boundary_judgment = judge_boundary(new_float, row.threshold)
-            row.boundary_judgment = boundary_judgment
-            if boundary_judgment == BoundaryJudgment.EQUAL_THRESHOLD:
-                row.processing_status = ProcessingStatus.BOUNDARY_PENDING_REVIEW
+            if field_name == "original_value":
+                new_float = float(new_value) if new_value != "" else None
+                recompute_snapshot = _recompute_value_and_status(row, new_original_value=new_float)
+            elif field_name == "threshold":
+                new_float = float(new_value) if new_value != "" else None
+                recompute_snapshot = _recompute_value_and_status(row, new_original_value=row.original_value, new_threshold=new_float)
         except ValueError:
-            pass
+            setattr(row, field_name, new_value)
+    else:
+        setattr(row, field_name, new_value)
+
+    if row.boundary_judgment == BoundaryJudgment.EQUAL_THRESHOLD and \
+       row.processing_status != ProcessingStatus.ROLLED_BACK:
+        row.processing_status = ProcessingStatus.BOUNDARY_PENDING_REVIEW
+    elif field_name in ("original_value", "threshold") and \
+         row.boundary_judgment != BoundaryJudgment.EQUAL_THRESHOLD and \
+         row.processing_status == ProcessingStatus.BOUNDARY_PENDING_REVIEW:
+        row.processing_status = ProcessingStatus.REVIEWING
 
     row.updated_at = datetime.utcnow()
     db.flush()
 
+    if recompute_snapshot is not None:
+        phase = ImportPhase.COUNTEREXAMPLE_UPDATED
+        _record_repair(
+            db=db, row=row, phase=phase,
+            action_type=f"manual_override:{field_name}",
+            change_reason=change_reason,
+            changed_by=changed_by,
+            next_action_owner=_next_owner_after(row),
+            interpolated_curve_data=recompute_snapshot["interpolated_curve_data"],
+            original_value_before=recompute_snapshot["original_value_before"],
+            original_value_after=recompute_snapshot["original_value_after"],
+            interpolated_value_before=recompute_snapshot["interpolated_value_before"],
+            interpolated_value_after=recompute_snapshot["interpolated_value_after"],
+            threshold_before=recompute_snapshot["threshold_before"],
+            threshold_after=recompute_snapshot["threshold_after"],
+            instructor_reviewed=0 if row.boundary_judgment == BoundaryJudgment.EQUAL_THRESHOLD else 1,
+        )
+
     trail = _record_audit(
-        db=db,
-        row_id=row_id,
-        original_row_number=row.original_row_number,
-        field_name=field_name,
-        old_value=old_val,
-        new_value=new_value,
-        change_reason=change_reason,
-        changed_by=changed_by,
+        db=db, row_id=row_id, original_row_number=row.original_row_number,
+        field_name=field_name, old_value=old_val, new_value=new_value,
+        change_reason=change_reason, changed_by=changed_by,
     )
+
+    _refresh_workflow_counts(db, row.import_batch_id)
     db.commit()
     db.refresh(trail)
     return AuditTrailResponse.model_validate(trail)
@@ -273,11 +452,6 @@ def review_boundary(
     reviewer: str = "instructor",
     reason: Optional[str] = None,
 ) -> WeightRowResponse:
-    """
-    任课老师复核边界值等于阈值的记录。
-    confirmed_normal=True → 归正常（CONFIRMED）
-    confirmed_normal=False → 保持 BOUNDARY_PENDING_REVIEW 或回退
-    """
     row = db.query(ScoringWeightRow).filter(ScoringWeightRow.id == row_id).first()
     if not row:
         raise ValueError(f"row_id={row_id} 不存在")
@@ -285,33 +459,41 @@ def review_boundary(
         raise ValueError(f"row_id={row_id} 非边界等于阈值，无需复核")
 
     old_status = row.processing_status
+    reason_text = f"任课老师复核：{'确认正常' if confirmed_normal else '继续审核'}{f'，理由：{reason}' if reason else ''}"
+
     if confirmed_normal:
         row.processing_status = ProcessingStatus.CONFIRMED
-        new_status = ProcessingStatus.CONFIRMED.value
+        next_owner = None
     else:
         row.processing_status = ProcessingStatus.REVIEWING
-        new_status = ProcessingStatus.REVIEWING.value
-
+        next_owner = "analyst_qi"
     row.updated_at = datetime.utcnow()
+    db.flush()
 
-    repair = db.query(RepairRecord).filter(
-        RepairRecord.row_id == row_id,
-        RepairRecord.is_boundary_equal_threshold == 1,
-        RepairRecord.instructor_reviewed == 0,
-    ).first()
-    if repair:
-        repair.instructor_reviewed = 1 if confirmed_normal else 0
+    _record_repair(
+        db=db, row=row, phase=ImportPhase.COUNTEREXAMPLE_UPDATED,
+        action_type="boundary_instructor_review",
+        change_reason=reason_text,
+        changed_by=reviewer,
+        next_action_owner=next_owner,
+        original_value_before=row.original_value,
+        original_value_after=row.original_value,
+        interpolated_value_before=row.interpolated_value,
+        interpolated_value_after=row.interpolated_value,
+        threshold_before=row.threshold,
+        threshold_after=row.threshold,
+        instructor_reviewed=1 if confirmed_normal else 0,
+    )
 
     _record_audit(
-        db=db,
-        row_id=row_id,
-        original_row_number=row.original_row_number,
+        db=db, row_id=row_id, original_row_number=row.original_row_number,
         field_name="processing_status",
         old_value=old_status.value if old_status else None,
-        new_value=new_status,
-        change_reason=f"任课老师复核：{'确认正常' if confirmed_normal else '继续审核'}{f'，理由：{reason}' if reason else ''}",
-        changed_by=reviewer,
+        new_value=row.processing_status.value,
+        change_reason=reason_text, changed_by=reviewer,
     )
+
+    _refresh_workflow_counts(db, row.import_batch_id)
     db.commit()
     db.refresh(row)
     return WeightRowResponse.model_validate(row)
@@ -323,9 +505,6 @@ def rollback_row(
     rollback_reason: str,
     changed_by: str = "analyst_qi",
 ) -> WeightRowResponse:
-    """
-    回滚：将行状态标记为 ROLLED_BACK，审计轨迹记录回滚原因。
-    """
     row = db.query(ScoringWeightRow).filter(ScoringWeightRow.id == row_id).first()
     if not row:
         raise ValueError(f"row_id={row_id} 不存在")
@@ -333,132 +512,105 @@ def rollback_row(
     old_status = row.processing_status
     row.processing_status = ProcessingStatus.ROLLED_BACK
     row.updated_at = datetime.utcnow()
+    db.flush()
 
-    repair = RepairRecord(
-        row_id=row_id,
-        import_batch_id=row.import_batch_id,
-        phase=ImportPhase.COUNTEREXAMPLE_UPDATED,
-        boundary_judgment=row.boundary_judgment,
+    _record_repair(
+        db=db, row=row, phase=ImportPhase.COUNTEREXAMPLE_UPDATED,
+        action_type="rollback",
+        change_reason=f"回滚：{rollback_reason}",
+        changed_by=changed_by,
+        next_action_owner="analyst_qi",
         rollback_reason=rollback_reason,
-        is_boundary_equal_threshold=1 if row.boundary_judgment == BoundaryJudgment.EQUAL_THRESHOLD else 0,
+        original_value_before=row.original_value,
+        original_value_after=row.original_value,
+        interpolated_value_before=row.interpolated_value,
+        interpolated_value_after=row.interpolated_value,
+        threshold_before=row.threshold,
+        threshold_after=row.threshold,
     )
-    db.add(repair)
 
     _record_audit(
-        db=db,
-        row_id=row_id,
-        original_row_number=row.original_row_number,
+        db=db, row_id=row_id, original_row_number=row.original_row_number,
         field_name="processing_status",
         old_value=old_status.value if old_status else None,
         new_value=ProcessingStatus.ROLLED_BACK.value,
-        change_reason=f"回滚：{rollback_reason}",
-        changed_by=changed_by,
+        change_reason=f"回滚：{rollback_reason}", changed_by=changed_by,
     )
+
+    _refresh_workflow_counts(db, row.import_batch_id)
+    db.commit()
+    db.refresh(row)
+    return WeightRowResponse.model_validate(row)
+
+
+def _quick_fix_impl(
+    db: Session,
+    row_id: int,
+    error_type: ErrorType,
+    fix_value: Optional[float],
+    fix_reason: str,
+    changed_by: str,
+    action_type: str,
+) -> WeightRowResponse:
+    row = db.query(ScoringWeightRow).filter(ScoringWeightRow.id == row_id).first()
+    if not row:
+        raise ValueError(f"row_id={row_id} 不存在")
+
+    snap = _recompute_value_and_status(row, new_original_value=fix_value)
+
+    if row.boundary_judgment == BoundaryJudgment.EQUAL_THRESHOLD:
+        row.processing_status = ProcessingStatus.BOUNDARY_PENDING_REVIEW
+    else:
+        row.processing_status = ProcessingStatus.CONFIRMED
+    row.error_type = error_type
+    row.updated_at = datetime.utcnow()
+    db.flush()
+
+    _record_repair(
+        db=db, row=row, phase=ImportPhase.COUNTEREXAMPLE_UPDATED,
+        action_type=action_type,
+        change_reason=f"{action_type}: {fix_reason}",
+        changed_by=changed_by,
+        next_action_owner=_next_owner_after(row),
+        interpolated_curve_data=snap["interpolated_curve_data"],
+        original_value_before=snap["original_value_before"],
+        original_value_after=snap["original_value_after"],
+        interpolated_value_before=snap["interpolated_value_before"],
+        interpolated_value_after=snap["interpolated_value_after"],
+        threshold_before=snap["threshold_before"],
+        threshold_after=snap["threshold_after"],
+        instructor_reviewed=0 if row.boundary_judgment == BoundaryJudgment.EQUAL_THRESHOLD else 1,
+    )
+
+    _record_audit(
+        db=db, row_id=row_id, original_row_number=row.original_row_number,
+        field_name="original_value",
+        old_value=str(snap["original_value_before"]) if snap["original_value_before"] is not None else None,
+        new_value=str(snap["original_value_after"]) if snap["original_value_after"] is not None else None,
+        change_reason=f"{action_type}: {fix_reason}", changed_by=changed_by,
+    )
+
+    _refresh_workflow_counts(db, row.import_batch_id)
     db.commit()
     db.refresh(row)
     return WeightRowResponse.model_validate(row)
 
 
 def quick_fix_wrong_caliber(
-    db: Session,
-    row_id: int,
-    fix_value: Optional[float],
-    fix_reason: str,
-    changed_by: str = "analyst_qi",
+    db: Session, row_id: int, fix_value: Optional[float],
+    fix_reason: str, changed_by: str = "analyst_qi",
 ) -> WeightRowResponse:
-    """
-    常见错口径快捷修补：修正原始值并重新计算边界判定和插值。
-    """
-    row = db.query(ScoringWeightRow).filter(ScoringWeightRow.id == row_id).first()
-    if not row:
-        raise ValueError(f"row_id={row_id} 不存在")
-
-    old_value = row.original_value
-    if fix_value is not None:
-        row.original_value = fix_value
-        row.boundary_judgment = judge_boundary(fix_value, row.threshold)
-        default_breakpoints = [
-            (0.0, 0.0),
-            (row.threshold * 0.5, 0.5),
-            (row.threshold, 1.0),
-            (row.threshold * 1.5, 1.5),
-        ]
-        row.interpolated_value = piecewise_linear_interpolate(fix_value, default_breakpoints)
-        if row.boundary_judgment == BoundaryJudgment.EQUAL_THRESHOLD:
-            row.processing_status = ProcessingStatus.BOUNDARY_PENDING_REVIEW
-        else:
-            row.processing_status = ProcessingStatus.CONFIRMED
-
-    row.error_type = ErrorType.WRONG_CALIBER
-    row.updated_at = datetime.utcnow()
-
-    _record_audit(
-        db=db,
-        row_id=row_id,
-        original_row_number=row.original_row_number,
-        field_name="original_value",
-        old_value=str(old_value) if old_value is not None else None,
-        new_value=str(fix_value) if fix_value is not None else None,
-        change_reason=f"错口径快捷修补：{fix_reason}",
-        changed_by=changed_by,
-    )
-    db.commit()
-    db.refresh(row)
-    return WeightRowResponse.model_validate(row)
+    return _quick_fix_impl(db, row_id, ErrorType.WRONG_CALIBER, fix_value, fix_reason, changed_by, "quick_fix_wrong_caliber")
 
 
 def quick_fix_supplementary_rework(
-    db: Session,
-    row_id: int,
-    fix_value: Optional[float],
-    fix_reason: str,
-    changed_by: str = "analyst_qi",
+    db: Session, row_id: int, fix_value: Optional[float],
+    fix_reason: str, changed_by: str = "analyst_qi",
 ) -> WeightRowResponse:
-    """
-    常见补录返工快捷修补。
-    """
-    row = db.query(ScoringWeightRow).filter(ScoringWeightRow.id == row_id).first()
-    if not row:
-        raise ValueError(f"row_id={row_id} 不存在")
-
-    old_value = row.original_value
-    if fix_value is not None:
-        row.original_value = fix_value
-        row.boundary_judgment = judge_boundary(fix_value, row.threshold)
-        default_breakpoints = [
-            (0.0, 0.0),
-            (row.threshold * 0.5, 0.5),
-            (row.threshold, 1.0),
-            (row.threshold * 1.5, 1.5),
-        ]
-        row.interpolated_value = piecewise_linear_interpolate(fix_value, default_breakpoints)
-        if row.boundary_judgment == BoundaryJudgment.EQUAL_THRESHOLD:
-            row.processing_status = ProcessingStatus.BOUNDARY_PENDING_REVIEW
-        else:
-            row.processing_status = ProcessingStatus.CONFIRMED
-
-    row.error_type = ErrorType.SUPPLEMENTARY_REWORK
-    row.updated_at = datetime.utcnow()
-
-    _record_audit(
-        db=db,
-        row_id=row_id,
-        original_row_number=row.original_row_number,
-        field_name="original_value",
-        old_value=str(old_value) if old_value is not None else None,
-        new_value=str(fix_value) if fix_value is not None else None,
-        change_reason=f"补录返工快捷修补：{fix_reason}",
-        changed_by=changed_by,
-    )
-    db.commit()
-    db.refresh(row)
-    return WeightRowResponse.model_validate(row)
+    return _quick_fix_impl(db, row_id, ErrorType.SUPPLEMENTARY_REWORK, fix_value, fix_reason, changed_by, "quick_fix_supplementary_rework")
 
 
 def get_export_detail(db: Session, row_id: int) -> ExportDetailResponse:
-    """
-    单数据源读取：导出明细、页面展示、接口返回都调用此方法。
-    """
     row = db.query(ScoringWeightRow).filter(ScoringWeightRow.id == row_id).first()
     if not row:
         raise ValueError(f"row_id={row_id} 不存在")
@@ -474,29 +626,50 @@ def get_export_detail(db: Session, row_id: int) -> ExportDetailResponse:
 
 
 def get_batch_export_details(db: Session, import_batch_id: str) -> List[ExportDetailResponse]:
-    """
-    按批次导出所有行明细（单数据源）。
-    """
     rows = db.query(ScoringWeightRow).filter(ScoringWeightRow.import_batch_id == import_batch_id).all()
-    results = []
-    for row in rows:
-        results.append(get_export_detail(db, row.id))
-    return results
+    return [get_export_detail(db, r.id) for r in rows]
 
 
 def get_workflow_state(db: Session, import_batch_id: str) -> Optional[WorkflowStateResponse]:
-    workflow = db.query(WorkflowState).filter(WorkflowState.import_batch_id == import_batch_id).first()
-    if workflow:
-        return WorkflowStateResponse.model_validate(workflow)
-    return None
+    workflow = _refresh_workflow_counts(db, import_batch_id)
+    db.commit()
+    db.refresh(workflow)
+    return WorkflowStateResponse.model_validate(workflow)
 
 
 def list_boundary_pending_review(db: Session, import_batch_id: str) -> List[WeightRowResponse]:
-    """
-    列出所有边界值等于阈值、待任课老师复核的记录。
-    """
     rows = db.query(ScoringWeightRow).filter(
         ScoringWeightRow.import_batch_id == import_batch_id,
         ScoringWeightRow.processing_status == ProcessingStatus.BOUNDARY_PENDING_REVIEW,
     ).all()
     return [WeightRowResponse.model_validate(r) for r in rows]
+
+
+def get_batch_summary(db: Session, import_batch_id: str) -> BatchSummaryResponse:
+    """
+    批次摘要（列表/详情/导出之外的统一汇总视图，与 detail/batch 读取同一份数据）
+    """
+    workflow = _refresh_workflow_counts(db, import_batch_id)
+    rows = db.query(ScoringWeightRow).filter(ScoringWeightRow.import_batch_id == import_batch_id).all()
+
+    counts = {s: 0 for s in ProcessingStatus}
+    for r in rows:
+        counts[r.processing_status] = counts.get(r.processing_status, 0) + 1
+
+    db.commit()
+    db.refresh(workflow)
+    return BatchSummaryResponse(
+        import_batch_id=workflow.import_batch_id,
+        current_phase=workflow.current_phase,
+        total_rows=workflow.total_rows,
+        boundary_equal_threshold_count=workflow.boundary_equal_threshold_count,
+        wrong_caliber_count=workflow.wrong_caliber_count,
+        supplementary_rework_count=workflow.supplementary_rework_count,
+        pending_count=counts.get(ProcessingStatus.PENDING, 0),
+        reviewing_count=counts.get(ProcessingStatus.REVIEWING, 0),
+        boundary_pending_review_count=counts.get(ProcessingStatus.BOUNDARY_PENDING_REVIEW, 0),
+        confirmed_count=counts.get(ProcessingStatus.CONFIRMED, 0),
+        rolled_back_count=counts.get(ProcessingStatus.ROLLED_BACK, 0),
+        created_at=workflow.created_at,
+        updated_at=workflow.updated_at,
+    )

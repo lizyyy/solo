@@ -7,6 +7,7 @@ from interpolation_gauge.models.payloads import (
     RepairRecordResponse, AuditTrailResponse, ExportDetailResponse,
     ManualOverrideRequest, BoundaryReviewRequest, RollbackRequest,
     QuickFixRequest, CounterexampleUpdateRequest, OldFormulaReviewRequest,
+    BatchSummaryResponse,
 )
 from interpolation_gauge.services import repair_service
 
@@ -41,7 +42,18 @@ def update_counterexample(request: CounterexampleUpdateRequest, db: Session = De
 
 @router.get("/workflow/{import_batch_id}", response_model=Optional[WorkflowStateResponse], summary="查询流程状态")
 def get_workflow_state(import_batch_id: str, db: Session = Depends(get_db)):
-    return repair_service.get_workflow_state(db, import_batch_id)
+    try:
+        return repair_service.get_workflow_state(db, import_batch_id)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+
+@router.get("/batch-summary/{import_batch_id}", response_model=BatchSummaryResponse, summary="批次摘要（统一汇总视图，与详情/导出同数据源）")
+def get_batch_summary(import_batch_id: str, db: Session = Depends(get_db)):
+    try:
+        return repair_service.get_batch_summary(db, import_batch_id)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
 
 
 @router.get("/detail/{row_id}", response_model=ExportDetailResponse, summary="单行明细（页面展示/接口返回/导出同一数据源）")
