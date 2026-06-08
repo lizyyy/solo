@@ -137,7 +137,7 @@ export const useStore = create<AppState>((set, get) => ({
   fetchSummaries: async (settlementId?: string) => {
     set({ loading: true })
     try {
-      const params = settlementId ? `?settlement_id=${settlementId}` : ''
+      const params = settlementId ? `?settlementId=${settlementId}` : ''
       const response = await api<Summary[]>(`/api/summaries${params}`)
       set({ summaries: response.data, loading: false })
     } catch {
@@ -148,7 +148,7 @@ export const useStore = create<AppState>((set, get) => ({
   fetchAuditLogs: async (settlementId?: string) => {
     set({ loading: true })
     try {
-      const params = settlementId ? `?settlement_id=${settlementId}` : ''
+      const params = settlementId ? `?settlementId=${settlementId}` : ''
       const response = await api<AuditLog[]>(`/api/audit-logs${params}`)
       set({ auditLogs: response.data, loading: false })
     } catch {
@@ -177,8 +177,8 @@ export const useStore = create<AppState>((set, get) => ({
       await api(`/api/entries/${entryId}/notes`, {
         method: 'POST',
         body: JSON.stringify({
-          tax_rate: data.taxRate,
-          tax_rate_note: data.taxRateNote,
+          taxRate: data.taxRate,
+          taxRateNote: data.taxRateNote,
           operator: data.operator,
         }),
       })
@@ -197,7 +197,7 @@ export const useStore = create<AppState>((set, get) => ({
         body: JSON.stringify({
           amount: data.amount,
           note: data.note,
-          correction_reason: data.correctionReason,
+          correctionReason: data.correctionReason,
         }),
       })
       await get().fetchEntries()
@@ -212,7 +212,7 @@ export const useStore = create<AppState>((set, get) => ({
     try {
       await api(`/api/entries/${entryId}/review`, {
         method: 'PATCH',
-        body: JSON.stringify({ reviewed_by: data.reviewedBy }),
+        body: JSON.stringify({ reviewedBy: data.reviewedBy }),
       })
       await get().fetchEntries()
       set({ loading: false })
