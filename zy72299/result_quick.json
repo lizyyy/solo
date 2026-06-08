@@ -1,0 +1,1628 @@
+{
+  "result_id": "result_96f3402e",
+  "building_id": "BUILDING_A",
+  "scenario_type": "快速验证",
+  "replay_command": "python3 main.py --building-id BUILDING_A --scenario all --origin-spec 'sample_data/origin_spec_building_a.json' --inspection-photos 'sample_data/*_building_a_*.json' --include-view # 目标视图版本 v1 (命令执行后自动递增) --generate-report --output result_快速验证_v1.json",
+  "summary": {
+    "generated_at": "2026-06-09T00:05:51.658644",
+    "total_records": 6,
+    "status_distribution": {
+      "normal": 2,
+      "duplicate_name": 1,
+      "supplemented": 2,
+      "conflict": 1
+    },
+    "source_distribution": {
+      "coordinate_origin_spec": 3,
+      "photo_supplement": 3
+    },
+    "reviewer_distribution": {},
+    "action_distribution": {
+      "IMPORT_COORDINATE_ORIGIN": 1,
+      "CREATE_OBSTACLE_RECORD": 5,
+      "LOAD_INSPECTION_PHOTO": 8,
+      "LINK_PHOTO_TO_RECORD": 5,
+      "DETECT_DUPLICATE_NAME": 1,
+      "SUPPLEMENT_FROM_PHOTO": 1,
+      "CREATE_SUPPLEMENTED_RECORD": 1,
+      "DETECT_CONFLICT": 1,
+      "BUMP_VIEW_VERSION": 1,
+      "UPDATE_3D_VIEW": 1
+    },
+    "total_history_entries": 25,
+    "view_record_consistency": {
+      "consistent": true,
+      "issue_count": 0,
+      "checked_at": "2026-06-09T00:05:51.658559"
+    }
+  },
+  "conflicts": [
+    {
+      "conflict_id": "conflict_7c2f824b",
+      "record_id": "rec_0d4fd50c",
+      "conflicting_fields": [
+        "position"
+      ],
+      "detected_at": "2026-06-09T00:05:51.658323",
+      "origin_evidence": {
+        "position": {
+          "x": 30.0,
+          "y": 5.0,
+          "z": 22.0
+        },
+        "obstacle_name": "消防立管-东墙",
+        "obstacle_type": "pipe",
+        "source": "coordinate_origin_spec",
+        "origin_id": "origin_35a3ea0e"
+      },
+      "photo_evidence": {
+        "position": {
+          "x": 32.0,
+          "y": 5.0,
+          "z": 22.0
+        },
+        "obstacle_name": "消防立管-东墙",
+        "obstacle_type": "pipe",
+        "source": "inspection_photo",
+        "photo_number": "INSP-2026-008"
+      },
+      "field_by_field_comparison": [
+        {
+          "field": "position",
+          "origin_value": {
+            "x": 30.0,
+            "y": 5.0,
+            "z": 22.0
+          },
+          "photo_value": {
+            "x": 32.0,
+            "y": 5.0,
+            "z": 22.0
+          }
+        }
+      ],
+      "review_message": "坐标原点说明与巡检照片编号在position上存在矛盾，请园区运维小陶选确认或驳回",
+      "review_options": [
+        {
+          "resolution": "confirm_origin",
+          "label": "确认坐标原点说明的口径"
+        },
+        {
+          "resolution": "confirm_photo",
+          "label": "确认巡检照片编号的口径"
+        },
+        {
+          "resolution": "reject_both",
+          "label": "双方均不可信，驳回"
+        }
+      ]
+    }
+  ],
+  "pending_reviews": [
+    {
+      "record_id": "rec_065595e8",
+      "obstacle_name": "空调外机-北墙3号",
+      "obstacle_type": "ac_unit",
+      "status": "duplicate_name",
+      "status_display": "同一障碍物多名称",
+      "position": {
+        "x": 15.0,
+        "y": 20.0,
+        "z": 15.5
+      },
+      "caliber_source": "photo_supplement",
+      "source_display": "巡检照片编号补录",
+      "photo_number": "INSP-2026-003",
+      "origin_id": "origin_35a3ea0e",
+      "duplicate_of": null,
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "conflict_evidence": null
+    }
+  ],
+  "records_summary": {
+    "total": 6,
+    "by_status": {
+      "normal": 2,
+      "duplicate_name": 1,
+      "supplemented": 2,
+      "conflict": 1
+    },
+    "by_source": {
+      "coordinate_origin_spec": 3,
+      "photo_supplement": 3
+    },
+    "details": [
+      {
+        "record_id": "rec_fcc4fc22",
+        "obstacle_name": "三层西窗01",
+        "obstacle_type": "window",
+        "status": "normal",
+        "status_display": "正常记录",
+        "position": {
+          "x": 5.2,
+          "y": 12.5,
+          "z": 9.0
+        },
+        "caliber_source": "coordinate_origin_spec",
+        "source_display": "坐标原点说明",
+        "photo_number": "INSP-2026-001",
+        "origin_id": "origin_35a3ea0e",
+        "duplicate_of": null,
+        "reviewed_by": null,
+        "reviewed_at": null,
+        "conflict_evidence": null
+      },
+      {
+        "record_id": "rec_8847fe2e",
+        "obstacle_name": "三层西窗02",
+        "obstacle_type": "window",
+        "status": "normal",
+        "status_display": "正常记录",
+        "position": {
+          "x": 8.5,
+          "y": 12.5,
+          "z": 9.0
+        },
+        "caliber_source": "coordinate_origin_spec",
+        "source_display": "坐标原点说明",
+        "photo_number": "INSP-2026-002",
+        "origin_id": "origin_35a3ea0e",
+        "duplicate_of": null,
+        "reviewed_by": null,
+        "reviewed_at": null,
+        "conflict_evidence": null
+      },
+      {
+        "record_id": "rec_065595e8",
+        "obstacle_name": "空调外机-北墙3号",
+        "obstacle_type": "ac_unit",
+        "status": "duplicate_name",
+        "status_display": "同一障碍物多名称",
+        "position": {
+          "x": 15.0,
+          "y": 20.0,
+          "z": 15.5
+        },
+        "caliber_source": "photo_supplement",
+        "source_display": "巡检照片编号补录",
+        "photo_number": "INSP-2026-003",
+        "origin_id": "origin_35a3ea0e",
+        "duplicate_of": null,
+        "reviewed_by": null,
+        "reviewed_at": null,
+        "conflict_evidence": null
+      },
+      {
+        "record_id": "rec_f30a4725",
+        "obstacle_name": "屋顶天线基座",
+        "obstacle_type": "antenna",
+        "status": "supplemented",
+        "status_display": "照片补录数据",
+        "position": {
+          "x": 25.0,
+          "y": 15.0,
+          "z": 45.0
+        },
+        "caliber_source": "photo_supplement",
+        "source_display": "巡检照片编号补录",
+        "photo_number": null,
+        "origin_id": "origin_35a3ea0e",
+        "duplicate_of": null,
+        "reviewed_by": null,
+        "reviewed_at": null,
+        "conflict_evidence": {
+          "old_caliber": "2024年口径：楼顶信号塔底座，坐标偏移+0.5m",
+          "photo_number": "INSP-2026-005"
+        }
+      },
+      {
+        "record_id": "rec_0d4fd50c",
+        "obstacle_name": "消防立管-东墙",
+        "obstacle_type": "pipe",
+        "status": "conflict",
+        "status_display": "数据冲突待确认",
+        "position": {
+          "x": 30.0,
+          "y": 5.0,
+          "z": 22.0
+        },
+        "caliber_source": "coordinate_origin_spec",
+        "source_display": "坐标原点说明",
+        "photo_number": "INSP-2026-008",
+        "origin_id": "origin_35a3ea0e",
+        "duplicate_of": null,
+        "reviewed_by": null,
+        "reviewed_at": null,
+        "conflict_evidence": {
+          "conflict_id": "conflict_7c2f824b",
+          "conflicting_fields": [
+            "position"
+          ],
+          "origin_evidence": {
+            "position": {
+              "x": 30.0,
+              "y": 5.0,
+              "z": 22.0
+            },
+            "obstacle_name": "消防立管-东墙",
+            "obstacle_type": "pipe",
+            "source": "coordinate_origin_spec",
+            "origin_id": "origin_35a3ea0e"
+          },
+          "photo_evidence": {
+            "position": {
+              "x": 32.0,
+              "y": 5.0,
+              "z": 22.0
+            },
+            "obstacle_name": "消防立管-东墙",
+            "obstacle_type": "pipe",
+            "source": "inspection_photo",
+            "photo_number": "INSP-2026-008"
+          }
+        }
+      },
+      {
+        "record_id": "rec_4580ab77",
+        "obstacle_name": "企业标识牌-南墙",
+        "obstacle_type": "sign",
+        "status": "supplemented",
+        "status_display": "照片补录数据",
+        "position": {
+          "x": 12.0,
+          "y": 0.0,
+          "z": 6.0
+        },
+        "caliber_source": "photo_supplement",
+        "source_display": "巡检照片编号补录",
+        "photo_number": "INSP-2026-006",
+        "origin_id": null,
+        "duplicate_of": null,
+        "reviewed_by": null,
+        "reviewed_at": null,
+        "conflict_evidence": {
+          "old_caliber": "2023年口径：南墙招牌，高度5.8m",
+          "supplemented_from": "inspection_photo"
+        }
+      }
+    ]
+  },
+  "view_state": {
+    "version": 1,
+    "last_updated": "2026-06-09T00:05:51.658561",
+    "origin_point": {
+      "x": 0.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+    "building_id": "BUILDING_A",
+    "layers": [
+      {
+        "layer_id": "layer_normal",
+        "layer_name": "正常记录",
+        "visible": true,
+        "record_ids": [
+          "rec_fcc4fc22",
+          "rec_8847fe2e"
+        ],
+        "record_count": 2,
+        "style": {
+          "color": "#4CAF50",
+          "opacity": 0.8,
+          "border": "solid"
+        }
+      },
+      {
+        "layer_id": "layer_duplicate_name",
+        "layer_name": "重复名称待处理",
+        "visible": true,
+        "record_ids": [
+          "rec_065595e8"
+        ],
+        "record_count": 1,
+        "style": {
+          "color": "#FF9800",
+          "opacity": 0.9,
+          "border": "dashed"
+        }
+      },
+      {
+        "layer_id": "layer_conflict",
+        "layer_name": "数据冲突待确认",
+        "visible": true,
+        "record_ids": [
+          "rec_0d4fd50c"
+        ],
+        "record_count": 1,
+        "style": {
+          "color": "#F44336",
+          "opacity": 1.0,
+          "border": "double"
+        }
+      },
+      {
+        "layer_id": "layer_pending_review",
+        "layer_name": "培训学员复核中",
+        "visible": true,
+        "record_ids": [],
+        "record_count": 0,
+        "style": {
+          "color": "#9C27B0",
+          "opacity": 0.8,
+          "border": "dashed"
+        }
+      },
+      {
+        "layer_id": "layer_supplemented",
+        "layer_name": "照片补录数据",
+        "visible": true,
+        "record_ids": [
+          "rec_f30a4725",
+          "rec_4580ab77"
+        ],
+        "record_count": 2,
+        "style": {
+          "color": "#2196F3",
+          "opacity": 0.8,
+          "border": "solid"
+        }
+      },
+      {
+        "layer_id": "layer_confirmed",
+        "layer_name": "已确认",
+        "visible": true,
+        "record_ids": [],
+        "record_count": 0,
+        "style": {
+          "color": "#8BC34A",
+          "opacity": 0.8,
+          "border": "solid"
+        }
+      },
+      {
+        "layer_id": "layer_rejected",
+        "layer_name": "已驳回",
+        "visible": false,
+        "record_ids": [],
+        "record_count": 0,
+        "style": {
+          "color": "#9E9E9E",
+          "opacity": 0.4,
+          "border": "dotted"
+        }
+      }
+    ],
+    "annotations": [
+      {
+        "annotation_id": "ann_rec_fcc4fc22",
+        "record_id": "rec_fcc4fc22",
+        "obstacle_name": "三层西窗01",
+        "obstacle_type": "window",
+        "position": {
+          "x": 5.2,
+          "y": 12.5,
+          "z": 9.0
+        },
+        "status": "normal",
+        "status_display": "正常记录",
+        "caliber_source": "coordinate_origin_spec",
+        "caliber_source_display": "坐标原点说明",
+        "style": {
+          "color": "#4CAF50",
+          "border_style": "solid",
+          "icon": "check_circle"
+        },
+        "labels": [],
+        "view_version": 1,
+        "photo_number": "INSP-2026-001",
+        "origin_id": "origin_35a3ea0e"
+      },
+      {
+        "annotation_id": "ann_rec_8847fe2e",
+        "record_id": "rec_8847fe2e",
+        "obstacle_name": "三层西窗02",
+        "obstacle_type": "window",
+        "position": {
+          "x": 8.5,
+          "y": 12.5,
+          "z": 9.0
+        },
+        "status": "normal",
+        "status_display": "正常记录",
+        "caliber_source": "coordinate_origin_spec",
+        "caliber_source_display": "坐标原点说明",
+        "style": {
+          "color": "#4CAF50",
+          "border_style": "solid",
+          "icon": "check_circle"
+        },
+        "labels": [],
+        "view_version": 1,
+        "photo_number": "INSP-2026-002",
+        "origin_id": "origin_35a3ea0e"
+      },
+      {
+        "annotation_id": "ann_rec_065595e8",
+        "record_id": "rec_065595e8",
+        "obstacle_name": "空调外机-北墙3号",
+        "obstacle_type": "ac_unit",
+        "position": {
+          "x": 15.0,
+          "y": 20.0,
+          "z": 15.5
+        },
+        "status": "duplicate_name",
+        "status_display": "同一障碍物多名称",
+        "caliber_source": "photo_supplement",
+        "caliber_source_display": "巡检照片编号补录",
+        "style": {
+          "color": "#FF9800",
+          "border_style": "dashed",
+          "icon": "warning"
+        },
+        "labels": [
+          "重复名称待复核"
+        ],
+        "view_version": 1,
+        "duplicate_of": null,
+        "review_pending": true,
+        "next_handler": "培训学员",
+        "photo_number": "INSP-2026-003",
+        "origin_id": "origin_35a3ea0e"
+      },
+      {
+        "annotation_id": "ann_rec_f30a4725",
+        "record_id": "rec_f30a4725",
+        "obstacle_name": "屋顶天线基座",
+        "obstacle_type": "antenna",
+        "position": {
+          "x": 25.0,
+          "y": 15.0,
+          "z": 45.0
+        },
+        "status": "supplemented",
+        "status_display": "照片补录数据",
+        "caliber_source": "photo_supplement",
+        "caliber_source_display": "巡检照片编号补录",
+        "style": {
+          "color": "#2196F3",
+          "border_style": "solid",
+          "icon": "add_photo_alternate"
+        },
+        "labels": [
+          "照片补录数据"
+        ],
+        "view_version": 1,
+        "old_caliber_note": "2024年口径：楼顶信号塔底座，坐标偏移+0.5m",
+        "origin_id": "origin_35a3ea0e",
+        "conflict_evidence": {
+          "old_caliber": "2024年口径：楼顶信号塔底座，坐标偏移+0.5m",
+          "photo_number": "INSP-2026-005"
+        }
+      },
+      {
+        "annotation_id": "ann_rec_0d4fd50c",
+        "record_id": "rec_0d4fd50c",
+        "obstacle_name": "消防立管-东墙",
+        "obstacle_type": "pipe",
+        "position": {
+          "x": 30.0,
+          "y": 5.0,
+          "z": 22.0
+        },
+        "status": "conflict",
+        "status_display": "数据冲突待确认",
+        "caliber_source": "coordinate_origin_spec",
+        "caliber_source_display": "坐标原点说明",
+        "style": {
+          "color": "#F44336",
+          "border_style": "double",
+          "icon": "error"
+        },
+        "labels": [
+          "数据冲突待确认"
+        ],
+        "view_version": 1,
+        "review_pending": true,
+        "next_handler": "园区运维小陶",
+        "conflict_fields": [
+          "position"
+        ],
+        "conflict_id": "conflict_7c2f824b",
+        "photo_number": "INSP-2026-008",
+        "origin_id": "origin_35a3ea0e",
+        "conflict_evidence": {
+          "conflict_id": "conflict_7c2f824b",
+          "conflicting_fields": [
+            "position"
+          ],
+          "origin_evidence": {
+            "position": {
+              "x": 30.0,
+              "y": 5.0,
+              "z": 22.0
+            },
+            "obstacle_name": "消防立管-东墙",
+            "obstacle_type": "pipe",
+            "source": "coordinate_origin_spec",
+            "origin_id": "origin_35a3ea0e"
+          },
+          "photo_evidence": {
+            "position": {
+              "x": 32.0,
+              "y": 5.0,
+              "z": 22.0
+            },
+            "obstacle_name": "消防立管-东墙",
+            "obstacle_type": "pipe",
+            "source": "inspection_photo",
+            "photo_number": "INSP-2026-008"
+          }
+        }
+      },
+      {
+        "annotation_id": "ann_rec_4580ab77",
+        "record_id": "rec_4580ab77",
+        "obstacle_name": "企业标识牌-南墙",
+        "obstacle_type": "sign",
+        "position": {
+          "x": 12.0,
+          "y": 0.0,
+          "z": 6.0
+        },
+        "status": "supplemented",
+        "status_display": "照片补录数据",
+        "caliber_source": "photo_supplement",
+        "caliber_source_display": "巡检照片编号补录",
+        "style": {
+          "color": "#2196F3",
+          "border_style": "solid",
+          "icon": "add_photo_alternate"
+        },
+        "labels": [
+          "照片补录数据"
+        ],
+        "view_version": 1,
+        "old_caliber_note": "2023年口径：南墙招牌，高度5.8m",
+        "photo_number": "INSP-2026-006",
+        "conflict_evidence": {
+          "old_caliber": "2023年口径：南墙招牌，高度5.8m",
+          "supplemented_from": "inspection_photo"
+        }
+      }
+    ],
+    "annotation_count": 6,
+    "layer_count": 7,
+    "view_record_consistency": {
+      "checked_at": "2026-06-09T00:05:51.658559",
+      "total_records": 6,
+      "total_annotations": 6,
+      "total_layers_members": 6,
+      "consistent": true,
+      "issue_count": 0,
+      "issues": []
+    },
+    "generated_by": "system",
+    "generation_reason": "final_render_after_all_steps"
+  },
+  "view_versions": [
+    {
+      "version": 1,
+      "bumped_at": "2026-06-09T00:05:51.658510",
+      "trigger_reason": "final_render_after_all_steps",
+      "actor": "system",
+      "total_record_changes": 0,
+      "changed_record_ids": [],
+      "changed_fields_by_record": {},
+      "records_before": {
+        "rec_fcc4fc22": {
+          "record_id": "rec_fcc4fc22",
+          "obstacle_name": "三层西窗01",
+          "status": "normal",
+          "position": {
+            "x": 5.2,
+            "y": 12.5,
+            "z": 9.0
+          },
+          "caliber_source": "coordinate_origin_spec",
+          "photo_number": "INSP-2026-001",
+          "origin_id": "origin_35a3ea0e",
+          "duplicate_of": null,
+          "reviewed_by": null,
+          "conflict_evidence": null
+        },
+        "rec_8847fe2e": {
+          "record_id": "rec_8847fe2e",
+          "obstacle_name": "三层西窗02",
+          "status": "normal",
+          "position": {
+            "x": 8.5,
+            "y": 12.5,
+            "z": 9.0
+          },
+          "caliber_source": "coordinate_origin_spec",
+          "photo_number": "INSP-2026-002",
+          "origin_id": "origin_35a3ea0e",
+          "duplicate_of": null,
+          "reviewed_by": null,
+          "conflict_evidence": null
+        },
+        "rec_065595e8": {
+          "record_id": "rec_065595e8",
+          "obstacle_name": "空调外机-北墙3号",
+          "status": "duplicate_name",
+          "position": {
+            "x": 15.0,
+            "y": 20.0,
+            "z": 15.5
+          },
+          "caliber_source": "photo_supplement",
+          "photo_number": "INSP-2026-003",
+          "origin_id": "origin_35a3ea0e",
+          "duplicate_of": null,
+          "reviewed_by": null,
+          "conflict_evidence": null
+        },
+        "rec_f30a4725": {
+          "record_id": "rec_f30a4725",
+          "obstacle_name": "屋顶天线基座",
+          "status": "supplemented",
+          "position": {
+            "x": 25.0,
+            "y": 15.0,
+            "z": 45.0
+          },
+          "caliber_source": "photo_supplement",
+          "photo_number": null,
+          "origin_id": "origin_35a3ea0e",
+          "duplicate_of": null,
+          "reviewed_by": null,
+          "conflict_evidence": {
+            "old_caliber": "2024年口径：楼顶信号塔底座，坐标偏移+0.5m",
+            "photo_number": "INSP-2026-005"
+          }
+        },
+        "rec_0d4fd50c": {
+          "record_id": "rec_0d4fd50c",
+          "obstacle_name": "消防立管-东墙",
+          "status": "conflict",
+          "position": {
+            "x": 30.0,
+            "y": 5.0,
+            "z": 22.0
+          },
+          "caliber_source": "coordinate_origin_spec",
+          "photo_number": "INSP-2026-008",
+          "origin_id": "origin_35a3ea0e",
+          "duplicate_of": null,
+          "reviewed_by": null,
+          "conflict_evidence": {
+            "conflict_id": "conflict_7c2f824b",
+            "conflicting_fields": [
+              "position"
+            ],
+            "origin_evidence": {
+              "position": {
+                "x": 30.0,
+                "y": 5.0,
+                "z": 22.0
+              },
+              "obstacle_name": "消防立管-东墙",
+              "obstacle_type": "pipe",
+              "source": "coordinate_origin_spec",
+              "origin_id": "origin_35a3ea0e"
+            },
+            "photo_evidence": {
+              "position": {
+                "x": 32.0,
+                "y": 5.0,
+                "z": 22.0
+              },
+              "obstacle_name": "消防立管-东墙",
+              "obstacle_type": "pipe",
+              "source": "inspection_photo",
+              "photo_number": "INSP-2026-008"
+            }
+          }
+        },
+        "rec_4580ab77": {
+          "record_id": "rec_4580ab77",
+          "obstacle_name": "企业标识牌-南墙",
+          "status": "supplemented",
+          "position": {
+            "x": 12.0,
+            "y": 0.0,
+            "z": 6.0
+          },
+          "caliber_source": "photo_supplement",
+          "photo_number": "INSP-2026-006",
+          "origin_id": null,
+          "duplicate_of": null,
+          "reviewed_by": null,
+          "conflict_evidence": {
+            "old_caliber": "2023年口径：南墙招牌，高度5.8m",
+            "supplemented_from": "inspection_photo"
+          }
+        }
+      },
+      "records_after": {
+        "rec_fcc4fc22": {
+          "record_id": "rec_fcc4fc22",
+          "obstacle_name": "三层西窗01",
+          "status": "normal",
+          "position": {
+            "x": 5.2,
+            "y": 12.5,
+            "z": 9.0
+          },
+          "caliber_source": "coordinate_origin_spec",
+          "photo_number": "INSP-2026-001",
+          "origin_id": "origin_35a3ea0e",
+          "duplicate_of": null,
+          "reviewed_by": null,
+          "conflict_evidence": null
+        },
+        "rec_8847fe2e": {
+          "record_id": "rec_8847fe2e",
+          "obstacle_name": "三层西窗02",
+          "status": "normal",
+          "position": {
+            "x": 8.5,
+            "y": 12.5,
+            "z": 9.0
+          },
+          "caliber_source": "coordinate_origin_spec",
+          "photo_number": "INSP-2026-002",
+          "origin_id": "origin_35a3ea0e",
+          "duplicate_of": null,
+          "reviewed_by": null,
+          "conflict_evidence": null
+        },
+        "rec_065595e8": {
+          "record_id": "rec_065595e8",
+          "obstacle_name": "空调外机-北墙3号",
+          "status": "duplicate_name",
+          "position": {
+            "x": 15.0,
+            "y": 20.0,
+            "z": 15.5
+          },
+          "caliber_source": "photo_supplement",
+          "photo_number": "INSP-2026-003",
+          "origin_id": "origin_35a3ea0e",
+          "duplicate_of": null,
+          "reviewed_by": null,
+          "conflict_evidence": null
+        },
+        "rec_f30a4725": {
+          "record_id": "rec_f30a4725",
+          "obstacle_name": "屋顶天线基座",
+          "status": "supplemented",
+          "position": {
+            "x": 25.0,
+            "y": 15.0,
+            "z": 45.0
+          },
+          "caliber_source": "photo_supplement",
+          "photo_number": null,
+          "origin_id": "origin_35a3ea0e",
+          "duplicate_of": null,
+          "reviewed_by": null,
+          "conflict_evidence": {
+            "old_caliber": "2024年口径：楼顶信号塔底座，坐标偏移+0.5m",
+            "photo_number": "INSP-2026-005"
+          }
+        },
+        "rec_0d4fd50c": {
+          "record_id": "rec_0d4fd50c",
+          "obstacle_name": "消防立管-东墙",
+          "status": "conflict",
+          "position": {
+            "x": 30.0,
+            "y": 5.0,
+            "z": 22.0
+          },
+          "caliber_source": "coordinate_origin_spec",
+          "photo_number": "INSP-2026-008",
+          "origin_id": "origin_35a3ea0e",
+          "duplicate_of": null,
+          "reviewed_by": null,
+          "conflict_evidence": {
+            "conflict_id": "conflict_7c2f824b",
+            "conflicting_fields": [
+              "position"
+            ],
+            "origin_evidence": {
+              "position": {
+                "x": 30.0,
+                "y": 5.0,
+                "z": 22.0
+              },
+              "obstacle_name": "消防立管-东墙",
+              "obstacle_type": "pipe",
+              "source": "coordinate_origin_spec",
+              "origin_id": "origin_35a3ea0e"
+            },
+            "photo_evidence": {
+              "position": {
+                "x": 32.0,
+                "y": 5.0,
+                "z": 22.0
+              },
+              "obstacle_name": "消防立管-东墙",
+              "obstacle_type": "pipe",
+              "source": "inspection_photo",
+              "photo_number": "INSP-2026-008"
+            }
+          }
+        },
+        "rec_4580ab77": {
+          "record_id": "rec_4580ab77",
+          "obstacle_name": "企业标识牌-南墙",
+          "status": "supplemented",
+          "position": {
+            "x": 12.0,
+            "y": 0.0,
+            "z": 6.0
+          },
+          "caliber_source": "photo_supplement",
+          "photo_number": "INSP-2026-006",
+          "origin_id": null,
+          "duplicate_of": null,
+          "reviewed_by": null,
+          "conflict_evidence": {
+            "old_caliber": "2023年口径：南墙招牌，高度5.8m",
+            "supplemented_from": "inspection_photo"
+          }
+        }
+      }
+    }
+  ],
+  "view_record_consistency": {
+    "checked_at": "2026-06-09T00:05:51.658559",
+    "total_records": 6,
+    "total_annotations": 6,
+    "total_layers_members": 6,
+    "consistent": true,
+    "issue_count": 0,
+    "issues": []
+  },
+  "cross_check_view_history": {
+    "checked_at": "2026-06-09T00:05:51.659494",
+    "total_view_versions": 1,
+    "total_bump_in_history": 1,
+    "consistent": true,
+    "issue_count": 0,
+    "issues": []
+  },
+  "history_timeline": [
+    {
+      "timestamp": "2026-06-09T00:05:51.657891",
+      "action": "IMPORT_COORDINATE_ORIGIN",
+      "actor": "system",
+      "record_id": null,
+      "details": {
+        "origin_id": "origin_35a3ea0e",
+        "building_id": "BUILDING_A",
+        "origin_point": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "description": "楼宇A西南角地面控制点，WGS84坐标系",
+        "obstacle_count": 5
+      }
+    },
+    {
+      "timestamp": "2026-06-09T00:05:51.658076",
+      "action": "CREATE_OBSTACLE_RECORD",
+      "actor": "system",
+      "record_id": "rec_fcc4fc22",
+      "details": {
+        "record_id": "rec_fcc4fc22",
+        "obstacle_name": "三层西窗01",
+        "position": {
+          "x": 5.2,
+          "y": 12.5,
+          "z": 9.0
+        },
+        "source": "coordinate_origin_spec"
+      }
+    },
+    {
+      "timestamp": "2026-06-09T00:05:51.658090",
+      "action": "CREATE_OBSTACLE_RECORD",
+      "actor": "system",
+      "record_id": "rec_8847fe2e",
+      "details": {
+        "record_id": "rec_8847fe2e",
+        "obstacle_name": "三层西窗02",
+        "position": {
+          "x": 8.5,
+          "y": 12.5,
+          "z": 9.0
+        },
+        "source": "coordinate_origin_spec"
+      }
+    },
+    {
+      "timestamp": "2026-06-09T00:05:51.658101",
+      "action": "CREATE_OBSTACLE_RECORD",
+      "actor": "system",
+      "record_id": "rec_065595e8",
+      "details": {
+        "record_id": "rec_065595e8",
+        "obstacle_name": "空调外机-北墙3号",
+        "position": {
+          "x": 15.0,
+          "y": 20.0,
+          "z": 15.5
+        },
+        "source": "coordinate_origin_spec"
+      }
+    },
+    {
+      "timestamp": "2026-06-09T00:05:51.658112",
+      "action": "CREATE_OBSTACLE_RECORD",
+      "actor": "system",
+      "record_id": "rec_f30a4725",
+      "details": {
+        "record_id": "rec_f30a4725",
+        "obstacle_name": "屋顶天线基座",
+        "position": {
+          "x": 25.0,
+          "y": 15.0,
+          "z": 45.0
+        },
+        "source": "coordinate_origin_spec"
+      }
+    },
+    {
+      "timestamp": "2026-06-09T00:05:51.658122",
+      "action": "CREATE_OBSTACLE_RECORD",
+      "actor": "system",
+      "record_id": "rec_0d4fd50c",
+      "details": {
+        "record_id": "rec_0d4fd50c",
+        "obstacle_name": "消防立管-东墙",
+        "position": {
+          "x": 30.0,
+          "y": 5.0,
+          "z": 22.0
+        },
+        "source": "coordinate_origin_spec"
+      }
+    },
+    {
+      "timestamp": "2026-06-09T00:05:51.658141",
+      "action": "LOAD_INSPECTION_PHOTO",
+      "actor": "xiaotao",
+      "record_id": null,
+      "details": {
+        "photo_id": "photo_410814fa",
+        "photo_number": "INSP-2026-001",
+        "obstacle_name": "三层西窗01",
+        "position": {
+          "x": 5.2,
+          "y": 12.5,
+          "z": 9.0
+        },
+        "has_old_caliber": false
+      }
+    },
+    {
+      "timestamp": "2026-06-09T00:05:51.658150",
+      "action": "LOAD_INSPECTION_PHOTO",
+      "actor": "xiaotao",
+      "record_id": null,
+      "details": {
+        "photo_id": "photo_e00f83ef",
+        "photo_number": "INSP-2026-002",
+        "obstacle_name": "三层西窗02",
+        "position": {
+          "x": 8.5,
+          "y": 12.5,
+          "z": 9.0
+        },
+        "has_old_caliber": false
+      }
+    },
+    {
+      "timestamp": "2026-06-09T00:05:51.658159",
+      "action": "LOAD_INSPECTION_PHOTO",
+      "actor": "xiaotao",
+      "record_id": null,
+      "details": {
+        "photo_id": "photo_8c948456",
+        "photo_number": "INSP-2026-003",
+        "obstacle_name": "空调外机-北墙3号",
+        "position": {
+          "x": 15.0,
+          "y": 20.0,
+          "z": 15.5
+        },
+        "has_old_caliber": false
+      }
+    },
+    {
+      "timestamp": "2026-06-09T00:05:51.658168",
+      "action": "LOAD_INSPECTION_PHOTO",
+      "actor": "xiaotao",
+      "record_id": null,
+      "details": {
+        "photo_id": "photo_3e817d9b",
+        "photo_number": "INSP-2026-004",
+        "obstacle_name": "北墙空调-3号位",
+        "position": {
+          "x": 15.0,
+          "y": 20.0,
+          "z": 15.5
+        },
+        "has_old_caliber": false
+      }
+    },
+    {
+      "timestamp": "2026-06-09T00:05:51.658177",
+      "action": "LOAD_INSPECTION_PHOTO",
+      "actor": "xiaotao",
+      "record_id": null,
+      "details": {
+        "photo_id": "photo_c76cb4fe",
+        "photo_number": "INSP-2026-005",
+        "obstacle_name": "屋顶天线基座",
+        "position": {
+          "x": 25.0,
+          "y": 15.0,
+          "z": 45.0
+        },
+        "has_old_caliber": true
+      }
+    },
+    {
+      "timestamp": "2026-06-09T00:05:51.658186",
+      "action": "LOAD_INSPECTION_PHOTO",
+      "actor": "xiaotao",
+      "record_id": null,
+      "details": {
+        "photo_id": "photo_44a28497",
+        "photo_number": "INSP-2026-006",
+        "obstacle_name": "企业标识牌-南墙",
+        "position": {
+          "x": 12.0,
+          "y": 0.0,
+          "z": 6.0
+        },
+        "has_old_caliber": true
+      }
+    },
+    {
+      "timestamp": "2026-06-09T00:05:51.658195",
+      "action": "LOAD_INSPECTION_PHOTO",
+      "actor": "xiaotao",
+      "record_id": null,
+      "details": {
+        "photo_id": "photo_e36116c8",
+        "photo_number": "INSP-2026-007",
+        "obstacle_name": "消防立管-东墙",
+        "position": {
+          "x": 30.0,
+          "y": 5.0,
+          "z": 22.0
+        },
+        "has_old_caliber": false
+      }
+    },
+    {
+      "timestamp": "2026-06-09T00:05:51.658204",
+      "action": "LOAD_INSPECTION_PHOTO",
+      "actor": "xiaotao",
+      "record_id": null,
+      "details": {
+        "photo_id": "photo_af6dd10b",
+        "photo_number": "INSP-2026-008",
+        "obstacle_name": "消防立管-东墙",
+        "position": {
+          "x": 32.0,
+          "y": 5.0,
+          "z": 22.0
+        },
+        "has_old_caliber": false
+      }
+    },
+    {
+      "timestamp": "2026-06-09T00:05:51.658222",
+      "action": "LINK_PHOTO_TO_RECORD",
+      "actor": "xiaotao",
+      "record_id": "rec_fcc4fc22",
+      "details": {
+        "record_id": "rec_fcc4fc22",
+        "photo_number": "INSP-2026-001",
+        "match_type": "position_exact_name"
+      }
+    },
+    {
+      "timestamp": "2026-06-09T00:05:51.658230",
+      "action": "LINK_PHOTO_TO_RECORD",
+      "actor": "xiaotao",
+      "record_id": "rec_8847fe2e",
+      "details": {
+        "record_id": "rec_8847fe2e",
+        "photo_number": "INSP-2026-002",
+        "match_type": "position_exact_name"
+      }
+    },
+    {
+      "timestamp": "2026-06-09T00:05:51.658236",
+      "action": "LINK_PHOTO_TO_RECORD",
+      "actor": "xiaotao",
+      "record_id": "rec_065595e8",
+      "details": {
+        "record_id": "rec_065595e8",
+        "photo_number": "INSP-2026-003",
+        "match_type": "position_exact_name"
+      }
+    },
+    {
+      "timestamp": "2026-06-09T00:05:51.658247",
+      "action": "DETECT_DUPLICATE_NAME",
+      "actor": "xiaotao",
+      "record_id": "rec_065595e8",
+      "details": {
+        "record_id": "rec_065595e8",
+        "origin_name": "空调外机-北墙3号",
+        "photo_name": "北墙空调-3号位",
+        "photo_number": "INSP-2026-004",
+        "position": {
+          "x": 15.0,
+          "y": 20.0,
+          "z": 15.5
+        },
+        "match_type": "position_diff_name"
+      }
+    },
+    {
+      "timestamp": "2026-06-09T00:05:51.658258",
+      "action": "SUPPLEMENT_FROM_PHOTO",
+      "actor": "xiaotao",
+      "record_id": "rec_f30a4725",
+      "details": {
+        "record_id": "rec_f30a4725",
+        "obstacle_name": "屋顶天线基座",
+        "photo_number": "INSP-2026-005",
+        "old_caliber": "2024年口径：楼顶信号塔底座，坐标偏移+0.5m",
+        "previous_status": "normal",
+        "new_status": "supplemented"
+      }
+    },
+    {
+      "timestamp": "2026-06-09T00:05:51.658272",
+      "action": "CREATE_SUPPLEMENTED_RECORD",
+      "actor": "xiaotao",
+      "record_id": "rec_4580ab77",
+      "details": {
+        "record_id": "rec_4580ab77",
+        "obstacle_name": "企业标识牌-南墙",
+        "photo_number": "INSP-2026-006",
+        "position": {
+          "x": 12.0,
+          "y": 0.0,
+          "z": 6.0
+        },
+        "old_caliber": "2023年口径：南墙招牌，高度5.8m"
+      }
+    },
+    {
+      "timestamp": "2026-06-09T00:05:51.658279",
+      "action": "LINK_PHOTO_TO_RECORD",
+      "actor": "xiaotao",
+      "record_id": "rec_0d4fd50c",
+      "details": {
+        "record_id": "rec_0d4fd50c",
+        "photo_number": "INSP-2026-007",
+        "match_type": "position_exact_name"
+      }
+    },
+    {
+      "timestamp": "2026-06-09T00:05:51.658285",
+      "action": "LINK_PHOTO_TO_RECORD",
+      "actor": "xiaotao",
+      "record_id": "rec_0d4fd50c",
+      "details": {
+        "record_id": "rec_0d4fd50c",
+        "photo_number": "INSP-2026-008",
+        "match_type": "name_only"
+      }
+    },
+    {
+      "timestamp": "2026-06-09T00:05:51.658430",
+      "action": "DETECT_CONFLICT",
+      "actor": "system",
+      "record_id": "rec_0d4fd50c",
+      "details": {
+        "record_id": "rec_0d4fd50c",
+        "obstacle_name": "消防立管-东墙",
+        "conflict_id": "conflict_7c2f824b",
+        "conflicting_fields": [
+          "position"
+        ],
+        "origin_data": {
+          "position": {
+            "x": 30.0,
+            "y": 5.0,
+            "z": 22.0
+          },
+          "obstacle_name": "消防立管-东墙",
+          "obstacle_type": "pipe",
+          "source": "coordinate_origin_spec",
+          "origin_id": "origin_35a3ea0e"
+        },
+        "photo_data": {
+          "position": {
+            "x": 32.0,
+            "y": 5.0,
+            "z": 22.0
+          },
+          "obstacle_name": "消防立管-东墙",
+          "obstacle_type": "pipe",
+          "source": "inspection_photo",
+          "photo_number": "INSP-2026-008"
+        },
+        "original_value": {
+          "record_id": "rec_0d4fd50c",
+          "obstacle_name": "消防立管-东墙",
+          "status": "normal",
+          "position": {
+            "x": 30.0,
+            "y": 5.0,
+            "z": 22.0
+          },
+          "obstacle_type": "pipe",
+          "caliber_source": "coordinate_origin_spec",
+          "photo_number": "INSP-2026-008",
+          "origin_id": "origin_35a3ea0e",
+          "duplicate_of": null,
+          "reviewed_by": null,
+          "conflict_evidence": null
+        },
+        "modified_value": {
+          "record_id": "rec_0d4fd50c",
+          "obstacle_name": "消防立管-东墙",
+          "status": "conflict",
+          "position": {
+            "x": 30.0,
+            "y": 5.0,
+            "z": 22.0
+          },
+          "obstacle_type": "pipe",
+          "caliber_source": "coordinate_origin_spec",
+          "photo_number": "INSP-2026-008",
+          "origin_id": "origin_35a3ea0e",
+          "duplicate_of": null,
+          "reviewed_by": null,
+          "conflict_evidence": {
+            "conflict_id": "conflict_7c2f824b",
+            "conflicting_fields": [
+              "position"
+            ],
+            "origin_evidence": {
+              "position": {
+                "x": 30.0,
+                "y": 5.0,
+                "z": 22.0
+              },
+              "obstacle_name": "消防立管-东墙",
+              "obstacle_type": "pipe",
+              "source": "coordinate_origin_spec",
+              "origin_id": "origin_35a3ea0e"
+            },
+            "photo_evidence": {
+              "position": {
+                "x": 32.0,
+                "y": 5.0,
+                "z": 22.0
+              },
+              "obstacle_name": "消防立管-东墙",
+              "obstacle_type": "pipe",
+              "source": "inspection_photo",
+              "photo_number": "INSP-2026-008"
+            }
+          }
+        },
+        "next_handler": "园区运维小陶",
+        "review_trail_id": "trail_5be22bc9"
+      }
+    },
+    {
+      "timestamp": "2026-06-09T00:05:51.658521",
+      "action": "BUMP_VIEW_VERSION",
+      "actor": "system",
+      "record_id": null,
+      "details": {
+        "new_version": 1,
+        "trigger_reason": "final_render_after_all_steps",
+        "total_changes": 0,
+        "changed_records": {}
+      }
+    },
+    {
+      "timestamp": "2026-06-09T00:05:51.658567",
+      "action": "UPDATE_3D_VIEW",
+      "actor": "system",
+      "record_id": null,
+      "details": {
+        "building_id": "BUILDING_A",
+        "version": 1,
+        "layers_count": 7,
+        "annotations_count": 6,
+        "status_summary": {
+          "normal": 2,
+          "duplicate_name": 1,
+          "conflict": 1,
+          "pending_review": 0,
+          "supplemented": 2,
+          "confirmed": 0,
+          "rejected": 0
+        },
+        "consistency_check": {
+          "checked_at": "2026-06-09T00:05:51.658559",
+          "total_records": 6,
+          "total_annotations": 6,
+          "total_layers_members": 6,
+          "consistent": true,
+          "issue_count": 0,
+          "issues": []
+        },
+        "reason": "final_render_after_all_steps"
+      }
+    }
+  ],
+  "cleaning_path": {
+    "path_id": "path_6c377972",
+    "path_name": "BUILDING_A-清洗路径-20260609",
+    "version": 1,
+    "created_at": "2026-06-09T00:05:51.658628",
+    "points_count": 4,
+    "points": [
+      {
+        "sequence": 1,
+        "position": {
+          "x": 12.0,
+          "y": 0.0,
+          "z": 6.0
+        },
+        "obstacle_id": "rec_4580ab77",
+        "cleaning_action": "标识牌擦拭"
+      },
+      {
+        "sequence": 2,
+        "position": {
+          "x": 5.2,
+          "y": 12.5,
+          "z": 9.0
+        },
+        "obstacle_id": "rec_fcc4fc22",
+        "cleaning_action": "玻璃擦拭"
+      },
+      {
+        "sequence": 3,
+        "position": {
+          "x": 8.5,
+          "y": 12.5,
+          "z": 9.0
+        },
+        "obstacle_id": "rec_8847fe2e",
+        "cleaning_action": "玻璃擦拭"
+      },
+      {
+        "sequence": 4,
+        "position": {
+          "x": 25.0,
+          "y": 15.0,
+          "z": 45.0
+        },
+        "obstacle_id": "rec_f30a4725",
+        "cleaning_action": "天线基座除尘"
+      }
+    ]
+  },
+  "review_trails": [
+    {
+      "trail_id": "trail_5be22bc9",
+      "record_id": "rec_0d4fd50c",
+      "changed_fields": [
+        "status",
+        "conflict_evidence"
+      ],
+      "original_value": {
+        "record_id": "rec_0d4fd50c",
+        "obstacle_name": "消防立管-东墙",
+        "status": "normal",
+        "position": {
+          "x": 30.0,
+          "y": 5.0,
+          "z": 22.0
+        },
+        "obstacle_type": "pipe",
+        "caliber_source": "coordinate_origin_spec",
+        "photo_number": "INSP-2026-008",
+        "origin_id": "origin_35a3ea0e",
+        "duplicate_of": null,
+        "reviewed_by": null,
+        "conflict_evidence": null
+      },
+      "modified_value": {
+        "record_id": "rec_0d4fd50c",
+        "obstacle_name": "消防立管-东墙",
+        "status": "conflict",
+        "position": {
+          "x": 30.0,
+          "y": 5.0,
+          "z": 22.0
+        },
+        "obstacle_type": "pipe",
+        "caliber_source": "coordinate_origin_spec",
+        "photo_number": "INSP-2026-008",
+        "origin_id": "origin_35a3ea0e",
+        "duplicate_of": null,
+        "reviewed_by": null,
+        "conflict_evidence": {
+          "conflict_id": "conflict_7c2f824b",
+          "conflicting_fields": [
+            "position"
+          ],
+          "origin_evidence": {
+            "position": {
+              "x": 30.0,
+              "y": 5.0,
+              "z": 22.0
+            },
+            "obstacle_name": "消防立管-东墙",
+            "obstacle_type": "pipe",
+            "source": "coordinate_origin_spec",
+            "origin_id": "origin_35a3ea0e"
+          },
+          "photo_evidence": {
+            "position": {
+              "x": 32.0,
+              "y": 5.0,
+              "z": 22.0
+            },
+            "obstacle_name": "消防立管-东墙",
+            "obstacle_type": "pipe",
+            "source": "inspection_photo",
+            "photo_number": "INSP-2026-008"
+          }
+        }
+      },
+      "reason": "坐标原点说明(origin)与巡检照片编号(photo)在['position']上存在矛盾，列出冲突证据，不自动拍板，交给园区运维小陶选确认或驳回。原始说法：origin={'position': {'x': 30.0, 'y': 5.0, 'z': 22.0}, 'obstacle_name': '消防立管-东墙', 'obstacle_type': 'pipe', 'source': 'coordinate_origin_spec', 'origin_id': 'origin_35a3ea0e'}, photo={'position': {'x': 32.0, 'y': 5.0, 'z': 22.0}, 'obstacle_name': '消防立管-东墙', 'obstacle_type': 'pipe', 'source': 'inspection_photo', 'photo_number': 'INSP-2026-008'}",
+      "next_handler": "园区运维小陶",
+      "handled_by": "system",
+      "handled_at": "2026-06-09T00:05:51.658421"
+    }
+  ],
+  "review_trace_matrix": [
+    {
+      "trail_id": "trail_5be22bc9",
+      "record_id": "rec_0d4fd50c",
+      "obstacle_name": "消防立管-东墙",
+      "current_status": "conflict",
+      "handled_by": "system",
+      "handled_at": "2026-06-09T00:05:51.658421",
+      "changed_fields": [
+        "status",
+        "conflict_evidence"
+      ],
+      "original_value": {
+        "record_id": "rec_0d4fd50c",
+        "obstacle_name": "消防立管-东墙",
+        "status": "normal",
+        "position": {
+          "x": 30.0,
+          "y": 5.0,
+          "z": 22.0
+        },
+        "obstacle_type": "pipe",
+        "caliber_source": "coordinate_origin_spec",
+        "photo_number": "INSP-2026-008",
+        "origin_id": "origin_35a3ea0e",
+        "duplicate_of": null,
+        "reviewed_by": null,
+        "conflict_evidence": null
+      },
+      "modified_value": {
+        "record_id": "rec_0d4fd50c",
+        "obstacle_name": "消防立管-东墙",
+        "status": "conflict",
+        "position": {
+          "x": 30.0,
+          "y": 5.0,
+          "z": 22.0
+        },
+        "obstacle_type": "pipe",
+        "caliber_source": "coordinate_origin_spec",
+        "photo_number": "INSP-2026-008",
+        "origin_id": "origin_35a3ea0e",
+        "duplicate_of": null,
+        "reviewed_by": null,
+        "conflict_evidence": {
+          "conflict_id": "conflict_7c2f824b",
+          "conflicting_fields": [
+            "position"
+          ],
+          "origin_evidence": {
+            "position": {
+              "x": 30.0,
+              "y": 5.0,
+              "z": 22.0
+            },
+            "obstacle_name": "消防立管-东墙",
+            "obstacle_type": "pipe",
+            "source": "coordinate_origin_spec",
+            "origin_id": "origin_35a3ea0e"
+          },
+          "photo_evidence": {
+            "position": {
+              "x": 32.0,
+              "y": 5.0,
+              "z": 22.0
+            },
+            "obstacle_name": "消防立管-东墙",
+            "obstacle_type": "pipe",
+            "source": "inspection_photo",
+            "photo_number": "INSP-2026-008"
+          }
+        }
+      },
+      "field_diff": [
+        {
+          "field": "status",
+          "original": "normal",
+          "modified": "conflict"
+        },
+        {
+          "field": "conflict_evidence",
+          "original": null,
+          "modified": {
+            "conflict_id": "conflict_7c2f824b",
+            "conflicting_fields": [
+              "position"
+            ],
+            "origin_evidence": {
+              "position": {
+                "x": 30.0,
+                "y": 5.0,
+                "z": 22.0
+              },
+              "obstacle_name": "消防立管-东墙",
+              "obstacle_type": "pipe",
+              "source": "coordinate_origin_spec",
+              "origin_id": "origin_35a3ea0e"
+            },
+            "photo_evidence": {
+              "position": {
+                "x": 32.0,
+                "y": 5.0,
+                "z": 22.0
+              },
+              "obstacle_name": "消防立管-东墙",
+              "obstacle_type": "pipe",
+              "source": "inspection_photo",
+              "photo_number": "INSP-2026-008"
+            }
+          }
+        }
+      ],
+      "reason": "坐标原点说明(origin)与巡检照片编号(photo)在['position']上存在矛盾，列出冲突证据，不自动拍板，交给园区运维小陶选确认或驳回。原始说法：origin={'position': {'x': 30.0, 'y': 5.0, 'z': 22.0}, 'obstacle_name': '消防立管-东墙', 'obstacle_type': 'pipe', 'source': 'coordinate_origin_spec', 'origin_id': 'origin_35a3ea0e'}, photo={'position': {'x': 32.0, 'y': 5.0, 'z': 22.0}, 'obstacle_name': '消防立管-东墙', 'obstacle_type': 'pipe', 'source': 'inspection_photo', 'photo_number': 'INSP-2026-008'}",
+      "next_handler": "园区运维小陶",
+      "related_history_entries": [
+        {
+          "timestamp": "2026-06-09T00:05:51.658430",
+          "action": "DETECT_CONFLICT",
+          "actor": "system",
+          "details_trail_id": "trail_5be22bc9"
+        }
+      ]
+    }
+  ]
+}

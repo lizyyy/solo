@@ -102,6 +102,18 @@ class HistoryEntry(BaseModel):
     record_id: Optional[str] = None
 
 
+class ReviewTrail(BaseModel):
+    trail_id: str
+    record_id: str
+    original_value: Dict[str, Any]
+    modified_value: Dict[str, Any]
+    changed_fields: List[str]
+    reason: str
+    next_handler: str
+    handled_by: str
+    handled_at: datetime
+
+
 class ProcessingResult(BaseModel):
     result_id: str
     building_id: str
@@ -113,3 +125,7 @@ class ProcessingResult(BaseModel):
     history: List[HistoryEntry]
     replay_command: str
     summary: Dict[str, Any]
+    view_state: Optional[Dict[str, Any]] = None
+    view_versions: List[Dict[str, Any]] = []
+    review_trails: List[ReviewTrail] = []
+    view_record_consistency: Optional[Dict[str, Any]] = None

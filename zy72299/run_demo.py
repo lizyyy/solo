@@ -1,23 +1,17 @@
 #!/usr/bin/env python3
 import json
-import subprocess
 import sys
 import os
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from main import process_building, load_json_file
-from history_manager import ResultFormatter
+from history_manager import ResultFormatter as RF
 
 
-def demo_step1_import_origin():
-    print("\n" + "=" * 70)
-    print("【演示第一步】坐标原点说明第一次导入")
-    print("=" * 70)
-
+def _load_all():
     origin_spec = load_json_file("sample_data/origin_spec_building_a.json")
     all_photos = []
-
     for photo_file in [
         "inspection_photos_building_a_normal.json",
         "inspection_photos_building_a_duplicate.json",
@@ -26,289 +20,259 @@ def demo_step1_import_origin():
     ]:
         data = load_json_file(f"sample_data/{photo_file}")
         all_photos.extend(data["photos"])
+    return origin_spec, all_photos
+
+
+def _print_hr(char="=", length=70, title=None):
+    if title:
+        line = f" {title} "
+        pad = (length - len(line)) // 2
+        print(f"\n{char * pad}{line}{char * pad}")
+    else:
+        print("\n" + char * length)
+
+
+def _diff_statuses(result_prev, result_curr):
+    prev_map = {r.record_id: r.status.value for r in result_prev.processed_records}
+    curr_map = {r.record_id: r.status.value for r in result_curr.processed_records}
+    changed = []
+    for rid in set(list(prev_map.keys()) + list(curr_map.keys())):
+        if prev_map.get(rid) != curr_map.get(rid):
+            changed.append({
+                "record_id": rid,
+                "prev": prev_map.get(rid, "<新增>"),
+                "curr": curr_map.get(rid, "<删除>"),
+            })
+    return changed
+
+
+def _summary_view_state(result):
+    if not result.view_state:
+        return "(视图未输出)"
+    vs = result.view_state
+    cons = vs.get("view_record_consistency", {})
+    cons_flag = "✓" if cons.get("consistent") else f"✗{cons.get('issue_count')}"
+    layer_info = ", ".join([
+        f"{l['layer_name']}:{l['record_count']}"
+        for l in vs.get("layers", []) if l.get("record_count", 0) > 0
+    ])
+    return (f"v{vs.get('version')} | 图层{vs.get('layer_count',0)} | 标注{vs.get('annotation_count',0)} | "
+            f"一致性{cons_flag} | [{layer_info}]")
+
+
+def step0_verify_environment():
+    _print_hr("=", 70, "步骤0 环境与数据自检")
+    print("工作目录:", os.getcwd())
+    print("依赖: models.py/coordinate_importer.py/photo_matcher.py/conflict_detector.py/view_updater.py/history_manager.py/main.py")
+    origin_spec, all_photos = _load_all()
+    print(f"坐标原点说明记录数: {len(origin_spec['obstacles'])}")
+    print(f"巡检照片总数: {len(all_photos)}")
+    print("样例已准备: 正常×2 + 重复×2 + 补录×2 + 冲突×2 = 8条照片数据")
+
+
+def step1_import_and_match():
+    _print_hr("=", 70, "步骤1 坐标原点说明导入 → 园区运维小陶补看巡检照片编号")
+    origin_spec, all_photos = _load_all()
 
     result = process_building(
         building_id="BUILDING_A",
         origin_spec=origin_spec,
         inspection_photos=all_photos,
-        scenario_type="演示-完整处理流程",
+        scenario_type="演示-第1步_导入匹配",
         origin_file="sample_data/origin_spec_building_a.json",
         photo_file="sample_data/*_building_a_*.json",
+        include_view=True,
     )
 
-    print("\n" + "=" * 70)
-    print("【第一步完成】检测到以下待处理项：")
-    print("=" * 70)
-
-    conflicts = result.conflicts
-    pending_reviews = result.pending_reviews
-
-    print(f"\n数据冲突（需要园区运维小陶确认）：{len(conflicts)} 条")
-    for i, c in enumerate(conflicts, 1):
-        print(f"  {i}. 冲突ID: {c.conflict_id}")
-        print(f"     涉及记录: {c.record_id}")
-        print(f"     矛盾字段: {', '.join(c.conflicting_fields)}")
-        print(f"     原点说明位置: {c.origin_data['position']}")
-        print(f"     照片位置: {c.photo_data['position']}")
-
-    print(f"\n待培训学员复核：{len(pending_reviews)} 条")
-    for i, r in enumerate(pending_reviews, 1):
-        print(f"  {i}. 记录ID: {r.record_id}")
-        print(f"     障碍物名称: {r.obstacle_name}")
-        print(f"     当前状态: {r.status.value}")
-        if r.duplicate_of:
-            print(f"     疑似与记录 {r.duplicate_of} 重复")
-
+    _print_hr("-", 70, "步骤1 结果")
+    print(f"记录总数: {len(result.processed_records)}")
+    print(f"待复核数: {len(result.pending_reviews)}")
+    print(f"冲突数: {len(result.conflicts)}")
+    print(f"视图状态: {_summary_view_state(result)}")
+    print(f"版本链: {[(v['version'], v['trigger_reason']) for v in result.view_versions]}")
+    print(f"复核痕迹: {len(result.review_trails)} 条")
+    print(f"复盘命令: {result.replay_command[:120]}...")
     return result
 
 
-def demo_step2_xiaotao_review(conflict_id):
-    print("\n" + "=" * 70)
-    print("【演示第二步】园区运维小陶补看巡检照片编号，处理冲突")
-    print("=" * 70)
+def step2_apply_resolutions(step1_result):
+    _print_hr("=", 70, "步骤2 应用重复名称决议 + 冲突决议 → 触发视图版本递增")
 
-    origin_spec = load_json_file("sample_data/origin_spec_building_a.json")
-    all_photos = []
+    origin_spec, all_photos = _load_all()
 
-    for photo_file in [
-        "inspection_photos_building_a_normal.json",
-        "inspection_photos_building_a_duplicate.json",
-        "inspection_photos_building_a_supplement.json",
-        "inspection_photos_building_a_conflict.json",
-    ]:
-        data = load_json_file(f"sample_data/{photo_file}")
-        all_photos.extend(data["photos"])
+    pending_id = step1_result.pending_reviews[0].record_id if step1_result.pending_reviews else None
+    conflict_id = step1_result.conflicts[0].conflict_id if step1_result.conflicts else None
 
-    conflict_resolutions = [
-        {
+    duplicate_resolutions = []
+    if pending_id:
+        duplicate_resolutions = [{
+            "record_id": pending_id,
+            "action": "keep_as_separate",
+            "actor": "xiaotao",
+        }]
+    conflict_resolutions = []
+    if conflict_id:
+        conflict_resolutions = [{
             "conflict_id": conflict_id,
             "resolution": "confirm_photo",
             "actor": "xiaotao",
-        }
-    ]
+        }]
 
-    print(f"\n园区运维小陶选择：确认巡检照片编号的数据")
-    print(f"冲突 {conflict_id} 按 confirm_photo 处理")
-
-    result = process_building(
-        building_id="BUILDING_A",
-        origin_spec=origin_spec,
-        inspection_photos=all_photos,
-        scenario_type="演示-园区运维小陶处理冲突",
-        conflict_resolutions=conflict_resolutions,
-        origin_file="sample_data/origin_spec_building_a.json",
-        photo_file="sample_data/*_building_a_*.json",
-    )
-
-    remaining_conflicts = [c for c in result.conflicts if any(
-        r.record_id == c.record_id and r.status.value == "conflict"
-        for r in result.processed_records
-    )]
-
-    print(f"\n处理后剩余冲突：{len(remaining_conflicts)} 条")
-    for r in result.processed_records:
-        if r.status.value == "confirmed":
-            print(f"\n已确认记录:")
-            print(f"  记录ID: {r.record_id}")
-            print(f"  障碍物: {r.obstacle_name}")
-            print(f"  最终采信: {r.caliber_source}")
-            print(f"  审核人: {r.reviewed_by}")
-            print(f"  位置: ({r.position.x}, {r.position.y}, {r.position.z})")
-
-    return result
-
-
-def demo_step3_training_review(record_id):
-    print("\n" + "=" * 70)
-    print("【演示第三步】培训学员复核同一障碍物多名称问题")
-    print("=" * 70)
-
-    origin_spec = load_json_file("sample_data/origin_spec_building_a.json")
-    all_photos = []
-
-    for photo_file in [
-        "inspection_photos_building_a_normal.json",
-        "inspection_photos_building_a_duplicate.json",
-        "inspection_photos_building_a_supplement.json",
-        "inspection_photos_building_a_conflict.json",
-    ]:
-        data = load_json_file(f"sample_data/{photo_file}")
-        all_photos.extend(data["photos"])
-
-    conflict_resolutions = []
-    duplicate_resolutions = [
-        {
-            "record_id": record_id,
-            "action": "keep_as_separate",
-            "actor": "trainee",
-        }
-    ]
-
-    print(f"\n培训学员选择：不急着归正常，保持为待复核状态")
-    print(f"记录 {record_id} 按 keep_as_separate 处理，留给后续深入复核")
+    print(f"应用决议:")
+    if duplicate_resolutions:
+        print(f"  · 重复名称: {duplicate_resolutions[0]['record_id']} → keep_as_separate (留给培训学员)")
+    if conflict_resolutions:
+        print(f"  · 冲突: {conflict_resolutions[0]['conflict_id']} → confirm_photo (采信巡检照片编号)")
 
     result = process_building(
         building_id="BUILDING_A",
         origin_spec=origin_spec,
         inspection_photos=all_photos,
-        scenario_type="演示-培训学员复核完成",
+        scenario_type="演示-第2步_决议应用",
         conflict_resolutions=conflict_resolutions,
         duplicate_resolutions=duplicate_resolutions,
         origin_file="sample_data/origin_spec_building_a.json",
         photo_file="sample_data/*_building_a_*.json",
+        include_view=True,
     )
 
-    pending = [r for r in result.processed_records if r.status.value == "pending_review"]
-    print(f"\n培训学员复核后状态：")
-    for r in pending:
-        print(f"\n待深入复核记录:")
-        print(f"  记录ID: {r.record_id}")
-        print(f"  障碍物名称: {r.obstacle_name}")
-        print(f"  当前状态: {r.status.value} (培训学员复核中)")
-        print(f"  复核人: {r.reviewed_by}")
+    _print_hr("-", 70, "步骤2 vs 步骤1 对比")
+    diffs = _diff_statuses(step1_result, result)
+    print(f"记录状态变更数: {len(diffs)}")
+    for d in diffs:
+        rec = next((r for r in result.processed_records if r.record_id == d['record_id']), None)
+        name = rec.obstacle_name if rec else ''
+        print(f"  · {d['record_id']} ({name}): {d['prev']} → {d['curr']}")
+
+    print(f"步骤1视图: {_summary_view_state(step1_result)}")
+    print(f"步骤2视图: {_summary_view_state(result)}")
+    print(f"视图版本变更: {[(v['version'], v['trigger_reason']) for v in result.view_versions]}")
+    print(f"清洗路径版本: v{result.cleaning_path.version if result.cleaning_path else 'N/A'}")
+
+    for trail in result.review_trails:
+        print(f"\n复核痕迹 {trail.trail_id}:")
+        print(f"  变更: {trail.changed_fields}")
+        print(f"  原始→改后: ", end="")
+        for f in trail.changed_fields:
+            print(f"{f}: {trail.original_value.get(f)}→{trail.modified_value.get(f)}  ", end="")
+        print()
+        print(f"  原因: {trail.reason[:80]}")
+        print(f"  下一步找谁: → {trail.next_handler}")
 
     return result
 
 
-def demo_final_summary():
-    from history_manager import ResultFormatter as RF_local
-    from view_updater import View3DUpdater
+def step3_view_record_alignment(step2_result):
+    _print_hr("=", 70, "步骤3 三维标注视图 ↔ 记录 ↔ 历史 三向一致性核对")
 
-    print("\n" + "=" * 70)
-    print("【最终演示】三步完整流程 + 三维标注视图更新")
-    print("=" * 70)
+    vs = step2_result.view_state
+    if not vs:
+        print("视图未输出，跳过核对。")
+        return
 
-    origin_spec = load_json_file("sample_data/origin_spec_building_a.json")
-    all_photos = []
-
-    for photo_file in [
-        "inspection_photos_building_a_normal.json",
-        "inspection_photos_building_a_duplicate.json",
-        "inspection_photos_building_a_supplement.json",
-        "inspection_photos_building_a_conflict.json",
-    ]:
-        data = load_json_file(f"sample_data/{photo_file}")
-        all_photos.extend(data["photos"])
-
-    conflict_resolutions = [
-        {
-            "conflict_id": "PLACEHOLDER",
-            "resolution": "confirm_photo",
-            "actor": "xiaotao",
-        }
-    ]
-    duplicate_resolutions = [
-        {
-            "record_id": "PLACEHOLDER",
-            "action": "keep_as_separate",
-            "actor": "trainee",
-        }
-    ]
-
-    result1 = process_building(
-        building_id="BUILDING_A",
-        origin_spec=origin_spec,
-        inspection_photos=all_photos,
-        scenario_type="最终演示-完整三步流程",
-        origin_file="sample_data/origin_spec_building_a.json",
-        photo_file="sample_data/*_building_a_*.json",
+    cons = vs["view_record_consistency"]
+    cross = RF._cross_check_view_history(
+        step2_result.view_versions,
+        step2_result.history,
+        step2_result.processed_records,
     )
 
-    if result1.conflicts:
-        conflict_resolutions[0]["conflict_id"] = result1.conflicts[0].conflict_id
-    if result1.pending_reviews:
-        duplicate_resolutions[0]["record_id"] = result1.pending_reviews[0].record_id
+    print("\n【A】视图 vs 记录一致性:")
+    print(f"  结果: {'✓一致' if cons['consistent'] else '✗不一致'}，问题数: {cons['issue_count']}")
+    for issue in cons.get("issues", []):
+        print(f"    · [{issue['type']}] {issue.get('record_id','')}: {issue['detail']}")
 
-    result2 = process_building(
-        building_id="BUILDING_A",
-        origin_spec=origin_spec,
-        inspection_photos=all_photos,
-        scenario_type="最终演示-完整三步流程",
-        conflict_resolutions=conflict_resolutions,
-        duplicate_resolutions=duplicate_resolutions,
-        origin_file="sample_data/origin_spec_building_a.json",
-        photo_file="sample_data/*_building_a_*.json",
+    print("\n【B】视图版本链 vs 历史记录 BUMP_VIEW_VERSION:")
+    print(f"  view_versions 版本数: {len(step2_result.view_versions)}")
+    print(f"  history 中 BUMP 动作数: {sum(1 for h in step2_result.history if h.action == 'BUMP_VIEW_VERSION')}")
+    print(f"  交叉一致性: {'✓' if cross['consistent'] else '✗'}，问题数: {cross['issue_count']}")
+    for issue in cross.get("issues", []):
+        print(f"    · [{issue['type']}]: {issue['detail']}")
+
+    print("\n【C】视图标注 vs 实际记录 逐条对应:")
+    view_ann = {a["record_id"]: a for a in vs["annotations"]}
+    all_match = True
+    for rec in step2_result.processed_records:
+        ann = view_ann.get(rec.record_id)
+        issues = []
+        if not ann:
+            issues.append("缺少标注")
+            all_match = False
+        else:
+            if ann["status"] != rec.status.value:
+                issues.append(f"状态不符 标注={ann['status']} 记录={rec.status.value}")
+                all_match = False
+            if abs(ann["position"]["x"] - rec.position.x) > 0.001 or \
+               abs(ann["position"]["y"] - rec.position.y) > 0.001 or \
+               abs(ann["position"]["z"] - rec.position.z) > 0.001:
+                issues.append(f"坐标不符")
+                all_match = False
+        mark = "✓" if not issues else "✗"
+        issue_str = f" → {'; '.join(issues)}" if issues else ""
+        print(f"  {mark} {rec.record_id} | {rec.obstacle_name} | {rec.status.value}{issue_str}")
+
+    print(f"\n  总结: {'全部对齐 ✓' if all_match else '存在不一致 ✗，需修复'}")
+
+    print("\n【D】可重新跑命令验证 (复制即可执行):")
+    print(f"  {step2_result.replay_command}")
+
+    print("\n【E】历史记录 & 视图版本 & 清洗路径 关联:")
+    path = step2_result.cleaning_path
+    if path:
+        print(f"  清洗路径版本 v{path.version} = 视图版本 v{vs['version']} : "
+              f"{'✓相等' if path.version == vs['version'] else '✗不等'}")
+
+
+def final_report_and_export(step2_result):
+    _print_hr("=", 70, "导出最终结果 (含视图/记录/命令/复核痕迹)")
+
+    formatted = RF.format_result(
+        step2_result,
+        include_history=True,
+        include_view=True,
+        include_review_trails=True,
     )
 
-    RF_local.print_console_report(result2)
-
-    print("\n" + "=" * 70)
-    print("【三维标注视图状态摘要】")
-    print("=" * 70)
-
-    view_updater_result = None
-    try:
-        from view_updater import View3DUpdater
-        from history_manager import ResultFormatter as RF
-        updater = View3DUpdater(result2.processed_records)
-        view_result = updater.generate_3d_view(
-            building_id="BUILDING_A",
-            origin_point=origin_spec["origin_point"],
-        )
-        view_state = view_result["view_state"]
-
-        print(f"\n视图版本: {view_state['version']}")
-        print(f"最后更新: {view_state['last_updated']}")
-        print(f"图层数量: {len(view_state['layers'])}")
-
-        print("\n图层详情:")
-        for layer in view_state["layers"]:
-            print(f"  - {layer['layer_name']}: {len(layer['record_ids'])} 条记录")
-            print(f"    颜色: {layer['style']['color']}, 可见: {layer['visible']}")
-
-        print("\n标注统计:")
-        status_count = {}
-        for ann in view_state["annotations"]:
-            s = ann["status"]
-            status_count[s] = status_count.get(s, 0) + 1
-
-        for status, count in status_count.items():
-            display = RF_local._get_status_display(status)
-            print(f"  {display}: {count} 个标注")
-
-    except Exception as e:
-        print(f"视图生成详情: {e}")
-
-    print("\n" + "=" * 70)
-    print("【复盘命令】")
-    print("=" * 70)
-    print(f"\n{result2.replay_command}")
-
-    print("\n" + "=" * 70)
-    print("【历史记录时间线（最近5条）】")
-    print("=" * 70)
-
-    for entry in result2.history[-5:]:
-        print(f"\n  时间: {entry.timestamp.strftime('%H:%M:%S')}")
-        print(f"  操作: {entry.action}")
-        print(f"  执行人: {entry.actor}")
-        if entry.record_id:
-            print(f"  涉及记录: {entry.record_id}")
-        print(f"  详情: {json.dumps(entry.details, ensure_ascii=False)[:80]}...")
-
-    with open("demo_result.json", "w", encoding="utf-8") as f:
-        formatted = RF_local.format_result(result2)
+    output_path = "demo_final_result.json"
+    with open(output_path, "w", encoding="utf-8") as f:
         json.dump(formatted, f, ensure_ascii=False, indent=2)
 
-    print("\n" + "=" * 70)
-    print("演示完成！完整结果已保存到 demo_result.json")
-    print("=" * 70 + "\n")
+    size_kb = os.path.getsize(output_path) / 1024
+    print(f"已导出 → {output_path} ({size_kb:.1f} KB)")
+    print(f"  顶层字段: {', '.join(formatted.keys())}")
+    print(f"  view_state: {bool(formatted.get('view_state'))}")
+    print(f"  view_versions: {len(formatted.get('view_versions', []))} 条")
+    print(f"  history_timeline: {len(formatted.get('history_timeline', []))} 条")
+    print(f"  review_trails: {len(formatted.get('review_trails', []))} 条")
+    print(f"  review_trace_matrix: {len(formatted.get('review_trace_matrix', []))} 条")
+    print(f"  replay_command: {formatted.get('replay_command')[:100]}...")
 
-    return result2
+    RF.print_console_report(step2_result, include_view=True)
+
+
+def run_full_demo():
+    step0_verify_environment()
+    r1 = step1_import_and_match()
+    r2 = step2_apply_resolutions(r1)
+    step3_view_record_alignment(r2)
+    final_report_and_export(r2)
 
 
 if __name__ == "__main__":
-    print("\n" + "#" * 70)
-    print("# 楼宇外立面清洗路径 - 完整处理流程演示")
-    print("# 包含：正常记录、同一障碍物多名称、旧口径补录三种场景")
-    print("#" * 70)
-
-    if len(sys.argv) > 1 and sys.argv[1] == "--full":
-        result1 = demo_step1_import_origin()
-        if result1.conflicts:
-            result2 = demo_step2_xiaotao_review(result1.conflicts[0].conflict_id)
-        if result1.pending_reviews:
-            result3 = demo_step3_training_review(result1.pending_reviews[0].record_id)
-        demo_final_summary()
+    if len(sys.argv) > 1 and sys.argv[1] == "--quick":
+        origin_spec, all_photos = _load_all()
+        r = process_building(
+            building_id="BUILDING_A",
+            origin_spec=origin_spec,
+            inspection_photos=all_photos,
+            scenario_type="快速验证",
+            origin_file="sample_data/origin_spec_building_a.json",
+            photo_file="sample_data/*_building_a_*.json",
+            include_view=True,
+        )
+        RF.print_console_report(r, include_view=True)
+        with open("result_quick.json", "w", encoding="utf-8") as f:
+            json.dump(RF.format_result(r), f, ensure_ascii=False, indent=2)
+        print(f"快速结果 → result_quick.json")
     else:
-        demo_final_summary()
+        run_full_demo()
