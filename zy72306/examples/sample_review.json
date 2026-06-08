@@ -1,14 +1,29 @@
 {
   "2": {
-    "review_note": "确认分母应为100，录入时遗漏",
+    "reviewed_by": "数据复核人-张",
+    "original_statement": "公式截图中分母格为空，老师批注说'漏填了100'",
+    "corrected_value": "100",
+    "review_reason": "对比旧公式截图和老师批注，以老师批注为准，分母漏填",
+    "next_owner": "数据分析师小祁确认改后数",
+    "review_note": "按老师批注补填，标记normal",
     "final_anomaly_type": "normal"
   },
   "3": {
-    "review_note": "分母为空字符串，按0处理，标记为异常",
+    "reviewed_by": "数据复核人-张",
+    "original_statement": "分母原始显示为空字符串，数值是0",
+    "corrected_value": "0",
+    "review_reason": "空字符串就是0，按0处理，不提前归normal，按异常记",
+    "next_owner": "课堂演示环节重点说明",
+    "review_note": "保持abnormal，用于课堂讲解",
     "final_anomaly_type": "abnormal"
   },
   "6": {
-    "review_note": "数据缺失，无法计算，保留边界案例标记",
-    "final_anomaly_type": "boundary_case"
+    "reviewed_by": "数据复核人-张",
+    "original_statement": "旧截图中该行为空，老师批注'数据源方确认'",
+    "corrected_value": "",
+    "review_reason": "数据源方还没回复，继续挂待验证，不提前归normal",
+    "next_owner": "下周找数据源方追数",
+    "review_note": "继续pending_verification，不finalize",
+    "final_anomaly_type": "pending_verification"
   }
 }

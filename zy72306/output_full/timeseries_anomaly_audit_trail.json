@@ -5,10 +5,10 @@
     "old_status": null,
     "new_status": "imported",
     "actor": "数据分析师小祁",
-    "timestamp": "2026-06-09T01:11:20.520993",
+    "timestamp": "2026-06-09T01:12:52.987772",
     "details": {
       "screenshot_ref": "screenshot_001",
-      "source": "sample_input.csv"
+      "source": "sample_input_cn.xlsx#数据表"
     },
     "comment": "从旧公式截图导入数据"
   },
@@ -18,10 +18,10 @@
     "old_status": null,
     "new_status": "imported",
     "actor": "数据分析师小祁",
-    "timestamp": "2026-06-09T01:11:20.527426",
+    "timestamp": "2026-06-09T01:12:52.987964",
     "details": {
       "screenshot_ref": "screenshot_002",
-      "source": "sample_input.csv"
+      "source": "sample_input_cn.xlsx#数据表"
     },
     "comment": "从旧公式截图导入数据"
   },
@@ -31,10 +31,10 @@
     "old_status": null,
     "new_status": "imported",
     "actor": "数据分析师小祁",
-    "timestamp": "2026-06-09T01:11:20.528514",
+    "timestamp": "2026-06-09T01:12:52.988140",
     "details": {
       "screenshot_ref": "screenshot_003",
-      "source": "sample_input.csv"
+      "source": "sample_input_cn.xlsx#数据表"
     },
     "comment": "从旧公式截图导入数据"
   },
@@ -44,10 +44,10 @@
     "old_status": null,
     "new_status": "imported",
     "actor": "数据分析师小祁",
-    "timestamp": "2026-06-09T01:11:20.528857",
+    "timestamp": "2026-06-09T01:12:52.988318",
     "details": {
       "screenshot_ref": "screenshot_004",
-      "source": "sample_input.csv"
+      "source": "sample_input_cn.xlsx#数据表"
     },
     "comment": "从旧公式截图导入数据"
   },
@@ -57,10 +57,10 @@
     "old_status": null,
     "new_status": "imported",
     "actor": "数据分析师小祁",
-    "timestamp": "2026-06-09T01:11:20.529185",
+    "timestamp": "2026-06-09T01:12:52.988499",
     "details": {
       "screenshot_ref": "screenshot_005",
-      "source": "sample_input.csv"
+      "source": "sample_input_cn.xlsx#数据表"
     },
     "comment": "从旧公式截图导入数据"
   },
@@ -70,10 +70,10 @@
     "old_status": null,
     "new_status": "imported",
     "actor": "数据分析师小祁",
-    "timestamp": "2026-06-09T01:11:20.531544",
+    "timestamp": "2026-06-09T01:12:52.988714",
     "details": {
       "screenshot_ref": "screenshot_006",
-      "source": "sample_input.csv"
+      "source": "sample_input_cn.xlsx#数据表"
     },
     "comment": "从旧公式截图导入数据"
   },
@@ -83,10 +83,10 @@
     "old_status": null,
     "new_status": "imported",
     "actor": "数据分析师小祁",
-    "timestamp": "2026-06-09T01:11:20.533962",
+    "timestamp": "2026-06-09T01:12:52.988967",
     "details": {
       "screenshot_ref": "screenshot_007",
-      "source": "sample_input.csv"
+      "source": "sample_input_cn.xlsx#数据表"
     },
     "comment": "从旧公式截图导入数据"
   },
@@ -96,25 +96,12 @@
     "old_status": null,
     "new_status": "imported",
     "actor": "数据分析师小祁",
-    "timestamp": "2026-06-09T01:11:20.535322",
+    "timestamp": "2026-06-09T01:12:52.989195",
     "details": {
       "screenshot_ref": "screenshot_008",
-      "source": "sample_input.csv"
+      "source": "sample_input_cn.xlsx#数据表"
     },
     "comment": "从旧公式截图导入数据"
-  },
-  {
-    "row_number": 2,
-    "action": "manual_modification",
-    "old_status": "manual_updated",
-    "new_status": "manual_updated",
-    "actor": "数据分析师小祁",
-    "timestamp": "2026-06-09T01:11:21.764944",
-    "details": {
-      "field": "denominator",
-      "reason": "根据旧公式截图 screenshot_002 老师批注漏填了100补录"
-    },
-    "comment": "根据旧公式截图 screenshot_002 老师批注漏填了100补录"
   },
   {
     "row_number": 2,
@@ -122,7 +109,7 @@
     "old_status": "imported",
     "new_status": "pending_review",
     "actor": "数据分析师小祁",
-    "timestamp": "2026-06-09T01:12:01.808871",
+    "timestamp": "2026-06-09T01:12:52.990057",
     "details": {
       "comment": "分母为空需复核，可能是数据录入错误，见旧公式截图 screenshot_002"
     },
@@ -134,7 +121,7 @@
     "old_status": "imported",
     "new_status": "pending_review",
     "actor": "数据分析师小祁",
-    "timestamp": "2026-06-09T01:12:01.814642",
+    "timestamp": "2026-06-09T01:12:52.990637",
     "details": {
       "comment": "分母为0但原始公式截图显示为空字符串，和老师批注冲突，留待复核人"
     },
@@ -146,7 +133,7 @@
     "old_status": "imported",
     "new_status": "pending_review",
     "actor": "数据分析师小祁",
-    "timestamp": "2026-06-09T01:12:01.815591",
+    "timestamp": "2026-06-09T01:12:52.991221",
     "details": {
       "comment": "空值记录，待与数据源方确认是否该补为100"
     },
@@ -158,7 +145,7 @@
     "old_status": "reviewed",
     "new_status": "reviewed",
     "actor": "数据复核人-张",
-    "timestamp": "2026-06-09T01:12:02.900916",
+    "timestamp": "2026-06-09T01:12:52.992161",
     "details": {
       "original_statement": "公式截图中分母格为空，老师批注说'漏填了100'",
       "next_owner": "数据分析师小祁确认改后数"
@@ -171,7 +158,7 @@
     "old_status": "reviewed",
     "new_status": "reviewed",
     "actor": "数据复核人-张",
-    "timestamp": "2026-06-09T01:12:02.901720",
+    "timestamp": "2026-06-09T01:12:52.992809",
     "details": {
       "original_statement": "分母原始显示为空字符串，数值是0",
       "next_owner": "课堂演示环节重点说明"
@@ -184,7 +171,7 @@
     "old_status": "reviewed",
     "new_status": "reviewed",
     "actor": "数据复核人-张",
-    "timestamp": "2026-06-09T01:12:02.902531",
+    "timestamp": "2026-06-09T01:12:52.993484",
     "details": {
       "original_statement": "旧截图中该行为空，老师批注'数据源方确认'",
       "next_owner": "下周找数据源方追数"
@@ -197,7 +184,7 @@
     "old_status": "reviewed",
     "new_status": "finalized",
     "actor": "课堂演示",
-    "timestamp": "2026-06-09T01:12:03.766742",
+    "timestamp": "2026-06-09T01:12:52.994255",
     "details": {},
     "comment": "课堂演示结果更新，最终确认"
   },
@@ -207,7 +194,7 @@
     "old_status": "reviewed",
     "new_status": "finalized",
     "actor": "课堂演示",
-    "timestamp": "2026-06-09T01:12:03.768015",
+    "timestamp": "2026-06-09T01:12:52.995013",
     "details": {},
     "comment": "课堂演示结果更新，最终确认"
   },
@@ -217,7 +204,7 @@
     "old_status": "reviewed",
     "new_status": "finalized",
     "actor": "课堂演示",
-    "timestamp": "2026-06-09T01:12:03.768948",
+    "timestamp": "2026-06-09T01:12:52.996871",
     "details": {},
     "comment": "课堂演示结果更新，最终确认"
   },
@@ -227,7 +214,7 @@
     "old_status": "reviewed",
     "new_status": "finalized",
     "actor": "课堂演示",
-    "timestamp": "2026-06-09T01:12:03.769894",
+    "timestamp": "2026-06-09T01:12:53.000012",
     "details": {},
     "comment": "课堂演示结果更新，最终确认"
   },
@@ -237,7 +224,7 @@
     "old_status": "reviewed",
     "new_status": "finalized",
     "actor": "课堂演示",
-    "timestamp": "2026-06-09T01:12:03.771207",
+    "timestamp": "2026-06-09T01:12:53.001338",
     "details": {},
     "comment": "课堂演示结果更新，最终确认"
   },
@@ -247,7 +234,7 @@
     "old_status": "reviewed",
     "new_status": "finalized",
     "actor": "课堂演示",
-    "timestamp": "2026-06-09T01:12:03.772865",
+    "timestamp": "2026-06-09T01:12:53.002562",
     "details": {},
     "comment": "课堂演示结果更新，最终确认"
   },
@@ -257,7 +244,7 @@
     "old_status": "reviewed",
     "new_status": "finalized",
     "actor": "课堂演示",
-    "timestamp": "2026-06-09T01:12:03.773886",
+    "timestamp": "2026-06-09T01:12:53.003738",
     "details": {},
     "comment": "课堂演示结果更新，最终确认"
   }

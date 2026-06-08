@@ -1,0 +1,694 @@
+{
+  "results": {
+    "1": {
+      "row_number": 1,
+      "timestamp": "2024-01-01",
+      "metric_name": "转化率A",
+      "numerator": 100.0,
+      "denominator": 200.0,
+      "raw_denominator": "200",
+      "ratio": 0.5,
+      "anomaly_type": "normal",
+      "process_status": "finalized",
+      "source_screenshot_ref": "screenshot_001",
+      "teacher_comment": null,
+      "manual_modifications": [],
+      "boundary_rule_triggered": null,
+      "review_note": null,
+      "review_records": [],
+      "created_at": "2026-06-09T01:11:20.518984",
+      "updated_at": "2026-06-09T01:12:03.766059",
+      "import_source": "sample_input.csv",
+      "import_sheet_name": null,
+      "snapshot_version": 2
+    },
+    "2": {
+      "row_number": 2,
+      "timestamp": "2024-01-01",
+      "metric_name": "转化率B",
+      "numerator": 50.0,
+      "denominator": 100.0,
+      "raw_denominator": "",
+      "ratio": 0.5,
+      "anomaly_type": "normal",
+      "process_status": "finalized",
+      "source_screenshot_ref": "screenshot_002",
+      "teacher_comment": "分母为空需复核，可能是数据录入错误，见旧公式截图 screenshot_002",
+      "manual_modifications": [
+        {
+          "modified_at": "2026-06-09T01:11:21.764361",
+          "modified_by": "数据分析师小祁",
+          "field_name": "denominator",
+          "old_value": "None",
+          "new_value": "100",
+          "reason": "根据旧公式截图 screenshot_002 老师批注漏填了100补录"
+        },
+        {
+          "modified_at": "2026-06-09T01:11:21.764361",
+          "modified_by": "数据分析师小祁",
+          "field_name": "denominator",
+          "old_value": "None",
+          "new_value": "100",
+          "reason": "根据旧公式截图 screenshot_002 老师批注漏填了100补录"
+        },
+        {
+          "modified_at": "2026-06-09T01:11:21.764361",
+          "modified_by": "数据分析师小祁",
+          "field_name": "denominator",
+          "old_value": "None",
+          "new_value": "100",
+          "reason": "根据旧公式截图 screenshot_002 老师批注漏填了100补录"
+        },
+        {
+          "modified_at": "2026-06-09T01:11:21.764361",
+          "modified_by": "数据分析师小祁",
+          "field_name": "denominator",
+          "old_value": "None",
+          "new_value": "100",
+          "reason": "根据旧公式截图 screenshot_002 老师批注漏填了100补录"
+        },
+        {
+          "modified_at": "2026-06-09T01:11:21.764361",
+          "modified_by": "数据分析师小祁",
+          "field_name": "denominator",
+          "old_value": "None",
+          "new_value": "100",
+          "reason": "根据旧公式截图 screenshot_002 老师批注漏填了100补录"
+        },
+        {
+          "modified_at": "2026-06-09T01:11:21.764361",
+          "modified_by": "数据分析师小祁",
+          "field_name": "denominator",
+          "old_value": "None",
+          "new_value": "100",
+          "reason": "根据旧公式截图 screenshot_002 老师批注漏填了100补录"
+        },
+        {
+          "modified_at": "2026-06-09T01:11:21.764361",
+          "modified_by": "数据分析师小祁",
+          "field_name": "denominator",
+          "old_value": "None",
+          "new_value": "100",
+          "reason": "根据旧公式截图 screenshot_002 老师批注漏填了100补录"
+        },
+        {
+          "modified_at": "2026-06-09T01:11:21.764361",
+          "modified_by": "数据分析师小祁",
+          "field_name": "denominator",
+          "old_value": "None",
+          "new_value": "100",
+          "reason": "根据旧公式截图 screenshot_002 老师批注漏填了100补录"
+        }
+      ],
+      "boundary_rule_triggered": "zero_denominator_empty_string",
+      "review_note": "按老师批注补填，标记normal",
+      "review_records": [
+        {
+          "reviewed_at": "2026-06-09T01:12:02.900225",
+          "reviewed_by": "数据复核人-张",
+          "original_statement": "公式截图中分母格为空，老师批注说'漏填了100'",
+          "corrected_value": "100",
+          "review_reason": "对比旧公式截图和老师批注，以老师批注为准，分母漏填",
+          "next_owner": "数据分析师小祁确认改后数",
+          "review_note": "按老师批注补填，标记normal",
+          "anomaly_type_after_review": "normal"
+        },
+        {
+          "reviewed_at": "2026-06-09T01:12:02.900225",
+          "reviewed_by": "数据复核人-张",
+          "original_statement": "公式截图中分母格为空，老师批注说'漏填了100'",
+          "corrected_value": "100",
+          "review_reason": "对比旧公式截图和老师批注，以老师批注为准，分母漏填",
+          "next_owner": "数据分析师小祁确认改后数",
+          "review_note": "按老师批注补填，标记normal",
+          "anomaly_type_after_review": "normal"
+        }
+      ],
+      "created_at": "2026-06-09T01:11:20.518999",
+      "updated_at": "2026-06-09T01:12:03.767445",
+      "import_source": "sample_input.csv",
+      "import_sheet_name": null,
+      "snapshot_version": 5
+    },
+    "3": {
+      "row_number": 3,
+      "timestamp": "2024-01-01",
+      "metric_name": "转化率C",
+      "numerator": 300.0,
+      "denominator": 0.0,
+      "raw_denominator": "0",
+      "ratio": null,
+      "anomaly_type": "abnormal",
+      "process_status": "finalized",
+      "source_screenshot_ref": "screenshot_003",
+      "teacher_comment": "分母为0但原始公式截图显示为空字符串，和老师批注冲突，留待复核人",
+      "manual_modifications": [],
+      "boundary_rule_triggered": "zero_denominator_empty_string",
+      "review_note": "保持abnormal，用于课堂讲解",
+      "review_records": [
+        {
+          "reviewed_at": "2026-06-09T01:12:02.900237",
+          "reviewed_by": "数据复核人-张",
+          "original_statement": "分母原始显示为空字符串，数值是0",
+          "corrected_value": "0",
+          "review_reason": "空字符串就是0，按0处理，不提前归normal，按异常记",
+          "next_owner": "课堂演示环节重点说明",
+          "review_note": "保持abnormal，用于课堂讲解",
+          "anomaly_type_after_review": "abnormal"
+        },
+        {
+          "reviewed_at": "2026-06-09T01:12:02.900237",
+          "reviewed_by": "数据复核人-张",
+          "original_statement": "分母原始显示为空字符串，数值是0",
+          "corrected_value": "0",
+          "review_reason": "空字符串就是0，按0处理，不提前归normal，按异常记",
+          "next_owner": "课堂演示环节重点说明",
+          "review_note": "保持abnormal，用于课堂讲解",
+          "anomaly_type_after_review": "abnormal"
+        }
+      ],
+      "created_at": "2026-06-09T01:11:20.519004",
+      "updated_at": "2026-06-09T01:12:03.768430",
+      "import_source": "sample_input.csv",
+      "import_sheet_name": null,
+      "snapshot_version": 4
+    },
+    "4": {
+      "row_number": 4,
+      "timestamp": "2024-01-02",
+      "metric_name": "转化率A",
+      "numerator": 150.0,
+      "denominator": 100.0,
+      "raw_denominator": "100",
+      "ratio": 1.5,
+      "anomaly_type": "normal",
+      "process_status": "finalized",
+      "source_screenshot_ref": "screenshot_004",
+      "teacher_comment": null,
+      "manual_modifications": [],
+      "boundary_rule_triggered": null,
+      "review_note": null,
+      "review_records": [],
+      "created_at": "2026-06-09T01:11:20.519008",
+      "updated_at": "2026-06-09T01:12:03.769374",
+      "import_source": "sample_input.csv",
+      "import_sheet_name": null,
+      "snapshot_version": 2
+    },
+    "5": {
+      "row_number": 5,
+      "timestamp": "2024-01-02",
+      "metric_name": "转化率B",
+      "numerator": 80.0,
+      "denominator": 400.0,
+      "raw_denominator": "400",
+      "ratio": 0.2,
+      "anomaly_type": "abnormal",
+      "process_status": "finalized",
+      "source_screenshot_ref": "screenshot_005",
+      "teacher_comment": null,
+      "manual_modifications": [],
+      "boundary_rule_triggered": "outlier_threshold",
+      "review_note": null,
+      "review_records": [],
+      "created_at": "2026-06-09T01:11:20.519011",
+      "updated_at": "2026-06-09T01:12:03.770330",
+      "import_source": "sample_input.csv",
+      "import_sheet_name": null,
+      "snapshot_version": 2
+    },
+    "6": {
+      "row_number": 6,
+      "timestamp": "2024-01-02",
+      "metric_name": "转化率C",
+      "numerator": 25.0,
+      "denominator": null,
+      "raw_denominator": "",
+      "ratio": null,
+      "anomaly_type": "pending_verification",
+      "process_status": "reviewed",
+      "source_screenshot_ref": "screenshot_006",
+      "teacher_comment": "空值记录，待与数据源方确认是否该补为100",
+      "manual_modifications": [],
+      "boundary_rule_triggered": "zero_denominator_empty_string",
+      "review_note": "继续pending_verification，不finalize",
+      "review_records": [
+        {
+          "reviewed_at": "2026-06-09T01:12:02.900239",
+          "reviewed_by": "数据复核人-张",
+          "original_statement": "旧截图中该行为空，老师批注'数据源方确认'",
+          "corrected_value": "",
+          "review_reason": "数据源方还没回复，继续挂待验证，不提前归normal",
+          "next_owner": "下周找数据源方追数",
+          "review_note": "继续pending_verification，不finalize",
+          "anomaly_type_after_review": "pending_verification"
+        }
+      ],
+      "created_at": "2026-06-09T01:11:20.519014",
+      "updated_at": "2026-06-09T01:12:02.902062",
+      "import_source": "sample_input.csv",
+      "import_sheet_name": null,
+      "snapshot_version": 3
+    },
+    "7": {
+      "row_number": 7,
+      "timestamp": "2024-01-03",
+      "metric_name": "转化率A",
+      "numerator": 90.0,
+      "denominator": 180.0,
+      "raw_denominator": "180",
+      "ratio": 0.5,
+      "anomaly_type": "normal",
+      "process_status": "finalized",
+      "source_screenshot_ref": "screenshot_007",
+      "teacher_comment": null,
+      "manual_modifications": [],
+      "boundary_rule_triggered": null,
+      "review_note": null,
+      "review_records": [],
+      "created_at": "2026-06-09T01:11:20.519017",
+      "updated_at": "2026-06-09T01:12:03.771955",
+      "import_source": "sample_input.csv",
+      "import_sheet_name": null,
+      "snapshot_version": 2
+    },
+    "8": {
+      "row_number": 8,
+      "timestamp": "2024-01-03",
+      "metric_name": "转化率B",
+      "numerator": 0.0,
+      "denominator": 50.0,
+      "raw_denominator": "50",
+      "ratio": 0.0,
+      "anomaly_type": "abnormal",
+      "process_status": "finalized",
+      "source_screenshot_ref": "screenshot_008",
+      "teacher_comment": null,
+      "manual_modifications": [],
+      "boundary_rule_triggered": "outlier_threshold",
+      "review_note": null,
+      "review_records": [],
+      "created_at": "2026-06-09T01:11:20.519020",
+      "updated_at": "2026-06-09T01:12:03.773328",
+      "import_source": "sample_input.csv",
+      "import_sheet_name": null,
+      "snapshot_version": 2
+    }
+  },
+  "audit_trail": [
+    {
+      "row_number": 1,
+      "action": "import",
+      "old_status": null,
+      "new_status": "imported",
+      "actor": "数据分析师小祁",
+      "timestamp": "2026-06-09T01:11:20.520993",
+      "details": {
+        "screenshot_ref": "screenshot_001",
+        "source": "sample_input.csv"
+      },
+      "comment": "从旧公式截图导入数据"
+    },
+    {
+      "row_number": 2,
+      "action": "import",
+      "old_status": null,
+      "new_status": "imported",
+      "actor": "数据分析师小祁",
+      "timestamp": "2026-06-09T01:11:20.527426",
+      "details": {
+        "screenshot_ref": "screenshot_002",
+        "source": "sample_input.csv"
+      },
+      "comment": "从旧公式截图导入数据"
+    },
+    {
+      "row_number": 3,
+      "action": "import",
+      "old_status": null,
+      "new_status": "imported",
+      "actor": "数据分析师小祁",
+      "timestamp": "2026-06-09T01:11:20.528514",
+      "details": {
+        "screenshot_ref": "screenshot_003",
+        "source": "sample_input.csv"
+      },
+      "comment": "从旧公式截图导入数据"
+    },
+    {
+      "row_number": 4,
+      "action": "import",
+      "old_status": null,
+      "new_status": "imported",
+      "actor": "数据分析师小祁",
+      "timestamp": "2026-06-09T01:11:20.528857",
+      "details": {
+        "screenshot_ref": "screenshot_004",
+        "source": "sample_input.csv"
+      },
+      "comment": "从旧公式截图导入数据"
+    },
+    {
+      "row_number": 5,
+      "action": "import",
+      "old_status": null,
+      "new_status": "imported",
+      "actor": "数据分析师小祁",
+      "timestamp": "2026-06-09T01:11:20.529185",
+      "details": {
+        "screenshot_ref": "screenshot_005",
+        "source": "sample_input.csv"
+      },
+      "comment": "从旧公式截图导入数据"
+    },
+    {
+      "row_number": 6,
+      "action": "import",
+      "old_status": null,
+      "new_status": "imported",
+      "actor": "数据分析师小祁",
+      "timestamp": "2026-06-09T01:11:20.531544",
+      "details": {
+        "screenshot_ref": "screenshot_006",
+        "source": "sample_input.csv"
+      },
+      "comment": "从旧公式截图导入数据"
+    },
+    {
+      "row_number": 7,
+      "action": "import",
+      "old_status": null,
+      "new_status": "imported",
+      "actor": "数据分析师小祁",
+      "timestamp": "2026-06-09T01:11:20.533962",
+      "details": {
+        "screenshot_ref": "screenshot_007",
+        "source": "sample_input.csv"
+      },
+      "comment": "从旧公式截图导入数据"
+    },
+    {
+      "row_number": 8,
+      "action": "import",
+      "old_status": null,
+      "new_status": "imported",
+      "actor": "数据分析师小祁",
+      "timestamp": "2026-06-09T01:11:20.535322",
+      "details": {
+        "screenshot_ref": "screenshot_008",
+        "source": "sample_input.csv"
+      },
+      "comment": "从旧公式截图导入数据"
+    },
+    {
+      "row_number": 2,
+      "action": "manual_modification",
+      "old_status": "manual_updated",
+      "new_status": "manual_updated",
+      "actor": "数据分析师小祁",
+      "timestamp": "2026-06-09T01:11:21.764944",
+      "details": {
+        "field": "denominator",
+        "reason": "根据旧公式截图 screenshot_002 老师批注漏填了100补录"
+      },
+      "comment": "根据旧公式截图 screenshot_002 老师批注漏填了100补录"
+    },
+    {
+      "row_number": 2,
+      "action": "add_teacher_comment",
+      "old_status": "imported",
+      "new_status": "pending_review",
+      "actor": "数据分析师小祁",
+      "timestamp": "2026-06-09T01:12:01.808871",
+      "details": {
+        "comment": "分母为空需复核，可能是数据录入错误，见旧公式截图 screenshot_002"
+      },
+      "comment": "数据分析师小祁补充老师批注，进入待复核状态"
+    },
+    {
+      "row_number": 3,
+      "action": "add_teacher_comment",
+      "old_status": "imported",
+      "new_status": "pending_review",
+      "actor": "数据分析师小祁",
+      "timestamp": "2026-06-09T01:12:01.814642",
+      "details": {
+        "comment": "分母为0但原始公式截图显示为空字符串，和老师批注冲突，留待复核人"
+      },
+      "comment": "数据分析师小祁补充老师批注，进入待复核状态"
+    },
+    {
+      "row_number": 6,
+      "action": "add_teacher_comment",
+      "old_status": "imported",
+      "new_status": "pending_review",
+      "actor": "数据分析师小祁",
+      "timestamp": "2026-06-09T01:12:01.815591",
+      "details": {
+        "comment": "空值记录，待与数据源方确认是否该补为100"
+      },
+      "comment": "数据分析师小祁补充老师批注，进入待复核状态"
+    },
+    {
+      "row_number": 2,
+      "action": "review_complete",
+      "old_status": "reviewed",
+      "new_status": "reviewed",
+      "actor": "数据复核人-张",
+      "timestamp": "2026-06-09T01:12:02.900916",
+      "details": {
+        "original_statement": "公式截图中分母格为空，老师批注说'漏填了100'",
+        "next_owner": "数据分析师小祁确认改后数"
+      },
+      "comment": "对比旧公式截图和老师批注，以老师批注为准，分母漏填"
+    },
+    {
+      "row_number": 3,
+      "action": "review_complete",
+      "old_status": "reviewed",
+      "new_status": "reviewed",
+      "actor": "数据复核人-张",
+      "timestamp": "2026-06-09T01:12:02.901720",
+      "details": {
+        "original_statement": "分母原始显示为空字符串，数值是0",
+        "next_owner": "课堂演示环节重点说明"
+      },
+      "comment": "空字符串就是0，按0处理，不提前归normal，按异常记"
+    },
+    {
+      "row_number": 6,
+      "action": "review_complete",
+      "old_status": "reviewed",
+      "new_status": "reviewed",
+      "actor": "数据复核人-张",
+      "timestamp": "2026-06-09T01:12:02.902531",
+      "details": {
+        "original_statement": "旧截图中该行为空，老师批注'数据源方确认'",
+        "next_owner": "下周找数据源方追数"
+      },
+      "comment": "数据源方还没回复，继续挂待验证，不提前归normal"
+    },
+    {
+      "row_number": 1,
+      "action": "finalize",
+      "old_status": "reviewed",
+      "new_status": "finalized",
+      "actor": "课堂演示",
+      "timestamp": "2026-06-09T01:12:03.766742",
+      "details": {},
+      "comment": "课堂演示结果更新，最终确认"
+    },
+    {
+      "row_number": 2,
+      "action": "finalize",
+      "old_status": "reviewed",
+      "new_status": "finalized",
+      "actor": "课堂演示",
+      "timestamp": "2026-06-09T01:12:03.768015",
+      "details": {},
+      "comment": "课堂演示结果更新，最终确认"
+    },
+    {
+      "row_number": 3,
+      "action": "finalize",
+      "old_status": "reviewed",
+      "new_status": "finalized",
+      "actor": "课堂演示",
+      "timestamp": "2026-06-09T01:12:03.768948",
+      "details": {},
+      "comment": "课堂演示结果更新，最终确认"
+    },
+    {
+      "row_number": 4,
+      "action": "finalize",
+      "old_status": "reviewed",
+      "new_status": "finalized",
+      "actor": "课堂演示",
+      "timestamp": "2026-06-09T01:12:03.769894",
+      "details": {},
+      "comment": "课堂演示结果更新，最终确认"
+    },
+    {
+      "row_number": 5,
+      "action": "finalize",
+      "old_status": "reviewed",
+      "new_status": "finalized",
+      "actor": "课堂演示",
+      "timestamp": "2026-06-09T01:12:03.771207",
+      "details": {},
+      "comment": "课堂演示结果更新，最终确认"
+    },
+    {
+      "row_number": 7,
+      "action": "finalize",
+      "old_status": "reviewed",
+      "new_status": "finalized",
+      "actor": "课堂演示",
+      "timestamp": "2026-06-09T01:12:03.772865",
+      "details": {},
+      "comment": "课堂演示结果更新，最终确认"
+    },
+    {
+      "row_number": 8,
+      "action": "finalize",
+      "old_status": "reviewed",
+      "new_status": "finalized",
+      "actor": "课堂演示",
+      "timestamp": "2026-06-09T01:12:03.773886",
+      "details": {},
+      "comment": "课堂演示结果更新，最终确认"
+    }
+  ],
+  "metadata": {
+    "current_version": 15,
+    "snapshots": [
+      {
+        "version": 1,
+        "created_at": "2026-06-09T01:11:20.519224",
+        "created_by": "数据分析师小祁",
+        "description": "import from sample_input.csv",
+        "checksum": "8cba68fe7141be8f",
+        "result_count": 8
+      },
+      {
+        "version": 2,
+        "created_at": "2026-06-09T01:11:21.764527",
+        "created_by": "数据分析师小祁",
+        "description": "manual_modify row=2 field=denominator",
+        "checksum": "556bcf6db81a4089",
+        "result_count": 8
+      },
+      {
+        "version": 3,
+        "created_at": "2026-06-09T01:12:01.807264",
+        "created_by": "数据分析师小祁",
+        "description": "add teacher comment row=2",
+        "checksum": "36e5fcb8a4b016d9",
+        "result_count": 8
+      },
+      {
+        "version": 4,
+        "created_at": "2026-06-09T01:12:01.811859",
+        "created_by": "数据分析师小祁",
+        "description": "add teacher comment row=3",
+        "checksum": "2cd76757ef300552",
+        "result_count": 8
+      },
+      {
+        "version": 5,
+        "created_at": "2026-06-09T01:12:01.815272",
+        "created_by": "数据分析师小祁",
+        "description": "add teacher comment row=6",
+        "checksum": "77f76179e258b3e6",
+        "result_count": 8
+      },
+      {
+        "version": 6,
+        "created_at": "2026-06-09T01:12:02.900498",
+        "created_by": "数据复核人-张",
+        "description": "review row=2 by=数据复核人-张",
+        "checksum": "54d937cabd48e2b3",
+        "result_count": 8
+      },
+      {
+        "version": 7,
+        "created_at": "2026-06-09T01:12:02.901384",
+        "created_by": "数据复核人-张",
+        "description": "review row=3 by=数据复核人-张",
+        "checksum": "bb9a9ff44db23708",
+        "result_count": 8
+      },
+      {
+        "version": 8,
+        "created_at": "2026-06-09T01:12:02.902159",
+        "created_by": "数据复核人-张",
+        "description": "review row=6 by=数据复核人-张",
+        "checksum": "5ae9cca7c4ff8b0c",
+        "result_count": 8
+      },
+      {
+        "version": 9,
+        "created_at": "2026-06-09T01:12:03.766238",
+        "created_by": "课堂演示",
+        "description": "finalize row=1",
+        "checksum": "c7cd5b6418a8eb89",
+        "result_count": 8
+      },
+      {
+        "version": 10,
+        "created_at": "2026-06-09T01:12:03.767564",
+        "created_by": "课堂演示",
+        "description": "finalize row=2",
+        "checksum": "38fdf3196a78326a",
+        "result_count": 8
+      },
+      {
+        "version": 11,
+        "created_at": "2026-06-09T01:12:03.768541",
+        "created_by": "课堂演示",
+        "description": "finalize row=3",
+        "checksum": "f7afcaaac4edcf76",
+        "result_count": 8
+      },
+      {
+        "version": 12,
+        "created_at": "2026-06-09T01:12:03.769482",
+        "created_by": "课堂演示",
+        "description": "finalize row=4",
+        "checksum": "2cffd60b22fb01b5",
+        "result_count": 8
+      },
+      {
+        "version": 13,
+        "created_at": "2026-06-09T01:12:03.770435",
+        "created_by": "课堂演示",
+        "description": "finalize row=5",
+        "checksum": "6fa05ad52cf0df39",
+        "result_count": 8
+      },
+      {
+        "version": 14,
+        "created_at": "2026-06-09T01:12:03.772084",
+        "created_by": "课堂演示",
+        "description": "finalize row=7",
+        "checksum": "5e7323a520219278",
+        "result_count": 8
+      },
+      {
+        "version": 15,
+        "created_at": "2026-06-09T01:12:03.773442",
+        "created_by": "课堂演示",
+        "description": "finalize row=8",
+        "checksum": "507aa95cdf727fda",
+        "result_count": 8
+      }
+    ],
+    "created_at": "2026-06-09T01:11:20.487410",
+    "last_modified_at": "2026-06-09T01:12:03.774623",
+    "last_modified_by": "课堂演示",
+    "import_sources": [
+      "/Users/lzy/pro/solo/workspaces/zy72306/examples/sample_input.csv"
+    ],
+    "pipeline_step": 3
+  }
+}

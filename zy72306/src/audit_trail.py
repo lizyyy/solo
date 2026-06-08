@@ -1,6 +1,5 @@
 from datetime import datetime
 from typing import List, Optional, Dict, Any
-from dataclasses import dataclass, field
 import json
 from pathlib import Path
 
@@ -8,32 +7,9 @@ from .data_models import (
     AnomalyResult,
     ProcessStatus,
     ManualModification,
-    AnomalyType
+    AnomalyType,
+    AuditRecord
 )
-
-
-@dataclass
-class AuditRecord:
-    row_number: int
-    action: str
-    old_status: Optional[ProcessStatus]
-    new_status: ProcessStatus
-    actor: str
-    timestamp: datetime = field(default_factory=datetime.now)
-    details: Dict[str, Any] = field(default_factory=dict)
-    comment: Optional[str] = None
-
-    def to_dict(self) -> Dict[str, Any]:
-        return {
-            "row_number": self.row_number,
-            "action": self.action,
-            "old_status": self.old_status.value if self.old_status else None,
-            "new_status": self.new_status.value,
-            "actor": self.actor,
-            "timestamp": self.timestamp.isoformat(),
-            "details": self.details,
-            "comment": self.comment
-        }
 
 
 class AuditTrail:
