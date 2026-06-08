@@ -66,6 +66,7 @@ class CommissionRecord(Base):
     status = Column(String, default=ProcessingStatus.IMPORTED)
     is_duplicate = Column(Boolean, default=False)
     duplicate_of_id = Column(Integer, nullable=True)
+    duplicate_resolved = Column(Boolean, default=False)
     manually_modified = Column(Boolean, default=False)
     modification_notes = Column(Text, nullable=True)
     balance_updated = Column(Boolean, default=False)

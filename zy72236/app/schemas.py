@@ -40,6 +40,8 @@ class CommissionRecord(CommissionRecordBase):
     source_type: str
     status: str
     is_duplicate: bool
+    duplicate_of_id: Optional[int] = None
+    duplicate_resolved: bool = False
     manually_modified: bool
     needs_manager_review: bool
     manager_reviewed: bool

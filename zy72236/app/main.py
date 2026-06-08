@@ -11,7 +11,7 @@ from .database import engine, get_db, Base
 from .crud import (
     get_all_batches, get_batch, get_unified_record_data,
     get_record_audit_logs, update_record, mark_manager_reviewed,
-    get_batch_audit_logs
+    resolve_duplicate, get_batch_audit_logs
 )
 from .workflow import (
     import_clearing_batch, review_holiday_adjustment,
@@ -183,6 +183,21 @@ async def manager_review(
     if not record:
         raise HTTPException(status_code=404, detail="记录不存在")
     return {"success": True, "record": record}
+
+
+@app.post("/api/records/{record_id}/resolve-duplicate")
+async def resolve_duplicate_api(
+    record_id: int,
+    action: str,
+    resolved_by: str = "system",
+    db: Session = Depends(get_db)
+):
+    if action not in ("skip", "keep"):
+        raise HTTPException(status_code=400, detail="action 必须为 skip 或 keep")
+    record = resolve_duplicate(db, record_id, action, resolved_by)
+    if not record:
+        raise HTTPException(status_code=404, detail="记录不存在或不是重复记录")
+    return {"success": True, "record_id": record_id, "action": action}
 
 
 @app.get("/api/balance-changes")

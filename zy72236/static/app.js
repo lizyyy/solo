@@ -184,7 +184,7 @@ async function loadCurrentBatch() {
                 </thead>
                 <tbody>
                     ${recordsData.records.map(r => `
-                        <tr class="${r.needs_manager_review || r.is_duplicate ? 'warning-row' : ''}">
+                        <tr class="${r.needs_manager_review || (r.is_duplicate && !r.duplicate_resolved) ? 'warning-row' : ''}">
                             <td>${r.original_line_number}</td>
                             <td>${r.fund_code}</td>
                             <td>${r.customer_name}</td>
@@ -195,6 +195,8 @@ async function loadCurrentBatch() {
                             <td>
                                 <button class="btn-secondary btn-small" onclick="viewRecordDetail(${r.id})">详情</button>
                                 ${r.needs_manager_review ? `<button class="btn-primary btn-small" onclick="reviewRecord(${r.id})">复核</button>` : ''}
+                                ${r.is_duplicate && !r.duplicate_resolved ? `<button class="btn-primary btn-small" onclick="resolveDuplicate(${r.id})">处理重复</button>` : ''}
+                                ${r.duplicate_resolved ? '<span class="badge badge-success">已处理</span>' : ''}
                             </td>
                         </tr>
                     `).join('')}
@@ -345,7 +347,18 @@ async function updateBalance() {
         const check = await checkRes.json();
 
         if (!check.can_proceed) {
-            alert('无法更新余额:\n' + check.issues.join('\n'));
+            let msg = '无法更新余额，请先处理以下问题：\n\n';
+            check.issues.forEach(issue => {
+                msg += '• ' + issue + '\n';
+            });
+            msg += '\n操作提示：\n';
+            if (check.duplicate_count > 0) {
+                msg += '→ 重复记录：请到"导入清算批次"页面，点击重复记录的"处理重复"按钮\n';
+            }
+            if (check.pending_review_count > 0) {
+                msg += '→ 审批人拼音：请到"导入清算批次"页面，点击待复核记录的"复核"按钮\n';
+            }
+            alert(msg);
             return;
         }
 
@@ -449,7 +462,7 @@ document.getElementById('export-batch-select').addEventListener('change', async 
         const data = await res.json();
 
         document.getElementById('records-body').innerHTML = data.records.map(r => `
-            <tr class="${r.needs_manager_review || r.is_duplicate ? 'warning-row' : ''}">
+            <tr class="${r.needs_manager_review || (r.is_duplicate && !r.duplicate_resolved) ? 'warning-row' : ''}">
                 <td>${r.original_line_number}</td>
                 <td>${r.fund_code}</td>
                 <td>${r.customer_name}</td>
@@ -464,6 +477,7 @@ document.getElementById('export-batch-select').addEventListener('change', async 
                 <td>
                     <button class="btn-secondary btn-small" onclick="viewRecordDetail(${r.id})">详情</button>
                     <button class="btn-secondary btn-small" onclick="viewAuditTrail(${r.id}, true)">审计</button>
+                    ${r.is_duplicate && !r.duplicate_resolved ? `<button class="btn-primary btn-small" onclick="resolveDuplicate(${r.id})">处理重复</button>` : ''}
                 </td>
             </tr>
         `).join('');
@@ -575,6 +589,30 @@ async function reviewRecord(recordId) {
         }
     } catch (e) {
         alert('复核失败: ' + e.message);
+    }
+}
+
+async function resolveDuplicate(recordId) {
+    const action = confirm('该记录被标记为重复。\n\n确定 = 确认跳过（不参与余额计算）\n取消 = 保留该记录（按非重复处理）') ? 'skip' : 'keep';
+    const resolvedBy = prompt('请输入处理人姓名:');
+    if (!resolvedBy) return;
+
+    try {
+        const res = await fetch(`/api/records/${recordId}/resolve-duplicate?action=${action}&resolved_by=${encodeURIComponent(resolvedBy)}`, {
+            method: 'POST'
+        });
+        const result = await res.json();
+
+        if (res.ok) {
+            alert(action === 'skip' ? '已确认跳过该重复记录' : '已保留该记录为非重复');
+            loadCurrentBatch();
+            loadOverview();
+            closeModal();
+        } else {
+            alert('处理失败: ' + (result.detail || '未知错误'));
+        }
+    } catch (e) {
+        alert('处理失败: ' + e.message);
     }
 }
 

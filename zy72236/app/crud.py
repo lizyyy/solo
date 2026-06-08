@@ -311,6 +311,47 @@ def mark_manager_reviewed(
     return record
 
 
+def resolve_duplicate(
+    db: Session,
+    record_id: int,
+    action: str,
+    resolved_by: str
+) -> Optional[models.CommissionRecord]:
+    record = db.query(models.CommissionRecord).filter(models.CommissionRecord.id == record_id).first()
+    if not record:
+        return None
+    if not record.is_duplicate:
+        return None
+
+    if action == "skip":
+        record.duplicate_resolved = True
+        status_note = "确认跳过，不参与余额计算"
+    elif action == "keep":
+        record.is_duplicate = False
+        record.duplicate_of_id = None
+        record.duplicate_resolved = True
+        record.status = models.ProcessingStatus.PENDING_REVIEW
+        status_note = "确认为非重复，参与余额计算"
+    else:
+        return None
+
+    db_audit = models.AuditLog(
+        batch_id=record.batch_id,
+        record_id=record.id,
+        action="duplicate_resolved",
+        field_name="is_duplicate",
+        old_value="True",
+        new_value="skip" if action == "skip" else "keep",
+        performed_by=resolved_by,
+        notes=f"重复记录已处理: {status_note}"
+    )
+    db.add(db_audit)
+    db.commit()
+    db.refresh(record)
+
+    return record
+
+
 def get_all_batches(db: Session) -> List[models.ClearingBatch]:
     return db.query(models.ClearingBatch).order_by(models.ClearingBatch.import_date.desc()).all()
 
@@ -346,6 +387,8 @@ def get_unified_record_data(db: Session, batch_id: int) -> List[Dict[str, Any]]:
             "source_type": r.source_type,
             "status": r.status,
             "is_duplicate": r.is_duplicate,
+            "duplicate_of_id": r.duplicate_of_id,
+            "duplicate_resolved": r.duplicate_resolved,
             "manually_modified": r.manually_modified,
             "needs_manager_review": r.needs_manager_review,
             "balance_updated": r.balance_updated,

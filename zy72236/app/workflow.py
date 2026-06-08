@@ -252,13 +252,13 @@ def can_proceed_to_balance_update(db: Session, batch_id: int) -> Dict[str, Any]:
 
     records = get_batch_records(db, batch_id)
     pending_review = [r for r in records if r.needs_manager_review and not r.is_duplicate]
-    duplicates = [r for r in records if r.is_duplicate]
+    unresolved_duplicates = [r for r in records if r.is_duplicate and not r.duplicate_resolved]
 
     issues = []
     if pending_review:
         issues.append(f"{len(pending_review)} 条记录待客户经理复核（审批人拼音）")
-    if duplicates:
-        issues.append(f"{len(duplicates)} 条重复记录待处理")
+    if unresolved_duplicates:
+        issues.append(f"{len(unresolved_duplicates)} 条重复记录待处理")
 
     can_proceed = len(issues) == 0
 
@@ -266,5 +266,5 @@ def can_proceed_to_balance_update(db: Session, batch_id: int) -> Dict[str, Any]:
         "can_proceed": can_proceed,
         "issues": issues,
         "pending_review_count": len(pending_review),
-        "duplicate_count": len(duplicates)
+        "duplicate_count": len(unresolved_duplicates)
     }

@@ -14,7 +14,7 @@ from app import models
 from app.workflow import import_clearing_batch, review_holiday_adjustment, get_workflow_status, can_proceed_to_balance_update
 from app.self_check import run_self_check
 from app.export import verify_export_consistency, export_to_excel, export_to_csv
-from app.crud import get_unified_record_data, mark_manager_reviewed, get_batch_records
+from app.crud import get_unified_record_data, mark_manager_reviewed, get_batch_records, resolve_duplicate
 from app.balance import update_balance_for_batch, get_balance_changes, get_balance_summary
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test_fund_commission.db"
@@ -184,21 +184,49 @@ def main():
         run_test("工作流状态验证", test_workflow_status)
 
         print()
-        print("🚫 验证：未完成拼音复核时不能更新余额")
+        print("🚫 验证：未处理重复记录和未复核拼音时不能更新余额")
         print("-" * 70)
 
         def test_block_balance_update():
             check = can_proceed_to_balance_update(db, batch_id)
             assert check["can_proceed"] == False, "未完成复核时应不能更新余额"
-            assert "待客户经理复核" in str(check["issues"]), "应提示待客户经理复核"
+            assert check["duplicate_count"] == 1, f"重复记录应为1，实际{check['duplicate_count']}"
+            assert check["pending_review_count"] == 2, f"待复核应为2，实际{check['pending_review_count']}"
 
             print(f"   正确拦截，原因: {check['issues']}")
+            print(f"   重复记录数: {check['duplicate_count']}")
+            print(f"   待复核数: {check['pending_review_count']}")
             return True
 
         run_test("余额更新拦截验证", test_block_balance_update)
 
         print()
-        print("👨‍💼 第三步：客户经理复核审批人拼音")
+        print("� 第三步（a）：处理重复记录")
+        print("-" * 70)
+
+        def test_resolve_duplicate():
+            records = get_batch_records(db, batch_id)
+            dup_records = [r for r in records if r.is_duplicate and not r.duplicate_resolved]
+            assert len(dup_records) == 1, f"未处理重复记录应为1，实际{len(dup_records)}"
+
+            dup_record = dup_records[0]
+            result = resolve_duplicate(db, dup_record.id, "skip", "风控老秦")
+            assert result is not None, "处理重复记录应成功"
+            assert result.duplicate_resolved == True, "应标记为已处理"
+            assert result.is_duplicate == True, "skip 操作应保持 is_duplicate"
+
+            check = can_proceed_to_balance_update(db, batch_id)
+            assert check["duplicate_count"] == 0, f"处理后重复记录应为0，实际{check['duplicate_count']}"
+
+            print(f"   处理重复记录ID: {dup_record.id}")
+            print(f"   操作: skip（跳过）")
+            print(f"   处理后重复计数: {check['duplicate_count']}")
+            return True
+
+        run_test("处理重复记录", test_resolve_duplicate)
+
+        print()
+        print("�‍💼 第三步（b）：客户经理复核审批人拼音")
         print("-" * 70)
 
         def test_step3_review():
@@ -404,6 +432,7 @@ def main():
         print("   ✅ 余额变化表（来源/待确认）")
         print("   ✅ 三步工作流：导入→节假日审核→余额更新")
         print("   ✅ 审批人拼音留待客户经理复核")
+        print("   ✅ 重复记录处理（跳过/保留）")
         print()
 
     finally:
