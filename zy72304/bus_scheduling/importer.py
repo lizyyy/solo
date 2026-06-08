@@ -123,16 +123,15 @@ class SamplingImporter:
                     )
                 )
 
-            # 检测百分数和小数混合
-            has_mixed, mixed_issues = self.validator.check_mixed_numbers(
-                [passenger_count_str],
-                record_id,
-                "客流量",
-            )
-
-            # 即使只有一条记录，也要检查该批次是否有混合
-            # 这里暂时只标记该记录的类型
+            # 记录该字段的类型，是否待复核由批次级别统一判定
+            # 纯小数/纯百分数批次：默认 APPROVED，附自动通过理由
+            # 混合批次：后续统一改为 PENDING_REVIEW
             if num_type in (NumberType.PERCENTAGE, NumberType.DECIMAL):
+                auto_reason = (
+                    "纯百分数格式，批次未检测到混用，自动通过"
+                    if num_type == NumberType.PERCENTAGE
+                    else "纯小数格式，批次未检测到混用，自动通过"
+                )
                 issue = MixedNumberIssue(
                     issue_id=f"issue_{uuid.uuid4().hex[:8]}",
                     record_id=record_id,
@@ -140,7 +139,8 @@ class SamplingImporter:
                     original_value=passenger_count_str,
                     detected_type=num_type,
                     suggested_value=converted_value,
-                    status=IssueStatus.PENDING_REVIEW,
+                    status=IssueStatus.APPROVED,
+                    retain_reason=auto_reason,
                 )
                 issues.append(issue)
 
@@ -257,13 +257,25 @@ class SamplingImporter:
                 self._imported_fingerprints.add(fingerprint)
                 new_count += 1
 
-            # 如果批次内有混合，确保所有相关问题都标记
+            # 三种口径分清：
+            # 1. 混合批次：所有 issue 改为 PENDING_REVIEW，清除自动通过理由
+            # 2. 纯小数/纯百分数批次：保持 APPROVED，保留自动通过理由
             if batch_has_mixed:
                 for issue in issues:
                     issue.status = IssueStatus.PENDING_REVIEW
-                    all_issues.append(issue)
+                    issue.retain_reason = None
+                    issue.reviewer = None
+                    issue.review_time = None
+
+            # 所有 issue 都加入列表（纯类型也有记录便于追溯）
+            all_issues.extend(issues)
 
             records.append(record)
+
+        # 统计待复核数量
+        pending_review_count = sum(
+            1 for i in all_issues if i.status == IssueStatus.PENDING_REVIEW
+        )
 
         import_stat = {
             "batch_id": batch_id,
@@ -271,8 +283,15 @@ class SamplingImporter:
             "total_records": len(records),
             "new_records": new_count,
             "duplicate_records": duplicate_count,
-            "issues_found": len(all_issues),
+            "total_issues": len(all_issues),
+            "pending_review_count": pending_review_count,
             "has_mixed_numbers": batch_has_mixed,
+            "batch_type": (
+                "混合" if batch_has_mixed
+                else ("纯百分数" if NumberType.PERCENTAGE in batch_types
+                      else ("纯小数" if NumberType.DECIMAL in batch_types
+                            else "未知"))
+            ),
             "operator": operator,
             "import_time": datetime.now().isoformat(),
         }

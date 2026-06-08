@@ -325,7 +325,9 @@ result1 = workflow.step1_import_sampling_list(
     file_path="test_data/sampling_list_mixed.csv",
     operator="实验助理小穆",
 )
-print(f"第一步完成，发现 {result1['issues_found']} 条混合问题")
+print(f"批次类型：{result1['batch_type']}")
+print(f"待复核数：{result1['pending_review_count']}")
+print(f"提示：{result1['note']}")
 
 # ==================== 第二步：参数调试 ====================
 result2 = workflow.step2_review_parameters(
@@ -364,17 +366,235 @@ rules = workflow.get_boundary_rules()
 print("边界规则：", rules)
 ```
 
+### 三种口径样例复现步骤
+
+> **三种口径分清**：只有同一批次同一字段真的混用百分数和小数时，才进入活动负责人复核；纯小数、纯百分数名单自动通过，可直接算到车辆班次、客流使用值、计算明细。
+
+---
+
+#### 场景一：纯小数名单（一路算完，无需复核）
+
+使用文件：`test_data/sampling_list_decimal_only.csv`
+
+```python
+from bus_scheduling import BoundaryValidator, SamplingImporter, BusScheduler, SchedulingWorkflow
+
+workflow = SchedulingWorkflow(BoundaryValidator(), SamplingImporter(BoundaryValidator()), BusScheduler(BoundaryValidator()))
+
+# 第一步：导入（无待复核，自动通过）
+r1 = workflow.step1_import_sampling_list("test_data/sampling_list_decimal_only.csv", "实验助理小穆")
+assert r1["batch_type"] == "纯小数"          # ✅ 批次类型正确
+assert r1["pending_review_count"] == 0        # ✅ 待复核数为0
+assert r1["can_skip_review"] is True          # ✅ 可直接进入计算
+print(r1["note"])  # "✅ 批次类型：纯小数。批次内均为纯小数格式，未检测到混用，已自动通过所有记录，可以直接进入计算。"
+
+# 第二步：参数调试（无待复核，自动进入第三步）
+r2 = workflow.step2_review_parameters(reviewer="活动负责人")
+assert r2["pending_count"] == 0
+assert r2["can_proceed"] is True
+
+# 第三步：计算明细更新
+r3 = workflow.step3_calculate(operator="实验助理小穆")
+print(f"总车辆数: {r3['total_buses']}")
+print(f"线路分配: {r3['route_allocations']}")
+
+# 下钻查看计算明细（含自动通过的保留理由）
+first = r3["drilldown_available"][0]
+detail = workflow.drilldown_detail(first["detail_id"])
+print(f"保留理由: {detail['retain_reason']}")  # "纯小数格式，批次未检测到混用，自动通过"
+print(f"步骤数: {len(detail['detail']['calculation_steps'])}")  # 5步
+```
+
+**预期输出**（详见 `test_outputs/three_scenarios_output.txt`）：
+- 总车辆数：10
+- 线路分配：R101→2, R102→3, R103→2, R104→3
+- 保留理由自动为"纯小数格式，批次未检测到混用，自动通过"
+
+---
+
+#### 场景二：纯百分数名单（一路算完，无需复核）
+
+使用文件：`test_data/sampling_list_percentage_only.csv`
+
+```python
+workflow = SchedulingWorkflow(BoundaryValidator(), SamplingImporter(BoundaryValidator()), BusScheduler(BoundaryValidator()))
+
+# 第一步：导入（无待复核，自动通过）
+r1 = workflow.step1_import_sampling_list("test_data/sampling_list_percentage_only.csv", "实验助理小穆")
+assert r1["batch_type"] == "纯百分数"
+assert r1["pending_review_count"] == 0
+assert r1["can_skip_review"] is True
+
+# 第二步：参数调试
+r2 = workflow.step2_review_parameters(reviewer="活动负责人")
+assert r2["pending_count"] == 0
+
+# 第三步：计算
+r3 = workflow.step3_calculate(operator="实验助理小穆")
+print(f"总车辆数: {r3['total_buses']}")
+
+# 下钻查看
+first = r3["drilldown_available"][0]
+detail = workflow.drilldown_detail(first["detail_id"])
+print(f"保留理由: {detail['retain_reason']}")  # "纯百分数格式，批次未检测到混用，自动通过"
+print(f"原始客流量: {detail['detail']['input_params']['original_passenger_count']}")  # 例如 "85%"
+print(f"有效客流量: {detail['detail']['input_params']['effective_passenger_count']}")  # 例如 0.85
+```
+
+**预期输出**（详见 `test_outputs/three_scenarios_output.txt`）：
+- 总车辆数：4
+- 百分数自动转换为 0~1 小数参与计算（85% → 0.85）
+- 保留理由自动为"纯百分数格式，批次未检测到混用，自动通过"
+
+---
+
+#### 场景三：混合名单（必须复核，复核能力不放松）
+
+使用文件：`test_data/sampling_list_mixed.csv`
+
+**核心保证：原始值保留 + 复核理由 + 回滚记录**
+
+```python
+workflow = SchedulingWorkflow(BoundaryValidator(), SamplingImporter(BoundaryValidator()), BusScheduler(BoundaryValidator()))
+
+# 第一步：导入（进入待复核状态）
+r1 = workflow.step1_import_sampling_list("test_data/sampling_list_mixed.csv", "实验助理小穆")
+assert r1["batch_type"] == "混合"
+assert r1["pending_review_count"] == 8      # ✅ 8条待复核
+assert r1["can_skip_review"] is False       # ✅ 不可跳过
+
+# 第二步：参数调试（阻断，不能继续）
+r2 = workflow.step2_review_parameters(reviewer="活动负责人")
+assert r2["can_proceed"] is False
+
+# 尝试绕过复核直接计算 → 必须失败！
+from bus_scheduling.models import WorkflowStep
+workflow._current_step = WorkflowStep.STEP3_CALC_UPDATE
+try:
+    workflow.step3_calculate()
+    assert False, "混合名单有待复核时必须被阻断！"
+except Exception as e:
+    print(f"✅ 正确阻断，错误提示：{e.message[:50]}...")
+
+# ---- 三种复核操作 ----
+pending = workflow.get_pending_issues()
+
+# 方式1：APPROVED - 保留原值（必须填写保留理由）
+workflow.review_issue(
+    issue_id=pending[0]["issue_id"],
+    approved=True,
+    reviewer="活动负责人",
+    retain_reason="线路1：负责人确认无误，保留原值 85%",
+)
+
+# 方式2：MODIFIED - 修改为新值（approved=False + 提供modified_value）
+workflow.review_issue(
+    issue_id=pending[1]["issue_id"],
+    approved=False,
+    reviewer="活动负责人",
+    modified_value=pending[1]["suggested_value"] * 1.1,
+    retain_reason="线路2：客流量偏高，加10%预留",
+)
+
+# 方式3：REJECTED - 拒绝参与计算（approved=False + 无modified_value）
+workflow.review_issue(
+    issue_id=pending[2]["issue_id"],
+    approved=False,
+    reviewer="活动负责人",
+    retain_reason="线路3：数据异常，不参与本轮计算",
+)
+
+# 其余全部 APPROVED
+for issue in pending[3:]:
+    workflow.review_issue(
+        issue_id=issue["issue_id"],
+        approved=True,
+        reviewer="活动负责人",
+        retain_reason=f"{issue['original_value']} 由负责人确认通过",
+    )
+
+# ---- 回滚操作（复核有误可撤销） ----
+rb = workflow.rollback_issue(
+    issue_id=pending[2]["issue_id"],  # 刚才拒绝的那条
+    operator="活动负责人",
+    reason="数据重新核对后需要再审议",
+)
+assert rb["status"] == "pending_review"   # 回到待复核状态
+assert len(workflow.get_pending_issues()) == 1  # 回滚后有1条需重新处理
+
+# 再次复核通过
+workflow.review_issue(
+    issue_id=pending[2]["issue_id"],
+    approved=True,
+    reviewer="活动负责人",
+    retain_reason="线路3：经重新核实可用",
+)
+
+# 全部通过后进入计算
+r2b = workflow.step2_review_parameters(reviewer="活动负责人")
+assert r2b["can_proceed"] is True
+r3 = workflow.step3_calculate(operator="实验助理小穆")
+print(f"总车辆数: {r3['total_buses']}")
+
+# 下钻（含关联问题、复核人、保留理由全链路追溯）
+mixed_detail = next(d for d in r3["drilldown_available"] if d["has_mixed_issue"])
+detail = workflow.drilldown_detail(mixed_detail["detail_id"])
+print(f"关联问题数: {len(detail['related_issues'])}")
+if detail['related_issues']:
+    iss = detail['related_issues'][0]
+    print(f"  问题状态: {iss['status']}")
+    print(f"  复核人: {iss['reviewer']}")
+    print(f"  保留理由: {iss['retain_reason']}")  # 能看到当时保留的理由
+
+# ---- 查看历史备注（全链路可追溯） ----
+first_rec_id = workflow.records[0].record_id
+history = workflow.get_record_history(first_rec_id)
+for h in history:
+    print(f"- {h['field_name']}: {h['old_value']} → {h['new_value']} （{h['operator']}）")
+```
+
+**预期输出**（详见 `test_outputs/three_scenarios_output.txt`）：
+- 导入后待复核数=8
+- 直接计算被阻断："该数据需要活动负责人复核后才能继续..."
+- 复核 APPROVED → 保留原值，MODIFIED → 新值替换，REJECTED → 排除
+- 回滚后重新回到待复核，可再次处理
+- 下钻可看到完整关联：复核人 + 保留理由 + 状态
+- 变更历史有：导入、查看、复核、修改、回滚等全部记录
+
+---
+
+#### 一键运行三种场景
+
+```bash
+# 运行三种场景对比验证脚本（已保存输出到test_outputs/）
+python3 verify_fix.py
+```
+
+输出示例：
+```
+📊 三种口径验证汇总
+  纯小数名单:    ✅ 通过（10辆车，4条明细）
+  纯百分数名单:  ✅ 通过（4辆车，4条明细）
+  混合名单:      ✅ 通过（复核阻断/修改/回滚/下钻全链路正常）
+  总计:          3/3 通过
+```
+
+---
+
 ### 运行测试
 
 ```bash
-# 运行边界校验器测试
+# 运行边界校验器测试（14个）
 python tests/test_boundary_validator.py
 
-# 运行导入器测试
+# 运行导入器测试（8个）
 python tests/test_importer.py
 
-# 运行工作流程测试
+# 运行工作流程测试（10个，含纯小数/纯百分数/混合三种场景）
 python tests/test_workflow.py
+
+# 运行全部测试并保存输出
+python tests/test_boundary_validator.py && python tests/test_importer.py && python tests/test_workflow.py 2>&1 | tee test_outputs/all_tests_output.txt
 ```
 
 ---

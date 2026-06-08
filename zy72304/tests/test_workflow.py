@@ -43,7 +43,7 @@ class TestWorkflow:
         assert self.workflow.current_step == WorkflowStep.STEP2_PARAM_DEBUG
         assert result1["has_mixed_numbers"] is True
         assert result1["pending_review_count"] == 8
-        print(f"✓ 导入完成，发现 {result1['issues_found']} 条混合问题")
+        print(f"✓ 导入完成，发现 {result1['pending_review_count']} 条待复核混合问题")
 
         # 第二步：参数调试
         print("\n=== 第二步：参数调试 ===")
@@ -266,6 +266,213 @@ class TestWorkflow:
 
         print("✓ 获取边界规则测试通过！")
 
+    def test_pure_decimal_full_workflow(self):
+        """测试纯小数名单完整流程（无待复核，一路算完）"""
+        file_path = os.path.join(
+            self.test_data_dir, "sampling_list_decimal_only.csv"
+        )
+
+        # 第一步：导入
+        r1 = self.workflow.step1_import_sampling_list(file_path, "实验助理小穆")
+        assert r1["batch_type"] == "纯小数"
+        assert r1["pending_review_count"] == 0
+        assert r1["can_skip_review"] is True
+        assert "纯小数格式" in r1["note"]
+        print(f"  导入: 批次类型={r1['batch_type']}, 待复核={r1['pending_review_count']}")
+
+        # 检查所有 issue 状态都是 approved
+        for rec in self.workflow.records:
+            for iss in rec.issues:
+                assert iss.status.value == "approved"
+                assert "纯小数格式" in (iss.retain_reason or "")
+        print("  所有记录状态: approved ✓")
+
+        # 第二步：参数调试
+        r2 = self.workflow.step2_review_parameters(reviewer="活动负责人")
+        assert r2["batch_type"] == "纯小数"
+        assert r2["pending_count"] == 0
+        assert r2["can_proceed"] is True
+        print(f"  参数调试: 待复核={r2['pending_count']}, can_proceed={r2['can_proceed']}")
+
+        # 第三步：计算（无需复核，直接算）
+        r3 = self.workflow.step3_calculate(operator="实验助理小穆")
+        assert r3["total_buses"] > 0
+        assert r3["calculation_details_count"] == 4
+        print(f"  计算: 总车辆={r3['total_buses']}, 明细={r3['calculation_details_count']}")
+
+        # 下钻查看明细
+        first_detail = r3["drilldown_available"][0]
+        detail = self.workflow.drilldown_detail(first_detail["detail_id"])
+        assert detail["retain_reason"] is not None
+        assert "纯小数" in detail["retain_reason"]
+        assert len(detail["detail"]["calculation_steps"]) == 5
+        print(f"  下钻: 保留理由='{detail['retain_reason']}', 步骤数=5 ✓")
+
+        print("✓ 纯小数名单完整流程测试通过（一路算完无阻断）！")
+
+    def test_pure_percentage_full_workflow(self):
+        """测试纯百分数名单完整流程（无待复核，一路算完）"""
+        file_path = os.path.join(
+            self.test_data_dir, "sampling_list_percentage_only.csv"
+        )
+
+        # 第一步：导入
+        r1 = self.workflow.step1_import_sampling_list(file_path, "实验助理小穆")
+        assert r1["batch_type"] == "纯百分数"
+        assert r1["pending_review_count"] == 0
+        assert r1["can_skip_review"] is True
+        assert "纯百分数格式" in r1["note"]
+        print(f"  导入: 批次类型={r1['batch_type']}, 待复核={r1['pending_review_count']}")
+
+        # 检查所有 issue 状态都是 approved
+        for rec in self.workflow.records:
+            for iss in rec.issues:
+                assert iss.status.value == "approved"
+                assert "纯百分数格式" in (iss.retain_reason or "")
+        print("  所有记录状态: approved ✓")
+
+        # 第二步：参数调试
+        r2 = self.workflow.step2_review_parameters(reviewer="活动负责人")
+        assert r2["batch_type"] == "纯百分数"
+        assert r2["pending_count"] == 0
+        assert r2["can_proceed"] is True
+        print(f"  参数调试: 待复核={r2['pending_count']}, can_proceed={r2['can_proceed']}")
+
+        # 第三步：计算（无需复核，直接算）
+        r3 = self.workflow.step3_calculate(operator="实验助理小穆")
+        assert r3["total_buses"] > 0
+        assert r3["calculation_details_count"] == 4
+        print(f"  计算: 总车辆={r3['total_buses']}, 明细={r3['calculation_details_count']}")
+
+        # 下钻查看明细
+        first_detail = r3["drilldown_available"][0]
+        detail = self.workflow.drilldown_detail(first_detail["detail_id"])
+        assert detail["retain_reason"] is not None
+        assert "纯百分数" in detail["retain_reason"]
+        assert len(detail["detail"]["calculation_steps"]) == 5
+        print(f"  下钻: 保留理由='{detail['retain_reason']}', 步骤数=5 ✓")
+
+        print("✓ 纯百分数名单完整流程测试通过（一路算完无阻断）！")
+
+    def test_mixed_workflow_retain_original_values(self):
+        """测试混合名单保留原始值、复核理由、回滚记录（不放松复核）"""
+        file_path = os.path.join(self.test_data_dir, "sampling_list_mixed.csv")
+
+        # 第一步：导入（8条待复核）
+        r1 = self.workflow.step1_import_sampling_list(file_path, "实验助理小穆")
+        assert r1["batch_type"] == "混合"
+        assert r1["pending_review_count"] == 8
+        assert r1["can_skip_review"] is False
+        print(f"  导入: 批次类型={r1['batch_type']}, 待复核={r1['pending_review_count']}")
+
+        # 验证原始值保留（不被归一化）
+        pct_records = [r for r in self.workflow.records if any(
+            i.detected_type.value == "percentage" for i in r.issues
+        )]
+        dec_records = [r for r in self.workflow.records if any(
+            i.detected_type.value == "decimal" for i in r.issues
+        )]
+        assert len(pct_records) == 4
+        assert len(dec_records) == 4
+        print(f"  百分数记录数={len(pct_records)}, 小数记录数={len(dec_records)} ✓")
+
+        # 验证待复核状态（全部 PENDING_REVIEW）
+        for rec in self.workflow.records:
+            for iss in rec.issues:
+                assert iss.status.value == "pending_review"
+                assert iss.retain_reason is None  # 理由为空，等复核填
+        print("  所有记录状态: pending_review ✓")
+
+        # 尝试直接计算（必须失败！）
+        from bus_scheduling.models import WorkflowStep
+        self.workflow._current_step = WorkflowStep.STEP3_CALC_UPDATE
+        caught_error = False
+        try:
+            self.workflow.step3_calculate()
+        except Exception:
+            caught_error = True
+        assert caught_error, "混合名单有待复核问题时必须被阻断！"
+        print("  直接计算被阻断 ✓")
+
+        # 重新设置到第二步
+        self.workflow._current_step = WorkflowStep.STEP2_PARAM_DEBUG
+        self.workflow.step2_review_parameters(reviewer="活动负责人")
+
+        # 复核第一条为 APPROVED
+        pending = self.workflow.get_pending_issues()
+        first_issue = pending[0]
+        r = self.workflow.review_issue(
+            issue_id=first_issue["issue_id"],
+            approved=True,
+            reviewer="活动负责人",
+            retain_reason="线路1：活动负责人确认数据无误，保留原值",
+        )
+        assert r["status"] == "approved"
+        assert "线路1：活动负责人确认数据无误" in r["retain_reason"]
+        print(f"  复核第1条: {r['old_value']} → approved, 理由已记录 ✓")
+
+        # 复核第二条为 MODIFIED（修改原值，需approved=False + modified_value）
+        second_issue = pending[1]
+        r = self.workflow.review_issue(
+            issue_id=second_issue["issue_id"],
+            approved=False,  # 不通过原始值
+            reviewer="活动负责人",
+            modified_value=second_issue["suggested_value"] * 1.1,  # 加10%调整为新值
+            retain_reason="线路2：客流量偏高，加10%预留",
+        )
+        assert r["status"] == "modified"
+        assert r["new_value"] != r["old_value"]
+        print(f"  复核第2条: {r['old_value']} → modified→{r['new_value']}, 理由已记录 ✓")
+
+        # 复核第三条为 REJECTED（approved=False + 无modified_value → 拒绝参与计算）
+        third_issue = pending[2]
+        r = self.workflow.review_issue(
+            issue_id=third_issue["issue_id"],
+            approved=False,  # 不通过且不提供新值
+            reviewer="活动负责人",
+            retain_reason="线路3：数据异常，不参与本轮计算",
+        )
+        assert r["status"] == "rejected"
+        print(f"  复核第3条: {r['old_value']} → rejected ✓")
+
+        # 其余全部 APPROVED
+        for issue in pending[3:]:
+            self.workflow.review_issue(
+                issue_id=issue["issue_id"],
+                approved=True,
+                reviewer="活动负责人",
+                retain_reason=f"{issue['original_value']} 由负责人确认通过",
+            )
+        print(f"  剩余 {len(pending)-3} 条全部复核通过 ✓")
+
+        # 测试回滚：把第3条（REJECTED）回滚
+        rb = self.workflow.rollback_issue(
+            issue_id=third_issue["issue_id"],
+            operator="活动负责人",
+            reason="数据重新核对后需要再审议",
+        )
+        assert rb["status"] == "pending_review"
+        # 检查回滚后有历史记录
+        new_pending = self.workflow.get_pending_issues()
+        assert len(new_pending) == 1  # 只有回滚的这1条
+        print(f"  回滚第3条后: 待复核数={len(new_pending)} ✓")
+
+        # 再次复核第3条（改回来 APPROVED）
+        self.workflow.review_issue(
+            issue_id=third_issue["issue_id"],
+            approved=True,
+            reviewer="活动负责人",
+            retain_reason="线路3：经重新核实，数据可用",
+        )
+
+        # 历史记录检查：有导入、查看、复核、修改、回滚等多次记录
+        first_rec_id = self.workflow.records[0].record_id
+        history = self.workflow.get_record_history(first_rec_id)
+        assert len(history) >= 3  # 至少导入 + 2次查看
+        print(f"  变更历史数={len(history)}（含导入、查看、复核） ✓")
+
+        print("✓ 混合名单测试通过（原始值保留、复核/修改/拒绝/回滚记录完整，不放松阻断）！")
+
 
 if __name__ == "__main__":
     print("\n" + "="*60)
@@ -307,6 +514,21 @@ if __name__ == "__main__":
     print("7. 测试获取边界规则...")
     test.setup_method()
     test.test_get_boundary_rules()
+    print()
+
+    print("8. 测试纯小数名单完整流程（无待复核，一路算完）...")
+    test.setup_method()
+    test.test_pure_decimal_full_workflow()
+    print()
+
+    print("9. 测试纯百分数名单完整流程（无待复核，一路算完）...")
+    test.setup_method()
+    test.test_pure_percentage_full_workflow()
+    print()
+
+    print("10. 测试混合名单：原始值保留+复核/修改/拒绝/回滚（不放松阻断）...")
+    test.setup_method()
+    test.test_mixed_workflow_retain_original_values()
     print()
 
     print("="*60)

@@ -20,6 +20,7 @@ from .models import (
     WorkflowStep,
     ChangeHistory,
     IssueStatus,
+    NumberType,
 )
 from .validator import BoundaryValidator
 from .importer import SamplingImporter
@@ -146,24 +147,45 @@ class SchedulingWorkflow:
             )
             self._change_history.append(history)
 
+        pending_count = sum(
+            1 for i in issues if i.status == IssueStatus.PENDING_REVIEW
+        )
+        batch_type = import_stat.get("batch_type", "未知")
+
         result_summary = {
             "step": "第一步：抽样名单导入",
             "status": "completed",
             "next_step": "第二步：参数调试",
             "import_stat": import_stat,
             "total_records": len(records),
-            "issues_found": len(issues),
+            "total_issues": len(issues),
+            "pending_review_count": pending_count,
             "has_mixed_numbers": import_stat.get("has_mixed_numbers", False),
+            "batch_type": batch_type,
+            "can_skip_review": (pending_count == 0),
             "warning": import_stat.get("warning"),
-            "pending_review_count": sum(
-                1 for i in issues if i.status == IssueStatus.PENDING_REVIEW
-            ),
         }
 
-        if result_summary["has_mixed_numbers"]:
+        # 三种口径的提示各不同
+        if batch_type == "混合":
             result_summary["note"] = (
-                "发现百分数和小数混合出现，已标记为待复核状态。"
-                "系统不会自动归一化，请活动负责人在参数调试阶段进行复核。"
+                f"⚠️ 批次类型：{batch_type}。发现百分数和小数混合出现，"
+                f"{pending_count}条记录已标记为待复核状态。"
+                f"系统不会自动归一化，请活动负责人在参数调试阶段进行复核。"
+            )
+        elif batch_type == "纯小数":
+            result_summary["note"] = (
+                f"✅ 批次类型：{batch_type}。批次内均为纯小数格式，未检测到混用，"
+                f"已自动通过所有记录，可以直接进入计算。"
+            )
+        elif batch_type == "纯百分数":
+            result_summary["note"] = (
+                f"✅ 批次类型：{batch_type}。批次内均为纯百分数格式，未检测到混用，"
+                f"已自动通过所有记录，可以直接进入计算。"
+            )
+        else:
+            result_summary["note"] = (
+                f"ℹ️ 批次类型：{batch_type}。"
             )
 
         return result_summary
@@ -213,10 +235,24 @@ class SchedulingWorkflow:
             )
             self._change_history.append(history)
 
+        # 判断批次类型
+        batch_has_mixed = any(
+            i.detected_type == NumberType.PERCENTAGE for i in self._issues
+        ) and any(
+            i.detected_type == NumberType.DECIMAL for i in self._issues
+        )
+        has_pct = any(i.detected_type == NumberType.PERCENTAGE for i in self._issues)
+        has_dec = any(i.detected_type == NumberType.DECIMAL for i in self._issues)
+        batch_type = (
+            "混合" if batch_has_mixed
+            else ("纯百分数" if has_pct else ("纯小数" if has_dec else "未知"))
+        )
+
         result_summary = {
             "step": "第二步：参数调试",
             "status": "completed",
             "next_step": "第三步：计算明细更新",
+            "batch_type": batch_type,
             "current_config": self.scheduler.config.to_dict(),
             "pending_issues": [i.to_dict() for i in pending_issues],
             "pending_count": len(pending_issues),
@@ -225,11 +261,14 @@ class SchedulingWorkflow:
 
         if pending_issues:
             result_summary["note"] = (
-                f"还有{len(pending_issues)}条百分数和小数混合的记录待复核。"
+                f"⚠️ 批次类型：{batch_type}。还有{len(pending_issues)}条百分数和小数混合的记录待复核。"
                 f"请活动负责人复核后，使用 review_issue() 方法处理，然后再进行第三步。"
             )
             result_summary["can_proceed"] = False
         else:
+            result_summary["note"] = (
+                f"✅ 批次类型：{batch_type}。无待复核记录，可直接进入计算。"
+            )
             result_summary["can_proceed"] = True
             self._current_step = WorkflowStep.STEP3_CALC_UPDATE
 
