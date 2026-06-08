@@ -141,6 +141,8 @@ def add_review(point_id, reviewer, review_result, review_note):
            VALUES (?, ?, ?, ?)''',
         (point_id, reviewer, review_result, review_note)
     )
+    conn.commit()
+    conn.close()
     
     if review_result == 'pass':
         update_point_field(point_id, 'status', 'processed', reviewer, 
@@ -152,8 +154,6 @@ def add_review(point_id, reviewer, review_result, review_note):
         update_point_field(point_id, 'status', 'need_onsite', reviewer, 
                           '需现场复看确认')
     
-    conn.commit()
-    conn.close()
     return True
 
 def get_statistics():
@@ -309,15 +309,20 @@ def export_to_excel(status_filter=None):
     
     return wb
 
-def merge_and_match_points(gis_data, feedback_data, photos_data, notes_data, operator='system'):
+def merge_and_match_points(gis_data, feedback_data, photos_data, notes_data, operator='system', source_id=None):
     conn = get_db()
     cursor = conn.cursor()
     
     report = {
         'created': 0,
         'updated': 0,
+        'feedback_added': 0,
+        'photos_added': 0,
+        'notes_added': 0,
         'conflicts': []
     }
+    
+    point_id_cache = {}
     
     for pt in gis_data:
         point_no = pt['point_no']
@@ -333,17 +338,19 @@ def merge_and_match_points(gis_data, feedback_data, photos_data, notes_data, ope
                  pt['property_type'], pt['area'], pt['households'])
             )
             point_id = cursor.lastrowid
+            point_id_cache[point_no] = point_id
             
             for field in ['address', 'area', 'property_type']:
                 cursor.execute(
                     '''INSERT INTO point_versions 
-                       (point_id, version, field_name, old_value, new_value, operator, operation_note)
-                       VALUES (?, ?, ?, ?, ?, ?, ?)''',
-                    (point_id, 1, field, None, str(pt[field]), operator, '数据导入创建')
+                       (point_id, version, field_name, old_value, new_value, source_id, operator, operation_note)
+                       VALUES (?, ?, ?, ?, ?, ?, ?, ?)''',
+                    (point_id, 1, field, None, str(pt[field]), source_id, operator, '数据导入创建')
                 )
             report['created'] += 1
         else:
             point_id = existing['id']
+            point_id_cache[point_no] = point_id
             old_area = existing['area']
             if abs(float(old_area) - float(pt['area'])) > 0.1:
                 report['conflicts'].append({
@@ -360,10 +367,10 @@ def merge_and_match_points(gis_data, feedback_data, photos_data, notes_data, ope
                 
                 cursor.execute(
                     '''INSERT INTO point_versions 
-                       (point_id, version, field_name, old_value, new_value, operator, operation_note)
-                       VALUES (?, ?, ?, ?, ?, ?, ?)''',
+                       (point_id, version, field_name, old_value, new_value, source_id, operator, operation_note)
+                       VALUES (?, ?, ?, ?, ?, ?, ?, ?)''',
                     (point_id, new_ver, 'area', str(old_area), str(pt['area']), 
-                     operator, 'GIS数据更新，面积有差异')
+                     source_id, operator, 'GIS数据更新，面积有差异')
                 )
                 
                 cursor.execute(
@@ -372,6 +379,66 @@ def merge_and_match_points(gis_data, feedback_data, photos_data, notes_data, ope
                     (pt['area'], new_ver, point_id)
                 )
                 report['updated'] += 1
+    
+    for fb in feedback_data:
+        point_no = fb['point_no']
+        if point_no not in point_id_cache:
+            cursor.execute('SELECT id FROM points WHERE point_no = ?', (point_no,))
+            row = cursor.fetchone()
+            if row:
+                point_id_cache[point_no] = row['id']
+        
+        pid = point_id_cache.get(point_no)
+        if pid:
+            cursor.execute(
+                '''INSERT INTO feedback 
+                   (point_id, feedback_type, feedback_content, feedback_source, feedback_time,
+                    handler, handle_note, handled_at, is_resolved)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                (pid, fb.get('feedback_type', ''), fb.get('feedback_content', ''),
+                 fb.get('feedback_source', ''), fb.get('feedback_time'),
+                 fb.get('handler'), fb.get('handle_note'), fb.get('handled_at'),
+                 fb.get('is_resolved', 0))
+            )
+            report['feedback_added'] += 1
+    
+    for photo in photos_data:
+        point_no = photo['point_no']
+        if point_no not in point_id_cache:
+            cursor.execute('SELECT id FROM points WHERE point_no = ?', (point_no,))
+            row = cursor.fetchone()
+            if row:
+                point_id_cache[point_no] = row['id']
+        
+        pid = point_id_cache.get(point_no)
+        if pid:
+            cursor.execute(
+                '''INSERT INTO inspection_photos 
+                   (point_id, photo_path, photo_desc, taken_at, taken_by)
+                   VALUES (?, ?, ?, ?, ?)''',
+                (pid, photo.get('photo_path', ''), photo.get('photo_desc', ''),
+                 photo.get('taken_at'), photo.get('taken_by'))
+            )
+            report['photos_added'] += 1
+    
+    for note in notes_data:
+        point_no = note['point_no']
+        if point_no not in point_id_cache:
+            cursor.execute('SELECT id FROM points WHERE point_no = ?', (point_no,))
+            row = cursor.fetchone()
+            if row:
+                point_id_cache[point_no] = row['id']
+        
+        pid = point_id_cache.get(point_no)
+        if pid:
+            cursor.execute(
+                '''INSERT INTO manual_notes 
+                   (point_id, street_name, note_content, operator)
+                   VALUES (?, ?, ?, ?)''',
+                (pid, note.get('street_name', ''), note.get('note_content', ''),
+                 note.get('operator', operator))
+            )
+            report['notes_added'] += 1
     
     conn.commit()
     conn.close()

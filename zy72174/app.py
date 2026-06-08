@@ -1,5 +1,6 @@
 import os
 import json
+import csv
 from datetime import datetime
 from flask import Flask, render_template, request, jsonify, send_file, redirect, url_for, flash
 from werkzeug.utils import secure_filename
@@ -91,22 +92,56 @@ def import_data():
         operator = request.form.get('operator', '何工')
         
         file = request.files.get('file')
-        if file:
-            filename = secure_filename(file.filename)
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(filepath)
-            
-            conn = get_db()
-            cursor = conn.cursor()
-            cursor.execute(
-                "INSERT INTO data_sources (source_type, source_name, source_file, imported_by) VALUES (?, ?, ?, ?)",
-                (source_type, source_name, filename, operator)
-            )
-            conn.commit()
-            conn.close()
-            
-            flash(f'数据文件 {filename} 已导入', 'success')
+        if not file or not file.filename:
+            flash('请选择要上传的文件', 'warning')
             return redirect(url_for('import_data'))
+        
+        filename = secure_filename(file.filename)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(filepath)
+        
+        try:
+            gis_data, feedback_data, photos_data, notes_data = _parse_uploaded_file(filepath, source_type)
+        except Exception as e:
+            flash(f'文件解析失败: {e}', 'danger')
+            return redirect(url_for('import_data'))
+        
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO data_sources (source_type, source_name, source_file, imported_by) VALUES (?, ?, ?, ?)",
+            (source_type, source_name, filename, operator)
+        )
+        source_id = cursor.lastrowid
+        conn.commit()
+        conn.close()
+        
+        report = merge_and_match_points(
+            gis_data, feedback_data, photos_data, notes_data,
+            operator=operator, source_id=source_id
+        )
+        
+        summary_parts = []
+        if report['created'] > 0:
+            summary_parts.append(f"新建{report['created']}个点位")
+        if report['updated'] > 0:
+            summary_parts.append(f"更新{report['updated']}个点位(面积差异)")
+        if report['feedback_added'] > 0:
+            summary_parts.append(f"导入{report['feedback_added']}条反馈")
+        if report['photos_added'] > 0:
+            summary_parts.append(f"导入{report['photos_added']}张照片")
+        if report['notes_added'] > 0:
+            summary_parts.append(f"导入{report['notes_added']}条备注")
+        if report['conflicts']:
+            conflict_nos = ', '.join(c['point_no'] for c in report['conflicts'])
+            summary_parts.append(f"冲突待核实: {conflict_nos}")
+        
+        if summary_parts:
+            flash(f'导入完成: {"; ".join(summary_parts)}', 'success')
+        else:
+            flash(f'文件 {filename} 已导入，但未发现可匹配的数据', 'info')
+        
+        return redirect(url_for('import_data'))
     
     conn = get_db()
     cursor = conn.cursor()
@@ -115,6 +150,109 @@ def import_data():
     conn.close()
     
     return render_template('import.html', sources=sources)
+
+
+def _parse_uploaded_file(filepath, source_type):
+    gis_data = []
+    feedback_data = []
+    photos_data = []
+    notes_data = []
+    
+    ext = os.path.splitext(filepath)[1].lower()
+    raw_rows = []
+    
+    if ext == '.json':
+        with open(filepath, 'r', encoding='utf-8') as f:
+            content = json.load(f)
+        if isinstance(content, list):
+            raw_rows = content
+        elif isinstance(content, dict):
+            if 'points' in content:
+                raw_rows = content['points']
+            elif 'data' in content:
+                raw_rows = content['data']
+            else:
+                raw_rows = [content]
+    elif ext in ('.xlsx', '.xls'):
+        from openpyxl import load_workbook
+        wb = load_workbook(filepath, read_only=True)
+        ws = wb.active
+        headers = None
+        for i, row in enumerate(ws.iter_rows(values_only=True)):
+            if i == 0:
+                headers = [str(h).strip() if h else '' for h in row]
+                continue
+            if headers:
+                row_dict = {}
+                for j, val in enumerate(row):
+                    if j < len(headers) and headers[j]:
+                        row_dict[headers[j]] = val
+                if row_dict:
+                    raw_rows.append(row_dict)
+        wb.close()
+    elif ext == '.csv':
+        with open(filepath, 'r', encoding='utf-8-sig') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                raw_rows.append(dict(row))
+    else:
+        raise ValueError(f'不支持的文件格式: {ext}')
+    
+    if source_type in ('gis_system', 'gis_old'):
+        for row in raw_rows:
+            point = {
+                'point_no': str(row.get('point_no', row.get('点位编号', ''))),
+                'address': str(row.get('address', row.get('地址', ''))),
+                'district': str(row.get('district', row.get('行政区', ''))) if row.get('district', row.get('行政区')) else None,
+                'gis_lng': float(row.get('gis_lng', row.get('经度', 0)) or 0),
+                'gis_lat': float(row.get('gis_lat', row.get('纬度', 0)) or 0),
+                'property_type': str(row.get('property_type', row.get('性质', ''))),
+                'area': float(row.get('area', row.get('面积', 0)) or 0),
+                'households': int(float(row.get('households', row.get('户数', 0)) or 0)),
+            }
+            if point['point_no'] and point['address']:
+                gis_data.append(point)
+    
+    elif source_type == 'feedback':
+        for row in raw_rows:
+            fb = {
+                'point_no': str(row.get('point_no', row.get('点位编号', ''))),
+                'feedback_type': str(row.get('feedback_type', row.get('反馈类型', ''))),
+                'feedback_content': str(row.get('feedback_content', row.get('反馈内容', ''))),
+                'feedback_source': str(row.get('feedback_source', row.get('反馈来源', ''))),
+                'feedback_time': str(row.get('feedback_time', row.get('反馈时间', ''))) if row.get('feedback_time', row.get('反馈时间')) else None,
+                'handler': str(row.get('handler', row.get('处理人', ''))) if row.get('handler', row.get('处理人')) else None,
+                'handle_note': str(row.get('handle_note', row.get('处理意见', ''))) if row.get('handle_note', row.get('处理意见')) else None,
+                'handled_at': str(row.get('handled_at', row.get('处理时间', ''))) if row.get('handled_at', row.get('处理时间')) else None,
+                'is_resolved': int(float(row.get('is_resolved', row.get('是否已处理', 0)) or 0)),
+            }
+            if fb['point_no'] and fb['feedback_content']:
+                feedback_data.append(fb)
+    
+    elif source_type == 'inspection':
+        for row in raw_rows:
+            photo = {
+                'point_no': str(row.get('point_no', row.get('点位编号', ''))),
+                'photo_path': str(row.get('photo_path', row.get('照片路径', ''))),
+                'photo_desc': str(row.get('photo_desc', row.get('照片描述', ''))),
+                'taken_at': str(row.get('taken_at', row.get('拍摄时间', ''))) if row.get('taken_at', row.get('拍摄时间')) else None,
+                'taken_by': str(row.get('taken_by', row.get('拍摄人', ''))),
+            }
+            if photo['point_no']:
+                photos_data.append(photo)
+    
+    elif source_type == 'manual':
+        for row in raw_rows:
+            note = {
+                'point_no': str(row.get('point_no', row.get('点位编号', ''))),
+                'street_name': str(row.get('street_name', row.get('街道名称', ''))),
+                'note_content': str(row.get('note_content', row.get('备注内容', ''))),
+                'operator': str(row.get('operator', row.get('操作人', ''))),
+            }
+            if note['point_no'] and note['note_content']:
+                notes_data.append(note)
+    
+    return gis_data, feedback_data, photos_data, notes_data
 
 @app.route('/api/stats')
 def api_stats():
