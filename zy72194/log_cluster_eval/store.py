@@ -34,7 +34,8 @@ CREATE TABLE IF NOT EXISTS evaluations (
     evaluated_at TEXT NOT NULL,
     status TEXT NOT NULL DEFAULT 'auto',
     source TEXT NOT NULL DEFAULT 'model',
-    FOREIGN KEY (sample_id) REFERENCES samples(sample_id)
+    FOREIGN KEY (sample_id) REFERENCES samples(sample_id),
+    UNIQUE(sample_id, source, model_version)
 );
 
 CREATE TABLE IF NOT EXISTS corrections (
@@ -177,11 +178,11 @@ class Store:
                (eval_id, sample_id, cluster_label, root_cause, confidence,
                 evidence, model_version, evaluated_at, status, source)
                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-               ON CONFLICT(eval_id) DO UPDATE SET
+               ON CONFLICT(sample_id, source, model_version) DO UPDATE SET
                  cluster_label=excluded.cluster_label, root_cause=excluded.root_cause,
                  confidence=excluded.confidence, evidence=excluded.evidence,
-                 model_version=excluded.model_version, evaluated_at=excluded.evaluated_at,
-                 status=excluded.status, source=excluded.source""",
+                 evaluated_at=excluded.evaluated_at,
+                 status=excluded.status""",
             (ev.eval_id, ev.sample_id, ev.cluster_label, ev.root_cause,
              ev.confidence, json.dumps([e.to_dict() for e in ev.evidence], ensure_ascii=False),
              ev.model_version, ev.evaluated_at, ev.status.value, ev.source),
@@ -215,6 +216,16 @@ class Store:
     def get_latest_evaluation(self, sample_id: str) -> Optional[Evaluation]:
         evs = self.get_evaluations_for_sample(sample_id)
         return evs[-1] if evs else None
+
+    def find_evaluation(self, sample_id: str, source: str, model_version: str) -> Optional[Evaluation]:
+        conn = self._get_conn()
+        row = conn.execute(
+            "SELECT * FROM evaluations WHERE sample_id=? AND source=? AND model_version=?",
+            (sample_id, source, model_version),
+        ).fetchone()
+        if row is None:
+            return None
+        return Evaluation.from_dict(self._row_to_eval_dict(row))
 
     def list_evaluations(self, status: Optional[str] = None) -> List[Evaluation]:
         conn = self._get_conn()

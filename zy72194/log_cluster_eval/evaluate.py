@@ -13,6 +13,9 @@ class EvaluationEngine:
         self.model_version = model_version
 
     def evaluate_sample(self, sample: Sample) -> Evaluation:
+        existing = self.store.find_evaluation(sample.sample_id, "model", self.model_version)
+        if existing is not None:
+            return existing
         ev = self._analyze_log(sample.raw_log)
         ev.sample_id = sample.sample_id
         ev.model_version = self.model_version
@@ -172,6 +175,10 @@ class EvaluationEngine:
         sample = self.store.get_sample(sample_id)
         if sample is None:
             raise ValueError(f"样本 {sample_id} 不存在，请先导入")
+
+        existing = self.store.find_evaluation(sample_id, "model", self.model_version)
+        if existing is not None:
+            return existing
 
         ev_evidence: List[Evidence] = []
         if evidence:
