@@ -290,13 +290,13 @@ class CLI:
                 if "case_text" in item:
                     print(f"      案例文本: {item['case_text']}")
 
-                if ctype == "label_conflicts":
+                if ctype == "label_conflicts" or item.get("conflict_type") == "标签冲突":
                     print(f"      预测标签: {item['pred_label']} (分数: {item['pred_score']})")
                     print(f"      标注标签: {item['true_label']} (标注人: {item['annotator']})")
                     print(f"      预测来源: {item['pred_source']}")
                     print(f"      标注来源: {item['annotation_source']}")
 
-                elif ctype == "version_conflicts":
+                elif ctype == "version_conflicts" or (ctype == "version" and "release_claim" in item):
                     print(f"      冲突类型: {item['conflict_type']}")
                     self._print_warning("以下为两边证据对比，系统不自动判定，请人工核实：")
                     print(f"\n      [发布记录宣称] 来源: {item['release_claim']['source']}")
@@ -304,7 +304,7 @@ class CLI:
                         print(f"        精确率: {item['release_claim']['claimed_precision']}")
                         print(f"        召回率: {item['release_claim']['claimed_recall']}")
                     if "claimed_label" in item["release_claim"]:
-                        print(f"        CASE{item.get('case_id', '?')} 判定为: {item['release_claim']['claimed_label']}")
+                        print(f"        {item.get('case_id', '?')} 判定为: {item['release_claim']['claimed_label']}")
 
                     print(f"\n      [实际数据] 来源: {item['actual_data'].get('source', item['actual_data'].get('review_source', '-'))}")
                     if "actual_precision" in item["actual_data"]:
@@ -325,24 +325,24 @@ class CLI:
                     if item.get("decision_required"):
                         self._print_error(item.get("note", "需要人工决策"))
 
-                elif ctype == "sample_leaks":
+                elif ctype == "sample_leaks" or (ctype == "sample_leak" and "evidence" in item and "data_sets_involved" in item.get("evidence", {})):
                     print(f"      描述: {item['description']}")
                     print(f"      涉及数据集: {', '.join(item['evidence']['data_sets_involved'])}")
                     print(f"      来源: {item['source']}")
 
-                elif ctype == "empty_values":
+                elif ctype == "empty_values" or item.get("conflict_type") == "空值":
                     print(f"      空字段: {', '.join(item['empty_fields'])}")
                     print(f"      行号: {item['annotation_line']}")
                     print(f"      来源: {item['source']}")
 
-                elif ctype == "duplicate_records":
+                elif ctype == "duplicate_records" or item.get("conflict_type") == "重复项":
                     print(f"      重复次数: {item['duplicate_count']}")
                     print(f"      涉及行号: {', '.join(map(str, item['lines']))}")
                     print(f"      来源: {item['source']}")
                     for ann in item["annotations"]:
                         print(f"        第{ann['line']}行: {ann['true_label']} ({ann['annotator']}, {ann['annotation_date']}) - {ann['conflict_note']}")
 
-                elif ctype == "boundary_cases":
+                elif ctype == "boundary_cases" or item.get("conflict_type") == "边界记录":
                     print(f"      预测分数: {item['pred_score']}")
                     print(f"      边界类型: {item['boundary_type']}")
                     if item.get("boundary_threshold"):

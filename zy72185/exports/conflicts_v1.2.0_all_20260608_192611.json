@@ -1,16 +1,16 @@
 {
   "export_metadata": {
-    "export_time": "2026-06-02 20:39:44",
+    "export_time": "2026-06-08 19:26:11",
     "export_tool": "大模型提示词版本仓库 v1.0",
     "version_id": "v1.2.0",
     "conflict_type": "all"
   },
   "summary": {
-    "total_conflicts": 14,
+    "total_conflicts": 16,
     "breakdown": {
       "label_conflicts": 4,
       "sample_leaks": 1,
-      "version_conflicts": 1,
+      "version_conflicts": 3,
       "empty_values": 1,
       "duplicate_records": 1,
       "boundary_cases": 6
@@ -18,10 +18,10 @@
     "severity_breakdown": {
       "critical": 1,
       "high": 5,
-      "medium": 7,
+      "medium": 9,
       "low": 1
     },
-    "decision_required_count": 1
+    "decision_required_count": 3
   },
   "conflicts": {
     "label_conflicts": [
@@ -156,6 +156,76 @@
         ],
         "decision_required": true,
         "note": "系统不自动判定，请人工核实后决定采用哪个值"
+      },
+      {
+        "conflict_id": "v1.2.0_review_CASE002",
+        "conflict_type": "版本冲突-人工改判不一致",
+        "severity": "medium",
+        "case_id": "CASE002",
+        "release_claim": {
+          "claimed_label": "高风险",
+          "source": "版本发布记录 v1.2.0 -> 【发布记录宣称】- CASE002经人工审核后判定为高风险（注：实际标注为低风险，此处存在冲突！）"
+        },
+        "actual_data": {
+          "actual_manual_review_label": "低风险",
+          "actual_pred_label": "中风险",
+          "review_reason": "用户仅逾期2次且已结清，当前无欠款，近期还款表现良好，不应判定为中风险",
+          "reviewer": "老唐",
+          "review_date": "2024-05-30",
+          "review_source": "版本v1.2.0.json -> manual_reviews -> CASE002",
+          "actual_annotation_label": "低风险",
+          "annotator": "王工",
+          "annotation_line": 3,
+          "annotation_source": "annotation_20240601.csv -> 第3行"
+        },
+        "evidence_comparison": {
+          "版本发布记录宣称": "- CASE002经人工审核后判定为高风险（注：实际标注为低风险，此处存在冲突！）",
+          "版本文件人工改判记录": "中风险 -> 低风险，理由：用户仅逾期2次且已结清，当前无欠款，近期还款表现良好，不应判定为中风险",
+          "标注表记录": "标注为低风险，标注人：王工"
+        },
+        "suggested_actions": [
+          "与老唐沟通确认CASE002的最终判定结果",
+          "统一发布记录、人工改判记录、标注表三者的标签",
+          "核实改判理由是否充分，是否需要重新标注",
+          "将最终决策记录到版本备注中"
+        ],
+        "decision_required": true,
+        "note": "系统不自动修正，请人工核实后统一三处记录"
+      },
+      {
+        "conflict_id": "v1.2.0_review_CASE013",
+        "conflict_type": "版本冲突-人工改判不一致",
+        "severity": "medium",
+        "case_id": "CASE013",
+        "release_claim": {
+          "claimed_label": "低风险",
+          "source": "版本发布记录 v1.2.0 -> 【发布记录宣称】- CASE013经人工审核后判定为低风险（注：实际标注为高风险，此处存在冲突！）"
+        },
+        "actual_data": {
+          "actual_manual_review_label": "高风险",
+          "actual_pred_label": "中风险",
+          "review_reason": "月收入2万申请50万贷款，债务收入比过高，还款压力大",
+          "reviewer": "老唐",
+          "review_date": "2024-05-30",
+          "review_source": "版本v1.2.0.json -> manual_reviews -> CASE013",
+          "actual_annotation_label": "高风险",
+          "annotator": "王工",
+          "annotation_line": 14,
+          "annotation_source": "annotation_20240601.csv -> 第14行"
+        },
+        "evidence_comparison": {
+          "版本发布记录宣称": "- CASE013经人工审核后判定为低风险（注：实际标注为高风险，此处存在冲突！）",
+          "版本文件人工改判记录": "中风险 -> 高风险，理由：月收入2万申请50万贷款，债务收入比过高，还款压力大",
+          "标注表记录": "标注为高风险，标注人：王工"
+        },
+        "suggested_actions": [
+          "与老唐沟通确认CASE013的最终判定结果",
+          "统一发布记录、人工改判记录、标注表三者的标签",
+          "核实改判理由是否充分，是否需要重新标注",
+          "将最终决策记录到版本备注中"
+        ],
+        "decision_required": true,
+        "note": "系统不自动修正，请人工核实后统一三处记录"
       }
     ],
     "empty_values": [
@@ -369,7 +439,73 @@
         "后续发布前由第二人复核发布记录与实际数据一致性"
       ],
       "note": "系统不自动判定，请人工核实后决定采用哪个值"
+    },
+    {
+      "conflict_type": "version_conflicts",
+      "conflict_id": "v1.2.0_review_CASE002",
+      "severity": "medium",
+      "release_claim": {
+        "claimed_label": "高风险",
+        "source": "版本发布记录 v1.2.0 -> 【发布记录宣称】- CASE002经人工审核后判定为高风险（注：实际标注为低风险，此处存在冲突！）"
+      },
+      "actual_data": {
+        "actual_manual_review_label": "低风险",
+        "actual_pred_label": "中风险",
+        "review_reason": "用户仅逾期2次且已结清，当前无欠款，近期还款表现良好，不应判定为中风险",
+        "reviewer": "老唐",
+        "review_date": "2024-05-30",
+        "review_source": "版本v1.2.0.json -> manual_reviews -> CASE002",
+        "actual_annotation_label": "低风险",
+        "annotator": "王工",
+        "annotation_line": 3,
+        "annotation_source": "annotation_20240601.csv -> 第3行"
+      },
+      "evidence_comparison": {
+        "版本发布记录宣称": "- CASE002经人工审核后判定为高风险（注：实际标注为低风险，此处存在冲突！）",
+        "版本文件人工改判记录": "中风险 -> 低风险，理由：用户仅逾期2次且已结清，当前无欠款，近期还款表现良好，不应判定为中风险",
+        "标注表记录": "标注为低风险，标注人：王工"
+      },
+      "suggested_actions": [
+        "与老唐沟通确认CASE002的最终判定结果",
+        "统一发布记录、人工改判记录、标注表三者的标签",
+        "核实改判理由是否充分，是否需要重新标注",
+        "将最终决策记录到版本备注中"
+      ],
+      "note": "系统不自动修正，请人工核实后统一三处记录"
+    },
+    {
+      "conflict_type": "version_conflicts",
+      "conflict_id": "v1.2.0_review_CASE013",
+      "severity": "medium",
+      "release_claim": {
+        "claimed_label": "低风险",
+        "source": "版本发布记录 v1.2.0 -> 【发布记录宣称】- CASE013经人工审核后判定为低风险（注：实际标注为高风险，此处存在冲突！）"
+      },
+      "actual_data": {
+        "actual_manual_review_label": "高风险",
+        "actual_pred_label": "中风险",
+        "review_reason": "月收入2万申请50万贷款，债务收入比过高，还款压力大",
+        "reviewer": "老唐",
+        "review_date": "2024-05-30",
+        "review_source": "版本v1.2.0.json -> manual_reviews -> CASE013",
+        "actual_annotation_label": "高风险",
+        "annotator": "王工",
+        "annotation_line": 14,
+        "annotation_source": "annotation_20240601.csv -> 第14行"
+      },
+      "evidence_comparison": {
+        "版本发布记录宣称": "- CASE013经人工审核后判定为低风险（注：实际标注为高风险，此处存在冲突！）",
+        "版本文件人工改判记录": "中风险 -> 高风险，理由：月收入2万申请50万贷款，债务收入比过高，还款压力大",
+        "标注表记录": "标注为高风险，标注人：王工"
+      },
+      "suggested_actions": [
+        "与老唐沟通确认CASE013的最终判定结果",
+        "统一发布记录、人工改判记录、标注表三者的标签",
+        "核实改判理由是否充分，是否需要重新标注",
+        "将最终决策记录到版本备注中"
+      ],
+      "note": "系统不自动修正，请人工核实后统一三处记录"
     }
   ],
-  "export_reason": "导出全部14个冲突问题，用于人工审核和决策；其中1个需要人工决策，系统仅展示证据对比和建议动作，不自动修改；包含6个高优先级问题，请优先处理"
+  "export_reason": "导出全部16个冲突问题，用于人工审核和决策；其中3个需要人工决策，系统仅展示证据对比和建议动作，不自动修改；包含6个高优先级问题，请优先处理"
 }
