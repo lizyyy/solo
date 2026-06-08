@@ -1,7 +1,7 @@
 {
-  "report_id": "report_BATCH-20260603-001_20260603202801",
+  "report_id": "report_BATCH-20260603-001_20260608230216",
   "batch_id": "BATCH-20260603-001",
-  "generated_at": "2026-06-03 20:28:01.812821",
+  "generated_at": "2026-06-08 23:02:16.504947",
   "total_records": 3,
   "normal_count": 2,
   "blocked_count": 0,
@@ -12,7 +12,7 @@
   "max_safe_distance": 1.8,
   "records": [
     {
-      "record_id": "rec_A-01_20260603202801",
+      "record_id": "rec_A-01_20260608230216",
       "batch_id": "BATCH-20260603-001",
       "shelf_code": "A-01",
       "origin_id": "origin_warehouse_a",
@@ -33,13 +33,13 @@
       "photos": [],
       "is_manual_correction": false,
       "correction_note": "",
-      "created_at": "2026-06-03 20:28:01.812078",
-      "updated_at": "2026-06-03 20:28:01.812087",
+      "created_at": "2026-06-08 23:02:16.496352",
+      "updated_at": "2026-06-08 23:02:16.496390",
       "run_count": 1,
       "old_calibration_data": null
     },
     {
-      "record_id": "rec_A-02_20260603202801",
+      "record_id": "rec_A-02_20260608230216",
       "batch_id": "BATCH-20260603-001",
       "shelf_code": "A-02",
       "origin_id": "origin_warehouse_a",
@@ -70,19 +70,29 @@
             150
           ],
           "labels": [
-            "AlertLabel(label_id='alert_A02_01', position_x=80, position_y=60, width=60, height=30, severity=<AlertSeverity.HIGH: 'high'>, message='承重接近上限', is_blocked=True, blocked_by='mobile_screenshot')"
+            {
+              "label_id": "alert_A02_01",
+              "position_x": 80,
+              "position_y": 60,
+              "width": 60,
+              "height": 30,
+              "severity": "high",
+              "message": "承重接近上限",
+              "is_blocked": true,
+              "blocked_by": "mobile_screenshot"
+            }
           ]
         }
       ],
       "is_manual_correction": true,
       "correction_note": "施工经理复核：移动端截图边缘遮挡告警标签区域，经核查该区域实际承重正常，确认无误",
-      "created_at": "2026-06-03 20:28:01.812232",
-      "updated_at": "2026-06-03 20:28:01.812717",
+      "created_at": "2026-06-08 23:02:16.496908",
+      "updated_at": "2026-06-08 23:02:16.503990",
       "run_count": 2,
       "old_calibration_data": null
     },
     {
-      "record_id": "rec_A-03_20260603202801",
+      "record_id": "rec_A-03_20260608230216",
       "batch_id": "BATCH-20260603-001",
       "shelf_code": "A-03",
       "origin_id": "origin_warehouse_a",
@@ -103,8 +113,8 @@
       "photos": [],
       "is_manual_correction": false,
       "correction_note": "",
-      "created_at": "2026-06-03 20:28:01.812369",
-      "updated_at": "2026-06-03 20:28:01.812502",
+      "created_at": "2026-06-08 23:02:16.497515",
+      "updated_at": "2026-06-08 23:02:16.500417",
       "run_count": 1,
       "old_calibration_data": {
         "photo_number": "OLD-P20251215-087",

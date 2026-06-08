@@ -1,29 +1,10 @@
 from flask import Flask, render_template_string, jsonify
-import json
-import os
+
+from .processor import HeatZoneProcessor
 
 app = Flask(__name__)
 
-DATA_DIR = "./data"
-
-
-def load_json_file(path):
-    if os.path.exists(path):
-        with open(path, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return None
-
-
-def get_all_records():
-    records = []
-    records_dir = f"{DATA_DIR}/records"
-    if os.path.exists(records_dir):
-        for filename in os.listdir(records_dir):
-            if filename.endswith(".json"):
-                data = load_json_file(f"{records_dir}/{filename}")
-                if data:
-                    records.append(data)
-    return records
+processor = HeatZoneProcessor(data_dir="./data")
 
 
 def get_status_color(status):
@@ -186,6 +167,7 @@ DASHBOARD_HTML = """
                                 <thead class="table-light">
                                     <tr>
                                         <th>货架</th>
+                                        <th>批次</th>
                                         <th>状态</th>
                                         <th>照片编号</th>
                                         <th>安全距离</th>
@@ -196,6 +178,7 @@ DASHBOARD_HTML = """
                                     {% for record in records %}
                                     <tr>
                                         <td class="fw-bold">{{ record.shelf_code }}</td>
+                                        <td class="small">{{ record.batch_id or '-' }}</td>
                                         <td>
                                             <span class="badge bg-{{ get_status_color(record.status) }}">
                                                 {{ get_status_text(record.status) }}
@@ -214,8 +197,8 @@ DASHBOARD_HTML = """
                                     {% endfor %}
                                     {% if not records %}
                                     <tr>
-                                        <td colspan="5" class="text-center text-muted py-4">
-                                            暂无记录，请先运行演示: <code>python -m warehouse_heat_zone demo</code>
+                                        <td colspan="6" class="text-center text-muted py-4">
+                                            暂无记录，请先运行演示: <code>python3 -m warehouse_heat_zone demo</code>
                                         </td>
                                     </tr>
                                     {% endif %}
@@ -227,9 +210,45 @@ DASHBOARD_HTML = """
             </div>
         </div>
 
+        {% if latest_report %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">� 最新安全距离报告</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <div class="h4 mb-0">{{ latest_report.total_records }}</div>
+                            <div class="text-muted small">总记录</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <div class="h4 mb-0 text-success">{{ latest_report.normal_count }}</div>
+                            <div class="text-muted small">正常</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <div class="h4 mb-0 text-warning">{{ latest_report.need_review_count }}</div>
+                            <div class="text-muted small">待复核</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <div class="h4 mb-0">{{ latest_report.avg_safe_distance | round(2) }}m</div>
+                            <div class="text-muted small">平均安全距离</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
         <div class="card">
             <div class="card-header">
-                <h5 class="mb-0">📝 三步流程说明</h5>
+                <h5 class="mb-0">�📝 三步流程说明</h5>
             </div>
             <div class="card-body">
                 <div class="row">
@@ -277,19 +296,38 @@ DASHBOARD_HTML = """
 
 @app.route("/")
 def index():
-    records = get_all_records()
+    p = HeatZoneProcessor(data_dir="./data")
+    records = p.get_all_records()
     total_records = len(records)
-    normal_count = sum(1 for r in records if r.get("status") == "normal")
-    need_review_count = sum(1 for r in records if r.get("status") == "need_review")
-    old_calibration_count = sum(1 for r in records if r.get("status") == "old_calibration")
+    normal_count = sum(1 for r in records if r.status.value == "normal")
+    need_review_count = sum(1 for r in records if r.status.value == "need_review")
+    old_calibration_count = sum(1 for r in records if r.status.value == "old_calibration")
+
+    record_dicts = []
+    for r in records:
+        rd = {
+            "record_id": r.record_id,
+            "shelf_code": r.shelf_code,
+            "batch_id": r.batch_id,
+            "status": r.status.value,
+            "photo_number": r.photo_number,
+            "run_count": r.run_count,
+            "heat_zones": [z.__dict__ for z in r.heat_zones],
+        }
+        record_dicts.append(rd)
+
+    latest_report = None
+    if p.current_batch_id:
+        latest_report = p.get_latest_report(p.current_batch_id)
 
     return render_template_string(
         DASHBOARD_HTML,
-        records=records,
+        records=record_dicts,
         total_records=total_records,
         normal_count=normal_count,
         need_review_count=need_review_count,
         old_calibration_count=old_calibration_count,
+        latest_report=latest_report,
         get_status_color=get_status_color,
         get_status_text=get_status_text,
     )
@@ -297,7 +335,22 @@ def index():
 
 @app.route("/api/records")
 def api_records():
-    return jsonify({"records": get_all_records()})
+    p = HeatZoneProcessor(data_dir="./data")
+    records = p.get_all_records()
+    return jsonify({
+        "records": [
+            {
+                "record_id": r.record_id,
+                "shelf_code": r.shelf_code,
+                "batch_id": r.batch_id,
+                "status": r.status.value,
+                "photo_number": r.photo_number,
+                "run_count": r.run_count,
+                "safe_distance": r.heat_zones[0].safe_distance if r.heat_zones else 0,
+            }
+            for r in records
+        ]
+    })
 
 
 def run_dashboard(host="127.0.0.1", port=5000):

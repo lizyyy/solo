@@ -30,13 +30,14 @@ def main():
     add_shelf_parser.add_argument("--origin-id", required=True, help="坐标原点ID")
     add_shelf_parser.add_argument("--data-dir", default="./data", help="数据目录")
 
-    batch_parser = subparsers.add_parser("new-batch", help="创建新批次")
+    batch_parser = subparsers.add_parser("new-batch", help="创建新批次（持久化）")
     batch_parser.add_argument("--batch-id", required=True, help="批次ID")
     batch_parser.add_argument("--data-dir", default="./data", help="数据目录")
 
     process_parser = subparsers.add_parser("process", help="处理巡检记录")
     process_parser.add_argument("--shelf-code", required=True, help="货架编号")
     process_parser.add_argument("--origin-id", required=True, help="坐标原点ID")
+    process_parser.add_argument("--batch-id", default=None, help="批次ID（不指定则使用当前持久化批次）")
     process_parser.add_argument("--photo-number", help="照片编号")
     process_parser.add_argument("--mobile-blocked", action="store_true", help="是否有移动端截图遮挡")
     process_parser.add_argument("--data-dir", default="./data", help="数据目录")
@@ -117,7 +118,7 @@ def cmd_add_shelf(args):
 def cmd_new_batch(args):
     processor = HeatZoneProcessor(data_dir=args.data_dir)
     processor.create_new_batch(args.batch_id)
-    print(f"✓ 新批次已创建: {args.batch_id}")
+    print(f"✓ 新批次已创建并持久化: {args.batch_id}")
 
 
 def cmd_process(args):
@@ -147,8 +148,10 @@ def cmd_process(args):
         origin_id=args.origin_id,
         photo=photo,
         photo_number=args.photo_number,
+        batch_id=args.batch_id,
     )
     print(f"✓ 记录已处理: {record.record_id}")
+    print(f"  批次: {record.batch_id or '(无)'}")
     print(f"  状态: {record.status.value}")
     print(f"  安全距离: {record.heat_zones[0].safe_distance}m")
 
@@ -162,6 +165,8 @@ def cmd_supplement(args):
     )
     print(f"✓ 照片编号已补录: {args.photo_number}")
     print(f"  新状态: {record.status.value}")
+    if record.batch_id:
+        print(f"  安全距离报告已同步更新 (批次: {record.batch_id})")
 
 
 def cmd_correct(args):
@@ -180,12 +185,16 @@ def cmd_correct(args):
     print(f"✓ 记录已人工修正")
     print(f"  新状态: {record.status.value}")
     print(f"  修正说明: {record.correction_note}")
+    if record.batch_id:
+        print(f"  安全距离报告已同步更新 (批次: {record.batch_id})")
 
 
 def cmd_rerun(args):
     processor = HeatZoneProcessor(data_dir=args.data_dir)
     record = processor.rerun_record(args.record_id)
     print(f"✓ 记录已重跑 (第{record.run_count}次)")
+    if record.batch_id:
+        print(f"  安全距离报告已同步更新 (批次: {record.batch_id})")
 
 
 def cmd_report(args):
@@ -213,10 +222,12 @@ def cmd_list(args):
     print(f"\n共 {len(records)} 条记录:\n")
     for r in records:
         print(f"ID: {r.record_id}")
-        print(f"  货架: {r.shelf_code}, 状态: {r.status.value}")
+        print(f"  货架: {r.shelf_code}, 批次: {r.batch_id or '(无)'}, 状态: {r.status.value}")
         print(f"  照片编号: {r.photo_number}, 重跑次数: {r.run_count}")
         if r.heat_zones:
             print(f"  安全距离: {r.heat_zones[0].safe_distance}m")
+        if r.is_manual_correction:
+            print(f"  人工修正: {r.correction_note}")
         print()
 
 
@@ -261,7 +272,7 @@ def cmd_demo(args):
         processor.add_shelf(shelf)
         print(f"✓ 货架 {code}: 承重 {cur_load}/{max_load} kg")
 
-    print("\n【第3步】创建巡检批次")
+    print("\n【第3步】创建巡检批次（持久化）")
     print("-" * 40)
     batch_id = "batch_20260603_demo"
     processor.create_new_batch(batch_id)
@@ -277,6 +288,7 @@ def cmd_demo(args):
         photo_number="P20260603_001",
     )
     print(f"    ✓ 记录ID: {record1.record_id}")
+    print(f"    批次: {record1.batch_id}")
     print(f"    状态: {record1.status.value}")
     print(f"    安全距离: {record1.heat_zones[0].safe_distance}m")
 
@@ -304,6 +316,7 @@ def cmd_demo(args):
         photo=photo_blocked,
     )
     print(f"    ✓ 记录ID: {record2.record_id}")
+    print(f"    批次: {record2.batch_id}")
     print(f"    状态: {record2.status.value} (施工经理复核中)")
     print(f"    安全距离: {record2.heat_zones[0].safe_distance}m")
     print(f"    ⚠ 告警标签被移动端截图遮挡，暂不归为正常")
@@ -326,6 +339,7 @@ def cmd_demo(args):
     )
     print(f"    ✓ 照片编号: {record3_updated.photo_number}")
     print(f"    新状态: {record3_updated.status.value}")
+    print(f"    安全距离报告已同步更新")
 
     print("\n【第6步】人工修正与重跑")
     print("-" * 40)
@@ -338,10 +352,12 @@ def cmd_demo(args):
     print(f"    ✓ 人工修正完成")
     print(f"    新状态: {record2_corrected.status.value}")
     print(f"    修正说明: {record2_corrected.correction_note}")
+    print(f"    安全距离报告已同步更新")
 
     print(f"\n  重跑记录2，更新计算结果")
     record2_rerun = processor.rerun_record(record2.record_id)
     print(f"    ✓ 重跑完成 (第{record2_rerun.run_count}次)")
+    print(f"    安全距离报告已同步更新")
 
     print("\n【第7步】生成安全距离报告")
     print("-" * 40)
@@ -356,10 +372,10 @@ def cmd_demo(args):
     print("\n" + "="*60)
     print("演示完成！所有数据已保存到 ./data 目录")
     print("="*60)
-    print("\n复盘命令:")
-    print(f"  查看记录列表: python -m warehouse_heat_zone list")
-    print(f"  重新生成报告: python -m warehouse_heat_zone report --batch-id {batch_id}")
-    print(f"  重跑某条记录: python -m warehouse_heat_zone rerun --record-id {record1.record_id}")
+    print("\n复盘命令（每条命令独立执行，数据从磁盘加载）:")
+    print(f"  查看记录列表: python3 -m warehouse_heat_zone list")
+    print(f"  重新生成报告: python3 -m warehouse_heat_zone report --batch-id {batch_id}")
+    print(f"  重跑某条记录: python3 -m warehouse_heat_zone rerun --record-id {record1.record_id}")
     print()
 
 

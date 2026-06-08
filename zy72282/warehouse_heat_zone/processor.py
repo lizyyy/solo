@@ -16,6 +16,8 @@ from .models import (
 
 
 class HeatZoneProcessor:
+    BATCH_STATE_FILE = "current_batch.json"
+
     def __init__(self, data_dir: str = "./data"):
         self.data_dir = data_dir
         self.origins: Dict[str, CoordinateOrigin] = {}
@@ -26,9 +28,22 @@ class HeatZoneProcessor:
         self._load_existing_data()
 
     def _load_existing_data(self):
+        self._load_batch_state()
         self._load_origins()
         self._load_shelves()
         self._load_records()
+
+    def _load_batch_state(self):
+        path = f"{self.data_dir}/{self.BATCH_STATE_FILE}"
+        if os.path.exists(path):
+            with open(path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            self.current_batch_id = data.get("current_batch_id", "")
+
+    def _save_batch_state(self):
+        path = f"{self.data_dir}/{self.BATCH_STATE_FILE}"
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump({"current_batch_id": self.current_batch_id}, f, ensure_ascii=False, indent=2)
 
     def _load_origins(self):
         origins_dir = f"{self.data_dir}/origins"
@@ -52,15 +67,58 @@ class HeatZoneProcessor:
 
     def _load_records(self):
         records_dir = f"{self.data_dir}/records"
-        if os.path.exists(records_dir):
-            for filename in os.listdir(records_dir):
-                if filename.endswith(".json"):
-                    with open(f"{records_dir}/{filename}", "r", encoding="utf-8") as f:
-                        data = json.load(f)
-                    data["status"] = RecordStatus(data["status"])
-                    data["heat_zones"] = [HeatZone(**z) for z in data["heat_zones"]]
-                    record = InspectionRecord(**data)
-                    self.records[record.record_id] = record
+        if not os.path.exists(records_dir):
+            return
+        for filename in os.listdir(records_dir):
+            if not filename.endswith(".json"):
+                continue
+            with open(f"{records_dir}/{filename}", "r", encoding="utf-8") as f:
+                data = json.load(f)
+            data["status"] = RecordStatus(data["status"])
+            data["heat_zones"] = [HeatZone(**z) for z in data.get("heat_zones", [])]
+            data["photos"] = [self._dict_to_photo(p) for p in data.get("photos", [])]
+            for key in ("created_at", "updated_at"):
+                if key in data and isinstance(data[key], str):
+                    try:
+                        data[key] = datetime.fromisoformat(data[key])
+                    except (ValueError, TypeError):
+                        pass
+            record = InspectionRecord(**data)
+            self.records[record.record_id] = record
+
+    def _dict_to_photo(self, d: dict) -> PhotoRecord:
+        labels = [self._dict_to_label(l) for l in d.get("labels", [])]
+        bbox = d.get("screenshot_bbox")
+        if isinstance(bbox, list):
+            bbox = tuple(bbox)
+        capture_time = d.get("capture_time")
+        if isinstance(capture_time, str):
+            try:
+                capture_time = datetime.fromisoformat(capture_time)
+            except (ValueError, TypeError):
+                capture_time = None
+        return PhotoRecord(
+            photo_id=d.get("photo_id", ""),
+            photo_number=d.get("photo_number", ""),
+            capture_time=capture_time,
+            is_mobile_screenshot=d.get("is_mobile_screenshot", False),
+            screenshot_bbox=bbox,
+            labels=labels,
+        )
+
+    @staticmethod
+    def _dict_to_label(d: dict) -> AlertLabel:
+        return AlertLabel(
+            label_id=d.get("label_id", ""),
+            position_x=d.get("position_x", 0),
+            position_y=d.get("position_y", 0),
+            width=d.get("width", 0),
+            height=d.get("height", 0),
+            severity=AlertSeverity(d.get("severity", "low")),
+            message=d.get("message", ""),
+            is_blocked=d.get("is_blocked", False),
+            blocked_by=d.get("blocked_by"),
+        )
 
     def _ensure_directories(self):
         os.makedirs(self.data_dir, exist_ok=True)
@@ -86,6 +144,7 @@ class HeatZoneProcessor:
 
     def create_new_batch(self, batch_id: str):
         self.current_batch_id = batch_id
+        self._save_batch_state()
 
     def detect_blocked_labels(self, photo: PhotoRecord) -> List[AlertLabel]:
         blocked_labels = []
@@ -149,6 +208,7 @@ class HeatZoneProcessor:
         photo: Optional[PhotoRecord] = None,
         photo_number: Optional[str] = None,
         is_rerun: bool = False,
+        batch_id: Optional[str] = None,
     ) -> InspectionRecord:
         record_id = f"rec_{shelf_code}_{datetime.now().strftime('%Y%m%d%H%M%S')}"
 
@@ -160,9 +220,11 @@ class HeatZoneProcessor:
         if not shelf or not origin:
             raise ValueError(f"Shelf {shelf_code} or origin {origin_id} not found")
 
+        effective_batch = batch_id or self.current_batch_id
+
         record = InspectionRecord(
             record_id=record_id,
-            batch_id=self.current_batch_id,
+            batch_id=effective_batch,
             shelf_code=shelf_code,
             origin_id=origin_id,
             photo_number=photo_number,
@@ -207,6 +269,7 @@ class HeatZoneProcessor:
             record.status = RecordStatus.COMPLETED
 
         self._save_record(record)
+        self._refresh_report_for_record(record)
         return record
 
     def manual_correct(
@@ -222,6 +285,7 @@ class HeatZoneProcessor:
         record.updated_at = datetime.now()
 
         self._save_record(record)
+        self._refresh_report_for_record(record)
         return record
 
     def rerun_record(self, record_id: str) -> InspectionRecord:
@@ -241,7 +305,12 @@ class HeatZoneProcessor:
             record.heat_zones = self.calculate_heat_zones(shelf, origin)
 
         self._save_record(record)
+        self._refresh_report_for_record(record)
         return record
+
+    def _refresh_report_for_record(self, record: InspectionRecord):
+        if record.batch_id:
+            self.generate_safety_report(record.batch_id)
 
     def generate_safety_report(self, batch_id: str) -> SafetyReport:
         batch_records = [
@@ -332,7 +401,7 @@ class HeatZoneProcessor:
             "photo_number": record.photo_number,
             "status": record.status.value,
             "heat_zones": [z.__dict__ for z in record.heat_zones],
-            "photos": [p.__dict__ for p in record.photos],
+            "photos": [self._photo_to_dict(p) for p in record.photos],
             "is_manual_correction": record.is_manual_correction,
             "correction_note": record.correction_note,
             "created_at": str(record.created_at),
@@ -341,8 +410,46 @@ class HeatZoneProcessor:
             "old_calibration_data": record.old_calibration_data,
         }
 
+    def _photo_to_dict(self, photo: PhotoRecord) -> dict:
+        return {
+            "photo_id": photo.photo_id,
+            "photo_number": photo.photo_number,
+            "capture_time": str(photo.capture_time) if photo.capture_time else None,
+            "is_mobile_screenshot": photo.is_mobile_screenshot,
+            "screenshot_bbox": list(photo.screenshot_bbox) if photo.screenshot_bbox else None,
+            "labels": [self._label_to_dict(l) for l in photo.labels],
+        }
+
+    @staticmethod
+    def _label_to_dict(label: AlertLabel) -> dict:
+        return {
+            "label_id": label.label_id,
+            "position_x": label.position_x,
+            "position_y": label.position_y,
+            "width": label.width,
+            "height": label.height,
+            "severity": label.severity.value,
+            "message": label.message,
+            "is_blocked": label.is_blocked,
+            "blocked_by": label.blocked_by,
+        }
+
     def get_record(self, record_id: str) -> Optional[InspectionRecord]:
         return self.records.get(record_id)
 
     def get_all_records(self) -> List[InspectionRecord]:
         return list(self.records.values())
+
+    def get_latest_report(self, batch_id: str) -> Optional[dict]:
+        reports_dir = f"{self.data_dir}/reports"
+        if not os.path.exists(reports_dir):
+            return None
+        candidates = []
+        for filename in os.listdir(reports_dir):
+            if filename.endswith(".json") and filename.startswith(f"report_{batch_id}_"):
+                with open(f"{reports_dir}/{filename}", "r", encoding="utf-8") as f:
+                    candidates.append(json.load(f))
+        if not candidates:
+            return None
+        candidates.sort(key=lambda x: x.get("generated_at", ""), reverse=True)
+        return candidates[0]

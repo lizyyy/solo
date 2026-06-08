@@ -1,5 +1,5 @@
 {
-  "record_id": "rec_A-02_20260603202801",
+  "record_id": "rec_A-02_20260608230216",
   "batch_id": "BATCH-20260603-001",
   "shelf_code": "A-02",
   "origin_id": "origin_warehouse_a",
@@ -30,14 +30,24 @@
         150
       ],
       "labels": [
-        "AlertLabel(label_id='alert_A02_01', position_x=80, position_y=60, width=60, height=30, severity=<AlertSeverity.HIGH: 'high'>, message='承重接近上限', is_blocked=True, blocked_by='mobile_screenshot')"
+        {
+          "label_id": "alert_A02_01",
+          "position_x": 80,
+          "position_y": 60,
+          "width": 60,
+          "height": 30,
+          "severity": "high",
+          "message": "承重接近上限",
+          "is_blocked": true,
+          "blocked_by": "mobile_screenshot"
+        }
       ]
     }
   ],
   "is_manual_correction": true,
   "correction_note": "施工经理复核：移动端截图边缘遮挡告警标签区域，经核查该区域实际承重正常，确认无误",
-  "created_at": "2026-06-03 20:28:01.812232",
-  "updated_at": "2026-06-03 20:28:01.812717",
+  "created_at": "2026-06-08 23:02:16.496908",
+  "updated_at": "2026-06-08 23:02:16.503990",
   "run_count": 2,
   "old_calibration_data": null
 }

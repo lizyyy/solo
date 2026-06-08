@@ -1,10 +1,7 @@
 from fastapi import FastAPI, HTTPException
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 from typing import Optional, List
 from datetime import datetime
-import os
 
 from .models import (
     CoordinateOrigin,
@@ -42,6 +39,7 @@ class ShelfRequest(BaseModel):
 class ProcessRecordRequest(BaseModel):
     shelf_code: str
     origin_id: str
+    batch_id: Optional[str] = None
     photo_number: Optional[str] = None
     is_mobile_blocked: bool = False
 
@@ -67,7 +65,7 @@ async def import_origin(origin: CoordinateOriginRequest):
 
 @app.get("/api/origins")
 async def list_origins():
-    return {"origins": list(processor.origins.values())}
+    return {"origins": [o.__dict__ for o in processor.origins.values()]}
 
 
 @app.post("/api/shelves")
@@ -79,7 +77,7 @@ async def add_shelf(shelf: ShelfRequest):
 
 @app.get("/api/shelves")
 async def list_shelves():
-    return {"shelves": list(processor.shelves.values())}
+    return {"shelves": [s.__dict__ for s in processor.shelves.values()]}
 
 
 @app.post("/api/batch/{batch_id}")
@@ -115,10 +113,12 @@ async def process_record(req: ProcessRecordRequest):
         origin_id=req.origin_id,
         photo=photo,
         photo_number=req.photo_number,
+        batch_id=req.batch_id,
     )
     return {
         "status": "success",
         "record_id": record.record_id,
+        "batch_id": record.batch_id,
         "record_status": record.status.value,
         "safe_distance": record.heat_zones[0].safe_distance if record.heat_zones else 0,
     }
@@ -131,10 +131,13 @@ async def supplement_photo(req: SupplementPhotoRequest):
         photo_number=req.photo_number,
         old_calibration=req.old_calibration,
     )
+    latest_report = processor.get_latest_report(record.batch_id) if record.batch_id else None
     return {
         "status": "success",
         "record_id": record.record_id,
         "new_status": record.status.value,
+        "batch_id": record.batch_id,
+        "report_updated": latest_report is not None,
     }
 
 
@@ -154,20 +157,26 @@ async def manual_correct(req: ManualCorrectRequest):
         new_status=status_map[req.new_status],
         note=req.note,
     )
+    latest_report = processor.get_latest_report(record.batch_id) if record.batch_id else None
     return {
         "status": "success",
         "record_id": record.record_id,
         "new_status": record.status.value,
+        "batch_id": record.batch_id,
+        "report_updated": latest_report is not None,
     }
 
 
 @app.post("/api/rerun/{record_id}")
 async def rerun_record(record_id: str):
     record = processor.rerun_record(record_id)
+    latest_report = processor.get_latest_report(record.batch_id) if record.batch_id else None
     return {
         "status": "success",
         "record_id": record.record_id,
         "run_count": record.run_count,
+        "batch_id": record.batch_id,
+        "report_updated": latest_report is not None,
     }
 
 
@@ -202,6 +211,7 @@ async def list_records():
             {
                 "record_id": r.record_id,
                 "shelf_code": r.shelf_code,
+                "batch_id": r.batch_id,
                 "status": r.status.value,
                 "photo_number": r.photo_number,
                 "run_count": r.run_count,
@@ -220,6 +230,7 @@ async def get_record(record_id: str):
     return {
         "record_id": record.record_id,
         "shelf_code": record.shelf_code,
+        "batch_id": record.batch_id,
         "status": record.status.value,
         "photo_number": record.photo_number,
         "heat_zones": [z.__dict__ for z in record.heat_zones],

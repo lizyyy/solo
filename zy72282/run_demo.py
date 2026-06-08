@@ -44,7 +44,7 @@ def main():
     print("  3. 安全距离报告更新")
 
     print_section("清理旧数据，准备重新开始")
-    os.system("rm -rf ./data/records ./data/reports")
+    os.system("rm -rf ./data/records ./data/reports ./data/current_batch.json")
     print("✓ 数据目录已清理")
 
     processor = HeatZoneProcessor(data_dir="./data")
