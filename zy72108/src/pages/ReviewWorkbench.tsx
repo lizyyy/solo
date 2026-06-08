@@ -139,7 +139,7 @@ export default function ReviewWorkbench() {
         <div className="card p-4">
           <h2 className="text-lg font-semibold mb-3">张力数据</h2>
           <table className="w-full text-sm">
-            <thead><tr className="text-gray-400 border-b border-surface-border"><th>弦别</th><th>标准张力(N)</th><th>实测张力(N)</th><th>偏差率(%)</th><th>状态</th></tr></thead>
+            <thead><tr className="text-gray-400 border-b border-surface-border"><th>弦别</th><th>标准张力(N)</th><th>实测张力(N)</th><th>偏差率(%)</th><th>状态</th><th>异常原因</th></tr></thead>
             <tbody>
               {measurements.map((m) => (
                 <tr key={m.id} className={`border-b border-surface-border/50 ${m.isAnomaly ? 'bg-data-anomaly/10' : ''}`}>
@@ -148,6 +148,7 @@ export default function ReviewWorkbench() {
                   <td className="font-mono">{m.measuredTension}</td>
                   <td className={`font-mono ${m.isAnomaly ? 'text-data-anomaly' : 'text-data-normal'}`}>{m.deviationRate > 0 ? '+' : ''}{m.deviationRate}</td>
                   <td>{m.isAnomaly ? <span className="text-data-anomaly text-xs">异常</span> : <span className="text-data-normal text-xs">正常</span>}</td>
+                  <td className="text-xs text-gray-400">{m.anomalyReason || '-'}</td>
                 </tr>
               ))}
             </tbody>

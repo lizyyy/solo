@@ -1,4 +1,5 @@
 import type { Batch, BatchStatus, ThresholdVersion, StringName, StringMeasurement, EnvironmentCondition, ParameterRecord, Conflict, AuditLog } from '@/types'
+import { detectAnomalies } from '@/utils/reviewEngine'
 
 const STRING_NAMES: StringName[] = ['E弦', 'A弦', 'D弦', 'G弦']
 
@@ -26,8 +27,8 @@ const INITIAL_THRESHOLD_V2: ThresholdVersion = {
   changedBy: '林老师',
 }
 
-function createMeasurements(recordId: string, data: { name: StringName; std: number; meas: number }[]): StringMeasurement[] {
-  return data.map((d) => {
+function createMeasurements(recordId: string, data: { name: StringName; std: number; meas: number }[], threshold: ThresholdVersion): StringMeasurement[] {
+  const raw = data.map((d) => {
     const deviationRate = ((d.meas - d.std) / d.std) * 100
     return {
       id: uid(),
@@ -40,6 +41,7 @@ function createMeasurements(recordId: string, data: { name: StringName; std: num
       anomalyReason: '',
     }
   })
+  return detectAnomalies(raw, threshold)
 }
 
 const SAMPLE_BATCH_1: Batch = (() => {
@@ -53,14 +55,14 @@ const SAMPLE_BATCH_1: Batch = (() => {
     { name: 'A弦', std: 52.5, meas: 52.1 },
     { name: 'D弦', std: 51.2, meas: 48.3 },
     { name: 'G弦', std: 49.8, meas: 50.1 },
-  ])
+  ], INITIAL_THRESHOLD_V1)
 
   const measurements2 = createMeasurements(recordId2, [
     { name: 'E弦', std: 53.4, meas: 54.8 },
     { name: 'A弦', std: 52.5, meas: 52.1 },
     { name: 'D弦', std: 51.2, meas: 49.8 },
     { name: 'G弦', std: 49.8, meas: 50.1 },
-  ])
+  ], INITIAL_THRESHOLD_V1)
 
   const env: EnvironmentCondition = {
     id: uid(),
@@ -183,8 +185,8 @@ const SAMPLE_BATCH_1: Batch = (() => {
       thresholdVersionId: 'tv_1',
       thresholdVersion: 'v1.0',
       source: '异常检测引擎',
-      reason: 'E弦偏差+2.6%微超阈值±3%；D弦偏差-5.7%显著超出阈值±3%（阈值版本v1.0）',
-      details: { anomalousStrings: ['E弦', 'D弦'] },
+      reason: 'D弦偏差-5.66%超出阈值±3%（阈值版本v1.0）；E弦偏差+2.62%接近阈值但未超出',
+      details: { anomalousStrings: ['D弦'] },
     },
   ]
 
@@ -209,7 +211,7 @@ const SAMPLE_BATCH_2: Batch = (() => {
     { name: 'A弦', std: 52.5, meas: 52.9 },
     { name: 'D弦', std: 51.2, meas: 50.8 },
     { name: 'G弦', std: 49.8, meas: 50.2 },
-  ])
+  ], INITIAL_THRESHOLD_V2)
 
   return {
     id: batchId,
@@ -273,7 +275,7 @@ const SAMPLE_BATCH_3: Batch = (() => {
     { name: 'A弦', std: 52.5, meas: 49.7 },
     { name: 'D弦', std: 51.2, meas: 47.5 },
     { name: 'G弦', std: 49.8, meas: 50.0 },
-  ])
+  ], INITIAL_THRESHOLD_V2)
 
   return {
     id: batchId,
@@ -321,7 +323,7 @@ const SAMPLE_BATCH_3: Batch = (() => {
         thresholdVersionId: 'tv_2',
         thresholdVersion: 'v1.1',
         source: '异常检测引擎',
-        reason: 'E弦偏差+5.1%、A弦偏差-5.3%、D弦偏差-7.2%均超出阈值±4%（阈值版本v1.1），环境工况异常',
+        reason: 'E弦偏差+5.06%、A弦偏差-5.33%、D弦偏差-7.23%均超出阈值±4%（阈值版本v1.1），环境工况异常',
         details: { anomalousStrings: ['E弦', 'A弦', 'D弦'] },
       },
       {
