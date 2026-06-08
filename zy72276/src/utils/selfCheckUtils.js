@@ -41,14 +41,11 @@ export const detectDuplicates = (records) => {
 
 export const detectMixedCoordinates = (records) => {
   const details = []
-  const mixedRecords = []
 
   records.forEach((record) => {
-    const coordinateType = detectCoordinateType(record)
     const hasMixed = checkMixedCoordinate(record)
     
     if (hasMixed) {
-      mixedRecords.push(record)
       details.push({
         type: 'mixed_coordinate',
         severity: 'error',
@@ -60,17 +57,15 @@ export const detectMixedCoordinates = (records) => {
         detectedTypes: detectAllCoordinateTypes(record),
         reservedForReview: true
       })
-      record.isMixedCoordinate = true
-      record.processingStatus = 'pending_review'
     }
   })
 
   return {
-    passed: mixedRecords.length === 0,
-    count: mixedRecords.length,
+    passed: details.length === 0,
+    count: details.length,
     details,
-    message: mixedRecords.length > 0 
-      ? `发现 ${mixedRecords.length} 条坐标混合记录，已标记待复核` 
+    message: details.length > 0 
+      ? `发现 ${details.length} 条坐标混合记录，已标记待复核` 
       : '坐标格式检查通过'
   }
 }
@@ -134,13 +129,24 @@ export const validateExportConsistency = (records, unifiedResult) => {
     })
   }
 
+  const actualMixedCount = records.filter(r => r.isMixedCoordinate === true).length
+  const reportedMixedCount = unifiedResult.selfCheckResults?.coordinateCheck?.count ?? 0
+  if (actualMixedCount !== reportedMixedCount) {
+    passed = false
+    details.push({
+      type: 'consistency',
+      severity: 'error',
+      message: `坐标混合数量不一致：实际标记 ${actualMixedCount} 条，自检报告 ${reportedMixedCount} 条`
+    })
+  }
+
   records.forEach((record, index) => {
     const unifiedRecord = unifiedResult.obstacleRecords[index]
     if (!unifiedRecord) return
 
     const fieldsToCheck = [
       'wallPanelCode', 'coordinate', 'obstacleNote', 
-      'processingStatus', 'isMixedCoordinate'
+      'processingStatus', 'isMixedCoordinate', 'coordinateType'
     ]
 
     fieldsToCheck.forEach(field => {
@@ -173,40 +179,67 @@ function generateDuplicateKey(record) {
 
 function detectCoordinateType(record) {
   if (!record.coordinate) return 'unknown'
-  const coordStr = String(record.coordinate)
+  const coordStr = String(record.coordinate).trim()
   
-  if (coordStr.includes(',') || coordStr.includes('°') || /^\d{1,3}\.\d+,\s*\d{1,3}\.\d+$/.test(coordStr)) {
-    return 'latlng'
-  }
-  if (/^\d+(\.\d+)?$/.test(coordStr) || /^[XYZxyz]:/.test(coordStr)) {
-    return 'metric'
-  }
+  const hasExplicitMetric = /[XYZxyz]:/.test(coordStr)
+  
+  const standaloneLatLng = /^-?\d{1,3}(\.\d+)?\s*,\s*-?\d{1,3}(\.\d+)?$/.test(coordStr)
+  const degreePattern = /\d+°/
+  const leadingLatLng = /^\d{1,3}\.\d+\s*,\s*\d{1,3}\.\d+/.test(coordStr)
+  const hasLatLng = standaloneLatLng || degreePattern.test(coordStr) || leadingLatLng
+  
+  if (hasLatLng && hasExplicitMetric) return 'mixed'
+  if (hasLatLng) return 'latlng'
+  if (hasExplicitMetric) return 'metric'
+  if (/^-?\d+(\.\d+)?$/.test(coordStr)) return 'metric'
+  if (coordStr.includes(',') && !hasExplicitMetric) return 'latlng'
   return 'unknown'
 }
 
 function checkMixedCoordinate(record) {
   if (!record.coordinate) return false
-  const coordStr = String(record.coordinate)
+  const coordStr = String(record.coordinate).trim()
   
-  const hasLatLng = coordStr.includes(',') || coordStr.includes('°') || /\d{1,3}\.\d+,\s*\d{1,3}\.\d+/.test(coordStr)
-  const hasMetric = /[XYZxyz]:/.test(coordStr) || (coordStr.match(/\d+\.\d+/g)?.length === 1 && !coordStr.includes(','))
+  const hasExplicitMetric = /[XYZxyz]:/.test(coordStr)
   
-  return hasLatLng && hasMetric
+  const standaloneLatLng = /^-?\d{1,3}(\.\d+)?\s*,\s*-?\d{1,3}(\.\d+)?$/.test(coordStr)
+  const degreePattern = /\d+°/
+  const leadingLatLng = /^\d{1,3}\.\d+\s*,\s*\d{1,3}\.\d+/.test(coordStr)
+  const hasLatLng = standaloneLatLng || degreePattern.test(coordStr) || leadingLatLng
+  
+  if (hasLatLng && hasExplicitMetric) {
+    return true
+  }
+  
+  return false
 }
 
 function detectAllCoordinateTypes(record) {
   if (!record.coordinate) return ['unknown']
   const types = []
-  const coordStr = String(record.coordinate)
+  const coordStr = String(record.coordinate).trim()
   
-  if (coordStr.includes(',') || coordStr.includes('°') || /\d{1,3}\.\d+,\s*\d{1,3}\.\d+/.test(coordStr)) {
-    types.push('经纬度')
-  }
-  if (/[XYZxyz]:/.test(coordStr) || /^\d+(\.\d+)?$/.test(coordStr)) {
-    types.push('米制')
+  const hasExplicitMetric = /[XYZxyz]:/.test(coordStr)
+  
+  const standaloneLatLng = /^-?\d{1,3}(\.\d+)?\s*,\s*-?\d{1,3}(\.\d+)?$/.test(coordStr)
+  const degreePattern = /\d+°/
+  const leadingLatLng = /^\d{1,3}\.\d+\s*,\s*\d{1,3}\.\d+/.test(coordStr)
+  const hasLatLng = standaloneLatLng || degreePattern.test(coordStr) || leadingLatLng
+  
+  if (hasLatLng) types.push('经纬度')
+  if (hasExplicitMetric) types.push('米制')
+  
+  if (types.length === 0) {
+    if (/^-?\d+(\.\d+)?$/.test(coordStr)) {
+      types.push('米制')
+    } else if (coordStr.includes(',') && !hasExplicitMetric) {
+      types.push('经纬度')
+    } else {
+      types.push('unknown')
+    }
   }
   
-  return types.length > 0 ? types : ['unknown']
+  return types
 }
 
 export const runAllSelfChecks = (records, unifiedResult) => {

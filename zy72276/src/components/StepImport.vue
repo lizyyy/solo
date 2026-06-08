@@ -232,12 +232,12 @@ const saveEdit = () => {
 }
 
 const getCoordTypeText = (type) => {
-  const map = { 'latlng': '经纬度', 'metric': '米制', 'unknown': '未知' }
+  const map = { 'latlng': '经纬度', 'metric': '米制', 'mixed': '经纬度+米制混合', 'unknown': '未知' }
   return map[type] || type
 }
 
 const getCoordTagType = (type) => {
-  const map = { 'latlng': 'success', 'metric': 'primary', 'unknown': 'info' }
+  const map = { 'latlng': 'success', 'metric': 'primary', 'mixed': 'danger', 'unknown': 'info' }
   return map[type] || 'info'
 }
 

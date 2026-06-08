@@ -139,6 +139,26 @@ export const useSimulationStore = defineStore('simulation', () => {
   const runSelfCheck = () => {
     selfCheckResults.value.duplicateCheck = detectDuplicates(obstacleRecords.value)
     selfCheckResults.value.coordinateCheck = detectMixedCoordinates(obstacleRecords.value)
+
+    const mixedRecordIds = new Set(
+      selfCheckResults.value.coordinateCheck.details.map(d => d.recordId)
+    )
+    obstacleRecords.value.forEach(record => {
+      const shouldBeMixed = mixedRecordIds.has(record.id)
+      if (record.isMixedCoordinate !== shouldBeMixed) {
+        record.isMixedCoordinate = shouldBeMixed
+      }
+      if (shouldBeMixed && record.processingStatus === 'pending') {
+        record.processingStatus = 'pending_review'
+        record.statusHistory.push({
+          status: 'pending_review',
+          timestamp: new Date().toISOString(),
+          operator: 'system',
+          reason: '坐标混合检测：经纬度和米制坐标混在一起，待巡检组复核'
+        })
+      }
+    })
+
     selfCheckResults.value.recalculateCheck = recalculateAfterSupplement(obstacleRecords.value)
     updateUnifiedResult()
   }
@@ -242,12 +262,19 @@ export const useSimulationStore = defineStore('simulation', () => {
 
 function detectCoordinateType(record) {
   if (!record.coordinate) return 'unknown'
-  const coordStr = String(record.coordinate)
-  if (coordStr.includes(',') || coordStr.includes('°') || /^\d{1,3}\.\d+,\s*\d{1,3}\.\d+$/.test(coordStr)) {
-    return 'latlng'
-  }
-  if (/^\d+(\.\d+)?$/.test(coordStr) || /^[XYZxyz]:/.test(coordStr)) {
-    return 'metric'
-  }
+  const coordStr = String(record.coordinate).trim()
+  
+  const hasExplicitMetric = /[XYZxyz]:/.test(coordStr)
+  
+  const standaloneLatLng = /^-?\d{1,3}(\.\d+)?\s*,\s*-?\d{1,3}(\.\d+)?$/.test(coordStr)
+  const degreePattern = /\d+°/
+  const leadingLatLng = /^\d{1,3}\.\d+\s*,\s*\d{1,3}\.\d+/.test(coordStr)
+  const hasLatLng = standaloneLatLng || degreePattern.test(coordStr) || leadingLatLng
+  
+  if (hasLatLng && hasExplicitMetric) return 'mixed'
+  if (hasLatLng) return 'latlng'
+  if (hasExplicitMetric) return 'metric'
+  if (/^-?\d+(\.\d+)?$/.test(coordStr)) return 'metric'
+  if (coordStr.includes(',') && !hasExplicitMetric) return 'latlng'
   return 'unknown'
 }

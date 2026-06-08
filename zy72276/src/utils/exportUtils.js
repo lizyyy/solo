@@ -203,6 +203,7 @@ function getCoordinateTypeText(type) {
   const typeMap = {
     'latlng': '经纬度',
     'metric': '米制',
+    'mixed': '经纬度+米制混合',
     'unknown': '未知'
   }
   return typeMap[type] || type
