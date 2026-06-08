@@ -120,7 +120,7 @@ return False, f"相似度{similarity:.0%}，留待财务复核确认"
 
 | 规则 | 说明 |
 |------|------|
-| **规则1：可回滚范围** | 所有 `update` 操作均可回滚，`create` 操作可回滚为 `delete` |
+| **规则1：可回滚范围** | 所有 `update`/`create` 操作均可回滚（通过 `rollback --change-id`） |
 | **规则2：回滚命令** | 每次操作自动生成 `rollback_command`，可直接执行回滚 |
 | **规则3：回滚后状态** | 回滚本身也记录为一条 `change_history`（action=rollback），不删除原历史记录 |
 

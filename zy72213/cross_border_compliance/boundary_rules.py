@@ -40,8 +40,8 @@
 回滚规则
 --------
 规则1: 可回滚范围
-  - 所有 update 操作均可回滚
-  - create 操作可回滚为 delete
+  - 所有 update 和 create 操作均可回滚
+  - 通过 rollback --change-id 指定变更记录回滚
 
 规则2: 回滚命令
   - 每次操作生成 rollback_command
@@ -216,10 +216,6 @@ def update_spot_check_field(
     if old_value == new_value:
         return spot_check, "值未变化，无需修改"
 
-    rollback_cmd = _generate_rollback_command(
-        spot_check_id, field_name, old_value
-    )
-
     change = ChangeHistory(
         spot_check_id=spot_check_id,
         field_name=field_name,
@@ -228,9 +224,11 @@ def update_spot_check_field(
         action=ChangeAction.UPDATE,
         changed_by=operator,
         change_reason=change_reason,
-        rollback_command=rollback_cmd
+        rollback_command=None
     )
     db.add(change)
+    db.flush()
+    change.rollback_command = _generate_rollback_command(change.id)
 
     setattr(spot_check, field_name, new_value)
 
@@ -245,18 +243,15 @@ def update_spot_check_field(
     return spot_check, f"已修改 {field_name}: {old_value} -> {new_value}"
 
 
-def _generate_rollback_command(
-    spot_check_id: int,
-    field_name: str,
-    old_value: Any
-) -> str:
-    """生成回滚命令"""
-    value_str = f"'{old_value}'" if isinstance(old_value, str) else str(old_value)
+def _generate_rollback_command(change_history_id: int) -> str:
+    """生成回滚命令，与 cli.py rollback 命令参数一致
+
+    实际CLI: rollback --change-id X --operator OPERATOR
+    """
     return (
         f"python -m cross_border_compliance.cli rollback "
-        f"--spot-check-id {spot_check_id} "
-        f"--field {field_name} "
-        f"--value {value_str}"
+        f"--change-id {change_history_id} "
+        f"--operator OPERATOR"
     )
 
 
@@ -310,7 +305,7 @@ def rollback_change(
 
     current_value = getattr(spot_check, change.field_name, None)
 
-    rollback_change = ChangeHistory(
+    rollback_change_record = ChangeHistory(
         spot_check_id=change.spot_check_id,
         field_name=change.field_name,
         old_value=current_value,
@@ -318,11 +313,13 @@ def rollback_change(
         action=ChangeAction.ROLLBACK,
         changed_by=operator,
         change_reason=f"回滚变更 #{change_history_id}",
-        rollback_command=_generate_rollback_command(
-            change.spot_check_id, change.field_name, current_value
-        )
+        rollback_command=None
     )
-    db.add(rollback_change)
+    db.add(rollback_change_record)
+    db.flush()
+    rollback_change_record.rollback_command = _generate_rollback_command(
+        rollback_change_record.id
+    )
 
     setattr(spot_check, change.field_name, change.old_value)
     db.commit()
@@ -426,10 +423,7 @@ def review_institution_name(
             action=ChangeAction.REVIEW_APPROVE,
             changed_by=reviewer,
             change_reason=reason,
-            rollback_command=_generate_rollback_command(
-                spot_check_id, "institution_name_from_screenshot",
-                spot_check.institution_name_from_screenshot
-            )
+            rollback_command=None
         )
         change_remark = ChangeHistory(
             spot_check_id=spot_check_id,
@@ -439,12 +433,16 @@ def review_institution_name(
             action=ChangeAction.REVIEW_APPROVE,
             changed_by=reviewer,
             change_reason=reason,
-            rollback_command=_generate_rollback_command(
-                spot_check_id, "institution_name_from_remark",
-                spot_check.institution_name_from_remark
-            )
+            rollback_command=None
         )
         db.add_all([change_screenshot, change_remark])
+        db.flush()
+        change_screenshot.rollback_command = _generate_rollback_command(
+            change_screenshot.id
+        )
+        change_remark.rollback_command = _generate_rollback_command(
+            change_remark.id
+        )
 
         spot_check.institution_name_from_screenshot = name_screenshot
         spot_check.institution_name_from_remark = name_remark
@@ -469,11 +467,11 @@ def review_institution_name(
             action=ChangeAction.REVIEW_REJECT,
             changed_by=reviewer,
             change_reason=resolution,
-            rollback_command=_generate_rollback_command(
-                spot_check_id, "status", spot_check.status.value
-            )
+            rollback_command=None
         )
         db.add(change)
+        db.flush()
+        change.rollback_command = _generate_rollback_command(change.id)
 
         spot_check.status = CheckStatus.REJECTED
         spot_check.reviewed_by = reviewer

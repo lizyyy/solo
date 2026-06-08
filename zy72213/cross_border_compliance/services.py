@@ -128,12 +128,11 @@ def import_ex_dividend_screenshots(
             action=ChangeAction.CREATE,
             changed_by=imported_by,
             change_reason="除权日截图导入，创建抽检记录",
-            rollback_command=(
-                f"python -m cross_border_compliance.cli delete "
-                f"--spot-check-id {spot_check.id}"
-            )
+            rollback_command=None
         )
         db.add(change)
+        db.flush()
+        change.rollback_command = _generate_rollback_command(change.id)
 
         spot_check_ids.append(spot_check.id)
         created += 1
@@ -147,7 +146,9 @@ def import_ex_dividend_screenshots(
 
     rerun_cmd = (
         f"python -m cross_border_compliance.cli import-screenshots "
-        f"--source-file '{source_file}' --operator {imported_by}"
+        f"--source-file '{source_file}' "
+        f"--data-file DATA_FILE.json "
+        f"--operator {imported_by}"
     )
 
     audit = AuditLog(
@@ -248,9 +249,7 @@ def add_tax_rate_remark(
         action=ChangeAction.UPDATE,
         changed_by=operator,
         change_reason="补录税费率备注",
-        rollback_command=_generate_rollback_command(
-            spot_check_id, "remark_id", None
-        )
+        rollback_command=None
     )
     change_institution = ChangeHistory(
         spot_check_id=spot_check_id,
@@ -260,9 +259,7 @@ def add_tax_rate_remark(
         action=ChangeAction.UPDATE,
         changed_by=operator,
         change_reason="从税费率备注提取机构名称",
-        rollback_command=_generate_rollback_command(
-            spot_check_id, "institution_name_from_remark", None
-        )
+        rollback_command=None
     )
     change_status = ChangeHistory(
         spot_check_id=spot_check_id,
@@ -272,9 +269,7 @@ def add_tax_rate_remark(
         action=ChangeAction.UPDATE,
         changed_by=operator,
         change_reason=status_reason,
-        rollback_command=_generate_rollback_command(
-            spot_check_id, "status", old_status
-        )
+        rollback_command=None
     )
     change_consistent = ChangeHistory(
         spot_check_id=spot_check_id,
@@ -284,11 +279,14 @@ def add_tax_rate_remark(
         action=ChangeAction.UPDATE,
         changed_by=operator,
         change_reason=hint,
-        rollback_command=_generate_rollback_command(
-            spot_check_id, "institution_name_consistent", None
-        )
+        rollback_command=None
     )
     db.add_all([change_remark_id, change_institution, change_status, change_consistent])
+    db.flush()
+    change_remark_id.rollback_command = _generate_rollback_command(change_remark_id.id)
+    change_institution.rollback_command = _generate_rollback_command(change_institution.id)
+    change_status.rollback_command = _generate_rollback_command(change_status.id)
+    change_consistent.rollback_command = _generate_rollback_command(change_consistent.id)
 
     db.commit()
     db.refresh(spot_check)
@@ -378,11 +376,11 @@ def update_spot_check_record(
                 action=ChangeAction.UPDATE,
                 changed_by=operator,
                 change_reason=change_reason,
-                rollback_command=_generate_rollback_command(
-                    spot_check_id, field_name, old_value
-                )
+                rollback_command=None
             )
             db.add(change)
+            db.flush()
+            change.rollback_command = _generate_rollback_command(change.id)
 
             setattr(spot_check, field_name, new_value)
             changes_made.append(f"{field_name}: {old_value} -> {new_value}")
@@ -402,11 +400,11 @@ def update_spot_check_record(
             action=ChangeAction.UPDATE,
             changed_by=operator,
             change_reason="补录完成，流程结束",
-            rollback_command=_generate_rollback_command(
-                spot_check_id, "status", old_status
-            )
+            rollback_command=None
         )
         db.add(change_status)
+        db.flush()
+        change_status.rollback_command = _generate_rollback_command(change_status.id)
         changes_made.append(f"status: {old_status} -> completed")
 
     db.commit()
@@ -414,11 +412,11 @@ def update_spot_check_record(
 
     summary = f"已更新抽检记录: {'; '.join(changes_made)}"
 
-    params_str = json.dumps(update_data, ensure_ascii=False)
+    check_result_val = update_data.get("check_result", "")
     rerun_cmd = (
         f"python -m cross_border_compliance.cli update-record "
         f"--spot-check-id {spot_check_id} "
-        f"--update-data '{params_str}' "
+        f"--check-result '{check_result_val}' "
         f"--operator {operator}"
     )
 

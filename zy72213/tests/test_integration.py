@@ -347,6 +347,43 @@ class TestChangeHistory:
         ]
         assert len(rollback_changes) == 1
 
+    def test_rollback_command_matches_real_cli(self, db_session):
+        """测试自动生成的回滚命令与真实CLI参数一致"""
+        screenshots_data = [
+            {
+                "institution_name": "摩根大通银行",
+                "ex_dividend_date": "2026-06-15",
+                "dividend_amount": "0.25",
+                "currency": "USD"
+            }
+        ]
+        result = import_ex_dividend_screenshots(
+            db_session, screenshots_data, "/data/test.png", "assistant_zhou"
+        )
+        spot_check_id = result["spot_check_ids"][0]
+
+        spot_check, msg = update_spot_check_field(
+            db_session, spot_check_id,
+            field_name="institution_name_from_screenshot",
+            new_value="摩根大通",
+            operator="assistant_zhou",
+            change_reason="测试修改"
+        )
+
+        history = get_change_history_diff(db_session, spot_check_id)
+        update_changes = [
+            c for c in history["changes"]
+            if c["action"] == "update" and c["field"] == "institution_name_from_screenshot"
+        ]
+        assert len(update_changes) >= 1
+        cmd = update_changes[-1]["rollback_command"]
+        assert "rollback" in cmd
+        assert "--change-id" in cmd
+        assert "--operator" in cmd
+        assert "--spot-check-id" not in cmd
+        assert "--field" not in cmd
+        assert "--value" not in cmd
+
 
 class TestBoundaryRules:
     """测试边界规则"""
@@ -483,6 +520,55 @@ class TestAuditAndRerun:
             assert "command" in cmd
             assert "description" in cmd
             assert "step" in cmd
+
+    def test_rerun_command_format_matches_cli(self, db_session):
+        """测试审计日志中的重跑命令与真实CLI参数一致"""
+        screenshots_data = [
+            {
+                "institution_name": "摩根大通银行",
+                "ex_dividend_date": "2026-06-15",
+                "dividend_amount": "0.25",
+                "currency": "USD"
+            }
+        ]
+        result = import_ex_dividend_screenshots(
+            db_session, screenshots_data, "/data/test.png", "assistant_zhou"
+        )
+        spot_check_id = result["spot_check_ids"][0]
+
+        remark_data = {
+            "institution_name": "摩根大通银行",
+            "remark_content": "跨境汇款税率10%",
+            "tax_rate": "10%"
+        }
+        add_tax_rate_remark(db_session, spot_check_id, remark_data, "assistant_zhou")
+
+        update_data = {"check_result": "合规"}
+        update_spot_check_record(
+            db_session, spot_check_id, update_data, "assistant_zhou"
+        )
+
+        audit_logs = db_session.query(AuditLog).order_by(AuditLog.created_at.asc()).all()
+
+        import_log = next(l for l in audit_logs if l.operation == "import_ex_dividend_screenshots")
+        assert "import-screenshots" in import_log.rerun_command
+        assert "--source-file" in import_log.rerun_command
+        assert "--data-file" in import_log.rerun_command
+        assert "--operator" in import_log.rerun_command
+
+        remark_log = next(l for l in audit_logs if l.operation == "add_tax_rate_remark")
+        assert "add-remark" in remark_log.rerun_command
+        assert "--spot-check-id" in remark_log.rerun_command
+        assert "--institution-name" in remark_log.rerun_command
+        assert "--remark-content" in remark_log.rerun_command
+        assert "--operator" in remark_log.rerun_command
+
+        update_log = next(l for l in audit_logs if l.operation == "update_spot_check_record")
+        assert "update-record" in update_log.rerun_command
+        assert "--spot-check-id" in update_log.rerun_command
+        assert "--check-result" in update_log.rerun_command
+        assert "--operator" in update_log.rerun_command
+        assert "--update-data" not in update_log.rerun_command
 
 
 class TestSpotCheckDetail:
