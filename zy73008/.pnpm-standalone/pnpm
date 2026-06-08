@@ -1,0 +1,2 @@
+#!/bin/sh
+exec "/Applications/Codex.app/Contents/Resources/node" "/Users/maca/pro/solo/workspaces/zy73008/.pnpm-standalone/package/bin/pnpm.cjs" "$@"
