@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import Optional, List, Dict
 from dataclasses import asdict
 
-from .models import PaymentRecord, ReviewStatus, IssueType
+from .models import PaymentRecord, ReviewStatus, IssueType, AuditEvent
 from . import config
 
 class ReviewManager:
@@ -49,6 +49,9 @@ class ReviewManager:
         issues_values = data.pop('issues', [])
         issues = [IssueType(v) for v in issues_values]
         
+        audit_data = data.pop('audit_trail', [])
+        audit_trail = [AuditEvent(**e) for e in audit_data]
+        
         created_at = data.pop('created_at')
         updated_at = data.pop('updated_at')
         
@@ -57,6 +60,7 @@ class ReviewManager:
             balance_change=balance_change,
             status=status,
             issues=issues,
+            audit_trail=audit_trail,
             **data
         )
         record.created_at = datetime.fromisoformat(created_at) if isinstance(created_at, str) else created_at
@@ -92,18 +96,22 @@ class ReviewManager:
         shutil.copy2(src_path, dest_path)
         record.xr_screenshot_path = str(dest_path)
 
-        self._update_balance_after_xr(record)
+        record.balance_change.has_xr_screenshot = True
+        if IssueType.MISSING_XR_SCREENSHOT in record.issues:
+            record.issues.remove(IssueType.MISSING_XR_SCREENSHOT)
+
+        self._recalculate_balance_info(record)
+        record.add_audit_event(
+            "上传除权日截图",
+            "基金会计林姐",
+            f"状态→{record.status.value}"
+        )
         self._save_records()
         return True
 
-    def _update_balance_after_xr(self, record: PaymentRecord) -> None:
+    def _recalculate_balance_info(self, record: PaymentRecord) -> None:
         if not record.balance_change:
             return
-
-        record.balance_change.has_xr_screenshot = True
-
-        if IssueType.MISSING_XR_SCREENSHOT in record.issues:
-            record.issues.remove(IssueType.MISSING_XR_SCREENSHOT)
 
         reasons = []
         missing = []
@@ -114,15 +122,24 @@ class ReviewManager:
             missing.append("审批人身份证明/签章")
             next_step = "联系客户经理"
 
+        if IssueType.MISSING_XR_SCREENSHOT in record.issues:
+            reasons.append("缺少除权日截图")
+            missing.append("除权日交易截图")
+            if not next_step:
+                next_step = "联系基金会计林姐"
+
         if IssueType.AMOUNT_MISMATCH in record.issues:
             reasons.append("余额计算口径有误")
             missing.append("正确余额计算表")
-            next_step = "联系基金会计林姐"
+            if not next_step:
+                next_step = "联系基金会计林姐"
 
         if reasons:
             record.balance_change.reason = "；".join(reasons)
+        elif record.balance_change.has_xr_screenshot:
+            record.balance_change.reason = "基金会计林姐已补看除权日截图，余额已确认"
         else:
-            record.balance_change.reason = "除权日截图已补录，余额已确认"
+            record.balance_change.reason = ""
 
         record.balance_change.missing_materials = missing
         record.balance_change.next_step = next_step
@@ -131,6 +148,8 @@ class ReviewManager:
             record.status = ReviewStatus.COMPLETED
         elif IssueType.PINYIN_APPROVER in record.issues:
             record.status = ReviewStatus.MANAGER_REVIEW
+        elif IssueType.MISSING_XR_SCREENSHOT in record.issues:
+            record.status = ReviewStatus.SUPPLEMENTING
         else:
             record.status = ReviewStatus.SUPPLEMENTING
 
@@ -146,11 +165,16 @@ class ReviewManager:
         if IssueType.AMOUNT_MISMATCH in record.issues:
             record.issues.remove(IssueType.AMOUNT_MISMATCH)
 
-        expected = record.balance_change.before_amount + record.balance_change.change_amount
+        expected = record.balance_change.before_amount - record.balance_change.change_amount
         if abs(expected - new_after_amount) > 0.01:
             record.issues.append(IssueType.AMOUNT_MISMATCH)
 
-        self._update_balance_after_xr(record)
+        self._recalculate_balance_info(record)
+        record.add_audit_event(
+            "人工修正余额",
+            "基金会计林姐",
+            f"{old_amount:.2f} → {new_after_amount:.2f}，状态→{record.status.value}"
+        )
         self._save_records()
         return True
 
@@ -166,7 +190,12 @@ class ReviewManager:
         if IssueType.PINYIN_APPROVER in record.issues:
             record.issues.remove(IssueType.PINYIN_APPROVER)
 
-        self._update_balance_after_xr(record)
+        self._recalculate_balance_info(record)
+        record.add_audit_event(
+            "确认审批人",
+            "客户经理",
+            f"{record.approver.name} → {full_name}，状态→{record.status.value}"
+        )
         self._save_records()
         return True
 
@@ -178,6 +207,11 @@ class ReviewManager:
         record.mark_rerun()
         record.status = ReviewStatus.PENDING_REVIEW
         record.notes = f"第{record.rerun_count}次重跑: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+        record.add_audit_event(
+            "系统重跑",
+            "系统",
+            f"第{record.rerun_count}次重跑"
+        )
         self._save_records()
         return True
 

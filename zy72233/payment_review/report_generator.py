@@ -62,6 +62,16 @@ class ReportGenerator:
             lines.append(f"  {'✅' if bc.has_xr_screenshot else '❌'} 除权日截图: {'已上传' if bc.has_xr_screenshot else '待补录'}")
             lines.append("")
 
+        if record.audit_trail:
+            lines.append("-" * 60)
+            lines.append("【操作时间线】")
+            lines.append("-" * 60)
+            for event in record.audit_trail:
+                lines.append(f"  {event.timestamp}  {event.actor}  {event.action}")
+                if event.detail:
+                    lines.append(f"    ↳ {event.detail}")
+            lines.append("")
+
         if record.corrections:
             lines.append("-" * 60)
             lines.append(f"【修正记录】(共{len(record.corrections)}次)")

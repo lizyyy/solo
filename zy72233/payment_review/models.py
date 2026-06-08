@@ -40,6 +40,13 @@ class BalanceChange:
     has_xr_screenshot: bool = False
 
 @dataclass
+class AuditEvent:
+    timestamp: str
+    action: str
+    actor: str
+    detail: str = ""
+
+@dataclass
 class PaymentRecord:
     id: str
     payment_date: str
@@ -56,6 +63,7 @@ class PaymentRecord:
     created_at: datetime = field(default_factory=datetime.now)
     updated_at: datetime = field(default_factory=datetime.now)
     notes: str = ""
+    audit_trail: List[AuditEvent] = field(default_factory=list)
 
     def update_status(self, new_status: ReviewStatus):
         self.status = new_status
@@ -67,4 +75,14 @@ class PaymentRecord:
 
     def mark_rerun(self):
         self.rerun_count += 1
+        self.updated_at = datetime.now()
+
+    def add_audit_event(self, action: str, actor: str, detail: str = ""):
+        event = AuditEvent(
+            timestamp=datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            action=action,
+            actor=actor,
+            detail=detail
+        )
+        self.audit_trail.append(event)
         self.updated_at = datetime.now()

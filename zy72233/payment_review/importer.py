@@ -108,6 +108,13 @@ class CustodianImporter:
         self._detect_issues(record)
         self._update_balance_info(record)
 
+        issue_names = [i.value for i in record.issues]
+        record.add_audit_event(
+            "导入托管确认页",
+            "系统",
+            f"问题: {', '.join(issue_names)}" if issue_names else "无问题"
+        )
+
         return record
 
     def _detect_issues(self, record: PaymentRecord) -> None:
@@ -118,7 +125,7 @@ class CustodianImporter:
             record.issues.append(IssueType.MISSING_XR_SCREENSHOT)
         
         if record.balance_change:
-            expected = record.balance_change.before_amount + record.balance_change.change_amount
+            expected = record.balance_change.before_amount - record.balance_change.change_amount
             if abs(expected - record.balance_change.after_amount) > 0.01:
                 record.issues.append(IssueType.AMOUNT_MISMATCH)
 
@@ -144,7 +151,8 @@ class CustodianImporter:
         if IssueType.AMOUNT_MISMATCH in record.issues:
             reasons.append("余额计算口径有误")
             missing.append("正确余额计算表")
-            next_step = "联系基金会计林姐"
+            if not next_step:
+                next_step = "联系基金会计林姐"
 
         if reasons:
             record.balance_change.reason = "；".join(reasons)

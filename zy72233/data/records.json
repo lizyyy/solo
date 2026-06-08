@@ -1,79 +1,5 @@
 [
   {
-    "id": "PAY20260601001",
-    "payment_date": "2026-06-01",
-    "amount": 500000.0,
-    "currency": "CNY",
-    "payee": "XX证券股份有限公司",
-    "approver": {
-      "name": "wang jing li",
-      "is_pinyin": false,
-      "full_name": "王经理"
-    },
-    "balance_change": {
-      "date": "2026-06-01",
-      "before_amount": 12500000.0,
-      "change_amount": 500000.0,
-      "after_amount": 12000000.0,
-      "reason": "余额计算口径有误",
-      "missing_materials": [
-        "正确余额计算表"
-      ],
-      "next_step": "联系基金会计林姐",
-      "has_xr_screenshot": true
-    },
-    "status": "补录中",
-    "issues": [
-      "金额不匹配"
-    ],
-    "xr_screenshot_path": "/Users/lzy/pro/solo/workspaces/zy72233/data/uploads/PAY20260601001_xr_20260603084953.txt",
-    "corrections": [
-      "确认审批人: wang jing li → 王经理"
-    ],
-    "rerun_count": 0,
-    "created_at": "2026-06-03 08:49:53.179892",
-    "updated_at": "2026-06-03 08:50:16.342459",
-    "notes": "托管行确认页 - 第1笔"
-  },
-  {
-    "id": "PAY20260601002",
-    "payment_date": "2026-06-01",
-    "amount": 280000.0,
-    "currency": "CNY",
-    "payee": "YY基金管理有限公司",
-    "approver": {
-      "name": "zhang san",
-      "is_pinyin": true,
-      "full_name": "张三"
-    },
-    "balance_change": {
-      "date": "2026-06-01",
-      "before_amount": 8300000.0,
-      "change_amount": 280000.0,
-      "after_amount": 8020000.0,
-      "reason": "审批人仅留拼音，需确认身份；余额计算口径有误",
-      "missing_materials": [
-        "审批人身份证明/签章",
-        "正确余额计算表"
-      ],
-      "next_step": "联系基金会计林姐",
-      "has_xr_screenshot": true
-    },
-    "status": "客户经理复核",
-    "issues": [
-      "审批人拼音",
-      "金额不匹配"
-    ],
-    "xr_screenshot_path": null,
-    "corrections": [
-      "修正余额: 8000000.00 → 8020000.00"
-    ],
-    "rerun_count": 0,
-    "created_at": "2026-06-03 08:49:53.180458",
-    "updated_at": "2026-06-03 08:49:53.183425",
-    "notes": "托管行确认页 - 第2笔（余额口径有误）"
-  },
-  {
     "id": "PAY20260601003",
     "payment_date": "2026-06-01",
     "amount": 1200000.0,
@@ -89,24 +15,32 @@
       "before_amount": 5200000.0,
       "change_amount": 1200000.0,
       "after_amount": 4000000.0,
-      "reason": "缺少除权日截图；余额计算口径有误",
-      "missing_materials": [
-        "除权日交易截图",
-        "正确余额计算表"
-      ],
-      "next_step": "联系基金会计林姐",
-      "has_xr_screenshot": false
+      "reason": "基金会计林姐已补看除权日截图，余额已确认",
+      "missing_materials": [],
+      "next_step": null,
+      "has_xr_screenshot": true
     },
-    "status": "待复核",
-    "issues": [
-      "缺少除权日截图",
-      "金额不匹配"
-    ],
-    "xr_screenshot_path": null,
+    "status": "已完成",
+    "issues": [],
+    "xr_screenshot_path": "/Users/lzy/pro/solo/workspaces/zy72233/data/uploads/PAY20260601003_xr_20260608201703.txt",
     "corrections": [],
-    "rerun_count": 1,
-    "created_at": "2026-06-03 08:49:53.181022",
-    "updated_at": "2026-06-03 08:49:53.183920",
-    "notes": "第1次重跑: 2026-06-03 08:49:53"
+    "rerun_count": 0,
+    "created_at": "2026-06-08 20:17:03.567112",
+    "updated_at": "2026-06-08 20:17:03.644600",
+    "notes": "托管行确认页 - 第3笔（审批人正常）",
+    "audit_trail": [
+      {
+        "timestamp": "2026-06-08 20:17:03",
+        "action": "导入托管确认页",
+        "actor": "系统",
+        "detail": "问题: 缺少除权日截图"
+      },
+      {
+        "timestamp": "2026-06-08 20:17:03",
+        "action": "上传除权日截图",
+        "actor": "基金会计林姐",
+        "detail": "状态→已完成"
+      }
+    ]
   }
 ]
