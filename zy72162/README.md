@@ -1,57 +1,139 @@
-# React + TypeScript + Vite
+# 垃圾分类投放热力
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+垃圾分类投放点位数据校对与公示管理工具。纯前端运行，所有数据存储在浏览器本地 IndexedDB，无需后端服务。
 
-Currently, two official plugins are available:
+## 安装与启动
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+```bash
+# 安装依赖
+npm install
 
-## Expanding the ESLint configuration
+# 开发模式启动
+npm run dev
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+# 生产构建
+npm run build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+启动后浏览器打开终端输出的地址（默认 http://localhost:5173/）。
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 首次使用：载入示例数据
 
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+首次打开页面时，系统会自动载入 8 个示例点位（望京街道、东湖街道、酒仙桥街道各若干），包含 21 条多源数据和 10 条操作日志。示例数据刻意制造了名称不一致和坐标冲突，可用来测试归并和复核功能。
+
+如果清空了数据，点击左侧导航栏底部「重置示例数据」按钮可重新载入。
+
+## 核心流程
+
+### 1. 导入点位数据
+
+1. 点击左侧「数据导入」进入导入页
+2. 选择来源类型：GIS点位 / 居民反馈 / 巡检照片 / 街道备注
+3. 拖拽或点击上传文件
+
+**支持的格式：**
+
+| 来源类型 | 支持格式 |
+|---------|---------|
+| GIS点位 | CSV、GeoJSON、JSON |
+| 居民反馈 | CSV、Excel(.xlsx/.xls) |
+| 巡检照片 | JPG、PNG（支持批量） |
+| 街道备注 | CSV、Excel、TXT |
+
+**字段映射（脏数据导入）：**
+
+- 如果文件表头是标准名（如"名称""纬度""经度""地址""街道"），系统自动识别并映射
+- 如果表头不在内置候选列表中（如"投放点""X坐标""Y坐标"），系统会标记为「待映射」并展示字段映射界面
+- 将左侧文件列名映射到右侧系统字段，**点位名称为必填项**
+- 映射完成后点击「确认映射并预览」查看解析结果
+- 已映射的文件可点击「修改映射」重新调整
+
+### 2. 智能归并
+
+导入的数据自动进入归并引擎：
+
+- **名称相似度**：基于 Levenshtein 编辑距离计算，标准化后比较（中文数字→阿拉伯数字，同义词替换，去除通用后缀）
+- **地理距离**：基于 Haversine 公式计算，距离超过 200 米禁止归并
+- **置信度分级**：
+  - ≥0.9：自动归并
+  - 0.7~0.9：进入人工复核
+  - <0.7：作为独立点位
+
+### 3. 人工复核
+
+1. 点击左侧「人工复核」进入复核页（待处理数量显示在导航上）
+2. 左侧展示 GIS 标准数据，右侧展示待复核来源数据
+3. 系统自动检测冲突并高亮显示差异关键词
+4. 根据置信度和冲突情况，选择操作：
+   - **确认归并**：确认该来源属于当前点位
+   - **作为新点位**：判定为独立点位
+   - **拆分为独立点位**：从当前点位拆出
+   - **驳回归并**：否决归并建议
+5. 所有操作需填写复核理由，记入操作日志
+
+### 4. 补充巡检照片
+
+1. 点击「数据导入」→「巡检照片」
+2. 批量上传 JPG/PNG 照片
+3. 照片以文件名作为点位名称，系统自动匹配已有点位
+4. 若坐标或名称有冲突，进入人工复核
+
+### 5. 导出公示清单
+
+1. 点击左侧「公示导出」
+2. 设置筛选条件：街道、状态、日期范围
+3. 选择导出字段（标准名称、地址、坐标、来源类型等）
+4. 选择导出格式：
+   - **Excel (.xlsx)**：适合二次编辑
+   - **PDF**：适合直接公示，可加水印
+5. 点击「导出」下载文件
+
+### 6. 查看操作日志
+
+点击左侧「操作日志」可查看所有操作的完整时间线，包括：
+- 操作类型（导入/归并/拆分/确认/驳回/导出）
+- 操作人、时间、详情
+- 证据引用（如"名称相似度：0.92，距离：12米"）
+
+## 数据追溯
+
+每条点位数据保留：
+- 所有来源数据的原始内容（GIS/居民反馈/巡检照片/街道备注）
+- 导入时间和操作人
+- 归并/拆分/确认/驳回的完整操作记录
+- 复核理由
+
+交接时可直接在操作日志中查询任意判定依据。
+
+## 项目结构
+
 ```
+src/
+├── pages/           # 页面组件
+│   ├── PointsPage.tsx      # 点位管理（列表+地图）
+│   ├── ImportPage.tsx      # 数据导入
+│   ├── ReviewPage.tsx      # 人工复核
+│   ├── ExportPage.tsx      # 公示导出
+│   ├── LogsPage.tsx        # 操作日志
+│   └── HelpPage.tsx        # 使用说明
+├── components/      # 通用组件
+├── utils/
+│   ├── mergeEngine.ts      # 智能归并引擎
+│   ├── importExport.ts     # 导入导出工具
+│   ├── geoUtils.ts         # 地理计算
+│   └── stringUtils.ts      # 字符串处理
+├── store/           # Zustand 状态管理
+├── db/              # IndexedDB 数据库（Dexie.js）
+├── types/           # TypeScript 类型定义
+└── data/            # Mock 示例数据
+```
+
+## 技术栈
+
+- React 18 + TypeScript + Vite 5
+- TailwindCSS 3（政务蓝主色调）
+- Zustand 状态管理
+- Dexie.js + IndexedDB 本地存储
+- Leaflet + react-leaflet 地图
+- PapaParse (CSV)、SheetJS/xlsx (Excel)、jsPDF (PDF)
+- fast-levenshtein 编辑距离、@turf/turf 地理计算

@@ -13,84 +13,99 @@ export interface ImportResult {
   warnings: string[];
 }
 
-export async function parseCSVFile(file: File, sourceType: SourceType): Promise<ImportResult> {
-  return new Promise((resolve) => {
-    const result: ImportResult = {
-      success: true,
-      data: [],
-      errors: [],
-      warnings: [],
-    };
+export interface RawPreview {
+  headers: string[];
+  rows: Record<string, any>[];
+  totalRows: number;
+}
 
+export async function extractRawCSV(file: File): Promise<RawPreview> {
+  return new Promise((resolve, reject) => {
     Papa.parse(file, {
       header: true,
       skipEmptyLines: true,
       complete: (results) => {
         const rows = results.data as Record<string, any>[];
-        
-        rows.forEach((row, index) => {
-          try {
-            const sourceData = parseRowToSourceData(row, sourceType, index + 2);
-            if (sourceData) {
-              result.data.push(sourceData);
-            }
-          } catch (error: any) {
-            result.errors.push(`第 ${index + 2} 行: ${error.message}`);
-          }
-        });
-
-        if (result.data.length === 0 && result.errors.length === 0) {
-          result.errors.push('未解析到有效数据');
-          result.success = false;
-        }
-
-        resolve(result);
+        const headers = rows.length > 0 ? Object.keys(rows[0]) : [];
+        resolve({ headers, rows, totalRows: rows.length });
       },
       error: (error) => {
-        result.errors.push(`解析错误: ${error.message}`);
-        result.success = false;
-        resolve(result);
+        reject(new Error(`CSV解析失败: ${error.message}`));
       },
     });
   });
 }
 
-export async function parseExcelFile(file: File, sourceType: SourceType): Promise<ImportResult> {
-  const result: ImportResult = {
-    success: true,
-    data: [],
-    errors: [],
-    warnings: [],
-  };
+export async function extractRawExcel(file: File): Promise<RawPreview> {
+  const buffer = await file.arrayBuffer();
+  const workbook = XLSX.read(buffer);
+  const sheetName = workbook.SheetNames[0];
+  const worksheet = workbook.Sheets[sheetName];
+  const rows = XLSX.utils.sheet_to_json(worksheet) as Record<string, any>[];
+  const headers = rows.length > 0 ? Object.keys(rows[0]) : [];
+  return { headers, rows, totalRows: rows.length };
+}
 
-  try {
-    const buffer = await file.arrayBuffer();
-    const workbook = XLSX.read(buffer);
-    const sheetName = workbook.SheetNames[0];
-    const worksheet = workbook.Sheets[sheetName];
-    const rows = XLSX.utils.sheet_to_json(worksheet) as Record<string, any>[];
+export function applyMappingAndParse(
+  rawRows: Record<string, any>[],
+  mapping: Record<string, string>,
+  sourceType: SourceType
+): ImportResult {
+  const result: ImportResult = { success: true, data: [], errors: [], warnings: [] };
 
-    rows.forEach((row, index) => {
-      try {
-        const sourceData = parseRowToSourceData(row, sourceType, index + 2);
-        if (sourceData) {
-          result.data.push(sourceData);
+  rawRows.forEach((rawRow, index) => {
+    try {
+      const remappedRow: Record<string, any> = {};
+      Object.entries(rawRow).forEach(([key, value]) => {
+        if (mapping[key]) {
+          remappedRow[mapping[key]] = value;
+        } else {
+          remappedRow[key] = value;
         }
-      } catch (error: any) {
-        result.errors.push(`第 ${index + 2} 行: ${error.message}`);
-      }
-    });
+      });
 
-    if (result.data.length === 0 && result.errors.length === 0) {
-      result.errors.push('未解析到有效数据');
-      result.success = false;
+      const sourceData = parseRowToSourceData(remappedRow, sourceType, index + 2);
+      if (sourceData) {
+        result.data.push(sourceData);
+      }
+    } catch (error: any) {
+      result.errors.push(`第 ${index + 2} 行: ${error.message}`);
     }
-  } catch (error: any) {
-    result.errors.push(`解析错误: ${error.message}`);
+  });
+
+  if (result.data.length === 0 && result.errors.length > 0) {
     result.success = false;
+    result.warnings.push(
+      '所有行解析失败，请检查字段映射是否正确。'
+      + '提示：名称字段为必填项，请确保至少一列映射到"点位名称"。'
+    );
   }
 
   return result;
+}
+
+export async function parseCSVFile(file: File, sourceType: SourceType, mapping?: Record<string, string>): Promise<ImportResult> {
+  try {
+    const preview = await extractRawCSV(file);
+    if (mapping && Object.keys(mapping).length > 0) {
+      return applyMappingAndParse(preview.rows, mapping, sourceType);
+    }
+    return applyMappingAndParse(preview.rows, {}, sourceType);
+  } catch (error: any) {
+    return { success: false, data: [], errors: [`解析错误: ${error.message}`], warnings: [] };
+  }
+}
+
+export async function parseExcelFile(file: File, sourceType: SourceType, mapping?: Record<string, string>): Promise<ImportResult> {
+  try {
+    const preview = await extractRawExcel(file);
+    if (mapping && Object.keys(mapping).length > 0) {
+      return applyMappingAndParse(preview.rows, mapping, sourceType);
+    }
+    return applyMappingAndParse(preview.rows, {}, sourceType);
+  } catch (error: any) {
+    return { success: false, data: [], errors: [`解析错误: ${error.message}`], warnings: [] };
+  }
 }
 
 export async function parseGeoJSONFile(file: File, sourceType: SourceType): Promise<ImportResult> {
@@ -181,9 +196,19 @@ function parseRowToSourceData(row: Record<string, any>, sourceType: SourceType, 
   const addressField = findField(row, ['address', '地址', '位置', '详细地址']);
   const streetField = findField(row, ['street', '街道', '所属街道', '街道办事处']);
 
+  if (!nameField) {
+    const availableKeys = Object.keys(row).filter(k => row[k] !== undefined && row[k] !== null && String(row[k]).trim() !== '');
+    throw new Error(
+      '未找到名称字段。'
+      + (availableKeys.length > 0
+        ? `请将以下字段之一映射到"点位名称"：${availableKeys.join('、')}`
+        : '该行所有字段为空')
+    );
+  }
+
   const name = row[nameField] as string;
   if (!name || String(name).trim() === '') {
-    throw new Error('名称字段为空');
+    throw new Error(`字段"${nameField}"的值为空`);
   }
 
   let lat: number | undefined;
