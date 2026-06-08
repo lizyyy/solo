@@ -136,6 +136,17 @@ export interface AppState {
   showHistoryDiff: boolean;
   compareVersionFrom: number | null;
   compareVersionTo: number | null;
+  lastImportStats?: {
+    importedCount: number;
+    duplicateCount: number;
+    skippedCount: number;
+    timestamp: number;
+  };
+  flowMessage?: {
+    text: string;
+    type: 'success' | 'info' | 'warning' | 'error';
+    timestamp: number;
+  };
 }
 
 export type AppAction =
@@ -159,4 +170,14 @@ export type AppAction =
   | { type: 'APPROVE_RECORD'; payload: { recordId: string; reviewer: Stakeholder; comment?: string } }
   | { type: 'REJECT_RECORD'; payload: { recordId: string; reviewer: Stakeholder; comment?: string } }
   | { type: 'UPDATE_CLASSROOM_NOTE'; payload: { resultId: string; note: string } }
-  | { type: 'MARK_DEMO_UPDATED'; payload: { resultId: string } };
+  | { type: 'MARK_DEMO_UPDATED'; payload: { resultId: string } }
+  | { type: 'RESET_ALL_DATA' }
+  | { type: 'SET_IMPORT_STATS'; payload: { importedCount: number; duplicateCount: number; skippedCount: number } }
+  | { type: 'SET_FLOW_MESSAGE'; payload: { text: string; type: 'success' | 'info' | 'warning' | 'error' } | null }
+  | { type: 'RECALCULATE_EXPLANATIONS' }
+  | { type: 'RUN_COMPARISON' }
+  | { type: 'FLOW_STEP4_ADD_COUNTEREXAMPLE' }
+  | { type: 'FLOW_STEP5_UPDATE_REMARK' }
+  | { type: 'FLOW_STEP6_APPROVE_ALL' }
+  | { type: 'FLOW_STEP7_SYNC_NOTES' }
+  | { type: 'REMOVE_COMPARISON_RESULTS_BY_RECORD'; payload: string };

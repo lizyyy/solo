@@ -15,6 +15,76 @@ import { formatPathDescription } from './graphAlgorithms';
 
 export { formatPathDescription };
 
+export interface RawImportItem {
+  sourceNode: string;
+  targetNode: string;
+  numerator: number;
+  denominator: number | string | null;
+  edgeWeight: number;
+  remark?: string;
+}
+
+export function buildRecordsFromRawData(
+  rawItems: RawImportItem[],
+  parameterVersionRef: string = 'v1.1.0'
+): ParameterRecord[] {
+  const batchId = uuidv4();
+  const now = Date.now();
+  return rawItems.map((item, idx) => {
+    const denVal =
+      item.denominator === null ||
+      item.denominator === undefined ||
+      (typeof item.denominator === 'string' && item.denominator.trim() === '')
+        ? 0
+        : Number(item.denominator);
+    const isZero = isNaN(denVal) || denVal === 0;
+    const id = uuidv4();
+    const record: ParameterRecord = {
+      id,
+      batchId,
+      importTimestamp: now + idx * 1000,
+      importHash: '',
+      sourceNode: item.sourceNode,
+      targetNode: item.targetNode,
+      numerator: Number(item.numerator) || 0,
+      denominator: isZero ? 0 : denVal,
+      denominatorDisplayEmpty: isZero,
+      edgeWeight: Number(item.edgeWeight) || 0,
+      remark: item.remark || '',
+      status: isZero ? 'zero_denominator' : 'needs_review',
+      reviewStatus: 'pending',
+      assignedTo: isZero ? 'data_reviewer' : 'alan',
+      versions: [],
+      currentVersion: 1,
+      parameterVersionRef,
+    };
+    const initialV1Changes = {
+      remark: record.remark,
+      denominator: record.denominator,
+      denominatorDisplayEmpty: record.denominatorDisplayEmpty,
+      status: record.status,
+      reviewStatus: record.reviewStatus,
+      assignedTo: record.assignedTo,
+      manualCounterexample: record.manualCounterexample,
+      counterexampleProvider: record.counterexampleProvider,
+      counterexampleTimestamp: record.counterexampleTimestamp,
+      numerator: record.numerator,
+      edgeWeight: record.edgeWeight,
+    };
+    record.versions = [
+      {
+        version: 1,
+        timestamp: now + idx * 1000,
+        author: 'system',
+        changes: initialV1Changes,
+        changeDescription: '首次导入',
+      },
+    ];
+    record.importHash = generateImportHash(record);
+    return record;
+  });
+}
+
 export function generateImportHash(record: Partial<ParameterRecord>): string {
   const key = `${record.sourceNode}-${record.targetNode}-${record.numerator}-${record.denominator}-${record.edgeWeight}`;
   let hash = 0;
@@ -73,27 +143,46 @@ export function computeHistoryDiff(
   
   if (fromVersion >= toVersion) return diffs;
   if (fromVersion < 1 || toVersion > record.currentVersion) return diffs;
-  
-  let baseRecord: Partial<ParameterRecord> = {};
-  for (let v = 1; v <= fromVersion; v++) {
-    const versionData = record.versions.find(vd => vd.version === v);
-    if (versionData) {
-      baseRecord = { ...baseRecord, ...versionData.changes };
+
+  const trackedFields: (keyof ParameterRecord)[] = [
+    'remark',
+    'denominator',
+    'denominatorDisplayEmpty',
+    'status',
+    'reviewStatus',
+    'assignedTo',
+    'manualCounterexample',
+    'counterexampleProvider',
+    'counterexampleTimestamp',
+    'numerator',
+    'edgeWeight',
+  ];
+
+  function reconstructAtVersion(targetVersion: number): Partial<ParameterRecord> {
+    const snap: Partial<ParameterRecord> = {};
+    for (let v = 1; v <= targetVersion; v++) {
+      const vd = record.versions.find(x => x.version === v);
+      if (vd) {
+        Object.assign(snap, vd.changes);
+      }
     }
+    return snap;
   }
-  
-  let currentRecord = { ...baseRecord };
-  
+
+  const fromSnap = reconstructAtVersion(fromVersion);
+  let currentSnap = { ...fromSnap };
+
   for (let v = fromVersion + 1; v <= toVersion; v++) {
     const versionData = record.versions.find(vd => vd.version === v);
     if (versionData) {
-      Object.keys(versionData.changes).forEach(key => {
-        const fieldKey = key as keyof ParameterRecord;
-        const oldVal = currentRecord[fieldKey];
-        const newVal = versionData.changes[fieldKey];
+      const beforeSnap = currentSnap;
+      const afterSnap = { ...currentSnap, ...versionData.changes };
+      trackedFields.forEach(fieldKey => {
+        const oldVal = beforeSnap[fieldKey];
+        const newVal = afterSnap[fieldKey];
         if (JSON.stringify(oldVal) !== JSON.stringify(newVal)) {
           diffs.push({
-            fieldName: key,
+            fieldName: fieldKey as string,
             oldValue: oldVal,
             newValue: newVal,
             changedAt: versionData.timestamp,
@@ -101,10 +190,10 @@ export function computeHistoryDiff(
           });
         }
       });
-      currentRecord = { ...currentRecord, ...versionData.changes };
+      currentSnap = afterSnap;
     }
   }
-  
+
   return diffs;
 }
 

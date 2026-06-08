@@ -128,7 +128,7 @@ export const initialParameterRecords: ParameterRecord[] = rawRecords.map((r, idx
 });
 
 export const initialAppState: AppState = {
-  parameterRecords: initialParameterRecords,
+  parameterRecords: [],
   comparisonResults: [],
   reviewTasks: [],
   parameterVersions: initialParameterVersions,
