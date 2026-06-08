@@ -83,9 +83,19 @@ class IssueRecord:
     resolved_at: Optional[datetime] = None
 
     def why_kept(self) -> str:
-        """说明这条为什么被留下"""
+        """说明这条为什么被留下——跟当前状态走，不只看 issue_type"""
+        if self.status == IssueStatus.RESOLVED:
+            return "已解决"
         if self.issue_type == IssueType.ROUTE_NOT_RECALCULATED:
-            return "补录后系统未自动触发路线长度重算，需展陈客户确认录入值是否准确"
+            if self.status == IssueStatus.PENDING_REVIEW:
+                return "补录后系统未自动触发路线长度重算，需展陈客户确认录入值是否准确"
+            if self.status == IssueStatus.MANUAL_FIXED:
+                return "园区运维小陶已确认人工录入值，待系统重跑后交展陈客户复核"
+            if self.status == IssueStatus.RERUN:
+                return "系统已重跑路线长度计算，出现补录差异，需展陈客户复核确认"
+            if self.status == IssueStatus.DETECTED:
+                return "补录路线存在异常，需园区运维小陶检查坐标原点说明后确认处理方式"
+            return "补录路线长度存疑，待进一步核实"
         elif self.issue_type == IssueType.WRONG_CALIBER:
             return "测量口径与标准规范不一致，需重新核对测量标准"
         elif self.issue_type == IssueType.MISSING_MATERIAL:
@@ -93,20 +103,40 @@ class IssueRecord:
         return "待进一步核实"
 
     def next_step(self) -> str:
-        """下一步该找谁"""
-        if self.status == IssueStatus.PENDING_REVIEW:
+        """下一步该找谁——严格与 current_handler 对齐"""
+        if self.status == IssueStatus.RESOLVED:
+            return "流程已完成"
+        if self.current_handler == Handler.EXHIBITION_CLIENT:
             return f"联系 {Handler.EXHIBITION_CLIENT.value} 复核数据准确性"
-        elif self.status in [IssueStatus.DETECTED, IssueStatus.RERUN]:
+        if self.current_handler == Handler.PARK_OPS_XT:
             return f"由 {Handler.PARK_OPS_XT.value} 检查坐标原点说明并确认处理方式"
-        return "流程已完成"
+        if self.status == IssueStatus.MANUAL_FIXED:
+            return "等待系统重跑验证，重跑后自动流转至展陈客户复核"
+        return f"由 {Handler.PARK_OPS_XT.value} 检查坐标原点说明并确认处理方式"
 
     def missing_info(self) -> str:
-        """还缺什么材料"""
-        if self.missing_materials:
-            return "、".join(self.missing_materials)
+        """还缺什么材料——跟当前状态走"""
+        base = []
         if self.issue_type == IssueType.ROUTE_NOT_RECALCULATED:
-            return "缺重新计算后的路线长度确认凭证、坐标原点校准记录"
-        return "待确认"
+            if self.status == IssueStatus.PENDING_REVIEW:
+                base = ["重新计算后的路线长度确认凭证", "坐标原点校准记录"]
+            elif self.status == IssueStatus.MANUAL_FIXED:
+                base = ["系统重跑计算结果", "展陈客户复核确认"]
+            elif self.status == IssueStatus.RERUN:
+                base = ["展陈客户对补录差异的复核确认"]
+            elif self.status == IssueStatus.DETECTED:
+                base = ["坐标原点说明确认", "路线长度校验记录"]
+            else:
+                base = ["重新计算后的路线长度确认凭证", "坐标原点校准记录"]
+        elif self.missing_materials:
+            base = list(self.missing_materials)
+        else:
+            return "待确认"
+        if self.missing_materials:
+            for m in self.missing_materials:
+                if m not in base:
+                    base.append(m)
+        return "、".join(base)
 
 
 @dataclass

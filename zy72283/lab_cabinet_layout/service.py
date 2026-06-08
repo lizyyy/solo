@@ -1,6 +1,6 @@
 """服务层 - 编排核心三步流程"""
 from typing import Dict, Any, Optional, List
-from .models import LayoutProject, Handler
+from .models import LayoutProject, Handler, IssueStatus
 from .data_import import (
     import_safety_radius_csv, import_safety_radius_json,
     import_routes_csv, import_routes_json, validate_safety_radius_overlap
@@ -108,7 +108,10 @@ def run_standard_three_step_process(
     if origin_check["needs_update"]:
         print(f"⚠️  原点需要更新: {origin_check['issues']}")
 
-    pending_issues = [i for i in project.issues if i.status.value in ["已检测", "已人工修正"]]
+    pending_issues = [i for i in project.issues
+                      if i.current_handler == Handler.PARK_OPS_XT
+                      or i.status == IssueStatus.DETECTED
+                      or i.status == IssueStatus.MANUAL_FIXED]
     for issue in pending_issues:
         print(f"\n🔧 处理问题 {issue.issue_id}...")
         process_result = process_issue_after_origin_check(

@@ -27,11 +27,13 @@ _project_cache = {}
 
 def _get_or_create_project(project_id: str = None, use_demo: bool = False):
     """获取或创建项目"""
-    if use_demo:
-        return create_demo_project()
-
     if project_id and project_id in _project_cache:
         return _project_cache[project_id]
+
+    if use_demo:
+        project = create_demo_project()
+        _project_cache[project.project_id] = project
+        return project
 
     from .models import LayoutProject
     import time
