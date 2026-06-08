@@ -273,6 +273,44 @@ class TestNavigateToSource(unittest.TestCase):
         self.assertEqual(source_info["holiday_extension"].reason, "测试原因")
         self.assertEqual(source_info["holiday_extension"].remark, "测试备注")
 
+    def test_navigate_back_to_tail_adjustment(self):
+        tail = [
+            TailAdjustment(
+                business_no="TEST001",
+                adjustment_type="利息尾差",
+                amount=99.99,
+                reason="四舍五入",
+                remark="尾差备注"
+            )
+        ]
+        self.service.import_tail_adjustments(tail, "BATCH-TAIL-001")
+
+        score = self.service.get_score("TEST001")
+        for detail in score.business_details:
+            source_info = self.service.navigate_to_source_material("TEST001", detail.id)
+            self.assertIsNotNone(source_info, f"{detail.detail_type} 追溯结果不应为空")
+            self.assertIsNotNone(source_info["tail_adjustment"],
+                                 f"{detail.detail_type} 应能追溯到尾差调整条，但 related_tail_id 未关联")
+            self.assertEqual(source_info["tail_adjustment"].adjustment_type, "利息尾差")
+            self.assertAlmostEqual(source_info["tail_adjustment"].amount, 99.99, places=2)
+
+    def test_detail_has_related_tail_id_after_import(self):
+        tail = [
+            TailAdjustment(
+                business_no="TEST001",
+                adjustment_type="本金尾差",
+                amount=200.00,
+                reason="分期计算",
+                remark=""
+            )
+        ]
+        self.service.import_tail_adjustments(tail, "BATCH-TAIL-002")
+
+        score = self.service.get_score("TEST001")
+        for detail in score.business_details:
+            self.assertIsNotNone(detail.related_tail_id,
+                                 f"{detail.detail_type} 的 related_tail_id 应已被回填")
+
 
 class TestReportGenerator(unittest.TestCase):
     def setUp(self):
@@ -298,6 +336,23 @@ class TestReportGenerator(unittest.TestCase):
         self.assertIn("差异清单详情", report)
         self.assertIn("为什么留下", report)
         self.assertIn("下一步", report)
+
+    def test_export_audit_report_with_formula_and_sample(self):
+        score = self.service.get_score("TEST001")
+        score.formula = "评分=信用×0.6+还款×0.4"
+        score.sample_count = 800
+        score.score = 72.0
+        score.score_level = "B+"
+        for d in score.business_details:
+            d.amount = 100.0
+            d.predicted_value = 95.0
+
+        report = ReportGenerator.generate_export_audit_report(self.service, "TEST001")
+        self.assertIn("导出核对报告", report)
+        self.assertIn("评分公式", report)
+        self.assertIn("样本数量", report)
+        self.assertIn("预测值", report)
+        self.assertIn("偏差", report)
 
 
 if __name__ == "__main__":

@@ -137,6 +137,13 @@ class ReportGenerator:
         report.append("  说明: 点击图表数据点时，可追溯至原始材料：")
         report.append("")
 
+        if score.formula:
+            report.append(f"  评分公式: {score.formula}")
+        if score.sample_count:
+            report.append(f"  样本数量: {score.sample_count}")
+        if score.formula or score.sample_count:
+            report.append("")
+
         for detail in score.business_details:
             source_info = service.navigate_to_source_material(business_no, detail.id)
             if not source_info:
@@ -144,23 +151,81 @@ class ReportGenerator:
 
             report.append(f"  ◆ 明细类型: {detail.detail_type}")
             report.append(f"     当前状态: {detail.status.value}")
+            if detail.predicted_value is not None:
+                report.append(f"     预测值: {detail.predicted_value:.2f}")
+            report.append(f"     实际金额: {detail.amount:.2f}")
 
             holiday = source_info.get('holiday_extension')
             tail = source_info.get('tail_adjustment')
 
             if holiday:
-                report.append(f"     关联节假日顺延说明:")
-                report.append(f"       - 原到期日: {holiday.original_due_date}")
-                report.append(f"       - 顺延到期日: {holiday.extended_due_date}")
-                report.append(f"       - 原因: {holiday.reason}")
-                report.append(f"       - 备注: {holiday.remark}")
+                report.append(f"     ← 节假日顺延说明:")
+                report.append(f"         原到期日: {holiday.original_due_date.strftime('%Y-%m-%d') if holiday.original_due_date else '无'}")
+                report.append(f"         顺延到期日: {holiday.extended_due_date.strftime('%Y-%m-%d') if holiday.extended_due_date else '无'}")
+                report.append(f"         原因: {holiday.reason}")
+                report.append(f"         备注: {holiday.remark}")
 
             if tail:
-                report.append(f"     关联尾差调整条:")
-                report.append(f"       - 调整类型: {tail.adjustment_type}")
-                report.append(f"       - 调整金额: {tail.amount}")
-                report.append(f"       - 原因: {tail.reason}")
+                report.append(f"     ← 尾差调整条:")
+                report.append(f"         调整类型: {tail.adjustment_type}")
+                report.append(f"         调整金额: {tail.amount:.2f}")
+                report.append(f"         原因: {tail.reason}")
+                report.append(f"         备注: {tail.remark}")
 
+            if not holiday and not tail:
+                report.append(f"     ⚠ 无关联原始材料（节假日顺延说明/尾差调整条均未关联）")
+
+            report.append("")
+
+        return "\n".join(report)
+
+    @staticmethod
+    def generate_export_audit_report(service: LoanRenewalScoreService, business_no: str) -> str:
+        score = service.get_score(business_no)
+        if not score:
+            return f"未找到业务号 {business_no} 的数据"
+
+        report = []
+        report.append("=" * 60)
+        report.append(f"  小微贷款续贷评分 - 导出核对报告")
+        report.append("=" * 60)
+        report.append(f"业务号: {business_no}")
+        report.append(f"生成时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        report.append("")
+
+        report.append("【评分概要】")
+        report.append(f"  续贷评分: {score.score:.2f}" if score.score else "  续贷评分: 未计算")
+        report.append(f"  评分等级: {score.score_level or '未评定'}")
+        report.append(f"  评分公式: {score.formula or '未设定'}")
+        report.append(f"  样本数量: {score.sample_count or 0}")
+        report.append("")
+
+        report.append("【预测值 vs 实际值核对】")
+        report.append("-" * 60)
+        for detail in score.business_details:
+            pv_str = f"{detail.predicted_value:.2f}" if detail.predicted_value is not None else "未设定"
+            diff_note = ""
+            if detail.predicted_value is not None and detail.amount != detail.predicted_value:
+                diff_note = f"  ⚠ 偏差: {abs(detail.amount - detail.predicted_value):.2f}"
+            report.append(f"  {detail.detail_type}:")
+            report.append(f"    预测值: {pv_str}")
+            report.append(f"    实际值: {detail.amount:.2f}")
+            report.append(f"    状态: {detail.status.value}")
+            if diff_note:
+                report.append(diff_note)
+            report.append("")
+
+        report.append("【3D图表数据源追溯核验】")
+        report.append("-" * 60)
+        for detail in score.business_details:
+            source_info = service.navigate_to_source_material(business_no, detail.id)
+            holiday_linked = source_info is not None and source_info.get('holiday_extension') is not None
+            tail_linked = source_info is not None and source_info.get('tail_adjustment') is not None
+            report.append(f"  {detail.detail_type}:")
+            report.append(f"    节假日顺延说明: {'✓ 已关联' if holiday_linked else '✗ 未关联'}")
+            report.append(f"    尾差调整条:     {'✓ 已关联' if tail_linked else '✗ 未关联'}")
+            if not tail_linked:
+                report.append(f"    → 请补看尾差调整条后重新追溯")
             report.append("")
 
         return "\n".join(report)

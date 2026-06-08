@@ -67,6 +67,7 @@ class BusinessDetail:
     business_no: str = ""
     detail_type: str = ""
     amount: float = 0.0
+    predicted_value: Optional[float] = None
     related_holiday_id: Optional[str] = None
     related_tail_id: Optional[str] = None
     status: BusinessStatus = BusinessStatus.PENDING_REVIEW
@@ -125,6 +126,8 @@ class LoanRenewalScore:
     business_no: str = ""
     score: float = 0.0
     score_level: str = ""
+    formula: str = ""
+    sample_count: int = 0
     holiday_extensions: List[HolidayExtension] = field(default_factory=list)
     tail_adjustments: List[TailAdjustment] = field(default_factory=list)
     business_details: List[BusinessDetail] = field(default_factory=list)

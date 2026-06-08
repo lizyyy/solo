@@ -125,9 +125,15 @@ class LoanRenewalScoreService:
                 score.updated_at = datetime.now()
                 imported_count += 1
 
-            self._update_differences_with_tail(score, adj)
+            self._link_tail_to_details(score, adj)
+            self._update_differences(score)
 
         return imported_count, skipped_count
+
+    def _link_tail_to_details(self, score: LoanRenewalScore, adj: TailAdjustment):
+        for detail in score.business_details:
+            if detail.business_no == adj.business_no and detail.related_tail_id is None:
+                detail.related_tail_id = adj.id
 
     def _generate_business_details(self, score: LoanRenewalScore, holiday: HolidayExtension):
         has_split = any(
@@ -249,9 +255,6 @@ class LoanRenewalScoreService:
         self._update_differences(score)
 
         return True
-
-    def _update_differences_with_tail(self, score: LoanRenewalScore, adj: TailAdjustment):
-        self._update_differences(score)
 
     def _update_differences(self, score: LoanRenewalScore):
         score.differences = []
