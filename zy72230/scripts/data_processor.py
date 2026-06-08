@@ -86,19 +86,23 @@ class MarginDataProcessor:
                         record['印花税'] = f"{new_tax:.2f}"
                         record['_tax_rate_used'] = new_rate
                         record['_status'] = config.REVIEW_STATUS['SUPPLEMENTED']
+                        old_calc = sup.get('original_calculation', f'{old_tax:.2f}')
+                        new_calc = sup.get('corrected_calculation', f'{new_tax:.2f}')
+                        old_rate_label = sup.get('original_tax_rate_label', f'{old_rate*100:.4}%')
+                        new_rate_label = sup.get('corrected_tax_rate_label', f'{new_rate*100:.4}%')
                         record['_history'].append({
                             'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
                             'action': '税费率补录修正',
                             'operator': '小周',
-                            'old_value': f'印花税{old_tax:.2f}(税率{old_rate*100:.4}%)',
-                            'new_value': f'印花税{new_tax:.2f}(税率{new_rate*100:.4}%)',
+                            'old_value': f'印花税{old_tax:.2f}(税率{old_rate_label}, {old_calc})',
+                            'new_value': f'印花税{new_tax:.2f}(税率{new_rate_label}, {new_calc})',
                             'diff': f'{new_tax - old_tax:+.2f}',
                             'remark': sup['remark']
                         })
                         corrected_biz.append(biz_id)
                         self._log_operation(
-                            f'税费率修正: {biz_id} 印花税 {old_tax:.2f} → {new_tax:.2f} '
-                            f'(税率 {old_rate*100:.4}% → {new_rate*100:.4}%)'
+                            f'税费率修正: {biz_id} 印花税 {old_tax:.2f}({old_calc}) → {new_tax:.2f}({new_calc}) '
+                            f'(税率 {old_rate_label} → {new_rate_label})'
                         )
         return corrected_biz
 

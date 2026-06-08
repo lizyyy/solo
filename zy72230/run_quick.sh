@@ -3,17 +3,15 @@ set -e
 
 cd "$(dirname "$0")"
 
-echo "=============================================="
-echo "券商两融维保提醒 - 快速演示 (无交互)"
-echo "=============================================="
-echo ""
-
 BASE_DIR=$(pwd)
-SCRIPT_DIR="$BASE_DIR/scripts"
 LOG_DIR="$BASE_DIR/logs"
-
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 LOG_FILE="$LOG_DIR/run_quick_${TIMESTAMP}.log"
+
+echo "=============================================="
+echo "券商两融维保提醒 - 快速演示 (三种材料合并)"
+echo "=============================================="
+echo ""
 
 mkdir -p "$LOG_DIR"
 
@@ -24,29 +22,33 @@ rm -f "$BASE_DIR/reports/"*.json
 echo "✓ 已清理"
 echo ""
 
-echo "▶︎ 运行1/3: 正常材料..."
-python3 "$SCRIPT_DIR/run_workflow.py" normal >> "$LOG_FILE" 2>&1
-echo "  ✓ 正常材料完成"
+echo "▶︎ 运行: 三种材料合并运行 (combined)..."
+python3 "$BASE_DIR/scripts/run_workflow.py" combined >> "$LOG_FILE" 2>&1
+RESULT=$?
 
-echo "▶︎ 运行2/3: 错口径材料..."
-python3 "$SCRIPT_DIR/run_workflow.py" wrong >> "$LOG_FILE" 2>&1
-echo "  ✓ 错口径材料完成"
-
-echo "▶︎ 运行3/3: 补录材料..."
-python3 "$SCRIPT_DIR/run_workflow.py" supplement >> "$LOG_FILE" 2>&1
-echo "  ✓ 补录材料完成"
+if [ $RESULT -eq 0 ]; then
+    echo "  ✓ 三种材料合并运行完成"
+else
+    echo "  ✗ 运行失败，请查看日志: $LOG_FILE"
+    exit 1
+fi
 
 echo ""
 echo "=============================================="
 echo "✓ 全部完成！日志: $LOG_FILE"
 echo "=============================================="
 echo ""
-echo "最新差异报告:"
-ls -t "$BASE_DIR/reports/"*.md | head -1 | awk '{print "  " $0}'
+echo "📁 处理结果文件:"
+ls -1 "$BASE_DIR/data/processed/"*.csv 2>/dev/null | while read f; do echo "  - $(basename "$f")"; done
 echo ""
-echo "最新历史记录:"
-ls -t "$BASE_DIR/reports/"*.json | head -1 | awk '{print "  " $0}'
+echo "📁 报告文件:"
+ls -1t "$BASE_DIR/reports/"*.md 2>/dev/null | while read f; do echo "  - $(basename "$f")"; done
+ls -1t "$BASE_DIR/reports/"*.json 2>/dev/null | while read f; do echo "  - $(basename "$f")"; done
 echo ""
-echo "重跑命令:"
-echo "  bash run_quick.sh   # 快速全量重跑"
-echo "  bash run_all.sh     # 交互式分步演示"
+echo "🔄 重跑命令:"
+echo "  bash run_quick.sh                            # 快速全量重跑"
+echo "  bash run_all.sh                              # 交互式分步演示"
+echo "  python3 scripts/run_workflow.py combined     # 三种材料合并运行"
+echo "  python3 scripts/run_workflow.py normal       # 仅正常材料"
+echo "  python3 scripts/run_workflow.py wrong        # 仅错口径材料"
+echo "  python3 scripts/run_workflow.py supplement   # 仅补录材料"

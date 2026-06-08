@@ -7,13 +7,23 @@
     "supplemented_biz": [
         {
             "biz_id": "BIZ20260601003",
+            "security_code": "601318",
+            "security_name": "中国平安",
+            "principal": 400000.00,
             "original_tax": 400.00,
             "original_tax_rate": 0.001,
+            "original_tax_rate_label": "0.1%（新口径）",
+            "original_calculation": "400000.00 × 0.1% = 400.00",
             "corrected_tax": 320.00,
             "corrected_tax_rate": 0.0008,
+            "corrected_tax_rate_label": "0.08%（旧口径）",
+            "corrected_calculation": "400000.00 × 0.08% = 320.00",
             "tax_diff": -80.00,
-            "remark": "旧口径补录，交易实际发生于2026-05-28，适用原税率0.08%",
+            "trade_date": "2026-05-28",
+            "remark": "旧口径补录：BIZ20260601003中国平安(601318)交易实际发生于2026-05-28，按税费率备注文件第2条口径说明，5月31日前业务补录适用原税率0.08%（即0.0008），故印花税由400.00(400000×0.1%)修正为320.00(400000×0.08%)，差额-80.00",
+            "remark_short": "旧口径补录，交易发生于2026-05-28，适用原税率0.08%",
             "reviewer": "老李",
+            "review_date": "2026-06-02",
             "review_status": "已复核"
         }
     ],
@@ -21,13 +31,19 @@
         {
             "correction_id": "COR20260602001",
             "biz_id": "BIZ20260601002",
+            "security_code": "000001",
+            "security_name": "平安银行",
             "correction_type": "拆分行标记",
             "field": "review_status",
             "old_value": "待复核",
             "new_value": "拆分行待主管复核",
             "operator": "小周",
             "timestamp": "2026-06-02 10:15:00",
-            "remark": "同一业务号拆成手续费和本金两行，留待结算主管复核"
+            "remark": "同一业务号BIZ20260601002拆成两行：第1行融资本金300000.00+手续费60.00，第2行手续费56.00（本金为0），不急着归正常，留待结算主管老李复核",
+            "split_detail": {
+                "line1": "本金部分：融资本金300000.00，融资利息197.26，手续费60.00，印花税300.00，过户费1.50",
+                "line2": "手续费部分：融资本金0.00，融资利息0.00，手续费56.00，印花税0.00，过户费0.00"
+            }
         }
     ]
 }

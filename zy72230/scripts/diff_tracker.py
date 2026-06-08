@@ -13,6 +13,7 @@ class DiffTracker:
     def __init__(self):
         self.runs = []
         self.diff_list = []
+        self.cross_diffs = []
 
     def register_run(self, run_name, data_file, processor):
         summary = processor.get_summary()
@@ -51,6 +52,18 @@ class DiffTracker:
         if not run1 or not run2:
             return None
 
+        diffs = self._compute_diffs(run1, run2)
+
+        self.diff_list.append({
+            'compare_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'run1': run1['run_name'],
+            'run2': run2['run_name'],
+            'diffs': diffs
+        })
+
+        return diffs
+
+    def _compute_diffs(self, run1, run2):
         diffs = []
 
         records1 = defaultdict(list)
@@ -114,23 +127,37 @@ class DiffTracker:
                         '说明': f"税率从{r1['使用税率']*100:.4}%变为{r2['使用税率']*100:.4}%"
                     })
 
-        self.diff_list.append({
-            'compare_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-            'run1': run1['run_name'],
-            'run2': run2['run_name'],
-            'diffs': diffs
-        })
-
         return diffs
 
-    def generate_diff_report(self, output_file=None):
-        output_file = output_file or os.path.join(
+    def cross_material_compare(self):
+        step2_runs = [r for r in self.runs if '步骤2' in r['run_name']]
+        if len(step2_runs) < 2:
+            return []
+
+        self.cross_diffs = []
+        for i in range(len(step2_runs)):
+            for j in range(i + 1, len(step2_runs)):
+                run_a = step2_runs[i]
+                run_b = step2_runs[j]
+                diffs = self._compute_diffs(run_a, run_b)
+                self.cross_diffs.append({
+                    'compare_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                    'run1': run_a['run_name'],
+                    'run2': run_b['run_name'],
+                    'diffs': diffs
+                })
+
+        return self.cross_diffs
+
+    def generate_diff_report(self, run_tag=None):
+        tag_suffix = f'_{run_tag}' if run_tag else ''
+        output_file = os.path.join(
             config.REPORT_DIR,
-            f'diff_report_{datetime.now().strftime("%Y%m%d_%H%M%S")}.md'
+            f'diff_report{tag_suffix}_{datetime.now().strftime("%Y%m%d_%H%M%S")}.md'
         )
 
         with open(output_file, 'w', encoding='utf-8') as f:
-            f.write('# 券商两融维保提醒 - 差异清单\n\n')
+            f.write(f'# 券商两融维保提醒 - 差异清单 [{run_tag or "单次"}]\n\n')
             f.write(f'生成时间: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\n\n')
             f.write(f'税费率备注: {config.TAX_RATE_REMARK}\n\n')
             f.write('---\n\n')
@@ -153,37 +180,108 @@ class DiffTracker:
 
                 f.write('\n')
 
-            f.write('---\n\n')
-            f.write('## 运行记录历史\n\n')
-
-            for run in self.runs:
-                s = run['summary']
-                f.write(f"### {run['run_name']} ({run['run_id']})\n\n")
-                f.write(f"- 运行时间: {run['timestamp']}\n")
-                f.write(f"- 数据文件: {run['data_file']}\n")
-                f.write(f"- 总记录数: {s['total_records']} 条 / {s['total_biz']} 笔业务\n")
-                f.write(f"- 正常: {s['normal']} 笔 | 待复核: {s['split_review']} 笔 | 已补录: {s['supplemented']} 笔 | 待处理: {s['pending']} 笔\n\n")
-
-                f.write('#### 业务明细:\n\n')
-                f.write('| 业务号 | 行数 | 状态 | 本金 | 手续费 | 印花税 | 税率 | 历史操作数 |\n')
-                f.write('|--------|------|------|------|--------|--------|------|------------|\n')
-
-                for detail in s['details']:
-                    f.write(
-                        f"| {detail['biz_id']} | {detail['line_count']} | {detail['status']} | "
-                        f"{detail['total_principal']:,.2f} | {detail['total_fee']:,.2f} | "
-                        f"{detail['total_tax']:,.2f} | {detail['tax_rate_used']*100:.4}% | "
-                        f"{detail['history_records']} |\n"
-                    )
-                f.write('\n')
+            self._write_run_history(f)
 
         print(f"差异报告已生成: {os.path.basename(output_file)}")
         return output_file
 
-    def save_history(self, output_file=None):
-        output_file = output_file or os.path.join(
+    def generate_combined_report(self):
+        output_file = os.path.join(
             config.REPORT_DIR,
-            f'history_{datetime.now().strftime("%Y%m%d_%H%M%S")}.json'
+            f'combined_report_{datetime.now().strftime("%Y%m%d_%H%M%S")}.md'
+        )
+
+        with open(output_file, 'w', encoding='utf-8') as f:
+            f.write('# 券商两融维保提醒 - 三种材料合并差异报告\n\n')
+            f.write(f'生成时间: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\n\n')
+            f.write(f'税费率备注: {config.TAX_RATE_REMARK}\n\n')
+            f.write('---\n\n')
+
+            f.write('## 一、各材料内部步骤对比（步骤1 导入 vs 步骤2 补录）\n\n')
+            for compare_item in self.diff_list:
+                f.write(f'### {compare_item["run1"]} vs {compare_item["run2"]}\n\n')
+                f.write(f'对比时间: {compare_item["compare_time"]}\n\n')
+
+                if not compare_item['diffs']:
+                    f.write('> ✅ 无差异\n\n')
+                    continue
+
+                f.write(f'共发现 **{len(compare_item["diffs"])}** 处差异:\n\n')
+                f.write('| 业务号 | 差异类型 | 补录前旧值 | 补录后新值 | 差额 | 说明 |\n')
+                f.write('|--------|----------|------------|------------|------|------|\n')
+
+                for diff in compare_item['diffs']:
+                    amount = f"{diff['差额']:+.2f}" if diff['差额'] is not None else '-'
+                    f.write(f"| {diff['业务号']} | {diff['差异类型']} | {diff['原值']} | {diff['现值']} | {amount} | {diff['说明']} |\n")
+
+                f.write('\n')
+
+            f.write('---\n\n')
+            f.write('## 二、跨材料对比（同业务号在不同材料中的结果差异）\n\n')
+
+            if not self.cross_diffs:
+                f.write('> 无跨材料差异\n\n')
+            else:
+                for cross_item in self.cross_diffs:
+                    f.write(f'### {cross_item["run1"]} vs {cross_item["run2"]}\n\n')
+                    f.write(f'对比时间: {cross_item["compare_time"]}\n\n')
+
+                    if not cross_item['diffs']:
+                        f.write('> ✅ 无差异\n\n')
+                        continue
+
+                    f.write(f'共发现 **{len(cross_item["diffs"])}** 处差异:\n\n')
+                    f.write('| 业务号 | 差异类型 | 前者 | 后者 | 差额 | 说明 |\n')
+                    f.write('|--------|----------|------|------|------|------|\n')
+
+                    for diff in cross_item['diffs']:
+                        amount = f"{diff['差额']:+.2f}" if diff['差额'] is not None else '-'
+                        f.write(f"| {diff['业务号']} | {diff['差异类型']} | {diff['原值']} | {diff['现值']} | {amount} | {diff['说明']} |\n")
+
+                    f.write('\n')
+
+            f.write('---\n\n')
+            f.write('## 三、三种材料最终结果汇总\n\n')
+
+            step2_runs = [r for r in self.runs if '步骤2' in r['run_name']]
+            if step2_runs:
+                all_biz_ids = set()
+                for run in step2_runs:
+                    for r in run['records']:
+                        all_biz_ids.add(r['业务号'])
+
+                header = '| 业务号 |'
+                sep = '|--------|'
+                for run in step2_runs:
+                    header += f' {run["run_name"]} |'
+                    sep += '------------|'
+                f.write(header + '\n')
+                f.write(sep + '\n')
+
+                for biz_id in sorted(all_biz_ids):
+                    row = f'| {biz_id} |'
+                    for run in step2_runs:
+                        recs = [r for r in run['records'] if r['业务号'] == biz_id]
+                        if recs:
+                            r0 = recs[0]
+                            tax = sum(r['印花税'] for r in recs)
+                            row += f' {r0["状态"]} / 印花税{tax:.0f} / 税率{r0["使用税率"]*100:.2f}% |'
+                        else:
+                            row += ' - |'
+                    f.write(row + '\n')
+                f.write('\n')
+
+            f.write('---\n\n')
+            self._write_run_history(f)
+
+        print(f"合并差异报告已生成: {os.path.basename(output_file)}")
+        return output_file
+
+    def save_history(self, run_tag=None):
+        tag_suffix = f'_{run_tag}' if run_tag else ''
+        output_file = os.path.join(
+            config.REPORT_DIR,
+            f'history{tag_suffix}_{datetime.now().strftime("%Y%m%d_%H%M%S")}.json'
         )
 
         with open(output_file, 'w', encoding='utf-8') as f:
@@ -196,3 +294,46 @@ class DiffTracker:
 
         print(f"历史记录已保存: {os.path.basename(output_file)}")
         return output_file
+
+    def save_combined_history(self):
+        output_file = os.path.join(
+            config.REPORT_DIR,
+            f'combined_history_{datetime.now().strftime("%Y%m%d_%H%M%S")}.json'
+        )
+
+        with open(output_file, 'w', encoding='utf-8') as f:
+            json.dump({
+                'generated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'material_count': len([r for r in self.runs if '步骤2' in r['run_name']]),
+                'runs': self.runs,
+                'within_material_diffs': self.diff_list,
+                'cross_material_diffs': self.cross_diffs,
+                'tax_rate_remark': config.TAX_RATE_REMARK
+            }, f, ensure_ascii=False, indent=2)
+
+        print(f"合并历史记录已保存: {os.path.basename(output_file)}")
+        return output_file
+
+    def _write_run_history(self, f):
+        f.write('## 运行记录历史\n\n')
+
+        for run in self.runs:
+            s = run['summary']
+            f.write(f"### {run['run_name']} ({run['run_id']})\n\n")
+            f.write(f"- 运行时间: {run['timestamp']}\n")
+            f.write(f"- 数据文件: {run['data_file']}\n")
+            f.write(f"- 总记录数: {s['total_records']} 条 / {s['total_biz']} 笔业务\n")
+            f.write(f"- 正常: {s['normal']} 笔 | 待复核: {s['split_review']} 笔 | 已补录: {s['supplemented']} 笔 | 待处理: {s['pending']} 笔\n\n")
+
+            f.write('#### 业务明细:\n\n')
+            f.write('| 业务号 | 行数 | 状态 | 本金 | 手续费 | 印花税 | 税率 | 历史操作数 |\n')
+            f.write('|--------|------|------|------|--------|--------|------|------------|\n')
+
+            for detail in s['details']:
+                f.write(
+                    f"| {detail['biz_id']} | {detail['line_count']} | {detail['status']} | "
+                    f"{detail['total_principal']:,.2f} | {detail['total_fee']:,.2f} | "
+                    f"{detail['total_tax']:,.2f} | {detail['tax_rate_used']*100:.4}% | "
+                    f"{detail['history_records']} |\n"
+                )
+            f.write('\n')
