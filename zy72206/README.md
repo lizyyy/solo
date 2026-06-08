@@ -87,7 +87,22 @@
 pip install -r requirements.txt
 ```
 
-### 完整流程示例
+### 启动 Web 服务
+
+```bash
+# 1. 导入样例数据
+python3 cli.py import-excel examples/sample_data.xlsx --operator 阿芬
+
+# 2. 启动 Web 服务 (页面 + API)
+python3 server.py --port 8000
+
+# 3. 浏览器打开:
+#    http://127.0.0.1:8000/          → 记录列表页
+#    http://127.0.0.1:8000/blocking  → 阻塞记录页
+#    http://127.0.0.1:8000/api/records  → API: 全部记录
+```
+
+### CLI 流程示例
 
 ```bash
 # 1. 导入除权日截图数据
@@ -122,6 +137,8 @@ python cli.py audit <record_id>
 
 ## 命令参考
 
+### CLI 命令
+
 | 命令 | 用途 | 对应角色 |
 |------|------|---------|
 | `import-excel` | 导入Excel数据 | 对账运营 |
@@ -137,15 +154,36 @@ python cli.py audit <record_id>
 | `audit` | 查看审计日志 | 全部 |
 | `blocking` | 查看阻塞记录 | 风控 |
 
+### HTTP API 路由
+
+| 路由 | 方法 | 用途 | 返回格式 |
+|------|------|------|---------|
+| `/` | GET | 记录列表页面 | HTML |
+| `/blocking` | GET | 阻塞记录页面 | HTML |
+| `/records/{id}` | GET | 记录详情页面 | HTML |
+| `/api/records` | GET | 全部记录 | JSON |
+| `/api/records/{id}` | GET | 单条记录详情 | JSON |
+| `/api/blocking` | GET | 阻塞记录 | JSON |
+| `/api/records/{id}/audit` | GET | 审计日志 | JSON |
+| `/api/records/{id}/advance` | POST | 推进步骤 | JSON |
+| `/api/records/{id}/tax-rate` | POST | 更新税率 | JSON |
+| `/api/records/{id}/risk-review` | POST | 风控复核 | JSON |
+| `/api/records/{id}/summary` | POST | 更新摘要 | JSON |
+| `/api/records/{id}/reverse` | POST | 冲正 | JSON |
+| `/api/records/{id}/rollback` | POST | 回滚 | JSON |
+| `/api/import` | POST | 上传Excel导入 | JSON |
+| `/api/export` | GET | 下载Excel | File |
+
 ---
 
 ## 交接体验说明
 
 ### 风控同事如何快速定位问题
 
-1. **第一步**: 运行 `python cli.py blocking`
+1. **第一步**: 打开 `http://127.0.0.1:8000/blocking` 页面
    - 直接看到所有卡住的记录
    - 每条记录显示：阻塞原因、当前步骤、下一步操作
+   - 冲正记录额外提示："不要急着归正常，留给风控同事复核"
 
 2. **第二步**: 点击记录ID查看详情
    - 原始行号: `original_row_number`
@@ -154,9 +192,9 @@ python cli.py audit <record_id>
    - 税率备注: `tax_rate_remark`
    - 风控备注: `risk_review_note`
 
-3. **第三步**: 查看审计历史
-   - 运行 `python cli.py audit <record_id>`
-   - 看到每一步操作人、时间、变更内容
+3. **第三步**: 页面底部查看审计日志
+   - 每一步操作人、时间、变更内容
+   - 不需要问阿芬，也能分清冲正记录卡在哪一步
 
 ### 关键字段说明
 
@@ -175,11 +213,13 @@ python cli.py audit <record_id>
 
 三个出口使用同一转换函数 `_record_to_dict`:
 
-- **导出明细**: `get_records_for_export()` → 调用 `_record_to_dict`
-- **页面展示**: `get_records_for_display()` → 调用 `_record_to_dict`
-- **API接口**: `get_record_for_api()` → 调用 `_record_to_dict`
+- **导出明细 (Excel)**: `GET /api/export` → `get_records_for_export()` → `_record_to_dict`
+- **页面展示 (HTML)**: `GET /` 和 `GET /records/{id}` → `get_records_for_display()` → `_record_to_dict`
+- **API接口 (JSON)**: `GET /api/records` → `get_record_for_api()` → `_record_to_dict`
 
 **代码位置**: [SettlementRepository._record_to_dict](file:///Users/lzy/pro/solo/workspaces/zy72206/forex_settlement/repository.py#L63-L88)
+
+已通过一致性验证：5条记录的金额、状态在页面HTML、API JSON、Excel导出中完全一致。
 
 ---
 
@@ -218,10 +258,18 @@ python cli.py import-excel examples/sample_data.xlsx --operator 阿芬
 │   ├── models.py            # 数据模型定义
 │   ├── boundary_rules.py    # ⭐ 边界规则 (交接重点)
 │   ├── state_machine.py     # 状态机逻辑
-│   └── repository.py        # 数据持久化
+│   ├── repository.py        # 数据持久化 + 统一数据出口
+│   ├── web.py               # FastAPI Web 服务 (页面+API)
+│   └── templates/           # HTML 页面模板
+│       ├── index.html       # 记录列表页
+│       ├── detail.html      # 记录详情页 (含阻塞提示)
+│       └── blocking.html    # 阻塞记录页
 ├── cli.py                   # 命令行工具
+├── server.py                # Web 服务启动入口
 ├── examples/
-│   └── sample_data.xlsx     # 示例数据
+│   ├── sample_data.xlsx     # 示例数据
+│   ├── create_sample_data.py # 生成示例数据
+│   └── e2e_test.py          # 端到端测试
 ├── data/                    # 运行时数据 (git忽略)
 └── README.md                # 本文档
 ```
@@ -246,4 +294,5 @@ A: 运行 `python cli.py audit <record_id>` 查看完整审计日志。
 
 ## 版本历史
 
+- v1.1.0: 添加 FastAPI Web 服务（页面展示 + HTTP API），修复 Excel 导出枚举值格式，三出口一致性验证通过
 - v1.0.0: 初始版本，支持三步流程、冲正处理、风控复核、审计追踪

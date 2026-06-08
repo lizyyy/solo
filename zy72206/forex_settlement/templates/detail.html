@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>记录详情 - 外汇远期交割排程</title>
+<style>
+body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; margin: 0; padding: 20px; background: #f5f5f5; color: #333; }
+h1 { color: #1a1a2e; }
+h1 small { font-size: 14px; color: #888; margin-left: 12px; }
+nav { margin: 16px 0; }
+nav a { margin-right: 16px; color: #0d6efd; text-decoration: none; }
+nav a:hover { text-decoration: underline; }
+.card { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; }
+.card h2 { margin-top: 0; color: #1a1a2e; border-bottom: 2px solid #eee; padding-bottom: 8px; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 24px; }
+.field { margin-bottom: 8px; }
+.field .label { font-size: 12px; color: #888; display: block; }
+.field .value { font-size: 14px; font-weight: 500; }
+.blocked-banner { background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 16px 20px; margin-bottom: 20px; }
+.blocked-banner h3 { margin: 0 0 8px 0; color: #856404; }
+.blocked-banner .reason { font-size: 14px; color: #664d03; }
+.blocked-banner .action { font-size: 13px; color: #0d6efd; margin-top: 4px; }
+.tag { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: 600; }
+.tag-pending { background: #ffc107; color: #664d03; }
+.tag-imported { background: #0d6efd; color: #fff; }
+.tag-reviewed { background: #198754; color: #fff; }
+.tag-summary { background: #6f42c1; color: #fff; }
+.tag-risk-approved { background: #20c997; color: #fff; }
+.tag-reversed { background: #dc3545; color: #fff; }
+table { border-collapse: collapse; width: 100%; }
+th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; font-size: 13px; }
+th { background: #f8f9fa; }
+.api-link { margin-top: 12px; padding: 12px; background: #e8f4fd; border-radius: 6px; font-size: 13px; }
+.api-link code { background: #fff; padding: 2px 6px; border-radius: 3px; }
+</style>
+</head>
+<body>
+<h1>记录详情 <small>{{ record.record_id[:8] }}...</small></h1>
+
+<nav>
+  <a href="/">← 返回列表</a>
+  <a href="/blocking">⚠️ 阻塞记录</a>
+  <a href="/api/records/{{ record.record_id }}" target="_blank">🔗 API 返回</a>
+</nav>
+
+{% if blocking and blocking.is_blocked %}
+<div class="blocked-banner">
+  <h3>⚠️ 此记录当前被阻塞</h3>
+  <div class="reason">原因：{{ blocking.block_reason }}</div>
+  <div class="action">下一步：{{ blocking.next_action }}</div>
+</div>
+{% endif %}
+
+<div class="card">
+  <h2>基本信息</h2>
+  <div class="grid">
+    <div class="field"><span class="label">记录ID</span><span class="value">{{ record.record_id }}</span></div>
+    <div class="field"><span class="label">除权日截图原始行号</span><span class="value" style="color:#dc3545;font-weight:bold">{{ record.original_row_number }}</span></div>
+    <div class="field"><span class="label">证据来源</span><span class="value">{{ record.source }}</span></div>
+    <div class="field"><span class="label">除权日证据ID</span><span class="value">{{ record.ex_date_evidence_id }}</span></div>
+    <div class="field"><span class="label">交易日</span><span class="value">{{ record.trade_date }}</span></div>
+    <div class="field"><span class="label">交割日</span><span class="value">{{ record.settlement_date }}</span></div>
+    <div class="field"><span class="label">货币对</span><span class="value">{{ record.currency_pair }}</span></div>
+    <div class="field"><span class="label">金额</span><span class="value" style="{{ 'color:#dc3545;font-weight:bold' if record.amount == 0 else '' }}">{{ "%.2f"|format(record.amount) }}</span></div>
+    <div class="field"><span class="label">原始金额</span><span class="value">{{ "%.2f"|format(record.original_amount) }}</span></div>
+    <div class="field"><span class="label">汇率</span><span class="value">{{ record.rate }}</span></div>
+    <div class="field"><span class="label">状态</span><span class="value">
+      {% if record.status == 'pending_risk_review' %}<span class="tag tag-pending">待风控复核</span>
+      {% elif record.status == 'imported' %}<span class="tag tag-imported">已导入</span>
+      {% elif record.status == 'tax_rate_reviewed' %}<span class="tag tag-reviewed">税率已复核</span>
+      {% elif record.status == 'summary_updated' %}<span class="tag tag-summary">摘要已更新</span>
+      {% elif record.status == 'risk_approved' %}<span class="tag tag-risk-approved">风控已通过</span>
+      {% elif record.status == 'reversed' %}<span class="tag tag-reversed">已冲正</span>
+      {% else %}{{ record.status }}{% endif %}
+    </span></div>
+    <div class="field"><span class="label">当前步骤</span><span class="value">{{ record.current_step }}</span></div>
+    <div class="field"><span class="label">备注</span><span class="value">{{ record.remark }}</span></div>
+    <div class="field"><span class="label">冲正标记</span><span class="value">
+      {% if record.has_zero_amount_with_reversal %}<span style="color:#dc3545;font-weight:bold">金额0 + 已冲正</span>
+      {% elif record.is_reversed %}已冲正
+      {% else %}-{% endif %}
+    </span></div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>税率信息（第二步：阿芬补看）</h2>
+  <div class="grid">
+    <div class="field"><span class="label">税率</span><span class="value">{{ record.tax_rate if record.tax_rate is not none else '未填写' }}</span></div>
+    <div class="field"><span class="label">税费率备注</span><span class="value">{{ record.tax_rate_remark or '未填写' }}</span></div>
+    <div class="field"><span class="label">风控复核要求</span><span class="value">{{ '是' if record.risk_review_required else '否' }}</span></div>
+    <div class="field"><span class="label">风控复核意见</span><span class="value">{{ record.risk_review_note or '无' }}</span></div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>操作人记录</h2>
+  <div class="grid">
+    <div class="field"><span class="label">创建人</span><span class="value">{{ record.created_by }}</span></div>
+    <div class="field"><span class="label">创建时间</span><span class="value">{{ record.created_at }}</span></div>
+    <div class="field"><span class="label">最后修改人</span><span class="value">{{ record.updated_by }}</span></div>
+    <div class="field"><span class="label">最后修改时间</span><span class="value">{{ record.updated_at }}</span></div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>审计日志（全程留痕）</h2>
+  {% if audit_logs %}
+  <table>
+  <thead>
+    <tr><th>时间</th><th>动作</th><th>操作人</th><th>字段</th><th>旧值</th><th>新值</th><th>备注</th></tr>
+  </thead>
+  <tbody>
+  {% for log in audit_logs %}
+  <tr>
+    <td>{{ log.timestamp }}</td>
+    <td>{{ log.action }}</td>
+    <td>{{ log.operator }}</td>
+    <td>{{ log.field_name or '-' }}</td>
+    <td>{{ log.old_value or '-' }}</td>
+    <td>{{ log.new_value or '-' }}</td>
+    <td>{{ log.note or '-' }}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+  </table>
+  {% else %}
+  <p style="color:#888">暂无审计日志</p>
+  {% endif %}
+</div>
+
+<div class="api-link">
+  <strong>数据一致性验证：</strong>本页面数据与 <code>GET /api/records/{{ record.record_id }}</code> 接口返回、
+  <code>GET /api/export</code> 导出Excel 读取同一份结果（均通过 <code>_record_to_dict</code> 转换）。
+</div>
+
+</body>
+</html>

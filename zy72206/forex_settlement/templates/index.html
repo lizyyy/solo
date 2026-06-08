@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>外汇远期交割排程</title>
+<style>
+body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; margin: 0; padding: 20px; background: #f5f5f5; color: #333; }
+h1 { color: #1a1a2e; }
+h1 small { font-size: 14px; color: #888; margin-left: 12px; }
+nav { margin: 16px 0; }
+nav a { margin-right: 16px; color: #0d6efd; text-decoration: none; }
+nav a:hover { text-decoration: underline; }
+table { border-collapse: collapse; width: 100%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+th, td { border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-size: 13px; }
+th { background: #1a1a2e; color: #fff; }
+tr:nth-child(even) { background: #f9f9f9; }
+tr:hover { background: #e8f4fd; }
+.blocked { background: #fff3cd !important; }
+.blocked td { color: #856404; }
+.tag { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: 600; }
+.tag-pending { background: #ffc107; color: #664d03; }
+.tag-imported { background: #0d6efd; color: #fff; }
+.tag-reviewed { background: #198754; color: #fff; }
+.tag-summary { background: #6f42c1; color: #fff; }
+.tag-risk-approved { background: #20c997; color: #fff; }
+.tag-reversed { background: #dc3545; color: #fff; }
+.amount-zero { color: #dc3545; font-weight: bold; }
+.evidence-link { color: #0d6efd; text-decoration: none; }
+.stats { display: flex; gap: 16px; margin: 16px 0; }
+.stat-card { background: #fff; padding: 16px 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); min-width: 120px; }
+.stat-card .label { font-size: 12px; color: #888; }
+.stat-card .value { font-size: 24px; font-weight: bold; color: #1a1a2e; }
+</style>
+</head>
+<body>
+<h1>外汇远期交割排程 <small>导出明细 / 页面展示 / 接口返回 → 同一份数据</small></h1>
+
+<nav>
+  <a href="/">📋 记录列表</a>
+  <a href="/blocking">⚠️ 阻塞记录</a>
+  <a href="/api/records" target="_blank">🔗 API: 全部记录</a>
+  <a href="/api/export">📥 导出 Excel</a>
+</nav>
+
+<div class="stats">
+  <div class="stat-card">
+    <div class="label">总记录数</div>
+    <div class="value">{{ records|length }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">阻塞中</div>
+    <div class="value" style="color:#dc3545">{{ blocking_map|length }}</div>
+  </div>
+</div>
+
+<table>
+<thead>
+<tr>
+  <th>记录ID</th>
+  <th>原始行号</th>
+  <th>交易日</th>
+  <th>交割日</th>
+  <th>货币对</th>
+  <th>金额</th>
+  <th>汇率</th>
+  <th>状态</th>
+  <th>当前步骤</th>
+  <th>备注</th>
+  <th>冲正标记</th>
+  <th>操作</th>
+</tr>
+</thead>
+<tbody>
+{% for r in records %}
+<tr class="{{ 'blocked' if r.record_id in blocking_map else '' }}">
+  <td><a class="evidence-link" href="/records/{{ r.record_id }}">{{ r.record_id[:8] }}...</a></td>
+  <td>{{ r.original_row_number }}</td>
+  <td>{{ r.trade_date }}</td>
+  <td>{{ r.settlement_date }}</td>
+  <td>{{ r.currency_pair }}</td>
+  <td class="{{ 'amount-zero' if r.amount == 0 else '' }}">{{ "%.2f"|format(r.amount) }}</td>
+  <td>{{ r.rate }}</td>
+  <td>
+    {% if r.status == 'pending_risk_review' %}
+      <span class="tag tag-pending">待风控复核</span>
+    {% elif r.status == 'imported' %}
+      <span class="tag tag-imported">已导入</span>
+    {% elif r.status == 'tax_rate_reviewed' %}
+      <span class="tag tag-reviewed">税率已复核</span>
+    {% elif r.status == 'summary_updated' %}
+      <span class="tag tag-summary">摘要已更新</span>
+    {% elif r.status == 'risk_approved' %}
+      <span class="tag tag-risk-approved">风控已通过</span>
+    {% elif r.status == 'reversed' %}
+      <span class="tag tag-reversed">已冲正</span>
+    {% else %}
+      <span class="tag">{{ r.status }}</span>
+    {% endif %}
+  </td>
+  <td>{{ r.current_step }}</td>
+  <td>{{ r.remark[:40] }}{% if r.remark|length > 40 %}...{% endif %}</td>
+  <td>
+    {% if r.has_zero_amount_with_reversal %}
+      <span style="color:#dc3545;font-weight:bold">金额0+已冲正</span>
+    {% elif r.is_reversed %}
+      已冲正
+    {% else %}
+      -
+    {% endif %}
+  </td>
+  <td><a class="evidence-link" href="/records/{{ r.record_id }}">详情</a></td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+
+</body>
+</html>
