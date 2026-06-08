@@ -51,6 +51,54 @@ export function Report() {
     }
   };
 
+  const handleExport = () => {
+    if (!report || !batch) return;
+    const lines: string[] = [];
+    lines.push('========================================');
+    lines.push('  图神经网络社区解释 - 交接报告');
+    lines.push('========================================');
+    lines.push('');
+    lines.push('批次: ' + batch.name);
+    lines.push('生成时间: ' + new Date().toLocaleString('zh-CN'));
+    lines.push('');
+    lines.push('--- 报告摘要 ---');
+    lines.push(report.summary);
+    lines.push('');
+    if (report.actionItems.length > 0) {
+      lines.push('--- 待处理事项 ---');
+      report.actionItems.forEach((item, i) => {
+        lines.push((i + 1) + '. ' + item);
+      });
+      lines.push('');
+    }
+    report.sections.forEach((section) => {
+      lines.push('--- ' + section.title + ' ---');
+      lines.push(section.content);
+      lines.push('');
+    });
+    lines.push('--- 计算明细 ---');
+    records.forEach((record) => {
+      lines.push(record.sampleName + ' | ' + (record.type === 'success' ? '顺利' : record.type === 'pending' ? '待确认' : '旧口径') + ' | 模块度: ' + record.outputData.modularity);
+      if (record.processingAdvice) {
+        lines.push('  建议: ' + record.processingAdvice);
+      }
+    });
+    lines.push('');
+    lines.push('========================================');
+    lines.push('本报告由图神经网络社区解释交接管理系统自动生成');
+    lines.push('========================================');
+
+    const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = '交接报告-' + batch.name + '-' + new Date().toISOString().slice(0, 10) + '.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   if (!batch || !report) {
     return (
       <div className="bg-white rounded-2xl p-12 shadow-sm border border-slate-100 text-center">
@@ -76,7 +124,7 @@ export function Report() {
             <Share2 className="w-4 h-4" />
             分享
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition-colors">
+          <button className="flex items-center gap-2 px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition-colors" onClick={handleExport}>
             <Download className="w-4 h-4" />
             导出报告
           </button>

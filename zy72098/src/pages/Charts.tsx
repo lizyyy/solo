@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 
 export function Charts() {
   const navigate = useNavigate();
-  const { getCurrentRecords, getCurrentSamples } = useAppStore();
+  const { getCurrentRecords, getCurrentSamples, selectRecord } = useAppStore();
   const records = getCurrentRecords();
   const samples = getCurrentSamples();
 
@@ -100,6 +100,7 @@ export function Charts() {
           value: params.value,
           recordId: params.data.recordId,
         });
+        useAppStore.getState().selectRecord(params.data.recordId);
         navigate('/calculation');
       }
     });
@@ -129,7 +130,7 @@ export function Charts() {
     const option: echarts.EChartsOption = {
       tooltip: {
         formatter: (params: any) => {
-          const [communityCount, modularity, stability, name, recordId] = params.data;
+          const [communityCount, modularity, stability, name] = params.data;
           return `
             <div style="padding: 8px;">
               <div style="font-weight: bold; margin-bottom: 4px;">${name}</div>
@@ -189,6 +190,7 @@ export function Charts() {
           value: params.data[1],
           recordId: params.data[4],
         });
+        useAppStore.getState().selectRecord(params.data[4]);
         navigate('/calculation');
       }
     });
@@ -304,7 +306,10 @@ export function Charts() {
                 <tr
                   key={record.id}
                   className="border-b border-slate-100 hover:bg-slate-50 cursor-pointer"
-                  onClick={() => navigate('/calculation')}
+                  onClick={() => {
+                    selectRecord(record.id);
+                    navigate('/calculation');
+                  }}
                 >
                   <td className="py-3 px-4 font-medium text-slate-800">{record.sampleName}</td>
                   <td className="py-3 px-4">

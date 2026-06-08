@@ -15,6 +15,33 @@ import {
 } from '@/data/mockData';
 import { calculationEngine } from '@/engine/CalculationEngine';
 
+const STORAGE_KEY = 'gnn-community-explainer-store';
+
+interface PersistedState {
+  remarks: Remark[];
+  calculationRecords: CalculationRecord[];
+  samples: Sample[];
+  batches: Batch[];
+}
+
+function loadPersistedState(): PersistedState | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as PersistedState;
+  } catch {
+    return null;
+  }
+}
+
+function savePersistedState(state: PersistedState) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch {}
+}
+
+const persisted = loadPersistedState();
+
 interface AppState {
   batches: Batch[];
   currentBatchId: string | null;
@@ -35,15 +62,25 @@ interface AppState {
   addRemark: (recordId: string, content: string, addedBy: string) => void;
   runCalculation: () => Promise<void>;
   recalculateRecord: (recordId: string) => void;
+  resetToDefaults: () => void;
+}
+
+function getPersistableState(state: AppState): PersistedState {
+  return {
+    remarks: state.remarks,
+    calculationRecords: state.calculationRecords,
+    samples: state.samples,
+    batches: state.batches,
+  };
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
-  batches: [mockBatch],
-  currentBatchId: mockBatch.id,
-  calculationRecords: mockCalculationRecords,
-  samples: mockSamples,
+  batches: persisted?.batches ?? [mockBatch],
+  currentBatchId: persisted?.batches?.[0]?.id ?? mockBatch.id,
+  calculationRecords: persisted?.calculationRecords ?? mockCalculationRecords,
+  samples: persisted?.samples ?? mockSamples,
   paramVersions: mockParamVersions,
-  remarks: mockRemarks,
+  remarks: persisted?.remarks ?? mockRemarks,
   selectedRecordId: null,
   isLoading: false,
 
@@ -77,16 +114,21 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   addRemark: (recordId: string, content: string, addedBy: string) => {
     const newRemark: Remark = {
-      id: `remark-${Date.now()}`,
+      id: 'remark-' + Date.now(),
       recordId,
       content,
       addedBy,
       addedAt: new Date().toISOString(),
       isSupplement: true,
     };
-    set((state) => ({
-      remarks: [...state.remarks, newRemark],
-    }));
+    set((state) => {
+      const updated = { remarks: [...state.remarks, newRemark] };
+      savePersistedState({
+        ...getPersistableState(state),
+        ...updated,
+      });
+      return updated;
+    });
   },
 
   runCalculation: async () => {
@@ -122,10 +164,8 @@ export const useAppStore = create<AppState>((set, get) => ({
       }
     }
 
-    set((state) => ({
-      calculationRecords: newRecords,
-      isLoading: false,
-      batches: state.batches.map((b) =>
+    set((state) => {
+      const updatedBatches = state.batches.map((b) =>
         b.id === currentBatchId
           ? {
               ...b,
@@ -137,8 +177,18 @@ export const useAppStore = create<AppState>((set, get) => ({
               completedAt: new Date().toISOString(),
             }
           : b
-      ),
-    }));
+      );
+      const updated = {
+        calculationRecords: newRecords,
+        isLoading: false,
+        batches: updatedBatches,
+      };
+      savePersistedState({
+        ...getPersistableState(state),
+        ...updated,
+      });
+      return updated;
+    });
   },
 
   recalculateRecord: (recordId: string) => {
@@ -154,10 +204,35 @@ export const useAppStore = create<AppState>((set, get) => ({
       avgDegree: 5 + Math.random() * 2,
     });
 
-    set((state) => ({
-      calculationRecords: state.calculationRecords.map((r) =>
-        r.id === recordId ? { ...result.record, id: recordId } : r
-      ),
-    }));
+    set((state) => {
+      const updated = {
+        calculationRecords: state.calculationRecords.map((r) =>
+          r.id === recordId ? { ...result.record, id: recordId } : r
+        ),
+      };
+      savePersistedState({
+        ...getPersistableState(state),
+        ...updated,
+      });
+      return updated;
+    });
+  },
+
+  resetToDefaults: () => {
+    const defaults: PersistedState = {
+      remarks: mockRemarks,
+      calculationRecords: mockCalculationRecords,
+      samples: mockSamples,
+      batches: [mockBatch],
+    };
+    localStorage.removeItem(STORAGE_KEY);
+    set({
+      batches: defaults.batches,
+      currentBatchId: mockBatch.id,
+      calculationRecords: defaults.calculationRecords,
+      samples: defaults.samples,
+      remarks: defaults.remarks,
+      selectedRecordId: null,
+    });
   },
 }));

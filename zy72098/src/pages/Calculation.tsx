@@ -14,9 +14,19 @@ import { useAppStore } from '@/store/appStore';
 import type { CalculationRecord } from '@/types';
 
 export function Calculation() {
-  const { getCurrentRecords, getRecordRemarks } = useAppStore();
+  const { getCurrentRecords, getRecordRemarks, selectedRecordId, selectRecord } = useAppStore();
   const records = getCurrentRecords();
-  const [selectedRecord, setSelectedRecord] = useState<CalculationRecord | null>(records[0] || null);
+  const [localSelectedId, setLocalSelectedId] = useState<string | null>(
+    selectedRecordId || records[0]?.id || null
+  );
+
+  const activeId = selectedRecordId || localSelectedId;
+  const selectedRecord = records.find((r) => r.id === activeId) || records[0] || null;
+
+  const handleSelect = (record: CalculationRecord) => {
+    selectRecord(record.id);
+    setLocalSelectedId(record.id);
+  };
 
   const getTypeInfo = (type: string) => {
     switch (type) {
@@ -52,7 +62,7 @@ export function Calculation() {
                 return (
                   <div
                     key={record.id}
-                    onClick={() => setSelectedRecord(record)}
+                    onClick={() => handleSelect(record)}
                     className={`p-3 rounded-xl cursor-pointer transition-all ${
                       selectedRecord?.id === record.id
                         ? 'bg-cyan-50 border-2 border-cyan-300'

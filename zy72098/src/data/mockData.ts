@@ -374,7 +374,7 @@ export const mockCalculationRecords: CalculationRecord[] = [
     sampleId: 'SAMPLE-006',
     sampleName: '社区F-数据缺失',
     type: 'pending',
-    inputData: { nodeCount: null, edgeCount: null, avgDegree: null },
+    inputData: { nodeCount: 0, edgeCount: 0, avgDegree: 0 },
     outputData: { modularity: 0, communityCount: 0, stability: 0 },
     formula: 'Q = (1/2m) * Σ(A_ij - (k_i*k_j)/(2m)) * δ(c_i,c_j)',
     unitCheck: { passed: false, issues: ['关键输入参数缺失'] },

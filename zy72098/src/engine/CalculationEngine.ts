@@ -4,7 +4,7 @@ import { unitValidator } from './UnitValidator';
 interface CalculationInput {
   nodeCount: number | null;
   edgeCount: number | string | null;
-  avgDegree?: number;
+  avgDegree?: number | null;
   sampleId: string;
   sampleName: string;
   batchId: string;
