@@ -620,8 +620,7 @@ const App = {
 
     document.getElementById('modalTitle').textContent = '📤 导出清单';
     document.getElementById('modalBody').innerHTML = menuHtml;
-    document.getElementById('modalFooter').style.display = 'none';
-    this.openModal('modal');
+    this.openModal('modal', false);
   },
 
   handleImport(e) {
@@ -722,10 +721,10 @@ const App = {
     document.getElementById('diffSection').style.display = 'none';
   },
 
-  openModal(id) {
+  openModal(id, showFooter) {
     document.getElementById(id).classList.add('show');
     if (id === 'modal') {
-      document.getElementById('modalFooter').style.display = 'flex';
+      document.getElementById('modalFooter').style.display = showFooter !== false ? 'flex' : 'none';
     }
   },
 
