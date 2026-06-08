@@ -3,7 +3,6 @@ import type {
   CoordinateOriginNote,
   MergedObstacle,
   SelfCheckIssue,
-  SelfCheckType,
   ExportPayload,
   ExportItem,
   SelfCheckSummary,

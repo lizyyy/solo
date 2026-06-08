@@ -1,6 +1,7 @@
-import { useCallback, useRef } from 'react'
-import { useAppState } from '../../store'
-import { parseCoordinateOriginCSV, mergeData, runSelfChecks, buildExportPayload } from '../../core/engine'
+import { useCallback, useRef, useState } from 'react'
+import { useAppState, apiPost, apiGet } from '../../store'
+import { parseCoordinateOriginCSV } from '../../core/engine'
+import type { MergedObstacle, SelfCheckIssue, ExportPayload } from '../../types'
 
 const DEMO_CSV = `obstacleId,obstacleName,originDescription,fieldObservation
 OBS-001,塔基爬梯入口,以塔基中心为原点，X轴正方向3m,现场确认爬梯入口偏移约0.2m
@@ -9,34 +10,84 @@ OBS-003,叶片根部检修通道,以轮毂中心为原点，Z轴正方向1.5m,�
 OBS-004,塔筒中部休息平台,以塔筒中心为原点，X轴负方向1m,现场说法与图纸标注一致
 OBS-005,发电机顶部检修口,以发电机中心为原点，Z轴正方向2m,现场确认无误`
 
+interface ApiImportOriginResponse {
+  imported: number
+  totalOriginNotes: number
+}
+
+interface ApiMergeResponse {
+  merged: number
+  issues: number
+  payload: ExportPayload
+}
+
+interface ApiResultResponse {
+  isMerged: boolean
+  mergedResults: MergedObstacle[]
+  selfCheckIssues: SelfCheckIssue[]
+  payload: ExportPayload
+}
+
 export default function Step2Origin() {
   const { state, dispatch } = useAppState()
   const fileRef = useRef<HTMLInputElement>(null)
+  const [syncing, setSyncing] = useState(false)
+  const [merging, setMerging] = useState(false)
+
+  const syncToApi = useCallback(async (csv: string) => {
+    setSyncing(true)
+    try {
+      await apiPost<ApiImportOriginResponse>('/api/import/origin', { csv })
+    } catch (e) {
+      console.error('API 同步失败:', e)
+    } finally {
+      setSyncing(false)
+    }
+  }, [])
 
   const handleFileUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
     const reader = new FileReader()
-    reader.onload = (ev) => {
+    reader.onload = async (ev) => {
       const csv = ev.target?.result as string
       const notes = parseCoordinateOriginCSV(csv)
       dispatch({ type: 'IMPORT_ORIGIN_NOTES', notes })
+      await syncToApi(csv)
     }
     reader.readAsText(file)
-  }, [dispatch])
+  }, [dispatch, syncToApi])
 
-  const handleDemoData = useCallback(() => {
+  const handleDemoData = useCallback(async () => {
     const notes = parseCoordinateOriginCSV(DEMO_CSV)
     dispatch({ type: 'IMPORT_ORIGIN_NOTES', notes })
-  }, [dispatch])
+    await syncToApi(DEMO_CSV)
+  }, [dispatch, syncToApi])
 
-  const handleMerge = useCallback(() => {
-    const merged = mergeData(state.radiusRows, state.originNotes)
-    const issues = runSelfChecks(state.radiusRows, state.originNotes, merged)
-    const payload = buildExportPayload(merged, issues)
-    dispatch({ type: 'MERGE_COMPLETE', merged, issues, payload })
-    dispatch({ type: 'SET_STEP', step: 3 })
-  }, [state.radiusRows, state.originNotes, dispatch])
+  const handleMerge = useCallback(async () => {
+    setMerging(true)
+    try {
+      await apiPost<ApiMergeResponse>('/api/merge')
+
+      const result = await apiGet<ApiResultResponse>('/api/result')
+      if (result.isMerged && result.payload) {
+        dispatch({
+          type: 'SYNC_FROM_API',
+          data: {
+            mergedResults: result.mergedResults,
+            selfCheckIssues: result.selfCheckIssues,
+            exportPayload: result.payload,
+          },
+        })
+      }
+
+      dispatch({ type: 'SET_STEP', step: 3 })
+    } catch (e) {
+      console.error('合并失败:', e)
+    } finally {
+      setMerging(false)
+    }
+  }, [dispatch])
 
   const dualNamePreview = (() => {
     const radiusIds = new Map(state.radiusRows.map(r => [r.obstacleId, r.obstacleName]))
@@ -57,6 +108,7 @@ export default function Step2Origin() {
         <div className="card-title">
           <span className="icon">📍</span>
           补看坐标原点说明
+          {syncing && <span className="badge badge-pending" style={{ marginLeft: 8 }}>同步中…</span>}
         </div>
 
         <div className="alert alert-info">
@@ -64,6 +116,7 @@ export default function Step2Origin() {
           <div>
             园区运维小陶在此补看坐标原点说明中的现场说法，
             与安全半径表主流程数据合并到同一结果中。
+            合并操作通过 API 完成，确保页面展示、导出明细和接口返回读同一份服务端结果。
           </div>
         </div>
 
@@ -86,7 +139,7 @@ export default function Step2Origin() {
         />
 
         <div style={{ marginTop: 12, textAlign: 'center' }}>
-          <button className="btn" onClick={handleDemoData}>
+          <button className="btn" onClick={handleDemoData} disabled={syncing}>
             使用演示数据
           </button>
         </div>
@@ -154,10 +207,10 @@ export default function Step2Origin() {
           </button>
           <button
             className="btn btn-primary"
-            disabled={state.radiusRows.length === 0 || state.originNotes.length === 0}
+            disabled={state.radiusRows.length === 0 || state.originNotes.length === 0 || merging}
             onClick={handleMerge}
           >
-            合并数据并进入三维标注视图 →
+            {merging ? '合并中…' : '合并数据并进入三维标注视图 →'}
           </button>
         </div>
       </div>

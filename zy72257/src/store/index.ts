@@ -28,6 +28,7 @@ export type AppAction =
       issues: SelfCheckIssue[]
       payload: ExportPayload
     }
+  | { type: 'SYNC_FROM_API'; data: { mergedResults: MergedObstacle[]; selfCheckIssues: SelfCheckIssue[]; exportPayload: ExportPayload } }
   | { type: 'CONFIRM_OBSTACLE'; obstacleId: string }
   | { type: 'RESOLVE_ISSUE'; issueId: string }
   | { type: 'RESET' }
@@ -75,6 +76,15 @@ export function appReducer(state: AppState, action: AppAction): AppState {
         mergedResults: action.merged,
         selfCheckIssues: action.issues,
         exportPayload: action.payload,
+        isMerged: true,
+      }
+
+    case 'SYNC_FROM_API':
+      return {
+        ...state,
+        mergedResults: action.data.mergedResults,
+        selfCheckIssues: action.data.selfCheckIssues,
+        exportPayload: action.data.exportPayload,
         isMerged: true,
       }
 
@@ -156,4 +166,25 @@ export const AppContext = createContext<AppContextValue>({
 
 export function useAppState() {
   return useContext(AppContext)
+}
+
+export async function apiPost<T>(path: string, body?: unknown): Promise<T> {
+  const res = await fetch(path, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: body ? JSON.stringify(body) : undefined,
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: res.statusText }))
+    throw new Error(err.error ?? `API ${path} 失败: ${res.status}`)
+  }
+  return res.json()
+}
+
+export async function apiGet<T>(path: string): Promise<T> {
+  const res = await fetch(path)
+  if (!res.ok) {
+    throw new Error(`API ${path} 失败: ${res.status}`)
+  }
+  return res.json()
 }

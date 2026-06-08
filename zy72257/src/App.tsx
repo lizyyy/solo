@@ -1,4 +1,4 @@
-import React, { useReducer } from 'react'
+import { useReducer } from 'react'
 import { AppContext, appReducer, initialState, useAppState } from './store'
 import type { WorkflowStep } from './types'
 import Step1Import from './components/Step1Import'

@@ -1,5 +1,5 @@
-import { useCallback, useRef } from 'react'
-import { useAppState } from '../../store'
+import { useCallback, useRef, useState } from 'react'
+import { useAppState, apiPost } from '../../store'
 import { parseSafetyRadiusCSV } from '../../core/engine'
 
 const DEMO_CSV = `obstacleId,obstacleName,radius,unit,manualChange
@@ -10,26 +10,48 @@ OBS-004,塔筒中部休息台,2.8,m,
 OBS-005,发电机顶部检修口,3.5,m,
 OBS-006,塔筒底部爬梯,2.5,m,`
 
+interface ApiImportRadiusResponse {
+  imported: number
+  newCount: number
+  conflictCount: number
+  totalRadiusRows: number
+  conflicts: { obstacleId: string; originalRowNumber: number }[]
+}
+
 export default function Step1Import() {
   const { state, dispatch } = useAppState()
   const fileRef = useRef<HTMLInputElement>(null)
+  const [syncing, setSyncing] = useState(false)
+
+  const syncToApi = useCallback(async (csv: string) => {
+    setSyncing(true)
+    try {
+      await apiPost<ApiImportRadiusResponse>('/api/import/radius', { csv })
+    } catch (e) {
+      console.error('API 同步失败:', e)
+    } finally {
+      setSyncing(false)
+    }
+  }, [])
 
   const handleFileUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
     const reader = new FileReader()
-    reader.onload = (ev) => {
+    reader.onload = async (ev) => {
       const csv = ev.target?.result as string
       const rows = parseSafetyRadiusCSV(csv)
       dispatch({ type: 'IMPORT_RADIUS_ROWS', rows })
+      await syncToApi(csv)
     }
     reader.readAsText(file)
-  }, [dispatch])
+  }, [dispatch, syncToApi])
 
-  const handleDemoData = useCallback(() => {
+  const handleDemoData = useCallback(async () => {
     const rows = parseSafetyRadiusCSV(DEMO_CSV)
     dispatch({ type: 'IMPORT_RADIUS_ROWS', rows })
-  }, [dispatch])
+    await syncToApi(DEMO_CSV)
+  }, [dispatch, syncToApi])
 
   const conflictRows = state.radiusRows.filter(r => r.status === 'conflict')
 
@@ -39,6 +61,7 @@ export default function Step1Import() {
         <div className="card-title">
           <span className="icon">📋</span>
           导入安全半径表
+          {syncing && <span className="badge badge-pending" style={{ marginLeft: 8 }}>同步中…</span>}
         </div>
 
         <div
@@ -60,7 +83,7 @@ export default function Step1Import() {
         />
 
         <div style={{ marginTop: 12, textAlign: 'center' }}>
-          <button className="btn" onClick={handleDemoData}>
+          <button className="btn" onClick={handleDemoData} disabled={syncing}>
             使用演示数据
           </button>
         </div>

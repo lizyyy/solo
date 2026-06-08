@@ -1,6 +1,19 @@
-import { useState, useMemo } from 'react'
-import { useAppState } from '../../store'
-import type { MergedObstacle } from '../../types'
+import { useState, useMemo, useCallback } from 'react'
+import { useAppState, apiPost, apiGet } from '../../store'
+import type { MergedObstacle, SelfCheckIssue, ExportPayload } from '../../types'
+
+interface ApiConfirmResponse {
+  obstacleId: string
+  newStatus: string
+  payload: ExportPayload
+}
+
+interface ApiResultResponse {
+  isMerged: boolean
+  mergedResults: MergedObstacle[]
+  selfCheckIssues: SelfCheckIssue[]
+  payload: ExportPayload
+}
 
 function StatusBadge({ status }: { status: MergedObstacle['status'] }) {
   const map: Record<string, { cls: string; text: string }> = {
@@ -90,10 +103,12 @@ function DetailPanel({
   item,
   onClose,
   onConfirm,
+  confirming,
 }: {
   item: MergedObstacle | null
   onClose: () => void
   onConfirm: (id: string) => void
+  confirming: boolean
 }) {
   if (!item) return null
 
@@ -194,9 +209,10 @@ function DetailPanel({
         {item.status !== 'confirmed' && (
           <button
             className="btn btn-success"
+            disabled={confirming}
             onClick={() => onConfirm(item.obstacleId)}
           >
-            确认复核通过
+            {confirming ? '确认中…' : '确认复核通过'}
           </button>
         )}
       </div>
@@ -207,6 +223,7 @@ function DetailPanel({
 export default function Step3View() {
   const { state, dispatch } = useAppState()
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [confirming, setConfirming] = useState(false)
 
   const selectedItem = useMemo(
     () => state.mergedResults.find(m => m.obstacleId === selectedId) ?? null,
@@ -217,13 +234,57 @@ export default function Step3View() {
   const confirmedCount = state.mergedResults.filter(m => m.status === 'confirmed').length
   const pendingCount = state.mergedResults.filter(m => m.status === 'pending_review').length
 
-  const handleConfirm = (id: string) => {
-    dispatch({ type: 'CONFIRM_OBSTACLE', obstacleId: id })
-  }
+  const refreshFromApi = useCallback(async () => {
+    try {
+      const result = await apiGet<ApiResultResponse>('/api/result')
+      if (result.isMerged && result.payload) {
+        dispatch({
+          type: 'SYNC_FROM_API',
+          data: {
+            mergedResults: result.mergedResults,
+            selfCheckIssues: result.selfCheckIssues,
+            exportPayload: result.payload,
+          },
+        })
+      }
+    } catch (e) {
+      console.error('刷新失败:', e)
+    }
+  }, [dispatch])
 
-  const handleExportJSON = () => {
-    if (!state.exportPayload) return
-    const json = JSON.stringify(state.exportPayload, null, 2)
+  const handleConfirm = useCallback(async (id: string) => {
+    setConfirming(true)
+    try {
+      await apiPost<ApiConfirmResponse>(`/api/confirm/${id}`)
+      await refreshFromApi()
+    } catch (e) {
+      console.error('确认失败:', e)
+    } finally {
+      setConfirming(false)
+    }
+  }, [refreshFromApi])
+
+  const handleResolveIssue = useCallback(async (issueId: string) => {
+    try {
+      await apiPost(`/api/resolve-issue/${issueId}`)
+      dispatch({ type: 'RESOLVE_ISSUE', issueId })
+    } catch (e) {
+      console.error('标记失败:', e)
+    }
+  }, [dispatch])
+
+  const handleExportJSON = useCallback(async () => {
+    let payload = state.exportPayload
+    if (!payload) return
+    try {
+      const result = await apiGet<ApiResultResponse>('/api/result')
+      if (result.isMerged && result.payload) {
+        payload = result.payload
+      }
+    } catch {
+      // fallback to state
+    }
+    const json = JSON.stringify(payload, null, 2)
     const blob = new Blob([json], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -231,12 +292,21 @@ export default function Step3View() {
     a.download = `风机检修爬梯路径_${new Date().toISOString().slice(0, 10)}.json`
     a.click()
     URL.revokeObjectURL(url)
-  }
+  }, [state.exportPayload])
 
-  const handleExportCSV = () => {
-    if (!state.exportPayload) return
+  const handleExportCSV = useCallback(async () => {
+    let payload = state.exportPayload
+    if (!payload) return
+    try {
+      const result = await apiGet<ApiResultResponse>('/api/result')
+      if (result.isMerged && result.payload) {
+        payload = result.payload
+      }
+    } catch {
+      // fallback to state
+    }
     const header = 'obstacleId,displayName,radius,unit,status,originalRowNumbers,hasAnomaly,anomalyDetail'
-    const rows = state.exportPayload.items.map(item =>
+    const rows = payload.items.map(item =>
       `${item.obstacleId},${item.displayName},${item.radius ?? ''},${item.unit},${item.status},"${item.originalRowNumbers.join(';')}",${item.hasAnomaly},"${item.anomalyDetail ?? ''}"`
     )
     const csv = [header, ...rows].join('\n')
@@ -247,7 +317,7 @@ export default function Step3View() {
     a.download = `风机检修爬梯路径_${new Date().toISOString().slice(0, 10)}.csv`
     a.click()
     URL.revokeObjectURL(url)
-  }
+  }, [state.exportPayload])
 
   return (
     <div>
@@ -296,7 +366,7 @@ export default function Step3View() {
                 {!issue.resolved && (
                   <button
                     className="btn btn-sm"
-                    onClick={() => dispatch({ type: 'RESOLVE_ISSUE', issueId: issue.id })}
+                    onClick={() => handleResolveIssue(issue.id)}
                   >
                     标记已处理
                   </button>
@@ -336,6 +406,13 @@ export default function Step3View() {
         <div className="card-title">
           <span className="icon">📋</span>
           合并结果明细（与导出/接口返回为同一数据源）
+        </div>
+        <div className="alert alert-info" style={{ marginBottom: 12 }}>
+          <span>ℹ️</span>
+          <div>
+            以下数据来自服务端 <code>GET /api/result</code>，页面展示、导出明细和接口返回读取同一份服务端结果。
+            确认操作通过 <code>POST /api/confirm/:id</code> 更新服务端状态后刷新。
+          </div>
         </div>
         <div style={{ overflowX: 'auto' }}>
           <table>
@@ -399,8 +476,8 @@ export default function Step3View() {
         <div className="alert alert-info">
           <span>ℹ️</span>
           <div>
-            导出数据、页面展示和接口返回均读取<strong>同一份</strong>合并结果（state.exportPayload），
-            确保一致性。同一障碍物双命名异常在所有位置均显示为"异常待复核"，不会出现一个地方显示异常、另一个地方消失的情况。
+            导出前会从 <code>GET /api/result</code> 拉取最新服务端结果，确保导出内容与接口返回、页面展示完全一致。
+            同一障碍物双命名异常在所有位置均显示为"异常待复核"，不会出现一个地方显示异常、另一个地方消失的情况。
           </div>
         </div>
         <div className="actions-bar">
@@ -417,6 +494,7 @@ export default function Step3View() {
         item={selectedItem}
         onClose={() => setSelectedId(null)}
         onConfirm={handleConfirm}
+        confirming={confirming}
       />
     </div>
   )
