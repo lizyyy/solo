@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Optional
 
 from .models import (
+    AuditEntry,
     CoordinateRow,
     FloorProfile,
     InspectionProject,
@@ -57,6 +59,23 @@ def detect_inconsistencies(project: InspectionProject) -> list[OcclusionPoint]:
                 if remark and remark.severity.value in ("high", "critical"):
                     next_action = NextAction.INSTRUCTOR_LIANG
 
+            now = datetime.now().isoformat()
+            entry = AuditEntry(
+                timestamp=now,
+                action="created",
+                from_status="",
+                to_status=OcclusionStatus.PENDING_REVIEW.value,
+                from_reason="",
+                to_reason=reason,
+                from_missing_material="",
+                to_missing_material=missing,
+                from_next_action="",
+                to_next_action=next_action.value,
+                changed_by="system_detect",
+                change_cause="照片有点位但坐标表缺一行，自动检测生成",
+                note="原始检测：不要急着归正常，留给安全员复核",
+            )
+
             op = OcclusionPoint(
                 photo_location_id=photo_loc.id,
                 photo_ref=photo_loc.photo_ref,
@@ -69,6 +88,10 @@ def detect_inconsistencies(project: InspectionProject) -> list[OcclusionPoint]:
                 next_action=next_action,
                 obstacle_remark_id=photo_loc.obstacle_remark_id,
                 floor_profile_id=photo_loc.floor_profile_id,
+                original_reason=reason,
+                original_missing_material=missing,
+                original_next_action=next_action.value,
+                audit_trail=[entry],
             )
             new_points.append(op)
 
@@ -79,6 +102,7 @@ def resolve_occlusion_points(
     project: InspectionProject,
 ) -> list[OcclusionPoint]:
     resolved: list[OcclusionPoint] = []
+    now = datetime.now().isoformat()
     for op in project.occlusion_points:
         if op.status != OcclusionStatus.PENDING_REVIEW:
             continue
@@ -87,15 +111,72 @@ def resolve_occlusion_points(
             continue
         match = find_matching_coordinate(photo_loc, project.coordinate_rows)
         if match is not None:
+            old_reason = op.reason
+            old_missing = op.missing_material
+            old_next = op.next_action.value
+
+            new_reason = op.original_reason
+            new_missing = f"已通过补录坐标表解决（匹配坐标行: {match.point_label}）"
+            new_next = NextAction.SAFETY_OFFICER.value
+
+            entry = AuditEntry(
+                timestamp=now,
+                action="resolved_by_coordinate",
+                from_status=OcclusionStatus.PENDING_REVIEW.value,
+                to_status=OcclusionStatus.RESOLVED.value,
+                from_reason=old_reason,
+                to_reason=new_reason,
+                from_missing_material=old_missing,
+                to_missing_material=new_missing,
+                from_next_action=old_next,
+                to_next_action=new_next,
+                changed_by="system_auto",
+                change_cause=f"坐标表补录了匹配行 {match.point_label} ({match.x:.2f}, {match.y:.2f}, {match.z:.2f})",
+                note="原始说法已保留，改后值和原因已记录",
+            )
+
             op.status = OcclusionStatus.RESOLVED
             op.resolved_by = "system_auto"
-            from datetime import datetime
-
-            op.resolved_at = datetime.now().isoformat()
-            op.updated_at = datetime.now().isoformat()
-            op.missing_material = "已通过补录坐标表解决"
+            op.resolved_at = now
+            op.updated_at = now
+            op.missing_material = new_missing
+            op.next_action = NextAction.SAFETY_OFFICER
+            op.audit_trail.append(entry)
             resolved.append(op)
     return resolved
+
+
+def add_review_note(
+    op: OcclusionPoint,
+    action: str,
+    new_status: OcclusionStatus,
+    new_missing: str,
+    new_next: NextAction,
+    changed_by: str,
+    cause: str,
+    note: str,
+) -> None:
+    now = datetime.now().isoformat()
+    entry = AuditEntry(
+        timestamp=now,
+        action=action,
+        from_status=op.status.value,
+        to_status=new_status.value,
+        from_reason=op.reason,
+        to_reason=op.reason,
+        from_missing_material=op.missing_material,
+        to_missing_material=new_missing,
+        from_next_action=op.next_action.value,
+        to_next_action=new_next.value,
+        changed_by=changed_by,
+        change_cause=cause,
+        note=note,
+    )
+    op.status = new_status
+    op.missing_material = new_missing
+    op.next_action = new_next
+    op.updated_at = now
+    op.audit_trail.append(entry)
 
 
 def _find_obstacle_remark(
@@ -174,12 +255,18 @@ def generate_occlusion_report(project: InspectionProject) -> str:
         lines.append(
             f"- **点位坐标**: ({op.point_x:.2f}, {op.point_y:.2f}, {op.point_z:.2f})"
         )
-        lines.append(f"- **状态**: {_status_label(op.status)}")
+        lines.append(f"- **当前状态**: {_status_label(op.status)}")
         lines.append(f"- **为什么被留下**: {op.reason}")
         lines.append(f"- **还缺什么材料**: {op.missing_material}")
         lines.append(
             f"- **下一步**: {_next_action_label(op.next_action)}"
         )
+        if op.original_reason and op.original_reason != op.reason:
+            lines.append(f"- **原始说法（保留）**: {op.original_reason}")
+        if op.original_missing_material and op.original_missing_material != op.missing_material:
+            lines.append(f"- **原始缺失描述（保留）**: {op.original_missing_material}")
+        if op.original_next_action and op.original_next_action != op.next_action.value:
+            lines.append(f"- **原始下一步（保留）**: {_next_action_label(NextAction(op.original_next_action))}")
         if op.obstacle_remark_id:
             remark = _find_obstacle_remark(project, op.obstacle_remark_id)
             if remark:
@@ -190,6 +277,22 @@ def generate_occlusion_report(project: InspectionProject) -> str:
             profile = _find_floor_profile(project, op.floor_profile_id)
             if profile:
                 lines.append(f"- **关联楼层剖面草图**: {profile.floor_name}")
+
+        if op.audit_trail:
+            lines.append(f"")
+            lines.append(f"### 变更历史")
+            for j, entry in enumerate(op.audit_trail, 1):
+                lines.append(f"  {j}. [{entry.timestamp}] {_audit_action_label(entry.action)}")
+                lines.append(f"     状态: {_occlusion_status_value_label(entry.from_status) or '(新建)'} → {_occlusion_status_value_label(entry.to_status)}")
+                if entry.from_missing_material != entry.to_missing_material:
+                    lines.append(f"     缺失描述: {entry.from_missing_material or '(无)'} → {entry.to_missing_material}")
+                if entry.from_next_action != entry.to_next_action:
+                    fn_from = _next_action_label(NextAction(entry.from_next_action)) if entry.from_next_action else "(无)"
+                    fn_to = _next_action_label(NextAction(entry.to_next_action)) if entry.to_next_action else "(无)"
+                    lines.append(f"     下一步: {fn_from} → {fn_to}")
+                lines.append(f"     操作人: {entry.changed_by}  原因: {entry.change_cause}")
+                if entry.note:
+                    lines.append(f"     备注: {entry.note}")
         lines.append(f"")
 
     return "\n".join(lines)
@@ -217,6 +320,25 @@ def _next_action_label(action: NextAction) -> str:
         NextAction.SAFETY_OFFICER: "找安全员复核",
         NextAction.INSTRUCTOR_LIANG: "找培训教官老梁补材料",
     }.get(action, str(action))
+
+
+def _audit_action_label(action: str) -> str:
+    return {
+        "created": "首次检测生成",
+        "resolved_by_coordinate": "坐标表补录后自动解决",
+        "escalated_to_safety": "升级安全员复核",
+        "revert_to_pending": "回退待复核",
+        "review_comment": "人工复核批注",
+    }.get(action, action)
+
+
+def _occlusion_status_value_label(value: str) -> str:
+    return {
+        "pending_review": "待安全员复核",
+        "confirmed": "已确认遮挡",
+        "resolved": "已解决",
+        "escalated_safety": "已升级安全员",
+    }.get(value, value)
 
 
 def _find_floor_profile(

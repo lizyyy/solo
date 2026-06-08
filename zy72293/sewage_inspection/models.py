@@ -79,6 +79,22 @@ class CoordinateRow(BaseModel):
     created_at: str = Field(default_factory=lambda: datetime.now().isoformat())
 
 
+class AuditEntry(BaseModel):
+    timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())
+    action: str = ""
+    from_status: str = ""
+    to_status: str = ""
+    from_reason: str = ""
+    to_reason: str = ""
+    from_missing_material: str = ""
+    to_missing_material: str = ""
+    from_next_action: str = ""
+    to_next_action: str = ""
+    changed_by: str = ""
+    change_cause: str = ""
+    note: str = ""
+
+
 class OcclusionPoint(BaseModel):
     id: str = Field(default_factory=lambda: uuid.uuid4().hex[:12])
     photo_location_id: str
@@ -96,6 +112,10 @@ class OcclusionPoint(BaseModel):
     resolved_at: Optional[str] = None
     created_at: str = Field(default_factory=lambda: datetime.now().isoformat())
     updated_at: str = Field(default_factory=lambda: datetime.now().isoformat())
+    original_reason: str = ""
+    original_missing_material: str = ""
+    original_next_action: str = ""
+    audit_trail: list[AuditEntry] = Field(default_factory=list)
 
 
 class InspectionProject(BaseModel):

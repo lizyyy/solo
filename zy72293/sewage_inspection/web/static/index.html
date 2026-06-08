@@ -66,15 +66,14 @@
     </div>
 
     <div id="tab-chart" class="tab-content">
-      <canvas id="chart-canvas" width="800" height="500"></canvas>
+      <canvas id="chart-canvas" width="800" height="500" style="cursor:pointer;"></canvas>
       <div id="chart-legend" class="legend"></div>
-      <div id="chart-detail" class="detail-panel hidden"></div>
+      <p class="hint">💡 点击红色异常点可查看详情并跳转到障碍物备注/楼层剖面草图</p>
     </div>
 
     <div id="tab-3d" class="tab-content hidden">
-      <canvas id="three-canvas" width="800" height="500"></canvas>
-      <p class="hint">3D视图：照片点位（红）与坐标表行（绿），红色无绿色配对 = 照片有点位但坐标表缺行</p>
-      <div id="three-detail" class="detail-panel hidden"></div>
+      <canvas id="three-canvas" width="800" height="500" style="cursor:pointer;"></canvas>
+      <p class="hint">3D视图：照片点位（红）与坐标表行（绿），红色无绿色配对 = 照片有点位但坐标表缺行；点击红点查看详情</p>
     </div>
 
     <div id="tab-occlusion" class="tab-content hidden">
@@ -102,6 +101,16 @@
       <div class="modal-actions">
         <button onclick="doImport()">确认导入</button>
         <button onclick="hideImportPanel()">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="detail-modal" class="modal hidden">
+    <div class="modal-content wide-modal">
+      <h3 id="detail-title">异常点详情</h3>
+      <div id="detail-body"></div>
+      <div class="modal-actions">
+        <button onclick="hideDetailModal()">关闭</button>
       </div>
     </div>
   </div>

@@ -29,7 +29,18 @@ from .core import (
 )
 from .workflow import WorkflowEngine
 
-app = FastAPI(title="污水厂池体巡检路线", version="1.0.0")
+app = FastAPI(title="污水厂池体巡检路线", version="1.1.0")
+
+
+@app.middleware("http")
+async def no_cache_static(request, call_next):
+    response = await call_next(request)
+    if request.url.path.startswith("/static/"):
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+    return response
+
 
 static_dir = Path(__file__).parent / "web" / "static"
 if static_dir.exists():
@@ -58,6 +69,11 @@ class ImportCoordinatesRequest(BaseModel):
 
 class EscalateRequest(BaseModel):
     target: str = "safety_officer"
+
+
+class ReviewCommentRequest(BaseModel):
+    comment: str
+    reviewer: str = "safety_officer"
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -141,6 +157,15 @@ async def escalate_occlusion(project_id: str, occlusion_id: str, req: EscalateRe
     return _project_detail(project)
 
 
+@app.post("/api/projects/{project_id}/occlusion/{occlusion_id}/review-comment")
+async def add_review_comment(project_id: str, occlusion_id: str, req: ReviewCommentRequest):
+    try:
+        project = engine.add_review_comment(project_id, occlusion_id, req.comment, req.reviewer)
+    except FileNotFoundError:
+        raise HTTPException(404, "项目不存在")
+    return _project_detail(project)
+
+
 @app.get("/api/projects/{project_id}/chart-data")
 async def chart_data(project_id: str):
     try:
@@ -176,20 +201,7 @@ async def chart_data(project_id: str):
             for row in project.coordinate_rows
         ],
         "occlusion_points": [
-            {
-                "id": op.id,
-                "photo_ref": op.photo_ref,
-                "x": op.point_x,
-                "y": op.point_y,
-                "z": op.point_z,
-                "status": op.status.value,
-                "status_label": _status_label(op.status),
-                "reason": op.reason,
-                "missing_material": op.missing_material,
-                "next_action_label": _next_action_label(op.next_action),
-                "obstacle_remark_id": op.obstacle_remark_id,
-                "floor_profile_id": op.floor_profile_id,
-            }
+            _serialize_occlusion(op, project)
             for op in project.occlusion_points
         ],
         "obstacle_remarks": [
@@ -213,6 +225,38 @@ async def chart_data(project_id: str):
     }
 
 
+def _serialize_occlusion(op: OcclusionPoint, project: InspectionProject) -> dict:
+    result = {
+        "id": op.id,
+        "photo_ref": op.photo_ref,
+        "x": op.point_x,
+        "y": op.point_y,
+        "z": op.point_z,
+        "status": op.status.value,
+        "status_label": _status_label(op.status),
+        "reason": op.reason,
+        "missing_material": op.missing_material,
+        "next_action_label": _next_action_label(op.next_action),
+        "obstacle_remark_id": op.obstacle_remark_id,
+        "floor_profile_id": op.floor_profile_id,
+        "original_reason": op.original_reason,
+        "original_missing_material": op.original_missing_material,
+        "original_next_action": op.original_next_action,
+        "audit_trail": [entry.model_dump() for entry in op.audit_trail],
+    }
+    if op.obstacle_remark_id:
+        for r in project.obstacle_remarks:
+            if r.id == op.obstacle_remark_id:
+                result["obstacle_remark_summary"] = f"{r.location} — {r.description}"
+                break
+    if op.floor_profile_id:
+        for p in project.floor_profiles:
+            if p.id == op.floor_profile_id:
+                result["floor_profile_summary"] = p.floor_name
+                break
+    return result
+
+
 def _has_coord_match(loc: PhotoLocation, rows: list[CoordinateRow]) -> bool:
     from .core import find_matching_coordinate
 
@@ -232,6 +276,7 @@ def _project_summary(project: InspectionProject) -> dict:
 def _project_detail(project: InspectionProject) -> dict:
     pending = sum(1 for op in project.occlusion_points if op.status == OcclusionStatus.PENDING_REVIEW)
     resolved = sum(1 for op in project.occlusion_points if op.status == OcclusionStatus.RESOLVED)
+    escalated = sum(1 for op in project.occlusion_points if op.status == OcclusionStatus.ESCALATED_SAFETY)
     return {
         **_project_summary(project),
         "stats": {
@@ -242,6 +287,7 @@ def _project_detail(project: InspectionProject) -> dict:
             "occlusion_points": len(project.occlusion_points),
             "pending_review": pending,
             "resolved": resolved,
+            "escalated": escalated,
         },
         "obstacle_remarks": [r.model_dump() for r in project.obstacle_remarks],
         "floor_profiles": [p.model_dump() for p in project.floor_profiles],
@@ -249,9 +295,7 @@ def _project_detail(project: InspectionProject) -> dict:
         "coordinate_rows": [r.model_dump() for r in project.coordinate_rows],
         "occlusion_points": [
             {
-                **op.model_dump(),
-                "status_label": _status_label(op.status),
-                "next_action_label": _next_action_label(op.next_action),
+                **_serialize_occlusion(op, project),
             }
             for op in project.occlusion_points
         ],

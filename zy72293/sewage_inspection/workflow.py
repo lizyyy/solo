@@ -16,6 +16,7 @@ from .models import (
     WorkflowPhase,
 )
 from .core import (
+    add_review_note,
     advance_workflow,
     detect_inconsistencies,
     generate_occlusion_report,
@@ -136,13 +137,47 @@ class WorkflowEngine:
         for op in project.occlusion_points:
             if op.id == occlusion_id:
                 if target == "safety_officer":
-                    op.status = OcclusionStatus.ESCALATED_SAFETY
-                    op.next_action = NextAction.SAFETY_OFFICER
+                    add_review_note(
+                        op,
+                        action="escalated_to_safety",
+                        new_status=OcclusionStatus.ESCALATED_SAFETY,
+                        new_missing=op.missing_material + "；已升级安全员复核",
+                        new_next=NextAction.SAFETY_OFFICER,
+                        changed_by="instructor_liang",
+                        cause="培训教官老梁确认需安全员现场复核",
+                        note="不提前归正常，保留原始说法和改后值，等安全员到场确认",
+                    )
                 else:
-                    op.status = OcclusionStatus.PENDING_REVIEW
-                from datetime import datetime
+                    add_review_note(
+                        op,
+                        action="revert_to_pending",
+                        new_status=OcclusionStatus.PENDING_REVIEW,
+                        new_missing=op.missing_material,
+                        new_next=op.next_action,
+                        changed_by="admin",
+                        cause="回退到待复核状态",
+                        note="",
+                    )
+                break
+        self._save(project)
+        return project
 
-                op.updated_at = datetime.now().isoformat()
+    def add_review_comment(
+        self, project_id: str, occlusion_id: str, comment: str, reviewer: str = "safety_officer"
+    ) -> InspectionProject:
+        project = self.load_project(project_id)
+        for op in project.occlusion_points:
+            if op.id == occlusion_id:
+                add_review_note(
+                    op,
+                    action="review_comment",
+                    new_status=op.status,
+                    new_missing=op.missing_material,
+                    new_next=op.next_action,
+                    changed_by=reviewer,
+                    cause="人工复核批注",
+                    note=comment,
+                )
                 break
         self._save(project)
         return project
