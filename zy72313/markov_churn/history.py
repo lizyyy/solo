@@ -40,9 +40,11 @@ class HistoryManager:
         self.current_version_file = self.history_dir / "current_version.txt"
         self.versions: Dict[str, Version] = {}
         self.current_version_id: Optional[str] = None
+        self._id_counter = 0
         self._load_history()
 
     def _load_history(self) -> None:
+        max_counter = 0
         if self.versions_file.exists():
             with open(self.versions_file, 'r', encoding='utf-8') as f:
                 data = json.load(f)
@@ -50,10 +52,14 @@ class HistoryManager:
                 for vid, vdata in data["versions"].items():
                     changes = [ChangeRecord(**c) for c in vdata.pop("changes", [])]
                     self.versions[vid] = Version(changes=changes, **vdata)
+                    parts = vid.rsplit("_", 1)
+                    if len(parts) == 2 and parts[1].isdigit():
+                        max_counter = max(max_counter, int(parts[1]))
                 self.current_version_id = data.get("current_version_id")
         elif self.current_version_file.exists():
             with open(self.current_version_file, 'r') as f:
                 self.current_version_id = f.read().strip()
+        self._id_counter = max_counter
 
     def _save_history(self) -> None:
         data = {
@@ -67,8 +73,9 @@ class HistoryManager:
             json.dump(data, f, ensure_ascii=False, indent=2)
 
     def _generate_version_id(self) -> str:
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        return f"v_{timestamp}"
+        self._id_counter += 1
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]
+        return f"v_{timestamp}_{self._id_counter:04d}"
 
     def create_version(self, data: Dict, author: str, description: str,
                        changes: List[ChangeRecord] = None,
@@ -212,3 +219,124 @@ class HistoryManager:
             else:
                 break
         return chain
+
+    def record_error_note_update(self, update_result: Dict) -> Tuple[str, ChangeRecord]:
+        change = ChangeRecord(
+            timestamp=update_result.get("changed_at", datetime.now().isoformat()),
+            field=f"error_notes.{update_result['customer_id']}.{update_result['timestamp']}",
+            old_value=update_result["old_value"],
+            new_value=update_result["new_value"],
+            author=update_result["modifier"],
+            comment=update_result.get("reason", "")
+        )
+        version_id = self.create_version(
+            data={
+                "type": "error_note_update",
+                **update_result
+            },
+            author=update_result["modifier"],
+            description=(f"更新误差说明：客户{update_result['customer_id']}，"
+                        f"学生{update_result.get('student_id','')}v{update_result.get('answer_version','')}；"
+                        f"原因：{update_result.get('reason', '未说明')}"),
+            changes=[change]
+        )
+        return version_id, change
+
+    def record_annotation_update(self, update_result: Dict) -> Tuple[str, ChangeRecord]:
+        change = ChangeRecord(
+            timestamp=update_result.get("changed_at", datetime.now().isoformat()),
+            field=f"annotations.{update_result['customer_id']}.{update_result['timestamp']}",
+            old_value=update_result["old_value"],
+            new_value=update_result["new_value"],
+            author=update_result["modifier"],
+            comment=update_result.get("reason", "")
+        )
+        version_id = self.create_version(
+            data={
+                "type": "annotation_update",
+                **update_result
+            },
+            author=update_result["modifier"],
+            description=(f"更新备注/批注：客户{update_result['customer_id']}，"
+                        f"学生{update_result.get('student_id','')}v{update_result.get('answer_version','')}；"
+                        f"原因：{update_result.get('reason', '未说明')}"),
+            changes=[change]
+        )
+        return version_id, change
+
+    def record_field_rollback(self, rollback_result: Dict) -> Tuple[str, ChangeRecord]:
+        change = ChangeRecord(
+            timestamp=datetime.now().isoformat(),
+            field=f"rollback.{rollback_result['field']}.{rollback_result['customer_id']}.{rollback_result['timestamp']}",
+            old_value=rollback_result["new_value"],
+            new_value=rollback_result["old_value"],
+            author=rollback_result["modifier"],
+            comment=rollback_result.get("reason", "回滚")
+        )
+        version_id = self.create_version(
+            data={
+                "type": "field_rollback",
+                **rollback_result
+            },
+            author=rollback_result["modifier"],
+            description=(f"回滚字段{rollback_result['field']}：客户{rollback_result['customer_id']}"),
+            changes=[change]
+        )
+        return version_id, change
+
+    def find_previous_field_value(self, customer_id: str, timestamp_str: str,
+                                   field: str) -> Optional[Any]:
+        try:
+            import pandas as pd
+            target = pd.to_datetime(timestamp_str).isoformat()
+        except Exception:
+            target = timestamp_str
+
+        for version in self.list_versions():
+            snap = version.data_snapshot
+            if snap.get("customer_id") != customer_id:
+                continue
+            if snap.get("field") != field:
+                continue
+            if snap.get("type") not in ("error_note_update", "annotation_update", "field_rollback"):
+                continue
+            try:
+                actual = pd.to_datetime(snap.get("timestamp", "")).isoformat()
+            except Exception:
+                actual = str(snap.get("timestamp", ""))
+            if actual == target:
+                return snap.get("old_value")
+        return None
+
+    def summary_report(self) -> Dict:
+        counts = {
+            "import": 0,
+            "error_note_update": 0,
+            "annotation_update": 0,
+            "field_rollback": 0,
+            "review_approve": 0,
+            "review_reject": 0,
+            "review_request_info": 0,
+            "rollback": 0,
+            "other": 0
+        }
+        unique_students_in_history = set()
+        for v in self.list_versions():
+            t = v.data_snapshot.get("type", "other")
+            if isinstance(t, str) and t in counts:
+                counts[t] += 1
+            else:
+                counts["other"] += 1
+            stu = v.data_snapshot.get("student_id")
+            if stu:
+                unique_students_in_history.add(str(stu))
+            if "review_id" in v.data_snapshot:
+                counts["review_approve"] += 1
+            if v.is_rollback:
+                counts["rollback"] += 1
+        return {
+            "total_versions": len(self.versions),
+            "current_version_id": self.current_version_id,
+            "operation_counts": counts,
+            "unique_students_touched": sorted(unique_students_in_history)
+        }

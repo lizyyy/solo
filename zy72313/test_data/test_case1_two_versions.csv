@@ -1,0 +1,9 @@
+customer_id,state,timestamp,student_id,answer_version,error_notes,annotations
+CA1,active,2024-01-01,STU_A,1,初始状态-第一版答案,"{""teacher"": ""张老师"", ""comment"": ""第一版推导""}"
+CA1,at_risk,2024-02-01,STU_A,1,活跃度下降-第一版,"{""teacher"": ""张老师"", ""comment"": ""关注风险""}"
+CA1,churned,2024-03-01,STU_A,1,判定流失-第一版,"{""teacher"": ""张老师"", ""comment"": ""流失确认""}"
+CA2,active,2024-01-01,STU_A,2,初始状态-第二版修正,"{""teacher"": ""李老师"", ""comment"": ""第二版修正公式""}"
+CA2,at_risk,2024-02-01,STU_A,2,活跃度下降-第二版,"{""teacher"": ""李老师"", ""comment"": ""修正后""}"
+CB1,active,2024-01-01,STU_B,1,B学生单版正常,"{""teacher"": ""王老师"", ""comment"": ""OK""}"
+CB1,reactivated,2024-03-01,STU_B,1,B学生回流,"{""teacher"": ""王老师""}"
+STUB_C1,active,2024-01-05,STU_C,1,普通客户,"{""teacher"": ""赵老师""}"

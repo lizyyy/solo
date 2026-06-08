@@ -86,13 +86,21 @@ class DataImporter:
                           source_file: str, check_multiple_answers: bool) -> Dict:
         imported_count = 0
         skipped_count = 0
+        skipped_duplicate_count = 0
         multiple_answer_students = []
+        duplicate_reasons = []
         warnings = []
 
         required_columns = ["customer_id", "state", "timestamp"]
         missing_cols = [col for col in required_columns if col not in df.columns]
         if missing_cols:
             raise ValueError(f"缺少必需列: {missing_cols}")
+
+        pre_student_ids = set()
+        for idx, row in df.iterrows():
+            sid = str(row.get("student_id", ""))
+            if sid:
+                pre_student_ids.add(sid)
 
         for _, row in df.iterrows():
             state = CustomerState(
@@ -106,20 +114,37 @@ class DataImporter:
                 annotations=json.loads(row.get("annotations", "{}")) if pd.notna(row.get("annotations")) else {}
             )
 
+            added, reason = model.add_customer_state(state, check_duplicate=True)
+            if not added:
+                skipped_count += 1
+                skipped_duplicate_count += 1
+                if reason:
+                    duplicate_reasons.append(reason)
+                    warnings.append(f"[同版本重复跳过] {reason}")
+                continue
+
+            imported_count += 1
+
             if check_multiple_answers and state.student_id:
                 has_multiple, _ = model.check_multiple_answers(state.student_id)
-                if has_multiple:
-                    if state.student_id not in multiple_answer_students:
-                        multiple_answer_students.append(state.student_id)
-                        warnings.append(f"学生 {state.student_id} 存在多版答案，需复核")
-
-            model.add_customer_state(state)
-            imported_count += 1
+                if has_multiple and state.student_id not in multiple_answer_students:
+                    multiple_answer_students.append(state.student_id)
+                    summary = model.get_student_version_summary(state.student_id)
+                    versions_str = ",".join(
+                        f"v{s['answer_version']}({len(s['customer_ids'])}个客户)"
+                        for s in summary["versions"]
+                    )
+                    warnings.append(
+                        f"[多版答案待复核] 学生 {state.student_id} 出现不同答案版本: {versions_str}，"
+                        f"请业务运营复核确认最终版本"
+                    )
 
         result = {
             "status": "success",
             "imported_count": imported_count,
             "skipped_count": skipped_count,
+            "skipped_duplicate_version_count": skipped_duplicate_count,
+            "duplicate_reasons": duplicate_reasons,
             "multiple_answer_students": multiple_answer_students,
             "warnings": warnings,
             "timestamp": datetime.now().isoformat()

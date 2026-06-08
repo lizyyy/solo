@@ -1,43 +1,56 @@
 {
-  "review_20260604_064818": {
-    "review_id": "review_20260604_064818",
+  "review_20260609_011858_375_0001": {
+    "review_id": "review_20260609_011858_375_0001",
     "review_type": "multiple_answers",
-    "status": "pending",
-    "created_at": "2026-06-04T06:48:18.668027",
+    "status": "approved",
+    "created_at": "2026-06-09T01:18:58.376003",
     "assigned_to": [
       "唐老师",
       "业务运营"
     ],
     "data": {
-      "student_id": "STU003",
+      "student_id": "STU_A",
       "versions": {
-        "CUST004_v1": [
-          {
-            "state": "active",
-            "timestamp": "2024-01-01T00:00:00"
-          },
-          {
-            "state": "at_risk",
-            "timestamp": "2024-02-01T00:00:00"
-          },
-          {
-            "state": "active",
-            "timestamp": "2024-03-01T00:00:00"
-          }
-        ]
+        "v1": {
+          "answer_version": 1,
+          "state_count": 3,
+          "customer_ids": [
+            "CA1"
+          ],
+          "source_files": [
+            "test_case1_two_versions.csv"
+          ]
+        },
+        "v2": {
+          "answer_version": 2,
+          "state_count": 2,
+          "customer_ids": [
+            "CA2"
+          ],
+          "source_files": [
+            "test_case1_two_versions.csv"
+          ]
+        }
       },
-      "source_file": "sample_formula_data.csv",
-      "issue": "同一学生提交了多版答案，需要业务运营复核确认正确版本"
+      "version_count": 2,
+      "source_file": "test_case1_two_versions.csv",
+      "issue": "同一学生提交了多版不同answer_version，需要业务运营复核确认最终使用版本"
     },
     "comments": [
       {
-        "timestamp": "2026-06-04T06:48:18.668028",
+        "timestamp": "2026-06-09T01:18:58.376004",
         "author": "system",
-        "content": "学生STU003存在多版答案，需复核确认"
+        "content": "学生STU_A存在2版不同答案，需复核确认"
+      },
+      {
+        "timestamp": "2026-06-09T01:18:58.376188",
+        "author": "唐老师",
+        "content": "业务运营复核确认：STU_A采用v2(第二版修正)"
       }
     ],
-    "resolved_at": null,
-    "resolved_by": null,
-    "resolution": null
+    "description": "学生STU_A存在2版不同答案，需复核确认",
+    "resolved_at": "2026-06-09T01:18:58.376186",
+    "resolved_by": "唐老师",
+    "resolution": "approved"
   }
 }

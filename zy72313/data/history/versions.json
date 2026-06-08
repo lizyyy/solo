@@ -1,38 +1,211 @@
 {
   "versions": {
-    "v_20260604_064818": {
-      "version_id": "v_20260604_064818",
+    "v_20260609_011858_375_0001": {
+      "version_id": "v_20260609_011858_375_0001",
       "parent_version": null,
-      "timestamp": "2026-06-04T06:48:18.667350",
+      "timestamp": "2026-06-09T01:18:58.375236",
       "author": "system",
-      "description": "导入数据文件: sample_formula_data.csv, 10条记录",
+      "description": "导入数据文件: test_case1_two_versions.csv, 8条记录",
       "changes": [],
       "data_snapshot": {
         "type": "import",
-        "source_file": "sample_formula_data.csv",
-        "file_hash": "a831f5aedc6918c8456cc783f404a48237004aa5c2d632011ff7704030fd0aa2",
-        "record_count": 10,
+        "source_file": "test_case1_two_versions.csv",
+        "file_hash": "4a144c7cf7ac60c5c11dcd20bbc2f7d7b8e6a7ce314a15899542067e19027337",
+        "record_count": 8,
         "metadata": {
           "status": "success",
-          "imported_count": 10,
+          "imported_count": 8,
           "skipped_count": 0,
+          "skipped_duplicate_version_count": 0,
+          "duplicate_reasons": [],
           "multiple_answer_students": [
-            "STU001",
-            "STU003"
+            "STU_A"
           ],
           "warnings": [
-            "学生 STU001 存在多版答案，需复核",
-            "学生 STU003 存在多版答案，需复核"
+            "[多版答案待复核] 学生 STU_A 出现不同答案版本: v1(1个客户),v2(1个客户)，请业务运营复核确认最终版本"
           ],
-          "timestamp": "2026-06-04T06:48:18.667117",
+          "timestamp": "2026-06-09T01:18:58.375027",
           "requires_review": true,
           "review_type": "multiple_answers",
-          "file_hash": "a831f5aedc6918c8456cc783f404a48237004aa5c2d632011ff7704030fd0aa2",
-          "source_file": "sample_formula_data.csv"
+          "file_hash": "4a144c7cf7ac60c5c11dcd20bbc2f7d7b8e6a7ce314a15899542067e19027337",
+          "source_file": "test_case1_two_versions.csv"
         }
+      },
+      "is_rollback": false
+    },
+    "v_20260609_011858_376_0002": {
+      "version_id": "v_20260609_011858_376_0002",
+      "parent_version": "v_20260609_011858_375_0001",
+      "timestamp": "2026-06-09T01:18:58.376389",
+      "author": "唐老师",
+      "description": "批准复核: review_20260609_011858_375_0001",
+      "changes": [],
+      "data_snapshot": {
+        "type": "review_approve",
+        "review_id": "review_20260609_011858_375_0001",
+        "action": "approve",
+        "review_type": "multiple_answers",
+        "approver": "唐老师",
+        "review_data": {
+          "student_id": "STU_A",
+          "versions": {
+            "v1": {
+              "answer_version": 1,
+              "state_count": 3,
+              "customer_ids": [
+                "CA1"
+              ],
+              "source_files": [
+                "test_case1_two_versions.csv"
+              ]
+            },
+            "v2": {
+              "answer_version": 2,
+              "state_count": 2,
+              "customer_ids": [
+                "CA2"
+              ],
+              "source_files": [
+                "test_case1_two_versions.csv"
+              ]
+            }
+          },
+          "version_count": 2,
+          "source_file": "test_case1_two_versions.csv",
+          "issue": "同一学生提交了多版不同answer_version，需要业务运营复核确认最终使用版本"
+        }
+      },
+      "is_rollback": false
+    },
+    "v_20260609_011858_378_0003": {
+      "version_id": "v_20260609_011858_378_0003",
+      "parent_version": "v_20260609_011858_376_0002",
+      "timestamp": "2026-06-09T01:18:58.378370",
+      "author": "system",
+      "description": "导入数据文件: test_case2_duplicate_version.csv, 3条记录",
+      "changes": [],
+      "data_snapshot": {
+        "type": "import",
+        "source_file": "test_case2_duplicate_version.csv",
+        "file_hash": "43a7db67c9b2e18288f2b5f5012d4d443bb82d0de3d8e4783fffe6212ff347e4",
+        "record_count": 3,
+        "metadata": {
+          "status": "success",
+          "imported_count": 3,
+          "skipped_count": 2,
+          "skipped_duplicate_version_count": 2,
+          "duplicate_reasons": [
+            "同版本重复：学生STU_D，客户CC1，答案v1，状态active，时间2024-01-01 00:00:00 已存在于 test_case2_duplicate_version.csv",
+            "同版本重复：学生STU_D，客户CC1，答案v1，状态at_risk，时间2024-02-01 00:00:00 已存在于 test_case2_duplicate_version.csv"
+          ],
+          "multiple_answer_students": [],
+          "warnings": [
+            "[同版本重复跳过] 同版本重复：学生STU_D，客户CC1，答案v1，状态active，时间2024-01-01 00:00:00 已存在于 test_case2_duplicate_version.csv",
+            "[同版本重复跳过] 同版本重复：学生STU_D，客户CC1，答案v1，状态at_risk，时间2024-02-01 00:00:00 已存在于 test_case2_duplicate_version.csv"
+          ],
+          "timestamp": "2026-06-09T01:18:58.378245",
+          "file_hash": "43a7db67c9b2e18288f2b5f5012d4d443bb82d0de3d8e4783fffe6212ff347e4",
+          "source_file": "test_case2_duplicate_version.csv"
+        }
+      },
+      "is_rollback": false
+    },
+    "v_20260609_011858_378_0004": {
+      "version_id": "v_20260609_011858_378_0004",
+      "parent_version": "v_20260609_011858_378_0003",
+      "timestamp": "2026-06-09T01:18:58.378814",
+      "author": "唐老师",
+      "description": "更新误差说明：客户CA1，学生STU_Av1；原因：业务运营复核发现公式误差来源，补全误差说明便于后续复盘",
+      "changes": [
+        {
+          "timestamp": "2026-06-09T01:18:58.378799",
+          "field": "error_notes.CA1.2024-03-01T00:00:00",
+          "old_value": "判定流失-第一版",
+          "new_value": "复核后更新：唐老师确认第一版判定公式有误，应以第二版为准；实际客户已在4月召回",
+          "author": "唐老师",
+          "comment": "业务运营复核发现公式误差来源，补全误差说明便于后续复盘"
+        }
+      ],
+      "data_snapshot": {
+        "type": "error_note_update",
+        "status": "success",
+        "field": "error_notes",
+        "customer_id": "CA1",
+        "timestamp": "2024-03-01T00:00:00",
+        "student_id": "STU_A",
+        "answer_version": 1,
+        "old_value": "判定流失-第一版",
+        "new_value": "复核后更新：唐老师确认第一版判定公式有误，应以第二版为准；实际客户已在4月召回",
+        "modifier": "唐老师",
+        "reason": "业务运营复核发现公式误差来源，补全误差说明便于后续复盘",
+        "changed_at": "2026-06-09T01:18:58.378799"
+      },
+      "is_rollback": false
+    },
+    "v_20260609_011858_379_0005": {
+      "version_id": "v_20260609_011858_379_0005",
+      "parent_version": "v_20260609_011858_378_0004",
+      "timestamp": "2026-06-09T01:18:58.379118",
+      "author": "唐老师",
+      "description": "更新误差说明：客户CA1，学生STU_Av1；原因：补充具体召回信息",
+      "changes": [
+        {
+          "timestamp": "2026-06-09T01:18:58.379109",
+          "field": "error_notes.CA1.2024-03-01T00:00:00",
+          "old_value": "复核后更新：唐老师确认第一版判定公式有误，应以第二版为准；实际客户已在4月召回",
+          "new_value": "二次更新：唐老师补充客户召回具体日期2024-04-18，由运营同学孙XX跟进",
+          "author": "唐老师",
+          "comment": "补充具体召回信息"
+        }
+      ],
+      "data_snapshot": {
+        "type": "error_note_update",
+        "status": "success",
+        "field": "error_notes",
+        "customer_id": "CA1",
+        "timestamp": "2024-03-01T00:00:00",
+        "student_id": "STU_A",
+        "answer_version": 1,
+        "old_value": "复核后更新：唐老师确认第一版判定公式有误，应以第二版为准；实际客户已在4月召回",
+        "new_value": "二次更新：唐老师补充客户召回具体日期2024-04-18，由运营同学孙XX跟进",
+        "modifier": "唐老师",
+        "reason": "补充具体召回信息",
+        "changed_at": "2026-06-09T01:18:58.379109"
+      },
+      "is_rollback": false
+    },
+    "v_20260609_011858_380_0006": {
+      "version_id": "v_20260609_011858_380_0006",
+      "parent_version": "v_20260609_011858_379_0005",
+      "timestamp": "2026-06-09T01:18:58.380204",
+      "author": "业务运营",
+      "description": "回滚字段error_notes：客户CA1",
+      "changes": [
+        {
+          "timestamp": "2026-06-09T01:18:58.380198",
+          "field": "rollback.error_notes.CA1.2024-03-01T00:00:00",
+          "old_value": "复核后更新：唐老师确认第一版判定公式有误，应以第二版为准；实际客户已在4月召回",
+          "new_value": "二次更新：唐老师补充客户召回具体日期2024-04-18，由运营同学孙XX跟进",
+          "author": "业务运营",
+          "comment": "第二次补充信息未经复核通过，回滚到唐老师第一版误差说明"
+        }
+      ],
+      "data_snapshot": {
+        "type": "field_rollback",
+        "status": "success",
+        "field": "error_notes",
+        "customer_id": "CA1",
+        "timestamp": "2024-03-01T00:00:00",
+        "student_id": "STU_A",
+        "answer_version": 1,
+        "old_value": "二次更新：唐老师补充客户召回具体日期2024-04-18，由运营同学孙XX跟进",
+        "new_value": "复核后更新：唐老师确认第一版判定公式有误，应以第二版为准；实际客户已在4月召回",
+        "modifier": "业务运营",
+        "reason": "第二次补充信息未经复核通过，回滚到唐老师第一版误差说明",
+        "changed_at": "2026-06-09T01:18:58.380195"
       },
       "is_rollback": false
     }
   },
-  "current_version_id": "v_20260604_064818"
+  "current_version_id": "v_20260609_011858_380_0006"
 }

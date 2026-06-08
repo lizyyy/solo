@@ -30,6 +30,7 @@ class ReviewItem:
     assigned_to: List[str]
     data: Dict
     comments: List[Dict]
+    description: str = ""
     resolved_at: Optional[str] = None
     resolved_by: Optional[str] = None
     resolution: Optional[str] = None
@@ -41,6 +42,7 @@ class ReviewSystem:
         self.review_file.parent.mkdir(parents=True, exist_ok=True)
         self.reviews: Dict[str, ReviewItem] = {}
         self.history_manager = history_manager
+        self._id_counter = 0
         self._load_reviews()
 
     def _load_reviews(self) -> None:
@@ -51,6 +53,12 @@ class ReviewSystem:
                     rid: ReviewItem(**rdata)
                     for rid, rdata in data.items()
                 }
+        max_counter = 0
+        for rid in self.reviews:
+            parts = rid.rsplit("_", 1)
+            if len(parts) == 2 and parts[1].isdigit():
+                max_counter = max(max_counter, int(parts[1]))
+        self._id_counter = max_counter
 
     def _save_reviews(self) -> None:
         data = {
@@ -61,13 +69,15 @@ class ReviewSystem:
             json.dump(data, f, ensure_ascii=False, indent=2)
 
     def _generate_review_id(self) -> str:
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        return f"review_{timestamp}"
+        self._id_counter += 1
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]
+        return f"review_{timestamp}_{self._id_counter:04d}"
 
     def create_review(self, review_type: ReviewType, data: Dict,
                       assigned_to: List[str] = None,
                       description: str = "") -> ReviewItem:
         review_id = self._generate_review_id()
+        desc_text = description or f"创建{review_type.value}复核任务"
         review = ReviewItem(
             review_id=review_id,
             review_type=review_type.value,
@@ -78,8 +88,9 @@ class ReviewSystem:
             comments=[{
                 "timestamp": datetime.now().isoformat(),
                 "author": "system",
-                "content": description or f"创建{review_type.value}复核任务"
-            }]
+                "content": desc_text
+            }],
+            description=desc_text
         )
         self.reviews[review_id] = review
         self._save_reviews()
@@ -117,6 +128,7 @@ class ReviewSystem:
         if self.history_manager:
             self.history_manager.create_version(
                 data={
+                    "type": "review_approve",
                     "review_id": review_id,
                     "action": "approve",
                     "review_type": review.review_type,
@@ -145,6 +157,22 @@ class ReviewSystem:
             "content": f"已拒绝: {reason}"
         })
         self._save_reviews()
+
+        if self.history_manager:
+            self.history_manager.create_version(
+                data={
+                    "type": "review_reject",
+                    "review_id": review_id,
+                    "action": "reject",
+                    "review_type": review.review_type,
+                    "rejector": rejector,
+                    "reason": reason,
+                    "review_data": review.data
+                },
+                author=rejector,
+                description=f"拒绝复核: {review_id} - {reason}"
+            )
+
         return review
 
     def request_more_info(self, review_id: str, requester: str, 
@@ -160,6 +188,22 @@ class ReviewSystem:
             "content": f"需要更多信息: {info_requested}"
         })
         self._save_reviews()
+
+        if self.history_manager:
+            self.history_manager.create_version(
+                data={
+                    "type": "review_request_info",
+                    "review_id": review_id,
+                    "action": "request_more_info",
+                    "review_type": review.review_type,
+                    "requester": requester,
+                    "info_requested": info_requested,
+                    "review_data": review.data
+                },
+                author=requester,
+                description=f"复核需要更多信息: {review_id}"
+            )
+
         return review
 
     def get_pending_reviews(self, review_type: str = None) -> List[ReviewItem]:
@@ -204,15 +248,73 @@ class ReviewSystem:
             description=f"学生{student_id}存在多版答案，需复核确认"
         )
 
+    def create_error_note_review(self, customer_id: str, timestamp: str,
+                                  old_error: str, new_error: str,
+                                  student_id: str = None, answer_version: int = None,
+                                  author: str = "", reason: str = "") -> ReviewItem:
+        item_key = f"{customer_id}@{timestamp}"
+        return self.create_review(
+            review_type=ReviewType.ERROR_NOTE_UPDATE,
+            data={
+                "customer_id": customer_id,
+                "timestamp": timestamp,
+                "student_id": student_id,
+                "answer_version": answer_version,
+                "old_error_notes": old_error,
+                "new_error_notes": new_error,
+                "updated_by": author,
+                "update_reason": reason
+            },
+            description=(f"误差说明更新复核：客户{customer_id}，"
+                        f"学生{student_id or '未知'}v{answer_version or '?'}")
+        )
+
     def create_annotation_review(self, item_id: str, old_annotation: Dict,
-                                  new_annotation: Dict, author: str) -> ReviewItem:
+                                  new_annotation: Dict, author: str,
+                                  customer_id: str = None, timestamp: str = None,
+                                  student_id: str = None, answer_version: int = None,
+                                  reason: str = "") -> ReviewItem:
         return self.create_review(
             review_type=ReviewType.ANNOTATION_UPDATE,
             data={
                 "item_id": item_id,
+                "customer_id": customer_id,
+                "timestamp": timestamp,
+                "student_id": student_id,
+                "answer_version": answer_version,
                 "old_annotation": old_annotation,
                 "new_annotation": new_annotation,
-                "updated_by": author
+                "updated_by": author,
+                "update_reason": reason
             },
             description=f"备注更新复核: {item_id}"
         )
+
+    def create_batch_multiple_answer_reviews(self, student_summaries: List[Dict],
+                                              source_file: str) -> List[ReviewItem]:
+        created = []
+        for summary in student_summaries:
+            student_id = summary["student_id"]
+            existing = [
+                r for r in self.get_pending_reviews("multiple_answers")
+                if r.data.get("student_id") == student_id
+            ]
+            if existing:
+                continue
+            versions_data = {}
+            for v in summary.get("versions", []):
+                versions_data[f"v{v['answer_version']}"] = v
+            review = self.create_review(
+                review_type=ReviewType.MULTIPLE_ANSWERS,
+                data={
+                    "student_id": student_id,
+                    "versions": versions_data,
+                    "version_count": len(summary.get("versions", [])),
+                    "source_file": source_file,
+                    "issue": "同一学生提交了多版不同answer_version，需要业务运营复核确认最终使用版本"
+                },
+                description=(f"学生{student_id}存在"
+                            f"{len(summary.get('versions', []))}版不同答案，需复核确认")
+            )
+            created.append(review)
+        return created

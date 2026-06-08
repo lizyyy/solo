@@ -1,0 +1,6 @@
+customer_id,state,timestamp,student_id,answer_version,error_notes,annotations
+CC1,active,2024-01-01,STU_D,1,初始记录(同v1提交重复),"{""teacher"": ""钱老师""}"
+CC1,active,2024-01-01,STU_D,1,初始记录(同v1提交重复-第二遍),"{""teacher"": ""钱老师""}"
+CC1,at_risk,2024-02-01,STU_D,1,风险记录(重复前),"{""teacher"": ""钱老师""}"
+CC1,at_risk,2024-02-01,STU_D,1,风险记录(重复后-同v1同timestamp同state),"{""teacher"": ""钱老师""}"
+CC2,active,2024-01-15,STU_E,1,E学生无重复正常,"{""teacher"": ""孙老师""}"

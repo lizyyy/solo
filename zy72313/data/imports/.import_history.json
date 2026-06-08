@@ -1,19 +1,33 @@
 {
   "imports": [
     {
-      "filename": "sample_formula_data.csv",
-      "file_hash": "a831f5aedc6918c8456cc783f404a48237004aa5c2d632011ff7704030fd0aa2",
-      "timestamp": "2026-06-04T06:48:18.667117",
-      "imported_count": 10,
+      "filename": "test_case1_two_versions.csv",
+      "file_hash": "4a144c7cf7ac60c5c11dcd20bbc2f7d7b8e6a7ce314a15899542067e19027337",
+      "timestamp": "2026-06-09T01:18:58.375027",
+      "imported_count": 8,
+      "status": "success"
+    },
+    {
+      "filename": "test_case2_duplicate_version.csv",
+      "file_hash": "43a7db67c9b2e18288f2b5f5012d4d443bb82d0de3d8e4783fffe6212ff347e4",
+      "timestamp": "2026-06-09T01:18:58.378245",
+      "imported_count": 3,
       "status": "success"
     }
   ],
   "file_hashes": {
-    "a831f5aedc6918c8456cc783f404a48237004aa5c2d632011ff7704030fd0aa2": {
-      "filename": "sample_formula_data.csv",
-      "file_hash": "a831f5aedc6918c8456cc783f404a48237004aa5c2d632011ff7704030fd0aa2",
-      "timestamp": "2026-06-04T06:48:18.667117",
-      "imported_count": 10,
+    "4a144c7cf7ac60c5c11dcd20bbc2f7d7b8e6a7ce314a15899542067e19027337": {
+      "filename": "test_case1_two_versions.csv",
+      "file_hash": "4a144c7cf7ac60c5c11dcd20bbc2f7d7b8e6a7ce314a15899542067e19027337",
+      "timestamp": "2026-06-09T01:18:58.375027",
+      "imported_count": 8,
+      "status": "success"
+    },
+    "43a7db67c9b2e18288f2b5f5012d4d443bb82d0de3d8e4783fffe6212ff347e4": {
+      "filename": "test_case2_duplicate_version.csv",
+      "file_hash": "43a7db67c9b2e18288f2b5f5012d4d443bb82d0de3d8e4783fffe6212ff347e4",
+      "timestamp": "2026-06-09T01:18:58.378245",
+      "imported_count": 3,
       "status": "success"
     }
   }

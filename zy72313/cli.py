@@ -5,6 +5,7 @@ import json
 import pandas as pd
 from pathlib import Path
 from datetime import datetime
+from typing import Dict
 
 from markov_churn import (
     MarkovChurnModel,
@@ -20,6 +21,31 @@ def load_config(config_path: str = "config.yaml"):
         return yaml.safe_load(f)
 
 
+def get_model_path(data_dir: Path) -> Path:
+    return data_dir / "model_state.json"
+
+
+def load_or_init_model(config: Dict) -> MarkovChurnModel:
+    data_dir = Path(config['system']['data_dir'])
+    model_path = get_model_path(data_dir)
+    if model_path.exists():
+        try:
+            return MarkovChurnModel.load(str(model_path))
+        except Exception:
+            pass
+    return MarkovChurnModel(
+        states=config['markov_model']['states'],
+        smoothing_factor=config['markov_model']['smoothing_factor']
+    )
+
+
+def save_model(model: MarkovChurnModel, config: Dict) -> None:
+    data_dir = Path(config['system']['data_dir'])
+    model_path = get_model_path(data_dir)
+    model_path.parent.mkdir(parents=True, exist_ok=True)
+    model.save(str(model_path))
+
+
 @click.group()
 @click.option('--config', default='config.yaml', help='配置文件路径')
 @click.pass_context
@@ -28,7 +54,7 @@ def cli(ctx, config):
     ctx.ensure_object(dict)
     ctx.obj['config'] = load_config(config)
     ctx.obj['data_dir'] = Path(ctx.obj['config']['system']['data_dir'])
-    ctx.obj['data_dir'].mkdir(exist_ok=True)
+    ctx.obj['data_dir'].mkdir(parents=True, exist_ok=True)
 
 
 @cli.command()
@@ -47,74 +73,79 @@ def init(ctx):
 @click.option('--check-multiple/--no-check-multiple', default=True, help='检查多版本答案')
 @click.pass_context
 def import_data(ctx, file_path, skip_duplicates, check_multiple):
-    """导入CSV数据文件"""
+    """导入CSV数据文件（旧公式截图第一次导入）"""
     config = ctx.obj['config']
     
     history_mgr = HistoryManager(config['system']['history_dir'])
     importer = DataImporter(config['system']['import_dir'], history_mgr)
-    model = MarkovChurnModel(
-        states=config['markov_model']['states'],
-        smoothing_factor=config['markov_model']['smoothing_factor']
-    )
+    model = load_or_init_model(config)
     
     result = importer.import_csv(file_path, model, skip_duplicates, check_multiple)
-    click.echo(json.dumps(result, ensure_ascii=False, indent=2))
+
+    printable = dict(result)
+    if "duplicate_reasons" in printable:
+        printable["duplicate_reasons_count"] = len(printable["duplicate_reasons"])
+    click.echo(json.dumps(printable, ensure_ascii=False, indent=2))
     
     if result.get('requires_review'):
         review_sys = ReviewSystem(
             Path(config['system']['data_dir']) / "reviews.json",
             history_mgr
         )
+        summaries = []
         for student_id in result.get('multiple_answer_students', []):
-            versions = model.get_student_versions(student_id)
-            review = review_sys.check_and_create_multiple_answer_review(
-                student_id,
-                {k: [{'state': s.state, 'timestamp': s.timestamp.isoformat()} for s in v] 
-                 for k, v in versions.items()},
-                result.get('source_file', '')
+            summaries.append(model.get_student_version_summary(student_id))
+        created = review_sys.create_batch_multiple_answer_reviews(
+            summaries, result.get('source_file', '')
+        )
+        for rev in created:
+            data = rev.data
+            click.echo(
+                f"创建独立复核任务: {rev.review_id} | 学生{data.get('student_id')} | "
+                f"{data.get('version_count')}版答案 | 状态:{rev.status}"
             )
-            if review:
-                click.echo(f"创建复核任务: {review.review_id}")
+
+    save_model(model, config)
 
 
 @cli.command()
 @click.option('--student-id', help='学生ID')
 @click.pass_context
 def check_answers(ctx, student_id):
-    """检查学生多版答案情况"""
+    """唐老师补看老师批注 - 检查学生多版答案情况"""
     config = ctx.obj['config']
     
     history_mgr = HistoryManager(config['system']['history_dir'])
-    importer = DataImporter(config['system']['import_dir'], history_mgr)
-    model = MarkovChurnModel(states=config['markov_model']['states'])
+    review_sys = ReviewSystem(
+        Path(config['system']['data_dir']) / "reviews.json",
+        history_mgr
+    )
+    model = load_or_init_model(config)
     
     if student_id:
-        has_multiple, answers = model.check_multiple_answers(student_id)
-        if has_multiple:
-            click.echo(f"学生 {student_id} 存在多版答案:")
-            for ans in answers:
-                click.echo(f"  - {ans.customer_id} v{ans.answer_version}: {ans.state}")
-        else:
-            click.echo(f"学生 {student_id} 无多版答案")
+        has_multiple, version_groups = model.check_multiple_answers(student_id)
+        summary = model.get_student_version_summary(student_id)
+        click.echo(json.dumps(summary, ensure_ascii=False, indent=2))
     else:
-        review_sys = ReviewSystem(
-            Path(config['system']['data_dir']) / "reviews.json",
-            history_mgr
-        )
         pending = review_sys.get_pending_reviews('multiple_answers')
         click.echo(f"待处理的多版答案复核任务: {len(pending)}")
         for p in pending:
-            click.echo(f"  {p.review_id}: 学生{p.data.get('student_id')}")
+            d = p.data
+            click.echo(
+                f"  {p.review_id} | 学生{d.get('student_id')} | "
+                f"{d.get('version_count')}版 | 分配给:{','.join(p.assigned_to)} | "
+                f"创建于{p.created_at}"
+            )
 
 
 @cli.command()
 @click.argument('review_id')
 @click.argument('action', type=click.Choice(['approve', 'reject', 'info']))
-@click.option('--author', required=True, help='操作人')
+@click.option('--approver', 'author', required=True, help='操作人')
 @click.option('--comment', default='', help='评论')
 @click.pass_context
 def review(ctx, review_id, action, author, comment):
-    """处理复核任务"""
+    """处理复核任务（approve/reject/info）"""
     config = ctx.obj['config']
     history_mgr = HistoryManager(config['system']['history_dir'])
     review_sys = ReviewSystem(
@@ -123,13 +154,13 @@ def review(ctx, review_id, action, author, comment):
     )
     
     if action == 'approve':
-        result = review_sys.approve(review_id, author, comment)
-        click.echo(f"已批准: {result.review_id}")
+        result = review_sys.approve(review_id, approver=author, comment=comment)
+        click.echo(f"已批准: {result.review_id} by {result.resolved_by} at {result.resolved_at}")
     elif action == 'reject':
-        result = review_sys.reject(review_id, author, comment)
-        click.echo(f"已拒绝: {result.review_id}")
+        result = review_sys.reject(review_id, rejector=author, reason=comment)
+        click.echo(f"已拒绝: {result.review_id} by {result.resolved_by}")
     elif action == 'info':
-        result = review_sys.request_more_info(review_id, author, comment)
+        result = review_sys.request_more_info(review_id, requester=author, info_requested=comment)
         click.echo(f"已请求更多信息: {result.review_id}")
 
 
@@ -197,9 +228,9 @@ def rollback(ctx, version_id, author, reason):
 @click.option('--prefix', default='', help='输出文件前缀')
 @click.pass_context
 def visualize(ctx, view, prefix):
-    """生成可视化图表"""
+    """生成可视化图表（点击数据点可回到原始数据+复核链接）"""
     config = ctx.obj['config']
-    model = MarkovChurnModel(states=config['markov_model']['states'])
+    model = load_or_init_model(config)
     viz = Visualizer(
         model,
         config['system']['export_dir'],
@@ -229,19 +260,228 @@ def visualize(ctx, view, prefix):
     for name, path in exports.items():
         if path:
             click.echo(f"  {name}: {path}")
+    click.echo("\n点击数据点溯源命令:")
+    click.echo("  python cli.py lookup <customer_id>")
 
 
 @cli.command()
 @click.argument('customer_id')
 @click.pass_context
 def lookup(ctx, customer_id):
-    """查看客户详细数据（点击图表时使用）"""
+    """查看客户详细数据+当前误差说明/备注（点击图表时回到原始数据）"""
     config = ctx.obj['config']
-    model = MarkovChurnModel(states=config['markov_model']['states'])
+    model = load_or_init_model(config)
     viz = Visualizer(model, config['system']['export_dir'])
     
     data = viz.get_clickable_data_point(customer_id)
+
+    history_mgr = HistoryManager(config['system']['history_dir'])
+    review_sys = ReviewSystem(
+        Path(config['system']['data_dir']) / "reviews.json",
+        history_mgr
+    )
+    reviews = [r for r in review_sys.list_reviews()
+               if r.data.get("customer_id") == customer_id
+               or r.data.get("student_id") in {
+                   h.get("student_id") for h in data.get("state_history", []) if h.get("student_id")
+               }]
+    data["linked_reviews"] = [
+        {"review_id": r.review_id, "status": r.status,
+         "review_type": r.review_type, "description": r.description}
+        for r in reviews
+    ]
     click.echo(json.dumps(data, ensure_ascii=False, indent=2))
+
+
+@cli.command(name="update-error-note")
+@click.argument('customer_id')
+@click.argument('timestamp')
+@click.argument('new_text')
+@click.option('--modifier', required=True, help='修改人，如 唐老师')
+@click.option('--reason', default='', help='处理原因/误差说明来源')
+@click.option('--need-review/--no-need-review', default=False, help='是否同时发起复核')
+@click.pass_context
+def update_error_note(ctx, customer_id, timestamp, new_text, modifier, reason, need_review):
+    """更新误差说明（竞赛教练唐老师改备注：保存改前/改后文本+修改人+原因）"""
+    config = ctx.obj['config']
+    model = load_or_init_model(config)
+    history_mgr = HistoryManager(config['system']['history_dir'])
+    review_sys = ReviewSystem(
+        Path(config['system']['data_dir']) / "reviews.json",
+        history_mgr
+    )
+
+    ts = pd.to_datetime(timestamp).to_pydatetime()
+    current = model.find_state_record(customer_id, ts)
+    if current is None:
+        click.echo(json.dumps({
+            "status": "error",
+            "message": f"未找到客户{customer_id}在{timestamp}的记录；请先使用 python cli.py import-data 导入数据"
+        }, ensure_ascii=False, indent=2))
+        ctx.exit(1)
+    old_text = current.error_notes
+
+    result = model.update_error_notes(customer_id, ts, new_text, modifier, reason)
+    click.echo(json.dumps(result, ensure_ascii=False, indent=2))
+
+    if result["status"] == "success":
+        version_id, change = history_mgr.record_error_note_update(result)
+        click.echo(f"已记录版本: {version_id}")
+
+        if need_review:
+            rev = review_sys.create_error_note_review(
+                customer_id=customer_id,
+                timestamp=result["timestamp"],
+                old_error=result["old_value"],
+                new_error=result["new_value"],
+                student_id=result.get("student_id"),
+                answer_version=result.get("answer_version"),
+                author=modifier,
+                reason=reason
+            )
+            click.echo(f"已创建复核任务: {rev.review_id}")
+
+    save_model(model, config)
+
+
+@cli.command(name="update-annotation")
+@click.argument('customer_id')
+@click.argument('timestamp')
+@click.argument('annotation_json')
+@click.option('--modifier', required=True, help='修改人')
+@click.option('--reason', default='', help='处理原因')
+@click.option('--need-review/--no-need-review', default=False)
+@click.pass_context
+def update_annotation(ctx, customer_id, timestamp, annotation_json, modifier, reason, need_review):
+    """更新备注/老师批注（保存改前改后+修改人+原因）"""
+    config = ctx.obj['config']
+    model = load_or_init_model(config)
+    history_mgr = HistoryManager(config['system']['history_dir'])
+    review_sys = ReviewSystem(
+        Path(config['system']['data_dir']) / "reviews.json",
+        history_mgr
+    )
+
+    ts = pd.to_datetime(timestamp).to_pydatetime()
+    if model.find_state_record(customer_id, ts) is None:
+        click.echo(json.dumps({
+            "status": "error",
+            "message": f"未找到客户{customer_id}在{timestamp}的记录"
+        }, ensure_ascii=False, indent=2))
+        ctx.exit(1)
+
+    new_ann = json.loads(annotation_json)
+    result = model.update_annotations(customer_id, ts, new_ann, modifier, reason)
+    click.echo(json.dumps(result, ensure_ascii=False, indent=2))
+
+    if result["status"] == "success":
+        version_id, change = history_mgr.record_annotation_update(result)
+        click.echo(f"已记录版本: {version_id}")
+
+        if need_review:
+            item_id = f"{customer_id}@{result['timestamp']}"
+            rev = review_sys.create_annotation_review(
+                item_id=item_id,
+                old_annotation=result["old_value"],
+                new_annotation=result["new_value"],
+                author=modifier,
+                customer_id=customer_id,
+                timestamp=result["timestamp"],
+                student_id=result.get("student_id"),
+                answer_version=result.get("answer_version"),
+                reason=reason
+            )
+            click.echo(f"已创建复核任务: {rev.review_id}")
+
+    save_model(model, config)
+
+
+@cli.command(name="rollback-field")
+@click.argument('customer_id')
+@click.argument('timestamp')
+@click.argument('field', type=click.Choice(['error_notes', 'annotations']))
+@click.option('--modifier', required=True, help='执行回滚的人')
+@click.option('--reason', default='回滚到上一份说明', help='回滚原因')
+@click.pass_context
+def rollback_field(ctx, customer_id, timestamp, field, modifier, reason):
+    """回滚误差说明或备注到上一份（从历史中找旧值）"""
+    config = ctx.obj['config']
+    model = load_or_init_model(config)
+    history_mgr = HistoryManager(config['system']['history_dir'])
+
+    old = history_mgr.find_previous_field_value(customer_id, timestamp, field)
+    if old is None:
+        click.echo(json.dumps({
+            "status": "error",
+            "message": "在历史版本中未找到上一份对应字段的值，无法回滚"
+        }, ensure_ascii=False, indent=2))
+        ctx.exit(1)
+
+    ts = pd.to_datetime(timestamp).to_pydatetime()
+    rb = model.rollback_field_update(customer_id, ts, field, old, modifier, reason)
+    click.echo(json.dumps(rb, ensure_ascii=False, indent=2))
+
+    if rb["status"] == "success":
+        vid, _ = history_mgr.record_field_rollback(rb)
+        click.echo(f"已记录回滚版本: {vid}")
+
+    save_model(model, config)
+
+
+@cli.command(name="report-summary")
+@click.pass_context
+def report_summary(ctx):
+    """生成复盘报告摘要：复核列表、学生编号、版本、状态、历史、操作统计"""
+    config = ctx.obj['config']
+    history_mgr = HistoryManager(config['system']['history_dir'])
+    review_sys = ReviewSystem(
+        Path(config['system']['data_dir']) / "reviews.json",
+        history_mgr
+    )
+
+    all_reviews = review_sys.list_reviews()
+    review_summary = []
+    student_status = {}
+    for r in all_reviews:
+        d = r.data
+        row = {
+            "review_id": r.review_id,
+            "type": r.review_type,
+            "status": r.status,
+            "student_id": d.get("student_id", d.get("customer_id", "")),
+            "answer_versions": (
+                sorted(d["versions"].keys()) if r.review_type == "multiple_answers" and "versions" in d
+                else ([d.get("answer_version")] if d.get("answer_version") else [])
+            ),
+            "assigned_to": r.assigned_to,
+            "created_at": r.created_at,
+            "resolved_by": r.resolved_by,
+            "resolution": r.resolution,
+            "description": r.description
+        }
+        review_summary.append(row)
+        sid = row["student_id"]
+        if sid:
+            if sid not in student_status:
+                student_status[sid] = {"reviews": 0, "pending": 0, "approved": 0, "rejected": 0}
+            student_status[sid]["reviews"] += 1
+            student_status[sid][r.status] = student_status[sid].get(r.status, 0) + 1
+
+    report = {
+        "generated_at": datetime.now().isoformat(),
+        "review_summary": review_summary,
+        "student_review_status": student_status,
+        "history_summary": history_mgr.summary_report(),
+        "consistency_check": {
+            "review_count_match": (
+                len(all_reviews)
+                == history_mgr.summary_report()["operation_counts"].get("review_approve", 0)
+                + sum(1 for r in all_reviews if r.status != "approved")
+            ),
+            "pending_multiple_answers_count": len(review_sys.get_pending_reviews("multiple_answers"))
+        }
+    }
+    click.echo(json.dumps(report, ensure_ascii=False, indent=2))
 
 
 @cli.command()
