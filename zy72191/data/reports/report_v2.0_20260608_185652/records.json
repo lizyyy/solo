@@ -6,7 +6,7 @@
     "grid_id": "G001",
     "change_type": "新增建筑",
     "confidence": "高",
-    "verify_status": "重复记录",
+    "verify_status": "通过",
     "material_sources": [
       "评测日志",
       "标注表",
@@ -16,11 +16,11 @@
     "missing_reference_note": null,
     "threshold_applied": "严格阈值0.9",
     "model_version": "v2.0",
-    "eval_timestamp": "2026-06-02T20:56:55.451797",
-    "old_caliber_note": "沿用v1.0口径标注: 2024年Q1卫星影像对比确认新增",
+    "eval_timestamp": "2026-06-08T18:56:52.422818",
+    "old_caliber_note": null,
     "conflict_note": null,
-    "is_duplicate": true,
-    "duplicate_of": "REC001",
+    "is_duplicate": false,
+    "duplicate_of": null,
     "raw_data": {
       "record_id": "REC001",
       "city": "北京市",
@@ -34,7 +34,7 @@
         "评测日志",
         "标注表"
       ],
-      "eval_timestamp": "2026-06-02T20:56:55.450781"
+      "eval_timestamp": "2026-06-08T18:56:52.421831"
     }
   },
   {
@@ -53,7 +53,7 @@
     "missing_reference_note": null,
     "threshold_applied": null,
     "model_version": "v2.0",
-    "eval_timestamp": "2026-06-02T20:56:55.451800",
+    "eval_timestamp": "2026-06-08T18:56:52.422821",
     "old_caliber_note": null,
     "conflict_note": "存在冲突案例，请人工复核",
     "is_duplicate": false,
@@ -70,7 +70,7 @@
       "material_sources": [
         "评测日志"
       ],
-      "eval_timestamp": "2026-06-02T20:56:55.450787"
+      "eval_timestamp": "2026-06-08T18:56:52.421838"
     }
   },
   {
@@ -80,7 +80,7 @@
     "grid_id": "G003",
     "change_type": "扩建",
     "confidence": "高",
-    "verify_status": "旧口径沿用",
+    "verify_status": "通过",
     "material_sources": [
       "评测日志",
       "标注表",
@@ -90,8 +90,8 @@
     "missing_reference_note": null,
     "threshold_applied": "标准阈值0.85",
     "model_version": "v2.0",
-    "eval_timestamp": "2026-06-02T20:56:55.451803",
-    "old_caliber_note": "沿用v1.0口径标注: 现场勘查确认扩建",
+    "eval_timestamp": "2026-06-08T18:56:52.422824",
+    "old_caliber_note": null,
     "conflict_note": null,
     "is_duplicate": false,
     "duplicate_of": null,
@@ -108,7 +108,7 @@
         "评测日志",
         "标注表"
       ],
-      "eval_timestamp": "2026-06-02T20:56:55.450788"
+      "eval_timestamp": "2026-06-08T18:56:52.421839"
     }
   },
   {
@@ -126,7 +126,7 @@
     "missing_reference_note": null,
     "threshold_applied": null,
     "model_version": "v2.0",
-    "eval_timestamp": "2026-06-02T20:56:55.451805",
+    "eval_timestamp": "2026-06-08T18:56:52.422826",
     "old_caliber_note": null,
     "conflict_note": null,
     "is_duplicate": false,
@@ -143,7 +143,7 @@
       "material_sources": [
         "评测日志"
       ],
-      "eval_timestamp": "2026-06-02T20:56:55.450789"
+      "eval_timestamp": "2026-06-08T18:56:52.421840"
     }
   },
   {
@@ -161,7 +161,7 @@
     "missing_reference_note": null,
     "threshold_applied": null,
     "model_version": "v2.0",
-    "eval_timestamp": "2026-06-02T20:56:55.451807",
+    "eval_timestamp": "2026-06-08T18:56:52.422829",
     "old_caliber_note": null,
     "conflict_note": null,
     "is_duplicate": false,
@@ -178,7 +178,7 @@
       "material_sources": [
         "评测日志"
       ],
-      "eval_timestamp": "2026-06-02T20:56:55.450790"
+      "eval_timestamp": "2026-06-08T18:56:52.421841"
     }
   },
   {
@@ -197,7 +197,7 @@
     "missing_reference_note": "报告结论缺少标注材料引用，请补充标注后再确认",
     "threshold_applied": "严格阈值0.9",
     "model_version": "v2.0",
-    "eval_timestamp": "2026-06-02T20:56:55.451809",
+    "eval_timestamp": "2026-06-08T18:56:52.422831",
     "old_caliber_note": null,
     "conflict_note": null,
     "is_duplicate": true,
@@ -214,7 +214,7 @@
       "material_sources": [
         "评测日志"
       ],
-      "eval_timestamp": "2026-06-02T20:56:55.450791"
+      "eval_timestamp": "2026-06-08T18:56:52.421842"
     }
   },
   {
@@ -230,7 +230,7 @@
     "missing_reference_note": "城市信息缺失",
     "threshold_applied": null,
     "model_version": "v2.0",
-    "eval_timestamp": "2026-06-02T20:56:55.451812",
+    "eval_timestamp": "2026-06-08T18:56:52.422833",
     "old_caliber_note": null,
     "conflict_note": null,
     "is_duplicate": false,
@@ -245,7 +245,7 @@
       "confidence_score": 0.3,
       "verify_status": "待人工确认",
       "material_sources": [],
-      "eval_timestamp": "2026-06-02T20:56:55.450792"
+      "eval_timestamp": "2026-06-08T18:56:52.421843"
     }
   },
   {
@@ -254,7 +254,7 @@
     "district": "西湖区",
     "grid_id": "G008",
     "change_type": "新增建筑",
-    "confidence": "高",
+    "confidence": "中",
     "verify_status": "旧口径沿用",
     "material_sources": [
       "评测日志",
@@ -264,7 +264,7 @@
     "missing_reference_note": null,
     "threshold_applied": null,
     "model_version": "v2.0",
-    "eval_timestamp": "2026-06-02T20:56:55.451814",
+    "eval_timestamp": "2026-06-08T18:56:52.422836",
     "old_caliber_note": "沿用v1.0口径标注: 沿用旧口径判定",
     "conflict_note": null,
     "is_duplicate": false,
@@ -275,14 +275,13 @@
       "district": "西湖区",
       "grid_id": "G008",
       "change_type": "新增建筑",
-      "confidence": "高",
-      "confidence_score": 0.95,
-      "verify_status": "通过",
+      "confidence": "中",
+      "confidence_score": 0.72,
+      "verify_status": "待人工确认",
       "material_sources": [
-        "评测日志",
-        "标注表"
+        "评测日志"
       ],
-      "eval_timestamp": "2026-06-02T20:56:55.450793"
+      "eval_timestamp": "2026-06-08T18:56:52.421844"
     }
   }
 ]

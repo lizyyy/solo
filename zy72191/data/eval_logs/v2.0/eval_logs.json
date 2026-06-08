@@ -12,7 +12,7 @@
       "评测日志",
       "标注表"
     ],
-    "eval_timestamp": "2026-06-02T20:56:55.450781"
+    "eval_timestamp": "2026-06-08T18:56:52.421831"
   },
   {
     "record_id": "REC002",
@@ -26,7 +26,7 @@
     "material_sources": [
       "评测日志"
     ],
-    "eval_timestamp": "2026-06-02T20:56:55.450787"
+    "eval_timestamp": "2026-06-08T18:56:52.421838"
   },
   {
     "record_id": "REC003",
@@ -41,7 +41,7 @@
       "评测日志",
       "标注表"
     ],
-    "eval_timestamp": "2026-06-02T20:56:55.450788"
+    "eval_timestamp": "2026-06-08T18:56:52.421839"
   },
   {
     "record_id": "REC004",
@@ -55,7 +55,7 @@
     "material_sources": [
       "评测日志"
     ],
-    "eval_timestamp": "2026-06-02T20:56:55.450789"
+    "eval_timestamp": "2026-06-08T18:56:52.421840"
   },
   {
     "record_id": "REC005",
@@ -69,7 +69,7 @@
     "material_sources": [
       "评测日志"
     ],
-    "eval_timestamp": "2026-06-02T20:56:55.450790"
+    "eval_timestamp": "2026-06-08T18:56:52.421841"
   },
   {
     "record_id": "REC006",
@@ -83,7 +83,7 @@
     "material_sources": [
       "评测日志"
     ],
-    "eval_timestamp": "2026-06-02T20:56:55.450791"
+    "eval_timestamp": "2026-06-08T18:56:52.421842"
   },
   {
     "record_id": "REC007",
@@ -95,7 +95,7 @@
     "confidence_score": 0.3,
     "verify_status": "待人工确认",
     "material_sources": [],
-    "eval_timestamp": "2026-06-02T20:56:55.450792"
+    "eval_timestamp": "2026-06-08T18:56:52.421843"
   },
   {
     "record_id": "REC008",
@@ -103,13 +103,12 @@
     "district": "西湖区",
     "grid_id": "G008",
     "change_type": "新增建筑",
-    "confidence": "高",
-    "confidence_score": 0.95,
-    "verify_status": "通过",
+    "confidence": "中",
+    "confidence_score": 0.72,
+    "verify_status": "待人工确认",
     "material_sources": [
-      "评测日志",
-      "标注表"
+      "评测日志"
     ],
-    "eval_timestamp": "2026-06-02T20:56:55.450793"
+    "eval_timestamp": "2026-06-08T18:56:52.421844"
   }
 ]

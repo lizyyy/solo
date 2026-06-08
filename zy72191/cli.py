@@ -282,10 +282,10 @@ def demo(ctx):
             'district': '西湖区',
             'grid_id': 'G008',
             'change_type': '新增建筑',
-            'confidence': '高',
-            'confidence_score': 0.95,
-            'verify_status': '通过',
-            'material_sources': ['评测日志', '标注表'],
+            'confidence': '中',
+            'confidence_score': 0.72,
+            'verify_status': '待人工确认',
+            'material_sources': ['评测日志'],
             'eval_timestamp': datetime.now().isoformat()
         }
     ]

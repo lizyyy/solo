@@ -133,9 +133,12 @@ class AnnotationManager:
             materials = annotation_materials.get(record.record_id, [])
             active_materials = [m for m in materials if m.is_active]
 
-            if active_materials:
+            if active_materials and record.verify_status != VerificationStatus.PASSED:
                 record.old_caliber_note = f"沿用{old_caliber_version}口径标注: {active_materials[0].content}"
                 record.verify_status = VerificationStatus.OLD_CALIBER
+                if MaterialSource.ANNOTATION_TABLE not in record.material_sources:
+                    record.material_sources.append(MaterialSource.ANNOTATION_TABLE)
+            elif active_materials:
                 if MaterialSource.ANNOTATION_TABLE not in record.material_sources:
                     record.material_sources.append(MaterialSource.ANNOTATION_TABLE)
 

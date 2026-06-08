@@ -102,7 +102,7 @@ class EvaluationEngine:
         return dict(stratified)
 
     def detect_duplicates(self, records: List[EvaluationRecord]) -> Tuple[List[EvaluationRecord], List[str]]:
-        seen: Dict[Tuple, List[str]] = {}
+        seen: Dict[Tuple, str] = {}
         duplicate_ids = []
 
         for record in records:
@@ -110,22 +110,11 @@ class EvaluationEngine:
 
             if key in seen:
                 record.is_duplicate = True
-                record.duplicate_of = seen[key][0]
+                record.duplicate_of = seen[key]
                 record.verify_status = VerificationStatus.DUPLICATE
                 duplicate_ids.append(record.record_id)
-
-                for other_id in seen[key]:
-                    for other in records:
-                        if other.record_id == other_id and not other.is_duplicate:
-                            other.is_duplicate = True
-                            other.duplicate_of = seen[key][0]
-                            other.verify_status = VerificationStatus.DUPLICATE
-                            if other_id not in duplicate_ids:
-                                duplicate_ids.append(other_id)
-
-                seen[key].append(record.record_id)
             else:
-                seen[key] = [record.record_id]
+                seen[key] = record.record_id
 
         return records, duplicate_ids
 
