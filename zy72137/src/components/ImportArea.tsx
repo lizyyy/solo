@@ -18,8 +18,8 @@ export default function ImportArea() {
       setImporting(true);
       setTimeout(() => {
         const fileArray = Array.from(files);
-        const { records: newRecords } = parseFilesToRecords(fileArray, records);
-        addRecords(newRecords);
+        const { records: newRecords, duplicateGroupMap } = parseFilesToRecords(fileArray, records);
+        addRecords(newRecords, duplicateGroupMap);
         setImporting(false);
       }, 300);
     },

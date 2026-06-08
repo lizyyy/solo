@@ -31,7 +31,7 @@ export const sampleData: SampleRecord[] = [
   {
     id: generateId() + "2",
     originalFileName: "drum_loop_808_master_v1.wav",
-    trackName: "Drum Loop 808 (旧版母带)",
+    trackName: "Drum Loop 808",
     sourcePath: "audio/drums/",
     authorizationStatus: "unknown",
     authorizationExpiry: null,
@@ -50,7 +50,7 @@ export const sampleData: SampleRecord[] = [
   },
   {
     id: generateId() + "3",
-    originalFileName: "piano_melody_take1.wav",
+    originalFileName: "piano_melody_take1_exp_2025-11-15.wav",
     trackName: "Piano Melody",
     sourcePath: "audio/keys/",
     authorizationStatus: "expired",
@@ -70,7 +70,7 @@ export const sampleData: SampleRecord[] = [
   },
   {
     id: generateId() + "4",
-    originalFileName: "piano_melody_final_mix.wav",
+    originalFileName: "piano_melody_final_mix_exp_2025-11-15.wav",
     trackName: "Piano Melody",
     sourcePath: "audio/keys/",
     authorizationStatus: "expired",
@@ -130,7 +130,7 @@ export const sampleData: SampleRecord[] = [
   },
   {
     id: generateId() + "7",
-    originalFileName: "synth_pad_deep.wav",
+    originalFileName: "synth_pad_deep_exp_2026-09-30.wav",
     trackName: "Synth Pad Deep",
     sourcePath: "audio/synth/",
     authorizationStatus: "valid",
@@ -150,7 +150,7 @@ export const sampleData: SampleRecord[] = [
   },
   {
     id: generateId() + "8",
-    originalFileName: "brass_fanfare_段B.wav",
+    originalFileName: "brass_fanfare_段B_exp_2025-08-20.wav",
     trackName: "Brass Fanfare 段B",
     sourcePath: "audio/brass/",
     authorizationStatus: "expired",
@@ -170,7 +170,7 @@ export const sampleData: SampleRecord[] = [
   },
   {
     id: generateId() + "9",
-    originalFileName: "bass_line_funk.wav",
+    originalFileName: "bass_line_funk_exp_2026-06-15.wav",
     trackName: "Bass Line Funk",
     sourcePath: "audio/bass/",
     authorizationStatus: "valid",
@@ -190,7 +190,7 @@ export const sampleData: SampleRecord[] = [
   },
   {
     id: generateId() + "0",
-    originalFileName: "strings_sweep_cinematic.wav",
+    originalFileName: "strings_sweep_cinematic_未授权.wav",
     trackName: "Strings Sweep Cinematic",
     sourcePath: "audio/strings/",
     authorizationStatus: "missing",

@@ -25,9 +25,33 @@ function extractTrackName(fileName: string): string {
     .replace(/_未授权$/i, "")
     .replace(/_take\d+$/i, "")
     .replace(/_final_mix$/i, "")
+    .replace(/_exp_\d{4}-\d{2}-\d{2}$/i, "")
     .replace(/_/g, " ")
     .trim();
   return name || fileName;
+}
+
+function inferAuthStatus(fileName: string): {
+  status: SampleRecord["authorizationStatus"];
+  expiry: string | null;
+} {
+  if (/_未授权/i.test(fileName)) {
+    return { status: "missing", expiry: null };
+  }
+
+  const expMatch = fileName.match(/_exp_(\d{4}-\d{2}-\d{2})/i);
+  if (expMatch) {
+    const expiryDate = expMatch[1];
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    const exp = new Date(expiryDate);
+    if (exp < now) {
+      return { status: "expired", expiry: expiryDate };
+    }
+    return { status: "valid", expiry: expiryDate };
+  }
+
+  return { status: "unknown", expiry: null };
 }
 
 function detectTimecodeIssue(start: string | null, end: string | null, duration: number | null): boolean {
@@ -46,11 +70,12 @@ export function parseFilesToRecords(
 ): { records: SampleRecord[]; duplicateGroupMap: Map<string, string> } {
   const batch = `batch-${Date.now()}`;
   const now = new Date().toISOString();
-  const existingByName = new Map<string, SampleRecord>();
+  const existingByName = new Map<string, { record: SampleRecord; index: number }>();
   const duplicateGroupMap = new Map<string, string>();
+  const newByName = new Map<string, number>();
 
   for (const r of existingRecords) {
-    existingByName.set(r.trackName.toLowerCase(), r);
+    existingByName.set(r.trackName.toLowerCase(), { record: r, index: -1 });
   }
 
   const records: SampleRecord[] = [];
@@ -63,28 +88,39 @@ export function parseFilesToRecords(
     const isManualRename = trackName.toLowerCase() !== file.name.replace(/\.[^.]+$/, "").toLowerCase();
     const isOldMaster = /_master_v\d+/i.test(file.name) || /旧版母带/.test(trackName);
 
-    const existing = existingByName.get(trackName.toLowerCase());
-    const isDuplicate = !!existing;
+    const { status: authStatus, expiry: authExpiry } = inferAuthStatus(file.name);
+
+    const key = trackName.toLowerCase();
+    const existingEntry = existingByName.get(key);
+    const newBatchIndex = newByName.get(key);
+    const isDuplicate = !!(existingEntry || newBatchIndex !== undefined);
     let duplicateGroupId: string | null = null;
 
     if (isDuplicate) {
-      if (existing.duplicateGroupId) {
-        duplicateGroupId = existing.duplicateGroupId;
+      if (duplicateGroupMap.has(key)) {
+        duplicateGroupId = duplicateGroupMap.get(key)!;
       } else {
         duplicateGroupId = "dup-" + generateId();
-        duplicateGroupMap.set(trackName.toLowerCase(), duplicateGroupId);
+        duplicateGroupMap.set(key, duplicateGroupId);
+        if (existingEntry && !existingEntry.record.duplicateGroupId) {
+          existingEntry.record = { ...existingEntry.record, isDuplicate: true, duplicateGroupId };
+        }
+        if (newBatchIndex !== undefined && records[newBatchIndex]) {
+          records[newBatchIndex] = { ...records[newBatchIndex], isDuplicate: true, duplicateGroupId };
+        }
       }
     }
 
-    const hasTimecodeIssue = detectTimecodeIssue(null, null, null);
+    const currentIdx = records.length;
+    newByName.set(key, currentIdx);
 
     records.push({
       id: generateId(),
       originalFileName: file.name,
       trackName,
       sourcePath: file.webkitRelativePath || file.name,
-      authorizationStatus: "unknown",
-      authorizationExpiry: null,
+      authorizationStatus: authStatus,
+      authorizationExpiry: authExpiry,
       timecodeStart: null,
       timecodeEnd: null,
       duration: null,
@@ -92,7 +128,7 @@ export function parseFilesToRecords(
       duplicateGroupId,
       isOldMaster,
       isManualRename,
-      hasTimecodeIssue,
+      hasTimecodeIssue: false,
       userNote: "",
       originalImportBatch: batch,
       createdAt: now,
@@ -103,4 +139,4 @@ export function parseFilesToRecords(
   return { records, duplicateGroupMap };
 }
 
-export { extractTrackName, detectTimecodeIssue };
+export { extractTrackName, detectTimecodeIssue, inferAuthStatus };

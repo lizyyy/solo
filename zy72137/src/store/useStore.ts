@@ -13,7 +13,7 @@ interface AppStore {
   diffLogOpen: boolean;
 
   setRecords: (records: SampleRecord[]) => void;
-  addRecords: (newRecords: SampleRecord[]) => void;
+  addRecords: (newRecords: SampleRecord[], duplicateGroupMap?: Map<string, string>) => void;
   updateNote: (id: string, note: string) => void;
   updateStatus: (id: string, status: SampleRecord["authorizationStatus"]) => void;
   setFilter: (filter: Partial<FilterState>) => void;
@@ -50,7 +50,7 @@ export const useStore = create<AppStore>()(
         set({ records, diffLog: [...diffEntries, ...get().diffLog] });
       },
 
-      addRecords: (newRecords) => {
+      addRecords: (newRecords, duplicateGroupMap) => {
         const state = get();
         const existingIds = new Set(state.records.map((r) => r.originalFileName + r.sourcePath));
         const trulyNew = newRecords.filter(
@@ -58,6 +58,29 @@ export const useStore = create<AppStore>()(
         );
 
         if (trulyNew.length === 0) return;
+
+        let existingUpdated = state.records;
+        const diffExtras: DiffLogEntry[] = [];
+
+        if (duplicateGroupMap && duplicateGroupMap.size > 0) {
+          existingUpdated = state.records.map((r) => {
+            const key = r.trackName.toLowerCase();
+            const groupId = duplicateGroupMap.get(key);
+            if (groupId && !r.isDuplicate) {
+              diffExtras.push({
+                id: generateId(),
+                operationType: "merge",
+                targetRecordId: r.id,
+                description: `重复标记: ${r.trackName} 归入组 ${groupId}`,
+                beforeValue: "独立",
+                afterValue: `重复组 ${groupId}`,
+                timestamp: new Date().toISOString(),
+              });
+              return { ...r, isDuplicate: true, duplicateGroupId: groupId, updatedAt: new Date().toISOString() };
+            }
+            return r;
+          });
+        }
 
         const diffEntries: DiffLogEntry[] = trulyNew.map((r) => ({
           id: generateId(),
@@ -70,8 +93,8 @@ export const useStore = create<AppStore>()(
         }));
 
         set({
-          records: [...state.records, ...trulyNew],
-          diffLog: [...diffEntries, ...state.diffLog],
+          records: [...existingUpdated, ...trulyNew],
+          diffLog: [...diffEntries, ...diffExtras, ...state.diffLog],
         });
       },
 
