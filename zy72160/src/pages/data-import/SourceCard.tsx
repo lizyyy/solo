@@ -81,7 +81,7 @@ interface ImportPreviewProps {
   confirming: boolean;
 }
 
-const SYSTEM_FIELDS = ["gisId", "address", "businessType", "area", "longitude", "latitude", "notes"];
+const SYSTEM_FIELDS = ["gisId", "address", "businessType", "area", "longitude", "latitude", "notes", "district", "contactPhone", "ownerName"];
 
 export function ImportPreview({ job, onMappingChange, onConfirm, onCancel, confirming }: ImportPreviewProps) {
   const sourceFields = job.rawPreview?.length ? Object.keys(job.rawPreview[0]) : [];
@@ -196,7 +196,9 @@ export function ImportJobsList({ jobs }: ImportJobsListProps) {
                 <td className="py-2">
                   <span
                     className={`inline-block px-2 py-0.5 rounded-sm text-xs font-medium ${
-                      j.status === "confirmed"
+                      j.status === "merged"
+                        ? "bg-blue-50 text-blue-700"
+                        : j.status === "confirmed"
                         ? "bg-green-50 text-resolved"
                         : j.status === "failed"
                         ? "bg-red-50 text-conflict"
@@ -205,7 +207,7 @@ export function ImportJobsList({ jobs }: ImportJobsListProps) {
                         : "bg-gray-50 text-gray-600"
                     }`}
                   >
-                    {j.status === "confirmed" ? "已确认" : j.status === "failed" ? "失败" : j.status === "previewing" ? "预览中" : "待处理"}
+                    {j.status === "merged" ? "已归并" : j.status === "confirmed" ? "已确认" : j.status === "failed" ? "失败" : j.status === "previewing" ? "预览中" : "待处理"}
                   </span>
                 </td>
                 <td className="py-2 text-gray-500 text-xs">

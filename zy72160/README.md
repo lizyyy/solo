@@ -1,57 +1,104 @@
-# React + TypeScript + Vite
+# 历史街区业态更新管理系统
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+本地运行的历史街区业态数据归并、复核与公示导出工具。支持 GIS 点位、街道表格、现场照片、审批记录四类数据源，提供字段级冲突检测、人工裁决、证据链追溯和异常人话描述。
 
-Currently, two official plugins are available:
+## 安装
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+依赖 Node.js ≥ 18。安装完成后无需额外配置数据库，首次启动自动创建 SQLite 数据文件 `data/app.db`。
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 启动
 
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+npm run dev
 ```
+
+该命令同时启动前端开发服务器（Vite 自动选择可用端口，默认 5173）和后端 API 服务器（默认 3002 端口）。终端会打印实际端口。
+
+- 前端：Vite 启动后终端显示的地址（如 http://localhost:5173/）
+- 后端健康检查：http://localhost:3002/api/health
+
+如需单独启动：
+
+```bash
+npm run client:dev   # 仅前端
+npm run server:dev   # 仅后端
+```
+
+## 快速上手：从载入样例到产出结果
+
+### 第一步：创建批次
+
+1. 打开 http://localhost:5174/
+2. 左侧边栏顶部点击「创建新批次」，输入批次名称（如"解放路片区一期"），点击确认
+3. 批次自动选中，页面跳转到总览
+
+### 第二步：导入 GIS 点位数据
+
+1. 点击左侧「数据导入」进入导入页
+2. 在「GIS点位」卡片中点击「上传文件」，选择 `samples/gis_points.csv`
+3. 上传后自动进入预览面板：
+   - 上方为字段映射区，系统自动识别"地址→address""业态→businessType""面积→area"等映射，未映射字段标红色星号
+   - 下方为数据预览表格（前 20 行），未映射列高亮为黄色
+4. 确认映射无误后点击「确认导入」
+5. 导入记录列表中出现一条状态为"已确认"的记录
+
+### 第三步：首次归并
+
+1. 点击左侧「归并与复核」进入归并页
+2. 点击「执行归并」
+3. 页面提示"归并完成: 新增 4 条, 匹配 0 条, 冲突 0 条, 异常 1 条"
+4. 异常说明：解放路8号的营业面积 250㎡ 超出规划上限 50㎡（面积超 200㎡ 上限自动标异常）
+5. 列表中显示 4 个点位，来源数均为 1
+
+### 第四步：导入街道表格（制造冲突）
+
+1. 回到「数据导入」页
+2. 在「街道表格」卡片上传 `samples/street_table.csv`
+3. 预览、确认导入
+4. 回到「归并与复核」页，再次点击「执行归并」
+5. 结果提示"匹配 3 条, 冲突 2 条"——解放路12号面积 85.5 vs 90、中山路25号面积 120 vs 130 产生冲突
+
+### 第五步：复核与裁决冲突
+
+1. 归并列表中出现带红色「冲突」徽章的点位
+2. 点击冲突点位的展开箭头，可看到冲突项（字段名、GIS 值、导入值）
+3. 点击「处理」或「查看冲突」进入裁决页面
+4. 裁决页面为双栏对比：
+   - 蓝底栏 = GIS 侧数据
+   - 黄底栏 = 导入侧数据
+5. 选择裁决方式（采纳GIS侧 / 采纳导入侧 / 手动填写 / 待核实），填写裁决理由
+6. 点击「提交裁决」
+7. 回到归并列表，冲突状态变为绿色「已决」
+
+### 第六步：导出公示清单
+
+1. 点击左侧「公示清单」进入导出页
+2. 可按业态、冲突状态筛选
+3. 表格中显示编号、地址、业态、面积、来源标签、状态、异常说明
+4. 点击「导出 Excel」生成 `.xlsx` 文件（双 Sheet：清单 + 异常明细）
+5. 点击「导出 PDF」生成 `.pdf` 文件
+
+## 核心设计
+
+- **原始备注保留**：GIS 点位的备注只读展示，只允许追加，不覆盖原始来源
+- **冲突不替用户拍板**：检测到字段差异时展示双方证据和建议动作，由用户裁决
+- **异常人话描述**：容量超限、时间段冲突等异常用完整中文短句描述，如"解放路8号的营业面积250㎡超出规划上限50㎡"
+- **证据链可追溯**：每条数据保留来源类型、文件名、导入时间、处理时间
+- **操作审计日志**：导入、归并、裁决、导出等关键操作均有日志记录
+
+## 样例数据说明
+
+| 文件 | 说明 |
+|------|------|
+| `samples/gis_points.csv` | 4 条 GIS 点位，含 1 条面积超限（250㎡） |
+| `samples/street_table.csv` | 3 条街道表格，含 2 条与 GIS 面积冲突 |
+
+## 技术栈
+
+- **前端**：React 18 + Vite + TailwindCSS 3 + Zustand + react-router-dom v7
+- **后端**：Express 4 + better-sqlite3 + multer + xlsx + pdfkit
+- **数据库**：SQLite（WAL 模式，单文件 `data/app.db`）

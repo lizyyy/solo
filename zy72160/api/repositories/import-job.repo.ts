@@ -91,6 +91,16 @@ export function createRawRecords(
   insertAll()
 }
 
+export function updateRawRecordsMappedData(importJobId: string, records: { id: string; mappedData: Record<string, unknown> }[]): void {
+  const stmt = db.prepare('UPDATE raw_record SET mapped_data = ? WHERE id = ?')
+  const updateAll = db.transaction(() => {
+    for (const r of records) {
+      stmt.run(JSON.stringify(r.mappedData), r.id)
+    }
+  })
+  updateAll()
+}
+
 export function getRawRecordsByJob(importJobId: string): any[] {
   const rows = db.prepare('SELECT * FROM raw_record WHERE import_job_id = ? ORDER BY row_index').all(importJobId) as any[]
   return rows.map(r => ({

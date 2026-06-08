@@ -12,7 +12,7 @@ export interface ImportJob {
   sourceType: "gis" | "street_table" | "photo" | "approval";
   fileName: string;
   importTime: string;
-  status: "pending" | "previewing" | "confirmed" | "failed";
+  status: "pending" | "previewing" | "confirmed" | "merged" | "failed";
   recordCount: number;
   fieldMapping: Record<string, string>;
   rawPreview: Record<string, unknown>[];

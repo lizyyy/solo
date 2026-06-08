@@ -1,8 +1,8 @@
 import db from '../database.js'
-import { getImportJobsByBatch, getRawRecordsByJob } from '../repositories/import-job.repo.js'
+import { getImportJobsByBatch, getRawRecordsByJob, updateImportJobStatus } from '../repositories/import-job.repo.js'
 import { createMergedPoint, getMergedPointsByBatch, updateMergedPointConflictStatus } from '../repositories/merged-point.repo.js'
 import { createConflictItem, countUnresolvedConflicts } from '../repositories/conflict-item.repo.js'
-import { createAnomaly } from '../repositories/anomaly.repo.js'
+import { createAnomaly, anomalyExists } from '../repositories/anomaly.repo.js'
 import { createAuditLog } from '../repositories/audit-log.repo.js'
 import type { MergedPoint, ConflictItem, Anomaly } from '../../shared/types.js'
 
@@ -102,6 +102,7 @@ export function mergeData(batchId: string, actor: string = 'system') {
   const mergedPoints = getMergedPointsByBatch(batchId)
   const detectedAnomalies = generateAnomalies(batchId, mergedPoints)
   for (const a of detectedAnomalies) {
+    if (anomalyExists(a.mergedPointId, a.type)) continue
     const anomaly = createAnomaly(a)
     anomalies.push(anomaly)
   }
@@ -113,6 +114,10 @@ export function mergeData(batchId: string, actor: string = 'system') {
     detail: `合并完成：新增 ${newCount} 个点位，匹配 ${matchedCount} 个点位，发现 ${conflicts.length} 个冲突，${anomalies.length} 个异常`,
     relatedId: batchId,
   })
+
+  for (const job of jobs) {
+    updateImportJobStatus(job.id, 'merged')
+  }
 
   return {
     newCount,

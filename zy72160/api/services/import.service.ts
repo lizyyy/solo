@@ -1,14 +1,17 @@
 import xlsx from 'xlsx'
 import path from 'path'
-import { createImportJob, updateImportJobMapping, updateImportJobStatus, createRawRecords, getImportJobById, getRawRecordsByJob } from '../repositories/import-job.repo.js'
+import fs from 'fs'
+import { createImportJob, updateImportJobMapping, updateImportJobStatus, getImportJobById, getRawRecordsByJob, updateRawRecordsMappedData, createRawRecords } from '../repositories/import-job.repo.js'
 import { createAuditLog } from '../repositories/audit-log.repo.js'
+import type { ImportJob } from '../../shared/types.js'
 
-export function processUploadedFile(filePath: string, originalName: string, sourceType: string, batchId: string) {
+export function processUploadedFile(filePath: string, originalName: string, sourceType: string, batchId: string): ImportJob {
   const ext = path.extname(originalName).toLowerCase()
   let data: Record<string, unknown>[] = []
 
   if (ext === '.csv') {
-    const workbook = xlsx.readFile(filePath, { type: 'file', raw: true })
+    const csvContent = fs.readFileSync(filePath, 'utf-8')
+    const workbook = xlsx.read(csvContent, { type: 'string' })
     const sheetName = workbook.SheetNames[0]
     const sheet = workbook.Sheets[sheetName]
     data = xlsx.utils.sheet_to_json(sheet)
@@ -33,6 +36,9 @@ export function processUploadedFile(filePath: string, originalName: string, sour
       else if (lower.includes('业态') || lower.includes('business')) defaultMapping[h] = 'businessType'
       else if (lower.includes('面积') || lower.includes('area')) defaultMapping[h] = 'area'
       else if (lower.includes('gis') || lower.includes('编号') || lower.includes('id')) defaultMapping[h] = 'gisId'
+      else if (lower.includes('经度') || lower.includes('longitude') || lower.includes('lng')) defaultMapping[h] = 'longitude'
+      else if (lower.includes('纬度') || lower.includes('latitude') || lower.includes('lat')) defaultMapping[h] = 'latitude'
+      else if (lower.includes('备注') || lower.includes('notes') || lower.includes('remark')) defaultMapping[h] = 'notes'
       else defaultMapping[h] = h
     }
   }
@@ -51,16 +57,10 @@ export function processUploadedFile(filePath: string, originalName: string, sour
     data.map(row => ({ rawData: row }))
   )
 
-  return {
-    jobId: job.id,
-    recordCount,
-    preview,
-    fieldMapping: defaultMapping,
-    headers: data.length > 0 ? Object.keys(data[0]) : [],
-  }
+  return job
 }
 
-export function mapFields(jobId: string, fieldMapping: Record<string, string>) {
+export function mapFields(jobId: string, fieldMapping: Record<string, string>): ImportJob {
   const job = getImportJobById(jobId)
   if (!job) throw new Error('Import job not found')
 
@@ -75,15 +75,34 @@ export function mapFields(jobId: string, fieldMapping: Record<string, string>) {
         mapped[targetField] = raw[srcField]
       }
     }
-    return { ...r, mappedData: mapped }
+    return { id: r.id, mappedData: mapped }
   })
 
-  return { jobId, mappedCount: mappedRecords.length }
+  updateRawRecordsMappedData(jobId, mappedRecords)
+
+  const updated = getImportJobById(jobId)
+  return updated!
 }
 
-export function confirmImport(jobId: string, actor: string = 'system') {
+export function confirmImport(jobId: string, actor: string = 'system'): ImportJob {
   const job = getImportJobById(jobId)
   if (!job) throw new Error('Import job not found')
+
+  const records = getRawRecordsByJob(jobId)
+  const needsMapping = records.length > 0 && !records[0].mappedData
+  if (needsMapping) {
+    const mappedRecords = records.map(r => {
+      const raw = r.rawData as Record<string, unknown>
+      const mapped: Record<string, unknown> = {}
+      for (const [srcField, targetField] of Object.entries(job.fieldMapping)) {
+        if (raw[srcField] !== undefined) {
+          mapped[targetField] = raw[srcField]
+        }
+      }
+      return { id: r.id, mappedData: mapped }
+    })
+    updateRawRecordsMappedData(jobId, mappedRecords)
+  }
 
   updateImportJobStatus(jobId, 'confirmed')
 
@@ -95,5 +114,6 @@ export function confirmImport(jobId: string, actor: string = 'system') {
     relatedId: jobId,
   })
 
-  return { jobId, status: 'confirmed' }
+  const updated = getImportJobById(jobId)
+  return updated!
 }

@@ -34,6 +34,11 @@ export function createAnomaly(data: {
   }
 }
 
+export function anomalyExists(mergedPointId: string, type: string): boolean {
+  const row = db.prepare('SELECT COUNT(*) as cnt FROM anomaly WHERE merged_point_id = ? AND type = ?').get(mergedPointId, type) as any
+  return row.cnt > 0
+}
+
 export function getAnomaliesByBatch(batchId: string): Anomaly[] {
   const rows = db.prepare('SELECT * FROM anomaly WHERE batch_id = ? ORDER BY detected_at DESC').all(batchId) as any[]
   return rows.map(rowToAnomaly)

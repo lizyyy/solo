@@ -61,7 +61,9 @@ export function exportToExcel(batchId: string, filters?: { district?: string; bu
   const ws2 = xlsx.utils.aoa_to_sheet([anomalyHeader, ...anomalyRows])
   xlsx.utils.book_append_sheet(wb, ws2, '异常记录')
 
-  const outputPath = path.join(__dirname, '..', 'uploads', `export_${batchId}_${Date.now()}.xlsx`)
+  const uploadsDir = path.join(__dirname, '..', '..', 'uploads')
+  if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true })
+  const outputPath = path.join(uploadsDir, `export_${batchId}_${Date.now()}.xlsx`)
   xlsx.writeFile(wb, outputPath)
 
   createAuditLog({
@@ -86,7 +88,9 @@ export function exportToPdf(batchId: string, filters?: { district?: string; busi
 
   const anomalies = getAnomaliesByBatch(batchId)
 
-  const outputPath = path.join(__dirname, '..', 'uploads', `export_${batchId}_${Date.now()}.pdf`)
+  const uploadsDir = path.join(__dirname, '..', '..', 'uploads')
+  if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true })
+  const outputPath = path.join(uploadsDir, `export_${batchId}_${Date.now()}.pdf`)
 
   const doc = new PDFDocument({ size: 'A4', margin: 50 })
   const stream = fs.createWriteStream(outputPath)

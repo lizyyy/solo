@@ -44,7 +44,8 @@ export const api = {
         async (res) => {
           if (!res.ok) throw new Error(await res.text().catch(() => res.statusText));
           const json = await res.json();
-          return (json.data ?? json) as Promise<ImportJob>;
+          const data = json.data ?? json;
+          return data as ImportJob;
         }
       );
     },
