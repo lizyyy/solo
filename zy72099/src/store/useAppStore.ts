@@ -22,17 +22,53 @@ interface AppState {
   clearAll: () => void
 }
 
+const STORAGE_KEY = 'exhibit-route-optimizer-state'
+
+function loadPersistedState(): Partial<AppState> {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (!raw) return {}
+    const parsed = JSON.parse(raw)
+    return {
+      points: parsed.points || [],
+      validationResults: parsed.validationResults || [],
+      optimizationResult: parsed.optimizationResult || null,
+      supplements: parsed.supplements || [],
+      conflicts: parsed.conflicts || [],
+    }
+  } catch {
+    return {}
+  }
+}
+
+function persistState(state: Partial<AppState>) {
+  try {
+    const toSave = {
+      points: state.points,
+      validationResults: state.validationResults,
+      optimizationResult: state.optimizationResult,
+      supplements: state.supplements,
+      conflicts: state.conflicts,
+    }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave))
+  } catch {}
+}
+
+const persisted = loadPersistedState()
+
 export const useAppStore = create<AppState>((set, get) => ({
-  points: [],
-  validationResults: [],
-  optimizationResult: null,
-  supplements: [],
-  conflicts: [],
+  points: persisted.points || [],
+  validationResults: persisted.validationResults || [],
+  optimizationResult: persisted.optimizationResult || null,
+  supplements: persisted.supplements || [],
+  conflicts: persisted.conflicts || [],
   highlightedPointId: null,
   isOptimizing: false,
 
   loadPoints: (points) => {
-    set({ points, optimizationResult: null, supplements: [], conflicts: [] })
+    const update = { points, optimizationResult: null as OptimizationResult | null, supplements: [] as Supplement[], conflicts: [] as Conflict[] }
+    set(update)
+    persistState({ ...get(), ...update })
     get().runValidation()
   },
 
@@ -40,6 +76,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     const { points } = get()
     const results = validatePoints(points)
     set({ validationResults: results })
+    persistState({ ...get(), validationResults: results })
   },
 
   runOptimization: () => {
@@ -47,7 +84,9 @@ export const useAppStore = create<AppState>((set, get) => ({
     const { points } = get()
     setTimeout(() => {
       const result = optimizeRoute(points)
-      set({ optimizationResult: result, isOptimizing: false })
+      const update = { optimizationResult: result, isOptimizing: false }
+      set(update)
+      persistState({ ...get(), ...update })
       get().detectConflicts()
     }, 600)
   },
@@ -59,17 +98,26 @@ export const useAppStore = create<AppState>((set, get) => ({
       timestamp: new Date().toLocaleString('zh-CN'),
     }
     const { points, supplements } = get()
+    const NUMERIC_FIELDS = new Set(['x', 'y', 'estimatedStayMinutes'])
     const updatedPoints = points.map((p) => {
       if (p.id === supplement.pointId) {
-        return { ...p, [supplement.field]: supplement.newValue }
+        const raw = supplement.newValue
+        const value = NUMERIC_FIELDS.has(supplement.field)
+          ? (raw === '' ? null : Number(raw))
+          : raw
+        return { ...p, [supplement.field]: value }
       }
       return p
     })
-    set({ points: updatedPoints, supplements: [...supplements, newSupplement] })
+    const update = { points: updatedPoints, supplements: [...supplements, newSupplement] }
+    set(update)
+    persistState({ ...get(), ...update })
     get().runValidation()
     if (get().optimizationResult) {
       const result = optimizeRoute(updatedPoints)
-      set({ optimizationResult: result })
+      const optUpdate = { optimizationResult: result }
+      set(optUpdate)
+      persistState({ ...get(), ...optUpdate })
       get().detectConflicts()
     }
   },
@@ -80,13 +128,13 @@ export const useAppStore = create<AppState>((set, get) => ({
     const conflicts: Conflict[] = []
 
     const suspiciousPoint = points.find(
-      (p) => p.estimatedStayMinutes !== null && p.estimatedStayMinutes > 120,
+      (p) => p.estimatedStayMinutes !== null && Number(p.estimatedStayMinutes) > 120,
     )
     if (suspiciousPoint && optimizationResult.estimatedTime > 180) {
       conflicts.push({
         id: `C${Date.now()}_1`,
         summaryClaim: `汇总页显示预计总时间 ${optimizationResult.estimatedTime} 分钟（${(optimizationResult.estimatedTime / 60).toFixed(1)} 小时）`,
-        dataEvidence: `展点"${suspiciousPoint.name}"停留时间 ${suspiciousPoint.estimatedStayMinutes} 分钟，占总量 ${(suspiciousPoint.estimatedStayMinutes! / optimizationResult.estimatedTime * 100).toFixed(0)}%，疑似异常值`,
+        dataEvidence: `展点"${suspiciousPoint.name}"停留时间 ${Number(suspiciousPoint.estimatedStayMinutes)} 分钟，占总量 ${(Number(suspiciousPoint.estimatedStayMinutes) / optimizationResult.estimatedTime * 100).toFixed(0)}%，疑似异常值`,
         suggestedAction: '建议复核该展点停留时间后再看汇总数据，或先将其排除后重新计算',
       })
     }
@@ -102,6 +150,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     }
 
     set({ conflicts })
+    persistState({ ...get(), conflicts })
   },
 
   setHighlightedPoint: (id) => set({ highlightedPointId: id }),
@@ -110,8 +159,8 @@ export const useAppStore = create<AppState>((set, get) => ({
     return get().points.find((p) => p.id === id)
   },
 
-  clearAll: () =>
-    set({
+  clearAll: () => {
+    const update = {
       points: [],
       validationResults: [],
       optimizationResult: null,
@@ -119,5 +168,8 @@ export const useAppStore = create<AppState>((set, get) => ({
       conflicts: [],
       highlightedPointId: null,
       isOptimizing: false,
-    }),
+    }
+    set(update)
+    persistState(update)
+  },
 }))

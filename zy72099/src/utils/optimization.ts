@@ -109,16 +109,16 @@ export function optimizeRoute(rawPoints: ExhibitPoint[]): OptimizationResult {
   const { route, totalDistance } = nearestNeighborRoute(validPoints, startPoint, endPoint)
 
   const suspiciousPoints = validPoints.filter(
-    (p) => p.estimatedStayMinutes !== null && p.estimatedStayMinutes > 120,
+    (p) => p.estimatedStayMinutes !== null && Number(p.estimatedStayMinutes) > 120,
   )
 
   steps.push({
     step: 4,
     title: '评分排序：距离+时间综合评分',
-    description: `路线总距离 ${totalDistance.toFixed(1)}m，总预计停留 ${validPoints.reduce((s, p) => s + (p.estimatedStayMinutes || 0), 0)} 分钟。${suspiciousPoints.length > 0 ? `注意：${suspiciousPoints.map((p) => p.name).join('、')}停留时间异常（>${120}分钟），会拉高总时间，建议复核。` : '所有展点停留时间在合理范围内。'}`,
+    description: `路线总距离 ${totalDistance.toFixed(1)}m，总预计停留 ${validPoints.reduce((s, p) => s + Number(p.estimatedStayMinutes || 0), 0)} 分钟。${suspiciousPoints.length > 0 ? `注意：${suspiciousPoints.map((p) => p.name).join('、')}停留时间异常（>${120}分钟），会拉高总时间，建议复核。` : '所有展点停留时间在合理范围内。'}`,
     data: {
       totalDistance: Math.round(totalDistance * 10) / 10,
-      totalStayMinutes: validPoints.reduce((s, p) => s + (p.estimatedStayMinutes || 0), 0),
+      totalStayMinutes: validPoints.reduce((s, p) => s + Number(p.estimatedStayMinutes || 0), 0),
       suspiciousPoints: suspiciousPoints.map((p) => ({ id: p.id, name: p.name, stay: p.estimatedStayMinutes })),
     },
   })
@@ -135,7 +135,7 @@ export function optimizeRoute(rawPoints: ExhibitPoint[]): OptimizationResult {
     },
   })
 
-  const totalStayMinutes = validPoints.reduce((s, p) => s + (p.estimatedStayMinutes || 0), 0)
+  const totalStayMinutes = validPoints.reduce((s, p) => s + Number(p.estimatedStayMinutes || 0), 0)
   const walkTimeMinutes = Math.round(totalDistance / 80)
   const estimatedTime = totalStayMinutes + walkTimeMinutes
 
@@ -150,7 +150,7 @@ export function optimizeRoute(rawPoints: ExhibitPoint[]): OptimizationResult {
   if (suspiciousPoints.length > 0) {
     predictions.push({
       suggestion: `建议复核"${suspiciousPoints[0].name}"停留时间`,
-      reasoning: `该展点预计停留 ${suspiciousPoints[0].estimatedStayMinutes} 分钟，远超 120 分钟阈值。如为录入错误，修正后总时间将减少约 ${(suspiciousPoints[0].estimatedStayMinutes! - 30)} 分钟。当前计算已包含此异常值，实际参观时间可能远低于预估。`,
+      reasoning: `该展点预计停留 ${Number(suspiciousPoints[0].estimatedStayMinutes)} 分钟，远超 120 分钟阈值。如为录入错误，修正后总时间将减少约 ${(Number(suspiciousPoints[0].estimatedStayMinutes!) - 30)} 分钟。当前计算已包含此异常值，实际参观时间可能远低于预估。`,
       confidence: 0.95,
     })
   }
