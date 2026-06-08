@@ -11,6 +11,28 @@ export type WarningType =
   | 'invalid_value'       
   | 'high_condition_number';
 
+export interface ReviewInfo {
+  previousValue: string;
+  newValue: string;
+  reason: string;
+  nextHandler: string;
+  reviewedAt: Date;
+  reviewedBy: string;
+  finalized: boolean;
+}
+
+export interface ChangeHistoryEntry {
+  id: string;
+  rowId: string;
+  criterionName: string;
+  field: 'originalValue' | 'status' | 'notes';
+  oldValue: string;
+  newValue: string;
+  changedBy: string;
+  changedAt: Date;
+  reason?: string;
+}
+
 export interface WeightRow {
   id: string;
   originalRowNumber: number;
@@ -24,6 +46,7 @@ export interface WeightRow {
   modifiedBy?: string;
   modifiedAt?: Date;
   notes?: string;
+  reviewInfo?: ReviewInfo;
 }
 
 export interface MatrixConditionResult {
@@ -51,6 +74,8 @@ export interface WeightTableData {
   processStep: ProcessStep;
   formulaScreenshot?: string;
   hasReviewStatus: 'not_viewed' | 'viewed' | 'confirmed';
+  history: ChangeHistoryEntry[];
+  dataVersion: number;
 }
 
 export type ProcessStep = 
@@ -66,6 +91,13 @@ export interface UnifiedResult {
     warningCount: number;
     errorCount: number;
     needsReviewCount: number;
+    normalCount: number;
+    modifiedCount: number;
   };
+  processStep: ProcessStep;
+  importTime: Date;
+  importedBy: string;
+  history: ChangeHistoryEntry[];
+  dataVersion: number;
   exportTime?: Date;
 }

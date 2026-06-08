@@ -1,51 +1,65 @@
-import { WeightRow, MatrixConditionResult, UnifiedResult } from '../types';
+import { WeightTableData, UnifiedResult, WeightRow, ChangeHistoryEntry } from '../types';
 
-export class UnifiedResultSource {
-  private rows: WeightRow[] = [];
-  private matrixResult: MatrixConditionResult | null = null;
+export function buildUnifiedResult(
+  tableData: WeightTableData
+): UnifiedResult {
+  const rows = tableData.rows;
+  const totalRows = rows.length;
+  const warningCount = rows.filter(r => r.status === 'warning').length;
+  const errorCount = rows.filter(r => r.status === 'error').length;
+  const needsReviewCount = rows.filter(r => r.status === 'needs_review').length;
+  const normalCount = rows.filter(r => r.status === 'normal').length;
+  const modifiedCount = rows.filter(r => r.isManualModified).length;
 
-  setData(rows: WeightRow[], matrixResult: MatrixConditionResult | null): void {
-    this.rows = rows;
-    this.matrixResult = matrixResult;
-  }
-
-  getRows(): WeightRow[] {
-    return [...this.rows];
-  }
-
-  getMatrixResult(): MatrixConditionResult | null {
-    return this.matrixResult ? { ...this.matrixResult } : null;
-  }
-
-  getUnifiedResult(): UnifiedResult {
-    const warningCount = this.rows.filter(r => r.status === 'warning').length;
-    const errorCount = this.rows.filter(r => r.status === 'error').length;
-    const needsReviewCount = this.rows.filter(r => r.status === 'needs_review').length;
-
-    return {
-      rows: this.getRows(),
-      matrixResult: this.getMatrixResult(),
-      summary: {
-        totalRows: this.rows.length,
-        warningCount,
-        errorCount,
-        needsReviewCount
-      },
-      exportTime: new Date()
-    };
-  }
-
-  getRowsForDisplay(): WeightRow[] {
-    return this.getRows();
-  }
-
-  getRowsForExport(): WeightRow[] {
-    return this.getRows();
-  }
-
-  getRowsForAPI(): WeightRow[] {
-    return this.getRows();
-  }
+  return {
+    rows: rows.map(r => ({ ...r })),
+    matrixResult: tableData.matrixResult ? { ...tableData.matrixResult } : null,
+    summary: {
+      totalRows,
+      warningCount,
+      errorCount,
+      needsReviewCount,
+      normalCount,
+      modifiedCount
+    },
+    processStep: tableData.processStep,
+    importTime: tableData.importTime,
+    importedBy: tableData.importedBy,
+    history: [...tableData.history],
+    dataVersion: tableData.dataVersion,
+    exportTime: new Date()
+  };
 }
 
-export const unifiedResultSource = new UnifiedResultSource();
+export function getResultForDisplay(unifiedResult: UnifiedResult) {
+  return unifiedResult.rows;
+}
+
+export function getResultForExport(unifiedResult: UnifiedResult) {
+  return unifiedResult.rows;
+}
+
+export function getResultForAPI(unifiedResult: UnifiedResult) {
+  return unifiedResult;
+}
+
+export function createHistoryEntry(params: {
+  row: WeightRow;
+  field: ChangeHistoryEntry['field'];
+  oldValue: string;
+  newValue: string;
+  changedBy: string;
+  reason?: string;
+}): ChangeHistoryEntry {
+  return {
+    id: Math.random().toString(36).substring(2, 15),
+    rowId: params.row.id,
+    criterionName: params.row.criterionName,
+    field: params.field,
+    oldValue: params.oldValue,
+    newValue: params.newValue,
+    changedBy: params.changedBy,
+    changedAt: new Date(),
+    reason: params.reason
+  };
+}
