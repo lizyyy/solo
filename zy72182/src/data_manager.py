@@ -161,7 +161,7 @@ class DataManager:
         
         all_reviews = []
         for review_file in self.review_dir.glob("*.json"):
-            with open(review_file, 'r') as f:
+            with open(review_file, 'r', encoding='utf-8') as f:
                 review_data = json.load(f)
                 if isinstance(review_data, list):
                     all_reviews.extend(review_data)
@@ -170,31 +170,59 @@ class DataManager:
             return df, merge_stats
         
         review_df = pd.DataFrame(all_reviews)
-        if 'sample_id' not in review_df.columns:
-            return df, merge_stats
+        
+        review_lookup = {}
+        if 'sample_id' in review_df.columns:
+            for _, rv in review_df.iterrows():
+                sid = rv.get('sample_id', '')
+                if sid:
+                    review_lookup[('sample_id', sid)] = rv
+        if 'image_path' in review_df.columns:
+            for _, rv in review_df.iterrows():
+                ip = rv.get('image_path', '')
+                if ip:
+                    review_lookup.setdefault(('image_path', ip), rv)
         
         for idx, row in df.iterrows():
-            sample_id = row['sample_id']
-            sample_reviews = review_df[review_df['sample_id'] == sample_id]
+            matched_review = None
             
-            if len(sample_reviews) > 0:
+            sid = row.get('sample_id', '')
+            if sid and ('sample_id', sid) in review_lookup:
+                matched_review = review_lookup[('sample_id', sid)]
+            
+            if matched_review is None and 'image_path' in row and pd.notna(row.get('image_path')):
+                ip = row['image_path']
+                if ('image_path', ip) in review_lookup:
+                    matched_review = review_lookup[('image_path', ip)]
+            
+            if matched_review is not None:
                 merge_stats["matched_reviews"] += 1
                 
-                latest_review = sample_reviews.iloc[-1]
-                
-                if pd.notna(latest_review.get('human_label')):
+                if pd.notna(matched_review.get('human_label')):
                     current_label = row.get('predicted_label', row.get('model_label'))
-                    historical_label = latest_review['human_label']
+                    historical_label = matched_review['human_label']
+                    review_status = matched_review.get('status', '')
+                    is_conflict = pd.notna(current_label) and str(current_label) != str(historical_label)
                     
-                    if pd.notna(current_label) and str(current_label) != str(historical_label):
+                    if is_conflict:
                         merge_stats["conflicting_labels"] += 1
+                    
+                    if review_status == 'confirmed':
+                        df.at[idx, 'human_label'] = historical_label
+                        df.at[idx, 'review_status'] = 'confirmed'
+                        df.at[idx, 'review_note'] = matched_review.get('note', '')
+                        if not is_conflict:
+                            merge_stats["applied_labels"] += 1
+                    elif is_conflict:
                         df.at[idx, 'review_status'] = 'need_confirm'
+                        df.at[idx, 'human_label'] = historical_label
                         df.at[idx, 'review_note'] = f'历史标签[{historical_label}]与模型预测[{current_label}]不一致'
                     else:
                         df.at[idx, 'human_label'] = historical_label
                         df.at[idx, 'review_status'] = 'confirmed'
+                        df.at[idx, 'review_note'] = matched_review.get('note', '')
                         merge_stats["applied_labels"] += 1
                     
-                    df.at[idx, 'review_source'] = latest_review.get('source_version', 'historical')
+                    df.at[idx, 'review_source'] = matched_review.get('source_version', 'historical')
         
         return df, merge_stats

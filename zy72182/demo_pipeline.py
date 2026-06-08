@@ -61,6 +61,10 @@ def demo_smooth_workflow():
     print(f"  标签冲突: {merge_stats['conflicting_labels']}")
     print(f"  应用标签: {merge_stats['applied_labels']}")
     
+    print("\n  --- 历史合并后样本状态 ---")
+    for _, r in merged_df.iterrows():
+        print(f"    {r['sample_id']}  pred={r.get('predicted_label','')}  human={r.get('human_label','')}  status={r.get('review_status','')}  source={r.get('review_source','')}")
+    
     print("\n[步骤5] 缺陷聚类")
     clustered_df, cluster_stats = ce.cluster_defects(merged_df)
     print(f"  聚类数量: {cluster_stats['cluster_count']}")
@@ -72,7 +76,7 @@ def demo_smooth_workflow():
     labeled_df, label_stats = ce.assign_cluster_labels(clustered_df)
     print(f"  已标记聚类: {label_stats['labeled_clusters']}")
     
-    print("\n[步骤7] 应用复核记录到DataFrame")
+    print("\n[步骤7] 应用复核记录到DataFrame（二次确认）")
     reviewed_df, apply_stats = rm.apply_reviews_to_dataframe(labeled_df)
     print(f"  匹配复核: {apply_stats['total_matched']}")
     print(f"  应用标签: {apply_stats['labels_applied']}")
@@ -85,6 +89,10 @@ def demo_smooth_workflow():
     
     review_summary = rm.get_review_summary(reviewed_df)
     print(f"  复核进度: {review_summary['review_progress']}%")
+    if review_summary['need_attention']:
+        print(f"  需关注样本:")
+        for item in review_summary['need_attention']:
+            print(f"    - {item['sample_id']}: {item.get('review_note', '')}")
     
     print("\n[步骤9] 保存中间数据")
     dm.save_processed_data(reviewed_df, version_id, "final")
@@ -104,27 +112,40 @@ def demo_smooth_workflow():
     excel_path = rg.export_result_excel(reviewed_df, version_id)
     print(f"  Excel结果: {excel_path}")
     
-    print("\n[步骤11] 人工复核演示 - 处理冲突样本")
+    print("\n[步骤11] 人工复核 - 处理冲突样本（need_confirm -> confirmed）")
     need_confirm = reviewed_df[reviewed_df['review_status'] == 'need_confirm']
     if len(need_confirm) > 0:
         sample = need_confirm.iloc[0]
-        print(f"  确认样本 {sample['sample_id']}: 模型预测[{sample['predicted_label']}] -> 人工标记[气泡]")
+        confirmed_label = sample.get('human_label', sample.get('predicted_label', ''))
+        print(f"  确认样本 {sample['sample_id']}: 模型预测[{sample.get('predicted_label','')}] -> 人工确认[{confirmed_label}]")
         rm.submit_review(
             sample_id=sample['sample_id'],
-            human_label="气泡",
+            human_label=confirmed_label,
             reviewer="小乔",
-            note="人工确认：实际是气泡缺陷",
+            note=f"人工确认：采用标签[{confirmed_label}]",
             version_id=version_id
         )
+    else:
+        print("  没有冲突样本需要确认")
     
-    print("\n[步骤12] 最终复核后重新生成报告")
-    final_df, final_stats = rm.apply_reviews_to_dataframe(reviewed_df)
-    final_metrics = ce.calculate_metrics(final_df)
-    final_summary = rm.get_review_summary(final_df)
+    print("\n[步骤12] 重新应用复核记录 -> 更新DataFrame")
+    reviewed_df_v2, apply_stats_v2 = rm.apply_reviews_to_dataframe(reviewed_df)
+    print(f"  匹配复核: {apply_stats_v2['total_matched']}")
+    print(f"  应用标签: {apply_stats_v2['labels_applied']}")
+    print(f"  发现冲突: {apply_stats_v2['conflicts_found']}")
+    
+    final_metrics = ce.calculate_metrics(reviewed_df_v2)
+    final_summary = rm.get_review_summary(reviewed_df_v2)
     print(f"  最终复核进度: {final_summary['review_progress']}%")
     print(f"  最终复核状态: {final_metrics['review_status']}")
     
-    final_handoff = rg.generate_handoff_report(final_df, version_info, final_summary)
+    print("\n  --- 最终样本状态 ---")
+    for _, r in reviewed_df_v2.iterrows():
+        print(f"    {r['sample_id']}  pred={r.get('predicted_label','')}  human={r.get('human_label','')}  status={r.get('review_status','')}  source={r.get('review_source','')}")
+    
+    dm.save_processed_data(reviewed_df_v2, version_id, "final")
+    
+    final_handoff = rg.generate_handoff_report(reviewed_df_v2, version_info, final_summary)
     print(f"  最终交接报告: {final_handoff}")
     
     return version_id, work_dir
@@ -159,15 +180,21 @@ def demo_rework_workflow(prev_version_id, work_dir):
     print(f"  标签冲突: {merge_stats['conflicting_labels']}")
     print(f"  应用标签: {merge_stats['applied_labels']}")
     
+    print("\n  --- V2历史合并后样本状态 ---")
+    for _, r in merged_df.iterrows():
+        print(f"    {r['sample_id']}  pred={r.get('predicted_label','')}  human={r.get('human_label','')}  status={r.get('review_status','')}  source={r.get('review_source','')}")
+    
     print("\n[步骤5] V2版本聚类")
     clustered_df, cluster_stats = ce.cluster_defects(merged_df)
     print(f"  聚类数量: {cluster_stats['cluster_count']}")
     
     labeled_df, _ = ce.assign_cluster_labels(clustered_df)
-    reviewed_df, _ = rm.apply_reviews_to_dataframe(labeled_df)
+    reviewed_df, apply_stats = rm.apply_reviews_to_dataframe(labeled_df)
+    print(f"  复核匹配: {apply_stats['total_matched']}, 应用: {apply_stats['labels_applied']}, 冲突: {apply_stats['conflicts_found']}")
     
     print("\n[步骤6] 与V1版本对比")
     prev_df = dm.load_processed_data(prev_version_id, "final")
+    comparison = {}
     if prev_df is not None:
         comparison = ce.compare_versions(prev_df, reviewed_df)
         print(f"  V1样本数: {comparison['total_samples_old']}")
@@ -195,10 +222,28 @@ def demo_rework_workflow(prev_version_id, work_dir):
         for label, change in metrics_diff['label_changes'].items():
             print(f"    {label}: {change['old']} -> {change['new']} ({change['delta']:+d})")
     
-    print("\n[步骤8] 生成V2完整报告（包含对比信息）")
+    print("\n[步骤8] 处理V2中新的冲突样本")
+    need_confirm_v2 = reviewed_df[reviewed_df['review_status'] == 'need_confirm']
+    if len(need_confirm_v2) > 0:
+        for _, sample in need_confirm_v2.iterrows():
+            confirmed_label = sample.get('human_label', sample.get('predicted_label', ''))
+            print(f"  确认样本 {sample['sample_id']}: 模型预测[{sample.get('predicted_label','')}] -> 人工确认[{confirmed_label}]")
+            rm.submit_review(
+                sample_id=sample['sample_id'],
+                human_label=confirmed_label,
+                reviewer="小乔",
+                note=f"V2确认：采用标签[{confirmed_label}]",
+                version_id=version_id
+            )
+        
+        reviewed_df, apply_stats = rm.apply_reviews_to_dataframe(reviewed_df)
+        print(f"  重新apply后: 应用{apply_stats['labels_applied']}, 冲突{apply_stats['conflicts_found']}")
+    
+    print("\n[步骤9] 生成V2完整报告（包含对比信息）")
     version_info = dm.get_version_info(version_id)
+    v2_metrics_final = ce.calculate_metrics(reviewed_df)
     report = rg.generate_full_report(
-        reviewed_df, version_info, v2_metrics,
+        reviewed_df, version_info, v2_metrics_final,
         cluster_stats, clean_stats, merge_stats,
         comparison=comparison
     )
@@ -246,8 +291,7 @@ def demo_decision_trail(work_dir):
         with open(report_path, 'r', encoding='utf-8') as f:
             report_data = json.load(f)
         
-        if report_data['decision_trail']:
-            sample_trail = report_data['decision_trail'][0]
+        for sample_trail in report_data['decision_trail'][:3]:
             print(f"\n样本 {sample_trail['sample_id']} 的判断轨迹:")
             for decision in sample_trail['decisions']:
                 print(f"  [{decision['step']}] {decision['action']}")
@@ -284,17 +328,6 @@ def main():
     print("  演示完成！")
     print(f"  所有数据保存在: {work_dir}/")
     print("="*60)
-    print("""
-目录结构说明:
-  workspace_demo/
-  ├── raw/              # 原始数据
-  ├── processed/        # 各版本处理结果
-  │   ├── v1_1_0_2/
-  │   └── v2_2_0_0/
-  ├── reviews/          # 人工复核记录（持久化）
-  ├── reports/          # 生成的报告
-  └── meta/             # 版本元数据
-""")
 
 
 if __name__ == "__main__":

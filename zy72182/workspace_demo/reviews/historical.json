@@ -1,6 +1,6 @@
 [
   {
-    "sample_id": "d41d8cd98f00",
+    "sample_id": "893179f90c31",
     "human_label": "划痕",
     "reviewer": "小乔",
     "review_time": "2026-05-15T10:30:00",
@@ -9,7 +9,7 @@
     "status": "confirmed"
   },
   {
-    "sample_id": "a43512cd98f0",
+    "sample_id": "cbeb879cd8f3",
     "human_label": "灰尘",
     "reviewer": "小乔",
     "review_time": "2026-05-15T10:35:00",
@@ -18,11 +18,11 @@
     "status": "confirmed"
   },
   {
-    "sample_id": "b523f7ac8e1d",
+    "sample_id": "dd6914cffcc3",
     "human_label": "严重气泡",
     "reviewer": "小乔",
     "review_time": "2026-05-20T14:20:00",
-    "note": "此样本模型预测与人工不符，需要确认",
+    "note": "此样本模型预测为气泡，人工确认为严重气泡，需关注",
     "source_version": "v1_0_0",
     "status": "confirmed"
   }

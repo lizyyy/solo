@@ -129,27 +129,58 @@ class ReviewManager:
             return result_df, apply_stats
         
         review_df = pd.DataFrame(all_reviews)
-        review_df = review_df.sort_values('review_time').groupby('sample_id').last().reset_index()
+        review_df = review_df.sort_values('review_time').groupby('sample_id', sort=False).last().reset_index()
+        
+        review_lookup = {}
+        for _, rv in review_df.iterrows():
+            sid = rv.get('sample_id', '')
+            if sid:
+                review_lookup[sid] = rv
+        
+        image_path_lookup = {}
+        if 'image_path' in review_df.columns:
+            for _, rv in review_df.iterrows():
+                ip = rv.get('image_path', '')
+                if ip:
+                    image_path_lookup.setdefault(ip, rv)
         
         for idx, row in result_df.iterrows():
-            sample_id = row['sample_id']
-            sample_review = review_df[review_df['sample_id'] == sample_id]
+            matched_review = None
             
-            if len(sample_review) > 0:
+            sample_id = row.get('sample_id', '')
+            if sample_id in review_lookup:
+                matched_review = review_lookup[sample_id]
+            
+            if matched_review is None and 'image_path' in row and pd.notna(row.get('image_path')):
+                ip = row['image_path']
+                if ip in image_path_lookup:
+                    matched_review = image_path_lookup[ip]
+            
+            if matched_review is not None:
                 apply_stats["total_matched"] += 1
-                review_data = sample_review.iloc[0]
-                
+                historical_label = matched_review['human_label']
+                review_status = matched_review.get('status', '')
                 current_pred = row.get('predicted_label')
-                historical_label = review_data['human_label']
                 
-                if pd.notna(current_pred) and str(current_pred) != str(historical_label):
+                if review_status == 'confirmed':
+                    result_df.at[idx, 'human_label'] = historical_label
+                    result_df.at[idx, 'review_status'] = 'confirmed'
+                    result_df.at[idx, 'review_note'] = matched_review.get('note', '')
+                    result_df.at[idx, 'review_source'] = matched_review.get('source_version', 'historical')
+                    
+                    if pd.notna(current_pred) and str(current_pred) != str(historical_label):
+                        apply_stats["conflicts_found"] += 1
+                    else:
+                        apply_stats["labels_applied"] += 1
+                elif pd.notna(current_pred) and str(current_pred) != str(historical_label):
                     apply_stats["conflicts_found"] += 1
                     result_df.at[idx, 'review_status'] = 'need_confirm'
+                    result_df.at[idx, 'human_label'] = historical_label
                     result_df.at[idx, 'review_note'] = f"模型预测[{current_pred}]与人工标签[{historical_label}]不一致"
                 else:
                     result_df.at[idx, 'human_label'] = historical_label
                     result_df.at[idx, 'review_status'] = 'confirmed'
-                    result_df.at[idx, 'review_note'] = review_data.get('note', '')
+                    result_df.at[idx, 'review_note'] = matched_review.get('note', '')
                     apply_stats["labels_applied"] += 1
         
         return result_df, apply_stats
