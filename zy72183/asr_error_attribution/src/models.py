@@ -180,6 +180,7 @@ class AttributionResult:
             "log_id": self.log_id,
             "annotation_id": self.annotation_id,
             "error_type": self.error_type,
+            "result_error_type": self.final_error_type or self.error_type,
             "confidence": self.confidence,
             "evidence": self.evidence,
             "status": self.status.value,

@@ -255,6 +255,8 @@ def review(
         {"records": conflicts, "count": len(conflicts)},
     )
 
+    export_report(version, attributions, conflicts)
+
     click.echo("审核完成")
 
 
@@ -322,21 +324,35 @@ def summary(version: str):
         click.echo(f"  {et}: {count}")
 
 
-def export_report(version: str, attributions: List[AttributionResult], conflicts):
+def export_report(version: str, attributions, conflicts=None):
     """导出报告到版本目录"""
     version_manager = VersionManager()
     version_dir = version_manager.get_version_dir(version)
 
-    records = [a.to_dict() for a in attributions]
+    if isinstance(attributions, list) and attributions and isinstance(attributions[0], AttributionResult):
+        records = [a.to_dict() for a in attributions]
+    else:
+        records = attributions if isinstance(attributions, list) else []
+
     df = pd.DataFrame(records)
+    cols = list(df.columns)
+    if "result_error_type" in cols:
+        idx = cols.index("result_error_type")
+        if "error_type" in cols:
+            cols.remove("error_type")
+            cols.remove("result_error_type")
+            cols.insert(idx - 1, "result_error_type")
+            cols.insert(idx - 1, "error_type")
+        df = df[cols]
 
     csv_path = version_dir / f"report_{version}.csv"
     df.to_csv(csv_path, index=False, encoding="utf-8-sig")
 
+    conflict_count = len(conflicts) if conflicts else 0
     summary = {
         "version": version,
-        "total_attributions": len(attributions),
-        "total_conflicts": len(conflicts),
+        "total_attributions": len(records),
+        "total_conflicts": conflict_count,
         "generated_at": datetime.now().isoformat(),
     }
 

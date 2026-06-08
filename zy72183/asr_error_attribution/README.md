@@ -251,11 +251,12 @@ A: 在 `data/versions/{version}/meta.json` 中查看版本的创建时间和创�
 A: 是的，所有版本数据都永久保存在 `data/versions/` 目录下，永不覆盖。
 
 **Q: 如何区分自动归因和人工审核的结果？**
-A: `status` 字段：
-  - `auto_attributed`: 自动归因
-  - `manual_reviewed`: 已人工审核
-  - `pending`: 待处理
-  - `final_error_type` 字段为最终结果（如有）
+A: 看 `result_error_type` 列——这是最终判定结果：
+  - 未经审核时，`result_error_type` = `error_type`（自动归因值）
+  - 人工审核后，`result_error_type` = `final_error_type`（人工修正值）
+  - `error_type` 列始终保留原始自动归因值，`final_error_type` 列仅在人工审核后非空
+  - `status` 字段：`auto_attributed` = 自动归因，`manual_reviewed` = 已人工审核，`pending` = 待处理
+  - CSV/JSON 导出均包含 `result_error_type`，可直接用于下游
 
 **Q: 如何批量导出数据给下游？**
 A: 使用 `export` 命令导出 CSV/JSON/XLSX 格式。
