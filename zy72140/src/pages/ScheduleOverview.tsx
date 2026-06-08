@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Download, X, ChevronDown, MessageSquare, Eye, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Search, Download, X, ChevronDown, MessageSquare, Eye, ChevronRight, ChevronLeft, RotateCcw } from 'lucide-react';
 import { useScheduleStore } from '@/stores/scheduleStore';
 import { useAuditStore } from '@/stores/auditStore';
+import { useMaterialStore } from '@/stores/materialStore';
 import { exportSchedulesToCSV, downloadCSV } from '@/utils/csv';
 
 const ROLES = ['全部', '舞台组', '音响组', '灯光组', '后勤组', '接待组', '安保组'];
@@ -80,13 +81,28 @@ export default function ScheduleOverview() {
               显示 {filtered.length} / {totalCount} 条记录
             </p>
           </div>
-          <button
-            onClick={handleExport}
-            className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white bg-amber-500 hover:bg-amber-600 transition-colors font-['Noto_Sans_SC']"
-          >
-            <Download size={16} />
-            导出 CSV ({filtered.length}条)
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleExport}
+              className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white bg-amber-500 hover:bg-amber-600 transition-colors font-['Noto_Sans_SC']"
+            >
+              <Download size={16} />
+              导出 CSV ({filtered.length}条)
+            </button>
+            <button
+              onClick={() => {
+                localStorage.removeItem('festival-schedules');
+                localStorage.removeItem('festival-materials');
+                localStorage.removeItem('festival-audit-logs');
+                window.location.reload();
+              }}
+              className="flex items-center gap-1 rounded-lg px-3 py-2 text-xs text-slate-400 hover:text-slate-600 border border-slate-200 hover:border-slate-300 transition-colors font-['Noto_Sans_SC']"
+              title="重置为初始样例数据"
+            >
+              <RotateCcw size={14} />
+              重置数据
+            </button>
+          </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-3 mb-6 bg-white rounded-xl p-4 shadow-sm border border-slate-200">

@@ -57,15 +57,15 @@ export const seedSchedules: Schedule[] = [
     id: 'sched-005',
     volunteerName: '刘浩然',
     role: '接待组',
-    timeSlot: '08:00-12:00',
+    timeSlot: '08:00-16:00',
     date: '2026-06-15',
-    status: 'conflict',
+    status: 'confirmed',
     remark: '与合同约定时段不一致，待协调',
     remarkHistory: [
       { from: '负责嘉宾签到', to: '与合同约定时段不一致，待协调', changedAt: '2026-06-11T16:45:00+08:00' },
     ],
     createdAt: '2026-06-08T12:00:00+08:00',
-    updatedAt: '2026-06-11T16:45:00+08:00',
+    updatedAt: '2026-06-12T11:00:00+08:00',
   },
   {
     id: 'sched-006',
@@ -188,7 +188,7 @@ export const seedMaterials: Material[] = [
     name: '刘浩然志愿服务协议扫描件',
     description: '接待组志愿者刘浩然签署的志愿服务协议，含约定服务时段08:00-16:00',
     fileUrl: '/files/contract-liuhaoran.pdf',
-    annotation: '合同第三条明确约定服务时段为08:00-16:00，与当前排班时段08:00-12:00存在差异',
+    annotation: '合同第三条明确约定服务时段为08:00-16:00，已采纳合同值，排班已调整为08:00-16:00',
     createdAt: '2026-06-10T09:30:00+08:00',
   },
   {

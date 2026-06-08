@@ -25,7 +25,7 @@ export default function BatchImport() {
 
   const { importResult, isImporting, startImport, setImportResult, clearImportResult, resolveConflict } =
     useImportStore();
-  const { schedules, addSchedule } = useScheduleStore();
+  const { schedules, addSchedule, updateSchedule } = useScheduleStore();
   const { materials } = useMaterialStore();
   const { addLog } = useAuditStore();
 
@@ -129,23 +129,46 @@ export default function BatchImport() {
 
   const handleResolve = useCallback(
     (conflictId: string, resolution: 'keep_import' | 'keep_contract' | 'manual_merge') => {
+      if (!importResult) return;
+      const conflict = importResult.conflicts.find((c) => c.id === conflictId);
+      if (!conflict) return;
+
+      const schedule = schedules.find((s) => s.id === conflict.scheduleId);
+      const beforeValue = schedule ? `${conflict.field}: ${schedule[conflict.field as keyof Schedule] ?? ''}` : '';
+      let afterValue = '';
+
+      if (resolution === 'keep_contract') {
+        const update: Partial<Schedule> = {
+          [conflict.field]: conflict.contractValue,
+          status: 'confirmed',
+        };
+        updateSchedule(conflict.scheduleId, update);
+        afterValue = `${conflict.field}: ${conflict.contractValue} (采纳合同值)`;
+      } else if (resolution === 'keep_import') {
+        const update: Partial<Schedule> = {
+          [conflict.field]: conflict.importValue,
+          status: 'confirmed',
+        };
+        updateSchedule(conflict.scheduleId, update);
+        afterValue = `${conflict.field}: ${conflict.importValue} (采纳导入值)`;
+      } else {
+        updateSchedule(conflict.scheduleId, { status: 'pending' });
+        afterValue = '手动合并，请在排班总览中编辑';
+      }
+
       resolveConflict(conflictId, resolution, 'batch_import');
       addLog({
-        scheduleId: 'batch',
+        scheduleId: conflict.scheduleId,
         action: 'conflict_resolved',
-        beforeValue: '',
-        afterValue: resolution,
-        evidence: conflictId,
-        suggestion: `冲突已通过${
-          resolution === 'keep_contract'
-            ? '采纳合同值'
-            : resolution === 'keep_import'
-              ? '采纳导入值'
-              : '手动合并'
-        }解决`,
+        beforeValue,
+        afterValue,
+        evidence: conflict.contractEvidence,
+        suggestion: resolution === 'manual_merge'
+          ? '已标记为待确认，请在排班总览中手动编辑后确认'
+          : '',
       });
     },
-    [resolveConflict, addLog],
+    [importResult, schedules, resolveConflict, updateSchedule, addLog],
   );
 
   const handleReset = useCallback(() => {
