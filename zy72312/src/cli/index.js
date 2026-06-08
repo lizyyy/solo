@@ -243,19 +243,43 @@ program
         console.log();
       }
 
-      console.log(chalk.bold.red('【误差说明】'));
-      console.log(report.record.errorAnalysis || '暂无');
+      console.log(chalk.bold.red('【误差说明 - 为什么被留下】'));
+      console.log(report.record.errorAnalysis ? report.record.errorAnalysis.split('\n').map(l => '  ' + l).join('\n') : '  暂无');
       console.log();
 
-      console.log(chalk.bold.green('【下一步行动】'));
-      console.log(report.record.nextStepDetail || '暂无');
+      console.log(chalk.bold.cyan('【下一步行动 - 找谁、做什么】'));
+      const nextDetail = report.record.nextStepDetail || report.summary.nextStepDetail || '暂无';
+      console.log(nextDetail.split('\n').map(l => '  ' + l).join('\n'));
       console.log();
 
-      console.log(chalk.bold('【处理历史】'));
+      console.log(chalk.bold('【摘要汇总】'));
+      const s = report.summary;
+      console.log(`  分配给：${report.record.assignedTo || s.assignedTo || '(未分配)'}`);
+      console.log(`  证据齐全度：手算反例 ${s.hasManual ? '✓' : '✗'} / 问卷原始行 ${s.hasQuestionnaire ? '✓' : '✗'}`);
+      console.log(`  几何问题：${s.issuesByType.total} 项 (凹点${s.issuesByType.concave || 0} / 重复${s.issuesByType.duplicate || 0} / 顺逆${s.issuesByType.winding || 0})`);
+      console.log(`  问题边数：${s.problemEdgeCount || 0} 条`);
+      console.log();
+
+      console.log(chalk.bold('【处理历史 - 保留全部痕迹，不提前归正常】'));
       report.record.reviewHistory.forEach((entry, i) => {
         const ts = entry.timestamp ? entry.timestamp.substring(0, 19) : '未知时间';
-        console.log(`  ${i + 1}. ${ts} - ${entry.message}`);
+        console.log(`  ${i + 1}. [${ts}] ${entry.action} - ${entry.message}`);
+        if (entry.processReason) console.log(chalk.gray(`     原因：${entry.processReason}`));
+        if (entry.snapshotBefore && entry.snapshotAfter) {
+          const sb = entry.snapshotBefore;
+          const sa = entry.snapshotAfter;
+          const diffs = [];
+          if (sb.status !== sa.status) diffs.push(`状态: ${sb.status}→${sa.status}`);
+          if (sb.nextStep !== sa.nextStep) diffs.push(`找谁: ${sb.nextStep}→${sa.nextStep}`);
+          if (sb.manualExample !== sa.manualExample) diffs.push(`手算: ${sb.manualExample}→${sa.manualExample}`);
+          if (sb.questionnaire !== sa.questionnaire) diffs.push(`问卷: ${sb.questionnaire}→${sa.questionnaire}`);
+          if (diffs.length > 0) console.log(chalk.gray('     变化：' + diffs.join(' / ')));
+        }
       });
+      console.log();
+
+      console.log(chalk.bold('【正式报告文本（可直接导出）】'));
+      console.log(chalk.gray(report.humanReport.split('\n').map(l => '  ' + l).join('\n')));
       console.log();
 
       console.log(chalk.bold.blue('══════════════════════════════════════════════\n'));
@@ -363,10 +387,11 @@ program
     console.log(table.toString());
     console.log();
 
-    console.log(chalk.cyan('步骤 4: 模拟吴老师补录问卷原始行'));
-    const s002Record = records.find(r => r.studentId === 'S002');
-    if (s002Record) {
-      const questionnaireData = {
+    console.log(chalk.cyan('步骤 4: 模拟吴老师补看问卷原始行（S002 李四 - 有凹点）'));
+    const s002 = records.find(r => r.studentId === 'S002');
+    let s002Id = s002 ? s002.id : null;
+    if (s002Id) {
+      const qData = {
         id: 'Q-DEMO-001',
         studentId: 'S002',
         answerId: 'A001',
@@ -374,26 +399,40 @@ program
         interviewer: '吴老师',
         additionalNotes: '已核实，大树确实在现场，凹点为合理情况'
       };
-      updateWithQuestionnaire(s002Record.id, questionnaireData);
-      console.log(chalk.green('  ✓ 已为 S002 补充问卷原始行'));
+      updateWithQuestionnaire(s002Id, qData);
+      console.log(chalk.green('  ✓ 已为 S002 补充问卷原始行，误差说明与下一步已重新计算'));
     }
     console.log();
 
-    console.log(chalk.cyan('步骤 5: 查看更新后的复核报告'));
-    if (s002Record) {
+    console.log(chalk.cyan('步骤 5: 再次查看 S002 复核详情（误差说明、下一步、历史都要跟着变）'));
+    if (s002Id) {
       dataStore.loadFromFiles();
-      const updatedReport = generateReport(s002Record.id);
-      console.log(chalk.bold('  误差说明已更新:'));
-      console.log(chalk.gray(updatedReport.record.errorAnalysis.split('\n').map(l => '    ' + l).join('\n')));
+      const rpt = generateReport(s002Id);
+      console.log(chalk.bold('  误差说明（变化："还缺什么材料"里问卷那一项消失）:'));
+      console.log(chalk.gray(rpt.record.errorAnalysis.split('\n').map(l => '    ' + l).join('\n')));
       console.log();
-      console.log(chalk.bold('  下一步行动:'));
-      const nextStep = updatedReport.record.nextStepDetail || updatedReport.record.nextStep || '暂无';
-      console.log(chalk.gray(String(nextStep).split('\n').map(l => '    ' + l).join('\n')));
+      console.log(chalk.bold('  下一步行动（变化：从"缺问卷"变为"人工复核几何问题"）:'));
+      const nd = rpt.record.nextStepDetail || rpt.record.nextStep || '暂无';
+      console.log(chalk.gray(String(nd).split('\n').map(l => '    ' + l).join('\n')));
+      console.log();
+      console.log(chalk.bold('  摘要汇总：'));
+      const sm = rpt.summary;
+      console.log(chalk.gray(`    分配给：${sm.assignedTo}　问题：${sm.issuesByType.total}项　手算${sm.hasManual ? '✓' : '✗'}问卷${sm.hasQuestionnaire ? '✓' : '✗'}`));
     }
     console.log();
 
-    console.log(chalk.bold.green('✓ 演示完成！'));
-    console.log(chalk.gray('\n运行 npm run report 查看详细报告\n'));
+    console.log(chalk.cyan('步骤 6: 人工批准 S003（王五 - 重复坐标），保留痕迹不提前归正常'));
+    const s003 = records.find(r => r.studentId === 'S003');
+    if (s003) {
+      approveRecord(s003.id, '吴老师', '重复坐标为录入多一步，面积与手算反例一致，批注通过');
+      console.log(chalk.green('  ✓ S003 已批准，历史中保留"批准时仍有未清事项"的说明'));
+    }
+    console.log();
+
+    console.log(chalk.bold.green('✓ 演示完成！建议对照操作：'));
+    console.log(chalk.gray('  1. npm run cli -- list          看列表：状态/下一步/分配给都一致'));
+    console.log(chalk.gray(`  2. npm run cli -- show ${s002Id ? s002Id.substring(0, 24) : 'S002记录ID'}  看详情：误差/下一步/历史/报告都同步`));
+    console.log(chalk.gray('  3. npm run server               小看板：点 S002 查看可视化与补录按钮\n'));
   });
 
 function getStatusText(status) {

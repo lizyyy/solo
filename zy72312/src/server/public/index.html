@@ -447,22 +447,69 @@
 
     <div class="modal" id="questionnaire-modal">
         <div class="modal-content">
-            <h2>📝 补充问卷原始行</h2>
+            <h2>📝 吴老师补录问卷原始行（现场说法）</h2>
             <div class="form-group">
-                <label>现场说法</label>
-                <textarea id="site-statement" placeholder="请输入现场说法内容..."></textarea>
+                <label>现场说法 *</label>
+                <textarea id="site-statement" placeholder="学生现场解释的实际情况..."></textarea>
             </div>
             <div class="form-group">
-                <label>调查员</label>
+                <label>调查员/补录人</label>
                 <input type="text" id="interviewer" value="吴老师">
             </div>
             <div class="form-group">
-                <label>补充说明</label>
-                <textarea id="additional-notes" placeholder="可选，输入补充说明..."></textarea>
+                <label>补充说明（核实结论）</label>
+                <textarea id="additional-notes" placeholder="如：已核实大树确实存在，凹点为合理情况..."></textarea>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeModal()">取消</button>
-                <button class="btn btn-primary" onclick="submitQuestionnaire()">提交</button>
+                <button class="btn btn-secondary" onclick="closeAllModals()">取消</button>
+                <button class="btn btn-primary" onclick="submitQuestionnaire()">提交 — 补录后误差说明与下一步自动更新</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="manual-modal">
+        <div class="modal-content">
+            <h2>📐 补录手算反例（学生主流程）</h2>
+            <div class="form-group">
+                <label>审核人</label>
+                <input type="text" id="manual-reviewer" value="吴老师">
+            </div>
+            <div class="form-group">
+                <label>期望面积（正确答案）</label>
+                <input type="number" id="manual-expected" placeholder="如：75">
+            </div>
+            <div class="form-group">
+                <label>学生上报的实际面积</label>
+                <input type="number" id="manual-actual" placeholder="如：87.5">
+            </div>
+            <div class="form-group">
+                <label>主流程计算备注 *</label>
+                <textarea id="manual-notes" placeholder="学生的计算步骤、公式使用、哪里出错..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeAllModals()">取消</button>
+                <button class="btn btn-primary" onclick="submitManualExample()">提交</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="approve-modal">
+        <div class="modal-content">
+            <h2>✓ 批准通过 — 请填写批注（必填）</h2>
+            <div style="background: #fffbeb; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 12px; color: #92400e;">
+                提示：批准会保留全部原始痕迹。若仍有几何/材料未清项，将在历史中注明"人工批准仍有未清事项"，不提前归正常。
+            </div>
+            <div class="form-group">
+                <label>批准人</label>
+                <input type="text" id="approve-name" value="吴老师">
+            </div>
+            <div class="form-group">
+                <label>批准理由/批注 *</label>
+                <textarea id="approve-reason" placeholder="如：凹点经问卷核实现场有大树，属合理情况，批注通过..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeAllModals()">取消</button>
+                <button class="btn btn-success" onclick="doApprove()">确认批准</button>
             </div>
         </div>
     </div>
@@ -603,28 +650,67 @@
                 </div>
 
                 <div class="detail-section">
-                    <h3>⚠️ 误差说明</h3>
-                    <div class="analysis-box analysis-error" style="font-size: 13px; white-space: pre-wrap;">
-                        ${record.errorAnalysis || '暂无'}
+                    <h3>📌 摘要（与列表、报告一致）</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px;">
+                        <div>分配给：<strong>${record.assignedTo || summary.assignedTo || '-'}</strong></div>
+                        <div>下一步：${summary.nextStep || '（详见下方）'}</div>
+                        <div>几何问题：${summary.issuesByType && summary.issuesByType.total ? summary.issuesByType.total + '项' : '无'}</div>
+                        <div>问题边：${summary.problemEdgeCount || 0} 条</div>
                     </div>
                 </div>
 
                 <div class="detail-section">
-                    <h3>✅ 下一步行动</h3>
+                    <h3>⚠️ 误差说明 — 为什么被留下</h3>
+                    <div class="analysis-box analysis-error" style="font-size: 13px; white-space: pre-wrap;">
+                        ${record.errorAnalysis || summary.errorAnalysis || '暂无发现误差项'}
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3>✅ 下一步行动 — 找谁、做什么</h3>
                     <div class="analysis-box analysis-next" style="font-size: 13px; white-space: pre-wrap;">
-                        ${record.nextStepDetail || '暂无'}
+                        ${record.nextStepDetail || summary.nextStepDetail || '暂无'}
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3>📜 处理历史（保留全部痕迹，不提前归正常）</h3>
+                    <div style="font-size: 12px; color: #555;">
+                        ${record.reviewHistory && record.reviewHistory.length > 0 ? record.reviewHistory.map((h, idx) => `
+                            <div style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;">
+                                <div><strong>#${idx + 1}</strong>
+                                    [${h.timestamp ? h.timestamp.substring(0, 19) : '?'}]
+                                    <span style="color: #667eea;">${h.action}</span>
+                                </div>
+                                <div style="color: #333; margin-top: 2px;">${h.message}</div>
+                                ${h.processReason ? `<div style="color: #888; font-size: 11px; margin-top: 2px;">原因：${h.processReason}</div>` : ''}
+                                ${h.snapshotBefore && h.snapshotAfter ? `
+                                    <div style="color: #999; font-size: 11px; margin-top: 2px;">
+                                        ${h.snapshotBefore.status !== h.snapshotAfter.status ? `状态：${h.snapshotBefore.status}→${h.snapshotAfter.status}　` : ''}
+                                        ${h.snapshotBefore.nextStep !== h.snapshotAfter.nextStep ? `找谁：${h.snapshotBefore.nextStep}→${h.snapshotAfter.nextStep}　` : ''}
+                                        ${h.snapshotBefore.questionnaire !== h.snapshotAfter.questionnaire ? `问卷：${h.snapshotBefore.questionnaire}→${h.snapshotAfter.questionnaire}　` : ''}
+                                        ${h.snapshotBefore.manualExample !== h.snapshotAfter.manualExample ? `手算：${h.snapshotBefore.manualExample}→${h.snapshotAfter.manualExample}` : ''}
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `).join('') : '<div style="color: #888;">暂无历史记录</div>'}
                     </div>
                 </div>
 
                 <div class="btn-group">
                     ${!record.questionnaire ? `
                         <button class="btn btn-primary" onclick="openQuestionnaireModal()">
-                            📝 补充问卷
+                            📝 吴老师补录问卷
+                        </button>
+                    ` : ''}
+                    ${!record.manualExample ? `
+                        <button class="btn btn-primary" onclick="openManualModal()">
+                            📐 补录手算反例
                         </button>
                     ` : ''}
                     ${record.status !== 'approved' ? `
                         <button class="btn btn-success" onclick="approveRecord()">
-                            ✓ 批准通过
+                            ✓ 批准通过（保留痕迹）
                         </button>
                     ` : ''}
                 </div>
@@ -751,23 +837,39 @@
         }
 
         function openQuestionnaireModal() {
+            document.getElementById('site-statement').value = '';
+            document.getElementById('additional-notes').value = '';
             document.getElementById('questionnaire-modal').classList.add('active');
         }
 
-        function closeModal() {
-            document.getElementById('questionnaire-modal').classList.remove('active');
+        function openManualModal() {
+            document.getElementById('manual-expected').value = '';
+            document.getElementById('manual-actual').value = '';
+            document.getElementById('manual-notes').value = '';
+            document.getElementById('manual-modal').classList.add('active');
+        }
+
+        function openApproveModal() {
+            document.getElementById('approve-reason').value = '';
+            document.getElementById('approve-modal').classList.add('active');
+        }
+
+        function closeAllModals() {
+            document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
         }
 
         async function submitQuestionnaire() {
             const record = records.find(r => r.id === currentRecordId);
             if (!record) return;
+            const stmt = document.getElementById('site-statement').value.trim();
+            if (!stmt) { alert('请填写现场说法'); return; }
 
             const data = {
                 id: 'Q-' + Date.now(),
                 studentId: record.studentId,
                 answerId: record.answerId,
-                siteStatement: document.getElementById('site-statement').value,
-                interviewer: document.getElementById('interviewer').value,
+                siteStatement: stmt,
+                interviewer: document.getElementById('interviewer').value || '吴老师',
                 additionalNotes: document.getElementById('additional-notes').value
             };
 
@@ -777,24 +879,54 @@
                 body: JSON.stringify(data)
             });
 
-            closeModal();
-            await selectRecord(currentRecordId);
-            await loadRecords();
-            await loadStats();
+            closeAllModals();
+            await Promise.all([selectRecord(currentRecordId), loadRecords(), loadStats()]);
         }
 
-        async function approveRecord() {
-            if (!confirm('确定要批准此记录吗？')) return;
+        async function submitManualExample() {
+            const record = records.find(r => r.id === currentRecordId);
+            if (!record) return;
+            const notes = document.getElementById('manual-notes').value.trim();
+            if (!notes) { alert('请填写主流程计算备注'); return; }
+
+            const data = {
+                id: 'M-' + Date.now(),
+                studentId: record.studentId,
+                answerId: record.answerId,
+                reviewer: document.getElementById('manual-reviewer').value || '吴老师',
+                expectedArea: parseFloat(document.getElementById('manual-expected').value) || 0,
+                actualArea: parseFloat(document.getElementById('manual-actual').value) || 0,
+                notes,
+                issues: ['手动录入']
+            };
+
+            await fetch(`/api/records/${currentRecordId}/manual`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            closeAllModals();
+            await Promise.all([selectRecord(currentRecordId), loadRecords(), loadStats()]);
+        }
+
+        function approveRecord() {
+            openApproveModal();
+        }
+
+        async function doApprove() {
+            const reason = document.getElementById('approve-reason').value.trim();
+            const approver = document.getElementById('approve-name').value || '吴老师';
+            if (!reason) { alert('请填写批准理由/批注'); return; }
 
             await fetch(`/api/records/${currentRecordId}/approve`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ approver: '吴老师' })
+                body: JSON.stringify({ approver, reason })
             });
 
-            await selectRecord(currentRecordId);
-            await loadRecords();
-            await loadStats();
+            closeAllModals();
+            await Promise.all([selectRecord(currentRecordId), loadRecords(), loadStats()]);
         }
 
         function setView(view) {

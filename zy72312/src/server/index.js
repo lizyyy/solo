@@ -71,8 +71,8 @@ app.post('/api/records/:id/manual', (req, res) => {
 
 app.post('/api/records/:id/approve', (req, res) => {
   dataStore.loadFromFiles();
-  const { approver } = req.body;
-  const updated = approveRecord(req.params.id, approver || '系统');
+  const { approver, reason } = req.body || {};
+  const updated = approveRecord(req.params.id, approver || '系统', reason);
   if (!updated) {
     return res.status(404).json({ error: '记录不存在' });
   }

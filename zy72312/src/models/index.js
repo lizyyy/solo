@@ -102,20 +102,45 @@ export class ReviewRecord {
     this.questionnaire = data.questionnaire || null;
     this.errorAnalysis = data.errorAnalysis || '';
     this.nextStep = data.nextStep || '';
+    this.nextStepDetail = data.nextStepDetail || '';
     this.assignedTo = data.assignedTo || '';
     this.hasMultipleVersions = data.hasMultipleVersions || false;
     this.versions = data.versions || [];
     this.createdAt = data.createdAt || new Date().toISOString();
     this.updatedAt = data.updatedAt || new Date().toISOString();
     this.reviewHistory = data.reviewHistory || [];
+    this.snapshotBefore = null;
+  }
+
+  snapshot() {
+    return {
+      status: this.status,
+      errorAnalysis: this.errorAnalysis,
+      nextStep: this.nextStep,
+      nextStepDetail: this.nextStepDetail,
+      assignedTo: this.assignedTo,
+      manualExample: this.manualExample ? '存在' : '缺失',
+      questionnaire: this.questionnaire ? '存在' : '缺失'
+    };
   }
 
   addHistoryEntry(entry) {
-    this.reviewHistory.push({
-      ...entry,
-      timestamp: new Date().toISOString()
-    });
-    this.updatedAt = new Date().toISOString();
+    const now = new Date().toISOString();
+    const fullEntry = {
+      timestamp: now,
+      snapshotBefore: this.snapshotBefore,
+      ...entry
+    };
+    if (entry.snapshotAfter !== undefined) {
+      fullEntry.snapshotAfter = entry.snapshotAfter;
+    }
+    this.reviewHistory.push(fullEntry);
+    this.updatedAt = now;
+    this.snapshotBefore = null;
+  }
+
+  markForHistory() {
+    this.snapshotBefore = this.snapshot();
   }
 
   toJSON() {
@@ -129,11 +154,11 @@ export class ReviewRecord {
       questionnaire: this.questionnaire,
       errorAnalysis: this.errorAnalysis,
       nextStep: this.nextStep,
+      nextStepDetail: this.nextStepDetail,
       assignedTo: this.assignedTo,
       hasMultipleVersions: this.hasMultipleVersions,
       versions: this.versions,
       createdAt: this.createdAt,
-      updatedAt: this.updatedAt,
       updatedAt: this.updatedAt,
       reviewHistory: this.reviewHistory
     };
