@@ -1,10 +1,9 @@
 import json
-from collections import defaultdict
 from app.database import (
     get_conn, insert_sample, insert_run, insert_stratification,
     insert_metric_snapshot, insert_audit, mark_duplicate,
-    update_sample_status, get_sample_by_id, get_latest_run_id,
-    get_samples_by_status, row_to_dict, now_iso, new_id,
+    update_sample_status, get_latest_run_id,
+    row_to_dict, now_iso, new_id,
 )
 
 
@@ -137,6 +136,31 @@ def run_stratification(samples: list[dict], strat_types: list[str] = None,
             "stratum_counts": stratum_counts, "metrics": metrics_json}
 
 
+def _cross_check_db_duplicates(conn, samples: list[dict], operator: str) -> tuple[list[dict], list[dict]]:
+    truly_unique = []
+    db_dups = []
+    for s in samples:
+        if s.get("is_duplicate"):
+            db_dups.append(s)
+            continue
+        content_key = s.get("content", "").strip()
+        domain_key = s.get("domain") or ""
+        existing = conn.execute(
+            "SELECT id FROM samples WHERE content=? AND domain=? AND is_duplicate=0 LIMIT 1",
+            (content_key, domain_key),
+        ).fetchone()
+        if existing:
+            s["is_duplicate"] = 1
+            s["duplicate_of"] = existing["id"]
+            s["status"] = "duplicate"
+            db_dups.append(s)
+            insert_audit(conn, s.get("id"), "跨库标记重复", operator,
+                         evidence_ref=f"内容与已有样本 {existing['id']} 重复")
+        else:
+            truly_unique.append(s)
+    return truly_unique, db_dups
+
+
 def incremental_stratification(new_samples: list[dict], strat_types: list[str] = None,
                                operator: str = "系统") -> dict:
     if strat_types is None:
@@ -147,23 +171,34 @@ def incremental_stratification(new_samples: list[dict], strat_types: list[str] =
     with get_conn() as conn:
         prev_run_id = get_latest_run_id(conn)
 
-        for s in unique_new + dup_new:
-            existing = conn.execute("SELECT id FROM samples WHERE id=?", (s.get("id"),)).fetchone()
-            if not existing:
+        truly_unique, db_dups = _cross_check_db_duplicates(conn, unique_new, operator)
+        all_dups = dup_new + db_dups
+
+        for s in truly_unique:
+            existing_by_id = conn.execute("SELECT id FROM samples WHERE id=?", (s.get("id"),)).fetchone()
+            if not existing_by_id:
                 insert_sample(conn, s)
                 insert_audit(conn, s.get("id"), "补录样本", operator,
                              evidence_ref=f"来源={s.get('source')}, 批次={s.get('import_batch')}")
             else:
-                insert_audit(conn, s.get("id"), "增量更新样本", operator,
-                             evidence_ref=f"来源={s.get('source')}")
+                insert_sample(conn, s)
+                insert_audit(conn, s.get("id"), "增量更新样本（ID已存在，覆盖写入）", operator,
+                             evidence_ref=f"来源={s.get('source')}, 批次={s.get('import_batch')}")
 
-        for d in dup_new:
+        for d in all_dups:
+            existing_by_id = conn.execute("SELECT id FROM samples WHERE id=?", (d.get("id"),)).fetchone()
+            if not existing_by_id:
+                insert_sample(conn, d)
+                insert_audit(conn, d.get("id"), "补录样本（重复）", operator,
+                             evidence_ref=f"来源={d.get('source')}, 批次={d.get('import_batch')}")
+
+        for d in all_dups:
             mark_duplicate(conn, d["id"], d["duplicate_of"], operator)
 
         run_id = insert_run(conn, "incremental", previous_run_id=prev_run_id,
-                            sample_count=len(unique_new), notes=f"增量分层: {', '.join(strat_types)}")
+                            sample_count=len(truly_unique), notes=f"增量分层: {', '.join(strat_types)}")
 
-        for s in unique_new:
+        for s in truly_unique:
             if s.get("is_duplicate"):
                 continue
             for stype in strat_types:
@@ -180,14 +215,14 @@ def incremental_stratification(new_samples: list[dict], strat_types: list[str] =
                          evidence_ref=f"运行ID={run_id}")
 
         stratum_counts = _compute_stratum_counts(conn, run_id, strat_types)
-        _save_metrics(conn, run_id, unique_new, strat_types, stratum_counts)
+        _save_metrics(conn, run_id, truly_unique, strat_types, stratum_counts)
 
         metrics_json = _build_metrics_json(conn, run_id)
         conn.execute("UPDATE runs SET metrics_json=? WHERE id=?",
                      (json.dumps(metrics_json, ensure_ascii=False), run_id))
 
-    return {"run_id": run_id, "new_unique": len(unique_new), "new_duplicates": len(dup_new),
-            "stratum_counts": stratum_counts, "metrics": metrics_json}
+    return {"run_id": run_id, "new_unique": len(truly_unique), "new_duplicates": len(all_dups),
+            "db_duplicates": len(db_dups), "stratum_counts": stratum_counts, "metrics": metrics_json}
 
 
 def _compute_stratum_counts(conn, run_id, strat_types):
@@ -203,7 +238,6 @@ def _compute_stratum_counts(conn, run_id, strat_types):
 
 def _save_metrics(conn, run_id, unique_samples, strat_types, stratum_counts):
     for stype in strat_types:
-        label = STRATIFY_FNS.get(stype, (stype,))[0]
         total = sum(stratum_counts.get(stype, {}).values())
         for stratum, count in stratum_counts.get(stype, {}).items():
             ratio = count / total if total > 0 else 0

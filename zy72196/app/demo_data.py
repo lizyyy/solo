@@ -180,4 +180,16 @@ EXTRA_SAMPLES = [
         "source": "情感评测集v3",
         "import_batch": "batch_2026_02",
     },
+    {
+        "id": "S017",
+        "content": "以下哪个选项是正确的？A.地球是平的 B.地球是圆的 C.地球是三角形的",
+        "domain": "常识问答",
+        "reference_result": "B",
+        "model_output": "B",
+        "model_confidence": 0.98,
+        "human_label": None,
+        "source": "常识问答集v2",
+        "import_batch": "batch_2026_02",
+        "notes": "跨库去重测试：内容与S003相同，ID不同",
+    },
 ]
