@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { TrailStore, CrowdingLevel, ConflictResolution } from '@/types'
+import type { TrailStore, CrowdingLevel } from '@/types'
 import {
   seedPoints, seedStatuses, seedFeedbacks, seedPhotos,
   seedNotes, seedRecords, seedOpinions, seedConflicts,
@@ -216,6 +216,15 @@ export const useTrailStore = create<TrailStore>()(
                 lines.push(`    覆盖原因：${op.overrideReason}（${op.overriddenAt ? new Date(op.overriddenAt).toLocaleString('zh-CN') : ''}）`)
               }
             }
+          }
+          lines.push('')
+        }
+
+        const orphanNotes = state.notes.filter((n) => !n.pointId)
+        if (orphanNotes.length > 0) {
+          lines.push('【未关联点位的备注】')
+          for (const note of orphanNotes) {
+            lines.push(`  - [${note.street}] ${note.content}（编辑：${note.editedBy} ${new Date(note.editedAt).toLocaleString('zh-CN')}）`)
           }
           lines.push('')
         }

@@ -62,11 +62,15 @@ export default function DetailPanel() {
   const resolveConflict = useTrailStore((s) => s.resolveConflict)
   const updateNote = useTrailStore((s) => s.updateNote)
 
+  const addNote = useTrailStore((s) => s.addNote)
+
   const [opinionFormVisible, setOpinionFormVisible] = useState(false)
   const [opinionContent, setOpinionContent] = useState('')
   const [opinionSource, setOpinionSource] = useState('')
   const [previewPhoto, setPreviewPhoto] = useState<string | null>(null)
-  const [noteDraft, setNoteDraft] = useState('')
+  const [noteDrafts, setNoteDrafts] = useState<Record<string, string>>({})
+  const [addNoteVisible, setAddNoteVisible] = useState(false)
+  const [addNoteContent, setAddNoteContent] = useState('')
 
   const point = selectedPointId ? getPointById(selectedPointId) : undefined
   const status = selectedPointId ? getStatusByPointId(selectedPointId) : undefined
@@ -76,7 +80,20 @@ export default function DetailPanel() {
   const opinions = selectedPointId ? getOpinionsByPointId(selectedPointId) : []
   const conflicts = selectedPointId ? getConflictsByPointId(selectedPointId) : []
 
-  const currentNote = notes[0]
+  const handleNoteBlur = (noteId: string) => {
+    const draft = noteDrafts[noteId]
+    if (draft === undefined) return
+    const original = notes.find((n) => n.id === noteId)
+    if (!original || draft === original.content) return
+    updateNote(noteId, draft)
+  }
+
+  const handleAddNote = () => {
+    if (!selectedPointId || !addNoteContent.trim()) return
+    addNote(selectedPointId, point?.street || '', addNoteContent.trim())
+    setAddNoteContent('')
+    setAddNoteVisible(false)
+  }
 
   const handleStatusChange = (newStatus: CrowdingLevel) => {
     if (!selectedPointId) return
@@ -101,11 +118,6 @@ export default function DetailPanel() {
 
   const handleResolveConflict = (conflictId: string, resolution: ConflictResolution) => {
     resolveConflict(conflictId, resolution)
-  }
-
-  const handleNoteBlur = () => {
-    if (!currentNote || noteDraft === currentNote.content) return
-    updateNote(currentNote.id, noteDraft)
   }
 
   const isOpen = !!selectedPointId && !!point
@@ -336,22 +348,64 @@ export default function DetailPanel() {
             <div className="border-t border-stone-200" />
 
             <section>
-              <div className="flex items-center gap-2 mb-2 text-[#1a535c] font-semibold">
-                <FileText size={16} />
-                <span>人工备注</span>
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2 text-[#1a535c] font-semibold">
+                  <FileText size={16} />
+                  <span>人工备注</span>
+                </div>
+                <button
+                  onClick={() => setAddNoteVisible(!addNoteVisible)}
+                  className="text-xs px-2.5 py-1 rounded-lg bg-[#1a535c] text-white hover:opacity-90 transition-opacity"
+                >
+                  新增备注
+                </button>
               </div>
-              {currentNote ? (
-                <textarea
-                  value={noteDraft || currentNote.content}
-                  onChange={(e) => setNoteDraft(e.target.value)}
-                  onFocus={() => setNoteDraft(currentNote.content)}
-                  onBlur={handleNoteBlur}
-                  className="w-full border border-stone-300 rounded-lg p-3 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-[#1a535c] bg-white"
-                  rows={4}
-                />
-              ) : (
+              {addNoteVisible && (
+                <div className="bg-stone-50 rounded-lg p-3 mb-3 space-y-2">
+                  <textarea
+                    value={addNoteContent}
+                    onChange={(e) => setAddNoteContent(e.target.value)}
+                    placeholder="输入备注内容"
+                    className="w-full border border-stone-300 rounded-lg p-2 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-[#1a535c]"
+                    rows={3}
+                  />
+                  <div className="flex justify-end gap-2">
+                    <button
+                      onClick={() => { setAddNoteVisible(false); setAddNoteContent(''); }}
+                      className="px-3 py-1.5 text-xs rounded-lg border border-stone-300 text-stone-600 hover:bg-stone-100"
+                    >
+                      取消
+                    </button>
+                    <button
+                      onClick={handleAddNote}
+                      disabled={!addNoteContent.trim()}
+                      className="px-3 py-1.5 text-xs rounded-lg bg-[#1a535c] text-white hover:opacity-90 disabled:opacity-40"
+                    >
+                      保存
+                    </button>
+                  </div>
+                </div>
+              )}
+              {notes.length === 0 && !addNoteVisible && (
                 <p className="text-sm text-stone-400">暂无备注</p>
               )}
+              <div className="space-y-2">
+                {notes.map((note) => (
+                  <div key={note.id}>
+                    <textarea
+                      value={noteDrafts[note.id] !== undefined ? noteDrafts[note.id] : note.content}
+                      onChange={(e) => setNoteDrafts((prev) => ({ ...prev, [note.id]: e.target.value }))}
+                      onFocus={() => setNoteDrafts((prev) => prev[note.id] !== undefined ? prev : { ...prev, [note.id]: note.content })}
+                      onBlur={() => handleNoteBlur(note.id)}
+                      className="w-full border border-stone-300 rounded-lg p-3 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-[#1a535c] bg-white"
+                      rows={3}
+                    />
+                    <div className="text-[10px] text-stone-400 mt-0.5 px-1">
+                      {note.editedBy} · {formatDate(note.editedAt)}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </section>
 
             <div className="border-t border-stone-200" />
