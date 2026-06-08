@@ -1,60 +1,82 @@
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { useEvidenceStore } from "@/store/useEvidenceStore"
 import StatusBadge from "@/components/StatusBadge"
+import { parseCsv } from "@/utils/fileParsers"
+import type { CustodianConfirmRow } from "@/utils/fileParsers"
 import {
   Upload,
   FileCheck,
   AlertTriangle,
   CheckCircle2,
   Eye,
+  Download,
 } from "lucide-react"
 
-const mockImportData = [
+const sampleFiles = [
   {
-    securityCode: "00004.HK",
-    securityName: "长实集团",
-    amountHKD: 350000,
-    amountCNY: null,
-    exDividendDate: "2026-05-25",
-    custodianConfirmRef: "CUST-2026-0525-004",
+    label: "正常材料（单币种）",
+    desc: "汇丰控股 HKD 150,000",
+    url: "/samples/custodian_confirm_normal.csv",
   },
   {
-    securityCode: "00005.HK",
-    securityName: "恒基兆业",
-    amountHKD: 280000,
-    amountCNY: 250000,
-    exDividendDate: "2026-05-26",
-    custodianConfirmRef: "CUST-2026-0526-005",
+    label: "错口径材料（港币+人民币同列）",
+    desc: "汇贤产业信托 HKD 200,000 + CNY 180,000",
+    url: "/samples/custodian_confirm_mixed.csv",
+  },
+  {
+    label: "补录材料（旧口径除权日）",
+    desc: "香港交易所 HKD 120,000 除权日 2026-05-15",
+    url: "/samples/custodian_confirm_old_caliber.csv",
   },
 ]
 
 export default function ImportPage() {
   const { records, importRecords, reviewRecord } = useEvidenceStore()
   const [step, setStep] = useState<"upload" | "preview" | "done">("upload")
+  const [parsedRows, setParsedRows] = useState<CustodianConfirmRow[]>([])
   const [importedIds, setImportedIds] = useState<string[]>([])
+  const [fileName, setFileName] = useState("")
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const pendingRecords = records.filter((r) => r.status === "pending_review")
 
-  function handleSimulateImport() {
-    const newIds: string[] = []
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setFileName(file.name)
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      const text = ev.target?.result as string
+      const rows = parseCsv(text)
+      if (rows.length === 0) {
+        alert("CSV 解析失败：文件为空或格式不正确")
+        return
+      }
+      setParsedRows(rows)
+      setStep("preview")
+    }
+    reader.readAsText(file)
+    e.target.value = ""
+  }
+
+  function handleConfirmImport() {
     const store = useEvidenceStore.getState()
-    mockImportData.forEach((d) => {
-      importRecords([d])
-    })
+    importRecords(parsedRows)
     const latestRecords = useEvidenceStore.getState().records
     const newestIds = latestRecords
       .filter((r) => !store.records.find((old) => old.id === r.id))
       .map((r) => r.id)
     setImportedIds(newestIds)
-    setStep("preview")
-  }
-
-  function handleConfirmImport() {
     setStep("done")
   }
 
   function handleReview(id: string) {
     reviewRecord(id)
+  }
+
+  function getCurrencyTypeForRow(row: CustodianConfirmRow) {
+    return row.amountHKD && row.amountCNY ? "MIXED" : row.amountCNY ? "CNY" : "HKD"
   }
 
   return (
@@ -64,26 +86,58 @@ export default function ImportPage() {
           托管确认导入
         </h1>
         <p className="text-sm text-gray-500 mt-1">
-          从托管确认页导入支付拒付记录，系统自动识别币种异常
+          从托管确认页 CSV 文件导入支付拒付记录，系统自动识别币种异常
         </p>
       </div>
 
       {step === "upload" && (
-        <div className="bg-white rounded-xl border border-gray-100 p-8 shadow-sm">
-          <div
-            className="border-2 border-dashed border-pine-300 rounded-xl p-12 text-center hover:border-pine-500 hover:bg-pine-50/30 transition-all duration-300 cursor-pointer"
-            onClick={handleSimulateImport}
-          >
-            <Upload className="w-12 h-12 text-pine-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-pine-700 mb-2">
-              点击模拟导入托管确认页
+        <div className="space-y-6">
+          <div className="bg-white rounded-xl border border-gray-100 p-8 shadow-sm">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".csv"
+              className="hidden"
+              onChange={handleFileChange}
+            />
+            <div
+              className="border-2 border-dashed border-pine-300 rounded-xl p-12 text-center hover:border-pine-500 hover:bg-pine-50/30 transition-all duration-300 cursor-pointer"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <Upload className="w-12 h-12 text-pine-400 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-pine-700 mb-2">
+                上传托管确认页 CSV
+              </h3>
+              <p className="text-sm text-gray-400 max-w-md mx-auto">
+                选择 CSV 文件上传，系统将自动解析并识别币种异常
+              </p>
+              <p className="text-xs text-gray-300 mt-4">
+                CSV 格式：securityCode, securityName, amountHKD, amountCNY, exDividendDate, custodianConfirmRef
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
+            <h3 className="font-semibold text-pine-800 mb-4 flex items-center gap-2">
+              <Download className="w-4 h-4 text-gold-500" />
+              样例材料下载
             </h3>
-            <p className="text-sm text-gray-400 max-w-md mx-auto">
-              模拟导入两条记录：一条正常单币种（长实集团 HKD 350,000），一条港币/人民币同列（恒基兆业 HKD 280,000 + CNY 250,000）
+            <p className="text-sm text-gray-500 mb-4">
+              下载对应场景的 CSV 样例，然后重新上传。检查方可用三种样例分别跑一遍，核对结果。
             </p>
-            <p className="text-xs text-gray-300 mt-4">
-              演示环境：点击即可模拟文件上传
-            </p>
+            <div className="grid grid-cols-3 gap-4">
+              {sampleFiles.map((sf) => (
+                <a
+                  key={sf.url}
+                  href={sf.url}
+                  download
+                  className="block border border-gray-200 rounded-lg p-4 hover:border-pine-300 hover:shadow-md transition-all duration-200"
+                >
+                  <p className="font-medium text-sm text-pine-800 mb-1">{sf.label}</p>
+                  <p className="text-xs text-gray-400">{sf.desc}</p>
+                </a>
+              ))}
+            </div>
           </div>
         </div>
       )}
@@ -91,9 +145,14 @@ export default function ImportPage() {
       {step === "preview" && (
         <div className="space-y-6">
           <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
-            <div className="flex items-center gap-2 mb-5">
-              <Eye className="w-5 h-5 text-pine-600" />
-              <h2 className="font-semibold text-pine-800">导入预览</h2>
+            <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center gap-2">
+                <Eye className="w-5 h-5 text-pine-600" />
+                <h2 className="font-semibold text-pine-800">导入预览</h2>
+                <span className="text-xs text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full">
+                  {fileName}
+                </span>
+              </div>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -108,32 +167,32 @@ export default function ImportPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {useEvidenceStore.getState().records
-                    .filter((r) => importedIds.includes(r.id))
-                    .map((record) => (
+                  {parsedRows.map((row, idx) => {
+                    const curType = getCurrencyTypeForRow(row)
+                    return (
                       <tr
-                        key={record.id}
+                        key={idx}
                         className={`border-b border-gray-50 ${
-                          record.currencyType === "MIXED" ? "bg-red-50/50" : ""
+                          curType === "MIXED" ? "bg-red-50/50" : ""
                         }`}
                       >
-                        <td className="py-3 px-4 font-mono text-xs">{record.securityCode}</td>
-                        <td className="py-3 px-4 font-medium text-pine-800">{record.securityName}</td>
+                        <td className="py-3 px-4 font-mono text-xs">{row.securityCode}</td>
+                        <td className="py-3 px-4 font-medium text-pine-800">{row.securityName}</td>
                         <td className="py-3 px-4 text-right font-semibold">
-                          {record.amountHKD?.toLocaleString() ?? "-"}
+                          {row.amountHKD?.toLocaleString() ?? "-"}
                         </td>
                         <td className="py-3 px-4 text-right">
-                          {record.amountCNY ? (
+                          {row.amountCNY ? (
                             <span className="font-semibold text-red-600">
-                              {record.amountCNY.toLocaleString()}
+                              {row.amountCNY.toLocaleString()}
                             </span>
                           ) : (
                             <span className="text-gray-300">-</span>
                           )}
                         </td>
-                        <td className="py-3 px-4 text-gray-600">{record.exDividendDate}</td>
+                        <td className="py-3 px-4 text-gray-600">{row.exDividendDate}</td>
                         <td className="py-3 px-4">
-                          {record.currencyType === "MIXED" ? (
+                          {curType === "MIXED" ? (
                             <span className="inline-flex items-center gap-1 text-xs bg-red-100 text-red-700 px-2.5 py-1 rounded-full font-medium">
                               <AlertTriangle className="w-3 h-3" />
                               港币+人民币同列 → 待复核
@@ -146,7 +205,8 @@ export default function ImportPage() {
                           )}
                         </td>
                       </tr>
-                    ))}
+                    )
+                  })}
                 </tbody>
               </table>
             </div>
@@ -213,7 +273,7 @@ export default function ImportPage() {
                       className="px-4 py-2 bg-red-600 text-white rounded-lg text-xs font-medium hover:bg-red-500 hover:shadow-md transition-all duration-200 flex items-center gap-1.5"
                     >
                       <FileCheck className="w-3.5 h-3.5" />
-                      模拟托管对接人复核
+                      托管对接人复核通过
                     </button>
                   </div>
                 ))}
@@ -222,7 +282,11 @@ export default function ImportPage() {
           )}
 
           <button
-            onClick={() => setStep("upload")}
+            onClick={() => {
+              setStep("upload")
+              setParsedRows([])
+              setFileName("")
+            }}
             className="px-5 py-2 border border-gray-200 text-gray-600 rounded-lg text-sm hover:border-pine-300 hover:text-pine-700 transition-all duration-200"
           >
             继续导入

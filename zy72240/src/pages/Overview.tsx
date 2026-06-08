@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 import { useEvidenceStore } from "@/store/useEvidenceStore"
 import StatusBadge from "@/components/StatusBadge"
 import type { RecordStatus } from "@/types"
-import { ArrowRight, AlertTriangle, CheckCircle2, RefreshCw } from "lucide-react"
+import { ArrowRight, AlertTriangle, CheckCircle2, RefreshCw, RotateCcw } from "lucide-react"
 
 const filterOptions: { value: RecordStatus | "all"; label: string }[] = [
   { value: "all", label: "全部" },
@@ -14,7 +14,7 @@ const filterOptions: { value: RecordStatus | "all"; label: string }[] = [
 ]
 
 export default function Overview() {
-  const { records, activeFilter, setActiveFilter } = useEvidenceStore()
+  const { records, activeFilter, setActiveFilter, resetStore } = useEvidenceStore()
 
   const filteredRecords =
     activeFilter === "all"
@@ -30,13 +30,22 @@ export default function Overview() {
 
   return (
     <div className="animate-fade-in">
-      <div className="mb-8">
-        <h1 className="font-serif text-2xl font-bold text-pine-800">
-          证据包总览
-        </h1>
-        <p className="text-sm text-gray-500 mt-1">
-          管理支付拒付证据记录，追踪处理状态
-        </p>
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h1 className="font-serif text-2xl font-bold text-pine-800">
+            证据包总览
+          </h1>
+          <p className="text-sm text-gray-500 mt-1">
+            管理支付拒付证据记录，追踪处理状态
+          </p>
+        </div>
+        <button
+          onClick={resetStore}
+          className="px-4 py-2 border border-red-200 text-red-600 rounded-lg text-sm font-medium hover:bg-red-50 hover:border-red-300 transition-all duration-200 flex items-center gap-1.5"
+        >
+          <RotateCcw className="w-3.5 h-3.5" />
+          重置全部数据
+        </button>
       </div>
 
       <div className="grid grid-cols-4 gap-4 mb-8">
@@ -153,7 +162,14 @@ export default function Overview() {
           </Link>
         ))}
 
-        {filteredRecords.length === 0 && (
+        {filteredRecords.length === 0 && records.length === 0 && (
+          <div className="text-center py-16 text-gray-400">
+            <p className="text-sm">尚无记录</p>
+            <p className="text-xs mt-1">请先到"托管确认导入"页上传 CSV 样例文件</p>
+          </div>
+        )}
+
+        {filteredRecords.length === 0 && records.length > 0 && (
           <div className="text-center py-16 text-gray-400">
             <p className="text-sm">暂无匹配的记录</p>
           </div>

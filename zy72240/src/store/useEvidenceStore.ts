@@ -1,6 +1,5 @@
 import { create } from "zustand"
 import type { EvidenceRecord, AuditEntry, OperationLog, RecordStatus } from "@/types"
-import { initialRecords, initialAuditEntries, initialOperationLogs } from "@/data/mockData"
 
 interface EvidenceState {
   records: EvidenceRecord[]
@@ -13,6 +12,7 @@ interface EvidenceState {
   supplementRecord: (id: string, correctedDate: string, note: string) => void
   manualCorrect: (id: string, field: string, oldValue: string, newValue: string) => void
   rerun: (id: string) => void
+  resetStore: () => void
   getRecordById: (id: string) => EvidenceRecord | undefined
   getAuditEntriesByRecordId: (id: string) => AuditEntry[]
   getOperationLogsByRecordId: (id: string) => OperationLog[]
@@ -25,13 +25,22 @@ function generateId(prefix: string) {
   return `${prefix}-${String(nextId).padStart(3, "0")}`
 }
 
+const initialState = {
+  records: [] as EvidenceRecord[],
+  auditEntries: [] as AuditEntry[],
+  operationLogs: [] as OperationLog[],
+  activeFilter: "all" as RecordStatus | "all",
+}
+
 export const useEvidenceStore = create<EvidenceState>((set, get) => ({
-  records: [...initialRecords],
-  auditEntries: [...initialAuditEntries],
-  operationLogs: [...initialOperationLogs],
-  activeFilter: "all",
+  ...initialState,
 
   setActiveFilter: (filter) => set({ activeFilter: filter }),
+
+  resetStore: () => {
+    nextId = 100
+    set(initialState)
+  },
 
   importRecords: (data) => {
     const newRecords: EvidenceRecord[] = data.map((d) => {

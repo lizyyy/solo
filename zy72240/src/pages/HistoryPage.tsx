@@ -1,4 +1,5 @@
 import { useEvidenceStore } from "@/store/useEvidenceStore"
+import { exportToCsv } from "@/utils/fileParsers"
 import {
   Clock,
   Upload,
@@ -8,6 +9,7 @@ import {
   Pencil,
   RefreshCw,
   FileCheck,
+  Download,
 } from "lucide-react"
 
 const actionIcons: Record<string, typeof Upload> = {
@@ -59,15 +61,33 @@ export default function HistoryPage() {
     })
   }
 
+  function handleExportAllHistory() {
+    const headers = ["日志ID", "记录ID", "操作", "操作人", "详情", "时间"]
+    const rows = sortedLogs.map((l) => [
+      l.id, l.recordId, l.action, l.operator, `"${l.detail}"`, l.timestamp,
+    ])
+    exportToCsv(headers, rows, "历史记录_全量.csv")
+  }
+
   return (
     <div className="animate-fade-in">
-      <div className="mb-8">
-        <h1 className="font-serif text-2xl font-bold text-pine-800">
-          历史记录
-        </h1>
-        <p className="text-sm text-gray-500 mt-1">
-          按时间线展示每次操作的详细日志
-        </p>
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h1 className="font-serif text-2xl font-bold text-pine-800">
+            历史记录
+          </h1>
+          <p className="text-sm text-gray-500 mt-1">
+            按时间线展示每次操作的详细日志
+          </p>
+        </div>
+        <button
+          onClick={handleExportAllHistory}
+          disabled={sortedLogs.length === 0}
+          className="px-5 py-2.5 bg-pine-800 text-white rounded-lg text-sm font-medium hover:bg-pine-700 transition-all duration-200 flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <Download className="w-4 h-4" />
+          导出全量历史记录
+        </button>
       </div>
 
       <div className="relative">

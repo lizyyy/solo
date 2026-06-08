@@ -1,7 +1,8 @@
 import { useState } from "react"
 import { useEvidenceStore } from "@/store/useEvidenceStore"
 import StatusBadge from "@/components/StatusBadge"
-import { ClipboardCheck, ChevronDown, ChevronUp, ArrowRight } from "lucide-react"
+import { exportToCsv } from "@/utils/fileParsers"
+import { ClipboardCheck, ChevronDown, ChevronUp, ArrowRight, Download } from "lucide-react"
 
 export default function AuditPage() {
   const { records, auditEntries, getAuditEntriesByRecordId } = useEvidenceStore()
@@ -11,15 +12,33 @@ export default function AuditPage() {
     setExpandedId(expandedId === id ? null : id)
   }
 
+  function handleExportAllAudit() {
+    const headers = ["审计ID", "记录ID", "字段", "旧值", "新值", "变更类型", "操作人", "时间"]
+    const rows = auditEntries.map((e) => [
+      e.id, e.recordId, e.fieldName, e.oldValue, e.newValue, e.changeType, e.operator, e.timestamp,
+    ])
+    exportToCsv(headers, rows, "审计明细_全量.csv")
+  }
+
   return (
     <div className="animate-fade-in">
-      <div className="mb-8">
-        <h1 className="font-serif text-2xl font-bold text-pine-800">
-          审计明细
-        </h1>
-        <p className="text-sm text-gray-500 mt-1">
-          汇总所有处理结果，展示每条记录的完整处理链路
-        </p>
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h1 className="font-serif text-2xl font-bold text-pine-800">
+            审计明细
+          </h1>
+          <p className="text-sm text-gray-500 mt-1">
+            汇总所有处理结果，展示每条记录的完整处理链路
+          </p>
+        </div>
+        <button
+          onClick={handleExportAllAudit}
+          disabled={auditEntries.length === 0}
+          className="px-5 py-2.5 bg-pine-800 text-white rounded-lg text-sm font-medium hover:bg-pine-700 transition-all duration-200 flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <Download className="w-4 h-4" />
+          导出全量审计明细
+        </button>
       </div>
 
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
