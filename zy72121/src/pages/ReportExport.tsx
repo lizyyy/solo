@@ -13,8 +13,12 @@ export default function ReportExport() {
   const activeThreshold = thresholds.find(t => t.id === activeThresholdId);
   const currentBatch = batches.find(b => b.id === currentBatchId);
 
-  const summary = results.length > 0 && activeThreshold
-    ? generateBatchSummary(results, activeThreshold)
+  const currentResults = currentBatchId
+    ? results.filter(r => r.batchId === currentBatchId)
+    : [];
+
+  const summary = currentResults.length > 0 && activeThreshold
+    ? generateBatchSummary(currentResults, activeThreshold)
     : null;
 
   const handleExportPDF = async () => {
@@ -61,9 +65,9 @@ export default function ReportExport() {
       text += `${s}\n`;
     });
 
-    if (results.filter(r => r.riskLevel !== 'normal').length > 0) {
+    if (currentResults.filter(r => r.riskLevel !== 'normal').length > 0) {
       text += `\n=== 异常明细 ===\n`;
-      results.filter(r => r.riskLevel !== 'normal').forEach(result => {
+      currentResults.filter(r => r.riskLevel !== 'normal').forEach(result => {
         const record = records.find(r => r.id === result.recordId);
         if (record) {
           text += `\n【${record.location}】\n`;
@@ -112,7 +116,7 @@ export default function ReportExport() {
           </button>
           <button
             onClick={handleExportPDF}
-            disabled={results.length === 0}
+            disabled={currentResults.length === 0}
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Download className="w-4 h-4" />
@@ -121,7 +125,7 @@ export default function ReportExport() {
         </div>
       </div>
 
-      {results.length === 0 ? (
+      {currentResults.length === 0 ? (
         <div className="p-12 text-center border-2 border-dashed border-slate-200 rounded-lg">
           <FileText className="w-12 h-12 text-slate-300 mx-auto mb-3" />
           <p className="text-slate-500">暂无计算结果</p>
@@ -202,11 +206,11 @@ export default function ReportExport() {
             </div>
           </div>
 
-          {results.filter(r => r.riskLevel !== 'normal').length > 0 && (
+          {currentResults.filter(r => r.riskLevel !== 'normal').length > 0 && (
             <div className="mb-6">
               <h3 className="text-lg font-semibold text-slate-800 mb-3">四、异常明细</h3>
               <div className="space-y-3">
-                {results.filter(r => r.riskLevel !== 'normal').map((result) => {
+                {currentResults.filter(r => r.riskLevel !== 'normal').map((result) => {
                   const record = records.find(r => r.id === result.recordId);
                   if (!record || !activeThreshold) return null;
                   return (

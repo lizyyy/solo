@@ -25,11 +25,15 @@ export default function ResultsPanel() {
   const activeThreshold = thresholds.find(t => t.id === activeThresholdId);
   const currentBatch = batches.find(b => b.id === currentBatchId);
 
-  const summary = results.length > 0 && activeThreshold
-    ? generateBatchSummary(results, activeThreshold)
+  const currentResults = currentBatchId
+    ? results.filter(r => r.batchId === currentBatchId)
+    : [];
+
+  const summary = currentResults.length > 0 && activeThreshold
+    ? generateBatchSummary(currentResults, activeThreshold)
     : null;
 
-  const chartData = results.map(result => {
+  const chartData = currentResults.map(result => {
     const record = records.find(r => r.id === result.recordId);
     return {
       name: record?.location?.slice(0, 6) || result.recordId.slice(-4),
@@ -171,7 +175,7 @@ export default function ResultsPanel() {
         </div>
       )}
 
-      {results.length > 0 ? (
+      {currentResults.length > 0 ? (
         <div className="border border-slate-200 rounded-lg overflow-hidden">
           <div className="overflow-x-auto max-h-80 overflow-y-auto">
             <table className="w-full text-sm">
@@ -187,7 +191,7 @@ export default function ResultsPanel() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {results.map((result) => {
+                {currentResults.map((result) => {
                   const record = records.find(r => r.id === result.recordId);
                   const recordNotes = notes.filter(n => n.recordId === result.recordId && n.batchId === currentBatchId);
 
@@ -249,11 +253,11 @@ export default function ResultsPanel() {
         </div>
       )}
 
-      {results.length > 0 && activeThreshold && (
+      {currentResults.length > 0 && activeThreshold && (
         <div className="space-y-2">
           <h3 className="text-sm font-medium text-slate-700">📝 处理建议详情</h3>
           <div className="space-y-2 max-h-48 overflow-y-auto">
-            {results.filter(r => r.riskLevel !== 'normal').map((result) => {
+            {currentResults.filter(r => r.riskLevel !== 'normal').map((result) => {
               const record = records.find(r => r.id === result.recordId);
               if (!record) return null;
               return (

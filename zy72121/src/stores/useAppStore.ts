@@ -33,7 +33,6 @@ interface AppState {
   setActiveThreshold: (id: string) => void;
 
   calculateResults: () => void;
-  createBatch: (name: string) => string;
   loadBatch: (batchId: string) => void;
   compareBatches: (batchIdA: string, batchIdB: string) => {
     batchA: CalculationBatch | undefined;
@@ -70,7 +69,7 @@ export const useAppStore = create<AppState>()(
             dataIssues: issues.map(i => i.message),
           };
         });
-        set({ records: processedRecords, results: [] });
+        set({ records: processedRecords });
       },
 
       addRecord: (record) => {
@@ -80,7 +79,7 @@ export const useAppStore = create<AppState>()(
           dataQuality: classifyDataQuality(issues),
           dataIssues: issues.map(i => i.message),
         };
-        set(state => ({ records: [...state.records, processedRecord], results: [] }));
+        set(state => ({ records: [...state.records, processedRecord] }));
       },
 
       updateRecord: (id, updates) => {
@@ -97,19 +96,18 @@ export const useAppStore = create<AppState>()(
             }
             return r;
           });
-          return { records, results: [] };
+          return { records };
         });
       },
 
       removeRecord: (id) => {
         set(state => ({
           records: state.records.filter(r => r.id !== id),
-          results: state.results.filter(r => r.recordId !== id),
         }));
       },
 
       setParams: (params) => {
-        set({ params, results: [] });
+        set({ params });
       },
 
       addThreshold: (threshold) => {
@@ -123,7 +121,6 @@ export const useAppStore = create<AppState>()(
         set(state => ({
           thresholds: state.thresholds.map(t => ({ ...t, isActive: false })).concat(newThreshold),
           activeThresholdId: newThreshold.id,
-          results: [],
         }));
       },
 
@@ -131,68 +128,42 @@ export const useAppStore = create<AppState>()(
         set(state => ({
           thresholds: state.thresholds.map(t => ({ ...t, isActive: t.id === id })),
           activeThresholdId: id,
-          results: [],
         }));
       },
 
       calculateResults: () => {
-        const { records, params, thresholds, activeThresholdId, currentBatchId } = get();
+        const { records, params, thresholds, activeThresholdId } = get();
         const threshold = thresholds.find(t => t.id === activeThresholdId);
         if (!threshold) return;
 
-        const batchId = currentBatchId || `batch_${Date.now()}`;
+        const batchId = `batch_${Date.now()}`;
         
-        const results = records
+        const newResults = records
           .map(r => calculateHeatLoss(r, params, threshold, batchId))
           .filter((r): r is HeatLossResult => r !== null);
 
-        if (!currentBatchId) {
-          const newBatch: CalculationBatch = {
-            id: batchId,
-            name: `批次-${new Date().toLocaleDateString('zh-CN')}`,
-            createdAt: new Date().toISOString(),
-            createdBy: '何工',
-            paramsSnapshot: { ...params },
-            thresholdVersionId: threshold.id,
-            recordCount: records.length,
-            notes: [],
-          };
-          set(state => ({
-            results,
-            batches: [...state.batches, newBatch],
-            currentBatchId: batchId,
-          }));
-        } else {
-          set({ results });
-        }
-      },
-
-      createBatch: (name) => {
-        const { params, activeThresholdId, records } = get();
-        const batchId = `batch_${Date.now()}`;
         const newBatch: CalculationBatch = {
           id: batchId,
-          name,
+          name: `批次-${new Date().toLocaleDateString('zh-CN')} ${new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}`,
           createdAt: new Date().toISOString(),
           createdBy: '何工',
           paramsSnapshot: { ...params },
-          thresholdVersionId: activeThresholdId,
+          thresholdVersionId: threshold.id,
           recordCount: records.length,
           notes: [],
         };
         set(state => ({
+          results: [...state.results, ...newResults],
           batches: [...state.batches, newBatch],
           currentBatchId: batchId,
         }));
-        return batchId;
       },
 
       loadBatch: (batchId) => {
-        const { batches, results, thresholds } = get();
+        const { batches, thresholds } = get();
         const batch = batches.find(b => b.id === batchId);
         if (!batch) return;
 
-        const batchResults = results.filter(r => r.batchId === batchId);
         const threshold = thresholds.find(t => t.id === batch.thresholdVersionId);
         
         if (threshold) {
@@ -200,13 +171,12 @@ export const useAppStore = create<AppState>()(
             currentBatchId: batchId,
             params: { ...batch.paramsSnapshot },
             activeThresholdId: threshold.id,
-            results: batchResults,
           });
         }
       },
 
       compareBatches: (batchIdA, batchIdB) => {
-        const { batches, results, records } = get();
+        const { batches, results } = get();
         const batchA = batches.find(b => b.id === batchIdA);
         const batchB = batches.find(b => b.id === batchIdB);
         

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { History, ArrowLeftRight, ChevronDown } from 'lucide-react';
+import { History, ArrowLeftRight } from 'lucide-react';
 import { useAppStore } from '../stores/useAppStore';
 import { cn } from '../utils/cn';
 
@@ -8,8 +8,6 @@ export default function HistoryCompare() {
   
   const [batchIdA, setBatchIdA] = useState<string>('');
   const [batchIdB, setBatchIdB] = useState<string>('');
-  const [showDropdownA, setShowDropdownA] = useState(false);
-  const [showDropdownB, setShowDropdownB] = useState(false);
 
   const comparison = batchIdA && batchIdB ? compareBatches(batchIdA, batchIdB) : null;
 
@@ -43,76 +41,36 @@ export default function HistoryCompare() {
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <div className="relative">
+        <div>
           <label className="block text-sm font-medium text-slate-600 mb-2">选择批次 A</label>
-          <button
-            onClick={() => { setShowDropdownA(!showDropdownA); setShowDropdownB(false); }}
-            className="w-full px-4 py-3 bg-white border border-slate-200 rounded-lg text-left flex items-center justify-between hover:border-blue-400 transition-colors"
+          <select
+            value={batchIdA}
+            onChange={(e) => setBatchIdA(e.target.value)}
+            className="w-full px-4 py-3 bg-white border border-slate-200 rounded-lg text-slate-800 hover:border-blue-400 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <span className={batchIdA ? 'text-slate-800' : 'text-slate-400'}>
-              {batches.find(b => b.id === batchIdA)?.name || '请选择批次'}
-            </span>
-            <ChevronDown className={cn('w-5 h-5 transition-transform', showDropdownA && 'rotate-180')} />
-          </button>
-          {showDropdownA && (
-            <div className="absolute z-10 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
-              {batches.length === 0 ? (
-                <div className="p-3 text-sm text-slate-500 text-center">暂无批次</div>
-              ) : (
-                batches.map(batch => (
-                  <div
-                    key={batch.id}
-                    onClick={() => { setBatchIdA(batch.id); setShowDropdownA(false); }}
-                    className={cn(
-                      'px-4 py-2 cursor-pointer hover:bg-slate-50',
-                      batch.id === batchIdA && 'bg-blue-50 text-blue-600'
-                    )}
-                  >
-                    <div className="font-medium text-sm">{batch.name}</div>
-                    <div className="text-xs text-slate-500">
-                      {new Date(batch.createdAt).toLocaleString('zh-CN')} · {batch.recordCount}条
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          )}
+            <option value="">请选择批次</option>
+            {batches.map(batch => (
+              <option key={batch.id} value={batch.id}>
+                {batch.name} ({new Date(batch.createdAt).toLocaleString('zh-CN')})
+              </option>
+            ))}
+          </select>
         </div>
 
-        <div className="relative">
+        <div>
           <label className="block text-sm font-medium text-slate-600 mb-2">选择批次 B</label>
-          <button
-            onClick={() => { setShowDropdownB(!showDropdownB); setShowDropdownA(false); }}
-            className="w-full px-4 py-3 bg-white border border-slate-200 rounded-lg text-left flex items-center justify-between hover:border-blue-400 transition-colors"
+          <select
+            value={batchIdB}
+            onChange={(e) => setBatchIdB(e.target.value)}
+            className="w-full px-4 py-3 bg-white border border-slate-200 rounded-lg text-slate-800 hover:border-blue-400 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <span className={batchIdB ? 'text-slate-800' : 'text-slate-400'}>
-              {batches.find(b => b.id === batchIdB)?.name || '请选择批次'}
-            </span>
-            <ChevronDown className={cn('w-5 h-5 transition-transform', showDropdownB && 'rotate-180')} />
-          </button>
-          {showDropdownB && (
-            <div className="absolute z-10 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
-              {batches.length === 0 ? (
-                <div className="p-3 text-sm text-slate-500 text-center">暂无批次</div>
-              ) : (
-                batches.map(batch => (
-                  <div
-                    key={batch.id}
-                    onClick={() => { setBatchIdB(batch.id); setShowDropdownB(false); }}
-                    className={cn(
-                      'px-4 py-2 cursor-pointer hover:bg-slate-50',
-                      batch.id === batchIdB && 'bg-blue-50 text-blue-600'
-                    )}
-                  >
-                    <div className="font-medium text-sm">{batch.name}</div>
-                    <div className="text-xs text-slate-500">
-                      {new Date(batch.createdAt).toLocaleString('zh-CN')} · {batch.recordCount}条
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          )}
+            <option value="">请选择批次</option>
+            {batches.map(batch => (
+              <option key={batch.id} value={batch.id}>
+                {batch.name} ({new Date(batch.createdAt).toLocaleString('zh-CN')})
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 
@@ -187,7 +145,7 @@ export default function HistoryCompare() {
                 <tbody className="divide-y divide-slate-100">
                   {comparison.resultsA.map((resultA, idx) => {
                     const record = records.find(r => r.id === resultA.recordId);
-                    const resultB = comparison.resultsB[idx];
+                    const resultB = comparison.resultsB.find(r => r.recordId === resultA.recordId);
                     const diff = resultB ? resultB.heatLossValue - resultA.heatLossValue : 0;
                     
                     return (
