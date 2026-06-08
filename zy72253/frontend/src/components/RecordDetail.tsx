@@ -125,8 +125,8 @@ export default function RecordDetail({ recordId, onBack }: Props) {
             {s.snapshot_data && (
               <div style={{ marginTop: 4, fontSize: 12, color: '#555' }}>
                 {s.snapshot_data.needs_review && <span style={{ color: '#d97706' }}>⚠️ 待复核 </span>}
-                坐标类型: {String(s.snapshot_data.coord_type)}
-                {s.snapshot_data.actor && <span> | 操作人: {String(s.snapshot_data.actor)}</span>}
+                坐标类型: {s.snapshot_data.coord_type}
+                {s.snapshot_data.actor && <span> | 操作人: {s.snapshot_data.actor}</span>}
               </div>
             )}
           </div>

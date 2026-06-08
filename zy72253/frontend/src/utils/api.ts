@@ -16,6 +16,21 @@ export interface RecordListItem {
   imported_at: string;
 }
 
+export interface SnapshotData {
+  batch_id: string;
+  raw_data: string;
+  coord_type: string;
+  needs_review: boolean;
+  stage: string;
+  actor?: string;
+  remarks?: {
+    id: string;
+    author: string;
+    content: string;
+    updated_at: string;
+  }[];
+}
+
 export interface TracebackResult {
   record: {
     id: string;
@@ -36,7 +51,7 @@ export interface TracebackResult {
   snapshots: {
     id: string;
     stage: string;
-    snapshot_data: Record<string, unknown>;
+    snapshot_data: SnapshotData;
     created_at: string;
   }[];
   reports: {
@@ -53,7 +68,7 @@ export interface TracebackResult {
 export interface SnapshotItem {
   id: string;
   stage: string;
-  snapshot_data: Record<string, unknown>;
+  snapshot_data: SnapshotData;
   model_params_version: string | null;
   model_params_reason: string | null;
   created_at: string;
