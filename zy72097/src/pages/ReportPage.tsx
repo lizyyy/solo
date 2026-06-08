@@ -4,6 +4,7 @@ import { Download, FileSpreadsheet, FileText, Printer, Eye, ArrowLeft, Save, His
 import { useDataStore } from '../store/dataStore';
 import { saveToHistory } from '../utils/storage';
 import ReportSummary from '../components/modules/ReportSummary';
+import FittingChart from '../components/modules/FittingChart';
 import DataTable from '../components/common/DataTable';
 import TracePanel from '../components/common/TracePanel';
 import { formatNumber, formatDateTime } from '../utils/format';
@@ -34,6 +35,12 @@ const ReportPage: React.FC = () => {
 
   const handleRowClick = (dataId: string) => {
     setSelectedDataId(dataId);
+    setTracePanelOpen(true);
+  };
+
+  const handleChartPointClick = (dataId: string) => {
+    setSelectedDataId(dataId);
+    setTracePanelOpen(true);
   };
 
   const handleTraceClose = () => {
@@ -303,6 +310,15 @@ const ReportPage: React.FC = () => {
               processedData={processedData}
               weightClosureStatus={adaptedWeightClosureStatus}
               boundaryStatus={adaptedBoundaryStatus}
+            />
+          )}
+
+          {fittingResult && (
+            <FittingChart
+              fittingResult={fittingResult}
+              processedData={processedData}
+              onPointClick={handleChartPointClick}
+              highlightId={selectedDataId || undefined}
             />
           )}
 
