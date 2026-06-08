@@ -58,8 +58,9 @@ export const useStore = create<AppState>((set, get) => ({
       if (!res.ok) throw new Error('获取记录失败')
       const data = await res.json()
       set({ records: data.data || data, loading: false })
-    } catch (e: any) {
-      set({ error: e.message, loading: false })
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e)
+      set({ error: msg, loading: false })
     }
   },
 
@@ -70,8 +71,9 @@ export const useStore = create<AppState>((set, get) => ({
       if (!res.ok) throw new Error('获取统计失败')
       const data = await res.json()
       set({ stats: data.data || data })
-    } catch (e: any) {
-      set({ error: e.message })
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e)
+      set({ error: msg })
     }
   },
 
@@ -82,8 +84,9 @@ export const useStore = create<AppState>((set, get) => ({
       if (!res.ok) throw new Error('获取审计日志失败')
       const data = await res.json()
       set({ auditLogs: data.data || data, loading: false })
-    } catch (e: any) {
-      set({ error: e.message, loading: false })
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e)
+      set({ error: msg, loading: false })
     }
   },
 
@@ -94,8 +97,9 @@ export const useStore = create<AppState>((set, get) => ({
       if (!res.ok) throw new Error('获取规则失败')
       const data = await res.json()
       set({ rules: data.data || data, loading: false })
-    } catch (e: any) {
-      set({ error: e.message, loading: false })
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e)
+      set({ error: msg, loading: false })
     }
   },
 
@@ -115,8 +119,9 @@ export const useStore = create<AppState>((set, get) => ({
       }))
       get().fetchStats()
       return result
-    } catch (e: any) {
-      set({ error: e.message, loading: false })
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e)
+      set({ error: msg, loading: false })
       return null
     }
   },
@@ -133,8 +138,9 @@ export const useStore = create<AppState>((set, get) => ({
       await get().fetchRecords()
       get().fetchStats()
       set({ loading: false })
-    } catch (e: any) {
-      set({ error: e.message, loading: false })
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e)
+      set({ error: msg, loading: false })
     }
   },
 
@@ -150,8 +156,9 @@ export const useStore = create<AppState>((set, get) => ({
       await get().fetchRecords()
       get().fetchStats()
       set({ loading: false })
-    } catch (e: any) {
-      set({ error: e.message, loading: false })
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e)
+      set({ error: msg, loading: false })
     }
   },
 
@@ -170,8 +177,9 @@ export const useStore = create<AppState>((set, get) => ({
         await get().fetchAuditLogs(get().currentRecord!.id)
       }
       set({ loading: false })
-    } catch (e: any) {
-      set({ error: e.message, loading: false })
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e)
+      set({ error: msg, loading: false })
     }
   },
 
@@ -184,8 +192,9 @@ export const useStore = create<AppState>((set, get) => ({
       if (!res.ok) throw new Error('获取照片失败')
       const data = await res.json()
       set({ photos: data.data || data })
-    } catch (e: any) {
-      set({ error: e.message })
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e)
+      set({ error: msg })
     }
   },
 

@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react'
 import { useStore } from '@/store'
-import { Upload, FileUp, CheckCircle2, AlertCircle } from 'lucide-react'
+import { Upload, AlertCircle } from 'lucide-react'
 import TypeBadge from '@/components/TypeBadge'
 import StatusBadge from '@/components/StatusBadge'
 import type { ImportResponse } from '@shared/types'

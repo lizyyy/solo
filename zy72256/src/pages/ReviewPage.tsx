@@ -21,7 +21,7 @@ export default function ReviewPage() {
 
   useEffect(() => {
     fetchRecords({ status: 'pending_review' })
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const pendingRecords = records.filter(
     (r) => r.status === 'pending_review' || r.status === 'pending_inspection'

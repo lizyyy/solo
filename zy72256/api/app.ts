@@ -1,11 +1,9 @@
 import express, {
   type Request,
   type Response,
-  type NextFunction,
 } from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
-import { getDb } from './database.js'
 import recordRoutes from './routes/records.js'
 import reviewRoutes from './routes/review.js'
 import auditRoutes from './routes/audit.js'
@@ -28,8 +26,7 @@ app.use('/api', photoRoutes)
 
 app.use(
   '/api/health',
-  (req: Request, res: Response, next: NextFunction): void => {
-    const db = getDb()
+  (_req: Request, res: Response): void => {
     res.status(200).json({
       success: true,
       message: 'ok',
@@ -37,7 +34,7 @@ app.use(
   },
 )
 
-app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
+app.use((error: Error, _req: Request, res: Response) => {
   res.status(500).json({
     success: false,
     error: 'Server internal error',

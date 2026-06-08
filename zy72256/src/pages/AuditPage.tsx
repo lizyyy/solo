@@ -23,7 +23,7 @@ export default function AuditPage() {
 
   useEffect(() => {
     fetchRecords()
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSelectRecord = async (record: CoordinateRecord) => {
     setSelectedRecord(record)

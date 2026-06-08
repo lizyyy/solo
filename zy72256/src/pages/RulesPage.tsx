@@ -3,7 +3,7 @@ import { useStore } from '@/store'
 import { CheckCircle, Code, Shield, RotateCcw, Search } from 'lucide-react'
 import type { RuleCategory } from '@shared/types'
 
-const categoryInfo: Record<RuleCategory, { label: string; icon: React.ComponentType<{ size?: number; className?: string }>; color: string }> = {
+const categoryInfo: Record<RuleCategory, { label: string; icon: React.ComponentType<{ size?: number | string; className?: string }>; color: string }> = {
   detection: { label: '判断规则', icon: Search, color: 'border-blue-500 bg-blue-50' },
   correction: { label: '修改规则', icon: Shield, color: 'border-purple-500 bg-purple-50' },
   rollback: { label: '回滚规则', icon: RotateCcw, color: 'border-red-500 bg-red-50' },
@@ -16,7 +16,7 @@ export default function RulesPage() {
 
   useEffect(() => {
     fetchRules()
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const grouped = rules.reduce<Record<string, typeof rules>>((acc, rule) => {
     const cat = rule.category

@@ -18,7 +18,7 @@ export default function BriefingPage() {
 
   useEffect(() => {
     fetchRecords()
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const confirmedRecords = records.filter(
     (r) => r.status === 'confirmed' || r.status === 'corrected'
@@ -107,7 +107,7 @@ export default function BriefingPage() {
 }
 
 function StatCard({ icon: Icon, label, value, color, bg }: {
-  icon: React.ComponentType<{ size?: number; className?: string }>
+  icon: React.ComponentType<{ size?: number | string; className?: string }>
   label: string
   value: number
   color: string

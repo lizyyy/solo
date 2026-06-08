@@ -25,7 +25,7 @@ export default function DetailPanel({ open, onClose, title, children, width = 48
       }, 300)
       return () => clearTimeout(timer)
     }
-  }, [open])
+  }, [open, visible])
 
   if (!visible) return null
 

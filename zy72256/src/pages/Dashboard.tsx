@@ -16,7 +16,7 @@ export default function Dashboard() {
       .then(res => res.json())
       .then(data => setAuditLogs(data.data || []))
       .catch(() => {})
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const cards = [
     {
