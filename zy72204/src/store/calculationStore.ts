@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import { v4 as uuidv4 } from 'uuid';
 import dayjs from 'dayjs';
 import {
@@ -13,7 +14,7 @@ import {
   WorkflowStep,
   TransactionType,
 } from '../types';
-import { detectSplit, validateImport, generateDiffRecords } from '../services/businessLogic';
+import { detectSplit, validateImport, generateDiffRecords, normalizeImportRow, mapColumnHeaders } from '../services/businessLogic';
 
 interface CalculationState {
   transactions: CounterTransaction[];
@@ -24,7 +25,7 @@ interface CalculationState {
   importBatches: ImportBatch[];
   splitInfos: SplitInfo[];
   currentUser: string;
-  importTransactions: (records: any[], fileName: string) => Promise<{
+  importTransactions: (rawRows: Record<string, string>[], fileName: string) => Promise<{
     success: number;
     skipped: number;
     errors: string[];
@@ -40,7 +41,9 @@ interface CalculationState {
   getSplitInfo: (businessNumber: string) => SplitInfo | undefined;
 }
 
-export const useCalculationStore = create<CalculationState>((set, get) => ({
+export const useCalculationStore = create<CalculationState>()(
+  persist(
+    (set, get) => ({
   transactions: [],
   emailSupplements: [],
   calculations: [],
@@ -50,7 +53,7 @@ export const useCalculationStore = create<CalculationState>((set, get) => ({
   splitInfos: [],
   currentUser: '支付平台产品阿南',
 
-  importTransactions: async (records, fileName) => {
+  importTransactions: async (rawRows, fileName) => {
     const errors: string[] = [];
     let successCount = 0;
     let skippedCount = 0;
@@ -58,6 +61,13 @@ export const useCalculationStore = create<CalculationState>((set, get) => ({
     const batchId = uuidv4();
     const importedAt = dayjs().toISOString();
     const { currentUser } = get();
+
+    const rawHeaders = Object.keys(rawRows[0] || {});
+    const { mapped: headerMapping, unmapped } = mapColumnHeaders(rawHeaders);
+
+    if (unmapped.length > 0) {
+      errors.push(`以下列名未能识别：${unmapped.join('、')}，对应数据将被忽略`);
+    }
 
     const existingTailNumbers = new Set(
       get().transactions.map(t => t.tailNumber)
@@ -67,38 +77,52 @@ export const useCalculationStore = create<CalculationState>((set, get) => ({
     const newHistoryVersions: HistoryVersion[] = [];
     const businessNumberGroups: Record<string, CounterTransaction[]> = {};
 
-    for (const record of records) {
-      const validation = validateImport(record);
-      if (!validation.valid) {
-        errors.push(`记录 ${record.tailNumber || '未知'}: ${validation.error}`);
+    for (let i = 0; i < rawRows.length; i++) {
+      const rowNumber = i + 2;
+      const { normalized, rawSource, missingFields } = normalizeImportRow(
+        rawRows[i],
+        headerMapping,
+        rowNumber
+      );
+
+      if (missingFields.length > 0) {
+        errors.push(`第 ${rowNumber} 行缺少必填字段：${missingFields.join('、')}`);
         continue;
       }
 
-      if (existingTailNumbers.has(record.tailNumber)) {
+      const validation = validateImport(normalized);
+      if (!validation.valid) {
+        errors.push(`第 ${rowNumber} 行：${validation.error}`);
+        continue;
+      }
+
+      if (existingTailNumbers.has(normalized.tailNumber)) {
         skippedCount++;
         continue;
       }
 
       const transactionType: TransactionType = 
-        record.amountType === 'FEE' ? 'FEE' :
-        record.amountType === 'PRINCIPAL' ? 'PRINCIPAL' : 'COMBINED';
+        normalized.amountType === 'FEE' ? 'FEE' :
+        normalized.amountType === 'PRINCIPAL' ? 'PRINCIPAL' : 'COMBINED';
 
       const transaction: CounterTransaction = {
         id: uuidv4(),
-        tailNumber: record.tailNumber,
-        businessNumber: record.businessNumber,
-        transactionDate: record.transactionDate,
-        amount: parseFloat(record.amount),
+        tailNumber: normalized.tailNumber,
+        businessNumber: normalized.businessNumber,
+        transactionDate: normalized.transactionDate,
+        amount: parseFloat(String(normalized.amount).replace(/,/g, '')),
         transactionType,
-        counterparty: record.counterparty || '',
-        remark: record.remark || '',
+        counterparty: normalized.counterparty || '',
+        remark: normalized.remark || '',
         importBatchId: batchId,
         importedAt,
         importedBy: currentUser,
+        sourceRowNumber: rowNumber,
+        rawSource,
       };
 
       newTransactions.push(transaction);
-      existingTailNumbers.add(record.tailNumber);
+      existingTailNumbers.add(normalized.tailNumber);
       successCount++;
 
       if (!businessNumberGroups[transaction.businessNumber]) {
@@ -117,7 +141,7 @@ export const useCalculationStore = create<CalculationState>((set, get) => ({
         },
         operatedBy: currentUser,
         operatedAt: importedAt,
-        remark: '柜台流水导入',
+        remark: `柜台流水导入（来源行 ${rowNumber}）`,
       });
     }
 
@@ -158,7 +182,7 @@ export const useCalculationStore = create<CalculationState>((set, get) => ({
       id: batchId,
       source: 'COUNTER',
       fileName,
-      recordCount: records.length,
+      recordCount: rawRows.length,
       importedAt,
       importedBy: currentUser,
       status: errors.length > 0 ? 'PARTIAL' : 'SUCCESS',
@@ -444,4 +468,17 @@ export const useCalculationStore = create<CalculationState>((set, get) => ({
   getSplitInfo: (businessNumber) => {
     return get().splitInfos.find(s => s.businessNumber === businessNumber);
   },
-}));
+}),
+{
+  name: 'option-margin-stress-test-storage',
+  partialize: (state) => ({
+    transactions: state.transactions,
+    emailSupplements: state.emailSupplements,
+    calculations: state.calculations,
+    diffRecords: state.diffRecords,
+    historyVersions: state.historyVersions,
+    importBatches: state.importBatches,
+    splitInfos: state.splitInfos,
+  }),
+}
+));

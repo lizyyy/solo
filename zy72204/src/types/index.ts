@@ -26,6 +26,8 @@ export interface CounterTransaction {
   importBatchId: string;
   importedAt: string;
   importedBy: string;
+  sourceRowNumber: number;
+  rawSource: Record<string, string>;
 }
 
 export interface EmailSupplement {

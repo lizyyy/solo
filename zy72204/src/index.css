@@ -119,3 +119,15 @@ body {
   border-color: #1890ff;
   background: #e6f7ff;
 }
+
+.row-valid {
+  background: #f6ffed;
+}
+
+.row-error {
+  background: #fff2f0;
+}
+
+.row-duplicate {
+  background: #fafafa;
+}

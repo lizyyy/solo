@@ -1,6 +1,123 @@
 import { CounterTransaction, EmailSupplement, SplitInfo, DiffRecord } from '../types';
 import { BUSINESS_RULES } from '../constants/businessRules';
 
+const COLUMN_MAPPINGS: Record<string, string> = {
+  '柜台流水尾号': 'tailNumber',
+  '流水尾号': 'tailNumber',
+  '尾号': 'tailNumber',
+  'tailNumber': 'tailNumber',
+  'tail_number': 'tailNumber',
+
+  '业务号': 'businessNumber',
+  '业务编号': 'businessNumber',
+  'businessNumber': 'businessNumber',
+  'business_number': 'businessNumber',
+
+  '交易日期': 'transactionDate',
+  '日期': 'transactionDate',
+  '成交日期': 'transactionDate',
+  'transactionDate': 'transactionDate',
+  'transaction_date': 'transactionDate',
+
+  '金额': 'amount',
+  '金额(元)': 'amount',
+  '金额（元）': 'amount',
+  '交易金额': 'amount',
+  'amount': 'amount',
+
+  '金额类型': 'amountType',
+  '类型': 'amountType',
+  '交易类型': 'amountType',
+  'amountType': 'amountType',
+  'amount_type': 'amountType',
+
+  '对手方': 'counterparty',
+  '交易对手': 'counterparty',
+  '对手': 'counterparty',
+  'counterparty': 'counterparty',
+
+  '备注': 'remark',
+  '备注说明': 'remark',
+  '说明': 'remark',
+  'remark': 'remark',
+};
+
+const AMOUNT_TYPE_MAPPINGS: Record<string, string> = {
+  '本金': 'PRINCIPAL',
+  '手续费': 'FEE',
+  '费用': 'FEE',
+  '合计': 'COMBINED',
+  '综合': 'COMBINED',
+  'PRINCIPAL': 'PRINCIPAL',
+  'FEE': 'FEE',
+  'COMBINED': 'COMBINED',
+};
+
+export function mapColumnHeaders(rawHeaders: string[]): {
+  mapped: Record<string, string>;
+  unmapped: string[];
+} {
+  const mapped: Record<string, string> = {};
+  const unmapped: string[] = [];
+
+  for (const header of rawHeaders) {
+    const trimmed = header.trim();
+    if (COLUMN_MAPPINGS[trimmed]) {
+      mapped[trimmed] = COLUMN_MAPPINGS[trimmed];
+    } else {
+      const lowerKey = trimmed.toLowerCase();
+      const found = Object.keys(COLUMN_MAPPINGS).find(
+        k => k.toLowerCase() === lowerKey
+      );
+      if (found) {
+        mapped[trimmed] = COLUMN_MAPPINGS[found];
+      } else {
+        unmapped.push(trimmed);
+      }
+    }
+  }
+
+  return { mapped, unmapped };
+}
+
+export function normalizeImportRow(
+  rawRow: Record<string, string>,
+  headerMapping: Record<string, string>,
+  _rowNumber: number
+): {
+  normalized: Record<string, string>;
+  rawSource: Record<string, string>;
+  missingFields: string[];
+} {
+  const normalized: Record<string, string> = {};
+  const rawSource: Record<string, string> = {};
+  const requiredFields = BUSINESS_RULES.VALIDATION.REQUIRED_FIELDS as readonly string[];
+  const missingFields: string[] = [];
+
+  for (const [rawHeader, rawValue] of Object.entries(rawRow)) {
+    const trimmedHeader = rawHeader.trim();
+    const trimmedValue = (rawValue || '').trim();
+    rawSource[trimmedHeader] = trimmedValue;
+
+    const internalField = headerMapping[trimmedHeader];
+    if (internalField) {
+      normalized[internalField] = trimmedValue;
+    }
+  }
+
+  for (const field of requiredFields) {
+    if (!normalized[field] || normalized[field] === '') {
+      missingFields.push(field);
+    }
+  }
+
+  if (normalized.amountType && AMOUNT_TYPE_MAPPINGS[normalized.amountType]) {
+    normalized.amountType = AMOUNT_TYPE_MAPPINGS[normalized.amountType];
+  }
+
+  return { normalized, rawSource, missingFields };
+}
+
 export function validateImport(record: any): { valid: boolean; error?: string } {
   const { VALIDATION, ERROR_MESSAGES } = BUSINESS_RULES;
 
@@ -16,7 +133,8 @@ export function validateImport(record: any): { valid: boolean; error?: string } 
   if (!record.amount && record.amount !== 0) {
     return { valid: false, error: ERROR_MESSAGES.MISSING_AMOUNT };
   }
-  if (parseFloat(record.amount) <= VALIDATION.AMOUNT_MIN) {
+  const amount = parseFloat(String(record.amount).replace(/,/g, ''));
+  if (isNaN(amount) || amount <= VALIDATION.AMOUNT_MIN) {
     return { valid: false, error: ERROR_MESSAGES.INVALID_AMOUNT };
   }
 
