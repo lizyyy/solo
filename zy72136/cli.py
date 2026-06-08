@@ -29,7 +29,7 @@ def check(excel_path):
         border_style="blue"
     ))
     
-    checker = TourMealAllowanceChecker(excel_path)
+    checker = TourMealAllowanceChecker(excel_path=excel_path)
     
     with console.status("[bold green]正在分析数据...[/bold green]"):
         if not checker.run_all_checks():
@@ -91,7 +91,7 @@ def export(excel_path, output):
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         output = f"合唱团巡演餐补清单_{timestamp}.xlsx"
     
-    checker = TourMealAllowanceChecker(excel_path)
+    checker = TourMealAllowanceChecker(excel_path=excel_path)
     
     with console.status("[bold green]正在导出餐补清单...[/bold green]"):
         if not checker.run_all_checks():
@@ -112,7 +112,7 @@ def export(excel_path, output):
 def report(excel_path):
     """生成业务友好的报表（月底复盘专用
     """
-    checker = TourMealAllowanceChecker(excel_path)
+    checker = TourMealAllowanceChecker(excel_path=excel_path)
     
     with console.status("[bold green]正在生成复盘报表...[/bold green]"):
         if not checker.run_all_checks():
