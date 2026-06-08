@@ -6,6 +6,7 @@ from datetime import datetime
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from src import init_db, BankStatementImporter, ReviewManager, AuditManager
+from src.database import reset_session, _get_db_path
 
 BATCH_NO = "TEST-20240601-001"
 SAMPLE_FILE = os.path.join(os.path.dirname(__file__), "samples", "sample_batch_20240601.csv")
@@ -41,7 +42,8 @@ def test_step1_import():
     print(f"\n📝 待处理审计项: {len(audits)} 条")
     for i, a in enumerate(audits[:5], 1):
         type_label = "🔴 币种混合" if a['audit_type'] == 'mixed_currency' else "🟡 缺少节假日说明"
-        print(f"   {i}. {type_label} - {a['reason']}")
+        txn_info = f"交易ID: {a['transaction_id']}" if a['transaction_id'] else "批次级"
+        print(f"   {i}. {type_label} ({txn_info}) - {a['reason']}")
         print(f"      责任人: {a['responsible_party']}")
         print(f"      下一步: {a['next_action']}")
 
@@ -183,6 +185,13 @@ def main():
     print("  2. 对账运营阿芬补看节假日顺延说明（审计明细自动更新）")
     print("  3. 审计明细更新 + 托管对接人复核币种混合")
     print()
+
+    db_path = _get_db_path()
+    if os.path.exists(db_path):
+        os.remove(db_path)
+        reset_session()
+        print("🗑️  已清空旧数据库，确保干净测试环境")
+        print()
 
     init_db()
 

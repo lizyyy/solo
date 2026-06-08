@@ -1,5 +1,6 @@
 import os
 import sys
+import json
 from datetime import datetime
 from flask import Flask, jsonify, request, render_template
 
@@ -8,7 +9,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src import init_db, ReviewManager, AuditManager, BankStatementImporter
 from src.visualizer import Visualizer
 
-app = Flask(__name__, template_folder="templates")
+TEMPLATE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates")
+app = Flask(__name__, template_folder=TEMPLATE_DIR)
 init_db()
 
 reviewer = ReviewManager()
@@ -153,8 +155,12 @@ def api_report(batch_no):
         return jsonify({"error": "批次不存在"}), 404
 
     if output_format == "json":
-        return jsonify(result)
-    return result
+        report_data = json.loads(result)
+        return jsonify(report_data)
+
+    from flask import Response
+    mime = "text/html" if output_format == "html" else "text/plain"
+    return Response(result, mimetype=mime + "; charset=utf-8")
 
 
 @app.route("/api/chart/<chart_type>/<batch_no>")
@@ -178,14 +184,16 @@ def view_batch(batch_no):
         return "批次不存在", 404
 
     from src.database import get_session
-    from src.models import TransactionRecord
+    from src.models import TransactionRecord, AuditTrail
     session = get_session()
     batch_id = batch["id"]
     transactions = session.query(TransactionRecord).filter_by(batch_id=batch_id).all()
+    batch_audits = session.query(AuditTrail).filter_by(batch_id=batch_id).all()
 
     return render_template("batch_detail.html",
                            batch=batch,
-                           transactions=transactions)
+                           transactions=transactions,
+                           batch_audits=batch_audits)
 
 
 @app.route("/transaction/<int:txn_id>")
@@ -195,7 +203,9 @@ def view_transaction(txn_id):
     if not data:
         return "交易不存在", 404
 
-    chart_data = visualizer.generate_currency_3d_chart(data["batch"]["batch_no"])
+    chart_data = None
+    if data["batch"]:
+        chart_data = visualizer.generate_currency_3d_chart(data["batch"]["batch_no"])
 
     return render_template("transaction_detail.html",
                            data=data,

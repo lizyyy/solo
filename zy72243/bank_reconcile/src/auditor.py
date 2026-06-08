@@ -34,7 +34,8 @@ class AuditManager:
 
         for txn in transactions:
             txn_audits = [a for a in audits if a.transaction_id == txn.id]
-            report_data["transactions"].append(self._format_transaction(txn, txn_audits))
+            batch_level_audits = [a for a in audits if a.transaction_id is None]
+            report_data["transactions"].append(self._format_transaction(txn, txn_audits, batch_level_audits))
 
         if format == "json":
             return json.dumps(report_data, ensure_ascii=False, indent=2)
@@ -43,10 +44,11 @@ class AuditManager:
         else:
             return self._format_text_report(report_data)
 
-    def _format_transaction(self, txn, audits):
+    def _format_transaction(self, txn, audits, batch_level_audits=None):
         has_mixed = txn.has_mixed_currency
         mixed_audits = [a for a in audits if a.audit_type == "mixed_currency"]
-        holiday_audits = [a for a in audits if a.audit_type == "missing_holiday_note"]
+        holiday_audits = [a for a in (batch_level_audits or []) if a.audit_type == "missing_holiday_note"]
+        all_audits = list(audits) + list(batch_level_audits or [])
 
         return {
             "transaction_no": txn.transaction_no,
@@ -65,10 +67,10 @@ class AuditManager:
                 "mixed_currency": self._format_audit_detail(mixed_audits[0]) if mixed_audits else None,
                 "holiday_note": self._format_audit_detail(holiday_audits[0]) if holiday_audits else None
             },
-            "why_kept": self._explain_why_kept(txn, audits),
-            "missing_materials": self._get_missing_materials(txn, audits),
-            "next_action": self._get_next_action(txn, audits),
-            "responsible_party": self._get_responsible_party(txn, audits)
+            "why_kept": self._explain_why_kept(txn, all_audits),
+            "missing_materials": self._get_missing_materials(txn, all_audits),
+            "next_action": self._get_next_action(txn, all_audits),
+            "responsible_party": self._get_responsible_party(txn, all_audits)
         }
 
     def _format_audit_detail(self, audit):
@@ -93,7 +95,7 @@ class AuditManager:
                     f"需要{self.roles['custodian']}复核确认后才能归并"
                 )
 
-        if not txn.is_reviewed:
+        if txn.has_mixed_currency and not txn.is_reviewed:
             reasons.append("此笔交易尚未完成复核流程")
 
         pending_audits = [a for a in audits if not a.is_resolved]

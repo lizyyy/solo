@@ -29,7 +29,11 @@ pip3 install -r requirements.txt
 ### 2. 初始化数据库
 
 ```bash
+# 首次使用
 python3 -m src.cli init
+
+# 如需清空旧数据重新开始
+python3 -m src.cli init --reset
 ```
 
 ### 3. 运行自动化测试（完整三步流程）
@@ -47,8 +51,11 @@ python3 test_three_step_flow.py
 ### 4. 用命令行自己试一遍
 
 ```bash
+# 先确保干净环境（可选，如之前跑过测试）
+python3 -m src.cli init --reset
+
 # 步骤1：导入清算批次
-python3 -m src.cli import_batch samples/sample_batch_20240601.csv --batch-no DEMO-001
+python3 -m src.cli import-batch samples/sample_batch_20240601.csv --batch-no DEMO-001
 
 # 查看待复核项
 python3 -m src.cli pending --batch-no DEMO-001
@@ -72,6 +79,8 @@ python3 -m src.cli review-mixed 3 \
 python3 -m src.cli report DEMO-001 --format text
 python3 -m src.cli report DEMO-001 --format html -o report.html
 ```
+
+> **注意**：如果导入时报"清算批次号已存在"，说明之前已导入过同批次号。用 `python3 -m src.cli init --reset` 清空后重新开始。
 
 ### 5. 启动小看板（Web界面）
 
@@ -144,15 +153,15 @@ python3 -m src.cli dashboard
 python3 -m src.cli --help
 
 # 常用命令
-python3 -m src.cli init                    # 初始化数据库
-python3 -m src.cli import_batch            # 导入批次
-python3 -m src.cli pending                 # 待复核列表
-python3 -m src.cli view-transaction        # 交易详情
-python3 -m src.cli add-holiday             # 补录节假日
-python3 -m src.cli review-mixed            # 复核币种混合
-python3 -m src.cli report                  # 生成报告
-python3 -m src.cli audits                  # 查看审计明细
-python3 -m src.cli dashboard               # 启动Web看板
+python3 -m src.cli init --reset          # 清空并初始化数据库
+python3 -m src.cli import-batch          # 导入批次
+python3 -m src.cli pending               # 待复核列表
+python3 -m src.cli view-transaction      # 交易详情
+python3 -m src.cli add-holiday           # 补录节假日
+python3 -m src.cli review-mixed          # 复核币种混合
+python3 -m src.cli report                # 生成报告
+python3 -m src.cli audits                # 查看审计明细
+python3 -m src.cli dashboard             # 启动Web看板
 ```
 
 ### 2. API 接口
@@ -295,6 +304,9 @@ audit_reasons:
 ---
 
 ## ❓ 常见问题
+
+**Q: 导入时报"清算批次号已存在"怎么办？**
+A: 说明之前已导入过同批次号的数据。运行 `python3 -m src.cli init --reset` 清空后重新开始。
 
 **Q: 为什么币种混合的记录不能自动归正常？**
 A: 这是系统的谨慎原则。港币和人民币在同一列可能有多种情况（双币种结算、录入错误、系统bug等），必须由托管对接人人工确认。

@@ -172,16 +172,14 @@ class Visualizer:
                     "color": "#27ae60"
                 })
 
-        holidays = self.session.query(TransactionRecord).filter_by(batch_id=batch.id).all()
-        holiday_adjustments = self.session.query(TransactionRecord).filter_by(batch_id=batch.id).all()
         from .models import HolidayAdjustment
-        has_holiday = self.session.query(HolidayAdjustment).filter_by(batch_id=batch.id).first()
-        if has_holiday:
+        all_holidays = self.session.query(HolidayAdjustment).filter_by(batch_id=batch.id).all()
+        for h in all_holidays:
             events.append({
-                "date": has_holiday.applied_at.strftime("%Y-%m-%d %H:%M:%S") if has_holiday.applied_at else "未知",
+                "date": h.applied_at.strftime("%Y-%m-%d %H:%M:%S") if h.applied_at else "未知",
                 "type": "holiday",
                 "title": "节假日顺延补录",
-                "description": f"{has_holiday.reason}",
+                "description": h.reason,
                 "color": "#f39c12"
             })
 

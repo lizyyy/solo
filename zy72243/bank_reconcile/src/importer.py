@@ -100,6 +100,7 @@ class BankStatementImporter:
         batch.status = "detected"
 
         self.session.add_all(records)
+        self.session.flush()
         self._generate_initial_audit(batch, records)
         self.session.commit()
 
@@ -167,19 +168,18 @@ class BankStatementImporter:
                 )
                 self.session.add(audit)
 
-            if not batch.holiday_notes:
-                audit = AuditTrail(
-                    batch_id=batch.id,
-                    transaction_id=record.id,
-                    audit_type="missing_holiday_note",
-                    status="pending",
-                    reason=self.audit_reasons["missing_holiday_note"],
-                    missing_materials="缺少节假日顺延说明",
-                    next_action=f"请{self.roles['operator']}补录节假日顺延说明",
-                    responsible_party=self.roles["operator"],
-                    is_resolved=False
-                )
-                self.session.add(audit)
+        batch_audit = AuditTrail(
+            batch_id=batch.id,
+            transaction_id=None,
+            audit_type="missing_holiday_note",
+            status="pending",
+            reason=self.audit_reasons["missing_holiday_note"],
+            missing_materials="缺少节假日顺延说明",
+            next_action=f"请{self.roles['operator']}补录节假日顺延说明",
+            responsible_party=self.roles["operator"],
+            is_resolved=False
+        )
+        self.session.add(batch_audit)
 
     def _get_value(self, row, possible_keys):
         for key in possible_keys:

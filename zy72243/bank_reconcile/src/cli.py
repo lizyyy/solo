@@ -6,6 +6,7 @@ from datetime import datetime
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src import init_db, BankStatementImporter, ReviewManager, AuditManager
+from src.database import reset_session
 
 
 @click.group()
@@ -16,13 +17,21 @@ def cli():
 
 
 @cli.command()
-def init():
+@click.option("--reset", is_flag=True, help="清空旧数据后重新初始化")
+def init(reset):
     """初始化数据库"""
+    if reset:
+        from src.database import _get_db_path
+        db_path = _get_db_path()
+        if os.path.exists(db_path):
+            os.remove(db_path)
+            click.echo("🗑️  已清空旧数据库")
+        reset_session()
     init_db()
     click.echo("✅ 数据库初始化完成")
 
 
-@cli.command()
+@cli.command("import-batch")
 @click.argument("file_path", type=click.Path(exists=True))
 @click.option("--batch-no", required=True, help="清算批次号")
 @click.option("--source-file", help="来源文件名称")
@@ -37,6 +46,11 @@ def import_batch(file_path, batch_no, source_file):
         click.echo(f"   港币人民币同列数: {result['mixed_currency_count']}")
         if result['mixed_currency_count'] > 0:
             click.echo(f"   ⚠️  存在币种混合，需托管对接人复核")
+    except ValueError as e:
+        if "已存在" in str(e):
+            click.echo(f"⚠️  {e}（如需重新导入，请先运行 python3 -m src.cli init --reset）")
+        else:
+            click.echo(f"❌ 导入失败: {e}", err=True)
     except Exception as e:
         click.echo(f"❌ 导入失败: {e}", err=True)
 
@@ -65,7 +79,7 @@ def pending(batch_no, review_type):
         click.echo()
 
 
-@cli.command()
+@cli.command("view-transaction")
 @click.argument("transaction_id", type=int)
 def view_transaction(transaction_id):
     """查看交易详情及关联信息"""
@@ -118,7 +132,8 @@ def view_transaction(transaction_id):
         click.echo("-" * 80)
         for audit in audits:
             status_icon = "✅" if audit["is_resolved"] else "⏳"
-            click.echo(f"{status_icon} 类型: {audit['audit_type']}, 状态: {audit['status']}")
+            type_label = "🔴 币种混合" if audit["audit_type"] == "mixed_currency" else "🟡 缺少节假日说明"
+            click.echo(f"{status_icon} {type_label}, 状态: {audit['status']}")
             click.echo(f"   原因: {audit['reason']}")
             click.echo(f"   缺材料: {audit['missing_materials']}")
             click.echo(f"   下一步: {audit['next_action']}")
@@ -133,7 +148,7 @@ def view_transaction(transaction_id):
     click.echo("=" * 80)
 
 
-@cli.command()
+@cli.command("add-holiday")
 @click.argument("batch_no")
 @click.option("--original-date", required=True, help="原日期 (YYYY-MM-DD)")
 @click.option("--adjusted-date", required=True, help="调整后日期 (YYYY-MM-DD)")
@@ -160,7 +175,7 @@ def add_holiday(batch_no, original_date, adjusted_date, reason, operator_note):
         click.echo(f"❌ 未找到批次: {batch_no}", err=True)
 
 
-@cli.command()
+@cli.command("review-mixed")
 @click.argument("transaction_id", type=int)
 @click.option("--review-note", required=True, help="复核意见")
 @click.option("--reviewed-by", help="复核人，默认托管对接人")
@@ -168,10 +183,7 @@ def add_holiday(batch_no, original_date, adjusted_date, reason, operator_note):
 def review_mixed(transaction_id, review_note, reviewed_by, mark_normal):
     """复核港币人民币同列问题（托管对接人）"""
     if not mark_normal:
-        click.confirm(
-            "⚠️  确认不标记为正常？此笔将继续保留在待复核列表中供托管对接人后续处理",
-            abort=True
-        )
+        click.echo("⚠️  注意：此笔未标记为正常，将继续保留在待复核列表中")
 
     reviewer = ReviewManager()
     result = reviewer.review_mixed_currency(transaction_id, review_note, reviewed_by, mark_normal)

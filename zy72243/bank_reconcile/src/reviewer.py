@@ -106,7 +106,14 @@ class ReviewManager:
         if not record:
             return None
 
-        audits = self.session.query(AuditTrail).filter_by(transaction_id=transaction_id).all()
+        from sqlalchemy import or_
+        audits = self.session.query(AuditTrail).filter(
+            AuditTrail.batch_id == record.batch_id,
+            or_(
+                AuditTrail.transaction_id == transaction_id,
+                AuditTrail.transaction_id == None
+            )
+        ).all()
         batch = self.session.query(ClearingBatch).filter_by(id=record.batch_id).first()
         holiday_notes = self.session.query(HolidayAdjustment).filter_by(batch_id=record.batch_id).all()
 
