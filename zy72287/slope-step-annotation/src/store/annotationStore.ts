@@ -45,8 +45,8 @@ function createEmptyAnnotation(): SlopeStepAnnotation {
   }
 }
 
-const COORD_METRIC_PATTERN = /^[xXyY]\s*[:=]\s*[\d.]+/
-const COORD_LNG_LAT_PATTERN = /[经纬lnglat]{1,2}\s*[:=：]\s*[\d.]+/i
+const COORD_METRIC_PATTERN = /[xXyY]\s*[:=]\s*[\d.]+/
+const COORD_LNG_LAT_PATTERN = /(?:经度|纬度|lng|lat|longitude|latitude)\s*[:/=：]\s*[\d.]+/i
 
 function parseCoord(raw: string): CoordValue {
   const hasMetric = COORD_METRIC_PATTERN.test(raw)
@@ -65,8 +65,8 @@ function parseCoord(raw: string): CoordValue {
     mixedDetail,
   }
 
-  const lngMatch = raw.match(/[经Ll][纬ng]*\s*[:=：]\s*([\d.]+)/)
-  const latMatch = raw.match(/[纬La][度it]*\s*[:=：]\s*([\d.]+)/)
+  const lngMatch = raw.match(/(?:经度|lng|longitude)\s*[:/=：]\s*([\d.]+)/i)
+  const latMatch = raw.match(/(?:纬度|lat|latitude)\s*[:/=：]\s*([\d.]+)/i)
   if (lngMatch) coord.lng = parseFloat(lngMatch[1])
   if (latMatch) coord.lat = parseFloat(latMatch[1])
 
