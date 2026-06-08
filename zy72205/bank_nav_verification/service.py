@@ -161,6 +161,28 @@ class VerificationService:
             "remark": remark.to_dict(),
         }
 
+    def add_upgrade_note(
+        self,
+        remark_id: str,
+        note: str,
+        operator: str = "",
+    ) -> dict[str, Any]:
+        remark = self._remarks.get(remark_id)
+        if remark is None:
+            return {"status": "error", "message": f"未找到备注: {remark_id}"}
+
+        remark.upgrade_note = note
+        remark.record_change(
+            change_type=ChangeType.UPGRADE_NOTE,
+            operator=operator,
+            reason=f"升阻备注: {note}",
+        )
+        return {
+            "status": "updated",
+            "message": "升阻备注已添加",
+            "remark": remark.to_dict(),
+        }
+
     def advance_workflow(
         self,
         remark_id: str,

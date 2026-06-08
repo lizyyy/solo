@@ -22,6 +22,7 @@ class ChangeType(str, Enum):
     ROLLBACK = "rollback"
     TAIL_REVIEW = "tail_review"
     RECONCILIATION_UPDATE = "reconciliation_update"
+    UPGRADE_NOTE = "upgrade_note"
 
 
 class SettlementType(str, Enum):
@@ -37,11 +38,19 @@ class FieldChange:
     old_value: Any
     new_value: Any
 
+    @staticmethod
+    def _format_value(val: Any) -> str:
+        if val is None:
+            return ""
+        if isinstance(val, Enum):
+            return val.value
+        return str(val)
+
     def to_dict(self) -> dict:
         return {
             "field_name": self.field_name,
-            "old_value": repr(self.old_value),
-            "new_value": repr(self.new_value),
+            "old_value": self._format_value(self.old_value),
+            "new_value": self._format_value(self.new_value),
         }
 
 
@@ -78,6 +87,7 @@ class TaxRateRemark:
     settlement_type: SettlementType = SettlementType.T_PLUS_1
     original_settlement_type: SettlementType = SettlementType.T_PLUS_1
     remark_text: str = ""
+    upgrade_note: str = ""
     counter_flow_tail: str = ""
     reconciliation_note: str = ""
     status: RemarkStatus = RemarkStatus.IMPORTED
@@ -99,6 +109,7 @@ class TaxRateRemark:
             "tax_rate": self.tax_rate,
             "settlement_type": self.settlement_type,
             "remark_text": self.remark_text,
+            "upgrade_note": self.upgrade_note,
             "counter_flow_tail": self.counter_flow_tail,
             "reconciliation_note": self.reconciliation_note,
             "status": self.status,
@@ -155,6 +166,7 @@ class TaxRateRemark:
             "settlement_type": self.settlement_type.value,
             "original_settlement_type": self.original_settlement_type.value,
             "remark_text": self.remark_text,
+            "upgrade_note": self.upgrade_note,
             "counter_flow_tail": self.counter_flow_tail,
             "reconciliation_note": self.reconciliation_note,
             "status": self.status.value,

@@ -1,8 +1,17 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Any
 
 from .models import ChangeRecord, ChangeType, FieldChange, TaxRateRemark
+
+
+def _format_val(val: Any) -> str:
+    if val is None:
+        return ""
+    if hasattr(val, "value"):
+        return val.value
+    return str(val)
 
 
 @dataclass
@@ -14,6 +23,7 @@ class DiffEntry:
     field_name: str
     old_value: str
     new_value: str
+    diff_description: str
 
     def to_dict(self) -> dict:
         return {
@@ -24,6 +34,7 @@ class DiffEntry:
             "field_name": self.field_name,
             "old_value": self.old_value,
             "new_value": self.new_value,
+            "diff_description": self.diff_description,
         }
 
 
@@ -32,6 +43,8 @@ class HistoryService:
         entries: list[DiffEntry] = []
         for record in remark.history:
             for fc in record.field_changes:
+                old_fmt = _format_val(fc.old_value)
+                new_fmt = _format_val(fc.new_value)
                 entries.append(
                     DiffEntry(
                         change_record_id=record.id,
@@ -39,8 +52,9 @@ class HistoryService:
                         operator=record.operator,
                         change_type=record.change_type.value,
                         field_name=fc.field_name,
-                        old_value=repr(fc.old_value),
-                        new_value=repr(fc.new_value),
+                        old_value=old_fmt,
+                        new_value=new_fmt,
+                        diff_description=f"{fc.field_name}: {old_fmt} → {new_fmt}",
                     )
                 )
         return entries
@@ -93,7 +107,7 @@ class HistoryService:
             match = not keyword
             if keyword:
                 match = any(
-                    keyword in repr(fc.old_value) or keyword in repr(fc.new_value)
+                    keyword in _format_val(fc.old_value) or keyword in _format_val(fc.new_value)
                     for fc in record.field_changes
                 )
                 match = match or keyword in record.reason

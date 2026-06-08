@@ -11,8 +11,16 @@ def _remark_identity_key(remark: TaxRateRemark) -> str:
     return f"{remark.product_code}:{remark.original_line_number}"
 
 
+def _remark_content_key(remark: TaxRateRemark) -> str:
+    return (
+        f"{remark.product_code}:{remark.original_line_number}:"
+        f"{remark.tax_rate}:{remark.settlement_type.value}:"
+        f"{remark.remark_text}:{remark.product_name}"
+    )
+
+
 def _compute_batch_hash(remarks: Iterable[TaxRateRemark]) -> str:
-    keys = sorted(_remark_identity_key(r) for r in remarks)
+    keys = sorted(_remark_content_key(r) for r in remarks)
     raw = json.dumps(keys, ensure_ascii=False)
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
@@ -37,11 +45,21 @@ class DedupService:
         source_file: str = "",
         operator: str = "",
     ) -> tuple[list[TaxRateRemark], list[TaxRateRemark], ImportBatch]:
-        existing_batch = self.check_batch_duplicate(remarks)
-        if existing_batch is not None:
-            return [], [], existing_batch
-
         content_hash = _compute_batch_hash(remarks)
+        existing_batch = self._batch_hashes.get(content_hash)
+
+        if existing_batch is not None:
+            has_updates = False
+            for remark in remarks:
+                key = _remark_identity_key(remark)
+                if key in self._existing_keys:
+                    existing = self._existing_keys[key]
+                    if self._has_field_diff(existing, remark):
+                        has_updates = True
+                        break
+            if not has_updates:
+                return [], [], existing_batch
+
         batch = ImportBatch(
             source_file=source_file,
             remark_count=len(remarks),
@@ -71,6 +89,13 @@ class DedupService:
                 self._existing_keys[key] = remark
 
         return new_remarks, updated_remarks, batch
+
+    @staticmethod
+    def _has_field_diff(existing: TaxRateRemark, incoming: TaxRateRemark) -> bool:
+        fields = ["tax_rate", "settlement_type", "remark_text", "product_name"]
+        return any(
+            getattr(existing, f) != getattr(incoming, f) for f in fields
+        )
 
     def _merge_existing(
         self,
