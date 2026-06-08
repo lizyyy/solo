@@ -8,7 +8,7 @@ import { usePlaylist } from './hooks/usePlaylist';
 import type { FilterOptions, AnomalyType } from './types';
 
 function App() {
-  const { playlist, filterTracks, updateTrackRemark, updateTrackAnomaly, resetToMock, anomalyStats } = usePlaylist();
+  const { playlist, filterTracks, updateTrackRemark, updateTrackAnomaly, updateVersion, resetToMock, anomalyStats } = usePlaylist();
   
   const [filters, setFilters] = useState<FilterOptions>({
     search: '',
@@ -45,7 +45,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-[#F4F1DE]">
-      <Header playlist={playlist} onReset={resetToMock} />
+      <Header playlist={playlist} onReset={resetToMock} onUpdateVersion={updateVersion} />
       
       <FilterBar
         filters={filters}

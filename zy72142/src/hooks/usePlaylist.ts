@@ -70,6 +70,17 @@ export function usePlaylist() {
     [setPlaylist]
   );
 
+  const updateVersion = useCallback(
+    (version: string) => {
+      setPlaylist((prev) => ({
+        ...prev,
+        version,
+        updatedAt: new Date().toISOString(),
+      }));
+    },
+    [setPlaylist]
+  );
+
   const resetToMock = useCallback(() => {
     setPlaylist(mockPlaylist);
   }, [setPlaylist]);
@@ -104,6 +115,7 @@ export function usePlaylist() {
     filterTracks,
     updateTrackRemark,
     updateTrackAnomaly,
+    updateVersion,
     resetToMock,
     anomalyStats,
   };
