@@ -1,6 +1,6 @@
 import { Search, Filter, X } from 'lucide-react';
 import { useStore } from '../../store/useStore';
-import { EMOTION_TAGS, SOURCE_TYPES, STATUS_LABELS, EXCEPTION_TYPES } from '../../types';
+import { EMOTION_TAGS, SOURCE_TYPES, EXCEPTION_TYPES } from '../../types';
 import type { MaterialStatus } from '../../types';
 
 const FilterBar = () => {

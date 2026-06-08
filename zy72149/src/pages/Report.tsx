@@ -4,7 +4,7 @@ import { exportToExcel, downloadReport, generateReportContent } from '../utils/e
 import TagBadge from '../components/common/TagBadge';
 
 const Report = () => {
-  const { materials, getFilteredMaterials, addToast, filter } = useStore();
+  const { materials, getFilteredMaterials, addToast } = useStore();
 
   const total = materials.length;
   const reviewed = materials.filter((m) => m.status === 'reviewed' || m.status === 'resolved').length;

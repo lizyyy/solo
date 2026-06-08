@@ -3,7 +3,7 @@ import { Save, CheckCircle2 } from 'lucide-react';
 import Modal from '../common/Modal';
 import TagBadge from '../common/TagBadge';
 import { useStore } from '../../store/useStore';
-import { EMOTION_TAGS, EXCEPTION_TYPES } from '../../types';
+import { EMOTION_TAGS } from '../../types';
 import type { EmotionTag, ExceptionType } from '../../types';
 
 const EditModal = () => {

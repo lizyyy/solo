@@ -1,7 +1,6 @@
 import { AlertTriangle, ChevronRight, X, Clock, Copy, Ban } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 import { EXCEPTION_TYPES } from '../../types';
-import TagBadge from '../common/TagBadge';
 
 const ExceptionPanel = () => {
   const { materials, preferences, toggleExceptionPanel, openEditModal, setFilter } = useStore();

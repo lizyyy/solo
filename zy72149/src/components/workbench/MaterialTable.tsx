@@ -1,11 +1,11 @@
-import { Edit2, Download, RefreshCw, Trash2 } from 'lucide-react';
+import { Edit2, Download, RefreshCw } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 import TagBadge from '../common/TagBadge';
 import { exportToExcel } from '../../utils/export';
 import { resetToMockData } from '../../utils/storage';
 
 const MaterialTable = () => {
-  const { getFilteredMaterials, openEditModal, updateMaterial, addToast, setMaterials } = useStore();
+  const { getFilteredMaterials, openEditModal, addToast, setMaterials } = useStore();
   const materials = getFilteredMaterials();
 
   const handleExport = () => {

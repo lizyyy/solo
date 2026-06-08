@@ -1,4 +1,4 @@
-import { Music, Upload, FileSpreadsheet, BarChart3, Home } from 'lucide-react';
+import { Music, Upload, BarChart3, Home } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 const Header = () => {

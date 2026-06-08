@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { AudioMaterial, FilterState, ToastMessage, EmotionTag, MaterialStatus, SourceType, ExceptionType } from '../types';
+import type { AudioMaterial, FilterState, ToastMessage, ExceptionType } from '../types';
 import { loadMaterials, saveMaterials, loadFilterState, saveFilterState, loadPreferences, savePreferences } from '../utils/storage';
 import { detectAllExceptions } from '../utils/detection';
 
@@ -15,7 +15,7 @@ interface AppState {
   setMaterials: (materials: AudioMaterial[]) => void;
   updateMaterial: (id: string, updates: Partial<AudioMaterial>) => void;
   resolveException: (materialId: string, exceptionType: ExceptionType) => void;
-  addMaterial: (material: Omit<AudioMaterial, 'id'>) => void;
+  addMaterial: (material: Omit<AudioMaterial, 'id' | 'processedAt'>) => void;
   setFilter: (filter: Partial<FilterState>) => void;
   resetFilter: () => void;
   toggleExceptionPanel: () => void;
