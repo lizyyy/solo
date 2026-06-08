@@ -18,9 +18,9 @@
 - **同时满足**以上两条才会被标记，状态自动设为 `ZERO_WITH_REVERSAL`
 
 ### 规则2：碰到这种记录怎么办？
-> 代码位置: [StatusFlowHandler.ts](file:///Users/lzy/pro/solo/workspaces/zy72215/src/core/StatusFlowHandler.ts)
+> 代码位置: [StatusFlowHandler.ts](file:///Users/lzy/pro/solo/workspaces/zy72215/src/core/StatusFlowHandler.ts#L5-L23) / [ALLOWED_TRANSITIONS](file:///Users/lzy/pro/solo/workspaces/zy72215/src/types/index.ts#L76-L84)
 
-**别急着归正常！** 按三步走：
+**别急着归正常！** 按三步走，**系统会强制拦住跳步**：
 
 ```
 第一步：导入
@@ -36,7 +36,17 @@
 ├─ 情况A：确实正常 → 复核通过-正常
 ├─ 情况B：需要调数 → 复核通过-已调整（填调整后金额）
 └─ 情况C：搞错了 → 回滚（填原因）
+第四步：纳入负责人摘要
 ```
+
+**非法路径会被拦截**（代码里写死了，不是口头约定）：
+- `ZERO_WITH_REVERSAL` 直接调 `reviewAsNormal` → ❌ 被拦，提示"允许的目标状态: 待风控复核"
+- `ZERO_WITH_REVERSAL` 直接调 `markAsSummarized` → ❌ 被拦
+- `ZERO_WITH_REVERSAL` 直接调 `reviewWithAdjustment` → ❌ 被拦
+- `PENDING_REVIEW` 直接调 `markAsSummarized` → ❌ 被拦，必须先复核
+- `SUMMARIZED` 是终态，任何操作 → ❌ 被拦
+
+正常交易（IMPORTED）可以直接纳入摘要，不用走复核流程。
 
 ### 规则3：尾差调整条要留什么？
 > 代码位置: [types/index.ts](file:///Users/lzy/pro/solo/workspaces/zy72215/src/types/index.ts#L25-L32)
@@ -61,7 +71,7 @@
 谁也别自己算汇总数，都从 `DataStore` 里拿。
 
 ### 规则5：怎么回滚？
-> 代码位置: [StatusFlowHandler.ts](file:///Users/lzy/pro/solo/workspaces/zy72215/src/core/StatusFlowHandler.ts#L100-L116)
+> 代码位置: [StatusFlowHandler.ts](file:///Users/lzy/pro/solo/workspaces/zy72215/src/core/StatusFlowHandler.ts#L138-L161)
 
 任何状态都能回滚，回滚路径：
 ```

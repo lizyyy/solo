@@ -67,3 +67,18 @@ export interface ImportResult {
   zeroWithReversalCount: number;
   records: TradeRecord[];
 }
+
+export interface TransitionResult {
+  success: boolean;
+  error?: string;
+}
+
+export const ALLOWED_TRANSITIONS: Record<RecordStatus, RecordStatus[]> = {
+  [RecordStatus.PENDING_IMPORT]: [RecordStatus.IMPORTED],
+  [RecordStatus.IMPORTED]: [RecordStatus.SUMMARIZED],
+  [RecordStatus.ZERO_WITH_REVERSAL]: [RecordStatus.PENDING_REVIEW],
+  [RecordStatus.PENDING_REVIEW]: [RecordStatus.REVIEWED_NORMAL, RecordStatus.REVIEWED_ADJUSTED],
+  [RecordStatus.REVIEWED_NORMAL]: [RecordStatus.SUMMARIZED],
+  [RecordStatus.REVIEWED_ADJUSTED]: [RecordStatus.SUMMARIZED],
+  [RecordStatus.SUMMARIZED]: []
+};

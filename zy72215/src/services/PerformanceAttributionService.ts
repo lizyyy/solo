@@ -2,7 +2,7 @@ import { DataStore } from '../data/DataStore';
 import { UnifiedDataService } from '../data/UnifiedDataService';
 import { TradeRecordFactory, RawTradeRecord } from '../core/TradeRecordFactory';
 import { StatusFlowHandler } from '../core/StatusFlowHandler';
-import { ImportResult, PerformanceReport, RecordStatus } from '../types';
+import { ImportResult, PerformanceReport, RecordStatus, TransitionResult } from '../types';
 
 export class PerformanceAttributionService {
   private static dataStore = DataStore.getInstance();
@@ -13,20 +13,26 @@ export class PerformanceAttributionService {
     return result;
   }
 
-  static submitForReview(recordId: string, operator: string, custodianPageRef?: string): boolean {
+  static submitForReview(recordId: string, operator: string, custodianPageRef?: string): TransitionResult {
     const record = this.dataStore.getRecord(recordId);
-    if (!record) return false;
+    if (!record) return { success: false, error: '记录不存在' };
 
-    const updated = StatusFlowHandler.moveToPendingReview(record, operator, custodianPageRef);
-    return this.dataStore.updateRecord(recordId, updated);
+    const result = StatusFlowHandler.moveToPendingReview(record, operator, custodianPageRef);
+    if (!result.success || !result.record) return result;
+
+    this.dataStore.updateRecord(recordId, result.record);
+    return { success: true };
   }
 
-  static reviewAsNormal(recordId: string, operator: string, remark?: string): boolean {
+  static reviewAsNormal(recordId: string, operator: string, remark?: string): TransitionResult {
     const record = this.dataStore.getRecord(recordId);
-    if (!record) return false;
+    if (!record) return { success: false, error: '记录不存在' };
 
-    const updated = StatusFlowHandler.reviewAsNormal(record, operator, remark);
-    return this.dataStore.updateRecord(recordId, updated);
+    const result = StatusFlowHandler.reviewAsNormal(record, operator, remark);
+    if (!result.success || !result.record) return result;
+
+    this.dataStore.updateRecord(recordId, result.record);
+    return { success: true };
   }
 
   static reviewWithAdjustment(
@@ -34,28 +40,37 @@ export class PerformanceAttributionService {
     operator: string,
     adjustedAmount: number,
     remark: string
-  ): boolean {
+  ): TransitionResult {
     const record = this.dataStore.getRecord(recordId);
-    if (!record) return false;
+    if (!record) return { success: false, error: '记录不存在' };
 
-    const updated = StatusFlowHandler.reviewWithAdjustment(record, operator, adjustedAmount, remark);
-    return this.dataStore.updateRecord(recordId, updated);
+    const result = StatusFlowHandler.reviewWithAdjustment(record, operator, adjustedAmount, remark);
+    if (!result.success || !result.record) return result;
+
+    this.dataStore.updateRecord(recordId, result.record);
+    return { success: true };
   }
 
-  static markAsSummarized(recordId: string, operator: string): boolean {
+  static markAsSummarized(recordId: string, operator: string): TransitionResult {
     const record = this.dataStore.getRecord(recordId);
-    if (!record) return false;
+    if (!record) return { success: false, error: '记录不存在' };
 
-    const updated = StatusFlowHandler.markAsSummarized(record, operator);
-    return this.dataStore.updateRecord(recordId, updated);
+    const result = StatusFlowHandler.markAsSummarized(record, operator);
+    if (!result.success || !result.record) return result;
+
+    this.dataStore.updateRecord(recordId, result.record);
+    return { success: true };
   }
 
-  static rollbackRecord(recordId: string, operator: string, reason: string): boolean {
+  static rollbackRecord(recordId: string, operator: string, reason: string): TransitionResult {
     const record = this.dataStore.getRecord(recordId);
-    if (!record) return false;
+    if (!record) return { success: false, error: '记录不存在' };
 
-    const updated = StatusFlowHandler.rollback(record, operator, reason);
-    return this.dataStore.updateRecord(recordId, updated);
+    const result = StatusFlowHandler.rollback(record, operator, reason);
+    if (!result.success || !result.record) return result;
+
+    this.dataStore.updateRecord(recordId, result.record);
+    return { success: true };
   }
 
   static getReport(reportDate: string): PerformanceReport {
@@ -90,10 +105,10 @@ export class PerformanceAttributionService {
   }
 
   static getPendingReviewRecords(reportDate?: string) {
-    const records = reportDate 
+    const records = reportDate
       ? this.dataStore.getRecordsByDate(reportDate)
       : this.dataStore.getAllRecords();
-    
+
     return records.filter(r => r.status === RecordStatus.PENDING_REVIEW);
   }
 }

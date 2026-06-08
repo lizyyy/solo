@@ -1,8 +1,31 @@
-import { TradeRecord, RecordStatus, AuditLog, ReviewSource } from '../types';
+import { TradeRecord, RecordStatus, AuditLog, ReviewSource, TransitionResult, ALLOWED_TRANSITIONS } from '../types';
 import { ReversalDetector } from './ReversalDetector';
 
 export class StatusFlowHandler {
-  static moveToPendingReview(record: TradeRecord, operator: string, custodianPageRef?: string): TradeRecord {
+  static validateTransition(currentStatus: RecordStatus, targetStatus: RecordStatus): TransitionResult {
+    const allowed = ALLOWED_TRANSITIONS[currentStatus] || [];
+    if (!allowed.includes(targetStatus)) {
+      const statusLabels: Record<RecordStatus, string> = {
+        [RecordStatus.PENDING_IMPORT]: '待导入',
+        [RecordStatus.IMPORTED]: '已导入',
+        [RecordStatus.ZERO_WITH_REVERSAL]: '金额为0-待冲正复核',
+        [RecordStatus.PENDING_REVIEW]: '待风控复核',
+        [RecordStatus.REVIEWED_NORMAL]: '复核通过-正常',
+        [RecordStatus.REVIEWED_ADJUSTED]: '复核通过-已调整',
+        [RecordStatus.SUMMARIZED]: '已纳入摘要'
+      };
+      return {
+        success: false,
+        error: `状态流转不合法: 当前状态[${statusLabels[currentStatus]}]不允许直接变为[${statusLabels[targetStatus]}]。允许的目标状态: ${allowed.map(s => statusLabels[s]).join('、') || '无（终态）'}`
+      };
+    }
+    return { success: true };
+  }
+
+  static moveToPendingReview(record: TradeRecord, operator: string, custodianPageRef?: string): TransitionResult & { record?: TradeRecord } {
+    const validation = this.validateTransition(record.status, RecordStatus.PENDING_REVIEW);
+    if (!validation.success) return validation;
+
     const auditLog = ReversalDetector.createAuditLog(
       operator,
       '提交复核',
@@ -26,10 +49,13 @@ export class StatusFlowHandler {
       };
     }
 
-    return updatedRecord;
+    return { success: true, record: updatedRecord };
   }
 
-  static reviewAsNormal(record: TradeRecord, operator: string, remark?: string): TradeRecord {
+  static reviewAsNormal(record: TradeRecord, operator: string, remark?: string): TransitionResult & { record?: TradeRecord } {
+    const validation = this.validateTransition(record.status, RecordStatus.REVIEWED_NORMAL);
+    if (!validation.success) return validation;
+
     const auditLog = ReversalDetector.createAuditLog(
       operator,
       '复核通过-正常',
@@ -39,10 +65,13 @@ export class StatusFlowHandler {
     );
 
     return {
-      ...record,
-      status: RecordStatus.REVIEWED_NORMAL,
-      auditLogs: [...record.auditLogs, auditLog],
-      updatedAt: new Date()
+      success: true,
+      record: {
+        ...record,
+        status: RecordStatus.REVIEWED_NORMAL,
+        auditLogs: [...record.auditLogs, auditLog],
+        updatedAt: new Date()
+      }
     };
   }
 
@@ -51,7 +80,10 @@ export class StatusFlowHandler {
     operator: string,
     adjustedAmount: number,
     remark: string
-  ): TradeRecord {
+  ): TransitionResult & { record?: TradeRecord } {
+    const validation = this.validateTransition(record.status, RecordStatus.REVIEWED_ADJUSTED);
+    if (!validation.success) return validation;
+
     const auditLog = ReversalDetector.createAuditLog(
       operator,
       '复核通过-调整',
@@ -77,10 +109,13 @@ export class StatusFlowHandler {
       };
     }
 
-    return updatedRecord;
+    return { success: true, record: updatedRecord };
   }
 
-  static markAsSummarized(record: TradeRecord, operator: string): TradeRecord {
+  static markAsSummarized(record: TradeRecord, operator: string): TransitionResult & { record?: TradeRecord } {
+    const validation = this.validateTransition(record.status, RecordStatus.SUMMARIZED);
+    if (!validation.success) return validation;
+
     const auditLog = ReversalDetector.createAuditLog(
       operator,
       '纳入摘要',
@@ -90,14 +125,21 @@ export class StatusFlowHandler {
     );
 
     return {
-      ...record,
-      status: RecordStatus.SUMMARIZED,
-      auditLogs: [...record.auditLogs, auditLog],
-      updatedAt: new Date()
+      success: true,
+      record: {
+        ...record,
+        status: RecordStatus.SUMMARIZED,
+        auditLogs: [...record.auditLogs, auditLog],
+        updatedAt: new Date()
+      }
     };
   }
 
-  static rollback(record: TradeRecord, operator: string, reason: string): TradeRecord {
+  static rollback(record: TradeRecord, operator: string, reason: string): TransitionResult & { record?: TradeRecord } {
+    if (record.status === RecordStatus.PENDING_IMPORT) {
+      return { success: false, error: '待导入状态无法回滚' };
+    }
+
     const previousStatus = this.getPreviousStatus(record.status);
     const auditLog = ReversalDetector.createAuditLog(
       operator,
@@ -108,10 +150,13 @@ export class StatusFlowHandler {
     );
 
     return {
-      ...record,
-      status: previousStatus,
-      auditLogs: [...record.auditLogs, auditLog],
-      updatedAt: new Date()
+      success: true,
+      record: {
+        ...record,
+        status: previousStatus,
+        auditLogs: [...record.auditLogs, auditLog],
+        updatedAt: new Date()
+      }
     };
   }
 
