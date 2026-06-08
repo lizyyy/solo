@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Download, FileText, CheckCircle, AlertTriangle, Users, RefreshCw, Calendar, Share2 } from 'lucide-react';
 import { useAppStore } from '../store/appStore';
 import { exportToCSV, formatDate } from '../utils';
+import { Sample } from '../types';
 
 export const Reports: React.FC = () => {
   const { report, samples, detections, reviews, generateReport, getSampleById, getDetectionBySampleId, getReviewBySampleId } = useAppStore();
@@ -36,10 +37,25 @@ export const Reports: React.FC = () => {
   };
 
   const getSamplesByCategory = (category: 'model' | 'manual' | 'review') => {
-    const sampleIds = report.samples[
-      category === 'model' ? 'modelDecision' : category === 'manual' ? 'manualCorrection' : 'needReview'
-    ];
-    return sampleIds.map((id) => getSampleById(id)).filter(Boolean);
+    const result: Sample[] = [];
+    for (const sample of samples) {
+      const detection = getDetectionBySampleId(sample.id);
+      const review = getReviewBySampleId(sample.id);
+      if (category === 'model') {
+        if (sample.status === 'completed' && (!review || !detection || review.finalIntent === detection.modelIntent)) {
+          result.push(sample);
+        }
+      } else if (category === 'manual') {
+        if (sample.status === 'completed' && review && detection && review.finalIntent !== detection.modelIntent) {
+          result.push(sample);
+        }
+      } else {
+        if (sample.status !== 'completed') {
+          result.push(sample);
+        }
+      }
+    }
+    return result;
   };
 
   const categoryConfig = {
