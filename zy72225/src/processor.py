@@ -24,12 +24,23 @@ class ReleaseScheduleProcessor:
         self._load_records()
 
     def _load_records(self) -> None:
-        if self.records_file.exists():
+        if not self.records_file.exists():
+            return
+        try:
             with open(self.records_file, "r", encoding="utf-8") as f:
                 data = json.load(f)
+        except (json.JSONDecodeError, OSError):
+            return
+
+        for record_data in data.get("records", []):
+            try:
+                record = ReleaseRecord.model_validate(record_data)
+                self.records[record.record_id] = record
+            except Exception:
+                continue
 
     def _save_records(self) -> None:
-        records_list = [record.model_dump() for record in self.records.values()]
+        records_list = [record.model_dump(mode="json") for record in self.records.values()]
         with open(self.records_file, "w", encoding="utf-8") as f:
             json.dump({"records": records_list}, f, ensure_ascii=False, indent=2, default=str)
 
@@ -58,13 +69,13 @@ class ReleaseScheduleProcessor:
     ) -> Dict[str, Any]:
         records, import_summary = self.importer.import_excel(excel_file_path, operator)
 
+        new_records: List[ReleaseRecord] = []
         for record in records:
             if record.record_id not in self.records:
                 self.records[record.record_id] = record
-            else:
-                pass
+                new_records.append(record)
 
-        for record in self.records.values():
+        for record in new_records:
             self.rule_engine.check_and_apply(record, operator="system")
 
         self._save_records()
@@ -266,8 +277,8 @@ class ReleaseScheduleProcessor:
         return {
             "record_id": record_id,
             "current": record.to_dict(),
-            "original_snapshot": record.original_snapshot.model_dump(),
-            "change_history": [log.model_dump() for log in record.change_history],
+            "original_snapshot": record.original_snapshot.model_dump(mode="json"),
+            "change_history": [log.model_dump(mode="json") for log in record.change_history],
             "change_summary": record.get_change_summary(),
         }
 
@@ -320,7 +331,7 @@ class ReleaseScheduleProcessor:
             "records": {
                 record_id: {
                     "data": record.to_dict(),
-                    "change_history": [log.model_dump() for log in record.change_history],
+                    "change_history": [log.model_dump(mode="json") for log in record.change_history],
                 }
                 for record_id, record in self.records.items()
             },
