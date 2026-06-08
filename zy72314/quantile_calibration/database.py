@@ -137,6 +137,7 @@ class Database:
             CREATE INDEX IF NOT EXISTS idx_records_batch ON rating_weight_records(import_batch_id);
             CREATE INDEX IF NOT EXISTS idx_records_status ON rating_weight_records(status);
             CREATE INDEX IF NOT EXISTS idx_records_boundary ON rating_weight_records(boundary_type);
+            CREATE INDEX IF NOT EXISTS idx_records_position_row ON rating_weight_records(position, original_row_number);
             CREATE INDEX IF NOT EXISTS idx_history_record ON record_histories(record_id);
             CREATE INDEX IF NOT EXISTS idx_review_record ON review_tasks(record_id);
             """)
@@ -268,6 +269,51 @@ class Database:
             created_by=row["created_by"],
             updated_by=row["updated_by"]
         )
+
+    def find_record_by_business_key(self, position: str, original_row_number: int) -> Optional[RatingWeightRecord]:
+        """
+        按业务主键（岗位+原始行号）查找现有记录。
+        用于内容不同但实际是同一份数据的场景，不简单翻倍数量。
+        """
+        with self._get_conn() as conn:
+            c = conn.cursor()
+            c.execute("""
+                SELECT * FROM rating_weight_records
+                WHERE position = ? AND original_row_number = ?
+                ORDER BY updated_at DESC LIMIT 1
+            """, (position, original_row_number))
+            row = c.fetchone()
+            if row:
+                return self._row_to_record(row)
+            return None
+
+    def get_all_active_records(self) -> List[RatingWeightRecord]:
+        """
+        获取同一份数据：同一业务主键只返回最新的一条，用于列表/摘要/导出。
+        确保同源一致，不翻倍。
+        """
+        with self._get_conn() as conn:
+            c = conn.cursor()
+            c.execute("""
+                SELECT r1.* FROM rating_weight_records r1
+                INNER JOIN (
+                    SELECT position, original_row_number, MAX(updated_at) AS max_updated
+                    FROM rating_weight_records
+                    GROUP BY position, original_row_number
+                ) r2 ON r1.position = r2.position
+                     AND r1.original_row_number = r2.original_row_number
+                     AND r1.updated_at = r2.max_updated
+                ORDER BY r1.original_row_number
+            """)
+            return [self._row_to_record(row) for row in c.fetchall()]
+
+    def get_latest_batch_id(self) -> Optional[int]:
+        """获取最新的导入批次 ID"""
+        with self._get_conn() as conn:
+            c = conn.cursor()
+            c.execute("SELECT id FROM import_batches ORDER BY imported_at DESC LIMIT 1")
+            row = c.fetchone()
+            return row["id"] if row else None
 
     def add_history(self, history: RecordHistory) -> int:
         with self._get_conn() as conn:

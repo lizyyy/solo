@@ -7,10 +7,11 @@
 
 关键特性：
 - 保留原始行号、人工改动、处理状态
-- 重复导入不去重，不翻倍数量
+- 重复导入不去重（两级去重：文件哈希 + 业务主键），不翻倍数量
 - 历史版本对比，改前改后可查
 - 负数被旧表当成缺失时不急着归正常，留给学生助教复核
 - 边界规则写在代码里，不靠口头约定
+- 统一视图层：列表、详情、摘要、导出、报告同源一致
 """
 
 import os
@@ -20,6 +21,7 @@ from .database import Database
 from .boundary_engine import BoundaryRuleEngine
 from .importer import RatingWeightImporter
 from .workflow import WorkflowManager
+from .views import UnifiedViewLayer
 from .models import BoundaryType, ProcessingStatus
 
 
@@ -32,6 +34,7 @@ class QuantileCalibrationSystem:
         self.boundary_engine = BoundaryRuleEngine(self.db)
         self.importer = RatingWeightImporter(self.db, self.boundary_engine)
         self.workflow = WorkflowManager(self.db, self.boundary_engine, self.importer)
+        self.views = UnifiedViewLayer(self.db)
 
     def run_complete_workflow(
         self,
@@ -156,12 +159,15 @@ class QuantileCalibrationSystem:
         }
 
     def get_records_by_boundary_type(self, boundary_type: str) -> Dict[str, Any]:
-        """按边界类型查询记录"""
+        """按边界类型查询记录（来自同一份数据"""
         bt = BoundaryType(boundary_type)
         records = self.db.get_records_by_boundary(bt)
+        active_ids = {r.id for r in self.db.get_all_active_records()}
+        records = [r for r in records if r.id in active_ids]
         return {
             "boundary_type": boundary_type,
             "count": len(records),
+            "source": "unified_view.get_all_active_records() - 同源一致",
             "records": [
                 {
                     "record_id": r.id,
@@ -175,6 +181,95 @@ class QuantileCalibrationSystem:
             ]
         }
 
+    # ====== 统一视图层 API（同源一致 ======
+
+    def get_list_view(
+        self,
+        batch_id: Optional[int] = None,
+        filter_status: Optional[str] = None,
+        filter_boundary: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """列表视图：与详情/摘要/导出/报告同一份数据"""
+        return self.views.get_list_view(batch_id, filter_status, filter_boundary)
+
+    def get_detail_view(self, record_id: int) -> Dict[str, Any]:
+        """
+        详情视图：保留原始说法、改后的值、处理原因、下一步找谁。
+        与列表/摘要/导出/报告同源一致。
+        """
+        return self.views.get_detail_view(record_id)
+
+    def get_summary_view(self, batch_id: Optional[int] = None) -> Dict[str, Any]:
+        """摘要视图：与列表/详情/导出/报告同一份数据"""
+        return self.views.get_summary_view(batch_id)
+
+    def export_records(
+        self,
+        batch_id: Optional[int] = None,
+        include_history: bool = True
+    ) -> list:
+        """导出记录：与列表/详情/摘要/报告同一份数据"""
+        return self.views.export_to_records(batch_id, include_history)
+
+    def export_csv(
+        self,
+        output_path: str,
+        batch_id: Optional[int] = None,
+        include_history: bool = True
+    ) -> str:
+        """导出 CSV：与列表/详情/摘要/报告同一份数据"""
+        return self.views.export_to_csv(output_path, batch_id, include_history)
+
+    def generate_boundary_report_view(self, batch_id: Optional[int] = None) -> Dict[str, Any]:
+        """边界报告：与列表/详情/摘要/导出同一份数据"""
+        return self.views.generate_boundary_report(batch_id)
+
+    def verify_consistency(self, batch_id: Optional[int] = None) -> Dict[str, Any]:
+        """
+        一致性校验：确认列表、详情、摘要、导出、报告是否全部同源一致。
+        返回校验报告。
+        """
+        list_view = self.get_list_view(batch_id)
+        detail_sample = None
+        if list_view["items"]:
+            detail_sample = self.get_detail_view(list_view["items"][0]["record_id"])
+        summary = self.get_summary_view(batch_id)
+        exported = self.export_records(batch_id, include_history=False)
+        report = self.generate_boundary_report_view(batch_id)
+
+        checks = {
+            "list_total": list_view["total_count"],
+            "summary_total": summary["total_records"],
+            "export_total": len(exported),
+            "report_total": report["total_records"],
+            "list_matches_summary": list_view["total_count"] == summary["total_records"],
+            "list_matches_export": list_view["total_count"] == len(exported),
+            "list_matches_report": list_view["total_count"] == report["total_records"],
+            "all_totals_match": (
+                list_view["total_count"] == summary["total_records"] == len(exported) == report["total_records"]
+            ),
+            "detail_status_consistent": detail_sample is not None and (
+                detail_sample["status"] ==
+                next(
+                    (i["status"] for i in list_view["items"]
+                     if i["record_id"] == detail_sample["record_id"]),
+                    None
+                )
+            )
+        }
+
+        return {
+            "source": "统一视图层一致性校验",
+            "checks": checks,
+            "consistency_passed": all([
+                checks["list_matches_summary"],
+                checks["list_matches_export"],
+                checks["list_matches_report"],
+                checks["all_totals_match"]
+            ]),
+            "note": "列表/详情/摘要/导出/报告全部来自 get_all_active_records()，同源一致"
+        }
+
 
 __all__ = [
     "QuantileCalibrationSystem",
@@ -183,5 +278,6 @@ __all__ = [
     "Database",
     "BoundaryRuleEngine",
     "RatingWeightImporter",
-    "WorkflowManager"
+    "WorkflowManager",
+    "UnifiedViewLayer"
 ]

@@ -50,7 +50,9 @@ class RatingWeightImporter:
     ) -> Dict[str, Any]:
         """
         导入评分权重表 Excel/CSV 文件。
-        自动去重：同一文件重复导入不会翻倍数量。
+        两级去重策略，绝不简单翻倍数量：
+          Level 1: 基于文件内容 SHA256 哈希 → 完全相同文件
+          Level 2: 基于业务主键（岗位+原始行号）→ 内容不同但实际是同一份数据
         """
         if not os.path.exists(file_path):
             raise FileNotFoundError(f"文件不存在: {file_path}")
@@ -61,7 +63,6 @@ class RatingWeightImporter:
         file_name = os.path.basename(file_path)
 
         existing_batch = self.db.find_existing_batch(file_hash)
-
         if existing_batch:
             return self._handle_duplicate_import(
                 existing_batch, file_path, file_hash, file_name, imported_by
@@ -70,63 +71,150 @@ class RatingWeightImporter:
         df = self._read_file(file_path)
         self._validate_columns(df)
 
-        batch = ImportBatch(
-            file_hash=file_hash,
-            file_name=file_name,
-            record_count=len(df),
-            imported_at=datetime.now(),
-            imported_by=imported_by,
-            is_deduplicated=False,
-            deduplication_note=""
+        return self._smart_merge_import(
+            df, file_path, file_hash, file_name, imported_by
         )
-        batch_id = self.db.create_import_batch(batch)
 
-        imported_records = []
+    def _smart_merge_import(
+        self,
+        df: pd.DataFrame,
+        file_path: str,
+        file_hash: str,
+        file_name: str,
+        imported_by: str
+    ) -> Dict[str, Any]:
+        """
+        智能合并导入：按业务主键（岗位+原始行号）去重。
+        - 新的业务主键 → 创建新记录（标记为 merged_from_new_file）
+        - 已存在的业务主键 → 更新差异字段，保留历史对比
+        绝不简单翻倍数量。
+        """
+        newly_created = []
+        merged_updated = []
+        unchanged_count = 0
+
+        has_any_existing = False
         for idx, row in df.iterrows():
             original_row_number = idx + 2
-            raw_data = row.to_dict()
-            record = self._row_to_record(row, batch_id, original_row_number, raw_data)
-            record_id = self.db.create_rating_record(record)
-            record.id = record_id
+            position_val = str(row.get("岗位", "")).strip() if pd.notna(row.get("岗位")) else ""
+            existing = self.db.find_record_by_business_key(position_val, original_row_number)
+            if existing is not None:
+                has_any_existing = True
+                break
 
-            history = RecordHistory(
-                record_id=record_id,
-                change_source=ChangeSource.INITIAL_IMPORT,
-                field_name="initial_import",
-                old_value=None,
-                new_value=str(raw_data),
-                old_status=None,
-                new_status=ProcessingStatus.IMPORTED,
-                snapshot_before={},
-                snapshot_after={
-                    "position": record.position,
-                    "weight_p10": record.weight_p10,
-                    "weight_p25": record.weight_p25,
-                    "weight_p50": record.weight_p50,
-                    "weight_p75": record.weight_p75,
-                    "weight_p90": record.weight_p90,
-                    "sample_count": record.sample_count,
-                    "remark": record.remark,
-                    "original_row_number": original_row_number,
-                    "raw_data": raw_data
-                },
-                changed_by=imported_by,
-                change_reason="首次导入评分权重表",
-                changed_at=datetime.now()
+        if has_any_existing:
+            batch_id = self.db.get_latest_batch_id()
+            if batch_id is None:
+                batch = ImportBatch(
+                    file_hash=file_hash,
+                    file_name=file_name,
+                    record_count=len(df),
+                    imported_at=datetime.now(),
+                    imported_by=imported_by,
+                    is_deduplicated=True,
+                    deduplication_note="业务主键级智能合并：哈希不同但按岗位+行号去重"
+                )
+                batch_id = self.db.create_import_batch(batch)
+        else:
+            batch = ImportBatch(
+                file_hash=file_hash,
+                file_name=file_name,
+                record_count=len(df),
+                imported_at=datetime.now(),
+                imported_by=imported_by,
+                is_deduplicated=False,
+                deduplication_note=""
             )
-            self.db.add_history(history)
-            imported_records.append(record)
+            batch_id = self.db.create_import_batch(batch)
 
-        self.db.init_workflow(batch_id)
+        for idx, row in df.iterrows():
+            original_row_number = idx + 2
+            position_val = str(row.get("岗位", "")).strip() if pd.notna(row.get("岗位")) else ""
+            raw_data = row.to_dict()
+
+            existing = self.db.find_record_by_business_key(position_val, original_row_number)
+
+            if existing is None:
+                record = self._row_to_record(row, batch_id, original_row_number, raw_data)
+                record_id = self.db.create_rating_record(record)
+                record.id = record_id
+
+                history = RecordHistory(
+                    record_id=record_id,
+                    change_source=ChangeSource.INITIAL_IMPORT,
+                    field_name="initial_import",
+                    old_value=None,
+                    new_value=str(raw_data),
+                    old_status=None,
+                    new_status=ProcessingStatus.IMPORTED,
+                    snapshot_before={},
+                    snapshot_after={
+                        "position": record.position,
+                        "weight_p10": record.weight_p10,
+                        "weight_p25": record.weight_p25,
+                        "weight_p50": record.weight_p50,
+                        "weight_p75": record.weight_p75,
+                        "weight_p90": record.weight_p90,
+                        "sample_count": record.sample_count,
+                        "remark": record.remark,
+                        "original_row_number": original_row_number,
+                        "raw_data": raw_data,
+                        "note": "业务主键级智能合并：新记录"
+                    },
+                    changed_by=imported_by,
+                    change_reason="智能合并导入：按岗位+行号判定为新数据",
+                    changed_at=datetime.now()
+                )
+                self.db.add_history(history)
+                newly_created.append(record)
+            else:
+                differences = self._compare_row_to_record(row, existing)
+                if differences:
+                    self._update_record_from_diff(
+                        existing, differences, imported_by, raw_data,
+                        change_source_override=ChangeSource.RE_IMPORT
+                    )
+                    merged_updated.append({
+                        "record_id": existing.id,
+                        "original_row_number": original_row_number,
+                        "position": existing.position,
+                        "differences": differences
+                    })
+                else:
+                    unchanged_count += 1
+
+        if not self.db.get_workflow(batch_id):
+            self.db.init_workflow(batch_id)
+
+        total_records_after = self.db.get_all_active_records()
+
+        if not has_any_existing:
+            self.boundary_engine.apply_boundary_detection(batch_id, imported_by)
 
         return {
-            "action": "new_import",
+            "action": "smart_merged_import",
             "batch_id": batch_id,
             "file_hash": file_hash,
-            "record_count": len(imported_records),
-            "records": imported_records,
-            "is_duplicate": False,
-            "note": "新导入批次，未发现重复"
+            "record_count": len(total_records_after),
+            "newly_created_count": len(newly_created),
+            "merged_updated_count": len(merged_updated),
+            "unchanged_count": unchanged_count,
+            "total_count": len(total_records_after),
+            "records": total_records_after,
+            "newly_created_records": newly_created,
+            "merged_updated_details": merged_updated,
+            "is_duplicate": has_any_existing,
+            "duplicate_level": "business_key" if has_any_existing else "none",
+            "changes_detected": len(merged_updated),
+            "change_details": merged_updated,
+            "note": (
+                f"业务主键级智能合并（岗位+行号）："
+                f"新增 {len(newly_created)} 条，"
+                f"更新 {len(merged_updated)} 条，"
+                f"无变化 {unchanged_count} 条，"
+                f"当前同一份数据总数 {len(total_records_after)} 条，"
+                f"未翻倍"
+            )
         }
 
     def _handle_duplicate_import(
@@ -216,9 +304,11 @@ class RatingWeightImporter:
         record: RatingWeightRecord,
         differences: Dict[str, Tuple[Any, Any]],
         operator: str,
-        new_raw_data: Dict[str, Any]
+        new_raw_data: Dict[str, Any],
+        change_source_override: Optional[ChangeSource] = None
     ):
         """根据差异更新记录，并记录历史用于版本对比"""
+        change_source = change_source_override or ChangeSource.RE_IMPORT
         snapshot_before = {
             "position": record.position,
             "weight_p10": record.weight_p10,
@@ -273,7 +363,7 @@ class RatingWeightImporter:
         for field, (old_val, new_val) in differences.items():
             history = RecordHistory(
                 record_id=record.id,
-                change_source=ChangeSource.RE_IMPORT,
+                change_source=change_source,
                 field_name=field,
                 old_value=str(old_val),
                 new_value=str(new_val),
@@ -282,7 +372,7 @@ class RatingWeightImporter:
                 snapshot_before=snapshot_before,
                 snapshot_after=snapshot_after,
                 changed_by=operator,
-                change_reason=f"重复导入时检测到字段变更: {field}",
+                change_reason=f"导入合并时检测到字段变更: {field}",
                 changed_at=datetime.now()
             )
             self.db.add_history(history)

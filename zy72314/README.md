@@ -72,34 +72,99 @@
 
 ## 导入去重规则
 
-### 去重机制
-基于文件内容 **SHA256 哈希** 判断是否为同一文件。
+### 两级去重策略（写死在代码里，绝不简单翻倍）
+
+| 级别 | 判定依据 | 适用场景 |
+|-----|---------|---------|
+| **Level 1: 文件哈希** | 文件内容 SHA256 完全相同 | 完全同一个文件反复导入 |
+| **Level 2: 业务主键** | 岗位 `position` + 原始行号 `original_row_number` | 内容有差异（如只改了一条备注），但实际是同一份数据 |
 
 ### 处理逻辑
 
 | 场景 | 处理方式 | 数量变化 |
 |-----|---------|---------|
-| 新文件首次导入 | 创建新批次、新记录 | 增加 N 条 |
-| **同一文件重复导入（内容完全相同）** | 标记为已去重，**不创建新记录** | 数量 **不变** |
-| 同一文件，但运营规划阿岚**只改了一条备注** | 更新现有记录的备注字段，记录历史版本对比 | 数量 **不变**，变更数 += 1 |
-| 完全不同的新文件 | 创建新批次、新记录 | 增加 M 条 |
+| 全新的文件，所有岗位+行号都是新的 | 创建新批次、新记录 | 增加 N 条 |
+| **同一文件重复导入（哈希相同）** | 标记为已去重，**不创建新记录** | **不变** |
+| **内容不同，但岗位+行号与已有完全重合（如只改了一条备注）** | 更新差异字段，记录历史对比，**绝不新建记录** | **不变**，变更数 += 改了多少条 |
+| 内容不同，有部分新的岗位+行号，部分已存在 | 已存在的合并更新，新增的创建新记录 | 新增条数 = 新出现的业务主键数 |
 
 ### 版本对比
-每次更新自动生成 `RecordHistory`，包含：
-- 改前快照（`snapshot_before`）
-- 改后快照（`snapshot_after`）
+每次更新（无论 Level 1 还是 Level 2 去重）自动生成 `RecordHistory`，包含：
+- 改前快照（`snapshot_before`）、改后快照（`snapshot_after`）
 - 变更字段、变更人、变更原因
 - 状态变更前后
+- 可通过 `get_version_diff(record_id)` / `get_detail_view(record_id)` 查看任意两次版本差异
 
-可通过 `get_version_diff(record_id)` 查看任意两个版本的差异。
+---
+
+## 统一视图层：同源一致
+
+### 设计原则
+所有展示（列表、详情、摘要、导出、报告）全部来自同一份数据源：
+`get_all_active_records()` —— 同业务主键（岗位+原始行号）只返回最新的一条记录。
+
+### 包含的视图
+
+| 视图 | 调用方式 | 说明 | 同源保证 |
+|-----|---------|------|---------|
+| **列表** | `get_list_view()` | 展示 ID、行号、岗位、分位数、状态、边界类型、待处理任务 | ✅ 来自 `get_all_active_records()` |
+| **详情** | `get_detail_view()` | 原始说法、改后值、处理原因、处理时间线、下一步找谁 | ✅ 同一条记录 ID，与列表同源 |
+| **摘要** | `get_summary_view()` | 总数、按状态统计、按边界类型统计 | ✅ 同一份数据聚合 |
+| **导出** | `export_csv()` / `export_records()` | CSV/JSON，含历史留痕 | ✅ 列表的总数 = 导出的总数 |
+| **边界报告** | `generate_boundary_report_view()` | 边界问题明细、下一步联系人 | ✅ 列表的边界数 = 报告的边界数 |
+| **一致性校验** | `verify_consistency()` | 检查以上视图是否全部一致 | ✅ 自检接口 |
+
+### 一致性校验示例
+```python
+check = system.verify_consistency(batch_id)
+print(check["consistency_passed"])  # True/False
+print(check["checks"])
+# {
+#   'list_total': 20, 'summary_total': 20,
+#   'export_total': 20, 'report_total': 20,
+#   'all_totals_match': True,
+#   'detail_status_consistent': True
+# }
+```
+
+### 详情视图：人工复核全留痕
+`get_detail_view(record_id)` 返回以下关键信息，**绝不提前归到正常结果**：
+
+```
+{
+  "original_row_number": 3,                 // 原始行号，证据追溯
+  "original_values": {                      // 原始说法
+    "weight_p10": None,
+    "weight_p25": 15000, ...
+  },
+  "current_values": {                       // 改后的值
+    "weight_p10": -500,
+    "weight_p25": 15000, ...
+  },
+  "value_changes": [                        // 改前改后差别
+    {"field": "weight_p10", "original_value": None, "current_value": -500}
+  ],
+  "status": "revised",
+  "boundary_type": "negative_value",
+  "processing_reasons": [                   // 处理原因（全链路）
+    "[首次导入] alan_ops: 智能合并导入...",
+    "[学生助教复核] ta_xiaoming: TA复核结论: restore_negative; 经与旧公式截图核对..."
+  ],
+  "processing_history": [                   // 处理时间线
+    {step: 1, action: "首次导入", operator: "alan_ops", reason: "...", time: "..."}
+    {step: 2, action: "学生助教复核", operator: "ta_xiaoming", reason: "...", time: "..."}
+  ],
+  "next_step": {                            // 下一步找谁
+    "step": "已修正待确认",
+    "assigned_to": ["运营规划"],
+    "instruction": "已由学生助教修正，等待运营规划阿岚确认后可定标"
+  }
+}
+```
 
 ---
 
 ## 学生助教复核机制
-
-### 复核任务分配
-- Step 3 自动创建复核任务，分配给指定学生助教
-- 任务状态：待处理 / 已完成
 
 ### 复核决策选项
 
@@ -313,19 +378,129 @@ README.md
 
 ---
 
+## 操作路速查：安装→启动→走完整条链路
+
+### 1. 安装
+```bash
+cd /path/to/project
+python3 -m pip install -r requirements.txt
+```
+
+### 2. 启动（创建系统实例）
+```python
+from quantile_calibration import QuantileCalibrationSystem
+system = QuantileCalibrationSystem("data/quantile_calibration.db")
+```
+
+### 3. Step 1：导入评分权重表
+```python
+step1 = system.step1_import("data/rating_weights.csv", operator="alan_ops")
+batch_id = step1["batch_id"]
+print(step1["import_result"]["note"])
+# 业务主键级智能合并（岗位+行号）：新增 0 条，更新 0 条，...
+```
+
+### 4. 导入 v2（只改了一条备注，内容不同但业务主键相同 → 不翻倍
+```python
+step1b = system.step1_import("data/rating_weights_edited.csv", operator="alan_ops")
+print(step1b["import_result"]["is_duplicate"])       # True
+print(step1b["import_result"]["duplicate_level"])    # business_key
+print(step1b["import_result"]["total_count"]) # 20 → 数量不变
+```
+
+### 5. Step 2：运营规划阿岚补看旧公式截图
+```python
+step2 = system.step2_review_formula(
+    batch_id=batch_id,
+    reviewed_by="alan_ops",
+    review_note="对照旧公式截图，确认高级产品经理 P10 原为 -500，旧表误标为缺失",
+    screenshot_reference="旧公式截图_2024_v3.png"
+)
+```
+
+### 6. Step 3：边界样本报告更新
+```python
+step3 = system.step3_boundary_report(
+    batch_id=batch_id,
+    operator="alan_ops",
+    ta_assignee="ta_xiaoming"
+)
+print("创建复核任务数:", len(step3["review_tasks_created"]))
+print(step3["note"])
+# 负数被旧表当成缺失的 N 条样本已留待学生助教复核，未自动归正常
+```
+
+### 7. 手动改一条备注
+```python
+edit_result = system.manual_edit(
+    record_id=1,
+    updates={"remark": "运营规划阿岚复核：已与 HR 确认"},
+    operator="alan_ops",
+    reason="补充复核备注"
+)
+print("改前改后可查：", edit_result["version_diffs"])
+```
+
+### 8. 学生助教复核
+```python
+pending = system.get_pending_review_tasks("ta_xiaoming")
+task = pending["tasks"][0]
+
+review = system.ta_review_record(
+    task_id=task["task_id"],
+    record_id=task["record_id"],
+    review_result="经与旧公式截图交叉核对，P10 确实是-500，旧表误标",
+    correction_decision="restore_negative",
+    corrected_values={"weight_p10": -500},
+    ta_name="xiaoming"
+)
+print("复核后状态：", review["updated_status"])
+```
+
+### 9. 同源一致性检查
+```python
+check = system.verify_consistency(batch_id)
+print(check["consistency_passed"])  # True ✅
+print(check["note"])
+# 列表/详情/摘要/导出/报告全部来自 get_all_active_records()，同源一致
+```
+
+### 10. 查看详情（全留痕
+```python
+detail = system.get_detail_view(task["record_id"])
+print("原始行号：", detail["original_row_number"])
+print("原始说法：", detail["original_values"])
+print("改后的值：", detail["current_values"])
+print("处理原因：", detail["processing_reasons"])
+print("下一步找谁：", detail["next_step"]["assigned_to"])
+```
+
+### 11. 导出 CSV + 边界报告
+```python
+system.export_csv("data/final_export.csv", batch_id)
+report = system.generate_boundary_report_view(batch_id)
+```
+
+---
+
 ## 常见问题 Q&A
 
 ### Q: 负数样本被旧表当成缺失，系统怎么处理？
 A: 自动标记为 `NEGATIVE_TREATED_AS_MISSING`，状态设为 `PENDING_REVIEW`，**不自动归正常**，创建复核任务留给学生助教处理。所有判定规则硬编码在 `boundary_engine.py` 中。
 
 ### Q: 重复导入同一批数据，数量会翻倍吗？
-A: 不会。基于文件哈希去重，同一文件重复导入不创建新记录。如果文件内容有变更（如只改了备注，只更新差异字段并记录历史。
+A: 不会。**两级去重**：
+- Level 1：文件哈希相同 → 不创建新记录
+- Level 2：岗位+行号相同但内容有差异 → 更新差异字段，绝不新建记录
 
 ### Q: 运营规划阿岚只改了一条备注，能看出改前改后差别吗？
-A: 能。每次改动都会生成历史快照，通过 `get_version_diff(record_id)` 可以看到改前改后对比。
+A: 能。每次改动都会生成历史快照，通过 `get_version_diff(record_id)` 或 `get_detail_view(record_id)` 可以看到改前改后对比。
 
 ### Q: 学生助教追问时，能回到证据吗？
-A: 能。通过 `get_evidence(record_id)` 可以查看：原始行号、原始数据、所有历史变更、版本对比、复核任务。
+A: 能。通过 `get_detail_view(record_id)` 可以查看：**原始行号、原始说法、改后的值、处理原因、处理时间线、下一步找谁。
+
+### Q: 列表、详情、摘要、导出、报告数据一致吗？
+A: **一致**。全部来自同一份数据源 `get_all_active_records()`，可通过 `verify_consistency()` 自检。
 
 ### Q: 改错了能回滚吗？
 A: 能。通过 `rollback_to_history()` 回滚到任意历史版本，回滚操作本身也留痕。
@@ -335,10 +510,12 @@ A: **不能**。所有边界规则全部硬编码在代码中，不靠口头约�
 
 ---
 
-## 代码中边界规则位置
+## 代码中关键逻辑位置
 
 - 边界类型判定：[boundary_engine.py](file:///Users/lzy/pro/solo/workspaces/zy72314/quantile_calibration/boundary_engine.py#L40-L91)
 - 负数痕迹检测：[boundary_engine.py](file:///Users/lzy/pro/solo/workspaces/zy72314/quantile_calibration/boundary_engine.py#L68-L91)
-- 导入去重逻辑：[importer.py](file:///Users/lzy/pro/solo/workspaces/zy72314/quantile_calibration/importer.py#L132-L188)
+- 两级去重逻辑：[importer.py](file:///Users/lzy/pro/solo/workspaces/zy72314/quantile_calibration/importer.py#L46-L218)
 - 三步工作流：[workflow.py](file:///Users/lzy/pro/solo/workspaces/zy72314/quantile_calibration/workflow.py#L30-L210)
 - 学生助教复核：[workflow.py](file:///Users/lzy/pro/solo/workspaces/zy72314/quantile_calibration/workflow.py#L245-L309)
+- 统一视图层（同源）：[views.py](file:///Users/lzy/pro/solo/workspaces/zy72314/quantile_calibration/views.py)
+- 一致性校验：[main.py](file:///Users/lzy/pro/solo/workspaces/zy72314/quantile_calibration/main.py#L227-L269)
