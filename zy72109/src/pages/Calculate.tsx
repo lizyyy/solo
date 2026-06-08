@@ -8,6 +8,9 @@ const POWER_UNITS: PowerUnit[] = ['kW', 'W', 'BTU/h', 'RT'];
 const AREA_UNITS: AreaUnit[] = ['m²', 'ft²'];
 const THICKNESS_UNITS: ThicknessUnit[] = ['mm', 'cm', 'in'];
 
+const RS_LABEL: Record<string, string> = { normal: '正常', pending: '待确认', old_caliber: '旧口径', extreme: '极端值' };
+const RS_CLS: Record<string, string> = { normal: 'status-badge-normal', pending: 'status-badge-pending', old_caliber: 'status-badge-old', extreme: 'status-badge-extreme' };
+
 export default function Calculate() {
   const currentBatch = useStore(s => s.currentBatch);
   const updateParameters = useStore(s => s.updateParameters);
@@ -132,7 +135,7 @@ export default function Calculate() {
             <table className="industrial-table">
               <thead>
                 <tr>
-                  <th>时间</th><th>温度</th><th>总负荷</th><th>冰负荷</th><th>对流</th><th>辐射</th><th>湿负荷</th><th>人员</th><th>设备</th><th>照明</th><th></th>
+                  <th>时间</th><th>温度</th><th>总负荷</th><th>冰负荷</th><th>对流</th><th>辐射</th><th>湿负荷</th><th>人员</th><th>设备</th><th>照明</th><th>状态</th><th></th>
                 </tr>
               </thead>
               <tbody>
@@ -152,6 +155,7 @@ export default function Calculate() {
                         <td>{r.personnelLoad.toFixed(2)}</td>
                         <td>{r.equipmentLoad.toFixed(2)}</td>
                         <td>{r.lightingLoad.toFixed(2)}</td>
+                        <td>{rec ? <span className={`status-badge ${RS_CLS[rec.recordStatus] ?? 'status-badge-normal'}`}>{RS_LABEL[rec.recordStatus] ?? rec.recordStatus}</span> : '-'}</td>
                         <td>
                           <button className="industrial-btn px-2 py-1" onClick={() => setExpandedStep(isOpen ? null : r.id)}>
                             {isOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
@@ -160,7 +164,7 @@ export default function Calculate() {
                       </tr>
                       {isOpen && (
                         <tr>
-                          <td colSpan={11} className="bg-industrial-50 p-4">
+                          <td colSpan={12} className="bg-industrial-50 p-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                               {r.calculationSteps.map(step => (
                                 <div key={step.id} className="formula-box">

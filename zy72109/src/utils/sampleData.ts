@@ -28,7 +28,7 @@ const DEFAULT_PARAMS: PhysicsParams = {
 };
 
 const DEFAULT_THRESHOLDS: ThresholdConfig = {
-  maxCoolingLoad: 500,
+  maxCoolingLoad: 800,
   maxCoolingLoadUnit: 'kW',
   warningRatio: 0.8,
   extremeOutlierThreshold: 1.5,
@@ -44,9 +44,9 @@ export function generateSampleData(): Batch {
       id: generateId(),
       batchId,
       timestamp: new Date(now.getTime() - 3 * 60 * 60000),
-      temperature: 22,
+      temperature: 10,
       temperatureUnit: '°C',
-      humidity: 55,
+      humidity: 40,
       dataStatus: 'clean',
       recordStatus: 'normal',
       sources: [{
@@ -55,6 +55,72 @@ export function generateSampleData(): Batch {
         sourceType: 'import',
         sourceFile: '冰场监测数据_2024.csv',
         sourceLine: 2,
+        originalValue: '10,40',
+        originalUnit: '°C',
+        importTimestamp: now,
+      }],
+      missingFields: [],
+      unitIssues: [],
+    },
+    {
+      id: generateId(),
+      batchId,
+      timestamp: new Date(now.getTime() - 2 * 60 * 60000),
+      temperature: 14,
+      temperatureUnit: '°C',
+      humidity: 48,
+      dataStatus: 'missing',
+      recordStatus: 'pending',
+      sources: [{
+        id: generateId(),
+        recordId: '',
+        sourceType: 'import',
+        sourceFile: '冰场监测数据_2024.csv',
+        sourceLine: 3,
+        originalValue: '14,48',
+        originalUnit: '°C',
+        importTimestamp: now,
+      }],
+      missingFields: ['coolingLoad'],
+      unitIssues: ['该时间点缺少冷量实测数据，需人工确认'],
+    },
+    {
+      id: generateId(),
+      batchId,
+      timestamp: new Date(now.getTime() - 1.5 * 60 * 60000),
+      temperature: 64,
+      temperatureUnit: '°F',
+      humidity: 50,
+      dataStatus: 'unit_mismatch',
+      recordStatus: 'pending',
+      sources: [{
+        id: generateId(),
+        recordId: '',
+        sourceType: 'import',
+        sourceFile: '冰场监测数据_2024.csv',
+        sourceLine: 4,
+        originalValue: '64,50',
+        originalUnit: 'F',
+        importTimestamp: now,
+      }],
+      missingFields: [],
+      unitIssues: ['温度单位"F"识别为°F（64°F≈17.8°C），置信度70%'],
+    },
+    {
+      id: generateId(),
+      batchId,
+      timestamp: new Date(now.getTime() - 1 * 60 * 60000),
+      temperature: 22,
+      temperatureUnit: '°C',
+      humidity: 55,
+      dataStatus: 'clean',
+      recordStatus: 'pending',
+      sources: [{
+        id: generateId(),
+        recordId: '',
+        sourceType: 'import',
+        sourceFile: '冰场监测数据_2024.csv',
+        sourceLine: 5,
         originalValue: '22,55',
         originalUnit: '°C',
         importTimestamp: now,
@@ -65,82 +131,10 @@ export function generateSampleData(): Batch {
     {
       id: generateId(),
       batchId,
-      timestamp: new Date(now.getTime() - 2.5 * 60 * 60000),
-      temperature: 24,
+      timestamp: new Date(now.getTime() - 30 * 60000),
+      temperature: 32,
       temperatureUnit: '°C',
-      humidity: 72,
-      coolingLoad: undefined,
-      coolingLoadUnit: undefined,
-      dataStatus: 'missing',
-      recordStatus: 'pending',
-      sources: [{
-        id: generateId(),
-        recordId: '',
-        sourceType: 'import',
-        sourceFile: '冰场监测数据_2024.csv',
-        sourceLine: 3,
-        originalValue: '24,72',
-        originalUnit: '°C',
-        importTimestamp: now,
-      }],
-      missingFields: ['coolingLoad'],
-      unitIssues: ['温度单位"°C"正常，但缺少冷量数据'],
-    },
-    {
-      id: generateId(),
-      batchId,
-      timestamp: new Date(now.getTime() - 2 * 60 * 60000),
-      temperature: 75,
-      temperatureUnit: '°F',
-      humidity: 60,
-      dataStatus: 'unit_mismatch',
-      recordStatus: 'pending',
-      sources: [{
-        id: generateId(),
-        recordId: '',
-        sourceType: 'import',
-        sourceFile: '冰场监测数据_2024.csv',
-        sourceLine: 4,
-        originalValue: '75,60',
-        originalUnit: 'F',
-        importTimestamp: now,
-      }],
-      missingFields: [],
-      unitIssues: ['温度单位"F"识别为°F，置信度70%'],
-    },
-    {
-      id: generateId(),
-      batchId,
-      timestamp: new Date(now.getTime() - 1.5 * 60 * 60000),
-      temperature: 23,
-      temperatureUnit: '°C',
-      humidity: 58,
-      coolingLoad: 185,
-      coolingLoadUnit: 'kW',
-      dataStatus: 'clean',
-      recordStatus: 'normal',
-      sources: [{
-        id: generateId(),
-        recordId: '',
-        sourceType: 'import',
-        sourceFile: '冰场监测数据_2024.csv',
-        sourceLine: 5,
-        originalValue: '23,58,185',
-        originalUnit: '°C',
-        importTimestamp: now,
-      }],
-      missingFields: [],
-      unitIssues: [],
-    },
-    {
-      id: generateId(),
-      batchId,
-      timestamp: new Date(now.getTime() - 1 * 60 * 60000),
-      temperature: 25,
-      temperatureUnit: '°C',
-      humidity: 65,
-      coolingLoad: 620,
-      coolingLoadUnit: 'kW',
+      humidity: 85,
       dataStatus: 'clean',
       recordStatus: 'extreme',
       sources: [{
@@ -149,7 +143,7 @@ export function generateSampleData(): Batch {
         sourceType: 'import',
         sourceFile: '冰场监测数据_2024.csv',
         sourceLine: 6,
-        originalValue: '25,65,620',
+        originalValue: '32,85',
         originalUnit: '°C',
         importTimestamp: now,
       }],
@@ -159,26 +153,26 @@ export function generateSampleData(): Batch {
     {
       id: generateId(),
       batchId,
-      timestamp: new Date(now.getTime() - 30 * 60000),
+      timestamp: new Date(now.getTime() - 15 * 60000),
       temperature: 21,
       temperatureUnit: '°C',
       humidity: 50,
       coolingLoad: 546120,
       coolingLoadUnit: 'BTU/h',
       dataStatus: 'unit_mismatch',
-      recordStatus: 'pending',
+      recordStatus: 'old_caliber',
       sources: [{
         id: generateId(),
         recordId: '',
         sourceType: 'inspection',
         sourceFile: '设备巡检表_2024Q3.xlsx',
         sourceLine: 12,
-        originalValue: '21,50,546000',
+        originalValue: '21,50,546120',
         originalUnit: '°C',
         importTimestamp: now,
       }],
       missingFields: [],
-      unitIssues: ['冷量单位"BTU/h"与主数据集"kW"不一致，需要换算'],
+      unitIssues: ['冷量单位"BTU/h"与主数据集"kW"不一致，需要换算', '来源: 设备巡检表旧口径'],
     },
   ];
 
@@ -207,13 +201,14 @@ export function generateSampleData(): Batch {
       conflictingFields: ['coolingLoad', 'coolingLoadUnit'],
       conflictEvidence: {
         importedData: {
-          source: '冰场监测数据_2024.csv (第5行)',
-          coolingLoad: 185,
+          source: '冰场监测数据_2024.csv (第5行, 22°C)',
+          coolingLoad: '约702 kW（计算值）',
           coolingLoadUnit: 'kW',
-          timestamp: new Date(now.getTime() - 1.5 * 60 * 60000),
+          temperature: '22°C',
+          timestamp: new Date(now.getTime() - 1 * 60 * 60000),
         },
         inspectionData: {
-          source: '设备巡检表_2024Q3.xlsx (第12行)',
+          source: '设备巡检表_2024Q3.xlsx (第12行, 21°C)',
           coolingLoad: 546120,
           coolingLoadUnit: 'BTU/h',
           recordDate: new Date(now.getTime() - 45 * 24 * 60 * 60000),
@@ -221,10 +216,10 @@ export function generateSampleData(): Batch {
           remark: '旧口径：按设备铭牌功率直接累加，未扣除效率系数',
         },
         suggestions: [
-          '546120 BTU/h ≈ 160.1 kW，与当前数据185 kW存在约15%差异',
+          '546120 BTU/h ≈ 160.1 kW，与同温区计算值约672 kW差异显著',
           '巡检表使用旧口径（铭牌功率直接累加），未扣除效率系数',
-          '建议确认当前数据185 kW是否已扣除效率系数后再比较',
-          '如需统一口径，可将巡检表数据乘以效率系数（约0.87）',
+          '旧口径仅统计设备铭牌功率，不含对流、辐射、湿负荷等环境热负荷',
+          '建议以当前物理模型计算结果为准，巡检表数据仅作设备容量参考',
         ],
       },
     },
@@ -271,6 +266,9 @@ export function generateSampleData(): Batch {
         description: `制冷负荷 ${result.totalLoad.toFixed(2)} kW 超过安全阈值 ${maxLoadKw.toFixed(0)} kW`,
         confirmStatus: 'pending',
       });
+      if (record.recordStatus !== 'old_caliber') {
+        record.recordStatus = 'extreme';
+      }
     } else if (result.totalLoad > maxLoadKw * batch.thresholds.warningRatio) {
       abnormalRecords.push({
         id: generateId(),
@@ -282,6 +280,9 @@ export function generateSampleData(): Batch {
         description: `制冷负荷 ${result.totalLoad.toFixed(2)} kW 接近安全阈值 ${maxLoadKw.toFixed(0)} kW（警告线${(batch.thresholds.warningRatio * 100).toFixed(0)}%）`,
         confirmStatus: 'pending',
       });
+      if (record.recordStatus === 'normal') {
+        record.recordStatus = 'pending';
+      }
     }
   });
 
@@ -352,10 +353,16 @@ export function generateReportMarkdown(batch: Batch): string {
   const cleanRecords = batch.records.filter(r => r.dataStatus === 'clean').length;
   const missingRecords = batch.records.filter(r => r.dataStatus === 'missing').length;
   const unitMismatchRecords = batch.records.filter(r => r.dataStatus === 'unit_mismatch').length;
+  const expectedInterval = batch.thresholds?.expectedIntervalMinutes ?? 30;
+  const gapResult = batch.records.length >= 2 ? DataCleaner.detectGaps(batch.records, expectedInterval) : { gaps: [] };
   lines.push(`- 总记录数: ${totalRecords}`);
   lines.push(`- 完整记录: ${cleanRecords}`);
-  lines.push(`- 采样缺口: ${missingRecords}`);
-  lines.push(`- 单位混写: ${unitMismatchRecords}`);
+  lines.push(`- 缺失字段记录: ${missingRecords}`);
+  lines.push(`- 单位混写记录: ${unitMismatchRecords}`);
+  lines.push(`- 时间序列采样缺口: ${gapResult.gaps.length}（期望间隔: ${expectedInterval}分钟）`);
+  gapResult.gaps.forEach((g, i) => {
+    lines.push(`  - 缺口#${i + 1}: 预期 ${new Date(g.expectedTime).toLocaleString('zh-CN')}，实际 ${new Date(g.actualTime).toLocaleString('zh-CN')}（间隔 ${g.gapMinutes.toFixed(0)} 分钟）`);
+  });
   lines.push(``);
 
   lines.push(`## 四、计算结果`);

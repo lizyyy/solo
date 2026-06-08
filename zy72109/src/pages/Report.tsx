@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useStore } from '@/store';
+import { DataCleaner } from '@/utils/dataCleaner';
 import { FileText, Download, Clock, Link, AlertOctagon } from 'lucide-react';
 
 const SEV: Record<string, { l: string; c: string }> = { low: { l: '低', c: 'status-badge-normal' }, medium: { l: '中', c: 'status-badge-old' }, high: { l: '高', c: 'status-badge-pending' }, critical: { l: '严重', c: 'status-badge-extreme' } };
 const CFM: Record<string, { l: string; c: string }> = { pending: { l: '待确认', c: 'status-badge-pending' }, confirmed: { l: '已确认', c: 'status-badge-extreme' }, rejected: { l: '已驳回', c: 'status-badge-normal' } };
+const RS: Record<string, { l: string; c: string }> = { normal: { l: '正常', c: 'status-badge-normal' }, pending: { l: '待确认', c: 'status-badge-pending' }, old_caliber: { l: '旧口径', c: 'status-badge-old' }, extreme: { l: '极端值', c: 'status-badge-extreme' } };
 
 export default function Report() {
   const currentBatch = useStore(s => s.currentBatch);
@@ -16,6 +18,9 @@ export default function Report() {
   const clean = b.records.filter(r => r.dataStatus === 'clean').length;
   const miss = b.records.filter(r => r.dataStatus === 'missing').length;
   const unit = b.records.filter(r => r.dataStatus === 'unit_mismatch').length;
+  const expectedInterval = b.thresholds?.expectedIntervalMinutes ?? 30;
+  const gapResult = b.records.length >= 2 ? DataCleaner.detectGaps(b.records, expectedInterval) : { gaps: [] };
+  const gapCount = gapResult.gaps.length;
   const nonExt = b.calculationResults.filter(r => !b.records.find(rec => rec.id === r.recordId && rec.recordStatus === 'extreme'));
   const rMean = nonExt.length > 0 ? nonExt.reduce((s, r) => s + r.totalLoad, 0) / nonExt.length : 0;
   const mLoad = b.calculationResults.length > 0 ? Math.max(...b.calculationResults.map(r => r.totalLoad)) : 0;
@@ -59,10 +64,21 @@ export default function Report() {
           </tbody></table></Sec>
 
           <Sec title="三、数据质量">
-            <div className="grid grid-cols-4 gap-3 text-center">
+            <div className="grid grid-cols-5 gap-3 text-center">
               <Stat label="总记录" value={b.records.length} /><Stat label="完整" value={clean} cls="text-green-600" />
-              <Stat label="缺口" value={miss} cls="text-amber-600" /><Stat label="单位混写" value={unit} cls="text-red-600" />
+              <Stat label="缺失字段" value={miss} cls="text-amber-600" /><Stat label="单位混写" value={unit} cls="text-red-600" />
+              <Stat label="采样缺口" value={gapCount} cls="text-purple-600" />
             </div>
+            {gapCount > 0 && (
+              <div className="mt-3 bg-purple-50 border border-purple-200 rounded p-3">
+                <div className="font-mono text-xs font-semibold text-purple-700 mb-2">时间序列采样缺口（期望间隔: {expectedInterval}分钟）</div>
+                {gapResult.gaps.map((g, i) => (
+                  <div key={i} className="font-mono text-xs text-purple-600 mb-1">
+                    缺口#{i + 1}: 预期 {new Date(g.expectedTime).toLocaleString('zh-CN')}，实际 {new Date(g.actualTime).toLocaleString('zh-CN')}（间隔 {g.gapMinutes.toFixed(0)} 分钟）
+                  </div>
+                ))}
+              </div>
+            )}
           </Sec>
 
           <Sec title="四、计算结果">
@@ -74,7 +90,7 @@ export default function Report() {
               return <tr key={r.id}><td className="font-mono">{i + 1}</td><td className="font-mono text-xs">{new Date(r.timestamp).toLocaleString('zh-CN')}</td>
                 <td>{r.temperature}{r.temperatureUnit}</td><td>{r.humidity}%</td>
                 <td className="font-semibold">{res ? `${res.totalLoad.toFixed(2)} ${res.totalLoadUnit}` : '-'}</td>
-                <td><span className="status-badge status-badge-normal">{r.recordStatus}</span></td>
+                <td><span className={`status-badge ${RS[r.recordStatus]?.c ?? 'status-badge-normal'}`}>{RS[r.recordStatus]?.l ?? r.recordStatus}</span></td>
                 <td>{src ? <SrcLink file={src.sourceFile} line={src.sourceLine} /> : '-'}</td></tr>;
             })}</tbody></table>
           </Sec>

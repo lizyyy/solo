@@ -4,16 +4,19 @@ import Papa from 'papaparse';
 import { Upload, FileSpreadsheet, AlertTriangle, CheckCircle, XCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import type { DataRecord } from '@/types';
 import { UnitConverter } from '@/utils/unitConverter';
+import { DataCleaner } from '@/utils/dataCleaner';
 
 type ParsedRow = Record<string, string>;
 
 export default function DataImport() {
   const { currentBatch, importData, runCalculation } = useStore();
-  const [records, setRecords] = useState<DataRecord[]>([]);
+  const [csvRecords, setCsvRecords] = useState<DataRecord[]>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [fileName, setFileName] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const records = currentBatch?.records?.length ? currentBatch.records : csvRecords;
 
   const handleFile = useCallback((file: File) => {
     setFileName(file.name);
@@ -24,7 +27,7 @@ export default function DataImport() {
         if (!currentBatch) return;
         importData(currentBatch.id, results.data, file.name);
         const updated = useStore.getState().currentBatch;
-        if (updated) setRecords(updated.records);
+        if (updated) setCsvRecords(updated.records);
       },
     });
   }, [currentBatch, importData]);
@@ -57,6 +60,9 @@ export default function DataImport() {
   const cleanCount = records.filter(r => r.dataStatus === 'clean').length;
   const missingCount = records.filter(r => r.dataStatus === 'missing').length;
   const mismatchCount = records.filter(r => r.dataStatus === 'unit_mismatch').length;
+  const expectedInterval = currentBatch?.thresholds?.expectedIntervalMinutes ?? 30;
+  const gapResult = records.length >= 2 ? DataCleaner.detectGaps(records, expectedInterval) : { gaps: [] };
+  const gapCount = gapResult.gaps.length;
 
   const rowBg = (r: DataRecord) => {
     if (r.dataStatus === 'missing') return 'bg-yellow-50';
@@ -126,7 +132,7 @@ export default function DataImport() {
               <CheckCircle size={16} />
               <span>数据质量概览</span>
             </div>
-            <div className="p-4 grid grid-cols-4 gap-3">
+            <div className="p-4 grid grid-cols-5 gap-3">
               <div className="industrial-card p-3 text-center">
                 <div className="font-mono text-2xl font-bold text-primary-700">{totalRecords}</div>
                 <div className="font-mono text-xs text-primary-500">总记录</div>
@@ -137,13 +143,29 @@ export default function DataImport() {
               </div>
               <div className="industrial-card p-3 text-center border-l-4 border-l-yellow-400">
                 <div className="font-mono text-2xl font-bold text-yellow-600">{missingCount}</div>
-                <div className="font-mono text-xs text-yellow-600">缺失</div>
+                <div className="font-mono text-xs text-yellow-600">缺失字段</div>
               </div>
               <div className="industrial-card p-3 text-center border-l-4 border-l-orange-400">
                 <div className="font-mono text-2xl font-bold text-orange-600">{mismatchCount}</div>
                 <div className="font-mono text-xs text-orange-600">单位异常</div>
               </div>
+              <div className="industrial-card p-3 text-center border-l-4 border-l-purple-400">
+                <div className="font-mono text-2xl font-bold text-purple-600">{gapCount}</div>
+                <div className="font-mono text-xs text-purple-600">采样缺口</div>
+              </div>
             </div>
+            {gapCount > 0 && (
+              <div className="px-4 pb-4">
+                <div className="bg-purple-50 border border-purple-200 rounded p-3">
+                  <div className="font-mono text-xs font-semibold text-purple-700 mb-2">采样缺口详情（期望间隔: {expectedInterval}分钟）</div>
+                  {gapResult.gaps.map((g, i) => (
+                    <div key={i} className="font-mono text-xs text-purple-600 mb-1">
+                      缺口#{i + 1}: {new Date(g.expectedTime).toLocaleString('zh-CN')} → {new Date(g.actualTime).toLocaleString('zh-CN')}（实际间隔 {g.gapMinutes.toFixed(0)} 分钟）
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="industrial-card">

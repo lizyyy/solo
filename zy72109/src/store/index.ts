@@ -45,7 +45,7 @@ const DEFAULT_PARAMS: PhysicsParams = {
 };
 
 const DEFAULT_THRESHOLDS: ThresholdConfig = {
-  maxCoolingLoad: 500,
+  maxCoolingLoad: 800,
   maxCoolingLoadUnit: 'kW',
   warningRatio: 0.8,
   extremeOutlierThreshold: 1.5,
@@ -156,9 +156,10 @@ export const useStore = create<AppStore>((set, get) => ({
           'kW'
         );
 
-        calculationResults.forEach((result, idx) => {
-          const record = b.records[idx];
+        const records = b.records.map((record, idx) => {
+          const result = calculationResults[idx];
           const existingAbnormal = abnormalRecords.find(a => a.recordId === record.id);
+          let newStatus = record.recordStatus;
           
           if (result.totalLoad > maxLoadKw) {
             if (!existingAbnormal) {
@@ -173,6 +174,9 @@ export const useStore = create<AppStore>((set, get) => ({
                 confirmStatus: 'pending',
               });
             }
+            if (newStatus !== 'old_caliber') {
+              newStatus = 'extreme';
+            }
           } else if (result.totalLoad > maxLoadKw * b.thresholds.warningRatio) {
             if (!existingAbnormal) {
               abnormalRecords.push({
@@ -186,14 +190,19 @@ export const useStore = create<AppStore>((set, get) => ({
                 confirmStatus: 'pending',
               });
             }
+            if (newStatus === 'normal') {
+              newStatus = 'pending';
+            }
           }
+
+          return newStatus !== record.recordStatus ? { ...record, recordStatus: newStatus } : record;
         });
 
         const allLoads = calculationResults.map(r => r.totalLoad);
         const outlierResult = DataCleaner.detectExtremes(allLoads, b.thresholds.extremeOutlierThreshold);
         
         outlierResult.outlierIndices.forEach(idx => {
-          const record = b.records[idx];
+          const record = records[idx];
           if (record && !abnormalRecords.find(a => a.recordId === record.id)) {
             abnormalRecords.push({
               id: generateId(),
@@ -210,6 +219,7 @@ export const useStore = create<AppStore>((set, get) => ({
 
         return {
           ...b,
+          records,
           calculationResults,
           abnormalRecords,
           status: 'completed' as const,
