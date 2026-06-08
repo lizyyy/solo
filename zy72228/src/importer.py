@@ -242,9 +242,13 @@ class DataImporter:
         if isinstance(amount_str, (int, float)):
             return float(amount_str)
         cleaned = str(amount_str).replace(',', '').replace('，', '').strip()
+        multiplier = 1
+        if '万' in cleaned:
+            multiplier = 10000
+            cleaned = cleaned.replace('万', '')
         match = re.search(r'([-+]?\d+\.?\d*)', cleaned)
         if match:
-            return float(match.group(1))
+            return float(match.group(1)) * multiplier
         raise ValueError(f"无法解析金额: {amount_str}")
 
     def _generate_record_id(self, trade_date: date, amount: float, direction: str) -> str:
@@ -267,13 +271,22 @@ class DataImporter:
 
     def parse_amount_from_email(self, email_remark: str) -> List[float]:
         amounts = []
-        pattern = r'金额[：:\s]*([\d,.]+)'
-        matches = re.findall(pattern, email_remark)
-        for match in matches:
-            try:
-                amounts.append(self._parse_amount(match))
-            except ValueError:
-                continue
+        patterns = [
+            r'金额[：:\s]*([\d,.]+)\s*万',
+            r'金额[：:\s]*([\d,.]+)',
+        ]
+        for pattern in patterns:
+            matches = re.findall(pattern, email_remark)
+            for match in matches:
+                try:
+                    val = self._parse_amount(match)
+                    if '万' in pattern:
+                        val *= 10000
+                    amounts.append(val)
+                except ValueError:
+                    continue
+            if amounts:
+                break
         return amounts
 
     def reset_import_state(self):

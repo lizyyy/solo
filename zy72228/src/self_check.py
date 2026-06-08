@@ -86,18 +86,25 @@ class SelfChecker:
         
         for flow in current_flows:
             original = original_map.get(flow.flow_id)
-            if not original:
-                continue
-            
-            if (original.settlement_type == SettlementType.T1 and
-                flow.settlement_type == SettlementType.T2 and
-                flow.is_manual_modified):
-                modifications.append(flow.flow_id)
-                modified_by = flow.modified_by or "未知用户"
-                modified_time = flow.modified_time.strftime('%Y-%m-%d %H:%M') if flow.modified_time else "未知时间"
-                details.append(
-                    f"流水号 {flow.flow_id}: 由 {modified_by} 在 {modified_time} 将 T+1 改为 T+2，需要基金经理复核"
-                )
+            if original:
+                if (original.settlement_type == SettlementType.T1 and
+                    flow.settlement_type == SettlementType.T2 and
+                    flow.is_manual_modified):
+                    modifications.append(flow.flow_id)
+                    modified_by = flow.modified_by or "未知用户"
+                    modified_time = flow.modified_time.strftime('%Y-%m-%d %H:%M') if flow.modified_time else "未知时间"
+                    details.append(
+                        f"流水号 {flow.flow_id}: 由 {modified_by} 在 {modified_time} 将 T+1 改为 T+2，需要基金经理复核"
+                    )
+            else:
+                if (flow.is_manual_modified and
+                    flow.settlement_type == SettlementType.T2):
+                    modifications.append(flow.flow_id)
+                    modified_by = flow.modified_by or "未知用户"
+                    modified_time = flow.modified_time.strftime('%Y-%m-%d %H:%M') if flow.modified_time else "未知时间"
+                    details.append(
+                        f"流水号 {flow.flow_id}: 由 {modified_by} 在 {modified_time} 新增并设为 T+2 到账，需要基金经理复核"
+                    )
         
         passed = len(modifications) == 0
         

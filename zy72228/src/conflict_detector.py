@@ -48,22 +48,10 @@ class ConflictDetector:
                     conflict = self._check_single_flow_vs_email(flow, record)
                     if conflict:
                         new_conflicts.append(conflict)
-            
-            email_tails = self.importer.parse_tail_from_email(record.email_remark)
-            email_amounts = self.importer.parse_amount_from_email(record.email_remark)
-            
-            for flow in flows:
-                if flow.flow_id == record.linked_flow_id:
-                    continue
-                
-                for email_tail in email_tails:
-                    if self._tails_conflict(flow.flow_tail, email_tail):
-                        conflict = self._create_conflict_record(
-                            flow, record, email_tail,
-                            email_amounts[0] if email_amounts else None
-                        )
-                        if not self._is_duplicate_conflict(conflict, new_conflicts):
-                            new_conflicts.append(conflict)
+            else:
+                conflict = self._try_match_flow_by_email(flows, record)
+                if conflict:
+                    new_conflicts.append(conflict)
         
         self.conflicts.extend(new_conflicts)
         return new_conflicts
@@ -87,6 +75,22 @@ class ConflictDetector:
             return self._create_conflict_record(flow, record, email_tail, email_amount)
         
         return None
+
+    def _try_match_flow_by_email(
+        self,
+        flows: List[CounterFlow],
+        record: MarginRecord
+    ) -> Optional[ConflictRecord]:
+        email_tails = self.importer.parse_tail_from_email(record.email_remark)
+        if not email_tails:
+            return None
+        email_amounts = self.importer.parse_amount_from_email(record.email_remark)
+        for flow in flows:
+            for et in email_tails:
+                if not self._tails_conflict(flow.flow_tail, et):
+                    return None
+        email_amount = email_amounts[0] if email_amounts else None
+        return self._create_conflict_record(flows[0], record, email_tails[0], email_amount)
 
     def _tails_conflict(self, counter_tail: str, email_tail: str) -> bool:
         ct = counter_tail.strip()
@@ -236,22 +240,33 @@ class ConflictDetector:
         
         for modified in modified_flows:
             original = original_map.get(modified.flow_id)
-            if not original:
-                continue
-            
-            if (original.settlement_type == SettlementType.T1 and
-                modified.settlement_type == SettlementType.T2 and
-                modified.is_manual_modified):
-                changes.append({
-                    "type": "T+1改为T+2",
-                    "flow_id": modified.flow_id,
-                    "original_settlement": original.settlement_type.value,
-                    "modified_settlement": modified.settlement_type.value,
-                    "modified_by": modified.modified_by,
-                    "modified_time": modified.modified_time,
-                    "trade_date": modified.trade_date,
-                    "needs_review": True
-                })
+            if original:
+                if (original.settlement_type == SettlementType.T1 and
+                    modified.settlement_type == SettlementType.T2 and
+                    modified.is_manual_modified):
+                    changes.append({
+                        "type": "T+1改为T+2",
+                        "flow_id": modified.flow_id,
+                        "original_settlement": original.settlement_type.value,
+                        "modified_settlement": modified.settlement_type.value,
+                        "modified_by": modified.modified_by,
+                        "modified_time": modified.modified_time,
+                        "trade_date": modified.trade_date,
+                        "needs_review": True
+                    })
+            else:
+                if (modified.is_manual_modified and
+                    modified.settlement_type == SettlementType.T2):
+                    changes.append({
+                        "type": "新增手工T+2",
+                        "flow_id": modified.flow_id,
+                        "original_settlement": "无(新增)",
+                        "modified_settlement": modified.settlement_type.value,
+                        "modified_by": modified.modified_by,
+                        "modified_time": modified.modified_time,
+                        "trade_date": modified.trade_date,
+                        "needs_review": True
+                    })
         
         return changes
 
