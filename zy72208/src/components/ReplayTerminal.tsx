@@ -20,57 +20,56 @@ export const ReplayTerminal: React.FC<ReplayTerminalProps> = ({ batchId, batchNo
 
 set -e
 
+BATCH="${batchNo}"
+
 echo "================================================"
 echo "  保险佣金阶梯结算 - 批次复盘"
-echo "  批次: ${batchNo}"
+echo "  批次: $BATCH"
 echo "================================================"
 
 echo ""
-echo "[1/5] 重置数据库（可选，如需完整重放）"
+echo "[1/5] 重置该批次数据（可选，如需完整重放）"
 echo "----------------------------------------"
-# npm run settlement -- reset
-echo "→ 跳过数据库重置（如需完整重放，取消上一行注释）"
+# npm run settlement:reset -- --batch="$BATCH"
+echo "→ 跳过批次重置（如需完整重放，取消上一行注释）"
 
 echo ""
 echo "[2/5] 导入除权日截图数据"
 echo "----------------------------------------"
-npm run settlement -- import --batch "${batchNo}"
+npm run settlement:import -- --batch="$BATCH"
 echo "✓ 数据导入完成"
 
 echo ""
 echo "[3/5] 执行四类自检"
 echo "----------------------------------------"
-npm run settlement -- self-check --batch "${batchNo}" \\
-  --check duplicate_import \\
-  --check mixed_currency \\
-  --check recalc_after_supplement \\
-  --check export_consistency
+npm run settlement:self-check -- --batch="$BATCH"
 echo "✓ 自检完成"
 
 echo ""
-echo "[4/5] 应用审计操作"
+echo "[4/5] 应用审计操作（风控复核 + 审计确认）"
 echo "----------------------------------------"
-npm run settlement -- replay-actions --batch "${batchNo}"
+npm run settlement:replay-actions -- --batch="$BATCH" --step=risk_control
+npm run settlement:replay-actions -- --batch="$BATCH" --step=audit
 echo "✓ 审计操作重放完成"
 
 echo ""
 echo "[5/5] 生成导出报告"
 echo "----------------------------------------"
-npm run settlement -- export-report --batch "${batchNo}" --format xlsx
+npm run settlement:export-report -- --batch="$BATCH" --format=xlsx
 echo "✓ 报告生成完成"
 
 echo ""
 echo "================================================"
 echo "  复盘完成！"
-echo "  报告位置: ./exports/${batchNo}-settlement.xlsx"
+echo "  报告位置: ./data/exports/"
 echo "================================================"
 
-# API 调用方式（备选）
+# API 调用方式（备选，需先启动服务 npm run server:dev）
 # ----------------------------------------
 # # 1. 导入数据
 # curl -X POST http://localhost:3001/api/batches \\
 #   -H "Content-Type: application/json" \\
-#   -d '{"batchNo":"${batchNo}","sourceFile":"screenshot.xlsx"}'
+#   -d '{"rawData":[...],"operator":"复盘","importSource":"PASTE"}'
 #
 # # 2. 执行自检
 # curl -X POST http://localhost:3001/api/batches/${batchId}/self-check
@@ -78,10 +77,12 @@ echo "================================================"
 # # 3. 风控复核
 # curl -X POST http://localhost:3001/api/batches/${batchId}/risk-review \\
 #   -H "Content-Type: application/json" \\
-#   -d '{"updates":[...]}'
+#   -d '{"operator":"风控复核","updates":[...]}'
 #
 # # 4. 审计更新
-# curl -X POST http://localhost:3001/api/batches/${batchId}/audit-update
+# curl -X POST http://localhost:3001/api/batches/${batchId}/audit-update \\
+#   -H "Content-Type: application/json" \\
+#   -d '{"operator":"审计确认","statusUpdates":[...]}'
 #
 # # 5. 导出
 # curl -O -J http://localhost:3001/api/export/${batchId}?format=xlsx

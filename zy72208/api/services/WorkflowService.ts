@@ -54,9 +54,10 @@ export class WorkflowService {
     rawRows: ImportRawRow[],
     operator: string,
     importSource: ImportSource,
-    fileHash?: string
+    fileHash?: string,
+    preferredBatchNo?: string
   ): Promise<SettlementBatch & { details: SettlementDetail[] }> {
-    const batchNo = this.generateBatchNo();
+    const batchNo = preferredBatchNo || this.generateBatchNo();
     const now = new Date().toISOString();
 
     const createTransaction = db.transaction(() => {

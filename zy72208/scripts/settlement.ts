@@ -80,7 +80,22 @@ async function commandImport(batchArg: string, source: string) {
     console.log(`[IMPORT] 使用示例数据，已保存至: ${samplePath}`);
   }
 
-  const result = await workflowService.step1Import(rawData, 'CLI_OPERATOR', 'PASTE');
+  if (batchArg) {
+    const existing = batchRepository.findByBatchNo(batchArg);
+    if (existing) {
+      console.log(`[IMPORT] 批次 ${batchArg} 已存在(ID: ${existing.id})，先重置再导入`);
+      db.transaction(() => {
+        db.prepare('DELETE FROM self_check_results WHERE batch_id = ?').run(existing.id);
+        db.prepare('DELETE FROM audit_logs WHERE batch_id = ?').run(existing.id);
+        db.prepare('DELETE FROM settlement_details WHERE batch_id = ?').run(existing.id);
+        db.prepare('DELETE FROM original_snapshots WHERE batch_id = ?').run(existing.id);
+        db.prepare('DELETE FROM settlement_batches WHERE id = ?').run(existing.id);
+      })();
+      console.log(`[IMPORT] 旧批次数据已清除`);
+    }
+  }
+
+  const result = await workflowService.step1Import(rawData, 'CLI_OPERATOR', 'PASTE', undefined, batchArg || undefined);
   console.log(`[IMPORT] 导入完成，批次号: ${result.batchNo}`);
   console.log(`[IMPORT] 总记录数: ${result.totalRecords}, 异常数: ${result.exceptionRecords}`);
   console.log(`[IMPORT] 批次ID: ${result.id}`);
@@ -269,12 +284,20 @@ async function main() {
 保险佣金阶梯结算 - 命令行工具
 ======================================
 可用命令:
+  npx tsx scripts/settlement.ts import --batch=<批次号> [--source=<数据文件路径>]
+  npx tsx scripts/settlement.ts self-check --batch=<批次号> [--type=<DUPLICATE_IMPORT|MIXED_CURRENCY|RECALC_AFTER_SUPPLEMENT|EXPORT_CONSISTENCY>]
+  npx tsx scripts/settlement.ts replay-actions --batch=<批次号> [--step=<risk_control|audit>]
+  npx tsx scripts/settlement.ts finalize --batch=<批次号> [--verify]
+  npx tsx scripts/settlement.ts export-report --batch=<批次号> [--format=<xlsx|txt>]
+  npx tsx scripts/settlement.ts reset --batch=<批次号>
+
+快捷 npm 脚本:
+  npm run settlement:import -- --batch=<批次号>
+  npm run settlement:self-check -- --batch=<批次号>
+  npm run settlement:replay-actions -- --batch=<批次号> --step=risk_control
+  npm run settlement:finalize -- --batch=<批次号>
+  npm run settlement:export-report -- --batch=<批次号>
   npm run settlement:reset -- --batch=<批次号>
-  npm run settlement:import -- --batch=<批次号> --source=<数据文件路径>
-  npm run settlement:self-check -- --batch=<批次号> --type=<DUPLICATE_IMPORT|MIXED_CURRENCY|RECALC_AFTER_SUPPLEMENT|EXPORT_CONSISTENCY>
-  npm run settlement:replay-actions -- --batch=<批次号> --step=<risk_control|audit>
-  npm run settlement:finalize -- --batch=<批次号> --verify
-  npm run settlement:export-report -- --batch=<批次号> --format=<xlsx|txt>
         `);
     }
     process.exit(0);
