@@ -1,6 +1,5 @@
 import json
-from typing import Dict, List, Optional, Any, Tuple
-from .models import CoordinateOrigin, InspectionPhoto, PreflightRecord
+from typing import Dict, Optional, Any
 
 
 class Visualizer:
@@ -145,29 +144,17 @@ class Visualizer:
             return json.dumps(data, indent=2, ensure_ascii=False)
         return str(data)
 
-    def get_replay_commands(self) -> List[str]:
-        commands = []
+    def get_replay_data(self) -> Dict[str, Any]:
+        origins_data = []
+        photos_data = []
         for record in self.preflight_manager.get_all_preflight_records():
-            for entry in record.history:
-                cmd = self._history_to_command(entry)
-                if cmd:
-                    commands.append(cmd)
-        return commands
-
-    def _history_to_command(self, history_entry: Dict[str, Any]) -> Optional[str]:
-        action = history_entry.get("action")
-        details = history_entry.get("details", {})
-        actor = history_entry.get("actor", "system")
-
-        cmd_map = {
-            "import": f"airbridge import --origin={details.get('origin_id')} --actor={actor}",
-            "photo_added": f"airbridge add-photo --photo={details.get('photo_id')} --origin={details.get('photo_id')} --actor={actor}",
-            "remark_updated": f"airbridge update-remark --photo={details.get('photo_id')} --remark='{details.get('new_remark')}' --actor={actor}",
-            "submitted_for_review": f"airbridge submit-review --record={details.get('photo_id')} --photo={details.get('photo_id')} --actor={actor}",
-            "block_confirmed": f"airbridge manager-review --record={details.get('photo_id')} --blocked=true --actor={actor}",
-            "block_cleared": f"airbridge manager-review --record={details.get('photo_id')} --blocked=false --actor={actor}",
-            "block_resolved": f"airbridge resolve-block --photo={details.get('photo_id')} --resolution={details.get('resolution')} --actor={actor}",
-            "rollback": f"airbridge rollback --record={details.get('photo_id')} --actor={actor}",
+            origin = self.preflight_manager.get_coordinate_origin(record.coordinate_origin_id)
+            if origin:
+                origins_data.append(origin.to_dict())
+            photos = self.preflight_manager.get_photos_by_origin_id(record.coordinate_origin_id)
+            for photo in photos:
+                photos_data.append(photo.to_dict())
+        return {
+            "coordinate_origins": origins_data,
+            "inspection_photos": photos_data,
         }
-
-        return cmd_map.get(action)

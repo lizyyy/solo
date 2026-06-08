@@ -1,6 +1,6 @@
 import json
 from datetime import datetime
-from typing import Dict, List, Any, Optional, Callable
+from typing import Dict, List, Any, Optional
 from .models import CoordinateOrigin, InspectionPhoto
 
 
@@ -121,48 +121,150 @@ class WorkflowEngine:
         })
 
     def generate_replay_script(self) -> str:
-        commands = self.visualizer.get_replay_commands()
-        script_content = [
+        pm = self.preflight_manager
+        rm = self.review_manager
+
+        origins_data = []
+        photos_data = []
+        remark_updates_data = []
+
+        for record in pm.get_all_preflight_records():
+            origin = pm.get_coordinate_origin(record.coordinate_origin_id)
+            if origin:
+                origins_data.append(origin.to_dict())
+
+            photos = pm.get_photos_by_origin_id(record.coordinate_origin_id)
+            for photo in photos:
+                photos_data.append(photo.to_dict())
+
+            for entry in record.history:
+                if entry["action"] == "remark_updated":
+                    remark_updates_data.append({
+                        "photo_id": entry["details"]["photo_id"],
+                        "old_remark": entry["details"]["old_remark"],
+                        "new_remark": entry["details"]["new_remark"],
+                        "actor": entry["actor"],
+                    })
+
+        replay_payload = json.dumps({
+            "coordinate_origins": origins_data,
+            "inspection_photos": photos_data,
+            "remark_updates": remark_updates_data,
+        }, indent=2, ensure_ascii=False)
+
+        payload_literal = repr(replay_payload)
+
+        header = '\n'.join([
             "#!/usr/bin/env python3",
             "# 机场廊桥停靠预演 - 重放脚本",
             "# 生成时间: " + datetime.now().isoformat(),
             "",
             "import sys",
+            "import json",
+            "",
             "sys.path.insert(0, '.')",
             "",
             "from airbridge import PreflightManager, ReviewManager, Visualizer, WorkflowEngine",
             "from airbridge.models import CoordinateOrigin, InspectionPhoto",
             "",
+            "",
+            "REPLAY_DATA = json.loads(" + payload_literal + ")",
+            "",
+            "",
+        ])
+
+        body = '\n'.join([
             "def replay():",
             "    pm = PreflightManager()",
             "    rm = ReviewManager(pm)",
             "    vz = Visualizer(pm)",
             "    we = WorkflowEngine(pm, rm, vz)",
-            "    ",
-            "    print('开始重放机场廊桥停靠预演流程...')",
+            "",
+            "    # ===== 步骤 1: 导入坐标原点说明 =====",
+            "    print('[步骤 1] 导入坐标原点说明...')",
+            "    print('-' * 60)",
+            "    for origin_dict in REPLAY_DATA['coordinate_origins']:",
+            "        origin = CoordinateOrigin(",
+            "            id=origin_dict['id'],",
+            "            name=origin_dict['name'],",
+            "            x=origin_dict['x'],",
+            "            y=origin_dict['y'],",
+            "            z=origin_dict['z'],",
+            "            description=origin_dict.get('description', ''),",
+            "        )",
+            "        created, skipped = pm.import_coordinate_origins([origin], actor='system_initial')",
+            "        print(f'  导入 {origin.name}: 创建={len(created)}, 跳过={len(skipped)}')",
             "    print()",
             "",
-        ]
-
-        for i, cmd in enumerate(commands, 1):
-            if cmd:
-                script_content.append(f"    # 步骤 {i}")
-                script_content.append(f"    print('执行: {cmd}')")
-                script_content.append(f"    # {cmd}")
-                script_content.append("")
-
-        script_content.extend([
+            "    # ===== 步骤 2: 展陈设计师阿景补看巡检照片编号 =====",
+            "    print('[步骤 2] 展陈设计师阿景补看巡检照片编号...')",
+            "    print('-' * 60)",
+            "    for photo_dict in REPLAY_DATA['inspection_photos']:",
+            "        original_remark = photo_dict['remark']",
+            "        for upd in REPLAY_DATA['remark_updates']:",
+            "            if upd['photo_id'] == photo_dict['id'] and upd['old_remark'] != upd['new_remark']:",
+            "                original_remark = upd['old_remark']",
+            "                break",
+            "        photo = InspectionPhoto(",
+            "            id=photo_dict['id'],",
+            "            photo_number=photo_dict['photo_number'],",
+            "            coordinate_origin_id=photo_dict['coordinate_origin_id'],",
+            "            remark=original_remark,",
+            "            has_mobile_screenshot=photo_dict['has_mobile_screenshot'],",
+            "            alert_label_visible=photo_dict['alert_label_visible'],",
+            "        )",
+            "        rec = pm.add_inspection_photo(photo, actor='designer_ajing')",
+            "        if rec:",
+            "            blocked = '遮挡' if photo.is_alert_label_blocked() else '正常'",
+            "            print(f'  添加照片 {photo.photo_number}: {blocked}')",
             "    print()",
-            "    print('重放完成！')",
-            "    print(f'预演记录总数: {len(pm.get_all_preflight_records())}')",
-            "    print(f'待复核记录数: {len(rm.get_records_needing_review())}')",
+            "",
+            "    # ===== 步骤 3: 安全距离报告更新 + 备注修改 =====",
+            "    print('[步骤 3] 安全距离报告更新...')",
+            "    print('-' * 60)",
+            "    for upd in REPLAY_DATA['remark_updates']:",
+            "        result = pm.update_photo_remark(",
+            "            upd['photo_id'], upd['new_remark'], actor=upd['actor'],",
+            "        )",
+            "        if result and result.get('changed'):",
+            "            print(f\"  备注更新: 照片={upd['photo_id']}, 改前={result['old']}, 改后={result['new']}\")",
+            "",
+            "    # 提交施工经理复核",
+            "    need_review = rm.get_records_needing_review()",
+            "    for rec in need_review:",
+            "        photos = pm.get_photos_by_origin_id(rec.coordinate_origin_id)",
+            "        for p in photos:",
+            "            if p.is_alert_label_blocked():",
+            "                rm.submit_for_manager_review(rec.id, p.id, submitter='designer_ajing')",
+            "                print(f'  提交复核: 照片={p.photo_number}')",
+            "    print()",
+            "",
+            "    # ===== 输出结果摘要 =====",
+            "    print('=' * 60)",
+            "    print('重放完成！结果摘要：')",
+            "    print('=' * 60)",
+            "    all_records = pm.get_all_preflight_records()",
+            "    print(f'  预演记录总数: {len(all_records)}')",
+            "    for r in all_records:",
+            "        o = pm.get_coordinate_origin(r.coordinate_origin_id)",
+            "        ps = pm.get_photos_by_origin_id(r.coordinate_origin_id)",
+            "        blocked_photos = [p for p in ps if p.is_alert_label_blocked()]",
+            "        origin_name = o.name if o else '未知'",
+            "        review_flag = '是' if r.status in ('needs_review', 'manager_review') else '否'",
+            "        print(f'  记录 {r.id}:')",
+            "        print(f'    坐标原点: {origin_name}')",
+            "        print(f'    状态: {r.status}')",
+            "        print(f'    照片数: {len(ps)}, 其中遮挡: {len(blocked_photos)}')",
+            "        print(f'    待复核: {review_flag}')",
+            "    print(f'  待复核记录数: {len(rm.get_records_needing_review())}')",
+            "",
             "",
             "if __name__ == '__main__':",
             "    replay()",
             "",
         ])
 
-        return "\n".join(script_content)
+        return header + body
 
     def verify_history_diff(self, record_id: str) -> Optional[Dict[str, Any]]:
         history = self.preflight_manager.get_record_history(record_id)

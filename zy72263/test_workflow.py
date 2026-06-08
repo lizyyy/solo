@@ -110,6 +110,13 @@ def run_test():
     print(f"  提交施工经理复核: {result['step3_update_report']['records_submitted_for_manager_review']} 条")
     print()
 
+    print("[输出] 生成重放脚本（在三步流程完成后、验证测试前捕获状态）...")
+    print("-" * 60)
+    with open("replay_script.py", "w") as f:
+        f.write(we.generate_replay_script())
+    print("  重放脚本 -> replay_script.py")
+    print()
+
     print("[验证] 移动端截图挡住告警标签处理...")
     print("-" * 60)
     need_review = rm.get_records_needing_review()
@@ -163,16 +170,12 @@ def run_test():
             print(f"  回滚后状态: {rolled_back.status}")
     print()
 
-    print("[输出] 可复盘记录和重放命令...")
+    print("[输出] 可复盘记录和可视化报告...")
     print("-" * 60)
 
     with open("workflow_log.json", "w") as f:
         f.write(we.export_workflow_log())
     print("  工作流日志 -> workflow_log.json")
-
-    with open("replay_script.py", "w") as f:
-        f.write(we.generate_replay_script())
-    print("  重放脚本 -> replay_script.py")
 
     with open("visualization_report.json", "w") as f:
         f.write(vz.export_visualization_report())

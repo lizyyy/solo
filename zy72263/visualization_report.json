@@ -13,7 +13,7 @@
         },
         "status": "manager_review",
         "has_block": true,
-        "record_id": "preflight_9c64f189"
+        "record_id": "preflight_63611db2"
       },
       {
         "id": "origin_002",
@@ -25,7 +25,7 @@
         },
         "status": "photo_attached",
         "has_block": false,
-        "record_id": "preflight_f5ecae47"
+        "record_id": "preflight_a142b1e1"
       }
     ],
     "interaction": {
@@ -53,7 +53,7 @@
   "records": [
     {
       "record": {
-        "id": "preflight_9c64f189",
+        "id": "preflight_63611db2",
         "coordinate_origin_id": "origin_001",
         "status": "manager_review",
         "review_status": "pending",
@@ -64,7 +64,7 @@
         "review_comment": "",
         "history": [
           {
-            "timestamp": "2026-06-03T17:49:16.853328",
+            "timestamp": "2026-06-08T21:37:44.578349",
             "action": "import",
             "actor": "system_initial",
             "details": {
@@ -73,7 +73,7 @@
             }
           },
           {
-            "timestamp": "2026-06-03T17:49:16.853358",
+            "timestamp": "2026-06-08T21:37:44.578389",
             "action": "photo_added",
             "actor": "designer_ajing",
             "details": {
@@ -84,7 +84,7 @@
             }
           },
           {
-            "timestamp": "2026-06-03T17:49:16.853361",
+            "timestamp": "2026-06-08T21:37:44.578391",
             "action": "photo_added",
             "actor": "designer_ajing",
             "details": {
@@ -95,7 +95,7 @@
             }
           },
           {
-            "timestamp": "2026-06-03T17:49:16.853368",
+            "timestamp": "2026-06-08T21:37:44.578398",
             "action": "remark_updated",
             "actor": "designer_ajing",
             "details": {
@@ -105,7 +105,7 @@
             }
           },
           {
-            "timestamp": "2026-06-03T17:49:16.853371",
+            "timestamp": "2026-06-08T21:37:44.578400",
             "action": "remark_updated",
             "actor": "designer_ajing",
             "details": {
@@ -115,7 +115,7 @@
             }
           },
           {
-            "timestamp": "2026-06-03T17:49:16.853377",
+            "timestamp": "2026-06-08T21:37:44.578409",
             "action": "submitted_for_review",
             "actor": "designer_ajing",
             "details": {
@@ -125,7 +125,7 @@
             }
           },
           {
-            "timestamp": "2026-06-03T17:49:16.853443",
+            "timestamp": "2026-06-08T21:37:44.578896",
             "action": "block_resolved",
             "actor": "designer_ajing",
             "details": {
@@ -134,7 +134,7 @@
             }
           },
           {
-            "timestamp": "2026-06-03T17:49:16.853446",
+            "timestamp": "2026-06-08T21:37:44.578899",
             "action": "rollback",
             "actor": "system",
             "details": {
@@ -143,13 +143,13 @@
                 "review_status": "pending",
                 "block_detected": true,
                 "block_verified": null,
-                "timestamp": "2026-06-03T17:49:16.853441"
+                "timestamp": "2026-06-08T21:37:44.578893"
               }
             }
           }
         ],
-        "created_at": "2026-06-03T17:49:16.853326",
-        "updated_at": "2026-06-03T17:49:16.853446"
+        "created_at": "2026-06-08T21:37:44.578347",
+        "updated_at": "2026-06-08T21:37:44.578899"
       },
       "origin": {
         "id": "origin_001",
@@ -159,7 +159,7 @@
         "z": 5.2,
         "description": "主廊桥停靠点，安全距离要求3.5米",
         "metadata": {},
-        "created_at": "2026-06-03T17:49:16.853260",
+        "created_at": "2026-06-08T21:37:44.578207",
         "version": 1
       },
       "photos": [
@@ -173,8 +173,8 @@
           "alert_label_visible": true,
           "alert_label_area": null,
           "metadata": {},
-          "created_at": "2026-06-03T17:49:16.853353",
-          "updated_at": "2026-06-03T17:49:16.853368"
+          "created_at": "2026-06-08T21:37:44.578381",
+          "updated_at": "2026-06-08T21:37:44.578398"
         },
         {
           "id": "photo_002",
@@ -186,14 +186,14 @@
           "alert_label_visible": true,
           "alert_label_area": null,
           "metadata": {},
-          "created_at": "2026-06-03T17:49:16.853354",
-          "updated_at": "2026-06-03T17:49:16.853442"
+          "created_at": "2026-06-08T21:37:44.578383",
+          "updated_at": "2026-06-08T21:37:44.578895"
         }
       ]
     },
     {
       "record": {
-        "id": "preflight_f5ecae47",
+        "id": "preflight_a142b1e1",
         "coordinate_origin_id": "origin_002",
         "status": "photo_attached",
         "review_status": "pending",
@@ -204,7 +204,7 @@
         "review_comment": "",
         "history": [
           {
-            "timestamp": "2026-06-03T17:49:16.853343",
+            "timestamp": "2026-06-08T21:37:44.578368",
             "action": "import",
             "actor": "system_initial",
             "details": {
@@ -213,7 +213,7 @@
             }
           },
           {
-            "timestamp": "2026-06-03T17:49:16.853363",
+            "timestamp": "2026-06-08T21:37:44.578393",
             "action": "photo_added",
             "actor": "designer_ajing",
             "details": {
@@ -224,8 +224,8 @@
             }
           }
         ],
-        "created_at": "2026-06-03T17:49:16.853342",
-        "updated_at": "2026-06-03T17:49:16.853362"
+        "created_at": "2026-06-08T21:37:44.578367",
+        "updated_at": "2026-06-08T21:37:44.578393"
       },
       "origin": {
         "id": "origin_002",
@@ -235,7 +235,7 @@
         "z": 5.2,
         "description": "备用廊桥停靠点",
         "metadata": {},
-        "created_at": "2026-06-03T17:49:16.853262",
+        "created_at": "2026-06-08T21:37:44.578209",
         "version": 1
       },
       "photos": [
@@ -249,8 +249,8 @@
           "alert_label_visible": true,
           "alert_label_area": null,
           "metadata": {},
-          "created_at": "2026-06-03T17:49:16.853355",
-          "updated_at": "2026-06-03T17:49:16.853356"
+          "created_at": "2026-06-08T21:37:44.578384",
+          "updated_at": "2026-06-08T21:37:44.578384"
         }
       ]
     }
