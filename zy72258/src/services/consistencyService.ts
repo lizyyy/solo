@@ -33,6 +33,26 @@ function prepareExportData(rows: CanonicalResult['rows']) {
   }));
 }
 
+async function simulateApiResponse(): Promise<{
+  data: CanonicalResult['rows'] | null;
+  hash: string;
+  rowCount: number;
+  version: string;
+}> {
+  const canonicalResult = await getLatestCanonicalResult();
+  if (!canonicalResult) {
+    return { data: null, hash: '', rowCount: 0, version: '' };
+  }
+  const serialized = JSON.parse(JSON.stringify(canonicalResult.rows));
+  const hash = await calculateChecksum(serialized);
+  return {
+    data: serialized,
+    hash,
+    rowCount: serialized.length,
+    version: canonicalResult.version,
+  };
+}
+
 function generateCSVContent(data: ReturnType<typeof prepareExportData>): string {
   const headers = Object.keys(data[0] || {}).join(',');
   const rows = data.map(row =>
@@ -71,16 +91,17 @@ export async function checkConsistency(
   }
 
   const pageData = canonicalResult.rows;
-  const apiData = canonicalResult.rows;
+  const apiResponse = await simulateApiResponse();
+  const apiData = apiResponse.data;
   const exportData = prepareExportData(canonicalResult.rows);
 
   const pageDataHash = await calculateChecksum(pageData);
-  const apiDataHash = await calculateChecksum(apiData);
+  const apiDataHash = apiResponse.hash;
   const exportDataHash = await calculateChecksum(exportData);
 
   const pageMatchesApi = pageDataHash === apiDataHash;
-  const pageMatchesExport = pageData.length === exportData.length;
-  const apiMatchesExport = apiDataHash === apiDataHash;
+  const pageMatchesExport = pageData.length === exportData.length && pageDataHash === exportDataHash;
+  const apiMatchesExport = apiDataHash === exportDataHash;
   const allConsistent = pageMatchesApi && pageMatchesExport && apiMatchesExport;
 
   const now = Date.now();
@@ -93,7 +114,7 @@ export async function checkConsistency(
       apiDataHash,
       exportDataHash,
       pageRowCount: pageData.length,
-      apiRowCount: apiData.length,
+      apiRowCount: apiResponse.rowCount,
       exportRowCount: exportData.length,
       pageMatchesApi,
       pageMatchesExport,
@@ -155,7 +176,7 @@ export async function checkConsistency(
       apiDataHash,
       exportDataHash,
       pageRowCount: pageData.length,
-      apiRowCount: apiData.length,
+      apiRowCount: apiResponse.rowCount,
       exportRowCount: exportData.length,
     },
     selfCheckResult,
@@ -283,7 +304,83 @@ export async function runSelfCheck(
       return result;
     }
 
-    case 'recalculation':
+    case 'recalculation': {
+      const coordinateRows = await db.coordinateOrigin.toArray();
+      const supplementedRows = coordinateRows.filter(r => r.processingStatus === 'supplemented');
+      const recalculatedRows = coordinateRows.filter(r => r.processingStatus === 'recalculated');
+      const canonicalResult = await getLatestCanonicalResult();
+
+      let passed = false;
+      let message = '';
+
+      if (supplementedRows.length === 0 && recalculatedRows.length === 0) {
+        passed = true;
+        message = '补录后重算校验通过：无补录待重算记录';
+      } else if (supplementedRows.length > 0) {
+        passed = false;
+        message = `补录后重算校验失败：仍有 ${supplementedRows.length} 条补录记录未完成重算`;
+      } else {
+        if (canonicalResult) {
+          const supplementedInResult = canonicalResult.rows.filter(
+            r => r.status === 'supplemented' || r.status === 'recalculated'
+          );
+          const allRecalculated = supplementedInResult.every(r => r.status === 'recalculated');
+          passed = allRecalculated;
+          message = allRecalculated
+            ? `补录后重算校验通过：${recalculatedRows.length} 条补录记录已全部完成重算`
+            : `补录后重算校验失败：标注结果中仍有未完成重算的补录记录`;
+        } else {
+          passed = false;
+          message = '补录后重算校验失败：无可用标注结果';
+        }
+      }
+
+      const result: SelfCheckResult = {
+        type,
+        passed,
+        checkedAt: now,
+        details: {
+          supplementedCount: supplementedRows.length,
+          recalculatedCount: recalculatedRows.length,
+          supplementedIds: supplementedRows.map(r => r.photoPointId),
+          recalculatedIds: recalculatedRows.map(r => r.photoPointId),
+          canonicalVersion: canonicalResult?.version,
+          canonicalChecksum: canonicalResult?.checksum,
+        },
+        message,
+      };
+
+      await db.transaction('rw', db.selfCheckResults, db.auditLogs, async () => {
+        await db.selfCheckResults.put(result);
+
+        const log: AuditLog = {
+          id: generateId('log_'),
+          timestamp: now,
+          operator,
+          actionType: 'self_check',
+          action: 'self_check_recalculation',
+          message,
+          rerunnableCommand: generateSelfCheckCommand('recalculation', operator),
+          payload: { type },
+          result: { success: passed, details: result.details },
+          success: passed,
+          details: result.details,
+          rowReference: supplementedRows.length > 0
+            ? `原始行号${supplementedRows.map(r => r.originalLineNumber).join(', ')}`
+            : undefined,
+          traceInfo: [{
+            action: '运行补录后重算自检',
+            operator,
+            timestamp: now,
+            details: passed ? '校验通过' : `校验失败，${supplementedRows.length}条未重算`,
+          }],
+        };
+        await db.auditLogs.add(log);
+      });
+
+      return result;
+    }
+
     case 'export_consistency': {
       const checkResult = await checkConsistency(operator);
       return checkResult.selfCheckResult;

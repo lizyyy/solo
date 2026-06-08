@@ -30,7 +30,7 @@ export class AppDatabase extends Dexie {
       coordinateTable: '&id, photoPointId',
       occlusionList: '&id, photoPointId',
       canonicalResults: '&version, generatedAt',
-      auditLogs: '&id, timestamp, operator',
+      auditLogs: '&id, timestamp, operator, action, actionType',
       selfCheckResults: '&type, checkedAt',
       workflowState: '&currentStep',
     });

@@ -277,12 +277,10 @@ export const useCanonicalStore = create<CanonicalStore>((set, get) => ({
   },
 }));
 
-export function useAnnotationRows(): AnnotationRow[] {
-  return useCanonicalStore(state => state.canonicalResult?.rows || []);
-}
+const emptyRows: AnnotationRow[] = [];
 
-export function useMissingRows(): AnnotationRow[] {
-  return useAnnotationRows().filter(r => r.status === 'missing_row');
+export function useAnnotationRows(): AnnotationRow[] {
+  return useCanonicalStore(state => state.canonicalResult?.rows ?? emptyRows);
 }
 
 export function useSingleDataSourceVersion(): string {

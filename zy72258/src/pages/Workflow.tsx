@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import {
   Workflow,
   FileSpreadsheet,
@@ -13,7 +13,7 @@ import {
   Wrench,
   Upload,
 } from 'lucide-react';
-import { useCanonicalStore, useMissingRows } from '../store/canonicalStore';
+import { useCanonicalStore, useAnnotationRows } from '../store/canonicalStore';
 import { db } from '../db';
 import { MOCK_COORDINATE_ORIGIN_CSV } from '../data/mockData';
 import { WORKFLOW_STEP_LABELS, type WorkflowStep } from '../types';
@@ -35,7 +35,8 @@ export function WorkflowPage() {
     currentOperator,
   } = useCanonicalStore();
 
-  const missingRows = useMissingRows();
+  const allRows = useAnnotationRows();
+  const missingRows = useMemo(() => allRows.filter(r => r.status === 'missing_row'), [allRows]);
   const [coordinateRows, setCoordinateRows] = useState<CoordinateOriginRow[]>([]);
   const [occlusionList, setOcclusionList] = useState<OcclusionEntry[]>([]);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);

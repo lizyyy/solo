@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import {
   Database,
   AlertTriangle,
@@ -8,7 +8,7 @@ import {
   FileText,
   Search,
 } from 'lucide-react';
-import { useCanonicalStore, useAnnotationRows, useMissingRows } from '../store/canonicalStore';
+import { useCanonicalStore, useAnnotationRows } from '../store/canonicalStore';
 import { checkConsistency } from '../services/consistencyService';
 import { Crack3DView } from '../components/Crack3DView';
 import { StatusBadge } from '../components/StatusBadge';
@@ -29,7 +29,7 @@ export function Overview() {
   } = useCanonicalStore();
 
   const allRows = useAnnotationRows();
-  const missingRows = useMissingRows();
+  const missingRows = useMemo(() => allRows.filter(r => r.status === 'missing_row'), [allRows]);
 
   const [selectedRow, setSelectedRow] = useState<AnnotationRow | null>(null);
   const [consistencyResult, setConsistencyResult] = useState<{
