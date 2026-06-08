@@ -241,7 +241,7 @@
                             {% for rec in records %}
                             <tr data-point-id="{{ rec.point_id }}" 
                                 data-status="{{ rec.review.status.value if rec.review else '' }}"
-                                data-issues="{{ ','.join([i.value for i in rec.review.issues]) if rec.review else '' }}">
+                                data-issues="{{ rec.review.issues|map(attribute='value')|join(',') if rec.review else '' }}">
                                 <td>
                                     <strong>{{ rec.point_id }}</strong>
                                     {% if rec.point_cloud_log and rec.point_cloud_log.is_manually_modified %}

@@ -52,11 +52,17 @@ class ReviewService:
             review.update_status(ReviewStatus.COORDINATE_SUPPLEMENTED, operator)
             self.data_store.save_review_record(review)
 
+        pc_log = self.data_store.get_point_cloud_log(batch_id)
+        pc_record = None
+        if pc_log:
+            pc_record = next((r for r in pc_log.records if r.point_id == point_id), None)
+
         self.data_store.add_audit_log(AuditLog.create(
             action=AuditAction.SUPPLEMENT_COORDINATE,
             batch_id=batch_id,
             point_id=point_id,
             operator=operator,
+            original_line_number=pc_record.original_line_number if pc_record else None,
             new_value=f"x={x}, y={y}, z={z}",
             remark="补录缺失的坐标"
         ))
@@ -92,7 +98,10 @@ class ReviewService:
             review.safety_radius_record_id = record.record_id
             if not record.is_within_safety:
                 review.add_issue(ReviewIssue.SAFETY_RADIUS_VIOLATION)
-            review.update_status(ReviewStatus.SAFETY_CHECKED, operator)
+            if ReviewIssue.SUPPLEMENTED_COORDINATE in review.issues:
+                review.update_status(ReviewStatus.SAFETY_REVIEW_PENDING, operator)
+            else:
+                review.update_status(ReviewStatus.SAFETY_CHECKED, operator)
             self.data_store.save_review_record(review)
 
         self.data_store.save_safety_radius_table(safety_table)
@@ -134,7 +143,9 @@ class ReviewService:
                     reviewed_by=operator
                 )
             review.occlusion_record_id = record.record_id
-            if review.status in [ReviewStatus.SAFETY_CHECKED, ReviewStatus.COORDINATE_SUPPLEMENTED]:
+            if ReviewIssue.SUPPLEMENTED_COORDINATE in review.issues:
+                review.update_status(ReviewStatus.SAFETY_REVIEW_PENDING, operator)
+            elif review.status in [ReviewStatus.SAFETY_CHECKED, ReviewStatus.COORDINATE_SUPPLEMENTED]:
                 review.update_status(ReviewStatus.OCCLUSION_UPDATED, operator)
             self.data_store.save_review_record(review)
 
@@ -227,7 +238,8 @@ class ReviewService:
             raise ValueError(f"点位{point_id}不存在")
 
         if review.status != ReviewStatus.SAFETY_REVIEW_PENDING:
-            if ReviewIssue.PHOTO_HAS_POINT_NO_COORDINATE in review.issues:
+            if (ReviewIssue.PHOTO_HAS_POINT_NO_COORDINATE in review.issues
+                    or ReviewIssue.SUPPLEMENTED_COORDINATE in review.issues):
                 pass
             else:
                 raise ValueError(f"点位{point_id}当前状态为{review.status.value}，不需要安全员复核")

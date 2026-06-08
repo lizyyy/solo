@@ -1,276 +1,486 @@
 {
   "point_cloud_logs": {
-    "PC-20260603192303": {
-      "log_id": "9aaa49ea-630b-4c5d-a1cc-ae88a65d2004",
-      "batch_id": "PC-20260603192303",
-      "file_name": "test_pc_8.csv",
+    "PC-20260608214202": {
+      "log_id": "bfb39068-4a25-4032-9abc-1d4ed1cc06c8",
+      "batch_id": "PC-20260608214202",
+      "file_name": "station_arrival_thin.csv",
       "records": [
         {
-          "record_id": "e21b0e9d-d7b8-46f8-8d17-2547416ffd07",
+          "record_id": "a6bb89d0-7298-4b2e-b4af-20ee35b27971",
           "original_line_number": 1,
-          "point_id": "P001",
-          "x": 100.0,
-          "y": 200.0,
-          "z": 300.0,
-          "raw_data": "P001,100.0,200.0,300.0",
+          "point_id": "STA-01",
+          "x": 116.391,
+          "y": 39.904,
+          "z": 50.2,
+          "raw_data": "STA-01,116.391,39.904,50.2",
           "is_manually_modified": false,
           "original_x": null,
           "original_y": null,
           "original_z": null,
-          "import_batch_id": "PC-20260603192303",
-          "created_at": "2026-06-03T19:23:03.328861",
-          "updated_at": "2026-06-03T19:23:03.328862"
+          "import_batch_id": "PC-20260608214202",
+          "created_at": "2026-06-08T21:42:02.806024",
+          "updated_at": "2026-06-08T21:42:02.806031"
         },
         {
-          "record_id": "c05ff4e6-0bb0-45cc-949b-5037372128b2",
+          "record_id": "e5075916-5133-4be5-bd66-398bef77835c",
           "original_line_number": 2,
-          "point_id": "P002",
-          "x": 110.0,
-          "y": 210.0,
-          "z": 310.0,
-          "raw_data": "P002,110.0,210.0,310.0",
+          "point_id": "STA-02",
+          "x": 116.392,
+          "y": 39.905,
+          "z": 48.7,
+          "raw_data": "STA-02,116.392,39.905,48.7",
           "is_manually_modified": false,
           "original_x": null,
           "original_y": null,
           "original_z": null,
-          "import_batch_id": "PC-20260603192303",
-          "created_at": "2026-06-03T19:23:03.328875",
-          "updated_at": "2026-06-03T19:23:03.328876"
+          "import_batch_id": "PC-20260608214202",
+          "created_at": "2026-06-08T21:42:02.806181",
+          "updated_at": "2026-06-08T21:42:02.806185"
         },
         {
-          "record_id": "3780b414-5190-4674-8217-e7bc0159cff0",
+          "record_id": "c79e854c-e267-4e18-a63d-4b738c45aeac",
           "original_line_number": 3,
-          "point_id": "P003",
-          "x": 120.0,
-          "y": 220.0,
-          "z": 320.0,
-          "raw_data": "P003,120.0,220.0,320.0",
+          "point_id": "STA-03",
+          "x": 116.393,
+          "y": 39.906,
+          "z": 52.1,
+          "raw_data": "STA-03,116.393,39.906,52.1",
           "is_manually_modified": false,
           "original_x": null,
           "original_y": null,
           "original_z": null,
-          "import_batch_id": "PC-20260603192303",
-          "created_at": "2026-06-03T19:23:03.328896",
-          "updated_at": "2026-06-03T19:23:03.328897"
+          "import_batch_id": "PC-20260608214202",
+          "created_at": "2026-06-08T21:42:02.806223",
+          "updated_at": "2026-06-08T21:42:02.806226"
+        },
+        {
+          "record_id": "5d5fd6b0-d90a-4281-b571-d4ae07dacdd9",
+          "original_line_number": 4,
+          "point_id": "STA-04",
+          "x": 116.394,
+          "y": 39.907,
+          "z": 46.3,
+          "raw_data": "STA-04,116.394,39.907,46.3",
+          "is_manually_modified": false,
+          "original_x": null,
+          "original_y": null,
+          "original_z": null,
+          "import_batch_id": "PC-20260608214202",
+          "created_at": "2026-06-08T21:42:02.806241",
+          "updated_at": "2026-06-08T21:42:02.806242"
         }
       ],
-      "imported_at": "2026-06-03T19:23:03.328823",
+      "imported_at": "2026-06-08T21:42:02.805766",
       "imported_by": "小陶",
       "is_duplicate": false,
       "duplicate_of_batch": null,
-      "checksum": "79889ae1e6d887f351e5d0bd80bff826"
+      "checksum": "7efdf2fe32490bb346524c465589f0f9"
     }
   },
   "coordinate_tables": {
-    "PC-20260603192303": {
-      "table_id": "95e9c655-77a1-433d-aac0-46f7bf8e8bcc",
-      "batch_id": "PC-20260603192303",
-      "file_name": "coord_8.csv",
+    "PC-20260608214202": {
+      "table_id": "4203078a-580f-4e85-acd4-9dd3deac41bf",
+      "batch_id": "PC-20260608214202",
+      "file_name": "station_coord.csv",
       "records": [
         {
-          "record_id": "742265de-afad-422a-a8ac-ebcf5c9f722c",
+          "record_id": "8ed95600-b0f6-4cc7-bd01-9380934b05d7",
           "original_line_number": 1,
-          "point_id": "P001",
-          "x": 100.0,
-          "y": 200.0,
-          "z": 300.0,
+          "point_id": "STA-01",
+          "x": 116.391,
+          "y": 39.904,
+          "z": 50.2,
           "is_supplemented": false,
           "supplemented_by": "",
           "supplemented_at": null,
-          "raw_data": "P001,100.0,200.0,300.0",
-          "created_at": "2026-06-03T19:23:03.330430",
-          "updated_at": "2026-06-03T19:23:03.330431"
+          "raw_data": "STA-01,116.391,39.904,50.2",
+          "created_at": "2026-06-08T21:42:02.930066",
+          "updated_at": "2026-06-08T21:42:02.930068"
         },
         {
-          "record_id": "7b1ee4ad-8558-4efc-a8bf-81ca830c9e26",
+          "record_id": "0a0297af-8d89-4a0c-8ca8-2f546a880610",
           "original_line_number": 2,
-          "point_id": "P002",
-          "x": 110.0,
-          "y": 210.0,
-          "z": 310.0,
+          "point_id": "STA-02",
+          "x": 116.392,
+          "y": 39.905,
+          "z": 48.7,
           "is_supplemented": false,
           "supplemented_by": "",
           "supplemented_at": null,
-          "raw_data": "P002,110.0,210.0,310.0",
-          "created_at": "2026-06-03T19:23:03.330438",
-          "updated_at": "2026-06-03T19:23:03.330438"
+          "raw_data": "STA-02,116.392,39.905,48.7",
+          "created_at": "2026-06-08T21:42:02.930105",
+          "updated_at": "2026-06-08T21:42:02.930106"
         },
         {
-          "record_id": "392917df-40f3-432d-92e0-b27ea8061e8f",
+          "record_id": "5098a9e4-6c5a-4ee0-88ce-83616d61c61a",
           "original_line_number": 3,
-          "point_id": "P003",
-          "x": 120.0,
-          "y": 220.0,
-          "z": 320.0,
+          "point_id": "STA-03",
+          "x": 116.393,
+          "y": 39.906,
+          "z": 52.1,
           "is_supplemented": false,
           "supplemented_by": "",
           "supplemented_at": null,
-          "raw_data": "P003,120.0,220.0,320.0",
-          "created_at": "2026-06-03T19:23:03.330443",
-          "updated_at": "2026-06-03T19:23:03.330443"
+          "raw_data": "STA-03,116.393,39.906,52.1",
+          "created_at": "2026-06-08T21:42:02.930118",
+          "updated_at": "2026-06-08T21:42:02.930119"
+        },
+        {
+          "record_id": "01ce41e0-f374-4102-8421-88f760c199c7",
+          "original_line_number": -1,
+          "point_id": "STA-04",
+          "x": 116.394,
+          "y": 39.907,
+          "z": 46.3,
+          "is_supplemented": true,
+          "supplemented_by": "小陶",
+          "supplemented_at": "2026-06-08T21:42:55.821100",
+          "raw_data": "SUPPLEMENTED:STA-04,116.394,39.907,46.3",
+          "created_at": "2026-06-08T21:42:55.821169",
+          "updated_at": "2026-06-08T21:42:55.821170"
         }
       ],
-      "imported_at": "2026-06-03T19:23:03.330412",
+      "imported_at": "2026-06-08T21:42:02.930016",
       "imported_by": "小陶"
     }
   },
   "photo_points": {
-    "PC-20260603192303": {
-      "P001": {
-        "point_id": "P001",
-        "photo_id": "PHOTO_001",
-        "x_in_photo": 100.0,
-        "y_in_photo": 200.0,
+    "PC-20260608214202": {
+      "STA-01": {
+        "point_id": "STA-01",
+        "photo_id": "PHOTO_NORTH",
+        "x_in_photo": 120.0,
+        "y_in_photo": 80.0,
         "has_point": true,
         "marked_by": "小陶",
-        "marked_at": "2026-06-03T19:23:03.329607",
+        "marked_at": "2026-06-08T21:42:02.913247",
         "remark": ""
       },
-      "P002": {
-        "point_id": "P002",
-        "photo_id": "PHOTO_001",
+      "STA-02": {
+        "point_id": "STA-02",
+        "photo_id": "PHOTO_NORTH",
+        "x_in_photo": 200.0,
+        "y_in_photo": 95.0,
+        "has_point": true,
+        "marked_by": "小陶",
+        "marked_at": "2026-06-08T21:42:02.913707",
+        "remark": ""
+      },
+      "STA-03": {
+        "point_id": "STA-03",
+        "photo_id": "PHOTO_EAST",
         "x_in_photo": 150.0,
-        "y_in_photo": 250.0,
+        "y_in_photo": 110.0,
         "has_point": true,
         "marked_by": "小陶",
-        "marked_at": "2026-06-03T19:23:03.329855",
+        "marked_at": "2026-06-08T21:42:02.914066",
         "remark": ""
       },
-      "P003": {
-        "point_id": "P003",
-        "photo_id": "PHOTO_002",
-        "x_in_photo": 80.0,
-        "y_in_photo": 180.0,
+      "STA-04": {
+        "point_id": "STA-04",
+        "photo_id": "PHOTO_EAST",
+        "x_in_photo": 180.0,
+        "y_in_photo": 130.0,
         "has_point": true,
         "marked_by": "小陶",
-        "marked_at": "2026-06-03T19:23:03.330107",
+        "marked_at": "2026-06-08T21:42:02.914524",
         "remark": ""
       }
     }
   },
-  "safety_radius_tables": {},
+  "safety_radius_tables": {
+    "PC-20260608214202": {
+      "table_id": "e7855949-5fb5-4715-b382-ed5b00925ad3",
+      "batch_id": "PC-20260608214202",
+      "building_name": "A栋",
+      "records": [
+        {
+          "record_id": "23fb2e83-d1a7-435a-8c34-ba5ddef7b1b6",
+          "point_id": "STA-01",
+          "building_name": "A栋",
+          "safety_radius": 25.0,
+          "measured_distance": 30.5,
+          "is_within_safety": true,
+          "remark": "",
+          "checked_by": "小陶",
+          "checked_at": "2026-06-08T21:42:55.935824"
+        },
+        {
+          "record_id": "41d5519e-b7ab-4f98-b857-577716080b41",
+          "point_id": "STA-02",
+          "building_name": "A栋",
+          "safety_radius": 20.0,
+          "measured_distance": 18.2,
+          "is_within_safety": false,
+          "remark": "",
+          "checked_by": "小陶",
+          "checked_at": "2026-06-08T21:42:55.936807"
+        },
+        {
+          "record_id": "e2e251ca-274e-459c-a745-e4242a224333",
+          "point_id": "STA-03",
+          "building_name": "A栋",
+          "safety_radius": 15.0,
+          "measured_distance": 10.0,
+          "is_within_safety": false,
+          "remark": "",
+          "checked_by": "小陶",
+          "checked_at": "2026-06-08T21:42:55.937434"
+        },
+        {
+          "record_id": "fd822e6e-648b-4492-9f6b-905742b7b610",
+          "point_id": "STA-04",
+          "building_name": "A栋",
+          "safety_radius": 25.0,
+          "measured_distance": 22.0,
+          "is_within_safety": false,
+          "remark": "",
+          "checked_by": "小陶",
+          "checked_at": "2026-06-08T21:42:55.938021"
+        }
+      ],
+      "created_at": "2026-06-08T21:42:55.935810",
+      "created_by": "小陶"
+    }
+  },
   "review_records": {
-    "PC-20260603192303": {
-      "P001": {
-        "review_id": "1d21be53-6577-4bf6-94c9-e35c383efcdc",
-        "batch_id": "PC-20260603192303",
-        "point_id": "P001",
-        "status": "待复核",
+    "PC-20260608214202": {
+      "STA-01": {
+        "review_id": "652d2dc5-0370-43a7-8527-05d5e720e303",
+        "batch_id": "PC-20260608214202",
+        "point_id": "STA-01",
+        "status": "遮挡点清单已更新",
         "issues": [],
-        "point_cloud_log_record_id": "e21b0e9d-d7b8-46f8-8d17-2547416ffd07",
+        "point_cloud_log_record_id": "a6bb89d0-7298-4b2e-b4af-20ee35b27971",
         "coordinate_record_id": null,
-        "photo_point_id": "P001",
-        "safety_radius_record_id": null,
-        "occlusion_record_id": null,
+        "photo_point_id": "STA-01",
+        "safety_radius_record_id": "23fb2e83-d1a7-435a-8c34-ba5ddef7b1b6",
+        "occlusion_record_id": "6fa06f94-c7d6-4a02-aeae-aafdbce1cb2f",
         "reviewed_by": "小陶",
         "reviewed_at": null,
         "safety_reviewed_by": "",
         "safety_reviewed_at": null,
         "remarks": "",
-        "created_at": "2026-06-03T19:23:03.331237",
-        "updated_at": "2026-06-03T19:23:03.331238"
+        "created_at": "2026-06-08T21:42:02.915002",
+        "updated_at": "2026-06-08T21:42:56.003251"
       },
-      "P002": {
-        "review_id": "b6051c71-021e-4ea5-a52d-5bd484b32f4a",
-        "batch_id": "PC-20260603192303",
-        "point_id": "P002",
-        "status": "待复核",
-        "issues": [],
-        "point_cloud_log_record_id": "c05ff4e6-0bb0-45cc-949b-5037372128b2",
+      "STA-02": {
+        "review_id": "7b8ecb76-4100-4c37-81ef-a19f29b7b77d",
+        "batch_id": "PC-20260608214202",
+        "point_id": "STA-02",
+        "status": "安全半径已核对",
+        "issues": [
+          "安全半径不满足"
+        ],
+        "point_cloud_log_record_id": "e5075916-5133-4be5-bd66-398bef77835c",
         "coordinate_record_id": null,
-        "photo_point_id": "P002",
-        "safety_radius_record_id": null,
+        "photo_point_id": "STA-02",
+        "safety_radius_record_id": "41d5519e-b7ab-4f98-b857-577716080b41",
         "occlusion_record_id": null,
         "reviewed_by": "小陶",
         "reviewed_at": null,
         "safety_reviewed_by": "",
         "safety_reviewed_at": null,
         "remarks": "",
-        "created_at": "2026-06-03T19:23:03.331643",
-        "updated_at": "2026-06-03T19:23:03.331644"
+        "created_at": "2026-06-08T21:42:02.915491",
+        "updated_at": "2026-06-08T21:42:55.936812"
       },
-      "P003": {
-        "review_id": "1bef14c1-95aa-456b-9c0e-68ddc4d0a869",
-        "batch_id": "PC-20260603192303",
-        "point_id": "P003",
-        "status": "待复核",
-        "issues": [],
-        "point_cloud_log_record_id": "3780b414-5190-4674-8217-e7bc0159cff0",
+      "STA-03": {
+        "review_id": "403811fc-5e1d-4521-a92b-aba116e9c1df",
+        "batch_id": "PC-20260608214202",
+        "point_id": "STA-03",
+        "status": "遮挡点清单已更新",
+        "issues": [
+          "安全半径不满足"
+        ],
+        "point_cloud_log_record_id": "c79e854c-e267-4e18-a63d-4b738c45aeac",
         "coordinate_record_id": null,
-        "photo_point_id": "P003",
-        "safety_radius_record_id": null,
-        "occlusion_record_id": null,
+        "photo_point_id": "STA-03",
+        "safety_radius_record_id": "e2e251ca-274e-459c-a745-e4242a224333",
+        "occlusion_record_id": "2c398be1-cc19-4f16-8f3a-a68b9f11ca7d",
         "reviewed_by": "小陶",
         "reviewed_at": null,
         "safety_reviewed_by": "",
         "safety_reviewed_at": null,
         "remarks": "",
-        "created_at": "2026-06-03T19:23:03.332052",
-        "updated_at": "2026-06-03T19:23:03.332052"
+        "created_at": "2026-06-08T21:42:02.915955",
+        "updated_at": "2026-06-08T21:42:56.004119"
+      },
+      "STA-04": {
+        "review_id": "e971f1d8-4530-4e9c-8a31-abeffd89bd33",
+        "batch_id": "PC-20260608214202",
+        "point_id": "STA-04",
+        "status": "正常",
+        "issues": [
+          "坐标为补录",
+          "安全半径不满足"
+        ],
+        "point_cloud_log_record_id": "5d5fd6b0-d90a-4281-b571-d4ae07dacdd9",
+        "coordinate_record_id": "01ce41e0-f374-4102-8421-88f760c199c7",
+        "photo_point_id": "STA-04",
+        "safety_radius_record_id": "fd822e6e-648b-4492-9f6b-905742b7b610",
+        "occlusion_record_id": null,
+        "reviewed_by": "小陶",
+        "reviewed_at": "2026-06-08T21:42:55.938025",
+        "safety_reviewed_by": "安全员老张",
+        "safety_reviewed_at": "2026-06-08T21:42:56.133656",
+        "remarks": "已核对该台站点位，坐标补录与点云数据一致",
+        "created_at": "2026-06-08T21:42:02.916394",
+        "updated_at": "2026-06-08T21:42:56.133651"
       }
     }
   },
-  "occlusion_lists": {},
+  "occlusion_lists": {
+    "PC-20260608214202": {
+      "list_id": "00834a6f-ff62-44b3-b3a8-8fd99a8bd5bb",
+      "batch_id": "PC-20260608214202",
+      "records": [
+        {
+          "record_id": "6fa06f94-c7d6-4a02-aeae-aafdbce1cb2f",
+          "point_id": "STA-01",
+          "occlusion_type": "天际线遮挡",
+          "description": "北侧树冠局部遮挡",
+          "is_confirmed": false,
+          "confirmed_by": "",
+          "confirmed_at": null,
+          "created_at": "2026-06-08T21:42:56.003246"
+        },
+        {
+          "record_id": "2c398be1-cc19-4f16-8f3a-a68b9f11ca7d",
+          "point_id": "STA-03",
+          "occlusion_type": "其他遮挡",
+          "description": "无遮挡",
+          "is_confirmed": false,
+          "confirmed_by": "",
+          "confirmed_at": null,
+          "created_at": "2026-06-08T21:42:56.004115"
+        }
+      ],
+      "created_at": "2026-06-08T21:42:56.003219",
+      "created_by": "小陶",
+      "updated_at": "2026-06-08T21:42:56.003229"
+    }
+  },
   "audit_logs": [
     {
-      "log_id": "b9738538-0872-43cc-8e80-b10c0eeaf247",
+      "log_id": "5b1b30fc-8dd3-42f1-81e6-ff4f9eddb83d",
       "action": "导入点云抽稀日志",
-      "batch_id": "PC-20260603192303",
+      "batch_id": "PC-20260608214202",
       "point_id": null,
       "operator": "小陶",
-      "timestamp": "2026-06-03T19:23:03.329339",
+      "timestamp": "2026-06-08T21:42:02.807961",
       "original_value": null,
       "new_value": null,
       "original_line_number": null,
-      "remark": "导入点云抽稀日志，共3条记录"
+      "remark": "导入点云抽稀日志，共4条记录"
     },
     {
-      "log_id": "875ff7c5-a2b7-43c0-878b-3ce197a39d69",
+      "log_id": "32e902b3-151b-4428-b79c-a8233950dcfd",
       "action": "导入坐标表",
-      "batch_id": "PC-20260603192303",
+      "batch_id": "PC-20260608214202",
       "point_id": null,
       "operator": "小陶",
-      "timestamp": "2026-06-03T19:23:03.330846",
+      "timestamp": "2026-06-08T21:42:02.931080",
       "original_value": null,
       "new_value": null,
       "original_line_number": null,
       "remark": "导入坐标表，共3条记录"
     },
     {
-      "log_id": "94f3d9e4-10a2-4057-9ec0-f3420a4bd1b0",
-      "action": "导出数据",
-      "batch_id": "PC-20260603192303",
-      "point_id": null,
+      "log_id": "86fe4d0b-aef2-4ebb-a837-df11406c64bc",
+      "action": "检测到照片有点位但坐标表缺行",
+      "batch_id": "PC-20260608214202",
+      "point_id": "STA-04",
       "operator": "小陶",
-      "timestamp": "2026-06-03T19:23:03.332552",
+      "timestamp": "2026-06-08T21:42:02.932229",
+      "original_value": null,
+      "new_value": null,
+      "original_line_number": 4,
+      "remark": "照片有点位但坐标表缺一行"
+    },
+    {
+      "log_id": "22297b3d-e0a5-4a47-9246-427950ac8d91",
+      "action": "补录坐标",
+      "batch_id": "PC-20260608214202",
+      "point_id": "STA-04",
+      "operator": "小陶",
+      "timestamp": "2026-06-08T21:42:55.822840",
+      "original_value": null,
+      "new_value": "x=116.394, y=39.907, z=46.3",
+      "original_line_number": 4,
+      "remark": "补录缺失的坐标"
+    },
+    {
+      "log_id": "0e734676-c6fd-45ba-856f-2b289c2bf057",
+      "action": "补录后重算",
+      "batch_id": "PC-20260608214202",
+      "point_id": "STA-04",
+      "operator": "小陶",
+      "timestamp": "2026-06-08T21:42:55.823427",
       "original_value": null,
       "new_value": null,
       "original_line_number": null,
-      "remark": "导出CSV文件，共3条记录"
+      "remark": "补录后重新计算"
     },
     {
-      "log_id": "2187582d-1b7e-4c6e-bb39-cbbb1c85900a",
+      "log_id": "866afcf4-5817-4e85-b477-83f555a6e52f",
+      "action": "核对安全半径",
+      "batch_id": "PC-20260608214202",
+      "point_id": null,
+      "operator": "小陶",
+      "timestamp": "2026-06-08T21:42:55.939301",
+      "original_value": null,
+      "new_value": null,
+      "original_line_number": null,
+      "remark": "核对A栋安全半径，共4条记录"
+    },
+    {
+      "log_id": "eaf49f4a-915a-4d26-aabd-c410c8075d1d",
+      "action": "更新遮挡点清单",
+      "batch_id": "PC-20260608214202",
+      "point_id": null,
+      "operator": "小陶",
+      "timestamp": "2026-06-08T21:42:56.005732",
+      "original_value": null,
+      "new_value": null,
+      "original_line_number": null,
+      "remark": "更新遮挡点清单，共2条记录"
+    },
+    {
+      "log_id": "5713e106-8bb7-4641-9072-eddc6fee1d0f",
+      "action": "安全员复核通过（正常）",
+      "batch_id": "PC-20260608214202",
+      "point_id": "STA-04",
+      "operator": "安全员老张",
+      "timestamp": "2026-06-08T21:42:56.135368",
+      "original_value": null,
+      "new_value": null,
+      "original_line_number": null,
+      "remark": "安全员复核通过，状态改为正常。备注：已核对该台站点位，坐标补录与点云数据一致"
+    },
+    {
+      "log_id": "adffa29a-1940-4781-9e7f-9d29275e32ae",
+      "action": "导出数据",
+      "batch_id": "PC-20260608214202",
+      "point_id": null,
+      "operator": "小陶",
+      "timestamp": "2026-06-08T21:43:31.207303",
+      "original_value": null,
+      "new_value": null,
+      "original_line_number": null,
+      "remark": "导出CSV文件，共4条记录"
+    },
+    {
+      "log_id": "b6687278-7ddc-4591-a8a5-0ae261de0fc0",
       "action": "导出一致性检查",
-      "batch_id": "PC-20260603192303",
+      "batch_id": "PC-20260608214202",
       "point_id": null,
       "operator": "小陶",
-      "timestamp": "2026-06-03T19:23:03.333074",
+      "timestamp": "2026-06-08T21:43:31.209333",
       "original_value": null,
       "new_value": null,
       "original_line_number": null,
-      "remark": "导出一致性检查通过，API记录数3，CSV记录数3"
-    },
-    {
-      "log_id": "20aacf8d-d960-490e-8547-e4122cb7d25d",
-      "action": "导出数据",
-      "batch_id": "PC-20260603192303",
-      "point_id": null,
-      "operator": "小陶",
-      "timestamp": "2026-06-03T19:23:03.333618",
-      "original_value": null,
-      "new_value": null,
-      "original_line_number": null,
-      "remark": "导出CSV文件，共3条记录"
+      "remark": "导出一致性检查通过，API记录数4，CSV记录数4"
     }
   ]
 }

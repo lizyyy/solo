@@ -87,11 +87,17 @@ class SelfCheckService:
                     review.update_status(ReviewStatus.PHOTO_HAS_POINT_NO_COORDINATE, operator)
                     self.data_store.save_review_record(review)
 
+                    pc_log = self.data_store.get_point_cloud_log(batch_id)
+                    pc_record = None
+                    if pc_log:
+                        pc_record = next((r for r in pc_log.records if r.point_id == point_id), None)
+
                     self.data_store.add_audit_log(AuditLog.create(
                         action=AuditAction.DETECT_MISSING_COORDINATE,
                         batch_id=batch_id,
                         point_id=point_id,
                         operator=operator,
+                        original_line_number=pc_record.original_line_number if pc_record else None,
                         remark="照片有点位但坐标表缺一行"
                     ))
 
