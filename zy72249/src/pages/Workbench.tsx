@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Upload, FileSearch, Terminal, FileText, AlertTriangle, ShieldAlert, Clock } from 'lucide-react'
 import StepIndicator from '@/components/StepIndicator'
+import TaxRemarkPanel from '@/components/TaxRemarkPanel'
 import { useStore } from '@/store'
 
 function useCountUp(target: number, duration = 800) {
@@ -39,8 +40,9 @@ function StatCard({ icon: Icon, label, value, color }: { icon: typeof Upload; la
 }
 
 export default function Workbench() {
-  const { currentBatch, workflowStep, fetchBatches, createBatch, importRecords, compareBatch, fetchReplayCommand, replayData, auditLogs, fetchAuditLogs } = useStore()
+  const { currentBatch, workflowStep, fetchBatches, createBatch, importRecords, fetchBatchDetail, fetchReplayCommand, replayData, auditLogs, fetchAuditLogs } = useStore()
   const [showCreate, setShowCreate] = useState(false)
+  const [showTaxRemark, setShowTaxRemark] = useState(false)
   const [batchName, setBatchName] = useState('')
 
   useEffect(() => {
@@ -71,7 +73,15 @@ export default function Workbench() {
 
   const handleCompare = async () => {
     if (!batch) return
-    await compareBatch(batch.id)
+    setShowTaxRemark(true)
+  }
+
+  const handleTaxRemarkClose = () => {
+    setShowTaxRemark(false)
+    if (batch) {
+      fetchBatchDetail(batch.id)
+      fetchAuditLogs({ batchId: batch.id })
+    }
   }
 
   const handleReplay = async () => {
@@ -172,6 +182,10 @@ export default function Workbench() {
             )}
           </div>
         </>
+      )}
+
+      {showTaxRemark && (
+        <TaxRemarkPanel onClose={handleTaxRemarkClose} />
       )}
     </div>
   )
