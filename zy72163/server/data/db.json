@@ -3,8 +3,8 @@
     "locations": [
       {
         "id": 1,
-        "createdAt": "2026-06-02T11:23:07.302Z",
-        "updatedAt": "2026-06-02T11:23:07.303Z",
+        "createdAt": "2026-06-08T09:00:12.883Z",
+        "updatedAt": "2026-06-08T09:00:12.884Z",
         "name": "南京西路1266号恒隆广场门口",
         "normalizedName": "南京西1266恒隆广场门",
         "address": "南京西路1266号",
@@ -15,8 +15,8 @@
       },
       {
         "id": 2,
-        "createdAt": "2026-06-02T11:23:07.304Z",
-        "updatedAt": "2026-06-02T11:23:07.304Z",
+        "createdAt": "2026-06-08T09:00:12.885Z",
+        "updatedAt": "2026-06-08T09:00:12.885Z",
         "name": "人民大道200号市政府大院",
         "normalizedName": "人民大200市政府大院",
         "address": "人民大道200号",
@@ -27,8 +27,8 @@
       },
       {
         "id": 3,
-        "createdAt": "2026-06-02T11:23:07.304Z",
-        "updatedAt": "2026-06-02T11:23:07.304Z",
+        "createdAt": "2026-06-08T09:00:12.886Z",
+        "updatedAt": "2026-06-08T09:00:12.886Z",
         "name": "淮海中路999号环贸广场",
         "normalizedName": "淮海中999环贸广场",
         "address": "淮海中路999号",
@@ -39,8 +39,8 @@
       },
       {
         "id": 4,
-        "createdAt": "2026-06-02T11:23:07.304Z",
-        "updatedAt": "2026-06-02T11:23:07.304Z",
+        "createdAt": "2026-06-08T09:00:12.886Z",
+        "updatedAt": "2026-06-08T09:00:12.886Z",
         "name": "世纪大道1号东方明珠",
         "normalizedName": "世纪大1东方明珠",
         "address": "世纪大道1号",
@@ -51,8 +51,8 @@
       },
       {
         "id": 5,
-        "createdAt": "2026-06-02T11:23:07.305Z",
-        "updatedAt": "2026-06-02T11:23:07.305Z",
+        "createdAt": "2026-06-08T09:00:12.887Z",
+        "updatedAt": "2026-06-08T09:00:12.887Z",
         "name": "外滩中山东一路33号",
         "normalizedName": "外滩中山东33",
         "address": "中山东一路33号",
@@ -63,8 +63,8 @@
       },
       {
         "id": 6,
-        "createdAt": "2026-06-02T11:23:07.305Z",
-        "updatedAt": "2026-06-02T11:23:07.305Z",
+        "createdAt": "2026-06-08T09:00:12.887Z",
+        "updatedAt": "2026-06-08T09:00:12.887Z",
         "name": "虹桥路1号港汇恒隆",
         "normalizedName": "虹桥1港汇恒隆",
         "address": "虹桥路1号",
@@ -72,79 +72,107 @@
         "lng": 121.43,
         "street": "虹桥路",
         "district": "徐汇区"
+      },
+      {
+        "id": 7,
+        "createdAt": "2026-06-08T09:04:18.580Z",
+        "updatedAt": "2026-06-08T09:04:18.580Z",
+        "name": "延安西路1000号",
+        "normalizedName": "延安西1000",
+        "address": "延安西路1000号",
+        "lat": 31.218,
+        "lng": 121.44,
+        "street": "延安西路",
+        "district": "长宁区"
       }
     ],
     "location_aliases": [
       {
         "id": 1,
-        "createdAt": "2026-06-02T11:23:07.303Z",
-        "updatedAt": "2026-06-02T11:23:07.303Z",
+        "createdAt": "2026-06-08T09:00:12.884Z",
+        "updatedAt": "2026-06-08T09:00:12.884Z",
         "locationId": 1,
         "alias": "南京西路1266号恒隆广场门口",
         "isManual": 1
       },
       {
         "id": 2,
-        "createdAt": "2026-06-02T11:23:07.303Z",
-        "updatedAt": "2026-06-02T11:23:07.303Z",
+        "createdAt": "2026-06-08T09:00:12.885Z",
+        "updatedAt": "2026-06-08T09:00:12.885Z",
         "locationId": 1,
         "alias": "恒隆广场正门大树",
         "isManual": 0
       },
       {
         "id": 3,
-        "createdAt": "2026-06-02T11:23:07.304Z",
-        "updatedAt": "2026-06-02T11:23:07.304Z",
+        "createdAt": "2026-06-08T09:00:12.885Z",
+        "updatedAt": "2026-06-08T09:00:12.885Z",
         "locationId": 2,
         "alias": "人民大道200号市政府大院",
         "isManual": 1
       },
       {
         "id": 4,
-        "createdAt": "2026-06-02T11:23:07.304Z",
-        "updatedAt": "2026-06-02T11:23:07.304Z",
+        "createdAt": "2026-06-08T09:00:12.886Z",
+        "updatedAt": "2026-06-08T09:00:12.886Z",
         "locationId": 3,
         "alias": "淮海中路999号环贸广场",
         "isManual": 1
       },
       {
         "id": 5,
-        "createdAt": "2026-06-02T11:23:07.304Z",
-        "updatedAt": "2026-06-02T11:23:07.304Z",
+        "createdAt": "2026-06-08T09:00:12.886Z",
+        "updatedAt": "2026-06-08T09:00:12.886Z",
         "locationId": 4,
         "alias": "世纪大道1号东方明珠",
         "isManual": 1
       },
       {
         "id": 6,
-        "createdAt": "2026-06-02T11:23:07.305Z",
-        "updatedAt": "2026-06-02T11:23:07.305Z",
+        "createdAt": "2026-06-08T09:00:12.886Z",
+        "updatedAt": "2026-06-08T09:00:12.886Z",
         "locationId": 1,
         "alias": "南京西路1266号",
         "isManual": 0
       },
       {
         "id": 7,
-        "createdAt": "2026-06-02T11:23:07.305Z",
-        "updatedAt": "2026-06-02T11:23:07.305Z",
+        "createdAt": "2026-06-08T09:00:12.887Z",
+        "updatedAt": "2026-06-08T09:00:12.887Z",
         "locationId": 5,
         "alias": "外滩中山东一路33号",
         "isManual": 1
       },
       {
         "id": 8,
-        "createdAt": "2026-06-02T11:23:07.305Z",
-        "updatedAt": "2026-06-02T11:23:07.305Z",
+        "createdAt": "2026-06-08T09:00:12.887Z",
+        "updatedAt": "2026-06-08T09:00:12.887Z",
         "locationId": 6,
         "alias": "虹桥路1号港汇恒隆",
         "isManual": 1
+      },
+      {
+        "id": 9,
+        "createdAt": "2026-06-08T09:04:18.581Z",
+        "updatedAt": "2026-06-08T09:04:18.581Z",
+        "locationId": 7,
+        "alias": "延安西路1000号",
+        "isManual": 1
+      },
+      {
+        "id": 10,
+        "createdAt": "2026-06-08T09:04:18.582Z",
+        "updatedAt": "2026-06-08T09:04:18.582Z",
+        "locationId": 1,
+        "alias": "南京西路1266号恒隆广场",
+        "isManual": 0
       }
     ],
     "resident_feedbacks": [
       {
         "id": 1,
-        "createdAt": "2026-06-02T11:23:07.303Z",
-        "updatedAt": "2026-06-02T11:23:07.303Z",
+        "createdAt": "2026-06-08T09:00:12.885Z",
+        "updatedAt": "2026-06-08T09:00:12.885Z",
         "locationId": 1,
         "feedbackNo": "FB202401001",
         "reporter": "张女士",
@@ -159,8 +187,8 @@
       },
       {
         "id": 2,
-        "createdAt": "2026-06-02T11:23:07.303Z",
-        "updatedAt": "2026-06-02T11:23:07.303Z",
+        "createdAt": "2026-06-08T09:00:12.885Z",
+        "updatedAt": "2026-06-08T09:00:12.885Z",
         "locationId": 1,
         "feedbackNo": "FB202401008",
         "reporter": "李先生",
@@ -175,8 +203,8 @@
       },
       {
         "id": 3,
-        "createdAt": "2026-06-02T11:23:07.304Z",
-        "updatedAt": "2026-06-02T11:23:07.304Z",
+        "createdAt": "2026-06-08T09:00:12.886Z",
+        "updatedAt": "2026-06-08T09:00:12.886Z",
         "locationId": 2,
         "feedbackNo": "FB202401002",
         "reporter": "王师傅",
@@ -191,8 +219,8 @@
       },
       {
         "id": 4,
-        "createdAt": "2026-06-02T11:23:07.304Z",
-        "updatedAt": "2026-06-02T11:23:07.304Z",
+        "createdAt": "2026-06-08T09:00:12.886Z",
+        "updatedAt": "2026-06-08T09:00:12.886Z",
         "locationId": 3,
         "feedbackNo": "FB202401003",
         "reporter": null,
@@ -207,8 +235,8 @@
       },
       {
         "id": 5,
-        "createdAt": "2026-06-02T11:23:07.304Z",
-        "updatedAt": "2026-06-02T11:23:07.304Z",
+        "createdAt": "2026-06-08T09:00:12.886Z",
+        "updatedAt": "2026-06-08T09:00:12.886Z",
         "locationId": 4,
         "feedbackNo": "FB202401004",
         "reporter": "赵先生",
@@ -223,8 +251,8 @@
       },
       {
         "id": 6,
-        "createdAt": "2026-06-02T11:23:07.305Z",
-        "updatedAt": "2026-06-02T11:23:07.305Z",
+        "createdAt": "2026-06-08T09:00:12.886Z",
+        "updatedAt": "2026-06-08T09:00:12.886Z",
         "locationId": 1,
         "feedbackNo": "FB202401005",
         "reporter": "陈阿姨",
@@ -239,8 +267,8 @@
       },
       {
         "id": 7,
-        "createdAt": "2026-06-02T11:23:07.305Z",
-        "updatedAt": "2026-06-02T11:23:07.305Z",
+        "createdAt": "2026-06-08T09:00:12.887Z",
+        "updatedAt": "2026-06-08T09:00:12.887Z",
         "locationId": 5,
         "feedbackNo": "FB202401006",
         "reporter": "孙先生",
@@ -255,8 +283,8 @@
       },
       {
         "id": 8,
-        "createdAt": "2026-06-02T11:23:07.306Z",
-        "updatedAt": "2026-06-02T11:23:07.306Z",
+        "createdAt": "2026-06-08T09:00:12.888Z",
+        "updatedAt": "2026-06-08T09:00:12.888Z",
         "locationId": 6,
         "feedbackNo": "FB202401007",
         "reporter": null,
@@ -268,34 +296,102 @@
         "status": "pending",
         "priority": "medium",
         "assignedTo": null
+      },
+      {
+        "id": 9,
+        "createdAt": "2026-06-08T09:04:18.582Z",
+        "updatedAt": "2026-06-08T09:04:18.582Z",
+        "locationId": 7,
+        "feedbackNo": "FB202401009",
+        "reporter": "刘先生",
+        "phone": null,
+        "feedbackDate": "2024-02-01",
+        "content": "行道树根把人行道地砖拱起了",
+        "rawContent": "【居委会上报】刘先生：延安西路1000号门口，行道树的根把人行道的地砖都拱起来了，老人走路容易绊倒！",
+        "source": "居委会上报",
+        "status": "pending",
+        "priority": "high",
+        "assignedTo": null
+      },
+      {
+        "id": 10,
+        "createdAt": "2026-06-08T09:04:18.583Z",
+        "updatedAt": "2026-06-08T09:04:18.583Z",
+        "locationId": 1,
+        "feedbackNo": null,
+        "reporter": null,
+        "phone": null,
+        "feedbackDate": "2024-02-05",
+        "content": "上次修剪后树枝又长出来了",
+        "rawContent": "上次修完才两个月，树枝又长出来了，能不能一次修彻底一点？",
+        "source": "电话回访",
+        "status": "pending",
+        "priority": "medium",
+        "assignedTo": null
       }
     ],
     "inspection_photos": [],
     "street_notes": [
       {
         "id": 1,
-        "createdAt": "2026-06-02T11:23:07.306Z",
-        "updatedAt": "2026-06-02T11:23:07.306Z",
+        "createdAt": "2026-06-08T09:00:12.888Z",
+        "updatedAt": "2026-06-08T09:00:12.888Z",
         "locationId": 1,
         "streetName": "南京西路",
         "content": "南京西路全段梧桐树每年3-4月统一修剪，注意避开客流高峰时段。",
         "author": "绿化养护队",
         "source": "养护手册"
+      },
+      {
+        "id": 2,
+        "createdAt": "2026-06-08T09:07:52.333Z",
+        "updatedAt": "2026-06-08T09:07:52.333Z",
+        "locationId": 7,
+        "streetName": "延安西路",
+        "content": "何工备注：树根拱起问题需协调市政部门处理",
+        "author": "何工",
+        "source": "人工备注"
+      },
+      {
+        "id": 3,
+        "createdAt": "2026-06-08T09:08:12.560Z",
+        "updatedAt": "2026-06-08T09:08:12.560Z",
+        "locationId": 7,
+        "streetName": "延安西路",
+        "content": "何工备注：树根拱起问题需协调市政部门处理",
+        "author": "何工",
+        "source": "人工备注"
       }
     ],
     "plan_versions": [
       {
         "id": 1,
-        "createdAt": "2026-06-02T11:23:57.841Z",
-        "updatedAt": "2026-06-02T11:23:57.841Z",
+        "createdAt": "2026-06-08T09:07:52.974Z",
+        "updatedAt": "2026-06-08T09:07:52.974Z",
         "locationId": 1,
         "version": "1.0",
-        "title": "南京西路1266号树木修剪方案",
-        "description": "处理居民反馈的3个问题：1)树枝挡人行道 2)树枝挡招牌 3)马蜂窝问题",
+        "title": "南京西路1266号综合修剪方案v2",
+        "description": "处理所有反馈问题",
         "pruningType": "综合修剪",
-        "estimatedDate": "2024-02-15",
+        "estimatedDate": "2024-03-15",
         "contractor": "绿化养护一队",
-        "cost": 2500,
+        "cost": 3500,
+        "status": "draft",
+        "createdBy": "何工",
+        "parentVersionId": null
+      },
+      {
+        "id": 2,
+        "createdAt": "2026-06-08T09:08:21.698Z",
+        "updatedAt": "2026-06-08T09:08:21.698Z",
+        "locationId": 1,
+        "version": "2.0",
+        "title": "南京西路1266号综合修剪方案",
+        "description": "处理所有反馈问题",
+        "pruningType": "综合修剪",
+        "estimatedDate": "2024-03-15",
+        "contractor": "绿化养护一队",
+        "cost": 3500,
         "status": "draft",
         "createdBy": "何工",
         "parentVersionId": null
@@ -304,25 +400,42 @@
     "reports": [
       {
         "id": 1,
-        "createdAt": "2026-06-02T11:24:02.069Z",
-        "updatedAt": "2026-06-02T11:24:02.069Z",
+        "createdAt": "2026-06-08T09:07:53.280Z",
+        "updatedAt": "2026-06-08T09:07:53.280Z",
         "planVersionId": 1,
         "locationId": 1,
-        "reportNo": "TP202606026850",
-        "title": "南京西路1266号树木修剪方案 - 修剪报告",
-        "content": "# 南京西路1266号树木修剪方案 - 修剪执行报告\n\n## 一、基本信息\n- 报告编号：TP202606026850\n- 方案版本：1.0\n- 修剪类型：综合修剪\n- 计划日期：2024-02-15\n- 施工单位：绿化养护一队\n- 预计费用：¥2500\n\n## 二、居民反馈汇总\n- [2024-01-22] 陈阿姨: 树上面有个大马蜂窝，太危险了！\n- [2024-01-18] 李先生: 大树枝叶挡住了店铺招牌，影响生意\n- [2024-01-15] 张女士: 门口那棵梧桐树树枝太长，挡到人行道了，走路要弯腰\n\n## 三、修剪作业建议\n1. 现场勘查后确定具体修剪方案\n2. 注意避让电力线路及地下管线\n3. 作业前设置安全警示区域\n4. 作业后及时清理现场树枝树叶\n5. 修剪后3日内安排巡检复核\n\n## 四、现场情况（待填写）\n[此处填写现场勘查实际情况]\n\n## 五、修剪后效果\n[此处填写修剪后照片及说明]\n\n## 六、存在问题及后续措施\n[此处记录发现的问题及跟进计划]",
+        "reportNo": "TP202606089663",
+        "title": "南京西路1266号综合修剪方案v2 - 修剪报告",
+        "content": "# 南京西路1266号综合修剪方案v2 - 修剪执行报告\n\n## 一、基本信息\n- 报告编号：TP202606089663\n- 方案版本：1.0\n- 修剪类型：综合修剪\n- 计划日期：2024-03-15\n- 施工单位：绿化养护一队\n- 预计费用：¥3500\n\n## 二、居民反馈汇总\n- [2024-02-05] 匿名: 上次修剪后树枝又长出来了\n- [2024-01-22] 陈阿姨: 树上面有个大马蜂窝，太危险了！\n- [2024-01-18] 李先生: 大树枝叶挡住了店铺招牌，影响生意\n- [2024-01-15] 张女士: 门口那棵梧桐树树枝太长，挡到人行道了，走路要弯腰\n\n## 三、修剪作业建议\n1. 回缩过长枝条，保持树形美观与安全平衡\n2. 作业前设置安全警示区域\n3. 作业后及时清理现场树枝树叶\n4. 修剪后3日内安排巡检复核\n\n## 四、现场情况（待填写）\n[此处填写现场勘查实际情况]\n\n## 五、修剪后效果\n[此处填写修剪后照片及说明]\n\n## 六、存在问题及后续措施\n[此处记录发现的问题及跟进计划]",
         "pruningDetails": null,
         "issuesFound": null,
         "followUpActions": null,
         "status": "draft",
-        "generatedBy": "何工"
+        "generatedBy": "何工",
+        "generatedAt": "2026-06-08T09:07:53.280Z"
+      },
+      {
+        "id": 2,
+        "createdAt": "2026-06-08T09:08:26.932Z",
+        "updatedAt": "2026-06-08T09:08:26.932Z",
+        "planVersionId": 2,
+        "locationId": 1,
+        "reportNo": "TP202606080946",
+        "title": "南京西路1266号综合修剪方案 - 修剪报告",
+        "content": "# 南京西路1266号综合修剪方案 - 修剪执行报告\n\n## 一、基本信息\n- 报告编号：TP202606080946\n- 方案版本：2.0\n- 修剪类型：综合修剪\n- 计划日期：2024-03-15\n- 施工单位：绿化养护一队\n- 预计费用：¥3500\n\n## 二、居民反馈汇总\n- [2024-02-05] 匿名: 上次修剪后树枝又长出来了\n- [2024-01-22] 陈阿姨: 树上面有个大马蜂窝，太危险了！\n- [2024-01-18] 李先生: 大树枝叶挡住了店铺招牌，影响生意\n- [2024-01-15] 张女士: 门口那棵梧桐树树枝太长，挡到人行道了，走路要弯腰\n\n## 三、修剪作业建议\n1. 回缩过长枝条，保持树形美观与安全平衡\n2. 作业前设置安全警示区域\n3. 作业后及时清理现场树枝树叶\n4. 修剪后3日内安排巡检复核\n\n## 四、现场情况（待填写）\n[此处填写现场勘查实际情况]\n\n## 五、修剪后效果\n[此处填写修剪后照片及说明]\n\n## 六、存在问题及后续措施\n[此处记录发现的问题及跟进计划]",
+        "pruningDetails": null,
+        "issuesFound": null,
+        "followUpActions": null,
+        "status": "draft",
+        "generatedBy": "何工",
+        "generatedAt": "2026-06-08T09:08:26.932Z"
       }
     ],
     "data_conflicts": [
       {
         "id": 1,
-        "createdAt": "2026-06-02T11:23:07.304Z",
-        "updatedAt": "2026-06-02T11:23:07.304Z",
+        "createdAt": "2026-06-08T09:00:12.885Z",
+        "updatedAt": "2026-06-08T09:00:12.885Z",
         "locationId": 1,
         "feedbackId": 2,
         "relatedFeedbackId": 1,
@@ -337,8 +450,8 @@
       },
       {
         "id": 2,
-        "createdAt": "2026-06-02T11:23:07.305Z",
-        "updatedAt": "2026-06-02T11:23:07.305Z",
+        "createdAt": "2026-06-08T09:00:12.887Z",
+        "updatedAt": "2026-06-08T09:00:12.887Z",
         "locationId": 1,
         "feedbackId": 6,
         "relatedFeedbackId": 1,
@@ -353,8 +466,8 @@
       },
       {
         "id": 3,
-        "createdAt": "2026-06-02T11:23:07.305Z",
-        "updatedAt": "2026-06-02T11:23:07.305Z",
+        "createdAt": "2026-06-08T09:00:12.887Z",
+        "updatedAt": "2026-06-08T09:00:12.887Z",
         "locationId": 1,
         "feedbackId": 6,
         "relatedFeedbackId": 2,
@@ -371,13 +484,13 @@
     "audit_logs": []
   },
   "idCounters": {
-    "locations": 6,
-    "location_aliases": 8,
-    "resident_feedbacks": 8,
+    "locations": 7,
+    "location_aliases": 10,
+    "resident_feedbacks": 10,
     "inspection_photos": 0,
-    "street_notes": 1,
-    "plan_versions": 1,
-    "reports": 1,
+    "street_notes": 3,
+    "plan_versions": 2,
+    "reports": 2,
     "data_conflicts": 3,
     "audit_logs": 0
   }

@@ -187,7 +187,15 @@ router.post('/feedbacks', (req, res) => {
     const conflicts = (0, conflictService_1.checkAndCreateConflicts)(feedback.id);
     res.json({ feedback, location, conflicts });
 });
-router.post('/feedbacks/batch', upload.single('file'), async (req, res) => {
+router.post('/feedbacks/batch', (req, res, next) => {
+    const contentType = req.get('Content-Type') || '';
+    if (contentType.includes('application/json')) {
+        next();
+    }
+    else {
+        upload.single('file')(req, res, next);
+    }
+}, async (req, res) => {
     let feedbacks = [];
     if (req.body.feedbacks && Array.isArray(req.body.feedbacks)) {
         feedbacks = req.body.feedbacks;

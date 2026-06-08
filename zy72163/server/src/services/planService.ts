@@ -129,7 +129,8 @@ ${suggestion}
     issuesFound: null,
     followUpActions: null,
     status: 'draft',
-    generatedBy
+    generatedBy,
+    generatedAt: new Date().toISOString()
   });
 
   return db.reports.get(result.lastInsertRowid) as Report;

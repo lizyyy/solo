@@ -118,6 +118,7 @@ export interface TimelineItem {
   priority?: string;
   version?: string;
   reportNo?: string;
+  createdAt?: string;
 }
 
 export const locationsApi = {
@@ -138,7 +139,7 @@ export const feedbacksApi = {
   update: (id: number, data: Partial<ResidentFeedback>) => 
     api.put<ResidentFeedback>(`/feedbacks/${id}`, data),
   delete: (id: number) => api.delete(`/feedbacks/${id}`),
-  import: (data: any[]) => api.post('/feedbacks/import', data)
+  import: (data: any[]) => api.post('/feedbacks/batch', { feedbacks: data })
 };
 
 export const plansApi = {
