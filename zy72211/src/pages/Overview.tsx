@@ -10,7 +10,7 @@ export default function Overview() {
   const pendingRisk = records.filter((r) => r.status === '待风控复核')
   const normalCount = records.filter((r) => r.status === '正常').length
   const supplementCount = records.filter((r) => r.status === '尾差补录').length
-  const totalAmount = records.reduce((s, r) => s + r.amount, 0)
+  const totalAmount = records.filter((r) => r.status !== '已驳回').reduce((s, r) => s + r.amount, 0)
 
   return (
     <div className="p-8 max-w-6xl mx-auto">

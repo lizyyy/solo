@@ -7,6 +7,7 @@ import {
   CheckCircle,
   RefreshCw,
   History,
+  XCircle,
 } from 'lucide-react'
 import type { RiskOpinion } from '@/types'
 import { useState } from 'react'
@@ -24,12 +25,13 @@ export default function Summary() {
   const [reviewComment, setReviewComment] = useState('')
 
   const pendingRisk = records.filter((r) => r.status === '待风控复核')
-  const totalAmount = records.reduce((s, r) => s + r.amount, 0)
+  const totalAmount = records.filter((r) => r.status !== '已驳回').reduce((s, r) => s + r.amount, 0)
   const normalCount = records.filter((r) => r.status === '正常').length
   const reversedCount = records.filter(
     (r) => r.status === '已冲正' || r.status === '待风控复核'
   ).length
   const supplementCount = records.filter((r) => r.status === '尾差补录').length
+  const rejectedCount = records.filter((r) => r.status === '已驳回').length
   const unresolvedConflicts = conflicts.filter((c) => c.resolution === '待裁决').length
   const resolvedConflicts = conflicts.filter((c) => c.resolution !== '待裁决').length
 
@@ -61,7 +63,7 @@ export default function Summary() {
         </button>
       </div>
 
-      <div className="grid grid-cols-5 gap-4 mb-8">
+      <div className="grid grid-cols-6 gap-4 mb-8">
         <div className="bg-gradient-to-br from-[#1a365d] to-[#1e3f7a] rounded-xl p-5 text-white shadow-lg">
           <p className="text-xs text-blue-200 mb-1">汇总金额</p>
           <p className="text-xl font-bold font-mono">¥{totalAmount.toLocaleString()}</p>
@@ -97,6 +99,15 @@ export default function Summary() {
             <span className="text-xs text-slate-400 ml-1">已解决</span>
           </p>
         </div>
+        {rejectedCount > 0 && (
+          <div className="bg-white rounded-xl border border-slate-300 p-5 shadow-sm">
+            <div className="flex items-center gap-2 mb-1">
+              <XCircle size={14} className="text-slate-400" />
+              <p className="text-xs text-slate-400">已驳回（不计入）</p>
+            </div>
+            <p className="text-xl font-bold text-slate-400">{rejectedCount}</p>
+          </div>
+        )}
       </div>
 
       {pendingRisk.length > 0 && (
@@ -252,6 +263,7 @@ export default function Summary() {
                   <th className="text-center py-2 px-3 text-xs font-medium text-slate-400">冲正</th>
                   <th className="text-center py-2 px-3 text-xs font-medium text-slate-400">补录</th>
                   <th className="text-center py-2 px-3 text-xs font-medium text-slate-400">待复核</th>
+                  <th className="text-center py-2 px-3 text-xs font-medium text-slate-400">已驳回</th>
                   <th className="text-center py-2 px-3 text-xs font-medium text-slate-400">冲突</th>
                 </tr>
               </thead>
@@ -268,6 +280,7 @@ export default function Summary() {
                     <td className="py-2.5 px-3 text-center text-amber-600">{s.reversedCount}</td>
                     <td className="py-2.5 px-3 text-center text-indigo-600">{s.supplementCount}</td>
                     <td className="py-2.5 px-3 text-center text-red-600">{s.riskReviewCount}</td>
+                    <td className="py-2.5 px-3 text-center text-slate-400">{s.rejectedCount}</td>
                     <td className="py-2.5 px-3 text-center text-slate-600">
                       {s.resolvedConflictCount}/{s.conflictCount}
                     </td>

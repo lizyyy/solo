@@ -1,11 +1,12 @@
 import type { TrialRecord } from '@/types'
-import { Shield, AlertTriangle, FilePlus, CheckCircle } from 'lucide-react'
+import { Shield, AlertTriangle, FilePlus, CheckCircle, XCircle } from 'lucide-react'
 
-const statusConfig: Record<TrialRecord['status'], { bg: string; border: string; text: string; icon: React.ElementType }> = {
+const statusConfig: Record<TrialRecord['status'], { bg: string; border: string; text: string; icon: React.ElementType; strikethrough?: boolean }> = {
   '正常': { bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-700', icon: CheckCircle },
   '已冲正': { bg: 'bg-amber-50', border: 'border-amber-200', text: 'text-amber-700', icon: AlertTriangle },
   '尾差补录': { bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-700', icon: FilePlus },
   '待风控复核': { bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-700', icon: Shield },
+  '已驳回': { bg: 'bg-slate-50', border: 'border-slate-300', text: 'text-slate-400', icon: XCircle, strikethrough: true },
 }
 
 export default function RecordCard({ record }: { record: TrialRecord }) {
@@ -30,7 +31,7 @@ export default function RecordCard({ record }: { record: TrialRecord }) {
       <div className="grid grid-cols-3 gap-4 text-sm">
         <div>
           <p className="text-slate-400 text-xs mb-0.5">金额</p>
-          <p className="font-mono font-semibold text-slate-800">
+          <p className={`font-mono font-semibold text-slate-800 ${cfg.strikethrough ? 'line-through opacity-50' : ''}`}>
             ¥{record.amount.toLocaleString()}
           </p>
         </div>

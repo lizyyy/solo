@@ -225,7 +225,7 @@ export const useStore = create<AppState>((set, get) => ({
       const recordUpdate =
         resolution === '已确认'
           ? { status: '尾差补录' as const, source: '尾差调整条' as const }
-          : {}
+          : { status: '已驳回' as const }
 
       const updatedRecords = s.records.map((r) =>
         r.id === conflict.recordId ? { ...r, ...recordUpdate, updatedAt: now() } : r
@@ -292,11 +292,12 @@ export const useStore = create<AppState>((set, get) => ({
     const { records, conflicts } = get()
     const summary: SummarySnapshot = {
       id: nextId('sum'),
-      totalAmount: records.reduce((s, r) => s + r.amount, 0),
+      totalAmount: records.filter((r) => r.status !== '已驳回').reduce((s, r) => s + r.amount, 0),
       normalCount: records.filter((r) => r.status === '正常').length,
       reversedCount: records.filter((r) => r.status === '已冲正' || r.status === '待风控复核').length,
       supplementCount: records.filter((r) => r.status === '尾差补录').length,
       riskReviewCount: records.filter((r) => r.status === '待风控复核').length,
+      rejectedCount: records.filter((r) => r.status === '已驳回').length,
       conflictCount: conflicts.length,
       resolvedConflictCount: conflicts.filter((c) => c.resolution !== '待裁决').length,
       createdAt: now(),

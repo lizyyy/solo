@@ -1,4 +1,4 @@
-export type RecordStatus = '正常' | '已冲正' | '尾差补录' | '待风控复核'
+export type RecordStatus = '正常' | '已冲正' | '尾差补录' | '待风控复核' | '已驳回'
 export type RecordSource = '顺延说明' | '尾差调整条'
 export type CaliberType = '新口径' | '旧口径'
 export type ConflictResolution = '待裁决' | '已确认' | '已驳回'
@@ -57,6 +57,7 @@ export interface SummarySnapshot {
   reversedCount: number
   supplementCount: number
   riskReviewCount: number
+  rejectedCount: number
   conflictCount: number
   resolvedConflictCount: number
   createdAt: string
