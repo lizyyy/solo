@@ -81,12 +81,11 @@ export const useStore = create<AppState>()(
       isInitialized: false,
 
       initializeWithSamples: () => {
-        if (get().isInitialized) return;
         set({
-          notifications: sampleNotifications,
-          versions: sampleVersions,
-          sources: sampleSources,
-          comments: sampleComments,
+          notifications: [...get().notifications, ...sampleNotifications],
+          versions: { ...get().versions, ...sampleVersions },
+          sources: { ...get().sources, ...sampleSources },
+          comments: { ...get().comments, ...sampleComments },
           isInitialized: true
         });
       },
@@ -97,7 +96,7 @@ export const useStore = create<AppState>()(
           versions: {},
           sources: {},
           comments: {},
-          isInitialized: true
+          isInitialized: false
         });
       },
 

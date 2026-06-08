@@ -17,7 +17,6 @@ import {
   ChevronDown,
   ChevronUp,
   Plus,
-  CheckCircle,
   AlertCircle
 } from 'lucide-react';
 import { useStore } from '../store/useStore';

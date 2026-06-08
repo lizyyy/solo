@@ -16,9 +16,7 @@ import { useStore } from '../store/useStore';
 import { 
   NotificationStatus, 
   SourceInput, 
-  SourceType, 
-  statusLabels,
-  sourceTypeLabels 
+  SourceType
 } from '../types';
 
 const statusOptions: { value: NotificationStatus; label: string }[] = [
@@ -93,18 +91,16 @@ export default function Form() {
   const handleSubmit = () => {
     if (!validate()) return;
 
-    let targetId = id;
-
     if (isEdit && id) {
       updateNotification(id, formData, changeReason);
+      navigate(`/notification/${id}`);
     } else {
-      targetId = addNotification(formData, sources);
+      const newId = addNotification(formData, sources);
       sources.forEach(source => {
-        addSource(targetId, source);
+        addSource(newId, source);
       });
+      navigate(`/notification/${newId}`);
     }
-
-    navigate(`/notification/${targetId}`);
   };
 
   const handleAddSource = () => {

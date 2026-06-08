@@ -42,7 +42,7 @@ export function exportToMarkdown(data: ExportData): string {
   md += `> ${notification.reason}\n\n`;
 
   md += `## 版本历史\n\n`;
-  versions.slice().reverse().forEach((v, idx) => {
+  versions.slice().reverse().forEach((v) => {
     const versionTime = format(new Date(v.modifiedAt), 'yyyy年MM月dd日 HH:mm', { locale: zhCN });
     md += `### v${v.versionNumber} - ${versionTime}\n\n`;
     md += `- 修改人：${v.modifiedBy}\n`;

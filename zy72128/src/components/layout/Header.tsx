@@ -1,4 +1,4 @@
-import { Music, Plus, Download, RefreshCw, Trash2 } from 'lucide-react';
+import { Music, Plus, RefreshCw, Trash2 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useStore } from '../../store/useStore';
 
