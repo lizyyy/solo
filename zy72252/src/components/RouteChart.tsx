@@ -1,6 +1,5 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell, ReferenceLine } from 'recharts';
 import type { Route, DetectionIssue } from '../types';
-import { RouteDetectionEngine } from '../services/RouteDetectionEngine';
 
 interface RouteChartProps {
   routes: Route[];
@@ -26,6 +25,7 @@ export function RouteChart({ routes, issues }: RouteChartProps) {
     return '#165DFF';
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;

@@ -1,66 +1,40 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Upload, FileJson, Play, Database } from 'lucide-react';
+import { ArrowLeft, Upload, FileJson, Play, RotateCcw } from 'lucide-react';
 import { useProjectStore } from '../store/projectStore';
-import { sampleProjects, samplePoints, sampleRoutes, sampleObstacles } from '../data/sampleData';
+import { sampleProjects } from '../data/sampleData';
 
 export function ImportPage() {
   const navigate = useNavigate();
-  const { importProjectData } = useProjectStore();
+  const { importProjectData, loadSampleData } = useProjectStore();
   const [activeTab, setActiveTab] = useState<'sample' | 'json'>('sample');
   const [jsonInput, setJsonInput] = useState('');
   const [importStatus, setImportStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [resetDone, setResetDone] = useState(false);
 
-  const quickSamples = [
-    {
-      id: 'demo-1',
-      name: '车展主舞台吊点系统',
-      description: '完整正常项目，无问题路线',
-      status: 'normal'
-    },
-    {
-      id: 'demo-2',
-      name: '新品发布会舞台',
-      description: '含补录路线未计算问题，标准演示用例',
-      status: 'warning'
-    },
-    {
-      id: 'demo-3',
-      name: '颁奖典礼多楼层舞台',
-      description: '多楼层复杂吊点系统，多个待处理问题',
-      status: 'pending_review'
-    }
-  ];
+  const quickSamples = sampleProjects.map(p => ({
+    id: p.id,
+    name: p.name,
+    description: p.description,
+    status: p.status
+  }));
 
   const handleLoadSample = (sampleId: string) => {
-    const sampleProject = sampleProjects.find(p => p.id === sampleId);
-    if (!sampleProject) return;
-
-    const points = samplePoints[sampleId] || [];
-    const routes = sampleRoutes[sampleId] || [];
-    const obstacles = sampleObstacles[sampleId]?.map(o => ({
-      routeId: o.routeId,
-      content: o.content,
-      imageUrl: o.imageUrl,
-      createdBy: o.createdBy
-    })) || [];
-
-    importProjectData({
-      project: {
-        name: sampleProject.name,
-        description: sampleProject.description,
-        status: sampleProject.status,
-        stage: sampleProject.stage
-      },
-      points,
-      routes,
-      obstacles
-    });
-
+    loadSampleData();
     setImportStatus('success');
     setTimeout(() => {
+      navigate(`/project/${sampleId}`);
+    }, 500);
+  };
+
+  const handleResetAndLoad = () => {
+    const keys = Object.keys(localStorage).filter(k => k.startsWith('stage-safety:'));
+    keys.forEach(k => localStorage.removeItem(k));
+    loadSampleData();
+    setResetDone(true);
+    setTimeout(() => {
       navigate('/');
-    }, 1000);
+    }, 800);
   };
 
   const handleJsonImport = () => {
@@ -87,41 +61,9 @@ export function ImportPage() {
       setTimeout(() => {
         navigate('/');
       }, 1000);
-    } catch (e) {
+    } catch {
       setImportStatus('error');
     }
-  };
-
-  const loadAllSamples = () => {
-    sampleProjects.forEach((project, index) => {
-      setTimeout(() => {
-        const points = samplePoints[project.id] || [];
-        const routes = sampleRoutes[project.id] || [];
-        const obstacles = sampleObstacles[project.id]?.map(o => ({
-          routeId: o.routeId,
-          content: o.content,
-          imageUrl: o.imageUrl,
-          createdBy: o.createdBy
-        })) || [];
-
-        importProjectData({
-          project: {
-            name: project.name,
-            description: project.description,
-            status: project.status,
-            stage: project.stage
-          },
-          points,
-          routes,
-          obstacles
-        });
-
-        if (index === sampleProjects.length - 1) {
-          setImportStatus('success');
-          setTimeout(() => navigate('/'), 1000);
-        }
-      }, index * 100);
-    });
   };
 
   const sampleJsonTemplate = JSON.stringify({
@@ -179,13 +121,19 @@ export function ImportPage() {
       <main className="max-w-4xl mx-auto px-6 py-8">
         {importStatus === 'success' && (
           <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700">
-            ✓ 导入成功，正在跳转...
+            ✓ 样例加载成功，正在跳转...
           </div>
         )}
 
         {importStatus === 'error' && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
             ✗ 导入失败，请检查JSON格式
+          </div>
+        )}
+
+        {resetDone && (
+          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700">
+            ✓ 样例数据已重置，正在跳转...
           </div>
         )}
 
@@ -223,13 +171,13 @@ export function ImportPage() {
             {activeTab === 'sample' ? (
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
-                  <p className="text-sm text-industrial-400">选择一个样例项目快速体验完整流程</p>
+                  <p className="text-sm text-industrial-400">点击样例直接进入项目详情页体验完整流程</p>
                   <button
-                    onClick={loadAllSamples}
-                    className="flex items-center gap-2 px-4 py-2 bg-primary-50 text-primary-600 rounded-lg hover:bg-primary-100 transition-colors text-sm"
+                    onClick={handleResetAndLoad}
+                    className="flex items-center gap-2 px-4 py-2 bg-warning-50 text-warning-600 rounded-lg hover:bg-warning-100 transition-colors text-sm"
                   >
-                    <Database className="w-4 h-4" />
-                    加载全部样例
+                    <RotateCcw className="w-4 h-4" />
+                    重置样例数据
                   </button>
                 </div>
 
@@ -266,7 +214,7 @@ export function ImportPage() {
                 <div className="mt-6 p-4 bg-primary-50 rounded-lg">
                   <h4 className="text-sm font-medium text-primary-600 mb-2">💡 推荐体验流程</h4>
                   <ol className="text-sm text-primary-700 space-y-1">
-                    <li>1. 加载「新品发布会舞台」样例（含标准问题场景）</li>
+                    <li>1. 点击「新品发布会舞台」样例（含标准问题场景）</li>
                     <li>2. 进入项目查看3D视图和检测到的问题</li>
                     <li>3. 点击「补录楼层剖面草图」补充材料</li>
                     <li>4. 以展陈客户身份复核确认解决</li>

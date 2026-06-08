@@ -17,7 +17,7 @@ interface ProjectState {
   loadSampleData: () => void;
   setCurrentProject: (id: string) => void;
   addFloorSketch: (sketch: Omit<FloorSketch, 'id' | 'uploadedAt'>) => void;
-  supplementIssue: (issueId: string, sketchId: string) => void;
+  supplementIssue: (issueId: string, sketchId?: string) => void;
   resolveIssue: (issueId: string, reviewNotes: string) => void;
   setViewMode: (mode: '3d' | 'chart') => void;
   setSelectedIssue: (id: string | null) => void;
@@ -31,7 +31,10 @@ interface ProjectState {
   }) => void;
 }
 
+const DATA_VERSION = 'v2';
+
 const STORAGE_KEYS = {
+  version: 'stage-safety:version',
   projects: 'stage-safety:projects',
   points: (id: string) => `stage-safety:project:${id}:points`,
   routes: (id: string) => `stage-safety:project:${id}:routes`,
@@ -74,9 +77,13 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   selectedIssueId: null,
 
   loadSampleData: () => {
+    const storedVersion = loadFromStorage<string>(STORAGE_KEYS.version, '');
     const storedProjects = loadFromStorage<Project[]>(STORAGE_KEYS.projects, []);
-    if (storedProjects.length === 0) {
+    const needsReset = storedVersion !== DATA_VERSION;
+
+    if (storedProjects.length === 0 || needsReset) {
       saveToStorage(STORAGE_KEYS.projects, sampleProjects);
+      saveToStorage(STORAGE_KEYS.version, DATA_VERSION);
       
       Object.entries(samplePoints).forEach(([projectId, data]) => {
         saveToStorage(STORAGE_KEYS.points(projectId), data);
@@ -133,7 +140,8 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     set({ sketches: updatedSketches });
   },
 
-  supplementIssue: (issueId: string, sketchId: string) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  supplementIssue: (issueId: string, sketchId?: string) => {
     const { currentProjectId, issues } = get();
     if (!currentProjectId) return;
 

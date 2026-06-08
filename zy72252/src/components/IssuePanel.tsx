@@ -11,7 +11,6 @@ interface IssuePanelProps {
   sketches: FloorSketch[];
   selectedIssueId: string | null;
   onSelectIssue: (issueId: string | null) => void;
-  onSupplementSketch: (issueId: string, sketchId: string) => void;
   onResolveIssue: (issueId: string, notes: string) => void;
   onAddSketch: () => void;
 }
@@ -23,7 +22,6 @@ export function IssuePanel({
   sketches,
   selectedIssueId,
   onSelectIssue,
-  onSupplementSketch,
   onResolveIssue,
   onAddSketch,
 }: IssuePanelProps) {

@@ -6,11 +6,10 @@ import type { HoistingPoint, Route, DetectionIssue } from '../types';
 
 interface PointMeshProps {
   point: HoistingPoint;
-  isSelected: boolean;
   onClick: () => void;
 }
 
-function PointMesh({ point, isSelected, onClick }: PointMeshProps) {
+function PointMesh({ point, onClick }: PointMeshProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const color = point.status === 'warning' ? '#FF7D00' : '#165DFF';
   const pulseColor = point.status === 'warning' ? '#FFE8BF' : '#C9DBFF';
@@ -71,16 +70,15 @@ function RouteLine({ route, points, hasIssue, issue }: RouteLineProps) {
   const fromPoint = points.find(p => p.id === route.fromPoint);
   const toPoint = points.find(p => p.id === route.toPoint);
 
-  if (!fromPoint || !toPoint) return null;
+  const start = useMemo(() => {
+    if (!fromPoint) return new THREE.Vector3(0, 0, 0);
+    return new THREE.Vector3(fromPoint.x, fromPoint.z, fromPoint.y);
+  }, [fromPoint]);
 
-  const start = new THREE.Vector3(fromPoint.x, fromPoint.z, fromPoint.y);
-  const end = new THREE.Vector3(toPoint.x, toPoint.z, toPoint.y);
-  const midPoint = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
-  midPoint.y += 0.5;
-
-  const color = hasIssue ? '#F53F3F' : (route.color || '#165DFF');
-  const dashSize = hasIssue ? 0.3 : 0;
-  const gapSize = hasIssue ? 0.2 : 0;
+  const end = useMemo(() => {
+    if (!toPoint) return new THREE.Vector3(0, 0, 0);
+    return new THREE.Vector3(toPoint.x, toPoint.z, toPoint.y);
+  }, [toPoint]);
 
   const curvePoints = useMemo(() => {
     const pts: THREE.Vector3[] = [];
@@ -94,6 +92,15 @@ function RouteLine({ route, points, hasIssue, issue }: RouteLineProps) {
     }
     return pts;
   }, [start, end]);
+
+  if (!fromPoint || !toPoint) return null;
+
+  const midPoint = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
+  midPoint.y += 0.5;
+
+  const color = hasIssue ? '#F53F3F' : (route.color || '#165DFF');
+  const dashSize = hasIssue ? 0.3 : 0;
+  const gapSize = hasIssue ? 0.2 : 0;
 
   return (
     <group>
@@ -210,7 +217,6 @@ export function Stage3DScene({ points, routes, issues, selectedIssueId, onPointC
           <PointMesh
             key={point.id}
             point={{ ...point, status: relatedIssue ? 'warning' : point.status }}
-            isSelected={false}
             onClick={() => onPointClick(point.id)}
           />
         );

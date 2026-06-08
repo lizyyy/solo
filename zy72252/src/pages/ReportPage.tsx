@@ -16,13 +16,20 @@ export function ReportPage() {
     sketches,
     issues,
     setCurrentProject,
+    loadSampleData,
   } = useProjectStore();
 
   useEffect(() => {
-    if (id && id !== currentProjectId) {
+    if (projects.length === 0) {
+      loadSampleData();
+    }
+  }, [projects.length, loadSampleData]);
+
+  useEffect(() => {
+    if (id && id !== currentProjectId && projects.length > 0) {
       setCurrentProject(id);
     }
-  }, [id, currentProjectId, setCurrentProject]);
+  }, [id, currentProjectId, setCurrentProject, projects.length]);
 
   const project = projects.find(p => p.id === id);
 

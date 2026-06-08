@@ -10,30 +10,22 @@ export class RouteDetectionEngine {
 
     for (const route of routes) {
       if (route.isSupplementary && !route.recalculated) {
-        issues.push({
-          id: generateId(),
-          type: 'route_not_recalculated',
-          routeId: route.id,
-          severity: 'warning',
-          description: `补录路线 "${route.name}" 没有重新计算长度`,
-          status: 'open',
-          nextAction: 'contact_designer',
-          missingMaterials: ['楼层剖面草图（避让段）', '复核确认记录'],
-          createdAt: new Date().toISOString()
-        });
-      }
+        const hasLengthDiff = route.calculatedLength !== undefined &&
+          Math.abs(route.length - route.calculatedLength) > 0.5;
 
-      if (route.isSupplementary && route.calculatedLength !== undefined && 
-          Math.abs(route.length - route.calculatedLength) > 0.5) {
         issues.push({
           id: generateId(),
           type: 'route_not_recalculated',
           routeId: route.id,
           severity: 'warning',
-          description: `补录路线 "${route.name}" 长度不一致：记录 ${route.length}m，实测 ${route.calculatedLength}m`,
+          description: hasLengthDiff
+            ? `补录路线 "${route.name}" 长度不一致：记录 ${route.length}m，实测 ${route.calculatedLength}m`
+            : `补录路线 "${route.name}" 没有重新计算长度`,
           status: 'open',
           nextAction: 'contact_designer',
-          missingMaterials: ['长度复核计算书', '现场测量照片'],
+          missingMaterials: hasLengthDiff
+            ? ['长度复核计算书', '现场测量照片']
+            : ['楼层剖面草图（避让段）', '复核确认记录'],
           createdAt: new Date().toISOString()
         });
       }

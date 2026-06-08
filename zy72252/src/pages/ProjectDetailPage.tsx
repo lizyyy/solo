@@ -26,20 +26,25 @@ export function ProjectDetailPage() {
     setCurrentProject,
     setViewMode,
     setSelectedIssue,
-    supplementIssue,
     resolveIssue,
-    addFloorSketch,
     runDetection,
+    loadSampleData,
   } = useProjectStore();
 
   const [showSketchModal, setShowSketchModal] = useState(false);
   const [activeTab, setActiveTab] = useState<'view' | 'report'>('view');
 
   useEffect(() => {
-    if (id && id !== currentProjectId) {
+    if (projects.length === 0) {
+      loadSampleData();
+    }
+  }, [projects.length, loadSampleData]);
+
+  useEffect(() => {
+    if (id && id !== currentProjectId && projects.length > 0) {
       setCurrentProject(id);
     }
-  }, [id, currentProjectId, setCurrentProject]);
+  }, [id, currentProjectId, setCurrentProject, projects.length]);
 
   const project = projects.find(p => p.id === id);
   const selectedIssue = issues.find(i => i.id === selectedIssueId);
@@ -75,11 +80,6 @@ export function ProjectDetailPage() {
     if (relatedIssue) {
       setSelectedIssue(relatedIssue.id);
     }
-  };
-
-  const handleSupplementSketch = (issueId: string, sketchId: string) => {
-    supplementIssue(issueId, sketchId);
-    setShowSketchModal(false);
   };
 
   return (
@@ -210,7 +210,6 @@ export function ProjectDetailPage() {
                 sketches={sketches}
                 selectedIssueId={selectedIssueId}
                 onSelectIssue={setSelectedIssue}
-                onSupplementSketch={handleSupplementSketch}
                 onResolveIssue={resolveIssue}
                 onAddSketch={handleAddSketch}
               />
