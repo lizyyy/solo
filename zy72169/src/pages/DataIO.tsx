@@ -50,7 +50,7 @@ const EMPTY_FORM: ManualForm = {
 }
 
 export default function DataIO() {
-  const { locations, aliases, loadAll: loadLocations, addLocation } = useLocationStore()
+  const { locations, aliases, loadAll: loadLocations, addLocation, checkMergeSuggestions } = useLocationStore()
   const { feedbacks, loadAll: loadFeedbacks } = useFeedbackStore()
   const { addLog } = useOperationLogStore()
 
@@ -115,7 +115,7 @@ export default function DataIO() {
 
       for (const row of importRows) {
         const p = row.parsed
-        await addLocation({
+        const added = await addLocation({
           originalName: p.originalName ?? '',
           canonicalName: p.canonicalName ?? p.originalName ?? '',
           address: p.address ?? '',
@@ -130,6 +130,7 @@ export default function DataIO() {
           rawNote: p.rawNote ?? '',
         })
         if (row.isAnomaly) anomalyCount++
+        await checkMergeSuggestions(added.id)
       }
 
       const after = useLocationStore.getState().locations
@@ -157,7 +158,7 @@ export default function DataIO() {
     try {
       const before = [...useLocationStore.getState().locations]
 
-      await addLocation({
+      const added = await addLocation({
         originalName: form.originalName.trim(),
         canonicalName: form.canonicalName.trim() || form.originalName.trim(),
         address: form.address.trim(),
@@ -171,6 +172,8 @@ export default function DataIO() {
         exceptionNote: '',
         rawNote: form.rawNote.trim(),
       })
+
+      await checkMergeSuggestions(added.id)
 
       const after = useLocationStore.getState().locations
       const diff = computeDiff(before, after)

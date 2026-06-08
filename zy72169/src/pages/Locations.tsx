@@ -1,8 +1,8 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useRef } from 'react'
 import { useLocationStore } from '@/stores/locationStore'
 import { useFeedbackStore } from '@/stores/feedbackStore'
 import { usePhotoStore } from '@/stores/photoStore'
-import { MapPin, Search, Filter, X, Check, ChevronRight, AlertTriangle, Image, StickyNote } from 'lucide-react'
+import { MapPin, Search, Filter, X, Check, ChevronRight, AlertTriangle, Image, StickyNote, Upload, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Location, MergeStatus, LocationStatus, MergeSuggestion } from '@/types'
 
@@ -47,13 +47,14 @@ function formatDateTime(iso: string) {
 export default function Locations() {
   const { locations, aliases, mergeSuggestions, loadAll: loadLocations, confirmMerge, rejectMerge } = useLocationStore()
   const { loadAll: loadFeedbacks, getByLocationId } = useFeedbackStore()
-  const { loadAll: loadPhotos, getByLocationId: getPhotosByLocationId } = usePhotoStore()
+  const { loadAll: loadPhotos, getByLocationId: getPhotosByLocationId, addPhoto, deletePhoto } = usePhotoStore()
 
   const [searchText, setSearchText] = useState('')
   const [mergeFilter, setMergeFilter] = useState<MergeStatus | '全部'>('全部')
   const [statusFilter, setStatusFilter] = useState<LocationStatus | '全部'>('全部')
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null)
   const [activeMerge, setActiveMerge] = useState<MergeSuggestion | null>(null)
+  const photoInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     loadLocations()
@@ -114,6 +115,30 @@ export default function Locations() {
     if (!activeMerge) return
     rejectMerge(activeMerge.id)
     setActiveMerge(null)
+  }
+
+  async function handlePhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    if (!selectedLocation || !e.target.files) return
+    for (const file of Array.from(e.target.files)) {
+      const reader = new FileReader()
+      await new Promise<void>((resolve) => {
+        reader.onload = async () => {
+          await addPhoto({
+            locationId: selectedLocation.id,
+            data: reader.result as string,
+            fileName: file.name,
+            source: '照片',
+          })
+          resolve()
+        }
+        reader.readAsDataURL(file)
+      })
+    }
+    e.target.value = ''
+  }
+
+  async function handleDeletePhoto(photoId: string) {
+    await deletePhoto(photoId)
   }
 
   return (
@@ -322,20 +347,44 @@ export default function Locations() {
               </section>
             )}
 
-            {selectedPhotos.length > 0 && (
-              <section>
-                <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-                  <Image size={12} /> 照片
-                </h3>
-                <div className="grid grid-cols-3 gap-2">
+            <section>
+              <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                <Image size={12} /> 照片
+              </h3>
+              {selectedPhotos.length > 0 && (
+                <div className="grid grid-cols-3 gap-2 mb-2">
                   {selectedPhotos.map((p) => (
-                    <div key={p.id} className="aspect-square rounded-md bg-zinc-900 overflow-hidden ring-1 ring-zinc-800">
+                    <div key={p.id} className="group relative aspect-square rounded-md bg-zinc-900 overflow-hidden ring-1 ring-zinc-800">
                       <img src={p.data} alt={p.fileName} className="w-full h-full object-cover" />
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleDeletePhoto(p.id) }}
+                        className="absolute top-1 right-1 rounded bg-red-900/80 p-0.5 text-red-300 opacity-0 group-hover:opacity-100 transition-opacity"
+                        title="删除照片"
+                      >
+                        <Trash2 size={12} />
+                      </button>
+                      <div className="absolute bottom-0 inset-x-0 bg-black/60 px-1.5 py-0.5 text-[9px] text-zinc-400 truncate">
+                        {p.fileName}
+                      </div>
                     </div>
                   ))}
                 </div>
-              </section>
-            )}
+              )}
+              <button
+                onClick={() => photoInputRef.current?.click()}
+                className="flex items-center gap-1.5 rounded-md border border-dashed border-zinc-700 bg-zinc-900/50 px-3 py-2 text-xs text-zinc-400 hover:text-teal-400 hover:border-teal-600 transition w-full justify-center"
+              >
+                <Upload size={12} /> 上传照片
+              </button>
+              <input
+                ref={photoInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={handlePhotoUpload}
+              />
+            </section>
 
             {selectedLocation.rawNote && (
               <section>
