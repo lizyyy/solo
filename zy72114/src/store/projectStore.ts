@@ -11,7 +11,6 @@ import type {
   HistoryVersion,
   ProjectSnapshot,
   DiffItem,
-  DiffType,
 } from '../types';
 import { validateSensorRecords, validateDeviceParams, markDirtyData } from '../utils/validation';
 import { detectAllConflicts } from '../utils/conflict';
@@ -22,10 +21,9 @@ import {
   calculateImpactEnergy,
   getSafetyLevel,
   getProcessingSuggestion,
-  getSafetyLevelLabel,
 } from '../utils/physics';
 import { convertValue } from '../utils/units';
-import { normalSample } from '../data/samples';
+import { normalSample, dirtySample, conflictSample } from '../data/samples';
 
 interface ProjectState {
   currentProject: Project | null;
@@ -141,10 +139,8 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   loadSampleData: (sampleType) => {
     let sample = normalSample;
     if (sampleType === 'dirty') {
-      const { dirtySample } = require('../data/samples');
       sample = dirtySample;
     } else if (sampleType === 'conflict') {
-      const { conflictSample } = require('../data/samples');
       sample = conflictSample;
     }
 

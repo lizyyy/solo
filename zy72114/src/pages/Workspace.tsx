@@ -16,7 +16,6 @@ import ResultPanel from '../components/ResultPanel';
 export default function Workspace() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'data' | 'analysis' | 'result'>('data');
-  const [editingRecord, setEditingRecord] = useState<string | null>(null);
 
   const {
     currentProject,
@@ -80,7 +79,7 @@ export default function Workspace() {
       content: '',
       recordedAt: new Date().toISOString(),
       recorder: '训练教练老唐',
-      isOriginal: true,
+      isOriginal: fieldNotes.length === 0,
       isSupplementary: fieldNotes.length > 0,
     });
   };
@@ -110,9 +109,9 @@ export default function Workspace() {
 
       <main className="flex-1 p-4 md:p-6 stagger-fade">
         {!currentProject ? (
-          <div className="max-w-3xl mx-auto mt-16">
-            <EngCard className="p-8">
-              <div className="text-center mb-8">
+          <div className="max-w-3xl mx-auto mt-4">
+            <EngCard className="p-6">
+              <div className="text-center mb-4">
                 <h1 className="text-2xl font-bold text-ink-800 mb-2">校园投石机安全试算</h1>
                 <p className="text-ink-600">选择样例数据开始体验，或手动创建新项目</p>
               </div>
@@ -239,7 +238,7 @@ export default function Workspace() {
                     />
                     <SensorTable
                       records={sensorRecords}
-                      onEdit={setEditingRecord}
+                      onEdit={updateSensorRecord}
                       onDelete={removeSensorRecord}
                       highlightIds={validationIssues
                         .filter((i) => i.recordId)

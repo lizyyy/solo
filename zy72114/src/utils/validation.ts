@@ -270,22 +270,17 @@ export function validateDeviceParams(params: DeviceParam[], projectId: string): 
       return;
     }
 
-    let min = 0,
-      max = 1000;
-    let quantity = 'length';
+    let min = 0, max = 1000;
 
     if (param.category === 'material' && param.paramName.includes('质量')) {
       min = 0;
       max = 50;
-      quantity = 'mass';
     } else if (param.category === 'structure') {
       min = 0;
       max = 10;
-      quantity = 'length';
     } else if (param.category === 'operation') {
       min = 0;
       max = 90;
-      quantity = 'angle';
     }
 
     const rangeIssue = validateValueRange(param.value, min, max, param.paramName, projectId, param.unit);
@@ -295,7 +290,7 @@ export function validateDeviceParams(params: DeviceParam[], projectId: string): 
   return issues;
 }
 
-export function markDirtyData(records: SensorRecord[], projectId: string): SensorRecord[] {
+export function markDirtyData(records: SensorRecord[], _projectId: string): SensorRecord[] {
   return records.map((record) => {
     let isDirty = false;
     const reasons: string[] = [];

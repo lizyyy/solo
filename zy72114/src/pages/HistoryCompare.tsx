@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { ArrowLeft, GitCompare, X, Plus, Minus, Edit3, FileText, Clock, User } from 'lucide-react';
+import { ArrowLeft, GitCompare, Plus, Minus, Edit3, FileText, Clock, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useProjectStore } from '../store/projectStore';
 import Navbar from '../components/Navbar';

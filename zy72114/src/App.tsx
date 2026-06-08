@@ -9,6 +9,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Workspace />} />
         <Route path="/history" element={<HistoryCompare />} />
+        <Route path="/report" element={<ReportPreview />} />
         <Route path="/report/:id" element={<ReportPreview />} />
       </Routes>
     </Router>

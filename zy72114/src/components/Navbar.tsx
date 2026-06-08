@@ -31,7 +31,7 @@ export default function Navbar() {
             <div className="flex items-center gap-2">
               {navItems.map((item) => {
                 const Icon = item.icon
-                const isActive = location.pathname === item.path
+                const isActive = location.pathname === item.path || (item.path === '/report' && location.pathname.startsWith('/report'))
                 return (
                   <Link
                     key={item.path}

@@ -211,7 +211,7 @@ export function detectValueConflicts(
 export function detectUnitConflicts(
   notes: FieldNote[],
   records: SensorRecord[],
-  params: DeviceParam[]
+  _params: DeviceParam[]
 ): DataConflict[] {
   const conflicts: DataConflict[] = [];
 

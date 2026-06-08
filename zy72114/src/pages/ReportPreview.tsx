@@ -1,7 +1,7 @@
 import { ArrowLeft, Printer, Download, FileText, AlertTriangle, CheckCircle, XCircle, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useProjectStore } from '../store/projectStore';
-import { getSafetyLevelLabel } from '../utils/physics';
+import { getSafetyLevelLabel, SafetyLevel } from '../utils/physics';
 import Navbar from '../components/Navbar';
 
 export default function ReportPreview() {
@@ -145,7 +145,7 @@ export default function ReportPreview() {
                   )} flex items-center justify-center`}
                 >
                   <span className="text-white font-bold text-lg">
-                    {getSafetyLevelLabel(calculationResult.safetyLevel as any)}
+                    {getSafetyLevelLabel(calculationResult.safetyLevel as SafetyLevel)}
                   </span>
                 </div>
                 <div className="flex-1">
