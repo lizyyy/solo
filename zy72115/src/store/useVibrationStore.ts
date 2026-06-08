@@ -1,16 +1,24 @@
 import { create } from 'zustand';
 import type { VibrationRecord, Compressor, RecordStatus } from '@/types';
 import { MOCK_RECORDS, COMPRESSORS, generateId } from '@/data/mockData';
-import { convertToMmPerS } from '@/utils/unitConversion';
+import { convertToMmPerS, convertToMmPerSSafe } from '@/utils/unitConversion';
 import { validateRecord } from '@/utils/validation';
 import { judgeThreshold, detectExtremeValues } from '@/utils/threshold';
+
+export interface AddRecordResult {
+  success: boolean;
+  record?: VibrationRecord;
+  errors: string[];
+  warnings: string[];
+  conversionNote?: string;
+}
 
 interface VibrationState {
   compressors: Compressor[];
   records: VibrationRecord[];
   selectedCompressorId: string;
 
-  addRecord: (record: Omit<VibrationRecord, 'id' | 'amplitudeMmPerS' | 'validationNotes' | 'isExtreme' | 'status'>) => VibrationRecord;
+  addRecord: (record: Omit<VibrationRecord, 'id' | 'amplitudeMmPerS' | 'validationNotes' | 'isExtreme' | 'status'>) => AddRecordResult;
   updateRecord: (id: string, updates: Partial<VibrationRecord>) => void;
   confirmRecord: (id: string, note: string) => void;
   deleteRecord: (id: string) => void;
@@ -24,7 +32,6 @@ export const useVibrationStore = create<VibrationState>((set, get) => ({
   selectedCompressorId: 'comp-001',
 
   addRecord: (recordData) => {
-    const amplitudeMmPerS = convertToMmPerS(recordData.amplitude, recordData.amplitudeUnit, recordData.frequencyHz);
     const existingRecords = get().records;
     const validation = validateRecord(
       {
@@ -38,11 +45,39 @@ export const useVibrationStore = create<VibrationState>((set, get) => ({
       existingRecords
     );
 
+    if (!validation.isValid) {
+      return {
+        success: false,
+        errors: validation.errors,
+        warnings: validation.warnings,
+      };
+    }
+
+    const conversionResult = convertToMmPerSSafe(recordData.amplitude, recordData.amplitudeUnit, recordData.frequencyHz);
+
+    if (!conversionResult.ok) {
+      return {
+        success: false,
+        errors: [conversionResult.note],
+        warnings: validation.warnings,
+      };
+    }
+
+    const amplitudeMmPerS = Math.round(conversionResult.value * 100) / 100;
+
+    if (isNaN(amplitudeMmPerS)) {
+      return {
+        success: false,
+        errors: ['换算结果无效(NaN)，请检查幅值和单位是否匹配。'],
+        warnings: validation.warnings,
+      };
+    }
+
     const threshold = judgeThreshold(amplitudeMmPerS);
     let status: RecordStatus = '正常';
     if (recordData.dataSource === '维修微信群') {
       status = '旧口径';
-    } else if (threshold.level !== '正常' || validation.warnings.length > 0 || !validation.isValid) {
+    } else if (threshold.level !== '正常' || validation.warnings.length > 0) {
       status = '需确认';
     }
 
@@ -50,11 +85,16 @@ export const useVibrationStore = create<VibrationState>((set, get) => ({
     const extremes = detectExtremeValues(allValues);
     const isExtreme = extremes[extremes.length - 1];
 
+    const allValidationNotes = [...validation.warnings];
+    if (conversionResult.note) {
+      allValidationNotes.push(conversionResult.note);
+    }
+
     const newRecord: VibrationRecord = {
       ...recordData,
       id: generateId(),
-      amplitudeMmPerS: Math.round(amplitudeMmPerS * 100) / 100,
-      validationNotes: [...validation.errors, ...validation.warnings],
+      amplitudeMmPerS,
+      validationNotes: allValidationNotes,
       isExtreme,
       status,
       confirmationNote: recordData.confirmationNote || '',
@@ -71,7 +111,13 @@ export const useVibrationStore = create<VibrationState>((set, get) => ({
       return { records: updatedWithExtremes };
     });
 
-    return newRecord;
+    return {
+      success: true,
+      record: newRecord,
+      errors: [],
+      warnings: allValidationNotes,
+      conversionNote: conversionResult.note,
+    };
   },
 
   updateRecord: (id, updates) => {

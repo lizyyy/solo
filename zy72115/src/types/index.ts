@@ -18,7 +18,7 @@ export interface Compressor {
 export interface VibrationRecord {
   id: string;
   compressorId: string;
-  direction: Direction;
+  direction: string;
   frequencyHz: number;
   amplitude: number;
   amplitudeUnit: AmplitudeUnit;

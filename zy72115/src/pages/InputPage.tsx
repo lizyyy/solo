@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useVibrationStore } from '@/store/useVibrationStore';
-import { DIRECTION_LABELS, VALID_DIRECTIONS, VALID_UNITS } from '@/utils/validation';
-import { UNIT_LABELS } from '@/utils/unitConversion';
+import { VALID_DIRECTIONS } from '@/utils/validation';
+import { UNIT_LABELS, VALID_UNITS } from '@/utils/unitConversion';
 import { cn } from '@/lib/utils';
-import { AlertTriangle, CheckCircle, ChevronDown, ChevronUp, Plus, Trash2 } from 'lucide-react';
+import { AlertTriangle, CheckCircle, ChevronDown, ChevronUp, Plus, Trash2, XCircle } from 'lucide-react';
 import type { Direction, AmplitudeUnit, DataSource, VibrationRecord } from '@/types';
 
 const DATA_SOURCES: DataSource[] = ['实验表', '照片说明', '维修微信群'];
@@ -25,9 +25,16 @@ const ROW_BAR_STYLE: Record<string, string> = {
   '旧口径': 'bg-zinc-500',
 };
 
+const DIRECTION_OPTION_LABELS: Record<string, string> = {
+  '': '请选择',
+  'H': 'H - 水平',
+  'V': 'V - 垂直',
+  'A': 'A - 轴向',
+};
+
 interface FormData {
   compressorId: string;
-  direction: Direction | '';
+  direction: string;
   frequencyHz: string;
   amplitude: string;
   amplitudeUnit: AmplitudeUnit;
@@ -54,7 +61,13 @@ export default function InputPage() {
     ...initialForm,
     compressorId: selectedCompressorId || compressors[0]?.id || '',
   });
-  const [lastValidation, setLastValidation] = useState<VibrationRecord | null>(null);
+  const [lastResult, setLastResult] = useState<{
+    success: boolean;
+    errors: string[];
+    warnings: string[];
+    conversionNote?: string;
+    record?: VibrationRecord;
+  } | null>(null);
   const [expandedNotes, setExpandedNotes] = useState<Record<string, boolean>>({});
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
   const [confirmNote, setConfirmNote] = useState('');
@@ -71,7 +84,7 @@ export default function InputPage() {
     e.preventDefault();
     if (!form.compressorId || !form.direction || !form.frequencyHz || !form.amplitude) return;
 
-    const newRecord = addRecord({
+    const result = addRecord({
       compressorId: form.compressorId,
       direction: form.direction as Direction,
       frequencyHz: Number(form.frequencyHz),
@@ -83,8 +96,11 @@ export default function InputPage() {
       confirmationNote: '',
     });
 
-    setLastValidation(newRecord);
-    setForm({ ...initialForm, compressorId: form.compressorId });
+    setLastResult(result);
+
+    if (result.success) {
+      setForm({ ...initialForm, compressorId: form.compressorId });
+    }
   };
 
   const handleConfirm = (id: string) => {
@@ -107,6 +123,14 @@ export default function InputPage() {
       hour: '2-digit',
       minute: '2-digit',
     });
+  };
+
+  const directionLabel = (d: string) => {
+    if (d === 'H' || d === 'V' || d === 'A') {
+      const labels: Record<string, string> = { H: '水平 (H)', V: '垂直 (V)', A: '轴向 (A)' };
+      return labels[d];
+    }
+    return d;
   };
 
   return (
@@ -132,19 +156,22 @@ export default function InputPage() {
           </div>
 
           <div>
-            <label className="mb-1.5 block text-sm text-zinc-400">测点方向</label>
-            <select
+            <label className="mb-1.5 block text-sm text-zinc-400">
+              测点方向
+              <span className="ml-1 text-zinc-600 text-xs">支持手动输入，如 CCW</span>
+            </label>
+            <input
+              list="direction-options"
               value={form.direction}
               onChange={(e) => handleChange('direction', e.target.value)}
+              placeholder="H / V / A 或手动输入"
               className="w-full rounded-lg border border-white/10 bg-[#2a2e38] px-3 py-2 text-sm text-zinc-200 outline-none focus:border-amber-500/50"
-            >
-              <option value="">请选择</option>
+            />
+            <datalist id="direction-options">
               {VALID_DIRECTIONS.map((d) => (
-                <option key={d} value={d}>
-                  {DIRECTION_LABELS[d]}
-                </option>
+                <option key={d} value={d} />
               ))}
-            </select>
+            </datalist>
           </div>
 
           <div>
@@ -240,33 +267,32 @@ export default function InputPage() {
           </div>
         </form>
 
-        {lastValidation && lastValidation.validationNotes.length > 0 && (
-          <div className="mt-5 rounded-lg border border-white/5 bg-[#1a1d23] p-4">
-            <h3 className="mb-2 text-sm font-medium text-zinc-300">验证结果</h3>
+        {lastResult && (lastResult.errors.length > 0 || lastResult.warnings.length > 0) && (
+          <div className={cn(
+            'mt-5 rounded-lg border p-4',
+            lastResult.success
+              ? 'border-white/5 bg-[#1a1d23]'
+              : 'border-red-500/30 bg-red-500/5'
+          )}>
+            <h3 className={cn(
+              'mb-2 text-sm font-medium',
+              lastResult.success ? 'text-zinc-300' : 'text-red-400'
+            )}>
+              {lastResult.success ? '验证结果' : '提交被阻止 — 以下问题需修正后重新提交'}
+            </h3>
             <ul className="space-y-1.5">
-              {lastValidation.validationNotes.map((note, i) => {
-                const isError =
-                  note.includes('无法识别') ||
-                  note.includes('不在支持') ||
-                  note.includes('无效') ||
-                  note.includes('缺少');
-                return (
-                  <li
-                    key={i}
-                    className={cn(
-                      'flex items-start gap-2 text-sm',
-                      isError ? 'text-red-400' : 'text-amber-400'
-                    )}
-                  >
-                    {isError ? (
-                      <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                    ) : (
-                      <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                    )}
-                    {note}
-                  </li>
-                );
-              })}
+              {lastResult.errors.map((note, i) => (
+                <li key={`err-${i}`} className="flex items-start gap-2 text-sm text-red-400">
+                  <XCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                  {note}
+                </li>
+              ))}
+              {lastResult.warnings.map((note, i) => (
+                <li key={`warn-${i}`} className="flex items-start gap-2 text-sm text-amber-400">
+                  <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                  {note}
+                </li>
+              ))}
             </ul>
           </div>
         )}
@@ -299,7 +325,7 @@ export default function InputPage() {
                     )}
                   />
                   <td className="py-3 pl-3 pr-4 text-zinc-300">{formatTime(rec.recordTime)}</td>
-                  <td className="py-3 pr-4 text-zinc-300">{DIRECTION_LABELS[rec.direction]}</td>
+                  <td className="py-3 pr-4 text-zinc-300">{directionLabel(rec.direction)}</td>
                   <td className="py-3 pr-4 text-zinc-300">
                     {rec.amplitude} {rec.amplitudeUnit}
                   </td>

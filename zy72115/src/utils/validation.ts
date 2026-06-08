@@ -1,5 +1,6 @@
 import type { ValidationResult, Direction, AmplitudeUnit, VibrationRecord } from '@/types';
 import { DIRECTION_LABELS } from '@/types';
+import { unitNeedsFrequency } from '@/utils/unitConversion';
 
 const VALID_DIRECTIONS: Direction[] = ['H', 'V', 'A'];
 const VALID_UNITS: AmplitudeUnit[] = ['mm/s', 'μm', 'in/s', 'mil', 'm/s²', 'g'];
@@ -20,7 +21,7 @@ export function validateDirection(value: string): ValidationResult {
   return { isValid: errors.length === 0, errors, warnings };
 }
 
-export function validateAmplitudeUnit(unit: string): ValidationResult {
+export function validateAmplitudeUnit(unit: string, frequencyHz?: number): ValidationResult {
   const errors: string[] = [];
   const warnings: string[] = [];
 
@@ -28,6 +29,17 @@ export function validateAmplitudeUnit(unit: string): ValidationResult {
     errors.push(
       `单位"${unit}"不在支持范围内。支持的单位：mm/s、μm、in/s、mil、m/s²、g。`
     );
+  } else if (unitNeedsFrequency(unit as AmplitudeUnit)) {
+    if (!frequencyHz || frequencyHz <= 0) {
+      errors.push(
+        `单位为${unit}（位移或加速度），需要频率值才能换算为速度 mm/s。` +
+        `当前缺少有效频率，无法完成换算，请先补充频率。`
+      );
+    } else {
+      warnings.push(
+        `单位为${unit}，系统将根据频率 ${frequencyHz} Hz 自动换算为 mm/s 进行阈值判断，请注意换算结果。`
+      );
+    }
   } else if (unit !== 'mm/s') {
     warnings.push(
       `单位为${unit}，系统会自动换算为 mm/s 进行阈值判断，请注意换算结果。`
@@ -117,7 +129,7 @@ export function validateRecord(
   }
 
   if (fields.amplitudeUnit) {
-    const unitResult = validateAmplitudeUnit(fields.amplitudeUnit);
+    const unitResult = validateAmplitudeUnit(fields.amplitudeUnit, fields.frequencyHz);
     allErrors.push(...unitResult.errors);
     allWarnings.push(...unitResult.warnings);
   }
@@ -132,8 +144,27 @@ export function validateRecord(
     allErrors.push(`频率值 ${fields.frequencyHz} Hz 无效，频率必须为正数。`);
   }
 
+  if (fields.frequencyHz !== undefined && fields.frequencyHz > 0 && fields.frequencyHz < 0.5) {
+    allWarnings.push(`频率值 ${fields.frequencyHz} Hz 极低，请确认单位是否正确（应为 Hz 而非 CPM）。`);
+  }
+
   if (fields.amplitude !== undefined && fields.amplitude < 0) {
     allWarnings.push(`幅值为负数（${fields.amplitude}），通常振动幅值应为正值，请确认方向符号是否需要调整。`);
+  }
+
+  if (fields.amplitude !== undefined && fields.amplitude === 0) {
+    allWarnings.push(`幅值为 0，该记录可能无实际测量意义，请确认是否为传感器故障或数据缺失。`);
+  }
+
+  if (fields.rpm !== undefined && fields.rpm > 0 && fields.frequencyHz !== undefined && fields.frequencyHz > 0) {
+    const fundamentalHz = fields.rpm / 60;
+    const ratio = fields.frequencyHz / fundamentalHz;
+    if (ratio > 20) {
+      allWarnings.push(
+        `频率 ${fields.frequencyHz} Hz 远超该转速下的基频 ${fundamentalHz.toFixed(1)} Hz 的 20 倍，` +
+        `请确认频率值和转速是否匹配。`
+      );
+    }
   }
 
   return {
