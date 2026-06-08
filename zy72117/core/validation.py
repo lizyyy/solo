@@ -132,9 +132,13 @@ class DataValidator:
 
     def validate_sensor_record(self, record: SensorRecord, record_index: int) -> None:
         record_id = f"{record.sensor_id}_{record_index}"
-        
+
         self.validate_direction(record.wind_direction, record_id)
-        
+
+        self.validate_unit(record.raw_data.get('temperature'), 'temperature', 'temperature', record_id)
+        self.validate_unit(record.raw_data.get('wind_speed'), 'velocity', 'wind_speed', record_id)
+        self.validate_unit(record.raw_data.get('co_concentration'), 'concentration', 'co_concentration', record_id)
+
         if record.temperature is not None:
             if record.temperature < -50 or record.temperature > 1000:
                 self.issues.append(ValidationIssue(

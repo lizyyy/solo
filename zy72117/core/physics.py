@@ -171,14 +171,17 @@ class TunnelVentilationPhysics:
                          velocity: float) -> Tuple[bool, str, List[str]]:
         warnings = []
         risk_score = 0
+        any_critical = False
 
         if visibility < Thresholds.VISIBILITY_MIN:
             warnings.append(f"[危险] 可见度过低: {visibility:.1f}m (阈值: {Thresholds.VISIBILITY_MIN}m)")
             risk_score += 3
+            any_critical = True
 
         if co_ppm > Thresholds.CO_MAX_PPM:
             warnings.append(f"[危险] CO浓度超标: {co_ppm:.1f}ppm (阈值: {Thresholds.CO_MAX_PPM}ppm)")
             risk_score += 3
+            any_critical = True
 
         if temp > Thresholds.TEMP_MAX:
             warnings.append(f"[警告] 烟气温度过高: {temp:.1f}°C (阈值: {Thresholds.TEMP_MAX}°C)")
@@ -195,8 +198,10 @@ class TunnelVentilationPhysics:
             return False, "极高风险", warnings
         elif risk_score >= 4:
             return False, "高风险", warnings
-        elif risk_score >= 2:
-            return True, "中风险", warnings
+        elif any_critical:
+            return False, "中风险", warnings
+        elif risk_score >= 1:
+            return True, "低风险(注意)", warnings
         else:
             return True, "低风险", warnings
 

@@ -63,8 +63,8 @@ class ReportGenerator:
         return "\n".join(chart_lines)
 
     def generate_risk_summary_chart(self, results: List[CalculationResult]) -> str:
-        risk_levels = {'低风险': 0, '中风险': 1, '高风险': 2, '极高风险': 3}
-        risk_colors = {'低风险': '🟢', '中风险': '🟡', '高风险': '🟠', '极高风险': '🔴'}
+        risk_levels = {'低风险': 0, '低风险(注意)': 1, '中风险': 2, '高风险': 3, '极高风险': 4}
+        risk_colors = {'低风险': '🟢', '低风险(注意)': '🟢', '中风险': '🟡', '高风险': '🟠', '极高风险': '🔴'}
 
         chart = []
         chart.append("\n📊 风险变化趋势:")
@@ -72,7 +72,8 @@ class ReportGenerator:
 
         for i, r in enumerate(results):
             time_marker = f"t={r.time_point:.0f}s" if i % 2 == 0 else " " * 6
-            chart.append(f"{time_marker} [{risk_colors.get(r.risk_level, '⚪')}] {r.risk_level}")
+            safe_tag = "" if r.is_safe else " [不安全]"
+            chart.append(f"{time_marker} [{risk_colors.get(r.risk_level, '⚪')}] {r.risk_level}{safe_tag}")
 
         chart.append("-" * 50)
 
@@ -81,7 +82,7 @@ class ReportGenerator:
             risk_counts[r.risk_level] = risk_counts.get(r.risk_level, 0) + 1
 
         chart.append("\n风险分布统计:")
-        for level in ['低风险', '中风险', '高风险', '极高风险']:
+        for level in ['低风险', '低风险(注意)', '中风险', '高风险', '极高风险']:
             count = risk_counts.get(level, 0)
             percentage = count / len(results) * 100 if results else 0
             chart.append(f"  {risk_colors.get(level, '⚪')} {level}: {count}次 ({percentage:.1f}%)")
@@ -145,7 +146,7 @@ class ReportGenerator:
         report.append("-" * 60)
 
         for r in results:
-            risk_marker = "🔴" if not r.is_safe else "🟢" if r.risk_level == "低风险" else "🟡"
+            risk_marker = "🔴" if not r.is_safe else "�" if r.risk_level == "低风险(注意)" else "�"
             report.append(f"{r.time_point:<8.0f} {r.smoke_layer_thickness:<8.2f} {r.smoke_temperature:<10.1f} "
                       f"{r.visibility:<10.1f} {r.co_concentration:<10.1f} {risk_marker}{r.risk_level}")
 
@@ -160,22 +161,31 @@ class ReportGenerator:
         report.append("-" * 70)
 
         unsafe_count = sum(1 for r in results if not r.is_safe)
+        medium_risk_count = sum(1 for r in results if r.risk_level == '中风险')
         high_risk_count = sum(1 for r in results if r.risk_level in ['高风险', '极高风险'])
+        attention_count = sum(1 for r in results if r.risk_level == '低风险(注意)')
+        total_warnings = sum(len(r.warnings) for r in results)
 
-        if high_risk_count > 0:
-            report.append(f"  ⚠️  检测到 {high_risk_count} 个高/极高风险时间点")
+        if high_risk_count > 0 or medium_risk_count > 0:
+            if high_risk_count > 0:
+                report.append(f"  🔴 检测到 {high_risk_count} 个高/极高风险时间点（不安全）")
+            if medium_risk_count > 0:
+                report.append(f"  🟡 检测到 {medium_risk_count} 个中风险时间点（不安全，有关键指标超阈值）")
+            report.append(f"  合计 {unsafe_count} 个不安全时间点，共产生 {total_warnings} 条告警")
             report.append("  建议:")
             report.append("    1. 立即检查通风系统运行状态")
-            report.append("    2. 考虑增加通风量或调整通风策略")
-            report.append("    3. 对高风险区域进行现场复核")
-            report.append("    4. 评估是否需要启动应急预案")
-        elif unsafe_count > 0:
-            report.append(f"  ⚠️  有 {unsafe_count} 个时间点存在安全隐患")
+            report.append("    2. 核查CO浓度、可见度等超阈值指标的现场实际情况")
+            report.append("    3. 考虑增加通风量或调整通风策略")
+            report.append("    4. 对高风险区域进行现场复核")
+            report.append("    5. 评估是否需要启动应急预案")
+        elif attention_count > 0:
+            report.append(f"  🟢 整体安全，但有 {attention_count} 个时间点存在需关注的指标")
+            report.append(f"  共产生 {total_warnings} 条注意/警告")
             report.append("  建议:")
-            report.append("    1. 关注CO浓度和可见度变化趋势")
+            report.append("    1. 关注风速不足或温度偏高等轻微异常")
             report.append("    2. 确保通风设备正常运行")
         else:
-            report.append("  ✅ 所有计算时间点均在安全范围内")
+            report.append("  ✅ 所有计算时间点均在安全范围内，无告警")
             report.append("  建议:")
             report.append("    1. 持续监测烟气扩散情况")
             report.append("    2. 保持通风系统良好运行状态")
@@ -249,7 +259,11 @@ class ReportGenerator:
             </div>
             <div class="summary-card">
                 <h3>高风险次数</h3>
-                <div class="value">{sum(1 for r in results if r.risk_level in ['高风险', '极高风险'])}</div>
+                <div class="value" style="color: #dc3545;">{sum(1 for r in results if r.risk_level in ['高风险', '极高风险'])}</div>
+            </div>
+            <div class="summary-card">
+                <h3>中风险次数(不安全)</h3>
+                <div class="value" style="color: #ffc107;">{sum(1 for r in results if r.risk_level == '中风险')}</div>
             </div>
         </div>
 
@@ -267,7 +281,12 @@ class ReportGenerator:
         """
 
         for r in results:
-            risk_class = 'risk-low' if r.risk_level == '低风险' else 'risk-medium' if r.risk_level == '中风险' else 'risk-high'
+            if r.risk_level in ['高风险', '极高风险']:
+                risk_class = 'risk-high'
+            elif r.risk_level == '中风险':
+                risk_class = 'risk-medium'
+            else:
+                risk_class = 'risk-low'
             status = '安全' if r.is_safe else '危险'
             html += f"""
             <tr class="{risk_class}">

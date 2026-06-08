@@ -1,0 +1,204 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>隧道通风烟气扩散分析报告</title>
+    <style>
+        body { font-family: 'Microsoft YaHei', Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #333; border-bottom: 3px solid #0078d4; padding-bottom: 10px; }
+        h2 { color: #0078d4; margin-top: 30px; }
+        .summary { display: flex; gap: 20px; flex-wrap: wrap; }
+        .summary-card { flex: 1; min-width: 200px; background: #f0f8ff; padding: 15px; border-radius: 8px; }
+        .summary-card h3 { margin: 0 0 10px 0; color: #666; }
+        .summary-card .value { font-size: 24px; font-weight: bold; color: #0078d4; }
+        .risk-low { background: #d4edda; color: #155724; }
+        .risk-medium { background: #fff3cd; color: #856404; }
+        .risk-high { background: #f8d7da; color: #721c24; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #0078d4; color: white; }
+        tr:hover { background: #f5f5f5; }
+        .wechat-note { background: #e8f5e9; padding: 10px; margin: 5px 0; border-radius: 4px; border-left: 4px solid #4caf50; }
+        .warnings { background: #fff3cd; padding: 15px; border-radius: 4px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 隧道通风烟气扩散分析报告</h1>
+        <p style="color: #666;">生成时间: 2026-06-08 15:11:04</p>
+
+        <h2>📋 数据概览</h2>
+        <div class="summary">
+            <div class="summary-card">
+                <h3>传感器记录</h3>
+                <div class="value">10</div>
+            </div>
+            <div class="summary-card">
+                <h3>设备参数</h3>
+                <div class="value">2</div>
+            </div>
+            <div class="summary-card">
+                <h3>计算时间点</h3>
+                <div class="value">10</div>
+            </div>
+            <div class="summary-card">
+                <h3>高风险次数</h3>
+                <div class="value" style="color: #dc3545;">1</div>
+            </div>
+            <div class="summary-card">
+                <h3>中风险次数(不安全)</h3>
+                <div class="value" style="color: #ffc107;">7</div>
+            </div>
+        </div>
+
+        <h2>📊 计算结果明细</h2>
+        <table>
+            <tr>
+                <th>时间(s)</th>
+                <th>烟层厚度(m)</th>
+                <th>烟气温度(°C)</th>
+                <th>可见度(m)</th>
+                <th>CO浓度(ppm)</th>
+                <th>风险等级</th>
+                <th>状态</th>
+            </tr>
+        
+            <tr class="risk-high">
+                <td>0</td>
+                <td>0.00</td>
+                <td>20.0</td>
+                <td>100.0</td>
+                <td>200.0</td>
+                <td>高风险</td>
+                <td>❌ 危险</td>
+            </tr>
+            
+            <tr class="risk-low">
+                <td>60</td>
+                <td>0.16</td>
+                <td>20.0</td>
+                <td>32.8</td>
+                <td>88.9</td>
+                <td>低风险(注意)</td>
+                <td>✅ 安全</td>
+            </tr>
+            
+            <tr class="risk-medium">
+                <td>120</td>
+                <td>0.24</td>
+                <td>20.0</td>
+                <td>33.0</td>
+                <td>133.3</td>
+                <td>中风险</td>
+                <td>❌ 危险</td>
+            </tr>
+            
+            <tr class="risk-medium">
+                <td>180</td>
+                <td>0.30</td>
+                <td>20.0</td>
+                <td>33.4</td>
+                <td>166.7</td>
+                <td>中风险</td>
+                <td>❌ 危险</td>
+            </tr>
+            
+            <tr class="risk-medium">
+                <td>240</td>
+                <td>0.30</td>
+                <td>20.0</td>
+                <td>49.2</td>
+                <td>111.1</td>
+                <td>中风险</td>
+                <td>❌ 危险</td>
+            </tr>
+            
+            <tr class="risk-medium">
+                <td>300</td>
+                <td>0.41</td>
+                <td>20.0</td>
+                <td>33.9</td>
+                <td>222.2</td>
+                <td>中风险</td>
+                <td>❌ 危险</td>
+            </tr>
+            
+            <tr class="risk-medium">
+                <td>360</td>
+                <td>0.44</td>
+                <td>20.0</td>
+                <td>36.4</td>
+                <td>222.2</td>
+                <td>中风险</td>
+                <td>❌ 危险</td>
+            </tr>
+            
+            <tr class="risk-medium">
+                <td>420</td>
+                <td>0.51</td>
+                <td>20.1</td>
+                <td>33.4</td>
+                <td>277.8</td>
+                <td>中风险</td>
+                <td>❌ 危险</td>
+            </tr>
+            
+            <tr class="risk-medium">
+                <td>480</td>
+                <td>0.69</td>
+                <td>20.1</td>
+                <td>20.8</td>
+                <td>679.1</td>
+                <td>中风险</td>
+                <td>❌ 危险</td>
+            </tr>
+            
+            <tr class="risk-low">
+                <td>540</td>
+                <td>0.28</td>
+                <td>20.0</td>
+                <td>100.0</td>
+                <td>33.3</td>
+                <td>低风险</td>
+                <td>✅ 安全</td>
+            </tr>
+            
+        </table>
+
+        <h2>💬 微信群原始备注</h2>
+        <div class="wechat-note"><strong>张工</strong> (2024-01-15 08:28:00): 维修微信群: 今天隧道通风系统测试，准备开始了，大家注意观察数据</div><div class="wechat-note"><strong>李工</strong> (2024-01-15 08:35:00): 维修微信群: 这里HRR好像不对，人工修正一下，HRR: 2200，CO: 250，风速好像也偏低</div><div class="wechat-note"><strong>王工</strong> (2024-01-15 08:36:00): 维修微信群: 老唐，隧道通风烟气扩散这块你得盯着点，CO浓度开始上来了</div><div class="wechat-note"><strong>老唐</strong> (2024-01-15 08:37:00): 维修微信群: 收到，隧道通风烟气扩散确实有问题，风机已经全功率运行了，再等等看</div><div class="wechat-note"><strong>张工</strong> (2024-01-15 08:37:30): 维修微信群: 修正: 温度: 92，风速确实只有0.5m/s，传感器没问题</div><div class="wechat-note"><strong>微信群用户</strong> (08:40): 【维修群】08:40 老唐: 隧道通风烟气扩散这个问题确实棘手，极端值被平均掉后风险真的看不出来</div><div class="wechat-note"><strong>微信群用户</strong> (08:41): 【维修群】08:41 李工: 同意，上次就是因为只看平均值差点出事，必须看每个时间点的实际数据</div><div class="wechat-note"><strong>微信群用户</strong> (08:42): 【维修群】08:42 王工: 隧道通风烟气扩散后面补材料时记得把这些数据都留着，复盘要用</div>
+
+        <h2>⚠️ 数据验证</h2>
+        <pre style="background: #f8f9fa; padding: 15px; border-radius: 4px; white-space: pre-wrap;">============================================================
+数据验证报告
+============================================================
+
+⚠️  警告 (2 项:
+  - [S001_5]: 风向符号不规范: '正方向'
+    建议: 请使用标准符号: +/-, 正/负, 进/出, up/down, in/out
+  - [S001_7]: 风向符号不规范: 'unknown'
+    建议: 请使用标准符号: +/-, 正/负, 进/出, up/down, in/out
+
+⚔️  数据冲突 (4 项):
+  - 数据冲突 - co_concentration
+    传感器数据: {'source': 'sensor', 'value': 280, 'sensor_id': 'S001'}
+    微信群数据: {'source': 'wechat', 'value': 250, 'author': '李工', 'content': '维修微信群: 这里HRR好像不对，人工修正一下，HRR: 2200，CO: 250，风速好像也偏低'}
+    建议动作: 确认哪个数据源更可靠, 考虑使用修正后的值, 现场核实实际情况, 保留两边数据供后续判断
+  - 数据冲突 - wind_speed
+    传感器数据: {'source': 'sensor', 'value': 1.2, 'sensor_id': 'S001'}
+    微信群数据: {'source': 'wechat', 'value': 1.5, 'author': '李工', 'content': '维修微信群: 这里HRR好像不对，人工修正一下，HRR: 2200，CO: 250，风速好像也偏低'}
+    建议动作: 确认哪个数据源更可靠, 考虑使用修正后的值, 现场核实实际情况, 保留两边数据供后续判断
+  - 数据冲突 - co_concentration
+    传感器数据: {'source': 'sensor', 'value': 280, 'sensor_id': 'S001'}
+    微信群数据: {'source': 'wechat', 'value': 250, 'author': '李工', 'content': '维修微信群: 这里HRR好像不对，人工修正一下，HRR: 2200，CO: 250，风速好像也偏低'}
+    建议动作: 确认哪个数据源更可靠, 考虑使用修正后的值, 现场核实实际情况, 保留两边数据供后续判断
+
+============================================================</pre>
+
+    </div>
+</body>
+</html>
+        
