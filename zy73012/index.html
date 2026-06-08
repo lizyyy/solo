@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>宠物寄养排程对账</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Noto Sans SC"', 'sans-serif'],
+            serif: ['"Noto Serif SC"', 'serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#EFF6FF', 100: '#DBEAFE', 500: '#3B82F6', 600: '#2563EB', 700: '#1D4ED8',
+            },
+            warn: {
+              50: '#FFF7ED', 100: '#FFEDD5', 500: '#F97316', 600: '#EA580C',
+            },
+            ok: {
+              50: '#ECFDF5', 100: '#D1FAE5', 500: '#10B981', 600: '#059669',
+            },
+            bad: {
+              50: '#FEF2F2', 100: '#FEE2E2', 500: '#EF4444', 600: '#DC2626',
+            },
+          },
+          boxShadow: {
+            card: '0 2px 8px rgba(15, 23, 42, 0.06)',
+            hover: '0 6px 20px rgba(15, 23, 42, 0.08)',
+          },
+          keyframes: {
+            fadeUp: {
+              '0%': { opacity: '0', transform: 'translateY(8px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            pulseSoft: {
+              '0%,100%': { boxShadow: '0 0 0 0 rgba(249,115,22,0.4)' },
+              '50%': { boxShadow: '0 0 0 8px rgba(249,115,22,0)' },
+            },
+            popIn: {
+              '0%': { opacity: '0', transform: 'scale(0.95)' },
+              '100%': { opacity: '1', transform: 'scale(1)' },
+            },
+          },
+          animation: {
+            'fade-up': 'fadeUp 0.5s ease both',
+            'pulse-soft': 'pulseSoft 2s ease-in-out infinite',
+            'pop-in': 'popIn 0.25s ease both',
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    html, body, #root { height: 100%; }
+    body {
+      background:
+        radial-gradient(1200px 600px at 10% -10%, #EFF6FF 0%, transparent 60%),
+        radial-gradient(900px 500px at 110% 10%, #FFF7ED 0%, transparent 55%),
+        #FAFBFC;
+      font-family: "Noto Sans SC", sans-serif;
+    }
+    .serif { font-family: "Noto Serif SC", serif; }
+    .mono { font-family: "JetBrains Mono", monospace; }
+    .scroll-thin::-webkit-scrollbar { width: 8px; height: 8px; }
+    .scroll-thin::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 4px; }
+    .scroll-thin::-webkit-scrollbar-thumb:hover { background: #CBD5E1; }
+    .unit-mixed-cell {
+      text-decoration: underline dotted #F97316;
+      text-underline-offset: 3px;
+      cursor: help;
+    }
+    .bg-grad-brand {
+      background: linear-gradient(135deg, #2563EB 0%, #60A5FA 100%);
+    }
+    .truncate-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .tab-dyn-border { border-left: 3px solid transparent; }
+    .tab-dyn-border.border-warn { border-left-color: #F97316; }
+    .tab-dyn-border.border-bad { border-left-color: #EF4444; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script crossorigin src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script type="text/babel" data-presets="env,react">
+    const { useState, useMemo, useCallback, useEffect, useRef } = React;
+
+    /* ===== Mock 数据 ===== */
+    const FOSTER_RECORDS = [
+      { id:'R001', petName:'奶盖', petType:'cat', ownerName:'林小姐', ownerPhone:'138****2301', checkinDate:'2026-06-01', checkoutDate:'2026-06-08', days:7, room:'C-203' },
+      { id:'R002', petName:'布丁', petType:'dog', ownerName:'王先生', ownerPhone:'139****8810', checkinDate:'2026-06-03', checkoutDate:'2026-06-10', days:7, room:'D-105' },
+      { id:'R003', petName:'雪球', petType:'cat', ownerName:'张女士', ownerPhone:'136****5566', checkinDate:'2026-06-05', checkoutDate:'2026-06-09', days:4, room:'C-201' },
+      { id:'R004', petName:'豆豆', petType:'dog', ownerName:'李先生', ownerPhone:'137****9922', checkinDate:'2026-06-02', checkoutDate:'2026-06-09', days:7, room:'D-108' },
+      { id:'R005', petName:'橘座', petType:'cat', ownerName:'陈先生', ownerPhone:'135****7788', checkinDate:'2026-06-04', checkoutDate:'2026-06-11', days:7, room:'C-305' },
+      { id:'R006', petName:'可卡', petType:'other', ownerName:'赵女士', ownerPhone:'133****1122', checkinDate:'2026-06-06', checkoutDate:'2026-06-08', days:2, room:'O-002' },
+      { id:'R007', petName:'毛毛', petType:'dog', ownerName:'孙先生', ownerPhone:'132****3344', checkinDate:'2026-06-07', checkoutDate:'2026-06-14', days:7, room:'D-112' },
+    ];
+
+    const WEIGHT_LOGS = [
+      // R001 奶盖 正常
+      { id:'W101', recordId:'R001', measuredAt:'2026-06-01 09:00', rawWeight:'4.2 kg',   operator:'小温',   rawSource:'{"scale":"A03","input":"4.2kg","time":1748739600}' },
+      { id:'W102', recordId:'R001', measuredAt:'2026-06-03 09:15', rawWeight:'4.15 kg',  operator:'小温',   rawSource:'{"scale":"A03","input":"4.15kg","time":1748912100}' },
+      { id:'W103', recordId:'R001', measuredAt:'2026-06-05 09:05', rawWeight:'4.18 kg',  operator:'小温',   rawSource:'{"scale":"A03","input":"4.18kg","time":1749084300}' },
+      { id:'W104', recordId:'R001', measuredAt:'2026-06-07 09:10', rawWeight:'4.22 kg',  operator:'小温',   rawSource:'{"scale":"A03","input":"4.22kg","time":1749256200}' },
+      { id:'W105', recordId:'R001', measuredAt:'2026-06-08 09:00', rawWeight:'4.25 kg',  operator:'小温',   rawSource:'{"scale":"A03","input":"4.25kg","time":1749342000}' },
+      // R002 布丁 kg/g 混写
+      { id:'W201', recordId:'R002', measuredAt:'2026-06-03 10:00', rawWeight:'12.5 kg',  operator:'小温',   rawSource:'{"scale":"B01","input":"12.5kg","time":1748908800}' },
+      { id:'W202', recordId:'R002', measuredAt:'2026-06-05 10:15', rawWeight:'12400 g',  operator:'新人小王', rawSource:'{"scale":"B01","input":"12400g","time":1749081300}' },
+      { id:'W203', recordId:'R002', measuredAt:'2026-06-07 10:05', rawWeight:'12.6 kg',  operator:'小温',   rawSource:'{"scale":"B01","input":"12.6kg","time":1749252300}' },
+      // R003 雪球 kg/lb 混写
+      { id:'W301', recordId:'R003', measuredAt:'2026-06-05 08:30', rawWeight:'3.8 kg',   operator:'小温',   rawSource:'{"scale":"A05","input":"3.8kg","time":1749081000}' },
+      { id:'W302', recordId:'R003', measuredAt:'2026-06-07 08:40', rawWeight:'8.6 lb',   operator:'新人小王', rawSource:'{"scale":"A05","input":"8.6lb","time":1749252000}' },
+      { id:'W303', recordId:'R003', measuredAt:'2026-06-08 08:35', rawWeight:'3.9 kg',   operator:'小温',   rawSource:'{"scale":"A05","input":"3.9kg","time":1749338100}' },
+      // R004 豆豆 含坏数据
+      { id:'W401', recordId:'R004', measuredAt:'2026-06-02 11:00', rawWeight:'9.3 kg',   operator:'小温',   rawSource:'{"scale":"B03","input":"9.3kg","time":1748826000}' },
+      { id:'W402', recordId:'R004', measuredAt:'2026-06-04 11:20', rawWeight:'-- 没称上', operator:'新人小王', rawSource:'{"scale":"B03","input":"--没称上","time":1749000000}' },
+      { id:'W403', recordId:'R004', measuredAt:'2026-06-06 11:10', rawWeight:'9.5 kg',   operator:'小温',   rawSource:'{"scale":"B03","input":"9.5kg","time":1749172200}' },
+      { id:'W404', recordId:'R004', measuredAt:'2026-06-08 11:05', rawWeight:'9.4 kg',   operator:'小温',   rawSource:'{"scale":"B03","input":"9.4kg","time":1749342300}' },
+      // R005 橘座 体重骤变
+      { id:'W501', recordId:'R005', measuredAt:'2026-06-04 09:30', rawWeight:'5.6 kg',   operator:'小温',   rawSource:'{"scale":"A01","input":"5.6kg","time":1748999400}' },
+      { id:'W502', recordId:'R005', measuredAt:'2026-06-06 09:45', rawWeight:'3.8 kg',   operator:'新人小王', rawSource:'{"scale":"A01","input":"3.8kg","time":1749171900}' },
+      { id:'W503', recordId:'R005', measuredAt:'2026-06-08 09:35', rawWeight:'5.7 kg',   operator:'小温',   rawSource:'{"scale":"A01","input":"5.7kg","time":1749339300}' },
+      // R006 可卡 正常
+      { id:'W601', recordId:'R006', measuredAt:'2026-06-06 14:00', rawWeight:'1.8 kg',   operator:'小温',   rawSource:'{"scale":"C01","input":"1.8kg","time":1749184800}' },
+      { id:'W602', recordId:'R006', measuredAt:'2026-06-07 14:10', rawWeight:'1.78 kg',  operator:'小温',   rawSource:'{"scale":"C01","input":"1.78kg","time":1749270600}' },
+      { id:'W603', recordId:'R006', measuredAt:'2026-06-08 14:05', rawWeight:'1.76 kg',  operator:'小温',   rawSource:'{"scale":"C01","input":"1.76kg","time":1749356700}' },
+      // R007 毛毛 正常
+      { id:'W701', recordId:'R007', measuredAt:'2026-06-07 16:00', rawWeight:'22.4 kg',  operator:'小温',   rawSource:'{"scale":"B02","input":"22.4kg","time":1749277200}' },
+      { id:'W702', recordId:'R007', measuredAt:'2026-06-08 16:10', rawWeight:'22.5 kg',  operator:'小温',   rawSource:'{"scale":"B02","input":"22.5kg","time":1749363000}' },
+    ];
+
+    const MEDICATIONS = [
+      { id:'M101', recordId:'R001', drugName:'化毛膏', dosage:'2g', frequency:'每日一次', dueTime:'2026-06-05 20:00', status:'done', note:'喂食正常' },
+      { id:'M102', recordId:'R001', drugName:'益生菌', dosage:'1袋', frequency:'每日两次', dueTime:'2026-06-07 20:00', status:'done', note:'' },
+      { id:'M201', recordId:'R002', drugName:'驱虫药', dosage:'1片', frequency:'单次', dueTime:'2026-06-06 09:00', status:'missed', note:'口头交接时漏记' },
+      { id:'M202', recordId:'R002', drugName:'关节保健品', dosage:'1粒', frequency:'每日一次', dueTime:'2026-06-08 09:00', status:'pending', note:'等下一次提醒' },
+      { id:'M301', recordId:'R003', drugName:'眼药', dosage:'1滴', frequency:'每日两次', dueTime:'2026-06-07 21:00', status:'done', note:'' },
+      { id:'M401', recordId:'R004', drugName:'消炎药', dosage:'半片', frequency:'每日两次', dueTime:'2026-06-08 08:00', status:'pending', note:'6/4坏数据那天没登记' },
+      { id:'M402', recordId:'R004', drugName:'滴耳液', dosage:'2滴', frequency:'每日一次', dueTime:'2026-06-08 21:00', status:'pending', note:'' },
+      { id:'M501', recordId:'R005', drugName:'止吐药', dosage:'1片', frequency:'每日两次', dueTime:'2026-06-06 21:00', status:'missed', note:'体重波动当天漏记' },
+      { id:'M601', recordId:'R006', drugName:'维C', dosage:'1片', frequency:'每日一次', dueTime:'2026-06-08 10:00', status:'done', note:'' },
+      { id:'M701', recordId:'R007', drugName:'皮肤喷剂', dosage:'3喷', frequency:'每日两次', dueTime:'2026-06-08 20:00', status:'pending', note:'' },
+    ];
+
+    /* ===== 对账引擎 ===== */
+    function parseWeight(raw){
+      if (!raw) return { value: null, unit: 'unknown' };
+      const s = String(raw).trim();
+      const m = s.match(/^(-?\d+(?:\.\d+)?)\s*(kg|g|lb|KG|G|LB)?$/i);
+      if (!m) return { value: null, unit: 'unknown' };
+      const val = parseFloat(m[1]);
+      const unit = (m[2] || 'kg').toLowerCase();
+      let kg = null;
+      switch (unit) {
+        case 'kg': kg = val; break;
+        case 'g':  kg = val / 1000; break;
+        case 'lb': kg = val * 0.45359237; break;
+        default:   kg = null;
+      }
+      return { value: kg, unit };
+    }
+
+    function useReconcileEngine(){
+      return useMemo(() => {
+        const logsByR = {};
+        WEIGHT_LOGS.forEach(w => {
+          const p = parseWeight(w.rawWeight);
+          const norm = { ...w, weightKg: p.value, detectedUnit: p.unit };
+          (logsByR[w.recordId] = logsByR[w.recordId] || []).push(norm);
+        });
+        const medsByR = {};
+        MEDICATIONS.forEach(m => { (medsByR[m.recordId] = medsByR[m.recordId] || []).push(m); });
+        const anomalyId = { n: 0 };
+        const makeA = (o) => ({ ...o, id: 'A' + (++anomalyId.n).toString().padStart(3,'0'), detectedAt: new Date().toISOString() });
+
+        const records = FOSTER_RECORDS.map(r => {
+          const logs = (logsByR[r.id] || []).slice().sort((a,b)=>a.measuredAt.localeCompare(b.measuredAt));
+          const meds = medsByR[r.id] || [];
+          const units = new Set(logs.map(l => l.detectedUnit).filter(u => u !== 'unknown'));
+          const unitMixed = units.size > 1;
+          const anomalies = [];
+
+          if (unitMixed) {
+            anomalies.push(makeA({
+              recordId: r.id, type: 'unit_mixed', severity: 'medium',
+              explanation: `同一只宠物(${r.petName})体重记录混用了 ${Array.from(units).join('/')} 多种单位`,
+              conclusionBefore: '按字面数字直接判断：体重波动异常，怀疑健康问题',
+              conclusionAfter: '统一换算为 kg 后：波动在正常范围内，为单位录入不统一',
+              conclusionChangeReason: '未执行单位标准化换算，把 g/lb 当成 kg 直接比较造成误判',
+            }));
+          }
+
+          logs.forEach(l => {
+            if (l.weightKg === null) {
+              anomalies.push(makeA({
+                recordId: r.id, weightLogId: l.id, type: 'bad_data', severity: 'high',
+                explanation: `原始记录无法解析为体重："${l.rawWeight}"`,
+                conclusionBefore: '该日体重缺失，对账结论：数据不完整',
+                conclusionAfter: `已标记为坏数据，保留原始录入内容供追溯：${l.rawWeight}`,
+                conclusionChangeReason: `操作人${l.operator}录入了非标准内容，已定位到具体体重日志ID=${l.id}`,
+              }));
+            }
+          });
+
+          const valid = logs.filter(l => l.weightKg !== null);
+          for (let i = 1; i < valid.length; i++) {
+            const pv = valid[i-1].weightKg, cv = valid[i].weightKg;
+            if (pv && cv) {
+              const ratio = Math.abs(cv - pv) / pv;
+              if (ratio > 0.3) {
+                anomalies.push(makeA({
+                  recordId: r.id, weightLogId: valid[i].id, type: 'weight_abnormal', severity: 'high',
+                  explanation: `体重两日波动 ${(ratio*100).toFixed(1)}%（${pv.toFixed(2)}kg → ${cv.toFixed(2)}kg）`,
+                  conclusionBefore: `体重骤变${(ratio*100).toFixed(1)}%，判定为健康异常，需立即联系医生`,
+                  conclusionAfter: unitMixed
+                    ? '进一步检查发现单位混写，换算后波动恢复到正常范围，结论降级为录入问题'
+                    : '单位一致，确认为真实体重异常，建议医生介入',
+                  conclusionChangeReason: unitMixed
+                    ? '触发单位混写异常关联排查，修正了初始健康异常结论'
+                    : '无单位问题，维持初始健康异常结论',
+                }));
+              }
+            }
+          }
+
+          meds.forEach(m => {
+            if (m.status === 'missed') {
+              anomalies.push(makeA({
+                recordId: r.id, type: 'medication_missed', severity: 'high',
+                explanation: `用药"${m.drugName} ${m.dosage}"(${m.dueTime})漏执行`,
+                conclusionBefore: '口头交接未记到：漏药无法追踪',
+                conclusionAfter: `系统已标记漏药：${m.drugName} ${m.dosage}，原因：${m.note || '未登记'}`,
+                conclusionChangeReason: '对账引擎从用药提醒中检测到 status=missed，替代了口头依赖',
+              }));
+            }
+          });
+
+          return { ...r, weightLogs: logs, medications: meds, anomalies, hasAnomaly: anomalies.length > 0, unitMixed };
+        });
+
+        const stats = {
+          total: records.length,
+          normal: records.filter(r => !r.hasAnomaly).length,
+          anomaly: records.filter(r => r.hasAnomaly).length,
+          medicationPending: records.reduce((s,r)=>s + r.medications.filter(m=>m.status==='pending').length, 0),
+          unitMixed: records.filter(r => r.unitMixed).length,
+        };
+        return { records, stats };
+      }, []);
+    }
+
+    /* ===== 图标包装 ===== */
+    const Lucide = ({ name, className='w-4 h-4', style }) => {
+      const ref = useRef(null);
+      useEffect(() => {
+        if (!ref.current) return;
+        const el = document.createElement('i');
+        el.setAttribute('data-lucide', name);
+        ref.current.innerHTML = '';
+        ref.current.appendChild(el);
+        window.lucide && window.lucide.createIcons({ attrs: { class: className, style }, nameAttr: 'data-lucide' });
+      }, [name, className]);
+      return <span ref={ref} className={className} style={style} />;
+    };
+
+    const ANOM_META = {
+      unit_mixed:        { label:'单位混写', color:'warn', icon:'ruler' },
+      bad_data:          { label:'坏数据',   color:'bad',  icon:'triangle-alert' },
+      weight_abnormal:   { label:'体重骤变', color:'bad',  icon:'activity' },
+      medication_missed: { label:'用药漏记', color:'bad',  icon:'pill' },
+    };
+    const SEV_META = {
+      high:   { label:'高', cls:'bg-bad-50 text-bad-600 border border-bad-100' },
+      medium: { label:'中', cls:'bg-warn-50 text-warn-600 border border-warn-100' },
+      low:    { label:'低', cls:'bg-ok-50 text-ok-600 border border-ok-100' },
+    };
+    const PET_META = {
+      cat:   { label:'猫',   emoji:'🐱' },
+      dog:   { label:'狗',   emoji:'🐶' },
+      other: { label:'其他', emoji:'🐾' },
+    };
+
+    /* ===== 筛选条 ===== */
+    function FilterBar({ filters, setFilters }){
+      const aTypes = [
+        {k:'all',label:'全部'},{k:'none',label:'仅正常'},
+        {k:'unit_mixed',label:'单位混写'},{k:'bad_data',label:'坏数据'},
+        {k:'weight_abnormal',label:'体重骤变'},{k:'medication_missed',label:'用药漏记'},
+      ];
+      const pTypes = [{k:'all',label:'全部'},{k:'cat',label:'猫'},{k:'dog',label:'狗'},{k:'other',label:'其他'}];
+      return (
+        <div className="bg-grad-brand rounded-2xl p-5 text-white shadow-card">
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Lucide name="sliders-horizontal" className="w-5 h-5 opacity-90" />
+              <span className="serif font-semibold text-white/95 text-sm">排程对账筛选</span>
+            </div>
+            <div className="flex items-center gap-2 ml-2">
+              <label className="text-xs text-white/80">入住起</label>
+              <input type="date" value={filters.startDate}
+                onChange={e=>setFilters({...filters,startDate:e.target.value})}
+                className="bg-white/10 border border-white/20 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-white/40 text-white" />
+              <label className="text-xs text-white/80">止</label>
+              <input type="date" value={filters.endDate}
+                onChange={e=>setFilters({...filters,endDate:e.target.value})}
+                className="bg-white/10 border border-white/20 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-white/40 text-white" />
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="text-xs text-white/80">宠物</label>
+              <select value={filters.petType} onChange={e=>setFilters({...filters,petType:e.target.value})}
+                className="bg-white/10 border border-white/20 rounded-lg px-2 py-1.5 text-sm text-white">
+                {pTypes.map(p=><option key={p.k} value={p.k} className="text-slate-800">{p.label}</option>)}
+              </select>
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="text-xs text-white/80">异常</label>
+              <select value={filters.anomalyType} onChange={e=>setFilters({...filters,anomalyType:e.target.value})}
+                className="bg-white/10 border border-white/20 rounded-lg px-2 py-1.5 text-sm text-white">
+                {aTypes.map(a=><option key={a.k} value={a.k} className="text-slate-800">{a.label}</option>)}
+              </select>
+            </div>
+            <div className="flex items-center gap-2 ml-auto">
+              <button onClick={()=>setFilters({startDate:'2026-06-01',endDate:'2026-06-10',petType:'all',anomalyType:'all',unitMixedOnly:false,keyword:''})}
+                className="bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs px-3 py-1.5 rounded-lg transition flex items-center gap-1">
+                <Lucide name="rotate-ccw" className="w-3.5 h-3.5" /> 重置
+              </button>
+              <label className="text-xs text-white/80 flex items-center gap-1 cursor-pointer bg-white/10 border border-white/20 rounded-lg px-2 py-1.5">
+                <input type="checkbox" checked={filters.unitMixedOnly}
+                  onChange={e=>setFilters({...filters,unitMixedOnly:e.target.checked})} className="accent-warn-500" />
+                仅看单位混写
+              </label>
+            </div>
+          </div>
+          <div className="mt-3 flex items-center gap-2">
+            <Lucide name="search" className="w-4 h-4 text-white/70" />
+            <input type="text" placeholder="搜索宠物名/主人/房间号（含原始体重内容也可搜）" value={filters.keyword}
+              onChange={e=>setFilters({...filters,keyword:e.target.value})}
+              className="flex-1 bg-white/10 border border-white/20 rounded-lg px-3 py-1.5 text-sm text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/40" />
+          </div>
+        </div>
+      );
+    }
+
+    /* ===== 统计卡片 ===== */
+    function StatsCards({ stats, filteredCount }){
+      const items = [
+        { k:'total',   label:'总记录数',   value: stats.total,   sub:`当前筛选 ${filteredCount}`, color:'brand', icon:'clipboard-list' },
+        { k:'normal',  label:'正常记录',   value: stats.normal,  sub:`${Math.round(stats.normal/stats.total*100)}% 占比`, color:'ok',    icon:'check-circle-2' },
+        { k:'anomaly', label:'异常记录',   value: stats.anomaly, sub:'高优先级',                    color:'bad',   icon:'alert-triangle' },
+        { k:'med',     label:'用药待提醒', value: stats.medicationPending, sub:'今日待执行',        color:'warn',  icon:'alarm-clock' },
+        { k:'unit',    label:'单位混写',   value: stats.unitMixed, sub:'需复核换算',               color:'warn',  icon:'ruler' },
+      ];
+      return (
+        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4">
+          {items.map((it,i)=>(
+            <div key={it.k}
+              className={`bg-white rounded-2xl p-4 border border-${it.color}-100 shadow-card hover:shadow-hover hover:-translate-y-0.5 transition animate-fade-up`}
+              style={{animationDelay: `${i*80}ms`}}>
+              <div className="flex items-start justify-between">
+                <div>
+                  <div className="text-xs text-slate-500 mb-1">{it.label}</div>
+                  <div className={`mono text-3xl font-bold text-${it.color}-600`}>{it.value}</div>
+                  <div className="text-[11px] text-slate-400 mt-1">{it.sub}</div>
+                </div>
+                <div className={`w-10 h-10 rounded-xl bg-${it.color}-50 text-${it.color}-600 flex items-center justify-center`}>
+                  <Lucide name={it.icon} className="w-5 h-5" />
+                </div>
+              </div>
+              <div className="mt-3 h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                <div className={`h-full bg-${it.color}-500 rounded-full`}
+                  style={{ width: `${Math.min(100, (it.value / Math.max(1, stats.total) * 200))}%` }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    /* ===== 体重单元格 ===== */
+    function WeightCell({ log, onClick }){
+      if (log.weightKg === null) {
+        return (
+          <span onClick={onClick}
+            title={`原始录入：${log.rawWeight} · 操作人：${log.operator} · 日志ID=${log.id}`}
+            className="inline-block px-2 py-0.5 rounded bg-bad-50 text-bad-600 text-xs cursor-pointer border border-bad-100 hover:bg-bad-100 transition">
+            坏数据 · {log.rawWeight}
+          </span>
+        );
+      }
+      const cls = log.unitMixed ? 'unit-mixed-cell text-warn-600' : 'text-slate-700';
+      return (
+        <span onClick={onClick}
+          title={`原始录入：${log.rawWeight}\n检测单位：${log.detectedUnit}\n换算后：${log.weightKg.toFixed(3)} kg\n操作人：${log.operator}\n日志ID=${log.id}`}
+          className={`inline-block mono text-sm ${cls} cursor-help hover:bg-slate-50 rounded px-1.5 py-0.5 transition`}>
+          {log.weightKg.toFixed(2)} <span className="text-[10px] text-slate-400">kg</span>
+          {log.unitMixed && <span className="ml-1 text-[10px] text-warn-500">[{log.detectedUnit}]</span>}
+        </span>
+      );
+    }
+
+    /* ===== 明细表 ===== */
+    function RecordsTable({ records, onOpenDetail, onOpenTrace }){
+      return (
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-card overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+            <div className="flex items-center gap-2">
+              <Lucide name="table-2" className="w-5 h-5 text-brand-600" />
+              <h2 className="serif font-semibold text-slate-800">寄养排程对账明细表</h2>
+              <span className="text-xs text-slate-400 ml-2">（点击异常行可查看结论变化解释）</span>
+            </div>
+            <div className="text-xs text-slate-500">
+              共 <span className="mono text-brand-600 font-semibold">{records.length}</span> 条
+            </div>
+          </div>
+          <div className="overflow-auto scroll-thin max-h-[560px]">
+            <table className="w-full text-sm">
+              <thead className="bg-slate-50 text-slate-500 text-xs sticky top-0 z-10">
+                <tr>
+                  <th className="px-4 py-3 text-left font-medium">宠物/类型</th>
+                  <th className="px-4 py-3 text-left font-medium">主人</th>
+                  <th className="px-4 py-3 text-left font-medium">入住→出院</th>
+                  <th className="px-4 py-3 text-left font-medium">房间</th>
+                  <th className="px-4 py-3 text-left font-medium">体重曲线(kg)</th>
+                  <th className="px-4 py-3 text-left font-medium">用药</th>
+                  <th className="px-4 py-3 text-left font-medium">异常标记</th>
+                  <th className="px-4 py-3 text-right font-medium">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                {records.length===0 && (
+                  <tr><td colSpan={8} className="text-center py-16 text-slate-400">
+                    <Lucide name="inbox" className="w-12 h-12 mx-auto mb-3 opacity-40" /><div>当前筛选下没有记录</div>
+                  </td></tr>
+                )}
+                {records.map(r=>{
+                  const pet = PET_META[r.petType];
+                  const pendingMed = r.medications.filter(m=>m.status==='pending').length;
+                  const missedMed  = r.medications.filter(m=>m.status==='missed').length;
+                  return (
+                    <tr key={r.id}
+                      className={`border-t border-slate-100 transition ${r.hasAnomaly?'bg-warn-50/30':'hover:bg-slate-50'}`}
+                      style={{borderLeft: r.hasAnomaly?'3px solid #F97316':'3px solid transparent'}}>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xl">{pet.emoji}</span>
+                          <div>
+                            <div className="font-semibold text-slate-800">{r.petName}</div>
+                            <div className="text-[11px] text-slate-400 mono">#{r.id} · {pet.label}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-slate-600">
+                        <div>{r.ownerName}</div>
+                        <div className="text-[11px] text-slate-400 mono">{r.ownerPhone}</div>
+                      </td>
+                      <td className="px-4 py-3 text-slate-600 mono text-xs">
+                        <div>{r.checkinDate}</div>
+                        <div className="text-slate-400">→ {r.checkoutDate}（{r.days}天）</div>
+                      </td>
+                      <td className="px-4 py-3 mono text-xs text-slate-600">{r.room}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex flex-wrap gap-1.5 max-w-[260px]">
+                          {r.weightLogs.map(w=>(
+                            <WeightCell key={w.id} log={{...w,unitMixed:r.unitMixed}} onClick={()=>onOpenTrace(r,w)} />
+                          ))}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex flex-col gap-1">
+                          {pendingMed>0 && (
+                            <span className="inline-flex items-center gap-1 text-[11px] bg-warn-50 text-warn-600 rounded px-1.5 py-0.5 w-fit border border-warn-100">
+                              <Lucide name="alarm-clock" className="w-3 h-3" /> 待提醒 {pendingMed}
+                            </span>
+                          )}
+                          {missedMed>0 && (
+                            <span className="inline-flex items-center gap-1 text-[11px] bg-bad-50 text-bad-600 rounded px-1.5 py-0.5 w-fit border border-bad-100">
+                              <Lucide name="x-circle" className="w-3 h-3" /> 漏记 {missedMed}
+                            </span>
+                          )}
+                          {pendingMed===0 && missedMed===0 && (
+                            <span className="text-[11px] text-ok-600 flex items-center gap-1">
+                              <Lucide name="check" className="w-3 h-3" /> 全部已执行
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex flex-wrap gap-1.5 max-w-[180px]">
+                          {r.anomalies.length===0 ? (
+                            <span className="inline-flex items-center gap-1 text-[11px] text-ok-600 bg-ok-50 border border-ok-100 rounded px-1.5 py-0.5">
+                              <Lucide name="check-circle-2" className="w-3 h-3" /> 正常
+                            </span>
+                          ) : r.anomalies.slice(0,3).map(a=>{
+                            const m=ANOM_META[a.type];
+                            return (
+                              <span key={a.id} title={`${m.label}：${a.explanation}`}
+                                className={`inline-flex items-center gap-1 text-[11px] bg-${m.color}-50 text-${m.color}-600 border border-${m.color}-100 rounded px-1.5 py-0.5`}>
+                                <Lucide name={m.icon} className="w-3 h-3" /> {m.label}
+                              </span>
+                            );
+                          })}
+                          {r.anomalies.length>3 && <span className="text-[10px] text-slate-400">+{r.anomalies.length-3}</span>}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <button onClick={()=>onOpenDetail(r)}
+                          className="inline-flex items-center gap-1 text-xs text-brand-600 hover:text-brand-700 bg-brand-50 hover:bg-brand-100 px-2.5 py-1 rounded-lg transition">
+                          <Lucide name="eye" className="w-3.5 h-3.5" /> 详情
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      );
+    }
+
+    /* ===== 异常队列 ===== */
+    function AnomalyQueue({ records, onOpenDetail, onOpenTrace }){
+      const list = useMemo(()=>{
+        const arr=[];
+        records.forEach(r=>r.anomalies.forEach(a=>arr.push({record:r,anomaly:a})));
+        const order={high:0,medium:1,low:2};
+        arr.sort((a,b)=>order[a.anomaly.severity]-order[b.anomaly.severity]);
+        return arr;
+      },[records]);
+
+      return (
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-card overflow-hidden flex flex-col max-h-[660px]">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 sticky top-0 bg-white">
+            <div className="flex items-center gap-2">
+              <Lucide name="workflow" className="w-5 h-5 text-bad-600" />
+              <h2 className="serif font-semibold text-slate-800">异常队列</h2>
+              <span className="text-xs text-bad-600 bg-bad-50 border border-bad-100 rounded-full px-2 py-0.5">{list.length}</span>
+            </div>
+            <span className="text-[11px] text-slate-400">按严重度排序</span>
+          </div>
+          <div className="p-4 space-y-3 overflow-y-auto scroll-thin flex-1">
+            {list.length===0 && (
+              <div className="text-center py-16 text-slate-400">
+                <Lucide name="party-popper" className="w-12 h-12 mx-auto mb-3 opacity-40 text-ok-500" /><div>没有异常，完美</div>
+              </div>
+            )}
+            {list.map((item,i)=>{
+              const {record:r,anomaly:a}=item;
+              const m=ANOM_META[a.type];
+              const sev=SEV_META[a.severity];
+              const borderCol = m.color==='warn' ? '#F97316' : '#EF4444';
+              return (
+                <div key={a.id}
+                  onClick={()=>onOpenDetail(r)}
+                  className={`rounded-xl border p-3 transition hover:shadow-card hover:-translate-y-0.5 cursor-pointer animate-fade-up ${a.severity==='high'?'animate-pulse-soft':''}`}
+                  style={{animationDelay:`${i*60}ms`, borderLeft:`4px solid ${borderCol}`, background:a.severity==='high'?'linear-gradient(180deg,#FEF2F2 0%,#FFFFFF 100%)':'#FFF'}}>
+                  <div className="flex items-start gap-2">
+                    <div className={`w-8 h-8 rounded-lg bg-${m.color}-50 text-${m.color}-600 flex items-center justify-center shrink-0`}>
+                      <Lucide name={m.icon} className="w-4 h-4" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-semibold text-slate-800 text-sm">{r.petName}</span>
+                        <span className="text-[10px] text-slate-400 mono">#{r.id}</span>
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded border ${sev.cls}`}>{sev.label}危</span>
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded bg-${m.color}-50 text-${m.color}-600 border border-${m.color}-100`}>{m.label}</span>
+                      </div>
+                      <p className="text-xs text-slate-600 mt-1 truncate-2 leading-relaxed">{a.explanation}</p>
+                      <div className="flex items-center gap-2 mt-2">
+                        <button onClick={e=>{e.stopPropagation();onOpenDetail(r);}}
+                          className="text-[11px] text-brand-600 hover:text-brand-700 flex items-center gap-0.5">
+                          <Lucide name="message-square-diff" className="w-3 h-3" /> 为什么结论变了
+                        </button>
+                        {a.weightLogId && (
+                          <button onClick={e=>{e.stopPropagation();const wl=r.weightLogs.find(w=>w.id===a.weightLogId);if(wl)onOpenTrace(r,wl);}}
+                            className="text-[11px] text-warn-600 hover:text-warn-700 flex items-center gap-0.5 ml-auto">
+                            <Lucide name="link" className="w-3 h-3" /> 指回原始记录
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+
+    /* ===== 详情弹窗 ===== */
+    function DetailModal({ record, onClose, onOpenTrace }){
+      const [tab,setTab] = useState('info');
+      if(!record) return null;
+      return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm" onClick={onClose}>
+          <div className="bg-white rounded-2xl shadow-hover border border-slate-200 w-full max-w-4xl max-h-[88vh] overflow-hidden flex flex-col animate-pop-in"
+            onClick={e=>e.stopPropagation()}>
+            <div className="flex items-start justify-between p-5 border-b border-slate-100"
+              style={{background: record.hasAnomaly?'linear-gradient(135deg,#FFF7ED 0%,#FFFFFF 100%)':'#FFF'}}>
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center text-2xl">
+                  {PET_META[record.petType].emoji}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h2 className="serif text-lg font-bold text-slate-800">{record.petName}</h2>
+                    <span className="mono text-xs text-slate-400">#{record.id}</span>
+                    {record.hasAnomaly && (
+                      <span className="text-[11px] bg-bad-50 text-bad-600 border border-bad-100 rounded px-2 py-0.5 flex items-center gap-1">
+                        <Lucide name="alert-triangle" className="w-3 h-3" /> 有异常
+                      </span>
+                    )}
+                    {!record.hasAnomaly && (
+                      <span className="text-[11px] bg-ok-50 text-ok-600 border border-ok-100 rounded px-2 py-0.5 flex items-center gap-1">
+                        <Lucide name="check-circle-2" className="w-3 h-3" /> 正常
+                      </span>
+                    )}
+                    {record.unitMixed && (
+                      <span className="text-[11px] bg-warn-50 text-warn-600 border border-warn-100 rounded px-2 py-0.5 flex items-center gap-1">
+                        <Lucide name="ruler" className="w-3 h-3" /> 单位混写
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-xs text-slate-500 mt-1">
+                    主人 {record.ownerName} · {record.ownerPhone} · 房间 {record.room} · {record.checkinDate} → {record.checkoutDate}（{record.days}天）
+                  </div>
+                </div>
+              </div>
+              <button onClick={onClose}
+                className="w-9 h-9 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-500 transition">
+                <Lucide name="x" className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="flex items-center gap-1 px-5 pt-3 border-b border-slate-100">
+              {[
+                {k:'info',label:'基本信息',icon:'info'},
+                {k:'weight',label:'体重曲线',icon:'activity'},
+                {k:'med',label:'用药提醒',icon:'pill'},
+                {k:'anom',label:'异常 & 结论变化',icon:'message-square-diff'},
+                {k:'raw',label:'原始线索',icon:'archive'},
+              ].map(t=>(
+                <button key={t.k} onClick={()=>setTab(t.k)}
+                  className={`px-3 py-2 text-sm rounded-t-lg flex items-center gap-1.5 transition ${tab===t.k?'bg-brand-50 text-brand-700 border-b-2 border-brand-500 -mb-px':'text-slate-500 hover:text-slate-700 hover:bg-slate-50'}`}>
+                  <Lucide name={t.icon} className="w-4 h-4" /> {t.label}
+                </button>
+              ))}
+            </div>
+            <div className="p-5 overflow-y-auto scroll-thin flex-1">
+              {tab==='info' && (
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  {[
+                    ['寄养记录ID',<span className="mono">{record.id}</span>],
+                    ['宠物名',record.petName],
+                    ['宠物类型',PET_META[record.petType].label],
+                    ['主人姓名',record.ownerName],
+                    ['联系电话',<span className="mono">{record.ownerPhone}</span>],
+                    ['入住日期',record.checkinDate],
+                    ['预计出院',record.checkoutDate],
+                    ['寄养天数',`${record.days} 天`],
+                    ['房间号',<span className="mono">{record.room}</span>],
+                    ['体重记录数',record.weightLogs.length],
+                    ['用药条数',record.medications.length],
+                    ['异常条数',record.anomalies.length],
+                  ].map(([k,v],i)=>(
+                    <div key={i} className="flex items-start justify-between py-2.5 border-b border-slate-100 last:border-0">
+                      <span className="text-slate-500">{k}</span>
+                      <span className="text-slate-800 font-medium">{v}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {tab==='weight' && (
+                <div className="space-y-3">
+                  <div className="text-xs text-slate-500 mb-2">
+                    点击任意一条记录可跳转至对应原始体重曲线数据；如有单位混写会以橙色虚线标注。
+                  </div>
+                  {record.weightLogs.map((w,i)=>(
+                    <div key={w.id} onClick={()=>onOpenTrace(record,w)}
+                      className={`rounded-xl border p-3 flex items-center gap-3 hover:shadow-card transition cursor-pointer ${w.weightKg===null?'bg-bad-50 border-bad-100':record.unitMixed?'bg-warn-50 border-warn-100':'bg-slate-50 border-slate-100'}`}>
+                      <div className="w-9 h-9 rounded-lg bg-white shadow-sm flex items-center justify-center font-bold mono text-brand-600">{i+1}</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <WeightCell log={{...w,unitMixed:record.unitMixed}} />
+                          <span className="text-[11px] text-slate-400 mono">{w.detectedUnit}</span>
+                          <span className="text-[11px] text-slate-400">操作人：{w.operator}</span>
+                          <span className="text-[11px] text-slate-400 mono">日志ID={w.id}</span>
+                        </div>
+                        <div className="text-xs text-slate-500 mt-1 mono">{w.measuredAt}</div>
+                        <div className="text-[11px] text-slate-400 mt-1">原始录入：<span className="mono text-slate-600">{w.rawWeight}</span></div>
+                      </div>
+                      <Lucide name="arrow-up-right" className="w-4 h-4 text-slate-400" />
+                    </div>
+                  ))}
+                </div>
+              )}
+              {tab==='med' && (
+                <div className="space-y-2">
+                  {record.medications.length===0 && <div className="text-slate-400 text-sm text-center py-10">暂无用药提醒</div>}
+                  {record.medications.map(m=>{
+                    const sMap={
+                      done:    {label:'已执行',cls:'bg-ok-50 text-ok-600 border-ok-100',icon:'check'},
+                      pending: {label:'待执行',cls:'bg-warn-50 text-warn-600 border-warn-100',icon:'alarm-clock'},
+                      missed:  {label:'已漏记',cls:'bg-bad-50 text-bad-600 border-bad-100',icon:'x-circle'},
+                    }[m.status];
+                    return (
+                      <div key={m.id} className="rounded-xl border border-slate-100 p-3 flex items-center gap-3 hover:bg-slate-50 transition">
+                        <div className={`w-9 h-9 rounded-lg border flex items-center justify-center shrink-0 ${sMap.cls}`}>
+                          <Lucide name={sMap.icon} className="w-4 h-4" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-semibold text-slate-800">{m.drugName}</span>
+                            <span className="text-xs text-slate-500">{m.dosage} · {m.frequency}</span>
+                            <span className={`text-[10px] px-1.5 py-0.5 rounded border ${sMap.cls}`}>{sMap.label}</span>
+                          </div>
+                          <div className="text-[11px] text-slate-400 mt-0.5">应执行：{m.dueTime}</div>
+                          {m.note && <div className="text-[11px] text-warn-600 mt-0.5">📝 {m.note}</div>}
+                        </div>
+                        <div className="mono text-[11px] text-slate-400">{m.id}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+              {tab==='anom' && (
+                <div className="space-y-4">
+                  {record.anomalies.length===0 && (
+                    <div className="text-center py-16">
+                      <Lucide name="party-popper" className="w-14 h-14 mx-auto mb-3 text-ok-500 opacity-60" />
+                      <div className="text-slate-500">没有异常记录，本次对账结论一致。</div>
+                    </div>
+                  )}
+                  {record.anomalies.map(a=>{
+                    const m = ANOM_META[a.type];
+                    const sev = SEV_META[a.severity];
+                    return (
+                      <div key={a.id} className={`rounded-xl border border-${m.color}-100 overflow-hidden`}>
+                        <div className={`px-4 py-3 bg-${m.color}-50 flex items-center gap-2 border-b border-${m.color}-100`}>
+                          <div className={`w-8 h-8 rounded-lg bg-white text-${m.color}-600 flex items-center justify-center border border-${m.color}-100`}>
+                            <Lucide name={m.icon} className="w-4 h-4" />
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-semibold text-slate-800">{m.label}</span>
+                              <span className={`text-[10px] px-1.5 py-0.5 rounded border ${sev.cls}`}>{sev.label}危</span>
+                              {a.weightLogId && <span className="text-[10px] mono text-slate-400">关联体重日志 {a.weightLogId}</span>}
+                            </div>
+                            <div className="text-xs text-slate-600 mt-0.5">{a.explanation}</div>
+                          </div>
+                          <div className="text-[10px] text-slate-400 mono">{a.id}</div>
+                        </div>
+                        <div className="grid grid-cols-2 divide-x divide-slate-100">
+                          <div className="p-4">
+                            <div className="text-[11px] text-slate-400 mb-1 flex items-center gap-1">
+                              <Lucide name="clock-rotate-left" className="w-3 h-3" /> 之前的结论
+                            </div>
+                            <div className="text-sm text-slate-600 bg-slate-50 rounded-lg p-3 border border-slate-100 leading-relaxed">
+                              {a.conclusionBefore}
+                            </div>
+                          </div>
+                          <div className="p-4">
+                            <div className="text-[11px] text-warn-600 mb-1 flex items-center gap-1">
+                              <Lucide name="sparkles" className="w-3 h-3" /> 现在的结论
+                            </div>
+                            <div className="text-sm text-warn-700 bg-warn-50 rounded-lg p-3 border border-warn-100 leading-relaxed">
+                              {a.conclusionAfter}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="px-4 py-3 bg-slate-50 border-t border-slate-100">
+                          <div className="text-[11px] text-slate-500 mb-1 flex items-center gap-1">
+                            <Lucide name="git-compare" className="w-3 h-3" /> 为什么结论变了？
+                          </div>
+                          <div className="text-xs text-slate-700 leading-relaxed">{a.conclusionChangeReason}</div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+              {tab==='raw' && (
+                <div className="space-y-3">
+                  <div className="text-xs text-slate-500 mb-1 p-3 bg-bad-50 border border-bad-100 rounded-lg flex items-start gap-2">
+                    <Lucide name="shield-alert" className="w-4 h-4 text-bad-600 shrink-0 mt-0.5" />
+                    <div>
+                      <div className="font-semibold text-bad-700 mb-0.5">坏材料来了看这里</div>
+                      <div>以下为体重记录的原始录入快照，任何无法解析/单位混写的记录都会完整保留原始字符串与来源信息，绝不丢线索。</div>
+                    </div>
+                  </div>
+                  {record.weightLogs.map(w=>(
+                    <div key={w.id} className={`rounded-xl border overflow-hidden ${w.weightKg===null?'border-bad-200':'border-slate-100'}`}>
+                      <div className={`px-3 py-2 flex items-center justify-between ${w.weightKg===null?'bg-bad-50':'bg-slate-50'}`}>
+                        <div className="flex items-center gap-2">
+                          <span className="mono text-xs text-slate-500">{w.id}</span>
+                          <span className="text-xs text-slate-500 mono">{w.measuredAt}</span>
+                          <span className="text-[11px] text-slate-400">操作人：{w.operator}</span>
+                        </div>
+                        <button onClick={()=>onOpenTrace(record,w)}
+                          className="text-[11px] text-brand-600 hover:text-brand-700 flex items-center gap-0.5">
+                          <Lucide name="link" className="w-3 h-3" /> 指回体重曲线
+                        </button>
+                      </div>
+                      <div className="p-3 space-y-2">
+                        <div>
+                          <div className="text-[10px] text-slate-400 mb-1">rawWeight · 原始录入字符串（追溯关键）</div>
+                          <div className="mono text-sm bg-slate-900 text-emerald-300 rounded px-3 py-2 break-all">{w.rawWeight}</div>
+                        </div>
+                        <div>
+                          <div className="text-[10px] text-slate-400 mb-1">rawSource · 原始设备/输入快照</div>
+                          <pre className="mono text-xs bg-slate-50 border border-slate-100 rounded p-2 overflow-x-auto text-slate-600">{w.rawSource}</pre>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="px-5 py-3 border-t border-slate-100 flex items-center justify-between bg-slate-50">
+              <div className="text-[11px] text-slate-400 mono">
+                记录ID {record.id} · 异常 {record.anomalies.length} 条
+              </div>
+              <div className="flex items-center gap-2">
+                <button onClick={onClose}
+                  className="text-xs text-slate-600 hover:text-slate-800 px-3 py-1.5 rounded-lg hover:bg-slate-100 transition">
+                  关闭
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    /* ===== 追溯弹窗（模拟跳回体重曲线原始记录上下文） ===== */
+    function TraceModal({ trace, onClose }){
+      if(!trace) return null;
+      const { record, weightLog } = trace;
+      // 找到该记录所有有效体重，绘制迷你SVG曲线
+      const valid = record.weightLogs.filter(w=>w.weightKg!==null);
+      const vals = valid.map(w=>w.weightKg);
+      const minV = Math.min(...vals)-0.2, maxV = Math.max(...vals)+0.2;
+      const W = 560, H = 180, PAD = 24;
+      const stepX = (W-PAD*2) / Math.max(1,valid.length-1);
+      const pts = valid.map((w,i)=>{
+        const x = PAD + i*stepX;
+        const y = H - PAD - ((w.weightKg-minV)/(maxV-minV))*(H-PAD*2);
+        return { x, y, w };
+      });
+      const path = pts.map((p,i)=>`${i===0?'M':'L'}${p.x},${p.y}`).join(' ');
+      const targetPts = pts.filter(p=>p.w.id===weightLog.id);
+      const targetP = targetPts.length?targetPts[0]:null;
+
+      return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm" onClick={onClose}>
+          <div className="bg-white rounded-2xl shadow-hover border border-slate-200 w-full max-w-3xl overflow-hidden animate-pop-in" onClick={e=>e.stopPropagation()}>
+            <div className="px-5 py-4 border-b border-slate-100 flex items-start justify-between"
+              style={{background:'linear-gradient(135deg,#DBEAFE 0%,#FFFFFF 100%)'}}>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-white shadow-sm border border-brand-100 flex items-center justify-center">
+                  <Lucide name="activity" className="w-5 h-5 text-brand-600" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="serif font-bold text-slate-800">原始体重曲线追溯视图</h2>
+                    <span className="text-[10px] bg-brand-50 text-brand-700 border border-brand-100 rounded px-2 py-0.5">
+                      从对账明细 / 异常队列跳转而来
+                    </span>
+                  </div>
+                  <div className="text-xs text-slate-500 mt-1">
+                    {record.petName} (#{record.id}) · 当前定位日志ID <span className="mono text-brand-600">{weightLog.id}</span> · {weightLog.measuredAt}
+                  </div>
+                </div>
+              </div>
+              <button onClick={onClose} className="w-9 h-9 rounded-lg hover:bg-white flex items-center justify-center text-slate-500 transition">
+                <Lucide name="x" className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-5 space-y-4">
+              <div className="rounded-xl border border-slate-100 p-4 bg-gradient-to-br from-slate-50 to-white">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="text-xs text-slate-500 flex items-center gap-1">
+                    <Lucide name="line-chart" className="w-3.5 h-3.5" /> 体重曲线 · 标准化单位 kg
+                  </div>
+                  <div className="flex items-center gap-3 text-[11px] text-slate-400">
+                    <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-brand-500 inline-block rounded" />曲线</span>
+                    <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-warn-500 inline-block border-2 border-white shadow" />追溯点</span>
+                  </div>
+                </div>
+                <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-[180px]">
+                  <defs>
+                    <linearGradient id="areaFill" x1="0" x2="0" y1="0" y2="1">
+                      <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.25"/>
+                      <stop offset="100%" stopColor="#3B82F6" stopOpacity="0"/>
+                    </linearGradient>
+                  </defs>
+                  {[0,1,2,3,4].map(i=>{
+                    const y = PAD + i*((H-PAD*2)/4);
+                    const val = maxV - ((maxV-minV)*i)/4;
+                    return (
+                      <g key={i}>
+                        <line x1={PAD} x2={W-PAD} y1={y} y2={y} stroke="#F1F5F9" strokeDasharray="3 3"/>
+                        <text x={PAD-6} y={y+3} textAnchor="end" className="mono fill-slate-400" fontSize="9">{val.toFixed(2)}</text>
+                      </g>
+                    );
+                  })}
+                  <path d={`${path} L${PAD+(valid.length-1)*stepX},${H-PAD} L${PAD},${H-PAD} Z`} fill="url(#areaFill)"/>
+                  <path d={path} fill="none" stroke="#3B82F6" strokeWidth="2" strokeLinejoin="round"/>
+                  {pts.map((p,i)=>(
+                    <g key={i}>
+                      <circle cx={p.x} cy={p.y} r={p.w.id===weightLog.id?7:3.5}
+                        fill={p.w.id===weightLog.id?'#F97316':'#FFF'}
+                        stroke={p.w.id===weightLog.id?'#F97316':'#3B82F6'}
+                        strokeWidth="2"/>
+                      <text x={p.x} y={H-PAD+14} textAnchor="middle" className="mono fill-slate-400" fontSize="9">
+                        {p.w.measuredAt.slice(5,10)}
+                      </text>
+                      {p.w.id===weightLog.id && (
+                        <g>
+                          <line x1={p.x} x2={p.x} y1={p.y-14} y2={p.y-40} stroke="#F97316" strokeWidth="1.5"/>
+                          <rect x={p.x-90} y={p.y-66} width="180" height="24" rx="4" fill="#F97316"/>
+                          <text x={p.x} y={p.y-50} textAnchor="middle" fill="#FFF" fontSize="10" fontWeight="600">
+                            ← 当前追溯点：{p.w.rawWeight}
+                          </text>
+                        </g>
+                      )}
+                    </g>
+                  ))}
+                </svg>
+              </div>
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div className="rounded-xl border border-slate-100 p-3 bg-slate-50">
+                  <div className="text-[11px] text-slate-400 mb-1">日志ID</div>
+                  <div className="mono font-medium text-slate-800">{weightLog.id}</div>
+                </div>
+                <div className="rounded-xl border border-slate-100 p-3 bg-slate-50">
+                  <div className="text-[11px] text-slate-400 mb-1">测量时间</div>
+                  <div className="mono font-medium text-slate-800">{weightLog.measuredAt}</div>
+                </div>
+                <div className="rounded-xl border border-warn-100 p-3 bg-warn-50">
+                  <div className="text-[11px] text-warn-600 mb-1">原始录入字符串（完整保留）</div>
+                  <div className="mono font-medium text-warn-700 break-all">{weightLog.rawWeight}</div>
+                </div>
+                <div className="rounded-xl border border-brand-100 p-3 bg-brand-50">
+                  <div className="text-[11px] text-brand-600 mb-1">标准化结果（kg）</div>
+                  <div className="mono font-medium text-brand-700">
+                    {weightLog.weightKg===null?'<无法解析>':weightLog.weightKg.toFixed(3)}
+                    <span className="text-[11px] text-brand-500 ml-2">原始单位：{weightLog.detectedUnit}</span>
+                  </div>
+                </div>
+                <div className="rounded-xl border border-slate-100 p-3 bg-slate-50">
+                  <div className="text-[11px] text-slate-400 mb-1">操作人</div>
+                  <div className="font-medium text-slate-800">{weightLog.operator}</div>
+                </div>
+                <div className="rounded-xl border border-slate-100 p-3 bg-slate-50">
+                  <div className="text-[11px] text-slate-400 mb-1">关联寄养记录</div>
+                  <div className="mono font-medium text-slate-800">{record.id} · {record.petName} · {record.room}</div>
+                </div>
+              </div>
+              <div className="rounded-xl border border-bad-100 p-3 bg-bad-50/40">
+                <div className="text-[11px] text-bad-600 mb-1 flex items-center gap-1">
+                  <Lucide name="package-search" className="w-3.5 h-3.5" /> rawSource · 设备原始快照（坏数据追溯证据）
+                </div>
+                <pre className="mono text-xs text-slate-700 bg-white/80 border border-slate-100 rounded p-2 overflow-x-auto">{weightLog.rawSource}</pre>
+              </div>
+            </div>
+            <div className="px-5 py-3 border-t border-slate-100 flex items-center justify-end bg-slate-50 gap-2">
+              <button onClick={onClose}
+                className="text-xs bg-brand-600 hover:bg-brand-700 text-white px-4 py-1.5 rounded-lg transition flex items-center gap-1">
+                <Lucide name="rotate-ccw" className="w-3.5 h-3.5" /> 返回对账
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    /* ===== CSV 导出 ===== */
+    function exportCSV(records){
+      const esc = (v)=>{
+        const s = v===null||v===undefined?'':String(v);
+        if(/[",\n]/.test(s)) return '"' + s.replace(/"/g,'""') + '"';
+        return s;
+      };
+      const header = [
+        '寄养ID','宠物名','类型','主人','电话','入住','出院','天数','房间',
+        '异常总数','异常类型列表','单位混写','用药待提醒','用药漏记',
+        '体重原始字符串列表(追溯)','体重标准化kg列表','体重日志ID列表',
+        '结论变化说明汇总','异常解释汇总'
+      ];
+      const rows = records.map(r=>{
+        const rawW = r.weightLogs.map(w=>w.rawWeight).join(' | ');
+        const stdW = r.weightLogs.map(w=>w.weightKg===null?'<坏数据>':w.weightKg.toFixed(2)).join(' | ');
+        const wIds = r.weightLogs.map(w=>w.id).join(',');
+        const aTypes = r.anomalies.map(a=>ANOM_META[a.type].label).join('/') || '无';
+        const medP = r.medications.filter(m=>m.status==='pending').length;
+        const medM = r.medications.filter(m=>m.status==='missed').length;
+        const change = r.anomalies.length===0?'无变化':
+          r.anomalies.map(a=>`[${ANOM_META[a.type].label}]${a.conclusionChangeReason}`).join('  ');
+        const expl = r.anomalies.length===0?'无异常':
+          r.anomalies.map(a=>`[${a.id}]${a.explanation}`).join('  ');
+        return [
+          r.id, r.petName, PET_META[r.petType].label, r.ownerName, r.ownerPhone,
+          r.checkinDate, r.checkoutDate, r.days, r.room,
+          r.anomalies.length, aTypes, r.unitMixed?'是':'否', medP, medM,
+          rawW, stdW, wIds,
+          change, expl
+        ].map(esc);
+      });
+      const csv = '\uFEFF' + [header, ...rows].map(r=>r.join(',')).join('\n');
+      const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `宠物寄养排程对账_${new Date().toISOString().slice(0,10).replace(/-/g,'')}.csv`;
+      document.body.appendChild(a); a.click();
+      setTimeout(()=>{document.body.removeChild(a); URL.revokeObjectURL(url);}, 100);
+    }
+
+    /* ===== 主应用 ===== */
+    function App(){
+      const { records, stats } = useReconcileEngine();
+      const [filters, setFilters] = useState({
+        startDate: '2026-06-01', endDate: '2026-06-10',
+        petType: 'all', anomalyType: 'all',
+        unitMixedOnly: false, keyword: ''
+      });
+      const [detailRec, setDetailRec] = useState(null);
+      const [trace, setTrace] = useState(null);
+      const [toast, setToast] = useState(null);
+
+      const filtered = useMemo(()=>{
+        return records.filter(r=>{
+          if(filters.startDate && r.checkoutDate < filters.startDate) return false;
+          if(filters.endDate && r.checkinDate > filters.endDate) return false;
+          if(filters.petType!=='all' && r.petType!==filters.petType) return false;
+          if(filters.anomalyType==='none' && r.hasAnomaly) return false;
+          if(filters.anomalyType!=='all' && filters.anomalyType!=='none'
+             && !r.anomalies.some(a=>a.type===filters.anomalyType)) return false;
+          if(filters.unitMixedOnly && !r.unitMixed) return false;
+          if(filters.keyword){
+            const kw = filters.keyword.trim().toLowerCase();
+            if(!kw) return true;
+            const hay = [
+              r.petName, r.ownerName, r.room, r.id,
+              ...r.weightLogs.map(w=>`${w.rawWeight} ${w.id} ${w.operator}`)
+            ].join(' ').toLowerCase();
+            if(!hay.includes(kw)) return false;
+          }
+          return true;
+        });
+      }, [records, filters]);
+
+      const showToast = (text, kind='ok')=>{
+        setToast({text, kind});
+        setTimeout(()=>setToast(null), 2200);
+      };
+
+      const handleExport = ()=>{
+        exportCSV(filtered);
+        showToast(`已导出 ${filtered.length} 条对账记录（含追溯线索列）`, 'ok');
+      };
+
+      return (
+        <div className="min-h-full">
+          <header className="px-6 lg:px-10 pt-6 pb-4">
+            <div className="flex items-start justify-between flex-wrap gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-2xl bg-grad-brand text-white flex items-center justify-center shadow-card">
+                  <Lucide name="stethoscope" className="w-6 h-6" />
+                </div>
+                <div>
+                  <h1 className="serif text-xl font-bold text-slate-800 flex items-center gap-2">
+                    宠物寄养排程对账
+                    <span className="text-[10px] bg-brand-50 text-brand-700 border border-brand-100 rounded px-2 py-0.5 font-normal mono">v1.0</span>
+                  </h1>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    体重曲线 · 用药提醒 · 异常队列 同一份结果，彻底告别口头交接漏记
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button onClick={()=>showToast('模拟数据已重新加载（奶盖R001为正常记录用于试跑对比）','ok')}
+                  className="text-xs text-slate-600 hover:text-slate-800 bg-white border border-slate-200 hover:border-slate-300 px-3 py-2 rounded-lg transition flex items-center gap-1.5 shadow-card">
+                  <Lucide name="refresh-cw" className="w-3.5 h-3.5" /> 试跑加载
+                </button>
+                <button onClick={handleExport}
+                  className="text-xs bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-lg transition flex items-center gap-1.5 shadow-card">
+                  <Lucide name="download" className="w-3.5 h-3.5" /> 导出CSV对账
+                </button>
+              </div>
+            </div>
+          </header>
+
+          <main className="px-6 lg:px-10 pb-10 space-y-5">
+            <FilterBar filters={filters} setFilters={setFilters} />
+            <StatsCards stats={stats} filteredCount={filtered.length} />
+
+            <div className="text-[11px] text-slate-400 flex items-center gap-1 px-1">
+              <Lucide name="info" className="w-3.5 h-3.5" />
+              提示：明细表与异常队列共享同一结果源；"单位混写/坏数据"任意处点击都可跳到详情，再点"指回原始记录"可查看完整体重曲线追溯视图。导出CSV包含原始字符串与结论变化列，方便复核。
+            </div>
+
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
+              <div className="xl:col-span-2">
+                <RecordsTable
+                  records={filtered}
+                  onOpenDetail={setDetailRec}
+                  onOpenTrace={(r,w)=>setTrace({record:r,weightLog:w})}
+                />
+              </div>
+              <div>
+                <AnomalyQueue
+                  records={filtered}
+                  onOpenDetail={setDetailRec}
+                  onOpenTrace={(r,w)=>setTrace({record:r,weightLog:w})}
+                />
+              </div>
+            </div>
+          </main>
+
+          <DetailModal
+            record={detailRec}
+            onClose={()=>setDetailRec(null)}
+            onOpenTrace={(r,w)=>setTrace({record:r,weightLog:w})}
+          />
+          <TraceModal trace={trace} onClose={()=>setTrace(null)} />
+
+          {toast && (
+            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-pop-in">
+              <div className={`rounded-xl shadow-hover px-4 py-2.5 text-sm flex items-center gap-2 border ${
+                toast.kind==='ok'?'bg-ok-500 text-white border-ok-600':'bg-bad-500 text-white border-bad-600'
+              }`}>
+                <Lucide name={toast.kind==='ok'?'check-circle':'x-circle'} className="w-4 h-4" />
+                {toast.text}
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
