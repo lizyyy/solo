@@ -10,7 +10,7 @@ class VisualizationService {
 
   create3DView(zoneIds, viewType = '3d') {
     const zones = zoneIds.map(id => this.temperatureZoneService.getZoneById(id)).filter(Boolean);
-    
+
     if (zones.length === 0) {
       return { success: false, message: '未找到有效的温区数据' };
     }
@@ -27,7 +27,9 @@ class VisualizationService {
         routeId: z.routeId,
         bounds: z.bounds,
         temperatureRange: z.temperatureRange,
-        color: z.color
+        color: z.color,
+        status: z.status,
+        remark: z.remark
       })),
       sourceLinks: this._buildSourceLinks(zones)
     };
@@ -52,20 +54,46 @@ class VisualizationService {
     }
 
     const sourceData = this._getSourceData(zone);
-    
+    const zoneSummary = this.temperatureZoneService.getZoneSummary(zoneId);
+
     if (sourceData.route && sourceData.route.needsLengthRecalculation()) {
       return {
         success: true,
         zone,
+        zoneSummary,
         sourceData,
         needsReview: true,
+        reviewContext: {
+          issue: getUserFriendlyError('ROUTE_LENGTH_NOT_RECALCULATED'),
+          originalValue: { lengthRecalculated: false },
+          changedValue: null,
+          nextStep: '请回到CAD图层或测距仪记录重新确认'
+        },
         message: getUserFriendlyError('ROUTE_LENGTH_NOT_RECALCULATED')
+      };
+    }
+
+    if (sourceData.route && sourceData.route.needsCustomerReview) {
+      return {
+        success: true,
+        zone,
+        zoneSummary,
+        sourceData,
+        needsReview: true,
+        reviewContext: {
+          issue: '该路线正处于客户复核中，请勿提前归为正常',
+          originalValue: { customerReviewStatus: 'pending' },
+          changedValue: null,
+          nextStep: '等待展陈客户复核完成'
+        },
+        message: getUserFriendlyError('DATA_NEEDS_REVIEW')
       };
     }
 
     return {
       success: true,
       zone,
+      zoneSummary,
       sourceData,
       needsReview: false
     };
@@ -82,7 +110,9 @@ class VisualizationService {
       return { success: false, message: getUserFriendlyError('THREE_D_LINK_BROKEN') };
     }
 
-    return { success: true, layer, zone };
+    const layerDetail = this.cadLayerService.getLayerDetail(zone.layerId);
+
+    return { success: true, layer, layerDetail, zone };
   }
 
   navigateToMeasurement(viewId, zoneId) {
@@ -96,11 +126,9 @@ class VisualizationService {
       return { success: false, message: getUserFriendlyError('THREE_D_LINK_BROKEN') };
     }
 
-    const measurement = route.linkedMeasurementId 
-      ? this.measurementService.getRecordById(route.linkedMeasurementId)
-      : null;
+    const routeDetail = this.measurementService.getRouteDetail(zone.routeId);
 
-    return { success: true, route, measurement, zone };
+    return { success: true, route, routeDetail, zone };
   }
 
   closeView(viewId) {
@@ -111,19 +139,23 @@ class VisualizationService {
     const links = [];
     for (const zone of zones) {
       if (zone.layerId) {
+        const layer = this.cadLayerService.getLayerById(zone.layerId);
         links.push({
           type: 'cad_layer',
           zoneId: zone.id,
           layerId: zone.layerId,
-          description: `关联CAD图层: ${zone.layerId}`
+          layerName: layer ? layer.name : '未知图层',
+          description: `关联CAD图层: ${layer ? layer.name : zone.layerId}`
         });
       }
       if (zone.routeId) {
+        const route = this.measurementService.getRouteById(zone.routeId);
         links.push({
           type: 'route',
           zoneId: zone.id,
           routeId: zone.routeId,
-          description: `关联补录路线: ${zone.routeId}`
+          routeName: route ? route.name : '未知路线',
+          description: `关联补录路线: ${route ? route.name : zone.routeId}`
         });
       }
     }
@@ -133,7 +165,7 @@ class VisualizationService {
   _getSourceData(zone) {
     const layer = zone.layerId ? this.cadLayerService.getLayerById(zone.layerId) : null;
     const route = zone.routeId ? this.measurementService.getRouteById(zone.routeId) : null;
-    const measurement = route?.linkedMeasurementId 
+    const measurement = route?.linkedMeasurementId
       ? this.measurementService.getRecordById(route.linkedMeasurementId)
       : null;
 

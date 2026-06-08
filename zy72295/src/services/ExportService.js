@@ -13,16 +13,39 @@ class ExportService {
       return {
         canExport: false,
         message: getUserFriendlyError('EXPORT_FAILED_CUSTOMER_REVIEW'),
-        pendingRoutes: pendingRoutes.map(r => ({ id: r.id, name: r.name }))
+        pendingRoutes: pendingRoutes.map(r => ({
+          id: r.id,
+          name: r.name,
+          customerReviewStatus: r.customerReviewStatus,
+          nextStep: r.needsCustomerReview ? '请联系展陈客户完成复核' : '无需复核'
+        }))
       };
     }
+
+    const allZones = this.temperatureZoneService.getAllZones();
+    const zonesNeedingReview = allZones.filter(z => {
+      const summary = this.temperatureZoneService.getZoneSummary(z.id);
+      return summary && summary.hasPendingReview;
+    });
+
+    if (zonesNeedingReview.length > 0) {
+      return {
+        canExport: false,
+        message: getUserFriendlyError('DATA_NEEDS_REVIEW'),
+        pendingZones: zonesNeedingReview.map(z => ({ id: z.id, name: z.name }))
+      };
+    }
+
     return { canExport: true };
   }
 
   exportScreenshot(viewId, exporter) {
     const checkResult = this.canExportScreenshot();
     if (!checkResult.canExport) {
-      return checkResult;
+      return {
+        success: false,
+        ...checkResult
+      };
     }
 
     const exportRecord = {
@@ -46,21 +69,27 @@ class ExportService {
     switch (step) {
       case 'cad_import':
         return { canProceed: true, message: 'CAD图层导入完成' };
-      
-      case 'measurement_review':
+
+      case 'measurement_review': {
         const pendingRoutes = this.measurementService.getRoutesPendingReview();
         if (pendingRoutes.length > 0) {
           return {
             canProceed: false,
             message: getUserFriendlyError('DATA_NEEDS_REVIEW'),
-            pendingRoutes: pendingRoutes.map(r => ({ id: r.id, name: r.name }))
+            pendingRoutes: pendingRoutes.map(r => ({
+              id: r.id,
+              name: r.name,
+              customerReviewStatus: r.customerReviewStatus,
+              context: '等待展陈客户复核，请勿提前归为正常'
+            }))
           };
         }
         return { canProceed: true, message: '测距仪记录复核完成' };
-      
+      }
+
       case 'export':
         return this.canExportScreenshot();
-      
+
       default:
         return { canProceed: true };
     }
@@ -84,7 +113,7 @@ class ExportService {
       } else {
         step.status = 'blocked';
         step.message = check.message;
-        step.blockingItems = check.pendingRoutes || [];
+        step.blockingItems = check.pendingRoutes || check.pendingZones || [];
         workflow.status = 'blocked';
         return { success: false, workflow, message: check.message };
       }
