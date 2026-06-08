@@ -1,4 +1,5 @@
 import { create } from "zustand"
+import { persist } from "zustand/middleware"
 import type {
   RangefinderRecord,
   ObstacleRemark,
@@ -8,7 +9,9 @@ import type {
   ValidationResult,
   ConflictEvidence,
   ApprovalAction,
+  SlopeGrade,
 } from "@/types"
+import { GRADE_LABELS } from "@/types"
 import {
   MOCK_RANGEFINDER_RECORDS,
   MOCK_OBSTACLE_REMARKS,
@@ -42,7 +45,9 @@ interface AppState {
   resetAll: () => void
 }
 
-export const useStore = create<AppState>((set, get) => ({
+export const useStore = create<AppState>()(
+  persist(
+    (set, get) => ({
   records: [...MOCK_RANGEFINDER_RECORDS],
   remarks: [...MOCK_OBSTACLE_REMARKS],
   obstructionPoints: [...MOCK_OBSTRUCTION_POINTS],
@@ -109,33 +114,63 @@ export const useStore = create<AppState>((set, get) => ({
     const state = get()
     if (!state.importedRecordIds.includes(recordId)) return
     const newReviewedIds = [...new Set([...state.reviewedRecordIds, recordId])]
-    set({ reviewedRecordIds: newReviewedIds })
-
-    const historyEntry: ObstructionHistory = {
-      id: `oh-review-${Date.now()}`,
-      pointId: recordId,
-      action: "补看障碍物备注",
-      operator: "设备工程师-许工",
-      timestamp: new Date().toISOString().replace("T", " ").slice(0, 19),
-      detail: `许工补看 ${recordId} 的障碍物备注`,
-    }
-    set((s) => ({
-      obstructionHistory: [...s.obstructionHistory, historyEntry],
-    }))
+    const now = new Date().toISOString().replace("T", " ").slice(0, 19)
 
     const conflicts = state.getConflictsForRecord(recordId)
-    if (conflicts.length > 0) {
-      set((s) => ({
-        records: s.records.map((r) =>
-          r.id === recordId ? { ...r, status: "conflict" as const } : r
-        ),
-        obstructionPoints: s.obstructionPoints.map((p) =>
-          p.recordId === recordId && p.status === "normal"
-            ? { ...p, status: "conflict" as const, reason: "测距仪记录与障碍物备注冲突，待工程师审批" }
-            : p
-        ),
-      }))
+    const hasConflicts = conflicts.length > 0
+
+    const conflictSequences = new Set<number>()
+    for (const c of conflicts) {
+      const m = c.field.match(/点位(\d+)/)
+      if (m) conflictSequences.add(parseInt(m[1]))
     }
+
+    const newHistoryEntries: ObstructionHistory[] = []
+
+    const updatedPoints = state.obstructionPoints.map((p) => {
+      if (p.recordId !== recordId) return p
+      const m = p.label.match(/点位(\d+)/)
+      const seq = m ? parseInt(m[1]) : -1
+      if (hasConflicts && conflictSequences.has(seq) && p.status === "normal") {
+        newHistoryEntries.push({
+          id: `oh-conflict-${p.id}-${Date.now()}`,
+          pointId: p.id,
+          action: "标记冲突",
+          operator: "系统",
+          timestamp: now,
+          detail: `${p.label} 测距仪记录与障碍物备注冲突，待工程师审批`,
+        })
+        return { ...p, status: "conflict" as const, reason: "测距仪记录与障碍物备注冲突，待工程师审批" }
+      }
+      return p
+    })
+
+    const remark = state.remarks.find((r) => r.recordId === recordId)
+    const reviewedPointIds = state.obstructionPoints
+      .filter((p) => p.recordId === recordId)
+      .map((p) => p.id)
+
+    for (const pid of reviewedPointIds) {
+      newHistoryEntries.push({
+        id: `oh-review-${pid}-${Date.now()}`,
+        pointId: pid,
+        action: "补看障碍物备注",
+        operator: "设备工程师-许工",
+        timestamp: now,
+        detail: remark ? `许工补看障碍物备注：${remark.remarkText}` : `许工补看 ${recordId} 的障碍物备注`,
+      })
+    }
+
+    set((s) => ({
+      reviewedRecordIds: newReviewedIds,
+      records: s.records.map((r) =>
+        r.id === recordId && hasConflicts
+          ? { ...r, status: "conflict" as const }
+          : r
+      ),
+      obstructionPoints: updatedPoints,
+      obstructionHistory: [...s.obstructionHistory, ...newHistoryEntries],
+    }))
 
     if (newReviewedIds.length === state.importedRecordIds.length) {
       set({ workflowStep: "update_list" })
@@ -145,39 +180,73 @@ export const useStore = create<AppState>((set, get) => ({
   updateObstructionList: (recordId: string) => {
     const state = get()
     if (!state.reviewedRecordIds.includes(recordId)) return
+    if (state.updatedPointIds.includes(recordId)) return
     const newUpdatedIds = [...new Set([...state.updatedPointIds, recordId])]
     set({ updatedPointIds: newUpdatedIds })
 
+    const now = new Date().toISOString().replace("T", " ").slice(0, 19)
     const record = state.records.find((r) => r.id === recordId)
     if (!record) return
 
-    const newPoints: ObstructionPoint[] = record.photoPoints
-      .filter((pp) => !state.obstructionPoints.some((op) => op.recordId === recordId && Math.abs(op.longitude - pp.longitude) < 0.0001 && Math.abs(op.latitude - pp.latitude) < 0.0001))
-      .map((pp, idx) => ({
-        id: `op-new-${Date.now()}-${idx}`,
-        label: `${record.slopeName}-点位${pp.sequenceNumber}`,
-        longitude: pp.longitude,
-        latitude: pp.latitude,
-        status: "normal" as const,
-        sourceType: "rangefinder" as const,
-        confirmedBy: "",
-        confirmedAt: "",
-        reason: "",
-        recordId: recordId,
-      }))
+    const pointsForRecord = state.obstructionPoints.filter((p) => p.recordId === recordId)
+    const gradableStatuses: Array<ObstructionPoint["status"]> = ["normal", "supplemented"]
+    const newGradings: GradingResult[] = []
+    const newHistory: ObstructionHistory[] = []
 
-    const historyEntries: ObstructionHistory[] = newPoints.map((p, idx) => ({
-      id: `oh-update-${Date.now()}-${idx}`,
-      pointId: p.id,
+    for (const point of pointsForRecord) {
+      const alreadyGraded = state.gradingResults.some((g) => g.pointId === point.id)
+      if (alreadyGraded) continue
+      if (!gradableStatuses.includes(point.status)) continue
+
+      const coordRow = record.coordinateRows.find((cr) => {
+        const m = point.label.match(/点位(\d+)/)
+        return m ? cr.sequenceNumber === parseInt(m[1]) : false
+      })
+      const elevation = coordRow?.elevation ?? 0
+      const slopeAngle = elevation > 0 ? Math.abs(Math.atan2(elevation - 1280, 100) * 180 / Math.PI) : 8.5
+      const slopeGrade: SlopeGrade =
+        slopeAngle < 10 ? "beginner" :
+        slopeAngle < 18 ? "intermediate" :
+        slopeAngle < 26 ? "advanced" : "expert"
+
+      const tradeoffReason = point.status === "supplemented"
+        ? `补录数据纳入分级。理由：${point.reason}`
+        : ""
+
+      newGradings.push({
+        id: `gr-${point.id}-${Date.now()}`,
+        pointId: point.id,
+        slopeName: record.slopeName,
+        slopeGrade,
+        slopeAngle: parseFloat(slopeAngle.toFixed(1)),
+        paramVersion: "SLOPE-CALC-v2.3",
+        modelVersion: "GRADE-MODEL-v1.1",
+        tradeoffReason,
+        calculatedAt: now,
+      })
+
+      newHistory.push({
+        id: `oh-grade-${point.id}-${Date.now()}`,
+        pointId: point.id,
+        action: "分级计算",
+        operator: "系统",
+        timestamp: now,
+        detail: `${point.label} 坡度分级为${GRADE_LABELS[slopeGrade]}（${slopeAngle.toFixed(1)}°）`,
+      })
+    }
+
+    newHistory.push({
+      id: `oh-update-${recordId}-${Date.now()}`,
+      pointId: recordId,
       action: "遮挡点清单更新",
       operator: "系统",
-      timestamp: new Date().toISOString().replace("T", " ").slice(0, 19),
-      detail: `${p.label} 加入遮挡点清单`,
-    }))
+      timestamp: now,
+      detail: `${record.slopeName} 遮挡点清单更新完成`,
+    })
 
     set((s) => ({
-      obstructionPoints: [...s.obstructionPoints, ...newPoints],
-      obstructionHistory: [...s.obstructionHistory, ...historyEntries],
+      gradingResults: [...s.gradingResults, ...newGradings],
+      obstructionHistory: [...s.obstructionHistory, ...newHistory],
     }))
   },
 
@@ -300,4 +369,21 @@ export const useStore = create<AppState>((set, get) => ({
       updatedPointIds: [],
     })
   },
-}))
+}),
+    {
+      name: "slope-grading-store",
+      partialize: (state) => ({
+        records: state.records,
+        remarks: state.remarks,
+        obstructionPoints: state.obstructionPoints,
+        obstructionHistory: state.obstructionHistory,
+        gradingResults: state.gradingResults,
+        validationResults: state.validationResults,
+        workflowStep: state.workflowStep,
+        importedRecordIds: state.importedRecordIds,
+        reviewedRecordIds: state.reviewedRecordIds,
+        updatedPointIds: state.updatedPointIds,
+      }),
+    }
+  )
+)

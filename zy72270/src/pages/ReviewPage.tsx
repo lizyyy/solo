@@ -3,23 +3,22 @@ import { useStore } from "@/store/useStore"
 import type { ConflictEvidence, ApprovalAction, ObstructionPoint } from "@/types"
 import { SOURCE_LABELS } from "@/types"
 import StatusBadge from "@/components/StatusBadge"
-import { AlertTriangle, CheckCircle2, XCircle, FileText } from "lucide-react"
+import { AlertTriangle, CheckCircle2, XCircle, FileText, ListChecks } from "lucide-react"
 
 function ConflictPanel({ recordId }: { recordId: string }) {
   const { records, remarks, getConflictsForRecord, approveConflict, obstructionPoints } = useStore()
   const [reason, setReason] = useState("")
-  const [resolved, setResolved] = useState(false)
 
   const record = records.find((r) => r.id === recordId)
   const remark = remarks.find((r) => r.recordId === recordId)
   const conflicts = getConflictsForRecord(recordId)
   if (!record || !remark) return null
 
-  const relatedPoints = obstructionPoints.filter((p) => p.recordId === recordId)
-  const alreadyResolved = relatedPoints.some(
-    (p) => p.status === "supplemented" || p.status === "rejected"
+  const conflictPoints = obstructionPoints.filter(
+    (p) => p.recordId === recordId && p.status === "conflict"
   )
-  const isDisabled = resolved || alreadyResolved
+  const alreadyResolved = conflictPoints.length === 0
+  const isDisabled = alreadyResolved
 
   const handleAction = (pointId: string, action: "confirm" | "reject") => {
     if (!reason.trim()) return
@@ -30,7 +29,6 @@ function ConflictPanel({ recordId }: { recordId: string }) {
       timestamp: new Date().toISOString().replace("T", " ").slice(0, 19),
     }
     approveConflict(pointId, approval)
-    setResolved(true)
   }
 
   return (
@@ -101,47 +99,62 @@ function ConflictPanel({ recordId }: { recordId: string }) {
           ))}
         </div>
       )}
-      <div className="border-t px-4 py-3">
-        <h4 className="mb-2 text-sm font-semibold text-slate-700">
-          <FileText className="mr-1 inline h-3.5 w-3.5" />
-          工程师审批
-        </h4>
-        <textarea
-          className="mb-2 w-full rounded border px-3 py-2 text-sm disabled:bg-slate-50"
-          rows={2}
-          placeholder="输入取舍理由（必填）"
-          value={reason}
-          onChange={(e) => setReason(e.target.value)}
-          disabled={isDisabled}
-        />
-        <div className="flex gap-2">
-          <button
-            className="flex items-center gap-1 rounded bg-emerald-600 px-3 py-1.5 text-sm text-white hover:bg-emerald-700 disabled:opacity-50"
-            disabled={isDisabled || !reason.trim()}
-            onClick={() => {
-              const point = relatedPoints[0]
-              if (point) handleAction(point.id, "confirm")
-            }}
-          >
-            <CheckCircle2 className="h-3.5 w-3.5" />
-            确认（采用障碍物备注）
-          </button>
-          <button
-            className="flex items-center gap-1 rounded bg-rose-600 px-3 py-1.5 text-sm text-white hover:bg-rose-700 disabled:opacity-50"
-            disabled={isDisabled || !reason.trim()}
-            onClick={() => {
-              const point = relatedPoints[0]
-              if (point) handleAction(point.id, "reject")
-            }}
-          >
-            <XCircle className="h-3.5 w-3.5" />
-            驳回（保留测距仪记录）
-          </button>
+      {conflictPoints.length > 0 && (
+        <div className="border-t px-4 py-3">
+          <h4 className="mb-2 text-sm font-semibold text-slate-700">
+            <FileText className="mr-1 inline h-3.5 w-3.5" />
+            工程师审批
+          </h4>
+          {conflictPoints.map((cp) => (
+            <div key={cp.id} className="mb-3 rounded border border-rose-200 bg-rose-50/50 p-2">
+              <div className="mb-1 flex items-center gap-2 text-xs">
+                <span className="font-medium">{cp.label}</span>
+                <StatusBadge status={cp.status} />
+              </div>
+              <p className="text-xs text-slate-500">{cp.reason}</p>
+            </div>
+          ))}
+          <textarea
+            className="mb-2 w-full rounded border px-3 py-2 text-sm disabled:bg-slate-50"
+            rows={2}
+            placeholder="输入取舍理由（必填）"
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            disabled={isDisabled}
+          />
+          <div className="flex gap-2">
+            <button
+              className="flex items-center gap-1 rounded bg-emerald-600 px-3 py-1.5 text-sm text-white hover:bg-emerald-700 disabled:opacity-50"
+              disabled={isDisabled || !reason.trim()}
+              onClick={() => {
+                for (const cp of conflictPoints) {
+                  handleAction(cp.id, "confirm")
+                }
+              }}
+            >
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              确认（采用障碍物备注）
+            </button>
+            <button
+              className="flex items-center gap-1 rounded bg-rose-600 px-3 py-1.5 text-sm text-white hover:bg-rose-700 disabled:opacity-50"
+              disabled={isDisabled || !reason.trim()}
+              onClick={() => {
+                for (const cp of conflictPoints) {
+                  handleAction(cp.id, "reject")
+                }
+              }}
+            >
+              <XCircle className="h-3.5 w-3.5" />
+              驳回（保留测距仪记录）
+            </button>
+          </div>
         </div>
-        {isDisabled && (
-          <p className="mt-2 text-xs text-slate-500">已处理审批决定</p>
-        )}
-      </div>
+      )}
+      {alreadyResolved && (
+        <div className="border-t px-4 py-3">
+          <p className="text-xs text-slate-500">所有冲突已处理</p>
+        </div>
+      )}
     </div>
   )
 }
@@ -200,13 +213,27 @@ function PendingPointCard({ point }: { point: ObstructionPoint }) {
 }
 
 export default function ReviewPage() {
-  const { records, importedRecordIds, reviewedRecordIds, obstructionPoints } = useStore()
+  const {
+    records,
+    importedRecordIds,
+    reviewedRecordIds,
+    updatedPointIds,
+    obstructionPoints,
+    updateObstructionList,
+  } = useStore()
 
   const conflictRecordIds = records
     .filter((r) => importedRecordIds.includes(r.id) && reviewedRecordIds.includes(r.id) && r.status === "conflict")
     .map((r) => r.id)
 
   const pendingPoints = obstructionPoints.filter((p) => p.status === "pending_review")
+
+  const hasUnresolvedConflicts = obstructionPoints.some((p) => p.status === "conflict")
+  const hasUnresolvedPending = obstructionPoints.some((p) => p.status === "pending_review")
+
+  const readyToUpdate = reviewedRecordIds.filter(
+    (rid) => !updatedPointIds.includes(rid)
+  )
 
   return (
     <div className="mx-auto max-w-5xl space-y-8 p-6">
@@ -238,6 +265,58 @@ export default function ReviewPage() {
             {pendingPoints.map((p) => (
               <PendingPointCard key={p.id} point={p} />
             ))}
+          </div>
+        )}
+      </section>
+
+      <section>
+        <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-slate-800">
+          <ListChecks className="h-5 w-5 text-frost-500" />
+          遮挡点清单更新
+        </h2>
+        {readyToUpdate.length === 0 ? (
+          <p className="text-sm text-slate-400">
+            {reviewedRecordIds.length === 0
+              ? "请先完成测距仪记录导入和障碍物备注补看"
+              : "所有记录已更新"}
+          </p>
+        ) : (
+          <div className="space-y-3">
+            {hasUnresolvedConflicts && (
+              <div className="rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700">
+                仍有未处理的冲突，请先完成冲突审批
+              </div>
+            )}
+            {hasUnresolvedPending && (
+              <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-700">
+                仍有待复核点位，请先完成安全员复核
+              </div>
+            )}
+            {readyToUpdate.map((rid) => {
+              const record = records.find((r) => r.id === rid)
+              const allResolved = !obstructionPoints.some(
+                (p) => p.recordId === rid && (p.status === "conflict" || p.status === "pending_review")
+              )
+              return (
+                <div key={rid} className="flex items-center justify-between rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+                  <div>
+                    <span className="font-medium">{record?.slopeName ?? rid}</span>
+                    <span className="ml-3 text-sm text-slate-500">
+                      {obstructionPoints.filter((p) => p.recordId === rid && p.status === "normal").length} 正常
+                      {obstructionPoints.filter((p) => p.recordId === rid && p.status === "supplemented").length > 0 &&
+                        ` · ${obstructionPoints.filter((p) => p.recordId === rid && p.status === "supplemented").length} 已补录`}
+                    </span>
+                  </div>
+                  <button
+                    className="rounded-lg bg-frost-500 px-4 py-2 text-sm font-medium text-white hover:bg-frost-600 disabled:opacity-40"
+                    disabled={!allResolved}
+                    onClick={() => updateObstructionList(rid)}
+                  >
+                    更新清单
+                  </button>
+                </div>
+              )
+            })}
           </div>
         )}
       </section>
