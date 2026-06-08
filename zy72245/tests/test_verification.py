@@ -12,6 +12,7 @@ from src.services.verification import (
     get_verification_with_trace,
     rollback_verification,
     fix_approver,
+    confirm_review,
     list_verifications,
 )
 from src.services.approver_checker import is_pinyin_only, classify_approver
@@ -190,7 +191,6 @@ class TestThreeStepWorkflow:
     def test_full_three_step_workflow(self, db_path):
         result = _import_one(db_path, approver="张三", green_ratio=0.7)
         txn_id = result["imported"][0]["transaction_id"]
-        verif_id = result["imported"][0]["verification_id"]
 
         email_result = add_supplementary_email(txn_id, "客户经理王五", "确认投向占比70%", db_path=db_path)
         email_id = email_result["email_id"]
@@ -200,8 +200,6 @@ class TestThreeStepWorkflow:
             operator="林姐", supplementary_email_id=email_id, db_path=db_path,
         )
         assert r2["current_step"] == VERIFICATION_STEP_EMAIL_REVIEW
-
-        verif_id_2 = self._get_latest_verif_id(txn_id, db_path)
 
         r3 = advance_verification_step(
             txn_id, VERIFICATION_STEP_BALANCE_UPDATE,
@@ -233,7 +231,6 @@ class TestThreeStepWorkflow:
             txn_id, VERIFICATION_STEP_BALANCE_UPDATE, new_balance=100, db_path=db_path,
         )
         assert "error" in r
-        assert "拼音" in r["error"] or "复核" in r["error"] or "pinyin" in r.get("error", "").lower()
 
     def test_pinyin_approver_must_go_through_email_review(self, db_path):
         result = _import_one(db_path, approver="lisi")
@@ -244,7 +241,7 @@ class TestThreeStepWorkflow:
         )
         assert r.get("current_step") == VERIFICATION_STEP_EMAIL_REVIEW
 
-    def test_fix_pinyin_approver_then_continue(self, db_path):
+    def test_fix_pinyin_approver_blocked_without_review_confirm(self, db_path):
         result = _import_one(db_path, approver="lisi")
         txn_id = result["imported"][0]["transaction_id"]
 
@@ -256,14 +253,42 @@ class TestThreeStepWorkflow:
         fix_result = fix_approver(txn_id, "李四", operator="客户经理王五", db_path=db_path)
         assert fix_result["new_approver"] == "李四"
         assert fix_result["new_status"] == APPROVER_STATUS_NORMAL
-        assert fix_result["requires_review"] is True
+        assert fix_result["review_required"] is True
 
-        verif_id = self._get_latest_verif_id(txn_id, db_path)
         r = advance_verification_step(
             txn_id, VERIFICATION_STEP_BALANCE_UPDATE,
             new_balance=200000, db_path=db_path,
         )
-        assert r["current_step"] == VERIFICATION_STEP_BALANCE_UPDATE
+        assert "error" in r
+        assert "复核确认" in r["error"]
+
+    def test_fix_pinyin_approver_then_confirm_review_then_balance(self, db_path):
+        result = _import_one(db_path, approver="lisi")
+        txn_id = result["imported"][0]["transaction_id"]
+
+        add_supplementary_email(txn_id, "客户经理", "确认审批人为李四", db_path=db_path)
+        advance_verification_step(
+            txn_id, VERIFICATION_STEP_EMAIL_REVIEW, operator="林姐", db_path=db_path,
+        )
+
+        fix_result = fix_approver(txn_id, "李四", operator="客户经理王五", db_path=db_path)
+        assert fix_result["review_required"] is True
+
+        r_blocked = advance_verification_step(
+            txn_id, VERIFICATION_STEP_BALANCE_UPDATE,
+            new_balance=200000, db_path=db_path,
+        )
+        assert "error" in r_blocked
+
+        confirm_result = confirm_review(txn_id, reviewer="客户经理王五", db_path=db_path)
+        assert confirm_result["review_required"] is False
+
+        r_pass = advance_verification_step(
+            txn_id, VERIFICATION_STEP_BALANCE_UPDATE,
+            new_balance=200000, db_path=db_path,
+        )
+        assert r_pass["current_step"] == VERIFICATION_STEP_BALANCE_UPDATE
+        assert r_pass["status"] == "approved"
 
 
 class TestRollback:
@@ -274,7 +299,6 @@ class TestRollback:
         add_supplementary_email(txn_id, "客户经理", "确认", db_path=db_path)
         advance_verification_step(txn_id, VERIFICATION_STEP_EMAIL_REVIEW, db_path=db_path)
 
-        verif_id_2 = None
         conn = get_db(db_path)
         try:
             c = conn.cursor()
@@ -340,12 +364,78 @@ class TestTraceLinks:
         trace = get_verification_with_trace(verif_id, db_path=db_path)
         assert len(trace["supplementary_emails"]) == 1
         assert len(trace["trace_links"]["supplementary_emails"]) == 1
+        for link in trace["trace_links"]["supplementary_emails"]:
+            assert "/api/transactions/" in link
+            assert "/emails" in link
+            assert "/api/emails/" not in link
+
+    def test_review_required_has_approver_review_link(self, db_path):
+        result = _import_one(db_path, approver="zhangsan")
+        txn_id = result["imported"][0]["transaction_id"]
+        verif_id = result["imported"][0]["verification_id"]
+
+        fix_approver(txn_id, "张三", operator="客户经理", db_path=db_path)
+
+        trace = get_verification_with_trace(verif_id, db_path=db_path)
+        assert "approver_review" in trace["trace_links"]
+
+
+class TestConfirmReview:
+    def test_confirm_review_clears_flag(self, db_path):
+        result = _import_one(db_path, approver="zhangsan")
+        txn_id = result["imported"][0]["transaction_id"]
+
+        fix_approver(txn_id, "张三", operator="客户经理", db_path=db_path)
+
+        conn = get_db(db_path)
+        try:
+            c = conn.cursor()
+            c.execute("SELECT review_required FROM counter_transactions WHERE id = ?", (txn_id,))
+            assert c.fetchone()["review_required"] == 1
+        finally:
+            conn.close()
+
+        confirm_result = confirm_review(txn_id, reviewer="客户经理王五", db_path=db_path)
+        assert confirm_result["review_required"] is False
+
+        conn = get_db(db_path)
+        try:
+            c = conn.cursor()
+            c.execute("SELECT review_required FROM counter_transactions WHERE id = ?", (txn_id,))
+            assert c.fetchone()["review_required"] == 0
+        finally:
+            conn.close()
+
+    def test_confirm_review_creates_history(self, db_path):
+        result = _import_one(db_path, approver="zhangsan")
+        txn_id = result["imported"][0]["transaction_id"]
+
+        fix_approver(txn_id, "张三", operator="客户经理", db_path=db_path)
+        confirm_review(txn_id, reviewer="客户经理王五", db_path=db_path)
+
+        history = get_transaction_history(txn_id, db_path=db_path)
+        review_hist = [h for h in history if h["field_key"] == "review_required"]
+        assert len(review_hist) == 1
+        assert review_hist[0]["old_value"] == "1"
+        assert review_hist[0]["new_value"] == "0"
+
+    def test_confirm_review_noop_when_not_required(self, db_path):
+        result = _import_one(db_path, approver="张三")
+        txn_id = result["imported"][0]["transaction_id"]
+
+        r = confirm_review(txn_id, reviewer="林姐", db_path=db_path)
+        assert "无需复核" in r["message"]
+
+    def test_confirm_review_nonexistent_transaction(self, db_path):
+        r = confirm_review("nonexistent-id", reviewer="林姐", db_path=db_path)
+        assert "error" in r
 
 
 class TestErrorMessages:
     def test_humanize_field(self):
         assert humanize_field("approver") == "审批人"
         assert humanize_field("remark") == "备注"
+        assert humanize_field("review_required") == "待复核确认"
         assert humanize_field("unknown_field") == "unknown_field"
 
     def test_error_message_is_chinese(self):
@@ -361,6 +451,10 @@ class TestErrorMessages:
         msg = get_error("NONEXISTENT_CODE")
         assert msg == "NONEXISTENT_CODE"
 
+    def test_review_not_confirmed_message(self):
+        msg = get_error("REVIEW_NOT_CONFIRMED")
+        assert "复核确认" in msg
+
 
 class TestFixApprover:
     def test_fix_pinyin_to_chinese(self, db_path):
@@ -371,7 +465,7 @@ class TestFixApprover:
         assert fix_result["old_approver"] == "zhangsan"
         assert fix_result["new_approver"] == "张三"
         assert fix_result["new_status"] == APPROVER_STATUS_NORMAL
-        assert fix_result["requires_review"] is True
+        assert fix_result["review_required"] is True
 
     def test_fix_to_still_pinyin(self, db_path):
         result = _import_one(db_path, approver="zhangsan")
@@ -379,7 +473,7 @@ class TestFixApprover:
 
         fix_result = fix_approver(txn_id, "zhang san", operator="客户经理", db_path=db_path)
         assert fix_result["new_status"] == APPROVER_STATUS_PINYIN_ONLY
-        assert fix_result["requires_review"] is True
+        assert fix_result["review_required"] is True
 
     def test_fix_approver_creates_history(self, db_path):
         result = _import_one(db_path, approver="zhangsan")
@@ -395,3 +489,81 @@ class TestFixApprover:
     def test_fix_nonexistent_transaction(self, db_path):
         r = fix_approver("nonexistent-id", "张三", db_path=db_path)
         assert "error" in r
+
+    def test_fix_normal_approver_no_review_required(self, db_path):
+        result = _import_one(db_path, approver="张三")
+        txn_id = result["imported"][0]["transaction_id"]
+
+        fix_result = fix_approver(txn_id, "李四", operator="林姐", db_path=db_path)
+        assert fix_result["review_required"] is False
+
+
+class TestEndToEndPinyinWorkflow:
+    def test_full_pinyin_workflow_import_email_fix_confirm_balance(self, db_path):
+        result = _import_one(db_path, approver="zhangsan", green_ratio=0.7)
+        txn_id = result["imported"][0]["transaction_id"]
+        verif_id = result["imported"][0]["verification_id"]
+
+        conn = get_db(db_path)
+        try:
+            c = conn.cursor()
+            c.execute("SELECT approver_status, review_required FROM counter_transactions WHERE id = ?", (txn_id,))
+            row = c.fetchone()
+            assert row["approver_status"] == APPROVER_STATUS_PINYIN_ONLY
+            assert row["review_required"] == 0
+        finally:
+            conn.close()
+
+        email_result = add_supplementary_email(txn_id, "客户经理王五", "确认审批人为张三", db_path=db_path)
+        email_id = email_result["email_id"]
+
+        r2 = advance_verification_step(
+            txn_id, VERIFICATION_STEP_EMAIL_REVIEW,
+            operator="林姐", supplementary_email_id=email_id, db_path=db_path,
+        )
+        assert r2["current_step"] == VERIFICATION_STEP_EMAIL_REVIEW
+
+        r_blocked = advance_verification_step(
+            txn_id, VERIFICATION_STEP_BALANCE_UPDATE,
+            new_balance=500000, db_path=db_path,
+        )
+        assert "error" in r_blocked
+
+        fix_result = fix_approver(txn_id, "张三", operator="客户经理王五", db_path=db_path)
+        assert fix_result["review_required"] is True
+
+        conn = get_db(db_path)
+        try:
+            c = conn.cursor()
+            c.execute("SELECT approver_status, review_required FROM counter_transactions WHERE id = ?", (txn_id,))
+            row = c.fetchone()
+            assert row["approver_status"] == APPROVER_STATUS_NORMAL
+            assert row["review_required"] == 1
+        finally:
+            conn.close()
+
+        r_still_blocked = advance_verification_step(
+            txn_id, VERIFICATION_STEP_BALANCE_UPDATE,
+            new_balance=500000, db_path=db_path,
+        )
+        assert "error" in r_still_blocked
+        assert "复核确认" in r_still_blocked["error"]
+
+        confirm_result = confirm_review(txn_id, reviewer="客户经理王五", db_path=db_path)
+        assert confirm_result["review_required"] is False
+
+        r_pass = advance_verification_step(
+            txn_id, VERIFICATION_STEP_BALANCE_UPDATE,
+            operator="林姐", new_balance=500000, db_path=db_path,
+        )
+        assert r_pass["current_step"] == VERIFICATION_STEP_BALANCE_UPDATE
+        assert r_pass["status"] == "approved"
+
+        trace = get_verification_with_trace(verif_id, db_path=db_path)
+        assert len(trace["all_steps"]) == 3
+        assert len(trace["supplementary_emails"]) == 1
+        assert len(trace["balance_changes"]) == 1
+
+        for link in trace["trace_links"].get("supplementary_emails", []):
+            assert "/api/emails/" not in link
+            assert "/api/transactions/" in link

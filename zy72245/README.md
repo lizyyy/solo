@@ -30,19 +30,28 @@
     ↓
 必须先进入"补看客户经理补充邮件"步骤
     ↓
-客户经理复核确认后，修改审批人为正确中文名
+客户经理修正审批人为正确中文名
     ↓
-修改后仍需客户经理复核确认（requires_review = true）
+系统持久化 review_required = 1，余额更新步骤仍被拦截
     ↓
-复核通过后方可继续后续步骤
+客户经理通过 confirm-review 接口复核确认
+    ↓
+review_required 清零，方可进入余额更新步骤
 ```
 
 ### 修改规则
 
 - 通过 `POST /api/transactions/{id}/fix-approver` 修改审批人
 - 修改后系统自动重新判定状态（拼音/正常）
-- **即使改为中文名，仍标记为需复核**，防止随便填个名字就过
+- **即使改为中文名，仍持久化 `review_required=1`**，防止随便填个名字就过
 - 修改记录写入 `transaction_history` 表，保留改前改后
+
+### 复核确认规则
+
+- 通过 `POST /api/transactions/{id}/confirm-review` 确认复核
+- 仅当 `review_required=1` 时可确认，否则返回"无需复核"
+- 确认后 `review_required` 清零，写入 `transaction_history` 记录变更
+- **复核确认前，余额更新步骤始终被拦截**
 
 ### 回滚规则
 
@@ -67,6 +76,7 @@
 步骤3：余额变化表更新
   ├─ 必须提供新余额
   ├─ 拼音审批人未解决时不可进入此步骤
+  ├─ 审批人修正后未复核确认（review_required=1）时也不可进入此步骤
   └─ 更新后核验状态变为 approved
 ```
 
@@ -104,6 +114,7 @@
 | `MISSING_TAIL_NUMBER` | 柜台流水尾号不能为空 |
 | `PINYIN_APPROVER_DETECTED` | 审批人只有拼音（如"zhangsan"），已标记为待客户经理复核，不会自动归为正常 |
 | `STEP_ORDER_VIOLATION` | 流程步骤顺序不对，请按 导入→补看邮件→余额更新 的顺序操作 |
+| `REVIEW_NOT_CONFIRMED` | 审批人修改后尚未复核确认，不能进入余额更新步骤 |
 
 ## API 接口
 
@@ -113,6 +124,7 @@
 | GET | `/api/transactions/{id}` | 查询流水详情 |
 | PATCH | `/api/transactions/{id}/update` | 修改备注/审批人 |
 | POST | `/api/transactions/{id}/fix-approver` | 修正审批人 |
+| POST | `/api/transactions/{id}/confirm-review` | 复核确认（清除 review_required） |
 | GET | `/api/transactions/{id}/history` | 查看变更历史 |
 | GET | `/api/transactions/{id}/emails` | 查看补充邮件 |
 | POST | `/api/transactions/{id}/emails` | 添加补充邮件 |

@@ -15,6 +15,7 @@ ERROR_MESSAGES = {
     "BALANCE_UPDATE_CONFLICT": "余额变化表已更新过，如需修改请先回滚",
     "EMAIL_NOT_FOUND": "找不到对应的客户经理补充邮件",
     "APPROVER_FIX_REQUIRES_REVIEW": "修改审批人后仍需客户经理复核确认",
+    "REVIEW_NOT_CONFIRMED": "审批人修改后尚未复核确认，不能进入余额更新步骤",
 }
 
 
@@ -35,6 +36,7 @@ FIELD_DISPLAY_NAMES = {
     "green_ratio": "绿色债券投向占比",
     "status": "核验状态",
     "verification_step": "核验步骤",
+    "review_required": "待复核确认",
 }
 
 

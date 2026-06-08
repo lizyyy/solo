@@ -64,9 +64,9 @@ def import_transactions(transactions: List[Dict[str, Any]], db_path: Optional[st
 
             c.execute(
                 """INSERT INTO counter_transactions
-                   (id, tail_number, amount, approver, approver_status, remark, batch_id, created_at, updated_at)
-                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                (txn_id, tail_number, amount, approver, approver_status, remark, batch_id, now, now),
+                   (id, tail_number, amount, approver, approver_status, review_required, remark, batch_id, created_at, updated_at)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                (txn_id, tail_number, amount, approver, approver_status, 0, remark, batch_id, now, now),
             )
 
             verif_id = _uuid()
@@ -271,6 +271,13 @@ def advance_verification_step(
                 "action_required": "请先让客户经理复核审批人信息，再继续后续步骤",
             }
 
+        review_required = txn["review_required"] if "review_required" in txn.keys() else 0
+        if review_required and target_step == VERIFICATION_STEP_BALANCE_UPDATE:
+            return {
+                "error": get_error("REVIEW_NOT_CONFIRMED"),
+                "action_required": "审批人已修改，请先通过复核确认后再进入余额更新步骤",
+            }
+
         now = _now()
         new_status = VERIFICATION_STATUS_PENDING
 
@@ -389,9 +396,9 @@ def get_verification_with_trace(
             result["trace_links"]["transaction_detail"] = f"/api/transactions/{transaction_id}"
         if emails:
             result["trace_links"]["supplementary_emails"] = [
-                f"/api/emails/{e['id']}" for e in emails
+                f"/api/transactions/{transaction_id}/emails" for _ in emails
             ]
-        if txn and txn["approver_status"] == APPROVER_STATUS_PINYIN_ONLY:
+        if txn and (txn["approver_status"] == APPROVER_STATUS_PINYIN_ONLY or (txn["review_required"] if "review_required" in txn.keys() else 0)):
             result["trace_links"]["approver_review"] = f"/api/transactions/{transaction_id}/review"
 
         return result
@@ -469,6 +476,7 @@ def fix_approver(
         old_approver = txn["approver"]
         old_status = txn["approver_status"]
         new_status = classify_approver(new_approver)
+        needs_review = old_status == APPROVER_STATUS_PINYIN_ONLY
         now = _now()
 
         history_id = _uuid()
@@ -481,9 +489,9 @@ def fix_approver(
 
         c.execute(
             """UPDATE counter_transactions
-               SET approver = ?, approver_status = ?, updated_at = ?
+               SET approver = ?, approver_status = ?, review_required = ?, updated_at = ?
                WHERE id = ?""",
-            (new_approver, new_status, now, transaction_id),
+            (new_approver, new_status, 1 if needs_review else 0, now, transaction_id),
         )
 
         conn.commit()
@@ -494,13 +502,59 @@ def fix_approver(
             "new_approver": new_approver,
             "old_status": old_status,
             "new_status": new_status,
-            "requires_review": new_status != APPROVER_STATUS_NORMAL or old_status == APPROVER_STATUS_PINYIN_ONLY,
+            "review_required": needs_review,
         }
 
-        if result["requires_review"]:
+        if needs_review:
             result["message"] = get_error("APPROVER_FIX_REQUIRES_REVIEW")
 
         return result
+    finally:
+        conn.close()
+
+
+def confirm_review(
+    transaction_id: str,
+    reviewer: str = "",
+    db_path: Optional[str] = None,
+) -> Dict[str, Any]:
+    conn = get_db(db_path)
+    c = conn.cursor()
+
+    try:
+        c.execute("SELECT * FROM counter_transactions WHERE id = ?", (transaction_id,))
+        txn = c.fetchone()
+        if not txn:
+            return {"error": get_error("TRANSACTION_NOT_FOUND")}
+
+        review_required = txn["review_required"] if "review_required" in txn.keys() else 0
+        if not review_required:
+            return {"message": "该记录无需复核确认"}
+
+        now = _now()
+        history_id = _uuid()
+        c.execute(
+            """INSERT INTO transaction_history
+               (id, transaction_id, field_name, old_value, new_value, changed_by, changed_at)
+               VALUES (?, ?, ?, ?, ?, ?, ?)""",
+            (history_id, transaction_id, "review_required", "1", "0", reviewer, now),
+        )
+
+        c.execute(
+            """UPDATE counter_transactions
+               SET review_required = 0, updated_at = ?
+               WHERE id = ?""",
+            (now, transaction_id),
+        )
+
+        conn.commit()
+
+        return {
+            "transaction_id": transaction_id,
+            "review_required": False,
+            "reviewer": reviewer,
+            "confirmed_at": now,
+        }
     finally:
         conn.close()
 

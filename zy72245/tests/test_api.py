@@ -72,6 +72,7 @@ class TestTransactionAPI:
         assert r2.status_code == 200
         data = r2.get_json()
         assert data["tail_number"] == "T001"
+        assert data["review_required"] == 0
 
     def test_get_nonexistent_transaction(self, app_client):
         r = app_client.get("/api/transactions/nonexistent")
@@ -121,7 +122,7 @@ class TestFixApproverAPI:
         assert data["old_approver"] == "lisi"
         assert data["new_approver"] == "李四"
         assert data["new_status"] == "normal"
-        assert data["requires_review"] is True
+        assert data["review_required"] is True
 
     def test_fix_approver_creates_history(self, app_client):
         r = _import_one(app_client, approver="lisi")
@@ -138,6 +139,38 @@ class TestFixApproverAPI:
         assert len(data["history"]) == 1
         assert data["history"][0]["old_value"] == "lisi"
         assert data["history"][0]["new_value"] == "李四"
+
+
+class TestConfirmReviewAPI:
+    def test_confirm_review_after_fix(self, app_client):
+        r = _import_one(app_client, approver="zhangsan")
+        txn_id = r.get_json()["imported"][0]["transaction_id"]
+
+        app_client.post(
+            f"/api/transactions/{txn_id}/fix-approver",
+            data=json.dumps({"new_approver": "张三", "operator": "客户经理王五"}),
+            content_type="application/json",
+        )
+
+        r2 = app_client.post(
+            f"/api/transactions/{txn_id}/confirm-review",
+            data=json.dumps({"reviewer": "客户经理王五"}),
+            content_type="application/json",
+        )
+        data = r2.get_json()
+        assert data["review_required"] is False
+
+    def test_confirm_review_noop_when_not_required(self, app_client):
+        r = _import_one(app_client, approver="张三")
+        txn_id = r.get_json()["imported"][0]["transaction_id"]
+
+        r2 = app_client.post(
+            f"/api/transactions/{txn_id}/confirm-review",
+            data=json.dumps({"reviewer": "林姐"}),
+            content_type="application/json",
+        )
+        data = r2.get_json()
+        assert "无需复核" in data["message"]
 
 
 class TestEmailAPI:
@@ -167,37 +200,6 @@ class TestVerificationAPI:
         data = r.get_json()
         assert data["total"] == 2
 
-    def test_advance_step(self, app_client):
-        r = _import_one(app_client, approver="张三")
-        txn_id = r.get_json()["imported"][0]["transaction_id"]
-
-        app_client.post(
-            f"/api/transactions/{txn_id}/emails",
-            data=json.dumps({"sender": "客户经理", "content": "确认"}),
-            content_type="application/json",
-        )
-
-        conn = None
-        from src.models.db import get_db
-        for p in [f for f in os.listdir(tempfile.gettempdir()) if f.endswith(".db")]:
-            pass
-
-        r2 = app_client.post(
-            "/api/verifications/any-id/advance",
-            data=json.dumps({"target_step": "基金会计补看客户经理补充邮件"}),
-            content_type="application/json",
-        )
-
-    def test_pinyin_blocked_at_balance_step(self, app_client):
-        r = _import_one(app_client, approver="zhangsan")
-        txn_id = r.get_json()["imported"][0]["transaction_id"]
-
-        app_client.post(
-            f"/api/transactions/{txn_id}/emails",
-            data=json.dumps({"sender": "客户经理", "content": "确认"}),
-            content_type="application/json",
-        )
-
 
 class TestReviewAPI:
     def test_review_page_has_links(self, app_client):
@@ -208,7 +210,23 @@ class TestReviewAPI:
         data = r2.get_json()
         assert "review_actions" in data
         assert "fix_approver" in data["review_actions"]
+        assert "confirm_review" in data["review_actions"]
         assert data["transaction"]["approver_status"] == "pinyin_only"
+
+    def test_review_page_shows_hint_after_fix(self, app_client):
+        r = _import_one(app_client, approver="zhangsan")
+        txn_id = r.get_json()["imported"][0]["transaction_id"]
+
+        app_client.post(
+            f"/api/transactions/{txn_id}/fix-approver",
+            data=json.dumps({"new_approver": "张三", "operator": "客户经理"}),
+            content_type="application/json",
+        )
+
+        r2 = app_client.get(f"/api/transactions/{txn_id}/review")
+        data = r2.get_json()
+        assert data["transaction"]["review_required"] == 1
+        assert "confirm_review_hint" in data["review_actions"]
 
 
 class TestChartDataAPI:
@@ -235,7 +253,7 @@ class TestTraceAPI:
         assert "trace_links" in data
         assert "approver_review" in data["trace_links"]
 
-    def test_trace_has_email_links(self, app_client):
+    def test_trace_email_links_use_correct_route(self, app_client):
         r = _import_one(app_client, approver="张三")
         txn_id = r.get_json()["imported"][0]["transaction_id"]
         verif_id = r.get_json()["imported"][0]["verification_id"]
@@ -249,4 +267,68 @@ class TestTraceAPI:
         r2 = app_client.get(f"/api/verifications/{verif_id}/trace")
         data = r2.get_json()
         assert len(data["supplementary_emails"]) == 1
-        assert "supplementary_emails" in data["trace_links"]
+        for link in data["trace_links"]["supplementary_emails"]:
+            assert "/api/emails/" not in link
+            assert "/api/transactions/" in link
+
+
+class TestEndToEndAPIWorkflow:
+    def test_full_pinyin_fix_confirm_balance_via_api(self, app_client):
+        r = _import_one(app_client, approver="zhangsan", green_ratio=0.7)
+        data = r.get_json()
+        txn_id = data["imported"][0]["transaction_id"]
+        verif_id = data["imported"][0]["verification_id"]
+
+        app_client.post(
+            f"/api/transactions/{txn_id}/emails",
+            data=json.dumps({"sender": "客户经理王五", "content": "确认审批人为张三"}),
+            content_type="application/json",
+        )
+
+        r2 = app_client.post(
+            f"/api/verifications/{verif_id}/advance",
+            data=json.dumps({"target_step": "基金会计补看客户经理补充邮件", "operator": "林姐"}),
+            content_type="application/json",
+        )
+        assert r2.get_json()["current_step"] == "基金会计补看客户经理补充邮件"
+
+        r_blocked = app_client.post(
+            f"/api/verifications/{verif_id}/advance",
+            data=json.dumps({"target_step": "余额变化表更新", "new_balance": 500000}),
+            content_type="application/json",
+        )
+        assert "error" in r_blocked.get_json()
+
+        app_client.post(
+            f"/api/transactions/{txn_id}/fix-approver",
+            data=json.dumps({"new_approver": "张三", "operator": "客户经理王五"}),
+            content_type="application/json",
+        )
+
+        r_still_blocked = app_client.post(
+            f"/api/verifications/{verif_id}/advance",
+            data=json.dumps({"target_step": "余额变化表更新", "new_balance": 500000}),
+            content_type="application/json",
+        )
+        assert "error" in r_still_blocked.get_json()
+        assert "复核确认" in r_still_blocked.get_json()["error"]
+
+        app_client.post(
+            f"/api/transactions/{txn_id}/confirm-review",
+            data=json.dumps({"reviewer": "客户经理王五"}),
+            content_type="application/json",
+        )
+
+        r_pass = app_client.post(
+            f"/api/verifications/{verif_id}/advance",
+            data=json.dumps({"target_step": "余额变化表更新", "operator": "林姐", "new_balance": 500000}),
+            content_type="application/json",
+        )
+        assert r_pass.get_json()["current_step"] == "余额变化表更新"
+        assert r_pass.get_json()["status"] == "approved"
+
+        r_txn = app_client.get(f"/api/transactions/{txn_id}")
+        txn_data = r_txn.get_json()
+        assert txn_data["approver"] == "张三"
+        assert txn_data["approver_status"] == "normal"
+        assert txn_data["review_required"] == 0

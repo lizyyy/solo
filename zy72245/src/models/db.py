@@ -45,6 +45,7 @@ def init_db(db_path: Optional[str] = None):
             amount REAL NOT NULL,
             approver TEXT NOT NULL,
             approver_status TEXT NOT NULL DEFAULT 'normal',
+            review_required INTEGER NOT NULL DEFAULT 0,
             remark TEXT DEFAULT '',
             batch_id TEXT NOT NULL,
             created_at TEXT NOT NULL,

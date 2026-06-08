@@ -10,6 +10,7 @@ from src.services.verification import (
     get_verification_with_trace,
     rollback_verification,
     fix_approver,
+    confirm_review,
     list_verifications,
 )
 
@@ -75,6 +76,16 @@ def api_fix_approver(transaction_id):
     if not new_approver:
         return jsonify({"error": "审批人不能为空"}), 400
     result = fix_approver(transaction_id, new_approver, operator)
+    if "error" in result:
+        return jsonify(result), 400
+    return jsonify(result)
+
+
+@bp.route("/transactions/<transaction_id>/confirm-review", methods=["POST"])
+def api_confirm_review(transaction_id):
+    data = request.get_json(force=True) or {}
+    reviewer = data.get("reviewer", "")
+    result = confirm_review(transaction_id, reviewer)
     if "error" in result:
         return jsonify(result), 400
     return jsonify(result)
@@ -185,15 +196,23 @@ def api_review_transaction(transaction_id):
         )
         history = [dict(r) for r in c.fetchall()]
 
+        review_actions = {
+            "fix_approver": f"/api/transactions/{transaction_id}/fix-approver",
+            "confirm_review": f"/api/transactions/{transaction_id}/confirm-review",
+            "view_emails": f"/api/transactions/{transaction_id}/emails",
+            "add_email": f"/api/transactions/{transaction_id}/emails",
+        }
+
+        txn_dict = dict(txn)
+        review_required = txn_dict.get("review_required", 0)
+        if review_required:
+            review_actions["confirm_review_hint"] = "审批人已修改，需复核确认后才能继续后续步骤"
+
         return jsonify({
-            "transaction": dict(txn),
+            "transaction": txn_dict,
             "supplementary_emails": emails,
             "change_history": history,
-            "review_actions": {
-                "fix_approver": f"/api/transactions/{transaction_id}/fix-approver",
-                "view_emails": f"/api/transactions/{transaction_id}/emails",
-                "add_email": f"/api/transactions/{transaction_id}/emails",
-            },
+            "review_actions": review_actions,
         })
     finally:
         conn.close()
@@ -215,10 +234,10 @@ def api_chart_data():
 
         c.execute("""
             SELECT v.id as verification_id, v.transaction_id, v.verification_step, t.tail_number,
-                   t.approver, t.approver_status, v.green_ratio
+                   t.approver, t.approver_status, t.review_required, v.green_ratio
             FROM green_bond_verifications v
             JOIN counter_transactions t ON v.transaction_id = t.id
-            WHERE t.approver_status = 'pinyin_only'
+            WHERE t.approver_status = 'pinyin_only' OR t.review_required = 1
         """)
         pinyin_items = []
         for r in c.fetchall():
