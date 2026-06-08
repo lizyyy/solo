@@ -147,9 +147,13 @@ def main():
         if report.anomalies:
             print(f"\n⚠️  异常分类统计:")
             from collections import Counter
+            severity_order = {"critical": 3, "error": 2, "warning": 1}
             stats = Counter(a.anomaly_type.value for a in report.anomalies)
             for atype, count in sorted(stats.items()):
-                severity = max(a.severity for a in report.anomalies if a.anomaly_type.value == atype)
+                severity = max(
+                    (a.severity for a in report.anomalies if a.anomaly_type.value == atype),
+                    key=lambda s: severity_order.get(s, 0)
+                )
                 print(f"  {atype}: {count} 条 (最严重: {severity})")
 
         if not args.no_save:

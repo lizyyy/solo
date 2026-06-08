@@ -2,6 +2,7 @@ import json
 import os
 from typing import Dict, List, Optional, Tuple
 from datetime import datetime
+from collections import defaultdict
 from .schemas import (
     SampleRecord, ModelPrediction, HumanReview, OnlineFeedback, EvaluationRecord
 )
@@ -25,8 +26,8 @@ class DataLoader:
                 versions.append(item)
         return sorted(versions)
 
-    def load_samples(self) -> Dict[str, SampleRecord]:
-        samples = {}
+    def load_samples(self) -> List[SampleRecord]:
+        samples = []
         if not os.path.exists(self.samples_dir):
             return samples
         for filename in os.listdir(self.samples_dir):
@@ -38,14 +39,14 @@ class DataLoader:
             if isinstance(data, list):
                 for item in data:
                     record = SampleRecord.from_dict(item)
-                    samples[record.sample_id] = record
+                    samples.append(record)
             else:
                 record = SampleRecord.from_dict(data)
-                samples[record.sample_id] = record
+                samples.append(record)
         return samples
 
-    def load_predictions(self, model_version: str) -> Dict[str, ModelPrediction]:
-        predictions = {}
+    def load_predictions(self, model_version: str) -> List[ModelPrediction]:
+        predictions = []
         version_dir = os.path.join(self.predictions_dir, model_version)
         if not os.path.exists(version_dir):
             return predictions
@@ -58,10 +59,10 @@ class DataLoader:
             if isinstance(data, list):
                 for item in data:
                     pred = ModelPrediction(**item)
-                    predictions[pred.sample_id] = pred
+                    predictions.append(pred)
             else:
                 pred = ModelPrediction(**data)
-                predictions[pred.sample_id] = pred
+                predictions.append(pred)
         return predictions
 
     def load_reviews(self) -> Dict[str, List[HumanReview]]:
@@ -117,8 +118,8 @@ class DataLoader:
     def load_evaluation_data(
         self, model_version: str
     ) -> Tuple[
-        Dict[str, SampleRecord],
-        Dict[str, ModelPrediction],
+        List[SampleRecord],
+        List[ModelPrediction],
         Dict[str, List[HumanReview]],
         Dict[str, List[OnlineFeedback]]
     ]:
@@ -130,28 +131,40 @@ class DataLoader:
 
     def build_evaluation_records(
         self,
-        samples: Dict[str, SampleRecord],
-        predictions: Dict[str, ModelPrediction],
+        samples: List[SampleRecord],
+        predictions: List[ModelPrediction],
         reviews: Dict[str, List[HumanReview]],
         feedback: Dict[str, List[OnlineFeedback]]
     ) -> List[EvaluationRecord]:
+        pred_map = defaultdict(list)
+        for pred in predictions:
+            pred_map[pred.sample_id].append(pred)
+        sample_map = defaultdict(list)
+        for sample in samples:
+            sample_map[sample.sample_id].append(sample)
         records = []
-        for sample_id, sample in samples.items():
-            if sample_id not in predictions:
+        seen = set()
+        for sample in samples:
+            sid = sample.sample_id
+            if sid not in pred_map:
                 continue
-            prediction = predictions[sample_id]
-            review_list = reviews.get(sample_id, [])
-            latest_review = review_list[-1] if review_list else None
-            feedback_list = feedback.get(sample_id, [])
-            latest_feedback = feedback_list[-1] if feedback_list else None
-            record = EvaluationRecord(
-                sample_id=sample_id,
-                sample=sample,
-                prediction=prediction,
-                review=latest_review,
-                feedback=latest_feedback,
-                anomalies=[],
-                metrics={}
-            )
-            records.append(record)
+            for pred in pred_map[sid]:
+                key = (sid, id(sample), id(pred))
+                if key in seen:
+                    continue
+                seen.add(key)
+                review_list = reviews.get(sid, [])
+                latest_review = review_list[-1] if review_list else None
+                feedback_list = feedback.get(sid, [])
+                latest_feedback = feedback_list[-1] if feedback_list else None
+                record = EvaluationRecord(
+                    sample_id=sid,
+                    sample=sample,
+                    prediction=pred,
+                    review=latest_review,
+                    feedback=latest_feedback,
+                    anomalies=[],
+                    metrics={}
+                )
+                records.append(record)
         return records

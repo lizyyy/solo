@@ -161,7 +161,8 @@ python main.py --anomalies v1 --type sample_leakage
 |------|----------|------|
 | `sample_leakage` | 🔴 critical | 样本泄漏，特征直接出现在预测中 |
 | `label_conflict` | 🟠 error | 人工复核与模型预测标签冲突 |
-| `duplicate` | 🟠 error | 样本ID或特征重复 |
+| `duplicate` (sample_id) | 🟠 error | 样本ID重复（同一ID出现多次，通常因看板重复导入） |
+| `duplicate` (features) | 🟡 warning | 不同ID但特征相同（排除ID字段后比较） |
 | `null_value` | 🟠/🟡 | 空值字段（超过阈值为error） |
 | `boundary` | 🟡 warning | 预测分数接近阈值边界 |
 
@@ -258,7 +259,7 @@ python main.py --evaluate v1 --data-dir /path/to/data --output-dir /path/to/outp
 
 ## 七、交接给小孟的 Checklist
 
-✅ **不用手工对第二遍**：系统自动去重，重复样本会标红  
+✅ **不用手工对第二遍**：系统自动检测两种重复——样本ID重复（看板重复导入）和特征重复（不同ID同特征），都会标出  
 ✅ **不用翻旧记录**：`--sample` 命令一条查完整证据链  
 ✅ **异常不被掩盖**：标签冲突、样本泄漏单独列，平均指标不会盖住问题  
 ✅ **可追溯**：每条记录都保留 `source`、`created_at`、`processed_at`、`reviewed_at`  
@@ -268,9 +269,10 @@ python main.py --evaluate v1 --data-dir /path/to/data --output-dir /path/to/outp
 | 样本 | 测试点 | 预期结果 |
 |------|--------|----------|
 | CS_001 | 顺利处理，一次通过 | approved，无异常 |
+| CS_001 (重导入) | 样本ID重复（看板重复导入） | 检测到 duplicate (sample_id) 异常 🟠 |
 | CS_002 | 返工后通过（两轮） | review_round=2，检测到标签冲突 |
 | CS_003 | 空值样本 | 检测到 null_value 异常 |
-| CS_004 | 与CS_001特征重复 | 检测到 duplicate 异常 |
+| CS_004 | 与CS_001特征重复（不同ID） | 检测到 duplicate (features) 异常 🟡 |
 | CS_005 | 边界分数 0.97 | 检测到 boundary 异常 |
 | CS_006 | 返工后通过（两轮） | review_round=2，检测到标签冲突 |
 | CS_007 | 样本泄漏 | 检测到 sample_leakage 异常（最严重） |

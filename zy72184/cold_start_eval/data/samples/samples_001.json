@@ -122,5 +122,24 @@
         "raw_data": {
             "original_query": "推荐跑步装备"
         }
+    },
+    {
+        "sample_id": "CS_001",
+        "source": "kanban_review_20260520_reimport",
+        "features": {
+            "user_id": "U10001",
+            "item_id": "I20001",
+            "item_category": "electronics",
+            "user_history_count": 15,
+            "item_popularity": 0.72,
+            "cold_start_type": "new_item",
+            "explanation_context": "新品耳机推荐"
+        },
+        "created_at": "2026-05-20T09:00:00",
+        "processed_at": "2026-05-20T11:30:00",
+        "raw_data": {
+            "original_query": "推荐一款适合运动的耳机",
+            "note": "看板重新导入，与5月15日为同一条样本"
+        }
     }
 ]

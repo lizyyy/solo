@@ -45,48 +45,51 @@ class AnomalyDetector:
         anomalies = []
         id_groups = defaultdict(list)
         feature_hashes = defaultdict(list)
+        id_dup_ids = set()
         for record in records:
             id_groups[record.sample_id].append(record)
             feature_hash = self._hash_features(record.sample.features)
             feature_hashes[feature_hash].append(record)
         for sample_id, group in id_groups.items():
             if len(group) > 1:
+                id_dup_ids.add(sample_id)
+                sources = [r.sample.source for r in group]
                 for record in group:
                     anomaly = AnomalyRecord(
                         anomaly_type=AnomalyType.DUPLICATE,
                         sample_id=sample_id,
-                        description=f"样本ID重复出现 {len(group)} 次",
+                        description=f"样本ID重复出现 {len(group)} 次，来源: {sources}",
                         severity="error",
                         details={
                             "duplicate_count": len(group),
                             "duplicate_type": "sample_id",
+                            "sources": sources,
                             "source": record.sample.source
                         }
                     )
                     anomalies.append(anomaly)
         for feature_hash, group in feature_hashes.items():
             if len(group) > 1:
-                sample_ids = [r.sample_id for r in group]
+                distinct_ids = list(dict.fromkeys(r.sample_id for r in group))
+                if len(distinct_ids) < 2:
+                    continue
                 for record in group:
-                    existing = any(
-                        a.anomaly_type == AnomalyType.DUPLICATE
-                        and a.sample_id == record.sample_id
-                        for a in anomalies
+                    if record.sample_id in id_dup_ids:
+                        continue
+                    other_ids = [sid for sid in distinct_ids if sid != record.sample_id]
+                    anomaly = AnomalyRecord(
+                        anomaly_type=AnomalyType.DUPLICATE,
+                        sample_id=record.sample_id,
+                        description=f"样本特征与不同ID样本重复: {other_ids}",
+                        severity="warning",
+                        details={
+                            "duplicate_count": len(group),
+                            "duplicate_type": "features",
+                            "duplicate_with": distinct_ids,
+                            "source": record.sample.source
+                        }
                     )
-                    if not existing:
-                        anomaly = AnomalyRecord(
-                            anomaly_type=AnomalyType.DUPLICATE,
-                            sample_id=record.sample_id,
-                            description=f"样本特征与其他样本重复: {sample_ids}",
-                            severity="warning",
-                            details={
-                                "duplicate_count": len(group),
-                                "duplicate_type": "features",
-                                "duplicate_with": sample_ids,
-                                "source": record.sample.source
-                            }
-                        )
-                        anomalies.append(anomaly)
+                    anomalies.append(anomaly)
         return anomalies
 
     def detect_null_values(self, record: EvaluationRecord) -> List[AnomalyRecord]:
