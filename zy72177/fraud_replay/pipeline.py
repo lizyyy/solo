@@ -113,8 +113,29 @@ class ReplayPipeline:
         return self.results
 
     def set_previous_run(self, df: pd.DataFrame):
-        self.previous_run_df = df.copy()
-        print(f"已设置前次运行数据，共 {len(df)} 条记录")
+        print(f"处理前次运行数据 (共 {len(df)} 条)...")
+        prev_df = df.copy()
+        
+        if "source" not in prev_df.columns:
+            prev_df["source"] = "前次运行"
+        if "process_time" not in prev_df.columns:
+            prev_df["process_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        if "sample_id" not in prev_df.columns:
+            prev_df["sample_id"] = prev_df.apply(
+                lambda row: "|".join([str(row.get(c, "")) for c in self.config.duplicate_detection_cols if pd.notna(row.get(c, ""))]),
+                axis=1
+            )
+        
+        prev_sample_processor = SampleProcessor(self.config)
+        prev_model_processor = ModelOutputProcessor(self.config)
+        prev_review_processor = ReviewProcessor(self.config)
+        
+        prev_df, _ = prev_sample_processor.process_samples(prev_df)
+        prev_df, _ = prev_model_processor.process_model_output(prev_df)
+        prev_df, _ = prev_review_processor.process_review_data(prev_df)
+        
+        self.previous_run_df = prev_df
+        print(f"前次运行数据处理完成，有效记录 {len(prev_df)} 条")
 
     def get_results(self) -> Dict:
         return self.results

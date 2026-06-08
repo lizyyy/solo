@@ -52,6 +52,7 @@ class ReviewProcessor:
         return df
 
     def _resolve_label_precedence(self, df: pd.DataFrame) -> pd.DataFrame:
+        existing_resolved = df["resolved_label"].copy() if "resolved_label" in df.columns else None
         df["resolved_label"] = np.nan
         
         if "online_feedback" in df.columns:
@@ -72,6 +73,13 @@ class ReviewProcessor:
             df.loc[mask_original, "label_source"] = "原始标签"
             self._log(f"使用原始标签作为最终标签: {mask_original.sum()} 条")
         
+        if existing_resolved is not None:
+            still_missing = df["resolved_label"].isna()
+            if still_missing.any():
+                df.loc[still_missing, "resolved_label"] = existing_resolved[still_missing]
+                df.loc[still_missing, "label_source"] = "前次已处理"
+                self._log(f"保留前次已处理标签: {still_missing.sum()} 条")
+        
         df["resolved_label"] = pd.to_numeric(df["resolved_label"], errors="coerce")
         
         return df
@@ -87,7 +95,7 @@ class ReviewProcessor:
                 fp_mask = wrong_mask & (df["model_prediction"] == 1) & (df["resolved_label"] == 0)
                 fn_mask = wrong_mask & (df["model_prediction"] == 0) & (df["resolved_label"] == 1)
                 
-                df["error_type"] = np.nan
+                df["error_type"] = pd.Series([np.nan] * len(df), dtype="object")
                 df.loc[fp_mask, "error_type"] = "误报 (FP)"
                 df.loc[fn_mask, "error_type"] = "漏报 (FN)"
                 
