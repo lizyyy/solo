@@ -7,6 +7,7 @@ const LAT_LNG_PATTERNS = [
 
 const METRIC_PATTERNS = [
   /[m米]\s*$/i,
+  /[m米][,\s]/i,
   /x\s*[=:]\s*[-+]?\d+\.?\d*/i,
   /y\s*[=:]\s*[-+]?\d+\.?\d*/i,
 ];
@@ -47,6 +48,12 @@ function parseNumbers(rawValue: string): { x: number; y: number } {
   };
 }
 
+const STRONGLY_LIKE_LNG_THRESHOLD = 50;
+
+function looksStronglyLikeLatLng(x: number, y: number): boolean {
+  return Math.abs(x) > STRONGLY_LIKE_LNG_THRESHOLD;
+}
+
 export function detectCoordinateType(rawValue: string): DetectionResult {
   const { x, y } = parseNumbers(rawValue);
   
@@ -56,14 +63,17 @@ export function detectCoordinateType(rawValue: string): DetectionResult {
   const xInLngRange = isInRange(x, LNG_RANGE.min, LNG_RANGE.max);
   const yInLatRange = isInRange(y, LAT_RANGE.min, LAT_RANGE.max);
   const bothInLatLngRange = xInLngRange && yInLatRange;
+  const stronglyLatLng = looksStronglyLikeLatLng(x, y);
   
-  const xOutsideLatLngRange = !xInLngRange;
-  const yOutsideLatLngRange = !yInLatRange;
-  const anyOutsideLatLngRange = xOutsideLatLngRange || yOutsideLatLngRange;
+  const anyOutsideLatLngRange = !xInLngRange || !yInLatRange;
   
-  const isLatLng = (hasLatLngMark || bothInLatLngRange) && !hasMetricMark;
-  const isMetric = (hasMetricMark || anyOutsideLatLngRange) && !hasLatLngMark;
-  const isMixed = (hasLatLngMark && hasMetricMark) || (bothInLatLngRange && hasMetricMark) || (hasLatLngMark && anyOutsideLatLngRange);
+  const isMixed = (hasLatLngMark && hasMetricMark)
+    || (stronglyLatLng && hasMetricMark)
+    || (hasLatLngMark && anyOutsideLatLngRange);
+  
+  const isMetric = !isMixed && ((hasMetricMark || anyOutsideLatLngRange) && !hasLatLngMark);
+  
+  const isLatLng = !isMixed && !isMetric && (hasLatLngMark || bothInLatLngRange);
   
   let coordinateType: CoordinateType = 'LAT_LNG';
   if (isMixed) {

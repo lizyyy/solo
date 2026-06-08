@@ -94,14 +94,16 @@ export const envelopeService = {
     
     for (let i = 0; i < dataRows.length; i++) {
       const row = dataRows[i];
-      const rawValue = row.join(', ');
-      const originalLineNumber = i + 2;
+      const parsedLineNumber = parseInt(row[0], 10);
+      const originalLineNumber = isNaN(parsedLineNumber) ? i + 2 : parsedLineNumber;
+      const coordinateRaw = row.length >= 3 ? `${row[1]},${row[2]}` : row.slice(1).join(',');
+      const rawValue = coordinateRaw;
+      const logRadius = row.length > 3 ? parseFloat(row[3]) : null;
       
       const detection = detectCoordinateType(rawValue);
       const distance = Math.sqrt(detection.xValue ** 2 + detection.yValue ** 2);
       const tableRadius = lookupSafetyRadius(safetyRadiusTable, distance, request.safetyRadiusVersion, request.robotArmId);
       
-      const logRadius = row.length > 2 ? parseFloat(row[2]) : null;
       const radiusValidation = validateSafetyRadius(logRadius, tableRadius);
       
       const status: ProcessingStatus = detection.isMixed ? 'INSPECTION_REVIEW' : 'IMPORTED';
@@ -137,8 +139,9 @@ export const envelopeService = {
       });
     }
     
-    const updatedEnvelope = envelopeRepository.updateEnvelopeStep(envelope.id, 1, 'IMPORTED')!;
-    envelopeRepository.updateEnvelopeStatus(envelope.id, mixedCount > 0 ? 'INSPECTION_REVIEW' : 'ENGINEER_REVIEW');
+    const finalStatus: ProcessingStatus = mixedCount > 0 ? 'INSPECTION_REVIEW' : 'ENGINEER_REVIEW';
+    envelopeRepository.updateEnvelopeStatus(envelope.id, finalStatus);
+    envelopeRepository.updateEnvelopeMixedPoints(envelope.id, mixedCount);
     
     envelopeRepository.createAuditLog({
       envelopeId: envelope.id,
@@ -151,8 +154,10 @@ export const envelopeService = {
       originalLineNumber: null,
     });
     
+    const finalEnvelope = envelopeRepository.findEnvelopeById(envelope.id)!;
+    
     return {
-      envelope: updatedEnvelope,
+      envelope: finalEnvelope,
       points,
       mixedCount,
     };

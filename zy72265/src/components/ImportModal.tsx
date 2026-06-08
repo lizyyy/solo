@@ -48,11 +48,13 @@ export function ImportModal({ isOpen, onClose }: ImportModalProps) {
     const dataRows = csvData.slice(1);
     
     const preview: PreviewRow[] = dataRows.slice(0, 10).map((row, index) => {
-      const rawValue = row.join(', ');
-      const detection = detectCoordinateType(rawValue);
+      const parsedLineNumber = parseInt(row[0], 10);
+      const lineNumber = isNaN(parsedLineNumber) ? index + 2 : parsedLineNumber;
+      const coordinateRaw = row.length >= 3 ? `${row[1]},${row[2]}` : row.slice(1).join(',');
+      const detection = detectCoordinateType(coordinateRaw);
       return {
-        lineNumber: index + 2,
-        rawValue,
+        lineNumber,
+        rawValue: coordinateRaw,
         xValue: detection.xValue,
         yValue: detection.yValue,
         coordinateType: detection.coordinateType,

@@ -186,7 +186,7 @@ export function EnvelopeList() {
                   {envelopes.map((envelope) => (
                     <tr
                       key={envelope.id}
-                      onClick={() => navigate(`/envelope/${envelope.id}`)}
+                      onClick={() => navigate(`/envelopes/${envelope.id}`)}
                       className="border-b border-slate-700/50 hover:bg-slate-700/30 cursor-pointer transition-colors"
                     >
                       <td className="px-4 py-3">
@@ -240,7 +240,7 @@ export function EnvelopeList() {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              navigate(`/envelope/${envelope.id}`);
+                              navigate(`/envelopes/${envelope.id}`);
                             }}
                             className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-700 rounded transition-colors"
                             title="查看详情"

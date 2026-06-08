@@ -154,6 +154,19 @@ export const envelopeRepository = {
     return this.findEnvelopeById(id);
   },
   
+  updateEnvelopeMixedPoints(id: string, mixedPoints: number): EnvelopeRecord | undefined {
+    const db = getDatabase();
+    const now = new Date().toISOString();
+    
+    db.prepare(`
+      UPDATE envelope_records
+      SET mixed_points = ?, updated_at = ?
+      WHERE id = ?
+    `).run(mixedPoints, now, id);
+    
+    return this.findEnvelopeById(id);
+  },
+  
   findPointsByEnvelopeId(envelopeId: string): CoordinatePoint[] {
     const db = getDatabase();
     const rows = db.prepare(`
