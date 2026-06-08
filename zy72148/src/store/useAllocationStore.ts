@@ -10,7 +10,7 @@ import type {
   FilterState,
   ImportSourceInfo,
 } from '@/types';
-import { checkAllDataQuality } from '@/utils/dataQuality';
+import { checkAllDataQuality, generateRecordHash, generateIdentityHash } from '@/utils/dataQuality';
 import { detectConflicts, resolveConflict } from '@/utils/conflictDetection';
 import { completeRecord } from '@/utils/import';
 import { exportToCSV, exportToJSON, filterRecords } from '@/utils/export';
@@ -30,6 +30,10 @@ interface AllocationState {
   pageSize: number;
   operator: string;
   isLoading: boolean;
+
+  pendingRecords: RoomAllocation[];
+  pendingVersionId: string | null;
+  pendingSourceInfo: ImportSourceInfo | null;
 
   initSampleData: () => void;
   clearAllData: () => void;
@@ -92,6 +96,9 @@ export const useAllocationStore = create<AllocationState>()(
       pageSize: 10,
       operator: '小孟',
       isLoading: false,
+      pendingRecords: [],
+      pendingVersionId: null,
+      pendingSourceInfo: null,
 
       initSampleData: () => {
         const now = new Date().toISOString();
@@ -268,9 +275,8 @@ export const useAllocationStore = create<AllocationState>()(
       clearSelection: () => set({ selectedRecords: [] }),
 
       importVersion: (data, sourceInfo) => {
-        const { allocations, versions, operator } = get();
-        const now = new Date().toISOString();
-        const nextVersionNumber = versions.length > 0 
+        const { allocations, versions } = get();
+        const nextVersionNumber = versions.length > 0
           ? Math.max(...versions.map(v => v.versionNumber)) + 1
           : 1;
         const versionId = generateId();
@@ -282,13 +288,18 @@ export const useAllocationStore = create<AllocationState>()(
 
         const conflicts = detectConflicts(allocations, data);
 
-        set({ conflicts });
+        set({
+          conflicts,
+          pendingRecords: completedRecords,
+          pendingVersionId: versionId,
+          pendingSourceInfo: sourceInfo,
+        });
 
         return { conflicts, newVersionId: versionId };
       },
 
       applyConflictResolution: (recordId, fieldName, choice, newValue) => {
-        const { allocations, conflicts, changeLogs, operator } = get();
+        const { allocations, conflicts, changeLogs, operator, pendingRecords } = get();
         const now = new Date().toISOString();
         const conflict = conflicts.find(
           c => c.recordId === recordId && c.fieldName === fieldName
@@ -312,59 +323,138 @@ export const useAllocationStore = create<AllocationState>()(
           changedAt: now,
         };
 
+        const updatedAllocations = allocations.map(a =>
+          a.id === recordId
+            ? { ...a, [fieldName]: valueToUse, updatedAt: now }
+            : a
+        );
+
+        const matchingPending = pendingRecords.find(
+          p => p.tourName === oldRecord.tourName
+            && p.hotelName === oldRecord.hotelName
+            && p.personName === oldRecord.personName
+            && p.checkInDate === oldRecord.checkInDate
+        );
+        let updatedPending = pendingRecords;
+        if (matchingPending && choice === 'keep') {
+          updatedPending = pendingRecords.map(p =>
+            p.id === matchingPending.id
+              ? { ...p, [fieldName]: valueToUse, updatedAt: now }
+              : p
+          );
+        }
+
         set({
-          allocations: allocations.map(a =>
-            a.id === recordId
-              ? { ...a, [fieldName]: valueToUse, updatedAt: now }
-              : a
-          ),
+          allocations: updatedAllocations,
           conflicts: resolveConflict(conflicts, recordId, fieldName, choice),
           changeLogs: [...changeLogs, newChangeLog],
+          pendingRecords: updatedPending,
         });
 
         get().checkQuality();
       },
 
       finalizeImport: (versionId) => {
-        const { allocations, versions, sourceTraces, operator } = get();
+        const { allocations, versions, sourceTraces, changeLogs, operator, pendingRecords, pendingVersionId, pendingSourceInfo } = get();
         const now = new Date().toISOString();
-        const nextVersionNumber = versions.length > 0 
+
+        if (pendingVersionId !== versionId || pendingRecords.length === 0) return;
+
+        const sourceInfo = pendingSourceInfo || { fileName: '导入文件', operator, changeNote: '版本导入' };
+
+        const nextVersionNumber = versions.length > 0
           ? Math.max(...versions.map(v => v.versionNumber)) + 1
           : 1;
 
         const newVersion: Version = {
           id: versionId,
-          versionName: `v${nextVersionNumber}`,
+          versionName: `v${nextVersionNumber} - ${sourceInfo.changeNote || '版本导入'}`,
           versionNumber: nextVersionNumber,
-          sourceFile: '导入文件',
-          operator,
-          changeNote: '版本导入',
+          sourceFile: sourceInfo.fileName,
+          operator: sourceInfo.operator || operator,
+          changeNote: sourceInfo.changeNote || '版本导入',
           createdAt: now,
-          recordCount: allocations.length,
+          recordCount: pendingRecords.length,
         };
 
-        const newSourceTraces = allocations
-          .filter(a => a.versionId === versionId)
-          .map(a => ({
-            id: generateId(),
-            recordId: a.id,
-            fileName: newVersion.sourceFile,
-            importedAt: now,
-            operator,
-            rawData: JSON.stringify(a),
-          }));
+        const existingHashMap = new Map<string, RoomAllocation>();
+        allocations.forEach(a => {
+          existingHashMap.set(generateIdentityHash(a), a);
+        });
+
+        const updatedAllocations = [...allocations];
+        const trulyNewRecords: RoomAllocation[] = [];
+        const newChangeLogs: ChangeLog[] = [];
+
+        pendingRecords.forEach(pendingRecord => {
+          const hash = generateIdentityHash(pendingRecord);
+          const existingRecord = existingHashMap.get(hash);
+
+          if (existingRecord) {
+            const index = updatedAllocations.findIndex(a => a.id === existingRecord.id);
+            if (index !== -1) {
+              const fieldsToCompare = ['roomType', 'personType', 'checkOutDate', 'remarks', 'status'] as const;
+              fieldsToCompare.forEach(field => {
+                const oldVal = String(updatedAllocations[index][field] || '');
+                const newVal = String(pendingRecord[field] || '');
+                if (oldVal !== newVal) {
+                  newChangeLogs.push({
+                    id: generateId(),
+                    recordId: updatedAllocations[index].id,
+                    versionId,
+                    fieldName: field,
+                    oldValue: oldVal,
+                    newValue: newVal,
+                    operator: sourceInfo.operator || operator,
+                    changedAt: now,
+                  });
+                }
+              });
+
+              updatedAllocations[index] = {
+                ...updatedAllocations[index],
+                ...pendingRecord,
+                id: updatedAllocations[index].id,
+                versionId,
+                updatedAt: now,
+                manualTag: updatedAllocations[index].manualTag,
+              };
+            }
+          } else {
+            trulyNewRecords.push(pendingRecord);
+          }
+        });
+
+        const newSourceTraces = pendingRecords.map(a => ({
+          id: generateId(),
+          recordId: a.id,
+          fileName: sourceInfo.fileName,
+          importedAt: now,
+          operator: sourceInfo.operator || operator,
+          rawData: JSON.stringify(a),
+        }));
 
         set({
+          allocations: [...updatedAllocations, ...trulyNewRecords],
           versions: [...versions, newVersion],
           sourceTraces: [...sourceTraces, ...newSourceTraces],
+          changeLogs: [...changeLogs, ...newChangeLogs],
           conflicts: [],
+          pendingRecords: [],
+          pendingVersionId: null,
+          pendingSourceInfo: null,
         });
 
         get().checkQuality();
       },
 
       cancelImport: () => {
-        set({ conflicts: [] });
+        set({
+          conflicts: [],
+          pendingRecords: [],
+          pendingVersionId: null,
+          pendingSourceInfo: null,
+        });
       },
 
       checkQuality: () => {

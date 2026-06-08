@@ -1,5 +1,5 @@
 import type { RoomAllocation, ConflictItem } from '@/types';
-import { generateRecordHash } from './dataQuality';
+import { generateIdentityHash } from './dataQuality';
 
 const COMPARE_FIELDS = ['roomType', 'checkInDate', 'checkOutDate', 'hotelName'] as const;
 
@@ -20,12 +20,12 @@ export const detectConflicts = (
   const oldRecordMap = new Map<string, RoomAllocation>();
   
   oldRecords.forEach(record => {
-    const hash = generateRecordHash(record);
+    const hash = generateIdentityHash(record);
     oldRecordMap.set(hash, record);
   });
   
   newRecords.forEach(newRecord => {
-    const hash = generateRecordHash(newRecord);
+    const hash = generateIdentityHash(newRecord);
     const oldRecord = oldRecordMap.get(hash);
     
     if (oldRecord) {

@@ -37,6 +37,11 @@ export const generateRecordHash = (record: Partial<RoomAllocation>): string => {
   return key;
 };
 
+export const generateIdentityHash = (record: Partial<RoomAllocation>): string => {
+  const key = `${record.tourName || ''}-${record.hotelName || ''}-${record.personName || ''}-${record.checkInDate || ''}`;
+  return key;
+};
+
 export const checkDuplicates = (records: RoomAllocation[]): DataQualityIssue[] => {
   const issues: DataQualityIssue[] = [];
   const hashMap = new Map<string, RoomAllocation[]>();

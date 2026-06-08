@@ -2,6 +2,7 @@ import { X, AlertTriangle, Check, XCircle, Edit3 } from 'lucide-react';
 import { useAllocationStore } from '@/store/useAllocationStore';
 import type { ConflictItem } from '@/types';
 import { groupConflictsByRecord } from '@/utils/conflictDetection';
+import { useEffect } from 'react';
 
 const FIELD_LABELS: Record<string, string> = {
   roomType: '房型',
@@ -17,12 +18,14 @@ interface ConflictModalProps {
   onClose: () => void;
 }
 
-export const ConflictModal = ({ isOpen, conflicts, versionId, onClose }: ConflictModalProps) => {
+export const ConflictModal = ({ isOpen, conflicts: initialConflicts, versionId, onClose }: ConflictModalProps) => {
   const applyConflictResolution = useAllocationStore(state => state.applyConflictResolution);
   const finalizeImport = useAllocationStore(state => state.finalizeImport);
   const cancelImport = useAllocationStore(state => state.cancelImport);
   const allocations = useAllocationStore(state => state.allocations);
+  const storeConflicts = useAllocationStore(state => state.conflicts);
 
+  const conflicts = storeConflicts.length > 0 ? storeConflicts : initialConflicts;
   const groupedConflicts = groupConflictsByRecord(conflicts);
   const remainingCount = conflicts.length;
 
@@ -45,7 +48,16 @@ export const ConflictModal = ({ isOpen, conflicts, versionId, onClose }: Conflic
     onClose();
   };
 
-  if (!isOpen || conflicts.length === 0) return null;
+  useEffect(() => {
+    if (isOpen && storeConflicts.length === 0 && initialConflicts.length > 0) {
+      finalizeImport(versionId);
+      onClose();
+    }
+  }, [storeConflicts.length, isOpen, initialConflicts.length, versionId, finalizeImport, onClose]);
+
+  if (!isOpen) return null;
+
+  if (conflicts.length === 0) return null;
 
   return (
     <>
