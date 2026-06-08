@@ -1,57 +1,78 @@
-# React + TypeScript + Vite
+# 游乐设施离心力提醒
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+解决维修数据复盘时极端值被平均掩盖风险的问题。面向项目助理等非技术人员，提供从原始数据到异常判定的完整流程，确保风险可追溯、结果可复现。
 
-Currently, two official plugins are available:
+## 快速开始
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+浏览器打开后：
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+1. 点击「加载样例数据并开始分析」
+2. 在分析页查看异常检测结果（样例含2个极端值：2850N、3100N）
+3. 添加补录备注 → 刷新页面 → 确认参数和历史记录还在
+4. 点击「导出报告」→ 选 HTML 格式获得完整交接报告
 
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## 怎样跑样例
+
+打开应用后默认在数据导入页，左侧「快速开始」卡片中点击蓝色按钮即可。样例数据包含12个5秒间隔采样点，其中2个为极端值异常。
+
+## 怎样调整参数
+
+进入分析页右侧「检测配置」面板，支持三种方法：
+
+| 方法 | 参数 | 默认值 | 说明 |
+|------|------|--------|------|
+| IQR 四分位距法 | IQR 乘数 | 1.5 | 值越小检测越严格 |
+| Z-Score 法 | Z-Score 阈值 | 3.0 | 值越小检测越严格 |
+| 手动阈值 | 上限/下限 | 0-5000 | 直接设定异常范围 |
+
+修改参数后图表和统计实时更新。
+
+## 怎样查看失败原因
+
+分析页右侧「数据校验结果」面板显示两类问题：
+
+- **错误**（红色）：方向符号无法识别、数值无效等，必须修复
+- **警告**（黄色）：单位异常、时间间隔不均、多种单位混用等，建议检查
+
+每个问题都带行号和修复建议。
+
+## 脏数据处理
+
+导入页可点击「测试脏数据处理能力」加载包含方向缺失、无效数值、异常单位、时间间隔不均的脏数据，观察系统如何给出清晰的错误和警告。系统不会静默失败或猜测数据。
+
+## 补录备注
+
+分析页右侧点击「添加补录备注」→ 输入说明 → 保存。补录后：
+
+- 页面顶部显示「有补录备注」标记
+- 保存补录前的数据快照
+- 导出报告包含补录内容及前后差异对比
+- 刷新页面后数据从 localStorage 恢复，备注不丢失
+
+## 导出格式
+
+| 格式 | 用途 | 内容 |
+|------|------|------|
+| HTML 报告 | 交接、打印 | 完整异常原因、检测配置、补录差异 |
+| CSV 数据 | 二次分析 | 数据表含异常标记列和原因列 |
+| JSON 原始数据 | 程序处理 | 完整会话含所有元数据 |
+
+## 技术栈
+
+- React 18 + TypeScript + Vite
+- TailwindCSS + Recharts + Lucide Icons
+- Zustand 状态管理
+- localStorage 持久化
+
+## 验证
+
+```bash
+npm run check    # TypeScript 类型检查
+npm run lint     # ESLint 代码检查
+npm run build    # 生产构建
 ```

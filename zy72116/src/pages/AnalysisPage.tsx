@@ -22,6 +22,10 @@ const AnalysisPage: React.FC = () => {
   const [supplementaryNote, setSupplementaryNote] = useState('');
   const [showDataTable, setShowDataTable] = useState(true);
 
+  const dataPoints = session?.dataPoints ?? [];
+  const stats = useMemo(() => calculateStatistics(dataPoints), [dataPoints]);
+  const movingAvg = useMemo(() => calculateMovingAverage(dataPoints, 3), [dataPoints]);
+
   if (!session || session.dataPoints.length === 0) {
     return (
       <div className="max-w-4xl mx-auto px-6 py-16 text-center">
@@ -37,9 +41,6 @@ const AnalysisPage: React.FC = () => {
       </div>
     );
   }
-
-  const stats = useMemo(() => calculateStatistics(session.dataPoints), [session.dataPoints]);
-  const movingAvg = useMemo(() => calculateMovingAverage(session.dataPoints, 3), [session.dataPoints]);
 
   const chartData = session.dataPoints.map((point, index) => ({
     ...point,

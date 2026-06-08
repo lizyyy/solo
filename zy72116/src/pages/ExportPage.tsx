@@ -12,6 +12,25 @@ const ExportPage: React.FC = () => {
   const { session } = useAnalysisStore();
   const [exportingFormat, setExportingFormat] = useState<string | null>(null);
 
+  const dataPoints = session?.dataPoints ?? [];
+  const stats = useMemo(() => calculateStatistics(dataPoints), [dataPoints]);
+  const metadata = session?.metadata ?? { source: '', processedAt: 0, processor: '', remarks: '' };
+  const anomalyConfig = session?.anomalyConfig ?? { method: 'iqr' as const, iqrMultiplier: 1.5, zscoreThreshold: 3.0 };
+  const hasSupplementaryNote = session?.hasSupplementaryNote ?? false;
+  const dataBeforeSupplementary = session?.dataBeforeSupplementary;
+
+  const report: ExportReport = useMemo(() => ({
+    title: session?.name ?? '',
+    exportedAt: Date.now(),
+    metadata,
+    anomalyConfig,
+    statistics: stats,
+    dataPoints,
+    supplementaryNote: metadata.supplementaryNote,
+    hasSupplementaryNote,
+    dataBeforeSupplementary
+  }), [session, stats, metadata, anomalyConfig, dataPoints, hasSupplementaryNote, dataBeforeSupplementary]);
+
   if (!session || session.dataPoints.length === 0) {
     return (
       <div className="max-w-4xl mx-auto px-6 py-16 text-center">
@@ -27,20 +46,6 @@ const ExportPage: React.FC = () => {
       </div>
     );
   }
-
-  const stats = useMemo(() => calculateStatistics(session.dataPoints), [session.dataPoints]);
-
-  const report: ExportReport = useMemo(() => ({
-    title: session.name,
-    exportedAt: Date.now(),
-    metadata: session.metadata,
-    anomalyConfig: session.anomalyConfig,
-    statistics: stats,
-    dataPoints: session.dataPoints,
-    supplementaryNote: session.metadata.supplementaryNote,
-    hasSupplementaryNote: session.hasSupplementaryNote,
-    dataBeforeSupplementary: session.dataBeforeSupplementary
-  }), [session, stats]);
 
   const handleExportJSON = () => {
     setExportingFormat('json');
