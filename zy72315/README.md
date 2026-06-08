@@ -58,7 +58,7 @@
 #### 步骤 1：边界值说明第一次导入
 - 导入边界值说明 Excel，包含「主流程」、分子、分母
 - 系统自动应用边界规则，标记需复核记录
-- 保留原始行号和导入时间
+- 保留原始行号和导入时间，同时快照保存 `originalRawData`（永不修改）
 
 #### 步骤 2：运营规划阿岚补看评分权重表
 - 补充导入评分权重表，包含「现场说法」权重
@@ -66,9 +66,53 @@
 - 两边证据齐全后才可进入下一步
 
 #### 步骤 3：课堂演示结果更新
-- 数据复核人完成复核后更新状态
-- 支持人工修改和回滚
+- **人工改动**：真正写入 `rawData`，同时记录字段/原值/新值/操作人/原因/下一步处理人
+- **复核更新**：状态、复核人、备注完整写入 `reviewTimeline`
+- **回滚操作**：真正恢复字段原始值，不是只改状态
 - 最终结果可用于课堂演示
+
+---
+
+### 4. 改动→同步→回滚 全链路（修复的核心）
+
+> 之前的问题：只写日志不写数据，页面显示改了但导出和结果还是旧值
+
+**现在的数据流转**：
+
+```
+人工改动分母
+  ↓
+applyManualChange()
+  ├─ 通过嵌套路径真正写入 boundaryEvidence.rawData.denominator
+  ├─ 原值保存在 manualChanges[].oldValue + boundaryEvidence.originalRawData（双备份）
+  ├─ 记录操作人、原因、下一步处理人
+  └─ 快照写入 auditTrail[].snapshot
+
+规则引擎重新评估（基于改动后的值）
+  ↓ 例如：分母空→300，规则从 DENOMINATOR_EMPTY_STRING → NORMAL
+
+列表/详情/CSV/API/报告 全链路读取同一份 rawData
+  ↓
+所有输出 displayValue 同步变化（四处一致）
+
+────────────────────────────
+
+用户点「回滚」
+  ↓
+rollbackChange()
+  ├─ 真正把 manualChanges[].oldValue 写回 rawData 对应字段
+  ├─ 标记 canRollback=false，记录 rolledBackAt/rolledBackBy
+  └─ 快照写入 auditTrail[].snapshot
+
+规则引擎重新评估（基于恢复后的原始值）
+  ↓
+列表/详情/CSV/API/报告 → 四处再次同步恢复原状
+```
+
+**关键点**：
+- 原始值存在 `originalRawData`（只读，永不覆盖），改动后值存在 `rawData`（读写）
+- 规则引擎始终基于 `rawData` 计算 → 改了就变、回了就还原
+- 所有输出模块（列表/详情/CSV/API/摘要/报告）统一从同一份 `rawData` 取数据
 
 ---
 
@@ -219,13 +263,47 @@ workflow.rollbackManualChange('EXP-002', 0);
 所有人工修改都支持回滚：
 - 修改记录保存在 `manualChanges` 数组
 - 每条修改标记 `canRollback: true`
-- 回滚后标记 `canRollback: false` 并记录回滚时间
-- 回滚操作也会写入审计日志
+- 回滚时 **真正把 oldValue 写回 rawData 对应字段（不只是改状态）
+- 回滚后标记 `canRollback: false` 并记录回滚时间和操作人
+- 回滚操作也会写入审计日志（带 rollback_applied 快照）
+- 回滚后规则引擎重新评估，所有输出同步恢复原值
+
+---
+
+## 回滚后 QA 自查清单
+
+> QA 和复核人检查以下链路：
+
+- [ ] 改动后：**数据真的变了？不是只改按钮文案】
+  - 打开 EXP-xxx `rawData.denominator` == 新值
+  - CSV 分母 == 新值
+  - 页面列表分母 == 新值
+  - API 返回分母 == 新值
+
+- [ ] 改动后：**结果同步变化？】
+  - displayValue（计算结果）四处分母计算）
+  - 例如 89/300 = 0.2967
+
+- [ ] 改动后：**保留原始说法、原因、处理人】
+  - `originalRawData.denominator` == 原始值
+  - `manualChanges` 含操作人/原因/nextHandler
+  - `auditTrail` 有快照
+
+- [ ] 回滚后：**数据真的恢复原值】
+  - `rawData.denominator` 变回原始值（如空）
+  - displayValue 变回 [需复核 - 分母为空]
+  - CSV/页面/API 四处同步回原状
+
+- [ ] 回滚后：**仍可追溯到改动存在】
+  - `originalRawData` 永远不丢
+  - `manualChanges[i].canRollback` = false + rolledBackAt 有值
+  - auditTrail rollback_applied 有记录
 
 ---
 
 ## 版本说明
 
 - **边界规则**：写在代码 `BoundaryRuleEngine.js` 和本文档中
+- **改动/回滚机制**：写在代码 `UnifiedEvidenceStore.js` + 本文档「改动→同步→回滚」章节
 - **不依赖口头约定**：所有规则均可追溯
 - **专业术语保留**：但解释采用运营 ↔ 复核交接语言
