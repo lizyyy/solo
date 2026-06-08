@@ -1,24 +1,26 @@
 import { useState } from 'react';
-import { Download, FilePlus, AlertCircle, Package, User, Clock, MapPin, AlertTriangle, X } from 'lucide-react';
+import { Download, FilePlus, AlertCircle, Package, User, Clock, MapPin, AlertTriangle, X, Eye } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '@/store';
 import StatusBadge from '@/components/StatusBadge';
 import * as XLSX from 'xlsx';
 import type { SafetyReport } from '@/types';
 
 export default function ReportPage() {
+  const navigate = useNavigate();
   const [showPendingAlert, setShowPendingAlert] = useState(false);
 
   const {
-    rangefinderRecords,
     safetyReports,
     generateSafetyReport,
+    confirmSafetyReport,
     getReviewForRecord,
+    getNoteForRecord,
+    getUniqueRecords,
+    setSelectedRecordId,
   } = useAppStore();
 
-  const uniqueRecords = rangefinderRecords.filter(
-    (r, i, arr) =>
-      arr.findIndex((x) => x.batchNo === r.batchNo && x.pointX === r.pointX && x.pointY === r.pointY) === i
-  );
+  const uniqueRecords = getUniqueRecords();
 
   const recordsNeedingReport = uniqueRecords.filter(
     (r) => r.distance < 1.2 || r.alarmOccluded
@@ -56,16 +58,20 @@ export default function ReportPage() {
 
   const handleExport = () => {
     const exportData = safetyReports.map((report) => {
-      const record = rangefinderRecords.find((r) => r.id === report.recordId);
+      const record = uniqueRecords.find((r) => r.id === report.recordId);
+      const review = getReviewForRecord(report.recordId);
       return {
         '报告ID': report.id,
         '测距点': record ? `(${record.pointX}, ${record.pointY})` : '',
         '批次号': record?.batchNo || '',
+        '遮挡告警': record?.alarmOccluded ? '是' : '否',
+        '复核状态': review ? (review.reviewStatus === 'pending' ? '待复核' : review.reviewStatus === 'normal' ? '正常' : review.reviewStatus === 'abnormal' ? '异常' : '需现场') : '无',
+        '复核人': review?.reviewedBy || '',
         '为什么留下': report.reason,
         '缺什么材料': report.missingMaterials.join('、'),
         '下一步找谁': report.nextStep,
         '责任人': report.nextOwner === 'manager' ? '施工经理' : '园区运维',
-        '状态': report.status === 'draft' ? '草稿' : report.status === 'confirmed' ? '已确认' : '已导出',
+        '状态': report.status === 'confirmed' ? '已确认' : report.status === 'exported' ? '已导出' : '草稿',
         '创建时间': report.createdAt.slice(0, 16).replace('T', ' '),
       };
     });
@@ -74,6 +80,12 @@ export default function ReportPage() {
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, '安全距离报告');
     XLSX.writeFile(wb, `安全距离报告_${new Date().toISOString().slice(0, 10)}.xlsx`);
+
+    safetyReports.forEach((r) => {
+      if (r.status !== 'exported') {
+        confirmSafetyReport(r.id);
+      }
+    });
   };
 
   const getStatusBadge = (status: SafetyReport['status']) => {
@@ -84,6 +96,16 @@ export default function ReportPage() {
         return <StatusBadge status="completed" />;
       case 'exported':
         return <StatusBadge status="completed" />;
+    }
+  };
+
+  const reviewStatusLabel = (status: string) => {
+    switch (status) {
+      case 'pending': return '待复核';
+      case 'normal': return '正常';
+      case 'abnormal': return '异常';
+      case 'onsite': return '需现场';
+      default: return status;
     }
   };
 
@@ -121,9 +143,15 @@ export default function ReportPage() {
               存在待复核的告警记录，请先由施工经理复核后再生成报告
             </p>
             <p className="text-xs text-warning-600 mt-1">
-              未复核的记录将无法生成正式报告
+              截图遮挡告警标签的记录必须先复核，不能提前归为正常
             </p>
           </div>
+          <button
+            onClick={() => navigate('/review')}
+            className="px-3 py-1.5 text-xs font-medium bg-warning-500 text-white rounded hover:bg-warning-600 transition-colors"
+          >
+            前往复核
+          </button>
         </div>
       )}
 
@@ -137,6 +165,7 @@ export default function ReportPage() {
           recordsNeedingReport.map((record) => {
             const report = getReportForRecord(record.id);
             const review = getReviewForRecord(record.id);
+            const note = getNoteForRecord(record.id);
             const isPending = record.alarmOccluded && review?.reviewStatus === 'pending';
 
             return (
@@ -148,6 +177,17 @@ export default function ReportPage() {
                       测距点 ({record.pointX}, {record.pointY})
                     </span>
                     <span className="text-xs text-gray-500">{record.batchNo}</span>
+                    {record.alarmOccluded && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-warning-100 text-warning-700">
+                        遮挡告警
+                      </span>
+                    )}
+                    {review && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-industrial-100 text-industrial-700">
+                        复核：{reviewStatusLabel(review.reviewStatus)}
+                        {review.reviewedBy && ` (${review.reviewedBy})`}
+                      </span>
+                    )}
                     {report && getStatusBadge(report.status)}
                   </div>
                   <div className="flex items-center gap-3">
@@ -170,7 +210,14 @@ export default function ReportPage() {
                 {isPending ? (
                   <div className="p-8 text-center text-gray-500">
                     <AlertCircle className="w-10 h-10 mx-auto mb-3 text-warning-400" />
-                    <p className="text-sm">请先由施工经理复核此记录</p>
+                    <p className="text-sm font-medium text-warning-700">截图遮挡告警标签，需施工经理复核</p>
+                    <p className="text-xs text-gray-400 mt-1">不能提前归为正常，请先完成复核</p>
+                    <button
+                      onClick={() => navigate('/review')}
+                      className="mt-3 px-4 py-1.5 text-sm bg-warning-500 text-white rounded hover:bg-warning-600 transition-colors"
+                    >
+                      前往复核
+                    </button>
                   </div>
                 ) : report ? (
                   <div className="divide-y divide-gray-100">
@@ -239,7 +286,7 @@ export default function ReportPage() {
               </div>
             </div>
             <p className="text-sm text-gray-600 mb-6">
-              截图遮挡告警标签的记录必须先由施工经理复核确认后，才能生成安全距离报告。请前往告警复核页面完成复核操作。
+              截图遮挡告警标签的记录必须先由施工经理复核确认后，才能生成安全距离报告。复核前不能提前归为正常结果。
             </p>
             <div className="flex gap-3">
               <button
@@ -249,7 +296,7 @@ export default function ReportPage() {
                 知道了
               </button>
               <button
-                onClick={() => setShowPendingAlert(false)}
+                onClick={() => { setShowPendingAlert(false); navigate('/review'); }}
                 className="flex-1 px-4 py-2 text-sm text-white bg-industrial-500 rounded-lg hover:bg-industrial-600 transition-colors"
               >
                 前往复核

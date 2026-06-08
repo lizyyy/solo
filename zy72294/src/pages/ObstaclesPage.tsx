@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { Edit, X, Clock, ChevronDown, ChevronUp, History } from 'lucide-react';
+import { Edit, X, Clock, ChevronDown, ChevronUp, History, AlertTriangle, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '@/store';
 import StatusBadge from '@/components/StatusBadge';
-import AlertOccludedBanner from '@/components/AlertOccludedBanner';
 import { cn } from '@/lib/utils';
 import type * as T from '@/types';
 
@@ -16,18 +16,20 @@ const filterLabels: Record<FilterType, string> = {
 };
 
 export default function ObstaclesPage() {
+  const navigate = useNavigate();
   const {
-    rangefinderRecords,
+    getUniqueRecords,
     getNoteForRecord,
     getReviewForRecord,
     updateObstacleNote,
     getHistoryForEntity,
-    reviewAlarm,
+    setSelectedRecordId,
   } = useAppStore();
 
   const [filter, setFilter] = useState<FilterType>('all');
   const [editingNote, setEditingNote] = useState<T.ObstacleNote | null>(null);
   const [editContent, setEditContent] = useState('');
+  const [editRecordId, setEditRecordId] = useState<string | null>(null);
   const [expandedHistory, setExpandedHistory] = useState<string | null>(null);
 
   const getStatus = (note: T.ObstacleNote | undefined): 'pending' | 'completed' | 'verify' => {
@@ -35,36 +37,34 @@ export default function ObstaclesPage() {
     return note.status;
   };
 
-  const filteredRecords = rangefinderRecords.filter((record) => {
+  const uniqueRecords = getUniqueRecords();
+
+  const filteredRecords = uniqueRecords.filter((record) => {
     const note = getNoteForRecord(record.id);
     const status = getStatus(note);
     if (filter === 'all') return true;
     return status === filter;
   });
 
-  const handleEdit = (note: T.ObstacleNote) => {
+  const handleEdit = (note: T.ObstacleNote, recordId: string) => {
     setEditingNote(note);
+    setEditRecordId(recordId);
     setEditContent(note.content);
   };
 
   const handleSave = () => {
-    if (editingNote && editContent.trim()) {
-      updateObstacleNote(editingNote.recordId, editContent.trim(), '小陶');
+    if (editRecordId && editContent.trim()) {
+      updateObstacleNote(editRecordId, editContent.trim(), '小陶');
       setEditingNote(null);
       setEditContent('');
+      setEditRecordId(null);
     }
   };
 
   const handleCancel = () => {
     setEditingNote(null);
     setEditContent('');
-  };
-
-  const handleReview = (recordId: string) => {
-    const review = getReviewForRecord(recordId);
-    if (review) {
-      reviewAlarm(review.id, 'normal', '已复核，截图无遮挡', '经理');
-    }
+    setEditRecordId(null);
   };
 
   const formatTime = (dateStr: string) => {
@@ -106,19 +106,38 @@ export default function ObstaclesPage() {
           const review = getReviewForRecord(record.id);
           const histories = note ? getHistoryForEntity('obstacle_note', note.id) : [];
           const isExpanded = expandedHistory === record.id;
+          const isOccludedPending = record.alarmOccluded && review?.reviewStatus === 'pending';
 
           return (
             <div key={record.id} className="bg-white rounded-lg border border-gray-200 shadow-card overflow-hidden">
-              {record.alarmOccluded && review?.reviewStatus === 'pending' && (
-                <div className="px-6 pt-4">
-                  <AlertOccludedBanner recordId={record.id} onReview={handleReview} />
+              {isOccludedPending && (
+                <div className="px-6 py-3 bg-warning-50 border-b border-warning-200 flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-warning-700 text-sm">
+                    <AlertTriangle className="w-4 h-4" />
+                    <span className="font-medium">移动端截图遮挡告警标签</span>
+                    <span className="text-warning-500">— 需施工经理复核后才能归为正常，请勿提前标记完成</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => navigate('/review')}
+                    className="px-3 py-1 text-xs font-medium bg-warning-500 text-white rounded hover:bg-warning-600 transition-colors"
+                  >
+                    前往复核
+                  </button>
                 </div>
               )}
 
               <div className="p-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-20 h-20 bg-gray-200 rounded-lg overflow-hidden flex items-center justify-center shrink-0">
-                    <span className="text-xs text-gray-500">截图</span>
+                  <div className={cn(
+                    "w-20 h-20 rounded-lg overflow-hidden flex items-center justify-center shrink-0",
+                    record.alarmOccluded ? "bg-warning-100" : "bg-gray-200"
+                  )}>
+                    {record.alarmOccluded ? (
+                      <AlertTriangle className="w-8 h-8 text-warning-500" />
+                    ) : (
+                      <span className="text-xs text-gray-500">截图</span>
+                    )}
                   </div>
 
                   <div className="flex-1 min-w-0">
@@ -127,11 +146,17 @@ export default function ObstaclesPage() {
                         测距点 ({record.pointX}, {record.pointY})
                       </p>
                       <span className="font-mono text-sm text-gray-500">{record.distance}m</span>
+                      {record.alarmOccluded && (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-warning-100 text-warning-700">
+                          遮挡告警
+                        </span>
+                      )}
+                      <StatusBadge status={status} />
                     </div>
                     <p className="text-sm text-gray-700 line-clamp-2">
-                      {note?.content || <span className="text-gray-400 italic">暂无备注</span>}
+                      {note?.content || <span className="text-gray-400 italic">暂无备注，请点击编辑补充</span>}
                     </p>
-                    {note?.updatedAt && (
+                    {note?.updatedAt && note.updatedBy && (
                       <p className="text-xs text-gray-400 mt-2">
                         最后更新：{note.updatedBy} · {formatTime(note.updatedAt)}
                       </p>
@@ -139,7 +164,6 @@ export default function ObstaclesPage() {
                   </div>
 
                   <div className="flex flex-col items-end gap-3 shrink-0">
-                    <StatusBadge status={status} />
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
@@ -147,23 +171,21 @@ export default function ObstaclesPage() {
                         className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                       >
                         <History className="w-4 h-4" />
-                        查看历史
+                        历史对比
                         {isExpanded ? (
                           <ChevronUp className="w-4 h-4" />
                         ) : (
                           <ChevronDown className="w-4 h-4" />
                         )}
                       </button>
-                      {note && (
-                        <button
-                          type="button"
-                          onClick={() => handleEdit(note)}
-                          className="flex items-center gap-1 px-3 py-1.5 text-sm text-industrial-600 hover:bg-industrial-50 rounded-lg transition-colors"
-                        >
-                          <Edit className="w-4 h-4" />
-                          编辑
-                        </button>
-                      )}
+                      <button
+                        type="button"
+                        onClick={() => handleEdit(note || { id: '', recordId: record.id, content: '', status: 'pending' as const, updatedAt: '', updatedBy: '' }, record.id)}
+                        className="flex items-center gap-1 px-3 py-1.5 text-sm text-industrial-600 hover:bg-industrial-50 rounded-lg transition-colors"
+                      >
+                        <Edit className="w-4 h-4" />
+                        编辑
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -174,16 +196,21 @@ export default function ObstaclesPage() {
                       <Clock className="w-4 h-4" />
                       变更历史（改前/改后）
                     </p>
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       {histories.map((h) => (
-                        <div key={h.id} className="grid grid-cols-2 gap-3">
-                          <div className="bg-red-50 rounded-lg p-3 border border-red-100">
-                            <p className="text-xs text-red-500 mb-1">改前</p>
-                            <p className="text-sm text-red-800">{h.oldValue || '(空)'}</p>
-                          </div>
-                          <div className="bg-green-50 rounded-lg p-3 border border-green-100">
-                            <p className="text-xs text-green-500 mb-1">改后</p>
-                            <p className="text-sm text-green-800">{h.newValue || '(空)'}</p>
+                        <div key={h.id}>
+                          <p className="text-xs text-gray-400 mb-1">
+                            {h.operator} · {formatTime(h.operatedAt)} · {h.fieldName}
+                          </p>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="bg-red-50 rounded-lg p-3 border border-red-100">
+                              <p className="text-xs text-red-500 mb-1">改前</p>
+                              <p className="text-sm text-red-800">{h.oldValue || '(空)'}</p>
+                            </div>
+                            <div className="bg-green-50 rounded-lg p-3 border border-green-100">
+                              <p className="text-xs text-green-500 mb-1">改后</p>
+                              <p className="text-sm text-green-800">{h.newValue || '(空)'}</p>
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -202,7 +229,7 @@ export default function ObstaclesPage() {
         })}
       </div>
 
-      {editingNote && (
+      {editingNote && editRecordId && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg w-full max-w-xl">
             <div className="flex items-center justify-between p-4 border-b border-gray-200">
@@ -212,6 +239,17 @@ export default function ObstaclesPage() {
               </button>
             </div>
             <div className="p-6">
+              {(() => {
+                const record = uniqueRecords.find((r) => r.id === editRecordId);
+                const review = getReviewForRecord(editRecordId);
+                const isOccludedPending = record?.alarmOccluded && review?.reviewStatus === 'pending';
+                return isOccludedPending ? (
+                  <div className="mb-4 p-3 bg-warning-50 border border-warning-200 rounded-lg text-sm text-warning-700">
+                    <AlertTriangle className="w-4 h-4 inline mr-1" />
+                    此记录截图遮挡告警标签，保存后备注状态将为"需核实"，待施工经理复核后才能标记为已完成。
+                  </div>
+                ) : null;
+              })()}
               <textarea
                 value={editContent}
                 onChange={(e) => setEditContent(e.target.value)}

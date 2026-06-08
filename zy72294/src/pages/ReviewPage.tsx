@@ -23,12 +23,13 @@ export default function ReviewPage() {
   const [reviewComment, setReviewComment] = useState('');
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
-  const { rangefinderRecords, alarmReviews, obstacleNotes, reviewAlarm, getNoteForRecord } = useAppStore();
+  const { alarmReviews, obstacleNotes, reviewAlarm, getNoteForRecord, getUniqueRecords, setSelectedRecordId } = useAppStore();
 
-  const occludedRecords = rangefinderRecords.filter((r) => r.alarmOccluded);
+  const uniqueRecords = getUniqueRecords();
+  const occludedRecords = uniqueRecords.filter((r) => r.alarmOccluded);
 
   const filteredReviews = alarmReviews.filter((review) => {
-    const record = rangefinderRecords.find((r) => r.id === review.recordId);
+    const record = uniqueRecords.find((r) => r.id === review.recordId);
     if (!record) return false;
 
     switch (activeFilter) {
@@ -50,7 +51,10 @@ export default function ReviewPage() {
     setReviewComment('');
   };
 
-  const getRecord = (recordId: string) => rangefinderRecords.find((r) => r.id === recordId);
+  const getRecord = (recordId: string) => {
+    setSelectedRecordId(recordId);
+    return uniqueRecords.find((r) => r.id === recordId);
+  };
   const getNote = (recordId: string) => getNoteForRecord(recordId);
 
   const getChangeHistoriesForNote = (noteId: string) => {

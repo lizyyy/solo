@@ -29,11 +29,13 @@ interface AppState {
   updateObstacleNote: (recordId: string, content: string, operator: string) => void;
   reviewAlarm: (reviewId: string, status: T.AlarmReview['reviewStatus'], comment: string, operator: string) => void;
   generateSafetyReport: (recordId: string) => T.SafetyReport | null;
+  confirmSafetyReport: (reportId: string) => void;
   getHistoryForEntity: (entityType: T.ChangeHistory['entityType'], entityId: string) => T.ChangeHistory[];
   getReviewForRecord: (recordId: string) => T.AlarmReview | undefined;
   getNoteForRecord: (recordId: string) => T.ObstacleNote | undefined;
   getEstimationForRecord: (recordId: string) => T.VolumeEstimation | undefined;
   getReportForRecord: (recordId: string) => T.SafetyReport | undefined;
+  getUniqueRecords: () => T.RangefinderRecord[];
   getStats: () => {
     importPending: number;
     notesPending: number;
@@ -79,6 +81,8 @@ export const useAppStore = create<AppState>()(
 
         const newVolumeEstimations: T.VolumeEstimation[] = [];
         const newAlarmReviews: T.AlarmReview[] = [];
+        const newObstacleNotes: T.ObstacleNote[] = [];
+        const newChangeHistories: T.ChangeHistory[] = [];
 
         for (const record of result.newRecords) {
           const calcResult = services.autoSelectModel(record);
@@ -93,20 +97,47 @@ export const useAppStore = create<AppState>()(
             calculatedAt: now,
           });
 
-          if (services.detectOcclusion(record.screenshotUrl)) {
+          const isOccluded = record.alarmOccluded || services.detectOcclusion(record.screenshotUrl);
+
+          if (isOccluded) {
             newAlarmReviews.push(services.markForReview(record.id));
           }
+
+          newObstacleNotes.push({
+            id: generateId(),
+            recordId: record.id,
+            content: '',
+            status: 'pending',
+            updatedAt: now,
+            updatedBy: '',
+          });
+
+          newChangeHistories.push(
+            services.trackChange(
+              'rangefinder_record',
+              record.id,
+              'import',
+              '',
+              `导入测距仪记录：批次${record.batchNo}，测距点(${record.pointX},${record.pointY})，距离${record.distance}m${isOccluded ? '，检测到遮挡告警' : ''}`,
+              operator
+            )
+          );
         }
 
-        const updatedRecords = result.newRecords.map((r) => ({
-          ...r,
-          alarmOccluded: newAlarmReviews.some((ar) => ar.recordId === r.id),
-        }));
+        const updatedRecords = result.newRecords.map((r) => {
+          const isOccluded = r.alarmOccluded || newAlarmReviews.some((ar) => ar.recordId === r.id);
+          return {
+            ...r,
+            alarmOccluded: isOccluded,
+          };
+        });
 
         set({
           rangefinderRecords: [...state.rangefinderRecords, ...updatedRecords],
           volumeEstimations: [...state.volumeEstimations, ...newVolumeEstimations],
           alarmReviews: [...state.alarmReviews, ...newAlarmReviews],
+          obstacleNotes: [...state.obstacleNotes, ...newObstacleNotes],
+          changeHistories: [...state.changeHistories, ...newChangeHistories],
           duplicateRecordIds: [
             ...state.duplicateRecordIds,
             ...result.duplicateRecords.map((r) => r.id),
@@ -129,14 +160,27 @@ export const useAppStore = create<AppState>()(
         }
 
         if (existingNote) {
-          const history = services.trackChange(
-            'obstacle_note',
-            existingNote.id,
-            'content',
-            existingNote.content,
-            content,
-            operator
-          );
+          const oldContent = existingNote.content;
+          const oldStatus = existingNote.status;
+          const histories: T.ChangeHistory[] = [];
+
+          if (oldContent !== content) {
+            histories.push(
+              services.trackChange('obstacle_note', existingNote.id, 'content', oldContent, content, operator)
+            );
+          }
+          if (oldStatus !== newStatus) {
+            histories.push(
+              services.trackChange(
+                'obstacle_note',
+                existingNote.id,
+                'status',
+                oldStatus,
+                newStatus,
+                operator
+              )
+            );
+          }
 
           set({
             obstacleNotes: state.obstacleNotes.map((n) =>
@@ -144,7 +188,7 @@ export const useAppStore = create<AppState>()(
                 ? { ...n, content, status: newStatus, updatedAt: now, updatedBy: operator }
                 : n
             ),
-            changeHistories: [...state.changeHistories, history],
+            changeHistories: [...state.changeHistories, ...histories],
           });
         } else {
           const newNote: T.ObstacleNote = {
@@ -156,8 +200,18 @@ export const useAppStore = create<AppState>()(
             updatedBy: operator,
           };
 
+          const history = services.trackChange(
+            'obstacle_note',
+            newNote.id,
+            'content',
+            '',
+            content,
+            operator
+          );
+
           set({
             obstacleNotes: [...state.obstacleNotes, newNote],
+            changeHistories: [...state.changeHistories, history],
           });
         }
       },
@@ -170,19 +224,59 @@ export const useAppStore = create<AppState>()(
       ) => {
         const state = get();
         const now = new Date().toISOString();
+        const review = state.alarmReviews.find((r) => r.id === reviewId);
+        if (!review) return;
+
+        const oldStatus = review.reviewStatus;
+        const oldComment = review.reviewComment;
+
+        const updatedReviews = state.alarmReviews.map((r) =>
+          r.id === reviewId
+            ? {
+                ...r,
+                reviewStatus: status,
+                reviewComment: comment,
+                reviewedAt: now,
+                reviewedBy: operator,
+              }
+            : r
+        );
+
+        const histories: T.ChangeHistory[] = [];
+        if (oldStatus !== status) {
+          histories.push(
+            services.trackChange('alarm_review', reviewId, 'reviewStatus', oldStatus, status, operator)
+          );
+        }
+        if (oldComment !== comment) {
+          histories.push(
+            services.trackChange('alarm_review', reviewId, 'reviewComment', oldComment || '(无)', comment, operator)
+          );
+        }
+
+        const updatedNotes = state.obstacleNotes.map((n) => {
+          if (n.recordId !== review.recordId) return n;
+          const record = state.rangefinderRecords.find((r) => r.id === review.recordId);
+          if (record?.alarmOccluded && status !== 'pending' && n.status === 'verify') {
+            histories.push(
+              services.trackChange(
+                'obstacle_note',
+                n.id,
+                'status',
+                'verify',
+                'completed',
+                operator
+              )
+            );
+            return { ...n, status: 'completed' as const, updatedAt: now, updatedBy: operator };
+          }
+          return n;
+        });
 
         set({
-          alarmReviews: state.alarmReviews.map((r) =>
-            r.id === reviewId
-              ? {
-                  ...r,
-                  reviewStatus: status,
-                  reviewComment: comment,
-                  reviewedAt: now,
-                  reviewedBy: operator,
-                }
-              : r
-          ),
+          alarmReviews: updatedReviews,
+          obstacleNotes: updatedNotes,
+          changeHistories: [...state.changeHistories, ...histories],
         });
       },
 
@@ -217,15 +311,50 @@ export const useAppStore = create<AppState>()(
           missingMaterials,
           nextStep,
           nextOwner,
-          status: 'draft',
+          status: 'confirmed',
           createdAt: new Date().toISOString(),
         };
 
+        const history = services.trackChange(
+          'safety_report',
+          newReport.id,
+          'status',
+          '(无)',
+          'confirmed',
+          '系统'
+        );
+
         set({
           safetyReports: [...state.safetyReports, newReport],
+          changeHistories: [...state.changeHistories, history],
         });
 
         return newReport;
+      },
+
+      confirmSafetyReport: (reportId: string) => {
+        const state = get();
+        const report = state.safetyReports.find((r) => r.id === reportId);
+        if (!report || report.status === 'exported') return;
+
+        const oldStatus = report.status;
+        const updatedReports = state.safetyReports.map((r) =>
+          r.id === reportId ? { ...r, status: 'exported' as const } : r
+        );
+
+        const history = services.trackChange(
+          'safety_report',
+          reportId,
+          'status',
+          oldStatus,
+          'exported',
+          '系统'
+        );
+
+        set({
+          safetyReports: updatedReports,
+          changeHistories: [...state.changeHistories, history],
+        });
       },
 
       getHistoryForEntity: (entityType: T.ChangeHistory['entityType'], entityId: string) => {
@@ -248,26 +377,37 @@ export const useAppStore = create<AppState>()(
         return get().safetyReports.find((r) => r.recordId === recordId);
       },
 
+      getUniqueRecords: () => {
+        const records = get().rangefinderRecords;
+        return records.filter(
+          (r, i, arr) =>
+            arr.findIndex((x) => x.batchNo === r.batchNo && x.pointX === r.pointX && x.pointY === r.pointY) === i
+        );
+      },
+
       getStats: () => {
         const state = get();
-        const pendingNotes = state.obstacleNotes.filter((n) => n.status === 'pending' || n.status === 'verify');
-        const pendingReviews = state.alarmReviews.filter((r) => r.reviewStatus === 'pending');
-        const recordsWithNote = state.rangefinderRecords.filter(
-          (r) => !state.obstacleNotes.some((n) => n.recordId === r.id && n.status === 'completed')
-        );
-        const recordsWithoutReport = state.rangefinderRecords.filter(
+        const uniqueRecords = state.getUniqueRecords();
+        const notesPending = uniqueRecords.filter((r) => {
+          const note = state.obstacleNotes.find((n) => n.recordId === r.id);
+          return !note || note.status === 'pending' || note.status === 'verify';
+        }).length;
+        const pendingReviews = state.alarmReviews.filter((r) => r.reviewStatus === 'pending').length;
+        const recordsWithoutReport = uniqueRecords.filter(
           (r) =>
             (r.distance < 1.2 || r.alarmOccluded) &&
             !state.safetyReports.some((s) => s.recordId === r.id)
-        );
+        ).length;
 
         return {
-          importPending: state.rangefinderRecords.filter((r) => !state.obstacleNotes.some((n) => n.recordId === r.id)).length,
-          notesPending: pendingNotes.length,
-          reviewPending: pendingReviews.length,
-          reportPending: recordsWithoutReport.length,
-          totalRecords: state.rangefinderRecords.length,
-          pendingReviews: pendingReviews.length,
+          importPending: uniqueRecords.filter(
+            (r) => !state.obstacleNotes.some((n) => n.recordId === r.id)
+          ).length,
+          notesPending,
+          reviewPending: pendingReviews,
+          reportPending: recordsWithoutReport,
+          totalRecords: uniqueRecords.length,
+          pendingReviews,
         };
       },
 

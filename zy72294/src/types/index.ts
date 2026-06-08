@@ -53,7 +53,7 @@ export interface SafetyReport {
 
 export interface ChangeHistory {
   id: string;
-  entityType: 'obstacle_note' | 'safety_report';
+  entityType: 'obstacle_note' | 'safety_report' | 'alarm_review' | 'rangefinder_record';
   entityId: string;
   fieldName: string;
   oldValue: string;

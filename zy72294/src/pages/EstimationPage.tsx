@@ -19,21 +19,27 @@ const modelLabels = {
 
 export default function EstimationPage() {
   const navigate = useNavigate();
-  const { volumeEstimations, rangefinderRecords, viewMode, setViewMode, getReviewForRecord } = useAppStore();
+  const { viewMode, setViewMode, getReviewForRecord, getUniqueRecords, getEstimationForRecord, setSelectedRecordId } = useAppStore();
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
-  const totalVolume = volumeEstimations.reduce((sum, e) => sum + e.volume, 0);
-  const avgVolume = volumeEstimations.length > 0 ? totalVolume / volumeEstimations.length : 0;
-  const recordCount = rangefinderRecords.length;
+  const uniqueRecords = getUniqueRecords();
+  const uniqueEstimations = uniqueRecords
+    .map((r) => getEstimationForRecord(r.id))
+    .filter((e): e is NonNullable<typeof e> => !!e);
+
+  const totalVolume = uniqueEstimations.reduce((sum, e) => sum + e.volume, 0);
+  const avgVolume = uniqueEstimations.length > 0 ? totalVolume / uniqueEstimations.length : 0;
+  const recordCount = uniqueRecords.length;
 
   const getRecord = (recordId: string) => {
-    return rangefinderRecords.find((r) => r.id === recordId);
+    return uniqueRecords.find((r) => r.id === recordId);
   };
 
-  const handleCardClick = (estimation: typeof volumeEstimations[0]) => {
+  const handleCardClick = (estimation: typeof uniqueEstimations[0]) => {
     const record = getRecord(estimation.recordId);
     const review = getReviewForRecord(estimation.recordId);
+    setSelectedRecordId(estimation.recordId);
     if (record?.alarmOccluded && review?.reviewStatus === 'pending') {
       navigate('/review');
     } else {
@@ -99,7 +105,7 @@ export default function EstimationPage() {
 
       {viewMode === 'list' && (
         <div className="space-y-4">
-          {volumeEstimations.map((estimation) => {
+          {uniqueEstimations.map((estimation) => {
             const record = getRecord(estimation.recordId);
             const review = getReviewForRecord(estimation.recordId);
             const ModelIcon = modelIcons[estimation.calculationModel];

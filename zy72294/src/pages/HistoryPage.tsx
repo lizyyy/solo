@@ -1,19 +1,35 @@
 import { useState } from 'react';
-import { History, Clock, User, ArrowRight, FileText, ClipboardList, Filter } from 'lucide-react';
+import { History, Clock, User, ArrowRight, FileText, ClipboardList, Filter, AlertTriangle, Shield, Upload } from 'lucide-react';
 import { useAppStore } from '@/store';
 import { cn } from '@/lib/utils';
 
-type EntityType = 'all' | 'obstacle_note' | 'safety_report';
+type EntityType = 'all' | 'obstacle_note' | 'safety_report' | 'alarm_review' | 'rangefinder_record';
 
 const entityLabels: Record<EntityType, string> = {
   all: '全部',
   obstacle_note: '障碍物备注',
   safety_report: '安全报告',
+  alarm_review: '告警复核',
+  rangefinder_record: '测距记录',
 };
 
 const entityIcons: Record<string, typeof FileText> = {
   obstacle_note: FileText,
   safety_report: ClipboardList,
+  alarm_review: AlertTriangle,
+  rangefinder_record: Upload,
+};
+
+const statusLabels: Record<string, string> = {
+  pending: '待复核',
+  normal: '正常',
+  abnormal: '异常',
+  onsite: '需现场',
+  completed: '已完成',
+  verify: '需核实',
+  draft: '草稿',
+  confirmed: '已确认',
+  exported: '已导出',
 };
 
 export default function HistoryPage() {
@@ -33,6 +49,11 @@ export default function HistoryPage() {
     return entityLabels[entityType as EntityType] || entityType;
   };
 
+  const formatValue = (value: string) => {
+    if (statusLabels[value]) return statusLabels[value];
+    return value || '(空)';
+  };
+
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
@@ -40,7 +61,7 @@ export default function HistoryPage() {
           <h1 className="text-2xl font-bold text-industrial-900 mb-1">变更历史</h1>
           <p className="text-gray-500 text-sm">所有操作留痕，改前改后可追溯</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <Filter className="w-4 h-4 text-gray-400" />
           {Object.entries(entityLabels).map(([key, label]) => (
             <button
@@ -71,6 +92,7 @@ export default function HistoryPage() {
           <div className="space-y-6">
             {filteredHistories.map((history) => {
               const EntityIcon = entityIcons[history.entityType] || FileText;
+              const isStatusField = history.fieldName === 'status' || history.fieldName === 'reviewStatus';
 
               return (
                 <div key={history.id} className="relative pl-16">
@@ -104,11 +126,15 @@ export default function HistoryPage() {
                       <div className="grid grid-cols-2 gap-4">
                         <div className="bg-red-50 rounded-lg p-4 border border-red-100">
                           <p className="text-xs font-medium text-red-600 mb-2">改前</p>
-                          <p className="text-sm text-red-800 whitespace-pre-wrap">{history.oldValue || '(空)'}</p>
+                          <p className="text-sm text-red-800 whitespace-pre-wrap">
+                            {isStatusField ? formatValue(history.oldValue) : (history.oldValue || '(空)')}
+                          </p>
                         </div>
                         <div className="bg-green-50 rounded-lg p-4 border border-green-100">
                           <p className="text-xs font-medium text-green-600 mb-2">改后</p>
-                          <p className="text-sm text-green-800 whitespace-pre-wrap">{history.newValue || '(空)'}</p>
+                          <p className="text-sm text-green-800 whitespace-pre-wrap">
+                            {isStatusField ? formatValue(history.newValue) : (history.newValue || '(空)')}
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-center justify-center my-2">
