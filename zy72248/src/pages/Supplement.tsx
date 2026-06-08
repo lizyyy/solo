@@ -13,7 +13,7 @@ import {
 } from 'lucide-react'
 import { useBillStore } from '@/store/billStore'
 import { STATUS_LABELS } from '@/types'
-import type { BillItem } from '@/types'
+import type { BillItem, ConflictEvidence } from '@/types'
 import { cn } from '@/lib/utils'
 
 type Step = 1 | 2 | 3
@@ -511,6 +511,28 @@ function StepOneContent({
 }
 
 function StepTwoContent({ items }: { items: BillItem[] }) {
+  const conflicts = useBillStore((s) => s.conflicts)
+
+  function getConflictForItem(itemId: string): ConflictEvidence | undefined {
+    return conflicts.find((c) => c.billItemId === itemId)
+  }
+
+  function checkConsistency(item: BillItem): { isMatch: boolean; detail: string } {
+    const conflict = getConflictForItem(item.id)
+    if (!conflict || conflict.resolved) {
+      return { isMatch: true, detail: '' }
+    }
+    const taxNum = parseFloat(conflict.taxRateValue)
+    const counterNum = parseFloat(conflict.counterTxnValue)
+    if (isNaN(taxNum) || isNaN(counterNum)) {
+      return { isMatch: false, detail: `税费率备注=${conflict.taxRateValue}，柜台数据=${conflict.counterTxnValue}` }
+    }
+    if (Math.abs(taxNum - counterNum) > 0.001) {
+      return { isMatch: false, detail: `税费率备注=${conflict.taxRateValue}，柜台数据=${conflict.counterTxnValue}，差异=${(counterNum - taxNum).toFixed(2)}%` }
+    }
+    return { isMatch: true, detail: '' }
+  }
+
   return (
     <div className="p-4">
       <div className="flex items-center gap-2 mb-4">
@@ -542,12 +564,9 @@ function StepTwoContent({ items }: { items: BillItem[] }) {
         </thead>
         <tbody className="divide-y divide-gray-100">
           {items.map((item) => {
-            const taxNum = parseFloat(item.taxRateRemark)
-            const isMatch = !isNaN(taxNum) && taxNum > 0
-              ? item.counterTxnTailNo.length > 0
-              : true
+            const { isMatch, detail } = checkConsistency(item)
             return (
-              <tr key={item.id} className="hover:bg-gray-50 transition-colors">
+              <tr key={item.id} className={cn('hover:bg-gray-50 transition-colors', !isMatch && 'bg-amber-50/50')}>
                 <td className="px-4 py-2.5 font-mono font-semibold text-navy-500">
                   {item.billNo}
                 </td>
@@ -562,7 +581,7 @@ function StepTwoContent({ items }: { items: BillItem[] }) {
                       <CheckCircle2 size={14} /> 一致
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-500 bg-amber-50 px-2 py-1 rounded-full">
+                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-500 bg-amber-50 px-2 py-1 rounded-full" title={detail}>
                       <AlertTriangle size={14} /> 不一致
                     </span>
                   )}
@@ -580,8 +599,32 @@ function StepTwoContent({ items }: { items: BillItem[] }) {
 }
 
 function StepThreeContent({ item }: { item: BillItem }) {
-  const oldSummary = item.amount * (parseFloat(item.taxRateRemark) || 0) / 100
-  const newSummary = item.amount * (parseFloat(item.taxRateRemark) || 0) / 100
+  const conflicts = useBillStore((s) => s.conflicts)
+  const conflict = conflicts.find((c) => c.billItemId === item.id)
+
+  const confirmedRate = parseFloat(item.taxRateRemark) || 0
+  const newSummary = item.amount * confirmedRate / 100
+
+  let oldSummary: number
+  let beforeLabel: string
+
+  if (conflict && conflict.resolution) {
+    const oldRate = conflict.resolution === 'counter_tail'
+      ? (parseFloat(conflict.taxRateValue) || 0)
+      : (parseFloat(conflict.counterTxnValue) || 0)
+    beforeLabel = conflict.resolution === 'counter_tail'
+      ? `原税费率 ${conflict.taxRateValue}（已弃用）`
+      : `原柜台数据 ${conflict.counterTxnValue}（已弃用）`
+    oldSummary = item.amount * oldRate / 100
+  } else if (item.isZeroWithReversal) {
+    oldSummary = 0
+    beforeLabel = '冲正未确认，税额按0计'
+  } else {
+    oldSummary = newSummary
+    beforeLabel = '无变更'
+  }
+
+  const hasChange = Math.abs(oldSummary - newSummary) > 0.001 || item.isZeroWithReversal
 
   return (
     <div className="p-4">
@@ -606,8 +649,8 @@ function StepThreeContent({ item }: { item: BillItem }) {
               <span className="font-mono text-gray-700">{item.amount.toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-gray-500">税费率备注</span>
-              <span className="font-mono text-gray-700">{item.taxRateRemark}</span>
+              <span className="text-gray-500">税费率</span>
+              <span className="font-mono text-gray-700">{conflict ? (conflict.resolution === 'counter_tail' ? conflict.taxRateValue : conflict.counterTxnValue) : item.taxRateRemark}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-gray-500">柜台流水尾号</span>
@@ -615,10 +658,11 @@ function StepThreeContent({ item }: { item: BillItem }) {
             </div>
             <div className="flex justify-between text-sm border-t border-gray-100 pt-2">
               <span className="text-gray-500">税额估算</span>
-              <span className="font-mono text-gray-400 line-through">
+              <span className={cn('font-mono', hasChange ? 'text-crimson-500 line-through' : 'text-gray-400')}>
                 {oldSummary.toFixed(2)}
               </span>
             </div>
+            {beforeLabel && <div className="text-xs text-gray-400 italic">{beforeLabel}</div>}
           </div>
         </div>
 
@@ -634,7 +678,7 @@ function StepThreeContent({ item }: { item: BillItem }) {
               <span className="font-mono text-emerald-700">{item.amount.toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-emerald-600">税费率备注</span>
+              <span className="text-emerald-600">税费率（已确认）</span>
               <span className="font-mono text-emerald-700">{item.taxRateRemark}</span>
             </div>
             <div className="flex justify-between text-sm">
@@ -647,6 +691,7 @@ function StepThreeContent({ item }: { item: BillItem }) {
                 {newSummary.toFixed(2)}
               </span>
             </div>
+            {item.isZeroWithReversal && <div className="text-xs text-emerald-600 italic">冲正已确认，状态更新为正常</div>}
           </div>
         </div>
       </div>

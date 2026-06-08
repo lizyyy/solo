@@ -8,7 +8,7 @@ import {
 } from 'lucide-react'
 import { useBillStore } from '@/store/billStore'
 import { cn } from '@/lib/utils'
-import type { BillItem, BillStatus, MaterialType, SelfCheckType, SelfCheckResult } from '@/types'
+import type { BillItem, BillStatus, MaterialType, RiskReviewStatus, SelfCheckType, SelfCheckResult } from '@/types'
 import { STATUS_LABELS, MATERIAL_TYPE_LABELS, SELF_CHECK_LABELS } from '@/types'
 
 const PAGE_SIZE = 10
@@ -71,19 +71,26 @@ export default function Home() {
     Papa.parse<Record<string, string>>(file, {
       header: true, skipEmptyLines: true,
       complete(results) {
-        const newItems: BillItem[] = results.data.map((row, i) => ({
-          id: `IMP-${Date.now()}-${i}`,
-          billNo: row['票据号'] || row['billNo'] || '',
-          amount: parseFloat(row['金额'] || row['amount'] || '0'),
-          taxRateRemark: row['税费率备注'] || row['taxRateRemark'] || '',
-          counterTxnTailNo: row['柜台流水尾号'] || row['counterTxnTailNo'] || '',
-          remark: row['备注'] || row['remark'] || '',
-          status: 'normal' as BillStatus,
-          materialType,
-          importBatch: '', importTime: '',
-          isZeroWithReversal: false, conflictResolved: true,
-          supplementStep: 0 as const, summaryUpdated: false,
-        }))
+        const newItems: BillItem[] = results.data.map((row, i) => {
+          const amount = parseFloat(row['金额'] || row['amount'] || '0')
+          const remark = row['备注'] || row['remark'] || ''
+          const isZeroWithReversal = amount === 0 && remark === '已冲正'
+          return {
+            id: `IMP-${Date.now()}-${i}`,
+            billNo: row['票据号'] || row['billNo'] || '',
+            amount,
+            taxRateRemark: row['税费率备注'] || row['taxRateRemark'] || '',
+            counterTxnTailNo: row['柜台流水尾号'] || row['counterTxnTailNo'] || '',
+            remark,
+            status: (isZeroWithReversal ? 'risk_review' : 'normal') as BillStatus,
+            materialType,
+            importBatch: '', importTime: '',
+            isZeroWithReversal,
+            conflictResolved: true,
+            riskReviewStatus: (isZeroWithReversal ? 'pending' : undefined) as RiskReviewStatus | undefined,
+            supplementStep: 0 as const, summaryUpdated: false,
+          }
+        })
         importItems(newItems, materialType)
         setImportModalOpen(false)
       },

@@ -68,6 +68,7 @@ export const useBillStore = create<BillStore>()(
 
         const newConflicts: ConflictEvidence[] = []
         for (const item of itemsWithBatch) {
+          if (item.isZeroWithReversal) continue
           if (item.taxRateRemark && item.counterTxnTailNo) {
             const taxNum = parseFloat(item.taxRateRemark)
             if (!isNaN(taxNum) && taxNum > 0 && Math.random() < 0.15) {
@@ -123,6 +124,9 @@ export const useBillStore = create<BillStore>()(
 
       resolveConflict: (conflictId, resolution, operator) => {
         const now = new Date().toISOString().replace('T', ' ').slice(0, 19)
+        const existingConflict = get().conflicts.find((c) => c.id === conflictId)
+        const counterValue = existingConflict?.counterTxnValue
+
         set((s) => ({
           conflicts: s.conflicts.map((c) =>
             c.id === conflictId
@@ -130,24 +134,27 @@ export const useBillStore = create<BillStore>()(
               : c
           ),
           items: s.items.map((item): BillItem => {
-            const conflict = s.conflicts.find((c) => c.id === conflictId)
-            if (conflict && item.id === conflict.billItemId) {
+            const cf = s.conflicts.find((c) => c.id === conflictId)
+            if (cf && item.id === cf.billItemId) {
               return {
                 ...item,
                 conflictResolved: true,
                 conflictResolution: resolution,
                 status: (resolution === 'rejected' ? 'wrong_caliber' : 'supplement') as BillStatus,
+                taxRateRemark: resolution === 'counter_tail' && counterValue
+                  ? counterValue
+                  : item.taxRateRemark,
               }
             }
             return item
           }),
         }))
 
-        const conflict = get().conflicts.find((c) => c.id === conflictId)
-        if (conflict) {
-          const item = get().items.find((it) => it.id === conflict.billItemId)
+        const resolvedConflict = get().conflicts.find((c) => c.id === conflictId)
+        if (resolvedConflict) {
+          const item = get().items.find((it) => it.id === resolvedConflict.billItemId)
           get().addHistoryRecord({
-            billItemId: conflict.billItemId,
+            billItemId: resolvedConflict.billItemId,
             action: 'conflict_resolve',
             operator,
             timestamp: now,
@@ -196,6 +203,7 @@ export const useBillStore = create<BillStore>()(
                 ...item,
                 riskReviewStatus: status,
                 status: (status === 'approved' ? 'supplement' : 'wrong_caliber') as BillStatus,
+                supplementStep: status === 'approved' ? 0 : item.supplementStep,
               }
             }
             return item
