@@ -159,24 +159,43 @@ class PrivacyEvaluator:
 
         for ann_idx, ann in enumerate(record_annotations):
             if ann_idx not in matched_annotations:
-                results.append(EvaluationResult(
-                    record_id=rid,
-                    sensitive_type=ann.sensitive_type,
-                    is_correct=False,
-                    error_type=ErrorType.FALSE_NEGATIVE,
-                    model_level=DesensitizationLevel.NOT_MASKED,
-                    expected_level=ann.expected_level,
-                    expected_value=ann.original_value,
-                    evidences=[
-                        self._make_evidence("model_output", rid, "detected_entities",
-                                            "未检测到",
-                                            model_output.raw_log),
-                        self._make_evidence("annotation", rid, "expected_level",
-                                            ann.expected_level.value,
-                                            f"ground_truth.csv#record={rid}")
-                    ],
-                    note=f"漏检：{ann.original_value}({ann.sensitive_type.value})未被模型检测到"
-                ))
+                if ann.expected_level == DesensitizationLevel.NOT_MASKED:
+                    results.append(EvaluationResult(
+                        record_id=rid,
+                        sensitive_type=ann.sensitive_type,
+                        is_correct=True,
+                        model_level=DesensitizationLevel.NOT_MASKED,
+                        expected_level=ann.expected_level,
+                        expected_value=ann.original_value,
+                        evidences=[
+                            self._make_evidence("model_output", rid, "detected_entities",
+                                                "未检测到",
+                                                model_output.raw_log),
+                            self._make_evidence("annotation", rid, "expected_level",
+                                                ann.expected_level.value,
+                                                f"ground_truth.csv#record={rid}")
+                        ],
+                        note=f"正确边界：{ann.original_value}({ann.sensitive_type.value})标注为不需脱敏，模型未检测，行为一致"
+                    ))
+                else:
+                    results.append(EvaluationResult(
+                        record_id=rid,
+                        sensitive_type=ann.sensitive_type,
+                        is_correct=False,
+                        error_type=ErrorType.FALSE_NEGATIVE,
+                        model_level=DesensitizationLevel.NOT_MASKED,
+                        expected_level=ann.expected_level,
+                        expected_value=ann.original_value,
+                        evidences=[
+                            self._make_evidence("model_output", rid, "detected_entities",
+                                                "未检测到",
+                                                model_output.raw_log),
+                            self._make_evidence("annotation", rid, "expected_level",
+                                                ann.expected_level.value,
+                                                f"ground_truth.csv#record={rid}")
+                        ],
+                        note=f"漏检：{ann.original_value}({ann.sensitive_type.value})未被模型检测到"
+                    ))
 
         return results
 

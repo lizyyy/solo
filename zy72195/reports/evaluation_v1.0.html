@@ -36,7 +36,7 @@
 
     <div class="summary-box">
         <div><strong>模型版本：</strong>v1.0</div>
-        <div><strong>评估时间：</strong>2026-06-02 21:01:12</div>
+        <div><strong>评估时间：</strong>2026-06-08 19:17:05</div>
     </div>
 
     <h2>总体指标</h2>
@@ -46,23 +46,23 @@
             <div class="metric-label">总记录数</div>
         </div>
         <div class="metric">
-            <div class="metric-value pass">12</div>
+            <div class="metric-value pass">13</div>
             <div class="metric-label">正确数</div>
         </div>
         <div class="metric">
-            <div class="metric-value fail">4</div>
+            <div class="metric-value fail">3</div>
             <div class="metric-label">错误数</div>
         </div>
         <div class="metric">
-            <div class="metric-value">85.71%</div>
+            <div class="metric-value">86.67%</div>
             <div class="metric-label">精确率</div>
         </div>
         <div class="metric">
-            <div class="metric-value">75.00%</div>
+            <div class="metric-value">81.25%</div>
             <div class="metric-label">召回率</div>
         </div>
         <div class="metric">
-            <div class="metric-value">80.00%</div>
+            <div class="metric-value">83.87%</div>
             <div class="metric-label">F1分数</div>
         </div>
     </div>
@@ -72,7 +72,7 @@
     
     <div class="threshold-alert">[id_card] 准确率50.00% 低于阈值98.00% - 身份证号要求最高，不能漏也不能错</div>
     
-    <div class="threshold-alert">[phone] 准确率25.00% 低于阈值90.00% - 手机号要求较高准确率</div>
+    <div class="threshold-alert">[phone] 准确率50.00% 低于阈值90.00% - 手机号要求较高准确率</div>
     
     
 
@@ -150,13 +150,13 @@
         <tr class="error-row">
             <td><strong>phone</strong></td>
             <td>4</td>
-            <td class="pass">1</td>
-            <td class="fail">3</td>
-            <td>25.00%</td>
+            <td class="pass">2</td>
+            <td class="fail">2</td>
+            <td>50.00%</td>
             <td>
                 
                 <span style="background: #ffe0e0; padding: 2px 6px; margin: 2px; border-radius: 3px; font-size: 12px;">
-                    false_negative: 2
+                    false_negative: 1
                 </span>
                 
                 <span style="background: #ffe0e0; padding: 2px 6px; margin: 2px; border-radius: 3px; font-size: 12px;">
@@ -229,13 +229,10 @@
         
         <tr class="error-row">
             <td><strong>false_negative</strong></td>
-            <td class="fail">3</td>
+            <td class="fail">2</td>
             <td>
                 
                 <code>REC004</code>
-                , 
-                
-                <code>REC009</code>
                 
                 
                 
@@ -267,7 +264,7 @@
     
     
     
-    <h3>false_negative (3条)</h3>
+    <h3>false_negative (2条)</h3>
     
     <div class="error-row" style="padding: 15px; margin: 10px 0; border-radius: 8px;">
         <div><strong>记录ID：</strong><code>REC004</code></div>
@@ -277,7 +274,8 @@
         <div><strong>模型级别：</strong>DesensitizationLevel.NOT_MASKED</div>
         <div><strong>期望级别：</strong>DesensitizationLevel.PARTIAL_MASK</div>
         
-        <div class="note"><strong>评估说明：</strong>漏检：13900139000(phone)未被模型检测到</div>
+        <div class="note"><strong>评估说明：</strong>漏检：13900139000(phone)未被模型检测到
+2026-06-02 临时补录：13900139000是真实手机号，v2.0已修复，v1.0漏检是因为正则少了139号段</div>
         
         <div style="margin-top: 8px;">
             <strong>证据：</strong>
@@ -293,36 +291,6 @@
                 <div><strong>annotation</strong>: expected_level = <code>partial_mask</code></div>
                 
                 <div class="evidence-source">来源: <a href="ground_truth.csv#record=REC004" class="link">ground_truth.csv#record=REC004</a></div>
-                
-            </div>
-            
-        </div>
-    </div>
-    
-    <div class="error-row" style="padding: 15px; margin: 10px 0; border-radius: 8px;">
-        <div><strong>记录ID：</strong><code>REC009</code></div>
-        <div><strong>敏感类型：</strong>SensitiveType.PHONE</div>
-        <div><strong>检测值：</strong><code>(空)</code></div>
-        <div><strong>期望值：</strong><code>010-12345678</code></div>
-        <div><strong>模型级别：</strong>DesensitizationLevel.NOT_MASKED</div>
-        <div><strong>期望级别：</strong>DesensitizationLevel.NOT_MASKED</div>
-        
-        <div class="note"><strong>评估说明：</strong>漏检：010-12345678(phone)未被模型检测到</div>
-        
-        <div style="margin-top: 8px;">
-            <strong>证据：</strong>
-            
-            <div class="evidence">
-                <div><strong>model_output</strong>: detected_entities = <code>未检测到</code></div>
-                
-                <div class="evidence-source">来源: <a href="batch_001.jsonl#L10" class="link">batch_001.jsonl#L10</a></div>
-                
-            </div>
-            
-            <div class="evidence">
-                <div><strong>annotation</strong>: expected_level = <code>not_masked</code></div>
-                
-                <div class="evidence-source">来源: <a href="ground_truth.csv#record=REC009" class="link">ground_truth.csv#record=REC009</a></div>
                 
             </div>
             

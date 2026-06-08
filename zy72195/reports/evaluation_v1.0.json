@@ -1,11 +1,11 @@
 {
   "model_version": "v1.0",
   "total_records": 16,
-  "correct_count": 12,
-  "error_count": 4,
-  "precision": 0.8571428571428571,
-  "recall": 0.75,
-  "f1_score": 0.7999999999999999,
+  "correct_count": 13,
+  "error_count": 3,
+  "precision": 0.8666666666666667,
+  "recall": 0.8125,
+  "f1_score": 0.8387096774193549,
   "by_sensitive_type": {
     "name": {
       "group_key": "name",
@@ -45,7 +45,7 @@
             }
           ],
           "note": null,
-          "eval_timestamp": "2026-06-02T21:02:30.821871"
+          "eval_timestamp": "2026-06-08T19:18:14.241799"
         },
         {
           "record_id": "REC002",
@@ -77,7 +77,7 @@
             }
           ],
           "note": null,
-          "eval_timestamp": "2026-06-02T21:02:30.821891"
+          "eval_timestamp": "2026-06-08T19:18:14.241867"
         },
         {
           "record_id": "REC003",
@@ -109,7 +109,7 @@
             }
           ],
           "note": null,
-          "eval_timestamp": "2026-06-02T21:02:30.821900"
+          "eval_timestamp": "2026-06-08T19:18:14.241899"
         },
         {
           "record_id": "REC004",
@@ -141,7 +141,7 @@
             }
           ],
           "note": "2026-06-02 临时补录：13900139000是真实手机号，v2.0已修复，v1.0漏检是因为正则少了139号段",
-          "eval_timestamp": "2026-06-02T21:02:30.821907"
+          "eval_timestamp": "2026-06-08T19:18:14.241992"
         },
         {
           "record_id": "REC006",
@@ -173,7 +173,7 @@
             }
           ],
           "note": "2026-06-02 评审确认：12345678不是有效手机号，模型误报，需要优化正则表达式",
-          "eval_timestamp": "2026-06-02T21:02:30.821917"
+          "eval_timestamp": "2026-06-08T19:18:14.242008"
         },
         {
           "record_id": "REC008",
@@ -205,7 +205,7 @@
             }
           ],
           "note": "2026-06-02 补充说明：身份证号根据最新合规要求必须全脱敏，v1.0模型只做了部分脱敏",
-          "eval_timestamp": "2026-06-02T21:02:30.821925"
+          "eval_timestamp": "2026-06-08T19:18:14.242018"
         },
         {
           "record_id": "REC009",
@@ -237,7 +237,7 @@
             }
           ],
           "note": null,
-          "eval_timestamp": "2026-06-02T21:02:30.821933"
+          "eval_timestamp": "2026-06-08T19:18:14.242026"
         }
       ]
     },
@@ -245,10 +245,10 @@
       "group_key": "phone",
       "group_name": "phone",
       "total_count": 4,
-      "correct_count": 1,
-      "error_count": 3,
+      "correct_count": 2,
+      "error_count": 2,
       "error_types": {
-        "false_negative": 2,
+        "false_negative": 1,
         "wrong_level": 1
       },
       "records": [
@@ -282,7 +282,7 @@
             }
           ],
           "note": null,
-          "eval_timestamp": "2026-06-02T21:02:30.821882"
+          "eval_timestamp": "2026-06-08T19:18:14.241820"
         },
         {
           "record_id": "REC004",
@@ -310,7 +310,7 @@
             }
           ],
           "note": "漏检：13900139000(phone)未被模型检测到\n2026-06-02 临时补录：13900139000是真实手机号，v2.0已修复，v1.0漏检是因为正则少了139号段",
-          "eval_timestamp": "2026-06-02T21:02:30.821910"
+          "eval_timestamp": "2026-06-08T19:18:14.241997"
         },
         {
           "record_id": "REC006",
@@ -342,13 +342,13 @@
             }
           ],
           "note": "脱敏级别不匹配：模型输出full_mask，期望not_masked\n2026-06-02 评审确认：12345678不是有效手机号，模型误报，需要优化正则表达式",
-          "eval_timestamp": "2026-06-02T21:02:30.821921"
+          "eval_timestamp": "2026-06-08T19:18:14.242012"
         },
         {
           "record_id": "REC009",
           "sensitive_type": "phone",
-          "is_correct": false,
-          "error_type": "false_negative",
+          "is_correct": true,
+          "error_type": null,
           "model_level": "not_masked",
           "expected_level": "not_masked",
           "detected_value": null,
@@ -369,8 +369,8 @@
               "link": "ground_truth.csv#record=REC009"
             }
           ],
-          "note": "漏检：010-12345678(phone)未被模型检测到",
-          "eval_timestamp": "2026-06-02T21:02:30.821935"
+          "note": "正确边界：010-12345678(phone)标注为不需脱敏，模型未检测，行为一致",
+          "eval_timestamp": "2026-06-08T19:18:14.242029"
         }
       ]
     },
@@ -414,7 +414,7 @@
             }
           ],
           "note": null,
-          "eval_timestamp": "2026-06-02T21:02:30.821885"
+          "eval_timestamp": "2026-06-08T19:18:14.241827"
         },
         {
           "record_id": "REC008",
@@ -446,7 +446,7 @@
             }
           ],
           "note": "脱敏级别不匹配：模型输出partial_mask，期望full_mask\n2026-06-02 补充说明：身份证号根据最新合规要求必须全脱敏，v1.0模型只做了部分脱敏",
-          "eval_timestamp": "2026-06-02T21:02:30.821929"
+          "eval_timestamp": "2026-06-08T19:18:14.242021"
         }
       ]
     },
@@ -488,7 +488,7 @@
             }
           ],
           "note": null,
-          "eval_timestamp": "2026-06-02T21:02:30.821894"
+          "eval_timestamp": "2026-06-08T19:18:14.241878"
         }
       ]
     },
@@ -530,7 +530,7 @@
             }
           ],
           "note": null,
-          "eval_timestamp": "2026-06-02T21:02:30.821896"
+          "eval_timestamp": "2026-06-08T19:18:14.241885"
         }
       ]
     },
@@ -572,7 +572,7 @@
             }
           ],
           "note": null,
-          "eval_timestamp": "2026-06-02T21:02:30.821903"
+          "eval_timestamp": "2026-06-08T19:18:14.241906"
         }
       ]
     }
@@ -581,8 +581,8 @@
     "correct": {
       "group_key": "correct",
       "group_name": "correct",
-      "total_count": 12,
-      "correct_count": 12,
+      "total_count": 13,
+      "correct_count": 13,
       "error_count": 0,
       "error_types": {},
       "records": [
@@ -616,7 +616,7 @@
             }
           ],
           "note": null,
-          "eval_timestamp": "2026-06-02T21:02:30.821871"
+          "eval_timestamp": "2026-06-08T19:18:14.241799"
         },
         {
           "record_id": "REC001",
@@ -648,7 +648,7 @@
             }
           ],
           "note": null,
-          "eval_timestamp": "2026-06-02T21:02:30.821882"
+          "eval_timestamp": "2026-06-08T19:18:14.241820"
         },
         {
           "record_id": "REC001",
@@ -680,7 +680,7 @@
             }
           ],
           "note": null,
-          "eval_timestamp": "2026-06-02T21:02:30.821885"
+          "eval_timestamp": "2026-06-08T19:18:14.241827"
         },
         {
           "record_id": "REC002",
@@ -712,7 +712,7 @@
             }
           ],
           "note": null,
-          "eval_timestamp": "2026-06-02T21:02:30.821891"
+          "eval_timestamp": "2026-06-08T19:18:14.241867"
         },
         {
           "record_id": "REC002",
@@ -744,7 +744,7 @@
             }
           ],
           "note": null,
-          "eval_timestamp": "2026-06-02T21:02:30.821894"
+          "eval_timestamp": "2026-06-08T19:18:14.241878"
         },
         {
           "record_id": "REC002",
@@ -776,7 +776,7 @@
             }
           ],
           "note": null,
-          "eval_timestamp": "2026-06-02T21:02:30.821896"
+          "eval_timestamp": "2026-06-08T19:18:14.241885"
         },
         {
           "record_id": "REC003",
@@ -808,7 +808,7 @@
             }
           ],
           "note": null,
-          "eval_timestamp": "2026-06-02T21:02:30.821900"
+          "eval_timestamp": "2026-06-08T19:18:14.241899"
         },
         {
           "record_id": "REC003",
@@ -840,7 +840,7 @@
             }
           ],
           "note": null,
-          "eval_timestamp": "2026-06-02T21:02:30.821903"
+          "eval_timestamp": "2026-06-08T19:18:14.241906"
         },
         {
           "record_id": "REC004",
@@ -872,7 +872,7 @@
             }
           ],
           "note": "2026-06-02 临时补录：13900139000是真实手机号，v2.0已修复，v1.0漏检是因为正则少了139号段",
-          "eval_timestamp": "2026-06-02T21:02:30.821907"
+          "eval_timestamp": "2026-06-08T19:18:14.241992"
         },
         {
           "record_id": "REC006",
@@ -904,7 +904,7 @@
             }
           ],
           "note": "2026-06-02 评审确认：12345678不是有效手机号，模型误报，需要优化正则表达式",
-          "eval_timestamp": "2026-06-02T21:02:30.821917"
+          "eval_timestamp": "2026-06-08T19:18:14.242008"
         },
         {
           "record_id": "REC008",
@@ -936,7 +936,7 @@
             }
           ],
           "note": "2026-06-02 补充说明：身份证号根据最新合规要求必须全脱敏，v1.0模型只做了部分脱敏",
-          "eval_timestamp": "2026-06-02T21:02:30.821925"
+          "eval_timestamp": "2026-06-08T19:18:14.242018"
         },
         {
           "record_id": "REC009",
@@ -968,19 +968,46 @@
             }
           ],
           "note": null,
-          "eval_timestamp": "2026-06-02T21:02:30.821933"
+          "eval_timestamp": "2026-06-08T19:18:14.242026"
+        },
+        {
+          "record_id": "REC009",
+          "sensitive_type": "phone",
+          "is_correct": true,
+          "error_type": null,
+          "model_level": "not_masked",
+          "expected_level": "not_masked",
+          "detected_value": null,
+          "expected_value": "010-12345678",
+          "evidences": [
+            {
+              "source_type": "model_output",
+              "source_id": "REC009",
+              "field": "detected_entities",
+              "value": "未检测到",
+              "link": "batch_001.jsonl#L10"
+            },
+            {
+              "source_type": "annotation",
+              "source_id": "REC009",
+              "field": "expected_level",
+              "value": "not_masked",
+              "link": "ground_truth.csv#record=REC009"
+            }
+          ],
+          "note": "正确边界：010-12345678(phone)标注为不需脱敏，模型未检测，行为一致",
+          "eval_timestamp": "2026-06-08T19:18:14.242029"
         }
       ]
     },
     "false_negative": {
       "group_key": "false_negative",
       "group_name": "false_negative",
-      "total_count": 2,
+      "total_count": 1,
       "correct_count": 0,
-      "error_count": 3,
+      "error_count": 1,
       "error_types": {
-        "false_negative": 2,
-        "conflict": 1
+        "false_negative": 1
       },
       "records": [
         {
@@ -1009,35 +1036,7 @@
             }
           ],
           "note": "漏检：13900139000(phone)未被模型检测到\n2026-06-02 临时补录：13900139000是真实手机号，v2.0已修复，v1.0漏检是因为正则少了139号段",
-          "eval_timestamp": "2026-06-02T21:02:30.821910"
-        },
-        {
-          "record_id": "REC009",
-          "sensitive_type": "phone",
-          "is_correct": false,
-          "error_type": "false_negative",
-          "model_level": "not_masked",
-          "expected_level": "not_masked",
-          "detected_value": null,
-          "expected_value": "010-12345678",
-          "evidences": [
-            {
-              "source_type": "model_output",
-              "source_id": "REC009",
-              "field": "detected_entities",
-              "value": "未检测到",
-              "link": "batch_001.jsonl#L10"
-            },
-            {
-              "source_type": "annotation",
-              "source_id": "REC009",
-              "field": "expected_level",
-              "value": "not_masked",
-              "link": "ground_truth.csv#record=REC009"
-            }
-          ],
-          "note": "漏检：010-12345678(phone)未被模型检测到",
-          "eval_timestamp": "2026-06-02T21:02:30.821935"
+          "eval_timestamp": "2026-06-08T19:18:14.241997"
         }
       ]
     },
@@ -1081,7 +1080,7 @@
             }
           ],
           "note": "脱敏级别不匹配：模型输出full_mask，期望not_masked\n2026-06-02 评审确认：12345678不是有效手机号，模型误报，需要优化正则表达式",
-          "eval_timestamp": "2026-06-02T21:02:30.821921"
+          "eval_timestamp": "2026-06-08T19:18:14.242012"
         },
         {
           "record_id": "REC008",
@@ -1113,7 +1112,7 @@
             }
           ],
           "note": "脱敏级别不匹配：模型输出partial_mask，期望full_mask\n2026-06-02 补充说明：身份证号根据最新合规要求必须全脱敏，v1.0模型只做了部分脱敏",
-          "eval_timestamp": "2026-06-02T21:02:30.821929"
+          "eval_timestamp": "2026-06-08T19:18:14.242021"
         }
       ]
     }
@@ -1145,33 +1144,10 @@
       ],
       "resolved": false,
       "resolution_note": null
-    },
-    {
-      "record_id": "REC009",
-      "conflict_type": "false_negative",
-      "description": "座机号010-12345678是否需要脱敏存在争议",
-      "evidences": [
-        {
-          "source_type": "model_output",
-          "source_id": "REC009",
-          "field": "detected_entities",
-          "value": [],
-          "link": "samples/model_logs/v1.0/batch_001.jsonl#L10"
-        },
-        {
-          "source_type": "annotation",
-          "source_id": "REC009",
-          "field": "expected_level",
-          "value": "not_masked",
-          "link": "samples/annotations/ground_truth.csv#L16"
-        }
-      ],
-      "resolved": false,
-      "resolution_note": null
     }
   ],
   "notes": [
     "[id_card] 准确率50.00% 低于阈值98.00% - 身份证号要求最高，不能漏也不能错",
-    "[phone] 准确率25.00% 低于阈值90.00% - 手机号要求较高准确率"
+    "[phone] 准确率50.00% 低于阈值90.00% - 手机号要求较高准确率"
   ]
 }
