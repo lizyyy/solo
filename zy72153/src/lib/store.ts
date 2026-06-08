@@ -83,9 +83,18 @@ export const useStore = create<AppState>((set, get) => ({
     const secondaryIds = group.mergedIds.slice(1)
     const primary = await db.points.get(primaryId)
     if (primary) {
+      const secondaryPoints = await Promise.all(secondaryIds.map(id => db.points.get(id)))
+      const secondaryTraces = secondaryPoints
+        .filter(Boolean)
+        .map(p => `${p!.name}(${p!.sourceTrace})`)
+        .join('、')
+      const mergedSourceTrace = secondaryTraces
+        ? `${primary.sourceTrace}；归并自：${secondaryTraces}`
+        : primary.sourceTrace
       await db.points.update(primaryId, {
         status: 'merged',
         mergeReason: group.reason,
+        sourceTrace: mergedSourceTrace,
         mergedFrom: [...(primary.mergedFrom || []), ...secondaryIds],
         updatedAt: new Date().toISOString(),
       })
@@ -130,6 +139,7 @@ export const useStore = create<AppState>((set, get) => ({
   },
 
   runMergeDetection: async () => {
+    await db.mergeGroups.where('status').equals('pending').delete()
     const points = get().points.filter(p => p.status !== 'merged')
     const sameNameGroups = detectSameNameGroups(points)
     const duplicateGroups = detectDuplicateComplaints(points)
@@ -142,6 +152,7 @@ export const useStore = create<AppState>((set, get) => ({
   },
 
   runConflictDetection: async () => {
+    await db.conflicts.where('status').equals('pending').delete()
     const { points, approvals } = get()
     const newConflicts = detectConflicts(points, approvals)
     if (newConflicts.length > 0) {

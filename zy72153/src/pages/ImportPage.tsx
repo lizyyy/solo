@@ -11,12 +11,14 @@ const POINT_COL_MAP: Record<string, keyof PointLocation> = {
   投诉编号: 'complaintId', 投诉时间: 'complaintTime', 审批编号: 'approvalRef',
   设计容量: 'designCapacity', 实际需求: 'actualDemand',
   施工期: 'constructionPeriod', 养护期: 'maintenancePeriod',
+  来源追溯: 'sourceTrace',
 }
 
 const APPROVAL_COL_MAP: Record<string, keyof ApprovalRecord> = {
   审批编号: 'approvalRef', 路口名称: 'locationName', 行政区划: 'district',
   审批内容: 'content', 审批状态: 'approvalStatus', 审批时间: 'approvedAt',
   设计容量: 'designCapacity', 施工期: 'constructionPeriod', 养护期: 'maintenancePeriod',
+  来源文件: 'sourceFile',
 }
 
 function parseCsv<T>(file: File, colMap: Record<string, keyof T>): Promise<{ rows: Partial<T>[], emptyCount: number }> {

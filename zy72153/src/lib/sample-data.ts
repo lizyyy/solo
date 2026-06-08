@@ -17,7 +17,11 @@ const SAMPLE_APPROVALS = [
   { approvalRef: 'SP-2024-092', locationName: '长安街与复兴路交叉口', district: '西城区', content: '同意建设雨水花园，设计容量180m³', approvalStatus: '已批准', approvedAt: '2024-03-25', designCapacity: 180, constructionPeriod: '2024-05-15~2024-08-15', maintenancePeriod: '2024-08-16~2024-11-15', sourceFile: '审批台账.xlsx' },
 ]
 
+let loading = false
+
 export async function loadSampleData() {
+  if (loading) return false
+  loading = true
   const existingPoints = await db.points.count()
   if (existingPoints > 0) return false
 

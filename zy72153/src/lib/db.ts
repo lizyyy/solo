@@ -9,7 +9,7 @@ class SpongeCityDB extends Dexie {
   photos!: Table<PhotoAttachment>
 
   constructor() {
-    super('SpongeCityDB_v2')
+    super('SpongeCityDB_v5')
     this.version(1).stores({
       points: 'id, name, district, complaintId, status, approvalRef',
       approvals: 'id, approvalRef, locationName, district',

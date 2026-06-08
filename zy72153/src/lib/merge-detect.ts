@@ -20,7 +20,7 @@ export function createPointLocation(data: Partial<PointLocation>): PointLocation
     constructionPeriod: data.constructionPeriod || '',
     maintenancePeriod: data.maintenancePeriod || '',
     status: data.status || 'pending',
-    sourceTrace: data.sourceTrace || '',
+    sourceTrace: data.sourceTrace || `导入数据(${new Date().toISOString().slice(0, 10)})`,
     mergeReason: data.mergeReason || '',
     conflictNote: data.conflictNote || '',
     mergedFrom: data.mergedFrom || [],
@@ -41,7 +41,7 @@ export function createApprovalRecord(data: Partial<ApprovalRecord>): ApprovalRec
     designCapacity: data.designCapacity ?? null,
     constructionPeriod: data.constructionPeriod || '',
     maintenancePeriod: data.maintenancePeriod || '',
-    sourceFile: data.sourceFile || '',
+    sourceFile: data.sourceFile || `审批台账导入(${new Date().toISOString().slice(0, 10)})`,
   }
 }
 
