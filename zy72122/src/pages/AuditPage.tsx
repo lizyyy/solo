@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom'
 export default function AuditPage() {
   const records = useStore((s) => s.records)
   const auditLog = useStore((s) => s.auditLog)
+  const validationResults = useStore((s) => s.validationResults)
   const navigate = useNavigate()
 
   return (
@@ -48,59 +49,68 @@ export default function AuditPage() {
                     new Date(a.timestamp).getTime() -
                     new Date(b.timestamp).getTime()
                 )
-                .map((r) => (
-                  <div
-                    key={r.id}
-                    className="rounded-lg border border-slate-700/30 bg-slate-800/50 p-3"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono text-xs text-slate-300">
-                          #{r.id.slice(-8)}
+                .map((r) => {
+                  const vr = validationResults.find((v) => v.recordId === r.id)
+                  const overThreshold = vr ? vr.status === 'error' : false
+                  return (
+                    <div
+                      key={r.id}
+                      className="rounded-lg border border-slate-700/30 bg-slate-800/50 p-3"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono text-xs text-slate-300">
+                            #{r.id.slice(-8)}
+                          </span>
+                          <span
+                            className={`rounded-full px-2 py-0.5 text-[10px] ${
+                              r.status === 'passed'
+                                ? 'bg-green-500/10 text-green-400'
+                                : r.status === 'needs_review'
+                                  ? 'bg-yellow-500/10 text-yellow-400'
+                                  : 'bg-blue-500/10 text-blue-400'
+                            }`}
+                          >
+                            {statusLabel(r.status)}
+                          </span>
+                          {overThreshold && r.status === 'passed' && (
+                            <span className="rounded-full bg-orange-500/10 px-2 py-0.5 text-[10px] text-orange-400">
+                              数据超阈值（已确认）
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-[10px] text-slate-600">
+                          处理于 {formatTimestamp(r.processedAt)}
                         </span>
-                        <span
-                          className={`rounded-full px-2 py-0.5 text-[10px] ${
-                            r.status === 'passed'
-                              ? 'bg-green-500/10 text-green-400'
-                              : r.status === 'needs_review'
-                                ? 'bg-yellow-500/10 text-yellow-400'
-                                : 'bg-blue-500/10 text-blue-400'
-                          }`}
-                        >
-                          {statusLabel(r.status)}
-                        </span>
                       </div>
-                      <span className="text-[10px] text-slate-600">
-                        处理于 {formatTimestamp(r.processedAt)}
-                      </span>
+                      <div className="mt-1.5 grid grid-cols-2 gap-x-4 gap-y-0.5 text-xs text-slate-500">
+                        <div>
+                          时间：{formatTimestamp(r.timestamp)}
+                        </div>
+                        <div>
+                          来源：{sourceTypeLabel(r.source.type)} -{' '}
+                          {r.source.reference}
+                        </div>
+                        <div>
+                          力：{r.force.toFixed(1)} {r.forceUnit}
+                        </div>
+                        <div>
+                          位移：{r.displacement.toFixed(1)} {r.displacementUnit}
+                        </div>
+                      </div>
+                      {r.amendedFrom && (
+                        <div className="mt-1.5 rounded border border-blue-500/20 bg-blue-500/5 px-2 py-1 text-[10px] text-blue-300">
+                          旧口径说明：{r.amendedFrom}
+                        </div>
+                      )}
+                      {r.reviewNote && (
+                        <div className="mt-1.5 rounded border border-green-500/20 bg-green-500/5 px-2 py-1 text-[10px] text-green-300">
+                          确认意见：{r.reviewNote}
+                        </div>
+                      )}
                     </div>
-                    <div className="mt-1.5 grid grid-cols-2 gap-x-4 gap-y-0.5 text-xs text-slate-500">
-                      <div>
-                        时间：{formatTimestamp(r.timestamp)}
-                      </div>
-                      <div>
-                        来源：{sourceTypeLabel(r.source.type)} -{' '}
-                        {r.source.reference}
-                      </div>
-                      <div>
-                        力：{r.force.toFixed(1)} {r.forceUnit}
-                      </div>
-                      <div>
-                        位移：{r.displacement.toFixed(1)} {r.displacementUnit}
-                      </div>
-                    </div>
-                    {r.amendedFrom && (
-                      <div className="mt-1.5 rounded border border-blue-500/20 bg-blue-500/5 px-2 py-1 text-[10px] text-blue-300">
-                        旧口径说明：{r.amendedFrom}
-                      </div>
-                    )}
-                    {r.reviewNote && (
-                      <div className="mt-1.5 rounded border border-green-500/20 bg-green-500/5 px-2 py-1 text-[10px] text-green-300">
-                        确认意见：{r.reviewNote}
-                      </div>
-                    )}
-                  </div>
-                ))}
+                  )
+                })}
             </div>
           )}
         </div>
@@ -124,19 +134,25 @@ export default function AuditPage() {
           <div>
             <h4 className="mb-1 text-slate-300">如何跑样例</h4>
             <p>
-              进入「数据录入」页面，点击「加载样例数据」按钮，系统会自动注入三条样例记录（顺利通过、超阈值需确认、旧口径补录）及其审计日志。
+              进入「数据录入」页面，点击「加载样例数据」按钮，系统会自动注入三条样例记录（顺利通过、超阈值需确认、旧口径补录）及其审计日志。默认力安全阈值为 ±500N，record2 的 1346.4N 会触发超阈值判定。
             </p>
           </div>
           <div>
             <h4 className="mb-1 text-slate-300">如何改参数</h4>
             <p>
-              进入「图表可视化」页面底部的「安全阈值参数配置」区域，修改力/位移的安全上下限、最大时间间隔、期望单位等参数。修改后系统自动重新校验所有记录并更新图表。注意：阈值变更不会删除已有的审计日志，新判定会追加到操作时间线。
+              进入「图表可视化」页面底部的「安全阈值参数配置」区域，修改力/位移的安全上下限、最大时间间隔、期望单位等参数。修改后系统自动重新校验所有记录并更新图表。注意：阈值变更不会删除已有的审计日志，也不会自动改变记录的操作状态（已通过/需确认/旧口径补录），但图表和校验详情会实时反映新的阈值判断。
             </p>
           </div>
           <div>
             <h4 className="mb-1 text-slate-300">哪里看失败原因</h4>
             <p>
-              进入「校验与异常」页面，点击每条记录可展开详情查看各项检查的结果。未通过的检查会显示红色/黄色图标及具体原因，并给出修正建议。超安全阈值的记录会出现在「需人工确认」区域，可点击「确认」按钮补充判定意见。
+              进入「校验与异常」页面，点击每条记录可展开详情查看各项检查的结果。未通过的检查会显示黄色图标及具体原因，并给出修正建议。超安全阈值的记录会出现在「需人工确认」区域，可点击「确认」按钮补充判定意见。确认后记录状态变为"已通过"，但技术检查仍标记"数据超阈值"，在图表中会显示为蓝色三角（已确认的超阈值点）。
+            </p>
+          </div>
+          <div>
+            <h4 className="mb-1 text-slate-300">批量导入格式</h4>
+            <p>
+              在「数据录入」页面的批量导入区域，每行格式为：时间戳, 刚度值+单位, 位移值+单位, 力值+单位。例如：2026-05-20T10:00:00, 25.5N/mm, 15.2mm, 387.6N。方向由力值的正负号决定。
             </p>
           </div>
           <div>
@@ -148,7 +164,7 @@ export default function AuditPage() {
           <div>
             <h4 className="mb-1 text-slate-300">交接时怎么看前次判断</h4>
             <p>
-              在「记录来源总览」中，每条记录都标注了原始来源、处理时间、判定状态、确认意见和旧口径说明。在「操作时间线」中，可以追溯每条记录的完整操作历史，包括谁在什么时候做了什么判定，从什么状态变更为什么状态。
+              在「记录来源总览」中，每条记录都标注了原始来源、处理时间、操作状态、确认意见和旧口径说明。如果记录已确认但数据仍超阈值，会同时显示"已通过"和"数据超阈值（已确认）"两个标签，区分操作判断和技术事实。在「操作时间线」中，可以追溯每条记录的完整操作历史，包括谁在什么时候做了什么判定，从什么状态变更为什么状态。
             </p>
           </div>
         </div>

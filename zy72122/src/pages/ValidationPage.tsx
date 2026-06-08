@@ -14,7 +14,7 @@ export default function ValidationPage() {
   const passedCount = records.filter((r) => r.status === 'passed').length
   const reviewCount = records.filter((r) => r.status === 'needs_review').length
   const legacyCount = records.filter((r) => r.status === 'legacy_amended').length
-  const errorCount = validationResults.filter((v) => v.status === 'error').length
+  const overThresholdCount = validationResults.filter((v) => v.status === 'error').length
 
   return (
     <div className="space-y-6">
@@ -52,9 +52,9 @@ export default function ValidationPage() {
         <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-4">
           <div className="flex items-center gap-2">
             <AlertTriangle className="h-4 w-4 text-red-400" />
-            <span className="text-xs text-slate-400">超阈值</span>
+            <span className="text-xs text-slate-400">数据超阈值</span>
           </div>
-          <p className="mt-1 text-2xl font-bold text-red-400">{errorCount}</p>
+          <p className="mt-1 text-2xl font-bold text-red-400">{overThresholdCount}</p>
         </div>
       </div>
 

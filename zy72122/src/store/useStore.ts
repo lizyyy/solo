@@ -49,7 +49,7 @@ export const useStore = create<LabStore>()(
         const prev = idx > 0 ? sorted[idx - 1] : null
 
         const vr = validateRecord(record, prev, get().config)
-        record.status = determineRecordStatus(vr)
+        record.status = determineRecordStatus(vr, record.source.type)
 
         const auditEntry: AuditEntry = {
           id: generateId(),
@@ -102,7 +102,7 @@ export const useStore = create<LabStore>()(
           const idx = allRecords.findIndex((r) => r.id === record.id)
           const prev = idx > 0 ? allRecords[idx - 1] : null
           const vr = validateRecord(record, prev, get().config)
-          record.status = determineRecordStatus(vr)
+          record.status = determineRecordStatus(vr, record.source.type)
 
           newAudit.push({
             id: generateId(),
@@ -171,10 +171,16 @@ export const useStore = create<LabStore>()(
       initSampleData: () => {
         const { records, audit } = generateSampleData()
         const config = get().config
+        const vr = validateAll(records, config)
+        const updatedRecords = records.map((r) => {
+          const result = vr.find((v) => v.recordId === r.id)
+          const computedStatus = result ? determineRecordStatus(result, r.source.type) : r.status
+          return { ...r, status: computedStatus }
+        })
         set({
-          records,
+          records: updatedRecords,
           auditLog: audit,
-          validationResults: validateAll(records, config),
+          validationResults: validateAll(updatedRecords, config),
         })
       },
 
@@ -189,11 +195,39 @@ export const useStore = create<LabStore>()(
     }),
     {
       name: 'spring-lab-store',
+      version: 3,
+      migrate: (persisted: Record<string, unknown>, version: number) => {
+        if (version < 2) {
+          return {
+            ...persisted,
+            config: DEFAULT_CONFIG,
+          }
+        }
+        if (version < 3) {
+          const records = (persisted as Record<string, unknown>).records as ExperimentRecord[]
+          if (records && records.length > 0) {
+            const updatedRecords = records.map((r) => {
+              const vr = validateAll(records, DEFAULT_CONFIG)
+              const result = vr.find((v) => v.recordId === r.id)
+              const computedStatus = result ? determineRecordStatus(result, r.source.type) : r.status
+              return { ...r, status: computedStatus }
+            })
+            return { ...persisted, records: updatedRecords, config: DEFAULT_CONFIG }
+          }
+          return { ...persisted, config: DEFAULT_CONFIG }
+        }
+        return persisted
+      },
       partialize: (state) => ({
         records: state.records,
         auditLog: state.auditLog,
         config: state.config,
       }),
+      onRehydrateStorage: () => (state) => {
+        if (state && state.records.length > 0) {
+          state.validationResults = validateAll(state.records, state.config)
+        }
+      },
     }
   )
 )

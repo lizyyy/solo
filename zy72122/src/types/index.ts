@@ -62,8 +62,8 @@ export interface ValidationConfig {
 }
 
 export const DEFAULT_CONFIG: ValidationConfig = {
-  forceThresholdMax: 50,
-  forceThresholdMin: -50,
+  forceThresholdMax: 500,
+  forceThresholdMin: -500,
   displacementThresholdMax: 100,
   displacementThresholdMin: -100,
   maxIntervalMs: 60000,

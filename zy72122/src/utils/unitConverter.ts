@@ -73,7 +73,7 @@ export function parseBatchInput(text: string): {
 
   for (const line of lines) {
     const parts = line.split(/[,\t;，]/).map((p) => p.trim())
-    if (parts.length < 7) continue
+    if (parts.length < 4) continue
 
     const timestamp = parts[0]
     const stiffnessParsed = parseRawValue(parts[1])

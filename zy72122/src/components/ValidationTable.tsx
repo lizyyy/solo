@@ -52,16 +52,15 @@ export default function ValidationTable() {
         const expanded = expandedId === record.id
         const Icon = statusIcon[record.status]
         const failedChecks = vr?.checks.filter((c) => !c.passed) || []
-        const overallStatus = vr?.status || 'pass'
 
         return (
           <div
             key={record.id}
             className={`rounded-lg border transition-all ${
-              overallStatus === 'error'
-                ? 'border-red-500/30 bg-red-500/5'
-                : overallStatus === 'warning'
-                  ? 'border-yellow-500/30 bg-yellow-500/5'
+              record.status === 'needs_review'
+                ? 'border-yellow-500/30 bg-yellow-500/5'
+                : record.status === 'legacy_amended'
+                  ? 'border-blue-500/30 bg-blue-500/5'
                   : 'border-slate-700/50 bg-slate-800/50'
             }`}
           >

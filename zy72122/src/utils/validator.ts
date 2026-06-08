@@ -212,13 +212,20 @@ export function validateAll(
   )
 
   return sorted.map((record, index) => {
-    const prev = index > 0 ? sorted[index - 1] : null
+    let prev: ExperimentRecord | null = null
+    for (let i = index - 1; i >= 0; i--) {
+      if (sorted[i].source.type !== 'legacy') {
+        prev = sorted[i]
+        break
+      }
+    }
     return validateRecord(record, prev, config)
   })
 }
 
 export function determineRecordStatus(
-  validationResult: ValidationResult
+  validationResult: ValidationResult,
+  sourceType?: string
 ): ExperimentRecord['status'] {
   const thresholdFailed = validationResult.checks.find(
     (c) => c.type === 'threshold' && !c.passed
@@ -226,6 +233,7 @@ export function determineRecordStatus(
   if (thresholdFailed) return 'needs_review'
 
   const anyFailed = validationResult.checks.some((c) => !c.passed)
+  if (anyFailed && sourceType === 'legacy') return 'legacy_amended'
   if (anyFailed) return 'needs_review'
 
   return 'passed'

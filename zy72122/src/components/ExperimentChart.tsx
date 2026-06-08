@@ -1,5 +1,5 @@
 import { useStore } from '@/store/useStore'
-import { DEFAULT_CONFIG } from '@/types'
+
 import {
   ComposedChart,
   Line,
@@ -15,27 +15,38 @@ import {
 
 export default function ExperimentChart() {
   const records = useStore((s) => s.records)
+  const validationResults = useStore((s) => s.validationResults)
   const config = useStore((s) => s.config)
 
   const sorted = [...records].sort(
     (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
   )
 
-  const chartData = sorted.map((r, idx) => ({
-    name: `#${idx + 1}`,
-    displacement: r.displacement,
-    force: r.force,
-    status: r.status,
-    timestamp: r.timestamp,
-    isAnomaly: r.status !== 'passed',
-  }))
+  const chartData = sorted.map((r, idx) => {
+    const vr = validationResults.find((v) => v.recordId === r.id)
+    const overThreshold = vr ? vr.status === 'error' : false
+    const confirmed = !!r.reviewNote
+    return {
+      name: `#${idx + 1}`,
+      displacement: r.displacement,
+      force: r.force,
+      overThreshold,
+      confirmed,
+      timestamp: r.timestamp,
+    }
+  })
 
-  const forceDisplacementData = sorted.map((r) => ({
-    displacement: r.displacement,
-    force: r.force,
-    status: r.status,
-    isAnomaly: r.status !== 'passed',
-  }))
+  const forceDisplacementData = sorted.map((r) => {
+    const vr = validationResults.find((v) => v.recordId === r.id)
+    const overThreshold = vr ? vr.status === 'error' : false
+    const confirmed = !!r.reviewNote
+    return {
+      displacement: r.displacement,
+      force: r.force,
+      overThreshold,
+      confirmed,
+    }
+  })
 
   if (records.length === 0) {
     return (
@@ -45,8 +56,9 @@ export default function ExperimentChart() {
     )
   }
 
-  const normalPoints = forceDisplacementData.filter((d) => !d.isAnomaly)
-  const anomalyPoints = forceDisplacementData.filter((d) => d.isAnomaly)
+  const normalPoints = forceDisplacementData.filter((d) => !d.overThreshold)
+  const anomalyUnconfirmed = forceDisplacementData.filter((d) => d.overThreshold && !d.confirmed)
+  const anomalyConfirmed = forceDisplacementData.filter((d) => d.overThreshold && d.confirmed)
 
   return (
     <div className="space-y-6">
@@ -111,14 +123,24 @@ export default function ExperimentChart() {
                   r={5}
                 />
               )}
-              {anomalyPoints.length > 0 && (
+              {anomalyUnconfirmed.length > 0 && (
                 <Scatter
-                  name="异常记录"
-                  data={anomalyPoints}
+                  name="超阈值（待确认）"
+                  data={anomalyUnconfirmed}
                   dataKey="force"
                   fill="#f97316"
                   r={7}
                   shape="diamond"
+                />
+              )}
+              {anomalyConfirmed.length > 0 && (
+                <Scatter
+                  name="超阈值（已确认）"
+                  data={anomalyConfirmed}
+                  dataKey="force"
+                  fill="#3b82f6"
+                  r={7}
+                  shape="triangle"
                 />
               )}
             </ComposedChart>
@@ -175,16 +197,22 @@ export default function ExperimentChart() {
                   const { cx, cy, payload } = props as {
                     cx: number
                     cy: number
-                    payload: { isAnomaly: boolean }
+                    payload: { overThreshold: boolean; confirmed: boolean }
                   }
+                  const isOver = payload.overThreshold
+                  const isConfirmed = payload.confirmed
+                  let fill = '#3b82f6'
+                  let r = 3
+                  if (isOver && isConfirmed) { fill = '#3b82f6'; r = 5 }
+                  else if (isOver) { fill = '#f97316'; r = 6 }
                   return (
                     <circle
                       key={`dot-${cx}-${cy}`}
                       cx={cx}
                       cy={cy}
-                      r={payload.isAnomaly ? 6 : 3}
-                      fill={payload.isAnomaly ? '#f97316' : '#3b82f6'}
-                      stroke={payload.isAnomaly ? '#f97316' : '#3b82f6'}
+                      r={r}
+                      fill={fill}
+                      stroke={fill}
                     />
                   )
                 }}
@@ -201,7 +229,11 @@ export default function ExperimentChart() {
         </div>
         <div className="flex items-center gap-1.5">
           <div className="h-2.5 w-2.5 rotate-45 bg-orange-500" />
-          异常记录
+          超阈值（待确认）
+        </div>
+        <div className="flex items-center gap-1.5">
+          <div className="h-0 w-0 border-l-[5px] border-r-[5px] border-b-[8px] border-l-transparent border-r-transparent border-b-blue-500" />
+          超阈值（已确认）
         </div>
         <div className="flex items-center gap-1.5">
           <div className="h-0 w-6 border-t-2 border-dashed border-red-500" />
