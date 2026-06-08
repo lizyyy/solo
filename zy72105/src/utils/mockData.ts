@@ -313,9 +313,6 @@ export const createReworkBatch = (): Batch => {
         source: 'import',
       },
       suggestedAction: '单位不匹配：传感器记录dBm，导入数据为dB。65dBm ≈ 82.3dB，差异巨大！建议使用传感器单位dBm重新换算。',
-      resolution: 'use_sensor',
-      resolvedBy: '老岑',
-      resolvedAt: baseTime + 28000,
     },
     {
       id: generateId(),
@@ -336,9 +333,6 @@ export const createReworkBatch = (): Batch => {
         source: 'import',
       },
       suggestedAction: '方向符号冲突：传感器记录CCW(逆时针)，导入数据为CW(顺时针)。请核实旋翼旋转方向，本次测试为爬升阶段，应为逆时针旋转。',
-      resolution: 'use_sensor',
-      resolvedBy: '老岑',
-      resolvedAt: baseTime + 28001,
     },
     {
       id: generateId(),
@@ -359,9 +353,6 @@ export const createReworkBatch = (): Batch => {
         source: 'threshold_config',
       },
       suggestedAction: '时间间隔15.00秒超过阈值5秒。2-3号数据点之间存在15秒缺口，可能丢失了爬升过程中的关键数据。',
-      resolution: 'manual',
-      resolvedBy: '老岑',
-      resolvedAt: baseTime + 28002,
     },
   ];
 

@@ -48,6 +48,14 @@ export const validateValueTolerance = (
   };
 };
 
+export const extractDirectionFromRawLog = (rawLog: string): Direction | null => {
+  const match = rawLog.match(/DIR=(CCW|CW)/i);
+  if (match) {
+    return match[1].toUpperCase() as Direction;
+  }
+  return null;
+};
+
 export const detectConflicts = (
   dataPoints: DataPoint[],
   sensorLogs: SensorLogEntry[],
@@ -93,11 +101,10 @@ export const detectConflicts = (
 
       if (
         importPoint.direction &&
-        config.directionMismatch &&
-        sensorLog.parameter.includes('direction')
+        config.directionMismatch
       ) {
-        const sensorDir = sensorLog.rawLog.includes('CCW') ? 'CCW' : 'CW';
-        if (sensorDir !== importPoint.direction) {
+        const sensorDir = extractDirectionFromRawLog(sensorLog.rawLog);
+        if (sensorDir && sensorDir !== importPoint.direction) {
           conflicts.push({
             id: generateId(),
             batchId: '',

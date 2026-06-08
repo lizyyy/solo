@@ -1,9 +1,37 @@
 import { useCallback } from 'react';
-import type { Batch, CalculationNode, NoisePredictionResult } from '../types';
+import type { Batch, CalculationNode, ConflictRecord, NoisePredictionResult } from '../types';
 import { useAppStore } from '../store/useAppStore';
 import { performFullCalculation, type CalculationInput } from '../utils/physicsCalculator';
 import { detectConflicts, detectAnomalies, getValidationSummary } from '../utils/validator';
 import { normalizeDataPointsToDB } from '../utils/physicsCalculator';
+
+const conflictFingerprint = (c: ConflictRecord): string =>
+  `${c.type}|${c.sensorData.value}|${c.sensorData.unit}|${c.importData.value}|${c.importData.unit}|${c.sensorData.timestamp}|${c.importData.timestamp}`;
+
+const mergeConflictsPreservingResolutions = (
+  newConflicts: ConflictRecord[],
+  existingConflicts: ConflictRecord[]
+): ConflictRecord[] => {
+  const resolvedMap = new Map<string, ConflictRecord>();
+  for (const ec of existingConflicts) {
+    if (ec.resolution) {
+      resolvedMap.set(conflictFingerprint(ec), ec);
+    }
+  }
+  return newConflicts.map((nc) => {
+    const key = conflictFingerprint(nc);
+    const resolved = resolvedMap.get(key);
+    if (resolved) {
+      return {
+        ...nc,
+        resolution: resolved.resolution,
+        resolvedBy: resolved.resolvedBy,
+        resolvedAt: resolved.resolvedAt,
+      };
+    }
+    return nc;
+  });
+};
 
 export const useNoiseCalculation = () => {
   const {
@@ -41,11 +69,13 @@ export const useNoiseCalculation = () => {
 
         const { experimentRecord } = batch;
 
-        const conflicts = detectConflicts(
+        const rawConflicts = detectConflicts(
           experimentRecord.dataPoints,
           experimentRecord.sensorLogs,
           thresholdConfig
         );
+
+        const conflicts = mergeConflictsPreservingResolutions(rawConflicts, batch.conflicts);
 
         const anomalies = detectAnomalies(experimentRecord.dataPoints, thresholdConfig);
 
