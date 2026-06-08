@@ -9,11 +9,32 @@
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; padding: 20px; }
         .container { max-width: 1200px; margin: 0 auto; }
         h1 { color: #333; margin-bottom: 20px; }
+        h2 { font-size: 18px; margin-bottom: 15px; }
+        h3 { font-size: 15px; margin-bottom: 10px; }
         .card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .nav { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .nav a { padding: 8px 16px; border-radius: 4px; text-decoration: none; background: white; color: #333; border: 1px solid #e0e0e0; font-size: 14px; }
+        .nav a.active { background: #2196F3; color: white; border-color: #2196F3; }
+        .nav a:hover { border-color: #2196F3; }
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .summary-item { background: #fafafa; border-radius: 6px; padding: 12px; border-left: 3px solid #2196F3; }
+        .summary-item .label { font-size: 12px; color: #666; margin-bottom: 4px; }
+        .summary-item .value { font-size: 22px; font-weight: 600; color: #333; }
+        .summary-item.warning { border-left-color: #FF9800; }
+        .summary-item.danger { border-left-color: #F44336; }
+        .summary-item.success { border-left-color: #4CAF50; }
+        .summary-item.purple { border-left-color: #9C27B0; }
+        .toolbar { display: flex; gap: 10px; margin-bottom: 20px; }
+        .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+        .btn-primary { background: #2196F3; color: white; }
+        .btn-secondary { background: #757575; color: white; }
+        .btn-danger { background: #F44336; color: white; }
+        .btn-success { background: #4CAF50; color: white; }
+        .btn:hover { opacity: 0.9; }
         .record-item { border: 1px solid #e0e0e0; border-radius: 6px; padding: 15px; margin-bottom: 10px; }
         .record-item:hover { border-color: #2196F3; }
         .record-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .status-badge { padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+        .status-badge { padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500; display: inline-block; }
         .status-normal { background: #C8E6C9; color: #2E7D32; }
         .status-warning { background: #FFCDD2; color: #C62828; }
         .status-pending { background: #FFF3E0; color: #EF6C00; }
@@ -26,26 +47,49 @@
         .phase-1 { background: #90CAF9; }
         .phase-2 { background: #A5D6A7; }
         .phase-3 { background: #FFCC80; }
-        .phases { margin-top: 10px; display: flex; gap: 15px; font-size: 12px; color: #666; }
-        .toolbar { display: flex; gap: 10px; margin-bottom: 20px; }
-        .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
-        .btn-primary { background: #2196F3; color: white; }
-        .btn-secondary { background: #757575; color: white; }
+        .phases { margin-top: 10px; display: flex; gap: 15px; flex-wrap: wrap; font-size: 12px; color: #666; }
+        .ce-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-right: 4px; }
+        .ce-boundary { background: #E1BEE7; color: #6A1B9A; }
+        .ce-missing_sample { background: #FFE0B2; color: #E65100; }
+        .ce-note_modified { background: #BBDEFB; color: #0D47A1; }
+        .ce-teacher_pending { background: #FFCDD2; color: #C62828; }
         .empty-state { text-align: center; padding: 40px; color: #999; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>蒙特卡洛库存波动 - 批注追踪</h1>
-        
-        <div class="toolbar">
-            <button class="btn btn-primary" onclick="showImportModal()">导入老师批注</button>
-            <button class="btn btn-secondary" onclick="showSamplingModal()">补录抽样名单</button>
+        <h1>蒙特卡洛库存波动 - 批注追踪系统</h1>
+
+        <div class="nav">
+            <a href="/" class="active">📋 批注记录</a>
+            <a href="/counterexamples">⚠️ 反例列表 <strong style="color:#F44336;">({{ summary.counterexamples }})</strong></a>
         </div>
 
         <div class="card">
-            <h2 style="margin-bottom: 15px; font-size: 18px;">批注记录列表</h2>
-            
+            <h2>📊 报告摘要</h2>
+            <div class="summary-grid">
+                <div class="summary-item"><div class="label">批注总数</div><div class="value">{{ summary.total_records }}</div></div>
+                <div class="summary-item success"><div class="label">正常</div><div class="value">{{ summary.normal }}</div></div>
+                <div class="summary-item danger"><div class="label">异常</div><div class="value">{{ summary.warning }}</div></div>
+                <div class="summary-item purple"><div class="label">边界值待复核</div><div class="value">{{ summary.boundary_case }}</div></div>
+                <div class="summary-item warning"><div class="label">待老师确认</div><div class="value">{{ summary.pending_teacher_review }}</div></div>
+                <div class="summary-item danger"><div class="label">反例总数</div><div class="value" style="color:#F44336;">{{ summary.counterexamples }}</div></div>
+                <div class="summary-item warning"><div class="label">缺抽样名单</div><div class="value">{{ summary.missing_sample }}</div></div>
+                <div class="summary-item"><div class="label">备注被修改</div><div class="value">{{ summary.note_modified }}</div></div>
+                <div class="summary-item"><div class="label">导入批注</div><div class="value">{{ summary.comments_imported }}</div></div>
+                <div class="summary-item success"><div class="label">已补录抽样</div><div class="value">{{ summary.samples_recorded }}</div></div>
+                <div class="summary-item purple"><div class="label">历史变更次数</div><div class="value">{{ summary.total_changes }}</div></div>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <button class="btn btn-primary" onclick="showImportModal()">📥 导入老师批注</button>
+            <button class="btn btn-secondary" onclick="showSamplingModal()">📎 补录抽样名单</button>
+        </div>
+
+        <div class="card">
+            <h2>批注记录列表</h2>
+
             {% if records %}
                 {% for rec in records %}
                 {% set basic = rec.basic_info %}
@@ -53,6 +97,12 @@
                     <div class="record-header">
                         <div>
                             <strong>记录 #{{ basic.id }}</strong>
+                            &nbsp;
+                            {% if rec.counterexample.is_counterexample %}
+                                {% for t in rec.counterexample.types %}
+                                    <span class="ce-tag ce-{{ t }}">{{ labels.get(t, t) }}</span>
+                                {% endfor %}
+                            {% endif %}
                             {% if basic.is_boundary_case %}
                             <span class="status-badge status-boundary">边界值需复核</span>
                             {% else %}
@@ -69,41 +119,41 @@
                         </div>
                         <a href="/record/{{ basic.id }}" class="view-detail">查看详情 →</a>
                     </div>
-                    
+
                     <div class="line-info">
-                        📄 {{ basic.source_file }} | 第 {{ basic.original_line_number }} 行
-                        {% if basic.boundary_value %}
-                        | 📊 波动值: {{ basic.boundary_value }} (阈值: {{ basic.threshold_value }})
+                        📄 {{ basic.source_file }} | 第 <strong>{{ basic.original_line_number }}</strong> 行
+                        {% if basic.boundary_value is not none %}
+                        | 📊 波动值: <strong>{{ basic.boundary_value }}</strong> (阈值: {{ basic.threshold_value }})
                         {% endif %}
                     </div>
-                    
+
                     <div class="comment-text">
                         <strong>原文:</strong> {{ basic.original_content }}<br>
                         <strong>批注:</strong> {{ basic.comment_text }}
                     </div>
-                    
+
                     <div class="phases">
-                        <span><span class="phase-marker phase-1"></span>批注导入</span>
-                        <span><span class="phase-marker phase-2"></span>
-                            {% if basic.sample_id %}抽样已关联 ({{ basic.sample_id }}){% else %}待补录抽样{% endif %}
+                        <span><span class="phase-marker phase-1"></span>① 批注导入</span>
+                        <span><span class="phase-marker phase-2"></span>②
+                            {% if basic.sample_id %}抽样已关联 ({{ basic.sample_id }}){% else %}待补录抽样名单{% endif %}
                         </span>
-                        <span><span class="phase-marker phase-3"></span>
-                            {% if basic.teacher_review_result %}已复核{% else %}待确认{% endif %}
+                        <span><span class="phase-marker phase-3"></span>③
+                            {% if basic.teacher_review_result %}已由{{ basic.teacher_reviewer }}复核{% else %}待人工确认{% endif %}
                         </span>
                     </div>
                 </div>
                 {% endfor %}
             {% else %}
                 <div class="empty-state">
-                    暂无记录，点击"导入老师批注"开始
+                    暂无记录，点击「导入老师批注」开始 →
                 </div>
             {% endif %}
         </div>
     </div>
 
     <div id="importModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000;">
-        <div style="background:white; margin:50px auto; padding:30px; max-width:600px; border-radius:8px;">
-            <h3>导入老师批注</h3>
+        <div style="background:white; margin:50px auto; padding:30px; max-width:650px; border-radius:8px;">
+            <h3>📥 导入老师批注</h3>
             <div style="margin:15px 0;">
                 <label>来源文件:</label>
                 <input type="text" id="sourceFile" value="蒙特卡洛库存波动.docx" style="width:100%; padding:8px; margin:5px 0;">
@@ -113,11 +163,12 @@
                 <input type="text" id="importOperator" value="实验助理小穆" style="width:100%; padding:8px; margin:5px 0;">
             </div>
             <div style="margin:15px 0;">
-                <label>批注数据 (JSON格式):</label>
-                <textarea id="commentsData" rows="10" style="width:100%; padding:8px; font-family:monospace;">[
+                <label>批注数据 (JSON格式, 包含 line_number, original_content, comment_text, boundary_value):</label>
+                <textarea id="commentsData" rows="12" style="width:100%; padding:8px; font-family:monospace; font-size:12px;">[
   {"line_number": 42, "original_content": "库存波动率: 0.12", "comment_text": "波动率在正常范围内", "boundary_value": 0.12},
   {"line_number": 56, "original_content": "库存波动率: 0.15", "comment_text": "等于阈值，需确认", "boundary_value": 0.15},
-  {"line_number": 78, "original_content": "库存波动率: 0.18", "comment_text": "波动率偏高", "boundary_value": 0.18}
+  {"line_number": 78, "original_content": "库存波动率: 0.18", "comment_text": "波动率偏高，需关注", "boundary_value": 0.18},
+  {"line_number": 93, "original_content": "库存波动率: 0.10", "comment_text": "波动平稳", "boundary_value": 0.10}
 ]</textarea>
             </div>
             <div style="text-align:right;">
@@ -128,16 +179,17 @@
     </div>
 
     <div id="samplingModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000;">
-        <div style="background:white; margin:50px auto; padding:30px; max-width:600px; border-radius:8px;">
-            <h3>补录抽样名单</h3>
+        <div style="background:white; margin:50px auto; padding:30px; max-width:650px; border-radius:8px;">
+            <h3>📎 补录抽样名单</h3>
             <div style="margin:15px 0;">
                 <label>操作人:</label>
                 <input type="text" id="samplingOperator" value="实验助理小穆" style="width:100%; padding:8px; margin:5px 0;">
             </div>
             <div style="margin:15px 0;">
-                <label>抽样数据 (JSON格式):</label>
-                <textarea id="samplingData" rows="10" style="width:100%; padding:8px; font-family:monospace;">[
-  {"sample_id": "S001", "sample_name": "A商品7月抽样", "comment_id": 1, "supplementary_note": "群内补录抽样名单"}
+                <label>抽样数据 (JSON格式, comment_id对应批注记录ID):</label>
+                <textarea id="samplingData" rows="12" style="width:100%; padding:8px; font-family:monospace; font-size:12px;">[
+  {"sample_id": "S001", "sample_name": "A商品7月抽样-北京仓", "comment_id": 1, "supplementary_note": "群内补录，对照聊天记录7月12日下午"},
+  {"sample_id": "S003", "sample_name": "C商品7月抽样-上海仓", "comment_id": 3, "supplementary_note": "群内补录，已核对样本签名"}
 ]</textarea>
             </div>
             <div style="text-align:right;">
@@ -152,39 +204,39 @@
         function hideImportModal() { document.getElementById('importModal').style.display = 'none'; }
         function showSamplingModal() { document.getElementById('samplingModal').style.display = 'block'; }
         function hideSamplingModal() { document.getElementById('samplingModal').style.display = 'none'; }
-        
+
         async function doImport() {
             const data = {
                 source_file: document.getElementById('sourceFile').value,
                 imported_by: document.getElementById('importOperator').value,
                 comments: JSON.parse(document.getElementById('commentsData').value)
             };
-            
+
             const res = await fetch('/api/import_comments', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(data)
             });
-            
+
             const result = await res.json();
-            alert(`导入成功: ${result.success_count} 条\n跳过: ${result.skipped.length} 条`);
+            alert(`导入成功: ${result.success_count} 条\n跳过: ${result.skipped.length} 条\n${result.skipped.join('\n')}`);
             location.reload();
         }
-        
+
         async function doSampling() {
             const data = {
                 operator: document.getElementById('samplingOperator').value,
                 samples: JSON.parse(document.getElementById('samplingData').value)
             };
-            
+
             const res = await fetch('/api/supplementary_sampling', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(data)
             });
-            
+
             const result = await res.json();
-            alert(`补录完成: ${result.updated_count} 条`);
+            alert(`补录完成: ${result.updated_count} 条\n${result.messages.join('\n')}`);
             location.reload();
         }
     </script>

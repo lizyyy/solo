@@ -7,57 +7,155 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; padding: 20px; }
-        .container { max-width: 1000px; margin: 0 auto; }
-        h1 { color: #333; margin-bottom: 20px; }
-        .card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .back-link { color: #2196F3; text-decoration: none; margin-bottom: 20px; display: inline-block; }
+        .container { max-width: 1100px; margin: 0 auto; }
+        h1 { color: #333; margin-bottom: 16px; }
+        h2 { font-size: 17px; margin-bottom: 14px; }
+        h3 { font-size: 15px; margin-bottom: 10px; }
+        .card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 18px; box-shadow: 0 2px 4px rgba(0,0,0,0.08); }
+        .nav { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .nav a { padding: 8px 16px; border-radius: 4px; text-decoration: none; background: white; color: #333; border: 1px solid #e0e0e0; font-size: 14px; }
+        .nav a.active { background: #2196F3; color: white; border-color: #2196F3; }
+        .nav a:hover { border-color: #2196F3; }
+        .back-link { color: #2196F3; text-decoration: none; margin-bottom: 16px; display: inline-block; }
         .back-link:hover { text-decoration: underline; }
-        .phase-card { border-left: 4px solid; padding: 15px; margin-bottom: 15px; }
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+        .summary-item { background: #fafafa; border-radius: 6px; padding: 10px; border-left: 3px solid #2196F3; }
+        .summary-item .label { font-size: 11px; color: #666; margin-bottom: 2px; }
+        .summary-item .value { font-size: 18px; font-weight: 600; color: #333; }
+        .summary-item.warning { border-left-color: #FF9800; }
+        .summary-item.danger { border-left-color: #F44336; }
+        .summary-item.success { border-left-color: #4CAF50; }
+        .summary-item.purple { border-left-color: #9C27B0; }
+        .phase-card { border-left: 4px solid; padding: 15px; margin-bottom: 14px; border-radius: 0 6px 6px 0; }
         .phase-1 { border-color: #2196F3; background: #E3F2FD; }
         .phase-2 { border-color: #4CAF50; background: #E8F5E9; }
         .phase-3 { border-color: #FF9800; background: #FFF3E0; }
-        .phase-title { font-weight: bold; margin-bottom: 10px; font-size: 16px; }
-        .info-row { display: flex; margin-bottom: 8px; font-size: 14px; }
-        .info-label { width: 120px; color: #666; flex-shrink: 0; }
-        .info-value { color: #333; flex: 1; }
+        .phase-title { font-weight: bold; margin-bottom: 10px; font-size: 15px; }
+        .info-row { display: flex; margin-bottom: 7px; font-size: 13.5px; flex-wrap: wrap; }
+        .info-label { width: 120px; color: #555; flex-shrink: 0; }
+        .info-value { color: #222; flex: 1; word-break: break-all; }
         .status-badge { padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500; display: inline-block; }
         .status-normal { background: #C8E6C9; color: #2E7D32; }
         .status-warning { background: #FFCDD2; color: #C62828; }
         .status-pending { background: #FFF3E0; color: #EF6C00; }
-        .boundary-alert { background: #FFF9C4; border: 1px solid #FBC02D; padding: 15px; border-radius: 6px; margin: 15px 0; }
+        .boundary-alert { background: #FFF9C4; border: 1px solid #FBC02D; padding: 14px; border-radius: 6px; margin: 14px 0; }
         .boundary-alert strong { color: #F57F17; }
+        .ce-alert { background: #FFEBEE; border: 1px solid #EF9A9A; padding: 14px; border-radius: 6px; margin: 14px 0; }
+        .ce-alert strong { color: #C62828; }
         .history-item { border: 1px solid #e0e0e0; border-radius: 6px; padding: 12px; margin-bottom: 10px; }
-        .history-header { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; }
+        .history-header { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; flex-wrap: wrap; gap: 6px; }
         .version-badge { background: #2196F3; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
-        .diff-display { background: #f9f9f9; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 13px; }
-        .diff-old { color: #C62828; text-decoration: line-through; }
+        .version-badge.rollback { background: #795548; }
+        .diff-display { background: #f9f9f9; padding: 10px; border-radius: 4px; font-family: Menlo, Consolas, monospace; font-size: 12.5px; line-height: 1.6; }
+        .diff-old { color: #C62828; }
         .diff-new { color: #2E7D32; }
         .btn { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; }
         .btn-primary { background: #2196F3; color: white; }
-        .btn-small { padding: 4px 8px; font-size: 12px; }
-        textarea { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; }
+        .btn-danger { background: #F44336; color: white; }
+        .btn-warning { background: #FF9800; color: white; }
+        .btn-small { padding: 4px 10px; font-size: 12px; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        textarea { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 13px; }
         .input-group { margin: 10px 0; }
-        .input-group label { display: block; margin-bottom: 5px; font-size: 13px; color: #666; }
+        .input-group label { display: block; margin-bottom: 5px; font-size: 13px; color: #555; }
+        .ce-tag { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 500; margin-right: 5px; }
+        .ce-tag-boundary { background: #E1BEE7; color: #6A1B9A; border: 1px solid #CE93D8; }
+        .ce-tag-missing_sample { background: #FFE0B2; color: #E65100; border: 1px solid #FFCC80; }
+        .ce-tag-note_modified { background: #BBDEFB; color: #0D47A1; border: 1px solid #90CAF9; }
+        .ce-tag-teacher_pending { background: #FFCDD2; color: #C62828; border: 1px solid #EF9A9A; }
+        .action-grid { display: flex; gap: 20px; flex-wrap: wrap; }
+        .action-col { flex: 1; min-width: 290px; }
+        .rollback-section { border-top: 2px dashed #F44336; margin-top: 20px; padding-top: 16px; }
+        .rollback-hint { font-size: 12.5px; color: #666; margin-bottom: 10px; background: #FFF3E0; padding: 8px; border-radius: 4px; }
+        .snapshot-note { font-size: 11.5px; color: #888; margin-top: 4px; }
     </style>
 </head>
 <body>
     <div class="container">
         <a href="/" class="back-link">← 返回列表</a>
-        
-        <h1>记录详情 #{{ trace.basic_info.id }}</h1>
-        
+
+        <div class="nav">
+            <a href="/">📋 批注记录</a>
+            <a href="/counterexamples">⚠️ 反例列表 <strong style="color:#F44336;">({{ summary.counterexamples }})</strong></a>
+        </div>
+
+        <h1>📋 记录详情 #{{ trace.basic_info.id }}
+            {% if trace.counterexample.is_counterexample %}
+                {% for t in trace.counterexample.types %}
+                    <span class="ce-tag ce-tag-{{ t }}">反例: {{ labels.get(t, t) }}</span>
+                {% endfor %}
+            {% endif %}
+        </h1>
+
         {% if trace.basic_info.is_boundary_case %}
         <div class="boundary-alert">
-            <strong>⚠️ 边界值提醒</strong><br>
-            当前波动值 ({{ trace.basic_info.boundary_value }}) 恰好等于阈值 ({{ trace.basic_info.threshold_value }})，需由任课老师最终复核！
+            <strong>⚠️ 边界值提醒：</strong>
+            当前波动值 ({{ trace.basic_info.boundary_value }}) 恰好等于阈值 ({{ trace.basic_info.threshold_value }})，<strong>不要急于归为正常</strong>，必须由任课老师最终复核！
+        </div>
+        {% endif %}
+
+        {% if trace.counterexample.is_counterexample %}
+        <div class="ce-alert">
+            <strong>⚠️ 当前记录为反例：</strong>
+            {{ trace.counterexample.labels|join('、') }}
+            {% if 'missing_sample' in trace.counterexample.types %}<br>→ 请先补录抽样名单关联{% endif %}
+            {% if 'teacher_pending' in trace.counterexample.types %}<br>→ 请任课老师完成最终复核{% endif %}
         </div>
         {% endif %}
 
         <div class="card">
-            <h2 style="margin-bottom: 15px; font-size: 18px;">📋 完整证据链</h2>
-            
+            <h2>📊 本记录报告摘要</h2>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="label">来源文件行号</div>
+                    <div class="value" style="font-size:16px;">#{{ trace.basic_info.original_line_number }}</div>
+                </div>
+                <div class="summary-item">
+                    <div class="label">当前处理状态</div>
+                    <div class="value" style="font-size:15px;">
+                        {% if trace.basic_info.current_status == 'normal' %}<span class="status-badge status-normal">正常</span>
+                        {% elif trace.basic_info.current_status == 'warning' %}<span class="status-badge status-warning">异常</span>
+                        {% else %}<span class="status-badge status-pending">待处理</span>{% endif %}
+                    </div>
+                </div>
+                <div class="summary-item purple">
+                    <div class="label">边界值</div>
+                    <div class="value">{{ trace.basic_info.boundary_value or '-' }}</div>
+                </div>
+                <div class="summary-item">
+                    <div class="label">阈值</div>
+                    <div class="value">{{ trace.basic_info.threshold_value or '-' }}</div>
+                </div>
+                <div class="summary-item {% if trace.basic_info.is_boundary_case %}danger{% endif %}">
+                    <div class="label">边界情况</div>
+                    <div class="value" style="font-size:14px;">{{ '是' if trace.basic_info.is_boundary_case else '否' }}</div>
+                </div>
+                <div class="summary-item warning">
+                    <div class="label">待老师复核</div>
+                    <div class="value" style="font-size:14px;">{{ '是' if trace.basic_info.needs_teacher_review else '否' }}</div>
+                </div>
+                <div class="summary-item success">
+                    <div class="label">抽样名单</div>
+                    <div class="value" style="font-size:14px;">
+                        {{ trace.basic_info.sample_id or '未关联' }}
+                    </div>
+                </div>
+                <div class="summary-item">
+                    <div class="label">备注修改次数</div>
+                    <div class="value">{{ trace.basic_info.note_modified_count or 0 }}</div>
+                </div>
+                <div class="summary-item purple">
+                    <div class="label">历史变更次数</div>
+                    <div class="value">{{ history|length }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🔗 完整证据链（三段追踪）</h2>
+
             <div class="phase-card phase-1">
-                <div class="phase-title">阶段一：老师批注来源</div>
+                <div class="phase-title">① 阶段一：老师批注来源</div>
                 <div class="info-row">
                     <span class="info-label">来源文件:</span>
                     <span class="info-value">{{ trace.trace_phases.phase1_teacher_comment.source }}</span>
@@ -68,24 +166,24 @@
                 </div>
                 <div class="info-row">
                     <span class="info-label">原始内容:</span>
-                    <span class="info-value">{{ trace.trace_phases.phase1_teacher_comment.content }}</span>
+                    <span class="info-value" style="background:#fff; padding:4px 8px; border-radius:4px;">{{ trace.trace_phases.phase1_teacher_comment.content }}</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">老师批注:</span>
-                    <span class="info-value" style="background: #fff; padding: 4px 8px; border-radius: 4px;">{{ trace.trace_phases.phase1_teacher_comment.comment }}</span>
+                    <span class="info-value" style="background:#fff3e0; padding:4px 8px; border-radius:4px; color:#e65100;">{{ trace.trace_phases.phase1_teacher_comment.comment }}</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">导入时间:</span>
                     <span class="info-value">{{ trace.trace_phases.phase1_teacher_comment.imported_at }}</span>
                 </div>
             </div>
-            
+
             <div class="phase-card phase-2">
-                <div class="phase-title">阶段二：抽样名单补录</div>
+                <div class="phase-title">② 阶段二：抽样名单补录</div>
                 {% if trace.trace_phases.phase2_sampling_supplement.sample_id %}
                 <div class="info-row">
                     <span class="info-label">样本ID:</span>
-                    <span class="info-value">{{ trace.trace_phases.phase2_sampling_supplement.sample_id }}</span>
+                    <span class="info-value"><strong>{{ trace.trace_phases.phase2_sampling_supplement.sample_id }}</strong></span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">样本名称:</span>
@@ -104,156 +202,223 @@
                     <span class="info-value">{{ trace.trace_phases.phase2_sampling_supplement.supplementary_at }}</span>
                 </div>
                 {% else %}
-                <div style="color: #999; font-size: 14px;">尚未补录抽样名单</div>
+                <div style="color: #E65100; font-size: 14px;">⚠️ 尚未补录抽样名单，返回首页通过「补录抽样名单」按钮关联。</div>
                 {% endif %}
             </div>
-            
+
             <div class="phase-card phase-3">
-                <div class="phase-title">阶段三：人工确认</div>
+                <div class="phase-title">③ 阶段三：人工确认</div>
                 <div class="info-row">
                     <span class="info-label">当前状态:</span>
                     <span class="info-value">
-                        {% if trace.basic_info.current_status == 'normal' %}
-                        <span class="status-badge status-normal">正常</span>
-                        {% elif trace.basic_info.current_status == 'warning' %}
-                        <span class="status-badge status-warning">异常</span>
-                        {% elif trace.basic_info.current_status == 'pending_teacher_review' %}
-                        <span class="status-badge status-pending">待老师复核</span>
-                        {% else %}
-                        <span class="status-badge status-pending">待处理</span>
-                        {% endif %}
+                        {% if trace.basic_info.current_status == 'normal' %}<span class="status-badge status-normal">normal - 正常</span>
+                        {% elif trace.basic_info.current_status == 'warning' %}<span class="status-badge status-warning">warning - 异常</span>
+                        {% elif trace.basic_info.current_status == 'pending_teacher_review' %}<span class="status-badge status-pending">pending_teacher_review - 待老师复核</span>
+                        {% else %}<span class="status-badge status-pending">pending - 待处理</span>{% endif %}
                     </span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">实验助理备注:</span>
-                    <span class="info-value">{{ trace.trace_phases.phase3_manual_confirmation.assistant_note or '无' }}</span>
+                    <span class="info-value">{{ trace.trace_phases.phase3_manual_confirmation.assistant_note or '（空）' }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">修改次数:</span>
+                    <span class="info-value">{{ trace.trace_phases.phase3_manual_confirmation.note_modified_count or 0 }} 次</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">老师复核结果:</span>
-                    <span class="info-value">{{ trace.trace_phases.phase3_manual_confirmation.teacher_review_result or '待复核' }}</span>
+                    <span class="info-value"><strong>{{ trace.trace_phases.phase3_manual_confirmation.teacher_review_result or '（尚未复核）' }}</strong></span>
                 </div>
+                {% if trace.trace_phases.phase3_manual_confirmation.teacher_reviewer %}
+                <div class="info-row">
+                    <span class="info-label">复核人 / 时间:</span>
+                    <span class="info-value">{{ trace.trace_phases.phase3_manual_confirmation.teacher_reviewer }} / {{ trace.trace_phases.phase3_manual_confirmation.teacher_review_at }}</span>
+                </div>
+                {% endif %}
             </div>
         </div>
 
         <div class="card">
-            <h2 style="margin-bottom: 15px; font-size: 18px;">✏️ 快速操作</h2>
-            
-            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
-                <div style="flex: 1; min-width: 300px;">
-                    <h3 style="font-size: 15px; margin-bottom: 10px;">实验助理修改备注</h3>
+            <h2>✏️ 快速操作</h2>
+            <div class="action-grid">
+                <div class="action-col">
+                    <h3>实验助理修改备注</h3>
                     <div class="input-group">
                         <label>操作人</label>
-                        <input type="text" id="noteOperator" value="实验助理小穆" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px;">
+                        <input type="text" id="noteOperator" value="实验助理小穆" style="width:100%; padding:7px; border:1px solid #ddd; border-radius:4px;">
                     </div>
                     <div class="input-group">
                         <label>新备注</label>
                         <textarea id="noteText" rows="3">{{ trace.basic_info.assistant_note or '' }}</textarea>
                     </div>
-                    <button class="btn btn-primary" onclick="updateNote()">保存备注</button>
+                    <button class="btn btn-primary" onclick="updateNote()">💾 保存备注</button>
+                    <div class="snapshot-note">保存后系统会记录修改前后差异，并自动将该条列入「备注被修改」反例类型。</div>
                 </div>
-                
-                {% if trace.basic_info.needs_teacher_review %}
-                <div style="flex: 1; min-width: 300px;">
-                    <h3 style="font-size: 15px; margin-bottom: 10px;">任课老师复核</h3>
+
+                {% if trace.basic_info.needs_teacher_review or trace.basic_info.is_boundary_case %}
+                <div class="action-col" style="border:1px dashed #FF9800; padding:14px; border-radius:6px; background:#FFFBF0;">
+                    <h3 style="color:#E65100;">任课老师复核（边界值等阈值）</h3>
                     <div class="input-group">
-                        <label>复核人</label>
-                        <input type="text" id="reviewer" value="任课老师" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px;">
+                        <label>复核老师姓名</label>
+                        <input type="text" id="reviewer" value="任课老师" style="width:100%; padding:7px; border:1px solid #ddd; border-radius:4px;">
                     </div>
                     <div class="input-group">
-                        <label>复核结论</label>
-                        <textarea id="reviewResult" rows="2" placeholder="请输入复核意见..."></textarea>
+                        <label>复核结论说明</label>
+                        <textarea id="reviewResult" rows="2" placeholder="请说明为何最终判定为正常或异常..."></textarea>
                     </div>
                     <div class="input-group">
                         <label>最终判定</label>
-                        <select id="finalStatus" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px;">
-                            <option value="normal">normal - 正常</option>
-                            <option value="warning">warning - 异常</option>
+                        <select id="finalStatus" style="width:100%; padding:7px; border:1px solid #ddd; border-radius:4px;">
+                            <option value="normal">normal - 判定为正常</option>
+                            <option value="warning">warning - 判定为异常</option>
                         </select>
                     </div>
-                    <button class="btn btn-primary" onclick="doReview()">提交复核</button>
+                    <button class="btn btn-warning" onclick="doReview()">✅ 提交复核（最终判定）</button>
+                    <div class="snapshot-note">提交后将清除边界值标记，状态同步至最终判定结果，且可在历史中回滚。</div>
                 </div>
                 {% endif %}
             </div>
         </div>
 
         <div class="card">
-            <h2 style="margin-bottom: 15px; font-size: 18px;">📜 变更历史（版本对比）</h2>
-            
+            <h2>📜 变更历史（版本对比 + 回滚入口）</h2>
+            <div class="rollback-section">
+                <div class="rollback-hint">
+                    <strong>🔙 回滚说明：</strong>点击任一条历史的「回滚到此版本」按钮，系统会<strong>完整恢复</strong>处理状态、老师复核结果、备注、边界标记等所有真实变更字段，不只是单个备注字段。回滚本身也会写入变更历史以便追踪。
+                </div>
+            </div>
+
             {% if history %}
                 {% for entry in history %}
                 <div class="history-item">
                     <div class="history-header">
                         <span>
-                            <span class="version-badge">v{{ entry.version }}</span>
-                            <span style="margin-left: 10px;">{{ entry.note }}</span>
+                            <span class="version-badge {% if entry.operation_type == 'rollback' %}rollback{% endif %}">v{{ entry.version }}</span>
+                            <span style="margin-left:8px; font-weight:500;">{{ entry.note }}</span>
                         </span>
-                        <span style="color: #666;">
+                        <span style="color:#666;">
                             {{ entry.operator }} · {{ entry.timestamp }}
+                            {% if entry.can_rollback %}
+                            <button class="btn btn-danger btn-small" style="margin-left:10px;"
+                                onclick="doRollback('{{ entry.history_id }}', 'v{{ entry.version }} - {{ entry.note }}')">
+                                ↩️ 回滚到此版本
+                            </button>
+                            {% else %}
+                            <span style="font-size:11px; color:#999; margin-left:8px;">（回滚记录本身不可再回滚 / 或无快照）</span>
+                            {% endif %}
                         </span>
                     </div>
-                    <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
-                        字段: {{ entry.field }} | 操作类型: {{ entry.operation_type }}
+                    <div style="font-size:12.5px; color:#555; margin-bottom:7px;">
+                        字段: <code>{{ entry.field }}</code> | 操作类型: <code>{{ entry.operation_type }}</code>
+                        {% if entry.can_rollback %}
+                        <span style="color:#2E7D32; margin-left:8px;">✓ 有完整快照，可回滚</span>
+                        {% endif %}
                     </div>
                     <div class="diff-display">
                         {% if entry.old_value %}
-                        <div class="diff-old">- 改前: {{ entry.old_value }}</div>
+                        <div class="diff-old">【改前】{{ entry.old_value }}</div>
                         {% endif %}
                         {% if entry.new_value %}
-                        <div class="diff-new">+ 改后: {{ entry.new_value }}</div>
+                        <div class="diff-new">【改后】{{ entry.new_value }}</div>
+                        {% endif %}
+                        {% if not entry.old_value and not entry.new_value %}
+                        <div style="color:#888;">（首次创建记录）</div>
                         {% endif %}
                     </div>
                 </div>
                 {% endfor %}
             {% else %}
-                <div style="color: #999; text-align: center; padding: 20px;">暂无变更记录</div>
+                <div style="color:#888; text-align:center; padding:20px;">暂无变更记录</div>
             {% endif %}
+        </div>
+    </div>
+
+    <div id="rollbackModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:1000;">
+        <div style="background:white; margin:100px auto; padding:26px; max-width:500px; border-radius:8px;">
+            <h3 style="margin-bottom:14px; color:#C62828;">⚠️ 确认回滚操作</h3>
+            <div id="rollbackDesc" style="background:#FFF3E0; padding:12px; border-radius:4px; margin-bottom:15px; font-size:13.5px;"></div>
+            <div style="margin-bottom:15px;">
+                <label style="font-size:13px; color:#555;">回滚操作人</label>
+                <input type="text" id="rollbackOperator" value="实验助理小穆" style="width:100%; padding:7px; margin-top:5px; border:1px solid #ddd; border-radius:4px;">
+            </div>
+            <div style="font-size:12.5px; color:#666; background:#f9f9f9; padding:8px; border-radius:4px; margin-bottom:15px;">
+                回滚后本记录的：处理状态、老师复核结果、备注、边界值标记、反例类型等都将恢复为该版本之前的快照状态，回滚本身会追加一条新的历史记录。
+            </div>
+            <div style="text-align:right;">
+                <button class="btn btn-secondary" onclick="hideRollbackModal()">取消</button>
+                <button class="btn btn-danger" onclick="confirmRollback()" style="margin-left:8px;">确认回滚</button>
+            </div>
         </div>
     </div>
 
     <script>
         const recordId = {{ trace.basic_info.id }};
-        
+        let pendingHistoryId = null;
+
         async function updateNote() {
             const data = {
                 note: document.getElementById('noteText').value,
                 operator: document.getElementById('noteOperator').value
             };
-            
             const res = await fetch(`/api/update_note/${recordId}`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(data)
             });
-            
             const result = await res.json();
-            if (result.success) {
-                alert('备注已更新');
-                location.reload();
-            } else {
-                alert('更新失败');
-            }
+            if (result.success) { alert('备注已保存，历史已记录，反例列表已同步'); location.reload(); }
+            else alert('更新失败');
         }
-        
+
         async function doReview() {
+            if (!confirm('提交复核后将作为最终判定（仍可通过历史回滚恢复），确认提交？')) return;
             const data = {
                 review_result: document.getElementById('reviewResult').value,
                 reviewer: document.getElementById('reviewer').value,
                 final_status: document.getElementById('finalStatus').value
             };
-            
             const res = await fetch(`/api/teacher_review/${recordId}`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(data)
             });
-            
+            const result = await res.json();
+            if (result.success) { alert('老师复核已提交，状态已同步，边界标记已清除'); location.reload(); }
+            else alert('提交失败');
+        }
+
+        function doRollback(historyId, desc) {
+            pendingHistoryId = historyId;
+            document.getElementById('rollbackDesc').innerHTML =
+                `即将回滚到：<strong>${desc}</strong><br>history_id = ${historyId}`;
+            document.getElementById('rollbackModal').style.display = 'block';
+        }
+        function hideRollbackModal() {
+            document.getElementById('rollbackModal').style.display = 'none';
+            pendingHistoryId = null;
+        }
+        async function confirmRollback() {
+            if (!pendingHistoryId) return;
+            const data = {
+                history_id: parseInt(pendingHistoryId),
+                operator: document.getElementById('rollbackOperator').value
+            };
+            const res = await fetch(`/api/rollback/${recordId}`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
             const result = await res.json();
             if (result.success) {
-                alert('复核已提交');
+                const restored = result.restored_fields.map(f =>
+                    `${f.field}: ${JSON.stringify(f.from)} → ${JSON.stringify(f.to)}`
+                ).join('\n') || '（无字段差异）';
+                alert(`回滚成功！\n\n恢复的字段：\n${restored}\n\n${result.message}`);
                 location.reload();
             } else {
-                alert('提交失败');
+                alert('回滚失败：' + (result.message || '未知错误'));
             }
+            hideRollbackModal();
         }
     </script>
 </body>

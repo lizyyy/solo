@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>反例列表 - 蒙特卡洛库存波动</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #333; margin-bottom: 20px; }
+        h2 { font-size: 18px; margin-bottom: 15px; }
+        .card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .nav { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .nav a { padding: 8px 16px; border-radius: 4px; text-decoration: none; background: white; color: #333; border: 1px solid #e0e0e0; font-size: 14px; }
+        .nav a.active { background: #2196F3; color: white; border-color: #2196F3; }
+        .nav a:hover { border-color: #2196F3; }
+        .filter-bar { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+        .filter-btn { padding: 6px 14px; border: 1px solid #ddd; border-radius: 20px; background: white; cursor: pointer; font-size: 13px; }
+        .filter-btn.active { background: #F44336; color: white; border-color: #F44336; }
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .summary-item { background: #fafafa; border-radius: 6px; padding: 12px; border-left: 3px solid #2196F3; }
+        .summary-item .label { font-size: 12px; color: #666; margin-bottom: 4px; }
+        .summary-item .value { font-size: 22px; font-weight: 600; color: #333; }
+        .summary-item.warning { border-left-color: #FF9800; }
+        .summary-item.danger { border-left-color: #F44336; }
+        .summary-item.success { border-left-color: #4CAF50; }
+        .summary-item.purple { border-left-color: #9C27B0; }
+        .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+        .btn-primary { background: #2196F3; color: white; }
+        .btn-secondary { background: #757575; color: white; }
+        .toolbar { display: flex; gap: 10px; margin-bottom: 20px; }
+        .ce-item { border: 2px solid #FFCDD2; border-radius: 8px; padding: 15px; margin-bottom: 12px; background: #FFFAFA; }
+        .ce-item:hover { border-color: #F44336; box-shadow: 0 2px 8px rgba(244,67,54,0.15); }
+        .ce-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; flex-wrap: wrap; gap: 10px; }
+        .ce-title { font-size: 15px; font-weight: 600; color: #C62828; }
+        .ce-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+        .ce-tag { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 500; }
+        .ce-tag-boundary { background: #E1BEE7; color: #6A1B9A; border: 1px solid #CE93D8; }
+        .ce-tag-missing_sample { background: #FFE0B2; color: #E65100; border: 1px solid #FFCC80; }
+        .ce-tag-note_modified { background: #BBDEFB; color: #0D47A1; border: 1px solid #90CAF9; }
+        .ce-tag-teacher_pending { background: #FFCDD2; color: #C62828; border: 1px solid #EF9A9A; }
+        .ce-line { color: #555; font-size: 13px; margin-bottom: 6px; }
+        .ce-content { background: white; border: 1px solid #f0f0f0; padding: 10px; border-radius: 4px; font-size: 13px; margin-bottom: 8px; }
+        .ce-meta { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: #666; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #eee; }
+        .view-detail { color: #2196F3; text-decoration: none; font-size: 14px; font-weight: 500; }
+        .view-detail:hover { text-decoration: underline; }
+        .empty-state { text-align: center; padding: 60px 20px; color: #999; }
+        .empty-state .icon { font-size: 48px; margin-bottom: 10px; opacity: 0.4; }
+        .phase-info { display: inline-flex; align-items: center; gap: 4px; }
+        .phase-badge { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+        .phase-1 { background: #90CAF9; }
+        .phase-2-done { background: #4CAF50; }
+        .phase-2-none { background: #ddd; }
+        .phase-3-done { background: #FF9800; }
+        .phase-3-none { background: #ddd; }
+        .stat-badge { display: inline-block; background: #F44336; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚠️ 反例列表 - 蒙特卡洛库存波动</h1>
+
+        <div class="nav">
+            <a href="/">📋 批注记录</a>
+            <a href="/counterexamples" class="active">⚠️ 反例列表 <span class="stat-badge">{{ summary.counterexamples }}</span></a>
+        </div>
+
+        <div class="card">
+            <h2>📊 反例报告摘要</h2>
+            <div class="summary-grid">
+                <div class="summary-item danger"><div class="label">反例总数</div><div class="value" style="color:#F44336;">{{ summary.counterexamples }}</div></div>
+                <div class="summary-item purple"><div class="label">边界值待复核</div><div class="value">{{ summary.boundary_case }}</div></div>
+                <div class="summary-item warning"><div class="label">缺抽样名单</div><div class="value">{{ summary.missing_sample }}</div></div>
+                <div class="summary-item"><div class="label">备注被修改</div><div class="value">{{ summary.note_modified }}</div></div>
+                <div class="summary-item warning"><div class="label">待老师确认</div><div class="value">{{ summary.pending_teacher_review }}</div></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🔍 按类型筛选</h2>
+            <div class="filter-bar">
+                <a href="/counterexamples" class="filter-btn {% if not active_filter %}active{% endif %}">全部 ({{ summary.counterexamples }})</a>
+                {% for key, label in labels.items() %}
+                <a href="/counterexamples?filter={{ key }}" class="filter-btn {% if active_filter == key %}active{% endif %}">
+                    {{ label }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📋 反例清单（{{ counterexamples|length }} 条）</h2>
+
+            {% if counterexamples %}
+                {% for ce in counterexamples %}
+                <div class="ce-item">
+                    <div class="ce-header">
+                        <div>
+                            <span class="ce-title">📌 记录 #{{ ce.record_id }} - 第 {{ ce.original_line_number }} 行</span>
+                            <div class="ce-tags" style="margin-top:6px;">
+                                {% for t in ce.types %}
+                                    <span class="ce-tag ce-tag-{{ t }}">⚠️ {{ labels.get(t, t) }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <a href="/record/{{ ce.record_id }}" class="view-detail">查看完整证据链 →</a>
+                    </div>
+
+                    <div class="ce-line">
+                        📄 <strong>来源文件:</strong> {{ ce.source_file }}
+                        {% if ce.boundary_value is not none %}
+                        &nbsp;|&nbsp; 📊 <strong>波动值:</strong> <span style="color:#C62828; font-weight:600;">{{ ce.boundary_value }}</span>
+                        (阈值: {{ ce.threshold_value }})
+                        {% endif %}
+                    </div>
+
+                    <div class="ce-content">
+                        <div><strong>原文:</strong> {{ ce.original_content }}</div>
+                        <div style="margin-top:4px;"><strong>老师批注:</strong> {{ ce.comment_text }}</div>
+                    </div>
+
+                    <div class="ce-line">
+                        <strong>问题点说明:</strong>
+                        <ul style="margin:4px 0 4px 24px; font-size:13px;">
+                            {% if 'boundary' in ce.types %}
+                            <li>边界值情况：波动值 <strong>{{ ce.boundary_value }}</strong> 恰好等于阈值 <strong>{{ ce.threshold_value }}</strong>，需要任课老师最终判定</li>
+                            {% endif %}
+                            {% if 'teacher_pending' in ce.types %}
+                            <li>仍在待老师复核状态，尚未获得老师最终结论</li>
+                            {% endif %}
+                            {% if 'missing_sample' in ce.types %}
+                            <li>尚未补录抽样名单，缺少关联的样本证据</li>
+                            {% endif %}
+                            {% if 'note_modified' in ce.types %}
+                            <li>实验助理已对备注进行过 <strong>{{ ce.note_modified_count }}</strong> 次人工修改，请确认修改合规</li>
+                            {% endif %}
+                        </ul>
+                    </div>
+
+                    <div class="ce-meta">
+                        <span class="phase-info"><span class="phase-badge phase-1"></span> ①批注已导入</span>
+                        <span class="phase-info">
+                            <span class="phase-badge {% if ce.has_sample %}phase-2-done{% else %}phase-2-none{% endif %}"></span>
+                            ②抽样名单: {% if ce.has_sample %}已关联 ({{ ce.sample_id }}){% else %}<span style="color:#E65100;">缺失</span>{% endif %}
+                        </span>
+                        <span class="phase-info">
+                            <span class="phase-badge {% if ce.teacher_review_result %}phase-3-done{% else %}phase-3-none{% endif %}"></span>
+                            ③人工确认: {% if ce.teacher_review_result %}已复核{% else %}<span style="color:#E65100;">未复核</span>{% endif %}
+                        </span>
+                        <span>导入时间: {{ ce.imported_at }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="icon">✅</div>
+                    <div style="font-size:18px; margin-bottom:8px;">当前没有反例</div>
+                    <div style="color:#888;">所有批注记录都已完整处理，边界值已复核、抽样已补录。</div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
