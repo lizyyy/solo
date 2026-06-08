@@ -19,6 +19,7 @@ class ChangeType(Enum):
     REMARK_CHANGE = "备注修改"
     BATCH_LINK = "关联清算批次"
     AMOUNT_ADJUST = "金额调整"
+    IMPORT_UPDATE = "重导入更新"
 
 
 @dataclass

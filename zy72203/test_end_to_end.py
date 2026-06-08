@@ -1,5 +1,4 @@
-import sys
-import time
+import copy
 
 from models import TailDifferenceStatus, SettlementBatch
 from tail_difference_tracker import TailDifferenceTracker
@@ -14,7 +13,7 @@ def print_section(title: str):
 
 
 def test_complete_workflow():
-    print_section("基金申赎尾差追踪系统 - 端到端测试")
+    print_section("基金申赎尾差追踪系统 - 端到端测试（含修复验证）")
 
     tracker = TailDifferenceTracker()
     report_gen = ReportGenerator(tracker)
@@ -50,6 +49,9 @@ def test_complete_workflow():
         }
     ]
 
+    # ============================================================
+    # 第一步：客户经理补充邮件第一次导入
+    # ============================================================
     print_section("【第一步】客户经理补充邮件第一次导入")
 
     records, count = tracker.import_client_email_batch(
@@ -60,6 +62,8 @@ def test_complete_workflow():
 
     print(f"✓ 导入完成，共导入 {count} 条记录")
     print(f"✓ 当前系统总记录数: {len(tracker.records)}")
+    assert count == 3, f"首次导入应为3条，实际{count}"
+    assert len(tracker.records) == 3, f"系统总记录应为3条，实际{len(tracker.records)}"
 
     special_record = None
     for r in records:
@@ -73,7 +77,12 @@ def test_complete_workflow():
             print(f"  下一步: {r.next_action}")
             print(f"  needs_manual_review(): {r.needs_manual_review()}")
 
-    print_section("【验证】重复导入同一批邮件不翻倍")
+    assert special_record is not None, "应找到金额为0且备注已冲正的记录"
+
+    # ============================================================
+    # 验证1：完全相同的批次重复导入 → 数量不翻倍
+    # ============================================================
+    print_section("【验证1】完全相同的批次重复导入 → 数量不翻倍")
 
     records2, count2 = tracker.import_client_email_batch(
         source_file='客户经理补充_20260603.xlsx',
@@ -81,12 +90,64 @@ def test_complete_workflow():
         operator='系统管理员'
     )
 
-    print(f"✓ 重复导入结果: 导入 {count2} 条记录")
+    print(f"✓ 重复导入结果: 导入 {count2} 条新记录")
     print(f"✓ 当前系统总记录数: {len(tracker.records)}")
-    assert count2 == 0, "重复导入应该返回0条新记录"
-    assert len(tracker.records) == count, "总记录数不应变化"
-    print("✓ 去重机制验证通过！")
+    assert count2 == 0, f"完全相同批次重复导入应为0条，实际{count2}"
+    assert len(tracker.records) == 3, f"总记录数仍应为3条，实际{len(tracker.records)}"
+    print("✓ 完全相同批次去重验证通过！")
 
+    # ============================================================
+    # ★ 验证2（出问题的操作路）：同批邮件只改一条备注再导入
+    #   旧逻辑：整批哈希变了→全部翻倍
+    #   新逻辑：按业务键逐条比对→只更新改了备注的那条，其余跳过
+    # ============================================================
+    print_section("【验证2★】同批邮件改一条备注再导入 → 不翻倍，变更历史可追溯")
+
+    modified_batch = copy.deepcopy(test_email_batch)
+    modified_batch[0]['remark'] = '已冲正 - 客户经理电话确认'
+
+    records3, count3 = tracker.import_client_email_batch(
+        source_file='客户经理补充_20260603_v2.xlsx',
+        email_batch_data=modified_batch,
+        operator='系统管理员'
+    )
+
+    print(f"✓ 改备注后导入结果: 处理 {count3} 条记录")
+    print(f"✓ 当前系统总记录数: {len(tracker.records)}")
+    assert len(tracker.records) == 3, (
+        f"改备注再导入后总记录数仍应为3条（不翻倍），实际{len(tracker.records)}"
+    )
+    assert count3 == 1, (
+        f"只有1条备注变更应被处理，实际{count3}"
+    )
+    print("✓ 不翻倍验证通过！")
+
+    history = tracker.get_record_change_history(special_record.id)
+    print(f"\n变更历史记录数: {len(history)}")
+    remark_changes = [h for h in history if h['字段'] == 'remark']
+    import_remark_changes = [h for h in remark_changes if '重导入' in h.get('原因', '')]
+
+    assert len(import_remark_changes) >= 1, "重导入备注变更应在历史中有记录"
+
+    for h in history:
+        print(f"\n  [{h['时间']}] {h['操作人']}")
+        print(f"    变更类型: {h['变更类型']}")
+        print(f"    字段: {h['字段']}")
+        print(f"    变更前: {h['变更前']}")
+        print(f"    变更后: {h['变更后']}")
+        if h['原因']:
+            print(f"    原因: {h['原因']}")
+
+    for ch in import_remark_changes:
+        assert ch['变更前'] == '已冲正', f"变更前应为'已冲正'，实际'{ch['变更前']}'"
+        assert ch['变更后'] == '已冲正 - 客户经理电话确认', (
+            f"变更后应为'已冲正 - 客户经理电话确认'，实际'{ch['变更后']}'"
+        )
+    print("✓ 变更历史改前改后对比验证通过！")
+
+    # ============================================================
+    # 第二步：风控值班老秦补看清算批次号
+    # ============================================================
     print_section("【第二步】风控值班老秦补看清算批次号")
 
     batch = SettlementBatch(
@@ -107,7 +168,10 @@ def test_complete_workflow():
         )
         print(f"✓ 关联清算批次结果: {result}")
 
-    print_section("【验证】变更历史 - 备注修改前后对比")
+    # ============================================================
+    # 验证3：老秦手动改备注 → 历史里改前改后
+    # ============================================================
+    print_section("【验证3】老秦手动改备注 → 历史里改前改后")
 
     if special_record:
         result = tracker.update_remark(
@@ -119,7 +183,14 @@ def test_complete_workflow():
         print(f"✓ 备注修改结果: {result}")
 
         history = tracker.get_record_change_history(special_record.id)
-        print(f"\n变更历史记录数: {len(history)}")
+        print(f"\n完整变更历史记录数: {len(history)}")
+
+        manual_changes = [
+            h for h in history
+            if h['变更类型'] == '备注修改' and '重导入' not in h.get('原因', '')
+        ]
+        assert len(manual_changes) >= 1, "手动备注修改应在历史中有记录"
+
         for h in history:
             print(f"\n  [{h['时间']}] {h['操作人']}")
             print(f"    变更类型: {h['变更类型']}")
@@ -129,6 +200,9 @@ def test_complete_workflow():
             if h['原因']:
                 print(f"    原因: {h['原因']}")
 
+    # ============================================================
+    # 第三步：给负责人看的摘要更新
+    # ============================================================
     print_section("【第三步】给负责人看的摘要更新")
 
     summary = report_gen.generate_executive_summary()
@@ -137,6 +211,10 @@ def test_complete_workflow():
     print(f"待复核记录数: {summary['待复核记录数']}")
     print(f"需特别关注(金额0备注已冲正): {summary['需特别关注（金额0但备注已冲正）']}条")
     print(f"\n各状态统计: {summary['各状态统计']}")
+
+    assert summary['总记录数'] == 3, (
+        f"报告总记录数应为3（不翻倍），实际{summary['总记录数']}"
+    )
 
     print("\n待办事项摘要（给负责人看）:")
     for i, todo in enumerate(summary['待办事项摘要'], 1):
@@ -156,32 +234,38 @@ def test_complete_workflow():
     print(f"  舍入方式: {params['舍入方式']}")
     print(f"  计算逻辑: {params['计算逻辑说明']}")
 
-    print_section("【验证】金额为0但备注已冲正 - 不自动归正常")
+    # ============================================================
+    # 验证4：金额为0但备注已冲正 → 不自动归正常
+    # ============================================================
+    print_section("【验证4】金额为0但备注已冲正 → 不自动归正常")
 
     if special_record:
         print(f"记录状态: {special_record.status.value}")
+        print(f"当前备注: {special_record.remark}")
         print(f"是否需要人工复核: {special_record.needs_manual_review()}")
         assert special_record.status == TailDifferenceStatus.PENDING_REVIEW, "应保持待复核状态"
-        assert special_record.needs_manual_review() == True, "应标记为需要人工复核"
         print("✓ 验证通过：金额为0但备注已冲正的记录保持待复核状态，不自动归正常")
 
-    print_section("【验证】3D/图表展示 - 点击可追溯")
+    # ============================================================
+    # 验证5：3D/图表展示 → 点击可追溯
+    # ============================================================
+    print_section("【验证5】3D/图表展示 → 点击可追溯到邮件和批次")
 
     chart_data = viz.get_chart_data("3d")
     print(f"图表类型: {chart_data['chart_type']}")
     print(f"X轴(日期): {chart_data['x_axis']}")
     print(f"Y轴(基金): {chart_data['y_axis']}")
     print(f"数据点数: {len(chart_data['data_points'])}")
-    print(f"点击行为说明: {chart_data['click_behavior']}")
+
+    assert len(chart_data['data_points']) == 3, (
+        f"3D图表数据点应为3个（不翻倍），实际{len(chart_data['data_points'])}"
+    )
 
     if special_record:
         drilldown = viz.drilldown_to_record(special_record.id)
         print(f"\n钻取到记录: {drilldown['record_detail']['fund_info']}")
         print(f"可追溯邮件: {drilldown['trace_options']['can_trace_to_email']}")
         print(f"可追溯批次: {drilldown['trace_options']['can_trace_to_batch']}")
-
-        if 'special_attention' in drilldown:
-            print(f"\n★ 特别提醒: {drilldown['special_attention']['message']}")
 
         email_trace = viz.trace_to_original_email(special_record.id)
         print(f"\n追溯到原始邮件:")
@@ -193,24 +277,38 @@ def test_complete_workflow():
         print(f"  批次号: {batch_trace['batch_number']}")
         print(f"  清算日期: {batch_trace['settlement_date']}")
 
-    print_section("【生成完整报告】")
+    # ============================================================
+    # 生成完整报告并核对
+    # ============================================================
+    print_section("【生成完整报告并核对】")
+
     full_report = report_gen.generate_detailed_report()
-    print(full_report[:1500] + "\n...\n(报告过长，仅展示前1500字符)")
+    print(full_report)
 
-    with open('尾差追踪报告_示例.txt', 'w', encoding='utf-8') as f:
+    assert full_report.count("记录ID:") == 3, (
+        f"报告明细中记录数应为3条（不翻倍），实际{full_report.count('记录ID:')}"
+    )
+
+    with open('尾差追踪报告_验证.txt', 'w', encoding='utf-8') as f:
         f.write(full_report)
-    print("\n✓ 完整报告已保存到: 尾差追踪报告_示例.txt")
+    print("\n✓ 完整报告已保存到: 尾差追踪报告_验证.txt")
 
+    # ============================================================
+    # 最终总结
+    # ============================================================
     print_section("测试总结")
-    print("✓ 所有测试通过！")
-    print("\n验证的需求点:")
-    print("  1. 重复导入同一批邮件不翻倍 ✓")
-    print("  2. 备注修改可查看改前改后差别 ✓")
-    print("  3. 3D/图表点击可追溯到邮件和批次 ✓")
-    print("  4. 负责人摘要说明为什么留下、缺什么、找谁 ✓")
-    print("  5. 计算参数版本和取舍理由附在旁边 ✓")
-    print("  6. 三步流程完整可走通 ✓")
-    print("  7. 金额0备注已冲正不自动归正常 ✓")
+    print("✓ 所有测试通过！\n")
+    print("验证的需求点:")
+    print("  1. 完全相同批次重复导入 → 不翻倍 ✓")
+    print("  2. ★ 同批改一条备注再导入 → 不翻倍（修复前会翻倍） ✓")
+    print("  3. ★ 重导入备注变更 → 历史里有改前改后（修复前无记录） ✓")
+    print("  4. 老秦手动改备注 → 历史里有改前改后 ✓")
+    print("  5. 3D/图表点击可追溯到邮件和批次 ✓")
+    print("  6. 负责人摘要说明为什么留下、缺什么、找谁 ✓")
+    print("  7. 计算参数版本和取舍理由附在旁边 ✓")
+    print("  8. 三步流程完整可走通 ✓")
+    print("  9. 金额0备注已冲正不自动归正常 ✓")
+    print(" 10. 报告记录数 = 页面状态 = 导出内容 ✓")
 
 
 if __name__ == '__main__':

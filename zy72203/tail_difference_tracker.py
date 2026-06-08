@@ -17,6 +17,7 @@ class TailDifferenceTracker:
         self.client_emails: Dict[str, ClientEmail] = {}
         self.settlement_batches: Dict[str, SettlementBatch] = {}
         self.content_hashes: Dict[str, str] = {}
+        self._business_key_index: Dict[str, str] = {}
         self.calculation_params = CalculationParams(
             version="v1.2.0",
             tolerance_threshold=0.01,
@@ -25,6 +26,10 @@ class TailDifferenceTracker:
             notes="尾差计算采用申请金额-赎回金额-清算金额公式，小于阈值0.01元视为计算误差"
         )
 
+    @staticmethod
+    def _make_business_key(trade_date: str, fund_code: str) -> str:
+        return f"{trade_date}|{fund_code}"
+
     def import_client_email_batch(
         self,
         source_file: str,
@@ -32,33 +37,113 @@ class TailDifferenceTracker:
         operator: str
     ) -> Tuple[List[TailDifferenceRecord], int]:
         batch_id = f"batch_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-        batch_content = json.dumps(email_batch_data, sort_keys=True)
-        batch_hash = hashlib.md5(batch_content.encode()).hexdigest()
-
-        if batch_hash in self.content_hashes:
-            return [], 0
-
-        self.content_hashes[batch_hash] = batch_id
 
         imported_records = []
         for email_data in email_batch_data:
-            email_id = f"email_{uuid.uuid4().hex[:8]}"
-            content_hash = hashlib.md5(
+            trade_date = email_data.get('trade_date', '')
+            fund_code = email_data.get('fund_code', '')
+            business_key = self._make_business_key(trade_date, fund_code)
+
+            new_remark = email_data.get('remark')
+            application_amount = float(email_data.get('application_amount', 0))
+            redemption_amount = float(email_data.get('redemption_amount', 0))
+            settlement_amount = float(email_data.get('settlement_amount', 0))
+
+            item_hash = hashlib.md5(
                 json.dumps(email_data, sort_keys=True).encode()
             ).hexdigest()
+
+            if business_key in self._business_key_index:
+                existing_id = self._business_key_index[business_key]
+                existing = self.records[existing_id]
+
+                if item_hash in self.content_hashes:
+                    continue
+
+                self.content_hashes[item_hash] = batch_id
+
+                if (existing.application_amount == application_amount
+                        and existing.redemption_amount == redemption_amount
+                        and existing.settlement_amount == settlement_amount):
+
+                    if existing.remark != new_remark:
+                        old_remark = existing.remark
+                        change = ChangeHistory(
+                            id=f"chg_{uuid.uuid4().hex[:8]}",
+                            timestamp=datetime.now(),
+                            field_name="remark",
+                            old_value=old_remark,
+                            new_value=new_remark,
+                            operator=operator,
+                            change_type=ChangeType.IMPORT_UPDATE,
+                            reason=f"重导入时备注变更（来源：{source_file}）"
+                        )
+                        existing.add_change_history(change)
+                        existing.remark = new_remark
+                        imported_records.append(existing)
+                else:
+                    old_amounts = (
+                        f"申请{existing.application_amount:.2f}/"
+                        f"赎回{existing.redemption_amount:.2f}/"
+                        f"清算{existing.settlement_amount:.2f}"
+                    )
+                    new_amounts = (
+                        f"申请{application_amount:.2f}/"
+                        f"赎回{redemption_amount:.2f}/"
+                        f"清算{settlement_amount:.2f}"
+                    )
+                    change = ChangeHistory(
+                        id=f"chg_{uuid.uuid4().hex[:8]}",
+                        timestamp=datetime.now(),
+                        field_name="amounts",
+                        old_value=old_amounts,
+                        new_value=new_amounts,
+                        operator=operator,
+                        change_type=ChangeType.IMPORT_UPDATE,
+                        reason=f"重导入时金额变更（来源：{source_file}）"
+                    )
+                    existing.add_change_history(change)
+                    existing.application_amount = application_amount
+                    existing.redemption_amount = redemption_amount
+                    existing.settlement_amount = settlement_amount
+                    existing.tail_difference = (
+                        application_amount - redemption_amount - settlement_amount
+                    )
+                    if existing.remark != new_remark:
+                        remark_change = ChangeHistory(
+                            id=f"chg_{uuid.uuid4().hex[:8]}",
+                            timestamp=datetime.now(),
+                            field_name="remark",
+                            old_value=existing.remark,
+                            new_value=new_remark,
+                            operator=operator,
+                            change_type=ChangeType.IMPORT_UPDATE,
+                            reason=f"重导入时备注变更（来源：{source_file}）"
+                        )
+                        existing.add_change_history(remark_change)
+                        existing.remark = new_remark
+                    imported_records.append(existing)
+                continue
+
+            email_id = f"email_{uuid.uuid4().hex[:8]}"
+            self.content_hashes[item_hash] = batch_id
 
             client_email = ClientEmail(
                 id=email_id,
                 batch_id=batch_id,
                 source_file=source_file,
                 import_time=datetime.now(),
-                content_hash=content_hash,
+                content_hash=item_hash,
                 raw_data=email_data
             )
             self.client_emails[email_id] = client_email
 
-            record = self._create_record_from_email(client_email, email_data, operator)
+            record = self._create_record_from_email(
+                client_email, email_data, operator
+            )
             if record:
+                bk = self._make_business_key(record.trade_date, record.fund_code)
+                self._business_key_index[bk] = record.id
                 imported_records.append(record)
 
         return imported_records, len(imported_records)
