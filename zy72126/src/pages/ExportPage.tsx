@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { Download, FileSpreadsheet, FileJson, CheckCircle2, Music, AlertCircle, FileText } from 'lucide-react';
+import { Download, FileSpreadsheet, FileJson, CheckCircle2, Music, AlertCircle, FileText, Table2 } from 'lucide-react';
 import { PageHeader } from '@/components/PageHeader';
 import { useAppStore } from '@/store';
 import { exportToExcel, exportToJSON, generateReport } from '@/utils/exporter';
 import { cn } from '@/lib/utils';
 
 export const ExportPage = () => {
-  const { tracks, annotations, conflicts, importRecords } = useAppStore();
+  const { tracks, annotations, conflicts, importRecords, channelTable } = useAppStore();
   const [format, setFormat] = useState<'xlsx' | 'json'>('xlsx');
   const [options, setOptions] = useState({
     includeAnnotations: true,
@@ -31,9 +31,9 @@ export const ExportPage = () => {
       };
 
       if (format === 'xlsx') {
-        exportToExcel(tracks, annotations, conflicts, importRecords, exportOptions);
+        exportToExcel(tracks, annotations, conflicts, importRecords, channelTable, exportOptions);
       } else {
-        exportToJSON(tracks, annotations, conflicts, importRecords, exportOptions);
+        exportToJSON(tracks, annotations, conflicts, importRecords, channelTable, exportOptions);
       }
 
       setIsExporting(false);
@@ -48,6 +48,7 @@ export const ExportPage = () => {
     annotations,
     conflicts,
     importRecords,
+    channelTable,
     {
       ...options,
       format,
@@ -183,6 +184,15 @@ export const ExportPage = () => {
               <h3 className="font-semibold text-olive-800">数据概览</h3>
             </div>
             <div className="p-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-amber-600">
+                  <Table2 size={18} />
+                  <span>通道表条目</span>
+                </div>
+                <span className="font-serif text-xl font-bold text-amber-600">
+                  {channelTable.length}
+                </span>
+              </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-olive-600">
                   <Music size={18} />

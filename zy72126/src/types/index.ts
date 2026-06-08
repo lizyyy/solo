@@ -6,6 +6,18 @@ export type ConflictStatus = 'pending' | 'resolved';
 
 export type ConflictResolution = 'A' | 'B' | 'manual';
 
+export interface ChannelTableEntry {
+  id: string;
+  channelNo: string;
+  trackName: string;
+  artist?: string;
+  duration?: string;
+  source?: string;
+  note?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Track {
   id: string;
   channelNo: string;
@@ -17,6 +29,7 @@ export interface Track {
   status: TrackStatus;
   fileHash?: string;
   metadata: Record<string, any>;
+  channelTableId?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -65,11 +78,16 @@ export interface ParsedFileName {
 }
 
 export interface AppState {
+  channelTable: ChannelTableEntry[];
   tracks: Track[];
   annotations: Annotation[];
   conflicts: Conflict[];
   importRecords: ImportRecord[];
   currentPage: string;
+  addChannelEntry: (entry: ChannelTableEntry) => void;
+  addChannelEntries: (entries: ChannelTableEntry[]) => void;
+  updateChannelEntry: (id: string, updates: Partial<ChannelTableEntry>) => void;
+  deleteChannelEntry: (id: string) => void;
   addTrack: (track: Track) => void;
   updateTrack: (id: string, updates: Partial<Track>) => void;
   deleteTrack: (id: string) => void;
@@ -87,4 +105,5 @@ export interface TrackWithDetails extends Track {
   annotations: Annotation[];
   conflicts: Conflict[];
   importRecord?: ImportRecord;
+  channelEntry?: ChannelTableEntry;
 }

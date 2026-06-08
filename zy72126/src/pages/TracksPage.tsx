@@ -36,7 +36,7 @@ const StatusBadge = ({ status }: { status: Track['status'] }) => {
 };
 
 export const TracksPage = () => {
-  const { tracks, updateTrack, deleteTrack } = useAppStore();
+  const { tracks, channelTable, updateTrack, deleteTrack } = useAppStore();
   const [globalFilter, setGlobalFilter] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<Partial<Track>>({});
@@ -80,6 +80,25 @@ export const TracksPage = () => {
       header: '文件大小',
       cell: (info) => formatFileSize(info.getValue() || 0),
       size: 120,
+    }),
+    columnHelper.display({
+      id: 'channelMatch',
+      header: '通道表',
+      cell: (info) => {
+        const track = info.row.original;
+        const entry = track.channelTableId
+          ? channelTable.find((e) => e.id === track.channelTableId)
+          : undefined;
+        return entry ? (
+          <span className="text-xs px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full">
+            #{entry.channelNo} {entry.trackName}
+          </span>
+        ) : (
+          <span className="text-xs px-2 py-0.5 bg-brick-100 text-brick-600 rounded-full">未匹配</span>
+        );
+      },
+      size: 150,
+      enableSorting: false,
     }),
     columnHelper.accessor('status', {
       header: '状态',

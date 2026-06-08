@@ -25,6 +25,7 @@ export const ConflictsPage = () => {
   });
 
   const getTrackName = (trackId: string) => {
+    if (!trackId) return '未关联曲目（缺失检测）';
     return tracks.find((t) => t.id === trackId)?.trackName || '未知曲目';
   };
 

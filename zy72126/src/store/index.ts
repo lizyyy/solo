@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type {
+  ChannelTableEntry,
   Track,
   Annotation,
   Conflict,
@@ -11,10 +12,11 @@ import type {
 import { generateMockData } from '@/utils/mockData';
 
 const initialState = {
-  tracks: [],
-  annotations: [],
-  conflicts: [],
-  importRecords: [],
+  channelTable: [] as ChannelTableEntry[],
+  tracks: [] as Track[],
+  annotations: [] as Annotation[],
+  conflicts: [] as Conflict[],
+  importRecords: [] as ImportRecord[],
   currentPage: 'import',
 };
 
@@ -22,6 +24,28 @@ export const useAppStore = create<AppState>()(
   persist(
     (set) => ({
       ...initialState,
+
+      addChannelEntry: (entry: ChannelTableEntry) =>
+        set((state) => ({
+          channelTable: [...state.channelTable, entry],
+        })),
+
+      addChannelEntries: (entries: ChannelTableEntry[]) =>
+        set((state) => ({
+          channelTable: [...state.channelTable, ...entries],
+        })),
+
+      updateChannelEntry: (id: string, updates: Partial<ChannelTableEntry>) =>
+        set((state) => ({
+          channelTable: state.channelTable.map((e) =>
+            e.id === id ? { ...e, ...updates, updatedAt: new Date().toISOString() } : e
+          ),
+        })),
+
+      deleteChannelEntry: (id: string) =>
+        set((state) => ({
+          channelTable: state.channelTable.filter((e) => e.id !== id),
+        })),
 
       addTrack: (track: Track) =>
         set((state) => ({
@@ -123,6 +147,7 @@ export const useAppStore = create<AppState>()(
       loadMockData: () => {
         const mock = generateMockData();
         set({
+          channelTable: mock.channelTable,
           tracks: mock.tracks,
           annotations: mock.annotations,
           conflicts: mock.conflicts,
@@ -133,7 +158,13 @@ export const useAppStore = create<AppState>()(
     {
       name: 'music-royalty-tracker-storage',
       storage: createJSONStorage(() => localStorage),
-      version: 1,
+      version: 2,
+      migrate: (persisted: any, version: number) => {
+        if (version < 2) {
+          return { ...persisted, channelTable: [] };
+        }
+        return persisted;
+      },
     }
   )
 );
@@ -148,5 +179,8 @@ export const getTrackWithDetails = (trackId: string) => {
     annotations: state.annotations.filter((a) => a.trackId === trackId),
     conflicts: state.conflicts.filter((c) => c.trackId === trackId),
     importRecord: state.importRecords.find((r) => r.trackId === trackId),
+    channelEntry: track.channelTableId
+      ? state.channelTable.find((e) => e.id === track.channelTableId)
+      : undefined,
   };
 };

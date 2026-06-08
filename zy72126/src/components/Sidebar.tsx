@@ -10,7 +10,7 @@ interface NavItem {
 }
 
 export const Sidebar = () => {
-  const { currentPage, setCurrentPage, tracks, conflicts } = useAppStore();
+  const { currentPage, setCurrentPage, channelTable, tracks, conflicts } = useAppStore();
   
   const pendingConflicts = conflicts.filter((c) => c.status === 'pending').length;
   const errorTracks = tracks.filter((t) => t.status === 'error').length;
@@ -79,9 +79,13 @@ export const Sidebar = () => {
       <div className="p-4 border-t border-olive-800">
         <div className="bg-olive-800 rounded-lg p-4">
           <p className="text-xs text-olive-300 mb-2">数据概览</p>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             <div>
-              <p className="text-2xl font-serif font-semibold text-amber-400">{tracks.length}</p>
+              <p className="text-2xl font-serif font-semibold text-amber-400">{channelTable.length}</p>
+              <p className="text-xs text-olive-300">通道表</p>
+            </div>
+            <div>
+              <p className="text-2xl font-serif font-semibold text-olive-200">{tracks.length}</p>
               <p className="text-xs text-olive-300">总曲目</p>
             </div>
             <div>
