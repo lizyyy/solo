@@ -9,6 +9,7 @@ class ViewSynchronizer {
     };
     this.history = [];
     this.subscribers = [];
+    this.version = 0;
   }
 
   subscribe(callback) {
@@ -34,8 +35,9 @@ class ViewSynchronizer {
     );
     
     if (!existing) {
-      this.viewState.annotations.push(annotation);
+      this.viewState.annotations.push(JSON.parse(JSON.stringify(annotation)));
       this.viewState.lastUpdated = new Date();
+      this.version++;
       
       this.addHistory('add_annotation', {
         annotationId: annotation.annotationId,
@@ -61,6 +63,7 @@ class ViewSynchronizer {
       annotation.reviewedBy = reviewedBy;
       annotation.reviewedAt = new Date();
       this.viewState.lastUpdated = new Date();
+      this.version++;
       
       this.addHistory('update_annotation_status', {
         annotationId,
@@ -70,7 +73,7 @@ class ViewSynchronizer {
       }, operator);
       
       this.notifySubscribers('annotation_updated', annotation);
-      return annotation;
+      return JSON.parse(JSON.stringify(annotation));
     }
     return null;
   }
@@ -80,19 +83,21 @@ class ViewSynchronizer {
       ? JSON.parse(JSON.stringify(this.viewState.obstacles[obstacle.id]))
       : null;
     
-    this.viewState.obstacles[obstacle.id] = obstacle;
+    const snapshot = JSON.parse(JSON.stringify(obstacle));
+    this.viewState.obstacles[obstacle.id] = snapshot;
     this.viewState.lastUpdated = new Date();
+    this.version++;
     
     this.addHistory('update_obstacle', {
       obstacleId: obstacle.id,
       oldData,
       newData: {
-        names: obstacle.names,
-        position: obstacle.position
+        names: snapshot.names,
+        position: snapshot.position
       }
     }, operator);
     
-    this.notifySubscribers('obstacle_updated', obstacle);
+    this.notifySubscribers('obstacle_updated', snapshot);
   }
 
   addHistory(action, details, operator) {
@@ -107,7 +112,8 @@ class ViewSynchronizer {
       obstacles: JSON.parse(JSON.stringify(this.viewState.obstacles)),
       lastUpdated: this.viewState.lastUpdated,
       annotationCount: this.viewState.annotations.length,
-      obstacleCount: Object.keys(this.viewState.obstacles).length
+      obstacleCount: Object.keys(this.viewState.obstacles).length,
+      version: this.version
     };
   }
 

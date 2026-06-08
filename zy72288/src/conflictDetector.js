@@ -7,10 +7,36 @@ class ConflictDetector {
   }
 
   detectAll(obstacles, cadLayers, rangefinderRecords) {
+    const resolvedConflictIds = new Set(
+      this.conflicts.filter(c => c.status === 'resolved').map(c => c.conflictId)
+    );
+    const resolvedMap = new Map();
+    for (const c of this.conflicts) {
+      if (c.status === 'resolved') {
+        resolvedMap.set(c.conflictId, c);
+      }
+    }
+    
     this.conflicts = [];
     
     this.detectDuplicateNames(obstacles);
     this.detectCADvsRangefinderConflict(cadLayers, rangefinderRecords);
+    
+    for (const conflict of this.conflicts) {
+      if (resolvedMap.has(conflict.conflictId)) {
+        const resolved = resolvedMap.get(conflict.conflictId);
+        conflict.status = resolved.status;
+        conflict.resolvedBy = resolved.resolvedBy;
+        conflict.resolvedAt = resolved.resolvedAt;
+        conflict.resolution = resolved.resolution;
+      }
+    }
+    
+    for (const [id, resolved] of resolvedMap) {
+      if (!this.conflicts.find(c => c.conflictId === id)) {
+        this.conflicts.push(resolved);
+      }
+    }
     
     return this.conflicts;
   }
@@ -123,7 +149,7 @@ class ConflictDetector {
       conflict.resolvedBy = resolvedBy;
       conflict.resolvedAt = new Date();
       conflict.resolution = resolution;
-      return conflict;
+      return JSON.parse(JSON.stringify(conflict));
     }
     return null;
   }

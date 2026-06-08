@@ -23,6 +23,41 @@ class SortingLineWorkflow {
     this.currentStep = 'idle';
   }
 
+  _snapshot() {
+    return {
+      currentStep: this.currentStep,
+      obstacleCount: Object.keys(this.obstacles).length,
+      cadLayerCount: this.cadLayers.length,
+      rangefinderRecordCount: this.rangefinderRecords.length,
+      pendingConflicts: this.conflictDetector.getPendingConflicts().length,
+      pendingTraineeReviews: Object.values(this.obstacles).filter(
+        o => o.hasMultipleNames() && o.names.some(n => n.status === 'pending')
+      ).length,
+      viewVersion: this.viewSync.version
+    };
+  }
+
+  _buildResult(action, success, message, extras = {}) {
+    return {
+      success,
+      action,
+      message,
+      state: this._snapshot(),
+      output: {
+        viewSnapshot: this.viewSync.getViewSnapshot(),
+        pendingConflicts: this.conflictDetector.getPendingConflicts().map(c => ({
+          conflictId: c.conflictId,
+          type: c.type,
+          obstacleId: c.obstacleId,
+          description: c.description,
+          status: c.status,
+          resolution: c.resolution
+        }))
+      },
+      ...extras
+    };
+  }
+
   async step1_importCADLayer(layerData, operator) {
     this.currentStep = 'import_cad';
     const { layerName, obstacleId, position } = layerData;
@@ -37,18 +72,15 @@ class SortingLineWorkflow {
         lastImportTime: existingLayer.importedAt.toLocaleString(),
         lastImportBy: existingLayer.importedBy || '未知用户'
       });
-      return {
-        success: false,
-        error,
-        message: formatError(error)
-      };
+      return this._buildResult('import_cad', false, formatError(error), { error });
     }
     
     const layer = new CADLayer(layerName, obstacleId, position);
     layer.importedBy = operator;
     this.cadLayers.push(layer);
     
-    if (!this.obstacles[obstacleId]) {
+    const isNewObstacle = !this.obstacles[obstacleId];
+    if (isNewObstacle) {
       this.obstacles[obstacleId] = new Obstacle(obstacleId, position, { x: 1, y: 1, z: 1 });
     }
     
@@ -58,32 +90,55 @@ class SortingLineWorkflow {
     
     const annotation = new Annotation(obstacleId, layerName, operator, 'cad_import');
     this.viewSync.addAnnotation(annotation, operator);
-    
-    this.workflowSteps.push({
+
+    const nowHasMultipleNames = obstacle.hasMultipleNames();
+
+    let newConflicts = [];
+    if (nowHasMultipleNames) {
+      newConflicts = this.conflictDetector.detectDuplicateNames(this.obstacles);
+    }
+
+    const workflowStep = {
       step: 1,
       action: 'import_cad',
       layerName,
       obstacleId,
       operator,
-      timestamp: new Date()
-    });
-    
-    return {
-      success: true,
-      step: 1,
-      message: `CAD图层「${layerName}」导入成功`,
-      layer,
-      obstacle,
-      nextStep: '请培训教官老梁补看测距仪记录'
+      timestamp: new Date(),
+      triggeredDuplicateNames: nowHasMultipleNames
     };
+    this.workflowSteps.push(workflowStep);
+
+    let message;
+    let nextStep;
+    let extras = {};
+
+    if (nowHasMultipleNames) {
+      message = `CAD图层「${layerName}」已导入，但障碍物【${obstacleId}】现在有 ${obstacle.names.length} 个名称：${obstacle.names.map(n => n.name).join('、')}。以前总被当成小备注跳过，现在需要处理！`;
+      nextStep = '请培训教官老梁补看测距仪记录，同时安排培训学员复核名称';
+      extras.triggeredDuplicateNames = true;
+      extras.duplicateNameConflict = newConflicts.length > 0
+        ? {
+            conflictId: newConflicts[0].conflictId,
+            names: obstacle.names.map(n => ({ name: n.name, source: n.source, status: n.status }))
+          }
+        : null;
+    } else {
+      message = `CAD图层「${layerName}」导入成功`;
+      nextStep = '请培训教官老梁补看测距仪记录';
+    }
+
+    return this._buildResult('import_cad', true, message, {
+      step: 1,
+      layer: JSON.parse(JSON.stringify(layer)),
+      nextStep,
+      ...extras
+    });
   }
 
   async step2_laoliangReviewRangefinder(rangefinderData, operator) {
     if (operator !== '老梁') {
-      return {
-        success: false,
-        message: '只有培训教官老梁可以补看测距仪记录'
-      };
+      return this._buildResult('laoliang_review', false, '只有培训教官老梁可以补看测距仪记录');
     }
     
     this.currentStep = 'laoliang_review';
@@ -103,14 +158,14 @@ class SortingLineWorkflow {
     
     this.recalculateObstacle(obstacleId, '老梁');
     
-    const conflicts = this.conflictDetector.detectAll(
+    this.conflictDetector.detectAll(
       this.obstacles,
       this.cadLayers,
       this.rangefinderRecords
     );
     
-    const pendingConflicts = conflicts.filter(c => c.status === 'pending');
-    
+    const pendingConflicts = this.conflictDetector.getPendingConflicts();
+
     this.workflowSteps.push({
       step: 2,
       action: 'laoliang_review',
@@ -119,20 +174,22 @@ class SortingLineWorkflow {
       timestamp: new Date(),
       conflictsFound: pendingConflicts.length
     });
-    
-    return {
-      success: true,
+
+    let message = `老梁已补看障碍物 ${obstacleId} 的测距仪记录`;
+    let nextStep;
+
+    if (pendingConflicts.length > 0) {
+      message += `，检测到 ${pendingConflicts.length} 个冲突！请列出冲突证据，让老梁选择确认或驳回，不要自动处理`;
+      nextStep = '老梁需先处理冲突确认/驳回';
+    } else {
+      nextStep = '等待培训学员复核后更新三维标注视图';
+    }
+
+    return this._buildResult('laoliang_review', true, message, {
       step: 2,
-      message: `老梁已补看障碍物 ${obstacleId} 的测距仪记录`,
-      record,
-      pendingConflicts,
-      conflictAction: pendingConflicts.length > 0 
-        ? '检测到冲突！请列出冲突证据，让老梁选择确认或驳回，不要自动处理'
-        : '无冲突，可进入下一步',
-      nextStep: pendingConflicts.length > 0 
-        ? '老梁需先处理冲突确认/驳回' 
-        : '等待培训学员复核后更新三维标注视图'
-    };
+      record: JSON.parse(JSON.stringify(record)),
+      nextStep
+    });
   }
 
   presentConflictToLaoliang(conflictId) {
@@ -150,22 +207,23 @@ class SortingLineWorkflow {
       type: conflict.type,
       obstacleId: conflict.obstacleId,
       description: conflict.description,
-      evidence: conflict.evidence,
+      evidence: JSON.parse(JSON.stringify(conflict.evidence)),
       options: [
         { action: 'confirm', label: '确认 - 以测距仪数据为准' },
         { action: 'reject', label: '驳回 - 保持CAD图层数据' },
         { action: 'defer', label: '暂缓 - 留给培训学员复核练习' }
       ],
-      note: '不要替业务同事自动拍板！必须老梁亲自选择'
+      note: '不要替业务同事自动拍板！必须老梁亲自选择',
+      state: this._snapshot(),
+      output: {
+        viewSnapshot: this.viewSync.getViewSnapshot()
+      }
     };
   }
 
   async laoliangResolveConflict(conflictId, resolution, operator) {
     if (operator !== '老梁') {
-      return {
-        success: false,
-        message: '只有培训教官老梁可以处理冲突'
-      };
+      return this._buildResult('resolve_conflict', false, '只有培训教官老梁可以处理冲突');
     }
     
     const conflict = this.conflictDetector.resolveConflict(
@@ -173,7 +231,7 @@ class SortingLineWorkflow {
     );
     
     if (!conflict) {
-      return { success: false, message: '冲突不存在' };
+      return this._buildResult('resolve_conflict', false, '冲突不存在');
     }
     
     this.viewSync.addHistory('resolve_conflict', {
@@ -181,34 +239,29 @@ class SortingLineWorkflow {
       resolution,
       conflictType: conflict.type
     }, '老梁');
-    
-    return {
-      success: true,
-      message: `老梁已${resolution === 'confirm' ? '确认' : resolution === 'reject' ? '驳回' : '暂缓'}该冲突`,
-      conflict,
+
+    const resolutionLabel = resolution === 'confirm' ? '确认' : resolution === 'reject' ? '驳回' : '暂缓';
+    const message = `老梁已${resolutionLabel}该冲突`;
+
+    return this._buildResult('resolve_conflict', true, message, {
+      conflict: JSON.parse(JSON.stringify(conflict)),
       resolution
-    };
+    });
   }
 
   async traineeReview(obstacleId, selectedName, traineeName) {
     const obstacle = this.obstacles[obstacleId];
     if (!obstacle) {
-      return { success: false, message: '障碍物不存在' };
+      return this._buildResult('trainee_review', false, '障碍物不存在');
     }
     
     if (!obstacle.hasMultipleNames()) {
-      return {
-        success: false,
-        message: '该障碍物没有名称冲突，无需学员复核'
-      };
+      return this._buildResult('trainee_review', false, '该障碍物没有名称冲突，无需学员复核');
     }
     
     const nameEntry = obstacle.names.find(n => n.name === selectedName);
     if (!nameEntry) {
-      return {
-        success: false,
-        message: `选择的名称「${selectedName}」不在候选列表中`
-      };
+      return this._buildResult('trainee_review', false, `选择的名称「${selectedName}」不在候选列表中`);
     }
     
     const review = {
@@ -237,31 +290,35 @@ class SortingLineWorkflow {
       selectedName,
       traineeName
     }, traineeName);
-    
-    return {
-      success: true,
-      message: `培训学员「${traineeName}」已完成复核，选择名称：${selectedName}`,
-      review,
+
+    const dupConflicts = this.conflictDetector.getConflictsByType('duplicate_names')
+      .filter(c => c.obstacleId === obstacleId && c.status === 'pending');
+    for (const conflict of dupConflicts) {
+      this.conflictDetector.resolveConflict(conflict.conflictId, 'trainee_reviewed', traineeName);
+    }
+
+    const message = `培训学员「${traineeName}」已完成复核，选择名称：${selectedName}`;
+
+    return this._buildResult('trainee_review', true, message, {
+      review: JSON.parse(JSON.stringify(review)),
       note: '学员复核完成，等待老梁最终确认后更新三维视图'
-    };
+    });
   }
 
   async step3_update3DView(obstacleId, operator) {
     const obstacle = this.obstacles[obstacleId];
     if (!obstacle) {
-      return { success: false, message: '障碍物不存在' };
+      return this._buildResult('update_3d_view', false, '障碍物不存在');
     }
     
     if (obstacle.hasMultipleNames()) {
       const pendingNames = obstacle.names.filter(n => n.status === 'pending');
       if (pendingNames.length > 0) {
         const error = getErrorMessage('MISSING_TRAINEE_REVIEW', { obstacleId });
-        return {
-          success: false,
+        return this._buildResult('update_3d_view', false, formatError(error), {
           error,
-          message: formatError(error),
           hint: '碰到同一障碍物被标了两个名字时，别急着归正常，留给培训学员复核'
-        };
+        });
       }
     }
     
@@ -298,15 +355,14 @@ class SortingLineWorkflow {
       operator,
       timestamp: new Date()
     });
-    
-    return {
-      success: true,
+
+    const message = `三维标注视图已更新，障碍物 ${obstacleId} 最终名称：${confirmedName}`;
+
+    return this._buildResult('update_3d_view', true, message, {
       step: 3,
-      message: `三维标注视图已更新，障碍物 ${obstacleId} 最终名称：${confirmedName}`,
       confirmedName,
-      viewSnapshot: this.viewSync.getViewSnapshot(),
       workflowComplete: true
-    };
+    });
   }
 
   recalculateObstacle(obstacleId, operator) {
@@ -323,23 +379,13 @@ class SortingLineWorkflow {
     const report = await this.selfChecker.runAllChecks();
     return {
       report,
-      formattedReport: this.selfChecker.formatReport(report)
+      formattedReport: this.selfChecker.formatReport(report),
+      state: this._snapshot()
     };
   }
 
   getWorkflowStatus() {
-    return {
-      currentStep: this.currentStep,
-      stepsCompleted: this.workflowSteps.length,
-      steps: this.workflowSteps,
-      obstacleCount: Object.keys(this.obstacles).length,
-      cadLayerCount: this.cadLayers.length,
-      rangefinderRecordCount: this.rangefinderRecords.length,
-      pendingConflicts: this.conflictDetector.getPendingConflicts().length,
-      pendingTraineeReviews: Object.values(this.obstacles).filter(
-        o => o.hasMultipleNames() && o.names.some(n => n.status === 'pending')
-      ).length
-    };
+    return this._snapshot();
   }
 }
 
