@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>猫砂盆异常记录复核</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <h1>🐱 猫砂盆异常记录复核系统</h1>
+  <div class="meta">
+    <span id="dash-total">记录总数: --</span>
+    <span id="dash-vac" class="vac-tag">疫苗缺失: --</span>
+    <button class="btn btn-seed" id="btn-seed">🧪 一键装载演示数据</button>
+  </div>
+</header>
+
+<nav class="toc">
+  <a href="#zone-import" class="toc-item">① 材料导入区</a>
+  <a href="#zone-abnormal" class="toc-item">② 异常复核区</a>
+  <a href="#zone-vaccine" class="toc-item">③ 疫苗缺失单独拎出</a>
+  <a href="#zone-export" class="toc-item">④ 导出与重跑</a>
+</nav>
+
+<main>
+
+<section id="zone-import" class="card">
+  <h2>① 材料导入区 <span class="sub">把寄养登记表、异常截图、口头备注统一放在这里</span></h2>
+  <p class="hint">支持粘贴 JSON 数组；重复导入会自动去重，不会让正常记录翻倍，也不会覆盖已有的人工备注。</p>
+  <div class="row">
+    <textarea id="import-json" rows="8" placeholder='[{
+  "cat_name": "奶糖",
+  "foster_no": "F2026-001",
+  "litter_box_issue": "连续2天未使用猫砂盆",
+  "vaccine_date": "2026-03-15",
+  "source_name": "寄养登记表.xlsx"
+}]'></textarea>
+  </div>
+  <div class="row row-inline">
+    <input id="import-operator" placeholder="操作人" value="项目经理"/>
+    <input id="import-remark" placeholder="备注（可选）"/>
+    <button class="btn btn-primary" id="btn-import">📥 导入材料</button>
+    <button class="btn" id="btn-rerun-last">🔁 用上次批次重跑</button>
+  </div>
+  <div id="import-result" class="result-box"></div>
+</section>
+
+<section id="zone-abnormal" class="card">
+  <h2>② 异常复核区 <span class="sub">按状态筛选，点击卡片看来源材料/备注/快照关联</span></h2>
+  <div class="row row-inline filters">
+    <label>状态筛选
+      <select id="filter-status">
+        <option value="">全部</option>
+      </select>
+    </label>
+    <label>批次
+      <select id="filter-batch">
+        <option value="">全部</option>
+      </select>
+    </label>
+    <button class="btn" id="btn-refresh">🔄 刷新</button>
+  </div>
+  <div id="records" class="record-grid"></div>
+</section>
+
+<section id="zone-vaccine" class="card card-vaccine">
+  <h2>③ 疫苗日期缺失 <span class="sub">⚠️ 已从正常结果中单独拎出，避免被揉进正常</span></h2>
+  <label class="chk"><input type="checkbox" id="vac-toggle" checked> 只看疫苗缺失</label>
+  <div id="vaccine-records" class="record-grid"></div>
+</section>
+
+<section id="zone-export" class="card">
+  <h2>④ 导出与重跑 <span class="sub">导出内容的「截图说明」与接口状态一致；重跑保留历史关联</span></h2>
+  <div class="row row-inline">
+    <label>批次
+      <select id="export-batch">
+        <option value="">全部</option>
+      </select>
+    </label>
+    <button class="btn btn-primary" id="btn-export">📤 导出 JSON（与接口一致）</button>
+    <button class="btn" id="btn-export-csv">📊 导出 CSV</button>
+  </div>
+  <div class="batch-list">
+    <h3>历史批次</h3>
+    <table id="batch-table">
+      <thead><tr><th>#</th><th>批次号</th><th>操作人</th><th>备注</th><th>创建时间</th><th>操作</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</section>
+
+</main>
+
+<div id="modal" class="modal hidden">
+  <div class="modal-content">
+    <div class="modal-head">
+      <h3 id="modal-title">详情</h3>
+      <button id="modal-close">×</button>
+    </div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
