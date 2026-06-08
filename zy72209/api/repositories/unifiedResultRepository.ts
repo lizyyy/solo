@@ -1,4 +1,4 @@
-import type { CreditRecord, OperationLog, ImportHistory } from '../../shared/types';
+import type { CreditRecord, OperationLog, ImportHistory, RemarkItem } from '../../shared/types';
 import { mockRecords, mockImportHistory, mockOperationLogs } from '../data/mockData';
 import crypto from 'crypto';
 
@@ -133,6 +133,24 @@ class UnifiedResultRepository {
 
   getDataHash(): string {
     return this.calculateDataHash(this.records);
+  }
+
+  addRemark(recordId: string, content: string, operator: string): CreditRecord | undefined {
+    const record = this.getRecordById(recordId);
+    if (!record) return undefined;
+
+    const remark: RemarkItem = {
+      id: this.generateId('RMK'),
+      content,
+      operator,
+      createTime: new Date().toISOString().replace('T', ' ').substring(0, 19)
+    };
+
+    const existingRemarks = record.remarks || [];
+    return this.updateRecord(recordId, {
+      remarks: [...existingRemarks, remark],
+      operator
+    } as Partial<CreditRecord>);
   }
 }
 

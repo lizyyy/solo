@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import { AlertTriangle, FileCheck, RefreshCw, Download, Users, DollarSign, Activity, CheckCircle2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { AlertTriangle, FileCheck, RefreshCw, Download, Users, DollarSign, Activity, CheckCircle2, Upload, ImagePlus } from 'lucide-react';
 import { useDashboardStore } from '@/store/dashboardStore';
 import { StatsCard } from '@/components/StatsCard';
 import { SelfCheckPanel } from '@/components/SelfCheckPanel';
@@ -7,10 +7,15 @@ import { FilterBar } from '@/components/FilterBar';
 import { RecordsTable } from '@/components/RecordsTable';
 import { ConflictDrawer } from '@/components/ConflictDrawer';
 import { SupplementModal } from '@/components/SupplementModal';
+import { ImportModal } from '@/components/ImportModal';
+import { ScreenshotModal } from '@/components/ScreenshotModal';
+import { RecordDetailDrawer } from '@/components/RecordDetailDrawer';
 import { useMemo } from 'react';
+import type { CreditRecord } from '../../shared/types';
 
 export default function Home() {
-  const { records, loading, fetchRecords, runSelfCheck, exportData, selfCheckRunning } = useDashboardStore();
+  const { records, loading, fetchRecords, runSelfCheck, exportData, selfCheckRunning, setShowImportModal } = useDashboardStore();
+  const [screenshotRecord, setScreenshotRecord] = useState<CreditRecord | null>(null);
 
   useEffect(() => {
     fetchRecords();
@@ -53,6 +58,13 @@ export default function Home() {
               </p>
             </div>
             <div className="flex items-center gap-3">
+              <button
+                onClick={() => setShowImportModal(true)}
+                className="flex items-center gap-2 rounded-lg bg-green-500 px-4 py-2 text-sm font-medium text-white hover:bg-green-600"
+              >
+                <Upload className="h-4 w-4" />
+                导入托管确认页
+              </button>
               <button
                 onClick={() => {
                   fetchRecords();
@@ -139,7 +151,7 @@ export default function Home() {
                 </div>
               </div>
             ) : (
-              <RecordsTable />
+              <RecordsTable onScreenshot={setScreenshotRecord} />
             )}
           </div>
         </div>
@@ -151,14 +163,14 @@ export default function Home() {
           </h3>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <div className="rounded-lg bg-white p-4">
-              <div className="mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-600 font-bold">1</div>
+              <div className="mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-green-100 text-green-600 font-bold">1</div>
               <h4 className="font-medium text-gray-900">导入托管确认页</h4>
               <p className="mt-1 text-sm text-gray-500">
                 系统自动检测重复导入和机构简称前后不一致，异常记录高亮标记
               </p>
             </div>
             <div className="rounded-lg bg-white p-4">
-              <div className="mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-600 font-bold">2</div>
+              <div className="mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-purple-100 text-purple-600 font-bold">2</div>
               <h4 className="font-medium text-gray-900">补看除权日截图</h4>
               <p className="mt-1 text-sm text-gray-500">
                 存在数据矛盾时列出冲突证据，由您选择确认或驳回，系统不自动拍板
@@ -175,8 +187,13 @@ export default function Home() {
         </div>
       </main>
 
+      <ImportModal />
+      {screenshotRecord && (
+        <ScreenshotModal record={screenshotRecord} onClose={() => setScreenshotRecord(null)} />
+      )}
       <ConflictDrawer />
       <SupplementModal />
+      <RecordDetailDrawer />
     </div>
   );
 }

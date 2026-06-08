@@ -237,4 +237,49 @@ router.get('/:id/logs', (req, res) => {
   });
 });
 
+router.post('/:id/remark', (req, res) => {
+  const { id } = req.params;
+  const { content, operator = '阿南' } = req.body;
+
+  if (!content || !content.trim()) {
+    return res.status(400).json({
+      success: false,
+      message: '备注内容不能为空',
+      timestamp: new Date().toISOString(),
+      dataHash: ''
+    });
+  }
+
+  const result = unifiedResultRepository.addRemark(id, content.trim(), operator);
+
+  if (!result) {
+    return res.status(404).json({
+      success: false,
+      message: '记录不存在',
+      timestamp: new Date().toISOString(),
+      dataHash: ''
+    });
+  }
+
+  unifiedResultRepository.addOperationLog({
+    recordId: id,
+    operationType: 'supplement',
+    operator,
+    operationTime: new Date().toISOString().replace('T', ' ').substring(0, 19),
+    remark: `添加人工备注: ${content.trim()}`
+  });
+
+  const { dataHash } = unifiedResultRepository.getAllRecords();
+
+  const response: ApiResponse<typeof result> = {
+    success: true,
+    data: result,
+    message: '备注已添加',
+    timestamp: new Date().toISOString(),
+    dataHash
+  };
+
+  res.json(response);
+});
+
 export default router;

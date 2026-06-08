@@ -34,6 +34,7 @@ interface DashboardStore {
   uploadScreenshot: (id: string, screenshotData: any) => Promise<{ hasConflict: boolean; conflicts: ConflictEvidence[] } | null>;
   resolveConflict: (id: string, resolution: 'confirm_custodian' | 'reject_use_screenshot', remark: string) => Promise<boolean>;
   supplementRecord: (id: string, fields: Record<string, any>) => Promise<boolean>;
+  addRemark: (id: string, content: string) => Promise<boolean>;
   exportData: () => Promise<void>;
   verifyExportConsistency: () => Promise<boolean>;
 }
@@ -168,6 +169,24 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ fields })
+      });
+      const data = await res.json();
+      if (data.success) {
+        await get().fetchRecords();
+        return true;
+      }
+      return false;
+    } catch (err) {
+      return false;
+    }
+  },
+  
+  addRemark: async (id, content) => {
+    try {
+      const res = await fetch(`/api/records/${id}/remark`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content })
       });
       const data = await res.json();
       if (data.success) {

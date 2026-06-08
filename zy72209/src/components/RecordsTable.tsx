@@ -1,11 +1,15 @@
 import { useMemo } from 'react';
-import { AlertTriangle, CheckCircle, ChevronRight, Edit, Eye, FileText, XCircle } from 'lucide-react';
+import { AlertTriangle, CheckCircle, ChevronRight, Edit, Eye, FileText, ImagePlus, XCircle } from 'lucide-react';
 import { useDashboardStore } from '@/store/dashboardStore';
 import { formatAmount, getStatusLabel, getStatusColor, getReviewStatusLabel, getReviewStatusColor } from '@/utils/format';
 import { cn } from '@/lib/utils';
 import type { CreditRecord } from '../../shared/types';
 
-export function RecordsTable() {
+interface RecordsTableProps {
+  onScreenshot?: (record: CreditRecord) => void;
+}
+
+export function RecordsTable({ onScreenshot }: RecordsTableProps) {
   const { records, filters, setSelectedRecord, setShowConflictDrawer, setShowSupplementModal } = useDashboardStore();
 
   const filteredRecords = useMemo(() => {
@@ -159,7 +163,16 @@ export function RecordsTable() {
                   </span>
                 </td>
                 <td className="px-4 py-4">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5">
+                    {onScreenshot && !record.screenshotData && (
+                      <button
+                        onClick={() => onScreenshot(record)}
+                        className="inline-flex items-center gap-1 rounded-md border border-purple-200 bg-purple-50 px-2 py-1 text-xs font-medium text-purple-700 hover:bg-purple-100"
+                      >
+                        <ImagePlus className="h-3.5 w-3.5" />
+                        截图
+                      </button>
+                    )}
                     {record.hasConflict && (
                       <button
                         onClick={() => handleViewConflict(record)}

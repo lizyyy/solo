@@ -27,6 +27,13 @@ export interface ConflictEvidence {
 
 export type RecordStatus = 'pending' | 'imported' | 'abnormal' | 'conflict' | 'resolved' | 'reviewed';
 
+export interface RemarkItem {
+  id: string;
+  content: string;
+  operator: string;
+  createTime: string;
+}
+
 export interface CreditRecord {
   id: string;
   institutionCode: string;
@@ -53,6 +60,7 @@ export interface CreditRecord {
     time: string;
     remark: string;
   };
+  remarks?: RemarkItem[];
 }
 
 export interface SelfCheckDetail {
