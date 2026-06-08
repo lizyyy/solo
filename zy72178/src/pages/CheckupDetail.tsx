@@ -71,10 +71,16 @@ export default function CheckupDetail() {
     const loadNotesForResults = async () => {
       const newNotes = new Map<string, Note[]>();
       for (const result of results) {
-        const history = await getEntityHistory('sampleResult', result.id);
-        const resultNotes = history.filter(h => h.action === 'add_note');
-        if (resultNotes.length > 0) {
-          newNotes.set(result.id, resultNotes.map(h => h.metadata?.note as Note));
+        if (result.notes && result.notes.length > 0) {
+          newNotes.set(result.id, result.notes);
+        } else {
+          const history = await getEntityHistory('sample_result', result.id);
+          const resultAuditNotes = history
+            .filter(h => h.action === 'add_note' && h.metadata?.note)
+            .map(h => h.metadata!.note as Note);
+          if (resultAuditNotes.length > 0) {
+            newNotes.set(result.id, resultAuditNotes);
+          }
         }
       }
       setNotes(newNotes);
@@ -688,7 +694,7 @@ function HistoryModal({ resultId, onClose }: { resultId: string; onClose: () => 
   useEffect(() => {
     const load = async () => {
       try {
-        const logs = await getEntityHistory('sampleResult', resultId);
+        const logs = await getEntityHistory('sample_result', resultId);
         setHistory(logs);
       } finally {
         setLoading(false);
@@ -701,6 +707,8 @@ function HistoryModal({ resultId, onClose }: { resultId: string; onClose: () => 
     create: '创建结果',
     add_manual_judgment: '人工改判',
     add_note: '添加备注',
+    override: '人工改判',
+    update: '更新',
   };
 
   return (

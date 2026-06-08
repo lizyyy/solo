@@ -130,10 +130,19 @@ export async function getAllFromStore<T extends keyof DBSchema>(
   direction?: IDBCursorDirection
 ): Promise<DBSchema[T]['value'][]> {
   const db = await getDB();
-  if (indexName) {
-    return (db as any).getAllFromIndex(storeName, indexName as string, undefined, direction);
+  if (indexName && direction) {
+    const items: DBSchema[T]['value'][] = [];
+    let cursor = await (db as any).transaction(storeName).store.index(indexName as string).openCursor(null, direction);
+    while (cursor) {
+      items.push(cursor.value);
+      cursor = await cursor.continue();
+    }
+    return items;
   }
-  return (db as any).getAll(storeName, undefined, direction) as Promise<DBSchema[T]['value'][]>;
+  if (indexName) {
+    return (db as any).getAllFromIndex(storeName, indexName as string);
+  }
+  return (db as any).getAll(storeName) as Promise<DBSchema[T]['value'][]>;
 }
 
 export async function getFromStore<T extends keyof DBSchema>(

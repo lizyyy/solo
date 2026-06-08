@@ -305,10 +305,15 @@ export async function addManualJudgment(
 
   result.manualJudgment = mj;
   result.judgment = newJudgment;
+  result.finalJudgment = newJudgment;
   result.status = 'manually_adjusted';
 
   await putToStore('sampleResults', result);
-  await logAction('sample_result', sampleResultId, 'override', beforeState, result, user);
+  await logAction('sample_result', sampleResultId, 'override', beforeState, result, user, {
+    judgment: newJudgment,
+    originalJudgment: mj.originalJudgment,
+    reason,
+  });
 
   const run = await getFromStore('checkupRuns', result.checkupRunId);
   if (run) {
@@ -345,12 +350,20 @@ export async function addNote(
   };
 
   await addToStore('notes', note);
-  await logAction('note', note.id, 'create', undefined, note, user);
+  await logAction(entityType, entityId, 'add_note', undefined, note, user, {
+    note: {
+      id: note.id,
+      content: note.content,
+      diffSummary: note.diffSummary,
+      operator: note.operator,
+      timestamp: note.timestamp,
+    },
+  });
 
   if (entityType === 'sample_result') {
     const result = await getFromStore('sampleResults', entityId);
     if (result) {
-      result.notes = [...result.notes, note];
+      result.notes = [...(result.notes || []), note];
       await putToStore('sampleResults', result);
     }
   }

@@ -12,6 +12,7 @@ import type {
   ModelVersion,
   JudgmentType,
   CreateCheckupOptions,
+  Note,
 } from '../types';
 
 interface CheckupState {
@@ -60,7 +61,17 @@ export const useCheckupStore = create<CheckupState>((set, get) => ({
   fetchResults: async (runId: string) => {
     set({ loading: true, error: null });
     try {
-      const results = await getFromIndex('sampleResults', 'by-checkupRunId', runId);
+      const rawResults = await getFromIndex('sampleResults', 'by-checkupRunId', runId);
+      const results = await Promise.all(
+        rawResults.map(async (r) => {
+          if (r.notes && r.notes.length > 0) return r;
+          const noteLogs = await getFromIndex('notes', 'by-entity', IDBKeyRange.only(['sample_result', r.id]));
+          if (noteLogs.length > 0) {
+            return { ...r, notes: noteLogs as Note[] };
+          }
+          return r;
+        })
+      );
       set({ results, currentResults: results, loading: false });
     } catch (error) {
       set({ error: (error as Error).message, loading: false });

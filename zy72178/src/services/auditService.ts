@@ -11,7 +11,8 @@ export async function logAction(
   action: AuditAction,
   beforeState?: Record<string, any>,
   afterState?: Record<string, any>,
-  operator?: string
+  operator?: string,
+  metadata?: Record<string, any>
 ): Promise<void> {
   const now = getCurrentISO();
   const user = operator || DEFAULT_USER;
@@ -26,7 +27,7 @@ export async function logAction(
     createdBy: user,
     operator: user,
     timestamp: now,
-    metadata: {},
+    metadata: metadata || {},
   };
 
   await addToStore('auditLogs', log);
