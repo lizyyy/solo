@@ -250,9 +250,12 @@ def test_full_workflow():
     print("老梁看到系统列出了冲突证据，不自动拍板，开始逐一确认...")
 
     conflict_decisions = []
+    alias_decisions = []
     for decision in step2_result['pending_decisions']:
         if decision['type'] == 'conflict':
             conflict_decisions.append(decision)
+        elif decision['type'] == 'alias_review':
+            alias_decisions.append(decision)
 
     for i, decision in enumerate(conflict_decisions):
         print(f"\n处理冲突 {i+1}/{len(conflict_decisions)}:")
@@ -269,6 +272,22 @@ def test_full_workflow():
         )
 
         print(f"  结果: {decision_result['prompt_for_instructor']}")
+
+    print(f"\n--- 处理同物异名复核 ---")
+    for i, decision in enumerate(alias_decisions):
+        print(f"\n复核同物异名 {i+1}/{len(alias_decisions)}:")
+        print(f"  「{decision['primary_name']}」 vs 「{decision['alias_name']}」")
+        print(f"  相似度: {decision['similarity']:.2f}, 距离: {decision['distance_meters']:.2f}米")
+        is_same = decision['similarity'] >= 0.5 or decision['distance_meters'] < 1.0
+        judgment = "同一物体的不同称呼" if is_same else "不同物体"
+        print(f"  学员判断: {judgment}")
+
+        review_result = orchestrator.review_alias(
+            candidate_id=decision['id'],
+            reviewer="xueyuan01",
+            is_same_object=is_same
+        )
+        print(f"  结果: {review_result['prompt_for_instructor']}")
 
     print_section("步骤3: 三维标注视图更新")
     print("所有冲突和复核处理完毕，进入最后一步，更新三维标注视图...")

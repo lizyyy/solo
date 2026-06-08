@@ -108,8 +108,25 @@ class AnnotationEngine:
             earliest = min(cluster, key=lambda p: p["obj"].submit_time)
             canonical_name = earliest["name"]
 
+        cluster_ids = set(p["id"] for p in cluster)
         cluster_names = set(p["name"] for p in cluster)
-        has_alias_issue = len(cluster_names) > 1
+
+        has_alias_issue = False
+        if len(cluster_names) > 1:
+            related_aliases = [
+                ac for ac in alias_candidates
+                if ac.primary_record_id in cluster_ids
+                and ac.alias_record_id in cluster_ids
+            ]
+            if not related_aliases:
+                has_alias_issue = True
+            else:
+                has_unresolved = any(
+                    ac.confirm_status == ConfirmStatus.PENDING
+                    for ac in related_aliases
+                )
+                if has_unresolved:
+                    has_alias_issue = True
 
         return canonical_name, has_alias_issue
 
@@ -211,13 +228,11 @@ class AnnotationEngine:
                 if c.confirm_status == ConfirmStatus.PENDING:
                     return True
 
-        cluster_names = set(p["name"] for p in cluster)
-        if len(cluster_names) > 1:
-            for ac in alias_candidates:
-                if (ac.primary_record_id in cluster_ids and
-                    ac.alias_record_id in cluster_ids and
-                    ac.confirm_status == ConfirmStatus.PENDING):
-                    return True
+        for ac in alias_candidates:
+            if (ac.primary_record_id in cluster_ids and
+                ac.alias_record_id in cluster_ids and
+                ac.confirm_status == ConfirmStatus.PENDING):
+                return True
 
         return False
 

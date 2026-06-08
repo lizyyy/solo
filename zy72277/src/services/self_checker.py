@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 from src.models.base import (
     AnnotationResult, SelfCheckReport, SelfCheckItem,
     RangefinderRecord, ObstacleAnnotation, ConfirmStatus
@@ -33,21 +33,38 @@ class SelfChecker:
         self,
         records: List[RangefinderRecord]
     ) -> SelfCheckItem:
-        duplicate_count = sum(1 for r in records if r.is_duplicate)
-        hash_groups = {}
-
+        hash_groups: Dict[str, List[RangefinderRecord]] = {}
         for r in records:
             if r.import_hash not in hash_groups:
                 hash_groups[r.import_hash] = []
-            hash_groups[r.import_hash].append(r.record_id)
+            hash_groups[r.import_hash].append(r)
 
-        duplicates_with_same_hash = [
-            f"哈希{h[:8]}: {len(ids)}条记录 - {', '.join(i[:8] for i in ids)}"
-            for h, ids in hash_groups.items()
-            if len(ids) > 1
-        ]
+        unhandled_duplicates = []
+        handled_info = []
+        for h, group in hash_groups.items():
+            if len(group) <= 1:
+                continue
+            flagged = [r for r in group if r.is_duplicate]
+            unflagged = [r for r in group if not r.is_duplicate]
+            if len(unflagged) == 1 and len(flagged) == len(group) - 1:
+                handled_info.append(
+                    f"哈希{h[:8]}: {len(group)}条记录，1条原始+{len(flagged)}条已标记重复 - 已正确处理"
+                )
+            else:
+                unhandled_duplicates.append(
+                    f"哈希{h[:8]}: {len(group)}条记录，其中{len(unflagged)}条未标记重复 - {', '.join(r.record_id[:8] for r in group)}"
+                )
 
-        if duplicate_count == 0 and not duplicates_with_same_hash:
+        if not unhandled_duplicates:
+            total_dup = sum(1 for r in records if r.is_duplicate)
+            if handled_info:
+                return SelfCheckItem(
+                    check_name="重复导入检测",
+                    passed=True,
+                    message=f"共{len(records)}条测距仪记录，{total_dup}条重复已正确标记处理",
+                    details=handled_info,
+                    severity="info"
+                )
             return SelfCheckItem(
                 check_name="重复导入检测",
                 passed=True,
@@ -58,8 +75,8 @@ class SelfChecker:
             return SelfCheckItem(
                 check_name="重复导入检测",
                 passed=False,
-                message=f"检测到{duplicate_count}条重复记录，涉及{len(duplicates_with_same_hash)}组相同内容",
-                details=duplicates_with_same_hash,
+                message=f"检测到{len(unhandled_duplicates)}组重复未正确处理",
+                details=unhandled_duplicates,
                 severity="warning"
             )
 
@@ -69,15 +86,26 @@ class SelfChecker:
             a for a in result.alias_candidates
             if a.confirm_status == ConfirmStatus.PENDING
         ]
-        annotations_with_alias_issue = [
+        annotations_with_unresolved_alias = [
             a for a in annotations if a.has_name_alias_issue
         ]
 
-        if not pending_alias and not annotations_with_alias_issue:
+        if not pending_alias and not annotations_with_unresolved_alias:
+            confirmed_alias = [
+                a for a in result.alias_candidates
+                if a.confirm_status != ConfirmStatus.PENDING
+            ]
+            if confirmed_alias:
+                return SelfCheckItem(
+                    check_name="同物异名检测",
+                    passed=True,
+                    message=f"共{len(annotations)}个障碍物，{len(confirmed_alias)}个同物异名已全部复核确认",
+                    severity="info"
+                )
             return SelfCheckItem(
                 check_name="同物异名检测",
                 passed=True,
-                message=f"共{len(annotations)}个障碍物，无未复核的同物异名",
+                message=f"共{len(annotations)}个障碍物，无同物异名问题",
                 severity="info"
             )
         else:
@@ -87,7 +115,7 @@ class SelfChecker:
                     f"待复核:「{ac.primary_name}」与「{ac.alias_name}」"
                     f"相似度{ac.similarity:.2f}，距离{ac.distance_meters:.2f}米"
                 )
-            for ann in annotations_with_alias_issue:
+            for ann in annotations_with_unresolved_alias:
                 all_names = set()
                 for rid in ann.source_records:
                     record = next(
@@ -104,14 +132,14 @@ class SelfChecker:
                     if remark:
                         all_names.add(remark.obstacle_name)
                 details.append(
-                    f"障碍物{ann.canonical_name}有{len(all_names)}个名称: {', '.join(all_names)}"
+                    f"障碍物{ann.canonical_name}有{len(all_names)}个名称待确认: {', '.join(all_names)}"
                 )
 
             return SelfCheckItem(
                 check_name="同物异名检测",
                 passed=False,
                 message=f"检测到{len(pending_alias)}个同物异名待复核，"
-                        f"{len(annotations_with_alias_issue)}个标注有名称问题",
+                        f"{len(annotations_with_unresolved_alias)}个标注有名称问题",
                 details=details,
                 severity="warning"
             )

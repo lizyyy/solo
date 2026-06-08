@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Optional
 from src.models.base import (
     RangefinderRecord, ObstacleRemark, NameAliasCandidate,
     OperationLog, ConfirmStatus
@@ -12,11 +12,18 @@ class AliasDetector:
     def detect_aliases(
         self,
         records: List[RangefinderRecord],
-        remarks: List[ObstacleRemark]
+        remarks: List[ObstacleRemark],
+        previous_candidates: List[NameAliasCandidate] = None
     ) -> Tuple[List[NameAliasCandidate], List[OperationLog]]:
         candidates: List[NameAliasCandidate] = []
         logs: List[OperationLog] = []
         all_items = []
+
+        prev_map = {}
+        if previous_candidates:
+            for pc in previous_candidates:
+                pair_key = tuple(sorted([pc.primary_record_id, pc.alias_record_id]))
+                prev_map[pair_key] = pc
 
         for r in records:
             if not r.is_duplicate:
@@ -66,22 +73,44 @@ class AliasDetector:
                     primary = item1 if item1["type"] == "record" else item2
                     alias = item2 if item1["type"] == "record" else item1
 
-                    candidate = NameAliasCandidate(
-                        primary_name=primary["name"],
-                        alias_name=alias["name"],
-                        similarity=similarity,
-                        distance_meters=distance,
-                        primary_record_id=primary["id"],
-                        alias_record_id=alias["id"],
-                        confirm_status=ConfirmStatus.PENDING
-                    )
-                    candidates.append(candidate)
+                    inherited = prev_map.get(pair_key)
 
-                    logs.append(OperationLog(
-                        operator="system",
-                        action="alias_candidate_detected",
-                        detail=f"发现可能的同物异名:「{primary['name']}」与「{alias['name']}」相似度{similarity:.2f}，距离{distance:.2f}米，待学员复核"
-                    ))
+                    if inherited and inherited.confirm_status != ConfirmStatus.PENDING:
+                        candidate = NameAliasCandidate(
+                            candidate_id=inherited.candidate_id,
+                            primary_name=primary["name"],
+                            alias_name=alias["name"],
+                            similarity=similarity,
+                            distance_meters=distance,
+                            primary_record_id=primary["id"],
+                            alias_record_id=alias["id"],
+                            confirm_status=inherited.confirm_status,
+                            reviewed_by=inherited.reviewed_by,
+                            reviewed_at=inherited.reviewed_at
+                        )
+                        candidates.append(candidate)
+                        logs.append(OperationLog(
+                            operator="system",
+                            action="alias_decision_inherited",
+                            detail=f"继承已有决策:「{primary['name']}」与「{alias['name']}」{inherited.confirm_status.value}"
+                        ))
+                    else:
+                        candidate = NameAliasCandidate(
+                            primary_name=primary["name"],
+                            alias_name=alias["name"],
+                            similarity=similarity,
+                            distance_meters=distance,
+                            primary_record_id=primary["id"],
+                            alias_record_id=alias["id"],
+                            confirm_status=ConfirmStatus.PENDING
+                        )
+                        candidates.append(candidate)
+
+                        logs.append(OperationLog(
+                            operator="system",
+                            action="alias_candidate_detected",
+                            detail=f"发现可能的同物异名:「{primary['name']}」与「{alias['name']}」相似度{similarity:.2f}，距离{distance:.2f}米，待学员复核"
+                        ))
 
         return candidates, logs
 

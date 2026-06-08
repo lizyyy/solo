@@ -76,7 +76,7 @@ class WorkflowOrchestrator:
         self_check = self.self_checker.run_all_checks(result)
 
         pending_aliases, alias_logs = self.alias_detector.detect_aliases(
-            records, []
+            records, [], previous_candidates=self.result_history[-1].alias_candidates if self.result_history else None
         )
         result.alias_candidates = pending_aliases
         result.operations_log.extend(alias_logs)
@@ -126,7 +126,8 @@ class WorkflowOrchestrator:
             all_logs.extend(conflict_logs)
 
         alias_candidates, alias_logs = self.alias_detector.detect_aliases(
-            previous_result.rangefinder_records, all_remarks
+            previous_result.rangefinder_records, all_remarks,
+            previous_candidates=previous_result.alias_candidates
         )
         all_logs.extend(alias_logs)
 
