@@ -41,7 +41,7 @@ router.post('/:id/export/generate', (req: Request, res: Response): void => {
       SELECT ri.*, ir.location_name, ir.address, ir.sunlight_hours, ir.source
       FROM review_items ri
       JOIN import_records ir ON ri.record_id = ir.id
-      WHERE ri.project_id = ? AND ri.status IN ('passed', 'failed', 'needs_field_visit')
+      WHERE ri.project_id = ? AND ri.status IN ('passed', 'failed', 'needs_field_visit', 'pending', 'conflict')
     `).all(id) as any[]
 
     const insertExport = db.prepare(`
@@ -53,17 +53,21 @@ router.post('/:id/export/generate', (req: Request, res: Response): void => {
       for (const item of reviewItems) {
         let category: string
         if (item.status === 'passed') category = 'processed'
-        else if (item.status === 'failed') category = 'pending_verification'
+        else if (item.status === 'failed' || item.status === 'pending' || item.status === 'conflict') category = 'pending_verification'
         else category = 'needs_field_visit'
 
         const judgmentBasis = item.status === 'passed'
           ? '日照时长达标，复核通过'
           : item.status === 'failed'
             ? '日照时长未达标，需进一步核实'
-            : '需要现场复看确认'
+            : item.status === 'pending'
+              ? '尚未复核，待核实'
+              : item.status === 'conflict'
+                ? '台账与实测数据冲突，待裁决核实'
+                : '需要现场复看确认'
 
         const lastNote = db.prepare(
-          `SELECT content FROM review_notes WHERE review_item_id = ? ORDER BY created_at DESC LIMIT 1`
+          `SELECT content FROM review_notes WHERE review_item_id = ? ORDER BY rowid DESC LIMIT 1`
         ).get(item.id) as any
 
         insertExport.run(

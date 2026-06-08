@@ -15,7 +15,7 @@ router.get('/:id/reviews', (req: Request, res: Response): void => {
     `).all(req.params.id)
 
     const enriched = (reviews as any[]).map((r) => {
-      const notes = db.prepare(`SELECT * FROM review_notes WHERE review_item_id = ? ORDER BY created_at DESC`).all(r.id)
+      const notes = db.prepare(`SELECT * FROM review_notes WHERE review_item_id = ? ORDER BY rowid DESC`).all(r.id)
       return { ...r, notes }
     })
 

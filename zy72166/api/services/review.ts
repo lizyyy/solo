@@ -49,7 +49,7 @@ export function addNote(
   if (!review) throw new Error('Review item not found')
 
   const lastNote = db.prepare(
-    `SELECT * FROM review_notes WHERE review_item_id = ? ORDER BY created_at DESC LIMIT 1`
+    `SELECT * FROM review_notes WHERE review_item_id = ? ORDER BY rowid DESC LIMIT 1`
   ).get(reviewItemId) as any
 
   let diffFromPrevious: string | null = null
@@ -75,7 +75,7 @@ export function addNote(
 
 export function getDiff(reviewItemId: string): any {
   const notes = db.prepare(
-    `SELECT * FROM review_notes WHERE review_item_id = ? ORDER BY created_at DESC LIMIT 2`
+    `SELECT *, rowid as _rowid FROM review_notes WHERE review_item_id = ? ORDER BY _rowid DESC LIMIT 2`
   ).all(reviewItemId) as any[]
 
   if (notes.length < 2) {
