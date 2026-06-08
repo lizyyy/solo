@@ -4,7 +4,7 @@ import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { statusColors } from '@/types';
 import type { DetectedObstacle } from '@/types';
-import { Info, AlertTriangle, CheckCircle, XCircle, RefreshCw } from 'lucide-react';
+import { Info, AlertTriangle, CheckCircle, XCircle, RefreshCw, MessageSquare } from 'lucide-react';
 
 interface ObstacleMarkerProps {
   obstacle: DetectedObstacle;
@@ -103,6 +103,12 @@ export function ObstacleMarker({ obstacle, isActive, onClick }: ObstacleMarkerPr
             {obstacle.conflictNote && (
               <div className="mt-1 pt-1 border-t border-gray-600 text-[10px] text-yellow-300 max-w-[200px] whitespace-normal">
                 {obstacle.conflictNote}
+              </div>
+            )}
+            {obstacle.manualNote && (
+              <div className="mt-1 pt-1 border-t border-gray-600 flex items-start gap-1 text-[10px] text-blue-300 max-w-[200px] whitespace-normal">
+                <MessageSquare size={10} className="flex-shrink-0 mt-0.5" />
+                <span>{obstacle.manualNote}</span>
               </div>
             )}
           </div>

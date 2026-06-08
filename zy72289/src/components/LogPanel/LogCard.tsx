@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FileText, Clock, User, ChevronDown, ChevronUp, AlertTriangle, CheckCircle, RefreshCw } from 'lucide-react';
+import { FileText, Clock, User, ChevronDown, ChevronUp, AlertTriangle, CheckCircle, RefreshCw, MessageSquare } from 'lucide-react';
 import type { PointCloudLog } from '@/types';
 import { statusLabels, statusColors } from '@/types';
 import { scenarioDescriptions } from '@/data/mockData';
+import { useAppStore } from '@/store/useAppStore';
 
 interface LogCardProps {
   log: PointCloudLog;
@@ -18,6 +19,9 @@ const statusIcons = {
 
 export function LogCard({ log, isLatest }: LogCardProps) {
   const [expanded, setExpanded] = useState(isLatest);
+  const [noteInput, setNoteInput] = useState<Record<string, string>>({});
+  const [noteEditing, setNoteEditing] = useState<Record<string, boolean>>({});
+  const { addManualNote } = useAppStore();
 
   const scenarioInfo = scenarioDescriptions[log.scenarioType];
   const StatusIcon = statusIcons[log.status];
@@ -154,33 +158,105 @@ export function LogCard({ log, isLatest }: LogCardProps) {
                   {log.detectedObstacles.map((obs) => (
                     <div
                       key={obs.id}
-                      className="flex items-center justify-between bg-primary-900/50 p-2 rounded text-xs"
+                      className="bg-primary-900/50 p-2 rounded text-xs"
                     >
-                      <div className="flex items-center gap-2">
-                        <span
-                          className="w-2 h-2 rounded-full"
-                          style={{ backgroundColor: statusColors[obs.status] }}
-                        />
-                        <span className="text-white">{obs.name}</span>
-                        {obs.alias && (
-                          <span className="text-yellow-500 text-[10px]">
-                            (别名: {obs.alias})
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className="w-2 h-2 rounded-full"
+                            style={{ backgroundColor: statusColors[obs.status] }}
+                          />
+                          <span className="text-white">{obs.name}</span>
+                          {obs.alias && (
+                            <span className="text-yellow-500 text-[10px]">
+                              (别名: {obs.alias})
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-gray-400 font-mono">
+                            {obs.detectedRadius}m
                           </span>
-                        )}
+                          <span
+                            className="px-1.5 py-0.5 rounded text-[10px]"
+                            style={{
+                              backgroundColor: statusColors[obs.status] + '30',
+                              color: statusColors[obs.status],
+                            }}
+                          >
+                            {statusLabels[obs.status]}
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-gray-400 font-mono">
-                          {obs.detectedRadius}m
-                        </span>
-                        <span
-                          className="px-1.5 py-0.5 rounded text-[10px]"
-                          style={{
-                            backgroundColor: statusColors[obs.status] + '30',
-                            color: statusColors[obs.status],
-                          }}
-                        >
-                          {statusLabels[obs.status]}
-                        </span>
+
+                      {obs.conflictNote && (
+                        <div className="mt-1.5 text-[10px] text-yellow-400 leading-relaxed">
+                          {obs.conflictNote}
+                        </div>
+                      )}
+
+                      {obs.manualNote && (
+                        <div className="mt-1.5 flex items-start gap-1.5 text-[10px] text-blue-300 bg-blue-900/20 px-2 py-1 rounded">
+                          <MessageSquare size={10} className="mt-0.5 flex-shrink-0" />
+                          <span>{obs.manualNote}</span>
+                        </div>
+                      )}
+
+                      <div className="mt-1.5 flex items-center gap-1.5">
+                        {noteEditing[obs.id] ? (
+                          <>
+                            <input
+                              type="text"
+                              value={noteInput[obs.id] ?? ''}
+                              onChange={(e) =>
+                                setNoteInput((prev) => ({ ...prev, [obs.id]: e.target.value }))
+                              }
+                              placeholder="输入人工备注..."
+                              className="flex-1 px-2 py-1 text-[10px] bg-primary-800 border border-primary-600 rounded text-white placeholder:text-gray-600"
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' && noteInput[obs.id]?.trim()) {
+                                  addManualNote(obs.id, noteInput[obs.id].trim());
+                                  setNoteEditing((prev) => ({ ...prev, [obs.id]: false }));
+                                  setNoteInput((prev) => ({ ...prev, [obs.id]: '' }));
+                                }
+                                if (e.key === 'Escape') {
+                                  setNoteEditing((prev) => ({ ...prev, [obs.id]: false }));
+                                }
+                              }}
+                              autoFocus
+                            />
+                            <button
+                              onClick={() => {
+                                if (noteInput[obs.id]?.trim()) {
+                                  addManualNote(obs.id, noteInput[obs.id].trim());
+                                  setNoteEditing((prev) => ({ ...prev, [obs.id]: false }));
+                                  setNoteInput((prev) => ({ ...prev, [obs.id]: '' }));
+                                }
+                              }}
+                              className="px-1.5 py-0.5 text-[10px] bg-blue-600 text-white rounded hover:bg-blue-500"
+                            >
+                              保存
+                            </button>
+                            <button
+                              onClick={() =>
+                                setNoteEditing((prev) => ({ ...prev, [obs.id]: false }))
+                              }
+                              className="px-1.5 py-0.5 text-[10px] text-gray-400 hover:text-white"
+                            >
+                              取消
+                            </button>
+                          </>
+                        ) : (
+                          <button
+                            onClick={() =>
+                              setNoteEditing((prev) => ({ ...prev, [obs.id]: true }))
+                            }
+                            className="flex items-center gap-1 px-1.5 py-0.5 text-[10px] text-gray-500 hover:text-blue-400 transition-colors"
+                          >
+                            <MessageSquare size={10} />
+                            <span>{obs.manualNote ? '编辑备注' : '添加备注'}</span>
+                          </button>
+                        )}
                       </div>
                     </div>
                   ))}

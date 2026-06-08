@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { FileText, Search, Edit3, RefreshCw, AlertTriangle, Eye } from 'lucide-react';
+import { FileText, Search, Edit3, RefreshCw, AlertTriangle, Eye, MessageSquare } from 'lucide-react';
 import type { HistoryRecord } from '@/types';
 import { statusColors } from '@/types';
 
@@ -41,6 +41,11 @@ const actionConfig: Record<
     icon: AlertTriangle,
     label: '标记待复核',
     color: statusColors.pending_review,
+  },
+  add_note: {
+    icon: MessageSquare,
+    label: '人工备注',
+    color: '#60a5fa',
   },
 };
 

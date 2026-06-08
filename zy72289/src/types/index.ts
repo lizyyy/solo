@@ -27,6 +27,7 @@ export interface DetectedObstacle {
   correctedRadius?: number;
   deviceId?: string;
   voltageLevel?: string;
+  manualNote?: string;
 }
 
 export interface SafetyRadiusEntry {
@@ -42,7 +43,7 @@ export interface SafetyRadiusEntry {
   hasConflict?: boolean;
 }
 
-export type ActionType = 'import_log' | 'check_radius' | 'manual_correct' | 're_run' | 'mark_review' | 'update_annotation';
+export type ActionType = 'import_log' | 'check_radius' | 'manual_correct' | 're_run' | 'mark_review' | 'update_annotation' | 'add_note';
 
 export interface HistoryRecord {
   id: string;
@@ -75,6 +76,7 @@ export interface AppActions {
   updateAnnotation: () => void;
   manualCorrect: (obstacleId: string, newRadius: number) => void;
   markForReview: (obstacleId: string) => void;
+  addManualNote: (obstacleId: string, note: string) => void;
   reRun: () => void;
   resetDemo: () => void;
   selectObstacle: (id: string | null) => void;

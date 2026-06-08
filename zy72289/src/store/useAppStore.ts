@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { AppStore, DetectedObstacle, HistoryRecord, PointCloudLog } from '@/types';
+import type { AppStore, CurrentStep, DetectedObstacle, HistoryRecord, PointCloudLog, ScenarioType } from '@/types';
 import {
   initialPointCloudLogs,
   safetyRadiusTable,
@@ -8,6 +8,8 @@ import {
   oldCaliberLog,
 } from '@/data/mockData';
 
+const STORAGE_KEY = 'substation-safety-demo-state';
+
 const generateId = () => Math.random().toString(36).substring(2, 11);
 
 const getCurrentTime = () => new Date().toISOString();
@@ -15,14 +17,50 @@ const getCurrentTime = () => new Date().toISOString();
 const deepCloneObstacles = (obstacles: DetectedObstacle[]): DetectedObstacle[] =>
   JSON.parse(JSON.stringify(obstacles));
 
+interface PersistedState {
+  currentStep: number;
+  pointCloudLogs: PointCloudLog[];
+  historyRecords: HistoryRecord[];
+  scenarioType: string | null;
+  isDemoRunning: boolean;
+}
+
+const loadPersistedState = (): Partial<PersistedState> | null => {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as Partial<PersistedState>;
+  } catch {
+    return null;
+  }
+};
+
+const persistState = (state: PersistedState) => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch {
+    // ignore quota errors
+  }
+};
+
+const clearPersistedState = () => {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // ignore
+  }
+};
+
+const saved = loadPersistedState();
+
 export const useAppStore = create<AppStore>((set, get) => ({
-  currentStep: 1,
-  pointCloudLogs: initialPointCloudLogs,
+  currentStep: (saved?.currentStep as CurrentStep) ?? 1,
+  pointCloudLogs: saved?.pointCloudLogs ?? initialPointCloudLogs,
   safetyRadiusTable: safetyRadiusTable,
-  historyRecords: [],
+  historyRecords: saved?.historyRecords ?? [],
   activeObstacleId: null,
-  scenarioType: null,
-  isDemoRunning: false,
+  scenarioType: (saved?.scenarioType as ScenarioType) ?? null,
+  isDemoRunning: saved?.isDemoRunning ?? false,
 
   importLog: (scenarioType) => {
     if (!scenarioType) return;
@@ -57,13 +95,23 @@ export const useAppStore = create<AppStore>((set, get) => ({
       },
     };
 
-    set((state) => ({
-      pointCloudLogs: [...state.pointCloudLogs, clonedLog],
-      historyRecords: [...state.historyRecords, historyRecord],
-      scenarioType: scenarioType,
-      currentStep: 1,
-      isDemoRunning: true,
-    }));
+    set((state) => {
+      const next = {
+        pointCloudLogs: [...state.pointCloudLogs, clonedLog],
+        historyRecords: [...state.historyRecords, historyRecord],
+        scenarioType: scenarioType,
+        currentStep: 1 as const,
+        isDemoRunning: true,
+      };
+      persistState({
+        currentStep: next.currentStep,
+        pointCloudLogs: next.pointCloudLogs,
+        historyRecords: next.historyRecords,
+        scenarioType: next.scenarioType,
+        isDemoRunning: next.isDemoRunning,
+      });
+      return next;
+    });
   },
 
   checkRadiusTable: () => {
@@ -85,6 +133,11 @@ export const useAppStore = create<AppStore>((set, get) => ({
           correctedRadius: radiusEntry.newRadius,
         };
       }
+
+      if (obs.status === 'pending_review') {
+        return obs;
+      }
+
       return { ...obs, status: 'normal' as const };
     });
 
@@ -106,13 +159,23 @@ export const useAppStore = create<AppStore>((set, get) => ({
       },
     };
 
-    set((state) => ({
-      pointCloudLogs: state.pointCloudLogs.map((log) =>
-        log.id === latestLog.id ? updatedLog : log
-      ),
-      historyRecords: [...state.historyRecords, historyRecord],
-      currentStep: 2,
-    }));
+    set((state) => {
+      const next = {
+        pointCloudLogs: state.pointCloudLogs.map((log) =>
+          log.id === latestLog.id ? updatedLog : log
+        ),
+        historyRecords: [...state.historyRecords, historyRecord],
+        currentStep: 2 as const,
+      };
+      persistState({
+        currentStep: next.currentStep,
+        pointCloudLogs: next.pointCloudLogs,
+        historyRecords: next.historyRecords,
+        scenarioType: get().scenarioType,
+        isDemoRunning: get().isDemoRunning,
+      });
+      return next;
+    });
   },
 
   updateAnnotation: () => {
@@ -128,6 +191,9 @@ export const useAppStore = create<AppStore>((set, get) => ({
           status: 'normal' as const,
           correctedRadius: undefined,
         };
+      }
+      if (obs.status === 'pending_review') {
+        return obs;
       }
       return obs;
     });
@@ -149,13 +215,23 @@ export const useAppStore = create<AppStore>((set, get) => ({
       },
     };
 
-    set((state) => ({
-      pointCloudLogs: state.pointCloudLogs.map((log) =>
-        log.id === latestLog.id ? updatedLog : log
-      ),
-      historyRecords: [...state.historyRecords, historyRecord],
-      currentStep: 3,
-    }));
+    set((state) => {
+      const next = {
+        pointCloudLogs: state.pointCloudLogs.map((log) =>
+          log.id === latestLog.id ? updatedLog : log
+        ),
+        historyRecords: [...state.historyRecords, historyRecord],
+        currentStep: 3 as const,
+      };
+      persistState({
+        currentStep: next.currentStep,
+        pointCloudLogs: next.pointCloudLogs,
+        historyRecords: next.historyRecords,
+        scenarioType: get().scenarioType,
+        isDemoRunning: get().isDemoRunning,
+      });
+      return next;
+    });
   },
 
   manualCorrect: (obstacleId, newRadius) => {
@@ -191,12 +267,22 @@ export const useAppStore = create<AppStore>((set, get) => ({
       },
     };
 
-    set((state) => ({
-      pointCloudLogs: state.pointCloudLogs.map((log) =>
-        log.id === latestLog.id ? updatedLog : log
-      ),
-      historyRecords: [...state.historyRecords, historyRecord],
-    }));
+    set((state) => {
+      const next = {
+        pointCloudLogs: state.pointCloudLogs.map((log) =>
+          log.id === latestLog.id ? updatedLog : log
+        ),
+        historyRecords: [...state.historyRecords, historyRecord],
+      };
+      persistState({
+        currentStep: get().currentStep,
+        pointCloudLogs: next.pointCloudLogs,
+        historyRecords: next.historyRecords,
+        scenarioType: get().scenarioType,
+        isDemoRunning: get().isDemoRunning,
+      });
+      return next;
+    });
   },
 
   markForReview: (obstacleId) => {
@@ -231,12 +317,75 @@ export const useAppStore = create<AppStore>((set, get) => ({
       },
     };
 
-    set((state) => ({
-      pointCloudLogs: state.pointCloudLogs.map((log) =>
-        log.id === latestLog.id ? updatedLog : log
-      ),
-      historyRecords: [...state.historyRecords, historyRecord],
-    }));
+    set((state) => {
+      const next = {
+        pointCloudLogs: state.pointCloudLogs.map((log) =>
+          log.id === latestLog.id ? updatedLog : log
+        ),
+        historyRecords: [...state.historyRecords, historyRecord],
+      };
+      persistState({
+        currentStep: get().currentStep,
+        pointCloudLogs: next.pointCloudLogs,
+        historyRecords: next.historyRecords,
+        scenarioType: get().scenarioType,
+        isDemoRunning: get().isDemoRunning,
+      });
+      return next;
+    });
+  },
+
+  addManualNote: (obstacleId, note) => {
+    const state = get();
+    const latestLog = state.pointCloudLogs[state.pointCloudLogs.length - 1];
+    if (!latestLog) return;
+
+    const targetObs = latestLog.detectedObstacles.find((o) => o.id === obstacleId);
+    if (!targetObs) return;
+
+    const obstaclesToUpdate = latestLog.detectedObstacles.map((obs) => {
+      if (obs.id === obstacleId) {
+        return {
+          ...obs,
+          manualNote: note,
+        };
+      }
+      return obs;
+    });
+
+    const updatedLog = {
+      ...latestLog,
+      detectedObstacles: obstaclesToUpdate,
+    };
+
+    const historyRecord: HistoryRecord = {
+      id: generateId(),
+      timestamp: getCurrentTime(),
+      actionType: 'add_note',
+      operator: '园区运维小陶',
+      description: `人工备注 - ${targetObs.name}: ${note}`,
+      affectedObstacleIds: [obstacleId],
+      snapshot: {
+        obstacles: deepCloneObstacles(obstaclesToUpdate),
+      },
+    };
+
+    set((state) => {
+      const next = {
+        pointCloudLogs: state.pointCloudLogs.map((log) =>
+          log.id === latestLog.id ? updatedLog : log
+        ),
+        historyRecords: [...state.historyRecords, historyRecord],
+      };
+      persistState({
+        currentStep: get().currentStep,
+        pointCloudLogs: next.pointCloudLogs,
+        historyRecords: next.historyRecords,
+        scenarioType: get().scenarioType,
+        isDemoRunning: get().isDemoRunning,
+      });
+      return next;
+    });
   },
 
   reRun: () => {
@@ -274,15 +423,26 @@ export const useAppStore = create<AppStore>((set, get) => ({
       },
     };
 
-    set((state) => ({
-      pointCloudLogs: state.pointCloudLogs.map((log) =>
-        log.id === latestLog.id ? updatedLog : log
-      ),
-      historyRecords: [...state.historyRecords, historyRecord],
-    }));
+    set((state) => {
+      const next = {
+        pointCloudLogs: state.pointCloudLogs.map((log) =>
+          log.id === latestLog.id ? updatedLog : log
+        ),
+        historyRecords: [...state.historyRecords, historyRecord],
+      };
+      persistState({
+        currentStep: get().currentStep,
+        pointCloudLogs: next.pointCloudLogs,
+        historyRecords: next.historyRecords,
+        scenarioType: get().scenarioType,
+        isDemoRunning: get().isDemoRunning,
+      });
+      return next;
+    });
   },
 
   resetDemo: () => {
+    clearPersistedState();
     set({
       currentStep: 1,
       pointCloudLogs: [],
