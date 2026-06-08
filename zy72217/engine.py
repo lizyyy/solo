@@ -3,7 +3,7 @@ import re
 from datetime import datetime
 from typing import List, Dict, Any, Tuple, Optional
 from models import (
-    AdjustmentEntry, ProcessingStatus, AbnormalType,
+    AdjustmentEntry, ProcessingStatus, AbnormalType, EntrySource,
     PositionGapWarning, CustodianConfirmation
 )
 from store import store
@@ -99,20 +99,41 @@ class SelfCheckEngine:
         }
 
     @staticmethod
-    def run_all_checks(warning: PositionGapWarning, file_name: str = None) -> List[Dict[str, Any]]:
+    def run_all_checks(warning: PositionGapWarning, file_name: str = None, include_duplicate_check: bool = False) -> List[Dict[str, Any]]:
         results = []
 
-        if file_name:
-            results.append(SelfCheckEngine.check_duplicate_import(file_name, warning.id))
+        if include_duplicate_check:
+            for record in store._import_history:
+                if record['warning_id'] == warning.id:
+                    count = sum(
+                        1 for r in store._import_history
+                        if r['file_name'] == record['file_name'] and r['warning_id'] == warning.id
+                    )
+                    if count > 1:
+                        results.append({
+                            'check_name': '重复导入检测',
+                            'passed': False,
+                            'message': f'文件 {record["file_name"]} 被导入了 {count} 次',
+                            'level': 'error'
+                        })
+                        break
+            if not any(r['check_name'] == '重复导入检测' for r in results):
+                results.append({
+                    'check_name': '重复导入检测',
+                    'passed': True,
+                    'message': '无重复导入',
+                    'level': 'info'
+                })
 
         for entry in warning.entries:
-            row_check = SelfCheckEngine.check_single_row_mixed_currency(entry.raw_import_data)
-            if not row_check['passed']:
-                results.append({
-                    **row_check,
-                    'entry_id': entry.id,
-                    'row_number': entry.original_row_number
-                })
+            if AbnormalType.MIXED_CURRENCY in entry.abnormal_types:
+                row_check = SelfCheckEngine.check_single_row_mixed_currency(entry.raw_import_data)
+                if not row_check['passed']:
+                    results.append({
+                        **row_check,
+                        'entry_id': entry.id,
+                        'row_number': entry.original_row_number
+                    })
 
         results.append(SelfCheckEngine.check_export_consistency(warning))
 
@@ -207,7 +228,7 @@ class PositionGapService:
         warning.status = ProcessingStatus.IMPORTED
         store.update_warning(warning)
 
-        SelfCheckEngine.run_all_checks(warning, file_name)
+        SelfCheckEngine.run_all_checks(warning)
 
         return {
             'success': True,
@@ -320,6 +341,135 @@ class PositionGapService:
         }
 
     @staticmethod
+    def supplement_entries(warning_id: str, rows: List[Dict[str, Any]], operator: str,
+                           remark: str = None) -> Dict[str, Any]:
+        warning = store.get_warning(warning_id)
+        if not warning:
+            return {'success': False, 'message': '预警记录不存在'}
+
+        if warning.status == ProcessingStatus.PENDING:
+            return {'success': False, 'message': '请先完成首次导入，再进行补录'}
+
+        batch_id = str(uuid.uuid4())
+        max_row = max((e.original_row_number for e in warning.entries), default=0)
+        supplemented_entries = []
+        abnormal_entries = []
+
+        for idx, row in enumerate(rows, start=1):
+            row_number = max_row + idx
+            security_code = str(row.get('security_code', row.get('证券代码', f'SUPP-{idx}')))
+            security_name = str(row.get('security_name', row.get('证券名称', '补录证券')))
+            raw_amount = row.get('amount', row.get('金额', '0'))
+
+            amount, currency, mixed_note = PositionGapService.parse_amount(raw_amount)
+
+            entry = AdjustmentEntry(
+                id=str(uuid.uuid4()),
+                original_row_number=row_number,
+                security_code=security_code,
+                security_name=security_name,
+                original_amount=amount,
+                original_currency=currency,
+                raw_import_data=row,
+                source=EntrySource.SUPPLEMENT,
+                supplement_batch_id=batch_id
+            )
+
+            if currency == 'MIXED':
+                entry.abnormal_types.append(AbnormalType.MIXED_CURRENCY)
+                entry.mixed_currency_note = mixed_note
+                entry.current_status = ProcessingStatus.NEEDS_REVIEW
+                abnormal_entries.append(entry)
+            else:
+                entry.current_status = ProcessingStatus.IMPORTED
+
+            store.add_audit_trail(entry, operator, '补录尾差调整条',
+                                  before_value=None,
+                                  after_value=f'金额: {amount} {currency}',
+                                  remark=remark)
+
+            supplemented_entries.append(entry)
+            store.add_adjustment_entry(warning_id, entry)
+
+        store.update_warning(warning)
+
+        SelfCheckEngine.run_all_checks(warning)
+
+        return {
+            'success': True,
+            'message': f'补录 {len(supplemented_entries)} 条记录，异常 {len(abnormal_entries)} 条',
+            'supplemented_count': len(supplemented_entries),
+            'abnormal_count': len(abnormal_entries),
+            'batch_id': batch_id
+        }
+
+    @staticmethod
+    def recalculate(warning_id: str, operator: str) -> Dict[str, Any]:
+        warning = store.get_warning(warning_id)
+        if not warning:
+            return {'success': False, 'message': '预警记录不存在'}
+
+        before_gap = warning.total_gap_amount
+        before_abnormal = sum(1 for e in warning.entries if e.abnormal_types)
+
+        recalculated_count = 0
+        for entry in warning.entries:
+            if entry.manual_adjustment is not None and entry.adjusted_amount != entry.original_amount + entry.manual_adjustment:
+                old_adjusted = entry.adjusted_amount
+                entry.adjusted_amount = entry.original_amount + entry.manual_adjustment
+                store.add_audit_trail(entry, operator, '重算调整后金额',
+                                      before_value=str(old_adjusted),
+                                      after_value=str(entry.adjusted_amount))
+                recalculated_count += 1
+            elif entry.manual_adjustment is not None and entry.adjusted_amount is None:
+                entry.adjusted_amount = entry.original_amount + entry.manual_adjustment
+                recalculated_count += 1
+
+        total_gap = 0.0
+        for entry in warning.entries:
+            effective_amount = entry.adjusted_amount if entry.adjusted_amount is not None else entry.original_amount
+            total_gap += effective_amount
+
+        warning.total_gap_amount = total_gap
+        warning.last_recalculate_time = datetime.now().isoformat()
+        after_abnormal = sum(1 for e in warning.entries if e.abnormal_types)
+
+        store.add_audit_trail(
+            warning.entries[0] if warning.entries else AdjustmentEntry(
+                id='recalc', original_row_number=0, security_code='N/A',
+                security_name='N/A', original_amount=0, original_currency='CNY'
+            ),
+            operator, '重算',
+            before_value=f'缺口总额: {before_gap}, 异常数: {before_abnormal}',
+            after_value=f'缺口总额: {total_gap}, 异常数: {after_abnormal}, 重算条目: {recalculated_count}'
+        )
+
+        store.update_warning(warning)
+
+        SelfCheckEngine.run_all_checks(warning, include_duplicate_check=True)
+
+        export_data = PositionGapService.get_export_data(warning.id)
+        page_data = PositionGapService.get_page_display_data(warning.id)
+        api_data = PositionGapService.get_api_response_data(warning.id)
+        consistency_ok = (
+            len(export_data.get('entries', [])) == len(page_data.get('entries', [])) == len(api_data.get('entries', []))
+            and export_data.get('abnormal_count', 0) == page_data.get('abnormal_count', 0) == api_data.get('abnormal_count', 0)
+            and export_data.get('total_entries', 0) == page_data.get('total_entries', 0) == api_data.get('total_entries', 0)
+        )
+
+        return {
+            'success': True,
+            'message': f'重算完成，修正 {recalculated_count} 条，缺口总额 {before_gap} → {total_gap}',
+            'recalculated_count': recalculated_count,
+            'before_gap': before_gap,
+            'after_gap': total_gap,
+            'before_abnormal': before_abnormal,
+            'after_abnormal': after_abnormal,
+            'consistency_ok': consistency_ok,
+            'total_entries': len(warning.entries)
+        }
+
+    @staticmethod
     def _serialize_entry(entry: AdjustmentEntry) -> Dict[str, Any]:
         return {
             'id': entry.id,
@@ -334,6 +484,8 @@ class PositionGapService:
             'abnormal_types': [t for t in entry.abnormal_types],
             'mixed_currency_note': entry.mixed_currency_note,
             'custodian_note': entry.custodian_note,
+            'source': entry.source,
+            'supplement_batch_id': entry.supplement_batch_id,
             'audit_trails': [
                 {
                     'timestamp': t.timestamp.isoformat(),
@@ -364,6 +516,8 @@ class PositionGapService:
             'entries': entries,
             'total_entries': len(entries),
             'abnormal_count': abnormal_count,
+            'total_gap_amount': warning.total_gap_amount,
+            'last_recalculate_time': warning.last_recalculate_time,
             'export_time': datetime.now().isoformat()
         }
 

@@ -21,6 +21,11 @@ class AbnormalType(str, Enum):
     MISSING_DATA = "数据缺失"
 
 
+class EntrySource(str, Enum):
+    IMPORT = "首次导入"
+    SUPPLEMENT = "补录"
+
+
 @dataclass
 class AuditTrail:
     timestamp: datetime
@@ -47,6 +52,8 @@ class AdjustmentEntry:
     custodian_note: Optional[str] = None
     mixed_currency_note: Optional[str] = None
     raw_import_data: Dict[str, Any] = field(default_factory=dict)
+    source: EntrySource = EntrySource.IMPORT
+    supplement_batch_id: Optional[str] = None
 
 
 @dataclass
@@ -74,3 +81,4 @@ class PositionGapWarning:
     updated_at: datetime = field(default_factory=datetime.now)
     status: ProcessingStatus = ProcessingStatus.PENDING
     self_check_results: List[Dict[str, Any]] = field(default_factory=list)
+    last_recalculate_time: Optional[str] = None

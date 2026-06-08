@@ -101,13 +101,36 @@ def update_audit(warning_id):
     return jsonify(result)
 
 
+@app.route('/api/warnings/<warning_id>/supplement', methods=['POST'])
+def supplement_entries(warning_id):
+    data = request.json
+    rows = data.get('rows', [])
+    result = PositionGapService.supplement_entries(
+        warning_id=warning_id,
+        rows=rows,
+        operator=data.get('operator', '林姐'),
+        remark=data.get('remark')
+    )
+    return jsonify(result)
+
+
+@app.route('/api/warnings/<warning_id>/recalculate', methods=['POST'])
+def recalculate(warning_id):
+    data = request.json
+    result = PositionGapService.recalculate(
+        warning_id=warning_id,
+        operator=data.get('operator', '林姐')
+    )
+    return jsonify(result)
+
+
 @app.route('/api/warnings/<warning_id>/self-check', methods=['GET'])
 def run_self_check(warning_id):
     warning = store.get_warning(warning_id)
     if not warning:
         return jsonify({'success': False, 'message': '预警记录不存在'}), 404
 
-    results = SelfCheckEngine.run_all_checks(warning)
+    results = SelfCheckEngine.run_all_checks(warning, include_duplicate_check=True)
     return jsonify({
         'success': True,
         'check_results': results,

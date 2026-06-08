@@ -59,10 +59,11 @@ class DataStore:
         })
 
     def is_duplicate_import(self, file_name: str, warning_id: str) -> bool:
-        for record in self._import_history:
-            if record['file_name'] == file_name and record['warning_id'] == warning_id:
-                return True
-        return False
+        count = sum(
+            1 for record in self._import_history
+            if record['file_name'] == file_name and record['warning_id'] == warning_id
+        )
+        return count > 1
 
 
 store = DataStore()

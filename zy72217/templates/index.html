@@ -42,6 +42,14 @@
         tr:hover td { background: #f8fafc; }
         .row-number { font-family: 'Monaco', monospace; background: #f1f5f9; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
         .mixed-currency { background: #fef3c7; padding: 4px 8px; border-radius: 4px; font-size: 12px; color: #92400e; }
+        .source-badge { display: inline-block; padding: 2px 8px; border-radius: 8px; font-size: 11px; font-weight: 500; }
+        .source-import { background: #dbeafe; color: #1d4ed8; }
+        .source-supplement { background: #fef3c7; color: #92400e; }
+        .gap-summary { display: flex; gap: 24px; margin-bottom: 16px; }
+        .gap-item { background: #f8fafc; padding: 12px 20px; border-radius: 8px; }
+        .gap-label { font-size: 12px; color: #64748b; margin-bottom: 4px; }
+        .gap-value { font-size: 20px; font-weight: 600; color: #1e293b; }
+        .gap-value .unit { font-size: 13px; color: #64748b; font-weight: 400; margin-left: 4px; }
 
         .btn { padding: 8px 16px; border: none; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
         .btn-primary { background: #3b82f6; color: white; }
@@ -110,12 +118,31 @@
         <div class="card">
             <div class="card-title">尾差调整条明细</div>
             <div class="info-box">
-                <p><strong>操作指引：</strong>港币和人民币写在同一列的记录会标为"需托管复核"，别急着改，先让托管对接人确认。每一条都保留原始行号、人工改动痕迹、完整审计追踪，对账时能回到证据。</p>
+                <p><strong>操作指引：</strong>港币和人民币写在同一列的记录会标为"需托管复核"，别急着改，先让托管对接人确认。每一条都保留原始行号、人工改动痕迹、完整审计追踪，对账时能回到证据。补录后记得点"重算"对齐数据。</p>
+            </div>
+            <div class="gap-summary" id="gapSummary">
+                <div class="gap-item">
+                    <div class="gap-label">缺口总额</div>
+                    <div class="gap-value" id="gapTotal">0<span class="unit">元</span></div>
+                </div>
+                <div class="gap-item">
+                    <div class="gap-label">记录总数</div>
+                    <div class="gap-value" id="gapEntries">0<span class="unit">条</span></div>
+                </div>
+                <div class="gap-item">
+                    <div class="gap-label">异常记录</div>
+                    <div class="gap-value" id="gapAbnormal">0<span class="unit">条</span></div>
+                </div>
+                <div class="gap-item">
+                    <div class="gap-label">上次重算时间</div>
+                    <div class="gap-value" id="gapRecalcTime" style="font-size:14px;">未重算</div>
+                </div>
             </div>
             <table>
                 <thead>
                     <tr>
                         <th>原始行号</th>
+                        <th>来源</th>
                         <th>证券代码</th>
                         <th>证券名称</th>
                         <th>原始金额</th>
@@ -136,6 +163,8 @@
             <div class="card-title">快捷操作</div>
             <div class="btn-group">
                 <button class="btn btn-primary" onclick="showImportModal()">导入尾差调整条</button>
+                <button class="btn btn-primary" onclick="showSupplementModal()" style="background:#7c3aed;">补录条目</button>
+                <button class="btn btn-warning" onclick="doRecalculate()">重算</button>
                 <button class="btn btn-success" onclick="updateAudit()">更新审计明细</button>
                 <button class="btn btn-secondary" onclick="exportData()">导出CSV</button>
                 <button class="btn btn-warning" onclick="runSelfCheck()">重新自检</button>
@@ -248,6 +277,31 @@
         </div>
     </div>
 
+    <div class="modal" id="supplementModal">
+        <div class="modal-content">
+            <div class="modal-title">补录尾差调整条</div>
+            <div class="info-box">
+                <p>补录用于首次导入后追加遗漏的条目。补录条目会独立标记来源为"补录"，行号接续已有最大行号。补录完成后请点"重算"对齐缺口总额。</p>
+            </div>
+            <div class="form-group">
+                <label>补录数据（每行一条记录）</label>
+                <textarea id="supplementData" rows="6" placeholder="证券代码,证券名称,金额&#10;002415,海康威视,200000&#10;601318,中国平安,HKD150000/RMB120000"></textarea>
+            </div>
+            <div class="form-group">
+                <label>操作人</label>
+                <input type="text" id="supplementOperator" value="林姐">
+            </div>
+            <div class="form-group">
+                <label>备注</label>
+                <input type="text" id="supplementRemark" placeholder="例如：漏补第二条">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('supplementModal')">取消</button>
+                <button class="btn btn-primary" onclick="doSupplement()" style="background:#7c3aed;">确认补录</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const API_BASE = 'http://localhost:8080/api';
         let currentWarningId = null;
@@ -285,6 +339,7 @@
             currentData = await res.json();
             renderSelfCheck();
             renderEntries();
+            renderGapSummary();
             updateWorkflowStatus();
         }
 
@@ -315,13 +370,14 @@
             const entries = currentData.entries || [];
 
             if (entries.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:#999;padding:40px;">暂无数据，请导入尾差调整条</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;color:#999;padding:40px;">暂无数据，请导入尾差调整条</td></tr>';
                 return;
             }
 
             tbody.innerHTML = entries.map(e => `
                 <tr>
                     <td><span class="row-number">${e.original_row_number}</span></td>
+                    <td><span class="source-badge ${e.source === '补录' ? 'source-supplement' : 'source-import'}">${e.source || '首次导入'}</span></td>
                     <td>${e.security_code}</td>
                     <td>${e.security_name}</td>
                     <td>${e.original_amount.toLocaleString()}</td>
@@ -339,6 +395,13 @@
                     </td>
                 </tr>
             `).join('');
+        }
+
+        function renderGapSummary() {
+            document.getElementById('gapTotal').innerHTML = `${(currentData.total_gap_amount || 0).toLocaleString()}<span class="unit">元</span>`;
+            document.getElementById('gapEntries').innerHTML = `${currentData.total_entries || 0}<span class="unit">条</span>`;
+            document.getElementById('gapAbnormal').innerHTML = `${currentData.abnormal_count || 0}<span class="unit">条</span>`;
+            document.getElementById('gapRecalcTime').textContent = currentData.last_recalculate_time ? new Date(currentData.last_recalculate_time).toLocaleString('zh-CN') : '未重算';
         }
 
         function getStatusBadge(status) {
@@ -511,6 +574,54 @@
 
         function closeModal(modalId) {
             document.getElementById(modalId).classList.remove('show');
+        }
+
+        function showSupplementModal() {
+            document.getElementById('supplementData').value = '';
+            document.getElementById('supplementRemark').value = '';
+            document.getElementById('supplementModal').classList.add('show');
+        }
+
+        async function doSupplement() {
+            const dataText = document.getElementById('supplementData').value;
+            const operator = document.getElementById('supplementOperator').value;
+            const remark = document.getElementById('supplementRemark').value;
+
+            const rows = dataText.trim().split('\n').filter((line, idx) => idx > 0).map(line => {
+                const parts = line.split(',');
+                return {
+                    security_code: parts[0] || '',
+                    security_name: parts[1] || '',
+                    amount: parts[2] || '0'
+                };
+            });
+
+            if (rows.length === 0) {
+                alert('请输入补录数据');
+                return;
+            }
+
+            const res = await fetch(`${API_BASE}/warnings/${currentWarningId}/supplement`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ rows, operator, remark })
+            });
+
+            const result = await res.json();
+            alert(result.message);
+            closeModal('supplementModal');
+            await loadData();
+        }
+
+        async function doRecalculate() {
+            const res = await fetch(`${API_BASE}/warnings/${currentWarningId}/recalculate`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ operator: '林姐' })
+            });
+            const result = await res.json();
+            alert(`${result.message}\n一致性校验: ${result.consistency_ok ? '通过' : '不一致'}`);
+            await loadData();
         }
 
         init();
