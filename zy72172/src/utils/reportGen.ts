@@ -65,7 +65,7 @@ export function generateBatchReport(points: SignalPoint[]): string {
   const pending = points.filter(p => p.status === 'pending').length;
   const conflict = points.filter(p => p.status === 'conflict').length;
   const legacy = points.filter(p => p.status === 'legacy').length;
-  const hasConflicts = points.filter(p => p.hasConflict).length;
+  const exceptionCount = points.filter(p => p.hasConflict).length;
   
   let report = '═══════════════════════════════════════════\n';
   report += '       公交优先信号复核汇总报告\n';
@@ -76,7 +76,7 @@ export function generateBatchReport(points: SignalPoint[]): string {
   report += `  点位总数：${total} 个\n`;
   report += `  复核通过：${approved} 个\n`;
   report += `  待人工确认：${pending} 个\n`;
-  report += `  存在冲突：${conflict} 个\n`;
+  report += `  存在例外（含冲突、超限、空值、重复等）：${exceptionCount} 个\n`;
   report += `  历史版本：${legacy} 个\n\n`;
   
   const conflictPoints = points.filter(p => p.hasConflict);

@@ -1,13 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useAppContext } from '../context/AppContext';
 import MapView from '../components/MapView';
 import PointList from '../components/PointList';
 import PointDetail from '../components/PointDetail';
-import { SignalPoint } from '../types';
 
 export default function HomePage() {
   const { data } = useAppContext();
-  const [selectedPoint, setSelectedPoint] = useState<SignalPoint | null>(null);
+  const [selectedPointId, setSelectedPointId] = useState<string | null>(null);
+
+  const selectedPoint = useMemo(() => {
+    if (!selectedPointId) return null;
+    return data.points.find(p => p.id === selectedPointId) ?? null;
+  }, [selectedPointId, data.points]);
 
   return (
     <div className="h-screen flex flex-col bg-slate-100">
@@ -30,7 +34,7 @@ export default function HomePage() {
           <PointList
             points={data.points}
             selectedPointId={selectedPoint?.id}
-            onPointSelect={setSelectedPoint}
+            onPointSelect={(point) => setSelectedPointId(point.id)}
           />
         </div>
 
@@ -39,7 +43,7 @@ export default function HomePage() {
             <MapView
               points={data.points}
               selectedPointId={selectedPoint?.id}
-              onPointClick={setSelectedPoint}
+              onPointClick={(point) => setSelectedPointId(point.id)}
             />
           </div>
         </div>
@@ -48,7 +52,7 @@ export default function HomePage() {
           <div className="w-96 flex-shrink-0 border-l border-slate-200 bg-white overflow-hidden">
             <PointDetail
               point={selectedPoint}
-              onClose={() => setSelectedPoint(null)}
+              onClose={() => setSelectedPointId(null)}
             />
           </div>
         )}

@@ -9,9 +9,8 @@ export default function Dashboard({ points }: DashboardProps) {
   const total = points.length;
   const approved = points.filter(p => p.status === 'approved').length;
   const pending = points.filter(p => p.status === 'pending').length;
-  const conflict = points.filter(p => p.status === 'conflict').length;
   const legacy = points.filter(p => p.status === 'legacy').length;
-  const hasConflicts = points.filter(p => p.hasConflict).length;
+  const exceptionCount = points.filter(p => p.hasConflict).length;
 
   const streetStats = points.reduce((acc, p) => {
     acc[p.street] = (acc[p.street] || 0) + 1;
@@ -54,10 +53,10 @@ export default function Dashboard({ points }: DashboardProps) {
           subtext="需人工处理"
         />
         <StatCard
-          label="存在冲突"
-          value={conflict}
+          label="存在例外（含冲突、超限、空值、重复等）"
+          value={exceptionCount}
           colorClass="bg-red-50 border-red-200 text-red-700"
-          subtext={`${hasConflicts} 个点位有问题`}
+          subtext="需重点关注"
         />
         <StatCard
           label="历史版本"
@@ -74,7 +73,7 @@ export default function Dashboard({ points }: DashboardProps) {
             {[
               { label: '复核通过', value: approved, color: 'bg-green-500' },
               { label: '待确认', value: pending, color: 'bg-amber-500' },
-              { label: '存在冲突', value: conflict, color: 'bg-red-500' },
+              { label: '存在例外', value: exceptionCount, color: 'bg-red-500' },
               { label: '历史版本', value: legacy, color: 'bg-gray-500' },
             ].map(item => (
               <div key={item.label}>

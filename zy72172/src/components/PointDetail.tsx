@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SignalPoint } from '../types';
 import { useAppContext } from '../context/AppContext';
 import { checkAllConflicts, getHumanReadableStatus, getSourceTypeLabel } from '../utils/conflictCheck';
@@ -14,6 +14,10 @@ export default function PointDetail({ point, onClose }: PointDetailProps) {
   const { data, updatePoint } = useAppContext();
   const [manualNote, setManualNote] = useState(point.manualNote || '');
   const [activeTab, setActiveTab] = useState<'overview' | 'feedback' | 'versions'>('overview');
+
+  useEffect(() => {
+    setManualNote(point.manualNote || '');
+  }, [point.manualNote]);
 
   const pointFeedbacks = data.feedbacks.filter(f => f.pointId === point.id);
   const pointVersions = data.planVersions.filter(v => v.pointId === point.id);
