@@ -1,0 +1,385 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2026-06-08T16:13:10.960Z",
+  "manualCounterExamples": [
+    {
+      "id": "mce_mq5etg9t_oy8ic6",
+      "sampleId": "SAMPLE-001",
+      "timestamp": "2024-01-15T02:30:00.000Z",
+      "windowNumber": 1,
+      "arrivalCount": 15,
+      "serviceTime": 8,
+      "waitTime": -5,
+      "isNegative": true,
+      "source": "old_table",
+      "notes": "旧系统导出数据异常",
+      "mainProcessEvidence": "主流程步骤3异常，系统记录等待时间为负，可能与临时关窗有关"
+    },
+    {
+      "id": "mce_mq5etg9t_k708t7",
+      "sampleId": "SAMPLE-002",
+      "timestamp": "2024-01-15T06:00:00.000Z",
+      "windowNumber": 2,
+      "arrivalCount": -3,
+      "serviceTime": 5,
+      "waitTime": 12,
+      "isNegative": true,
+      "source": "old_table",
+      "notes": "到达人数统计异常",
+      "mainProcessEvidence": "到达人数统计为负数，怀疑排队溢出时系统统计出错"
+    },
+    {
+      "id": "mce_mq5etg9t_gpkisd",
+      "sampleId": "SAMPLE-003",
+      "timestamp": "2024-01-15T03:00:00.000Z",
+      "windowNumber": 1,
+      "arrivalCount": 20,
+      "serviceTime": 6,
+      "waitTime": 8,
+      "isNegative": false,
+      "source": "manual",
+      "notes": "正常样本"
+    },
+    {
+      "id": "mce_mq5etg9t_s5qn1u",
+      "sampleId": "SAMPLE-004",
+      "timestamp": "2024-01-15T04:15:00.000Z",
+      "windowNumber": 3,
+      "arrivalCount": 8,
+      "serviceTime": 10,
+      "waitTime": -2,
+      "isNegative": true,
+      "source": "old_table",
+      "notes": "午休时间数据异常",
+      "mainProcessEvidence": "午休期间窗口关闭，系统仍在统计，导致等待时间计算异常"
+    },
+    {
+      "id": "mce_mq5etg9t_l57di8",
+      "sampleId": "SAMPLE-005",
+      "timestamp": "2024-01-15T01:30:00.000Z",
+      "windowNumber": 2,
+      "arrivalCount": 12,
+      "serviceTime": 7,
+      "waitTime": 5,
+      "isNegative": false,
+      "source": "manual",
+      "notes": "正常样本"
+    }
+  ],
+  "questionnaireRows": [
+    {
+      "id": "qr_mq5etvgx_s0mpbp",
+      "sampleId": "SAMPLE-001",
+      "timestamp": "2024-01-15T02:30:00.000Z",
+      "windowNumber": 1,
+      "onSiteStatement": "窗口1在10:20-10:40临时关闭处理紧急事务，实际等待时间应为15分钟，有3位同学可作证",
+      "witnessName": "张三、李四、王五",
+      "hasBreak": false,
+      "isTemporaryClosed": true,
+      "queueOverflow": false,
+      "actualWaitTime": 15,
+      "actualArrivalCount": 15,
+      "supplementaryNotes": "临时关窗原因：窗口设备故障维修"
+    },
+    {
+      "id": "qr_mq5etg9t_fkg3g6",
+      "sampleId": "SAMPLE-002",
+      "timestamp": "2024-01-15T06:00:00.000Z",
+      "windowNumber": 2,
+      "onSiteStatement": "下午2点窗口2排队溢出，队伍排到门外，系统统计时可能重复计数或漏记",
+      "witnessName": "赵六",
+      "hasBreak": false,
+      "isTemporaryClosed": false,
+      "queueOverflow": true,
+      "actualWaitTime": 25,
+      "actualArrivalCount": 25,
+      "supplementaryNotes": "建议该时段增加临时窗口"
+    }
+  ],
+  "boundarySamples": [
+    {
+      "internalId": "bs_SAMPLE-001",
+      "data": {
+        "sampleId": "SAMPLE-001",
+        "status": "coach_verified",
+        "createdAt": "2026-06-08T16:12:50.466Z",
+        "updatedAt": "2026-06-08T16:13:10.960Z",
+        "negativeSample": {
+          "sampleId": "SAMPLE-001",
+          "detectedAt": "2026-06-08T16:12:50.465Z",
+          "detectedBy": "old_table",
+          "reason": "等待时间为负数(-5分钟)；旧系统标记为缺失；窗口临时关闭；主流程证据: 主流程步骤3异常，系统记录等待时间为负，可能与临时关窗有关",
+          "value": -5,
+          "isMarkedAsMissing": false,
+          "sourceLink": {
+            "manualCounterExampleId": "mce_mq5etg9t_oy8ic6",
+            "questionnaireRowId": "qr_mq5etg9t_v28b1u"
+          }
+        },
+        "manualCounterExample": {
+          "id": "mce_mq5etg9t_oy8ic6",
+          "sampleId": "SAMPLE-001",
+          "timestamp": "2024-01-15T02:30:00.000Z",
+          "windowNumber": 1,
+          "arrivalCount": 15,
+          "serviceTime": 8,
+          "waitTime": 15,
+          "isNegative": true,
+          "source": "old_table",
+          "notes": "旧系统导出数据异常",
+          "mainProcessEvidence": "主流程步骤3异常，系统记录等待时间为负，可能与临时关窗有关"
+        },
+        "questionnaireRow": {
+          "id": "qr_mq5etvgx_s0mpbp",
+          "sampleId": "SAMPLE-001",
+          "timestamp": "2024-01-15T02:30:00.000Z",
+          "windowNumber": 1,
+          "onSiteStatement": "窗口1在10:20-10:40临时关闭处理紧急事务，实际等待时间应为15分钟，有3位同学可作证",
+          "witnessName": "张三、李四、王五",
+          "hasBreak": false,
+          "isTemporaryClosed": true,
+          "queueOverflow": false,
+          "actualWaitTime": 15,
+          "actualArrivalCount": 15,
+          "supplementaryNotes": "临时关窗原因：窗口设备故障维修"
+        },
+        "whyKept": "包含主流程关键证据；包含现场说法记录；旧表异常样本，需要人工复核确认；涉及特殊现场情况（临时关窗/排队溢出）",
+        "missingMaterials": [],
+        "nextAction": "resolve",
+        "originalNegativeValues": {
+          "waitTime": -5
+        },
+        "reviewLog": [
+          {
+            "id": "log_mq5etg9u_75y0",
+            "timestamp": "2026-06-08T16:12:50.466Z",
+            "action": "created",
+            "operator": "旧表系统",
+            "statusAfter": "pending_ta",
+            "originalWaitTime": -5,
+            "reason": "等待时间为负数(-5分钟)；旧系统标记为缺失；窗口临时关闭；主流程证据: 主流程步骤3异常，系统记录等待时间为负，可能与临时关窗有关"
+          },
+          {
+            "id": "log_mq5etvgx_gl5u",
+            "timestamp": "2026-06-08T16:13:10.161Z",
+            "action": "ta_review",
+            "operator": "学生助教",
+            "statusBefore": "pending_ta",
+            "statusAfter": "pending_coach",
+            "originalWaitTime": -5,
+            "correctedWaitTime": 15,
+            "correctedArrivalCount": 15,
+            "reason": "学生助教确认通过",
+            "notes": "已核实：临时关窗是因设备故障，等了8分钟，到达12人，问卷原始行已补录",
+            "rawStatementAdded": true
+          },
+          {
+            "id": "log_mq5etw34_87fg",
+            "timestamp": "2026-06-08T16:13:10.960Z",
+            "action": "coach_review",
+            "operator": "竞赛教练唐老师",
+            "statusBefore": "pending_coach",
+            "statusAfter": "coach_verified",
+            "reason": "唐老师确认通过",
+            "notes": "唐老师确认：排队溢出排班优化建议已记录，临时关窗影响核实"
+          }
+        ],
+        "rawOriginalStatement": "窗口1在10:20-10:40临时关闭处理紧急事务，实际等待时间应为15分钟，有3位同学可作证",
+        "taReviewNotes": "已核实：临时关窗是因设备故障，等了8分钟，到达12人，问卷原始行已补录",
+        "coachReviewNotes": "唐老师确认：排队溢出排班优化建议已记录，临时关窗影响核实",
+        "dataResolution": {
+          "resolved": true,
+          "resolvedAt": "2026-06-08T16:13:10.960Z",
+          "resolvedBy": "竞赛教练唐老师",
+          "finalWaitTime": 15,
+          "finalArrivalCount": 15,
+          "resolutionReason": "唐老师确认：排队溢出排班优化建议已记录，临时关窗影响核实",
+          "nextContactPerson": "竞赛教练唐老师（用于窗口排班优化）"
+        }
+      }
+    },
+    {
+      "internalId": "bs_SAMPLE-002",
+      "data": {
+        "sampleId": "SAMPLE-002",
+        "status": "pending_ta",
+        "createdAt": "2026-06-08T16:12:50.466Z",
+        "updatedAt": "2026-06-08T16:12:50.466Z",
+        "negativeSample": {
+          "sampleId": "SAMPLE-002",
+          "detectedAt": "2026-06-08T16:12:50.465Z",
+          "detectedBy": "old_table",
+          "reason": "到达人数为负数(-3人)；旧系统标记为缺失；排队溢出；主流程证据: 到达人数统计为负数，怀疑排队溢出时系统统计出错",
+          "value": -3,
+          "isMarkedAsMissing": true,
+          "sourceLink": {
+            "manualCounterExampleId": "mce_mq5etg9t_k708t7",
+            "questionnaireRowId": "qr_mq5etg9t_fkg3g6"
+          }
+        },
+        "manualCounterExample": {
+          "id": "mce_mq5etg9t_k708t7",
+          "sampleId": "SAMPLE-002",
+          "timestamp": "2024-01-15T06:00:00.000Z",
+          "windowNumber": 2,
+          "arrivalCount": -3,
+          "serviceTime": 5,
+          "waitTime": 12,
+          "isNegative": true,
+          "source": "old_table",
+          "notes": "到达人数统计异常",
+          "mainProcessEvidence": "到达人数统计为负数，怀疑排队溢出时系统统计出错"
+        },
+        "questionnaireRow": {
+          "id": "qr_mq5etg9t_fkg3g6",
+          "sampleId": "SAMPLE-002",
+          "timestamp": "2024-01-15T06:00:00.000Z",
+          "windowNumber": 2,
+          "onSiteStatement": "下午2点窗口2排队溢出，队伍排到门外，系统统计时可能重复计数或漏记",
+          "witnessName": "赵六",
+          "hasBreak": false,
+          "isTemporaryClosed": false,
+          "queueOverflow": true,
+          "actualWaitTime": 25,
+          "actualArrivalCount": 25,
+          "supplementaryNotes": "建议该时段增加临时窗口"
+        },
+        "whyKept": "包含主流程关键证据；包含现场说法记录；旧表异常样本，需要人工复核确认；涉及特殊现场情况（临时关窗/排队溢出）；保留原始负数证据，不归入正常统计",
+        "missingMaterials": [
+          "旧表标记为缺失，需核实数据来源"
+        ],
+        "nextAction": "find_coach",
+        "assignee": "学生助教",
+        "originalNegativeValues": {
+          "arrivalCount": -3
+        },
+        "reviewLog": [
+          {
+            "id": "log_mq5etg9u_u5f1",
+            "timestamp": "2026-06-08T16:12:50.466Z",
+            "action": "created",
+            "operator": "旧表系统",
+            "statusAfter": "pending_ta",
+            "originalArrivalCount": -3,
+            "reason": "到达人数为负数(-3人)；旧系统标记为缺失；排队溢出；主流程证据: 到达人数统计为负数，怀疑排队溢出时系统统计出错"
+          }
+        ],
+        "rawOriginalStatement": "下午2点窗口2排队溢出，队伍排到门外，系统统计时可能重复计数或漏记"
+      }
+    },
+    {
+      "internalId": "bs_SAMPLE-004",
+      "data": {
+        "sampleId": "SAMPLE-004",
+        "status": "pending_ta",
+        "createdAt": "2026-06-08T16:12:50.466Z",
+        "updatedAt": "2026-06-08T16:12:50.466Z",
+        "negativeSample": {
+          "sampleId": "SAMPLE-004",
+          "detectedAt": "2026-06-08T16:12:50.465Z",
+          "detectedBy": "old_table",
+          "reason": "等待时间为负数(-2分钟)；旧系统标记为缺失；主流程证据: 午休期间窗口关闭，系统仍在统计，导致等待时间计算异常",
+          "value": -2,
+          "isMarkedAsMissing": true,
+          "sourceLink": {
+            "manualCounterExampleId": "mce_mq5etg9t_s5qn1u"
+          }
+        },
+        "manualCounterExample": {
+          "id": "mce_mq5etg9t_s5qn1u",
+          "sampleId": "SAMPLE-004",
+          "timestamp": "2024-01-15T04:15:00.000Z",
+          "windowNumber": 3,
+          "arrivalCount": 8,
+          "serviceTime": 10,
+          "waitTime": -2,
+          "isNegative": true,
+          "source": "old_table",
+          "notes": "午休时间数据异常",
+          "mainProcessEvidence": "午休期间窗口关闭，系统仍在统计，导致等待时间计算异常"
+        },
+        "whyKept": "包含主流程关键证据；旧表异常样本，需要人工复核确认；保留原始负数证据，不归入正常统计",
+        "missingMaterials": [
+          "缺少问卷原始行（现场说法）",
+          "旧表标记为缺失，需核实数据来源"
+        ],
+        "nextAction": "collect_more_data",
+        "assignee": "学生助教",
+        "originalNegativeValues": {
+          "waitTime": -2
+        },
+        "reviewLog": [
+          {
+            "id": "log_mq5etg9u_6h5z",
+            "timestamp": "2026-06-08T16:12:50.466Z",
+            "action": "created",
+            "operator": "旧表系统",
+            "statusAfter": "pending_ta",
+            "originalWaitTime": -2,
+            "reason": "等待时间为负数(-2分钟)；旧系统标记为缺失；主流程证据: 午休期间窗口关闭，系统仍在统计，导致等待时间计算异常"
+          }
+        ]
+      }
+    }
+  ],
+  "reviewHistory": [
+    {
+      "sampleId": "SAMPLE-001",
+      "action": "created",
+      "operator": "旧表系统",
+      "reason": "等待时间为负数(-5分钟)；旧系统标记为缺失；窗口临时关闭；主流程证据: 主流程步骤3异常，系统记录等待时间为负，可能与临时关窗有关",
+      "statusAfter": "pending_ta",
+      "id": "hist_1780935170466_9k3vg1",
+      "timestamp": "2026-06-08T16:12:50.466Z"
+    },
+    {
+      "sampleId": "SAMPLE-002",
+      "action": "created",
+      "operator": "旧表系统",
+      "reason": "到达人数为负数(-3人)；旧系统标记为缺失；排队溢出；主流程证据: 到达人数统计为负数，怀疑排队溢出时系统统计出错",
+      "statusAfter": "pending_ta",
+      "id": "hist_1780935170466_lov52r",
+      "timestamp": "2026-06-08T16:12:50.466Z"
+    },
+    {
+      "sampleId": "SAMPLE-004",
+      "action": "created",
+      "operator": "旧表系统",
+      "reason": "等待时间为负数(-2分钟)；旧系统标记为缺失；主流程证据: 午休期间窗口关闭，系统仍在统计，导致等待时间计算异常",
+      "statusAfter": "pending_ta",
+      "id": "hist_1780935170466_tevvu7",
+      "timestamp": "2026-06-08T16:12:50.466Z"
+    },
+    {
+      "sampleId": "*",
+      "action": "data_import",
+      "operator": "用户",
+      "reason": "导入完成，创建/更新 3 条边界样本",
+      "id": "hist_1780935170466_76zrm6",
+      "timestamp": "2026-06-08T16:12:50.466Z"
+    },
+    {
+      "sampleId": "SAMPLE-001",
+      "action": "ta_review",
+      "operator": "学生助教",
+      "statusBefore": "pending_ta",
+      "statusAfter": "pending_coach",
+      "notes": "已核实：临时关窗是因设备故障，等了8分钟，到达12人，问卷原始行已补录",
+      "reason": "学生助教确认通过",
+      "rawStatementAdded": true,
+      "id": "hist_1780935190161_2kqdaj",
+      "timestamp": "2026-06-08T16:13:10.161Z"
+    },
+    {
+      "sampleId": "SAMPLE-001",
+      "action": "coach_review",
+      "operator": "竞赛教练唐老师",
+      "statusBefore": "pending_coach",
+      "statusAfter": "coach_verified",
+      "notes": "唐老师确认：排队溢出排班优化建议已记录，临时关窗影响核实",
+      "reason": "唐老师确认通过",
+      "id": "hist_1780935190960_4swsx6",
+      "timestamp": "2026-06-08T16:13:10.960Z"
+    }
+  ]
+}

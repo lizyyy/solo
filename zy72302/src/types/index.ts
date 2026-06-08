@@ -57,6 +57,46 @@ export type ReviewStatus = 'pending_ta' | 'ta_verified' | 'pending_coach' | 'coa
 
 export type NextAction = 'find_ta' | 'find_coach' | 'collect_more_data' | 'resolve' | 'dismiss';
 
+export type ReviewErrorKind =
+  | 'sample_not_found'
+  | 'invalid_status_transition'
+  | 'missing_materials'
+  | 'already_handled'
+  | 'validation_error';
+
+export interface ReviewResult {
+  success: boolean;
+  sample?: BoundarySample;
+  errorKind?: ReviewErrorKind;
+  errorMessage?: string;
+  allowedActions?: ReviewStatus[];
+  hints?: string[];
+}
+
+export interface ReviewLogEntry {
+  id: string;
+  timestamp: Date;
+  action:
+    | 'detected'
+    | 'created'
+    | 'ta_review'
+    | 'coach_review'
+    | 'supplement'
+    | 'dismissed'
+    | 'resolved'
+    | 'reopened';
+  operator: string;
+  statusBefore?: ReviewStatus;
+  statusAfter?: ReviewStatus;
+  originalWaitTime?: number;
+  correctedWaitTime?: number;
+  originalArrivalCount?: number;
+  correctedArrivalCount?: number;
+  reason?: string;
+  notes?: string;
+  rawStatementAdded?: boolean;
+}
+
 export interface BoundarySample {
   sampleId: string;
   status: ReviewStatus;
@@ -71,6 +111,21 @@ export interface BoundarySample {
   assignee?: string;
   taReviewNotes?: string;
   coachReviewNotes?: string;
+  originalNegativeValues: {
+    waitTime?: number;
+    arrivalCount?: number;
+  };
+  reviewLog: ReviewLogEntry[];
+  rawOriginalStatement?: string;
+  dataResolution?: {
+    resolved: boolean;
+    resolvedAt?: Date;
+    resolvedBy?: string;
+    finalWaitTime?: number;
+    finalArrivalCount?: number;
+    resolutionReason?: string;
+    nextContactPerson?: string;
+  };
 }
 
 export interface QueueCalculationResult {

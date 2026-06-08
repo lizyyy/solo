@@ -1,429 +1,268 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>排队论窗口配置 - 小看板</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
-    .container { max-width: 1400px; margin: 0 auto; }
-    header { background: white; padding: 20px 30px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-    h1 { color: #333; font-size: 24px; }
-    .subtitle { color: #666; font-size: 14px; margin-top: 5px; }
-    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px; }
-    .stat-card { background: white; padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-    .stat-number { font-size: 32px; font-weight: bold; color: #667eea; }
-    .stat-label { font-size: 13px; color: #666; margin-top: 5px; }
-    .main-content { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
-    .panel { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-    .panel-title { font-size: 18px; font-weight: 600; color: #333; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #f0f0f0; }
-    .chart-container { position: relative; height: 300px; }
-    .view-toggle { display: flex; gap: 10px; margin-bottom: 15px; }
-    .toggle-btn { padding: 8px 16px; border: 2px solid #667eea; background: white; color: #667eea; border-radius: 6px; cursor: pointer; font-weight: 500; transition: all 0.2s; }
-    .toggle-btn.active { background: #667eea; color: white; }
-    .toggle-btn:hover { background: #5a6fd6; color: white; }
-    .sample-list { max-height: 400px; overflow-y: auto; }
-    .sample-card { border: 2px solid #e0e0e0; border-radius: 8px; padding: 15px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s; }
-    .sample-card:hover { border-color: #667eea; transform: translateX(5px); }
-    .sample-card.selected { border-color: #667eea; background: #f8f9ff; }
-    .sample-card.negative { border-left: 4px solid #ff6b6b; }
-    .sample-id { font-weight: 600; color: #333; font-size: 14px; }
-    .sample-status { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 500; margin-top: 8px; }
-    .status-pending_ta { background: #fff3cd; color: #856404; }
-    .status-pending_coach { background: #cce5ff; color: #004085; }
-    .status-coach_verified { background: #d4edda; color: #155724; }
-    .sample-reason { font-size: 12px; color: #666; margin-top: 8px; }
-    .detail-panel { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: none; }
-    .detail-panel.show { display: block; }
-    .detail-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .close-btn { background: #f0f0f0; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
-    .evidence-section { margin-bottom: 20px; padding: 15px; border-radius: 8px; }
-    .manual-evidence { background: #fff8e1; border-left: 4px solid #ff9800; }
-    .questionnaire-evidence { background: #e8f5e9; border-left: 4px solid #4caf50; }
-    .section-title { font-weight: 600; margin-bottom: 10px; font-size: 14px; }
-    .why-kept { background: #e3f2fd; padding: 12px; border-radius: 6px; margin-bottom: 15px; }
-    .missing-item { color: #e65100; margin: 5px 0; }
-    .next-action { background: #f3e5f5; padding: 12px; border-radius: 6px; font-weight: 500; }
-    .action-buttons { display: flex; gap: 10px; margin-top: 20px; }
-    .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; }
-    .btn-primary { background: #667eea; color: white; }
-    .btn-success { background: #4caf50; color: white; }
-    .btn-danger { background: #f44336; color: white; }
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
-    .modal.show { display: flex; }
-    .modal-content { background: white; padding: 30px; border-radius: 12px; max-width: 500px; width: 90%; }
-    .modal-title { font-size: 18px; font-weight: 600; margin-bottom: 20px; }
-    .form-group { margin-bottom: 15px; }
-    .form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
-    .form-group textarea, .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
-    .empty-state { text-align: center; padding: 40px; color: #999; }
-    .view-3d { display: none; }
-    .view-3d.show { display: block; }
-    .window-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; }
-    .window-3d { background: linear-gradient(145deg, #667eea, #764ba2); color: white; padding: 20px; border-radius: 8px; text-align: center; transform: perspective(500px) rotateX(10deg); box-shadow: 0 10px 30px rgba(0,0,0,0.3); transition: transform 0.3s; }
-    .window-3d:hover { transform: perspective(500px) rotateX(0deg); }
-    .window-number { font-size: 24px; font-weight: bold; }
-    .window-status { font-size: 12px; opacity: 0.9; margin-top: 5px; }
-    .window-closed { background: linear-gradient(145deg, #9e9e9e, #757575); }
-    .window-overflow { background: linear-gradient(145deg, #f44336, #d32f2f); }
-    @media (max-width: 768px) { .main-content { grid-template-columns: 1fr; } }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>排队论窗口配置 - 小看板</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;padding:20px}
+.container{max-width:1400px;margin:0 auto}
+header{background:white;padding:20px 30px;border-radius:12px;margin-bottom:20px;box-shadow:0 4px 20px rgba(0,0,0,.1);display:flex;justify-content:space-between;align-items:center}
+header h1{color:#333;font-size:24px}
+.subtitle{color:#666;font-size:14px;margin-top:5px}
+.state-path{background:#f8f9fa;padding:6px 12px;border-radius:6px;font-size:12px;color:#666;font-family:monospace}
+.toast{position:fixed;top:20px;right:20px;z-index:9999;padding:14px 22px;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.2);color:white;font-weight:500;max-width:420px;animation:slideIn .3s ease}
+.toast.success{background:#4caf50}.toast.error{background:#f44336}.toast.info{background:#2196f3}.toast.warn{background:#ff9800}
+.toast .hints{margin-top:8px;font-size:12px;opacity:.95;font-weight:400}
+.toast .hints li{margin:3px 0 3px 18px}
+@keyframes slideIn{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:15px;margin-bottom:20px}
+.stat-card{background:white;padding:20px;border-radius:12px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.1)}
+.stat-number{font-size:32px;font-weight:bold;color:#667eea}.stat-label{font-size:13px;color:#666;margin-top:5px}
+.main-content{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
+.panel{background:white;border-radius:12px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.1)}
+.panel-title{font-size:18px;font-weight:600;color:#333;margin-bottom:15px;padding-bottom:10px;border-bottom:2px solid #f0f0f0}
+.chart-container{position:relative;height:300px}
+.view-toggle{display:flex;gap:10px;margin-bottom:15px;flex-wrap:wrap}
+.toggle-btn,.btn{padding:8px 16px;border:2px solid #667eea;background:white;color:#667eea;border-radius:6px;cursor:pointer;font-weight:500;transition:all .2s}
+.toggle-btn.active,.btn.primary{background:#667eea;color:white}.btn.success{background:#4caf50;border-color:#4caf50;color:white}.btn.danger{background:#f44336;border-color:#f44336;color:white}.btn:hover{opacity:.85}
+.sample-list{max-height:480px;overflow-y:auto}
+.sample-card{border:2px solid #e0e0e0;border-radius:8px;padding:15px;margin-bottom:12px;cursor:pointer;transition:all .2s}
+.sample-card:hover{border-color:#667eea;transform:translateX(5px)}
+.sample-card.selected{border-color:#667eea;background:#f8f9ff}
+.sample-card.negative{border-left:4px solid #ff6b6b}
+.sample-id{font-weight:600;color:#333;font-size:14px}
+.sample-status{display:inline-block;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:500;margin-top:8px}
+.status-pending_ta{background:#fff3cd;color:#856404}.status-pending_coach{background:#cce5ff;color:#004085}.status-coach_verified{background:#d4edda;color:#155724}.status-dismissed{background:#f8d7da;color:#721c24}.status-ta_verified{background:#d1ecf1;color:#0c5460}.status-resolved{background:#e2e3e5;color:#383d41}
+.sample-reason{font-size:12px;color:#666;margin-top:8px}
+.sample-meta{display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;font-size:11px;color:#888}
+.badge-missing{background:#ffebee;color:#c62828;padding:2px 8px;border-radius:10px}
+.badge-complete{background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:10px}
+.detail-panel{background:white;border-radius:12px;padding:25px;box-shadow:0 2px 10px rgba(0,0,0,.1);display:none;margin-bottom:20px}
+.detail-panel.show{display:block}
+.detail-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+.close-btn{background:#f0f0f0;border:none;padding:8px 16px;border-radius:6px;cursor:pointer}
+.evidence-section{margin-bottom:18px;padding:15px;border-radius:8px}
+.manual-evidence{background:#fff8e1;border-left:4px solid #ff9800}
+.questionnaire-evidence{background:#e8f5e9;border-left:4px solid #4caf50}
+.section-title{font-weight:600;margin-bottom:10px;font-size:14px}
+.why-kept{background:#e3f2fd;padding:12px;border-radius:6px;margin-bottom:15px}
+.missing-item{color:#e65100;margin:5px 0}
+.next-action{background:#f3e5f5;padding:12px;border-radius:6px;font-weight:500;margin-bottom:15px}
+.action-buttons{display:flex;gap:10px;flex-wrap:wrap}
+.delta-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:8px}
+.delta-cell{border:1px solid #eee;border-radius:6px;padding:10px;text-align:center;font-size:13px}
+.delta-cell.neg{background:#ffebee;color:#c62828;font-weight:600}
+.delta-cell.corr{background:#e8f5e9;color:#2e7d32;font-weight:600}
+.delta-label{font-size:11px;color:#888;margin-bottom:3px}
+.timeline{border-left:2px solid #e0e0e0;padding-left:20px;margin-top:10px}
+.timeline-item{position:relative;padding-bottom:15px}
+.timeline-item::before{content:'';position:absolute;left:-27px;top:4px;width:12px;height:12px;border-radius:50%;background:#667eea;border:2px solid white;box-shadow:0 0 0 2px #667eea}
+.timeline-time{font-size:12px;color:#999}
+.timeline-body{margin-top:4px}
+.timeline-badge{display:inline-block;background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:10px;font-size:11px;margin-left:6px}
+.muted{color:#666;font-size:13px;margin-top:4px}
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center}
+.modal.show{display:flex}
+.modal-content{background:white;padding:30px;border-radius:12px;max-width:560px;width:90%;max-height:90vh;overflow-y:auto}
+.modal-title{font-size:18px;font-weight:600;margin-bottom:20px}
+.form-group{margin-bottom:15px}
+.form-group label{display:block;margin-bottom:5px;font-weight:500}
+.form-group textarea,.form-group input{width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-size:14px;font-family:inherit}
+.form-hint{font-size:11px;color:#999;margin-top:3px}
+.empty-state{text-align:center;padding:40px;color:#999}
+.view-3d{display:none}.view-3d.show{display:block}
+.window-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px}
+.window-3d{background:linear-gradient(145deg,#667eea,#764ba2);color:white;padding:20px;border-radius:8px;text-align:center;transform:perspective(500px) rotateX(10deg);box-shadow:0 10px 30px rgba(0,0,0,.3);transition:transform .3s}
+.window-3d:hover{transform:perspective(500px) rotateX(0)}
+.window-number{font-size:24px;font-weight:bold}
+.window-status{font-size:12px;opacity:.9;margin-top:5px}
+.window-closed{background:linear-gradient(145deg,#9e9e9e,#757575)}
+.window-overflow{background:linear-gradient(145deg,#f44336,#d32f2f)}
+.resolution-box{background:#f1f8e9;border-left:4px solid #7cb342;padding:12px 15px;border-radius:6px;margin-top:10px}
+@media(max-width:768px){.main-content{grid-template-columns:1fr}.delta-grid{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>🎯 排队论窗口配置 - 小看板</h1>
-      <div class="subtitle">整合手算反例与问卷原始行，支持边界样本复核流程</div>
-    </header>
+<div class="container">
+<header>
+  <div>
+    <h1>🎯 排队论窗口配置 - 小看板</h1>
+    <div class="subtitle">整合手算反例与问卷原始行 · 负数样本先服务复核 · 报告与数据同源同步</div>
+  </div>
+  <div class="state-path" id="statePath">状态文件: data/app-state.json</div>
+</header>
 
-    <div class="stats-grid">
-      <div class="stat-card"><div class="stat-number" id="stat-total">0</div><div class="stat-label">总样本</div></div>
-      <div class="stat-card"><div class="stat-number" id="stat-pending-ta">0</div><div class="stat-label">待学生助教</div></div>
-      <div class="stat-card"><div class="stat-number" id="stat-pending-coach">0</div><div class="stat-label">待唐老师</div></div>
-      <div class="stat-card"><div class="stat-number" id="stat-verified">0</div><div class="stat-label">已确认</div></div>
-      <div class="stat-card"><div class="stat-number" id="stat-resolved">0</div><div class="stat-label">已解决</div></div>
+<div class="stats-grid">
+  <div class="stat-card"><div class="stat-number" id="stat-total">0</div><div class="stat-label">总样本</div></div>
+  <div class="stat-card"><div class="stat-number" id="stat-pending-ta">0</div><div class="stat-label">待学生助教</div></div>
+  <div class="stat-card"><div class="stat-number" id="stat-pending-coach">0</div><div class="stat-label">待唐老师</div></div>
+  <div class="stat-card"><div class="stat-number" id="stat-verified">0</div><div class="stat-label">已确认</div></div>
+  <div class="stat-card"><div class="stat-number" id="stat-resolved">0</div><div class="stat-label">已解决</div></div>
+</div>
+
+<div class="main-content">
+  <div class="panel">
+    <div class="panel-title">📊 数据可视化（点击红点回溯原始）</div>
+    <div class="view-toggle">
+      <button class="toggle-btn active" onclick="switchView('chart')">图表视图</button>
+      <button class="toggle-btn" onclick="switchView('3d')">3D视图</button>
+      <button class="btn" onclick="loadData()">🔄 刷新数据</button>
     </div>
-
-    <div class="main-content">
-      <div class="panel">
-        <div class="panel-title">📊 数据可视化</div>
-        <div class="view-toggle">
-          <button class="toggle-btn active" onclick="switchView('chart')">图表视图</button>
-          <button class="toggle-btn" onclick="switchView('3d')">3D视图</button>
-        </div>
-        <div id="view-chart">
-          <div class="chart-container">
-            <canvas id="waitTimeChart"></canvas>
-          </div>
-          <p style="font-size: 12px; color: #666; margin-top: 10px;">💡 点击图表中的红点（负数样本）可以回溯查看原始数据</p>
-        </div>
-        <div id="view-3d" class="view-3d">
-          <div class="window-grid" id="windowGrid"></div>
-        </div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-title">📋 边界样本列表</div>
-        <div class="sample-list" id="sampleList"></div>
-      </div>
+    <div id="view-chart"><div class="chart-container"><canvas id="waitTimeChart"></canvas></div>
+      <p style="font-size:12px;color:#666;margin-top:10px">💡 红色柱：负数样本（被旧表当成缺失）；点击可直接回溯查看手算反例 + 问卷原始行 + 历史</p>
     </div>
+    <div id="view-3d" class="view-3d"><div class="window-grid" id="windowGrid"></div></div>
+  </div>
+  <div class="panel">
+    <div class="panel-title">📋 边界样本列表（点击查看详情）</div>
+    <div class="sample-list" id="sampleList"></div>
+  </div>
+</div>
 
-    <div class="detail-panel" id="detailPanel">
-      <div class="detail-header">
-        <div class="panel-title" style="border-bottom: none; margin-bottom: 0;">样本详情 - <span id="detailSampleId"></span></div>
-        <button class="close-btn" onclick="closeDetail()">关闭</button>
-      </div>
-      
-      <div id="manualEvidence" class="evidence-section manual-evidence">
-        <div class="section-title">📝 手算反例（主流程证据）</div>
-        <div id="manualContent"></div>
-      </div>
-      
-      <div id="questionnaireEvidence" class="evidence-section questionnaire-evidence">
-        <div class="section-title">🎤 问卷原始行（现场说法）</div>
-        <div id="questionnaireContent"></div>
-      </div>
-      
-      <div class="why-kept">
-        <strong>❓ 为什么留下：</strong><span id="whyKept"></span>
-      </div>
-      
-      <div style="margin-bottom: 15px;">
-        <strong>📦 还缺什么材料：</strong>
-        <div id="missingMaterials"></div>
-      </div>
-      
-      <div class="next-action">
-        <strong>➡️ 下一步：</strong><span id="nextAction"></span>
-        <div><strong>👤 当前负责人：</strong><span id="assignee"></span></div>
-      </div>
-      
-      <div class="action-buttons">
-        <button class="btn btn-success" onclick="showReviewModal('ta')">学生助教复核</button>
-        <button class="btn btn-primary" onclick="showReviewModal('coach')">唐老师复核</button>
-      </div>
+<div class="detail-panel" id="detailPanel">
+  <div class="detail-header">
+    <div class="panel-title" style="border-bottom:0;margin-bottom:0">样本详情 · <span id="detailSampleId"></span> <span id="detailStatusBadge"></span></div>
+    <button class="close-btn" onclick="closeDetail()">关闭</button>
+  </div>
+  <div id="negativeInfo" class="evidence-section" style="background:#fff3cd;border-left:4px solid #ffc107;margin-bottom:15px"></div>
+  <div id="deltaSection">
+    <div class="section-title">🔍 原始负数 ↔ 修正后对比（保留原始说法，不归入正常）</div>
+    <div id="deltaGrid" class="delta-grid"></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:15px 0">
+    <div id="manualEvidence" class="evidence-section manual-evidence"><div class="section-title">📝 手算反例（主流程证据）</div><div id="manualContent"></div></div>
+    <div id="questionnaireEvidence" class="evidence-section questionnaire-evidence"><div class="section-title">🎤 问卷原始行（现场说法）</div><div id="questionnaireContent"></div></div>
+  </div>
+  <div class="why-kept"><strong>❓ 为什么留下：</strong><span id="whyKept"></span></div>
+  <div style="margin-bottom:15px"><strong>📦 还缺什么材料：</strong><div id="missingMaterials"></div></div>
+  <div class="next-action"><strong>➡️ 下一步：</strong><span id="nextAction"></span><div><strong>👤 当前负责人：</strong><span id="assignee"></span></div></div>
+  <div id="resolutionSection" style="display:none;margin-bottom:15px"><div class="section-title">✅ 最终处理结果（唐老师确认后归档）</div><div id="resolutionContent" class="resolution-box"></div></div>
+  <div style="margin-bottom:15px"><div class="section-title">📜 复核历史时间线</div><div class="timeline" id="historyTimeline"></div></div>
+  <div class="action-buttons">
+    <button class="btn success" onclick="showReviewModal('ta')">👨‍🎓 学生助教复核</button>
+    <button class="btn primary" onclick="showReviewModal('coach')">👨‍🏫 唐老师复核</button>
+  </div>
+</div>
+</div>
+
+<div class="modal" id="reviewModal">
+  <div class="modal-content">
+    <div class="modal-title" id="modalTitle">复核</div>
+    <div class="form-group">
+      <label>复核备注（填写处理原因）</label>
+      <textarea id="reviewNotes" rows="3" placeholder="例如：已核实现场说法，窗口1确实在10:20-10:40临时关闭"></textarea>
+    </div>
+    <div class="form-group" id="questionnaireField">
+      <label>补录问卷原始行（JSON 格式，可选）</label>
+      <textarea id="questionnaireJson" rows="5" placeholder='{"onSiteStatement": "窗口1在10:20-10:40临时关闭，等待时间应为15分钟", "witnessName": "张三", "isTemporaryClosed": true, "queueOverflow": false, "actualWaitTime": 15, "actualArrivalCount": 15}'></textarea>
+      <div class="form-hint">学生助教补录：填入现场说法、证人、修正后的实际值</div>
+    </div>
+    <div class="action-buttons">
+      <button class="btn success" onclick="submitReview(true)">✅ 通过</button>
+      <button class="btn danger" onclick="submitReview(false)">❌ 驳回</button>
+      <button class="btn" onclick="closeReviewModal()">取消</button>
     </div>
   </div>
+</div>
 
-  <div class="modal" id="reviewModal">
-    <div class="modal-content">
-      <div class="modal-title" id="modalTitle">复核</div>
-      <div class="form-group">
-        <label>复核备注</label>
-        <textarea id="reviewNotes" rows="4"></textarea>
-      </div>
-      <div class="form-group">
-        <label>问卷原始行（JSON格式，可选）</label>
-        <textarea id="questionnaireJson" rows="4" placeholder='{"onSiteStatement": "...", "witnessName": "..."}'></textarea>
-      </div>
-      <div class="action-buttons">
-        <button class="btn btn-success" onclick="submitReview(true)">通过</button>
-        <button class="btn btn-danger" onclick="submitReview(false)">驳回</button>
-        <button class="btn" onclick="closeReviewModal()">取消</button>
-      </div>
-    </div>
-  </div>
+<script>
+let samples=[],statistics=null,waitTimeChart=null,currentSampleId=null,currentReviewType=null;
 
-  <script>
-    let samples = [];
-    let currentSampleId = null;
-    let currentReviewType = null;
-    let waitTimeChart = null;
+function toast(type,msg,hints){
+  const t=document.createElement('div');
+  t.className='toast '+type;
+  let html=msg;
+  if(hints&&hints.length)html+='<ul class="hints">'+hints.map(h=>'<li>'+h+'</li>').join('')+'</ul>';
+  t.innerHTML=html;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),6500);
+}
 
-    async function loadData() {
-      const response = await fetch('/api/samples');
-      const result = await response.json();
-      samples = result.data;
-      updateStats(result.statistics);
-      updateSampleList();
-      updateChart();
-      update3DView();
-    }
+const STATUS={pending_ta:'待学生助教复核',ta_verified:'学生助教已确认',pending_coach:'待唐老师复核',coach_verified:'唐老师已确认',resolved:'已解决',dismissed:'已驳回'};
+const NEXT={find_ta:'请联系学生助教补充材料或复核',find_coach:'请联系唐老师进行最终确认',collect_more_data:'需要收集更多现场数据',resolve:'可以标记为已解决',dismiss:'可以驳回该样本'};
+const LOG_ACTIONS={detected:'检测',created:'创建',ta_review:'学生助教复核',coach_review:'唐老师复核',supplement:'补录',dismissed:'驳回',resolved:'解决',reopened:'重新打开',data_import:'数据导入'};
 
-    function updateStats(stats) {
-      document.getElementById('stat-total').textContent = stats.total;
-      document.getElementById('stat-pending-ta').textContent = stats.pendingTa;
-      document.getElementById('stat-pending-coach').textContent = stats.pendingCoach;
-      document.getElementById('stat-verified').textContent = stats.verified;
-      document.getElementById('stat-resolved').textContent = stats.resolved;
-    }
-
-    function updateSampleList() {
-      const list = document.getElementById('sampleList');
-      if (samples.length === 0) {
-        list.innerHTML = '<div class="empty-state">暂无边界样本<br>使用 queue-config demo 加载演示数据</div>';
-        return;
-      }
-      
-      list.innerHTML = samples.map(sample => `
-        <div class="sample-card ${sample.negativeSample.isMarkedAsMissing ? 'negative' : ''}" 
-             onclick="showDetail('${sample.sampleId}')">
-          <div class="sample-id">${sample.sampleId}</div>
-          <div class="sample-status status-${sample.status}">${getStatusLabel(sample.status)}</div>
-          <div class="sample-reason">${sample.negativeSample.reason}</div>
-        </div>
-      `).join('');
-    }
-
-    function getStatusLabel(status) {
-      const labels = {
-        pending_ta: '待学生助教',
-        pending_coach: '待唐老师',
-        coach_verified: '已确认',
-        resolved: '已解决',
-        dismissed: '已驳回'
-      };
-      return labels[status] || status;
-    }
-
-    function updateChart() {
-      const ctx = document.getElementById('waitTimeChart').getContext('2d');
-      
-      const labels = samples.map(s => s.sampleId);
-      const waitTimes = samples.map(s => {
-        if (s.questionnaireRow) return s.questionnaireRow.actualWaitTime;
-        if (s.manualCounterExample) return s.manualCounterExample.waitTime;
-        return 0;
-      });
-      const isNegative = samples.map(s => s.negativeSample.isMarkedAsMissing);
-      
-      const colors = waitTimes.map((time, i) => isNegative[i] ? '#ff6b6b' : '#667eea');
-      
-      if (waitTimeChart) waitTimeChart.destroy();
-      
-      waitTimeChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: '等待时间 (分钟)',
-            data: waitTimes,
-            backgroundColor: colors,
-            borderRadius: 4
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          onClick: (event, elements) => {
-            if (elements.length > 0) {
-              const index = elements[0].index;
-              if (isNegative[index]) {
-                showDetail(samples[index].sampleId);
-              }
-            }
-          },
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              callbacks: {
-                label: (context) => {
-                  const sample = samples[context.dataIndex];
-                  const isMissing = sample.negativeSample.isMarkedAsMissing;
-                  return `等待时间: ${context.raw}分钟${isMissing ? ' [负数样本-旧表标记缺失]' : ''}`;
-                }
-              }
-            }
-          }
-        }
-      });
-    }
-
-    function switchView(view) {
-      document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
-      
-      if (view === 'chart') {
-        document.getElementById('view-chart').style.display = 'block';
-        document.getElementById('view-3d').classList.remove('show');
-      } else {
-        document.getElementById('view-chart').style.display = 'none';
-        document.getElementById('view-3d').classList.add('show');
-      }
-    }
-
-    function update3DView() {
-      const windows = [1, 2, 3];
-      const grid = document.getElementById('windowGrid');
-      
-      grid.innerHTML = windows.map(winNum => {
-        const winSamples = samples.filter(s => 
-          (s.manualCounterExample?.windowNumber === winNum) || 
-          (s.questionnaireRow?.windowNumber === winNum)
-        );
-        const hasOverflow = winSamples.some(s => s.questionnaireRow?.queueOverflow);
-        const isClosed = winSamples.some(s => s.questionnaireRow?.isTemporaryClosed);
-        
-        let cssClass = '';
-        if (hasOverflow) cssClass = 'window-overflow';
-        else if (isClosed) cssClass = 'window-closed';
-        
-        return `
-          <div class="window-3d ${cssClass}">
-            <div class="window-number">窗口 ${winNum}</div>
-            <div class="window-status">
-              ${hasOverflow ? '⚠️ 排队溢出' : isClosed ? '🔴 临时关闭' : '✅ 正常服务'}
-            </div>
-            <div style="font-size: 11px; margin-top: 10px; opacity: 0.8;">
-              异常样本: ${winSamples.length}
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function showDetail(sampleId) {
-      const sample = samples.find(s => s.sampleId === sampleId);
-      if (!sample) return;
-      
-      currentSampleId = sampleId;
-      document.getElementById('detailSampleId').textContent = sampleId;
-      
-      const manualDiv = document.getElementById('manualEvidence');
-      if (sample.manualCounterExample) {
-        manualDiv.style.display = 'block';
-        document.getElementById('manualContent').innerHTML = `
-          <div>窗口号: ${sample.manualCounterExample.windowNumber}</div>
-          <div>时间: ${new Date(sample.manualCounterExample.timestamp).toLocaleString('zh-CN')}</div>
-          <div>到达人数: ${sample.manualCounterExample.arrivalCount}</div>
-          <div>等待时间: ${sample.manualCounterExample.waitTime} 分钟</div>
-          ${sample.manualCounterExample.mainProcessEvidence ? `<div style="margin-top: 8px; font-style: italic;">主流程证据: ${sample.manualCounterExample.mainProcessEvidence}</div>` : ''}
-        `;
-      } else {
-        manualDiv.style.display = 'none';
-      }
-      
-      const qDiv = document.getElementById('questionnaireEvidence');
-      if (sample.questionnaireRow) {
-        qDiv.style.display = 'block';
-        document.getElementById('questionnaireContent').innerHTML = `
-          <div><strong>现场说法:</strong> ${sample.questionnaireRow.onSiteStatement}</div>
-          <div><strong>证人:</strong> ${sample.questionnaireRow.witnessName}</div>
-          <div>临时关窗: ${sample.questionnaireRow.isTemporaryClosed ? '是' : '否'}</div>
-          <div>排队溢出: ${sample.questionnaireRow.queueOverflow ? '是' : '否'}</div>
-          <div>实际等待时间: ${sample.questionnaireRow.actualWaitTime} 分钟</div>
-        `;
-      } else {
-        qDiv.style.display = 'block';
-        document.getElementById('questionnaireContent').innerHTML = '<div style="color: #999;">暂无问卷原始行，请学生助教补录</div>';
-      }
-      
-      document.getElementById('whyKept').textContent = sample.whyKept;
-      document.getElementById('missingMaterials').innerHTML = sample.missingMaterials.length > 0
-        ? sample.missingMaterials.map(m => `<div class="missing-item">⭕ ${m}</div>`).join('')
-        : '<div style="color: #4caf50;">✅ 材料齐全</div>';
-      
-      const actionLabels = {
-        find_ta: '请联系学生助教补充材料或复核',
-        find_coach: '请联系竞赛教练唐老师进行最终确认',
-        collect_more_data: '需要收集更多现场数据补充完整',
-        resolve: '可以标记为已解决',
-        dismiss: '可以驳回该样本'
-      };
-      document.getElementById('nextAction').textContent = actionLabels[sample.nextAction] || sample.nextAction;
-      document.getElementById('assignee').textContent = sample.assignee || '暂无';
-      
-      document.getElementById('detailPanel').classList.add('show');
-      document.getElementById('detailPanel').scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function closeDetail() {
-      document.getElementById('detailPanel').classList.remove('show');
-      currentSampleId = null;
-    }
-
-    function showReviewModal(type) {
-      currentReviewType = type;
-      document.getElementById('modalTitle').textContent = type === 'ta' ? '学生助教复核' : '唐老师复核';
-      document.getElementById('questionnaireJson').parentElement.style.display = type === 'ta' ? 'block' : 'none';
-      document.getElementById('reviewModal').classList.add('show');
-    }
-
-    function closeReviewModal() {
-      document.getElementById('reviewModal').classList.remove('show');
-      document.getElementById('reviewNotes').value = '';
-      document.getElementById('questionnaireJson').value = '';
-      currentReviewType = null;
-    }
-
-    async function submitReview(verified) {
-      if (!currentSampleId || !currentReviewType) return;
-      
-      const notes = document.getElementById('reviewNotes').value;
-      let questionnaire = null;
-      
-      if (currentReviewType === 'ta' && document.getElementById('questionnaireJson').value) {
-        try {
-          questionnaire = JSON.parse(document.getElementById('questionnaireJson').value);
-        } catch (e) {
-          alert('问卷JSON格式错误');
-          return;
-        }
-      }
-      
-      const url = currentReviewType === 'ta'
-        ? `/api/samples/${currentSampleId}/ta-review`
-        : `/api/samples/${currentSampleId}/coach-review`;
-      
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ verified, notes, questionnaire })
-      });
-      
-      if (response.ok) {
-        closeReviewModal();
-        closeDetail();
-        loadData();
-        alert('复核成功！');
-      } else {
-        alert('复核失败');
-      }
-    }
-
-    loadData();
-  </script>
+async function loadData(){
+  const r=await fetch('/api/samples');
+  const res=await r.json();
+  if(!res.success)return toast('error','加载失败');
+  samples=res.data||[];statistics=res.statistics;
+  updateStats();updateSampleList();updateChart();update3DView();
+}
+function updateStats(s){s=s||statistics;if(!s)return;['total','pendingTa','pendingCoach','verified','resolved'].forEach(k=>{const el=document.getElementById('stat-'+k.replace(/([A-Z])/g,'_$1').toLowerCase());if(el)el.textContent=s[k]??0})}
+function updateSampleList(){
+  const list=document.getElementById('sampleList');
+  if(samples.length===0){list.innerHTML='<div class="empty-state"><div style="font-size:48px">📭</div><h3 style="margin:10px 0">总样本数: 0</h3><p>请先通过 CLI 执行 <code>queue-config import</code> 导入数据</p><p style="margin-top:6px;font-size:12px">或运行 <code>queue-config demo</code> 自动走完三步</p></div>';return}
+  list.innerHTML=samples.map(s=>{
+    const neg=s.negativeSample.isMarkedAsMissing?'negative':'';
+    const sel=currentSampleId===s.sampleId?'selected':'';
+    const missingBadge=s.missingMaterials.length>0?`<span class="badge-missing">缺${s.missingMaterials.length}项</span>`:`<span class="badge-complete">材料全</span>`;
+    return `<div class="sample-card ${neg} ${sel}" onclick="showDetail('${s.sampleId}')"><div class="sample-id">${s.sampleId} ${missingBadge}</div><div class="sample-status status-${s.status}">${STATUS[s.status]||s.status}</div><div class="sample-reason">${s.negativeSample.reason}</div><div class="sample-meta"><span>窗口: ${s.manualCounterExample?.windowNumber??s.questionnaireRow?.windowNumber??'-'}</span><span>负责人: ${s.assignee||'未指定'}</span></div></div>`}).join('');
+}
+function updateChart(){
+  const ctx=document.getElementById('waitTimeChart').getContext('2d');
+  const labels=samples.map(s=>s.sampleId);
+  const waitTimes=samples.map(s=>{if(s.questionnaireRow)return s.questionnaireRow.actualWaitTime;if(s.manualCounterExample)return s.manualCounterExample.waitTime;return 0});
+  const isNeg=samples.map(s=>s.negativeSample.isMarkedAsMissing||(s.originalNegativeValues&&(s.originalNegativeValues.waitTime!==undefined||s.originalNegativeValues.arrivalCount!==undefined)));
+  const colors=waitTimes.map((t,i)=>isNeg[i]?'#ff6b6b':'#667eea');
+  if(waitTimeChart)waitTimeChart.destroy();
+  waitTimeChart=new Chart(ctx,{type:'bar',data:{labels,datasets:[{label:'等待时间(分钟)',data:waitTimes,backgroundColor:colors,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,onClick:(e,el)=>{if(el.length>0)showDetail(samples[el[0].index].sampleId)},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{const s=samples[c.dataIndex];return `等待:${c.raw}分钟${s.negativeSample.isMarkedAsMissing?' [负数样本/旧表标记缺失]':''}`}}}}}});
+}
+function switchView(v){document.querySelectorAll('.toggle-btn').forEach(b=>b.classList.remove('active'));event.target.classList.add('active');if(v==='chart'){document.getElementById('view-chart').style.display='block';document.getElementById('view-3d').classList.remove('show')}else{document.getElementById('view-chart').style.display='none';document.getElementById('view-3d').classList.add('show')}}
+function update3DView(){
+  const wins=[1,2,3];const grid=document.getElementById('windowGrid');
+  grid.innerHTML=wins.map(wn=>{
+    const ws=samples.filter(s=>(s.manualCounterExample?.windowNumber===wn)||(s.questionnaireRow?.windowNumber===wn));
+    const hasO=ws.some(s=>s.questionnaireRow?.queueOverflow);
+    const isC=ws.some(s=>s.questionnaireRow?.isTemporaryClosed);
+    let cls='';if(hasO)cls='window-overflow';else if(isC)cls='window-closed';
+    const neg=ws.filter(s=>s.negativeSample.isMarkedAsMissing).length;
+    return `<div class="window-3d ${cls}"><div class="window-number">窗口 ${wn}</div><div class="window-status">${hasO?'⚠️ 排队溢出':isC?'🔴 临时关闭':'✅ 正常服务'}</div><div style="font-size:11px;margin-top:10px;opacity:.9">异常: ${ws.length}${neg>0?` <span style="color:#ffebee">(负数${neg})</span>`:''}</div></div>`}).join('');
+}
+async function showDetail(sid){
+  currentSampleId=sid;
+  const r=await fetch('/api/samples/'+sid);
+  const res=await r.json();
+  if(!res.success){toast('error',res.error||'样本不存在',res.hints);return}
+  const s=res.data;const history=res.history||s.reviewLog||[];
+  document.getElementById('detailSampleId').textContent=sid;
+  document.getElementById('detailStatusBadge').innerHTML=`<span class="sample-status status-${s.status}">${STATUS[s.status]||s.status}</span>`;
+  document.getElementById('negativeInfo').innerHTML=`<div class="section-title">⚠️ 负数样本信息</div><div><strong>异常原因:</strong> ${s.negativeSample.reason}</div><div><strong>检测来源:</strong> ${s.negativeSample.detectedBy==='old_table'?'旧表系统':'系统检测'}</div><div><strong>是否标记为缺失:</strong> ${s.negativeSample.isMarkedAsMissing?'是（旧表当成缺失，先服务复核）':'否'}</div>`;
+  const orig=s.originalNegativeValues||{};const hasOrig=orig.waitTime!==undefined||orig.arrivalCount!==undefined;
+  document.getElementById('deltaSection').style.display=hasOrig?'block':'none';
+  if(hasOrig){
+    const finalWT=s.dataResolution?.finalWaitTime??s.questionnaireRow?.actualWaitTime??s.manualCounterExample?.waitTime;
+    const finalAC=s.dataResolution?.finalArrivalCount??s.questionnaireRow?.actualArrivalCount??s.manualCounterExample?.arrivalCount;
+    let html='';
+    if(orig.waitTime!==undefined){html+=`<div class="delta-cell neg"><div class="delta-label">原始负数</div>等待时间: ${orig.waitTime}分钟</div><div class="delta-cell corr"><div class="delta-label">修正后</div>${finalWT!==undefined?finalWT+'分钟':'未确定'}</div><div class="delta-cell"><div class="delta-label">对比</div>${finalWT!==undefined?`Δ ${(finalWT-orig.waitTime).toFixed(0)} 分钟`:'-'}</div>`}
+    if(orig.arrivalCount!==undefined){html+=`<div class="delta-cell neg"><div class="delta-label">原始负数</div>到达人数: ${orig.arrivalCount}人</div><div class="delta-cell corr"><div class="delta-label">修正后</div>${finalAC!==undefined?finalAC+'人':'未确定'}</div><div class="delta-cell"><div class="delta-label">对比</div>${finalAC!==undefined?`Δ ${finalAC-orig.arrivalCount} 人`:'-'}</div>`}
+    document.getElementById('deltaGrid').innerHTML=html;
+  }
+  const m=s.manualCounterExample;const manEl=document.getElementById('manualEvidence');
+  if(m){document.getElementById('manualContent').innerHTML=`<div>窗口: #${m.windowNumber} · ${new Date(m.timestamp).toLocaleString('zh-CN')}</div><div>到达人数: ${m.arrivalCount} · 服务时间: ${m.serviceTime}分钟 · 等待时间: ${m.waitTime}分钟</div>${m.mainProcessEvidence?`<div style="margin-top:8px;font-style:italic">🔑 主流程证据: ${m.mainProcessEvidence}</div>`:''}`;manEl.style.display='block'}else manEl.style.display='none';
+  const q=s.questionnaireRow;const qEl=document.getElementById('questionnaireEvidence');
+  if(q){document.getElementById('questionnaireContent').innerHTML=`<div style="font-weight:500">💬 ${q.onSiteStatement||'(暂无现场说法)'}</div><div style="margin-top:6px">👤 证人: ${q.witnessName||'(未签名)'}</div><div>临时关窗: ${q.isTemporaryClosed?'是 ⚠️':'否'} · 排队溢出: ${q.queueOverflow?'是 ⚠️':'否'}</div><div>实际等待: ${q.actualWaitTime}分钟 · 实际到达: ${q.actualArrivalCount}人</div>`;qEl.style.display='block'}else{document.getElementById('questionnaireContent').innerHTML='<div style="color:#c62828">⭕ 缺少问卷原始行，请学生助教补录现场说法</div>';qEl.style.display='block'}
+  document.getElementById('whyKept').textContent=s.whyKept||'边界样本，保留用于分析';
+  document.getElementById('missingMaterials').innerHTML=s.missingMaterials.length?s.missingMaterials.map(m=>`<div class="missing-item">⭕ ${m}</div>`).join(''):'<div style="color:#2e7d32">✅ 材料齐全</div>';
+  document.getElementById('nextAction').textContent=NEXT[s.nextAction]||s.nextAction;
+  document.getElementById('assignee').textContent=s.assignee||'暂无';
+  const rs=s.dataResolution;const rsSec=document.getElementById('resolutionSection');
+  if(rs){rsSec.style.display='block';document.getElementById('resolutionContent').innerHTML=`${rs.finalWaitTime!==undefined?`<div><strong>最终等待时间:</strong> ${rs.finalWaitTime}分钟</div>`:''}${rs.finalArrivalCount!==undefined?`<div><strong>最终到达人数:</strong> ${rs.finalArrivalCount}人</div>`:''}${rs.resolutionReason?`<div><strong>处理原因:</strong> ${rs.resolutionReason}</div>`:''}${rs.nextContactPerson?`<div><strong>后续找谁:</strong> ${rs.nextContactPerson}</div>`:''}${rs.resolvedBy?`<div><strong>处理人:</strong> ${rs.resolvedBy} @ ${new Date(rs.resolvedAt).toLocaleString('zh-CN')}</div>`:''}`}else rsSec.style.display='none';
+  const tl=document.getElementById('historyTimeline');
+  const merged=history.length?history:(s.reviewLog||[]);
+  tl.innerHTML=merged.length?merged.map(h=>{const sb=h.statusBefore?STATUS[h.statusBefore]:'';const sa=h.statusAfter?STATUS[h.statusAfter]:'';return `<div class="timeline-item"><div class="timeline-time">${new Date(h.timestamp).toLocaleString('zh-CN')}</div><div class="timeline-body"><strong>${h.operator}</strong> 执行【${LOG_ACTIONS[h.action]||h.action}】${sb&&sa?` <span class="timeline-badge">${sb} → ${sa}</span>`:''}${h.notes?`<div class="muted">📝 ${h.notes}</div>`:''}${h.reason?`<div class="muted">💡 ${h.reason}</div>`:''}${h.rawStatementAdded?`<div style="color:#2e7d32">☑ 补录了现场说法</div>`:''}</div></div>`}).join(''):'<div class="muted">暂无历史记录</div>';
+  document.getElementById('detailPanel').classList.add('show');
+  document.getElementById('detailPanel').scrollIntoView({behavior:'smooth'});
+  updateSampleList();
+}
+function closeDetail(){document.getElementById('detailPanel').classList.remove('show');currentSampleId=null;updateSampleList()}
+function showReviewModal(type){if(!currentSampleId){toast('warn','请先选择一个样本');return}currentReviewType=type;document.getElementById('modalTitle').textContent=type==='ta'?'👨‍🎓 学生助教复核（可补录问卷）':'👨‍🏫 唐老师复核（最终确认）';document.getElementById('questionnaireField').style.display=type==='ta'?'block':'none';document.getElementById('reviewModal').classList.add('show')}
+function closeReviewModal(){document.getElementById('reviewModal').classList.remove('show');document.getElementById('reviewNotes').value='';document.getElementById('questionnaireJson').value='';currentReviewType=null}
+async function submitReview(verified){if(!currentSampleId||!currentReviewType)return;const notes=document.getElementById('reviewNotes').value.trim();let qData=null;if(currentReviewType==='ta'&&document.getElementById('questionnaireJson').value.trim()){try{qData=JSON.parse(document.getElementById('questionnaireJson').value.trim())}catch(e){toast('error','问卷JSON格式错误: '+e.message);return}}const url=currentReviewType==='ta'?`/api/samples/${currentSampleId}/ta-review`:`/api/samples/${currentSampleId}/coach-review`;const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({verified,notes,questionnaire:qData})});const res=await r.json();if(res.success){toast('success',(currentReviewType==='ta'?'学生助教':'唐老师')+'复核成功');closeReviewModal();showDetail(currentSampleId);loadData()}else{const why=res.errorKind==='sample_not_found'?'样本不存在（总样本数: '+(res.statistics?.total??'?')+'）':res.errorKind==='invalid_status_transition'?'当前状态不允许该操作':'操作失败';toast(res.errorKind==='sample_not_found'?'error':res.errorKind==='invalid_status_transition'?'warn':'error',why||res.error,res.hints)}}
+loadData();
+</script>
 </body>
 </html>

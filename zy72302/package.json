@@ -10,8 +10,8 @@
     "build": "tsc",
     "start": "node dist/cli/index.js",
     "dev": "ts-node src/cli/index.ts",
-    "web": "node dist/web/server.js",
-    "web:dev": "ts-node src/web/server.ts",
+    "web": "node dist/cli/index.js web",
+    "web:dev": "ts-node src/cli/index.ts web",
     "test": "ts-node src/tests/integration.test.ts",
     "lint": "eslint src --ext .ts",
     "typecheck": "tsc --noEmit"
