@@ -95,20 +95,17 @@ export const detectAnomalies = (
     .filter((a): a is number => a !== null);
 
   if (validAmplitudes.length > 0) {
-    const mean = validAmplitudes.reduce((a, b) => a + b, 0) / validAmplitudes.length;
-    const stdDev = Math.sqrt(
-      validAmplitudes.reduce((sum, a) => sum + Math.pow(a - mean, 2), 0) / validAmplitudes.length
-    );
+    const { q3: ampQ3, iqr: ampIqr } = calculateIQR(validAmplitudes);
+    const ampUpperBound = ampQ3 + 1.5 * ampIqr;
 
     records.forEach((record) => {
       if (record.amplitude !== null) {
-        const zScore = Math.abs((record.amplitude - mean) / stdDev);
-        if (zScore > rules.amplitudeOutlierThreshold) {
+        if (record.amplitude > ampUpperBound) {
           issues.push({
             type: 'outlier',
             recordId: record.id,
             field: 'amplitude',
-            message: `振幅 (Z分数 (${zScore.toFixed(2)}) 超出正常范围`,
+            message: `振幅 ${record.amplitude} 超出IQR上界 (${ampUpperBound.toFixed(0)})`,
             severity: 'error',
           });
         }

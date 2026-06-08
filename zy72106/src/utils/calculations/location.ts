@@ -4,7 +4,10 @@ const EARTH_RADIUS = 6371.0;
 
 const toRadians = (degrees: number): number => (degrees * Math.PI) / 180;
 
-const calculateDistance = (
+const DEG_TO_KM_LAT = 111.32;
+const degToKmLon = (lat: number): number => 111.32 * Math.cos(toRadians(lat));
+
+export const calculateDistance = (
   lat1: number,
   lon1: number,
   lat2: number,
@@ -22,19 +25,55 @@ const calculateDistance = (
   return EARTH_RADIUS * c;
 };
 
-const calculateTravelTime = (
-  distance: number,
-  velocity: number
-): number => {
-  return distance / velocity;
+const toLocalXyz = (
+  lat: number,
+  lon: number,
+  depth: number,
+  refLat: number,
+  refLon: number
+): [number, number, number] => {
+  const x = (lon - refLon) * degToKmLon(refLat);
+  const y = (lat - refLat) * DEG_TO_KM_LAT;
+  const z = depth;
+  return [x, y, z];
 };
 
-const solveLinearSystem = (
+const fromLocalXyz = (
+  x: number,
+  y: number,
+  refLat: number,
+  refLon: number
+): [number, number] => {
+  const lat = refLat + y / DEG_TO_KM_LAT;
+  const lon = refLon + x / degToKmLon(refLat);
+  return [lat, lon];
+};
+
+const solveLeastSquares = (
   A: number[][],
-  b: number[]
+  b: number[],
+  damping: number = 0
 ): number[] => {
-  const n = A.length;
-  const augmented = A.map((row, i) => [...row, b[i]]);
+  const m = A.length;
+  const n = A[0].length;
+
+  const AtA: number[][] = Array.from({ length: n }, () => new Array(n).fill(0));
+  const Atb: number[] = new Array(n).fill(0);
+
+  for (let i = 0; i < m; i++) {
+    for (let j = 0; j < n; j++) {
+      for (let k = 0; k < n; k++) {
+        AtA[j][k] += A[i][j] * A[i][k];
+      }
+      Atb[j] += A[i][j] * b[i];
+    }
+  }
+
+  for (let i = 0; i < n; i++) {
+    AtA[i][i] += damping;
+  }
+
+  const augmented = AtA.map((row, i) => [...row, Atb[i]]);
 
   for (let i = 0; i < n; i++) {
     let maxRow = i;
@@ -44,6 +83,8 @@ const solveLinearSystem = (
       }
     }
     [augmented[i], augmented[maxRow]] = [augmented[maxRow], augmented[i]];
+
+    if (Math.abs(augmented[i][i]) < 1e-15) continue;
 
     for (let j = i + 1; j < n; j++) {
       const factor = augmented[j][i] / augmented[i][i];
@@ -55,6 +96,7 @@ const solveLinearSystem = (
 
   const x = new Array(n).fill(0);
   for (let i = n - 1; i >= 0; i--) {
+    if (Math.abs(augmented[i][i]) < 1e-15) continue;
     let sum = 0;
     for (let j = i + 1; j < n; j++) {
       sum += augmented[i][j] * x[j];
@@ -65,6 +107,17 @@ const solveLinearSystem = (
   return x;
 };
 
+const MAX_STEP_KM = 50.0;
+
+const clampStep = (delta: number[], maxStep: number): number[] => {
+  const spatialMag = Math.sqrt(delta[0] * delta[0] + delta[1] * delta[1] + delta[2] * delta[2]);
+  if (spatialMag > maxStep && spatialMag > 0) {
+    const scale = maxStep / spatialMag;
+    return [delta[0] * scale, delta[1] * scale, delta[2] * scale, delta[3] * scale];
+  }
+  return delta;
+};
+
 export const locateEarthquake = (
   records: SensorRecord[],
   params: CalculationParams
@@ -73,15 +126,12 @@ export const locateEarthquake = (
     (r) => r.pWaveArrival !== null && r.sWaveArrival !== null
   );
 
-  if (validRecords.length < 3) {
-    throw new Error('至少需要3个有效台站记录');
+  if (validRecords.length < 4) {
+    throw new Error('至少需要4个有效台站记录进行定位');
   }
 
   let lat = 0;
   let lon = 0;
-  let depth = 10;
-  let originTime = 0;
-
   validRecords.forEach((r) => {
     lat += r.latitude;
     lon += r.longitude;
@@ -89,83 +139,131 @@ export const locateEarthquake = (
   lat /= validRecords.length;
   lon /= validRecords.length;
 
-  const pWaveArrivals = validRecords.map((r) => r.pWaveArrival!);
-  originTime = Math.min(...pWaveArrivals) - 5;
+  let depth = 15.0;
+  const vp = params.pWaveVelocity;
+  const refLat = lat;
+  const refLon = lon;
+
+  let originTime = 0;
+  let travelTimeSum = 0;
+  validRecords.forEach((record) => {
+    const [stx, sty] = toLocalXyz(record.latitude, record.longitude, 0, refLat, refLon);
+    const Ri = Math.sqrt(stx * stx + sty * sty + depth * depth);
+    travelTimeSum += Ri / vp;
+  });
+  const avgTravelTime = travelTimeSum / validRecords.length;
+  const avgObserved = validRecords.reduce((s, r) => s + r.pWaveArrival!, 0) / validRecords.length;
+  originTime = avgObserved - avgTravelTime;
+
+  let damping = 1.0;
+  let prevAvgResidual = Infinity;
 
   for (let iter = 0; iter < params.maxIterations; iter++) {
+    const [sx, sy, sz] = toLocalXyz(lat, lon, depth, refLat, refLon);
+
     const A: number[][] = [];
     const b: number[] = [];
 
     validRecords.forEach((record) => {
-      const distance = calculateDistance(
-        lat,
-        lon,
+      const [stx, sty, stz] = toLocalXyz(
         record.latitude,
-        record.longitude
+        record.longitude,
+        0,
+        refLat,
+        refLon
       );
-      const totalDistance = Math.sqrt(
-        distance * distance + depth * depth
-      );
+      const dx = stx - sx;
+      const dy = sty - sy;
+      const dz = stz - sz;
+      const Ri = Math.sqrt(dx * dx + dy * dy + dz * dz);
 
-      const theoreticalTime =
-        originTime +
-        calculateTravelTime(totalDistance, params.pWaveVelocity);
+      if (Ri < 1e-10) return;
 
-      const dTdLat =
-        ((record.latitude - lat) *
-        (depth / totalDistance) *
-        (1 / params.pWaveVelocity));
-      const dTdLon =
-        ((record.longitude - lon) *
-          (depth / totalDistance) *
-          (1 / params.pWaveVelocity));
-      const dTdDepth =
-        (depth / totalDistance) * (1 / params.pWaveVelocity);
+      const theoreticalTime = originTime + Ri / vp;
+      const dTdX = -dx / (vp * Ri);
+      const dTdY = -dy / (vp * Ri);
+      const dTdZ = -dz / (vp * Ri);
 
-      A.push([dTdLat, dTdLon, dTdDepth, 1]);
+      A.push([dTdX, dTdY, dTdZ, 1]);
       b.push(record.pWaveArrival! - theoreticalTime);
     });
 
-    const delta = solveLinearSystem(A, b);
+    if (A.length < 4) break;
 
-    lat += delta[0];
-    lon += delta[1];
-    depth += delta[2];
-    originTime += delta[3];
+    let delta = solveLeastSquares(A, b, damping);
+    delta = clampStep(delta, MAX_STEP_KM);
 
-    const deltaMagnitude = Math.sqrt(
-      delta[0] * delta[0] +
-        delta[1] * delta[1] +
-        delta[2] * delta[2]
+    const [curX, curY, curZ] = toLocalXyz(lat, lon, depth, refLat, refLon);
+    const updatedX = curX + delta[0];
+    const updatedY = curY + delta[1];
+    const updatedZ = curZ + delta[2];
+
+    const testDepth = updatedZ < 0 ? 1.0 : updatedZ;
+    const [testLat, testLon] = fromLocalXyz(updatedX, updatedY, refLat, refLon);
+
+    let testAvgRes = Infinity;
+    const testSx = updatedX;
+    const testSy = updatedY;
+    const testSz = testDepth;
+    const testOt = originTime + delta[3];
+    let testResSum = 0;
+    let testResCount = 0;
+    validRecords.forEach((record) => {
+      const [stx, sty, stz] = toLocalXyz(record.latitude, record.longitude, 0, refLat, refLon);
+      const dx2 = stx - testSx;
+      const dy2 = sty - testSy;
+      const dz2 = stz - testSz;
+      const Ri = Math.sqrt(dx2 * dx2 + dy2 * dy2 + dz2 * dz2);
+      if (Ri > 1e-10) {
+        testResSum += Math.abs(record.pWaveArrival! - (testOt + Ri / vp));
+        testResCount++;
+      }
+    });
+    if (testResCount > 0) testAvgRes = testResSum / testResCount;
+
+    if (testAvgRes < prevAvgResidual) {
+      depth = testDepth;
+      lat = testLat;
+      lon = testLon;
+      originTime = testOt;
+      damping = Math.max(damping * 0.5, 1e-6);
+      prevAvgResidual = testAvgRes;
+    } else {
+      damping = damping * 2.0;
+    }
+
+    const deltaMag = Math.sqrt(
+      delta[0] * delta[0] + delta[1] * delta[1] + delta[2] * delta[2]
     );
 
-    if (deltaMagnitude < params.convergenceThreshold) {
+    if (deltaMag < params.convergenceThreshold && damping < 0.01) {
       break;
     }
   }
 
   const residuals = validRecords.map((record) => {
-    const distance = calculateDistance(
-      lat,
-      lon,
+    const [stx, sty, stz] = toLocalXyz(
       record.latitude,
-      record.longitude
+      record.longitude,
+      0,
+      refLat,
+      refLon
     );
-    const totalDistance = Math.sqrt(
-      distance * distance + depth * depth
-    );
-    const theoreticalTime =
-      originTime +
-      calculateTravelTime(totalDistance, params.pWaveVelocity);
+    const [sx2, sy2, sz2] = toLocalXyz(lat, lon, depth, refLat, refLon);
+    const dx = stx - sx2;
+    const dy = sty - sy2;
+    const dz = stz - sz2;
+    const Ri = Math.sqrt(dx * dx + dy * dy + dz * dz);
+    const theoreticalTime = originTime + Ri / vp;
     return {
       sensorId: record.sensorId,
       residual: record.pWaveArrival! - theoreticalTime,
     };
   });
 
+  const absResiduals = residuals.map((r) => Math.abs(r.residual));
   const avgResidual =
-    residuals.reduce((sum, r) => sum + Math.abs(r.residual), 0) /
-    residuals.length;
+    absResiduals.reduce((sum, r) => sum + r, 0) / absResiduals.length;
 
   let quality: 'excellent' | 'good' | 'fair' | 'poor' = 'good';
   if (avgResidual < 0.1) quality = 'excellent';
@@ -173,10 +271,10 @@ export const locateEarthquake = (
   else if (avgResidual < 1.0) quality = 'fair';
   else quality = 'poor';
 
-  const magnitudes = validRecords.map((r) => r.amplitude);
-  const validMagnitudes = magnitudes.filter(
-    (m): m is number => m !== null
-  );
+  const validMagnitudes = validRecords
+    .map((r) => r.amplitude)
+    .filter((m): m is number => m !== null);
+
   const magnitude =
     validMagnitudes.length > 0
       ? validMagnitudes.reduce((a, b) => a + b, 0) / validMagnitudes.length
@@ -191,8 +289,8 @@ export const locateEarthquake = (
     originTime: originTime,
     magnitude: magnitude,
     uncertainty: {
-      horizontal: avgResidual * params.pWaveVelocity,
-      vertical: avgResidual * params.pWaveVelocity * 0.5,
+      horizontal: avgResidual * vp,
+      vertical: avgResidual * vp * 0.5,
     },
     residuals: residuals,
     quality: quality,
@@ -205,5 +303,6 @@ export const calculateMagnitude = (
   amplitude: number,
   distance: number
 ): number => {
+  if (amplitude <= 0 || distance <= 0) return 0;
   return Math.log10(amplitude) + 1.7 * Math.log10(distance) - 0.1;
 };

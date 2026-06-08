@@ -387,7 +387,7 @@ export function Workspace() {
           <div className="space-y-3">
             <button
               onClick={handleCalculate}
-              disabled={isCalculating || sensorRecords.length < 3}
+              disabled={isCalculating || sensorRecords.filter(r => r.pWaveArrival !== null && r.sWaveArrival !== null).length < 4}
               className="btn-primary w-full flex items-center justify-center gap-2"
             >
               <Play size={18} />
