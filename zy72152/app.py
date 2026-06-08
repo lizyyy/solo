@@ -91,7 +91,7 @@ def import_spots():
         "added": len(new_spots),
         "merged_total": len(merged),
         "merge_report": merge_report,
-        "duplicates": duplicates,
+        "duplicates": all_duplicates,
         "conflicts_count": len(conflicts),
         "overflow": overflow,
     })
