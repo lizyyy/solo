@@ -1,8 +1,8 @@
 [
   {
-    "entry_id": "3552b8d9-c254-4d22-8d4d-d1770dbb414c",
-    "timestamp": "2026-06-08T16:24:33.744844",
-    "operator": "林老师",
+    "entry_id": "7624b7d3-cd67-4099-a1d2-f1fca00be2ca",
+    "timestamp": "2026-06-08T16:24:34.406874",
+    "operator": "系统",
     "action": "导入曲目表",
     "track_id": null,
     "file_path": null,
@@ -12,9 +12,9 @@
     "source": "sample_data/track_list.xlsx"
   },
   {
-    "entry_id": "770ae6dd-b3f9-4fb7-9b97-5d81f6d928ad",
-    "timestamp": "2026-06-08T16:24:33.866114",
-    "operator": "林老师",
+    "entry_id": "a613326b-ff2d-4b53-80f8-74bf745ce23e",
+    "timestamp": "2026-06-08T16:24:34.487841",
+    "operator": "系统",
     "action": "导入完成",
     "track_id": null,
     "file_path": null,
@@ -24,9 +24,9 @@
     "source": "sample_data/track_list.xlsx"
   },
   {
-    "entry_id": "e8a7835a-3a66-41e8-b7e9-ba97d9888d43",
-    "timestamp": "2026-06-08T16:24:33.866453",
-    "operator": "林老师",
+    "entry_id": "40a560a4-e3b5-437a-b30f-8274d278a5e2",
+    "timestamp": "2026-06-08T16:24:34.488121",
+    "operator": "系统",
     "action": "扫描音频目录",
     "track_id": null,
     "file_path": null,
@@ -36,9 +36,9 @@
     "source": "sample_data/audio"
   },
   {
-    "entry_id": "df6994ac-98b4-404c-9865-962fd4d25203",
-    "timestamp": "2026-06-08T16:24:33.867394",
-    "operator": "林老师",
+    "entry_id": "ba4bdb44-bafa-4449-a5d0-53e054247bc6",
+    "timestamp": "2026-06-08T16:24:34.488980",
+    "operator": "系统",
     "action": "扫描完成",
     "track_id": null,
     "file_path": null,
@@ -48,9 +48,9 @@
     "source": "sample_data/audio"
   },
   {
-    "entry_id": "1dc2ac57-b6d3-4015-940a-81c154265a96",
-    "timestamp": "2026-06-08T16:24:33.867604",
-    "operator": "林老师",
+    "entry_id": "07217e64-3e99-4296-9644-2cad9644d510",
+    "timestamp": "2026-06-08T16:24:34.489135",
+    "operator": "验证",
     "action": "开始匹配",
     "track_id": null,
     "file_path": null,
@@ -60,9 +60,9 @@
     "source": "匹配器"
   },
   {
-    "entry_id": "17eeb2d9-3edf-4280-ab26-ae9a49b8e10e",
-    "timestamp": "2026-06-08T16:24:33.870422",
-    "operator": "林老师",
+    "entry_id": "111db67a-4357-4eec-9cc0-145ddd04da0e",
+    "timestamp": "2026-06-08T16:24:34.491761",
+    "operator": "验证",
     "action": "匹配完成",
     "track_id": null,
     "file_path": null,
@@ -70,17 +70,5 @@
     "new_value": null,
     "reason": "匹配完成: 成功匹配 2 条, 异常 8 条",
     "source": "匹配器"
-  },
-  {
-    "entry_id": "1e147f04-f525-4f1b-8093-55712a28cef6",
-    "timestamp": "2026-06-08T16:24:33.896402",
-    "operator": "林老师",
-    "action": "生成报告",
-    "track_id": null,
-    "file_path": null,
-    "old_value": null,
-    "new_value": null,
-    "reason": "生成HTML报告: output/report.html",
-    "source": "output/report.html"
   }
 ]

@@ -474,7 +474,10 @@ class ReportGenerator:
         elif exc_type == ExceptionType.MISSING_LICENSE:
             return f"授权信息不完整，请确认版权状态"
         elif exc_type == ExceptionType.RENAMED:
-            return f"模糊匹配，可能已人工改名"
+            evidence = details.get('evidence', '')
+            if evidence:
+                return evidence
+            return "文件名与曲名不匹配，可能已人工改名"
         return str(details)
     
     def _get_audit_trail(self, track_id: str) -> List[Dict]:
