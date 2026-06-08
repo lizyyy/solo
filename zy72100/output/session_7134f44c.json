@@ -1,22 +1,22 @@
 {
-  "session_id": "cc484bd3",
-  "started_at": "2026-06-01T23:40:26.257343",
-  "finished_at": "2026-06-01T23:40:26.260503",
+  "session_id": "7134f44c",
+  "started_at": "2026-06-08T08:40:34.750521",
+  "finished_at": "2026-06-08T08:40:34.753125",
   "batch_label": "trial_run_20260601",
   "source_files": [
     "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv",
     "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv"
   ],
-  "active_threshold_id": "dce79af6",
+  "active_threshold_id": "a8449375",
   "threshold_version_chain": [
     {
-      "config_id": "abc29e4c",
-      "created_at": "2026-06-01T23:40:26.257395",
+      "config_id": "2c7c3037",
+      "created_at": "2026-06-08T08:40:34.750553",
       "created_by": "engineer_zhang",
       "reason": "initial_setup",
       "values": {
-        "config_id": "abc29e4c",
-        "created_at": "2026-06-01T23:40:26.257395",
+        "config_id": "2c7c3037",
+        "created_at": "2026-06-08T08:40:34.750553",
         "created_by": "engineer_zhang",
         "reason": "initial_setup",
         "cl_max": 1.8,
@@ -30,13 +30,13 @@
       }
     },
     {
-      "config_id": "dce79af6",
-      "created_at": "2026-06-01T23:40:26.261020",
+      "config_id": "a8449375",
+      "created_at": "2026-06-08T08:40:34.753291",
       "created_by": "engineer_zhang",
       "reason": "post-stall region allowed",
       "values": {
-        "config_id": "dce79af6",
-        "created_at": "2026-06-01T23:40:26.261020",
+        "config_id": "a8449375",
+        "created_at": "2026-06-08T08:40:34.753291",
         "created_by": "engineer_zhang",
         "reason": "post-stall region allowed",
         "cl_max": 1.8,
@@ -52,7 +52,7 @@
   ],
   "data_gaps": [
     {
-      "gap_id": "7244644a",
+      "gap_id": "0462bd47",
       "start": "2026-06-01T08:00:04",
       "end": "2026-06-01T08:00:10",
       "expected_sec": 1.0,
@@ -60,7 +60,7 @@
       "missing_samples": 5
     },
     {
-      "gap_id": "ee7c163f",
+      "gap_id": "0adf8f97",
       "start": "2026-06-01T08:00:20",
       "end": "2026-06-01T09:00:00",
       "expected_sec": 1.0,
@@ -68,7 +68,7 @@
       "missing_samples": 3579
     },
     {
-      "gap_id": "bbf62641",
+      "gap_id": "72b8dccc",
       "start": "2026-06-01T09:00:08",
       "end": "2026-06-01T09:00:14",
       "expected_sec": 1.0,
@@ -78,7 +78,7 @@
   ],
   "unit_issues": [
     {
-      "issue_id": "4089d1c0",
+      "issue_id": "1c8c5f5b",
       "record_id": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L9",
       "field": "lift_force",
       "original": "142.8 kN",
@@ -86,7 +86,7 @@
       "factor": 999.9999999999999
     },
     {
-      "issue_id": "32f72b3e",
+      "issue_id": "e484feb9",
       "record_id": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L17",
       "field": "lift_force",
       "original": "98.4 lbf",
@@ -94,7 +94,7 @@
       "factor": 4.44822
     },
     {
-      "issue_id": "df086fbe",
+      "issue_id": "84245cf6",
       "record_id": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L17",
       "field": "temperature",
       "original": "78.2 °F",
@@ -111,8 +111,8 @@
       "cd": 0.44263038548752837,
       "ld_ratio": -0.6830601092896175,
       "dynamic_pressure": 551.25,
-      "threshold_config_id": "dce79af6",
-      "threshold_version": "vdce79a_202606012340",
+      "threshold_config_id": "a8449375",
+      "threshold_version": "va84493_202606080840",
       "exceeds_threshold": true,
       "threshold_violation_detail": "Cd=0.443 > 阈值0.15; L/D=-0.7 < 阈值0.0",
       "data_gap_ids": [],
@@ -120,7 +120,7 @@
       "is_interpolated": false,
       "raw_annotation_preserved": "",
       "source_file": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv",
-      "processing_time": "2026-06-01T23:40:26.261122"
+      "processing_time": "2026-06-08T08:40:34.753310"
     },
     {
       "record_id": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L3",
@@ -130,8 +130,8 @@
       "cd": 0.29266817838246406,
       "ld_ratio": 0.4793388429752067,
       "dynamic_pressure": 551.25,
-      "threshold_config_id": "dce79af6",
-      "threshold_version": "vdce79a_202606012340",
+      "threshold_config_id": "a8449375",
+      "threshold_version": "va84493_202606080840",
       "exceeds_threshold": true,
       "threshold_violation_detail": "Cd=0.293 > 阈值0.15",
       "data_gap_ids": [],
@@ -139,7 +139,7 @@
       "is_interpolated": false,
       "raw_annotation_preserved": "",
       "source_file": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv",
-      "processing_time": "2026-06-01T23:40:26.261137"
+      "processing_time": "2026-06-08T08:40:34.753315"
     },
     {
       "record_id": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L4",
@@ -149,8 +149,8 @@
       "cd": 0.23703703703703705,
       "ld_ratio": 2.285714285714285,
       "dynamic_pressure": 551.25,
-      "threshold_config_id": "dce79af6",
-      "threshold_version": "vdce79a_202606012340",
+      "threshold_config_id": "a8449375",
+      "threshold_version": "va84493_202606080840",
       "exceeds_threshold": true,
       "threshold_violation_detail": "Cd=0.237 > 阈值0.15",
       "data_gap_ids": [],
@@ -158,7 +158,7 @@
       "is_interpolated": false,
       "raw_annotation_preserved": "",
       "source_file": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv",
-      "processing_time": "2026-06-01T23:40:26.261148"
+      "processing_time": "2026-06-08T08:40:34.753320"
     },
     {
       "record_id": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L5",
@@ -168,8 +168,8 @@
       "cd": 0.2691024644424717,
       "ld_ratio": 4.071428571428572,
       "dynamic_pressure": 554.9311250000001,
-      "threshold_config_id": "dce79af6",
-      "threshold_version": "vdce79a_202606012340",
+      "threshold_config_id": "a8449375",
+      "threshold_version": "va84493_202606080840",
       "exceeds_threshold": true,
       "threshold_violation_detail": "Cd=0.269 > 阈值0.15",
       "data_gap_ids": [],
@@ -177,7 +177,7 @@
       "is_interpolated": false,
       "raw_annotation_preserved": "",
       "source_file": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv",
-      "processing_time": "2026-06-01T23:40:26.261159"
+      "processing_time": "2026-06-08T08:40:34.753324"
     },
     {
       "record_id": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L6",
@@ -187,18 +187,18 @@
       "cd": 0.3507180650037793,
       "ld_ratio": 4.710344827586207,
       "dynamic_pressure": 551.25,
-      "threshold_config_id": "dce79af6",
-      "threshold_version": "vdce79a_202606012340",
+      "threshold_config_id": "a8449375",
+      "threshold_version": "va84493_202606080840",
       "exceeds_threshold": true,
       "threshold_violation_detail": "Cd=0.351 > 阈值0.15",
       "data_gap_ids": [
-        "7244644a"
+        "0462bd47"
       ],
       "unit_issue_ids": [],
       "is_interpolated": true,
       "raw_annotation_preserved": "",
       "source_file": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv",
-      "processing_time": "2026-06-01T23:40:26.261168"
+      "processing_time": "2026-06-08T08:40:34.753328"
     },
     {
       "record_id": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L7",
@@ -208,18 +208,18 @@
       "cd": 0.45230536659108084,
       "ld_ratio": 5.090909090909091,
       "dynamic_pressure": 551.25,
-      "threshold_config_id": "dce79af6",
-      "threshold_version": "vdce79a_202606012340",
+      "threshold_config_id": "a8449375",
+      "threshold_version": "va84493_202606080840",
       "exceeds_threshold": true,
       "threshold_violation_detail": "Cl=2.303 > 阈值1.8; Cd=0.452 > 阈值0.15",
       "data_gap_ids": [
-        "7244644a"
+        "0462bd47"
       ],
       "unit_issue_ids": [],
       "is_interpolated": true,
       "raw_annotation_preserved": "",
       "source_file": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv",
-      "processing_time": "2026-06-01T23:40:26.261191"
+      "processing_time": "2026-06-08T08:40:34.753333"
     },
     {
       "record_id": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L8",
@@ -229,8 +229,8 @@
       "cd": 0.5838562398171484,
       "ld_ratio": 4.8765432098765435,
       "dynamic_pressure": 554.9311250000001,
-      "threshold_config_id": "dce79af6",
-      "threshold_version": "vdce79a_202606012340",
+      "threshold_config_id": "a8449375",
+      "threshold_version": "va84493_202606080840",
       "exceeds_threshold": true,
       "threshold_violation_detail": "Cl=2.847 > 阈值1.8; Cd=0.584 > 阈值0.15",
       "data_gap_ids": [],
@@ -238,7 +238,7 @@
       "is_interpolated": false,
       "raw_annotation_preserved": "",
       "source_file": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv",
-      "processing_time": "2026-06-01T23:40:26.261205"
+      "processing_time": "2026-06-08T08:40:34.753338"
     },
     {
       "record_id": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L9",
@@ -248,18 +248,18 @@
       "cd": 0.7159486016628874,
       "ld_ratio": 4824.324324324324,
       "dynamic_pressure": 551.25,
-      "threshold_config_id": "dce79af6",
-      "threshold_version": "vdce79a_202606012340",
+      "threshold_config_id": "a8449375",
+      "threshold_version": "va84493_202606080840",
       "exceeds_threshold": true,
       "threshold_violation_detail": "Cl=3453.968 > 阈值1.8; Cd=0.716 > 阈值0.15; L/D=4824.3 > 阈值80.0",
       "data_gap_ids": [],
       "unit_issue_ids": [
-        "4089d1c0"
+        "1c8c5f5b"
       ],
       "is_interpolated": false,
       "raw_annotation_preserved": "",
       "source_file": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv",
-      "processing_time": "2026-06-01T23:40:26.261217"
+      "processing_time": "2026-06-08T08:40:34.753343"
     },
     {
       "record_id": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L10",
@@ -269,8 +269,8 @@
       "cd": 0.8755857898715043,
       "ld_ratio": 4.569060773480663,
       "dynamic_pressure": 551.25,
-      "threshold_config_id": "dce79af6",
-      "threshold_version": "vdce79a_202606012340",
+      "threshold_config_id": "a8449375",
+      "threshold_version": "va84493_202606080840",
       "exceeds_threshold": true,
       "threshold_violation_detail": "Cl=4.001 > 阈值1.8; Cd=0.876 > 阈值0.15",
       "data_gap_ids": [],
@@ -278,7 +278,7 @@
       "is_interpolated": false,
       "raw_annotation_preserved": "",
       "source_file": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv",
-      "processing_time": "2026-06-01T23:40:26.261227"
+      "processing_time": "2026-06-08T08:40:34.753347"
     },
     {
       "record_id": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L11",
@@ -288,8 +288,8 @@
       "cd": 1.0763416477702192,
       "ld_ratio": 4.240449438202247,
       "dynamic_pressure": 551.25,
-      "threshold_config_id": "dce79af6",
-      "threshold_version": "vdce79a_202606012340",
+      "threshold_config_id": "a8449375",
+      "threshold_version": "va84493_202606080840",
       "exceeds_threshold": true,
       "threshold_violation_detail": "Cl=4.564 > 阈值1.8; Cd=1.076 > 阈值0.15",
       "data_gap_ids": [],
@@ -297,7 +297,7 @@
       "is_interpolated": false,
       "raw_annotation_preserved": "",
       "source_file": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv",
-      "processing_time": "2026-06-01T23:40:26.261238"
+      "processing_time": "2026-06-08T08:40:34.753352"
     },
     {
       "record_id": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L12",
@@ -307,8 +307,8 @@
       "cd": 1.3496598639455781,
       "ld_ratio": 3.768817204301076,
       "dynamic_pressure": 551.25,
-      "threshold_config_id": "dce79af6",
-      "threshold_version": "vdce79a_202606012340",
+      "threshold_config_id": "a8449375",
+      "threshold_version": "va84493_202606080840",
       "exceeds_threshold": true,
       "threshold_violation_detail": "Cl=5.087 > 阈值1.8; Cd=1.350 > 阈值0.15",
       "data_gap_ids": [],
@@ -316,7 +316,7 @@
       "is_interpolated": false,
       "raw_annotation_preserved": "",
       "source_file": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv",
-      "processing_time": "2026-06-01T23:40:26.261248"
+      "processing_time": "2026-06-08T08:40:34.753357"
     },
     {
       "record_id": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L13",
@@ -326,8 +326,8 @@
       "cd": 1.7395552165745494,
       "ld_ratio": 3.1505524861878453,
       "dynamic_pressure": 554.9311250000001,
-      "threshold_config_id": "dce79af6",
-      "threshold_version": "vdce79a_202606012340",
+      "threshold_config_id": "a8449375",
+      "threshold_version": "va84493_202606080840",
       "exceeds_threshold": true,
       "threshold_violation_detail": "Cl=5.481 > 阈值1.8; Cd=1.740 > 阈值0.15",
       "data_gap_ids": [],
@@ -335,7 +335,7 @@
       "is_interpolated": false,
       "raw_annotation_preserved": "",
       "source_file": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv",
-      "processing_time": "2026-06-01T23:40:26.261258"
+      "processing_time": "2026-06-08T08:40:34.753363"
     },
     {
       "record_id": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L14",
@@ -345,8 +345,8 @@
       "cd": 2.312320483749055,
       "ld_ratio": 2.515690376569038,
       "dynamic_pressure": 551.25,
-      "threshold_config_id": "dce79af6",
-      "threshold_version": "vdce79a_202606012340",
+      "threshold_config_id": "a8449375",
+      "threshold_version": "va84493_202606080840",
       "exceeds_threshold": true,
       "threshold_violation_detail": "Cl=5.817 > 阈值1.8; Cd=2.312 > 阈值0.15",
       "data_gap_ids": [],
@@ -354,7 +354,7 @@
       "is_interpolated": false,
       "raw_annotation_preserved": "",
       "source_file": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv",
-      "processing_time": "2026-06-01T23:40:26.261268"
+      "processing_time": "2026-06-08T08:40:34.753367"
     },
     {
       "record_id": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L15",
@@ -364,8 +364,8 @@
       "cd": 2.912169312169312,
       "ld_ratio": 1.5390365448504986,
       "dynamic_pressure": 551.25,
-      "threshold_config_id": "dce79af6",
-      "threshold_version": "vdce79a_202606012340",
+      "threshold_config_id": "a8449375",
+      "threshold_version": "va84493_202606080840",
       "exceeds_threshold": true,
       "threshold_violation_detail": "Cl=4.482 > 阈值1.8; Cd=2.912 > 阈值0.15; 压力=160.2kPa > 阈值150.0kPa",
       "data_gap_ids": [],
@@ -373,7 +373,7 @@
       "is_interpolated": false,
       "raw_annotation_preserved": "传感器抖动",
       "source_file": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv",
-      "processing_time": "2026-06-01T23:40:26.261279"
+      "processing_time": "2026-06-08T08:40:34.753372"
     },
     {
       "record_id": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L16",
@@ -383,8 +383,8 @@
       "cd": 3.526530612244898,
       "ld_ratio": 0.9780521262002743,
       "dynamic_pressure": 551.25,
-      "threshold_config_id": "dce79af6",
-      "threshold_version": "vdce79a_202606012340",
+      "threshold_config_id": "a8449375",
+      "threshold_version": "va84493_202606080840",
       "exceeds_threshold": true,
       "threshold_violation_detail": "Cl=3.449 > 阈值1.8; Cd=3.527 > 阈值0.15; 压力=175.3kPa > 阈值150.0kPa",
       "data_gap_ids": [],
@@ -392,7 +392,7 @@
       "is_interpolated": false,
       "raw_annotation_preserved": "",
       "source_file": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv",
-      "processing_time": "2026-06-01T23:40:26.261290"
+      "processing_time": "2026-06-08T08:40:34.753377"
     },
     {
       "record_id": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L17",
@@ -402,21 +402,21 @@
       "cd": 4.167498110355253,
       "ld_ratio": 2.5403647591410334,
       "dynamic_pressure": 551.25,
-      "threshold_config_id": "dce79af6",
-      "threshold_version": "vdce79a_202606012340",
+      "threshold_config_id": "a8449375",
+      "threshold_version": "va84493_202606080840",
       "exceeds_threshold": true,
       "threshold_violation_detail": "Cl=10.587 > 阈值1.8; Cd=4.167 > 阈值0.15; 压力=190.5kPa > 阈值150.0kPa",
       "data_gap_ids": [
-        "ee7c163f"
+        "0adf8f97"
       ],
       "unit_issue_ids": [
-        "32f72b3e",
-        "df086fbe"
+        "e484feb9",
+        "84245cf6"
       ],
       "is_interpolated": true,
       "raw_annotation_preserved": "",
       "source_file": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv",
-      "processing_time": "2026-06-01T23:40:26.261301"
+      "processing_time": "2026-06-08T08:40:34.753381"
     },
     {
       "record_id": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv:L2",
@@ -426,18 +426,18 @@
       "cd": 0.20435929473830347,
       "ld_ratio": 0.7130434782608696,
       "dynamic_pressure": 750.3125,
-      "threshold_config_id": "dce79af6",
-      "threshold_version": "vdce79a_202606012340",
+      "threshold_config_id": "a8449375",
+      "threshold_version": "va84493_202606080840",
       "exceeds_threshold": true,
       "threshold_violation_detail": "Cd=0.204 > 阈值0.15",
       "data_gap_ids": [
-        "ee7c163f"
+        "0adf8f97"
       ],
       "unit_issue_ids": [],
       "is_interpolated": true,
       "raw_annotation_preserved": "",
       "source_file": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv",
-      "processing_time": "2026-06-01T23:40:26.261311"
+      "processing_time": "2026-06-08T08:40:34.753386"
     },
     {
       "record_id": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv:L3",
@@ -447,8 +447,8 @@
       "cd": 0.15282521171733998,
       "ld_ratio": 3.313953488372093,
       "dynamic_pressure": 750.3125,
-      "threshold_config_id": "dce79af6",
-      "threshold_version": "vdce79a_202606012340",
+      "threshold_config_id": "a8449375",
+      "threshold_version": "va84493_202606080840",
       "exceeds_threshold": true,
       "threshold_violation_detail": "Cd=0.153 > 阈值0.15",
       "data_gap_ids": [],
@@ -456,7 +456,7 @@
       "is_interpolated": false,
       "raw_annotation_preserved": "",
       "source_file": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv",
-      "processing_time": "2026-06-01T23:40:26.261321"
+      "processing_time": "2026-06-08T08:40:34.753390"
     },
     {
       "record_id": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv:L4",
@@ -466,8 +466,8 @@
       "cd": 0.19192003331945023,
       "ld_ratio": 4.8240740740740735,
       "dynamic_pressure": 750.3125,
-      "threshold_config_id": "dce79af6",
-      "threshold_version": "vdce79a_202606012340",
+      "threshold_config_id": "a8449375",
+      "threshold_version": "va84493_202606080840",
       "exceeds_threshold": true,
       "threshold_violation_detail": "Cd=0.192 > 阈值0.15",
       "data_gap_ids": [],
@@ -475,7 +475,7 @@
       "is_interpolated": false,
       "raw_annotation_preserved": "",
       "source_file": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv",
-      "processing_time": "2026-06-01T23:40:26.261331"
+      "processing_time": "2026-06-08T08:40:34.753394"
     },
     {
       "record_id": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv:L5",
@@ -485,8 +485,8 @@
       "cd": 0.23456892961266138,
       "ld_ratio": 5.742424242424242,
       "dynamic_pressure": 750.3125,
-      "threshold_config_id": "dce79af6",
-      "threshold_version": "vdce79a_202606012340",
+      "threshold_config_id": "a8449375",
+      "threshold_version": "va84493_202606080840",
       "exceeds_threshold": true,
       "threshold_violation_detail": "Cd=0.235 > 阈值0.15",
       "data_gap_ids": [],
@@ -494,7 +494,7 @@
       "is_interpolated": false,
       "raw_annotation_preserved": "",
       "source_file": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv",
-      "processing_time": "2026-06-01T23:40:26.261340"
+      "processing_time": "2026-06-08T08:40:34.753398"
     },
     {
       "record_id": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv:L6",
@@ -504,8 +504,8 @@
       "cd": 0.3109815354713314,
       "ld_ratio": 5.851428571428571,
       "dynamic_pressure": 750.3125,
-      "threshold_config_id": "dce79af6",
-      "threshold_version": "vdce79a_202606012340",
+      "threshold_config_id": "a8449375",
+      "threshold_version": "va84493_202606080840",
       "exceeds_threshold": true,
       "threshold_violation_detail": "Cl=1.820 > 阈值1.8; Cd=0.311 > 阈值0.15",
       "data_gap_ids": [],
@@ -513,7 +513,7 @@
       "is_interpolated": false,
       "raw_annotation_preserved": "",
       "source_file": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv",
-      "processing_time": "2026-06-01T23:40:26.261350"
+      "processing_time": "2026-06-08T08:40:34.753402"
     },
     {
       "record_id": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv:L7",
@@ -523,8 +523,8 @@
       "cd": 0.3927252533666528,
       "ld_ratio": 5.819004524886877,
       "dynamic_pressure": 750.3125,
-      "threshold_config_id": "dce79af6",
-      "threshold_version": "vdce79a_202606012340",
+      "threshold_config_id": "a8449375",
+      "threshold_version": "va84493_202606080840",
       "exceeds_threshold": true,
       "threshold_violation_detail": "Cl=2.285 > 阈值1.8; Cd=0.393 > 阈值0.15",
       "data_gap_ids": [],
@@ -532,7 +532,7 @@
       "is_interpolated": false,
       "raw_annotation_preserved": "",
       "source_file": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv",
-      "processing_time": "2026-06-01T23:40:26.261360"
+      "processing_time": "2026-06-08T08:40:34.753406"
     },
     {
       "record_id": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv:L8",
@@ -542,8 +542,8 @@
       "cd": 0.5046786061363321,
       "ld_ratio": 5.46830985915493,
       "dynamic_pressure": 750.3125,
-      "threshold_config_id": "dce79af6",
-      "threshold_version": "vdce79a_202606012340",
+      "threshold_config_id": "a8449375",
+      "threshold_version": "va84493_202606080840",
       "exceeds_threshold": true,
       "threshold_violation_detail": "Cl=2.760 > 阈值1.8; Cd=0.505 > 阈值0.15",
       "data_gap_ids": [],
@@ -551,7 +551,7 @@
       "is_interpolated": false,
       "raw_annotation_preserved": "",
       "source_file": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv",
-      "processing_time": "2026-06-01T23:40:26.261370"
+      "processing_time": "2026-06-08T08:40:34.753411"
     },
     {
       "record_id": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv:L9",
@@ -561,8 +561,8 @@
       "cd": 0.6326252950159656,
       "ld_ratio": 5.025280898876404,
       "dynamic_pressure": 750.3125,
-      "threshold_config_id": "dce79af6",
-      "threshold_version": "vdce79a_202606012340",
+      "threshold_config_id": "a8449375",
+      "threshold_version": "va84493_202606080840",
       "exceeds_threshold": true,
       "threshold_violation_detail": "Cl=3.179 > 阈值1.8; Cd=0.633 > 阈值0.15",
       "data_gap_ids": [],
@@ -570,7 +570,7 @@
       "is_interpolated": false,
       "raw_annotation_preserved": "",
       "source_file": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv",
-      "processing_time": "2026-06-01T23:40:26.261379"
+      "processing_time": "2026-06-08T08:40:34.753415"
     },
     {
       "record_id": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv:L10",
@@ -580,18 +580,18 @@
       "cd": 0.760571983895599,
       "ld_ratio": 4.630841121495328,
       "dynamic_pressure": 750.3125,
-      "threshold_config_id": "dce79af6",
-      "threshold_version": "vdce79a_202606012340",
+      "threshold_config_id": "a8449375",
+      "threshold_version": "va84493_202606080840",
       "exceeds_threshold": true,
       "threshold_violation_detail": "Cl=3.522 > 阈值1.8; Cd=0.761 > 阈值0.15",
       "data_gap_ids": [
-        "bbf62641"
+        "72b8dccc"
       ],
       "unit_issue_ids": [],
       "is_interpolated": true,
       "raw_annotation_preserved": "温升偏大",
       "source_file": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv",
-      "processing_time": "2026-06-01T23:40:26.261390"
+      "processing_time": "2026-06-08T08:40:34.753419"
     },
     {
       "record_id": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv:L11",
@@ -601,18 +601,18 @@
       "cd": 1.0342357351103708,
       "ld_ratio": 3.7044673539518893,
       "dynamic_pressure": 750.3125,
-      "threshold_config_id": "dce79af6",
-      "threshold_version": "vdce79a_202606012340",
+      "threshold_config_id": "a8449375",
+      "threshold_version": "va84493_202606080840",
       "exceeds_threshold": true,
       "threshold_violation_detail": "Cl=3.831 > 阈值1.8; Cd=1.034 > 阈值0.15",
       "data_gap_ids": [
-        "bbf62641"
+        "72b8dccc"
       ],
       "unit_issue_ids": [],
       "is_interpolated": true,
       "raw_annotation_preserved": "",
       "source_file": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv",
-      "processing_time": "2026-06-01T23:40:26.261400"
+      "processing_time": "2026-06-08T08:40:34.753423"
     },
     {
       "record_id": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv:L12",
@@ -622,8 +622,8 @@
       "cd": 1.3434402332361515,
       "ld_ratio": 3.0529100529100535,
       "dynamic_pressure": 750.3125,
-      "threshold_config_id": "dce79af6",
-      "threshold_version": "vdce79a_202606012340",
+      "threshold_config_id": "a8449375",
+      "threshold_version": "va84493_202606080840",
       "exceeds_threshold": true,
       "threshold_violation_detail": "Cl=4.101 > 阈值1.8; Cd=1.343 > 阈值0.15",
       "data_gap_ids": [],
@@ -631,7 +631,7 @@
       "is_interpolated": false,
       "raw_annotation_preserved": "",
       "source_file": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv",
-      "processing_time": "2026-06-01T23:40:26.261409"
+      "processing_time": "2026-06-08T08:40:34.753428"
     },
     {
       "record_id": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv:L13",
@@ -641,8 +641,8 @@
       "cd": 1.7486047480216578,
       "ld_ratio": 2.4603658536585367,
       "dynamic_pressure": 750.3125,
-      "threshold_config_id": "dce79af6",
-      "threshold_version": "vdce79a_202606012340",
+      "threshold_config_id": "a8449375",
+      "threshold_version": "va84493_202606080840",
       "exceeds_threshold": true,
       "threshold_violation_detail": "Cl=4.302 > 阈值1.8; Cd=1.749 > 阈值0.15",
       "data_gap_ids": [],
@@ -650,28 +650,28 @@
       "is_interpolated": false,
       "raw_annotation_preserved": "",
       "source_file": "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv",
-      "processing_time": "2026-06-01T23:40:26.261419"
+      "processing_time": "2026-06-08T08:40:34.753432"
     }
   ],
   "audit_log": [
     {
-      "entry_id": "c39be538",
-      "timestamp": "2026-06-01T23:40:26.257415",
+      "entry_id": "be13f180",
+      "timestamp": "2026-06-08T08:40:34.750570",
       "action": "threshold_created",
       "actor": "engineer_zhang",
       "details": "新建阈值配置, 原因: initial_setup",
-      "threshold_config_id": "abc29e4c",
+      "threshold_config_id": "2c7c3037",
       "affected_record_ids": [],
       "before_value": "",
-      "after_value": "{'config_id': 'abc29e4c', 'created_at': '2026-06-01T23:40:26.257395', 'created_by': 'engineer_zhang', 'reason': 'initial_setup', 'cl_max': 1.8, 'cl_min': -1.0, 'cd_max': 0.08, 'cd_min': 0.0, 'ld_ratio_min': 0.0, 'ld_ratio_max': 80.0, 'pressure_max_kpa': 150.0, 'wind_speed_max_mps': 100.0}"
+      "after_value": "{'config_id': '2c7c3037', 'created_at': '2026-06-08T08:40:34.750553', 'created_by': 'engineer_zhang', 'reason': 'initial_setup', 'cl_max': 1.8, 'cl_min': -1.0, 'cd_max': 0.08, 'cd_min': 0.0, 'ld_ratio_min': 0.0, 'ld_ratio_max': 80.0, 'pressure_max_kpa': 150.0, 'wind_speed_max_mps': 100.0}"
     },
     {
-      "entry_id": "3cefe15b",
-      "timestamp": "2026-06-01T23:40:26.261089",
+      "entry_id": "a3b4a612",
+      "timestamp": "2026-06-08T08:40:34.753302",
       "action": "threshold_overridden",
       "actor": "engineer_zhang",
       "details": "手动修改阈值 cd_max: 0.08 -> 0.15, 原因: post-stall region allowed",
-      "threshold_config_id": "dce79af6",
+      "threshold_config_id": "a8449375",
       "affected_record_ids": [],
       "before_value": "cd_max=0.08",
       "after_value": "cd_max=0.15"
@@ -679,25 +679,24 @@
   ],
   "note_supplements": [
     {
-      "supplement_id": "13520685",
-      "timestamp": "2026-06-01T23:40:26.262311",
+      "supplement_id": "34c1adad",
+      "timestamp": "2026-06-08T08:40:34.753575",
       "author": "assistant_song",
-      "note_text": "该数据点经现场工程师确认有效，传感器校准偏差已记录",
+      "note_text": "22度攻角传感器抖动，现场工程师根据重复试验修正Cl和Cd",
       "affected_record_ids": [
-        "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L2"
+        "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L15"
       ],
       "previous_values": {
-        "/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L2": {
-          "cl": -0.30234315948601664,
-          "cd": 0.44263038548752837,
-          "ld_ratio": -0.6830601092896175
-        }
+        "cl": 4.481934996220711,
+        "cd": 2.912169312169312,
+        "ld_ratio": 1.5390365448504986,
+        "dynamic_pressure": 551.25
       },
       "new_values": {
-        "cl": -0.30234315948601664,
-        "cd": 0.44263038548752837
+        "cl": 3.6752,
+        "cd": 3.0578
       },
-      "diff_description": "cl: N/A -> -0.30234315948601664; cd: N/A -> 0.44263038548752837"
+      "diff_description": "cl: 4.481934996220711 -> 3.6752; cd: 2.912169312169312 -> 3.0578"
     }
   ]
 }

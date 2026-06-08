@@ -99,11 +99,11 @@ class SessionCoordinator:
         previous_values = {}
         for r in self._results:
             if r.record_id in affected_record_ids:
-                previous_values[r.record_id] = {
-                    "cl": r.cl,
-                    "cd": r.cd,
-                    "ld_ratio": r.ld_ratio,
-                }
+                previous_values["cl"] = r.cl
+                previous_values["cd"] = r.cd
+                previous_values["ld_ratio"] = r.ld_ratio
+                previous_values["dynamic_pressure"] = r.dynamic_pressure
+                break
 
         supplement = NoteSupplement(
             author=author,

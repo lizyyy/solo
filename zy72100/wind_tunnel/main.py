@@ -165,17 +165,29 @@ def main():
     for v in new_violations:
         print(f"      -> Record {v.record_id}: {v.threshold_violation_detail}")
 
-    print(f"\n[4] Adding note supplement to a specific record...")
-    first_result = results_after[0] if results_after else None
-    if first_result:
+    print(f"\n[4] Adding note supplement — engineer corrects Cl for the sensor-vibration record at AoA=22...")
+    vib_result = None
+    for r in results_after:
+        if "传感器抖动" in r.raw_annotation_preserved:
+            vib_result = r
+            break
+    if vib_result is None and results_after:
+        vib_result = results_after[0]
+
+    if vib_result:
+        corrected_cl = round(vib_result.cl * 0.82, 4)
+        corrected_cd = round(vib_result.cd * 1.05, 4)
         supplement = coord.add_note_supplement(
-            note_text="该数据点经现场工程师确认有效，传感器校准偏差已记录",
-            affected_record_ids=[first_result.record_id],
-            new_values={"cl": first_result.cl, "cd": first_result.cd},
+            note_text="22度攻角传感器抖动，现场工程师根据重复试验修正Cl和Cd",
+            affected_record_ids=[vib_result.record_id],
+            new_values={"cl": corrected_cl, "cd": corrected_cd},
             author="assistant_song",
         )
-        print(f"    Supplement added: {supplement.supplement_id}")
-        print(f"    Diff: {supplement.diff_description}")
+        print(f"    Supplement ID: {supplement.supplement_id}")
+        print(f"    Record: {vib_result.record_id}")
+        print(f"    Previous: cl={supplement.previous_values.get('cl')}, cd={supplement.previous_values.get('cd')}")
+        print(f"    New:      cl={corrected_cl}, cd={corrected_cd}")
+        print(f"    Diff:     {supplement.diff_description}")
 
     report_gen = ReportGenerator(output_dir=str(OUTPUT_DIR))
 
