@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>地铁站厅客流瓶颈</title>
+<style>
+:root {
+    --bg: #0f172a; --card: #1e293b; --border: #334155; --text: #e2e8f0;
+    --muted: #94a3b8; --accent: #3b82f6; --danger: #ef4444; --success: #22c55e;
+    --warn: #f59e0b;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; background: var(--bg); color: var(--text); line-height:1.6; }
+.container { max-width:1200px; margin:0 auto; padding:20px; }
+header { background: var(--card); border-bottom:1px solid var(--border); padding:16px 24px; margin-bottom:24px; border-radius:8px; display:flex; align-items:center; justify-content:space-between; }
+header h1 { font-size:20px; font-weight:600; }
+.status-badge { padding:4px 12px; border-radius:20px; font-size:13px; font-weight:500; }
+.status-badge.step-cad { background:#1e3a5f; color:#60a5fa; }
+.status-badge.step-rf { background:#1e3f30; color:#4ade80; }
+.status-badge.step-replay { background:#3f2e1e; color:#fbbf24; }
+.status-badge.step-done { background:#1e3f30; color:#4ade80; }
+.status-badge.step-empty { background:#3f1e1e; color:#f87171; }
+
+nav.tabs { display:flex; gap:4px; margin-bottom:20px; background:var(--card); padding:6px; border-radius:10px; border:1px solid var(--border); }
+nav.tabs button { flex:1; padding:10px 16px; border:none; background:transparent; color:var(--muted); font-size:14px; font-weight:500; border-radius:8px; cursor:pointer; transition:all .2s; }
+nav.tabs button.active { background:var(--accent); color:#fff; }
+nav.tabs button:hover:not(.active) { background:var(--border); color:var(--text); }
+
+.panel { display:none; }
+.panel.active { display:block; }
+.card { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:20px; margin-bottom:16px; }
+.card h2 { font-size:16px; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+.card h2 .icon { width:20px; height:20px; border-radius:4px; display:inline-flex; align-items:center; justify-content:center; font-size:12px; }
+
+label { display:block; font-size:13px; color:var(--muted); margin-bottom:4px; margin-top:12px; }
+input, select, textarea { width:100%; padding:8px 12px; background:var(--bg); border:1px solid var(--border); border-radius:6px; color:var(--text); font-size:14px; }
+input:focus, select:focus, textarea:focus { outline:none; border-color:var(--accent); }
+textarea { resize:vertical; min-height:60px; }
+
+.row { display:flex; gap:12px; }
+.row > * { flex:1; }
+
+.btn { padding:8px 20px; border:none; border-radius:6px; font-size:14px; font-weight:500; cursor:pointer; transition:all .2s; }
+.btn-primary { background:var(--accent); color:#fff; }
+.btn-primary:hover { background:#2563eb; }
+.btn-danger { background:var(--danger); color:#fff; }
+.btn-danger:hover { background:#dc2626; }
+.btn-success { background:var(--success); color:#fff; }
+.btn-success:hover { background:#16a34a; }
+.btn-warn { background:var(--warn); color:#000; }
+.btn-warn:hover { background:#d97706; }
+.btn-outline { background:transparent; border:1px solid var(--border); color:var(--text); }
+.btn-outline:hover { background:var(--border); }
+.btn:disabled { opacity:.5; cursor:not-allowed; }
+.btn-row { display:flex; gap:8px; margin-top:16px; flex-wrap:wrap; }
+
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th, td { padding:8px 12px; text-align:left; border-bottom:1px solid var(--border); }
+th { color:var(--muted); font-weight:500; background:rgba(0,0,0,.2); }
+
+.conflict-card { background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.3); border-radius:8px; padding:14px; margin-bottom:10px; }
+.conflict-card .type { font-weight:600; color:var(--danger); margin-bottom:4px; }
+.conflict-card .detail { font-size:13px; color:var(--muted); }
+.conflict-card .values { display:flex; gap:16px; margin:8px 0; font-size:13px; }
+.conflict-card .values span { background:var(--bg); padding:4px 8px; border-radius:4px; }
+
+.check-pass { color:var(--success); }
+.check-fail { color:var(--danger); }
+.check-item { padding:8px 0; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+
+.toast { position:fixed; top:20px; right:20px; padding:12px 20px; border-radius:8px; font-size:14px; z-index:1000; display:none; }
+.toast.show { display:block; animation: slideIn .3s ease; }
+.toast.success { background:var(--success); color:#fff; }
+.toast.error { background:var(--danger); color:#fff; }
+.toast.warning { background:var(--warn); color:#000; }
+
+@keyframes slideIn { from{transform:translateX(100px);opacity:0}to{transform:translateX(0);opacity:1} }
+
+.replay-version { display:inline-block; padding:4px 10px; margin:4px; background:var(--bg); border:1px solid var(--border); border-radius:6px; font-size:13px; cursor:pointer; }
+.replay-version:hover { border-color:var(--accent); }
+.replay-version.active { border-color:var(--accent); background:rgba(59,130,246,.15); color:var(--accent); }
+
+.verify-ok { background:rgba(34,197,94,.1); border:1px solid rgba(34,197,94,.3); border-radius:8px; padding:14px; color:var(--success); }
+.verify-fail { background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.3); border-radius:8px; padding:14px; color:var(--danger); }
+
+.path-table td, .path-table th { font-size:12px; }
+
+.loading { text-align:center; padding:40px; color:var(--muted); }
+.empty-state { text-align:center; padding:60px 20px; color:var(--muted); }
+.empty-state .big-icon { font-size:48px; margin-bottom:16px; }
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+    <h1>🚇 地铁站厅客流瓶颈</h1>
+    <div><span class="status-badge step-empty" id="globalStatus">尚未开始</span></div>
+</header>
+
+<nav class="tabs">
+    <button class="active" onclick="switchTab('cad')">① CAD图层导入</button>
+    <button onclick="switchTab('rangefinder')">② 补看测距仪</button>
+    <button onclick="switchTab('replay')">③ 回放复盘</button>
+    <button onclick="switchTab('conflict')">碰撞检查</button>
+    <button onclick="switchTab('selfcheck')">自检</button>
+    <button onclick="switchTab('export')">导出报告</button>
+</nav>
+
+<div id="panel-cad" class="panel active">
+    <div class="card">
+        <h2><span class="icon" style="background:var(--accent)">📂</span> 导入CAD图层</h2>
+        <div class="row">
+            <div><label>图层名称</label><input id="cad_layer_name" placeholder="例：站厅A-1号出入口" value="站厅A-1号出入口"></div>
+            <div><label>来源文件</label><input id="cad_source_file" placeholder="例：station_A.dwg" value="station_A.dwg"></div>
+        </div>
+        <div class="row">
+            <div><label>Z轴方向值</label><input id="cad_z_direction" type="number" step="0.1" value="1.0"><small style="color:var(--muted);font-size:12px">正数=向上，负数=向下（旧习惯可能写反）</small></div>
+            <div><label>操作人</label><input id="cad_operator" value="小陶"></div>
+        </div>
+        <label>坐标点（JSON数组）</label>
+        <textarea id="cad_points" rows="3">[{"x":0,"y":0,"z":0},{"x":10.5,"y":0,"z":0}]</textarea>
+        <div class="btn-row">
+            <button class="btn btn-primary" onclick="doCadImport()">导入CAD图层</button>
+        </div>
+    </div>
+    <div class="card" id="cad-result" style="display:none">
+        <h2>导入结果</h2>
+        <div id="cad-result-content"></div>
+    </div>
+</div>
+
+<div id="panel-rangefinder" class="panel">
+    <div class="card">
+        <h2><span class="icon" style="background:var(--success)">📏</span> 补看测距仪记录</h2>
+        <div class="row">
+            <div><label>测量点</label><input id="rf_measure_point" placeholder="例：1号出入口通道" value="1号出入口通道"></div>
+            <div><label>Z轴方向</label><input id="rf_z_direction" type="number" step="0.1" value="1.0"></div>
+        </div>
+        <div class="row">
+            <div><label>实测距离</label><input id="rf_distance" type="number" step="0.1" value="10.5"></div>
+            <div><label>操作人</label><input id="rf_operator" value="小陶"></div>
+        </div>
+        <div class="row">
+            <div><label>是否补录</label><select id="rf_is_supplement"><option value="false">首次测量</option><option value="true">补录数据</option></select></div>
+            <div><label>备注</label><input id="rf_notes" placeholder="可选"></div>
+        </div>
+        <div class="btn-row">
+            <button class="btn btn-primary" onclick="doRfSupplement()">补充测距仪记录</button>
+            <button class="btn btn-success" onclick="doCalculate()">计算客流瓶颈</button>
+        </div>
+    </div>
+    <div class="card" id="rf-result" style="display:none">
+        <h2>计算结果</h2>
+        <div id="rf-result-content"></div>
+    </div>
+</div>
+
+<div id="panel-replay" class="panel">
+    <div class="card">
+        <h2><span class="icon" style="background:var(--warn)">🔄</span> 路径回放复盘</h2>
+        <label>路径点（JSON数组，含 x, y, z, passenger_count）</label>
+        <textarea id="replay_points" rows="4">[{"x":0,"y":0,"z":0,"passenger_count":45,"timestamp":"2025-01-01T10:00:00"},{"x":5,"y":0,"z":0,"passenger_count":52,"timestamp":"2025-01-01T10:01:00"},{"x":10,"y":0,"z":0,"passenger_count":38,"timestamp":"2025-01-01T10:02:00"}]</textarea>
+        <div class="btn-row">
+            <button class="btn btn-primary" onclick="doReplayUpdate()">更新路径回放</button>
+            <button class="btn btn-outline" onclick="loadReplayVersions()">查看回放版本列表</button>
+        </div>
+    </div>
+    <div class="card" id="replay-versions-card" style="display:none">
+        <h2>回放版本列表</h2>
+        <div id="replay-versions-list"></div>
+        <div style="margin-top:12px">
+            <div class="row">
+                <div><label>对比版本1</label><input id="replay_v1" type="number" value="1" min="1"></div>
+                <div><label>对比版本2</label><input id="replay_v2" type="number" value="2" min="1"></div>
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-outline" onclick="doReplayCompare()">对比版本差异</button>
+                <button class="btn btn-warn" onclick="doReplayVerify()">校验与最新结果一致性</button>
+            </div>
+        </div>
+    </div>
+    <div class="card" id="replay-compare-card" style="display:none">
+        <h2>版本对比结果</h2>
+        <div id="replay-compare-content"></div>
+    </div>
+    <div class="card" id="replay-verify-card" style="display:none">
+        <h2>一致性校验结果</h2>
+        <div id="replay-verify-content"></div>
+    </div>
+    <div class="card" id="replay-detail-card" style="display:none">
+        <h2>版本详情</h2>
+        <div id="replay-detail-content"></div>
+    </div>
+</div>
+
+<div id="panel-conflict" class="panel">
+    <div class="card">
+        <h2><span class="icon" style="background:var(--danger)">⚠️</span> 碰撞检查</h2>
+        <div class="btn-row" style="margin-bottom:12px">
+            <button class="btn btn-primary" onclick="loadConflicts()">刷新冲突列表</button>
+        </div>
+        <div id="conflict-list">
+            <div class="empty-state"><div class="big-icon">✓</div><p>暂无冲突，或请先点击刷新</p></div>
+        </div>
+    </div>
+</div>
+
+<div id="panel-selfcheck" class="panel">
+    <div class="card">
+        <h2><span class="icon" style="background:var(--success)">🔍</span> 基本自检</h2>
+        <div class="btn-row" style="margin-bottom:12px">
+            <button class="btn btn-primary" onclick="runSelfCheck()">执行自检</button>
+        </div>
+        <div id="selfcheck-list">
+            <div class="empty-state"><div class="big-icon">🔍</div><p>点击"执行自检"开始检查</p></div>
+        </div>
+    </div>
+</div>
+
+<div id="panel-export" class="panel">
+    <div class="card">
+        <h2><span class="icon" style="background:var(--accent)">📄</span> 导出报告</h2>
+        <div class="btn-row">
+            <button class="btn btn-primary" onclick="doExportPreview()">预览导出数据</button>
+            <button class="btn btn-success" onclick="doExportDownload()">下载JSON报告</button>
+        </div>
+    </div>
+    <div class="card" id="export-preview-card" style="display:none">
+        <h2>导出数据预览</h2>
+        <pre id="export-preview-content" style="max-height:500px;overflow:auto;background:var(--bg);padding:12px;border-radius:6px;font-size:12px;white-space:pre-wrap"></pre>
+    </div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = '';
+function $(id){ return document.getElementById(id); }
+function showToast(msg, type='success'){
+    const t=$('toast'); t.textContent=msg; t.className='toast show '+type;
+    setTimeout(()=>{ t.className='toast'; }, 3000);
+}
+async function api(path, opts={}){
+    try {
+        const resp = await fetch(API+path, {headers:{'Content-Type':'application/json'}, ...opts});
+        const data = await resp.json();
+        if(!resp.ok) { showToast(data.error||'操作失败','error'); return null; }
+        return data;
+    } catch(e) { showToast('网络错误：'+e.message,'error'); return null; }
+}
+
+function switchTab(name){
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.remove('active'));
+    $('panel-'+name).classList.add('active');
+    event.target.classList.add('active');
+    refreshStatus();
+}
+
+async function refreshStatus(){
+    const s = await api('/api/status');
+    if(!s) return;
+    const badge=$('globalStatus');
+    const stepMap={cad_import:'step-cad',rangefinder_supplement:'step-rf',path_replay_update:'step-replay',completed:'step-done'};
+    badge.className='status-badge '+(stepMap[s.status]||'step-empty');
+    badge.textContent=s.status_label||s.status||'尚未开始';
+}
+
+async function doCadImport(){
+    const body={
+        layer_name:$('cad_layer_name').value,
+        source_file:$('cad_source_file').value,
+        z_direction:parseFloat($('cad_z_direction').value),
+        points:JSON.parse($('cad_points').value||'[]'),
+        operator:$('cad_operator').value
+    };
+    const r=await api('/api/cad/import',{method:'POST',body:JSON.stringify(body)});
+    if(!r) return;
+    $('cad-result').style.display='block';
+    const zLabel=r.z_direction_status==='pending_review'?'<span style="color:var(--danger)">⚠️ 待复核（Z轴可能写反）</span>':'<span style="color:var(--success)">✓ 正常</span>';
+    $('cad-result-content').innerHTML=`
+        <p><strong>图层：</strong>${r.hall_name} &nbsp; <strong>Z轴：</strong>${zLabel}</p>
+        <p><strong>自检结果：</strong></p>
+        <ul>${(r.self_check_results||[]).map(c=>'<li class="'+(c.passed?'check-pass':'check-fail')+'">'+c.check_name+'：'+c.message+'</li>').join('')}</ul>
+        ${r.conflicts&&r.conflicts.length?'<p style="color:var(--danger);margin-top:8px">发现'+r.conflicts.length+'处冲突，请到"碰撞检查"面板处理</p>':''}
+    `;
+    showToast('CAD图层导入完成');
+    refreshStatus();
+}
+
+async function doRfSupplement(){
+    const rec={
+        z_direction:parseFloat($('rf_z_direction').value),
+        distance:parseFloat($('rf_distance').value),
+        measure_point:$('rf_measure_point').value,
+        operator:$('rf_operator').value,
+        is_supplement:$('rf_is_supplement').value==='true',
+        notes:$('rf_notes').value||null
+    };
+    const r=await api('/api/rangefinder/supplement',{method:'POST',body:JSON.stringify({records:[rec]})});
+    if(!r) return;
+    showToast('测距仪记录已补充');
+    refreshStatus();
+}
+
+async function doCalculate(){
+    const r=await api('/api/bottleneck/calculate',{method:'POST'});
+    if(!r) return;
+    $('rf-result').style.display='block';
+    $('rf-result-content').innerHTML=`
+        <table><tr><th>瓶颈位置</th><th>瓶颈流量</th><th>容量</th><th>利用率</th><th>版本</th></tr>
+        <tr><td>${r.bottleneck_location}</td><td>${r.bottleneck_flow}</td><td>${r.capacity}</td><td>${(r.utilization_rate*100).toFixed(0)}%</td><td>v${r.version}</td></tr></table>
+        ${r.conflicts&&r.conflicts.length?'<p style="color:var(--warn);margin-top:8px">提示：还有'+r.conflicts.length+'处冲突待确认，计算结果可能不准确。</p>':''}
+    `;
+    showToast('客流瓶颈计算完成');
+    refreshStatus();
+}
+
+async function doReplayUpdate(){
+    const pts=JSON.parse($('replay_points').value||'[]');
+    const r=await api('/api/replay/update',{method:'POST',body:JSON.stringify({path_points:pts})});
+    if(!r) return;
+    showToast('路径回放已更新，流程完成！');
+    refreshStatus();
+    loadReplayVersions();
+}
+
+async function loadReplayVersions(){
+    const r=await api('/api/replay/versions');
+    if(!r) return;
+    $('replay-versions-card').style.display='block';
+    const versions=r.versions||[];
+    if(!versions.length){
+        $('replay-versions-list').innerHTML='<p style="color:var(--muted)">还没有回放记录。</p>';
+        return;
+    }
+    $('replay-versions-list').innerHTML=versions.map(v=>
+        '<span class="replay-version" onclick="loadReplayDetail('+v+')">版本 '+v+'</span>'
+    ).join('');
+}
+
+async function loadReplayDetail(v){
+    const r=await api('/api/replay/detail/'+v);
+    if(!r) return;
+    $('replay-detail-card').style.display='block';
+    if(!r.found){
+        $('replay-detail-content').innerHTML='<p class="check-fail">'+r.message+'</p>';
+        return;
+    }
+    const pts=r.path_points||[];
+    $('replay-detail-content').innerHTML=`
+        <p><strong>回放版本：</strong>${r.replay_version} &nbsp; <strong>关联结果版本：</strong>${r.result_version} &nbsp; <strong>保存时间：</strong>${r.saved_at||'内存'}</p>
+        <p><strong>路径点数：</strong>${r.total_points}</p>
+        <table class="path-table"><tr><th>#</th><th>X</th><th>Y</th><th>Z</th><th>客流</th></tr>
+        ${pts.map((p,i)=>'<tr><td>'+i+'</td><td>'+p.x+'</td><td>'+p.y+'</td><td>'+p.z+'</td><td>'+p.passenger_count+'</td></tr>').join('')}
+        </table>
+    `;
+    document.querySelectorAll('.replay-version').forEach(el=>el.classList.remove('active'));
+    event.target.classList.add('active');
+}
+
+async function doReplayCompare(){
+    const v1=parseInt($('replay_v1').value);
+    const v2=parseInt($('replay_v2').value);
+    const r=await api('/api/replay/compare?v1='+v1+'&v2='+v2);
+    if(!r) return;
+    $('replay-compare-card').style.display='block';
+    if(r.error){
+        $('replay-compare-content').innerHTML='<p class="check-fail">'+(r.message||r.error)+'</p>';
+        return;
+    }
+    if(r.is_consistent){
+        $('replay-compare-content').innerHTML='<p class="verify-ok">✓ 版本'+v1+'与版本'+v2+'完全一致</p>';
+    } else {
+        $('replay-compare-content').innerHTML=`
+            <p class="check-fail">发现${r.differences.length}处差异：</p>
+            <table><tr><th>#</th><th>类型</th><th>说明</th></tr>
+            ${r.differences.map((d,i)=>'<tr><td>'+(d.index||i)+'</td><td>'+d.type+'</td><td>'+(d.message||JSON.stringify(d.old||d))+'</td></tr>').join('')}
+            </table>
+        `;
+    }
+}
+
+async function doReplayVerify(){
+    const v=parseInt($('replay_v1').value);
+    const r=await api('/api/replay/verify/'+v);
+    if(!r) return;
+    $('replay-verify-card').style.display='block';
+    if(r.consistent){
+        $('replay-verify-content').innerHTML=`<div class="verify-ok">
+            <p>✓ ${r.message}</p>
+            <p style="margin-top:8px;font-size:13px">CAD图层名：${r.latest_cad_layer_name||'无'} &nbsp; 测距仪记录：${r.latest_rangefinder_count}条 &nbsp; 结果版本：v${r.latest_result_version}</p>
+        </div>`;
+    } else {
+        const issues=r.issues||[];
+        $('replay-verify-content').innerHTML=`<div class="verify-fail">
+            <p>⚠️ ${r.message}</p>
+            ${issues.length?'<ul style="margin-top:8px">'+issues.map(i=>'<li>'+i.message+'</li>').join('')+'</ul>':''}
+            ${r.available_replay_versions?'<p style="margin-top:8px;font-size:13px">可选回放版本：'+r.available_replay_versions.join(', ')+'</p>':''}
+            <p style="margin-top:8px;font-size:13px">CAD图层名：${r.latest_cad_layer_name||'无'} &nbsp; 测距仪记录：${r.latest_rangefinder_count}条 &nbsp; 结果版本：v${r.latest_result_version}</p>
+        </div>`;
+    }
+}
+
+async function loadConflicts(){
+    const r=await api('/api/conflicts');
+    if(!r) return;
+    if(!r.length){
+        $('conflict-list').innerHTML='<div class="empty-state"><div class="big-icon">✓</div><p>没有发现数据冲突</p></div>';
+        return;
+    }
+    $('conflict-list').innerHTML=r.map((c,i)=>`
+        <div class="conflict-card">
+            <div class="type">${conflictTypeName(c.conflict_type)}</div>
+            <div class="detail">${c.description}</div>
+            <div class="values">
+                <span>CAD：${c.cad_value}</span>
+                <span>测距仪：${c.rangefinder_value}</span>
+                <span>可信度：${(c.confidence*100).toFixed(0)}%</span>
+            </div>
+            <div class="detail">位置：${c.location||'未知'}</div>
+            <div class="btn-row" style="margin-top:8px">
+                <button class="btn btn-success" style="font-size:13px;padding:4px 12px" onclick="resolveConflict(${i},true)">确认CAD正确</button>
+                <button class="btn btn-danger" style="font-size:13px;padding:4px 12px" onclick="resolveConflict(${i},false)">驳回，以测距仪为准</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function conflictTypeName(t){
+    return {z_axis_direction:'Z轴方向冲突',distance_mismatch:'距离数据冲突',layer_name_mismatch:'图层名称冲突'}[t]||t;
+}
+
+async function resolveConflict(idx, confirmed){
+    const r=await api('/api/conflicts/'+idx+'/resolve',{method:'POST',body:JSON.stringify({confirmed,operator:'小陶'})});
+    if(!r) return;
+    showToast(confirmed?'已确认CAD正确':'已驳回，以测距仪为准');
+    loadConflicts();
+    refreshStatus();
+}
+
+async function runSelfCheck(){
+    const r=await api('/api/selfcheck');
+    if(!r) return;
+    $('selfcheck-list').innerHTML=r.map(c=>`
+        <div class="check-item">
+            <span>${c.check_name}：${c.message}</span>
+            <span class="${c.passed?'check-pass':'check-fail'}">${c.passed?'✓ 通过':'✗ 未通过'}</span>
+        </div>
+    `).join('');
+}
+
+async function doExportPreview(){
+    const r=await api('/api/export');
+    if(!r) return;
+    $('export-preview-card').style.display='block';
+    $('export-preview-content').textContent=JSON.stringify(r,null,2);
+}
+
+function doExportDownload(){
+    window.open(API+'/api/export/download','_blank');
+}
+
+refreshStatus();
+</script>
+</body>
+</html>

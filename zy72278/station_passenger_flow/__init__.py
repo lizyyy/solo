@@ -9,8 +9,9 @@ from .models import (
 from .processor import StationFlowProcessor
 from .validator import DataValidator
 from .replay import PathReplay
+from .store import DataStore
 
-__version__ = "1.0.0"
+__version__ = "2.0.0"
 __all__ = [
     "CADLayer",
     "RangefinderRecord",
@@ -20,5 +21,6 @@ __all__ = [
     "DirectionStatus",
     "StationFlowProcessor",
     "DataValidator",
-    "PathReplay"
+    "PathReplay",
+    "DataStore"
 ]

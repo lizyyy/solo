@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Optional, Callable
+from typing import List, Optional, Callable, Dict, Any
 from uuid import uuid4
 from .models import (
     CADLayer,
@@ -8,17 +8,22 @@ from .models import (
     WorkflowStep,
     DirectionStatus,
     ConflictEvidence,
-    UserDecision
+    UserDecision,
+    PathPoint
 )
 from .validator import DataValidator
+from .replay import PathReplay
+from .store import DataStore
 from .exceptions import WorkflowStepError
 
 
 class StationFlowProcessor:
-    def __init__(self):
+    def __init__(self, data_dir: str = None):
         self.validator = DataValidator()
         self._current_result: Optional[PassengerFlowResult] = None
         self._decision_callbacks: List[Callable] = []
+        self._store = DataStore(data_dir) if data_dir else None
+        self._replay = PathReplay(self._store)
 
     def on_conflict_decision(self, callback: Callable):
         self._decision_callbacks.append(callback)
@@ -160,12 +165,21 @@ class StationFlowProcessor:
                 "path_replay_update"
             )
 
-        from .models import PathPoint
         self._current_result.path_history = [
             PathPoint(**point) for point in path_points
         ]
 
+        self._replay.record_path(
+            self._current_result.path_history,
+            self._current_result.result_id,
+            self._current_result.version
+        )
+
         self._current_result.current_step = WorkflowStep.COMPLETED
+
+        if self._store:
+            self._store.save_result(self._current_result)
+
         return self._current_result
 
     def resolve_conflict(
@@ -244,3 +258,41 @@ class StationFlowProcessor:
             print(f"  可信度: {conflict.confidence * 100:.0f}%")
             print(f"\n  请选择: [1] 确认CAD正确  [2] 驳回，以测距仪为准")
         print("\n" + "=" * 60)
+
+    def get_replay(self) -> PathReplay:
+        return self._replay
+
+    def get_store(self) -> Optional[DataStore]:
+        return self._store
+
+    def replay_version_detail(self, version: int) -> Dict[str, Any]:
+        if not self._current_result:
+            return {"found": False, "message": "没有当前处理的结果，无法查看回放版本。"}
+        return self._replay.get_path_version_detail(version, self._current_result.result_id)
+
+    def replay_compare(self, version1: int, version2: int) -> Dict[str, Any]:
+        if not self._current_result:
+            return {"error": "没有当前处理的结果，无法对比回放版本。"}
+        return self._replay.compare_paths(version1, version2, self._current_result.result_id)
+
+    def replay_verify_latest(self, replay_version: int) -> Dict[str, Any]:
+        if not self._current_result:
+            return {"consistent": False, "message": "没有当前处理的结果，无法校验。"}
+        if not self._store:
+            return {"consistent": False, "message": "未配置数据存储，无法校验回放与最新结果的一致性。"}
+        return self._replay.verify_with_latest_result(self._current_result.result_id, replay_version)
+
+    def replay_list_versions(self) -> Dict[str, Any]:
+        if not self._current_result:
+            return {"versions": [], "message": "没有当前处理的结果。"}
+        return self._replay.list_available_versions(self._current_result.result_id)
+
+    def load_result(self, result_id: str, version: int = None) -> Optional[PassengerFlowResult]:
+        if not self._store:
+            return None
+        return self._store.load_result(result_id, version)
+
+    def list_all_results(self) -> List[Dict[str, Any]]:
+        if not self._store:
+            return []
+        return self._store.list_all_results()

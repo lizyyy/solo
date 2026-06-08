@@ -1,0 +1,92 @@
+{
+  "result_id": "afaf80a4-2ec6-4fd7-9db0-5e0ccaaa6fef",
+  "station_name": "未命名站厅",
+  "hall_name": "站厅A-1号出入口",
+  "calculate_time": "2026-06-08T23:03:34.358741",
+  "bottleneck_location": "1号出入口通道",
+  "bottleneck_flow": 1260,
+  "capacity": 2100,
+  "utilization_rate": 0.6,
+  "cad_layer": {
+    "layer_id": "ab21f103-e0a4-461a-a1fa-2e8badb1458a",
+    "layer_name": "站厅A-1号出入口",
+    "import_time": "2026-06-08T23:03:07.071266",
+    "z_direction": 1.0,
+    "points": [
+      {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      {
+        "x": 10.5,
+        "y": 0.0,
+        "z": 0.0
+      }
+    ],
+    "is_duplicate": false,
+    "source_file": "station_A.dwg",
+    "import_batch": "batch_20260608"
+  },
+  "rangefinder_records": [
+    {
+      "record_id": "83b1748b-31e1-4b19-a99e-a378258e1a2a",
+      "measure_time": "2026-06-08T23:03:25.687591",
+      "z_direction": 1.0,
+      "distance": 10.5,
+      "measure_point": "1号出入口通道",
+      "operator": "小陶",
+      "is_supplement": false,
+      "notes": null
+    }
+  ],
+  "conflicts": [],
+  "self_check_results": [
+    {
+      "check_name": "Z轴方向检查",
+      "passed": true,
+      "message": "Z轴方向正常。",
+      "details": null
+    },
+    {
+      "check_name": "重复导入检查",
+      "passed": true,
+      "message": "没有发现重复导入，没问题。",
+      "details": null
+    },
+    {
+      "check_name": "补录重算检查",
+      "passed": true,
+      "message": "补录数据已纳入计算。",
+      "details": null
+    }
+  ],
+  "current_step": "completed",
+  "z_direction_status": "normal",
+  "path_history": [
+    {
+      "x": 0.0,
+      "y": 0.0,
+      "z": 0.0,
+      "timestamp": "2025-01-01T10:00:00",
+      "passenger_count": 45
+    },
+    {
+      "x": 5.0,
+      "y": 0.0,
+      "z": 0.0,
+      "timestamp": "2025-01-01T10:01:00",
+      "passenger_count": 52
+    },
+    {
+      "x": 10.0,
+      "y": 0.0,
+      "z": 0.0,
+      "timestamp": "2025-01-01T10:02:00",
+      "passenger_count": 38
+    }
+  ],
+  "is_supplemented": false,
+  "version": 2,
+  "operator": "小陶"
+}
