@@ -1,15 +1,19 @@
-import { useState } from 'react';
-import { Upload, FileSpreadsheet, CheckCircle, Trash2, Play, Sparkles, RefreshCw } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Upload, FileSpreadsheet, CheckCircle, Trash2, Play, Sparkles, RefreshCw, Camera, ImagePlus } from 'lucide-react';
 import { useAppStore } from '../store';
 import { createPoint } from '../data/sampleData';
-import { Point } from '../types';
+import { Point, Photo } from '../types';
 import { cn } from '../lib/utils';
 
 export function ImportPage() {
-  const { addPoints, loadSampleData, loadSmoothCase, loadReworkCase, clearAllData, importStats, points } = useAppStore();
+  const { addPoints, addPhotosToPoints, loadSampleData, loadSmoothCase, loadReworkCase, clearAllData, importStats, points } = useAppStore();
   const [dragActive, setDragActive] = useState(false);
   const [importing, setImporting] = useState(false);
   const [importResult, setImportResult] = useState<string | null>(null);
+  const [uploadedPhotos, setUploadedPhotos] = useState<{ name: string; url: string; pointId: string }[]>([]);
+  const [selectedPointForPhoto, setSelectedPointForPhoto] = useState<string>('');
+  const [photoDesc, setPhotoDesc] = useState('');
+  const photoInputRef = useRef<HTMLInputElement>(null);
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -25,17 +29,16 @@ export function ImportPage() {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-
     const files = Array.from(e.dataTransfer.files);
-    handleFiles(files);
+    handleDataFiles(files);
   };
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    handleFiles(files);
+    handleDataFiles(files);
   };
 
-  const handleFiles = async (files: File[]) => {
+  const handleDataFiles = async (files: File[]) => {
     setImporting(true);
     setImportResult(null);
 
@@ -72,6 +75,51 @@ export function ImportPage() {
     setImporting(false);
     setImportResult(`成功导入 ${files.length} 个文件`);
     setTimeout(() => setImportResult(null), 3000);
+  };
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    const targetPointId = selectedPointForPhoto;
+    if (!targetPointId) {
+      setImportResult('请先选择要关联的点位');
+      setTimeout(() => setImportResult(null), 3000);
+      return;
+    }
+
+    const newPhotos: Photo[] = [];
+    const previewList: { name: string; url: string; pointId: string }[] = [];
+
+    for (const file of files) {
+      const url = await readFileAsDataURL(file);
+      const photo: Photo = {
+        id: `photo-upload-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`,
+        pointId: targetPointId,
+        url,
+        description: photoDesc || file.name,
+        uploadTime: new Date().toISOString(),
+      };
+      newPhotos.push(photo);
+      previewList.push({ name: file.name, url, pointId: targetPointId });
+    }
+
+    addPhotosToPoints(newPhotos);
+    setUploadedPhotos((prev) => [...prev, ...previewList]);
+    setPhotoDesc('');
+    setImportResult(`已上传 ${files.length} 张照片到选中点位`);
+    setTimeout(() => setImportResult(null), 3000);
+
+    if (photoInputRef.current) photoInputRef.current.value = '';
+  };
+
+  const readFileAsDataURL = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
   };
 
   const handleSampleData = () => {
@@ -201,6 +249,89 @@ export function ImportPage() {
         </button>
       </div>
 
+      <div className="bg-white rounded-xl border border-gray-200 p-6 mb-8">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center">
+            <Camera className="w-5 h-5 text-teal-600" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-gray-900">巡检照片上传</h3>
+            <p className="text-sm text-gray-500">选择点位后上传巡检照片，照片将关联到对应点位</p>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div className="flex items-end gap-4">
+            <div className="flex-1">
+              <label className="text-sm font-medium text-gray-700 block mb-1">关联点位</label>
+              <select
+                value={selectedPointForPhoto}
+                onChange={(e) => setSelectedPointForPhoto(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="">-- 请选择点位 --</option>
+                {points.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name} ({p.address})
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex-1">
+              <label className="text-sm font-medium text-gray-700 block mb-1">照片描述</label>
+              <input
+                type="text"
+                value={photoDesc}
+                onChange={(e) => setPhotoDesc(e.target.value)}
+                placeholder="例如：正门外观、消防通道等"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div>
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={handlePhotoUpload}
+                className="hidden"
+                ref={photoInputRef}
+                id="photo-upload"
+              />
+              <label
+                htmlFor="photo-upload"
+                className={cn(
+                  'px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 cursor-pointer transition-colors',
+                  selectedPointForPhoto
+                    ? 'bg-teal-600 text-white hover:bg-teal-700'
+                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                )}
+                onClick={(e) => {
+                  if (!selectedPointForPhoto) e.preventDefault();
+                }}
+              >
+                <ImagePlus className="w-4 h-4" />
+                上传照片
+              </label>
+            </div>
+          </div>
+
+          {uploadedPhotos.length > 0 && (
+            <div className="mt-4">
+              <p className="text-sm font-medium text-gray-700 mb-2">
+                已上传照片 ({uploadedPhotos.length})
+              </p>
+              <div className="flex gap-3 flex-wrap">
+                {uploadedPhotos.map((p, idx) => (
+                  <div key={idx} className="w-20 h-20 rounded-lg overflow-hidden border border-gray-200">
+                    <img src={p.url} alt={p.name} className="w-full h-full object-cover" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
       {points.length > 0 && (
         <div className="bg-white rounded-xl border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-4">
@@ -225,10 +356,12 @@ export function ImportPage() {
                   <th className="text-left py-3 px-4 font-medium text-gray-600">地址</th>
                   <th className="text-left py-3 px-4 font-medium text-gray-600">来源</th>
                   <th className="text-left py-3 px-4 font-medium text-gray-600">类别</th>
+                  <th className="text-center py-3 px-4 font-medium text-gray-600">反馈</th>
+                  <th className="text-center py-3 px-4 font-medium text-gray-600">照片</th>
                 </tr>
               </thead>
               <tbody>
-                {points.slice(0, 10).map((point) => (
+                {points.slice(0, 15).map((point) => (
                   <tr key={point.id} className="border-b border-gray-100 hover:bg-gray-50">
                     <td className="py-3 px-4 text-gray-900">{point.name}</td>
                     <td className="py-3 px-4 text-gray-600">{point.address}</td>
@@ -249,13 +382,27 @@ export function ImportPage() {
                       </span>
                     </td>
                     <td className="py-3 px-4 text-gray-600">{point.category}</td>
+                    <td className="py-3 px-4 text-center">
+                      {point.feedbacks.length > 0 ? (
+                        <span className="text-purple-600 font-medium">{point.feedbacks.length}</span>
+                      ) : (
+                        <span className="text-gray-300">-</span>
+                      )}
+                    </td>
+                    <td className="py-3 px-4 text-center">
+                      {point.photos.length > 0 ? (
+                        <span className="text-teal-600 font-medium">{point.photos.length}</span>
+                      ) : (
+                        <span className="text-gray-300">-</span>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            {points.length > 10 && (
+            {points.length > 15 && (
               <p className="text-center text-sm text-gray-500 py-4">
-                还有 {points.length - 10} 条数据未显示
+                还有 {points.length - 15} 条数据未显示
               </p>
             )}
           </div>

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Point, MergeGroup, PointStatus, HistoryRecord } from '../types';
+import { Point, MergeGroup, PointStatus, HistoryRecord, Photo } from '../types';
 import { findMergeGroups, mergePoints } from '../utils/matching';
 import { generateSampleData, generateSmoothCaseData, generateReworkCaseData } from '../data/sampleData';
 
@@ -38,6 +38,7 @@ interface AppActions {
   clearAllData: () => void;
   resolveConflict: (pointId: string, conflictIndex: number, resolution: 'use_gis' | 'use_import' | 'custom', customValue?: string) => void;
   addHistoryRecord: (pointId: string, record: Omit<HistoryRecord, 'id' | 'pointId' | 'timestamp'>) => void;
+  addPhotosToPoints: (photos: Photo[]) => void;
 }
 
 export const useAppStore = create<AppState & AppActions>()(
@@ -298,6 +299,23 @@ export const useAppStore = create<AppState & AppActions>()(
               : p
           ),
         }));
+      },
+
+      addPhotosToPoints: (photos) => {
+        set((state) => {
+          const updatedPoints = [...state.points];
+          for (const photo of photos) {
+            const idx = updatedPoints.findIndex((p) => p.id === photo.pointId);
+            if (idx !== -1) {
+              updatedPoints[idx] = {
+                ...updatedPoints[idx],
+                photos: [...updatedPoints[idx].photos, photo],
+                updatedAt: new Date().toISOString(),
+              };
+            }
+          }
+          return { points: updatedPoints };
+        });
       },
     }),
     {
