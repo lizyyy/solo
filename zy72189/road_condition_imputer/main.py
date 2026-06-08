@@ -19,7 +19,7 @@ def run_pipeline(raw_data, run_id, audit_trail=None, prev_snapshot=None, prev_re
 
     loader = DataLoader(audit_log=shared_audit, run_id=run_id)
     records = loader.load_records(raw_data)
-    clean_records, validation_issues = loader.validate(records)
+    clean_records, validation_issues, rejected = loader.validate(records)
 
     imputer = RoadConditionImputer(audit_log=shared_audit, run_id=run_id)
     imputer.build_reference_pool(clean_records)
@@ -35,7 +35,7 @@ def run_pipeline(raw_data, run_id, audit_trail=None, prev_snapshot=None, prev_re
         results[i] = reviewer.auto_review(results[i])
 
     metrics_comp = MetricsComparator(audit_log=shared_audit, run_id=run_id)
-    snapshot = metrics_comp.compute_snapshot(results)
+    snapshot = metrics_comp.compute_snapshot(results, rejected_count=len(rejected))
     diffs = metrics_comp.diff_snapshots(prev_snapshot, snapshot, prev_results, results)
 
     audit_trail.add_entries(shared_audit)
@@ -48,6 +48,7 @@ def run_pipeline(raw_data, run_id, audit_trail=None, prev_snapshot=None, prev_re
         "snapshot": snapshot,
         "diffs": diffs,
         "audit_trail": audit_trail,
+        "rejected": rejected,
     }
 
 
@@ -104,6 +105,12 @@ def main():
     print(f"校验问题数: {len(run1['validation_issues'])}")
     for issue in run1['validation_issues']:
         print(f"  [{issue.severity.value}] {issue.record_id}: {issue.description}")
+
+    if run1['rejected']:
+        print(f"\n被拒绝记录数: {len(run1['rejected'])}")
+        for rec in run1['rejected']:
+            rid = rec.record_id if rec.record_id else "(空ID)"
+            print(f"  - {rid}  来源: {rec.source}")
 
     print(f"\n修补结果状态分布:")
     status_counts = {}
@@ -169,6 +176,7 @@ def main():
         diffs=run1['diffs'],
         reviews=reviews1,
         audit_trail=audit_trail,
+        rejected=run1['rejected'],
     )
     print(report1)
 
@@ -205,9 +213,22 @@ def main():
     print(audit_trail.format_audit_for_record("RC-004"))
 
     # ── 导出结果表格 ──
-    print("\n>>> 导出结果（JSON 格式，可直接对接看板）\n")
-    export_rows = reporter.export_results_table(run2['results'])
-    for row in export_rows:
+    print("\n>>> 第一次运行导出（含被拒绝记录，可直接对接看板）\n")
+    export_rows1 = reporter.export_results_table(
+        results1,
+        rejected=run1.get('rejected'),
+        validation_issues=run1['validation_issues'],
+    )
+    for row in export_rows1:
+        print(json.dumps(row, ensure_ascii=False, default=str))
+
+    print("\n>>> 第二次运行导出（修正后数据，可直接对接看板）\n")
+    export_rows2 = reporter.export_results_table(
+        run2['results'],
+        rejected=run2.get('rejected'),
+        validation_issues=run2['validation_issues'],
+    )
+    for row in export_rows2:
         print(json.dumps(row, ensure_ascii=False, default=str))
 
 

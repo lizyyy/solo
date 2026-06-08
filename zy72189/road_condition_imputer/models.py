@@ -100,6 +100,7 @@ class MetricSnapshot:
     missing_count: int
     imputed_count: int
     avg_confidence: float
+    rejected_count: int = 0
     fields_imputed: Dict[str, int] = field(default_factory=dict)
     by_missing_type: Dict[str, int] = field(default_factory=dict)
     computed_at: str = field(default_factory=lambda: datetime.now().isoformat())

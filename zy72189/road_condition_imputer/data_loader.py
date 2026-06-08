@@ -47,9 +47,10 @@ class DataLoader:
             self._log(record.record_id, "loaded", {"source": record.source, "raw_keys": list(item.keys())})
         return records
 
-    def validate(self, records: List[RoadConditionRecord]) -> Tuple[List[RoadConditionRecord], List[ValidationIssue]]:
+    def validate(self, records: List[RoadConditionRecord]) -> Tuple[List[RoadConditionRecord], List[ValidationIssue], List[RoadConditionRecord]]:
         issues = []
         clean = []
+        rejected = []
         seen_ids = set()
 
         for rec in records:
@@ -65,6 +66,8 @@ class DataLoader:
                 )
                 rec_issues.append(issue)
                 self._log("UNKNOWN", "validation_error", {"issue": "missing_id"})
+                issues.extend(rec_issues)
+                rejected.append(rec)
                 continue
 
             if rec.record_id in seen_ids:
@@ -78,6 +81,8 @@ class DataLoader:
                 )
                 rec_issues.append(issue)
                 self._log(rec.record_id, "duplicate_detected", {"duplicate_of": rec.record_id})
+                issues.extend(rec_issues)
+                rejected.append(rec)
                 continue
             seen_ids.add(rec.record_id)
 
@@ -96,6 +101,8 @@ class DataLoader:
                 )
                 rec_issues.append(issue)
                 self._log(rec.record_id, "validation_error", {"issue": "full_row_missing"})
+                issues.extend(rec_issues)
+                rejected.append(rec)
                 continue
 
             if rec.congestion_level is not None:
@@ -165,7 +172,7 @@ class DataLoader:
             clean.append(rec)
             self._log(rec.record_id, "validated", {"issue_count": len(rec_issues)})
 
-        return clean, issues
+        return clean, issues, rejected
 
     def classify_missing(self, record: RoadConditionRecord) -> MissingType:
         missing = [

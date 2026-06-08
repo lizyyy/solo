@@ -27,7 +27,7 @@ class MetricsComparator:
             )
         )
 
-    def compute_snapshot(self, results: List[ImputationResult]) -> MetricSnapshot:
+    def compute_snapshot(self, results: List[ImputationResult], rejected_count: int = 0) -> MetricSnapshot:
         total = len(results)
         missing_count = sum(1 for r in results if r.evidences)
         imputed_count = sum(
@@ -52,6 +52,7 @@ class MetricsComparator:
             missing_count=missing_count,
             imputed_count=imputed_count,
             avg_confidence=round(avg_conf, 4),
+            rejected_count=rejected_count,
             fields_imputed=fields_imputed,
             by_missing_type=by_missing_type,
             computed_at=datetime.now().isoformat(),
@@ -83,6 +84,7 @@ class MetricsComparator:
             ("missing_count", previous.missing_count, current.missing_count),
             ("imputed_count", previous.imputed_count, current.imputed_count),
             ("avg_confidence", previous.avg_confidence, current.avg_confidence),
+            ("rejected_count", previous.rejected_count, current.rejected_count),
         ]
 
         for name, prev_val, curr_val in metric_comparisons:
@@ -118,6 +120,11 @@ class MetricsComparator:
                     cause = (
                         f"平均置信度变化: {prev_val:.4f} → {curr_val:.4f}，"
                         f"反映参考数据充足程度变化"
+                    )
+                elif name == "rejected_count":
+                    cause = (
+                        f"被拒绝记录数变化: {prev_val} → {curr_val}，"
+                        f"反映输入数据质量变化"
                     )
                 else:
                     cause = f"{name} 从 {prev_val} 变为 {curr_val}"

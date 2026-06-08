@@ -8,6 +8,7 @@ from .models import (
     ValidationIssue,
     ReviewDecision,
     RecordStatus,
+    RoadConditionRecord,
     AuditEntry,
 )
 
@@ -25,6 +26,7 @@ class Reporter:
         diffs: List[MetricDiff],
         reviews: Optional[List[ReviewDecision]] = None,
         audit_trail: Optional[object] = None,
+        rejected: Optional[List[RoadConditionRecord]] = None,
     ) -> str:
         lines = []
         lines.append("=" * 60)
@@ -55,6 +57,7 @@ class Reporter:
         lines.append("")
         lines.append("── 二、修补指标 ──")
         lines.append(f"  总记录数: {snapshot.total_records}")
+        lines.append(f"  被拒绝记录数: {snapshot.rejected_count}")
         lines.append(f"  含缺失记录数: {snapshot.missing_count}")
         lines.append(f"  修补成功数: {snapshot.imputed_count}")
         lines.append(f"  平均置信度: {snapshot.avg_confidence:.2%}")
@@ -114,11 +117,30 @@ class Reporter:
                     lines.append(f"    意见: {rev.comment}")
                 lines.append(f"    时间: {rev.reviewed_at}")
 
+        if rejected:
+            lines.append("")
+            lines.append("── 六、被拒绝记录 ──")
+            lines.append(f"  共 {len(rejected)} 条记录因校验不通过被拒绝，未进入修补流程:")
+            for rec in rejected:
+                rid = rec.record_id if rec.record_id else "(空ID)"
+                lines.append(f"  - {rid}  来源: {rec.source}  加载时间: {rec.loaded_at}")
+                matched_issues = [i for i in validation_issues if i.record_id == (rec.record_id if rec.record_id else "UNKNOWN")]
+                for iss in matched_issues:
+                    lines.append(f"    [{iss.severity.value}] {iss.description}")
+                    if iss.suggestion:
+                        lines.append(f"    建议: {iss.suggestion}")
+
         if audit_trail is not None:
             lines.append("")
-            lines.append("── 六、审计追踪摘要 ──")
-            record_ids = sorted(set(r.record_id for r in results))
-            for rid in record_ids:
+            section_label = "七" if rejected else "六"
+            lines.append(f"── {section_label}、审计追踪摘要 ──")
+            audit_record_ids = set(r.record_id for r in results)
+            if rejected:
+                for rec in rejected:
+                    if rec.record_id:
+                        audit_record_ids.add(rec.record_id)
+                audit_record_ids.add("UNKNOWN")
+            for rid in sorted(audit_record_ids):
                 trail = audit_trail.format_audit_for_record(rid)
                 for line in trail.split("\n"):
                     lines.append(f"  {line}")
@@ -130,7 +152,7 @@ class Reporter:
 
         return "\n".join(lines)
 
-    def export_results_table(self, results: List[ImputationResult]) -> List[Dict]:
+    def export_results_table(self, results: List[ImputationResult], rejected: Optional[List[RoadConditionRecord]] = None, validation_issues: Optional[List[ValidationIssue]] = None) -> List[Dict]:
         rows = []
         for r in results:
             row = {
@@ -155,4 +177,28 @@ class Reporter:
                 for s in r.suggestions
             )
             rows.append(row)
+
+        if rejected:
+            for rec in rejected:
+                rid = rec.record_id if rec.record_id else "(空ID)"
+                row = {
+                    "record_id": rid,
+                    "status": "rejected",
+                    "source": rec.source,
+                    "loaded_at": rec.loaded_at,
+                    "processed_at": "",
+                }
+                for field_name in ("timestamp", "road_segment", "congestion_level", "weather",
+                                  "temperature", "surface_condition", "traffic_volume"):
+                    row[f"imputed_{field_name}"] = None
+                    row[f"original_{field_name}"] = getattr(rec, field_name)
+                issue_key = rec.record_id if rec.record_id else "UNKNOWN"
+                matched = [i for i in (validation_issues or []) if i.record_id == issue_key]
+                row["evidence_summary"] = ""
+                row["suggestion_summary"] = "; ".join(
+                    f"[{i.severity.value}]{i.issue_type}:{i.suggestion}"
+                    for i in matched
+                )
+                rows.append(row)
+
         return rows
