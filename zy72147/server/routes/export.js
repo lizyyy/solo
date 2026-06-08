@@ -43,7 +43,8 @@ router.get('/batch/:batchId/excel', (req, res) => {
       const buffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
       
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-      res.setHeader('Content-Disposition', `attachment; filename="管弦乐谱页码校验_批次${batchId}.xlsx"`);
+      const filename = encodeURIComponent(`管弦乐谱页码校验_批次${batchId}.xlsx`);
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
       res.send(buffer);
     }
   );
@@ -90,7 +91,8 @@ router.get('/batch/:batchId/csv', (req, res) => {
       const csv = '\ufeff' + headers.concat(csvRows).join('\n');
       
       res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-      res.setHeader('Content-Disposition', `attachment; filename="管弦乐谱页码校验_批次${batchId}.csv"`);
+      const filename = encodeURIComponent(`管弦乐谱页码校验_批次${batchId}.csv`);
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
       res.send(csv);
     }
   );

@@ -75,20 +75,21 @@ router.post('/batch', upload.array('files'), async (req, res) => {
           }
           
           try {
-            parseFile(file.path, fileExt, batchId, fileId, (parseErr, tracks, anomalies) => {
+            parseFile(file.path, fileExt, batchId, fileId, (parseErr, trackResults) => {
               if (parseErr) {
                 updateFileStatus(fileId, 'error', parseErr.message);
                 finishFile();
                 return;
               }
               
-              saveTracksAndAnomalies(tracks, anomalies, batchId, fileId, () => {
+              saveTracksAndAnomalies(trackResults, batchId, fileId, () => {
                 updateFileStatus(fileId, 'success', null);
+                const totalAnomalies = trackResults.reduce((sum, t) => sum + t.anomalies.length, 0);
                 results.push({
                   fileId,
                   originalName: file.originalname,
-                  trackCount: tracks.length,
-                  anomalyCount: anomalies.length
+                  trackCount: trackResults.length,
+                  anomalyCount: totalAnomalies
                 });
                 finishFile();
               });
@@ -125,20 +126,16 @@ router.post('/batch', upload.array('files'), async (req, res) => {
 
 function parseFile(filePath, fileExt, batchId, fileId, callback) {
   const tracks = [];
-  const anomalies = [];
   
   if (fileExt === '.csv' || fileExt === '.txt') {
     fs.createReadStream(filePath)
       .pipe(csv())
       .on('data', (row) => {
         const result = parseRow(row, tracks.length + 1);
-        tracks.push(result.track);
-        if (result.anomalies.length > 0) {
-          anomalies.push(...result.anomalies);
-        }
+        tracks.push(result);
       })
-      .on('end', () => callback(null, tracks, anomalies))
-      .on('error', (err) => callback(err, [], []));
+      .on('end', () => callback(null, tracks))
+      .on('error', (err) => callback(err, []));
   } else if (fileExt === '.xlsx' || fileExt === '.xls') {
     try {
       const workbook = XLSX.readFile(filePath);
@@ -148,17 +145,14 @@ function parseFile(filePath, fileExt, batchId, fileId, callback) {
       
       data.forEach((row, index) => {
         const result = parseRow(row, index + 1);
-        tracks.push(result.track);
-        if (result.anomalies.length > 0) {
-          anomalies.push(...result.anomalies);
-        }
+        tracks.push(result);
       });
-      callback(null, tracks, anomalies);
+      callback(null, tracks);
     } catch (e) {
-      callback(e, [], []);
+      callback(e, []);
     }
   } else {
-    callback(new Error('不支持的文件格式'), [], []);
+    callback(new Error('不支持的文件格式'), []);
   }
 }
 
@@ -202,16 +196,19 @@ function parseRow(row, rowNum) {
   return { track, anomalies };
 }
 
-function saveTracksAndAnomalies(tracks, anomalies, batchId, fileId, callback) {
+function saveTracksAndAnomalies(trackResults, batchId, fileId, callback) {
   const db = getDB();
   let savedCount = 0;
   
-  if (tracks.length === 0) {
+  if (trackResults.length === 0) {
     callback();
     return;
   }
   
-  tracks.forEach((track, index) => {
+  trackResults.forEach((result, index) => {
+    const track = result.track;
+    const trackAnomalies = result.anomalies;
+    
     db.run(`INSERT INTO tracks 
       (file_id, batch_id, track_name, track_number, instrument, page_count, start_page, end_page, expected_pages, is_valid, validation_status)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -221,17 +218,13 @@ function saveTracksAndAnomalies(tracks, anomalies, batchId, fileId, callback) {
       function(err) {
         const trackId = this.lastID;
         
-        const trackAnomalies = anomalies.filter((_, i) => 
-          Math.floor(i / 2) === index || i === index
-        ).slice(0, 3);
-        
-        let anomalySaved = 0;
         if (trackAnomalies.length === 0) {
           savedCount++;
-          if (savedCount === tracks.length) callback();
+          if (savedCount === trackResults.length) callback();
           return;
         }
         
+        let anomalySaved = 0;
         trackAnomalies.forEach(anomaly => {
           db.run(`INSERT INTO anomalies 
             (track_id, file_id, batch_id, anomaly_type, description, severity, suggestion, evidence)
@@ -242,7 +235,7 @@ function saveTracksAndAnomalies(tracks, anomalies, batchId, fileId, callback) {
               anomalySaved++;
               if (anomalySaved === trackAnomalies.length) {
                 savedCount++;
-                if (savedCount === tracks.length) callback();
+                if (savedCount === trackResults.length) callback();
               }
             }
           );
