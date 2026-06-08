@@ -147,8 +147,12 @@ export function validateTimeInterval(timestamps: string[]): { valid: boolean; me
   for (let i = 1; i < times.length; i++) {
     intervals.push((times[i] - times[i - 1]) / 1000)
   }
-  const avg = intervals.reduce((a, b) => a + b, 0) / intervals.length
-  const irregular = intervals.some((iv) => Math.abs(iv - avg) / avg > 0.5)
+  const positiveIntervals = intervals.filter((iv) => iv > 0)
+  if (positiveIntervals.length === 0) {
+    return { valid: true, message: '所有记录为同一时刻采集', intervals }
+  }
+  const avg = positiveIntervals.reduce((a, b) => a + b, 0) / positiveIntervals.length
+  const irregular = positiveIntervals.some((iv) => Math.abs(iv - avg) / avg > 0.5)
   if (irregular) {
     return {
       valid: false,

@@ -33,8 +33,12 @@ export function calculatePumpHead(params: EquipmentParams, records: SensorRecord
     r.parameterName.includes('流量') || r.parameterName.toLowerCase().includes('flow')
   )
   if (flowRecord) {
-    const flowConvSI = toSI(flowRecord.standardValue || flowRecord.rawValue, flowRecord.rawUnit, 'flow')
-    if (flowConvSI !== 0) actualFlow = flowConvSI
+    if (flowRecord.standardValue != null && flowRecord.standardValue !== 0) {
+      actualFlow = flowRecord.standardValue
+    } else {
+      const flowConvSI = toSI(flowRecord.rawValue, flowRecord.rawUnit, 'flow')
+      if (flowConvSI !== 0) actualFlow = flowConvSI
+    }
   }
 
   const pipeArea = PI * Math.pow(diameterSI, 2) / 4
@@ -98,19 +102,23 @@ export function detectConflicts(
     r.parameterName.toLowerCase().includes('suction')
   )
   if (suctionRecord) {
-    const recordVal = suctionRecord.standardValue || suctionRecord.rawValue
-    const paramVal = params.suctionPressure
-    const diff = Math.abs(recordVal - paramVal)
-    const threshold = Math.max(Math.abs(paramVal) * 0.1, 0.01)
+    const recordSI = suctionRecord.standardValue ?? toSI(suctionRecord.rawValue, suctionRecord.rawUnit, 'pressure')
+    const paramSI = toSI(params.suctionPressure, params.suctionPressureUnit, 'pressure')
+    const diff = Math.abs(recordSI - paramSI)
+    const threshold = Math.max(Math.abs(paramSI) * 0.1, 100)
     if (diff > threshold) {
+      const recordDisplay = suctionRecord.standardValue != null
+        ? `${suctionRecord.standardValue} ${suctionRecord.standardUnit}（≈${recordSI.toFixed(1)} Pa）`
+        : `${suctionRecord.rawValue} ${suctionRecord.rawUnit}（≈${recordSI.toFixed(1)} Pa）`
+      const paramDisplay = `${params.suctionPressure} ${params.suctionPressureUnit}（≈${paramSI.toFixed(1)} Pa）`
       conflicts.push({
         id: `conflict-suction-${Date.now()}`,
         fieldName: '吸入压力',
-        inspectionValue: `${paramVal} ${params.suctionPressureUnit}`,
-        importedValue: `${recordVal} ${suctionRecord.rawUnit}`,
+        inspectionValue: paramDisplay,
+        importedValue: recordDisplay,
         inspectionUnit: params.suctionPressureUnit,
         importedUnit: suctionRecord.rawUnit,
-        evidence: `设备巡检表记录 ${paramVal} ${params.suctionPressureUnit}，传感器数据 ${recordVal} ${suctionRecord.rawUnit}，偏差 ${diff.toFixed(4)}`,
+        evidence: `换算为统一单位(Pa)后比较：巡检表 ${paramSI.toFixed(1)} Pa，传感器 ${recordSI.toFixed(1)} Pa，偏差 ${diff.toFixed(1)} Pa`,
         suggestedAction: '请核实吸入压力来源：以巡检表为准请选左侧，以传感器为准请选右侧',
         resolved: false,
         chosenSide: null,
@@ -123,19 +131,23 @@ export function detectConflicts(
     r.parameterName.toLowerCase().includes('discharge')
   )
   if (dischargeRecord) {
-    const recordVal = dischargeRecord.standardValue || dischargeRecord.rawValue
-    const paramVal = params.dischargePressure
-    const diff = Math.abs(recordVal - paramVal)
-    const threshold = Math.max(Math.abs(paramVal) * 0.1, 0.01)
+    const recordSI = dischargeRecord.standardValue ?? toSI(dischargeRecord.rawValue, dischargeRecord.rawUnit, 'pressure')
+    const paramSI = toSI(params.dischargePressure, params.dischargePressureUnit, 'pressure')
+    const diff = Math.abs(recordSI - paramSI)
+    const threshold = Math.max(Math.abs(paramSI) * 0.1, 100)
     if (diff > threshold) {
+      const recordDisplay = dischargeRecord.standardValue != null
+        ? `${dischargeRecord.standardValue} ${dischargeRecord.standardUnit}（≈${recordSI.toFixed(1)} Pa）`
+        : `${dischargeRecord.rawValue} ${dischargeRecord.rawUnit}（≈${recordSI.toFixed(1)} Pa）`
+      const paramDisplay = `${params.dischargePressure} ${params.dischargePressureUnit}（≈${paramSI.toFixed(1)} Pa）`
       conflicts.push({
         id: `conflict-discharge-${Date.now()}`,
         fieldName: '排出压力',
-        inspectionValue: `${paramVal} ${params.dischargePressureUnit}`,
-        importedValue: `${recordVal} ${dischargeRecord.rawUnit}`,
+        inspectionValue: paramDisplay,
+        importedValue: recordDisplay,
         inspectionUnit: params.dischargePressureUnit,
         importedUnit: dischargeRecord.rawUnit,
-        evidence: `设备巡检表记录 ${paramVal} ${params.dischargePressureUnit}，传感器数据 ${recordVal} ${dischargeRecord.rawUnit}，偏差 ${diff.toFixed(4)}`,
+        evidence: `换算为统一单位(Pa)后比较：巡检表 ${paramSI.toFixed(1)} Pa，传感器 ${recordSI.toFixed(1)} Pa，偏差 ${diff.toFixed(1)} Pa`,
         suggestedAction: '请核实排出压力来源：以巡检表为准请选左侧，以传感器为准请选右侧',
         resolved: false,
         chosenSide: null,

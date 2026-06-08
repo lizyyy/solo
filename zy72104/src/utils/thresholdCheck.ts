@@ -161,5 +161,15 @@ export function generateSuggestions(result: CalcResult, alerts: ThresholdAlert[]
     })
   }
 
+  if (suggestions.length === 0 && alerts.length > 0) {
+    suggestions.push({
+      id: `sug-${counter++}`,
+      category: '持续观察',
+      action: '关注告警指标变化趋势，如偏差持续扩大请安排排查',
+      explanation: '当前指标略有偏差但无需紧急处理，建议下次巡检重点关注',
+      priority: 'notice',
+    })
+  }
+
   return suggestions
 }
