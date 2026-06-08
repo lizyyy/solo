@@ -144,6 +144,20 @@ export function createSampleData(threshold: ThresholdVersion): MooringRecord[] {
     windVelocity: 8,
   }
 
+  const params004: CalculationParams = {
+    ...params001,
+    currentVelocity: 2.8,
+    waveAcceleration: 3.2,
+    windVelocity: 28,
+  }
+
+  const params005: CalculationParams = {
+    ...params001,
+    currentVelocity: 1.8,
+    waveAcceleration: 1.5,
+    windVelocity: 15,
+  }
+
   return [
     buildRecord(
       "REC-001",
@@ -173,6 +187,26 @@ export function createSampleData(threshold: ThresholdVersion): MooringRecord[] {
       [5200, 5400, 5600, 5800, null, 5500, 5300, 5100],
       "N",
       params003,
+      threshold
+    ),
+    buildRecord(
+      "REC-004",
+      "超限记录",
+      "sensor_log",
+      "传感器日志直接采集，第2采样点缺失，单位lbf，实测峰值明显超过安全阈值",
+      [7200, null, 7600, 7800, 7900, 7700, 7500, 7300],
+      "lbf",
+      params004,
+      threshold
+    ),
+    buildRecord(
+      "REC-005",
+      "单位混写记录",
+      "sensor_log",
+      "传感器日志直接采集，第6采样点缺失，单位kgf",
+      [950, 980, 1020, 1060, 1080, null, 1000, 940],
+      "kgf",
+      params005,
       threshold
     ),
   ]

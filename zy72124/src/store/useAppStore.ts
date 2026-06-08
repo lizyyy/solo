@@ -6,7 +6,7 @@ import { calculateMooringForce } from "@/utils/calculation"
 import { convertToKN, fillGaps } from "@/utils/unitConversion"
 import type { RawDataPoint, DataSource, Judgment, ProcessedDataPoint, JudgmentStatus } from "@/types"
 
-const STORE_VERSION = 2
+const STORE_VERSION = 3
 
 const INITIAL_THRESHOLD: ThresholdVersion = {
   version: "v1.0",
