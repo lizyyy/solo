@@ -2,6 +2,7 @@ package com.aerialsurvey.service;
 
 import com.aerialsurvey.dto.*;
 import com.aerialsurvey.entity.*;
+import com.aerialsurvey.enums.ConflictStatus;
 import com.aerialsurvey.enums.InspectionStatus;
 import com.aerialsurvey.enums.ProcessStep;
 import com.aerialsurvey.repository.*;
@@ -24,6 +25,7 @@ public class ParkingSlopeInspectionService {
     private final ParkingSlopeInspectionRepository inspectionRepository;
     private final ProcessTraceRepository processTraceRepository;
     private final InspectionAlertRepository alertRepository;
+    private final ConflictRecordRepository conflictRecordRepository;
     private final ConflictDetectionService conflictDetectionService;
     private final SelfCheckService selfCheckService;
 
@@ -32,6 +34,7 @@ public class ParkingSlopeInspectionService {
                                          ParkingSlopeInspectionRepository inspectionRepository,
                                          ProcessTraceRepository processTraceRepository,
                                          InspectionAlertRepository alertRepository,
+                                         ConflictRecordRepository conflictRecordRepository,
                                          ConflictDetectionService conflictDetectionService,
                                          SelfCheckService selfCheckService) {
         this.safetyRadiusRepository = safetyRadiusRepository;
@@ -39,6 +42,7 @@ public class ParkingSlopeInspectionService {
         this.inspectionRepository = inspectionRepository;
         this.processTraceRepository = processTraceRepository;
         this.alertRepository = alertRepository;
+        this.conflictRecordRepository = conflictRecordRepository;
         this.conflictDetectionService = conflictDetectionService;
         this.selfCheckService = selfCheckService;
     }
@@ -213,6 +217,11 @@ public class ParkingSlopeInspectionService {
         if (!processTraceRepository.existsByParkingLotCodeAndProcessStep(
                 parkingLotCode, ProcessStep.REVIEW_COORDINATE_ORIGIN)) {
             throw new IllegalStateException("请先完成第二步：坐标原点说明补看");
+        }
+
+        if (conflictRecordRepository.existsByParkingLotCodeAndStatus(
+                parkingLotCode, ConflictStatus.PENDING_CONFIRM)) {
+            throw new IllegalStateException("存在待确认的冲突记录，请先通过确认或驳回后再更新安全距离报告");
         }
 
         List<ParkingSlopeInspection> inspections = inspectionRepository.findByParkingLotCode(parkingLotCode);
