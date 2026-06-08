@@ -48,7 +48,7 @@ export function importRecords(records: any[], operator = 'system') {
         updated_at: now,
       })
 
-      const cliCommand = `node cli.js import --file ${r.trade_no}`
+      const cliCommand = `npm run cli -- import --file ${r.trade_no}`
       const detail = consistent
         ? `导入记录 ${r.trade_no}，机构简称一致`
         : `导入记录 ${r.trade_no}，机构简称不一致：${r.institution_name_source1} vs ${r.institution_name_source2}`
@@ -69,7 +69,7 @@ export function supplement(id: string, rate: number, remark: string, operator = 
     UPDATE ledger_records SET tax_rate = ?, tax_rate_remark = ?, tax_rate_source = 'supplemented', status = 'supplemented', updated_at = ? WHERE id = ?
   `).run(rate, remark, now, id)
 
-  const cliCommand = `node cli.js supplement --record ${record.trade_no} --rate ${rate} --remark "${remark}"`
+  const cliCommand = `npm run cli -- supplement --record ${record.trade_no} --rate ${rate} --remark "${remark}"`
   const detail = `补录 ${record.trade_no} 税费率备注：${rate}%，${remark}`
   db.prepare(`
     INSERT INTO operation_logs (id, record_id, action, detail, cli_command, operator, timestamp)
@@ -92,7 +92,7 @@ export function correct(id: string, field: string, value: string, operator = 'sy
   db.prepare(`UPDATE ledger_records SET ${field} = ?, updated_at = ? WHERE id = ?`).run(value, now, id)
 
   const fieldName = field.replace(/_/g, ' ')
-  const cliCommand = `node cli.js correct --record ${record.trade_no} --field ${field} --value "${value}"`
+  const cliCommand = `npm run cli -- correct --record ${record.trade_no} --field ${field} --value "${value}"`
   const detail = `修正 ${record.trade_no} ${fieldName}：${oldValue} → ${value}`
   db.prepare(`
     INSERT INTO operation_logs (id, record_id, action, detail, cli_command, operator, timestamp)
@@ -110,7 +110,7 @@ export function rerun(recordId?: string, operator = 'system') {
     db.prepare('UPDATE ledger_records SET institution_name_consistent = ?, status = ?, updated_at = ? WHERE id = ?')
       .run(consistent, newStatus, now, rec.id)
 
-    const cliCommand = `node cli.js detect --record ${rec.trade_no}`
+    const cliCommand = `npm run cli -- detect --record ${rec.trade_no}`
     const detail = consistent
       ? `重跑一致性检测，${rec.trade_no} 机构简称已一致`
       : `重跑一致性检测，${rec.trade_no} 机构简称不一致：${rec.institution_name_source1} vs ${rec.institution_name_source2}`
@@ -139,7 +139,7 @@ export function confirm(id: string, operator = 'system') {
 
   db.prepare('UPDATE ledger_records SET status = ?, updated_at = ? WHERE id = ?').run('confirmed', now, id)
 
-  const cliCommand = `node cli.js confirm --record ${record.trade_no}`
+  const cliCommand = `npm run cli -- confirm --record ${record.trade_no}`
   const detail = `财务复核确认 ${record.trade_no}`
   db.prepare(`
     INSERT INTO operation_logs (id, record_id, action, detail, cli_command, operator, timestamp)
@@ -155,7 +155,7 @@ export function reject(id: string, operator = 'system') {
 
   db.prepare('UPDATE ledger_records SET status = ?, updated_at = ? WHERE id = ?').run('inconsistent', now, id)
 
-  const cliCommand = `node cli.js reject --record ${record.trade_no}`
+  const cliCommand = `npm run cli -- reject --record ${record.trade_no}`
   const detail = `财务复核打回 ${record.trade_no}`
   db.prepare(`
     INSERT INTO operation_logs (id, record_id, action, detail, cli_command, operator, timestamp)

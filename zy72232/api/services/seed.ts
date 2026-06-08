@@ -43,19 +43,13 @@ export function seedDemoData(): void {
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `)
 
-    const t1 = new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString()
-    insertLog.run(uuidv4(), null, 'import', '导入3条展期记录', 'node cli.js import --file batch-2024.xlsx', 'system', t1)
+    const t1 = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
+    insertLog.run(uuidv4(), null, 'import', '导入3条展期记录', 'npm run cli -- import --file batch-2024.xlsx', 'system', t1)
 
-    const t2 = new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString()
-    insertLog.run(uuidv4(), r2, 'detect', '检测到 TX-2024-002 机构简称不一致：中信建投证券 vs 中信建投', 'node cli.js detect --record TX-2024-002', 'system', t2)
+    const t2 = new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString()
+    insertLog.run(uuidv4(), r2, 'detect', '检测到 TX-2024-002 机构简称不一致：中信建投证券 vs 中信建投', 'npm run cli -- detect --record TX-2024-002', 'system', t2)
 
-    const t3 = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
-    insertLog.run(uuidv4(), r3, 'supplement', '补录 TX-2024-003 税费率备注：2.50%，旧口径', 'node cli.js supplement --record TX-2024-003 --rate 2.50 --remark "旧口径"', 'system', t3)
-
-    const t4 = new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString()
-    insertLog.run(uuidv4(), r2, 'correct', '修正 TX-2024-002 机构简称来源2：中信建投 → 中信建投证券', 'node cli.js correct --record TX-2024-002 --field institution_name_source2 --value "中信建投证券"', 'system', t4)
-
-    const t5 = new Date(Date.now() - 0.5 * 60 * 60 * 1000).toISOString()
-    insertLog.run(uuidv4(), r2, 'detect', '重跑一致性检测，TX-2024-002 机构简称已一致', 'node cli.js detect --record TX-2024-002', 'system', t5)
+    const t3 = new Date(Date.now() - 0.5 * 60 * 60 * 1000).toISOString()
+    insertLog.run(uuidv4(), r3, 'supplement', '补录 TX-2024-003 税费率备注：2.50%，旧口径', 'npm run cli -- supplement --record TX-2024-003 --rate 2.50 --remark "旧口径"', 'system', t3)
   })()
 }

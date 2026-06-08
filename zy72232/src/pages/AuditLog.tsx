@@ -14,15 +14,15 @@ const ACTION_CONFIG: Record<OperationLog['action'], { label: string; color: stri
 }
 
 const CLI_TEMPLATES = [
-  'node cli.js import --file <filename>',
-  'node cli.js detect --all',
-  'node cli.js detect --record <trade_no>',
-  'node cli.js supplement --record <trade_no> --rate <rate> --remark "<remark>"',
-  'node cli.js correct --record <trade_no> --field <field> --value "<value>"',
-  'node cli.js confirm --record <trade_no>',
-  'node cli.js reject --record <trade_no>',
-  'node cli.js stats',
-  'node cli.js demo --seed',
+  'npm run cli -- import --file <filename>',
+  'npm run cli -- detect --all',
+  'npm run cli -- detect --record <trade_no>',
+  'npm run cli -- supplement --record <trade_no> --rate <rate> --remark "<remark>"',
+  'npm run cli -- correct --record <trade_no> --field <field> --value "<value>"',
+  'npm run cli -- confirm --record <trade_no>',
+  'npm run cli -- reject --record <trade_no>',
+  'npm run cli -- stats',
+  'npm run cli -- demo --seed',
 ]
 
 function CopyButton({ text }: { text: string }) {
