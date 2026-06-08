@@ -93,9 +93,9 @@ export const MATERIAL_LABELS: Record<MaterialType, string> = {
 };
 
 export const STATUS_LABELS: Record<WorkflowStatus, string> = {
-  step1: '第一步：已导入照片',
-  step2: '第二步：待补录CAD',
-  step3: '第三步：待更新说明',
+  step1: 'Step1 已导入照片',
+  step2: 'Step2 已补录CAD',
+  step3: 'Step3 已填现场说明',
   pending_review: '待巡检组复核',
   confirmed: '已确认',
   rejected: '已驳回',

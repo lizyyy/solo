@@ -47,8 +47,20 @@ export default function SelfCheckPage() {
     return CHECK_CONFIG.find((c) => c.key === key)?.label || key;
   };
 
-  const getNavigatePath = (issue: SelfCheckIssue) => {
-    return `/cad?recordId=${issue.recordId}`;
+  const getNavigatePath = (issue: SelfCheckIssue & { checkType?: string }, checkType?: string) => {
+    const ct = checkType || (issue as any).checkType;
+    const rid = issue.recordId;
+    const { records } = usePipelineStore.getState();
+    const record = records.find((r) => r.id === rid);
+    if (ct === 'coordinateMixed' || record?.isCoordinateMixed || record?.status === 'pending_review') {
+      return '/coordinates';
+    }
+    if (ct === 'duplicateImport') {
+      if (!record?.cadLayer) return '/cad';
+      return '/conflicts';
+    }
+    if (!record?.cadLayer) return '/cad';
+    return '/instructions';
   };
 
   return (
@@ -166,7 +178,7 @@ export default function SelfCheckPage() {
                           <p className="text-sm text-gray-600">{issue.detail}</p>
                         </div>
                         <Link
-                          to={getNavigatePath(issue)}
+                          to={getNavigatePath(issue, selectedCheck)}
                           className="text-primary-600 hover:text-primary-800 inline-flex items-center gap-1 text-sm"
                         >
                           定位 <ExternalLink className="w-3 h-3" />
