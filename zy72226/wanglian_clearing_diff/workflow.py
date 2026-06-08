@@ -60,7 +60,7 @@ class WorkflowEngine:
                 detail=f"节假日顺延说明: {note} (来源: {source})",
                 new_value=note,
             )
-
+        self._store.save()
         return info
 
     def update_summary(self, clearing_batch_no: str, note: str = "",
@@ -88,7 +88,7 @@ class WorkflowEngine:
                 actor=actor,
                 detail=f"摘要更新: {note or '(无额外说明)'}",
             )
-
+        self._store.save()
         return update
 
     def confirm_record(self, record_id: str, actor: str = "risk_control") -> Optional[ClearingRecord]:
@@ -105,6 +105,7 @@ class WorkflowEngine:
             original_value=ProcessingStatus.PENDING_REVIEW.value,
             new_value=ProcessingStatus.CONFIRMED.value,
         )
+        self._store.save()
         return record
 
     def reject_record(self, record_id: str, reason: str, actor: str = "risk_control") -> Optional[ClearingRecord]:
@@ -120,6 +121,7 @@ class WorkflowEngine:
             original_value=old_status,
             new_value=ProcessingStatus.REJECTED.value,
         )
+        self._store.save()
         return record
 
     def supplement_record(self, record_id: str, new_amount: int, note: str = "",
@@ -137,4 +139,5 @@ class WorkflowEngine:
             original_value=old_amount,
             new_value=str(new_amount),
         )
+        self._store.save()
         return record

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import sys
 
 import click
@@ -10,7 +11,7 @@ from rich.panel import Panel
 from rich.text import Text
 
 from .models import ProcessingStatus
-from .store import ResultStore
+from .store import ResultStore, DEFAULT_STORE_DIR, DEFAULT_STORE_FILE
 from .workflow import WorkflowEngine
 
 console = Console()
@@ -33,17 +34,37 @@ def _status_style(status: ProcessingStatus) -> str:
     return styles.get(status, "white")
 
 
+def _default_store_path() -> str:
+    return os.path.join(os.getcwd(), DEFAULT_STORE_DIR, DEFAULT_STORE_FILE)
+
+
 @click.group()
-def main() -> None:
-    pass
+@click.option("--store", "store_path", default=None,
+              help=f"持久化存储路径 (默认: {DEFAULT_STORE_DIR}/{DEFAULT_STORE_FILE})")
+@click.pass_context
+def main(ctx: click.Context, store_path: str) -> None:
+    ctx.ensure_object(dict)
+    resolved = store_path or _default_store_path()
+    ctx.obj["store_path"] = resolved
+    ResultStore.reset()
+    ResultStore.get_instance(resolved)
+
+
+def _get_store() -> ResultStore:
+    return ResultStore.get_instance()
+
+
+def _get_engine() -> WorkflowEngine:
+    return WorkflowEngine(_get_store())
 
 
 @main.command(name="import")
 @click.argument("file", type=click.Path(exists=True))
 @click.option("--actor", default="system", help="操作人")
-def import_cmd(file: str, actor: str) -> None:
-    store = ResultStore.get_instance()
-    engine = WorkflowEngine(store)
+@click.pass_context
+def import_cmd(ctx: click.Context, file: str, actor: str) -> None:
+    store = _get_store()
+    engine = _get_engine()
 
     with open(file, encoding="utf-8") as f:
         rows = json.load(f)
@@ -61,6 +82,7 @@ def import_cmd(file: str, actor: str) -> None:
         color = "red" if severity == "error" else "yellow"
         console.print(f"  [{color}]{f.get('rule')}[/{color}]: {f.get('message')}")
 
+    console.print(f"\n[dim]数据已持久化到 {store._store_path}[/dim]")
     _render_records_table(store)
 
 
@@ -71,12 +93,13 @@ def import_cmd(file: str, actor: str) -> None:
 @click.option("--source", default="", help="信息来源")
 @click.option("--actor", default="system", help="操作人")
 def holiday(clearing_batch_no: str, note: str, effective_date: str, source: str, actor: str) -> None:
-    store = ResultStore.get_instance()
-    engine = WorkflowEngine(store)
+    store = _get_store()
+    engine = _get_engine()
 
     info = engine.apply_holiday_note(clearing_batch_no, note, effective_date, source, actor)
     if info is None:
         console.print(f"[red]未找到清算批次号 {clearing_batch_no}[/red]")
+        console.print(f"[dim]请先执行 wlc-diff import 导入包含该批次号的数据[/dim]")
         sys.exit(1)
 
     console.print(Panel(
@@ -96,12 +119,13 @@ def holiday(clearing_batch_no: str, note: str, effective_date: str, source: str,
 @click.option("--note", default="", help="摘要备注")
 @click.option("--actor", default="system", help="操作人")
 def summary(clearing_batch_no: str, note: str, actor: str) -> None:
-    store = ResultStore.get_instance()
-    engine = WorkflowEngine(store)
+    store = _get_store()
+    engine = _get_engine()
 
     update = engine.update_summary(clearing_batch_no, note, actor)
     if update is None:
         console.print(f"[red]未找到清算批次号 {clearing_batch_no}[/red]")
+        console.print(f"[dim]请先执行 wlc-diff import 导入包含该批次号的数据[/dim]")
         sys.exit(1)
 
     console.print(Panel(
@@ -124,11 +148,12 @@ def summary(clearing_batch_no: str, note: str, actor: str) -> None:
 @click.argument("record_id")
 @click.option("--actor", default="risk_control", help="操作人")
 def confirm(record_id: str, actor: str) -> None:
-    store = ResultStore.get_instance()
-    engine = WorkflowEngine(store)
+    store = _get_store()
+    engine = _get_engine()
     record = engine.confirm_record(record_id, actor)
     if record is None:
         console.print(f"[red]未找到记录 {record_id}[/red]")
+        console.print(f"[dim]请先执行 wlc-diff import 导入数据[/dim]")
         sys.exit(1)
     console.print(f"[green]记录 {record_id} 已由 {actor} 确认[/green]")
     _render_evidence(store, record_id)
@@ -139,11 +164,12 @@ def confirm(record_id: str, actor: str) -> None:
 @click.argument("reason")
 @click.option("--actor", default="risk_control", help="操作人")
 def reject(record_id: str, reason: str, actor: str) -> None:
-    store = ResultStore.get_instance()
-    engine = WorkflowEngine(store)
+    store = _get_store()
+    engine = _get_engine()
     record = engine.reject_record(record_id, reason, actor)
     if record is None:
         console.print(f"[red]未找到记录 {record_id}[/red]")
+        console.print(f"[dim]请先执行 wlc-diff import 导入数据[/dim]")
         sys.exit(1)
     console.print(f"[magenta]记录 {record_id} 已由 {actor} 驳回: {reason}[/magenta]")
     _render_evidence(store, record_id)
@@ -152,14 +178,14 @@ def reject(record_id: str, reason: str, actor: str) -> None:
 @main.command(name="evidence")
 @click.argument("record_id")
 def evidence_cmd(record_id: str) -> None:
-    store = ResultStore.get_instance()
+    store = _get_store()
     _render_evidence(store, record_id)
 
 
 @main.command()
 @click.option("--output", "-o", default="", help="输出文件路径")
 def export(output: str) -> None:
-    store = ResultStore.get_instance()
+    store = _get_store()
     data = {
         "records": store.export_records(),
         "check_results": store.export_check_results(),
@@ -172,6 +198,13 @@ def export(output: str) -> None:
         console.print(f"[green]已导出到 {output}[/green]")
     else:
         console.print(content)
+
+
+@main.command()
+def reset() -> None:
+    store = _get_store()
+    store.clear()
+    console.print("[green]已清除所有数据[/green]")
 
 
 def _render_records_table(store: ResultStore) -> None:

@@ -36,6 +36,7 @@ class SelfCheckEngine:
                     detail=f"自检完成, {'存在异常' if has_failure else '全部通过'}",
                 )
 
+        self._store.save()
         return results
 
     def _check_duplicate_import(self) -> list[SelfCheckResult]:

@@ -2,11 +2,16 @@
 
 支付平台网联通道清分差异处理工具，支持自检、审计轨迹、CLI 和 API 双模式。
 
+数据默认持久化到当前目录下的 `.wlc-diff/store.json`，跨命令调用自动加载，无需重复导入。
+
 ## 快速开始
 
 ```bash
 # 安装
 pip install -e ".[dev]"
+
+# 0. （可选）清除旧数据
+wlc-diff reset
 
 # 1. 导入样例数据 + 自检
 wlc-diff import sample_data.json
@@ -18,15 +23,25 @@ wlc-diff holiday WL20260601001 "端午节顺延一天，6月2日到账" --effect
 wlc-diff summary WL20260601001 --note "6月1日批次摘要"
 
 # 4. 查看证据（风控同事追问时用）
-wlc-diff evidence t002
+wlc-diff evidence r002
 
 # 5. 风控确认 / 驳回
-wlc-diff confirm t002 --actor 风控小李
-wlc-diff reject t002 "数据有误" --actor 风控小王
+wlc-diff confirm r002 --actor 风控小李
+wlc-diff reject r002 "数据有误" --actor 风控小王
 
 # 6. 导出完整报告
 wlc-diff export -o report.json
 ```
+
+> 每条命令结束后数据自动落盘到 `.wlc-diff/store.json`，后续命令自动读取，无需在同一进程内操作。
+
+## 持久化
+
+| 项目 | 说明 |
+|------|------|
+| 默认路径 | `.wlc-diff/store.json`（当前工作目录下） |
+| 自定义路径 | `wlc-diff --store /path/to/store.json <command>` |
+| 清除数据 | `wlc-diff reset` |
 
 ## API 模式
 
@@ -48,7 +63,7 @@ uvicorn wanglian_clearing_diff.api:app --reload
 | `/api/reject` | POST | 风控驳回 |
 | `/api/supplement` | POST | 补录 |
 | `/api/report` | GET | 完整报告 |
-| `/api/reset` | POST | 重置内存数据 |
+| `/api/reset` | POST | 重置数据 |
 
 API 返回统一携带清算批次号和节假日顺延证据摘要，示例：
 
@@ -90,5 +105,5 @@ API 返回统一携带清算批次号和节假日顺延证据摘要，示例：
 ## 运行测试
 
 ```bash
-pytest -v
+pytest -v -p no:asyncio
 ```

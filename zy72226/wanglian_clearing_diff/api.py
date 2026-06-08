@@ -1,13 +1,16 @@
 from __future__ import annotations
 
+import os
 from typing import Optional
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
 from .models import EvidenceSummary, ProcessingStatus
-from .store import ResultStore
+from .store import ResultStore, DEFAULT_STORE_DIR, DEFAULT_STORE_FILE
 from .workflow import WorkflowEngine
+
+STORE_PATH = os.path.join(os.getcwd(), DEFAULT_STORE_DIR, DEFAULT_STORE_FILE)
 
 app = FastAPI(title="网联通道清分差异", version="1.0.0")
 
@@ -91,7 +94,7 @@ class FullReportResponse(BaseModel):
 
 
 def _store() -> ResultStore:
-    return ResultStore.get_instance()
+    return ResultStore.get_instance(STORE_PATH)
 
 
 def _engine() -> WorkflowEngine:

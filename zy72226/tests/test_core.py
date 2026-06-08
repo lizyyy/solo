@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import pytest
 
 from wanglian_clearing_diff.models import ProcessingStatus, SelfCheckRule
@@ -10,9 +11,10 @@ from wanglian_clearing_diff.self_check import SelfCheckEngine
 
 
 @pytest.fixture(autouse=True)
-def fresh_store():
+def fresh_store(tmp_path):
+    store_file = str(tmp_path / "test_store.json")
     ResultStore.reset()
-    store = ResultStore.get_instance()
+    store = ResultStore.get_instance(store_file)
     yield store
     ResultStore.reset()
 
