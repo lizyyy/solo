@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>宠物减重排程对账</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>🐾 宠物减重排程对账工作台</h1>
+    <div class="sub">
+      训练师阿岑 · 自动匹配病历手写单 · 识别体重单位混写 · 人工备注持久化 · CSV明细绑定筛选
+      {% if current_batch %}· 对账批次：<strong>{{ current_batch }}</strong>{% endif %}
+    </div>
+    <div class="actions">
+      <button class="btn ghost" onclick="runReconcile(1)">
+        <span>🔄</span> 首轮对账（导入新手写单后）
+      </button>
+      <button class="btn ghost" onclick="runReconcile(2)">
+        <span>♻️</span> 重跑（沿用批次号，继承备注）
+      </button>
+      <button class="btn success" onclick="exportCsv(true)">
+        <span>📥</span> 导出CSV（按当前筛选）
+      </button>
+      <button class="btn primary" onclick="exportCsv(false)">
+        <span>📄</span> 导出全部
+      </button>
+    </div>
+  </header>
+
+  {% if not current_batch %}
+  <div class="card empty-state">
+    <div class="icon">📋</div>
+    <h3>还没有对账数据</h3>
+    <p>先执行「首轮对账」导入样例数据，或用命令行：<code>python import_samples.py && python run_pipeline.py --export</code></p>
+    <button class="btn success" onclick="runReconcile(1)">立即开始首轮对账</button>
+  </div>
+  {% else %}
+
+  <div class="grid">
+    <aside class="sidebar">
+      <div class="card">
+        <h3>📊 本批次统计</h3>
+        <div class="stats">
+          <div class="stat"><div class="num">{{ stats.total }}</div><div class="lbl">记录总数</div></div>
+          <div class="stat review"><div class="num">{{ stats.need_review }}</div><div class="lbl">需复核</div></div>
+          <div class="stat ok"><div class="num">{{ stats.normal }}</div><div class="lbl">正常</div></div>
+        </div>
+        <div class="stats" style="margin-top:8px">
+          <div class="stat warn"><div class="num">{{ stats.name_unmatched }}</div><div class="lbl">名称未匹配</div></div>
+          <div class="stat warn"><div class="num">{{ stats.weight_mixed }}</div><div class="lbl">单位混写</div></div>
+          <div class="stat"><div class="num">{{ stats.has_note }}</div><div class="lbl">已备注</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>🔍 筛选条件 <span class="hint">· 刷新自动恢复</span></h3>
+        <form id="filterForm" method="GET" action="{{ url_for('index') }}">
+          <input type="hidden" name="batch" value="{{ current_batch }}" />
+
+          <div class="filter-row">
+            <label>宠物名称</label>
+            <input type="text" name="pet_name" value="{{ filters.get('pet_name', '') }}"
+                   placeholder="搜登记名或手写名…" />
+          </div>
+
+          <div class="filter-row">
+            <label>复核状态</label>
+            <select name="review_status">
+              <option value="">全部</option>
+              <option value="正常" {% if filters.get('review_status')=='正常' %}selected{% endif %}>正常</option>
+              <option value="需复核" {% if filters.get('review_status')=='需复核' %}selected{% endif %}>需复核</option>
+            </select>
+          </div>
+
+          <div class="filter-row">
+            <label>名称匹配方式</label>
+            <select name="name_match_status">
+              <option value="">全部</option>
+              {% for s in ['完全匹配','别名匹配','模糊匹配','未匹配'] %}
+              <option value="{{ s }}" {% if filters.get('name_match_status')==s %}selected{% endif %}>{{ s }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="filter-row">
+            <label>体重单位状态</label>
+            <select name="weight_unit_status">
+              <option value="">全部</option>
+              {% for s in ['标准','混写(已转换)','无单位(默认kg)','无法识别'] %}
+              <option value="{{ s }}" {% if filters.get('weight_unit_status')==s %}selected{% endif %}>{{ s }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="filter-row">
+            <label>处理状态</label>
+            <select name="process_status">
+              <option value="">全部</option>
+              {% for s in ['首轮处理','重跑(后补)','新增'] %}
+              <option value="{{ s }}" {% if filters.get('process_status')==s %}selected{% endif %}>{{ s }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="filter-row">
+            <label>处理轮次</label>
+            <select name="process_round">
+              <option value="">全部</option>
+              {% for s in ['1','2','3','4','5'] %}
+              <option value="{{ s }}" {% if filters.get('process_round')==s %}selected{% endif %}>第 {{ s }} 轮</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="filter-row">
+            <label>人工备注</label>
+            <select name="has_note">
+              <option value="">全部</option>
+              <option value="1" {% if filters.get('has_note')=='1' %}selected{% endif %}>已填备注</option>
+              <option value="0" {% if filters.get('has_note')=='0' %}selected{% endif %}>未填备注</option>
+            </select>
+          </div>
+
+          <div class="filter-actions">
+            <button type="submit" class="btn sm">应用</button>
+            <a href="{{ url_for('index', batch=current_batch, reset_filter=1) }}"
+               class="btn sm" style="background:#f1f5f9;color:#475569">重置</a>
+          </div>
+        </form>
+      </div>
+
+      <div class="card">
+        <h3>📁 历史批次</h3>
+        <div class="batch-list">
+          {% for b in all_batches %}
+          <div class="batch-item {% if b.batch_no == current_batch %}active{% endif %}"
+               onclick="location.href='{{ url_for('index', batch=b.batch_no) }}'">
+            <div>
+              <div>{{ b.batch_no }}</div>
+              <div class="meta">共 {{ b.count }} 条</div>
+            </div>
+            {% if b.need_review %}<div class="need">{{ b.need_review }}🔴</div>{% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      {% if export_batches %}
+      <div class="card">
+        <h3>📦 最近导出 <span class="hint">· 绑定筛选可追回</span></h3>
+        <div class="export-list">
+          {% for eb in export_batches %}
+          <div class="export-item">
+            <div class="name">{{ eb.file_name }}</div>
+            <div class="meta">
+              <span>{{ eb.record_count }}条 · {{ eb.export_timestamp[:8] }} {{ eb.export_timestamp[9:11] }}:{{ eb.export_timestamp[11:13] }}</span>
+              <a href="{{ url_for('download_export', filename=eb.file_name) }}">下载</a>
+            </div>
+            {% if eb.filter_criteria and eb.filter_criteria != '{}' %}
+            <div class="meta" style="margin-top:4px;color:#667eea;">
+              筛选: {{ eb.filter_criteria[:60] }}{% if eb.filter_criteria|length > 60 %}…{% endif %}
+            </div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    </aside>
+
+    <main class="main-content">
+      <div class="table-wrap">
+        <div class="table-header">
+          <div class="left">
+            <h2>对账明细</h2>
+            <span class="pill">当前筛选 {{ total }} / 全部 {{ stats.total }} 条</span>
+          </div>
+          <div>
+            <span style="font-size:12px;color:#94a3b8;">每页数：</span>
+            <select id="perPageSel" onchange="changePerPage(this.value)"
+                    style="padding:4px 6px;border-radius:4px;border:1px solid #e2e8f0;font-size:12px;">
+              {% for n in [10,20,50,100] %}
+              <option value="{{ n }}" {% if per_page==n %}selected{% endif %}>{{ n }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>轮次</th>
+              <th>宠物（登记名 / 手写名）</th>
+              <th>名称匹配</th>
+              <th>体重（标准 / 原始）</th>
+              <th>单位状态</th>
+              <th>目标/差值</th>
+              <th>用药提醒</th>
+              <th>复核</th>
+              <th>人工备注</th>
+              <th>处理</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in records %}
+            <tr class="{% if r.review_status == '需复核' %}review-row{% endif %}">
+              <td>
+                <span class="tag tag-info">R{{ r.process_round }}</span>
+              </td>
+              <td>
+                <div class="pet-name-cell">
+                  <span class="name">{{ r.pet_name or '—' }}</span>
+                  <span class="hand">写：{{ r.handwritten_name }}</span>
+                  <span class="hand">{{ r.record_date }} · {{ r.pet_id }}</span>
+                </div>
+              </td>
+              <td><span class="{{ status_class(r.name_match_status) }}">{{ r.name_match_status }}</span></td>
+              <td>
+                <div class="weight-cell">
+                  <span class="std">{{ '%0.2f' % r.standard_weight_kg if r.standard_weight_kg is not none else '—' }} kg</span>
+                  <span class="raw">原：{{ r.raw_weight }}</span>
+                </div>
+              </td>
+              <td><span class="{{ status_class(r.weight_unit_status) }}">{{ r.weight_unit_status }}</span></td>
+              <td style="font-size:12px">
+                目标：{{ '%0.2f' % r.target_weight_kg if r.target_weight_kg is not none else '—' }} kg<br/>
+                {% if r.weight_loss_diff is not none %}
+                <span style="color:{% if r.weight_loss_diff < 0 %}#ef4444{% else %}#10b981{% endif %}">
+                  差：{{ '%+0.2f' % r.weight_loss_diff }} kg
+                </span>
+                {% endif %}
+              </td>
+              <td style="max-width:180px;font-size:12px">
+                {% if r.medication_reminder %}
+                💊 {{ r.medication_reminder }}
+                {% else %}
+                <span style="color:#ef4444;">⚠️ 缺失</span>
+                {% endif %}
+              </td>
+              <td style="min-width:180px">
+                <span class="{{ status_class(r.review_status) }}">{{ r.review_status }}</span>
+                {% if r.review_reason %}
+                <div class="review-reason">{{ r.review_reason }}</div>
+                {% endif %}
+              </td>
+              <td style="min-width:160px">
+                {% if r.manual_note %}
+                <div class="note-cell">
+                  {{ r.manual_note }}
+                  <span class="src">来源：{{ r.note_source }} · {{ r.created_at.strftime('%m-%d %H:%M') }}</span>
+                </div>
+                {% else %}
+                <span style="color:#cbd5e1;font-size:12px;">（空）</span>
+                {% endif %}
+              </td>
+              <td><span class="{{ status_class(r.process_status) }}">{{ r.process_status }}</span></td>
+              <td>
+                <div style="display:flex;gap:4px;flex-wrap:wrap;">
+                  <button class="btn sm" onclick="openNoteModal({{ r.id }}, {{ r.process_round }})">
+                    ✍️ 备注
+                  </button>
+                  <button class="btn sm" style="background:#eef2ff;color:#4f46e5;" onclick="viewHistory({{ r.id }})">
+                    📜 历史
+                  </button>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        <div class="pagination">
+          <div>共 <strong>{{ total }}</strong> 条 · 第 <strong>{{ page }}</strong> / {{ total_pages }} 页</div>
+          <div class="pages">
+            {% if page > 1 %}
+            <a class="page-btn" href="{{ url_for('index', batch=current_batch, page=1, **filters) }}">«</a>
+            <a class="page-btn" href="{{ url_for('index', batch=current_batch, page=page-1, **filters) }}">‹</a>
+            {% endif %}
+
+            {% set start = [1, page-2]|max %}
+            {% set end = [total_pages, page+2]|min %}
+            {% if start > 1 %}<span class="page-btn" style="border:none;cursor:default;">…</span>{% endif %}
+            {% for p in range(start, end+1) %}
+            <a class="page-btn {% if p==page %}active{% endif %}"
+               href="{{ url_for('index', batch=current_batch, page=p, **filters) }}">{{ p }}</a>
+            {% endfor %}
+            {% if end < total_pages %}<span class="page-btn" style="border:none;cursor:default;">…</span>{% endif %}
+
+            {% if page < total_pages %}
+            <a class="page-btn" href="{{ url_for('index', batch=current_batch, page=page+1, **filters) }}">›</a>
+            <a class="page-btn" href="{{ url_for('index', batch=current_batch, page=total_pages, **filters) }}">»</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  {% endif %}
+</div>
+
+<div id="toast" class="toast"></div>
+
+<div id="noteModal" class="modal-mask" onclick="if(event.target===this)closeNoteModal()">
+  <div class="modal">
+    <h3>✍️ 添加人工备注</h3>
+    <ul class="info-list" id="noteInfo"></ul>
+    <textarea id="noteText" placeholder="请输入备注内容，例如：已确认归属/体重已换算/用药已核对…"></textarea>
+    <div class="footer">
+      <button class="btn" onclick="closeNoteModal()">取消</button>
+      <button class="btn success" onclick="submitNote()">💾 保存</button>
+    </div>
+  </div>
+</div>
+
+<div id="historyModal" class="modal-mask" onclick="if(event.target===this)closeHistoryModal()">
+  <div class="modal">
+    <h3>📜 备注历史</h3>
+    <div class="note-history" id="noteHistory">
+      <div style="text-align:center;color:#94a3b8;padding:20px;">加载中…</div>
+    </div>
+    <div class="footer">
+      <button class="btn" onclick="closeHistoryModal()">关闭</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const CURRENT_BATCH = {{ current_batch|tojson }};
+let pendingRecId = null;
+let pendingRound = null;
+
+function toast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.className = `toast ${type} show`;
+  t.textContent = msg;
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+function runReconcile(round) {
+  const btn = event.target.closest('button');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> 处理中…'; }
+  fetch('/api/reconcile', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ batch_no: CURRENT_BATCH, process_round: round })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.ok) {
+      toast(`✅ 第${round}轮完成：共${data.count}条，需复核${data.need_review}条`);
+      setTimeout(() => location.href = data.redirect, 800);
+    } else {
+      toast(data.error || '处理失败', 'error');
+      if (btn) { btn.disabled = false; btn.innerHTML = btn._old || btn.innerHTML; }
+    }
+  })
+  .catch(e => { toast('网络错误：'+e, 'error'); });
+}
+
+function exportCsv(useFilter) {
+  fetch('/api/export', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ batch_no: CURRENT_BATCH, use_current_filters: useFilter })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.ok) {
+      toast(`📥 已导出${data.count}条 CSV 明细`);
+      window.open(data.download_url, '_blank');
+      setTimeout(() => location.reload(), 600);
+    } else {
+      toast(data.error || '导出失败', 'error');
+    }
+  })
+  .catch(e => toast('导出错误：'+e, 'error'));
+}
+
+function openNoteModal(recId, round) {
+  pendingRecId = recId;
+  pendingRound = round;
+  document.getElementById('noteInfo').innerHTML =
+    `<li><strong>对账 ID：</strong>${recId}</li>` +
+    `<li><strong>处理轮次：</strong>第 ${round} 轮</li>` +
+    `<li><strong>批次号：</strong>${CURRENT_BATCH}</li>` +
+    `<li><strong>填写人：</strong>阿岑（训练师）</li>`;
+  document.getElementById('noteText').value = '';
+  document.getElementById('noteModal').classList.add('show');
+  setTimeout(() => document.getElementById('noteText').focus(), 100);
+}
+function closeNoteModal() {
+  document.getElementById('noteModal').classList.remove('show');
+  pendingRecId = null;
+}
+
+function submitNote() {
+  const content = document.getElementById('noteText').value.trim();
+  if (!content) { toast('请填写备注内容', 'error'); return; }
+  fetch('/api/note', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ rec_id: pendingRecId, content, created_by: '阿岑' })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.ok) {
+      toast(`✅ 备注已保存（${data.created_at}）`);
+      closeNoteModal();
+      setTimeout(() => location.reload(), 500);
+    } else {
+      toast(data.error || '保存失败', 'error');
+    }
+  });
+}
+
+function viewHistory(recId) {
+  document.getElementById('historyModal').classList.add('show');
+  fetch(`/api/note_history/${recId}`)
+    .then(r => r.json())
+    .then(list => {
+      const box = document.getElementById('noteHistory');
+      if (!list || !list.length) {
+        box.innerHTML = `<div style="text-align:center;color:#94a3b8;padding:20px;">暂无历史备注</div>`;
+        return;
+      }
+      box.innerHTML = list.map(n => `
+        <div class="note-history-item ${n.is_latest ? 'latest':''}">
+          <div class="top">
+            <span><strong>${n.created_by}</strong> · ${n.source}${n.is_latest?' · ✅最新':''}</span>
+            <span>${n.created_at}</span>
+          </div>
+          <div style="color:#334155;">${n.content}</div>
+        </div>
+      `).join('');
+    })
+    .catch(() => {
+      document.getElementById('noteHistory').innerHTML =
+        `<div style="text-align:center;color:#ef4444;padding:20px;">加载失败</div>`;
+    });
+}
+function closeHistoryModal() {
+  document.getElementById('historyModal').classList.remove('show');
+}
+
+function changePerPage(val) {
+  const url = new URL(location.href);
+  url.searchParams.set('per_page', val);
+  url.searchParams.set('page', '1');
+  location.href = url.toString();
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeNoteModal(); closeHistoryModal(); }
+});
+</script>
+</body>
+</html>

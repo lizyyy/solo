@@ -1,0 +1,20 @@
+启动宠物减重排程对账 Web 服务 ...
+  数据目录: /Users/maca/pro/solo/workspaces/zy73022/data
+  导出目录: /Users/maca/pro/solo/workspaces/zy73022/exports
+  访问地址: http://127.0.0.1:5002/
+ * Serving Flask app 'app'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5002
+ * Running on http://192.168.31.172:5002
+[33mPress CTRL+C to quit[0m
+127.0.0.1 - - [09/Jun/2026 04:05:24] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [09/Jun/2026 04:05:25] "GET /static/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [09/Jun/2026 04:05:25] "[33mGET /@vite/client HTTP/1.1[0m" 404 -
+127.0.0.1 - - [09/Jun/2026 04:06:34] "GET /?batch=RCN20260609034845&pet_name=&review_status=需复核&name_match_status=&weight_unit_status=&process_status=&process_round=&has_note= HTTP/1.1" 200 -
+127.0.0.1 - - [09/Jun/2026 04:06:34] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [09/Jun/2026 04:06:34] "[33mGET /@vite/client HTTP/1.1[0m" 404 -
+127.0.0.1 - - [09/Jun/2026 04:09:17] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [09/Jun/2026 04:09:17] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [09/Jun/2026 04:09:17] "[33mGET /@vite/client HTTP/1.1[0m" 404 -
