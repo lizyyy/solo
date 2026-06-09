@@ -72,6 +72,11 @@ class CalculationDetail:
     calculation_time: datetime
     source: str
     remark: str = ""
+    original_sampling_value: str = ""
+    original_param_value: str = ""
+    conflict_resolved: bool = False
+    analyst_decision: str = ""
+    manager_review_needed: bool = False
 
 
 @dataclass
@@ -91,8 +96,13 @@ class ConflictEvidence:
     field_name: str
     sampling_value: str
     param_value: str
-    description: str
+    sampling_source: str = "抽样名单"
+    param_source: str = "参数调试表"
+    description: str = ""
     severity: str = "high"
+    analyst_decision: Optional[str] = None
+    analyst_name: str = ""
+    need_manager_review: bool = False
 
 
 @dataclass
@@ -105,6 +115,9 @@ class WarningItem:
     description: str = ""
     suggestion: str = ""
     need_manager_review: bool = False
+    source_table: str = ""
+    duplicate_reason: str = ""
+    batch_info: str = ""
 
 
 @dataclass

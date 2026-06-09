@@ -12,10 +12,17 @@ from models import (
 
 class ValidationEngine:
     def __init__(self):
-        self.imported_grid_ids: List[Tuple[str, datetime]] = []
+        self.imported_grid_ids: List[Tuple[str, datetime, str]] = []
+        self.current_batch_id: Optional[str] = None
         self.percent_pattern = re.compile(r'^(-?\d+\.?\d*)%$')
         self.decimal_pattern = re.compile(r'^(-?\d+\.?\d*)$')
         self.history_records: List[HistoryRecord] = []
+
+    def _new_batch(self) -> str:
+        ts = datetime.now().strftime('%Y%m%d%H%M%S')
+        batch_id = f"batch_{ts}"
+        self.current_batch_id = batch_id
+        return batch_id
 
     def parse_value(self, raw_value: str) -> Tuple[Optional[float], Optional[bool], str]:
         raw_value = raw_value.strip()
@@ -58,11 +65,14 @@ class ValidationEngine:
                         grid_id=grid_id,
                         field_name="boundary_threshold",
                         current_value=data.raw_value,
-                        description=f"网格[{grid_id}]同时存在百分数和小数格式的边界值，"
-                                   f"当前行({data.row_index})值为{data.raw_value}",
-                        suggestion="请统一数值格式，全部使用百分数或全部使用小数，"
-                                  "不自动判定为正常，需活动负责人复核",
-                        need_manager_review=True
+                        description=f"同表内混用：网格[{grid_id}]同时存在百分数和小数格式，"
+                                   f"第{data.row_index}行值为{data.raw_value}。"
+                                   f"请统一格式（全百分或全小数）",
+                        suggestion="统一数值格式后再导入，系统不会自动判定正常，留待活动负责人复核",
+                        need_manager_review=True,
+                        source_table=data.source.value,
+                        batch_info="同表内多次出现",
+                        duplicate_reason=""
                     ))
         
         return warnings
@@ -70,37 +80,52 @@ class ValidationEngine:
     def detect_duplicate_import(
         self,
         grid_data_list: List[GridBoundaryData],
-        source: DataSource
+        source: DataSource,
+        current_batch_override: Optional[str] = None
     ) -> List[WarningItem]:
         warnings = []
-        current_import = set()
+        current_import = {}
+        batch_id = current_batch_override or (self.current_batch_id or "current")
         
         for data in grid_data_list:
             if data.grid_id in current_import:
+                first_row = current_import[data.grid_id]
                 warnings.append(WarningItem(
                     warning_type=WarningType.DUPLICATE_IMPORT,
                     grid_id=data.grid_id,
                     field_name="grid_id",
                     current_value=data.grid_id,
-                    description=f"网格[{data.grid_id}]在本次导入中重复出现，"
-                               f"重复位置：第{data.row_index}行",
-                    suggestion="请检查导入文件，删除重复数据后重新导入",
-                    need_manager_review=False
+                    description=f"【本次导入内重复】同一批导入的{source.value}中，"
+                               f"网格[{data.grid_id}]在第{first_row}行已出现，"
+                               f"本次又在第{data.row_index}行出现。"
+                               f"共出现2次。",
+                    suggestion="请删除本次导入内的重复数据后重新导入；"
+                              "若不同行是不同测点请更换grid_id后再导入",
+                    need_manager_review=False,
+                    source_table=source.value,
+                    batch_info="本次导入",
+                    duplicate_reason="同一批文件内同一grid_id出现多次"
                 ))
-            current_import.add(data.grid_id)
+            else:
+                current_import[data.grid_id] = data.row_index
             
-            for imported_id, import_time in self.imported_grid_ids:
-                if data.grid_id == imported_id:
+            for imported_id, import_time, hist_batch_id in self.imported_grid_ids:
+                if data.grid_id == imported_id and hist_batch_id != batch_id:
                     warnings.append(WarningItem(
                         warning_type=WarningType.DUPLICATE_IMPORT,
                         grid_id=data.grid_id,
                         field_name="grid_id",
                         current_value=data.grid_id,
-                        expected_value=None,
-                        description=f"网格[{data.grid_id}]曾在{import_time.strftime('%Y-%m-%d %H:%M:%S')}"
-                                   f"导入过，本次为重复导入",
-                        suggestion="如需更新数据请走补录流程，不要重复导入",
-                        need_manager_review=False
+                        description=f"【跨历史批次重复】网格[{data.grid_id}]"
+                                   f"曾在{import_time.strftime('%Y-%m-%d %H:%M:%S')}"
+                                   f"（批次{hist_batch_id}）的{source.value}中导入过，"
+                                   f"本批次又再次导入。",
+                        suggestion="如为更新数据请走补录流程（supplement_data），"
+                                  "不要重复导入；如为新批次且确需覆盖，请先执行reset_import_history()",
+                        need_manager_review=False,
+                        source_table=source.value,
+                        batch_info=f"历史批次（{hist_batch_id}）",
+                        duplicate_reason="与之前批次导入的grid_id相同"
                     ))
         
         return warnings
@@ -123,10 +148,13 @@ class ValidationEngine:
                         field_name="boundary_value",
                         current_value=new_d.raw_value,
                         expected_value=old_d.raw_value,
-                        description=f"网格[{new_d.grid_id}]边界值与历史记录不一致："
-                                   f"历史值{old_d.raw_value}，当前值{new_d.raw_value}",
+                        description=f"网格[{new_d.grid_id}]边界值与历史同网格记录不一致："
+                                   f"历史值{old_d.raw_value} vs 当前值{new_d.raw_value}",
                         suggestion="请确认数据是否正确，如需修改请走补录流程",
-                        need_manager_review=True
+                        need_manager_review=True,
+                        source_table=new_d.source.value,
+                        batch_info="",
+                        duplicate_reason=""
                     ))
         
         return warnings
@@ -151,7 +179,10 @@ class ValidationEngine:
                         current_value=data.raw_value,
                         description=f"网格[{data.grid_id}]边界值格式错误：{data.raw_value}，{msg}",
                         suggestion="请检查边界值格式，应为百分数（如5%）或小数（如0.05）",
-                        need_manager_review=False
+                        need_manager_review=False,
+                        source_table=source.value,
+                        batch_info=self.current_batch_id or "",
+                        duplicate_reason=""
                     ))
                 else:
                     data.numeric_value = numeric
@@ -172,17 +203,23 @@ class ValidationEngine:
 
     def record_import(self, grid_data_list: List[GridBoundaryData]):
         now = datetime.now()
+        batch_id = self._new_batch()
         for data in grid_data_list:
-            self.imported_grid_ids.append((data.grid_id, now))
+            self.imported_grid_ids.append((data.grid_id, now, batch_id))
         
         self.history_records.append(HistoryRecord(
-            record_id=f"hist_{now.strftime('%Y%m%d%H%M%S')}",
-            operation_type="导入数据",
-            operator="system",
+            record_id=f"hist_{now.strftime('%Y%m%d%H%M%S%f')}",
+            operation_type="导入抽样名单",
+            operator="活动负责人",
             operation_time=now,
-            detail=f"成功导入{len(grid_data_list)}条网格边界数据",
-            data_after={"count": len(grid_data_list)}
+            detail=f"批次[{batch_id}]成功导入{len(grid_data_list)}条网格边界数据",
+            data_after={"count": len(grid_data_list), "batch_id": batch_id}
         ))
+
+    def reset_import_history(self):
+        self.imported_grid_ids = []
+        self.history_records = []
+        self.current_batch_id = None
 
     def get_import_history(self) -> List[HistoryRecord]:
         return self.history_records
