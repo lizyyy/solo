@@ -23,6 +23,10 @@ class Annotation:
     edge_case_type: Optional[str] = None
     status: ReviewStatus = ReviewStatus.PENDING
     import_batch_id: str = ""
+    review_reason: str = ""
+    next_contact: str = ""
+    reviewed_by: str = ""
+    reviewed_at: str = ""
     created_at: str = field(default_factory=lambda: datetime.now().isoformat())
     updated_at: str = field(default_factory=lambda: datetime.now().isoformat())
 
@@ -99,6 +103,8 @@ class EvidenceSummary:
     original_line_number: int = 0
     original_value: str = ""
     current_value: str = ""
+    original_statement: str = ""
+    corrected_value: str = ""
     source: AnnotationSource = AnnotationSource.TEACHER_ANNOTATION
     is_edge_case: bool = False
     edge_case_type: Optional[str] = None
@@ -106,6 +112,10 @@ class EvidenceSummary:
     annotation_content: str = ""
     sampling_list_value: str = ""
     conflict_resolution: Optional[str] = None
+    review_reason: str = ""
+    next_contact: str = ""
+    reviewed_by: str = ""
+    reviewed_at: str = ""
     change_count: int = 0
     last_changed_by: str = ""
     last_changed_reason: str = ""

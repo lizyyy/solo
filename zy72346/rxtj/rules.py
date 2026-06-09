@@ -16,6 +16,7 @@ class ReviewStatus(str, Enum):
     SAMPLING_REVIEWED = "sampling_reviewed"
     DEMO_UPDATED = "demo_updated"
     FLAGGED = "flagged"
+    REVIEWED = "reviewed"
     ROLLED_BACK = "rolled_back"
 
 

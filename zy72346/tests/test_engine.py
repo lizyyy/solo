@@ -241,7 +241,7 @@ class TestRollback:
         ann = store.list_annotations(source=AnnotationSource.TEACHER_ANNOTATION)[0]
         assert ann.current_value == "0.9"
 
-        rolled = store.rollback_batch(result2.batch.id)
+        rolled, _ = store.rollback_batch(result2.batch.id)
         assert rolled >= 1
 
         ann = store.list_annotations(source=AnnotationSource.TEACHER_ANNOTATION)[0]

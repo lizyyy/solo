@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import json
 import sqlite3
+from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
@@ -10,6 +10,13 @@ from .rules import ReviewStatus, AnnotationSource
 
 
 DEFAULT_DB_PATH = Path.home() / ".rxtj" / "rxtj.db"
+
+_LATEST_ANNOTATION_COLUMNS = [
+    ("review_reason", "TEXT NOT NULL DEFAULT ''"),
+    ("next_contact", "TEXT NOT NULL DEFAULT ''"),
+    ("reviewed_by", "TEXT NOT NULL DEFAULT ''"),
+    ("reviewed_at", "TEXT NOT NULL DEFAULT ''"),
+]
 
 
 class Store:
@@ -42,6 +49,10 @@ class Store:
                 edge_case_type TEXT,
                 status TEXT NOT NULL DEFAULT 'pending',
                 import_batch_id TEXT,
+                review_reason TEXT NOT NULL DEFAULT '',
+                next_contact TEXT NOT NULL DEFAULT '',
+                reviewed_by TEXT NOT NULL DEFAULT '',
+                reviewed_at TEXT NOT NULL DEFAULT '',
                 created_at TEXT NOT NULL,
                 updated_at TEXT NOT NULL
             );
@@ -78,22 +89,34 @@ class Store:
             CREATE INDEX IF NOT EXISTS idx_changes_annotation ON change_records(annotation_id);
             CREATE INDEX IF NOT EXISTS idx_changes_batch ON change_records(import_batch_id);
         """)
+        self._migrate_annotations_schema(conn)
         conn.commit()
+
+    def _migrate_annotations_schema(self, conn: sqlite3.Connection) -> None:
+        cur = conn.execute("PRAGMA table_info(annotations)")
+        existing = {row[1] for row in cur.fetchall()}
+        for col_name, col_def in _LATEST_ANNOTATION_COLUMNS:
+            if col_name not in existing:
+                conn.execute(f"ALTER TABLE annotations ADD COLUMN {col_name} {col_def}")
 
     def save_annotation(self, ann: Annotation, batch_id: str = "") -> None:
         conn = self._get_conn()
+        ann.updated_at = datetime.now().isoformat()
         conn.execute(
             """INSERT OR REPLACE INTO annotations
                (id, source, original_line_number, original_value, current_value,
                 item_name, category, denominator_raw, numerator_raw,
                 is_edge_case, edge_case_type, status, import_batch_id,
+                review_reason, next_contact, reviewed_by, reviewed_at,
                 created_at, updated_at)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             (ann.id, ann.source.value, ann.original_line_number, ann.original_value,
              ann.current_value, ann.item_name, ann.category,
              ann.denominator_raw, ann.numerator_raw,
              int(ann.is_edge_case), ann.edge_case_type, ann.status.value,
-             batch_id, ann.created_at, ann.updated_at),
+             batch_id or ann.import_batch_id,
+             ann.review_reason, ann.next_contact, ann.reviewed_by, ann.reviewed_at,
+             ann.created_at, ann.updated_at),
         )
         conn.commit()
 
@@ -180,13 +203,21 @@ class Store:
             return None
         return self._row_to_batch(row)
 
-    def rollback_batch(self, batch_id: str) -> int:
+    def rollback_batch(self, batch_id: str, changed_by: str = "system") -> tuple[int, list[ChangeRecord]]:
         conn = self._get_conn()
         changes = conn.execute(
             "SELECT * FROM change_records WHERE import_batch_id = ? ORDER BY created_at DESC",
             (batch_id,),
         ).fetchall()
+
         rolled = 0
+        rollback_changes: list[ChangeRecord] = []
+        now = datetime.now().isoformat()
+
+        annotation_ids_affected: set[str] = set()
+        for ch_row in changes:
+            annotation_ids_affected.add(ch_row["annotation_id"])
+
         for ch_row in changes:
             ann_row = conn.execute(
                 "SELECT * FROM annotations WHERE id = ?", (ch_row["annotation_id"],)
@@ -194,18 +225,67 @@ class Store:
             if ann_row:
                 field = ch_row["field_name"]
                 old_val = ch_row["old_value"]
+                new_val = ch_row["new_value"]
+
                 conn.execute(
                     f"UPDATE annotations SET {field} = ?, updated_at = ? WHERE id = ?",
-                    (old_val, ch_row["created_at"], ch_row["annotation_id"]),
+                    (old_val, now, ch_row["annotation_id"]),
                 )
                 rolled += 1
+
+                rb_ch = ChangeRecord(
+                    annotation_id=ch_row["annotation_id"],
+                    field_name=field,
+                    old_value=str(new_val),
+                    new_value=str(old_val),
+                    changed_by=changed_by,
+                    reason=f"rollback_batch:{batch_id}: 回滚到改前值",
+                    import_batch_id=batch_id,
+                    created_at=now,
+                )
+                self.save_change(rb_ch)
+                rollback_changes.append(rb_ch)
+
+        batch_ann_rows = conn.execute(
+            "SELECT * FROM annotations WHERE import_batch_id = ? AND source = ?",
+            (batch_id, AnnotationSource.TEACHER_ANNOTATION.value),
+        ).fetchall()
+        for ann_row in batch_ann_rows:
+            prior_status = conn.execute(
+                """SELECT new_value FROM change_records
+                   WHERE annotation_id = ? AND field_name = 'status'
+                   AND import_batch_id != ?
+                   ORDER BY created_at DESC LIMIT 1""",
+                (ann_row["id"], batch_id),
+            ).fetchone()
+            old_status = ann_row["status"]
+            new_status = prior_status["new_value"] if prior_status else ReviewStatus.PENDING.value
+            if old_status != new_status:
+                conn.execute(
+                    "UPDATE annotations SET status = ?, updated_at = ? WHERE id = ?",
+                    (new_status, now, ann_row["id"]),
+                )
+                rb_ch = ChangeRecord(
+                    annotation_id=ann_row["id"],
+                    field_name="status",
+                    old_value=str(old_status),
+                    new_value=str(new_status),
+                    changed_by=changed_by,
+                    reason=f"rollback_batch:{batch_id}: 同步回滚状态",
+                    import_batch_id=batch_id,
+                    created_at=now,
+                )
+                self.save_change(rb_ch)
+                rollback_changes.append(rb_ch)
+
         conn.execute(
             "UPDATE import_batches SET rolled_back = 1 WHERE id = ?", (batch_id,)
         )
         conn.commit()
-        return rolled
+        return rolled, rollback_changes
 
     def _row_to_annotation(self, row: sqlite3.Row) -> Annotation:
+        keys = set(row.keys())
         return Annotation(
             id=row["id"],
             source=AnnotationSource(row["source"]),
@@ -219,7 +299,11 @@ class Store:
             is_edge_case=bool(row["is_edge_case"]),
             edge_case_type=row["edge_case_type"],
             status=ReviewStatus(row["status"]),
-            import_batch_id=row["import_batch_id"] if "import_batch_id" in row.keys() else "",
+            import_batch_id=row["import_batch_id"] if "import_batch_id" in keys and row["import_batch_id"] else "",
+            review_reason=row["review_reason"] if "review_reason" in keys else "",
+            next_contact=row["next_contact"] if "next_contact" in keys else "",
+            reviewed_by=row["reviewed_by"] if "reviewed_by" in keys else "",
+            reviewed_at=row["reviewed_at"] if "reviewed_at" in keys else "",
             created_at=row["created_at"],
             updated_at=row["updated_at"],
         )

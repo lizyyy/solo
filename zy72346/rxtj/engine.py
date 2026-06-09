@@ -63,23 +63,38 @@ def apply_boundary_rule(annotation: Annotation, edge_type: str) -> Annotation:
     return annotation
 
 
-def build_evidence(annotation: Annotation, sampling_annotations: Optional[list[Annotation]] = None) -> EvidenceSummary:
+def build_evidence(
+    annotation: Annotation,
+    sampling_annotations: Optional[list[Annotation]] = None,
+    changes: Optional[list] = None,
+) -> EvidenceSummary:
     sampling_val = ""
     conflict_res = None
     if sampling_annotations:
         for sa in sampling_annotations:
             if sa.item_name == annotation.item_name and sa.original_line_number == annotation.original_line_number:
                 sampling_val = sa.current_value
-                if sampling_val != annotation.current_value:
+                if sampling_val != annotation.current_value and annotation.status != ReviewStatus.REVIEWED:
                     from .rules import ConflictResolution
                     conflict_res = ConflictResolution.FLAG_FOR_HUMAN.value
                 break
 
+    last_changed_by = ""
+    last_changed_reason = ""
+    if changes:
+        for ch in reversed(changes):
+            last_changed_by = ch.changed_by
+            last_changed_reason = ch.reason
+            break
+
+    reviewed_flag = bool(annotation.review_reason or annotation.reviewed_by)
     return EvidenceSummary(
         annotation_id=annotation.id,
         original_line_number=annotation.original_line_number,
         original_value=annotation.original_value,
         current_value=annotation.current_value,
+        original_statement=annotation.original_value,
+        corrected_value=annotation.current_value if reviewed_flag else "",
         source=annotation.source,
         is_edge_case=annotation.is_edge_case,
         edge_case_type=annotation.edge_case_type,
@@ -87,6 +102,13 @@ def build_evidence(annotation: Annotation, sampling_annotations: Optional[list[A
         annotation_content=annotation.current_value,
         sampling_list_value=sampling_val,
         conflict_resolution=conflict_res,
+        review_reason=annotation.review_reason,
+        next_contact=annotation.next_contact,
+        reviewed_by=annotation.reviewed_by,
+        reviewed_at=annotation.reviewed_at,
+        change_count=len(changes) if changes else 0,
+        last_changed_by=last_changed_by,
+        last_changed_reason=last_changed_reason,
     )
 
 
