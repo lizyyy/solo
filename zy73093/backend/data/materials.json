@@ -1,0 +1,303 @@
+{
+  "materials": [
+    {
+      "id": "MAT-2026-001",
+      "projectName": "机电管综方案比选-小样例",
+      "materialName": "给排水管道系统-1F",
+      "reviewer": "张三",
+      "reviewDate": "2026-06-01",
+      "status": "normal",
+      "collisionScreenshots": [
+        {
+          "id": "COL-001",
+          "name": "1F-走廊-管道与风管碰撞",
+          "description": "给水管DN100与排烟风管800x400标高冲突",
+          "cameraView": {
+            "x": 120.5,
+            "y": 45.2,
+            "z": 3,
+            "targetX": 125,
+            "targetY": 48,
+            "targetZ": 3.2
+          },
+          "bbox": {
+            "minX": 118,
+            "minY": 42,
+            "minZ": 2.8,
+            "maxX": 128,
+            "maxY": 51,
+            "maxZ": 3.6
+          },
+          "imageUrl": "/screenshots/col-001.png"
+        }
+      ],
+      "attachments": [
+        {
+          "id": "ATT-001",
+          "name": "材料报审表-给排水-1F.pdf",
+          "uploadTime": "2026-06-01 10:00:00",
+          "isLate": false,
+          "isChangeOrder": false,
+          "lateReason": ""
+        }
+      ],
+      "remark": "导入带的备注1",
+      "importBatch": "BATCH-001",
+      "importTime": "2026-06-01 10:05:00",
+      "hasManualRemark": false,
+      "sourceLink": "material://MAT-2026-001"
+    },
+    {
+      "id": "MAT-2026-002",
+      "projectName": "机电管综方案比选-小样例",
+      "materialName": "喷淋系统-B1层",
+      "reviewer": "李四",
+      "reviewDate": "2026-06-02",
+      "status": "normal",
+      "collisionScreenshots": [
+        {
+          "id": "COL-002",
+          "name": "B1-停车场-喷淋头与桥架碰撞",
+          "description": "喷淋头上喷与强电桥架200x100距离不足",
+          "cameraView": {
+            "x": 80,
+            "y": 120,
+            "z": -2.5,
+            "targetX": 82.5,
+            "targetY": 123,
+            "targetZ": -2.8
+          },
+          "bbox": {
+            "minX": 78,
+            "minY": 118,
+            "minZ": -3,
+            "maxX": 86,
+            "maxY": 126,
+            "maxZ": -2.2
+          },
+          "imageUrl": "/screenshots/col-002.png"
+        }
+      ],
+      "attachments": [
+        {
+          "id": "ATT-002",
+          "name": "材料报审表-喷淋-B1.pdf",
+          "uploadTime": "2026-06-02 14:00:00",
+          "isLate": false,
+          "isChangeOrder": false,
+          "lateReason": ""
+        }
+      ],
+      "remark": "复核人前端修改：碰撞点方案已调整，请在模型中确认标高",
+      "importBatch": "BATCH-001",
+      "importTime": "2026-06-01 10:05:00",
+      "hasManualRemark": true,
+      "sourceLink": "material://MAT-2026-002"
+    },
+    {
+      "id": "MAT-2026-003",
+      "projectName": "机电管综方案比选-小样例",
+      "materialName": "消防报警系统-2F",
+      "reviewer": "王五",
+      "reviewDate": "2026-06-03",
+      "status": "dirty_late_attachment",
+      "collisionScreenshots": [
+        {
+          "id": "COL-003",
+          "name": "2F-办公区-烟感与灯具冲突",
+          "description": "烟感探测器距荧光灯水平距离不足0.5m",
+          "cameraView": {
+            "x": 200,
+            "y": 80,
+            "z": 6,
+            "targetX": 202,
+            "targetY": 82,
+            "targetZ": 5.8
+          },
+          "bbox": {
+            "minX": 198,
+            "minY": 78,
+            "minZ": 5.5,
+            "maxX": 205,
+            "maxY": 85,
+            "maxZ": 6.2
+          },
+          "imageUrl": "/screenshots/col-003.png"
+        }
+      ],
+      "attachments": [
+        {
+          "id": "ATT-003",
+          "name": "材料报审表-消防报警-2F.pdf",
+          "uploadTime": "2026-06-03 09:00:00",
+          "isLate": false,
+          "isChangeOrder": false,
+          "lateReason": ""
+        },
+        {
+          "id": "ATT-004",
+          "name": "补充检测报告-烟感-2F.pdf",
+          "uploadTime": "2026-06-05 16:30:00",
+          "isLate": true,
+          "isChangeOrder": false,
+          "lateReason": "附件晚到：比材料报审表提交晚3天，超出送审窗口期",
+          "originalMaterialId": "MAT-2026-003"
+        }
+      ],
+      "remark": "",
+      "importBatch": "BATCH-002",
+      "importTime": "2026-06-05 17:00:00",
+      "hasManualRemark": false,
+      "sourceLink": "material://MAT-2026-003",
+      "dirtyFlags": [
+        "late_attachment"
+      ]
+    },
+    {
+      "id": "MAT-2026-004",
+      "projectName": "机电管综方案比选-小样例",
+      "materialName": "暖通空调系统-3F",
+      "reviewer": "赵六",
+      "reviewDate": "2026-06-04",
+      "status": "dirty_change_order",
+      "collisionScreenshots": [
+        {
+          "id": "COL-004",
+          "name": "3F-会议室-新风管与喷淋主管碰撞",
+          "description": "新风管630x250与喷淋主管DN150交叉碰撞",
+          "cameraView": {
+            "x": 150,
+            "y": 200,
+            "z": 9,
+            "targetX": 152.5,
+            "targetY": 203,
+            "targetZ": 8.8
+          },
+          "bbox": {
+            "minX": 148,
+            "minY": 198,
+            "minZ": 8.5,
+            "maxX": 156,
+            "maxY": 206,
+            "maxZ": 9.3
+          },
+          "imageUrl": "/screenshots/col-004.png"
+        }
+      ],
+      "attachments": [
+        {
+          "id": "ATT-005",
+          "name": "材料报审表-暖通-3F.pdf",
+          "uploadTime": "2026-06-04 11:00:00",
+          "isLate": false,
+          "isChangeOrder": false,
+          "lateReason": ""
+        }
+      ],
+      "remark": "",
+      "importBatch": "BATCH-002",
+      "importTime": "2026-06-04 11:30:00",
+      "hasManualRemark": false,
+      "sourceLink": "material://MAT-2026-004",
+      "changeOrders": [
+        {
+          "id": "CO-001",
+          "name": "变更单-暖通3F-新风管改路径",
+          "issueDate": "2026-06-07",
+          "uploadTime": "2026-06-07 15:00:00",
+          "isLate": true,
+          "reason": "变更单晚到：方案比选截止后才提交，影响方案决策依据",
+          "originalMaterialId": "MAT-2026-004"
+        }
+      ],
+      "dirtyFlags": [
+        "change_order_late"
+      ]
+    },
+    {
+      "id": "MAT-2026-005",
+      "projectName": "机电管综方案比选-小样例",
+      "materialName": "强电系统-4F",
+      "reviewer": "钱七",
+      "reviewDate": "2026-06-05",
+      "status": "normal",
+      "collisionScreenshots": [
+        {
+          "id": "COL-005",
+          "name": "4F-配电间-桥架与母线槽碰撞",
+          "description": "弱电桥架300x150与母线槽1000A距离不足",
+          "cameraView": {
+            "x": 300,
+            "y": 150,
+            "z": 12,
+            "targetX": 302,
+            "targetY": 152,
+            "targetZ": 11.8
+          },
+          "bbox": {
+            "minX": 298,
+            "minY": 148,
+            "minZ": 11.5,
+            "maxX": 305,
+            "maxY": 155,
+            "maxZ": 12.3
+          },
+          "imageUrl": "/screenshots/col-005.png"
+        }
+      ],
+      "attachments": [
+        {
+          "id": "ATT-006",
+          "name": "材料报审表-强电-4F.pdf",
+          "uploadTime": "2026-06-05 10:00:00",
+          "isLate": false,
+          "isChangeOrder": false,
+          "lateReason": ""
+        }
+      ],
+      "remark": "此条记录用于测试重复导入去重",
+      "importBatch": "BATCH-003",
+      "importTime": "2026-06-05 10:30:00",
+      "hasManualRemark": true,
+      "sourceLink": "material://MAT-2026-005"
+    },
+    {
+      "id": "MAT-2026-999",
+      "materialName": "测试新增记录",
+      "projectName": "机电管综方案比选-小样例",
+      "reviewer": "测试员",
+      "reviewDate": "2026-06-10",
+      "status": "normal",
+      "importBatch": "BATCH-004",
+      "importTime": "2026-06-09 19:42:08",
+      "hasManualRemark": false,
+      "sourceLink": "material://MAT-2026-999"
+    }
+  ],
+  "importBatches": [
+    {
+      "id": "BATCH-001",
+      "name": "首次导入",
+      "importTime": "2026-06-01 10:05:00",
+      "count": 2
+    },
+    {
+      "id": "BATCH-002",
+      "name": "含晚到数据导入",
+      "importTime": "2026-06-05 17:00:00",
+      "count": 2
+    },
+    {
+      "id": "BATCH-003",
+      "name": "重复导入测试批次",
+      "importTime": "2026-06-05 10:30:00",
+      "count": 1
+    },
+    {
+      "id": "BATCH-004",
+      "name": "功能测试-重复导入",
+      "importTime": "2026-06-09 19:42:08",
+      "count": 1
+    }
+  ]
+}

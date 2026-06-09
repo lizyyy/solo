@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>机电管综方案比选 - 材料送审表管理</title>
+  <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css" />
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://unpkg.com/element-plus"></script>
+  <script src="https://unpkg.com/@element-plus/icons-vue"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #f5f7fa;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    #app { min-height: 100vh; padding: 0; }
+    .app-header {
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      color: white;
+      padding: 18px 32px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .app-header h1 {
+      margin: 0 0 6px 0;
+      font-size: 22px;
+      font-weight: 600;
+    }
+    .app-header p {
+      margin: 0;
+      font-size: 13px;
+      opacity: 0.85;
+    }
+    .main-container {
+      padding: 20px 24px 40px 24px;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+    .summary-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .summary-card {
+      background: white;
+      border-radius: 10px;
+      padding: 18px 20px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      border-left: 4px solid;
+    }
+    .summary-card.total { border-left-color: #409EFF; }
+    .summary-card.normal { border-left-color: #67C23A; }
+    .summary-card.dirty { border-left-color: #F56C6C; }
+    .summary-card.batch { border-left-color: #E6A23C; }
+    .summary-card .label {
+      color: #909399;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+    .summary-card .value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #303133;
+    }
+    .summary-card .desc {
+      color: #C0C4CC;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+    .toolbar {
+      background: white;
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+    .toolbar-left { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .tab-content {
+      background: white;
+      border-radius: 10px;
+      padding: 4px 0 16px 0;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+    .status-tag-normal {
+      background: #f0f9eb !important;
+      border-color: #e1f3d8 !important;
+      color: #67C23A !important;
+    }
+    .status-tag-dirty {
+      background: #fef0f0 !important;
+      border-color: #fde2e2 !important;
+      color: #F56C6C !important;
+    }
+    .remark-editable {
+      cursor: pointer;
+      min-height: 28px;
+      line-height: 28px;
+      padding: 0 8px;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+    .remark-editable:hover {
+      background: #ecf5ff;
+    }
+    .remark-empty {
+      color: #C0C4CC;
+      font-style: italic;
+    }
+    .remark-manual {
+      position: relative;
+    }
+    .remark-manual::after {
+      content: '✎';
+      position: absolute;
+      right: 4px;
+      top: -2px;
+      font-size: 10px;
+      color: #409EFF;
+    }
+    .dirty-detail-panel {
+      background: linear-gradient(135deg, #fff5f5 0%, #ffe8e8 100%);
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+      border: 1px solid #fbc4c4;
+    }
+    .dirty-detail-panel h4 {
+      margin: 0 0 12px 0;
+      color: #C0392B;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .dirty-item-row {
+      background: white;
+      border-radius: 6px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      border-left: 3px solid #F56C6C;
+    }
+    .dirty-item-row:last-child { margin-bottom: 0; }
+    .dirty-item-name {
+      font-weight: 600;
+      color: #303133;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .dirty-item-reason {
+      color: #F56C6C;
+      font-size: 13px;
+      margin-bottom: 8px;
+      padding: 6px 10px;
+      background: #fef0f0;
+      border-radius: 4px;
+    }
+    .dirty-item-meta {
+      display: flex;
+      gap: 18px;
+      font-size: 12px;
+      color: #909399;
+      align-items: center;
+    }
+    .screenshot-card {
+      border: 1px solid #ebeef5;
+      border-radius: 8px;
+      overflow: hidden;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+    .screenshot-card:hover {
+      border-color: #409EFF;
+      box-shadow: 0 4px 12px rgba(64,158,255,0.15);
+    }
+    .screenshot-preview {
+      height: 140px;
+      background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      position: relative;
+    }
+    .screenshot-preview .icon { font-size: 42px; opacity: 0.8; }
+    .screenshot-info {
+      padding: 10px 12px;
+    }
+    .screenshot-info .name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #303133;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .screenshot-info .desc {
+      font-size: 12px;
+      color: #909399;
+      line-height: 1.5;
+    }
+    .screenshot-view-badge {
+      position: absolute;
+      bottom: 6px;
+      right: 8px;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(4px);
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+    }
+    .batch-info {
+      font-size: 12px;
+      color: #606266;
+    }
+    .batch-info .tag {
+      display: inline-block;
+      padding: 1px 8px;
+      border-radius: 10px;
+      background: #ecf5ff;
+      color: #409EFF;
+      margin-left: 6px;
+      font-size: 11px;
+    }
+    .link-btn {
+      color: #409EFF;
+      text-decoration: none;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .link-btn:hover { text-decoration: underline; }
+    .attachments-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .attachment-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    .attachment-item.late {
+      background: #fef0f0;
+      color: #F56C6C;
+    }
+    .change-order-item {
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      background: #fdf6ec;
+      color: #E6A23C;
+      margin-bottom: 4px;
+    }
+    .change-order-item.late {
+      background: #fef0f0;
+      color: #F56C6C;
+    }
+    .import-dialog-demo-list {
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid #ebeef5;
+      border-radius: 6px;
+      padding: 10px;
+    }
+    .demo-import-item {
+      padding: 8px 10px;
+      border-bottom: 1px dashed #ebeef5;
+      font-size: 13px;
+    }
+    .demo-import-item:last-child { border-bottom: none; }
+    .demo-import-item .dup {
+      color: #E6A23C;
+      font-weight: 600;
+    }
+    .screenshot-dialog-content {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 20px;
+    }
+    .screenshot-dialog-viewer {
+      background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+      border-radius: 8px;
+      min-height: 380px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      position: relative;
+    }
+    .screenshot-dialog-viewer .placeholder-icon {
+      font-size: 80px;
+      opacity: 0.5;
+    }
+    .screenshot-dialog-viewer .view-hint {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+    }
+    .screenshot-dialog-viewer .bbox-indicator {
+      position: absolute;
+      border: 2px dashed rgba(255,193,7,0.9);
+      background: rgba(255,193,7,0.1);
+      border-radius: 4px;
+      pointer-events: none;
+    }
+    .screenshot-dialog-meta {
+      background: #fafbfc;
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .meta-section { margin-bottom: 16px; }
+    .meta-section h5 {
+      margin: 0 0 8px 0;
+      font-size: 13px;
+      color: #303133;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #ebeef5;
+    }
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      padding: 4px 0;
+    }
+    .meta-row .k { color: #909399; }
+    .meta-row .v { color: #303133; font-weight: 500; }
+    .sync-remark-tip {
+      padding: 10px 14px;
+      background: #ecf5ff;
+      border: 1px solid #d9ecff;
+      border-radius: 6px;
+      color: #409EFF;
+      font-size: 13px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .el-tabs { padding: 0 18px; }
+    .table-wrapper { padding: 4px 18px 0 18px; }
+  </style>
+</head>
+<body>
+<div id="app">
+  <div class="app-header">
+    <h1>🏗️ 机电管综方案比选 - 材料送审表管理系统</h1>
+    <p>碰撞点视角留痕 · 备注实时同步 · 晚到附件/变更单单独拎出 · 重复导入去重 · 脏数据可回溯</p>
+  </div>
+
+  <div class="main-container">
+    <div class="summary-cards">
+      <div class="summary-card total">
+        <div class="label">总记录数</div>
+        <div class="value">{{ summary.total }}</div>
+        <div class="desc">材料送审表总量</div>
+      </div>
+      <div class="summary-card normal">
+        <div class="label">正常记录</div>
+        <div class="value" style="color:#67C23A">{{ summary.normal }}</div>
+        <div class="desc">可直接参与方案比选</div>
+      </div>
+      <div class="summary-card dirty">
+        <div class="label">脏数据记录</div>
+        <div class="value" style="color:#F56C6C">{{ summary.dirty }}</div>
+        <div class="desc">晚到附件 / 变更单晚到</div>
+      </div>
+      <div class="summary-card batch">
+        <div class="label">导入批次</div>
+        <div class="value" style="color:#E6A23C">{{ batches.length }}</div>
+        <div class="desc">累计导入 {{ batches.reduce((s,b)=>s+b.count,0) }} 条</div>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <el-input
+          v-model="searchText"
+          placeholder="搜索材料编号/名称/项目"
+          style="width:260px"
+          :prefix-icon="Search"
+          clearable
+        />
+        <el-select v-model="filterStatus" placeholder="状态筛选" clearable style="width:160px">
+          <el-option label="正常记录" value="normal" />
+          <el-option label="晚到附件" value="dirty_late_attachment" />
+          <el-option label="变更单晚到" value="dirty_change_order" />
+          <el-option label="混合脏数据" value="dirty_mixed" />
+          <el-option label="全部脏数据" value="__dirty__" />
+        </el-select>
+      </div>
+      <div style="display:flex;gap:10px">
+        <el-button type="success" :icon="Refresh" @click="resetDemo">
+          重置演示数据
+        </el-button>
+        <el-button type="warning" :icon="Upload" @click="openImportDialog">
+          模拟重复导入
+        </el-button>
+        <el-button type="primary" :icon="Download" @click="exportExcel">
+          导出Excel
+        </el-button>
+      </div>
+    </div>
+
+    <el-tabs v-model="activeTab" class="tab-content">
+      <el-tab-pane label="📋 全部材料送审表" name="all">
+        <div class="table-wrapper">
+          <div v-if="dirtyList.length > 0" class="dirty-detail-panel">
+            <h4>⚠️ 脏数据提醒 - 以下记录含晚到附件或变更单晚到，已单独拎出展示，请人工复核：</h4>
+            <el-row :gutter="16">
+              <el-col v-for="item in dirtyList" :key="item.id" :span="12">
+                <div class="dirty-item-row">
+                  <div class="dirty-item-name">
+                    <el-tag size="small" type="danger">{{ item.materialName }}</el-tag>
+                    <span style="color:#909399;font-size:12px;font-weight:normal">{{ item.id }}</span>
+                  </div>
+                  <div v-for="(d, i) in item.dirtyDetails" :key="i" class="dirty-item-reason">
+                    <strong>[{{ d.typeName }}]</strong> {{ d.name }} — {{ d.reason }}
+                  </div>
+                  <div class="dirty-item-meta">
+                    <span>上传: {{ item.dirtyDetails[0]?.uploadTime }}</span>
+                    <a class="link-btn" @click="jumpToSource(item.dirtyDetails[0]?.originalLink || item.sourceLink)">
+                      ↗ 回溯原始对象
+                    </a>
+                    <a class="link-btn" @click="openDetail(item)">
+                      → 查看详情
+                    </a>
+                  </div>
+                </div>
+              </el-col>
+            </el-row>
+          </div>
+
+          <el-table :data="filteredMaterials" stripe border style="width:100%" row-key="id">
+            <el-table-column prop="id" label="材料编号" width="130" fixed>
+              <template #default="{ row }">
+                <div style="display:flex;align-items:center;gap:6px">
+                  <el-tag v-if="row.status !== 'normal'" size="small" type="danger" effect="dark" style="margin-right:4px">!</el-tag>
+                  <strong>{{ row.id }}</strong>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column prop="materialName" label="材料名称" width="200" />
+            <el-table-column prop="projectName" label="项目名称" width="220" />
+            <el-table-column prop="reviewer" label="复核人" width="80" />
+            <el-table-column prop="reviewDate" label="复核日期" width="110" />
+            <el-table-column label="状态" width="120">
+              <template #default="{ row }">
+                <el-tag v-if="row.status === 'normal'" size="small" class="status-tag-normal" effect="plain">
+                  ✅ 正常
+                </el-tag>
+                <el-tag v-else size="small" class="status-tag-dirty" effect="plain">
+                  ❌ 脏数据
+                </el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="碰撞点截图" width="300">
+              <template #default="{ row }">
+                <el-row :gutter="8">
+                  <el-col v-for="sc in row.collisionScreenshots" :key="sc.id" :span="12">
+                    <div class="screenshot-card" @click="openScreenshot(row, sc)">
+                      <div class="screenshot-preview">
+                        <span class="icon">📸</span>
+                        <span class="screenshot-view-badge">视角已锁定</span>
+                      </div>
+                      <div class="screenshot-info">
+                        <div class="name">{{ sc.name }}</div>
+                        <div class="desc">{{ sc.description }}</div>
+                      </div>
+                    </div>
+                  </el-col>
+                  <el-col v-if="!row.collisionScreenshots?.length" :span="24">
+                    <span style="color:#C0C4CC;font-size:12px">—</span>
+                  </el-col>
+                </el-row>
+              </template>
+            </el-table-column>
+            <el-table-column label="附件/变更单" width="220">
+              <template #default="{ row }">
+                <div class="attachments-list">
+                  <div v-for="a in row.attachments" :key="a.id" class="attachment-item" :class="{late: a.isLate}">
+                    📄 {{ a.name }}
+                    <el-tag v-if="a.isLate" size="small" type="danger" style="margin-left:auto">晚到</el-tag>
+                  </div>
+                  <div v-for="c in (row.changeOrders||[])" :key="c.id" class="change-order-item" :class="{late: c.isLate}">
+                    📝 {{ c.name }}
+                    <el-tag v-if="c.isLate" size="small" type="danger">晚到</el-tag>
+                  </div>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column label="备注（点击编辑）" min-width="200">
+              <template #default="{ row }">
+                <div
+                  class="remark-editable"
+                  :class="{'remark-empty': !row.remark, 'remark-manual': row.hasManualRemark}"
+                  @click="editRemark(row)"
+                >
+                  <span v-if="row.remark">{{ row.remark }}</span>
+                  <span v-else>+ 添加备注</span>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column label="导入信息" width="170">
+              <template #default="{ row }">
+                <div class="batch-info">
+                  <div>📦 {{ row.importBatch }}</div>
+                  <div>🕒 {{ row.importTime }}</div>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" width="150" fixed="right">
+              <template #default="{ row }">
+                <el-button size="small" type="primary" link @click="openDetail(row)">详情</el-button>
+                <el-button size="small" type="warning" link @click="jumpToSource(row.sourceLink)">回溯源</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+      </el-tab-pane>
+
+      <el-tab-pane label="🚨 脏数据专区（晚到附件/变更单晚到）" name="dirty">
+        <div class="table-wrapper">
+          <div style="padding: 12px 0 16px 0">
+            <el-alert
+              title="本区域仅展示脏数据：晚到附件、变更单晚到，不会混入正常记录的结果中"
+              type="error"
+              :closable="false"
+              show-icon
+            />
+          </div>
+          <el-table :data="dirtyList" stripe border style="width:100%" row-key="id">
+            <el-table-column prop="id" label="材料编号" width="130" fixed />
+            <el-table-column prop="materialName" label="材料名称" width="200" />
+            <el-table-column label="脏数据类型" width="160">
+              <template #default="{ row }">
+                <div>
+                  <el-tag v-for="d in row.dirtyDetails" :key="d.type" size="small"
+                    :type="d.type==='late_attachment'?'warning':'danger'"
+                    style="margin-right:4px;margin-bottom:4px">
+                    {{ d.typeName }}
+                  </el-tag>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column label="问题文件" width="260">
+              <template #default="{ row }">
+                <div style="font-size:13px">
+                  <div v-for="d in row.dirtyDetails" :key="d.type" style="padding:3px 0">
+                    <strong>📄 {{ d.name }}</strong>
+                  </div>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column label="晚到原因" min-width="300">
+              <template #default="{ row }">
+                <div style="font-size:13px;color:#F56C6C">
+                  <div v-for="d in row.dirtyDetails" :key="d.type" style="padding:4px 0">
+                    {{ d.reason }}
+                  </div>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column label="上传时间" width="180">
+              <template #default="{ row }">
+                <div style="font-size:12px;color:#909399">
+                  <div v-for="d in row.dirtyDetails" :key="d.type" style="padding:3px 0">
+                    {{ d.uploadTime }}
+                  </div>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column label="原始对象链接" width="140" fixed="right">
+              <template #default="{ row }">
+                <div>
+                  <a class="link-btn" v-for="(d,i) in row.dirtyDetails" :key="i"
+                     @click="jumpToSource(d.originalLink || row.sourceLink)"
+                     style="display:block;padding:3px 0">
+                    ↗ 跳转原记录
+                  </a>
+                </div>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+      </el-tab-pane>
+
+      <el-tab-pane label="📦 导入批次日志" name="batches">
+        <div class="table-wrapper" style="padding-top:16px">
+          <el-table :data="batches" stripe border style="width:100%">
+            <el-table-column prop="id" label="批次编号" width="140" />
+            <el-table-column prop="name" label="批次名称" width="220" />
+            <el-table-column prop="count" label="导入条数" width="120" />
+            <el-table-column prop="importTime" label="导入时间" width="200" />
+          </el-table>
+        </div>
+      </el-tab-pane>
+    </el-tabs>
+  </div>
+
+  <el-dialog v-model="remarkDialogVisible" title="编辑备注" width="500px" :close-on-click-modal="false">
+    <div class="sync-remark-tip">
+      <el-icon size="16"><InfoFilled /></el-icon>
+      备注修改保存后，将立即同步至后端数据库。导出Excel时将使用最新备注。
+    </div>
+    <div style="margin-bottom:12px">
+      <div style="font-size:13px;color:#909399;margin-bottom:6px">
+        编辑对象：<strong style="color:#303133">{{ editingRow?.materialName }}</strong>
+        <span style="margin-left:10px;color:#C0C4CC">{{ editingRow?.id }}</span>
+      </div>
+      <el-input
+        v-model="remarkInput"
+        type="textarea"
+        :rows="5"
+        placeholder="请输入备注信息，例如：碰撞点已调整方案、需与设计院确认、此附件晚到需人工复核..."
+        maxlength="500"
+        show-word-limit
+      />
+    </div>
+    <template #footer>
+      <el-button @click="remarkDialogVisible = false">取消</el-button>
+      <el-button type="primary" :icon="Check" @click="saveRemark">保存并同步</el-button>
+    </template>
+  </el-dialog>
+
+  <el-dialog v-model="screenshotDialogVisible" title="碰撞点截图（视角已锁定）" width="900px">
+    <div class="screenshot-dialog-content" v-if="currentScreenshot">
+      <div class="screenshot-dialog-viewer">
+        <div class="view-hint">
+          🎯 碰撞点：{{ currentScreenshot.name }}
+        </div>
+        <div class="placeholder-icon">📐</div>
+        <div class="bbox-indicator" style="left:35%;top:40%;width:30%;height:25%"></div>
+        <div style="position:absolute;bottom:12px;left:12px;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);padding:8px 12px;border-radius:6px;font-size:11px;max-width:60%">
+          {{ currentScreenshot.description }}
+        </div>
+      </div>
+      <div class="screenshot-dialog-meta">
+        <div class="meta-section">
+          <h5>📷 视角参数（离开视角也能还原）</h5>
+          <div class="meta-row"><span class="k">相机位置X</span><span class="v">{{ currentScreenshot.cameraView?.x?.toFixed(2) }}</span></div>
+          <div class="meta-row"><span class="k">相机位置Y</span><span class="v">{{ currentScreenshot.cameraView?.y?.toFixed(2) }}</span></div>
+          <div class="meta-row"><span class="k">相机位置Z</span><span class="v">{{ currentScreenshot.cameraView?.z?.toFixed(2) }}</span></div>
+          <div class="meta-row"><span class="k">目标点X</span><span class="v">{{ currentScreenshot.cameraView?.targetX?.toFixed(2) }}</span></div>
+          <div class="meta-row"><span class="k">目标点Y</span><span class="v">{{ currentScreenshot.cameraView?.targetY?.toFixed(2) }}</span></div>
+          <div class="meta-row"><span class="k">目标点Z</span><span class="v">{{ currentScreenshot.cameraView?.targetZ?.toFixed(2) }}</span></div>
+        </div>
+        <div class="meta-section">
+          <h5>📏 碰撞包围盒</h5>
+          <div class="meta-row"><span class="k">Min</span><span class="v" style="font-size:11px">{{ currentScreenshot.bbox?.minX }}, {{ currentScreenshot.bbox?.minY }}, {{ currentScreenshot.bbox?.minZ }}</span></div>
+          <div class="meta-row"><span class="k">Max</span><span class="v" style="font-size:11px">{{ currentScreenshot.bbox?.maxX }}, {{ currentScreenshot.bbox?.maxY }}, {{ currentScreenshot.bbox?.maxZ }}</span></div>
+        </div>
+        <div class="meta-section">
+          <h5>📝 关联备注</h5>
+          <div style="font-size:12px;color:#606266;line-height:1.6;background:white;padding:8px 10px;border-radius:4px;min-height:40px">
+            {{ currentMaterial?.remark || '（暂无备注，可在列表中点击备注列添加）' }}
+          </div>
+        </div>
+        <div class="meta-section">
+          <h5>🔗 关联信息</h5>
+          <div class="meta-row"><span class="k">所属材料</span><span class="v">{{ currentMaterial?.id }}</span></div>
+          <div class="meta-row"><span class="k">复核人</span><span class="v">{{ currentMaterial?.reviewer }}</span></div>
+        </div>
+      </div>
+    </div>
+  </el-dialog>
+
+  <el-dialog v-model="importDialogVisible" title="模拟重复导入测试" width="620px">
+    <el-alert
+      title="测试场景：再次导入一批数据，其中包含3条已存在记录（去重）+ 1条新记录"
+      type="info"
+      :closable="false"
+      show-icon
+      style="margin-bottom:16px"
+    />
+    <div style="margin-bottom:14px">
+      <div style="font-size:13px;font-weight:600;margin-bottom:8px;color:#303133">即将导入以下数据：</div>
+      <div class="import-dialog-demo-list">
+        <div v-for="(it, idx) in demoImportList" :key="idx" class="demo-import-item">
+          <el-tag v-if="it.duplicate" size="small" type="warning" class="dup">重复</el-tag>
+          <el-tag v-else size="small" type="success">新增</el-tag>
+          <span style="margin-left:6px">
+            <strong>{{ it.id }}</strong> — {{ it.materialName }}
+            <span v-if="it.duplicate && it.hasManualRemark" style="color:#409EFF;margin-left:6px">
+              (含人工备注，导入时将保留不覆盖)
+            </span>
+          </span>
+          <div v-if="it.duplicate" style="color:#909399;font-size:12px;padding-left:64px;padding-top:4px">
+            → 处理结果：跳过不重复导入，现有备注保持不变
+          </div>
+        </div>
+      </div>
+    </div>
+    <template #footer>
+      <el-button @click="importDialogVisible = false">取消</el-button>
+      <el-button type="warning" :icon="Upload" @click="doImport">执行模拟导入</el-button>
+    </template>
+  </el-dialog>
+
+  <el-dialog v-model="detailDialogVisible" title="材料送审详情" width="700px">
+    <div v-if="currentDetail" style="font-size:14px">
+      <el-descriptions :column="2" border>
+        <el-descriptions-item label="材料编号">{{ currentDetail.id }}</el-descriptions-item>
+        <el-descriptions-item label="状态">
+          <el-tag v-if="currentDetail.status==='normal'" type="success">正常</el-tag>
+          <el-tag v-else type="danger">脏数据</el-tag>
+        </el-descriptions-item>
+        <el-descriptions-item label="项目名称" :span="2">{{ currentDetail.projectName }}</el-descriptions-item>
+        <el-descriptions-item label="材料名称">{{ currentDetail.materialName }}</el-descriptions-item>
+        <el-descriptions-item label="复核人">{{ currentDetail.reviewer }}</el-descriptions-item>
+        <el-descriptions-item label="复核日期">{{ currentDetail.reviewDate }}</el-descriptions-item>
+        <el-descriptions-item label="导入批次">{{ currentDetail.importBatch }} / {{ currentDetail.importTime }}</el-descriptions-item>
+        <el-descriptions-item label="备注" :span="2">
+          <div style="min-height:36px;padding:6px 10px;background:#fafafa;border-radius:4px">
+            {{ currentDetail.remark || '（暂无备注）' }}
+            <span v-if="currentDetail.hasManualRemark" style="color:#409EFF;font-size:12px;margin-left:8px">✎ 人工填写</span>
+          </div>
+        </el-descriptions-item>
+        <el-descriptions-item label="原始对象链接" :span="2">
+          <a class="link-btn" @click="jumpToSource(currentDetail.sourceLink)">{{ currentDetail.sourceLink }}</a>
+        </el-descriptions-item>
+      </el-descriptions>
+
+      <div style="margin-top:18px">
+        <h4 style="margin:0 0 10px 0;font-size:14px">📷 碰撞点截图</h4>
+        <el-row :gutter="12">
+          <el-col v-for="sc in currentDetail.collisionScreenshots" :key="sc.id" :span="8">
+            <div class="screenshot-card" @click="openScreenshot(currentDetail, sc)">
+              <div class="screenshot-preview"><span class="icon">📸</span></div>
+              <div class="screenshot-info">
+                <div class="name">{{ sc.name }}</div>
+                <div class="desc">{{ sc.description }}</div>
+              </div>
+            </div>
+          </el-col>
+        </el-row>
+      </div>
+
+      <div v-if="currentDetail.attachments?.length" style="margin-top:18px">
+        <h4 style="margin:0 0 10px 0;font-size:14px">📄 附件列表</h4>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div v-for="a in currentDetail.attachments" :key="a.id"
+               class="attachment-item"
+               :class="{'late':a.isLate}"
+               style="padding:10px 14px;border:1px solid #ebeef5;border-radius:6px">
+            <span style="font-weight:500">📄 {{ a.name }}</span>
+            <el-tag v-if="a.isLate" size="small" type="danger">晚到附件</el-tag>
+            <span style="margin-left:auto;color:#909399;font-size:12px">{{ a.uploadTime }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="currentDetail.changeOrders?.length" style="margin-top:18px">
+        <h4 style="margin:0 0 10px 0;font-size:14px">📝 变更单</h4>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div v-for="c in currentDetail.changeOrders" :key="c.id"
+               class="change-order-item"
+               :class="{'late':c.isLate}"
+               style="padding:10px 14px;border:1px solid #ebeef5;border-radius:6px;font-size:13px">
+            <div style="display:flex;align-items:center">
+              <span style="font-weight:500">📝 {{ c.name }}</span>
+              <el-tag v-if="c.isLate" size="small" type="danger" style="margin-left:8px">变更单晚到</el-tag>
+              <span style="margin-left:auto;color:#909399;font-size:12px">{{ c.uploadTime }}</span>
+            </div>
+            <div v-if="c.isLate" style="color:#F56C6C;margin-top:6px;font-size:12px">{{ c.reason }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="currentDetail.status !== 'normal'" style="margin-top:18px">
+        <el-alert
+          title="该记录存在脏数据，请人工确认后再参与方案比选"
+          type="error"
+          show-icon
+          :closable="false"
+        />
+      </div>
+    </div>
+  </el-dialog>
+</div>
+
+<script>
+const { createApp, ref, computed, onMounted, markRaw } = Vue;
+const { ElMessage, ElMessageBox } = ElementPlus;
+const { Search, Refresh, Upload, Download, Check, InfoFilled } = ElementPlusIconsVue;
+
+const API_BASE = 'http://localhost:3001';
+
+async function api(url, options = {}) {
+  const res = await fetch(API_BASE + url, {
+    headers: { 'Content-Type': 'application/json' },
+    ...options
+  });
+  return await res.json();
+}
+
+const app = createApp({
+  setup() {
+    const materials = ref([]);
+    const batches = ref([]);
+    const searchText = ref('');
+    const filterStatus = ref('');
+    const activeTab = ref('all');
+
+    const remarkDialogVisible = ref(false);
+    const editingRow = ref(null);
+    const remarkInput = ref('');
+
+    const screenshotDialogVisible = ref(false);
+    const currentScreenshot = ref(null);
+    const currentMaterial = ref(null);
+
+    const importDialogVisible = ref(false);
+    const demoImportList = ref([]);
+
+    const detailDialogVisible = ref(false);
+    const currentDetail = ref(null);
+
+    const summary = computed(() => {
+      const total = materials.value.length;
+      const normal = materials.value.filter(m => m.status === 'normal').length;
+      return { total, normal, dirty: total - normal };
+    });
+
+    const filteredMaterials = computed(() => {
+      let r = [...materials.value];
+      if (searchText.value) {
+        const q = searchText.value.toLowerCase();
+        r = r.filter(m =>
+          m.id.toLowerCase().includes(q) ||
+          m.materialName.toLowerCase().includes(q) ||
+          m.projectName.toLowerCase().includes(q)
+        );
+      }
+      if (filterStatus.value) {
+        if (filterStatus.value === '__dirty__') {
+          r = r.filter(m => m.status !== 'normal');
+        } else {
+          r = r.filter(m => m.status === filterStatus.value);
+        }
+      }
+      return r;
+    });
+
+    const dirtyList = computed(() => {
+      const dirties = materials.value.filter(m => m.status !== 'normal');
+      return dirties.map(m => {
+        const dirtyDetails = [];
+        if (m.dirtyFlags?.includes('late_attachment')) {
+          const la = m.attachments?.find(a => a.isLate);
+          if (la) {
+            dirtyDetails.push({
+              type: 'late_attachment',
+              typeName: '晚到附件',
+              name: la.name,
+              reason: la.lateReason,
+              uploadTime: la.uploadTime,
+              originalLink: la.originalMaterialId ? `material://${la.originalMaterialId}` : null
+            });
+          }
+        }
+        if (m.dirtyFlags?.includes('change_order_late')) {
+          const lc = m.changeOrders?.find(c => c.isLate);
+          if (lc) {
+            dirtyDetails.push({
+              type: 'change_order_late',
+              typeName: '变更单晚到',
+              name: lc.name,
+              reason: lc.reason,
+              uploadTime: lc.uploadTime,
+              originalLink: lc.originalMaterialId ? `material://${lc.originalMaterialId}` : null
+            });
+          }
+        }
+        return { ...m, dirtyDetails };
+      });
+    });
+
+    async function loadAll() {
+      const [mRes, bRes, dRes] = await Promise.all([
+        api('/api/materials'),
+        api('/api/batches'),
+        api('/api/materials/dirty/list')
+      ]);
+      if (mRes.code === 0) materials.value = mRes.data;
+      if (bRes.code === 0) batches.value = bRes.data;
+    }
+
+    function editRemark(row) {
+      editingRow.value = row;
+      remarkInput.value = row.remark || '';
+      remarkDialogVisible.value = true;
+    }
+
+    async function saveRemark() {
+      if (!editingRow.value) return;
+      ElMessage.info('正在同步后端数据...');
+      const res = await api(`/api/materials/${editingRow.value.id}/remark`, {
+        method: 'PUT',
+        body: JSON.stringify({ remark: remarkInput.value })
+      });
+      if (res.code === 0) {
+        const idx = materials.value.findIndex(m => m.id === editingRow.value.id);
+        if (idx >= 0) {
+          materials.value[idx].remark = remarkInput.value;
+          materials.value[idx].hasManualRemark = true;
+        }
+        remarkDialogVisible.value = false;
+        ElMessage.success('备注已同步至后端，导出Excel将使用最新备注');
+      } else {
+        ElMessage.error(res.message || '保存失败');
+      }
+    }
+
+    function openScreenshot(row, sc) {
+      currentMaterial.value = row;
+      currentScreenshot.value = sc;
+      screenshotDialogVisible.value = true;
+    }
+
+    function jumpToSource(link) {
+      ElMessageBox.alert(
+        `已解析回溯链接：<strong>${link}</strong><br/><br/>
+         点击确认后将跳转至材料送审表系统的原始对象页面。<br/>
+         （演示环境为模拟跳转，真实环境会打开对应BIM/文档系统）`,
+        '回溯原始对象',
+        { confirmButtonText: '跳转（模拟）', dangerouslyUseHTMLString: true }
+      ).then(() => {
+        ElMessage.success(`已跳转至原始对象: ${link}`);
+      }).catch(()=>{});
+    }
+
+    function openDetail(row) {
+      currentDetail.value = row;
+      detailDialogVisible.value = true;
+    }
+
+    function openImportDialog() {
+      demoImportList.value = [
+        { id: 'MAT-2026-001', materialName: '给排水管道系统-1F', duplicate: true, hasManualRemark: false },
+        { id: 'MAT-2026-002', materialName: '喷淋系统-B1层', duplicate: true, hasManualRemark: false },
+        { id: 'MAT-2026-005', materialName: '强电系统-4F', duplicate: true, hasManualRemark: true },
+        {
+          id: 'MAT-2026-006',
+          materialName: '弱电系统-5F（新记录）',
+          duplicate: false,
+          projectName: '机电管综方案比选-小样例',
+          reviewer: '孙八',
+          reviewDate: '2026-06-08',
+          collisionScreenshots: [{
+            id: 'COL-006',
+            name: '5F-机房-弱电桥架与消防管碰撞',
+            description: '弱电桥架400x200与消防管DN100标高冲突',
+            cameraView: { x: 350.0, y: 60.0, z: 15.0, targetX: 352.5, targetY: 62.5, targetZ: 14.8 },
+            bbox: { minX: 348, minY: 58, minZ: 14.5, maxX: 356, maxY: 65, maxZ: 15.2 },
+            imageUrl: '/screenshots/col-006.png'
+          }],
+          attachments: [{
+            id: 'ATT-007',
+            name: '材料报审表-弱电-5F.pdf',
+            uploadTime: '2026-06-08 09:00:00',
+            isLate: false,
+            isChangeOrder: false,
+            lateReason: ''
+          }],
+          remark: ''
+        }
+      ];
+      importDialogVisible.value = true;
+    }
+
+    async function doImport() {
+      const items = demoImportList.value.map(x => ({
+        id: x.id,
+        projectName: x.projectName || '机电管综方案比选-小样例',
+        materialName: x.materialName,
+        reviewer: x.reviewer || '模拟导入',
+        reviewDate: x.reviewDate || '2026-06-08',
+        collisionScreenshots: x.collisionScreenshots || [],
+        attachments: x.attachments || [],
+        changeOrders: x.changeOrders,
+        remark: (x.duplicate && !x.hasManualRemark) ? '（这条备注是导入带的，已存在但无人工备注时会更新；有备注时不覆盖）' : ''
+      }));
+
+      const res = await api('/api/materials/import', {
+        method: 'POST',
+        body: JSON.stringify({ items, batchName: '模拟重复导入测试' })
+      });
+
+      if (res.code === 0) {
+        const d = res.data;
+        const msg = `✅ 导入完成\n新增: ${d.totals.importedCount} 条 (不翻倍)\n跳过: ${d.totals.skippedCount} 条 (已存在去重)`;
+        const preserved = d.conflicts.filter(c => c.remarkPreserved).length;
+        let fullMsg = msg;
+        if (preserved > 0) {
+          fullMsg += `\n备注保留: ${preserved} 条 (人工备注未被覆盖)`;
+        }
+        ElMessageBox.alert(fullMsg.replace(/\n/g, '<br/>'), '导入结果', {
+          confirmButtonText: '好的',
+          dangerouslyUseHTMLString: true,
+          type: 'success'
+        });
+        importDialogVisible.value = false;
+        await loadAll();
+      } else {
+        ElMessage.error(res.message || '导入失败');
+      }
+    }
+
+    async function resetDemo() {
+      try {
+        await ElMessageBox.confirm(
+          '确认重置为演示数据？\n演示数据包包含：5条记录=3条正常 + 1条晚到附件 + 1条变更单晚到。\n脏数据不会混入正常结果。',
+          '重置演示数据',
+          { confirmButtonText: '确认重置', cancelButtonText: '取消', type: 'warning' }
+        );
+        const res = await api('/api/reset-demo', { method: 'POST' });
+        if (res.code === 0) {
+          await loadAll();
+          ElMessage.success('✅ 已重置为演示数据，含1条晚到附件+1条变更单晚到的脏数据');
+        }
+      } catch (e) {}
+    }
+
+    function exportExcel() {
+      ElMessage.info('正在导出，备注已自动同步...');
+      window.open(API_BASE + '/api/export/excel?includeDirty=true', '_blank');
+      setTimeout(() => {
+        ElMessage.success('✅ 已导出Excel，含「正常记录」「脏数据清单」「导出汇总」3个Sheet');
+      }, 800);
+    }
+
+    onMounted(async () => {
+      await loadAll();
+      if (dirtyList.value.length === 0) {
+        ElMessage.warning('当前数据中无脏数据，可点击右上角「重置演示数据」加载包含晚到附件和变更单晚到的完整示例');
+      } else {
+        ElMessage.info(`已加载演示数据，包含 ${summary.value.dirty} 条脏数据（晚到附件/变更单晚到），不会混入正常结果`);
+      }
+    });
+
+    return {
+      materials, batches, searchText, filterStatus, activeTab,
+      summary, filteredMaterials, dirtyList,
+      remarkDialogVisible, editingRow, remarkInput,
+      screenshotDialogVisible, currentScreenshot, currentMaterial,
+      importDialogVisible, demoImportList,
+      detailDialogVisible, currentDetail,
+      editRemark, saveRemark, openScreenshot, jumpToSource, openDetail,
+      openImportDialog, doImport, resetDemo, exportExcel,
+      Search: markRaw(Search),
+      Refresh: markRaw(Refresh),
+      Upload: markRaw(Upload),
+      Download: markRaw(Download),
+      Check: markRaw(Check),
+      InfoFilled: markRaw(InfoFilled)
+    };
+  }
+});
+
+for (const [k, v] of Object.entries(ElementPlusIconsVue)) {
+  app.component(k, v);
+}
+app.use(ElementPlus);
+app.mount('#app');
+</script>
+</body>
+</html>
