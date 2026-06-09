@@ -1,0 +1,1 @@
+{"name": "出库总价（元）", "type": "formula", "expression": "IFERROR([实际出库数量] * [单价（元）], 0)"}

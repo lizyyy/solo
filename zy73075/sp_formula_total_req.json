@@ -1,0 +1,1 @@
+{"name": "申报总价（元）", "type": "formula", "expression": "IFERROR([申报数量] * [单价（元）], 0)"}
