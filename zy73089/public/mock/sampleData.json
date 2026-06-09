@@ -1,0 +1,146 @@
+{
+  "visaForms": [
+    {
+      "visaFormId": "v001",
+      "visaNo": "XZ-2026-0605-003（手写有涂改，原号疑似002）",
+      "issueDate": "2026-06-05",
+      "componentId": "C-Beam-012",
+      "rawContent": "【原始扫描件OCR文本】\n现场签证单 编号:XZ-2026-0605-003（此处有涂改痕迹）\n工程名称: XX大厦结构加固工程\n签证部位: 2层3轴主梁 C-Beam-012\n签证内容: 梁底碳纤维布加固，采用300g/m² 规格，层数：3层。\n（手写备注：「此处原设计2层，现场实际按3层做」——字迹潦草，签名模糊）\n坐标标注：X=12.450  Y=3.200  Z=8.880（手写，可能量错）\n附件: 现场照片3张，实测记录1份\n签发人: 王XX（签字半缺失）  日期: 2026-06-05",
+      "rawCoordinates": { "x": 12.45, "y": 3.2, "z": 8.88 },
+      "sourceFile": "现场签证单_XZ-2026-0605-003_扫描件.jpg",
+      "constructionStandard": "碳纤维布300g/m²，3层"
+    },
+    {
+      "visaFormId": "v002",
+      "visaNo": "XZ-2026-0606-008",
+      "issueDate": "2026-06-06",
+      "componentId": "C-Column-005",
+      "rawContent": "【原始扫描件OCR文本】\n现场签证单 编号:XZ-2026-0606-008\n签证部位: 1层B轴5号柱 C-Column-005\n签证内容: 柱外包钢加固，采用8mm厚钢板，缀板间距300mm。\n坐标标注：X=4.000  Y=0.000  Z=0.000\n签发人: 李XX  日期: 2026-06-06",
+      "rawCoordinates": { "x": 4.0, "y": 0.0, "z": 0.0 },
+      "sourceFile": "现场签证单_XZ-2026-0606-008.pdf",
+      "constructionStandard": "外包钢8mm钢板，缀板@300"
+    },
+    {
+      "visaFormId": "v003",
+      "visaNo": "XZ-2026-0607-015（缺签发人签字）",
+      "issueDate": "2026-06-07",
+      "componentId": "C-Slab-201",
+      "rawContent": "【原始扫描件OCR文本】\n现场签证单 编号:XZ-2026-0607-015\n签证部位: 2层楼板 C-Slab-201\n签证内容: 板底粘钢加固，采用5mm厚钢板条，间距200mm。\n（备注栏为空，签发人未签字）\n坐标标注：X=0.000  Y=6.000  Z=3.000\n日期: 2026-06-07  签发人: （空）",
+      "rawCoordinates": { "x": 0.0, "y": 6.0, "z": 3.0 },
+      "sourceFile": "现场签证单_XZ-2026-0607-015_未签字.jpg",
+      "constructionStandard": "粘钢5mm钢板条@200"
+    },
+    {
+      "visaFormId": "v004",
+      "visaNo": "XZ-2026-0608-022",
+      "issueDate": "2026-06-08",
+      "componentId": "C-Wall-301",
+      "rawContent": "【原始扫描件OCR文本】\n现场签证单 编号:XZ-2026-0608-022\n签证部位: 3层剪力墙 C-Wall-301\n签证内容: 墙双面碳纤维加固，200g/m² 规格，2层。\n坐标标注：X=8.000  Y=1.500  Z=9.000\n签发人: 赵XX  日期: 2026-06-08",
+      "rawCoordinates": { "x": 8.0, "y": 1.5, "z": 9.0 },
+      "sourceFile": "现场签证单_XZ-2026-0608-022.pdf",
+      "constructionStandard": "碳纤维200g/m²，双面2层"
+    }
+  ],
+  "materialSubmissions": [
+    {
+      "materialId": "m001",
+      "batchNo": "CFRP-B20260608（批号末尾数字有磨损，疑似0606）",
+      "componentId": "C-Beam-012",
+      "submitDate": "2026-06-08",
+      "materialName": "碳纤维布",
+      "specification": "300g/m²，2层（与签证单写的3层不符，待确认）",
+      "rawContent": "【材料送审单原文】\n送审单编号: CL-2026-0608-001\n材料名称: 碳纤维布（单向）\n批号: CFRP-B20260608（钢印磨损，最后一位看不清）\n规格/型号: 300g/m²\n送审数量: 300㎡\n进场数量: 280㎡\n使用部位: 2层3轴主梁 C-Beam-012 等\n厂家: 某复合材料有限公司\n质量证明文件: 合格证1份、检测报告1份（检测日期2026-05-28）\n备注: （空）",
+      "sourceFile": "材料送审单_CFRP-B20260608.pdf",
+      "constructionStandard": "碳纤维布300g/m²，2层"
+    },
+    {
+      "materialId": "m002",
+      "batchNo": "STEEL-B20260607",
+      "componentId": "C-Column-005",
+      "submitDate": "2026-06-07",
+      "materialName": "结构钢板（Q345B）",
+      "specification": "8mm厚，Q345B",
+      "rawContent": "【材料送审单原文】\n送审单编号: CL-2026-0607-003\n材料名称: 结构钢板\n批号: STEEL-B20260607\n规格: 8mm厚 Q345B\n送审数量: 1.2吨\n使用部位: 1层B轴5号柱 C-Column-005 外包钢\n厂家: 某钢铁集团\n质量证明: 材质单1份、力学性能报告1份\n备注: 附探伤报告",
+      "sourceFile": "材料送审单_STEEL-B20260607.pdf",
+      "constructionStandard": "外包钢8mm Q345B钢板，缀板@300"
+    },
+    {
+      "materialId": "m003",
+      "batchNo": "STEEL-B20260609-2",
+      "componentId": "C-Slab-201",
+      "submitDate": "2026-06-09",
+      "materialName": "粘钢用钢板条（Q235B）",
+      "specification": "5mm厚，Q235B，宽100mm",
+      "rawContent": "【材料送审单原文】\n送审单编号: CL-2026-0609-005\n材料名称: 粘钢加固用钢板条\n批号: STEEL-B20260609-2\n规格: 5mm×100mm Q235B\n送审数量: 600m\n使用部位: 2层楼板 C-Slab-201\n厂家: 某金属制品厂\n质量证明: 合格证1份\n备注: 间距按设计200mm布置",
+      "sourceFile": "材料送审单_STEEL-B20260609-2.pdf",
+      "constructionStandard": "粘钢5mm Q235B钢板条@200"
+    },
+    {
+      "materialId": "m004",
+      "batchNo": "CFRP-B20260610",
+      "componentId": "C-Wall-301",
+      "submitDate": "2026-06-10",
+      "materialName": "碳纤维布（双向）",
+      "specification": "200g/m²，双向，2层",
+      "rawContent": "【材料送审单原文】\n送审单编号: CL-2026-0610-002\n材料名称: 双向碳纤维布\n批号: CFRP-B20260610\n规格: 200g/m² 双向\n送审数量: 500㎡\n使用部位: 3层剪力墙 C-Wall-301 双面\n厂家: 某复合材料有限公司\n备注: 附环氧树脂胶送审单 CL-2026-0610-003",
+      "sourceFile": "材料送审单_CFRP-B20260610.pdf",
+      "constructionStandard": "碳纤维200g/m² 双向，双面2层"
+    }
+  ],
+  "modelComponents": [
+    {
+      "id": "C-Beam-012",
+      "name": "2层3轴主梁",
+      "type": "beam",
+      "position": { "x": 12.0, "y": 3.0, "z": 9.0 },
+      "size": { "x": 6.0, "y": 0.4, "z": 0.8 },
+      "color": "#64748B"
+    },
+    {
+      "id": "C-Column-005",
+      "name": "1层B轴5号柱",
+      "type": "column",
+      "position": { "x": 4.0, "y": 0.0, "z": 0.0 },
+      "size": { "x": 0.6, "y": 0.6, "z": 4.2 },
+      "color": "#475569"
+    },
+    {
+      "id": "C-Slab-201",
+      "name": "2层楼板",
+      "type": "slab",
+      "position": { "x": 0.0, "y": 0.0, "z": 4.2 },
+      "size": { "x": 16.0, "y": 12.0, "z": 0.2 },
+      "color": "#94A3B8"
+    },
+    {
+      "id": "C-Wall-301",
+      "name": "3层剪力墙",
+      "type": "wall",
+      "position": { "x": 8.0, "y": 0.2, "z": 4.4 },
+      "size": { "x": 0.25, "y": 5.0, "z": 4.0 },
+      "color": "#64748B"
+    },
+    {
+      "id": "C-Beam-008",
+      "name": "1层A轴次梁",
+      "type": "beam",
+      "position": { "x": 2.0, "y": 1.0, "z": 4.2 },
+      "size": { "x": 5.0, "y": 0.3, "z": 0.6 },
+      "color": "#64748B"
+    },
+    {
+      "id": "C-Column-010",
+      "name": "2层C轴3号柱",
+      "type": "column",
+      "position": { "x": 10.0, "y": 8.0, "z": 4.2 },
+      "size": { "x": 0.6, "y": 0.6, "z": 4.2 },
+      "color": "#475569"
+    }
+  ],
+  "expectedIssues": [
+    "C-Beam-012：签证单坐标(12.45, 3.20, 8.88)与模型(12.00, 3.00, 9.00)偏移超过阈值0.5m → 坐标疑点，阻止进入最终报告",
+    "C-Beam-012：签证单要求3层碳纤维 vs 材料送审2层 → 施工口径对不上",
+    "C-Beam-012：签证单编号有涂改（003疑似002）→ 原始脏数据保留未清洗",
+    "C-Slab-201：签证单无签发人签字 → 原始脏数据保留"
+  ]
+}
