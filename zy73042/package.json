@@ -1,0 +1,14 @@
+{
+  "name": "pump-station-schedule",
+  "version": "1.0.0",
+  "description": "泵站巡检备件排程系统 - 改判全链路可追溯",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2"
+  }
+}
