@@ -1,0 +1,4162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>配电柜温升异常归因 · 月底封账版</title>
+<style>
+  body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+          margin: 24px; color: #222; line-height: 1.55; }
+  h1 { font-size: 20px; border-bottom: 2px solid #333; padding-bottom: 8px; }
+  h2 { font-size: 16px; margin-top: 32px; border-left: 4px solid #333; padding-left: 10px; }
+  h3 { font-size: 14px; margin-top: 20px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; margin-top: 10px; }
+  th, td { border: 1px solid #ccc; padding: 8px 10px; vertical-align: top; text-align: left; }
+  th { background: #f3f3f3; font-weight: 600; }
+  .muted { color: #888; }
+  .small { font-size: 11px; }
+  .peak { color: #c0392b; font-weight: 700; }
+  .bad { color: #c0392b; }
+  .late-row { background: #fff3f0; }
+  .gap-row { background: #fffbe6; }
+  .status-tag { display: inline-block; padding: 2px 8px; border-radius: 10px;
+                 font-size: 11px; font-weight: 600; }
+  .status-已归因 { background: #e6f7ea; color: #2e7d32; }
+  .status-异常处理 { background: #fdecea; color: #c62828; }
+  .status-pending { background: #eee; color: #555; }
+  .badge-note { display: inline-block; margin-left: 6px; padding: 1px 6px;
+                 background: #fff3cd; color: #856404; border-radius: 8px; font-size: 11px; }
+  .impact-box { margin-top: 6px; padding: 8px; background: #fff3f0;
+                 border-left: 3px solid #c0392b; font-size: 12.5px; }
+  .gap-box { margin-top: 6px; padding: 8px; background: #fffbe6;
+              border-left: 3px solid #e6a817; font-size: 12.5px; }
+  .skew-box { margin-top: 6px; padding: 8px; background: #f0f4ff;
+               border-left: 3px solid #3b6fe6; font-size: 12.5px; }
+  .note-box { margin-top: 6px; padding: 8px; background: #e8f5e9;
+               border-left: 3px solid #2e7d32; font-size: 12.5px; }
+  code { background: #f5f5f5; padding: 1px 5px; border-radius: 3px; font-size: 12px; }
+  .kpi { display: flex; gap: 16px; flex-wrap: wrap; margin: 12px 0; }
+  .kpi > div { flex: 1; min-width: 180px; border: 1px solid #ddd; padding: 10px 14px; }
+  .kpi .v { font-size: 22px; font-weight: 700; }
+  .kpi .l { font-size: 12px; color: #666; }
+  .howto { background: #f5faff; border: 1px dashed #7aa9e6; padding: 10px 14px;
+            font-size: 12.5px; margin-top: 8px; }
+  .howto b { color: #1d4f91; }
+  details { margin-top: 8px; }
+  summary { cursor: pointer; color: #1d4f91; font-size: 12.5px; }
+</style>
+</head>
+<body>
+
+<h1>📋 配电柜温升异常归因 · 月底封账版（交付：维保主管 阿敏）</h1>
+<p class="muted small">生成时间：2026-06-10 01:28:47
+  · 算法值班人维修照片字段已自动标准化 · 来源/处理状态已保留 · 采样断档已按"异常处理"标记 ·
+  重复导入已去重 · 人工备注已保留</p>
+
+<div class="kpi">
+  <div><div class="v">146</div><div class="l">归因异常条</div></div>
+  <div><div class="v bad">76</div><div class="l">含晚到备件影响</div></div>
+  <div><div class="v bad">2</div><div class="l">采样断档(已标异常处理)</div></div>
+  <div><div class="v peak">93.1℃</div><div class="l">最高峰值温度</div></div>
+  <div><div class="v">35</div><div class="l">已标准化维修照片数</div></div>
+</div>
+
+<h2>① 维保主管关心的：晚到备件清单（为什么会影响结论）</h2>
+<p>备件如果在<b>计划停机窗口结束之后</b>才到货，窗口内无法执行更换，设备带病运行，温升异常会持续或扩大。
+下列晚到备件已在归因结论中逐条说明影响链路。</p>
+<table>
+  <thead><tr>
+    <th>备件编号</th><th>备件名称</th><th>配电柜</th>
+    <th>计划停机窗口</th><th>实际到货</th><th>晚到时长</th>
+    <th>晚到原因</th><th>供应商</th>
+  </tr></thead>
+  <tbody>
+        <tr class="late-row">
+          <td>SP-FAN-001</td>
+          <td>轴流散热风扇</td>
+          <td>PDU-A01</td>
+          <td>2026-06-03 00:00-06:00</td>
+          <td class="bad">2026-06-03 14:25:00</td>
+          <td class="bad"><b>晚到 8.4h</b></td>
+          <td>物流中转延误</td>
+          <td>电气配件甲</td>
+        </tr>
+        <tr class="late-row">
+          <td>SP-CAP-003</td>
+          <td>补偿电容组</td>
+          <td>PDU-C01</td>
+          <td>2026-06-06 00:00-06:00</td>
+          <td class="bad">2026-06-07 09:30:00</td>
+          <td class="bad"><b>晚到 27.5h</b></td>
+          <td>厂家产能紧张</td>
+          <td>电容供应商乙</td>
+        </tr></tbody>
+</table>
+
+<h2>② 归因结果明细（每条结论都可追溯）</h2>
+<div class="howto">
+  <b>📖 追溯指南（阿敏自核用）：</b><br/>
+  1. <b>从归因 → 维修照片：</b>看每条里的"拖偏结论的照片"字段，会写清照片ID和它在
+  <code>normalized_photos.csv</code> 中的<b>行号</b>，打开CSV直接跳到那行核对。<br/>
+  2. <b>从维修照片 → 温度采样CSV明细：</b>用照片的<b>设备编号</b>和<b>拍摄日期</b>在
+  <code>temperature_sampling.csv</code> 里筛 cabinet_id + 日期，即可追到原始采样点。<br/>
+  3. <b>晚到备件怎么影响结论：</b>红色底色行的"晚到备件如何影响结论"框里把因果链写完整了。<br/>
+  4. <b>采样断档不会默默放行：</b>黄色底色行会标出"异常处理"并注明断档时段。<br/>
+  5. <b>人工备注不被覆盖：</b>有黄色"有备注"徽章的行，绿色框中会显示备注内容，重复导入不会覆盖。
+</div>
+<table>
+  <thead><tr>
+    <th>归因ID</th><th>配电柜</th><th>异常时段</th>
+    <th>峰值</th><th>均值</th><th>可信度</th><th>处理状态</th>
+    <th>归因结论 + 追溯信息</th>
+  </tr></thead>
+  <tbody>
+        <tr class="late-row">
+          <td><a href="#ATTR-0001">ATTR-0001</a></td>
+          <td><b>PDU-A01</b></td>
+          <td>2026-06-01 11:50:00<br/><span class="muted">→ 2026-06-01 11:50:00</span></td>
+          <td class="peak">70.1℃</td>
+          <td>70.1℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0001">
+              <div><b>归因结论：</b>轴流散热风扇(编号SP-FAN-001)到货晚于计划停机窗口8.4小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-03 00:00-06:00 内应更换 轴流散热风扇，但实际到货 2026-06-03 14:25:00（晚到8.4h，原因：物流中转延误）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-01 11:50:00 持续至 2026-06-01 11:50:00，峰值 70.1℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1000
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 2 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前0.8h拍摄（紧邻异常窗口）;部位='电容柜'，直接关联散热/发热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:5;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0002">ATTR-0002</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A01</b></td>
+          <td>2026-06-01 17:20:00<br/><span class="muted">→ 2026-06-01 17:20:00</span></td>
+          <td class="peak">70.6℃</td>
+          <td>70.6℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0002">
+              <div><b>归因结论：</b>轴流散热风扇(编号SP-FAN-001)到货晚于计划停机窗口8.4小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-03 00:00-06:00 内应更换 轴流散热风扇，但实际到货 2026-06-03 14:25:00（晚到8.4h，原因：物流中转延误）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-01 17:20:00 持续至 2026-06-01 17:20:00，峰值 70.6℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1012
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 14 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前0.3h拍摄（紧邻异常窗口）;现场读数85.0℃，属严重过热;部位='散热风扇'，直接关联散热/发热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:7;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0003">ATTR-0003</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A01</b></td>
+          <td>2026-06-02 11:00:00<br/><span class="muted">→ 2026-06-02 11:00:00</span></td>
+          <td class="peak">70.1℃</td>
+          <td>70.1℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0003">
+              <div><b>归因结论：</b>轴流散热风扇(编号SP-FAN-001)到货晚于计划停机窗口8.4小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-03 00:00-06:00 内应更换 轴流散热风扇，但实际到货 2026-06-03 14:25:00（晚到8.4h，原因：物流中转延误）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-02 11:00:00 持续至 2026-06-02 11:00:00，峰值 70.1℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1012
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 14 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前18.0h拍摄;现场读数85.0℃，属严重过热;部位='散热风扇'，直接关联散热/发热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:11;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0004">ATTR-0004</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A01</b></td>
+          <td>2026-06-02 12:40:00<br/><span class="muted">→ 2026-06-02 12:40:00</span></td>
+          <td class="peak">70.6℃</td>
+          <td>70.6℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0004">
+              <div><b>归因结论：</b>轴流散热风扇(编号SP-FAN-001)到货晚于计划停机窗口8.4小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-03 00:00-06:00 内应更换 轴流散热风扇，但实际到货 2026-06-03 14:25:00（晚到8.4h，原因：物流中转延误）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-02 12:40:00 持续至 2026-06-02 12:40:00，峰值 70.6℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1004
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 6 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前0.7h拍摄（紧邻异常窗口）;处理意见='待备件'，说明问题未闭环;现场读数82.0℃，已过阈值</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:10;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0005">ATTR-0005</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A01</b></td>
+          <td>2026-06-02 18:20:00<br/><span class="muted">→ 2026-06-02 18:20:00</span></td>
+          <td class="peak">71.2℃</td>
+          <td>71.2℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0005">
+              <div><b>归因结论：</b>轴流散热风扇(编号SP-FAN-001)到货晚于计划停机窗口8.4小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-03 00:00-06:00 内应更换 轴流散热风扇，但实际到货 2026-06-03 14:25:00（晚到8.4h，原因：物流中转延误）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-02 18:20:00 持续至 2026-06-02 18:20:00，峰值 71.2℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1007
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 9 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前1.3h拍摄（紧邻异常窗口）;现场读数91.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:10;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0006">ATTR-0006</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A01</b></td>
+          <td>2026-06-02 18:45:00<br/><span class="muted">→ 2026-06-02 18:45:00</span></td>
+          <td class="peak">70.9℃</td>
+          <td>70.9℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0006">
+              <div><b>归因结论：</b>轴流散热风扇(编号SP-FAN-001)到货晚于计划停机窗口8.4小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-03 00:00-06:00 内应更换 轴流散热风扇，但实际到货 2026-06-03 14:25:00（晚到8.4h，原因：物流中转延误）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-02 18:45:00 持续至 2026-06-02 18:45:00，峰值 70.9℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1007
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 9 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前1.8h拍摄（紧邻异常窗口）;现场读数91.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:10;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0007">ATTR-0007</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A01</b></td>
+          <td>2026-06-03 09:05:00<br/><span class="muted">→ 2026-06-03 11:05:00</span></td>
+          <td class="peak">89.2℃</td>
+          <td>79.9℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0007">
+              <div><b>归因结论：</b>轴流散热风扇(编号SP-FAN-001)到货晚于计划停机窗口8.4小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-03 00:00-06:00 内应更换 轴流散热风扇，但实际到货 2026-06-03 14:25:00（晚到8.4h，原因：物流中转延误）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-03 09:05:00 持续至 2026-06-03 11:05:00，峰值 89.2℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1004
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 6 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前21.1h拍摄;处理意见='待备件'，说明问题未闭环;现场读数82.0℃，已过阈值</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 11:20:00)：</b>
+                此照片拍摄于备件更换前，旧风扇已连续运行3年未维护
+            </div>
+              <div class="muted small">诊断参数：温度样本数:25;关联照片:10;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0008">ATTR-0008</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A01</b></td>
+          <td>2026-06-03 11:15:00<br/><span class="muted">→ 2026-06-03 12:15:00</span></td>
+          <td class="peak">84.4℃</td>
+          <td>77.9℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0008">
+              <div><b>归因结论：</b>轴流散热风扇(编号SP-FAN-001)到货晚于计划停机窗口8.4小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-03 00:00-06:00 内应更换 轴流散热风扇，但实际到货 2026-06-03 14:25:00（晚到8.4h，原因：物流中转延误）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-03 11:15:00 持续至 2026-06-03 12:15:00，峰值 84.4℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1004
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 6 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前23.2h拍摄;处理意见='待备件'，说明问题未闭环;现场读数82.0℃，已过阈值</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 11:20:00)：</b>
+                此照片拍摄于备件更换前，旧风扇已连续运行3年未维护
+            </div>
+              <div class="muted small">诊断参数：温度样本数:13;关联照片:10;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0009">ATTR-0009</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A01</b></td>
+          <td>2026-06-03 12:25:00<br/><span class="muted">→ 2026-06-03 13:50:00</span></td>
+          <td class="peak">89.6℃</td>
+          <td>78.9℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0009">
+              <div><b>归因结论：</b>轴流散热风扇(编号SP-FAN-001)到货晚于计划停机窗口8.4小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-03 00:00-06:00 内应更换 轴流散热风扇，但实际到货 2026-06-03 14:25:00（晚到8.4h，原因：物流中转延误）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-03 12:25:00 持续至 2026-06-03 13:50:00，峰值 89.6℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1008
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 10 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前4.4h拍摄（紧邻异常窗口）;现场读数80.0℃，已过阈值;部位='母线排'，属传导过热关联</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 11:20:00)：</b>
+                此照片拍摄于备件更换前，旧风扇已连续运行3年未维护
+            </div>
+              <div class="muted small">诊断参数：温度样本数:18;关联照片:10;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0010">ATTR-0010</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A01</b></td>
+          <td>2026-06-03 14:00:00<br/><span class="muted">→ 2026-06-03 14:05:00</span></td>
+          <td class="peak">84.9℃</td>
+          <td>78.0℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0010">
+              <div><b>归因结论：</b>轴流散热风扇(编号SP-FAN-001)到货晚于计划停机窗口8.4小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-03 00:00-06:00 内应更换 轴流散热风扇，但实际到货 2026-06-03 14:25:00（晚到8.4h，原因：物流中转延误）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-03 14:00:00 持续至 2026-06-03 14:05:00，峰值 84.9℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1018
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 20 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前0.0h拍摄（紧邻异常窗口）;现场读数70.0℃，已过阈值;部位='散热风扇'，直接关联散热/发热</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 11:20:00)：</b>
+                此照片拍摄于备件更换前，旧风扇已连续运行3年未维护
+            </div>
+              <div class="muted small">诊断参数：温度样本数:2;关联照片:10;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0011">ATTR-0011</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A01</b></td>
+          <td>2026-06-03 14:15:00<br/><span class="muted">→ 2026-06-03 14:55:00</span></td>
+          <td class="peak">85.2℃</td>
+          <td>76.3℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0011">
+              <div><b>归因结论：</b>轴流散热风扇(编号SP-FAN-001)到货晚于计划停机窗口8.4小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-03 00:00-06:00 内应更换 轴流散热风扇，但实际到货 2026-06-03 14:25:00（晚到8.4h，原因：物流中转延误）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-03 14:15:00 持续至 2026-06-03 14:55:00，峰值 85.2℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1018
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 20 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前0.2h拍摄（紧邻异常窗口）;现场读数70.0℃，已过阈值;部位='散热风扇'，直接关联散热/发热</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 11:20:00)：</b>
+                此照片拍摄于备件更换前，旧风扇已连续运行3年未维护
+            </div>
+              <div class="muted small">诊断参数：温度样本数:9;关联照片:10;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0012">ATTR-0012</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A01</b></td>
+          <td>2026-06-03 15:05:00<br/><span class="muted">→ 2026-06-03 15:50:00</span></td>
+          <td class="peak">87.8℃</td>
+          <td>79.5℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0012">
+              <div><b>归因结论：</b>轴流散热风扇(编号SP-FAN-001)到货晚于计划停机窗口8.4小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-03 00:00-06:00 内应更换 轴流散热风扇，但实际到货 2026-06-03 14:25:00（晚到8.4h，原因：物流中转延误）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-03 15:05:00 持续至 2026-06-03 15:50:00，峰值 87.8℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1018
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 20 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前1.1h拍摄（紧邻异常窗口）;现场读数70.0℃，已过阈值;部位='散热风扇'，直接关联散热/发热</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 11:20:00)：</b>
+                此照片拍摄于备件更换前，旧风扇已连续运行3年未维护
+            </div>
+              <div class="muted small">诊断参数：温度样本数:10;关联照片:10;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0013">ATTR-0013</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A01</b></td>
+          <td>2026-06-03 16:00:00<br/><span class="muted">→ 2026-06-03 16:55:00</span></td>
+          <td class="peak">87.1℃</td>
+          <td>81.0℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0013">
+              <div><b>归因结论：</b>轴流散热风扇(编号SP-FAN-001)到货晚于计划停机窗口8.4小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-03 00:00-06:00 内应更换 轴流散热风扇，但实际到货 2026-06-03 14:25:00（晚到8.4h，原因：物流中转延误）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-03 16:00:00 持续至 2026-06-03 16:55:00，峰值 87.1℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1018
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 20 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前2.0h拍摄（紧邻异常窗口）;现场读数70.0℃，已过阈值;部位='散热风扇'，直接关联散热/发热</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 11:20:00)：</b>
+                此照片拍摄于备件更换前，旧风扇已连续运行3年未维护
+            </div>
+              <div class="muted small">诊断参数：温度样本数:12;关联照片:10;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0014">ATTR-0014</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A01</b></td>
+          <td>2026-06-03 17:05:00<br/><span class="muted">→ 2026-06-03 17:50:00</span></td>
+          <td class="peak">87.6℃</td>
+          <td>77.8℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0014">
+              <div><b>归因结论：</b>轴流散热风扇(编号SP-FAN-001)到货晚于计划停机窗口8.4小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-03 00:00-06:00 内应更换 轴流散热风扇，但实际到货 2026-06-03 14:25:00（晚到8.4h，原因：物流中转延误）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-03 17:05:00 持续至 2026-06-03 17:50:00，峰值 87.6℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1018
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 20 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前3.1h拍摄（紧邻异常窗口）;现场读数70.0℃，已过阈值;部位='散热风扇'，直接关联散热/发热</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 11:20:00)：</b>
+                此照片拍摄于备件更换前，旧风扇已连续运行3年未维护
+            </div>
+              <div class="muted small">诊断参数：温度样本数:10;关联照片:10;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0015">ATTR-0015</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A01</b></td>
+          <td>2026-06-03 18:00:00<br/><span class="muted">→ 2026-06-03 18:20:00</span></td>
+          <td class="peak">82.6℃</td>
+          <td>79.8℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0015">
+              <div><b>归因结论：</b>轴流散热风扇(编号SP-FAN-001)到货晚于计划停机窗口8.4小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-03 00:00-06:00 内应更换 轴流散热风扇，但实际到货 2026-06-03 14:25:00（晚到8.4h，原因：物流中转延误）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-03 18:00:00 持续至 2026-06-03 18:20:00，峰值 82.6℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1018
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 20 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前4.0h拍摄（紧邻异常窗口）;现场读数70.0℃，已过阈值;部位='散热风扇'，直接关联散热/发热</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 11:20:00)：</b>
+                此照片拍摄于备件更换前，旧风扇已连续运行3年未维护
+            </div>
+              <div class="muted small">诊断参数：温度样本数:5;关联照片:11;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0016">ATTR-0016</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A01</b></td>
+          <td>2026-06-03 18:30:00<br/><span class="muted">→ 2026-06-03 18:55:00</span></td>
+          <td class="peak">87.0℃</td>
+          <td>81.8℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0016">
+              <div><b>归因结论：</b>轴流散热风扇(编号SP-FAN-001)到货晚于计划停机窗口8.4小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-03 00:00-06:00 内应更换 轴流散热风扇，但实际到货 2026-06-03 14:25:00（晚到8.4h，原因：物流中转延误）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-03 18:30:00 持续至 2026-06-03 18:55:00，峰值 87.0℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1018
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 20 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前4.5h拍摄（紧邻异常窗口）;现场读数70.0℃，已过阈值;部位='散热风扇'，直接关联散热/发热</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 11:20:00)：</b>
+                此照片拍摄于备件更换前，旧风扇已连续运行3年未维护
+            </div>
+              <div class="muted small">诊断参数：温度样本数:6;关联照片:10;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0017">ATTR-0017</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A01</b></td>
+          <td>2026-06-04 10:05:00<br/><span class="muted">→ 2026-06-04 10:05:00</span></td>
+          <td class="peak">71.5℃</td>
+          <td>71.5℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0017">
+              <div><b>归因结论：</b>轴流散热风扇(编号SP-FAN-001)到货晚于计划停机窗口8.4小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-03 00:00-06:00 内应更换 轴流散热风扇，但实际到货 2026-06-03 14:25:00（晚到8.4h，原因：物流中转延误）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-04 10:05:00 持续至 2026-06-04 10:05:00，峰值 71.5℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2011
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 33 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前4.1h拍摄（紧邻异常窗口）;处理意见='需更换'，说明问题未闭环;现场读数81.0℃，已过阈值;部位='电容柜'，直接关联散热/发热</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 10:15:00)：</b>
+                用户侧确认：6月2日夜间曾发生短时过负荷，当时尖峰电流约1120A
+            </div>
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:9;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0018">ATTR-0018</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A01</b></td>
+          <td>2026-06-04 10:20:00<br/><span class="muted">→ 2026-06-04 10:20:00</span></td>
+          <td class="peak">70.2℃</td>
+          <td>70.2℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0018">
+              <div><b>归因结论：</b>轴流散热风扇(编号SP-FAN-001)到货晚于计划停机窗口8.4小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-03 00:00-06:00 内应更换 轴流散热风扇，但实际到货 2026-06-03 14:25:00（晚到8.4h，原因：物流中转延误）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-04 10:20:00 持续至 2026-06-04 10:20:00，峰值 70.2℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2011
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 33 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前4.3h拍摄（紧邻异常窗口）;处理意见='需更换'，说明问题未闭环;现场读数81.0℃，已过阈值;部位='电容柜'，直接关联散热/发热</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 10:15:00)：</b>
+                用户侧确认：6月2日夜间曾发生短时过负荷，当时尖峰电流约1120A
+            </div>
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:9;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0019">ATTR-0019</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A01</b></td>
+          <td>2026-06-04 15:45:00<br/><span class="muted">→ 2026-06-04 15:45:00</span></td>
+          <td class="peak">70.5℃</td>
+          <td>70.5℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0019">
+              <div><b>归因结论：</b>轴流散热风扇(编号SP-FAN-001)到货晚于计划停机窗口8.4小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-03 00:00-06:00 内应更换 轴流散热风扇，但实际到货 2026-06-03 14:25:00（晚到8.4h，原因：物流中转延误）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-04 15:45:00 持续至 2026-06-04 15:45:00，峰值 70.5℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2011
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 33 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前9.8h拍摄;处理意见='需更换'，说明问题未闭环;现场读数81.0℃，已过阈值;部位='电容柜'，直接关联散热/发热</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 10:15:00)：</b>
+                用户侧确认：6月2日夜间曾发生短时过负荷，当时尖峰电流约1120A
+            </div>
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:7;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0020">ATTR-0020</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A01</b></td>
+          <td>2026-06-04 18:15:00<br/><span class="muted">→ 2026-06-04 18:15:00</span></td>
+          <td class="peak">70.7℃</td>
+          <td>70.7℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0020">
+              <div><b>归因结论：</b>轴流散热风扇(编号SP-FAN-001)到货晚于计划停机窗口8.4小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-03 00:00-06:00 内应更换 轴流散热风扇，但实际到货 2026-06-03 14:25:00（晚到8.4h，原因：物流中转延误）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-04 18:15:00 持续至 2026-06-04 18:15:00，峰值 70.7℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2011
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 33 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前12.2h拍摄;处理意见='需更换'，说明问题未闭环;现场读数81.0℃，已过阈值;部位='电容柜'，直接关联散热/发热</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 10:15:00)：</b>
+                用户侧确认：6月2日夜间曾发生短时过负荷，当时尖峰电流约1120A
+            </div>
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:8;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0021">ATTR-0021</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A01</b></td>
+          <td>2026-06-04 18:35:00<br/><span class="muted">→ 2026-06-04 18:35:00</span></td>
+          <td class="peak">70.3℃</td>
+          <td>70.3℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0021">
+              <div><b>归因结论：</b>轴流散热风扇(编号SP-FAN-001)到货晚于计划停机窗口8.4小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-03 00:00-06:00 内应更换 轴流散热风扇，但实际到货 2026-06-03 14:25:00（晚到8.4h，原因：物流中转延误）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-04 18:35:00 持续至 2026-06-04 18:35:00，峰值 70.3℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2011
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 33 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前12.6h拍摄;处理意见='需更换'，说明问题未闭环;现场读数81.0℃，已过阈值;部位='电容柜'，直接关联散热/发热</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 10:15:00)：</b>
+                用户侧确认：6月2日夜间曾发生短时过负荷，当时尖峰电流约1120A
+            </div>
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:8;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0022">ATTR-0022</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A01</b></td>
+          <td>2026-06-05 12:30:00<br/><span class="muted">→ 2026-06-05 12:30:00</span></td>
+          <td class="peak">70.6℃</td>
+          <td>70.6℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0022">
+              <div><b>归因结论：</b>轴流散热风扇(编号SP-FAN-001)到货晚于计划停机窗口8.4小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-03 00:00-06:00 内应更换 轴流散热风扇，但实际到货 2026-06-03 14:25:00（晚到8.4h，原因：物流中转延误）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-05 12:30:00 持续至 2026-06-05 12:30:00，峰值 70.6℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2001
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 23 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前2.5h拍摄（紧邻异常窗口）;现场读数86.0℃，属严重过热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:3;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0023">ATTR-0023</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A01</b></td>
+          <td>2026-06-05 15:20:00<br/><span class="muted">→ 2026-06-05 15:20:00</span></td>
+          <td class="peak">70.2℃</td>
+          <td>70.2℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0023">
+              <div><b>归因结论：</b>轴流散热风扇(编号SP-FAN-001)到货晚于计划停机窗口8.4小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-03 00:00-06:00 内应更换 轴流散热风扇，但实际到货 2026-06-03 14:25:00（晚到8.4h，原因：物流中转延误）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-05 15:20:00 持续至 2026-06-05 15:20:00，峰值 70.2℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2001
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 23 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前5.3h拍摄（紧邻异常窗口）;现场读数86.0℃，属严重过热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:4;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0024">ATTR-0024</a></td>
+          <td><b>PDU-A01</b></td>
+          <td>2026-06-06 10:30:00<br/><span class="muted">→ 2026-06-06 10:30:00</span></td>
+          <td class="peak">70.3℃</td>
+          <td>70.3℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0024">
+              <div><b>归因结论：</b>轴流散热风扇(编号SP-FAN-001)到货晚于计划停机窗口8.4小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-03 00:00-06:00 内应更换 轴流散热风扇，但实际到货 2026-06-03 14:25:00（晚到8.4h，原因：物流中转延误）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-06 10:30:00 持续至 2026-06-06 10:30:00，峰值 70.3℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2002
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 24 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前3.5h拍摄（紧邻异常窗口）;处理意见='待备件'，说明问题未闭环;现场读数91.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:9;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0025">ATTR-0025</a></td>
+          <td><b>PDU-A01</b></td>
+          <td>2026-06-06 16:15:00<br/><span class="muted">→ 2026-06-06 16:15:00</span></td>
+          <td class="peak">70.4℃</td>
+          <td>70.4℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0025">
+              <div><b>归因结论：</b>轴流散热风扇(编号SP-FAN-001)到货晚于计划停机窗口8.4小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-03 00:00-06:00 内应更换 轴流散热风扇，但实际到货 2026-06-03 14:25:00（晚到8.4h，原因：物流中转延误）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-06 16:15:00 持续至 2026-06-06 16:15:00，峰值 70.4℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2002
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 24 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前9.2h拍摄;处理意见='待备件'，说明问题未闭环;现场读数91.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:8;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0026">ATTR-0026</a></td>
+          <td><b>PDU-A01</b></td>
+          <td>2026-06-07 10:00:00<br/><span class="muted">→ 2026-06-07 10:00:00</span></td>
+          <td class="peak">70.6℃</td>
+          <td>70.6℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0026">
+              <div><b>归因结论：</b>轴流散热风扇(编号SP-FAN-001)到货晚于计划停机窗口8.4小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-03 00:00-06:00 内应更换 轴流散热风扇，但实际到货 2026-06-03 14:25:00（晚到8.4h，原因：物流中转延误）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-07 10:00:00 持续至 2026-06-07 10:00:00，峰值 70.6℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2003
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 25 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前1.0h拍摄（紧邻异常窗口）;处理意见='待备件'，说明问题未闭环;现场读数89.0℃，属严重过热;部位='电容柜'，直接关联散热/发热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:3;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0027">ATTR-0027</a></td>
+          <td><b>PDU-A01</b></td>
+          <td>2026-06-07 17:25:00<br/><span class="muted">→ 2026-06-07 17:30:00</span></td>
+          <td class="peak">70.1℃</td>
+          <td>70.1℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0027">
+              <div><b>归因结论：</b>轴流散热风扇(编号SP-FAN-001)到货晚于计划停机窗口8.4小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-03 00:00-06:00 内应更换 轴流散热风扇，但实际到货 2026-06-03 14:25:00（晚到8.4h，原因：物流中转延误）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-07 17:25:00 持续至 2026-06-07 17:30:00，峰值 70.1℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2003
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 25 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前8.4h拍摄;处理意见='待备件'，说明问题未闭环;现场读数89.0℃，属严重过热;部位='电容柜'，直接关联散热/发热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:2;关联照片:1;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="gap-row">
+          <td><a href="#ATTR-0028">ATTR-0028</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A01</b></td>
+          <td>2026-06-02 23:55:00<br/><span class="muted">→ 2026-06-03 06:00:00</span></td>
+          <td class="peak">64.2℃</td>
+          <td>54.4℃</td>
+          <td>低（数据缺失）</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0028">
+              <div><b>归因结论：</b>采样断档（365.0分钟）：该时段无温度数据，无法判断是否发生温升，按异常处理</div>
+              
+              <div class="gap-box">
+                ⚠️ <b>采样断档，已标为异常处理（未默默放行）：</b>
+                独立断档条目：2026-06-02 23:55:00~2026-06-03 06:00:00，持续365.0分钟；断档前温度44.6℃→断档后64.2℃
+            </div>
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1004
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 6 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前11.9h拍摄;处理意见='待备件'，说明问题未闭环;现场读数82.0℃，已过阈值</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 11:20:00)：</b>
+                此照片拍摄于备件更换前，旧风扇已连续运行3年未维护
+            </div>
+              <div class="muted small">诊断参数：本行为独立生成的断档条目；断档前温度44.6℃ 断档后64.2℃</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0029">ATTR-0029</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A02</b></td>
+          <td>2026-06-01 13:00:00<br/><span class="muted">→ 2026-06-01 13:00:00</span></td>
+          <td class="peak">70.7℃</td>
+          <td>70.7℃</td>
+          <td>中</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0029">
+              <div><b>归因结论：</b>常规温升，待人工确认</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1000
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 2 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前2.0h拍摄（紧邻异常窗口）;部位='电容柜'，直接关联散热/发热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:6;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0030">ATTR-0030</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A02</b></td>
+          <td>2026-06-02 09:30:00<br/><span class="muted">→ 2026-06-02 09:30:00</span></td>
+          <td class="peak">70.2℃</td>
+          <td>70.2℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0030">
+              <div><b>归因结论：</b>关联维修照片指示部件进线端子,母线排,散热风扇,电容柜,出线开关待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1012
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 14 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前16.5h拍摄;现场读数85.0℃，属严重过热;部位='散热风扇'，直接关联散热/发热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:11;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0031">ATTR-0031</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A02</b></td>
+          <td>2026-06-02 09:45:00<br/><span class="muted">→ 2026-06-02 09:45:00</span></td>
+          <td class="peak">70.2℃</td>
+          <td>70.2℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0031">
+              <div><b>归因结论：</b>关联维修照片指示部件进线端子,母线排,散热风扇,电容柜,出线开关待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1012
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 14 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前16.8h拍摄;现场读数85.0℃，属严重过热;部位='散热风扇'，直接关联散热/发热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:11;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0032">ATTR-0032</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A02</b></td>
+          <td>2026-06-02 10:00:00<br/><span class="muted">→ 2026-06-02 10:00:00</span></td>
+          <td class="peak">70.1℃</td>
+          <td>70.1℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0032">
+              <div><b>归因结论：</b>关联维修照片指示部件进线端子,母线排,散热风扇,电容柜,出线开关待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1012
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 14 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前17.0h拍摄;现场读数85.0℃，属严重过热;部位='散热风扇'，直接关联散热/发热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:11;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0033">ATTR-0033</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A02</b></td>
+          <td>2026-06-02 12:20:00<br/><span class="muted">→ 2026-06-02 12:20:00</span></td>
+          <td class="peak">70.9℃</td>
+          <td>70.9℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0033">
+              <div><b>归因结论：</b>关联维修照片指示部件出线开关,进线端子,母线排,散热风扇待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1004
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 6 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前0.3h拍摄（紧邻异常窗口）;处理意见='待备件'，说明问题未闭环;现场读数82.0℃，已过阈值</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:10;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0034">ATTR-0034</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A02</b></td>
+          <td>2026-06-02 13:55:00<br/><span class="muted">→ 2026-06-02 13:55:00</span></td>
+          <td class="peak">70.4℃</td>
+          <td>70.4℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0034">
+              <div><b>归因结论：</b>关联维修照片指示部件出线开关,进线端子,母线排,散热风扇待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1004
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 6 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前1.9h拍摄（紧邻异常窗口）;处理意见='待备件'，说明问题未闭环;现场读数82.0℃，已过阈值</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:11;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0035">ATTR-0035</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A02</b></td>
+          <td>2026-06-02 16:30:00<br/><span class="muted">→ 2026-06-02 16:30:00</span></td>
+          <td class="peak">71.0℃</td>
+          <td>71.0℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0035">
+              <div><b>归因结论：</b>关联维修照片指示部件出线开关,进线端子,母线排,散热风扇待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1004
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 6 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前4.5h拍摄（紧邻异常窗口）;处理意见='待备件'，说明问题未闭环;现场读数82.0℃，已过阈值</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:11;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0036">ATTR-0036</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A02</b></td>
+          <td>2026-06-02 17:40:00<br/><span class="muted">→ 2026-06-02 17:40:00</span></td>
+          <td class="peak">70.5℃</td>
+          <td>70.5℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0036">
+              <div><b>归因结论：</b>关联维修照片指示部件出线开关,进线端子,母线排待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1004
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 6 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前5.7h拍摄（紧邻异常窗口）;处理意见='待备件'，说明问题未闭环;现场读数82.0℃，已过阈值</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:10;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0037">ATTR-0037</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A02</b></td>
+          <td>2026-06-03 09:30:00<br/><span class="muted">→ 2026-06-03 09:30:00</span></td>
+          <td class="peak">70.0℃</td>
+          <td>70.0℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0037">
+              <div><b>归因结论：</b>关联维修照片指示部件进线端子,母线排,散热风扇,电容柜,出线开关待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1004
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 6 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前21.5h拍摄;处理意见='待备件'，说明问题未闭环;现场读数82.0℃，已过阈值</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 11:20:00)：</b>
+                此照片拍摄于备件更换前，旧风扇已连续运行3年未维护
+            </div>
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:8;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0038">ATTR-0038</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A02</b></td>
+          <td>2026-06-03 11:45:00<br/><span class="muted">→ 2026-06-03 11:45:00</span></td>
+          <td class="peak">70.1℃</td>
+          <td>70.1℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0038">
+              <div><b>归因结论：</b>关联维修照片指示部件进线端子,母线排,散热风扇,电容柜,出线开关待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1004
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 6 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前23.8h拍摄;处理意见='待备件'，说明问题未闭环;现场读数82.0℃，已过阈值</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 11:20:00)：</b>
+                此照片拍摄于备件更换前，旧风扇已连续运行3年未维护
+            </div>
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:10;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0039">ATTR-0039</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A02</b></td>
+          <td>2026-06-03 13:35:00<br/><span class="muted">→ 2026-06-03 13:35:00</span></td>
+          <td class="peak">70.7℃</td>
+          <td>70.7℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0039">
+              <div><b>归因结论：</b>关联维修照片指示部件进线端子,母线排,散热风扇,电容柜,出线开关待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1008
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 10 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前5.6h拍摄（紧邻异常窗口）;现场读数80.0℃，已过阈值;部位='母线排'，属传导过热关联</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 11:20:00)：</b>
+                此照片拍摄于备件更换前，旧风扇已连续运行3年未维护
+            </div>
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:10;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0040">ATTR-0040</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A02</b></td>
+          <td>2026-06-03 16:30:00<br/><span class="muted">→ 2026-06-03 16:30:00</span></td>
+          <td class="peak">71.0℃</td>
+          <td>71.0℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0040">
+              <div><b>归因结论：</b>关联维修照片指示部件进线端子,母线排,散热风扇,电容柜,出线开关待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1018
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 20 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前2.5h拍摄（紧邻异常窗口）;现场读数70.0℃，已过阈值;部位='散热风扇'，直接关联散热/发热</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 11:20:00)：</b>
+                此照片拍摄于备件更换前，旧风扇已连续运行3年未维护
+            </div>
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:10;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0041">ATTR-0041</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A02</b></td>
+          <td>2026-06-03 16:45:00<br/><span class="muted">→ 2026-06-03 16:45:00</span></td>
+          <td class="peak">70.2℃</td>
+          <td>70.2℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0041">
+              <div><b>归因结论：</b>关联维修照片指示部件进线端子,母线排,散热风扇,电容柜,出线开关待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1018
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 20 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前2.8h拍摄（紧邻异常窗口）;现场读数70.0℃，已过阈值;部位='散热风扇'，直接关联散热/发热</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 11:20:00)：</b>
+                此照片拍摄于备件更换前，旧风扇已连续运行3年未维护
+            </div>
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:10;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0042">ATTR-0042</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A02</b></td>
+          <td>2026-06-04 11:45:00<br/><span class="muted">→ 2026-06-04 11:50:00</span></td>
+          <td class="peak">70.3℃</td>
+          <td>70.2℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0042">
+              <div><b>归因结论：</b>关联维修照片指示部件进线端子,母线排,散热风扇,电容柜,出线开关待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2011
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 33 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前5.8h拍摄（紧邻异常窗口）;处理意见='需更换'，说明问题未闭环;现场读数81.0℃，已过阈值;部位='电容柜'，直接关联散热/发热</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 10:15:00)：</b>
+                用户侧确认：6月2日夜间曾发生短时过负荷，当时尖峰电流约1120A
+            </div>
+              <div class="muted small">诊断参数：温度样本数:2;关联照片:9;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0043">ATTR-0043</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A02</b></td>
+          <td>2026-06-04 14:05:00<br/><span class="muted">→ 2026-06-04 14:05:00</span></td>
+          <td class="peak">70.8℃</td>
+          <td>70.8℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0043">
+              <div><b>归因结论：</b>关联维修照片指示部件进线端子,母线排,散热风扇,电容柜,出线开关待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2011
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 33 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前8.1h拍摄;处理意见='需更换'，说明问题未闭环;现场读数81.0℃，已过阈值;部位='电容柜'，直接关联散热/发热</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 10:15:00)：</b>
+                用户侧确认：6月2日夜间曾发生短时过负荷，当时尖峰电流约1120A
+            </div>
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:7;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0044">ATTR-0044</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A02</b></td>
+          <td>2026-06-04 18:25:00<br/><span class="muted">→ 2026-06-04 18:25:00</span></td>
+          <td class="peak">70.9℃</td>
+          <td>70.9℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0044">
+              <div><b>归因结论：</b>关联维修照片指示部件进线端子,母线排,散热风扇,电容柜,出线开关待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2011
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 33 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前12.4h拍摄;处理意见='需更换'，说明问题未闭环;现场读数81.0℃，已过阈值;部位='电容柜'，直接关联散热/发热</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 10:15:00)：</b>
+                用户侧确认：6月2日夜间曾发生短时过负荷，当时尖峰电流约1120A
+            </div>
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:8;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0045">ATTR-0045</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A02</b></td>
+          <td>2026-06-04 18:35:00<br/><span class="muted">→ 2026-06-04 18:35:00</span></td>
+          <td class="peak">70.4℃</td>
+          <td>70.4℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0045">
+              <div><b>归因结论：</b>关联维修照片指示部件进线端子,母线排,散热风扇,电容柜,出线开关待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2011
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 33 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前12.6h拍摄;处理意见='需更换'，说明问题未闭环;现场读数81.0℃，已过阈值;部位='电容柜'，直接关联散热/发热</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 10:15:00)：</b>
+                用户侧确认：6月2日夜间曾发生短时过负荷，当时尖峰电流约1120A
+            </div>
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:8;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0046">ATTR-0046</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A02</b></td>
+          <td>2026-06-05 09:10:00<br/><span class="muted">→ 2026-06-05 09:10:00</span></td>
+          <td class="peak">71.1℃</td>
+          <td>71.1℃</td>
+          <td>中</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0046">
+              <div><b>归因结论：</b>常规温升，待人工确认</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2014
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 36 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前5.2h拍摄（紧邻异常窗口）;现场读数85.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:3;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0047">ATTR-0047</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A02</b></td>
+          <td>2026-06-05 13:50:00<br/><span class="muted">→ 2026-06-05 13:50:00</span></td>
+          <td class="peak">71.6℃</td>
+          <td>71.6℃</td>
+          <td>中</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0047">
+              <div><b>归因结论：</b>常规温升，待人工确认</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2001
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 23 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前3.8h拍摄（紧邻异常窗口）;现场读数86.0℃，属严重过热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:3;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0048">ATTR-0048</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A02</b></td>
+          <td>2026-06-05 17:10:00<br/><span class="muted">→ 2026-06-05 17:10:00</span></td>
+          <td class="peak">70.3℃</td>
+          <td>70.3℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0048">
+              <div><b>归因结论：</b>关联维修照片指示部件出线开关,进线端子,母线排待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2004
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 26 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前1.2h拍摄（紧邻异常窗口）;处理意见='观察运行'，问题可能延续;现场读数77.0℃，已过阈值;部位='进线端子'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:6;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0049">ATTR-0049</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-A02</b></td>
+          <td>2026-06-05 18:25:00<br/><span class="muted">→ 2026-06-05 18:25:00</span></td>
+          <td class="peak">71.1℃</td>
+          <td>71.1℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0049">
+              <div><b>归因结论：</b>关联维修照片指示部件出线开关,进线端子,母线排待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2004
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 26 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前2.4h拍摄（紧邻异常窗口）;处理意见='观察运行'，问题可能延续;现场读数77.0℃，已过阈值;部位='进线端子'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:7;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0050">ATTR-0050</a></td>
+          <td><b>PDU-A02</b></td>
+          <td>2026-06-06 09:05:00<br/><span class="muted">→ 2026-06-06 09:05:00</span></td>
+          <td class="peak">71.3℃</td>
+          <td>71.3℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0050">
+              <div><b>归因结论：</b>关联维修照片指示部件出线开关,进线端子,母线排待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2002
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 24 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前2.1h拍摄（紧邻异常窗口）;处理意见='待备件'，说明问题未闭环;现场读数91.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:10;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0051">ATTR-0051</a></td>
+          <td><b>PDU-A02</b></td>
+          <td>2026-06-07 17:45:00<br/><span class="muted">→ 2026-06-07 17:45:00</span></td>
+          <td class="peak">70.9℃</td>
+          <td>70.9℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0051">
+              <div><b>归因结论：</b>关联维修照片指示部件电容柜待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2003
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 25 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前8.8h拍摄;处理意见='待备件'，说明问题未闭环;现场读数89.0℃，属严重过热;部位='电容柜'，直接关联散热/发热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:1;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0052">ATTR-0052</a></td>
+          <td><b>PDU-B01</b></td>
+          <td>2026-06-01 12:50:00<br/><span class="muted">→ 2026-06-01 12:50:00</span></td>
+          <td class="peak">70.0℃</td>
+          <td>70.0℃</td>
+          <td>中</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0052">
+              <div><b>归因结论：</b>常规温升，待人工确认</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1000
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 2 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前1.8h拍摄（紧邻异常窗口）;部位='电容柜'，直接关联散热/发热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:5;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0053">ATTR-0053</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-B01</b></td>
+          <td>2026-06-01 17:30:00<br/><span class="muted">→ 2026-06-01 17:30:00</span></td>
+          <td class="peak">70.6℃</td>
+          <td>70.6℃</td>
+          <td>中</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0053">
+              <div><b>归因结论：</b>常规温升，待人工确认</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1012
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 14 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前0.5h拍摄（紧邻异常窗口）;现场读数85.0℃，属严重过热;部位='散热风扇'，直接关联散热/发热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:7;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0054">ATTR-0054</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-B01</b></td>
+          <td>2026-06-02 09:00:00<br/><span class="muted">→ 2026-06-02 09:00:00</span></td>
+          <td class="peak">70.1℃</td>
+          <td>70.1℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0054">
+              <div><b>归因结论：</b>关联维修照片指示部件进线端子,母线排,散热风扇,电容柜,出线开关待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1012
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 14 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前16.0h拍摄;现场读数85.0℃，属严重过热;部位='散热风扇'，直接关联散热/发热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:11;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0055">ATTR-0055</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-B01</b></td>
+          <td>2026-06-02 12:35:00<br/><span class="muted">→ 2026-06-02 12:35:00</span></td>
+          <td class="peak">70.8℃</td>
+          <td>70.8℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0055">
+              <div><b>归因结论：</b>关联维修照片指示部件出线开关,进线端子,母线排,散热风扇待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1004
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 6 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前0.6h拍摄（紧邻异常窗口）;处理意见='待备件'，说明问题未闭环;现场读数82.0℃，已过阈值</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:10;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0056">ATTR-0056</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-B01</b></td>
+          <td>2026-06-02 14:00:00<br/><span class="muted">→ 2026-06-02 14:00:00</span></td>
+          <td class="peak">70.0℃</td>
+          <td>70.0℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0056">
+              <div><b>归因结论：</b>关联维修照片指示部件出线开关,进线端子,母线排,散热风扇待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1004
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 6 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前2.0h拍摄（紧邻异常窗口）;处理意见='待备件'，说明问题未闭环;现场读数82.0℃，已过阈值</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:11;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0057">ATTR-0057</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-B01</b></td>
+          <td>2026-06-02 15:10:00<br/><span class="muted">→ 2026-06-02 15:10:00</span></td>
+          <td class="peak">70.2℃</td>
+          <td>70.2℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0057">
+              <div><b>归因结论：</b>关联维修照片指示部件出线开关,进线端子,母线排,散热风扇待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1004
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 6 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前3.2h拍摄（紧邻异常窗口）;处理意见='待备件'，说明问题未闭环;现场读数82.0℃，已过阈值</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:11;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0058">ATTR-0058</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-B01</b></td>
+          <td>2026-06-02 16:45:00<br/><span class="muted">→ 2026-06-02 16:45:00</span></td>
+          <td class="peak">70.2℃</td>
+          <td>70.2℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0058">
+              <div><b>归因结论：</b>关联维修照片指示部件出线开关,进线端子,母线排,散热风扇待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1004
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 6 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前4.8h拍摄（紧邻异常窗口）;处理意见='待备件'，说明问题未闭环;现场读数82.0℃，已过阈值</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:11;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0059">ATTR-0059</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-B01</b></td>
+          <td>2026-06-03 11:00:00<br/><span class="muted">→ 2026-06-03 11:00:00</span></td>
+          <td class="peak">70.4℃</td>
+          <td>70.4℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0059">
+              <div><b>归因结论：</b>关联维修照片指示部件进线端子,母线排,散热风扇,电容柜,出线开关待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1004
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 6 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前23.0h拍摄;处理意见='待备件'，说明问题未闭环;现场读数82.0℃，已过阈值</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 11:20:00)：</b>
+                此照片拍摄于备件更换前，旧风扇已连续运行3年未维护
+            </div>
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:10;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0060">ATTR-0060</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-B01</b></td>
+          <td>2026-06-03 14:40:00<br/><span class="muted">→ 2026-06-03 14:40:00</span></td>
+          <td class="peak">70.8℃</td>
+          <td>70.8℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0060">
+              <div><b>归因结论：</b>关联维修照片指示部件进线端子,母线排,散热风扇,电容柜,出线开关待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1018
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 20 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前0.7h拍摄（紧邻异常窗口）;现场读数70.0℃，已过阈值;部位='散热风扇'，直接关联散热/发热</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 11:20:00)：</b>
+                此照片拍摄于备件更换前，旧风扇已连续运行3年未维护
+            </div>
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:10;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0061">ATTR-0061</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-B01</b></td>
+          <td>2026-06-03 17:05:00<br/><span class="muted">→ 2026-06-03 17:05:00</span></td>
+          <td class="peak">70.7℃</td>
+          <td>70.7℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0061">
+              <div><b>归因结论：</b>关联维修照片指示部件进线端子,母线排,散热风扇,电容柜,出线开关待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1018
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 20 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前3.1h拍摄（紧邻异常窗口）;现场读数70.0℃，已过阈值;部位='散热风扇'，直接关联散热/发热</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 11:20:00)：</b>
+                此照片拍摄于备件更换前，旧风扇已连续运行3年未维护
+            </div>
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:10;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0062">ATTR-0062</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-B01</b></td>
+          <td>2026-06-03 17:20:00<br/><span class="muted">→ 2026-06-03 17:20:00</span></td>
+          <td class="peak">70.4℃</td>
+          <td>70.4℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0062">
+              <div><b>归因结论：</b>关联维修照片指示部件进线端子,母线排,散热风扇,电容柜,出线开关待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1018
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 20 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前3.3h拍摄（紧邻异常窗口）;现场读数70.0℃，已过阈值;部位='散热风扇'，直接关联散热/发热</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 11:20:00)：</b>
+                此照片拍摄于备件更换前，旧风扇已连续运行3年未维护
+            </div>
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:10;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0063">ATTR-0063</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-B01</b></td>
+          <td>2026-06-04 09:40:00<br/><span class="muted">→ 2026-06-04 09:40:00</span></td>
+          <td class="peak">70.0℃</td>
+          <td>70.0℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0063">
+              <div><b>归因结论：</b>关联维修照片指示部件进线端子,母线排,散热风扇,电容柜,出线开关待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2011
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 33 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前3.7h拍摄（紧邻异常窗口）;处理意见='需更换'，说明问题未闭环;现场读数81.0℃，已过阈值;部位='电容柜'，直接关联散热/发热</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 10:15:00)：</b>
+                用户侧确认：6月2日夜间曾发生短时过负荷，当时尖峰电流约1120A
+            </div>
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:9;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0064">ATTR-0064</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-B01</b></td>
+          <td>2026-06-04 13:05:00<br/><span class="muted">→ 2026-06-04 13:05:00</span></td>
+          <td class="peak">71.3℃</td>
+          <td>71.3℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0064">
+              <div><b>归因结论：</b>关联维修照片指示部件进线端子,母线排,散热风扇,电容柜,出线开关待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2011
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 33 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前7.1h拍摄;处理意见='需更换'，说明问题未闭环;现场读数81.0℃，已过阈值;部位='电容柜'，直接关联散热/发热</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 10:15:00)：</b>
+                用户侧确认：6月2日夜间曾发生短时过负荷，当时尖峰电流约1120A
+            </div>
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:9;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0065">ATTR-0065</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-B01</b></td>
+          <td>2026-06-05 11:25:00<br/><span class="muted">→ 2026-06-05 11:25:00</span></td>
+          <td class="peak">70.4℃</td>
+          <td>70.4℃</td>
+          <td>中</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0065">
+              <div><b>归因结论：</b>常规温升，待人工确认</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2001
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 23 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前1.4h拍摄（紧邻异常窗口）;现场读数86.0℃，属严重过热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:3;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0066">ATTR-0066</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-B01</b></td>
+          <td>2026-06-05 13:40:00<br/><span class="muted">→ 2026-06-05 13:45:00</span></td>
+          <td class="peak">71.2℃</td>
+          <td>71.0℃</td>
+          <td>中</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0066">
+              <div><b>归因结论：</b>常规温升，待人工确认</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2001
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 23 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前3.7h拍摄（紧邻异常窗口）;现场读数86.0℃，属严重过热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:2;关联照片:3;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0067">ATTR-0067</a></td>
+          <td><b>PDU-B01</b></td>
+          <td>2026-06-07 12:45:00<br/><span class="muted">→ 2026-06-07 12:45:00</span></td>
+          <td class="peak">70.1℃</td>
+          <td>70.1℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0067">
+              <div><b>归因结论：</b>关联维修照片指示部件电容柜,进线端子待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2003
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 25 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前3.8h拍摄（紧邻异常窗口）;处理意见='待备件'，说明问题未闭环;现场读数89.0℃，属严重过热;部位='电容柜'，直接关联散热/发热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:3;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0068">ATTR-0068</a></td>
+          <td><b>PDU-B01</b></td>
+          <td>2026-06-07 13:15:00<br/><span class="muted">→ 2026-06-07 13:15:00</span></td>
+          <td class="peak">71.0℃</td>
+          <td>71.0℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0068">
+              <div><b>归因结论：</b>关联维修照片指示部件电容柜,进线端子待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2003
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 25 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前4.2h拍摄（紧邻异常窗口）;处理意见='待备件'，说明问题未闭环;现场读数89.0℃，属严重过热;部位='电容柜'，直接关联散热/发热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:3;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0069">ATTR-0069</a></td>
+          <td><b>PDU-B01</b></td>
+          <td>2026-06-07 13:25:00<br/><span class="muted">→ 2026-06-07 13:25:00</span></td>
+          <td class="peak">71.1℃</td>
+          <td>71.1℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0069">
+              <div><b>归因结论：</b>关联维修照片指示部件电容柜,进线端子待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2003
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 25 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前4.4h拍摄（紧邻异常窗口）;处理意见='待备件'，说明问题未闭环;现场读数89.0℃，属严重过热;部位='电容柜'，直接关联散热/发热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:3;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0070">ATTR-0070</a></td>
+          <td><b>PDU-B02</b></td>
+          <td>2026-06-01 12:35:00<br/><span class="muted">→ 2026-06-01 12:35:00</span></td>
+          <td class="peak">70.2℃</td>
+          <td>70.2℃</td>
+          <td>中</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0070">
+              <div><b>归因结论：</b>常规温升，待人工确认</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1000
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 2 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前1.6h拍摄（紧邻异常窗口）;部位='电容柜'，直接关联散热/发热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:5;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0071">ATTR-0071</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-B02</b></td>
+          <td>2026-06-01 13:40:00<br/><span class="muted">→ 2026-06-01 13:40:00</span></td>
+          <td class="peak">70.2℃</td>
+          <td>70.2℃</td>
+          <td>中</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0071">
+              <div><b>归因结论：</b>常规温升，待人工确认</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1000
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 2 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前2.7h拍摄（紧邻异常窗口）;部位='电容柜'，直接关联散热/发热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:6;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0072">ATTR-0072</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-B02</b></td>
+          <td>2026-06-01 14:50:00<br/><span class="muted">→ 2026-06-01 14:50:00</span></td>
+          <td class="peak">71.8℃</td>
+          <td>71.8℃</td>
+          <td>中</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0072">
+              <div><b>归因结论：</b>常规温升，待人工确认</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1000
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 2 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前3.8h拍摄（紧邻异常窗口）;部位='电容柜'，直接关联散热/发热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:6;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0073">ATTR-0073</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-B02</b></td>
+          <td>2026-06-01 16:40:00<br/><span class="muted">→ 2026-06-01 16:40:00</span></td>
+          <td class="peak">71.5℃</td>
+          <td>71.5℃</td>
+          <td>中</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0073">
+              <div><b>归因结论：</b>常规温升，待人工确认</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1000
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 2 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前5.7h拍摄（紧邻异常窗口）;部位='电容柜'，直接关联散热/发热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:7;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0074">ATTR-0074</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-B02</b></td>
+          <td>2026-06-01 17:10:00<br/><span class="muted">→ 2026-06-01 17:10:00</span></td>
+          <td class="peak">70.0℃</td>
+          <td>70.0℃</td>
+          <td>中</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0074">
+              <div><b>归因结论：</b>常规温升，待人工确认</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1012
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 14 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前0.2h拍摄（紧邻异常窗口）;现场读数85.0℃，属严重过热;部位='散热风扇'，直接关联散热/发热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:7;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0075">ATTR-0075</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-B02</b></td>
+          <td>2026-06-01 18:10:00<br/><span class="muted">→ 2026-06-01 18:10:00</span></td>
+          <td class="peak">70.3℃</td>
+          <td>70.3℃</td>
+          <td>中</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0075">
+              <div><b>归因结论：</b>常规温升，待人工确认</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1012
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 14 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前1.2h拍摄（紧邻异常窗口）;现场读数85.0℃，属严重过热;部位='散热风扇'，直接关联散热/发热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:7;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0076">ATTR-0076</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-B02</b></td>
+          <td>2026-06-01 18:25:00<br/><span class="muted">→ 2026-06-01 18:25:00</span></td>
+          <td class="peak">70.0℃</td>
+          <td>70.0℃</td>
+          <td>中</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0076">
+              <div><b>归因结论：</b>常规温升，待人工确认</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1012
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 14 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前1.4h拍摄（紧邻异常窗口）;现场读数85.0℃，属严重过热;部位='散热风扇'，直接关联散热/发热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:7;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0077">ATTR-0077</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-B02</b></td>
+          <td>2026-06-02 10:35:00<br/><span class="muted">→ 2026-06-02 10:35:00</span></td>
+          <td class="peak">70.1℃</td>
+          <td>70.1℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0077">
+              <div><b>归因结论：</b>关联维修照片指示部件进线端子,母线排,散热风扇,电容柜,出线开关待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1012
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 14 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前17.6h拍摄;现场读数85.0℃，属严重过热;部位='散热风扇'，直接关联散热/发热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:11;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0078">ATTR-0078</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-B02</b></td>
+          <td>2026-06-02 13:15:00<br/><span class="muted">→ 2026-06-02 13:20:00</span></td>
+          <td class="peak">71.6℃</td>
+          <td>71.2℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0078">
+              <div><b>归因结论：</b>关联维修照片指示部件出线开关,进线端子,母线排,散热风扇待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1004
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 6 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前1.2h拍摄（紧邻异常窗口）;处理意见='待备件'，说明问题未闭环;现场读数82.0℃，已过阈值</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:2;关联照片:11;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0079">ATTR-0079</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-B02</b></td>
+          <td>2026-06-02 14:30:00<br/><span class="muted">→ 2026-06-02 14:30:00</span></td>
+          <td class="peak">70.1℃</td>
+          <td>70.1℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0079">
+              <div><b>归因结论：</b>关联维修照片指示部件出线开关,进线端子,母线排,散热风扇待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1004
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 6 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前2.5h拍摄（紧邻异常窗口）;处理意见='待备件'，说明问题未闭环;现场读数82.0℃，已过阈值</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:11;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0080">ATTR-0080</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-B02</b></td>
+          <td>2026-06-03 09:55:00<br/><span class="muted">→ 2026-06-03 09:55:00</span></td>
+          <td class="peak">70.2℃</td>
+          <td>70.2℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0080">
+              <div><b>归因结论：</b>关联维修照片指示部件进线端子,母线排,散热风扇,电容柜,出线开关待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1004
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 6 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前21.9h拍摄;处理意见='待备件'，说明问题未闭环;现场读数82.0℃，已过阈值</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 11:20:00)：</b>
+                此照片拍摄于备件更换前，旧风扇已连续运行3年未维护
+            </div>
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:8;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0081">ATTR-0081</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-B02</b></td>
+          <td>2026-06-03 10:55:00<br/><span class="muted">→ 2026-06-03 10:55:00</span></td>
+          <td class="peak">70.4℃</td>
+          <td>70.4℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0081">
+              <div><b>归因结论：</b>关联维修照片指示部件进线端子,母线排,散热风扇,电容柜,出线开关待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1004
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 6 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前22.9h拍摄;处理意见='待备件'，说明问题未闭环;现场读数82.0℃，已过阈值</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 11:20:00)：</b>
+                此照片拍摄于备件更换前，旧风扇已连续运行3年未维护
+            </div>
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:8;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0082">ATTR-0082</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-B02</b></td>
+          <td>2026-06-03 18:45:00<br/><span class="muted">→ 2026-06-03 18:45:00</span></td>
+          <td class="peak">70.2℃</td>
+          <td>70.2℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0082">
+              <div><b>归因结论：</b>关联维修照片指示部件进线端子,母线排,散热风扇,电容柜,出线开关待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1018
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 20 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前4.8h拍摄（紧邻异常窗口）;现场读数70.0℃，已过阈值;部位='散热风扇'，直接关联散热/发热</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 11:20:00)：</b>
+                此照片拍摄于备件更换前，旧风扇已连续运行3年未维护
+            </div>
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:10;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0083">ATTR-0083</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-B02</b></td>
+          <td>2026-06-04 15:35:00<br/><span class="muted">→ 2026-06-04 15:40:00</span></td>
+          <td class="peak">70.3℃</td>
+          <td>70.2℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0083">
+              <div><b>归因结论：</b>关联维修照片指示部件进线端子,母线排,散热风扇,电容柜,出线开关待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2011
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 33 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前9.6h拍摄;处理意见='需更换'，说明问题未闭环;现场读数81.0℃，已过阈值;部位='电容柜'，直接关联散热/发热</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 10:15:00)：</b>
+                用户侧确认：6月2日夜间曾发生短时过负荷，当时尖峰电流约1120A
+            </div>
+              <div class="muted small">诊断参数：温度样本数:2;关联照片:7;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0084">ATTR-0084</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-B02</b></td>
+          <td>2026-06-04 16:10:00<br/><span class="muted">→ 2026-06-04 16:10:00</span></td>
+          <td class="peak">70.7℃</td>
+          <td>70.7℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0084">
+              <div><b>归因结论：</b>关联维修照片指示部件进线端子,母线排,散热风扇,电容柜,出线开关待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2011
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 33 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前10.2h拍摄;处理意见='需更换'，说明问题未闭环;现场读数81.0℃，已过阈值;部位='电容柜'，直接关联散热/发热</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 10:15:00)：</b>
+                用户侧确认：6月2日夜间曾发生短时过负荷，当时尖峰电流约1120A
+            </div>
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:8;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0085">ATTR-0085</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-B02</b></td>
+          <td>2026-06-04 18:45:00<br/><span class="muted">→ 2026-06-04 18:45:00</span></td>
+          <td class="peak">70.5℃</td>
+          <td>70.5℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0085">
+              <div><b>归因结论：</b>关联维修照片指示部件进线端子,母线排,散热风扇,电容柜,出线开关待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2011
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 33 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前12.8h拍摄;处理意见='需更换'，说明问题未闭环;现场读数81.0℃，已过阈值;部位='电容柜'，直接关联散热/发热</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 10:15:00)：</b>
+                用户侧确认：6月2日夜间曾发生短时过负荷，当时尖峰电流约1120A
+            </div>
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:8;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0086">ATTR-0086</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-B02</b></td>
+          <td>2026-06-05 09:20:00<br/><span class="muted">→ 2026-06-05 09:20:00</span></td>
+          <td class="peak">70.6℃</td>
+          <td>70.6℃</td>
+          <td>中</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0086">
+              <div><b>归因结论：</b>常规温升，待人工确认</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2014
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 36 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前5.3h拍摄（紧邻异常窗口）;现场读数85.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:3;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0087">ATTR-0087</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-B02</b></td>
+          <td>2026-06-05 18:05:00<br/><span class="muted">→ 2026-06-05 18:05:00</span></td>
+          <td class="peak">70.9℃</td>
+          <td>70.9℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0087">
+              <div><b>归因结论：</b>关联维修照片指示部件出线开关,进线端子,母线排待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2004
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 26 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前2.1h拍摄（紧邻异常窗口）;处理意见='观察运行'，问题可能延续;现场读数77.0℃，已过阈值;部位='进线端子'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:7;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0088">ATTR-0088</a></td>
+          <td><b>PDU-B02</b></td>
+          <td>2026-06-06 10:55:00<br/><span class="muted">→ 2026-06-06 10:55:00</span></td>
+          <td class="peak">70.4℃</td>
+          <td>70.4℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0088">
+              <div><b>归因结论：</b>关联维修照片指示部件出线开关,进线端子,母线排待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2002
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 24 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前3.9h拍摄（紧邻异常窗口）;处理意见='待备件'，说明问题未闭环;现场读数91.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:9;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0089">ATTR-0089</a></td>
+          <td><b>PDU-B02</b></td>
+          <td>2026-06-06 12:00:00<br/><span class="muted">→ 2026-06-06 12:00:00</span></td>
+          <td class="peak">70.0℃</td>
+          <td>70.0℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0089">
+              <div><b>归因结论：</b>关联维修照片指示部件出线开关,进线端子,母线排待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2002
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 24 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前5.0h拍摄（紧邻异常窗口）;处理意见='待备件'，说明问题未闭环;现场读数91.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:9;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0090">ATTR-0090</a></td>
+          <td><b>PDU-B02</b></td>
+          <td>2026-06-06 13:10:00<br/><span class="muted">→ 2026-06-06 13:10:00</span></td>
+          <td class="peak">70.6℃</td>
+          <td>70.6℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0090">
+              <div><b>归因结论：</b>关联维修照片指示部件出线开关,进线端子,母线排待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2002
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 24 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前6.2h拍摄;处理意见='待备件'，说明问题未闭环;现场读数91.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:9;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0091">ATTR-0091</a></td>
+          <td><b>PDU-B02</b></td>
+          <td>2026-06-06 14:00:00<br/><span class="muted">→ 2026-06-06 14:00:00</span></td>
+          <td class="peak">71.1℃</td>
+          <td>71.1℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0091">
+              <div><b>归因结论：</b>关联维修照片指示部件出线开关,进线端子,母线排待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2002
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 24 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前7.0h拍摄;处理意见='待备件'，说明问题未闭环;现场读数91.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:9;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0092">ATTR-0092</a></td>
+          <td><b>PDU-B02</b></td>
+          <td>2026-06-07 09:35:00<br/><span class="muted">→ 2026-06-07 09:35:00</span></td>
+          <td class="peak">71.4℃</td>
+          <td>71.4℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0092">
+              <div><b>归因结论：</b>关联维修照片指示部件电容柜,进线端子待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2003
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 25 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前0.6h拍摄（紧邻异常窗口）;处理意见='待备件'，说明问题未闭环;现场读数89.0℃，属严重过热;部位='电容柜'，直接关联散热/发热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:3;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0093">ATTR-0093</a></td>
+          <td><b>PDU-B02</b></td>
+          <td>2026-06-07 12:15:00<br/><span class="muted">→ 2026-06-07 12:15:00</span></td>
+          <td class="peak">70.8℃</td>
+          <td>70.8℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0093">
+              <div><b>归因结论：</b>关联维修照片指示部件电容柜,进线端子待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2003
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 25 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前3.2h拍摄（紧邻异常窗口）;处理意见='待备件'，说明问题未闭环;现场读数89.0℃，属严重过热;部位='电容柜'，直接关联散热/发热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:3;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0094">ATTR-0094</a></td>
+          <td><b>PDU-B02</b></td>
+          <td>2026-06-07 14:15:00<br/><span class="muted">→ 2026-06-07 14:15:00</span></td>
+          <td class="peak">70.4℃</td>
+          <td>70.4℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0094">
+              <div><b>归因结论：</b>关联维修照片指示部件电容柜,进线端子待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2003
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 25 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前5.2h拍摄（紧邻异常窗口）;处理意见='待备件'，说明问题未闭环;现场读数89.0℃，属严重过热;部位='电容柜'，直接关联散热/发热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:2;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0095">ATTR-0095</a></td>
+          <td><b>PDU-B02</b></td>
+          <td>2026-06-07 15:40:00<br/><span class="muted">→ 2026-06-07 15:40:00</span></td>
+          <td class="peak">70.3℃</td>
+          <td>70.3℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0095">
+              <div><b>归因结论：</b>关联维修照片指示部件电容柜,进线端子待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2003
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 25 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前6.7h拍摄;处理意见='待备件'，说明问题未闭环;现场读数89.0℃，属严重过热;部位='电容柜'，直接关联散热/发热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:2;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="">
+          <td><a href="#ATTR-0096">ATTR-0096</a></td>
+          <td><b>PDU-B02</b></td>
+          <td>2026-06-07 17:05:00<br/><span class="muted">→ 2026-06-07 17:05:00</span></td>
+          <td class="peak">70.8℃</td>
+          <td>70.8℃</td>
+          <td>中高</td>
+          <td><span class="status-tag status-已归因">已归因</span></td>
+          <td>
+            <div id="ATTR-0096">
+              <div><b>归因结论：</b>关联维修照片指示部件电容柜待更换/待备件，散热能力下降</div>
+              
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2003
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 25 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前8.1h拍摄;处理意见='待备件'，说明问题未闭环;现场读数89.0℃，属严重过热;部位='电容柜'，直接关联散热/发热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:1;晚到备件:0</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0097">ATTR-0097</a></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-01 10:50:00<br/><span class="muted">→ 2026-06-01 10:50:00</span></td>
+          <td class="peak">70.4℃</td>
+          <td>70.4℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0097">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-01 10:50:00 持续至 2026-06-01 10:50:00，峰值 70.4℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1012
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 14 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：现场读数85.0℃，属严重过热;部位='散热风扇'，直接关联散热/发热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:5;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0098">ATTR-0098</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-01 14:55:00<br/><span class="muted">→ 2026-06-01 14:55:00</span></td>
+          <td class="peak">70.2℃</td>
+          <td>70.2℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0098">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-01 14:55:00 持续至 2026-06-01 14:55:00，峰值 70.2℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1000
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 2 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前3.9h拍摄（紧邻异常窗口）;部位='电容柜'，直接关联散热/发热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:6;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0099">ATTR-0099</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-01 17:55:00<br/><span class="muted">→ 2026-06-01 17:55:00</span></td>
+          <td class="peak">70.0℃</td>
+          <td>70.0℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0099">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-01 17:55:00 持续至 2026-06-01 17:55:00，峰值 70.0℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1012
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 14 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前0.9h拍摄（紧邻异常窗口）;现场读数85.0℃，属严重过热;部位='散热风扇'，直接关联散热/发热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:7;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0100">ATTR-0100</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-02 10:20:00<br/><span class="muted">→ 2026-06-02 10:20:00</span></td>
+          <td class="peak">70.0℃</td>
+          <td>70.0℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0100">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-02 10:20:00 持续至 2026-06-02 10:20:00，峰值 70.0℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1012
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 14 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前17.3h拍摄;现场读数85.0℃，属严重过热;部位='散热风扇'，直接关联散热/发热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:11;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0101">ATTR-0101</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-02 18:15:00<br/><span class="muted">→ 2026-06-02 18:15:00</span></td>
+          <td class="peak">70.4℃</td>
+          <td>70.4℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0101">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-02 18:15:00 持续至 2026-06-02 18:15:00，峰值 70.4℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1007
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 9 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前1.2h拍摄（紧邻异常窗口）;现场读数91.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:10;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0102">ATTR-0102</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-03 14:15:00<br/><span class="muted">→ 2026-06-03 14:15:00</span></td>
+          <td class="peak">70.7℃</td>
+          <td>70.7℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0102">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-03 14:15:00 持续至 2026-06-03 14:15:00，峰值 70.7℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1018
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 20 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前0.2h拍摄（紧邻异常窗口）;现场读数70.0℃，已过阈值;部位='散热风扇'，直接关联散热/发热</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 11:20:00)：</b>
+                此照片拍摄于备件更换前，旧风扇已连续运行3年未维护
+            </div>
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:10;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0103">ATTR-0103</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-03 15:05:00<br/><span class="muted">→ 2026-06-03 15:05:00</span></td>
+          <td class="peak">70.2℃</td>
+          <td>70.2℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0103">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-03 15:05:00 持续至 2026-06-03 15:05:00，峰值 70.2℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1018
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 20 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前1.1h拍摄（紧邻异常窗口）;现场读数70.0℃，已过阈值;部位='散热风扇'，直接关联散热/发热</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 11:20:00)：</b>
+                此照片拍摄于备件更换前，旧风扇已连续运行3年未维护
+            </div>
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:10;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0104">ATTR-0104</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-03 15:55:00<br/><span class="muted">→ 2026-06-03 15:55:00</span></td>
+          <td class="peak">70.1℃</td>
+          <td>70.1℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0104">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-03 15:55:00 持续至 2026-06-03 15:55:00，峰值 70.1℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1018
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 20 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前1.9h拍摄（紧邻异常窗口）;现场读数70.0℃，已过阈值;部位='散热风扇'，直接关联散热/发热</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 11:20:00)：</b>
+                此照片拍摄于备件更换前，旧风扇已连续运行3年未维护
+            </div>
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:10;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0105">ATTR-0105</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-03 16:20:00<br/><span class="muted">→ 2026-06-03 16:20:00</span></td>
+          <td class="peak">70.7℃</td>
+          <td>70.7℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0105">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-03 16:20:00 持续至 2026-06-03 16:20:00，峰值 70.7℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-1018
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 20 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前2.3h拍摄（紧邻异常窗口）;现场读数70.0℃，已过阈值;部位='散热风扇'，直接关联散热/发热</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 11:20:00)：</b>
+                此照片拍摄于备件更换前，旧风扇已连续运行3年未维护
+            </div>
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:10;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0106">ATTR-0106</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-04 12:45:00<br/><span class="muted">→ 2026-06-04 12:45:00</span></td>
+          <td class="peak">70.3℃</td>
+          <td>70.3℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0106">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-04 12:45:00 持续至 2026-06-04 12:45:00，峰值 70.3℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2011
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 33 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前6.8h拍摄;处理意见='需更换'，说明问题未闭环;现场读数81.0℃，已过阈值;部位='电容柜'，直接关联散热/发热</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 10:15:00)：</b>
+                用户侧确认：6月2日夜间曾发生短时过负荷，当时尖峰电流约1120A
+            </div>
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:9;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0107">ATTR-0107</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-04 16:55:00<br/><span class="muted">→ 2026-06-04 16:55:00</span></td>
+          <td class="peak">70.2℃</td>
+          <td>70.2℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0107">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-04 16:55:00 持续至 2026-06-04 16:55:00，峰值 70.2℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2011
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 33 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前10.9h拍摄;处理意见='需更换'，说明问题未闭环;现场读数81.0℃，已过阈值;部位='电容柜'，直接关联散热/发热</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 10:15:00)：</b>
+                用户侧确认：6月2日夜间曾发生短时过负荷，当时尖峰电流约1120A
+            </div>
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:8;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0108">ATTR-0108</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-04 17:45:00<br/><span class="muted">→ 2026-06-04 17:45:00</span></td>
+          <td class="peak">70.7℃</td>
+          <td>70.7℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0108">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-04 17:45:00 持续至 2026-06-04 17:45:00，峰值 70.7℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2011
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 33 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前11.8h拍摄;处理意见='需更换'，说明问题未闭环;现场读数81.0℃，已过阈值;部位='电容柜'，直接关联散热/发热</span>
+            </div>
+              <div class="note-box">
+                <b>人工备注 (阿敏 @ 2026-06-04 10:15:00)：</b>
+                用户侧确认：6月2日夜间曾发生短时过负荷，当时尖峰电流约1120A
+            </div>
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:8;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0109">ATTR-0109</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-05 12:10:00<br/><span class="muted">→ 2026-06-05 12:10:00</span></td>
+          <td class="peak">71.0℃</td>
+          <td>71.0℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0109">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-05 12:10:00 持续至 2026-06-05 12:10:00，峰值 71.0℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2001
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 23 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前2.2h拍摄（紧邻异常窗口）;现场读数86.0℃，属严重过热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:3;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0110">ATTR-0110</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-05 14:40:00<br/><span class="muted">→ 2026-06-05 14:40:00</span></td>
+          <td class="peak">70.4℃</td>
+          <td>70.4℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0110">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-05 14:40:00 持续至 2026-06-05 14:40:00，峰值 70.4℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2001
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 23 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前4.7h拍摄（紧邻异常窗口）;现场读数86.0℃，属严重过热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:3;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0111">ATTR-0111</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-05 18:40:00<br/><span class="muted">→ 2026-06-05 18:40:00</span></td>
+          <td class="peak">70.3℃</td>
+          <td>70.3℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0111">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-05 18:40:00 持续至 2026-06-05 18:40:00，峰值 70.3℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2004
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 26 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前2.7h拍摄（紧邻异常窗口）;处理意见='观察运行'，问题可能延续;现场读数77.0℃，已过阈值;部位='进线端子'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:7;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0112">ATTR-0112</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-06 02:05:00<br/><span class="muted">→ 2026-06-06 02:05:00</span></td>
+          <td class="peak">70.1℃</td>
+          <td>70.1℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0112">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-06 02:05:00 持续至 2026-06-06 02:05:00，峰值 70.1℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2002
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 24 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：处理意见='待备件'，说明问题未闭环;现场读数91.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:10;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0113">ATTR-0113</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-06 02:15:00<br/><span class="muted">→ 2026-06-06 02:15:00</span></td>
+          <td class="peak">70.6℃</td>
+          <td>70.6℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0113">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-06 02:15:00 持续至 2026-06-06 02:15:00，峰值 70.6℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2002
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 24 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：处理意见='待备件'，说明问题未闭环;现场读数91.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:10;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0114">ATTR-0114</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-06 02:25:00<br/><span class="muted">→ 2026-06-06 02:25:00</span></td>
+          <td class="peak">71.0℃</td>
+          <td>71.0℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0114">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-06 02:25:00 持续至 2026-06-06 02:25:00，峰值 71.0℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2002
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 24 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：处理意见='待备件'，说明问题未闭环;现场读数91.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:10;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0115">ATTR-0115</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-06 03:10:00<br/><span class="muted">→ 2026-06-06 03:10:00</span></td>
+          <td class="peak">71.7℃</td>
+          <td>71.7℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0115">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-06 03:10:00 持续至 2026-06-06 03:10:00，峰值 71.7℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2002
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 24 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：处理意见='待备件'，说明问题未闭环;现场读数91.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:10;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0116">ATTR-0116</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-06 03:25:00<br/><span class="muted">→ 2026-06-06 03:25:00</span></td>
+          <td class="peak">70.2℃</td>
+          <td>70.2℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0116">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-06 03:25:00 持续至 2026-06-06 03:25:00，峰值 70.2℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2002
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 24 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：处理意见='待备件'，说明问题未闭环;现场读数91.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:10;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0117">ATTR-0117</a></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-06 04:40:00<br/><span class="muted">→ 2026-06-06 04:40:00</span></td>
+          <td class="peak">71.2℃</td>
+          <td>71.2℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0117">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-06 04:40:00 持续至 2026-06-06 04:40:00，峰值 71.2℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2007
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 29 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前0.7h拍摄（紧邻异常窗口）;处理意见='需更换'，说明问题未闭环;现场读数86.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:9;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0118">ATTR-0118</a></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-06 04:50:00<br/><span class="muted">→ 2026-06-06 04:55:00</span></td>
+          <td class="peak">73.1℃</td>
+          <td>72.3℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0118">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-06 04:50:00 持续至 2026-06-06 04:55:00，峰值 73.1℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2007
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 29 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前0.8h拍摄（紧邻异常窗口）;处理意见='需更换'，说明问题未闭环;现场读数86.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:2;关联照片:9;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0119">ATTR-0119</a></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-06 05:15:00<br/><span class="muted">→ 2026-06-06 05:20:00</span></td>
+          <td class="peak">71.0℃</td>
+          <td>70.8℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0119">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-06 05:15:00 持续至 2026-06-06 05:20:00，峰值 71.0℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2007
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 29 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前1.2h拍摄（紧邻异常窗口）;处理意见='需更换'，说明问题未闭环;现场读数86.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:2;关联照片:10;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0120">ATTR-0120</a></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-06 05:55:00<br/><span class="muted">→ 2026-06-06 05:55:00</span></td>
+          <td class="peak">70.5℃</td>
+          <td>70.5℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0120">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-06 05:55:00 持续至 2026-06-06 05:55:00，峰值 70.5℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2007
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 29 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前1.9h拍摄（紧邻异常窗口）;处理意见='需更换'，说明问题未闭环;现场读数86.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:10;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0121">ATTR-0121</a></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-06 06:05:00<br/><span class="muted">→ 2026-06-06 06:15:00</span></td>
+          <td class="peak">70.9℃</td>
+          <td>70.5℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0121">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-06 06:05:00 持续至 2026-06-06 06:15:00，峰值 70.9℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2007
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 29 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前2.1h拍摄（紧邻异常窗口）;处理意见='需更换'，说明问题未闭环;现场读数86.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:3;关联照片:10;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0122">ATTR-0122</a></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-06 06:25:00<br/><span class="muted">→ 2026-06-06 06:25:00</span></td>
+          <td class="peak">71.1℃</td>
+          <td>71.1℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0122">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-06 06:25:00 持续至 2026-06-06 06:25:00，峰值 71.1℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2007
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 29 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前2.4h拍摄（紧邻异常窗口）;处理意见='需更换'，说明问题未闭环;现场读数86.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:10;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0123">ATTR-0123</a></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-06 06:35:00<br/><span class="muted">→ 2026-06-06 06:35:00</span></td>
+          <td class="peak">72.2℃</td>
+          <td>72.2℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0123">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-06 06:35:00 持续至 2026-06-06 06:35:00，峰值 72.2℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2007
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 29 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前2.6h拍摄（紧邻异常窗口）;处理意见='需更换'，说明问题未闭环;现场读数86.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:10;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0124">ATTR-0124</a></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-06 06:55:00<br/><span class="muted">→ 2026-06-06 06:55:00</span></td>
+          <td class="peak">72.7℃</td>
+          <td>72.7℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0124">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-06 06:55:00 持续至 2026-06-06 06:55:00，峰值 72.7℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2007
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 29 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前2.9h拍摄（紧邻异常窗口）;处理意见='需更换'，说明问题未闭环;现场读数86.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:10;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0125">ATTR-0125</a></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-06 09:00:00<br/><span class="muted">→ 2026-06-06 18:55:00</span></td>
+          <td class="peak">93.1℃</td>
+          <td>81.1℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0125">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-06 09:00:00 持续至 2026-06-06 18:55:00，峰值 93.1℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2002
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 24 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前2.0h拍摄（紧邻异常窗口）;处理意见='待备件'，说明问题未闭环;现场读数91.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:120;关联照片:10;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0126">ATTR-0126</a></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-06 19:15:00<br/><span class="muted">→ 2026-06-06 19:15:00</span></td>
+          <td class="peak">70.0℃</td>
+          <td>70.0℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0126">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-06 19:15:00 持续至 2026-06-06 19:15:00，峰值 70.0℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2002
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 24 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前12.2h拍摄;处理意见='待备件'，说明问题未闭环;现场读数91.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:8;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0127">ATTR-0127</a></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-06 19:35:00<br/><span class="muted">→ 2026-06-06 19:35:00</span></td>
+          <td class="peak">71.0℃</td>
+          <td>71.0℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0127">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-06 19:35:00 持续至 2026-06-06 19:35:00，峰值 71.0℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2002
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 24 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前12.6h拍摄;处理意见='待备件'，说明问题未闭环;现场读数91.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:8;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0128">ATTR-0128</a></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-06 20:10:00<br/><span class="muted">→ 2026-06-06 20:15:00</span></td>
+          <td class="peak">71.4℃</td>
+          <td>71.2℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0128">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-06 20:10:00 持续至 2026-06-06 20:15:00，峰值 71.4℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2002
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 24 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前13.2h拍摄;处理意见='待备件'，说明问题未闭环;现场读数91.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:2;关联照片:8;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0129">ATTR-0129</a></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-06 21:00:00<br/><span class="muted">→ 2026-06-06 21:00:00</span></td>
+          <td class="peak">72.6℃</td>
+          <td>72.6℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0129">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-06 21:00:00 持续至 2026-06-06 21:00:00，峰值 72.6℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2002
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 24 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前14.0h拍摄;处理意见='待备件'，说明问题未闭环;现场读数91.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:9;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0130">ATTR-0130</a></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-06 23:30:00<br/><span class="muted">→ 2026-06-06 23:30:00</span></td>
+          <td class="peak">71.2℃</td>
+          <td>71.2℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0130">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-06 23:30:00 持续至 2026-06-06 23:30:00，峰值 71.2℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2002
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 24 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前16.5h拍摄;处理意见='待备件'，说明问题未闭环;现场读数91.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:9;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0131">ATTR-0131</a></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-07 00:45:00<br/><span class="muted">→ 2026-06-07 00:50:00</span></td>
+          <td class="peak">72.3℃</td>
+          <td>71.3℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0131">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-07 00:45:00 持续至 2026-06-07 00:50:00，峰值 72.3℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2002
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 24 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前17.8h拍摄;处理意见='待备件'，说明问题未闭环;现场读数91.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:2;关联照片:9;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0132">ATTR-0132</a></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-07 01:20:00<br/><span class="muted">→ 2026-06-07 01:25:00</span></td>
+          <td class="peak">70.4℃</td>
+          <td>70.3℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0132">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-07 01:20:00 持续至 2026-06-07 01:25:00，峰值 70.4℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2002
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 24 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前18.3h拍摄;处理意见='待备件'，说明问题未闭环;现场读数91.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:2;关联照片:9;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0133">ATTR-0133</a></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-07 02:05:00<br/><span class="muted">→ 2026-06-07 02:05:00</span></td>
+          <td class="peak">70.9℃</td>
+          <td>70.9℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0133">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-07 02:05:00 持续至 2026-06-07 02:05:00，峰值 70.9℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2002
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 24 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前19.1h拍摄;处理意见='待备件'，说明问题未闭环;现场读数91.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:9;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0134">ATTR-0134</a></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-07 02:20:00<br/><span class="muted">→ 2026-06-07 02:30:00</span></td>
+          <td class="peak">72.3℃</td>
+          <td>71.2℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0134">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-07 02:20:00 持续至 2026-06-07 02:30:00，峰值 72.3℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2002
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 24 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前19.3h拍摄;处理意见='待备件'，说明问题未闭环;现场读数91.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:3;关联照片:9;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0135">ATTR-0135</a></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-07 02:40:00<br/><span class="muted">→ 2026-06-07 02:40:00</span></td>
+          <td class="peak">71.8℃</td>
+          <td>71.8℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0135">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-07 02:40:00 持续至 2026-06-07 02:40:00，峰值 71.8℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2002
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 24 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前19.7h拍摄;处理意见='待备件'，说明问题未闭环;现场读数91.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:9;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0136">ATTR-0136</a></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-07 02:50:00<br/><span class="muted">→ 2026-06-07 02:50:00</span></td>
+          <td class="peak">72.1℃</td>
+          <td>72.1℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0136">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-07 02:50:00 持续至 2026-06-07 02:50:00，峰值 72.1℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2002
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 24 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前19.8h拍摄;处理意见='待备件'，说明问题未闭环;现场读数91.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:9;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0137">ATTR-0137</a></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-07 03:20:00<br/><span class="muted">→ 2026-06-07 03:20:00</span></td>
+          <td class="peak">70.0℃</td>
+          <td>70.0℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0137">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-07 03:20:00 持续至 2026-06-07 03:20:00，峰值 70.0℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2002
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 24 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前20.3h拍摄;处理意见='待备件'，说明问题未闭环;现场读数91.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:8;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0138">ATTR-0138</a></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-07 03:35:00<br/><span class="muted">→ 2026-06-07 03:35:00</span></td>
+          <td class="peak">71.8℃</td>
+          <td>71.8℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0138">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-07 03:35:00 持续至 2026-06-07 03:35:00，峰值 71.8℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2002
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 24 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前20.6h拍摄;处理意见='待备件'，说明问题未闭环;现场读数91.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:8;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0139">ATTR-0139</a></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-07 04:10:00<br/><span class="muted">→ 2026-06-07 04:15:00</span></td>
+          <td class="peak">72.3℃</td>
+          <td>72.2℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0139">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-07 04:10:00 持续至 2026-06-07 04:15:00，峰值 72.3℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2002
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 24 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前21.2h拍摄;处理意见='待备件'，说明问题未闭环;现场读数91.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:2;关联照片:7;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0140">ATTR-0140</a></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-07 04:35:00<br/><span class="muted">→ 2026-06-07 04:40:00</span></td>
+          <td class="peak">70.9℃</td>
+          <td>70.8℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0140">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-07 04:35:00 持续至 2026-06-07 04:40:00，峰值 70.9℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2002
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 24 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前21.6h拍摄;处理意见='待备件'，说明问题未闭环;现场读数91.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:2;关联照片:7;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0141">ATTR-0141</a></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-07 06:20:00<br/><span class="muted">→ 2026-06-07 06:20:00</span></td>
+          <td class="peak">71.7℃</td>
+          <td>71.7℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0141">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-07 06:20:00 持续至 2026-06-07 06:20:00，峰值 71.7℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2002
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 24 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前23.3h拍摄;处理意见='待备件'，说明问题未闭环;现场读数91.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:5;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0142">ATTR-0142</a></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-07 06:40:00<br/><span class="muted">→ 2026-06-07 06:40:00</span></td>
+          <td class="peak">70.2℃</td>
+          <td>70.2℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0142">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-07 06:40:00 持续至 2026-06-07 06:40:00，峰值 70.2℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2002
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 24 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前23.7h拍摄;处理意见='待备件'，说明问题未闭环;现场读数91.0℃，属严重过热;部位='母线排'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:5;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0143">ATTR-0143</a></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-07 09:00:00<br/><span class="muted">→ 2026-06-07 11:55:00</span></td>
+          <td class="peak">92.5℃</td>
+          <td>83.5℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0143">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-07 09:00:00 持续至 2026-06-07 11:55:00，峰值 92.5℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2003
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 25 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前0.0h拍摄（紧邻异常窗口）;处理意见='待备件'，说明问题未闭环;现场读数89.0℃，属严重过热;部位='电容柜'，直接关联散热/发热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:36;关联照片:4;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0144">ATTR-0144</a></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-07 13:00:00<br/><span class="muted">→ 2026-06-07 13:00:00</span></td>
+          <td class="peak">70.0℃</td>
+          <td>70.0℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0144">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-07 13:00:00 持续至 2026-06-07 13:00:00，峰值 70.0℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2003
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 25 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前4.0h拍摄（紧邻异常窗口）;处理意见='待备件'，说明问题未闭环;现场读数89.0℃，属严重过热;部位='电容柜'，直接关联散热/发热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:3;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="late-row">
+          <td><a href="#ATTR-0145">ATTR-0145</a></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-07 14:50:00<br/><span class="muted">→ 2026-06-07 14:50:00</span></td>
+          <td class="peak">70.9℃</td>
+          <td>70.9℃</td>
+          <td>高</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0145">
+              <div><b>归因结论：</b>补偿电容组(编号SP-CAP-003)到货晚于计划停机窗口27.5小时，导致窗口内无法更换，异常持续存在</div>
+              <div class="impact-box">
+                <b>晚到备件如何影响结论：</b><br/>
+                【关键链路】计划停机窗口 2026-06-06 00:00-06:00 内应更换 补偿电容组，但实际到货 2026-06-07 09:30:00（晚到27.5h，原因：厂家产能紧张）。→ 停机窗口期未能执行更换 → 设备带病运行 → 异常从 2026-06-07 14:50:00 持续至 2026-06-07 14:50:00，峰值 70.9℃。若按时到货并更换，预计可在窗口内消除异常并降低后续至少 12h 的温升风险。
+            </div>
+              
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2003
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 25 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前5.8h拍摄（紧邻异常窗口）;处理意见='待备件'，说明问题未闭环;现场读数89.0℃，属严重过热;部位='电容柜'，直接关联散热/发热</span>
+            </div>
+              
+              <div class="muted small">诊断参数：温度样本数:1;关联照片:2;晚到备件:1</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="gap-row">
+          <td><a href="#ATTR-0146">ATTR-0146</a><span class="badge-note">有备注</span></td>
+          <td><b>PDU-C01</b></td>
+          <td>2026-06-05 21:55:00<br/><span class="muted">→ 2026-06-06 02:00:00</span></td>
+          <td class="peak">64.0℃</td>
+          <td>55.5℃</td>
+          <td>低（数据缺失）</td>
+          <td><span class="status-tag status-异常处理">异常处理</span></td>
+          <td>
+            <div id="ATTR-0146">
+              <div><b>归因结论：</b>采样断档（245.0分钟）：该时段无温度数据，无法判断是否发生温升，按异常处理</div>
+              
+              <div class="gap-box">
+                ⚠️ <b>采样断档，已标为异常处理（未默默放行）：</b>
+                独立断档条目：2026-06-05 21:55:00~2026-06-06 02:00:00，持续245.0分钟；断档前温度47.1℃→断档后64.0℃
+            </div>
+              <div class="skew-box">
+                <b>拖偏结论的照片：</b>PHT-2026-2004
+                → 在 <code>normalized_photos.csv</code> 的
+                <b>第 26 行</b>
+                <span class="muted">（可打开CSV直接跳转核对）</span><br/>
+                <span class="muted">影响原因：异常发生前5.9h拍摄（紧邻异常窗口）;处理意见='观察运行'，问题可能延续;现场读数77.0℃，已过阈值;部位='进线端子'，属传导过热关联</span>
+            </div>
+              
+              <div class="muted small">诊断参数：本行为独立生成的断档条目；断档前温度47.1℃ 断档后64.0℃</div>
+            </div>
+          </td>
+        </tr></tbody>
+</table>
+
+<h2>③ 照片来源与处理状态（字段名不一致已合并，保住来源/状态）</h2>
+<p>算法值班人交来的两批照片字段名不同（一批中文字段、一批英文字段），已合并到统一结构，
+<b>source字段和process_status字段始终保留</b>。</p>
+<table style="max-width:420px; display:inline-block; margin-right:20px;">
+  <thead><tr><th>来源系统</th><th>条数</th></tr></thead>
+  <tbody><tr><td>班组巡检App-v1</td><td>20</td></tr><tr><td>算法巡检系统-v2</td><td>15</td></tr></tbody>
+</table>
+<table style="max-width:420px; display:inline-block;">
+  <thead><tr><th>处理状态</th><th>条数</th></tr></thead>
+  <tbody><tr><td>pending</td><td>35</td></tr></tbody>
+</table>
+
+<h2>④ 相关CSV文件（阿敏自核）</h2>
+<details open>
+<summary>📂 点击展开文件清单与说明</summary>
+<ul>
+  <li><code>output/attribution_with_notes.csv</code> — 归因结果 + 人工备注合并版（主交付件）</li>
+  <li><code>output/normalized_photos.csv</code> — 维修照片标准化后（两批字段名已合并，保留来源/状态）</li>
+  <li><code>output/skew_trace.csv</code> — 偏差追溯表：每条归因对应"拖偏"的照片行号</li>
+  <li><code>output/attribution_result.csv</code> — 归因结果原始版（无备注）</li>
+  <li><code>data/temperature_sampling.csv</code> — 温度采样原始数据（可按配电柜+日期筛）</li>
+  <li><code>data/spare_parts.csv</code> — 备件到货记录</li>
+  <li><code>data/manual_notes.csv</code> — 人工备注源（重复导入不覆盖）</li>
+</ul>
+</details>
+
+<hr/>
+<p class="muted small">本报告所有数据均来自CSV，可审计。重复导入结果不翻倍，人工备注不被清除。
+采样断档均已标记为"异常处理"，未静默放行。</p>
+
+</body>
+</html>
