@@ -115,7 +115,7 @@ router.post('/calculate', async (req: express.Request, res: express.Response): P
     const results = paramRecords.map(paramRecord => {
       const exampleRecord = exampleRecords.find(e => e.productId === paramRecord.productId);
       const conflict = resolvedConflicts.find(c => c.productId === paramRecord.productId);
-      return generateForecast(paramRecord, exampleRecord, conflict?.resolution || undefined);
+      return generateForecast(paramRecord, exampleRecord, conflict || undefined);
     });
     await storage.saveForecastResults(results);
     const workflowState = await storage.getWorkflowState();

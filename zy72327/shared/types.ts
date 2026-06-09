@@ -23,6 +23,75 @@ export interface ParameterRecord {
   createdAt: string;
 }
 
+export interface MixedFormatInfo {
+  rawAlpha: string;
+  rawBeta: string;
+  rawGamma: string;
+  parsedAlpha: number;
+  parsedBeta: number;
+  parsedGamma: number;
+  hasPercentage: boolean[];
+  originalDescription: string;
+  normalizedDescription: string;
+  needManualReview: boolean;
+  nextOwner: string;
+}
+
+export interface ConflictDecisionInfo {
+  conflictId: string;
+  resolution: 'accept_example' | 'reject_example';
+  parameterValue: number;
+  exampleValue: number;
+  diffPercentage: number;
+  evidence: string;
+  resolutionReason: string;
+  resolvedBy: string;
+  resolvedAt: string;
+  originalStatement: string;
+  updatedValue: number;
+  changeReason: string;
+  nextOwner: string;
+}
+
+export interface ReviewChainEntry {
+  stage: 'import_detected' | 'conflict_resolved' | 'calculation_completed' | 'owner_reviewed';
+  action: string;
+  originalValue?: string;
+  updatedValue?: string;
+  reason?: string;
+  operator?: string;
+  nextOwner?: string;
+  timestamp: string;
+}
+
+export interface ForecastResult {
+  id: string;
+  productId: string;
+  productName: string;
+  parameterVersion: string;
+  calculationDetail: string;
+  tradeoffReason: string;
+  forecastValue: number;
+  rawValue: number | string;
+  valueFormat: 'decimal' | 'percentage' | 'mixed';
+  isMixedFormat: boolean;
+  reviewStatus: 'pending_review' | 'reviewed' | 'normal';
+  reviewedBy: string | null;
+  reviewedAt: string | null;
+  createdAt: string;
+  historicalData: number[];
+  smoothedData: number[];
+  rawAlpha: string;
+  rawBeta: string;
+  rawGamma: string;
+  parsedAlpha: number;
+  parsedBeta: number;
+  parsedGamma: number;
+  mixedFormatInfo: MixedFormatInfo | null;
+  conflictDecision: ConflictDecisionInfo | null;
+  reviewChain: ReviewChainEntry[];
+}
+
 export interface CounterExample {
   id: string;
   batch: string;
