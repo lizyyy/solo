@@ -1,0 +1,28 @@
+[
+  {
+    "handover_id": "HO-20260609185127",
+    "date": "2026-06-09",
+    "from_shift": "早班",
+    "from_operator": "小宋",
+    "to_shift": "中班",
+    "to_operator": "小王",
+    "handover_time": "2026-06-09T18:51:27",
+    "summary": "3# 管廊 09:20 压力突升至 1.8MPa，已手动减压至 1.2MPa；WO-2026-00013 第 6 行与 WO-2026-00014 第 8 行采样记录断档，需中班补录；WO-2026-00016 第 12 行复核人复核备注写入。",
+    "changed_line_nos": [
+      6,
+      7,
+      12
+    ],
+    "remarks": [
+      {
+        "remark_id": "RMK-b5d3cd51",
+        "author": "小宋",
+        "shift": "早班",
+        "created_at": "2026-06-09T18:51:27",
+        "content": "复核人：第 12 行现场温度计显示 23.5℃，低于阈值 0.5℃，已在 DCS 记录备查。",
+        "attached_to_line_no": 12,
+        "remark_type": "交接后补备注"
+      }
+    ]
+  }
+]
