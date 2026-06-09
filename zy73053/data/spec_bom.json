@@ -1,0 +1,35 @@
+{
+  "crane_id": "TC-003",
+  "effective_from": "2025-01-01",
+  "parts_spec": [
+    {
+      "name": "齿轮油",
+      "approved_models": ["Mobil SHC 630", "Shell Omala S4 GX 220"],
+      "tolerance_note": "粘度等级ISO VG 220"
+    },
+    {
+      "name": "主卷扬机密封圈",
+      "approved_models": ["TC-O-RING-45×3.5-NBR", "TC-O-RING-45×3.5-FKM"],
+      "tolerance_note": "内径必须为45mm，±0.2mm；线径3.5mm；材质丁腈或氟橡胶均可",
+      "cross_section_mm": 3.5,
+      "inner_dia_mm": 45.0,
+      "inner_dia_tolerance_mm": 0.2
+    },
+    {
+      "name": "回转支撑黄油嘴",
+      "approved_models": ["ZERK-M10×1", "ZERK-M10×1.5"],
+      "tolerance_note": "公制粗牙M10"
+    }
+  ],
+  "sensor_thresholds": {
+    "SNS-A-WINCH": {
+      "temp_C": {"warning": 55.0, "alarm": 60.0},
+      "vibration_mm_s": {"warning": 1.5, "alarm": 2.0},
+      "pressure_MPa": {"warning_low": 13.0, "alarm_low": 12.5}
+    },
+    "SNS-B-SLEW": {
+      "temp_C": {"warning": 45.0, "alarm": 50.0},
+      "vibration_mm_s": {"warning": 1.5, "alarm": 2.0}
+    }
+  }
+}

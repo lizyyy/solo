@@ -1,0 +1,50 @@
+{
+  "report_id": "WR-TC003-20260608-001",
+  "crane_id": "TC-003",
+  "crane_name": "三号塔吊",
+  "work_date": "2026-06-08",
+  "shift": "day",
+  "operator": "王建国",
+  "maintenance_person": "李志强",
+  "reviewer": "唐安全（待复核）",
+  "summary": "今日完成例行维保，更换主卷扬机齿轮油，检查回转支撑。作业过程中14:50左右出现一次重载，温度偏高，已记录。",
+  "parts_replaced": [
+    {
+      "name": "齿轮油",
+      "model_claimed": "Mobil SHC 630",
+      "model_actual": "Mobil SHC 630",
+      "quantity": 18,
+      "unit": "L",
+      "is_replacement_consistent": true
+    },
+    {
+      "name": "主卷扬机密封圈",
+      "model_claimed": "TC-O-RING-45×3.5-NBR",
+      "model_actual": "TC-O-RING-42×3.5-NBR",
+      "quantity": 2,
+      "unit": "个",
+      "is_replacement_consistent": false,
+      "note": "仓库无45型号，临时用42顶替"
+    },
+    {
+      "name": "回转支撑黄油嘴",
+      "model_claimed": "ZERK-M10×1",
+      "model_actual": "ZERK-M10×1",
+      "quantity": 4,
+      "unit": "个",
+      "is_replacement_consistent": true
+    }
+  ],
+  "sensor_refs": [
+    "sensor_20260608_A.log",
+    "sensor_20260608_B.log"
+  ],
+  "boundary_events_claimed": [
+    {
+      "event_id": "EVT-001",
+      "time": "2026-06-08T14:50:33",
+      "description": "重载吊装作业（9.8t），温度和振动达到告警阈值，后自行回落",
+      "conclusion_claimed": "正常现象，无需额外处理"
+    }
+  ]
+}

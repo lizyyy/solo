@@ -1,0 +1,453 @@
+{
+  "report_id": "WR-TC003-20260608-001",
+  "run_id": "RUN-WR-TC003-20260608-001-20260609-183936",
+  "run_time": "2026-06-09 18:39:36",
+  "review_status": "BLOCKED",
+  "part_checks": [
+    {
+      "part_name": "齿轮油",
+      "model_claimed": "Mobil SHC 630",
+      "model_actual": "Mobil SHC 630",
+      "is_consistent": true,
+      "approved_models": [
+        "Mobil SHC 630",
+        "Shell Omala S4 GX 220"
+      ],
+      "issue": "",
+      "blocking_step": "",
+      "tolerance_note": "粘度等级ISO VG 220",
+      "blocked": false
+    },
+    {
+      "part_name": "主卷扬机密封圈",
+      "model_claimed": "TC-O-RING-45×3.5-NBR",
+      "model_actual": "TC-O-RING-42×3.5-NBR",
+      "is_consistent": false,
+      "approved_models": [
+        "TC-O-RING-45×3.5-NBR",
+        "TC-O-RING-45×3.5-FKM"
+      ],
+      "issue": "实际领用 TC-O-RING-42×3.5-NBR 与报单 TC-O-RING-45×3.5-NBR 不一致，且尺寸公差/型号不在可替代范围",
+      "blocking_step": "【步骤2】备件实际领用型号与报单一致性校验（含公差比对）",
+      "tolerance_note": "内径必须为45mm，±0.2mm；线径3.5mm；材质丁腈或氟橡胶均可",
+      "blocked": true
+    },
+    {
+      "part_name": "回转支撑黄油嘴",
+      "model_claimed": "ZERK-M10×1",
+      "model_actual": "ZERK-M10×1",
+      "is_consistent": true,
+      "approved_models": [
+        "ZERK-M10×1",
+        "ZERK-M10×1.5"
+      ],
+      "issue": "",
+      "blocking_step": "",
+      "tolerance_note": "公制粗牙M10",
+      "blocked": false
+    }
+  ],
+  "sensor_breaches": [
+    {
+      "sensor_id": "SNS-A-WINCH",
+      "metric": "vibration_mm_s",
+      "value": 1.68,
+      "threshold_type": "warning",
+      "threshold_value": 1.5,
+      "severity": "警告",
+      "source": {
+        "file": "sensor_20260608_A.log",
+        "line_no": 5,
+        "ts": "2026-06-08T10:20:18",
+        "detail": "vibration_mm_s=1.68"
+      },
+      "load_at_breach": 8.5
+    },
+    {
+      "sensor_id": "SNS-A-WINCH",
+      "metric": "temp_C",
+      "value": 62.1,
+      "threshold_type": "warning",
+      "threshold_value": 55.0,
+      "severity": "警告",
+      "source": {
+        "file": "sensor_20260608_A.log",
+        "line_no": 9,
+        "ts": "2026-06-08T14:50:33",
+        "detail": "temp_C=62.1"
+      },
+      "load_at_breach": 9.8
+    },
+    {
+      "sensor_id": "SNS-A-WINCH",
+      "metric": "temp_C",
+      "value": 62.1,
+      "threshold_type": "alarm",
+      "threshold_value": 60.0,
+      "severity": "严重",
+      "source": {
+        "file": "sensor_20260608_A.log",
+        "line_no": 9,
+        "ts": "2026-06-08T14:50:33",
+        "detail": "temp_C=62.1"
+      },
+      "load_at_breach": 9.8
+    },
+    {
+      "sensor_id": "SNS-A-WINCH",
+      "metric": "vibration_mm_s",
+      "value": 2.18,
+      "threshold_type": "warning",
+      "threshold_value": 1.5,
+      "severity": "警告",
+      "source": {
+        "file": "sensor_20260608_A.log",
+        "line_no": 9,
+        "ts": "2026-06-08T14:50:33",
+        "detail": "vibration_mm_s=2.18"
+      },
+      "load_at_breach": 9.8
+    },
+    {
+      "sensor_id": "SNS-A-WINCH",
+      "metric": "vibration_mm_s",
+      "value": 2.18,
+      "threshold_type": "alarm",
+      "threshold_value": 2.0,
+      "severity": "严重",
+      "source": {
+        "file": "sensor_20260608_A.log",
+        "line_no": 9,
+        "ts": "2026-06-08T14:50:33",
+        "detail": "vibration_mm_s=2.18"
+      },
+      "load_at_breach": 9.8
+    },
+    {
+      "sensor_id": "SNS-A-WINCH",
+      "metric": "pressure_MPa",
+      "value": 12.3,
+      "threshold_type": "warning_low",
+      "threshold_value": 13.0,
+      "severity": "警告",
+      "source": {
+        "file": "sensor_20260608_A.log",
+        "line_no": 9,
+        "ts": "2026-06-08T14:50:33",
+        "detail": "pressure_MPa=12.3"
+      },
+      "load_at_breach": 9.8
+    },
+    {
+      "sensor_id": "SNS-A-WINCH",
+      "metric": "pressure_MPa",
+      "value": 12.3,
+      "threshold_type": "alarm_low",
+      "threshold_value": 12.5,
+      "severity": "严重",
+      "source": {
+        "file": "sensor_20260608_A.log",
+        "line_no": 9,
+        "ts": "2026-06-08T14:50:33",
+        "detail": "pressure_MPa=12.3"
+      },
+      "load_at_breach": 9.8
+    },
+    {
+      "sensor_id": "SNS-A-WINCH",
+      "metric": "temp_C",
+      "value": 58.4,
+      "threshold_type": "warning",
+      "threshold_value": 55.0,
+      "severity": "警告",
+      "source": {
+        "file": "sensor_20260608_A.log",
+        "line_no": 10,
+        "ts": "2026-06-08T15:30:47",
+        "detail": "temp_C=58.4"
+      },
+      "load_at_breach": 8.2
+    },
+    {
+      "sensor_id": "SNS-A-WINCH",
+      "metric": "vibration_mm_s",
+      "value": 1.92,
+      "threshold_type": "warning",
+      "threshold_value": 1.5,
+      "severity": "警告",
+      "source": {
+        "file": "sensor_20260608_A.log",
+        "line_no": 10,
+        "ts": "2026-06-08T15:30:47",
+        "detail": "vibration_mm_s=1.92"
+      },
+      "load_at_breach": 8.2
+    },
+    {
+      "sensor_id": "SNS-A-WINCH",
+      "metric": "pressure_MPa",
+      "value": 12.7,
+      "threshold_type": "warning_low",
+      "threshold_value": 13.0,
+      "severity": "警告",
+      "source": {
+        "file": "sensor_20260608_A.log",
+        "line_no": 10,
+        "ts": "2026-06-08T15:30:47",
+        "detail": "pressure_MPa=12.7"
+      },
+      "load_at_breach": 8.2
+    },
+    {
+      "sensor_id": "SNS-A-WINCH",
+      "metric": "temp_C",
+      "value": 55.7,
+      "threshold_type": "warning",
+      "threshold_value": 55.0,
+      "severity": "警告",
+      "source": {
+        "file": "sensor_20260608_A.log",
+        "line_no": 11,
+        "ts": "2026-06-08T16:00:21",
+        "detail": "temp_C=55.7"
+      },
+      "load_at_breach": 7.0
+    },
+    {
+      "sensor_id": "SNS-A-WINCH",
+      "metric": "vibration_mm_s",
+      "value": 1.65,
+      "threshold_type": "warning",
+      "threshold_value": 1.5,
+      "severity": "警告",
+      "source": {
+        "file": "sensor_20260608_A.log",
+        "line_no": 11,
+        "ts": "2026-06-08T16:00:21",
+        "detail": "vibration_mm_s=1.65"
+      },
+      "load_at_breach": 7.0
+    },
+    {
+      "sensor_id": "SNS-B-SLEW",
+      "metric": "temp_C",
+      "value": 48.6,
+      "threshold_type": "warning",
+      "threshold_value": 45.0,
+      "severity": "警告",
+      "source": {
+        "file": "sensor_20260608_B.log",
+        "line_no": 7,
+        "ts": "2026-06-08T14:25:36",
+        "detail": "temp_C=48.6"
+      },
+      "load_at_breach": 4.5
+    },
+    {
+      "sensor_id": "SNS-B-SLEW",
+      "metric": "vibration_mm_s",
+      "value": 1.85,
+      "threshold_type": "warning",
+      "threshold_value": 1.5,
+      "severity": "警告",
+      "source": {
+        "file": "sensor_20260608_B.log",
+        "line_no": 7,
+        "ts": "2026-06-08T14:25:36",
+        "detail": "vibration_mm_s=1.85"
+      },
+      "load_at_breach": 4.5
+    },
+    {
+      "sensor_id": "SNS-B-SLEW",
+      "metric": "temp_C",
+      "value": 50.2,
+      "threshold_type": "warning",
+      "threshold_value": 45.0,
+      "severity": "警告",
+      "source": {
+        "file": "sensor_20260608_B.log",
+        "line_no": 8,
+        "ts": "2026-06-08T15:05:11",
+        "detail": "temp_C=50.2"
+      },
+      "load_at_breach": 5.1
+    },
+    {
+      "sensor_id": "SNS-B-SLEW",
+      "metric": "temp_C",
+      "value": 50.2,
+      "threshold_type": "alarm",
+      "threshold_value": 50.0,
+      "severity": "严重",
+      "source": {
+        "file": "sensor_20260608_B.log",
+        "line_no": 8,
+        "ts": "2026-06-08T15:05:11",
+        "detail": "temp_C=50.2"
+      },
+      "load_at_breach": 5.1
+    },
+    {
+      "sensor_id": "SNS-B-SLEW",
+      "metric": "vibration_mm_s",
+      "value": 2.03,
+      "threshold_type": "warning",
+      "threshold_value": 1.5,
+      "severity": "警告",
+      "source": {
+        "file": "sensor_20260608_B.log",
+        "line_no": 8,
+        "ts": "2026-06-08T15:05:11",
+        "detail": "vibration_mm_s=2.03"
+      },
+      "load_at_breach": 5.1
+    },
+    {
+      "sensor_id": "SNS-B-SLEW",
+      "metric": "vibration_mm_s",
+      "value": 2.03,
+      "threshold_type": "alarm",
+      "threshold_value": 2.0,
+      "severity": "严重",
+      "source": {
+        "file": "sensor_20260608_B.log",
+        "line_no": 8,
+        "ts": "2026-06-08T15:05:11",
+        "detail": "vibration_mm_s=2.03"
+      },
+      "load_at_breach": 5.1
+    },
+    {
+      "sensor_id": "SNS-B-SLEW",
+      "metric": "temp_C",
+      "value": 47.1,
+      "threshold_type": "warning",
+      "threshold_value": 45.0,
+      "severity": "警告",
+      "source": {
+        "file": "sensor_20260608_B.log",
+        "line_no": 9,
+        "ts": "2026-06-08T15:45:49",
+        "detail": "temp_C=47.1"
+      },
+      "load_at_breach": 3.8
+    },
+    {
+      "sensor_id": "SNS-B-SLEW",
+      "metric": "vibration_mm_s",
+      "value": 1.62,
+      "threshold_type": "warning",
+      "threshold_value": 1.5,
+      "severity": "警告",
+      "source": {
+        "file": "sensor_20260608_B.log",
+        "line_no": 9,
+        "ts": "2026-06-08T15:45:49",
+        "detail": "vibration_mm_s=1.62"
+      },
+      "load_at_breach": 3.8
+    }
+  ],
+  "boundary_judgements": [
+    {
+      "event_id": "EVT-001",
+      "claimed_time": "2026-06-08T14:50:33",
+      "claimed_desc": "重载吊装作业（9.8t），温度和振动达到告警阈值，后自行回落",
+      "claimed_conclusion": "正常现象，无需额外处理",
+      "sensor_matches": [
+        {
+          "sensor_id": "SNS-A-WINCH",
+          "metric": "temp_C",
+          "value": 62.1,
+          "threshold_type": "warning",
+          "threshold_value": 55.0,
+          "source": {
+            "file": "sensor_20260608_A.log",
+            "line_no": 9,
+            "ts": "2026-06-08T14:50:33",
+            "detail": "temp_C=62.1"
+          },
+          "load_at_breach": 9.8
+        },
+        {
+          "sensor_id": "SNS-A-WINCH",
+          "metric": "temp_C",
+          "value": 62.1,
+          "threshold_type": "alarm",
+          "threshold_value": 60.0,
+          "source": {
+            "file": "sensor_20260608_A.log",
+            "line_no": 9,
+            "ts": "2026-06-08T14:50:33",
+            "detail": "temp_C=62.1"
+          },
+          "load_at_breach": 9.8
+        },
+        {
+          "sensor_id": "SNS-A-WINCH",
+          "metric": "vibration_mm_s",
+          "value": 2.18,
+          "threshold_type": "warning",
+          "threshold_value": 1.5,
+          "source": {
+            "file": "sensor_20260608_A.log",
+            "line_no": 9,
+            "ts": "2026-06-08T14:50:33",
+            "detail": "vibration_mm_s=2.18"
+          },
+          "load_at_breach": 9.8
+        },
+        {
+          "sensor_id": "SNS-A-WINCH",
+          "metric": "vibration_mm_s",
+          "value": 2.18,
+          "threshold_type": "alarm",
+          "threshold_value": 2.0,
+          "source": {
+            "file": "sensor_20260608_A.log",
+            "line_no": 9,
+            "ts": "2026-06-08T14:50:33",
+            "detail": "vibration_mm_s=2.18"
+          },
+          "load_at_breach": 9.8
+        },
+        {
+          "sensor_id": "SNS-A-WINCH",
+          "metric": "pressure_MPa",
+          "value": 12.3,
+          "threshold_type": "warning_low",
+          "threshold_value": 13.0,
+          "source": {
+            "file": "sensor_20260608_A.log",
+            "line_no": 9,
+            "ts": "2026-06-08T14:50:33",
+            "detail": "pressure_MPa=12.3"
+          },
+          "load_at_breach": 9.8
+        },
+        {
+          "sensor_id": "SNS-A-WINCH",
+          "metric": "pressure_MPa",
+          "value": 12.3,
+          "threshold_type": "alarm_low",
+          "threshold_value": 12.5,
+          "source": {
+            "file": "sensor_20260608_A.log",
+            "line_no": 9,
+            "ts": "2026-06-08T14:50:33",
+            "detail": "pressure_MPa=12.3"
+          },
+          "load_at_breach": 9.8
+        }
+      ],
+      "actual_conclusion": "存在3条严重告警，最大载荷9.8t，达到边界样本标准——不可直接归类为『正常现象无需处理』，需补充事后检查记录（齿轮箱磨损、润滑脂状态）",
+      "justification": "[警告] SNS-A-WINCH temp_C=62.1 (阈值55.0 warning) 来源: 文件[sensor_20260608_A.log] 行9 时间[2026-06-08T14:50:33] 细节:temp_C=62.1\n[严重] SNS-A-WINCH temp_C=62.1 (阈值60.0 alarm) 来源: 文件[sensor_20260608_A.log] 行9 时间[2026-06-08T14:50:33] 细节:temp_C=62.1\n[警告] SNS-A-WINCH vibration_mm_s=2.18 (阈值1.5 warning) 来源: 文件[sensor_20260608_A.log] 行9 时间[2026-06-08T14:50:33] 细节:vibration_mm_s=2.18\n[严重] SNS-A-WINCH vibration_mm_s=2.18 (阈值2.0 alarm) 来源: 文件[sensor_20260608_A.log] 行9 时间[2026-06-08T14:50:33] 细节:vibration_mm_s=2.18\n[警告] SNS-A-WINCH pressure_MPa=12.3 (阈值13.0 warning_low) 来源: 文件[sensor_20260608_A.log] 行9 时间[2026-06-08T14:50:33] 细节:pressure_MPa=12.3\n[严重] SNS-A-WINCH pressure_MPa=12.3 (阈值12.5 alarm_low) 来源: 文件[sensor_20260608_A.log] 行9 时间[2026-06-08T14:50:33] 细节:pressure_MPa=12.3",
+      "verdict": "驳回"
+    }
+  ],
+  "notes": [],
+  "handover_note": "",
+  "data_hash": "c10457a4d33b9920",
+  "extra_note": ""
+}
