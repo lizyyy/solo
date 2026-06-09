@@ -1,57 +1,188 @@
-# React + TypeScript + Vite
+# 真空泵抽速曲线管理系统
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+面向质检员和设备工程师，解决**温度校准记录（主材料）+ 传感器编号（含关键备注）临时拼接导致的数据口径混乱**问题。
 
-Currently, two official plugins are available:
+- 产品需求：[.trae/documents/prd.md](file:///Users/lzy/pro/solo/workspaces/zy72359/.trae/documents/prd.md)
+- 技术架构：[.trae/documents/tech-architecture.md](file:///Users/lzy/pro/solo/workspaces/zy72359/.trae/documents/tech-architecture.md)
+- 核心类型：[src/types/index.ts](file:///Users/lzy/pro/solo/workspaces/zy72359/src/types/index.ts)
+- 状态管理（单一数据源）：[src/store/useStore.ts](file:///Users/lzy/pro/solo/workspaces/zy72359/src/store/useStore.ts)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## 一、启动方式
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+```bash
+# 1. 进入项目
+cd /Users/lzy/pro/solo/workspaces/zy72359
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+# 2. 首次安装（已安装可跳过）
+npm install
+
+# 3. 类型检查
+npx tsc --noEmit
+
+# 4. 启动开发服务器（端口 5180 避开其他默认端口冲突）
+npx vite --host --port 5180
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+浏览器打开 `http://localhost:5180/` 即可使用。
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+> HMR 热更新生效中，修改任何 `src/` 下的文件会自动刷新，无需重启。
 
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### 复跑 / 环境清理
+
+```bash
+# 端口冲突时，先杀 5173 / 5180 上旧进程
+lsof -i :5173 -sTCP:LISTEN | awk 'NR>1 {print $2}' | xargs kill -9 2>/dev/null
+lsof -i :5180 -sTCP:LISTEN | awk 'NR>1 {print $2}' | xargs kill -9 2>/dev/null
+
+# 再重新启动
+npx vite --host --port 5180
+
+# 生产构建（验证 bundle 正确）
+npx vite build && npx vite preview --host --port 5180
 ```
+
+---
+
+## 二、三个页面功能一览
+
+| 页面 | 路由 | 角色 | 核心功能 |
+|------|------|------|----------|
+| 导入与校验 | `/import` | 质检员 | 新建批次导入、传感器备注补看、冲突检测+确认/驳回 |
+| 参数回放 | `/replay` | 质检员/工程师 | 抽速曲线基准 vs 当前对比、系数修改、改前改后历史、工程师复核 |
+| 导出与一致 | `/export` | 双角色 | 自检 6 项、批次筛选、三端一致性校验（导出/页面/接口）、报告反查 |
+
+角色切换按钮在左侧侧边栏底部。
+
+---
+
+## 三、完整演示脚本（推荐按顺序走一遍）
+
+> 系统默认预置了 5 条历史初始化记录（BATCH-HIST-001 ~ 004），其中：
+> - rec-002：温度校准 22.5°C vs 传感器备注 28.0°C（含"关键备注：传感器漂移"）→ 冲突待质检员确认
+> - rec-003：系数 1.0 → 0.95 但没有任何原因 → 待设备工程师复核
+> - rec-001 与 rec-004：批次号+传感器号完全一致 → 重复导入检测告警
+
+下面演示**从 0 新建一条**的完整闭环。
+
+---
+
+### 第 1 步：导入（角色 = 质检员，停在 `/import`）
+
+1. 点 **「新建批次导入」** 按钮 → 顶部出现蓝色"当前批次：BATCH-CUR-00x"徽章
+2. 填写表单（**故意制造冲突**，演示后面的完整链路）：
+   - 批次号：`BATCH-DEMO-001`
+   - 温度校准：`26.5°C`
+   - 传感器编号：`SN-9901`
+   - 传感器备注：`传感器编号SN-9901现场记录温度30.5°C（关键备注：传感器老化需更换）`
+     > ⚠ 这里故意写 **30.5°C**，与温度校准 **26.5°C** 不一致，会自动触发冲突检测
+   - 主体材质：`316L不锈钢`
+   - 系数：`1.08`
+   - 原始系数：`1.0` （表示这是一次人为修改）
+3. 点 **「导入记录」** → 记录列表顶部多一条带 **【本次】** 徽章 + 左侧蓝色边框的行
+4. 下滚到「冲突检测面板」，看到新增的第 3 条冲突：温度 **26.5°C** vs 传感器备注 **30.5°C**
+5. 在冲突卡片最底部的输入框填写处理理由：
+   ```
+   校验温度26.5°C经二等标准铂电阻复核，传感器SN-9901漂移超差，确认以校准值为准，传感器送修
+   ```
+6. 点 **「确认（以校准值为准）」**
+   - 冲突卡片变成「已确认」状态，显示处理理由 + 处理人（质检员小白）+ 处理时间
+   - 对应记录状态流转，抽速曲线版本号升级（v1 → v2）
+
+---
+
+### 第 2 步：参数回放 + 补录原因 + 工程师复核
+
+1. 左侧切到 **「参数回放」** (`/replay`)
+2. 顶部下拉选 **BATCH-DEMO-001**（即刚导入的 rec-006）
+   - 看到基准曲线（灰色虚线）和当前曲线（琥珀色实线）两条
+   - 右侧面板显示 traceId 可复制、系数 1.01、版本 v2、**计算明细**写着"状态变更触发重算..."
+3. **质检员改系数，故意不写原因**（触发待工程师复核链路）：
+   - 在「编辑系数」卡的「输入新系数」框填 `1.15`
+   - **不填**修改原因
+   - 点「保存」
+   - 观察到变化：
+     - 系数 1.01 → **1.15**，版本 v2 → **v3**
+     - 计算明细：`系数变更重算：抽速 = 基准抽速 × 系数 1.15（原系数 1.01，变更原因：未填写；版本 v3）`
+     - 橙色警告："系数已人工修改，补录原因后请设备工程师复核"
+     - 下方「人工改系数标记」多一张卡片（rec-006）
+4. **质检员补录原因**（仍在人工改系数标记卡内）：
+   - 输入框填：
+     ```
+     现场温度实际波动至 29°C，根据GB/T 25753.1-2010附录F 温度补偿系数 ×1.14 取1.15
+     ```
+   - 点「提交原因」→ 人工改系数标记卡片消失，rec-006 状态已流转到工程师待复核
+5. **切角色 = 设备工程师**（侧边栏底部按钮）
+   - 页面自动多出「**设备工程师复核**」面板，里面只有 rec-006 一条
+   - 能看到改前/改后 Δ、修改原因、改前改后审计历史列表
+6. 写复核意见并通过：
+   - 输入框填：
+     ```
+     已核查GB/T 25753.1-2010附录F，温度26.5°C→29°C补偿系数1.15符合要求。同意，已通知现场工程师更新SN-9901台账。
+     ```
+   - 点「通过」
+   - 观察：
+     - 工程师复核面板消失（任务闭环）
+     - 计算明细完整更新：`已复核：抽速 = 基准抽速 × 系数 1.15（复核人：设备工程师，复核意见：<完整文字>；版本 v3）`
+     - 橙色警告消失，下一步找谁 = **无待办**
+
+---
+
+### 第 3 步：自检 + 导出（任何角色）
+
+切到 **「导出与一致」** (`/export`)，按顺序看四个模块：
+
+#### 3.1 自检报告（6 项）
+- 点「重新自检」刷新
+- 每一项后带**受影响记录 traceId**，点按钮可跳到对应明细行
+- 预期能看到：1 条重复导入（历史预置 rec-001/004）、1 条人工改系数无原因（历史预置 rec-003）、补录后重算提醒、历史变更同步通过、可追溯主键一致通过
+
+#### 3.2 明细导出
+- 批次筛选下拉：可选择"全部批次"或任一导入批次（BATCH-HIST 为历史，BATCH-CUR 为本次），每一项后带 `x条` 统计
+- JSON / CSV 按钮切换格式
+- 点「导出 JSON / 导出 CSV」下载文件，文件名带 `traceId` 时间戳
+- 表格 traceId 按钮可**一键复制**，审计次数按钮可展开显示所有操作人+时间+原因
+
+#### 3.3 一致性校验
+- 表头四组：反查主键 / 状态×3 / 系数×3 / 下一步处理人×3 / 改系数原因×3
+- 每组 3 列分别来自：`getExportData()`（导出） / `records`（页面） / `getApiReturnData()`（接口）
+- **三端完全一致 → 绿色 ✓**
+- rec-003 那行是**琥珀色加粗重点行**，右侧写着 "⚠ 人工改系数无原因 → 三端均应显示异常，不得在任一端消失"
+
+#### 3.4 报告与反查
+- 顶部 5 个统计卡：总记录数 / 冲突数 / 待复核数 / 已复核数 / 重复组合数
+- 每条记录摘要含：
+  - traceId + 批次徽章（可复制）
+  - 温度校准 vs 传感器备注对比（一致绿 / 不一致红）
+  - 系数变更摘要（含原因，未填写标琥珀色）
+  - 计算明细摘要（版本 + 完整说明）
+  - 下一步找谁（NEXT_HANDLER_LABELS 映射）+ 理由
+  - 审计时间线（最近 3 条，彩色 action 徽章）
+
+---
+
+## 四、关键业务规则速查
+
+| 场景 | 处理方式 |
+|------|----------|
+| 温度校准值 vs 传感器备注不一致 | **不自动拍板**，冲突面板等质检员「确认/驳回」+ 理由 |
+| 人工修改系数没写原因 | **不归正常**，保持 pending_review，转设备工程师复核 |
+| 重复导入（批次号+传感器号已存在） | 区分 importBatchId（BATCH-HIST-xxx 历史 / BATCH-CUR-xxx 本次），自检时列出来 |
+| 导出 / 页面 / 接口不一致 | **不可能发生**，三者都从 Zustand store 同一份 map 函数取 |
+| 系数修改 + 冲突确认 + 备注补录 | 每次操作自动**重算抽速数组**，版本号 +1，calculationDetail 写入当次完整说明（不是只加 `//`） |
+| 报告反查 | 每条记录带 `traceId = VAC-日期-序号` + `importBatchId`，任一端都能反查到同一条 |
+| 审计日志 | 每次写操作（import/update/confirm/reject/review_approve/review_reject）必追加一条 AuditEntry |
+
+---
+
+## 五、技术栈
+
+- **前端框架**：React 18 + TypeScript 5
+- **构建工具**：Vite 6（HMR）
+- **路由**：react-router-dom v7（`/import` `/replay` `/export`）
+- **状态管理**：Zustand（单一数据源，所有写操作都走 store）
+- **图表**：Recharts 2（抽速曲线图）
+- **样式**：TailwindCSS 3 + 自定义 steel/amber/emerald 10 级色阶
+- **字体**：Noto Sans SC（正文）+ JetBrains Mono（数据字段）
+- **图标**：lucide-react
