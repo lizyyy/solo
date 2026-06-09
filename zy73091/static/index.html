@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>机电管综碰撞预审</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:#f3f5f9;color:#1f2937;font-size:14px}
+.header{background:linear-gradient(90deg,#1e3a8a,#2563eb);color:#fff;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+.header h1{font-size:18px;font-weight:600;letter-spacing:.5px}
+.header .sub{font-size:12px;opacity:.85;margin-top:2px}
+.case-nav{background:#fff;border-bottom:1px solid #e5e7eb;padding:10px 24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.case-nav select{padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;min-width:220px}
+.case-nav .meta{font-size:12px;color:#6b7280}
+.tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:500}
+.tag-pass{background:#d1fae5;color:#065f46}
+.tag-cond{background:#fef3c7;color:#92400e}
+.tag-rej{background:#fee2e2;color:#991b1b}
+.tag-sus{background:#fde68a;color:#92400e;animation:pulse 1.8s infinite}
+.tag-mod{background:#e0e7ff;color:#3730a3;margin-left:6px}
+.tag-new{background:#fce7f3;color:#9d174d;margin-left:6px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+.layout{display:grid;grid-template-columns:380px 1fr;gap:16px;padding:16px 24px;align-items:start}
+.card{background:#fff;border:1px solid #e5e7eb;border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.card-head{padding:12px 16px;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;justify-content:space-between;font-weight:600}
+.card-head .dot{width:8px;height:8px;border-radius:50%;margin-right:8px;display:inline-block}
+.card-head .dot.blue{background:#2563eb}.dot.red{background:#dc2626}.dot.green{background:#16a34a}.dot.amber{background:#d97706}
+.card-body{padding:14px 16px}
+.form-group{margin-bottom:12px}
+.form-group label{display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:5px}
+.form-group label .hint{color:#9ca3af;font-weight:400;margin-left:4px}
+textarea,input[type=text]{width:100%;padding:8px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;font-family:inherit;resize:vertical;background:#fafafa;transition:all .2s}
+textarea:focus,input:focus{outline:none;border-color:#2563eb;background:#fff;box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+textarea{min-height:88px;line-height:1.6}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:6px;font-size:13px;font-weight:500;border:1px solid transparent;cursor:pointer;transition:all .15s}
+.btn-primary{background:#2563eb;color:#fff}
+.btn-primary:hover{background:#1d4ed8}
+.btn-outline{background:#fff;color:#374151;border-color:#d1d5db}
+.btn-outline:hover{background:#f9fafb}
+.btn-danger{background:#fee2e2;color:#991b1b;border-color:#fecaca}
+.btn-danger:hover{background:#fecaca}
+.btn-amber{background:#fef3c7;color:#92400e;border-color:#fde68a}
+.btn-amber:hover{background:#fde68a}
+.btn-sm{padding:4px 10px;font-size:12px}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.suspend-banner{background:linear-gradient(135deg,#fff7ed,#fde68a);border:1px solid #fcd34d;color:#92400e;border-radius:8px;padding:12px 14px;margin-bottom:14px;display:flex;align-items:flex-start;gap:10px}
+.suspend-banner .icon{font-size:20px;flex-shrink:0}
+.suspend-banner strong{display:block;margin-bottom:4px}
+.suspend-banner p{font-size:12px;line-height:1.6;opacity:.9}
+.section-title{font-size:13px;font-weight:600;color:#374151;margin:14px 0 8px;display:flex;align-items:center;gap:6px}
+.table{width:100%;border-collapse:collapse;font-size:12.5px}
+.table th,.table td{padding:8px 10px;text-align:left;border-bottom:1px solid #f3f4f6;vertical-align:top}
+.table th{background:#f9fafb;font-weight:600;color:#374151;font-size:12px;white-space:nowrap}
+.table tr.row-mismatch{background:#fff1f2}
+.table tr.row-mismatch td{color:#881337}
+.table tr.row-modified td:first-child::after{content:" 已改口径";font-size:10.5px;color:#3730a3;background:#e0e7ff;padding:1px 6px;border-radius:8px;margin-left:4px;vertical-align:middle}
+.badge-count{background:#eef2ff;color:#3730a3;padding:1px 7px;border-radius:10px;font-size:11px;font-weight:600;margin-left:6px}
+.spec-cell{max-width:170px;word-break:break-all;line-height:1.5}
+.spec-input{width:100%;padding:5px 7px;font-size:12px;border:1px dashed #cbd5e1;border-radius:4px;background:#fff}
+.spec-input:focus{border-style:solid;border-color:#2563eb}
+.timeline{max-height:300px;overflow-y:auto;border:1px solid #f1f5f9;border-radius:6px}
+.tl-item{padding:10px 12px;border-bottom:1px solid #f8fafc;font-size:12.5px;line-height:1.6}
+.tl-item:last-child{border-bottom:none}
+.tl-meta{color:#6b7280;font-size:11px;margin-bottom:3px;display:flex;justify-content:space-between}
+.tl-operator{font-weight:500;color:#1f2937}
+.tl-arrow{margin:0 6px;color:#6b7280}
+.tl-old{color:#b91c1c;text-decoration:line-through;opacity:.7}
+.tl-new{color:#047857;font-weight:500}
+.tl-reason{color:#4b5563;margin-top:3px;padding-left:10px;border-left:2px solid #e5e7eb}
+.three-cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px}
+.mini-card{border:1px solid #e5e7eb;border-radius:8px;padding:10px 12px;background:#fafbfc}
+.mini-card .num{font-size:22px;font-weight:700;line-height:1;margin-bottom:4px}
+.mini-card .lbl{font-size:11.5px;color:#6b7280}
+.mini-card.danger{background:#fff5f5;border-color:#fecaca}.mini-card.danger .num{color:#dc2626}
+.mini-card.warn{background:#fffbeb;border-color:#fde68a}.mini-card.warn .num{color:#d97706}
+.mini-card.info{background:#eff6ff;border-color:#bfdbfe}.mini-card.info .num{color:#2563eb}
+.modal-mask{position:fixed;inset:0;background:rgba(17,24,39,.45);display:none;align-items:center;justify-content:center;z-index:100}
+.modal-mask.show{display:flex}
+.modal{background:#fff;border-radius:10px;width:480px;max-width:92vw;padding:18px 20px;box-shadow:0 20px 40px rgba(0,0,0,.2)}
+.modal h3{font-size:15px;margin-bottom:12px}
+.toast{position:fixed;top:20px;right:20px;background:#111827;color:#fff;padding:10px 16px;border-radius:8px;font-size:13px;z-index:200;opacity:0;transform:translateY(-10px);transition:all .25s;pointer-events:none;max-width:360px}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.error{background:#991b1b}.toast.warn{background:#92400e}.toast.ok{background:#065f46}
+.empty{padding:24px;text-align:center;color:#9ca3af;font-size:12.5px}
+.coord-row{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border:1px solid #e5e7eb;border-radius:6px;margin-bottom:6px;font-size:12.5px;background:#fafbfc}
+.coord-row.offset{background:#fffbeb;border-color:#fde68a}
+.coord-row.confirmed{background:#ecfdf5;border-color:#a7f3d0}
+.coord-info{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.legend{font-size:11px;color:#6b7280;margin-top:6px;display:flex;gap:12px;flex-wrap:wrap}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+.legend .leg-mismatch::before{background:#fee2e2}
+.legend .leg-mod::before{background:#e0e7ff}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>⚙ 机电管综碰撞预审</h1>
+    <div class="sub">设计院助理阿宁交接 → 复核人确认口径 / 坐标 / 碰撞 / 导出，全程留痕不覆盖</div>
+  </div>
+  <div>
+    <button class="btn btn-outline btn-sm" onclick="newCase()">＋ 新建预审单</button>
+  </div>
+</div>
+
+<div class="case-nav">
+  <span style="font-size:12px;color:#6b7280;font-weight:500">预审单：</span>
+  <select id="caseList" onchange="loadCase(this.value)">
+    <option value="">— 请选择或新建 —</option>
+  </select>
+  <span id="caseMeta" class="meta"></span>
+  <span id="caseStatus" class="tag" style="margin-left:auto"></span>
+</div>
+
+<div class="layout">
+
+  <!-- ============= 左列：交接区（放材料）============= -->
+  <div>
+    <div class="card">
+      <div class="card-head">
+        <span><span class="dot blue"></span>① 交接区 <small style="color:#6b7280;font-weight:400">（阿宁放材料的地方）</small></span>
+        <span id="verBadge" class="badge-count" style="display:none"></span>
+      </div>
+      <div class="card-body">
+        <div class="form-group">
+          <label>项目名称</label>
+          <input type="text" id="projectName" placeholder="请输入项目名称">
+        </div>
+        <div class="form-group">
+          <label>会议纪要 <span class="hint">（主材料）</span></label>
+          <textarea id="meetingMinutes" placeholder="粘贴机电管综协调会、碰撞检查会的会议纪要文本…"></textarea>
+        </div>
+        <div class="form-group">
+          <label>后补备注 <span class="hint">（阿宁后发的补充说明）</span></label>
+          <textarea id="supplementaryNote" placeholder="后补的口径调整、材料变更等说明…"></textarea>
+        </div>
+        <div class="form-group">
+          <label>临时口头说明 <span class="hint">（电话/当面交代的内容）</span></label>
+          <textarea id="oralInstruction" placeholder="记录阿宁口头交代的特殊口径或注意事项…"></textarea>
+        </div>
+        <div class="form-group">
+          <label>操作人</label>
+          <input type="text" id="operator" value="阿宁">
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="submitAnalyze()">🔍 一键解析 / 新建</button>
+          <button class="btn btn-amber" onclick="openRerun()">🔁 补录后重跑</button>
+          <button class="btn btn-outline" onclick="saveRemarks()">💾 同步备注修改</button>
+        </div>
+        <div class="legend">
+          <span class="leg-mismatch">送审/施工口径不一致</span>
+          <span class="leg-mod">材料改过口径</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="card-head"><span><span class="dot red"></span>③ 异常区 <small style="color:#6b7280;font-weight:400">（复核人重点看这里）</small></span></div>
+      <div class="card-body" id="summaryArea">
+        <div class="three-cols">
+          <div class="mini-card info"><div class="num" id="cntMaterial">0</div><div class="lbl">解析出的材料数</div></div>
+          <div class="mini-card danger"><div class="num" id="cntMismatch">0</div><div class="lbl">口径不一致</div></div>
+          <div class="mini-card warn"><div class="num" id="cntOffset">0</div><div class="lbl">坐标偏移项</div></div>
+        </div>
+        <div id="coordList"></div>
+        <div class="btn-row" id="coordConfirmRow" style="display:none;margin-top:8px">
+          <button class="btn btn-primary btn-sm" onclick="confirmCoords()">✅ 复核人确认坐标偏移</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============= 右列：操作区 + 详情 ============= -->
+  <div>
+
+    <div id="suspendBanner" class="suspend-banner" style="display:none">
+      <div class="icon">⚠️</div>
+      <div>
+        <strong>预审已挂起，不会给出假稳定结论</strong>
+        <p id="suspendReason">检测到模型坐标偏移未确认，请复核人先在左侧「异常区」确认坐标后再判定。</p>
+      </div>
+    </div>
+
+    <!-- 操作区 -->
+    <div class="card">
+      <div class="card-head">
+        <span><span class="dot green"></span>② 操作区 <small style="color:#6b7280;font-weight:400">（复核人改备注 / 改判定 / 重新导出）</small></span>
+      </div>
+      <div class="card-body">
+        <div class="btn-row" style="margin-bottom:14px">
+          <button class="btn btn-primary" onclick="openJudge('pass')">✅ 判定通过</button>
+          <button class="btn btn-amber" onclick="openJudge('conditional')">🟡 附条件通过</button>
+          <button class="btn btn-danger" onclick="openJudge('reject')">❌ 不予通过</button>
+          <button class="btn btn-outline" onclick="openJudge('suspended')">⏸ 挂起待确认</button>
+          <button class="btn btn-outline" style="margin-left:auto" onclick="exportCase()">📊 导出 Excel 报告</button>
+        </div>
+
+        <div class="form-group">
+          <label>判定备注 / 预审意见 <span class="hint" style="color:#991b1b">（修改后点「同步备注修改」，导出会自动同步最新口径）</span></label>
+          <textarea id="judgeNote" placeholder="复核人可直接修改此处备注，保存后后端数据与导出文件同步变更…"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- 材料口径对比 -->
+    <div class="card" style="margin-top:14px">
+      <div class="card-head">
+        <span>📋 材料口径对比 <small style="color:#6b7280;font-weight:400">（红色行=不一致，双击规格可直接改）</small></span>
+        <span id="modifiedBadge" class="tag tag-mod" style="display:none"></span>
+      </div>
+      <div class="card-body" style="padding:0">
+        <table class="table" id="materialTable">
+          <thead>
+            <tr>
+              <th>材料名称</th>
+              <th>送审口径（图注/设计）</th>
+              <th>施工口径（现场/采购）</th>
+              <th>是否一致</th>
+              <th>版本</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="5" class="empty">请先提交阿宁的交接材料进行解析…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 碰撞清单 -->
+    <div class="card" style="margin-top:14px">
+      <div class="card-head"><span>💥 碰撞点清单</span></div>
+      <div class="card-body" style="padding:0">
+        <table class="table" id="collisionTable">
+          <thead>
+            <tr><th>系统A</th><th>系统B</th><th>级别</th><th>位置</th><th>状态</th></tr>
+          </thead>
+          <tbody><tr><td colspan="5" class="empty">暂无碰撞数据</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 历史留痕 -->
+    <div class="card" style="margin-top:14px">
+      <div class="card-head"><span>📜 判断与变更历史 <small style="color:#6b7280;font-weight:400">（旧判断 / 新判断 / 说明 全部留下，补录不覆盖）</small></span></div>
+      <div class="card-body" style="padding:0">
+        <div class="timeline" id="historyTimeline">
+          <div class="empty">暂无历史记录</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 判定弹窗 -->
+<div class="modal-mask" id="judgeModal">
+  <div class="modal">
+    <h3 id="judgeModalTitle">变更判定</h3>
+    <div class="form-group">
+      <label>变更说明 <span class="hint" style="color:#991b1b">（必填，作为留痕依据）</span></label>
+      <textarea id="judgeReason" rows="4" placeholder="请说明变更判定的原因，例如：材料口径已整改一致、坐标偏移已确认是设计要求…"></textarea>
+    </div>
+    <div class="btn-row" style="justify-content:flex-end;margin-top:8px">
+      <button class="btn btn-outline" onclick="closeModal('judgeModal')">取消</button>
+      <button class="btn btn-primary" onclick="submitJudgement()">确认变更</button>
+    </div>
+  </div>
+</div>
+
+<!-- 重跑弹窗 -->
+<div class="modal-mask" id="rerunModal">
+  <div class="modal">
+    <h3>补录后重跑预审</h3>
+    <p style="font-size:12.5px;color:#6b7280;line-height:1.7;margin-bottom:12px">
+      系统会保留所有历史记录（判断历史、变更留痕、材料版本号递增），不会覆盖旧数据。<br>
+      请先在左侧「交接区」补充/修改会议纪要、后补备注或口头说明，再点击下方确认重跑。
+    </p>
+    <div class="btn-row" style="justify-content:flex-end">
+      <button class="btn btn-outline" onclick="closeModal('rerunModal')">取消</button>
+      <button class="btn btn-primary" onclick="submitRerun()">确认重跑</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = '';
+let currentCaseId = null;
+let currentCase = null;
+let currentMaterials = [];
+let pendingJudgeType = null;
+
+function toast(msg, type='ok'){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  setTimeout(()=>t.className='toast ' + type, 2600);
+}
+
+function openModal(id){ document.getElementById(id).classList.add('show'); }
+function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+
+async function api(url, method='GET', body=null){
+  const opts = {method, headers:{'Content-Type':'application/json'}};
+  if (body) opts.body = JSON.stringify(body);
+  try {
+    const r = await fetch(API + url, opts);
+    return await r.json();
+  } catch(e){
+    toast('网络请求失败：'+e.message, 'error');
+    return null;
+  }
+}
+
+function collectForm(){
+  return {
+    project_name: document.getElementById('projectName').value.trim(),
+    meeting_minutes: document.getElementById('meetingMinutes').value,
+    supplementary_note: document.getElementById('supplementaryNote').value,
+    oral_instruction: document.getElementById('oralInstruction').value,
+    operator: document.getElementById('operator').value.trim() || '阿宁',
+  };
+}
+
+function fillForm(c){
+  document.getElementById('projectName').value = c.project_name || '';
+  document.getElementById('meetingMinutes').value = c.meeting_minutes || '';
+  document.getElementById('supplementaryNote').value = c.supplementary_note || '';
+  document.getElementById('oralInstruction').value = c.oral_instruction || '';
+  document.getElementById('judgeNote').value = c.current_judgement_note || '';
+}
+
+function renderStatus(c){
+  const s = document.getElementById('caseStatus');
+  const map = {
+    pass:['tag-pass','✅ 通过'],
+    conditional:['tag-cond','🟡 附条件通过'],
+    reject:['tag-rej','❌ 不通过'],
+    suspended:['tag-sus','⏸ 挂起待确认'],
+  };
+  const [cls,txt] = map[c.current_judgement] || ['tag-cond','未判定'];
+  s.className = 'tag ' + cls;
+  s.textContent = txt;
+
+  const banner = document.getElementById('suspendBanner');
+  if (c.is_suspended || c.current_judgement === 'suspended'){
+    banner.style.display = 'flex';
+    document.getElementById('suspendReason').textContent = c.suspend_reason || '检测到异常需要复核人确认。';
+  } else {
+    banner.style.display = 'none';
+  }
+
+  document.getElementById('caseMeta').textContent =
+    `创建 ${c.created_at} · 更新 ${c.updated_at}` +
+    (c.rerun_count ? ` · 重跑 ${c.rerun_count} 次` : '');
+
+  const vb = document.getElementById('verBadge');
+  if (c.rerun_count){ vb.style.display='inline-block'; vb.textContent=`重跑 ×${c.rerun_count}`; }
+  else vb.style.display='none';
+}
+
+function renderMaterials(mats){
+  currentMaterials = mats || [];
+  const tb = document.querySelector('#materialTable tbody');
+  const mb = document.getElementById('modifiedBadge');
+  if (!mats || mats.length===0){
+    tb.innerHTML = '<tr><td colspan="5" class="empty">暂无材料数据</td></tr>';
+    mb.style.display='none';
+    return;
+  }
+  const modifiedCount = mats.filter(m=>m.modified_after_submit).length;
+  if (modifiedCount){
+    mb.style.display='inline-block';
+    mb.textContent = `${modifiedCount} 项改过口径`;
+  } else mb.style.display='none';
+
+  let mismatch = 0;
+  tb.innerHTML = mats.map(m=>{
+    const cls = m.spec_mismatch ? 'row-mismatch' : '';
+    const modCls = m.modified_after_submit ? 'row-modified' : '';
+    if (m.spec_mismatch) mismatch++;
+    const matchTag = m.spec_mismatch
+      ? '<span style="color:#991b1b;font-weight:600">✘ 不一致</span>'
+      : '<span style="color:#065f46">✔ 一致</span>';
+    return `<tr class="${cls} ${modCls}">
+      <td style="font-weight:500">${escapeHtml(m.material_name)}</td>
+      <td><input class="spec-input" data-id="${m.id}" data-field="review_spec"
+           value="${escapeAttr(m.review_spec||'')}" placeholder="(未识别)"
+           onchange="onMaterialSpecChange()"></td>
+      <td><input class="spec-input" data-id="${m.id}" data-field="construction_spec"
+           value="${escapeAttr(m.construction_spec||'')}" placeholder="(未识别)"
+           onchange="onMaterialSpecChange()"></td>
+      <td>${matchTag}</td>
+      <td>v${m.version_tag}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('cntMaterial').textContent = mats.length;
+  document.getElementById('cntMismatch').textContent = mismatch;
+}
+
+function onMaterialSpecChange(){
+  // 标红提示用户需要点「同步备注修改」
+  toast('规格已修改，请点击「💾 同步备注修改」保存到后端', 'warn');
+}
+
+function collectMaterialChanges(){
+  const changes = [];
+  const inputs = document.querySelectorAll('#materialTable .spec-input');
+  inputs.forEach(inp=>{
+    const id = +inp.dataset.id;
+    const field = inp.dataset.field;
+    const val = inp.value;
+    let found = changes.find(c=>c.id===id);
+    if (!found){ found = {id}; changes.push(found); }
+    found[field] = val;
+  });
+  return changes;
+}
+
+function renderCoords(coords){
+  const box = document.getElementById('coordList');
+  const row = document.getElementById('coordConfirmRow');
+  if (!coords || coords.length===0){
+    box.innerHTML = '<div class="empty">（未检测到坐标信息）</div>';
+    document.getElementById('cntOffset').textContent = 0;
+    row.style.display='none';
+    return;
+  }
+  const offsets = coords.filter(c=>c.offset_detected);
+  document.getElementById('cntOffset').textContent = offsets.length;
+  const needConfirm = offsets.some(c=>!c.confirmed);
+  row.style.display = needConfirm ? 'flex' : 'none';
+
+  box.innerHTML = coords.map(c=>{
+    let cls = ''; let state='';
+    if (c.offset_detected){
+      cls = c.confirmed ? 'confirmed' : 'offset';
+      state = c.confirmed
+        ? '<span style="color:#065f46">✔ 偏移已确认</span>'
+        : '<span style="color:#92400e">⚠ 偏移未确认</span>';
+    } else { state = '<span style="color:#065f46">✔ 坐标正常</span>'; }
+    const offsetStr = `Δ(${fmt(c.offset_value_x)}, ${fmt(c.offset_value_y)}, ${fmt(c.offset_value_z)})mm`;
+    return `<div class="coord-row ${cls}">
+      <div class="coord-info">
+        <strong>${escapeHtml(c.system_name)}</strong>
+        <span>原点(${fmt(c.origin_x)},${fmt(c.origin_y)},${fmt(c.origin_z)})</span>
+        <span style="color:#6b7280">${offsetStr}</span>
+      </div>
+      <div>${state}</div>
+    </div>`;
+  }).join('');
+}
+
+function fmt(n){ return (n==null||isNaN(n))?'-':(+n).toFixed(1); }
+
+function renderCollisions(cols){
+  const tb = document.querySelector('#collisionTable tbody');
+  if (!cols || cols.length===0){
+    tb.innerHTML = '<tr><td colspan="5" class="empty">暂无碰撞数据</td></tr>';
+    return;
+  }
+  const lvlMap={'严重':'<span class="tag tag-rej">严重</span>',
+                '中等':'<span class="tag tag-cond">中等</span>',
+                '轻微':'<span class="tag tag-pass">轻微</span>'};
+  tb.innerHTML = cols.filter(c=>c.version_tag<=100).map(c=>`
+    <tr>
+      <td>${escapeHtml(c.system_a)}</td>
+      <td>${escapeHtml(c.system_b)}</td>
+      <td>${lvlMap[c.collision_level]||c.collision_level}</td>
+      <td>${escapeHtml(c.location||'-')}</td>
+      <td>${c.resolved?'<span style="color:#065f46">已解决</span>':'<span style="color:#92400e">未解决</span>'}</td>
+    </tr>`).join('');
+}
+
+function renderHistory(judgements, remarks){
+  const box = document.getElementById('historyTimeline');
+  const items = [];
+  const jMap = {pass:'✅ 通过', conditional:'🟡 附条件通过', reject:'❌ 不通过', suspended:'⏸ 挂起'};
+  (judgements||[]).forEach(j=>{
+    items.push({
+      t: j.created_at,
+      type: 'judge',
+      html: `<div class="tl-meta">
+        <span class="tl-operator">${escapeHtml(j.operator||'')}</span>
+        <span>判定变更 · 批次#${j.rerun_batch||0}</span>
+      </div>
+      <div>
+        ${j.old_judgement?`<span class="tl-old">${jMap[j.old_judgement]||j.old_judgement}</span><span class="tl-arrow">→</span>`:''}
+        <span class="tl-new">${jMap[j.new_judgement]||j.new_judgement}</span>
+      </div>
+      <div class="tl-reason">${escapeHtml(j.reason||'')}</div>`
+    });
+  });
+  (remarks||[]).forEach(r=>{
+    const oldV = (r.old_value||'').length>80 ? (r.old_value||'').slice(0,80)+'…' : (r.old_value||'(空)');
+    const newV = (r.new_value||'').length>80 ? (r.new_value||'').slice(0,80)+'…' : (r.new_value||'(空)');
+    items.push({
+      t: r.changed_at,
+      type: 'remark',
+      html: `<div class="tl-meta">
+        <span class="tl-operator">${escapeHtml(r.operator||'')}</span>
+        <span>备注修改 · ${escapeHtml(r.field_name||'')}</span>
+      </div>
+      <div><span class="tl-old">${escapeHtml(oldV)}</span><span class="tl-arrow">→</span>
+        <span class="tl-new">${escapeHtml(newV)}</span></div>
+      ${r.change_note?`<div class="tl-reason">${escapeHtml(r.change_note)}</div>`:''}`
+    });
+  });
+  items.sort((a,b)=> (a.t<b.t?-1:a.t>b.t?1:0));
+  if (!items.length){
+    box.innerHTML = '<div class="empty">暂无历史记录</div>';
+    return;
+  }
+  box.innerHTML = items.reverse().map(i=>`<div class="tl-item">${i.html}</div>`).join('');
+}
+
+function escapeHtml(s){
+  return String(s==null?'':s).replace(/[&<>"']/g, c=>({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  })[c]);
+}
+function escapeAttr(s){ return escapeHtml(s); }
+
+async function refreshCaseList(){
+  const res = await api('/api/cases');
+  const sel = document.getElementById('caseList');
+  sel.innerHTML = '<option value="">— 请选择或新建 —</option>';
+  if (res && res.ok){
+    const jMap = {pass:'✅', conditional:'🟡', reject:'❌', suspended:'⏸'};
+    res.data.forEach(c=>{
+      const o = document.createElement('option');
+      o.value = c.id;
+      o.textContent = `${jMap[c.current_judgement]||''} ${c.case_no} · ${c.project_name}`;
+      sel.appendChild(o);
+    });
+    if (currentCaseId) sel.value = currentCaseId;
+  }
+}
+
+async function loadCase(id){
+  if (!id){ currentCaseId=null; return; }
+  currentCaseId = +id;
+  const r = await api(`/api/cases/${id}`);
+  if (!r || !r.ok){ toast('加载失败','error'); return; }
+  currentCase = r.case;
+  fillForm(r.case);
+  renderStatus(r.case);
+  renderMaterials(r.materials);
+  renderCoords(r.coordinates);
+  renderCollisions(r.collisions);
+  renderHistory(r.judgement_history, r.remark_history);
+}
+
+function newCase(){
+  currentCaseId = null;
+  document.getElementById('caseList').value = '';
+  ['projectName','meetingMinutes','supplementaryNote','oralInstruction','judgeNote']
+    .forEach(id=>document.getElementById(id).value='');
+  document.getElementById('operator').value = '阿宁';
+  renderStatus({current_judgement:'', is_suspended:0, suspend_reason:'',
+                created_at:'-', updated_at:'-', rerun_count:0});
+  renderMaterials([]); renderCoords([]); renderCollisions([]);
+  renderHistory([],[]);
+  toast('已清空，准备新建预审单');
+}
+
+async function submitAnalyze(){
+  const form = collectForm();
+  if (!form.project_name){ toast('请输入项目名称','warn'); return; }
+  if (!form.meeting_minutes && !form.supplementary_note && !form.oral_instruction){
+    toast('至少填写一项交接材料（会议纪要/后补备注/口头说明）','warn'); return;
+  }
+  const r = await api('/api/cases/analyze','POST', form);
+  if (r && r.ok){
+    toast(`解析完成：${r.parsed_note}`);
+    await refreshCaseList();
+    currentCaseId = r.case_id;
+    document.getElementById('caseList').value = r.case_id;
+    await loadCase(r.case_id);
+  } else toast((r&&r.msg)||'解析失败','error');
+}
+
+async function saveRemarks(){
+  if (!currentCaseId){ toast('请先选择一个预审单','warn'); return; }
+  const form = collectForm();
+  const mats = collectMaterialChanges();
+  const payload = {
+    operator: form.operator,
+    change_note: '复核人前端修改备注',
+    supplementary_note: form.supplementary_note,
+    oral_instruction: form.oral_instruction,
+    meeting_minutes: form.meeting_minutes,
+    current_judgement_note: document.getElementById('judgeNote').value,
+    materials: mats,
+  };
+  const r = await api(`/api/cases/${currentCaseId}/remark`,'PATCH', payload);
+  if (r && r.ok){
+    toast('✅ 备注已同步，后端数据与导出文件均已更新');
+    fillForm(r.case);
+    renderStatus(r.case);
+    renderMaterials(r.materials);
+    await refreshCaseList();
+    await loadCase(currentCaseId);
+  } else toast((r&&r.msg)||'保存失败','error');
+}
+
+function openJudge(type){
+  if (!currentCaseId){ toast('请先选择一个预审单','warn'); return; }
+  if (currentCase && currentCase.is_suspended && type !== 'suspended'){
+    toast('当前预审处于挂起状态，请先确认坐标偏移或选择「挂起待确认」','warn');
+    return;
+  }
+  pendingJudgeType = type;
+  const titles={pass:'判定：通过', conditional:'判定：附条件通过',
+                reject:'判定：不予通过', suspended:'判定：挂起待确认'};
+  document.getElementById('judgeModalTitle').textContent = titles[type] || '变更判定';
+  document.getElementById('judgeReason').value = '';
+  openModal('judgeModal');
+}
+
+async function submitJudgement(){
+  const reason = document.getElementById('judgeReason').value.trim();
+  if (!reason){ toast('请填写变更说明（留痕依据）','warn'); return; }
+  const r = await api(`/api/cases/${currentCaseId}/judgement`,'POST',{
+    new_judgement: pendingJudgeType,
+    reason,
+    operator: document.getElementById('operator').value.trim() || '阿宁',
+  });
+  closeModal('judgeModal');
+  if (r && r.ok){
+    toast('✅ 判断变更已留痕（旧/新/说明均已保存）');
+    await refreshCaseList();
+    await loadCase(currentCaseId);
+  } else toast((r&&r.msg)||'变更失败','error');
+}
+
+function openRerun(){
+  if (!currentCaseId){ toast('请先选择一个预审单再重跑','warn'); return; }
+  openModal('rerunModal');
+}
+
+async function submitRerun(){
+  closeModal('rerunModal');
+  const form = collectForm();
+  const r = await api(`/api/cases/${currentCaseId}/rerun`,'POST',{
+    meeting_minutes: form.meeting_minutes,
+    supplementary_note: form.supplementary_note,
+    oral_instruction: form.oral_instruction,
+    operator: form.operator,
+  });
+  if (r && r.ok){
+    toast(`🔁 补录重跑完成，批次 #${r.rerun_batch}，历史记录未覆盖`);
+    await refreshCaseList();
+    await loadCase(currentCaseId);
+  } else toast((r&&r.msg)||'重跑失败','error');
+}
+
+async function confirmCoords(){
+  const r = await api(`/api/cases/${currentCaseId}/coordinate/confirm`,'POST',{
+    operator: document.getElementById('operator').value.trim() || '复核人',
+  });
+  if (r && r.ok){
+    toast('✅ 坐标偏移已确认，系统已自动重新判定');
+    await refreshCaseList();
+    await loadCase(currentCaseId);
+  } else toast((r&&r.msg)||'确认失败','error');
+}
+
+function exportCase(){
+  if (!currentCaseId){ toast('请先选择一个预审单','warn'); return; }
+  toast('📊 正在生成报告（含最新备注与口径）…');
+  setTimeout(()=>{
+    window.location.href = `${API}/api/cases/${currentCaseId}/export`;
+  }, 400);
+}
+
+(async function init(){
+  await refreshCaseList();
+})();
+</script>
+</body>
+</html>
