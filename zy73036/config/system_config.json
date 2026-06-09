@@ -1,0 +1,41 @@
+{
+  "unit_conversion": {
+    "kg_to_g": 1000,
+    "jin_to_kg": 0.5,
+    "lb_to_kg": 0.453592
+  },
+  "known_units": {
+    "kg": ["kg", "KG", "Kg", "千克", "公斤", "kilogram", "kilograms"],
+    "g": ["g", "G", "克", "gram", "grams"],
+    "jin": ["斤", "市斤", "jin", "JIN"],
+    "lb": ["lb", "LB", "Lb", "磅", "pound", "pounds", "lbs"]
+  },
+  "anomaly_threshold": {
+    "weight_jump_ratio": 0.3,
+    "max_orphan_days": 30,
+    "min_records_for_trend": 3
+  },
+  "responsible_roles": {
+    "unit_mismatch": {
+      "role": "运营主管",
+      "contact": "运营数据组",
+      "instruction": "请核对原始称重记录，确认单位后补录或标记正确单位"
+    },
+    "data_conflict": {
+      "role": "宠物训练师",
+      "contact": "阿岑",
+      "instruction": "请核实主人补充信息与旧记录冲突，需对照现场复核实际体重"
+    },
+    "missing_field": {
+      "role": "数据录入员",
+      "contact": "数据组",
+      "instruction": "请补充缺失的必填字段"
+    }
+  },
+  "export": {
+    "default_format": "csv",
+    "supported_formats": ["csv", "xlsx"],
+    "include_processing_status": true,
+    "include_source_trace": true
+  }
+}

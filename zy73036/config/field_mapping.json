@@ -1,0 +1,39 @@
+{
+  "weight_fields": [
+    {"source_names": ["体重", "重量", "weight", "Weight", "body_weight", "BodyWeight"],
+    "canonical_name": "weight_kg",
+    "unit_hint": "数值型，单位见单位字段，未标注时默认kg"
+  }
+],
+  "date_fields": [
+    {"source_names": ["日期", "时间", "测量日期", "记录日期", "date", "Date", "measure_date", "record_date"],
+    "canonical_name": "measure_date",
+    "unit_hint": "YYYY-MM-DD 或 YYYY/MM/DD"
+  }
+],
+  "pet_fields": [
+    {"source_names": ["宠物编号", "宠物ID", "编号", "ID", "pet_id", "PetID"],
+    "canonical_name": "pet_id"
+  }
+],
+  "pet_name_fields": [
+    {"source_names": ["宠物名称", "姓名", "name", "Name", "pet_name", "PetName"],
+    "canonical_name": "pet_name"
+  }
+],
+  "unit_fields": [
+    {"source_names": ["单位", "计量单位", "unit", "Unit"],
+    "canonical_name": "weight_unit"
+  }
+],
+  "source_fields": [
+    {"source_names": ["来源", "数据来源", "source", "Source", "提交人", "operator"],
+    "canonical_name": "data_source"
+  }
+],
+  "remark_fields": [
+    {"source_names": ["备注", "说明", "remark", "Remark", "备注信息"],
+    "canonical_name": "remark"
+  }
+]
+}

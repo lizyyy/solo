@@ -1,0 +1,347 @@
+{
+  "P001": {
+    "pet_id": "P001",
+    "pet_name": "橘座",
+    "points": [
+      {
+        "record_id": "c6c5a529-d3f7-4185-a713-1a837a12af42",
+        "date": "2026-04-01T00:00:00",
+        "weight_kg": 5.2,
+        "source": "救助站入站",
+        "source_file": "运营主管_历史体重记录_202605.csv",
+        "source_row": 1,
+        "status": "已确认",
+        "remark": "成年公猫，橘猫，入站称重"
+      },
+      {
+        "record_id": "2eae965c-be42-4c63-b370-e1a3e62fdcfa",
+        "date": "2026-04-10T00:00:00",
+        "weight_kg": 5.4,
+        "source": "救助站周测",
+        "source_file": "运营主管_历史体重记录_202605.csv",
+        "source_row": 2,
+        "status": "已确认",
+        "remark": "状态良好"
+      },
+      {
+        "record_id": "d90b3865-f40d-4add-a2a9-8d75eb3595b6",
+        "date": "2026-04-20T00:00:00",
+        "weight_kg": 5.35,
+        "source": "救助站周测",
+        "source_file": "运营主管_历史体重记录_202605.csv",
+        "source_row": 3,
+        "status": "已确认",
+        "remark": ""
+      },
+      {
+        "record_id": "3bd9dd50-b6ab-428e-ac54-10b1c9b90744",
+        "date": "2026-04-30T00:00:00",
+        "weight_kg": 4.5,
+        "source": "主人临时补充",
+        "source_file": "主人补充材料_橘座_P001_202606.csv",
+        "source_row": 3,
+        "status": "已确认",
+        "remark": "主人回忆体重，单位未标注 | 已和运营主管核对：主人回忆时口头说的是 kg，实际和现场对得上"
+      },
+      {
+        "record_id": "6786d6ad-a3cb-4984-b06f-4f1070e490a6",
+        "date": "2026-04-30T00:00:00",
+        "weight_kg": 5.5,
+        "source": "救助站月测",
+        "source_file": "运营主管_历史体重记录_202605.csv",
+        "source_row": 4,
+        "status": "已确认",
+        "remark": ""
+      },
+      {
+        "record_id": "cda76031-4529-4f15-b63a-df49190e76b0",
+        "date": "2026-05-05T00:00:00",
+        "weight_kg": 1.25,
+        "source": "主人临时补充",
+        "source_file": "主人补充材料_橘座_P001_202606.csv",
+        "source_row": 1,
+        "status": "已确认",
+        "remark": "主人自己在家称的，电子秤单位是斤"
+      },
+      {
+        "record_id": "22129376-306e-4ff1-9dfe-c06da4f43b38",
+        "date": "2026-05-15T00:00:00",
+        "weight_kg": 5.8,
+        "source": "主人临时补充",
+        "source_file": "主人补充材料_橘座_P001_202606.csv",
+        "source_row": 2,
+        "status": "已确认",
+        "remark": ""
+      },
+      {
+        "record_id": "2360abbb-5ac2-44ea-897a-06f6a08094ff",
+        "date": "2026-05-25T00:00:00",
+        "weight_kg": 5.9,
+        "source": "运营A",
+        "source_file": "运营_新批次体重_字段不同.xlsx.csv",
+        "source_row": 1,
+        "status": "已确认",
+        "remark": "新电子秤，单位g"
+      }
+    ],
+    "trend": "上升",
+    "baseline_weight_kg": 5.2,
+    "last_weight_kg": 5.9,
+    "calc_note": "共8个有效点；起始=5.2kg，最新=5.9kg，变动率=13.46%",
+    "generated_at": "2026-06-09T08:45:54.781112"
+  },
+  "P005": {
+    "pet_id": "P005",
+    "pet_name": "花花",
+    "points": [
+      {
+        "record_id": "dcbc7b16-3da8-483d-b17d-2800ffe54279",
+        "date": "2026-05-20T00:00:00",
+        "weight_kg": 3.5,
+        "source": "运营B",
+        "source_file": "运营_新批次体重_字段不同.xlsx.csv",
+        "source_row": 11,
+        "status": "已确认",
+        "remark": "新来的，小泰迪"
+      }
+    ],
+    "trend": "stable",
+    "baseline_weight_kg": 3.5,
+    "last_weight_kg": 3.5,
+    "calc_note": "共1个有效点（点不足，趋势未计算）",
+    "generated_at": "2026-06-09T08:45:54.781117"
+  },
+  "P002": {
+    "pet_id": "P002",
+    "pet_name": "小黑",
+    "points": [
+      {
+        "record_id": "3bdff9ec-cfc1-4e66-921f-28d4d6110b8f",
+        "date": "2026-04-01T00:00:00",
+        "weight_kg": 8.6,
+        "source": "救助站入站",
+        "source_file": "运营主管_历史体重记录_202605.csv",
+        "source_row": 5,
+        "status": "已确认",
+        "remark": "中型犬，公"
+      },
+      {
+        "record_id": "afdced9f-e0de-4f7d-90ce-d5202f295370",
+        "date": "2026-04-10T00:00:00",
+        "weight_kg": 8.7,
+        "source": "救助站周测",
+        "source_file": "运营主管_历史体重记录_202605.csv",
+        "source_row": 6,
+        "status": "已确认",
+        "remark": ""
+      },
+      {
+        "record_id": "2a9ec07c-8ae9-492d-bab7-9837ab0a8e42",
+        "date": "2026-04-20T00:00:00",
+        "weight_kg": 8.5,
+        "source": "救助站周测",
+        "source_file": "运营主管_历史体重记录_202605.csv",
+        "source_row": 7,
+        "status": "已确认",
+        "remark": ""
+      },
+      {
+        "record_id": "5d40dd9b-baf5-4566-83fd-4220a1f517f5",
+        "date": "2026-04-30T00:00:00",
+        "weight_kg": 8.8,
+        "source": "救助站月测",
+        "source_file": "运营主管_历史体重记录_202605.csv",
+        "source_row": 8,
+        "status": "已确认",
+        "remark": ""
+      },
+      {
+        "record_id": "2be476fa-09fc-4af4-a46d-00d0bedba8a4",
+        "date": "2026-05-05T00:00:00",
+        "weight_kg": 8.9,
+        "source": "运营A",
+        "source_file": "运营_新批次体重_字段不同.xlsx.csv",
+        "source_row": 2,
+        "status": "已确认",
+        "remark": ""
+      },
+      {
+        "record_id": "a1657092-bff0-4061-ba33-ba69ffe8ec1f",
+        "date": "2026-05-15T00:00:00",
+        "weight_kg": 9.1,
+        "source": "运营B",
+        "source_file": "运营_新批次体重_字段不同.xlsx.csv",
+        "source_row": 3,
+        "status": "已确认",
+        "remark": ""
+      }
+    ],
+    "trend": "stable",
+    "baseline_weight_kg": 8.6,
+    "last_weight_kg": 9.1,
+    "calc_note": "共6个有效点；起始=8.6kg，最新=9.1kg，变动率=5.81%",
+    "generated_at": "2026-06-09T08:45:54.781128"
+  },
+  "P003": {
+    "pet_id": "P003",
+    "pet_name": "奶糖",
+    "points": [
+      {
+        "record_id": "ed9e6d5b-cf15-4f6c-a1f9-21dcb48783d6",
+        "date": "2026-04-01T00:00:00",
+        "weight_kg": 2.1,
+        "source": "救助站入站",
+        "source_file": "运营主管_历史体重记录_202605.csv",
+        "source_row": 9,
+        "status": "已确认",
+        "remark": "幼猫，2月龄"
+      },
+      {
+        "record_id": "191f1fa2-b8c9-4c68-91c4-da6edc021b5a",
+        "date": "2026-04-10T00:00:00",
+        "weight_kg": 2.35,
+        "source": "救助站周测",
+        "source_file": "运营主管_历史体重记录_202605.csv",
+        "source_row": 10,
+        "status": "已确认",
+        "remark": ""
+      },
+      {
+        "record_id": "28dd7eab-8e08-471f-9f0e-04c4345c3c16",
+        "date": "2026-04-20T00:00:00",
+        "weight_kg": 2.5,
+        "source": "救助站周测",
+        "source_file": "运营主管_历史体重记录_202605.csv",
+        "source_row": 11,
+        "status": "已确认",
+        "remark": ""
+      },
+      {
+        "record_id": "e11431c6-4756-4443-a050-701f580d49fe",
+        "date": "2026-04-30T00:00:00",
+        "weight_kg": 2.7,
+        "source": "救助站月测",
+        "source_file": "运营主管_历史体重记录_202605.csv",
+        "source_row": 12,
+        "status": "已确认",
+        "remark": ""
+      },
+      {
+        "record_id": "9f579e69-5c08-440b-b536-c01cc97cb12a",
+        "date": "2026-05-05T00:00:00",
+        "weight_kg": 3.0,
+        "source": "运营A",
+        "source_file": "运营_新批次体重_字段不同.xlsx.csv",
+        "source_row": 5,
+        "status": "已确认",
+        "remark": ""
+      },
+      {
+        "record_id": "4faaa4f9-4713-4244-82b1-203030e04cb7",
+        "date": "2026-05-15T00:00:00",
+        "weight_kg": 5.0,
+        "source": "主人在家称的",
+        "source_file": "运营_新批次体重_字段不同.xlsx.csv",
+        "source_row": 6,
+        "status": "已确认",
+        "remark": "None"
+      },
+      {
+        "record_id": "b669a15c-ebf4-4849-acfd-e7f45f0acdc3",
+        "date": "2026-05-25T00:00:00",
+        "weight_kg": 3.4,
+        "source": "运营B",
+        "source_file": "运营_新批次体重_字段不同.xlsx.csv",
+        "source_row": 7,
+        "status": "已确认",
+        "remark": ""
+      }
+    ],
+    "trend": "上升",
+    "baseline_weight_kg": 2.1,
+    "last_weight_kg": 3.4,
+    "calc_note": "共7个有效点；起始=2.1kg，最新=3.4kg，变动率=61.9%",
+    "generated_at": "2026-06-09T08:45:54.781138"
+  },
+  "P004": {
+    "pet_id": "P004",
+    "pet_name": "毛豆",
+    "points": [
+      {
+        "record_id": "1cbdc6d8-f7db-4885-9090-9004b70036a9",
+        "date": "2026-04-01T00:00:00",
+        "weight_kg": 12.5,
+        "source": "救助站入站",
+        "source_file": "运营主管_历史体重记录_202605.csv",
+        "source_row": 13,
+        "status": "已确认",
+        "remark": "大型犬"
+      },
+      {
+        "record_id": "25ba9a3a-1b18-4638-8ae5-6d5183b10e13",
+        "date": "2026-04-10T00:00:00",
+        "weight_kg": 12.6,
+        "source": "救助站周测",
+        "source_file": "运营主管_历史体重记录_202605.csv",
+        "source_row": 14,
+        "status": "已确认",
+        "remark": ""
+      },
+      {
+        "record_id": "f21a3767-8a4a-4467-ace0-9a090ff16ad0",
+        "date": "2026-04-20T00:00:00",
+        "weight_kg": 12.3,
+        "source": "救助站周测",
+        "source_file": "运营主管_历史体重记录_202605.csv",
+        "source_row": 15,
+        "status": "已确认",
+        "remark": ""
+      },
+      {
+        "record_id": "fc2eed81-be0f-473d-9b36-c823f5b616aa",
+        "date": "2026-04-30T00:00:00",
+        "weight_kg": 13.0,
+        "source": "救助站月测",
+        "source_file": "运营主管_历史体重记录_202605.csv",
+        "source_row": 16,
+        "status": "已改判",
+        "remark": "2026-06-09 现场复核：电子秤log显示13.0kg，6.0为笔误"
+      },
+      {
+        "record_id": "7ef89be7-8d93-4c74-965f-0d6bb85bbaab",
+        "date": "2026-05-05T00:00:00",
+        "weight_kg": 13.0,
+        "source": "运营A",
+        "source_file": "运营_新批次体重_字段不同.xlsx.csv",
+        "source_row": 8,
+        "status": "已改判",
+        "remark": "？？？骤降异常，需复核（原12.x） | 2026-06-09 现场复核：电子秤log显示13.0kg，6.0为笔误"
+      },
+      {
+        "record_id": "0d89cecb-ab88-44ea-8b37-21b30cb63fa2",
+        "date": "2026-05-15T00:00:00",
+        "weight_kg": 13.0,
+        "source": "运营B",
+        "source_file": "运营_新批次体重_字段不同.xlsx.csv",
+        "source_row": 9,
+        "status": "已确认",
+        "remark": ""
+      },
+      {
+        "record_id": "3e71d02e-38d6-42e7-b6d8-05174bbd78d7",
+        "date": "2026-05-25T00:00:00",
+        "weight_kg": 13.2,
+        "source": "运营B",
+        "source_file": "运营_新批次体重_字段不同.xlsx.csv",
+        "source_row": 10,
+        "status": "已确认",
+        "remark": ""
+      }
+    ],
+    "trend": "stable",
+    "baseline_weight_kg": 12.5,
+    "last_weight_kg": 13.2,
+    "calc_note": "共7个有效点；起始=12.5kg，最新=13.2kg，变动率=5.6%",
+    "generated_at": "2026-06-09T08:45:54.781148"
+  }
+}
