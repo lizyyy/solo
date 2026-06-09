@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>详情 · {{ answer.id }} · 随机游走资产敞口</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: #f0f2f5; color: #1f2937; line-height: 1.6;
+        }
+        a { text-decoration: none; color: inherit; }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff; padding: 18px 32px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .header h1 { font-size: 18px; font-weight: 700; }
+        .header .sub { font-size: 12px; opacity: 0.92; margin-top: 3px; }
+        .btn {
+            padding: 7px 14px; border: none; border-radius: 7px; font-size: 12.5px; cursor: pointer;
+            font-weight: 500; display: inline-flex; align-items: center; gap: 5px;
+            transition: all .15s;
+        }
+        .btn-white { background: rgba(255,255,255,0.2); color: #fff; }
+        .btn-white:hover { background: rgba(255,255,255,0.32); }
+        .btn-primary { background: #667eea; color: #fff; }
+        .btn-outline { background: #fff; color: #4b5563; border: 1px solid #d1d5db; }
+        .btn-outline:hover { border-color: #667eea; color: #667eea; }
+        .btn-sm { padding: 5px 10px; font-size: 11.5px; }
+
+        .container { max-width: 1200px; margin: 22px auto; padding: 0 24px; }
+
+        .crumb {
+            font-size: 12.5px; color: #6b7280; margin-bottom: 14px;
+        }
+        .crumb a { color: #667eea; }
+        .crumb a:hover { text-decoration: underline; }
+
+        .card {
+            background: #fff; border-radius: 12px; padding: 20px 24px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04); margin-bottom: 16px;
+        }
+        .card-title {
+            font-size: 14.5px; font-weight: 600; color: #111827;
+            margin-bottom: 14px; display: flex; align-items: center; gap: 10px;
+        }
+        .card-title::before {
+            content: ''; width: 3px; height: 15px; border-radius: 2px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+        .card-title h2 { flex: 1; }
+
+        .hero {
+            display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 14px;
+            background: linear-gradient(135deg, #f8f7ff 0%, #eef2ff 100%);
+            border-radius: 12px; padding: 18px 22px; margin-bottom: 18px;
+            border: 1px solid #e0e7ff;
+        }
+        .hero .item { }
+        .hero .l { font-size: 11.5px; color: #6366f1; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .hero .v { font-size: 20px; font-weight: 700; color: #1e1b4b; margin-top: 3px; }
+        .hero .sub { font-size: 11.5px; color: #6b7280; margin-top: 2px; }
+
+        .badge {
+            display: inline-block; padding: 3px 11px; border-radius: 12px;
+            font-size: 11.5px; font-weight: 500; color: #fff;
+        }
+
+        .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 28px; }
+        .field { padding: 6px 0; }
+        .field .k { font-size: 11.5px; color: #6b7280; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
+        .field .v { font-size: 13.5px; color: #1f2937; margin-top: 3px; line-height: 1.6; }
+        .field code { background: #f3f4f6; padding: 1px 5px; border-radius: 3px; font-size: 11.5px; }
+
+        .review-box {
+            background: #f5f3ff; border: 1px solid #ddd6fe; border-radius: 9px; padding: 14px 16px;
+        }
+        .review-box .row { display: grid; grid-template-columns: 96px 1fr; gap: 6px; padding: 5px 0; }
+        .review-box .row .k { color: #6d28d9; font-weight: 600; font-size: 12.5px; }
+        .review-box .row .v { color: #1f2937; font-size: 13px; line-height: 1.55; }
+        .review-box .tag {
+            display: inline-block; background: #ddd6fe; color: #5b21b6;
+            padding: 1px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-right: 4px;
+        }
+
+        .boundary-box {
+            background: #fef2f2; border: 1px solid #fecaca; border-radius: 9px; padding: 14px 16px;
+        }
+        .b-item { margin: 6px 0; padding: 6px 0; border-bottom: 1px dashed #fecaca; }
+        .b-item:last-child { border-bottom: none; }
+        .b-item .t { font-weight: 600; color: #991b1b; font-size: 13px; display: flex; align-items: center; gap: 6px; }
+        .b-item .d { margin: 4px 0 0 20px; font-size: 12.5px; color: #374151; line-height: 1.55; }
+        .b-item .thr { margin: 2px 0 0 20px; font-size: 11px; color: #6b7280; }
+
+        .rev-timeline { margin-left: 4px; }
+        .rev-item {
+            position: relative; padding: 0 0 14px 18px; margin-left: 5px;
+            border-left: 2px solid #e5e7eb;
+        }
+        .rev-item:last-child { border-left: 2px solid transparent; }
+        .rev-item::before {
+            content: ''; position: absolute; left: -7px; top: 3px;
+            width: 12px; height: 12px; border-radius: 50%;
+            background: #667eea; border: 2px solid #fff;
+            box-shadow: 0 0 0 1px #c7d2fe;
+        }
+        .rev-item.manual::before { background: #f59e0b; box-shadow: 0 0 0 1px #fde68a; }
+        .rev-item.system::before { background: #6366f1; box-shadow: 0 0 0 1px #c7d2fe; }
+        .rev-head { font-size: 12px; color: #6b7280; }
+        .rev-head b { color: #1f2937; font-weight: 600; }
+        .rev-head .op {
+            display: inline-block; background: #eef2ff; color: #4338ca;
+            padding: 1px 7px; border-radius: 4px; font-size: 11px; font-weight: 600; margin: 0 3px;
+        }
+        .rev-head .op-manual { background: #fef3c7; color: #92400e; }
+        .rev-body { font-size: 12.5px; color: #374151; margin: 4px 0 2px; line-height: 1.6; }
+        .rev-body .diff { background: #fef9c3; padding: 1px 4px; border-radius: 3px; font-weight: 500; }
+        .rev-body .diff-new { background: #dcfce7; padding: 1px 4px; border-radius: 3px; font-weight: 500; }
+        .rev-next { font-size: 11.5px; color: #6366f1; }
+        .rev-next b { color: #4338ca; }
+
+        .err-item {
+            background: #fffbeb; border: 1px solid #fde68a; border-radius: 9px;
+            padding: 12px 14px; margin-bottom: 10px;
+        }
+        .err-head {
+            font-size: 12px; color: #92400e; font-weight: 600;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .err-body { margin-top: 6px; font-size: 12.5px; color: #374151; line-height: 1.6; }
+        .err-score {
+            display: inline-block; background: #fde68a; color: #92400e;
+            padding: 1px 7px; border-radius: 4px; font-weight: 700; font-size: 12px; margin-right: 6px;
+        }
+
+        .group-box {
+            background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 9px; padding: 12px 14px;
+        }
+        .group-item {
+            padding: 8px 10px; border-bottom: 1px dashed #bae6fd;
+            display: flex; justify-content: space-between; align-items: center; gap: 10px;
+        }
+        .group-item:last-child { border-bottom: none; }
+        .group-item.current { background: rgba(14,165,233,0.1); border-radius: 6px; }
+        .group-info { font-size: 12.5px; color: #0369a1; line-height: 1.5; }
+        .group-info code { background: #e0f2fe; padding: 1px 4px; border-radius: 3px; font-size: 11px; }
+
+        .toolbar-group { display: flex; gap: 8px; flex-wrap: wrap; }
+
+        .toast {
+            position: fixed; top: 20px; right: 20px; background: #10b981; color: #fff;
+            padding: 10px 18px; border-radius: 8px; z-index: 9999;
+            animation: slideIn .25s ease-out; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .toast.warn { background: #f59e0b; }
+        .toast.err { background: #ef4444; }
+        @keyframes slideIn { from { transform: translateX(120%); } to { transform: translateX(0); } }
+
+        .score-big { font-size: 22px; font-weight: 700; }
+        .score-chain { display: flex; align-items: center; gap: 8px; }
+        .score-chain .orig { color: #9ca3af; text-decoration: line-through; font-size: 14px; }
+        .score-chain .cur { font-size: 24px; font-weight: 700; color: #1f2937; }
+        .score-chain .adj { font-size: 18px; font-weight: 700; color: #5b21b6; background: #ede9fe; padding: 2px 10px; border-radius: 6px; }
+        .arrow { color: #9ca3af; font-size: 15px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1>🔍 详情视图 · {{ answer.id }} · 随机游走资产敞口</h1>
+            <div class="sub">列表 / 详情 / 摘要 / 历史 / 误差 均引用同一份最新数据，保持一致</div>
+        </div>
+        <div>
+            <a href="/" class="btn btn-white">← 返回列表</a>
+            <button class="btn btn-white" onclick="exportReport()">📤 导出报告</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="crumb">
+            <a href="/">总览</a> / 详情 · <code>{{ answer.id }}</code>
+        </div>
+
+        <!-- Hero 卡片 -->
+        <div class="hero">
+            <div class="item">
+                <div class="l">状态</div>
+                <div class="v">
+                    <span class="badge" style="background:{{ answer.status_color }};">{{ answer.status_label }}</span>
+                </div>
+                <div class="sub">最后更新: {{ answer.last_rerun_at or answer.reviewed_at or answer.created_at }}</div>
+            </div>
+            <div class="item">
+                <div class="l">得分链</div>
+                <div class="v">
+                    <div class="score-chain">
+                        <span class="orig">{{ answer.original_score }}</span>
+                        <span class="arrow">→</span>
+                        <span class="cur">{{ answer.score }}</span>
+                        {% if answer.adjusted_score %}
+                        <span class="arrow">→</span>
+                        <span class="adj">调后 {{ '%.2f'|format(answer.adjusted_score) }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="sub">原始/当前/调整后，全程可追溯</div>
+            </div>
+            <div class="item">
+                <div class="l">学生 · 题目</div>
+                <div class="v" style="font-size:17px;">{{ answer.student_name }} · {{ answer.question_id }}</div>
+                <div class="sub">{{ answer.student_id }} · v{{ answer.version }} · {{ answer.submitted_at }}</div>
+            </div>
+            <div class="item">
+                <div class="l">处理痕迹</div>
+                <div class="v" style="font-size:15px;">
+                    📜 {{ answer.revision_history|length }} · 🔔 {{ answer.error_logs|length }} · 🔁 {{ answer.rerun_count }}
+                </div>
+                <div class="sub">修改历史 / 误差说明 / 重跑次数</div>
+            </div>
+        </div>
+
+        <!-- 基本信息 -->
+        <div class="card">
+            <div class="card-title"><h2>📝 基本信息（同一份数据，未被清洗）</h2></div>
+            <div class="field-grid">
+                <div class="field">
+                    <div class="k">记录 ID</div>
+                    <div class="v"><code>{{ answer.id }}</code></div>
+                </div>
+                <div class="field">
+                    <div class="k">导入批次</div>
+                    <div class="v"><code>{{ answer.import_batch }}</code></div>
+                </div>
+                <div class="field">
+                    <div class="k">答案 ID</div>
+                    <div class="v"><code>{{ answer.answer_id }}</code></div>
+                </div>
+                <div class="field">
+                    <div class="k">题目 ID</div>
+                    <div class="v"><code>{{ answer.question_id }}</code></div>
+                </div>
+                <div class="field">
+                    <div class="k">学生</div>
+                    <div class="v">{{ answer.student_name }}（{{ answer.student_id }}）</div>
+                </div>
+                <div class="field">
+                    <div class="k">提交时间</div>
+                    <div class="v">{{ answer.submitted_at }}</div>
+                </div>
+                <div class="field">
+                    <div class="k">复核人 / 时间</div>
+                    <div class="v">{{ answer.reviewed_by or '（未复核）' }} · {{ answer.reviewed_at or '-' }}</div>
+                </div>
+                <div class="field">
+                    <div class="k">重跑信息</div>
+                    <div class="v">{{ answer.rerun_count }} 次 · 最近 {{ answer.last_rerun_at or '-' }}</div>
+                </div>
+                <div class="field" style="grid-column: span 2;">
+                    <div class="k">答案内容</div>
+                    <div class="v">{{ answer.answer_content }}</div>
+                </div>
+                <div class="field" style="grid-column: span 2;">
+                    <div class="k">完整备注（系统 + 人工 串联拼接）</div>
+                    <div class="v">{{ answer.notes }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 两栏布局：复核/边界 + 同组 -->
+        <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 16px;">
+            <!-- 复核详情五要素 -->
+            <div class="card">
+                <div class="card-title"><h2>🔷 复核详情（原始说法 / 改后值 / 处理原因 / 下一步 / 找谁）</h2></div>
+                {% if answer.review_detail and (answer.review_detail.original_claim or answer.review_detail.corrected_value) %}
+                <div class="review-box">
+                    <div class="row">
+                        <span class="k"><span class="tag">原始说法</span></span>
+                        <span class="v">{{ answer.review_detail.original_claim }}</span>
+                    </div>
+                    <div class="row">
+                        <span class="k"><span class="tag">改后的值</span></span>
+                        <span class="v">{{ answer.review_detail.corrected_value or '（未填写）' }}</span>
+                    </div>
+                    <div class="row">
+                        <span class="k"><span class="tag">处理原因</span></span>
+                        <span class="v">{{ answer.review_detail.handling_reason or '（未填写）' }}</span>
+                    </div>
+                    <div class="row">
+                        <span class="k"><span class="tag">复核意见</span></span>
+                        <span class="v">
+                            {{ answer.review_detail.review_opinion or '（无）' }}
+                            {% if answer.review_detail.reviewed_score %}
+                            · 复核得分: <b>{{ answer.review_detail.reviewed_score }}</b>
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="row">
+                        <span class="k"><span class="tag">下一步动作</span></span>
+                        <span class="v">{{ answer.review_detail.next_step or '（未定义）' }}</span>
+                    </div>
+                    <div class="row">
+                        <span class="k"><span class="tag">下一步找谁</span></span>
+                        <span class="v">{{ answer.review_detail.next_contact or '（未指定）' }}</span>
+                    </div>
+                </div>
+                {% else %}
+                <div style="color:#9ca3af; padding: 20px; text-align:center; font-size: 13px;">
+                    当前记录无复核详情（正常记录或未进入复核流程）
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- 同组其他版本 -->
+            <div class="card">
+                <div class="card-title"><h2>🔗 同学生同题其他版本（联动显示）</h2></div>
+                <div class="group-box">
+                    {% for g in answer.same_group %}
+                    <div class="group-item {% if g.id == answer.id %}current{% endif %}">
+                        <div class="group-info">
+                            <code>{{ g.id }}</code> · v{{ g.version }} ·
+                            得分 <b>{{ g.score }}</b> · {{ g.submitted_at }}
+                            {% if g.id == answer.id %} · <b>← 当前</b>{% endif %}
+                        </div>
+                        <span class="badge" style="background:{{ status_colors.get(g.status_label, '#999') }}; font-size:10.5px;">
+                            {{ g.status_label }}
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- 边界值说明 -->
+        {% if answer.boundary_notes and answer.boundary_notes|length > 0 %}
+        <div class="card">
+            <div class="card-title">
+                <h2>🔶 边界值说明（第一次导入触发，原始说明保留至今）</h2>
+                <span style="font-size:12px; color:#991b1b;">共 {{ answer.boundary_notes|length }} 项</span>
+            </div>
+            <div class="boundary-box">
+                {% for b in answer.boundary_notes %}
+                <div class="b-item">
+                    <div class="t">{{ b.type_label or b.boundary_type }}</div>
+                    <div class="d">{{ b.description }}</div>
+                    <div class="thr">阈值参考：<code>{{ b.threshold_ref }}</code> · 触发于 {{ b.triggered_at }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- 修改历史轨迹 -->
+        <div class="card">
+            <div class="card-title">
+                <h2>📜 修改历史轨迹（人工修正 + 系统变更，原值均不丢失）</h2>
+                <span style="font-size:12px; color:#6366f1;">共 {{ answer.revision_history|length }} 条</span>
+            </div>
+            {% if answer.revision_history and answer.revision_history|length > 0 %}
+            <div class="rev-timeline">
+                {% set op_types = {
+                    '运营规划阿岚': 'manual', '业务运营': 'manual',
+                    '系统（运营规划阿岚补录权重表触发）': 'system'
+                } %}
+                {% for rev in answer.revision_history %}
+                {% set cls = 'manual' if '运营规划阿岚' in rev.operator or '业务运营' in rev.operator else 'system' %}
+                <div class="rev-item {{ cls }}">
+                    <div class="rev-head">
+                        <span class="op {{ 'op-manual' if cls == 'manual' else '' }}">
+                            {{ '人工' if cls == 'manual' else '系统' }}操作
+                        </span>
+                        <b>{{ rev.operator }}</b> · {{ rev.operated_at }}
+                    </div>
+                    <div class="rev-body">
+                        字段：<b>{{ rev.field_name }}</b><br>
+                        原值：<span class="diff">{{ rev.old_value }}</span><br>
+                        新值：<span class="diff-new">{{ rev.new_value }}</span><br>
+                        原因：{{ rev.reason }}
+                    </div>
+                    {% if rev.next_step or rev.next_contact %}
+                    <div class="rev-next">
+                        ➡️ 下一步：{% if rev.next_step %}<b>{{ rev.next_step }}</b>{% endif %}
+                        {% if rev.next_contact %} · 对接人：<b>{{ rev.next_contact }}</b>{% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div style="color:#9ca3af; padding: 20px; text-align:center; font-size: 13px;">
+                暂无修改历史（顺利记录，未经历任何变更）
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- 误差说明 -->
+        <div class="card">
+            <div class="card-title">
+                <h2>🔴 关联误差说明（补录权重表后自动生成，跟着变化）</h2>
+                <span style="font-size:12px; color:#92400e;">共 {{ answer.error_logs|length }} 条</span>
+            </div>
+            {% if answer.error_logs and answer.error_logs|length > 0 %}
+            {% for e in answer.error_logs %}
+            <div class="err-item">
+                <div class="err-head">
+                    <span>
+                        {{ e.id }} · {{ e.source }}
+                        <span class="badge" style="background:#d97706; margin-left:6px;">{{ e.error_type }}</span>
+                    </span>
+                    <span style="font-size:11px; color:#b45309;">权重版本: <code>{{ e.weight_version }}</code></span>
+                </div>
+                <div class="err-body">
+                    <span class="err-score">{{ e.original_score }} → {{ '%.2f'|format(e.adjusted_score) }}</span>
+                    权重系数 <b>{{ e.weight_factor }}</b>
+                    <div style="margin-top: 5px;">{{ e.description }}</div>
+                    <div style="margin-top:4px; font-size:11px; color:#6b7280;">
+                        创建于 {{ e.created_at }}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div style="color:#9ca3af; padding: 20px; text-align:center; font-size: 13px;">
+                暂无误差说明记录（正常记录，无需权重补录）
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        function toast(msg, type='success') {
+            const t = document.createElement('div');
+            t.className = 'toast ' + (type !== 'success' ? type : '');
+            t.textContent = msg;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 2400);
+        }
+        function exportReport() {
+            toast('正在生成报告...', 'warn');
+            setTimeout(() => window.location.href = '/api/export', 500);
+        }
+    </script>
+</body>
+</html>
