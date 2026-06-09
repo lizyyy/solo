@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<title>风机叶片工单回放 · 灰度发布版</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; background: #f4f6fa; color: #2c3e50; }
+  header { background: linear-gradient(135deg, #1f3a68 0%, #2e5a9c 100%); color: #fff; padding: 18px 28px; display: flex; justify-content: space-between; align-items: center; }
+  header h1 { margin: 0; font-size: 20px; letter-spacing: 1px; }
+  header .meta { font-size: 13px; opacity: .9; }
+  main { padding: 24px 28px; max-width: 1440px; margin: 0 auto; }
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .kpi { background: #fff; border-radius: 10px; padding: 16px 20px; box-shadow: 0 2px 6px rgba(0,0,0,.05); border-left: 5px solid #aaa; }
+  .kpi h3 { margin: 0; font-size: 13px; color: #6b7c93; font-weight: normal; }
+  .kpi .num { font-size: 30px; font-weight: bold; margin-top: 6px; }
+  .kpi.c-confirmed { border-left-color: #2ecc71; } .kpi.c-confirmed .num { color: #27ae60; }
+  .kpi.c-pending { border-left-color: #f1c40f; } .kpi.c-pending .num { color: #d4a017; }
+  .kpi.c-part { border-left-color: #e67e22; } .kpi.c-part .num { color: #d35400; }
+  .kpi.c-returned { border-left-color: #e74c3c; } .kpi.c-returned .num { color: #c0392b; }
+
+  .section { background: #fff; border-radius: 10px; padding: 18px 22px; margin-bottom: 24px; box-shadow: 0 2px 6px rgba(0,0,0,.05); }
+  .section h2 { margin: 0 0 14px; font-size: 16px; color: #1f3a68; padding-bottom: 10px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+  .section h2 .hint { font-size: 12px; color: #8a9ab0; font-weight: normal; }
+
+  .tabs { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .tab { padding: 7px 16px; border-radius: 20px; background: #eef2f7; cursor: pointer; font-size: 13px; user-select: none; }
+  .tab.active { background: #2e5a9c; color: #fff; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #eef2f7; vertical-align: top; }
+  th { background: #f7f9fc; color: #6b7c93; font-weight: 600; font-size: 12px; }
+  tr:hover td { background: #fafcff; }
+
+  .tag { display: inline-block; padding: 2px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+  .tag.confirmed { background: #e8f8ef; color: #27ae60; }
+  .tag.pending { background: #fdf8e2; color: #b7950b; }
+  .tag.pending_part { background: #fdeedc; color: #d35400; }
+  .tag.returned { background: #fde1dd; color: #c0392b; }
+
+  .chip { display: inline-block; padding: 2px 8px; background: #eef2f7; border-radius: 4px; font-size: 11px; margin: 2px 3px 0 0; }
+  .chip.warn { background: #fde1dd; color: #c0392b; }
+  .chip.boundary { background: #e3dcf9; color: #5b3fd0; }
+
+  .anom-block { background: #fff8f6; border-left: 3px solid #e67e22; padding: 8px 12px; margin-top: 6px; border-radius: 4px; font-size: 12px; }
+  .anom-block .t { font-weight: 600; color: #d35400; }
+  .trace-block { margin-top: 8px; font-size: 12px; color: #5a6a82; }
+  .trace-block .step { background: #f7f9fc; border-radius: 6px; padding: 6px 10px; margin-bottom: 4px; border-left: 3px solid #2e5a9c; }
+  .trace-block .step .seq { font-weight: 600; color: #2e5a9c; margin-right: 6px; }
+  .trace-block .step .fields { color: #6b7c93; font-size: 11px; margin-left: 8px; }
+
+  .pending-card { background: #fffaf0; border: 1px solid #f3d9a4; border-radius: 8px; padding: 10px 14px; margin-bottom: 10px; }
+  .pending-card h4 { margin: 0 0 6px; font-size: 13px; color: #8a5a00; display: flex; justify-content: space-between; }
+  .pending-card ul { margin: 4px 0 0; padding-left: 18px; color: #7a5800; font-size: 12px; }
+  .parts-row { font-size: 12px; margin-top: 4px; }
+  .parts-row .rep { color: #2e5a9c; font-weight: 600; }
+  .parts-row .scope { color: #8a6d3b; background: #fcf8e3; padding: 1px 6px; border-radius: 3px; margin-left: 4px; }
+  .btn { background: #2e5a9c; color: #fff; border: 0; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+  .btn.small { padding: 3px 10px; font-size: 11px; }
+  .empty { text-align: center; padding: 24px; color: #95a5b8; font-size: 13px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>⚙ 风机叶片工单回放系统 <span style="font-size:13px;opacity:.7;margin-left:10px;">灰度发布版 v1.0</span></h1>
+  <div class="meta">
+    操作人员：<span id="opName">小林 / 排班同事</span>
+    <button class="btn small" style="margin-left:14px" onclick="loadAll()">🔄 刷新</button>
+  </div>
+</header>
+<main>
+  <div class="kpis" id="kpis"></div>
+
+  <div class="section">
+    <h2>📋 待处理记录说明（排班同事重点查看）<span class="hint">小林月底复核：已确认/待补件/退回 分类清晰</span></h2>
+    <div id="pendingExplain"></div>
+  </div>
+
+  <div class="section">
+    <h2>🧾 工单列表 <span class="hint">异常单独列出·不被平均值掩盖·每步变更留痕</span></h2>
+    <div class="tabs" id="tabs">
+      <div class="tab active" data-status="all">全部</div>
+      <div class="tab" data-status="pending">待处理</div>
+      <div class="tab" data-status="pending_part">待补件</div>
+      <div class="tab" data-status="confirmed">已确认</div>
+      <div class="tab" data-status="returned">退回</div>
+    </div>
+    <div id="woTable"></div>
+  </div>
+
+  <div class="section">
+    <h2>📜 回放步骤（换参数看哪一步变了）<span class="hint">每步快照状态、异常、备件情况</span></h2>
+    <div id="stepsArea"></div>
+  </div>
+</main>
+
+<script>
+const API = '';
+let curStatus = 'all';
+let allData = null;
+
+async function loadAll() {
+  const [woR, stepR] = await Promise.all([
+    fetch(API + '/api/workorders').then(r => r.json()),
+    fetch(API + '/api/steps').then(r => r.json())
+  ]);
+  allData = woR;
+  renderKPIs(woR.counts);
+  renderPending(woR.pending_explain);
+  renderTable(woR);
+  renderSteps(stepR);
+}
+
+function renderKPIs(c) {
+  document.getElementById('kpis').innerHTML = `
+    <div class="kpi c-confirmed"><h3>已确认</h3><div class="num">${c.confirmed}</div></div>
+    <div class="kpi c-part"><h3>待补件</h3><div class="num">${c.pending_part}</div></div>
+    <div class="kpi c-returned"><h3>退回</h3><div class="num">${c.returned}</div></div>
+    <div class="kpi c-pending"><h3>待分类</h3><div class="num">${c.pending}</div></div>
+  `;
+}
+
+function renderPending(list) {
+  if (!list.length) { document.getElementById('pendingExplain').innerHTML = '<div class="empty">✅ 暂无待处理</div>'; return; }
+  document.getElementById('pendingExplain').innerHTML = list.map(p => `
+    <div class="pending-card">
+      <h4>
+        <span>${p.blade_no} · ${p.wind_farm} <span class="tag ${p.current_status === '待补件' ? 'pending_part' : 'pending'}">${p.current_status}</span></span>
+        <span style="font-size:11px;font-weight:normal;color:#8a6d3b;">经过 ${p.replay_steps} 步回放 ${p.last_action ? '· 最后: ' + p.last_action.action : ''}</span>
+      </h4>
+      <ul>${p.reasons.map(r => `<li>${r}</li>`).join('')}</ul>
+      <div style="font-size:11px;color:#8a9ab0;margin-top:6px;">工单ID: ${p.workorder_id}</div>
+    </div>
+  `).join('');
+}
+
+function renderTable(woR) {
+  const items = curStatus === 'all' ? woR.items : (woR.groups[curStatus] || []);
+  if (!items.length) { document.getElementById('woTable').innerHTML = '<div class="empty">无数据</div>'; return; }
+  document.getElementById('woTable').innerHTML = `
+    <table>
+      <thead><tr>
+        <th>叶片编号 / 风场</th><th>状态</th><th>传感器摘要（异常不掩盖）</th><th>备件（来源行·影响范围）</th><th>回放步骤痕迹</th>
+      </tr></thead>
+      <tbody>
+        ${items.map(w => `
+          <tr>
+            <td>
+              <div style="font-weight:600;">${w.blade_no}</div>
+              <div style="color:#6b7c93;font-size:12px;">${w.wind_farm}</div>
+              <div style="color:#95a5b8;font-size:11px;margin-top:4px;">${w.id}</div>
+            </td>
+            <td>
+              <span class="tag ${w.status}">${w.status_label}</span>
+              ${w.confirm_note ? `<div style="font-size:11px;color:#27ae60;margin-top:4px;">✓ ${w.confirm_note}</div>` : ''}
+              ${w.return_reason ? `<div style="font-size:11px;color:#c0392b;margin-top:4px;">✗ ${w.return_reason}</div>` : ''}
+            </td>
+            <td>
+              <div style="font-size:12px;color:#5a6a82;">${w.sensor_summary.summary_note || '无数据'}</div>
+              ${w.anomalies.sensor_anomalies.length ? `
+                <div class="anom-block">
+                  <div class="t">⚠ ${w.anomalies.sensor_anomalies.length} 条异常(未被均值掩盖)</div>
+                  ${w.anomalies.sensor_anomalies.slice(0, 3).map(a => `
+                    <div>第${a.line}行 ${a.time}: ${a.flags.join(' / ')} ${a.is_boundary ? '<span class="chip boundary">边界样本</span>' : ''} ${a.remark ? `<span class="chip">${a.remark}</span>` : ''}</div>
+                  `).join('')}
+                  ${w.anomalies.sensor_anomalies.length > 3 ? `<div style="color:#8a9ab0;margin-top:4px;">…还有 ${w.anomalies.sensor_anomalies.length - 3} 条</div>` : ''}
+                </div>` : ''}
+              ${w.anomalies.boundary_samples.length ? `
+                <div style="margin-top:6px;">
+                  ${w.anomalies.boundary_samples.map(b => `<span class="chip boundary">边界#${b.line}:振${b.vibration}/桨${b.pitch}/温${b.temp} ${b.remark || ''}</span>`).join('')}
+                </div>` : ''}
+              ${w.anomalies.masked_risk && w.anomalies.masked_risk.length ? `
+                <div class="anom-block" style="background:#fff3cd;border-color:#ffc107;">
+                  <div class="t" style="color:#856404;">防掩盖提示</div>
+                  ${w.anomalies.masked_risk.map(r => `<div>• ${r}</div>`).join('')}
+                </div>` : ''}
+            </td>
+            <td>
+              <div class="parts-row">共 ${w.parts.total} 件 · 已替换 ${w.parts.replaced_count} · 待补 ${w.parts.pending_replace_count}</div>
+              ${w.parts.replaced.length ? w.parts.replaced.map(p => `
+                <div class="parts-row">
+                  <span class="rep">${p.original} → ${p.replacement}</span> ×${p.qty}
+                  ${p.source_line ? `<span class="scope">来源行:${p.source_line}</span>` : ''}
+                  ${p.impact_scope ? `<span class="scope">影响:${p.impact_scope}</span>` : ''}
+                </div>
+              `).join('') : ''}
+              ${w.parts.pending_replace.length ? `<div class="parts-row" style="color:#d35400;">待补: ${w.parts.pending_replace.map(p => p.original + '×' + p.qty).join(', ')}</div>` : ''}
+            </td>
+            <td>
+              <div class="trace-block">
+                ${w.replay_trace.slice().reverse().slice(0, 5).map(s => `
+                  <div class="step">
+                    <span class="seq">#${s.seq}</span>${s.action} <span style="color:#8a9ab0;">${s.operator}</span>
+                    ${s.changed_fields.length ? `<span class="fields">变:${s.changed_fields.join(',')}</span>` : ''}
+                    ${s.note ? `<div style="margin-top:3px;color:#6b7c93;">💬 ${s.note}</div>` : ''}
+                  </div>
+                `).join('')}
+              </div>
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+function renderSteps(steps) {
+  if (!steps.length) { document.getElementById('stepsArea').innerHTML = '<div class="empty">暂无回放步骤</div>'; return; }
+  document.getElementById('stepsArea').innerHTML = `
+    <table>
+      <thead><tr><th>序号</th><th>操作</th><th>操作人</th><th>变化字段</th><th>影响工单</th><th>备注(讲清哪里变了)</th><th>时间</th></tr></thead>
+      <tbody>
+        ${steps.map(s => `
+          <tr>
+            <td style="font-weight:600;color:#2e5a9c;">#${s.seq_no}</td>
+            <td style="font-weight:600;">${s.action}</td>
+            <td>${s.operator}</td>
+            <td>${s.changed_fields.map(f => `<span class="chip">${f}</span>`).join('') || '<span style="color:#95a5b8;">无</span>'}</td>
+            <td>${s.workorder_impact.map(id => `<span class="chip" title="${id}">${id.slice(-5)}</span>`).join('')}</td>
+            <td style="color:#5a6a82;max-width:360px;">${s.note || '-'}</td>
+            <td style="color:#8a9ab0;white-space:nowrap;">${s.created_at}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+document.getElementById('tabs').addEventListener('click', e => {
+  if (!e.target.classList.contains('tab')) return;
+  document.querySelectorAll('#tabs .tab').forEach(t => t.classList.remove('active'));
+  e.target.classList.add('active');
+  curStatus = e.target.dataset.status;
+  if (allData) renderTable(allData);
+});
+
+loadAll();
+setInterval(loadAll, 15000);
+</script>
+</body>
+</html>
