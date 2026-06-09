@@ -154,20 +154,63 @@ print("工作流日志：", audit["workflow_log"])
 
 ## 重新导入（补录返工）
 
-当同一批记录部分字段有修改时，使用 `reimport_records` 不会重复创建记录，只会更新变化的字段：
+**重要**：补录返工必须指定要在哪个批次上更新。系统不会新建批次，而是在原批次内按 `original_line_no` 定位记录并增量更新，绝不翻倍。
 
 ```python
-from em_calibrator.importer import reimport_records
+from em_calibrator.importer import import_records, reimport_records
 
-# 假设只改了一条备注
-modified_records = original_records.copy()
-modified_records[0]["remark"] = "何工补充：已复核"
-
-batch_id, created, updated = reimport_records(
-    db, modified_records, source_file="20260604.csv", operator="何工"
+# 1) 第一次导入
+batch_id, created, updated, details = import_records(
+    db, records, source_file="20260609.csv"
 )
-# 返回 updated = 1（只有备注改了）
-# 变更历史会记录 remark 从 "初始记录" → "何工补充：已复核"
+
+# 2) 只改一条备注（何工补注）
+modified = [dict(r) for r in records]
+modified[0]["remark"] = "何工补充：已复核传感器编号"
+
+# 3) 补录返工 —— 关键：target_batch_id 作为 db 之后的第一个参数
+#    在 batch_id 原批次内按 original_line_no 定位更新
+batch_id_back, created, updated, details = reimport_records(
+    db, batch_id,               # ← 必须指定原批次
+    modified,
+    source_file="20260609.csv",
+    operator="何工",
+    reason="补录返工：何工核对后只改 line=3 的备注",
+)
+# batch_id_back == batch_id （在同一个批次上更新，不新建）
+```
+
+### 返回值（4 元组）
+
+`(batch_id, created_count, updated_count, details_list)`，每条记录的 `action` 字段可**明确区分**以下四种情况：
+
+| action | 含义 | 说明 |
+|--------|------|------|
+| `duplicate_exact` | **本次重复**（完全相同 hash 再次调用 `import_records`） | 整批内容完全一致，不写任何数据 |
+| `new_in_batch` | **补录新行**（`reimport_records` 发现新 original_line_no） | 在原批次内新增一条记录 |
+| `updated` | **更新**（存在同 original_line_no，字段有变化） | UPDATE + 每条字段差异写一条 `MANUAL_EDIT` 变更历史 |
+| `unchanged` | **历史已存在且无变化** | 不写任何东西 |
+
+### 变更历史留存（append-only，不覆盖）
+
+每条字段修改都**独立 INSERT 一条** `change_history`，不覆盖原值：
+
+| change_type | field | old_value | new_value | changed_by | reason |
+|-------------|-------|-----------|-----------|------------|--------|
+| `import` | `*` | `""` | `"imported"` | system | initial import |
+| `manual_edit` | `remark` | `"B位标定"` | `"B位标定·何工确认…"` | 何工 | 补录返工：何工核对后只改 line=3 的备注 |
+
+### 明细 / 历史 / 后续工作流都读到同一条
+
+四种访问路径全部指向同一条更新后的记录：
+
+```python
+rid = 2  # line=3 对应 record_id
+assert db.get_record(rid).remark \
+    == db.get_record_by_batch_and_line(batch_id, 3).remark \
+    == get_record_with_evidence(db, rid)["record"].remark \
+    == [r.remark for r in db.get_records_by_batch(batch_id)
+        if r.original_line_no == 3][0]
 ```
 
 ## 传感器重启编号变更完整流程

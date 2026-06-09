@@ -38,17 +38,21 @@ class TestEMCalibrator(unittest.TestCase):
                 "remark": "test",
             }
         ]
-        batch_id_1, created_1, updated_1 = import_records(self.db, records, "file1.csv", "admin")
+        batch_id_1, created_1, updated_1, details_1 = import_records(self.db, records, "file1.csv", "admin")
         self.assertGreater(batch_id_1, 0)
         self.assertEqual(created_1, 1)
         self.assertEqual(updated_1, 0)
+        self.assertEqual(len(details_1), 1)
+        self.assertEqual(details_1[0]["action"], "new")
         count_1 = self.db.count_records_by_batch(batch_id_1)
         self.assertEqual(count_1, 1)
 
-        batch_id_2, created_2, updated_2 = import_records(self.db, records, "file1.csv", "admin")
+        batch_id_2, created_2, updated_2, details_2 = import_records(self.db, records, "file1.csv", "admin")
         self.assertEqual(batch_id_2, batch_id_1)
         self.assertEqual(created_2, 0)
         self.assertEqual(updated_2, 0)
+        self.assertEqual(len(details_2), 1)
+        self.assertEqual(details_2[0]["action"], "duplicate_exact")
         count_2 = self.db.count_records_by_batch(batch_id_1)
         self.assertEqual(count_2, 1)
 
@@ -79,7 +83,7 @@ class TestEMCalibrator(unittest.TestCase):
                 "remark": "batch1 line3",
             },
         ]
-        batch_id, created, updated = import_records(self.db, records, "temp_log.csv", "admin")
+        batch_id, created, updated, _ = import_records(self.db, records, "temp_log.csv", "admin")
         self.assertEqual(created, 3)
 
         recs = self.db.get_records_by_batch(batch_id)
@@ -119,7 +123,7 @@ class TestEMCalibrator(unittest.TestCase):
                 "remark": "batch1",
             }
         ]
-        batch_id_1, _, _ = import_records(self.db, batch1_records, "b1.csv", "admin")
+        batch_id_1, _, _, _ = import_records(self.db, batch1_records, "b1.csv", "admin")
         recs_1 = self.db.get_records_by_batch(batch_id_1)
         self.assertEqual(recs_1[0].sensor_id, "S-001")
 
@@ -138,7 +142,7 @@ class TestEMCalibrator(unittest.TestCase):
                 "remark": "batch2",
             }
         ]
-        batch_id_2, _, _ = import_records(self.db, batch2_records, "b2.csv", "admin")
+        batch_id_2, _, _, _ = import_records(self.db, batch2_records, "b2.csv", "admin")
         recs_2 = self.db.get_records_by_batch(batch_id_2)
         self.assertEqual(recs_2[0].status, RecordStatus.IMPORTED.value)
 
@@ -173,7 +177,7 @@ class TestEMCalibrator(unittest.TestCase):
                 "remark": "batch1",
             }
         ]
-        batch_id_1, _, _ = import_records(self.db, batch1_records, "b1.csv", "admin")
+        batch_id_1, _, _, _ = import_records(self.db, batch1_records, "b1.csv", "admin")
         recs_1 = self.db.get_records_by_batch(batch_id_1)
         engineer_review(self.db, recs_1[0].id, "何工", "review")
         engineer_review(self.db, recs_1[0].id, "何工", "to safety")
@@ -189,7 +193,7 @@ class TestEMCalibrator(unittest.TestCase):
                 "remark": "batch2",
             }
         ]
-        batch_id_2, _, _ = import_records(self.db, batch2_records, "b2.csv", "admin")
+        batch_id_2, _, _, _ = import_records(self.db, batch2_records, "b2.csv", "admin")
         recs_2 = self.db.get_records_by_batch(batch_id_2)
         result = engineer_review(self.db, recs_2[0].id, "何工", "review")
         self.assertEqual(result.status, RecordStatus.SENSOR_CHANGED.value)
@@ -214,8 +218,10 @@ class TestEMCalibrator(unittest.TestCase):
                 "remark": "initial",
             }
         ]
-        batch_id_1, created_1, updated_1 = import_records(self.db, records_1, "f1.csv", "admin")
+        batch_id_1, created_1, updated_1, details_1 = import_records(self.db, records_1, "f1.csv", "admin")
         self.assertEqual(created_1, 1)
+        self.assertEqual(len(details_1), 1)
+        self.assertEqual(details_1[0]["action"], "new")
 
         records_2 = [
             {
@@ -227,9 +233,14 @@ class TestEMCalibrator(unittest.TestCase):
                 "remark": "何工 added note",
             }
         ]
-        batch_id_2, created_2, updated_2 = reimport_records(self.db, records_2, "f1_revised.csv", "何工")
-        self.assertEqual(created_2, 1)
+        batch_id_2, created_2, updated_2, details_2 = reimport_records(self.db, batch_id_1, records_2, "f1_revised.csv", "何工")
+        self.assertEqual(batch_id_2, batch_id_1)
+        self.assertEqual(created_2, 0)
         self.assertEqual(updated_2, 1)
+        self.assertEqual(len(details_2), 1)
+        self.assertEqual(details_2[0]["action"], "updated")
+        self.assertEqual(len(details_2[0]["changes"]), 1)
+        self.assertEqual(details_2[0]["changes"][0][0], "remark")
 
         recs = self.db.get_records_by_batch(batch_id_2)
         self.assertEqual(recs[0].remark, "何工 added note")
@@ -239,6 +250,118 @@ class TestEMCalibrator(unittest.TestCase):
         self.assertEqual(len(manual_edits), 1)
         self.assertEqual(manual_edits[0].old_value, "initial")
         self.assertEqual(manual_edits[0].new_value, "何工 added note")
+
+        record_id = recs[0].id
+        self.assertEqual(self.db.count_records_by_batch(batch_id_2), 1)
+        self.assertEqual(self.db.count_records_by_batch(batch_id_1), 1)
+        total_rows = self.db._conn.execute("SELECT COUNT(*) FROM temperature_record").fetchone()[0]
+        self.assertEqual(total_rows, 1)
+
+        remark_a = self.db.get_record(record_id).remark
+        remark_b = self.db.get_record_by_batch_and_line(batch_id_1, 1).remark
+        remark_c = get_record_with_evidence(self.db, record_id)["record"].remark
+        remark_d = [r.remark for r in self.db.get_records_by_batch(batch_id_1) if r.original_line_no == 1][0]
+        self.assertEqual(remark_a, "何工 added note")
+        self.assertEqual(remark_b, "何工 added note")
+        self.assertEqual(remark_c, "何工 added note")
+        self.assertEqual(remark_d, "何工 added note")
+
+        self.assertEqual(manual_edits[0].changed_by, "何工")
+        self.assertTrue(manual_edits[0].reason and len(manual_edits[0].reason) > 0)
+
+    def test_reimport_scenarios_distinguished(self):
+        records_initial = [
+            {
+                "original_line_no": 2,
+                "sensor_id": "S-001",
+                "equipment_position": "POS-01",
+                "temperature_value": 25.0,
+                "caliber": "PT100",
+                "remark": "line2 original",
+            },
+            {
+                "original_line_no": 3,
+                "sensor_id": "S-002",
+                "equipment_position": "POS-02",
+                "temperature_value": 26.0,
+                "caliber": "PT100",
+                "remark": "line3 original",
+            },
+        ]
+        batch_id_1, created_1, updated_1, details_1 = import_records(
+            self.db, records_initial, "scenarios.csv", "admin"
+        )
+        self.assertEqual(created_1, 2)
+        self.assertEqual(updated_1, 0)
+
+        batch_id_dup, created_dup, updated_dup, details_dup = import_records(
+            self.db, records_initial, "scenarios.csv", "admin"
+        )
+        self.assertEqual(batch_id_dup, batch_id_1)
+        self.assertEqual(created_dup, 0)
+        self.assertEqual(updated_dup, 0)
+        self.assertEqual(len(details_dup), 2)
+        self.assertEqual(details_dup[0]["action"], "duplicate_exact")
+        self.assertEqual(details_dup[1]["action"], "duplicate_exact")
+
+        records_revised = [
+            {
+                "original_line_no": 2,
+                "sensor_id": "S-001",
+                "equipment_position": "POS-01",
+                "temperature_value": 25.0,
+                "caliber": "PT100",
+                "remark": "line2 original",
+            },
+            {
+                "original_line_no": 3,
+                "sensor_id": "S-002",
+                "equipment_position": "POS-02",
+                "temperature_value": 26.0,
+                "caliber": "PT100",
+                "remark": "modified",
+            },
+            {
+                "original_line_no": 5,
+                "sensor_id": "S-003",
+                "equipment_position": "POS-03",
+                "temperature_value": 27.0,
+                "caliber": "PT100",
+                "remark": "new record",
+            },
+        ]
+        batch_id_2, created_2, updated_2, details_2 = reimport_records(
+            self.db, batch_id_1, records_revised, "scenarios_revised.csv", "何工"
+        )
+        self.assertEqual(batch_id_2, batch_id_1)
+        self.assertEqual(created_2, 1)
+        self.assertEqual(updated_2, 1)
+
+        self.assertEqual(len(details_2), 3)
+        line2_detail = [d for d in details_2 if d["original_line_no"] == 2][0]
+        line3_detail = [d for d in details_2 if d["original_line_no"] == 3][0]
+        line5_detail = [d for d in details_2 if d["original_line_no"] == 5][0]
+        self.assertEqual(line2_detail["action"], "unchanged")
+        self.assertEqual(line3_detail["action"], "updated")
+        self.assertEqual(line5_detail["action"], "new_in_batch")
+        self.assertEqual(len(line3_detail["changes"]), 1)
+        self.assertEqual(line3_detail["changes"][0][0], "remark")
+        self.assertEqual(line3_detail["changes"][0][1], "line3 original")
+        self.assertEqual(line3_detail["changes"][0][2], "modified")
+
+        batch_count = self.db.count_records_by_batch(batch_id_1)
+        self.assertEqual(batch_count, 3)
+
+        line3_record = self.db.get_record_by_batch_and_line(batch_id_1, 3)
+        line3_history = self.db.get_change_history(line3_record.id)
+        line3_manual_edits = [
+            h for h in line3_history
+            if h.change_type == ChangeType.MANUAL_EDIT.value and h.field_name == "remark"
+        ]
+        self.assertEqual(len(line3_manual_edits), 1)
+        self.assertEqual(line3_manual_edits[0].old_value, "line3 original")
+        self.assertEqual(line3_manual_edits[0].new_value, "modified")
+        self.assertEqual(line3_manual_edits[0].changed_by, "何工")
 
     def test_record_evidence(self):
         records = [
@@ -251,7 +374,7 @@ class TestEMCalibrator(unittest.TestCase):
                 "remark": "test",
             }
         ]
-        batch_id, _, _ = import_records(self.db, records, "test.csv", "admin")
+        batch_id, _, _, _ = import_records(self.db, records, "test.csv", "admin")
         recs = self.db.get_records_by_batch(batch_id)
         record_id = recs[0].id
 
@@ -340,7 +463,7 @@ class TestEMCalibrator(unittest.TestCase):
                 "remark": "test",
             }
         ]
-        batch_id, _, _ = import_records(self.db, records, "test.csv", "admin")
+        batch_id, _, _, _ = import_records(self.db, records, "test.csv", "admin")
         recs = self.db.get_records_by_batch(batch_id)
         record_id = recs[0].id
 
