@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>屋面排水碰撞预审</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:#f4f6f9;color:#303133}
+.header{background:linear-gradient(135deg,#1e88e5,#0d47a1);color:#fff;padding:16px 24px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.header h1{font-size:20px;font-weight:600}
+.header .sub{font-size:12px;opacity:.8;margin-top:2px}
+.btn{background:#1e88e5;color:#fff;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:13px;transition:.2s}
+.btn:hover{background:#1565c0}
+.btn.ghost{background:transparent;border:1px solid rgba(255,255,255,.6)}
+.btn.ghost:hover{background:rgba(255,255,255,.15)}
+.btn.warn{background:#f57c00}
+.btn.warn:hover{background:#e65100}
+.btn.small{padding:4px 10px;font-size:12px;border-radius:4px}
+.btn.danger{background:#e53935}
+.btn.ok{background:#43a047}
+.container{display:grid;grid-template-columns:1fr 380px;gap:16px;padding:16px;max-width:1600px;margin:0 auto}
+.panel{background:#fff;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden}
+.panel-header{padding:12px 16px;border-bottom:1px solid #eee;font-weight:600;display:flex;justify-content:space-between;align-items:center;font-size:14px;color:#1976d2}
+.panel-body{padding:16px}
+.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:16px}
+.stat{background:#fff;border-radius:10px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.stat .num{font-size:22px;font-weight:700;color:#1976d2}
+.stat .num.warn{color:#f57c00}
+.stat .num.err{color:#e53935}
+.stat .num.ok{color:#43a047}
+.stat .lbl{font-size:12px;color:#777;margin-top:4px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+.toolbar label{display:inline-flex;align-items:center;gap:6px}
+canvas#plan{background:#fafbfc;border:1px solid #e0e0e0;border-radius:8px;display:block;width:100%;cursor:grab}
+.legend{display:flex;gap:16px;margin-top:10px;flex-wrap:wrap;font-size:12px;color:#555}
+.legend span{display:inline-flex;align-items:center;gap:4px}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.tabs{display:flex;border-bottom:1px solid #eee;margin-bottom:12px}
+.tab{padding:10px 16px;cursor:pointer;font-size:13px;border-bottom:2px solid transparent;color:#666}
+.tab.active{color:#1976d2;border-color:#1976d2;font-weight:600}
+.tab .badge{background:#e53935;color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;margin-left:6px}
+.tab .badge.warn{background:#f57c00}
+.list{max-height:520px;overflow-y:auto}
+.list-item{padding:10px 12px;border:1px solid #eee;border-radius:8px;margin-bottom:8px;font-size:13px;background:#fafafa;transition:.15s}
+.list-item:hover{border-color:#1976d2;background:#f5f9ff}
+.list-item .title{font-weight:600;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center}
+.list-item .meta{font-size:11px;color:#888;margin-top:4px;line-height:1.7}
+.list-item .sug{margin-top:6px;padding:8px 10px;background:#fff8e1;border-left:3px solid #ffb300;border-radius:0 4px 4px 0;font-size:12px;line-height:1.6}
+.tag{display:inline-block;padding:1px 8px;border-radius:10px;font-size:11px;font-weight:500}
+.tag.critical{background:#ffebee;color:#c62828}
+.tag.warning{background:#fff3e0;color:#e65100}
+.tag.info{background:#e3f2fd;color:#1565c0}
+.tag.ok{background:#e8f5e9;color:#2e7d32}
+.tag.pending{background:#eceff1;color:#455a64}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}
+textarea{width:100%;border:1px solid #ddd;border-radius:6px;padding:6px 8px;font-size:12px;resize:vertical;font-family:inherit}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid #eee}
+th{background:#f5f7fa;font-weight:600;color:#555;position:sticky;top:0}
+tr:hover td{background:#f9fbfd}
+.modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:999}
+.modal-mask.show{display:flex}
+.modal{background:#fff;border-radius:12px;width:520px;max-height:80vh;overflow:hidden;display:flex;flex-direction:column}
+.modal-header{padding:14px 20px;border-bottom:1px solid #eee;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+.modal-body{padding:20px;overflow-y:auto}
+.modal-footer{padding:12px 20px;border-top:1px solid #eee;display:flex;justify-content:flex-end;gap:10px}
+input[type=file]{border:1px dashed #ccc;padding:16px;border-radius:8px;width:100%;font-size:13px}
+.hint{font-size:12px;color:#888;margin-top:6px;line-height:1.6}
+.close{cursor:pointer;color:#888;font-size:20px;line-height:1}
+.plan-wrap{position:relative}
+.tooltip{position:absolute;background:#333;color:#fff;padding:6px 10px;border-radius:6px;font-size:12px;pointer-events:none;z-index:10;display:none;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+</style>
+</head>
+<body>
+<div class="header">
+  <div>
+    <h1>🏗️ 屋面排水碰撞预审</h1>
+    <div class="sub">设计院助理工作台 · 空间位置 · 异常高亮 · 送审材料可追溯</div>
+  </div>
+  <div style="display:flex;gap:10px">
+    <button class="btn ghost" onclick="loadSamples()">📦 加载现场样例</button>
+    <button class="btn ghost" onclick="showImport('submission')">📋 导入送审表</button>
+    <button class="btn ghost" onclick="showImport('model')">📐 导入模型坐标</button>
+    <button class="btn warn" onclick="runDetect()">🔍 开始碰撞预审</button>
+  </div>
+</div>
+
+<div style="max-width:1600px;margin:0 auto;padding:16px 16px 0">
+<div class="stats" id="stats"></div>
+</div>
+
+<div class="container">
+  <div class="panel">
+    <div class="panel-header">
+      <span>📐 屋面 2D 平面位置图</span>
+      <div class="legend">
+        <span><i class="dot" style="background:#42a5f5"></i>排水构件</span>
+        <span><i class="dot" style="background:#78909c"></i>梁/柱/基础</span>
+        <span><i class="dot" style="background:#ff7043"></i>碰撞位置</span>
+        <span><i class="dot" style="background:#ffca28"></i>坐标偏移</span>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="toolbar">
+        <button class="btn small ghost" style="color:#333;border-color:#ccc" onclick="zoom(1.2)">放大 +</button>
+        <button class="btn small ghost" style="color:#333;border-color:#ccc" onclick="zoom(0.8)">缩小 -</button>
+        <button class="btn small ghost" style="color:#333;border-color:#ccc" onclick="resetView()">重置视图</button>
+        <label style="margin-left:auto;font-size:12px;color:#666">
+          <input type="checkbox" id="chkCollision" checked onchange="draw()"> 显示碰撞
+        </label>
+        <label style="font-size:12px;color:#666">
+          <input type="checkbox" id="chkOffset" checked onchange="draw()"> 显示偏移
+        </label>
+      </div>
+      <div class="plan-wrap">
+        <canvas id="plan" width="900" height="600"></canvas>
+        <div class="tooltip" id="tip"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header">📌 预审结果与材料清单</div>
+    <div class="panel-body">
+      <div class="tabs">
+        <div class="tab active" data-tab="collision" onclick="switchTab('collision')">碰撞问题<span class="badge" id="bdg1">0</span></div>
+        <div class="tab" data-tab="offset" onclick="switchTab('offset')">坐标偏移<span class="badge warn" id="bdg2">0</span></div>
+        <div class="tab" data-tab="submission" onclick="switchTab('submission')">送审材料</div>
+      </div>
+      <div id="tab-collision" class="tab-pane list"></div>
+      <div id="tab-offset" class="tab-pane list" style="display:none"></div>
+      <div id="tab-submission" class="tab-pane list" style="display:none;max-height:520px;overflow:auto"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-mask" id="mask">
+  <div class="modal">
+    <div class="modal-header">
+      <span id="modalTitle">导入</span>
+      <span class="close" onclick="hideModal()">×</span>
+    </div>
+    <div class="modal-body">
+      <div id="sampleList" style="display:none">
+        <p style="font-size:13px;color:#555;margin-bottom:10px">选择模拟"现场收到的材料"一键导入：</p>
+        <div id="samples" style="display:grid;gap:8px"></div>
+      </div>
+      <div id="uploadForm">
+        <input type="file" id="file" accept=".csv">
+        <div class="hint">
+          📋 送审表支持字段：<code>材料编号/物料编码/料号</code>、<code>材料名称</code>、<code>规格型号</code>、<code>数量</code>、<code>图纸版本/版次</code>、<code>复核人</code>、<code>备注</code> 等（字段名前后不一致也可识别）<br>
+          📐 模型坐标支持字段：<code>构件编号</code>、<code>构件类型</code>、<code>X坐标/Y坐标/Z坐标</code>、<code>宽/高/长</code>、<code>图纸版本</code>、<code>备注</code>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn small ghost" style="color:#555;border-color:#ccc" onclick="hideModal()">取消</button>
+      <button class="btn small" onclick="doImport()">确认导入</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let state = {submissions:[],components:[],collisions:[],offsets:[],batches:[],stats:{}};
+let currentTab = 'collision';
+let canvas, ctx;
+let scale = 1, tx = 40, ty = 40, dragging = false, dragStart = {x:0,y:0};
+let importType = 'submission';
+let currentData = [];
+
+function $(id){return document.getElementById(id)}
+
+async function refresh(){
+  const r = await fetch('/api/overview').then(x=>x.json());
+  state = r; renderStats(); renderList(); draw();
+}
+
+function renderStats(){
+  const s = state.stats;
+  $('stats').innerHTML = `
+    <div class="stat"><div class="num">${s.submission_total}</div><div class="lbl">送审记录</div></div>
+    <div class="stat"><div class="num warn">${s.submission_pending}</div><div class="lbl">待预审</div></div>
+    <div class="stat"><div class="num">${s.components_total}</div><div class="lbl">模型构件</div></div>
+    <div class="stat"><div class="num">${s.collisions_total}</div><div class="lbl">碰撞总数</div></div>
+    <div class="stat"><div class="num err">${s.collisions_critical}</div><div class="lbl">严重碰撞</div></div>
+    <div class="stat"><div class="num warn">${s.offsets_total}</div><div class="lbl">坐标偏移</div></div>
+  `;
+  $('bdg1').textContent = s.collisions_total;
+  $('bdg2').textContent = s.offsets_total;
+}
+
+function switchTab(t){
+  currentTab = t;
+  document.querySelectorAll('.tab').forEach(el=>el.classList.toggle('active', el.dataset.tab===t));
+  document.querySelectorAll('.tab-pane').forEach(el=>el.style.display='none');
+  $('tab-'+t).style.display='';
+  renderList();
+}
+
+function tagClassBySeverity(s){ return s==='critical'?'critical':'warning'; }
+function tagClassByStatus(s){
+  if(['已处理','已确认','已解决'].includes(s)) return 'ok';
+  if(s==='待预审'||s==='未处理') return 'pending';
+  return 'info';
+}
+
+function renderList(){
+  if(currentTab==='collision'){
+    $('tab-collision').innerHTML = state.collisions.map(c=>{
+      try{var coord = JSON.parse(c.coordinates)}catch(e){coord={}}
+      return `
+      <div class="list-item">
+        <div class="title">
+          <span><span class="tag ${tagClassBySeverity(c.severity)}">${c.severity==='critical'?'严重':'警示'}</span> ${c.component_a_type} ⚠️ ${c.component_b_type}</span>
+          <span class="tag ${tagClassByStatus(c.process_status)}">${c.process_status}</span>
+        </div>
+        <div style="font-size:12px;color:#555;margin-top:4px">${c.description}</div>
+        <div class="meta">构件：${c.component_a_id} / ${c.component_b_id} · 图纸：${c.drawing_version||'—'} · 坐标：(${coord.a?.x??'?'}, ${coord.a?.y??'?'}) / (${coord.b?.x??'?'}, ${coord.b?.y??'?'})</div>
+        <div class="sug">💡 ${c.suggestion||'无'}</div>
+        <div class="row">
+          <button class="btn small ok" onclick="setStatus('collision',${c.id},'已处理')">标记已处理</button>
+        </div>
+      </div>`;
+    }).join('') || '<div style="text-align:center;padding:40px;color:#999;font-size:13px">暂无碰撞问题，先导入模型坐标再"开始碰撞预审"</div>';
+  }
+  else if(currentTab==='offset'){
+    $('tab-offset').innerHTML = state.offsets.map(o=>`
+      <div class="list-item">
+        <div class="title">
+          <span><span class="tag warning">坐标偏移</span> ${o.component_type} (${o.component_id})</span>
+          <span class="tag ${tagClassByStatus(o.process_status)}">${o.process_status}</span>
+        </div>
+        <div class="meta">原坐标：X=${o.original_x} Y=${o.original_y} Z=${o.original_z} · 偏移量 Δ≈${Math.abs(o.offset_x)+Math.abs(o.offset_y)+Math.abs(o.offset_z)||'异常'}</div>
+        <div class="meta" style="color:#666">来源：${o.source_file||'—'} · 图纸版次：${o.drawing_version||'—'}</div>
+        <div style="font-size:12px;color:#c62828;margin-top:6px">📝 标注：${o.description||'无'}</div>
+        <div class="sug">💡 ${o.suggestion||'无'}</div>
+        <div class="row">
+          <button class="btn small ok" onclick="setStatus('offset',${o.id},'已处理')">标记已处理</button>
+        </div>
+      </div>
+    `).join('') || '<div style="text-align:center;padding:40px;color:#999;font-size:13px">暂无坐标偏移记录</div>';
+  }
+  else {
+    $('tab-submission').innerHTML = `
+      <table>
+        <thead><tr>
+          <th>编号</th><th>名称</th><th>规格</th><th>数量</th>
+          <th>图纸版</th><th>复核人</th><th>来源文件</th><th>状态</th><th>操作</th>
+        </tr></thead>
+        <tbody>
+        ${state.submissions.map(s=>`
+          <tr>
+            <td><b>${s.material_code}</b></td>
+            <td>${s.material_name||'—'}</td>
+            <td style="font-size:11px">${s.specification||'—'}</td>
+            <td>${s.quantity||0}${s.unit||''}</td>
+            <td>${s.drawing_version||'—'}</td>
+            <td>${s.reviewer||'—'}</td>
+            <td style="font-size:11px;color:#555">${s.source_file||''}</td>
+            <td><span class="tag ${tagClassByStatus(s.process_status)}">${s.process_status}</span></td>
+            <td>
+              <button class="btn small ghost" style="color:#1565c0;border-color:#bbdefb" onclick="editRemark(${s.id}, ${JSON.stringify(s.manual_remark||'').replace(/"/g,'&quot;')})">备注</button>
+              <button class="btn small ok" onclick="setStatus('submission',${s.id},'已确认')">确认</button>
+            </td>
+          </tr>
+          ${(s.remark||s.manual_remark)?`
+          <tr><td colspan="9" style="padding:6px 14px;background:#fffbf0;color:#8d6e63;font-size:11px">
+            ${s.remark?`📋 系统备注：${s.remark}`:''}${s.manual_remark?`&nbsp;&nbsp;✏️ 人工备注：<b>${s.manual_remark}</b>`:''}
+          </td></tr>`:''}
+        `).join('')}
+        </tbody>
+      </table>
+    ` || '<div style="text-align:center;padding:40px;color:#999;font-size:13px">暂无送审记录</div>';
+  }
+}
+
+async function setStatus(table, id, status){
+  await fetch(`/api/status/${table}/${id}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({status})});
+  refresh();
+}
+
+function editRemark(id, val){
+  const nv = prompt('编辑人工备注（重复导入时不会被覆盖）：', val);
+  if(nv===null) return;
+  fetch(`/api/submission/${id}/remark`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({manual_remark:nv})}).then(refresh);
+}
+
+function draw(){
+  canvas = $('plan'); ctx = canvas.getContext('2d');
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.setTransform(scale,0,0,scale,tx,ty);
+  const comps = state.components;
+  if(!comps.length){
+    ctx.fillStyle='#aaa';ctx.font='14px sans-serif';
+    ctx.fillText('📐 先导入模型坐标（构件编号 / 类型 / XYZ / 宽高长）', 20, 30);
+    return;
+  }
+  const xs = comps.map(c=>c.x||0), ys = comps.map(c=>c.y||0);
+  const minX = Math.min(...xs)-50, minY = Math.min(...ys)-50;
+  const maxX = Math.max(...xs)+50, maxY = Math.max(...ys)+50;
+  const cx = comps.reduce((s,c)=>s+(c.x||0),0)/comps.length;
+  const cy = comps.reduce((s,c)=>s+(c.y||0),0)/comps.length;
+  ctx.save(); ctx.translate(cx, cy);
+  ctx.strokeStyle='#eee'; ctx.lineWidth=0.5;
+  for(let x=Math.floor(minX/1000)*1000; x<=maxX; x+=1000){
+    ctx.beginPath(); ctx.moveTo(x-cx, minY-cy); ctx.lineTo(x-cx, maxY-cy); ctx.stroke();
+  }
+  for(let y=Math.floor(minY/1000)*1000; y<=maxY; y+=1000){
+    ctx.beginPath(); ctx.moveTo(minX-cx, y-cy); ctx.lineTo(maxX-cx, y-cy); ctx.stroke();
+  }
+  ctx.restore();
+  currentData = [];
+  comps.forEach(c=>{
+    const x = c.x||0, y = c.y||0, w = c.width||200, h = c.length||200;
+    let fill = '#78909c', stroke = '#546e7a';
+    const isDrain = /排水|雨水|地漏|drain/i.test(c.component_type||'');
+    if(isDrain){ fill = '#42a5f5'; stroke = '#1976d2'; }
+    ctx.fillStyle = fill; ctx.strokeStyle = stroke; ctx.lineWidth = 1.5;
+    ctx.fillRect(x-w/2, y-h/2, w, h);
+    ctx.strokeRect(x-w/2, y-h/2, w, h);
+    ctx.fillStyle = '#fff'; ctx.font = 'bold 11px sans-serif'; ctx.textAlign='center';
+    ctx.fillText(c.component_id||'', x, y+4);
+    currentData.push({type:'component', data:c, x:x-w/2, y:y-h/2, w, h});
+  });
+
+  if($('chkCollision').checked){
+    state.collisions.forEach(c=>{
+      try{var coord = JSON.parse(c.coordinates)}catch(e){return}
+      if(!coord.a) return;
+      const ax = coord.a.x||0, ay = coord.a.y||0, bx = coord.b.x||0, by = coord.b.y||0;
+      const mx = (ax+bx)/2, my = (ay+by)/2;
+      ctx.strokeStyle = c.severity==='critical'?'#e53935':'#ff7043';
+      ctx.lineWidth = 3; ctx.setLineDash([6,4]);
+      ctx.beginPath(); ctx.arc(mx, my, 180, 0, Math.PI*2); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = c.severity==='critical'?'#e53935':'#ff7043';
+      ctx.beginPath(); ctx.arc(mx, my, 12, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle='#fff';ctx.font='bold 12px sans-serif';ctx.textAlign='center';
+      ctx.fillText('!', mx, my+4);
+      currentData.push({type:'collision', data:c, x:mx-180, y:my-180, w:360, h:360});
+    });
+  }
+  if($('chkOffset').checked){
+    state.offsets.forEach(o=>{
+      const x = o.original_x||0, y = o.original_y||0;
+      ctx.strokeStyle='#ffca28'; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(x-150, y-150); ctx.lineTo(x+150, y+150);
+      ctx.moveTo(x+150, y-150); ctx.lineTo(x-150, y+150); ctx.stroke();
+      ctx.strokeRect(x-150, y-150, 300, 300);
+      ctx.fillStyle='#ffca28';
+      ctx.beginPath(); ctx.arc(x+150, y-150, 16, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle='#333';ctx.font='bold 13px sans-serif';ctx.textAlign='center';
+      ctx.fillText('⇄', x+150, y-146);
+      currentData.push({type:'offset', data:o, x:x-150, y:y-150, w:300, h:300});
+    });
+  }
+}
+
+function zoom(s){ scale*=s; draw(); }
+function resetView(){ scale=1; tx=40; ty=40; draw(); }
+
+function canvasPos(e){
+  const r = canvas.getBoundingClientRect();
+  return {x:(e.clientX-r.left-tx)/scale, y:(e.clientY-r.top-ty)/scale};
+}
+function setupCanvasEvents(){
+  canvas = $('plan');
+  canvas.addEventListener('mousedown', e=>{ dragging=true; dragStart={x:e.clientX-tx,y:e.clientY-ty}; canvas.style.cursor='grabbing'; });
+  window.addEventListener('mouseup', ()=>{ dragging=false; canvas.style.cursor='grab'; });
+  window.addEventListener('mousemove', e=>{
+    if(dragging){ tx=e.clientX-dragStart.x; ty=e.clientY-dragStart.y; draw(); return; }
+    const p = canvasPos(e); const hit = currentData.find(d=>p.x>=d.x&&p.x<=d.x+d.w&&p.y>=d.y&&p.y<=d.y+d.h);
+    const tip = $('tip');
+    if(hit){
+      let txt = '';
+      if(hit.type==='component'){
+        const c = hit.data;
+        txt = `[${c.component_id}] ${c.component_type}\n坐标(${c.x}, ${c.y}, ${c.z}) 规格${c.width||'?'}×${c.length||'?'}×${c.height||'?'}\n图纸版次：${c.drawing_version||'—'}`;
+        if(c.remark) txt += `\n📝 ${c.remark}`;
+      }else if(hit.type==='collision'){
+        const c = hit.data;
+        txt = `⚠️ ${c.severity==='critical'?'严重碰撞':'碰撞警示'}\n${c.description}\n处理建议：${c.suggestion||'无'}`;
+      }else{
+        const o = hit.data;
+        txt = `⇄ 坐标偏移 [${o.component_id}]\n${o.description||''}\n建议：${o.suggestion||'无'}`;
+      }
+      tip.textContent = txt; tip.style.whiteSpace='pre-line';
+      tip.style.display='block';
+      tip.style.left = (e.clientX-canvas.getBoundingClientRect().left+14)+'px';
+      tip.style.top = (e.clientY-canvas.getBoundingClientRect().top+14)+'px';
+    }else tip.style.display='none';
+  });
+  canvas.addEventListener('wheel', e=>{ e.preventDefault(); scale *= (e.deltaY<0?1.1:0.9); draw(); }, {passive:false});
+}
+
+function showImport(type){
+  importType = type;
+  $('modalTitle').textContent = type==='submission'?'📋 导入材料送审表':'📐 导入模型坐标 CSV';
+  $('uploadForm').style.display=''; $('sampleList').style.display='none';
+  $('file').value=''; showModal();
+}
+
+async function loadSamples(){
+  const list = await fetch('/api/samples').then(x=>x.json());
+  $('modalTitle').textContent = '📦 加载现场样例';
+  $('uploadForm').style.display='none'; $('sampleList').style.display='';
+  $('samples').innerHTML = list.map(n=>`
+    <label style="padding:10px 12px;border:1px solid #e0e0e0;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:10px">
+      <input type="radio" name="sample" value="${n}">
+      <div>
+        <div style="font-weight:600;font-size:13px">${n}</div>
+        <div style="font-size:11px;color:#888;margin-top:2px">${/送审|submission/i.test(n)?'材料送审表（含复核人、图纸版次）':'模型坐标数据（含坐标偏移标注样例）'}</div>
+      </div>
+    </label>
+  `).join('');
+  showModal();
+}
+
+async function doImport(){
+  if($('sampleList').style.display!=='none'){
+    const sel = document.querySelector('input[name=sample]:checked');
+    if(!sel){ alert('请选择一个样例文件'); return; }
+    const r = await fetch(`/api/load_sample/${sel.value}`,{method:'POST'}).then(x=>x.json());
+    alert(`导入完成：新增 ${r.total-r.duplicates} 条，重复 ${r.duplicates} 条（未覆盖人工备注）`);
+  }else{
+    const f = $('file').files[0]; if(!f){ alert('请选择 CSV 文件'); return; }
+    const fd = new FormData(); fd.append('file', f);
+    const r = await fetch(`/api/import/${importType}`,{method:'POST',body:fd}).then(x=>x.json());
+    alert(`导入完成：新增 ${r.total-r.duplicates} 条，重复 ${r.duplicates} 条`);
+  }
+  hideModal(); refresh();
+}
+
+async function runDetect(){
+  const r = await fetch('/api/detect',{method:'POST'}).then(x=>x.json());
+  alert(`碰撞预审完成：发现碰撞 ${r.collisions} 处，坐标偏移 ${r.offsets} 处`);
+  refresh();
+}
+
+function showModal(){ $('mask').classList.add('show'); }
+function hideModal(){ $('mask').classList.remove('show'); }
+
+window.addEventListener('DOMContentLoaded', ()=>{ setupCanvasEvents(); refresh(); });
+</script>
+</body>
+</html>
