@@ -10,12 +10,25 @@ import {
   Plus,
   FileCheck,
   X,
+  Download,
+  AlertOctagon,
+  Thermometer,
+  CheckCircle2,
 } from 'lucide-react';
 import { useThresholdStore } from '../store/thresholdStore';
+import { cn } from '../lib/utils';
 
 const Reports = () => {
   const navigate = useNavigate();
-  const { reports, thresholds, getDeviceById, generateReport, currentRole } = useThresholdStore();
+  const {
+    reports,
+    thresholds,
+    getDeviceById,
+    generateReport,
+    currentRole,
+    exportReport,
+    verifyConsistency,
+  } = useThresholdStore();
   const [showGenerator, setShowGenerator] = useState(false);
   const [selectedThreshold, setSelectedThreshold] = useState('');
   const [formData, setFormData] = useState({
@@ -25,6 +38,12 @@ const Reports = () => {
     nextAction: '',
     assigneeRole: 'engineer' as 'engineer' | 'coach',
   });
+  const [toast, setToast] = useState<{ msg: string; type: 'success' | 'warning' } | null>(null);
+
+  const showToast = (msg: string, type: 'success' | 'warning' = 'success') => {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 2500);
+  };
 
   const thresholdsWithoutReport = thresholds.filter(
     (t) => !reports.some((r) => r.thresholdId === t.id)
@@ -33,11 +52,20 @@ const Reports = () => {
   const handleGenerate = () => {
     if (!selectedThreshold) return;
 
+    const consistency = verifyConsistency(selectedThreshold);
+    if (!consistency.ok) {
+      const msg = `数据一致性检查不通过，共 ${consistency.issues.length} 个问题，请先修复后再生成报告`;
+      alert(`⚠️ ${msg}\n\n问题清单:\n${consistency.issues.map((i, n) => `${n + 1}. ${i}`).join('\n')}`);
+      showToast(msg, 'warning');
+      return;
+    }
+
     generateReport(selectedThreshold, {
       ...formData,
       missingMaterials: formData.missingMaterials.split('\n').filter(Boolean),
     });
 
+    showToast('报告已生成');
     setShowGenerator(false);
     setSelectedThreshold('');
     setFormData({
@@ -49,9 +77,30 @@ const Reports = () => {
     });
   };
 
+  const formatUnit = (unit: string) => (unit === 'Celsius' ? '℃' : 'K');
+
   const ReportCard = ({ report }: { report: typeof reports[0] }) => {
     const threshold = thresholds.find((t) => t.id === report.thresholdId);
     const device = threshold ? getDeviceById(threshold.deviceId) : undefined;
+
+    const snapshotMismatches: string[] = [];
+    if (report.snapshot && threshold) {
+      if (report.snapshot.thresholdValue !== threshold.value) {
+        snapshotMismatches.push(
+          `阈值：快照 ${report.snapshot.thresholdValue}${formatUnit(report.snapshot.thresholdUnit)} → 当前 ${threshold.value}${formatUnit(threshold.unit)}`
+        );
+      }
+      if (report.snapshot.thresholdStatus !== threshold.status) {
+        snapshotMismatches.push(
+          `状态：快照 ${report.snapshot.thresholdStatus} → 当前 ${threshold.status}`
+        );
+      }
+      if (report.snapshot.thresholdRemark !== threshold.remark) {
+        snapshotMismatches.push(
+          `备注：快照 "${report.snapshot.thresholdRemark}" → 当前 "${threshold.remark}"`
+        );
+      }
+    }
 
     return (
       <div className="bg-industrial-600 rounded-xl border border-industrial-500 overflow-hidden hover:border-primary-500/50 transition-all">
@@ -61,10 +110,56 @@ const Reports = () => {
               <h3 className="text-white font-semibold text-lg">{threshold?.name}</h3>
               <p className="text-industrial-400 text-sm">{device?.name}</p>
             </div>
-            <div className="bg-success-500/20 p-2 rounded-lg">
-              <FileCheck className="w-5 h-5 text-success-400" />
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  exportReport(report.id);
+                  showToast('报告已导出');
+                }}
+                className="flex items-center gap-1.5 px-3 py-2 bg-success-500/20 hover:bg-success-500/30 border border-success-500/30 text-success-400 rounded-lg text-sm transition-colors"
+              >
+                <Download className="w-4 h-4" />
+                导出报告
+              </button>
+              <div className="bg-success-500/20 p-2 rounded-lg">
+                <FileCheck className="w-5 h-5 text-success-400" />
+              </div>
             </div>
           </div>
+
+          {snapshotMismatches.length > 0 && (
+            <div className="mb-4 rounded-lg border border-warning-500/30 bg-warning-500/10 p-3">
+              <div className="flex items-start gap-2 mb-2">
+                <AlertTriangle className="w-4 h-4 text-warning-400 mt-0.5 flex-shrink-0" />
+                <p className="text-warning-400 font-medium text-sm">
+                  快照与当前记录不一致（{snapshotMismatches.length}）
+                </p>
+              </div>
+              <ul className="space-y-1 ml-6">
+                {snapshotMismatches.map((m, i) => (
+                  <li key={i} className="text-xs text-warning-300 font-mono">
+                    {m}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {snapshotMismatches.length === 0 && report.snapshot && (
+            <div className="mb-4 rounded-lg border border-success-500/30 bg-success-500/10 p-3">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-success-400" />
+                <p className="text-success-400 font-medium text-sm">快照与当前记录一致 ✓</p>
+              </div>
+              <div className="mt-2 flex items-center gap-4 text-xs text-industrial-400 font-mono">
+                <span className="flex items-center gap-1">
+                  <Thermometer className="w-3 h-3" />
+                  {report.snapshot.thresholdValue}{formatUnit(report.snapshot.thresholdUnit)}
+                </span>
+                <span>[{report.snapshot.thresholdStatus}]</span>
+              </div>
+            </div>
+          )}
 
           <p className="text-white mb-4">{report.content}</p>
 
@@ -110,6 +205,11 @@ const Reports = () => {
               <Clock className="w-4 h-4" />
               {new Date(report.createdAt).toLocaleDateString('zh-CN')}
             </div>
+            {report.exportTraceId && (
+              <div className="text-industrial-500 text-xs font-mono truncate max-w-[180px]" title={report.exportTraceId}>
+                exp: {report.exportTraceId.slice(0, 16)}...
+              </div>
+            )}
           </div>
           <button
             onClick={() => navigate(`/threshold/${report.thresholdId}`)}
@@ -119,12 +219,33 @@ const Reports = () => {
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
+
+        {report.exportTraceId && (
+          <div className="bg-industrial-700 border-t border-industrial-500 px-6 py-2">
+            <p className="text-industrial-500 text-xs">
+              导出追踪 ID: <span className="font-mono text-industrial-400">{report.exportTraceId}</span>
+            </p>
+          </div>
+        )}
       </div>
     );
   };
 
   return (
     <div className="space-y-6">
+      {toast && (
+        <div
+          className={cn(
+            'fixed top-6 right-6 z-50 px-5 py-3 rounded-lg shadow-xl border animate-pulse',
+            toast.type === 'success'
+              ? 'bg-success-500/20 text-success-400 border-success-500/30'
+              : 'bg-warning-500/20 text-warning-400 border-warning-500/30'
+          )}
+        >
+          {toast.msg}
+        </div>
+      )}
+
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white mb-1">交接报告</h1>
@@ -204,12 +325,41 @@ const Reports = () => {
                   className="w-full bg-industrial-700 border border-industrial-500 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary-500"
                 >
                   <option value="">请选择...</option>
-                  {thresholdsWithoutReport.map((t) => (
-                    <option key={t.id} value={t.id}>
-                      {t.name} - {getDeviceById(t.deviceId)?.name}
-                    </option>
-                  ))}
+                  {thresholdsWithoutReport.map((t) => {
+                    const consistency = verifyConsistency(t.id);
+                    return (
+                      <option key={t.id} value={t.id}>
+                        {t.name} - {getDeviceById(t.deviceId)?.name}
+                        {!consistency.ok ? ` ⚠️ 有${consistency.issues.length}个一致性问题` : ''}
+                      </option>
+                    );
+                  })}
                 </select>
+                {selectedThreshold && (
+                  <div className="mt-2">
+                    {(() => {
+                      const c = verifyConsistency(selectedThreshold);
+                      return c.ok ? (
+                        <div className="flex items-center gap-2 text-xs text-success-400 bg-success-500/10 px-3 py-2 rounded-lg">
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          一致性检查通过 ✓
+                        </div>
+                      ) : (
+                        <div className="text-xs text-warning-400 bg-warning-500/10 border border-warning-500/30 px-3 py-2 rounded-lg">
+                          <div className="flex items-center gap-2 mb-1 font-medium">
+                            <AlertOctagon className="w-3.5 h-3.5" />
+                            一致性检查不通过，将无法生成报告
+                          </div>
+                          <ul className="space-y-0.5 ml-5 text-warning-300 list-disc">
+                            {c.issues.slice(0, 3).map((i, n) => (
+                              <li key={n}>{i}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                )}
               </div>
 
               <div>

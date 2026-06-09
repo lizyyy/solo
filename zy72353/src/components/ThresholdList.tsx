@@ -13,6 +13,7 @@ const statusConfig: Record<ThresholdStatus, { label: string; color: string; icon
   reviewing: { label: '复核中', color: 'bg-primary-500/20 text-primary-400 border-primary-500/30', icon: Clock },
   approved: { label: '已通过', color: 'bg-success-500/20 text-success-400 border-success-500/30', icon: CheckCircle },
   rejected: { label: '已拒绝', color: 'bg-red-500/20 text-red-400 border-red-500/30', icon: XCircle },
+  needs_manual: { label: '待人工复核', color: 'bg-warning-500/20 text-warning-400 border-warning-500/30', icon: AlertTriangle },
 };
 
 const ThresholdList = ({ filter = 'all' }: ThresholdListProps) => {

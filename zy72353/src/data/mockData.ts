@@ -1,4 +1,12 @@
-import type { ThresholdData, HistoryRecord, WorkflowTask, HandoverReport, Device } from '../types';
+import type {
+  ThresholdData,
+  HistoryRecord,
+  WorkflowTask,
+  HandoverReport,
+  Device,
+  ImportBatch,
+  ManualReviewRecord,
+} from '../types';
 
 export const mockDevices: Device[] = [
   {
@@ -27,6 +35,121 @@ export const mockDevices: Device[] = [
       serialNumber: 'SN20240115002',
     },
   },
+  {
+    id: 'dev-003',
+    name: '冷凝管机组 C-03',
+    model: 'CC-1500S',
+    manufacturer: '中科精机',
+    nameplateParams: {
+      ratedTemperature: -8,
+      temperatureUnit: 'Celsius',
+      maxPressure: 1.2,
+      powerRating: 30,
+      serialNumber: 'SN20240220003',
+    },
+  },
+];
+
+export const mockBatches: ImportBatch[] = [
+  {
+    id: 'batch-001',
+    batchNo: 'BATCH-20240515-001',
+    source: 'file',
+    format: 'xlsx',
+    fileName: '安全阈值表_0515.xlsx',
+    importedBy: '何工',
+    importedAt: '2024-05-15T08:00:00Z',
+    totalCount: 2,
+    successCount: 2,
+    duplicateCount: 0,
+    errorCount: 0,
+    thresholdIds: ['th-003', 'th-004'],
+    messages: ['批次初始导入成功'],
+  },
+  {
+    id: 'batch-002',
+    batchNo: 'BATCH-20240520-001',
+    source: 'sample',
+    format: 'unknown',
+    importedBy: '训练教练',
+    importedAt: '2024-05-20T11:30:00Z',
+    totalCount: 1,
+    successCount: 1,
+    duplicateCount: 0,
+    errorCount: 0,
+    thresholdIds: ['th-004'],
+    messages: ['历史数据补录'],
+  },
+  {
+    id: 'batch-003',
+    batchNo: 'BATCH-20240601-001',
+    source: 'file',
+    format: 'csv',
+    fileName: 'weekly_threshold_import.csv',
+    importedBy: 'system',
+    importedAt: '2024-06-01T09:00:00Z',
+    totalCount: 1,
+    successCount: 1,
+    duplicateCount: 0,
+    errorCount: 0,
+    thresholdIds: ['th-001'],
+    messages: ['系统自动导入'],
+  },
+  {
+    id: 'batch-004',
+    batchNo: 'BATCH-20240602-001',
+    source: 'file',
+    format: 'xlsx',
+    fileName: 'B组设备阈值表_0602.xlsx',
+    importedBy: '何工',
+    importedAt: '2024-06-02T10:15:00Z',
+    totalCount: 1,
+    successCount: 1,
+    duplicateCount: 0,
+    errorCount: 0,
+    thresholdIds: ['th-002'],
+    messages: ['检测到B-02设备存在单位混用情况'],
+  },
+];
+
+export const mockManualReviews: ManualReviewRecord[] = [
+  {
+    id: 'review-001',
+    thresholdId: 'th-002',
+    reviewType: 'unit_mix',
+    originalValue: '265',
+    originalUnit: 'Kelvin',
+    decision: 'pending',
+    reason: '设备铭牌为开尔文、历史记录有摄氏度，留待教练复核',
+    reviewedBy: '何工',
+    createdAt: '2024-06-02T10:20:00Z',
+  },
+  {
+    id: 'review-002',
+    thresholdId: 'th-004',
+    reviewType: 'unit_mix',
+    originalValue: '268',
+    originalUnit: 'Kelvin',
+    modifiedValue: '268',
+    modifiedUnit: 'Kelvin',
+    decision: 'confirmed',
+    reason: '核查设备铭牌序列号 SN20240115002，确认使用开尔文',
+    reviewedBy: '训练教练',
+    reviewedAt: '2024-05-21T09:00:00Z',
+    createdAt: '2024-05-20T14:00:00Z',
+  },
+  {
+    id: 'review-003',
+    thresholdId: 'th-003',
+    reviewType: 'remark_change',
+    originalValue: '初始导入值',
+    modifiedValue: '夏季高温调整阈值',
+    decision: 'confirmed',
+    reason: '备注修正符合夏季工况说明',
+    reviewedBy: '训练教练',
+    reviewedAt: '2024-05-16T16:40:00Z',
+    createdAt: '2024-05-15T10:00:00Z',
+  },
 ];
 
 export const mockThresholds: ThresholdData[] = [
@@ -45,6 +168,9 @@ export const mockThresholds: ThresholdData[] = [
     createdBy: 'system',
     createdAt: '2024-06-01T09:00:00Z',
     updatedAt: '2024-06-03T14:30:00Z',
+    importBatchId: 'batch-003',
+    originalImportedValue: -5,
+    originalImportedUnit: 'Celsius',
   },
   {
     id: 'th-002',
@@ -53,7 +179,7 @@ export const mockThresholds: ThresholdData[] = [
     unit: 'Kelvin',
     deviceId: 'dev-002',
     remark: '需要复核：设备铭牌显示开尔文，但历史记录使用摄氏度',
-    status: 'pending',
+    status: 'needs_manual',
     calculationModel: 'FrostPointPrediction',
     modelVersion: 'v2.1.0',
     tradeOffReason: '待复核后确认',
@@ -61,6 +187,10 @@ export const mockThresholds: ThresholdData[] = [
     createdBy: '何工',
     createdAt: '2024-06-02T10:15:00Z',
     updatedAt: '2024-06-02T10:15:00Z',
+    importBatchId: 'batch-004',
+    manualReviewId: 'review-001',
+    originalImportedValue: 265,
+    originalImportedUnit: 'Kelvin',
   },
   {
     id: 'th-003',
@@ -77,6 +207,10 @@ export const mockThresholds: ThresholdData[] = [
     createdBy: '何工',
     createdAt: '2024-05-15T08:00:00Z',
     updatedAt: '2024-05-16T16:45:00Z',
+    importBatchId: 'batch-001',
+    manualReviewId: 'review-003',
+    originalImportedValue: -5,
+    originalImportedUnit: 'Celsius',
   },
   {
     id: 'th-004',
@@ -93,6 +227,11 @@ export const mockThresholds: ThresholdData[] = [
     createdBy: '训练教练',
     createdAt: '2024-05-20T11:30:00Z',
     updatedAt: '2024-05-21T09:00:00Z',
+    importBatchId: 'batch-002',
+    manualReviewId: 'review-002',
+    exportTraceId: 'exp-20240521-001',
+    originalImportedValue: 268,
+    originalImportedUnit: 'Kelvin',
   },
 ];
 
@@ -106,6 +245,11 @@ export const mockHistory: HistoryRecord[] = [
     modifiedBy: '何工',
     modifiedAt: '2024-06-03T14:30:00Z',
     changeReason: '补充说明信息',
+    consistencySnapshot: {
+      thresholdStatus: 'reviewing',
+      workflowStep: 'engineer_review',
+      batchId: 'batch-003',
+    },
   },
   {
     id: 'h-002',
@@ -116,6 +260,11 @@ export const mockHistory: HistoryRecord[] = [
     modifiedBy: '何工',
     modifiedAt: '2024-05-15T10:30:00Z',
     changeReason: '夏季高温调整',
+    consistencySnapshot: {
+      thresholdStatus: 'reviewing',
+      workflowStep: 'engineer_review',
+      batchId: 'batch-001',
+    },
   },
   {
     id: 'h-003',
@@ -126,6 +275,11 @@ export const mockHistory: HistoryRecord[] = [
     modifiedBy: '训练教练',
     modifiedAt: '2024-05-16T16:45:00Z',
     changeReason: '复核通过',
+    consistencySnapshot: {
+      thresholdStatus: 'approved',
+      workflowStep: 'coach_review',
+      batchId: 'batch-001',
+    },
   },
   {
     id: 'h-004',
@@ -136,6 +290,26 @@ export const mockHistory: HistoryRecord[] = [
     modifiedBy: '训练教练',
     modifiedAt: '2024-05-21T09:00:00Z',
     changeReason: '确认设备统一使用开尔文单位',
+    consistencySnapshot: {
+      thresholdStatus: 'approved',
+      workflowStep: 'coach_review',
+      batchId: 'batch-002',
+    },
+  },
+  {
+    id: 'h-005',
+    thresholdId: 'th-003',
+    fieldName: 'remark',
+    oldValue: '初始导入值',
+    newValue: '夏季高温调整阈值',
+    modifiedBy: '何工',
+    modifiedAt: '2024-05-15T10:30:00Z',
+    changeReason: '只改了一条备注：补充夏季说明',
+    consistencySnapshot: {
+      thresholdStatus: 'reviewing',
+      workflowStep: 'engineer_review',
+      batchId: 'batch-001',
+    },
   },
 ];
 
@@ -149,6 +323,7 @@ export const mockWorkflowTasks: WorkflowTask[] = [
     previousStep: 'import',
     nextStep: 'coach_review',
     createdAt: '2024-06-02T10:15:00Z',
+    consistencyCheckedAt: '2024-06-02T10:20:00Z',
   },
   {
     id: 'task-002',
@@ -169,6 +344,18 @@ export const mockWorkflowTasks: WorkflowTask[] = [
     previousStep: 'coach_review',
     createdAt: '2024-05-16T16:45:00Z',
     completedAt: '2024-05-17T10:00:00Z',
+    consistencyCheckedAt: '2024-05-16T16:45:00Z',
+  },
+  {
+    id: 'task-004',
+    thresholdId: 'th-004',
+    step: 'report',
+    status: 'completed',
+    assignee: 'coach',
+    previousStep: 'coach_review',
+    createdAt: '2024-05-21T09:00:00Z',
+    completedAt: '2024-05-21T11:00:00Z',
+    consistencyCheckedAt: '2024-05-21T09:00:00Z',
   },
 ];
 
@@ -183,6 +370,13 @@ export const mockReports: HandoverReport[] = [
     assigneeRole: 'engineer',
     createdBy: '训练教练',
     createdAt: '2024-05-17T10:00:00Z',
+    exportTraceId: 'exp-20240517-001',
+    snapshot: {
+      thresholdValue: -3,
+      thresholdUnit: 'Celsius',
+      thresholdStatus: 'approved',
+      thresholdRemark: '夏季高温调整阈值',
+    },
   },
   {
     id: 'report-002',
@@ -194,6 +388,13 @@ export const mockReports: HandoverReport[] = [
     assigneeRole: 'coach',
     createdBy: '训练教练',
     createdAt: '2024-05-21T11:00:00Z',
+    exportTraceId: 'exp-20240521-001',
+    snapshot: {
+      thresholdValue: 268,
+      thresholdUnit: 'Kelvin',
+      thresholdStatus: 'approved',
+      thresholdRemark: '复核通过，确认使用开尔文单位',
+    },
   },
 ];
 
@@ -205,4 +406,38 @@ export const temperatureChartData = [
   { time: '16:00', temperature: -3.0, threshold: -5 },
   { time: '20:00', temperature: -4.5, threshold: -5 },
   { time: '24:00', temperature: -5.1, threshold: -5 },
+];
+
+export const sampleImportCSV = `name,value,unit,deviceId,remark,calculationModel,modelVersion,tradeOffReason
+冷凝管结霜阈值,-4,Celsius,dev-001,测试CSV导入数据1,FrostPointPrediction,v2.1.0,测试数据
+冷凝管结霜阈值,-5,Celsius,dev-001,重复数据测试,,,
+冷凝管结霜阈值,270,Kelvin,dev-002,测试CSV导入数据2,,,
+冷凝管结霜阈值,-8,Celsius,dev-003,新增C-03新设备阈值,,,
+`;
+
+export const sampleImportJSON = [
+  {
+    name: '冷凝管结霜阈值',
+    value: -4,
+    unit: 'Celsius',
+    deviceId: 'dev-001',
+    remark: '测试JSON导入数据1',
+    calculationModel: 'FrostPointPrediction',
+    modelVersion: 'v2.1.0',
+    tradeOffReason: '测试数据',
+  },
+  {
+    name: '冷凝管结霜阈值',
+    value: -5,
+    unit: 'Celsius',
+    deviceId: 'dev-001',
+    remark: '重复数据测试',
+  },
+  {
+    name: '冷凝管结霜阈值',
+    value: 270,
+    unit: 'Kelvin',
+    deviceId: 'dev-002',
+    remark: '测试JSON导入数据2',
+  },
 ];

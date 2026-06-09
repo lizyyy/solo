@@ -1,57 +1,259 @@
-# React + TypeScript + Vite
+# 冷凝管结霜阈值安全管理系统
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## 一、启动方式
 
-Currently, two official plugins are available:
+### 1.1 环境要求
+- Node.js >= 18
+- npm >= 9
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 1.2 首次启动
+```bash
+# 进入项目目录
+cd /Users/lzy/pro/solo/workspaces/zy72353
 
-## Expanding the ESLint configuration
+# 安装依赖（如未安装）
+npm install
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+# 启动开发服务器
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+启动成功后访问：**http://localhost:5173/**
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### 1.3 可用命令
+| 命令 | 说明 |
+|------|------|
+| `npm run dev` | 启动开发服务器（Vite + HMR） |
+| `npm run build` | 打包生产版本 |
+| `npm run preview` | 预览打包结果 |
+| `npm run check` | TypeScript 类型检查（tsc） |
+| `npm run lint` | ESLint 检查 |
 
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+---
+
+## 二、复跑完整流程（含一致性验证）
+
+以下是端到端的标准操作路径，涵盖用户提出的所有关键校验点。
+
+### 角色说明
+系统左下角可切换当前角色：
+- **何工（engineer）**：导入阈值表、查看铭牌、改备注、提交复核
+- **训练教练（coach）**：人工复核单位混用、审批通过、生成交接报告
+
+---
+
+### 🔷 步骤 1：导入安全阈值表（支持真实文件 / 示例数据两种链路）
+
+**目标**：验证重复导入不会翻倍、检测单位混用、批次区分。
+
+#### 1a. 使用「示例数据测试导入」
+1. 打开首页 http://localhost:5173/
+2. 左下角确保当前角色为 **何工**
+3. 点击右上角按钮 **「导入阈值表」**
+4. 点击底部按钮 **「使用示例数据测试导入」**
+5. 查看结果：
+   - 显示唯一的 **批次号 BATCH-YYYYMMDD-NNN**
+   - 统计卡片：**成功 / 重复 / 错误** 三栏，总数相等
+   - 重复记录会标注 **[跳过重复] 哪条旧记录 ID**（不会翻倍）
+   - 导入数据若有单位混用（dev-002 已有开尔文、新增摄氏度），会自动标记为 `needs_manual`（**不会自动归一**）
+
+#### 1b. 使用真实文件上传
+1. 导入面板点击 **「拖拽文件或点击选择」**
+2. 支持格式：`.csv` / `.json` / `.xlsx`
+3. 建议用下方 **CSV 测试样例** 保存成文件后上传：
+
+```csv
+name,value,unit,deviceId,remark,calculationModel,modelVersion,tradeOffReason
+冷凝管结霜阈值,-4,Celsius,dev-001,真实文件导入测试1,FrostPointPrediction,v2.1.0,测试数据
+冷凝管结霜阈值,-5,Celsius,dev-001,重复数据测试,,,
+冷凝管结霜阈值,270,Kelvin,dev-002,真实文件导入测试2,,,
+冷凝管结霜阈值,-8,Celsius,dev-003,C-03新设备,,,
 ```
+
+4. **验证一致性**：
+   - 真实文件上传 和 示例数据 走 **完全相同的解析链路** → 结果完全一致
+   - 结果页三 Tab：成功明细 / 重复明细 / 错误明细，每条都可追溯
+
+---
+
+### 🔷 步骤 2：设备工程师何工 **只改一条备注**
+
+**目标**：修改痕迹、改前改后对比、人工复核链。
+
+1. 步骤 1 导入后，**记录其中一条新阈值的 ID**（例如 `th-xxxx`）
+2. 首页「阈值列表」Tab → 点击该记录最右侧 **「查看」** 进入详情页
+3. 页面顶部先看 **一致性校验横幅**：
+   - 绿色 → `状态一致 ✓`
+   - 橙红色 → 列出不一致问题（不应该出现，除非手动改数据库）
+4. 在「基本信息」卡片点击 **「编辑备注」**
+5. 修改备注为任意文字（例如「何工补看铭牌后修正说明」）
+6. 填写「修改原因」（例如「只改了一条备注：补充 B-02 铭牌观察」）
+7. 点击 **「保存」**
+8. **验证**：
+   - 滚动到「历史变更记录」→ 时间轴最新一条：
+     * 左栏 **修改前**（旧备注红色）
+     * 右栏 **修改后**（新备注绿色）
+     * 修改人显示 **何工**、修改原因准确
+   - 「人工审核记录」卡片出现橙色 **「待教练复核」** 徽章 → **改备注会触发人工复核链**（非静默保存）
+
+---
+
+### 🔷 步骤 3：刷新页面 → 验证保存结果
+
+**目标**：持久化生效、刷新后状态不丢失。
+
+1. **浏览器按 ⌘+R（或 Ctrl+R）强制刷新**
+2. 重新打开同一条阈值详情页
+3. 检查：
+   - 备注文字是否与修改后一致
+   - 历史记录是否仍在
+   - 批次号是否存在且一致
+   - 工作流进度条与状态徽章是否匹配
+   - 一致性横幅仍为绿色
+
+> 数据持久化在 localStorage，key = `threshold_system_state_v2`
+> 首页工具栏「刷新」按钮 = 重新加载持久化数据；「重置数据」按钮 = 清空并恢复出厂状态。
+
+---
+
+### 🔷 步骤 4：切换到「工作流中心」复核整条链路
+
+1. 左侧导航 **「工作流中心」**
+2. 左下角切换角色为 **训练教练**
+3. 切换后顶部应有 toast 提示「已切换到训练教练」
+4. 找到刚才那条待处理任务（应在「待处理」列）
+5. 展开卡片：
+   - 右上角显示 **批次号** 与阈值详情里相同
+   - **一致性检查** 绿色 OK / 红色问题列表
+   - 若有 `hasUnitMix`，右上角有 **「人工复核」** 按钮
+6. 若单位混用 → **先点「人工复核」**（见步骤5），再推进
+7. 否则 → 点击 **「完成并推进」**
+
+---
+
+### 🔷 步骤 5：**人工复核**（℃/K 单位混用判断）
+
+**目标**：留待教练处理、**保留原始值 + 修改值 + 原因 + 负责人确认/驳回**。
+
+1. 在工作流卡片或详情页点击 **「人工复核」**
+2. 弹窗显示：
+   - **左（原始值）**：导入时的数值+单位（红色）
+   - **右（修改值）**：可编辑的数值+单位（绿色，默认同原始值）
+   - **复核原因文本框**（必填，否则按钮 disabled）
+3. 两种决策：
+   - **「确认通过」** → 决策 `confirmed`，`hasUnitMix` 改为 false，数值按修改值保存
+   - **「驳回」** → 决策 `rejected`，记录留痕但数值不变
+4. 弹窗底部始终显示 **`verifyConsistency` 结果**：
+   - 不一致项列出，全部为 OK 才能保证下环节无冲突
+5. 操作后刷新详情页 → 人工审核卡片显示确认/驳回结果、审核人、时间、原因
+
+---
+
+### 🔷 步骤 6：生成交接报告 + 导出
+
+**目标**：报告内容与状态不打架、可反查到同一条记录。
+
+1. 角色保持 **训练教练**
+2. 左侧导航 **「交接报告」**
+3. 点击 **「生成报告」**（仅教练可见）
+4. 选择目标阈值 → 弹窗会自动执行 **一致性校验**：
+   - ✅ 通过 → 正常继续
+   - ❌ 不通过 → 告警并列出问题（阻止生成，直到问题解决）
+5. 填写表单：
+   - 报告内容
+   - **留存原因**（说明为什么保留这条）
+   - **缺少材料**（每行一项，会标橙色警示）
+   - **下一步行动**
+   - 选择 **对接人**：设备工程师何工 / 训练教练
+6. 点击 **「生成报告」**
+7. **验证一致性**：
+   - 报告卡片显示 snapshot 快照（生成时的阈值、状态、备注）
+   - 若后续阈值被改，快照与当前值对比会显示 **橙色不一致提示**（防篡改）
+   - 点击卡片右上角 **「导出报告」** → 下载 `.txt` 文件
+   - 详情页「数据导出」可**导出阈值 JSON**（含历史、批次、审核等全部链路）
+8. **反查验证**：
+   - 报告文件开头含 `导出追踪号 exp-xxxxxxxx`
+   - 此 ID 在阈值记录和报告记录里 **exportTraceId 相同**
+   - 可通过 `store.traceByExportId(exportId)` 反查原记录（防伪造）
+
+---
+
+## 三、关键机制一览
+
+### 3.1 重复导入判定
+同一 `(name, deviceId, |value差| < 0.01)` 组合视为重复 → **跳过不新增**，批次记录里统计 `duplicateCount`。
+
+### 3.2 单位混用处理
+同一设备下 `℃ ∩ K` 同时存在 → `hasUnitMix = true`，阈值状态自动 `needs_manual`，**绝不自动归一**，转教练人工复核。
+
+### 3.3 一致性校验 `verifyConsistency`
+每次写操作和展示前都会跑：
+- ✔️ 工作流 step ↔ 阈值 status 匹配吗？
+- ✔️ 报告 snapshot ↔ 当前值 匹配吗？
+- ✔️ hasUnitMix 但 review 没结论吗？
+- ✔️ review pending 但状态却 approved 吗？
+
+### 3.4 数据可追溯 ID 链
+```
+批次 batchId (BATCH-...)
+   ↓ 1:N
+阈值 th-id (importBatchId 关联)
+   ↓ 1:1
+人工复核 review-id (manualReviewId 关联)
+   ↓ 1:1
+交接报告 report-id (thresholdId 关联)
+   ↓ 1:1
+导出追踪 exportTraceId (阈值+报告同号)
+   ↓
+导出文件哈希 hash（防篡改）
+```
+
+### 3.5 持久化
+- 页面加载时 `loadPersisted()` 读 localStorage
+- 关闭窗口 `beforeunload` 自动 `persist()` 写入
+- 首页「重置数据」按钮 `resetState()` → 回到初始 Mock 数据
+
+---
+
+## 四、文件结构速查
+```
+src/
+├── types/index.ts              // 类型：批次/人工复核/导出/一致性快照
+├── data/mockData.ts            // Mock + 示例 CSV/JSON 字符串
+├── store/thresholdStore.ts     // Zustand：所有核心逻辑（导入/审核/一致性/导出）
+├── components/
+│   ├── Sidebar.tsx             // 左侧导航（含角色切换）
+│   ├── Layout.tsx              // 主布局
+│   ├── ImportPanel.tsx         // ⭐ 文件上传 + 示例导入 + 批次结果
+│   ├── ThresholdList.tsx       // 列表
+│   ├── BatchHistory.tsx        // ⭐ 导入批次追踪、批次导出
+│   ├── HistoryTimeline.tsx     // 改前改后左右对比时间轴
+│   ├── WorkflowProgress.tsx    // 三步进度条
+│   ├── StatsCard.tsx           // 统计卡片
+│   └── ManualReviewModal.tsx   // ⭐ 人工审核弹窗（一致性校验+决策）
+├── pages/
+│   ├── Home.tsx                // ⭐ 概览 + 批次Tab + 刷新/重置
+│   ├── ThresholdDetail.tsx     // ⭐ 详情（批次/审核/一致性/导出）
+│   ├── Workflow.tsx            // ⭐ 工作流（批次+复核前置校验）
+│   ├── Reports.tsx             // ⭐ 报告（快照对比 + 导出）
+│   └── Visualization.tsx       // 3D + 图表（可溯源跳转）
+├── main.tsx                    // 入口（持久化加载/保存）
+└── App.tsx                     // 路由
+```
+
+---
+
+## 五、快速验收清单（用户原话对照）
+
+| 要求 | 验证位置 |
+|------|----------|
+| ❌ 别让"冷凝管结霜阈值"重复导入翻倍 | ImportPanel 结果页 + 批次统计 |
+| 只改一条备注 → 改前改后历史可对比 | 详情页「历史变更记录」时间轴 |
+| 3D/图表 → 点到单位混用可回数据表/铭牌 | Visualization 页右侧「数据溯源」卡片 |
+| 报告不要系统日志 → 要写留存原因/缺材料/下一步找教练或何工 | 报告页生成表单 + 卡片展示 |
+| 专业计算 → 把参数版本和取舍理由留旁边 | 详情页「计算模型」卡片 |
+| 走完 三步流程 + ℃/K 混用别急着归正常，留给教练 | Workflow + ManualReviewModal |
+| 区分本次导入和历史批次 | 首页 Tab2「导入批次」列表 + batchNo |
+| 报告/导出能反查到同一条记录 | exportTraceId + hash + traceByExportId |
+| 状态/保存/报告 不要互相打架 | 全链路 verifyConsistency + 橙色告警 |
+| 人工判断要保留原始值/修改值/原因/负责人 | ManualReviewModal 字段 |
