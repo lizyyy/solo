@@ -1,0 +1,1141 @@
+{
+  "tasks": [
+    {
+      "id": "d21983f1-f275-4aac-90c7-2dd8bff552d0",
+      "projectName": "滨海新区中心医院扩建工程",
+      "drawingVersion": "V2.3",
+      "cadSource": "中建八局设计院",
+      "status": "in_progress",
+      "createdAt": "2026-05-28T19:00:00.000Z",
+      "updatedAt": "2026-06-07T19:10:00.000Z",
+      "layerCount": 8,
+      "openIssueCount": 6,
+      "description": "门诊楼机电专业综合管线深化设计复核，重点关注地下一层管综碰撞及管井布置"
+    },
+    {
+      "id": "f13386d7-4ee2-4c69-a67a-c4305f5cd47d",
+      "projectName": "城东科创园A栋办公楼",
+      "drawingVersion": "V1.5",
+      "cadSource": "华建集团上海院",
+      "status": "pending",
+      "createdAt": "2026-06-03T19:32:00.000Z",
+      "updatedAt": "2026-06-04T19:03:00.000Z",
+      "layerCount": 7,
+      "openIssueCount": 7,
+      "description": "总部办公楼1-8层标准层机电管线综合图审核，含VRV多联机系统"
+    }
+  ],
+  "layers": [
+    {
+      "id": "62db8c5c-092e-46e6-a3c6-458aba6f1fb7",
+      "taskId": "d21983f1-f275-4aac-90c7-2dd8bff552d0",
+      "originalName": "给水-LAYER-001",
+      "displayName": "喷淋给水",
+      "category": "给水",
+      "color": "#2563EB",
+      "lineType": "CONTINUOUS",
+      "currentStatus": "rejected",
+      "latestOpinion": "违反GB50015-2019第3.5.10条，管道穿防火墙无防护措施",
+      "version": 2,
+      "createdAt": "2026-05-28T19:38:00.000Z",
+      "updatedAt": "2026-06-07T19:55:00.000Z"
+    },
+    {
+      "id": "cb60d7b3-6347-4a9d-9b1a-42befbf90e2a",
+      "taskId": "d21983f1-f275-4aac-90c7-2dd8bff552d0",
+      "originalName": "给水-LAYER-002",
+      "displayName": "生活给水主管",
+      "category": "给水",
+      "color": "#2563EB",
+      "lineType": "CONTINUOUS",
+      "currentStatus": "approved",
+      "latestOpinion": "管线布置合理，满足规范要求，可通过",
+      "version": 3,
+      "createdAt": "2026-05-26T19:18:00.000Z",
+      "updatedAt": "2026-06-06T19:47:00.000Z"
+    },
+    {
+      "id": "aa153fdd-ffba-4910-8c5d-9ec1706ba709",
+      "taskId": "d21983f1-f275-4aac-90c7-2dd8bff552d0",
+      "originalName": "排水-LAYER-003",
+      "displayName": "污水排水总管",
+      "category": "排水",
+      "color": "#DC2626",
+      "lineType": "DASHED",
+      "currentStatus": "needs_modify",
+      "latestOpinion": "与暖通主管交叉净距不足300mm，需调整标高",
+      "version": 3,
+      "createdAt": "2026-05-26T19:10:00.000Z",
+      "updatedAt": "2026-06-07T19:56:00.000Z"
+    },
+    {
+      "id": "17dce798-1c79-46d4-ac3b-cec5c52c4826",
+      "taskId": "d21983f1-f275-4aac-90c7-2dd8bff552d0",
+      "originalName": "排水-LAYER-004",
+      "displayName": "专用通气管",
+      "category": "排水",
+      "color": "#DC2626",
+      "lineType": "DASHED",
+      "currentStatus": "rejected",
+      "latestOpinion": "违反GB50015-2019第3.5.10条，管道穿防火墙无防护措施",
+      "version": 2,
+      "createdAt": "2026-05-27T19:37:00.000Z",
+      "updatedAt": "2026-06-08T19:16:00.000Z"
+    },
+    {
+      "id": "d3dc1f73-b2ec-44a9-8f1a-e88f3fb4950a",
+      "taskId": "d21983f1-f275-4aac-90c7-2dd8bff552d0",
+      "originalName": "暖通-LAYER-005",
+      "displayName": "空调回风管",
+      "category": "暖通",
+      "color": "#16A34A",
+      "lineType": "CENTER",
+      "currentStatus": "rejected",
+      "latestOpinion": "违反GB50015-2019第3.5.10条，管道穿防火墙无防护措施",
+      "version": 3,
+      "createdAt": "2026-05-30T19:44:00.000Z",
+      "updatedAt": "2026-06-05T19:57:00.000Z"
+    },
+    {
+      "id": "6ffef543-c306-44db-b10e-bd4891c1134a",
+      "taskId": "d21983f1-f275-4aac-90c7-2dd8bff552d0",
+      "originalName": "电气-LAYER-006",
+      "displayName": "消防报警线路",
+      "category": "电气",
+      "color": "#CA8A04",
+      "lineType": "PHANTOM",
+      "currentStatus": "approved",
+      "latestOpinion": "管线布置合理，满足规范要求，可通过",
+      "version": 2,
+      "createdAt": "2026-05-27T19:52:00.000Z",
+      "updatedAt": "2026-06-08T19:33:00.000Z"
+    },
+    {
+      "id": "9f31bdef-2fc7-4c70-ba58-648b3bb4d64f",
+      "taskId": "d21983f1-f275-4aac-90c7-2dd8bff552d0",
+      "originalName": "消防-LAYER-007",
+      "displayName": "消火栓管道",
+      "category": "消防",
+      "color": "#9333EA",
+      "lineType": "CONTINUOUS",
+      "currentStatus": "needs_modify",
+      "latestOpinion": "与暖通主管交叉净距不足300mm，需调整标高",
+      "version": 2,
+      "createdAt": "2026-05-30T19:54:00.000Z",
+      "updatedAt": "2026-06-06T19:11:00.000Z"
+    },
+    {
+      "id": "46bc13ad-3af4-4c7f-9792-12d94ada66f3",
+      "taskId": "d21983f1-f275-4aac-90c7-2dd8bff552d0",
+      "originalName": "消防-LAYER-008",
+      "displayName": "消火栓管道",
+      "category": "消防",
+      "color": "#9333EA",
+      "lineType": "CONTINUOUS",
+      "currentStatus": "rejected",
+      "latestOpinion": "违反GB50015-2019第3.5.10条，管道穿防火墙无防护措施",
+      "version": 3,
+      "createdAt": "2026-05-30T19:24:00.000Z",
+      "updatedAt": "2026-06-06T19:37:00.000Z"
+    },
+    {
+      "id": "9cdc09a6-a39a-4459-8425-2d4af453a1f3",
+      "taskId": "f13386d7-4ee2-4c69-a67a-c4305f5cd47d",
+      "originalName": "给水-LAYER-009",
+      "displayName": "消火栓给水",
+      "category": "给水",
+      "color": "#2563EB",
+      "lineType": "CONTINUOUS",
+      "currentStatus": "rejected",
+      "latestOpinion": "违反GB50015-2019第3.5.10条，管道穿防火墙无防护措施",
+      "version": 2,
+      "createdAt": "2026-05-28T19:09:00.000Z",
+      "updatedAt": "2026-06-06T19:17:00.000Z"
+    },
+    {
+      "id": "0334a703-c638-4d93-b6fc-beaaa7cc21fc",
+      "taskId": "f13386d7-4ee2-4c69-a67a-c4305f5cd47d",
+      "originalName": "排水-LAYER-010",
+      "displayName": "废水排水管",
+      "category": "排水",
+      "color": "#DC2626",
+      "lineType": "DASHED",
+      "currentStatus": "needs_modify",
+      "latestOpinion": "与暖通主管交叉净距不足300mm，需调整标高",
+      "version": 3,
+      "createdAt": "2026-05-30T19:41:00.000Z",
+      "updatedAt": "2026-06-06T19:06:00.000Z"
+    },
+    {
+      "id": "65b47478-316e-4333-b0a2-baf1bf9f3bd2",
+      "taskId": "f13386d7-4ee2-4c69-a67a-c4305f5cd47d",
+      "originalName": "暖通-LAYER-011",
+      "displayName": "排烟风管",
+      "category": "暖通",
+      "color": "#16A34A",
+      "lineType": "CENTER",
+      "currentStatus": "needs_modify",
+      "latestOpinion": "与暖通主管交叉净距不足300mm，需调整标高",
+      "version": 2,
+      "createdAt": "2026-05-29T19:57:00.000Z",
+      "updatedAt": "2026-06-07T19:42:00.000Z"
+    },
+    {
+      "id": "b2dd249e-175c-4108-b017-8e0612cfd6e9",
+      "taskId": "f13386d7-4ee2-4c69-a67a-c4305f5cd47d",
+      "originalName": "暖通-LAYER-012",
+      "displayName": "排烟风管",
+      "category": "暖通",
+      "color": "#16A34A",
+      "lineType": "CENTER",
+      "currentStatus": "needs_modify",
+      "latestOpinion": "与暖通主管交叉净距不足300mm，需调整标高",
+      "version": 2,
+      "createdAt": "2026-05-29T19:57:00.000Z",
+      "updatedAt": "2026-06-06T19:27:00.000Z"
+    },
+    {
+      "id": "12baa3d3-5938-4975-88e4-43f3d7fbde39",
+      "taskId": "f13386d7-4ee2-4c69-a67a-c4305f5cd47d",
+      "originalName": "电气-LAYER-013",
+      "displayName": "动力配电桥架",
+      "category": "电气",
+      "color": "#CA8A04",
+      "lineType": "PHANTOM",
+      "currentStatus": "needs_modify",
+      "latestOpinion": "与暖通主管交叉净距不足300mm，需调整标高",
+      "version": 3,
+      "createdAt": "2026-05-26T19:10:00.000Z",
+      "updatedAt": "2026-06-05T19:33:00.000Z"
+    },
+    {
+      "id": "e7d1bd5c-0d11-4550-bf2d-7cb7188cfb7c",
+      "taskId": "f13386d7-4ee2-4c69-a67a-c4305f5cd47d",
+      "originalName": "消防-LAYER-014",
+      "displayName": "消火栓管道",
+      "category": "消防",
+      "color": "#9333EA",
+      "lineType": "CONTINUOUS",
+      "currentStatus": "needs_modify",
+      "latestOpinion": "与暖通主管交叉净距不足300mm，需调整标高",
+      "version": 2,
+      "createdAt": "2026-05-30T19:10:00.000Z",
+      "updatedAt": "2026-06-07T19:08:00.000Z"
+    },
+    {
+      "id": "3dc4c86a-e279-4dc7-b97b-6a913e6b12fe",
+      "taskId": "f13386d7-4ee2-4c69-a67a-c4305f5cd47d",
+      "originalName": "消防-LAYER-015",
+      "displayName": "喷淋主管",
+      "category": "消防",
+      "color": "#9333EA",
+      "lineType": "CONTINUOUS",
+      "currentStatus": "needs_modify",
+      "latestOpinion": "与暖通主管交叉净距不足300mm，需调整标高",
+      "version": 3,
+      "createdAt": "2026-05-26T19:01:00.000Z",
+      "updatedAt": "2026-06-08T19:45:00.000Z"
+    }
+  ],
+  "histories": [
+    {
+      "id": "6fb43a92-32ba-4505-a8f0-65715bed51d1",
+      "layerId": "62db8c5c-092e-46e6-a3c6-458aba6f1fb7",
+      "version": 1,
+      "status": "needs_modify",
+      "opinion": "初次审核：发现多处标高冲突，建议与机电各专业协调",
+      "note": "详见截图区域A-3轴线交5-6轴处管井",
+      "reviewer": "建筑师小赵",
+      "reviewedAt": "2026-06-06T19:25:00.000Z",
+      "standardTags": [
+        "GB50052-2009",
+        "GB50736-2012"
+      ],
+      "screenshotIds": [],
+      "changedFields": [
+        "status",
+        "opinion",
+        "note"
+      ]
+    },
+    {
+      "id": "b2cb516a-30ec-4cb4-89ef-00263253d410",
+      "layerId": "62db8c5c-092e-46e6-a3c6-458aba6f1fb7",
+      "version": 2,
+      "status": "rejected",
+      "opinion": "调整后复核：部分区域仍需优化净距",
+      "note": "已协调暖通单位下调风管标高50mm",
+      "reviewer": "建筑师小赵",
+      "reviewedAt": "2026-06-07T19:57:00.000Z",
+      "standardTags": [
+        "14X505-1",
+        "06MS201",
+        "GB50016-2014"
+      ],
+      "screenshotIds": [
+        "3977ef47-204e-477b-b3a9-a00d80ea7d8e"
+      ],
+      "changedFields": [
+        "status",
+        "opinion",
+        "note",
+        "standardTags"
+      ]
+    },
+    {
+      "id": "124f9f57-4f8f-46dc-bc46-db6e29eae2e0",
+      "layerId": "cb60d7b3-6347-4a9d-9b1a-42befbf90e2a",
+      "version": 1,
+      "status": "rejected",
+      "opinion": "初次审核：发现多处标高冲突，建议与机电各专业协调",
+      "note": "详见截图区域A-3轴线交5-6轴处管井",
+      "reviewer": "建筑师小赵",
+      "reviewedAt": "2026-06-06T19:02:00.000Z",
+      "standardTags": [
+        "14X505-1"
+      ],
+      "screenshotIds": [],
+      "changedFields": [
+        "status",
+        "opinion",
+        "note"
+      ]
+    },
+    {
+      "id": "c514d079-f7ab-4041-93bb-d0b61b65f2ad",
+      "layerId": "cb60d7b3-6347-4a9d-9b1a-42befbf90e2a",
+      "version": 2,
+      "status": "rejected",
+      "opinion": "调整后复核：部分区域仍需优化净距",
+      "note": "已协调暖通单位下调风管标高50mm",
+      "reviewer": "建筑师小赵",
+      "reviewedAt": "2026-06-06T19:48:00.000Z",
+      "standardTags": [
+        "09S304",
+        "06MS201"
+      ],
+      "screenshotIds": [],
+      "changedFields": [
+        "status",
+        "opinion",
+        "note",
+        "standardTags"
+      ]
+    },
+    {
+      "id": "cb93b36c-afbb-4598-b84a-3eec3832f1ad",
+      "layerId": "cb60d7b3-6347-4a9d-9b1a-42befbf90e2a",
+      "version": 3,
+      "status": "approved",
+      "opinion": "最终复核：符合规范要求",
+      "note": "各方会签确认",
+      "reviewer": "建筑师小赵",
+      "reviewedAt": "2026-06-07T19:56:00.000Z",
+      "standardTags": [
+        "06MS201",
+        "09S304",
+        "GB50016-2014",
+        "GB50015-2019"
+      ],
+      "screenshotIds": [],
+      "changedFields": [
+        "status",
+        "opinion"
+      ]
+    },
+    {
+      "id": "69d6335e-e0d0-46b6-8df6-865ff6027219",
+      "layerId": "aa153fdd-ffba-4910-8c5d-9ec1706ba709",
+      "version": 1,
+      "status": "needs_modify",
+      "opinion": "初次审核：发现多处标高冲突，建议与机电各专业协调",
+      "note": "详见截图区域A-3轴线交5-6轴处管井",
+      "reviewer": "建筑师小赵",
+      "reviewedAt": "2026-06-05T19:24:00.000Z",
+      "standardTags": [
+        "GB50015-2019",
+        "GB50016-2014"
+      ],
+      "screenshotIds": [],
+      "changedFields": [
+        "status",
+        "opinion",
+        "note"
+      ]
+    },
+    {
+      "id": "6a7a0eef-d213-4eab-b378-14ae649b68c8",
+      "layerId": "aa153fdd-ffba-4910-8c5d-9ec1706ba709",
+      "version": 2,
+      "status": "needs_modify",
+      "opinion": "调整后复核：部分区域仍需优化净距",
+      "note": "已协调暖通单位下调风管标高50mm",
+      "reviewer": "建筑师小赵",
+      "reviewedAt": "2026-06-07T19:25:00.000Z",
+      "standardTags": [
+        "GB50052-2009",
+        "GB50084-2017",
+        "14X505-1"
+      ],
+      "screenshotIds": [
+        "79694a5f-707a-4930-a0ad-5b66b7a68409"
+      ],
+      "changedFields": [
+        "status",
+        "opinion",
+        "note",
+        "standardTags"
+      ]
+    },
+    {
+      "id": "5f406fc9-b857-4469-a556-ffe19cb2e739",
+      "layerId": "aa153fdd-ffba-4910-8c5d-9ec1706ba709",
+      "version": 3,
+      "status": "needs_modify",
+      "opinion": "最终复核：符合规范要求",
+      "note": "各方会签确认",
+      "reviewer": "建筑师小赵",
+      "reviewedAt": "2026-06-07T19:40:00.000Z",
+      "standardTags": [
+        "GB50116-2013",
+        "GB50736-2012",
+        "15K606",
+        "04X501"
+      ],
+      "screenshotIds": [
+        "79694a5f-707a-4930-a0ad-5b66b7a68409"
+      ],
+      "changedFields": [
+        "status",
+        "opinion"
+      ]
+    },
+    {
+      "id": "d43261b7-b475-4c6c-b885-e289a374b338",
+      "layerId": "17dce798-1c79-46d4-ac3b-cec5c52c4826",
+      "version": 1,
+      "status": "needs_modify",
+      "opinion": "初次审核：发现多处标高冲突，建议与机电各专业协调",
+      "note": "详见截图区域A-3轴线交5-6轴处管井",
+      "reviewer": "建筑师小赵",
+      "reviewedAt": "2026-06-06T19:02:00.000Z",
+      "standardTags": [
+        "GB50015-2019"
+      ],
+      "screenshotIds": [],
+      "changedFields": [
+        "status",
+        "opinion",
+        "note"
+      ]
+    },
+    {
+      "id": "bced7dbb-aadc-4900-91cd-d0784ae5bb99",
+      "layerId": "17dce798-1c79-46d4-ac3b-cec5c52c4826",
+      "version": 2,
+      "status": "rejected",
+      "opinion": "调整后复核：部分区域仍需优化净距",
+      "note": "已协调暖通单位下调风管标高50mm",
+      "reviewer": "建筑师小赵",
+      "reviewedAt": "2026-06-08T19:16:00.000Z",
+      "standardTags": [
+        "09S304",
+        "GB50116-2013",
+        "GB50057-2010"
+      ],
+      "screenshotIds": [],
+      "changedFields": [
+        "status",
+        "opinion",
+        "note",
+        "standardTags"
+      ]
+    },
+    {
+      "id": "2e74a690-9208-46e1-8590-16beaacf780c",
+      "layerId": "d3dc1f73-b2ec-44a9-8f1a-e88f3fb4950a",
+      "version": 1,
+      "status": "rejected",
+      "opinion": "初次审核：发现多处标高冲突，建议与机电各专业协调",
+      "note": "详见截图区域A-3轴线交5-6轴处管井",
+      "reviewer": "建筑师小赵",
+      "reviewedAt": "2026-06-05T19:29:00.000Z",
+      "standardTags": [
+        "GB50016-2014",
+        "GB50084-2017",
+        "14X505-1",
+        "06MS201"
+      ],
+      "screenshotIds": [],
+      "changedFields": [
+        "status",
+        "opinion",
+        "note"
+      ]
+    },
+    {
+      "id": "5af9faf0-9a38-4560-951f-347002c2821f",
+      "layerId": "d3dc1f73-b2ec-44a9-8f1a-e88f3fb4950a",
+      "version": 2,
+      "status": "rejected",
+      "opinion": "调整后复核：部分区域仍需优化净距",
+      "note": "已协调暖通单位下调风管标高50mm",
+      "reviewer": "建筑师小赵",
+      "reviewedAt": "2026-06-06T19:33:00.000Z",
+      "standardTags": [
+        "06MS201",
+        "15K606"
+      ],
+      "screenshotIds": [
+        "5f4f6a54-3e59-4309-80da-5a905e0c2957"
+      ],
+      "changedFields": [
+        "status",
+        "opinion",
+        "note",
+        "standardTags"
+      ]
+    },
+    {
+      "id": "c6438ce8-ee02-4a48-9ba4-2c4717ea19dd",
+      "layerId": "d3dc1f73-b2ec-44a9-8f1a-e88f3fb4950a",
+      "version": 3,
+      "status": "rejected",
+      "opinion": "最终复核：符合规范要求",
+      "note": "各方会签确认",
+      "reviewer": "建筑师小赵",
+      "reviewedAt": "2026-06-08T19:22:00.000Z",
+      "standardTags": [
+        "GB50016-2014"
+      ],
+      "screenshotIds": [
+        "5f4f6a54-3e59-4309-80da-5a905e0c2957"
+      ],
+      "changedFields": [
+        "status",
+        "opinion"
+      ]
+    },
+    {
+      "id": "8726d65f-7117-44c8-bbcf-27b8febac13e",
+      "layerId": "6ffef543-c306-44db-b10e-bd4891c1134a",
+      "version": 1,
+      "status": "needs_modify",
+      "opinion": "初次审核：发现多处标高冲突，建议与机电各专业协调",
+      "note": "详见截图区域A-3轴线交5-6轴处管井",
+      "reviewer": "建筑师小赵",
+      "reviewedAt": "2026-06-07T19:57:00.000Z",
+      "standardTags": [
+        "GB50116-2013",
+        "GB50015-2019",
+        "GB50016-2014",
+        "GB50052-2009"
+      ],
+      "screenshotIds": [],
+      "changedFields": [
+        "status",
+        "opinion",
+        "note"
+      ]
+    },
+    {
+      "id": "4cfbbe92-e5fb-4151-8be7-ec9e76c42c43",
+      "layerId": "6ffef543-c306-44db-b10e-bd4891c1134a",
+      "version": 2,
+      "status": "approved",
+      "opinion": "调整后复核：部分区域仍需优化净距",
+      "note": "已协调暖通单位下调风管标高50mm",
+      "reviewer": "建筑师小赵",
+      "reviewedAt": "2026-06-08T19:50:00.000Z",
+      "standardTags": [
+        "14X505-1"
+      ],
+      "screenshotIds": [],
+      "changedFields": [
+        "status",
+        "opinion",
+        "note",
+        "standardTags"
+      ]
+    },
+    {
+      "id": "9a8ab94d-61cc-4be8-a69c-fc5d0efece56",
+      "layerId": "9f31bdef-2fc7-4c70-ba58-648b3bb4d64f",
+      "version": 1,
+      "status": "rejected",
+      "opinion": "初次审核：发现多处标高冲突，建议与机电各专业协调",
+      "note": "详见截图区域A-3轴线交5-6轴处管井",
+      "reviewer": "建筑师小赵",
+      "reviewedAt": "2026-06-07T19:50:00.000Z",
+      "standardTags": [
+        "09S304"
+      ],
+      "screenshotIds": [],
+      "changedFields": [
+        "status",
+        "opinion",
+        "note"
+      ]
+    },
+    {
+      "id": "77f85461-5e41-439f-95d8-dfdb03489f0d",
+      "layerId": "9f31bdef-2fc7-4c70-ba58-648b3bb4d64f",
+      "version": 2,
+      "status": "needs_modify",
+      "opinion": "调整后复核：部分区域仍需优化净距",
+      "note": "已协调暖通单位下调风管标高50mm",
+      "reviewer": "建筑师小赵",
+      "reviewedAt": "2026-06-08T19:46:00.000Z",
+      "standardTags": [
+        "14X505-1",
+        "15K606",
+        "GB50057-2010",
+        "GB50116-2013"
+      ],
+      "screenshotIds": [
+        "d25d8bba-f28c-4ba8-86fd-0e9c128f633e"
+      ],
+      "changedFields": [
+        "status",
+        "opinion",
+        "note",
+        "standardTags"
+      ]
+    },
+    {
+      "id": "a5650e0c-9d87-491e-b934-1ee7a94898e9",
+      "layerId": "46bc13ad-3af4-4c7f-9792-12d94ada66f3",
+      "version": 1,
+      "status": "needs_modify",
+      "opinion": "初次审核：发现多处标高冲突，建议与机电各专业协调",
+      "note": "详见截图区域A-3轴线交5-6轴处管井",
+      "reviewer": "建筑师小赵",
+      "reviewedAt": "2026-06-06T19:39:00.000Z",
+      "standardTags": [
+        "GB50057-2010",
+        "GB50015-2019"
+      ],
+      "screenshotIds": [],
+      "changedFields": [
+        "status",
+        "opinion",
+        "note"
+      ]
+    },
+    {
+      "id": "389c94e2-46c6-4749-b986-5c96f5018865",
+      "layerId": "46bc13ad-3af4-4c7f-9792-12d94ada66f3",
+      "version": 2,
+      "status": "needs_modify",
+      "opinion": "调整后复核：部分区域仍需优化净距",
+      "note": "已协调暖通单位下调风管标高50mm",
+      "reviewer": "建筑师小赵",
+      "reviewedAt": "2026-06-07T19:54:00.000Z",
+      "standardTags": [
+        "GB50052-2009"
+      ],
+      "screenshotIds": [],
+      "changedFields": [
+        "status",
+        "opinion",
+        "note",
+        "standardTags"
+      ]
+    },
+    {
+      "id": "3868e3af-fa62-461f-8c29-ee10503ead12",
+      "layerId": "46bc13ad-3af4-4c7f-9792-12d94ada66f3",
+      "version": 3,
+      "status": "rejected",
+      "opinion": "最终复核：符合规范要求",
+      "note": "各方会签确认",
+      "reviewer": "建筑师小赵",
+      "reviewedAt": "2026-06-08T19:46:00.000Z",
+      "standardTags": [
+        "GB50052-2009",
+        "GB50116-2013",
+        "04X501",
+        "GB50736-2012"
+      ],
+      "screenshotIds": [],
+      "changedFields": [
+        "status",
+        "opinion"
+      ]
+    },
+    {
+      "id": "fdbd0a43-0f31-4537-afc7-352b357e0b1a",
+      "layerId": "9cdc09a6-a39a-4459-8425-2d4af453a1f3",
+      "version": 1,
+      "status": "needs_modify",
+      "opinion": "初次审核：发现多处标高冲突，建议与机电各专业协调",
+      "note": "详见截图区域A-3轴线交5-6轴处管井",
+      "reviewer": "建筑师小赵",
+      "reviewedAt": "2026-06-06T19:24:00.000Z",
+      "standardTags": [
+        "15K606",
+        "14X505-1",
+        "GB50736-2012"
+      ],
+      "screenshotIds": [],
+      "changedFields": [
+        "status",
+        "opinion",
+        "note"
+      ]
+    },
+    {
+      "id": "a2b6a48d-954b-45df-892d-a073c386864d",
+      "layerId": "9cdc09a6-a39a-4459-8425-2d4af453a1f3",
+      "version": 2,
+      "status": "rejected",
+      "opinion": "调整后复核：部分区域仍需优化净距",
+      "note": "已协调暖通单位下调风管标高50mm",
+      "reviewer": "建筑师小赵",
+      "reviewedAt": "2026-06-07T19:43:00.000Z",
+      "standardTags": [
+        "GB50736-2012",
+        "GB50015-2019"
+      ],
+      "screenshotIds": [],
+      "changedFields": [
+        "status",
+        "opinion",
+        "note",
+        "standardTags"
+      ]
+    },
+    {
+      "id": "e6b6f999-cedc-4204-af25-efc92046b30f",
+      "layerId": "0334a703-c638-4d93-b6fc-beaaa7cc21fc",
+      "version": 1,
+      "status": "needs_modify",
+      "opinion": "初次审核：发现多处标高冲突，建议与机电各专业协调",
+      "note": "详见截图区域A-3轴线交5-6轴处管井",
+      "reviewer": "建筑师小赵",
+      "reviewedAt": "2026-06-05T19:54:00.000Z",
+      "standardTags": [
+        "GB50015-2019",
+        "GB50116-2013",
+        "GB50016-2014"
+      ],
+      "screenshotIds": [],
+      "changedFields": [
+        "status",
+        "opinion",
+        "note"
+      ]
+    },
+    {
+      "id": "25561d00-a788-4f41-8027-cd8132418dde",
+      "layerId": "0334a703-c638-4d93-b6fc-beaaa7cc21fc",
+      "version": 2,
+      "status": "rejected",
+      "opinion": "调整后复核：部分区域仍需优化净距",
+      "note": "已协调暖通单位下调风管标高50mm",
+      "reviewer": "建筑师小赵",
+      "reviewedAt": "2026-06-07T19:31:00.000Z",
+      "standardTags": [
+        "GB50052-2009"
+      ],
+      "screenshotIds": [
+        "e318d6f0-b2f8-41f8-822b-3827939016f9"
+      ],
+      "changedFields": [
+        "status",
+        "opinion",
+        "note",
+        "standardTags"
+      ]
+    },
+    {
+      "id": "8aaa192d-7fe6-4d15-bc4f-cf3a794662ad",
+      "layerId": "0334a703-c638-4d93-b6fc-beaaa7cc21fc",
+      "version": 3,
+      "status": "needs_modify",
+      "opinion": "最终复核：符合规范要求",
+      "note": "各方会签确认",
+      "reviewer": "建筑师小赵",
+      "reviewedAt": "2026-06-07T19:37:00.000Z",
+      "standardTags": [
+        "GB50015-2019",
+        "GB50736-2012",
+        "14X505-1",
+        "GB50084-2017"
+      ],
+      "screenshotIds": [
+        "e318d6f0-b2f8-41f8-822b-3827939016f9"
+      ],
+      "changedFields": [
+        "status",
+        "opinion"
+      ]
+    },
+    {
+      "id": "2ec324df-34b7-4412-ab50-f6b37e359923",
+      "layerId": "65b47478-316e-4333-b0a2-baf1bf9f3bd2",
+      "version": 1,
+      "status": "needs_modify",
+      "opinion": "初次审核：发现多处标高冲突，建议与机电各专业协调",
+      "note": "详见截图区域A-3轴线交5-6轴处管井",
+      "reviewer": "建筑师小赵",
+      "reviewedAt": "2026-06-06T19:41:00.000Z",
+      "standardTags": [
+        "09S304"
+      ],
+      "screenshotIds": [],
+      "changedFields": [
+        "status",
+        "opinion",
+        "note"
+      ]
+    },
+    {
+      "id": "6a36f986-3ae4-4694-990a-df1b93442ccf",
+      "layerId": "65b47478-316e-4333-b0a2-baf1bf9f3bd2",
+      "version": 2,
+      "status": "needs_modify",
+      "opinion": "调整后复核：部分区域仍需优化净距",
+      "note": "已协调暖通单位下调风管标高50mm",
+      "reviewer": "建筑师小赵",
+      "reviewedAt": "2026-06-07T19:54:00.000Z",
+      "standardTags": [
+        "GB50015-2019"
+      ],
+      "screenshotIds": [],
+      "changedFields": [
+        "status",
+        "opinion",
+        "note",
+        "standardTags"
+      ]
+    },
+    {
+      "id": "9e3d7ec4-11ac-4682-a6ae-25cea4483b21",
+      "layerId": "b2dd249e-175c-4108-b017-8e0612cfd6e9",
+      "version": 1,
+      "status": "needs_modify",
+      "opinion": "初次审核：发现多处标高冲突，建议与机电各专业协调",
+      "note": "详见截图区域A-3轴线交5-6轴处管井",
+      "reviewer": "建筑师小赵",
+      "reviewedAt": "2026-06-07T19:25:00.000Z",
+      "standardTags": [
+        "GB50057-2010",
+        "GB50052-2009",
+        "GB50736-2012",
+        "04X501"
+      ],
+      "screenshotIds": [],
+      "changedFields": [
+        "status",
+        "opinion",
+        "note"
+      ]
+    },
+    {
+      "id": "96678ab9-eab5-41d1-a64b-3768e7613cda",
+      "layerId": "b2dd249e-175c-4108-b017-8e0612cfd6e9",
+      "version": 2,
+      "status": "needs_modify",
+      "opinion": "调整后复核：部分区域仍需优化净距",
+      "note": "已协调暖通单位下调风管标高50mm",
+      "reviewer": "建筑师小赵",
+      "reviewedAt": "2026-06-07T19:33:00.000Z",
+      "standardTags": [
+        "GB50736-2012",
+        "GB50084-2017",
+        "GB50016-2014"
+      ],
+      "screenshotIds": [
+        "4ddd13db-bb53-45c9-8b86-51e7176832ed"
+      ],
+      "changedFields": [
+        "status",
+        "opinion",
+        "note",
+        "standardTags"
+      ]
+    },
+    {
+      "id": "90f502e1-4674-4cfc-9a59-1fc9f2744aec",
+      "layerId": "12baa3d3-5938-4975-88e4-43f3d7fbde39",
+      "version": 1,
+      "status": "needs_modify",
+      "opinion": "初次审核：发现多处标高冲突，建议与机电各专业协调",
+      "note": "详见截图区域A-3轴线交5-6轴处管井",
+      "reviewer": "建筑师小赵",
+      "reviewedAt": "2026-06-05T19:22:00.000Z",
+      "standardTags": [
+        "09S304",
+        "GB50052-2009",
+        "GB50116-2013"
+      ],
+      "screenshotIds": [],
+      "changedFields": [
+        "status",
+        "opinion",
+        "note"
+      ]
+    },
+    {
+      "id": "f3a4c34a-a5d7-4759-bb02-cc53477438e7",
+      "layerId": "12baa3d3-5938-4975-88e4-43f3d7fbde39",
+      "version": 2,
+      "status": "rejected",
+      "opinion": "调整后复核：部分区域仍需优化净距",
+      "note": "已协调暖通单位下调风管标高50mm",
+      "reviewer": "建筑师小赵",
+      "reviewedAt": "2026-06-06T19:21:00.000Z",
+      "standardTags": [
+        "GB50057-2010",
+        "GB50084-2017",
+        "04X501"
+      ],
+      "screenshotIds": [],
+      "changedFields": [
+        "status",
+        "opinion",
+        "note",
+        "standardTags"
+      ]
+    },
+    {
+      "id": "3a717c87-80ce-42f8-b4ad-dfc51b78e31d",
+      "layerId": "12baa3d3-5938-4975-88e4-43f3d7fbde39",
+      "version": 3,
+      "status": "needs_modify",
+      "opinion": "最终复核：符合规范要求",
+      "note": "各方会签确认",
+      "reviewer": "建筑师小赵",
+      "reviewedAt": "2026-06-07T19:06:00.000Z",
+      "standardTags": [
+        "GB50016-2014",
+        "04X501",
+        "GB50736-2012"
+      ],
+      "screenshotIds": [],
+      "changedFields": [
+        "status",
+        "opinion"
+      ]
+    },
+    {
+      "id": "40a539d7-f471-4221-8036-7498aa73e408",
+      "layerId": "e7d1bd5c-0d11-4550-bf2d-7cb7188cfb7c",
+      "version": 1,
+      "status": "needs_modify",
+      "opinion": "初次审核：发现多处标高冲突，建议与机电各专业协调",
+      "note": "详见截图区域A-3轴线交5-6轴处管井",
+      "reviewer": "建筑师小赵",
+      "reviewedAt": "2026-06-06T19:23:00.000Z",
+      "standardTags": [
+        "GB50015-2019",
+        "GB50016-2014",
+        "15K606",
+        "GB50084-2017"
+      ],
+      "screenshotIds": [],
+      "changedFields": [
+        "status",
+        "opinion",
+        "note"
+      ]
+    },
+    {
+      "id": "47afdee8-804f-4aea-80ad-3782284f82fa",
+      "layerId": "e7d1bd5c-0d11-4550-bf2d-7cb7188cfb7c",
+      "version": 2,
+      "status": "needs_modify",
+      "opinion": "调整后复核：部分区域仍需优化净距",
+      "note": "已协调暖通单位下调风管标高50mm",
+      "reviewer": "建筑师小赵",
+      "reviewedAt": "2026-06-08T19:08:00.000Z",
+      "standardTags": [
+        "GB50015-2019",
+        "GB50016-2014"
+      ],
+      "screenshotIds": [],
+      "changedFields": [
+        "status",
+        "opinion",
+        "note",
+        "standardTags"
+      ]
+    },
+    {
+      "id": "54d2079e-a6af-487b-bab8-31354050a510",
+      "layerId": "3dc4c86a-e279-4dc7-b97b-6a913e6b12fe",
+      "version": 1,
+      "status": "rejected",
+      "opinion": "初次审核：发现多处标高冲突，建议与机电各专业协调",
+      "note": "详见截图区域A-3轴线交5-6轴处管井",
+      "reviewer": "建筑师小赵",
+      "reviewedAt": "2026-06-06T19:28:00.000Z",
+      "standardTags": [
+        "14X505-1",
+        "GB50052-2009"
+      ],
+      "screenshotIds": [],
+      "changedFields": [
+        "status",
+        "opinion",
+        "note"
+      ]
+    },
+    {
+      "id": "3a4bc981-b2d9-4108-9bca-228bda39012b",
+      "layerId": "3dc4c86a-e279-4dc7-b97b-6a913e6b12fe",
+      "version": 2,
+      "status": "rejected",
+      "opinion": "调整后复核：部分区域仍需优化净距",
+      "note": "已协调暖通单位下调风管标高50mm",
+      "reviewer": "建筑师小赵",
+      "reviewedAt": "2026-06-06T19:34:00.000Z",
+      "standardTags": [
+        "GB50736-2012",
+        "15K606",
+        "14X505-1",
+        "GB50015-2019"
+      ],
+      "screenshotIds": [],
+      "changedFields": [
+        "status",
+        "opinion",
+        "note",
+        "standardTags"
+      ]
+    },
+    {
+      "id": "6f3ba01a-dc1e-4e56-9083-f3363cb64aa2",
+      "layerId": "3dc4c86a-e279-4dc7-b97b-6a913e6b12fe",
+      "version": 3,
+      "status": "needs_modify",
+      "opinion": "最终复核：符合规范要求",
+      "note": "各方会签确认",
+      "reviewer": "建筑师小赵",
+      "reviewedAt": "2026-06-08T19:50:00.000Z",
+      "standardTags": [
+        "09S304",
+        "04X501",
+        "GB50116-2013",
+        "GB50057-2010"
+      ],
+      "screenshotIds": [],
+      "changedFields": [
+        "status",
+        "opinion"
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "id": "3977ef47-204e-477b-b3a9-a00d80ea7d8e",
+      "taskId": "d21983f1-f275-4aac-90c7-2dd8bff552d0",
+      "layerId": "62db8c5c-092e-46e6-a3c6-458aba6f1fb7",
+      "fileName": "screenshot_1.jpg",
+      "storedPath": "https://picsum.photos/seed/shot1/800/500",
+      "fileSize": 567028,
+      "mimeType": "image/jpeg",
+      "uploadedAt": "2026-06-06T19:37:00.000Z",
+      "caption": "管综交叉区域截图 - 1区",
+      "standardTags": [
+        "GB50052-2009",
+        "09S304"
+      ],
+      "boundVersion": 2,
+      "isDeleted": false
+    },
+    {
+      "id": "79694a5f-707a-4930-a0ad-5b66b7a68409",
+      "taskId": "d21983f1-f275-4aac-90c7-2dd8bff552d0",
+      "layerId": "aa153fdd-ffba-4910-8c5d-9ec1706ba709",
+      "fileName": "screenshot_2.jpg",
+      "storedPath": "https://picsum.photos/seed/shot2/800/500",
+      "fileSize": 293862,
+      "mimeType": "image/jpeg",
+      "uploadedAt": "2026-06-08T19:37:00.000Z",
+      "caption": "管综交叉区域截图 - 2区",
+      "standardTags": [
+        "GB50736-2012",
+        "GB50084-2017",
+        "14X505-1",
+        "06MS201"
+      ],
+      "boundVersion": 3,
+      "isDeleted": false
+    },
+    {
+      "id": "5f4f6a54-3e59-4309-80da-5a905e0c2957",
+      "taskId": "d21983f1-f275-4aac-90c7-2dd8bff552d0",
+      "layerId": "d3dc1f73-b2ec-44a9-8f1a-e88f3fb4950a",
+      "fileName": "screenshot_3.jpg",
+      "storedPath": "https://picsum.photos/seed/shot3/800/500",
+      "fileSize": 526894,
+      "mimeType": "image/jpeg",
+      "uploadedAt": "2026-06-05T19:33:00.000Z",
+      "caption": "管综交叉区域截图 - 3区",
+      "standardTags": [
+        "GB50736-2012",
+        "GB50084-2017",
+        "04X501",
+        "GB50057-2010"
+      ],
+      "boundVersion": 3,
+      "isDeleted": false
+    },
+    {
+      "id": "e318d6f0-b2f8-41f8-822b-3827939016f9",
+      "taskId": "f13386d7-4ee2-4c69-a67a-c4305f5cd47d",
+      "layerId": "0334a703-c638-4d93-b6fc-beaaa7cc21fc",
+      "fileName": "screenshot_4.jpg",
+      "storedPath": "https://picsum.photos/seed/shot4/800/500",
+      "fileSize": 636258,
+      "mimeType": "image/jpeg",
+      "uploadedAt": "2026-06-04T19:48:00.000Z",
+      "caption": "管综交叉区域截图 - 4区",
+      "standardTags": [
+        "GB50084-2017",
+        "GB50736-2012",
+        "GB50052-2009"
+      ],
+      "boundVersion": 3,
+      "isDeleted": false
+    },
+    {
+      "id": "4ddd13db-bb53-45c9-8b86-51e7176832ed",
+      "taskId": "f13386d7-4ee2-4c69-a67a-c4305f5cd47d",
+      "layerId": "b2dd249e-175c-4108-b017-8e0612cfd6e9",
+      "fileName": "screenshot_5.jpg",
+      "storedPath": "https://picsum.photos/seed/shot5/800/500",
+      "fileSize": 678546,
+      "mimeType": "image/jpeg",
+      "uploadedAt": "2026-06-05T19:05:00.000Z",
+      "caption": "管综交叉区域截图 - 5区",
+      "standardTags": [
+        "GB50015-2019",
+        "GB50052-2009"
+      ],
+      "boundVersion": 2,
+      "isDeleted": false
+    },
+    {
+      "id": "d25d8bba-f28c-4ba8-86fd-0e9c128f633e",
+      "taskId": "d21983f1-f275-4aac-90c7-2dd8bff552d0",
+      "layerId": "9f31bdef-2fc7-4c70-ba58-648b3bb4d64f",
+      "fileName": "screenshot_6.jpg",
+      "storedPath": "https://picsum.photos/seed/shot6/800/500",
+      "fileSize": 747969,
+      "mimeType": "image/jpeg",
+      "uploadedAt": "2026-06-08T19:37:00.000Z",
+      "caption": "管综交叉区域截图 - 6区",
+      "standardTags": [
+        "GB50016-2014",
+        "GB50052-2009",
+        "GB50736-2012",
+        "15K606"
+      ],
+      "boundVersion": 2,
+      "isDeleted": false
+    }
+  ]
+}
