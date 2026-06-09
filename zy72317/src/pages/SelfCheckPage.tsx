@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, CheckCircle, XCircle, AlertTriangle, RefreshCw, FileWarning, Hash, FileSpreadsheet, Database } from 'lucide-react';
+import { Shield, CheckCircle, XCircle, AlertTriangle, RefreshCw, FileWarning, Hash, FileSpreadsheet, Database, UserCheck } from 'lucide-react';
 import { useAppStore } from '../store/appStore';
 import { selfCheckApi } from '../api/selfCheckApi';
 import type { SelfCheckResult } from '../../shared/types';
@@ -149,28 +149,85 @@ export const SelfCheckPage: React.FC = () => {
             passed={checkResult.numberGap.passed}
             details={
               <div className="space-y-2">
-                <div>
-                  <span className="text-gray-500 text-sm">编号断档：</span>
-                  <span className={`font-medium ml-1 ${checkResult.numberGap.details.gapCount > 0 ? 'text-red-600' : 'text-green-600'}`}>
-                    {checkResult.numberGap.details.gapCount} 处
-                  </span>
+                <div className="grid grid-cols-3 gap-4 text-sm">
+                  <div>
+                    <span className="text-gray-500">总断档：</span>
+                    <span className={`font-medium ml-1 ${checkResult.numberGap.details.gapCount > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                      {checkResult.numberGap.details.gapCount} 处
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">待复核：</span>
+                    <span className={`font-medium ml-1 ${(checkResult.numberGap.details as any).openGapCount > 0 ? 'text-orange-600' : 'text-green-600'}`}>
+                      {(checkResult.numberGap.details as any).openGapCount ?? checkResult.numberGap.details.gapCount} 处
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">已复核：</span>
+                    <span className="font-medium ml-1 text-indigo-600">
+                      {(checkResult.numberGap.details as any).reviewedGapCount ?? 0} 处
+                    </span>
+                  </div>
                 </div>
                 {checkResult.numberGap.details.gaps.length > 0 && (
-                  <div className="mt-3 bg-warning-50 border border-warning-300 rounded p-3">
-                    <p className="text-sm font-medium text-warning-800 mb-2">断档详情（待教研组复核）：</p>
-                    <div className="space-y-1">
-                      {checkResult.numberGap.details.gaps.map((gap, idx) => (
-                        <div key={idx} className="text-sm text-warning-700 flex items-center space-x-3">
-                          <AlertTriangle className="w-4 h-4 flex-shrink-0" />
-                          <span>
-                            编号 {gap.beforeLineNo} 后缺少 {gap.missingCount} 条记录，
-                            下一条编号为 {gap.afterLineNo}
-                          </span>
+                  <div className="space-y-3 mt-3">
+                    {(checkResult.numberGap.details as any).openGapCount > 0 && (
+                      <div className="bg-warning-50 border border-warning-300 rounded p-3">
+                        <p className="text-sm font-medium text-warning-800 mb-2 flex items-center">
+                          <AlertTriangle className="w-4 h-4 mr-1.5" />
+                          待教研组复核：{(checkResult.numberGap.details as any).openGapCount} 处
+                        </p>
+                        <div className="space-y-1">
+                          {checkResult.numberGap.details.gaps
+                            .filter((g: any) => g.status === 'open')
+                            .map((gap: any, idx: number) => (
+                            <div key={idx} className="text-sm text-warning-700 flex items-start space-x-2 bg-white/60 p-2 rounded">
+                              <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                              <div>
+                                <span className="font-mono">
+                                  编号 #{gap.beforeLineNo} → #{gap.afterLineNo}，
+                                  缺失 <span className="font-bold">{gap.missingCount}</span> 条
+                                </span>
+                                {gap.gapId && (
+                                  <span className="ml-2 text-xs text-gray-500">[ID: {gap.gapId.slice(0, 8)}]</span>
+                                )}
+                                <div className="text-xs text-warning-600 mt-0.5">
+                                  请在"拣货路线明细"页的黄色断档列表中点击"教研组复核"按钮
+                                </div>
+                              </div>
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
-                    <p className="mt-2 text-xs text-warning-600">
-                      注意：断档记录不会自动修正，保留原始证据，由教研组复核后处理
+                      </div>
+                    )}
+                    {(checkResult.numberGap.details as any).reviewedGapCount > 0 && (
+                      <div className="bg-indigo-50 border border-indigo-200 rounded p-3">
+                        <p className="text-sm font-medium text-indigo-800 mb-2 flex items-center">
+                          <UserCheck className="w-4 h-4 mr-1.5" />
+                          已完成复核：{(checkResult.numberGap.details as any).reviewedGapCount} 处（保留变更证据，不自动归正常）
+                        </p>
+                        <div className="space-y-1">
+                          {checkResult.numberGap.details.gaps
+                            .filter((g: any) => g.status === 'reviewed')
+                            .map((gap: any, idx: number) => (
+                            <div key={idx} className="text-sm text-indigo-700 flex items-start space-x-2 bg-white/60 p-2 rounded">
+                              <CheckCircle className="w-4 h-4 flex-shrink-0 mt-0.5 text-indigo-500" />
+                              <div>
+                                <span className="font-mono">
+                                  原断档 #{gap.beforeLineNo} → #{gap.afterLineNo}，
+                                  缺 {gap.missingCount} 条
+                                </span>
+                                {gap.gapId && (
+                                  <span className="ml-2 text-xs text-gray-500">[ID: {gap.gapId.slice(0, 8)}]</span>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    <p className="mt-1 text-xs text-gray-500">
+                      注意：编号断档不会自动修正，保留完整证据，必须由教研组在明细页执行"复核"动作
                     </p>
                   </div>
                 )}
@@ -196,21 +253,28 @@ export const SelfCheckPage: React.FC = () => {
                       {checkResult.supplementRecalc.details.pendingRecalcCount} 条
                     </span>
                   </div>
+                  <div>
+                    <span className="text-gray-500">已重算：</span>
+                    <span className="font-medium ml-1 text-purple-600">
+                      {checkResult.supplementRecalc.details.supplementCount - checkResult.supplementRecalc.details.pendingRecalcCount} 条
+                    </span>
+                  </div>
                 </div>
                 {checkResult.supplementRecalc.details.items.length > 0 && (
                   <div className="mt-3 bg-amber-50 border border-amber-200 rounded p-3">
                     <p className="text-sm font-medium text-amber-800 mb-2">待重算记录：</p>
                     <div className="space-y-1">
                       {checkResult.supplementRecalc.details.items.map((item, idx) => (
-                        <div key={idx} className="text-sm text-amber-700 flex items-center space-x-3">
+                        <div key={idx} className="text-sm text-amber-700 flex items-center space-x-3 bg-white/60 p-2 rounded">
                           <span className="font-mono text-xs">{item.id.slice(0, 8)}...</span>
-                          <span>原始行号：{item.originalLineNo}</span>
-                          <span className="px-2 py-0.5 rounded text-xs bg-amber-100">{item.status}</span>
+                          <span>原始行号：补录</span>
+                          <span>订单号：{item.orderNo || '-'}</span>
+                          <span className="px-2 py-0.5 rounded text-xs bg-amber-100 font-medium">{item.status}</span>
                         </div>
                       ))}
                     </div>
                     <p className="mt-2 text-xs text-amber-600">
-                      请在"明细展示"页点击"补录后重算"按钮完成重算
+                      请在"拣货路线明细"页点击顶部"补录后重算"按钮完成重算
                     </p>
                   </div>
                 )}
@@ -221,11 +285,11 @@ export const SelfCheckPage: React.FC = () => {
           <CheckCard
             icon={<Database className="w-5 h-5" />}
             title="导出一致性校验"
-            description="确保页面展示、导出明细、接口返回读取同一份数据"
+            description="确保页面展示、导出明细、接口返回读取同一份 picking_route + gap_record 数据源"
             passed={checkResult.exportConsistency.passed}
             details={
               <div className="space-y-2">
-                <div className="grid grid-cols-3 gap-4 text-sm">
+                <div className="grid grid-cols-4 gap-4 text-sm">
                   <div>
                     <span className="text-gray-500">页面展示：</span>
                     <span className="font-medium text-gray-900 ml-1">{checkResult.exportConsistency.details.pageCount} 条</span>
@@ -237,6 +301,10 @@ export const SelfCheckPage: React.FC = () => {
                   <div>
                     <span className="text-gray-500">接口返回：</span>
                     <span className="font-medium text-gray-900 ml-1">{checkResult.exportConsistency.details.apiCount} 条</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">数据库实际：</span>
+                    <span className="font-medium text-gray-900 ml-1">{(checkResult.exportConsistency.details as any).dbCount ?? checkResult.exportConsistency.details.pageCount} 条</span>
                   </div>
                 </div>
                 <div className={`mt-3 p-3 rounded border ${
@@ -254,13 +322,13 @@ export const SelfCheckPage: React.FC = () => {
                       checkResult.exportConsistency.details.isConsistent ? 'text-green-800' : 'text-red-800'
                     }`}>
                       {checkResult.exportConsistency.details.isConsistent
-                        ? '数据一致性校验通过，三者读取同一份 picking_route 表数据'
-                        : '数据不一致！请检查数据源配置'}
+                        ? '✅ 数据一致性校验通过：页面/导出/接口/DB 四重读取同一份 picking_route + gap_record 数据'
+                        : '❌ 数据不一致！请立即检查，确保单一数据源原则'}
                     </span>
                   </div>
                   {!checkResult.exportConsistency.details.isConsistent && (
                     <p className="mt-1 text-xs text-red-600">
-                      这是严重问题，请立即联系技术人员，确保单一数据源原则
+                      这是严重问题，请立即联系技术人员，确保所有列表、接口、导出都读取同一份结果
                     </p>
                   )}
                 </div>
@@ -274,9 +342,10 @@ export const SelfCheckPage: React.FC = () => {
         <h4 className="font-medium text-blue-800 mb-2">给教研组的说明</h4>
         <ul className="text-sm text-blue-700 space-y-1 list-disc list-inside">
           <li>四项自检覆盖最容易出错的场景，每次操作后建议重新自检</li>
-          <li>编号断档不会自动修正，保留原始证据，请在明细页人工复核</li>
-          <li>所有展示、导出、接口均读取同一份结果数据，确保口径一致</li>
-          <li>每条记录的变更历史均可追溯，点击明细页的"变更历史"查看</li>
+          <li>编号断档不会自动修正，保留原始证据，请在明细页的黄色断档列表点击"教研组复核"处理</li>
+          <li>所有展示、导出、接口、自检均读取同一份 picking_route + gap_record 数据源，口径一致</li>
+          <li>每条记录的变更历史均可追溯（含断档复核的全部信息），点击明细页的眼睛图标查看</li>
+          <li>导出CSV末尾附带断档汇总表，便于教研组直接核对</li>
         </ul>
       </div>
     </div>

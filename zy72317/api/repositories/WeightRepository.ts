@@ -1,6 +1,8 @@
 import db from '../db';
 import type { ScoreWeight } from '../../shared/types';
 
+const DEFAULT_WEIGHT_BATCH_ID = 'weight-batch-default';
+
 export class WeightRepository {
   findAll(): ScoreWeight[] {
     const stmt = db.prepare('SELECT * FROM score_weight ORDER BY id ASC');
@@ -30,6 +32,13 @@ export class WeightRepository {
       SET reviewed_by = ?, reviewed_at = CURRENT_TIMESTAMP, remark = ?, updated_at = CURRENT_TIMESTAMP
     `);
     stmt.run(operator, remark || null);
+
+    db.prepare(`
+      UPDATE weight_batch 
+      SET reviewed_by = ?, reviewed_at = CURRENT_TIMESTAMP, remark = ?
+      WHERE id = ?
+    `).run(operator, remark || null, DEFAULT_WEIGHT_BATCH_ID);
+
     return this.findAll();
   }
 
@@ -44,13 +53,26 @@ export class WeightRepository {
   }
 
   getReviewInfo(): { reviewedBy: string | null; reviewedAt: string | null; remark: string | null } | null {
-    const stmt = db.prepare('SELECT reviewed_by, reviewed_at, remark FROM score_weight LIMIT 1');
-    const row = stmt.get() as any;
-    return row ? {
+    const stmt = db.prepare(`
+      SELECT reviewed_by, reviewed_at, remark 
+      FROM weight_batch 
+      WHERE id = ? 
+      LIMIT 1
+    `);
+    const row = stmt.get(DEFAULT_WEIGHT_BATCH_ID) as any;
+    if (!row) {
+      const fallback = db.prepare('SELECT reviewed_by, reviewed_at, remark FROM score_weight LIMIT 1').get() as any;
+      return fallback ? {
+        reviewedBy: fallback.reviewed_by,
+        reviewedAt: fallback.reviewed_at,
+        remark: fallback.remark,
+      } : null;
+    }
+    return {
       reviewedBy: row.reviewed_by,
       reviewedAt: row.reviewed_at,
       remark: row.remark,
-    } : null;
+    };
   }
 
   private mapToModel(row: any): ScoreWeight {

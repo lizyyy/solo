@@ -2,6 +2,7 @@ import type { SelfCheckResult } from '../../shared/types';
 import { importRepository } from '../repositories/ImportRepository';
 import { routeRepository } from '../repositories/RouteRepository';
 import { routeService } from './RouteService';
+import { gapRecordRepository } from '../repositories/GapRecordRepository';
 
 export class SelfCheckService {
   runSelfCheck(): SelfCheckResult {
@@ -53,41 +54,32 @@ export class SelfCheckService {
   }
 
   private checkNumberGap(): SelfCheckResult['numberGap'] {
-    const routes = routeRepository.findAll();
-    routes.sort((a, b) => a.currentLineNo - b.currentLineNo);
+    const allGaps = gapRecordRepository.findAll('all');
+    const openGaps = allGaps.filter(g => g.status === 'open');
+    const reviewedGaps = allGaps.filter(g => g.status === 'reviewed');
 
-    const gaps: { beforeLineNo: number; afterLineNo: number; missingCount: number }[] = [];
-
-    for (let i = 0; i < routes.length - 1; i++) {
-      const current = routes[i];
-      const next = routes[i + 1];
-      const expectedNext = current.currentLineNo + 1;
-
-      if (next.currentLineNo > expectedNext) {
-        gaps.push({
-          beforeLineNo: current.currentLineNo,
-          afterLineNo: next.currentLineNo,
-          missingCount: next.currentLineNo - expectedNext,
-        });
-      }
-    }
-
-    const hasPendingGap = routes.some(r => r.status === 'gap_pending_review');
+    const gapsDetail = allGaps.map(g => ({
+      gapId: g.id,
+      beforeLineNo: g.beforeLineNo,
+      afterLineNo: g.afterLineNo,
+      missingCount: g.missingCount,
+      status: g.status === 'open' ? '待教研组复核' : '已复核',
+    }));
 
     return {
-      passed: gaps.length === 0 && !hasPendingGap,
+      passed: openGaps.length === 0,
       details: {
-        gapCount: gaps.length,
-        gaps,
-      },
+        gapCount: allGaps.length,
+        openGapCount: openGaps.length,
+        reviewedGapCount: reviewedGaps.length,
+        gaps: gapsDetail,
+      } as any,
     };
   }
 
   private checkSupplementRecalc(): SelfCheckResult['supplementRecalc'] {
     const routes = routeRepository.findAll(false);
-    const supplementItems = routes.filter(r =>
-      r.status === 'supplement_pending_recalc' || r.sourceBatch === 'supplement'
-    );
+    const supplementItems = routes.filter(r => r.originalLineNo === -1);
     const pendingItems = supplementItems.filter(r => r.status === 'supplement_pending_recalc');
 
     return {
@@ -99,17 +91,25 @@ export class SelfCheckService {
           id: r.id,
           originalLineNo: r.originalLineNo,
           status: r.statusLabel,
+          orderNo: r.routeData.orderNo,
+          sku: r.routeData.sku,
         })),
       },
     };
   }
 
   private checkExportConsistency(): SelfCheckResult['exportConsistency'] {
-    const pageCount = routeService.getCount();
+    const apiResult = routeService.getAllRoutes();
+    const apiCount = apiResult.length;
     const exportResult = routeService.exportRoutes();
-    const apiCount = routeRepository.findAll().length;
+    const pageCount = routeService.getCount();
 
-    const isConsistent = pageCount === exportResult.count && exportResult.count === apiCount;
+    const routes = routeRepository.findAll();
+    const dbCount = routes.length;
+
+    const isConsistent = pageCount === exportResult.count
+      && exportResult.count === apiCount
+      && apiCount === dbCount;
 
     return {
       passed: isConsistent,
@@ -117,6 +117,7 @@ export class SelfCheckService {
         pageCount,
         exportCount: exportResult.count,
         apiCount,
+        dbCount,
         isConsistent,
       },
     };

@@ -2,20 +2,22 @@ import db from '../db';
 import { v4 as uuidv4 } from 'uuid';
 import type { ParameterVersion, VersionStatus } from '../../shared/types';
 
+const DEFAULT_WEIGHT_BATCH_ID = 'weight-batch-default';
+
 export class VersionRepository {
   create(
     versionNo: string,
-    weightBatchId: string,
     hasGap: boolean,
+    openGapCount: number,
     createdBy: string
   ): ParameterVersion {
     const id = uuidv4();
     const status: VersionStatus = hasGap ? 'pending_review' : 'draft';
     const stmt = db.prepare(`
-      INSERT INTO parameter_version (id, version_no, status, weight_batch_id, has_gap, created_by)
-      VALUES (?, ?, ?, ?, ?, ?)
+      INSERT INTO parameter_version (id, version_no, status, weight_batch_id, has_gap, open_gap_count, created_by)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
     `);
-    stmt.run(id, versionNo, status, weightBatchId, hasGap ? 1 : 0, createdBy);
+    stmt.run(id, versionNo, status, DEFAULT_WEIGHT_BATCH_ID, hasGap ? 1 : 0, openGapCount, createdBy);
     return this.findById(id) as ParameterVersion;
   }
 
@@ -54,6 +56,16 @@ export class VersionRepository {
       WHERE id = ?
     `);
     stmt.run(status, id);
+    return this.findById(id);
+  }
+
+  updateGapCount(id: string, hasGap: boolean, openGapCount: number): ParameterVersion | null {
+    const stmt = db.prepare(`
+      UPDATE parameter_version 
+      SET has_gap = ?, open_gap_count = ?
+      WHERE id = ?
+    `);
+    stmt.run(hasGap ? 1 : 0, openGapCount, id);
     return this.findById(id);
   }
 

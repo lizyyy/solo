@@ -22,13 +22,13 @@ export class VersionService {
       throw new Error('评分权重表尚未补看完成，请先完成补看');
     }
 
-    const gapResult = routeService.detectAndMarkGaps(createdBy);
-    const hasGap = gapResult.gapCount > 0;
+    const gapResult = routeService.detectAndCreateGapRecords(createdBy);
+    const hasGap = gapResult.openGapCount > 0;
 
     const version = versionRepository.create(
       versionNo,
-      'weight-batch-001',
       hasGap,
+      gapResult.openGapCount,
       createdBy
     );
 
@@ -41,8 +41,9 @@ export class VersionService {
       throw new Error('版本不存在');
     }
 
-    if (version.hasGap) {
-      throw new Error('存在编号断档待复核，不能发布版本，请先处理断档问题');
+    const openGapCount = routeService.countOpenGaps();
+    if (openGapCount > 0) {
+      throw new Error(`存在${openGapCount}处编号断档待教研组复核，不能发布版本，请先处理断档问题`);
     }
 
     return versionRepository.publish(id);
@@ -54,9 +55,9 @@ export class VersionService {
       return { canPublish: false, reason: '评分权重表尚未补看完成' };
     }
 
-    const gapResult = routeService.detectAndMarkGaps('system');
-    if (gapResult.gapCount > 0) {
-      return { canPublish: false, reason: `存在${gapResult.gapCount}处编号断档待教研组复核` };
+    const openGapCount = routeService.countOpenGaps();
+    if (openGapCount > 0) {
+      return { canPublish: false, reason: `存在${openGapCount}处编号断档待教研组复核` };
     }
 
     return { canPublish: true };

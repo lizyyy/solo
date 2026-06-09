@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Clock, User, FileText } from 'lucide-react';
+import { X, Clock, User, FileText, CheckSquare, AlertTriangle } from 'lucide-react';
 import type { ChangeRecord } from '../../shared/types';
 import dayjs from 'dayjs';
 
@@ -17,6 +17,7 @@ const actionLabels: Record<string, string> = {
   supplement: '补录',
   recalculate: '重算',
   status_update: '状态更新',
+  gap_review: '断档复核',
 };
 
 const actionColors: Record<string, string> = {
@@ -25,6 +26,113 @@ const actionColors: Record<string, string> = {
   supplement: 'bg-blue-500',
   recalculate: 'bg-purple-500',
   status_update: 'bg-warning-500',
+  gap_review: 'bg-indigo-500',
+};
+
+const renderChangeDetail = (change: ChangeRecord) => {
+  const before = change.beforeValue as any;
+  const after = change.afterValue as any;
+
+  if (change.action === 'gap_review' && after?.gapReviewInfo) {
+    const info = after.gapReviewInfo;
+    return (
+      <div className="space-y-2 mt-2">
+        <div className="bg-indigo-50 border border-indigo-200 rounded p-3 text-xs text-indigo-800">
+          <div className="flex items-center mb-1.5 font-medium text-indigo-900">
+            <CheckSquare className="w-3.5 h-3.5 mr-1.5" />
+            断档复核详情
+          </div>
+          <div className="space-y-1.5">
+            <div>
+              <span className="text-gray-500">原始断档：</span>
+              <span className="font-mono ml-1">
+                #{info.originalGap.beforeLineNo} → #{info.originalGap.afterLineNo}，
+                缺失 {info.originalGap.missingCount} 条
+              </span>
+            </div>
+            <div>
+              <span className="text-gray-500">处理方式：</span>
+              <span className="ml-1 font-medium">
+                {info.resolutionType === 'accept_gap' && '接受断档不修正'}
+                {info.resolutionType === 'supplement_fill' && '补录填充断档'}
+                {info.resolutionType === 'renumber' && '后续重排编号'}
+                {info.resolutionType === 'other' && '其他方式'}
+              </span>
+            </div>
+            <div>
+              <span className="text-gray-500">复核说明：</span>
+              <span className="ml-1">{info.resolutionRemark}</span>
+            </div>
+            {info.nextHandler && (
+              <div>
+                <span className="text-gray-500">下一步责任人：</span>
+                <span className="ml-1 font-medium text-indigo-900">{info.nextHandler}</span>
+              </div>
+            )}
+            <div className="text-xs text-gray-500 pt-1 border-t border-indigo-100">
+              复核人：{info.reviewedBy} · {dayjs(info.reviewedAt).format('YYYY-MM-DD HH:mm:ss')}
+            </div>
+          </div>
+        </div>
+        {before?.status !== undefined && (
+          <div className="text-xs text-gray-500 flex items-center">
+            <AlertTriangle className="w-3 h-3 mr-1 text-warning-500" />
+            状态：{before.status} → {after.status}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (change.action === 'delete' && before?.currentLineNo !== undefined) {
+    return (
+      <div className="text-xs text-gray-500 space-y-1">
+        <p className="text-red-600 font-medium">删除前编号：</p>
+        <div className="bg-red-50 p-2 rounded">
+          <div>原始行号：{before.originalLineNo}</div>
+          <div>当前编号：{before.currentLineNo}</div>
+          <div>订单号：{before.orderNo || before.routeData?.orderNo}</div>
+          <div>SKU：{before.sku || before.routeData?.sku}</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (change.action === 'supplement' && after?.originalLineNo === -1) {
+    return (
+      <div className="text-xs text-gray-500 space-y-1">
+        <p className="text-blue-600 font-medium">补录说明：</p>
+        <div className="bg-blue-50 p-2 rounded">
+          <div>原始行号：补录（-1）</div>
+          <div>当前编号：{after.currentLineNo || '待重算分配'}</div>
+          <div className="text-gray-500 pt-1 border-t border-blue-100 mt-1">
+            补录后需点击"补录后重算"按钮重新计算拣货参数
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      {before && Object.keys(before).length > 0 && (
+        <div className="text-xs text-gray-500 mb-1">
+          <span className="text-red-600 font-medium">变更前：</span>
+          <pre className="mt-1 bg-red-50 p-2 rounded overflow-x-auto whitespace-pre-wrap break-words">
+            {JSON.stringify(before, null, 2)}
+          </pre>
+        </div>
+      )}
+      {after && Object.keys(after).length > 0 && (
+        <div className="text-xs text-gray-500">
+          <span className="text-green-600 font-medium">变更后：</span>
+          <pre className="mt-1 bg-green-50 p-2 rounded overflow-x-auto whitespace-pre-wrap break-words">
+            {JSON.stringify(after, null, 2)}
+          </pre>
+        </div>
+      )}
+    </>
+  );
 };
 
 export const ChangeLogDrawer: React.FC<ChangeLogDrawerProps> = ({
@@ -39,7 +147,7 @@ export const ChangeLogDrawer: React.FC<ChangeLogDrawerProps> = ({
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="absolute right-0 top-0 h-full w-96 bg-white shadow-2xl transform transition-transform">
+      <div className="absolute right-0 top-0 h-full w-full max-w-lg bg-white shadow-2xl transform transition-transform">
         <div className="h-full flex flex-col">
           <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
             <div className="flex items-center justify-between">
@@ -75,7 +183,7 @@ export const ChangeLogDrawer: React.FC<ChangeLogDrawerProps> = ({
                   {changes.map((change, index) => (
                     <div key={index} className="relative pl-8">
                       <div className={`absolute left-0 top-1.5 w-6 h-6 rounded-full ${actionColors[change.action] || 'bg-gray-500'} flex items-center justify-center text-white text-xs font-bold`}>
-                        {index + 1}
+                        {changes.length - index}
                       </div>
                       <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
                         <div className="flex items-center justify-between mb-2">
@@ -91,23 +199,10 @@ export const ChangeLogDrawer: React.FC<ChangeLogDrawerProps> = ({
                           <User className="w-4 h-4 mr-1" />
                           <span>{change.operator}</span>
                         </div>
-                        <p className="text-sm text-gray-700 mb-2">{change.remark}</p>
-                        {change.beforeValue && (
-                          <div className="text-xs text-gray-500 mb-1">
-                            <span className="text-red-600 font-medium">变更前：</span>
-                            <pre className="mt-1 bg-red-50 p-2 rounded overflow-x-auto">
-                              {JSON.stringify(change.beforeValue, null, 2)}
-                            </pre>
-                          </div>
+                        {change.remark && (
+                          <p className="text-sm text-gray-700 mb-2 whitespace-pre-wrap">{change.remark}</p>
                         )}
-                        {change.afterValue && (
-                          <div className="text-xs text-gray-500">
-                            <span className="text-green-600 font-medium">变更后：</span>
-                            <pre className="mt-1 bg-green-50 p-2 rounded overflow-x-auto">
-                              {JSON.stringify(change.afterValue, null, 2)}
-                            </pre>
-                          </div>
-                        )}
+                        {renderChangeDetail(change)}
                       </div>
                     </div>
                   ))}

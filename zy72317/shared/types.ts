@@ -1,8 +1,37 @@
-export type RouteStatus = 'normal' | 'gap_pending_review' | 'deleted' | 'supplement_pending_recalc';
+export type RouteStatus = 'normal' | 'gap_pending_review' | 'deleted' | 'supplement_pending_recalc' | 'reviewed_resolved';
 
-export type ActionType = 'import' | 'delete' | 'supplement' | 'recalculate' | 'status_update';
+export type ActionType = 'import' | 'delete' | 'supplement' | 'recalculate' | 'status_update' | 'gap_review';
 
 export type VersionStatus = 'draft' | 'pending_review' | 'published';
+
+export type GapResolutionType = 'supplement_fill' | 'renumber' | 'accept_gap' | 'other';
+
+export interface GapReviewInfo {
+  reviewedBy: string;
+  reviewedAt: string;
+  originalGap: {
+    beforeLineNo: number;
+    afterLineNo: number;
+    missingCount: number;
+  };
+  resolutionType: GapResolutionType;
+  resolutionRemark: string;
+  nextHandler: string | null;
+  beforeFixValues?: any;
+  afterFixValues?: any;
+}
+
+export interface GapRecord {
+  id: string;
+  beforeLineNo: number;
+  afterLineNo: number;
+  missingCount: number;
+  beforeRouteId: string | null;
+  afterRouteId: string | null;
+  status: 'open' | 'reviewed';
+  detectedAt: string;
+  reviewInfo: GapReviewInfo | null;
+}
 
 export interface RouteOptimizationResult {
   orderNo: string;
@@ -35,6 +64,7 @@ export interface PickingRoute {
   createdAt: string;
   updatedAt: string;
   changeLog: ChangeRecord[];
+  gapReviewInfo: GapReviewInfo | null;
 }
 
 export interface ImportBatch {
@@ -122,6 +152,21 @@ export interface CreateVersionRequest {
   createdBy: string;
 }
 
+export interface GapReviewRequest {
+  gapId: string;
+  reviewedBy: string;
+  resolutionType: GapResolutionType;
+  resolutionRemark: string;
+  nextHandler?: string;
+}
+
+export interface GapReviewResponse {
+  success: boolean;
+  gapRecord?: GapRecord;
+  affectedRoutes?: PickingRoute[];
+  message: string;
+}
+
 export interface SelfCheckResult {
   duplicateImport: {
     passed: boolean;
@@ -135,7 +180,9 @@ export interface SelfCheckResult {
     passed: boolean;
     details: {
       gapCount: number;
-      gaps: { beforeLineNo: number; afterLineNo: number; missingCount: number }[];
+      openGapCount: number;
+      reviewedGapCount: number;
+      gaps: { gapId: string; beforeLineNo: number; afterLineNo: number; missingCount: number; status: string }[];
     };
   };
   supplementRecalc: {
@@ -143,7 +190,7 @@ export interface SelfCheckResult {
     details: {
       supplementCount: number;
       pendingRecalcCount: number;
-      items: { id: string; originalLineNo: number; status: string }[];
+      items: { id: string; originalLineNo: number; status: string; orderNo?: string; sku?: string }[];
     };
   };
   exportConsistency: {
@@ -152,6 +199,7 @@ export interface SelfCheckResult {
       pageCount: number;
       exportCount: number;
       apiCount: number;
+      dbCount: number;
       isConsistent: boolean;
     };
   };
@@ -162,10 +210,18 @@ export const STATUS_LABELS: Record<RouteStatus, string> = {
   gap_pending_review: '编号断档-待复核',
   deleted: '已删除',
   supplement_pending_recalc: '补录待重算',
+  reviewed_resolved: '断档已复核',
 };
 
 export const VERSION_STATUS_LABELS: Record<VersionStatus, string> = {
   draft: '草稿',
   pending_review: '待复核',
   published: '已发布',
+};
+
+export const GAP_RESOLUTION_LABELS: Record<GapResolutionType, string> = {
+  supplement_fill: '补录填充断档',
+  renumber: '重排编号',
+  accept_gap: '接受断档不修正',
+  other: '其他方式',
 };

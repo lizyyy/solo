@@ -1,7 +1,10 @@
 import db from '../db';
 import { v4 as uuidv4 } from 'uuid';
-import type { PickingRoute, RouteStatus, RouteOptimizationResult, ChangeRecord, ActionType } from '../../shared/types';
+import type { PickingRoute, RouteStatus, RouteOptimizationResult, ChangeRecord, ActionType, GapReviewInfo } from '../../shared/types';
 import { STATUS_LABELS } from '../../shared/types';
+import { gapRecordRepository } from './GapRecordRepository';
+
+export const VIRTUAL_SUPPLEMENT_BATCH_ID = 'virtual-supplement-batch';
 
 export class RouteRepository {
   create(
@@ -106,53 +109,43 @@ export class RouteRepository {
     return this.findById(id);
   }
 
-  updateStatusForMultiple(ids: string[], status: RouteStatus, operator: string, remark: string): void {
+  updateGapReviewInfo(id: string, gapReviewInfo: GapReviewInfo, operator: string): PickingRoute | null {
+    const route = this.findById(id);
+    if (!route) return null;
+
+    const changeRecord: ChangeRecord = {
+      timestamp: new Date().toISOString(),
+      operator,
+      action: 'gap_review',
+      beforeValue: { status: route.status, gapReviewInfo: route.gapReviewInfo },
+      afterValue: { status: 'reviewed_resolved', gapReviewInfo },
+      remark: gapReviewInfo.resolutionRemark,
+    };
+
+    const newChangeLog = [...route.changeLog, changeRecord];
+    const newStatus: RouteStatus = 'reviewed_resolved';
     const stmt = db.prepare(`
       UPDATE picking_route 
-      SET status = ?, updated_at = CURRENT_TIMESTAMP
+      SET status = ?, change_log = ?, gap_review_info = ?, updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `);
+    stmt.run(newStatus, JSON.stringify(newChangeLog), JSON.stringify(gapReviewInfo), id);
 
     const insertLogStmt = db.prepare(`
       INSERT INTO change_log (id, route_id, operator, action, before_value, after_value, remark)
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `);
+    insertLogStmt.run(
+      uuidv4(),
+      id,
+      operator,
+      'gap_review',
+      JSON.stringify({ status: route.status, gapReviewInfo: route.gapReviewInfo }),
+      JSON.stringify({ status: newStatus, gapReviewInfo }),
+      gapReviewInfo.resolutionRemark
+    );
 
-    const transaction = db.transaction(() => {
-      for (const id of ids) {
-        const route = this.findById(id);
-        if (!route) continue;
-
-        const changeRecord: ChangeRecord = {
-          timestamp: new Date().toISOString(),
-          operator,
-          action: 'status_update' as ActionType,
-          beforeValue: route.status,
-          afterValue: status,
-          remark,
-        };
-
-        const newChangeLog = [...route.changeLog, changeRecord];
-
-        db.prepare(`
-          UPDATE picking_route 
-          SET status = ?, change_log = ?, updated_at = CURRENT_TIMESTAMP
-          WHERE id = ?
-        `).run(status, JSON.stringify(newChangeLog), id);
-
-        insertLogStmt.run(
-          uuidv4(),
-          id,
-          operator,
-          'status_update',
-          JSON.stringify(route.status),
-          JSON.stringify(status),
-          remark
-        );
-      }
-    });
-
-    transaction();
+    return this.findById(id);
   }
 
   logicalDelete(id: string, operator: string): PickingRoute | null {
@@ -163,9 +156,9 @@ export class RouteRepository {
       timestamp: new Date().toISOString(),
       operator,
       action: 'delete',
-      beforeValue: { ...route.routeData },
+      beforeValue: { ...route.routeData, currentLineNo: route.currentLineNo },
       afterValue: null,
-      remark: '人工删除行',
+      remark: `人工删除行，原始行号=${route.originalLineNo}，当前编号=${route.currentLineNo}`,
     };
 
     const newChangeLog = [...route.changeLog, changeRecord];
@@ -185,9 +178,9 @@ export class RouteRepository {
       id,
       operator,
       'delete',
-      JSON.stringify(route.routeData),
+      JSON.stringify({ ...route.routeData, currentLineNo: route.currentLineNo }),
       null,
-      '人工删除行'
+      `人工删除行，原始行号=${route.originalLineNo}，当前编号=${route.currentLineNo}`
     );
 
     return this.findById(id);
@@ -201,15 +194,15 @@ export class RouteRepository {
     const currentLineNo = maxLineNo + 1;
     const originalLineNo = -1;
     const status: RouteStatus = 'supplement_pending_recalc';
-    const sourceBatch = 'supplement';
+    const sourceBatch = VIRTUAL_SUPPLEMENT_BATCH_ID;
 
     const changeRecord: ChangeRecord = {
       timestamp: new Date().toISOString(),
       operator,
       action: 'supplement',
       beforeValue: null,
-      afterValue: routeData,
-      remark: '人工补录行',
+      afterValue: { ...routeData, currentLineNo, originalLineNo },
+      remark: `人工补录行，原始行号标记为-1表示补录，当前编号=${currentLineNo}`,
     };
 
     const id = uuidv4();
@@ -238,8 +231,8 @@ export class RouteRepository {
       operator,
       'supplement',
       null,
-      JSON.stringify(routeData),
-      '人工补录行'
+      JSON.stringify({ ...routeData, currentLineNo, originalLineNo }),
+      `人工补录行，原始行号标记为-1表示补录，当前编号=${currentLineNo}`
     );
 
     return this.findById(id) as PickingRoute;
@@ -254,8 +247,8 @@ export class RouteRepository {
       operator,
       action: 'recalculate',
       beforeValue: { ...route.routeData },
-      afterValue: newRouteData,
-      remark: '补录后重算',
+      afterValue: { ...newRouteData },
+      remark: '补录后重算拣货路线参数',
     };
 
     const newChangeLog = [...route.changeLog, changeRecord];
@@ -276,9 +269,9 @@ export class RouteRepository {
       routeId,
       operator,
       'recalculate',
-      JSON.stringify(route.routeData),
-      JSON.stringify(newRouteData),
-      '补录后重算'
+      JSON.stringify({ ...route.routeData }),
+      JSON.stringify({ ...newRouteData }),
+      '补录后重算拣货路线参数'
     );
 
     return this.findById(routeId);
@@ -294,10 +287,61 @@ export class RouteRepository {
     return row.count;
   }
 
+  countSupplementPendingRecalc(): number {
+    const stmt = db.prepare(`
+      SELECT COUNT(*) as count 
+      FROM picking_route 
+      WHERE status = 'supplement_pending_recalc'
+    `);
+    const row = stmt.get() as { count: number };
+    return row.count;
+  }
+
+  detectAndCreateGapRecords(operator: string): { gapCount: number; gaps: any[] } {
+    const routes = this.findAll(false);
+    const activeRoutes = routes.filter(r => r.status !== 'deleted');
+    activeRoutes.sort((a, b) => a.currentLineNo - b.currentLineNo);
+
+    gapRecordRepository.closeAllOpenGaps();
+
+    const gaps: { gapId: string; beforeLineNo: number; afterLineNo: number; missingCount: number; beforeRouteId: string | null; afterRouteId: string | null }[] = [];
+
+    for (let i = 0; i < activeRoutes.length - 1; i++) {
+      const current = activeRoutes[i];
+      const next = activeRoutes[i + 1];
+      const expectedNext = current.currentLineNo + 1;
+
+      if (next.currentLineNo > expectedNext) {
+        const missingCount = next.currentLineNo - expectedNext;
+        const gapRecord = gapRecordRepository.create(
+          current.currentLineNo,
+          next.currentLineNo,
+          missingCount,
+          current.id,
+          next.id
+        );
+        gaps.push({
+          gapId: gapRecord.id,
+          beforeLineNo: current.currentLineNo,
+          afterLineNo: next.currentLineNo,
+          missingCount,
+          beforeRouteId: current.id,
+          afterRouteId: next.id,
+        });
+      }
+    }
+
+    return {
+      gapCount: gaps.length,
+      gaps,
+    };
+  }
+
   private mapToModel(row: any): PickingRoute {
     const routeData = JSON.parse(row.route_data) as RouteOptimizationResult;
     const changeLog = JSON.parse(row.change_log) as ChangeRecord[];
     const status = row.status as RouteStatus;
+    const gapReviewInfo = row.gap_review_info ? JSON.parse(row.gap_review_info) : null;
 
     return {
       id: row.id,
@@ -305,12 +349,13 @@ export class RouteRepository {
       currentLineNo: row.current_line_no,
       routeData,
       status,
-      statusLabel: STATUS_LABELS[status],
+      statusLabel: STATUS_LABELS[status] || status,
       sourceBatch: row.source_batch,
       operator: row.operator,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
       changeLog,
+      gapReviewInfo,
     };
   }
 }

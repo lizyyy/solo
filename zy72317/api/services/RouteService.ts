@@ -1,5 +1,6 @@
-import type { PickingRoute, RouteOptimizationResult, RouteStatus } from '../../shared/types';
+import type { PickingRoute, RouteOptimizationResult, GapReviewRequest, GapReviewResponse, GapReviewInfo, GapRecord } from '../../shared/types';
 import { routeRepository } from '../repositories/RouteRepository';
+import { gapRecordRepository } from '../repositories/GapRecordRepository';
 
 export class RouteService {
   getAllRoutes(excludeDeleted: boolean = true): PickingRoute[] {
@@ -17,7 +18,7 @@ export class RouteService {
   deleteRoute(id: string, operator: string): PickingRoute | null {
     const result = routeRepository.logicalDelete(id, operator);
     if (result) {
-      this.detectAndMarkGaps(operator);
+      this.detectAndCreateGapRecords(operator);
     }
     return result;
   }
@@ -42,7 +43,7 @@ export class RouteService {
 
     let updatedCount = 0;
     for (const route of routes) {
-      if (route.status === 'supplement_pending_recalc' || route.status === 'gap_pending_review') {
+      if (route.status === 'supplement_pending_recalc') {
         const newDistance = Math.max(50, route.routeData.distance + Math.floor(Math.random() * 50 - 25));
         const newTime = Math.max(5, route.routeData.estimatedTime + Math.floor(Math.random() * 10 - 5));
         const newPickingSequence = this.calculatePickingSequence(route.routeData, weights);
@@ -59,59 +60,97 @@ export class RouteService {
       }
     }
 
+    this.detectAndCreateGapRecords(operator);
+
     return {
       updated: updatedCount,
-      message: `已重算${updatedCount}条记录`,
+      message: updatedCount > 0
+        ? `已重算${updatedCount}条补录记录。${this.countOpenGaps() > 0 ? `当前仍有${this.countOpenGaps()}处编号断档待教研组复核。` : ''}`
+        : '没有需要重算的补录记录。',
     };
   }
 
-  detectAndMarkGaps(operator: string): { gapCount: number; gaps: any[] } {
+  detectAndCreateGapRecords(operator: string): { gapCount: number; openGapCount: number; gaps: any[] } {
+    const result = routeRepository.detectAndCreateGapRecords(operator);
+    const openGapCount = gapRecordRepository.countOpenGaps();
+    return {
+      gapCount: result.gapCount,
+      openGapCount,
+      gaps: result.gaps,
+    };
+  }
+
+  countOpenGaps(): number {
+    return gapRecordRepository.countOpenGaps();
+  }
+
+  getOpenGaps(): GapRecord[] {
+    return gapRecordRepository.findOpenGaps();
+  }
+
+  getAllGaps(status?: 'open' | 'reviewed' | 'all'): GapRecord[] {
+    return gapRecordRepository.findAll(status);
+  }
+
+  reviewGap(request: GapReviewRequest): GapReviewResponse {
+    const { gapId, reviewedBy, resolutionType, resolutionRemark, nextHandler } = request;
+
+    const gapRecord = gapRecordRepository.findById(gapId);
+    if (!gapRecord) {
+      return { success: false, message: '断档记录不存在' };
+    }
+    if (gapRecord.status === 'reviewed') {
+      return { success: false, message: '该断档已完成复核，无需重复操作' };
+    }
+
     const routes = routeRepository.findAll(false);
-    const activeRoutes = routes.filter(r => r.status !== 'deleted');
-    activeRoutes.sort((a, b) => a.currentLineNo - b.currentLineNo);
+    const beforeRoute = gapRecord.beforeRouteId ? routes.find(r => r.id === gapRecord.beforeRouteId) : null;
+    const afterRoute = gapRecord.afterRouteId ? routes.find(r => r.id === gapRecord.afterRouteId) : null;
 
-    const gaps: { beforeLineNo: number; afterLineNo: number; missingCount: number; affectedIds: string[] }[] = [];
-    const affectedRouteIds: string[] = [];
+    const reviewInfo: GapReviewInfo = {
+      reviewedBy,
+      reviewedAt: new Date().toISOString(),
+      originalGap: {
+        beforeLineNo: gapRecord.beforeLineNo,
+        afterLineNo: gapRecord.afterLineNo,
+        missingCount: gapRecord.missingCount,
+      },
+      resolutionType,
+      resolutionRemark,
+      nextHandler: nextHandler || null,
+      beforeFixValues: beforeRoute ? {
+        id: beforeRoute.id,
+        currentLineNo: beforeRoute.currentLineNo,
+        orderNo: beforeRoute.routeData.orderNo,
+        status: beforeRoute.status,
+      } : null,
+      afterFixValues: afterRoute ? {
+        id: afterRoute.id,
+        currentLineNo: afterRoute.currentLineNo,
+        orderNo: afterRoute.routeData.orderNo,
+        status: afterRoute.status,
+      } : null,
+    };
 
-    for (let i = 0; i < activeRoutes.length - 1; i++) {
-      const current = activeRoutes[i];
-      const next = activeRoutes[i + 1];
-      const expectedNext = current.currentLineNo + 1;
+    gapRecordRepository.reviewGap(gapId, reviewInfo);
 
-      if (next.currentLineNo > expectedNext) {
-        const missingCount = next.currentLineNo - expectedNext;
-        gaps.push({
-          beforeLineNo: current.currentLineNo,
-          afterLineNo: next.currentLineNo,
-          missingCount,
-          affectedIds: [current.id, next.id],
-        });
-        if (!affectedRouteIds.includes(current.id)) affectedRouteIds.push(current.id);
-        if (!affectedRouteIds.includes(next.id)) affectedRouteIds.push(next.id);
-      }
+    const affectedRoutes: PickingRoute[] = [];
+    if (beforeRoute) {
+      const updated = routeRepository.updateGapReviewInfo(beforeRoute.id, reviewInfo, reviewedBy);
+      if (updated) affectedRoutes.push(updated);
+    }
+    if (afterRoute && afterRoute.id !== beforeRoute?.id) {
+      const updated = routeRepository.updateGapReviewInfo(afterRoute.id, reviewInfo, reviewedBy);
+      if (updated) affectedRoutes.push(updated);
     }
 
-    const allRoutes = routeRepository.findAll(false);
-    const previouslyGapped = allRoutes.filter(r => r.status === 'gap_pending_review');
-
-    for (const route of previouslyGapped) {
-      if (!affectedRouteIds.includes(route.id)) {
-        routeRepository.updateStatus(route.id, 'normal', operator, '断档已解决，恢复正常状态');
-      }
-    }
-
-    if (affectedRouteIds.length > 0) {
-      routeRepository.updateStatusForMultiple(
-        affectedRouteIds,
-        'gap_pending_review',
-        operator,
-        `检测到编号断档，共${gaps.length}处，待教研组复核`
-      );
-    }
+    const reviewedGap = gapRecordRepository.findById(gapId);
 
     return {
-      gapCount: gaps.length,
-      gaps,
+      success: true,
+      gapRecord: reviewedGap || undefined,
+      affectedRoutes,
+      message: `断档复核完成。处理方式：${resolutionRemark}。下一步责任人：${nextHandler || '无'}`,
     };
   }
 
@@ -121,13 +160,23 @@ export class RouteService {
     return route.changeLog;
   }
 
-  exportRoutes(): { data: PickingRoute[]; count: number } {
+  exportRoutes(): { data: PickingRoute[]; count: number; openGapCount: number; openGaps: GapRecord[] } {
     const data = routeRepository.findAll();
-    return { data, count: data.length };
+    const openGaps = this.getOpenGaps();
+    return {
+      data,
+      count: data.length,
+      openGapCount: openGaps.length,
+      openGaps,
+    };
   }
 
   getCount(): number {
     return routeRepository.count();
+  }
+
+  getSupplementPendingRecalcCount(): number {
+    return routeRepository.countSupplementPendingRecalc();
   }
 
   private calculatePickingSequence(routeData: RouteOptimizationResult, weights: any[]): number {
