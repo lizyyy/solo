@@ -1,0 +1,78 @@
+import type { MaterialLocation } from '../types/schedule';
+
+export const defaultLocations: MaterialLocation[] = [
+  {
+    id: 'LOC-001',
+    partModel: 'M100',
+    warehouseZone: 'A',
+    shelfNo: 'A-01',
+    drawerNo: '抽屉-02',
+    qrCodeUrl: '#',
+    contactPerson: '仓管-老赵',
+  },
+  {
+    id: 'LOC-002',
+    partModel: 'M200',
+    warehouseZone: 'A',
+    shelfNo: 'A-01',
+    drawerNo: '抽屉-03',
+    qrCodeUrl: '#',
+    contactPerson: '仓管-老赵',
+  },
+  {
+    id: 'LOC-003',
+    partModel: 'SEAL-A20',
+    warehouseZone: 'A',
+    shelfNo: 'A-05',
+    drawerNo: '抽屉-01',
+    qrCodeUrl: '#',
+    contactPerson: '仓管-小钱',
+  },
+  {
+    id: 'LOC-004',
+    partModel: 'SEAL-B25',
+    warehouseZone: 'A',
+    shelfNo: 'A-05',
+    drawerNo: '抽屉-02',
+    qrCodeUrl: '#',
+    contactPerson: '仓管-小钱',
+  },
+  {
+    id: 'LOC-005',
+    partModel: 'GASKET-F150',
+    warehouseZone: 'B',
+    shelfNo: 'B-02',
+    drawerNo: '抽屉-01',
+    qrCodeUrl: '#',
+    contactPerson: '仓管-老孙',
+  },
+  {
+    id: 'LOC-006',
+    partModel: 'PACK-V30',
+    warehouseZone: 'B',
+    shelfNo: 'B-04',
+    drawerNo: '抽屉-03',
+    qrCodeUrl: '#',
+    contactPerson: '仓管-老孙',
+  },
+  {
+    id: 'LOC-007',
+    partModel: 'ORING-D80',
+    warehouseZone: 'C',
+    shelfNo: 'C-01',
+    drawerNo: '抽屉-01',
+    qrCodeUrl: '#',
+    contactPerson: '仓管-小李',
+  },
+  {
+    id: 'LOC-008',
+    partModel: 'FILTER-M50',
+    warehouseZone: 'C',
+    shelfNo: 'C-03',
+    drawerNo: '抽屉-02',
+    qrCodeUrl: '#',
+    contactPerson: '仓管-小李',
+  },
+];
+
+export { defaultLocations as default };
