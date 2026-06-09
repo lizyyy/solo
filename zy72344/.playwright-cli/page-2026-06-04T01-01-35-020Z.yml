@@ -1,0 +1,145 @@
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - generic [ref=e6]:
+      - img [ref=e8]
+      - generic [ref=e10]:
+        - heading "拉格朗日乘子配餐" [level=1] [ref=e11]
+        - paragraph [ref=e12]: 智能分析平台
+    - navigation [ref=e13]:
+      - link "仪表盘" [ref=e14] [cursor=pointer]:
+        - /url: /
+        - img [ref=e15]
+        - generic [ref=e20]: 仪表盘
+      - link "参数调试表" [ref=e21] [cursor=pointer]:
+        - /url: /parameters
+        - img [ref=e22]
+        - generic [ref=e24]: 参数调试表
+      - link "学生答案" [active] [ref=e25] [cursor=pointer]:
+        - /url: /answers
+        - img [ref=e26]
+        - generic [ref=e29]: 学生答案
+      - link "3D可视化" [ref=e30] [cursor=pointer]:
+        - /url: /visualization
+        - img [ref=e31]
+        - generic [ref=e33]: 3D可视化
+      - link "历史记录" [ref=e34] [cursor=pointer]:
+        - /url: /history
+        - img [ref=e35]
+        - generic [ref=e39]: 历史记录
+      - link "报告中心" [ref=e40] [cursor=pointer]:
+        - /url: /reports
+        - img [ref=e41]
+        - generic [ref=e44]: 报告中心
+    - generic [ref=e46]:
+      - generic [ref=e48]: 吴
+      - generic [ref=e49]:
+        - paragraph [ref=e50]: 吴老师
+        - paragraph [ref=e51]: 教研负责人
+  - main [ref=e52]:
+    - generic [ref=e54]:
+      - heading "仪表盘" [level=2] [ref=e55]
+      - generic [ref=e57]: 2026年6月4日星期四
+    - generic [ref=e258]:
+      - generic [ref=e260]:
+        - heading "学生答案" [level=1] [ref=e261]
+        - paragraph [ref=e262]: 管理和复核学生提交的答案，支持多版答案对比
+      - generic [ref=e264]:
+        - img [ref=e265]
+        - generic [ref=e267]:
+          - paragraph [ref=e268]: 业务运营复核提示
+          - paragraph [ref=e269]: 同一学生提交多版答案时，请先查看历史版本和手算反例，再决定是否标记为正常。 吴老师已补充手算验证的答案优先处理。
+      - generic [ref=e270]:
+        - generic [ref=e271]:
+          - img [ref=e272]
+          - textbox "搜索学生姓名..." [ref=e275]
+        - generic [ref=e276]:
+          - img [ref=e277]
+          - combobox [ref=e279]:
+            - option "全部状态" [selected]
+            - option "待审核"
+            - option "复核中"
+            - option "正常"
+            - option "异常"
+      - table [ref=e281]:
+        - rowgroup [ref=e282]:
+          - row "学生 版本 答案内容 状态 备注 提交时间 操作" [ref=e283]:
+            - columnheader "学生" [ref=e284]
+            - columnheader "版本" [ref=e285]
+            - columnheader "答案内容" [ref=e286]
+            - columnheader "状态" [ref=e287]
+            - columnheader "备注" [ref=e288]
+            - columnheader "提交时间" [ref=e289]
+            - columnheader "操作" [ref=e290]
+        - rowgroup [ref=e291]:
+          - row "张 张三多版答案 v1 解法一：使用拉格朗日乘子法，设L = f(x,y) - λ(g(x,y)-c)... 异常 初始答案，待复核 2026-06-02 10:00:00 查看详情" [ref=e292]:
+            - cell "张 张三多版答案" [ref=e293]:
+              - generic [ref=e294]:
+                - generic [ref=e296]: 张
+                - generic [ref=e297]: 张三多版答案
+            - cell "v1" [ref=e298]:
+              - generic [ref=e299]: v1
+            - cell "解法一：使用拉格朗日乘子法，设L = f(x,y) - λ(g(x,y)-c)..." [ref=e300]:
+              - paragraph [ref=e301]: 解法一：使用拉格朗日乘子法，设L = f(x,y) - λ(g(x,y)-c)...
+            - cell "异常" [ref=e302]:
+              - generic [ref=e303]: 异常
+            - cell "初始答案，待复核" [ref=e305]:
+              - paragraph [ref=e306]: 初始答案，待复核
+            - cell "2026-06-02 10:00:00" [ref=e307]
+            - cell "查看详情" [ref=e308]:
+              - button "查看详情" [ref=e309] [cursor=pointer]:
+                - img [ref=e310]
+                - text: 查看详情
+          - row "张 张三多版答案 v2 解法二：修正了约束条件，重新计算偏导数... 复核中 同一学生提交第二版答案，留待运营复核 2026-06-02 15:30:00 查看详情" [ref=e313]:
+            - cell "张 张三多版答案" [ref=e314]:
+              - generic [ref=e315]:
+                - generic [ref=e317]: 张
+                - generic [ref=e318]: 张三多版答案
+            - cell "v2" [ref=e319]:
+              - generic [ref=e320]: v2
+            - cell "解法二：修正了约束条件，重新计算偏导数..." [ref=e321]:
+              - paragraph [ref=e322]: 解法二：修正了约束条件，重新计算偏导数...
+            - cell "复核中" [ref=e323]:
+              - generic [ref=e324]: 复核中
+            - cell "同一学生提交第二版答案，留待运营复核" [ref=e326]:
+              - paragraph [ref=e327]: 同一学生提交第二版答案，留待运营复核
+            - cell "2026-06-02 15:30:00" [ref=e328]
+            - cell "查看详情" [ref=e329]:
+              - button "查看详情" [ref=e330] [cursor=pointer]:
+                - img [ref=e331]
+                - text: 查看详情
+          - row "李 李四 v1 标准解法，步骤完整，答案正确 正常 答案正确 2026-06-02 11:20:00 查看详情" [ref=e334]:
+            - cell "李 李四" [ref=e335]:
+              - generic [ref=e336]:
+                - generic [ref=e338]: 李
+                - generic [ref=e339]: 李四
+            - cell "v1" [ref=e340]:
+              - generic [ref=e341]: v1
+            - cell "标准解法，步骤完整，答案正确" [ref=e342]:
+              - paragraph [ref=e343]: 标准解法，步骤完整，答案正确
+            - cell "正常" [ref=e344]:
+              - generic [ref=e345]: 正常
+            - cell "答案正确" [ref=e347]:
+              - paragraph [ref=e348]: 答案正确
+            - cell "2026-06-02 11:20:00" [ref=e349]
+            - cell "查看详情" [ref=e350]:
+              - button "查看详情" [ref=e351] [cursor=pointer]:
+                - img [ref=e352]
+                - text: 查看详情
+          - row "王 王五 v1 计算过程存在符号错误 待审核 待审核 2026-06-03 09:15:00 查看详情" [ref=e355]:
+            - cell "王 王五" [ref=e356]:
+              - generic [ref=e357]:
+                - generic [ref=e359]: 王
+                - generic [ref=e360]: 王五
+            - cell "v1" [ref=e361]:
+              - generic [ref=e362]: v1
+            - cell "计算过程存在符号错误" [ref=e363]:
+              - paragraph [ref=e364]: 计算过程存在符号错误
+            - cell "待审核" [ref=e365]:
+              - generic [ref=e366]: 待审核
+            - cell "待审核" [ref=e368]:
+              - paragraph [ref=e369]: 待审核
+            - cell "2026-06-03 09:15:00" [ref=e370]
+            - cell "查看详情" [ref=e371]:
+              - button "查看详情" [ref=e372] [cursor=pointer]:
+                - img [ref=e373]
+                - text: 查看详情

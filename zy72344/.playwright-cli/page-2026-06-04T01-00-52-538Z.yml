@@ -1,0 +1,146 @@
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - generic [ref=e6]:
+      - img [ref=e8]
+      - generic [ref=e10]:
+        - heading "拉格朗日乘子配餐" [level=1] [ref=e11]
+        - paragraph [ref=e12]: 智能分析平台
+    - navigation [ref=e13]:
+      - link "仪表盘" [ref=e14] [cursor=pointer]:
+        - /url: /
+        - img [ref=e15]
+        - generic [ref=e20]: 仪表盘
+      - link "参数调试表" [ref=e21] [cursor=pointer]:
+        - /url: /parameters
+        - img [ref=e22]
+        - generic [ref=e24]: 参数调试表
+      - link "学生答案" [ref=e25] [cursor=pointer]:
+        - /url: /answers
+        - img [ref=e26]
+        - generic [ref=e29]: 学生答案
+      - link "3D可视化" [ref=e30] [cursor=pointer]:
+        - /url: /visualization
+        - img [ref=e31]
+        - generic [ref=e33]: 3D可视化
+      - link "历史记录" [ref=e34] [cursor=pointer]:
+        - /url: /history
+        - img [ref=e35]
+        - generic [ref=e39]: 历史记录
+      - link "报告中心" [ref=e40] [cursor=pointer]:
+        - /url: /reports
+        - img [ref=e41]
+        - generic [ref=e44]: 报告中心
+    - generic [ref=e46]:
+      - generic [ref=e48]: 吴
+      - generic [ref=e49]:
+        - paragraph [ref=e50]: 吴老师
+        - paragraph [ref=e51]: 教研负责人
+  - main [ref=e52]:
+    - generic [ref=e54]:
+      - heading "仪表盘" [level=2] [ref=e55]
+      - generic [ref=e57]: 2026年6月4日星期四
+    - generic [ref=e59]:
+      - generic [ref=e60]:
+        - generic [ref=e61]:
+          - heading "欢迎回来，吴老师" [level=1] [ref=e62]
+          - paragraph [ref=e63]: 今天是 2026/6/4，您有 2 条待处理事项
+        - button "导入参数表" [ref=e64] [cursor=pointer]:
+          - img [ref=e65]
+          - text: 导入参数表
+      - generic [ref=e68]:
+        - generic [ref=e70]:
+          - generic [ref=e71]:
+            - paragraph [ref=e72]: 待审核答案
+            - paragraph [ref=e73]: "1"
+          - img [ref=e75]
+        - generic [ref=e79]:
+          - generic [ref=e80]:
+            - paragraph [ref=e81]: 复核中答案
+            - paragraph [ref=e82]: "1"
+          - img [ref=e84]
+        - generic [ref=e87]:
+          - generic [ref=e88]:
+            - paragraph [ref=e89]: 异常答案
+            - paragraph [ref=e90]: "1"
+          - img [ref=e92]
+        - generic [ref=e95]:
+          - generic [ref=e96]:
+            - paragraph [ref=e97]: 已通过答案
+            - paragraph [ref=e98]: "1"
+          - img [ref=e100]
+      - generic [ref=e103]:
+        - generic [ref=e104]:
+          - generic [ref=e105]:
+            - heading "最近提交的答案" [level=3] [ref=e106]
+            - button "查看全部" [ref=e107] [cursor=pointer]:
+              - text: 查看全部
+              - img [ref=e108]
+          - generic [ref=e110]:
+            - generic [ref=e111] [cursor=pointer]:
+              - generic [ref=e112]:
+                - generic [ref=e114]: 王
+                - generic [ref=e115]:
+                  - paragraph [ref=e116]:
+                    - text: 王五
+                    - generic [ref=e117]: v1
+                  - paragraph [ref=e118]: 计算过程存在符号错误...
+              - generic [ref=e119]:
+                - generic [ref=e120]: 2026-06-03 09:15:00
+                - generic [ref=e121]: 待审核
+            - generic [ref=e123] [cursor=pointer]:
+              - generic [ref=e124]:
+                - generic [ref=e126]: 张
+                - generic [ref=e127]:
+                  - paragraph [ref=e128]:
+                    - text: 张三
+                    - generic [ref=e129]: v2
+                  - paragraph [ref=e130]: 解法二：修正了约束条件，重新计算偏导数......
+              - generic [ref=e131]:
+                - generic [ref=e132]: 2026-06-02 15:30:00
+                - generic [ref=e133]: 复核中
+            - generic [ref=e135] [cursor=pointer]:
+              - generic [ref=e136]:
+                - generic [ref=e138]: 李
+                - generic [ref=e139]:
+                  - paragraph [ref=e140]:
+                    - text: 李四
+                    - generic [ref=e141]: v1
+                  - paragraph [ref=e142]: 标准解法，步骤完整，答案正确...
+              - generic [ref=e143]:
+                - generic [ref=e144]: 2026-06-02 11:20:00
+                - generic [ref=e145]: 正常
+            - generic [ref=e147] [cursor=pointer]:
+              - generic [ref=e148]:
+                - generic [ref=e150]: 张
+                - generic [ref=e151]:
+                  - paragraph [ref=e152]:
+                    - text: 张三
+                    - generic [ref=e153]: v1
+                  - paragraph [ref=e154]: 解法一：使用拉格朗日乘子法，设L = f(x,y) - λ(g(x,y)-c)......
+              - generic [ref=e155]:
+                - generic [ref=e156]: 2026-06-02 10:00:00
+                - generic [ref=e157]: 异常
+        - generic [ref=e159]:
+          - generic [ref=e160]:
+            - generic [ref=e161]:
+              - img [ref=e163]
+              - generic [ref=e168]:
+                - paragraph [ref=e169]: 学生人数
+                - paragraph [ref=e170]: "3"
+            - generic [ref=e171]: 其中 1 位学生提交了多版答案
+          - generic [ref=e172]:
+            - generic [ref=e173]:
+              - img [ref=e175]
+              - generic [ref=e177]:
+                - paragraph [ref=e178]: 参数版本
+                - paragraph [ref=e179]: "2"
+            - button "最新版本：v1.0" [ref=e180] [cursor=pointer]
+          - generic [ref=e181]:
+            - generic [ref=e182]:
+              - img [ref=e184]
+              - generic [ref=e187]:
+                - paragraph [ref=e188]: 配餐结果
+                - paragraph [ref=e189]: "1"
+            - button "查看报告" [ref=e190] [cursor=pointer]:
+              - text: 查看报告
+              - img [ref=e191]

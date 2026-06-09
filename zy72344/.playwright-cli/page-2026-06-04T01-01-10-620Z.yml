@@ -1,0 +1,89 @@
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - generic [ref=e6]:
+      - img [ref=e8]
+      - generic [ref=e10]:
+        - heading "拉格朗日乘子配餐" [level=1] [ref=e11]
+        - paragraph [ref=e12]: 智能分析平台
+    - navigation [ref=e13]:
+      - link "仪表盘" [ref=e14] [cursor=pointer]:
+        - /url: /
+        - img [ref=e15]
+        - generic [ref=e20]: 仪表盘
+      - link "参数调试表" [active] [ref=e21] [cursor=pointer]:
+        - /url: /parameters
+        - img [ref=e22]
+        - generic [ref=e24]: 参数调试表
+      - link "学生答案" [ref=e25] [cursor=pointer]:
+        - /url: /answers
+        - img [ref=e26]
+        - generic [ref=e29]: 学生答案
+      - link "3D可视化" [ref=e30] [cursor=pointer]:
+        - /url: /visualization
+        - img [ref=e31]
+        - generic [ref=e33]: 3D可视化
+      - link "历史记录" [ref=e34] [cursor=pointer]:
+        - /url: /history
+        - img [ref=e35]
+        - generic [ref=e39]: 历史记录
+      - link "报告中心" [ref=e40] [cursor=pointer]:
+        - /url: /reports
+        - img [ref=e41]
+        - generic [ref=e44]: 报告中心
+    - generic [ref=e46]:
+      - generic [ref=e48]: 吴
+      - generic [ref=e49]:
+        - paragraph [ref=e50]: 吴老师
+        - paragraph [ref=e51]: 教研负责人
+  - main [ref=e52]:
+    - generic [ref=e54]:
+      - heading "仪表盘" [level=2] [ref=e55]
+      - generic [ref=e57]: 2026年6月4日星期四
+    - generic [ref=e193]:
+      - generic [ref=e194]:
+        - generic [ref=e195]:
+          - heading "参数调试表" [level=1] [ref=e196]
+          - paragraph [ref=e197]: 管理配餐计算的参数配置，支持Excel导入
+        - generic [ref=e198]:
+          - button "导入演示数据" [ref=e199] [cursor=pointer]
+          - button "导入Excel" [ref=e200] [cursor=pointer]:
+            - img [ref=e201]
+            - text: 导入Excel
+      - generic [ref=e205]:
+        - img [ref=e206]
+        - generic [ref=e208]:
+          - paragraph [ref=e209]: 同一学生多版答案处理说明
+          - paragraph [ref=e210]: 当系统检测到同一学生提交多版答案时，会自动标记为"复核中"状态，由业务运营团队进行人工复核。 教研负责人吴老师可以补充手算反例帮助判断。
+      - generic [ref=e211]:
+        - generic [ref=e213] [cursor=pointer]:
+          - generic [ref=e214]:
+            - img [ref=e216]
+            - generic [ref=e219]:
+              - heading "第二季度配餐参数表" [level=3] [ref=e220]
+              - generic [ref=e221]:
+                - generic [ref=e222]:
+                  - img [ref=e223]
+                  - text: 2026-06-03 14:20:00
+                - generic [ref=e226]:
+                  - img [ref=e227]
+                  - text: 吴老师
+          - generic [ref=e230]:
+            - generic [ref=e231]: v1.1
+            - generic [ref=e232]: 3 条记录
+            - img [ref=e233]
+        - generic [ref=e236] [cursor=pointer]:
+          - generic [ref=e237]:
+            - img [ref=e239]
+            - generic [ref=e242]:
+              - heading "第一季度配餐参数表" [level=3] [ref=e243]
+              - generic [ref=e244]:
+                - generic [ref=e245]:
+                  - img [ref=e246]
+                  - text: 2026-06-01 09:30:00
+                - generic [ref=e249]:
+                  - img [ref=e250]
+                  - text: 吴老师
+          - generic [ref=e253]:
+            - generic [ref=e254]: v1.0
+            - generic [ref=e255]: 3 条记录
+            - img [ref=e256]

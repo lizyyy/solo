@@ -1,0 +1,152 @@
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - generic [ref=e6]:
+      - img [ref=e8]
+      - generic [ref=e10]:
+        - heading "拉格朗日乘子配餐" [level=1] [ref=e11]
+        - paragraph [ref=e12]: 智能分析平台
+    - navigation [ref=e13]:
+      - link "仪表盘" [ref=e14] [cursor=pointer]:
+        - /url: /
+        - img [ref=e15]
+        - generic [ref=e20]: 仪表盘
+      - link "参数调试表" [ref=e21] [cursor=pointer]:
+        - /url: /parameters
+        - img [ref=e22]
+        - generic [ref=e24]: 参数调试表
+      - link "学生答案" [ref=e25] [cursor=pointer]:
+        - /url: /answers
+        - img [ref=e26]
+        - generic [ref=e29]: 学生答案
+      - link "3D可视化" [ref=e30] [cursor=pointer]:
+        - /url: /visualization
+        - img [ref=e31]
+        - generic [ref=e33]: 3D可视化
+      - link "历史记录" [ref=e34] [cursor=pointer]:
+        - /url: /history
+        - img [ref=e35]
+        - generic [ref=e39]: 历史记录
+      - link "报告中心" [ref=e40] [cursor=pointer]:
+        - /url: /reports
+        - img [ref=e41]
+        - generic [ref=e44]: 报告中心
+    - generic [ref=e46]:
+      - generic [ref=e48]: 吴
+      - generic [ref=e49]:
+        - paragraph [ref=e50]: 吴老师
+        - paragraph [ref=e51]: 教研负责人
+  - main [ref=e52]:
+    - generic [ref=e54]:
+      - heading "仪表盘" [level=2] [ref=e55]
+      - generic [ref=e57]: 2026年6月4日星期四
+    - generic [ref=e376]:
+      - generic [ref=e377]:
+        - button [ref=e378] [cursor=pointer]:
+          - img [ref=e379]
+        - generic [ref=e381]:
+          - heading "张三 - 答案详情" [level=1] [ref=e382]
+          - paragraph [ref=e383]: 版本 v2 · 提交于 2026-06-02 15:30:00
+      - generic [ref=e385]:
+        - img [ref=e387]
+        - generic [ref=e391]:
+          - paragraph [ref=e392]: 该学生提交了 2 版答案
+          - generic [ref=e393]:
+            - button "v1" [ref=e394] [cursor=pointer]
+            - button "v2 (当前)" [ref=e395] [cursor=pointer]
+      - generic [ref=e396]:
+        - generic [ref=e397]:
+          - generic [ref=e398]:
+            - heading "答案内容" [level=3] [ref=e399]
+            - paragraph [ref=e401]: 解法二：修正了约束条件，重新计算偏导数...
+          - generic [ref=e402]:
+            - generic [ref=e403]:
+              - generic [ref=e404]:
+                - img [ref=e405]
+                - heading "手算反例（吴老师补充）" [level=3] [ref=e407]
+              - button "编辑" [ref=e408] [cursor=pointer]:
+                - img [ref=e409]
+                - text: 编辑
+            - paragraph [ref=e412]: 手算验证：当x=5,y=3时，f=34，满足约束g=8
+          - generic [ref=e457]:
+            - heading "修改历史" [level=3] [ref=e458]
+            - generic [ref=e459]:
+              - generic [ref=e464]:
+                - generic [ref=e465]:
+                  - generic [ref=e466]: 吴老师
+                  - generic [ref=e467]: 2026-06-02 16:00:00
+                - paragraph [ref=e468]:
+                  - text: 修改了
+                  - code [ref=e469]: remark
+                - generic [ref=e470]:
+                  - generic [ref=e471]:
+                    - paragraph [ref=e472]: 修改前
+                    - paragraph [ref=e473]: 初始答案
+                  - generic [ref=e474]:
+                    - paragraph [ref=e475]: 修改后
+                    - paragraph [ref=e476]: 同一学生提交第二版答案，留待运营复核
+              - generic [ref=e481]:
+                - generic [ref=e482]:
+                  - generic [ref=e483]: 吴老师
+                  - generic [ref=e484]: 2026-06-02 16:00:00
+                - paragraph [ref=e485]:
+                  - text: 修改了
+                  - code [ref=e486]: status
+                - generic [ref=e487]:
+                  - generic [ref=e488]:
+                    - paragraph [ref=e489]: 修改前
+                    - paragraph [ref=e490]: pending
+                  - generic [ref=e491]:
+                    - paragraph [ref=e492]: 修改后
+                    - paragraph [ref=e493]: reviewing
+              - generic [ref=e498]:
+                - generic [ref=e499]:
+                  - generic [ref=e500]: 吴老师
+                  - generic [ref=e501]: 2026-06-03 10:00:00
+                - paragraph [ref=e502]:
+                  - text: 修改了
+                  - code [ref=e503]: manualExample
+                - generic [ref=e504]:
+                  - generic [ref=e505]:
+                    - paragraph [ref=e506]: 修改前
+                    - paragraph [ref=e507]: (空)
+                  - generic [ref=e508]:
+                    - paragraph [ref=e509]: 修改后
+                    - paragraph [ref=e510]: 手算验证：当x=5,y=3时，f=34，满足约束g=8
+              - generic [ref=e515]:
+                - generic [ref=e516]:
+                  - generic [ref=e517]: 吴老师
+                  - generic [ref=e518]: 2026-06-04 01:02:04
+                - paragraph [ref=e519]:
+                  - text: 修改了
+                  - code [ref=e520]: remark
+                - generic [ref=e521]:
+                  - generic [ref=e522]:
+                    - paragraph [ref=e523]: 修改前
+                    - paragraph [ref=e524]: 同一学生提交第二版答案，留待运营复核
+                  - generic [ref=e525]:
+                    - paragraph [ref=e526]: 修改后
+                    - paragraph [ref=e527]: 同一学生提交第二版答案，继续留给业务运营复核
+        - generic [ref=e413]:
+          - generic [ref=e414]:
+            - heading "状态管理" [level=3] [ref=e415]
+            - generic [ref=e416]:
+              - generic [ref=e417]: 复核中
+              - generic [ref=e419]:
+                - button "标记为正常" [ref=e420] [cursor=pointer]:
+                  - img [ref=e421]
+                  - generic [ref=e424]: 标记为正常
+                - button "标记为异常" [ref=e425] [cursor=pointer]:
+                  - img [ref=e426]
+                  - generic [ref=e430]: 标记为异常
+                - button "留待运营复核" [ref=e431] [cursor=pointer]:
+                  - img [ref=e432]
+                  - generic [ref=e436]: 留待运营复核
+          - generic [ref=e437]:
+            - generic [ref=e438]:
+              - heading "备注" [level=3] [ref=e439]
+              - button [ref=e440] [cursor=pointer]:
+                - img [ref=e454]
+            - paragraph [ref=e456]: 同一学生提交第二版答案，继续留给业务运营复核
+          - button "隐藏修改历史" [active] [ref=e528] [cursor=pointer]:
+            - img [ref=e445]
+            - text: 隐藏修改历史

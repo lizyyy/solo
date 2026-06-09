@@ -46,11 +46,18 @@ export type NextStep = 'business' | 'research';
 
 export interface ErrorItem {
   id: string;
+  answerId?: string;
+  studentName?: string;
+  studentVersion?: number;
   description: string;
+  originalContent?: string;
+  correctedContent?: string;
+  reviewProcess?: string;
   reason: string;
   missingMaterials: string[];
   nextStep: NextStep;
   kept: boolean;
+  resolved?: boolean;
 }
 
 export interface MealPlanResult {

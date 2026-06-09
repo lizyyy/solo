@@ -9,13 +9,25 @@ import {
   TrendingUp,
   Users,
   BarChart3,
+  Calculator,
+  Layers,
+  FileBarChart,
 } from 'lucide-react';
 import { useAppStore } from '@/store';
 import StatusBadge from '@/components/StatusBadge';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
-  const { studentAnswers, parameterTables, mealPlanResults } = useAppStore();
+  const {
+    studentAnswers,
+    parameterTables,
+    mealPlanResults,
+    getLatestMealPlan,
+  } = useAppStore();
+
+  const latestPlan = getLatestMealPlan();
+  const unresolvedErrors = latestPlan?.errors.filter(e => !e.resolved).length || 0;
+  const resolvedErrors = latestPlan?.errors.filter(e => e.resolved).length || 0;
 
   const stats = {
     total: studentAnswers.length,
@@ -26,7 +38,9 @@ const Dashboard: React.FC = () => {
   };
 
   const multiVersionStudents = new Set(
-    studentAnswers.map(a => a.studentId)
+    studentAnswers.filter(a =>
+      studentAnswers.filter(x => x.studentId === a.studentId).length > 1
+    ).map(a => a.studentId)
   ).size;
 
   const recentAnswers = [...studentAnswers]
@@ -42,7 +56,7 @@ const Dashboard: React.FC = () => {
       bgColor: 'bg-slate-50',
     },
     {
-      label: '复核中答案',
+      label: '复核中答案（运营）',
       value: stats.reviewing,
       icon: AlertTriangle,
       color: 'bg-amber-500',
@@ -145,19 +159,62 @@ const Dashboard: React.FC = () => {
         </div>
 
         <div className="space-y-6">
+          <div className="bg-white rounded-xl border-2 border-amber-200 p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <Layers className="w-5 h-5 text-amber-600" />
+              <p className="font-semibold text-slate-800">三步样例流程</p>
+            </div>
+            <div className="space-y-2.5">
+              <button
+                onClick={() => navigate('/parameters')}
+                className="w-full flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-emerald-500 text-white text-xs font-bold flex items-center justify-center">1</span>
+                  <span className="text-sm text-slate-700">导入参数调试表</span>
+                </div>
+                <span className="text-xs text-slate-400">{parameterTables.length}条 →</span>
+              </button>
+              <button
+                onClick={() => navigate('/answers')}
+                className="w-full flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-amber-500 text-white text-xs font-bold flex items-center justify-center">2</span>
+                  <span className="text-sm text-slate-700">吴老师补看手算反例</span>
+                </div>
+                <span className="text-xs text-slate-400">
+                  {studentAnswers.filter(a => a.manualExample).length}已补 →
+                </span>
+              </button>
+              <button
+                onClick={() => navigate('/reports')}
+                className="w-full flex items-center justify-between p-3 bg-amber-50 rounded-lg hover:bg-amber-100 border border-amber-200 transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-slate-400 text-white text-xs font-bold flex items-center justify-center">3</span>
+                  <span className="text-sm font-medium text-amber-800">误差说明更新（同数据）</span>
+                </div>
+                <span className="text-xs font-medium text-amber-700">
+                  {unresolvedErrors}待处理 →
+                </span>
+              </button>
+            </div>
+          </div>
+
           <div className="bg-white rounded-xl border border-slate-200 p-6">
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 bg-blue-100 rounded-lg">
                 <Users className="w-5 h-5 text-blue-600" />
               </div>
               <div>
-                <p className="text-sm text-slate-500">学生人数</p>
-                <p className="text-2xl font-bold text-slate-800">{multiVersionStudents}</p>
+                <p className="text-sm text-slate-500">多版答案冲突</p>
+                <p className="text-2xl font-bold text-slate-800">{multiVersionStudents} 人</p>
               </div>
             </div>
-            <div className="text-sm text-slate-500">
-              其中 <span className="font-medium text-amber-600">1</span> 位学生提交了多版答案
-            </div>
+            <p className="text-xs text-slate-500">
+              已标记<span className="font-medium text-amber-600"> 留待运营复核 </span>，勿提前归正常
+            </p>
           </div>
 
           <div className="bg-white rounded-xl border border-slate-200 p-6">
@@ -172,27 +229,40 @@ const Dashboard: React.FC = () => {
             </div>
             <button
               onClick={() => navigate('/parameters')}
-              className="w-full text-sm text-slate-600 hover:text-slate-800 text-left"
+              className="w-full text-sm text-slate-600 hover:text-slate-800 text-left flex items-center justify-between"
             >
-              最新版本：{parameterTables[0]?.version || '无'}
+              <span>
+                生效版本：
+                <span className="font-mono font-semibold text-slate-800 ml-1">
+                  {latestPlan?.parameterVersion || '暂无'}
+                </span>
+              </span>
+              <Calculator className="w-4 h-4" />
             </button>
           </div>
 
           <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-6 text-white">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-amber-500/20 rounded-lg">
-                <TrendingUp className="w-5 h-5 text-amber-400" />
-              </div>
-              <div>
-                <p className="text-sm text-slate-400">配餐结果</p>
-                <p className="text-2xl font-bold">{mealPlanResults.length}</p>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-amber-500/20 rounded-lg">
+                  <FileBarChart className="w-5 h-5 text-amber-400" />
+                </div>
+                <div>
+                  <p className="text-sm text-slate-400">最新误差报告</p>
+                  <p className="text-2xl font-bold">
+                    {resolvedErrors}/{latestPlan?.errors.length || 0}
+                  </p>
+                </div>
               </div>
             </div>
+            <p className="text-xs text-slate-400 mb-3">
+              保留原始说法、改后值、处理原因、下一步找谁
+            </p>
             <button
               onClick={() => navigate('/reports')}
               className="w-full flex items-center justify-center gap-2 py-2 bg-amber-500 text-slate-900 rounded-lg font-medium hover:bg-amber-400 transition-colors"
             >
-              查看报告
+              查看完整误差说明
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
