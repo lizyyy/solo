@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>风机叶片阈值预警 - 复核工作台</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:#f0f2f5;color:#1f2937;font-size:14px}
+.header{background:linear-gradient(135deg,#1e40af,#3b82f6);color:#fff;padding:16px 28px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.header h1{font-size:18px;font-weight:600}
+.header .meta{font-size:12px;opacity:.92;display:flex;gap:14px;align-items:center}
+.header .meta .reviewer-tag{background:rgba(255,255,255,.18);padding:4px 10px;border-radius:12px}
+.container{max-width:1680px;margin:0 auto;padding:18px;display:grid;grid-template-columns:360px 1fr;gap:18px}
+.card{background:#fff;border-radius:9px;box-shadow:0 1px 3px rgba(0,0,0,.06);padding:16px;margin-bottom:16px}
+.card-title{font-size:14px;font-weight:600;margin-bottom:12px;color:#111827;border-left:3px solid #3b82f6;padding-left:8px;display:flex;justify-content:space-between;align-items:center}
+.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.sum-item{background:#f9fafb;border-radius:7px;padding:10px 8px;text-align:center;transition:transform .15s}
+.sum-item:hover{transform:translateY(-1px)}
+.sum-item .n{font-size:22px;font-weight:700;color:#1e40af}
+.sum-item .l{font-size:11px;color:#6b7280;margin-top:2px}
+.sum-item.danger .n{color:#dc2626}
+.sum-item.warn .n{color:#d97706}
+.sum-item.success .n{color:#16a34a}
+.tabs{display:flex;gap:2px;margin-bottom:12px;border-bottom:1px solid #e5e7eb;flex-wrap:wrap}
+.tab{padding:8px 11px;cursor:pointer;border-bottom:2px solid transparent;font-size:12.5px;color:#6b7280;transition:all .2s;border-radius:5px 5px 0 0;user-select:none}
+.tab:hover{color:#2563eb;background:#f8fafc}
+.tab.active{color:#2563eb;border-color:#2563eb;font-weight:600;background:#eff6ff}
+.tab .badge{background:#e5e7eb;border-radius:10px;padding:1px 7px;font-size:11px;margin-left:4px;color:#374151;font-weight:500}
+.tab.active .badge{background:#dbeafe;color:#1e40af}
+.filter-row{display:flex;gap:7px;margin-bottom:10px;flex-wrap:wrap}
+.input,select,textarea{border:1px solid #d1d5db;border-radius:6px;padding:6px 9px;font-size:13px;outline:none;transition:all .15s;font-family:inherit;background:#fff}
+.input:focus,select:focus,textarea:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.12)}
+.input{flex:1;min-width:130px}
+.btn{padding:6px 12px;border-radius:6px;border:none;cursor:pointer;font-size:12.5px;transition:all .15s;font-weight:500;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+.btn-primary{background:#2563eb;color:#fff}
+.btn-primary:hover{background:#1d4ed8;box-shadow:0 2px 5px rgba(37,99,235,.25)}
+.btn-success{background:#16a34a;color:#fff}
+.btn-success:hover{background:#15803d}
+.btn-danger{background:#dc2626;color:#fff}
+.btn-danger:hover{background:#b91c1c}
+.btn-warn{background:#d97706;color:#fff}
+.btn-warn:hover{background:#b45309}
+.btn-ghost{background:#f3f4f6;color:#374151}
+.btn-ghost:hover{background:#e5e7eb}
+.btn-sm{padding:3px 8px;font-size:11.5px;border-radius:5px}
+.list{max-height:470px;overflow:auto;border:1px solid #e5e7eb;border-radius:7px}
+.list::-webkit-scrollbar{width:7px}
+.list::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:4px}
+.list-item{padding:9px 11px;border-bottom:1px solid #f3f4f6;cursor:pointer;transition:background .1s;position:relative}
+.list-item:hover{background:#f9fafb}
+.list-item.active{background:#eff6ff;border-left:3px solid #2563eb;padding-left:8px}
+.list-item .row1{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.list-item .dev{font-weight:600;color:#1f2937;font-size:13px}
+.list-item .status{font-size:10.5px;padding:2px 7px;border-radius:3px;white-space:nowrap;font-weight:500}
+.s-pending{background:#fef3c7;color:#92400e}
+.s-doing{background:#dbeafe;color:#1e40af}
+.s-done{background:#dcfce7;color:#166534}
+.s-reject{background:#fee2e2;color:#991b1b}
+.temp-tag{background:#fee2e2;color:#991b1b;font-size:10px;padding:1px 5px;border-radius:3px;margin-left:4px;font-weight:500}
+.list-item .row2{font-size:12px;color:#6b7280;margin-top:4px;display:flex;justify-content:space-between;gap:6px}
+.list-item .row3{font-size:11px;color:#9ca3af;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.detail-panel{background:#fff;border-radius:9px;box-shadow:0 1px 3px rgba(0,0,0,.06);min-height:600px}
+.detail-empty{padding:90px 20px;text-align:center;color:#9ca3af}
+.detail-empty .big{font-size:50px;margin-bottom:10px}
+.detail-head{padding:14px 20px;border-bottom:1px solid #f3f4f6;display:flex;justify-content:space-between;align-items:flex-start;gap:20px;background:linear-gradient(to bottom,#f8fafc,#fff)}
+.detail-head h2{font-size:16.5px;margin-bottom:4px}
+.detail-head .sub{font-size:12px;color:#6b7280;line-height:1.7}
+.detail-body{padding:17px 20px}
+.section{margin-bottom:22px}
+.section-title{font-size:13px;font-weight:600;color:#374151;margin-bottom:10px;padding-bottom:5px;border-bottom:1px dashed #e5e7eb;display:flex;justify-content:space-between;align-items:center}
+.field-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px 18px}
+.field{font-size:13px}
+.field .lbl{color:#6b7280;font-size:11px;margin-bottom:2px}
+.field .val{color:#111827;font-weight:500}
+.field .val.big{font-size:15px;color:#1e40af;font-weight:700}
+.field .val.danger{color:#dc2626;font-weight:600}
+.banner{padding:11px 14px;border-radius:7px;margin-bottom:14px;display:flex;gap:10px;align-items:flex-start;font-size:12.5px}
+.banner-warn{background:#fef3c7;border:1px solid #fde68a;color:#92400e}
+.banner-danger{background:#fee2e2;border:1px solid #fecaca;color:#991b1b}
+.banner-info{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af}
+.banner-success{background:#dcfce7;border:1px solid #bbf7d0;color:#166534}
+.banner .icon{font-size:17px;flex-shrink:0;margin-top:1px}
+.form-row{display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.form-row .field-lg{flex:1;min-width:200px}
+.form-row label{display:block;font-size:11.5px;color:#6b7280;margin-bottom:3px;font-weight:500}
+.form-row textarea,.form-row .full{width:100%}
+.textarea-lg{min-height:78px;resize:vertical;line-height:1.6}
+.variant-list{display:flex;gap:5px;flex-wrap:wrap}
+.variant-chip{background:#f3f4f6;border:1px solid #e5e7eb;border-radius:12px;padding:3px 8px;font-size:11.5px;color:#4b5563}
+.variant-chip.main{background:#dbeafe;border-color:#93c5fd;color:#1e40af;font-weight:600}
+.trace-chain{background:#f9fafb;border-radius:7px;padding:12px 12px 8px 12px}
+.trace-step{padding:6px 0;position:relative;padding-left:22px;margin-bottom:6px}
+.trace-step::before{content:'';position:absolute;left:7px;top:22px;bottom:-4px;width:2px;background:#e5e7eb}
+.trace-step:last-child::before{display:none}
+.trace-step .arrow{position:absolute;left:0;top:5px;width:16px;height:16px;border-radius:50%;background:#3b82f6;color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:700}
+.trace-step.t2 .arrow{background:#16a34a}
+.trace-step.t3 .arrow{background:#d97706}
+.trace-step .t-label{font-size:10.5px;color:#6b7280;margin-bottom:3px;font-weight:500}
+.trace-step .t-content{font-size:12.5px;color:#1f2937;background:#fff;border-radius:5px;padding:6px 8px;border:1px solid #e5e7eb;white-space:pre-wrap;word-break:break-all;line-height:1.55}
+.consistency-list{display:flex;flex-direction:column;gap:4px}
+.consist-item{display:grid;grid-template-columns:80px 1fr 24px 1fr 22px;font-size:12px;align-items:center;gap:6px}
+.consist-item .orig{background:#f3f4f6;padding:4px 7px;border-radius:4px;font-size:11.5px;color:#374151}
+.consist-item .cur{background:#eff6ff;padding:4px 7px;border-radius:4px;font-size:11.5px;font-weight:500}
+.consist-item .arr{text-align:center;color:#9ca3af;font-size:11px}
+.consist-item.ok .cur{background:#dcfce7}
+.consist-item.bad .cur{background:#fee2e2}
+.consist-item .chk{text-align:center;font-weight:700;font-size:14px}
+.consist-item.ok .chk{color:#16a34a}
+.consist-item.bad .chk{color:#dc2626}
+.breakdown-list{display:flex;flex-direction:column;gap:5px}
+.breakdown-item{background:#f9fafb;border-left:3px solid #fbbf24;padding:7px 9px;border-radius:0 5px 5px 0;font-size:12px;cursor:pointer;transition:all .12s}
+.breakdown-item:hover{background:#fffbeb;border-left-color:#d97706;transform:translateX(2px)}
+.breakdown-item.bd-temp{border-left-color:#ef4444;background:#fef2f2}
+.breakdown-item.bd-temp:hover{background:#fee2e2}
+.breakdown-item .bi-row1{display:flex;justify-content:space-between;font-weight:500;font-size:12px;align-items:center}
+.breakdown-item .bi-row2{font-size:10.5px;color:#6b7280;margin-top:3px;line-height:1.5}
+.pager{display:flex;justify-content:space-between;align-items:center;padding:9px 2px;font-size:12px;color:#6b7280}
+.pager .btns{display:flex;gap:4px}
+.logs{max-height:200px;overflow:auto;border:1px solid #f3f4f6;border-radius:6px}
+.log-item{padding:7px 10px;border-bottom:1px solid #f9fafb;font-size:11.5px;line-height:1.6}
+.log-item .lt{color:#9ca3af;margin-right:7px}
+.log-item .la{color:#2563eb;font-weight:600;margin-right:7px}
+.log-item .lv{color:#6b7280;font-size:10.5px;margin-top:2px}
+.snapshot-hint{background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;padding:8px 12px;border-radius:6px;font-size:12px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.42);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
+.modal-mask.show{display:flex}
+.modal{background:#fff;border-radius:11px;max-width:820px;width:100%;max-height:86vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(0,0,0,.18)}
+.modal-head{padding:14px 20px;border-bottom:1px solid #f3f4f6;display:flex;justify-content:space-between;align-items:center}
+.modal-head h3{font-size:15px;font-weight:600}
+.modal-body{padding:18px 20px;overflow:auto;flex:1}
+.import-area{border:2px dashed #cbd5e1;border-radius:8px;padding:24px;text-align:center;color:#6b7280;margin-bottom:14px;transition:border-color .15s}
+.import-area:hover{border-color:#93c5fd}
+.import-area textarea{width:100%;min-height:180px;margin-top:10px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11.5px;line-height:1.55}
+.device-group{margin-bottom:14px}
+.device-group-title{font-size:13px;font-weight:600;margin-bottom:8px;color:#1f2937;background:#f9fafb;padding:6px 10px;border-radius:5px}
+.empty-rec{padding:30px;text-align:center;color:#9ca3af;font-size:12.5px}
+.handover-card{background:#fff;border:1px solid #e5e7eb;border-radius:7px;padding:12px 14px;margin-bottom:10px;transition:all .15s}
+.handover-card:hover{border-color:#93c5fd;box-shadow:0 2px 8px rgba(59,130,246,.08)}
+.handover-card .hc-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px}
+.handover-card .hc-title{font-weight:600;font-size:13px;color:#1f2937}
+.handover-card .hc-meta{font-size:11px;color:#9ca3af}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:8px}
+.col-block{background:#f9fafb;border-radius:6px;padding:10px}
+.col-block h4{font-size:11.5px;color:#6b7280;margin-bottom:6px;font-weight:600}
+.col-block .orig-words{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11.5px;color:#374151;background:#fff;border:1px solid #e5e7eb;padding:7px 8px;border-radius:4px;white-space:pre-wrap;line-height:1.6;min-height:60px;max-height:180px;overflow:auto}
+.summary-bullet{font-size:12px;color:#374151;padding:3px 0;line-height:1.6}
+.summary-bullet::before{content:'• ';color:#3b82f6;font-weight:700}
+.conclusion-box{font-size:12.5px;color:#1f2937;background:#fff;border:1px solid #e5e7eb;padding:7px 8px;border-radius:4px;line-height:1.6;min-height:60px;white-space:pre-wrap}
+@media(max-width:1180px){
+.container{grid-template-columns:1fr}
+.summary-grid{grid-template-columns:repeat(3,1fr)}
+.field-grid{grid-template-columns:repeat(2,1fr)}
+.three-col{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>🌀 风机叶片阈值预警 · 复核工作台</h1>
+  <div class="meta">
+    <span>维保主管：<span class="reviewer-tag" id="curReviewer">阿敏</span></span>
+    <span id="snapshotHint"></span>
+  </div>
+</div>
+
+<div class="container">
+  <div class="left-col">
+    <div class="card">
+      <div class="card-title">
+        <span>📊 汇总看板</span>
+        <button class="btn btn-sm btn-ghost" onclick="refreshAll()" title="刷新全部">🔄</button>
+      </div>
+      <div class="summary-grid" id="summaryCards"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>🎯 拉动结果明细</span><span style="font-size:11px;color:#6b7280">点击跳转</span></div>
+      <div class="breakdown-list" id="breakdownList"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>📋 记录列表</span><button class="btn btn-sm btn-primary" onclick="openImport()">+ 导入</button></div>
+      <div class="tabs" id="filterTabs">
+        <div class="tab active" data-tab="all" onclick="switchTab('all')">全部<span class="badge" id="cntAll">0</span></div>
+        <div class="tab" data-tab="pending" onclick="switchTab('pending')">待复核<span class="badge" id="cntPending">0</span></div>
+        <div class="tab" data-tab="doing" onclick="switchTab('doing')">处理中<span class="badge" id="cntDoing">0</span></div>
+        <div class="tab" data-tab="temp" onclick="switchTab('temp')">⚠️ 临时调高<span class="badge" id="cntTemp">0</span></div>
+        <div class="tab" data-tab="done" onclick="switchTab('done')">已完成<span class="badge" id="cntDone">0</span></div>
+      </div>
+      <div class="filter-row">
+        <input class="input" id="kwInput" placeholder="搜索备件/备注/设备..." oninput="debouncedSearch()">
+        <select id="devSelect" onchange="onDevChange()"><option value="">全部设备</option></select>
+      </div>
+      <div class="list" id="recordList" onscroll="onListScroll()"></div>
+      <div class="pager">
+        <span id="pagerInfo">共 0 条</span>
+        <div class="btns">
+          <button class="btn btn-sm btn-ghost" onclick="changePage(-1)">‹ 上一页</button>
+          <span id="curPageInfo" style="padding:3px 6px">1</span>
+          <button class="btn btn-sm btn-ghost" onclick="changePage(1)">下一页 ›</button>
+        </div>
+      </div>
+      <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-success" onclick="exportSummary()">📤 导出摘要</button>
+        <button class="btn btn-sm btn-warn" onclick="openHandover()">🤝 交接溯源</button>
+        <button class="btn btn-sm btn-ghost" onclick="genDemo()">🧪 生成演示</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="right-col">
+    <div class="detail-panel" id="detailPanel">
+      <div class="detail-empty" id="emptyDetail">
+        <div class="big">🔍</div>
+        <div style="font-size:15px;font-weight:500;color:#6b7280">从左侧选择一条记录开始复核</div>
+        <div style="font-size:12px;margin-top:10px;color:#9ca3af;line-height:1.8">
+          💡 页面进度（筛选条件、滚动位置、当前选中项等）<br>会自动保存至数据库，<b>服务重启后自动恢复</b>
+        </div>
+      </div>
+      <div id="detailContent" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 导入弹窗 -->
+<div class="modal-mask" id="importModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>📥 导入备件清单</h3>
+      <button class="btn btn-sm btn-ghost" onclick="closeModal('importModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="snapshot-hint">
+        <span>💡 系统自动兼容字段名差异（如「设备编号/机组编号/风机号/FD#」），并<b>强制保留</b>「来源、处理状态、备注、结论」的原始值用于溯源。</span>
+      </div>
+      <div style="margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap">
+        <input class="input" id="importSource" placeholder="数据来源（如：SCADA日报6月第2周）" value="">
+        <input class="input" id="importReviewer" placeholder="复核人" value="阿敏" style="max-width:140px">
+      </div>
+      <div class="import-area">
+        <div style="font-weight:500;margin-bottom:5px">粘贴 CSV/TSV 数据（首行表头）</div>
+        <div style="font-size:11.5px;color:#9ca3af">示例：设备编号,备件名称,数量,备注,处理状态,复核结论 ...</div>
+        <textarea id="importText" placeholder="机组编号,备件名称,数量,备注,处理状态&#10;FD012,叶根衬套,2,临时放宽阈值,待复核,"></textarea>
+      </div>
+      <div id="importResult" style="display:none;margin-bottom:10px"></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn btn-ghost" onclick="closeModal('importModal')">取消</button>
+        <button class="btn btn-primary" onclick="doImport()">开始导入</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 交接溯源弹窗 -->
+<div class="modal-mask" id="handoverModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>🤝 交接溯源 · 阿敏专用</h3>
+      <button class="btn btn-sm btn-ghost" onclick="closeModal('handoverModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="snapshot-hint">
+        <span>💡 三步溯源：① <b>找到备件清单原话</b> → ② 查看页面摘要要点 → ③ 对照复核结论。一眼看懂来龙去脉。</span>
+      </div>
+      <div class="filter-row" style="margin-bottom:14px">
+        <input class="input" id="handoverDev" placeholder="任意写法：FD#012 / 风机3号 / #18 / 025号">
+        <input class="input" id="handoverKw" placeholder="备件名称/备注关键词">
+        <button class="btn btn-primary" onclick="doHandoverTrace()">🔍 追溯</button>
+      </div>
+      <div id="handoverVariants" style="margin-bottom:12px"></div>
+      <div id="handoverResults"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const PAGE_KEY = 'blade_warning_review_main';
+const state = {
+  page: 1, size: 20, activeTab: 'all', keyword: '', device_no_norm: '',
+  total: 0, records: [], currentId: null, summary: null, snapshot: null,
+  scrollPos: 0, saveTimer: null, currentDetail: null
+};
+
+// ============ 工具函数 ============
+function $(id){return document.getElementById(id)}
+function scls(n){return({'待复核':'s-pending','处理中':'s-doing','已通过':'s-done','已完成':'s-done','建议停机':'s-reject','驳回':'s-reject'}[n]||'s-pending')}
+function debounce(fn,ms){let t;return function(...a){clearTimeout(t);t=setTimeout(()=>fn.apply(this,a),ms)}}
+const debouncedSearch = debounce(()=>{state.page=1;loadRecords()},300);
+const debouncedSaveSnap = debounce(()=>saveSnapshot(),1200);
+
+async function api(url,method='GET',body){
+  const opt={method,headers:{'Content-Type':'application/json'}};
+  if(body)opt.body=JSON.stringify(body);
+  try{const r=await fetch(url,opt);return await r.json();}
+  catch(e){console.error(e);return{ok:false,msg:String(e)};}
+}
+
+// ============ 快照：自动保存/恢复进度 ============
+async function saveSnapshot(){
+  const snap={
+    reviewer:$('curReviewer').textContent,
+    filters:{tab:state.activeTab,keyword:state.keyword,device_no_norm:state.device_no_norm,page:state.page},
+    current_record_id:state.currentId,
+    scroll_pos:document.getElementById('recordList')?.scrollTop||0,
+    active_tab:state.activeTab,
+    summary:state.summary?{total:state.summary.total,temp:state.summary.temp_adjusted_count}:null,
+    draft_notes:{lastActionTime:Date.now()}
+  };
+  await api('/api/snapshot/'+PAGE_KEY,'PUT',snap);
+}
+function scheduleSave(){debouncedSaveSnap()}
+
+async function restoreSnapshot(){
+  const r=await api('/api/snapshot/'+PAGE_KEY);
+  if(r.ok&&r.snapshot){
+    state.snapshot=r.snapshot;
+    const f=r.snapshot.filters||{};
+    if(f.tab){state.activeTab=f.tab;updateTabUI();}
+    if(f.keyword){state.keyword=f.keyword;$('kwInput').value=state.keyword;}
+    if(f.device_no_norm){state.device_no_norm=f.device_no_norm;}
+    if(f.page)state.page=f.page;
+    state.currentId=r.snapshot.current_record_id;
+    state.scrollPos=r.snapshot.scroll_pos||0;
+    const lv=r.snapshot.last_visit_time;
+    $('snapshotHint').innerHTML=`<span style="background:rgba(255,255,255,.16);padding:4px 10px;border-radius:12px">💾 已恢复 ${lv} 的进度</span>`;
+    setTimeout(()=>{const el=$('recordList');if(el)el.scrollTop=state.scrollPos;},900);
+  }else{
+    $('snapshotHint').innerHTML=`<span style="opacity:.72">首次打开，操作将自动保存进度</span>`;
+  }
+}
+
+// ============ 数据加载 ============
+async function refreshAll(){
+  await Promise.all([loadSummary(),loadRecords()]);
+  scheduleSave();
+}
+
+async function loadSummary(){
+  const r=await api('/api/summary');
+  if(!r.ok)return;
+  state.summary=r;
+  const sd=r.status_distribution||{};
+  const pending=(sd['待复核']||0);
+  const doing=(sd['处理中']||0);
+  const done=(sd['已通过']||0)+(sd['已完成']||0);
+  const temp=r.temp_adjusted_count||0;
+  $('summaryCards').innerHTML=`
+    <div class="sum-item"><div class="n">${r.total}</div><div class="l">记录总数</div></div>
+    <div class="sum-item warn"><div class="n">${temp}</div><div class="l">⚠️ 阈值临时调高</div></div>
+    <div class="sum-item"><div class="n">${pending}</div><div class="l">待复核</div></div>
+    <div class="sum-item warn"><div class="n">${doing}</div><div class="l">处理中</div></div>
+    <div class="sum-item success"><div class="n">${done}</div><div class="l">已完成</div></div>
+    <div class="sum-item danger"><div class="n">${(r.devices||[]).length}</div><div class="l">涉及设备数</div></div>`;
+  $('cntAll').textContent=r.total;
+  $('cntPending').textContent=pending;
+  $('cntDoing').textContent=doing;
+  $('cntTemp').textContent=temp;
+  $('cntDone').textContent=done;
+  // 填充设备下拉
+  const sel=$('devSelect');
+  const curVal=state.device_no_norm;
+  sel.innerHTML='<option value="">全部设备</option>'+
+    (r.devices||[]).map(d=>`<option value="${d.device_no_norm}">${d.device_no_norm} (${d.c}条, 临时${d.temp_cnt})</option>`).join('');
+  if(curVal)sel.value=curVal;
+  // 拉动明细
+  const bd=r.pulled_breakdown||{};
+  const html=[];
+  (bd.temp_highlights||[]).slice(0,8).forEach(t=>{
+    html.push(`<div class="breakdown-item bd-temp" onclick="jumpToRecord(${t.id})">
+      <div class="bi-row1"><span>⚠️ ${t.device_no_norm||t.device_no_raw}</span><span class="status s-reject">临时调高</span></div>
+      <div class="bi-row2">${t.threshold_type||''} 当前${t.current_value||'?'} / 标准${t.threshold_value||'?'}${t.temp_threshold?' / 临时'+t.temp_threshold:''}<br>原因: ${t.temp_adjust_reason||''}</div>
+    </div>`);
+  });
+  (bd.pending_highlights||[]).slice(0,6).forEach(p=>{
+    if(bd.temp_highlights&&bd.temp_highlights.find(x=>x.id===p.id))return;
+    html.push(`<div class="breakdown-item" onclick="jumpToRecord(${p.id})">
+      <div class="bi-row1"><span>⏳ ${p.device_no_norm||p.device_no_raw}</span><span class="status s-pending">${p.status||'待复核'}</span></div>
+      <div class="bi-row2">${p.threshold_type||''} · ${p.spare_part_name||'无备件信息'}</div>
+    </div>`);
+  });
+  if(!html.length)html.push('<div style="padding:16px;text-align:center;color:#9ca3af;font-size:12px">暂无拉动结果</div>');
+  $('breakdownList').innerHTML=html.join('');
+}
+
+function jumpToRecord(id){
+  state.currentId=id;
+  state.activeTab='all';
+  updateTabUI();
+  state.device_no_norm='';$('devSelect').value='';
+  state.keyword='';$('kwInput').value='';
+  state.page=1;
+  loadRecords().then(()=>{
+    setTimeout(()=>{
+      const el=document.querySelector(`.list-item[data-id="${id}"]`);
+      if(el){el.scrollIntoView({block:'center',behavior:'smooth'});selectRecord(id);}
+      else{loadDetail(id);renderList(true);}
+    },300);
+  });
+}
+
+async function loadRecords(){
+  const params=new URLSearchParams({
+    page:state.page,size:state.size,
+    keyword:state.keyword,device_no_norm:state.device_no_norm,tab:state.activeTab
+  });
+  const r=await api('/api/records?'+params);
+  if(!r.ok){alert('加载失败:'+r.msg);return;}
+  state.records=r.records;state.total=r.total;
+  renderList();
+  $('pagerInfo').textContent=`共 ${r.total} 条`;
+  $('curPageInfo').textContent=`${state.page}/${Math.max(1,Math.ceil(r.total/state.size))}`;
+  if(state.currentId&&!r.records.find(x=>x.id===state.currentId)){
+    // 不自动加载
+  }else if(state.currentId){
+    if(!state.currentDetail||state.currentDetail.id!==state.currentId){
+      // 等列表渲染后设置选中
+      setTimeout(()=>{const el=document.querySelector(`.list-item[data-id="${state.currentId}"]`);if(el)el.classList.add('active');},50);
+    }
+  }
+  scheduleSave();
+}
+
+function renderList(forceDetail){
+  const list=$('recordList');
+  if(!state.records.length){
+    list.innerHTML='<div class="empty-rec">暂无记录，点击「+ 导入」或「🧪 生成演示」</div>';
+    if(forceDetail){$('emptyDetail').style.display='';$('detailContent').style.display='none';}
+    return;
+  }
+  list.innerHTML=state.records.map(r=>{
+    const active=(state.currentId===r.id)?'active':'';
+    const tempTag=r.is_temp_adjusted?'<span class="temp-tag">⚠️临时调高</span>':'';
+    const rawDev=r.device_no_raw&&r.device_no_raw!==r.device_no_norm?`<span style="color:#9ca3af;margin-left:4px">(${r.device_no_raw})</span>`:'';
+    return `<div class="list-item ${active}" data-id="${r.id}" onclick="selectRecord(${r.id})">
+      <div class="row1">
+        <span class="dev">${r.device_no_norm||'未知设备'}${rawDev}${tempTag}</span>
+        <span class="status ${scls(r.status)}">${r.status||'待复核'}</span>
+      </div>
+      <div class="row2">
+        <span>${r.threshold_type||'—'}</span>
+        <span>${r.spare_part_name||'无备件'}</span>
+      </div>
+      <div class="row3">${r.remark||(r.reviewer?'复核人: '+r.reviewer:r.source||'')}</div>
+    </div>`;
+  }).join('');
+  if(state.currentId){
+    if(forceDetail)loadDetail(state.currentId);
+  }
+}
+
+function updateTabUI(){
+  document.querySelectorAll('.tab').forEach(t=>{
+    t.classList.toggle('active',t.dataset.tab===state.activeTab);
+  });
+}
+
+function switchTab(tab){
+  state.activeTab=tab;state.page=1;
+  updateTabUI();
+  loadRecords();
+}
+function onDevChange(){state.device_no_norm=$('devSelect').value;state.page=1;loadRecords();}
+function changePage(d){
+  const maxP=Math.ceil(state.total/state.size)||1;
+  const np=Math.max(1,Math.min(maxP,state.page+d));
+  if(np!==state.page){state.page=np;loadRecords();}
+}
+function onListScroll(){scheduleSave();}
+
+async function selectRecord(id){
+  document.querySelectorAll('.list-item').forEach(el=>el.classList.toggle('active',+el.dataset.id===id));
+  state.currentId=id;
+  await loadDetail(id);
+  scheduleSave();
+}
+
+async function loadDetail(id){
+  const r=await api('/api/records/'+id);
+  if(!r.ok){$('emptyDetail').style.display='';$('detailContent').style.display='none';return;}
+  state.currentDetail=r.record;
+  $('emptyDetail').style.display='none';
+  $('detailContent').style.display='block';
+  renderDetail(r.record);
+}
+
+function renderDetail(d){
+  const t=d.traceability||{};
+  const cf=t.core_fields||{};
+  const vars=d.device_variants||[];
+  const tempBanner=d.is_temp_adjusted?`<div class="banner banner-danger"><span class="icon">🚨</span>
+    <div><b>阈值临时调高记录</b>（已单独拎出）<br>原因: ${d.temp_adjust_reason||'未知'}</div></div>`:'';
+  const varHtml=d.device_no_norm?`<div class="variant-list">
+    <span class="variant-chip main">✔ 归一化: ${d.device_no_norm}</span>`+
+    vars.map(v=>`<span class="variant-chip" title="出现 ${v.hit_count} 次">🗂 ${v.device_no_raw} (×${v.hit_count})</span>`).join('')+
+    `</div>`:'';
+  const consistItems=['status','remark','conclusion','source','reviewer'].map(f=>{
+    const info=cf[f]||{};const ok=info.consistent;
+    const cls=ok?'ok':'bad';
+    const labels={status:'处理状态',remark:'备注',conclusion:'复核结论',source:'数据来源',reviewer:'复核人'};
+    return `<div class="consist-item ${cls}">
+      <div>${labels[f]}</div>
+      <div class="orig" title="备件清单原值">${info.original_value==null?'—':String(info.original_value)}</div>
+      <div class="arr">→</div>
+      <div class="cur" title="当前页面值">${info.current_value==null||info.current_value===''?'—':String(info.current_value)}</div>
+      <div class="chk">${ok?'✓':'✗'}</div>
+    </div>`;
+  }).join('');
+  const logs=(d.action_logs||[]).map(l=>{
+    let lv='';
+    try{const o=JSON.parse(l.old_value||'{}'),n=JSON.parse(l.new_value||'{}');
+      lv=Object.keys(n).map(k=>`${k}: ${JSON.stringify(o[k])} → ${JSON.stringify(n[k])}`).join('；');
+    }catch(e){}
+    return `<div class="log-item"><span class="lt">${l.operate_time}</span><span class="la">${l.action}</span>${l.operator?'by '+l.operator:''}<br><span class="lv">${lv||l.remark||''}</span></div>`;
+  }).join('')||'<div class="empty-rec">暂无操作记录</div>';
+  const summaryPoints=(t.summary_points||[]).map(p=>`<div class="summary-bullet">${p}</div>`).join('');
+  $('detailContent').innerHTML=`
+    <div class="detail-head">
+      <div>
+        <h2>🔧 ${d.device_no_norm||'未知设备'} ${d.blade_no?'· '+d.blade_no+'叶片':''}</h2>
+        <div class="sub">
+          原始编号: <b>${d.device_no_raw||'—'}</b> · 来源: <b>${d.source||'未知'}</b> · 导入: ${d.import_time||''}<br>
+          ${varHtml}
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-success" onclick="quickUpdate('已通过','符合要求')">✓ 通过</button>
+        <button class="btn btn-sm btn-warn" onclick="quickUpdate('处理中','')">⏳ 处理中</button>
+        <button class="btn btn-sm btn-danger" onclick="quickUpdate('建议停机','存在安全隐患')">✗ 停机</button>
+      </div>
+    </div>
+    <div class="detail-body">
+      ${tempBanner}
+      <div class="section">
+        <div class="section-title"><span>📈 阈值与当前值</span></div>
+        <div class="field-grid">
+          <div class="field"><div class="lbl">预警类型</div><div class="val">${d.threshold_type||'—'}</div></div>
+          <div class="field"><div class="lbl">当前检测值</div><div class="val big ${d.threshold_value!=null&&d.current_value>d.threshold_value?'danger':''}">${d.current_value!=null?d.current_value:'—'}</div></div>
+          <div class="field"><div class="lbl">标准阈值</div><div class="val">${d.threshold_value!=null?d.threshold_value:'—'}</div></div>
+          <div class="field"><div class="lbl">临时阈值</div><div class="val ${d.temp_threshold!=null&&d.temp_threshold!=d.threshold_value?'danger':''}">${d.temp_threshold!=null?d.temp_threshold:'—'}</div></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title"><span>🧰 备件信息</span></div>
+        <div class="field-grid">
+          <div class="field"><div class="lbl">备件名称</div><div class="val">${d.spare_part_name||'—'}</div></div>
+          <div class="field"><div class="lbl">数量</div><div class="val">${d.spare_part_qty!=null?d.spare_part_qty:'—'}</div></div>
+          <div class="field"><div class="lbl">规格型号</div><div class="val">${d.spare_part_model||'—'}</div></div>
+          <div class="field"><div class="lbl">报告日期</div><div class="val">${d.report_date||'—'}</div></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title"><span>✏️ 复核处理（修改后自动保存进度）</span></div>
+        <div class="form-row">
+          <div class="field-lg"><label>处理状态</label>
+            <select id="f_status" class="full" onchange="updateField('status',this.value)">
+              ${['待复核','处理中','已通过','已完成','建议停机','驳回'].map(s=>`<option value="${s}"${s===d.status?' selected':''}>${s}</option>`).join('')}
+            </select>
+          </div>
+          <div class="field-lg" style="max-width:200px"><label>复核人</label>
+            <input id="f_reviewer" class="full input" value="${d.reviewer||''}" onchange="updateField('reviewer',this.value)">
+          </div>
+          <div class="field-lg" style="max-width:200px;display:flex;align-items:flex-end">
+            <label style="display:flex;align-items:center;gap:5px;cursor:pointer;margin:0">
+              <input type="checkbox" id="f_tempMark" ${d.is_temp_adjusted?'checked':''} onchange="updateField('is_temp_adjusted',this.checked?1:0);">
+              <span>🚨 标记为阈值临时调高</span>
+            </label>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field-lg" style="flex:2"><label>备注（复核人填写）</label>
+            <textarea id="f_remark" class="textarea-lg" onchange="updateField('remark',this.value)">${d.remark||''}</textarea>
+          </div>
+          <div class="field-lg" style="flex:2"><label>复核结论（文件结论）</label>
+            <textarea id="f_conclusion" class="textarea-lg" onchange="updateField('conclusion',this.value)">${d.conclusion||''}</textarea>
+          </div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title"><span>🔗 溯源链路：备件清单原话 → 页面摘要 → 处理结论</span></div>
+        <div class="trace-chain">
+          <div class="trace-step t1">
+            <div class="arrow">1</div>
+            <div class="t-label">备件清单原话（导入时的原始值）</div>
+            <div class="t-content">${extractDisplayWords(cf)||'（无数据）'}</div>
+          </div>
+          <div class="trace-step t2">
+            <div class="arrow">2</div>
+            <div class="t-label">页面摘要要点（自动汇总）</div>
+            <div class="t-content">${summaryPoints||'—'}</div>
+          </div>
+          <div class="trace-step t3">
+            <div class="arrow">3</div>
+            <div class="t-label">最终处理结论</div>
+            <div class="t-content">${d.conclusion?`【${d.status||'待复核'}】${d.conclusion}`:d.status||'暂无结论'}</div>
+          </div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title"><span>✅ 一致性校验：状态 / 备注 / 文件结论 对齐检查</span></div>
+        <div class="consistency-list">${consistItems}</div>
+        <div style="margin-top:8px;font-size:11px;color:#6b7280">✓ 表示页面值与备件清单原值一致；✗ 表示已被修改，导出摘要时会带标注</div>
+      </div>
+      <div class="section">
+        <div class="section-title"><span>📜 操作记录</span></div>
+        <div class="logs">${logs}</div>
+      </div>
+    </div>`;
+}
+
+function extractDisplayWords(cf){
+  const parts=[];
+  for(const std of ['device_no','threshold_type','current_value','threshold_value','temp_threshold',
+    'spare_part_name','spare_part_qty','spare_part_model','source','status','remark','conclusion']){
+    const info=cf[std]||{};
+    if(info.original_column&&String(info.original_value||'').trim()){
+      parts.push(`【${info.original_column}】${info.original_value}`);
+    }
+  }
+  return parts.join('；\n');
+}
+
+async function updateField(field,value){
+  if(!state.currentId)return;
+  const r=await api('/api/records/'+state.currentId,'PUT',{[field]:value,operator:$('curReviewer').textContent});
+  if(r.ok){
+    // 更新本地缓存
+    if(state.currentDetail)state.currentDetail[field]=value;
+    // 刷新列表与汇总
+    await Promise.all([loadSummary(),loadRecords()]);
+    // 重新加载详情，刷新溯源与一致性信息
+    await loadDetail(state.currentId);
+  }else{
+    alert('更新失败: '+r.msg);
+  }
+}
+
+function quickUpdate(status,conclusion){
+  if(!state.currentDetail)return;
+  $('f_status').value=status;
+  updateField('status',status).then(()=>{
+    if(conclusion){
+      $('f_conclusion').value=conclusion;
+      updateField('conclusion',conclusion);
+    }
+  });
+}
+
+// ============ 导出摘要 ============
+async function exportSummary(){
+  try{
+    const resp=await fetch('/api/export/summary',{
+      method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({})
+    });
+    if(!resp.ok)throw new Error('导出失败');
+    const blob=await resp.blob();
+    const disp=resp.headers.get('Content-Disposition')||'';
+    const fn=decodeURIComponent((disp.match(/filename\*?=UTF-8''([^;]+)/)||disp.match(/filename="?([^";]+)"?/)||[,])[1]||'summary.csv');
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);a.download=fn;document.body.appendChild(a);a.click();a.remove();
+  }catch(e){alert('导出失败:'+e.message);}
+}
+
+// ============ 导入 ============
+function openImport(){$('importModal').classList.add('show');$('importResult').style.display='none';}
+function closeModal(id){$(id).classList.remove('show');}
+
+async function doImport(){
+  const txt=$('importText').value.trim();
+  if(!txt){alert('请粘贴数据');return;}
+  let rows=[],headers=[];
+  try{
+    const lines=txt.split(/\r?\n/).filter(l=>l.trim());
+    if(!lines.length)throw new Error('空内容');
+    const sep=(lines[0].match(/\t/)||(lines[0].split(',').length>lines[0].split('\t').length)?',':'\t');
+    const splitRow=line=>{
+      if(sep==='\t')return line.split('\t');
+      // simple csv split supporting quoted
+      const r=[];let cur='',inQ=false;
+      for(let i=0;i<line.length;i++){
+        const c=line[i];
+        if(c==='"'){if(inQ&&line[i+1]==='"'){cur+='"';i++;}else inQ=!inQ;}
+        else if(c===','&&!inQ){r.push(cur);cur='';}
+        else cur+=c;
+      }
+      r.push(cur);return r.map(x=>x.replace(/^"|"$/g,''));
+    };
+    headers=splitRow(lines[0]);
+    rows=lines.slice(1).map(splitRow).filter(r=>r.some(c=>String(c).trim()));
+  }catch(e){alert('解析失败:'+e.message);return;}
+  if(!rows.length){alert('无有效数据行');return;}
+  const r=await api('/api/import','POST',{
+    headers,rows,source:$('importSource').value,reviewer:$('importReviewer').value
+  });
+  const box=$('importResult');box.style.display='block';
+  if(r.ok){
+    box.innerHTML=`<div class="banner banner-success"><span class="icon">✓</span>
+      <div>导入成功！批次 <b>${r.batch_id}</b>，共 <b>${r.inserted}</b> 条，跳过 ${r.skipped.length} 条<br>
+      字段映射: ${JSON.stringify(r.mapping_used||{})}</div></div>`;
+    setTimeout(async()=>{await refreshAll();closeModal('importModal');},1300);
+  }else{
+    box.innerHTML=`<div class="banner banner-danger"><span class="icon">✗</span><div>${r.msg}</div></div>`;
+  }
+}
+
+// ============ 演示数据生成 ============
+async function genDemo(){
+  if(!confirm('将导入一批演示数据（含设备编号不统一写法、阈值临时调高、不同处理状态等），确定？'))return;
+  const r=await api('/api/demo/generate','POST');
+  if(r.ok){alert(`演示数据已生成：${r.inserted} 条，跳过 ${r.skipped.length} 条`);refreshAll();}
+  else alert('失败:'+r.msg);
+}
+
+// ============ 交接溯源 ============
+function openHandover(){$('handoverModal').classList.add('show');$('handoverVariants').innerHTML='';$('handoverResults').innerHTML=`<div class="empty-rec">请输入设备编号或关键词追溯</div>`;}
+async function doHandoverTrace(){
+  const dev=$('handoverDev').value.trim();const kw=$('handoverKw').value.trim();
+  if(!dev&&!kw){alert('请至少输入一项');return;}
+  const p=new URLSearchParams({device_no_raw:dev,keyword:kw});
+  const r=await api('/api/handover/trace?'+p);
+  if(!r.ok){alert('追溯失败:'+r.msg);return;}
+  // 变体
+  const hv=$('handoverVariants');
+  if(r.normalized_device_no){
+    hv.innerHTML=`<div class="banner banner-info"><span class="icon">🗂</span>
+      <div>已归一化为 <b>${r.normalized_device_no}</b><br>
+      历史写法汇总：${(r.device_variants||[]).map(v=>`<span class="variant-chip">${v.device_no_raw}</span>`).join(' ')||'无'}
+      </div></div>`;
+  }else{hv.innerHTML='';}
+  const hr=$('handoverResults');
+  if(!r.traces||!r.traces.length){hr.innerHTML='<div class="empty-rec">未找到相关记录</div>';return;}
+  // 按设备分组
+  const groups={};
+  r.traces.forEach(t=>{const k=t.device_no_norm||t.device_no_raw||'未知设备';(groups[k]=groups[k]||[]).push(t);});
+  hr.innerHTML=Object.entries(groups).map(([dev,list])=>`
+    <div class="device-group">
+      <div class="device-group-title">🌀 ${dev} 共 ${list.length} 条记录</div>
+      ${list.map(t=>`
+        <div class="handover-card">
+          <div class="hc-top">
+            <span class="hc-title">
+              ${t.is_temp?'<span class="temp-tag">⚠️临时调高</span>':''}
+              ${t.device_no_raw||''} · ${t.status||'待复核'}
+            </span>
+            <span class="hc-meta">${t.source||''} · ${t.import_time||''}</span>
+          </div>
+          <div class="three-col">
+            <div class="col-block">
+              <h4>① 备件清单原话</h4>
+              <div class="orig-words">${t.original_words||'—'}</div>
+            </div>
+            <div class="col-block">
+              <h4>② 页面摘要要点</h4>
+              <div style="min-height:60px">${(t.page_summary||[]).map(p=>`<div class="summary-bullet">${p}</div>`).join('')||'<div style="color:#9ca3af">—</div>'}</div>
+            </div>
+            <div class="col-block">
+              <h4>③ 处理结论（文件结论）</h4>
+              <div class="conclusion-box">${(t.conclusion?`【结论】${t.conclusion}\n`:'')}【状态】${t.status||'待复核'}${t.reviewer?`\n【复核人】${t.reviewer}`:''}</div>
+            </div>
+          </div>
+          <div style="margin-top:8px;text-align:right">
+            <button class="btn btn-sm btn-ghost" onclick="jumpFromHandover(${t.record_id})">📋 打开详情 →</button>
+          </div>
+        </div>`).join('')}
+    </div>`).join('');
+}
+async function jumpFromHandover(id){
+  closeModal('handoverModal');
+  await jumpToRecord(id);
+}
+
+// ============ 启动 ============
+async function boot(){
+  await restoreSnapshot();
+  await refreshAll();
+  if(state.currentId){
+    await loadDetail(state.currentId);
+    setTimeout(()=>{
+      const el=document.querySelector(`.list-item[data-id="${state.currentId}"]`);
+      if(el)el.classList.add('active');
+    },400);
+  }
+  // 定时保存（30秒保底）
+  setInterval(saveSnapshot,30000);
+}
+boot();
+
+// 监听离开前保存
+window.addEventListener('beforeunload',e=>{saveSnapshot();});
+</script>
+</body>
+</html>

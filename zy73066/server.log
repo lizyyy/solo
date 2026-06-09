@@ -1,0 +1,29 @@
+starting...
+ * Serving Flask app 'app'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001
+[33mPress CTRL+C to quit[0m
+127.0.0.1 - - [10/Jun/2026 00:35:07] "GET /api/summary HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 00:35:19] "GET /api/summary HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 00:35:35] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 00:35:35] "POST /api/demo/generate HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 00:35:35] "GET /api/summary HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 00:35:51] "POST /api/demo/generate HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 00:36:09] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 00:36:09] "GET /api/snapshot/blade_warning_review_main HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 00:36:09] "GET /api/records?page=1&size=20&keyword=&device_no_norm=&tab=all HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 00:36:09] "GET /api/summary HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 00:36:09] "[33mGET /@vite/client HTTP/1.1[0m" 404 -
+127.0.0.1 - - [10/Jun/2026 00:36:11] "PUT /api/snapshot/blade_warning_review_main HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 00:36:39] "PUT /api/snapshot/blade_warning_review_main HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 00:37:04] "GET /api/records/13 HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 00:37:05] "PUT /api/snapshot/blade_warning_review_main HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 00:37:09] "PUT /api/snapshot/blade_warning_review_main HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 00:37:39] "PUT /api/snapshot/blade_warning_review_main HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 00:38:09] "PUT /api/snapshot/blade_warning_review_main HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 00:38:26] "GET /api/handover/trace?device_no_raw=风机%2312&keyword= HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 00:38:39] "PUT /api/snapshot/blade_warning_review_main HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 00:39:09] "PUT /api/snapshot/blade_warning_review_main HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 00:39:18] "POST /api/export/summary HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 00:39:39] "PUT /api/snapshot/blade_warning_review_main HTTP/1.1" 200 -
