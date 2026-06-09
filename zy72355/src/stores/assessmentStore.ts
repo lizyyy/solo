@@ -12,6 +12,9 @@ export interface AssessmentItem {
   status: string
   boundary_flag: number
   boundary_rule: string | null
+  raw_direction_original: string | null
+  review_reason: string | null
+  review_by: string | null
   created_at: string
   updated_at: string
 }

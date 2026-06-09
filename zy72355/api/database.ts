@@ -23,6 +23,7 @@ export function getDb(): Database.Database {
   db.pragma('foreign_keys = ON')
 
   initializeSchema(db)
+  migrateOldDatabase(db)
   return db
 }
 
@@ -40,6 +41,9 @@ function initializeSchema(db: Database.Database): void {
       status TEXT NOT NULL DEFAULT '待补看',
       boundary_flag INTEGER NOT NULL DEFAULT 0,
       boundary_rule TEXT,
+      raw_direction_original TEXT,
+      review_reason TEXT,
+      review_by TEXT,
       created_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
       updated_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
       UNIQUE(file_hash, line_number)
@@ -70,6 +74,12 @@ function initializeSchema(db: Database.Database): void {
       active INTEGER NOT NULL DEFAULT 1
     );
   `)
+}
+
+function migrateOldDatabase(db: Database.Database): void {
+  try { db.prepare('ALTER TABLE assessment_items ADD COLUMN raw_direction_original TEXT').run(); } catch (_) { /* 列已存在 */ }
+  try { db.prepare('ALTER TABLE assessment_items ADD COLUMN review_reason TEXT').run(); } catch (_) { /* 列已存在 */ }
+  try { db.prepare('ALTER TABLE assessment_items ADD COLUMN review_by TEXT').run(); } catch (_) { /* 列已存在 */ }
 
   const count = db.prepare('SELECT COUNT(*) as cnt FROM boundary_rules').get() as { cnt: number }
   if (count.cnt === 0) {

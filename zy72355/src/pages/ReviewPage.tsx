@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { FileSearch, Save, AlertTriangle, History, Image, ChevronLeft, ChevronRight, Check } from 'lucide-react'
+import { FileSearch, Save, AlertTriangle, History, Image, ChevronLeft, ChevronRight, Check, User, FileText, ArrowRight } from 'lucide-react'
 import { useAssessmentStore, type AssessmentItem } from '@/stores/assessmentStore'
 import StatusBadge from '@/components/StatusBadge'
 import { Link, useNavigate } from 'react-router-dom'
@@ -10,6 +10,7 @@ export default function ReviewPage() {
   const [remark, setRemark] = useState('')
   const [directionOverride, setDirectionOverride] = useState('')
   const [savedId, setSavedId] = useState<string | null>(null)
+  const [savedItem, setSavedItem] = useState<AssessmentItem | null>(null)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -32,9 +33,14 @@ export default function ReviewPage() {
 
   const handleSave = async () => {
     if (!selected) return
-    await updateRemark(selected.id, remark, directionOverride !== selected.direction ? directionOverride : undefined)
+    const dirOverride = directionOverride !== selected.direction ? directionOverride : undefined
+    await updateRemark(selected.id, remark, dirOverride)
     setSavedId(selected.id)
-    setTimeout(() => setSavedId(null), 2000)
+    // 重新拉取最新数据
+    await fetchItems()
+    setTimeout(() => {
+      setSavedId(null)
+    }, 2500)
   }
 
   const handlePrev = () => {
@@ -47,11 +53,22 @@ export default function ReviewPage() {
     if (idx < pendingItems.length - 1) setSelected(pendingItems[idx + 1])
   }
 
+  // 根据最新 items 列表刷新 selected
+  useEffect(() => {
+    if (selected) {
+      const fresh = items.find(i => i.id === selected.id)
+      if (fresh && fresh.id === selected.id) {
+        setSavedItem(fresh)
+        // 只有当用户没在编辑时才同步更新表单
+      }
+    }
+  }, [items.length, items.map(i => `${i.id}-${i.status}-${i.updated_at}`).join('|')])
+
   return (
     <div className="p-8">
       <div className="mb-6">
         <h1 className="text-xl font-bold text-zinc-800">巡检备注补看</h1>
-        <p className="text-sm text-zinc-500 mt-1">第 2 / 3 步：质检员逐条补看手写巡检备注，对照原始行号补全</p>
+        <p className="text-sm text-zinc-500 mt-1">第 2 / 3 步：质检员逐条补看手写巡检备注，对照原始行号补全。保存后列表、详情、历史、异常表同步更新同一份数据。</p>
       </div>
 
       <div className="flex gap-6">
@@ -80,13 +97,25 @@ export default function ReviewPage() {
                       <StatusBadge status={item.status} boundaryFlag={item.boundary_flag} />
                     </div>
                     <div className="text-xs text-zinc-500 truncate">{item.raw_conclusion}</div>
-                    {item.direction && (
-                      <div className="text-xs text-zinc-400 mt-1">方向：{item.direction}</div>
-                    )}
+                    <div className="text-xs flex items-center gap-1 text-zinc-400 mt-1">
+                      <FileText size={11} />
+                      备注：{item.remark ? '已补' : '未补'}
+                      {item.direction && ` · 方向：${item.direction}`}
+                    </div>
                   </div>
                 ))
               )}
             </div>
+          </div>
+
+          <div className="mt-4 p-3 bg-[#1B3A4B] text-white rounded-lg text-xs">
+            <div className="font-medium mb-1.5 flex items-center gap-1.5">
+              <ArrowRight size={12} /> 三步同一份数据
+            </div>
+            <p className="text-white/70 leading-relaxed">
+              ①导入 → ②补看备注 → ③异常表复核<br/>
+              每一步都写同一条记录，变更历史可见。
+            </p>
           </div>
         </div>
 
@@ -94,7 +123,7 @@ export default function ReviewPage() {
           {selected ? (
             <div className="bg-white rounded-lg border border-zinc-200 overflow-hidden">
               <div className="px-5 py-3 border-b border-zinc-100 flex items-center justify-between">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 flex-wrap">
                   <span className="text-sm font-medium text-zinc-800">行号 {selected.line_number}</span>
                   <StatusBadge status={selected.status} boundaryFlag={selected.boundary_flag} />
                   <Link
@@ -105,6 +134,11 @@ export default function ReviewPage() {
                     <History size={12} />
                     查看变更历史
                   </Link>
+                  {savedId === selected.id && (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium text-emerald-700 bg-emerald-50">
+                      <Check size={12} /> 已保存，列表/异常表/历史已同步更新
+                    </span>
+                  )}
                 </div>
                 <div className="flex gap-2">
                   <button onClick={handlePrev} disabled={pendingItems[0]?.id === selected.id} className="p-1.5 hover:bg-zinc-100 rounded disabled:opacity-30">
@@ -116,44 +150,70 @@ export default function ReviewPage() {
                 </div>
               </div>
 
-              <div className="flex h-[500px]">
-                <div className="w-1/2 p-5 border-r border-zinc-100">
-                  <div className="text-xs text-zinc-500 mb-2">工况照片缩略图</div>
-                  <div className="aspect-[4/3] bg-zinc-100 rounded flex items-center justify-center mb-3">
+              <div className="grid grid-cols-2 divide-x divide-zinc-100">
+                <div className="p-5">
+                  <div className="text-xs text-zinc-500 mb-2">工况照片（原始证据）</div>
+                  <div className="aspect-[4/3] bg-zinc-100 rounded flex items-center justify-center mb-3 border border-zinc-200">
                     <Image size={48} className="text-zinc-300" />
                   </div>
                   <div className="text-xs space-y-2">
-                    <div>
-                      <span className="text-zinc-400">文件名：</span>
-                      <span className="text-zinc-600">{selected.file_name}</span>
+                    <div className="flex">
+                      <span className="w-20 text-zinc-400 shrink-0">文件名：</span>
+                      <span className="text-zinc-600 break-all">{selected.file_name}</span>
                     </div>
-                    <div>
-                      <span className="text-zinc-400">原始结论：</span>
+                    <div className="flex">
+                      <span className="w-20 text-zinc-400 shrink-0">原始结论：</span>
                       <span className="text-zinc-700">{selected.raw_conclusion}</span>
                     </div>
-                    <div>
-                      <span className="text-zinc-400">原始方向：</span>
-                      <span className={`${selected.boundary_flag ? 'text-amber-600 font-medium' : 'text-zinc-700'}`}>
+                    <div className="flex">
+                      <span className="w-20 text-zinc-400 shrink-0">原始行号：</span>
+                      <span className="text-zinc-700 font-mono">#{selected.line_number}</span>
+                    </div>
+                    <div className="flex">
+                      <span className="w-20 text-zinc-400 shrink-0">原始方向：</span>
+                      <span className={selected.boundary_flag ? 'text-amber-600 font-medium' : 'text-zinc-700'}>
                         {selected.boundary_flag && '⚠ '}
-                        {selected.direction || '（未填写）'}
+                        {selected.raw_direction_original || selected.direction || '（未填写）'}
                       </span>
                     </div>
-                    {selected.boundary_flag && (
-                      <div className="p-2 bg-amber-50 rounded mt-3">
-                        <div className="flex items-start gap-1.5 text-amber-700">
-                          <AlertTriangle size={14} className="shrink-0 mt-0.5" />
-                          <div>
-                            <div className="font-medium text-xs">边界规则触发</div>
-                            <div className="text-xs mt-0.5">方向"{selected.direction}"为非标表述，将自动进入"待实验老师复核"状态</div>
-                          </div>
-                        </div>
+                    {selected.raw_direction_original && selected.raw_direction_original !== selected.direction && (
+                      <div className="flex">
+                        <span className="w-20 text-zinc-400 shrink-0">当前方向：</span>
+                        <span className="text-zinc-700">{selected.direction}</span>
+                      </div>
+                    )}
+                    {selected.direction_normalized && (
+                      <div className="flex">
+                        <span className="w-20 text-zinc-400 shrink-0">建议归一：</span>
+                        <span className="text-blue-600">{selected.direction_normalized}</span>
                       </div>
                     )}
                   </div>
+
+                  {selected.boundary_flag && (
+                    <div className="p-3 bg-amber-50 rounded mt-3 border border-amber-100">
+                      <div className="flex items-start gap-1.5 text-amber-800">
+                        <AlertTriangle size={14} className="shrink-0 mt-0.5" />
+                        <div className="text-xs">
+                          <div className="font-semibold">边界规则触发 — 不归正常</div>
+                          <div className="mt-0.5">方向"{selected.raw_direction_original || selected.direction}"为非标表述。</div>
+                          <div className="mt-1 flex items-center gap-1 text-amber-700">
+                            <User size={11} />
+                            下一步责任人：<span className="font-semibold">实验老师复核</span>
+                          </div>
+                          {selected.review_reason && (
+                            <div className="mt-1.5 pt-1.5 border-t border-amber-200/60">
+                              触发原因：{selected.review_reason}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
-                <div className="w-1/2 p-5">
-                  <div className="text-xs text-zinc-500 mb-2">手写巡检备注</div>
+                <div className="p-5 flex flex-col">
+                  <div className="text-xs text-zinc-500 mb-2">手写巡检备注（补看）</div>
                   <textarea
                     value={remark}
                     onChange={e => setRemark(e.target.value)}
@@ -161,12 +221,12 @@ export default function ReviewPage() {
                     placeholder="在此输入从手写巡检备注中补看的内容..."
                   />
 
-                  <div className="text-xs text-zinc-500 mb-2 mt-4">方向（可修改）</div>
+                  <div className="mt-4 text-xs text-zinc-500 mb-2">方向（可修正）</div>
                   <input
                     type="text"
                     value={directionOverride}
                     onChange={e => setDirectionOverride(e.target.value)}
-                    className={`w-full px-3 py-2 text-sm border rounded focus:outline-none ${
+                    className={`w-full px-3 py-2 text-sm border rounded focus:outline-none transition-colors ${
                       checkBoundary(directionOverride)
                         ? 'border-amber-300 focus:border-amber-400 bg-amber-50'
                         : 'border-zinc-200 focus:border-[#1B3A4B]'
@@ -175,16 +235,29 @@ export default function ReviewPage() {
                   />
 
                   {checkBoundary(directionOverride) && (
-                    <div className="p-2 bg-amber-50 rounded mt-2 text-xs text-amber-700">
+                    <div className="p-2 bg-amber-50 rounded mt-2 text-xs text-amber-700 border border-amber-100">
                       <AlertTriangle size={12} className="inline mr-1" />
-                      保存后将进入"待实验老师复核"，不会自动归正常
+                      保存后进入"待实验老师复核"，不会自动归正常
                     </div>
                   )}
 
-                  <div className="mt-5 flex items-center justify-between">
-                    <div className="text-xs text-zinc-400">
-                      改前：{selected.remark || '（空）'}
+                  <div className="mt-5 pt-4 border-t border-zinc-100 text-xs space-y-1.5">
+                    <div className="flex">
+                      <span className="w-16 text-zinc-400 shrink-0">改前备注：</span>
+                      <span className="text-zinc-500">{selected.remark || '（空）'}</span>
                     </div>
+                    <div className="flex">
+                      <span className="w-16 text-zinc-400 shrink-0">改前方向：</span>
+                      <span className="text-zinc-500">{selected.direction || '（空）'}</span>
+                    </div>
+                    {(remark !== selected.remark || directionOverride !== (selected.direction || '')) && (
+                      <div className="p-2 bg-blue-50 rounded text-blue-700 mt-1.5">
+                        有改动，保存将生成变更历史记录
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="mt-auto pt-4 flex justify-end">
                     <button
                       onClick={handleSave}
                       disabled={loading}
@@ -193,7 +266,7 @@ export default function ReviewPage() {
                       {savedId === selected.id ? (
                         <><Check size={14} /> 已保存</>
                       ) : (
-                        <><Save size={14} /> 保存备注</>
+                        <><Save size={14} /> 保存备注与修正</>
                       )}
                     </button>
                   </div>
@@ -202,13 +275,11 @@ export default function ReviewPage() {
 
               <div className="px-5 py-3 bg-zinc-50 border-t border-zinc-100 flex items-center justify-between">
                 <div className="text-xs text-zinc-500">
-                  {remark && remark !== selected.remark
-                    ? '备注已修改，保存后将生成变更历史记录'
-                    : '仅修改的字段会记入变更历史'}
+                  仅实际改动的字段会记入变更历史；列表、异常工况表、历史记录均从同一条数据读取。
                 </div>
                 <button
                   onClick={() => navigate('/abnormal')}
-                  className="text-sm text-[#1B3A4B] hover:underline"
+                  className="text-sm text-[#1B3A4B] hover:underline font-medium"
                 >
                   前往第 3 步：异常工况表 →
                 </button>
