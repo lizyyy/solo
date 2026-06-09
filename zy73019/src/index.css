@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  line-height: 1.5;
+  font-weight: 400;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --color-sand: #B8956A;
+  --color-sand-dark: #8B6E4A;
+  --color-sage: #7A9E7E;
+  --color-sage-dark: #5A7D5E;
+  --color-ochre: #D97706;
+  --color-ochre-dark: #B45309;
+  --color-brick: #B91C1C;
+  --color-brick-dark: #991B1B;
+  --color-slate-stone: #6B7280;
+  --color-slate-stone-dark: #374151;
+  --color-cream: #FAF7F2;
+  --color-border: #e8ddd0;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    color: var(--color-slate-stone-dark);
+    background-color: #fdfaf6;
+  }
+
+  input,
+  select,
+  textarea {
+    font-family: inherit;
+  }
+
+  button {
+    cursor: pointer;
+    font-family: inherit;
+  }
+}
