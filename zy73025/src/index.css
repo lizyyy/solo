@@ -1,0 +1,93 @@
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f8f9fa;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-mist-200 p-5;
+  }
+
+  .card-hover {
+    @apply transition-all duration-200 hover:shadow-md hover:border-forest-200 cursor-pointer;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-primary {
+    @apply btn bg-forest-700 text-white hover:bg-forest-600;
+  }
+
+  .btn-secondary {
+    @apply btn bg-white text-forest-700 border border-forest-200 hover:bg-forest-50;
+  }
+
+  .btn-danger {
+    @apply btn bg-cinnabar-600 text-white hover:bg-cinnabar-500;
+  }
+
+  .btn-warning {
+    @apply btn bg-amber-500 text-white hover:bg-amber-400;
+  }
+
+  .btn-ghost {
+    @apply btn text-mist-700 hover:bg-mist-100;
+  }
+
+  .input {
+    @apply w-full px-3 py-2 rounded-lg border border-mist-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-forest-400 focus:border-forest-400 transition-all;
+  }
+
+  .label {
+    @apply block text-sm font-medium text-mist-700 mb-1.5;
+  }
+
+  .section-title {
+    @apply font-serif text-lg font-semibold text-mist-900 mb-3;
+  }
+}
+
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: #adb5bd #f1f3f5;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: #f1f3f5;
+    border-radius: 3px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #adb5bd;
+    border-radius: 3px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: #868e96;
+  }
+}

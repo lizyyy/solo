@@ -1,0 +1,71 @@
+/** @type {import('tailwindcss').Config} */
+
+export default {
+  darkMode: "class",
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  theme: {
+    container: {
+      center: true,
+    },
+    extend: {
+      colors: {
+        forest: {
+          50: "#f0f7f2",
+          100: "#dbeedf",
+          200: "#b8ddc1",
+          300: "#8cc59a",
+          400: "#5ea672",
+          500: "#3f8a55",
+          600: "#2f6e43",
+          700: "#275737",
+          800: "#22462e",
+          900: "#1d3a27",
+          950: "#0f2016",
+        },
+        amber: {
+          50: "#fffbeb",
+          100: "#fff3c6",
+          200: "#ffe688",
+          300: "#ffd249",
+          400: "#ffbb1f",
+          500: "#f99a0b",
+          600: "#dd7402",
+          700: "#b75106",
+          800: "#943e0c",
+          900: "#7a340d",
+          950: "#461a02",
+        },
+        cinnabar: {
+          50: "#fef2f2",
+          100: "#fee2e3",
+          200: "#fecaca",
+          300: "#fca5a7",
+          400: "#f87174",
+          500: "#ef4448",
+          600: "#dc262a",
+          700: "#b91c20",
+          800: "#991b1e",
+          900: "#7f1d20",
+          950: "#450a0c",
+        },
+        mist: {
+          50: "#f8f9fa",
+          100: "#f1f3f5",
+          200: "#e9ecef",
+          300: "#dee2e6",
+          400: "#ced4da",
+          500: "#adb5bd",
+          600: "#868e96",
+          700: "#495057",
+          800: "#343a40",
+          900: "#212529",
+        },
+      },
+      fontFamily: {
+        serif: ['Lora', 'Georgia', 'serif'],
+        sans: ['"Noto Sans SC"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Helvetica', 'Arial', 'sans-serif'],
+      },
+    },
+  },
+  plugins: [],
+};

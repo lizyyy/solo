@@ -1,0 +1,2128 @@
+{
+  "records": [
+    {
+      "id": "rec-R001",
+      "code": "R001",
+      "petName": "豆豆",
+      "ownerName": "张小明",
+      "petType": "仓鼠",
+      "visitDate": "2026-06-08",
+      "reviewer": "李医生",
+      "status": "confirmed",
+      "conclusion": "observe",
+      "tempCurve": [
+        {
+          "t": 0,
+          "value": 37.2
+        },
+        {
+          "t": 5,
+          "value": 37.24
+        },
+        {
+          "t": 10,
+          "value": 37.21
+        },
+        {
+          "t": 15,
+          "value": 37.28
+        },
+        {
+          "t": 20,
+          "value": 37.12
+        },
+        {
+          "t": 25,
+          "value": 37.12
+        },
+        {
+          "t": 30,
+          "value": 37.25
+        },
+        {
+          "t": 35,
+          "value": 37.25
+        },
+        {
+          "t": 40,
+          "value": 37.12
+        },
+        {
+          "t": 45,
+          "value": 37.3
+        },
+        {
+          "t": 50,
+          "value": 37.1
+        },
+        {
+          "t": 55,
+          "value": 37.14
+        }
+      ],
+      "tempThreshold": {
+        "min": 36.5,
+        "max": 38
+      },
+      "weightCurve": [
+        {
+          "t": 0,
+          "value": 1017,
+          "version": "new"
+        },
+        {
+          "t": 7,
+          "value": 1073,
+          "version": "new"
+        },
+        {
+          "t": 14,
+          "value": 1113,
+          "version": "new"
+        },
+        {
+          "t": 21,
+          "value": 1159,
+          "version": "new"
+        },
+        {
+          "t": 28,
+          "value": 1223,
+          "version": "new"
+        },
+        {
+          "t": 35,
+          "value": 1272,
+          "version": "new"
+        },
+        {
+          "t": 42,
+          "value": 1329,
+          "version": "new"
+        },
+        {
+          "t": 49,
+          "value": 1370,
+          "version": "new"
+        }
+      ],
+      "vaccines": [
+        {
+          "date": "2026-03-15",
+          "name": "狂犬疫苗"
+        },
+        {
+          "date": "2026-04-20",
+          "name": "多联疫苗"
+        }
+      ],
+      "notes": [
+        {
+          "id": "note-R001-1",
+          "content": "饮食正常，精神状态良好",
+          "source": "written",
+          "operator": "李医生",
+          "time": "2026-06-08T10:00:00.000Z"
+        }
+      ],
+      "factors": [],
+      "hasLegacyCurve": false,
+      "isBoundarySample": false,
+      "updatedAt": "2026-06-09T00:23:35.588Z",
+      "createdAt": "2026-06-08T09:00:00.000Z",
+      "pendingReason": "复查发现夜间体温波动"
+    },
+    {
+      "id": "rec-R002",
+      "code": "R002",
+      "petName": "花花",
+      "ownerName": "王大伟",
+      "petType": "龙猫",
+      "visitDate": "2026-06-07",
+      "reviewer": "赵医生",
+      "status": "pending",
+      "conclusion": "abnormal",
+      "tempCurve": [
+        {
+          "t": 0,
+          "value": 38.35
+        },
+        {
+          "t": 5,
+          "value": 38.25
+        },
+        {
+          "t": 10,
+          "value": 38.13
+        },
+        {
+          "t": 15,
+          "value": 38.2
+        },
+        {
+          "t": 20,
+          "value": 38.27
+        },
+        {
+          "t": 25,
+          "value": 38.16
+        },
+        {
+          "t": 30,
+          "value": 38.13
+        },
+        {
+          "t": 35,
+          "value": 38.12
+        },
+        {
+          "t": 40,
+          "value": 38.34
+        },
+        {
+          "t": 45,
+          "value": 38.11
+        },
+        {
+          "t": 50,
+          "value": 38.44
+        },
+        {
+          "t": 55,
+          "value": 38.12
+        }
+      ],
+      "tempThreshold": {
+        "min": 36,
+        "max": 37.8
+      },
+      "weightCurve": [
+        {
+          "t": 0,
+          "value": 1009,
+          "version": "new"
+        },
+        {
+          "t": 7,
+          "value": 1071,
+          "version": "new"
+        },
+        {
+          "t": 14,
+          "value": 1112,
+          "version": "new"
+        },
+        {
+          "t": 21,
+          "value": 1169,
+          "version": "new"
+        },
+        {
+          "t": 28,
+          "value": 1220,
+          "version": "new"
+        },
+        {
+          "t": 35,
+          "value": 1259,
+          "version": "new"
+        },
+        {
+          "t": 42,
+          "value": 1308,
+          "version": "new"
+        },
+        {
+          "t": 49,
+          "value": 1360,
+          "version": "new"
+        }
+      ],
+      "vaccines": [
+        {
+          "date": null,
+          "name": "狂犬疫苗"
+        },
+        {
+          "date": "2026-02-10",
+          "name": "多联疫苗"
+        },
+        {
+          "date": "2026-06-01",
+          "name": "狂犬疫苗"
+        }
+      ],
+      "notes": [],
+      "factors": [
+        {
+          "id": "fac-lt8YQO34qy",
+          "type": "vaccine_missing",
+          "label": "疫苗接种日期缺失",
+          "impact": "negative",
+          "description": "检测到 1 项疫苗记录缺少接种日期，无法确认免疫状态有效性",
+          "affectedRecords": [
+            "rec-R002"
+          ]
+        }
+      ],
+      "hasLegacyCurve": false,
+      "isBoundarySample": false,
+      "updatedAt": "2026-06-09T00:23:35.594Z",
+      "createdAt": "2026-06-07T13:30:00.000Z"
+    },
+    {
+      "id": "rec-R003",
+      "code": "R003",
+      "petName": "毛毛",
+      "ownerName": "刘小芳",
+      "petType": "兔子",
+      "visitDate": "2026-06-05",
+      "reviewer": "孙医生",
+      "status": "pending",
+      "conclusion": "observe",
+      "tempCurve": [
+        {
+          "t": 0,
+          "value": 38.78
+        },
+        {
+          "t": 5,
+          "value": 38.81
+        },
+        {
+          "t": 10,
+          "value": 38.8
+        },
+        {
+          "t": 15,
+          "value": 38.82
+        },
+        {
+          "t": 20,
+          "value": 38.74
+        },
+        {
+          "t": 25,
+          "value": 38.91
+        },
+        {
+          "t": 30,
+          "value": 38.91
+        },
+        {
+          "t": 35,
+          "value": 38.77
+        },
+        {
+          "t": 40,
+          "value": 38.92
+        },
+        {
+          "t": 45,
+          "value": 38.86
+        },
+        {
+          "t": 50,
+          "value": 38.79
+        },
+        {
+          "t": 55,
+          "value": 38.86
+        }
+      ],
+      "tempThreshold": {
+        "min": 38,
+        "max": 39.5
+      },
+      "weightCurve": [
+        {
+          "t": 0,
+          "value": 1015,
+          "version": "legacy"
+        },
+        {
+          "t": 7,
+          "value": 1075,
+          "version": "legacy"
+        },
+        {
+          "t": 14,
+          "value": 1108,
+          "version": "legacy"
+        },
+        {
+          "t": 21,
+          "value": 1157,
+          "version": "new"
+        },
+        {
+          "t": 28,
+          "value": 1220,
+          "version": "new"
+        },
+        {
+          "t": 35,
+          "value": 1277,
+          "version": "new"
+        },
+        {
+          "t": 42,
+          "value": 1312,
+          "version": "new"
+        },
+        {
+          "t": 49,
+          "value": 1360,
+          "version": "new"
+        },
+        {
+          "t": 56,
+          "value": 1400,
+          "version": "new"
+        },
+        {
+          "t": 63,
+          "value": 1467,
+          "version": "new"
+        }
+      ],
+      "vaccines": [
+        {
+          "date": "2026-01-18",
+          "name": "狂犬疫苗"
+        }
+      ],
+      "notes": [
+        {
+          "id": "note-R003-1",
+          "content": "体重数据包含历史记录，需结合临床判断",
+          "source": "written",
+          "operator": "孙医生",
+          "time": "2026-06-05T11:30:00.000Z"
+        }
+      ],
+      "factors": [
+        {
+          "id": "fac-R003-1",
+          "type": "legacy_curve",
+          "label": "体重曲线包含旧版数据",
+          "impact": "neutral",
+          "description": "检测到 3 个历史版本的体重测量点，可能影响趋势分析准确性",
+          "affectedRecords": [
+            "rec-R003"
+          ]
+        }
+      ],
+      "hasLegacyCurve": true,
+      "isBoundarySample": false,
+      "updatedAt": "2026-06-05T12:00:00.000Z",
+      "createdAt": "2026-06-05T10:00:00.000Z"
+    },
+    {
+      "id": "rec-R004",
+      "code": "R004",
+      "petName": "雪球",
+      "ownerName": "陈静怡",
+      "petType": "荷兰猪",
+      "visitDate": "2026-06-03",
+      "reviewer": "周医生",
+      "status": "pending",
+      "conclusion": "observe",
+      "tempCurve": [
+        {
+          "t": 0,
+          "value": 37.25
+        },
+        {
+          "t": 5,
+          "value": 37.25
+        },
+        {
+          "t": 10,
+          "value": 37.23
+        },
+        {
+          "t": 15,
+          "value": 37.23
+        },
+        {
+          "t": 20,
+          "value": 38.68
+        },
+        {
+          "t": 25,
+          "value": 38.77
+        },
+        {
+          "t": 30,
+          "value": 38.79
+        },
+        {
+          "t": 35,
+          "value": 38.7
+        },
+        {
+          "t": 40,
+          "value": 38.79
+        },
+        {
+          "t": 45,
+          "value": 38.11
+        },
+        {
+          "t": 50,
+          "value": 37.93
+        },
+        {
+          "t": 55,
+          "value": 38.07
+        }
+      ],
+      "tempThreshold": {
+        "min": 37.2,
+        "max": 38.8
+      },
+      "weightCurve": [
+        {
+          "t": 0,
+          "value": 1027,
+          "version": "new"
+        },
+        {
+          "t": 7,
+          "value": 1053,
+          "version": "new"
+        },
+        {
+          "t": 14,
+          "value": 1110,
+          "version": "new"
+        },
+        {
+          "t": 21,
+          "value": 1172,
+          "version": "new"
+        },
+        {
+          "t": 28,
+          "value": 1209,
+          "version": "new"
+        },
+        {
+          "t": 35,
+          "value": 1267,
+          "version": "new"
+        },
+        {
+          "t": 42,
+          "value": 1315,
+          "version": "new"
+        },
+        {
+          "t": 49,
+          "value": 1362,
+          "version": "new"
+        }
+      ],
+      "vaccines": [
+        {
+          "date": "2026-02-22",
+          "name": "狂犬疫苗"
+        },
+        {
+          "date": "2026-05-01",
+          "name": "多联疫苗"
+        }
+      ],
+      "notes": [],
+      "factors": [
+        {
+          "id": "fac-R004-1",
+          "type": "boundary_sample",
+          "label": "温度样本接近阈值边界",
+          "impact": "neutral",
+          "description": "多个测量点在温度阈值 ±0.2℃ 范围内，需人工复核确认",
+          "affectedRecords": [
+            "rec-R004"
+          ]
+        }
+      ],
+      "hasLegacyCurve": false,
+      "isBoundarySample": true,
+      "updatedAt": "2026-06-03T17:00:00.000Z",
+      "createdAt": "2026-06-03T14:30:00.000Z"
+    },
+    {
+      "id": "rec-R005",
+      "code": "R005",
+      "petName": "团团",
+      "ownerName": "林志强",
+      "petType": "鹦鹉",
+      "visitDate": "2026-05-31",
+      "reviewer": "吴医生",
+      "status": "confirmed",
+      "conclusion": "normal",
+      "tempCurve": [
+        {
+          "t": 0,
+          "value": 40.76
+        },
+        {
+          "t": 5,
+          "value": 40.89
+        },
+        {
+          "t": 10,
+          "value": 40.66
+        },
+        {
+          "t": 15,
+          "value": 40.87
+        },
+        {
+          "t": 20,
+          "value": 40.8
+        },
+        {
+          "t": 25,
+          "value": 40.83
+        },
+        {
+          "t": 30,
+          "value": 40.79
+        },
+        {
+          "t": 35,
+          "value": 40.69
+        },
+        {
+          "t": 40,
+          "value": 40.81
+        },
+        {
+          "t": 45,
+          "value": 40.75
+        },
+        {
+          "t": 50,
+          "value": 40.93
+        },
+        {
+          "t": 55,
+          "value": 40.79
+        }
+      ],
+      "tempThreshold": {
+        "min": 40,
+        "max": 42
+      },
+      "weightCurve": [
+        {
+          "t": 0,
+          "value": 1005,
+          "version": "new"
+        },
+        {
+          "t": 7,
+          "value": 1064,
+          "version": "new"
+        },
+        {
+          "t": 14,
+          "value": 1112,
+          "version": "new"
+        },
+        {
+          "t": 21,
+          "value": 1167,
+          "version": "new"
+        },
+        {
+          "t": 28,
+          "value": 1210,
+          "version": "new"
+        },
+        {
+          "t": 35,
+          "value": 1270,
+          "version": "new"
+        },
+        {
+          "t": 42,
+          "value": 1319,
+          "version": "new"
+        },
+        {
+          "t": 49,
+          "value": 1350,
+          "version": "new"
+        }
+      ],
+      "vaccines": [
+        {
+          "date": "2026-03-08",
+          "name": "多联疫苗"
+        }
+      ],
+      "notes": [
+        {
+          "id": "note-R005-1",
+          "content": "主人反映近期食量略有减少，口头告知无其他异常",
+          "source": "verbal",
+          "operator": "吴医生",
+          "time": "2026-05-31T11:30:00.000Z"
+        },
+        {
+          "id": "note-R005-2",
+          "content": "体征检查正常，建议观察一周后复诊",
+          "source": "written",
+          "operator": "吴医生",
+          "time": "2026-05-31T12:00:00.000Z"
+        }
+      ],
+      "factors": [
+        {
+          "id": "fac-R005-1",
+          "type": "verbal_note",
+          "label": "存在口头备注记录",
+          "impact": "neutral",
+          "description": "检测到 1 条口述来源的备注信息，书面信息完整性受限",
+          "affectedRecords": [
+            "rec-R005"
+          ]
+        }
+      ],
+      "hasLegacyCurve": false,
+      "isBoundarySample": false,
+      "updatedAt": "2026-05-31T14:00:00.000Z",
+      "createdAt": "2026-05-31T10:30:00.000Z"
+    },
+    {
+      "id": "rec-R006",
+      "code": "R006",
+      "petName": "圆圆",
+      "ownerName": "黄丽娟",
+      "petType": "雪貂",
+      "visitDate": "2026-05-28",
+      "reviewer": "郑医生",
+      "status": "confirmed",
+      "conclusion": "observe",
+      "tempCurve": [
+        {
+          "t": 0,
+          "value": 38.99
+        },
+        {
+          "t": 5,
+          "value": 38.75
+        },
+        {
+          "t": 10,
+          "value": 38.91
+        },
+        {
+          "t": 15,
+          "value": 38.83
+        },
+        {
+          "t": 20,
+          "value": 39.01
+        },
+        {
+          "t": 25,
+          "value": 38.85
+        },
+        {
+          "t": 30,
+          "value": 38.73
+        },
+        {
+          "t": 35,
+          "value": 38.88
+        },
+        {
+          "t": 40,
+          "value": 38.81
+        },
+        {
+          "t": 45,
+          "value": 38.84
+        },
+        {
+          "t": 50,
+          "value": 38.78
+        },
+        {
+          "t": 55,
+          "value": 39.08
+        }
+      ],
+      "tempThreshold": {
+        "min": 37.8,
+        "max": 39.2
+      },
+      "weightCurve": [
+        {
+          "t": 0,
+          "value": 1012,
+          "version": "new"
+        },
+        {
+          "t": 7,
+          "value": 1055,
+          "version": "new"
+        },
+        {
+          "t": 14,
+          "value": 1129,
+          "version": "new"
+        },
+        {
+          "t": 21,
+          "value": 1161,
+          "version": "new"
+        },
+        {
+          "t": 28,
+          "value": 1209,
+          "version": "new"
+        },
+        {
+          "t": 35,
+          "value": 1268,
+          "version": "new"
+        },
+        {
+          "t": 42,
+          "value": 1300,
+          "version": "new"
+        },
+        {
+          "t": 49,
+          "value": 1354,
+          "version": "new"
+        }
+      ],
+      "vaccines": [
+        {
+          "date": "2026-01-05",
+          "name": "狂犬疫苗"
+        },
+        {
+          "date": "2026-04-12",
+          "name": "多联疫苗"
+        }
+      ],
+      "notes": [
+        {
+          "id": "note-R006-1",
+          "content": "改判说明：复查血常规指标正常，原异常为应激反应导致",
+          "source": "written",
+          "operator": "郑医生",
+          "time": "2026-05-30T15:00:00.000Z"
+        }
+      ],
+      "factors": [],
+      "pendingReason": "初次检测温度偏高，疑似炎症，后经复查排除",
+      "hasLegacyCurve": false,
+      "isBoundarySample": false,
+      "updatedAt": "2026-05-30T15:30:00.000Z",
+      "createdAt": "2026-05-28T08:30:00.000Z"
+    },
+    {
+      "id": "rec-R007",
+      "code": "R007",
+      "petName": "阿黑",
+      "ownerName": "许文彬",
+      "petType": "刺猬",
+      "visitDate": "2026-05-27",
+      "reviewer": "冯医生",
+      "status": "exception",
+      "conclusion": "abnormal",
+      "tempCurve": [
+        {
+          "t": 0,
+          "value": 35.65
+        },
+        {
+          "t": 5,
+          "value": 35.96
+        },
+        {
+          "t": 10,
+          "value": 35.62
+        },
+        {
+          "t": 15,
+          "value": 35.92
+        },
+        {
+          "t": 20,
+          "value": 35.64
+        },
+        {
+          "t": 25,
+          "value": 35.73
+        },
+        {
+          "t": 30,
+          "value": 35.79
+        },
+        {
+          "t": 35,
+          "value": 35.97
+        },
+        {
+          "t": 40,
+          "value": 35.91
+        },
+        {
+          "t": 45,
+          "value": 35.93
+        },
+        {
+          "t": 50,
+          "value": 35.99
+        },
+        {
+          "t": 55,
+          "value": 35.98
+        }
+      ],
+      "tempThreshold": {
+        "min": 36.5,
+        "max": 37.8
+      },
+      "weightCurve": [
+        {
+          "t": 0,
+          "value": 1001,
+          "version": "new"
+        },
+        {
+          "t": 7,
+          "value": 1077,
+          "version": "new"
+        },
+        {
+          "t": 14,
+          "value": 1124,
+          "version": "new"
+        },
+        {
+          "t": 21,
+          "value": 1163,
+          "version": "new"
+        },
+        {
+          "t": 28,
+          "value": 1215,
+          "version": "new"
+        },
+        {
+          "t": 35,
+          "value": 1266,
+          "version": "new"
+        },
+        {
+          "t": 42,
+          "value": 1326,
+          "version": "new"
+        },
+        {
+          "t": 49,
+          "value": 1377,
+          "version": "new"
+        }
+      ],
+      "vaccines": [
+        {
+          "date": "2025-12-20",
+          "name": "狂犬疫苗"
+        }
+      ],
+      "notes": [],
+      "factors": [],
+      "pendingReason": "体温持续低于正常范围，且主人无法提供完整的既往病史，需进一步检查确认",
+      "hasLegacyCurve": false,
+      "isBoundarySample": false,
+      "updatedAt": "2026-05-27T16:00:00.000Z",
+      "createdAt": "2026-05-27T12:30:00.000Z"
+    }
+  ],
+  "history": [
+    {
+      "id": "hist-rec-R001-create",
+      "recordId": "rec-R001",
+      "action": "create",
+      "isManual": false,
+      "operator": "李医生",
+      "time": "2026-06-08T09:00:00.000Z",
+      "summary": "创建记录 R001 - 豆豆",
+      "oldSnapshot": {},
+      "newSnapshot": {
+        "id": "rec-R001",
+        "code": "R001",
+        "petName": "豆豆",
+        "ownerName": "张小明",
+        "petType": "仓鼠",
+        "visitDate": "2026-06-08",
+        "reviewer": "李医生",
+        "status": "pending",
+        "conclusion": "normal",
+        "tempCurve": [
+          {
+            "t": 0,
+            "value": 37.2
+          },
+          {
+            "t": 5,
+            "value": 37.24
+          },
+          {
+            "t": 10,
+            "value": 37.21
+          },
+          {
+            "t": 15,
+            "value": 37.28
+          },
+          {
+            "t": 20,
+            "value": 37.12
+          },
+          {
+            "t": 25,
+            "value": 37.12
+          },
+          {
+            "t": 30,
+            "value": 37.25
+          },
+          {
+            "t": 35,
+            "value": 37.25
+          },
+          {
+            "t": 40,
+            "value": 37.12
+          },
+          {
+            "t": 45,
+            "value": 37.3
+          },
+          {
+            "t": 50,
+            "value": 37.1
+          },
+          {
+            "t": 55,
+            "value": 37.14
+          }
+        ],
+        "tempThreshold": {
+          "min": 36.5,
+          "max": 38
+        },
+        "weightCurve": [
+          {
+            "t": 0,
+            "value": 1017,
+            "version": "new"
+          },
+          {
+            "t": 7,
+            "value": 1073,
+            "version": "new"
+          },
+          {
+            "t": 14,
+            "value": 1113,
+            "version": "new"
+          },
+          {
+            "t": 21,
+            "value": 1159,
+            "version": "new"
+          },
+          {
+            "t": 28,
+            "value": 1223,
+            "version": "new"
+          },
+          {
+            "t": 35,
+            "value": 1272,
+            "version": "new"
+          },
+          {
+            "t": 42,
+            "value": 1329,
+            "version": "new"
+          },
+          {
+            "t": 49,
+            "value": 1370,
+            "version": "new"
+          }
+        ],
+        "vaccines": [
+          {
+            "date": "2026-03-15",
+            "name": "狂犬疫苗"
+          },
+          {
+            "date": "2026-04-20",
+            "name": "多联疫苗"
+          }
+        ],
+        "notes": [
+          {
+            "id": "note-R001-1",
+            "content": "饮食正常，精神状态良好",
+            "source": "written",
+            "operator": "李医生",
+            "time": "2026-06-08T10:00:00.000Z"
+          }
+        ],
+        "factors": [],
+        "hasLegacyCurve": false,
+        "isBoundarySample": false,
+        "updatedAt": "2026-06-08T11:00:00.000Z",
+        "createdAt": "2026-06-08T09:00:00.000Z"
+      }
+    },
+    {
+      "id": "hist-rec-R002-create",
+      "recordId": "rec-R002",
+      "action": "create",
+      "isManual": false,
+      "operator": "赵医生",
+      "time": "2026-06-07T13:30:00.000Z",
+      "summary": "创建记录 R002 - 花花",
+      "oldSnapshot": {},
+      "newSnapshot": {
+        "id": "rec-R002",
+        "code": "R002",
+        "petName": "花花",
+        "ownerName": "王大伟",
+        "petType": "龙猫",
+        "visitDate": "2026-06-07",
+        "reviewer": "赵医生",
+        "status": "pending",
+        "conclusion": "abnormal",
+        "tempCurve": [
+          {
+            "t": 0,
+            "value": 38.35
+          },
+          {
+            "t": 5,
+            "value": 38.25
+          },
+          {
+            "t": 10,
+            "value": 38.13
+          },
+          {
+            "t": 15,
+            "value": 38.2
+          },
+          {
+            "t": 20,
+            "value": 38.27
+          },
+          {
+            "t": 25,
+            "value": 38.16
+          },
+          {
+            "t": 30,
+            "value": 38.13
+          },
+          {
+            "t": 35,
+            "value": 38.12
+          },
+          {
+            "t": 40,
+            "value": 38.34
+          },
+          {
+            "t": 45,
+            "value": 38.11
+          },
+          {
+            "t": 50,
+            "value": 38.44
+          },
+          {
+            "t": 55,
+            "value": 38.12
+          }
+        ],
+        "tempThreshold": {
+          "min": 36,
+          "max": 37.8
+        },
+        "weightCurve": [
+          {
+            "t": 0,
+            "value": 1009,
+            "version": "new"
+          },
+          {
+            "t": 7,
+            "value": 1071,
+            "version": "new"
+          },
+          {
+            "t": 14,
+            "value": 1112,
+            "version": "new"
+          },
+          {
+            "t": 21,
+            "value": 1169,
+            "version": "new"
+          },
+          {
+            "t": 28,
+            "value": 1220,
+            "version": "new"
+          },
+          {
+            "t": 35,
+            "value": 1259,
+            "version": "new"
+          },
+          {
+            "t": 42,
+            "value": 1308,
+            "version": "new"
+          },
+          {
+            "t": 49,
+            "value": 1360,
+            "version": "new"
+          }
+        ],
+        "vaccines": [
+          {
+            "date": null,
+            "name": "狂犬疫苗"
+          },
+          {
+            "date": "2026-02-10",
+            "name": "多联疫苗"
+          }
+        ],
+        "notes": [],
+        "factors": [
+          {
+            "id": "fac-R002-1",
+            "type": "vaccine_missing",
+            "label": "狂犬疫苗接种日期缺失",
+            "impact": "negative",
+            "description": "狂犬疫苗记录中日期字段为空，无法确认免疫状态",
+            "affectedRecords": [
+              "rec-R002"
+            ]
+          }
+        ],
+        "hasLegacyCurve": false,
+        "isBoundarySample": false,
+        "updatedAt": "2026-06-07T16:30:00.000Z",
+        "createdAt": "2026-06-07T13:30:00.000Z"
+      }
+    },
+    {
+      "id": "hist-rec-R003-create",
+      "recordId": "rec-R003",
+      "action": "create",
+      "isManual": false,
+      "operator": "孙医生",
+      "time": "2026-06-05T10:00:00.000Z",
+      "summary": "创建记录 R003 - 毛毛",
+      "oldSnapshot": {},
+      "newSnapshot": {
+        "id": "rec-R003",
+        "code": "R003",
+        "petName": "毛毛",
+        "ownerName": "刘小芳",
+        "petType": "兔子",
+        "visitDate": "2026-06-05",
+        "reviewer": "孙医生",
+        "status": "pending",
+        "conclusion": "observe",
+        "tempCurve": [
+          {
+            "t": 0,
+            "value": 38.78
+          },
+          {
+            "t": 5,
+            "value": 38.81
+          },
+          {
+            "t": 10,
+            "value": 38.8
+          },
+          {
+            "t": 15,
+            "value": 38.82
+          },
+          {
+            "t": 20,
+            "value": 38.74
+          },
+          {
+            "t": 25,
+            "value": 38.91
+          },
+          {
+            "t": 30,
+            "value": 38.91
+          },
+          {
+            "t": 35,
+            "value": 38.77
+          },
+          {
+            "t": 40,
+            "value": 38.92
+          },
+          {
+            "t": 45,
+            "value": 38.86
+          },
+          {
+            "t": 50,
+            "value": 38.79
+          },
+          {
+            "t": 55,
+            "value": 38.86
+          }
+        ],
+        "tempThreshold": {
+          "min": 38,
+          "max": 39.5
+        },
+        "weightCurve": [
+          {
+            "t": 0,
+            "value": 1015,
+            "version": "legacy"
+          },
+          {
+            "t": 7,
+            "value": 1075,
+            "version": "legacy"
+          },
+          {
+            "t": 14,
+            "value": 1108,
+            "version": "legacy"
+          },
+          {
+            "t": 21,
+            "value": 1157,
+            "version": "new"
+          },
+          {
+            "t": 28,
+            "value": 1220,
+            "version": "new"
+          },
+          {
+            "t": 35,
+            "value": 1277,
+            "version": "new"
+          },
+          {
+            "t": 42,
+            "value": 1312,
+            "version": "new"
+          },
+          {
+            "t": 49,
+            "value": 1360,
+            "version": "new"
+          },
+          {
+            "t": 56,
+            "value": 1400,
+            "version": "new"
+          },
+          {
+            "t": 63,
+            "value": 1467,
+            "version": "new"
+          }
+        ],
+        "vaccines": [
+          {
+            "date": "2026-01-18",
+            "name": "狂犬疫苗"
+          }
+        ],
+        "notes": [
+          {
+            "id": "note-R003-1",
+            "content": "体重数据包含历史记录，需结合临床判断",
+            "source": "written",
+            "operator": "孙医生",
+            "time": "2026-06-05T11:30:00.000Z"
+          }
+        ],
+        "factors": [
+          {
+            "id": "fac-R003-1",
+            "type": "legacy_curve",
+            "label": "体重曲线包含旧版数据",
+            "impact": "neutral",
+            "description": "检测到 3 个历史版本的体重测量点，可能影响趋势分析准确性",
+            "affectedRecords": [
+              "rec-R003"
+            ]
+          }
+        ],
+        "hasLegacyCurve": true,
+        "isBoundarySample": false,
+        "updatedAt": "2026-06-05T12:00:00.000Z",
+        "createdAt": "2026-06-05T10:00:00.000Z"
+      }
+    },
+    {
+      "id": "hist-rec-R004-create",
+      "recordId": "rec-R004",
+      "action": "create",
+      "isManual": false,
+      "operator": "周医生",
+      "time": "2026-06-03T14:30:00.000Z",
+      "summary": "创建记录 R004 - 雪球",
+      "oldSnapshot": {},
+      "newSnapshot": {
+        "id": "rec-R004",
+        "code": "R004",
+        "petName": "雪球",
+        "ownerName": "陈静怡",
+        "petType": "荷兰猪",
+        "visitDate": "2026-06-03",
+        "reviewer": "周医生",
+        "status": "pending",
+        "conclusion": "observe",
+        "tempCurve": [
+          {
+            "t": 0,
+            "value": 37.25
+          },
+          {
+            "t": 5,
+            "value": 37.25
+          },
+          {
+            "t": 10,
+            "value": 37.23
+          },
+          {
+            "t": 15,
+            "value": 37.23
+          },
+          {
+            "t": 20,
+            "value": 38.68
+          },
+          {
+            "t": 25,
+            "value": 38.77
+          },
+          {
+            "t": 30,
+            "value": 38.79
+          },
+          {
+            "t": 35,
+            "value": 38.7
+          },
+          {
+            "t": 40,
+            "value": 38.79
+          },
+          {
+            "t": 45,
+            "value": 38.11
+          },
+          {
+            "t": 50,
+            "value": 37.93
+          },
+          {
+            "t": 55,
+            "value": 38.07
+          }
+        ],
+        "tempThreshold": {
+          "min": 37.2,
+          "max": 38.8
+        },
+        "weightCurve": [
+          {
+            "t": 0,
+            "value": 1027,
+            "version": "new"
+          },
+          {
+            "t": 7,
+            "value": 1053,
+            "version": "new"
+          },
+          {
+            "t": 14,
+            "value": 1110,
+            "version": "new"
+          },
+          {
+            "t": 21,
+            "value": 1172,
+            "version": "new"
+          },
+          {
+            "t": 28,
+            "value": 1209,
+            "version": "new"
+          },
+          {
+            "t": 35,
+            "value": 1267,
+            "version": "new"
+          },
+          {
+            "t": 42,
+            "value": 1315,
+            "version": "new"
+          },
+          {
+            "t": 49,
+            "value": 1362,
+            "version": "new"
+          }
+        ],
+        "vaccines": [
+          {
+            "date": "2026-02-22",
+            "name": "狂犬疫苗"
+          },
+          {
+            "date": "2026-05-01",
+            "name": "多联疫苗"
+          }
+        ],
+        "notes": [],
+        "factors": [
+          {
+            "id": "fac-R004-1",
+            "type": "boundary_sample",
+            "label": "温度样本接近阈值边界",
+            "impact": "neutral",
+            "description": "多个测量点在温度阈值 ±0.2℃ 范围内，需人工复核确认",
+            "affectedRecords": [
+              "rec-R004"
+            ]
+          }
+        ],
+        "hasLegacyCurve": false,
+        "isBoundarySample": true,
+        "updatedAt": "2026-06-03T17:00:00.000Z",
+        "createdAt": "2026-06-03T14:30:00.000Z"
+      }
+    },
+    {
+      "id": "hist-rec-R005-create",
+      "recordId": "rec-R005",
+      "action": "create",
+      "isManual": false,
+      "operator": "吴医生",
+      "time": "2026-05-31T10:30:00.000Z",
+      "summary": "创建记录 R005 - 团团",
+      "oldSnapshot": {},
+      "newSnapshot": {
+        "id": "rec-R005",
+        "code": "R005",
+        "petName": "团团",
+        "ownerName": "林志强",
+        "petType": "鹦鹉",
+        "visitDate": "2026-05-31",
+        "reviewer": "吴医生",
+        "status": "confirmed",
+        "conclusion": "normal",
+        "tempCurve": [
+          {
+            "t": 0,
+            "value": 40.76
+          },
+          {
+            "t": 5,
+            "value": 40.89
+          },
+          {
+            "t": 10,
+            "value": 40.66
+          },
+          {
+            "t": 15,
+            "value": 40.87
+          },
+          {
+            "t": 20,
+            "value": 40.8
+          },
+          {
+            "t": 25,
+            "value": 40.83
+          },
+          {
+            "t": 30,
+            "value": 40.79
+          },
+          {
+            "t": 35,
+            "value": 40.69
+          },
+          {
+            "t": 40,
+            "value": 40.81
+          },
+          {
+            "t": 45,
+            "value": 40.75
+          },
+          {
+            "t": 50,
+            "value": 40.93
+          },
+          {
+            "t": 55,
+            "value": 40.79
+          }
+        ],
+        "tempThreshold": {
+          "min": 40,
+          "max": 42
+        },
+        "weightCurve": [
+          {
+            "t": 0,
+            "value": 1005,
+            "version": "new"
+          },
+          {
+            "t": 7,
+            "value": 1064,
+            "version": "new"
+          },
+          {
+            "t": 14,
+            "value": 1112,
+            "version": "new"
+          },
+          {
+            "t": 21,
+            "value": 1167,
+            "version": "new"
+          },
+          {
+            "t": 28,
+            "value": 1210,
+            "version": "new"
+          },
+          {
+            "t": 35,
+            "value": 1270,
+            "version": "new"
+          },
+          {
+            "t": 42,
+            "value": 1319,
+            "version": "new"
+          },
+          {
+            "t": 49,
+            "value": 1350,
+            "version": "new"
+          }
+        ],
+        "vaccines": [
+          {
+            "date": "2026-03-08",
+            "name": "多联疫苗"
+          }
+        ],
+        "notes": [
+          {
+            "id": "note-R005-1",
+            "content": "主人反映近期食量略有减少，口头告知无其他异常",
+            "source": "verbal",
+            "operator": "吴医生",
+            "time": "2026-05-31T11:30:00.000Z"
+          },
+          {
+            "id": "note-R005-2",
+            "content": "体征检查正常，建议观察一周后复诊",
+            "source": "written",
+            "operator": "吴医生",
+            "time": "2026-05-31T12:00:00.000Z"
+          }
+        ],
+        "factors": [
+          {
+            "id": "fac-R005-1",
+            "type": "verbal_note",
+            "label": "存在口头备注记录",
+            "impact": "neutral",
+            "description": "检测到 1 条口述来源的备注信息，书面信息完整性受限",
+            "affectedRecords": [
+              "rec-R005"
+            ]
+          }
+        ],
+        "hasLegacyCurve": false,
+        "isBoundarySample": false,
+        "updatedAt": "2026-05-31T14:00:00.000Z",
+        "createdAt": "2026-05-31T10:30:00.000Z"
+      }
+    },
+    {
+      "id": "hist-rec-R006-create",
+      "recordId": "rec-R006",
+      "action": "create",
+      "isManual": false,
+      "operator": "郑医生",
+      "time": "2026-05-28T08:30:00.000Z",
+      "summary": "创建记录 R006 - 圆圆",
+      "oldSnapshot": {},
+      "newSnapshot": {
+        "id": "rec-R006",
+        "code": "R006",
+        "petName": "圆圆",
+        "ownerName": "黄丽娟",
+        "petType": "雪貂",
+        "visitDate": "2026-05-28",
+        "reviewer": "郑医生",
+        "status": "confirmed",
+        "conclusion": "observe",
+        "tempCurve": [
+          {
+            "t": 0,
+            "value": 38.99
+          },
+          {
+            "t": 5,
+            "value": 38.75
+          },
+          {
+            "t": 10,
+            "value": 38.91
+          },
+          {
+            "t": 15,
+            "value": 38.83
+          },
+          {
+            "t": 20,
+            "value": 39.01
+          },
+          {
+            "t": 25,
+            "value": 38.85
+          },
+          {
+            "t": 30,
+            "value": 38.73
+          },
+          {
+            "t": 35,
+            "value": 38.88
+          },
+          {
+            "t": 40,
+            "value": 38.81
+          },
+          {
+            "t": 45,
+            "value": 38.84
+          },
+          {
+            "t": 50,
+            "value": 38.78
+          },
+          {
+            "t": 55,
+            "value": 39.08
+          }
+        ],
+        "tempThreshold": {
+          "min": 37.8,
+          "max": 39.2
+        },
+        "weightCurve": [
+          {
+            "t": 0,
+            "value": 1012,
+            "version": "new"
+          },
+          {
+            "t": 7,
+            "value": 1055,
+            "version": "new"
+          },
+          {
+            "t": 14,
+            "value": 1129,
+            "version": "new"
+          },
+          {
+            "t": 21,
+            "value": 1161,
+            "version": "new"
+          },
+          {
+            "t": 28,
+            "value": 1209,
+            "version": "new"
+          },
+          {
+            "t": 35,
+            "value": 1268,
+            "version": "new"
+          },
+          {
+            "t": 42,
+            "value": 1300,
+            "version": "new"
+          },
+          {
+            "t": 49,
+            "value": 1354,
+            "version": "new"
+          }
+        ],
+        "vaccines": [
+          {
+            "date": "2026-01-05",
+            "name": "狂犬疫苗"
+          },
+          {
+            "date": "2026-04-12",
+            "name": "多联疫苗"
+          }
+        ],
+        "notes": [
+          {
+            "id": "note-R006-1",
+            "content": "改判说明：复查血常规指标正常，原异常为应激反应导致",
+            "source": "written",
+            "operator": "郑医生",
+            "time": "2026-05-30T15:00:00.000Z"
+          }
+        ],
+        "factors": [],
+        "pendingReason": "初次检测温度偏高，疑似炎症，后经复查排除",
+        "hasLegacyCurve": false,
+        "isBoundarySample": false,
+        "updatedAt": "2026-05-30T15:30:00.000Z",
+        "createdAt": "2026-05-28T08:30:00.000Z"
+      }
+    },
+    {
+      "id": "hist-rec-R007-create",
+      "recordId": "rec-R007",
+      "action": "create",
+      "isManual": false,
+      "operator": "冯医生",
+      "time": "2026-05-27T12:30:00.000Z",
+      "summary": "创建记录 R007 - 阿黑",
+      "oldSnapshot": {},
+      "newSnapshot": {
+        "id": "rec-R007",
+        "code": "R007",
+        "petName": "阿黑",
+        "ownerName": "许文彬",
+        "petType": "刺猬",
+        "visitDate": "2026-05-27",
+        "reviewer": "冯医生",
+        "status": "exception",
+        "conclusion": "abnormal",
+        "tempCurve": [
+          {
+            "t": 0,
+            "value": 35.65
+          },
+          {
+            "t": 5,
+            "value": 35.96
+          },
+          {
+            "t": 10,
+            "value": 35.62
+          },
+          {
+            "t": 15,
+            "value": 35.92
+          },
+          {
+            "t": 20,
+            "value": 35.64
+          },
+          {
+            "t": 25,
+            "value": 35.73
+          },
+          {
+            "t": 30,
+            "value": 35.79
+          },
+          {
+            "t": 35,
+            "value": 35.97
+          },
+          {
+            "t": 40,
+            "value": 35.91
+          },
+          {
+            "t": 45,
+            "value": 35.93
+          },
+          {
+            "t": 50,
+            "value": 35.99
+          },
+          {
+            "t": 55,
+            "value": 35.98
+          }
+        ],
+        "tempThreshold": {
+          "min": 36.5,
+          "max": 37.8
+        },
+        "weightCurve": [
+          {
+            "t": 0,
+            "value": 1001,
+            "version": "new"
+          },
+          {
+            "t": 7,
+            "value": 1077,
+            "version": "new"
+          },
+          {
+            "t": 14,
+            "value": 1124,
+            "version": "new"
+          },
+          {
+            "t": 21,
+            "value": 1163,
+            "version": "new"
+          },
+          {
+            "t": 28,
+            "value": 1215,
+            "version": "new"
+          },
+          {
+            "t": 35,
+            "value": 1266,
+            "version": "new"
+          },
+          {
+            "t": 42,
+            "value": 1326,
+            "version": "new"
+          },
+          {
+            "t": 49,
+            "value": 1377,
+            "version": "new"
+          }
+        ],
+        "vaccines": [
+          {
+            "date": "2025-12-20",
+            "name": "狂犬疫苗"
+          }
+        ],
+        "notes": [],
+        "factors": [],
+        "pendingReason": "体温持续低于正常范围，且主人无法提供完整的既往病史，需进一步检查确认",
+        "hasLegacyCurve": false,
+        "isBoundarySample": false,
+        "updatedAt": "2026-05-27T16:00:00.000Z",
+        "createdAt": "2026-05-27T12:30:00.000Z"
+      }
+    },
+    {
+      "id": "hist-rec-R006-rejudge",
+      "recordId": "rec-R006",
+      "action": "rejudge",
+      "isManual": true,
+      "operator": "郑医生",
+      "time": "2026-05-30T15:30:00.000Z",
+      "summary": "改判结论：abnormal → observe",
+      "reason": "复查血常规、CRP 指标均正常，结合临床观察，原异常为入院应激导致的一过性体温升高，建议观察两周后复诊确认",
+      "oldSnapshot": {
+        "conclusion": "abnormal",
+        "status": "pending",
+        "pendingReason": "初次检测温度偏高，疑似炎症",
+        "updatedAt": "2026-05-28T11:00:00.000Z"
+      },
+      "newSnapshot": {
+        "conclusion": "observe",
+        "status": "confirmed",
+        "pendingReason": "初次检测温度偏高，疑似炎症，后经复查排除",
+        "updatedAt": "2026-05-30T15:30:00.000Z",
+        "notes": [
+          {
+            "id": "note-R006-1",
+            "content": "改判说明：复查血常规指标正常，原异常为应激反应导致",
+            "source": "written",
+            "operator": "郑医生",
+            "time": "2026-05-30T15:00:00.000Z"
+          }
+        ]
+      }
+    },
+    {
+      "id": "hist-miYE-7xzhw",
+      "recordId": "rec-R001",
+      "action": "rejudge",
+      "isManual": true,
+      "operator": "阿宁",
+      "time": "2026-06-09T00:23:35.588Z",
+      "summary": "改判结论：normal → observe",
+      "reason": "复查发现夜间体温波动",
+      "oldSnapshot": {
+        "status": "pending",
+        "conclusion": "normal",
+        "updatedAt": "2026-06-08T11:00:00.000Z",
+        "factors": [],
+        "hasLegacyCurve": false,
+        "isBoundarySample": false
+      },
+      "newSnapshot": {
+        "status": "confirmed",
+        "conclusion": "observe",
+        "pendingReason": "复查发现夜间体温波动",
+        "updatedAt": "2026-06-09T00:23:35.588Z",
+        "factors": [],
+        "hasLegacyCurve": false,
+        "isBoundarySample": false
+      }
+    },
+    {
+      "id": "hist-F4yFL23s4P",
+      "recordId": "rec-R002",
+      "action": "supplement",
+      "isManual": true,
+      "operator": "阿宁",
+      "time": "2026-06-09T00:23:35.594Z",
+      "summary": "补录疫苗：狂犬疫苗（2026-06-01）",
+      "oldSnapshot": {
+        "status": "pending",
+        "conclusion": "abnormal",
+        "updatedAt": "2026-06-07T16:30:00.000Z",
+        "factors": [
+          {
+            "id": "fac-R002-1",
+            "type": "vaccine_missing",
+            "label": "狂犬疫苗接种日期缺失",
+            "impact": "negative",
+            "description": "狂犬疫苗记录中日期字段为空，无法确认免疫状态",
+            "affectedRecords": [
+              "rec-R002"
+            ]
+          }
+        ],
+        "hasLegacyCurve": false,
+        "isBoundarySample": false
+      },
+      "newSnapshot": {
+        "status": "pending",
+        "conclusion": "abnormal",
+        "updatedAt": "2026-06-09T00:23:35.594Z",
+        "factors": [
+          {
+            "id": "fac-lt8YQO34qy",
+            "type": "vaccine_missing",
+            "label": "疫苗接种日期缺失",
+            "impact": "negative",
+            "description": "检测到 1 项疫苗记录缺少接种日期，无法确认免疫状态有效性",
+            "affectedRecords": [
+              "rec-R002"
+            ]
+          }
+        ],
+        "hasLegacyCurve": false,
+        "isBoundarySample": false
+      }
+    }
+  ],
+  "queue": [
+    {
+      "id": "q-R002-vm",
+      "recordId": "rec-R002",
+      "type": "vaccine_missing",
+      "title": "狂犬疫苗接种日期缺失",
+      "reason": "花花（R002）的狂犬疫苗接种记录中日期为空，无法确认有效免疫",
+      "affectedRecords": [
+        "rec-R002"
+      ],
+      "status": "open",
+      "createdAt": "2026-06-07T16:35:00.000Z",
+      "suggestion": "联系主人王大伟补充狂犬疫苗接种凭证，确认免疫状态后补录日期"
+    },
+    {
+      "id": "q-R004-bs",
+      "recordId": "rec-R004",
+      "type": "boundary_sample",
+      "title": "温度样本接近阈值边界",
+      "reason": "雪球（R004）的温度曲线多个测点处于阈值边缘，存在误判风险",
+      "affectedRecords": [
+        "rec-R004"
+      ],
+      "status": "open",
+      "createdAt": "2026-06-03T17:05:00.000Z",
+      "suggestion": "建议复核员周医生人工查看完整温度曲线数据，结合体征综合判断"
+    },
+    {
+      "id": "q-R003-lc",
+      "recordId": "rec-R003",
+      "type": "legacy_curve",
+      "title": "体重曲线混入旧版数据",
+      "reason": "毛毛（R003）体重曲线中存在旧版测量系统的数据点",
+      "affectedRecords": [
+        "rec-R003"
+      ],
+      "status": "open",
+      "createdAt": "2026-06-05T12:05:00.000Z",
+      "suggestion": "建议孙医生确认旧版数据测量仪器的校准情况，判断是否需要剔除异常点"
+    },
+    {
+      "id": "q-R007-pr",
+      "recordId": "rec-R007",
+      "type": "pending_reason",
+      "title": "异常记录待确认",
+      "reason": "阿黑（R007）体温异常偏低，且主人无法提供完整既往病史，需要人工确认原因",
+      "affectedRecords": [
+        "rec-R007"
+      ],
+      "status": "open",
+      "createdAt": "2026-05-27T16:10:00.000Z",
+      "suggestion": "冯医生需联系主人许文彬补充详细病史，必要时安排进一步检查（血常规、生化、影像）"
+    }
+  ]
+}
