@@ -1,0 +1,319 @@
+{
+  "workorder_id": "WO-2025-S003",
+  "title": "银滩桥5#墩1#支座检测（问题工单）",
+  "bridge_name": "银滩跨海大桥",
+  "support_position": "5#墩1号支座",
+  "status": "pending_evidence",
+  "created_at": "2026-06-09T09:31:53",
+  "updated_at": "2026-06-09T09:31:53",
+  "created_by": "系统导入",
+  "current_conclusion": "支座需重新检测",
+  "current_note": "同事复核发现照片时间有疑点，且转角记录超阈值",
+  "alarm_status": "triggered",
+  "spare_parts": [
+    {
+      "part_id": "SP-202",
+      "name": "不锈钢滑板",
+      "spec": "20mm×300×300",
+      "quantity": 2.0,
+      "unit": "块",
+      "raw_entry": {
+        "name": "不锈钢板",
+        "spec": "20mm",
+        "qty": "2",
+        "u": "块"
+      },
+      "cleaned_note": "按实际尺寸补全",
+      "source": "第一次领料单",
+      "version": 1,
+      "recorded_at": "2026-06-09T09:31:53"
+    },
+    {
+      "part_id": "SP-202",
+      "name": "不锈钢滑板",
+      "spec": "20mm×300×300",
+      "quantity": 4.0,
+      "unit": "块",
+      "raw_entry": {
+        "name": "不锈钢板",
+        "spec": "20mm",
+        "qty": "4",
+        "u": "块"
+      },
+      "cleaned_note": null,
+      "source": "第二次领料单（但未说明原因）",
+      "version": 2,
+      "recorded_at": "2026-06-09T09:31:53"
+    }
+  ],
+  "photos": [
+    {
+      "photo_id": "P-S003-1",
+      "file_path": "./photos/S003-1.jpg",
+      "exif_time": "2025-11-02T01:30:00+00:00",
+      "claimed_time": "2025-11-02T08:00:00+08:00",
+      "site_time": "2025-11-02T07:30:00+08:00",
+      "upload_time": "2025-11-02T20:15:00+08:00",
+      "description": "支座顶面照",
+      "uploaded_by": "赵六",
+      "camera_tz": "UTC",
+      "mismatch_notes": []
+    },
+    {
+      "photo_id": "P-S003-2",
+      "file_path": "./photos/S003-2.jpg",
+      "exif_time": "2025-11-01T02:10:00+08:00",
+      "claimed_time": "2025-11-02T09:00:00+08:00",
+      "site_time": "2025-11-02T09:00:00+08:00",
+      "upload_time": "2025-11-02T20:16:00+08:00",
+      "description": "支座位移测值",
+      "uploaded_by": "赵六",
+      "camera_tz": "Asia/Shanghai",
+      "mismatch_notes": []
+    }
+  ],
+  "timeline": [
+    {
+      "event_id": "evt_1f5aa1dae1",
+      "event_type": "created",
+      "timestamp": "2026-06-09T09:31:53",
+      "actor": "系统导入",
+      "summary": "从 养护系统API 2025-11-01 导入原始工单快照",
+      "before_snapshot": {},
+      "after_snapshot": {
+        "raw_snapshot_keys": [
+          "来源系统",
+          "旧结论",
+          "报警信息"
+        ]
+      },
+      "metadata": {}
+    },
+    {
+      "event_id": "evt_1a11f89654",
+      "event_type": "spare_part_recorded",
+      "timestamp": "2026-06-09T09:31:53",
+      "actor": "赵六",
+      "summary": "记录备件 SP-202 (v1): 按实际尺寸补全",
+      "before_snapshot": {
+        "part_id": "SP-202",
+        "previous_count": 0
+      },
+      "after_snapshot": {
+        "spare_part": {
+          "part_id": "SP-202",
+          "name": "不锈钢滑板",
+          "spec": "20mm×300×300",
+          "quantity": 2.0,
+          "unit": "块",
+          "raw_entry": {
+            "name": "不锈钢板",
+            "spec": "20mm",
+            "qty": "2",
+            "u": "块"
+          },
+          "cleaned_note": "按实际尺寸补全",
+          "source": "第一次领料单",
+          "version": 1,
+          "recorded_at": "2026-06-09T09:31:53"
+        }
+      },
+      "metadata": {}
+    },
+    {
+      "event_id": "evt_62adb745e7",
+      "event_type": "spare_part_recorded",
+      "timestamp": "2026-06-09T09:31:53",
+      "actor": "赵六",
+      "summary": "记录备件 SP-202 (v2): 原始录入",
+      "before_snapshot": {
+        "part_id": "SP-202",
+        "previous_count": 1
+      },
+      "after_snapshot": {
+        "spare_part": {
+          "part_id": "SP-202",
+          "name": "不锈钢滑板",
+          "spec": "20mm×300×300",
+          "quantity": 4.0,
+          "unit": "块",
+          "raw_entry": {
+            "name": "不锈钢板",
+            "spec": "20mm",
+            "qty": "4",
+            "u": "块"
+          },
+          "cleaned_note": null,
+          "source": "第二次领料单（但未说明原因）",
+          "version": 2,
+          "recorded_at": "2026-06-09T09:31:53"
+        }
+      },
+      "metadata": {}
+    },
+    {
+      "event_id": "evt_e54d8bacdf",
+      "event_type": "supplement",
+      "timestamp": "2026-06-09T09:31:53",
+      "actor": "赵六",
+      "summary": "[补录] 现场初查未见明显异常",
+      "before_snapshot": {
+        "current_conclusion": null,
+        "current_note": null,
+        "status": "created"
+      },
+      "after_snapshot": {
+        "current_conclusion": "支座状态合格",
+        "current_note": "现场初查未见明显异常",
+        "status": "created",
+        "evidence": {
+          "初查人": "赵六"
+        }
+      },
+      "metadata": {
+        "evidence": {
+          "初查人": "赵六"
+        }
+      }
+    },
+    {
+      "event_id": "evt_b682cdd14e",
+      "event_type": "alarm",
+      "timestamp": "2026-06-09T09:31:53",
+      "actor": "自动巡检AI",
+      "summary": "[报警] 支座转角超限报警 (ALM-8821)：转角 0.032rad > 限值 0.02rad",
+      "before_snapshot": {
+        "alarm_status": null
+      },
+      "after_snapshot": {
+        "alarm_status": "triggered",
+        "alarm_text": "支座转角超限报警 (ALM-8821)：转角 0.032rad > 限值 0.02rad",
+        "details": {
+          "alarm_id": "ALM-8821",
+          "转角值": 0.032,
+          "限值": 0.02
+        }
+      },
+      "metadata": {
+        "alarm_text": "支座转角超限报警 (ALM-8821)：转角 0.032rad > 限值 0.02rad",
+        "details": {
+          "alarm_id": "ALM-8821",
+          "转角值": 0.032,
+          "限值": 0.02
+        }
+      }
+    },
+    {
+      "event_id": "evt_78fa7d8252",
+      "event_type": "manual_note",
+      "timestamp": "2026-06-09T09:31:53",
+      "actor": "赵六",
+      "summary": "[人工备注] 现场清理完毕，工具已归还",
+      "before_snapshot": {},
+      "after_snapshot": {
+        "note": "现场清理完毕，工具已归还"
+      },
+      "metadata": {}
+    },
+    {
+      "event_id": "evt_37bfa7dd4d",
+      "event_type": "reversal",
+      "timestamp": "2026-06-09T09:31:53",
+      "actor": "老唐",
+      "summary": "[改判] 检测照片时间存疑，自动报警转角超限未在原始备注中回应：支座状态合格 → 支座需重新检测",
+      "before_snapshot": {
+        "current_conclusion": "支座状态合格",
+        "current_note": "现场初查未见明显异常\n现场清理完毕，工具已归还",
+        "status": "created"
+      },
+      "after_snapshot": {
+        "current_conclusion": "支座需重新检测",
+        "current_note": "同事复核发现照片时间有疑点，且转角记录超阈值",
+        "status": "created",
+        "evidence": {
+          "复核人": "老唐",
+          "复核日期": "2025-11-03"
+        }
+      },
+      "metadata": {
+        "evidence": {
+          "复核人": "老唐",
+          "复核日期": "2025-11-03"
+        }
+      }
+    }
+  ],
+  "raw_snapshot": {
+    "来源系统": "养护系统",
+    "旧结论": "第一次检测误判为合格",
+    "报警信息": "系统自动检测到支座转角超限报警ID=ALM-8821"
+  },
+  "raw_snapshot_source": "养护系统API 2025-11-01",
+  "cleaning_log": [
+    {
+      "timestamp": "2026-06-09T09:31:53",
+      "actor": "赵六",
+      "part_id": "SP-202",
+      "version": 1,
+      "note": "按实际尺寸补全",
+      "fields_changed": {
+        "name": [
+          "不锈钢板",
+          "不锈钢滑板"
+        ],
+        "spec": [
+          "20mm",
+          "20mm×300×300"
+        ],
+        "quantity": [
+          null,
+          2.0
+        ],
+        "unit": [
+          null,
+          "块"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-06-09T09:31:53",
+      "actor": "赵六",
+      "part_id": "SP-202",
+      "version": 2,
+      "note": "未填写清洗说明",
+      "fields_changed": {
+        "name": [
+          "不锈钢板",
+          "不锈钢滑板"
+        ],
+        "spec": [
+          "20mm",
+          "20mm×300×300"
+        ],
+        "quantity": [
+          null,
+          4.0
+        ],
+        "unit": [
+          null,
+          "块"
+        ]
+      }
+    }
+  ],
+  "conclusion_history": [
+    {
+      "timestamp": "2026-06-09T09:31:53",
+      "actor": "老唐",
+      "old_conclusion": "支座状态合格",
+      "new_conclusion": "支座需重新检测",
+      "old_note": "现场初查未见明显异常\n现场清理完毕，工具已归还",
+      "new_note": "同事复核发现照片时间有疑点，且转角记录超阈值",
+      "reversal_reason": "检测照片时间存疑，自动报警转角超限未在原始备注中回应",
+      "evidence_snapshot": {
+        "复核人": "老唐",
+        "复核日期": "2025-11-03"
+      }
+    }
+  ]
+}

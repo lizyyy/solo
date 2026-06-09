@@ -1,0 +1,251 @@
+{
+  "workorder_id": "WO-2025-S001",
+  "title": "青岩桥1#墩4#支座更换",
+  "bridge_name": "青岩大桥",
+  "support_position": "1#墩4号盆式支座GPZ(Ⅱ)5DX",
+  "status": "handled",
+  "created_at": "2026-06-09T09:31:53",
+  "updated_at": "2026-06-09T09:31:53",
+  "created_by": "系统导入",
+  "current_conclusion": "支座更换完成，验收合格，质保资料齐全",
+  "current_note": "养护单位提交了质保书",
+  "alarm_status": null,
+  "spare_parts": [
+    {
+      "part_id": "SP-001",
+      "name": "盆式支座",
+      "spec": "GPZ(Ⅱ)5DX",
+      "quantity": 1.0,
+      "unit": "个",
+      "raw_entry": {
+        "物料名称": "盆式支座",
+        "型号": "",
+        "数量": "1个",
+        "规格写的": "很乱"
+      },
+      "cleaned_note": "原始型号空，根据养护工单图纸确认为GPZ(Ⅱ)5DX",
+      "source": "老唐微信2025-10-12转发Excel",
+      "version": 1,
+      "recorded_at": "2026-06-09T09:31:53"
+    },
+    {
+      "part_id": "SP-002",
+      "name": "锚固螺栓",
+      "spec": "M24×120 8.8级",
+      "quantity": 4.0,
+      "unit": "套",
+      "raw_entry": {
+        "物料名称": "锚固螺栓",
+        "型号": "M24",
+        "数量": "4",
+        "单位": "套"
+      },
+      "cleaned_note": "补全长度/强度等级按现场交底",
+      "source": "同批Excel第2行",
+      "version": 1,
+      "recorded_at": "2026-06-09T09:31:53"
+    }
+  ],
+  "photos": [
+    {
+      "photo_id": "P-S001-1",
+      "file_path": "./photos/S001-1.jpg",
+      "exif_time": "2025-10-12T09:30:00+08:00",
+      "claimed_time": "2025-10-12T09:30:00+08:00",
+      "site_time": "2025-10-12T09:35:00+08:00",
+      "upload_time": "2025-10-12T14:20:00+08:00",
+      "description": "旧支座拆除前",
+      "uploaded_by": "张三",
+      "camera_tz": "Asia/Shanghai",
+      "mismatch_notes": []
+    },
+    {
+      "photo_id": "P-S001-2",
+      "file_path": "./photos/S001-2.jpg",
+      "exif_time": "2025-10-12T11:10:00+08:00",
+      "claimed_time": "2025-10-12T11:10:00+08:00",
+      "site_time": "2025-10-12T11:12:00+08:00",
+      "upload_time": "2025-10-12T14:22:00+08:00",
+      "description": "新支座安装后",
+      "uploaded_by": "张三",
+      "camera_tz": "Asia/Shanghai",
+      "mismatch_notes": []
+    }
+  ],
+  "timeline": [
+    {
+      "event_id": "evt_9a700e07be",
+      "event_type": "created",
+      "timestamp": "2026-06-09T09:31:53",
+      "actor": "系统导入",
+      "summary": "从 养护系统API 2025-10-11导出 导入原始工单快照",
+      "before_snapshot": {},
+      "after_snapshot": {
+        "raw_snapshot_keys": [
+          "来源系统",
+          "养护类别",
+          "旧说法"
+        ]
+      },
+      "metadata": {}
+    },
+    {
+      "event_id": "evt_0d79a06af4",
+      "event_type": "spare_part_recorded",
+      "timestamp": "2026-06-09T09:31:53",
+      "actor": "张三",
+      "summary": "记录备件 SP-001 (v1): 原始型号空，根据养护工单图纸确认为GPZ(Ⅱ)5DX",
+      "before_snapshot": {
+        "part_id": "SP-001",
+        "previous_count": 0
+      },
+      "after_snapshot": {
+        "spare_part": {
+          "part_id": "SP-001",
+          "name": "盆式支座",
+          "spec": "GPZ(Ⅱ)5DX",
+          "quantity": 1.0,
+          "unit": "个",
+          "raw_entry": {
+            "物料名称": "盆式支座",
+            "型号": "",
+            "数量": "1个",
+            "规格写的": "很乱"
+          },
+          "cleaned_note": "原始型号空，根据养护工单图纸确认为GPZ(Ⅱ)5DX",
+          "source": "老唐微信2025-10-12转发Excel",
+          "version": 1,
+          "recorded_at": "2026-06-09T09:31:53"
+        }
+      },
+      "metadata": {}
+    },
+    {
+      "event_id": "evt_a1726028a4",
+      "event_type": "spare_part_recorded",
+      "timestamp": "2026-06-09T09:31:53",
+      "actor": "张三",
+      "summary": "记录备件 SP-002 (v1): 补全长度/强度等级按现场交底",
+      "before_snapshot": {
+        "part_id": "SP-002",
+        "previous_count": 0
+      },
+      "after_snapshot": {
+        "spare_part": {
+          "part_id": "SP-002",
+          "name": "锚固螺栓",
+          "spec": "M24×120 8.8级",
+          "quantity": 4.0,
+          "unit": "套",
+          "raw_entry": {
+            "物料名称": "锚固螺栓",
+            "型号": "M24",
+            "数量": "4",
+            "单位": "套"
+          },
+          "cleaned_note": "补全长度/强度等级按现场交底",
+          "source": "同批Excel第2行",
+          "version": 1,
+          "recorded_at": "2026-06-09T09:31:53"
+        }
+      },
+      "metadata": {}
+    },
+    {
+      "event_id": "evt_7815e77cbb",
+      "event_type": "manual_note",
+      "timestamp": "2026-06-09T09:31:53",
+      "actor": "老唐",
+      "summary": "[人工备注] 现场监理旁站，支座型号与设计一致",
+      "before_snapshot": {},
+      "after_snapshot": {
+        "note": "现场监理旁站，支座型号与设计一致"
+      },
+      "metadata": {}
+    },
+    {
+      "event_id": "evt_7c6e86ab76",
+      "event_type": "supplement",
+      "timestamp": "2026-06-09T09:31:53",
+      "actor": "李四",
+      "summary": "[补录] 养护单位提交了质保书",
+      "before_snapshot": {
+        "current_conclusion": null,
+        "current_note": "现场监理旁站，支座型号与设计一致",
+        "status": "created"
+      },
+      "after_snapshot": {
+        "current_conclusion": "支座更换完成，验收合格，质保资料齐全",
+        "current_note": "养护单位提交了质保书",
+        "status": "created",
+        "evidence": {
+          "质保书编号": "ZB-2025-1012"
+        }
+      },
+      "metadata": {
+        "evidence": {
+          "质保书编号": "ZB-2025-1012"
+        }
+      }
+    }
+  ],
+  "raw_snapshot": {
+    "来源系统": "养护管理系统",
+    "养护类别": "桥梁支座更换",
+    "旧说法": "原来写的'支座磨损'，后经拆解确认是'橡胶老化'"
+  },
+  "raw_snapshot_source": "养护系统API 2025-10-11导出",
+  "cleaning_log": [
+    {
+      "timestamp": "2026-06-09T09:31:53",
+      "actor": "张三",
+      "part_id": "SP-001",
+      "version": 1,
+      "note": "原始型号空，根据养护工单图纸确认为GPZ(Ⅱ)5DX",
+      "fields_changed": {
+        "name": [
+          null,
+          "盆式支座"
+        ],
+        "spec": [
+          null,
+          "GPZ(Ⅱ)5DX"
+        ],
+        "quantity": [
+          null,
+          1.0
+        ],
+        "unit": [
+          null,
+          "个"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-06-09T09:31:53",
+      "actor": "张三",
+      "part_id": "SP-002",
+      "version": 1,
+      "note": "补全长度/强度等级按现场交底",
+      "fields_changed": {
+        "name": [
+          null,
+          "锚固螺栓"
+        ],
+        "spec": [
+          null,
+          "M24×120 8.8级"
+        ],
+        "quantity": [
+          null,
+          4.0
+        ],
+        "unit": [
+          null,
+          "套"
+        ]
+      }
+    }
+  ],
+  "conclusion_history": []
+}

@@ -1,0 +1,118 @@
+{
+  "workorder_id": "WO-2025-S002",
+  "title": "枫林桥3#墩2#支座裂纹排查",
+  "bridge_name": "枫林高架桥",
+  "support_position": "3#墩2号球型钢支座",
+  "status": "pending_evidence",
+  "created_at": "2026-06-09T09:31:53",
+  "updated_at": "2026-06-09T09:31:53",
+  "created_by": "王五",
+  "current_conclusion": null,
+  "current_note": "测量裂纹宽度约1.2mm",
+  "alarm_status": null,
+  "spare_parts": [
+    {
+      "part_id": "SP-101",
+      "name": "修补胶",
+      "spec": null,
+      "quantity": null,
+      "unit": null,
+      "raw_entry": {
+        "name": "修补胶",
+        "数量": "1"
+      },
+      "cleaned_note": "规格待供应商确认",
+      "source": "王五口述",
+      "version": 1,
+      "recorded_at": "2026-06-09T09:31:53"
+    }
+  ],
+  "photos": [
+    {
+      "photo_id": "P-S002-1",
+      "file_path": "./photos/S002-1.jpg",
+      "exif_time": "2025-10-15T10:05:00+08:00",
+      "claimed_time": null,
+      "site_time": "2025-10-15T10:00:00+08:00",
+      "upload_time": "2025-10-15T18:10:00+08:00",
+      "description": "裂纹位置远景",
+      "uploaded_by": "王五",
+      "camera_tz": "Asia/Shanghai",
+      "mismatch_notes": []
+    }
+  ],
+  "timeline": [
+    {
+      "event_id": "evt_941b1609ff",
+      "event_type": "created",
+      "timestamp": "2026-06-09T09:31:53",
+      "actor": "王五",
+      "summary": "从 巡检APP离线工单 2025-10-15 16:20 导入原始工单快照",
+      "before_snapshot": {},
+      "after_snapshot": {
+        "raw_snapshot_keys": [
+          "来源系统",
+          "发现问题"
+        ]
+      },
+      "metadata": {}
+    },
+    {
+      "event_id": "evt_1702cb2ff6",
+      "event_type": "spare_part_recorded",
+      "timestamp": "2026-06-09T09:31:53",
+      "actor": "王五",
+      "summary": "记录备件 SP-101 (v1): 规格待供应商确认",
+      "before_snapshot": {
+        "part_id": "SP-101",
+        "previous_count": 0
+      },
+      "after_snapshot": {
+        "spare_part": {
+          "part_id": "SP-101",
+          "name": "修补胶",
+          "spec": null,
+          "quantity": null,
+          "unit": null,
+          "raw_entry": {
+            "name": "修补胶",
+            "数量": "1"
+          },
+          "cleaned_note": "规格待供应商确认",
+          "source": "王五口述",
+          "version": 1,
+          "recorded_at": "2026-06-09T09:31:53"
+        }
+      },
+      "metadata": {}
+    },
+    {
+      "event_id": "evt_244e0bcaad",
+      "event_type": "manual_note",
+      "timestamp": "2026-06-09T09:31:53",
+      "actor": "王五",
+      "summary": "[人工备注] 测量裂纹宽度约1.2mm",
+      "before_snapshot": {},
+      "after_snapshot": {
+        "note": "测量裂纹宽度约1.2mm"
+      },
+      "metadata": {}
+    }
+  ],
+  "raw_snapshot": {
+    "来源系统": "巡检APP",
+    "发现问题": "支座有裂纹"
+  },
+  "raw_snapshot_source": "巡检APP离线工单 2025-10-15 16:20",
+  "cleaning_log": [
+    {
+      "timestamp": "2026-06-09T09:31:53",
+      "actor": "王五",
+      "part_id": "SP-101",
+      "version": 1,
+      "note": "规格待供应商确认",
+      "fields_changed": {}
+    }
+  ],
+  "conclusion_history": []
+}
