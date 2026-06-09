@@ -16,7 +16,9 @@ _THERMAL_IMAGER_MAX_C = 2000.0
 
 _CELSIUS_PATTERNS = [
     re.compile(r"°C", re.IGNORECASE),
-    re.compile(r"deg\s*C", re.IGNORECASE),
+    re.compile(r"\u2103"),
+    re.compile(r"deg\s*c", re.IGNORECASE),
+    re.compile(r"degree\s*c", re.IGNORECASE),
     re.compile(r"celsius", re.IGNORECASE),
     re.compile(r"centigrade", re.IGNORECASE),
 ]
@@ -24,6 +26,7 @@ _CELSIUS_PATTERNS = [
 _KELVIN_PATTERNS = [
     re.compile(r"\bK\b"),
     re.compile(r"kelvin", re.IGNORECASE),
+    re.compile(r"deg\s*k", re.IGNORECASE),
 ]
 
 
@@ -87,7 +90,7 @@ def judge_conflict(
             return UnitConflictRecord(
                 line_number=line_number,
                 detected_units=detected_units,
-                action_taken=UnitConflictAction.CONVERT_TO_CELSIUS,
+                action_taken=UnitConflictAction.AUTO_CONVERT_KELVIN_TO_CELSIUS,
                 original_raw=raw_text,
                 resolved_value=value,
                 resolved_unit=TemperatureUnit.CELSIUS,
@@ -99,7 +102,7 @@ def judge_conflict(
             return UnitConflictRecord(
                 line_number=line_number,
                 detected_units=detected_units,
-                action_taken=UnitConflictAction.CONVERT_TO_CELSIUS,
+                action_taken=UnitConflictAction.AUTO_CONVERT_KELVIN_TO_CELSIUS,
                 original_raw=raw_text,
                 resolved_value=converted,
                 resolved_unit=TemperatureUnit.CELSIUS,
@@ -109,7 +112,7 @@ def judge_conflict(
     return UnitConflictRecord(
         line_number=line_number,
         detected_units=detected_units,
-        action_taken=UnitConflictAction.NEEDS_COACH_REVIEW,
+        action_taken=UnitConflictAction.PENDING_COACH_REVIEW,
         original_raw=raw_text,
         resolved_value=value,
         resolved_unit=None,
@@ -121,12 +124,12 @@ def rollback_conflict(conflict: UnitConflictRecord) -> UnitConflictRecord:
     return UnitConflictRecord(
         line_number=conflict.line_number,
         detected_units=conflict.detected_units,
-        action_taken=UnitConflictAction.KEEP_ORIGINAL,
+        action_taken=UnitConflictAction.ROLLED_BACK,
         original_raw=conflict.original_raw,
         resolved_value=None,
         resolved_unit=None,
         needs_coach_review=True,
-        coach_review_note=(conflict.coach_review_note or "") + " [已回滚，等待教练复核]",
+        coach_review_note=(conflict.coach_review_note or "") + " [已回滚，等待教练重新复核]",
     )
 
 
@@ -139,11 +142,7 @@ def coach_resolve_conflict(
     return UnitConflictRecord(
         line_number=conflict.line_number,
         detected_units=conflict.detected_units,
-        action_taken=(
-            UnitConflictAction.CONVERT_TO_CELSIUS
-            if resolved_unit == TemperatureUnit.CELSIUS
-            else UnitConflictAction.CONVERT_TO_KELVIN
-        ),
+        action_taken=UnitConflictAction.COACH_RESOLVED,
         original_raw=conflict.original_raw,
         resolved_value=resolved_value,
         resolved_unit=resolved_unit,

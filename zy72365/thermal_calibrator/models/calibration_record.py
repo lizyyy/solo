@@ -21,9 +21,11 @@ class RecordStatus(enum.Enum):
 
 class UnitConflictAction(enum.Enum):
     KEEP_ORIGINAL = "keep_original"
-    CONVERT_TO_CELSIUS = "convert_to_celsius"
-    CONVERT_TO_KELVIN = "convert_to_kelvin"
-    NEEDS_COACH_REVIEW = "needs_coach_review"
+    AUTO_CONVERT_KELVIN_TO_CELSIUS = "auto_convert_kelvin_to_celsius"
+    AUTO_CONVERT_CELSIUS_TO_KELVIN = "auto_convert_celsius_to_kelvin"
+    PENDING_COACH_REVIEW = "pending_coach_review"
+    COACH_RESOLVED = "coach_resolved"
+    ROLLED_BACK = "rolled_back"
 
 
 @dataclass
