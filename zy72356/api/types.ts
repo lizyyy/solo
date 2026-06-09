@@ -15,6 +15,8 @@ export interface RecordDetail {
   updatedAt: string
 }
 
+export type OperatorRole = 'engineer' | 'maintenance_worker' | 'training_coach' | 'system'
+
 export interface AuditLogEntry {
   id: string
   recordId: string

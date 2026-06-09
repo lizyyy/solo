@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { fetchReport } from '@/api'
 
 export interface RecordDetail {
   id: string
@@ -64,7 +65,7 @@ interface AppState {
   setRecordsLoading: (loading: boolean) => void
   setRecordsPage: (page: number) => void
   setRecordsFilter: (filter: AppState['recordsFilter']) => void
-  updateRecord: (record: RecordDetail) => void
+  updateRecord: (record: RecordDetail) => Promise<void>
 
   selectedRecord: RecordDetail | null
   setSelectedRecord: (record: RecordDetail | null) => void
@@ -78,12 +79,13 @@ interface AppState {
   reportSummary: ReportSummary | null
   reportGroups: ReportGroup[]
   setReport: (summary: ReportSummary, groups: ReportGroup[]) => void
+  refreshReport: () => Promise<void>
 
   importResult: { imported: number; mixed: number; normal: number } | null
   setImportResult: (result: AppState['importResult']) => void
 }
 
-export const useStore = create<AppState>((set) => ({
+export const useStore = create<AppState>((set, get) => ({
   currentRole: 'training_coach',
   setCurrentRole: (role) => set({ currentRole: role }),
 
@@ -97,11 +99,32 @@ export const useStore = create<AppState>((set) => ({
   setRecordsLoading: (loading) => set({ recordsLoading: loading }),
   setRecordsPage: (page) => set({ recordsPage: page }),
   setRecordsFilter: (filter) => set({ recordsFilter: filter, recordsPage: 1 }),
-  updateRecord: (record) =>
-    set((state) => ({
-      records: state.records.map((r) => (r.id === record.id ? record : r)),
-      selectedRecord: state.selectedRecord?.id === record.id ? record : state.selectedRecord,
-    })),
+  updateRecord: async (record) => {
+    const state = get()
+    const updatedRecords = state.records.map((r) =>
+      r.id === record.id ? record : r
+    )
+    const updatedSelected = state.selectedRecord?.id === record.id ? record : state.selectedRecord
+
+    const updatedGroups = state.reportGroups.map((g) =>
+      g.records.some((r) => r.id === record.id)
+        ? { ...g, records: g.records.map((r) => (r.id === record.id ? record : r)) }
+        : g
+    )
+
+    let updatedSummary = state.reportSummary
+    try {
+      const fresh = await fetchReport()
+      updatedSummary = fresh.summary
+    } catch (_e) {}
+
+    set({
+      records: updatedRecords,
+      selectedRecord: updatedSelected,
+      reportGroups: updatedGroups,
+      reportSummary: updatedSummary,
+    })
+  },
 
   selectedRecord: null,
   setSelectedRecord: (record) => set({ selectedRecord: record }),
@@ -115,6 +138,14 @@ export const useStore = create<AppState>((set) => ({
   reportSummary: null,
   reportGroups: [],
   setReport: (summary, groups) => set({ reportSummary: summary, reportGroups: groups }),
+  refreshReport: async () => {
+    try {
+      const result = await fetchReport()
+      set({ reportSummary: result.summary, reportGroups: result.groups })
+    } catch (e) {
+      console.error('Failed to refresh report:', e)
+    }
+  },
 
   importResult: null,
   setImportResult: (result) => set({ importResult: result }),

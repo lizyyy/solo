@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useStore } from '@/store'
 import { fetchRecords, reviewRecord, confirmRecord, rollbackRecord, fetchAuditLogs, uploadPhoto, fetchPhotos } from '@/api'
 import { StatusBadge, CredibilityBadge, UnitBadge, SourceBadge } from '@/components/Badges'
-import { ClipboardCheck, Camera, History, RotateCcw, CheckCircle, Image, X, Eye } from 'lucide-react'
+import { ClipboardCheck, Camera, History, RotateCcw, CheckCircle, Image, X, Eye, ArrowRight, Shield, UserCheck } from 'lucide-react'
 import type { RecordDetail, AuditLogEntry, PhotoEntry } from '@/store'
 import { cn } from '@/lib/utils'
 
@@ -34,6 +34,7 @@ export default function ReviewPage() {
     setPhotos,
     updateRecord,
     currentRole,
+    refreshReport,
   } = useStore()
 
   const [statusFilter, setStatusFilter] = useState<string>(recordsFilter.status || 'mixed_unit')
@@ -88,12 +89,14 @@ export default function ReviewPage() {
     if (noteValue) payload.note = noteValue
     try {
       const updated = await reviewRecord(selectedRecord.id, payload)
-      updateRecord(updated as RecordDetail)
+      await updateRecord(updated as RecordDetail)
+      await refreshReport()
       setNoteValue('')
       setCorrectedValue('')
+      await loadRecords()
       await loadDetail(selectedRecord.id)
     } catch (e: any) {
-      alert(e.message)
+      alert('复核失败：' + (e.message || e))
     }
   }
 
@@ -101,11 +104,13 @@ export default function ReviewPage() {
     if (!selectedRecord) return
     try {
       const updated = await confirmRecord(selectedRecord.id, currentRole, noteValue || undefined)
-      updateRecord(updated as RecordDetail)
+      await updateRecord(updated as RecordDetail)
+      await refreshReport()
       setNoteValue('')
+      await loadRecords()
       await loadDetail(selectedRecord.id)
     } catch (e: any) {
-      alert(e.message)
+      alert('确认失败：' + (e.message || e))
     }
   }
 
@@ -113,12 +118,14 @@ export default function ReviewPage() {
     if (!selectedRecord || !rollbackReason.trim()) return
     try {
       const updated = await rollbackRecord(selectedRecord.id, rollbackReason, currentRole)
-      updateRecord(updated as RecordDetail)
+      await updateRecord(updated as RecordDetail)
+      await refreshReport()
       setRollbackReason('')
       setShowRollback(false)
+      await loadRecords()
       await loadDetail(selectedRecord.id)
     } catch (e: any) {
-      alert(e.message)
+      alert('回滚失败：' + (e.message || e))
     }
   }
 
@@ -274,6 +281,8 @@ export default function ReviewPage() {
                     <CredibilityBadge credibility={selectedRecord.credibility} />
                     <SourceBadge source={selectedRecord.source} />
                   </div>
+
+                  <NextStepPanel record={selectedRecord} />
 
                   <div>
                     <p className="text-xs text-slate-500 mb-1">工况照片</p>
@@ -475,6 +484,93 @@ export default function ReviewPage() {
           </button>
         </div>
       )}
+    </div>
+  )
+}
+
+function NextStepPanel({ record }: { record: RecordDetail }) {
+  const { text, action, iconClass, bgClass, borderClass, owner } = (() => {
+    if (record.status === 'confirmed') {
+      return {
+        text: '训练教练已确认，记录完成，可纳入交接报告。',
+        action: '无待办',
+        iconClass: 'text-emerald-700',
+        bgClass: 'bg-emerald-50',
+        borderClass: 'border-emerald-200',
+        owner: '—',
+      }
+    }
+    if (record.status === 'rolled_back') {
+      return {
+        text: '已回滚至传感器原始值。如需重新确认，请训练教练重新处理。',
+        action: '请训练教练复核',
+        iconClass: 'text-slate-700',
+        bgClass: 'bg-slate-50',
+        borderClass: 'border-slate-200',
+        owner: '训练教练',
+      }
+    }
+    if (record.correctedValue !== null && record.credibility === 'photo_trusted') {
+      return {
+        text: '维修师傅已通过工况照片补看，标记为照片可信。请训练教练查看修正结果并确认。',
+        action: '等待训练教练确认',
+        iconClass: 'text-indigo-700',
+        bgClass: 'bg-indigo-50',
+        borderClass: 'border-indigo-200',
+        owner: '训练教练',
+      }
+    }
+    if (record.status === 'mixed_unit' || record.credibility === 'pending_confirmation') {
+      return {
+        text: '同一传感器编号存在摄氏度/开尔文混用，请维修师傅先补看工况照片，再交由训练教练复核。',
+        action: '① 维修师傅补看照片 → ② 训练教练复核确认',
+        iconClass: 'text-amber-700',
+        bgClass: 'bg-amber-50',
+        borderClass: 'border-amber-200',
+        owner: '维修师傅 → 训练教练',
+      }
+    }
+    if (record.status === 'anomaly') {
+      return {
+        text: '已做修正，请训练教练复核后确认或回滚。',
+        action: '请训练教练复核确认',
+        iconClass: 'text-orange-700',
+        bgClass: 'bg-orange-50',
+        borderClass: 'border-orange-200',
+        owner: '训练教练',
+      }
+    }
+    return {
+      text: '数据正常，单位一致，无需额外处理。',
+      action: '无需处理',
+      iconClass: 'text-emerald-700',
+      bgClass: 'bg-emerald-50',
+      borderClass: 'border-emerald-200',
+      owner: '—',
+    }
+  })()
+
+  return (
+    <div className={`${bgClass} ${borderClass} border rounded-lg p-3`}>
+      <div className="flex items-start gap-2">
+        <UserCheck size={16} className={`mt-0.5 ${iconClass} flex-shrink-0`} />
+        <div className="flex-1 text-xs">
+          <p className={`font-semibold mb-1 ${iconClass} flex items-center gap-1`}>
+            <Shield size={12} />
+            下一步处理
+            {owner !== '—' && (
+              <span className="ml-auto font-mono font-normal bg-white/60 px-1.5 py-0.5 rounded border border-current/20">
+                负责人：{owner}
+              </span>
+            )}
+          </p>
+          <p className="text-slate-700 leading-relaxed mb-1">{text}</p>
+          <p className="font-mono text-[11px] text-slate-500 flex items-center gap-1">
+            <ArrowRight size={10} />
+            {action}
+          </p>
+        </div>
+      </div>
     </div>
   )
 }

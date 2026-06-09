@@ -59,9 +59,33 @@ function detectMixedUnits(records: Array<{ sensorId: string; temperatureUnit: Te
 }
 
 function assertCoachRole(operatorRole: string, action: string) {
-  if (operatorRole !== 'coach') {
-    throw new Error(`权限不足：只有教练才能${action}`)
+  const normalized = normalizeRole(operatorRole)
+  if (normalized !== 'training_coach') {
+    throw new Error(`权限不足：只有训练教练才能${action}，当前角色：${roleToLabel(operatorRole)}`)
   }
+}
+
+export function normalizeRole(role: string): string {
+  const legacyMap: Record<string, string> = {
+    'coach': 'training_coach',
+    'senior': 'training_coach',
+    'trainer': 'training_coach',
+    'engineer_lead': 'engineer',
+    'maintenance': 'maintenance_worker',
+    'repair': 'maintenance_worker',
+  }
+  return legacyMap[role] || role
+}
+
+export function roleToLabel(role: string): string {
+  const r = normalizeRole(role)
+  const map: Record<string, string> = {
+    'training_coach': '训练教练',
+    'maintenance_worker': '维修师傅',
+    'engineer': '实验工程师',
+    'system': '系统',
+  }
+  return map[r] || r
 }
 
 export async function importFromCsv(fileBuffer: Buffer, fileName: string): Promise<{
@@ -272,7 +296,7 @@ export async function reviewRecord(
   await createAuditLog(
     id,
     'review',
-    data.operatorRole,
+    normalizeRole(data.operatorRole),
     oldValue,
     JSON.stringify({
       correctedValue: newCorrectedValue,
@@ -326,7 +350,7 @@ export async function confirmRecord(
   await createAuditLog(
     id,
     'confirm',
-    operatorRole,
+    normalizeRole(operatorRole),
     oldValue,
     JSON.stringify({ status: 'confirmed', credibility: 'photo_trusted' }),
     newNote || '教练确认'
@@ -376,7 +400,7 @@ export async function rollbackRecord(
   await createAuditLog(
     id,
     'rollback',
-    operatorRole,
+    normalizeRole(operatorRole),
     oldValue,
     JSON.stringify({ status: 'rolled_back', reason }),
     reason
@@ -392,11 +416,16 @@ export async function getReport(): Promise<ReportResponse> {
 
   const records = allRecords.map(mapRowToRecord)
 
+  const isPending = (r: RecordDetail) =>
+    r.status === 'mixed_unit' ||
+    r.status === 'anomaly' ||
+    r.credibility === 'pending_confirmation'
+
   const summary: ReportSummary = {
     totalRecords: records.length,
     normalCount: records.filter(r => r.status === 'normal').length,
     mixedCount: records.filter(r => r.status === 'mixed_unit').length,
-    pendingCount: records.filter(r => r.status === 'anomaly').length,
+    pendingCount: records.filter(isPending).length,
     confirmedCount: records.filter(r => r.status === 'confirmed').length,
     rolledBackCount: records.filter(r => r.status === 'rolled_back').length,
   }
@@ -419,17 +448,50 @@ export async function getReport(): Promise<ReportResponse> {
 
 export async function getReportCsv(): Promise<string> {
   const report = await getReport()
+
+  const statusToLabel: Record<string, string> = {
+    normal: '正常',
+    mixed_unit: '混用待复核',
+    anomaly: '已修正待确认',
+    confirmed: '教练已确认',
+    rolled_back: '已回滚',
+  }
+  const credibilityToLabel: Record<string, string> = {
+    sensor_trusted: '传感器可信',
+    photo_trusted: '工况照片可信',
+    pending_confirmation: '待训练教练复核',
+  }
+  const sourceToLabel: Record<string, string> = {
+    sensor_original: '传感器原始',
+    photo_corrected: '维修师傅补看照片修正',
+    coach_confirmed: '训练教练确认',
+    rolled_back: '训练教练回滚',
+  }
+  const nextStepFor = (r: RecordDetail): string => {
+    if (r.status === 'confirmed') return '记录已完成，无待办'
+    if (r.status === 'rolled_back') return '已回滚至原始值，如需确认请训练教练处理'
+    if (r.credibility === 'pending_confirmation') return '请训练教练复核并确认/回滚'
+    if (r.correctedValue !== null) return '已标记照片可信，请训练教练确认'
+    if (r.status === 'mixed_unit') return '同一传感器单位混用，请维修师傅先补看工况照片，再由训练教练复核'
+    if (r.status === 'anomaly') return '请训练教练确认'
+    return '数据正常，无需处理'
+  }
+
   const header = [
     '传感器ID',
     '原始行号',
     '原始温度',
     '原始单位',
-    '显示温度',
-    '显示单位',
-    '状态',
-    '可信度',
-    '来源',
-    '备注',
+    '修正后温度',
+    '修正后单位',
+    '展示温度',
+    '展示单位',
+    '处理状态',
+    '可信度结论',
+    '数据来源',
+    '单位混用风险',
+    '处理备注',
+    '下一步找谁',
     '批次ID',
     '创建时间',
     '更新时间',
@@ -440,13 +502,17 @@ export async function getReportCsv(): Promise<string> {
       r.sensorId,
       r.originalLineNo,
       r.temperatureValue,
-      r.temperatureUnit,
+      r.temperatureUnit === 'C' ? '°C' : 'K',
+      r.correctedValue !== null ? r.correctedValue : '',
+      r.correctedUnit !== null ? (r.correctedUnit === 'C' ? '°C' : 'K') : '',
       r.correctedValue ?? r.temperatureValue,
-      r.correctedUnit ?? r.temperatureUnit,
-      r.status,
-      r.credibility ?? '',
-      r.source,
+      (r.correctedUnit ?? r.temperatureUnit) === 'C' ? '°C' : 'K',
+      statusToLabel[r.status] ?? r.status,
+      r.credibility ? (credibilityToLabel[r.credibility] ?? r.credibility) : '',
+      sourceToLabel[r.source] ?? r.source,
+      r.status === 'mixed_unit' ? '是 - 同一传感器两种单位混用' : (r.credibility === 'pending_confirmation' ? '待复核确认' : '否'),
       r.note ?? '',
+      nextStepFor(r),
       r.batchId,
       r.createdAt,
       r.updatedAt,

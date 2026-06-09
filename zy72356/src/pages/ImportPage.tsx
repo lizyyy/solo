@@ -21,7 +21,7 @@ export default function ImportPage() {
     try {
       const result = await importRecords(file)
       setImportResult({ imported: result.imported, mixed: result.mixed, normal: result.normal })
-      await loadRecords()
+      await Promise.all([loadRecords(), useStore.getState().refreshReport()])
     } catch (e: any) {
       setError(e.message || '导入失败')
     } finally {

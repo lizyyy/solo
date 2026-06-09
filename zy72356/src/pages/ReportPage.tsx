@@ -2,16 +2,26 @@ import { useState, useEffect } from 'react'
 import { useStore } from '@/store'
 import { fetchReport, getReportExportUrl } from '@/api'
 import { StatusBadge, CredibilityBadge, SourceBadge, UnitBadge } from '@/components/Badges'
-import { FileBarChart, Download, AlertTriangle, CheckCircle2, Clock, AlertCircle, RotateCcw, ChevronDown, ChevronUp } from 'lucide-react'
+import { FileBarChart, Download, AlertTriangle, CheckCircle2, Clock, AlertCircle, RotateCcw, ChevronDown, ChevronUp, ArrowRight, UserCheck } from 'lucide-react'
 import type { RecordDetail } from '@/store'
 
+const statusToLabel: Record<string, string> = {
+  normal: '正常',
+  mixed_unit: '混用待复核',
+  anomaly: '已修正待确认',
+  confirmed: '教练已确认',
+  rolled_back: '已回滚',
+}
+
 export default function ReportPage() {
-  const { reportSummary, reportGroups, setReport, currentRole } = useStore()
+  const { reportSummary, reportGroups, setReport, currentRole, refreshReport } = useStore()
   const [expandedSensor, setExpandedSensor] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     loadReport()
+    const timer = setInterval(() => refreshReport(), 15000)
+    return () => clearInterval(timer)
   }, [])
 
   async function loadReport() {
@@ -28,6 +38,17 @@ export default function ReportPage() {
 
   const displayValue = (r: RecordDetail) => r.correctedValue ?? r.temperatureValue
   const displayUnit = (r: RecordDetail) => r.correctedUnit ?? r.temperatureUnit
+
+  const nextStepFor = (r: RecordDetail): { label: string; owner: string; colorClass: string } => {
+    if (r.status === 'confirmed') return { label: '记录已完成', owner: '—', colorClass: 'text-emerald-600' }
+    if (r.status === 'rolled_back') return { label: '已回滚至原始值', owner: '训练教练复核', colorClass: 'text-slate-600' }
+    if (r.correctedValue !== null && r.credibility === 'photo_trusted')
+      return { label: '照片可信已标记', owner: '训练教练确认', colorClass: 'text-indigo-600' }
+    if (r.status === 'mixed_unit' || r.credibility === 'pending_confirmation')
+      return { label: '混用待处理', owner: '维修师傅 → 训练教练', colorClass: 'text-amber-700' }
+    if (r.status === 'anomaly') return { label: '已修正待确认', owner: '训练教练', colorClass: 'text-orange-600' }
+    return { label: '正常无待办', owner: '—', colorClass: 'text-emerald-600' }
+  }
 
   const StatCard = ({ icon: Icon, label, value, colorClass, bgClass, borderClass }: any) => (
     <div className={`${bgClass} ${borderClass} rounded-xl p-4 border`}>
@@ -195,11 +216,15 @@ export default function ReportPage() {
                           <th className="px-5 py-2 text-left font-medium text-slate-500">状态</th>
                           <th className="px-5 py-2 text-left font-medium text-slate-500">可信度</th>
                           <th className="px-5 py-2 text-left font-medium text-slate-500">数据来源</th>
+                          <th className="px-5 py-2 text-left font-medium text-slate-500">处理状态</th>
+                          <th className="px-5 py-2 text-left font-medium text-slate-500">下一步找谁</th>
                           <th className="px-5 py-2 text-left font-medium text-slate-500">备注</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-200">
-                        {group.records.map((r) => (
+                        {group.records.map((r) => {
+                          const step = nextStepFor(r)
+                          return (
                           <tr key={r.id} className={r.status === 'mixed_unit' ? 'bg-amber-50/60' : ''}>
                             <td className="px-5 py-2.5 font-mono text-slate-500">{r.originalLineNo}</td>
                             <td className="px-5 py-2.5 font-mono text-right text-slate-500">
@@ -211,11 +236,25 @@ export default function ReportPage() {
                             <td className="px-5 py-2.5"><StatusBadge status={r.status} /></td>
                             <td className="px-5 py-2.5"><CredibilityBadge credibility={r.credibility} /></td>
                             <td className="px-5 py-2.5"><SourceBadge source={r.source} /></td>
+                            <td className="px-5 py-2.5 text-xs font-mono">{statusToLabel[r.status] || r.status}</td>
+                            <td className="px-5 py-2.5">
+                              <div className="text-xs">
+                                <p className={`font-medium ${step.colorClass} flex items-center gap-1`}>
+                                  <UserCheck size={12} />
+                                  {step.label}
+                                </p>
+                                <p className="text-slate-500 mt-0.5 flex items-center gap-1">
+                                  <ArrowRight size={10} />
+                                  {step.owner}
+                                </p>
+                              </div>
+                            </td>
                             <td className="px-5 py-2.5 text-slate-600 text-xs max-w-xs truncate" title={r.note || ''}>
                               {r.note || '-'}
                             </td>
                           </tr>
-                        ))}
+                          )
+                        })}
                       </tbody>
                     </table>
                   </div>

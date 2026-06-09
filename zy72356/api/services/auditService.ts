@@ -1,6 +1,7 @@
 import { getDb } from '../db.js'
 import { v4 as uuidv4 } from 'uuid'
 import type { AuditLogEntry } from '../types.js'
+import { normalizeRole } from './recordService.js'
 
 export async function createAuditLog(
   recordId: string,
@@ -13,11 +14,12 @@ export async function createAuditLog(
   const db = await getDb()
   const id = uuidv4()
   const now = new Date().toISOString()
+  const normalizedRole = normalizeRole(operatorRole)
   db.run(`
     INSERT INTO audit_logs (id, record_id, action, operator_role, old_value, new_value, note, created_at)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-  `, [id, recordId, action, operatorRole, oldValue, newValue, note, now])
-  return { id, recordId, action, operatorRole, oldValue, newValue, note, createdAt: now }
+  `, [id, recordId, action, normalizedRole, oldValue, newValue, note, now])
+  return { id, recordId, action, operatorRole: normalizedRole, oldValue, newValue, note, createdAt: now }
 }
 
 export async function getAuditLogsByRecordId(recordId: string): Promise<AuditLogEntry[]> {
@@ -29,7 +31,7 @@ export async function getAuditLogsByRecordId(recordId: string): Promise<AuditLog
     id: row[0],
     recordId: row[1],
     action: row[2],
-    operatorRole: row[3],
+    operatorRole: normalizeRole(row[3] ?? ''),
     oldValue: row[4],
     newValue: row[5],
     note: row[6],
