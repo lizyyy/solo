@@ -41,17 +41,95 @@ class UnifiedDataAccess {
         showOriginalLineNumber: true,
         showManualChanges: true,
         showQualityReviewStatus: true,
-        highlightMissingTime: true
-      }
+        highlightMissingTime: true,
+        showNextStepHint: true
+      },
+      list: this.getListForDisplay(evaluationId).list,
+      history: this.getHistoryForDisplay(evaluationId).history,
+      dataSource: 'integratedResults（同一份数据，保证三处一致）'
+    };
+  }
+
+  getListForDisplay(evaluationId) {
+    return this.workflow.engine.getDisplayList(evaluationId);
+  }
+
+  getDetailForDisplay(evaluationId, recordId) {
+    return this.workflow.engine.getDetail(evaluationId, recordId);
+  }
+
+  getHistoryForDisplay(evaluationId) {
+    const exportData = this.workflow.engine.getExportDetails(evaluationId);
+    return {
+      summary: exportData.summary,
+      history: exportData.history
     };
   }
 
   getResultsForExport(evaluationId) {
-    return this.workflow.getExportData(evaluationId);
+    return this.workflow.engine.getExportDetails(evaluationId);
+  }
+
+  getReport(evaluationId) {
+    const exportData = this.workflow.engine.getExportDetails(evaluationId);
+    const unified = this.workflow.getUnifiedResults(evaluationId);
+    
+    return {
+      reportId: `RPT-${evaluationId.slice(0, 8)}-v${unified.version}`,
+      generatedAt: new Date().toISOString(),
+      evaluation: {
+        id: evaluationId,
+        version: unified.version,
+        workflowStage: unified.workflowStage,
+        operator: unified.operator || '老唐'
+      },
+      overview: exportData.summary,
+      selfCheckReport: exportData.selfCheckReport,
+      durationBreakdown: unified.summary.durationBreakdown,
+      pendingActions: unified.records
+        .filter(r => r.needsQualityReview)
+        .map(r => ({
+          sourceLine: r.sourceLineNumber,
+          sensorId: r.sensorId,
+          issue: r.sampleTimeIssue.description,
+          missingMinutes: r.sampleTimeIssue.missingMinutes || 0,
+          nextHandler: r.qualityReview.nextHandler,
+          nextAction: r.qualityReview.nextStepDescription
+        })),
+      recordAudits: unified.records.map(r => ({
+        sourceLine: r.sourceLineNumber,
+        sensorId: r.sensorId,
+        siteStatement: r.siteStatement,
+        originalInput: r.originalData,
+        sampleTimeIssue: r.sampleTimeIssue,
+        corrections: r.manualChanges.map(c => ({
+          field: c.field,
+          originalValue: c.oldValue,
+          correctedValue: c.newValue,
+          operator: c.operator,
+          reason: c.reason,
+          at: c.timestamp
+        })),
+        review: {
+          status: r.qualityReview.status,
+          reviewer: r.qualityReview.reviewer,
+          decision: r.qualityReview.decision,
+          notes: r.qualityReview.reviewNotes,
+          nextHandler: r.qualityReview.nextHandler,
+          nextStepDescription: r.qualityReview.nextStepDescription
+        },
+        processingStatus: r.processingStatus,
+        isInNormalResults: r.qualityReview.status === 'approved' && r.durationCompliant
+      })),
+      consistencyGuarantee: exportData.dataConsistencyNote,
+      changeLog: unified.changeLog
+    };
   }
 
   getResultsForAPI(evaluationId) {
     const unified = this.workflow.getUnifiedResults(evaluationId);
+    const list = this.getListForDisplay(evaluationId);
+
     return {
       code: 200,
       message: 'success',
@@ -61,21 +139,29 @@ class UnifiedDataAccess {
         workflowStage: unified.workflowStage,
         selfCheck: unified.selfCheckResults,
         summary: unified.summary,
+        list: list.list,
         records: unified.records.map(r => ({
           id: r.recordId,
           sourceLine: r.sourceLineNumber,
           sensorId: r.sensorId,
           calibrationTime: r.calibrationTime,
+          sampleStartTime: r.sampleStartTime,
+          sampleEndTime: r.sampleEndTime,
+          sampleDurationMinutes: r.sampleDurationMinutes,
           temperature: r.temperature,
           humidity: r.humidity,
           siteStatement: r.siteStatement,
           installLocation: r.installLocation,
-          status: r.processingStatus,
+          sampleTimeIssue: r.sampleTimeIssue,
           hasMissingSampleTime: r.hasMissingSampleTime,
           needsQualityReview: r.needsQualityReview,
-          qualityReviewStatus: r.qualityReviewStatus
-        }))
-      }
+          processingStatus: r.processingStatus,
+          qualityReview: r.qualityReview,
+          durationCompliant: r.durationCompliant
+        })),
+        changeLog: unified.changeLog
+      },
+      consistency: unified.summary.consistency
     };
   }
 
@@ -91,38 +177,134 @@ class UnifiedDataAccess {
     const display = this.getResultsForDisplay(evaluationId);
     const api = this.getResultsForAPI(evaluationId);
     const exportData = this.getResultsForExport(evaluationId);
+    const list = this.getListForDisplay(evaluationId);
+    const report = this.getReport(evaluationId);
 
     const displayCount = display.records.length;
+    const listCount = list.total;
     const apiCount = api.data.records.length;
     const exportCount = exportData.details.length;
+    const historyCount = exportData.history.length;
+    const reportCount = report.recordAudits.length;
 
     const displayMissingCount = display.records.filter(r => r.hasMissingSampleTime).length;
+    const listMissingCount = list.list.filter(r => r.hasIssue).length;
     const apiMissingCount = api.data.records.filter(r => r.hasMissingSampleTime).length;
     const exportMissingCount = exportData.details.filter(r => r.采样时间缺失 === '是').length;
+    const historyMissingCount = exportData.history.filter(
+      h => h.初始问题类型 !== 'none'
+    ).length;
+    const reportMissingCount = report.recordAudits.filter(
+      r => r.sampleTimeIssue.type !== 'none'
+    ).length;
 
-    const isConsistent = (
-      displayCount === apiCount && 
+    const displayReviewCount = display.records.filter(r => r.needsQualityReview).length;
+    const listReviewCount = list.list.filter(r => r.needsReview).length;
+    const apiReviewCount = api.data.records.filter(r => r.needsQualityReview).length;
+    const exportReviewCount = exportData.details.filter(r => r.需质检员复核 === '是').length;
+    const historyReviewCount = exportData.history.filter(
+      h => h.复核状态 === 'pending' || h.复核状态 === 'rejected'
+    ).length;
+    const reportReviewCount = report.pendingActions.length;
+
+    const allCountConsistent = (
+      displayCount === listCount &&
+      listCount === apiCount &&
       apiCount === exportCount &&
-      displayMissingCount === apiMissingCount &&
-      apiMissingCount === exportMissingCount
+      exportCount === historyCount &&
+      historyCount === reportCount
     );
+
+    const allMissingConsistent = (
+      displayMissingCount === listMissingCount &&
+      listMissingCount === apiMissingCount &&
+      apiMissingCount === exportMissingCount &&
+      exportMissingCount === historyMissingCount &&
+      historyMissingCount === reportMissingCount
+    );
+
+    const allReviewConsistent = (
+      displayReviewCount === listReviewCount &&
+      listReviewCount === apiReviewCount &&
+      apiReviewCount === exportReviewCount &&
+      exportReviewCount === historyReviewCount &&
+      historyReviewCount === reportReviewCount
+    );
+
+    const sampleRecord = display.records[0];
+    const sampleListRecord = list.list[0];
+    const sampleAPIRecord = api.data.records[0];
+    const sampleExportRecord = exportData.details[0];
+
+    const fieldConsistencyChecks = sampleRecord ? {
+      sourceLine: {
+        display: sampleRecord.sourceLineNumber,
+        list: sampleListRecord.row,
+        api: sampleAPIRecord.sourceLine,
+        export: sampleExportRecord.原始行号,
+        consistent: (
+          sampleRecord.sourceLineNumber === sampleListRecord.row &&
+          sampleListRecord.row === sampleAPIRecord.sourceLine &&
+          sampleAPIRecord.sourceLine === sampleExportRecord.原始行号
+        )
+      },
+      sensorId: {
+        display: sampleRecord.sensorId,
+        list: sampleListRecord.sensorId,
+        api: sampleAPIRecord.sensorId,
+        export: sampleExportRecord.传感器编号,
+        consistent: (
+          sampleRecord.sensorId === sampleListRecord.sensorId &&
+          sampleListRecord.sensorId === sampleAPIRecord.sensorId &&
+          sampleAPIRecord.sensorId === sampleExportRecord.传感器编号
+        )
+      }
+    } : {};
+
+    const isConsistent = allCountConsistent && allMissingConsistent && allReviewConsistent;
 
     return {
       isConsistent,
+      summary: {
+        totalSourcesVerified: 6,
+        display: '页面展示',
+        list: '列表',
+        api: '接口返回',
+        export: '导出明细',
+        history: '历史记录',
+        report: '报告'
+      },
       checks: {
         recordCount: {
           display: displayCount,
+          list: listCount,
           api: apiCount,
           export: exportCount,
-          consistent: displayCount === apiCount && apiCount === exportCount
+          history: historyCount,
+          report: reportCount,
+          consistent: allCountConsistent
         },
         missingTimeCount: {
           display: displayMissingCount,
+          list: listMissingCount,
           api: apiMissingCount,
           export: exportMissingCount,
-          consistent: displayMissingCount === apiMissingCount && apiMissingCount === exportMissingCount
+          history: historyMissingCount,
+          report: reportMissingCount,
+          consistent: allMissingConsistent
+        },
+        qualityReviewCount: {
+          display: displayReviewCount,
+          list: listReviewCount,
+          api: apiReviewCount,
+          export: exportReviewCount,
+          history: historyReviewCount,
+          report: reportReviewCount,
+          consistent: allReviewConsistent
         }
-      }
+      },
+      sampleFieldConsistency: fieldConsistencyChecks,
+      guarantee: exportData.dataConsistencyNote
     };
   }
 }
