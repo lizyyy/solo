@@ -1,13 +1,16 @@
 from __future__ import annotations
 
+import csv
 import hashlib
-import uuid
+import io
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
 
 from .models import (
     AuditEntry,
+    OVER_THRESHOLD_STATUSES,
     ProcessingStatus,
+    ReviewDecision,
     SensorRecord,
     ThresholdEvent,
     UnitConversionNote,
@@ -21,6 +24,70 @@ DEFAULT_THRESHOLDS: Dict[str, float] = {
     "current": 150.0,
     "smoke_density": 0.5,
 }
+
+CSV_COLUMN_ALIASES: Dict[str, List[str]] = {
+    "sensor_id": ["传感器编号", "传感器ID", "sensor_id", "sensorId", "id", "编号", "SN", "sn"],
+    "original_row": ["原始行号", "行号", "row", "original_row", "originalRow", "序号"],
+    "timestamp": ["时间戳", "采集时间", "时间", "timestamp", "time", "datetime", "date"],
+    "value": ["值", "数值", "采集值", "测量值", "value", "val", "measurement", "读数", "检测值", "采样值"],
+    "unit": ["单位", "unit", "计量单位", "uom"],
+    "source": ["来源", "数据源", "source", "来源文件", "导入来源"],
+}
+
+
+def normalize_row(raw: Dict[str, Any]) -> Dict[str, Any]:
+    normalized: Dict[str, Any] = {}
+    raw_lower: Dict[str, Any] = {}
+    for k, v in raw.items():
+        raw_lower[str(k).strip().lower()] = (k, v)
+
+    for field_name, aliases in CSV_COLUMN_ALIASES.items():
+        found_key = None
+        found_value = None
+        for alias in aliases:
+            alias_lower = alias.strip().lower()
+            if alias_lower in raw_lower:
+                found_key, found_value = raw_lower[alias_lower]
+                break
+        if found_key is None and field_name in raw:
+            found_value = raw[field_name]
+        if found_value is not None:
+            normalized[field_name] = found_value
+
+    for k, v in raw.items():
+        if k not in CSV_COLUMN_ALIASES and k not in normalized:
+            normalized[k] = v
+
+    if "original_row" not in normalized or normalized.get("original_row") in (None, "", 0):
+        normalized["original_row"] = normalized.get("__row__", 1)
+    try:
+        normalized["original_row"] = int(normalized["original_row"])
+    except (TypeError, ValueError):
+        normalized["original_row"] = int(normalized.get("__row__", 1))
+
+    if "value" in normalized and normalized["value"] is not None and normalized["value"] != "":
+        try:
+            normalized["value"] = float(normalized["value"])
+        except (TypeError, ValueError):
+            normalized["value"] = 0.0
+
+    for key in ("sensor_id", "timestamp", "unit", "source"):
+        if key in normalized and normalized[key] is not None:
+            normalized[key] = str(normalized[key]).strip()
+
+    return normalized
+
+
+def parse_csv_to_rows(csv_text: str, source_name: str = "") -> List[Dict[str, Any]]:
+    reader = csv.DictReader(io.StringIO(csv_text))
+    rows: List[Dict[str, Any]] = []
+    for idx, raw in enumerate(reader, start=2):
+        enriched = dict(raw)
+        enriched["__row__"] = idx
+        if source_name:
+            enriched["source"] = source_name
+        rows.append(normalize_row(enriched))
+    return rows
 
 
 class ThermalRunawayEngine:
@@ -65,22 +132,40 @@ class ThermalRunawayEngine:
         self.audit_log.append(entry)
         return entry
 
+    def _find_record(self, sensor_id: str, original_row: int) -> Optional[SensorRecord]:
+        for r in self.records:
+            if r.sensor_id == sensor_id and r.original_row == original_row:
+                return r
+        return None
+
+    def _find_event(self, sensor_id: str, original_row: int) -> Optional[ThresholdEvent]:
+        for e in self.threshold_events:
+            if e.sensor_id == sensor_id and e.record_original_row == original_row:
+                return e
+        return None
+
     def import_records(
         self,
         rows: List[Dict[str, Any]],
         dedup: bool = True,
+        source: str = "",
     ) -> Tuple[List[SensorRecord], List[str]]:
         self._batch_counter += 1
         batch_id = f"batch-{self._batch_counter}"
         imported: List[SensorRecord] = []
         skipped_reasons: List[str] = []
 
-        for row in rows:
+        for idx, raw_row in enumerate(rows):
+            row = normalize_row(dict(raw_row))
+            if source and "source" not in row:
+                row["source"] = source
+
             sensor_id = str(row.get("sensor_id", ""))
-            original_row = int(row.get("original_row", 0))
+            original_row = int(row.get("original_row", idx + 1))
             timestamp = str(row.get("timestamp", ""))
             value = float(row.get("value", 0))
             unit = str(row.get("unit", ""))
+            src = str(row.get("source", source or ""))
 
             rec_hash = self._record_hash(sensor_id, original_row, timestamp, value)
 
@@ -101,6 +186,7 @@ class ThermalRunawayEngine:
                 value=value,
                 unit=unit,
                 batch_id=batch_id,
+                source=src,
             )
 
             over_threshold = self._check_threshold(record)
@@ -123,12 +209,24 @@ class ThermalRunawayEngine:
 
         return imported, skipped_reasons
 
+    def import_csv(
+        self,
+        csv_text: str,
+        source_name: str = "",
+        dedup: bool = True,
+    ) -> Tuple[List[SensorRecord], List[str]]:
+        rows = parse_csv_to_rows(csv_text, source_name or "csv_import")
+        return self.import_records(rows, dedup=dedup, source=source_name or "csv_import")
+
     def _check_threshold(self, record: SensorRecord) -> Optional[ThresholdEvent]:
         unit_type = self._infer_unit_type(record.unit)
         threshold = self.thresholds.get(unit_type)
         if threshold is None:
             return None
         if record.value > threshold:
+            existing = self._find_event(record.sensor_id, record.original_row)
+            if existing is not None:
+                return existing
             event = ThresholdEvent(
                 sensor_id=record.sensor_id,
                 record_original_row=record.original_row,
@@ -147,6 +245,8 @@ class ThermalRunawayEngine:
             "°c": "temperature",
             "c": "temperature",
             "℃": "temperature",
+            "k": "temperature",
+            "kelvin": "temperature",
             "v": "voltage",
             "mv": "voltage",
             "a": "current",
@@ -166,14 +266,25 @@ class ThermalRunawayEngine:
 
         avg_value = sum(r.value for r in sensor_records) / len(sensor_records)
         over_threshold_records = [
-            r for r in sensor_records if r.status == ProcessingStatus.THRESHOLD_EXCEEDED
+            r
+            for r in sensor_records
+            if r.status
+            in (
+                ProcessingStatus.THRESHOLD_EXCEEDED,
+                ProcessingStatus.SUPPRESSED_BY_AVERAGE,
+                ProcessingStatus.RECALCULATED,
+                ProcessingStatus.AWAITING_REVIEW,
+            )
         ]
 
         results: List[Dict[str, Any]] = []
         for rec in over_threshold_records:
             unit_type = self._infer_unit_type(rec.unit)
             threshold = self.thresholds.get(unit_type, 0)
-            if avg_value <= threshold:
+            if threshold == 0:
+                continue
+            original_over = rec.value > threshold
+            if avg_value <= threshold and original_over:
                 findings = {
                     "sensor_id": sensor_id,
                     "original_row": rec.original_row,
@@ -187,23 +298,62 @@ class ThermalRunawayEngine:
                         f"但平均值{avg_value:.2f}低于阈值，原始超阈值记录不应被平均值掩盖"
                     ),
                 }
+
+                old_record_status = rec.status
+                rec.status = ProcessingStatus.SUPPRESSED_BY_AVERAGE
+
+                event = self._find_event(sensor_id, rec.original_row)
+                old_event_status = None
+                if event is not None:
+                    old_event_status = event.status
+                    event.status = ProcessingStatus.SUPPRESSED_BY_AVERAGE
+                    event.average_value = avg_value
+                    event.suppressed_by_avg = True
+                    if not event.next_reviewer:
+                        event.next_reviewer = "维修师傅"
+
                 self._add_audit(
                     sensor_id,
                     rec.original_row,
-                    "suppression_check",
-                    "未检测",
-                    "超阈值记录被平均值盖掉",
+                    "status",
+                    old_record_status.value,
+                    ProcessingStatus.SUPPRESSED_BY_AVERAGE.value,
                     findings["detail"],
                 )
+                if event is not None:
+                    self._add_audit(
+                        sensor_id,
+                        rec.original_row,
+                        "event.suppressed_by_avg",
+                        "false" if old_event_status else "未设置",
+                        f"true (avg={avg_value:.2f})",
+                        "平均值掩盖检测结果写入事件",
+                    )
+                    self._add_audit(
+                        sensor_id,
+                        rec.original_row,
+                        "next_reviewer",
+                        "",
+                        event.next_reviewer,
+                        "超阈值记录被平均值盖掉，需维修师傅复核",
+                    )
+
                 results.append(findings)
 
         return results
+
+    def run_all_suppression_checks(self) -> List[Dict[str, Any]]:
+        all_findings: List[Dict[str, Any]] = []
+        sensor_ids = sorted(set(r.sensor_id for r in self.records))
+        for sid in sensor_ids:
+            all_findings.extend(self.compute_average_suppression_check(sid))
+        return all_findings
 
     def recalculate_after_supplement(
         self,
         supplement_rows: List[Dict[str, Any]],
     ) -> Tuple[List[SensorRecord], List[ThresholdEvent]]:
-        imported, skipped = self.import_records(supplement_rows)
+        imported, skipped = self.import_records(supplement_rows, source="supplement")
 
         new_events: List[ThresholdEvent] = []
         affected_sensors = set()
@@ -220,14 +370,10 @@ class ThermalRunawayEngine:
                 ProcessingStatus.RECALCULATED.value,
                 "补录后重新计算",
             )
-            if old_status == ProcessingStatus.THRESHOLD_EXCEEDED:
-                matching_events = [
-                    e
-                    for e in self.threshold_events
-                    if e.sensor_id == rec.sensor_id
-                    and e.record_original_row == rec.original_row
-                ]
-                new_events.extend(matching_events)
+            event = self._find_event(rec.sensor_id, rec.original_row)
+            if event is not None:
+                event.status = ProcessingStatus.RECALCULATED
+                new_events.append(event)
 
         for sid in affected_sensors:
             for existing in self.records:
@@ -246,11 +392,142 @@ class ThermalRunawayEngine:
                         ProcessingStatus.RECALCULATED.value,
                         "因补录数据触发重算",
                     )
+                    ev = self._find_event(sid, existing.original_row)
+                    if ev is not None:
+                        ev.status = ProcessingStatus.RECALCULATED
 
-        for sensor_id in affected_sensors:
-            self.compute_average_suppression_check(sensor_id)
+        self.run_all_suppression_checks()
 
         return imported, new_events
+
+    def amend_sensor_value(
+        self,
+        sensor_id: str,
+        original_row: int,
+        new_value: float,
+        amendment_note: str,
+    ) -> bool:
+        record = self._find_record(sensor_id, original_row)
+        if record is None:
+            return False
+
+        old_value = record.value
+        record.amended_value = new_value
+        record.amendment_note = amendment_note
+        record.value = new_value
+
+        self._add_audit(
+            sensor_id,
+            original_row,
+            "value",
+            old_value,
+            new_value,
+            f"何工修正读数，原因为: {amendment_note}",
+        )
+        self._add_audit(
+            sensor_id,
+            original_row,
+            "amendment_note",
+            "",
+            amendment_note,
+            "设备工程师修正说明",
+        )
+
+        event = self._find_event(sensor_id, original_row)
+        if event is not None:
+            unit_type = self._infer_unit_type(record.unit)
+            threshold = self.thresholds.get(unit_type, 0)
+            if new_value > threshold:
+                event.value = new_value
+                event.status = ProcessingStatus.AWAITING_REVIEW
+                record.status = ProcessingStatus.AWAITING_REVIEW
+            else:
+                event.value = new_value
+                event.status = ProcessingStatus.AWAITING_REVIEW
+                record.status = ProcessingStatus.AWAITING_REVIEW
+
+            self._add_audit(
+                sensor_id,
+                original_row,
+                "status",
+                (
+                    ProcessingStatus.SUPPRESSED_BY_AVERAGE.value
+                    if event.status == ProcessingStatus.AWAITING_REVIEW
+                    else record.status.value
+                ),
+                ProcessingStatus.AWAITING_REVIEW.value,
+                "修正后等待维修师傅复核",
+            )
+            if not event.next_reviewer:
+                event.next_reviewer = "维修师傅"
+
+        return True
+
+    def manual_review_decision(
+        self,
+        sensor_id: str,
+        original_row: int,
+        final_status: ProcessingStatus,
+        original_statement: str,
+        amended_reason: str,
+        reviewer: str,
+        next_reviewer: str = "",
+        amended_value: Optional[float] = None,
+    ) -> Optional[ReviewDecision]:
+        record = self._find_record(sensor_id, original_row)
+        event = self._find_event(sensor_id, original_row)
+        if record is None:
+            return None
+
+        old_status = record.status
+        record.status = final_status
+
+        decision = ReviewDecision(
+            sensor_id=sensor_id,
+            original_row=original_row,
+            original_value=record.original_import_value or record.value,
+            amended_value=amended_value,
+            original_statement=original_statement,
+            amended_reason=amended_reason,
+            next_reviewer=next_reviewer,
+            decided_at=datetime.now().isoformat(),
+            decided_by=reviewer,
+        )
+
+        if event is not None:
+            event.status = final_status
+            event.review_note = f"{original_statement} | {amended_reason}"
+            event.reviewer = reviewer
+            event.next_reviewer = next_reviewer
+            event.review_decision = decision
+
+        self._add_audit(
+            sensor_id,
+            original_row,
+            "status",
+            old_status.value,
+            final_status.value,
+            f"人工复核决定: {original_statement} → {amended_reason}",
+        )
+        self._add_audit(
+            sensor_id,
+            original_row,
+            "reviewer",
+            "",
+            reviewer,
+            "复核人",
+        )
+        if next_reviewer:
+            self._add_audit(
+                sensor_id,
+                original_row,
+                "next_reviewer",
+                "",
+                next_reviewer,
+                "下一步处理人",
+            )
+
+        return decision
 
     def attach_photo(
         self,
@@ -258,21 +535,24 @@ class ThermalRunawayEngine:
         photo_path: str,
         description: str = "",
         attached_by: str = "",
+        original_row: Optional[int] = None,
     ) -> WorkingConditionPhoto:
         photo = WorkingConditionPhoto(
             sensor_id=sensor_id,
             photo_path=photo_path,
             description=description,
             attached_by=attached_by or self.operator,
+            attached_to_original_row=original_row,
         )
         self.photos.append(photo)
+        row_text = f"第{original_row}行" if original_row else ""
         self._add_audit(
             sensor_id,
-            0,
+            original_row or 0,
             "photo",
             "",
             photo_path,
-            f"关联工况照片: {description}",
+            f"关联{row_text}工况照片: {description}",
         )
         return photo
 
@@ -309,11 +589,7 @@ class ThermalRunawayEngine:
         new_status: ProcessingStatus,
         reason: str = "",
     ) -> bool:
-        record = None
-        for r in self.records:
-            if r.sensor_id == sensor_id and r.original_row == original_row:
-                record = r
-                break
+        record = self._find_record(sensor_id, original_row)
         if record is None:
             return False
 
@@ -328,9 +604,9 @@ class ThermalRunawayEngine:
             reason,
         )
 
-        for event in self.threshold_events:
-            if event.sensor_id == sensor_id and event.record_original_row == original_row:
-                event.status = new_status
+        event = self._find_event(sensor_id, original_row)
+        if event is not None:
+            event.status = new_status
 
         return True
 
@@ -343,8 +619,24 @@ class ThermalRunawayEngine:
     def get_photos_by_sensor(self, sensor_id: str) -> List[WorkingConditionPhoto]:
         return [p for p in self.photos if p.sensor_id == sensor_id]
 
+    def get_photos_by_record(self, sensor_id: str, original_row: int) -> List[WorkingConditionPhoto]:
+        result: List[WorkingConditionPhoto] = []
+        for p in self.photos:
+            if p.sensor_id != sensor_id:
+                continue
+            if p.attached_to_original_row in (original_row, None):
+                result.append(p)
+        return result
+
     def get_audit_by_sensor(self, sensor_id: str) -> List[AuditEntry]:
         return [a for a in self.audit_log if a.sensor_id == sensor_id]
+
+    def get_audit_by_record(self, sensor_id: str, original_row: int) -> List[AuditEntry]:
+        return [
+            a
+            for a in self.audit_log
+            if a.sensor_id == sensor_id and a.original_row in (original_row, 0)
+        ]
 
     def get_unit_conversions(self) -> List[UnitConversionNote]:
         return list(self.unit_notes)
@@ -360,22 +652,24 @@ class ThermalRunawayEngine:
                 if e.sensor_id == rec.sensor_id
                 and e.record_original_row == rec.original_row
             ]
-            is_over = any(
-                e.status
-                in (
-                    ProcessingStatus.THRESHOLD_EXCEEDED,
-                    ProcessingStatus.AWAITING_REVIEW,
-                    ProcessingStatus.CONFIRMED_ABNORMAL,
-                )
-                for e in events
-            )
+
+            is_over = any(e.status in OVER_THRESHOLD_STATUSES for e in events)
+            if rec.status in OVER_THRESHOLD_STATUSES:
+                is_over = True
+
             suppressed = any(
                 e.status == ProcessingStatus.SUPPRESSED_BY_AVERAGE for e in events
+            ) or rec.status == ProcessingStatus.SUPPRESSED_BY_AVERAGE or any(
+                e.suppressed_by_avg for e in events
             )
-            threshold = events[0].threshold if events else 0
 
-            photos = self.get_photos_by_sensor(rec.sensor_id)
-            audit_trail = self.get_audit_by_sensor(rec.sensor_id)
+            threshold = events[0].threshold if events else 0
+            average_value = events[0].average_value if events else None
+            next_reviewer = events[0].next_reviewer if events else ""
+            review_decision = events[0].review_decision if events else None
+
+            photos = self.get_photos_by_record(rec.sensor_id, rec.original_row)
+            audit_trail = self.get_audit_by_record(rec.sensor_id, rec.original_row)
 
             conv_note = conversion_map.get(rec.unit)
             display_value = rec.value
@@ -393,6 +687,12 @@ class ThermalRunawayEngine:
                 status=rec.status,
                 is_over_threshold=is_over,
                 suppressed_by_average=suppressed,
+                average_value=average_value,
+                original_import_value=rec.original_import_value,
+                amended_value=rec.amended_value,
+                amendment_note=rec.amendment_note,
+                next_reviewer=next_reviewer,
+                review_decision=review_decision,
                 photos=photos,
                 audit_trail=audit_trail,
                 unit_conversion=conv_note if conv_note and conv_note.from_unit == rec.unit else None,

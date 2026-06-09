@@ -16,6 +16,40 @@ class ProcessingStatus(enum.Enum):
     RECALCULATED = "recalculated"
 
 
+OVER_THRESHOLD_STATUSES = {
+    ProcessingStatus.THRESHOLD_EXCEEDED,
+    ProcessingStatus.AWAITING_REVIEW,
+    ProcessingStatus.CONFIRMED_ABNORMAL,
+    ProcessingStatus.SUPPRESSED_BY_AVERAGE,
+}
+
+
+@dataclass
+class ReviewDecision:
+    sensor_id: str
+    original_row: int
+    original_value: float
+    amended_value: Optional[float]
+    original_statement: str
+    amended_reason: str
+    next_reviewer: str
+    decided_at: str
+    decided_by: str
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "sensor_id": self.sensor_id,
+            "original_row": self.original_row,
+            "original_value": self.original_value,
+            "amended_value": self.amended_value,
+            "original_statement": self.original_statement,
+            "amended_reason": self.amended_reason,
+            "next_reviewer": self.next_reviewer,
+            "decided_at": self.decided_at,
+            "decided_by": self.decided_by,
+        }
+
+
 @dataclass
 class SensorRecord:
     sensor_id: str
@@ -26,6 +60,14 @@ class SensorRecord:
     status: ProcessingStatus = ProcessingStatus.PENDING
     imported_at: str = field(default_factory=lambda: datetime.now().isoformat())
     batch_id: str = ""
+    original_import_value: Optional[float] = None
+    amended_value: Optional[float] = None
+    amendment_note: str = ""
+    source: str = ""
+
+    def __post_init__(self) -> None:
+        if self.original_import_value is None:
+            self.original_import_value = self.value
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -37,6 +79,10 @@ class SensorRecord:
             "status": self.status.value,
             "imported_at": self.imported_at,
             "batch_id": self.batch_id,
+            "original_import_value": self.original_import_value,
+            "amended_value": self.amended_value,
+            "amendment_note": self.amendment_note,
+            "source": self.source,
         }
 
 
@@ -51,6 +97,10 @@ class ThresholdEvent:
     detected_at: str = field(default_factory=lambda: datetime.now().isoformat())
     review_note: str = ""
     reviewer: str = ""
+    average_value: Optional[float] = None
+    suppressed_by_avg: bool = False
+    next_reviewer: str = ""
+    review_decision: Optional[ReviewDecision] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -63,6 +113,10 @@ class ThresholdEvent:
             "detected_at": self.detected_at,
             "review_note": self.review_note,
             "reviewer": self.reviewer,
+            "average_value": self.average_value,
+            "suppressed_by_avg": self.suppressed_by_avg,
+            "next_reviewer": self.next_reviewer,
+            "review_decision": self.review_decision.to_dict() if self.review_decision else None,
         }
 
 
@@ -97,6 +151,7 @@ class WorkingConditionPhoto:
     description: str = ""
     attached_at: str = field(default_factory=lambda: datetime.now().isoformat())
     attached_by: str = ""
+    attached_to_original_row: Optional[int] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -105,6 +160,7 @@ class WorkingConditionPhoto:
             "description": self.description,
             "attached_at": self.attached_at,
             "attached_by": self.attached_by,
+            "attached_to_original_row": self.attached_to_original_row,
         }
 
 
@@ -140,6 +196,12 @@ class WarningResult:
     status: ProcessingStatus
     is_over_threshold: bool
     suppressed_by_average: bool
+    average_value: Optional[float]
+    original_import_value: Optional[float]
+    amended_value: Optional[float]
+    amendment_note: str
+    next_reviewer: str
+    review_decision: Optional[ReviewDecision]
     photos: List[WorkingConditionPhoto] = field(default_factory=list)
     audit_trail: List[AuditEntry] = field(default_factory=list)
     unit_conversion: Optional[UnitConversionNote] = None
@@ -156,6 +218,12 @@ class WarningResult:
             "status": self.status.value,
             "is_over_threshold": self.is_over_threshold,
             "suppressed_by_average": self.suppressed_by_average,
+            "average_value": self.average_value,
+            "original_import_value": self.original_import_value,
+            "amended_value": self.amended_value,
+            "amendment_note": self.amendment_note,
+            "next_reviewer": self.next_reviewer,
+            "review_decision": self.review_decision.to_dict() if self.review_decision else None,
             "photos": [p.to_dict() for p in self.photos],
             "audit_trail": [a.to_dict() for a in self.audit_trail],
             "unit_conversion": self.unit_conversion.to_dict() if self.unit_conversion else None,

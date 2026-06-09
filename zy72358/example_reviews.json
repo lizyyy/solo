@@ -1,0 +1,21 @@
+[
+  {
+    "sensor_id": "T-101",
+    "original_row": 3,
+    "final_status": "confirmed_abnormal",
+    "original_statement": "初始导入值75°C超阈值60°C，但组内平均值49.25°C<60°C，被平均值盖掉，不会自动消失；何工现场重测后修正为68°C",
+    "amended_reason": "现场拆包确认第3组电芯接触不良，温度读数偏高，确认为异常电芯，需立即更换该模组",
+    "reviewer": "维修师傅王工",
+    "next_reviewer": "质量主管李工",
+    "amended_value": 68.0
+  },
+  {
+    "sensor_id": "T-103",
+    "original_row": 3,
+    "final_status": "awaiting_review",
+    "original_statement": "第3行155A超阈值100A，怀疑是启动瞬间浪涌",
+    "amended_reason": "现场观察波形，第3行读数为短时启动尖峰，暂挂待二次复核，不急于判定异常",
+    "reviewer": "维修师傅王工",
+    "next_reviewer": "设备工程师何工"
+  }
+]
