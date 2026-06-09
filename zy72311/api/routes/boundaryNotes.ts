@@ -19,15 +19,9 @@ router.get('/:id', (req: Request, res: Response): void => {
     return
   }
 
-  const relatedRecords = db.prepare(`
-    SELECT * FROM questionnaire_raw
-    WHERE target_name IN (SELECT value FROM json_each(boundary_notes.related_fields))
-    AND boundary_notes.id = ?
-  `).all?.(req.params.id) ?? []
-
   const relatedFieldNames = JSON.parse((note as any).related_fields || '[]') as string[]
   const qrRecords = relatedFieldNames.length > 0
-    ? db.prepare(`SELECT * FROM questionnaire_raw WHERE target_name IN (${relatedFieldNames.map(() => '?').join(',')})`).all(...relatedFieldNames)
+    ? db.prepare(`SELECT id, batch_id, target_name, weight, score, denominator, raw_value, record_type, source, status, boundary_note_id, original_statement, next_handler, created_at FROM questionnaire_raw WHERE target_name IN (${relatedFieldNames.map(() => '?').join(',')}) ORDER BY created_at DESC`).all(...relatedFieldNames)
     : []
 
   res.json({ success: true, data: { note, relatedRecords: qrRecords } })
@@ -56,17 +50,22 @@ router.post('/supplement', (req: Request, res: Response): void => {
   }
 
   const existingRecord = db.prepare(
-    "SELECT * FROM questionnaire_raw WHERE target_name = ? AND record_type != 'supplemented' ORDER BY created_at DESC LIMIT 1"
+    'SELECT * FROM questionnaire_raw WHERE target_name = ? ORDER BY created_at DESC LIMIT 1'
   ).get(targetField) as any
 
-  const recordId = uuidv4()
   const parsedValue = parseFloat(supplementValue) || 0
+  const originalStatement = note.content ? note.content.substring(0, 100) : ''
   let conflictDetected = false
   let conflictId: string | undefined
+  let recordId: string
 
   const insertQr = db.prepare(`
-    INSERT INTO questionnaire_raw (id, batch_id, target_name, weight, score, denominator, raw_value, record_type, source, status, created_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO questionnaire_raw (id, batch_id, target_name, weight, score, denominator, raw_value, record_type, source, status, boundary_note_id, original_statement, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `)
+
+  const updateQr = db.prepare(`
+    UPDATE questionnaire_raw SET score = ?, source = ?, status = ?, boundary_note_id = ?, original_statement = ?, created_at = ? WHERE id = ?
   `)
 
   const insertConflict = db.prepare(`
@@ -80,36 +79,73 @@ router.post('/supplement', (req: Request, res: Response): void => {
   `)
 
   const transaction = db.transaction(() => {
-    insertQr.run(
-      recordId, existingRecord?.batch_id || 'supplement-batch', targetField,
-      existingRecord?.weight ?? 0, parsedValue, existingRecord?.denominator ?? 100,
-      `${targetField},${existingRecord?.weight ?? 0},${parsedValue},${existingRecord?.denominator ?? 100}`,
-      'supplemented', 'boundary_note', 'pending', now
-    )
+    const affectedResults: string[] = []
+    let beforeValue: string | null = null
+    let afterValue: string
 
-    if (existingRecord) {
-      const qValue = String(existingRecord.score ?? '')
+    if (!existingRecord) {
+      recordId = uuidv4()
+      insertQr.run(
+        recordId, 'boundary-supplement', targetField,
+        0, parsedValue, 100,
+        `${targetField},0,${parsedValue},100`,
+        'supplemented', 'boundary_note', 'pending',
+        noteId, originalStatement, now
+      )
+      beforeValue = null
+      afterValue = JSON.stringify({
+        score: parsedValue,
+        source: 'boundary_note',
+        boundaryNoteId: noteId,
+        originalStatement
+      })
+      affectedResults.push(recordId)
+    } else {
+      recordId = existingRecord.id
+      const oldScore = existingRecord.score
+      const oldSource = existingRecord.source
+      const oldStatus = existingRecord.status
+
+      updateQr.run(
+        parsedValue, 'boundary_note', 'pending',
+        noteId, originalStatement, now,
+        existingRecord.id
+      )
+
+      beforeValue = JSON.stringify({
+        score: oldScore,
+        source: oldSource,
+        status: oldStatus
+      })
+      afterValue = JSON.stringify({
+        score: parsedValue,
+        source: 'boundary_note',
+        boundaryNoteId: noteId,
+        originalStatement
+      })
+      affectedResults.push(existingRecord.id)
+
+      const qValue = String(oldScore ?? '')
       const bValue = String(parsedValue)
-
       if (qValue !== bValue) {
         conflictDetected = true
         conflictId = uuidv4()
-
         insertConflict.run(
           conflictId, existingRecord.id, noteId, 'score',
           qValue, bValue,
           `问卷原始值(${qValue})与边界值说明补录值(${bValue})不一致`,
           'pending', now
         )
+        affectedResults.push(conflictId)
       }
     }
 
     insertAudit.run(
       uuidv4(), 'analyst', 'supplement', 'questionnaire', recordId,
-      existingRecord ? JSON.stringify({ score: existingRecord.score }) : null,
-      JSON.stringify({ score: parsedValue, source: 'boundary_note' }),
+      beforeValue,
+      afterValue,
       reason,
-      JSON.stringify(conflictDetected ? [recordId, existingRecord?.id, conflictId].filter(Boolean) : [recordId]),
+      JSON.stringify(affectedResults),
       now
     )
   })

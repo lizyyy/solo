@@ -1,14 +1,27 @@
-import { useEffect } from 'react'
-import { TrendingUp, TrendingDown, RefreshCw, Target, Scale } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { TrendingUp, TrendingDown, RefreshCw, Target, Scale, ArrowRight } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { useStore } from '@/store/useStore'
 import StepIndicator from '@/components/StepIndicator'
+import StatusBadge from '@/components/StatusBadge'
 
 export default function DemoPage() {
-  const { scoringData, currentStep, loading, fetchScoringResults, updateResults } = useStore()
+  const { scoringData, currentStep, boundaryNotes, loading, fetchScoringResults, updateResults, fetchDashboard } = useStore()
+  const [showUpdateTip, setShowUpdateTip] = useState(false)
+  const [prevScoringLength, setPrevScoringLength] = useState(0)
 
   useEffect(() => {
     fetchScoringResults()
   }, [fetchScoringResults])
+
+  useEffect(() => {
+    const currentLength = scoringData?.results?.length || 0
+    if (prevScoringLength > 0 && currentLength > 0 && prevScoringLength !== currentLength) {
+      setShowUpdateTip(true)
+      setTimeout(() => setShowUpdateTip(false), 8000)
+    }
+    setPrevScoringLength(currentLength)
+  }, [scoringData?.results?.length, prevScoringLength])
 
   const results = scoringData?.results || []
   const totalScore = scoringData?.totalScore || 0
@@ -19,12 +32,57 @@ export default function DemoPage() {
   const hasComparison = results.some((r) => r.previousScore !== undefined)
   const totalPreviousScore = results.reduce((sum, r) => sum + (r.previousWeightedScore ?? 0), 0)
 
+  const handleUpdateResults = async () => {
+    await updateResults()
+    await fetchDashboard()
+    setShowUpdateTip(true)
+    setTimeout(() => setShowUpdateTip(false), 8000)
+  }
+
+  const getBoundaryNoteTitle = (result: any) => {
+    if (result.boundaryNoteId) {
+      const note = boundaryNotes.find((n) => n.id === result.boundaryNoteId)
+      if (note) return note.title
+    }
+    const note = boundaryNotes.find((n) => n.relatedFields.includes(result.targetName))
+    return note?.title
+  }
+
+  const getSourceLabel = (source: string) => {
+    const labels: Record<string, string> = {
+      questionnaire: '问卷导入',
+      boundary_note: '边界值说明',
+      manual: '手动',
+    }
+    return labels[source] || source
+  }
+
+  const getSourceForTarget = (targetName: string) => {
+    const record = useStore.getState().questionnaireRecords.find((r) => r.targetName === targetName)
+    return record?.source
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="font-serif text-xl font-bold text-slate-100">课堂演示</h2>
         <StepIndicator currentStep={stepStatus} />
       </div>
+
+      {showUpdateTip && (
+        <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4 flex items-start gap-3">
+          <Target size={20} className="text-emerald-400 flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <div className="text-sm font-medium text-emerald-400">结果已更新</div>
+            <div className="text-xs text-slate-400 mt-1 flex items-center gap-1">
+              请
+              <Link to="/audit" className="text-emerald-400 hover:text-emerald-300 inline-flex items-center gap-0.5 underline underline-offset-2">
+                查看审计日志确认变更详情 <ArrowRight size={12} />
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <div className="card">
@@ -77,12 +135,18 @@ export default function DemoPage() {
           const diff = result.previousScore !== undefined ? result.score - result.previousScore : 0
           const isIncrease = diff > 0
           const isDecrease = diff < 0
+          const boundaryNoteTitle = result.source === 'boundary_note' ? getBoundaryNoteTitle(result) : null
+          const recordSource = getSourceForTarget(result.targetName)
+          const displaySource = recordSource || result.source
 
           return (
             <div key={result.id} className="card">
-              <div className="flex items-center gap-2 mb-3">
-                <Target size={16} className="text-amber-500" />
-                <span className="text-sm font-medium text-slate-200">{result.targetName}</span>
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Target size={16} className="text-amber-500" />
+                  <span className="text-sm font-medium text-slate-200">{result.targetName}</span>
+                </div>
+                <StatusBadge type="source" source={displaySource} />
               </div>
               <div className="text-3xl font-bold text-amber-500 mb-1">{result.score.toFixed(2)}</div>
               <div className="flex items-center gap-2 mb-3">
@@ -104,12 +168,17 @@ export default function DemoPage() {
                   </span>
                 )}
               </div>
-              <div className="w-full h-2 bg-slate-700 rounded-full overflow-hidden">
+              <div className="w-full h-2 bg-slate-700 rounded-full overflow-hidden mb-2">
                 <div
                   className="h-full bg-amber-500 rounded-full transition-all duration-500"
                   style={{ width: `${(result.weight / maxWeight) * 100}%` }}
                 />
               </div>
+              {boundaryNoteTitle && (
+                <div className="text-[11px] text-amber-400/80">
+                  来源：边界值说明 - {boundaryNoteTitle}
+                </div>
+              )}
             </div>
           )
         })}
@@ -175,6 +244,7 @@ export default function DemoPage() {
                   <th className="px-4 py-3 text-right">变化</th>
                   <th className="px-4 py-3 text-right">更新前加权</th>
                   <th className="px-4 py-3 text-right">更新后加权</th>
+                  <th className="px-4 py-3 text-left">来源变更</th>
                 </tr>
               </thead>
               <tbody>
@@ -182,6 +252,8 @@ export default function DemoPage() {
                   const prevScore = result.previousScore ?? 0
                   const prevWeighted = result.previousWeightedScore ?? 0
                   const scoreDiff = result.score - prevScore
+                  const recordSource = getSourceForTarget(result.targetName)
+                  const currentSource = recordSource || result.source
                   return (
                     <tr key={result.id} className="table-row">
                       <td className="px-4 py-3 text-slate-300 font-medium">{result.targetName}</td>
@@ -196,6 +268,9 @@ export default function DemoPage() {
                       </td>
                       <td className="px-4 py-3 text-right text-slate-400">{prevWeighted.toFixed(2)}</td>
                       <td className="px-4 py-3 text-right text-slate-200">{result.weightedScore.toFixed(2)}</td>
+                      <td className="px-4 py-3 text-xs text-slate-400">
+                        <StatusBadge type="source" source={currentSource} />
+                      </td>
                     </tr>
                   )
                 })}
@@ -207,7 +282,7 @@ export default function DemoPage() {
 
       <div className="flex justify-end">
         <button
-          onClick={updateResults}
+          onClick={handleUpdateResults}
           disabled={loading || stepStatus === 'updated'}
           className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
         >

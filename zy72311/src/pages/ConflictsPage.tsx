@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react'
-import { AlertTriangle, CheckCircle2, XCircle, ChevronDown, ChevronUp } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, XCircle, ChevronDown, ChevronUp, FileText, ArrowRight } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { useStore } from '@/store/useStore'
 import StatusBadge from '@/components/StatusBadge'
 
 export default function ConflictsPage() {
-  const { conflicts, allConflicts, loading, resolveConflict, fetchDashboard, fetchAllConflicts } = useStore()
+  const { conflicts, allConflicts, boundaryNotes, questionnaireRecords, loading, resolveConflict, fetchDashboard, fetchAllConflicts } = useStore()
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [reason, setReason] = useState('')
   const [historyExpanded, setHistoryExpanded] = useState(false)
+  const [resolvedToast, setResolvedToast] = useState(false)
 
   const pendingConflicts = conflicts.filter((c) => c.status === 'pending')
   const resolvedConflicts = allConflicts.filter((c) => c.status !== 'pending')
@@ -29,6 +31,8 @@ export default function ConflictsPage() {
     await resolveConflict(selectedConflict.id, decision, reason)
     await fetchAllConflicts()
     setReason('')
+    setResolvedToast(true)
+    setTimeout(() => setResolvedToast(false), 5000)
     const remaining = pendingConflicts.filter((c) => c.id !== selectedConflict.id)
     setSelectedId(remaining.length > 0 ? remaining[0].id : null)
   }
@@ -38,6 +42,19 @@ export default function ConflictsPage() {
     return isNaN(num) ? '空值' : num.toFixed(2)
   }
 
+  const getBoundaryNote = (conflict: typeof selectedConflict) => {
+    if (!conflict) return null
+    return boundaryNotes.find((n) => n.id === conflict.boundaryNoteId) || null
+  }
+
+  const getOriginalRecord = (conflict: typeof selectedConflict) => {
+    if (!conflict) return null
+    return questionnaireRecords.find((r) => r.id === conflict.questionnaireRecordId) || null
+  }
+
+  const boundaryNote = getBoundaryNote(selectedConflict)
+  const originalRecord = getOriginalRecord(selectedConflict)
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -46,6 +63,21 @@ export default function ConflictsPage() {
           {pendingConflicts.length} 个待处理
         </span>
       </div>
+
+      {resolvedToast && (
+        <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4 flex items-start gap-3">
+          <CheckCircle2 size={20} className="text-emerald-400 flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <div className="text-sm font-medium text-emerald-400">冲突已解决</div>
+            <div className="text-xs text-slate-400 mt-1 flex items-center gap-1">
+              已同步更新演示结果，请
+              <Link to="/demo" className="text-emerald-400 hover:text-emerald-300 inline-flex items-center gap-0.5 underline underline-offset-2">
+                前往课堂演示页面查看 <ArrowRight size={12} />
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
 
       {pendingConflicts.length === 0 && resolvedConflicts.length === 0 && (
         <div className="card text-center py-12">
@@ -62,6 +94,53 @@ export default function ConflictsPage() {
               冲突 #{selectedConflict.id.slice(0, 8)} — {selectedConflict.fieldName}
             </h3>
           </div>
+
+          {boundaryNote && (
+            <div className="bg-amber-500/5 border border-amber-500/20 rounded-lg p-4 mb-5">
+              <div className="flex items-center gap-2 mb-2">
+                <FileText size={14} className="text-amber-400" />
+                <span className="text-xs font-medium text-amber-400">关联边界值说明</span>
+              </div>
+              <div className="text-sm font-medium text-slate-200 mb-1">{boundaryNote.title}</div>
+              {boundaryNote.methodology && (
+                <div className="text-xs text-slate-400 mb-1">方法论：{boundaryNote.methodology}</div>
+              )}
+              {boundaryNote.content && (
+                <div className="text-xs text-slate-500 line-clamp-2">
+                  {boundaryNote.content.length > 100 ? boundaryNote.content.slice(0, 100) + '...' : boundaryNote.content}
+                </div>
+              )}
+            </div>
+          )}
+
+          {originalRecord && (
+            <div className="bg-blue-500/5 border border-blue-500/20 rounded-lg p-4 mb-5">
+              <div className="flex items-center gap-2 mb-2">
+                <FileText size={14} className="text-blue-400" />
+                <span className="text-xs font-medium text-blue-400">原始问卷记录</span>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                <div>
+                  <div className="text-slate-500 mb-0.5">指标名称</div>
+                  <div className="text-slate-300 font-medium">{originalRecord.targetName}</div>
+                </div>
+                <div>
+                  <div className="text-slate-500 mb-0.5">来源</div>
+                  <StatusBadge type="source" source={originalRecord.source} />
+                </div>
+                <div>
+                  <div className="text-slate-500 mb-0.5">状态</div>
+                  <StatusBadge status={originalRecord.status} />
+                </div>
+                <div>
+                  <div className="text-slate-500 mb-0.5">原始说法</div>
+                  <div className="text-slate-400 truncate">
+                    {originalRecord.originalStatement ? (originalRecord.originalStatement.length > 20 ? originalRecord.originalStatement.slice(0, 20) + '...' : originalRecord.originalStatement) : '-'}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="grid grid-cols-2 gap-4 mb-5">
             <div className="bg-slate-700/30 rounded-lg p-4 border border-slate-600/50">

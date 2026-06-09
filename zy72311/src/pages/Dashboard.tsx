@@ -1,7 +1,8 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { FileCheck, AlertTriangle, ClipboardCheck, Clock, ArrowRight } from 'lucide-react'
+import { FileCheck, AlertTriangle, ClipboardCheck, Clock, ArrowRight, ChevronDown, ChevronUp, User } from 'lucide-react'
 import { useStore } from '@/store/useStore'
+import type { AuditLog } from '@/store/useStore'
 
 const actionColors: Record<string, string> = {
   import: 'bg-blue-400',
@@ -19,8 +20,23 @@ const actionLabels: Record<string, string> = {
   review: '数据复核',
 }
 
+const targetTypeRoutes: Record<string, string> = {
+  questionnaire: '/import',
+  boundary_note: '/boundary',
+  conflict: '/conflicts',
+  scoring_result: '/demo',
+}
+
+const targetTypeLabels: Record<string, string> = {
+  questionnaire: '问卷记录',
+  boundary_note: '边界值说明',
+  conflict: '冲突记录',
+  scoring_result: '评分结果',
+}
+
 export default function Dashboard() {
-  const { questionnaireSummary, conflicts, reviewTasks, auditLogs, fetchDashboard } = useStore()
+  const { questionnaireSummary, questionnaireRecords, conflicts, reviewTasks, auditLogs, fetchDashboard } = useStore()
+  const [expandedId, setExpandedId] = useState<string | null>(null)
 
   useEffect(() => {
     fetchDashboard()
@@ -28,6 +44,13 @@ export default function Dashboard() {
 
   const pendingConflicts = conflicts.filter((c) => c.status === 'pending')
   const pendingReviews = reviewTasks.filter((t) => t.status === 'pending')
+  const boundaryLinkedCount = questionnaireRecords.filter((r) => r.boundaryNoteId).length
+
+  const formatValue = (val: any) => {
+    if (val === null || val === undefined) return '-'
+    if (typeof val === 'object') return JSON.stringify(val, null, 2)
+    return String(val)
+  }
 
   return (
     <div className="space-y-6">
@@ -49,6 +72,9 @@ export default function Dashboard() {
             正常 <span className="text-emerald-400">{questionnaireSummary.normal}</span> ·
             分母为0 <span className="text-rose-400">{questionnaireSummary.zeroDenominator}</span> ·
             已补录 <span className="text-amber-400">{questionnaireSummary.supplemented}</span>
+          </div>
+          <div className="text-xs text-slate-500 mt-1">
+            关联边界值说明 <span className="text-amber-400">{boundaryLinkedCount}</span> 条
           </div>
           <Link
             to="/import"
@@ -102,26 +128,99 @@ export default function Dashboard() {
           <div className="text-center text-sm text-slate-500 py-8">暂无审计日志</div>
         ) : (
           <div className="space-y-3">
-            {auditLogs.slice(0, 8).map((log) => (
-              <div
-                key={log.id}
-                className="flex items-center gap-3 py-2 px-3 rounded-lg bg-slate-700/30 hover:bg-slate-700/50 transition-colors"
-              >
-                <div
-                  className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                    actionColors[log.action] || 'bg-slate-400'
-                  }`}
-                />
-                <span className="text-xs px-2 py-0.5 rounded bg-slate-700 text-slate-400 flex-shrink-0">
-                  {actionLabels[log.action] || log.action}
-                </span>
-                <span className="text-sm text-slate-300 flex-1 truncate">{log.reason}</span>
-                <span className="text-xs text-slate-500 flex-shrink-0">{log.operator}</span>
-                <span className="text-xs text-slate-600 flex-shrink-0">
-                  {new Date(log.createdAt).toLocaleString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
-                </span>
-              </div>
-            ))}
+            {auditLogs.slice(0, 8).map((log: AuditLog) => {
+              const isExpanded = expandedId === log.id
+              const hasDetails = log.beforeValue || log.afterValue || (log.affectedResults?.length > 0)
+              const targetRoute = targetTypeRoutes[log.targetType]
+              const targetLabel = targetTypeLabels[log.targetType] || log.targetType
+              return (
+                <div key={log.id} className="rounded-lg bg-slate-700/30 hover:bg-slate-700/50 transition-colors overflow-hidden">
+                  <div className="flex items-center gap-3 py-2 px-3">
+                    <div
+                      className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                        actionColors[log.action] || 'bg-slate-400'
+                      }`}
+                    />
+                    <span className="text-xs px-2 py-0.5 rounded bg-slate-700 text-slate-400 flex-shrink-0">
+                      {actionLabels[log.action] || log.action}
+                    </span>
+                    <span className="text-sm text-slate-300 flex-1 truncate">{log.reason}</span>
+                    <span className="text-xs text-slate-500 flex-shrink-0">{log.operator}</span>
+                    <span className="text-xs text-slate-600 flex-shrink-0">
+                      {new Date(log.createdAt).toLocaleString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                  {hasDetails && (
+                    <div className="px-3 pb-2">
+                      <button
+                        onClick={() => setExpandedId(isExpanded ? null : log.id)}
+                        className="text-xs text-slate-500 hover:text-slate-300 inline-flex items-center gap-1 transition-colors"
+                      >
+                        {isExpanded ? '收起详情' : '查看详情'}
+                        {isExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                      </button>
+                      {isExpanded && (
+                        <div className="mt-2 space-y-2 border-t border-slate-600/50 pt-2 text-xs">
+                          <div className="flex items-start gap-2">
+                            <span className="text-slate-500 flex-shrink-0 w-16">目标类型：</span>
+                            <div>
+                              <span className="text-slate-400">{targetLabel}</span>
+                              {targetRoute && (
+                                <Link to={targetRoute} className="text-amber-400 hover:text-amber-300 ml-2 underline underline-offset-2">
+                                  跳转 →
+                                </Link>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <span className="text-slate-500 flex-shrink-0 w-16">目标ID：</span>
+                            <div>
+                              <span className="text-slate-400 font-mono">#{log.targetId.slice(0, 12)}</span>
+                              {targetRoute && (
+                                <Link to={targetRoute} className="text-amber-400 hover:text-amber-300 ml-2 underline underline-offset-2">
+                                  跳转 →
+                                </Link>
+                              )}
+                            </div>
+                          </div>
+                          {log.beforeValue && (
+                            <div>
+                              <div className="text-slate-500 mb-1">变更前：</div>
+                              <pre className="text-xs bg-slate-800 rounded p-2 text-slate-400 overflow-x-auto">
+                                {formatValue(log.beforeValue)}
+                              </pre>
+                            </div>
+                          )}
+                          {log.afterValue && (
+                            <div>
+                              <div className="text-slate-500 mb-1">变更后：</div>
+                              <pre className="text-xs bg-slate-800 rounded p-2 text-amber-400 overflow-x-auto">
+                                {formatValue(log.afterValue)}
+                              </pre>
+                            </div>
+                          )}
+                          {log.affectedResults?.length > 0 && (
+                            <div>
+                              <div className="text-slate-500 mb-1">影响的记录：</div>
+                              <div className="flex flex-wrap gap-1">
+                                {log.affectedResults.map((id) => (
+                                  <span
+                                    key={id}
+                                    className="text-xs px-1.5 py-0.5 rounded bg-slate-700 text-slate-500"
+                                  >
+                                    #{id.slice(0, 8)}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
           </div>
         )}
       </div>

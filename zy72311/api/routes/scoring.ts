@@ -34,21 +34,23 @@ router.get('/results', (_req: Request, res: Response): void => {
 })
 
 router.post('/update', (req: Request, res: Response): void => {
-  const { batchId } = req.body as { batchId: string }
-
-  if (!batchId) {
-    res.status(400).json({ success: false, error: 'batchId is required' })
-    return
-  }
+  const { batchId } = req.body as { batchId?: string }
 
   const db = getDb()
   const now = new Date().toISOString()
 
   const previousResults = db.prepare('SELECT * FROM scoring_results ORDER BY target_name').all() as any[]
 
-  const questionnaireRecords = db.prepare(
-    "SELECT * FROM questionnaire_raw WHERE batch_id = ? AND status IN ('confirmed', 'pending') ORDER BY target_name"
-  ).all(batchId) as any[]
+  let questionnaireRecords: any[]
+  if (batchId) {
+    questionnaireRecords = db.prepare(
+      "SELECT * FROM questionnaire_raw WHERE batch_id = ? AND status IN ('confirmed', 'pending') ORDER BY target_name"
+    ).all(batchId) as any[]
+  } else {
+    questionnaireRecords = db.prepare(
+      "SELECT * FROM questionnaire_raw WHERE status IN ('confirmed') ORDER BY target_name"
+    ).all() as any[]
+  }
 
   const insertAudit = db.prepare(`
     INSERT INTO audit_logs (id, operator, action, target_type, target_id, before_value, after_value, reason, affected_results, created_at)
@@ -58,29 +60,47 @@ router.post('/update', (req: Request, res: Response): void => {
   const auditLogIds: string[] = []
 
   const transaction = db.transaction(() => {
-    for (const record of questionnaireRecords) {
-      const existing = db.prepare('SELECT * FROM scoring_results WHERE target_name = ?').get(record.target_name) as any
-      if (!existing) continue
+    for (const sr of previousResults) {
+      const latestQr = db.prepare(
+        "SELECT * FROM questionnaire_raw WHERE target_name = ? AND status = 'confirmed' ORDER BY created_at DESC LIMIT 1"
+      ).get(sr.target_name) as any
 
-      const newScore = record.score ?? 0
-      const newWeightedScore = newScore * existing.weight
-      const beforeValue = JSON.stringify({ score: existing.score, weighted_score: existing.weighted_score, version: existing.version })
-      const afterValue = JSON.stringify({ score: newScore, weighted_score: newWeightedScore, version: existing.version + 1 })
+      if (!latestQr) continue
+
+      const newScore = latestQr.score ?? 0
+      const newWeightedScore = newScore * sr.weight
+      const newSource = latestQr.source
+
+      if (newScore === sr.score && newSource === sr.source) continue
+
+      const beforeValue = JSON.stringify({
+        score: sr.score,
+        weighted_score: sr.weighted_score,
+        version: sr.version,
+        source: sr.source
+      })
+      const afterValue = JSON.stringify({
+        score: newScore,
+        weighted_score: newWeightedScore,
+        version: sr.version + 1,
+        source: newSource,
+        questionnaireRecordId: latestQr.id
+      })
 
       db.prepare(`
         UPDATE scoring_results
         SET score = ?, weighted_score = ?, source = ?, version = version + 1, updated_at = ?
-        WHERE target_name = ?
-      `).run(newScore, newWeightedScore, record.source, now, record.target_name)
+        WHERE id = ?
+      `).run(newScore, newWeightedScore, newSource, now, sr.id)
 
       const auditId = uuidv4()
       auditLogIds.push(auditId)
 
       insertAudit.run(
-        auditId, 'system', 'update_result', 'scoring_result', existing.id,
+        auditId, 'system', 'update_result', 'scoring_result', sr.id,
         beforeValue, afterValue,
-        `根据问卷记录更新评分结果：${record.target_name}`,
-        JSON.stringify([existing.id]),
+        `根据问卷记录(ID: ${latestQr.id}, 状态: ${latestQr.status})更新评分结果：${sr.target_name}`,
+        JSON.stringify([sr.id]),
         now
       )
     }

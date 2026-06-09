@@ -30,6 +30,9 @@ export interface QuestionnaireRecord {
   source: string
   status: RecordStatus
   createdAt: string
+  boundaryNoteId?: string
+  originalStatement?: string
+  nextHandler?: string
 }
 
 export interface QuestionnaireSummary {
@@ -71,6 +74,10 @@ export interface ReviewTask {
   targetName: string
   recordType: RecordStatus
   rawValue: string
+  originalStatement?: string
+  correctedValue?: number
+  nextHandler?: string
+  boundaryNoteId?: string
 }
 
 export interface AuditLog {
@@ -96,6 +103,7 @@ export interface ScoringResult {
   version: number
   previousScore?: number
   previousWeightedScore?: number
+  boundaryNoteId?: string
 }
 
 export interface ScoringData {
@@ -114,6 +122,12 @@ interface DashboardData {
   reviewTasks: ReviewTask[]
   scoring: ScoringData
   auditLogs: AuditLog[]
+}
+
+interface ReviewExtra {
+  originalStatement?: string
+  correctedValue?: number
+  nextHandler?: string
 }
 
 interface StoreState {
@@ -141,8 +155,8 @@ interface StoreState {
   fetchBoundaryNotes: () => Promise<void>
   fetchScoringResults: () => Promise<void>
   fetchAllConflicts: () => Promise<void>
-  approveReviewTask: (taskId: string, note: string) => Promise<void>
-  rejectReviewTask: (taskId: string, note: string) => Promise<void>
+  approveReviewTask: (taskId: string, note: string, extra?: ReviewExtra) => Promise<void>
+  rejectReviewTask: (taskId: string, note: string, extra?: ReviewExtra) => Promise<void>
 }
 
 const API_BASE = '/api'
@@ -195,12 +209,13 @@ export const useStore = create<StoreState>((set, get) => ({
   fetchDashboard: async () => {
     set({ loading: true, error: null })
     try {
-      const [qRes, cRes, rRes, sRes, aRes] = await Promise.all([
+      const [qRes, cRes, rRes, sRes, aRes, bRes] = await Promise.all([
         fetch(`${API_BASE}/questionnaire`),
         fetch(`${API_BASE}/conflicts?status=pending`),
         fetch(`${API_BASE}/review`),
         fetch(`${API_BASE}/scoring/results`),
         fetch(`${API_BASE}/audit-logs`),
+        fetch(`${API_BASE}/boundary-notes`),
       ])
 
       const qData = await qRes.json()
@@ -208,6 +223,7 @@ export const useStore = create<StoreState>((set, get) => ({
       const rData = await rRes.json()
       const sData = await sRes.json()
       const aData = await aRes.json()
+      const bData = await bRes.json()
 
       const records = convertSnakeToCamel(qData.data?.records || [])
       const summary = convertSnakeToCamel(qData.data?.summary || {})
@@ -221,6 +237,13 @@ export const useStore = create<StoreState>((set, get) => ({
           beforeValue: parseJSON(camel.beforeValue),
           afterValue: parseJSON(camel.afterValue),
           affectedResults: parseJSON(camel.affectedResults) || [],
+        }
+      })
+      const boundaryNotes = (bData.data?.notes || []).map((note: any) => {
+        const camel = convertSnakeToCamel(note)
+        return {
+          ...camel,
+          relatedFields: parseJSON(camel.relatedFields) || [],
         }
       })
 
@@ -238,6 +261,7 @@ export const useStore = create<StoreState>((set, get) => ({
         reviewTasks,
         scoringData,
         auditLogs,
+        boundaryNotes,
         currentStep: sData.data?.stepStatus || 'imported',
         loading: false,
       })
@@ -303,7 +327,10 @@ export const useStore = create<StoreState>((set, get) => ({
         loading: false,
       })
 
-      await get().fetchDashboard()
+      await Promise.all([
+        get().fetchDashboard(),
+        get().fetchBoundaryNotes(),
+      ])
       return data
     } catch (e: any) {
       set({ error: e.message, loading: false })
@@ -322,7 +349,12 @@ export const useStore = create<StoreState>((set, get) => ({
 
       if (!res.ok) throw new Error('解决冲突失败')
       set({ loading: false })
-      await get().fetchDashboard()
+      await Promise.all([
+        get().fetchDashboard(),
+        get().fetchScoringResults(),
+        get().fetchBoundaryNotes(),
+        get().fetchAllConflicts(),
+      ])
     } catch (e: any) {
       set({ error: e.message, loading: false })
     }
@@ -331,10 +363,16 @@ export const useStore = create<StoreState>((set, get) => ({
   updateResults: async () => {
     set({ loading: true, error: null })
     try {
+      const { batchId } = get()
+      const body: any = {}
+      if (batchId) {
+        body.batchId = batchId
+      }
+
       const res = await fetch(`${API_BASE}/scoring/update`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ batchId: 'batch-001' }),
+        body: JSON.stringify(body),
       })
 
       if (!res.ok) throw new Error('更新评分结果失败')
@@ -360,6 +398,8 @@ export const useStore = create<StoreState>((set, get) => ({
         currentStep: 'updated',
         loading: false,
       }))
+
+      await get().fetchDashboard()
     } catch (e: any) {
       set({ error: e.message, loading: false })
     }
@@ -373,6 +413,7 @@ export const useStore = create<StoreState>((set, get) => ({
       if (filters?.action) params.set('action', filters.action)
       if (filters?.from) params.set('from', filters.from)
       if (filters?.to) params.set('to', filters.to)
+      if (filters?.keyword) params.set('keyword', filters.keyword)
 
       const res = await fetch(`${API_BASE}/audit-logs?${params.toString()}`)
       if (!res.ok) throw new Error('获取审计日志失败')
@@ -388,17 +429,7 @@ export const useStore = create<StoreState>((set, get) => ({
         }
       })
 
-      if (filters?.keyword) {
-        const keyword = filters.keyword.toLowerCase()
-        const filtered = logs.filter((log: AuditLog) =>
-          log.operator.toLowerCase().includes(keyword) ||
-          log.reason?.toLowerCase().includes(keyword) ||
-          log.action.toLowerCase().includes(keyword)
-        )
-        set({ auditLogs: filtered, loading: false })
-      } else {
-        set({ auditLogs: logs, loading: false })
-      }
+      set({ auditLogs: logs, loading: false })
     } catch (e: any) {
       set({ error: e.message, loading: false })
     }
@@ -470,13 +501,19 @@ export const useStore = create<StoreState>((set, get) => ({
     }
   },
 
-  approveReviewTask: async (taskId: string, note: string) => {
+  approveReviewTask: async (taskId: string, note: string, extra?: ReviewExtra) => {
     set({ loading: true, error: null })
     try {
+      const body: any = { decision: 'approved', note, operator: '复核员' }
+      if (extra) {
+        if (extra.originalStatement) body.originalStatement = extra.originalStatement
+        if (extra.correctedValue !== undefined) body.correctedValue = extra.correctedValue
+        if (extra.nextHandler) body.nextHandler = extra.nextHandler
+      }
       const res = await fetch(`${API_BASE}/review/${taskId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ decision: 'approved', note, operator: '复核员' }),
+        body: JSON.stringify(body),
       })
       if (!res.ok) throw new Error('复核失败')
       set({ loading: false })
@@ -486,13 +523,19 @@ export const useStore = create<StoreState>((set, get) => ({
     }
   },
 
-  rejectReviewTask: async (taskId: string, note: string) => {
+  rejectReviewTask: async (taskId: string, note: string, extra?: ReviewExtra) => {
     set({ loading: true, error: null })
     try {
+      const body: any = { decision: 'rejected', note, operator: '复核员' }
+      if (extra) {
+        if (extra.originalStatement) body.originalStatement = extra.originalStatement
+        if (extra.correctedValue !== undefined) body.correctedValue = extra.correctedValue
+        if (extra.nextHandler) body.nextHandler = extra.nextHandler
+      }
       const res = await fetch(`${API_BASE}/review/${taskId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ decision: 'rejected', note, operator: '复核员' }),
+        body: JSON.stringify(body),
       })
       if (!res.ok) throw new Error('复核失败')
       set({ loading: false })

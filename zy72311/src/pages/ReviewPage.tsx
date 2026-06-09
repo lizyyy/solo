@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react'
-import { ClipboardCheck, CheckCircle2, XCircle, AlertCircle } from 'lucide-react'
+import { ClipboardCheck, CheckCircle2, XCircle, AlertCircle, FileText } from 'lucide-react'
 import { useStore } from '@/store/useStore'
 import StatusBadge from '@/components/StatusBadge'
 
 export default function ReviewPage() {
-  const { reviewTasks, loading, fetchReviewTasks, approveReviewTask, rejectReviewTask, fetchDashboard } = useStore()
+  const { reviewTasks, boundaryNotes, questionnaireRecords, loading, fetchReviewTasks, approveReviewTask, rejectReviewTask, fetchDashboard } = useStore()
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [note, setNote] = useState('')
+  const [originalStatement, setOriginalStatement] = useState('')
+  const [correctedValue, setCorrectedValue] = useState('')
+  const [nextHandler, setNextHandler] = useState('')
 
   useEffect(() => {
     fetchReviewTasks()
@@ -22,18 +25,44 @@ export default function ReviewPage() {
     }
   }, [pendingTasks, selectedId])
 
+  useEffect(() => {
+    if (selectedTask) {
+      setOriginalStatement(selectedTask.originalStatement || '')
+      setCorrectedValue(selectedTask.correctedValue !== undefined ? String(selectedTask.correctedValue) : '')
+      setNextHandler(selectedTask.nextHandler || '')
+    } else {
+      setOriginalStatement('')
+      setCorrectedValue('')
+      setNextHandler('')
+    }
+  }, [selectedTask])
+
   const handleApprove = async () => {
     if (!selectedTask) return
-    await approveReviewTask(selectedTask.id, note)
+    const extra: any = {}
+    if (originalStatement.trim()) extra.originalStatement = originalStatement.trim()
+    if (correctedValue.trim() !== '') extra.correctedValue = Number(correctedValue)
+    if (nextHandler.trim()) extra.nextHandler = nextHandler.trim()
+    await approveReviewTask(selectedTask.id, note, Object.keys(extra).length > 0 ? extra : undefined)
     setNote('')
+    setOriginalStatement('')
+    setCorrectedValue('')
+    setNextHandler('')
     const remaining = pendingTasks.filter((t) => t.id !== selectedTask.id)
     setSelectedId(remaining.length > 0 ? remaining[0].id : null)
   }
 
   const handleReject = async () => {
     if (!selectedTask) return
-    await rejectReviewTask(selectedTask.id, note)
+    const extra: any = {}
+    if (originalStatement.trim()) extra.originalStatement = originalStatement.trim()
+    if (correctedValue.trim() !== '') extra.correctedValue = Number(correctedValue)
+    if (nextHandler.trim()) extra.nextHandler = nextHandler.trim()
+    await rejectReviewTask(selectedTask.id, note, Object.keys(extra).length > 0 ? extra : undefined)
     setNote('')
+    setOriginalStatement('')
+    setCorrectedValue('')
+    setNextHandler('')
     const remaining = pendingTasks.filter((t) => t.id !== selectedTask.id)
     setSelectedId(remaining.length > 0 ? remaining[0].id : null)
   }
@@ -46,6 +75,26 @@ export default function ReviewPage() {
       score: parts[2] || '-',
       denominator: parts[3] || '-',
     }
+  }
+
+  const getBoundaryNoteForTask = () => {
+    if (!selectedTask) return null
+    const noteId = selectedTask.boundaryNoteId
+    if (noteId) {
+      return boundaryNotes.find((n) => n.id === noteId) || null
+    }
+    const record = questionnaireRecords.find((r) => r.id === selectedTask.recordId)
+    if (record?.boundaryNoteId) {
+      return boundaryNotes.find((n) => n.id === record.boundaryNoteId) || null
+    }
+    return null
+  }
+
+  const boundaryNote = getBoundaryNoteForTask()
+
+  const getOriginalStatementSummary = (text: string | undefined) => {
+    if (!text) return '-'
+    return text.length > 20 ? text.slice(0, 20) + '...' : text
   }
 
   return (
@@ -73,6 +122,24 @@ export default function ReviewPage() {
                   复核任务 #{selectedTask.id.slice(0, 8)} — {selectedTask.targetName}
                 </h3>
               </div>
+
+              {boundaryNote && (
+                <div className="bg-amber-500/5 border border-amber-500/20 rounded-lg p-4 mb-5">
+                  <div className="flex items-center gap-2 mb-2">
+                    <FileText size={14} className="text-amber-400" />
+                    <span className="text-xs font-medium text-amber-400">关联边界值说明</span>
+                  </div>
+                  <div className="text-sm font-medium text-slate-200 mb-1">{boundaryNote.title}</div>
+                  {boundaryNote.methodology && (
+                    <div className="text-xs text-slate-400 mb-1">方法论：{boundaryNote.methodology}</div>
+                  )}
+                  {boundaryNote.content && (
+                    <div className="text-xs text-slate-500 line-clamp-2">
+                      {boundaryNote.content.length > 100 ? boundaryNote.content.slice(0, 100) + '...' : boundaryNote.content}
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-5">
                 <div className="bg-slate-700/30 rounded-lg p-4 border border-slate-600/50">
@@ -106,15 +173,51 @@ export default function ReviewPage() {
                 </div>
               </div>
 
-              <div className="mb-5">
-                <label className="text-xs text-slate-400 block mb-1.5">复核意见（必填）</label>
-                <textarea
-                  value={note}
-                  onChange={(e) => setNote(e.target.value)}
-                  placeholder="请说明复核意见"
-                  rows={3}
-                  className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500 transition-colors resize-none"
-                />
+              <div className="space-y-4 mb-5">
+                <div>
+                  <label className="text-xs text-slate-400 block mb-1.5">复核意见（必填）</label>
+                  <textarea
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                    placeholder="请说明复核意见"
+                    rows={3}
+                    className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500 transition-colors resize-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs text-slate-400 block mb-1.5">原始说法</label>
+                  <textarea
+                    value={originalStatement}
+                    onChange={(e) => setOriginalStatement(e.target.value)}
+                    placeholder="请摘录原始说法/边界值备注原文..."
+                    rows={3}
+                    className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500 transition-colors resize-none"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs text-slate-400 block mb-1.5">改后的值</label>
+                    <input
+                      type="number"
+                      value={correctedValue}
+                      onChange={(e) => setCorrectedValue(e.target.value)}
+                      placeholder="如通过复核需修正分数，填入正确值"
+                      className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500 transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-slate-400 block mb-1.5">下一步处理人</label>
+                    <input
+                      type="text"
+                      value={nextHandler}
+                      onChange={(e) => setNextHandler(e.target.value)}
+                      placeholder="后续跟进处理人"
+                      className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500 transition-colors"
+                    />
+                  </div>
+                </div>
               </div>
 
               <div className="flex gap-3">
@@ -173,6 +276,8 @@ export default function ReviewPage() {
                     <th className="px-4 py-3 text-right">得分</th>
                     <th className="px-4 py-3 text-right">分母</th>
                     <th className="px-4 py-3 text-left">类型</th>
+                    <th className="px-4 py-3 text-left">原始说法</th>
+                    <th className="px-4 py-3 text-left">下一步处理人</th>
                     <th className="px-4 py-3 text-left">状态</th>
                     <th className="px-4 py-3 text-left">操作</th>
                   </tr>
@@ -191,6 +296,12 @@ export default function ReviewPage() {
                         <td className="px-4 py-3 text-right text-rose-400">{parsed.denominator || '-'}</td>
                         <td className="px-4 py-3">
                           <StatusBadge status={task.recordType} />
+                        </td>
+                        <td className="px-4 py-3 text-xs text-slate-500 max-w-[160px] truncate">
+                          {getOriginalStatementSummary(task.originalStatement)}
+                        </td>
+                        <td className="px-4 py-3 text-xs text-slate-400">
+                          {task.nextHandler || '-'}
                         </td>
                         <td className="px-4 py-3">
                           <StatusBadge status="review" />

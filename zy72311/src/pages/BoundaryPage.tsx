@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react'
 import { FileText, X, Plus, Tag, ChevronRight, AlertCircle, CheckCircle } from 'lucide-react'
 import { useStore } from '@/store/useStore'
+import StatusBadge from '@/components/StatusBadge'
 
 export default function BoundaryPage() {
-  const { boundaryNotes, loading, supplementResult, fetchBoundaryNotes, supplementFromNote } = useStore()
+  const { boundaryNotes, questionnaireRecords, loading, supplementResult, fetchBoundaryNotes, supplementFromNote } = useStore()
   const [selectedNote, setSelectedNote] = useState<string | null>(null)
   const [showModal, setShowModal] = useState(false)
   const [supplementForm, setSupplementForm] = useState({ noteId: '', targetField: '', supplementValue: '', reason: '' })
   const [showResult, setShowResult] = useState<{ conflictDetected: boolean; conflictId?: string } | null>(null)
+  const [lastSupplementedNoteId, setLastSupplementedNoteId] = useState<string | null>(null)
 
   useEffect(() => {
     fetchBoundaryNotes()
@@ -23,6 +25,13 @@ export default function BoundaryPage() {
     }
   }, [supplementResult])
 
+  const getRelatedRecords = (noteId: string, relatedFields: string[]) => {
+    return questionnaireRecords.filter((r) => {
+      if (r.boundaryNoteId === noteId) return true
+      return relatedFields.includes(r.targetName)
+    })
+  }
+
   const handleSupplement = async () => {
     if (!supplementForm.noteId || !supplementForm.targetField || !supplementForm.supplementValue || !supplementForm.reason) return
     const result = await supplementFromNote(
@@ -32,6 +41,8 @@ export default function BoundaryPage() {
       supplementForm.reason
     )
     if (result) {
+      setLastSupplementedNoteId(supplementForm.noteId)
+      setSelectedNote(supplementForm.noteId)
       setShowModal(false)
       setSupplementForm({ noteId: '', targetField: '', supplementValue: '', reason: '' })
     }
@@ -46,6 +57,8 @@ export default function BoundaryPage() {
     })
     setShowModal(true)
   }
+
+  const relatedRecords = activeNote ? getRelatedRecords(activeNote.id, activeNote.relatedFields) : []
 
   return (
     <div className="space-y-6">
@@ -93,6 +106,8 @@ export default function BoundaryPage() {
                 onClick={() => setSelectedNote(note.id)}
                 className={`card-hover cursor-pointer ${
                   selectedNote === note.id ? 'border-amber-500/50' : ''
+                } ${
+                  lastSupplementedNoteId === note.id ? 'ring-2 ring-amber-400/50' : ''
                 }`}
               >
                 <div className="flex items-start justify-between mb-2">
@@ -148,6 +163,67 @@ export default function BoundaryPage() {
               <div className="border-t border-slate-700/50 pt-3 mt-3">
                 <div className="text-xs text-slate-500 mb-1">生效日期</div>
                 <div className="text-sm text-slate-300">{new Date(activeNote.effectiveDate).toLocaleDateString('zh-CN')}</div>
+              </div>
+              <div className="border-t border-slate-700/50 pt-3 mt-3">
+                <div className="text-xs text-slate-500 mb-2">关联记录 ({relatedRecords.length})</div>
+                {relatedRecords.length === 0 ? (
+                  <div className="text-xs text-slate-500">暂无关联记录</div>
+                ) : (
+                  <div className="space-y-2 max-h-64 overflow-y-auto">
+                    {relatedRecords.map((record) => {
+                      const isCurrentNoteSource = record.boundaryNoteId === activeNote.id
+                      const showAmberBg = record.source === 'boundary_note' || record.recordType === 'supplemented'
+                      return (
+                        <div
+                          key={record.id}
+                          className={`rounded-lg border border-slate-600/50 p-2 text-xs space-y-1 ${
+                            showAmberBg ? 'bg-amber-500/10 border-amber-500/20' : 'bg-slate-700/30'
+                          }`}
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="font-medium text-slate-200">{record.targetName}</div>
+                            {isCurrentNoteSource && (
+                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30 flex-shrink-0 whitespace-nowrap">
+                                本说明补录来源
+                              </span>
+                            )}
+                          </div>
+                          <div className="grid grid-cols-2 gap-1 text-[11px]">
+                            <div>
+                              <span className="text-slate-500">权重：</span>
+                              <span className="text-slate-300">{record.weight.toFixed(2)}</span>
+                            </div>
+                            <div>
+                              <span className="text-slate-500">得分：</span>
+                              <span className="text-slate-300">{record.score.toFixed(2)}</span>
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-1 text-[11px]">
+                            <div>
+                              <span className="text-slate-500">状态：</span>
+                              <StatusBadge status={record.status} />
+                            </div>
+                            <div>
+                              <span className="text-slate-500">来源：</span>
+                              <StatusBadge type="source" source={record.source} />
+                            </div>
+                          </div>
+                          {record.boundaryNoteId && (
+                            <div className="text-[11px]">
+                              <span className="text-slate-500">关联说明：</span>
+                              <span className="text-amber-400">#{record.boundaryNoteId.slice(-8)}</span>
+                            </div>
+                          )}
+                          {record.originalStatement && (
+                            <div className="text-[11px] text-amber-400 bg-amber-500/10 rounded px-1.5 py-1 border border-amber-500/20">
+                              原始说法：{record.originalStatement}
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
               </div>
               <button
                 onClick={() => openSupplementModal(activeNote.id, activeNote.relatedFields[0])}

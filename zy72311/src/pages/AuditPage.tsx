@@ -52,6 +52,12 @@ export default function AuditPage() {
     })
   }
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch()
+    }
+  }
+
   const operators = [...new Set(auditLogs.map((l) => l.operator))]
 
   const formatValue = (val: any) => {
@@ -116,6 +122,7 @@ export default function AuditPage() {
                 type="text"
                 value={filters.keyword}
                 onChange={(e) => setFilters((p) => ({ ...p, keyword: e.target.value }))}
+                onKeyDown={handleKeyDown}
                 placeholder="关键词搜索"
                 className="w-full bg-slate-700 border border-slate-600 rounded-lg pl-8 pr-3 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500 transition-colors"
               />
@@ -180,6 +187,16 @@ export default function AuditPage() {
 
                         {isExpanded && hasDetails && (
                           <div className="mt-3 space-y-2 border-t border-slate-700/50 pt-3">
+                            <div className="text-xs grid grid-cols-2 gap-2">
+                              <div>
+                                <span className="text-slate-500">目标类型：</span>
+                                <span className="text-slate-400">{log.targetType}</span>
+                              </div>
+                              <div>
+                                <span className="text-slate-500">目标ID：</span>
+                                <span className="text-slate-400 font-mono">#{log.targetId.slice(0, 12)}</span>
+                              </div>
+                            </div>
                             {log.beforeValue && (
                               <div>
                                 <div className="text-xs text-slate-500 mb-1">变更前</div>

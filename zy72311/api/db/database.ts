@@ -41,6 +41,9 @@ function initSchema(db: Database.Database): void {
       record_type TEXT NOT NULL CHECK(record_type IN ('normal', 'zero_denominator_empty', 'supplemented')),
       source TEXT NOT NULL CHECK(source IN ('questionnaire', 'boundary_note')),
       status TEXT NOT NULL CHECK(status IN ('pending', 'review', 'confirmed', 'rejected')),
+      boundary_note_id TEXT NULL,
+      original_statement TEXT NULL,
+      next_handler TEXT NULL,
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
 
@@ -100,6 +103,10 @@ function initSchema(db: Database.Database): void {
       reviewer TEXT NOT NULL,
       status TEXT NOT NULL CHECK(status IN ('pending', 'approved', 'rejected')),
       review_note TEXT,
+      original_statement TEXT NULL,
+      corrected_value TEXT NULL,
+      next_handler TEXT NULL,
+      boundary_note_id TEXT NULL,
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
       reviewed_at TEXT
     );
@@ -113,6 +120,29 @@ function initSchema(db: Database.Database): void {
     CREATE INDEX IF NOT EXISTS idx_audit_created ON audit_logs(created_at);
     CREATE INDEX IF NOT EXISTS idx_review_status ON review_tasks(status);
   `)
+
+  migrateColumns(db)
+}
+
+function columnExists(db: Database.Database, tableName: string, columnName: string): boolean {
+  const columns = db.prepare(`PRAGMA table_info(${tableName})`).all() as { name: string }[]
+  return columns.some(col => col.name === columnName)
+}
+
+function migrateColumns(db: Database.Database): void {
+  const qrColumns = ['boundary_note_id', 'original_statement', 'next_handler']
+  for (const col of qrColumns) {
+    if (!columnExists(db, 'questionnaire_raw', col)) {
+      db.prepare(`ALTER TABLE questionnaire_raw ADD COLUMN ${col} TEXT NULL`).run()
+    }
+  }
+
+  const rtColumns = ['original_statement', 'corrected_value', 'next_handler', 'boundary_note_id']
+  for (const col of rtColumns) {
+    if (!columnExists(db, 'review_tasks', col)) {
+      db.prepare(`ALTER TABLE review_tasks ADD COLUMN ${col} TEXT NULL`).run()
+    }
+  }
 }
 
 function seedData(db: Database.Database): void {
@@ -122,13 +152,13 @@ function seedData(db: Database.Database): void {
   const now = new Date().toISOString()
 
   const insertQr = db.prepare(`
-    INSERT INTO questionnaire_raw (id, batch_id, target_name, weight, score, denominator, raw_value, record_type, source, status, created_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO questionnaire_raw (id, batch_id, target_name, weight, score, denominator, raw_value, record_type, source, status, boundary_note_id, original_statement, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `)
 
-  insertQr.run('qr-001', 'batch-001', '客户满意度', 0.3, 85.0, 100.0, '客户满意度,0.3,85.0,100.0', 'normal', 'questionnaire', 'confirmed', now)
-  insertQr.run('qr-002', 'batch-001', '响应时效', 0.25, 0, 0, '响应时效,0.25,,', 'zero_denominator_empty', 'questionnaire', 'review', now)
-  insertQr.run('qr-003', 'batch-001', '合规达标率', 0.2, 92.0, 100.0, '合规达标率,0.2,92.0,100.0', 'supplemented', 'boundary_note', 'pending', now)
+  insertQr.run('qr-001', 'batch-001', '客户满意度', 0.3, 85.0, 100.0, '客户满意度,0.3,85.0,100.0', 'normal', 'questionnaire', 'confirmed', null, null, now)
+  insertQr.run('qr-002', 'batch-001', '响应时效', 0.25, 0, 0, '响应时效,0.25,,', 'zero_denominator_empty', 'questionnaire', 'review', null, null, now)
+  insertQr.run('qr-003', 'batch-001', '合规达标率', 0.2, 92.0, 100.0, '合规达标率,0.2,92.0,100.0', 'supplemented', 'boundary_note', 'pending', 'bn-001', '2024年Q1之前合规达标率计算口径：分母为实际检查项数，非全部应检项数。补录时需按旧口径折算。', now)
 
   const insertBn = db.prepare(`
     INSERT INTO boundary_notes (id, title, content, related_fields, methodology, effective_date, created_at, updated_at)

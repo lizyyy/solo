@@ -53,12 +53,12 @@ router.put('/:id/resolve', (req: Request, res: Response): void => {
   const newStatus = decision === 'confirm' ? 'confirmed' : 'rejected'
 
   const qrRecord = db.prepare('SELECT * FROM questionnaire_raw WHERE id = ?').get(conflict.questionnaire_record_id) as any
-  const affectedResults: string[] = []
+  const boundaryNote = db.prepare('SELECT * FROM boundary_notes WHERE id = ?').get(conflict.boundary_note_id) as any
+  const originalStatement = boundaryNote?.content ? boundaryNote.content.substring(0, 100) : ''
+
+  const affectedResults: any[] = []
 
   const scoringResult = db.prepare("SELECT * FROM scoring_results WHERE target_name = ?").get(qrRecord?.target_name) as any
-  if (scoringResult) {
-    affectedResults.push(scoringResult.id)
-  }
 
   const insertAudit = db.prepare(`
     INSERT INTO audit_logs (id, operator, action, target_type, target_id, before_value, after_value, reason, affected_results, created_at)
@@ -70,29 +70,78 @@ router.put('/:id/resolve', (req: Request, res: Response): void => {
       UPDATE conflicts SET status = ?, resolved_by = ?, resolved_at = ?, resolution = ? WHERE id = ?
     `).run(newStatus, operator, now, decision === 'confirm' ? '采用边界值说明' : '保留问卷原始值', id)
 
+    let beforeQr: any = { score: qrRecord?.score, source: qrRecord?.source, status: qrRecord?.status }
+    let afterQr: any = {}
+
     if (decision === 'confirm' && qrRecord) {
       const newValue = parseFloat(conflict.boundary_note_value)
+      const safeValue = isNaN(newValue) ? 0 : newValue
+      afterQr = {
+        score: safeValue,
+        source: 'boundary_note',
+        status: 'confirmed',
+        boundaryNoteId: conflict.boundary_note_id,
+        originalStatement
+      }
       db.prepare(`
-        UPDATE questionnaire_raw SET score = ?, source = 'boundary_note', status = 'confirmed' WHERE id = ?
-      `).run(isNaN(newValue) ? 0 : newValue, conflict.questionnaire_record_id)
+        UPDATE questionnaire_raw SET score = ?, source = 'boundary_note', status = 'confirmed', boundary_note_id = ?, original_statement = ? WHERE id = ?
+      `).run(safeValue, conflict.boundary_note_id, originalStatement, conflict.questionnaire_record_id)
 
       if (scoringResult) {
-        const newScore = isNaN(newValue) ? 0 : newValue
+        const newScore = safeValue
         const newWeightedScore = newScore * scoringResult.weight
         db.prepare(`
           UPDATE scoring_results SET score = ?, weighted_score = ?, source = 'boundary_note', version = version + 1, updated_at = ? WHERE id = ?
         `).run(newScore, newWeightedScore, now, scoringResult.id)
+        affectedResults.push({
+          scoringResultId: scoringResult.id,
+          questionnaireRecordId: conflict.questionnaire_record_id,
+          conflictId: id
+        })
+      } else {
+        affectedResults.push({
+          questionnaireRecordId: conflict.questionnaire_record_id,
+          conflictId: id
+        })
       }
     } else if (decision === 'reject' && qrRecord) {
+      afterQr = { score: qrRecord.score, source: qrRecord.source, status: 'confirmed' }
       db.prepare(`
         UPDATE questionnaire_raw SET status = 'confirmed' WHERE id = ?
       `).run(conflict.questionnaire_record_id)
+      if (scoringResult) {
+        db.prepare(`
+          UPDATE scoring_results SET updated_at = ? WHERE id = ?
+        `).run(now, scoringResult.id)
+        affectedResults.push({
+          scoringResultId: scoringResult.id,
+          questionnaireRecordId: conflict.questionnaire_record_id,
+          conflictId: id
+        })
+      } else {
+        affectedResults.push({
+          questionnaireRecordId: conflict.questionnaire_record_id,
+          conflictId: id
+        })
+      }
     }
+
+    const beforeValue = JSON.stringify({
+      conflict: { status: 'pending', value: conflict.questionnaire_value },
+      questionnaireRecord: beforeQr,
+      boundaryNote: { id: conflict.boundary_note_id, source: 'boundary_note' }
+    })
+    const afterValue = JSON.stringify({
+      conflict: { status: newStatus, value: decision === 'confirm' ? conflict.boundary_note_value : conflict.questionnaire_value },
+      questionnaireRecord: afterQr,
+      boundaryNote: { id: conflict.boundary_note_id, source: 'boundary_note' },
+      relatedRecordId: conflict.questionnaire_record_id
+    })
 
     insertAudit.run(
       uuidv4(), operator, 'resolve_conflict', 'conflict', id,
-      JSON.stringify({ status: 'pending', value: conflict.questionnaire_value }),
-      JSON.stringify({ status: newStatus, value: decision === 'confirm' ? conflict.boundary_note_value : conflict.questionnaire_value }),
+      beforeValue,
+      afterValue,
       reason,
       JSON.stringify(affectedResults),
       now
