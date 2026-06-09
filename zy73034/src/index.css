@@ -1,0 +1,74 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: "Noto Sans SC", -apple-system, BlinkMacSystemFont, "PingFang SC",
+    "Microsoft YaHei", sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  line-height: 1.55;
+  font-weight: 400;
+  color-scheme: light;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  color: #1f2a22;
+  background-color: #FAF6EE;
+}
+
+.font-song {
+  font-family: "Noto Serif SC", "Source Han Serif CN", SimSun, serif;
+  letter-spacing: 0.01em;
+}
+.font-hei {
+  font-family: "Noto Sans SC", "Source Han Sans CN", "PingFang SC", sans-serif;
+}
+.font-mono {
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.bg-paper {
+  background-color: #FAF6EE;
+  background-image:
+    radial-gradient(circle at 20% 10%, rgba(74,103,65,0.05) 0, transparent 40%),
+    radial-gradient(circle at 80% 90%, rgba(201,123,59,0.06) 0, transparent 45%);
+  background-attachment: fixed;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD8C1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #A9BD9B;
+}
+::-webkit-scrollbar-track {
+  background: #F3F5F0;
+}
