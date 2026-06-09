@@ -65,6 +65,9 @@ class ImportService:
 
             note_hash = note.content_hash()
 
+            is_update = False
+            old_error_id_to_reuse = None
+
             if note.note_id in self._note_store:
                 existing_note = self._note_store[note.note_id]
                 existing_hash = existing_note.content_hash()
@@ -79,6 +82,9 @@ class ImportService:
                     note.version = existing_note.version + 1
                     result.updated_notes += 1
                     result.updated_original_notes.append(existing_note)
+                    is_update = True
+                    if existing_hash in self._error_by_note_hash:
+                        old_error_id_to_reuse = self._error_by_note_hash[existing_hash]
             else:
                 result.new_notes += 1
 
@@ -87,9 +93,41 @@ class ImportService:
             error = self.rule_engine.create_error_from_note(note, batch_id)
             error.source_note_hash = note_hash
 
+            if is_update and old_error_id_to_reuse and old_error_id_to_reuse in self._error_store:
+                old_error = self._error_store[old_error_id_to_reuse]
+                error.error_id = old_error.error_id
+                error.created_at = old_error.created_at
+                error.version = old_error.version + 1
+                if old_error.review_by:
+                    error.review_by = old_error.review_by
+                    error.review_time = old_error.review_time
+                    error.review_comment = old_error.review_comment
+
+                before_data = old_error.to_dict()
+                after_data = error.to_dict()
+                fields_changed = self._find_changed_fields(before_data, after_data)
+                history_entry = VersionHistory(
+                    error_id=error.error_id,
+                    version=error.version,
+                    before_data=before_data,
+                    after_data=after_data,
+                    modified_by="system_import_update",
+                    modification_reason="重新导入巡检备注，数据已更新",
+                    fields_changed=fields_changed,
+                )
+                if error.error_id not in self._history_store:
+                    self._history_store[error.error_id] = []
+                self._history_store[error.error_id].append(history_entry)
+
+                old_existing_note_hash = existing_note.content_hash() if 'existing_note' in locals() else None
+                if old_existing_note_hash and old_existing_note_hash in self._error_by_note_hash:
+                    del self._error_by_note_hash[old_existing_note_hash]
+            else:
+                if error.error_id not in self._history_store:
+                    self._history_store[error.error_id] = []
+
             self._error_store[error.error_id] = error
             self._error_by_note_hash[note_hash] = error.error_id
-            self._history_store[error.error_id] = []
 
             result.errors.append(error)
             result.created_errors += 1

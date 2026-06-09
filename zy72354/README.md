@@ -138,6 +138,44 @@
 
 ---
 
+### 3.1 人工复核信息包（采样时间缺半小时等待处理场景）
+
+每条需要人工复核的记录都附带完整的信息包，**不会提前归到正常结果里**：
+
+| 字段 | 说明 |
+|------|------|
+| 原始问题说法 | 保留判定时的原话，如：`"采样时间缺了20分钟（只有10分钟，要求≥30分钟）..."` |
+| 改后的值 | 改前→改后的中文字段对比，如：`采样开始时间：08:00 → 08:00，采样时长：10 → 35` |
+| 处理原因 | 修改人填写的复核说明，如：`"经核对原始巡检记录，实际采样到8:35，之前少记25分钟"` |
+| 下一步找谁 | 按状态自动判断：<br>待复核→质检员小白<br>已修改→质检员主管<br>已回滚→质检员小白（请确认是否重新处理） |
+
+代码入口：
+- 详情接口：`workflow.get_full_error_detail(error_id)` → 返回含 `manual_review_packet` 字典
+- 人话渲染：`workflow.render_error_detail_for_humans(error_id)` → 直接打印可读详情
+- 报告导出：`workflow.export_report(error_ids=[...])` / `workflow.save_report_to_file(path)`
+  报告包含：总览摘要 + 每条记录的**全链路详情 + 人工复核信息包 + 完整版本历史**
+
+对应代码：[workflow.py#L606-L809](file:///Users/lzy/pro/solo/workspaces/zy72354/workflow.py#L606-L809)
+
+### 3.2 同一份数据全链路同步规则
+
+对同一条记录（同一个 `error_id`）的任何修改/回滚，以下视图**必须同时更新，不允许出现数据错位**：
+
+1. **待复核列表** `import_service.get_pending_review_errors()` — 状态变化后自动进/出列表
+2. **单条详情** `workflow.get_full_error_detail(error_id)` — 最新状态+历史+复核信息包
+3. **总览摘要** `viz_service.get_visualization_summary()` — 按状态计数全部实时重算
+4. **3D/2D图表** `viz_service.prepare_chart_data(ViewMode.*)` — 每个数据点同步最新状态与坐标
+5. **版本历史** `import_service.get_error_history(error_id)` — 修改/回滚自动追加一条
+6. **导出报告** `workflow.export_report()` — 基于上述最新快照生成
+
+同 `error_id` 复用规则：
+- 同一个 `note_id` 更新导入 → **error_id 不变，版本号+1，保留历史**（不会生成新记录）
+- 完全相同内容重复导入 → **直接跳过，不新增、不改历史、数量不翻倍**
+
+对应代码：[import_service.py#L61-L133](file:///Users/lzy/pro/solo/workspaces/zy72354/import_service.py#L61-L133)
+
+---
+
 ## 四、文件结构
 
 | 文件 | 职责 |

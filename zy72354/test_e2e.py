@@ -491,6 +491,186 @@ class TestSolarTrackingBracketErrorSystem(unittest.TestCase):
             for msg in error.human_readable_issues:
                 print(f"   • {msg}")
 
+    def test_09_full_chain_consistency_after_modify_and_rollback(self):
+        """测试：修改和回滚后，列表/详情/摘要/历史 保持同一份数据一致"""
+        print("\n" + "=" * 50)
+        print("TEST 9: 修改→回滚 全链路一致性")
+        print("=" * 50)
+        from datetime import timedelta
+
+        notes = create_test_notes()
+        self.workflow.step_1_import_notes(notes)
+
+        pending = self.import_service.get_pending_review_errors()
+        target = next(
+            e for e in pending
+            if any(v.startswith("SAMPLING_DURATION_TOO_SHORT") for v in e.boundary_violations)
+        )
+        eid = target.error_id
+        bracket = target.bracket_id
+
+        duration_before = target.sampling_duration_minutes
+        status_before = target.status
+
+        print(f"聚焦：支架{bracket}（{eid}）")
+        print(f"   修改前：采样{duration_before}分钟，状态{status_before.value}")
+
+        base_date = datetime(2026, 6, 1)
+        fix_result = self.workflow.reviewer_fix_duration_issue(
+            error_id=eid,
+            new_sampling_start=base_date.replace(hour=8, minute=0),
+            new_sampling_end=base_date.replace(hour=8, minute=35),
+            reviewer="质检员小白",
+            review_comment="测试：补全到35分钟",
+        )
+        self.assertTrue(fix_result.success)
+        after_modify = self.import_service.get_error(eid)
+        detail_after_modify = self.workflow.get_full_error_detail(eid)
+        self.assertTrue(detail_after_modify["success"])
+
+        print(f"   修改后：采样{after_modify.sampling_duration_minutes}分钟，"
+              f"状态{after_modify.status.value}，"
+              f"版本v{after_modify.version}，"
+              f"历史条数{detail_after_modify['history_count']}")
+
+        self.assertAlmostEqual(after_modify.sampling_duration_minutes, 35.0, places=1)
+        self.assertGreaterEqual(detail_after_modify["history_count"], 1)
+
+        pending_after_modify = self.import_service.get_pending_review_errors()
+        pending_ids = {e.error_id for e in pending_after_modify}
+        if after_modify.status == ErrorStatus.NORMAL:
+            self.assertNotIn(eid, pending_ids, "修改达标后不应再在待复核列表中")
+
+        summary_after_modify = self.viz_service.get_visualization_summary()
+        self.assertEqual(
+            summary_after_modify["by_status"]["normal"], 1 + 1,
+            "摘要中正常数应增加一条"
+        )
+
+        chart_after_modify = self.viz_service.prepare_chart_data(ViewMode.CHART_3D)
+        dp = next(d for d in chart_after_modify["data_points"] if d["error_id"] == eid)
+        self.assertEqual(dp["status"], "正常", "3D图表点状态应同步为正常")
+
+        packet = detail_after_modify["manual_review_packet"]
+        self.assertIn("原始问题说法", packet)
+        self.assertIn("改后的值", packet)
+        self.assertIn("处理原因", packet)
+        self.assertIn("下一步找谁", packet)
+        self.assertTrue(packet["原始问题说法"], "原始问题说法不应为空")
+        self.assertTrue(packet["改后的值"], "改后的值不应为空")
+        self.assertTrue(
+            "质检员" in packet["下一步找谁"] or "主管" in packet["下一步找谁"] or "归档" in packet["下一步找谁"],
+            f"下一步找谁应明确，当前值：{packet['下一步找谁']}"
+        )
+        print(f"   人工复核信息包完整：原始说法/改后值/处理原因/下一步找谁 ✅")
+        print(f"     → 下一步找谁：{packet['下一步找谁']}")
+
+        report = self.workflow.export_report(error_ids=[eid])
+        self.assertEqual(report["record_count"], 1, "报告应包含1条记录")
+        self.assertIn(bracket, report["text"], "报告文本中应包含支架号")
+        self.assertIn("原始问题说法", report["text"], "报告应包含人工复核信息")
+        print(f"   导出报告：{report['record_count']}条，包含人工复核信息 ✅")
+
+        rollback_result = self.workflow.rollback_modification(eid, "质检员小白")
+        self.assertTrue(rollback_result.success)
+
+        after_rollback = self.import_service.get_error(eid)
+        detail_rollback = self.workflow.get_full_error_detail(eid)
+        print(f"   回滚后：采样{after_rollback.sampling_duration_minutes}分钟，"
+              f"状态{after_rollback.status.value}，"
+              f"版本v{after_rollback.version}，"
+              f"历史条数{detail_rollback['history_count']}")
+
+        self.assertAlmostEqual(
+            after_rollback.sampling_duration_minutes, duration_before, places=1)
+        self.assertEqual(after_rollback.status, ErrorStatus.ROLLED_BACK)
+        self.assertGreaterEqual(detail_rollback["history_count"], 2, "回滚后历史条数应至少2条")
+
+        pending_ids_rollback = self.import_service.get_pending_review_errors()
+        bracket_in_pending_after_rollback = any(
+            e.bracket_id == bracket for e in pending_ids_rollback
+        )
+        has_duration_issue = any(
+            v.startswith("SAMPLING_DURATION_TOO_SHORT")
+            for v in after_rollback.boundary_violations
+        )
+        self.assertTrue(
+            bracket_in_pending_after_rollback or has_duration_issue,
+            "回滚后应恢复待复核/问题字段保持待处理"
+        )
+
+        summary_after_rollback = self.viz_service.get_visualization_summary()
+        self.assertEqual(
+            summary_after_rollback["by_status"]["rolled_back"], 1)
+        print(f"   回滚后摘要同步：已回滚1条 ✅")
+
+        print("✅ 修改→列表→详情→摘要→3D图→报告→回滚→再同步 全链路一致")
+
+    def test_10_update_import_preserves_history_and_error_id(self):
+        """测试：重新导入更新同note_id时，error_id和历史记录保留不丢"""
+        print("\n" + "=" * 50)
+        print("TEST 10: 更新导入保留error_id不变+历史不丢")
+        print("=" * 50)
+        base_date = datetime(2026, 6, 1)
+
+        notes_v1 = [ManualInspectionNote(
+            note_id="NOTE_UPDATE_01",
+            inspection_date="2026-06-01",
+            inspector="更新测试",
+            bracket_id="BRACKET_UP_01",
+            azimuth_error=1.0,
+            elevation_error=0.5,
+            sampling_start_time=base_date.replace(hour=8, minute=0),
+            sampling_end_time=base_date.replace(hour=8, minute=15),
+            tracking_accuracy=96.0,
+            raw_content="更新测试v1：15分钟，更新测试",
+        )]
+        r1 = self.workflow.step_1_import_notes(notes_v1)
+        self.assertTrue(r1.success)
+        note_v1_hash = notes_v1[0].content_hash()
+        eid_1 = self.import_service._error_by_note_hash.get(note_v1_hash)
+        self.assertIsNotNone(eid_1, "v1导入后应能找到error_id")
+        hc1 = len(self.import_service.get_error_history(eid_1))
+        print(f"   v1导入：error_id={eid_1}，历史条数={hc1}")
+
+        notes_v2 = [ManualInspectionNote(
+            note_id="NOTE_UPDATE_01",
+            inspection_date="2026-06-01",
+            inspector="更新测试",
+            bracket_id="BRACKET_UP_01",
+            azimuth_error=1.0,
+            elevation_error=0.5,
+            sampling_start_time=base_date.replace(hour=8, minute=0),
+            sampling_end_time=base_date.replace(hour=8, minute=45),
+            tracking_accuracy=96.0,
+            raw_content="更新测试v2：45分钟，达标",
+        )]
+        r2 = self.workflow.step_1_import_notes(notes_v2)
+        self.assertTrue(r2.success)
+        note_v2_hash = notes_v2[0].content_hash()
+        eid_2 = self.import_service._error_by_note_hash.get(note_v2_hash)
+        self.assertIsNotNone(eid_2, "v2更新导入后应能找到error_id")
+        hc2 = len(self.import_service.get_error_history(eid_2))
+        print(f"   v2更新导入：error_id={eid_2}，历史条数={hc2}")
+
+        self.assertEqual(eid_1, eid_2, "更新导入前后error_id必须相同")
+        self.assertGreaterEqual(hc2, 1, "更新导入必须保留历史")
+
+        err_after = self.import_service.get_error(eid_2)
+        self.assertAlmostEqual(err_after.sampling_duration_minutes, 45.0, places=1)
+        print("✅ 更新导入：error_id复用+历史保留+数据正确")
+
+        r3 = self.workflow.step_1_import_notes(notes_v2)
+        hc3 = len(self.import_service.get_error_history(eid_1))
+        print(f"   v3完全重复导入：历史条数={hc3}，重复跳过")
+        import_info = r3.data.get("import_result", {})
+        dup_count = import_info.get("duplicate", 0)
+        dup_skipped = getattr(r3, "duplicate_errors_skipped", 0)
+        total_dup = dup_count + dup_skipped
+        self.assertGreaterEqual(total_dup, 1, "完全重复导入应有重复跳过计数")
+        self.assertEqual(hc2, hc3, "完全重复导入不新增历史")
+        print("✅ 完全重复导入：不新增历史+数量不翻倍")
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

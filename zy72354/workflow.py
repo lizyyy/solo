@@ -602,3 +602,208 @@ class QualityInspectionWorkflow:
                 f"下一步：{self.current_step.value}"
             ),
         }
+
+    def get_full_error_detail(self, error_id: str) -> Dict[str, Any]:
+        error = self.import_service.get_error(error_id)
+        if not error:
+            return {"success": False, "message": "找不到误差记录"}
+
+        note = self.import_service.get_note(error.note_id)
+        history = self.import_service.get_error_history(error_id)
+        human_diff = []
+        if len(history) >= 1:
+            human_diff = self.import_service.get_version_diff_for_humans(
+                error_id, history[-1].version - 1, history[-1].version
+            )
+
+        has_duration_issue = any(
+            v.startswith("SAMPLING_DURATION_TOO_SHORT")
+            for v in error.boundary_violations
+        )
+
+        original_issue_statement = ""
+        if error.human_readable_issues:
+            original_issue_statement = error.human_readable_issues[0]
+
+        modified_value_summary = {}
+        processing_reason = ""
+        next_step_person = ""
+
+        if history:
+            latest = history[-1]
+            processing_reason = latest.modification_reason
+            for f in latest.fields_changed:
+                if f in latest.after_data:
+                    modified_value_summary[f] = {
+                        "before": latest.before_data.get(f),
+                        "after": latest.after_data.get(f),
+                    }
+
+        if error.status == ErrorStatus.PENDING_REVIEW:
+            next_step_person = "质检员小白（请先核对采样开始/结束时间，填写复核说明或补全数据）"
+        elif error.status == ErrorStatus.MODIFIED:
+            next_step_person = "质检员主管（请确认修改后数据是否可归档）"
+        elif error.status == ErrorStatus.ROLLED_BACK:
+            next_step_person = "质检员小白（回滚完成，请确认是否需要重新处理）"
+        elif error.status == ErrorStatus.NORMAL:
+            next_step_person = "已归档，无需进一步处理"
+        else:
+            next_step_person = "设备维护组（请根据异常内容检查支架）"
+
+        review_info = {
+            "reviewer": error.review_by,
+            "review_time": error.review_time.strftime("%Y-%m-%d %H:%M") if error.review_time else "",
+            "comment": error.review_comment,
+        }
+
+        return {
+            "success": True,
+            "error": error.to_dict(),
+            "note": note.to_dict() if note else None,
+            "threshold": self.rule_engine.threshold.to_dict(),
+            "history": [h.to_dict() for h in history],
+            "history_count": len(history),
+            "latest_human_diff": human_diff,
+            "has_duration_issue": has_duration_issue,
+            "manual_review_required": has_duration_issue or error.status == ErrorStatus.PENDING_REVIEW,
+            "manual_review_packet": {
+                "原始问题说法": original_issue_statement or "（无问题描述）",
+                "改后的值": modified_value_summary,
+                "处理原因": processing_reason or (review_info["comment"] if review_info["comment"] else "（未填写）"),
+                "下一步找谁": next_step_person,
+            },
+            "review_info": review_info,
+        }
+
+    def render_error_detail_for_humans(self, error_id: str) -> List[str]:
+        detail = self.get_full_error_detail(error_id)
+        if not detail["success"]:
+            return [detail["message"]]
+
+        lines: List[str] = []
+        error = detail["error"]
+        packet = detail["manual_review_packet"]
+
+        lines.append("=" * 50)
+        lines.append(f"📋 太阳跟踪支架误差 · 全链路详情")
+        lines.append("=" * 50)
+        lines.append(f"  误差ID：{error['error_id']}（v{error['version']}）")
+        lines.append(f"  支架号：{error['bracket_id']}    巡检日期：{error['inspection_date']}")
+        lines.append(f"  关联备注：{error['note_id']}    来源：{error['data_source']}")
+        lines.append(f"  当前状态：{error['status']}")
+        lines.append("-" * 50)
+        lines.append(f"  方位角误差：{error['azimuth_error']}°    俯仰角误差：{error['elevation_error']}°")
+        lines.append(f"  跟踪准确率：{error['tracking_accuracy']}%    采样时长：{error['sampling_duration_minutes']}分钟")
+        lines.append("-" * 50)
+        lines.append("🔍 【问题判定结果】")
+        if error["human_readable_issues"]:
+            for msg in error["human_readable_issues"]:
+                lines.append(f"   ⚠️  {msg}")
+        else:
+            lines.append("   ✅ 无边界规则问题")
+        lines.append("-" * 50)
+        lines.append("📝 【人工复核信息包】（别提前归正常！）")
+        lines.append(f"   🗣️  原始问题说法：{packet['原始问题说法']}")
+        lines.append(f"   🔧 改后的值：")
+        if packet["改后的值"]:
+            field_cn = {
+                "sampling_start_time": "采样开始时间",
+                "sampling_end_time": "采样结束时间",
+                "sampling_duration_minutes": "采样时长",
+                "azimuth_error": "方位角误差",
+                "elevation_error": "俯仰角误差",
+                "tracking_accuracy": "跟踪准确率",
+                "status": "状态",
+            }
+            for f, v in packet["改后的值"].items():
+                name = field_cn.get(f, f)
+                lines.append(f"      · {name}：{v['before']} → {v['after']}")
+        else:
+            lines.append("      · （暂无修改记录）")
+        lines.append(f"   💡 处理原因：{packet['处理原因']}")
+        lines.append(f"   👤 下一步找谁：{packet['下一步找谁']}")
+        lines.append("-" * 50)
+        lines.append(f"📜 【版本历史】共 {detail['history_count']} 条")
+        if detail["history"]:
+            for h in detail["history"]:
+                lines.append(
+                    f"   v{h['version']} | {h['modified_time'][:16]} | "
+                    f"{h['modified_by']} | 原因：{h['modification_reason']}"
+                )
+                if h["fields_changed"]:
+                    lines.append(f"          修改字段：{', '.join(h['fields_changed'])}")
+        else:
+            lines.append("   （暂无修改/回滚记录）")
+        lines.append("-" * 50)
+        if detail["latest_human_diff"]:
+            lines.append("🔄 【最近一次改前改后对比】")
+            for d in detail["latest_human_diff"]:
+                lines.append(f"   {d}")
+        lines.append("=" * 50)
+        return lines
+
+    def export_report(self, error_ids: Optional[List[str]] = None, format: str = "text") -> Dict[str, Any]:
+        if error_ids is None:
+            all_errors = self.import_service.get_all_errors()
+            error_ids = [e.error_id for e in all_errors]
+
+        report_lines: List[str] = []
+        report_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        report_lines.append("")
+        report_lines.append("#" * 60)
+        report_lines.append("#  太阳跟踪支架误差 · 质检报告")
+        report_lines.append(f"#  导出时间：{report_time}")
+        report_lines.append("#" * 60)
+        report_lines.append("")
+
+        summary = self.viz_service.get_visualization_summary()
+        report_lines.append("📊 总览摘要")
+        report_lines.append("-" * 40)
+        report_lines.append(f"   总记录数：{summary['total']}")
+        report_lines.append(
+            f"   按状态分布："
+            f"正常 {summary['by_status']['normal']} 条，"
+            f"异常 {summary['by_status']['abnormal']} 条，"
+            f"待复核 {summary['by_status']['pending_review']} 条，"
+            f"已修改 {summary['by_status']['modified']} 条，"
+            f"已回滚 {summary['by_status']['rolled_back']} 条"
+        )
+        report_lines.append(f"   采样时间缺半小时：{summary['duration_issues_count']} 条")
+        report_lines.append(f"   需要关注：{summary['needs_attention']} 条")
+        report_lines.append(f"   一句话总结：{summary['human_summary']}")
+        report_lines.append("")
+        report_lines.append("=" * 60)
+        report_lines.append("")
+
+        for idx, eid in enumerate(error_ids, 1):
+            detail_lines = self.render_error_detail_for_humans(eid)
+            report_lines.extend(detail_lines)
+            report_lines.append("")
+
+        report_lines.append("")
+        report_lines.append("#" * 60)
+        report_lines.append("#  报告结束 · 共导出 " + str(len(error_ids)) + " 条记录")
+        report_lines.append("#" * 60)
+        report_lines.append("")
+
+        report_text = "\n".join(report_lines)
+
+        return {
+            "format": format,
+            "generated_at": report_time,
+            "record_count": len(error_ids),
+            "error_ids": error_ids,
+            "summary": summary,
+            "text": report_text,
+            "lines": report_lines,
+        }
+
+    def save_report_to_file(self, output_path: str, error_ids: Optional[List[str]] = None) -> str:
+        report = self.export_report(error_ids=error_ids)
+        try:
+            with open(output_path, "w", encoding="utf-8") as f:
+                f.write(report["text"])
+            return output_path
+        except Exception as ex:
+            raise IOError(f"报告保存失败：{ex}")
