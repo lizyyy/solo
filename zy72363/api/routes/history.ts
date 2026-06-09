@@ -190,20 +190,75 @@ router.post('/:id/rollback', async (req: Request, res: Response): Promise<void> 
       let updateStmt = db.prepare(`UPDATE ${table} SET ${field} = ?, updated_at = ? WHERE id = ?`)
       updateStmt.run(oldValue, now, record.target_id)
 
+      if (table === 'sensor_data' && field === 'coefficient') {
+        const zone = db.prepare('SELECT * FROM safety_zone WHERE sensor_id = ?').get(record.target_id) as any
+        if (zone) {
+          db.prepare(
+            'UPDATE safety_zone SET coefficient = ?, coefficient_source = ?, review_status = ?, updated_at = ? WHERE sensor_id = ?'
+          ).run(
+            oldValue,
+            'auto',
+            'approved',
+            now,
+            record.target_id
+          )
+
+          recordChange({
+            targetType: 'safety_zone',
+            targetId: zone.id,
+            field: 'coefficient',
+            oldValue: currentValue,
+            newValue: oldValue,
+            operator,
+            reason: reason || 'Rollback from sensor coefficient history',
+          })
+        }
+
+        db.prepare(
+          'UPDATE sensor_data SET coefficient_manual = 0, coefficient_reason = NULL, updated_at = ? WHERE id = ?'
+        ).run(now, record.target_id)
+      }
+
+      if (table === 'safety_zone' && field === 'coefficient') {
+        const zone = db.prepare('SELECT sensor_id FROM safety_zone WHERE id = ?').get(record.target_id) as { sensor_id: string }
+        if (zone && zone.sensor_id) {
+          db.prepare(
+            'UPDATE sensor_data SET coefficient = ?, coefficient_manual = ?, updated_at = ? WHERE id = ?'
+          ).run(
+            oldValue,
+            0,
+            now,
+            zone.sensor_id
+          )
+
+          recordChange({
+            targetType: 'sensor',
+            targetId: zone.sensor_id,
+            field: 'coefficient',
+            oldValue: currentValue,
+            newValue: oldValue,
+            operator,
+            reason: reason || 'Rollback from safety_zone coefficient history',
+          })
+        }
+      }
+
       if (table === 'safety_zone') {
         const zone = db.prepare('SELECT version FROM safety_zone WHERE id = ?').get(record.target_id) as { version: number }
-        const newVersion = zone.version + 1
-        db.prepare('UPDATE safety_zone SET version = ? WHERE id = ?').run(newVersion, record.target_id)
+        if (zone) {
+          const newVersion = zone.version + 1
+          db.prepare('UPDATE safety_zone SET version = ? WHERE id = ?').run(newVersion, record.target_id)
 
-        recordChange({
-          targetType: 'safety_zone',
-          targetId: record.target_id,
-          field: 'version',
-          oldValue: zone.version,
-          newValue: newVersion,
-          operator,
-          reason: reason || 'Rollback version increment',
-        })
+          recordChange({
+            targetType: 'safety_zone',
+            targetId: record.target_id,
+            field: 'version',
+            oldValue: zone.version,
+            newValue: newVersion,
+            operator,
+            reason: reason || 'Rollback version increment',
+          })
+        }
       }
 
       recordChange({

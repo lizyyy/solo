@@ -115,22 +115,25 @@ export async function importSensors(
 
 export async function updateSensorRemark(
   sensorId: string,
-  remark: string
+  remark: string,
+  reason: string,
+  operator: string = 'system'
 ): Promise<SensorData> {
   return fetchApi<SensorData>(`/sensors/${sensorId}/remark`, {
     method: 'PUT',
-    body: JSON.stringify({ remark }),
+    body: JSON.stringify({ remark, reason, operator }),
   })
 }
 
 export async function updateSensorCoefficient(
   sensorId: string,
   coefficient: number,
-  reason: string
+  reason: string,
+  operator: string = 'system'
 ): Promise<SensorData> {
   return fetchApi<SensorData>(`/sensors/${sensorId}/coefficient`, {
     method: 'PUT',
-    body: JSON.stringify({ coefficient, reason }),
+    body: JSON.stringify({ coefficient, reason, operator }),
   })
 }
 

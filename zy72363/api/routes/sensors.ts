@@ -94,6 +94,8 @@ router.post('/import', upload.single('file'), async (req: Request, res: Response
     let duplicates = 0
 
     const tx = db.transaction(() => {
+      insertBatch.run(batchId, filename, records.length, imported, duplicates, now)
+
       for (const record of records) {
         const sensorCode = record['sensor_code'] || record['传感器编号'] || ''
         const materialType = record['material_type'] || record['材质类型'] || ''
@@ -147,7 +149,7 @@ router.post('/import', upload.single('file'), async (req: Request, res: Response
         }
       }
 
-      insertBatch.run(batchId, filename, records.length, imported, duplicates, now)
+      db.prepare('UPDATE batch SET imported_count = ?, duplicate_count = ? WHERE id = ?').run(imported, duplicates, batchId)
     })
 
     tx()
@@ -319,8 +321,8 @@ router.put('/:id/coefficient', async (req: Request, res: Response): Promise<void
     const oldCoefficient = sensor.coefficient
     const now = new Date().toISOString().replace('T', ' ').replace(/\.\d+Z$/, '')
 
-    const coefficientManual = reason ? 1 : 1
-    const reviewStatus = reason ? 'approved' : 'pending'
+    const coefficientManual = 1
+    const reviewStatus = reason && reason.trim() !== '' ? 'approved' : 'pending'
 
     const tx = db.transaction(() => {
       db.prepare(
