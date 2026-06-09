@@ -1,7 +1,8 @@
 import { create } from 'zustand'
-import type { RawData, BoundaryRecord, WeightEntry, SVDResult, WorkflowStep, AnomalyPoint } from '@/types'
-import { scanBoundaryValues } from '@/utils/scanner'
+import type { RawData, BoundaryRecord, WeightEntry, SVDResult, WorkflowStep, AnomalyPoint, Role } from '@/types'
+import { scanBoundaryValues, reviewRecord, resolveRecord } from '@/utils/scanner'
 import { computeSVD } from '@/utils/svd'
+import { detectColumnTypes, toNumericMatrix } from '@/utils/csvParser'
 
 function buildAnomalyPoints(
   boundaryRecords: BoundaryRecord[],
@@ -23,6 +24,23 @@ function buildAnomalyPoints(
     }))
 }
 
+function buildNumericMatrixWithCorrections(
+  rawData: RawData,
+  boundaryRecords: BoundaryRecord[]
+): number[][] {
+  const base = rawData.numericMatrix.map(row => [...row])
+  for (const r of boundaryRecords) {
+    if (r.status === 'resolved' && r.correctedValue !== '') {
+      const n = Number(r.correctedValue)
+      if (!isNaN(n) && isFinite(n)) {
+        base[r.rowIndex] = base[r.rowIndex] ?? []
+        base[r.rowIndex][r.columnIndex] = n
+      }
+    }
+  }
+  return base
+}
+
 interface AppState {
   rawData: RawData | null
   boundaryRecords: BoundaryRecord[]
@@ -33,8 +51,9 @@ interface AppState {
   selectedAnomalyId: string | null
   tracePanelOpen: boolean
 
-  importData: (rawData: RawData) => void
-  updateBoundaryStatus: (id: string, status: BoundaryRecord['status']) => void
+  importParsed: (fileName: string, headers: string[], rows: string[][]) => void
+  reviewBoundary: (id: string, role: Role, note?: string) => void
+  resolveBoundary: (id: string, role: Role, correctedValue: string, resolvedReason: string) => void
   setWeight: (columnName: string, weight: number) => void
   markWeightComplete: (id: string) => void
   recomputeSVD: () => void
@@ -66,49 +85,116 @@ export const useStore = create<AppState>((set, get) => ({
   selectedAnomalyId: null,
   tracePanelOpen: false,
 
-  importData: (rawData: RawData) => {
-    const boundaryRecords = scanBoundaryValues(rawData.headers, rawData.rows, rawData.numericMatrix)
-    const weights: WeightEntry[] = rawData.headers.map((h, i) => ({
-      id: `w-${i}`, columnName: h, weight: 1, isComplete: false,
-    }))
-    const svdResult = computeSVD(rawData.numericMatrix, weights, boundaryRecords)
+  importParsed: (fileName, headers, rows) => {
+    const columnTypes = detectColumnTypes(headers, rows)
+    const numericMatrix = toNumericMatrix(rows, headers.length)
+    const rawData: RawData = {
+      id: `raw-${Date.now()}`,
+      fileName,
+      headers,
+      columnTypes,
+      rows,
+      numericMatrix,
+      uploadTime: new Date().toLocaleString('zh-CN'),
+    }
+    const boundaryRecords = scanBoundaryValues(headers, columnTypes, rows, numericMatrix)
+    const weights: WeightEntry[] = headers
+      .map((h, i) => ({
+        id: `w-${i}`,
+        columnName: h,
+        columnIndex: i,
+        weight: 1,
+        isComplete: false,
+      }))
+    const svdResult = computeSVD(numericMatrix, weights, boundaryRecords)
     const anomalyPoints = buildAnomalyPoints(boundaryRecords, svdResult, weights)
-    set({ rawData, boundaryRecords, weights, svdResult, anomalyPoints, workflowSteps: buildWorkflowSteps(rawData, weights, svdResult) })
+    set({
+      rawData,
+      boundaryRecords,
+      weights,
+      svdResult,
+      anomalyPoints,
+      workflowSteps: buildWorkflowSteps(rawData, weights, svdResult),
+    })
   },
 
-  updateBoundaryStatus: (id, status) => {
+  reviewBoundary: (id, role, note) => {
     set(state => {
-      const boundaryRecords = state.boundaryRecords.map(r => r.id === id ? { ...r, status } : r)
-      const svdResult = computeSVD(state.rawData!.numericMatrix, state.weights, boundaryRecords)
+      const target = state.boundaryRecords.find(r => r.id === id)
+      if (!target) return {}
+      const updated = reviewRecord(target, role, note)
+      const boundaryRecords = state.boundaryRecords.map(r => (r.id === id ? updated : r))
+      const correctedMatrix = buildNumericMatrixWithCorrections(state.rawData!, boundaryRecords)
+      const svdResult = computeSVD(correctedMatrix, state.weights, boundaryRecords)
       const anomalyPoints = buildAnomalyPoints(boundaryRecords, svdResult, state.weights)
-      return { boundaryRecords, svdResult, anomalyPoints, workflowSteps: buildWorkflowSteps(state.rawData, state.weights, svdResult) }
+      return {
+        boundaryRecords,
+        svdResult,
+        anomalyPoints,
+        workflowSteps: buildWorkflowSteps(state.rawData, state.weights, svdResult),
+      }
+    })
+  },
+
+  resolveBoundary: (id, role, correctedValue, resolvedReason) => {
+    set(state => {
+      const target = state.boundaryRecords.find(r => r.id === id)
+      if (!target) return {}
+      const updated = resolveRecord(target, role, correctedValue, resolvedReason)
+      const boundaryRecords = state.boundaryRecords.map(r => (r.id === id ? updated : r))
+      const correctedMatrix = buildNumericMatrixWithCorrections(state.rawData!, boundaryRecords)
+      const svdResult = computeSVD(correctedMatrix, state.weights, boundaryRecords)
+      const anomalyPoints = buildAnomalyPoints(boundaryRecords, svdResult, state.weights)
+      return {
+        boundaryRecords,
+        svdResult,
+        anomalyPoints,
+        workflowSteps: buildWorkflowSteps(state.rawData, state.weights, svdResult),
+      }
     })
   },
 
   setWeight: (columnName, weight) => {
     set(state => {
       const weights = state.weights.map(w => w.columnName === columnName ? { ...w, weight } : w)
-      const svdResult = computeSVD(state.rawData!.numericMatrix, weights, state.boundaryRecords)
+      const correctedMatrix = buildNumericMatrixWithCorrections(state.rawData!, state.boundaryRecords)
+      const svdResult = computeSVD(correctedMatrix, weights, state.boundaryRecords)
       const anomalyPoints = buildAnomalyPoints(state.boundaryRecords, svdResult, weights)
-      return { weights, svdResult, anomalyPoints, workflowSteps: buildWorkflowSteps(state.rawData, weights, svdResult) }
+      return {
+        weights,
+        svdResult,
+        anomalyPoints,
+        workflowSteps: buildWorkflowSteps(state.rawData, weights, svdResult),
+      }
     })
   },
 
   markWeightComplete: (id) => {
     set(state => {
       const weights = state.weights.map(w => w.id === id ? { ...w, isComplete: true } : w)
-      const svdResult = computeSVD(state.rawData!.numericMatrix, weights, state.boundaryRecords)
+      const correctedMatrix = buildNumericMatrixWithCorrections(state.rawData!, state.boundaryRecords)
+      const svdResult = computeSVD(correctedMatrix, weights, state.boundaryRecords)
       const anomalyPoints = buildAnomalyPoints(state.boundaryRecords, svdResult, weights)
-      return { weights, svdResult, anomalyPoints, workflowSteps: buildWorkflowSteps(state.rawData, weights, svdResult) }
+      return {
+        weights,
+        svdResult,
+        anomalyPoints,
+        workflowSteps: buildWorkflowSteps(state.rawData, weights, svdResult),
+      }
     })
   },
 
   recomputeSVD: () => {
     const { rawData, weights, boundaryRecords } = get()
     if (!rawData) return
-    const svdResult = computeSVD(rawData.numericMatrix, weights, boundaryRecords)
+    const correctedMatrix = buildNumericMatrixWithCorrections(rawData, boundaryRecords)
+    const svdResult = computeSVD(correctedMatrix, weights, boundaryRecords)
     const anomalyPoints = buildAnomalyPoints(boundaryRecords, svdResult, weights)
-    set({ svdResult, anomalyPoints, workflowSteps: buildWorkflowSteps(rawData, weights, svdResult) })
+    set({
+      svdResult,
+      anomalyPoints,
+      workflowSteps: buildWorkflowSteps(rawData, weights, svdResult),
+    })
   },
 
   selectAnomaly: (id) => set({ selectedAnomalyId: id, tracePanelOpen: id !== null }),

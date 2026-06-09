@@ -21,13 +21,34 @@ export function parseJSON(text: string): { headers: string[]; rows: string[][] }
   return { headers, rows }
 }
 
+export type ColumnType = 'numeric' | 'text'
+
+export function detectColumnTypes(
+  headers: string[],
+  rows: string[][]
+): ColumnType[] {
+  return headers.map((_, colIdx) => {
+    let numericCount = 0
+    let nonEmptyCount = 0
+    for (let r = 0; r < rows.length; r++) {
+      const cell = rows[r]?.[colIdx]
+      if (cell === '' || cell === undefined || cell === null) continue
+      nonEmptyCount++
+      const n = Number(cell)
+      if (!isNaN(n) && isFinite(n)) numericCount++
+    }
+    if (nonEmptyCount === 0) return 'text'
+    return numericCount / nonEmptyCount >= 0.7 ? 'numeric' : 'text'
+  })
+}
+
 export function toNumericMatrix(rows: string[][], colCount: number): number[][] {
   return rows.map(row => {
     const nums: number[] = []
     for (let i = 0; i < colCount; i++) {
       const val = row[i]
       const num = val === '' || val === undefined || val === null ? NaN : Number(val)
-      nums.push(isNaN(num) ? 0 : num)
+      nums.push(isNaN(num) || !isFinite(num) ? 0 : num)
     }
     return nums
   })

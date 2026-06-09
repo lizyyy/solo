@@ -2,6 +2,7 @@ import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { CheckCircle, Circle, AlertTriangle } from 'lucide-react'
 import { useStore } from '@/store/useStore'
 import { cn } from '@/lib/utils'
+import TracePanel from '@/components/TracePanel'
 
 const stepIcons: Record<string, string> = {
   '数据导入': '📥',
@@ -71,6 +72,7 @@ export default function Layout() {
 
       <main className="flex-1 overflow-y-auto bg-[#1a1a2e]">
         <Outlet />
+        <TracePanel />
       </main>
     </div>
   )
