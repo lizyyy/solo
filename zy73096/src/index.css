@@ -1,0 +1,97 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+    width: 100%;
+  }
+
+  body {
+    @apply font-sans text-steel-700 bg-paper-50 bg-blueprint-grid bg-[length:32px_32px];
+    background-color: #fbfaf7;
+  }
+
+  :focus-visible {
+    @apply outline outline-2 outline-offset-2 outline-blueprint-400;
+  }
+
+  ::selection {
+    background: #0a2463;
+    color: #f5f0e8;
+  }
+}
+
+@layer components {
+  .bp-panel {
+    @apply bg-paper-100/90 backdrop-blur-sm border border-paper-300 shadow-eng-inset;
+  }
+
+  .bp-btn {
+    @apply inline-flex items-center gap-2 px-3 py-2 text-xs font-eng tracking-wider
+           border border-steel-500 bg-paper-100 text-steel-700
+           hover:bg-blueprint-50 hover:border-blueprint-500 hover:text-blueprint-600
+           active:bg-blueprint-100
+           transition-colors duration-150 cursor-pointer select-none;
+  }
+
+  .bp-btn-primary {
+    @apply bg-blueprint-500 text-paper-50 border-blueprint-600
+           hover:bg-blueprint-600 hover:text-paper-100 hover:border-blueprint-700;
+  }
+
+  .bp-btn-danger {
+    @apply bg-fire-critical text-paper-50 border-fire-fail
+           hover:bg-fire-fail;
+  }
+
+  .bp-chip {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-eng tracking-wide
+           border rounded-sm;
+  }
+
+  .bp-input {
+    @apply w-full px-2 py-1.5 text-xs font-sans bg-paper-50 border border-paper-300
+           focus:border-blueprint-500 focus:bg-white placeholder:text-steel-400;
+  }
+
+  .bp-section-title {
+    @apply font-eng text-[11px] uppercase tracking-[0.2em] text-steel-500
+           border-b border-paper-300 pb-1 mb-3 flex items-center justify-between;
+  }
+
+  .bp-stamp {
+    @apply font-eng text-[10px] px-3 py-1.5 tracking-widest uppercase
+           border-2 border-dashed rotate-[-6deg] whitespace-nowrap;
+  }
+}
+
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: #bac8ff #f5f0e8;
+  }
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: #f5f0e8;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #bac8ff;
+    border-radius: 0;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: #5c7cfa;
+  }
+
+  .noise-bg {
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(10, 36, 99, 0.08) 1px, transparent 0);
+    background-size: 8px 8px;
+  }
+}

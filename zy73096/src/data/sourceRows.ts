@@ -1,0 +1,118 @@
+import type { SourceRow, CollisionLevel } from "@/types";
+
+const V1_TS = new Date("2026-06-08T18:30:00+08:00").getTime();
+const V2_TS = new Date("2026-06-09T21:15:00+08:00").getTime();
+
+export const VERSION_V1_ID = "ver-v1-20260608";
+export const VERSION_V2_ID = "ver-v2-20260609";
+
+export const INITIAL_SOURCE_ROWS: SourceRow[] = [
+  {
+    id: "src-001",
+    versionId: VERSION_V1_ID,
+    sourceType: "cad_layer",
+    raw_source_name: "CAD-3F-F1.dwg (图层:F1-BOUNDARY,导入时间:2026/6/8 18:31)",
+    raw_fire_zone_a: "F1",
+    raw_fire_zone_b: "F2",
+    raw_position: "3F-01 东走廊防火卷帘位置",
+    raw_level: "严重",
+    raw_note: "原CAD图F1与F2边界线有重叠约240mm",
+    importedAt: V1_TS,
+    normalized: {
+      zoneA: "F1",
+      zoneB: "F2",
+      level: "critical" as CollisionLevel,
+      positionHash: "3F-01#F1-F2",
+    },
+  },
+  {
+    id: "src-002",
+    versionId: VERSION_V1_ID,
+    sourceType: "cad_layer",
+    raw_source_name: "CAD-B1-F3.dwg (图层:EQUIP-ROOM, 版本:2026-05-28)",
+    raw_fire_zone_a: "F3",
+    raw_fire_zone_b: "F4",
+    raw_position: "B1-07 变电所墙体与F4防火墙交接处",
+    raw_level: "warning",
+    raw_note: "设备基础出界60mm",
+    importedAt: V1_TS,
+    normalized: {
+      zoneA: "F3",
+      zoneB: "F4",
+      level: "warning" as CollisionLevel,
+      positionHash: "B1-07#F3-F4",
+    },
+  },
+  {
+    id: "src-003",
+    versionId: VERSION_V1_ID,
+    sourceType: "disclosure_doc",
+    raw_source_name: "消防交底-20260528.pdf 第4.1条（签字：张工）",
+    raw_fire_zone_a: "F1",
+    raw_fire_zone_b: "F2",
+    raw_position: "3F-01 走廊位置（同CAD-3F-F1.dwg）",
+    raw_level: "严重 · critical",
+    raw_note: "交底原文：F1/F2卷帘处必须复核，与上次审图意见一致",
+    importedAt: V1_TS,
+    normalized: {
+      zoneA: "F1",
+      zoneB: "F2",
+      level: "critical" as CollisionLevel,
+      positionHash: "3F-01#F1-F2",
+    },
+  },
+  {
+    id: "src-004",
+    versionId: VERSION_V1_ID,
+    sourceType: "disclosure_doc",
+    raw_source_name: "消防交底-20260601.pdf 第2.3条",
+    raw_fire_zone_a: "F2",
+    raw_fire_zone_b: "F3",
+    raw_position: "2F-03 疏散楼梯间与F3分区墙",
+    raw_level: "警告",
+    raw_note: "楼梯间前室门垛偏移，需结构复核",
+    importedAt: V1_TS,
+    normalized: {
+      zoneA: "F2",
+      zoneB: "F3",
+      level: "warning" as CollisionLevel,
+      positionHash: "2F-03#F2-F3",
+    },
+  },
+  {
+    id: "src-005",
+    versionId: VERSION_V1_ID,
+    sourceType: "cad_layer",
+    raw_source_name: "CAD-1F-F5.dwg（图层名手写：F5 外牆，编码:LAY-00-22）",
+    raw_fire_zone_a: "F4",
+    raw_fire_zone_b: "  F5",
+    raw_position: "1F-11 大堂外侧玻璃幕墙与F4竖井",
+    raw_level: "提示",
+    raw_note: "",
+    importedAt: V1_TS,
+    normalized: {
+      zoneA: "F4",
+      zoneB: "F5",
+      level: "info" as CollisionLevel,
+      positionHash: "1F-11#F4-F5",
+    },
+  },
+  {
+    id: "src-006",
+    versionId: VERSION_V2_ID,
+    sourceType: "attachment",
+    raw_source_name: "【晚到】20260609-防火卷帘深化图-RevB.skp 设计院补送邮件附件",
+    raw_fire_zone_a: "F2",
+    raw_fire_zone_b: "",
+    raw_position: "3F-01 防火卷帘侧槽（与3F-01原位置重合）",
+    raw_level: "严重 critical",
+    raw_note: "原漏列的卷帘门侧槽150mm侵入F2分区，导致分区边界不满足2小时耐火极限",
+    importedAt: V2_TS,
+    normalized: {
+      zoneA: "F2",
+      zoneB: "F1",
+      level: "critical" as CollisionLevel,
+      positionHash: "3F-01#F1-F2",
+    },
+  },
+];
