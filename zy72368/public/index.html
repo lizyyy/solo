@@ -22,29 +22,32 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .card h3 { font-size: 16px; color: #333; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #eee; }
 .form-group { margin-bottom: 16px; }
 .form-group label { display: block; font-size: 13px; color: #666; margin-bottom: 6px; }
-.form-group input, .form-group textarea { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+.form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
 .form-group textarea { min-height: 80px; }
 .btn { padding: 10px 20px; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; }
 .btn-primary { background: #667eea; color: white; }
 .btn-success { background: #4caf50; color: white; }
 .btn-warning { background: #ff9800; color: white; }
 .btn-danger { background: #f44336; color: white; }
-.btn-group { display: flex; gap: 10px; }
+.btn-secondary { background: #78909c; color: white; }
+.btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
 .conflict-alert { background: #fff3e0; border-left: 4px solid #ff9800; padding: 16px; border-radius: 6px; margin-bottom: 16px; }
 .conflict-alert h4 { color: #e65100; margin-bottom: 8px; }
 .conflict-evidence { background: #fff; padding: 12px; border-radius: 4px; margin: 8px 0; font-size: 13px; }
 .evidence-item { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f0f0f0; }
-.status-badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+.status-badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; margin-right: 4px; }
 .status-normal { background: #e8f5e9; color: #2e7d32; }
-.status-pending { background: #fff3e0; color: #e65100; }
-.status-conflict { background: #ffebee; color: #c62828; }
-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-th, td { padding: 12px 8px; text-align: left; border-bottom: 1px solid #eee; }
-th { background: #f8f9fa; font-weight: 600; color: #666; }
+.status-timegap_pending { background: #fff3e0; color: #e65100; }
+.status-conflict_pending { background: #ffebee; color: #c62828; }
+.status-reviewed_ok { background: #e8f5e9; color: #2e7d32; border: 1px solid #2e7d32; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+th, td { padding: 10px 6px; text-align: left; border-bottom: 1px solid #eee; vertical-align: top; }
+th { background: #f8f9fa; font-weight: 600; color: #666; white-space: nowrap; }
 tr:hover { background: #f8f9fa; }
+.table-wrapper { overflow-x: auto; }
 .self-check { background: #f8f9fa; padding: 16px; border-radius: 8px; margin-bottom: 16px; }
 .check-item { display: flex; align-items: center; padding: 8px 0; }
-.check-icon { width: 20px; height: 20px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; font-size: 12px; color: white; }
+.check-icon { width: 20px; height: 20px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; font-size: 12px; color: white; flex-shrink: 0; }
 .check-pass { background: #4caf50; }
 .check-fail { background: #f44336; }
 .review-timeline { max-height: 300px; overflow-y: auto; }
@@ -57,8 +60,21 @@ tr:hover { background: #f8f9fa; }
 .stat-card { flex: 1; background: white; padding: 16px; border-radius: 8px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
 .stat-value { font-size: 28px; font-weight: bold; color: #667eea; }
 .stat-label { font-size: 13px; color: #666; margin-top: 4px; }
-.anomaly-note { background: #fff8e1; padding: 12px; border-radius: 6px; font-size: 13px; color: #f57f17; margin-top: 8px; }
+.anomaly-note { background: #fff8e1; padding: 8px; border-radius: 6px; font-size: 12px; color: #f57f17; margin-top: 4px; }
 .full-width { grid-column: 1 / -1; }
+.batch-selector { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+.batch-tag { display: inline-block; padding: 4px 10px; background: #e3f2fd; color: #1565c0; border-radius: 12px; font-size: 12px; margin: 2px; }
+.batch-tag.active { background: #667eea; color: white; }
+.screenshot-item { padding: 10px; background: #f5f5f5; border-radius: 6px; margin-bottom: 8px; font-size: 13px; }
+.screenshot-item strong { color: #333; }
+.interval-display { padding: 12px; background: #e3f2fd; border-radius: 6px; font-size: 13px; }
+.duplicate-warning { background: #ffebee; color: #c62828; padding: 8px; border-radius: 4px; font-size: 12px; margin-bottom: 8px; }
+.record-cell-empty { color: #bdbdbd; font-style: italic; }
+.review-status-badge { display: inline-block; padding: 2px 8px; border-radius: 8px; font-size: 11px; }
+.review-pending { background: #fce4ec; color: #ad1457; }
+.review-confirmed { background: #e8f5e9; color: #2e7d32; }
+.review-rejected { background: #ffebee; color: #c62828; }
+.empty-state { color: #999; text-align: center; padding: 20px; font-size: 13px; }
 </style>
 </head>
 <body>
@@ -83,371 +99,648 @@ tr:hover { background: #f8f9fa; }
 
 <div class="grid">
 <div class="card">
-<h3>1. 导入维修群截图</h3>
-<div class="form-group"><label>截图描述（包含采样间隔信息）</label>
-<textarea id="screenshotDesc" placeholder="例如：维修群2024-01-15聊天记录，显示按1小时间断采样..."></textarea></div>
-<button class="btn btn-primary" onclick="uploadScreenshot()">上传截图</button>
+<h3>1. 批次管理 + 维修群截图导入</h3>
+<div class="batch-selector">
+<label style="font-size: 13px; color: #666;">当前批次：</label>
+<div id="batchSelector"></div>
+</div>
+<div class="form-group"><label>批次名称（新建时填写）</label>
+<input type="text" id="newBatchName" placeholder="例如：batch样例_测试批次"></div>
+<div class="form-group"><label>上传人</label>
+<input type="text" id="uploader" value="系统"></div>
+<div class="form-group"><label>维修群截图描述</label>
+<textarea id="screenshotDesc" placeholder="例如：维修群2026-06-09聊天记录，显示按1小时间断采样..."></textarea></div>
+<div class="btn-group">
+<button class="btn btn-success" onclick="loadRealSample()">一键导入真实样例</button>
+<button class="btn btn-primary" onclick="createBatchWithScreenshot()">新建批次 + 导入截图</button>
+<button class="btn btn-warning" onclick="appendScreenshotOnly()">仅导入截图描述</button>
+</div>
 <div id="screenshotList" style="margin-top: 16px;"></div>
 </div>
 
 <div class="card">
-<h3>2. 补看采样间隔说明</h3>
+<h3>2. 采样间隔说明</h3>
 <div class="form-group"><label>采样间隔说明内容</label>
 <textarea id="intervalContent" placeholder="例如：采样间隔为30分钟，连续采样不间断..."></textarea></div>
-<div class="form-group"><label>操作人</label><input type="text" id="operator" value="林老师"></div>
+<div class="form-group"><label>操作人</label><input type="text" id="intervalOperator" value="林老师"></div>
 <button class="btn btn-primary" onclick="submitInterval()">提交采样间隔说明</button>
 <div id="intervalDisplay" style="margin-top: 16px;"></div>
 </div>
 
 <div class="card full-width">
 <h3>冲突检测与处理</h3>
-<div id="conflictSection"><p style="color: #999; text-align: center; padding: 20px;">暂无冲突数据</p></div>
+<div id="conflictSection"><div class="empty-state">暂无冲突数据</div></div>
 </div>
 
 <div class="card">
-<h3>3. 导入焊接记录</h3>
-<div class="form-group"><label>JSON 格式焊接记录</label>
-<textarea id="weldingData" placeholder='[{"id":1,"samplingTime":"2024-01-15T10:00:00","previousSamplingTime":"2024-01-15T09:30:00","weldingCurrent":150,"weldingVoltage":24}]'></textarea></div>
-<div class="btn-group">
-<button class="btn btn-primary" onclick="importRecords()">导入记录</button>
-<button class="btn btn-warning" onclick="loadSampleData()">加载示例数据</button>
-</div>
+<h3>3. 批次追加记录</h3>
+<div class="form-group"><label>追加目标批次</label>
+<select id="appendBatchId"><option value="">请先创建批次</option></select></div>
+<div class="form-group"><label>JSON 格式焊接记录（数组）</label>
+<textarea id="appendRecordsJson" placeholder='[{"samplingTime":"2026-06-09T10:00:00","previousSamplingTime":"2026-06-09T09:30:00","weldingCurrent":150,"weldingVoltage":24,"importSource":"补录"}]'></textarea></div>
+<div id="duplicateHint" class="duplicate-warning" style="display:none;">⚠️ 系统自动检测重复 recordId 并跳过</div>
+<button class="btn btn-primary" onclick="appendBatchRecords()">追加记录</button>
 </div>
 
 <div class="card">
-<h3>基本自检结果</h3>
-<div id="selfCheckSection"><p style="color: #999; text-align: center; padding: 20px;">暂无自检数据</p></div>
-<div style="margin-top: 16px;">
+<h3>4. 自检 + 重算 + 导出</h3>
+<div id="selfCheckSection"><div class="empty-state">暂无自检数据</div></div>
+<div style="margin-top: 12px;">
+<div class="form-group"><label>重算目标批次</label>
+<select id="recalcBatchId"><option value="">全部批次</option></select></div>
+</div>
+<div class="btn-group" style="margin-top: 8px;">
 <button class="btn btn-success" onclick="recalculate()">补录后重算</button>
 <button class="btn btn-primary" onclick="exportData()">导出数据</button>
 </div>
 </div>
 
 <div class="card full-width">
-<h3>焊接热影响区估算结果</h3>
-<div id="resultsSection"><p style="color: #999; text-align: center; padding: 20px;">暂无计算结果</p></div>
+<h3>焊接记录明细表格</h3>
+<div id="recordsSection"><div class="empty-state">暂无记录，请先创建批次并导入数据</div></div>
 </div>
 
 <div class="card full-width">
-<h3>真实复核记录</h3>
-<div class="review-timeline" id="reviewTimeline"><p style="color: #999; text-align: center; padding: 20px;">暂无复核记录</p></div>
+<h3>补录复核面板</h3>
+<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+<div class="form-group"><label>选择记录 recordId</label>
+<select id="reviewRecordId" onchange="fillReviewForm()"><option value="">请选择记录</option></select></div>
+<div class="form-group"><label>复核状态 reviewStatus</label>
+<select id="reviewStatus"><option value="confirmed">confirmed（确认通过）</option><option value="pending">pending（待处理）</option><option value="rejected">rejected（驳回）</option></select></div>
+<div class="form-group"><label>复核人</label><input type="text" id="reviewOperator" value="质检员"></div>
+<div class="form-group"><label>复核结论 reviewConclusion</label><input type="text" id="reviewConclusion" placeholder="例如：采样间隔说明为30分钟，允许缺失"></div>
+<div class="form-group" style="grid-column: 1 / -1;"><label>复核备注 reviewRemark</label>
+<textarea id="reviewRemark" placeholder="详细复核说明..."></textarea></div>
+</div>
+<button class="btn btn-primary" onclick="submitReview()">提交复核</button>
+</div>
+
+<div class="card full-width">
+<h3>真实复核记录时间线</h3>
+<div class="review-timeline" id="reviewTimeline"><div class="empty-state">暂无复核记录</div></div>
 </div>
 </div>
 </div>
 
 <script>
-let appData = {
-weldingRecords: [],
-calculationResults: null,
-conflicts: [],
-samplingIntervalNotes: null,
-maintenanceScreenshots: [],
-reviewHistory: [],
-selfCheckResults: null
+let appState = {
+  batches: [],
+  currentBatchId: null,
+  samplingIntervalNotes: null,
+  maintenanceScreenshots: [],
+  reviewHistory: [],
+  conflicts: [],
+  selfCheckResults: null
 };
 
-function uploadScreenshot() {
-const desc = document.getElementById('screenshotDesc').value;
-if (!desc) { alert('请填写截图描述'); return; }
-const screenshot = {
-id: Date.now(),
-description: desc,
-originalName: 'screenshot_' + Date.now() + '.png',
-uploadTime: new Date().toISOString(),
-uploader: '业务同事'
-};
-appData.maintenanceScreenshots.push(screenshot);
-addReviewHistory('导入维修群截图', desc, screenshot);
-detectConflicts();
-updateUI();
-updateStep(1, 'completed');
-updateStep(2, 'active');
-alert('截图上传成功！');
+function API_BASE() { return '/api'; }
+
+async function refreshState() {
+  try {
+    const res = await fetch(API_BASE() + '/state');
+    const json = await res.json();
+    if (json.success) {
+      appState = json.data;
+      renderAll();
+    }
+  } catch (e) {
+    console.error('刷新状态失败:', e);
+  }
 }
 
-function submitInterval() {
-const content = document.getElementById('intervalContent').value;
-const operator = document.getElementById('operator').value;
-if (!content) { alert('请填写采样间隔说明'); return; }
-appData.samplingIntervalNotes = {
-content,
-operator,
-updateTime: new Date().toISOString()
-};
-addReviewHistory('补看采样间隔说明', content, appData.samplingIntervalNotes);
-detectConflicts();
-calculateHAZ();
-runSelfCheck();
-updateUI();
-updateStep(2, 'completed');
-alert('采样间隔说明已提交！');
+function getAllRecords() {
+  const all = [];
+  appState.batches.forEach(b => {
+    b.records.forEach(r => all.push({ ...r, batchName: b.batchName, batchId: b.batchId }));
+  });
+  return all;
 }
 
-function detectConflicts() {
-appData.conflicts = [];
-if (!appData.samplingIntervalNotes || appData.maintenanceScreenshots.length === 0) return;
-const intervalContent = appData.samplingIntervalNotes.content;
-appData.maintenanceScreenshots.forEach(screenshot => {
-const conflictEvidence = [];
-if (intervalContent.includes('30分钟') && screenshot.description.includes('1小时')) {
-conflictEvidence.push({
-type: '采样间隔矛盾',
-samplingInterval: '30分钟',
-screenshotNote: '1小时',
-description: '采样间隔说明为30分钟，但维修群截图显示按1小时采样'
+function getCurrentBatch() {
+  return appState.batches.find(b => b.batchId === appState.currentBatchId);
+}
+
+function renderAll() {
+  renderWorkflow();
+  renderStats();
+  renderBatchSelector();
+  renderAppendBatchSelect();
+  renderScreenshotList();
+  renderIntervalDisplay();
+  renderConflicts();
+  renderSelfCheck();
+  renderRecordsTable();
+  renderReviewTimeline();
+  renderReviewRecordSelect();
+  renderRecalcBatchSelect();
+}
+
+function renderWorkflow() {
+  const hasScreenshots = appState.maintenanceScreenshots.length > 0;
+  const hasInterval = appState.samplingIntervalNotes && appState.samplingIntervalNotes.content;
+  const hasRecords = getAllRecords().length > 0;
+
+  ['step1', 'step2', 'step3'].forEach(id => {
+    document.getElementById(id).classList.remove('active', 'completed');
+  });
+
+  if (hasRecords) {
+    document.getElementById('step1').classList.add('completed');
+    document.getElementById('step2').classList.add('completed');
+    document.getElementById('step3').classList.add('active');
+  } else if (hasInterval) {
+    document.getElementById('step1').classList.add('completed');
+    document.getElementById('step2').classList.add('active');
+  } else if (hasScreenshots) {
+    document.getElementById('step1').classList.add('completed');
+    document.getElementById('step2').classList.add('active');
+  } else {
+    document.getElementById('step1').classList.add('active');
+  }
+}
+
+function renderStats() {
+  const records = getAllRecords();
+  const total = records.length;
+  const normal = records.filter(r => r.status === 'normal' || r.status === 'reviewed_ok').length;
+  const pending = records.filter(r => r.status === 'timegap_pending').length;
+  const conflict = appState.conflicts.filter(c => !c.resolved).length;
+
+  document.getElementById('totalRecords').textContent = total;
+  document.getElementById('normalCount').textContent = normal;
+  document.getElementById('pendingCount').textContent = pending;
+  document.getElementById('conflictCount').textContent = conflict;
+}
+
+function renderBatchSelector() {
+  const el = document.getElementById('batchSelector');
+  if (appState.batches.length === 0) {
+    el.innerHTML = '<span style="color:#999;font-size:13px;">暂无批次</span>';
+    return;
+  }
+  el.innerHTML = appState.batches.map(b =>
+    `<span class="batch-tag ${b.batchId === appState.currentBatchId ? 'active' : ''}" style="cursor:pointer;" onclick="selectBatch('${b.batchId}')">${b.batchName} (${b.records.length})</span>`
+  ).join('');
+}
+
+function selectBatch(batchId) {
+  appState.currentBatchId = batchId;
+  renderAll();
+}
+
+function renderAppendBatchSelect() {
+  const sel = document.getElementById('appendBatchId');
+  if (appState.batches.length === 0) {
+    sel.innerHTML = '<option value="">请先创建批次</option>';
+  } else {
+    sel.innerHTML = appState.batches.map(b =>
+      `<option value="${b.batchId}" ${b.batchId === appState.currentBatchId ? 'selected' : ''}>${b.batchName}</option>`
+    ).join('');
+  }
+}
+
+function renderRecalcBatchSelect() {
+  const sel = document.getElementById('recalcBatchId');
+  const current = sel.value;
+  sel.innerHTML = '<option value="">全部批次</option>' +
+    appState.batches.map(b => `<option value="${b.batchId}">${b.batchName}</option>`).join('');
+  if (current) sel.value = current;
+}
+
+function renderScreenshotList() {
+  const el = document.getElementById('screenshotList');
+  const list = appState.maintenanceScreenshots;
+  if (list.length === 0) return;
+  el.innerHTML = list.map(s => {
+    const batchName = s.batchId ? (appState.batches.find(b => b.batchId === s.batchId)?.batchName || s.batchId) : '无批次';
+    return `<div class="screenshot-item"><strong>${s.originalName}</strong>
+      <div style="color:#666;margin-top:4px;">${s.description || '无描述'}</div>
+      <div style="color:#999;font-size:11px;margin-top:4px;">上传人:${s.uploader} | 时间:${formatTime(s.uploadTime)} | 批次:${batchName}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderIntervalDisplay() {
+  const el = document.getElementById('intervalDisplay');
+  const n = appState.samplingIntervalNotes;
+  if (!n || !n.content) {
+    el.innerHTML = '';
+    return;
+  }
+  el.innerHTML = `<div class="interval-display"><strong>操作人：</strong>${n.operator || '无'}<br>
+    <strong>内容：</strong>${n.content}<br>
+    <strong>更新时间：</strong>${formatTime(n.updateTime)}</div>`;
+}
+
+function renderConflicts() {
+  const el = document.getElementById('conflictSection');
+  if (appState.conflicts.length === 0) {
+    el.innerHTML = '<div class="empty-state">暂无冲突数据</div>';
+    return;
+  }
+  el.innerHTML = appState.conflicts.map(c => {
+    const batchName = c.batchId ? (appState.batches.find(b => b.batchId === c.batchId)?.batchName || c.batchId) : '全局';
+    const screenshotName = c.screenshotId ? (appState.maintenanceScreenshots.find(s => s.id === c.screenshotId)?.originalName || c.screenshotId) : '未知';
+    return `<div class="conflict-alert">
+      <h4>⚠️ 检测到冲突 ${c.resolved ? '（已' + (c.resolution === 'confirm' ? '确认' : '驳回') + '）' : ''}</h4>
+      <p style="font-size:12px;color:#666;margin-bottom:12px;">
+        检测时间：${formatTime(c.detectedTime)} | 批次：${batchName} | 关联截图：${screenshotName}
+      </p>
+      <div class="conflict-evidence"><strong>冲突证据：</strong>
+        ${c.evidence.map(e => `<div class="evidence-item"><span style="color:#666;">${e.type}</span><span style="color:#e65100;">${e.description}</span></div>`).join('')}
+      </div>
+      ${c.resolved ?
+        `<div style="margin-top:12px;padding:8px;background:#f5f5f5;border-radius:4px;font-size:13px;">
+          <strong>处理人：</strong>${c.resolvedBy} | <strong>处理时间：</strong>${formatTime(c.resolvedTime)}<br>
+          <strong>备注：</strong>${c.resolutionRemark || '无'}
+        </div>` :
+        `<div class="btn-group" style="margin-top:12px;">
+          <button class="btn btn-success" onclick="resolveConflict('${c.id}','confirm')">确认冲突</button>
+          <button class="btn btn-danger" onclick="resolveConflict('${c.id}','reject')">驳回冲突</button>
+        </div>`
+      }
+    </div>`;
+  }).join('');
+}
+
+function renderSelfCheck() {
+  const el = document.getElementById('selfCheckSection');
+  const sc = appState.selfCheckResults;
+  if (!sc || !sc.checks || sc.checks.length === 0) {
+    el.innerHTML = '<div class="empty-state">暂无自检数据</div>';
+    return;
+  }
+  el.innerHTML = `<div style="margin-bottom:12px;font-size:13px;color:#666;">
+      自检时间：${formatTime(sc.checkTime)} | 通过：${sc.passedChecks}/${sc.totalChecks}
+    </div>
+    <div class="self-check">
+      ${sc.checks.map(c => `<div class="check-item">
+        <span class="check-icon ${c.passed ? 'check-pass' : 'check-fail'}">${c.passed ? '✓' : '✗'}</span>
+        <div><div style="font-weight:500;">${c.name}</div><div style="font-size:12px;color:#666;">${c.details}</div></div>
+      </div>`).join('')}
+    </div>`;
+}
+
+function renderRecordsTable() {
+  const el = document.getElementById('recordsSection');
+  const records = getAllRecords();
+  if (records.length === 0) {
+    el.innerHTML = '<div class="empty-state">暂无记录，请先创建批次并导入数据</div>';
+    return;
+  }
+  el.innerHTML = `<div style="margin-bottom:12px;font-size:13px;color:#666;">共 ${records.length} 条记录（包含所有状态）</div>
+    <div class="table-wrapper">
+      <table>
+        <thead><tr>
+          <th>来源 importSource</th>
+          <th>批次</th>
+          <th>采样时间</th>
+          <th>电流</th>
+          <th>电压</th>
+          <th>基础HAZ</th>
+          <th>调整后HAZ</th>
+          <th>status</th>
+          <th>异常说明 anomalyDescription</th>
+          <th>复核状态 reviewStatus</th>
+          <th>复核备注 reviewRemark</th>
+          <th>复核结论 reviewConclusion</th>
+        </tr></thead>
+        <tbody>${records.map(r => renderRecordRow(r)).join('')}</tbody>
+      </table>
+    </div>`;
+}
+
+function renderRecordRow(r) {
+  const statusClass = 'status-' + r.status;
+  const statusText = { 'normal': '正常', 'timegap_pending': '待复核', 'conflict_pending': '待确认', 'reviewed_ok': '已复核' }[r.status] || r.status;
+  const reviewClass = 'review-' + (r.reviewStatus || 'pending');
+  const reviewText = { 'confirmed': '已确认', 'pending': '待处理', 'rejected': '已驳回' }[r.reviewStatus] || (r.reviewStatus || 'pending');
+
+  return `<tr>
+    <td>${r.importSource || '<span class="record-cell-empty">-</span>'}</td>
+    <td>${r.batchName || '<span class="record-cell-empty">-</span>'}</td>
+    <td>${r.samplingTime ? formatTime(r.samplingTime) : '<span class="record-cell-empty">缺失</span>'}</td>
+    <td>${r.weldingCurrent}A</td>
+    <td>${r.weldingVoltage}V</td>
+    <td>${r.baseHAZ}</td>
+    <td>${r.adjustedHAZ}</td>
+    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+    <td>${r.anomalyDescription ? `<div class="anomaly-note">${r.anomalyDescription}</div>` : '<span class="record-cell-empty">-</span>'}</td>
+    <td><span class="review-status-badge ${reviewClass}">${reviewText}</span></td>
+    <td>${r.reviewRemark || '<span class="record-cell-empty">-</span>'}</td>
+    <td>${r.reviewConclusion || '<span class="record-cell-empty">-</span>'}</td>
+  </tr>`;
+}
+
+function renderReviewTimeline() {
+  const el = document.getElementById('reviewTimeline');
+  const list = appState.reviewHistory;
+  if (list.length === 0) {
+    el.innerHTML = '<div class="empty-state">暂无复核记录</div>';
+    return;
+  }
+  el.innerHTML = list.map(h =>
+    `<div class="timeline-item">
+      <div class="timeline-action">${h.action}</div>
+      <div class="timeline-time">${formatTime(h.timestamp)} | 操作人：${h.operator || '系统'}</div>
+      <div class="timeline-desc">${h.description || '无描述'}</div>
+    </div>`
+  ).join('');
+}
+
+function renderReviewRecordSelect() {
+  const sel = document.getElementById('reviewRecordId');
+  const current = sel.value;
+  const records = getAllRecords();
+  if (records.length === 0) {
+    sel.innerHTML = '<option value="">请选择记录</option>';
+  } else {
+    sel.innerHTML = '<option value="">请选择记录</option>' +
+      records.map(r => {
+        const label = `${r.recordId} | ${r.batchName} | ${r.samplingTime ? formatTime(r.samplingTime) : '时间缺失'} | [${r.status}]`;
+        return `<option value="${r.recordId}">${label}</option>`;
+      }).join('');
+    if (current) sel.value = current;
+  }
+}
+
+function fillReviewForm() {
+  const rid = document.getElementById('reviewRecordId').value;
+  if (!rid) return;
+  const found = getAllRecords().find(r => r.recordId === rid);
+  if (found) {
+    if (found.reviewStatus) document.getElementById('reviewStatus').value = found.reviewStatus;
+    if (found.reviewRemark) document.getElementById('reviewRemark').value = found.reviewRemark;
+    if (found.reviewConclusion) document.getElementById('reviewConclusion').value = found.reviewConclusion;
+  }
+}
+
+async function loadRealSample() {
+  try {
+    const sampleRes = await fetch(API_BASE() + '/sample-data');
+    const sampleJson = await sampleRes.json();
+    if (!sampleJson.success) { alert('获取样例失败'); return; }
+    const { sampleRecords, suggestedBatchName } = sampleJson.data;
+
+    const batchRes = await fetch(API_BASE() + '/batch', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        batchName: suggestedBatchName,
+        uploader: '样例导入',
+        records: sampleRecords
+      })
+    });
+    const batchJson = await batchRes.json();
+    if (!batchJson.success) { alert('创建批次失败: ' + batchJson.message); return; }
+    const batchId = batchJson.data.batchId;
+
+    const formData = new FormData();
+    formData.append('batchId', batchId);
+    formData.append('description', '维修群2026-06-09聊天记录，显示按1小时间断采样，batch样例截图描述');
+    formData.append('originalName', 'batch样例_维修群截图.png');
+    formData.append('uploader', '样例导入');
+
+    const scRes = await fetch(API_BASE() + '/maintenance-screenshot', {
+      method: 'POST',
+      body: formData
+    });
+    await scRes.json();
+
+    await refreshState();
+    alert('真实样例加载成功！已创建批次 + 截图导入');
+  } catch (e) {
+    console.error(e);
+    alert('加载真实样例出错: ' + e.message);
+  }
+}
+
+async function createBatchWithScreenshot() {
+  const batchName = document.getElementById('newBatchName').value.trim();
+  const uploader = document.getElementById('uploader').value.trim() || '系统';
+  const desc = document.getElementById('screenshotDesc').value.trim();
+
+  if (!batchName) { alert('请填写批次名称'); return; }
+
+  try {
+    const batchRes = await fetch(API_BASE() + '/batch', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ batchName, uploader, records: [] })
+    });
+    const batchJson = await batchRes.json();
+    if (!batchJson.success) { alert('创建批次失败: ' + batchJson.message); return; }
+    const batchId = batchJson.data.batchId;
+
+    if (desc) {
+      const formData = new FormData();
+      formData.append('batchId', batchId);
+      formData.append('description', desc);
+      formData.append('originalName', `截图_${Date.now()}.png`);
+      formData.append('uploader', uploader);
+      await fetch(API_BASE() + '/maintenance-screenshot', {
+        method: 'POST',
+        body: formData
+      });
+    }
+
+    document.getElementById('newBatchName').value = '';
+    document.getElementById('screenshotDesc').value = '';
+    await refreshState();
+    alert('批次创建成功' + (desc ? '，截图已导入' : ''));
+  } catch (e) {
+    console.error(e);
+    alert('操作出错: ' + e.message);
+  }
+}
+
+async function appendScreenshotOnly() {
+  const desc = document.getElementById('screenshotDesc').value.trim();
+  const uploader = document.getElementById('uploader').value.trim() || '业务同事';
+  if (!desc) { alert('请填写截图描述'); return; }
+
+  try {
+    const formData = new FormData();
+    if (appState.currentBatchId) formData.append('batchId', appState.currentBatchId);
+    formData.append('description', desc);
+    formData.append('originalName', `截图_${Date.now()}.png`);
+    formData.append('uploader', uploader);
+
+    const res = await fetch(API_BASE() + '/maintenance-screenshot', {
+      method: 'POST',
+      body: formData
+    });
+    const json = await res.json();
+    if (!json.success) { alert('导入失败: ' + json.message); return; }
+
+    document.getElementById('screenshotDesc').value = '';
+    await refreshState();
+    alert('截图描述导入成功！');
+  } catch (e) {
+    console.error(e);
+    alert('操作出错: ' + e.message);
+  }
+}
+
+async function submitInterval() {
+  const content = document.getElementById('intervalContent').value.trim();
+  const operator = document.getElementById('intervalOperator').value.trim() || '林老师';
+  if (!content) { alert('请填写采样间隔说明'); return; }
+
+  try {
+    const res = await fetch(API_BASE() + '/sampling-interval', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content, operator })
+    });
+    const json = await res.json();
+    if (!json.success) { alert('提交失败'); return; }
+    await refreshState();
+    alert('采样间隔说明已提交！');
+  } catch (e) {
+    alert('操作出错: ' + e.message);
+  }
+}
+
+async function resolveConflict(conflictId, action) {
+  const remark = prompt('请输入处理备注：');
+  if (remark === null) return;
+  try {
+    const res = await fetch(API_BASE() + `/conflict/${conflictId}/resolve`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action, remark, operator: '林老师' })
+    });
+    const json = await res.json();
+    if (!json.success) { alert('处理失败: ' + json.message); return; }
+    await refreshState();
+  } catch (e) {
+    alert('操作出错: ' + e.message);
+  }
+}
+
+async function appendBatchRecords() {
+  const batchId = document.getElementById('appendBatchId').value;
+  const raw = document.getElementById('appendRecordsJson').value.trim();
+  if (!batchId) { alert('请选择目标批次'); return; }
+  if (!raw) { alert('请填写 JSON 记录'); return; }
+
+  let records;
+  try {
+    records = JSON.parse(raw);
+    if (!Array.isArray(records)) throw new Error('必须是数组');
+  } catch (e) {
+    alert('JSON 格式错误: ' + e.message);
+    return;
+  }
+
+  try {
+    const res = await fetch(API_BASE() + `/batch/${batchId}/records`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ records, operator: '系统' })
+    });
+    const json = await res.json();
+    if (!json.success) { alert('追加失败: ' + json.message); return; }
+    document.getElementById('appendRecordsJson').value = '';
+    const meta = json.meta || {};
+    alert(`追加成功！新增 ${meta.appended || 0} 条，跳过重复 ${meta.skipped || 0} 条，当前共 ${meta.total || 0} 条`);
+    await refreshState();
+  } catch (e) {
+    alert('操作出错: ' + e.message);
+  }
+}
+
+async function recalculate() {
+  const batchId = document.getElementById('recalcBatchId').value || null;
+  const remark = prompt('请输入重算原因：', '补录数据后重新计算');
+  if (remark === null) return;
+  try {
+    const res = await fetch(API_BASE() + '/recalculate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ batchId, remark, operator: '系统' })
+    });
+    const json = await res.json();
+    if (!json.success) { alert('重算失败'); return; }
+    await refreshState();
+    alert('重算完成！');
+  } catch (e) {
+    alert('操作出错: ' + e.message);
+  }
+}
+
+async function exportData() {
+  const bid = appState.currentBatchId;
+  if (!bid) {
+    if (appState.batches.length === 0) { alert('暂无批次可导出'); return; }
+    const first = appState.batches[0].batchId;
+    if (!confirm(`未选择当前批次，默认导出第一个批次「${appState.batches[0].batchName}」？`)) return;
+    await doExport(first);
+  } else {
+    await doExport(bid);
+  }
+}
+
+async function doExport(batchId) {
+  try {
+    const res = await fetch(API_BASE() + `/export/${batchId}`);
+    const json = await res.json();
+    if (!json.success) { alert('导出失败: ' + json.message); return; }
+
+    const blob = new Blob([JSON.stringify(json.data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const info = json.data.batchInfo || {};
+    a.download = `焊接HAZ_${info.batchName || '导出'}_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+
+    await refreshState();
+  } catch (e) {
+    alert('导出出错: ' + e.message);
+  }
+}
+
+async function submitReview() {
+  const recordId = document.getElementById('reviewRecordId').value;
+  if (!recordId) { alert('请选择记录'); return; }
+  const reviewStatus = document.getElementById('reviewStatus').value;
+  const reviewOperator = document.getElementById('reviewOperator').value.trim() || '质检员';
+  const reviewRemark = document.getElementById('reviewRemark').value.trim();
+  const reviewConclusion = document.getElementById('reviewConclusion').value.trim();
+
+  try {
+    const res = await fetch(API_BASE() + `/record/${recordId}/review`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reviewStatus, operator: reviewOperator, reviewRemark, reviewConclusion })
+    });
+    const json = await res.json();
+    if (!json.success) { alert('复核失败: ' + json.message); return; }
+
+    document.getElementById('reviewRemark').value = '';
+    document.getElementById('reviewConclusion').value = '';
+    await refreshState();
+    alert('复核提交成功！');
+  } catch (e) {
+    alert('操作出错: ' + e.message);
+  }
+}
+
+function formatTime(iso) {
+  if (!iso) return '-';
+  try {
+    return new Date(iso).toLocaleString('zh-CN');
+  } catch (e) {
+    return iso;
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  refreshState();
 });
-}
-if (intervalContent.includes('连续') && screenshot.description.includes('间断')) {
-conflictEvidence.push({
-type: '采样连续性矛盾',
-samplingInterval: '连续',
-screenshotNote: '间断',
-description: '采样间隔说明为连续采样，但维修群截图显示间断采样'
-});
-}
-if (conflictEvidence.length > 0) {
-appData.conflicts.push({
-id: Date.now() + Math.random(),
-screenshotId: screenshot.id,
-evidence: conflictEvidence,
-resolved: false,
-detectedTime: new Date().toISOString()
-});
-}
-});
-}
-
-function resolveConflict(conflictId, action) {
-const conflict = appData.conflicts.find(c => c.id === conflictId);
-if (!conflict) return;
-const remark = prompt('请输入处理备注：');
-conflict.resolved = true;
-conflict.resolution = action;
-conflict.resolutionRemark = remark;
-conflict.resolvedBy = '林老师';
-conflict.resolvedTime = new Date().toISOString();
-addReviewHistory(action === 'confirm' ? '确认冲突' : '驳回冲突', remark, conflict);
-calculateHAZ();
-runSelfCheck();
-updateUI();
-}
-
-function importRecords() {
-try {
-const records = JSON.parse(document.getElementById('weldingData').value);
-const checkResult = checkDuplicateImport(records);
-if (checkResult.hasDuplicate) {
-const confirm = showDuplicateWarning(checkResult.duplicateInfo);
-if (!confirm) return;
-}
-appData.weldingRecords = records.map(r => ({
-...r,
-id: r.id || Date.now() + Math.random(),
-importSource: '手动录入',
-importTime: new Date().toISOString(),
-status: 'pending'
-}));
-addReviewHistory('导入焊接记录', '共 ' + records.length + ' 条记录', appData.weldingRecords);
-calculateHAZ();
-runSelfCheck();
-updateUI();
-updateStep(3, 'active');
-alert('记录导入成功！');
-} catch (e) { alert('JSON格式错误：' + e.message); }
-}
-
-function checkDuplicateImport(records) {
-const duplicates = [];
-const existingIds = new Set(appData.weldingRecords.map(r => r.id));
-const existingTimestamps = new Set(appData.weldingRecords.map(r => r.samplingTime));
-records.forEach((r, index) => {
-if (r.id && existingIds.has(r.id)) duplicates.push({ type: 'id', index, value: r.id });
-if (r.samplingTime && existingTimestamps.has(r.samplingTime)) duplicates.push({ type: 'samplingTime', index, value: r.samplingTime });
-});
-return { hasDuplicate: duplicates.length > 0, duplicateInfo: duplicates };
-}
-
-function showDuplicateWarning(info) {
-return confirm('检测到重复导入！\n' + info.map(i => '- 第' + (i.index+1) + '条：' + i.type + '重复 (' + i.value + ')').join('\n') + '\n是否继续导入？');
-}
-
-function loadSampleData() {
-const sampleData = [
-{ id: 1, samplingTime: '2024-01-15T10:00:00', previousSamplingTime: '2024-01-15T09:30:00', weldingCurrent: 150, weldingVoltage: 24 },
-{ id: 2, samplingTime: '2024-01-15T11:05:00', previousSamplingTime: '2024-01-15T10:00:00', weldingCurrent: 165, weldingVoltage: 26 },
-{ id: 3, samplingTime: '2024-01-15T11:35:00', previousSamplingTime: '2024-01-15T11:05:00', weldingCurrent: 145, weldingVoltage: 23 }
-];
-document.getElementById('weldingData').value = JSON.stringify(sampleData, null, 2);
-document.getElementById('screenshotDesc').value = '维修群2024-01-15聊天记录，显示按1小时间断采样';
-document.getElementById('intervalContent').value = '采样间隔为30分钟，连续采样不间断';
-}
-
-function calculateHAZ() {
-if (appData.weldingRecords.length === 0) { appData.calculationResults = null; return; }
-const results = appData.weldingRecords.map(record => {
-const timeGap = detectTimeGap(record);
-const baseHAZ = (record.weldingCurrent || 100) * 0.1 + (record.weldingVoltage || 20) * 0.5;
-let adjustedHAZ = baseHAZ;
-let status = 'normal';
-let anomalyDescription = null;
-if (timeGap.hasGap) {
-status = 'pending_review';
-anomalyDescription = '采样时间缺失 ' + timeGap.gapMinutes + ' 分钟，待质检员复核';
-adjustedHAZ = baseHAZ * 1.2;
-}
-const unresolvedConflicts = appData.conflicts.filter(c => !c.resolved);
-if (unresolvedConflicts.length > 0) {
-status = 'conflict_pending';
-anomalyDescription = (anomalyDescription ? anomalyDescription + '；' : '') + '存在 ' + unresolvedConflicts.length + ' 个冲突待林老师确认';
-}
-return { ...record, baseHAZ: baseHAZ.toFixed(2), adjustedHAZ: adjustedHAZ.toFixed(2), status, anomalyDescription, timeGapInfo: timeGap };
-});
-appData.calculationResults = {
-calculateTime: new Date().toISOString(),
-totalRecords: results.length,
-normalCount: results.filter(r => r.status === 'normal').length,
-pendingReviewCount: results.filter(r => r.status === 'pending_review').length,
-conflictPendingCount: results.filter(r => r.status === 'conflict_pending').length,
-records: results
-};
-}
-
-function detectTimeGap(record) {
-if (!record.samplingTime || !record.previousSamplingTime) return { hasGap: false };
-const current = new Date(record.samplingTime);
-const previous = new Date(record.previousSamplingTime);
-const gapMinutes = (current - previous) / (1000 * 60);
-if (gapMinutes > 35) return { hasGap: true, gapMinutes: Math.round(gapMinutes - 30), expectedInterval: 30 };
-return { hasGap: false };
-}
-
-function runSelfCheck() {
-const checks = [];
-checks.push({ name: '重复导入检查', passed: appData.weldingRecords.length === new Set(appData.weldingRecords.map(r => r.id)).size, details: '共 ' + appData.weldingRecords.length + ' 条记录，ID无重复' });
-const gapRecords = appData.weldingRecords.filter(r => {
-if (!r.samplingTime || !r.previousSamplingTime) return false;
-const gap = (new Date(r.samplingTime) - new Date(r.previousSamplingTime)) / (1000 * 60);
-return gap > 35;
-});
-checks.push({ name: '采样时间缺失检查', passed: gapRecords.length === 0, details: gapRecords.length > 0 ? '发现 ' + gapRecords.length + ' 条记录存在采样时间缺失' : '所有记录采样时间连续' });
-checks.push({ name: '导出一致性验证', passed: true, details: '导出数据、页面展示、接口返回使用同一计算结果源' });
-checks.push({ name: '冲突状态同步', passed: appData.conflicts.every(c => (c.resolved && !appData.calculationResults?.records.some(r => r.status === 'conflict_pending')) || (!c.resolved && appData.calculationResults?.records.some(r => r.status === 'conflict_pending'))), details: '冲突状态与计算结果保持同步' });
-appData.selfCheckResults = { checkTime: new Date().toISOString(), totalChecks: checks.length, passedChecks: checks.filter(c => c.passed).length, checks, summary: checks.map(c => c.name + ': ' + (c.passed ? '通过' : '未通过')).join('；') };
-}
-
-function recalculate() {
-const remark = prompt('请输入重算原因：', '补录数据后重新计算');
-if (remark === null) return;
-const beforeResults = JSON.stringify(appData.calculationResults);
-calculateHAZ();
-runSelfCheck();
-addReviewHistory('补录后重算', remark, { before: JSON.parse(beforeResults || '{}'), after: appData.calculationResults });
-updateUI();
-alert('重算完成！');
-}
-
-function exportData() {
-const exportData = {
-exportTime: new Date().toISOString(),
-weldingRecords: appData.weldingRecords,
-calculationResults: appData.calculationResults,
-selfCheckSummary: appData.selfCheckResults?.summary
-};
-const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
-const url = URL.createObjectURL(blob);
-const a = document.createElement('a');
-a.href = url;
-a.download = '焊接热影响区估算_' + new Date().toISOString().slice(0,10) + '.json';
-a.click();
-URL.revokeObjectURL(url);
-addReviewHistory('导出数据', '导出明细数据', { recordCount: appData.weldingRecords.length });
-updateUI();
-}
-
-function addReviewHistory(action, description, changes) {
-appData.reviewHistory.unshift({
-id: Date.now(),
-action,
-description,
-operator: '系统',
-timestamp: new Date().toISOString(),
-changes: JSON.stringify(changes).substring(0, 500)
-});
-}
-
-function updateStep(stepNum, status) {
-const stepEl = document.getElementById('step' + stepNum);
-stepEl.classList.remove('active', 'completed');
-stepEl.classList.add(status);
-}
-
-function updateUI() {
-updateStats();
-updateConflicts();
-updateSelfCheck();
-updateResults();
-updateReviewHistory();
-updateScreenshotList();
-updateIntervalDisplay();
-}
-
-function updateStats() {
-const results = appData.calculationResults;
-document.getElementById('totalRecords').textContent = results?.totalRecords || 0;
-document.getElementById('normalCount').textContent = results?.normalCount || 0;
-document.getElementById('pendingCount').textContent = results?.pendingReviewCount || 0;
-document.getElementById('conflictCount').textContent = appData.conflicts.filter(c => !c.resolved).length;
-}
-
-function updateConflicts() {
-const section = document.getElementById('conflictSection');
-if (appData.conflicts.length === 0) {
-section.innerHTML = '<p style="color: #999; text-align: center; padding: 20px;">暂无冲突数据</p>';
-return;
-}
-section.innerHTML = appData.conflicts.map(conflict => '<div class="conflict-alert"><h4>⚠️ 检测到冲突 ' + (conflict.resolved ? '（已' + (conflict.resolution === 'confirm' ? '确认' : '驳回') + '）' : '') + '</h4><p style="font-size: 12px; color: #666; margin-bottom: 12px;">检测时间：' + new Date(conflict.detectedTime).toLocaleString() + '</p><div class="conflict-evidence"><strong>冲突证据：</strong>' + conflict.evidence.map(e => '<div class="evidence-item"><span style="color: #666;">' + e.type + '</span><span style="color: #e65100;">' + e.description + '</span></div>').join('') + '</div>' + (!conflict.resolved ? '<div class="btn-group" style="margin-top: 12px;"><button class="btn btn-success" onclick="resolveConflict(' + conflict.id + ', \'confirm\')">确认冲突</button><button class="btn btn-danger" onclick="resolveConflict(' + conflict.id + ', \'reject\')">驳回冲突</button></div>' : '<div style="margin-top: 12px; padding: 8px; background: #f5f5f5; border-radius: 4px; font-size: 13px;"><strong>处理人：</strong>' + conflict.resolvedBy + ' | <strong>处理时间：</strong>' + new Date(conflict.resolvedTime).toLocaleString() + '<br><strong>备注：</strong>' + (conflict.resolutionRemark || '无') + '</div>') + '</div>').join('');
-}
-
-function updateSelfCheck() {
-const section = document.getElementById('selfCheckSection');
-if (!appData.selfCheckResults) {
-section.innerHTML = '<p style="color: #999; text-align: center; padding: 20px;">暂无自检数据</p>';
-return;
-}
-const sc = appData.selfCheckResults;
-section.innerHTML = '<div style="margin-bottom: 12px; font-size: 13px; color: #666;">自检时间：' + new Date(sc.checkTime).toLocaleString() + ' | 通过：' + sc.passedChecks + '/' + sc.totalChecks + '</div><div class="self-check">' + sc.checks.map(check => '<div class="check-item"><span class="check-icon ' + (check.passed ? 'check-pass' : 'check-fail') + '">' + (check.passed ? '✓' : '✗') + '</span><div><div style="font-weight: 500;">' + check.name + '</div><div style="font-size: 12px; color: #666;">' + check.details + '</div></div></div>').join('') + '</div>';
-}
-
-function updateResults() {
-const section = document.getElementById('resultsSection');
-if (!appData.calculationResults || appData.calculationResults.records.length === 0) {
-section.innerHTML = '<p style="color: #999; text-align: center; padding: 20px;">暂无计算结果</p>';
-return;
-}
-const records = appData.calculationResults.records;
-section.innerHTML = '<div style="margin-bottom: 12px; font-size: 13px; color: #666;">计算时间：' + new Date(appData.calculationResults.calculateTime).toLocaleString() + '</div><table><thead><tr><th>ID</th><th>采样时间</th><th>焊接电流</th><th>焊接电压</th><th>基础HAZ</th><th>调整后HAZ</th><th>状态</th></tr></thead><tbody>' + records.map(r => '<tr><td>' + r.id + '</td><td>' + new Date(r.samplingTime).toLocaleString() + '</td><td>' + r.weldingCurrent + 'A</td><td>' + r.weldingVoltage + 'V</td><td>' + r.baseHAZ + '</td><td>' + r.adjustedHAZ + '</td><td><span class="status-badge status-' + (r.status === 'normal' ? 'normal' : r.status === 'pending_review' ? 'pending' : 'conflict') + '">' + (r.status === 'normal' ? '正常' : r.status === 'pending_review' ? '待复核' : '待确认') + '</span>' + (r.anomalyDescription ? '<div class="anomaly-note">' + r.anomalyDescription + '</div>' : '') + '</td></tr>').join('') + '</tbody></table>';
-}
-
-function updateReviewHistory() {
-const section = document.getElementById('reviewTimeline');
-if (appData.reviewHistory.length === 0) {
-section.innerHTML = '<p style="color: #999; text-align: center; padding: 20px;">暂无复核记录</p>';
-return;
-}
-section.innerHTML = appData.reviewHistory.map(h => '<div class="timeline-item"><div class="timeline-action">' + h.action + '</div><div class="timeline-time">' + new Date(h.timestamp).toLocaleString() + '</div><div class="timeline-desc">' + (h.description || '无描述') + '</div></div>').join('');
-}
-
-function updateScreenshotList() {
-const list = document.getElementById('screenshotList');
-if (appData.maintenanceScreenshots.length === 0) return;
-list.innerHTML = appData.maintenanceScreenshots.map(s => '<div style="padding: 8px; background: #f5f5f5; border-radius: 4px; margin-bottom: 8px; font-size: 13px;"><strong>' + s.originalName + '</strong><div style="color: #666; margin-top: 4px;">' + s.description + '</div></div>').join('');
-}
-
-function updateIntervalDisplay() {
-const display = document.getElementById('intervalDisplay');
-if (!appData.samplingIntervalNotes) return;
-display.innerHTML = '<div style="padding: 12px; background: #e3f2fd; border-radius: 6px; font-size: 13px;"><strong>操作人：</strong>' + appData.samplingIntervalNotes.operator + '<br><strong>内容：</strong>' + appData.samplingIntervalNotes.content + '<br><strong>更新时间：</strong>' + new Date(appData.samplingIntervalNotes.updateTime).toLocaleString() + '</div>';
-}
 </script>
 </body>
 </html>
