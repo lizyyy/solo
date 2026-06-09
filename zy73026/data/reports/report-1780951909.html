@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<title>异宠温控异常提醒 —— 报告</title>
+<style>
+  body{font-family:-apple-system,Segoe UI,"PingFang SC",sans-serif;
+       margin:24px;color:#222;max-width:1100px}
+  h1{font-size:20px;border-bottom:2px solid #333;padding-bottom:6px}
+  h2{font-size:16px;margin-top:28px;color:#333}
+  .alert{border:1px solid #ddd;border-radius:6px;padding:14px 18px;
+         margin:12px 0;background:#fafafa}
+  .status{display:inline-block;padding:2px 10px;border-radius:4px;
+          font-size:12px;font-weight:600}
+  .PENDING{background:#fff3cd;color:#856404}
+  .CONFIRMED{background:#cce5ff;color:#004085}
+  .RESOLVED{background:#d4edda;color:#155724}
+  .PENDING_REVIEW{background:#f8d7da;color:#721c24;animation:pulse 1.5s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.65}}
+  .meta{color:#666;font-size:13px;margin:4px 0}
+  .reason{background:#fff5f5;border-left:3px solid #e74c3c;
+          padding:6px 10px;margin:8px 0;font-size:13px;color:#721c24}
+  ul.hist,ul.notes{font-size:13px;padding-left:20px;margin:6px 0}
+  ul.hist li,ul.notes li{margin:3px 0}
+  table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
+  th,td{border:1px solid #e5e5e5;padding:6px 8px;text-align:left}
+  th{background:#f0f0f0}
+  .muted{color:#999}
+</style></head><body>
+<h1>🐾 异宠温控异常提醒报告</h1>
+<p class="muted">当前过滤：宠物ID = CHAMELEON-01</p>
+
+<h2>📋 温控异常提醒清单</h2>
+
+  
+  <div class="alert">
+    <div>
+      <span class="status PENDING_REVIEW">待人工复核</span>
+      <strong>小绿</strong>
+      <span class="muted">(变色龙 · ID: CHAMELEON-01)</span>
+      <span style="float:right">温度: <b>31.8°C</b></span>
+    </div>
+    <div class="meta">提醒ID: 6d86eee7d8de463ca3adbcdc39f6570e · 异常时间: 2026-06-09 10:15
+      · 创建: 2026-06-08 20:51:48 · 更新: 2026-06-08 20:51:49</div>
+    
+      <div class="meta"><b>结论:</b> 调整灯罩高度，加设排风扇</div>
+    
+      <div class="reason">⚠️ 待复核原因: 用药 钙粉 剂量变更: 1g/次 → 3g/次</div>
+    
+    
+      <h4 style="margin:10px 0 4px">📜 状态变更历史</h4>
+      <ul class="hist">
+      
+        <li><span class="muted">[2026-06-08 20:51:48]</span>
+          <b>system</b> 修改：
+          (初值) → <b>PENDING</b>
+          · 原因：首次导入创建提醒</li>
+      
+        <li><span class="muted">[2026-06-08 20:51:48]</span>
+          <b>阿岑</b> 修改：
+          PENDING → <b>CONFIRMED</b>
+          · 原因：现场复核 31.2°C，确认为温控器偏差</li>
+      
+        <li><span class="muted">[2026-06-08 20:51:49]</span>
+          <b>system</b> 修改：
+          CONFIRMED → <b>PENDING_REVIEW</b>
+          · 原因：用药 钙粉 剂量变更: 1g/次 → 3g/次</li>
+      
+      </ul>
+    
+    
+      <h4 style="margin:10px 0 4px">🗒️ 人工备注</h4>
+      <ul class="notes">
+      
+        <li><span class="muted">[2026-06-08 20:51:48]</span>
+          <b>阿岑</b>：现场查看遮阳灯位置过高</li>
+      
+      </ul>
+    
+  </div>
+  
+
+
+<h2>🔗 疫苗本照片 ↔ 用药记录 关联关系</h2>
+
+  <p class="muted">尚未建立关联。使用 <code>cli link</code> 命令建立关系。</p>
+
+
+<h2>📁 约定目录</h2>
+<ul>
+  <li>数据库: <code>/Users/maca/pro/solo/workspaces/zy73026/data/alertdb.sqlite3</code></li>
+  <li>疫苗照片归档: <code>/Users/maca/pro/solo/workspaces/zy73026/data/vaccine_photos</code>
+    <span class="muted">（按宠物ID分子目录）</span></li>
+  <li>报告输出: <code>/Users/maca/pro/solo/workspaces/zy73026/data/reports</code></li>
+</ul>
+</body></html>
