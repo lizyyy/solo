@@ -32,6 +32,8 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }))
  * API Routes
  */
 app.use('/api/auth', authRoutes)
+app.use('/api/calibration', calibrationRoutes)
+app.use('/api/anomalies', anomaliesRoutes)
 
 /**
  * health
