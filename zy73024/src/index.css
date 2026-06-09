@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  background-color: #FAF7F2;
+  color: #3A200E;
+  font-family: 'Noto Sans SC', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+@layer components {
+  .paper-bg {
+    background-image:
+      radial-gradient(at 18% 22%, rgba(200,121,65,0.06) 0px, transparent 55%),
+      radial-gradient(at 82% 78%, rgba(143,166,140,0.08) 0px, transparent 55%),
+      repeating-linear-gradient(
+        0deg,
+        rgba(200,121,65,0.015) 0px,
+        rgba(200,121,65,0.015) 1px,
+        transparent 1px,
+        transparent 4px
+      );
+  }
+  .tag-tag {
+    @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium border;
+  }
+  .flag-badge {
+    @apply inline-flex items-center gap-1 px-2 py-1 rounded-tl-sm rounded-tr-md rounded-br-md rounded-bl-md text-xs font-bold text-white;
+    clip-path: polygon(8% 0, 100% 0, 100% 85%, 92% 100%, 0 100%, 0 15%);
+  }
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-4 py-2 bg-clay text-white rounded-lg shadow-btn hover:bg-clay-600 active:translate-y-[1px] active:shadow-none transition-all text-sm font-medium;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center gap-2 px-4 py-2 border border-clay-200 text-clay-700 rounded-lg hover:bg-clay-50 transition-all text-sm font-medium;
+  }
+  .btn-danger {
+    @apply inline-flex items-center gap-2 px-4 py-2 bg-rust text-white rounded-lg shadow-btn hover:bg-rust-600 active:translate-y-[1px] active:shadow-none transition-all text-sm font-medium;
+  }
+  .card {
+    @apply bg-white rounded-2xl shadow-card hover:shadow-card-hover transition-all;
+  }
+  .stripe-pad {
+    background-image: repeating-linear-gradient(
+      135deg,
+      rgba(86, 82, 100, 0.06) 0px,
+      rgba(86, 82, 100, 0.06) 6px,
+      transparent 6px,
+      transparent 14px
+    );
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium border border-sage-200 text-sage-700 hover:bg-sage-50 cursor-pointer select-none transition-colors;
+  }
+  .chip-active {
+    @apply bg-sage text-white border-sage;
+  }
+  .num {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+  }
+  .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(200,121,65,0.3); border-radius: 6px; }
+}
+
+@keyframes drawSvg {
+  to { stroke-dashoffset: 0; }
+}
+.animate-draw {
+  stroke-dasharray: 2000;
+  stroke-dashoffset: 2000;
+  animation: drawSvg 0.9s ease-out forwards;
+}
