@@ -8,13 +8,14 @@ class SensorDataProcessor {
 
   detectSensorRestart(records) {
     const restartDetections = [];
-    
+    const DOWNSTREAM = new Set([RECORD_STATUS.FROM_MANUAL_NOTE, RECORD_STATUS.REVIEWED]);
+
     for (let i = 0; i < records.length; i++) {
       const current = records[i];
-      
+
       if (this.knownSensors.has(current.springId)) {
         const previousSensorId = this.knownSensors.get(current.springId);
-        
+
         if (current.sensorId !== previousSensorId) {
           restartDetections.push({
             recordIndex: i,
@@ -24,16 +25,18 @@ class SensorDataProcessor {
             newSensorId: current.sensorId,
             timestamp: current.timestamp
           });
-          
+
           current.sensorRestartDetected = true;
-          current.status = RECORD_STATUS.PENDING_REVIEW;
           current.originalSensorId = previousSensorId;
+          if (!DOWNSTREAM.has(current.status)) {
+            current.status = RECORD_STATUS.PENDING_REVIEW;
+          }
         }
       }
-      
+
       this.knownSensors.set(current.springId, current.sensorId);
     }
-    
+
     return restartDetections;
   }
 
@@ -70,9 +73,14 @@ class SensorDataProcessor {
 
   processSession(session) {
     const restartDetections = this.detectSensorRestart(session.records);
-    
+    const DOWNSTREAM = new Set([
+      RECORD_STATUS.FROM_MANUAL_NOTE,
+      RECORD_STATUS.REVIEWED,
+      RECORD_STATUS.PENDING_REVIEW
+    ]);
+
     session.records.forEach(record => {
-      if (!record.sensorRestartDetected) {
+      if (!record.sensorRestartDetected && !DOWNSTREAM.has(record.status)) {
         record.status = RECORD_STATUS.NORMAL;
       }
     });
@@ -90,24 +98,31 @@ class SensorDataProcessor {
   }
 
   generateSafetyReminder(session) {
+    const effectiveFatigue = r =>
+      r.correctedFatigueValue !== null && r.correctedFatigueValue !== undefined
+        ? r.correctedFatigueValue
+        : r.fatigueValue;
+
     const dangerousRecords = session.records.filter(
-      r => this.calculateFatigueStatus(r.fatigueValue) === SAFETY_LEVEL.DANGER
-    );
-    
-    const warningRecords = session.records.filter(
-      r => this.calculateFatigueStatus(r.fatigueValue) === SAFETY_LEVEL.WARNING
+      r => this.calculateFatigueStatus(effectiveFatigue(r)) === SAFETY_LEVEL.DANGER
     );
 
-    const restartRecords = session.records.filter(r => r.sensorRestartDetected);
-    
+    const warningRecords = session.records.filter(
+      r => this.calculateFatigueStatus(effectiveFatigue(r)) === SAFETY_LEVEL.WARNING
+    );
+
+    const pendingReviewRecords = session.records.filter(
+      r => r.status === RECORD_STATUS.PENDING_REVIEW
+    );
+
     let level = SAFETY_LEVEL.SAFE;
     let title = '复核完成，一切正常';
     let description = '所有弹簧疲劳值均在安全范围内。';
 
-    if (restartRecords.length > 0) {
+    if (pendingReviewRecords.length > 0) {
       level = SAFETY_LEVEL.WARNING;
       title = '传感器异常需复核';
-      description = `检测到 ${restartRecords.length} 条记录传感器编号发生变化，需安全员复核。`;
+      description = `检测到 ${pendingReviewRecords.length} 条记录传感器编号发生变化，需安全员复核。\n待复核弹簧：${pendingReviewRecords.map(r => r.springId).join('、')}`;
     } else if (dangerousRecords.length > 0) {
       level = SAFETY_LEVEL.DANGER;
       title = '危险：存在高疲劳弹簧';
@@ -127,7 +142,7 @@ class SensorDataProcessor {
       affectedRecords: [
         ...dangerousRecords.map(r => r.id),
         ...warningRecords.map(r => r.id),
-        ...restartRecords.map(r => r.id)
+        ...pendingReviewRecords.map(r => r.id)
       ]
     });
   }
@@ -138,13 +153,30 @@ class SensorDataProcessor {
       throw new Error(`记录 ${recordId} 不存在`);
     }
 
+    const oldFatigue = record.fatigueValue;
+    const oldCorrected = record.correctedFatigueValue;
+    const oldNote = record.manualNote;
+
     record.history.push({
       action: 'manual_note_applied',
       timestamp: new Date().toISOString(),
-      data: { oldNote: record.manualNote, newNote: manualNote }
+      data: {
+        oldNote,
+        newNote: manualNote,
+        oldFatigueValue: oldCorrected !== null ? oldCorrected : oldFatigue,
+        newFatigueValue: manualNote.correctedFatigueValue !== undefined
+          ? manualNote.correctedFatigueValue
+          : (oldCorrected !== null ? oldCorrected : oldFatigue),
+        reason: manualNote.reason || '手写巡检备注补录'
+      }
     });
 
-    record.manualNote = manualNote;
+    record.manualNote = {
+      content: typeof manualNote === 'object' ? manualNote.content : manualNote,
+      author: manualNote.author || '维修师傅',
+      timestamp: new Date().toISOString(),
+      reason: manualNote.reason || ''
+    };
     record.status = RECORD_STATUS.FROM_MANUAL_NOTE;
 
     if (manualNote.correctedFatigueValue !== undefined) {
@@ -152,8 +184,35 @@ class SensorDataProcessor {
     }
 
     session.updatedAt = new Date().toISOString();
-    
-    return record;
+
+    const reminder = this.generateSafetyReminder(session);
+    if (session.safetyReminder) {
+      const prev = new SafetyReminder(session.safetyReminder);
+      prev.updateLevel(
+        reminder.level,
+        `补录手写备注后刷新：${record.springId} 疲劳值 ${oldCorrected !== null ? oldCorrected : oldFatigue} → ${record.correctedFatigueValue !== null ? record.correctedFatigueValue : oldFatigue}`
+      );
+      prev.title = reminder.title;
+      prev.description = reminder.description + '\n' + prev.description.split('\n').filter(l => l.startsWith('[更新]')).join('\n');
+      prev.affectedRecords = reminder.affectedRecords;
+      prev.updatedAt = new Date().toISOString();
+      session.safetyReminder = prev.toJSON();
+    } else {
+      session.safetyReminder = reminder.toJSON();
+    }
+
+    return {
+      record,
+      safetyReminder: session.safetyReminder,
+      diff: {
+        springId: record.springId,
+        oldFatigue: oldCorrected !== null ? oldCorrected : oldFatigue,
+        newFatigue: record.correctedFatigueValue !== null ? record.correctedFatigueValue : oldFatigue,
+        oldNote: oldNote ? (typeof oldNote === 'object' ? oldNote.content : oldNote) : null,
+        newNote: typeof manualNote === 'object' ? manualNote.content : manualNote,
+        reason: manualNote.reason || '手写巡检备注补录'
+      }
+    };
   }
 
   reviewRecord(recordId, reviewResult, reviewer, session) {
@@ -161,6 +220,9 @@ class SensorDataProcessor {
     if (!record) {
       throw new Error(`记录 ${recordId} 不存在`);
     }
+
+    const oldCorrected = record.correctedFatigueValue;
+    const oldFatigue = oldCorrected !== null ? oldCorrected : record.fatigueValue;
 
     record.history.push({
       action: 'review_completed',
@@ -178,8 +240,35 @@ class SensorDataProcessor {
     }
 
     session.updatedAt = new Date().toISOString();
-    
-    return record;
+
+    const reminder = this.generateSafetyReminder(session);
+    if (session.safetyReminder) {
+      const prev = new SafetyReminder(session.safetyReminder);
+      const newFatigue = record.correctedFatigueValue !== null ? record.correctedFatigueValue : record.fatigueValue;
+      prev.updateLevel(
+        reminder.level,
+        `安全员复核完成：${record.springId} ${oldFatigue} → ${newFatigue}，结论"${reviewResult.comment}"`
+      );
+      prev.title = reminder.title;
+      prev.description = reminder.description + '\n' + prev.description.split('\n').filter(l => l.startsWith('[更新]')).join('\n');
+      prev.affectedRecords = reminder.affectedRecords;
+      prev.updatedAt = new Date().toISOString();
+      session.safetyReminder = prev.toJSON();
+    } else {
+      session.safetyReminder = reminder.toJSON();
+    }
+
+    return {
+      record,
+      safetyReminder: session.safetyReminder,
+      diff: {
+        springId: record.springId,
+        oldFatigue,
+        newFatigue: record.correctedFatigueValue !== null ? record.correctedFatigueValue : record.fatigueValue,
+        reviewer,
+        comment: reviewResult.comment
+      }
+    };
   }
 
   rerunAnalysis(session) {

@@ -1,26 +1,17 @@
 #!/usr/bin/env node
 
+const readline = require('readline');
 const { SensorDataProcessor } = require('./processor');
 const { DemoData } = require('./demo-data');
-const { RECORD_STATUS, SAFETY_LEVEL } = require('./models');
+const { RECORD_STATUS, SAFETY_LEVEL, InspectionSession } = require('./models');
 
-const processor = new SensorDataProcessor();
+let processor = new SensorDataProcessor();
+let currentSession = null;
 
 function printHeader(title) {
-  console.log('\n' + '='.repeat(60));
+  console.log('\n' + '='.repeat(64));
   console.log(`  ${title}`);
-  console.log('='.repeat(60));
-}
-
-function printStatusIcon(status) {
-  const icons = {
-    [RECORD_STATUS.NORMAL]: '✅',
-    [RECORD_STATUS.SENSOR_RESTART]: '⚠️',
-    [RECORD_STATUS.PENDING_REVIEW]: '🔍',
-    [RECORD_STATUS.FROM_MANUAL_NOTE]: '📝',
-    [RECORD_STATUS.REVIEWED]: '✓'
-  };
-  return icons[status] || '❓';
+  console.log('='.repeat(64));
 }
 
 function printSafetyLevel(level) {
@@ -39,201 +30,407 @@ function printSafetyLevel(level) {
   return `${colors[level] || ''}${labels[level] || level}\x1b[0m`;
 }
 
-function printRecord(record, showDetails = false) {
-  const statusIcon = printStatusIcon(record.status);
-  const fatigueStatus = processor.calculateFatigueStatus(
-    record.correctedFatigueValue !== null ? record.correctedFatigueValue : record.fatigueValue
-  );
-  
-  console.log(`\n${statusIcon} 弹簧 ${record.springId}`);
-  console.log(`   记录ID: ${record.id}`);
-  console.log(`   传感器: ${record.sensorId}${record.sensorRestartDetected ? ` (原: ${record.originalSensorId}) ⚠️ 编号变更` : ''}`);
-  console.log(`   疲劳值: ${record.fatigueValue}${record.correctedFatigueValue !== null ? ` → 修正: ${record.correctedFatigueValue}` : ''} ${printSafetyLevel(fatigueStatus)}`);
-  console.log(`   状态: ${record.status}`);
-  console.log(`   运行次数: ${record.runCount}`);
-  
-  if (record.photoPath) {
-    console.log(`   工况照片: ${record.photoPath}`);
-  }
-  
-  if (record.manualNote) {
-    console.log(`   📝 手写备注: ${typeof record.manualNote === 'object' ? record.manualNote.content : record.manualNote}`);
-  }
-  
-  if (record.reviewComment) {
-    console.log(`   💬 复核意见: ${record.reviewComment} (复核人: ${record.reviewedBy})`);
-  }
-  
-  if (showDetails && record.history && record.history.length > 0) {
-    console.log(`   📜 操作历史:`);
-    record.history.forEach((h, i) => {
-      console.log(`      ${i + 1}. ${h.action} - ${h.timestamp}`);
-    });
-  }
+function statusLabel(status) {
+  return {
+    [RECORD_STATUS.NORMAL]: '正常',
+    [RECORD_STATUS.PENDING_REVIEW]: '待复核',
+    [RECORD_STATUS.FROM_MANUAL_NOTE]: '手写补录',
+    [RECORD_STATUS.REVIEWED]: '已复核',
+    [RECORD_STATUS.SENSOR_RESTART]: '传感器重启'
+  }[status] || status;
+}
+
+function statusIcon(status) {
+  return {
+    [RECORD_STATUS.NORMAL]: '✅',
+    [RECORD_STATUS.PENDING_REVIEW]: '🔍',
+    [RECORD_STATUS.FROM_MANUAL_NOTE]: '📝',
+    [RECORD_STATUS.REVIEWED]: '✓ ',
+    [RECORD_STATUS.SENSOR_RESTART]: '⚠️ '
+  }[status] || '❓';
+}
+
+function fatigueColor(value) {
+  if (value === null || value === undefined) return '\x1b[37m';
+  if (value < 30) return '\x1b[32m';
+  if (value < 60) return '\x1b[33m';
+  return '\x1b[31m';
+}
+
+function printRecordList(records) {
+  console.log('\n  ' + '-'.repeat(60));
+  console.log('  编号  弹簧    传感器                疲劳值       状态');
+  console.log('  ' + '-'.repeat(60));
+  records.forEach((r, idx) => {
+    const display = r.correctedFatigueValue !== null
+      ? `${r.fatigueValue} → ${r.correctedFatigueValue}`
+      : `${r.fatigueValue}`;
+    const color = fatigueColor(
+      r.correctedFatigueValue !== null ? r.correctedFatigueValue : r.fatigueValue
+    );
+    const restartMark = r.sensorRestartDetected ? ' ⚠️变号' : '';
+    const pad = str => String(str).padEnd(18, ' ');
+    console.log(
+      `  ${String(idx + 1).padEnd(4, ' ')}` +
+      ` ${r.springId.padEnd(6, ' ')}` +
+      ` ${pad(r.sensorId + restartMark)}` +
+      ` ${color}${display.padEnd(12, ' ')}\x1b[0m` +
+      ` ${statusIcon(r.status)} ${statusLabel(r.status)}`
+    );
+  });
+  console.log('  ' + '-'.repeat(60));
 }
 
 function printSafetyReminder(reminder) {
-  console.log('\n' + '-'.repeat(50));
-  console.log(`🚨 安全提醒: ${printSafetyLevel(reminder.level)}`);
-  console.log(`   标题: ${reminder.title}`);
-  console.log(`   描述: ${reminder.description}`);
-  console.log(`   影响记录: ${reminder.affectedRecords.length} 条`);
-  console.log(`   生成时间: ${reminder.generatedAt}`);
+  if (!reminder) {
+    console.log('\n  ⚠️  暂无安全提醒');
+    return;
+  }
+  console.log('\n  ' + '─'.repeat(58));
+  console.log(`  🚨 安全提醒：${printSafetyLevel(reminder.level)}`);
+  console.log(`  标题：${reminder.title}`);
+  console.log(`  说明：${reminder.description.split('\n').join('\n        ')}`);
   if (reminder.updatedAt !== reminder.generatedAt) {
-    console.log(`   更新时间: ${reminder.updatedAt}`);
+    console.log(`  更新时间：${reminder.updatedAt}`);
   }
-  console.log('-'.repeat(50));
+  console.log('  ' + '─'.repeat(58));
 }
 
-function runDemo() {
-  printHeader('弹簧疲劳寿命复核 - 演示模式');
-  console.log('\n👷 维修师傅: 老岑');
-  console.log('📍 地点: A区生产线-3号机组');
-  console.log('📅 日期: 2024-06-01');
-
-  const stepByStep = DemoData.getStepByStepDemo();
-  
-  printHeader(stepByStep.step1.title);
-  console.log(`\n${stepByStep.step1.description}`);
-  console.log('\n导入的工况照片数据:');
-  stepByStep.step1.data.forEach(d => {
-    console.log(`  • 弹簧 ${d.springId}: 传感器 ${d.sensorId}, 疲劳值 ${d.fatigueValue}`);
+function ask(question) {
+  return new Promise(resolve => {
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    rl.question(question, answer => {
+      rl.close();
+      resolve(answer);
+    });
   });
+}
 
-  printHeader(stepByStep.step2.title);
-  console.log(`\n${stepByStep.step2.description}`);
-  console.log('\n检测到的传感器编号变化:');
-  stepByStep.step2.detections.forEach(d => {
-    console.log(`  🔍 弹簧 ${d.springId}: ${d.old} → ${d.new}`);
-  });
-  console.log('\n⚠️  系统标记为待复核，不自动归正常，留给安全员确认');
+async function stepImportPhotos() {
+  printHeader('步骤 1/4：工况照片第一次导入');
+  console.log('\n  📷 正在从现场工况照片提取OCR数据 ...');
 
-  printHeader(stepByStep.step3.title);
-  console.log(`\n${stepByStep.step3.description}`);
-  console.log(`\n📝 手写备注内容:`);
-  console.log(`  ${stepByStep.step3.manualNote.content}`);
-  console.log(`  修正疲劳值: ${stepByStep.step3.manualNote.correctedFatigueValue}`);
-
-  printHeader('执行复核流程');
-  
+  processor = new SensorDataProcessor();
   processor.knownSensors = DemoData.getBaselineSensors();
-  const session = DemoData.createDemoSession();
-  const result = processor.processSession(session);
-  
-  console.log('\n📊 复核结果汇总:');
-  console.log(`  总记录数: ${result.session.records.length}`);
-  console.log(`  传感器重启检测: ${result.restartDetections.length} 条`);
 
-  console.log('\n📋 记录详情:');
-  result.session.records.forEach(record => {
-    printRecord(record, true);
+  const photoData = DemoData.getPhotoImportData();
+  const records = processor.importPhotoData(photoData);
+
+  currentSession = new InspectionSession({
+    id: `session-${Date.now()}`,
+    date: new Date().toISOString().slice(0, 10),
+    inspector: '老岑',
+    location: 'A区生产线-3号机组',
+    photos: photoData.map((p, i) => ({
+      id: `photo-${i + 1}`,
+      path: p.path,
+      description: `弹簧 ${p.springId} 工况照片`,
+      timestamp: p.timestamp
+    })),
+    status: 'imported'
   });
+  records.forEach(r => currentSession.addRecord(r.toJSON()));
 
-  if (result.safetyReminder) {
-    printSafetyReminder(result.safetyReminder);
+  console.log(`\n  ✅ 共导入 ${records.length} 条工况照片记录`);
+  printRecordList(currentSession.records);
+
+  console.log('\n  🔎 开始检测传感器编号变化 ...');
+  const result = processor.processSession(currentSession);
+  if (result.restartDetections.length > 0) {
+    console.log(`\n  ⚠️  检测到 ${result.restartDetections.length} 条传感器编号变化`);
+    result.restartDetections.forEach(d => {
+      console.log(`     • 弹簧 ${d.springId}：${d.oldSensorId} → ${d.newSensorId}`);
+    });
+    console.log('     → 已标记为「待复核」，暂时不归正常，留给安全员确认');
+  } else {
+    console.log('\n  ✅ 未检测到传感器编号变化');
   }
 
-  printHeader(stepByStep.step4.title);
-  console.log(`\n${stepByStep.step4.description}`);
-  
-  const record2 = session.getRecordById('record-2');
-  processor.reviewRecord('record-2', {
-    comment: stepByStep.step4.reviewResult.comment,
-    correctedFatigueValue: record2.fatigueValue
-  }, '安全员-老王', session);
-  
-  console.log('\n✅ 已复核 record-2 (弹簧 A002)');
+  printRecordList(currentSession.records);
+  printSafetyReminder(currentSession.safetyReminder);
 
-  printHeader(stepByStep.step5.title);
-  console.log(`\n${stepByStep.step5.description}`);
-  
-  const updatedReminder = processor.updateSafetyReminderAfterReview(session);
-  printSafetyReminder(updatedReminder);
-
-  printHeader('三种处理结果对比');
-  console.log('\n1️⃣ 顺利记录 (弹簧 A001):');
-  console.log('   • 传感器编号无变化');
-  console.log('   • 疲劳值正常 (25 < 30)');
-  console.log('   • 状态: normal ✅');
-  
-  console.log('\n2️⃣ 传感器重启待复核 (弹簧 A002):');
-  console.log('   • 传感器编号变化: SNS-0022 → SNS-0022-NEW');
-  console.log('   • 已由安全员复核');
-  console.log('   • 状态: reviewed ✓');
-  
-  console.log('\n3️⃣ 手写备注补录修正 (弹簧 A003):');
-  console.log('   • 传感器编号变化: SNS-0031 → SNS-0031-NEW');
-  console.log('   • 原始疲劳值 78 (危险) → 修正为 42 (警告)');
-  console.log('   • 来源: 手写巡检备注');
-  console.log('   • 状态: from_manual_note 📝');
-  console.log('   • 重跑分析: 是 (runCount = 2)');
-
-  printHeader('证据链完整检查');
-  console.log('\n✅ 工况照片: 每条记录都有对应的照片路径');
-  console.log('✅ 操作历史: 每条记录都保留完整的处理轨迹');
-  console.log('✅ 复核痕迹: 复核人、复核时间、复核意见完整记录');
-  console.log('✅ 数据溯源: 传感器原始编号、修正值来源清晰可查');
-  
-  console.log('\n🎓 给新人的建议:');
-  console.log('   1. 看到传感器编号变化时，别急着归正常');
-  console.log('   2. 一定要翻手写巡检本确认是否真的更换过传感器');
-  console.log('   3. 更换传感器后的数据要按旧口径折算');
-  console.log('   4. 每一步操作都要留痕，方便以后追溯');
-
-  printHeader('演示结束');
-  console.log('\n💡 运行 `npm run demo` 可重新查看演示');
-  console.log('💡 运行 `npm start` 可进入交互模式');
+  console.log('\n  💡 下一步：在菜单中选 [3] 补录手写巡检备注');
 }
 
-function runInteractive() {
-  const readline = require('readline');
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
+async function stepApplyManualNote() {
+  if (!currentSession) {
+    console.log('\n  ❌ 请先执行「1. 工况照片第一次导入」');
+    return;
+  }
+
+  printHeader('步骤 2/4：补录手写巡检备注');
+
+  const pending = currentSession.records.filter(
+    r => r.status === RECORD_STATUS.PENDING_REVIEW || r.sensorRestartDetected
+  );
+  if (pending.length === 0) {
+    console.log('\n  ✅ 没有待复核的记录，无需补录');
+    return;
+  }
+
+  console.log('\n  📋 以下记录传感器编号变化，可选择一条补录手写巡检备注：');
+  printRecordList(pending);
+
+  const pickStr = await ask(`\n  选择要补录的记录编号 (1-${pending.length}，直接回车=跳过)：`);
+  if (!pickStr.trim()) {
+    console.log('  已跳过补录');
+    return;
+  }
+  const pick = parseInt(pickStr, 10);
+  if (isNaN(pick) || pick < 1 || pick > pending.length) {
+    console.log('  ❌ 无效编号');
+    return;
+  }
+  const target = pending[pick - 1];
+
+  console.log(`\n  ┌─ 弹簧 ${target.springId} 补录信息`);
+  const defaultContent =
+    '5月28日手写记录：弹簧' + target.springId + '原传感器' +
+    target.originalSensorId + '损坏，已更换新传感器' + target.sensorId +
+    '，疲劳值按旧口径修正为42';
+  const content = await ask(`  手写备注内容 [回车用默认]:\n  `) || defaultContent;
+
+  const defaultCorrected = 42;
+  const correctedStr = await ask(
+    `  修正后疲劳值 [默认 ${defaultCorrected}]：`
+  );
+  const correctedValue = correctedStr.trim()
+    ? parseInt(correctedStr, 10)
+    : defaultCorrected;
+
+  const defaultReason = '更换新传感器后按旧口径折算';
+  const reason = await ask(`  修改原因 [默认: ${defaultReason}]：`) || defaultReason;
+
+  console.log(`  └──────────────────────────────`);
+  console.log(`\n  📝 改前 / 改后对比：`);
+  console.log(`     改前备注：${target.manualNote ? (typeof target.manualNote === 'object' ? target.manualNote.content : target.manualNote) : '(无)'}`);
+  console.log(`     改后备注：${content}`);
+  console.log(`     疲劳值：${target.fatigueValue} → ${correctedValue}`);
+  const oldLvl = processor.calculateFatigueStatus(target.fatigueValue);
+  const newLvl = processor.calculateFatigueStatus(correctedValue);
+  console.log(`     安全等级：${printSafetyLevel(oldLvl)} → ${printSafetyLevel(newLvl)}`);
+  console.log(`     修改原因：${reason}`);
+
+  const confirm = await ask('\n  确认补录？(y/N) ');
+  if (confirm.toLowerCase() !== 'y') {
+    console.log('  已取消');
+    return;
+  }
+
+  const result = processor.applyManualNote(
+    target.id,
+    { content, correctedFatigueValue: correctedValue, reason, author: '老岑' },
+    currentSession
+  );
+
+  console.log(`\n  ✅ 补录完成`);
+  console.log(`     状态：${statusLabel(result.record.status)}`);
+  console.log(`\n  🔄 安全提醒已同步更新`);
+  printSafetyReminder(result.safetyReminder);
+}
+
+async function stepReviewRecord() {
+  if (!currentSession) {
+    console.log('\n  ❌ 请先执行「1. 工况照片第一次导入」');
+    return;
+  }
+
+  printHeader('步骤 3/4：安全员复核待处理记录');
+
+  const pending = currentSession.records.filter(
+    r => r.status === RECORD_STATUS.PENDING_REVIEW
+  );
+  if (pending.length === 0) {
+    console.log('\n  ✅ 没有待复核记录');
+    printRecordList(currentSession.records);
+    printSafetyReminder(currentSession.safetyReminder);
+    return;
+  }
+
+  console.log(`\n  📋 共 ${pending.length} 条记录待安全员复核：`);
+  printRecordList(pending);
+
+  const pickStr = await ask(`\n  选择记录编号 (1-${pending.length}，直接回车=跳过)：`);
+  if (!pickStr.trim()) {
+    console.log('  已跳过');
+    return;
+  }
+  const pick = parseInt(pickStr, 10);
+  if (isNaN(pick) || pick < 1 || pick > pending.length) {
+    console.log('  ❌ 无效编号');
+    return;
+  }
+  const target = pending[pick - 1];
+
+  console.log(`\n  弹簧 ${target.springId} 当前情况：`);
+  console.log(`     传感器编号变化：${target.originalSensorId} → ${target.sensorId}`);
+  const fv = target.correctedFatigueValue !== null
+    ? target.correctedFatigueValue : target.fatigueValue;
+  console.log(`     当前疲劳值：${fv} (${printSafetyLevel(processor.calculateFatigueStatus(fv))})`);
+
+  const defaultComment =
+    '传感器重启后数据偏差在可接受范围内，标记为需持续监测';
+  const comment = await ask(`\n  复核意见 [回车用默认]:\n  `) || defaultComment;
+
+  const correctedStr = await ask(
+    `  复核修正疲劳值 (直接回车用当前 ${fv})：`
+  );
+  const correctedValue = correctedStr.trim() ? parseInt(correctedStr, 10) : fv;
+  const reviewer = (await ask('  复核人姓名 [默认 安全员-老王]：')) || '安全员-老王';
+
+  console.log(`\n  📝 复核对比：`);
+  console.log(`     疲劳值：${fv} → ${correctedValue}`);
+  console.log(`     复核意见：${comment}`);
+  console.log(`     复核人：${reviewer}`);
+
+  const confirm = await ask('\n  确认复核完成？(y/N) ');
+  if (confirm.toLowerCase() !== 'y') {
+    console.log('  已取消');
+    return;
+  }
+
+  const result = processor.reviewRecord(
+    target.id,
+    { comment, correctedFatigueValue: correctedValue },
+    reviewer,
+    currentSession
+  );
+
+  console.log(`\n  ✅ 复核完成：弹簧 ${result.diff.springId} 已由 ${reviewer} 复核`);
+  console.log(`\n  🔄 安全提醒已同步更新`);
+  printSafetyReminder(result.safetyReminder);
+}
+
+async function stepRerun() {
+  if (!currentSession) {
+    console.log('\n  ❌ 请先执行「1. 工况照片第一次导入」');
+    return;
+  }
+
+  printHeader('步骤 4/4：重跑分析');
+
+  const before = currentSession.records.map(r => ({
+    springId: r.springId,
+    fatigue: r.correctedFatigueValue !== null ? r.correctedFatigueValue : r.fatigueValue,
+    status: r.status,
+    runCount: r.runCount
+  }));
+
+  const confirm = await ask(
+    '\n  将对全部记录重跑分析，运行次数+1。确认重跑？(y/N) '
+  );
+  if (confirm.toLowerCase() !== 'y') {
+    console.log('  已取消');
+    return;
+  }
+
+  const result = processor.rerunAnalysis(currentSession);
+
+  console.log(`\n  ✅ 重跑完成`);
+  console.log(`  重跑前后对比：`);
+  console.log('  ' + '-'.repeat(58));
+  console.log('  弹簧    疲劳(前)→(后)  状态(前)→(后)  运行次数');
+  console.log('  ' + '-'.repeat(58));
+  result.session.records.forEach((r, i) => {
+    const fAfter = r.correctedFatigueValue !== null
+      ? r.correctedFatigueValue : r.fatigueValue;
+    console.log(
+      `  ${r.springId.padEnd(6, ' ')} ` +
+      `${String(before[i].fatigue).padStart(6, ' ')} → ${String(fAfter).padEnd(6, ' ')} ` +
+      `${statusLabel(before[i].status).padEnd(4, ' ')} → ${statusLabel(r.status).padEnd(4, ' ')} ` +
+      `${before[i].runCount} → ${r.runCount}`
+    );
   });
+  console.log('  ' + '-'.repeat(58));
 
-  printHeader('弹簧疲劳寿命复核 - 交互模式');
-  console.log('\n请选择操作:');
-  console.log('  1. 导入工况照片数据');
-  console.log('  2. 查看当前会话记录');
-  console.log('  3. 补录手写巡检备注');
-  console.log('  4. 复核待处理记录');
-  console.log('  5. 更新安全提醒');
-  console.log('  6. 重跑分析');
-  console.log('  7. 运行演示');
-  console.log('  0. 退出');
+  printSafetyReminder(currentSession.safetyReminder);
+}
 
-  rl.question('\n请输入选项: ', (choice) => {
-    switch(choice) {
-      case '1':
-        console.log('\n📷 导入照片数据...');
-        const photoData = DemoData.getPhotoImportData();
-        processor.knownSensors = DemoData.getBaselineSensors();
-        const records = processor.importPhotoData(photoData);
-        console.log(`✅ 已导入 ${records.length} 条记录`);
-        rl.close();
-        break;
-      case '7':
-        rl.close();
-        runDemo();
-        break;
-      case '0':
-        console.log('\n👋 再见！');
-        rl.close();
-        break;
-      default:
-        console.log('\n❌ 无效选项');
-        rl.close();
+function stepShowRecords() {
+  if (!currentSession) {
+    console.log('\n  ❌ 暂无数据，请先执行「1. 工况照片第一次导入」');
+    return;
+  }
+  printHeader('当前会话记录总览');
+  console.log(`\n  会话ID：${currentSession.id}`);
+  console.log(`  巡检员：${currentSession.inspector}  地点：${currentSession.location}`);
+  printRecordList(currentSession.records);
+  printSafetyReminder(currentSession.safetyReminder);
+
+  console.log('\n  📜 每条记录操作历史：');
+  currentSession.records.forEach(r => {
+    console.log(`\n  ${statusIcon(r.status)} 弹簧 ${r.springId} (${statusLabel(r.status)})`);
+    console.log(`     传感器：${r.sensorId}` +
+      (r.sensorRestartDetected ? `  (原 ${r.originalSensorId})` : ''));
+    const fv = r.correctedFatigueValue !== null
+      ? `${r.fatigueValue} → ${r.correctedFatigueValue}`
+      : r.fatigueValue;
+    console.log(`     疲劳值：${fv}   运行次数：${r.runCount}`);
+    if (r.manualNote) {
+      const n = typeof r.manualNote === 'object' ? r.manualNote : { content: r.manualNote };
+      console.log(`     📝 手写备注：${n.content}`);
     }
+    if (r.reviewComment) {
+      console.log(`     💬 复核[${r.reviewedBy} @ ${r.reviewedAt}]：${r.reviewComment}`);
+    }
+    if (r.photoPath) console.log(`     📷 照片：${r.photoPath}`);
+    console.log(`     操作轨迹：`);
+    r.history.forEach((h, i) => {
+      console.log(`       ${i + 1}. ${h.action}  ${h.timestamp}`);
+      if (h.data && h.data.reason) console.log(`          原因：${h.data.reason}`);
+    });
   });
+}
+
+function runQuickDemo() {
+  printHeader('快速演示：完整链路一次性走通');
+  const { execSync } = require('child_process');
+  console.log(execSync('node test.js', { cwd: __dirname + '/..', encoding: 'utf8' }));
+}
+
+async function mainMenu() {
+  while (true) {
+    printHeader('弹簧疲劳寿命复核 · 主菜单');
+    console.log(`\n  当前会话状态：${currentSession ? '已导入' : '未开始'}`);
+    console.log('\n  ┌─────────────────────────────────────────────────────┐');
+    console.log('  │  1. 工况照片第一次导入  (第一步必选)                 │');
+    console.log('  │  2. 查看记录与证据链                                 │');
+    console.log('  │  3. 补录手写巡检备注  (改备注+疲劳值+刷新安全提醒)  │');
+    console.log('  │  4. 安全员复核待处理  (复核意见+刷新安全提醒)       │');
+    console.log('  │  5. 重跑分析          (全量重算，运行次数+1)         │');
+    console.log('  │  6. 运行快速演示      (一次跑完整流程)              │');
+    console.log('  │  0. 退出                                              │');
+    console.log('  └─────────────────────────────────────────────────────┘');
+
+    const choice = await ask('\n  请输入选项 [0-6]：');
+
+    switch (choice.trim()) {
+      case '1': await stepImportPhotos(); break;
+      case '2': stepShowRecords(); break;
+      case '3': await stepApplyManualNote(); break;
+      case '4': await stepReviewRecord(); break;
+      case '5': await stepRerun(); break;
+      case '6': runQuickDemo(); break;
+      case '0':
+        console.log('\n  👋 再见');
+        return;
+      default:
+        console.log(
+          `\n  ❌ 无效选项「${choice}」，请输入 0-6 之间的数字。` +
+          `\n     提示：必须先选 [1] 导入工况照片，后续 3/4/5 才能操作。`
+        );
+    }
+    await ask('\n  按回车返回菜单...');
+  }
 }
 
 const args = process.argv.slice(2);
 
-if (args.includes('review') && args.includes('--demo')) {
-  runDemo();
-} else if (args.includes('--demo')) {
-  runDemo();
+if (args.includes('--demo')) {
+  runQuickDemo();
 } else {
-  runInteractive();
+  mainMenu().catch(err => {
+    console.error('  ❌ 程序异常：', err.message);
+    process.exit(1);
+  });
 }
