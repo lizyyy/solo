@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>泵站巡检报告复核</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:#f5f6f8;color:#2c3e50;font-size:14px;line-height:1.6}
+  .app{max-width:1440px;margin:0 auto;padding:20px}
+  header{background:linear-gradient(135deg,#2c5282 0%,#2b6cb0 100%);color:#fff;padding:20px 28px;border-radius:12px;margin-bottom:20px;box-shadow:0 4px 12px rgba(43,108,176,.2)}
+  header h1{font-size:22px;font-weight:600;margin-bottom:4px}
+  header p{opacity:.85;font-size:13px}
+
+  .laohe-panel{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px}
+  .lh-card{background:#fff;border-radius:10px;padding:18px 20px;box-shadow:0 2px 8px rgba(0,0,0,.06);border-top:4px solid #2b6cb0;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+  .lh-card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(43,108,176,.15)}
+  .lh-card.sample{border-top-color:#38a169}
+  .lh-card.abnormal{border-top-color:#e53e3e}
+  .lh-card.export{border-top-color:#d69e2e}
+  .lh-card h3{font-size:15px;margin-bottom:6px;color:#2d3748}
+  .lh-card p{font-size:12px;color:#718096;margin-bottom:10px}
+  .lh-badge{display:inline-block;background:#edf2f7;color:#2c5282;font-size:11px;padding:2px 8px;border-radius:10px;font-weight:500}
+  .lh-card.abnormal .lh-badge{background:#fed7d7;color:#c53030}
+  .lh-card.sample .lh-badge{background:#c6f6d5;color:#276749}
+  .lh-card.export .lh-badge{background:#feebc8;color:#92400e}
+
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;background:#fff;padding:14px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+  .btn{padding:8px 16px;border:none;border-radius:6px;font-size:13px;cursor:pointer;font-weight:500;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+  .btn-primary{background:#2b6cb0;color:#fff}.btn-primary:hover{background:#2c5282}
+  .btn-success{background:#38a169;color:#fff}.btn-success:hover{background:#276749}
+  .btn-warn{background:#d69e2e;color:#fff}.btn-warn:hover{background:#b7791f}
+  .btn-danger{background:#e53e3e;color:#fff}.btn-danger:hover{background:#c53030}
+  .btn-ghost{background:#edf2f7;color:#4a5568}.btn-ghost:hover{background:#e2e8f0}
+  .btn-sm{padding:5px 10px;font-size:12px}
+  input[type=file]{display:none}
+  .search-box{flex:1;min-width:220px;max-width:360px}
+  .search-box input{width:100%;padding:8px 12px;border:1px solid #e2e8f0;border-radius:6px;font-size:13px;outline:none;transition:border .15s}
+  .search-box input:focus{border-color:#2b6cb0}
+  .status-filter{display:flex;gap:6px;align-items:center}
+  .status-filter select{padding:8px 12px;border:1px solid #e2e8f0;border-radius:6px;font-size:13px;background:#fff;outline:none;cursor:pointer}
+
+  .stats-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
+  .stat{background:#fff;border-radius:8px;padding:14px 18px;box-shadow:0 2px 6px rgba(0,0,0,.05);text-align:center}
+  .stat .num{font-size:26px;font-weight:700;color:#2b6cb0}
+  .stat .lbl{font-size:12px;color:#718096;margin-top:2px}
+  .stat.pending .num{color:#d69e2e}
+  .stat.confirmed .num{color:#38a169}
+  .stat.withdrawn .num{color:#718096}
+  .stat.modified .num{color:#805ad5}
+  .stat.delayed .num{color:#e53e3e}
+
+  table{width:100%;border-collapse:collapse;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+  thead{background:#edf2f7}
+  th{padding:12px 14px;text-align:left;font-size:12px;color:#4a5568;font-weight:600;border-bottom:2px solid #e2e8f0;white-space:nowrap}
+  td{padding:12px 14px;border-bottom:1px solid #f0f2f5;font-size:13px;vertical-align:top}
+  tr:hover td{background:#fafbfc}
+  .tag{display:inline-block;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:500}
+  .tag-pending{background:#feebc8;color:#92400e}
+  .tag-confirmed{background:#c6f6d5;color:#276749}
+  .tag-withdrawn{background:#e2e8f0;color:#4a5568}
+  .tag-modified{background:#e9d8fd;color:#553c9a}
+  .tag-src-import{background:#bee3f8;color:#2c5282}
+  .tag-src-api{background:#fbd38d;color:#7b341e}
+  .tag-src-manual{background:#fed7e2;color:#97266d}
+  .tag-delay{background:#fc8181;color:#742a2a;margin-left:4px}
+  .raw-badge{font-size:10px;background:#fefcbf;color:#744210;padding:1px 5px;border-radius:4px;margin-left:4px;font-weight:500}
+
+  .row-actions{display:flex;gap:5px;flex-wrap:wrap}
+  .multi-line{white-space:pre-wrap;max-width:260px;line-height:1.5}
+  .link-btn{background:none;border:none;color:#2b6cb0;cursor:pointer;text-decoration:underline;font-size:12px;padding:2px 4px}
+  .link-btn:hover{color:#2c5282}
+  .link-btn.danger{color:#e53e3e}.link-btn.danger:hover{color:#c53030}
+
+  .empty{text-align:center;padding:60px 20px;color:#a0aec0}
+  .empty h3{font-size:16px;margin-bottom:8px;color:#718096}
+  .empty p{font-size:13px}
+
+  /* Modal */
+  .modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px}
+  .modal-mask.show{display:flex}
+  .modal{background:#fff;border-radius:12px;max-width:880px;width:100%;max-height:88vh;overflow:hidden;display:flex;flex-direction:column;animation:pop .2s}
+  @keyframes pop{from{transform:scale(.96);opacity:0}to{transform:scale(1);opacity:1}}
+  .modal-header{padding:16px 22px;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center}
+  .modal-header h2{font-size:17px;color:#2d3748}
+  .close-btn{background:none;border:none;font-size:22px;cursor:pointer;color:#a0aec0;line-height:1}
+  .modal-body{padding:22px;overflow-y:auto;flex:1}
+  .modal-footer{padding:14px 22px;border-top:1px solid #e2e8f0;display:flex;justify-content:flex-end;gap:10px;background:#fafbfc}
+
+  .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px 20px;margin-bottom:18px}
+  .form-grid.full{grid-template-columns:1fr}
+  .form-item label{display:block;font-size:12px;color:#4a5568;margin-bottom:5px;font-weight:500}
+  .form-item label .req{color:#e53e3e;margin-left:2px}
+  .form-item input,.form-item select,.form-item textarea{width:100%;padding:8px 10px;border:1px solid #e2e8f0;border-radius:6px;font-size:13px;outline:none;font-family:inherit;transition:border .15s}
+  .form-item input:focus,.form-item select:focus,.form-item textarea:focus{border-color:#2b6cb0;box-shadow:0 0 0 3px rgba(43,108,176,.1)}
+  .form-item textarea{resize:vertical;min-height:72px}
+  .form-item .hint{font-size:11px;color:#a0aec0;margin-top:4px}
+
+  .section-title{font-size:14px;font-weight:600;color:#2d3748;margin:18px 0 10px;padding-left:8px;border-left:3px solid #2b6cb0}
+  .section-title:first-child{margin-top:0}
+
+  .spare-table{width:100%;border:1px solid #e2e8f0;border-radius:6px;overflow:hidden;margin-bottom:10px}
+  .spare-table th{background:#f7fafc;padding:8px 10px;font-size:11px}
+  .spare-table td{padding:8px 10px;font-size:12px;border-bottom:1px solid #edf2f7}
+  .spare-table tr:last-child td{border-bottom:none}
+  .spare-table input,.spare-table select{padding:5px 8px;font-size:12px}
+  .delay-highlight{background:#fff5f5 !important}
+  .delay-highlight td:first-child{border-left:3px solid #e53e3e}
+
+  /* History timeline */
+  .timeline{position:relative;padding-left:22px;margin-top:10px}
+  .timeline::before{content:'';position:absolute;left:6px;top:6px;bottom:6px;width:2px;background:#e2e8f0}
+  .tl-item{position:relative;margin-bottom:16px}
+  .tl-item::before{content:'';position:absolute;left:-20px;top:4px;width:12px;height:12px;border-radius:50%;background:#2b6cb0;border:3px solid #fff;box-shadow:0 0 0 2px #bee3f8}
+  .tl-item.action-confirm::before{background:#38a169;box-shadow:0 0 0 2px #c6f6d5}
+  .tl-item.action-withdraw::before{background:#718096;box-shadow:0 0 0 2px #e2e8f0}
+  .tl-item.action-modify::before{background:#805ad5;box-shadow:0 0 0 2px #e9d8fd}
+  .tl-item.action-replace::before{background:#dd6b20;box-shadow:0 0 0 2px #feebc8}
+  .tl-item.action-import::before{background:#4299e1;box-shadow:0 0 0 2px #bee3f8}
+  .tl-time{font-size:11px;color:#a0aec0}
+  .tl-title{font-size:13px;font-weight:600;color:#2d3748;margin:2px 0}
+  .tl-actor{font-size:11px;color:#718096;margin-left:6px;font-weight:400}
+  .tl-body{font-size:12px;color:#4a5568;background:#f7fafc;padding:8px 10px;border-radius:6px;margin-top:5px;line-height:1.6}
+  .tl-diff{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+  .tl-old{background:#fed7d7;color:#742a2a;padding:6px 8px;border-radius:4px;font-size:11px;white-space:pre-wrap}
+  .tl-new{background:#c6f6d5;color:#276749;padding:6px 8px;border-radius:4px;font-size:11px;white-space:pre-wrap}
+  .tl-label{font-weight:600;margin-bottom:2px;opacity:.8}
+
+  .diff-block{background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:10px 12px;margin-bottom:10px}
+  .diff-block h4{font-size:12px;color:#4a5568;margin-bottom:8px;padding-bottom:5px;border-bottom:1px dashed #e2e8f0}
+
+  .raw-box{background:#faf5e4;border:1px dashed:#ecc94b;padding:10px 12px;border-radius:6px;margin-top:8px;font-family:"SF Mono",Consolas,monospace;font-size:11px;color:#744210;white-space:pre-wrap;max-height:180px;overflow-y:auto}
+  .raw-box-title{font-size:11px;color:#92400e;font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:5px}
+
+  /* Toast */
+  .toast{position:fixed;top:20px;right:20px;padding:12px 18px;border-radius:8px;color:#fff;font-size:13px;z-index:2000;box-shadow:0 6px 20px rgba(0,0,0,.2);animation:slideIn .3s;max-width:360px}
+  @keyframes slideIn{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
+  .toast-success{background:#38a169}.toast-error{background:#e53e3e}.toast-info{background:#2b6cb0}.toast-warn{background:#d69e2e}
+
+  .kv-pair{display:flex;gap:6px;font-size:12px;margin-bottom:3px}
+  .kv-pair .k{color:#718096;min-width:70px;flex-shrink:0}
+  .kv-pair .v{color:#2d3748;word-break:break-all}
+
+  .reason-note{background:#fffbeb;border-left:3px solid:#d69e2e;padding:8px 10px;border-radius:4px;font-size:12px;color:#744210;margin-top:6px;line-height:1.5}
+  .disposition-note{background:#ebf8ff;border-left:3px solid:#2b6cb0;padding:8px 10px;border-radius:4px;font-size:12px;color:#2c5282;margin-top:6px;line-height:1.5}
+
+  @media(max-width:900px){
+    .laohe-panel,.stats-bar{grid-template-columns:1fr}
+    .form-grid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>🏭 泵站巡检报告复核</h1>
+    <p>导入 → 复核 → 确认 → 历史留痕 &nbsp;·&nbsp; 备件到货窗口 &nbsp;·&nbsp; 本地统一数据源</p>
+  </header>
+
+  <div class="laohe-panel">
+    <div class="lh-card sample" onclick="loadSample()">
+      <h3>📋 样例数据</h3>
+      <p>点这里载入 3 条模拟记录，体验完整流程</p>
+      <span class="lh-badge">快速上手</span>
+    </div>
+    <div class="lh-card abnormal" onclick="filterDelayed()">
+      <h3>⚠️ 异常窗口</h3>
+      <p>备件到货晚于停机窗口的记录一览</p>
+      <span class="lh-badge" id="abnCount">0 条</span>
+    </div>
+    <div class="lh-card export" onclick="document.getElementById('fileExport').click()">
+      <h3>📤 结果导出</h3>
+      <p>按当前筛选条件导出 JSON/CSV</p>
+      <span class="lh-badge">一键导出</span>
+    </div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat"><div class="num" id="stTotal">0</div><div class="lbl">总记录</div></div>
+    <div class="stat pending"><div class="num" id="stPending">0</div><div class="lbl">待确认</div></div>
+    <div class="stat confirmed"><div class="num" id="stConfirmed">0</div><div class="lbl">已确认</div></div>
+    <div class="stat modified"><div class="num" id="stModified">0</div><div class="lbl">已变更</div></div>
+    <div class="stat delayed"><div class="num" id="stDelayed">0</div><div class="lbl">窗口异常</div></div>
+  </div>
+
+  <div class="toolbar">
+    <label class="btn btn-primary">📥 导入 JSON/CSV<input type="file" id="fileImport" accept=".json,.csv" onchange="onImport(event)"></label>
+    <button class="btn btn-ghost" onclick="loadSample()">🔄 载入样例</button>
+    <button class="btn btn-success" onclick="openCreate()">➕ 手动补录</button>
+    <div class="search-box"><input type="text" id="searchInput" placeholder="搜索泵站/巡检人/备件型号/备注..." oninput="render()"></div>
+    <div class="status-filter">
+      <select id="statusFilter" onchange="render()">
+        <option value="">全部状态</option>
+        <option value="pending">待确认</option>
+        <option value="confirmed">已确认</option>
+        <option value="withdrawn">已撤回</option>
+        <option value="modified">已变更</option>
+      </select>
+      <select id="delayFilter" onchange="render()">
+        <option value="">是否窗口异常</option>
+        <option value="1">⚠️ 有异常</option>
+        <option value="0">✅ 正常</option>
+      </select>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="exportJSON()">导出JSON</button>
+    <button class="btn btn-ghost btn-sm" onclick="exportCSV()">导出CSV</button>
+    <button class="btn btn-danger btn-sm" onclick="clearAll()">🗑️ 清空</button>
+    <input type="file" id="fileExport" style="display:none">
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:50px">#</th>
+        <th>泵站 / 巡检信息</th>
+        <th>来源 & 状态</th>
+        <th>备件清单 <span style="color:#a0aec0;font-weight:400">(窗口)</span></th>
+        <th>备注 / 结论</th>
+        <th>最近操作</th>
+        <th style="width:220px">操作</th>
+      </tr>
+    </thead>
+    <tbody id="recordList"></tbody>
+  </table>
+  <div class="empty" id="emptyHint" style="display:none">
+    <h3>暂无记录</h3>
+    <p>点击 <b>📋 样例数据</b> 快速体验，或 <b>📥 导入</b> 巡检数据</p>
+  </div>
+</div>
+
+<div class="modal-mask" id="modalMask" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modalBox">
+    <div class="modal-header">
+      <h2 id="modalTitle">标题</h2>
+      <button class="close-btn" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer" id="modalFooter"></div>
+  </div>
+</div>
+
+<script>
+// ================ 数据层：统一 localStorage 入口 ================
+const STORAGE_KEY = 'pump_station_review_v1';
+const ACTOR = '老何'; // 默认操作员
+
+let DB = { records: [] };
+
+function uid(){return 'P'+Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function now(){return new Date().toISOString().slice(0,19).replace('T',' ')}
+function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(DB));updateStats()}
+function load(){try{const s=localStorage.getItem(STORAGE_KEY);if(s){DB=JSON.parse(s);return true}}catch(e){}return false}
+
+// ================ 数据结构：巡检记录 ================
+// record = {
+//   id, stationName, inspector, inspectDate, source('import'|'api'|'manual'),
+//   status('pending'|'confirmed'|'withdrawn'|'modified'),
+//   conclusion, remark,
+//   items: [{name,result,note}],           // 巡检项
+//   spareParts: [{                          // 备件
+//     id, name, modelOriginal, modelReplaced,
+//     arrivalDate, shutdownStart, shutdownEnd, isDelayed,
+//     replaceReason, disposition            // 替换原因 & 处理去向
+//   }],
+//   rawData: {},                            // 原始来源（脏数据保留）
+//   apiReturn: {},                          // 接口返回快照
+//   history: [{action, actor, timestamp, reason, diff:{old,new}, field}]
+// }
+
+function createRecord(partial={}, source='manual'){
+  const r = Object.assign({
+    id: uid(),
+    stationName:'',
+    inspector:'',
+    inspectDate: new Date().toISOString().slice(0,10),
+    source,
+    status:'pending',
+    conclusion:'',
+    remark:'',
+    items:[],
+    spareParts:[],
+    rawData:{},
+    apiReturn:{},
+    history:[]
+  }, partial);
+  r.history.unshift({
+    action: source==='import'?'import':(source==='api'?'api_return':'manual_create'),
+    actor: ACTOR,
+    timestamp: now(),
+    reason: source==='manual'?'手动补录创建':(source==='api'?'接口返回写入':'数据文件导入'),
+    diff: null
+  });
+  return r;
+}
+
+// ================ 状态流转 ================
+function confirmRecord(id, reason){
+  const r = findRecord(id);
+  if(!r) return;
+  const old = r.status;
+  r.status = 'confirmed';
+  r.history.unshift({
+    action:'confirm', actor:ACTOR, timestamp:now(),
+    reason: reason||'复核无误，确认通过',
+    diff:{old, new:'confirmed', field:'status'}
+  });
+  save();render();toast('已确认','success');
+}
+function withdrawRecord(id, reason){
+  const r = findRecord(id);
+  if(!r) return;
+  const old = r.status;
+  r.status = 'withdrawn';
+  r.history.unshift({
+    action:'withdraw', actor:ACTOR, timestamp:now(),
+    reason: reason||'撤回确认',
+    diff:{old, new:'withdrawn', field:'status'}
+  });
+  save();render();toast('已撤回','warn');
+}
+function modifyRecord(id, patch, reason){
+  const r = findRecord(id);
+  if(!r) return;
+  const diffs = [];
+  for(const k of Object.keys(patch)){
+    if(JSON.stringify(r[k])!==JSON.stringify(patch[k])){
+      diffs.push({field:k, old:r[k], new:patch[k]});
+      r[k] = patch[k];
+    }
+  }
+  if(diffs.length){
+    if(r.status==='confirmed') r.status='modified';
+    r.history.unshift({
+      action:'modify', actor:ACTOR, timestamp:now(),
+      reason: reason||'补录/修改记录',
+      diff: diffs.length===1?{old:diffs[0].old,new:diffs[0].new,field:diffs[0].field}:{_multi:diffs}
+    });
+  }
+  save();render();toast('已保存变更','success');
+}
+
+function findRecord(id){return DB.records.find(x=>x.id===id)}
+
+// ================ 备件窗口异常检测 ================
+function checkSpareDelay(sp){
+  if(!sp.arrivalDate||!sp.shutdownEnd) return false;
+  return new Date(sp.arrivalDate)>new Date(sp.shutdownEnd);
+}
+function recordHasDelay(r){return r.spareParts&&r.spareParts.some(s=>s.isDelayed)}
+
+// ================ 导入 ================
+function onImport(e){
+  const f = e.target.files[0]; if(!f) return;
+  const rd = new FileReader();
+  const name = f.name.toLowerCase();
+  rd.onload = ev=>{
+    try{
+      let data;
+      if(name.endsWith('.json')){
+        data = JSON.parse(ev.target.result);
+      } else {
+        data = parseCSV(ev.target.result);
+      }
+      const arr = Array.isArray(data)?data:[data];
+      let cnt=0;
+      arr.forEach(item=>{
+        const r = buildRecordFromImport(item);
+        r.rawData = JSON.parse(JSON.stringify(item)); // 原始数据快照
+        DB.records.unshift(r);
+        cnt++;
+      });
+      save();render();
+      toast(`导入成功 ${cnt} 条`,'success');
+    }catch(err){
+      toast('导入失败: '+err.message,'error');
+    }
+  };
+  rd.readAsText(f,'UTF-8');
+  e.target.value='';
+}
+
+function parseCSV(text){
+  const lines = text.replace(/\r/g,'').split('\n').filter(l=>l.trim());
+  if(lines.length<2) return [];
+  const headers = splitCSV(lines[0]);
+  return lines.slice(1).map(l=>{
+    const cols = splitCSV(l);
+    const obj={};
+    headers.forEach((h,i)=>obj[h]=cols[i]||'');
+    return obj;
+  });
+}
+function splitCSV(line){
+  const res=[], cur=[]; let q=false;
+  for(let i=0;i<line.length;i++){
+    const c=line[i];
+    if(c==='"'){q=!q;continue}
+    if(c===','&&!q){res.push(cur.join(''));cur.length=0;continue}
+    cur.push(c);
+  }
+  res.push(cur.join(''));return res;
+}
+
+// 导入字段映射
+function buildRecordFromImport(obj){
+  const parts = [];
+  // 支持 flat 字段：spare_0_model, spare_0_arrival ...
+  for(let i=0;i<10;i++){
+    const pfx = 'spare_'+i+'_';
+    if(obj[pfx+'name']||obj[pfx+'model']||obj[pfx+'modelOriginal']){
+      const sp = {
+        id: uid(),
+        name: obj[pfx+'name']||obj[pfx+'备件名称']||'',
+        modelOriginal: obj[pfx+'modelOriginal']||obj[pfx+'model']||obj[pfx+'型号']||'',
+        modelReplaced: obj[pfx+'modelReplaced']||obj[pfx+'替换型号']||'',
+        arrivalDate: obj[pfx+'arrivalDate']||obj[pfx+'到货日期']||'',
+        shutdownStart: obj[pfx+'shutdownStart']||obj[pfx+'停机开始']||'',
+        shutdownEnd: obj[pfx+'shutdownEnd']||obj[pfx+'停机结束']||'',
+        replaceReason: obj[pfx+'replaceReason']||obj[pfx+'替换原因']||'',
+        disposition: obj[pfx+'disposition']||obj[pfx+'处理去向']||''
+      };
+      sp.isDelayed = checkSpareDelay(sp);
+      parts.push(sp);
+    }
+  }
+  // 支持 JSON 内嵌 spareParts 字段
+  if(obj.spareParts){
+    try{
+      const arr = typeof obj.spareParts==='string'?JSON.parse(obj.spareParts):obj.spareParts;
+      arr.forEach(s=>{
+        const sp = Object.assign({id:uid()}, s);
+        sp.isDelayed = checkSpareDelay(sp);
+        parts.push(sp);
+      });
+    }catch(e){}
+  }
+
+  const r = createRecord({
+    stationName: obj.stationName||obj.泵站名称||obj.泵站||'',
+    inspector: obj.inspector||obj.巡检人||'',
+    inspectDate: obj.inspectDate||obj.巡检日期||new Date().toISOString().slice(0,10),
+    conclusion: obj.conclusion||obj.结论||'',
+    remark: obj.remark||obj.备注||'',
+    spareParts: parts,
+    items: obj.items?(typeof obj.items==='string'?safeJSON(obj.items,[]):obj.items):[],
+    apiReturn: obj._apiReturn||{}
+  }, 'import');
+  return r;
+}
+function safeJSON(s,def){try{return JSON.parse(s)}catch(e){return def}}
+
+// ================ 渲染主表 ================
+function render(){
+  const kw = document.getElementById('searchInput').value.trim().toLowerCase();
+  const sf = document.getElementById('statusFilter').value;
+  const df = document.getElementById('delayFilter').value;
+  let list = DB.records.slice();
+  if(kw) list = list.filter(r=>JSON.stringify(r).toLowerCase().includes(kw));
+  if(sf) list = list.filter(r=>r.status===sf);
+  if(df!=='') list = list.filter(r=>recordHasDelay(r)=== (df==='1'));
+
+  const tb = document.getElementById('recordList');
+  const empty = document.getElementById('emptyHint');
+  tb.innerHTML='';
+  if(list.length===0){empty.style.display='block';return}
+  empty.style.display='none';
+
+  list.forEach((r,i)=>{
+    const srcTag = r.source==='import'?'<span class="tag tag-src-import">导入</span>'
+                : r.source==='api'?'<span class="tag tag-src-api">接口</span>'
+                : '<span class="tag tag-src-manual">手动</span>';
+    const stMap = {pending:['待确认','tag-pending'],confirmed:['已确认','tag-confirmed'],withdrawn:['已撤回','tag-withdrawn'],modified:['已变更','tag-modified']};
+    const [stTxt,stCls] = stMap[r.status]||['',''];
+    const delayBadge = recordHasDelay(r)?'<span class="tag tag-delay">⚠窗口异常</span>':'';
+    const rawBadge = Object.keys(r.rawData).length?'<span class="raw-badge">原始数据</span>':'';
+
+    const spHTML = r.spareParts.length? r.spareParts.map(s=>{
+      const model = s.modelReplaced? `<span title="型号替换" style="color:#dd6b20">${s.modelOriginal}→${s.modelReplaced}</span>` : s.modelOriginal;
+      const win = s.shutdownEnd? `<span style="color:#718096">(${s.shutdownStart||''}~${s.shutdownEnd})</span>`:'';
+      const arr = s.arrivalDate? `<span style="color:${s.isDelayed?'#e53e3e':'#38a169'}">到货:${s.arrivalDate}</span>`:'';
+      return `<div style="margin-bottom:4px;font-size:12px;${s.isDelayed?'color:#c53030;font-weight:500':''}">• ${s.name||'-'} <span style="color:#4a5568">${model||''}</span> ${win} ${arr}</div>`;
+    }).join(''):'<span style="color:#a0aec0">无</span>';
+
+    const h = r.history[0];
+    const lastOp = h? `<div style="font-size:11px;color:#718096">${h.timestamp.slice(5)}</div><div style="font-size:12px">${actionText(h.action)}${h.reason?`: ${h.reason.slice(0,14)}`:''}</div>`:'';
+
+    const btns = `
+      <div class="row-actions">
+        <button class="btn btn-ghost btn-sm" onclick="openDetail('${r.id}')">详情</button>
+        ${r.status==='pending'?`<button class="btn btn-success btn-sm" onclick="askConfirm('${r.id}')">确认</button>`:''}
+        ${r.status==='confirmed'?`<button class="btn btn-warn btn-sm" onclick="askWithdraw('${r.id}')">撤回</button>`:''}
+        <button class="btn btn-ghost btn-sm" onclick="openEdit('${r.id}')">编辑</button>
+        <button class="btn btn-ghost btn-sm" onclick="openHistory('${r.id}')">历史</button>
+        <button class="link-btn danger" onclick="deleteRecord('${r.id}')">删除</button>
+      </div>`;
+
+    tb.insertAdjacentHTML('beforeend',`
+      <tr>
+        <td style="color:#a0aec0">${i+1}</td>
+        <td>
+          <div style="font-weight:600;font-size:13px">${r.stationName||'(未填写泵站)'}</div>
+          <div style="font-size:11px;color:#718096;margin-top:3px">巡检人: ${r.inspector||'-'} · ${r.inspectDate||'-'}</div>
+        </td>
+        <td>${srcTag} <span class="tag ${stCls}">${stTxt}</span> ${delayBadge} ${rawBadge}</td>
+        <td>${spHTML}</td>
+        <td>
+          ${r.conclusion?`<div style="font-size:12px;margin-bottom:4px"><b>结论:</b> ${r.conclusion}</div>`:''}
+          ${r.remark?`<div class="multi-line" style="font-size:12px;color:#4a5568">${r.remark}</div>`:'<span style="color:#a0aec0">无备注</span>'}
+        </td>
+        <td>${lastOp}</td>
+        <td>${btns}</td>
+      </tr>
+    `);
+  });
+  updateStats();
+}
+
+function actionText(a){return {import:'导入',api_return:'接口',manual_create:'新建',confirm:'确认',withdraw:'撤回',modify:'变更',replace:'替换备件'}[a]||a}
+
+function updateStats(){
+  document.getElementById('stTotal').textContent = DB.records.length;
+  document.getElementById('stPending').textContent = DB.records.filter(r=>r.status==='pending').length;
+  document.getElementById('stConfirmed').textContent = DB.records.filter(r=>r.status==='confirmed').length;
+  document.getElementById('stModified').textContent = DB.records.filter(r=>r.status==='modified').length;
+  const d = DB.records.filter(recordHasDelay).length;
+  document.getElementById('stDelayed').textContent = d;
+  document.getElementById('abnCount').textContent = d+' 条';
+}
+
+// ================ 模态框 ================
+function openModal(title, bodyHTML, footerHTML){
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = bodyHTML;
+  document.getElementById('modalFooter').innerHTML = footerHTML || `<button class="btn btn-ghost" onclick="closeModal()">关闭</button>`;
+  document.getElementById('modalMask').classList.add('show');
+}
+function closeModal(){document.getElementById('modalMask').classList.remove('show')}
+
+// ================ 详情 ================
+function openDetail(id){
+  const r = findRecord(id); if(!r) return;
+  const stMap={pending:['待确认','tag-pending'],confirmed:['已确认','tag-confirmed'],withdrawn:['已撤回','tag-withdrawn'],modified:['已变更','tag-modified']};
+  const [stTxt,stCls]=stMap[r.status];
+  const sp = r.spareParts.map(s=>{
+    const delay = s.isDelayed?'delay-highlight':'';
+    return `<tr class="${delay}">
+      <td>${s.name||'-'}</td>
+      <td>
+        <div>${s.modelOriginal||'-'}</div>
+        ${s.modelReplaced?`<div style="color:#dd6b20;font-size:11px;margin-top:2px">→ 替换为 ${s.modelReplaced}</div>`:''}
+      </td>
+      <td>${s.arrivalDate||'-'}</td>
+      <td>${s.shutdownStart||'-'} ~ ${s.shutdownEnd||'-'}</td>
+      <td style="color:${s.isDelayed?'#e53e3e':'#38a169'};font-weight:500">${s.isDelayed?'⚠️ 晚到':'✅ 正常'}</td>
+    </tr>
+    ${s.replaceReason?`<tr><td colspan="5"><div class="reason-note"><b>待确认原因(替换):</b> ${s.replaceReason}</div></td></tr>`:''}
+    ${s.disposition?`<tr><td colspan="5"><div class="disposition-note"><b>处理去向:</b> ${s.disposition}</div></td></tr>`:''}`;
+  }).join('')||'<tr><td colspan="5" style="text-align:center;color:#a0aec0;padding:16px">暂无备件</td></tr>';
+
+  const raw = Object.keys(r.rawData).length? `
+    <div class="raw-box-title">📎 原始来源数据（未做任何清洗）</div>
+    <div class="raw-box">${JSON.stringify(r.rawData,null,2)}</div>`:'';
+  const api = Object.keys(r.apiReturn).length? `
+    <div class="raw-box-title" style="color:#2c5282;margin-top:8px">🔌 接口返回快照</div>
+    <div class="raw-box" style="background:#ebf8ff;color:#2c5282;border-color:#bee3f8">${JSON.stringify(r.apiReturn,null,2)}</div>`:'';
+
+  const body = `
+    <div class="form-grid">
+      <div class="form-item"><label>泵站名称</label><div style="padding:8px 0;font-weight:600">${r.stationName||'-'}</div></div>
+      <div class="form-item"><label>巡检日期</label><div style="padding:8px 0">${r.inspectDate||'-'}</div></div>
+      <div class="form-item"><label>巡检人</label><div style="padding:8px 0">${r.inspector||'-'}</div></div>
+      <div class="form-item"><label>状态 / 来源</label><div style="padding:8px 0"><span class="tag ${stCls}">${stTxt}</span>
+        ${r.source==='import'?'<span class="tag tag-src-import" style="margin-left:4px">导入</span>':r.source==='api'?'<span class="tag tag-src-api" style="margin-left:4px">接口</span>':'<span class="tag tag-src-manual" style="margin-left:4px">手动</span>'}
+      </div></div>
+    </div>
+    <h3 class="section-title">🧰 备件清单 & 停机窗口</h3>
+    <table class="spare-table">
+      <thead><tr><th>备件名称</th><th>型号(替换)</th><th>到货日期</th><th>停机窗口</th><th>窗口匹配</th></tr></thead>
+      <tbody>${sp}</tbody>
+    </table>
+    ${r.items&&r.items.length?`
+    <h3 class="section-title">🔍 巡检项明细</h3>
+    <table class="spare-table">
+      <thead><tr><th>巡检项</th><th>结果</th><th>备注</th></tr></thead>
+      <tbody>${r.items.map(it=>`<tr><td>${it.name||'-'}</td><td style="color:${it.result==='合格'||it.result==='正常'?'#38a169':(it.result?'#e53e3e':'#4a5568')}">${it.result||'-'}</td><td>${it.note||'-'}</td></tr>`).join('')}</tbody>
+    </table>`:''}
+    <h3 class="section-title">📝 结论 / 备注</h3>
+    <div class="diff-block"><div class="kv-pair"><div class="k">复核结论</div><div class="v">${r.conclusion||'<span style="color:#a0aec0">(未填写)</span>'}</div></div>
+    <div class="kv-pair" style="margin-top:6px"><div class="k">备注</div><div class="v" style="white-space:pre-wrap">${r.remark||'<span style="color:#a0aec0">(无)</span>'}</div></div></div>
+    ${raw}${api}
+  `;
+  openModal(`🔍 巡检详情 - ${r.stationName||'(未命名)'}`, body);
+}
+
+// ================ 历史 (重点：旧材料/新备注/改判原因) ================
+function openHistory(id){
+  const r = findRecord(id); if(!r) return;
+  const fieldNames = {status:'状态',conclusion:'结论',remark:'备注',stationName:'泵站名称',inspector:'巡检人',inspectDate:'巡检日期',spareParts:'备件清单',items:'巡检项'};
+  const tl = r.history.map(h=>{
+    let diffHTML='';
+    if(h.diff){
+      if(h.diff._multi){
+        diffHTML = h.diff._multi.map(d=>diffBlock(d.field,d.old,d.new,fieldNames)).join('');
+      } else {
+        diffHTML = diffBlock(h.diff.field,h.diff.old,h.diff.new,fieldNames);
+      }
+    }
+    const body = h.reason?`<div class="tl-body"><b>原因:</b> ${h.reason}${diffHTML}</div>`:(diffHTML?`<div class="tl-body">${diffHTML}</div>`:'');
+    return `<div class="tl-item action-${h.action}">
+      <div class="tl-time">${h.timestamp}</div>
+      <div class="tl-title">${actionText(h.action)}<span class="tl-actor">${h.actor||'系统'}</span></div>
+      ${body}
+    </div>`;
+  }).join('')||'<div style="color:#a0aec0">无历史记录</div>';
+  openModal(`📜 操作历史 - ${r.stationName||id.slice(0,8)}`,
+    `<div class="diff-block" style="margin-bottom:14px"><b>说明:</b> 所有状态变更、补录、改判、备件替换都会留痕，旧材料/新备注/改判原因逐条列出</div>
+     <div class="timeline">${tl}</div>`);
+}
+
+function diffBlock(field,oldV,newV,names){
+  const fn = names[field]||field;
+  const os = typeof oldV==='object'?JSON.stringify(oldV,null,2):(oldV===''?'(空)':String(oldV));
+  const ns = typeof newV==='object'?JSON.stringify(newV,null,2):(newV===''?'(空)':String(newV));
+  return `<div class="diff-block">
+    <h4>📌 ${fn} 变更</h4>
+    <div class="tl-diff">
+      <div><div class="tl-label">变更前 (旧材料)</div><div class="tl-old">${escapeHTML(os)}</div></div>
+      <div><div class="tl-label">变更后 (新备注)</div><div class="tl-new">${escapeHTML(ns)}</div></div>
+    </div>
+  </div>`;
+}
+function escapeHTML(s){return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'})[c])}
+
+// ================ 确认 / 撤回 对话框 ================
+function askConfirm(id){
+  openModal('✔️ 确认复核',`
+    <div class="form-grid full">
+      <div class="form-item"><label>确认原因 / 备注<span class="req">*</span></label>
+      <textarea id="confirmReason" placeholder="如：各项检查正常，备件到货在窗口内...">复核无误，确认通过</textarea></div>
+    </div>
+  `, `<button class="btn btn-ghost" onclick="closeModal()">取消</button>
+      <button class="btn btn-success" onclick="doConfirm('${id}')">确认复核</button>`);
+}
+function doConfirm(id){const v=document.getElementById('confirmReason').value;confirmRecord(id,v);closeModal()}
+
+function askWithdraw(id){
+  openModal('↩️ 撤回确认',`
+    <div class="form-grid full">
+      <div class="form-item"><label>撤回原因<span class="req">*</span></label>
+      <textarea id="withdrawReason" placeholder="如：发现备件型号不匹配...">发现需补充/修正信息</textarea></div>
+    </div>
+  `, `<button class="btn btn-ghost" onclick="closeModal()">取消</button>
+      <button class="btn btn-warn" onclick="doWithdraw('${id}')">确认撤回</button>`);
+}
+function doWithdraw(id){const v=document.getElementById('withdrawReason').value;withdrawRecord(id,v);closeModal()}
+
+// ================ 新建 / 编辑 ================
+function openCreate(){openEdit(null)}
+function openEdit(id){
+  const r = id?findRecord(id):createRecord({},'manual');
+  const isNew = !id;
+  const spRows = (r.spareParts||[]).map((s,idx)=>spareRowHTML(s,idx)).join('') + spareRowHTML({id:uid(),isNewRow:true}, r.spareParts?r.spareParts.length:0);
+  const body = `
+    <h3 class="section-title">基础信息</h3>
+    <div class="form-grid">
+      <div class="form-item"><label>泵站名称<span class="req">*</span></label>
+        <input id="f_station" value="${escapeAttr(r.stationName)}" placeholder="如：3号排水泵站"></div>
+      <div class="form-item"><label>巡检日期</label>
+        <input id="f_date" type="date" value="${r.inspectDate}"></div>
+      <div class="form-item"><label>巡检人</label>
+        <input id="f_inspector" value="${escapeAttr(r.inspector)}" placeholder="如：张工"></div>
+      <div class="form-item"><label>来源</label>
+        <select id="f_source"><option value="manual" ${r.source==='manual'?'selected':''}>手动补录</option>
+          <option value="import" ${r.source==='import'?'selected':''}>导入来源</option>
+          <option value="api" ${r.source==='api'?'selected':''}>接口返回</option></select>
+        <div class="hint">手动补录不会覆盖 original rawData</div></div>
+    </div>
+    <h3 class="section-title">🧰 备件清单（含型号替换 & 停机窗口）</h3>
+    <table class="spare-table" id="spareTable">
+      <thead><tr><th>备件名称</th><th>原始型号</th><th>替换型号</th><th>到货日期</th><th>停机开始</th><th>停机结束</th>
+      <th>替换原因(待确认)</th><th>处理去向</th><th></th></tr></thead>
+      <tbody>${spRows}</tbody>
+    </table>
+    <button class="btn btn-ghost btn-sm" onclick="addSpareRow()" style="margin-bottom:14px">➕ 再加一行</button>
+    <h3 class="section-title">📝 结论 & 备注</h3>
+    <div class="form-grid">
+      <div class="form-item"><label>复核结论</label>
+        <select id="f_conclusion">
+          <option value="" ${!r.conclusion?'selected':''}>-- 请选择 --</option>
+          <option value="合格" ${r.conclusion==='合格'?'selected':''}>合格（所有项目正常）</option>
+          <option value="基本合格" ${r.conclusion==='基本合格'?'selected':''}>基本合格（有小问题不影响运行）</option>
+          <option value="待整改" ${r.conclusion==='待整改'?'selected':''}>待整改（需停机维修）</option>
+          <option value="不合格" ${r.conclusion==='不合格'?'selected':''}>不合格（无法运行）</option>
+        </select></div>
+      <div class="form-item"><label>当前状态</label>
+        <select id="f_status">
+          <option value="pending" ${r.status==='pending'?'selected':''}>待确认</option>
+          <option value="confirmed" ${r.status==='confirmed'?'selected':''}>已确认</option>
+          <option value="withdrawn" ${r.status==='withdrawn'?'selected':''}>已撤回</option>
+          <option value="modified" ${r.status==='modified'?'selected':''}>已变更</option>
+        </select></div>
+    </div>
+    <div class="form-grid full">
+      <div class="form-item"><label>备注</label>
+        <textarea id="f_remark" placeholder="巡检情况说明、异常处理、改判原因等...">${escapeAttr(r.remark)}</textarea></div>
+      ${!isNew?`<div class="form-item"><label>变更原因 / 改判说明<span class="req">*</span></label>
+        <textarea id="f_reason" placeholder="本次修改/补录/改判的原因，将写入历史留痕..."></textarea></div>`:''}
+    </div>
+  `;
+  const footer = `<button class="btn btn-ghost" onclick="closeModal()">取消</button>
+    <button class="btn btn-primary" onclick="saveEdit('${r.id}', ${isNew})">${isNew?'创建记录':'保存变更'}</button>`;
+  openModal(isNew?'➕ 手动补录巡检记录':'✏️ 编辑 / 补录 / 改判', body, footer);
+}
+function escapeAttr(s){return String(s??'').replace(/"/g,'&quot;')}
+
+function spareRowHTML(s,idx){
+  const delayCls = s.isDelayed?'delay-highlight':'';
+  return `<tr class="sp-row ${delayCls}" data-idx="${idx}" data-id="${s.id}">
+    <td><input type="text" class="sp-name" value="${escapeAttr(s.name)}" placeholder="如:轴承"></td>
+    <td><input type="text" class="sp-modelO" value="${escapeAttr(s.modelOriginal)}" placeholder="原型号"></td>
+    <td><input type="text" class="sp-modelR" value="${escapeAttr(s.modelReplaced)}" placeholder="若替换填此项"></td>
+    <td><input type="date" class="sp-arrival" value="${s.arrivalDate||''}"></td>
+    <td><input type="date" class="sp-s1" value="${s.shutdownStart||''}"></td>
+    <td><input type="date" class="sp-s2" value="${s.shutdownEnd||''}"></td>
+    <td><input type="text" class="sp-reason" value="${escapeAttr(s.replaceReason)}" placeholder="为何替换?"></td>
+    <td><input type="text" class="sp-disp" value="${escapeAttr(s.disposition)}" placeholder="旧件去哪了?"></td>
+    <td><button class="link-btn danger" onclick="removeSpareRow(${idx})">删除</button></td>
+  </tr>`;
+}
+
+function addSpareRow(){
+  const tb = document.querySelector('#spareTable tbody');
+  const rows = tb.querySelectorAll('.sp-row');
+  const idx = rows.length;
+  const tr = document.createElement('tr');
+  tr.className='sp-row';tr.dataset.idx=idx;tr.dataset.id=uid();
+  tr.innerHTML = spareRowHTML({id:tr.dataset.id},idx).replace(/^<tr[^>]*>|<\/tr>$/g,'');
+  tb.appendChild(tr);
+}
+function removeSpareRow(idx){
+  const row = document.querySelector(`.sp-row[data-idx="${idx}"]`);
+  if(row) row.remove();
+}
+
+function saveEdit(id, isNew){
+  const patch = {
+    stationName: document.getElementById('f_station').value.trim(),
+    inspectDate: document.getElementById('f_date').value,
+    inspector: document.getElementById('f_inspector').value.trim(),
+    source: document.getElementById('f_source').value,
+    conclusion: document.getElementById('f_conclusion').value,
+    status: document.getElementById('f_status').value,
+    remark: document.getElementById('f_remark').value.trim()
+  };
+  if(!patch.stationName){toast('请填写泵站名称','error');return}
+  // 收集备件
+  const sp=[];
+  document.querySelectorAll('.sp-row').forEach(row=>{
+    const name=row.querySelector('.sp-name').value.trim();
+    const mo=row.querySelector('.sp-modelO').value.trim();
+    if(!name && !mo) return; // 空行忽略
+    const part={
+      id:row.dataset.id,
+      name, modelOriginal:mo,
+      modelReplaced:row.querySelector('.sp-modelR').value.trim(),
+      arrivalDate:row.querySelector('.sp-arrival').value,
+      shutdownStart:row.querySelector('.sp-s1').value,
+      shutdownEnd:row.querySelector('.sp-s2').value,
+      replaceReason:row.querySelector('.sp-reason').value.trim(),
+      disposition:row.querySelector('.sp-disp').value.trim()
+    };
+    part.isDelayed = checkSpareDelay(part);
+    sp.push(part);
+  });
+  patch.spareParts = sp;
+
+  if(isNew){
+    const r = createRecord(patch, patch.source||'manual');
+    if(!r.rawData) r.rawData={};
+    DB.records.unshift(r);
+    save();render();closeModal();
+    toast('创建成功','success');
+  } else {
+    const reason = document.getElementById('f_reason')?.value.trim();
+    if(!reason){toast('请填写变更原因，写入历史留痕','error');return}
+    modifyRecord(id, patch, reason);
+    closeModal();
+  }
+}
+
+function deleteRecord(id){
+  if(!confirm('确认删除该记录?操作无法撤销'))return;
+  DB.records = DB.records.filter(r=>r.id!==id);
+  save();render();toast('已删除','warn');
+}
+
+// ================ 导出 ================
+function exportJSON(){
+  const data = filteredRecords();
+  download('巡检报告复核_'+dateStr()+'.json', JSON.stringify(data,null,2), 'application/json');
+  toast('已导出 JSON','success');
+}
+function exportCSV(){
+  const list = filteredRecords();
+  const headers=['泵站名称','巡检人','巡检日期','来源','状态','结论','备注','备件数量','窗口异常','备件详情JSON','操作次数','最后操作时间'];
+  const rows = [headers.join(',')];
+  list.forEach(r=>{
+    const sp = r.spareParts.map(s=>({name:s.name,model:s.modelOriginal,replace:s.modelReplaced||'',arrival:s.arrivalDate||'',win:(s.shutdownStart||'')+'~'+(s.shutdownEnd||''),delay:s.isDelayed?'是':'否',reason:s.replaceReason||'',disp:s.disposition||''}));
+    rows.push([
+      CSVq(r.stationName), CSVq(r.inspector), CSVq(r.inspectDate),
+      CSVq({import:'导入',api:'接口',manual:'手动'}[r.source]||r.source),
+      CSVq({pending:'待确认',confirmed:'已确认',withdrawn:'已撤回',modified:'已变更'}[r.status]||r.status),
+      CSVq(r.conclusion), CSVq(r.remark),
+      r.spareParts.length, recordHasDelay(r)?'是':'否',
+      CSVq(JSON.stringify(sp)),
+      r.history.length, CSVq(r.history[0]?.timestamp||'')
+    ].join(','));
+  });
+  download('巡检报告复核_'+dateStr()+'.csv', '\ufeff'+rows.join('\n'), 'text/csv');
+  toast('已导出 CSV','success');
+}
+function CSVq(s){s=String(s??'');return '"'+s.replace(/"/g,'""')+'"'}
+function dateStr(){return new Date().toISOString().slice(0,10)}
+function download(name,content,type){
+  const blob=new Blob([content],{type});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=name;a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+function filteredRecords(){
+  const kw = document.getElementById('searchInput').value.trim().toLowerCase();
+  const sf = document.getElementById('statusFilter').value;
+  const df = document.getElementById('delayFilter').value;
+  let list = DB.records.slice();
+  if(kw) list = list.filter(r=>JSON.stringify(r).toLowerCase().includes(kw));
+  if(sf) list = list.filter(r=>r.status===sf);
+  if(df!=='') list = list.filter(r=>recordHasDelay(r)===(df==='1'));
+  return list;
+}
+
+// ================ 老何快捷入口 ================
+function filterDelayed(){
+  document.getElementById('delayFilter').value='1';
+  render();
+  document.querySelector('.toolbar').scrollIntoView({behavior:'smooth',block:'center'});
+  toast('已筛选「备件到货晚于停机窗口」的记录','info');
+}
+
+function loadSample(){
+  if(DB.records.length>0 && !confirm('当前已有记录，载入样例会追加，继续?'))return;
+  const samples = [
+    {
+      stationName:'3#排水提升泵站', inspector:'张建国', inspectDate:'2026-06-05',
+      source:'import', status:'pending', conclusion:'', remark:'巡检表有污渍，部分数字模糊，待核对',
+      items:[{name:'主泵振动',result:'正常',note:'0.8mm/s'},{name:'电机温度',result:'正常',note:'72℃'},{name:'密封泄漏',result:'异常',note:'前轴封微漏，建议更换'}],
+      spareParts:[
+        {id:uid(), name:'机械密封', modelOriginal:'BURGMANN M7N-35', modelReplaced:'', arrivalDate:'2026-06-10', shutdownStart:'2026-06-08', shutdownEnd:'2026-06-12', isDelayed:false, replaceReason:'', disposition:''},
+        {id:uid(), name:'SKF轴承', modelOriginal:'SKF 6312-2Z', modelReplaced:'NSK 6312ZZ', arrivalDate:'2026-06-14', shutdownStart:'2026-06-08', shutdownEnd:'2026-06-12', isDelayed:true, replaceReason:'SKF缺货，供应商建议NSK替代，同尺寸，需要确认寿命', disposition:'旧件回收入库，待检测磨损'}
+      ],
+      rawData:{'泵站':'3#排水提升泵站','巡檢人':'張建國','日期':'2026/6/5','備註':'(原始脏数据: 字迹潦草)','_乱码字段':'���浫','未匹配列':'XXX'}
+    },
+    {
+      stationName:'1#循环水泵站', inspector:'李明', inspectDate:'2026-06-07',
+      source:'api', status:'confirmed', conclusion:'合格', remark:'接口返回数据已复核，全项正常',
+      items:[{name:'进口压力',result:'正常',note:'0.18MPa'},{name:'出口压力',result:'正常',note:'0.52MPa'}],
+      spareParts:[
+        {id:uid(), name:'O型圈', modelOriginal:'NBR 180x5.7', modelReplaced:'', arrivalDate:'2026-06-03', shutdownStart:'2026-06-05', shutdownEnd:'2026-06-06', isDelayed:false}
+      ],
+      apiReturn:{code:0,msg:'ok',data:{batchId:'API2026060700145',verifiedBy:'algo-v2.1',confidence:0.923}}
+    },
+    {
+      stationName:'5#消防泵站', inspector:'王强', inspectDate:'2026-06-03',
+      source:'manual', status:'modified', conclusion:'基本合格→待整改', remark:'首次判定基本合格，二次复核发现阀门腐蚀超标',
+      spareParts:[
+        {id:uid(), name:'闸阀', modelOriginal:'Z41H-16C DN200', modelReplaced:'', arrivalDate:'', shutdownStart:'', shutdownEnd:''}
+      ],
+      history:[
+        {action:'modify',actor:'老何',timestamp:'2026-06-08 15:30:12',reason:'二次巡检发现阀门腐蚀程度超过阈值，改判为待整改',diff:{_multi:[
+          {field:'conclusion',old:'基本合格',new:'待整改'},
+          {field:'remark',old:'泵体外观锈蚀，运行参数正常',new:'首次判定基本合格，二次复核发现阀门腐蚀超标'}
+        ]}},
+        {action:'confirm',actor:'老何',timestamp:'2026-06-05 10:20:00',reason:'首次复核通过',diff:{old:'pending',new:'confirmed',field:'status'}},
+        {action:'manual_create',actor:'老何',timestamp:'2026-06-04 09:00:00',reason:'手动补录创建'}
+      ]
+    }
+  ];
+  samples.forEach(s=>{
+    const r = createRecord({}, s.source);
+    Object.assign(r, s, {id:uid()});
+    if(!r.history.length || r.history[0].action==='manual_create'){
+      r.history.unshift({
+        action: s.source==='import'?'import':(s.source==='api'?'api_return':'manual_create'),
+        actor:ACTOR, timestamp:now(), reason:'样例数据载入', diff:null
+      });
+    }
+    DB.records.unshift(r);
+  });
+  save();render();toast('载入 3 条样例数据','success');
+}
+
+// ================ 清空 ================
+function clearAll(){
+  if(!confirm('确认清空所有巡检记录?此操作无法撤销!'))return;
+  DB.records=[];save();render();toast('已清空','warn');
+}
+
+// ================ Toast ================
+let toastTimer;
+function toast(msg,type='info'){
+  const old=document.querySelector('.toast');if(old)old.remove();
+  const t=document.createElement('div');
+  t.className='toast toast-'+type;t.textContent=msg;
+  document.body.appendChild(t);
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(120%)';t.style.transition='all .3s';setTimeout(()=>t.remove(),300)},2800);
+}
+
+// ================ 接口返回写入 (统一数据入口) ================
+// 供算法/外部系统调用: window.PumpStationAPI.ingest({...})
+window.PumpStationAPI = {
+  ingest(payload){
+    const arr = Array.isArray(payload)?payload:[payload];
+    let cnt=0;
+    arr.forEach(item=>{
+      const r = buildRecordFromImport(item);
+      r.source = 'api';
+      r.apiReturn = JSON.parse(JSON.stringify(item)); // 快照
+      r.rawData = Object.assign({}, r.rawData, {_apiIngestedAt: now()});
+      r.history[0] = {
+        action:'api_return', actor:'API', timestamp:now(),
+        reason:'接口返回自动入库', diff:null
+      };
+      DB.records.unshift(r);
+      cnt++;
+    });
+    save();render();
+    return {ok:true, count:cnt};
+  },
+  getAll(){ return DB.records.slice(); },
+  getPending(){ return DB.records.filter(r=>r.status==='pending'); },
+  getDelayed(){ return DB.records.filter(recordHasDelay); }
+};
+
+// ================ 待处理记录说明 (算法值班人视图) ================
+function showPendingBoard(){
+  const pending = DB.records.filter(r=>r.status==='pending');
+  const delayed = DB.records.filter(recordHasDelay);
+  const cards = (list, title, color)=>{
+    if(!list.length) return `<div class="diff-block"><h4 style="color:${color};margin-bottom:6px">${title} (0)</h4><div style="color:#a0aec0">无</div></div>`;
+    return `<div class="diff-block"><h4 style="color:${color};margin-bottom:10px">${title} (${list.length})</h4>` +
+      list.map(r=>{
+        const reasons = [];
+        if(recordHasDelay(r)) reasons.push('⚠️ 有备件晚于停机窗口');
+        if(r.status==='pending') reasons.push('⏳ 待确认复核');
+        if(!r.conclusion) reasons.push('📝 结论未填写');
+        if(Object.keys(r.rawData).length) reasons.push('📎 含原始脏数据，需注意');
+        return `<div style="padding:8px 10px;background:#fafbfc;border-left:3px solid ${color};border-radius:4px;margin-bottom:6px">
+          <div style="font-weight:600">${r.stationName||'(未命名)'}</div>
+          <div style="font-size:11px;color:#718096;margin:2px 0">巡检人: ${r.inspector||'-'} · ${r.inspectDate||'-'} · 来源: ${r.source}</div>
+          <div style="font-size:12px;color:#4a5568">${reasons.join(' ｜ ')}</div>
+          <button class="link-btn" onclick="closeModal();openDetail('${r.id}')">查看详情</button>
+          <button class="link-btn" onclick="closeModal();openHistory('${r.id}')">历史</button>
+        </div>`;
+      }).join('') + '</div>';
+  };
+  openModal('📋 待处理记录说明（算法值班视图）',
+    `<div class="diff-block" style="margin-bottom:14px">
+      <b>说明：</b>本视图汇总所有需要人介入的记录，逐条说明"待处理原因"和"当前去向"。
+      <br>• 带 <b>⏳待确认</b> = 老何还没签字确认
+      <br>• 带 <b>⚠️窗口异常</b> = 备件到货晚于停机窗口，可能影响生产
+      <br>• 带 <b>📎原始脏数据</b> = 有原始来源快照，修改不会覆盖
+     </div>
+     ${cards(pending,'⏳ 待确认复核（老何需处理）','#d69e2e')}
+     ${cards(delayed,'⚠️ 备件窗口异常（可能影响生产）','#e53e3e')}
+     <div class="diff-block" style="margin-top:10px"><h4 style="color:#2b6cb0">📊 全局汇总</h4>
+       <div style="font-size:13px;line-height:2">
+         总记录数：${DB.records.length}　｜　已确认：${DB.records.filter(r=>r.status==='confirmed').length}　｜　已变更：${DB.records.filter(r=>r.status==='modified').length}　｜　已撤回：${DB.records.filter(r=>r.status==='withdrawn').length}
+       </div>
+     </div>`);
+}
+
+// ================ 启动 ================
+(function init(){
+  load();
+  render();
+  // 工具栏追加一个待处理看板按钮
+  const bar = document.querySelector('.toolbar');
+  const pendingBtn = document.createElement('button');
+  pendingBtn.className='btn btn-primary btn-sm';
+  pendingBtn.innerHTML='📋 待处理看板';
+  pendingBtn.onclick=showPendingBoard;
+  bar.insertBefore(pendingBtn, bar.querySelector('.btn-danger'));
+})();
+</script>
+</body>
+</html>
