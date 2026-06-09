@@ -179,36 +179,47 @@ export default function Home() {
           <div className="mt-4 pt-4 border-t border-[#2d5a87]">
             <h4 className="text-sm font-bold text-[#f39c12] mb-2">⚠️ 待办事项</h4>
             <ul className="space-y-2 text-xs">
-              {!processState.nameplateReviewedByHe && (
-                <li className="flex items-start space-x-2 text-gray-300">
-                  <span className="text-[#e67e22]">•</span>
-                  <span>
-                    请切换到「设备工程师（何工）」角色，前往「阈值冲突」页面处理阈值表与铭牌参数的冲突
-                  </span>
-                </li>
-              )}
-              {pendingCount > 0 && (
-                <li className="flex items-start space-x-2 text-gray-300">
-                  <span className="text-[#e67e22]">•</span>
-                  <span>
-                    请切换到「维修师傅」角色，前往「记录复核」页面复核超阈值被平均值盖掉的记录
-                  </span>
-                </li>
-              )}
-              {!processState.conversionUpdated && (
+              {!processState.thresholdImported && (
                 <li className="flex items-start space-x-2 text-gray-300">
                   <span className="text-[#f39c12]">•</span>
                   <span>
-                    完成上述步骤后，前往「单位换算」页面确认换算说明更新
+                    第一步：在上方「业务流程进度」区域，点击「确认阈值表导入完成」按钮，完成安全阈值表第一次导入
                   </span>
                 </li>
               )}
-              {processState.nameplateReviewedByHe &&
+              {processState.thresholdImported && !processState.nameplateReviewedByHe && (
+                <li className="flex items-start space-x-2 text-gray-300">
+                  <span className="text-[#e67e22]">•</span>
+                  <span>
+                    第二步：切换到「设备工程师（何工）」角色，前往「阈值冲突」页面处理阈值表与铭牌参数的冲突
+                  </span>
+                </li>
+              )}
+              {processState.thresholdImported && processState.nameplateReviewedByHe && pendingCount > 0 && (
+                <li className="flex items-start space-x-2 text-gray-300">
+                  <span className="text-[#e67e22]">•</span>
+                  <span>
+                    第三步：切换到「维修师傅」角色，前往「记录复核」页面复核超阈值被平均值盖掉的记录
+                  </span>
+                </li>
+              )}
+              {processState.thresholdImported &&
+                processState.nameplateReviewedByHe &&
+                !processState.conversionUpdated && (
+                <li className="flex items-start space-x-2 text-gray-300">
+                  <span className="text-[#f39c12]">•</span>
+                  <span>
+                    第四步：前往「单位换算」页面确认换算说明更新，完成整个流程
+                  </span>
+                </li>
+              )}
+              {processState.thresholdImported &&
+                processState.nameplateReviewedByHe &&
                 pendingCount === 0 &&
                 processState.conversionUpdated && (
                 <li className="flex items-start space-x-2 text-[#27ae60]">
                   <CheckCircle2 className="w-4 h-4 mt-0.5" />
-                  <span>所有流程已完成！</span>
+                  <span>所有流程已完成！三种记录（顺利/超阈值被盖/旧口径补录）的明细、历史、单位换算说明均已同步。</span>
                 </li>
               )}
             </ul>

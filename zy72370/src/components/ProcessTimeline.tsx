@@ -1,4 +1,4 @@
-import { Check, Clock, ArrowRight } from 'lucide-react';
+import { Check, Clock, ArrowRight, UploadCloud } from 'lucide-react';
 import { useAppStore } from '../store/useAppStore';
 import type { ProcessStep, ProcessStatus } from '../types';
 
@@ -40,6 +40,11 @@ const statusConfig: Record<ProcessStatus, { icon: typeof Check; color: string; b
 
 export default function ProcessTimeline() {
   const processState = useAppStore((s) => s.processState);
+  const confirmThresholdImported = useAppStore((s) => s.confirmThresholdImported);
+
+  const showThresholdConfirm =
+    processState.currentStep === 'threshold_import' &&
+    !processState.thresholdImported;
 
   return (
     <div className="bg-[#0f2744] border border-[#2d5a87] rounded-sm p-6 mb-8">
@@ -160,6 +165,34 @@ export default function ProcessTimeline() {
           </span>
         </div>
       </div>
+
+      {showThresholdConfirm && (
+        <div className="mt-6 pt-4 border-t border-[#2d5a87]">
+          <div className="bg-[#f39c12]/10 border border-[#f39c12]/30 rounded-sm p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-start space-x-3">
+                <UploadCloud className="w-5 h-5 text-[#f39c12] flex-shrink-0 mt-0.5" />
+                <div>
+                  <div className="font-bold text-[#f39c12] text-sm">
+                    安全阈值表第一次导入
+                  </div>
+                  <p className="text-xs text-gray-400 mt-1 leading-relaxed">
+                    阈值表 v1.3 已加载完成。请确认导入并完成初步检测：
+                    顺利记录 ✓、超阈值被平均值盖掉（挂起待复核）✓、旧口径待补录 ✓。
+                    点击下方按钮推进到第二步：何工补看设备铭牌参数。
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={confirmThresholdImported}
+                className="px-5 py-2.5 rounded-sm font-bold text-sm bg-[#5dade2] text-[#0a1929] hover:bg-[#85c1e9] transition-colors flex-shrink-0 ml-4"
+              >
+                确认阈值表导入完成
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

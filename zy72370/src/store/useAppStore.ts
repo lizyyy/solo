@@ -25,6 +25,7 @@ interface AppActions {
   setSelectedRecordId: (id: string | null) => void;
   advanceProcessStep: () => void;
   setStepStatus: (step: ProcessStep, status: ProcessStatus) => void;
+  confirmThresholdImported: () => void;
   markNameplateReviewed: () => void;
   markConversionUpdated: () => void;
   resolveConflict: (
@@ -102,6 +103,64 @@ export const useAppStore = create<AppState & AppActions>()(
         });
       },
 
+      confirmThresholdImported: () => {
+        const { processState, records } = get();
+        const now = new Date().toISOString().replace('T', ' ').substring(0, 19);
+
+        const updatedRecords = records.map((r) => {
+          const baseLog = {
+            id: `LOG-${Date.now()}-${r.id}`,
+            recordId: r.id,
+            step: 'threshold_import' as ProcessStep,
+            operator: roleLabels.analyst,
+            timestamp: now,
+          };
+          if (r.type === 'smooth') {
+            return {
+              ...r,
+              processLogs: [
+                ...r.processLogs,
+                {
+                  ...baseLog,
+                  action: '第一步确认：顺利记录，测量值在阈值范围且口径匹配，流程推进至何工补看铭牌。',
+                },
+              ],
+            };
+          }
+          if (r.type === 'overwritten') {
+            return {
+              ...r,
+              processLogs: [
+                ...r.processLogs,
+                {
+                  ...baseLog,
+                  action: '第一步确认：超阈值被平均值盖掉，**暂不归正常**，已挂起待后续：何工补看铭牌 → 维修师傅复核 → 单位换算更新。',
+                },
+              ],
+            };
+          }
+          return {
+            ...r,
+            processLogs: [
+              ...r.processLogs,
+              {
+                ...baseLog,
+                action: '第一步确认：测量口径缺失，需留待第二步何工补看设备铭牌参数后补录旧口径。',
+              },
+            ],
+          };
+        }) as RecordData[];
+
+        set({
+          records: updatedRecords,
+          processState: {
+            ...processState,
+            thresholdImported: true,
+          },
+        });
+        get().advanceProcessStep();
+      },
+
       markNameplateReviewed: () => {
         const { processState } = get();
         set({
@@ -114,8 +173,70 @@ export const useAppStore = create<AppState & AppActions>()(
       },
 
       markConversionUpdated: () => {
-        const { processState } = get();
+        const { processState, records, unitConversion } = get();
+        const now = new Date().toISOString().replace('T', ' ').substring(0, 19);
+
+        const updatedRecords = records.map((r) => {
+          const baseLog = {
+            id: `LOG-CU-${Date.now()}-${r.id}`,
+            recordId: r.id,
+            step: 'conversion_update' as ProcessStep,
+            operator: roleLabels.analyst,
+            timestamp: now,
+          };
+          if (r.type === 'smooth') {
+            return {
+              ...r,
+              calculationNote: {
+                ...r.calculationNote,
+                parameterVersion: unitConversion.parameterVersion,
+                tradeOffReason: `${r.calculationNote.tradeOffReason} 单位换算说明于 ${now} 更新，参数版本同步为 ${unitConversion.parameterVersion}。`,
+              },
+              processLogs: [
+                ...r.processLogs,
+                {
+                  ...baseLog,
+                  action: `第三步：单位换算说明更新完成。参数版本 ${unitConversion.parameterVersion}，来源：${unitConversion.parameterSourceLabel}。顺利记录确认正常归档。`,
+                },
+              ],
+            };
+          }
+          if (r.type === 'overwritten') {
+            return {
+              ...r,
+              calculationNote: {
+                ...r.calculationNote,
+                parameterVersion: unitConversion.parameterVersion,
+                tradeOffReason: `${r.calculationNote.tradeOffReason} 单位换算说明于 ${now} 更新，参数版本同步为 ${unitConversion.parameterVersion}。`,
+              },
+              processLogs: [
+                ...r.processLogs,
+                {
+                  ...baseLog,
+                  action: `第三步：单位换算说明更新完成。参数版本 ${unitConversion.parameterVersion}，来源：${unitConversion.parameterSourceLabel}。超阈值被平均值盖掉记录${r.status === 'pending_review' ? '仍挂起待维修师傅复核' : r.status === 'reviewed' ? '已复核通过，最终归档' : '已驳回'}。`,
+                },
+              ],
+            };
+          }
+          return {
+            ...r,
+            calculationNote: {
+              ...r.calculationNote,
+              parameterVersion: unitConversion.parameterVersion,
+              tradeOffReason: `${r.calculationNote.tradeOffReason} 单位换算说明于 ${now} 更新，参数版本同步为 ${unitConversion.parameterVersion}。`,
+            },
+            processLogs: [
+              ...r.processLogs,
+              {
+                ...baseLog,
+                action: `第三步：单位换算说明更新完成。参数版本 ${unitConversion.parameterVersion}，来源：${unitConversion.parameterSourceLabel}。旧口径补录记录（0.3mm）确认归档。`,
+              },
+            ],
+          };
+        }) as RecordData[];
+
         set({
+          records: updatedRecords,
           processState: {
             ...processState,
             conversionUpdated: true,
@@ -180,6 +301,13 @@ export const useAppStore = create<AppState & AppActions>()(
         });
 
         const updatedRecords = get().records.map((r) => {
+          const baseLog = {
+            id: `LOG-NP-${Date.now()}-${r.id}`,
+            recordId: r.id,
+            step: 'nameplate_review' as ProcessStep,
+            operator: roleLabels.engineer,
+            timestamp: now,
+          };
           if (r.type === 'supplemented') {
             return {
               ...r,
@@ -191,6 +319,13 @@ export const useAppStore = create<AppState & AppActions>()(
                     ? `使用阈值表 v1.3 参数，何工于 ${now} 确认。原始测量口径缺失，从设备铭牌 RDS-200 #EQ-2024-001 补录旧口径 0.3mm。`
                     : `使用铭牌参数 v1.0，何工于 ${now} 驳回阈值表 v1.3。原始测量口径缺失，从设备铭牌 RDS-200 #EQ-2024-001 补录旧口径 0.3mm。`,
               },
+              processLogs: [
+                ...r.processLogs,
+                {
+                  ...baseLog,
+                  action: `第二步：何工补看设备铭牌 RDS-200 #EQ-2024-001，发现测量口径缺失，${decision === 'confirm' ? '确认使用阈值表 v1.3（6.0 m/s）' : '驳回阈值表改用铭牌 v1.0（5.5 m/s）'}，补录旧口径 0.3mm。`,
+                },
+              ],
             };
           }
           if (r.type === 'overwritten') {
@@ -205,6 +340,13 @@ export const useAppStore = create<AppState & AppActions>()(
                     ? `测量值 7.8 m/s > 阈值 6.0 m/s，但被平均值 4.5 掩盖。使用阈值表 v1.3 参数，何工于 ${now} 确认。**不归正常**，留待维修师傅复核。`
                     : `测量值 7.8 m/s > 阈值 5.5 m/s，但被平均值 4.5 掩盖。使用铭牌参数 v1.0，何工于 ${now} 驳回阈值表 v1.3。**不归正常**，留待维修师傅复核。`,
               },
+              processLogs: [
+                ...r.processLogs,
+                {
+                  ...baseLog,
+                  action: `第二步：何工补看设备铭牌参数，${decision === 'confirm' ? '确认使用阈值表 v1.3（最大阈值 6.0 m/s）' : '驳回阈值表改用铭牌 v1.0（最大阈值 5.5 m/s）'}。超阈值被平均值盖掉记录维持**挂起待维修师傅复核**状态，不自动归正常。`,
+                },
+              ],
             };
           }
           return {
@@ -217,6 +359,13 @@ export const useAppStore = create<AppState & AppActions>()(
                   ? `使用阈值表 v1.3 参数，何工于 ${now} 确认。测量值 4.2 < 阈值 6.0，正常。`
                   : `使用铭牌参数 v1.0，何工于 ${now} 驳回阈值表 v1.3。测量值 4.2 < 阈值 5.5，正常。`,
             },
+            processLogs: [
+              ...r.processLogs,
+              {
+                ...baseLog,
+                action: `第二步：何工补看设备铭牌参数，口径 0.5mm 与测量一致，${decision === 'confirm' ? '确认使用阈值表 v1.3' : '驳回阈值表改用铭牌 v1.0'}，顺利记录保持正常。`,
+              },
+            ],
           };
         }) as RecordData[];
 
