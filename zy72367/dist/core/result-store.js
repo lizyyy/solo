@@ -1,13 +1,20 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.setRecords = setRecords;
+exports.getRecords = getRecords;
+exports.getResult = getResult;
+exports.getSummary = getSummary;
+exports.resetStore = resetStore;
 let records = [];
 let lastGeneratedAt = "";
-export function setRecords(newRecords) {
+function setRecords(newRecords) {
     records = newRecords;
     lastGeneratedAt = new Date().toISOString();
 }
-export function getRecords() {
+function getRecords() {
     return [...records];
 }
-export function getResult() {
+function getResult() {
     const summary = buildSummary(records);
     return {
         records: [...records],
@@ -15,7 +22,7 @@ export function getResult() {
         generatedAt: lastGeneratedAt,
     };
 }
-export function getSummary() {
+function getSummary() {
     return buildSummary(records);
 }
 function buildSummary(recs) {
@@ -29,7 +36,7 @@ function buildSummary(recs) {
         confirmedAbnormalCount: recs.filter((r) => r.processingStatus === "confirmed_abnormal").length,
     };
 }
-export function resetStore() {
+function resetStore() {
     records = [];
     lastGeneratedAt = "";
 }

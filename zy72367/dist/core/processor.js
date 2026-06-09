@@ -1,7 +1,12 @@
-export function checkThreshold(value, config) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.checkThreshold = checkThreshold;
+exports.processRecords = processRecords;
+exports.recalculateAfterSupplement = recalculateAfterSupplement;
+function checkThreshold(value, config) {
     return value > config.upperLimit || value < config.lowerLimit;
 }
-export function processRecords(rawRecords, config) {
+function processRecords(rawRecords, config) {
     const avg = computeAverage(rawRecords);
     return rawRecords.map((record) => {
         const isOver = checkThreshold(record.tensionValue, config);
@@ -26,7 +31,7 @@ function computeAverage(records) {
     const sum = records.reduce((acc, r) => acc + r.tensionValue, 0);
     return sum / records.length;
 }
-export function recalculateAfterSupplement(existingRecords, supplementRecords, config) {
+function recalculateAfterSupplement(existingRecords, supplementRecords, config) {
     const merged = [...existingRecords, ...supplementRecords];
     const avg = computeAverage(merged);
     return merged.map((record) => {

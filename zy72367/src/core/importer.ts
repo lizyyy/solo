@@ -1,5 +1,16 @@
-import type { TensionRecord, ImportResult, ImportStep } from "../types.js";
-import { processRecords, recalculateAfterSupplement, type ThresholdConfig } from "./processor.js";
+import type {
+  TensionRecord,
+  ImportResult,
+  ImportStep,
+  DedupCategory,
+  CurrentBatchDuplicateKey,
+  HistoryDuplicateKey,
+} from "../types.js";
+import {
+  processRecords,
+  recalculateAfterSupplement,
+  type ThresholdConfig,
+} from "./processor.js";
 
 let existingRecords: TensionRecord[] = [];
 let batchCounter = 0;
@@ -21,37 +32,65 @@ export function firstImport(
   config: ThresholdConfig
 ): ImportResult {
   const batchId = `batch_${++batchCounter}`;
-  const seen = new Set<string>();
+
+  const seenInBatch = new Map<string, { line: number; firstId: string }>();
+  const newRecordIds: string[] = [];
+  const currentBatchDuplicateKeys: CurrentBatchDuplicateKey[] = [];
+  const historyDuplicateKeys: HistoryDuplicateKey[] = [];
+
+  const historyKeyMap = new Map<string, string>();
+  for (const rec of existingRecords) {
+    const key = `${rec.beltId}_${rec.timestamp}_${rec.tensionValue}`;
+    historyKeyMap.set(key, rec.id);
+  }
+
   const records: TensionRecord[] = [];
   let duplicateSkipped = 0;
 
   for (const raw of rawData) {
     const key = `${raw.beltId}_${raw.timestamp}_${raw.tensionValue}`;
-    if (seen.has(key)) {
-      duplicateSkipped++;
-      continue;
-    }
-    seen.add(key);
+    let dedupCategory: DedupCategory;
+    let skipRecord = false;
 
-    const record: TensionRecord = {
-      id: `${batchId}_${raw.originalLineNumber}`,
-      originalLineNumber: raw.originalLineNumber,
-      timestamp: raw.timestamp,
-      beltId: raw.beltId,
-      tensionValue: raw.tensionValue,
-      unit: raw.unit,
-      temperature: raw.temperature,
-      temperatureCalibrationNote: null,
-      samplingIntervalNote: null,
-      isOverThreshold: false,
-      thresholdValue: config.upperLimit,
-      processingStatus: "pending_review",
-      avgMasked: false,
-      manualOverrides: [],
-      importBatchId: batchId,
-      importStep: "first_import",
-    };
-    records.push(record);
+    const historyExistingId = historyKeyMap.get(key);
+    if (historyExistingId) {
+      dedupCategory = "dup_history";
+      historyDuplicateKeys.push({ key, line: raw.originalLineNumber, existingId: historyExistingId });
+      duplicateSkipped++;
+      skipRecord = true;
+    } else if (seenInBatch.has(key)) {
+      dedupCategory = "dup_in_batch";
+      const firstOccurrence = seenInBatch.get(key)!;
+      currentBatchDuplicateKeys.push({ key, line: raw.originalLineNumber });
+      duplicateSkipped++;
+      skipRecord = true;
+    } else {
+      dedupCategory = "new";
+      const recordId = `${batchId}_${raw.originalLineNumber}`;
+      seenInBatch.set(key, { line: raw.originalLineNumber, firstId: recordId });
+
+      const record: TensionRecord = {
+        id: recordId,
+        originalLineNumber: raw.originalLineNumber,
+        timestamp: raw.timestamp,
+        beltId: raw.beltId,
+        tensionValue: raw.tensionValue,
+        unit: raw.unit,
+        temperature: raw.temperature,
+        temperatureCalibrationNote: null,
+        samplingIntervalNote: null,
+        isOverThreshold: false,
+        thresholdValue: config.upperLimit,
+        processingStatus: "pending_review",
+        avgMasked: false,
+        manualOverrides: [],
+        importBatchId: batchId,
+        importStep: "first_import",
+        dedupCategory,
+      };
+      records.push(record);
+      newRecordIds.push(recordId);
+    }
   }
 
   const processed = processRecords(records, config);
@@ -65,6 +104,9 @@ export function firstImport(
     overThresholdCount: processed.filter((r) => r.isOverThreshold).length,
     avgMaskedCount: processed.filter((r) => r.avgMasked).length,
     records: processed,
+    newRecordIds,
+    currentBatchDuplicateKeys,
+    historyDuplicateKeys,
   };
 }
 
@@ -102,6 +144,9 @@ export function supplementTemperatureCalibration(
     overThresholdCount: recalculated.filter((r) => r.isOverThreshold).length,
     avgMaskedCount: recalculated.filter((r) => r.avgMasked).length,
     records: recalculated,
+    newRecordIds: [],
+    currentBatchDuplicateKeys: [],
+    historyDuplicateKeys: [],
   };
 }
 
@@ -150,6 +195,9 @@ export function updateUnitConversion(
     overThresholdCount: recalculated.filter((r) => r.isOverThreshold).length,
     avgMaskedCount: recalculated.filter((r) => r.avgMasked).length,
     records: recalculated,
+    newRecordIds: [],
+    currentBatchDuplicateKeys: [],
+    historyDuplicateKeys: [],
   };
 }
 

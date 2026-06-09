@@ -1,15 +1,21 @@
-import { getResult, getRecords, getSummary } from "../core/result-store.js";
-export function apiGetRecords() {
-    return getRecords();
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.apiGetRecords = apiGetRecords;
+exports.apiGetSummary = apiGetSummary;
+exports.apiGetResult = apiGetResult;
+exports.apiGetExportData = apiGetExportData;
+const result_store_js_1 = require("../core/result-store.js");
+function apiGetRecords() {
+    return (0, result_store_js_1.getRecords)();
 }
-export function apiGetSummary() {
-    return getSummary();
+function apiGetSummary() {
+    return (0, result_store_js_1.getSummary)();
 }
-export function apiGetResult() {
-    return getResult();
+function apiGetResult() {
+    return (0, result_store_js_1.getResult)();
 }
-export function apiGetExportData() {
-    const result = getResult();
+function apiGetExportData() {
+    const result = (0, result_store_js_1.getResult)();
     return {
         generatedAt: result.generatedAt,
         summary: result.summary,

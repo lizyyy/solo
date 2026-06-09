@@ -65,7 +65,7 @@ export function runTemperatureCalibrationReview(
         "after temp calibration review, avg-masked over-threshold record restored to pending_review for maintenance worker confirmation"
       );
     }
-    return attachSamplingNote(r, "temp calibration reviewed", null);
+    return attachSamplingNote(r, "temp calibration reviewed", "温度校准补录完成，记录已关联校准备注");
   });
   setRecords(patched);
 
@@ -91,7 +91,7 @@ export function runUnitConversionUpdate(
         "after unit conversion update, avg-masked over-threshold record restored to pending_review for maintenance worker confirmation"
       );
     }
-    return attachSamplingNote(r, "unit conversion updated", null);
+    return attachSamplingNote(r, "unit conversion updated", "单位换算说明已更新，张力值按系数重算");
   });
   setRecords(patched);
 

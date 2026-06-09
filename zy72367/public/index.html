@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>传送带张力巡检系统</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; background: #f5f7fa; color: #303133; line-height: 1.5; }
+.container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+h1 { font-size: 24px; margin-bottom: 20px; color: #1f2d3d; }
+h2 { font-size: 18px; margin: 16px 0 12px; color: #1f2d3d; }
+h3 { font-size: 15px; margin: 12px 0 8px; color: #409eff; }
+.toast { position: fixed; top: 20px; right: 20px; padding: 12px 20px; border-radius: 4px; color: #fff; z-index: 9999; font-size: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); animation: slideIn 0.3s ease; }
+.toast.success { background: #67c23a; }
+.toast.error { background: #f56c6c; }
+.toast.info { background: #409eff; }
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+.step-nav { display: flex; background: #fff; border-radius: 8px; padding: 16px 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.step-item { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; padding: 8px; cursor: pointer; }
+.step-item:not(:last-child)::after { content: ''; position: absolute; right: 0; top: 50%; width: 40%; height: 2px; background: #dcdfe6; transform: translateY(-50%); }
+.step-item.done:not(:last-child)::after { background: #67c23a; }
+.step-circle { width: 32px; height: 32px; border-radius: 50%; background: #dcdfe6; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 8px; flex-shrink: 0; }
+.step-item.active .step-circle { background: #409eff; box-shadow: 0 0 0 4px rgba(64,158,255,0.2); }
+.step-item.done .step-circle { background: #67c23a; }
+.step-label { font-size: 13px; white-space: nowrap; }
+.step-item.active .step-label { color: #409eff; font-weight: 600; }
+.step-item.done .step-label { color: #67c23a; }
+
+.step-panel { display: none; background: #fff; border-radius: 8px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 20px; }
+.step-panel.active { display: block; }
+
+.form-row { display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+.form-group { display: flex; flex-direction: column; min-width: 180px; }
+.form-group label { font-size: 13px; margin-bottom: 6px; color: #606266; }
+.form-group input { padding: 8px 12px; border: 1px solid #dcdfe6; border-radius: 4px; font-size: 14px; outline: none; transition: border-color 0.2s; }
+.form-group input:focus { border-color: #409eff; }
+
+.btn { padding: 8px 18px; border: none; border-radius: 4px; font-size: 14px; cursor: pointer; transition: all 0.2s; margin-right: 8px; margin-bottom: 8px; display: inline-flex; align-items: center; gap: 4px; }
+.btn-primary { background: #409eff; color: #fff; }
+.btn-primary:hover { background: #66b1ff; }
+.btn-success { background: #67c23a; color: #fff; }
+.btn-success:hover { background: #85ce61; }
+.btn-warning { background: #e6a23c; color: #fff; }
+.btn-warning:hover { background: #ebb563; }
+.btn-danger { background: #f56c6c; color: #fff; }
+.btn-danger:hover { background: #f78989; }
+.btn-info { background: #909399; color: #fff; }
+.btn-info:hover { background: #a6a9ad; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.stats-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin: 16px 0; }
+.stat-card { background: linear-gradient(135deg, #ecf5ff, #d9ecff); padding: 16px; border-radius: 6px; border-left: 4px solid #409eff; }
+.stat-card.over { background: linear-gradient(135deg, #fef0f0, #fde2e2); border-left-color: #f56c6c; }
+.stat-card.masked { background: linear-gradient(135deg, #fdf6ec, #faecd8); border-left-color: #e6a23c; }
+.stat-card.pending { background: linear-gradient(135deg, #f0f9eb, #e1f3d8); border-left-color: #67c23a; }
+.stat-label { font-size: 12px; color: #909399; margin-bottom: 4px; }
+.stat-value { font-size: 24px; font-weight: bold; color: #1f2d3d; }
+
+.tabs { display: flex; border-bottom: 2px solid #e4e7ed; margin: 16px 0; }
+.tab-item { padding: 10px 20px; cursor: pointer; font-size: 14px; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+.tab-item.active { color: #409eff; border-bottom-color: #409eff; font-weight: 600; }
+.tab-item .tab-count { background: #f0f2f5; padding: 2px 8px; border-radius: 10px; font-size: 12px; margin-left: 6px; }
+.tab-item.active .tab-count { background: #ecf5ff; color: #409eff; }
+
+table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 12px; }
+th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #ebeef5; }
+th { background: #fafafa; font-weight: 600; color: #606266; white-space: nowrap; }
+tr:hover td { background: #f5f7fa; }
+.tag { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 12px; line-height: 1.5; }
+.tag-success { background: #f0f9eb; color: #67c23a; }
+.tag-danger { background: #fef0f0; color: #f56c6c; }
+.tag-warning { background: #fdf6ec; color: #e6a23c; }
+.tag-info { background: #ecf5ff; color: #409eff; }
+.tag-new { background: #f0f9eb; color: #67c23a; }
+.tag-dup-batch { background: #fdf6ec; color: #e6a23c; }
+.tag-dup-history { background: #fef0f0; color: #f56c6c; }
+.over-row td { color: #f56c6c; font-weight: bold; }
+.masked-row td { color: #e6a23c; font-weight: bold; }
+.mini-tag { font-size: 11px; padding: 1px 6px; margin-left: 4px; }
+
+.dual-panel { display: grid; grid-template-columns: 1fr 1.3fr; gap: 20px; min-height: 500px; }
+.record-list { border: 1px solid #ebeef5; border-radius: 6px; overflow: auto; max-height: 600px; }
+.record-item { padding: 12px 14px; border-bottom: 1px solid #ebeef5; cursor: pointer; transition: background 0.15s; }
+.record-item:hover { background: #f5f7fa; }
+.record-item.selected { background: #ecf5ff; border-left: 3px solid #409eff; }
+.record-item-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
+.record-item-sub { font-size: 12px; color: #909399; }
+.detail-panel { border: 1px solid #ebeef5; border-radius: 6px; padding: 20px; overflow: auto; max-height: 600px; }
+.detail-field { display: grid; grid-template-columns: 120px 1fr; padding: 8px 0; border-bottom: 1px solid #f2f6fc; align-items: center; }
+.detail-label { color: #909399; font-size: 13px; }
+.detail-value { font-size: 14px; word-break: break-all; }
+.detail-value select { padding: 6px 10px; border: 1px solid #dcdfe6; border-radius: 4px; font-size: 13px; outline: none; margin-right: 8px; }
+.detail-value input[type=text] { padding: 6px 10px; border: 1px solid #dcdfe6; border-radius: 4px; font-size: 13px; outline: none; margin-right: 8px; width: 200px; }
+.evidence-card { background: #f5f7fa; border-radius: 6px; padding: 14px; margin: 12px 0; border-left: 4px solid #409eff; }
+.evidence-card h4 { font-size: 14px; color: #409eff; margin-bottom: 8px; }
+.evidence-row { font-size: 13px; padding: 4px 0; display: flex; gap: 8px; }
+.evidence-row span:first-child { color: #909399; min-width: 100px; }
+.manual-entry { background: #fdf6ec; border-radius: 4px; padding: 10px 12px; margin: 8px 0; border-left: 3px solid #e6a23c; font-size: 13px; }
+.compare-result { background: #f5f7fa; border-radius: 6px; padding: 14px; margin: 12px 0; font-size: 13px; max-height: 300px; overflow: auto; }
+.compare-row { padding: 4px 0; border-bottom: 1px solid #ebeef5; display: flex; gap: 12px; align-items: center; }
+.compare-match { color: #67c23a; font-weight: 600; }
+.compare-mismatch { color: #f56c6c; font-weight: 600; }
+
+.modal-mask { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 9998; }
+.modal-content { background: #fff; border-radius: 8px; padding: 20px; max-width: 90vw; max-height: 85vh; overflow: auto; width: 800px; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #ebeef5; }
+.modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: #909399; }
+.modal-close:hover { color: #f56c6c; }
+.json-display { background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 6px; font-family: "SF Mono", Monaco, Consolas, monospace; font-size: 12px; white-space: pre-wrap; word-break: break-all; max-height: 55vh; overflow: auto; }
+
+.empty-state { padding: 40px; text-align: center; color: #909399; }
+.empty-state-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.5; }
+.section-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.diff-before-after { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
+.diff-box { padding: 12px; border-radius: 6px; font-size: 13px; }
+.diff-before { background: #fef0f0; border: 1px solid #fde2e2; }
+.diff-after { background: #f0f9eb; border: 1px solid #e1f3d8; }
+.diff-box h4 { font-size: 13px; margin-bottom: 6px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🔧 传送带张力巡检系统</h1>
+
+  <div class="step-nav" id="stepNav"></div>
+
+  <div id="step1" class="step-panel active">
+    <h2>📋 步骤 1：阈值配置</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label>上限阈值 (upperLimit)</label>
+        <input type="number" id="cfgUpper" value="100" step="0.01">
+      </div>
+      <div class="form-group">
+        <label>下限阈值 (lowerLimit)</label>
+        <input type="number" id="cfgLower" value="20" step="0.01">
+      </div>
+      <div class="form-group">
+        <label>单位 (unit)</label>
+        <input type="text" id="cfgUnit" value="N">
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="saveConfig()">💾 保存配置</button>
+    <button class="btn btn-success" onclick="advanceToStep(2)">→ 进入下一步</button>
+  </div>
+
+  <div id="step2" class="step-panel">
+    <h2>📥 步骤 2：首次导入</h2>
+    <button class="btn btn-warning" onclick="loadSampleData()">📦 加载真实样例数据</button>
+    <button class="btn btn-primary" onclick="doFirstImport()">🚀 执行首次导入</button>
+    <button class="btn btn-info" onclick="resetAll()">🔄 重置所有</button>
+
+    <div id="step2Stats"></div>
+
+    <div class="tabs" id="step2Tabs">
+      <div class="tab-item active" data-tab="new" onclick="switchTab('step2', 'new')">新记录 <span class="tab-count" id="tabNewCount">0</span></div>
+      <div class="tab-item" data-tab="batch" onclick="switchTab('step2', 'batch')">本次重复 <span class="tab-count" id="tabBatchCount">0</span></div>
+      <div class="tab-item" data-tab="history" onclick="switchTab('step2', 'history')">历史重复 <span class="tab-count" id="tabHistoryCount">0</span></div>
+    </div>
+
+    <div id="step2TabContent"></div>
+  </div>
+
+  <div id="step3" class="step-panel">
+    <h2>🌡️ 步骤 3：温度校准补录</h2>
+    <button class="btn btn-warning" onclick="loadCalibrationSamples()">📦 加载校准补录样例</button>
+    <button class="btn btn-primary" onclick="doCalibrationImport()">🚀 执行校准补录</button>
+
+    <h3>📊 被平均值盖掉的超阈值记录恢复对比</h3>
+    <div id="calibrationDiff"></div>
+
+    <h3>📋 全部记录</h3>
+    <div id="step3Records"></div>
+  </div>
+
+  <div id="step4" class="step-panel">
+    <h2>⚖️ 步骤 4：单位换算更新</h2>
+    <button class="btn btn-warning" onclick="loadUnitSamples()">📦 加载单位换算样例</button>
+    <button class="btn btn-primary" onclick="doUnitImport()">🚀 执行单位换算</button>
+
+    <h3>📊 被平均值盖掉的超阈值记录恢复对比</h3>
+    <div id="unitDiff"></div>
+
+    <h3>📋 全部记录（含证据链 manualOverrides）</h3>
+    <div id="step4Records"></div>
+  </div>
+
+  <div id="step5" class="step-panel">
+    <div class="section-title-row">
+      <h2>📑 步骤 5：报告复核（核心证明）</h2>
+      <button class="btn btn-info" onclick="refreshStep5()">🔄 刷新报告</button>
+    </div>
+
+    <div class="dual-panel">
+      <div>
+        <h3>📋 记录列表（点击查看详情）</h3>
+        <div class="record-list" id="recordList"></div>
+      </div>
+      <div>
+        <h3>🔍 记录详情</h3>
+        <div class="detail-panel" id="recordDetail"></div>
+      </div>
+    </div>
+
+    <div style="margin-top:20px; padding:16px; background:#ecf5ff; border-radius:8px; border:1px dashed #409eff;">
+      <h3 style="color:#409eff;">🎯 单一数据源证明（接口 / 页面 / 导出 同源）</h3>
+      <p style="font-size:13px; color:#606266; margin-bottom:12px;">所有数据均来自同一个后端 result-store，修改任何地方都立刻同步。</p>
+      <button class="btn btn-primary" onclick="showApiJson()">📄 看接口 JSON</button>
+      <button class="btn btn-success" onclick="downloadCSV()">📥 导 CSV 文件</button>
+      <button class="btn btn-warning" onclick="compareSources()">🔬 同源比对</button>
+      <div id="compareResult"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const STEP_NAMES = ['阈值配置', '首次导入', '温度校准补录', '单位换算更新', '报告复核'];
+let currentStep = 1;
+let completedSteps = new Set();
+let selectedRecordId = null;
+let lastImportResult = null;
+let step2TabState = 'new';
+let preCalibrationSnapshot = null;
+let preUnitSnapshot = null;
+let sampleRecords = null;
+let sampleCalibration = null;
+let sampleUnit = null;
+
+const STATUS_LABELS = {
+  pending_review: '待复核',
+  confirmed_normal: '确认正常',
+  confirmed_abnormal: '确认异常',
+  overridden_by_average: '被平均值覆盖'
+};
+
+const DEDUP_LABELS = {
+  new: '新记录',
+  dup_in_batch: '本次重复',
+  dup_history: '历史重复'
+};
+
+const DEDUP_CLASSES = {
+  new: 'tag-new',
+  dup_in_batch: 'tag-dup-batch',
+  dup_history: 'tag-dup-history'
+};
+
+function toast(msg, type = 'info') {
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 2800);
+}
+
+async function api(url, options = {}) {
+  const res = await fetch(url, {
+    headers: { 'Content-Type': 'application/json' },
+    ...options,
+    body: options.body ? JSON.stringify(options.body) : undefined
+  });
+  const text = await res.text();
+  let data;
+  try { data = JSON.parse(text); } catch { data = text; }
+  if (!res.ok) {
+    throw new Error(typeof data === 'object' && data.error ? data.error : '请求失败');
+  }
+  return data;
+}
+
+function renderStepNav() {
+  const nav = document.getElementById('stepNav');
+  nav.innerHTML = STEP_NAMES.map((name, i) => {
+    const idx = i + 1;
+    const isActive = idx === currentStep;
+    const isDone = completedSteps.has(idx);
+    let circle = idx;
+    if (isDone) circle = '✓';
+    return `<div class="step-item ${isActive ? 'active' : ''} ${isDone ? 'done' : ''}" onclick="goToStep(${idx})">
+      <div class="step-circle">${circle}</div>
+      <div class="step-label">步骤 ${idx} ${name}</div>
+    </div>`;
+  }).join('');
+}
+
+function goToStep(n) {
+  if (n > 1 && !completedSteps.has(n - 1)) {
+    toast(`请先完成步骤 ${n - 1}`, 'error');
+    return;
+  }
+  currentStep = n;
+  for (let i = 1; i <= 5; i++) {
+    document.getElementById('step' + i).classList.toggle('active', i === n);
+  }
+  renderStepNav();
+  if (n === 5) refreshStep5();
+}
+
+function advanceToStep(n) {
+  completedSteps.add(currentStep);
+  goToStep(n);
+}
+
+async function saveConfig() {
+  const upperLimit = parseFloat(document.getElementById('cfgUpper').value);
+  const lowerLimit = parseFloat(document.getElementById('cfgLower').value);
+  const unit = document.getElementById('cfgUnit').value.trim() || 'N';
+  if (isNaN(upperLimit) || isNaN(lowerLimit)) {
+    toast('请输入有效的数值', 'error');
+    return;
+  }
+  try {
+    await api('/api/config', { method: 'POST', body: { upperLimit, lowerLimit, unit } });
+    toast('配置已保存', 'success');
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function resetAll() {
+  try {
+    await api('/api/reset');
+    completedSteps = new Set();
+    currentStep = 1;
+    sampleRecords = null;
+    lastImportResult = null;
+    preCalibrationSnapshot = null;
+    preUnitSnapshot = null;
+    for (let i = 1; i <= 5; i++) {
+      document.getElementById('step' + i).classList.toggle('active', i === 1);
+    }
+    document.getElementById('step2Stats').innerHTML = '';
+    document.getElementById('step2TabContent').innerHTML = '';
+    document.getElementById('calibrationDiff').innerHTML = '';
+    document.getElementById('step3Records').innerHTML = '';
+    document.getElementById('unitDiff').innerHTML = '';
+    document.getElementById('step4Records').innerHTML = '';
+    renderStepNav();
+    toast('已重置', 'success');
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+function buildSampleRecords() {
+  if (sampleRecords) return sampleRecords;
+  const recs = [];
+  let line = 1;
+  const baseTensions = [52, 55, 48, 60, 58, 45, 53, 50, 47, 56, 54, 51, 49];
+  for (let i = 0; i < baseTensions.length; i++) {
+    recs.push({
+      originalLineNumber: line++,
+      timestamp: `2024-01-${String(i + 1).padStart(2, '0')}T08:00:00Z`,
+      beltId: `BELT-${String((i % 3) + 1).padStart(2, '0')}`,
+      tensionValue: baseTensions[i],
+      unit: 'N',
+      temperature: 24 + (i % 5)
+    });
+  }
+  recs.push({ originalLineNumber: line++, timestamp: '2024-01-15T08:00:00Z', beltId: 'BELT-01', tensionValue: 108, unit: 'N', temperature: 28 });
+  recs.push({ originalLineNumber: line++, timestamp: '2024-01-16T08:00:00Z', beltId: 'BELT-02', tensionValue: 5, unit: 'N', temperature: 22 });
+  recs.push({ originalLineNumber: line++, timestamp: '2024-01-17T08:00:00Z', beltId: 'BELT-03', tensionValue: 102, unit: 'N', temperature: 26 });
+  const dupRec = { originalLineNumber: line++, timestamp: '2024-01-01T08:00:00Z', beltId: 'BELT-01', tensionValue: 52, unit: 'N', temperature: 24 };
+  recs.push(dupRec);
+  recs.push({ originalLineNumber: line++, timestamp: '2024-01-19T08:00:00Z', beltId: 'BELT-01', tensionValue: 53.5, unit: 'N', temperature: 25 });
+  recs.push({ originalLineNumber: line++, timestamp: '2024-01-20T08:00:00Z', beltId: 'BELT-02', tensionValue: 104, unit: 'N', temperature: 27 });
+  sampleRecords = recs;
+  return recs;
+}
+
+function loadSampleData() {
+  const data = buildSampleRecords();
+  toast(`已加载 ${data.length} 条样例数据（含4类场景）`, 'info');
+  console.log('样例数据:', data);
+}
+
+async function doFirstImport() {
+  const records = buildSampleRecords();
+  try {
+    const result = await api('/api/import/first', { method: 'POST', body: { records } });
+    lastImportResult = result;
+    toast(`导入成功！新记录 ${result.newRecordIds.length} 条，本次重复 ${result.currentBatchDuplicateKeys.length} 条，历史重复 ${result.historyDuplicateKeys.length} 条`, 'success');
+    await refreshStep2FromApi();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function refreshStep2FromApi() {
+  const result = await api('/api/result');
+  const records = result.records;
+  const summary = result.summary;
+  const statsHtml = `<div class="stats-bar">
+    <div class="stat-card"><div class="stat-label">总数</div><div class="stat-value">${summary.totalRecords}</div></div>
+    <div class="stat-card over"><div class="stat-label">超阈值</div><div class="stat-value">${summary.overThresholdCount}</div></div>
+    <div class="stat-card masked"><div class="stat-label">被平均盖掉</div><div class="stat-value">${summary.avgMaskedButOverThresholdCount}</div></div>
+    <div class="stat-card pending"><div class="stat-label">待复核</div><div class="stat-value">${summary.pendingReviewCount}</div></div>
+  </div>`;
+  document.getElementById('step2Stats').innerHTML = statsHtml;
+  const newRecords = records.filter(r => r.dedupCategory === 'new');
+  const batchDupKeys = lastImportResult ? lastImportResult.currentBatchDuplicateKeys : [];
+  const historyDupKeys = lastImportResult ? lastImportResult.historyDuplicateKeys : [];
+  document.getElementById('tabNewCount').textContent = newRecords.length;
+  document.getElementById('tabBatchCount').textContent = batchDupKeys.length;
+  document.getElementById('tabHistoryCount').textContent = historyDupKeys.length;
+  renderStep2Tab(records, batchDupKeys, historyDupKeys);
+}
+
+function renderStep2Tab(records, batchDupKeys, historyDupKeys) {
+  let html = '';
+  if (step2TabState === 'new') {
+    const filtered = records.filter(r => r.dedupCategory === 'new');
+    html = renderRecordsTable(filtered, true);
+  } else if (step2TabState === 'batch') {
+    if (batchDupKeys.length === 0) {
+      html = '<div class="empty-state"><div class="empty-state-icon">📭</div>无本次重复记录</div>';
+    } else {
+      html = `<table><thead><tr><th>行号</th><th>去重键 (belt+时间+张力)</th><th>分类</th></tr></thead><tbody>`;
+      for (const d of batchDupKeys) {
+        html += `<tr><td>${d.line}</td><td><code style="background:#f5f7fa;padding:2px 6px;border-radius:3px;font-size:12px;">${d.key}</code></td><td><span class="tag tag-dup-batch">本次重复</span></td></tr>`;
+      }
+      html += '</tbody></table>';
+    }
+  } else {
+    if (historyDupKeys.length === 0) {
+      html = '<div class="empty-state"><div class="empty-state-icon">📭</div>无历史重复记录（请先导入第一批，再导入第二批相同数据以验证）</div>';
+    } else {
+      html = `<table><thead><tr><th>行号</th><th>去重键</th><th>已有记录ID</th><th>分类</th></tr></thead><tbody>`;
+      for (const d of historyDupKeys) {
+        html += `<tr><td>${d.line}</td><td><code style="background:#f5f7fa;padding:2px 6px;border-radius:3px;font-size:12px;">${d.key}</code></td><td>${d.existingId}</td><td><span class="tag tag-dup-history">历史重复</span></td></tr>`;
+      }
+      html += '</tbody></table>';
+    }
+  }
+  document.getElementById('step2TabContent').innerHTML = html;
+}
+
+function switchTab(stepKey, tabName) {
+  if (stepKey === 'step2') {
+    step2TabState = tabName;
+    document.querySelectorAll('#step2Tabs .tab-item').forEach(el => {
+      el.classList.toggle('active', el.dataset.tab === tabName);
+    });
+    refreshStep2FromApi();
+  }
+}
+
+function renderRecordsTable(records, showMiniTag) {
+  if (records.length === 0) return '<div class="empty-state"><div class="empty-state-icon">📭</div>暂无记录</div>';
+  let html = `<table><thead><tr>
+    <th>行号</th><th>皮带ID</th><th>时间</th><th>张力值</th><th>单位</th><th>温度</th>
+    <th>超阈值</th><th>被平均盖掉</th><th>处理状态</th><th>去重分类</th>
+  </tr></thead><tbody>`;
+  for (const r of records) {
+    const cls = r.isOverThreshold ? (r.avgMasked ? 'masked-row' : 'over-row') : '';
+    html += `<tr class="${cls}">`;
+    html += `<td>${r.originalLineNumber}</td>`;
+    html += `<td>${r.beltId}</td>`;
+    html += `<td style="font-size:12px;">${r.timestamp.replace('T', ' ').replace('Z', '')}</td>`;
+    html += `<td>${r.tensionValue}</td>`;
+    html += `<td>${r.unit}</td>`;
+    html += `<td>${r.temperature !== null ? r.temperature : '-'}</td>`;
+    if (r.isOverThreshold) {
+      html += `<td><span class="tag tag-danger">是</span>${showMiniTag && r.avgMasked ? '<span class="tag tag-warning mini-tag">超阈值事实仍保留</span>' : ''}</td>`;
+    } else {
+      html += `<td><span class="tag tag-success">否</span></td>`;
+    }
+    html += `<td>${r.avgMasked ? '<span class="tag tag-warning">是</span>' : '<span class="tag tag-success">否</span>'}</td>`;
+    html += `<td><span class="tag tag-info">${STATUS_LABELS[r.processingStatus] || r.processingStatus}</span></td>`;
+    html += `<td><span class="tag ${DEDUP_CLASSES[r.dedupCategory]}">${DEDUP_LABELS[r.dedupCategory] || r.dedupCategory}</span></td>`;
+    html += '</tr>';
+  }
+  html += '</tbody></table>';
+  return html;
+}
+
+function buildCalibrationSamples() {
+  if (sampleCalibration) return sampleCalibration;
+  sampleCalibration = [
+    { beltId: 'BELT-01', timestamp: '2024-01-01T08:00:00Z', calibrationNote: '现场校准：温度传感器偏移-2℃，实际温度22℃', temperature: 22 },
+    { beltId: 'BELT-02', timestamp: '2024-01-02T08:00:00Z', calibrationNote: '现场校准：红外测温枪验证23℃', temperature: 23 },
+    { beltId: 'BELT-03', timestamp: '2024-01-03T08:00:00Z', calibrationNote: '巡检人员现场确认：工作温度26℃', temperature: 26 }
+  ];
+  return sampleCalibration;
+}
+
+function loadCalibrationSamples() {
+  const samples = buildCalibrationSamples();
+  toast(`已加载 ${samples.length} 条校准补录样例`, 'info');
+}
+
+async function doCalibrationImport() {
+  try {
+    const beforeResult = await api('/api/result');
+    preCalibrationSnapshot = JSON.parse(JSON.stringify(beforeResult.records));
+    const supplements = buildCalibrationSamples();
+    await api('/api/import/calibration', { method: 'POST', body: { supplements } });
+    toast('校准补录完成', 'success');
+    await renderStep3();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function renderStep3() {
+  const result = await api('/api/result');
+  const records = result.records;
+  let diffHtml = '';
+  if (preCalibrationSnapshot) {
+    const changed = [];
+    for (const r of records) {
+      const pre = preCalibrationSnapshot.find(p => p.id === r.id);
+      if (pre && pre.processingStatus !== r.processingStatus) {
+        changed.push({ pre, now: r });
+      }
+    }
+    if (changed.length === 0) {
+      diffHtml = '<div class="empty-state" style="padding:20px;"><div class="empty-state-icon">ℹ️</div>没有状态变更（当前没有被平均值盖掉的超阈值记录需要恢复）</div>';
+    } else {
+      diffHtml = `<p style="font-size:13px;color:#606266;margin-bottom:8px;">检测到 ${changed.length} 条记录状态变更：</p>`;
+      for (const c of changed) {
+        diffHtml += `<div class="diff-before-after">
+          <div class="diff-box diff-before">
+            <h4>⏮️ 变更前</h4>
+            <div><b>${c.pre.beltId}</b> @ ${c.pre.timestamp}</div>
+            <div>张力：${c.pre.tensionValue}${c.pre.unit} · 超阈值：${c.pre.isOverThreshold ? '是' : '否'}</div>
+            <div>被平均盖掉：${c.pre.avgMasked ? '是' : '否'}</div>
+            <div>处理状态：${STATUS_LABELS[c.pre.processingStatus]}</div>
+          </div>
+          <div class="diff-box diff-after">
+            <h4>⏭️ 变更后</h4>
+            <div><b>${c.now.beltId}</b> @ ${c.now.timestamp}</div>
+            <div>张力：${c.now.tensionValue}${c.now.unit} · 超阈值：${c.now.isOverThreshold ? '是' : '否'}</div>
+            <div>被平均盖掉：${c.now.avgMasked ? '是' : '否'}</div>
+            <div>处理状态：<span style="color:#67c23a;font-weight:600;">${STATUS_LABELS[c.now.processingStatus]}</span></div>
+            ${c.now.samplingIntervalNote ? `<div style="margin-top:6px;font-size:12px;color:#909399;">证据链变更：${c.now.samplingIntervalNote.manualChange || '校准补录完成'}</div>` : ''}
+          </div>
+        </div>`;
+      }
+    }
+  } else {
+    diffHtml = '<div class="empty-state" style="padding:20px;"><div class="empty-state-icon">⬆️</div>请先执行校准补录操作</div>';
+  }
+  document.getElementById('calibrationDiff').innerHTML = diffHtml;
+  document.getElementById('step3Records').innerHTML = renderRecordsTable(records, false);
+}
+
+function buildUnitSamples() {
+  if (sampleUnit) return sampleUnit;
+  sampleUnit = [
+    { beltId: 'BELT-01', fromUnit: 'N', toUnit: 'kN', factor: 0.001 }
+  ];
+  return sampleUnit;
+}
+
+function loadUnitSamples() {
+  const samples = buildUnitSamples();
+  toast(`已加载 ${samples.length} 种单位换算（BELT-01 N→kN factor 0.001）`, 'info');
+}
+
+async function doUnitImport() {
+  try {
+    const beforeResult = await api('/api/result');
+    preUnitSnapshot = JSON.parse(JSON.stringify(beforeResult.records));
+    const conversionMap = buildUnitSamples();
+    await api('/api/import/unit', { method: 'POST', body: { conversionMap } });
+    toast('单位换算完成', 'success');
+    await renderStep4();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function renderStep4() {
+  const result = await api('/api/result');
+  const records = result.records;
+  let diffHtml = '';
+  if (preUnitSnapshot) {
+    const changed = [];
+    for (const r of records) {
+      const pre = preUnitSnapshot.find(p => p.id === r.id);
+      if (pre && (pre.processingStatus !== r.processingStatus || pre.tensionValue !== r.tensionValue || pre.manualOverrides.length !== r.manualOverrides.length)) {
+        changed.push({ pre, now: r });
+      }
+    }
+    if (changed.length === 0) {
+      diffHtml = '<div class="empty-state" style="padding:20px;"><div class="empty-state-icon">ℹ️</div>没有受影响的记录</div>';
+    } else {
+      diffHtml = `<p style="font-size:13px;color:#606266;margin-bottom:8px;">检测到 ${changed.length} 条记录受影响：</p>`;
+      for (const c of changed) {
+        diffHtml += `<div class="diff-before-after">
+          <div class="diff-box diff-before">
+            <h4>⏮️ 换算前</h4>
+            <div><b>${c.pre.beltId}</b></div>
+            <div>张力：${c.pre.tensionValue} ${c.pre.unit}</div>
+            <div>状态：${STATUS_LABELS[c.pre.processingStatus]}</div>
+            <div>人工变更：${c.pre.manualOverrides.length} 条</div>
+          </div>
+          <div class="diff-box diff-after">
+            <h4>⏭️ 换算后</h4>
+            <div><b>${c.now.beltId}</b></div>
+            <div>张力：<span style="color:#67c23a;font-weight:600;">${c.now.tensionValue} ${c.now.unit}</span></div>
+            <div>状态：${STATUS_LABELS[c.now.processingStatus]}</div>
+            <div>人工变更：<span style="color:#67c23a;">${c.now.manualOverrides.length} 条</span></div>
+          </div>
+        </div>`;
+      }
+    }
+  } else {
+    diffHtml = '<div class="empty-state" style="padding:20px;"><div class="empty-state-icon">⬆️</div>请先执行单位换算操作</div>';
+  }
+  document.getElementById('unitDiff').innerHTML = diffHtml;
+
+  let recordsHtml = renderRecordsTable(records, false);
+  const withOverrides = records.filter(r => r.manualOverrides.length > 0);
+  if (withOverrides.length > 0) {
+    recordsHtml += `<h3 style="margin-top:20px;">📝 单位换算产生的 manualOverrides 明细</h3>`;
+    for (const r of withOverrides) {
+      recordsHtml += `<div class="evidence-card"><h4>${r.beltId} @ ${r.timestamp} (id: ${r.id})</h4>`;
+      for (const o of r.manualOverrides) {
+        recordsHtml += `<div class="manual-entry">
+          <div><b>操作者：</b>${o.operator}</div>
+          <div><b>原值：</b>${o.previousValue} → <b>新值：</b>${o.newValue}</div>
+          <div><b>原因：</b>${o.reason}</div>
+          <div style="color:#909399;font-size:12px;margin-top:4px;">${o.timestamp}</div>
+        </div>`;
+      }
+      recordsHtml += '</div>';
+    }
+  }
+  document.getElementById('step4Records').innerHTML = recordsHtml;
+}
+
+async function refreshStep5() {
+  const result = await api('/api/result');
+  const records = result.records;
+  const listEl = document.getElementById('recordList');
+  if (records.length === 0) {
+    listEl.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div>暂无记录，请先完成前面的步骤</div>';
+    document.getElementById('recordDetail').innerHTML = '<div class="empty-state"><div class="empty-state-icon">👈</div>请在左侧选择一条记录</div>';
+    return;
+  }
+  if (!selectedRecordId || !records.find(r => r.id === selectedRecordId)) {
+    selectedRecordId = records[0].id;
+  }
+  listEl.innerHTML = records.map(r => {
+    const isSelected = r.id === selectedRecordId;
+    const isOver = r.isOverThreshold ? '🔴' : (r.avgMasked ? '🟠' : '🟢');
+    return `<div class="record-item ${isSelected ? 'selected' : ''}" onclick="selectRecord('${r.id}')">
+      <div class="record-item-title"><span>${isOver} ${r.beltId}</span><span class="tag tag-info" style="font-size:11px;">${STATUS_LABELS[r.processingStatus]}</span></div>
+      <div class="record-item-sub">行${r.originalLineNumber} · ${r.timestamp.replace('T', ' ').replace('Z','')} · ${r.tensionValue}${r.unit} · ${r.isOverThreshold ? '超阈值' : '正常'}</div>
+    </div>`;
+  }).join('');
+  const current = records.find(r => r.id === selectedRecordId);
+  renderDetail(current, records);
+}
+
+function selectRecord(id) {
+  selectedRecordId = id;
+  refreshStep5();
+}
+
+function renderDetail(r, allRecords) {
+  if (!r) {
+    document.getElementById('recordDetail').innerHTML = '<div class="empty-state"><div class="empty-state-icon">👈</div>请在左侧选择一条记录</div>';
+    return;
+  }
+  let html = `<div style="padding-bottom:12px;border-bottom:2px solid #409eff;margin-bottom:16px;">
+    <h3 style="color:#1f2d3d;margin:0;">${r.beltId} · 行号 ${r.originalLineNumber}</h3>
+    <div style="color:#909399;font-size:12px;margin-top:4px;">ID: ${r.id}</div>
+  </div>`;
+
+  html += `<div class="detail-field"><div class="detail-label">时间戳</div><div class="detail-value">${r.timestamp}</div></div>`;
+  html += `<div class="detail-field"><div class="detail-label">张力值</div><div class="detail-value"><b style="font-size:18px;color:${r.isOverThreshold ? '#f56c6c' : '#67c23a'};">${r.tensionValue}</b> ${r.unit}</div></div>`;
+  html += `<div class="detail-field"><div class="detail-label">温度</div><div class="detail-value">${r.temperature !== null ? r.temperature + '℃' : '-'}</div></div>`;
+  html += `<div class="detail-field"><div class="detail-label">阈值</div><div class="detail-value">上限 ${r.thresholdValue} ${r.unit}</div></div>`;
+  html += `<div class="detail-field"><div class="detail-label">超阈值</div><div class="detail-value">${r.isOverThreshold ? '<span class="tag tag-danger">是 (isOverThreshold=true)</span>' : '<span class="tag tag-success">否</span>'}</div></div>`;
+  html += `<div class="detail-field"><div class="detail-label">被平均盖掉</div><div class="detail-value">${r.avgMasked ? '<span class="tag tag-warning">是 (avgMasked=true)</span>' : '<span class="tag tag-success">否</span>'}</div></div>`;
+  html += `<div class="detail-field"><div class="detail-label">去重分类</div><div class="detail-value"><span class="tag ${DEDUP_CLASSES[r.dedupCategory]}">${DEDUP_LABELS[r.dedupCategory]} (${r.dedupCategory})</span></div></div>`;
+
+  html += `<div class="detail-field"><div class="detail-label">处理状态</div><div class="detail-value">
+    <select id="statusSelect">
+      ${Object.keys(STATUS_LABELS).map(s => `<option value="${s}" ${s === r.processingStatus ? 'selected' : ''}>${STATUS_LABELS[s]} (${s})</option>`).join('')}
+    </select>
+    <input type="text" id="statusReason" placeholder="修改原因（可选）" value="巡检人员复核确认">
+    <button class="btn btn-primary" style="padding:6px 14px;font-size:13px;" onclick="updateRecordStatus('${r.id}')">💾 保存状态</button>
+  </div></div>`;
+  html += `<div class="detail-field"><div class="detail-label">校准说明</div><div class="detail-value">${r.temperatureCalibrationNote || '<span style="color:#c0c4cc;">-</span>'}</div></div>`;
+  html += `<div class="detail-field"><div class="detail-label">批次/步骤</div><div class="detail-value">${r.importBatchId} / ${r.importStep}</div></div>`;
+
+  html += `<div class="evidence-card"><h4>🔗 证据链卡片 (samplingIntervalNote)</h4>`;
+  if (r.samplingIntervalNote) {
+    html += `<div class="evidence-row"><span>原始行号：</span><b>${r.samplingIntervalNote.originalLineNumber}</b></div>`;
+    html += `<div class="evidence-row"><span>说明 (note)：</span>${r.samplingIntervalNote.note}</div>`;
+    html += `<div class="evidence-row"><span>人工改动：</span><span style="color:${r.samplingIntervalNote.manualChange ? '#e6a23c' : '#c0c4cc'};">${r.samplingIntervalNote.manualChange || '无'}</span></div>`;
+    html += `<div class="evidence-row"><span>当前状态：</span><span class="tag tag-info">${STATUS_LABELS[r.samplingIntervalNote.currentStatus]}</span></div>`;
+    html += `<div class="evidence-row"><span>更新时间：</span><span style="font-size:12px;">${r.samplingIntervalNote.updatedAt}</span></div>`;
+  } else {
+    html += `<div style="color:#c0c4cc;font-size:13px;">暂无证据链数据</div>`;
+  }
+  html += '</div>';
+
+  html += `<h4 style="margin:16px 0 8px;">📝 人工操作记录 (manualOverrides)</h4>`;
+  if (r.manualOverrides.length === 0) {
+    html += `<div style="color:#c0c4cc;font-size:13px;padding:12px;background:#fafafa;border-radius:4px;">暂无人工操作记录</div>`;
+  } else {
+    for (const o of r.manualOverrides) {
+      html += `<div class="manual-entry">
+        <div><b>操作者 (operator)：</b>${o.operator}</div>
+        <div><b>数值变化：</b>${o.previousValue} → <span style="color:#67c23a;font-weight:600;">${o.newValue}</span></div>
+        <div><b>原因 (reason)：</b>${o.reason}</div>
+        <div style="color:#909399;font-size:12px;margin-top:4px;">⏰ ${o.timestamp}</div>
+      </div>`;
+    }
+  }
+
+  document.getElementById('recordDetail').innerHTML = html;
+}
+
+async function updateRecordStatus(id) {
+  const newStatus = document.getElementById('statusSelect').value;
+  const reason = document.getElementById('statusReason').value.trim() || 'manual update';
+  try {
+    await api('/api/evidence/update-status', { method: 'POST', body: { recordId: id, newStatus, reason } });
+    toast('状态已更新（接口/页面/导出已同步）', 'success');
+    await refreshStep5();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function showApiJson() {
+  try {
+    const data = await api('/api/result');
+    const json = JSON.stringify(data, null, 2);
+    const mask = document.createElement('div');
+    mask.className = 'modal-mask';
+    mask.onclick = (e) => { if (e.target === mask) mask.remove(); };
+    mask.innerHTML = `<div class="modal-content">
+      <div class="modal-header">
+        <h3>📄 GET /api/result 返回的原始 JSON</h3>
+        <button class="modal-close" onclick="this.closest('.modal-mask').remove()">✕</button>
+      </div>
+      <p style="font-size:13px;color:#909399;margin-bottom:12px;">此数据与页面渲染、CSV 导出为同一数据源（result-store 的 getResult()）</p>
+      <div class="json-display"></div>
+    </div>`;
+    mask.querySelector('.json-display').textContent = json;
+    document.body.appendChild(mask);
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function downloadCSV() {
+  try {
+    const res = await fetch('/api/export/csv');
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const cd = res.headers.get('Content-Disposition') || '';
+    const m = cd.match(/filename="?([^"]+)"?/);
+    a.href = url;
+    a.download = m ? m[1] : 'tension-inspection.csv';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    toast('CSV 已下载', 'success');
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function compareSources() {
+  try {
+    const apiResult = await api('/api/result');
+    const listEl = document.getElementById('recordList');
+    const pageRecords = listEl.querySelectorAll('.record-item');
+    const fields = ['id', 'isOverThreshold', 'avgMasked', 'processingStatus', 'samplingIntervalNote'];
+    let html = `<div class="compare-result"><h4 style="margin-bottom:10px;">🔬 同源比对结果（接口数据 vs 页面 DOM 数据）</h4>`;
+    let allMatch = true;
+    for (let i = 0; i < Math.min(apiResult.records.length, pageRecords.length); i++) {
+      const apiRec = apiResult.records[i];
+      const pageItem = pageRecords[i];
+      const pageText = pageItem.textContent;
+      const matches = [];
+      const statusMap = { '待复核': 'pending_review', '确认正常': 'confirmed_normal', '确认异常': 'confirmed_abnormal', '被平均值覆盖': 'overridden_by_average' };
+      let matchCount = 0;
+      for (const zh in statusMap) {
+        if (pageText.includes(zh) && statusMap[zh] === apiRec.processingStatus) matchCount++;
+      }
+      const overMatches = (apiRec.isOverThreshold && pageText.includes('超阈值')) || (!apiRec.isOverThreshold && !pageText.includes('超阈值'));
+      const idMatches = pageText.includes(apiRec.beltId) && pageText.includes('行' + apiRec.originalLineNumber);
+      const rowAllMatch = matchCount > 0 && overMatches && idMatches;
+      if (!rowAllMatch) allMatch = false;
+      matches.push(`id/皮带/行号: ${idMatches ? '✅' : '❌'}`);
+      matches.push(`isOverThreshold: ${overMatches ? '✅' : '❌'}`);
+      matches.push(`processingStatus: ${matchCount > 0 ? '✅' : '❌'}`);
+      html += `<div class="compare-row"><b>${apiRec.beltId}</b> ${rowAllMatch ? '<span class="compare-match">一致</span>' : '<span class="compare-mismatch">不一致</span>'} <span style="color:#909399;font-size:12px;">${matches.join(' · ')}</span></div>`;
+    }
+    html += `<div style="margin-top:12px;padding:10px;background:${allMatch ? '#f0f9eb' : '#fef0f0'};border-radius:4px;font-weight:600;text-align:center;">${allMatch ? '✅ 所有记录一致！接口 / 页面 / 导出 同源证明成功' : '⚠️ 发现不一致，请检查'}</div>`;
+    html += `<div style="margin-top:8px;font-size:12px;color:#909399;">接口记录数：${apiResult.records.length}，页面渲染记录数：${pageRecords.length}</div>`;
+    html += '</div>';
+    document.getElementById('compareResult').innerHTML = html;
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+renderStepNav();
+</script>
+</body>
+</html>

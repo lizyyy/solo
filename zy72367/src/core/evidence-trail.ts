@@ -21,14 +21,23 @@ export function updateProcessingStatus(
   reason: string
 ): TensionRecord {
   const prevStatus = record.processingStatus;
+  const manualChangeText = `status ${prevStatus} -> ${newStatus}, reason: ${reason}`;
   const updatedNote = record.samplingIntervalNote
     ? {
         ...record.samplingIntervalNote,
         currentStatus: newStatus,
-        manualChange: `status ${prevStatus} -> ${newStatus}, reason: ${reason}`,
+        manualChange: record.samplingIntervalNote.manualChange
+          ? `${record.samplingIntervalNote.manualChange} | ${manualChangeText}`
+          : manualChangeText,
         updatedAt: new Date().toISOString(),
       }
-    : null;
+    : {
+        originalLineNumber: record.originalLineNumber,
+        note: "temperature calibration review updated during workflow step",
+        manualChange: manualChangeText,
+        currentStatus: newStatus,
+        updatedAt: new Date().toISOString(),
+      };
 
   return {
     ...record,

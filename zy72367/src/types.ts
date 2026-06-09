@@ -4,6 +4,8 @@ export type ProcessingStatus =
   | "confirmed_abnormal"
   | "overridden_by_average";
 
+export type DedupCategory = "new" | "dup_in_batch" | "dup_history";
+
 export interface SamplingIntervalNote {
   originalLineNumber: number;
   note: string;
@@ -29,6 +31,7 @@ export interface TensionRecord {
   manualOverrides: ManualOverrideEntry[];
   importBatchId: string;
   importStep: ImportStep;
+  dedupCategory: DedupCategory;
 }
 
 export interface ManualOverrideEntry {
@@ -44,6 +47,17 @@ export type ImportStep =
   | "temperature_calibration_review"
   | "unit_conversion_update";
 
+export interface CurrentBatchDuplicateKey {
+  key: string;
+  line: number;
+}
+
+export interface HistoryDuplicateKey {
+  key: string;
+  line: number;
+  existingId: string;
+}
+
 export interface ImportResult {
   batchId: string;
   step: ImportStep;
@@ -52,6 +66,9 @@ export interface ImportResult {
   overThresholdCount: number;
   avgMaskedCount: number;
   records: TensionRecord[];
+  newRecordIds: string[];
+  currentBatchDuplicateKeys: CurrentBatchDuplicateKey[];
+  historyDuplicateKeys: HistoryDuplicateKey[];
 }
 
 export interface InspectionResult {

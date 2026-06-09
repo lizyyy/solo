@@ -1,4 +1,9 @@
-export function attachSamplingNote(record, note, manualChange) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.attachSamplingNote = attachSamplingNote;
+exports.updateProcessingStatus = updateProcessingStatus;
+exports.getEvidenceSummary = getEvidenceSummary;
+function attachSamplingNote(record, note, manualChange) {
     const updated = {
         originalLineNumber: record.originalLineNumber,
         note,
@@ -8,7 +13,7 @@ export function attachSamplingNote(record, note, manualChange) {
     };
     return { ...record, samplingIntervalNote: updated };
 }
-export function updateProcessingStatus(record, newStatus, reason) {
+function updateProcessingStatus(record, newStatus, reason) {
     const prevStatus = record.processingStatus;
     const updatedNote = record.samplingIntervalNote
         ? {
@@ -24,7 +29,7 @@ export function updateProcessingStatus(record, newStatus, reason) {
         samplingIntervalNote: updatedNote,
     };
 }
-export function getEvidenceSummary(record) {
+function getEvidenceSummary(record) {
     const parts = [];
     parts.push(`line ${record.originalLineNumber}, belt ${record.beltId}`);
     parts.push(`tension ${record.tensionValue}${record.unit}, threshold ${record.thresholdValue}${record.unit}`);

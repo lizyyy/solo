@@ -1,4 +1,4 @@
-export type { TensionRecord, ImportResult, InspectionResult, InspectionSummary, SelfTestResult, ImportStep, ProcessingStatus, SamplingIntervalNote, ManualOverrideEntry } from "./types.js";
+export type { TensionRecord, ImportResult, InspectionResult, InspectionSummary, SelfTestResult, ImportStep, ProcessingStatus, SamplingIntervalNote, ManualOverrideEntry, DedupCategory, CurrentBatchDuplicateKey, HistoryDuplicateKey } from "./types.js";
 export { firstImport, supplementTemperatureCalibration, updateUnitConversion, resetImporter, getExistingRecords } from "./core/importer.js";
 export { processRecords, recalculateAfterSupplement } from "./core/processor.js";
 export type { ThresholdConfig } from "./core/processor.js";
