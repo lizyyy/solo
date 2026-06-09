@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>结构加固碰撞预审</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f5f0; color: #222; font-size: 13px; line-height: 1.6; }
+  header { background: #3a3a3a; color: #e8e8e0; padding: 10px 20px; border-bottom: 3px solid #8b6914; }
+  header h1 { font-size: 18px; font-weight: 500; display: inline-block; }
+  header .meta { float: right; font-size: 12px; opacity: 0.75; }
+  nav { background: #e8e4d8; padding: 8px 20px; border-bottom: 1px solid #c8c4b8; }
+  nav button { background: none; border: 1px solid #b8b4a8; padding: 5px 14px; margin-right: 6px; cursor: pointer; font-size: 12px; border-radius: 2px; color: #444; }
+  nav button.active { background: #8b6914; color: #fff; border-color: #8b6914; }
+  nav button:hover:not(.active) { background: #d8d4c8; }
+  main { padding: 16px 20px; max-width: 1400px; margin: 0 auto; }
+  .panel { background: #fff; border: 1px solid #d0ccc0; border-radius: 2px; margin-bottom: 14px; }
+  .panel-title { background: #f0ece0; padding: 8px 12px; border-bottom: 1px solid #d0ccc0; font-weight: 600; font-size: 13px; color: #555; }
+  .panel-body { padding: 12px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th, td { border: 1px solid #ddd; padding: 5px 8px; text-align: left; vertical-align: top; }
+  th { background: #f5f1e5; font-weight: 600; color: #555; white-space: nowrap; }
+  tr.withdrawn { background: #f8e0e0 !important; text-decoration: line-through; opacity: 0.65; }
+  tr.withdrawn td:first-child::before { content: "【撤回】"; color: #c0392b; font-weight: 600; text-decoration: none; display: inline-block; margin-right: 4px; }
+  tr.impacted { background: #fff8e1 !important; }
+  tr.impacted td:first-child::before { content: "⚠ "; color: #e67e22; }
+  tr.manual-edited { background: #e8f5e9 !important; }
+  tr.normal:hover { background: #fafaf5; }
+  .tag { display: inline-block; padding: 1px 7px; border-radius: 2px; font-size: 11px; margin-right: 4px; }
+  .tag-ok { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+  .tag-warn { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+  .tag-danger { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+  .tag-info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+  .tag-withdraw { background: #e2e3e5; color: #383d41; border: 1px solid #d6d8db; }
+  .summary-box { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+  .summary-card { flex: 1; min-width: 140px; background: #fafaf5; border: 1px solid #e0dcc8; padding: 10px 14px; border-left: 4px solid #8b6914; }
+  .summary-card .num { font-size: 22px; font-weight: 600; color: #333; }
+  .summary-card .label { font-size: 12px; color: #777; margin-top: 2px; }
+  .summary-card.danger { border-left-color: #c0392b; }
+  .summary-card.warn { border-left-color: #e67e22; }
+  .summary-card.ok { border-left-color: #27ae60; }
+  .chain-box { background: #fdf8ee; border: 1px solid #e8d8b0; padding: 12px; border-radius: 2px; margin-bottom: 10px; }
+  .chain-title { font-weight: 600; color: #8b6914; margin-bottom: 8px; font-size: 13px; }
+  .chain-step { padding: 6px 10px; margin: 4px 0; background: #fff; border-left: 3px solid #8b6914; font-size: 12px; }
+  .chain-step strong { color: #c0392b; }
+  textarea.remark { width: 100%; min-height: 50px; border: 1px solid #ccc; padding: 4px 6px; font-family: inherit; font-size: 12px; resize: vertical; }
+  input[type="text"] { padding: 3px 6px; border: 1px solid #ccc; font-size: 12px; font-family: inherit; }
+  .btn { padding: 4px 12px; border: 1px solid #888; background: #f5f5f0; cursor: pointer; font-size: 12px; border-radius: 2px; }
+  .btn-primary { background: #8b6914; color: #fff; border-color: #6b5010; }
+  .btn-primary:hover { background: #7a5c12; }
+  .btn-sm { padding: 2px 8px; font-size: 11px; }
+  .empty-state { padding: 30px; text-align: center; color: #999; }
+  .hidden { display: none !important; }
+  .source-ref { color: #8b6914; font-size: 11px; font-style: italic; }
+  .history-entry { padding: 6px 10px; border-bottom: 1px solid #eee; font-size: 12px; }
+  .history-entry:last-child { border-bottom: none; }
+  .history-time { color: #999; font-size: 11px; }
+  .history-field { color: #8b6914; font-weight: 600; }
+  .toolbar { margin-bottom: 10px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .toolbar select, .toolbar input { padding: 3px 6px; font-size: 12px; }
+  .impact-list { margin: 4px 0 0 0; padding-left: 18px; }
+  .impact-list li { margin: 2px 0; font-size: 11px; color: #555; }
+  .footnote { font-size: 11px; color: #888; margin-top: 6px; }
+  .section-hint { background: #eef5ee; border: 1px dashed #82c982; padding: 8px 12px; border-radius: 2px; margin-bottom: 12px; font-size: 12px; color: #2d5a2d; }
+  .section-hint::before { content: "📌 说明："; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>结构加固碰撞预审系统</h1>
+  <span class="meta" id="headerMeta">版本 v1.0 · 试跑样例已加载</span>
+</header>
+
+<nav>
+  <button class="tab-btn active" data-tab="analysis">预审结论</button>
+  <button class="tab-btn" data-tab="import">材料导入</button>
+  <button class="tab-btn" data-tab="submission">材料送审表</button>
+  <button class="tab-btn" data-tab="clash">碰撞清单</button>
+  <button class="tab-btn" data-tab="history">修改历史</button>
+  <button class="tab-btn" data-tab="help">操作指引</button>
+</nav>
+
+<main>
+
+  <!-- 预审结论页 -->
+  <section id="tab-analysis">
+    <div class="section-hint">
+      本页为周一早会材料。结论链路讲清「撤回一条记录 → 影响范围扩大 → 哪些碰撞结论需重新判定」。
+      红色删除线 = 被撤回；黄色 = 受撤回影响需重判；绿色底 = 已人工复核。
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">预审总览（截至 <span id="runTime"></span>）</div>
+      <div class="panel-body">
+        <div class="summary-box">
+          <div class="summary-card ok"><div class="num" id="sTotal">0</div><div class="label">送审记录总数</div></div>
+          <div class="summary-card"><div class="num" id="sClash">0</div><div class="label">检出碰撞数</div></div>
+          <div class="summary-card warn"><div class="num" id="sWithdraw">0</div><div class="label">撤回记录</div></div>
+          <div class="summary-card danger"><div class="num" id="sImpact">0</div><div class="label">受影响碰撞</div></div>
+          <div class="summary-card"><div class="num" id="sManual">0</div><div class="label">人工修改数</div></div>
+          <div class="summary-card ok"><div class="num" id="sResolved">0</div><div class="label">已闭环</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">⚠ 撤回记录对结论的影响链路（早会重点讲这一段）</div>
+      <div class="panel-body" id="chainBody"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">预审结论明细（按结论优先级排序）</div>
+      <div class="panel-body">
+        <div class="toolbar">
+          <input type="text" id="filterKeyword" placeholder="搜索构件/变更单号..." style="width:200px">
+          <select id="filterStatus"><option value="">全部状态</option><option value="需重判">需重判</option><option value="确认碰撞">确认碰撞</option><option value="误报排除">误报排除</option><option value="已闭环">已闭环</option></select>
+          <button class="btn btn-primary btn-sm" onclick="renderAnalysis()">应用筛选</button>
+          <button class="btn btn-sm" onclick="document.getElementById('filterKeyword').value='';document.getElementById('filterStatus').value='';renderAnalysis()">重置</button>
+          <span style="margin-left:auto;color:#888;font-size:11px;">提示：可在表格中直接修改"人工备注"和"复核结论"，修改会自动留存历史</span>
+        </div>
+        <table id="analysisTable">
+          <thead>
+            <tr>
+              <th style="width:40px;">序号</th>
+              <th style="width:80px;">碰撞编号</th>
+              <th style="width:90px;">专业A</th>
+              <th>构件A</th>
+              <th style="width:90px;">专业B</th>
+              <th>构件B</th>
+              <th style="width:80px;">碰撞类型</th>
+              <th style="width:70px;">原始结论</th>
+              <th style="width:80px;">复核结论</th>
+              <th style="width:110px;">关联变更单</th>
+              <th>影响说明 + 来源行锚定</th>
+              <th style="width:200px;">人工备注</th>
+              <th style="width:80px;">操作</th>
+            </tr>
+          </thead>
+          <tbody id="analysisTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- 材料导入页 -->
+  <section id="tab-import" class="hidden">
+    <div class="section-hint">
+      导入逻辑：以「变更单号 + 构件编码 + 版本号」作为去重键。重复导入时：已存在的记录不新增；"人工备注"字段不会被覆盖（保留人工输入）。可多次点击"加载试跑样例"验证去重。
+    </div>
+    <div class="panel">
+      <div class="panel-title">导入方式</div>
+      <div class="panel-body">
+        <div style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;">
+          <div style="flex:1;min-width:300px;">
+            <button class="btn btn-primary" onclick="loadSampleData()" style="margin-right:8px;">📦 加载试跑样例（模拟现场收到的材料）</button>
+            <button class="btn" onclick="testReimport()">🔁 再导入一次（验证去重 + 备注保留）</button>
+            <button class="btn" onclick="clearAllData()">🗑 清空全部数据</button>
+            <div class="footnote">试跑样例来源：结构加固工程 · 3#楼 B2层 · 批次 2026-06-08</div>
+          </div>
+          <div style="flex:1;min-width:300px;">
+            <div style="font-weight:600;margin-bottom:6px;">导入状态</div>
+            <div id="importStatus" style="background:#f5f5f0;border:1px solid #ddd;padding:10px;font-size:12px;min-height:80px;">
+              尚未导入任何材料。点击左侧"加载试跑样例"开始。
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">导入日志（去重判定记录）</div>
+      <div class="panel-body">
+        <table>
+          <thead><tr><th style="width:40px;">#</th><th style="width:140px;">时间</th><th>操作</th><th style="width:80px;">新增</th><th style="width:80px;">跳过(重复)</th><th style="width:100px;">备注保留</th></tr></thead>
+          <tbody id="importLogTbody"><tr><td colspan="6" class="empty-state">暂无导入记录</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- 材料送审表 -->
+  <section id="tab-submission" class="hidden">
+    <div class="section-hint">
+      原始材料按现场收到的样子呈现。第3行（SUB-003）为撤回记录，保留原始痕迹，不做"洗干净"处理。每一行都可追溯到碰撞清单的影响项。
+    </div>
+    <div class="panel">
+      <div class="panel-title">材料送审表（结构加固 · 变更单）</div>
+      <div class="panel-body">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:36px;">行号</th>
+              <th style="width:90px;">送审编号</th>
+              <th style="width:100px;">变更单号</th>
+              <th style="width:90px;">版本</th>
+              <th>变更描述</th>
+              <th style="width:80px;">专业</th>
+              <th style="width:120px;">关联构件编码</th>
+              <th style="width:70px;">状态</th>
+              <th style="width:100px;">提交人</th>
+              <th style="width:120px;">提交时间</th>
+              <th>备注</th>
+            </tr>
+          </thead>
+          <tbody id="submissionTbody"></tbody>
+        </table>
+        <div class="footnote">* 红色删除线 = 施工方已撤回的变更单。虽然撤回，但已在预审结论中留下影响痕迹，需追踪。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 碰撞清单 -->
+  <section id="tab-clash" class="hidden">
+    <div class="panel">
+      <div class="panel-title">碰撞检测原始清单（算法输出）</div>
+      <div class="panel-body">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:36px;">#</th>
+              <th style="width:80px;">碰撞编号</th>
+              <th style="width:80px;">专业A</th>
+              <th>构件A</th>
+              <th style="width:80px;">专业B</th>
+              <th>构件B</th>
+              <th style="width:80px;">类型</th>
+              <th style="width:60px;">严重级</th>
+              <th style="width:140px;">检测坐标</th>
+              <th style="width:100px;">关联变更单</th>
+              <th style="width:70px;">结论</th>
+              <th style="width:60px;">来源行</th>
+            </tr>
+          </thead>
+          <tbody id="clashTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- 修改历史 -->
+  <section id="tab-history" class="hidden">
+    <div class="section-hint">
+      算法值班人可以从这里看出每一步谁人工改过什么。字段级追踪：改前值 / 改后值 / 时间戳。到周一早会前，直接翻这个列表就能对齐变更。
+    </div>
+    <div class="panel">
+      <div class="panel-title">人工修改历史追踪（按时间倒序）</div>
+      <div class="panel-body">
+        <div style="margin-bottom:8px;">
+          <select id="historyFilter" onchange="renderHistory()">
+            <option value="">全部对象</option>
+            <option value="clash">碰撞记录</option>
+            <option value="submission">送审表</option>
+          </select>
+          <button class="btn btn-sm" onclick="exportHistory()">导出JSON</button>
+        </div>
+        <div id="historyList" style="border:1px solid #ddd;max-height:500px;overflow-y:auto;"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 操作指引 -->
+  <section id="tab-help" class="hidden">
+    <div class="panel">
+      <div class="panel-title">操作指引（给算法值班人）</div>
+      <div class="panel-body" style="font-size:13px;line-height:1.9;">
+        <h3 style="margin-bottom:10px;">周一早会前流程</h3>
+        <ol style="padding-left:22px;margin-bottom:18px;">
+          <li>打开 <b>材料导入</b> 标签 → 点「📦 加载试跑样例」（现场材料就是这种格式，会自带一条撤回记录）</li>
+          <li>可选：再点一次「🔁 再导入一次」验证去重逻辑，确认记录不翻倍、人工备注不被覆盖</li>
+          <li>切到 <b>预审结论</b> 标签 → 顶部「撤回影响链路」就是早会讲稿骨架</li>
+          <li>如需人工复核结论：直接在表格里改"复核结论"或填"人工备注"，修改会自动进历史</li>
+          <li>切到 <b>修改历史</b> 标签 → 能看到每一步人工修改的字段级记录</li>
+        </ol>
+        <h3 style="margin-bottom:10px;">关键设计</h3>
+        <ul style="padding-left:22px;margin-bottom:18px;">
+          <li><b>撤回记录为何影响结论？</b>：一条变更单撤回 → 依赖它的加固方案假设失效 → 碰撞检测空间关系重算 → 原本"已闭环"的碰撞需要"需重判"。影响链路在结论页最上方可视化展示。</li>
+          <li><b>去重键</b>：<code>变更单号 + 构件编码 + 版本号</code>，三要素相同视为重复。人工备注字段永不被导入覆盖。</li>
+          <li><b>来源行锚定</b>：每条碰撞记录都标注「送审表行号」，不再靠人眼扫变更单原文。</li>
+          <li><b>影响范围</b>：撤回记录直接列出「受影响碰撞编号清单」，不用人工翻模型。</li>
+        </ul>
+        <h3 style="margin-bottom:10px;">数据位置</h3>
+        <ul style="padding-left:22px;">
+          <li>所有数据在浏览器 <code>localStorage</code> 中，键名：<code>clashPreReview_v1</code></li>
+          <li>导入样例是结构化 JSON，实际对接时替换 <code>getSampleSubmissionData()</code> 即可</li>
+          <li>修改历史单独存储，清空数据不会删除历史（防止误操作）</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+/* ============================================================
+ *  结构加固碰撞预审 — 核心逻辑
+ *  模块划分：
+ *    1. Store        : 本地存储 + 状态管理
+ *    2. DataModel    : 数据模型定义 + 样例数据
+ *    3. Engine       : 碰撞预审算法 + 撤回影响分析
+ *    4. Dedup        : 导入去重 + 备注保护
+ *    5. History      : 人工修改追踪
+ *    6. UI           : 各标签页渲染
+ * ============================================================ */
+
+/* ---------- 1. Store ---------- */
+const Store = (() => {
+  const KEY = 'clashPreReview_v1';
+  const HIST_KEY = 'clashPreReview_history_v1';
+  const LOG_KEY = 'clashPreReview_importLog_v1';
+  let state = load();
+  let history = loadHistory();
+  let importLog = loadImportLog();
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (raw) return JSON.parse(raw);
+    } catch(e) {}
+    return { submissions: [], clashes: [], analysis: [], lastRun: null };
+  }
+  function loadHistory() {
+    try {
+      const raw = localStorage.getItem(HIST_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch(e) {}
+    return [];
+  }
+  function loadImportLog() {
+    try {
+      const raw = localStorage.getItem(LOG_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch(e) {}
+    return [];
+  }
+  function save() {
+    localStorage.setItem(KEY, JSON.stringify(state));
+  }
+  function saveHistory() {
+    localStorage.setItem(HIST_KEY, JSON.stringify(history));
+  }
+  function saveImportLog() {
+    localStorage.setItem(LOG_KEY, JSON.stringify(importLog));
+  }
+  return {
+    get: () => state,
+    set: (s) => { state = s; save(); },
+    getHistory: () => history,
+    addHistory: (h) => { history.unshift(h); saveHistory(); },
+    getImportLog: () => importLog,
+    addImportLog: (l) => { importLog.unshift(l); saveImportLog(); },
+    clear: () => {
+      state = { submissions: [], clashes: [], analysis: [], lastRun: null };
+      save();
+    },
+    clearHistory: () => { history = []; saveHistory(); },
+    clearAll: () => {
+      Store.clear();
+      history = []; saveHistory();
+      importLog = []; saveImportLog();
+    }
+  };
+})();
+
+/* ---------- 2. DataModel ---------- */
+const DataModel = {
+  /* 样例送审表：按现场实际收到的样子，包含一条撤回记录 SUB-003 */
+  getSampleSubmissionData() {
+    return [
+      { subNo:'SUB-001', changeNo:'JG-B2-2026-012', version:'V1.0',
+        desc:'3#楼B2层1-3轴柱碳纤维加固，截面增加25mm',
+        discipline:'结构', memberCode:'COL-B2-001-A,COL-B2-001-B,COL-B2-001-C',
+        status:'正常', submitter:'张工·结构', submitTime:'2026-06-07 14:22',
+        remark:'原设计承载力不足，按变更单2026-012执行' },
+      { subNo:'SUB-002', changeNo:'JD-B2-2026-007', version:'V1.2',
+        desc:'B2层人防通道机电综合吊架调整，标高+100mm',
+        discipline:'机电', memberCode:'MEP-HVAC-032,MEP-FP-051,MEP-EL-019',
+        status:'正常', submitter:'李工·机电', submitTime:'2026-06-07 16:45',
+        remark:'与结构加固配合调整，避免梁下空间冲突' },
+      { subNo:'SUB-003', changeNo:'JG-B2-2026-015', version:'V1.0',
+        desc:'B2层4-6轴梁粘钢加固方案（外包钢板20mm）',
+        discipline:'结构', memberCode:'BM-B2-004,BM-B2-005,BM-B2-006',
+        status:'撤回', submitter:'王工·结构', submitTime:'2026-06-08 09:10',
+        remark:'【施工方撤回】方案改为碳纤维加固，新单2026-018待补' },
+      { subNo:'SUB-004', changeNo:'SZ-B2-2026-003', version:'V1.1',
+        desc:'B2层人防门门框埋件定位修正，偏移-30mm',
+        discipline:'建筑', memberCode:'DW-B2-002-FRM',
+        status:'正常', submitter:'赵工·建筑', submitTime:'2026-06-08 10:30',
+        remark:'原定位与梁加固冲突，已与结构专业协调' },
+      { subNo:'SUB-005', changeNo:'JD-B2-2026-009', version:'V1.0',
+        desc:'喷淋主管绕行加固柱，增加2个90°弯头',
+        discipline:'给排水', memberCode:'PL-FS-077,PL-FS-078',
+        status:'正常', submitter:'钱工·水', submitTime:'2026-06-08 11:55',
+        remark:'因COL-B2-001-C加固截面变化，原管线无法直穿' },
+      { subNo:'SUB-006', changeNo:'JG-B2-2026-018', version:'V1.0',
+        desc:'B2层4-6轴梁碳纤维加固方案（替代撤回的2026-015）',
+        discipline:'结构', memberCode:'BM-B2-004,BM-B2-005,BM-B2-006',
+        status:'正常', submitter:'王工·结构', submitTime:'2026-06-08 15:40',
+        remark:'补SUB-003撤回后的新方案，厚度从20mm钢板改5mm碳纤维' }
+    ];
+  },
+
+  /* 根据送审表生成碰撞检测结果（模拟算法输出） */
+  generateClashes(submissions) {
+    const clashList = [];
+    const subMap = {};
+    submissions.forEach((s, idx) => { s._rowNum = idx + 1; subMap[s.changeNo] = s; });
+
+    /* 模拟碰撞：加固柱 vs 机电吊架 */
+    clashList.push({
+      clashNo: 'C-2026-0608-001',
+      discA: '结构', memberA: 'COL-B2-001-A 加固柱（碳纤维+25mm）',
+      discB: '机电', memberB: 'MEP-HVAC-032 风管吊架膨胀螺栓位',
+      type: '硬碰撞', severity: '严重',
+      coord: 'X:12350 Y:8820 Z:-4250',
+      changeNos: ['JG-B2-2026-012', 'JD-B2-2026-007'],
+      origConclusion: '确认碰撞',
+      reviewConclusion: '',
+      sourceRows: [subMap['JG-B2-2026-012']?._rowNum, subMap['JD-B2-2026-007']?._rowNum],
+      remark: ''
+    });
+
+    /* 模拟碰撞：加固梁（撤回那条的）vs 人防门框 */
+    clashList.push({
+      clashNo: 'C-2026-0608-002',
+      discA: '结构', memberA: 'BM-B2-004 加固梁（原20mm外包钢板方案）',
+      discB: '建筑', memberB: 'DW-B2-002-FRM 人防门门框埋件',
+      type: '净空不足', severity: '严重',
+      coord: 'X:15400 Y:7200 Z:-4180',
+      changeNos: ['JG-B2-2026-015', 'SZ-B2-2026-003'],
+      origConclusion: '已闭环',
+      reviewConclusion: '',
+      sourceRows: [subMap['JG-B2-2026-015']?._rowNum, subMap['SZ-B2-2026-003']?._rowNum],
+      remark: '原判定：门框已偏移-30mm避让梁加固钢板'
+    });
+
+    /* 模拟碰撞：喷淋管绕行 vs 加固柱 */
+    clashList.push({
+      clashNo: 'C-2026-0608-003',
+      discA: '结构', memberA: 'COL-B2-001-C 加固柱',
+      discB: '给排水', memberB: 'PL-FS-077 喷淋主管（绕行弯头处）',
+      type: '间隙不足', severity: '中等',
+      coord: 'X:12880 Y:9350 Z:-4200',
+      changeNos: ['JG-B2-2026-012', 'JD-B2-2026-009'],
+      origConclusion: '误报排除',
+      reviewConclusion: '',
+      sourceRows: [subMap['JG-B2-2026-012']?._rowNum, subMap['JD-B2-2026-009']?._rowNum],
+      remark: '弯头外侧净距48mm，满足规范≥30mm要求'
+    });
+
+    /* 模拟碰撞：新碳纤维梁方案 vs 机电管线 */
+    clashList.push({
+      clashNo: 'C-2026-0608-004',
+      discA: '结构', memberA: 'BM-B2-005 加固梁（碳纤维5mm方案，替代SUB-003）',
+      discB: '机电', memberB: 'MEP-FP-051 消防配管',
+      type: '硬碰撞', severity: '中等',
+      coord: 'X:15750 Y:7320 Z:-4210',
+      changeNos: ['JG-B2-2026-018', 'JD-B2-2026-007'],
+      origConclusion: '确认碰撞',
+      reviewConclusion: '',
+      sourceRows: [subMap['JG-B2-2026-018']?._rowNum, subMap['JD-B2-2026-007']?._rowNum],
+      remark: '碳纤维厚度5mm，梁底标高变化与SUB-003不同，需重新评估'
+    });
+
+    /* 模拟碰撞：梁加固方案变更后BIM未同步导致的隐藏碰撞 */
+    clashList.push({
+      clashNo: 'C-2026-0608-005',
+      discA: '结构', memberA: 'BM-B2-006 加固梁（原方案钢板20mm仍在模型中）',
+      discB: '建筑', memberB: 'DW-B2-002-FRM 人防门门扇开启轨迹',
+      type: '轨迹冲突', severity: '严重',
+      coord: 'X:16050 Y:7100 Z:-4000~-4200',
+      changeNos: ['JG-B2-2026-015', 'SZ-B2-2026-003'],
+      origConclusion: '需重判',
+      reviewConclusion: '',
+      sourceRows: [subMap['JG-B2-2026-015']?._rowNum, subMap['SZ-B2-2026-003']?._rowNum],
+      remark: 'SUB-003撤回但BIM模型未同步更新，仍按20mm钢板出图'
+    });
+
+    /* 模拟碰撞：柱加固 vs 电缆桥架 */
+    clashList.push({
+      clashNo: 'C-2026-0608-006',
+      discA: '结构', memberA: 'COL-B2-001-B 加固柱',
+      discB: '机电', memberB: 'MEP-EL-019 电缆桥架（400x200）',
+      type: '硬碰撞', severity: '严重',
+      coord: 'X:12600 Y:9000 Z:-4280',
+      changeNos: ['JG-B2-2026-012', 'JD-B2-2026-007'],
+      origConclusion: '确认碰撞',
+      reviewConclusion: '',
+      sourceRows: [subMap['JG-B2-2026-012']?._rowNum, subMap['JD-B2-2026-007']?._rowNum],
+      remark: '桥架需改路径或局部降低标高'
+    });
+
+    return clashList;
+  }
+};
+
+/* ---------- 3. Engine ---------- */
+const Engine = {
+  /* 分析撤回记录对结论的影响 */
+  analyzeImpact(state) {
+    const withdrawn = state.submissions.filter(s => s.status === '撤回');
+    const impactMap = {};  // changeNo -> { clashNos, reasons }
+    const clashConclusionOverride = {}; // clashNo -> 需要强制改成的状态
+
+    withdrawn.forEach(w => {
+      /* 找出所有引用了这条撤回变更单的碰撞 */
+      const affectedClashes = state.clashes.filter(c =>
+        c.changeNos.includes(w.changeNo)
+      );
+
+      if (affectedClashes.length > 0) {
+        impactMap[w.changeNo] = {
+          submission: w,
+          clashes: affectedClashes.map(c => c.clashNo),
+          reason: `变更单[${w.changeNo}]「${w.desc}」已被施工方撤回（${w.remark}），原加固方案假设失效。`
+        };
+
+        affectedClashes.forEach(c => {
+          /* 如果碰撞原本是"已闭环"或"误报排除"，现在要重新判定 */
+          if (c.origConclusion === '已闭环' || c.origConclusion === '误报排除') {
+            clashConclusionOverride[c.clashNo] = {
+              forcedStatus: '需重判',
+              reason: `原结论「${c.origConclusion}」基于已撤回的变更单[${w.changeNo}]，方案变更后空间关系需重新校核，BIM模型尚未同步SUB-006新方案。`
+            };
+          }
+          /* "确认碰撞"的也要标受影响，但状态不一定改，提示注意 */
+          else if (c.origConclusion === '确认碰撞') {
+            clashConclusionOverride[c.clashNo] = {
+              forcedStatus: null, /* 保留原结论，但标受影响 */
+              reason: `碰撞本身仍成立，但加固方案已撤回，新方案SUB-006的几何参数不同，需确认新方案下碰撞是否依然存在。`
+            };
+          } else {
+            clashConclusionOverride[c.clashNo] = {
+              forcedStatus: '需重判',
+              reason: `关联变更单[${w.changeNo}]已撤回，原判定依据失效。`
+            };
+          }
+        });
+      }
+    });
+
+    /* 生成分析后的结论列表 */
+    const analysis = state.clashes.map(c => {
+      const override = clashConclusionOverride[c.clashNo];
+      const impactedChangeNos = c.changeNos.filter(cn => impactMap[cn]);
+      return {
+        ...c,
+        impacted: override ? true : false,
+        impactReasons: override ? [override.reason] : [],
+        impactedChangeNos,
+        finalStatus: (override && override.forcedStatus) ? override.forcedStatus : c.reviewConclusion || c.origConclusion,
+        manualEdited: !!c.reviewConclusion || c.remark !== c._origRemark /* mark edited in UI */
+      };
+    });
+
+    return { impactMap, analysis, clashConclusionOverride };
+  },
+
+  runFullPipeline() {
+    const s = Store.get();
+    s.lastRun = new Date().toISOString();
+    const result = Engine.analyzeImpact(s);
+    s.analysis = result.analysis;
+    s._impactMap = result.impactMap;
+    s._override = result.clashConclusionOverride;
+    Store.set(s);
+    return result;
+  }
+};
+
+/* ---------- 4. Dedup ---------- */
+const Dedup = {
+  /* 生成去重键：变更单号 + 构件编码 + 版本号 (组合唯一) */
+  makeKey(sub) {
+    return `${sub.changeNo}|${sub.memberCode.split(',').sort().join(',')}|${sub.version}`;
+  },
+
+  importBatch(newSubs) {
+    const s = Store.get();
+
+    /* ---- 关键：在覆盖碰撞/送审表前，先备份所有需要保护的字段 ---- */
+    const oldClashRemarks = {};
+    const oldReviewConclusions = {};
+    (s.clashes || []).forEach(c => {
+      if (c.remark) oldClashRemarks[c.clashNo] = c.remark;
+      if (c.reviewConclusion) oldReviewConclusions[c.clashNo] = c.reviewConclusion;
+    });
+
+    const existingKeys = new Set(s.submissions.map(Dedup.makeKey));
+    /* 保存现有送审表备注用于保护 */
+    const existingRemarks = {};
+    s.submissions.forEach(sub => { existingRemarks[Dedup.makeKey(sub)] = sub.remark; });
+
+    let added = 0, skipped = 0, remarkProtected = 0;
+    const log = [];
+
+    newSubs.forEach(sub => {
+      const key = Dedup.makeKey(sub);
+      if (existingKeys.has(key)) {
+        skipped++;
+        log.push({ op:'跳过', key, reason:'重复记录（变更单号+构件+版本号完全匹配）' });
+      } else {
+        added++;
+        existingKeys.add(key);
+        s.submissions.push({ ...sub, remark: existingRemarks[key] || sub.remark });
+        log.push({ op:'新增', key, reason:'首次导入' });
+      }
+    });
+
+    /* 重新生成碰撞（仅基于送审表） */
+    s.clashes = DataModel.generateClashes(s.submissions);
+
+    /* 保护人工备注：从之前的备份中恢复 */
+    s.clashes.forEach(c => {
+      if (oldClashRemarks[c.clashNo]) { c.remark = oldClashRemarks[c.clashNo]; remarkProtected++; }
+      if (oldReviewConclusions[c.clashNo]) { c.reviewConclusion = oldReviewConclusions[c.clashNo]; }
+    });
+
+    Store.set(s);
+
+    /* 跑分析引擎 */
+    Engine.runFullPipeline();
+
+    /* 导入日志 */
+    const importLogEntry = {
+      time: new Date().toLocaleString('zh-CN'),
+      op: `导入${newSubs.length}条送审记录`,
+      added, skipped, remarkProtected, details: log
+    };
+    Store.addImportLog(importLogEntry);
+
+    return importLogEntry;
+  }
+};
+
+/* ---------- 5. History ---------- */
+const History = {
+  log(targetType, targetId, field, oldValue, newValue, operator='当前用户') {
+    if (oldValue === newValue) return;
+    Store.addHistory({
+      id: 'H-' + Date.now() + '-' + Math.random().toString(36).slice(2,6),
+      time: new Date().toLocaleString('zh-CN'),
+      targetType, targetId, field, oldValue, newValue, operator
+    });
+  },
+
+  setClashField(clashNo, field, value) {
+    const s = Store.get();
+    const clash = s.clashes.find(c => c.clashNo === clashNo);
+    if (!clash) return;
+    const old = clash[field];
+    clash[field] = value;
+    Store.set(s);
+    History.log('clash', clashNo, field, old, value);
+    Engine.runFullPipeline();
+    renderAll();
+  }
+};
+
+/* ---------- 6. UI ---------- */
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.tab === name));
+  ['analysis','import','submission','clash','history','help'].forEach(t =>
+    document.getElementById('tab-' + t).classList.toggle('hidden', t !== name));
+}
+document.querySelectorAll('.tab-btn').forEach(b =>
+  b.addEventListener('click', () => switchTab(b.dataset.tab)));
+
+function statusTag(status) {
+  const map = {
+    '确认碰撞':'tag-danger', '需重判':'tag-warn', '已闭环':'tag-ok',
+    '误报排除':'tag-info', '正常':'tag-ok', '撤回':'tag-withdraw'
+  };
+  const cls = map[status] || 'tag-info';
+  return `<span class="tag ${cls}">${status || '-'}</span>`;
+}
+function sevTag(s) {
+  const map = {'严重':'tag-danger','中等':'tag-warn','轻微':'tag-info'};
+  return `<span class="tag ${map[s]||'tag-info'}">${s}</span>`;
+}
+
+function renderHeader() {
+  const s = Store.get();
+  document.getElementById('runTime').textContent =
+    s.lastRun ? new Date(s.lastRun).toLocaleString('zh-CN') : '尚未运行';
+}
+
+function renderSummary() {
+  const s = Store.get();
+  const analysis = s.analysis || [];
+  document.getElementById('sTotal').textContent = s.submissions.length;
+  document.getElementById('sClash').textContent = analysis.length;
+  document.getElementById('sWithdraw').textContent = s.submissions.filter(x=>x.status==='撤回').length;
+  document.getElementById('sImpact').textContent = analysis.filter(a=>a.impacted).length;
+  document.getElementById('sManual').textContent = Store.getHistory().length;
+  document.getElementById('sResolved').textContent = analysis.filter(a=>a.finalStatus==='已闭环').length;
+}
+
+function renderImpactChain() {
+  const s = Store.get();
+  const impactMap = s._impactMap || {};
+  const box = document.getElementById('chainBody');
+  const keys = Object.keys(impactMap);
+  if (keys.length === 0) {
+    box.innerHTML = '<div class="footnote">暂未检测到撤回记录的影响。</div>';
+    return;
+  }
+  let html = '';
+  keys.forEach((changeNo, idx) => {
+    const info = impactMap[changeNo];
+    html += `<div class="chain-box">
+      <div class="chain-title">链路 #${idx+1}：变更单 ${changeNo} 撤回 → 结论重判</div>
+      <div class="chain-step">
+        🔴 <strong>步骤1·撤回事件：</strong>送审表第<b>${info.submission._rowNum||'?'}行</b> [${info.submission.subNo}]
+        「${info.submission.desc}」由 ${info.submission.submitter} 提交后撤回。<br>
+        <span class="source-ref">备注原文：${info.submission.remark}</span>
+      </div>
+      <div class="chain-step">
+        🟠 <strong>步骤2·影响扩散：</strong>${info.reason}<br>
+        共影响 <b>${info.clashes.length}</b> 条碰撞：${info.clashes.map(n =>
+          `<a href="javascript:void(0)" onclick="locateClash('${n}')" style="color:#8b6914;">${n}</a>`).join('、')}
+      </div>
+      <div class="chain-step">
+        🟡 <strong>步骤3·结论推翻：</strong>
+        <ul class="impact-list">
+          ${info.clashes.map(cn => {
+            const clash = (s.analysis||[]).find(a=>a.clashNo===cn);
+            if (!clash) return '';
+            const override = (s._override||{})[cn];
+            return `<li>碰撞 <b>${cn}</b>：原结论「${clash.origConclusion}」
+              ${override && override.forcedStatus ? `→ <strong style="color:#c0392b;">强制重判为「${override.forcedStatus}」</strong>` : '→ 需结合新方案复核'}
+              <div class="footnote" style="margin:2px 0 0 0;">${override?override.reason:''}</div></li>`;
+          }).join('')}
+        </ul>
+      </div>
+      <div class="chain-step" style="background:#f4fbe8;">
+        🟢 <strong>步骤4·处置建议：</strong>
+        通知结构专业确认新方案 JG-B2-2026-018 已导入模型并重新出碰撞报告；
+        人防门冲突需现场实量 + 模型双校核；
+        <b>本次早会需同步：施工方撤回未同步BIM是漏检风险点。</b>
+      </div>
+    </div>`;
+  });
+  box.innerHTML = html;
+}
+
+function locateClash(clashNo) {
+  switchTab('analysis');
+  renderAnalysis();
+  setTimeout(() => {
+    const row = document.querySelector(`tr[data-clash="${clashNo}"]`);
+    if (row) { row.scrollIntoView({ behavior:'smooth', block:'center' }); row.style.outline='3px solid #e67e22'; setTimeout(()=>row.style.outline='', 2500); }
+  }, 100);
+}
+
+function renderAnalysis() {
+  const s = Store.get();
+  let list = s.analysis ? [...s.analysis] : [];
+  const kw = document.getElementById('filterKeyword')?.value?.trim();
+  const st = document.getElementById('filterStatus')?.value;
+  if (kw) list = list.filter(c =>
+    (c.memberA+c.memberB+c.changeNos.join(',')+c.clashNo).toLowerCase().includes(kw.toLowerCase()));
+  if (st) list = list.filter(c => c.finalStatus === st);
+
+  /* 排序：需重判 > 确认碰撞 > 其他 */
+  const rank = { '需重判':0, '确认碰撞':1, '轨迹冲突':1, '硬碰撞':1, '误报排除':2, '已闭环':3 };
+  list.sort((a,b) => {
+    if (a.impacted && !b.impacted) return -1;
+    if (!a.impacted && b.impacted) return 1;
+    return (rank[a.finalStatus] ?? 5) - (rank[b.finalStatus] ?? 5);
+  });
+
+  const tbody = document.getElementById('analysisTbody');
+  const submissions = s.submissions;
+  tbody.innerHTML = list.map((c, i) => {
+    const rowClass = c.impacted ? 'impacted' : (c.reviewConclusion ? 'manual-edited' : 'normal');
+    return `<tr class="${rowClass}" data-clash="${c.clashNo}">
+      <td>${i+1}</td>
+      <td><b>${c.clashNo}</b></td>
+      <td>${c.discA}</td><td>${c.memberA}</td>
+      <td>${c.discB}</td><td>${c.memberB}</td>
+      <td>${c.type}${sevTag(c.severity)}</td>
+      <td>${statusTag(c.origConclusion)}</td>
+      <td>
+        <select onchange="History.setClashField('${c.clashNo}','reviewConclusion',this.value)" style="width:100%;font-size:11px;">
+          <option value="">(待复核)</option>
+          <option value="确认碰撞" ${c.reviewConclusion==='确认碰撞'?'selected':''}>确认碰撞</option>
+          <option value="需重判" ${c.reviewConclusion==='需重判'?'selected':''}>需重判</option>
+          <option value="误报排除" ${c.reviewConclusion==='误报排除'?'selected':''}>误报排除</option>
+          <option value="已闭环" ${c.reviewConclusion==='已闭环'?'selected':''}>已闭环</option>
+        </select>
+        ${c.impacted && c.finalStatus !== c.origConclusion ? `<div class="footnote">← 算法强制</div>` : ''}
+      </td>
+      <td>${c.changeNos.map(cn => {
+        const sub = submissions.find(s => s.changeNo === cn);
+        const isW = sub && sub.status === '撤回';
+        return `<div style="${isW?'color:#c0392b;text-decoration:line-through;':''}" title="${sub?sub.desc:''}">${cn}${isW?' ❌':''}</div>`;
+      }).join('')}</td>
+      <td style="font-size:11px;">
+        ${c.impactReasons && c.impactReasons.length ? `<div style="color:#c0392b;margin-bottom:4px;"><b>⚠ 影响：</b>${c.impactReasons[0]}</div>` : ''}
+        <div><b>送审表来源行：</b><span class="source-ref">第 ${(c.sourceRows||[]).map(r=>r+'行').join(' + ') || '-'} 行</span></div>
+        ${c.impactedChangeNos && c.impactedChangeNos.length ? `<div style="color:#e67e22;"><b>关联撤回：</b>${c.impactedChangeNos.join(',')}</div>` : ''}
+      </td>
+      <td>
+        <textarea class="remark" data-clash="${c.clashNo}" onblur="History.setClashField(this.dataset.clash,'remark',this.value)"
+          onclick="event.stopPropagation()">${c.remark || ''}</textarea>
+        ${c.reviewConclusion ? '<div class="footnote">✅ 已人工复核</div>' : ''}
+      </td>
+      <td><button class="btn btn-sm" onclick="locateClash('${c.clashNo}')">定位</button></td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="13" class="empty-state">无数据，请先到「材料导入」加载样例。</td></tr>`;
+}
+
+function renderSubmission() {
+  const s = Store.get();
+  const tbody = document.getElementById('submissionTbody');
+  tbody.innerHTML = s.submissions.map((x, i) =>
+    `<tr class="${x.status==='撤回'?'withdrawn':'normal'}">
+      <td>${i+1}</td><td>${x.subNo}</td><td>${x.changeNo}</td>
+      <td>${x.version}</td><td>${x.desc}</td><td>${x.discipline}</td>
+      <td style="font-family:monospace;font-size:11px;">${x.memberCode}</td>
+      <td>${statusTag(x.status)}</td><td>${x.submitter}</td>
+      <td>${x.submitTime}</td><td>${x.remark}</td>
+    </tr>`
+  ).join('') || `<tr><td colspan="11" class="empty-state">暂无送审记录</td></tr>`;
+}
+
+function renderClash() {
+  const s = Store.get();
+  const tbody = document.getElementById('clashTbody');
+  const submissions = s.submissions;
+  tbody.innerHTML = (s.clashes||[]).map((c, i) => {
+    const analysis = (s.analysis||[]).find(a=>a.clashNo===c.clashNo);
+    return `<tr class="${analysis && analysis.impacted?'impacted':'normal'}">
+      <td>${i+1}</td><td><b>${c.clashNo}</b></td><td>${c.discA}</td>
+      <td>${c.memberA}</td><td>${c.discB}</td><td>${c.memberB}</td>
+      <td>${c.type}</td><td>${sevTag(c.severity)}</td><td style="font-family:monospace;font-size:11px;">${c.coord}</td>
+      <td>${c.changeNos.map(cn=>{
+        const sub = submissions.find(s=>s.changeNo===cn);
+        return (sub && sub.status==='撤回') ? `<span style="color:#c0392b;text-decoration:line-through;">${cn}</span>` : cn;
+      }).join('<br>')}</td>
+      <td>${statusTag(analysis?analysis.finalStatus:c.origConclusion)}</td>
+      <td><span class="source-ref">${(c.sourceRows||[]).map(r=>r+'行').join('+')||'-'}</span></td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="12" class="empty-state">暂无碰撞记录</td></tr>`;
+}
+
+function renderHistory() {
+  const filter = document.getElementById('historyFilter')?.value || '';
+  const list = Store.getHistory().filter(h => !filter || h.targetType === filter);
+  const box = document.getElementById('historyList');
+  const fieldLabels = { reviewConclusion:'复核结论', remark:'人工备注', status:'状态', desc:'描述' };
+  box.innerHTML = list.length ? list.map(h => {
+    const typeLabel = h.targetType === 'clash' ? '碰撞记录' : '送审表';
+    const fieldLabel = fieldLabels[h.field] || h.field;
+    return `<div class="history-entry">
+      <div>
+        <span class="tag tag-info">${typeLabel}</span>
+        <b>${h.targetId}</b>
+        修改字段：<span class="history-field">${fieldLabel}</span>
+        <span class="history-time" style="float:right;">${h.time} · ${h.operator}</span>
+      </div>
+      <div style="margin-top:3px;color:#555;">
+        <span style="color:#c0392b;">「${h.oldValue || '(空)'}」</span>
+        →
+        <span style="color:#27ae60;">「${h.newValue || '(空)'}」</span>
+      </div>
+    </div>`;
+  }).join('') : `<div class="empty-state">暂无修改记录。到预审结论页修改复核结论或填写备注，会自动出现在这里。</div>`;
+}
+
+function renderImportLog() {
+  const tbody = document.getElementById('importLogTbody');
+  const log = Store.getImportLog();
+  tbody.innerHTML = log.length ? log.map((l,i) =>
+    `<tr>
+      <td>${i+1}</td><td>${l.time}</td><td>${l.op}</td>
+      <td style="color:#27ae60;font-weight:600;">+${l.added}</td>
+      <td style="color:#999;">${l.skipped}</td>
+      <td style="color:#8b6914;">${l.remarkProtected} 条</td>
+    </tr>`
+  ).join('') : `<tr><td colspan="6" class="empty-state">暂无导入记录</td></tr>`;
+}
+
+function updateImportStatus(html) {
+  document.getElementById('importStatus').innerHTML = html;
+}
+
+/* --- 公共操作 --- */
+function loadSampleData() {
+  const sample = DataModel.getSampleSubmissionData();
+  const result = Dedup.importBatch(sample);
+
+  updateImportStatus(
+    `<div style="margin-bottom:8px;"><b style="color:#27ae60;">✓ 导入完成</b> · ${result.time}</div>
+     <div>新增：<b style="color:#27ae60;">${result.added}</b> 条，
+     跳过重复：<b>${result.skipped}</b> 条，
+     备注保护：<b style="color:#8b6914;">${result.remarkProtected}</b> 条</div>
+     <div style="margin-top:6px;color:#555;">包含 <b style="color:#c0392b;">1条撤回记录</b>（SUB-003 / JG-B2-2026-015），
+     请切到"预审结论"查看影响链路。</div>
+     <div style="margin-top:6px;color:#666;font-size:11px;">
+       明细：<ul style="margin:4px 0 0 18px;">
+         ${result.details.map(d=>`<li>[${d.op}] ${d.key.slice(0,35)}… · ${d.reason}</li>`).join('')}
+       </ul>
+     </div>`
+  );
+
+  renderAll();
+}
+
+function testReimport() {
+  if (Store.get().submissions.length === 0) {
+    updateImportStatus('<div style="color:#c0392b;">请先加载样例，再点"再导入一次"验证去重。</div>');
+    return;
+  }
+  /* 模拟：用户先在一条碰撞上写了备注 + 复核结论 */
+  const s = Store.get();
+  if (s.clashes.length > 0) {
+    s.clashes[0].remark = '【测试保护】此备注是导入前人工写的，不应被再导入覆盖。时间戳 ' + Date.now();
+    s.clashes[0].reviewConclusion = '已闭环';
+    Store.set(s);
+  }
+
+  const sample = DataModel.getSampleSubmissionData();
+  const result = Dedup.importBatch(sample);
+
+  const s2 = Store.get();
+  const protectedRemark = s2.clashes[0]?.remark || '';
+  const protectedConclusion = s2.clashes[0]?.reviewConclusion || '';
+  const remarkOk = protectedRemark.includes('测试保护');
+  const conclOk = protectedConclusion === '已闭环';
+
+  updateImportStatus(
+    `<div style="margin-bottom:8px;"><b style="color:${remarkOk&&conclOk?'#27ae60':'#c0392b'};">
+      ${remarkOk&&conclOk?'✓ 去重验证通过':'✗ 部分失败'}</b> · ${result.time}</div>
+     <div>新增：<b>${result.added}</b>（应当为0），
+     跳过重复：<b>${result.skipped}</b>（应当=${sample.length}），
+     备注保护：<b>${result.remarkProtected}</b> 条</div>
+     <div style="margin-top:8px;padding:6px 8px;background:${remarkOk?'#eef8ee':'#fdecea'};">
+       <b>人工备注保护：</b>${remarkOk?'✅ 备注未被覆盖':'❌ 备注丢失'}<br>
+       <span style="font-size:11px;color:#666;">${protectedRemark.slice(0,80)}…</span>
+     </div>
+     <div style="margin-top:4px;padding:6px 8px;background:${conclOk?'#eef8ee':'#fdecea'};">
+       <b>复核结论保护：</b>${conclOk?'✅ 结论未被覆盖（当前：'+conclOk+'）':'❌ 结论丢失'}
+     </div>`
+  );
+
+  renderAll();
+}
+
+function clearAllData() {
+  if (!confirm('确认清空全部数据？（修改历史也会被清）')) return;
+  Store.clearAll();
+  updateImportStatus('<div style="color:#999;">已清空，点击"加载试跑样例"重新开始。</div>');
+  renderAll();
+}
+
+function exportHistory() {
+  const json = JSON.stringify(Store.getHistory(), null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `修改历史_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function renderAll() {
+  renderHeader();
+  renderSummary();
+  renderImpactChain();
+  renderAnalysis();
+  renderSubmission();
+  renderClash();
+  renderHistory();
+  renderImportLog();
+}
+
+/* 启动：如果本地已有数据直接渲染，否则提示去导入 */
+(function init() {
+  if (Store.get().submissions.length > 0) {
+    Engine.runFullPipeline();
+    renderAll();
+  } else {
+    renderAll();
+    document.getElementById('importStatus').innerHTML =
+      '<div style="color:#8b6914;">👆 请点击"加载试跑样例"开始。样例中已包含一条撤回记录(SUB-003)。</div>';
+  }
+})();
+</script>
+</body>
+</html>
