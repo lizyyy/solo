@@ -1,0 +1,19 @@
+{
+  "name": "stray-animal-review",
+  "version": "1.0.0",
+  "description": "流浪动物救助记录复核交班小工具",
+  "main": "server.js",
+  "scripts": {
+    "init": "node scripts/init-db.js",
+    "seed": "node scripts/seed-sample.js",
+    "start": "node server.js",
+    "check": "node scripts/check-dirty.js",
+    "export": "node scripts/export-csv.js",
+    "rerun": "node scripts/rerun-batch.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "csv-writer": "^1.6.0"
+  }
+}

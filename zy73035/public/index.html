@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>流浪动物救助记录复核 - 交班台</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f7fa; color: #333; }
+.header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px 32px; display: flex; justify-content: space-between; align-items: center; }
+.header h1 { font-size: 22px; display: flex; align-items: center; gap: 10px; }
+.header .sub { font-size: 13px; opacity: 0.9; margin-top: 4px; }
+.header .user { background: rgba(255,255,255,0.2); padding: 6px 14px; border-radius: 20px; font-size: 13px; }
+
+.container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+
+.tabs { display: flex; gap: 4px; background: #e8ecf1; padding: 4px; border-radius: 10px; margin-bottom: 20px; }
+.tab { flex: 1; padding: 12px 16px; text-align: center; border-radius: 8px; cursor: pointer; font-weight: 500; color: #666; transition: all 0.2s; }
+.tab.active { background: white; color: #667eea; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.tab:hover:not(.active) { background: rgba(255,255,255,0.5); }
+
+.panel { display: none; }
+.panel.active { display: block; }
+
+.card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+.card-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
+.card-title .badge { font-size: 12px; font-weight: normal; background: #eef1ff; color: #667eea; padding: 3px 10px; border-radius: 12px; }
+
+.btn { padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; transition: all 0.2s; font-weight: 500; }
+.btn-primary { background: #667eea; color: white; }
+.btn-primary:hover { background: #5a6fd6; }
+.btn-success { background: #48bb78; color: white; }
+.btn-success:hover { background: #3da068; }
+.btn-warning { background: #ed8936; color: white; }
+.btn-warning:hover { background: #d4782e; }
+.btn-danger { background: #f56565; color: white; }
+.btn-outline { background: white; border: 1px solid #e2e8f0; color: #4a5568; }
+.btn-outline:hover { border-color: #667eea; color: #667eea; }
+.btn-sm { padding: 5px 12px; font-size: 12px; }
+
+.batch-list { display: grid; gap: 12px; }
+.batch-item { background: #fafbfc; border: 1px solid #e8ecf1; border-radius: 10px; padding: 16px; cursor: pointer; transition: all 0.2s; }
+.batch-item:hover { border-color: #667eea; box-shadow: 0 4px 12px rgba(102,126,234,0.15); }
+.batch-item.selected { border-color: #667eea; background: #f5f7ff; }
+.batch-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+.batch-name { font-size: 15px; font-weight: 600; color: #2d3748; }
+.batch-run { background: #667eea; color: white; padding: 2px 10px; border-radius: 10px; font-size: 11px; margin-left: 8px; }
+.batch-meta { color: #718096; font-size: 12px; margin-bottom: 10px; }
+.batch-stats { display: flex; gap: 16px; }
+.stat { font-size: 13px; color: #4a5568; }
+.stat strong { color: #2d3748; margin-right: 4px; }
+.stat.danger strong { color: #f56565; }
+
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+.modal { background: white; border-radius: 14px; width: 600px; max-height: 85vh; overflow: auto; }
+.modal-head { padding: 18px 24px; border-bottom: 1px solid #edf2f7; display: flex; justify-content: space-between; align-items: center; }
+.modal-head h3 { font-size: 17px; }
+.modal-body { padding: 24px; }
+.modal-foot { padding: 14px 24px; border-top: 1px solid #edf2f7; display: flex; justify-content: flex-end; gap: 10px; }
+.close-btn { background: none; border: none; font-size: 22px; cursor: pointer; color: #a0aec0; }
+
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-size: 13px; font-weight: 500; color: #4a5568; margin-bottom: 6px; }
+.form-group label .required { color: #f56565; }
+.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 9px 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; font-family: inherit; transition: border-color 0.2s; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #667eea; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-hint { font-size: 11px; color: #a0aec0; margin-top: 4px; }
+
+.record-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+.toolbar-left { display: flex; gap: 8px; align-items: center; }
+.toolbar-right { display: flex; gap: 8px; }
+.search-input { padding: 8px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; width: 220px; }
+
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #edf2f7; }
+th { background: #f7fafc; font-weight: 600; color: #4a5568; font-size: 12px; white-space: nowrap; }
+tr:hover td { background: #fafbfc; }
+.status-tag { padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 500; white-space: nowrap; }
+.status-待复核 { background: #fffaf0; color: #c05621; }
+.status-复核中 { background: #ebf8ff; color: #2b6cb0; }
+.status-已确认 { background: #f0fff4; color: #276749; }
+.status-有疑问 { background: #fff5f5; color: #c53030; }
+.override-tag { background: #fef3c7; color: #92400e; padding: 2px 8px; border-radius: 8px; font-size: 10px; }
+.dirty-tag { background: #fed7d7; color: #c53030; padding: 2px 8px; border-radius: 8px; font-size: 10px; }
+.action-links { display: flex; gap: 10px; }
+.link-btn { background: none; border: none; color: #667eea; cursor: pointer; font-size: 12px; }
+.link-btn:hover { text-decoration: underline; }
+.link-btn.danger { color: #f56565; }
+
+.dirty-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+.dirty-card { padding: 14px; border-radius: 10px; text-align: center; }
+.dirty-card.total { background: linear-gradient(135deg, #a8edea, #fed6e3); }
+.dirty-card.error { background: #fff5f5; border: 1px solid #feb2b2; }
+.dirty-card.warn { background: #fffaf0; border: 1px solid #fbd38d; }
+.dirty-card.info { background: #ebf8ff; border: 1px solid #90cdf4; }
+.dirty-num { font-size: 26px; font-weight: 700; margin-bottom: 2px; }
+.dirty-label { font-size: 12px; color: #666; }
+.dirty-card.error .dirty-num { color: #c53030; }
+.dirty-card.warn .dirty-num { color: #c05621; }
+.dirty-card.info .dirty-num { color: #2b6cb0; }
+
+.dirty-group { margin-bottom: 16px; border: 1px solid #edf2f7; border-radius: 10px; overflow: hidden; }
+.dirty-group-head { padding: 12px 16px; background: #f7fafc; font-weight: 600; font-size: 13px; display: flex; justify-content: space-between; align-items: center; }
+.dirty-group-list { padding: 4px 0; }
+.dirty-item { padding: 10px 16px; border-bottom: 1px solid #f7fafc; font-size: 13px; display: flex; align-items: flex-start; gap: 10px; }
+.dirty-item:last-child { border-bottom: none; }
+.sev-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+.sev-dot.error { background: #f56565; }
+.sev-dot.warn { background: #ed8936; }
+.sev-dot.info { background: #4299e1; }
+
+.timeline { position: relative; padding-left: 28px; }
+.timeline::before { content: ''; position: absolute; left: 10px; top: 4px; bottom: 4px; width: 2px; background: #e2e8f0; }
+.tl-item { position: relative; padding-bottom: 18px; }
+.tl-item::before { content: ''; position: absolute; left: -22px; top: 4px; width: 12px; height: 12px; border-radius: 50%; background: #667eea; border: 2px solid white; box-shadow: 0 0 0 2px #e2e8f0; }
+.tl-item.override::before { background: #ed8936; }
+.tl-item.create::before { background: #48bb78; }
+.tl-time { font-size: 11px; color: #a0aec0; margin-bottom: 2px; }
+.tl-title { font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 4px; }
+.tl-body { font-size: 12px; color: #4a5568; line-height: 1.5; }
+.tl-body .val-old { text-decoration: line-through; color: #a0aec0; }
+.tl-body .val-new { color: #667eea; font-weight: 500; }
+.tl-user { font-size: 11px; color: #718096; margin-top: 3px; }
+
+.diff-table th { background: #f7fafc; }
+.diff-row.added td { background: #f0fff4; }
+.diff-row.changed td { background: #fffaf0; }
+.diff-val { padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+.diff-val.old { background: #fed7d7; text-decoration: line-through; }
+.diff-val.new { background: #c6f6d5; }
+
+.export-list { display: flex; flex-direction: column; gap: 8px; }
+.export-item { padding: 10px 14px; background: #f7fafc; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+.export-item .time { color: #718096; font-size: 11px; }
+
+.empty { text-align: center; padding: 40px; color: #a0aec0; font-size: 14px; }
+.empty .emoji { font-size: 40px; margin-bottom: 10px; }
+
+.tag { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 11px; }
+.tag-species { background: #e6fffa; color: #234e52; }
+.tag-gender { background: #faf5ff; color: #553c9a; }
+.field-label { font-size: 11px; color: #a0aec0; margin-bottom: 2px; }
+.field-value { font-size: 13px; color: #2d3748; }
+.info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+
+.btn-group { display: flex; gap: 6px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>🐾 流浪动物救助记录复核台</h1>
+    <div class="sub">交班专用 · 前后一致 · 每笔变更好追溯</div>
+  </div>
+  <div class="user">👩‍💼 当前：前台小温</div>
+</div>
+
+<div class="container">
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('batches')">📦 批次管理</div>
+    <div class="tab" onclick="switchTab('records')">📋 复核记录</div>
+    <div class="tab" onclick="switchTab('dirty')">⚠️ 脏数据</div>
+    <div class="tab" onclick="switchTab('history')">🕓 历史时间线</div>
+    <div class="tab" onclick="switchTab('compare')">🔍 批次对比</div>
+    <div class="tab" onclick="switchTab('export')">📤 导出文件</div>
+  </div>
+
+  <div id="panel-batches" class="panel active">
+    <div class="card">
+      <div class="card-title">
+        所有复核批次
+        <button class="btn btn-primary btn-sm" onclick="openBatchModal()">＋ 新建批次 / 补跑上一批</button>
+      </div>
+      <div id="batchList" class="batch-list"></div>
+    </div>
+  </div>
+
+  <div id="panel-records" class="panel">
+    <div class="card">
+      <div class="card-title">
+        <span>救助记录复核 <span id="curBatchBadge" class="badge">请先选批次</span></span>
+      </div>
+      <div class="record-toolbar">
+        <div class="toolbar-left">
+          <select id="batchSelect" onchange="selectBatch(this.value)" class="btn-outline" style="padding:8px 12px;">
+            <option value="">-- 选择批次 --</option>
+          </select>
+          <input type="text" id="searchInput" class="search-input" placeholder="🔍 搜索宠物名/备注..." oninput="filterRecords()">
+          <select id="statusFilter" class="btn-outline" style="padding:8px 12px;" onchange="filterRecords()">
+            <option value="">全部状态</option>
+            <option value="待复核">待复核</option>
+            <option value="复核中">复核中</option>
+            <option value="已确认">已确认</option>
+            <option value="有疑问">有疑问</option>
+          </select>
+        </div>
+        <div class="toolbar-right">
+          <button class="btn btn-outline btn-sm" onclick="checkDirty()">🔍 检测脏数据</button>
+          <button class="btn btn-warning btn-sm" onclick="openRecordModal()">＋ 加一条记录</button>
+          <button class="btn btn-success btn-sm" onclick="doExport()">📤 导出此批次</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table id="recordsTable">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>宠物名</th>
+              <th>别名</th>
+              <th>物种</th>
+              <th>救助日期</th>
+              <th>疫苗照片</th>
+              <th>初步结论</th>
+              <th>复核状态</th>
+              <th>备注</th>
+              <th>改判</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="recordsBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div id="panel-dirty" class="panel">
+    <div class="card">
+      <div class="card-title">
+        <span>脏数据检测报告 <span id="dirtyBatchBadge" class="badge">请先选批次</span></span>
+        <button class="btn btn-primary btn-sm" onclick="runDirtyCheck()">🔄 重新检测</button>
+      </div>
+      <div id="dirtySummary" class="dirty-summary"></div>
+      <div id="dirtyGroups"></div>
+    </div>
+  </div>
+
+  <div id="panel-history" class="panel">
+    <div class="card">
+      <div class="card-title">变更历史时间线</div>
+      <div style="margin-bottom:16px;">
+        <select id="historyRecordSelect" onchange="loadHistory()" class="btn-outline" style="padding:8px 12px;">
+          <option value="">-- 选择宠物查看单条记录时间线 --</option>
+        </select>
+      </div>
+      <div id="timelineBox"></div>
+    </div>
+  </div>
+
+  <div id="panel-compare" class="panel">
+    <div class="card">
+      <div class="card-title">批次对比 · 补跑前后差异</div>
+      <div style="margin-bottom:16px;">
+        <select id="compareBatchSelect" onchange="loadCompare()" class="btn-outline" style="padding:8px 12px;">
+          <option value="">-- 选择批次（选第2次及以后运行的） --</option>
+        </select>
+      </div>
+      <div id="compareResult"></div>
+    </div>
+  </div>
+
+  <div id="panel-export" class="panel">
+    <div class="card">
+      <div class="card-title">已导出的文件</div>
+      <div id="exportList" class="export-list"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+let state = { batches: [], records: [], selectedBatchId: null, dirty: null };
+
+function $(id) { return document.getElementById(id); }
+
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  event.target.classList.add('active');
+  $('panel-' + name).classList.add('active');
+  if (name === 'export') loadExports();
+}
+
+async function api(url, method='GET', body=null) {
+  const opt = { method, headers: { 'Content-Type': 'application/json' } };
+  if (body) opt.body = JSON.stringify(body);
+  const r = await fetch(url, opt);
+  return r.json();
+}
+
+async function loadBatches() {
+  state.batches = await api('/api/batches');
+  renderBatches();
+  ['batchSelect','compareBatchSelect'].forEach(id => {
+    const sel = $(id);
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">-- 选择批次 --</option>' +
+      state.batches.map(b => `<option value="${b.id}" ${cur==b.id?'selected':''}>${b.batch_name} (run${b.run_number}) · ${b.created_at.slice(5,16)}</option>`).join('');
+  });
+}
+
+function renderBatches() {
+  const el = $('batchList');
+  if (state.batches.length === 0) {
+    el.innerHTML = '<div class="empty"><div class="emoji">📦</div>还没有批次，点击右上角"新建批次"开始吧</div>';
+    return;
+  }
+  el.innerHTML = state.batches.map(b => `
+    <div class="batch-item ${state.selectedBatchId==b.id?'selected':''}" onclick="pickBatch(${b.id})">
+      <div class="batch-head">
+        <div>
+          <span class="batch-name">${b.batch_name}</span>
+          <span class="batch-run">第${b.run_number}次跑</span>
+        </div>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-sm btn-outline" onclick="event.stopPropagation();doExport(${b.id})">导出</button>
+          <button class="btn btn-sm btn-primary" onclick="event.stopPropagation();pickBatch(${b.id});switchTab('records');">进入</button>
+        </div>
+      </div>
+      <div class="batch-meta">创建时间：${b.created_at} · 创建人：${b.created_by}${b.remark?' · '+b.remark:''}</div>
+      <div class="batch-stats">
+        <div class="stat"><strong>${b.record_count}</strong>条记录</div>
+        <div class="stat"><strong>${b.confirmed_count}</strong>已确认</div>
+        <div class="stat danger"><strong>${b.dirty_count}</strong>条脏数据</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function pickBatch(id) {
+  state.selectedBatchId = id;
+  selectBatch(id);
+  renderBatches();
+}
+
+async function selectBatch(id) {
+  state.selectedBatchId = id || null;
+  if (!id) return;
+  const batch = state.batches.find(b => b.id == id);
+  $('curBatchBadge').textContent = `${batch.batch_name} · 第${batch.run_number}次跑`;
+  $('dirtyBatchBadge').textContent = `${batch.batch_name} · 第${batch.run_number}次跑`;
+  state.records = await api(`/api/batches/${id}/records`);
+  filterRecords();
+  renderDirtySelect();
+  renderHistorySelect();
+  loadDirty();
+}
+
+function renderHistorySelect() {
+  const sel = $('historyRecordSelect');
+  sel.innerHTML = '<option value="">-- 选择宠物查看单条记录时间线 --</option>' +
+    state.records.map(r => `<option value="${r.id}">${r.pet_name}${r.pet_alias?'（'+r.pet_alias+'）':''}</option>`).join('');
+}
+
+function renderDirtySelect() {}
+
+function filterRecords() {
+  const kw = $('searchInput').value.trim();
+  const st = $('statusFilter').value;
+  let rows = state.records.filter(r => {
+    if (kw && !(r.pet_name.includes(kw) || (r.pet_alias||'').includes(kw) || (r.review_remark||'').includes(kw))) return false;
+    if (st && r.review_status !== st) return false;
+    return true;
+  });
+  $('recordsBody').innerHTML = rows.map(r => `
+    <tr>
+      <td>#${r.id}</td>
+      <td><strong>${r.pet_name}</strong></td>
+      <td>${r.pet_alias||'-'}</td>
+      <td>${r.species?`<span class="tag tag-species">${r.species}</span>`:'-'}</td>
+      <td>${r.rescue_date||'-'}</td>
+      <td>${r.vaccine_photo_refs?r.vaccine_photo_refs.split(/[,，;；]/).length+'张':'<span class="dirty-tag">缺失</span>'}</td>
+      <td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;">${r.initial_conclusion||'-'}</td>
+      <td><span class="status-tag status-${r.review_status}">${r.review_status}</span></td>
+      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.review_remark||'-'}</td>
+      <td>${r.manual_overridden==1?'<span class="override-tag">人工改判</span>':'-'}</td>
+      <td>
+        <div class="action-links">
+          <button class="link-btn" onclick="openEditModal(${r.id})">编辑</button>
+          <button class="link-btn" onclick="viewHistory(${r.id})">历史</button>
+          <button class="link-btn" onclick="openOverrideModal(${r.id})">改判</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+  if (rows.length === 0) $('recordsBody').innerHTML = '<tr><td colspan="11" class="empty">暂无记录</td></tr>';
+}
+
+function openBatchModal() {
+  showModal(`
+    <div class="modal-head"><h3>📦 新建复核批次 / 补跑上一批</h3><button class="close-btn" onclick="closeModal()">×</button></div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>批次名称 <span class="required">*</span></label>
+        <input id="nb_name" placeholder="例如：2026年6月第二批、徐汇站5月救助清单">
+        <div class="form-hint">💡 如果填入<strong>已存在的批次名</strong>，系统会自动把它变成第N次补跑，数据从上次继承</div>
+      </div>
+      <div class="form-group">
+        <label>批次备注</label>
+        <textarea id="nb_remark" rows="2" placeholder="可选：说明这批材料是哪里来的，例如'社区王阿姨送的照片+志愿者聊天记录'"></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal()">取消</button>
+      <button class="btn btn-primary" onclick="createBatch()">创建 / 补跑</button>
+    </div>
+  `);
+}
+
+async function createBatch() {
+  const name = $('nb_name').value.trim();
+  const remark = $('nb_remark').value.trim();
+  if (!name) { alert('请填批次名称'); return; }
+  await api('/api/batches', 'POST', { batch_name: name, remark });
+  closeModal();
+  await loadBatches();
+  alert('批次已创建！如果是补跑，已自动继承上一批数据');
+}
+
+function openRecordModal() {
+  if (!state.selectedBatchId) { alert('请先选批次'); return; }
+  showModal(`
+    <div class="modal-head"><h3>＋ 新增救助记录</h3><button class="close-btn" onclick="closeModal()">×</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label>宠物名称 <span class="required">*</span></label><input id="nr_name" placeholder="例：小黄"></div>
+        <div class="form-group"><label>别名</label><input id="nr_alias" placeholder="例：小黄豆、豆豆"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>物种</label>
+          <select id="nr_species"><option value="">--</option><option>猫</option><option>狗</option><option>其他</option></select>
+        </div>
+        <div class="form-group"><label>性别</label>
+          <select id="nr_gender"><option value="">--</option><option>公</option><option>母</option><option>未知</option></select>
+        </div>
+      </div>
+      <div class="form-group"><label>救助日期</label><input id="nr_date" type="date"></div>
+      <div class="form-group">
+        <label>疫苗本照片引用</label>
+        <textarea id="nr_photo" rows="2" placeholder="多个用逗号分隔，例：微信聊天-20260601-小黄疫苗1, 疫苗本P3, 志愿者转发图4"></textarea>
+        <div class="form-hint">把散落在聊天里的照片编号记在这里，下次不用翻聊天</div>
+      </div>
+      <div class="form-group"><label>初步结论（基于材料）</label><textarea id="nr_conc" rows="2" placeholder="例：已完成3针基础免疫+狂犬，在有效期内"></textarea></div>
+      <div class="form-group"><label>复核备注</label><textarea id="nr_remark" rows="2" placeholder="例：疫苗照片少一张，但医院系统可查"></textarea></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal()">取消</button>
+      <button class="btn btn-primary" onclick="addRecord()">保存</button>
+    </div>
+  `);
+}
+
+async function addRecord() {
+  const body = {
+    pet_name: $('nr_name').value.trim(),
+    pet_alias: $('nr_alias').value.trim(),
+    species: $('nr_species').value,
+    gender: $('nr_gender').value,
+    rescue_date: $('nr_date').value,
+    vaccine_photo_refs: $('nr_photo').value.trim(),
+    initial_conclusion: $('nr_conc').value.trim(),
+    review_remark: $('nr_remark').value.trim()
+  };
+  if (!body.pet_name) { alert('宠物名必填'); return; }
+  await api(`/api/batches/${state.selectedBatchId}/records`, 'POST', body);
+  closeModal();
+  selectBatch(state.selectedBatchId);
+}
+
+function openEditModal(id) {
+  const r = state.records.find(x => x.id == id);
+  if (!r) return;
+  showModal(`
+    <div class="modal-head"><h3>✏️ 编辑记录 · ${r.pet_name}</h3><button class="close-btn" onclick="closeModal()">×</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label>宠物名称</label><input id="er_name" value="${r.pet_name}"></div>
+        <div class="form-group"><label>别名</label><input id="er_alias" value="${r.pet_alias||''}"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>物种</label>
+          <select id="er_species"><option value="">--</option><option ${r.species=='猫'?'selected':''}>猫</option><option ${r.species=='狗'?'selected':''}>狗</option><option>其他</option></select>
+        </div>
+        <div class="form-group"><label>性别</label>
+          <select id="er_gender"><option value="">--</option><option ${r.gender=='公'?'selected':''}>公</option><option ${r.gender=='母'?'selected':''}>母</option><option>未知</option></select>
+        </div>
+      </div>
+      <div class="form-group"><label>救助日期</label><input id="er_date" type="date" value="${r.rescue_date||''}"></div>
+      <div class="form-group"><label>疫苗照片引用</label><textarea id="er_photo" rows="2">${r.vaccine_photo_refs||''}</textarea></div>
+      <div class="form-group"><label>初步结论</label><textarea id="er_conc" rows="2">${r.initial_conclusion||''}</textarea></div>
+      <div class="form-group">
+        <label>复核状态</label>
+        <select id="er_status">
+          <option ${r.review_status=='待复核'?'selected':''}>待复核</option>
+          <option ${r.review_status=='复核中'?'selected':''}>复核中</option>
+          <option ${r.review_status=='已确认'?'selected':''}>已确认</option>
+          <option ${r.review_status=='有疑问'?'selected':''}>有疑问</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>复核备注 <span style="color:#667eea;">(改这里就会同步数据库和导出)</span></label>
+        <textarea id="er_remark" rows="3">${r.review_remark||''}</textarea>
+        <div class="form-hint">最终结论会同步写入导出CSV，接手同事不用翻聊天记录</div>
+      </div>
+      <div class="form-group">
+        <label>最终结论</label>
+        <textarea id="er_final" rows="2">${r.final_conclusion||''}</textarea>
+      </div>
+      <div class="form-group"><label>变更原因（交班写清楚）</label><input id="er_reason" placeholder="例：补了社区医院证明，免疫合格"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal()">取消</button>
+      <button class="btn btn-primary" onclick="saveEdit(${id})">保存修改</button>
+    </div>
+  `);
+}
+
+async function saveEdit(id) {
+  const body = {
+    pet_name: $('er_name').value.trim(),
+    pet_alias: $('er_alias').value.trim(),
+    species: $('er_species').value,
+    gender: $('er_gender').value,
+    rescue_date: $('er_date').value,
+    vaccine_photo_refs: $('er_photo').value.trim(),
+    initial_conclusion: $('er_conc').value.trim(),
+    review_status: $('er_status').value,
+    review_remark: $('er_remark').value.trim(),
+    final_conclusion: $('er_final').value.trim(),
+    change_reason: $('er_reason').value.trim(),
+    changed_by: '前台小温'
+  };
+  await api(`/api/records/${id}`, 'PUT', body);
+  closeModal();
+  selectBatch(state.selectedBatchId);
+  await loadBatches();
+}
+
+function openOverrideModal(id) {
+  const r = state.records.find(x => x.id == id);
+  if (!r) return;
+  showModal(`
+    <div class="modal-head"><h3>⚖️ 人工改判 · ${r.pet_name}</h3><button class="close-btn" onclick="closeModal()">×</button></div>
+    <div class="modal-body">
+      <div class="info-grid" style="margin-bottom:16px;background:#f7fafc;padding:14px;border-radius:8px;">
+        <div><div class="field-label">原初步结论</div><div class="field-value">${r.initial_conclusion||'(空)'}</div></div>
+        <div><div class="field-label">原备注</div><div class="field-value">${r.review_remark||'(空)'}</div></div>
+      </div>
+      <div class="form-group">
+        <label>是否确认人工改判？ <span class="required">*</span></label>
+        <select id="ov_flag">
+          <option value="0">否（按材料结论）</option>
+          <option value="1" ${r.manual_overridden==1?'selected':''}>是（人工改判）</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>改判后的最终结论 <span class="required">*</span></label>
+        <textarea id="ov_final" rows="2">${r.final_conclusion||''}</textarea>
+      </div>
+      <div class="form-group">
+        <label style="color:#c53030;">改判原因 / 最终说法 <span class="required">*</span></label>
+        <textarea id="ov_reason" rows="3" placeholder="例：疫苗本照片缺第2针，但通过院方系统查询到接种记录，编号A202601230017，经办人李医生确认。">${r.override_reason||''}</textarea>
+        <div class="form-hint" style="color:#c53030;">⚠️ 改判原因必须填，否则接手人不知道为什么变了，交班时也讲不清楚</div>
+      </div>
+      <div class="form-group"><label>复核状态</label>
+        <select id="ov_status">
+          <option>待复核</option><option>复核中</option>
+          <option ${r.review_status=='已确认'?'selected':''}>已确认</option><option>有疑问</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal()">取消</button>
+      <button class="btn btn-warning" onclick="saveOverride(${id})">保存改判（可追溯）</button>
+    </div>
+  `);
+}
+
+async function saveOverride(id) {
+  const flag = Number($('ov_flag').value);
+  const body = {
+    manual_overridden: flag,
+    final_conclusion: $('ov_final').value.trim(),
+    override_reason: $('ov_reason').value.trim(),
+    review_status: $('ov_status').value,
+    confirmed_by: flag ? '前台小温（人工改判）' : '前台小温',
+    change_reason: '人工改判操作',
+    changed_by: '前台小温'
+  };
+  if (flag === 1 && !body.override_reason) { alert('改判原因必须填！'); return; }
+  await api(`/api/records/${id}`, 'PUT', body);
+  closeModal();
+  selectBatch(state.selectedBatchId);
+  await loadBatches();
+  alert('改判已记录，历史时间线能看到前后变化');
+}
+
+function viewHistory(id) {
+  $('historyRecordSelect').value = id;
+  switchTab0('history');
+  loadHistory();
+}
+function switchTab0(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    const names=['batches','records','dirty','history','compare','export'];
+    if (names[i]===name) t.classList.add('active');
+  });
+  $('panel-' + name).classList.add('active');
+}
+
+async function loadHistory() {
+  const rid = $('historyRecordSelect').value;
+  const box = $('timelineBox');
+  if (!rid) {
+    if (!state.selectedBatchId) { box.innerHTML = '<div class="empty"><div class="emoji">🕓</div>请先选批次，再选宠物</div>'; return; }
+    const all = [];
+    for (const r of state.records) {
+      const hs = await api(`/api/records/${r.id}/history`);
+      hs.forEach(h => h.pet_name = r.pet_name);
+      all.push(...hs);
+    }
+    all.sort((a,b) => b.changed_at.localeCompare(a.changed_at));
+    renderTimeline(all, true);
+    return;
+  }
+  const list = await api(`/api/records/${rid}/history`);
+  renderTimeline(list, false);
+}
+
+function renderTimeline(list, showName) {
+  const box = $('timelineBox');
+  if (list.length === 0) { box.innerHTML = '<div class="empty"><div class="emoji">📝</div>还没有变更记录</div>'; return; }
+  box.innerHTML = '<div class="timeline">' + list.map(h => {
+    const cls = h.change_type.includes('改判')||h.field_name==='manual_overridden' ? 'override'
+      : (h.change_type==='创建记录'||h.change_type==='创建') ? 'create' : '';
+    const fieldMap = {
+      review_remark:'复核备注', final_conclusion:'最终结论', review_status:'复核状态',
+      manual_overridden:'人工改判标记', override_reason:'改判原因', pet_name:'宠物名称',
+      pet_alias:'别名', initial_conclusion:'初步结论', vaccine_photo_refs:'疫苗照片引用',
+      batch_carryover:'批次继承', rescue_date:'救助日期', species:'物种', gender:'性别'
+    };
+    const fname = fieldMap[h.field_name] || h.field_name;
+    let body = '';
+    if (h.old_value || h.new_value) {
+      if (h.old_value && h.new_value) {
+        body = `<span class="val-old">${h.old_value||'(空)'}</span> → <span class="val-new">${h.new_value||'(空)'}</span>`;
+      } else if (h.new_value) {
+        body = `设置为 <span class="val-new">${h.new_value}</span>`;
+      } else {
+        body = `清除：<span class="val-old">${h.old_value}</span>`;
+      }
+    }
+    return `
+      <div class="tl-item ${cls}">
+        <div class="tl-time">${h.changed_at}</div>
+        <div class="tl-title">${showName?'【'+h.pet_name+'】 ':''}${fname} · ${h.change_type}</div>
+        ${body?`<div class="tl-body">${body}</div>`:''}
+        ${h.change_reason?`<div class="tl-body" style="color:#c05621;">📌 原因：${h.change_reason}</div>`:''}
+        <div class="tl-user">操作人：${h.changed_by}</div>
+      </div>
+    `;
+  }).join('') + '</div>';
+}
+
+async function loadDirty() {
+  if (!state.selectedBatchId) return;
+  const data = await api(`/api/batches/${state.selectedBatchId}/dirty`);
+  state.dirty = data;
+  renderDirty();
+}
+
+function renderDirty() {
+  const d = state.dirty;
+  if (!d) { $('dirtySummary').innerHTML='';$('dirtyGroups').innerHTML='';return; }
+  $('dirtySummary').innerHTML = `
+    <div class="dirty-card total"><div class="dirty-num">${d.total}</div><div class="dirty-label">问题总数</div></div>
+    <div class="dirty-card error"><div class="dirty-num">${d.bySeverity['错误']||0}</div><div class="dirty-label">🔴 错误</div></div>
+    <div class="dirty-card warn"><div class="dirty-num">${d.bySeverity['警告']||0}</div><div class="dirty-label">🟡 警告</div></div>
+    <div class="dirty-card info"><div class="dirty-num">${d.bySeverity['信息']||0}</div><div class="dirty-label">🔵 信息</div></div>
+  `;
+  const groups = d.grouped;
+  const keys = Object.keys(groups);
+  if (keys.length === 0) {
+    $('dirtyGroups').innerHTML = '<div class="empty"><div class="emoji">✅</div>暂时没有脏数据，干得漂亮！</div>';
+    return;
+  }
+  $('dirtyGroups').innerHTML = keys.map(k => `
+    <div class="dirty-group">
+      <div class="dirty-group-head">
+        <span>${k} <span class="badge" style="margin-left:8px;">${groups[k].length}条</span></span>
+        <span style="font-size:11px;color:#a0aec0;">
+          ${groups[k].some(x=>x.severity==='错误')?'🔴 有错误':''}
+          ${groups[k].some(x=>x.severity==='警告')?'🟡 有警告':''}
+          ${groups[k].every(x=>x.severity==='信息')?'🔵 仅提示':''}
+        </span>
+      </div>
+      <div class="dirty-group-list">
+        ${groups[k].map(item => `
+          <div class="dirty-item">
+            <span class="sev-dot ${item.severity==='错误'?'error':item.severity==='警告'?'warn':'info'}"></span>
+            <div style="flex:1;">
+              <div style="color:#2d3748;">${item.description}</div>
+              <div style="font-size:11px;color:#a0aec0;margin-top:3px;">
+                涉及字段：${item.affected_fields||'-'} · 检测于：${item.detected_at}
+                ${item.record_id?` · <a href="javascript:void(0)" onclick="jumpEdit(${item.record_id})" style="color:#667eea;">跳转编辑此记录 #${item.record_id}</a>`:''}
+              </div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function jumpEdit(id) {
+  switchTab0('records');
+  openEditModal(id);
+}
+
+async function runDirtyCheck() {
+  if (!state.selectedBatchId) { alert('请先选批次'); return; }
+  await api(`/api/batches/${state.selectedBatchId}/check-dirty`, 'POST');
+  loadDirty();
+  await loadBatches();
+  alert('检测完成，打开"脏数据"标签页查看详情');
+  switchTab0('dirty');
+}
+
+async function checkDirty() { runDirtyCheck(); }
+
+async function loadCompare() {
+  const bid = $('compareBatchSelect').value;
+  const box = $('compareResult');
+  if (!bid) { box.innerHTML = '<div class="empty"><div class="emoji">🔍</div>选择一个补跑批次查看差异</div>'; return; }
+  const data = await api(`/api/batches/${bid}/compare`);
+  if (!data.previous) { box.innerHTML = `<div class="empty"><div class="emoji">📌</div>${data.message}</div>`; return; }
+  if (data.diffs.length === 0) {
+    box.innerHTML = `
+      <div class="card" style="background:#f0fff4;margin-bottom:14px;">
+        <strong>✅ 补跑前后没有差异</strong>，${data.current.batch_name} 第${data.previous.run_number}次 → 第${data.current.run_number}次 数据完全一致
+      </div>`;
+    return;
+  }
+  const fieldMap = {review_remark:'复核备注', final_conclusion:'最终结论', review_status:'复核状态', manual_overridden:'人工改判标记', override_reason:'改判原因'};
+  box.innerHTML = `
+    <div class="card" style="background:#fffaf0;margin-bottom:14px;">
+      <strong>📊 发现 ${data.count} 处差异</strong>，${data.current.batch_name}：
+      第${data.previous.run_number}次（${data.previous.created_at.slice(5,16)}）
+      → 第${data.current.run_number}次（${data.current.created_at.slice(5,16)}）
+    </div>
+    <div class="table-wrap">
+      <table class="diff-table">
+        <thead><tr><th>宠物</th><th>字段</th><th>上一次(run${data.previous.run_number})</th><th>本次(run${data.current.run_number})</th></tr></thead>
+        <tbody>
+          ${data.diffs.map(d => `
+            <tr class="diff-row changed">
+              <td><strong>${d.pet_name}</strong></td>
+              <td>${fieldMap[d.field]||d.field}</td>
+              <td><span class="diff-val old">${d.prev_value||'(空)'}</span></td>
+              <td><span class="diff-val new">${d.curr_value||'(空)'}</span></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+async function doExport(batchId) {
+  const bid = batchId || state.selectedBatchId;
+  if (!bid) { alert('请先选批次'); return; }
+  const r = await api(`/api/batches/${bid}/export`, 'POST');
+  alert(`导出完成！\n\n记录CSV (${r.records_count}条)：${r.records_file}\n脏数据CSV (${r.dirty_count}条)：${r.dirty_file}\n变更历史CSV (${r.history_count}条)：${r.history_file}\n\n位置：${r.export_dir}/`);
+  await loadBatches();
+}
+
+async function loadExports() {
+  const files = await api('/api/exports');
+  const el = $('exportList');
+  if (files.length === 0) { el.innerHTML = '<div class="empty"><div class="emoji">📤</div>还没有导出文件，在"复核记录"页点"导出此批次"吧</div>'; return; }
+  el.innerHTML = files.map(f => `
+    <div class="export-item">
+      <span>📄 ${f}</span>
+      <span class="time">${f.includes('-记录-')?'记录文件':f.includes('-脏数据-')?'脏数据报告':'变更历史'}</span>
+    </div>
+  `).join('');
+}
+
+function showModal(html) {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.id = 'modal';
+  overlay.innerHTML = `<div class="modal">${html}</div>`;
+  overlay.onclick = e => { if (e.target === overlay) closeModal(); };
+  document.body.appendChild(overlay);
+}
+function closeModal() { const m = $('modal'); if (m) m.remove(); }
+
+(async function init() {
+  await loadBatches();
+  if (state.batches.length > 0) {
+    pickBatch(state.batches[0].id);
+  }
+})();
+</script>
+</body>
+</html>
