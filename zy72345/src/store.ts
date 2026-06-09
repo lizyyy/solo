@@ -7,6 +7,14 @@ export interface SamplingList {
   recordCount: number
   importTime: string
   status: 'active' | 'archived'
+  lastBatchId?: string
+  lastImportTime?: string
+  lastBatchTime?: string
+  hasDuplicateImport?: boolean
+  importCount?: number
+  duplicateImportCount?: number
+  importHistory?: Array<{ time: string; operator?: string; batchId?: string }>
+  batches?: any[]
 }
 
 export interface SamplingRecord {
@@ -18,6 +26,9 @@ export interface SamplingRecord {
   isBoundary: boolean
   boundaryStatus: 'pending' | 'confirmed' | 'ignored'
   remark: string
+  batchId?: string
+  traceableId?: string
+  remarkHistory?: Array<{ time: string; operator: string; operatorRole: string; oldValue: string; newValue: string }>
 }
 
 export interface ParamEntry {
@@ -52,6 +63,15 @@ export interface CostAllocationResult {
   listName?: string
   listId?: string
   boundaryStatus?: string
+  traceableId?: string
+  batchId?: string
+  correctedValue?: number
+  processReason?: string
+  confirmedBy?: string
+  sourceParamKey?: string
+  sourceParamValue?: number
+  unitCost?: number
+  allocationRatio?: number
 }
 
 export interface CalculationSummary {
@@ -61,6 +81,8 @@ export interface CalculationSummary {
   pendingCount: number
   confirmedCount: number
   ignoredCount: number
+  batchCount: number
+  needReviewCount: number
 }
 
 export interface BoundarySample {
@@ -77,7 +99,14 @@ export interface BoundarySample {
   oldTableStatus?: string
   remark?: string
   listName?: string
+  listId?: string
   reviewComments: ReviewComment[]
+  correctedValue?: number
+  processReason?: string
+  decisionDetail?: string
+  reviewCommentsCount?: number
+  batchId?: string
+  traceableId?: string
 }
 
 export interface ReviewComment {
@@ -101,11 +130,22 @@ export interface ChangeLogEntry {
   operatorRole: string
   timestamp: string
   canRollback: boolean
+  humanReadable?: string
+  affectedEntities?: Array<{ table: string; id: string }>
+  rollbackPreview?: Array<{ field: string; willBecome: string; currentValue: string }>
 }
 
 export type UserRole = '教研负责人' | '学生助教' | '数据录入员'
 
+export interface RollbackResult {
+  rollbackDetails?: {
+    tables: string[]
+    fields: Array<{ table: string; field: string; from: string; to: string }>
+  }
+}
+
 function mapList(raw: any): SamplingList {
+  const dupCount = raw.duplicateImportCount ?? raw.import_count ?? raw.importCount ?? raw.importCount
   return {
     id: raw.id,
     name: raw.name,
@@ -113,6 +153,14 @@ function mapList(raw: any): SamplingList {
     recordCount: raw.record_count ?? raw.recordCount ?? 0,
     importTime: raw.import_time ?? raw.importTime ?? '',
     status: raw.status,
+    lastBatchId: raw.lastBatchId ?? raw.last_batch_id,
+    lastImportTime: raw.lastImportTime ?? raw.last_import_time,
+    lastBatchTime: raw.lastBatchTime ?? raw.last_import_time ?? raw.lastImportTime ?? raw.import_time ?? raw.importTime,
+    hasDuplicateImport: !!raw.hasDuplicateImport,
+    importCount: raw.importCount ?? raw.import_count,
+    duplicateImportCount: dupCount,
+    importHistory: raw.importHistory,
+    batches: raw.batches,
   }
 }
 
@@ -126,6 +174,15 @@ function mapRecord(raw: any): SamplingRecord {
     isBoundary: !!(raw.is_boundary ?? raw.isBoundary),
     boundaryStatus: raw.boundary_status ?? raw.boundaryStatus ?? 'pending',
     remark: raw.remark ?? '',
+    batchId: raw.batch_id ?? raw.batchId,
+    traceableId: raw.traceable_id ?? raw.traceableId ?? raw.id,
+    remarkHistory: (raw.remarkHistory ?? raw.remark_history ?? []).map((h: any) => ({
+      time: h.time ?? h.changed_at ?? h.changedAt ?? '',
+      operator: h.operator ?? h.changed_by ?? h.changedBy ?? '',
+      operatorRole: h.operatorRole ?? h.operator_role ?? '',
+      oldValue: h.oldValue ?? h.old_remark ?? h.oldRemark ?? '',
+      newValue: h.newValue ?? h.new_remark ?? h.newRemark ?? '',
+    })),
   }
 }
 
@@ -166,6 +223,15 @@ function mapCalcResult(raw: any): CostAllocationResult {
     listName: raw.list_name ?? raw.listName,
     listId: raw.list_id ?? raw.listId,
     boundaryStatus: raw.boundary_status ?? raw.boundaryStatus,
+    traceableId: raw.traceable_id ?? raw.traceableId ?? raw.record_id ?? raw.recordId,
+    batchId: raw.batch_id ?? raw.batchId,
+    correctedValue: raw.corrected_value ?? raw.correctedValue,
+    processReason: raw.process_reason ?? raw.processReason,
+    confirmedBy: raw.confirmed_by ?? raw.confirmedBy,
+    sourceParamKey: raw.source_param_key ?? raw.sourceParamKey,
+    sourceParamValue: raw.source_param_value ?? raw.sourceParamValue,
+    unitCost: raw.unitCost ?? raw.unit_cost,
+    allocationRatio: raw.allocationRatio ?? raw.allocation_ratio,
   }
 }
 
@@ -184,7 +250,14 @@ function mapBoundarySample(raw: any): BoundarySample {
     oldTableStatus: raw.old_table_status ?? raw.oldTableStatus,
     remark: raw.remark,
     listName: raw.list_name ?? raw.listName,
+    listId: raw.listId ?? raw.list_id,
     reviewComments: [],
+    correctedValue: raw.corrected_value ?? raw.correctedValue,
+    processReason: raw.process_reason ?? raw.processReason,
+    decisionDetail: raw.decision_detail ?? raw.decisionDetail,
+    reviewCommentsCount: raw.review_comments_count ?? raw.reviewCommentsCount,
+    batchId: raw.batch_id ?? raw.batchId,
+    traceableId: raw.traceable_id ?? raw.traceableId ?? raw.record_id ?? raw.recordId,
   }
 }
 
@@ -201,6 +274,9 @@ function mapChangeLog(raw: any): ChangeLogEntry {
     operatorRole: raw.operator_role ?? raw.operatorRole ?? '',
     timestamp: raw.timestamp,
     canRollback: !!(raw.can_rollback ?? raw.canRollback ?? true),
+    humanReadable: raw.humanReadable,
+    affectedEntities: raw.affectedEntities,
+    rollbackPreview: raw.rollbackPreview,
   }
 }
 
@@ -222,6 +298,7 @@ interface AppState {
 
   changeLog: ChangeLogEntry[]
   changeLogTotal: number
+  currentChangeLogDetail: ChangeLogEntry | null
 
   sidebarOpen: boolean
   viewMode: '3d' | 'chart'
@@ -230,22 +307,44 @@ interface AppState {
   error: Record<string, string | null>
 
   fetchSamplingLists: () => Promise<void>
-  importSamplingList: (file: File, listName: string) => Promise<{ importedCount: number; boundaryCount: number; message?: string }>
+  importSamplingList: (file: File, listName: string) => Promise<{
+    importedCount: number
+    boundaryCount: number
+    message?: string
+    batchId?: string
+    duplicateImportCount?: number
+    originalListId?: string
+    historyBatches?: any[]
+  }>
   fetchSamplingDetail: (id: string) => Promise<void>
+  updateRecordRemark: (recordId: string, remark: string, operator?: string, operatorRole?: string) => Promise<void>
+  exportSampling: (listId?: string) => void
 
   fetchParams: () => Promise<void>
-  updateParam: (id: string, data: { value?: number; description?: string }) => Promise<void>
+  updateParam: (id: string, data: { value?: number; description?: string }) => Promise<{ oldValue?: number; newValue?: number; key?: string }>
   fetchParamHistory: () => Promise<void>
 
   fetchCalculation: () => Promise<void>
   setSelectedResult: (result: CostAllocationResult | null) => void
+  exportCalculation: () => void
 
   fetchBoundarySamples: (status?: string) => Promise<void>
-  updateBoundaryStatus: (id: string, status: 'confirmed' | 'ignored', comment?: string) => Promise<void>
+  updateBoundaryStatus: (
+    id: string,
+    status: 'confirmed' | 'ignored',
+    options?: {
+      comment?: string
+      processReason?: string
+      decisionDetail?: string
+      correctedValue?: number
+    }
+  ) => Promise<void>
   addReviewComment: (boundaryId: string, content: string) => Promise<void>
+  exportBoundary: () => void
 
   fetchChangeLog: (filters?: { entityType?: string; action?: string; page?: number }) => Promise<void>
-  rollbackChange: (id: string) => Promise<void>
+  getChangeLogDetail: (id: string) => Promise<ChangeLogEntry>
+  rollbackChange: (id: string) => Promise<RollbackResult>
 
   setSidebarOpen: (open: boolean) => void
   setViewMode: (mode: '3d' | 'chart') => void
@@ -270,6 +369,7 @@ export const useStore = create<AppState>((set, get) => ({
 
   changeLog: [],
   changeLogTotal: 0,
+  currentChangeLogDetail: null,
 
   sidebarOpen: true,
   viewMode: '3d',
@@ -307,9 +407,24 @@ export const useStore = create<AppState>((set, get) => ({
       set(s => ({ loading: { ...s.loading, importSampling: false } }))
       const d = json.data ?? {}
       if (d.skipped) {
-        return { importedCount: 0, boundaryCount: 0, message: '这份抽样名单已经导入过了，不会重复计算数量' }
+        return {
+          importedCount: 0,
+          boundaryCount: 0,
+          message: json.message || '这份抽样名单已经导入过了，不会重复计算数量',
+          batchId: d.batchId,
+          duplicateImportCount: d.duplicateImportCount,
+          originalListId: d.originalListId,
+          historyBatches: d.historyBatches,
+        }
       }
-      return { importedCount: d.recordCount ?? 0, boundaryCount: d.boundaryCount ?? 0 }
+      return {
+        importedCount: d.recordCount ?? 0,
+        boundaryCount: d.boundaryCount ?? 0,
+        batchId: d.batchId,
+        duplicateImportCount: d.duplicateImportCount,
+        originalListId: d.originalListId,
+        historyBatches: d.historyBatches,
+      }
     } catch (e: any) {
       set(s => ({ loading: { ...s.loading, importSampling: false }, error: { ...s.error, importSampling: e.message } }))
       throw e
@@ -333,6 +448,41 @@ export const useStore = create<AppState>((set, get) => ({
     }
   },
 
+  updateRecordRemark: async (recordId, remark, operator, operatorRole) => {
+    set(s => ({ loading: { ...s.loading, updateRecordRemark: true }, error: { ...s.error, updateRecordRemark: null } }))
+    try {
+      const res = await fetch(`/api/sampling/records/${recordId}/remark`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          remark,
+          operator: operator ?? get().userRole,
+          operatorRole: operatorRole ?? get().userRole,
+        }),
+      })
+      const json = await res.json()
+      if (!json.success) {
+        throw new Error(json.error || '修改备注失败')
+      }
+      set(s => ({
+        samplingRecords: s.samplingRecords.map(r => r.id === recordId ? { ...r, remark } : r),
+        loading: { ...s.loading, updateRecordRemark: false },
+      }))
+    } catch (e: any) {
+      set(s => ({ loading: { ...s.loading, updateRecordRemark: false }, error: { ...s.error, updateRecordRemark: e.message } }))
+      throw e
+    }
+  },
+
+  exportSampling: (listId) => {
+    if (!listId) {
+      const firstList = get().samplingLists[0]
+      if (!firstList) return
+      listId = firstList.id
+    }
+    window.open(`/api/sampling/export/csv?listId=${encodeURIComponent(listId)}`, '_blank')
+  },
+
   fetchParams: async () => {
     set(s => ({ loading: { ...s.loading, params: true }, error: { ...s.error, params: null } }))
     try {
@@ -348,6 +498,9 @@ export const useStore = create<AppState>((set, get) => ({
   updateParam: async (id, data) => {
     set(s => ({ loading: { ...s.loading, updateParam: true }, error: { ...s.error, updateParam: null } }))
     try {
+      const old = get().params.find(p => p.id === id)
+      const oldValue = old?.value
+      const key = old?.key
       const res = await fetch(`/api/params/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -359,6 +512,7 @@ export const useStore = create<AppState>((set, get) => ({
       }
       await get().fetchParams()
       set(s => ({ loading: { ...s.loading, updateParam: false } }))
+      return { oldValue, newValue: data.value, key }
     } catch (e: any) {
       set(s => ({ loading: { ...s.loading, updateParam: false }, error: { ...s.error, updateParam: e.message } }))
       throw e
@@ -395,6 +549,10 @@ export const useStore = create<AppState>((set, get) => ({
 
   setSelectedResult: (result) => set({ selectedResult: result }),
 
+  exportCalculation: () => {
+    window.open('/api/calculation/export', '_blank')
+  },
+
   fetchBoundarySamples: async (status) => {
     set(s => ({ loading: { ...s.loading, boundary: true }, error: { ...s.error, boundary: null } }))
     try {
@@ -408,13 +566,21 @@ export const useStore = create<AppState>((set, get) => ({
     }
   },
 
-  updateBoundaryStatus: async (id, status, comment) => {
+  updateBoundaryStatus: async (id, status, options = {}) => {
     set(s => ({ loading: { ...s.loading, updateBoundary: true }, error: { ...s.error, updateBoundary: null } }))
     try {
       const res = await fetch(`/api/boundary/${id}/status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status, comment, confirmedBy: get().userRole, operatorRole: get().userRole }),
+        body: JSON.stringify({
+          status,
+          comment: options.comment,
+          processReason: options.processReason,
+          decisionDetail: options.decisionDetail,
+          correctedValue: options.correctedValue,
+          confirmedBy: get().userRole,
+          operatorRole: get().userRole,
+        }),
       })
       const json = await res.json()
       if (!json.success) {
@@ -445,6 +611,10 @@ export const useStore = create<AppState>((set, get) => ({
     }
   },
 
+  exportBoundary: () => {
+    window.open('/api/boundary/export', '_blank')
+  },
+
   fetchChangeLog: async (filters) => {
     set(s => ({ loading: { ...s.loading, changeLog: true }, error: { ...s.error, changeLog: null } }))
     try {
@@ -466,6 +636,17 @@ export const useStore = create<AppState>((set, get) => ({
     }
   },
 
+  getChangeLogDetail: async (id) => {
+    const res = await fetch(`/api/history/${id}`)
+    const json = await res.json()
+    if (!json.success) {
+      throw new Error(json.error || '获取变更详情失败')
+    }
+    const entry = mapChangeLog(json.data.entry)
+    set({ currentChangeLogDetail: entry })
+    return entry
+  },
+
   rollbackChange: async (id) => {
     set(s => ({ loading: { ...s.loading, rollback: true }, error: { ...s.error, rollback: null } }))
     try {
@@ -480,6 +661,7 @@ export const useStore = create<AppState>((set, get) => ({
       }
       await get().fetchChangeLog()
       set(s => ({ loading: { ...s.loading, rollback: false } }))
+      return { rollbackDetails: json.rollbackDetails } as RollbackResult
     } catch (e: any) {
       set(s => ({ loading: { ...s.loading, rollback: false }, error: { ...s.error, rollback: e.message } }))
       throw e

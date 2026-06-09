@@ -10,7 +10,8 @@ router.get('/', (req: Request, res: Response): void => {
 
     let query = `
       SELECT bs.*, sr.original_value, sr.is_negative, sr.old_table_status, sr.remark, sr.boundary_status as record_boundary_status,
-             sl.name as list_name
+             sl.name as list_name, sr.batch_id,
+             (SELECT COUNT(*) FROM review_comments rc WHERE rc.boundary_id = bs.id) as review_comments_count
       FROM boundary_samples bs
       JOIN sampling_records sr ON bs.record_id = sr.id
       JOIN sampling_lists sl ON sr.list_id = sl.id
@@ -36,7 +37,7 @@ router.get('/', (req: Request, res: Response): void => {
 router.put('/:id/status', (req: Request, res: Response): void => {
   try {
     const { id } = req.params
-    const { status, confirmedBy, operatorRole } = req.body
+    const { status, confirmedBy, operatorRole, processReason, decisionDetail, correctedValue } = req.body
 
     if (!['confirmed', 'ignored'].includes(status)) {
       res.status(400).json({ success: false, error: '状态值无效，只支持 confirmed 或 ignored' })
@@ -56,14 +57,37 @@ router.put('/:id/status', (req: Request, res: Response): void => {
 
     const operator = confirmedBy || 'system'
     const role = operatorRole || 'system'
+    const reason = processReason || ''
+    const detail = decisionDetail || ''
+    const hasCorrected = correctedValue !== undefined && correctedValue !== null && correctedValue !== ''
+    const correctedVal = hasCorrected ? parseFloat(correctedValue) : null
+
+    if (status === 'confirmed' && !reason) {
+      res.status(400).json({ success: false, error: '请填写处理原因' })
+      return
+    }
 
     const transaction = db.transaction(() => {
-      db.prepare("UPDATE boundary_samples SET status = ?, confirmed_by = ?, confirmed_at = datetime('now') WHERE id = ?").run(status, operator, id)
+      db.prepare(
+        "UPDATE boundary_samples SET status = ?, confirmed_by = ?, confirmed_at = datetime('now'), process_reason = ?, decision_detail = ?, corrected_value = ? WHERE id = ?"
+      ).run(status, operator, reason, detail, correctedVal, id)
 
       if (status === 'confirmed') {
         db.prepare('UPDATE sampling_records SET boundary_status = ? WHERE id = ?').run('confirmed', sample.record_id)
       } else if (status === 'ignored') {
         db.prepare('UPDATE sampling_records SET boundary_status = ? WHERE id = ?').run('ignored', sample.record_id)
+      }
+
+      if (hasCorrected && !isNaN(correctedVal!)) {
+        const record = db.prepare('SELECT original_value FROM sampling_records WHERE id = ?').get(sample.record_id) as { original_value: number } | undefined
+        const oldVal = record ? String(record.original_value) : String(sample.original_value)
+        const newVal = String(correctedVal)
+
+        db.prepare('UPDATE sampling_records SET original_value = ? WHERE id = ?').run(correctedVal, sample.record_id)
+
+        db.prepare(
+          'INSERT INTO change_log (id, entity_type, entity_id, action, field, old_value, new_value, operator, operator_role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+        ).run(uuidv4(), 'sampling_record', sample.record_id, 'correct_value', 'original_value', oldVal, newVal, operator, role)
       }
 
       db.prepare('INSERT INTO change_log (id, entity_type, entity_id, action, field, old_value, new_value, operator, operator_role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)').run(
@@ -114,6 +138,50 @@ router.post('/:id/review', (req: Request, res: Response): void => {
   } catch (error) {
     console.error('添加审核意见失败:', error)
     res.status(500).json({ success: false, error: '添加审核意见失败' })
+  }
+})
+
+router.get('/export', (req: Request, res: Response): void => {
+  try {
+    const rows = db.prepare(`
+      SELECT sr.id as traceable_id,
+             bs.original_value, bs.corrected_value,
+             sr.is_negative, sr.old_table_status,
+             bs.type, bs.status, bs.process_reason, bs.decision_detail,
+             bs.confirmed_by, bs.confirmed_at, bs.detected_at,
+             sl.name as list_name, sr.batch_id,
+             (SELECT COUNT(*) FROM review_comments rc WHERE rc.boundary_id = bs.id) as review_comments_count
+      FROM boundary_samples bs
+      JOIN sampling_records sr ON bs.record_id = sr.id
+      JOIN sampling_lists sl ON sr.list_id = sl.id
+      ORDER BY bs.detected_at DESC
+    `).all() as any[]
+
+    const headers = ['traceable_id', 'original_value', 'corrected_value', 'is_negative', 'old_table_status', 'type', 'status', 'process_reason', 'decision_detail', 'confirmed_by', 'confirmed_at', 'detected_at', 'list_name', 'batch_id', 'review_comments_count']
+
+    const csvLines = [headers.join(',')]
+    for (const row of rows) {
+      const line = headers.map(h => {
+        const val = row[h] ?? ''
+        const str = String(val)
+        if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+          return '"' + str.replace(/"/g, '""') + '"'
+        }
+        return str
+      }).join(',')
+      csvLines.push(line)
+    }
+
+    const csvContent = '\ufeff' + csvLines.join('\r\n')
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
+    const fileName = `边界样本报告_${timestamp}.csv`
+
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8')
+    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fileName)}"`)
+    res.send(csvContent)
+  } catch (error) {
+    console.error('导出失败:', error)
+    res.status(500).json({ success: false, error: '导出失败' })
   }
 })
 

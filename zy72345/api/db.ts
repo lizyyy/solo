@@ -117,6 +117,56 @@ db.exec(`
 `)
 
 db.exec(`
+  CREATE TABLE IF NOT EXISTS batch_imports (
+    id TEXT PRIMARY KEY,
+    fingerprint TEXT NOT NULL,
+    list_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    is_duplicate INTEGER NOT NULL DEFAULT 0,
+    import_time TEXT NOT NULL DEFAULT (datetime('now')),
+    operator TEXT NOT NULL,
+    operator_role TEXT NOT NULL,
+    note TEXT NOT NULL DEFAULT ''
+  );
+
+  CREATE TABLE IF NOT EXISTS record_remark_history (
+    id TEXT PRIMARY KEY,
+    record_id TEXT NOT NULL REFERENCES sampling_records(id),
+    old_remark TEXT NOT NULL,
+    new_remark TEXT NOT NULL,
+    changed_by TEXT NOT NULL,
+    changed_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_batch_fingerprint ON batch_imports(fingerprint);
+  CREATE INDEX IF NOT EXISTS idx_record_remark_history_record ON record_remark_history(record_id);
+`)
+
+try {
+  db.exec('ALTER TABLE boundary_samples ADD COLUMN original_value REAL')
+} catch (e) {}
+try {
+  db.exec('ALTER TABLE boundary_samples ADD COLUMN corrected_value REAL')
+} catch (e) {}
+try {
+  db.exec("ALTER TABLE boundary_samples ADD COLUMN process_reason TEXT NOT NULL DEFAULT ''")
+} catch (e) {}
+try {
+  db.exec("ALTER TABLE boundary_samples ADD COLUMN decision_detail TEXT NOT NULL DEFAULT ''")
+} catch (e) {}
+
+try {
+  db.exec('ALTER TABLE sampling_records ADD COLUMN batch_id TEXT')
+} catch (e) {}
+
+try {
+  db.exec('ALTER TABLE cost_allocation_results ADD COLUMN batch_id TEXT')
+} catch (e) {}
+try {
+  db.exec('ALTER TABLE cost_allocation_results ADD COLUMN traceable_id TEXT')
+} catch (e) {}
+
+db.exec(`
   INSERT OR IGNORE INTO param_entries (id, key, value, description, updated_by) VALUES
     ('param-001', 'unit_cost', 100.0, '单位成本', 'system'),
     ('param-002', 'allocation_ratio', 1.0, '分摊比例', 'system'),

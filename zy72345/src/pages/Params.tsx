@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Save, X, ChevronDown, ChevronUp, Clock, Link as LinkIcon } from 'lucide-react'
+import { Save, X, ChevronDown, ChevronUp, Clock, Link as LinkIcon, CheckCircle } from 'lucide-react'
 import { useStore } from '@/store'
 
-function EditableValue({ param, onUpdate }: { param: any; onUpdate: (id: string, data: { value?: number; description?: string }) => Promise<void> }) {
+function EditableValue({ param, onUpdate }: { param: any; onUpdate: (id: string, data: { value?: number; description?: string }) => Promise<{ oldValue?: number; newValue?: number; key?: string }> }) {
   const [editing, setEditing] = useState(false)
   const [value, setValue] = useState(String(param.value))
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [savedInfo, setSavedInfo] = useState<{ key: string; oldValue: number; newValue: number } | null>(null)
 
   const handleSave = async () => {
     const numVal = Number(value)
@@ -21,8 +22,13 @@ function EditableValue({ param, onUpdate }: { param: any; onUpdate: (id: string,
     }
     setSaving(true)
     setError(null)
+    setSavedInfo(null)
     try {
-      await onUpdate(param.id, { value: numVal })
+      const result = await onUpdate(param.id, { value: numVal })
+      if (result.oldValue !== undefined && result.newValue !== undefined && result.key) {
+        setSavedInfo({ key: result.key, oldValue: result.oldValue, newValue: result.newValue })
+        setTimeout(() => setSavedInfo(null), 5000)
+      }
       setEditing(false)
     } catch (e: any) {
       setError(e.message)
@@ -37,32 +43,48 @@ function EditableValue({ param, onUpdate }: { param: any; onUpdate: (id: string,
     setError(null)
   }
 
-  if (editing) {
-    return (
-      <div className="flex items-center gap-2">
-        <input
-          type="number"
-          value={value}
-          onChange={e => setValue(e.target.value)}
-          className="w-28 bg-slate-700/50 border border-slate-600 rounded px-2 py-1 text-sm text-slate-200 font-mono"
-          autoFocus
-          onKeyDown={e => { if (e.key === 'Enter') handleSave(); if (e.key === 'Escape') handleCancel() }}
-        />
-        <button onClick={handleSave} disabled={saving} className="p-1 text-emerald-500 hover:text-emerald-400 disabled:opacity-50">
-          <Save size={14} />
-        </button>
-        <button onClick={handleCancel} className="p-1 text-slate-400 hover:text-slate-200">
-          <X size={14} />
-        </button>
-        {error && <span className="text-rose-500 text-xs">{error}</span>}
-      </div>
-    )
-  }
-
   return (
-    <button onClick={() => setEditing(true)} className="text-amber-500 font-mono hover:underline cursor-pointer text-sm">
-      {param.value}
-    </button>
+    <div className="space-y-1">
+      {editing ? (
+        <div className="flex items-center gap-2">
+          <input
+            type="number"
+            value={value}
+            onChange={e => setValue(e.target.value)}
+            className="w-28 bg-slate-700/50 border border-slate-600 rounded px-2 py-1 text-sm text-slate-200 font-mono"
+            autoFocus
+            onKeyDown={e => { if (e.key === 'Enter') handleSave(); if (e.key === 'Escape') handleCancel() }}
+          />
+          <button onClick={handleSave} disabled={saving} className="p-1 text-emerald-500 hover:text-emerald-400 disabled:opacity-50">
+            <Save size={14} />
+          </button>
+          <button onClick={handleCancel} className="p-1 text-slate-400 hover:text-slate-200">
+            <X size={14} />
+          </button>
+          {error && <span className="text-rose-500 text-xs">{error}</span>}
+        </div>
+      ) : (
+        <button onClick={() => setEditing(true)} className="text-amber-500 font-mono hover:underline cursor-pointer text-sm">
+          {param.value}
+        </button>
+      )}
+      {savedInfo && (
+        <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg px-3 py-2 text-xs mt-1">
+          <div className="flex items-center gap-1.5 text-emerald-400 mb-1">
+            <CheckCircle size={12} />
+            参数 {savedInfo.key} 更新成功
+          </div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="line-through text-rose-400">{savedInfo.oldValue}</span>
+            <span className="text-slate-500">→</span>
+            <span className="text-emerald-400">{savedInfo.newValue}</span>
+            <Link to="/params/history" className="text-amber-500 hover:underline ml-2">
+              查看变更历史 →
+            </Link>
+          </div>
+        </div>
+      )}
+    </div>
   )
 }
 

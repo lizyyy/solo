@@ -1,10 +1,10 @@
 import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowLeft, Clock } from 'lucide-react'
+import { ArrowLeft, Clock, User } from 'lucide-react'
 import { useStore } from '@/store'
 
 const changeTypeConfig: Record<string, { label: string; color: string }> = {
-  value: { label: '值变更', color: 'bg-blue-500/10 text-blue-400' },
+  value: { label: '参数值', color: 'bg-blue-500/10 text-blue-400' },
   remark: { label: '备注修改', color: 'bg-amber-500/10 text-amber-400' },
   boundary_rule: { label: '边界规则', color: 'bg-purple-500/10 text-purple-400' },
 }
@@ -36,24 +36,32 @@ export default function ParamHistory() {
               <div key={change.id} className="relative">
                 <div className="absolute -left-5 top-1.5 w-3 h-3 rounded-full bg-slate-600 border-2 border-slate-800" />
                 <div className="bg-slate-800/50 backdrop-blur rounded-xl border border-slate-700/50 p-4">
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="font-mono text-sm text-slate-200">{change.paramId}</span>
+                  <div className="flex items-center gap-3 mb-3 flex-wrap">
+                    <span className="font-mono text-sm text-slate-200">{change.paramId?.slice(0, 12)}</span>
                     <span className={`px-2 py-0.5 rounded text-xs font-medium ${config.color}`}>{config.label}</span>
-                    <span className="text-slate-500 text-xs flex items-center gap-1">
+                    <span className="text-slate-500 text-xs flex items-center gap-1 ml-auto">
                       <Clock size={12} />
                       {new Date(change.changedAt).toLocaleString('zh-CN')}
                     </span>
                   </div>
-                  <div className="text-sm space-y-1">
+                  <div className="text-sm space-y-1.5">
                     <p className="text-slate-400">
                       字段: <span className="text-slate-300">{change.field}</span>
                     </p>
-                    <p className="text-slate-400">
-                      旧值: <span className="line-through text-rose-400">{change.oldValue}</span>
-                      {' → '}
-                      新值: <span className="text-emerald-400">{change.newValue}</span>
+                    <p className="text-slate-400 flex items-center gap-2 flex-wrap">
+                      改前→改后：
+                      <span className="line-through text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded text-xs">
+                        {change.oldValue}
+                      </span>
+                      <span className="text-slate-500">→</span>
+                      <span className="text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded text-xs">
+                        {change.newValue}
+                      </span>
                     </p>
-                    <p className="text-slate-500 text-xs">操作人: {change.changedBy}</p>
+                    <p className="text-slate-500 text-xs flex items-center gap-1.5">
+                      <User size={12} />
+                      操作人: <span className="text-slate-400">{change.changedBy}</span>
+                    </p>
                   </div>
                 </div>
               </div>
