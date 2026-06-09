@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>工厂管线报告复核 · 班组交接历史台</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:#f1f5f9;color:#0f172a;line-height:1.5}
+header{background:#0f172a;color:#f8fafc;padding:16px 24px;display:flex;align-items:center;justify-content:space-between}
+header h1{font-size:20px;font-weight:600}
+header .sub{font-size:12px;color:#94a3b8;margin-top:2px}
+main{padding:20px 24px;max-width:1480px;margin:0 auto}
+.panel{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:16px;margin-bottom:18px;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+.panel h2{font-size:14px;font-weight:600;color:#334155;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.panel h2 .dot{width:6px;height:6px;border-radius:50%;background:#3b82f6}
+.filter-row{display:flex;flex-wrap:wrap;gap:12px;align-items:end}
+.filter-row .field{display:flex;flex-direction:column;gap:4px}
+.filter-row label{font-size:12px;color:#64748b;font-weight:500}
+.filter-row input,.filter-row select{padding:7px 10px;border:1px solid #cbd5e1;border-radius:6px;font-size:13px;min-width:140px;background:#fff}
+.filter-row button{padding:7px 16px;border:none;border-radius:6px;font-size:13px;cursor:pointer;font-weight:500}
+.btn-primary{background:#2563eb;color:#fff}
+.btn-primary:hover{background:#1d4ed8}
+.btn-ghost{background:#f1f5f9;color:#334155}
+.btn-ghost:hover{background:#e2e8f0}
+.btn-warning{background:#f59e0b;color:#fff}
+.btn-danger{background:#dc2626;color:#fff}
+.btn-success{background:#16a34a;color:#fff}
+.stat-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.stat-card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:14px 16px}
+.stat-card .n{font-size:26px;font-weight:700}
+.stat-card .l{font-size:12px;color:#64748b;margin-top:4px}
+.sc1 .n{color:#16a34a}.sc2 .n{color:#d97706}.sc3 .n{color:#dc2626}.sc4 .n{color:#7c3aed}
+.record-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(460px,1fr));gap:14px}
+.rec-card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:14px;position:relative;overflow:hidden}
+.rec-card .tag{position:absolute;top:12px;right:12px;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;color:#fff}
+.rec-card h3{font-size:15px;margin-bottom:6px;padding-right:80px}
+.rec-card .meta{font-size:12px;color:#64748b;margin-bottom:10px;display:flex;flex-wrap:wrap;gap:8px 14px}
+.rec-card .meta span b{color:#334155;font-weight:600}
+.measures{border-top:1px dashed #e2e8f0;padding-top:10px;margin-top:10px}
+.measures .m{background:#f8fafc;border:1px solid #e2e8f0;border-radius:7px;padding:8px 10px;margin-bottom:8px;font-size:12.5px}
+.measures .m .formula-name{font-weight:600;color:#1e40af}
+.measures .m .inputs{color:#475569;margin-top:3px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11.5px}
+.measures .m .result{margin-top:3px}
+.measures .m .result .val{font-weight:700;color:#0f172a;font-size:14px}
+.measures .m .result .unit{color:#64748b;font-size:11px;margin-left:3px}
+.measures .m .oob{margin-top:4px;color:#b91c1c;font-size:11.5px;font-weight:600;background:#fef2f2;padding:3px 7px;border-radius:4px;display:inline-block}
+.remark{background:#fffbeb;border:1px solid #fde68a;border-left:3px solid #f59e0b;padding:7px 10px;border-radius:6px;margin-top:10px;font-size:12.5px;color:#92400e}
+.remark::before{content:"📝 补录备注：";font-weight:600}
+.photos{margin-top:10px;display:flex;gap:6px;flex-wrap:wrap}
+.ph{padding:4px 8px;border-radius:5px;font-size:11px;display:inline-flex;align-items:center;gap:5px}
+.ph-ok{background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46}
+.ph-bad{background:#fef2f2;border:1px solid #fecaca;color:#991b1b;font-weight:600}
+.actions{margin-top:12px;display:flex;gap:7px;flex-wrap:wrap}
+.actions button{padding:5px 11px;border-radius:5px;border:none;cursor:pointer;font-size:12px;font-weight:500}
+.modal-mask{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;align-items:center;justify-content:center;z-index:50;padding:20px}
+.modal-mask.on{display:flex}
+.modal{background:#fff;border-radius:12px;max-width:860px;width:100%;max-height:85vh;overflow:hidden;display:flex;flex-direction:column}
+.modal-hd{padding:14px 18px;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center}
+.modal-hd h3{font-size:16px;font-weight:600}
+.modal-bd{padding:18px;overflow:auto;flex:1}
+.modal-ft{padding:12px 18px;border-top:1px solid #e2e8f0;display:flex;justify-content:end;gap:8px}
+.timeline{position:relative;padding-left:28px}
+.timeline::before{content:"";position:absolute;left:9px;top:6px;bottom:6px;width:2px;background:#cbd5e1}
+.tl-item{position:relative;margin-bottom:18px}
+.tl-item::before{content:"";position:absolute;left:-23px;top:6px;width:12px;height:12px;border-radius:50%;background:#3b82f6;border:2px solid #fff;box-shadow:0 0 0 2px #3b82f6}
+.tl-item.v-old::before{background:#94a3b8;box-shadow:0 0 0 2px #94a3b8}
+.tl-item .tl-meta{font-size:12px;color:#64748b;margin-bottom:4px}
+.tl-item .tl-meta b{color:#0f172a;font-weight:600}
+.tl-item .tl-note{font-size:13px;font-weight:600;color:#1e293b;margin-bottom:6px}
+.tl-item .tl-snap{background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:10px 12px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11.5px;color:#334155;white-space:pre-wrap;word-break:break-all}
+.tl-item .tl-shot{margin-top:6px;font-size:12px;color:#7c3aed}
+.formula-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}
+.fml{border:1px solid #e2e8f0;border-radius:8px;padding:11px 13px;background:#fafafa}
+.fml .name{font-weight:600;color:#1e40af;font-size:13.5px}
+.fml .desc{font-size:11.5px;color:#64748b;margin:3px 0 8px}
+.fml .kv{font-size:12px;margin-top:5px}
+.fml .kv .k{color:#475569;font-weight:600}
+.fml .kv .u{color:#64748b;margin-left:6px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11.5px}
+.fml .kv .b{color:#0f766e;margin-left:6px;font-size:11.5px}
+.empty{padding:40px;text-align:center;color:#94a3b8;font-size:13px}
+.close-x{background:none;border:none;font-size:20px;cursor:pointer;color:#64748b;line-height:1}
+.badge{padding:2px 7px;border-radius:4px;font-size:11px;font-weight:600;margin-left:5px}
+.badge-purple{background:#ede9fe;color:#6d28d9}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>🏭 工厂管线报告复核 · 班组交接历史台</h1>
+    <div class="sub">公式 / 单位 / 边界值摆在明处 · 历史版本完整留痕 · 时间错位照片单独拎出</div>
+  </div>
+  <div style="display:flex;gap:10px;align-items:center">
+    <span style="font-size:12px;color:#94a3b8">设备工程师 老何</span>
+    <button class="btn-warning" id="btnExport">📦 导出屏幕筛选结果</button>
+  </div>
+</header>
+
+<main>
+  <div class="stat-cards">
+    <div class="stat-card sc1"><div class="n" id="stConfirmed">0</div><div class="l">✅ 已确认记录</div></div>
+    <div class="stat-card sc2"><div class="n" id="stPending">0</div><div class="l">📦 待补件记录</div></div>
+    <div class="stat-card sc3"><div class="n" id="stReturned">0</div><div class="l">↩️ 退回记录</div></div>
+    <div class="stat-card sc4"><div class="n" id="stAnomaly">0</div><div class="l">⚠️ 时间错位照片数</div></div>
+  </div>
+
+  <div class="panel">
+    <h2><span class="dot"></span>筛选条件（导出文件与屏幕口径一致）</h2>
+    <div class="filter-row">
+      <div class="field"><label>状态</label>
+        <select id="fStatus">
+          <option value="">全部</option>
+          <option value="confirmed">✅ 已确认</option>
+          <option value="pending_parts">📦 待补件</option>
+          <option value="returned">↩️ 退回</option>
+        </select>
+      </div>
+      <div class="field"><label>管线编号</label><select id="fPipeline"><option value="">全部</option></select></div>
+      <div class="field"><label>交接日期起</label><input type="date" id="fFrom"></div>
+      <div class="field"><label>交接日期止</label><input type="date" id="fTo"></div>
+      <div class="field"><label>照片异常</label>
+        <select id="fAnomaly"><option value="">全部</option><option value="1">只看含时间错位照片</option></select>
+      </div>
+      <button class="btn-primary" id="btnSearch">🔍 筛选</button>
+      <button class="btn-ghost" id="btnReset">重置</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2><span class="dot" style="background:#7c3aed"></span>交接记录列表（按时间倒序）</h2>
+    <div id="recordGrid" class="record-grid"></div>
+  </div>
+
+  <div class="panel">
+    <h2><span class="dot" style="background:#16a34a"></span>公式库 · 单位 · 边界值（明处展示，最终值可溯源）</h2>
+    <div id="formulaGrid" class="formula-grid"></div>
+  </div>
+</main>
+
+<div class="modal-mask" id="modalTimeline">
+  <div class="modal">
+    <div class="modal-hd">
+      <h3>📜 历史时间线 <span id="tlTitle" class="badge badge-purple"></span></h3>
+      <button class="close-x" onclick="closeModal('modalTimeline')">×</button>
+    </div>
+    <div class="modal-bd" id="timelineBody"></div>
+    <div class="modal-ft">
+      <button class="btn-ghost" onclick="exportTL()">📥 导出该时间线</button>
+      <button class="btn-primary" onclick="closeModal('modalTimeline')">关闭</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-mask" id="modalStatus">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-hd"><h3>🔧 更新状态</h3><button class="close-x" onclick="closeModal('modalStatus')">×</button></div>
+    <div class="modal-bd">
+      <div class="field" style="margin-bottom:12px"><label style="font-size:13px;color:#334155;font-weight:600">新状态</label>
+        <select id="stSelect" style="width:100%;padding:8px;border:1px solid #cbd5e1;border-radius:6px;margin-top:4px">
+          <option value="confirmed">✅ 已确认</option>
+          <option value="pending_parts">📦 待补件</option>
+          <option value="returned">↩️ 退回</option>
+        </select>
+      </div>
+      <div class="field"><label style="font-size:13px;color:#334155;font-weight:600">变更说明</label>
+        <input type="text" id="stNote" placeholder="如：现场复核通过 / 缺少合格证退回" style="width:100%;padding:8px;border:1px solid #cbd5e1;border-radius:6px;margin-top:4px">
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn-ghost" onclick="closeModal('modalStatus')">取消</button>
+      <button class="btn-primary" id="btnStOk">确认变更（自动写入历史）</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STATUS_META={{status_labels|tojson}};
+let CURRENT_RECORDS=[];
+let CURRENT_TL_RID=null;
+
+function $(s){return document.querySelector(s)}
+function $$(s){return document.querySelectorAll(s)}
+function esc(s){return String(s??"").replace(/[<>&]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;"}[c]))}
+function fmtDT(s){if(!s)return"";return s.replace("T"," ").slice(0,19)}
+
+async function loadPipelines(){
+  const r=await fetch("/api/pipelines");
+  const list=await r.json();
+  const sel=$("#fPipeline");
+  list.forEach(p=>{const o=document.createElement("option");o.value=p;o.textContent=p;sel.appendChild(o)});
+}
+
+async function loadFormulas(){
+  const r=await fetch("/api/formulas");
+  const d=await r.json();
+  const box=$("#formulaGrid");
+  box.innerHTML="";
+  Object.entries(d).forEach(([k,f])=>{
+    const units=Object.entries(f.units).map(([p,u])=>`<div class="kv"><span class="k">${p}</span><span class="u">[${u}]</span><span class="b">边界 ${f.boundary[p][0]} ~ ${f.boundary[p][1]}</span></div>`).join("");
+    box.innerHTML+=`<div class="fml"><div class="name">${f.name} <span style="color:#94a3b8;font-size:11px;font-weight:400">[${k}]</span></div>
+      <div class="desc">${f.description}</div>${units}</div>`;
+  });
+}
+
+function buildQuery(){
+  const p={};
+  ["Status","Pipeline","From","To","Anomaly"].forEach(k=>{
+    const v=$("#f"+k).value;
+    if(v){
+      const map={Status:"status",Pipeline:"pipeline_id",From:"date_from",To:"date_to",Anomaly:"anomaly"};
+      p[map[k]]=v;
+    }
+  });
+  return p;
+}
+
+async function search(){
+  const q=buildQuery();
+  const qs=new URLSearchParams(q).toString();
+  const r=await fetch("/api/records?"+qs);
+  CURRENT_RECORDS=await r.json();
+  renderRecords(CURRENT_RECORDS);
+  updateStats();
+}
+
+function updateStats(){
+  let c=0,p=0,rt=0,an=0;
+  CURRENT_RECORDS.forEach(r=>{
+    if(r.status==="confirmed")c++;
+    else if(r.status==="pending_parts")p++;
+    else if(r.status==="returned")rt++;
+    r.photos.forEach(ph=>{if(ph.is_anomaly)an++});
+  });
+  $("#stConfirmed").textContent=c;
+  $("#stPending").textContent=p;
+  $("#stReturned").textContent=rt;
+  $("#stAnomaly").textContent=an;
+}
+
+function renderRecords(list){
+  const grid=$("#recordGrid");
+  if(!list.length){grid.innerHTML='<div class="empty" style="grid-column:1/-1">📭 没有符合条件的记录，试试重置筛选。</div>';return}
+  grid.innerHTML="";
+  list.forEach(r=>{
+    const sm=STATUS_META[r.status]||{text:r.status,color:"#64748b"};
+    const measHtml=r.measurements.map(m=>{
+      const inps=Object.entries(m.inputs).map(([k,v])=>`${k}=${v}`).join("，");
+      return `<div class="m">
+        <div><span class="formula-name">${m.formula_key}</span> ${m.out_of_bound?`<span class="badge" style="background:#fee2e2;color:#991b1b">边界告警</span>`:""}</div>
+        <div class="inputs">输入：${inps}</div>
+        <div class="result"><span class="val">${m.result}</span><span class="unit">${m.unit}</span></div>
+        ${m.out_of_bound?`<div class="oob">⚠ ${m.out_of_bound} 超出边界值区间</div>`:""}
+      </div>`;
+    }).join("");
+    const phHtml=r.photos.map(ph=>{
+      const shiftH=Math.round((ph.time_shift_sec||0)/3600);
+      if(ph.is_anomaly)return`<span class="ph ph-bad">⚠️ ${ph.photo_ref} · 错位${shiftH}h</span>`;
+      return`<span class="ph ph-ok">📷 ${ph.photo_ref}</span>`;
+    }).join("");
+    const card=document.createElement("div");
+    card.className="rec-card";
+    card.innerHTML=`<span class="tag" style="background:${sm.color}">${sm.text}</span>
+      <h3>🔧 ${esc(r.pipeline_id)} · ${esc(r.line_section||"—")}</h3>
+      <div class="meta">
+        <span>📅 <b>${r.shift_date}</b></span>
+        <span>🕗 <b>${r.shift_name}</b></span>
+        <span>👷 <b>${esc(r.operator)}</b></span>
+        <span>🆔 <b>#${r.id}</b></span>
+      </div>
+      <div class="measures">${measHtml||'<div style="font-size:12px;color:#94a3b8">— 无计算数据 —</div>'}</div>
+      ${r.remark_later?`<div class="remark">${esc(r.remark_later)}</div>`:""}
+      ${phHtml?`<div class="photos">${phHtml}</div>`:""}
+      <div class="actions">
+        <button class="btn-ghost" onclick="openTimeline(${r.id})">📜 历史时间线</button>
+        <button class="btn-success" onclick="openStatus(${r.id},'confirmed')">标记已确认</button>
+        <button class="btn-warning" onclick="openStatus(${r.id},'pending_parts')">待补件</button>
+        <button class="btn-danger" onclick="openStatus(${r.id},'returned')">退回</button>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+async function openTimeline(rid){
+  CURRENT_TL_RID=rid;
+  const r=await fetch(`/api/records/${rid}/versions`);
+  const vs=await r.json();
+  $("#tlTitle").textContent="记录#"+rid;
+  const body=$("#timelineBody");
+  if(!vs.length){body.innerHTML='<div class="empty">暂无历史版本</div>';openModal("modalTimeline");return}
+  const isMax=vs.length;
+  body.innerHTML=`<div class="timeline">`+vs.map((v,i)=>`
+    <div class="tl-item ${v.version_no<isMax?'v-old':''}">
+      <div class="tl-meta">版本 <b>v${v.version_no}</b> · ${v.version_no===isMax?'<span class="badge" style="background:#dcfce7;color:#166534">当前</span>':'<span class="badge" style="background:#f1f5f9;color:#64748b">历史</span>'}
+       · 变更人 <b>${esc(v.changed_by)}</b> · ${fmtDT(v.changed_at)}</div>
+      <div class="tl-note">${esc(v.change_note)}</div>
+      <div class="tl-snap">${JSON.stringify(v.snapshot,null,2)}</div>
+      ${v.screenshot_ref?`<div class="tl-shot">🖼️ 旧版本截图留存：${esc(v.screenshot_ref)}</div>`:""}
+    </div>`).join("")+`</div>`;
+  openModal("modalTimeline");
+}
+
+function openModal(id){document.getElementById(id).classList.add("on")}
+function closeModal(id){document.getElementById(id).classList.remove("on")}
+
+let _stRid=null;
+function openStatus(rid,def){
+  _stRid=rid;$("#stSelect").value=def;$("#stNote").value="";openModal("modalStatus");
+}
+$("#btnStOk").addEventListener("click",async()=>{
+  const body={status:$("#stSelect").value,change_note:$("#stNote").value||"状态变更",changed_by:"老何"};
+  await fetch(`/api/records/${_stRid}/status`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+  closeModal("modalStatus");await search();
+});
+
+$("#btnSearch").addEventListener("click",search);
+$("#btnReset").addEventListener("click",()=>{
+  ["Status","Pipeline","From","To","Anomaly"].forEach(k=>$("#f"+k).value="");search();
+});
+
+$("#btnExport").addEventListener("click",()=>{
+  const q=buildQuery();const qs=new URLSearchParams(q).toString();
+  window.open("/api/export?"+qs,"_blank");
+});
+
+function exportTL(){
+  if(CURRENT_TL_RID)window.open(`/api/export/timeline/${CURRENT_TL_RID}`,"_blank");
+}
+
+(async function init(){
+  await loadPipelines();
+  await loadFormulas();
+  await search();
+})();
+</script>
+</body>
+</html>
