@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  line-height: 1.6;
+  font-weight: 400;
+  color: #111827;
+  background: #F4F4F6;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body, #root { height: 100%; }
+body { margin: 0; }
+
+/* 数字使用等宽字体 */
+.tabular-nums, .tn { font-variant-numeric: tabular-nums; }
+
+/* 自定义滚动条（工业风细条） */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(27,40,69,.2);
+  border-radius: 0;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(27,40,69,.4); }
+
+/* 聚焦环 */
+:focus-visible {
+  outline: 2px solid #D7263D;
+  outline-offset: 2px;
+}
+
+/* 通用工具类 */
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-1.5 px-3.5 py-2 text-sm font-medium
+           border-2 border-navy-500 text-navy-500 bg-white
+           hover:bg-navy-50 active:shadow-press transition-all select-none;
+  }
+  .btn-primary {
+    @apply bg-navy-500 text-white hover:bg-navy-600 active:shadow-press;
+  }
+  .btn-danger {
+    @apply bg-fire-500 border-fire-500 text-white hover:bg-fire-600;
+  }
+  .btn-ghost {
+    @apply border-transparent bg-transparent text-navy-500 hover:bg-ink-100;
+  }
+
+  .tag {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full border;
+  }
+  .tag-confirm { @apply bg-confirm-50 text-confirm-700 border-confirm-300; }
+  .tag-pending { @apply bg-pending-50 text-pending-700 border-pending-300; }
+  .tag-reject  { @apply bg-reject-50  text-reject-700  border-reject-300; }
+  .tag-abnormal{ @apply bg-abnormal-50 text-abnormal-700 border-abnormal-300; }
+
+  .field-label {
+    @apply block text-xs font-medium text-ink-500 uppercase tracking-wider mb-1;
+  }
+  .field-input {
+    @apply w-full px-3 py-2 text-sm border-2 border-ink-200 bg-white
+           focus:border-navy-500 focus:ring-0 outline-none transition-colors;
+  }
+
+  .card {
+    @apply bg-white border border-ink-200 shadow-card;
+  }
+
+  .chip {
+    @apply inline-flex items-center h-5 px-1.5 rounded text-[11px] font-medium
+           bg-ink-100 text-ink-700 border border-ink-200;
+  }
+}
+
+/* 入场动画 */
+@keyframes slideInRight {
+  from { transform: translateX(32px); opacity: 0; }
+  to   { transform: translateX(0);     opacity: 1; }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes growY {
+  from { transform: scaleY(0); opacity: 0; }
+  to   { transform: scaleY(1); opacity: 1; }
+}
+.anim-slide-in { animation: slideInRight .28s cubic-bezier(.2,.8,.2,1) both; }
+.anim-fade-in  { animation: fadeIn .2s ease-out both; }
+.anim-grow-y   { animation: growY .22s ease-out both; transform-origin: top; }
+
+/* 拖拽占位 */
+.dnd-over {
+  @apply border-2 border-dashed border-navy-400 bg-navy-50/50;
+}
