@@ -1,0 +1,100 @@
+[
+  {
+    "record_id": "PET-20250601-001",
+    "pet_name": "毛毛",
+    "owner_name": "张女士",
+    "training_date": "2026-06-01",
+    "course_type": "基础服从",
+    "vaccine_date": "2026-03-15",
+    "trainer": "李教练",
+    "medication_reminder": "无",
+    "handwritten_note": "今天表现很好，坐和卧都很稳",
+    "status": "completed",
+    "operator": "小温",
+    "change_reason": "首次录入",
+    "attachments": [
+      {"attachment_type": "手写病历", "attachment_ref": "scan/20250601/001_v1.jpg", "description": "初版手写病历单"}
+    ]
+  },
+  {
+    "record_id": "PET-20250602-002",
+    "pet_name": "豆豆",
+    "owner_name": "王先生",
+    "training_date": "2026-06-02",
+    "course_type": "行为纠正",
+    "vaccine_date": "",
+    "trainer": "陈教练",
+    "medication_reminder": "",
+    "handwritten_note": "护食情况需继续训练，下次重点练习食盆脱敏",
+    "status": "completed",
+    "operator": "小温",
+    "change_reason": "首次录入，疫苗本未带待补",
+    "attachments": [
+      {"attachment_type": "手写病历", "attachment_ref": "scan/20250602/002_v1.jpg", "description": "初版手写单，疫苗栏空白"}
+    ]
+  },
+  {
+    "record_id": "PET-20250603-003",
+    "pet_name": "奶糖",
+    "owner_name": "刘小姐",
+    "training_date": "2026-06-03",
+    "course_type": "寄养训练营",
+    "vaccine_date": "2026-05-10",
+    "trainer": "李教练",
+    "medication_reminder": "",
+    "handwritten_note": "主人交代有皮肤病，每天要喷药一次，耳朵滴剂每两天一次；另外本周需吃驱虫药",
+    "status": "in_progress",
+    "operator": "小温",
+    "change_reason": "首次录入",
+    "attachments": [
+      {"attachment_type": "手写病历", "attachment_ref": "scan/20250603/003_v1.jpg", "description": "初版手写单，背面有用药说明"}
+    ]
+  },
+  {
+    "record_id": "PET-20250604-004",
+    "pet_name": "球球",
+    "owner_name": "赵先生",
+    "training_date": "2026-06-04",
+    "course_type": "敏捷训练",
+    "vaccine_date": "2024-12-01",
+    "trainer": "陈教练",
+    "medication_reminder": "饭后半粒速诺，每日2次，连7天",
+    "handwritten_note": "跑酷训练顺利，跳跃障碍无问题",
+    "status": "completed",
+    "operator": "小温",
+    "change_reason": "首次录入",
+    "attachments": []
+  },
+  {
+    "record_id": "PET-20250605-005",
+    "pet_name": "旺财",
+    "owner_name": "孙总",
+    "training_date": "2026-06-05",
+    "course_type": "高级才艺课",
+    "vaccine_date": "2026-04-20",
+    "trainer": "",
+    "medication_reminder": "有",
+    "handwritten_note": "学了装死和打滚，主人很满意",
+    "status": "completed",
+    "operator": "小温",
+    "change_reason": "首次录入，训练师下班忘签",
+    "attachments": []
+  },
+  {
+    "record_id": "PET-20250606-006",
+    "pet_name": "咪咪",
+    "owner_name": "周阿姨",
+    "training_date": "2026-06-06",
+    "course_type": "幼犬社交",
+    "vaccine_date": "2026-05-20",
+    "trainer": "林助理",
+    "medication_reminder": "无",
+    "handwritten_note": "和其他幼犬相处和谐",
+    "status": "completed",
+    "operator": "小温",
+    "change_reason": "首次录入",
+    "attachments": [
+      {"attachment_type": "现场合影", "attachment_ref": "photo/20250606/006_group.jpg", "description": "社交课结束合影"}
+    ]
+  }
+]

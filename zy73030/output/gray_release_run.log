@@ -1,0 +1,17 @@
+灰度发布前完整验证流程 — 开始于 2026-06-09 07:38:38.260578
+数据库位置: output/pet_training.db (每轮测试自动重建)
+
+ℹ️  已清理旧数据库，确保本次验证从零开始
+  → 导入统计: inserted=6, versioned=0, failed=0
+  → 复核结果: total=6, 异常记录=6, 总异常数=8, 按严重级={'warning': 6, 'error': 2}
+  → 导入统计: inserted=1, versioned=2, failed=0
+  → 复核结果: total=7, 异常记录=7, 总异常数=11, 按规则={'R003': 6, 'R001': 2, 'R002': 3}
+
+================================================================================
+✅ 灰度流程全部执行完毕
+   - 基线 run_tag: gray_baseline_v1
+   - 当前 run_tag: gray_current_v2
+   - 报告文件: /Users/maca/pro/solo/workspaces/zy73030/output/audit_report_gray_current_v2.md
+   - 完整日志: /Users/maca/pro/solo/workspaces/zy73030/output/gray_release_run.log
+   - 报告大小: 6955 字节
+   - 报告行数: 111 行

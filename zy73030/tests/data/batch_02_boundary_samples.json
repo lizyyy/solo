@@ -1,0 +1,57 @@
+[
+  {
+    "record_id": "PET-20250602-002",
+    "pet_name": "豆豆",
+    "owner_name": "王先生",
+    "training_date": "2026-06-02",
+    "course_type": "行为纠正",
+    "vaccine_date": "2026-05-28",
+    "trainer": "陈教练",
+    "medication_reminder": "",
+    "handwritten_note": "【6月7日补记】主人后送疫苗本来了，已核对；护食训练有进步，脱敏3次，训练师签字补全",
+    "status": "completed",
+    "operator": "小温",
+    "change_reason": "补疫苗本+训练师签字+训练师手写备注",
+    "attachments": [
+      {"attachment_type": "手写病历V1", "attachment_ref": "scan/20250602/002_v1.jpg", "description": "初版手写单（留档，疫苗栏空白）"},
+      {"attachment_type": "疫苗本照片", "attachment_ref": "scan/20250602/002_vaccine_book.jpg", "description": "后补的疫苗本内页照片，2026-05-28四联"},
+      {"attachment_type": "手写病历V2", "attachment_ref": "scan/20250602/002_v2.jpg", "description": "6月7日补充的新版手写单，训练师补签字"}
+    ]
+  },
+  {
+    "record_id": "PET-20250603-003",
+    "pet_name": "奶糖",
+    "owner_name": "刘小姐",
+    "training_date": "2026-06-03",
+    "course_type": "寄养训练营",
+    "vaccine_date": "2026-05-10",
+    "trainer": "李教练",
+    "medication_reminder": "",
+    "handwritten_note": "【6月7日补记】主人微信追加：皮肤病喷剂换成XX牌，每天喷2次；驱虫药大宠爱今晚必须用一次（原计划是6月8日）",
+    "status": "in_progress",
+    "operator": "小温",
+    "change_reason": "主人微信发来用药调整，手写病历背面补抄了一段",
+    "attachments": [
+      {"attachment_type": "手写病历V1", "attachment_ref": "scan/20250603/003_v1.jpg", "description": "初版手写单留档"},
+      {"attachment_type": "微信聊天截图", "attachment_ref": "chat/20250607/003_wechat.png", "description": "6月7日主人微信要求的用药调整截图"},
+      {"attachment_type": "手写病历V2背面", "attachment_ref": "scan/20250603/003_v2_back.jpg", "description": "补抄的用药调整说明"}
+    ]
+  },
+  {
+    "record_id": "PET-20250608-007",
+    "pet_name": "黑豹",
+    "owner_name": "钱老板",
+    "training_date": "2026-06-20",
+    "course_type": "一对一私教",
+    "vaccine_date": "去年夏天",
+    "trainer": "李教练",
+    "medication_reminder": "无",
+    "handwritten_note": "6月8日提前开的20号私教课预售单，疫苗等6月18日体检一起补",
+    "status": "scheduled",
+    "operator": "小温",
+    "change_reason": "预售开单（边界样本）",
+    "attachments": [
+      {"attachment_type": "预售确认单", "attachment_ref": "scan/20250608/007_preorder.jpg", "description": "主人签字的预售确认单"}
+    ]
+  }
+]
