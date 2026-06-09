@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { AlertTriangle, ArrowRight, CheckCircle, XCircle, User } from 'lucide-react';
+import { AlertTriangle, ArrowRight, CheckCircle, XCircle, User, Shield, FileText, ListChecks } from 'lucide-react';
 import { api } from '../lib/api';
-import { useAppStore } from '../store';
+import { useDataStore } from '../store/dataStore';
+import { useAuthStore } from '../store/authStore';
 import { GapRecord, GapReviewStatus } from '../../shared/types';
 import { cn } from '../lib/utils';
 
@@ -11,27 +12,17 @@ const warningPattern = {
 };
 
 export default function GapReviewPage() {
-  const { gaps, setGaps, currentUser } = useAppStore();
-  const [loading, setLoading] = useState(false);
+  const { gaps, records, loading, refreshAll, refreshGaps, getRecordById, getHistoryByRecordId } = useDataStore();
+  const { user: currentUser } = useAuthStore();
   const [selectedGap, setSelectedGap] = useState<GapRecord | null>(null);
   const [reviewNote, setReviewNote] = useState('');
   const [reviewing, setReviewing] = useState(false);
 
-  const loadGaps = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await api.getGaps();
-      setGaps(data);
-    } catch (error) {
-      console.error('加载断档列表失败:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [setGaps]);
-
   useEffect(() => {
-    loadGaps();
-  }, [loadGaps]);
+    if (gaps.length === 0) {
+      refreshGaps();
+    }
+  }, [gaps.length, refreshGaps]);
 
   const handleSelectGap = (gap: GapRecord) => {
     if (gap.reviewStatus !== 'pending') return;
@@ -53,7 +44,7 @@ export default function GapReviewPage() {
     setReviewing(true);
     try {
       await api.reviewGap(selectedGap.id, status, reviewNote);
-      await loadGaps();
+      await refreshAll();
       setSelectedGap(null);
       setReviewNote('');
     } catch (error) {
@@ -67,9 +58,31 @@ export default function GapReviewPage() {
   const pendingGaps = gaps.filter((g) => g.reviewStatus === 'pending');
   const reviewedGaps = gaps.filter((g) => g.reviewStatus !== 'pending');
 
+  const getNextHandlerLabel = (gap: GapRecord): string => {
+    if (gap.reviewStatus === 'pending') return '教研组';
+    if (gap.reviewStatus === 'normal') return '唐老师确认 / 归档';
+    if (gap.reviewStatus === 'abnormal') return '唐老师确认 / 归档';
+    return '唐老师确认 / 归档';
+  };
+
   const GapCard = ({ gap }: { gap: GapRecord }) => {
     const isSelected = selectedGap?.id === gap.id;
     const isPending = gap.reviewStatus === 'pending';
+    const record = getRecordById(gap.recordId);
+    const gapHistory = gap.recordId ? getHistoryByRecordId(gap.recordId) : [];
+    const latestReason = gapHistory.length > 0 ? gapHistory[gapHistory.length - 1] : null;
+    let parsedReason = '';
+    if (latestReason?.afterState) {
+      const state = latestReason.afterState;
+      if (typeof state === 'object') {
+        parsedReason = state.reason || '';
+      } else {
+        try {
+          const parsed = JSON.parse(state);
+          parsedReason = parsed.reason || '';
+        } catch {}
+      }
+    }
 
     return (
       <div
@@ -97,10 +110,13 @@ export default function GapReviewPage() {
                 <AlertTriangle className="w-5 h-5" />
               </div>
               <div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <span className="font-mono font-medium text-gray-900">
-                    {gap.recordId}
+                    {record?.recordNo || gap.recordId}
                   </span>
+                  {record?.teacherName && (
+                    <span className="text-sm text-gray-600">{record.teacherName}</span>
+                  )}
                   {!isPending && (
                     <span className={cn(
                       'px-2 py-0.5 rounded-full text-xs font-medium',
@@ -115,15 +131,34 @@ export default function GapReviewPage() {
                 </p>
               </div>
             </div>
-            {isPending && (
-              <span className="px-2 py-1 bg-orange-100 text-orange-600 text-xs font-medium rounded-lg">
-                待复核
-              </span>
-            )}
+            <div className="flex flex-col items-end gap-1">
+              {isPending ? (
+                <span className="px-2 py-1 bg-orange-100 text-orange-600 text-xs font-medium rounded-lg">
+                  待复核
+                </span>
+              ) : (
+                gap.reviewStatus === 'normal' ? (
+                  <span className="px-2 py-1 bg-green-100 text-green-600 text-xs font-medium rounded-lg flex items-center gap-1">
+                    <CheckCircle className="w-3 h-3" /> 已复核正常
+                  </span>
+                ) : (
+                  <span className="px-2 py-1 bg-red-100 text-red-600 text-xs font-medium rounded-lg flex items-center gap-1">
+                    <XCircle className="w-3 h-3" /> 已复核异常
+                  </span>
+                )
+              )}
+              <div className="flex items-center gap-1 text-[10px] text-gray-500 mt-1">
+                <Shield className="w-3 h-3" />
+                下一步：{getNextHandlerLabel(gap)}
+              </div>
+            </div>
           </div>
 
           <div className="bg-white rounded-lg border border-orange-200 p-4">
-            <div className="text-sm font-medium text-gray-700 mb-3">断档位置</div>
+            <div className="text-xs font-semibold text-orange-700 mb-3 flex items-center gap-1.5">
+              <AlertTriangle className="w-3.5 h-3.5" />
+              原始说法：编号序列跳号，疑似人工删除
+            </div>
             <div className="flex items-center justify-center gap-4">
               <div className="flex flex-col items-center">
                 <div className="w-16 h-16 bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center">
@@ -133,10 +168,13 @@ export default function GapReviewPage() {
               </div>
               <ArrowRight className="w-5 h-5 text-gray-400" />
               <div className="flex flex-col items-center">
-                <div className="w-16 h-16 bg-red-50 rounded-lg border-2 border-red-300 border-dashed flex items-center justify-center">
+                <div className="w-16 h-16 bg-red-50 rounded-lg border-2 border-red-300 border-dashed flex items-center justify-center relative">
                   <span className="font-mono text-2xl font-bold text-red-500">?</span>
+                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded whitespace-nowrap">
+                    MISSING
+                  </div>
                 </div>
-                <span className="text-xs text-red-600 mt-1 font-medium">{gap.missingRecordNo}</span>
+                <span className="text-xs text-red-600 mt-2 font-medium">{gap.missingRecordNo}</span>
               </div>
               <ArrowRight className="w-5 h-5 text-gray-400" />
               <div className="flex flex-col items-center">
@@ -146,7 +184,19 @@ export default function GapReviewPage() {
                 <span className="text-xs text-gray-500 mt-1">后一编号</span>
               </div>
             </div>
+            <div className="mt-4 text-center text-xs text-gray-500">
+              编号序列：{gap.previousRecordNo} → [缺失 {gap.missingRecordNo}] → {gap.nextRecordNo}
+            </div>
           </div>
+
+          {isPending && parsedReason && (
+            <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+              <div className="text-[10px] font-semibold text-amber-700 uppercase tracking-wider mb-1">
+                处理原因（待复核）
+              </div>
+              <p className="text-sm text-amber-800">{parsedReason}</p>
+            </div>
+          )}
 
           {!isPending && gap.reviewNote && (
             <div className={cn(
@@ -166,7 +216,7 @@ export default function GapReviewPage() {
         </div>
 
         {isSelected && isPending && (
-          <div className="border-t border-orange-200 bg-white p-4">
+          <div className="border-t border-orange-200 bg-white p-4" onClick={(e) => e.stopPropagation()}>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -178,12 +228,11 @@ export default function GapReviewPage() {
                   placeholder="请输入复核意见（必填），说明断档原因或处理方式"
                   rows={3}
                   className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none"
-                  onClick={(e) => e.stopPropagation()}
                 />
                 {currentUser && (
                   <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
                     <User className="w-3 h-3" />
-                    操作人：{currentUser.name}
+                    操作人：{currentUser.name} ({currentUser.role === 'reviewer' ? '教研组' : currentUser.role})
                   </p>
                 )}
               </div>
@@ -245,6 +294,23 @@ export default function GapReviewPage() {
         </div>
       </div>
 
+      <div className="bg-yellow-50 border-2 border-yellow-400 rounded-xl p-4 shadow-sm">
+        <div className="flex items-start gap-3">
+          <AlertTriangle className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-0.5" />
+          <div className="text-sm">
+            <p className="font-bold text-yellow-900 text-base">
+              ⚠️ 编号断档不自动归正常！
+            </p>
+            <p className="mt-1 text-yellow-800">
+              请根据实际情况人工复核，确认无问题后再标记正常。
+            </p>
+            <p className="mt-1 text-yellow-700">
+              标记后会同步更新参数版本，<span className="font-semibold">全系统各页面看到的是同一份结果</span>。
+            </p>
+          </div>
+        </div>
+      </div>
+
       <div className="bg-orange-50 border border-orange-200 rounded-xl p-4">
         <div className="flex items-start gap-3">
           <AlertTriangle className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
@@ -255,7 +321,7 @@ export default function GapReviewPage() {
         </div>
       </div>
 
-      {loading ? (
+      {loading && gaps.length === 0 ? (
         <div className="bg-white rounded-xl border border-gray-200 p-8 text-center text-gray-500">
           加载中...
         </div>

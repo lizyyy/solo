@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import { Upload, FileSpreadsheet, FileText, Clock, CheckCircle, AlertCircle, X, Info } from 'lucide-react';
+import { Upload, FileSpreadsheet, FileText, Clock, CheckCircle, AlertCircle, X, Info, Shield, GitBranch, History } from 'lucide-react';
 import { api } from '../lib/api';
-import { useAppStore } from '../store';
+import { useDataStore } from '../store/dataStore';
+import { useAuthStore } from '../store/authStore';
 import { cn } from '../lib/utils';
 
 interface ImportHistoryItem {
@@ -15,8 +16,16 @@ interface ImportHistoryItem {
   message?: string;
 }
 
+interface ImportStats {
+  newRecords: number;
+  gaps: number;
+  supplements: number;
+  conflicts: number;
+}
+
 export default function ImportPage() {
-  const { currentUser } = useAppStore();
+  const { user: currentUser } = useAuthStore();
+  const { refreshAll, records, conflicts, gaps } = useDataStore();
   const [teacherDragActive, setTeacherDragActive] = useState(false);
   const [samplingDragActive, setSamplingDragActive] = useState(false);
   const [teacherFile, setTeacherFile] = useState<File | null>(null);
@@ -26,6 +35,8 @@ export default function ImportPage() {
   const [teacherResult, setTeacherResult] = useState<{ success: boolean; count: number; message: string } | null>(null);
   const [samplingResult, setSamplingResult] = useState<{ success: boolean; count: number; message: string } | null>(null);
   const [importHistory, setImportHistory] = useState<ImportHistoryItem[]>([]);
+  const [showSuccessBanner, setShowSuccessBanner] = useState(false);
+  const [importStats, setImportStats] = useState<ImportStats | null>(null);
   const teacherInputRef = useRef<HTMLInputElement>(null);
   const samplingInputRef = useRef<HTMLInputElement>(null);
 
@@ -40,6 +51,18 @@ export default function ImportPage() {
       { id: '3', type: 'teacher_note', fileName: 'teacher_notes_2024_02.csv', importedAt: '2024-01-14 15:20:00', importedBy: '系统管理员', count: 0, status: 'error', message: '文件格式错误' },
     ];
     setImportHistory(mockHistory);
+  };
+
+  const calculateImportStats = (): ImportStats => {
+    const gapCount = gaps.filter((g) => g.reviewStatus === 'pending').length;
+    const supplementCount = records.filter((r) => r.status === 'supplement').length;
+    const conflictCount = conflicts.filter((c) => !c.resolution).length;
+    return {
+      newRecords: records.length,
+      gaps: gapCount,
+      supplements: supplementCount,
+      conflicts: conflictCount,
+    };
   };
 
   const handleDrag = (e: React.DragEvent) => {
@@ -100,6 +123,10 @@ export default function ImportPage() {
       const result = await api.importTeacherNotes(teacherFile);
       setTeacherResult({ success: result.success, count: result.importedCount, message: result.message });
       setTeacherFile(null);
+      await refreshAll();
+      setImportStats(calculateImportStats());
+      setShowSuccessBanner(true);
+      setTimeout(() => setShowSuccessBanner(false), 8000);
       loadImportHistory();
     } catch (error) {
       setTeacherResult({ success: false, count: 0, message: error instanceof Error ? error.message : '导入失败' });
@@ -116,6 +143,10 @@ export default function ImportPage() {
       const result = await api.importSamplingList(samplingFile);
       setSamplingResult({ success: result.success, count: result.importedCount, message: result.message });
       setSamplingFile(null);
+      await refreshAll();
+      setImportStats(calculateImportStats());
+      setShowSuccessBanner(true);
+      setTimeout(() => setShowSuccessBanner(false), 8000);
       loadImportHistory();
     } catch (error) {
       setSamplingResult({ success: false, count: 0, message: error instanceof Error ? error.message : '导入失败' });
@@ -301,6 +332,64 @@ export default function ImportPage() {
         )}
       </div>
 
+      {showSuccessBanner && importStats && (
+        <div className="bg-green-50 border-2 border-green-400 rounded-xl p-5 shadow-sm">
+          <div className="flex items-start gap-3">
+            <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="font-bold text-green-900 text-base mb-2">
+                🎉 导入完成！数据已同步到全系统各页面
+              </p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3">
+                <div className="bg-white p-3 rounded-lg border border-green-200">
+                  <div className="text-xs text-gray-500">总记录数</div>
+                  <div className="text-xl font-bold text-gray-800">{importStats.newRecords}</div>
+                </div>
+                <div className="bg-white p-3 rounded-lg border border-orange-200">
+                  <div className="text-xs text-gray-500">识别断档</div>
+                  <div className="text-xl font-bold text-orange-600">{importStats.gaps}</div>
+                </div>
+                <div className="bg-white p-3 rounded-lg border border-purple-200">
+                  <div className="text-xs text-gray-500">补录记录</div>
+                  <div className="text-xl font-bold text-purple-600">{importStats.supplements}</div>
+                </div>
+                <div className="bg-white p-3 rounded-lg border border-red-200">
+                  <div className="text-xs text-gray-500">数据冲突</div>
+                  <div className="text-xl font-bold text-red-600">{importStats.conflicts}</div>
+                </div>
+              </div>
+              <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="flex items-start gap-2">
+                  <Info className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <div className="text-xs text-blue-800 space-y-0.5">
+                    <p className="font-medium">导入完成后：</p>
+                    <ul className="list-disc list-inside space-y-0.5 mt-1">
+                      <li>参数版本页会自动生成新版本快照</li>
+                      <li>历史记录页会记录所有操作轨迹</li>
+                      <li>整合结果页立即显示最新状态统计</li>
+                      <li>断档复核/冲突处理页同步最新待办</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+        <div className="flex items-start gap-3">
+          <Shield className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+          <div className="text-sm text-amber-800">
+            <p className="font-medium">提示：</p>
+            <p className="mt-1 text-amber-700">
+              导入完成后，参数版本页会自动生成新版本快照，历史记录页会记录所有操作轨迹。
+              全系统各页面（整合结果、断档复核、冲突处理等）将同步显示同一份最新数据。
+            </p>
+          </div>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <UploadZone
           type="teacher"
@@ -333,11 +422,21 @@ export default function ImportPage() {
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
+        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
             <Clock className="w-5 h-5 text-gray-500" />
             最近导入记录
           </h2>
+          <div className="flex items-center gap-4 text-xs text-gray-500">
+            <span className="flex items-center gap-1">
+              <GitBranch className="w-3 h-3" />
+              导入即生成版本快照
+            </span>
+            <span className="flex items-center gap-1">
+              <History className="w-3 h-3" />
+              所有操作记入历史
+            </span>
+          </div>
         </div>
         <div className="divide-y divide-gray-100">
           {importHistory.length === 0 ? (

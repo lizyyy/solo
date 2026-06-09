@@ -36,15 +36,17 @@ function resolveConflict(
       throw new Error(`关联记录 ${conflict.recordId} 不存在`)
     }
 
-    const beforeState = record.status
-    let afterState: typeof record.status = 'approved'
+    let afterStatus: typeof record.status = 'approved'
 
     if (resolution === 'rejected') {
-      afterState = 'rejected'
+      afterStatus = 'rejected'
     }
 
+    const conflictNextHandler = '归档'
+    const conflictReason = note || `冲突处理结果：${resolution === 'teacher_note' ? '以老师批注为准' : resolution === 'sampling_list' ? '以抽样名单为准' : '驳回，需重新处理'}`
+
     billRecordRepo.update(record.id, {
-      status: afterState,
+      status: afterStatus,
     })
 
     createOperationHistory({
@@ -52,9 +54,28 @@ function resolveConflict(
       description: `处理冲突记录 ${record.recordNo}，处理方式: ${resolution}，备注: ${note}`,
       recordId: record.id,
       operator,
-      operatorRole: 'admin',
-      beforeState,
-      afterState,
+      operatorRole: 'coach',
+      beforeState: {
+        status: record.status,
+        recordNo: record.recordNo,
+        teacherName: record.teacherName,
+        amount: record.amount,
+        conflictingFields: conflict.conflictingFields,
+        resolution: 'none',
+      },
+      afterState: {
+        status: afterStatus,
+        recordNo: record.recordNo,
+        teacherName: record.teacherName,
+        amount: record.amount,
+        conflictingFields: conflict.conflictingFields,
+        resolution,
+        resolutionNote: note,
+        nextHandler: conflictNextHandler,
+        reason: conflictReason,
+      },
+      nextHandler: conflictNextHandler,
+      reason: conflictReason,
     })
 
     return resolvedConflict
@@ -64,6 +85,7 @@ function resolveConflict(
 
   const newVersion = createNewVersion(
     operator,
+    'coach',
     `处理冲突记录 ${id}，处理方式: ${resolution}`
   )
 

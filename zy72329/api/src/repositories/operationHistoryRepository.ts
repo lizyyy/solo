@@ -10,6 +10,8 @@ interface OperationHistoryRow {
   operator_role: string
   before_state: string | null
   after_state: string | null
+  next_handler: string | null
+  reason: string | null
   created_at: string
 }
 
@@ -21,8 +23,10 @@ function rowToOperationHistory(row: OperationHistoryRow): OperationHistory {
     description: row.description,
     operator: row.operator,
     operatorRole: row.operator_role,
-    beforeState: row.before_state ?? undefined,
-    afterState: row.after_state ?? undefined,
+    beforeState: row.before_state ? JSON.parse(row.before_state) : undefined,
+    afterState: row.after_state ? JSON.parse(row.after_state) : undefined,
+    nextHandler: row.next_handler ?? undefined,
+    reason: row.reason ?? undefined,
     createdAt: row.created_at
   }
 }
@@ -35,8 +39,10 @@ function operationHistoryToRow(history: OperationHistory): unknown[] {
     history.description,
     history.operator,
     history.operatorRole,
-    history.beforeState ?? null,
-    history.afterState ?? null,
+    history.beforeState ? JSON.stringify(history.beforeState) : null,
+    history.afterState ? JSON.stringify(history.afterState) : null,
+    history.nextHandler ?? null,
+    history.reason ?? null,
     history.createdAt
   ]
 }
@@ -44,8 +50,8 @@ function operationHistoryToRow(history: OperationHistory): unknown[] {
 const insertStmt = db.prepare(`
   INSERT INTO operation_histories (
     id, record_id, operation_type, description, operator,
-    operator_role, before_state, after_state, created_at
-  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    operator_role, before_state, after_state, next_handler, reason, created_at
+  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `)
 
 const findByRecordIdStmt = db.prepare(`
@@ -127,8 +133,10 @@ interface OperationHistoryCreate {
   description: string
   operator: string
   operatorRole: string
-  beforeState?: string
-  afterState?: string
+  beforeState?: Record<string, any>
+  afterState?: Record<string, any>
+  nextHandler?: string
+  reason?: string
 }
 
 export function create(data: OperationHistoryCreate): OperationHistory {

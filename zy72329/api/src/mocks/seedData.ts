@@ -162,8 +162,22 @@ function seedMockData(): void {
       recordId: record003.id,
       operator,
       operatorRole,
-      beforeState: 'pending',
-      afterState: 'smooth',
+      beforeState: {
+        status: 'pending',
+        recordNo: record003.recordNo,
+        teacherName: record003.teacherName,
+        amount: record003.amount,
+      },
+      afterState: {
+        status: 'smooth',
+        recordNo: record003.recordNo,
+        teacherName: record003.teacherName,
+        amount: record003.amount,
+        nextHandler: '无',
+        reason: '双边数据完全一致，顺利通过',
+      },
+      nextHandler: '无',
+      reason: '双边数据完全一致，顺利通过',
     })
 
     createOperationHistory({
@@ -172,8 +186,23 @@ function seedMockData(): void {
       recordId: record007.id,
       operator,
       operatorRole,
-      beforeState: 'pending',
-      afterState: 'gap',
+      beforeState: {
+        status: 'pending',
+        recordNo: record007.recordNo,
+        teacherName: record007.teacherName,
+        amount: record007.amount,
+      },
+      afterState: {
+        status: 'gap',
+        recordNo: record007.recordNo,
+        missingRecordNo: '006',
+        previousNo: '005',
+        nextNo: '007',
+        nextHandler: '教研组',
+        reason: '编号断档：005 之后跳过 006 直接到 007，疑似人工删除一行',
+      },
+      nextHandler: '教研组',
+      reason: '编号断档：005 之后跳过 006 直接到 007，疑似人工删除一行',
     })
 
     createOperationHistory({
@@ -182,8 +211,22 @@ function seedMockData(): void {
       recordId: record012.id,
       operator,
       operatorRole,
-      beforeState: 'pending',
-      afterState: 'supplement',
+      beforeState: {
+        status: 'pending',
+        recordNo: record012.recordNo,
+        teacherName: record012.teacherName,
+        amount: record012.amount,
+      },
+      afterState: {
+        status: 'supplement',
+        recordNo: record012.recordNo,
+        teacherName: record012.teacherName,
+        amount: record012.amount,
+        nextHandler: '唐老师',
+        reason: '旧口径补录，仅抽样名单中有，老师批注中无此记录',
+      },
+      nextHandler: '唐老师',
+      reason: '旧口径补录，仅抽样名单中有，老师批注中无此记录',
     })
 
     createOperationHistory({

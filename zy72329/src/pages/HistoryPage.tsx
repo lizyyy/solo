@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { History, Clock, User, Search, Filter, Upload, GitBranch, FileCheck, GitMerge, ChevronDown, ExternalLink } from 'lucide-react';
-import { api } from '../lib/api';
+import { History, Clock, User, Search, Filter, Upload, GitBranch, FileCheck, GitMerge, ChevronDown, ExternalLink, ArrowRight, Shield } from 'lucide-react';
+import { useDataStore } from '../store/dataStore';
 import { useAppStore } from '../store';
-import { OperationHistory, OperationType } from '../../shared/types';
+import { OperationHistory, OperationType, RecordStatus } from '../../shared/types';
 import { cn } from '../lib/utils';
+import StatusBadge from '../components/StatusBadge';
 
 const operationIcons: Record<OperationType, typeof Upload> = {
   import: Upload,
@@ -16,10 +17,10 @@ const operationIcons: Record<OperationType, typeof Upload> = {
 
 const operationLabels: Record<OperationType, string> = {
   import: '数据导入',
-  match: '数据匹配',
+  match: '匹配识别',
   conflict_resolve: '冲突处理',
   gap_review: '断档复核',
-  version_create: '版本创建',
+  version_create: '参数版本生成',
 };
 
 const operationColors: Record<OperationType, string> = {
@@ -32,14 +33,54 @@ const operationColors: Record<OperationType, string> = {
 
 const roleLabels: Record<string, string> = {
   admin: '系统管理员',
-  coach: '教练',
-  reviewer: '审核员',
+  coach: '唐老师',
+  reviewer: '教研组',
 };
+
+const statusLabels: Record<string, string> = {
+  smooth: '顺利记录',
+  gap: '编号断档',
+  supplement: '旧口径补录',
+  conflict: '数据冲突',
+  pending: '待处理',
+  approved: '已通过',
+  rejected: '已拒绝',
+  reviewed_normal: '复核正常',
+  reviewed_abnormal: '复核异常',
+};
+
+interface ParsedState {
+  status?: RecordStatus;
+  nextHandler?: string;
+  reason?: string;
+  resolution?: string;
+  [key: string]: any;
+}
+
+function parseStateJson(state?: Record<string, any> | string): ParsedState {
+  if (!state) return {};
+  if (typeof state === 'object') {
+    return state as ParsedState;
+  }
+  try {
+    return JSON.parse(state) as ParsedState;
+  } catch {
+    return {};
+  }
+}
+
+function getNextHandlerLabel(handler?: string): string {
+  if (!handler) return '';
+  if (handler === 'coach') return '唐老师';
+  if (handler === 'reviewer') return '教研组';
+  if (handler === 'admin') return '系统管理员';
+  return handler;
+}
 
 export default function HistoryPage() {
   const navigate = useNavigate();
-  const { histories, setHistories, setSelectedRecord, setDrawerOpen } = useAppStore();
-  const [loading, setLoading] = useState(false);
+  const { history, loading, refreshHistory, getRecordById, records } = useDataStore();
+  const { setSelectedRecord, toggleDrawer } = useAppStore();
   const [filterOpen, setFilterOpen] = useState(false);
   const [filters, setFilters] = useState({
     recordId: '',
@@ -50,28 +91,13 @@ export default function HistoryPage() {
   });
   const [selectedRecordHistory, setSelectedRecordHistory] = useState<string | null>(null);
 
-  const loadHistory = useCallback(async () => {
-    setLoading(true);
-    try {
-      const params: Record<string, string> = {};
-      if (filters.recordId) params.recordId = filters.recordId;
-      if (filters.operator) params.operator = filters.operator;
-      if (filters.startDate) params.startDate = filters.startDate;
-      if (filters.endDate) params.endDate = filters.endDate;
-      if (filters.operationType) params.operationType = filters.operationType;
-
-      const data = await api.getHistory(params);
-      setHistories(data);
-    } catch (error) {
-      console.error('加载历史记录失败:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [filters, setHistories]);
-
   useEffect(() => {
-    loadHistory();
-  }, [loadHistory]);
+    refreshHistory();
+  }, [refreshHistory]);
+
+  const loadHistory = useCallback(async () => {
+    await refreshHistory();
+  }, [refreshHistory]);
 
   const handleFilterChange = (key: keyof typeof filters, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -92,13 +118,11 @@ export default function HistoryPage() {
   };
 
   const handleViewRecord = async (recordId: string) => {
-    try {
-      const record = await api.getRecordDetail(recordId);
+    const record = getRecordById(recordId);
+    if (record) {
       setSelectedRecord(record);
-      setDrawerOpen(true);
+      toggleDrawer(true);
       setSelectedRecordHistory(recordId);
-    } catch (error) {
-      console.error('加载记录详情失败:', error);
     }
   };
 
@@ -106,10 +130,19 @@ export default function HistoryPage() {
     navigate('/');
     setTimeout(() => {
       handleViewRecord(recordId);
-    }, 100);
+    }, 150);
   };
 
-  const groupedByDate = histories.reduce((acc, item) => {
+  const filteredHistory = history.filter((item) => {
+    if (filters.recordId && !item.recordId?.includes(filters.recordId)) return false;
+    if (filters.operator && !item.operator.includes(filters.operator)) return false;
+    if (filters.startDate && item.createdAt < filters.startDate) return false;
+    if (filters.endDate && item.createdAt > filters.endDate + ' 23:59:59') return false;
+    if (filters.operationType && item.operationType !== filters.operationType) return false;
+    return true;
+  });
+
+  const groupedByDate = filteredHistory.reduce((acc, item) => {
     const date = item.createdAt.split(' ')[0];
     if (!acc[date]) {
       acc[date] = [];
@@ -119,9 +152,92 @@ export default function HistoryPage() {
   }, {} as Record<string, OperationHistory[]>);
 
   const getRecordLifecycle = (recordId: string) => {
-    return histories
+    return history
       .filter((h) => h.recordId === recordId)
       .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+  };
+
+  const StateCompareCard = ({ item }: { item: OperationHistory }) => {
+    const beforeParsed = parseStateJson(item.beforeState);
+    const afterParsed = parseStateJson(item.afterState);
+
+    const displayNextHandler = afterParsed.nextHandler || beforeParsed.nextHandler;
+    const displayReason = afterParsed.reason || beforeParsed.reason;
+
+    return (
+      <div className="mt-3 space-y-3">
+        {(beforeParsed.status || afterParsed.status) && (
+          <div className="grid grid-cols-2 gap-3">
+            <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+              <div className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                前状态 beforeState
+              </div>
+              {beforeParsed.status ? (
+                <StatusBadge status={beforeParsed.status} />
+              ) : (
+                <span className="text-xs text-gray-400">-</span>
+              )}
+              {beforeParsed.status && (
+                <div className="mt-2 text-xs text-gray-500">
+                  {statusLabels[beforeParsed.status] || beforeParsed.status}
+                </div>
+              )}
+            </div>
+            <div
+              className={cn(
+                'p-3 rounded-lg border-2',
+                afterParsed.status === 'smooth' && 'bg-green-50 border-green-300',
+                afterParsed.status === 'gap' && 'bg-orange-50 border-orange-300',
+                afterParsed.status === 'supplement' && 'bg-purple-50 border-purple-300',
+                afterParsed.status === 'conflict' && 'bg-red-50 border-red-300',
+                afterParsed.status === 'pending' && 'bg-slate-50 border-slate-300',
+                (afterParsed.status === 'approved' || afterParsed.status === 'reviewed_normal') && 'bg-green-50 border-green-400',
+                (afterParsed.status === 'rejected' || afterParsed.status === 'reviewed_abnormal') && 'bg-red-50 border-red-400',
+                !afterParsed.status && 'bg-gray-50 border-gray-200'
+              )}
+            >
+              <div className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                后状态 afterState
+              </div>
+              {afterParsed.status ? (
+                <StatusBadge status={afterParsed.status} />
+              ) : (
+                <span className="text-xs text-gray-400">-</span>
+              )}
+              {afterParsed.status && (
+                <div className="mt-2 text-xs text-gray-600">
+                  {statusLabels[afterParsed.status] || afterParsed.status}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        <div className="flex items-center justify-center text-gray-300">
+          <ArrowRight className="w-4 h-4" />
+        </div>
+
+        <div className="flex flex-wrap gap-2 items-center">
+          {displayNextHandler && (
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-lg">
+              <Shield className="w-3.5 h-3.5 text-blue-600" />
+              <span className="text-xs font-medium text-blue-700">
+                下一步找谁：{getNextHandlerLabel(displayNextHandler)}
+              </span>
+            </div>
+          )}
+
+          {displayReason && (
+            <div className="flex-1 min-w-[200px] p-3 bg-amber-50 border border-amber-200 rounded-lg">
+              <div className="text-[10px] font-semibold text-amber-700 uppercase tracking-wider mb-1">
+                处理原因
+              </div>
+              <p className="text-sm text-amber-800">{displayReason}</p>
+            </div>
+          )}
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -232,11 +348,11 @@ export default function HistoryPage() {
         )}
       </div>
 
-      {loading ? (
+      {loading && filteredHistory.length === 0 ? (
         <div className="bg-white rounded-xl border border-gray-200 p-8 text-center text-gray-500">
           加载中...
         </div>
-      ) : histories.length === 0 ? (
+      ) : filteredHistory.length === 0 ? (
         <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
           <History className="w-12 h-12 text-gray-300 mx-auto mb-4" />
           <p className="text-gray-500">暂无操作记录</p>
@@ -281,7 +397,7 @@ export default function HistoryPage() {
                         >
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
+                              <div className="flex items-center gap-2 mb-1 flex-wrap">
                                 <span className={cn(
                                   'px-2 py-0.5 rounded text-xs font-medium',
                                   operationColors[item.operationType]
@@ -291,13 +407,18 @@ export default function HistoryPage() {
                                 <span className="text-xs text-gray-400 font-mono">
                                   {item.createdAt.split(' ')[1]}
                                 </span>
+                                <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-[10px] font-medium">
+                                  {roleLabels[item.operatorRole] || item.operatorRole}
+                                </span>
                               </div>
-                              <p className="text-sm text-gray-800">{item.description}</p>
+                              <p className="text-sm text-gray-800 font-medium">{item.description}</p>
                               <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
                                 <span className="flex items-center gap-1">
                                   <User className="w-3 h-3" />
                                   {item.operator}
-                                  <span className="text-gray-400">({roleLabels[item.operatorRole] || item.operatorRole})</span>
+                                  <span className="text-gray-400 ml-1">
+                                    ({roleLabels[item.operatorRole] || item.operatorRole})
+                                  </span>
                                 </span>
                                 {item.recordId && (
                                   <span className="font-mono text-gray-400">
@@ -305,6 +426,10 @@ export default function HistoryPage() {
                                   </span>
                                 )}
                               </div>
+
+                              {(item.beforeState || item.afterState) && (
+                                <StateCompareCard item={item} />
+                              )}
                             </div>
                             {item.recordId && (
                               <button
@@ -312,8 +437,8 @@ export default function HistoryPage() {
                                   e.stopPropagation();
                                   handleJumpToRecord(item.recordId);
                                 }}
-                                className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
-                                title="跳转到记录"
+                                className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
+                                title="跳转到记录并打开证据链"
                               >
                                 <ExternalLink className="w-4 h-4 text-gray-400" />
                               </button>
@@ -343,13 +468,18 @@ export default function HistoryPage() {
                                           <EventIcon className="w-2.5 h-2.5" />
                                         </div>
                                         <div className="p-2 bg-gray-50 rounded-lg">
-                                          <div className="flex items-center gap-2">
+                                          <div className="flex items-center gap-2 flex-wrap">
                                             <span className="text-xs font-medium text-gray-700">
                                               {operationLabels[event.operationType]}
                                             </span>
                                             <span className="text-[10px] text-gray-400 font-mono">
                                               {event.createdAt.split(' ')[1]}
                                             </span>
+                                            {event.operatorRole && (
+                                              <span className="px-1.5 py-0.5 bg-gray-200 text-gray-600 rounded text-[9px]">
+                                                {roleLabels[event.operatorRole] || event.operatorRole}
+                                              </span>
+                                            )}
                                           </div>
                                           <p className="text-xs text-gray-500 mt-0.5">{event.description}</p>
                                           <p className="text-[10px] text-gray-400 mt-0.5">

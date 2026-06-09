@@ -9,20 +9,6 @@ export type RecordStatus =
   | 'reviewed_normal'
   | 'reviewed_abnormal';
 
-export interface BillRecord {
-  id: string;
-  recordNo: string;
-  date: string;
-  teacherName: string;
-  amount: number;
-  itemType: string;
-  status: RecordStatus;
-  teacherNoteId?: string;
-  samplingListId?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
 export interface TeacherNote {
   id: string;
   recordNo: string;
@@ -79,8 +65,10 @@ export interface OperationHistory {
   description: string;
   operator: string;
   operatorRole: string;
-  beforeState?: string;
-  afterState?: string;
+  beforeState?: Record<string, any>;
+  afterState?: Record<string, any>;
+  nextHandler?: string;
+  reason?: string;
   createdAt: string;
 }
 
@@ -116,6 +104,22 @@ export interface GapRecord {
   reviewedBy?: string;
   reviewedAt?: string;
   createdAt: string;
+}
+
+export interface BillRecord {
+  id: string;
+  recordNo: string;
+  date: string;
+  teacherName: string;
+  amount: number;
+  itemType: string;
+  status: RecordStatus;
+  teacherNoteId?: string;
+  samplingListId?: string;
+  createdAt: string;
+  updatedAt: string;
+  gapRecord?: GapRecord;
+  conflictRecord?: ConflictRecord;
 }
 
 export type UserRole = 'admin' | 'coach' | 'reviewer';

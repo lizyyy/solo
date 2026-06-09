@@ -3,8 +3,12 @@ import {
   batchCreate as batchCreateTeacherNote,
   findByRecordNo as findTeacherNoteByRecordNo,
   findAll as findAllTeacherNotes,
+  findById as findTeacherNoteById,
 } from '../repositories/teacherNoteRepository'
-import { batchCreate as batchCreateSamplingList } from '../repositories/samplingListRepository'
+import {
+  batchCreate as batchCreateSamplingList,
+  findById as findSamplingListById,
+} from '../repositories/samplingListRepository'
 import {
   create as createBillRecord,
   update as updateBillRecord,
@@ -69,7 +73,7 @@ function importTeacherNotes(fileData: any[], operator: string): { batchId: strin
 
   const records = importTransaction()
 
-  createNewVersion(operator, `导入老师批注 ${records.length} 条`)
+  createNewVersion(operator, 'admin', `导入老师批注 ${records.length} 条`)
 
   return {
     batchId,
@@ -103,19 +107,28 @@ function importSamplingList(fileData: any[], operator: string): { batchId: strin
 
       let status: BillRecord['status'] = 'pending'
       let teacherNoteId = teacherNote?.id
-      const beforeState = existingRecord?.status || 'pending'
+      let nextHandler = '无'
+      let reason = ''
 
       if (sampling.isOldFormat && !teacherNote) {
         status = 'supplement'
+        nextHandler = '唐老师'
+        reason = '旧口径补录，仅抽样名单中有，老师批注中无此记录'
       } else if (teacherNote) {
         const conflicts = findConflicts(teacherNote, sampling)
         if (conflicts.length > 0) {
           status = 'conflict'
+          nextHandler = '唐老师'
+          reason = '老师批注与抽样名单字段不一致，需人工确认'
         } else {
           status = 'smooth'
+          nextHandler = '无'
+          reason = '双边数据完全一致，顺利通过'
         }
       } else {
         status = 'pending'
+        nextHandler = '待导入老师批注'
+        reason = '仅抽样名单存在，等待老师批注数据导入后匹配'
       }
 
       let billRecord: BillRecord
@@ -156,8 +169,26 @@ function importSamplingList(fileData: any[], operator: string): { batchId: strin
         recordId: billRecord.id,
         operator,
         operatorRole: 'admin',
-        beforeState,
-        afterState: status,
+        beforeState: {
+          status: existingRecord?.status || 'pending',
+          recordNo: sampling.recordNo,
+          teacherName: sampling.teacherName,
+          amount: sampling.amount,
+          rawTeacherNote: teacherNote?.annotation || '',
+          rawSampling: sampling.sceneDescription || '',
+        },
+        afterState: {
+          status,
+          recordNo: sampling.recordNo,
+          teacherName: sampling.teacherName,
+          amount: sampling.amount,
+          rawTeacherNote: teacherNote?.annotation || '',
+          rawSampling: sampling.sceneDescription || '',
+          nextHandler,
+          reason,
+        },
+        nextHandler,
+        reason,
       })
     }
 
@@ -168,6 +199,16 @@ function importSamplingList(fileData: any[], operator: string): { batchId: strin
     for (const gap of gaps) {
       const nextRecord = findBillRecordByRecordNo(gap.nextNo)
       if (nextRecord && nextRecord.status !== 'gap') {
+        const teacherNote = nextRecord.teacherNoteId
+          ? findTeacherNoteById(nextRecord.teacherNoteId)
+          : undefined
+        const samplingListRecord = nextRecord.samplingListId
+          ? findSamplingListById(nextRecord.samplingListId)
+          : undefined
+
+        const gapReason = `编号断档：${gap.prevNo} 之后跳过 ${gap.missingNo} 直接到 ${gap.nextNo}，疑似人工删除一行`
+        const gapNextHandler = '教研组'
+
         updateBillRecord(nextRecord.id, {
           status: 'gap',
         })
@@ -178,8 +219,25 @@ function importSamplingList(fileData: any[], operator: string): { batchId: strin
           recordId: nextRecord.id,
           operator,
           operatorRole: 'admin',
-          beforeState: nextRecord.status,
-          afterState: 'gap',
+          beforeState: {
+            status: nextRecord.status,
+            recordNo: nextRecord.recordNo,
+            teacherName: nextRecord.teacherName,
+            amount: nextRecord.amount,
+            rawTeacherNote: teacherNote?.annotation || '',
+            rawSampling: samplingListRecord?.sceneDescription || '',
+          },
+          afterState: {
+            status: 'gap',
+            recordNo: nextRecord.recordNo,
+            missingRecordNo: gap.missingNo,
+            previousNo: gap.prevNo,
+            nextNo: gap.nextNo,
+            nextHandler: gapNextHandler,
+            reason: gapReason,
+          },
+          nextHandler: gapNextHandler,
+          reason: gapReason,
         })
       }
 
@@ -209,7 +267,7 @@ function importSamplingList(fileData: any[], operator: string): { batchId: strin
 
   const records = importTransaction()
 
-  createNewVersion(operator, `导入抽样名单 ${records.length} 条`)
+  createNewVersion(operator, 'admin', `导入抽样名单 ${records.length} 条`)
 
   return {
     batchId,

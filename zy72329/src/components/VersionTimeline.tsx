@@ -1,6 +1,7 @@
 import { GitBranch, User, Clock, CheckCircle, AlertTriangle, PlusCircle, XCircle, ArrowLeftRight } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useAppStore } from '../store';
+import { useDataStore } from '../store/dataStore';
 import { ParamVersion } from '../../shared/types';
 
 interface VersionTimelineProps {
@@ -30,7 +31,8 @@ const statusIcons = {
 };
 
 export default function VersionTimeline({ versions: propVersions, onCompare }: VersionTimelineProps) {
-  const { versions: storeVersions, compareVersions, setCompareVersion } = useAppStore();
+  const { compareVersions, setCompareVersion } = useAppStore();
+  const { versions: storeVersions } = useDataStore();
   const versions = propVersions || storeVersions;
 
   const handleSelectCompare = (index: 0 | 1, versionId: string) => {

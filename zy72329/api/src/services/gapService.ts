@@ -36,13 +36,15 @@ function reviewGap(
       throw new Error(`关联记录 ${gap.recordId} 不存在`)
     }
 
-    const beforeState = record.status
-    const afterState: typeof record.status = status === 'normal'
+    const afterStatus: typeof record.status = status === 'normal'
       ? 'reviewed_normal'
       : 'reviewed_abnormal'
 
+    const reviewNextHandler = status === 'normal' ? '归档' : '唐老师'
+    const reviewReason = note || `断档复核结果：${status === 'normal' ? '正常，无需处理' : '异常，需唐老师确认'}`
+
     billRecordRepo.update(record.id, {
-      status: afterState,
+      status: afterStatus,
     })
 
     createOperationHistory({
@@ -51,8 +53,25 @@ function reviewGap(
       recordId: record.id,
       operator,
       operatorRole: 'reviewer',
-      beforeState,
-      afterState,
+      beforeState: {
+        status: record.status,
+        missingRecordNo: gap.missingRecordNo,
+        previousRecordNo: gap.previousRecordNo,
+        nextRecordNo: gap.nextRecordNo,
+        reviewStatus: 'pending',
+      },
+      afterState: {
+        status: afterStatus,
+        missingRecordNo: gap.missingRecordNo,
+        previousRecordNo: gap.previousRecordNo,
+        nextRecordNo: gap.nextRecordNo,
+        reviewStatus: status,
+        reviewNote: note,
+        nextHandler: reviewNextHandler,
+        reason: reviewReason,
+      },
+      nextHandler: reviewNextHandler,
+      reason: reviewReason,
     })
 
     return reviewedGap
@@ -62,6 +81,7 @@ function reviewGap(
 
   const newVersion = createNewVersion(
     operator,
+    'reviewer',
     `复核断档记录 ${gap.missingRecordNo}，结果: ${status === 'normal' ? '正常' : '异常'}`
   )
 

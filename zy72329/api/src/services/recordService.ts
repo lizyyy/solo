@@ -5,11 +5,21 @@ import * as operationHistoryRepo from '../repositories/operationHistoryRepositor
 import * as conflictRecordRepo from '../repositories/conflictRecordRepository'
 import * as gapRecordRepo from '../repositories/gapRecordRepository'
 import { generateId } from '../utils/idGenerator'
-import type { BillRecord, OperationHistory, EvidenceItem, TeacherNote, SamplingList, RecordStatus } from '../../../shared/types'
+import type { BillRecord, OperationHistory, EvidenceItem, TeacherNote, SamplingList, RecordStatus, GapRecord, ConflictRecord } from '../../../shared/types'
 
 function getRecords(status?: string): { records: BillRecord[]; total: number } {
   const records = billRecordRepo.findAll(status as RecordStatus)
   const total = billRecordRepo.count(status as RecordStatus)
+
+  for (const record of records) {
+    if (record.status === 'gap' || record.status === 'reviewed_normal' || record.status === 'reviewed_abnormal') {
+      (record as BillRecord & { gapRecord?: GapRecord }).gapRecord = gapRecordRepo.findByRecordId(record.id)
+    }
+    if (record.status === 'conflict' || record.status === 'approved' || record.status === 'rejected') {
+      (record as BillRecord & { conflictRecord?: ConflictRecord }).conflictRecord = conflictRecordRepo.findByRecordId(record.id)
+    }
+  }
+
   return { records, total }
 }
 
@@ -18,6 +28,8 @@ function getRecordDetail(id: string): {
   teacherNote?: TeacherNote
   samplingList?: SamplingList
   history: OperationHistory[]
+  gapRecord?: GapRecord
+  conflictRecord?: ConflictRecord
 } {
   const record = billRecordRepo.findById(id)
   if (!record) {
@@ -34,11 +46,21 @@ function getRecordDetail(id: string): {
 
   const history = operationHistoryRepo.findByRecordId(id)
 
+  const gapRecord = (record.status === 'gap' || record.status === 'reviewed_normal' || record.status === 'reviewed_abnormal')
+    ? gapRecordRepo.findByRecordId(id)
+    : undefined
+
+  const conflictRecord = (record.status === 'conflict' || record.status === 'approved' || record.status === 'rejected')
+    ? conflictRecordRepo.findByRecordId(id)
+    : undefined
+
   return {
     record,
     teacherNote,
     samplingList,
     history,
+    gapRecord,
+    conflictRecord,
   }
 }
 

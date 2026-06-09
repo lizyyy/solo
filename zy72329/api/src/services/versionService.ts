@@ -82,7 +82,7 @@ function compareVersions(fromId: string, toId: string): { diffs: any[] } {
   return { diffs }
 }
 
-function createNewVersion(operator: string, changeSummary: string): ParamVersion {
+function createNewVersion(operator: string, operatorRole: string, changeSummary: string): ParamVersion {
   const latestVersion = paramVersionRepo.findLatest()
   const newVersionStr = latestVersion 
     ? generateNextVersion(latestVersion.version)
@@ -109,7 +109,7 @@ function createNewVersion(operator: string, changeSummary: string): ParamVersion
     operationType: 'version_create',
     description: `创建参数版本 ${newVersionStr}：${changeSummary}`,
     operator,
-    operatorRole: 'admin',
+    operatorRole,
   })
 
   return newVersion

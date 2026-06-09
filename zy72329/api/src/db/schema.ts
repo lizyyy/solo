@@ -79,6 +79,8 @@ export const DDL_STATEMENTS: string[] = [
     operator_role TEXT,
     before_state TEXT,
     after_state TEXT,
+    next_handler TEXT,
+    reason TEXT,
     created_at TEXT
   )`,
   `CREATE TABLE IF NOT EXISTS users (

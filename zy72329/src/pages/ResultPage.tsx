@@ -1,55 +1,63 @@
 import { useState, useEffect } from 'react';
-import { CheckCircle, AlertTriangle, PlusCircle, TrendingUp } from 'lucide-react';
-import { api } from '../lib/api';
+import { CheckCircle, AlertTriangle, PlusCircle, TrendingUp, XCircle } from 'lucide-react';
+import { useDataStore } from '../store/dataStore';
 import { useAppStore } from '../store';
 import { BillRecord, RecordStatus } from '../../shared/types';
 import { DataTable, Column } from '../components/DataTable';
 import EvidenceDrawer from '../components/EvidenceDrawer';
 import { cn } from '../lib/utils';
 
-type TabType = 'smooth' | 'gap' | 'supplement';
+type TabType = 'smooth' | 'gap' | 'supplement' | 'conflict' | 'reviewed';
 
 const tabConfig: Record<TabType, { label: string; icon: typeof CheckCircle; color: string }> = {
   smooth: { label: '顺利记录', icon: CheckCircle, color: 'text-green-600 bg-green-50 border-green-200' },
   gap: { label: '断档记录', icon: AlertTriangle, color: 'text-orange-600 bg-orange-50 border-orange-200' },
   supplement: { label: '补录记录', icon: PlusCircle, color: 'text-purple-600 bg-purple-50 border-purple-200' },
+  conflict: { label: '冲突记录', icon: XCircle, color: 'text-red-600 bg-red-50 border-red-200' },
+  reviewed: { label: '已复核', icon: TrendingUp, color: 'text-blue-600 bg-blue-50 border-blue-200' },
 };
 
 export default function ResultPage() {
   const [activeTab, setActiveTab] = useState<TabType>('smooth');
-  const [loading, setLoading] = useState(false);
-  const [stats, setStats] = useState({ smooth: 0, gap: 0, supplement: 0, total: 0 });
-  const { records, setRecords, selectedRecord, setSelectedRecord, drawerOpen, setDrawerOpen } = useAppStore();
-
-  const filteredRecords = records.filter((r) => r.status === activeTab);
+  const { records, loading, refreshAll } = useDataStore();
+  const { selectedRecord, setSelectedRecord, isDrawerOpen, setDrawerOpen } = useAppStore();
 
   useEffect(() => {
-    const loadRecords = async () => {
-      setLoading(true);
-      try {
-        const [smoothRes, gapRes, supplementRes] = await Promise.all([
-          api.getRecords({ status: 'smooth' as RecordStatus, pageSize: 100 }),
-          api.getRecords({ status: 'gap' as RecordStatus, pageSize: 100 }),
-          api.getRecords({ status: 'supplement' as RecordStatus, pageSize: 100 }),
-        ]);
+    refreshAll();
+  }, [refreshAll]);
 
-        const allRecords = [...smoothRes.records, ...gapRes.records, ...supplementRes.records];
-        setRecords(allRecords);
-        setStats({
-          smooth: smoothRes.total,
-          gap: gapRes.total,
-          supplement: supplementRes.total,
-          total: smoothRes.total + gapRes.total + supplementRes.total,
-        });
-      } catch (error) {
-        console.error('加载记录失败:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const stats = {
+    smooth: records.filter((r) => r.status === 'smooth').length,
+    gap: records.filter((r) => r.status === 'gap' || r.status === 'pending').length,
+    supplement: records.filter((r) => r.status === 'supplement').length,
+    conflict: records.filter((r) => r.status === 'conflict').length,
+    reviewed: records.filter((r) => r.status === 'reviewed_normal' || r.status === 'reviewed_abnormal' || r.status === 'approved' || r.status === 'rejected').length,
+    total: records.length,
+  };
 
-    loadRecords();
-  }, [activeTab, setRecords]);
+  const getFilteredRecords = (): BillRecord[] => {
+    switch (activeTab) {
+      case 'smooth':
+        return records.filter((r) => r.status === 'smooth');
+      case 'gap':
+        return records.filter((r) => r.status === 'gap' || r.status === 'pending');
+      case 'supplement':
+        return records.filter((r) => r.status === 'supplement');
+      case 'conflict':
+        return records.filter((r) => r.status === 'conflict');
+      case 'reviewed':
+        return records.filter((r) =>
+          r.status === 'reviewed_normal' ||
+          r.status === 'reviewed_abnormal' ||
+          r.status === 'approved' ||
+          r.status === 'rejected'
+        );
+      default:
+        return [];
+    }
+  };
+
+  const filteredRecords = getFilteredRecords();
 
   const handleRowClick = (row: BillRecord) => {
     setSelectedRecord(row);
@@ -101,6 +109,16 @@ export default function ResultPage() {
     { label: '总计', value: stats.total, icon: TrendingUp, color: 'bg-blue-500', bgColor: 'bg-blue-50', textColor: 'text-blue-700' },
   ];
 
+  const getTabCount = (tab: TabType): number => {
+    switch (tab) {
+      case 'smooth': return stats.smooth;
+      case 'gap': return stats.gap;
+      case 'supplement': return stats.supplement;
+      case 'conflict': return stats.conflict;
+      case 'reviewed': return stats.reviewed;
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -127,17 +145,17 @@ export default function ResultPage() {
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
-        <div className="flex border-b border-gray-200">
+        <div className="flex border-b border-gray-200 overflow-x-auto">
           {(Object.keys(tabConfig) as TabType[]).map((tab) => {
             const config = tabConfig[tab];
-            const count = stats[tab];
+            const count = getTabCount(tab);
             const isActive = activeTab === tab;
             return (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={cn(
-                  'flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors relative',
+                  'flex-shrink-0 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors relative',
                   isActive ? 'text-blue-600 bg-blue-50/50' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                 )}
               >
@@ -169,7 +187,7 @@ export default function ResultPage() {
       </div>
 
       <EvidenceDrawer
-        open={drawerOpen}
+        open={isDrawerOpen}
         onClose={() => {
           setDrawerOpen(false);
           setSelectedRecord(null);
