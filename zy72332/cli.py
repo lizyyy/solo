@@ -266,7 +266,7 @@ class StoreGroupingCLI:
         return 0
 
     def cmd_demo_flow(self, args):
-        """展示完整演示流程"""
+        """展示完整演示流程 - 所有状态、分群、误差说明引用同一份最新 record"""
         records = self.store.get_all_records()
         if not records:
             print("❌ 请先运行: python cli.py init-demo")
@@ -276,8 +276,19 @@ class StoreGroupingCLI:
         duplicate = [r for r in records if r.processing_type == ProcessingType.DUPLICATE][0]
         old_std = [r for r in records if r.processing_type == ProcessingType.OLD_STANDARD_SUPPLEMENT][0]
 
+        auditor = AuditExporter(self.store)
+
+        smooth_result = self.store.get_grouping_result(smooth.record_id)
+        duplicate_result = self.store.get_grouping_result(duplicate.record_id)
+        old_std_result = self.store.get_grouping_result(old_std.record_id)
+
+        dup_is_pending = duplicate.status in [RecordStatus.PENDING_REVIEW, RecordStatus.DUPLICATE_DETECTED]
+        dup_approved_id = auditor._find_approved_answer(duplicate)
+        dup_reviewer = auditor._find_reviewer_name(duplicate)
+        dup_approved = next((a for a in duplicate.student_answers if a.answer_id == dup_approved_id), None)
+
         print("\n" + "=" * 70)
-        print("📚 距离度量门店分群 - 完整演示流程")
+        print("📚 距离度量门店分群 - 完整演示流程（所有视图引用同一份最新数据）")
         print("=" * 70)
 
         print("\n🎬 场景一：顺利记录（望京SOHO店）")
@@ -288,7 +299,9 @@ class StoreGroupingCLI:
         print(f"    命令: python cli.py import-answers --record-id {smooth.record_id} ...")
         print("  步骤3: 运行分群算法")
         print(f"    命令: python cli.py run-grouping --record-id {smooth.record_id}")
-        print(f"  ✅ 结果: {smooth.final_group}")
+        smooth_group = (smooth.final_group if smooth.final_group else
+                        (smooth_result.final_group if smooth_result else "未分群"))
+        print(f"  ✅ 最新结果: {smooth_group}（状态：{smooth.status.value}）")
 
         print("\n🎬 场景二：同一学生两版答案（国贸商城店）")
         print("-" * 50)
@@ -297,13 +310,23 @@ class StoreGroupingCLI:
         print("  步骤2: 导入学生答案（同一学生小红交了两版）")
         print(f"    命令: python cli.py import-answers --record-id {duplicate.record_id} ...")
         print("  ⚠️  系统自动检测到重复，不自动归正常")
-        print(f"     状态: {duplicate.status.value}")
-        print(f"     误差: {duplicate.error_explanation.current_text}")
+        print(f"     当前状态: {duplicate.status.value}" + ("，分群已阻止" if dup_is_pending else ""))
+        print(f"     误差说明: {duplicate.error_explanation.current_text}")
         print("  步骤3: 小祁标记待业务运营复核")
         print(f"    命令: python cli.py mark-review --record-id {duplicate.record_id}")
-        print("  步骤4: 业务运营复核，指定正确版本")
-        print(f"    命令: python cli.py review-duplicate --record-id {duplicate.record_id} --approved-answer-id <id>")
-        print("  💡 关键细节: 检测到重复时不自动归正常，留给业务运营复核")
+        if dup_is_pending:
+            print("  🔴 下一步：业务运营复核，指定正确版本（未执行，留待人工）")
+            print(f"     可用命令:")
+            for a in duplicate.student_answers:
+                print(f"       python cli.py review-duplicate --record-id {duplicate.record_id} --approved-answer-id {a.answer_id} --reviewer <姓名>  # 采纳{a.student_name}v{a.version}")
+            print("     💡 关键细节: 不提前归正常，留给业务运营复核后才分群")
+        else:
+            print(f"  步骤4: 业务运营{dup_reviewer or '（已）'}复核，指定采纳{dup_approved.student_name if dup_approved else ''}v{dup_approved.version if dup_approved else ''}")
+            print(f"    命令: python cli.py review-duplicate --record-id {duplicate.record_id} --approved-answer-id {dup_approved_id} --reviewer {dup_reviewer or '<运营姓名>'}")
+            dup_group = (duplicate.final_group if duplicate.final_group else
+                         (duplicate_result.final_group if duplicate_result else "未分群"))
+            print(f"  步骤5: 运行分群 → {dup_group}（状态：{duplicate.status.value}）")
+            print(f"    命令: python cli.py run-grouping --record-id {duplicate.record_id}")
 
         print("\n🎬 场景三：老师批注补录旧口径（三里屯太古里店）")
         print("-" * 50)
@@ -318,42 +341,55 @@ class StoreGroupingCLI:
         print(f"     误差说明已更新为: {old_std.error_explanation.current_text}")
         print("  步骤5: 人工修正（应用旧口径）")
         print(f"    命令: python cli.py manual-correct --record-id {old_std.record_id} ...")
+        print(f"    修正说明: {old_std.manual_correction_note}")
         print("  步骤6: 重跑分群")
         print(f"    命令: python cli.py re-run --record-id {old_std.record_id}")
-        print(f"  ✅ 最终结果: {old_std.final_group}（已应用旧口径调整）")
+        old_std_group = (old_std.final_group if old_std.final_group else
+                         (old_std_result.final_group if old_std_result else "未分群"))
+        print(f"  ✅ 最终结果: {old_std_group}（状态：{old_std.status.value}，共运行{old_std.re_run_count}次）")
 
         print("\n" + "=" * 70)
-        print("🎯 三种处理结果对比")
+        print("🎯 三种处理结果对比（均引用同一份最新 record）")
         print("=" * 70)
-
-        smooth_result = self.store.get_grouping_result(smooth.record_id)
-        old_std_result = self.store.get_grouping_result(old_std.record_id)
 
         print(f"\n  1. 顺利记录（望京SOHO店）:")
-        print(f"     分群: {smooth_result.final_group} | 置信度: {smooth_result.confidence:.2%}")
-        print(f"     误差: {smooth_result.error_explanation}")
+        smooth_conf = f"{smooth_result.confidence:.2%}" if smooth_result else "-"
+        print(f"     分群: {smooth_group} | 置信度: {smooth_conf}")
+        print(f"     状态: {smooth.status.value} | 误差: {smooth.error_explanation.current_text}")
 
         print(f"\n  2. 两版答案（国贸商城店）:")
-        print(f"     状态: {duplicate.status.value}（待运营复核）")
-        print(f"     误差: {duplicate.error_explanation.current_text}")
-        print(f"     💡 不自动归正常，留待业务运营复核")
+        if dup_is_pending:
+            print(f"     状态: {duplicate.status.value} | 不自动归正常，留待业务运营复核")
+            print(f"     分群: 未分群（待运营复核后再执行）")
+            print(f"     误差: {duplicate.error_explanation.current_text}")
+            print(f"     下一步找谁: 业务运营使用 review-duplicate 命令指定正确版本")
+        else:
+            dup_group = (duplicate.final_group if duplicate.final_group else
+                         (duplicate_result.final_group if duplicate_result else "未分群"))
+            dup_conf = f"{duplicate_result.confidence:.2%}" if duplicate_result else "-"
+            print(f"     状态: {duplicate.status.value} | 运营: {dup_reviewer or '-'}")
+            print(f"     分群: {dup_group} | 置信度: {dup_conf}")
+            print(f"     采纳: {dup_approved.student_name if dup_approved else '-'}v{dup_approved.version if dup_approved else '-'}")
+            print(f"     误差: {duplicate.error_explanation.current_text}")
 
         print(f"\n  3. 旧口径补录（三里屯太古里店）:")
-        print(f"     分群: {old_std_result.final_group} | 置信度: {old_std_result.confidence:.2%}")
-        print(f"     重跑次数: {old_std.re_run_count}")
-        print(f"     误差: {old_std_result.error_explanation}")
-        print(f"     📌 应用了旧口径: {old_std.annotations[0].old_standard_reference if old_std.annotations else 'N/A'}")
+        old_std_conf = f"{old_std_result.confidence:.2%}" if old_std_result else "-"
+        print(f"     分群: {old_std_group} | 置信度: {old_std_conf}")
+        print(f"     状态: {old_std.status.value} | 重跑次数: {old_std.re_run_count}")
+        print(f"     误差: {old_std.error_explanation.current_text}")
+        print(f"     旧口径: {old_std.annotations[0].old_standard_reference if old_std.annotations else 'N/A'}")
 
         print("\n" + "=" * 70)
-        print("📖 复盘与重跑")
+        print("📖 复盘与重跑（与 record 同一份最新结果）")
         print("=" * 70)
-        print("\n  导出复盘记录:")
+        print("\n  导出复盘记录（含可直接复制粘贴的重跑命令）:")
         print(f"    python cli.py export-audit --record-id {smooth.record_id}")
+        print(f"    python cli.py export-audit --record-id {duplicate.record_id}")
         print(f"    python cli.py export-all")
-        print("\n  重跑任意记录:")
+        print("\n  查看单条详情:")
+        print(f"    python cli.py show --record-id {duplicate.record_id}")
+        print("\n  重跑任意记录（先复核的话国贸店需要先 review-duplicate）:")
         print(f"    python cli.py re-run --record-id {old_std.record_id}")
-        print("\n  查看完整复盘:")
-        print(f"    python cli.py show --record-id {old_std.record_id}")
         print("=" * 70 + "\n")
 
         return 0

@@ -57,8 +57,15 @@ class GroupingEngine:
         else:
             return self.GROUPS[3]
 
+    def _find_reviewer_from_logs(self, record: StoreGroupingRecord) -> Optional[str]:
+        """从操作日志中查找运营复核人"""
+        for log in reversed(record.operation_log):
+            if log.get("operation") == "复核完成":
+                return log.get("operator")
+        return None
+
     def run_grouping(self, record_id: str, operator: str = "小祁") -> Optional[GroupingResult]:
-        """运行分群算法"""
+        """运行分群算法 - 与 record 同一份最新状态保持一致"""
         record = self.store.get_record(record_id)
         if not record:
             raise ValueError(f"记录不存在: {record_id}")
@@ -81,25 +88,29 @@ class GroupingEngine:
         score = self._calculate_distance_score(record)
         final_group = self._determine_group(score, record)
         confidence = min(0.95, score + 0.1) if score > 0.3 else 0.5
+        reviewer = self._find_reviewer_from_logs(record)
+
+        record.final_group = final_group
+        record.status = RecordStatus.RE_RUN if record.re_run_count > 1 else RecordStatus.NORMAL
 
         result = GroupingResult(
             record_id=record_id,
             store_id=record.store_id,
-            final_group=final_group,
+            final_group=record.final_group,
             confidence=confidence,
             processing_type=record.processing_type,
             status=record.status,
             error_explanation=record.error_explanation.current_text,
-            generated_at=datetime.now()
+            generated_at=datetime.now(),
+            reviewed_by=reviewer
         )
 
-        record.final_group = final_group
-        record.status = RecordStatus.RE_RUN if record.re_run_count > 1 else RecordStatus.NORMAL
         record.log_operation("分群完成", operator, {
             "run_count": record.re_run_count,
             "score": score,
             "final_group": final_group,
-            "confidence": confidence
+            "confidence": confidence,
+            "reviewed_by": reviewer
         })
 
         audit = self.store.get_audit_trail_by_record(record_id)
@@ -113,7 +124,8 @@ class GroupingEngine:
                     "score": score,
                     "final_group": final_group,
                     "confidence": confidence,
-                    "processing_type": record.processing_type.value
+                    "processing_type": record.processing_type.value,
+                    "reviewed_by": reviewer
                 }
             )
             self.store.save_audit_trail(audit)
