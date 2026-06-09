@@ -20,7 +20,8 @@ export const getStatusLabel = (status: BatchStatus): string => {
   const labels: Record<BatchStatus, string> = {
     normal: '正常',
     pending_review: '待复核',
-    supplemented: '已补录'
+    supplemented: '已补录',
+    needs_supplement: '待补录'
   };
   return labels[status];
 };
@@ -29,7 +30,8 @@ export const getStatusColor = (status: BatchStatus): string => {
   const colors: Record<BatchStatus, string> = {
     normal: 'bg-success',
     pending_review: 'bg-warning',
-    supplemented: 'bg-supplemented'
+    supplemented: 'bg-supplemented',
+    needs_supplement: 'bg-rose-500'
   };
   return colors[status];
 };

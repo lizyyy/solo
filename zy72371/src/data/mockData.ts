@@ -69,8 +69,11 @@ const createProcessLogs = (
       batchId,
       action: 'manual_correction',
       operator: '未知操作员',
-      description: '人工修改了温度系数，但未填写修正原因',
-      timestamp: new Date('2024-01-15T09:05:00')
+      description: '检测到第8-9温区有人工涂改痕迹，温度系数被修改，但未填写修正原因',
+      timestamp: new Date('2024-01-15T09:05:00'),
+      fieldName: 'temperatureCoefficient',
+      beforeValue: '原始系数(超限)',
+      afterValue: '人工下调(合规)'
     });
   }
 
@@ -81,16 +84,38 @@ const createProcessLogs = (
         batchId,
         action: 'threshold_check',
         operator: '质检员小白',
-        description: '检查安全阈值表，发现使用了错误口径',
-        timestamp: new Date('2024-01-15T09:10:00')
+        description: '质检员小白补看安全阈值表，发现本批次为老配方产品，不应使用 v2024.01 新口径',
+        timestamp: new Date('2024-01-15T09:10:00'),
+        fieldName: 'thresholdVersion',
+        beforeValue: 'v2024.01 (新口径)',
+        afterValue: 'v2023.09 (旧口径)'
       },
       {
         id: generateId(),
         batchId,
         action: 'supplement',
         operator: '质检员小白',
-        description: '从安全阈值表补录 v2023.09 旧口径标准',
-        timestamp: new Date('2024-01-15T09:15:00')
+        description: '从安全阈值表补录 v2023.09 旧口径标准，重新判定为正常',
+        timestamp: new Date('2024-01-15T09:15:00'),
+        fieldName: 'status',
+        beforeValue: 'needs_supplement (需补录)',
+        afterValue: 'supplemented (已补录)'
+      }
+    );
+  }
+
+  if (status === 'needs_supplement') {
+    logs.push(
+      {
+        id: generateId(),
+        batchId,
+        action: 'threshold_check',
+        operator: '系统',
+        description: '按 v2024.01 新口径判定发现异常，但巡检备注提示为老配方产品，请人工核对阈值口径',
+        timestamp: new Date('2024-01-15T09:08:00'),
+        fieldName: 'abnormalStatus',
+        beforeValue: 'pending',
+        afterValue: 'needs_supplement'
       }
     );
   }
@@ -101,8 +126,11 @@ const createProcessLogs = (
       batchId,
       action: 'complete',
       operator: '系统',
-      description: '数据校验通过，记录正常',
-      timestamp: new Date('2024-01-15T09:05:00')
+      description: '按 v2024.01 口径校验通过，无异常',
+      timestamp: new Date('2024-01-15T09:05:00'),
+      fieldName: 'status',
+      beforeValue: 'imported',
+      afterValue: 'normal'
     });
   }
 
@@ -116,8 +144,12 @@ export const mockBatches: BatchRecord[] = [
     materialType: '高铝瓷',
     status: 'normal',
     remark: '升温曲线正常，各温区稳定，无异常波动。巡检员：张三',
+    originalRemark: '升温曲线正常，各温区稳定，无异常波动。巡检员：张三',
+    remarkHistory: [],
     hasManualCorrection: false,
     source: '手写巡检单 #20240115001',
+    originalThresholdVersion: 'v2024.01',
+    appliedThresholdVersion: 'v2024.01',
     createdAt: new Date('2024-01-15T09:00:00'),
     updatedAt: new Date('2024-01-15T09:05:00'),
     temperaturePoints: generateTemperatureCurve('batch-001', 1200, false, false),
@@ -129,9 +161,12 @@ export const mockBatches: BatchRecord[] = [
     materialType: '长石瓷',
     status: 'pending_review',
     remark: '第8-9温区数据有涂改痕迹，人工改过系数但未注明原因。巡检员：李四',
+    originalRemark: '第8-9温区数据有涂改痕迹，人工改过系数但未注明原因。巡检员：李四',
+    remarkHistory: [],
     hasManualCorrection: true,
-    correctionReason: undefined,
     source: '手写巡检单 #20240115002',
+    originalThresholdVersion: 'v2024.01',
+    appliedThresholdVersion: 'v2024.01',
     createdAt: new Date('2024-01-15T09:30:00'),
     updatedAt: new Date('2024-01-15T09:35:00'),
     temperaturePoints: generateTemperatureCurve('batch-002', 1200, true, true),
@@ -139,18 +174,20 @@ export const mockBatches: BatchRecord[] = [
   },
   {
     id: 'batch-003',
-    name: '2024-01-15-C批次(已补录)',
-    materialType: '镁质瓷',
-    status: 'supplemented',
-    remark: '初始使用新口径判定异常，经核对安全阈值表，该批次为老配方产品，适用v2023.09旧口径标准。补录后数据正常。巡检员：王五',
+    name: '2024-01-15-C批次(待补录)',
+    materialType: '镁质瓷(老配方)',
+    status: 'needs_supplement',
+    remark: '按新口径超标，巡检备注提示本批次为老配方产品，请查安全阈值表旧口径。巡检员：王五',
+    originalRemark: '按新口径超标，巡检备注提示本批次为老配方产品，请查安全阈值表旧口径。巡检员：王五',
+    remarkHistory: [],
     hasManualCorrection: false,
     source: '手写巡检单 #20240115003',
-    supplementedFrom: '安全阈值表 v2023.09',
-    supplementedAt: new Date('2024-01-15T09:15:00'),
+    originalThresholdVersion: 'v2024.01',
+    appliedThresholdVersion: 'v2024.01',
     createdAt: new Date('2024-01-15T10:00:00'),
-    updatedAt: new Date('2024-01-15T10:15:00'),
+    updatedAt: new Date('2024-01-15T10:08:00'),
     temperaturePoints: generateTemperatureCurve('batch-003', 1180, true, false),
-    processLogs: createProcessLogs('batch-003', 'supplemented')
+    processLogs: createProcessLogs('batch-003', 'needs_supplement')
   }
 ];
 
@@ -249,16 +286,16 @@ export const sampleDescriptions = {
   normal: {
     title: '正常材料',
     subtitle: '顺利记录 · 无人工修改',
-    description: '标准高铝瓷批次，巡检数据完整，温度曲线在安全阈值范围内，无异常点。'
+    description: '标准高铝瓷批次，巡检数据完整，温度曲线在安全阈值范围内，无异常点。导入即正常。'
   },
   pending_review: {
     title: '错口径材料',
     subtitle: '人工改过系数 · 没写原因',
-    description: '长石瓷批次，发现第8-9温区数据有涂改痕迹。人工改过温度系数但未在备注中说明原因，需设备工程师复核确认。'
+    description: '长石瓷批次，发现第8-9温区数据有涂改痕迹。人工改过温度系数但未在备注中说明原因，需留给设备工程师复核。'
   },
-  supplemented: {
+  needs_supplement: {
     title: '补录材料',
     subtitle: '从安全阈值表补录旧口径',
-    description: '镁质瓷老配方产品，初始用新口径判定异常。经核对安全阈值表补录v2023.09旧口径后数据正常。'
+    description: '镁质瓷老配方产品，初始用新口径判定异常。需质检员小白去安全阈值表选v2023.09旧口径真实补录，再看后续结果。'
   }
 };

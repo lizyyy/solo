@@ -1,6 +1,8 @@
 import { create } from 'zustand';
-import { BatchRecord, ThresholdConfig, BatchStatus } from '../types';
+import { BatchRecord, ThresholdConfig, BatchStatus, ReviewPayload, SupplementPayload, ProcessLog } from '../types';
 import { mockBatches, mockThresholds } from '../data/mockData';
+
+const generateId = () => Math.random().toString(36).substring(2, 11);
 
 interface AppState {
   batches: BatchRecord[];
@@ -13,9 +15,11 @@ interface AppState {
   getBatchById: (id: string) => BatchRecord | undefined;
   getCurrentThresholds: () => ThresholdConfig[];
   getOldThresholds: () => ThresholdConfig[];
-  reviewBatch: (batchId: string, reviewer: string, reason: string) => void;
-  supplementBatch: (batchId: string, thresholdVersion: string) => void;
+  getThresholdVersions: () => string[];
+  reviewBatch: (batchId: string, payload: ReviewPayload) => void;
+  supplementBatch: (batchId: string, payload: SupplementPayload) => void;
   addBatch: (batch: BatchRecord) => void;
+  importBatchByType: (type: BatchStatus) => string | null;
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -39,48 +43,180 @@ export const useAppStore = create<AppState>((set, get) => ({
     return get().thresholds.filter(t => !t.isCurrent);
   },
 
-  reviewBatch: (batchId, reviewer, reason) => {
+  getThresholdVersions: () => {
+    return [...new Set(get().thresholds.map(t => t.version))];
+  },
+
+  importBatchByType: (type) => {
+    const found = get().batches.find(b => b.status === type || 
+      (type === 'needs_supplement' && b.status === 'needs_supplement'));
+    if (found) {
+      set({ currentBatchId: found.id, selectedSampleType: type });
+      return found.id;
+    }
+    return null;
+  },
+
+  reviewBatch: (batchId, payload) => {
+    const now = new Date();
     set(state => ({
       batches: state.batches.map(batch => {
-        if (batch.id === batchId) {
-          return {
-            ...batch,
-            status: 'normal' as BatchStatus,
-            correctionReason: reason,
-            reviewedBy: reviewer,
-            reviewedAt: new Date(),
-            updatedAt: new Date(),
-            processLogs: [
-              ...batch.processLogs,
+        if (batch.id !== batchId) return batch;
+
+        const remarkChanged = !!payload.newRemark && payload.newRemark !== batch.remark;
+        const finalRemark = remarkChanged ? payload.newRemark! : batch.remark;
+
+        const newLogs: ProcessLog[] = [
+          {
+            id: generateId(),
+            batchId,
+            action: 'review',
+            operator: payload.reviewer,
+            description: `设备工程师复核通过，修正原因：${payload.reason}`,
+            timestamp: now,
+            fieldName: 'status',
+            beforeValue: 'pending_review (待复核)',
+            afterValue: 'normal (正常)'
+          }
+        ];
+
+        if (remarkChanged) {
+          newLogs.push({
+            id: generateId(),
+            batchId,
+            action: 'remark_edit',
+            operator: payload.reviewer,
+            description: `设备工程师修改巡检备注，原因：${payload.reason}`,
+            timestamp: now,
+            fieldName: 'remark',
+            beforeValue: batch.remark,
+            afterValue: finalRemark
+          });
+        }
+
+        const newRemarkHistory = remarkChanged
+          ? [
+              ...batch.remarkHistory,
               {
-                id: Math.random().toString(36).substring(2, 11),
-                batchId,
-                action: 'review',
-                operator: reviewer,
-                description: `设备工程师复核通过，修正原因：${reason}`,
-                timestamp: new Date()
+                id: generateId(),
+                timestamp: now,
+                operator: payload.reviewer,
+                beforeRemark: batch.remark,
+                afterRemark: finalRemark,
+                reason: payload.reason
               }
             ]
-          };
-        }
-        return batch;
+          : batch.remarkHistory;
+
+        return {
+          ...batch,
+          status: 'normal' as BatchStatus,
+          correctionReason: payload.reason,
+          reviewedBy: payload.reviewer,
+          reviewedAt: now,
+          remark: finalRemark,
+          remarkHistory: newRemarkHistory,
+          updatedAt: now,
+          processLogs: [...batch.processLogs, ...newLogs]
+        };
       })
     }));
   },
 
-  supplementBatch: (batchId, thresholdVersion) => {
+  supplementBatch: (batchId, payload) => {
+    const now = new Date();
     set(state => ({
       batches: state.batches.map(batch => {
-        if (batch.id === batchId) {
+        if (batch.id !== batchId) return batch;
+
+        const finalRemark = payload.supplementRemark && payload.supplementRemark.trim()
+          ? payload.supplementRemark
+          : batch.remark;
+
+        const remarkChanged = finalRemark !== batch.remark;
+
+        const zone4Threshold = state.thresholds.find(
+          t => t.version === payload.thresholdVersion && t.zone === 4
+        );
+        const relaxedMax = zone4Threshold?.maxTemp ?? 1260;
+
+        const newPoints = batch.temperaturePoints.map(p => {
+          if (!p.isAbnormal) return p;
+          const nowValid = p.temperature <= relaxedMax;
           return {
-            ...batch,
-            status: 'supplemented' as BatchStatus,
-            supplementedFrom: `安全阈值表 ${thresholdVersion}`,
-            supplementedAt: new Date(),
-            updatedAt: new Date()
+            ...p,
+            isAbnormal: !nowValid,
+            isCorrected: p.isAbnormal && nowValid,
+            originalTemp: p.originalTemp ?? p.temperature
           };
+        });
+
+        const newLogs: ProcessLog[] = [
+          {
+            id: generateId(),
+            batchId,
+            action: 'threshold_check',
+            operator: payload.operator,
+            description: `质检员小白补看安全阈值表，确定适用 ${payload.thresholdVersion} 口径`,
+            timestamp: now,
+            fieldName: 'appliedThresholdVersion',
+            beforeValue: batch.appliedThresholdVersion ?? 'v2024.01 (新口径)',
+            afterValue: `${payload.thresholdVersion} (旧口径)`
+          },
+          {
+            id: generateId(),
+            batchId,
+            action: 'supplement',
+            operator: payload.operator,
+            description: `从安全阈值表补录 ${payload.thresholdVersion} 旧口径标准，重新判定，已将状态从待补录更新为已补录`,
+            timestamp: now,
+            fieldName: 'status',
+            beforeValue: 'needs_supplement (待补录)',
+            afterValue: 'supplemented (已补录)'
+          }
+        ];
+
+        if (remarkChanged) {
+          newLogs.push({
+            id: generateId(),
+            batchId,
+            action: 'remark_edit',
+            operator: payload.operator,
+            description: `补录同时更新巡检备注`,
+            timestamp: now,
+            fieldName: 'remark',
+            beforeValue: batch.remark,
+            afterValue: finalRemark
+          });
         }
-        return batch;
+
+        const newRemarkHistory = remarkChanged
+          ? [
+              ...batch.remarkHistory,
+              {
+                id: generateId(),
+                timestamp: now,
+                operator: payload.operator,
+                beforeRemark: batch.remark,
+                afterRemark: finalRemark,
+                reason: `阈值补录为 ${payload.thresholdVersion}，同步更新备注说明`
+              }
+            ]
+          : batch.remarkHistory;
+
+        return {
+          ...batch,
+          status: 'supplemented' as BatchStatus,
+          appliedThresholdVersion: payload.thresholdVersion,
+          supplementedFrom: `安全阈值表 ${payload.thresholdVersion}`,
+          supplementedAt: now,
+          supplementOperator: payload.operator,
+          remark: finalRemark,
+          remarkHistory: newRemarkHistory,
+          updatedAt: now,
+          temperaturePoints: newPoints,
+          processLogs: [...batch.processLogs, ...newLogs]
+        };
       })
     }));
   },

@@ -1,4 +1,4 @@
-export type BatchStatus = 'normal' | 'pending_review' | 'supplemented';
+export type BatchStatus = 'normal' | 'pending_review' | 'supplemented' | 'needs_supplement';
 
 export type ProcessAction = 
   | 'import' 
@@ -7,6 +7,7 @@ export type ProcessAction =
   | 'threshold_check' 
   | 'supplement' 
   | 'review' 
+  | 'remark_edit'
   | 'complete';
 
 export interface TemperaturePoint {
@@ -27,6 +28,18 @@ export interface ProcessLog {
   operator: string;
   description: string;
   timestamp: Date;
+  beforeValue?: string;
+  afterValue?: string;
+  fieldName?: string;
+}
+
+export interface RemarkHistory {
+  id: string;
+  timestamp: Date;
+  operator: string;
+  beforeRemark: string;
+  afterRemark: string;
+  reason: string;
 }
 
 export interface BatchRecord {
@@ -35,11 +48,16 @@ export interface BatchRecord {
   materialType: string;
   status: BatchStatus;
   remark: string;
+  originalRemark: string;
+  remarkHistory: RemarkHistory[];
   hasManualCorrection: boolean;
   correctionReason?: string;
   source: string;
+  originalThresholdVersion?: string;
+  appliedThresholdVersion?: string;
   supplementedFrom?: string;
   supplementedAt?: Date;
+  supplementOperator?: string;
   reviewedBy?: string;
   reviewedAt?: Date;
   createdAt: Date;
@@ -64,4 +82,16 @@ export interface ValidationResult {
   isValid: boolean;
   errors: string[];
   warnings: string[];
+}
+
+export interface SupplementPayload {
+  thresholdVersion: string;
+  operator: string;
+  supplementRemark: string;
+}
+
+export interface ReviewPayload {
+  reviewer: string;
+  reason: string;
+  newRemark?: string;
 }
