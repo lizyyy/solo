@@ -1,0 +1,28 @@
+blade_anomaly:
+  vibration:
+    formula: "vibration_velocity > threshold"
+    unit: "mm/s"
+    warning: 4.5
+    critical: 7.1
+    tolerance: 0.1
+  temperature:
+    formula: "temp - ambient > delta_threshold"
+    unit: "°C"
+    warning_delta: 25
+    critical_delta: 40
+    tolerance: 0.5
+  pitch_angle:
+    formula: "abs(pitch - pitch_reference) > offset"
+    unit: "°"
+    warning_offset: 2.0
+    critical_offset: 5.0
+    tolerance: 0.1
+
+spare_parts:
+  lead_time_days:
+    default: 3
+    blade_root_bolt: 7
+    pitch_motor: 5
+  replacement_markers:
+    - BOLT-M16-10.9 -> BOLT-M16-12.9
+    - GREASE-LT-400G -> GREASE-HT-400G
