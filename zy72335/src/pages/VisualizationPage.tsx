@@ -141,10 +141,10 @@ export default function VisualizationPage() {
         let isMixedFormat = false
 
         if (rawRow) {
-          if (rawRow.has_mixed_format) {
+          if (rawRow.hasMixedFormat) {
             color = '#f43f5e'
             isMixedFormat = true
-          } else if (rawRow.calculation_detail?.kept) {
+          } else if (rawRow.calculation?.kept) {
             color = '#f59e0b'
           } else if (index % 5 === 0) {
             color = '#f59e0b'
@@ -168,21 +168,21 @@ export default function VisualizationPage() {
     setSelectedSeat(seat)
   }
 
-  const handleBarClick = (data: { review_status?: string; next_action?: string; has_mixed_format?: boolean }) => {
-    if (data.review_status) {
-      const calc = calculationDetails.find(c => c.review_status === data.review_status)
+  const handleBarClick = (data: { reviewStatus?: string; nextAction?: string; hasMixedFormat?: boolean }) => {
+    if (data.reviewStatus) {
+      const calc = calculationDetails.find(c => c.reviewStatus === data.reviewStatus)
       if (calc) {
         setSelectedChartItem({ type: 'calculation', data: calc })
         setShowChartModal(true)
       }
-    } else if (data.next_action) {
-      const calc = calculationDetails.find(c => c.next_action === data.next_action)
+    } else if (data.nextAction) {
+      const calc = calculationDetails.find(c => c.nextAction === data.nextAction)
       if (calc) {
         setSelectedChartItem({ type: 'calculation', data: calc })
         setShowChartModal(true)
       }
-    } else if (data.has_mixed_format !== undefined) {
-      const row = rawRows.find(r => r.has_mixed_format === data.has_mixed_format)
+    } else if (data.hasMixedFormat !== undefined) {
+      const row = rawRows.find(r => r.hasMixedFormat === data.hasMixedFormat)
       if (row) {
         setSelectedChartItem({ type: 'raw', data: row })
         setShowChartModal(true)
@@ -191,27 +191,27 @@ export default function VisualizationPage() {
   }
 
   const statusData = [
-    { name: '已保留', count: calculationDetails.filter(c => c.kept).length, review_status: 'kept' },
-    { name: '待复核', count: calculationDetails.filter(c => c.review_status === 'pending').length, review_status: 'pending' },
-    { name: '已退回', count: calculationDetails.filter(c => c.review_status === 'rejected').length, review_status: 'rejected' },
-    { name: '已确认', count: calculationDetails.filter(c => c.review_status === 'confirmed').length, review_status: 'confirmed' },
+    { name: '已保留', count: calculationDetails.filter(c => c.kept).length, reviewStatus: 'kept' },
+    { name: '待复核', count: calculationDetails.filter(c => c.reviewStatus === 'pending').length, reviewStatus: 'pending' },
+    { name: '已退回', count: calculationDetails.filter(c => c.reviewStatus === 'rejected').length, reviewStatus: 'rejected' },
+    { name: '已确认', count: calculationDetails.filter(c => c.reviewStatus === 'confirmed').length, reviewStatus: 'confirmed' },
   ]
 
   const nextActionData = [
-    { name: '联系活动负责人', value: calculationDetails.filter(c => c.next_action === 'contact_activity_leader').length, next_action: 'contact_activity_leader' },
-    { name: '联系竞赛教练', value: calculationDetails.filter(c => c.next_action === 'contact_coach').length, next_action: 'contact_coach' },
-    { name: '无需操作', value: calculationDetails.filter(c => c.next_action === 'no_action').length, next_action: 'no_action' },
+    { name: '联系活动负责人', value: calculationDetails.filter(c => c.nextAction === 'contact_activity_leader').length, nextAction: 'contact_activity_leader' },
+    { name: '联系竞赛教练', value: calculationDetails.filter(c => c.nextAction === 'contact_coach').length, nextAction: 'contact_coach' },
+    { name: '无需操作', value: calculationDetails.filter(c => c.nextAction === 'no_action').length, nextAction: 'no_action' },
   ]
 
   const mixedFormatData = [
-    { name: '混合格式', count: rawRows.filter(r => r.has_mixed_format).length, has_mixed_format: true },
-    { name: '格式正常', count: rawRows.filter(r => !r.has_mixed_format).length, has_mixed_format: false },
+    { name: '混合格式', count: rawRows.filter(r => r.hasMixedFormat).length, hasMixedFormat: true },
+    { name: '格式正常', count: rawRows.filter(r => !r.hasMixedFormat).length, hasMixedFormat: false },
   ]
 
   const getCurrentRawRow = (): RawRow | undefined => {
     if (selectedSeat?.rawRow) return selectedSeat.rawRow
     if (selectedChartItem?.type === 'raw') return selectedChartItem.data as RawRow
-    if (selectedChartItem?.type === 'calculation') return (selectedChartItem.data as CalculationDetail).raw_row
+    if (selectedChartItem?.type === 'calculation') return (selectedChartItem.data as CalculationDetail).rawRow
     return undefined
   }
 
@@ -378,7 +378,7 @@ export default function VisualizationPage() {
                       radius={[4, 4, 0, 0]}
                     >
                       {mixedFormatData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.has_mixed_format ? '#f43f5e' : '#1e293b'} />
+                        <Cell key={`cell-${index}`} fill={entry.hasMixedFormat ? '#f43f5e' : '#1e293b'} />
                       ))}
                     </Bar>
                   </BarChart>
@@ -518,7 +518,7 @@ export default function VisualizationPage() {
 
             <div className="space-y-3">
               {currentRawRow && Object.entries(currentRawRow)
-                .filter(([key]) => key !== 'boundary_spec' && key !== 'calculation_detail')
+                .filter(([key]) => key !== 'boundary' && key !== 'calculation')
                 .map(([key, value]) => (
                 <div key={key} className="rounded-lg bg-slate-50 p-3">
                   <p className="text-xs font-medium text-slate-500">{key}</p>
@@ -555,7 +555,7 @@ export default function VisualizationPage() {
             </div>
 
             {(() => {
-              const boundarySpec = currentRawRow?.boundary_spec
+              const boundarySpec = currentRawRow?.boundary
 
               if (!boundarySpec) {
                 return (

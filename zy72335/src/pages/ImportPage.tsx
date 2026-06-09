@@ -102,25 +102,40 @@ KEY005,参赛队伍 自动化E队,95%,0.95`
   const handleOpenBoundaryModal = (row: RawRow) => {
     setSelectedRow(row)
     setBoundaryForm({
-      fieldName: '',
-      minValue: '',
-      maxValue: '',
-      unit: '',
-      description: '',
+      fieldName: row.boundary?.fieldName || '',
+      minValue: row.boundary?.minValue != null ? String(row.boundary.minValue) : '',
+      maxValue: row.boundary?.maxValue != null ? String(row.boundary.maxValue) : '',
+      unit: row.boundary?.unit || '',
+      description: row.boundary?.description || '',
     })
     setBoundaryModalOpen(true)
   }
 
   const handleSubmitBoundary = async () => {
     if (!selectedRow) return
-    await createBoundarySpec({
-      raw_row_id: selectedRow.id,
-      field_name: boundaryForm.fieldName,
-      min_value: boundaryForm.minValue ? parseFloat(boundaryForm.minValue) : null,
-      max_value: boundaryForm.maxValue ? parseFloat(boundaryForm.maxValue) : null,
-      unit: boundaryForm.unit,
-      description: boundaryForm.description,
-    })
+    if (selectedRow.boundary) {
+      await useAppStore.getState().updateBoundarySpec(
+        selectedRow.boundary.id,
+        {
+          fieldName: boundaryForm.fieldName,
+          minValue: boundaryForm.minValue ? parseFloat(boundaryForm.minValue) : null,
+          maxValue: boundaryForm.maxValue ? parseFloat(boundaryForm.maxValue) : null,
+          unit: boundaryForm.unit,
+          description: boundaryForm.description,
+        },
+        '唐老师更新边界值说明',
+      )
+    } else {
+      await createBoundarySpec({
+        rawRowId: selectedRow.id,
+        fieldName: boundaryForm.fieldName,
+        minValue: boundaryForm.minValue ? parseFloat(boundaryForm.minValue) : null,
+        maxValue: boundaryForm.maxValue ? parseFloat(boundaryForm.maxValue) : null,
+        unit: boundaryForm.unit,
+        description: boundaryForm.description,
+        operator: currentOperator,
+      })
+    }
     setBoundaryModalOpen(false)
     setSelectedRow(null)
   }
@@ -129,8 +144,8 @@ KEY005,参赛队伍 自动化E队,95%,0.95`
     setSelectedRow(row)
     setEditForm({
       content: row.content,
-      percentageValue: row.percentage_value || '',
-      decimalValue: row.decimal_value || '',
+      percentageValue: row.percentageValue || '',
+      decimalValue: row.decimalValue || '',
       reason: '',
     })
     setEditModalOpen(true)
@@ -143,6 +158,7 @@ KEY005,参赛队伍 自动化E队,95%,0.95`
       percentageValue: editForm.percentageValue || undefined,
       decimalValue: editForm.decimalValue || undefined,
       reason: editForm.reason || undefined,
+      operator: currentOperator,
     })
     setEditModalOpen(false)
     setSelectedRow(null)
@@ -323,22 +339,22 @@ KEY005,参赛队伍 自动化E队,95%,0.95`
                     ) : (
                       importLogs.map((log) => (
                         <tr key={log.id} className="hover:bg-slate-50">
-                          <td className="table-cell font-mono text-xs">{log.batch_id}</td>
+                          <td className="table-cell font-mono text-xs">{log.batchId}</td>
                           <td className="table-cell">{log.operator}</td>
-                          <td className="table-cell">{log.total_rows}</td>
+                          <td className="table-cell">{log.totalRows}</td>
                           <td className="table-cell">
-                            <span className="text-emerald-600">{log.new_rows}</span>
+                            <span className="text-emerald-600">{log.newRows}</span>
                           </td>
                           <td className="table-cell">
-                            <span className="text-slate-500">{log.skipped_rows}</span>
+                            <span className="text-slate-500">{log.skippedRows}</span>
                           </td>
                           <td className="table-cell">
-                            <span className="text-rose-600">{log.conflict_rows}</span>
+                            <span className="text-rose-600">{log.conflictRows}</span>
                           </td>
                           <td className="table-cell">
                             <div className="flex items-center gap-1 text-xs text-slate-500">
                               <Clock size={12} />
-                              {formatDate(log.created_at)}
+                              {formatDate(log.createdAt)}
                             </div>
                           </td>
                         </tr>
@@ -416,27 +432,27 @@ KEY005,参赛队伍 自动化E队,95%,0.95`
                   <tr
                     key={row.id}
                     className={`hover:bg-slate-50 ${
-                      row.has_mixed_format ? 'row-mixed' : ''
-                    } ${!row.boundary_spec ? 'row-missing-boundary' : ''}`}
+                      row.hasMixedFormat ? 'row-mixed' : ''
+                    } ${!row.boundary ? 'row-missing-boundary' : ''}`}
                   >
-                    <td className="table-cell font-mono text-xs">{row.unique_key}</td>
+                    <td className="table-cell font-mono text-xs">{row.uniqueKey}</td>
                     <td className="table-cell max-w-xs truncate">{row.content}</td>
-                    <td className="table-cell">{row.percentage_value || '-'}</td>
-                    <td className="table-cell">{row.decimal_value || '-'}</td>
+                    <td className="table-cell">{row.percentageValue || '-'}</td>
+                    <td className="table-cell">{row.decimalValue || '-'}</td>
                     <td className="table-cell">
-                      {row.has_mixed_format ? (
+                      {row.hasMixedFormat ? (
                         <StatusBadge variant="warning">是</StatusBadge>
                       ) : (
                         <StatusBadge variant="success">否</StatusBadge>
                       )}
                     </td>
                     <td className="table-cell">
-                      {row.boundary_spec ? (
+                      {row.boundary ? (
                         <div className="text-xs">
-                          <span className="font-medium">{row.boundary_spec.field_name}</span>
+                          <span className="font-medium">{row.boundary.fieldName}</span>
                           <span className="text-slate-400">
                             {' '}
-                            [{row.boundary_spec.min_value} - {row.boundary_spec.max_value} {row.boundary_spec.unit}]
+                            [{row.boundary.minValue} - {row.boundary.maxValue} {row.boundary.unit}]
                           </span>
                         </div>
                       ) : (
@@ -445,14 +461,12 @@ KEY005,参赛队伍 自动化E队,95%,0.95`
                     </td>
                     <td className="table-cell">
                       <div className="flex gap-2">
-                        {!row.boundary_spec && (
-                          <button
-                            onClick={() => handleOpenBoundaryModal(row)}
-                            className="text-xs text-primary hover:text-accent"
-                          >
-                            <Plus size={14} className="inline" /> 补录边界值
-                          </button>
-                        )}
+                        <button
+                          onClick={() => handleOpenBoundaryModal(row)}
+                          className="text-xs text-primary hover:text-accent"
+                        >
+                          <Plus size={14} className="inline" /> {row.boundary ? '编辑边界值' : '补录边界值'}
+                        </button>
                         <button
                           onClick={() => handleOpenEditModal(row)}
                           className="text-xs text-blue-600 hover:text-blue-800"
@@ -482,10 +496,10 @@ KEY005,参赛队伍 自动化E队,95%,0.95`
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
             <h3 className="mb-4 font-heading text-xl font-semibold text-primary">
-              补录边界值
+              {selectedRow.boundary ? '编辑边界值' : '补录边界值'}
             </h3>
             <p className="mb-4 text-sm text-slate-500">
-              为 <span className="font-mono text-xs">{selectedRow.unique_key}</span> 补充边界值说明
+              为 <span className="font-mono text-xs">{selectedRow.uniqueKey}</span> {selectedRow.boundary ? '编辑' : '补充'}边界值说明
             </p>
             <div className="space-y-4">
               <div>
@@ -575,7 +589,7 @@ KEY005,参赛队伍 自动化E队,95%,0.95`
               编辑原始行
             </h3>
             <p className="mb-4 text-sm text-slate-500">
-              编辑 <span className="font-mono text-xs">{selectedRow.unique_key}</span> 的数据
+              编辑 <span className="font-mono text-xs">{selectedRow.uniqueKey}</span> 的数据
             </p>
             <div className="space-y-4">
               <div>
@@ -657,7 +671,7 @@ KEY005,参赛队伍 自动化E队,95%,0.95`
               </h3>
             </div>
             <p className="mb-6 text-sm text-slate-600">
-              确定要删除 <span className="font-mono text-xs font-medium">{selectedRow.unique_key}</span> 吗？此操作不可撤销。
+              确定要删除 <span className="font-mono text-xs font-medium">{selectedRow.uniqueKey}</span> 吗？此操作不可撤销。
             </p>
             <div className="flex justify-end gap-3">
               <button

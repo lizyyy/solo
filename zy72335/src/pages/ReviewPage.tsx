@@ -27,8 +27,9 @@ export default function ReviewPage() {
 
   useEffect(() => {
     fetchWorkflowStatus()
-    fetchCalculations()
-    fetchRawRows()
+    fetchRawRows().then(() => {
+      fetchCalculations()
+    })
   }, [fetchWorkflowStatus, fetchCalculations, fetchRawRows])
 
   const steps = [
@@ -86,7 +87,7 @@ export default function ReviewPage() {
   }
 
   const mixedFormatCalculations = useMemo(
-    () => calculationDetails.filter((c) => c.mixed_format_flagged),
+    () => calculationDetails.filter((c) => c.mixedFormatFlagged),
     [calculationDetails]
   )
 
@@ -126,6 +127,11 @@ export default function ReviewPage() {
     if (currentStep === 1) return '确认边界值复核完成 →'
     if (currentStep === 2) return '确认计算明细更新完成 →'
     return '所有步骤已完成'
+  }
+
+  const getCurrentRawRow = (calc: CalculationDetail): RawRow | null => {
+    if (calc.rawRow) return calc.rawRow
+    return rawRows.find((r) => r.id === calc.rawRowId) || null
   }
 
   return (
@@ -205,86 +211,89 @@ export default function ReviewPage() {
 
               {calculationDetails.length === 0 ? (
                 <div className="py-12 text-center text-slate-400">
-                  暂无计算明细，请先导入数据
+                  暂无计算明细，请先导入数据并刷新
                 </div>
               ) : (
                 <div className="grid grid-cols-2 gap-6">
-                  {calculationDetails.map((calc: CalculationDetail) => (
-                    <div
-                      key={calc.id}
-                      className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm transition-all hover:shadow-md"
-                    >
-                      <div className="mb-3 flex items-start justify-between">
-                        <StatusBadge variant={calc.kept ? 'success' : 'danger'}>
-                          {calc.kept ? '已保留' : '未保留'}
-                        </StatusBadge>
-                        <StatusBadge variant={getReviewStatusVariant(calc.review_status)}>
-                          {getReviewStatusLabel(calc.review_status)}
-                        </StatusBadge>
-                      </div>
+                  {calculationDetails.map((calc: CalculationDetail) => {
+                    const rawRow = getCurrentRawRow(calc)
+                    return (
+                      <div
+                        key={calc.id}
+                        className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm transition-all hover:shadow-md"
+                      >
+                        <div className="mb-3 flex items-start justify-between">
+                          <StatusBadge variant={calc.kept ? 'success' : 'danger'}>
+                            {calc.kept ? '已保留' : '未保留'}
+                          </StatusBadge>
+                          <StatusBadge variant={getReviewStatusVariant(calc.reviewStatus)}>
+                            {getReviewStatusLabel(calc.reviewStatus)}
+                          </StatusBadge>
+                        </div>
 
-                      <p className="mb-4 line-clamp-2 text-sm text-slate-700">
-                        {calc.raw_row?.content || '原始行内容加载中...'}
-                      </p>
+                        <p className="mb-4 line-clamp-2 text-sm text-slate-700">
+                          {rawRow?.content || '原始行内容加载中...'}
+                        </p>
 
-                      <div className="space-y-3">
-                        <div>
-                          <p className="text-xs font-semibold text-slate-500">
-                            保留原因
-                          </p>
-                          <p className="mt-1 text-sm text-slate-700">
-                            {calc.keep_reason || (
-                              <span className="text-slate-400">待补充</span>
+                        <div className="space-y-3">
+                          <div>
+                            <p className="text-xs font-semibold text-slate-500">
+                              保留原因
+                            </p>
+                            <p className="mt-1 text-sm text-slate-700">
+                              {calc.keepReason || (
+                                <span className="text-slate-400">待补充</span>
+                              )}
+                            </p>
+                          </div>
+
+                          <div>
+                            <p className="text-xs font-semibold text-slate-500">
+                              缺失材料
+                            </p>
+                            {calc.missingMaterials.length > 0 ? (
+                              <ul className="mt-1 list-disc space-y-0.5 pl-5 text-sm text-slate-700">
+                                {calc.missingMaterials.map((mat, idx) => (
+                                  <li key={idx}>{mat}</li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <p className="mt-1 text-sm text-slate-400">暂无缺失</p>
                             )}
-                          </p>
+                          </div>
+
+                          <div>
+                            <p className="text-xs font-semibold text-slate-500">
+                              下一步行动
+                            </p>
+                            <p className="mt-1 flex items-center gap-1 text-sm text-slate-700">
+                              <ChevronRight size={14} className="text-accent" />
+                              {getNextActionLabel(calc.nextAction)}
+                            </p>
+                          </div>
                         </div>
 
-                        <div>
-                          <p className="text-xs font-semibold text-slate-500">
-                            缺失材料
-                          </p>
-                          {calc.missing_materials.length > 0 ? (
-                            <ul className="mt-1 list-disc space-y-0.5 pl-5 text-sm text-slate-700">
-                              {calc.missing_materials.map((mat, idx) => (
-                                <li key={idx}>{mat}</li>
-                              ))}
-                            </ul>
-                          ) : (
-                            <p className="mt-1 text-sm text-slate-400">暂无缺失</p>
-                          )}
-                        </div>
-
-                        <div>
-                          <p className="text-xs font-semibold text-slate-500">
-                            下一步行动
-                          </p>
-                          <p className="mt-1 flex items-center gap-1 text-sm text-slate-700">
-                            <ChevronRight size={14} className="text-accent" />
-                            {getNextActionLabel(calc.next_action)}
-                          </p>
-                        </div>
+                        {calc.reviewStatus === 'pending' && calc.mixedFormatFlagged && (
+                          <div className="mt-4 flex gap-2 border-t border-slate-100 pt-4">
+                            <button
+                              onClick={() => handleReview(calc.id, 'confirmed')}
+                              className="flex flex-1 items-center justify-center gap-1 rounded-lg bg-emerald-500 px-3 py-2 text-sm font-medium text-white hover:bg-emerald-600"
+                            >
+                              <CheckCircle size={14} />
+                              确认通过
+                            </button>
+                            <button
+                              onClick={() => handleReview(calc.id, 'rejected')}
+                              className="flex flex-1 items-center justify-center gap-1 rounded-lg bg-rose-500 px-3 py-2 text-sm font-medium text-white hover:bg-rose-600"
+                            >
+                              <XCircle size={14} />
+                              退回修正
+                            </button>
+                          </div>
+                        )}
                       </div>
-
-                      {calc.review_status === 'pending' && calc.mixed_format_flagged && (
-                        <div className="mt-4 flex gap-2 border-t border-slate-100 pt-4">
-                          <button
-                            onClick={() => handleReview(calc.id, 'confirmed')}
-                            className="flex flex-1 items-center justify-center gap-1 rounded-lg bg-emerald-500 px-3 py-2 text-sm font-medium text-white hover:bg-emerald-600"
-                          >
-                            <CheckCircle size={14} />
-                            确认通过
-                          </button>
-                          <button
-                            onClick={() => handleReview(calc.id, 'rejected')}
-                            className="flex flex-1 items-center justify-center gap-1 rounded-lg bg-rose-500 px-3 py-2 text-sm font-medium text-white hover:bg-rose-600"
-                          >
-                            <XCircle size={14} />
-                            退回修正
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               )}
             </div>
@@ -318,43 +327,46 @@ export default function ReviewPage() {
                         </td>
                       </tr>
                     ) : (
-                      mixedFormatCalculations.map((calc) => (
-                        <tr key={calc.id} className="row-mixed hover:bg-slate-50">
-                          <td className="table-cell max-w-md truncate">
-                            {calc.raw_row?.content || '-'}
-                          </td>
-                          <td className="table-cell font-mono text-xs">
-                            {calc.raw_row?.percentage_value || '-'}
-                          </td>
-                          <td className="table-cell font-mono text-xs">
-                            {calc.raw_row?.decimal_value || '-'}
-                          </td>
-                          <td className="table-cell">
-                            <StatusBadge variant={getReviewStatusVariant(calc.review_status)}>
-                              {getReviewStatusLabel(calc.review_status)}
-                            </StatusBadge>
-                          </td>
-                          <td className="table-cell">
-                            <div className="flex gap-3">
-                              <button
-                                onClick={() => handleViewRawRow(calc.raw_row_id)}
-                                className="text-xs text-blue-600 hover:text-blue-800"
-                              >
-                                <Eye size={14} className="inline" /> 查看原始行
-                              </button>
-                              <button
-                                onClick={() => {
-                                  const row = rawRows.find((r) => r.id === calc.raw_row_id)
-                                  if (row) handleViewBoundary(row)
-                                }}
-                                className="text-xs text-primary hover:text-accent"
-                              >
-                                <Eye size={14} className="inline" /> 查看边界值
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))
+                      mixedFormatCalculations.map((calc) => {
+                        const rawRow = getCurrentRawRow(calc)
+                        return (
+                          <tr key={calc.id} className="row-mixed hover:bg-slate-50">
+                            <td className="table-cell max-w-md truncate">
+                              {rawRow?.content || '-'}
+                            </td>
+                            <td className="table-cell font-mono text-xs">
+                              {rawRow?.percentageValue || '-'}
+                            </td>
+                            <td className="table-cell font-mono text-xs">
+                              {rawRow?.decimalValue || '-'}
+                            </td>
+                            <td className="table-cell">
+                              <StatusBadge variant={getReviewStatusVariant(calc.reviewStatus)}>
+                                {getReviewStatusLabel(calc.reviewStatus)}
+                              </StatusBadge>
+                            </td>
+                            <td className="table-cell">
+                              <div className="flex gap-3">
+                                <button
+                                  onClick={() => handleViewRawRow(calc.rawRowId)}
+                                  className="text-xs text-blue-600 hover:text-blue-800"
+                                >
+                                  <Eye size={14} className="inline" /> 查看原始行
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    const row = rawRows.find((r) => r.id === calc.rawRowId)
+                                    if (row) handleViewBoundary(row)
+                                  }}
+                                  className="text-xs text-primary hover:text-accent"
+                                >
+                                  <Eye size={14} className="inline" /> 查看边界值
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        )
+                      })
                     )}
                   </tbody>
                 </table>
@@ -389,26 +401,26 @@ export default function ReviewPage() {
                       <tr
                         key={row.id}
                         className={`hover:bg-slate-50 ${
-                          !row.boundary_spec ? 'row-missing-boundary' : ''
+                          !row.boundary ? 'row-missing-boundary' : ''
                         }`}
                       >
-                        <td className="table-cell font-mono text-xs">{row.unique_key}</td>
+                        <td className="table-cell font-mono text-xs">{row.uniqueKey}</td>
                         <td className="table-cell max-w-xs truncate">{row.content}</td>
                         <td className="table-cell">
-                          {row.boundary_spec?.field_name || '-'}
+                          {row.boundary?.fieldName || '-'}
                         </td>
                         <td className="table-cell font-mono text-xs">
-                          {row.boundary_spec?.min_value ?? '-'}
+                          {row.boundary?.minValue ?? '-'}
                         </td>
                         <td className="table-cell font-mono text-xs">
-                          {row.boundary_spec?.max_value ?? '-'}
+                          {row.boundary?.maxValue ?? '-'}
                         </td>
-                        <td className="table-cell">{row.boundary_spec?.unit || '-'}</td>
+                        <td className="table-cell">{row.boundary?.unit || '-'}</td>
                         <td className="table-cell max-w-xs truncate">
-                          {row.boundary_spec?.description || '-'}
+                          {row.boundary?.description || '-'}
                         </td>
                         <td className="table-cell">
-                          {row.boundary_spec ? (
+                          {row.boundary ? (
                             <StatusBadge variant="success">已补充</StatusBadge>
                           ) : (
                             <StatusBadge variant="danger">待补充</StatusBadge>
@@ -433,7 +445,7 @@ export default function ReviewPage() {
             <div className="space-y-3">
               <div>
                 <p className="text-xs font-medium text-slate-500">唯一键</p>
-                <p className="font-mono text-sm">{selectedRawRow.unique_key}</p>
+                <p className="font-mono text-sm">{selectedRawRow.uniqueKey}</p>
               </div>
               <div>
                 <p className="text-xs font-medium text-slate-500">内容</p>
@@ -442,17 +454,17 @@ export default function ReviewPage() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <p className="text-xs font-medium text-slate-500">百分数值</p>
-                  <p className="font-mono text-sm">{selectedRawRow.percentage_value || '-'}</p>
+                  <p className="font-mono text-sm">{selectedRawRow.percentageValue || '-'}</p>
                 </div>
                 <div>
                   <p className="text-xs font-medium text-slate-500">小数值</p>
-                  <p className="font-mono text-sm">{selectedRawRow.decimal_value || '-'}</p>
+                  <p className="font-mono text-sm">{selectedRawRow.decimalValue || '-'}</p>
                 </div>
               </div>
               <div>
                 <p className="text-xs font-medium text-slate-500">是否混合格式</p>
                 <p className="text-sm">
-                  {selectedRawRow.has_mixed_format ? (
+                  {selectedRawRow.hasMixedFormat ? (
                     <StatusBadge variant="warning">是</StatusBadge>
                   ) : (
                     <StatusBadge variant="success">否</StatusBadge>
@@ -461,7 +473,7 @@ export default function ReviewPage() {
               </div>
               <div>
                 <p className="text-xs font-medium text-slate-500">创建时间</p>
-                <p className="text-sm text-slate-600">{formatDate(selectedRawRow.created_at)}</p>
+                <p className="text-sm text-slate-600">{formatDate(selectedRawRow.createdAt)}</p>
               </div>
             </div>
             <div className="mt-6 flex justify-end">
@@ -482,37 +494,37 @@ export default function ReviewPage() {
             <h3 className="mb-4 font-heading text-xl font-semibold text-primary">
               查看边界值
             </h3>
-            {selectedBoundary.boundary_spec ? (
+            {selectedBoundary.boundary ? (
               <div className="space-y-3">
                 <div>
                   <p className="text-xs font-medium text-slate-500">关联原始行</p>
-                  <p className="text-sm">{selectedBoundary.unique_key} - {selectedBoundary.content}</p>
+                  <p className="text-sm">{selectedBoundary.uniqueKey} - {selectedBoundary.content}</p>
                 </div>
                 <div>
                   <p className="text-xs font-medium text-slate-500">字段名称</p>
-                  <p className="text-sm">{selectedBoundary.boundary_spec.field_name}</p>
+                  <p className="text-sm">{selectedBoundary.boundary.fieldName}</p>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <p className="text-xs font-medium text-slate-500">最小值</p>
-                    <p className="font-mono text-sm">{selectedBoundary.boundary_spec.min_value ?? '-'}</p>
+                    <p className="font-mono text-sm">{selectedBoundary.boundary.minValue ?? '-'}</p>
                   </div>
                   <div>
                     <p className="text-xs font-medium text-slate-500">最大值</p>
-                    <p className="font-mono text-sm">{selectedBoundary.boundary_spec.max_value ?? '-'}</p>
+                    <p className="font-mono text-sm">{selectedBoundary.boundary.maxValue ?? '-'}</p>
                   </div>
                 </div>
                 <div>
                   <p className="text-xs font-medium text-slate-500">单位</p>
-                  <p className="text-sm">{selectedBoundary.boundary_spec.unit}</p>
+                  <p className="text-sm">{selectedBoundary.boundary.unit}</p>
                 </div>
                 <div>
                   <p className="text-xs font-medium text-slate-500">描述说明</p>
-                  <p className="text-sm">{selectedBoundary.boundary_spec.description}</p>
+                  <p className="text-sm">{selectedBoundary.boundary.description}</p>
                 </div>
                 <div>
                   <p className="text-xs font-medium text-slate-500">创建时间</p>
-                  <p className="text-sm text-slate-600">{formatDate(selectedBoundary.boundary_spec.created_at)}</p>
+                  <p className="text-sm text-slate-600">{formatDate(selectedBoundary.boundary.createdAt)}</p>
                 </div>
               </div>
             ) : (

@@ -79,11 +79,13 @@ router.put('/:id/review', (req: Request, res: Response): void => {
 router.post('/refresh', (req: Request, res: Response): void => {
   try {
     const rawRows = db.prepare(`
-      SELECT r.*, b.id AS boundary_id_exists
+      SELECT r.*,
+             b.id AS boundary_id, b.field_name, b.min_value, b.max_value, b.unit, b.description
       FROM raw_rows r
       LEFT JOIN boundary_specs b ON b.raw_row_id = r.id
-      WHERE r.id NOT IN (SELECT raw_row_id FROM calculation_details)
     `).all() as any[]
+
+    db.prepare('DELETE FROM calculation_details').run()
 
     const insertStmt = db.prepare(`
       INSERT INTO calculation_details (id, raw_row_id, kept, keep_reason, missing_materials, next_action, mixed_format_flagged)
@@ -92,14 +94,51 @@ router.post('/refresh', (req: Request, res: Response): void => {
 
     const transaction = db.transaction(() => {
       for (const row of rawRows) {
-        const hasBoundary = !!row.boundary_id_exists
+        const hasBoundary = !!row.boundary_id
         const mixedFlagged = row.has_mixed_format ? 1 : 0
         const kept = 1
-        const keepReason = hasBoundary ? 'Boundary spec available' : 'No boundary spec'
-        const missingMaterials = hasBoundary ? '[]' : JSON.stringify([row.content])
-        const nextAction = hasBoundary ? 'no_action' : (row.has_mixed_format ? 'contact_activity_leader' : 'contact_coach')
 
-        insertStmt.run(uuidv4(), row.id, kept, keepReason, missingMaterials, nextAction, mixedFlagged)
+        const pct = row.percentage_value ? String(row.percentage_value) : '—'
+        const dec = row.decimal_value ? String(row.decimal_value) : '—'
+        const fn = row.field_name ? String(row.field_name) : '未命名字段'
+        const unit = row.unit ? String(row.unit) : ''
+        const minV = row.min_value
+        const maxV = row.max_value
+
+        let keepReason: string
+        const missing: string[] = []
+        let nextAction: string
+
+        if (hasBoundary) {
+          const rangeDesc = (minV !== null && minV !== undefined) || (maxV !== null && maxV !== undefined)
+            ? `[${minV ?? '—'}-${maxV ?? '—'}]${unit}`
+            : `无明确数值范围`
+          keepReason = `${row.content}：${fn}为${pct}${unit ? '/' : ''}${dec}${unit ? ' ' + unit : ''}，已关联${rangeDesc}的边界值说明，${row.description ? '备注：' + row.description : '符合模拟退火保留规则'}`
+
+          if (row.has_mixed_format) {
+            missing.push(`「${row.content}」同时记录了百分数(${pct})和小数(${dec})两种格式，需要联系活动负责人确认原始录入口径`)
+            nextAction = 'contact_activity_leader'
+          } else {
+            nextAction = 'no_action'
+          }
+        } else {
+          keepReason = `${row.content}：尚未补录「${fn}」的边界值说明，暂按模拟退火默认规则保留，待竞赛教练唐老师补充边界阈值后重新判定`
+          missing.push(`缺少「${row.content}」的边界值说明(${fn}的上下限、单位和判定规则)，需要竞赛教练唐老师根据竞赛规则补录`)
+          if (row.has_mixed_format) {
+            missing.push(`同时存在百分数(${pct})和小数(${dec})两种录入格式，需活动负责人和唐老师共同确认`)
+          }
+          nextAction = 'contact_coach'
+        }
+
+        insertStmt.run(
+          uuidv4(),
+          row.id,
+          kept,
+          keepReason,
+          JSON.stringify(missing),
+          nextAction,
+          mixedFlagged
+        )
       }
     })
 

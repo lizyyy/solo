@@ -48,6 +48,43 @@ function toCamelCaseCalculation(calc: any): any {
   }
 }
 
+const FIELD_LABEL_MAP: Record<string, string> = {
+  content: '内容',
+  percentage_value: '百分数值',
+  percentageValue: '百分数值',
+  decimal_value: '小数值',
+  decimalValue: '小数值',
+  field_name: '字段名称',
+  fieldName: '字段名称',
+  min_value: '最小值',
+  minValue: '最小值',
+  max_value: '最大值',
+  maxValue: '最大值',
+  unit: '单位',
+  description: '描述说明',
+}
+
+function fieldLabel(field: string): string {
+  return FIELD_LABEL_MAP[field] || field
+}
+
+function findAffectedResults(entityType: string, entityId: string): string[] {
+  const results: string[] = []
+  if (entityType === 'raw_row') {
+    const calc = db.prepare('SELECT id FROM calculation_details WHERE raw_row_id = ?').get(entityId) as any
+    if (calc) results.push(`calculation:${calc.id}`)
+  }
+  if (entityType === 'boundary') {
+    const boundary = db.prepare('SELECT raw_row_id FROM boundary_specs WHERE id = ?').get(entityId) as any
+    if (boundary) {
+      results.push(`raw_row:${boundary.raw_row_id}`)
+      const calc = db.prepare('SELECT id FROM calculation_details WHERE raw_row_id = ?').get(boundary.raw_row_id) as any
+      if (calc) results.push(`calculation:${calc.id}`)
+    }
+  }
+  return results
+}
+
 const router = Router()
 
 router.post('/import', (req: Request, res: Response): void => {
@@ -135,7 +172,15 @@ router.get('/', (req: Request, res: Response): void => {
 
     sql += ' ORDER BY created_at DESC'
     const rows = db.prepare(sql).all(...params) as any[]
-    res.json({ success: true, data: rows.map(toCamelCase) })
+    const camelRows = rows.map(toCamelCase)
+    const withRelations = camelRows.map((row: any) => {
+      if (row.boundaryId) {
+        const boundary = db.prepare('SELECT * FROM boundary_specs WHERE id = ?').get(row.boundaryId) as any
+        if (boundary) row.boundary = toCamelCaseBoundary(boundary)
+      }
+      return row
+    })
+    res.json({ success: true, data: withRelations })
   } catch (error: any) {
     res.status(500).json({ success: false, error: error.message })
   }
@@ -178,13 +223,26 @@ router.put('/:id', (req: Request, res: Response): void => {
       decimalValue: 'decimal_value',
     }
 
+    const reason = req.body.reason || '未填写原因'
+    const operator = req.body.operator || 'system'
+
     const transaction = db.transaction(() => {
       for (const [bodyKey, dbField] of Object.entries(fieldMap)) {
-        if (req.body[bodyKey] !== undefined && req.body[bodyKey] !== existing[dbField]) {
+        if (req.body[bodyKey] !== undefined && String(req.body[bodyKey] ?? '') !== String(existing[dbField] ?? '')) {
+          const affected = findAffectedResults('raw_row', existing.id)
           db.prepare(`
-            INSERT INTO change_records (id, entity_type, entity_id, field_name, old_value, new_value, reason, changed_by)
-            VALUES (?, 'raw_row', ?, ?, ?, ?, ?, 'system')
-          `).run(uuidv4(), existing.id, dbField, String(existing[dbField] ?? ''), String(req.body[bodyKey]))
+            INSERT INTO change_records (id, entity_type, entity_id, field_name, old_value, new_value, reason, changed_by, affected_results)
+            VALUES (?, 'raw_row', ?, ?, ?, ?, ?, ?, ?)
+          `).run(
+            uuidv4(),
+            existing.id,
+            fieldLabel(bodyKey),
+            String(existing[dbField] ?? ''),
+            String(req.body[bodyKey] ?? ''),
+            reason,
+            operator,
+            JSON.stringify(affected)
+          )
           updates[dbField] = req.body[bodyKey]
         }
       }

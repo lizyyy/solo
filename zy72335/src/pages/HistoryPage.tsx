@@ -22,8 +22,8 @@ export default function HistoryPage() {
     const query = searchQuery.toLowerCase()
     return changeRecords.filter(
       (record) =>
-        record.entity_id.toLowerCase().includes(query) ||
-        record.field_name.toLowerCase().includes(query)
+        record.entityId.toLowerCase().includes(query) ||
+        record.fieldName.toLowerCase().includes(query)
     )
   }, [changeRecords, searchQuery])
 
@@ -35,7 +35,7 @@ export default function HistoryPage() {
       calculation: 0,
     }
     changeRecords.forEach((r) => {
-      byType[r.entity_type] = (byType[r.entity_type] || 0) + 1
+      byType[r.entityType] = (byType[r.entityType] || 0) + 1
     })
     return { total, byType }
   }, [changeRecords])
@@ -69,6 +69,21 @@ export default function HistoryPage() {
   const formatValue = (val: string) => {
     if (val === null || val === undefined || val === '') return '（空）'
     return val
+  }
+
+  const formatAffected = (items: string[]) => {
+    if (!items || items.length === 0) return '无'
+    return items
+      .map((s) => {
+        const [type, id] = s.split(':')
+        const typeLabel: Record<string, string> = {
+          raw_row: '原始行',
+          boundary: '边界值',
+          calculation: '计算明细',
+        }
+        return `${typeLabel[type] || type} ${id?.slice(0, 8)}...`
+      })
+      .join('、')
   }
 
   return (
@@ -187,22 +202,22 @@ export default function HistoryPage() {
                 <div className="mb-3 flex flex-wrap items-center gap-3">
                   <div className="flex items-center gap-1 text-xs text-slate-500">
                     <Clock size={12} />
-                    {formatDate(record.created_at)}
+                    {formatDate(record.createdAt)}
                   </div>
                   <div className="flex items-center gap-1 text-xs text-slate-500">
                     <User size={12} />
-                    {record.changed_by}
+                    {record.changedBy}
                   </div>
-                  <StatusBadge variant={getEntityTypeVariant(record.entity_type)}>
-                    {getEntityTypeLabel(record.entity_type)}
+                  <StatusBadge variant={getEntityTypeVariant(record.entityType)}>
+                    {getEntityTypeLabel(record.entityType)}
                   </StatusBadge>
                   <span className="font-mono text-xs text-slate-400">
-                    ID: {record.entity_id}
+                    ID: {record.entityId}
                   </span>
                 </div>
 
                 <p className="mb-3 text-sm font-medium text-slate-700">
-                  修改字段: <span className="text-primary">{record.field_name}</span>
+                  修改字段: <span className="text-primary">{record.fieldName}</span>
                 </p>
 
                 <div className="mb-3 grid grid-cols-2 gap-3">
@@ -210,24 +225,24 @@ export default function HistoryPage() {
                     <p className="mb-1 text-xs font-medium text-slate-500">改前</p>
                     <div
                       className={`rounded-lg p-3 text-sm ${
-                        valuesDiffer(record.old_value, record.new_value)
+                        valuesDiffer(record.oldValue, record.newValue)
                           ? 'diff-removed'
                           : 'bg-slate-50 text-slate-600'
                       }`}
                     >
-                      {formatValue(record.old_value)}
+                      {formatValue(record.oldValue)}
                     </div>
                   </div>
                   <div>
                     <p className="mb-1 text-xs font-medium text-slate-500">改后</p>
                     <div
                       className={`rounded-lg p-3 text-sm ${
-                        valuesDiffer(record.old_value, record.new_value)
+                        valuesDiffer(record.oldValue, record.newValue)
                           ? 'diff-added'
                           : 'bg-slate-50 text-slate-600'
                       }`}
                     >
-                      {formatValue(record.new_value)}
+                      {formatValue(record.newValue)}
                     </div>
                   </div>
                 </div>
@@ -244,10 +259,7 @@ export default function HistoryPage() {
                   <div>
                     <span className="font-medium text-slate-500">影响范围: </span>
                     <span className="text-slate-700">
-                      {record.affected_results && record.affected_results.length > 0
-                        ? record.affected_results.join(', ')
-                        : <span className="text-slate-400">无</span>
-                      }
+                      {formatAffected(record.affectedResults || [])}
                     </span>
                   </div>
                 </div>

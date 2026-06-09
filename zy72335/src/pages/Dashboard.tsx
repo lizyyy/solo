@@ -33,7 +33,7 @@ export default function Dashboard() {
     },
   ]
 
-  const flaggedCount = rawRows.filter((r) => r.has_mixed_format).length
+  const flaggedCount = rawRows.filter((r) => r.hasMixedFormat).length
   const pendingCount = calculationDetails.length
 
   return (

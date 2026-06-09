@@ -2,69 +2,69 @@ import { create } from 'zustand'
 
 export interface BoundarySpec {
   id: string
-  raw_row_id: string
-  field_name: string
-  min_value: number | null
-  max_value: number | null
+  rawRowId: string
+  fieldName: string
+  minValue: number | null
+  maxValue: number | null
   unit: string
   description: string
-  created_at: string
-  updated_at: string
+  createdAt: string
+  updatedAt: string
 }
 
 export interface CalculationDetail {
   id: string
-  raw_row_id: string
+  rawRowId: string
   kept: boolean
-  keep_reason: string
-  missing_materials: string[]
-  next_action: 'contact_activity_leader' | 'contact_coach' | 'no_action'
-  mixed_format_flagged: boolean
-  review_status: 'pending' | 'confirmed' | 'rejected'
-  reviewed_by: string | null
-  reviewed_at: string | null
-  created_at: string
-  updated_at: string
-  raw_row?: RawRow
+  keepReason: string
+  missingMaterials: string[]
+  nextAction: 'contact_activity_leader' | 'contact_coach' | 'no_action'
+  mixedFormatFlagged: boolean
+  reviewStatus: 'pending' | 'confirmed' | 'rejected'
+  reviewedBy: string | null
+  reviewedAt: string | null
+  createdAt: string
+  updatedAt: string
+  rawRow?: RawRow
 }
 
 export interface RawRow {
   id: string
-  unique_key: string
+  uniqueKey: string
   content: string
-  percentage_value: string | null
-  decimal_value: string | null
-  has_mixed_format: boolean
-  boundary_id: string | null
-  import_batch_id: string
-  created_at: string
-  updated_at: string
-  boundary_spec?: BoundarySpec
-  calculation_detail?: CalculationDetail
+  percentageValue: string | null
+  decimalValue: string | null
+  hasMixedFormat: boolean
+  boundaryId: string | null
+  importBatchId: string
+  createdAt: string
+  updatedAt: string
+  boundary?: BoundarySpec
+  calculation?: CalculationDetail
 }
 
 export interface ChangeRecord {
   id: string
-  entity_type: 'raw_row' | 'boundary' | 'calculation'
-  entity_id: string
-  field_name: string
-  old_value: string
-  new_value: string
+  entityType: 'raw_row' | 'boundary' | 'calculation'
+  entityId: string
+  fieldName: string
+  oldValue: string
+  newValue: string
   reason: string
-  changed_by: string
-  affected_results: string[]
-  created_at: string
+  changedBy: string
+  affectedResults: string[]
+  createdAt: string
 }
 
 export interface ImportLog {
   id: string
-  batch_id: string
+  batchId: string
   operator: string
-  total_rows: number
-  new_rows: number
-  skipped_rows: number
-  conflict_rows: number
-  created_at: string
+  totalRows: number
+  newRows: number
+  skippedRows: number
+  conflictRows: number
+  createdAt: string
 }
 
 export interface WorkflowStatus {
@@ -76,19 +76,50 @@ export interface WorkflowStatus {
   calculationUpdatedAt: string | null
 }
 
-export interface ReportSection {
-  heading: string
+export interface ReportItem {
+  id: string
   content: string
-  keptItems: Array<{ id: string; content: string; reason: string }>
+}
+
+export interface KeptItem extends ReportItem {
+  keepReason: string
+  boundary?: { fieldName: string; minValue: number | null; maxValue: number | null; unit: string } | null
+}
+
+export interface FlaggedItem extends ReportItem {
+  percentageValue: string | null
+  decimalValue: string | null
+  reviewStatus: string
+}
+
+export interface MissingMaterialItem extends ReportItem {
   missingMaterials: string[]
-  nextActions: Array<{ action: string; target: string }>
+}
+
+export interface NextActionItem extends ReportItem {
+  nextAction: string
+}
+
+export interface ReportSections {
+  keptItems: KeptItem[]
+  flaggedItems: FlaggedItem[]
+  missingMaterials: MissingMaterialItem[]
+  nextActions: NextActionItem[]
 }
 
 export interface Report {
   id: string
   title: string
-  sections: ReportSection[]
-  created_at: string
+  createdAt: string
+  generatedAt: string
+  summary: {
+    totalRows: number
+    keptCount: number
+    flaggedCount: number
+    missingCount: number
+    actionRequiredCount: number
+  }
+  sections: ReportSections
 }
 
 export interface ImportResult {
@@ -125,7 +156,7 @@ interface AppState {
 
   boundarySpecs: BoundarySpec[]
   fetchBoundarySpecs: (filters?: { rawRowId?: string }) => Promise<void>
-  createBoundarySpec: (spec: Omit<BoundarySpec, 'id' | 'created_at' | 'updated_at'>) => Promise<BoundarySpec>
+  createBoundarySpec: (spec: Omit<BoundarySpec, 'id' | 'createdAt' | 'updatedAt'>) => Promise<BoundarySpec>
   updateBoundarySpec: (id: string, updates: Partial<BoundarySpec>, reason?: string) => Promise<void>
 
   calculationDetails: CalculationDetail[]
@@ -248,8 +279,13 @@ export const useAppStore = create<AppState>((set, get) => ({
       if (filters?.mixedFormatFlagged) params.set('mixedFormatFlagged', 'true')
       const query = params.toString()
       const url = `/api/calculations${query ? `?${query}` : ''}`
-      const data = await apiFetch<CalculationDetail[]>(url)
-      set({ calculationDetails: data })
+      const baseData = await apiFetch<CalculationDetail[]>(url)
+      const rawRows = get().rawRows
+      const withRawRow = baseData.map((calc) => {
+        const rawRow = rawRows.find((r) => r.id === calc.rawRowId)
+        return rawRow ? { ...calc, rawRow } : calc
+      })
+      set({ calculationDetails: withRawRow })
     } catch {
       set({ calculationDetails: [] })
     }
@@ -314,4 +350,3 @@ export const useAppStore = create<AppState>((set, get) => ({
     return await apiFetch<Report>(`/api/reports/${id}`)
   },
 }))
-
