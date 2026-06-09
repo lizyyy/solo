@@ -1,0 +1,19 @@
+{
+  "name": "pet-training-alert-backend",
+  "version": "1.0.0",
+  "description": "宠物训练课异常提醒 - 后端服务",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "init-db": "node scripts/init-db.js",
+    "seed": "node scripts/seed-data.js",
+    "rerun-algorithm": "node scripts/rerun-algorithm.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "exceljs": "^4.4.0",
+    "express": "^4.18.2",
+    "sql.js": "^1.14.1"
+  }
+}
