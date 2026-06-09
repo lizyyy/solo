@@ -1,0 +1,97 @@
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --eng-bg: #0f172a;
+  --eng-panel: #1e293b;
+  --eng-panel2: #334155;
+  --eng-line: #1e40af;
+  --eng-border: #475569;
+  --eng-warn: #ea580c;
+  --eng-alert: #dc2626;
+  --eng-pass: #15803d;
+  --eng-muted: #94a3b8;
+  --eng-text: #f1f5f9;
+  --eng-dim: #cbd5e1;
+  --src-cad: #6366f1;
+  --src-add: #059669;
+  --src-oral: #d97706;
+
+  font-family: "Noto Sans SC", system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color: var(--eng-text);
+  background: var(--eng-bg);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: var(--eng-bg);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+@layer components {
+  .eng-btn {
+    @apply border-2 px-3 py-1.5 text-sm font-medium transition-all select-none cursor-pointer border-eng-border text-eng-text;
+    background: var(--eng-panel);
+  }
+  .eng-btn:hover {
+    background: var(--eng-panel2);
+    transform: translateY(-1px);
+  }
+  .eng-btn:active {
+    transform: translateY(1px);
+  }
+  .eng-btn-primary {
+    @apply border-eng-line;
+    background: #1e3a8a;
+  }
+  .eng-btn-primary:hover {
+    background: #1d4ed8;
+  }
+
+  .eng-panel {
+    background: var(--eng-panel);
+    border: 1px solid var(--eng-border);
+    box-shadow: 0 4px 24px -4px rgba(15, 23, 42, 0.6);
+  }
+
+  .eng-tag {
+    @apply inline-flex items-center px-2 py-0.5 text-xs font-mono border;
+  }
+
+  .eng-input {
+    @apply w-full border px-3 py-2 text-sm bg-eng-bg text-eng-text border-eng-border outline-none;
+  }
+  .eng-input:focus {
+    border-color: var(--eng-line);
+  }
+}
