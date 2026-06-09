@@ -29,6 +29,15 @@ class ConflictResolution(str, Enum):
 
 
 @dataclass
+class PendingReviewInfo:
+    original_statement: str = ""
+    suggested_value: str = ""
+    reason: str = ""
+    next_handler: str = ""
+    created_at: datetime = field(default_factory=datetime.now)
+
+
+@dataclass
 class ReviewRecord:
     id: str
     equipment_id: str
@@ -42,6 +51,9 @@ class ReviewRecord:
     original_unit: Optional[TempUnit] = None
     supplemental_source: Optional[RecordSource] = None
     note: str = ""
+    pending_review: Optional[PendingReviewInfo] = None
+    original_value_before_supplement: Optional[float] = None
+    original_efficiency_before_supplement: Optional[float] = None
 
 
 @dataclass

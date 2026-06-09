@@ -55,3 +55,25 @@ def make_conflicting_note() -> SamplingIntervalNote:
         documented_at=datetime(2026, 5, 27, 11, 0, 0),
         is_old_caliber=False,
     )
+
+
+def make_webcalc_screenshot_a() -> ChatScreenshot:
+    return ChatScreenshot(
+        id="webcalc-A01-celsius",
+        equipment_id="PULLEY-A01",
+        temperature_value=22.5,
+        temperature_unit=TempUnit.CELSIUS,
+        efficiency=0.93,
+        captured_at=datetime(2026, 6, 1, 9, 0, 0),
+    )
+
+
+def make_webcalc_screenshot_b_mixed() -> ChatScreenshot:
+    return ChatScreenshot(
+        id="webcalc-A01-kelvin",
+        equipment_id="PULLEY-A01",
+        temperature_value=296.65,
+        temperature_unit=TempUnit.KELVIN,
+        efficiency=0.90,
+        captured_at=datetime(2026, 6, 2, 14, 30, 0),
+    )

@@ -224,3 +224,67 @@ class TestThreeStepWorkflow:
         changelog = wf.audit_log.format_changelog()
         mixed_entries = [e for e in changelog if "混用" in e["why"]]
         assert len(mixed_entries) >= 1
+
+
+class TestWebInteractionPath:
+    def test_webcalc_summary_0_normal_consistent_across_views(self):
+        from pulley_review.sample_data import make_webcalc_screenshot_a, make_webcalc_screenshot_b_mixed, make_old_caliber_note
+        wf = PulleyReviewWorkflow("PULLEY-A01")
+        a = wf.step1_import_screenshot(make_webcalc_screenshot_a())
+        b = wf.step1_import_screenshot(make_webcalc_screenshot_b_mixed())
+        assert a.status == ReviewStatus.NORMAL
+        assert b.status == ReviewStatus.PENDING_REVIEW
+        assert b.pending_review is not None
+        assert "训练教练" in b.pending_review.next_handler
+        c = wf._counts()
+        assert c["normal"] == 1
+        assert c["pending"] == 1
+        assert c["supplemented"] == 0
+        note = make_old_caliber_note()
+        wf.step2_review_sampling_note(note, a.id, "老岑")
+        c2 = wf._counts()
+        assert c2["normal"] == 0
+        assert c2["supplemented"] == 1
+        assert c2["pending"] == 1
+        sv = wf.build_summary_view()
+        assert sv["counts"]["normal"] == 0
+        lst = wf.build_records_list()
+        normal_count_in_list = sum(1 for x in lst if x["status"] == "normal")
+        supplemented_in_list = sum(1 for x in lst if x["status"] == "supplemented")
+        pending_in_list = sum(1 for x in lst if x["status"] == "pending_review")
+        assert normal_count_in_list == 0
+        assert supplemented_in_list == 1
+        assert pending_in_list == 1
+        for item in lst:
+            assert item["report_summary"] == sv["summary_text"]
+        detail = wf.build_record_detail(a.id)
+        assert detail is not None
+        assert detail["summary_view"]["counts"]["normal"] == 0
+        assert detail["report_summary"] == sv["summary_text"]
+        assert detail["record"]["status"] == "supplemented"
+        detail2 = wf.build_record_detail(b.id)
+        assert detail2 is not None
+        assert detail2["record"]["status"] == "pending_review"
+        pr = detail2["pending_review"]
+        assert pr is not None
+        assert len(pr["original_statement"]) > 0
+        assert len(pr["next_handler"]) > 0
+        assert "不自动" in pr["reason"]
+        report = wf.step3_update_handover_report()
+        assert "正常记录: 0条" in report.summary
+        assert "待复核(含温度单位混用): 1条" in report.summary
+        assert "旧口径补录: 1条" in report.summary
+        txt = wf.export_handover_text()
+        assert "正常记录: 0条" in txt
+        js = wf.export_handover_json()
+        assert '"正常记录: 0条"' in js or "正常记录: 0条" in js
+
+    def test_three_distinct_statuses_on_same_device(self):
+        from pulley_review.sample_data import make_webcalc_screenshot_a, make_webcalc_screenshot_b_mixed, make_old_caliber_note
+        wf = PulleyReviewWorkflow("PULLEY-A01")
+        a = wf.step1_import_screenshot(make_webcalc_screenshot_a())
+        b = wf.step1_import_screenshot(make_webcalc_screenshot_b_mixed())
+        wf.step2_review_sampling_note(make_old_caliber_note(), a.id, "老岑")
+        statuses = {r.status for r in wf.records}
+        assert ReviewStatus.SUPPLEMENTED in statuses
+        assert ReviewStatus.PENDING_REVIEW in statuses
