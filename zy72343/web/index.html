@@ -1,972 +1,844 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>线段相交施工冲突检测</title>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/controls/OrbitControls.js"></script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
-            background: #f5f6f8;
-            color: #333;
-        }
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 16px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .header h1 { font-size: 20px; font-weight: 600; }
-        .header .subtitle { font-size: 12px; opacity: 0.85; margin-top: 4px; }
-        .container {
-            display: grid;
-            grid-template-columns: 320px 1fr 360px;
-            height: calc(100vh - 68px);
-        }
-        .panel {
-            background: white;
-            border-right: 1px solid #e5e7eb;
-            overflow-y: auto;
-            padding: 16px;
-        }
-        .panel-right {
-            border-right: none;
-            border-left: 1px solid #e5e7eb;
-        }
-        .panel-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: #111827;
-            margin-bottom: 12px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #667eea;
-        }
-        .view-3d {
-            position: relative;
-            background: #1a1a2e;
-        }
-        #canvas3d {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-        .view-controls {
-            position: absolute;
-            top: 12px;
-            left: 12px;
-            background: rgba(0,0,0,0.75);
-            padding: 12px;
-            border-radius: 8px;
-            color: white;
-            font-size: 12px;
-            z-index: 10;
-        }
-        .view-controls label {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            margin: 4px 0;
-            cursor: pointer;
-        }
-        .project-item {
-            padding: 12px;
-            background: #f9fafb;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: all 0.2s;
-        }
-        .project-item:hover {
-            background: #eef2ff;
-            border-color: #667eea;
-        }
-        .project-item.active {
-            background: #eef2ff;
-            border-color: #667eea;
-        }
-        .project-name { font-weight: 600; font-size: 13px; }
-        .project-meta {
-            font-size: 11px;
-            color: #6b7280;
-            margin-top: 4px;
-        }
-        .import-area {
-            margin-bottom: 16px;
-        }
-        .import-area input[type="text"] {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            margin-bottom: 8px;
-            font-size: 13px;
-        }
-        .btn {
-            display: inline-block;
-            padding: 8px 16px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-            transition: background 0.2s;
-        }
-        .btn:hover { background: #5a67d8; }
-        .btn-success { background: #10b981; }
-        .btn-success:hover { background: #059669; }
-        .btn-warning { background: #f59e0b; }
-        .btn-warning:hover { background: #d97706; }
-        .btn-small { padding: 4px 8px; font-size: 11px; }
-        .gap-item {
-            padding: 10px;
-            background: #fffbeb;
-            border-left: 4px solid #f59e0b;
-            border-radius: 4px;
-            margin-bottom: 8px;
-            font-size: 12px;
-        }
-        .gap-item.resolved {
-            background: #f0fdf4;
-            border-left-color: #10b981;
-        }
-        .gap-item.pending {
-            background: #fef2f2;
-            border-left-color: #ef4444;
-        }
-        .gap-title { font-weight: 600; margin-bottom: 4px; }
-        .gap-meta { color: #6b7280; font-size: 11px; }
-        .conflict-item {
-            padding: 10px;
-            border-radius: 6px;
-            margin-bottom: 8px;
-            font-size: 12px;
-            cursor: pointer;
-        }
-        .conflict-critical { background: #fee2e2; border-left: 4px solid #dc2626; }
-        .conflict-high { background: #fed7aa; border-left: 4px solid #ea580c; }
-        .conflict-medium { background: #fef3c7; border-left: 4px solid #d97706; }
-        .param-version {
-            padding: 12px;
-            background: #f8fafc;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            font-size: 12px;
-        }
-        .param-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-        .param-version-badge {
-            background: #667eea;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 10px;
-            font-weight: 600;
-        }
-        .param-row {
-            display: flex;
-            gap: 4px;
-            margin: 4px 0;
-        }
-        .param-label {
-            color: #6b7280;
-            min-width: 60px;
-        }
-        .owner-qi { color: #dc2626; font-weight: 600; }
-        .owner-team { color: #0891b2; font-weight: 600; }
-        .status-badge {
-            display: inline-block;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 10px;
-            font-weight: 600;
-        }
-        .status-needs { background: #fee2e2; color: #dc2626; }
-        .status-ready { background: #d1fae5; color: #059669; }
-        .status-pending { background: #fef3c7; color: #d97706; }
-        .tabs {
-            display: flex;
-            gap: 4px;
-            margin-bottom: 12px;
-        }
-        .tab {
-            flex: 1;
-            padding: 8px;
-            background: #e5e7eb;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 600;
-            color: #6b7280;
-        }
-        .tab.active {
-            background: #667eea;
-            color: white;
-        }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .info-bubble {
-            position: absolute;
-            background: rgba(0,0,0,0.9);
-            color: white;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 11px;
-            pointer-events: none;
-            z-index: 20;
-            max-width: 240px;
-            display: none;
-        }
-        .info-bubble .title { font-weight: 600; margin-bottom: 4px; }
-        .info-bubble .row { display: flex; gap: 6px; margin: 2px 0; }
-        .info-bubble .label { color: #9ca3af; }
-        .trace-btn {
-            background: #8b5cf6;
-            color: white;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 10px;
-            cursor: pointer;
-            margin-top: 6px;
-        }
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #9ca3af;
-            font-size: 13px;
-        }
-        input[type="number"] {
-            padding: 6px;
-            border: 1px solid #d1d5db;
-            border-radius: 4px;
-            font-size: 12px;
-            width: 70px;
-        }
-        .action-row {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-            margin-top: 6px;
-        }
-        .empty-state {
-            text-align: center;
-            padding: 20px;
-            color: #9ca3af;
-            font-size: 12px;
-        }
-        .severity-dot {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            margin-right: 6px;
-        }
-        .dot-critical { background: #dc2626; }
-        .dot-high { background: #ea580c; }
-        .dot-medium { background: #d97706; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>线段相交施工冲突检测（全链路一致性）</title>
+<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/controls/OrbitControls.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f6f8; color: #1f2937; }
+
+.header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.header h1 { font-size: 18px; font-weight: 600; }
+.header .sub { font-size: 11px; opacity: 0.9; margin-top: 2px; }
+.todo-bar { display: flex; gap: 14px; font-size: 12px; }
+.todo-chip { background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 12px; }
+.todo-chip b { font-size: 14px; margin-left: 4px; }
+
+.container {
+  display: grid;
+  grid-template-columns: 300px 1fr 380px;
+  height: calc(100vh - 64px);
+}
+.panel { background: #fff; border-right: 1px solid #e5e7eb; overflow-y: auto; padding: 14px; }
+.panel.right { border-right: none; border-left: 1px solid #e5e7eb; }
+.p-title { font-size: 13px; font-weight: 700; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 2px solid #667eea; }
+.view-3d { position: relative; background: #0f172a; }
+#canvas3d { width: 100%; height: 100%; display: block; }
+
+.layer-ctl {
+  position: absolute; top: 12px; left: 12px;
+  background: rgba(15, 23, 42, 0.85); padding: 10px 12px; border-radius: 8px;
+  color: #e5e7eb; font-size: 11px; z-index: 10;
+}
+.layer-ctl label { display: flex; align-items: center; gap: 6px; margin: 3px 0; cursor: pointer; }
+.version-tag {
+  position: absolute; top: 12px; right: 12px;
+  background: rgba(15, 23, 42, 0.85); color: #fde68a;
+  padding: 6px 10px; border-radius: 6px; font-size: 11px; z-index: 10;
+  max-width: 320px;
+}
+
+/* 项目 */
+.p-item { padding: 10px; background: #f9fafb; border-radius: 8px; margin-bottom: 8px; cursor: pointer;
+         border: 2px solid transparent; transition: all .2s; }
+.p-item:hover { background: #eef2ff; border-color: #667eea; }
+.p-item.active { background: #eef2ff; border-color: #667eea; }
+.p-name { font-weight: 700; font-size: 13px; }
+.p-meta { font-size: 11px; color: #6b7280; margin-top: 3px; display: flex; flex-wrap: wrap; gap: 6px; }
+.badge { display: inline-block; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 600; }
+.b-qi { background: #fee2e2; color: #dc2626; }
+.b-team { background: #cffafe; color: #0891b2; }
+.b-gap { background: #fef3c7; color: #d97706; }
+
+.import-area { margin-bottom: 16px; }
+.import-area input[type=text], .import-area input[type=file] {
+  width: 100%; padding: 7px; border: 1px solid #d1d5db; border-radius: 6px;
+  margin-bottom: 7px; font-size: 12px;
+}
+.btn { display: inline-block; padding: 7px 12px; background: #667eea; color: #fff; border: none;
+       border-radius: 6px; cursor: pointer; font-size: 12px; transition: background .15s; font-weight: 600; }
+.btn:hover { background: #5a67d8; }
+.btn.ok { background: #10b981; }
+.btn.ok:hover { background: #059669; }
+.btn.warn { background: #f59e0b; }
+.btn.warn:hover { background: #d97706; }
+.btn.danger { background: #ef4444; }
+.btn.danger:hover { background: #dc2626; }
+.btn.small { padding: 4px 8px; font-size: 10px; }
+
+/* tabs */
+.tabs { display: flex; gap: 3px; margin-bottom: 10px; }
+.tab { flex: 1; padding: 7px; background: #e5e7eb; border: none; border-radius: 6px;
+       cursor: pointer; font-size: 11px; font-weight: 700; color: #6b7280; }
+.tab.active { background: #667eea; color: #fff; }
+.tabc { display: none; }
+.tabc.active { display: block; }
+
+/* 断档 */
+.gap { padding: 10px; border-left: 4px solid; border-radius: 6px; margin-bottom: 8px; font-size: 12px; background: #fffbeb; }
+.gap.pending { border-color: #ef4444; background: #fef2f2; }
+.gap.done { border-color: #10b981; background: #f0fdf4; }
+.gap-title { font-weight: 700; margin-bottom: 4px; }
+.gap-meta { color: #6b7280; font-size: 11px; line-height: 1.6; }
+.row { display: flex; gap: 5px; align-items: center; margin-top: 5px; flex-wrap: wrap; }
+input[type=number] { padding: 5px; border: 1px solid #d1d5db; border-radius: 5px; font-size: 11px; width: 70px; }
+
+/* 冲突 */
+.conf { padding: 10px; border-radius: 6px; margin-bottom: 7px; font-size: 12px; cursor: pointer;
+        border-left: 4px solid; }
+.conf.critical { background: #fee2e2; border-color: #dc2626; }
+.conf.high { background: #fed7aa; border-color: #ea580c; }
+.conf.medium { background: #fef3c7; border-color: #d97706; }
+.sev { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+
+/* 参数版本 */
+.pv-card {
+  padding: 11px; background: #f8fafc; border-radius: 8px; margin-bottom: 9px;
+  font-size: 12px; border-left: 4px solid #667eea;
+}
+.pv-card.needs { border-left-color: #dc2626; }
+.pv-card.ready { border-left-color: #0891b2; }
+.pv-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.pv-name { font-weight: 700; }
+.pv-ver { background: #667eea; color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; }
+.kv { display: flex; gap: 6px; margin: 3px 0; line-height: 1.5; }
+.kv .k { color: #6b7280; min-width: 72px; flex-shrink: 0; }
+.kv .v { flex: 1; word-break: break-all; }
+.owner-qi { color: #dc2626; font-weight: 700; }
+.owner-team { color: #0891b2; font-weight: 700; }
+.sb { display: inline-block; padding: 1px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+.sb-needs { background: #fee2e2; color: #dc2626; }
+.sb-ready { background: #d1fae5; color: #059669; }
+.sb-pending { background: #fef3c7; color: #d97706; }
+.sb-resolved { background: #d1fae5; color: #059669; }
+.sb-rejected { background: #fee2e2; color: #dc2626; }
+
+.chain { margin-top: 7px; padding-top: 7px; border-top: 1px dashed #d1d5db; }
+.chain-title { font-weight: 700; font-size: 11px; color: #374151; margin-bottom: 4px; }
+.chain-item {
+  padding: 5px 7px; background: #fff; border-radius: 5px;
+  font-size: 11px; margin-bottom: 4px; border-left: 3px solid #a5b4fc;
+}
+.chain-item small { color: #9ca3af; }
+.empty { text-align: center; padding: 24px 10px; color: #9ca3af; font-size: 12px; line-height: 1.7; }
+.loading { text-align: center; padding: 30px; color: #9ca3af; font-size: 12px; }
+
+/* 复核记录 */
+.rr-card {
+  padding: 10px; background: #f8fafc; border-radius: 8px; margin-bottom: 8px;
+  font-size: 11px; border-left: 4px solid #8b5cf6;
+}
+.rr-head { display: flex; justify-content: space-between; margin-bottom: 5px; font-weight: 700; }
+.change-from { background: #fee2e2; padding: 1px 5px; border-radius: 4px; }
+.change-to { background: #d1fae5; padding: 1px 5px; border-radius: 4px; }
+
+/* 3D info bubble */
+.bubble {
+  position: absolute; background: rgba(15, 23, 42, 0.95);
+  color: #fff; padding: 10px 12px; border-radius: 8px; font-size: 11px;
+  pointer-events: none; z-index: 20; max-width: 280px; display: none;
+  line-height: 1.6; border: 1px solid #334155;
+}
+.bubble .t { font-weight: 700; margin-bottom: 4px; font-size: 12px; color: #93c5fd; }
+.bubble .kv { margin: 1px 0; }
+.bubble .kv .k { min-width: 62px; color: #94a3b8; }
+.trace-btn {
+  background: #8b5cf6; color: #fff; border: none; padding: 4px 8px;
+  border-radius: 4px; font-size: 10px; cursor: pointer; margin-top: 6px;
+  font-weight: 600;
+}
+
+/* 摘要 */
+.summary {
+  padding: 10px; background: #eef2ff; border-radius: 8px; margin-bottom: 12px;
+  font-size: 11px; border: 1px dashed #667eea;
+}
+.summary .row2 { display: flex; gap: 8px; flex-wrap: wrap; }
+.summary .s-item { background: #fff; padding: 4px 8px; border-radius: 5px; }
+.summary .s-item b { color: #4338ca; margin-left: 3px; }
+</style>
 </head>
 <body>
-    <div class="header">
-        <div>
-            <h1>线段相交施工冲突检测</h1>
-            <div class="subtitle">服务复核：点到断档能追溯原始行 · 参数版本有血有肉</div>
-        </div>
-        <div>
-            <button class="btn btn-success" onclick="downloadReport()">下载报告</button>
-        </div>
+<div class="header">
+  <div>
+    <h1>线段相交施工冲突检测</h1>
+    <div class="sub">全链路一致性：CLI / API / 报告 / 小看板 共享同一份最新参数版本</div>
+  </div>
+  <div>
+    <div id="todoBar" class="todo-bar">
+      <span class="todo-chip">待小祁<b id="todoQi">-</b></span>
+      <span class="todo-chip">待教研组<b id="todoTeam">-</b></span>
+      <span class="todo-chip">待补录断档<b id="todoGap">-</b></span>
+    </div>
+    <div style="margin-top:6px;text-align:right;">
+      <button class="btn ok small" onclick="downloadReport()">📄 下载报告</button>
+      <button class="btn small" onclick="location.reload()" style="background:#64748b">🔄 刷新</button>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <!-- 左：项目列表 -->
+  <div class="panel">
+    <div class="import-area">
+      <div class="p-title">① 导入手算反例</div>
+      <input type="text" id="projName" placeholder="项目名称，如：试点项目">
+      <input type="file" id="csvFile" accept=".csv">
+      <button class="btn" onclick="importProject()">导入 CSV</button>
+    </div>
+    <div class="p-title">项目列表</div>
+    <div id="projectList"><div class="loading">加载项目中...</div></div>
+  </div>
+
+  <!-- 中：3D 视图 -->
+  <div class="view-3d">
+    <canvas id="canvas3d"></canvas>
+    <div class="layer-ctl">
+      <div style="font-weight:700;margin-bottom:6px;">图层</div>
+      <label><input type="checkbox" id="shSeg" checked onchange="renderScene()">线段</label>
+      <label><input type="checkbox" id="shCon" checked onchange="renderScene()">冲突点</label>
+      <label><input type="checkbox" id="shDel" onchange="renderScene()">已删除</label>
+      <label><input type="checkbox" id="shLab" onchange="renderScene()">编号</label>
+      <div style="margin-top:8px;font-size:10px;color:#94a3b8;">
+        悬停查看详情<br>点击追溯原始行
+      </div>
+    </div>
+    <div id="verTag" class="version-tag">请导入或选择项目 →</div>
+    <div id="bub" class="bubble"></div>
+  </div>
+
+  <!-- 右：详情面板 -->
+  <div class="panel right">
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('gap')">断档追踪</button>
+      <button class="tab" onclick="switchTab('conf')">冲突列表</button>
+      <button class="tab" onclick="switchTab('pv')">参数版本</button>
+      <button class="tab" onclick="switchTab('rr')">复核记录</button>
     </div>
 
-    <div class="container">
-        <div class="panel">
-            <div class="import-area">
-                <div class="panel-title">项目导入</div>
-                <input type="text" id="projectName" placeholder="项目名称，如：试点项目">
-                <input type="file" id="csvFile" accept=".csv" style="margin-bottom: 8px;">
-                <button class="btn" onclick="importProject()">导入CSV</button>
-            </div>
-
-            <div class="panel-title">项目列表</div>
-            <div id="projectList">
-                <div class="empty-state">加载中...</div>
-            </div>
-        </div>
-
-        <div class="view-3d">
-            <canvas id="canvas3d"></canvas>
-            <div class="view-controls">
-                <div style="font-weight: 600; margin-bottom: 8px;">图层控制</div>
-                <label><input type="checkbox" id="showSegments" checked onchange="renderScene()"> 显示线段</label>
-                <label><input type="checkbox" id="showConflicts" checked onchange="renderScene()"> 显示冲突点</label>
-                <label><input type="checkbox" id="showDeleted" onchange="renderScene()"> 显示已删除</label>
-                <label><input type="checkbox" id="showLabels" onchange="renderScene()"> 显示编号</label>
-                <div style="margin-top: 10px; font-size: 11px; color: #9ca3af;">
-                    提示：鼠标悬停查看详情<br>
-                    点击追溯原始行
-                </div>
-            </div>
-            <div class="info-bubble" id="infoBubble"></div>
-        </div>
-
-        <div class="panel panel-right">
-            <div class="tabs">
-                <button class="tab active" onclick="switchTab('gaps')">断档追踪</button>
-                <button class="tab" onclick="switchTab('conflicts')">冲突列表</button>
-                <button class="tab" onclick="switchTab('params')">参数版本</button>
-            </div>
-
-            <div id="tab-gaps" class="tab-content active">
-                <div class="panel-title">编号断档（人工删除行标记）</div>
-                <div id="gapList">
-                    <div class="empty-state">请先选择项目</div>
-                </div>
-            </div>
-
-            <div id="tab-conflicts" class="tab-content">
-                <div class="panel-title">线段相交冲突</div>
-                <div id="conflictList">
-                    <div class="empty-state">请先选择项目</div>
-                </div>
-            </div>
-
-            <div id="tab-params" class="tab-content">
-                <div class="panel-title">参数版本页（数据血缘）</div>
-                <div id="paramList">
-                    <div class="empty-state">请先选择项目</div>
-                </div>
-            </div>
-        </div>
+    <div id="tab-gap" class="tabc active">
+      <div class="p-title">编号断档（人工删除行 → 不急着归正常）</div>
+      <div id="gapList"><div class="empty">请导入或选择项目</div></div>
     </div>
-
-    <script>
-        const API_BASE = "http://localhost:8000";
-        let currentProject = null;
-        let sceneData = null;
-        let scene, camera, renderer, controls;
-        let sceneObjects = [];
-        let raycaster, mouse;
-
-        async function init() {
-            initThree();
-            await loadProjects();
-            animate();
-        }
-
-        function initThree() {
-            const container = document.querySelector('.view-3d');
-            const canvas = document.getElementById('canvas3d');
-
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x1a1a2e);
-
-            camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
-            camera.position.set(10, 10, 10);
-
-            renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-            renderer.setSize(container.clientWidth, container.clientHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
-
-            controls = new THREE.OrbitControls(camera, renderer.domElement);
-            controls.enableDamping = true;
-            controls.dampingFactor = 0.05;
-
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-            scene.add(ambientLight);
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-            directionalLight.position.set(10, 20, 10);
-            scene.add(directionalLight);
-
-            const gridHelper = new THREE.GridHelper(20, 20, 0x444444, 0x333333);
-            scene.add(gridHelper);
-
-            const axesHelper = new THREE.AxesHelper(5);
-            scene.add(axesHelper);
-
-            raycaster = new THREE.Raycaster();
-            mouse = new THREE.Vector2();
-
-            canvas.addEventListener('mousemove', onMouseMove);
-            canvas.addEventListener('click', onClick);
-            window.addEventListener('resize', onWindowResize);
-        }
-
-        function onWindowResize() {
-            const container = document.querySelector('.view-3d');
-            camera.aspect = container.clientWidth / container.clientHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(container.clientWidth, container.clientHeight);
-        }
-
-        function animate() {
-            requestAnimationFrame(animate);
-            controls.update();
-            renderer.render(scene, camera);
-        }
-
-        async function loadProjects() {
-            try {
-                const res = await fetch(`${API_BASE}/projects`);
-                const data = await res.json();
-                renderProjectList(data.projects);
-            } catch (e) {
-                document.getElementById('projectList').innerHTML =
-                    '<div class="empty-state">请先启动后端服务<br><code>uvicorn segment_conflict.api:app --reload</code></div>';
-            }
-        }
-
-        function renderProjectList(projects) {
-            const list = document.getElementById('projectList');
-            if (!projects || projects.length === 0) {
-                list.innerHTML = '<div class="empty-state">暂无项目，请先导入CSV</div>';
-                return;
-            }
-            list.innerHTML = projects.map(p => `
-                <div class="project-item ${currentProject === p.name ? 'active' : ''}" onclick="selectProject('${p.name}')">
-                    <div class="project-name">${p.name}</div>
-                    <div class="project-meta">
-                        v${p.version} · ${p.segments}条线段 · ${p.conflicts}处冲突 · ${p.gaps}处断档
-                    </div>
-                    <div class="project-meta">更新: ${new Date(p.updated_at).toLocaleString()}</div>
-                </div>
-            `).join('');
-        }
-
-        async function importProject() {
-            const name = document.getElementById('projectName').value.trim();
-            const fileInput = document.getElementById('csvFile');
-
-            if (!name) {
-                alert('请输入项目名称');
-                return;
-            }
-            if (!fileInput.files[0]) {
-                alert('请选择CSV文件');
-                return;
-            }
-
-            const formData = new FormData();
-            formData.append('file', fileInput.files[0]);
-
-            try {
-                const res = await fetch(`${API_BASE}/import?name=${encodeURIComponent(name)}`, {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await res.json();
-                if (res.ok) {
-                    alert(`导入成功！\n线段: ${data.segments_count}条\n冲突: ${data.conflicts_count}处\n断档: ${data.gaps_count}处`);
-                    await loadProjects();
-                    await selectProject(name);
-                } else {
-                    alert('导入失败: ' + data.detail);
-                }
-            } catch (e) {
-                alert('导入失败，请检查后端服务是否启动');
-            }
-        }
-
-        async function selectProject(name) {
-            currentProject = name;
-            await loadProjects();
-
-            const [projRes, dataRes] = await Promise.all([
-                fetch(`${API_BASE}/projects/${name}`),
-                fetch(`${API_BASE}/3d-data/${name}`)
-            ]);
-
-            const projData = await projRes.json();
-            sceneData = await dataRes.json();
-
-            renderScene();
-            renderGaps(projData.gaps, sceneData.segments);
-            renderConflicts(projData.conflicts, sceneData.segments);
-            renderParams(projData.parameter_versions, sceneData.segments);
-        }
-
-        function renderScene() {
-            sceneObjects.forEach(obj => scene.remove(obj));
-            sceneObjects = [];
-
-            if (!sceneData) return;
-
-            const showSegments = document.getElementById('showSegments').checked;
-            const showConflicts = document.getElementById('showConflicts').checked;
-            const showDeleted = document.getElementById('showDeleted').checked;
-            const showLabels = document.getElementById('showLabels').checked;
-
-            const categoryColors = {
-                '管道': 0x3b82f6,
-                '电缆': 0x10b981,
-                '结构': 0xf59e0b,
-                '暖通': 0x8b5cf6,
-                'default': 0x6b7280
-            };
-
-            sceneData.segments.forEach(seg => {
-                if (seg.is_deleted && !showDeleted) return;
-                if (!showSegments) return;
-
-                const color = seg.is_deleted ? 0x6b7280 : (categoryColors[seg.category] || categoryColors.default);
-                const opacity = seg.is_deleted ? 0.3 : 1.0;
-
-                const geometry = new THREE.BufferGeometry().setFromPoints([
-                    new THREE.Vector3(seg.start.x, seg.start.z, seg.start.y),
-                    new THREE.Vector3(seg.end.x, seg.end.z, seg.end.y)
-                ]);
-                const material = new THREE.LineBasicMaterial({
-                    color,
-                    transparent: true,
-                    opacity,
-                    linewidth: seg.is_deleted ? 1 : 3
-                });
-                const line = new THREE.Line(geometry, material);
-                line.userData = { type: 'segment', data: seg };
-                scene.add(line);
-                sceneObjects.push(line);
-
-                if (showLabels && !seg.is_deleted) {
-                    const midX = (seg.start.x + seg.end.x) / 2;
-                    const midY = (seg.start.z + seg.end.z) / 2;
-                    const midZ = (seg.start.y + seg.end.y) / 2;
-                    const label = createTextSprite(`#${seg.id}`, 0xffffff);
-                    label.position.set(midX, midY + 0.3, midZ);
-                    scene.add(label);
-                    sceneObjects.push(label);
-                }
-
-                if (seg.questionnaire_row) {
-                    const markerGeo = new THREE.SphereGeometry(0.08, 8, 8);
-                    const markerMat = new THREE.MeshBasicMaterial({ color: 0x10b981 });
-                    const marker = new THREE.Mesh(markerGeo, markerMat);
-                    marker.position.set(seg.start.x, seg.start.z + 0.15, seg.start.y);
-                    marker.userData = { type: 'qmarker', data: seg };
-                    scene.add(marker);
-                    sceneObjects.push(marker);
-                }
-            });
-
-            if (showConflicts) {
-                sceneData.conflicts.forEach(c => {
-                    const color = c.severity === 'critical' ? 0xdc2626 :
-                                  c.severity === 'high' ? 0xea580c : 0xd97706;
-                    const size = c.severity === 'critical' ? 0.2 :
-                                 c.severity === 'high' ? 0.15 : 0.1;
-
-                    const geometry = new THREE.SphereGeometry(size, 16, 16);
-                    const material = new THREE.MeshBasicMaterial({
-                        color,
-                        transparent: true,
-                        opacity: 0.8
-                    });
-                    const sphere = new THREE.Mesh(geometry, material);
-                    sphere.position.set(c.point.x, c.point.z, c.point.y);
-                    sphere.userData = { type: 'conflict', data: c };
-                    scene.add(sphere);
-                    sceneObjects.push(sphere);
-                });
-            }
-
-            if (sceneData.bounds) {
-                const b = sceneData.bounds;
-                const center = {
-                    x: (b.min[0] + b.max[0]) / 2,
-                    y: (b.min[2] + b.max[2]) / 2,
-                    z: (b.min[1] + b.max[1]) / 2
-                };
-                const size = Math.max(b.max[0] - b.min[0], b.max[1] - b.min[1], b.max[2] - b.min[2]) * 1.5;
-                camera.position.set(center.x + size, center.y + size, center.z + size);
-                controls.target.set(center.x, center.y, center.z);
-                controls.update();
-            }
-        }
-
-        function createTextSprite(text, color) {
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
-            canvas.width = 64;
-            canvas.height = 32;
-            context.fillStyle = 'rgba(0,0,0,0.7)';
-            context.fillRect(0, 0, 64, 32);
-            context.fillStyle = '#' + color.toString(16).padStart(6, '0');
-            context.font = 'bold 14px Arial';
-            context.textAlign = 'center';
-            context.textBaseline = 'middle';
-            context.fillText(text, 32, 16);
-
-            const texture = new THREE.CanvasTexture(canvas);
-            const spriteMaterial = new THREE.SpriteMaterial({ map: texture });
-            const sprite = new THREE.Sprite(spriteMaterial);
-            sprite.scale.set(1, 0.5, 1);
-            return sprite;
-        }
-
-        function onMouseMove(event) {
-            const canvas = document.getElementById('canvas3d');
-            const rect = canvas.getBoundingClientRect();
-            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-            mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-
-            raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObjects(sceneObjects);
-
-            const bubble = document.getElementById('infoBubble');
-            if (intersects.length > 0 && intersects[0].object.userData) {
-                const obj = intersects[0].object.userData;
-                bubble.style.display = 'block';
-                bubble.style.left = (event.clientX + 15) + 'px';
-                bubble.style.top = (event.clientY + 15) + 'px';
-
-                if (obj.type === 'segment') {
-                    const seg = obj.data;
-                    bubble.innerHTML = `
-                        <div class="title">${seg.name}</div>
-                        <div class="row"><span class="label">线段ID:</span>${seg.id}</div>
-                        <div class="row"><span class="label">原始行:</span>第${seg.original_row_num}行</div>
-                        ${seg.questionnaire_row ? `<div class="row"><span class="label">问卷行:</span>第${seg.questionnaire_row}行 ✓</div>` : ''}
-                        <div class="row"><span class="label">类型:</span>${seg.category}</div>
-                        <div class="row"><span class="label">状态:</span>${seg.is_deleted ? '<span style="color:#ef4444">已删除</span>' : '<span style="color:#10b981">有效</span>'}</div>
-                        <button class="trace-btn" onclick="traceOriginalRow(${seg.id}, ${seg.original_row_num})">追溯原始行 →</button>
-                    `;
-                } else if (obj.type === 'conflict') {
-                    const c = obj.data;
-                    bubble.innerHTML = `
-                        <div class="title">冲突 #${c.id} <span class="severity-dot dot-${c.severity}"></span>${c.severity}</div>
-                        <div class="row"><span class="label">线段:</span>#${c.segment1} ↔ #${c.segment2}</div>
-                        <div class="row"><span class="label">距离:</span>${c.distance.toFixed(4)}m</div>
-                        <div class="row"><span class="label">位置:</span>(${c.point.x.toFixed(2)}, ${c.point.y.toFixed(2)}, ${c.point.z.toFixed(2)})</div>
-                        <button class="trace-btn" onclick="locateConflict(${c.id})">定位冲突 →</button>
-                    `;
-                } else if (obj.type === 'qmarker') {
-                    const seg = obj.data;
-                    bubble.innerHTML = `
-                        <div class="title">✓ 已关联问卷</div>
-                        <div class="row"><span class="label">线段:</span>#${seg.id}</div>
-                        <div class="row"><span class="label">问卷行:</span>第${seg.questionnaire_row}行</div>
-                    `;
-                }
-            } else {
-                bubble.style.display = 'none';
-            }
-        }
-
-        function onClick(event) {
-            const canvas = document.getElementById('canvas3d');
-            const rect = canvas.getBoundingClientRect();
-            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-            mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-
-            raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObjects(sceneObjects);
-
-            if (intersects.length > 0 && intersects[0].object.userData) {
-                const obj = intersects[0].object.userData;
-                if (obj.type === 'segment') {
-                    traceOriginalRow(obj.data.id, obj.data.original_row_num);
-                } else if (obj.type === 'conflict') {
-                    locateConflict(obj.data.id);
-                }
-            }
-        }
-
-        function traceOriginalRow(segmentId, originalRow) {
-            const seg = sceneData.segments.find(s => s.id === segmentId);
-            if (!seg) return;
-
-            let msg = `【追溯原始行】\n\n线段 #${segmentId}: ${seg.name}\n原始行号: 第${originalRow}行\n`;
-
-            if (seg.questionnaire_row) {
-                msg += `问卷原始行: 第${seg.questionnaire_row}行 ✓ 已关联\n`;
-            } else {
-                msg += `问卷原始行: 未关联 ⚠ 请联系数据分析师小祁补录\n`;
-            }
-
-            if (seg.is_deleted) {
-                msg += `\n⚠ 此线段已标记删除，需要教研组复核是否恢复`;
-            }
-
-            const inGap = sceneData.gaps.find(g =>
-                g.gap_start <= originalRow && originalRow <= g.gap_end
-            );
-            if (inGap) {
-                msg += `\n⚠ 此行位于断档区间 ${inGap.gap_start}-${inGap.gap_end}，需确认完整性`;
-            }
-
-            alert(msg);
-        }
-
-        function locateConflict(conflictId) {
-            const c = sceneData.conflicts.find(x => x.id === conflictId);
-            if (!c) return;
-
-            const s1 = sceneData.segments.find(s => s.id === c.segment1);
-            const s2 = sceneData.segments.find(s => s.id === c.segment2);
-
-            camera.position.set(
-                c.point.x + 3,
-                c.point.z + 3,
-                c.point.y + 3
-            );
-            controls.target.set(c.point.x, c.point.z, c.point.y);
-            controls.update();
-
-            alert(`【冲突详情】\n\n冲突 #${conflictId}\n严重程度: ${c.severity}\n距离: ${c.distance.toFixed(4)}m\n\n线段1: ${s1?.name || '未知'} (原始行 ${s1?.original_row_num})\n线段2: ${s2?.name || '未知'} (原始行 ${s2?.original_row_num})\n\n交点: (${c.point.x.toFixed(2)}, ${c.point.y.toFixed(2)}, ${c.point.z.toFixed(2)})`);
-        }
-
-        function renderGaps(gaps, segments) {
-            const list = document.getElementById('gapList');
-            if (!gaps || gaps.length === 0) {
-                list.innerHTML = '<div class="empty-state">无断档</div>';
-                return;
-            }
-
-            list.innerHTML = gaps.map((g, i) => {
-                const statusClass = g.status === 'pending_supplement' ? 'pending' :
-                                    g.status === 'resolved' ? 'resolved' : '';
-                const before = segments.find(s => s.id === g.segment_before);
-                const after = segments.find(s => s.id === g.segment_after);
-
-                return `
-                    <div class="gap-item ${statusClass}">
-                        <div class="gap-title">断档 #${i + 1}: 第${g.gap_start}-${g.gap_end}行</div>
-                        <div class="gap-meta">缺失 ${g.missing_count} 行 · ${getStatusText(g.status)}</div>
-                        ${before ? `<div class="gap-meta">前序: ${before.name} (行${before.original_row_num})</div>` : ''}
-                        ${after ? `<div class="gap-meta">后序: ${after.name} (行${after.original_row_num})</div>` : ''}
-                        ${g.supplemented_rows.length > 0 ? `<div class="gap-meta">已补录: ${g.supplemented_rows.join(', ')}</div>` : ''}
-                        ${g.note ? `<div class="gap-meta">备注: ${g.note}</div>` : ''}
-                        <div class="action-row">
-                            <input type="number" id="gap-supplement-${i}" placeholder="问卷行号" min="1">
-                            <button class="btn btn-warning btn-small" onclick="supplementGapRow(${i})">补录</button>
-                        </div>
-                        <div class="action-row">
-                            <button class="btn btn-success btn-small" onclick="reviewGap(${i}, true, '复核通过')">✓ 通过</button>
-                            <button class="btn btn-small" style="background:#ef4444" onclick="reviewGap(${i}, false, '需进一步核实')">✗ 驳回</button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function getStatusText(status) {
-            const map = {
-                'pending_supplement': '待补录',
-                'supplemented': '已补录待复核',
-                'partially_resolved': '部分补录',
-                'resolved': '已解决',
-                'rejected': '已驳回'
-            };
-            return map[status] || status;
-        }
-
-        function renderConflicts(conflicts, segments) {
-            const list = document.getElementById('conflictList');
-            if (!conflicts || conflicts.length === 0) {
-                list.innerHTML = '<div class="empty-state">未检测到冲突</div>';
-                return;
-            }
-
-            list.innerHTML = conflicts.map(c => {
-                const s1 = segments.find(s => s.id === c.segment1_id);
-                const s2 = segments.find(s => s.id === c.segment2_id);
-                const cls = `conflict-${c.severity}`;
-                const typeMap = {
-                    'exact_intersection': '精确相交',
-                    'near_intersection': '近似相交',
-                    'close_proximity': '距离过近'
-                };
-
-                return `
-                    <div class="conflict-item ${cls}" onclick="locateConflict(${c.id})">
-                        <div style="font-weight:600">
-                            <span class="severity-dot dot-${c.severity}"></span>
-                            冲突 #${c.id} · ${typeMap[c.conflict_type] || c.conflict_type}
-                        </div>
-                        <div style="margin-top:4px; color:#374151">
-                            ${s1?.name || '未知'} ↔ ${s2?.name || '未知'}
-                        </div>
-                        <div style="margin-top:2px; color:#6b7280; font-size:11px">
-                            距离: ${c.distance.toFixed(4)}m · 原始行 ${s1?.original_row_num} ↔ ${s2?.original_row_num}
-                        </div>
-                        ${c.review_note ? `<div style="margin-top:4px; font-size:11px; color:#059669">复核: ${c.review_note}</div>` : ''}
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function renderParams(versions, segments) {
-            const list = document.getElementById('paramList');
-            if (!versions || versions.length === 0) {
-                list.innerHTML = '<div class="empty-state">暂无参数版本</div>';
-                return;
-            }
-
-            const latestMap = {};
-            versions.forEach(v => {
-                if (!latestMap[v.segment_id] || v.version > latestMap[v.segment_id].version) {
-                    latestMap[v.segment_id] = v;
-                }
-            });
-
-            const sorted = Object.values(latestMap).sort((a, b) => {
-                const order = { 'needs_supplement': 0, 'pending_review': 1, 'ready_for_review': 2, 'resolved': 3 };
-                return (order[a.status] || 9) - (order[b.status] || 9);
-            });
-
-            list.innerHTML = sorted.map(p => {
-                const seg = segments.find(s => s.id === p.segment_id);
-                const ownerClass = p.next_owner === '数据分析师小祁' ? 'owner-qi' : 'owner-team';
-                const statusClass = p.status === 'needs_supplement' ? 'status-needs' :
-                                   p.status === 'ready_for_review' ? 'status-ready' : 'status-pending';
-
-                return `
-                    <div class="param-version">
-                        <div class="param-header">
-                            <span style="font-weight:600">
-                                ${seg?.name || `线段#${p.segment_id}`}
-                            </span>
-                            <span class="param-version-badge">v${p.version}</span>
-                        </div>
-                        <div class="param-row">
-                            <span class="param-label">保留原因</span>
-                            <span>${p.kept_reason}</span>
-                        </div>
-                        <div class="param-row">
-                            <span class="param-label">缺失材料</span>
-                            <span>${p.missing_materials.length > 0 ? p.missing_materials.join(', ') : '<span style="color:#10b981">无</span>'}</span>
-                        </div>
-                        <div class="param-row">
-                            <span class="param-label">下一步</span>
-                            <span class="${ownerClass}">${p.next_owner}</span>
-                        </div>
-                        <div class="param-row">
-                            <span class="param-label">状态</span>
-                            <span class="status-badge ${statusClass}">${getStatusText(p.status)}</span>
-                        </div>
-                        <div class="param-row" style="color:#6b7280; font-size:11px">
-                            <span class="param-label">最近变更</span>
-                            <span>${p.change_log[p.change_log.length - 1] || '无'}</span>
-                        </div>
-                        <div class="param-row" style="color:#9ca3af; font-size:11px">
-                            <span class="param-label">创建人</span>
-                            <span>${p.created_by} · ${new Date(p.created_at).toLocaleString()}</span>
-                        </div>
-                        ${p.status === 'needs_supplement' && seg ? `
-                        <div class="action-row" style="margin-top:8px">
-                            <input type="number" id="param-supplement-${p.segment_id}" placeholder="问卷行号" min="1">
-                            <button class="btn btn-warning btn-small" onclick="supplementParamRow(${p.segment_id})">补录</button>
-                        </div>
-                        ` : ''}
-                    </div>
-                `;
-            }).join('');
-        }
-
-        async function supplementGapRow(gapIndex) {
-            const input = document.getElementById(`gap-supplement-${gapIndex}`);
-            const row = parseInt(input.value);
-            if (!row || row < 1) {
-                alert('请输入有效的问卷行号');
-                return;
-            }
-
-            const gap = sceneData.gaps[gapIndex];
-            const segId = gap.segment_after || gap.segment_before;
-            if (!segId) {
-                alert('无法定位关联线段');
-                return;
-            }
-
-            await supplementRow(segId, row);
-        }
-
-        async function supplementParamRow(segmentId) {
-            const input = document.getElementById(`param-supplement-${segmentId}`);
-            const row = parseInt(input.value);
-            if (!row || row < 1) {
-                alert('请输入有效的问卷行号');
-                return;
-            }
-            await supplementRow(segmentId, row);
-        }
-
-        async function supplementRow(segmentId, questionnaireRow) {
-            if (!currentProject) return;
-
-            try {
-                const res = await fetch(`${API_BASE}/supplement`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        project_name: currentProject,
-                        segment_id: segmentId,
-                        questionnaire_row: questionnaireRow
-                    })
-                });
-                const data = await res.json();
-                if (res.ok) {
-                    alert(`补录成功！\n线段 #${segmentId}\n问卷行: ${questionnaireRow}\n新版本: v${data.new_version}`);
-                    await selectProject(currentProject);
-                } else {
-                    alert('补录失败: ' + data.detail);
-                }
-            } catch (e) {
-                alert('补录失败，请检查后端服务');
-            }
-        }
-
-        async function reviewGap(gapIndex, approved, note) {
-            if (!currentProject) return;
-
-            try {
-                const res = await fetch(`${API_BASE}/review`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        project_name: currentProject,
-                        gap_index: gapIndex,
-                        approved: approved,
-                        note: note
-                    })
-                });
-                const data = await res.json();
-                if (res.ok) {
-                    alert(`复核${approved ? '通过' : '驳回'}！\n新版本: v${data.new_version}`);
-                    await selectProject(currentProject);
-                } else {
-                    alert('操作失败: ' + data.detail);
-                }
-            } catch (e) {
-                alert('操作失败，请检查后端服务');
-            }
-        }
-
-        async function downloadReport() {
-            if (!currentProject) {
-                alert('请先选择项目');
-                return;
-            }
-            window.open(`${API_BASE}/report/${currentProject}`, '_blank');
-        }
-
-        function switchTab(tab) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            event.target.classList.add('active');
-            document.getElementById(`tab-${tab}`).classList.add('active');
-        }
-
-        init();
-    </script>
+    <div id="tab-conf" class="tabc">
+      <div class="p-title">线段相交冲突</div>
+      <div id="confList"><div class="empty">请导入或选择项目</div></div>
+    </div>
+    <div id="tab-pv" class="tabc">
+      <div class="p-title">参数版本页（按最新版本去重展示）</div>
+      <div id="pvList"><div class="empty">请导入或选择项目</div></div>
+    </div>
+    <div id="tab-rr" class="tabc">
+      <div class="p-title">人工复核记录链</div>
+      <div id="rrList"><div class="empty">暂无复核记录</div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = "http://localhost:8000";
+let currentProject = null;
+let sceneData = null;
+let projDetail = null;
+
+let scene, camera, renderer, controls, raycaster, mouse;
+let sceneObjs = [];
+
+async function init() {
+  initThree();
+  await loadProjects();
+  animate();
+}
+
+function initThree() {
+  const host = document.querySelector('.view-3d');
+  const canvas = document.getElementById('canvas3d');
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x0f172a);
+  camera = new THREE.PerspectiveCamera(60, host.clientWidth/host.clientHeight, 0.1, 1000);
+  camera.position.set(10, 10, 10);
+  renderer = new THREE.WebGLRenderer({canvas, antialias: true});
+  renderer.setSize(host.clientWidth, host.clientHeight);
+  renderer.setPixelRatio(window.devicePixelRatio);
+  controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true; controls.dampingFactor = 0.05;
+  scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+  const dl = new THREE.DirectionalLight(0xffffff, 0.8);
+  dl.position.set(10, 20, 10); scene.add(dl);
+  scene.add(new THREE.GridHelper(20, 20, 0x334155, 0x1e293b));
+  scene.add(new THREE.AxesHelper(5));
+  raycaster = new THREE.Raycaster();
+  mouse = new THREE.Vector2();
+  canvas.addEventListener('mousemove', onMouseMove);
+  canvas.addEventListener('click', onClick);
+  window.addEventListener('resize', () => {
+    camera.aspect = host.clientWidth/host.clientHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(host.clientWidth, host.clientHeight);
+  });
+}
+
+function animate() { requestAnimationFrame(animate); controls.update(); renderer.render(scene, camera); }
+
+/* ------------------------- 项目列表 ------------------------- */
+async function loadProjects() {
+  try {
+    const res = await fetch(`${API}/projects`);
+    const {projects} = await res.json();
+    renderProjects(projects);
+  } catch (e) {
+    document.getElementById('projectList').innerHTML =
+      '<div class="empty">请先启动后端服务<br><code>uvicorn segment_conflict.api:app --reload</code></div>';
+  }
+}
+
+function renderProjects(projects) {
+  const el = document.getElementById('projectList');
+  if (!projects || !projects.length) {
+    el.innerHTML = '<div class="empty">暂无项目<br>请先导入 CSV</div>';
+    return;
+  }
+  el.innerHTML = projects.map(p => {
+    const active = p.name === currentProject ? 'active' : '';
+    return `
+      <div class="p-item ${active}" onclick="selectProject('${p.name}')">
+        <div class="p-name">${p.name}</div>
+        <div class="p-meta">
+          v${p.version} · ${p.segments}条 · ${p.conflicts}冲突 · ${p.gaps}断档
+        </div>
+        <div class="p-meta" style="margin-top:4px">
+          <span class="badge b-qi">小祁 ${p.needs_qi_count||0}</span>
+          <span class="badge b-team">教研组 ${p.needs_review_count||0}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function importProject() {
+  const name = document.getElementById('projName').value.trim();
+  const f = document.getElementById('csvFile').files[0];
+  if (!name) return alert('请输入项目名称');
+  if (!f) return alert('请选择 CSV 文件');
+  const fd = new FormData(); fd.append('file', f);
+  try {
+    const r = await fetch(`${API}/import?name=${encodeURIComponent(name)}`, {method:'POST', body:fd});
+    const d = await r.json();
+    if (r.ok) {
+      alert(`导入成功 ✔\n线段 ${d.segments_count} · 冲突 ${d.conflicts_count} · 断档 ${d.gaps_count}\n待小祁 ${d.todo.needs_qi_count} · 待教研组 ${d.todo.needs_review_count}\n${d.consistency}`);
+      await loadProjects();
+      await selectProject(name);
+    } else alert('导入失败：' + d.detail);
+  } catch (e) { alert('导入失败，请启动后端服务'); }
+}
+
+/* ------------------------- 选中项目：拉取所有数据 ------------------------- */
+async function selectProject(name) {
+  currentProject = name;
+  await loadProjects();
+
+  const [r1, r2] = await Promise.all([
+    fetch(`${API}/projects/${name}`),
+    fetch(`${API}/3d-data/${name}`),
+  ]);
+  projDetail = await r1.json();
+  sceneData = await r2.json();
+
+  // 顶部摘要（与 CLI / 报告 / API 一致）
+  const td = projDetail.todo;
+  document.getElementById('todoQi').textContent = td.needs_qi_count;
+  document.getElementById('todoTeam').textContent = td.needs_review_count;
+  document.getElementById('todoGap').textContent = td.pending_gaps;
+  document.getElementById('verTag').innerHTML =
+    `<b>${projDetail.name}</b> v${projDetail.version}<br>` +
+    `<span style="color:#86efac">${td.consistency_note}</span>`;
+
+  renderScene();
+  renderGaps(projDetail.gaps);
+  renderConflicts(projDetail.conflicts, sceneData.segments);
+  renderParams(projDetail.latest_parameters);
+  renderReviewRecords(projDetail.review_records);
+}
+
+/* ------------------------- 3D 渲染 ------------------------- */
+function renderScene() {
+  sceneObjs.forEach(o => scene.remove(o));
+  sceneObjs = [];
+  if (!sceneData) return;
+
+  const shSeg = document.getElementById('shSeg').checked;
+  const shCon = document.getElementById('shCon').checked;
+  const shDel = document.getElementById('shDel').checked;
+  const shLab = document.getElementById('shLab').checked;
+  const catC = {管道:0x3b82f6,电缆:0x10b981,结构:0xf59e0b,暖通:0x8b5cf6,default:0x64748b};
+
+  sceneData.segments.forEach(seg => {
+    if (seg.is_deleted && !shDel) return;
+    if (!shSeg) return;
+    const col = seg.is_deleted ? 0x64748b : (catC[seg.category] || catC.default);
+    const op = seg.is_deleted ? 0.35 : 1.0;
+    const g = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(seg.start.x, seg.start.z, seg.start.y),
+      new THREE.Vector3(seg.end.x, seg.end.z, seg.end.y),
+    ]);
+    const line = new THREE.Line(g, new THREE.LineBasicMaterial({color:col, transparent:true, opacity:op, linewidth: seg.is_deleted?1:3}));
+    line.userData = {type:'segment', data:seg};
+    scene.add(line); sceneObjs.push(line);
+
+    if (shLab && !seg.is_deleted) {
+      const mx = (seg.start.x + seg.end.x)/2;
+      const my = (seg.start.z + seg.end.z)/2 + 0.3;
+      const mz = (seg.start.y + seg.end.y)/2;
+      const sp = makeLabel(`#${seg.id}`);
+      sp.position.set(mx, my, mz);
+      scene.add(sp); sceneObjs.push(sp);
+    }
+    if (seg.questionnaire_row) {
+      const mg = new THREE.SphereGeometry(0.08, 8, 8);
+      const mm = new THREE.MeshBasicMaterial({color:0x10b981});
+      const marker = new THREE.Mesh(mg, mm);
+      marker.position.set(seg.start.x, seg.start.z + 0.15, seg.start.y);
+      marker.userData = {type:'qmark', data:seg};
+      scene.add(marker); sceneObjs.push(marker);
+    }
+  });
+
+  if (shCon) {
+    sceneData.conflicts.forEach(c => {
+      const col = c.severity==='critical' ? 0xdc2626
+                : c.severity==='high' ? 0xea580c : 0xd97706;
+      const sz  = c.severity==='critical' ? 0.20
+                : c.severity==='high' ? 0.16 : 0.12;
+      const s = new THREE.Mesh(
+        new THREE.SphereGeometry(sz, 16, 16),
+        new THREE.MeshBasicMaterial({color:col, transparent:true, opacity:0.85})
+      );
+      s.position.set(c.point.x, c.point.z, c.point.y);
+      s.userData = {type:'conflict', data:c};
+      scene.add(s); sceneObjs.push(s);
+    });
+  }
+
+  // 自动居中
+  if (sceneData.bounds) {
+    const b = sceneData.bounds;
+    const cx = (b.min[0]+b.max[0])/2, cy = (b.min[2]+b.max[2])/2, cz = (b.min[1]+b.max[1])/2;
+    const s  = Math.max(b.max[0]-b.min[0], b.max[1]-b.min[1], b.max[2]-b.min[2]) * 1.6;
+    camera.position.set(cx+s, cy+s, cz+s);
+    controls.target.set(cx, cy, cz);
+    controls.update();
+  }
+}
+
+function makeLabel(txt) {
+  const cv = document.createElement('canvas');
+  const cx = cv.getContext('2d');
+  cv.width = 64; cv.height = 32;
+  cx.fillStyle = 'rgba(15,23,42,0.85)'; cx.fillRect(0,0,64,32);
+  cx.fillStyle = '#fff'; cx.font = 'bold 14px Arial';
+  cx.textAlign = 'center'; cx.textBaseline = 'middle';
+  cx.fillText(txt, 32, 16);
+  const t = new THREE.CanvasTexture(cv);
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({map:t}));
+  sp.scale.set(1, 0.5, 1);
+  return sp;
+}
+
+function onMouseMove(e) {
+  const canvas = document.getElementById('canvas3d');
+  const r = canvas.getBoundingClientRect();
+  mouse.x = ((e.clientX - r.left)/r.width)*2 - 1;
+  mouse.y = -((e.clientY - r.top)/r.height)*2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  const hits = raycaster.intersectObjects(sceneObjs);
+  const bb = document.getElementById('bub');
+  if (hits.length && hits[0].object.userData) {
+    const ud = hits[0].object.userData;
+    bb.style.display = 'block';
+    bb.style.left = (e.clientX + 14) + 'px';
+    bb.style.top  = (e.clientY + 14) + 'px';
+    if (ud.type === 'segment') bb.innerHTML = segBubble(ud.data);
+    else if (ud.type === 'conflict') bb.innerHTML = confBubble(ud.data);
+    else if (ud.type === 'qmark') bb.innerHTML = `<div class="t">✔ 已关联问卷</div>
+      <div class="kv"><span class="k">线段</span><span>#${ud.data.id} ${ud.data.name}</span></div>
+      <div class="kv"><span class="k">问卷行</span><span>第 ${ud.data.questionnaire_row} 行</span></div>`;
+  } else bb.style.display = 'none';
+}
+function onClick(e) {
+  const canvas = document.getElementById('canvas3d');
+  const r = canvas.getBoundingClientRect();
+  mouse.x = ((e.clientX - r.left)/r.width)*2 - 1;
+  mouse.y = -((e.clientY - r.top)/r.height)*2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  const hits = raycaster.intersectObjects(sceneObjs);
+  if (hits.length && hits[0].object.userData) {
+    const ud = hits[0].object.userData;
+    if (ud.type === 'segment') traceOriginalRow(ud.data.id);
+    else if (ud.type === 'conflict') locateConflict(ud.data.id);
+  }
+}
+function segBubble(seg) {
+  const tr = seg.trace || {};
+  const qr = seg.questionnaire_row ? `<span style="color:#4ade80">第 ${seg.questionnaire_row} 行 ✔</span>` : `<span style="color:#fca5a5">未关联 ⚠</span>`;
+  const owner = tr.next_owner === '数据分析师小祁'
+    ? '<span style="color:#fca5a5">小祁</span>' : '<span style="color:#67e8f9">教研组</span>';
+  const missing = (tr.missing_materials && tr.missing_materials.length)
+    ? tr.missing_materials.join('、') : '<span style="color:#4ade80">无</span>';
+  return `
+    <div class="t">#${seg.id} ${seg.name} <small>(${seg.category})</small></div>
+    <div class="kv"><span class="k">手算原始行</span><span>第 ${seg.original_row} 行</span></div>
+    <div class="kv"><span class="k">问卷原始行</span><span>${qr}</span></div>
+    <div class="kv"><span class="k">参数版本</span><span>v${tr.param_version || '-'} <small>${tr.status || ''}</small></span></div>
+    <div class="kv"><span class="k">还缺材料</span><span style="max-width:180px">${missing}</span></div>
+    <div class="kv"><span class="k">下一步找谁</span><span>${owner}</span></div>
+    ${tr.original_value ? `<div class="kv" style="color:#94a3b8"><span class="k">原始说法</span><span>${tr.original_value}</span></div>` : ''}
+    ${tr.new_value      ? `<div class="kv" style="color:#94a3b8"><span class="k">改后值</span><span>${tr.new_value}</span></div>` : ''}
+    <button class="trace-btn" onclick="event.preventDefault(); traceOriginalRow(${seg.id})">追溯原始行 →</button>
+  `;
+}
+function confBubble(c) {
+  const s1 = sceneData.segments.find(x => x.id===c.segment1);
+  const s2 = sceneData.segments.find(x => x.id===c.segment2);
+  const tMap = {exact_intersection:'精确相交', near_intersection:'近似相交', close_proximity:'距离过近'};
+  return `
+    <div class="t">冲突 #${c.id} <span style="color:#fca5a5">● ${c.severity}</span></div>
+    <div class="kv"><span class="k">类型</span><span>${tMap[c.type] || c.type}</span></div>
+    <div class="kv"><span class="k">线段</span><span>#${c.segment1} ↔ #${c.segment2}</span></div>
+    <div class="kv"><span class="k">距离</span><span>${c.distance.toFixed(4)} m</span></div>
+    <div class="kv" style="color:#94a3b8"><span class="k">交点</span><span>(${c.point.x.toFixed(2)}, ${c.point.y.toFixed(2)}, ${c.point.z.toFixed(2)})</span></div>
+    <button class="trace-btn" onclick="event.preventDefault(); locateConflict(${c.id})">定位冲突 →</button>
+  `;
+}
+
+/* ------------------------- 追溯 / 定位 ------------------------- */
+function traceOriginalRow(sid) {
+  const seg = sceneData.segments.find(s => s.id === sid);
+  if (!seg) return;
+  const pv = projDetail.latest_parameters.find(x => x.segment_id === sid);
+  let msg = `【追溯原始行】线段 #${sid} ${seg.name}\n\n`;
+  msg += `手算反例原始行号：第 ${seg.original_row} 行\n`;
+  msg += `问卷原始行号：${seg.questionnaire_row ? `第 ${seg.questionnaire_row} 行 ✔ 已关联` : `未关联 ⚠ 请联系数据分析师小祁补录`}\n`;
+  if (seg.is_deleted) msg += `\n⚠ 此线段已标记为已删除，需要教研组复核后决定是否恢复\n`;
+  if (pv) {
+    msg += `\n【参数版本最新 v${pv.version}】\n`;
+    msg += `  状态：${sbStatus(pv.status)}\n`;
+    msg += `  为什么被留下：${pv.kept_reason}\n`;
+    msg += `  还缺什么材料：${pv.missing_materials.length ? pv.missing_materials.join('、') : '无'}\n`;
+    msg += `  下一步找谁：${pv.next_owner}\n`;
+    if (pv.original_value) msg += `  原始说法：${pv.original_value}\n`;
+    if (pv.new_value) msg += `  改后值  ：${pv.new_value}\n`;
+    if (pv.change_reason) msg += `  处理原因：${pv.change_reason}\n`;
+  }
+  const inGap = projDetail.gaps.find(g =>
+    (seg.original_row === g.gap_start - 1) || (seg.original_row === g.gap_end + 1) ||
+    (g.gap_start <= seg.original_row && seg.original_row <= g.gap_end)
+  );
+  if (inGap) msg += `\n⚠ 此行紧邻或位于断档区间 ${inGap.gap_start}-${inGap.gap_end}，需教研组复核完整性（不提前归正常）`;
+  alert(msg);
+}
+function locateConflict(cid) {
+  const c = sceneData.conflicts.find(x => x.id === cid);
+  if (!c) return;
+  const s1 = sceneData.segments.find(s => s.id === c.segment1);
+  const s2 = sceneData.segments.find(s => s.id === c.segment2);
+  camera.position.set(c.point.x + 3, c.point.z + 3, c.point.y + 3);
+  controls.target.set(c.point.x, c.point.z, c.point.y);
+  controls.update();
+  alert(`【冲突 #${cid}】\n${{critical:'严重',high:'高危',medium:'中等'}[c.severity]}  ${{exact_intersection:'精确相交',near_intersection:'近似相交',close_proximity:'距离过近'}[c.type]}\n距离：${c.distance.toFixed(4)} m\n\n线段 #${c.segment1} ${s1?.name || ''} (原始行 ${s1?.original_row})\n线段 #${c.segment2} ${s2?.name || ''} (原始行 ${s2?.original_row})\n\n交点：(${c.point.x.toFixed(2)}, ${c.point.y.toFixed(2)}, ${c.point.z.toFixed(2)})`);
+}
+
+/* ------------------------- 断档渲染 ------------------------- */
+function renderGaps(gaps) {
+  const el = document.getElementById('gapList');
+  if (!gaps || !gaps.length) { el.innerHTML = '<div class="empty">无断档</div>'; return; }
+  el.innerHTML = gaps.map((g, i) => {
+    const cls = g.status === 'pending_supplement' ? 'pending' :
+                (g.status === 'resolved' || g.status === 'supplemented') ? 'done' : '';
+    const segB = sceneData?.segments?.find(s => s.id === g.segment_before);
+    const segA = sceneData?.segments?.find(s => s.id === g.segment_after);
+    const progress = g.supplemented_rows?.length
+      ? `<div class="gap-meta">已补录 ${g.supplemented_rows.join(', ')} (${g.supplemented_rows.length}/${g.missing_count})</div>` : '';
+    const rv = g.reviewed_by ? `<div class="gap-meta">复核人：${g.reviewed_by} @ ${g.reviewed_at?.slice(0,16).replace('T',' ')}</div>` : '';
+    const note = g.note ? `<div class="gap-meta" style="color:#374151">备注：${g.note}</div>` : '';
+    const next = g.status === 'pending_supplement' ? '→ 找数据分析师小祁补录'
+               : (g.status === 'rejected' ? '→ 找小祁重新核实' : '→ 找教研组复核（不急着归正常）');
+    return `
+      <div class="gap ${cls}">
+        <div class="gap-title">断档 #${i+1}：第 ${g.gap_start}-${g.gap_end} 行 （缺 ${g.missing_count} 行）
+          ${sbStatus(g.status)}
+        </div>
+        ${segB ? `<div class="gap-meta">前序：${segB.name} (行 ${segB.original_row})</div>` : ''}
+        ${segA ? `<div class="gap-meta">后序：${segA.name} (行 ${segA.original_row})</div>` : ''}
+        ${progress}${rv}${note}
+        <div class="gap-meta" style="color:#667eea;margin-top:3px;font-weight:600;">${next}</div>
+        <div class="row">
+          <input type="number" id="gapsup-${i}" placeholder="问卷行号" min="1">
+          <button class="btn warn small" onclick="supplementGap(${i})">小祁补录</button>
+        </div>
+        <div class="row">
+          <button class="btn ok small" onclick="reviewGap(${i}, true)">✔ 教研组通过</button>
+          <button class="btn danger small" onclick="reviewGap(${i}, false)">✗ 驳回</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+/* ------------------------- 冲突渲染 ------------------------- */
+function renderConflicts(confs, segs) {
+  const el = document.getElementById('confList');
+  if (!confs || !confs.length) { el.innerHTML = '<div class="empty">未检测到冲突</div>'; return; }
+  const sMap = {}; (segs||[]).forEach(s => sMap[s.id] = s);
+  const tMap = {exact_intersection:'精确相交', near_intersection:'近似相交', close_proximity:'距离过近'};
+  el.innerHTML = confs.map(c => {
+    const s1 = sMap[c.segment1_id], s2 = sMap[c.segment2_id];
+    return `
+      <div class="conf ${c.severity}" onclick="locateConflict(${c.id})">
+        <div style="font-weight:700;">
+          <span class="sev" style="background:${c.severity==='critical'?'#dc2626':c.severity==='high'?'#ea580c':'#d97706'}"></span>
+          冲突 #${c.id} · ${tMap[c.conflict_type] || c.conflict_type}
+        </div>
+        <div style="margin-top:4px;">
+          ${s1?.name || '?'} (行 ${s1?.original_row || '?'})
+          ↔ ${s2?.name || '?'} (行 ${s2?.original_row || '?'})
+        </div>
+        <div style="margin-top:3px;color:#6b7280;font-size:11px;">
+          距离 ${c.distance.toFixed(4)}m · 交点 (${c.intersection_point.x.toFixed(2)}, ${c.intersection_point.y.toFixed(2)}, ${c.intersection_point.z.toFixed(2)})
+        </div>
+        ${c.review_note ? `<div style="margin-top:4px;font-size:11px;color:#059669;">复核意见：${c.review_note}</div>` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+/* ------------------------- 参数版本渲染（用 latest_parameters 已去重） ------------------------- */
+function renderParams(latest) {
+  const el = document.getElementById('pvList');
+  if (!latest || !latest.length) { el.innerHTML = '<div class="empty">暂无</div>'; return; }
+
+  // 摘要（与顶部一致）
+  const qi = latest.filter(p => p.status === 'needs_supplement' && p.next_owner === '数据分析师小祁');
+  const tm = latest.filter(p => p.next_owner === '教研组' && ['pending_review','ready_for_review'].includes(p.status));
+  const done = latest.filter(p => p.status === 'resolved');
+  let html = `<div class="summary">
+    <div style="font-weight:700;margin-bottom:6px;">📊 参数版本摘要（按最新版本去重，与 CLI / 报告一致）</div>
+    <div class="row2">
+      <span class="s-item">总线段<b>${latest.length}</b></span>
+      <span class="s-item">待小祁<b>${qi.length}</b></span>
+      <span class="s-item">待教研组<b>${tm.length}</b></span>
+      <span class="s-item">已完成<b>${done.length}</b></span>
+      <span class="s-item">历史总版本<b>${projDetail.history_count_total}</b></span>
+    </div>
+  </div>`;
+
+  // 分组渲染：待小祁 → 待教研组 → 其他
+  const groups = [
+    {title:'■ 待数据分析师小祁补录', list: qi, cls:'needs'},
+    {title:'■ 待教研组复核', list: tm, cls:'ready'},
+    {title:'■ 其他状态', list: latest.filter(p => !qi.includes(p) && !tm.includes(p)), cls:''},
+  ];
+
+  groups.forEach(grp => {
+    if (!grp.list.length) return;
+    html += `<div style="font-weight:700;font-size:12px;margin:8px 0 6px;color:#374151;">${grp.title} (${grp.list.length})</div>`;
+    grp.list.sort((a,b) => a.segment_id - b.segment_id).forEach(p => {
+      html += pvCardHTML(p, grp.cls);
+    });
+  });
+  el.innerHTML = html;
+}
+
+function pvCardHTML(p, cls) {
+  const owner = p.next_owner === '数据分析师小祁' ? 'owner-qi' : 'owner-team';
+  const missing = (p.missing_materials && p.missing_materials.length)
+    ? `<span style="color:#dc2626">${p.missing_materials.join('、')}</span>`
+    : `<span style="color:#059669">无</span>`;
+  const question = p.questionnaire_row ? `<span style="color:#059669">第 ${p.questionnaire_row} 行 ✔</span>` : `<span style="color:#dc2626">未关联</span>`;
+  const deleted = p.is_deleted ? `<span class="sb sb-rejected" style="margin-left:6px;">已删除</span>` : '';
+  const his = p.history || [];
+  let chain = '';
+  if (his.length > 1) {
+    chain = '<div class="chain"><div class="chain-title">📜 参数版本完整变更链（' + his.length + ' 个版本）</div>';
+    his.forEach(h => {
+      chain += `<div class="chain-item">
+        <b>v${h.version}</b> <small>[${h.created_by} @ ${h.created_at?.slice(0,16).replace('T',' ')}]</small> ${sbStatus(h.status)}<br>
+        <small style="color:#4b5563;">为什么被留下：${h.kept_reason}</small><br>
+        ${h.original_value ? `<small style="color:#dc2626;">原始：${h.original_value} →</small> ` : ''}
+        ${h.new_value ? `<small style="color:#059669;">改后：${h.new_value}</small><br>` : ''}
+        ${h.change_reason ? `<small style="color:#667eea;">原因：${h.change_reason}</small>` : ''}
+      </div>`;
+    });
+    chain += '</div>';
+  }
+  return `
+    <div class="pv-card ${cls}">
+      <div class="pv-head">
+        <span class="pv-name">
+          #${p.segment_id} ${p.segment_name || ''}
+          <small style="color:#6b7280;font-weight:normal;">(原始行 ${p.original_row_num || '-'})</small>
+          ${deleted}
+        </span>
+        <span class="pv-ver">v${p.version}</span>
+      </div>
+      <div class="kv"><span class="k">状态</span><span class="v">${sbStatus(p.status)}</span></div>
+      <div class="kv"><span class="k">问卷行</span><span class="v">${question}</span></div>
+      <div class="kv"><span class="k">为什么被留下</span><span class="v">${p.kept_reason}</span></div>
+      <div class="kv"><span class="k">还缺什么材料</span><span class="v">${missing}</span></div>
+      ${p.original_value ? `<div class="kv"><span class="k">原始说法</span><span class="v" style="color:#dc2626">${p.original_value}</span></div>` : ''}
+      ${p.new_value      ? `<div class="kv"><span class="k">改后值</span><span class="v" style="color:#059669">${p.new_value}</span></div>` : ''}
+      ${p.change_reason  ? `<div class="kv"><span class="k">处理原因</span><span class="v" style="color:#667eea">${p.change_reason}</span></div>` : ''}
+      <div class="kv"><span class="k">下一步找谁</span><span class="v ${owner}">${p.next_owner}</span></div>
+      ${chain}
+      ${p.status === 'needs_supplement' ? `
+        <div class="row" style="margin-top:8px;">
+          <input type="number" id="pvsup-${p.segment_id}" placeholder="问卷原始行号" min="1">
+          <button class="btn warn small" onclick="supplementSegment(${p.segment_id})">数据分析师小祁补录</button>
+        </div>` : ''}
+    </div>
+  `;
+}
+
+/* ------------------------- 复核记录链 ------------------------- */
+function renderReviewRecords(records) {
+  const el = document.getElementById('rrList');
+  if (!records || !records.length) {
+    el.innerHTML = '<div class="empty">暂无人工复核记录<br>教研组操作后会在此完整保留：<br>原始说法 → 改后值 → 处理原因 → 下一步找谁</div>';
+    return;
+  }
+  const typeMap = {gap:'断档复核', segment_parameter:'参数版本复核'};
+  el.innerHTML = `<div style="font-size:11px;color:#6b7280;margin-bottom:8px;">共 ${records.length} 条复核记录</div>` +
+    records.map(r => {
+      const tLabel = typeMap[r.target_type] || r.target_type;
+      const changes = r.changes ? JSON.stringify(r.changes, null, 0) : '';
+      return `
+        <div class="rr-card">
+          <div class="rr-head">
+            <span>#${r.id} [${tLabel}] ${r.target_id}</span>
+            <small style="color:#6b7280;">${r.reviewer} @ ${r.reviewed_at?.slice(0,16).replace('T',' ')}</small>
+          </div>
+          <div class="kv"><span class="k">原始说法</span><span class="v change-from">状态=${translateStatus(r.original_status)}</span></div>
+          <div class="kv"><span class="k">改后值</span><span class="v change-to">状态=${translateStatus(r.new_status)}</span></div>
+          <div class="kv"><span class="k">处理原因</span><span class="v" style="color:#667eea;">${r.reason}</span></div>
+          <div class="kv"><span class="k">下一步找谁</span><span class="v"><b>${r.next_owner}</b></span></div>
+          ${changes ? `<div class="kv"><span class="k">变更明细</span><span class="v" style="font-size:10px;color:#64748b;word-break:break-all;">${changes}</span></div>` : ''}
+        </div>
+      `;
+    }).join('');
+}
+
+/* ------------------------- 操作：补录 / 复核 ------------------------- */
+async function supplementGap(i) {
+  const v = parseInt(document.getElementById(`gapsup-${i}`).value);
+  if (!v || v < 1) return alert('请输入有效的问卷行号');
+  const gap = projDetail.gaps[i];
+  // 把补录挂到 adjacent 线段上
+  const sid = gap.segment_after || gap.segment_before;
+  if (!sid) return alert('无法定位关联线段');
+  await supplementSegment(sid, v);
+}
+
+async function supplementSegment(sid, questionnaireRowOverride) {
+  const qr = questionnaireRowOverride || parseInt(document.getElementById(`pvsup-${sid}`)?.value);
+  if (!qr || qr < 1) return alert('请输入有效的问卷原始行号');
+  if (!currentProject) return;
+  try {
+    const r = await fetch(`${API}/supplement`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({project_name: currentProject, segment_id: sid, questionnaire_row: qr})
+    });
+    const d = await r.json();
+    if (r.ok) {
+      const b = d.before, a = d.after;
+      alert(
+        `【补录完成】线段 #${sid}\n\n` +
+        `问卷原始行：${qr}\n` +
+        `状态变更：${b.status} → ${a.status}\n` +
+        `还缺什么材料（前）：${b.missing_materials?.join('、') || '无'}\n` +
+        `还缺什么材料（后）：${a.missing_materials?.join('、') || '无'}\n` +
+        `保留原因：${a.kept_reason}\n` +
+        `下一步找谁：${a.next_owner}\n\n` +
+        `原始说法：${a.original_value}\n` +
+        `改后值  ：${a.new_value}\n` +
+        `处理原因：${a.change_reason}\n\n` +
+        `项目新版本 v${d.new_project_version}（列表、详情、摘要、报告已同步）`
+      );
+      await selectProject(currentProject);
+    } else alert('失败：' + d.detail);
+  } catch (e) { alert('操作失败'); }
+}
+
+async function reviewGap(i, approved) {
+  const note = prompt(`请输入教研组复核意见（${approved ? '通过' : '驳回'}）：`,
+    approved ? '数据完整，复核通过' : '请重新核实问卷原始行');
+  if (note === null) return;
+  if (!currentProject) return;
+  try {
+    const r = await fetch(`${API}/review-gap`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({project_name: currentProject, gap_index: i, approved, note})
+    });
+    const d = await r.json();
+    if (r.ok) {
+      const rr = d.review_record || {};
+      alert(
+        `【教研组复核${approved ? '通过' : '驳回'}】断档 #${i+1}\n\n` +
+        `断档状态：${d.before.status} → ${d.after.status}\n` +
+        `备注：${d.after.note}\n\n` +
+        `【复核记录（永久保留）】\n` +
+        `原始说法：状态=${translateStatus(rr.original_status)}\n` +
+        `改后值  ：状态=${translateStatus(rr.new_status)}\n` +
+        `处理原因：${rr.reason}\n` +
+        `下一步找谁：${rr.next_owner}\n\n` +
+        `项目新版本 v${d.new_project_version}\n相邻线段参数版本已同步追加变更版本（不提前归正常）`
+      );
+      await selectProject(currentProject);
+    } else alert('失败：' + d.detail);
+  } catch (e) { alert('操作失败'); }
+}
+
+/* ------------------------- 工具 ------------------------- */
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tabc').forEach(c => c.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+}
+function sbStatus(s) {
+  const map = {
+    needs_supplement:'<span class="sb sb-needs">需补录</span>',
+    ready_for_review:'<span class="sb sb-ready">待复核(材料齐)</span>',
+    pending_review:  '<span class="sb sb-pending">待复核</span>',
+    supplemented:    '<span class="sb sb-pending">已补录待复核</span>',
+    partially_resolved:'<span class="sb sb-pending">部分补录待复核</span>',
+    resolved:        '<span class="sb sb-resolved">已解决</span>',
+    rejected:        '<span class="sb sb-rejected">已驳回</span>',
+  };
+  return map[s] || `<span class="sb sb-pending">${s}</span>`;
+}
+function translateStatus(s) {
+  return {
+    pending_review:'待复核', pending_supplement:'待补录',
+    needs_supplement:'需补录', ready_for_review:'待复核(材料齐)',
+    partially_resolved:'部分补录待复核', supplemented:'已补录待复核',
+    resolved:'已解决', rejected:'已驳回(待补正)',
+  }[s] || s;
+}
+async function downloadReport() {
+  if (!currentProject) return alert('请先选择项目');
+  window.open(`${API}/report/${currentProject}`, '_blank');
+}
+
+init();
+</script>
 </body>
 </html>
