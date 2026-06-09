@@ -18,6 +18,21 @@ const db = new Database(dbPath)
 db.pragma('journal_mode = WAL')
 db.pragma('foreign_keys = ON')
 
+const addColumnIfNotExists = (tableName: string, columnName: string, columnDef: string): void => {
+  try {
+    const columns = db.prepare(`PRAGMA table_info(${tableName})`).all() as { name: string }[]
+    const exists = columns.some(c => c.name === columnName)
+    if (!exists) {
+      db.exec(`ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${columnDef}`)
+    }
+  } catch (_e) {
+    try {
+      db.exec(`ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${columnDef}`)
+    } catch (_e2) {
+    }
+  }
+}
+
 db.exec(`
 CREATE TABLE IF NOT EXISTS param_versions (
     id TEXT PRIMARY KEY,
@@ -35,7 +50,12 @@ CREATE TABLE IF NOT EXISTS param_items (
     rationale TEXT NOT NULL DEFAULT '',
     is_denominator_zero INTEGER NOT NULL DEFAULT 0,
     raw_denominator_value TEXT NOT NULL DEFAULT '',
-    review_status TEXT NOT NULL DEFAULT 'normal' CHECK (review_status IN ('normal', 'pending_review', 'reviewed'))
+    review_status TEXT NOT NULL DEFAULT 'normal' CHECK (review_status IN ('normal', 'pending_review', 'reviewed')),
+    previous_value TEXT NOT NULL DEFAULT '',
+    adjudication_note TEXT NOT NULL DEFAULT '',
+    review_note TEXT NOT NULL DEFAULT '',
+    next_action TEXT NOT NULL DEFAULT '',
+    last_actor TEXT NOT NULL DEFAULT ''
 );
 CREATE INDEX IF NOT EXISTS idx_param_items_version ON param_items(version_id);
 CREATE INDEX IF NOT EXISTS idx_param_items_name ON param_items(name);
@@ -79,7 +99,14 @@ CREATE TABLE IF NOT EXISTS demo_results (
     is_denominator_zero INTEGER NOT NULL DEFAULT 0,
     review_status TEXT NOT NULL DEFAULT 'normal' CHECK (review_status IN ('normal', 'pending_review', 'reviewed')),
     display_label TEXT NOT NULL DEFAULT '',
-    calculated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    calculated_at TEXT NOT NULL DEFAULT (datetime('now')),
+    previous_value TEXT NOT NULL DEFAULT '',
+    adjudication_note TEXT NOT NULL DEFAULT '',
+    review_note TEXT NOT NULL DEFAULT '',
+    review_action TEXT NOT NULL DEFAULT '',
+    next_action TEXT NOT NULL DEFAULT '',
+    last_actor TEXT NOT NULL DEFAULT '',
+    counterexample_note_raw TEXT NOT NULL DEFAULT ''
 );
 CREATE INDEX IF NOT EXISTS idx_demo_results_param ON demo_results(param_item_id);
 CREATE TABLE IF NOT EXISTS denominator_zero_reviews (
@@ -107,7 +134,39 @@ CREATE TABLE IF NOT EXISTS self_checks (
     run_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 CREATE INDEX IF NOT EXISTS idx_self_checks_type ON self_checks(check_type);
+CREATE TABLE IF NOT EXISTS audit_logs (
+    id TEXT PRIMARY KEY,
+    record_type TEXT NOT NULL CHECK (record_type IN ('param_item', 'counterexample', 'conflict', 'demo_result', 'denominator_zero_review', 'workflow_step', 'checks')),
+    record_id TEXT NOT NULL,
+    param_item_id TEXT,
+    counterexample_id TEXT,
+    action_type TEXT NOT NULL,
+    previous_value TEXT NOT NULL DEFAULT '',
+    new_value TEXT NOT NULL DEFAULT '',
+    reason TEXT NOT NULL DEFAULT '',
+    note TEXT NOT NULL DEFAULT '',
+    actor TEXT NOT NULL DEFAULT '',
+    next_action TEXT NOT NULL DEFAULT '',
+    details TEXT NOT NULL DEFAULT '{}',
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_audit_param ON audit_logs(param_item_id);
+CREATE INDEX IF NOT EXISTS idx_audit_counterexample ON audit_logs(counterexample_id);
 `)
+
+addColumnIfNotExists('param_items', 'previous_value', "TEXT NOT NULL DEFAULT ''")
+addColumnIfNotExists('param_items', 'adjudication_note', "TEXT NOT NULL DEFAULT ''")
+addColumnIfNotExists('param_items', 'review_note', "TEXT NOT NULL DEFAULT ''")
+addColumnIfNotExists('param_items', 'next_action', "TEXT NOT NULL DEFAULT ''")
+addColumnIfNotExists('param_items', 'last_actor', "TEXT NOT NULL DEFAULT ''")
+
+addColumnIfNotExists('demo_results', 'previous_value', "TEXT NOT NULL DEFAULT ''")
+addColumnIfNotExists('demo_results', 'adjudication_note', "TEXT NOT NULL DEFAULT ''")
+addColumnIfNotExists('demo_results', 'review_note', "TEXT NOT NULL DEFAULT ''")
+addColumnIfNotExists('demo_results', 'review_action', "TEXT NOT NULL DEFAULT ''")
+addColumnIfNotExists('demo_results', 'next_action', "TEXT NOT NULL DEFAULT ''")
+addColumnIfNotExists('demo_results', 'last_actor', "TEXT NOT NULL DEFAULT ''")
+addColumnIfNotExists('demo_results', 'counterexample_note_raw', "TEXT NOT NULL DEFAULT ''")
 
 db.exec(`
 INSERT OR IGNORE INTO workflow_state (id, current_step, import_completed, counterexample_review_completed, demo_update_completed) VALUES ('singleton', 'import', 0, 0, 0);
@@ -120,7 +179,7 @@ if (existingVersions.cnt === 0) {
     INSERT INTO param_versions (id, version, imported_by, item_count, change_summary) VALUES (?, ?, ?, ?, ?)
   `)
   const insertItem = db.prepare(`
-    INSERT INTO param_items (id, version_id, name, value, rationale, is_denominator_zero, raw_denominator_value, review_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO param_items (id, version_id, name, value, rationale, is_denominator_zero, raw_denominator_value, review_status, previous_value, adjudication_note, review_note, next_action, last_actor) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `)
   const insertCounterexample = db.prepare(`
     INSERT INTO counterexamples (id, name, note, note_raw, expected_value, actual_value, source_param_id, has_conflict) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -137,9 +196,9 @@ if (existingVersions.cnt === 0) {
   const normalItemId = 'pi-sample-normal'
   const conflictItemId = 'pi-sample-conflict'
 
-  insertItem.run(dzItemId, versionId, 'alignment_threshold', '', '分母为0时无法计算对齐阈值', 1, '0', 'pending_review')
-  insertItem.run(normalItemId, versionId, 'max_edit_distance', '3', '最大编辑距离上限', 0, '', 'normal')
-  insertItem.run(conflictItemId, versionId, 'substitution_cost', '2', '替换操作代价', 0, '', 'normal')
+  insertItem.run(dzItemId, versionId, 'alignment_threshold', '', '分母为0时无法计算对齐阈值', 1, '0', 'pending_review', '', '', '分母为0，分母为0的空字符串', 'review', '')
+  insertItem.run(normalItemId, versionId, 'max_edit_distance', '3', '最大编辑距离上限', 0, '', 'normal', '', '', '', '', '')
+  insertItem.run(conflictItemId, versionId, 'substitution_cost', '2', '替换操作代价', 0, '', 'normal', '2', '', '', '', '')
 
   const ceId = 'ce-sample-001'
   insertCounterexample.run(ceId, 'substitution_cost', '替换代价应为1而非2，基于序列ACGT→ACGA的观察', '替换代价应为1而非2，基于序列ACGT→ACGA的观察', '1', '2', conflictItemId, 1)

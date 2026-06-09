@@ -1,4 +1,5 @@
 import express, {
+  type NextFunction,
   type Request,
   type Response,
 } from 'express'
@@ -10,6 +11,7 @@ import conflictsRoutes from './routes/conflicts.js'
 import checksRoutes from './routes/checks.js'
 import demoRoutes from './routes/demo.js'
 import workflowRoutes from './routes/workflow.js'
+import historyRoutes from './routes/history.js'
 
 dotenv.config()
 
@@ -26,6 +28,7 @@ app.use('/api/conflicts', conflictsRoutes)
 app.use('/api/checks', checksRoutes)
 app.use('/api/demo', demoRoutes)
 app.use('/api/workflow', workflowRoutes)
+app.use('/api/history', historyRoutes)
 
 app.use(
   '/api/health',
@@ -37,10 +40,11 @@ app.use(
   },
 )
 
-app.use((error: Error, _req: Request, res: Response): void => {
+app.use((error: Error, _req: Request, res: Response, _next: NextFunction): void => {
+  console.error('[API ERROR]', error.message, error.stack)
   res.status(500).json({
     success: false,
-    error: 'Server internal error',
+    error: 'Server internal error: ' + error.message,
   })
 })
 

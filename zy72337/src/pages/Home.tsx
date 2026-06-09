@@ -1,7 +1,15 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { CheckCircle2, Circle, AlertTriangle, ArrowRight, Sliders, FileText, Presentation } from 'lucide-react'
+import { CheckCircle2, Circle, AlertTriangle, ArrowRight, Sliders, FileText, Presentation, Clock, Gavel, AlertOctagon, ListChecks } from 'lucide-react'
 import { useAppStore } from '@/store'
+
+interface ActionItem {
+  id: string
+  name: string
+  nextAction: string
+  adjudicationNote?: string
+  lastActor?: string
+}
 
 const steps = [
   { key: 'import' as const, label: '① 导入参数调试表', path: '/params', icon: Sliders },
@@ -24,14 +32,53 @@ const statusColors: Record<string, string> = {
 
 export default function Home() {
   const navigate = useNavigate()
-  const { workflow, selfChecks, fetchWorkflow, fetchSelfChecks } = useAppStore()
+  const { workflow, selfChecks, paramItems, demoResults, conflicts, fetchWorkflow, fetchSelfChecks, fetchParamItems, fetchDemoResults, fetchConflicts } = useAppStore()
 
   useEffect(() => {
     fetchWorkflow()
     fetchSelfChecks()
-  }, [fetchWorkflow, fetchSelfChecks])
+    fetchParamItems()
+    fetchDemoResults()
+    fetchConflicts()
+  }, [fetchWorkflow, fetchSelfChecks, fetchParamItems, fetchDemoResults, fetchConflicts])
 
   const currentStep = workflow?.currentStep ?? 'import'
+
+  const pendingNextActions: ActionItem[] = [
+    ...paramItems.filter((p) => p.nextAction).map((p) => ({
+      id: p.id,
+      name: p.name,
+      nextAction: p.nextAction,
+      adjudicationNote: p.adjudicationNote,
+      lastActor: p.lastActor,
+    })),
+    ...demoResults.filter((d) => d.nextAction).map((d) => ({
+      id: d.id,
+      name: d.paramName,
+      nextAction: d.nextAction,
+      adjudicationNote: d.adjudicationNote,
+      lastActor: d.lastActor,
+    })),
+  ]
+
+  const pendingConflictsItems = conflicts.filter((c) => c.status === 'pending')
+
+  const itemsNeedingAdjudication: ActionItem[] = [
+    ...paramItems.filter((p) => p.adjudicationNote && p.nextAction).map((p) => ({
+      id: p.id,
+      name: p.name,
+      nextAction: p.nextAction,
+      adjudicationNote: p.adjudicationNote,
+      lastActor: p.lastActor,
+    })),
+    ...demoResults.filter((d) => d.adjudicationNote && d.nextAction).map((d) => ({
+      id: d.id,
+      name: d.paramName,
+      nextAction: d.nextAction,
+      adjudicationNote: d.adjudicationNote,
+      lastActor: d.lastActor,
+    })),
+  ]
 
   return (
     <div className="space-y-8">
@@ -80,6 +127,115 @@ export default function Home() {
         })}
       </div>
 
+      <div className="grid grid-cols-2 gap-5">
+        <div className="bg-slate-800 rounded-lg p-5 border border-slate-700">
+          <div className="flex items-center gap-2 mb-4">
+            <AlertOctagon size={18} className="text-red-400" />
+            <h3 className="text-sm font-medium text-slate-300">待处理警报</h3>
+          </div>
+          <div className="space-y-3">
+            {pendingConflictsItems.length > 0 && (
+              <button
+                onClick={() => navigate('/counterexamples')}
+                className="w-full flex items-start gap-3 p-3 rounded-lg bg-red-500/10 border border-red-500/20 hover:bg-red-500/15 transition-colors text-left"
+              >
+                <AlertTriangle size={18} className="text-red-400 flex-shrink-0 mt-0.5" />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-sm font-medium text-red-400">冲突待裁定</span>
+                    <span className="text-xs px-2 py-0.5 bg-red-500/20 text-red-400 rounded-full">{pendingConflictsItems.length}</span>
+                  </div>
+                  <div className="text-xs text-slate-400 mt-1">前往反例页面处理冲突裁定</div>
+                </div>
+              </button>
+            )}
+            {workflow?.pendingReviews && workflow.pendingReviews > 0 && (
+              <button
+                onClick={() => navigate('/demo')}
+                className="w-full flex items-start gap-3 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 hover:bg-amber-500/15 transition-colors text-left"
+              >
+                <AlertTriangle size={18} className="text-amber-400 flex-shrink-0 mt-0.5" />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-sm font-medium text-amber-400">分母为零待复核</span>
+                    <span className="text-xs px-2 py-0.5 bg-amber-500/20 text-amber-400 rounded-full">{workflow.pendingReviews}</span>
+                  </div>
+                  <div className="text-xs text-slate-400 mt-1">前往演示页面复核异常项</div>
+                </div>
+              </button>
+            )}
+            {pendingConflictsItems.length === 0 && (!workflow?.pendingReviews || workflow.pendingReviews === 0) && (
+              <div className="text-center py-6 text-slate-500 text-sm">
+                <CheckCircle2 size={28} className="mx-auto mb-2 text-emerald-500/50" />
+                暂无待处理警报
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="bg-slate-800 rounded-lg p-5 border border-slate-700">
+          <div className="flex items-center gap-2 mb-4">
+            <ListChecks size={18} className="text-sky-400" />
+            <h3 className="text-sm font-medium text-slate-300">下一步操作</h3>
+          </div>
+          <div className="space-y-2 max-h-[280px] overflow-auto">
+            {pendingNextActions.length === 0 ? (
+              <div className="text-center py-6 text-slate-500 text-sm">
+                <Clock size={28} className="mx-auto mb-2 text-slate-600" />
+                暂无待执行操作
+              </div>
+            ) : (
+              pendingNextActions.slice(0, 8).map((item, idx) => (
+                <div
+                  key={`${item.id}-${idx}`}
+                  className="flex items-center gap-3 p-2.5 rounded-lg bg-slate-900/50 border border-slate-700/50"
+                >
+                  <ArrowRight size={14} className="text-sky-400 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm text-slate-200 font-mono truncate">{item.name}</div>
+                    <div className="text-xs text-sky-400 truncate">{item.nextAction}</div>
+                  </div>
+                  {item.lastActor && (
+                    <div className="text-xs text-slate-500 flex-shrink-0">{item.lastActor}</div>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+
+      {itemsNeedingAdjudication.length > 0 && (
+        <div className="bg-slate-800 rounded-lg p-5 border border-amber-500/20">
+          <div className="flex items-center gap-2 mb-4">
+            <Gavel size={18} className="text-amber-400" />
+            <h3 className="text-sm font-medium text-slate-300">裁决跟进事项</h3>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            {itemsNeedingAdjudication.slice(0, 4).map((item, idx) => (
+              <div
+                key={`adj-${item.id}-${idx}`}
+                className="p-3 rounded-lg bg-amber-500/5 border border-amber-500/10"
+              >
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <span className="text-sm font-mono text-amber-400 truncate">{item.name}</span>
+                  {item.nextAction && (
+                    <span className="text-xs text-sky-400 flex items-center gap-1 flex-shrink-0">
+                      <ArrowRight size={10} />
+                      {item.nextAction}
+                    </span>
+                  )}
+                </div>
+                <div className="text-xs text-slate-400 line-clamp-2">{item.adjudicationNote}</div>
+                {item.lastActor && (
+                  <div className="text-xs text-slate-500 mt-2">裁决人: {item.lastActor}</div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="bg-slate-800 rounded-lg p-5">
         <h3 className="text-sm font-medium text-slate-300 mb-4">自检状态</h3>
         <div className="flex gap-6">
@@ -103,7 +259,7 @@ export default function Home() {
 
       {workflow && (workflow.pendingConflicts > 0 || workflow.pendingReviews > 0) && (
         <div className="bg-slate-800 rounded-lg p-5">
-          <h3 className="text-sm font-medium text-slate-300 mb-3">待处理事项</h3>
+          <h3 className="text-sm font-medium text-slate-300 mb-3">待处理事项汇总</h3>
           <div className="space-y-2">
             {workflow.pendingConflicts > 0 && (
               <div className="flex items-center gap-2 text-red-400">

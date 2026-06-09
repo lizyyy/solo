@@ -1,24 +1,26 @@
 import { useEffect, useState } from 'react'
-import { Download, RefreshCw, AlertTriangle, ChevronDown, ChevronRight, X } from 'lucide-react'
+import { Download, RefreshCw, AlertTriangle, ChevronDown, ChevronRight, X, History, ArrowRight } from 'lucide-react'
 import { useAppStore } from '@/store'
 import type { DemoResult } from '@/store'
+import HistoryPanel from '@/components/HistoryPanel'
 
 export default function Demo() {
   const { demoResults, fetchDemoResults, recalculateDemo, exportDemo, reviewDenominatorZero, loading } = useAppStore()
-  const [expandedRationale, setExpandedRationale] = useState<Set<string>>(new Set())
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
   const [reviewingItem, setReviewingItem] = useState<DemoResult | null>(null)
   const [reviewDecision, setReviewDecision] = useState<'confirm_anomaly' | 'confirm_corrected'>('confirm_anomaly')
   const [reviewer, setReviewer] = useState('')
   const [reviewReason, setReviewReason] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [recalculating, setRecalculating] = useState(false)
+  const [historyParamItemId, setHistoryParamItemId] = useState<string | null>(null)
 
   useEffect(() => {
     fetchDemoResults()
   }, [fetchDemoResults])
 
-  const toggleRationale = (id: string) => {
-    setExpandedRationale((prev) => {
+  const toggleRow = (id: string) => {
+    setExpandedRows((prev) => {
       const next = new Set(prev)
       if (next.has(id)) next.delete(id)
       else next.add(id)
@@ -94,61 +96,123 @@ export default function Demo() {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-slate-700">
+              <th className="text-left py-2 px-3 text-slate-400 font-medium w-8"></th>
               <th className="text-left py-2 px-3 text-slate-400 font-medium">参数名</th>
               <th className="text-left py-2 px-3 text-slate-400 font-medium">值/标签</th>
               <th className="text-left py-2 px-3 text-slate-400 font-medium">版本</th>
-              <th className="text-left py-2 px-3 text-slate-400 font-medium">依据</th>
               <th className="text-left py-2 px-3 text-slate-400 font-medium">复核状态</th>
+              <th className="text-left py-2 px-3 text-slate-400 font-medium w-16">操作</th>
             </tr>
           </thead>
           <tbody>
-            {demoResults.map((item, idx) => (
-              <tr
-                key={item.id}
-                className={`border-b border-slate-700/50 ${
-                  item.isDenominatorZero ? 'bg-amber-500/10' : idx % 2 === 1 ? 'bg-slate-800/30' : ''
-                }`}
-              >
-                <td className="py-2 px-3 font-mono">
-                  {item.isDenominatorZero && <AlertTriangle size={14} className="inline mr-1 text-amber-400" />}
-                  {item.paramName}
-                </td>
-                <td className="py-2 px-3">
-                  {item.isDenominatorZero ? (
-                    <span className="text-amber-400">{item.displayLabel}</span>
-                  ) : (
-                    <span className="font-mono">{item.value}</span>
+            {demoResults.map((item, idx) => {
+              const isExpanded = expandedRows.has(item.id)
+              const showValueDiff = item.previousValue && item.previousValue !== item.value
+              return (
+                <>
+                  <tr
+                    key={item.id}
+                    className={`border-b border-slate-700/50 cursor-pointer ${
+                      item.isDenominatorZero ? 'bg-amber-500/10' : idx % 2 === 1 ? 'bg-slate-800/30' : ''
+                    } hover:bg-slate-700/30 transition-colors`}
+                    onClick={() => toggleRow(item.id)}
+                  >
+                    <td className="py-2 px-3">
+                      {isExpanded ? <ChevronDown size={14} className="text-slate-400" /> : <ChevronRight size={14} className="text-slate-400" />}
+                    </td>
+                    <td className="py-2 px-3 font-mono">
+                      {item.isDenominatorZero && <AlertTriangle size={14} className="inline mr-1 text-amber-400" />}
+                      {item.paramName}
+                    </td>
+                    <td className="py-2 px-3">
+                      <div className="flex flex-col">
+                        {item.isDenominatorZero ? (
+                          <span className="text-amber-400">{item.displayLabel}</span>
+                        ) : (
+                          <div className="flex items-center gap-2 flex-wrap">
+                            {showValueDiff && (
+                              <>
+                                <span className="text-slate-500 line-through font-mono">{item.previousValue}</span>
+                                <ArrowRight size={12} className="text-slate-600" />
+                              </>
+                            )}
+                            <span className={`font-mono ${showValueDiff ? 'text-amber-400' : ''}`}>{item.value}</span>
+                          </div>
+                        )}
+                        {item.nextAction && (
+                          <div className="text-xs text-sky-400 mt-1 flex items-center gap-1">
+                            <ArrowRight size={10} />
+                            {item.nextAction}
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                    <td className="py-2 px-3 text-slate-400">{item.paramVersion}</td>
+                    <td className="py-2 px-3">
+                      {item.reviewStatus === 'pending_review' ? (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setReviewingItem(item); setReviewDecision('confirm_anomaly'); setReviewer(''); setReviewReason('') }}
+                          className="text-xs px-2 py-0.5 bg-amber-500/20 text-amber-400 rounded hover:bg-amber-500/30 transition-colors"
+                        >
+                          待复核
+                        </button>
+                      ) : item.reviewStatus === 'reviewed' ? (
+                        <span className="text-xs px-2 py-0.5 bg-emerald-500/20 text-emerald-400 rounded">已复核</span>
+                      ) : (
+                        <span className="text-xs text-slate-500">正常</span>
+                      )}
+                    </td>
+                    <td className="py-2 px-3">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setHistoryParamItemId(item.paramItemId) }}
+                        className="p-1.5 rounded text-slate-400 hover:text-amber-400 hover:bg-slate-700/50 transition-colors"
+                        title="查看历史"
+                      >
+                        <History size={14} />
+                      </button>
+                    </td>
+                  </tr>
+                  {isExpanded && (
+                    <tr className="border-b border-slate-700/50 bg-slate-900/50">
+                      <td colSpan={6} className="py-3 px-6">
+                        <div className="space-y-3">
+                          <div>
+                            <div className="text-xs text-slate-500 mb-1">参数依据</div>
+                            <div className="text-sm text-slate-300 whitespace-pre-wrap bg-slate-800/50 rounded p-2">
+                              <div className="text-slate-500 mb-1 text-xs">v{item.paramVersion}</div>
+                              {item.rationale || '无'}
+                            </div>
+                          </div>
+                          {item.adjudicationNote && (
+                            <div>
+                              <div className="text-xs text-amber-500 mb-1">裁决理由</div>
+                              <div className="text-sm text-slate-300 whitespace-pre-wrap bg-amber-500/5 rounded p-2 border border-amber-500/20">{item.adjudicationNote}</div>
+                            </div>
+                          )}
+                          {item.reviewNote && (
+                            <div>
+                              <div className="text-xs text-sky-500 mb-1">复核备注</div>
+                              <div className="text-sm text-slate-300 whitespace-pre-wrap bg-sky-500/5 rounded p-2 border border-sky-500/20">{item.reviewNote}</div>
+                            </div>
+                          )}
+                          {item.counterexampleNoteRaw && (
+                            <div>
+                              <div className="text-xs text-red-400 mb-1">反例依据</div>
+                              <div className="text-sm font-mono text-slate-300 whitespace-pre-wrap bg-red-500/5 rounded p-2 border border-red-500/20">{item.counterexampleNoteRaw}</div>
+                            </div>
+                          )}
+                          {item.lastActor && (
+                            <div className="text-xs text-slate-500">
+                              最后操作人: <span className="text-slate-400">{item.lastActor}</span>
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
                   )}
-                </td>
-                <td className="py-2 px-3 text-slate-400">{item.paramVersion}</td>
-                <td className="py-2 px-3 max-w-[260px]">
-                  <button onClick={() => toggleRationale(item.id)} className="flex items-center gap-1 text-left">
-                    {expandedRationale.has(item.id) ? <ChevronDown size={14} className="text-slate-400 flex-shrink-0" /> : <ChevronRight size={14} className="text-slate-400 flex-shrink-0" />}
-                    <span className="truncate">{item.rationale}</span>
-                  </button>
-                  {expandedRationale.has(item.id) && (
-                    <div className="mt-1 p-2 bg-slate-900 rounded text-xs">
-                      <div className="text-slate-500 mb-1">v{item.paramVersion}</div>
-                      <div className="text-slate-300 whitespace-pre-wrap">{item.rationale}</div>
-                    </div>
-                  )}
-                </td>
-                <td className="py-2 px-3">
-                  {item.reviewStatus === 'pending_review' ? (
-                    <button
-                      onClick={() => { setReviewingItem(item); setReviewDecision('confirm_anomaly'); setReviewer(''); setReviewReason('') }}
-                      className="text-xs px-2 py-0.5 bg-amber-500/20 text-amber-400 rounded hover:bg-amber-500/30 transition-colors"
-                    >
-                      待复核
-                    </button>
-                  ) : item.reviewStatus === 'reviewed' ? (
-                    <span className="text-xs px-2 py-0.5 bg-emerald-500/20 text-emerald-400 rounded">已复核</span>
-                  ) : (
-                    <span className="text-xs text-slate-500">正常</span>
-                  )}
-                </td>
-              </tr>
-            ))}
+                </>
+              )
+            })}
           </tbody>
         </table>
       )}
@@ -228,6 +292,13 @@ export default function Demo() {
             </button>
           </div>
         </div>
+      )}
+
+      {historyParamItemId && (
+        <HistoryPanel
+          paramItemId={historyParamItemId}
+          onClose={() => setHistoryParamItemId(null)}
+        />
       )}
     </div>
   )

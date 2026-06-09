@@ -34,6 +34,11 @@ interface ParamItem {
   isDenominatorZero: boolean
   rawDenominatorValue: string
   reviewStatus: 'normal' | 'pending_review' | 'reviewed'
+  previousValue: string
+  adjudicationNote: string
+  reviewNote: string
+  nextAction: string
+  lastActor: string
 }
 
 interface Counterexample {
@@ -46,6 +51,11 @@ interface Counterexample {
   sourceParamId: string
   hasConflict: boolean
   createdAt: string
+  previousValue: string
+  adjudicationNote: string
+  reviewNote: string
+  nextAction: string
+  lastActor: string
 }
 
 interface Conflict {
@@ -69,6 +79,29 @@ interface DemoResult {
   isDenominatorZero: boolean
   reviewStatus: 'normal' | 'pending_review' | 'reviewed'
   displayLabel: string
+  previousValue: string
+  adjudicationNote: string
+  reviewNote: string
+  nextAction: string
+  lastActor: string
+  counterexampleNoteRaw: string
+}
+
+interface AuditLog {
+  id: string
+  recordType: string
+  recordId: string
+  paramItemId: string
+  counterexampleId: string
+  actionType: string
+  previousValue: string
+  newValue: string
+  reason: string
+  note: string
+  actor: string
+  nextAction: string
+  details: any
+  createdAt: string
 }
 
 interface AppStore {
@@ -80,6 +113,7 @@ interface AppStore {
   counterexamples: Counterexample[]
   conflicts: Conflict[]
   demoResults: DemoResult[]
+  auditLogs: AuditLog[]
   loading: boolean
   error: string | null
 
@@ -98,6 +132,8 @@ interface AppStore {
   exportDemo: () => Promise<{ data: DemoResult[]; exportedAt: string; checksum: string }>
   advanceWorkflow: (step: string) => Promise<void>
   reviewDenominatorZero: (itemId: string, decision: 'confirm_anomaly' | 'confirm_corrected', reviewer: string, reason: string) => Promise<void>
+  fetchAuditLogs: (paramItemId?: string, counterexampleId?: string) => Promise<void>
+  fetchAuditTimeline: (paramItemId: string) => Promise<void>
 }
 
 async function apiFetch<T>(url: string, options?: RequestInit): Promise<T> {
@@ -122,6 +158,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
   counterexamples: [],
   conflicts: [],
   demoResults: [],
+  auditLogs: [],
   loading: false,
   error: null,
 
@@ -134,8 +171,8 @@ export const useAppStore = create<AppStore>((set, get) => ({
         importCompleted: !!data.import_completed,
         counterexampleReviewCompleted: !!data.counterexample_review_completed,
         demoUpdateCompleted: !!data.demo_update_completed,
-        pendingConflicts: data.pendingConflicts ?? 0,
-        pendingReviews: data.pendingReviews ?? 0,
+        pendingConflicts: data.pendingConflicts ?? data.pending_conflicts ?? 0,
+        pendingReviews: data.pendingReviews ?? data.pending_reviews ?? 0,
       }
       set({ workflow: converted, loading: false })
     } catch (e: unknown) {
@@ -146,9 +183,29 @@ export const useAppStore = create<AppStore>((set, get) => ({
   fetchSelfChecks: async () => {
     set({ loading: true, error: null })
     try {
-      const data = await apiFetch<{ results: SelfCheckResult[]; runAt: string }>('/api/checks/latest')
-      set({ selfChecks: data.results || [], selfCheckRunAt: data.runAt || null, loading: false })
-    } catch (e: unknown) {
+      const raw = await apiFetch<any>(`/api/checks/latest`)
+      const list = Array.isArray(raw) ? raw : (raw?.results || raw?.data || [])
+      const mapped: SelfCheckResult[] = list.map((c: any) => {
+        let parsedDetails: Array<{ id: string; description: string }> = []
+        try {
+          const rawDetails = typeof c.details === 'string' ? JSON.parse(c.details) : (c.details || [])
+          parsedDetails = (rawDetails || []).map((d: any) => ({
+            id: d.id,
+            description: d.description ?? d.name ?? d.message ?? '',
+          }))
+        } catch { /* ignore */ }
+        return {
+          type: c.type || c.check_type,
+          status: c.status,
+          message: c.message,
+          details: parsedDetails,
+        }
+      })
+      let runAt: string | null = null
+      if (list.length > 0 && list[0].run_at) runAt = list[0].run_at
+      else if (raw?.runAt) runAt = raw.runAt
+      set({ selfChecks: mapped, selfCheckRunAt: runAt, loading: false })
+    } catch {
       set({ selfChecks: [], loading: false })
     }
   },
@@ -156,8 +213,9 @@ export const useAppStore = create<AppStore>((set, get) => ({
   runSelfChecks: async () => {
     set({ loading: true, error: null })
     try {
-      const data = await apiFetch<{ results: SelfCheckResult[]; runAt: string }>('/api/checks/run', { method: 'POST' })
-      set({ selfChecks: data.results || [], selfCheckRunAt: data.runAt || null, loading: false })
+      await apiFetch<any>('/api/checks/run', { method: 'POST' })
+      await get().fetchSelfChecks()
+      await get().fetchAuditLogs()
     } catch (e: unknown) {
       set({ error: e instanceof Error ? e.message : String(e), loading: false })
     }
@@ -195,6 +253,11 @@ export const useAppStore = create<AppStore>((set, get) => ({
         isDenominatorZero: !!item.is_denominator_zero,
         rawDenominatorValue: item.raw_denominator_value,
         reviewStatus: item.review_status,
+        previousValue: item.previous_value ?? '',
+        adjudicationNote: item.adjudication_note ?? '',
+        reviewNote: item.review_note ?? '',
+        nextAction: item.next_action ?? '',
+        lastActor: item.last_actor ?? '',
       }))
       set({ paramItems: converted, loading: false })
     } catch (e: unknown) {
@@ -210,6 +273,11 @@ export const useAppStore = create<AppStore>((set, get) => ({
         body: JSON.stringify({ items }),
       })
       await get().fetchParamVersions()
+      await get().fetchParamItems()
+      await get().fetchWorkflow()
+      await get().fetchDemoResults()
+      await get().fetchSelfChecks()
+      await get().fetchAuditLogs()
       set({ loading: false })
       return result
     } catch (e: unknown) {
@@ -232,6 +300,11 @@ export const useAppStore = create<AppStore>((set, get) => ({
         sourceParamId: ce.source_param_id,
         hasConflict: !!ce.has_conflict,
         createdAt: ce.created_at,
+        previousValue: ce.previous_value ?? '',
+        adjudicationNote: ce.adjudication_note ?? '',
+        reviewNote: ce.review_note ?? '',
+        nextAction: ce.next_action ?? '',
+        lastActor: ce.last_actor ?? '',
       }))
       set({ counterexamples: converted, loading: false })
     } catch (e: unknown) {
@@ -247,6 +320,10 @@ export const useAppStore = create<AppStore>((set, get) => ({
         body: JSON.stringify(data),
       })
       await get().fetchCounterexamples()
+      await get().fetchConflicts()
+      await get().fetchWorkflow()
+      await get().fetchParamItems()
+      await get().fetchAuditLogs()
       set({ loading: false })
     } catch (e: unknown) {
       set({ error: e instanceof Error ? e.message : String(e), loading: false })
@@ -281,8 +358,11 @@ export const useAppStore = create<AppStore>((set, get) => ({
         method: 'POST',
         body: JSON.stringify({ decision, reason, adjudicator }),
       })
-      await get().fetchConflicts()
-      await get().fetchCounterexamples()
+      await get().fetchParamItems()
+      await get().fetchDemoResults()
+      await get().fetchWorkflow()
+      await get().fetchSelfChecks()
+      await get().fetchAuditLogs()
       set({ loading: false })
     } catch (e: unknown) {
       set({ error: e instanceof Error ? e.message : String(e), loading: false })
@@ -303,6 +383,12 @@ export const useAppStore = create<AppStore>((set, get) => ({
         isDenominatorZero: !!item.is_denominator_zero,
         reviewStatus: item.review_status,
         displayLabel: item.display_label,
+        previousValue: item.previous_value ?? '',
+        adjudicationNote: item.adjudication_note ?? '',
+        reviewNote: item.review_note ?? '',
+        nextAction: item.next_action ?? '',
+        lastActor: item.last_actor ?? '',
+        counterexampleNoteRaw: item.counterexample_note_raw ?? '',
       }))
       set({ demoResults: converted, loading: false })
     } catch (e: unknown) {
@@ -318,6 +404,8 @@ export const useAppStore = create<AppStore>((set, get) => ({
         body: JSON.stringify({ triggerWorkflowStep }),
       })
       await get().fetchDemoResults()
+      await get().fetchSelfChecks()
+      await get().fetchAuditLogs()
       set({ loading: false })
     } catch (e: unknown) {
       set({ error: e instanceof Error ? e.message : String(e), loading: false })
@@ -344,6 +432,10 @@ export const useAppStore = create<AppStore>((set, get) => ({
         body: JSON.stringify({ step }),
       })
       await get().fetchWorkflow()
+      await get().fetchParamItems()
+      await get().fetchDemoResults()
+      await get().fetchSelfChecks()
+      await get().fetchAuditLogs()
       set({ loading: false })
     } catch (e: unknown) {
       set({ error: e instanceof Error ? e.message : String(e), loading: false })
@@ -357,13 +449,74 @@ export const useAppStore = create<AppStore>((set, get) => ({
         method: 'POST',
         body: JSON.stringify({ itemId, decision, reviewer, reason }),
       })
-      await get().fetchDemoResults()
       await get().fetchParamItems()
+      await get().fetchDemoResults()
+      await get().fetchWorkflow()
+      await get().fetchSelfChecks()
+      await get().fetchAuditLogs()
       set({ loading: false })
     } catch (e: unknown) {
       set({ error: e instanceof Error ? e.message : String(e), loading: false })
     }
   },
+
+  fetchAuditLogs: async (paramItemId?: string, counterexampleId?: string) => {
+    set({ loading: true, error: null })
+    try {
+      let url = '/api/history'
+      const params: string[] = []
+      if (paramItemId) params.push(`paramItemId=${paramItemId}`)
+      if (counterexampleId) params.push(`counterexampleId=${counterexampleId}`)
+      if (params.length > 0) url += '?' + params.join('&')
+      const data = await apiFetch<any[]>(url)
+      const converted = data.map((log: any) => ({
+        id: log.id,
+        recordType: log.record_type,
+        recordId: log.record_id,
+        paramItemId: log.param_item_id,
+        counterexampleId: log.counterexample_id,
+        actionType: log.action_type,
+        previousValue: log.previous_value,
+        newValue: log.new_value,
+        reason: log.reason,
+        note: log.note,
+        actor: log.actor,
+        nextAction: log.next_action,
+        details: log.details,
+        createdAt: log.created_at,
+      }))
+      set({ auditLogs: converted, loading: false })
+    } catch {
+      set({ auditLogs: [], loading: false })
+    }
+  },
+
+  fetchAuditTimeline: async (paramItemId: string) => {
+    set({ loading: true, error: null })
+    try {
+      const raw = await apiFetch<any>(`/api/history/for/${paramItemId}`)
+      const logs = Array.isArray(raw) ? raw : ((raw && (raw as any).auditLogs) || []) as any[]
+      const converted = logs.map((log: any) => ({
+        id: log.id,
+        recordType: log.record_type,
+        recordId: log.record_id,
+        paramItemId: log.param_item_id,
+        counterexampleId: log.counterexample_id,
+        actionType: log.action_type,
+        previousValue: log.previous_value,
+        newValue: log.new_value,
+        reason: log.reason,
+        note: log.note,
+        actor: log.actor,
+        nextAction: log.next_action,
+        details: log.details,
+        createdAt: log.created_at,
+      }))
+      set({ auditLogs: converted, loading: false })
+    } catch {
+      set({ auditLogs: [], loading: false })
+    }
+  },
 }))
 
-export type { WorkflowState, SelfCheckResult, ParamVersion, ParamItem, Counterexample, Conflict, DemoResult }
+export type { WorkflowState, SelfCheckResult, ParamVersion, ParamItem, Counterexample, Conflict, DemoResult, AuditLog }
