@@ -1,0 +1,70 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.6;
+  font-weight: 400;
+  color: #2D3748;
+  background-color: #E8ECEF;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-md border border-coolgray-200 shadow-card;
+  }
+  .card-hoverable {
+    @apply card transition-all duration-200 hover:shadow-card-hover hover:-translate-y-px;
+  }
+  .btn-primary {
+    @apply px-4 py-2 bg-navy-500 text-white rounded-sm text-sm font-medium transition-colors duration-150 hover:bg-navy-600 shadow-inner inline-flex items-center gap-1.5;
+  }
+  .btn-secondary {
+    @apply px-4 py-2 bg-white border border-coolgray-200 text-coolgray-700 rounded-sm text-sm font-medium transition-colors duration-150 hover:bg-coolgray-50 inline-flex items-center gap-1.5;
+  }
+  .btn-danger {
+    @apply px-4 py-2 bg-coral-500 text-white rounded-sm text-sm font-medium transition-colors duration-150 hover:bg-coral-600 shadow-inner inline-flex items-center gap-1.5;
+  }
+  .btn-warning {
+    @apply px-4 py-2 bg-amber-400 text-white rounded-sm text-sm font-medium transition-colors duration-150 hover:bg-amber-500 shadow-inner inline-flex items-center gap-1.5;
+  }
+  .tag {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-sm;
+  }
+  .input-field {
+    @apply w-full px-3 py-2 border border-coolgray-300 rounded-sm text-sm text-coolgray-700 placeholder-coolgray-400 focus:outline-none focus:ring-2 focus:ring-navy-300 focus:border-navy-400 transition-colors duration-150;
+  }
+  .section-title {
+    @apply text-sm font-bold text-navy-500 uppercase tracking-wider flex items-center gap-2;
+  }
+  .data-mono {
+    @apply font-mono text-xs text-coolgray-600;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #F7F9FA;
+}
+::-webkit-scrollbar-thumb {
+  background: #A9B2BD;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #838F9C;
+}
