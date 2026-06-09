@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}导入批次详情{% endblock %}
+{% block content %}
+
+<div class="card">
+  <h2>📦 导入批次详情</h2>
+  <div class="stat-grid">
+    <div class="stat-box"><div class="label">批次ID</div><div class="value" style="font-size:13px"><code>{{ batch.batch_id }}</code></div></div>
+    <div class="stat-box"><div class="label">文件</div><div class="value" style="font-size:14px">{{ batch.file_name }}</div></div>
+    <div class="stat-box"><div class="label">总数</div><div class="value">{{ batch.total_count }}</div></div>
+    <div class="stat-box"><div class="label">成功导入</div><div class="value" style="color:#16a34a">{{ batch.success_count }}</div></div>
+    <div class="stat-box"><div class="label">重复跳过</div><div class="value" style="color:#f59e0b">{{ batch.duplicate_count }}</div></div>
+    <div class="stat-box"><div class="label">不齐整</div><div class="value" style="color:#dc2626">{{ batch.incomplete_count }}</div></div>
+  </div>
+  <a class="btn btn-warn" href="{{ url_for('run_warning') }}?batch_id={{ batch.batch_id }}">⚡ 以此批次运行阈值预警</a>
+</div>
+
+<div class="card">
+  <h2>📋 备件明细（共 {{ parts|length }} 条）</h2>
+  {% if batch.incomplete_count %}
+  <div class="alert alert-warn">⚠️ 本批次有 <strong>{{ batch.incomplete_count }}</strong> 条不齐整材料，已在备注中标注缺失字段，可在下方「人工备注」列补充后补说明。</div>
+  {% endif %}
+  <table style="font-size:12px">
+    <thead><tr>
+      <th>#</th><th>材料批次</th><th>编码</th><th>名称</th><th>规格型号</th>
+      <th>测量值</th><th>单位</th><th>供应商</th><th>齐整度</th>
+      <th>原始备注</th><th>人工备注</th><th>操作</th>
+    </tr></thead>
+    <tbody>
+      {% for p in parts %}
+      <tr style="{% if not p.is_complete %}background:#fffbeb{% endif %}">
+        <td>{{ p.id }}</td>
+        <td>{{ p.batch_no }}</td>
+        <td>{{ p.material_code or '-' }}</td>
+        <td><strong>{{ p.material_name }}</strong></td>
+        <td>{{ p.spec_model or '-' }}</td>
+        <td>{% if p.measured_value is not none %}{{ p.measured_value }}{% else %}<span class="badge b-err">缺</span>{% endif %}</td>
+        <td>{{ p.unit or '-' }}</td>
+        <td>{{ p.supplier or '-' }}</td>
+        <td>{% if p.is_complete %}<span class="badge b-ok">齐整</span>{% else %}<span class="badge b-inc">不齐整</span>{% endif %}</td>
+        <td style="max-width:220px;white-space:pre-wrap">{{ p.raw_remark or '-' }}</td>
+        <td>
+          <form class="inline-form" method="post" action="{{ url_for('set_remark', spare_id=p.id) }}">
+            <input type="text" name="manual_remark" value="{{ p.manual_remark or '' }}" placeholder="后补备注…" style="width:140px">
+            <button class="btn small-btn btn-ghost" type="submit">保存</button>
+          </form>
+        </td>
+        <td><span class="muted">{{ p.created_at[:19].replace('T',' ') }}</span></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

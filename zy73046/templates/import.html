@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}备件导入{% endblock %}
+{% block content %}
+
+<div class="card">
+  <h2>📥 桥梁支座备件清单导入</h2>
+  <div class="alert alert-info">
+    <strong>两种导入方式：</strong>① <u>上传自己的Excel</u>（需含列：批次号、材料名称；可选：材料编码、规格型号、测量值、单位、供应商、备注）；
+    ② <u>一键使用内置样例清单</u>（包含20条记录：3条异常、2条不齐整，用于快速验证）。
+  </div>
+  {% if error %}<div class="alert alert-err">{{ error }}</div>{% endif %}
+
+  <form method="post" enctype="multipart/form-data">
+    <div class="row">
+      <div class="col-6">
+        <h3 style="margin-top:6px">方式A：上传Excel文件</h3>
+        <div class="form-group">
+          <label>选择Excel文件 (.xlsx)</label>
+          <input type="file" name="file" accept=".xlsx,.xls" style="width:100%">
+        </div>
+        <div class="form-group"><label>操作人</label><input type="text" name="operator" value="测试用户"></div>
+        <button type="submit" class="btn">📤 上传并导入</button>
+      </div>
+      <div class="col-6" style="border-left:1px dashed #cbd5e1; padding-left:24px">
+        <h3 style="margin-top:6px">方式B：使用内置样例（推荐首次试用）</h3>
+        <p class="muted">
+          样例清单共20条：
+          <br>• 板式橡胶支座 GJZ200x200x42 × 8（其中2条严重异常：35.5mm/52.3mm vs 中位数~42mm）
+          <br>• 盆式橡胶支座 GPZ(II)2.5DX × 7（其中1条偏高：310mm vs 中位数~284mm）
+          <br>• 球型支座 QZ1000GD × 1（不齐整：缺测量值，带"后补"备注）
+          <br>• 滑板式橡胶支座 × 1（不齐整：缺编码/规格/单位/供应商）
+          <br>• 高阻尼支座 HDR × 3（全部正常）
+        </p>
+        <div class="form-group"><label>操作人</label><input type="text" name="operator" value="测试用户"></div>
+        <input type="hidden" name="use_sample" value="1">
+        <button type="submit" class="btn btn-success">🎲 一键生成样例并导入</button>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

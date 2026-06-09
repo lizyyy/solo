@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}运行阈值预警{% endblock %}
+{% block content %}
+
+<div class="card">
+  <h2>⚡ 桥梁支座阈值预警 - 运行配置</h2>
+  <div class="alert alert-info">
+    <strong>💡 建议验证顺序：</strong><br>
+    ① 先选默认配置跑一次 → ② 再选「临时调高阈值-样例包」跑同一批次 → ③ 对比两次运行的【步骤日志】和【参数变更对比】，即可看出哪一步让结果变化。
+  </div>
+
+  <form method="post">
+    <div class="row">
+      <div class="col-6">
+        <div class="form-group">
+          <label>1. 选择导入批次 *</label>
+          <select name="import_batch_id" required style="width:100%">
+            <option value="">-- 请选择 --</option>
+            {% for b in batches %}
+            <option value="{{ b.batch_id }}" {% if request.args.get('batch_id') == b.batch_id %}selected{% endif %}>
+              {{ b.file_name }} | 共{{ b.total_count }}条 | 导入:{{ b.imported_at[:19].replace('T',' ') }}
+              {% if b.incomplete_count %} [含{{ b.incomplete_count }}不齐整]{% endif %}
+              | ID: {{ b.batch_id[-10:] }}
+            </option>
+            {% endfor %}
+          </select>
+          {% if not batches %}<div class="muted">还没有导入批次，先去<a href="{{ url_for('import_view') }}">导入</a>吧。</div>{% endif %}
+        </div>
+        <div class="form-group"><label>3. 操作人</label><input type="text" name="operator" value="算法值班人"></div>
+      </div>
+      <div class="col-6">
+        <div class="form-group">
+          <label>2. 选择阈值配置（留空=使用当前激活）</label>
+          <select name="config_id" style="width:100%">
+            <option value="">（默认：使用当前激活配置）</option>
+            {% for c in configs %}
+            <option value="{{ c.id }}">
+              {% if c.is_active %}★ {% endif %}{{ c.config_name }}
+              {% set p = c.params_json|tojson|fromjson if c.params_json else {} %}
+              [上偏{{ p.deviation_upper_pct }}% / 下偏{{ p.deviation_lower_pct }}% / IQR×{{ p.iqr_multiplier }} / Z>{{ p.zscore_threshold }}]
+            </option>
+            {% endfor %}
+          </select>
+          <div class="hint">★ = 当前激活配置；推荐先跑默认，再跑「临时调高阈值-样例包」对比变化</div>
+        </div>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-warn" style="font-size:15px; padding:10px 20px">🚀 开始运行预警</button>
+  </form>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0">🧪 场景校验清单（完成所有后本系统验收通过）</h3>
+  <table>
+    <thead><tr><th>#</th><th>校验场景</th><th>如何验证</th><th>预期结果</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>异常不被均值掩盖</td><td>默认配置跑，查看严重异常的检出步骤</td><td>走【稳健上/下界(IQR)超限】，中位数~42mm能检出35.5/52.3异常</td></tr>
+      <tr><td>2</td><td>参数变化可追溯</td><td>同一批次先跑默认→再跑"临时调高阈值"，进入第二次运行详情，点顶部"与上次运行参数对比"</td><td>清晰展示deviation_upper_pct/zscore_threshold等变更项，算法值班人一眼定位</td></tr>
+      <tr><td>3</td><td>不齐整材料处理</td><td>导入样例后查看【导入批次详情】→不齐整列；运行预警后查看异常列表里的"数据缺失"类型</td><td>缺字段自动打标+备注标注"不齐整:缺xx后补"；缺测量值单独产生"数据缺失"类异常</td></tr>
+      <tr><td>4</td><td>阈值调高异常提示清晰</td><td>用"临时调高阈值"配置跑，查看各异常级别的level字段变化</td><td>部分警告消失/降级，step_detected字段仍清晰标注检出步骤；调高后仍漏不掉严重异常</td></tr>
+      <tr><td>5</td><td>重复导入不翻倍</td><td>同一Excel再次导入，查看导入批次的"重复跳过"</td><td>UNIQUE约束命中，重复数>0，新增成功数=0；备件总数不增加</td></tr>
+      <tr><td>6</td><td>人工备注不覆盖</td><td>在导入详情给某条加人工备注→再次导入同一文件</td><td>带manual_remark的记录被跳过（skipped_due_manual_remark计数），原备注保留</td></tr>
+      <tr><td>7</td><td>状态/备注/结论对应</td><td>给一条记录标记"需补货+结论"→导出异常队列，查看Sheet里的"一致性告警"</td><td>记录状态↔队列状态↔文件结论三者自动联动；无告警条目</td></tr>
+      <tr><td>8</td><td>维保主管视角</td><td>导出"维保主管报告"，查看Sheet结构</td><td>分"需补货/可放行/待判定"三张清单+处理建议，不写技术术语；另有步骤详情Sheet给算法值班人</td></tr>
+    </tbody>
+  </table>
+</div>
+{% endblock %}
