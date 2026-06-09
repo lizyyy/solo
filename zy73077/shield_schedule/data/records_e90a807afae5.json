@@ -1,0 +1,497 @@
+[
+  {
+    "record_id": "a9d6970480a0",
+    "part_id": "HD-001",
+    "part_name": "滚刀17寸",
+    "category": "滚刀",
+    "scheduled_date": "2026-06-11",
+    "quantity": 4,
+    "status": "优先排产",
+    "source": "运营主管-白班",
+    "source_fields": {
+      "备件编号": "HD-001",
+      "备件名称": "滚刀17寸",
+      "分类": "滚刀",
+      "计划日期": "2026-06-12",
+      "件数": "3",
+      "维修照片": "https://img.example.com/hd001.jpg",
+      "拍照时间": "2026-06-09",
+      "提交人": "运营主管-白班"
+    },
+    "field_mapping_log": [
+      {
+        "raw": "备件编号",
+        "mapped": "part_id",
+        "at": "2026-06-10 01:40:54"
+      },
+      {
+        "raw": "备件名称",
+        "mapped": "part_name",
+        "at": "2026-06-10 01:40:54"
+      },
+      {
+        "raw": "分类",
+        "mapped": "category",
+        "at": "2026-06-10 01:40:54"
+      },
+      {
+        "raw": "计划日期",
+        "mapped": "scheduled_date",
+        "at": "2026-06-10 01:40:54"
+      },
+      {
+        "raw": "件数",
+        "mapped": "quantity",
+        "at": "2026-06-10 01:40:54"
+      },
+      {
+        "raw": "维修照片",
+        "mapped": "photo_url",
+        "at": "2026-06-10 01:40:54"
+      },
+      {
+        "raw": "拍照时间",
+        "mapped": "photo_time",
+        "at": "2026-06-10 01:40:54"
+      },
+      {
+        "raw": "提交人",
+        "mapped": "source",
+        "at": "2026-06-10 01:40:54"
+      }
+    ],
+    "photo_url": "https://img.example.com/hd001.jpg",
+    "photo_time": "2026-06-09",
+    "anomalies": [],
+    "audit_log": [
+      {
+        "audit_id": "5dfcdaa6d2c9",
+        "record_id": "a9d6970480a0",
+        "field": "scheduled_date",
+        "old_value": "2026-06-12",
+        "new_value": "2026-06-11",
+        "operator": "现场调度-小宋",
+        "reason": "实测磨损4mm需提前换；与白班主管电话确认加订1件；今早调度会指令优先排产",
+        "timestamp": "2026-06-10 01:40:54"
+      },
+      {
+        "audit_id": "50f39fa7258c",
+        "record_id": "a9d6970480a0",
+        "field": "quantity",
+        "old_value": 3,
+        "new_value": 4,
+        "operator": "现场调度-小宋",
+        "reason": "实测磨损4mm需提前换；与白班主管电话确认加订1件；今早调度会指令优先排产",
+        "timestamp": "2026-06-10 01:40:54"
+      }
+    ],
+    "created_at": "2026-06-10 01:40:54",
+    "updated_at": "2026-06-10 01:40:54"
+  },
+  {
+    "record_id": "4d66373b8955",
+    "part_id": "HD-002",
+    "part_name": "主轴承密封件",
+    "category": "主轴承密封",
+    "scheduled_date": "2026-06-15",
+    "quantity": 2,
+    "status": "待确认",
+    "source": "夜班维修组",
+    "source_fields": {
+      "物料编码": "HD-002",
+      "物料名称": "主轴承密封件",
+      "类型": "主轴承密封",
+      "date": "2026-06-15",
+      "qty": "2",
+      "image": "https://img.example.com/hd002.jpg",
+      "shot_time": "2026-06-01",
+      "from": "夜班维修组"
+    },
+    "field_mapping_log": [
+      {
+        "raw": "物料编码",
+        "mapped": "part_id",
+        "at": "2026-06-10 01:40:54"
+      },
+      {
+        "raw": "物料名称",
+        "mapped": "part_name",
+        "at": "2026-06-10 01:40:54"
+      },
+      {
+        "raw": "类型",
+        "mapped": "category",
+        "at": "2026-06-10 01:40:54"
+      },
+      {
+        "raw": "date",
+        "mapped": "scheduled_date",
+        "at": "2026-06-10 01:40:54"
+      },
+      {
+        "raw": "qty",
+        "mapped": "quantity",
+        "at": "2026-06-10 01:40:54"
+      },
+      {
+        "raw": "image",
+        "mapped": "photo_url",
+        "at": "2026-06-10 01:40:54"
+      },
+      {
+        "raw": "shot_time",
+        "mapped": "photo_time",
+        "at": "2026-06-10 01:40:54"
+      },
+      {
+        "raw": "from",
+        "mapped": "source",
+        "at": "2026-06-10 01:40:54"
+      }
+    ],
+    "photo_url": "https://img.example.com/hd002.jpg",
+    "photo_time": "2026-06-01",
+    "anomalies": [
+      {
+        "anomaly_id": "afc40f3bcf44",
+        "record_id": "4d66373b8955",
+        "anomaly_type": "照片时间错位",
+        "description": "照片时间 2026-06-01 与排程日期 2026-06-15 相差 14 天，超过窗口 3 天 → 未按正常记录走",
+        "severity": "warning",
+        "resolved": true,
+        "resolved_note": "已与维修组核对，照片时间错位情况属实，已纳入当日工单",
+        "created_at": "2026-06-10 01:40:54"
+      }
+    ],
+    "audit_log": [
+      {
+        "audit_id": "645deb46790e",
+        "record_id": "4d66373b8955",
+        "field": "anomaly:afc40f3bcf44",
+        "old_value": false,
+        "new_value": true,
+        "operator": "现场调度-小宋",
+        "reason": "已与维修组核对，照片时间错位情况属实，已纳入当日工单",
+        "timestamp": "2026-06-10 01:40:54"
+      }
+    ],
+    "created_at": "2026-06-10 01:40:54",
+    "updated_at": "2026-06-10 01:40:54"
+  },
+  {
+    "record_id": "e84b3e0aac36",
+    "part_id": "HD-003",
+    "part_name": "刀盘刮刀",
+    "category": "刮刀",
+    "scheduled_date": "2026-06-11",
+    "quantity": 8,
+    "status": "正常排程",
+    "source": "点检系统",
+    "source_fields": {
+      "part_code": "HD-003",
+      "name": "刀盘刮刀",
+      "刀盘部位": "刮刀",
+      "更换日期": "2026-06-11",
+      "amount": "8",
+      "图片链接": "https://img.example.com/hd003.jpg",
+      "时间戳": "2026-06-10",
+      "来源渠道": "点检系统"
+    },
+    "field_mapping_log": [
+      {
+        "raw": "part_code",
+        "mapped": "part_id",
+        "at": "2026-06-10 01:40:54"
+      },
+      {
+        "raw": "name",
+        "mapped": "part_name",
+        "at": "2026-06-10 01:40:54"
+      },
+      {
+        "raw": "刀盘部位",
+        "mapped": "category",
+        "at": "2026-06-10 01:40:54"
+      },
+      {
+        "raw": "更换日期",
+        "mapped": "scheduled_date",
+        "at": "2026-06-10 01:40:54"
+      },
+      {
+        "raw": "amount",
+        "mapped": "quantity",
+        "at": "2026-06-10 01:40:54"
+      },
+      {
+        "raw": "图片链接",
+        "mapped": "photo_url",
+        "at": "2026-06-10 01:40:54"
+      },
+      {
+        "raw": "时间戳",
+        "mapped": "photo_time",
+        "at": "2026-06-10 01:40:54"
+      },
+      {
+        "raw": "来源渠道",
+        "mapped": "source",
+        "at": "2026-06-10 01:40:54"
+      }
+    ],
+    "photo_url": "https://img.example.com/hd003.jpg",
+    "photo_time": "2026-06-10",
+    "anomalies": [],
+    "audit_log": [],
+    "created_at": "2026-06-10 01:40:54",
+    "updated_at": "2026-06-10 01:40:54"
+  },
+  {
+    "record_id": "564bd2879126",
+    "part_id": "HD-004",
+    "part_name": "边缘滚刀",
+    "category": "滚刀",
+    "scheduled_date": "2026-06-20",
+    "quantity": 0,
+    "status": "待确认",
+    "source": "运营主管Excel导入",
+    "source_fields": {
+      "编号": "HD-004",
+      "名称": "边缘滚刀",
+      "类别": "滚刀",
+      "预计日期": "2026-06-20",
+      "需求数量": "0",
+      "照片链接": "https://img.example.com/hd004.jpg",
+      "img_time": "2026-06-08"
+    },
+    "field_mapping_log": [
+      {
+        "raw": "编号",
+        "mapped": "part_id",
+        "at": "2026-06-10 01:40:54"
+      },
+      {
+        "raw": "名称",
+        "mapped": "part_name",
+        "at": "2026-06-10 01:40:54"
+      },
+      {
+        "raw": "类别",
+        "mapped": "category",
+        "at": "2026-06-10 01:40:54"
+      },
+      {
+        "raw": "预计日期",
+        "mapped": "scheduled_date",
+        "at": "2026-06-10 01:40:54"
+      },
+      {
+        "raw": "需求数量",
+        "mapped": "quantity",
+        "at": "2026-06-10 01:40:54"
+      },
+      {
+        "raw": "照片链接",
+        "mapped": "photo_url",
+        "at": "2026-06-10 01:40:54"
+      },
+      {
+        "raw": "img_time",
+        "mapped": "photo_time",
+        "at": "2026-06-10 01:40:54"
+      }
+    ],
+    "photo_url": "https://img.example.com/hd004.jpg",
+    "photo_time": "2026-06-08",
+    "anomalies": [
+      {
+        "anomaly_id": "a6179f078d36",
+        "record_id": "564bd2879126",
+        "anomaly_type": "数量异常",
+        "description": "数量 0 低于阈值 2",
+        "severity": "warning",
+        "resolved": false,
+        "resolved_note": "",
+        "created_at": "2026-06-10 01:40:54"
+      },
+      {
+        "anomaly_id": "e005008d263f",
+        "record_id": "564bd2879126",
+        "anomaly_type": "照片时间错位",
+        "description": "照片时间 2026-06-08 与排程日期 2026-06-20 相差 12 天，超过窗口 3 天 → 未按正常记录走",
+        "severity": "warning",
+        "resolved": false,
+        "resolved_note": "",
+        "created_at": "2026-06-10 01:40:54"
+      }
+    ],
+    "audit_log": [],
+    "created_at": "2026-06-10 01:40:54",
+    "updated_at": "2026-06-10 01:40:54"
+  },
+  {
+    "record_id": "e86649983791",
+    "part_id": "HD-005",
+    "part_name": "",
+    "category": "主驱动",
+    "scheduled_date": "2026-06-05",
+    "quantity": 1,
+    "status": "异常-待处理",
+    "source": "运营主管Excel导入",
+    "source_fields": {
+      "备件编号": "HD-005",
+      "备件名称": "",
+      "分类": "主驱动",
+      "计划日期": "2026-06-05",
+      "件数": "1",
+      "照片": ""
+    },
+    "field_mapping_log": [
+      {
+        "raw": "备件编号",
+        "mapped": "part_id",
+        "at": "2026-06-10 01:40:54"
+      },
+      {
+        "raw": "备件名称",
+        "mapped": "part_name",
+        "at": "2026-06-10 01:40:54"
+      },
+      {
+        "raw": "分类",
+        "mapped": "category",
+        "at": "2026-06-10 01:40:54"
+      },
+      {
+        "raw": "计划日期",
+        "mapped": "scheduled_date",
+        "at": "2026-06-10 01:40:54"
+      },
+      {
+        "raw": "件数",
+        "mapped": "quantity",
+        "at": "2026-06-10 01:40:54"
+      },
+      {
+        "raw": "照片",
+        "mapped": "photo_url",
+        "at": "2026-06-10 01:40:54"
+      }
+    ],
+    "photo_url": "",
+    "photo_time": "",
+    "anomalies": [
+      {
+        "anomaly_id": "b9329efcf758",
+        "record_id": "e86649983791",
+        "anomaly_type": "关键字段缺失",
+        "description": "备件编号/名称不完整 (编号=HD-005, 名称=)",
+        "severity": "error",
+        "resolved": false,
+        "resolved_note": "",
+        "created_at": "2026-06-10 01:40:54"
+      },
+      {
+        "anomaly_id": "4422078a58e4",
+        "record_id": "e86649983791",
+        "anomaly_type": "数量异常",
+        "description": "数量 1 低于阈值 2",
+        "severity": "warning",
+        "resolved": false,
+        "resolved_note": "",
+        "created_at": "2026-06-10 01:40:54"
+      },
+      {
+        "anomaly_id": "dba260dee52d",
+        "record_id": "e86649983791",
+        "anomaly_type": "日期滞后",
+        "description": "排程日期 2026-06-05 早于今日",
+        "severity": "warning",
+        "resolved": false,
+        "resolved_note": "",
+        "created_at": "2026-06-10 01:40:54"
+      },
+      {
+        "anomaly_id": "d5c5bf833683",
+        "record_id": "e86649983791",
+        "anomaly_type": "缺少凭证",
+        "description": "该备件记录未附带维修照片",
+        "severity": "info",
+        "resolved": false,
+        "resolved_note": "",
+        "created_at": "2026-06-10 01:40:54"
+      }
+    ],
+    "audit_log": [],
+    "created_at": "2026-06-10 01:40:54",
+    "updated_at": "2026-06-10 01:40:54"
+  },
+  {
+    "record_id": "73e7348e6de5",
+    "part_id": "HD-006",
+    "part_name": "滚刀19寸",
+    "category": "滚刀",
+    "scheduled_date": "2026-06-14",
+    "quantity": 5,
+    "status": "优先排产",
+    "source": "现场调度-小宋",
+    "source_fields": {
+      "part_id": "HD-006",
+      "part": "滚刀19寸",
+      "cate": "滚刀",
+      "plan_date": "2026-06-14",
+      "num": "5",
+      "attachment": "https://img.example.com/hd006.jpg",
+      "time": "2026-06-13",
+      "source": "现场调度-小宋"
+    },
+    "field_mapping_log": [
+      {
+        "raw": "part_id",
+        "mapped": "part_id",
+        "at": "2026-06-10 01:40:54"
+      },
+      {
+        "raw": "part",
+        "mapped": "part_name",
+        "at": "2026-06-10 01:40:54"
+      },
+      {
+        "raw": "cate",
+        "mapped": "category",
+        "at": "2026-06-10 01:40:54"
+      },
+      {
+        "raw": "plan_date",
+        "mapped": "scheduled_date",
+        "at": "2026-06-10 01:40:54"
+      },
+      {
+        "raw": "num",
+        "mapped": "quantity",
+        "at": "2026-06-10 01:40:54"
+      },
+      {
+        "raw": "attachment",
+        "mapped": "photo_url",
+        "at": "2026-06-10 01:40:54"
+      },
+      {
+        "raw": "time",
+        "mapped": "photo_time",
+        "at": "2026-06-10 01:40:54"
+      },
+      {
+        "raw": "source",
+        "mapped": "source",
+        "at": "2026-06-10 01:40:54"
+      }
+    ],
+    "photo_url": "https://img.example.com/hd006.jpg",
+    "photo_time": "2026-06-13",
+    "anomalies": [],
+    "audit_log": [],
+    "created_at": "2026-06-10 01:40:54",
+    "updated_at": "2026-06-10 01:40:54"
+  }
+]

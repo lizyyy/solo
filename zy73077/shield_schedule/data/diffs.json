@@ -1,0 +1,356 @@
+[
+  {
+    "diff_id": "0906bba89028",
+    "base_version": "79c1240ca714",
+    "compare_version": "e90a807afae5",
+    "created_at": "2026-06-10 01:43:32",
+    "param_changes": [
+      {
+        "key": "min_quantity",
+        "old": 1,
+        "new": 2
+      },
+      {
+        "key": "photo_window_days",
+        "old": 7,
+        "new": 3
+      },
+      {
+        "key": "priority",
+        "old": "default",
+        "new": "urgent"
+      },
+      {
+        "key": "urgent_categories",
+        "old": [
+          "滚刀",
+          "主轴承密封"
+        ],
+        "new": [
+          "滚刀",
+          "主轴承密封",
+          "主驱动"
+        ]
+      }
+    ],
+    "record_changes": [
+      {
+        "part_id": "HD-001",
+        "part_name": "滚刀17寸",
+        "change_type": "变更",
+        "old_status": "正常排程",
+        "new_status": "优先排产",
+        "field_deltas": [
+          {
+            "field": "status",
+            "old": "正常排程",
+            "new": "优先排产"
+          },
+          {
+            "field": "scheduled_date",
+            "old": "2026-06-12",
+            "new": "2026-06-11"
+          },
+          {
+            "field": "quantity",
+            "old": 3,
+            "new": 4
+          }
+        ],
+        "driving_param_changes": [
+          {
+            "key": "min_quantity",
+            "old": 1,
+            "new": 2
+          },
+          {
+            "key": "photo_window_days",
+            "old": 7,
+            "new": 3
+          },
+          {
+            "key": "priority",
+            "old": "default",
+            "new": "urgent"
+          },
+          {
+            "key": "urgent_categories",
+            "old": [
+              "滚刀",
+              "主轴承密封"
+            ],
+            "new": [
+              "滚刀",
+              "主轴承密封",
+              "主驱动"
+            ]
+          }
+        ]
+      },
+      {
+        "part_id": "HD-005",
+        "part_name": "",
+        "change_type": "变更",
+        "old_status": "异常-待处理",
+        "new_status": "异常-待处理",
+        "field_deltas": [
+          {
+            "field": "anomalies",
+            "old": 3,
+            "new": 4
+          }
+        ],
+        "driving_param_changes": [
+          {
+            "key": "min_quantity",
+            "old": 1,
+            "new": 2
+          },
+          {
+            "key": "photo_window_days",
+            "old": 7,
+            "new": 3
+          },
+          {
+            "key": "priority",
+            "old": "default",
+            "new": "urgent"
+          },
+          {
+            "key": "urgent_categories",
+            "old": [
+              "滚刀",
+              "主轴承密封"
+            ],
+            "new": [
+              "滚刀",
+              "主轴承密封",
+              "主驱动"
+            ]
+          }
+        ]
+      },
+      {
+        "part_id": "HD-006",
+        "part_name": "滚刀19寸",
+        "change_type": "变更",
+        "old_status": "正常排程",
+        "new_status": "优先排产",
+        "field_deltas": [
+          {
+            "field": "status",
+            "old": "正常排程",
+            "new": "优先排产"
+          }
+        ],
+        "driving_param_changes": [
+          {
+            "key": "min_quantity",
+            "old": 1,
+            "new": 2
+          },
+          {
+            "key": "photo_window_days",
+            "old": 7,
+            "new": 3
+          },
+          {
+            "key": "priority",
+            "old": "default",
+            "new": "urgent"
+          },
+          {
+            "key": "urgent_categories",
+            "old": [
+              "滚刀",
+              "主轴承密封"
+            ],
+            "new": [
+              "滚刀",
+              "主轴承密封",
+              "主驱动"
+            ]
+          }
+        ]
+      }
+    ],
+    "summary": {
+      "added": 0,
+      "removed": 0,
+      "modified": 3,
+      "param_changes": 4
+    }
+  },
+  {
+    "diff_id": "4615ba098d3e",
+    "base_version": "79c1240ca714",
+    "compare_version": "e90a807afae5",
+    "created_at": "2026-06-10 01:40:54",
+    "param_changes": [
+      {
+        "key": "min_quantity",
+        "old": 1,
+        "new": 2
+      },
+      {
+        "key": "photo_window_days",
+        "old": 7,
+        "new": 3
+      },
+      {
+        "key": "priority",
+        "old": "default",
+        "new": "urgent"
+      },
+      {
+        "key": "urgent_categories",
+        "old": [
+          "滚刀",
+          "主轴承密封"
+        ],
+        "new": [
+          "滚刀",
+          "主轴承密封",
+          "主驱动"
+        ]
+      }
+    ],
+    "record_changes": [
+      {
+        "part_id": "HD-001",
+        "part_name": "滚刀17寸",
+        "change_type": "变更",
+        "old_status": "正常排程",
+        "new_status": "优先排产",
+        "field_deltas": [
+          {
+            "field": "status",
+            "old": "正常排程",
+            "new": "优先排产"
+          }
+        ],
+        "driving_param_changes": [
+          {
+            "key": "min_quantity",
+            "old": 1,
+            "new": 2
+          },
+          {
+            "key": "photo_window_days",
+            "old": 7,
+            "new": 3
+          },
+          {
+            "key": "priority",
+            "old": "default",
+            "new": "urgent"
+          },
+          {
+            "key": "urgent_categories",
+            "old": [
+              "滚刀",
+              "主轴承密封"
+            ],
+            "new": [
+              "滚刀",
+              "主轴承密封",
+              "主驱动"
+            ]
+          }
+        ]
+      },
+      {
+        "part_id": "HD-005",
+        "part_name": "",
+        "change_type": "变更",
+        "old_status": "异常-待处理",
+        "new_status": "异常-待处理",
+        "field_deltas": [
+          {
+            "field": "anomalies",
+            "old": 3,
+            "new": 4
+          }
+        ],
+        "driving_param_changes": [
+          {
+            "key": "min_quantity",
+            "old": 1,
+            "new": 2
+          },
+          {
+            "key": "photo_window_days",
+            "old": 7,
+            "new": 3
+          },
+          {
+            "key": "priority",
+            "old": "default",
+            "new": "urgent"
+          },
+          {
+            "key": "urgent_categories",
+            "old": [
+              "滚刀",
+              "主轴承密封"
+            ],
+            "new": [
+              "滚刀",
+              "主轴承密封",
+              "主驱动"
+            ]
+          }
+        ]
+      },
+      {
+        "part_id": "HD-006",
+        "part_name": "滚刀19寸",
+        "change_type": "变更",
+        "old_status": "正常排程",
+        "new_status": "优先排产",
+        "field_deltas": [
+          {
+            "field": "status",
+            "old": "正常排程",
+            "new": "优先排产"
+          }
+        ],
+        "driving_param_changes": [
+          {
+            "key": "min_quantity",
+            "old": 1,
+            "new": 2
+          },
+          {
+            "key": "photo_window_days",
+            "old": 7,
+            "new": 3
+          },
+          {
+            "key": "priority",
+            "old": "default",
+            "new": "urgent"
+          },
+          {
+            "key": "urgent_categories",
+            "old": [
+              "滚刀",
+              "主轴承密封"
+            ],
+            "new": [
+              "滚刀",
+              "主轴承密封",
+              "主驱动"
+            ]
+          }
+        ]
+      }
+    ],
+    "summary": {
+      "added": 0,
+      "removed": 0,
+      "modified": 3,
+      "param_changes": 4
+    }
+  }
+]

@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>盾构刀盘备件排程系统</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; }
+  .tag { display:inline-block; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:500; }
+  .sev-error { background:#fee2e2; color:#991b1b; }
+  .sev-warning { background:#fef3c7; color:#92400e; }
+  .sev-info { background:#dbeafe; color:#1e40af; }
+  .st-normal { background:#dcfce7; color:#166534; }
+  .st-wait { background:#fef9c3; color:#854d0e; }
+  .st-error { background:#fee2e2; color:#991b1b; }
+  .st-priority { background:#ede9fe; color:#5b21b6; }
+  .dot { width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:6px; }
+  details > summary { cursor: pointer; list-style: none; }
+  details > summary::-webkit-details-marker { display: none; }
+  .modal-bg { background: rgba(0,0,0,0.45); }
+  .diff-add { color:#166534; background:#f0fdf4; }
+  .diff-del { color:#991b1b; background:#fef2f2; }
+  .scroll-thin::-webkit-scrollbar { height:6px; width:6px; }
+  .scroll-thin::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:3px; }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+
+<!-- =============== 顶部栏 =============== -->
+<header class="bg-white border-b border-slate-200 sticky top-0 z-30">
+  <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center text-white font-bold">盾</div>
+      <div>
+        <h1 class="text-lg font-semibold">盾构刀盘备件排程</h1>
+        <p class="text-xs text-slate-500">可追溯 · 可对比 · 可导出</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2 text-sm">
+      <select id="currentVersion" class="border border-slate-300 rounded px-3 py-1.5 text-sm"></select>
+      <button onclick="openRunModal()" class="bg-sky-600 hover:bg-sky-700 text-white px-4 py-1.5 rounded text-sm">➕ 新排程</button>
+      <button onclick="openDiffModal()" class="bg-white border border-slate-300 hover:bg-slate-100 px-4 py-1.5 rounded text-sm">🔍 版本对比</button>
+    </div>
+  </div>
+</header>
+
+<!-- =============== 三大入口卡（调度小宋接班一眼可见） =============== -->
+<section class="max-w-7xl mx-auto px-6 pt-6">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <a href="#samples" class="bg-white rounded-xl border border-slate-200 p-5 hover:border-sky-400 hover:shadow-md transition">
+      <div class="text-3xl mb-2">📋</div>
+      <h3 class="font-semibold text-slate-800 mb-1">样例在哪？</h3>
+      <p class="text-sm text-slate-500">点击查看示例数据和字段兼容映射表</p>
+    </a>
+    <a href="#anomalies" class="bg-white rounded-xl border border-slate-200 p-5 hover:border-amber-400 hover:shadow-md transition">
+      <div class="text-3xl mb-2">⚠️</div>
+      <h3 class="font-semibold text-slate-800 mb-1">异常在哪？</h3>
+      <p class="text-sm text-slate-500">汇总→异常清单→单条记录→变更原因一路钻取</p>
+    </a>
+    <button onclick="doExport()" class="text-left bg-white rounded-xl border border-slate-200 p-5 hover:border-emerald-400 hover:shadow-md transition">
+      <div class="text-3xl mb-2">⬇️</div>
+      <h3 class="font-semibold text-slate-800 mb-1">结果怎么导出？</h3>
+      <p class="text-sm text-slate-500">一键下载 CSV（含异常明细、变更次数），Excel 可直接打开</p>
+    </button>
+  </div>
+</section>
+
+<!-- =============== 汇总卡片 =============== -->
+<section class="max-w-7xl mx-auto px-6 pt-6">
+  <h2 class="text-base font-semibold text-slate-700 mb-3">📊 当前版本汇总</h2>
+  <div id="summaryBox" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+    <div class="bg-white rounded-xl border border-slate-200 p-4"><h4 class="text-xs font-semibold text-slate-500 mb-2">按状态分布</h4><div id="byStatus" class="space-y-2"></div></div>
+    <div class="bg-white rounded-xl border border-slate-200 p-4"><h4 class="text-xs font-semibold text-slate-500 mb-2">按分类分布</h4><div id="byCategory" class="space-y-2"></div></div>
+    <div class="bg-white rounded-xl border border-slate-200 p-4"><h4 class="text-xs font-semibold text-slate-500 mb-2">异常类型分布</h4><div id="byAnom" class="space-y-2"></div></div>
+  </div>
+</section>
+
+<!-- =============== 参数快照 =============== -->
+<section class="max-w-7xl mx-auto px-6 pt-6">
+  <h2 class="text-base font-semibold text-slate-700 mb-3">⚙️ 运行参数快照</h2>
+  <div id="paramsBox" class="bg-white rounded-xl border border-slate-200 p-4 text-sm overflow-x-auto scroll-thin"></div>
+</section>
+
+<!-- =============== 异常清单（drill-down入口） =============== -->
+<section id="anomalies" class="max-w-7xl mx-auto px-6 pt-10 scroll-mt-20">
+  <div class="flex items-center justify-between mb-3">
+    <h2 class="text-base font-semibold text-slate-700">⚠️ 异常清单（点击可钻取到记录详情和变更链）</h2>
+    <button onclick="toggleOnlyAnomaly()" id="toggleAnomBtn" class="text-xs border border-slate-300 rounded px-3 py-1 hover:bg-slate-100">全部记录</button>
+  </div>
+  <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+    <div class="overflow-x-auto scroll-thin">
+      <table class="w-full text-sm">
+        <thead class="bg-slate-100 text-slate-600 text-xs">
+          <tr>
+            <th class="px-3 py-2 text-left">备件编号</th>
+            <th class="px-3 py-2 text-left">名称</th>
+            <th class="px-3 py-2 text-left">分类</th>
+            <th class="px-3 py-2 text-left">排程日期</th>
+            <th class="px-3 py-2 text-right">数量</th>
+            <th class="px-3 py-2 text-left">状态</th>
+            <th class="px-3 py-2 text-left">来源</th>
+            <th class="px-3 py-2 text-center">异常</th>
+            <th class="px-3 py-2 text-left">最近更新</th>
+            <th class="px-3 py-2 text-center">操作</th>
+          </tr>
+        </thead>
+        <tbody id="recordsTbody" class="divide-y divide-slate-100"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- =============== 样例数据区 =============== -->
+<section id="samples" class="max-w-7xl mx-auto px-6 pt-10 pb-16 scroll-mt-20">
+  <h2 class="text-base font-semibold text-slate-700 mb-3">📋 样例数据 & 字段兼容映射</h2>
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div class="bg-white rounded-xl border border-slate-200 p-4">
+      <h4 class="text-xs font-semibold text-slate-500 mb-2">示例输入（可直接粘贴使用）</h4>
+      <pre id="sampleJson" class="bg-slate-50 border border-slate-200 rounded p-3 text-xs overflow-x-auto scroll-thin max-h-96"></pre>
+    </div>
+    <div class="bg-white rounded-xl border border-slate-200 p-4">
+      <h4 class="text-xs font-semibold text-slate-500 mb-2">字段别名兼容表（运营主管即使字段名前后不一也能识别）</h4>
+      <div id="aliasBox" class="text-xs space-y-2 max-h-96 overflow-y-auto scroll-thin pr-2"></div>
+    </div>
+  </div>
+</section>
+
+<!-- =============== 记录详情模态框（钻取：异常→变更链→来源字段） =============== -->
+<div id="recordModal" class="fixed inset-0 z-50 hidden modal-bg items-center justify-center p-4">
+  <div class="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+    <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+      <h3 class="font-semibold">记录详情：<span id="recTitle" class="text-slate-600 font-normal"></span></h3>
+      <button onclick="closeRecordModal()" class="text-slate-400 hover:text-slate-700 text-xl">✕</button>
+    </div>
+    <div class="p-6 overflow-y-auto scroll-thin space-y-6">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm" id="recBasic"></div>
+      <div>
+        <h4 class="text-xs font-semibold text-slate-500 mb-2">🔴 异常列表（为什么没按正常记录走）</h4>
+        <div id="recAnomalies" class="space-y-2"></div>
+      </div>
+      <div>
+        <h4 class="text-xs font-semibold text-slate-500 mb-2">📜 变更审计链（旧值 → 新值 · 原因 · 操作人）</h4>
+        <div id="recAudit" class="space-y-2 text-xs"></div>
+        <button onclick="openManualEdit()" class="mt-3 text-xs bg-slate-800 hover:bg-slate-900 text-white px-3 py-1.5 rounded">✏️ 人工修改（必须填原因）</button>
+      </div>
+      <div>
+        <h4 class="text-xs font-semibold text-slate-500 mb-2">🗂 原始字段映射（保住来源）</h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div>
+            <p class="text-xs text-slate-400 mb-1">来源原始字段</p>
+            <pre id="recSource" class="bg-slate-50 p-3 rounded text-xs max-h-40 overflow-auto scroll-thin"></pre>
+          </div>
+          <div>
+            <p class="text-xs text-slate-400 mb-1">字段映射过程</p>
+            <div id="recMapping" class="text-xs space-y-1"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =============== 人工修改弹窗 =============== -->
+<div id="editModal" class="fixed inset-0 z-[60] hidden modal-bg items-center justify-center p-4">
+  <div class="bg-white rounded-xl w-full max-w-md p-5">
+    <h4 class="font-semibold mb-3">修改记录 <span class="text-xs text-rose-600">（系统会强制记下旧值/新判断/原因）</span></h4>
+    <div id="editForm" class="space-y-3 text-sm"></div>
+    <div class="mt-4 space-y-2">
+      <div><label class="text-xs text-slate-500">操作人</label><input id="editOperator" class="w-full border rounded px-3 py-1.5 text-sm" value="运营主管"/></div>
+      <div><label class="text-xs text-rose-600">变更原因 <span class="text-slate-400">（周一早会不再靠回忆）</span></label>
+        <textarea id="editReason" rows="3" class="w-full border rounded px-3 py-1.5 text-sm" placeholder="例：现场实测磨损4mm，提前更换；与白班主管电话确认..."></textarea></div>
+    </div>
+    <div class="flex justify-end gap-2 mt-4">
+      <button onclick="closeEditModal()" class="border border-slate-300 rounded px-4 py-1.5 text-sm">取消</button>
+      <button onclick="submitEdit()" class="bg-sky-600 hover:bg-sky-700 text-white px-4 py-1.5 rounded text-sm">提交变更</button>
+    </div>
+  </div>
+</div>
+
+<!-- =============== 新排程弹窗 =============== -->
+<div id="runModal" class="fixed inset-0 z-50 hidden modal-bg items-center justify-center p-4">
+  <div class="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+    <div class="px-5 py-3 border-b flex justify-between items-center">
+      <h4 class="font-semibold">新建排程版本</h4>
+      <button onclick="closeRunModal()" class="text-slate-400 hover:text-slate-700">✕</button>
+    </div>
+    <div class="p-5 overflow-y-auto scroll-thin space-y-4 text-sm">
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="text-xs text-slate-500">版本名称</label><input id="runName" class="w-full border rounded px-3 py-1.5"/></div>
+        <div><label class="text-xs text-slate-500">创建人</label><input id="runBy" value="运营主管" class="w-full border rounded px-3 py-1.5"/></div>
+      </div>
+      <div><label class="text-xs text-slate-500">备注</label><input id="runNote" class="w-full border rounded px-3 py-1.5" placeholder="例：周一早会版 / 调参对比v2"/></div>
+      <details class="border rounded-lg" open>
+        <summary class="px-4 py-2 bg-slate-50 rounded-t-lg text-xs font-semibold">⚙️ 排程参数（换这组参数再跑 → 结果变化一目了然）</summary>
+        <div class="p-4 space-y-3 text-sm">
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="text-xs text-slate-500">照片时间窗口（天）</label><input id="pWindow" type="number" value="7" class="w-full border rounded px-3 py-1.5"/></div>
+            <div><label class="text-xs text-slate-500">最小数量阈值</label><input id="pMinQty" type="number" value="1" class="w-full border rounded px-3 py-1.5"/></div>
+          </div>
+          <div>
+            <label class="text-xs text-slate-500">优先级策略</label>
+            <select id="pPriority" class="w-full border rounded px-3 py-1.5">
+              <option value="default">默认</option>
+              <option value="urgent">优先处理关键件</option>
+            </select>
+          </div>
+          <div><label class="text-xs text-slate-500">关键件分类（逗号分隔）</label><input id="pUrgent" value="滚刀,主轴承密封" class="w-full border rounded px-3 py-1.5"/></div>
+        </div>
+      </details>
+      <details class="border rounded-lg">
+        <summary class="px-4 py-2 bg-slate-50 rounded-t-lg text-xs font-semibold">📥 数据输入（留空=使用示例数据）</summary>
+        <div class="p-4">
+          <textarea id="runRows" rows="10" class="w-full border rounded p-3 text-xs font-mono" placeholder='[{"备件编号":"HD-001","备件名称":"滚刀17寸",...}]'></textarea>
+        </div>
+      </details>
+    </div>
+    <div class="px-5 py-3 border-t flex justify-end gap-2 bg-slate-50">
+      <button onclick="closeRunModal()" class="border border-slate-300 rounded px-4 py-1.5 text-sm">取消</button>
+      <button onclick="submitRun()" class="bg-sky-600 hover:bg-sky-700 text-white px-4 py-1.5 rounded text-sm">▶️ 运行排程</button>
+    </div>
+  </div>
+</div>
+
+<!-- =============== 版本对比弹窗 =============== -->
+<div id="diffModal" class="fixed inset-0 z-50 hidden modal-bg items-center justify-center p-4">
+  <div class="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+    <div class="px-5 py-3 border-b flex justify-between items-center">
+      <h4 class="font-semibold">🔍 版本对比：看清"哪一步让结果变化"</h4>
+      <button onclick="closeDiffModal()" class="text-slate-400 hover:text-slate-700">✕</button>
+    </div>
+    <div class="p-5 space-y-4">
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="text-xs text-slate-500">基准版本</label><select id="diffBase" class="w-full border rounded px-3 py-1.5 text-sm"></select></div>
+        <div><label class="text-xs text-slate-500">对比版本</label><select id="diffCmp" class="w-full border rounded px-3 py-1.5 text-sm"></select></div>
+      </div>
+      <button onclick="doDiff()" class="bg-sky-600 hover:bg-sky-700 text-white px-4 py-1.5 rounded text-sm w-full">生成对比</button>
+      <div id="diffResult" class="hidden space-y-4"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const cur = { versionId: null, recordId: null, onlyAnomaly: false };
+
+async function j(url, opt) {
+  const r = await fetch(url, opt);
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+
+function statusTag(s) {
+  const map = { "正常排程":"st-normal", "待确认":"st-wait", "异常-待处理":"st-error", "优先排产":"st-priority" };
+  return `<span class="tag ${map[s]||'bg-slate-100 text-slate-600'}">${s||'-'}</span>`;
+}
+function sevTag(s) {
+  return `<span class="tag sev-${s}">${s}</span>`;
+}
+
+async function refreshVersions() {
+  const vs = await j("/api/versions");
+  const sel = $("currentVersion");
+  sel.innerHTML = vs.map(v => `<option value="${v.version_id}">${v.version_name} · ${v.created_at.slice(5,16)} · ${v.record_count}条/${v.anomaly_count}异常</option>`).join("");
+  if (vs.length) {
+    if (!vs.find(v=>v.version_id===cur.versionId)) cur.versionId = vs[0].version_id;
+    sel.value = cur.versionId;
+  }
+  for (const id of ["diffBase","diffCmp"]) {
+    $(id).innerHTML = vs.map(v => `<option value="${v.version_id}">${v.version_name}</option>`).join("");
+    if (vs[1] && id==="diffCmp") $(id).value = vs[0].version_id;
+    if (vs[0] && id==="diffBase") $(id).value = vs[1] ? vs[1].version_id : vs[0].version_id;
+  }
+}
+
+async function refreshSummary() {
+  if (!cur.versionId) return;
+  const s = await j(`/api/versions/${cur.versionId}/summary`);
+  $("summaryBox").innerHTML = `
+    <div class="bg-white border border-slate-200 rounded-xl p-4"><div class="text-xs text-slate-500">版本名称</div><div class="text-lg font-semibold mt-1">${s.version_name}</div></div>
+    <div class="bg-white border border-slate-200 rounded-xl p-4"><div class="text-xs text-slate-500">记录总数</div><div class="text-2xl font-bold mt-1 text-slate-800">${s.total}</div></div>
+    <div class="bg-white border border-slate-200 rounded-xl p-4"><div class="text-xs text-slate-500">异常总数</div><div class="text-2xl font-bold mt-1 ${s.anomaly_total?'text-rose-600':'text-emerald-600'}">${s.anomaly_total}</div></div>
+    <div class="bg-white border border-slate-200 rounded-xl p-4"><div class="text-xs text-slate-500">参数组数</div><div class="text-2xl font-bold mt-1 text-indigo-600">${Object.keys(s.params).length}</div></div>`;
+  const bars = (obj, color) => {
+    const total = Object.values(obj).reduce((a,b)=>a+b,0)||1;
+    return Object.entries(obj).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`
+      <div><div class="flex justify-between text-xs mb-1"><span>${k||'-'}</span><span class="text-slate-400">${v}</span></div>
+      <div class="h-2 bg-slate-100 rounded-full overflow-hidden"><div class="${color}" style="width:${v/total*100}%;height:100%"></div></div></div>`).join("");
+  };
+  $("byStatus").innerHTML = bars(s.by_status, "bg-sky-500");
+  $("byCategory").innerHTML = bars(s.by_category, "bg-emerald-500");
+  $("byAnom").innerHTML = bars(s.by_anom_type, "bg-rose-500");
+  $("paramsBox").innerHTML = Object.entries(s.params).map(([k,v])=>`<div class="inline-block mr-5 my-1"><span class="text-slate-500">${k}：</span><span class="font-mono text-slate-800">${JSON.stringify(v)}</span></div>`).join("");
+}
+
+async function refreshRecords() {
+  if (!cur.versionId) return;
+  const url = cur.onlyAnomaly ? `/api/versions/${cur.versionId}/records?anomaly=1` : `/api/versions/${cur.versionId}/records`;
+  const rs = await j(url);
+  $("recordsTbody").innerHTML = rs.map(r => `
+    <tr class="hover:bg-slate-50">
+      <td class="px-3 py-2 font-mono text-xs">${r.part_id||'-'}</td>
+      <td class="px-3 py-2">${r.part_name||'-'}</td>
+      <td class="px-3 py-2 text-slate-500">${r.category||'-'}</td>
+      <td class="px-3 py-2 text-slate-500">${r.scheduled_date||'-'}</td>
+      <td class="px-3 py-2 text-right">${r.quantity}</td>
+      <td class="px-3 py-2">${statusTag(r.status)}</td>
+      <td class="px-3 py-2 text-slate-500 text-xs">${r.source||'-'}</td>
+      <td class="px-3 py-2 text-center">
+        ${r.anomaly_count ? `<span class="tag ${r.has_error?'sev-error':'sev-warning'}">${r.anomaly_count} 项</span>` : '<span class="text-slate-300">-</span>'}
+      </td>
+      <td class="px-3 py-2 text-xs text-slate-400">${r.updated_at.slice(5,16)}</td>
+      <td class="px-3 py-2 text-center">
+        <button onclick="openRecord('${r.record_id}')" class="text-sky-600 hover:text-sky-800 text-xs font-semibold">详情→</button>
+      </td>
+    </tr>`).join("") || `<tr><td colspan="10" class="px-3 py-10 text-center text-slate-400">暂无记录</td></tr>`;
+}
+
+async function openSampleAndAlias() {
+  try {
+    const samp = await j("/api/sample-input");
+    $("sampleJson").textContent = JSON.stringify(samp, null, 2);
+  } catch(e){ $("sampleJson").textContent = "（尚未加载样例，先跑一次排程即可）"; }
+  const ali = await j("/api/field-aliases");
+  $("aliasBox").innerHTML = Object.entries(ali).map(([k,v])=>`
+    <div class="border border-slate-200 rounded p-2">
+      <div class="font-semibold text-slate-700 mb-1">${k}</div>
+      <div class="text-slate-500">${v.filter(x=>x!==k).map(x=>`<span class="tag bg-slate-100 text-slate-600 mr-1 mb-1">${x}</span>`).join("")||"—"}</div>
+    </div>`).join("");
+}
+
+function toggleOnlyAnomaly() {
+  cur.onlyAnomaly = !cur.onlyAnomaly;
+  $("toggleAnomBtn").textContent = cur.onlyAnomaly ? "仅异常" : "全部记录";
+  $("toggleAnomBtn").className = cur.onlyAnomaly
+    ? "text-xs border border-rose-400 bg-rose-50 text-rose-600 rounded px-3 py-1"
+    : "text-xs border border-slate-300 rounded px-3 py-1 hover:bg-slate-100";
+  refreshRecords();
+}
+
+// ========== 详情钻取 ==========
+async function openRecord(rid) {
+  cur.recordId = rid;
+  const r = await j(`/api/versions/${cur.versionId}/records/${rid}`);
+  $("recTitle").textContent = `${r.part_name||'-'} (${r.part_id||'-'})`;
+  $("recBasic").innerHTML = [
+    ["状态", statusTag(r.status)], ["分类", r.category||"-"],
+    ["排程日期", r.scheduled_date||"-"], ["数量", r.quantity],
+    ["来源", r.source||"-"], ["照片时间", r.photo_time||"-"],
+    ["创建于", r.created_at.slice(5,16)], ["更新于", r.updated_at.slice(5,16)],
+  ].map(([l,v])=>`<div class="bg-slate-50 rounded-lg p-3"><div class="text-xs text-slate-500 mb-1">${l}</div><div>${v}</div></div>`).join("");
+  $("recAnomalies").innerHTML = r.anomalies.length ? r.anomalies.map(a=>`
+    <div class="border ${a.resolved?'border-emerald-200 bg-emerald-50':'border-slate-200'} rounded-lg p-3">
+      <div class="flex items-start justify-between gap-2">
+        <div class="flex items-start gap-2">
+          <span class="dot ${a.severity==='error'?'bg-rose-500':a.severity==='warning'?'bg-amber-500':'bg-sky-500'} mt-1"></span>
+          <div>
+            <div class="text-sm">${sevTag(a.severity)} <span class="font-semibold">${a.anomaly_type}</span>
+              ${a.resolved?'<span class="tag st-normal ml-1">已处理</span>':''}
+            </div>
+            <div class="text-slate-600 text-xs mt-1">${a.description}</div>
+            ${a.resolved_note?`<div class="text-emerald-700 text-xs mt-1">处理说明：${a.resolved_note}</div>`:''}
+          </div>
+        </div>
+        ${!a.resolved?`<button onclick="resolveOne('${r.record_id}','${a.anomaly_id}')" class="text-xs border border-emerald-400 text-emerald-700 px-2 py-0.5 rounded hover:bg-emerald-50 shrink-0">标记已处理</button>`:''}
+      </div>
+    </div>`).join("") : '<div class="text-slate-400 text-xs">无异常，按正常记录走</div>';
+
+  $("recAudit").innerHTML = r.audit_log.length ? r.audit_log.map(a=>`
+    <div class="border-l-2 border-sky-300 pl-3 py-1">
+      <div class="text-slate-700"><span class="font-semibold">${a.field}</span>：
+        <span class="diff-del line-through">${JSON.stringify(a.old_value)}</span>
+        <span class="mx-1">→</span>
+        <span class="diff-add">${JSON.stringify(a.new_value)}</span>
+      </div>
+      <div class="text-slate-400 mt-0.5">
+        <span class="mr-3">👤 ${a.operator}</span>
+        <span class="mr-3">🕐 ${a.timestamp.slice(5,16)}</span>
+        <span class="text-slate-600">📌 ${a.reason}</span>
+      </div>
+    </div>`).join("") : '<div class="text-slate-400 text-xs">尚无人工变更</div>';
+
+  $("recSource").textContent = JSON.stringify(r.source_fields, null, 2);
+  $("recMapping").innerHTML = r.field_mapping_log.map(m=>{
+    const mapped = m.mapped !== "未匹配→保留source_fields";
+    return `<div class="flex items-center gap-2 ${mapped?'':'opacity-60'}">
+      <span class="font-mono text-slate-700">${m.raw}</span>
+      <span class="text-slate-400">${mapped?'→':'↘︎'}</span>
+      <span class="${mapped?'text-emerald-600 font-semibold':'text-slate-400'}">${m.mapped}</span>
+    </div>`;
+  }).join("");
+
+  $("recordModal").classList.remove("hidden");
+  $("recordModal").classList.add("flex");
+}
+function closeRecordModal() {
+  $("recordModal").classList.add("hidden");
+  $("recordModal").classList.remove("flex");
+}
+
+// ========== 人工修改（强制记原因） ==========
+function openManualEdit() {
+  const fields = [
+    ["status", "状态", ["正常排程","优先排产","待确认","异常-待处理","已完成"]],
+    ["scheduled_date", "排程日期", null],
+    ["quantity", "数量", null],
+    ["category", "分类", null],
+    ["part_name", "备件名称", null],
+  ];
+  $("editForm").innerHTML = fields.map(([k,l,opts])=>{
+    if (opts) return `<div><label class="text-xs text-slate-500">${l}</label>
+      <select data-k="${k}" class="edit-input w-full border rounded px-3 py-1.5 text-sm">
+        ${opts.map(o=>`<option>${o}</option>`).join("")}</select></div>`;
+    const t = k==="scheduled_date"?"date":"text";
+    return `<div><label class="text-xs text-slate-500">${l}</label>
+      <input data-k="${k}" type="${t}" class="edit-input w-full border rounded px-3 py-1.5 text-sm"/></div>`;
+  }).join("");
+  $("editModal").classList.remove("hidden");
+  $("editModal").classList.add("flex");
+}
+function closeEditModal() {
+  $("editModal").classList.add("hidden");
+  $("editModal").classList.remove("flex");
+}
+async function submitEdit() {
+  const updates = {};
+  document.querySelectorAll(".edit-input").forEach(el => {
+    const v = el.value.trim();
+    if (v !== "") {
+      const k = el.dataset.k;
+      updates[k] = k === "quantity" ? parseInt(v) : v;
+    }
+  });
+  const reason = $("editReason").value.trim();
+  const op = $("editOperator").value.trim() || "未知";
+  if (!reason) { alert("必须填写变更原因（周一早会靠它，不靠人回忆）"); return; }
+  if (!Object.keys(updates).length) { alert("至少填一个要改的字段"); return; }
+  await j(`/api/versions/${cur.versionId}/records/${cur.recordId}`, {
+    method:"PUT", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({updates, operator:op, reason})
+  });
+  closeEditModal();
+  refreshSummary(); refreshRecords(); openRecord(cur.recordId);
+}
+
+async function resolveOne(rid, aid) {
+  const note = prompt("请输入处理说明：");
+  if (note === null || !note.trim()) return;
+  const op = prompt("操作人：", "运营主管") || "运营主管";
+  await j(`/api/versions/${cur.versionId}/records/${rid}/anomalies/${aid}/resolve`, {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({note, operator:op})
+  });
+  openRecord(rid); refreshSummary(); refreshRecords();
+}
+
+// ========== 新排程 / Diff / 导出 ==========
+function openRunModal() {
+  $("runName").value = `排程-${new Date().toISOString().slice(0,16).replace(/[-T:]/g,'').slice(0,12)}`;
+  $("runModal").classList.remove("hidden");
+  $("runModal").classList.add("flex");
+}
+function closeRunModal() {
+  $("runModal").classList.add("hidden");
+  $("runModal").classList.remove("flex");
+}
+async function submitRun() {
+  const rows = $("runRows").value.trim();
+  const params = {
+    photo_window_days: parseInt($("pWindow").value),
+    min_quantity: parseInt($("pMinQty").value),
+    priority: $("pPriority").value,
+    urgent_categories: $("pUrgent").value.split(/[,，]/).map(s=>s.trim()).filter(Boolean),
+  };
+  const body = {
+    rows: rows ? JSON.parse(rows) : null,
+    params,
+    version_name: $("runName").value || "未命名",
+    created_by: $("runBy").value || "系统",
+    note: $("runNote").value,
+  };
+  const r = await j("/api/run", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)});
+  cur.versionId = r.version_id;
+  closeRunModal();
+  await refreshAll();
+}
+
+function openDiffModal() {
+  $("diffResult").classList.add("hidden");
+  $("diffResult").innerHTML = "";
+  $("diffModal").classList.remove("hidden");
+  $("diffModal").classList.add("flex");
+}
+function closeDiffModal() {
+  $("diffModal").classList.add("hidden");
+  $("diffModal").classList.remove("flex");
+}
+async function doDiff() {
+  const d = await j("/api/diff", {method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({base:$("diffBase").value, compare:$("diffCmp").value})});
+  const box = $("diffResult");
+  box.classList.remove("hidden");
+  box.innerHTML = `
+    <div class="grid grid-cols-4 gap-2 text-center text-sm">
+      <div class="bg-sky-50 border border-sky-200 rounded-lg py-3"><div class="text-xs text-slate-500">参数变动</div><div class="text-2xl font-bold text-sky-700">${d.summary.param_changes}</div></div>
+      <div class="bg-emerald-50 border border-emerald-200 rounded-lg py-3"><div class="text-xs text-slate-500">新增记录</div><div class="text-2xl font-bold text-emerald-700">${d.summary.added}</div></div>
+      <div class="bg-rose-50 border border-rose-200 rounded-lg py-3"><div class="text-xs text-slate-500">删除记录</div><div class="text-2xl font-bold text-rose-700">${d.summary.removed}</div></div>
+      <div class="bg-amber-50 border border-amber-200 rounded-lg py-3"><div class="text-xs text-slate-500">变更记录</div><div class="text-2xl font-bold text-amber-700">${d.summary.modified}</div></div>
+    </div>
+    ${d.param_changes.length?`<div><h5 class="text-xs font-semibold text-slate-500 mb-2">🔧 驱动参数变化（这就是"哪一步让结果变化"）</h5>
+      <div class="border border-slate-200 rounded-lg overflow-hidden text-xs">
+        <table class="w-full"><thead class="bg-slate-100"><tr><th class="p-2 text-left">参数</th><th class="p-2 text-left">基准</th><th class="p-2 text-left">对比</th></tr></thead>
+        <tbody class="divide-y">${d.param_changes.map(p=>`
+          <tr><td class="p-2 font-mono">${p.key}</td>
+          <td class="p-2 diff-del">${JSON.stringify(p.old)}</td>
+          <td class="p-2 diff-add">${JSON.stringify(p.new)}</td></tr>`).join("")}
+        </tbody></table>
+      </div></div>`:""}
+    ${d.record_changes.length?`<div><h5 class="text-xs font-semibold text-slate-500 mb-2">📦 受影响的记录（含每一步字段级变更 + 关联驱动参数）</h5>
+      <div class="space-y-2 text-xs">${d.record_changes.map(rc=>{
+        const ct = rc.change_type;
+        const cls = ct==="新增"?"diff-add":ct==="删除"?"diff-del":"bg-amber-50 border-amber-200";
+        const dots = (rc.field_deltas||[]).map(f=>`<div><span class="font-mono">${f.field}</span>: <span class="diff-del line-through">${JSON.stringify(f.old)}</span> → <span class="diff-add">${JSON.stringify(f.new)}</span></div>`).join("");
+        const driver = rc.driving_param_changes.map(p=>`<span class="tag bg-indigo-50 text-indigo-700 mr-1 mb-1">${p.key}: ${JSON.stringify(p.old)}→${JSON.stringify(p.new)}</span>`).join("");
+        return `<div class="border border-slate-200 rounded-lg p-3">
+          <div class="flex items-center justify-between mb-2">
+            <div><span class="tag ${ct==='新增'?'st-normal':ct==='删除'?'sev-error':'sev-warning'}">${ct}</span>
+              <span class="font-semibold ml-2">${rc.part_id} · ${rc.part_name}</span></div>
+            <div>${statusTag(rc.old_status)} → ${statusTag(rc.new_status)}</div>
+          </div>
+          ${dots?`<div class="bg-slate-50 p-2 rounded mb-2 space-y-1">${dots}</div>`:""}
+          ${driver?`<div class="text-slate-500"><span class="text-slate-400 mr-1">🔗 关联参数变动：</span>${driver}</div>`:""}
+        </div>`;
+      }).join("")}</div></div>`:""}
+  `;
+}
+
+function doExport() {
+  if (!cur.versionId) return alert("请先选择或创建一个排程版本");
+  location.href = `/api/versions/${cur.versionId}/export`;
+}
+
+async function refreshAll() {
+  await refreshVersions();
+  await Promise.all([refreshSummary(), refreshRecords(), openSampleAndAlias()]);
+}
+
+$("currentVersion").addEventListener("change", e => {
+  cur.versionId = e.target.value;
+  refreshSummary(); refreshRecords();
+});
+
+refreshAll();
+</script>
+</body>
+</html>

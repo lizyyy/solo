@@ -1,0 +1,39 @@
+[
+  {
+    "version_id": "e90a807afae5",
+    "version_name": "运营夜班-v2 收紧参数",
+    "created_by": "运营主管-夜班",
+    "created_at": "2026-06-10 01:40:54",
+    "params": {
+      "photo_window_days": 3,
+      "min_quantity": 2,
+      "priority": "urgent",
+      "urgent_categories": [
+        "滚刀",
+        "主轴承密封",
+        "主驱动"
+      ]
+    },
+    "note": "上一班调整参数后重跑：窗口收紧+阈值提高",
+    "record_count": 6,
+    "anomaly_count": 7
+  },
+  {
+    "version_id": "79c1240ca714",
+    "version_name": "运营白班-v1 默认参数",
+    "created_by": "运营主管-白班",
+    "created_at": "2026-06-10 01:40:54",
+    "params": {
+      "photo_window_days": 7,
+      "min_quantity": 1,
+      "priority": "default",
+      "urgent_categories": [
+        "滚刀",
+        "主轴承密封"
+      ]
+    },
+    "note": "周一早会前基线版",
+    "record_count": 6,
+    "anomaly_count": 6
+  }
+]
