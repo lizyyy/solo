@@ -1,0 +1,132 @@
+{
+  "material_label": "phase1_old_legacy_records",
+  "description": "历史班组交接记录（灰度发布第一步导入用），含多种写法的设备编号、现场痕迹、一条照片时间错位样本",
+  "records": [
+    {
+      "record_id": "HO-20260609-001",
+      "device_id": "1A-001",
+      "shift": "白班",
+      "recorder": "张建国",
+      "record_time": "2026-06-09T08:30:00+08:00",
+      "on_site_trace": "A区1号柜背面左侧铜牌温度异常，红外测温枪82.3℃，柜门上沿有轻微发热痕迹，已贴热敏变色贴（变褐色）。",
+      "temperature_c": 82.3,
+      "spare_part_needed": "主母线连接排",
+      "spare_part_quantity": 2,
+      "photos": [
+        {
+          "photo_id": "PH-A001-01",
+          "filename": "IMG_1A001_front.jpg",
+          "photo_time": "2026-06-09T08:28:00+08:00",
+          "upload_time": "2026-06-09T08:35:00+08:00"
+        }
+      ]
+    },
+    {
+      "record_id": "HO-20260609-002",
+      "device_id": "配电柜1号B柜002",
+      "shift": "白班",
+      "recorder": "张建国",
+      "record_time": "2026-06-09T09:15:00+08:00",
+      "on_site_trace": "B号1号柜断路器下端口触头发烫，目测颜色发黑，操作时手感明显高于相邻开关。",
+      "temperature_c": 68.5,
+      "spare_part_needed": "断路器",
+      "spare_part_quantity": 1,
+      "photos": [
+        {
+          "photo_id": "PH-B002-01",
+          "filename": "IMG_1B002_breaker.jpg",
+          "photo_time": "2026-06-09T09:10:00+08:00",
+          "upload_time": "2026-06-09T09:20:00+08:00"
+        }
+      ]
+    },
+    {
+      "record_id": "HO-20260609-003",
+      "device_id": "pdg_02a_005",
+      "shift": "中班",
+      "recorder": "李卫东",
+      "record_time": "2026-06-09T16:45:00+08:00",
+      "on_site_trace": "2号区A柜5号开关散热风扇停转一只，柜顶温度偏高，已用便携风扇临时补吹。",
+      "temperature_c": 61.0,
+      "spare_part_needed": "散热风扇",
+      "spare_part_quantity": 4,
+      "photos": [
+        {
+          "photo_id": "PH-2A005-01",
+          "filename": "IMG_2A005_fan.jpg",
+          "photo_time": "2026-06-09T16:40:00+08:00",
+          "upload_time": "2026-06-09T16:50:00+08:00"
+        }
+      ]
+    },
+    {
+      "record_id": "HO-20260609-004",
+      "device_id": "3-012",
+      "shift": "中班",
+      "recorder": "李卫东",
+      "record_time": "2026-06-09T17:30:00+08:00",
+      "on_site_trace": "3号区域12号柜温控开关跳闸两次，重新合闸后运行，怀疑开关本体老化误动。",
+      "temperature_c": 54.0,
+      "spare_part_needed": "温控开关",
+      "spare_part_quantity": 2,
+      "photos": [
+        {
+          "photo_id": "PH-3012-01",
+          "filename": "IMG_3012_switch.jpg",
+          "photo_time": "2026-06-09T17:25:00+08:00",
+          "upload_time": "2026-06-09T17:35:00+08:00"
+        }
+      ]
+    },
+    {
+      "record_id": "HO-20260609-005",
+      "device_id": "PDG 01A 001",
+      "shift": "夜班",
+      "recorder": "王海涛",
+      "record_time": "2026-06-10T02:10:00+08:00",
+      "on_site_trace": "（与白班张建国交接内容一致，再次巡检确认）1号A-001铜牌温度81.8℃，夜间负荷下降后仍偏高，变色贴颜色未消退。",
+      "temperature_c": 81.8,
+      "spare_part_needed": "主母线连接排",
+      "spare_part_quantity": 2,
+      "photos": [
+        {
+          "photo_id": "PH-A001-02",
+          "filename": "IMG_A001_night.jpg",
+          "photo_time": "2026-06-10T02:05:00+08:00",
+          "upload_time": "2026-06-10T02:15:00+08:00"
+        }
+      ]
+    },
+    {
+      "record_id": "HO-20260609-006",
+      "device_id": "配电柜5C柜099",
+      "shift": "夜班",
+      "recorder": "王海涛",
+      "record_time": "2026-06-10T03:20:00+08:00",
+      "on_site_trace": "5C区99号电容补偿柜绝缘垫片老化，发现柜底有少量黑色碎屑掉落，疑似长期受热碳化。",
+      "temperature_c": 47.0,
+      "spare_part_needed": "绝缘垫片",
+      "spare_part_quantity": 10,
+      "photos": [
+        {
+          "photo_id": "PH-5C099-01",
+          "filename": "IMG_5C099_carbon.jpg",
+          "photo_time": "2026-06-09T15:42:00+08:00",
+          "upload_time": "2026-06-10T03:25:00+08:00"
+        }
+      ]
+    },
+    {
+      "record_id": "HO-20260609-BAD-01",
+      "device_id": "老配电室东北角那个",
+      "shift": "夜班",
+      "recorder": "王海涛",
+      "record_time": "2026-06-10T04:00:00+08:00",
+      "on_site_trace": "现场巡检临时记录，位置描述较口语化，需补填正式设备编号。怀疑电容补偿模块有异常声。",
+      "temperature_c": null,
+      "spare_part_needed": "电容补偿模块",
+      "spare_part_quantity": 1,
+      "photos": []
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "material_label": "phase2_boundary_plus_followup",
+  "description": "灰度发布第二步：补一条边界样本 + 一条后补说明（包含一条重复导入用的相同内容旧记录，用于验证去重）",
+  "records": [
+    {
+      "record_id": "HO-20260610-BDY-01",
+      "device_id": "PDG-05C-099",
+      "shift": "白班",
+      "recorder": "赵敏（补记）",
+      "record_time": "2026-06-10T09:12:00+08:00",
+      "on_site_trace": "【边界样本】5C-099号电容补偿柜凌晨后温度骤升至85.6℃，绝缘垫片部位严重过热，值班长判断为紧急更换。同时记录：电容补偿模块内部有明显焦味，需一并更换。本记录满足：温度≥80℃（HIGH优先级触发边界）、数量较大触发合并、多次交接累计合并次数≥3边界。",
+      "temperature_c": 85.6,
+      "spare_part_needed": "绝缘垫片",
+      "spare_part_quantity": 20,
+      "photos": [
+        {
+          "photo_id": "PH-5C099-BDY-01",
+          "filename": "IMG_BDY_5C099_hotspot.jpg",
+          "photo_time": "2026-06-10T08:55:00+08:00",
+          "upload_time": "2026-06-10T09:05:00+08:00"
+        }
+      ]
+    },
+    {
+      "record_id": "HO-20260610-FUP-01",
+      "device_id": "1B-002",
+      "shift": "白班",
+      "recorder": "张建国（后补说明）",
+      "record_time": "2026-06-10T10:30:00+08:00",
+      "on_site_trace": "【后补说明】针对6月9日HO-20260609-002记录的补充：断路器型号为NM1-400S/3300，额定电流315A，已向物资科确认货位在A-03-12货架。更换前需提前通知高压班配合拉闸，预计耗时约45分钟。",
+      "temperature_c": null,
+      "spare_part_needed": "断路器",
+      "spare_part_quantity": 1,
+      "photos": [
+        {
+          "photo_id": "PH-1B002-FUP-01",
+          "filename": "IMG_FUP_1B002_nameplate.jpg",
+          "photo_time": "2026-06-10T10:20:00+08:00",
+          "upload_time": "2026-06-10T10:32:00+08:00"
+        }
+      ]
+    },
+    {
+      "record_id": "HO-20260609-001",
+      "device_id": "1-A-001",
+      "shift": "白班",
+      "recorder": "张建国",
+      "record_time": "2026-06-09T08:30:00+08:00",
+      "on_site_trace": "【重复导入验证】内容与HO-20260609-001完全一致：A区1号柜背面左侧铜牌温度异常，红外测温枪82.3℃，柜门上沿有轻微发热痕迹，已贴热敏变色贴（变褐色）。",
+      "temperature_c": 82.3,
+      "spare_part_needed": "主母线连接排",
+      "spare_part_quantity": 2,
+      "photos": [
+        {
+          "photo_id": "PH-A001-01",
+          "filename": "IMG_1A001_front.jpg",
+          "photo_time": "2026-06-09T08:28:00+08:00",
+          "upload_time": "2026-06-09T08:35:00+08:00"
+        }
+      ]
+    }
+  ]
+}
