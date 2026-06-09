@@ -33,14 +33,18 @@ export function Review() {
 
   const handleCorrect = () => {
     if (taskId && selectedRow && newValue) {
-      addCorrection(taskId, {
-        field: 'temperature',
-        oldValue: `${selectedRow.temperature}${selectedRow.temperatureUnit === 'K' ? 'K' : '°C'}`,
-        newValue: `${newValue}°C`,
-        reason: correctionReason || '开尔文转摄氏度，统一单位便于分析',
-        correctedBy: '训练教练老唐',
-        correctedAt: new Date().toISOString(),
-      });
+      addCorrection(
+        taskId,
+        selectedRow.id,
+        {
+          field: 'temperature',
+          oldValue: `${selectedRow.temperature}${selectedRow.temperatureUnit === 'K' ? 'K' : '°C'}`,
+          newValue: `${newValue}°C`,
+          reason: correctionReason || '开尔文转摄氏度，统一单位便于分析',
+          correctedBy: '训练教练老唐',
+          correctedAt: new Date().toISOString(),
+        }
+      );
       setSelectedRow(null);
       setNewValue('');
       setCorrectionReason('');

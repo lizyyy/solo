@@ -35,12 +35,39 @@ export interface WorkPhoto {
 export interface CorrectionRecord {
   id: string;
   diagnosisId: string;
+  sensorNo: string;
+  sensorId: string;
   field: string;
   oldValue: string;
   newValue: string;
+  oldUnit?: TemperatureUnit;
+  newUnit?: TemperatureUnit;
   reason: string;
   correctedBy: string;
   correctedAt: string;
+}
+
+export interface ReportVersionSnapshot {
+  problemStatement: string;
+  missingMaterials: string[];
+  nextAction: NextAction;
+  nextHandler: string;
+  hasUnitMixing: boolean;
+  photoCount: number;
+  correctionCount: number;
+  sensorDataSnapshots: Array<{
+    sensorNo: string;
+    temperature: number;
+    temperatureUnit: TemperatureUnit;
+    needsReview: boolean;
+  }>;
+}
+
+export interface MissingMaterialTrigger {
+  material: string;
+  sourceType: 'sensor' | 'photo' | 'correction';
+  sourceIds: string[];
+  sourceDescriptions: string[];
 }
 
 export interface HandoverReport {
@@ -54,12 +81,15 @@ export interface HandoverReport {
   updatedAt: string;
   version: number;
   versionHistory: ReportVersion[];
+  missingMaterialTriggers: MissingMaterialTrigger[];
 }
 
 export interface ReportVersion {
   version: number;
   updatedAt: string;
   changes: string[];
+  snapshot: ReportVersionSnapshot;
+  triggeredBy: string;
 }
 
 export interface DiagnosisTask {

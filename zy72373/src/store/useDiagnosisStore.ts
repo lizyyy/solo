@@ -6,6 +6,7 @@ import type {
   CorrectionRecord,
   OperationLog,
   TaskStatus,
+  TemperatureUnit,
 } from '../types';
 import { sampleTasks, demoTask, demoOperationLogs } from '../data/demoData';
 import { TemperatureUnitDetector } from '../services/temperatureService';
@@ -23,7 +24,7 @@ interface DiagnosisState {
   loadDemoData: () => void;
   importSensorData: (taskId: string, data: SensorData[]) => void;
   addPhoto: (taskId: string, photo: Omit<WorkPhoto, 'id' | 'diagnosisId'>) => void;
-  addCorrection: (taskId: string, correction: Omit<CorrectionRecord, 'id' | 'diagnosisId'>) => void;
+  addCorrection: (taskId: string, sensorId: string, correction: Omit<CorrectionRecord, 'id' | 'diagnosisId' | 'sensorNo' | 'sensorId'>) => void;
   rerunDiagnosis: (taskId: string) => void;
   updateTaskStatus: (taskId: string, status: TaskStatus, currentStep: number) => void;
   addOperationLog: (taskId: string, action: string, details: Record<string, unknown>, operator: string) => void;
@@ -163,37 +164,64 @@ export const useDiagnosisStore = create<DiagnosisState>((set, get) => ({
     );
   },
 
-  addCorrection: (taskId: string, correction: Omit<CorrectionRecord, 'id' | 'diagnosisId'>) => {
-    const newCorrection: CorrectionRecord = {
-      ...correction,
-      id: `correction-${generateId()}`,
-      diagnosisId: taskId,
-    };
-
+  addCorrection: (taskId: string, sensorId: string, correction: Omit<CorrectionRecord, 'id' | 'diagnosisId' | 'sensorNo' | 'sensorId'>) => {
     set(state => {
       const updatedTasks = state.tasks.map(task => {
         if (task.id === taskId) {
+          const targetSensor = task.sensorData.find(s => s.id === sensorId);
+          if (!targetSensor) return task;
+
+          let parsedNewTemp = targetSensor.temperature;
+          let parsedNewUnit: TemperatureUnit = targetSensor.temperatureUnit;
+          if (correction.field === 'temperature') {
+            const match = correction.newValue.match(/^([\d.]+)(°C|K)$/);
+            if (match) {
+              parsedNewTemp = parseFloat(match[1]);
+              parsedNewUnit = match[2] === '°C' ? 'C' : 'K';
+            }
+          }
+
           const updatedSensorData = task.sensorData.map(data => {
-            if (data.needsReview && correction.field === 'temperature') {
-              return { ...data, needsReview: false };
+            if (data.id === sensorId) {
+              return {
+                ...data,
+                needsReview: false,
+                temperature: parsedNewTemp,
+                temperatureUnit: parsedNewUnit,
+              };
             }
             return data;
           });
 
           const stillHasMixing = updatedSensorData.some(d => d.needsReview);
+          const stillAnyKelvinAndCelsius = 
+            updatedSensorData.some(d => d.temperatureUnit === 'C') && 
+            updatedSensorData.some(d => d.temperatureUnit === 'K');
+
+          const newCorrection: CorrectionRecord = {
+            ...correction,
+            id: `correction-${generateId()}`,
+            diagnosisId: taskId,
+            sensorNo: targetSensor.sensorNo,
+            sensorId: targetSensor.id,
+            oldUnit: targetSensor.temperatureUnit,
+            newUnit: parsedNewUnit,
+          };
 
           const updatedTask = {
             ...task,
             sensorData: updatedSensorData,
             corrections: [...task.corrections, newCorrection],
             status: 'reviewing' as TaskStatus,
-            hasUnitMixing: stillHasMixing,
-            unitMixingInfo: stillHasMixing ? task.unitMixingInfo : null,
+            hasUnitMixing: stillAnyKelvinAndCelsius || stillHasMixing,
+            unitMixingInfo: stillAnyKelvinAndCelsius 
+              ? TemperatureUnitDetector.detectMixing(updatedSensorData)
+              : null,
           };
 
           return {
             ...updatedTask,
-            report: ReportAutoUpdater.onCorrectionMade(updatedTask),
+            report: ReportAutoUpdater.onCorrectionMade(updatedTask, targetSensor.sensorNo),
           };
         }
         return task;
@@ -202,13 +230,18 @@ export const useDiagnosisStore = create<DiagnosisState>((set, get) => ({
       return { tasks: updatedTasks };
     });
 
+    const task = get().tasks.find(t => t.id === taskId);
+    const sensor = task?.sensorData.find(s => s.id === sensorId);
     get().addOperationLog(
       taskId,
       '人工修正数据',
       {
+        sensorNo: sensor?.sensorNo || '',
+        sensorId,
         field: correction.field,
         oldValue: correction.oldValue,
         newValue: correction.newValue,
+        reason: correction.reason,
       },
       correction.correctedBy
     );
