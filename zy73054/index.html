@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>塔吊维保异常归因系统</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --panel: #1e293b;
+    --panel-2: #334155;
+    --border: #475569;
+    --text: #e2e8f0;
+    --text-dim: #94a3b8;
+    --accent: #3b82f6;
+    --accent-2: #06b6d4;
+    --warn: #f59e0b;
+    --danger: #ef4444;
+    --success: #10b981;
+    --purple: #a855f7;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 20px;
+  }
+  .container { max-width: 1600px; margin: 0 auto; }
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    background: linear-gradient(135deg, var(--panel), var(--panel-2));
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 20px;
+  }
+  h1 { font-size: 22px; font-weight: 700; }
+  h1 .sub { font-size: 13px; color: var(--text-dim); font-weight: 400; margin-left: 12px; }
+  .meta { display: flex; gap: 20px; font-size: 13px; color: var(--text-dim); }
+  .meta span b { color: var(--text); font-weight: 600; }
+
+  .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+  }
+  .panel h2 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .panel h2 .tag {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--accent);
+    color: white;
+    font-weight: 500;
+  }
+  .panel h2 .tag.warn { background: var(--warn); }
+  .panel h2 .tag.danger { background: var(--danger); }
+  .panel h2 .tag.success { background: var(--success); }
+  .panel h2 .tag.purple { background: var(--purple); }
+
+  .col-4 { grid-column: span 4; }
+  .col-5 { grid-column: span 5; }
+  .col-6 { grid-column: span 6; }
+  .col-7 { grid-column: span 7; }
+  .col-8 { grid-column: span 8; }
+  .col-12 { grid-column: span 12; }
+
+  /* Formula */
+  .formula-block {
+    background: #0b1220;
+    border: 1px dashed var(--accent-2);
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 10px;
+    font-family: "JetBrains Mono", "SF Mono", monospace;
+    font-size: 13px;
+    line-height: 1.9;
+  }
+  .formula-block .label { color: var(--accent-2); font-weight: 600; }
+  .formula-block .var { color: #fbbf24; }
+  .formula-block .op { color: var(--accent); }
+  .formula-block .val { color: var(--success); }
+  .formula-block .unit { color: var(--text-dim); font-size: 11px; margin-left: 6px; }
+  .formula-note { font-size: 12px; color: var(--text-dim); margin-top: 8px; }
+  .boundary-list { margin-top: 12px; }
+  .boundary-list li {
+    list-style: none;
+    padding: 6px 10px;
+    margin-bottom: 4px;
+    background: #0b1220;
+    border-left: 3px solid var(--purple);
+    border-radius: 4px;
+    font-size: 12.5px;
+    font-family: "JetBrains Mono", monospace;
+  }
+  .boundary-list li b { color: var(--warn); }
+
+  /* KPI */
+  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 14px; }
+  .kpi {
+    background: #0b1220;
+    border-radius: 8px;
+    padding: 14px;
+    text-align: center;
+    border: 1px solid var(--border);
+  }
+  .kpi .n { font-size: 24px; font-weight: 700; }
+  .kpi .n.danger { color: var(--danger); }
+  .kpi .n.warn { color: var(--warn); }
+  .kpi .n.success { color: var(--success); }
+  .kpi .n.accent { color: var(--accent); }
+  .kpi .t { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+
+  /* Attribution bars */
+  .attr-item { margin-bottom: 12px; }
+  .attr-head {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    margin-bottom: 5px;
+  }
+  .attr-head .name { font-weight: 500; }
+  .attr-head .pct { font-family: "JetBrains Mono", monospace; color: var(--accent-2); }
+  .attr-bar {
+    height: 10px;
+    background: #0b1220;
+    border-radius: 999px;
+    overflow: hidden;
+    position: relative;
+  }
+  .attr-fill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.5s;
+  }
+  .attr-fill.danger { background: linear-gradient(90deg, #ef4444, #f87171); }
+  .attr-fill.warn { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+  .attr-fill.accent { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+  .attr-fill.success { background: linear-gradient(90deg, #10b981, #34d399); }
+  .attr-fill.purple { background: linear-gradient(90deg, #a855f7, #c084fc); }
+  .attr-evidence {
+    font-size: 11.5px;
+    color: var(--text-dim);
+    margin-top: 4px;
+    padding-left: 8px;
+    border-left: 2px solid var(--border);
+  }
+  .attr-evidence code {
+    background: #0b1220;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 11px;
+    color: var(--accent-2);
+  }
+
+  /* Dirty data */
+  .dirty-alert {
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid var(--warn);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+  .dirty-alert .title {
+    font-weight: 600;
+    color: var(--warn);
+    font-size: 13px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .dirty-item {
+    font-size: 12px;
+    padding: 6px 8px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 4px;
+    margin-top: 4px;
+  }
+  .dirty-item .key { color: var(--warn); font-weight: 500; }
+  .dirty-item .val { color: var(--accent-2); font-family: "JetBrains Mono", monospace; }
+
+  /* CSV Table */
+  table.csv {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    font-family: "JetBrains Mono", "SF Mono", monospace;
+  }
+  table.csv th, table.csv td {
+    padding: 8px 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  table.csv th {
+    background: #0b1220;
+    font-weight: 600;
+    color: var(--accent-2);
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    font-size: 11.5px;
+  }
+  table.csv tr:hover td { background: rgba(59, 130, 246, 0.08); }
+  table.csv tr.dirty td { background: rgba(245, 158, 11, 0.08); }
+  table.csv tr.dirty td:first-child::before {
+    content: "⚠ ";
+    color: var(--warn);
+  }
+  table.csv tr.boundary td { background: rgba(168, 85, 247, 0.08); }
+  table.csv tr.boundary td:first-child::before {
+    content: "◈ ";
+    color: var(--purple);
+  }
+  table.csv tr.normal td:first-child::before {
+    content: "● ";
+    color: var(--success);
+  }
+  .badge {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 10.5px;
+    font-weight: 600;
+    font-family: -apple-system, sans-serif;
+  }
+  .badge.danger { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+  .badge.warn { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+  .badge.success { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+  .badge.accent { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+  .badge.purple { background: rgba(168, 85, 247, 0.2); color: #c084fc; }
+
+  .csv-wrap {
+    max-height: 420px;
+    overflow: auto;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  .csv-tools {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 7px 14px;
+    border-radius: 6px;
+    font-size: 12.5px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: opacity 0.2s;
+  }
+  .btn:hover { opacity: 0.9; }
+  .btn.secondary { background: var(--panel-2); border: 1px solid var(--border); }
+  .btn.warn { background: var(--warn); }
+  .btn.success { background: var(--success); }
+
+  /* Handover */
+  .handover-form {
+    background: #0b1220;
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 14px;
+  }
+  .handover-form textarea {
+    width: 100%;
+    min-height: 70px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    padding: 10px;
+    font-size: 13px;
+    font-family: inherit;
+    resize: vertical;
+  }
+  .handover-form textarea:focus { outline: none; border-color: var(--accent); }
+  .form-row { display: flex; gap: 10px; margin-top: 10px; align-items: center; }
+  .form-row select, .form-row input {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    padding: 7px 10px;
+    font-size: 12.5px;
+  }
+
+  .impact-block {
+    background: rgba(6, 182, 212, 0.08);
+    border: 1px solid var(--accent-2);
+    border-radius: 8px;
+    padding: 14px;
+    margin-top: 12px;
+  }
+  .impact-block h4 {
+    font-size: 13px;
+    color: var(--accent-2);
+    margin-bottom: 8px;
+  }
+  .impact-item {
+    font-size: 12.5px;
+    padding: 6px 0;
+    border-bottom: 1px dashed var(--border);
+  }
+  .impact-item:last-child { border-bottom: none; }
+  .impact-item .before { color: var(--text-dim); text-decoration: line-through; }
+  .impact-item .after { color: var(--success); font-weight: 500; }
+  .impact-item .arrow { color: var(--accent); margin: 0 8px; }
+
+  .progress-list li {
+    list-style: none;
+    padding: 10px 12px;
+    background: #0b1220;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    border-left: 4px solid var(--accent);
+  }
+  .progress-list li.done { border-left-color: var(--success); }
+  .progress-list li.hold { border-left-color: var(--warn); }
+  .progress-list li.block { border-left-color: var(--danger); }
+  .progress-list .title { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+  .progress-list .detail { font-size: 11.5px; color: var(--text-dim); }
+  .progress-list .gap {
+    display: inline-block;
+    margin-top: 5px;
+    font-size: 11px;
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  .history-item {
+    padding: 10px 12px;
+    border-left: 3px solid var(--border);
+    margin-bottom: 8px;
+    background: #0b1220;
+    border-radius: 0 6px 6px 0;
+  }
+  .history-item .time {
+    font-size: 11px;
+    color: var(--text-dim);
+    font-family: "JetBrains Mono", monospace;
+  }
+  .history-item .who { font-size: 12.5px; font-weight: 600; margin: 2px 0; }
+  .history-item .note { font-size: 12px; color: var(--text-dim); }
+  .diff-same { color: var(--success); }
+  .diff-new { color: var(--accent-2); background: rgba(6, 182, 212, 0.15); padding: 1px 5px; border-radius: 3px; }
+
+  .legend {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    font-size: 11.5px;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+  }
+  .legend span { display: flex; align-items: center; gap: 5px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .dot.g { background: var(--success); }
+  .dot.y { background: var(--warn); }
+  .dot.p { background: var(--purple); }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div>
+      <h1>塔吊维保异常归因系统<span class="sub">Tower Crane Maintenance Anomaly Attribution</span></h1>
+    </div>
+    <div class="meta">
+      <span>运行批次: <b id="batchId">B2026-0609-001</b></span>
+      <span>样本数: <b id="sampleCount">0</b></span>
+      <span>归因时间: <b id="runTime">—</b></span>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- 公式与单位 -->
+    <div class="panel col-5">
+      <h2>归因公式与单位 <span class="tag">透明</span></h2>
+      <div class="formula-block">
+        <div class="label">异常归因权重得分 S：</div>
+        S = <span class="var">W_sp</span> × <span class="var">F_sp</span>
+          + <span class="var">W_te</span> × <span class="var">F_te</span>
+          + <span class="var">W_hs</span> × <span class="var">F_hs</span>
+          + <span class="var">W_bd</span> × <span class="var">F_bd</span>
+        <div class="formula-note">
+          范围: <b>0 ~ 100 分</b>　|　≥60 判定为「异常」，≥80 为「严重异常」
+        </div>
+      </div>
+
+      <div class="formula-block">
+        <div class="label">① 备件滞后因子 F_sp：</div>
+        F_sp = min( 100, (<span class="var">到货延迟天数 T_delay</span> / <span class="var">停机窗口 W_stop</span>) × 100 )
+        <br>
+        W_sp = <span class="val">0.40</span> (40%权重)
+        <span class="unit">[T_delay: 天, W_stop: 天]</span>
+      </div>
+
+      <div class="formula-block">
+        <div class="label">② 班组执行因子 F_te：</div>
+        F_te = min( 100, (<span class="var">实际用时 T_act</span> − <span class="var">标准工时 T_std</span>) / T_std × 100 )
+        <br>
+        W_te = <span class="val">0.25</span> (25%权重)
+        <span class="unit">[T_act, T_std: 小时]</span>
+      </div>
+
+      <div class="formula-block">
+        <div class="label">③ 交接合规因子 F_hs：</div>
+        F_hs = 100 × (1 − <span class="var">交接完整率 R_hs</span>)
+        <br>
+        W_hs = <span class="val">0.20</span> (20%权重)
+        <span class="unit">[R_hs: 0~1]</span>
+      </div>
+
+      <div class="formula-block">
+        <div class="label">④ 边界突破因子 F_bd：</div>
+        F_bd = 100 × <span class="var">突破项数 N_bd</span> / 总检查项 N_total
+        <br>
+        W_bd = <span class="val">0.15</span> (15%权重)
+        <span class="unit">[N_bd: 项]</span>
+      </div>
+
+      <h2 style="margin-top:18px">边界值定义 <span class="tag purple">边界</span></h2>
+      <ul class="boundary-list">
+        <li>T_delay ≤ <b>0</b> 天 → F_sp = 0（备件按时/提前）</li>
+        <li>T_delay = W_stop → F_sp = 100（延迟=窗口，满分）</li>
+        <li>T_act ≤ T_std → F_te = 0（不超工时）</li>
+        <li>R_hs ≥ <b>0.95</b> → F_hs = 0（交接≥95%视为完整）</li>
+        <li>S &lt; <b>60</b> → 正常　|　60≤S&lt;80 → 异常　|　S≥80 → 严重</li>
+        <li>阈值临时偏移 > <b>15%</b> → 标记为「脏数据」⚠</li>
+      </ul>
+    </div>
+
+    <!-- 归因结果面板 -->
+    <div class="panel col-7">
+      <h2>归因结果总览 <span class="tag danger">实时</span></h2>
+
+      <div id="dirtyAlertWrap"></div>
+
+      <div class="kpi-row">
+        <div class="kpi"><div class="n accent" id="kpiTotal">0</div><div class="t">记录总数</div></div>
+        <div class="kpi"><div class="n success" id="kpiNormal">0</div><div class="t">正常 (S&lt;60)</div></div>
+        <div class="kpi"><div class="n warn" id="kpiAbn">0</div><div class="t">异常 (60≤S&lt;80)</div></div>
+        <div class="kpi"><div class="n danger" id="kpiSevere">0</div><div class="t">严重 (S≥80)</div></div>
+      </div>
+
+      <h2 style="margin-top:6px">根因权重分布</h2>
+      <div id="attrBars"></div>
+
+      <h2 style="margin-top:18px">处理进度与缺口</h2>
+      <ul class="progress-list" id="progressList"></ul>
+    </div>
+
+    <!-- CSV明细 -->
+    <div class="panel col-12">
+      <h2>CSV 明细数据 <span class="tag success">可追溯</span></h2>
+      <div class="legend">
+        <span><i class="dot g"></i>正常样本</span>
+        <span><i class="dot p"></i>边界样本 (S≈60临界)</span>
+        <span><i class="dot y"></i>脏数据 (阈值被临时调高)</span>
+      </div>
+      <div class="csv-tools">
+        <button class="btn" onclick="exportCSV()">⬇ 导出 CSV</button>
+        <button class="btn secondary" onclick="rerun()">↻ 重跑归因</button>
+        <button class="btn warn" onclick="simulateDirty()">⚠ 注入阈值调高脏数据</button>
+        <button class="btn success" onclick="addHandoverNote()">✎ 补班组交接备注并重跑</button>
+      </div>
+      <div class="csv-wrap">
+        <table class="csv" id="csvTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>设备编号</th>
+              <th>维保日期</th>
+              <th>停机窗口 W_stop(天)</th>
+              <th>到货延迟 T_delay(天)</th>
+              <th>F_sp(%)</th>
+              <th>标准工时 T_std(h)</th>
+              <th>实际工时 T_act(h)</th>
+              <th>F_te(%)</th>
+              <th>交接完整率 R_hs</th>
+              <th>F_hs(%)</th>
+              <th>边界突破 N_bd</th>
+              <th>F_bd(%)</th>
+              <th>综合得分 S</th>
+              <th>判定</th>
+              <th>主因</th>
+              <th>备注/交接</th>
+              <th>数据标记</th>
+            </tr>
+          </thead>
+          <tbody id="csvBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 班组交接备注 -->
+    <div class="panel col-6">
+      <h2>班组交接备注 <span class="tag">追加</span></h2>
+      <div class="handover-form">
+        <label style="font-size:13px; color:var(--text-dim); display:block; margin-bottom:6px;">
+          选择设备：
+        </label>
+        <div class="form-row" style="margin-top:0; margin-bottom:10px;">
+          <select id="handoverDevice">
+            <option value="TC-001">TC-001 (1#塔吊 · 北标段)</option>
+            <option value="TC-002">TC-002 (2#塔吊 · 南标段)</option>
+            <option value="TC-003">TC-003 (3#塔吊 · 东标段)</option>
+            <option value="TC-004">TC-004 (4#塔吊 · 西标段)</option>
+            <option value="TC-005">TC-005 (5#塔吊 · 中央)</option>
+          </select>
+          <select id="handoverShift">
+            <option value="早班">早班 (08:00-16:00)</option>
+            <option value="中班">中班 (16:00-00:00)</option>
+            <option value="晚班">晚班 (00:00-08:00)</option>
+          </select>
+        </div>
+        <textarea id="handoverText" placeholder="输入班组交接备注。例如：16:20备件MQ-220主钢丝绳到货，已开箱验收入库，预计明早启动更换作业；发现力矩限制器触点磨损，已列入下次维保重点项…"></textarea>
+        <div class="form-row">
+          <select id="completeness">
+            <option value="0.60">交接完整率 60%（信息不全）</option>
+            <option value="0.75">交接完整率 75%（部分缺失）</option>
+            <option value="0.85" selected>交接完整率 85%（基本完整）</option>
+            <option value="0.95">交接完整率 95%（完整）</option>
+            <option value="1.00">交接完整率 100%（非常完整）</option>
+          </select>
+          <button class="btn success" onclick="submitHandover()">提交备注并重跑归因</button>
+        </div>
+      </div>
+
+      <h2 style="margin-top:8px">备注对归因判断的影响</h2>
+      <div id="impactBlock">
+        <div style="color:var(--text-dim); font-size:12.5px; padding:12px; text-align:center;">
+          提交交接备注后，此处将显示哪些判定发生了变化（F_hs 因子更新前后对比）
+        </div>
+      </div>
+    </div>
+
+    <!-- 历史与重跑对比 -->
+    <div class="panel col-6">
+      <h2>重跑历史 · 旧记录 vs 新导出 <span class="tag accent">可对比</span></h2>
+      <div id="historyList">
+        <div style="color:var(--text-dim); font-size:12.5px; padding:12px; text-align:center;">
+          暂无重跑记录。提交交接备注或点击「重跑归因」将生成可追溯的历史快照。
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   塔吊维保异常归因系统 - 核心数据与算法
+   ============================================================ */
+
+const STANDARD_THRESHOLD = {
+  W_stop_default: 3,
+  T_std_default: 8,
+  delay_tolerance: 0,
+  completeness_required: 0.95,
+  dirty_offset_pct: 15
+};
+
+let RECORDS = [
+  { id:"TC-001", name:"1#塔吊·北标段", date:"2026-06-01",
+    W_stop:3, T_delay:2, T_std:8, T_act:10, R_hs:0.80, N_bd:1, N_total:12,
+    note:"例行月度维保", threshold_override:null, tag:"normal" },
+  { id:"TC-002", name:"2#塔吊·南标段", date:"2026-06-02",
+    W_stop:2, T_delay:0, T_std:6, T_act:6, R_hs:1.00, N_bd:0, N_total:12,
+    note:"季度大保 · 备件提前3天到齐", threshold_override:null, tag:"normal" },
+  { id:"TC-003", name:"3#塔吊·东标段", date:"2026-06-03",
+    W_stop:3, T_delay:1.7, T_std:8, T_act:8.5, R_hs:0.92, N_bd:0, N_total:12,
+    note:"【边界样本】各项指标接近60分阈值", threshold_override:null, tag:"boundary" },
+  { id:"TC-004", name:"4#塔吊·西标段", date:"2026-06-04",
+    W_stop:4, T_delay:5, T_std:10, T_act:16, R_hs:0.55, N_bd:3, N_total:12,
+    note:"【脏数据·阈值调高】阈值临时偏移+28%", threshold_override:{offset_pct:28, fields:["W_stop","T_std"]}, tag:"dirty" },
+  { id:"TC-005", name:"5#塔吊·中央", date:"2026-06-05",
+    W_stop:2, T_delay:3, T_std:6, T_act:9, R_hs:0.70, N_bd:2, N_total:12,
+    note:"顶升作业后维保 · 交接缺力矩校验记录", threshold_override:null, tag:"normal" },
+  { id:"TC-001", name:"1#塔吊·北标段", date:"2026-06-08",
+    W_stop:3, T_delay:4, T_std:8, T_act:12, R_hs:0.65, N_bd:2, N_total:12,
+    note:"二次维保 · 钢丝绳更换滞后", threshold_override:null, tag:"normal" }
+];
+
+let HANDOVER_HISTORY = [];
+let RUN_HISTORY = [];
+let lastRunSnapshot = null;
+
+/* ---------- 核心归因计算 ---------- */
+function calcRecord(r) {
+  const W = { sp:0.40, te:0.25, hs:0.20, bd:0.15 };
+
+  let W_stop_adj = r.W_stop, T_std_adj = r.T_std;
+  let dirtyFlag = null;
+  if (r.threshold_override) {
+    const op = r.threshold_override;
+    dirtyFlag = `阈值临时调高 +${op.offset_pct}%，字段: ${op.fields.join(",")}`;
+    if (op.fields.includes("W_stop")) W_stop_adj = r.W_stop * (1 + op.offset_pct/100);
+    if (op.fields.includes("T_std")) T_std_adj = r.T_std * (1 + op.offset_pct/100);
+  }
+
+  let F_sp = (r.T_delay / W_stop_adj) * 100;
+  F_sp = Math.max(0, Math.min(100, F_sp));
+
+  let F_te = ((r.T_act - T_std_adj) / T_std_adj) * 100;
+  F_te = Math.max(0, Math.min(100, F_te));
+
+  let F_hs = (1 - r.R_hs) * 100;
+  if (r.R_hs >= STANDARD_THRESHOLD.completeness_required) F_hs = 0;
+  F_hs = Math.max(0, Math.min(100, F_hs));
+
+  let F_bd = (r.N_bd / r.N_total) * 100;
+  F_bd = Math.max(0, Math.min(100, F_bd));
+
+  const S = W.sp*F_sp + W.te*F_te + W.hs*F_hs + W.bd*F_bd;
+
+  let level, levelCls;
+  if (S >= 80) { level = "严重异常"; levelCls = "danger"; }
+  else if (S >= 60) { level = "异常"; levelCls = "warn"; }
+  else { level = "正常"; levelCls = "success"; }
+
+  const contribs = [
+    { k:"sp", name:"备件到货滞后", v:W.sp*F_sp, color:"danger",
+      ev:`W=${W.sp.toFixed(2)} × F=${F_sp.toFixed(1)}% = <code>${(W.sp*F_sp).toFixed(2)}</code>　延迟${r.T_delay}天/窗口${W_stop_adj.toFixed(1)}天` },
+    { k:"te", name:"班组执行超时", v:W.te*F_te, color:"warn",
+      ev:`W=${W.te.toFixed(2)} × F=${F_te.toFixed(1)}% = <code>${(W.te*F_te).toFixed(2)}</code>　实${r.T_act}h/标${T_std_adj.toFixed(1)}h` },
+    { k:"hs", name:"交接合规缺失", v:W.hs*F_hs, color:"accent",
+      ev:`W=${W.hs.toFixed(2)} × F=${F_hs.toFixed(1)}% = <code>${(W.hs*F_hs).toFixed(2)}</code>　完整率${(r.R_hs*100).toFixed(0)}%` },
+    { k:"bd", name:"边界项突破", v:W.bd*F_bd, color:"purple",
+      ev:`W=${W.bd.toFixed(2)} × F=${F_bd.toFixed(1)}% = <code>${(W.bd*F_bd).toFixed(2)}</code>　突破${r.N_bd}/${r.N_total}项` }
+  ];
+  contribs.sort((a,b)=>b.v-a.v);
+  const topCause = contribs[0];
+
+  return {
+    ...r,
+    F_sp: +F_sp.toFixed(1), F_te: +F_te.toFixed(1),
+    F_hs: +F_hs.toFixed(1), F_bd: +F_bd.toFixed(1),
+    S: +S.toFixed(2),
+    W_stop_adj: +W_stop_adj.toFixed(2),
+    T_std_adj: +T_std_adj.toFixed(2),
+    level, levelCls,
+    mainCause: topCause.name,
+    mainCauseColor: topCause.color,
+    contribs,
+    dirtyFlag
+  };
+}
+
+function runAttribution() {
+  const results = RECORDS.map(calcRecord);
+  const ts = new Date().toLocaleString("zh-CN", {hour12:false});
+
+  if (lastRunSnapshot) {
+    RUN_HISTORY.push({
+      time: ts,
+      before: lastRunSnapshot,
+      after: results.map(r=>({id:r.id, date:r.date, S:r.S, level:r.level, F_hs:r.F_hs, R_hs:r.R_hs}))
+    });
+  }
+  lastRunSnapshot = results.map(r=>({id:r.id, date:r.date, S:r.S, level:r.level, F_hs:r.F_hs, R_hs:r.R_hs}));
+
+  renderAll(results, ts);
+  return results;
+}
+
+/* ---------- 渲染 ---------- */
+function renderAll(results, ts) {
+  document.getElementById("runTime").textContent = ts;
+  document.getElementById("sampleCount").textContent = results.length;
+
+  const total = results.length;
+  const normal = results.filter(r=>r.S<60).length;
+  const abn = results.filter(r=>r.S>=60 && r.S<80).length;
+  const severe = results.filter(r=>r.S>=80).length;
+  document.getElementById("kpiTotal").textContent = total;
+  document.getElementById("kpiNormal").textContent = normal;
+  document.getElementById("kpiAbn").textContent = abn;
+  document.getElementById("kpiSevere").textContent = severe;
+
+  renderDirtyAlert(results);
+  renderAttrBars(results);
+  renderProgress(results);
+  renderCSV(results);
+  renderHistory();
+}
+
+function renderDirtyAlert(results) {
+  const dirty = results.filter(r=>r.dirtyFlag);
+  const boundary = results.filter(r=>r.tag==="boundary");
+  const html = [];
+  if (dirty.length > 0) {
+    html.push(`<div class="dirty-alert">
+      <div class="title">⚠ 检测到 ${dirty.length} 条脏数据（阈值临时被调高）</div>
+      ${dirty.map(r=>`<div class="dirty-item">
+        <span class="key">[${r.id} ${r.date}]</span>
+        <span class="val">${r.dirtyFlag}</span>
+        　→ 导致 F_sp 降低 ${(r.F_sp - calcWithoutDirty(r).F_sp).toFixed(1)}pp，得分被虚低 ${(r.S - calcWithoutDirty(r).S).toFixed(2)} 分
+      </div>`).join("")}
+    </div>`);
+  }
+  if (boundary.length > 0) {
+    html.push(`<div class="dirty-alert" style="border-color:var(--purple); background:rgba(168,85,247,0.08);">
+      <div class="title" style="color:var(--purple);">◈ 检测到 ${boundary.length} 条边界样本（S≈60分临界区）</div>
+      ${boundary.map(r=>`<div class="dirty-item">
+        <span class="key">[${r.id} ${r.date}]</span>
+        <span class="val">S=${r.S} 分</span>
+        　距异常线(60)仅 ${(r.S-60).toFixed(2)} 分，完整率提升3pp即可降为正常
+      </div>`).join("")}
+    </div>`);
+  }
+  document.getElementById("dirtyAlertWrap").innerHTML = html.join("");
+}
+
+function calcWithoutDirty(r) {
+  const clean = {...r, threshold_override:null};
+  return calcRecord(clean);
+}
+
+function renderAttrBars(results) {
+  const agg = { sp:0, te:0, hs:0, bd:0 };
+  results.forEach(r=>{
+    r.contribs.forEach(c=>{ agg[c.k] += c.v; });
+  });
+  const sum = agg.sp+agg.te+agg.hs+agg.bd || 1;
+  const items = [
+    { k:"sp", name:"备件到货滞后 (W=0.40)", v:agg.sp, color:"danger" },
+    { k:"te", name:"班组执行超时 (W=0.25)", v:agg.te, color:"warn" },
+    { k:"hs", name:"交接合规缺失 (W=0.20)", v:agg.hs, color:"accent" },
+    { k:"bd", name:"边界项突破 (W=0.15)", v:agg.bd, color:"purple" }
+  ];
+  items.sort((a,b)=>b.v-a.v);
+  const main = items[0];
+  items.forEach(it=>it.pct = (it.v/sum*100));
+
+  const html = items.map(it=>`
+    <div class="attr-item">
+      <div class="attr-head">
+        <span class="name">${it.name}</span>
+        <span class="pct">${it.v.toFixed(2)} 分 · ${it.pct.toFixed(1)}%</span>
+      </div>
+      <div class="attr-bar"><div class="attr-fill ${it.color}" style="width:${it.pct}%"></div></div>
+      <div class="attr-evidence">
+        ${it.k==="sp"?"共 "+results.filter(r=>r.T_delay>0).length+" 条备件延迟，累计延迟 "+results.reduce((s,r)=>s+r.T_delay,0).toFixed(1)+" 天":""}
+        ${it.k==="te"?"共 "+results.filter(r=>r.T_act>r.T_std_adj).length+" 条超工时，累计超 "+results.reduce((s,r)=>s+Math.max(0,r.T_act-r.T_std_adj),0).toFixed(1)+" h":""}
+        ${it.k==="hs"?"共 "+results.filter(r=>r.R_hs<0.95).length+" 条交接不完整，平均完整率 "+(results.reduce((s,r)=>s+r.R_hs,0)/results.length*100).toFixed(0)+"%":""}
+        ${it.k==="bd"?"共 "+results.filter(r=>r.N_bd>0).length+" 条突破边界，累计 "+results.reduce((s,r)=>s+r.N_bd,0)+" 项":""}
+      </div>
+    </div>
+  `).join("");
+  document.getElementById("attrBars").innerHTML = html + `
+    <div style="margin-top:14px; padding:10px; background:rgba(16,185,129,0.08); border:1px solid var(--success); border-radius:8px; font-size:13px;">
+      <b style="color:var(--success)">首要根因：</b>${main.name}　｜　建议优先协调备件到货时间窗口 & 建立备件到货预警机制
+    </div>`;
+}
+
+function renderProgress(results) {
+  const total = results.length;
+  const abnormal = results.filter(r=>r.S>=60);
+  const partsDelay = abnormal.filter(r=>r.mainCause.includes("备件"));
+  const teamIssue = abnormal.filter(r=>r.mainCause.includes("班组"));
+  const handoverIssue = abnormal.filter(r=>r.mainCause.includes("交接"));
+  const gapDays = results.reduce((s,r)=>s+Math.max(0,r.T_delay),0).toFixed(1);
+
+  const items = [
+    { cls:"done", title:`已完成维保记录归档：${total}/${total}`,
+      detail:"全部6条维保记录已录入系统，数据齐全", gap:null },
+    { cls:"block", title:`备件到货滞后：${partsDelay.length} 条未闭环`,
+      detail:`累计缺口 ${gapDays} 天 · TC-001/004/005 存在备件晚于停机窗口`,
+      gap:`缺口：需供应链提前 ≥ ${Math.ceil(gapDays/partsDelay.length)} 天发货` },
+    { cls:"hold", title:`班组交接补全：${handoverIssue.length} 条待完善`,
+      detail:`完整率低于95%的共 ${results.filter(r=>r.R_hs<0.95).length} 条`,
+      gap:`缺口：补全交接班电子签字 + 关键参数记录` },
+    { cls:"hold", title:`工时超标整改：${teamIssue.length} 条待复盘`,
+      detail:`超标准工时累计 ${results.reduce((s,r)=>s+Math.max(0,r.T_act-r.T_std_adj),0).toFixed(1)} 小时`,
+      gap:`缺口：需编制《超工时案例复盘报告》` },
+    { cls:"block", title:`边界项突破整改：${results.filter(r=>r.N_bd>0).length} 台设备`,
+      detail:`共 ${results.reduce((s,r)=>s+r.N_bd,0)} 项边界检查未通过`,
+      gap:`缺口：力矩限制器/钢丝绳磨损项需在下次维保前完成` }
+  ];
+  document.getElementById("progressList").innerHTML = items.map(it=>`
+    <li class="${it.cls}">
+      <div class="title">${it.title}</div>
+      <div class="detail">${it.detail}</div>
+      ${it.gap?`<span class="gap">${it.gap}</span>`:""}
+    </li>
+  `).join("");
+}
+
+function renderCSV(results) {
+  const body = document.getElementById("csvBody");
+  body.innerHTML = results.map((r,i)=>{
+    const rowCls = r.tag==="dirty"?"dirty":(r.tag==="boundary"?"boundary":"normal");
+    const tagBadge = r.tag==="dirty"?'<span class="badge warn">脏数据</span>':
+                    r.tag==="boundary"?'<span class="badge purple">边界</span>':
+                    '<span class="badge success">正常</span>';
+    const flag = r.dirtyFlag ? `<span title="${r.dirtyFlag}" style="color:var(--warn); cursor:help;">⚠阈值+${r.threshold_override.offset_pct}%</span>` : "—";
+    return `<tr class="${rowCls}">
+      <td>${i+1}</td>
+      <td><b>${r.id}</b><br><span style="color:var(--text-dim); font-size:10.5px;">${r.name}</span></td>
+      <td>${r.date}</td>
+      <td>${r.W_stop}${r.W_stop_adj!==r.W_stop?`<br><span style="color:var(--warn);">→${r.W_stop_adj}</span>`:""}</td>
+      <td>${r.T_delay}</td>
+      <td>${r.F_sp}</td>
+      <td>${r.T_std}${r.T_std_adj!==r.T_std?`<br><span style="color:var(--warn);">→${r.T_std_adj}</span>`:""}</td>
+      <td>${r.T_act}</td>
+      <td>${r.F_te}</td>
+      <td>${(r.R_hs*100).toFixed(0)}%</td>
+      <td>${r.F_hs}</td>
+      <td>${r.N_bd}/${r.N_total}</td>
+      <td>${r.F_bd}</td>
+      <td><b style="font-size:13px;">${r.S}</b></td>
+      <td><span class="badge ${r.levelCls}">${r.level}</span></td>
+      <td><span class="badge ${r.mainCauseColor}">${r.mainCause}</span></td>
+      <td style="max-width:180px; font-size:11px; line-height:1.4;">${r.note}</td>
+      <td>${tagBadge}<br>${flag}</td>
+    </tr>`;
+  }).join("");
+}
+
+function renderHistory() {
+  const wrap = document.getElementById("historyList");
+  if (RUN_HISTORY.length === 0) {
+    wrap.innerHTML = `<div style="color:var(--text-dim); font-size:12.5px; padding:12px; text-align:center;">暂无重跑记录。</div>`;
+    return;
+  }
+  wrap.innerHTML = RUN_HISTORY.slice().reverse().map((h, idx)=>{
+    const diffs = [];
+    h.after.forEach((a,i)=>{
+      const b = h.before[i];
+      if (a.S !== b.S || a.level !== b.level || a.F_hs !== b.F_hs) {
+        diffs.push(`
+          <div style="font-size:11.5px; padding:4px 0; border-bottom:1px dashed var(--border);">
+            <b>[${a.id} ${a.date}]</b>
+            完整率: <span class="${a.R_hs!==b.R_hs?'diff-new':'diff-same'}">${(b.R_hs*100).toFixed(0)}% → ${(a.R_hs*100).toFixed(0)}%</span>
+            　F_hs: <span class="${a.F_hs!==b.F_hs?'diff-new':'diff-same'}">${b.F_hs} → ${a.F_hs}</span>
+            　得分: <span class="${a.S!==b.S?'diff-new':'diff-same'}">${b.S} → ${a.S}</span>
+            　判定: ${a.level!==b.level?`<span class="before">${b.level}</span><span class="arrow">→</span><span class="after">${a.level}</span>`:`<span class="diff-same">${a.level}</span>`}
+          </div>
+        `);
+      }
+    });
+    const realIdx = RUN_HISTORY.length - idx;
+    return `<div class="history-item">
+      <div class="time">第 ${realIdx} 次重跑 · ${h.time}</div>
+      <div class="who">触发：${HANDOVER_HISTORY[HANDOVER_HISTORY.length-realIdx-1]?.who || "系统重跑"}</div>
+      <div class="note">${HANDOVER_HISTORY[HANDOVER_HISTORY.length-realIdx-1]?.note || "无备注变更"}</div>
+      <div style="margin-top:8px;">${diffs.length?diffs.join(""):'<span class="diff-same" style="font-size:11.5px;">本次重跑各记录得分与判定无变化（与上次导出一致 ✓）</span>'}</div>
+    </div>`;
+  }).join("");
+}
+
+/* ---------- 交互 ---------- */
+function submitHandover() {
+  const dev = document.getElementById("handoverDevice").value;
+  const shift = document.getElementById("handoverShift").value;
+  const text = document.getElementById("handoverText").value.trim();
+  const comp = parseFloat(document.getElementById("completeness").value);
+  if (!text) { alert("请输入交接备注内容"); return; }
+
+  const target = RECORDS.filter(r=>r.id===dev).pop();
+  if (!target) { alert("未找到该设备记录"); return; }
+
+  const before = { R_hs: target.R_hs, S: null, F_hs: null, level: null };
+  const pre = calcRecord(target);
+  before.S = pre.S; before.F_hs = pre.F_hs; before.level = pre.level;
+
+  target.R_hs = Math.max(target.R_hs, comp);
+  target.note += `　｜【${shift}交接补录】${text}`;
+
+  const afterRec = calcRecord(target);
+
+  HANDOVER_HISTORY.push({
+    time: new Date().toLocaleString("zh-CN",{hour12:false}),
+    who: `老何 · ${shift} · 设备工程师`,
+    device: dev,
+    note: text.substring(0,60)+(text.length>60?"…":""),
+    before,
+    after: { R_hs: target.R_hs, S: afterRec.S, F_hs: afterRec.F_hs, level: afterRec.level }
+  });
+
+  showImpact(before, { R_hs: target.R_hs, S: afterRec.S, F_hs: afterRec.F_hs, level: afterRec.level }, dev, text);
+  runAttribution();
+  document.getElementById("handoverText").value = "";
+}
+
+function showImpact(before, after, dev, text) {
+  const html = [];
+  html.push(`<div class="impact-block">
+    <h4>📝 ${dev} 备注补录对归因的影响分析</h4>
+    <div class="impact-item">
+      <b>原始备注：</b>${text.substring(0,80)}${text.length>80?"…":""}
+    </div>
+    <div class="impact-item">
+      <b>交接完整率 R_hs：</b>
+      <span class="before">${(before.R_hs*100).toFixed(0)}%</span>
+      <span class="arrow">→</span>
+      <span class="after">${(after.R_hs*100).toFixed(0)}%</span>
+      ${after.R_hs>=0.95?' <span class="badge success">达标(≥95%)</span>':' <span class="badge warn">未达标</span>'}
+    </div>
+    <div class="impact-item">
+      <b>交接因子 F_hs：</b>
+      <span class="before">${before.F_hs.toFixed(1)}%</span>
+      <span class="arrow">→</span>
+      <span class="after">${after.F_hs.toFixed(1)}%</span>
+      （降低 ${(before.F_hs-after.F_hs).toFixed(1)} pp）
+    </div>
+    <div class="impact-item">
+      <b>综合得分 S：</b>
+      <span class="before">${before.S.toFixed(2)}</span>
+      <span class="arrow">→</span>
+      <span class="after">${after.S.toFixed(2)}</span>
+      （下降 ${(before.S-after.S).toFixed(2)} 分）
+    </div>
+    <div class="impact-item">
+      <b>异常判定：</b>
+      ${before.level===after.level
+        ? `<span class="diff-same">保持「${before.level}」（备注对最终判定无决定性影响）</span>`
+        : `<span class="before">${before.level}</span><span class="arrow">→</span><span class="after">${after.level}</span>
+           <span class="badge success">判定已改善！</span>`}
+    </div>
+    <div class="impact-item" style="color:var(--text-dim); font-size:12px;">
+      💡 说明：交接完整率仅影响 F_hs 因子（权重20%）。若备件滞后是主因，仅补备注无法改变整体判定，需配合备件到货提前。
+    </div>
+  </div>`);
+  document.getElementById("impactBlock").innerHTML = html.join("");
+}
+
+function addHandoverNote() {
+  document.getElementById("handoverDevice").value = "TC-003";
+  document.getElementById("handoverShift").value = "中班";
+  document.getElementById("handoverText").value =
+    "16:45完成东标段边界巡检，补录力矩限制器校验记录（读数：1.02 额定值，合格），" +
+    "补录钢丝绳磨损测量记录（8#绳：磨损率4.2%<10%合格），" +
+    "签字确认人：老何/张工，拍照已存档目录 /维保/2026-0609/TC003/";
+  document.getElementById("completeness").value = "0.95";
+  setTimeout(submitHandover, 200);
+}
+
+function rerun() {
+  const results = runAttribution();
+  alert(`重跑完成！共 ${results.length} 条记录，\n正常：${results.filter(r=>r.S<60).length}，`+
+        `异常：${results.filter(r=>r.S>=60&&r.S<80).length}，严重：${results.filter(r=>r.S>=80).length}`);
+}
+
+function simulateDirty() {
+  const idx = Math.floor(Math.random()*RECORDS.length);
+  const r = RECORDS[idx];
+  if (r.threshold_override) { alert("该记录已是脏数据，换一条试试"); return; }
+  const offset = 15 + Math.floor(Math.random()*25);
+  r.threshold_override = { offset_pct: offset, fields: ["W_stop","T_std"] };
+  r.tag = "dirty";
+  r.note += `　｜【脏数据注入】阈值临时调高+${offset}%`;
+  runAttribution();
+}
+
+function exportCSV() {
+  const results = RECORDS.map(calcRecord);
+  const header = ["序号","设备编号","设备名称","维保日期","停机窗口(天)","调整后窗口",
+    "到货延迟(天)","F_sp(%)","标准工时(h)","调整后工时(h)","实际工时(h)","F_te(%)",
+    "完整率R_hs","F_hs(%)","边界突破","F_bd(%)","综合得分S","判定","主因","备注","数据标记"];
+  const rows = results.map((r,i)=>[
+    i+1, r.id, r.name, r.date, r.W_stop, r.W_stop_adj, r.T_delay, r.F_sp,
+    r.T_std, r.T_std_adj, r.T_act, r.F_te,
+    (r.R_hs*100).toFixed(0)+"%", r.F_hs,
+    `${r.N_bd}/${r.N_total}`, r.F_bd, r.S, r.level, r.mainCause,
+    r.note.replace(/｜/g," | "), r.tag+(r.dirtyFlag?"(阈值+"+r.threshold_override.offset_pct+"%)":"")
+  ]);
+  const csv = "\uFEFF"+[header, ...rows].map(r=>r.map(c=>`"${c}"`).join(",")).join("\n");
+  const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `塔吊维保异常归因_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+/* ---------- 启动 ---------- */
+runAttribution();
+</script>
+</body>
+</html>
