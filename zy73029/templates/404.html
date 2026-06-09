@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}404 · 异宠温控回访追踪{% endblock %}
+{% block content %}
+<div class="max-w-lg mx-auto text-center py-20">
+  <div class="text-6xl mb-4">🐾</div>
+  <h1 class="text-2xl font-bold text-slate-800 mb-2">找不到这条记录</h1>
+  <p class="text-sm text-slate-500 mb-6">可能是被归档时误删，或记录号输错了。</p>
+  <a href="{{ url_for('index') }}"
+     class="inline-flex items-center gap-1 text-sm px-4 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm">
+    ← 回到汇总页
+  </a>
+</div>
+{% endblock %}

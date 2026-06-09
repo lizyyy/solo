@@ -1,0 +1,358 @@
+{% extends "base.html" %}
+{% block title %}{{ rec.pet_name or '记录' }} · 异宠温控回访追踪{% endblock %}
+{% block content %}
+
+{% if request.args.get('error') %}
+<div class="mb-4 bg-red-50 border border-red-200 rounded-xl p-3 text-sm text-red-700">
+  ❌ {{ request.args.get('error') }}
+</div>
+{% endif %}
+
+<div class="flex items-start justify-between gap-3 flex-wrap mb-5">
+  <div>
+    <div class="flex items-center gap-2 mb-1 flex-wrap">
+      <h1 class="text-xl sm:text-2xl font-bold text-slate-900">
+        {{ rec.pet_name or '未命名' }}
+        <span class="text-sm font-normal text-slate-500">{{ rec.pet_type or '' }}</span>
+      </h1>
+      {{ rec.status|status_badge|safe }}
+    </div>
+    <p class="text-xs text-slate-500">
+      主人：{{ rec.owner_name or '—' }}
+      {% if rec.owner_contact %}｜ 联系方式：{{ rec.owner_contact }}{% endif %}
+      　·　记录ID：<code class="bg-slate-100 px-1 rounded text-slate-600">{{ rec.record_id }}</code>
+      　·　创建于 {{ rec.created_at }}
+    </p>
+  </div>
+  <a href="{{ url_for('index') }}" class="text-sm text-slate-500 hover:text-indigo-600">← 返回汇总</a>
+</div>
+
+{% if unresolved_blockers %}
+<div class="mb-5 bg-red-50 border-2 border-red-300 rounded-xl p-4 shadow-sm">
+  <div class="flex items-start gap-3">
+    <div class="text-2xl">🛑</div>
+    <div class="flex-1">
+      <h3 class="font-bold text-red-900 text-base">本次结论暂时不能放行</h3>
+      <p class="text-sm text-red-800 mt-1">
+        检测到 {{ unresolved_blockers|length }} 处卡点，请先处理下方红色「拦截」疑点，再归档或修改状态。
+      </p>
+      <div class="mt-2 text-xs text-red-700 space-y-0.5">
+        {% for f in unresolved_blockers %}
+          <div>· <b>{{ f.title }}</b>：{{ f.detail.split('⚠')[-1].strip() if '⚠' in f.detail else f.detail[:60] }}</div>
+        {% endfor %}
+      </div>
+      <a href="#flags" class="mt-3 inline-block text-xs font-medium text-red-800 underline">跳转到疑点处理 →</a>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<div class="grid lg:grid-cols-3 gap-5">
+  <div class="lg:col-span-2 space-y-5">
+
+    <section class="bg-white border border-slate-200 rounded-xl shadow-sm">
+      <div class="px-5 py-3 border-b border-slate-100 flex items-center justify-between">
+        <h2 class="font-semibold text-slate-900">🌡 温控面板</h2>
+      </div>
+      <div class="p-5 grid sm:grid-cols-4 gap-4 text-center">
+        <div>
+          <div class="text-xs text-slate-500 mb-1">初温</div>
+          <div class="text-2xl font-bold text-slate-900 tabular-nums">{{ rec.original_temp }}<span class="text-sm font-normal ml-0.5">℃</span></div>
+        </div>
+        <div>
+          <div class="text-xs text-slate-500 mb-1">目标范围</div>
+          <div class="text-lg font-semibold text-slate-700 tabular-nums">{{ rec.target_temp_min }}~{{ rec.target_temp_max }}<span class="text-xs font-normal ml-0.5">℃</span></div>
+        </div>
+        <div>
+          <div class="text-xs text-slate-500 mb-1">当前体温</div>
+          {% set cur = rec.current_temp %}
+          {% set ok = rec.target_temp_min <= cur <= rec.target_temp_max if cur and rec.target_temp_min else True %}
+          <div class="text-2xl font-bold tabular-nums {{ 'text-green-600' if ok else 'text-orange-600' }}">
+            {{ cur }}<span class="text-sm font-normal ml-0.5">℃</span>
+          </div>
+          <div class="text-xs mt-0.5 {{ 'text-green-600' if ok else 'text-orange-600' }}">
+            {{ '达标 ✓' if ok else '偏离范围 ⚠' }}
+          </div>
+        </div>
+        <div>
+          <div class="text-xs text-slate-500 mb-1">状态</div>
+          <div class="mt-1">{{ rec.status|status_badge|safe }}</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="bg-white border border-slate-200 rounded-xl shadow-sm" id="notes">
+      <div class="px-5 py-3 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
+        <h2 class="font-semibold text-slate-900">💬 主人微信备注</h2>
+        <span class="text-xs text-slate-500">{{ rec.wechat_notes|length }} 条 · 撤回 {{ rec.wechat_notes|selectattr('has_retract')|list|length }} 条</span>
+      </div>
+      <div class="p-5 space-y-3">
+        {% for n in rec.wechat_notes %}
+        <div class="rounded-lg border {% if n.has_retract %}border-red-300 bg-red-50/40{% else %}border-slate-200 bg-slate-50/50{% endif %} p-3">
+          <div class="flex items-start justify-between gap-2 mb-1">
+            <span class="text-xs text-slate-500">{{ n.recorded_at }}</span>
+            {% if n.has_retract %}
+              <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-red-100 text-red-700 border border-red-200">⚠ 含撤回</span>
+            {% endif %}
+          </div>
+          <p class="code-block text-slate-800">{{ n.raw_text }}</p>
+          {% if n.has_retract %}
+            <div class="mt-2 text-xs text-red-700 bg-white/70 rounded p-2 border border-red-200">
+              <b>撤回片段：</b>「{{ n.retract_snippet }}」<br/>
+              <span class="text-red-600">建议人工与主人确认撤回内容是否影响用药/体温结论。</span>
+            </div>
+          {% endif %}
+        </div>
+        {% else %}
+        <p class="text-sm text-slate-400 py-4 text-center">暂无备注。录入新备注会自动识别撤回、用药、体温异常。</p>
+        {% endfor %}
+        <form method="post" action="{{ url_for('add_note', record_id=rec.record_id) }}" class="pt-3 border-t border-slate-100">
+          <label class="block text-xs font-medium text-slate-600 mb-1">材料入口 · 粘贴主人微信原话（每行一条，可直接含撤回痕迹）：</label>
+          <textarea name="raw_text" rows="3" required
+                    placeholder="例如：王女士：今天早上体温37.2，美洛昔康0.5ml早晚。&#10;王女士：撤回了一条消息。&#10;王女士：剂量刚才写错了，是0.3ml。"
+                    class="w-full text-sm rounded-lg border border-slate-300 px-3 py-2 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none"></textarea>
+          <div class="mt-2 flex justify-end">
+            <button type="submit"
+                    class="text-sm px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm font-medium">
+              提交并分析 →
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section class="bg-white border border-slate-200 rounded-xl shadow-sm" id="dosages">
+      <div class="px-5 py-3 border-b border-slate-100 flex items-center justify-between">
+        <h2 class="font-semibold text-slate-900">💊 用药记录</h2>
+        <span class="text-xs text-slate-500">{{ rec.dosages|length }} 条</span>
+      </div>
+      <div class="p-5">
+        {% if rec.dosages %}
+        <table class="w-full text-sm">
+          <thead class="text-xs text-slate-500">
+            <tr class="border-b border-slate-100">
+              <th class="text-left py-2 pr-2 font-medium">药品</th>
+              <th class="text-left py-2 pr-2 font-medium">剂量</th>
+              <th class="text-left py-2 pr-2 font-medium">频次</th>
+              <th class="text-left py-2 pr-2 font-medium hidden sm:table-cell">来源</th>
+              <th class="text-left py-2 font-medium hidden sm:table-cell">记录时间</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            {% for d in rec.dosages %}
+            <tr>
+              <td class="py-2 pr-2 font-medium text-slate-900">{{ d.drug_name }}</td>
+              <td class="py-2 pr-2 text-slate-700">{{ d.dose }}</td>
+              <td class="py-2 pr-2 text-slate-700">{{ d.frequency }}</td>
+              <td class="py-2 pr-2 text-xs text-slate-500 hidden sm:table-cell">{{ d.source }}</td>
+              <td class="py-2 text-xs text-slate-500 hidden sm:table-cell">{{ d.recorded_at }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <p class="text-sm text-slate-400 text-center py-4">暂无用药。在备注里提到剂量/频次时会自动提取。</p>
+        {% endif %}
+      </div>
+    </section>
+
+    <section class="bg-white border border-slate-200 rounded-xl shadow-sm" id="flags">
+      <div class="px-5 py-3 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
+        <h2 class="font-semibold text-slate-900">🚩 疑点 / 卡点 / 人工改判记录 <span class="text-xs font-normal text-slate-500 ml-1">（异常出口）</span></h2>
+        <span class="text-xs text-slate-500">
+          共 {{ rec.flags|length }} · 未处理 {{ unresolved|length }}
+          {% if unresolved_blockers %}· <span class="text-red-600 font-medium">拦截 {{ unresolved_blockers|length }}</span>{% endif %}
+        </span>
+      </div>
+      <div class="p-5 space-y-3">
+        {% for f in rec.flags %}
+        {% set level_color = '' %}
+        {% if f.level == 'blocker' %}{% set level_color = 'border-red-400 bg-red-50/60' %}
+        {% elif f.level == 'warning' %}{% set level_color = 'border-yellow-400 bg-yellow-50/60' %}
+        {% else %}{% set level_color = 'border-blue-300 bg-blue-50/40' %}{% endif %}
+        <div class="rounded-lg border-2 {{ level_color }} p-4 {% if f.resolved %}opacity-70{% endif %}">
+          <div class="flex items-start justify-between gap-2 flex-wrap mb-2">
+            <div class="flex items-center gap-2 flex-wrap">
+              {{ f.level|level_badge|safe }}
+              <h3 class="font-semibold text-slate-900 text-sm">{{ f.title }}</h3>
+              {% if f.resolved %}
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] bg-green-100 text-green-700 border border-green-300">
+                  ✔ 已处理 · {{ f.resolved_by }} · {{ f.resolved_at }}
+                </span>
+              {% endif %}
+            </div>
+            <span class="text-[11px] text-slate-500">{{ f.created_at }}</span>
+          </div>
+          <p class="text-sm text-slate-700 whitespace-pre-line code-block">{{ f.detail }}</p>
+          {% if f.blocked_fields %}
+          <div class="mt-2 text-xs">
+            <span class="text-slate-500">暂时不能放行：</span>
+            {% for bf in f.blocked_fields %}
+              <span class="inline-block bg-red-100 text-red-700 px-2 py-0.5 rounded border border-red-200 mr-1 mt-1">
+                {{ bf }}
+              </span>
+            {% endfor %}
+          </div>
+          {% endif %}
+          {% if f.resolved %}
+          <div class="mt-3 text-xs text-green-800 bg-green-50 rounded border border-green-200 p-2">
+            <b>处理说明：</b>{{ f.resolution_note }}
+          </div>
+          {% else %}
+          <form method="post" action="{{ url_for('resolve_flag', record_id=rec.record_id, flag_id=f.flag_id) }}" class="mt-3 pt-3 border-t border-dashed border-slate-300">
+            <div class="grid sm:grid-cols-4 gap-2">
+              <input name="resolver" placeholder="处理人（如 值班人/阿岑）" required
+                     class="sm:col-span-1 text-sm rounded-md border border-slate-300 px-2 py-1.5 outline-none focus:border-indigo-500" />
+              <input name="note" placeholder="处理说明（必填，为什么可以放行？）" required
+                     class="sm:col-span-2 text-sm rounded-md border border-slate-300 px-2 py-1.5 outline-none focus:border-indigo-500" />
+              <button type="submit"
+                      class="sm:col-span-1 text-sm rounded-md bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 shadow-sm font-medium">
+                确认放行
+              </button>
+            </div>
+          </form>
+          {% endif %}
+        </div>
+        {% else %}
+        <p class="text-sm text-slate-400 text-center py-6">暂无疑点，算法已自动对齐。</p>
+        {% endfor %}
+      </div>
+    </section>
+
+  </div>
+
+  <div class="space-y-5">
+
+    <section class="bg-white border border-slate-200 rounded-xl shadow-sm" id="overrides">
+      <div class="px-5 py-3 border-b border-slate-100">
+        <h2 class="font-semibold text-slate-900">✏️ 人工改判</h2>
+        <p class="text-xs text-slate-500 mt-0.5">永久记入时间线，下一班可追。</p>
+      </div>
+      <div class="p-5 space-y-4">
+        <form method="post" action="{{ url_for('override', record_id=rec.record_id) }}">
+          <div class="space-y-2">
+            <input name="operator" placeholder="操作人（如：阿岑 / 值班人）" required
+                   class="w-full text-sm rounded-md border border-slate-300 px-3 py-2 outline-none focus:border-indigo-500" />
+            <select name="new_status" required
+                    class="w-full text-sm rounded-md border border-slate-300 px-3 py-2 outline-none focus:border-indigo-500 bg-white">
+              <option value="">改判为状态…</option>
+              <option value="pending">待对齐</option>
+              <option value="aligned">信息对齐</option>
+              <option value="flagged">有疑点</option>
+              <option value="blocked">结论拦截</option>
+              <option value="closed">已归档</option>
+            </select>
+            <textarea name="reason" rows="3" required placeholder="改判原因（详细记录，下一班同事会看）"
+                      class="w-full text-sm rounded-md border border-slate-300 px-3 py-2 outline-none focus:border-indigo-500"></textarea>
+            {% if unresolved %}
+            <div class="text-xs text-slate-600 space-y-1 border border-slate-200 rounded p-2 bg-slate-50">
+              <div class="font-medium text-slate-700">本次改判同时放行疑点：</div>
+              {% for f in unresolved %}
+                <label class="flex items-center gap-2 py-0.5">
+                  <input type="checkbox" name="resolve_flag_ids" value="{{ f.flag_id }}" class="rounded"/>
+                  <span class="truncate">{{ f.level|level_badge|safe }} {{ f.title }}</span>
+                </label>
+              {% endfor %}
+            </div>
+            {% endif %}
+            <button type="submit"
+                    class="w-full text-sm py-2 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm font-medium">
+              提交改判（写入时间线）
+            </button>
+          </div>
+        </form>
+        {% if rec.overrides %}
+        <div class="pt-3 border-t border-slate-100 space-y-2">
+          <h4 class="text-xs font-medium text-slate-600">历史改判（{{ rec.overrides|length }}）</h4>
+          {% for ov in rec.overrides %}
+          <div class="rounded-lg border border-indigo-200 bg-indigo-50/40 p-3">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-sm font-semibold text-indigo-800">{{ ov.operator }}</span>
+              <span class="text-[11px] text-slate-500">{{ ov.created_at }}</span>
+            </div>
+            <div class="text-xs text-slate-700">
+              <span class="bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded">{{ ov.old_status }}</span>
+              <span class="mx-1 text-slate-400">→</span>
+              <span class="bg-indigo-200 text-indigo-900 px-1.5 py-0.5 rounded font-medium">{{ ov.new_status }}</span>
+            </div>
+            <p class="text-xs text-slate-700 mt-1.5 whitespace-pre-line code-block">{{ ov.reason }}</p>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+    </section>
+
+    <section class="bg-white border border-slate-200 rounded-xl shadow-sm">
+      <div class="px-5 py-3 border-b border-slate-100">
+        <h2 class="font-semibold text-slate-900">📦 归档关闭</h2>
+      </div>
+      <div class="p-5">
+        {% if rec.status == 'closed' %}
+        <p class="text-sm text-slate-600">✅ 本记录已归档，如有需要仍可在时间线中加备注或改判重新打开。</p>
+        {% else %}
+        <form method="post" action="{{ url_for('close_record', record_id=rec.record_id) }}">
+          <input name="operator" placeholder="归档人"
+                 class="w-full text-sm rounded-md border border-slate-300 px-3 py-2 mb-2 outline-none focus:border-indigo-500"/>
+          <input name="close_note" placeholder="归档备注（如：连续3天稳定）"
+                 class="w-full text-sm rounded-md border border-slate-300 px-3 py-2 mb-2 outline-none focus:border-indigo-500"/>
+          <button type="submit"
+                  class="w-full text-sm py-2 rounded-md bg-slate-800 hover:bg-slate-900 text-white shadow-sm font-medium disabled:opacity-50"
+                  {% if unresolved_blockers %}disabled{% endif %}>
+            {% if unresolved_blockers %}还有拦截疑点，不能关闭{% else %}确认归档{% endif %}
+          </button>
+          {% if unresolved_blockers %}
+          <p class="text-[11px] text-red-600 mt-1">请先处理上方红色卡点再归档。</p>
+          {% endif %}
+        </form>
+        {% endif %}
+      </div>
+    </section>
+
+    <section class="bg-white border border-slate-200 rounded-xl shadow-sm" id="timeline">
+      <div class="px-5 py-3 border-b border-slate-100 flex items-center justify-between">
+        <h2 class="font-semibold text-slate-900">📜 完整时间线</h2>
+        <span class="text-xs text-slate-500">{{ rec.timeline|length }} 条</span>
+      </div>
+      <div class="p-5">
+        <ol class="relative border-l-2 border-slate-200 ml-2 space-y-3">
+          {% for evt in rec.timeline %}
+          {% set color = '' %}
+          {% if evt.event_type == 'blocker' %}{% set color = 'bg-red-500' %}
+          {% elif evt.event_type == 'flag' %}{% set color = 'bg-yellow-500' %}
+          {% elif evt.event_type == 'override' %}{% set color = 'bg-indigo-500' %}
+          {% elif evt.event_type == 'resolve' %}{% set color = 'bg-emerald-500' %}
+          {% elif evt.event_type == 'close' %}{% set color = 'bg-slate-600' %}
+          {% elif evt.event_type == 'dosage' %}{% set color = 'bg-pink-500' %}
+          {% else %}{% set color = 'bg-slate-400' %}{% endif %}
+          <li class="ml-4">
+            <span class="timeline-dot {{ color }} absolute -left-[7px]"></span>
+            <div class="flex items-center justify-between flex-wrap gap-1">
+              <span class="text-xs font-medium text-slate-700">
+                {{ evt.event_type|event_icon }}
+                <span class="uppercase text-[11px] tracking-wide text-slate-500">{{ evt.event_type }}</span>
+                · {{ evt.message }}
+              </span>
+            </div>
+            <div class="flex items-center justify-between flex-wrap gap-1 mt-0.5">
+              <span class="text-[11px] text-slate-400">{{ evt.operator }} · {{ evt.timestamp }}</span>
+              {% if evt.old_status or evt.new_status or evt.drug or evt.flag_id %}
+              <details class="text-[11px]">
+                <summary class="text-indigo-600 hover:underline">字段变更详情 ↓</summary>
+                <pre class="mt-1 text-xs bg-slate-50 border border-slate-200 rounded p-2 text-slate-600 code-block">{% for k, v in evt.items() if k not in ['event_id','event_type','message','operator','timestamp','resolve_flag_ids'] %}{{ k }}: {{ v }}
+{% endfor %}{% if evt.resolve_flag_ids %}同时放行疑点: {{ evt.resolve_flag_ids|join(', ') }}{% endif %}</pre>
+              </details>
+              {% endif %}
+            </div>
+          </li>
+          {% else %}
+          <li class="text-xs text-slate-400 ml-4">暂无事件</li>
+          {% endfor %}
+        </ol>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+{% endblock %}

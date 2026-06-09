@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}新材料 · 异宠温控回访追踪{% endblock %}
+{% block content %}
+
+<div class="max-w-3xl mx-auto">
+  <a href="{{ url_for('index') }}" class="text-sm text-slate-500 hover:text-indigo-600">← 返回汇总</a>
+  <div class="mt-4 bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-indigo-50 to-white">
+      <h1 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+        <span>📥</span> 材料入口 · 新建温控回访记录
+      </h1>
+      <p class="text-xs text-slate-500 mt-1">现场收到什么就按什么填，微信备注原样粘贴，算法会自动对齐并标出问题。</p>
+    </div>
+
+    {% if error %}
+    <div class="mx-6 mt-4 bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">
+      出错：{{ error }}
+    </div>
+    {% endif %}
+
+    <form method="post" class="p-6 space-y-5">
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">宠物名称 <span class="text-red-500">*</span></label>
+          <input name="pet_name" required value="{{ form.get('pet_name','') }}" placeholder="如：雪球"
+                 class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"/>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">异宠种类 <span class="text-red-500">*</span></label>
+          <input name="pet_type" required value="{{ form.get('pet_type','') }}" placeholder="如：龙猫 / 鬃狮蜥 / 刺猬 / 蜜袋鼯 / 貂"
+                 class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"/>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">主人姓名</label>
+          <input name="owner_name" value="{{ form.get('owner_name','') }}" placeholder="如：王女士"
+                 class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"/>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">联系方式 / 微信</label>
+          <input name="owner_contact" value="{{ form.get('owner_contact','') }}" placeholder="如：138****2345 / 微信：wang_xueqiu"
+                 class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"/>
+        </div>
+      </div>
+
+      <div class="grid sm:grid-cols-4 gap-4">
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">初诊体温 (℃)</label>
+          <input name="original_temp" type="number" step="0.1" value="{{ form.get('original_temp','') }}" placeholder="37.8"
+                 class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm tabular-nums outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"/>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">目标最低 (℃)</label>
+          <input name="target_temp_min" type="number" step="0.1" value="{{ form.get('target_temp_min','') }}" placeholder="36.5"
+                 class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm tabular-nums outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"/>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">目标最高 (℃)</label>
+          <input name="target_temp_max" type="number" step="0.1" value="{{ form.get('target_temp_max','') }}" placeholder="37.5"
+                 class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm tabular-nums outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"/>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">当前体温 (℃)</label>
+          <input name="current_temp" type="number" step="0.1" value="{{ form.get('current_temp','') }}" placeholder="37.2"
+                 class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm tabular-nums outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"/>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-medium text-slate-600 mb-1">
+          主人微信备注（可留空，之后在详情页继续补）
+        </label>
+        <textarea name="notes_text" rows="5"
+                  placeholder="粘贴主人的微信原话就行，一行一条。撤回痕迹不要删。&#10;&#10;例：&#10;王女士：雪球今天早上37.2度，比昨天好点了。早上喂了美洛昔康0.5ml，早晚各一次。&#10;王女士：对了，刚才的剂量我发错了撤回了一条消息，应该是美洛昔康0.3ml早晚各一次。"
+                  class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 leading-relaxed"></textarea>
+        <p class="text-[11px] text-slate-500 mt-1">
+          🔍 系统会自动识别：① 撤回记录 → 标警告 ② 用药剂量冲突 → <span class="text-red-600 font-medium">标红拦截、暂不放行结论</span> ③ 体温对不上 → 标疑点
+        </p>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+        <a href="{{ url_for('index') }}"
+           class="text-sm px-4 py-2 rounded-md border border-slate-300 text-slate-700 hover:bg-slate-50">
+          取消
+        </a>
+        <button type="submit"
+                class="text-sm px-5 py-2 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm font-medium">
+          录入并自动分析 →
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

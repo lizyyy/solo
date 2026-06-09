@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block title %}汇总 · 异宠温控回访追踪{% endblock %}
+{% block content %}
+
+<section class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6">
+  <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+    <div class="text-xs text-slate-500 mb-1">回访总数</div>
+    <div class="text-2xl font-bold text-slate-900">{{ stats.total }}</div>
+  </div>
+  <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+    <div class="text-xs text-slate-500 mb-1">有疑点</div>
+    <div class="text-2xl font-bold text-yellow-600">{{ stats.has_flag }}</div>
+  </div>
+  <div class="bg-white rounded-xl border border-red-200 p-4 shadow-sm ring-1 ring-red-50">
+    <div class="text-xs text-red-500 mb-1">🔴 结论拦截（需处理）</div>
+    <div class="text-2xl font-bold text-red-600">{{ stats.has_blocker }}</div>
+  </div>
+  <div class="bg-white rounded-xl border border-indigo-200 p-4 shadow-sm">
+    <div class="text-xs text-indigo-500 mb-1">人工改判记录</div>
+    <div class="text-2xl font-bold text-indigo-600">{{ stats.has_override }}</div>
+  </div>
+</section>
+
+{% if stats.has_blocker > 0 %}
+<div class="mb-5 bg-red-50 border border-red-200 rounded-xl p-4">
+  <div class="flex items-start gap-3">
+    <span class="text-xl">🛑</span>
+    <div class="flex-1">
+      <h3 class="font-semibold text-red-800 text-sm">异常出口：有 {{ stats.has_blocker }} 条结论已被算法拦截</h3>
+      <p class="text-xs text-red-700 mt-1">卡点通常是「用药剂量冲突」「新旧信息对不上」，请先进入对应记录查看疑点说明并人工确认，之后再放行结论。</p>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<section class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+  <div class="px-4 sm:px-5 py-3 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
+    <h2 class="font-semibold text-slate-900">回访列表 <span class="text-xs font-normal text-slate-500 ml-1">（材料入口：点击任一行进入详情）</span></h2>
+    <span class="text-xs text-slate-500">共 {{ records|length }} 条</span>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wide">
+        <tr>
+          <th class="text-left px-4 sm:px-5 py-2.5 font-medium">宠物</th>
+          <th class="text-left px-2 py-2.5 font-medium hidden sm:table-cell">主人</th>
+          <th class="text-center px-2 py-2.5 font-medium">初温</th>
+          <th class="text-center px-2 py-2.5 font-medium">当前</th>
+          <th class="text-center px-2 py-2.5 font-medium">状态</th>
+          <th class="text-center px-2 py-2.5 font-medium">疑点</th>
+          <th class="text-center px-2 py-2.5 font-medium hidden md:table-cell">改判</th>
+          <th class="text-right px-4 sm:px-5 py-2.5 font-medium">操作</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        {% for r in records %}
+        {% set unresolved_flags = r.flags|selectattr("resolved", "equalto", false)|list %}
+        {% set blocker_count = unresolved_flags|selectattr("level", "equalto", "blocker")|list|length %}
+        {% set row_class = '' %}
+        {% if blocker_count > 0 %}{% set row_class = 'bg-red-50/40 hover:bg-red-50' %}
+        {% elif unresolved_flags|length > 0 %}{% set row_class = 'bg-yellow-50/30 hover:bg-yellow-50' %}
+        {% elif r.overrides|length > 0 %}{% set row_class = 'bg-indigo-50/30 hover:bg-indigo-50' %}
+        {% else %}{% set row_class = 'hover:bg-slate-50' %}
+        {% endif %}
+        <tr class="{{ row_class }} transition">
+          <td class="px-4 sm:px-5 py-3">
+            <a href="{{ url_for('record_detail', record_id=r.record_id) }}" class="block">
+              <div class="font-medium text-slate-900">{{ r.pet_name or '—' }}</div>
+              <div class="text-xs text-slate-500">{{ r.pet_type or '—' }}</div>
+              <div class="text-xs text-slate-400 mt-0.5 sm:hidden">{{ r.owner_name or '—' }}</div>
+            </a>
+          </td>
+          <td class="px-2 py-3 text-slate-600 text-xs hidden sm:table-cell">{{ r.owner_name or '—' }}</td>
+          <td class="px-2 py-3 text-center text-slate-700 tabular-nums">{{ r.original_temp or '—' }}</td>
+          <td class="px-2 py-3 text-center tabular-nums">
+            {% set cur = r.current_temp %}
+            {% set ok = (r.target_temp_min <= cur <= r.target_temp_max) if cur and r.target_temp_min else True %}
+            <span class="{{ 'text-green-700' if ok else 'text-orange-600' }} font-medium">
+              {{ cur or '—' }}
+            </span>
+          </td>
+          <td class="px-2 py-3 text-center">{{ r.status|status_badge|safe }}</td>
+          <td class="px-2 py-3 text-center">
+            {% if unresolved_flags %}
+              <div class="flex items-center justify-center gap-1">
+                {% if blocker_count %}
+                  <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-100 text-red-700 text-xs font-bold border border-red-300">{{ blocker_count }}</span>
+                {% endif %}
+                {% set warn = unresolved_flags|selectattr("level", "equalto", "warning")|list|length %}
+                {% if warn %}
+                  <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-yellow-100 text-yellow-700 text-xs font-bold border border-yellow-300">{{ warn }}</span>
+                {% endif %}
+              </div>
+            {% else %}
+              <span class="text-slate-300 text-xs">—</span>
+            {% endif %}
+          </td>
+          <td class="px-2 py-3 text-center text-xs hidden md:table-cell">
+            {% if r.overrides %}
+              <span class="text-indigo-600 font-medium">{{ r.overrides[-1].operator }}</span>
+            {% else %}
+              <span class="text-slate-300">—</span>
+            {% endif %}
+          </td>
+          <td class="px-4 sm:px-5 py-3 text-right">
+            <a href="{{ url_for('record_detail', record_id=r.record_id) }}"
+               class="inline-flex items-center gap-1 text-xs px-3 py-1.5 rounded-md bg-white border border-slate-200 text-slate-700 hover:border-indigo-400 hover:text-indigo-700 transition">
+              查看 →
+            </a>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="8" class="text-center py-16 text-slate-400 text-sm">
+            还没有回访记录，点击右上角「+ 新材料」创建一条。
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="mt-6 grid md:grid-cols-2 gap-4">
+  <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+    <h3 class="font-semibold text-slate-900 mb-2 flex items-center gap-2">
+      <span>📖</span> 怎么上手（给第一次用的同事）
+    </h3>
+    <ol class="text-sm text-slate-600 space-y-1.5 list-decimal list-inside">
+      <li><b>材料入口</b>：顶部「+ 新材料」录入初诊信息，或从本页点击任一宠物进入详情。</li>
+      <li><b>录入备注</b>：详情页「微信备注录入」直接粘贴主人原话，系统会自动识别撤回、用药、体温。</li>
+      <li><b>异常出口</b>：本页上方红色「结论拦截」或详情页标红的疑点卡片，点击进入查看卡点。</li>
+      <li><b>处理疑点</b>：确认清楚后在疑点卡片上填处理人 + 说明 → 「确认放行」。</li>
+      <li><b>人工改判</b>：详情页「人工改判」填写操作人 + 新状态 + 原因，时间线会永久记录。</li>
+      <li><b>历史追溯</b>：详情页底部「时间线」包含本次全部事件，支持下一班交接。</li>
+    </ol>
+  </div>
+  <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+    <h3 class="font-semibold text-slate-900 mb-2 flex items-center gap-2">
+      <span>🧪</span> 试跑样例说明
+    </h3>
+    <ul class="text-sm text-slate-600 space-y-1.5">
+      <li>🐱 <b>雪球（龙猫）</b>：微信备注含「撤回了一条消息」且剂量 0.5ml → 0.3ml，<span class="text-red-600 font-medium">结论拦截</span>。</li>
+      <li>🦎 <b>豆豆（鬃狮蜥）</b>：体温 36.8℃ / 37.5℃ 对不上，<span class="text-yellow-700">有疑点</span>。</li>
+      <li>🦔 <b>胖胖（刺猬）</b>：训练师「阿岑」<span class="text-indigo-600 font-medium">人工改判</span>，时间线可查原因。</li>
+      <li>🦦 <b>皮皮（安格鲁貂）</b>：正常对齐，<span class="text-green-700">已归档</span>。</li>
+      <li>🐿 <b>团子（蜜袋鼯）</b>：备注内嵌「[撤回]」、多种用药自动提取。</li>
+    </ul>
+  </div>
+</section>
+
+{% endblock %}

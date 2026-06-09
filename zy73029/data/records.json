@@ -1,0 +1,399 @@
+{
+  "records": [
+    {
+      "record_id": "264878be7a30",
+      "pet_name": "团子",
+      "pet_type": "蜜袋鼯",
+      "owner_name": "小周",
+      "owner_contact": "微信：zhou_tuanzi",
+      "original_temp": 35.8,
+      "target_temp_min": 35.5,
+      "target_temp_max": 36.5,
+      "current_temp": 36.2,
+      "status": "flagged",
+      "wechat_notes": [
+        {
+          "raw_text": "小周：团子今天测了36.2，还好。[撤回] 那个我说错了，钙液是1滴不是2滴。对，钙液1滴每天。维生素A每天1粒。",
+          "has_retract": true,
+          "retract_snippet": "小周：团子今天测了36.2，还好。[撤回] 那个我说错了，钙液是1滴不是2滴。对，",
+          "recorded_at": "2026-06-09 07:46:27"
+        },
+        {
+          "raw_text": "小周：对了上次开的驱虫药吃半片，每周一次。",
+          "has_retract": false,
+          "retract_snippet": "",
+          "recorded_at": "2026-06-09 07:46:27"
+        }
+      ],
+      "dosages": [
+        {
+          "drug_name": "口服药",
+          "dose": "半片",
+          "frequency": "遵医嘱",
+          "recorded_at": "2026-06-09 07:46:27",
+          "source": "parsed_from_note"
+        }
+      ],
+      "flags": [
+        {
+          "flag_id": "7accc1ec1831",
+          "flag_type": "retract_in_note",
+          "level": "warning",
+          "title": "微信备注含撤回记录",
+          "detail": "主人备注中检测到撤回消息片段：「小周：团子今天测了36.2，还好。[撤回] 那个我说错了，钙液是1滴不是2滴。对，」。请人工确认撤回内容是否影响已有结论。",
+          "blocked_fields": [],
+          "created_at": "2026-06-09 07:46:27",
+          "resolved": false,
+          "resolved_by": "",
+          "resolved_at": "",
+          "resolution_note": ""
+        }
+      ],
+      "overrides": [],
+      "timeline": [
+        {
+          "event_id": "05c51732b3e9",
+          "event_type": "create",
+          "message": "创建温控回访记录：团子(蜜袋鼯)，初温 35.8℃",
+          "operator": "system",
+          "timestamp": "2026-06-09 07:46:27"
+        },
+        {
+          "event_id": "34139b384760",
+          "event_type": "flag",
+          "message": "⚠ 检测到撤回记录：小周：团子今天测了36.2，还好。[撤回] 那个我说错了，钙液是1滴不是2滴。对",
+          "operator": "system",
+          "timestamp": "2026-06-09 07:46:27",
+          "flag_id": "7accc1ec1831"
+        },
+        {
+          "event_id": "2b965502199a",
+          "event_type": "dosage",
+          "message": "新增用药：口服药 半片 遵医嘱",
+          "operator": "system",
+          "timestamp": "2026-06-09 07:46:27",
+          "source": "parsed_from_note"
+        }
+      ],
+      "created_at": "2026-06-09 07:46:27",
+      "updated_at": "2026-06-09 07:46:27"
+    },
+    {
+      "record_id": "14e9d2700654",
+      "pet_name": "皮皮",
+      "pet_type": "安格鲁貂",
+      "owner_name": "赵先生",
+      "owner_contact": "137****0011",
+      "original_temp": 39.1,
+      "target_temp_min": 37.8,
+      "target_temp_max": 39.0,
+      "current_temp": 38.5,
+      "status": "closed",
+      "wechat_notes": [
+        {
+          "raw_text": "赵先生：皮皮今天食欲正常，38.5度。阿莫西林片半片 bid。",
+          "has_retract": false,
+          "retract_snippet": "",
+          "recorded_at": "2026-06-09 07:46:27"
+        }
+      ],
+      "dosages": [],
+      "flags": [],
+      "overrides": [],
+      "timeline": [
+        {
+          "event_id": "fc68f644976b",
+          "event_type": "create",
+          "message": "创建温控回访记录：皮皮(安格鲁貂)，初温 39.1℃",
+          "operator": "system",
+          "timestamp": "2026-06-09 07:46:27"
+        },
+        {
+          "event_id": "18e3fe14f423",
+          "event_type": "close",
+          "message": "归档关闭：aligned → closed | 连续3天体温稳定，用药无误，归档。",
+          "operator": "系统",
+          "timestamp": "2026-06-09 07:46:27"
+        }
+      ],
+      "created_at": "2026-06-09 07:46:27",
+      "updated_at": "2026-06-09 07:46:27"
+    },
+    {
+      "record_id": "b1af2daf4821",
+      "pet_name": "胖胖",
+      "pet_type": "非洲迷你刺猬",
+      "owner_name": "陈小姐",
+      "owner_contact": "微信：cjj_pangpang",
+      "original_temp": 35.2,
+      "target_temp_min": 35.0,
+      "target_temp_max": 37.0,
+      "current_temp": 36.1,
+      "status": "flagged",
+      "wechat_notes": [
+        {
+          "raw_text": "陈小姐：胖胖昨晚活动少，今早测36.1度。益生菌1袋每天一次。",
+          "has_retract": false,
+          "retract_snippet": "",
+          "recorded_at": "2026-06-09 07:46:27"
+        }
+      ],
+      "dosages": [
+        {
+          "drug_name": "益生菌",
+          "dose": "1袋",
+          "frequency": "天",
+          "recorded_at": "2026-06-09 07:46:27",
+          "source": "parsed_from_note"
+        }
+      ],
+      "flags": [
+        {
+          "flag_id": "f2ec30cab9d8",
+          "flag_type": "manual_override",
+          "level": "info",
+          "title": "阿岑 人工改判",
+          "detail": "状态：aligned → flagged\n原因：现场电话回访胖胖主人时，主人临时补充：昨晚实际体温偏低到34.9，之前微信里忘了提，因此需要再观察24h。原结论'已达标'改判为'继续追踪'。\n（此为人工改判记录，算法结论请结合上下文审阅）",
+          "blocked_fields": [],
+          "created_at": "2026-06-09 07:46:27",
+          "resolved": true,
+          "resolved_by": "阿岑",
+          "resolved_at": "2026-06-09 07:46:27",
+          "resolution_note": "现场电话回访胖胖主人时，主人临时补充：昨晚实际体温偏低到34.9，之前微信里忘了提，因此需要再观察24h。原结论'已达标'改判为'继续追踪'。"
+        }
+      ],
+      "overrides": [
+        {
+          "override_id": "f0f50d3d9c45",
+          "operator": "阿岑",
+          "old_status": "aligned",
+          "new_status": "flagged",
+          "reason": "现场电话回访胖胖主人时，主人临时补充：昨晚实际体温偏低到34.9，之前微信里忘了提，因此需要再观察24h。原结论'已达标'改判为'继续追踪'。",
+          "created_at": "2026-06-09 07:46:27"
+        }
+      ],
+      "timeline": [
+        {
+          "event_id": "0a5f39487b29",
+          "event_type": "create",
+          "message": "创建温控回访记录：胖胖(非洲迷你刺猬)，初温 35.2℃",
+          "operator": "system",
+          "timestamp": "2026-06-09 07:46:27"
+        },
+        {
+          "event_id": "e741ea72e3af",
+          "event_type": "dosage",
+          "message": "新增用药：益生菌 1袋 天",
+          "operator": "system",
+          "timestamp": "2026-06-09 07:46:27",
+          "source": "parsed_from_note"
+        },
+        {
+          "event_id": "0f3322337f47",
+          "event_type": "override",
+          "message": "✏️ 阿岑 改判：aligned → flagged | 原因：现场电话回访胖胖主人时，主人临时补充：昨晚实际体温偏低到34.9，之前微信里忘了提，因此需要再观察24h。原结论'已达标'改判为'继续追踪'。",
+          "operator": "阿岑",
+          "timestamp": "2026-06-09 07:46:27",
+          "override_id": "f0f50d3d9c45",
+          "old_status": "aligned",
+          "new_status": "flagged",
+          "reason": "现场电话回访胖胖主人时，主人临时补充：昨晚实际体温偏低到34.9，之前微信里忘了提，因此需要再观察24h。原结论'已达标'改判为'继续追踪'。",
+          "resolve_flag_ids": []
+        }
+      ],
+      "created_at": "2026-06-09 07:46:27",
+      "updated_at": "2026-06-09 07:46:27"
+    },
+    {
+      "record_id": "0a8d83ffcdce",
+      "pet_name": "豆豆",
+      "pet_type": "鬃狮蜥",
+      "owner_name": "李先生",
+      "owner_contact": "139****7788",
+      "original_temp": 38.5,
+      "target_temp_min": 35.0,
+      "target_temp_max": 38.0,
+      "current_temp": 36.8,
+      "status": "flagged",
+      "wechat_notes": [
+        {
+          "raw_text": "李先生：豆豆晒灯后测了36.8度，状态还行。喂食正常。",
+          "has_retract": false,
+          "retract_snippet": "",
+          "recorded_at": "2026-06-09 07:46:27"
+        },
+        {
+          "raw_text": "李先生：补：今天下午又测了一次是37.5度，刚才说的36.8度是上午的。",
+          "has_retract": false,
+          "retract_snippet": "",
+          "recorded_at": "2026-06-09 07:46:27"
+        }
+      ],
+      "dosages": [],
+      "flags": [
+        {
+          "flag_id": "a4080003f2cb",
+          "flag_type": "note_alignment",
+          "level": "warning",
+          "title": "体温记录对不上",
+          "detail": "系统记录当前体温 36.8℃，备注中提到 37.5℃，差值 0.7℃。请确认以哪次测量为准。",
+          "blocked_fields": [
+            "current_temp"
+          ],
+          "created_at": "2026-06-09 07:46:27",
+          "resolved": false,
+          "resolved_by": "",
+          "resolved_at": "",
+          "resolution_note": ""
+        }
+      ],
+      "overrides": [],
+      "timeline": [
+        {
+          "event_id": "16a6ad944bc2",
+          "event_type": "create",
+          "message": "创建温控回访记录：豆豆(鬃狮蜥)，初温 38.5℃",
+          "operator": "system",
+          "timestamp": "2026-06-09 07:46:27"
+        },
+        {
+          "event_id": "c5edaa200987",
+          "event_type": "flag",
+          "message": "⚠ 体温不一致：系统 36.8℃ vs 备注 37.5℃",
+          "operator": "system",
+          "timestamp": "2026-06-09 07:46:27",
+          "flag_id": "a4080003f2cb",
+          "sys_temp": 36.8,
+          "note_temp": 37.5
+        }
+      ],
+      "created_at": "2026-06-09 07:46:27",
+      "updated_at": "2026-06-09 07:46:27"
+    },
+    {
+      "record_id": "ed1ecc10e175",
+      "pet_name": "雪球",
+      "pet_type": "龙猫",
+      "owner_name": "王女士",
+      "owner_contact": "138****2345 / 微信：wang_xueqiu",
+      "original_temp": 37.8,
+      "target_temp_min": 36.5,
+      "target_temp_max": 37.5,
+      "current_temp": 37.2,
+      "status": "blocked",
+      "wechat_notes": [
+        {
+          "raw_text": "王女士：雪球今天早上37.2度，比昨天好点了。早上喂了美洛昔康0.5ml，早晚各一次。",
+          "has_retract": false,
+          "retract_snippet": "",
+          "recorded_at": "2026-06-09 07:46:27"
+        },
+        {
+          "raw_text": "王女士：对了，刚才的剂量我发错了撤回了一条消息，应该是美洛昔康0.3ml早晚各一次。之前医生开的是0.5ml但是雪球体重轻。",
+          "has_retract": true,
+          "retract_snippet": "王女士：对了，刚才的剂量我发错了撤回了一条消息，应该是美洛昔康0.3ml早晚各一次。之",
+          "recorded_at": "2026-06-09 07:46:27"
+        }
+      ],
+      "dosages": [
+        {
+          "drug_name": "美洛昔康",
+          "dose": "0.5ml",
+          "frequency": "遵医嘱",
+          "recorded_at": "2026-06-09 07:46:27",
+          "source": "parsed_from_note"
+        },
+        {
+          "drug_name": "美洛昔康",
+          "dose": "0.3ml",
+          "frequency": "早晚",
+          "recorded_at": "2026-06-09 07:46:27",
+          "source": "parsed_from_note"
+        }
+      ],
+      "flags": [
+        {
+          "flag_id": "bbe15f30dbc1",
+          "flag_type": "retract_in_note",
+          "level": "warning",
+          "title": "微信备注含撤回记录",
+          "detail": "主人备注中检测到撤回消息片段：「王女士：对了，刚才的剂量我发错了撤回了一条消息，应该是美洛昔康0.3ml早晚各一次。之」。请人工确认撤回内容是否影响已有结论。",
+          "blocked_fields": [],
+          "created_at": "2026-06-09 07:46:27",
+          "resolved": false,
+          "resolved_by": "",
+          "resolved_at": "",
+          "resolution_note": ""
+        },
+        {
+          "flag_id": "54bb5d2060f2",
+          "flag_type": "dosage_changed",
+          "level": "blocker",
+          "title": "用药剂量变更：美洛昔康",
+          "detail": "原记录：美洛昔康 0.5ml 遵医嘱（来源：parsed_from_note）\n新备注：美洛昔康 0.3ml 早晚（来源：微信备注）\n⚠ 卡点：剂量/频次不一致，用药结论暂不能放行，需训练师确认后再归档。",
+          "blocked_fields": [
+            "dosages",
+            "status",
+            "conclusion"
+          ],
+          "created_at": "2026-06-09 07:46:27",
+          "resolved": false,
+          "resolved_by": "",
+          "resolved_at": "",
+          "resolution_note": ""
+        }
+      ],
+      "overrides": [],
+      "timeline": [
+        {
+          "event_id": "bb73b0dd1c88",
+          "event_type": "create",
+          "message": "创建温控回访记录：雪球(龙猫)，初温 37.8℃",
+          "operator": "system",
+          "timestamp": "2026-06-09 07:46:27"
+        },
+        {
+          "event_id": "1eeee5416b5f",
+          "event_type": "dosage",
+          "message": "新增用药：美洛昔康 0.5ml 遵医嘱",
+          "operator": "system",
+          "timestamp": "2026-06-09 07:46:27",
+          "source": "parsed_from_note"
+        },
+        {
+          "event_id": "44cd758a0e01",
+          "event_type": "flag",
+          "message": "⚠ 检测到撤回记录：王女士：对了，刚才的剂量我发错了撤回了一条消息，应该是美洛昔康0.3ml早晚各一",
+          "operator": "system",
+          "timestamp": "2026-06-09 07:46:27",
+          "flag_id": "bbe15f30dbc1"
+        },
+        {
+          "event_id": "b59d291c4462",
+          "event_type": "blocker",
+          "message": "🛑 用药剂量冲突：美洛昔康 0.5ml → 0.3ml，结论暂不放行",
+          "operator": "system",
+          "timestamp": "2026-06-09 07:46:27",
+          "flag_id": "54bb5d2060f2",
+          "drug": "美洛昔康",
+          "old": "0.5ml 遵医嘱",
+          "new": "0.3ml 早晚"
+        },
+        {
+          "event_id": "40549a12cde1",
+          "event_type": "dosage",
+          "message": "初始化对齐用药：美洛昔康 0.3ml 早晚",
+          "operator": "system",
+          "timestamp": "2026-06-09 07:46:27"
+        }
+      ],
+      "created_at": "2026-06-09 07:46:27",
+      "updated_at": "2026-06-09 07:46:27"
+    }
+  ],
+  "meta": {
+    "version": 1,
+    "created_at": "2026-06-09 07:46:27",
+    "updated_at": "2026-06-09 07:46:27"
+  }
+}
