@@ -1,0 +1,15 @@
+{
+  "name": "shield-cutterhead-warning",
+  "version": "1.0.0",
+  "description": "盾构刀盘阈值预警系统 - 设备编号统一化、统一数据源、异常挂起与交接流程",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "node --test dist/tests/",
+    "demo": "node dist/demo.js"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0",
+    "@types/node": "^20.10.0"
+  }
+}
