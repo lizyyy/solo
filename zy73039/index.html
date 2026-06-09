@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>流浪动物救助回访追踪</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="logo">🐾</span>
+    <div>
+      <h1>流浪动物救助回访追踪</h1>
+      <p class="subtitle">主人微信备注 · 用药提醒 · 材料口径追踪 · 异常挂起</p>
+    </div>
+  </div>
+  <div class="top-actions">
+    <button id="btn-import-entry" class="btn btn-primary">+ 新材料入口</button>
+    <button id="btn-clear" class="btn btn-ghost" title="清空全部本地数据">清空数据</button>
+  </div>
+</header>
+
+<main class="container">
+
+  <section class="summary" aria-label="页面摘要">
+    <h2 class="section-title">页面摘要</h2>
+    <div class="summary-grid">
+      <div class="sum-card sum-cleared">
+        <div class="sum-num" id="sum-cleared">0</div>
+        <div class="sum-label">已放行</div>
+        <div class="sum-desc">确认通过、可归档</div>
+      </div>
+      <div class="sum-card sum-pending">
+        <div class="sum-num" id="sum-pending">0</div>
+        <div class="sum-label">待补证据</div>
+        <div class="sum-desc">首次导入、等确认</div>
+      </div>
+      <div class="sum-card sum-human">
+        <div class="sum-num" id="sum-human">0</div>
+        <div class="sum-label">人工改过</div>
+        <div class="sum-desc">有手改痕迹、需留意</div>
+      </div>
+      <div class="sum-card sum-hang">
+        <div class="sum-num" id="sum-hang">0</div>
+        <div class="sum-label">挂起中</div>
+        <div class="sum-desc">体重/口径冲突、等接手同事</div>
+      </div>
+      <div class="sum-card sum-revoked">
+        <div class="sum-num" id="sum-revoked">0</div>
+        <div class="sum-label">已撤回</div>
+        <div class="sum-desc">已作废、留痕可查</div>
+      </div>
+      <div class="sum-card sum-total">
+        <div class="sum-num" id="sum-total">0</div>
+        <div class="sum-label">总记录</div>
+        <div class="sum-desc">含所有状态</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="import-panel" id="import-panel" aria-label="材料导入入口">
+    <h2 class="section-title with-hint">
+      材料导入入口
+      <span class="hint">阿宁把主人微信备注、晚到附件、口头说明一起丢到这里即可</span>
+    </h2>
+    <form id="form-import" class="import-form">
+      <div class="form-row">
+        <div class="form-col">
+          <label>主人微信备注 <em>*</em></label>
+          <input type="text" name="ownerWechat" required placeholder="例：金毛-王阿姨-望京" />
+          <small>用于关联主人，同时也是用药提醒的接收方</small>
+        </div>
+        <div class="form-col">
+          <label>动物姓名/编号</label>
+          <input type="text" name="animalName" placeholder="例：旺财 / A023" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-col">
+          <label>回访体重</label>
+          <input type="text" name="weight" placeholder="例：5.2kg 或 5200g 或 11.45lb" />
+          <small>kg/g/lb 混写会自动挂起，请接手同事确认</small>
+        </div>
+        <div class="form-col">
+          <label>回访日期</label>
+          <input type="date" name="visitDate" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-col form-col-full">
+          <label>用药提醒</label>
+          <textarea name="medReminder" rows="2" placeholder="例：每日两次阿莫西林，7天后复查血常规"></textarea>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-col">
+          <label>主人微信备注（原始文本）</label>
+          <textarea name="wechatNote" rows="3" placeholder="直接粘贴微信聊天里的备注原文即可"></textarea>
+        </div>
+        <div class="form-col">
+          <label>晚到附件（描述/链接）</label>
+          <textarea name="attachment" rows="3" placeholder="例：化验单拍照已补，文件名 20260609-血检.jpg"></textarea>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-col form-col-full">
+          <label>临时口头说明</label>
+          <textarea name="verbalNote" rows="2" placeholder="例：主人电话里说食欲正常，未呕吐，大便成型"></textarea>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary btn-lg">导入记录</button>
+        <button type="reset" class="btn btn-ghost">清空表单</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="list-section">
+    <div class="list-header">
+      <h2 class="section-title">回访记录列表</h2>
+      <div class="filter-bar">
+        <button class="chip active" data-filter="all">全部</button>
+        <button class="chip" data-filter="pending">待补证据</button>
+        <button class="chip" data-filter="cleared">已放行</button>
+        <button class="chip" data-filter="hang">挂起中</button>
+        <button class="chip" data-filter="human">人工改过</button>
+        <button class="chip" data-filter="revoked">已撤回</button>
+      </div>
+    </div>
+    <div id="record-list" class="record-list">
+      <div class="empty-tip">暂无记录，从上方「材料导入入口」开始。</div>
+    </div>
+  </section>
+
+  <section class="anomaly-section">
+    <h2 class="section-title with-hint">
+      异常出口
+      <span class="hint">接手同事通常先扫汇总再追这里的明细，数字变动也能追到原因</span>
+    </h2>
+    <div id="anomaly-list" class="anomaly-list">
+      <div class="empty-tip">暂无异常。</div>
+    </div>
+  </section>
+</main>
+
+<div id="modal" class="modal" hidden>
+  <div class="modal-mask" data-close></div>
+  <div class="modal-panel">
+    <div class="modal-head">
+      <h3 id="modal-title">详情</h3>
+      <button class="modal-close" data-close>×</button>
+    </div>
+    <div id="modal-body" class="modal-body"></div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
