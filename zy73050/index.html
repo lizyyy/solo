@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>塔吊维保工单回放系统</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-left">
+      <div class="logo">
+        <svg viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="4" y1="28" x2="28" y2="28"></line>
+          <line x1="8" y1="28" x2="8" y2="4"></line>
+          <line x1="8" y1="4" x2="26" y2="4"></line>
+          <line x1="14" y1="28" x2="14" y2="4"></line>
+          <path d="M18 8 L22 8 L22 14 L18 14 Z" fill="currentColor" fill-opacity="0.2"></path>
+        </svg>
+      </div>
+      <div>
+        <h1 class="app-title">塔吊维保工单回放</h1>
+        <p class="app-subtitle">Tower Crane Maintenance Work Order Replay System</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="status-chips" id="statusChips"></div>
+      <button class="btn btn-primary" id="btnExport" title="重新导出当前视图">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        <span>重新导出</span>
+      </button>
+      <button class="btn btn-ghost" id="btnGuide" title="接手引导说明">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        <span>引导</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <h3 class="section-title">工单分类筛选</h3>
+        <div class="filter-tabs" id="filterTabs">
+          <button class="tab active" data-filter="all">
+            <span class="tab-label">全部工单</span>
+            <span class="tab-count" id="count-all">0</span>
+          </button>
+          <button class="tab" data-filter="confirmed">
+            <span class="dot dot-green"></span>
+            <span class="tab-label">已确认</span>
+            <span class="tab-count" id="count-confirmed">0</span>
+          </button>
+          <button class="tab" data-filter="pending">
+            <span class="dot dot-amber"></span>
+            <span class="tab-label">待补件</span>
+            <span class="tab-count" id="count-pending">0</span>
+          </button>
+          <button class="tab" data-filter="returned">
+            <span class="dot dot-rose"></span>
+            <span class="tab-label">退回记录</span>
+            <span class="tab-count" id="count-returned">0</span>
+          </button>
+          <button class="tab tab-warning" data-filter="abnormal">
+            <span class="warn-icon">⚠</span>
+            <span class="tab-label">采样断档</span>
+            <span class="tab-count" id="count-abnormal">0</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <h3 class="section-title">工单列表</h3>
+        <div class="search-box">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="searchInput" placeholder="搜索工单编号 / 塔吊编号..." />
+        </div>
+        <div class="workorder-list" id="workorderList"></div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <div class="detail-header" id="detailHeader"></div>
+
+      <div class="detail-sections">
+        <section class="detail-card" id="card-parts">
+          <div class="card-header">
+            <div class="card-title-group">
+              <span class="card-badge">①</span>
+              <h2 class="card-title">备件清单</h2>
+              <span class="card-hint">材料区 · 含历史备注与旧版本截图</span>
+            </div>
+            <div class="card-actions">
+              <button class="btn btn-sm" id="btnUploadRemark">补录备注</button>
+              <button class="btn btn-sm" id="btnUploadScreenshot">上传截图</button>
+            </div>
+          </div>
+          <div class="card-body" id="partsList"></div>
+        </section>
+
+        <section class="detail-card" id="card-sampling">
+          <div class="card-header">
+            <div class="card-title-group">
+              <span class="card-badge card-badge-warn">②</span>
+              <h2 class="card-title">采样记录</h2>
+              <span class="card-hint">异常区 · 采样断档已单独标注</span>
+            </div>
+            <div class="card-actions">
+              <span class="legend-item">
+                <span class="dot dot-green"></span>正常
+              </span>
+              <span class="legend-item">
+                <span class="dot dot-rose"></span>断档
+              </span>
+            </div>
+          </div>
+          <div class="card-body" id="samplingList"></div>
+        </section>
+
+        <section class="detail-card detail-card-wide" id="card-timeline">
+          <div class="card-header">
+            <div class="card-title-group">
+              <span class="card-badge card-badge-blue">③</span>
+              <h2 class="card-title">历史时间线</h2>
+              <span class="card-hint">处理状态与人工改判全程追溯</span>
+            </div>
+            <div class="card-actions">
+              <label class="toggle-switch">
+                <input type="checkbox" id="toggleOverride" checked />
+                <span class="slider"></span>
+                <span class="toggle-label">显示人工改判</span>
+              </label>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="timeline" id="timeline"></div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Duplicate Submission Detection Modal -->
+  <div class="modal" id="duplicateModal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-box modal-box-warn">
+      <div class="modal-icon">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+      </div>
+      <h3 class="modal-title">检测到重复提交</h3>
+      <p class="modal-desc" id="duplicateDesc">该边界样本已存在记录，系统已自动去重，未计入重复数量。</p>
+      <div class="modal-info" id="duplicateInfo"></div>
+      <div class="modal-actions">
+        <button class="btn btn-primary" id="btnDupConfirm">我知道了</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Onboarding Guide Modal -->
+  <div class="modal" id="guideModal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-box modal-box-guide">
+      <div class="modal-header">
+        <h3 class="modal-title">📚 接手引导 · 使用说明</h3>
+        <button class="modal-close" id="btnCloseGuide">×</button>
+      </div>
+      <div class="guide-steps" id="guideSteps"></div>
+      <div class="modal-actions modal-actions-between">
+        <button class="btn btn-ghost" id="btnGuidePrev">上一步</button>
+        <div class="guide-dots" id="guideDots"></div>
+        <button class="btn btn-primary" id="btnGuideNext">下一步</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Version History Modal -->
+  <div class="modal" id="versionModal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-box modal-box-large">
+      <div class="modal-header">
+        <h3 class="modal-title" id="versionModalTitle">历史版本</h3>
+        <button class="modal-close" id="btnCloseVersion">×</button>
+      </div>
+      <div class="card-body" id="versionList"></div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="js/data.js?v=2"></script>
+  <script src="js/core.js?v=2"></script>
+  <script src="js/timeline.js?v=2"></script>
+  <script src="js/ui.js?v=2"></script>
+  <script src="js/app.js?v=2"></script>
+</body>
+</html>
