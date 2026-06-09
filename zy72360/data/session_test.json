@@ -1,0 +1,213 @@
+{
+  "session_name": "无人船横摇周期-夜间批次",
+  "saved_time": "2026-06-09T09:19:50.127779",
+  "created_time": "2026-06-09T09:19:50.127094",
+  "sampling_records": [
+    {
+      "record_id": "SAMPLE-001",
+      "ship_id": "SHIP-A",
+      "sensor_id": "SENSOR-A01",
+      "sampling_interval": 0.045,
+      "sampling_start_time": "2026-06-08T20:00:00",
+      "sampling_end_time": "2026-06-08T22:00:00",
+      "roll_periods": [
+        12.5,
+        12.3,
+        12.6,
+        12.4,
+        12.5
+      ],
+      "import_time": "2026-06-09T09:19:50.127111",
+      "import_user": "操作员张三",
+      "status": "已修正",
+      "sensor_status": "原始编号",
+      "previous_sensor_id": null,
+      "is_supplementary": false,
+      "original_record_id": null,
+      "remarks": "发现与校准记录[CAL-A001]冲突；",
+      "original_sampling_interval": 0.05,
+      "correction_reason": "",
+      "next_handler": "安全员王五复核后归档",
+      "version": 4,
+      "last_modified_time": "2026-06-09T09:19:50.127527",
+      "last_modified_by": "",
+      "supplementary_ids": [],
+      "related_calibration_ids": [
+        "CAL-A001"
+      ],
+      "related_reminder_ids": [
+        "221b97e1-1c05-4346-bf59-b2ef7d37fc33",
+        "660f6681-bd59-4a65-91ed-529fcb2627f2"
+      ],
+      "related_conflict_ids": [
+        "d123751a-14e5-402e-95da-37333859f9cf"
+      ],
+      "review_infos": [
+        {
+          "field_name": "sampling_interval",
+          "original_value": 0.05,
+          "corrected_value": 0.045,
+          "reason": "冲突处理：确认冲突存在，采用折中0.045s",
+          "next_handler": "安全员王五复核后归档",
+          "handled_by": "质检员小白",
+          "handled_time": "2026-06-09T09:19:50.127516",
+          "result": "确认冲突存在，采用折中0.045s"
+        }
+      ]
+    }
+  ],
+  "calibration_records": [
+    {
+      "calibration_id": "CAL-A001",
+      "ship_id": "SHIP-A",
+      "sensor_id": "SENSOR-A01",
+      "calibration_time": "2026-06-08T18:00:00",
+      "effective_sampling_interval": 0.04,
+      "calibration_temperature": 32.5,
+      "operator": "校准员李四",
+      "remarks": "夜航高温导致采样频率偏移",
+      "related_sampling_record_ids": [
+        "SAMPLE-001"
+      ],
+      "affected_conflict_ids": [
+        "d123751a-14e5-402e-95da-37333859f9cf"
+      ]
+    }
+  ],
+  "estimates": [],
+  "safety_reminders": [
+    {
+      "reminder_id": "221b97e1-1c05-4346-bf59-b2ef7d37fc33",
+      "related_record_id": "SAMPLE-001",
+      "level": "中",
+      "title": "采样间隔冲突待确认",
+      "content": "采样记录声明的间隔(0.05s)与温度校准后的有效间隔(0.04s)不一致",
+      "created_time": "2026-06-09T09:19:50.127424",
+      "reviewed": false,
+      "reviewed_by": null,
+      "reviewed_time": null,
+      "related_conflict_id": "d123751a-14e5-402e-95da-37333859f9cf",
+      "reminder_type": "interval_conflict",
+      "next_step": "联系质检员小白确认采用哪个间隔值",
+      "original_value": 0.05,
+      "current_value": 0.04
+    },
+    {
+      "reminder_id": "660f6681-bd59-4a65-91ed-529fcb2627f2",
+      "related_record_id": "SAMPLE-001",
+      "level": "中",
+      "title": "记录已修正待后续处理",
+      "content": "采样间隔已从0.05修正为0.045s，原因：，下一步处理：安全员王五复核后归档",
+      "created_time": "2026-06-09T09:19:50.127657",
+      "reviewed": false,
+      "reviewed_by": null,
+      "reviewed_time": null,
+      "related_conflict_id": null,
+      "reminder_type": "corrected",
+      "next_step": "安全员王五复核后归档",
+      "original_value": 0.05,
+      "current_value": 0.045
+    }
+  ],
+  "conflicts": [
+    {
+      "conflict_id": "d123751a-14e5-402e-95da-37333859f9cf",
+      "sampling_record_id": "SAMPLE-001",
+      "calibration_id": "CAL-A001",
+      "conflict_type": "采样间隔与温度校准冲突",
+      "description": "采样记录声明的间隔(0.05s)与温度校准后的有效间隔(0.04s)不一致",
+      "sampling_value": 0.05,
+      "calibration_value": 0.04,
+      "discovered_time": "2026-06-09T09:19:50.127262",
+      "resolved": true,
+      "resolution": "确认冲突存在，采用折中0.045s",
+      "resolved_by": "质检员小白",
+      "resolved_time": "2026-06-09T09:19:50.127515",
+      "original_status": "冲突待确认",
+      "corrected_status": "已修正",
+      "handler_after_resolve": "安全员王五复核后归档",
+      "result_summary": "采样间隔已从0.05s修正为0.045s",
+      "reminder_id": "221b97e1-1c05-4346-bf59-b2ef7d37fc33"
+    }
+  ],
+  "self_check_results": {
+    "duplicate_import": [],
+    "sensor_id_change": [],
+    "supplementary_recalc": [],
+    "export_consistency": []
+  },
+  "history_log": [
+    {
+      "timestamp": "2026-06-09T09:19:50.127136",
+      "action": "导入采样记录",
+      "record_id": "SAMPLE-001",
+      "details": {
+        "check_issues": [],
+        "has_conflict": false,
+        "initial_status": "正常",
+        "is_supplementary": false,
+        "original_record_id": null
+      }
+    },
+    {
+      "timestamp": "2026-06-09T09:19:50.127269",
+      "action": "校准触发冲突",
+      "record_id": "SAMPLE-001",
+      "details": {
+        "conflict_id": "d123751a-14e5-402e-95da-37333859f9cf",
+        "calibration_id": "CAL-A001",
+        "old_status": "冲突待确认",
+        "new_status": "冲突待确认",
+        "sampling_value": 0.05,
+        "calibration_value": 0.04
+      }
+    },
+    {
+      "timestamp": "2026-06-09T09:19:50.127273",
+      "action": "导入温度校准记录",
+      "record_id": null,
+      "details": {
+        "calibration_id": "CAL-A001",
+        "new_conflicts_count": 1,
+        "affected_records": [
+          "SAMPLE-001"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-06-09T09:19:50.127437",
+      "action": "更新安全提醒",
+      "record_id": null,
+      "details": {
+        "operator": "质检员小白",
+        "new_reminders": 1,
+        "total_pending": 1
+      }
+    },
+    {
+      "timestamp": "2026-06-09T09:19:50.127525",
+      "action": "冲突处理",
+      "record_id": "SAMPLE-001",
+      "details": {
+        "conflict_id": "d123751a-14e5-402e-95da-37333859f9cf",
+        "resolution": "确认冲突存在，采用折中0.045s",
+        "resolved_by": "质检员小白",
+        "old_status": "冲突待确认",
+        "new_status": "已修正",
+        "correct_value": 0.045,
+        "handler_after": "安全员王五复核后归档",
+        "result_summary": "采样间隔已从0.05s修正为0.045s"
+      }
+    },
+    {
+      "timestamp": "2026-06-09T09:19:50.127661",
+      "action": "更新安全提醒",
+      "record_id": null,
+      "details": {
+        "operator": "质检员小白",
+        "new_reminders": 1,
+        "total_pending": 2
+      }
+    }
+  ]
+}
