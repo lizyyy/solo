@@ -1,0 +1,173 @@
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --brand: #1e40af;
+  --brand-light: #3b82f6;
+  --danger: #dc2626;
+  --warning: #f59e0b;
+  --success: #059669;
+  --note-bg: #fef3c7;
+  --anomaly-bg: #fee2e2;
+  --grid: #e5e7eb;
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    @apply font-sans text-slate-800 bg-slate-50;
+    background-image: linear-gradient(
+        rgba(30, 64, 175, 0.035) 1px,
+        transparent 1px
+      ),
+      linear-gradient(90deg, rgba(30, 64, 175, 0.035) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display;
+  }
+  .font-mono {
+    font-family: "JetBrains Mono", ui-monospace, monospace !important;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded border border-slate-300 bg-white text-slate-700 shadow-sm hover:bg-slate-50 hover:border-slate-400 active:translate-y-[1px] transition relative overflow-hidden;
+  }
+  .btn::before {
+    content: "";
+    @apply absolute left-0 top-0 bottom-0 w-1;
+  }
+  .btn-primary {
+    @apply border-brand-700 bg-brand-800 text-white hover:bg-brand-700 hover:border-brand-600;
+  }
+  .btn-primary::before {
+    background-color: #60a5fa;
+  }
+  .btn-danger {
+    @apply border-red-700 bg-red-600 text-white hover:bg-red-700 hover:border-red-600;
+  }
+  .btn-danger::before {
+    background-color: #fca5a5;
+  }
+  .btn-warn {
+    @apply border-amber-700 bg-amber-500 text-white hover:bg-amber-600 hover:border-amber-500;
+  }
+  .btn-warn::before {
+    background-color: #fde68a;
+  }
+  .btn-success {
+    @apply border-emerald-700 bg-emerald-600 text-white hover:bg-emerald-700 hover:border-emerald-500;
+  }
+  .btn-success::before {
+    background-color: #6ee7b7;
+  }
+
+  .card {
+    @apply bg-white border border-slate-200 rounded-lg shadow-card;
+  }
+  .card-anomaly {
+    @apply border-red-300 bg-white shadow-card animate-flash-border;
+    position: relative;
+  }
+  .card-anomaly::before {
+    content: "";
+    @apply absolute left-0 top-0 bottom-0 w-1 rounded-l-lg bg-red-600;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full;
+  }
+  .badge-success {
+    @apply bg-emerald-100 text-emerald-700 border border-emerald-200;
+  }
+  .badge-warn {
+    @apply bg-amber-100 text-amber-700 border border-amber-200;
+  }
+  .badge-danger {
+    @apply bg-red-100 text-red-700 border border-red-200;
+  }
+  .badge-info {
+    @apply bg-blue-100 text-blue-700 border border-blue-200;
+  }
+
+  .row-anomaly {
+    @apply bg-red-50/80;
+    box-shadow: inset 4px 0 0 #dc2626;
+  }
+  .row-note {
+    @apply bg-amber-50/80;
+    box-shadow: inset 4px 0 0 #d97706;
+  }
+
+  .diff-change {
+    text-decoration: underline wavy #dc2626 1.5px;
+    text-underline-offset: 3px;
+    background-color: rgba(220, 38, 38, 0.08);
+    padding: 0 2px;
+    border-radius: 2px;
+  }
+
+  .timeline-node {
+    @apply absolute -left-[7px] top-1.5 w-3.5 h-3.5 rounded-full border-2 border-white shadow;
+  }
+}
+
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 12mm;
+  }
+  body {
+    background: white !important;
+    background-image: none !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .row-anomaly {
+    background-color: #fee2e2 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .row-note {
+    background-color: #fef3c7 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .badge-danger {
+    background-color: #fee2e2 !important;
+    color: #991b1b !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
