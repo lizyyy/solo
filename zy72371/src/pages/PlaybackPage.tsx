@@ -48,13 +48,18 @@ const PlaybackPage: React.FC = () => {
 
   useEffect(() => {
     if (batch && batch.status === 'needs_supplement' && oldVersions.length > 0 && !suppVersion) {
-      setSuppVersion(oldVersions[0]);
+      if (preVersion && oldVersions.includes(preVersion)) {
+        setSuppVersion(preVersion);
+        setShowSupplementModal(true);
+      } else {
+        setSuppVersion(oldVersions[0]);
+      }
     }
     if (batch && (batch.status === 'pending_review' || batch.status === 'needs_supplement')) {
       setShowRemarkDiff(true);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [batch?.id]);
+  }, [batch?.id, preVersion]);
 
   if (!batch) {
     return (
