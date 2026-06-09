@@ -1,9 +1,9 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Nameplate, BendLossRecord, ConflictEntry, ScreenshotAttachment, AuditLog, SelfCheckResult, CurrentUser, Direction, ConflictStatus, AuditAction, RecordStatus } from '@/types';
+import type { Nameplate, BendLossRecord, ConflictEntry, ScreenshotAttachment, AuditLog, SelfCheckResult, CurrentUser, Direction, ConflictStatus, AuditAction, RecordStatus, RecordChange, ScreenshotChange } from '@/types';
 import { genId } from '@/utils/id';
 import { detectConflicts } from '@/utils/conflict';
-import { runAllSelfChecks } from '@/utils/selfcheck';
+import { runAllSelfChecks, classifyDuplicate } from '@/utils/selfcheck';
 
 interface AppState {
   currentUser: CurrentUser | null;
@@ -19,12 +19,15 @@ interface AppState {
   logout: () => void;
 
   importNameplate: (data: Omit<Nameplate, 'id' | 'importTime' | 'isLocked' | 'source'>) => string;
-  addRecord: (data: Omit<BendLossRecord, 'id' | 'recordTime' | 'screenshotIds' | 'status' | 'isSupplementary' | 'supplementaryNote' | 'reviewConclusion' | 'reviewer'>) => string;
-  addSupplementaryRecord: (data: Omit<BendLossRecord, 'id' | 'recordTime' | 'screenshotIds' | 'status' | 'reviewConclusion' | 'reviewer'>) => string;
-  addScreenshot: (data: Omit<ScreenshotAttachment, 'id' | 'uploadTime'>) => void;
+  addRecord: (data: Omit<BendLossRecord, 'id' | 'recordTime' | 'screenshotIds' | 'status' | 'isSupplementary' | 'supplementaryNote' | 'reviewConclusion' | 'reviewer' | 'errorNote' | 'lastModified' | 'changeHistory'>) => string;
+  addSupplementaryRecord: (data: Omit<BendLossRecord, 'id' | 'recordTime' | 'screenshotIds' | 'status' | 'reviewConclusion' | 'reviewer' | 'lastModified' | 'changeHistory'>) => string;
+  addScreenshot: (data: Omit<ScreenshotAttachment, 'id' | 'uploadTime' | 'lastModified' | 'changeHistory'>) => void;
   resolveConflict: (conflictId: string, status: ConflictStatus, resolver: string) => void;
   reviewRecord: (recordId: string, conclusion: string, reviewer: string) => void;
   runSelfCheck: () => SelfCheckResult[];
+
+  updateRecordNote: (recordId: string, field: 'errorNote' | 'supplementaryNote' | 'bendRadius' | 'lossValue' | 'direction', value: string, operator: string) => void;
+  updateScreenshotNote: (screenshotId: string, note: string, operator: string) => void;
 
   addAuditLog: (recordId: string, action: AuditAction, detail: string, operator: string) => void;
 }
@@ -47,22 +50,37 @@ export const useStore = create<AppState>()(
 
       importNameplate: (data) => {
         const id = genId();
+        const now = new Date().toISOString();
         const nameplate: Nameplate = {
           ...data,
           id,
-          importTime: new Date().toISOString(),
+          importTime: now,
           isLocked: true,
           source: 'nameplate',
         };
+        const operator = get().currentUser?.name || '系统';
+
         set((state) => {
+          const existingCodes = state.nameplates.filter(np => np.equipmentCode.trim() === data.equipmentCode.trim());
+          if (existingCodes.length > 0) {
+            const existingIds = existingCodes.map(np => np.id.slice(0, 10)).join(', ');
+            setTimeout(() => {
+              get().addAuditLog(
+                id,
+                'nameplate_duplicate_warning',
+                `铭牌参数重复警告: 设备编码"${data.equipmentCode}"与已导入的 ${existingCodes.length} 条铭牌相同 (ID: ${existingIds}) — 请注意是否误操作`,
+                operator
+              );
+            }, 0);
+          }
           const newConflicts = detectConflicts(nameplate, state.records, state.screenshots);
           return {
             nameplates: [...state.nameplates, nameplate],
             conflicts: [...state.conflicts, ...newConflicts],
           };
         });
-        const operator = get().currentUser?.name || '系统';
-        get().addAuditLog(id, 'import', `导入铭牌参数: 设备编码 ${data.equipmentCode}`, operator);
+
+        get().addAuditLog(id, 'import', `导入铭牌参数: 设备编码 ${data.equipmentCode}, 类型${data.fiberType}, 芯径${data.coreDiameter}μm, 最小弯曲半径${data.minBendRadius}mm`, operator);
         return id;
       },
 
@@ -78,7 +96,10 @@ export const useStore = create<AppState>()(
           screenshotIds: [],
           status,
           isSupplementary: false,
+          changeHistory: [],
         };
+        const operator = get().currentUser?.name || '系统';
+
         set((state) => {
           const newConflicts: ConflictEntry[] = [];
           for (const np of state.nameplates) {
@@ -88,16 +109,29 @@ export const useStore = create<AppState>()(
             }
           }
           const hasConflict = newConflicts.length > 0;
-          const finalRecord = hasConflict ? { ...record, status: 'conflict' as RecordStatus } : record;
+          const finalRecord: BendLossRecord = hasConflict ? { ...record, status: 'conflict' as RecordStatus } : record;
+
+          const dupInfo = classifyDuplicate(finalRecord, state.records, state.nameplates);
+          if (dupInfo.category !== 'new_record') {
+            setTimeout(() => {
+              get().addAuditLog(
+                id,
+                'record_duplicate_warning',
+                `${dupInfo.description} (匹配: ${dupInfo.matchRecordIds.map(rid => rid.slice(0,10)).join(', ')})`,
+                '系统'
+              );
+            }, 0);
+          }
+
           return {
             records: [...state.records, finalRecord],
             conflicts: [...state.conflicts, ...newConflicts],
           };
         });
-        const operator = get().currentUser?.name || '系统';
+
         get().addAuditLog(id, 'create', `录入弯曲损耗数据: 半径${data.bendRadius}mm 方向${data.direction} 损耗${data.lossValue}dB`, operator);
         if (direction === '向左') {
-          get().addAuditLog(id, 'review', `方向为"向左"，自动标记为待复核`, '系统');
+          get().addAuditLog(id, 'review', `方向为"向左"，自动标记为待复核（不自动归为正常），请实验老师确认`, '系统');
         }
         return id;
       },
@@ -106,7 +140,7 @@ export const useStore = create<AppState>()(
         const id = genId();
         const now = new Date().toISOString();
         const direction = data.direction as Direction;
-        const status: RecordStatus = direction === '向左' ? 'pending_review' : 'normal';
+        const status: RecordStatus = direction === '向左' ? 'pending_review' : 'reviewed';
         const record: BendLossRecord = {
           ...data,
           id,
@@ -114,25 +148,35 @@ export const useStore = create<AppState>()(
           screenshotIds: [],
           status,
           isSupplementary: true,
+          lastModified: now,
+          changeHistory: [],
         };
-        set((state) => ({
-          records: [...state.records, record],
-        }));
         const operator = get().currentUser?.name || '系统';
-        get().addAuditLog(id, 'supplementary', `补录数据: ${data.supplementaryNote || '无说明'}`, operator);
+
+        set((state) => {
+          const allRecs = [...state.records, record];
+          return { records: allRecs };
+        });
+
+        get().addAuditLog(id, 'supplementary', `补录数据: ${data.supplementaryNote || '无说明'} — 数据: R=${data.bendRadius}mm D=${data.direction} L=${data.lossValue}dB`, operator);
+        get().addAuditLog(id, 'supplementary_recalc', `补录后触发重算: 已更新同铭牌(${data.nameplateId.slice(0,8)})统计，建议运行自检确认一致性`, '系统');
         return id;
       },
 
       addScreenshot: (data) => {
         const id = genId();
+        const now = new Date().toISOString();
         const screenshot: ScreenshotAttachment = {
           ...data,
           id,
-          uploadTime: new Date().toISOString(),
+          uploadTime: now,
+          changeHistory: [],
         };
+        const operator = get().currentUser?.name || '系统';
+
         set((state) => {
           const updatedRecords = state.records.map(r =>
-            r.id === data.recordId ? { ...r, screenshotIds: [...r.screenshotIds, id] } : r
+            r.id === data.recordId ? { ...r, screenshotIds: [...r.screenshotIds, id], lastModified: now } : r
           );
           const newConflicts: ConflictEntry[] = [];
           const record = state.records.find(r => r.id === data.recordId);
@@ -150,8 +194,8 @@ export const useStore = create<AppState>()(
             conflicts: [...state.conflicts, ...newConflicts],
           };
         });
-        const operator = get().currentUser?.name || '系统';
-        get().addAuditLog(data.recordId, 'create', `上传维修群截图: "${data.note}"`, operator);
+
+        get().addAuditLog(data.recordId, 'create', `上传维修群截图: 备注="${data.note}" (保留原文，不清洗)`, operator);
       },
 
       resolveConflict: (conflictId, status, resolver) => {
@@ -159,44 +203,159 @@ export const useStore = create<AppState>()(
         set((state) => {
           const conflict = state.conflicts.find(c => c.id === conflictId);
           targetRecordId = conflict?.recordId || '';
+          const now = new Date().toISOString();
           return {
             conflicts: state.conflicts.map(c =>
-              c.id === conflictId ? { ...c, status, resolvedBy: resolver, resolvedAt: new Date().toISOString() } : c
+              c.id === conflictId ? { ...c, status, resolvedBy: resolver, resolvedAt: now } : c
             ),
             records: state.records.map(r => {
               if (conflict && r.id === conflict.recordId && status !== 'rejected') {
-                return { ...r, status: 'normal' as RecordStatus };
+                const change: RecordChange = {
+                  id: genId(),
+                  field: 'direction',
+                  oldValue: `conflict(${conflict.nameplateValue} vs ${conflict.screenshotValue})`,
+                  newValue: status === 'confirmed_nameplate' ? `nameplate:${conflict.nameplateValue}` : `screenshot:${conflict.screenshotValue}`,
+                  changedBy: resolver,
+                  changedAt: now,
+                  affectedResults: `冲突已裁决，状态由 conflict → normal`,
+                };
+                const prevHistory = r.changeHistory || [];
+                return { ...r, status: 'normal' as RecordStatus, lastModified: now, changeHistory: [...prevHistory, change] };
               }
               return r;
             }),
           };
         });
         const operator = get().currentUser?.name || resolver;
+        const statusLabel = status === 'confirmed_nameplate' ? '确认铭牌' : status === 'confirmed_screenshot' ? '确认截图' : '驳回';
         get().addAuditLog(
           targetRecordId,
           'conflict_resolved',
-          `冲突裁决: ${status === 'confirmed_nameplate' ? '确认铭牌' : status === 'confirmed_screenshot' ? '确认截图' : '驳回'}`,
+          `冲突裁决: ${statusLabel} — 裁决人: ${operator}`,
           operator
         );
       },
 
       reviewRecord: (recordId, conclusion, reviewer) => {
+        const now = new Date().toISOString();
         set((state) => ({
-          records: state.records.map(r =>
-            r.id === recordId ? { ...r, status: 'reviewed' as RecordStatus, reviewConclusion: conclusion, reviewer } : r
-          ),
+          records: state.records.map(r => {
+            if (r.id !== recordId) return r;
+            const change: RecordChange = {
+              id: genId(),
+              field: 'direction',
+              oldValue: `${r.direction} (状态: pending_review)`,
+              newValue: `${r.direction} (状态: reviewed, 结论: ${conclusion})`,
+              changedBy: reviewer,
+              changedAt: now,
+              affectedResults: `方向判定复核完成，导出状态就绪`,
+            };
+            const prevHistory = r.changeHistory || [];
+            return { ...r, status: 'reviewed' as RecordStatus, reviewConclusion: conclusion, reviewer, lastModified: now, changeHistory: [...prevHistory, change] };
+          }),
         }));
-        get().addAuditLog(recordId, 'review', `实验老师复核: ${conclusion}`, reviewer);
+        get().addAuditLog(recordId, 'review', `实验老师复核: 方向判定结论 — ${conclusion}`, reviewer);
       },
 
       runSelfCheck: () => {
         const state = get();
-        const results = runAllSelfChecks(state.records, state.conflicts);
+        const results = runAllSelfChecks(state.nameplates, state.records, state.conflicts, state.screenshots);
         set({ selfCheckResults: results, lastSelfCheckTime: new Date().toISOString() });
         const operator = state.currentUser?.name || '系统';
         const allPassed = results.every(r => r.passed);
-        get().addAuditLog('system', 'selfcheck', `自检${allPassed ? '全部通过' : '存在未通过项'}`, operator);
+        const failedCount = results.filter(r => !r.passed).length;
+        const passedCount = results.filter(r => r.passed).length;
+        get().addAuditLog(
+          'system',
+          'selfcheck',
+          `自检完成: ${passedCount}项通过，${failedCount}项未通过。${allPassed ? '可导出报告。' : '请修复问题后重新自检。'}`,
+          operator
+        );
         return results;
+      },
+
+      updateRecordNote: (recordId, field, value, operator) => {
+        const now = new Date().toISOString();
+        let oldVal = '';
+        set((state) => {
+          const record = state.records.find(r => r.id === recordId);
+          if (!record) return state;
+          const prevHistory = record.changeHistory || [];
+
+          if (field === 'errorNote') oldVal = record.errorNote || '(空)';
+          else if (field === 'supplementaryNote') oldVal = record.supplementaryNote || '(空)';
+          else if (field === 'bendRadius') oldVal = `${record.bendRadius}mm`;
+          else if (field === 'lossValue') oldVal = `${record.lossValue}dB`;
+          else if (field === 'direction') oldVal = record.direction;
+
+          const change: RecordChange = {
+            id: genId(),
+            field,
+            oldValue: oldVal,
+            newValue: value,
+            changedBy: operator,
+            changedAt: now,
+            affectedResults: field === 'errorNote'
+              ? '更新误差/备注说明，不影响数值'
+              : field === 'supplementaryNote'
+                ? '更新补录说明，关联记录统计已联动'
+                : `变更字段 ${field}，请重新运行自检`,
+          };
+
+          const updatedRecords = state.records.map(r => {
+            if (r.id !== recordId) return r;
+            const newRec: BendLossRecord = { ...r, lastModified: now, changeHistory: [...prevHistory, change] };
+            if (field === 'errorNote') newRec.errorNote = value;
+            else if (field === 'supplementaryNote') newRec.supplementaryNote = value;
+            else if (field === 'bendRadius') newRec.bendRadius = parseFloat(value);
+            else if (field === 'lossValue') newRec.lossValue = parseFloat(value);
+            else if (field === 'direction') newRec.direction = value as Direction;
+            return newRec;
+          });
+
+          return { records: updatedRecords };
+        });
+
+        get().addAuditLog(
+          recordId,
+          'edit',
+          `修改 ${field}: "${oldVal}" → "${value}" (修改人: ${operator})`,
+          operator
+        );
+      },
+
+      updateScreenshotNote: (screenshotId, note, operator) => {
+        const now = new Date().toISOString();
+        let oldVal = '';
+        let recordId = '';
+        set((state) => {
+          const ss = state.screenshots.find(s => s.id === screenshotId);
+          if (!ss) return state;
+          oldVal = ss.note || '(空)';
+          recordId = ss.recordId;
+          const prevHistory = ss.changeHistory || [];
+          const change: ScreenshotChange = {
+            id: genId(),
+            field: 'note',
+            oldValue: oldVal,
+            newValue: note,
+            changedBy: operator,
+            changedAt: now,
+          };
+          const updatedSS = state.screenshots.map(s =>
+            s.id === screenshotId ? { ...s, note, lastModified: now, changeHistory: [...prevHistory, change] } : s
+          );
+          return { screenshots: updatedSS };
+        });
+
+        if (recordId) {
+          get().addAuditLog(
+            recordId,
+            'edit',
+            `修改维修群截图备注: "${oldVal}" → "${note}" (修改人: ${operator}) — 原文保留在变更历史中`,
+            operator
+          );
+        }
       },
 
       addAuditLog: (recordId, action, detail, operator) => {

@@ -28,6 +28,19 @@ export interface BendLossRecord {
   supplementaryNote?: string;
   reviewConclusion?: string;
   reviewer?: string;
+  errorNote?: string;
+  lastModified?: string;
+  changeHistory?: RecordChange[];
+}
+
+export interface RecordChange {
+  id: string;
+  field: 'errorNote' | 'supplementaryNote' | 'bendRadius' | 'lossValue' | 'direction';
+  oldValue: string;
+  newValue: string;
+  changedBy: string;
+  changedAt: string;
+  affectedResults?: string;
 }
 
 export type ConflictStatus = 'pending' | 'confirmed_nameplate' | 'confirmed_screenshot' | 'rejected';
@@ -51,9 +64,20 @@ export interface ScreenshotAttachment {
   note: string;
   uploadTime: string;
   uploader: string;
+  lastModified?: string;
+  changeHistory?: ScreenshotChange[];
 }
 
-export type AuditAction = 'import' | 'create' | 'supplementary' | 'conflict_detected' | 'conflict_resolved' | 'review' | 'selfcheck';
+export interface ScreenshotChange {
+  id: string;
+  field: 'note';
+  oldValue: string;
+  newValue: string;
+  changedBy: string;
+  changedAt: string;
+}
+
+export type AuditAction = 'import' | 'create' | 'supplementary' | 'conflict_detected' | 'conflict_resolved' | 'review' | 'selfcheck' | 'edit' | 'nameplate_duplicate_warning' | 'record_duplicate_warning' | 'supplementary_recalc';
 
 export interface AuditLog {
   id: string;
@@ -64,7 +88,7 @@ export interface AuditLog {
   timestamp: string;
 }
 
-export type SelfCheckType = 'duplicate_import' | 'negative_direction' | 'supplementary_recalc' | 'export_consistency';
+export type SelfCheckType = 'nameplate_validation' | 'duplicate_import' | 'negative_direction' | 'supplementary_recalc' | 'export_consistency' | 'screenshot_note_integrity';
 
 export interface SelfCheckResult {
   type: SelfCheckType;
@@ -78,4 +102,12 @@ export type UserRole = 'equipment_engineer' | 'field_worker' | 'lab_teacher';
 export interface CurrentUser {
   role: UserRole;
   name: string;
+}
+
+export type DuplicateCategory = 'exact_same_import' | 'history_duplicate' | 'new_record';
+
+export interface DuplicateInfo {
+  category: DuplicateCategory;
+  matchRecordIds: string[];
+  description: string;
 }
