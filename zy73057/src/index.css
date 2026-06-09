@@ -1,0 +1,34 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root { height: 100%; }
+body { background: #0F1623; color: #E4E9EF; font-family: "Source Han Sans CN","Noto Sans SC",system-ui,sans-serif; }
+.font-mono { font-family: "JetBrains Mono","SFMono-Regular",monospace; font-variant-numeric: tabular-nums; }
+
+.table-zebra tbody tr:nth-child(odd) td { background-color: rgba(31,42,55,0.45); }
+
+.bg-dots-rust {
+  background-image: radial-gradient(rgba(200,75,49,0.45) 1px, transparent 1px);
+  background-size: 10px 10px;
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: #39475B; border-radius: 2px; }
+::-webkit-scrollbar-track { background: transparent; }
+
+.btn-industrial {
+  border-radius: 2px;
+  border-width: 2px;
+  border-style: solid;
+  padding: 8px 14px;
+  font-weight: 600;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.btn-industrial:hover:not(:disabled) { box-shadow: inset 0 2px 6px 0 rgba(15,22,35,0.35); }
+.btn-industrial:disabled { opacity: 0.5; cursor: not-allowed; }
