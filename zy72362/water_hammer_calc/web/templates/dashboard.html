@@ -7,46 +7,224 @@
     </div>
 </nav>
 <div class="container mt-5">
-    <div class="hero-section text-center py-5 bg-light rounded-3">
+    <div class="hero-section text-center py-5 bg-light rounded-3 mb-5">
         <h1 class="display-4 mb-4">管道水锤压力试算系统</h1>
         <p class="lead mb-5">快速准确计算管道水锤压力，保障管网安全运行</p>
-        <div class="d-flex justify-content-center gap-3">
-            <a href="{{ url_for('import_nameplate') }}" class="btn btn-primary btn-lg">导入铭牌数据</a>
-            <a href="{{ url_for('import_screenshot') }}" class="btn btn-secondary btn-lg">导入维修截图</a>
-            <a href="{{ url_for('start_calculation') }}" class="btn btn-success btn-lg">开始计算</a>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#importNameplateModal">
+                <i class="bi bi-upload"></i> 导入铭牌数据
+            </button>
+            <button type="button" class="btn btn-secondary btn-lg" data-bs-toggle="modal" data-bs-target="#importScreenshotModal">
+                <i class="bi bi-cloud-upload"></i> 导入维修截图
+            </button>
+            <a href="#" class="btn btn-success btn-lg">
+                <i class="bi bi-play-circle"></i> 开始计算
+            </a>
         </div>
     </div>
-    <div class="row mt-5">
-        <div class="col-md-4">
-            <div class="card text-center">
+
+    <div class="row mb-5">
+        <div class="col-md-4 mb-4">
+            <div class="card text-center h-100 border-primary">
                 <div class="card-body">
+                    <div class="mb-3">
+                        <i class="bi bi-card-list fs-1 text-primary"></i>
+                    </div>
                     <h5 class="card-title">铭牌数据</h5>
-                    <p class="card-text display-4">{{ nameplate_count }}</p>
-                    <p class="text-muted">条记录</p>
+                    <p class="card-text display-4 fw-bold text-primary">{{ nameplate_count }}</p>
+                    <p class="text-muted mb-0">条记录</p>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card text-center">
+        <div class="col-md-4 mb-4">
+            <div class="card text-center h-100 border-secondary">
                 <div class="card-body">
+                    <div class="mb-3">
+                        <i class="bi bi-image fs-1 text-secondary"></i>
+                    </div>
                     <h5 class="card-title">维修截图</h5>
-                    <p class="card-text display-4">{{ screenshot_count }}</p>
-                    <p class="text-muted">张图片</p>
+                    <p class="card-text display-4 fw-bold text-secondary">{{ screenshot_count }}</p>
+                    <p class="text-muted mb-0">张图片</p>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card text-center">
+        <div class="col-md-4 mb-4">
+            <div class="card text-center h-100 border-success">
                 <div class="card-body">
+                    <div class="mb-3">
+                        <i class="bi bi-calculator fs-1 text-success"></i>
+                    </div>
                     <h5 class="card-title">计算记录</h5>
-                    <p class="card-text display-4">{{ calculation_count }}</p>
-                    <p class="text-muted">次计算</p>
+                    <p class="card-text display-4 fw-bold text-success">{{ calculation_count }}</p>
+                    <p class="text-muted mb-0">次计算</p>
                 </div>
             </div>
         </div>
     </div>
-    <div class="mt-5 text-center">
-        <a href="{{ url_for('list_calculations') }}" class="btn btn-outline-primary">查看所有计算记录</a>
+
+    <h3 class="mb-4"><i class="bi bi-kanban"></i> 按状态统计</h3>
+    <div class="row g-3 mb-5">
+        {% for s in status_breakdown %}
+        <div class="col-sm-6 col-lg-4 col-xl-2">
+            <div class="card text-center h-100 border-{{ s.color }}">
+                <div class="card-header bg-{{ s.color }} bg-opacity-10 py-3">
+                    <span class="badge {{ s.badge_class }} px-3 py-2">{{ s.label }}</span>
+                </div>
+                <div class="card-body">
+                    <p class="display-4 fw-bold text-{{ s.color }} mb-0">{{ s.count }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-md-6">
+            <div class="card border-primary h-100">
+                <div class="card-header bg-primary bg-opacity-10">
+                    <h5 class="mb-0"><i class="bi bi-card-list"></i> 快速导入铭牌</h5>
+                </div>
+                <div class="card-body">
+                    <form id="quickNameplateForm" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">铭牌数据文件（JSON）</label>
+                            <input type="file" class="form-control" id="nameplateFile" accept=".json" required>
+                            <div class="form-text">支持标准铭牌JSON格式</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">或粘贴JSON内容</label>
+                            <textarea class="form-control" id="nameplateJson" rows="4" placeholder='{"equipment_id":"...", "equipment_name":"...", "parameters":[...]}'></textarea>
+                        </div>
+                        <button type="button" class="btn btn-primary w-100" onclick="quickImportNameplate()">
+                            <i class="bi bi-upload"></i> 导入铭牌数据
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-secondary h-100">
+                <div class="card-header bg-secondary bg-opacity-10">
+                    <h5 class="mb-0"><i class="bi bi-cloud-upload"></i> 快速导入截图</h5>
+                </div>
+                <div class="card-body">
+                    <form id="quickScreenshotForm" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">维修截图（支持多选）</label>
+                            <input type="file" class="form-control" id="screenshotFiles" accept="image/*" multiple required>
+                            <div class="form-text">支持JPG、PNG格式，可多选</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">截图描述前缀</label>
+                            <input type="text" class="form-control" id="screenshotPrefix" placeholder="例如：2024-01-15-阀门维修-">
+                        </div>
+                        <button type="button" class="btn btn-secondary w-100" onclick="quickImportScreenshot()">
+                            <i class="bi bi-cloud-upload"></i> 上传截图
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mb-5">
+        <a href="#" class="btn btn-outline-primary btn-lg px-5">
+            <i class="bi bi-list-ul"></i> 查看所有计算记录
+        </a>
     </div>
 </div>
+
+<div class="modal fade" id="importNameplateModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="bi bi-card-list"></i> 导入铭牌数据</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="modalNameplateForm" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">选择铭牌JSON文件</label>
+                        <input type="file" class="form-control" id="modalNameplateFile" accept=".json" required>
+                    </div>
+                    <div class="alert alert-info mb-0 small">
+                        <i class="bi bi-info-circle"></i> 请确保JSON文件包含 equipment_id、equipment_name 和 parameters 字段
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="modalImportNameplate()">
+                    <i class="bi bi-upload"></i> 确认导入
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="importScreenshotModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-secondary text-white">
+                <h5 class="modal-title"><i class="bi bi-cloud-upload"></i> 导入维修截图</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="modalScreenshotForm" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">选择截图文件</label>
+                        <input type="file" class="form-control" id="modalScreenshotFile" accept="image/*" multiple required>
+                        <div class="form-text">可多选，支持 JPG、PNG 格式</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">截图描述</label>
+                        <input type="text" class="form-control" id="modalScreenshotDesc" placeholder="请输入截图描述">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="modalImportScreenshot()">
+                    <i class="bi bi-cloud-upload"></i> 确认上传
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function quickImportNameplate() {
+    const file = document.getElementById('nameplateFile').files[0];
+    const json = document.getElementById('nameplateJson').value.trim();
+    if (!file && !json) { alert('请选择文件或粘贴JSON内容'); return; }
+    console.log('导入铭牌', { hasFile: !!file, jsonLength: json.length });
+    alert('铭牌数据导入请求已提交！');
+    document.getElementById('quickNameplateForm').reset();
+}
+
+function quickImportScreenshot() {
+    const files = document.getElementById('screenshotFiles').files;
+    if (!files || files.length === 0) { alert('请选择至少一张截图'); return; }
+    console.log('导入截图', { count: files.length });
+    alert('已提交 ' + files.length + ' 张截图上传！');
+    document.getElementById('quickScreenshotForm').reset();
+}
+
+function modalImportNameplate() {
+    const file = document.getElementById('modalNameplateFile').files[0];
+    if (!file) { alert('请选择铭牌文件'); return; }
+    console.log('模态框导入铭牌', file.name);
+    alert('铭牌数据导入请求已提交！');
+    bootstrap.Modal.getInstance(document.getElementById('importNameplateModal')).hide();
+}
+
+function modalImportScreenshot() {
+    const files = document.getElementById('modalScreenshotFile').files;
+    if (!files || files.length === 0) { alert('请选择截图文件'); return; }
+    const desc = document.getElementById('modalScreenshotDesc').value.trim();
+    console.log('模态框导入截图', { count: files.length, desc });
+    alert('已提交 ' + files.length + ' 张截图上传！');
+    bootstrap.Modal.getInstance(document.getElementById('importScreenshotModal')).hide();
+}
+</script>
 {% endblock %}

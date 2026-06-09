@@ -7,12 +7,288 @@
     </div>
 </nav>
 <div class="container mt-4">
-    <h2 class="mb-4">计算详情 #{{ calc_id }}</h2>
-    {% if has_override_without_reason %}
-    <div class="warning-banner mb-4">
-        <strong>警告：</strong>发现人工改系数但未填写原因，需设备工程师复核。
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">计算详情 #{{ calc_id }}</h2>
+        <a href="{{ replay_link }}" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-repeat"></i> 参数回放页
+        </a>
+    </div>
+
+    <div class="card border-{{ status_color }} mb-4">
+        <div class="card-header bg-{{ status_color }} bg-opacity-10 d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div class="d-flex align-items-center gap-3">
+                <span class="fs-5">当前状态：</span>
+                <span class="badge {{ status_badge }} fs-6 px-3 py-2">{{ status_label }}</span>
+            </div>
+            <div class="d-flex gap-3 flex-wrap">
+                {% if reviewed_by_trainer and trainer_name %}
+                <span class="badge bg-info px-3 py-2">
+                    <i class="bi bi-person-check"></i> 训练教练：{{ trainer_name }}
+                </span>
+                {% endif %}
+                {% if reviewed_by_engineer and engineer_name %}
+                <span class="badge bg-success px-3 py-2">
+                    <i class="bi bi-person-gear"></i> 设备工程师：{{ engineer_name }}
+                </span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% if has_override_without_reason and status_name == 'NEEDS_REVIEW' %}
+    <div class="alert alert-warning alert-dismissible fade show mb-4" role="alert">
+        <div class="d-flex align-items-start gap-3">
+            <i class="bi bi-exclamation-triangle-fill fs-4 flex-shrink-0"></i>
+            <div>
+                <h5 class="alert-heading">需设备工程师复核</h5>
+                <p class="mb-2">发现人工改系数但未填写原因，请及时处理。</p>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="{{ replay_link }}" class="btn btn-warning btn-sm">
+                        <i class="bi bi-arrow-repeat"></i> 前往参数回放页处理
+                    </a>
+                    <a href="{{ nameplate_link }}" class="btn btn-outline-warning btn-sm">
+                        <i class="bi bi-card-list"></i> 查看铭牌数据
+                    </a>
+                </div>
+            </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
     {% endif %}
-    <a href="{{ url_for('calc_replay', calc_id=calc_id) }}" class="btn btn-primary">参数回放页</a>
+
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">计算结果</h5>
+            <div class="btn-group" role="group">
+                <input type="radio" class="btn-check" name="viewMode" id="chartMode" autocomplete="off" checked>
+                <label class="btn btn-outline-primary btn-sm" for="chartMode">
+                    <i class="bi bi-bar-chart"></i> 图表模式
+                </label>
+                <input type="radio" class="btn-check" name="viewMode" id="tableMode" autocomplete="off">
+                <label class="btn btn-outline-primary btn-sm" for="tableMode">
+                    <i class="bi bi-table"></i> 数据模式
+                </label>
+                <input type="radio" class="btn-check" name="viewMode" id="view3DMode" autocomplete="off">
+                <label class="btn btn-outline-primary btn-sm" for="view3DMode">
+                    <i class="bi bi-box-seam"></i> 3D模式
+                </label>
+            </div>
+        </div>
+        <div class="card-body">
+            <div id="chartView">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="card text-center bg-primary bg-opacity-10 border-primary">
+                            <div class="card-body">
+                                <h6 class="card-subtitle text-muted mb-2">最大压力</h6>
+                                <p class="card-text fs-3 fw-bold text-primary">{{ "%.2f"|format(max_pressure) }} MPa</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-center bg-danger bg-opacity-10 border-danger">
+                            <div class="card-body">
+                                <h6 class="card-subtitle text-muted mb-2">压力上升</h6>
+                                <p class="card-text fs-3 fw-bold text-danger">{{ "%.2f"|format(pressure_rise) }} MPa</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-center bg-info bg-opacity-10 border-info">
+                            <div class="card-body">
+                                <h6 class="card-subtitle text-muted mb-2">Joukowsky压力</h6>
+                                <p class="card-text fs-3 fw-bold text-info">{{ "%.2f"|format(joukowsky_pressure) }} MPa</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card text-center bg-secondary bg-opacity-10 border-secondary">
+                            <div class="card-body">
+                                <h6 class="card-subtitle text-muted mb-2">使用波速</h6>
+                                <p class="card-text fs-3 fw-bold text-secondary">{{ "%.2f"|format(wave_speed_used) }} m/s</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card text-center bg-success bg-opacity-10 border-success">
+                            <div class="card-body">
+                                <h6 class="card-subtitle text-muted mb-2">安全等级</h6>
+                                <p class="card-text fs-3 fw-bold text-success">{{ classification }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="tableView" style="display:none;">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>参数名称</th>
+                                <th>数值</th>
+                                <th>单位</th>
+                                <th>来源</th>
+                                <th>人工修改</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for entry in parameter_entries %}
+                            <tr class="{% if entry.is_manually_modified %}table-warning{% endif %}">
+                                <td>{{ entry.name }}</td>
+                                <td>{{ entry.value }}</td>
+                                <td>{{ entry.unit }}</td>
+                                <td><span class="badge bg-secondary">{{ entry.provenance.source }}</span></td>
+                                <td>
+                                    {% if entry.is_manually_modified %}
+                                    <span class="badge bg-warning text-dark">是</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">否</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="view3D" style="display:none;">
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-box-seam fs-1 mb-3 d-block"></i>
+                    <p class="mb-0">3D可视化模式 - 管道水锤压力分布（功能开发中）</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-clock-history"></i> 变更历史</h5>
+        </div>
+        <div class="card-body p-0">
+            {% if change_history %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>时间</th>
+                            <th>操作类型</th>
+                            <th>参数名称</th>
+                            <th>旧值 → 新值</th>
+                            <th>操作人</th>
+                            <th>原因/备注</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in change_history %}
+                        <tr>
+                            <td><small class="text-muted">{{ record.timestamp[:19] }}</small></td>
+                            <td><span class="badge bg-primary">{{ record.change_type }}</span></td>
+                            <td>{{ record.parameter_name or '-' }}</td>
+                            <td>
+                                {% if record.old_value is not none and record.new_value is not none %}
+                                <code>{{ record.old_value }}</code> → <code class="text-success">{{ record.new_value }}</code>
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                            <td>{{ record.operator }}</td>
+                            <td><small>{{ record.reason or record.comments or '-' }}</small></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5 text-muted">
+                <p class="mb-0">暂无变更历史记录</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card border-warning mb-4">
+        <div class="card-header bg-warning bg-opacity-10">
+            <h5 class="mb-0"><i class="bi bi-person-gear"></i> 工程师复核</h5>
+        </div>
+        <div class="card-body">
+            <form id="engineerReviewForm">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">设备工程师姓名</label>
+                    <input type="text" class="form-control" id="engineerName" placeholder="请输入您的姓名" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">复核意见</label>
+                    <textarea class="form-control" id="engineerComments" rows="3" placeholder="请输入复核意见...（驳回时必填）"></textarea>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-success" onclick="submitEngineerReview('approve')">
+                        <i class="bi bi-check-circle"></i> 确认通过
+                    </button>
+                    <button type="button" class="btn btn-danger" onclick="submitEngineerReview('reject')">
+                        <i class="bi bi-x-circle"></i> 驳回
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card border-info mb-4">
+        <div class="card-header bg-info bg-opacity-10">
+            <h5 class="mb-0"><i class="bi bi-person-check"></i> 训练教练确认</h5>
+        </div>
+        <div class="card-body">
+            <form id="trainerReviewForm">
+                <div class="d-flex gap-2 align-items-end flex-wrap">
+                    <div class="flex-grow-1">
+                        <label class="form-label fw-bold">训练教练姓名</label>
+                        <input type="text" class="form-control" id="trainerName" placeholder="请输入训练教练姓名" required>
+                    </div>
+                    <button type="button" class="btn btn-info" onclick="submitTrainerReview()">
+                        <i class="bi bi-patch-check"></i> 训练教练确认
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
+
+<script>
+document.getElementById('chartMode').addEventListener('change', function() {
+    if (this.checked) {
+        document.getElementById('chartView').style.display = 'block';
+        document.getElementById('tableView').style.display = 'none';
+        document.getElementById('view3D').style.display = 'none';
+    }
+});
+document.getElementById('tableMode').addEventListener('change', function() {
+    if (this.checked) {
+        document.getElementById('chartView').style.display = 'none';
+        document.getElementById('tableView').style.display = 'block';
+        document.getElementById('view3D').style.display = 'none';
+    }
+});
+document.getElementById('view3DMode').addEventListener('change', function() {
+    if (this.checked) {
+        document.getElementById('chartView').style.display = 'none';
+        document.getElementById('tableView').style.display = 'none';
+        document.getElementById('view3D').style.display = 'block';
+    }
+});
+
+function submitEngineerReview(action) {
+    const name = document.getElementById('engineerName').value.trim();
+    const comments = document.getElementById('engineerComments').value.trim();
+    if (!name) { alert('请输入设备工程师姓名'); return; }
+    if (action === 'reject' && !comments) { alert('驳回复核时请填写原因'); return; }
+    console.log('工程师复核', { calc_id: '{{ calc_id }}', action, name, comments });
+    alert(action === 'approve' ? '已确认通过！' : '已提交驳回！');
+}
+
+function submitTrainerReview() {
+    const name = document.getElementById('trainerName').value.trim();
+    if (!name) { alert('请输入训练教练姓名'); return; }
+    console.log('教练确认', { calc_id: '{{ calc_id }}', name });
+    alert('训练教练已确认！');
+}
+</script>
 {% endblock %}

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}参数回放页{% endblock %}
+{% block title %}参数回放 - {{ calc_id }}{% endblock %}
 {% block content %}
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container">
@@ -7,7 +7,366 @@
     </div>
 </nav>
 <div class="container mt-4">
-    <h2 class="mb-4">参数回放页</h2>
-    <a href="#" class="btn btn-secondary">补录维修群截图</a>
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+        <h2 class="mb-0">参数回放页 #{{ calc_id }}</h2>
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="{{ detail_link }}" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-left"></i> 返回详情
+            </a>
+            <a href="{{ export_link }}" class="btn btn-success">
+                <i class="bi bi-file-earmark-arrow-down"></i> 导出报告
+            </a>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div class="d-flex align-items-center gap-3">
+                <span class="fw-bold">当前状态：</span>
+                <span class="badge {{ status_badge }} fs-6 px-3 py-2">{{ status_label }}</span>
+            </div>
+            <div class="d-flex gap-3 flex-wrap">
+                {% if reviewed_by_trainer and trainer_name %}
+                <span class="badge bg-info px-3 py-2">
+                    <i class="bi bi-person-check"></i> 训练教练：{{ trainer_name }}
+                </span>
+                {% endif %}
+                {% if reviewed_by_engineer and engineer_name %}
+                <span class="badge bg-success px-3 py-2">
+                    <i class="bi bi-person-gear"></i> 设备工程师：{{ engineer_name }}
+                </span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% if all_next_actions %}
+    <div class="card border-primary mb-4">
+        <div class="card-header bg-primary bg-opacity-10">
+            <h5 class="mb-0"><i class="bi bi-list-task"></i> 下一步行动</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width:30%;">关联参数</th>
+                            <th>行动内容</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in all_next_actions %}
+                        <tr>
+                            <td><span class="badge bg-secondary">{{ item.param }}</span></td>
+                            <td>{{ item.action }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if all_missing_materials %}
+    <div class="card border-danger mb-4">
+        <div class="card-header bg-danger bg-opacity-10">
+            <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> 缺失材料清单</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width:30%;">关联参数</th>
+                            <th>缺失材料</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in all_missing_materials %}
+                        <tr>
+                            <td><span class="badge bg-secondary">{{ item.param }}</span></td>
+                            <td><span class="text-danger fw-medium">{{ item.material }}</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-list-columns-reverse"></i> 参数条目明细</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>参数名称</th>
+                            <th>数值</th>
+                            <th>单位</th>
+                            <th>数据来源</th>
+                            <th>人工修改</th>
+                            <th>修改原因</th>
+                            <th>备注</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in parameter_entries %}
+                        <tr class="{% if entry.is_manually_modified %}table-warning{% endif %}">
+                            <td class="fw-medium">{{ entry.name }}</td>
+                            <td><code>{{ entry.value }}</code></td>
+                            <td>{{ entry.unit }}</td>
+                            <td><span class="badge bg-secondary">{{ entry.provenance.source }}</span></td>
+                            <td>
+                                {% if entry.is_manually_modified %}
+                                <span class="badge bg-warning text-dark">已修改</span>
+                                {% else %}
+                                <span class="badge bg-light text-secondary">原始</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if entry.modification_reason %}
+                                <small class="text-success">{{ entry.modification_reason }}</small>
+                                {% elif entry.is_manually_modified %}
+                                <span class="badge bg-danger text-white">未填写</span>
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                            <td>
+                                <small class="text-muted">{{ entry.provenance.detail[:50] }}{% if entry.provenance.detail|length > 50 %}...{% endif %}</small>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {% if override_flags %}
+    <div class="card border-warning mb-4">
+        <div class="card-header bg-warning bg-opacity-10">
+            <h5 class="mb-0"><i class="bi bi-flag"></i> 改系数标志复核表</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>参数名称</th>
+                            <th>原始值</th>
+                            <th>修改后值</th>
+                            <th>修改原因</th>
+                            <th>状态</th>
+                            <th>复核人</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for flag in override_flags %}
+                        <tr>
+                            <td class="fw-medium">{{ flag.parameter_name }}</td>
+                            <td><code class="text-muted">{{ flag.original_value }}</code></td>
+                            <td><code class="text-success fw-bold">{{ flag.overridden_value }}</code></td>
+                            <td>
+                                {% if flag.reason %}
+                                <span class="text-success">{{ flag.reason }}</span>
+                                {% else %}
+                                <span class="badge bg-danger text-white">待补充</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if flag.needs_review %}
+                                <span class="badge bg-warning text-dark">待复核</span>
+                                {% else %}
+                                <span class="badge bg-success">已复核</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ flag.reviewer or '-' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="card border-info mb-4">
+        <div class="card-header bg-info bg-opacity-10">
+            <h5 class="mb-0"><i class="bi bi-journal-text"></i> 回放叙述</h5>
+        </div>
+        <div class="card-body">
+            {% if replay_narrative %}
+            <div class="p-3 bg-light rounded border-start border-4 border-info">
+                <p class="mb-0" style="white-space: pre-wrap;">{{ replay_narrative }}</p>
+            </div>
+            {% else %}
+            <p class="text-muted mb-0">暂无回放叙述内容</p>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if change_history %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-clock-history"></i> 变更历史</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>时间</th>
+                            <th>操作类型</th>
+                            <th>参数</th>
+                            <th>变化</th>
+                            <th>操作人</th>
+                            <th>原因</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in change_history %}
+                        <tr>
+                            <td><small class="text-muted">{{ record.timestamp[:19] }}</small></td>
+                            <td><span class="badge bg-primary">{{ record.change_type }}</span></td>
+                            <td>{{ record.parameter_name or '-' }}</td>
+                            <td>
+                                {% if record.old_value is not none and record.new_value is not none %}
+                                <code>{{ record.old_value }}</code> → <code class="text-success">{{ record.new_value }}</code>
+                                {% elif record.status_before and record.status_after %}
+                                <small>{{ record.status_before }}</small> → <small class="text-success">{{ record.status_after }}</small>
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                            <td>{{ record.operator }}</td>
+                            <td><small>{{ record.reason or record.comments or '-' }}</small></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card border-secondary h-100">
+                <div class="card-header bg-secondary bg-opacity-10">
+                    <h5 class="mb-0"><i class="bi bi-image"></i> 补录维修群截图</h5>
+                </div>
+                <div class="card-body">
+                    <form id="screenshotForm" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">截图文件</label>
+                            <input type="file" class="form-control" id="screenshotFile" accept="image/*" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">截图描述</label>
+                            <input type="text" class="form-control" id="screenshotDesc" placeholder="例如：2024-01-15维修群阀门参数确认截图" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">关联参数名称（逗号分隔）</label>
+                            <input type="text" class="form-control" id="relatedParams" placeholder="例如：wave_speed, valve_closing_time">
+                        </div>
+                        <button type="button" class="btn btn-secondary w-100" onclick="submitScreenshot()">
+                            <i class="bi bi-cloud-upload"></i> 上传截图
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-secondary h-100">
+                <div class="card-header bg-secondary bg-opacity-10">
+                    <h5 class="mb-0"><i class="bi bi-link-45deg"></i> 关联已有截图</h5>
+                </div>
+                <div class="card-body">
+                    <form id="linkScreenshotForm">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">选择已有截图</label>
+                            <select class="form-select" id="existingScreenshot" required>
+                                <option value="">请选择截图ID...</option>
+                                {% for sid in available_screenshots %}
+                                <option value="{{ sid }}">{{ sid }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="button" class="btn btn-outline-secondary w-100" onclick="linkExistingScreenshot()">
+                            <i class="bi bi-link"></i> 关联此截图
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-primary mb-4">
+        <div class="card-header bg-primary bg-opacity-10">
+            <h5 class="mb-0"><i class="bi bi-pencil-square"></i> 补充改系数原因</h5>
+        </div>
+        <div class="card-body">
+            <form id="overrideReasonForm">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">选择参数</label>
+                        <select class="form-select" id="overrideParam" required>
+                            <option value="">请选择参数...</option>
+                            {% for p in modifiable_params %}
+                            <option value="{{ p.name }}">{{ p.name }} ({{ p.original }} → {{ p.overridden }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">复核人姓名</label>
+                        <input type="text" class="form-control" id="overrideReviewer" placeholder="请输入复核人姓名" required>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold">改系数原因</label>
+                        <textarea class="form-control" id="overrideReason" rows="3" placeholder="请详细说明修改该系数的依据和原因..." required></textarea>
+                    </div>
+                    <div class="col-md-12">
+                        <button type="button" class="btn btn-primary w-100" onclick="submitOverrideReason()">
+                            <i class="bi bi-check2-circle"></i> 提交修改原因
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
+
+<script>
+function submitScreenshot() {
+    const file = document.getElementById('screenshotFile').files[0];
+    const desc = document.getElementById('screenshotDesc').value.trim();
+    if (!file || !desc) { alert('请填写截图文件和描述'); return; }
+    console.log('上传截图', { calc_id: '{{ calc_id }}', file: file.name, desc });
+    alert('截图已上传！');
+    document.getElementById('screenshotForm').reset();
+}
+
+function linkExistingScreenshot() {
+    const sid = document.getElementById('existingScreenshot').value;
+    if (!sid) { alert('请选择截图'); return; }
+    console.log('关联截图', { calc_id: '{{ calc_id }}', screenshot_id: sid });
+    alert('已关联截图：' + sid);
+}
+
+function submitOverrideReason() {
+    const param = document.getElementById('overrideParam').value;
+    const reviewer = document.getElementById('overrideReviewer').value.trim();
+    const reason = document.getElementById('overrideReason').value.trim();
+    if (!param || !reviewer || !reason) { alert('请完整填写所有字段'); return; }
+    console.log('补充改系数原因', { calc_id: '{{ calc_id }}', param, reviewer, reason });
+    alert('已提交改系数原因！');
+    document.getElementById('overrideReasonForm').reset();
+}
+</script>
 {% endblock %}

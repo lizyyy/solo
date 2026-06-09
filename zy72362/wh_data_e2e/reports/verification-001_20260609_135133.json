@@ -1,0 +1,171 @@
+{
+  "calc_id": "verification-001",
+  "export_timestamp": "2026-06-09T13:51:33.740162",
+  "status": "设备工程师已通过",
+  "summary": {
+    "pipe_length": 500.0,
+    "pipe_diameter": 0.3,
+    "wall_thickness": 0.01,
+    "fluid_density": 1000.0,
+    "bulk_modulus": 2200000000.0,
+    "wave_speed_used": 1286.131928826069,
+    "valve_closing_time": 5.0,
+    "initial_velocity": 2.5,
+    "joukowsky_pressure": 3215329.8220651727,
+    "pressure_rise": 3215329.8220651727,
+    "max_pressure": 3215329.8220651727
+  },
+  "parameter_entries": [
+    {
+      "name": "pipe_length",
+      "value": 500.0,
+      "unit": "m",
+      "provenance": {
+        "source": "设备铭牌参数",
+        "detail": "泵出口至一号阀门管道总长度",
+        "timestamp": "2024-01-15T09:00:00"
+      },
+      "is_manually_modified": false,
+      "modification_reason": null,
+      "missing_materials": [
+        "现场实际管长复测报告"
+      ],
+      "next_action": "找设备工程师确认管长"
+    },
+    {
+      "name": "valve_closing_time",
+      "value": 5.0,
+      "unit": "s",
+      "provenance": {
+        "source": "维修群截图",
+        "detail": "维修群截图 训练教练老唐在维修群的现场说法：阀门关闭时间实测为 2.5 秒，不是铭牌上的 5 秒",
+        "timestamp": "2026-06-09T13:51:33.738116"
+      },
+      "is_manually_modified": true,
+      "modification_reason": "维修群截图显示实测关阀时间为2.5秒，铭牌标称5秒偏保守",
+      "missing_materials": [
+        "阀门现场实测数据"
+      ],
+      "next_action": null
+    },
+    {
+      "name": "friction_factor",
+      "value": 0.015,
+      "unit": "-",
+      "provenance": {
+        "source": "维修群截图",
+        "detail": "维修群截图 训练教练老唐在维修群的现场说法：阀门关闭时间实测为 2.5 秒，不是铭牌上的 5 秒",
+        "timestamp": "2026-06-09T13:51:33.738116"
+      },
+      "is_manually_modified": true,
+      "modification_reason": "老唐提供的管道结垢照片显示实际粗糙度大于设计值",
+      "missing_materials": [],
+      "next_action": "找设备工程师复核"
+    }
+  ],
+  "override_flags": [
+    {
+      "parameter_name": "valve_closing_time",
+      "original_value": 5.0,
+      "overridden_value": 5.0,
+      "reason": "维修群截图显示实测关阀时间为2.5秒，铭牌标称5秒偏保守",
+      "needs_review": false,
+      "reviewer": "设备工程师李工"
+    },
+    {
+      "parameter_name": "friction_factor",
+      "original_value": 0.015,
+      "overridden_value": 0.015,
+      "reason": "老唐提供的管道结垢照片显示实际粗糙度大于设计值",
+      "needs_review": false,
+      "reviewer": "设备工程师李工"
+    }
+  ],
+  "replay_narrative": "参数「pipe_length」（500.0 m）来源：设备铭牌参数，泵出口至一号阀门管道总长度；缺少材料：现场实际管长复测报告；下一步：找设备工程师确认管长\n参数「valve_closing_time」（5.0 s）来源：维修群截图，维修群截图 训练教练老唐在维修群的现场说法：阀门关闭时间实测为 2.5 秒，不是铭牌上的 5 秒；已人工修改，原因：维修群截图显示实测关阀时间为2.5秒，铭牌标称5秒偏保守；缺少材料：阀门现场实测数据\n参数「friction_factor」（0.015 -）来源：维修群截图，维修群截图 训练教练老唐在维修群的现场说法：阀门关闭时间实测为 2.5 秒，不是铭牌上的 5 秒；已人工修改，原因：老唐提供的管道结垢照片显示实际粗糙度大于设计值；下一步：找设备工程师复核",
+  "change_history": [
+    {
+      "change_id": "a51a4dc8",
+      "change_type": "补录维修群截图",
+      "timestamp": "2026-06-09T13:51:33.738116",
+      "operator": "训练教练老唐",
+      "parameter_name": null,
+      "old_value": null,
+      "new_value": null,
+      "reason": "训练教练老唐在维修群的现场说法：阀门关闭时间实测为 2.5 秒，不是铭牌上的 5 秒",
+      "status_before": null,
+      "status_after": null,
+      "related_screenshot_id": "SCREEN-2024-001",
+      "related_nameplate_id": null,
+      "reviewer": null,
+      "comments": null
+    },
+    {
+      "change_id": "93dc8a47",
+      "change_type": "补充改系数原因",
+      "timestamp": "2026-06-09T13:51:33.738771",
+      "operator": "设备工程师张工",
+      "parameter_name": "friction_factor",
+      "old_value": null,
+      "new_value": null,
+      "reason": "老唐提供的管道结垢照片显示实际粗糙度大于设计值",
+      "status_before": null,
+      "status_after": null,
+      "related_screenshot_id": null,
+      "related_nameplate_id": null,
+      "reviewer": "设备工程师张工",
+      "comments": null
+    },
+    {
+      "change_id": "acb7d69d",
+      "change_type": "补充改系数原因",
+      "timestamp": "2026-06-09T13:51:33.739056",
+      "operator": "设备工程师张工",
+      "parameter_name": "valve_closing_time",
+      "old_value": null,
+      "new_value": null,
+      "reason": "维修群截图显示实测关阀时间为2.5秒，铭牌标称5秒偏保守",
+      "status_before": null,
+      "status_after": null,
+      "related_screenshot_id": null,
+      "related_nameplate_id": null,
+      "reviewer": "设备工程师张工",
+      "comments": null
+    },
+    {
+      "change_id": "c9b8ed76",
+      "change_type": "训练教练确认",
+      "timestamp": "2026-06-09T13:51:33.739398",
+      "operator": "训练教练老唐",
+      "parameter_name": null,
+      "old_value": null,
+      "new_value": null,
+      "reason": "现场已核关阀时间确实为2.5秒，结垢照片属实",
+      "status_before": null,
+      "status_after": null,
+      "related_screenshot_id": null,
+      "related_nameplate_id": null,
+      "reviewer": "训练教练老唐",
+      "comments": "现场已核关阀时间确实为2.5秒，结垢照片属实"
+    },
+    {
+      "change_id": "d2514177",
+      "change_type": "设备工程师复核",
+      "timestamp": "2026-06-09T13:51:33.739713",
+      "operator": "设备工程师李工",
+      "parameter_name": null,
+      "old_value": null,
+      "new_value": null,
+      "reason": "所有参数均有证据支撑，压力升高 3.22 MPa 在允许范围内，予以通过",
+      "status_before": null,
+      "status_after": null,
+      "related_screenshot_id": null,
+      "related_nameplate_id": null,
+      "reviewer": "设备工程师李工",
+      "comments": "所有参数均有证据支撑，压力升高 3.22 MPa 在允许范围内，予以通过"
+    }
+  ],
+  "next_action_summary": [
+    "找设备工程师确认管长",
+    "找设备工程师复核"
+  ]
+}

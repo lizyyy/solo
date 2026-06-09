@@ -1,20 +1,99 @@
 body {
-    padding-top: 20px;
+    padding-top: 0;
+    background-color: #f8f9fa;
 }
+
 table {
     border-collapse: collapse;
     width: 100%;
 }
+
 table th, table td {
     border: 1px solid #dee2e6;
-    padding: 8px;
+    padding: 8px 12px;
+    vertical-align: middle;
 }
+
 .warning-banner {
-    background-color: #dc3545;
-    color: white;
-    padding: 15px;
-    border-radius: 5px;
-}
-.modified-row {
     background-color: #ffc107;
+    color: #212529;
+    padding: 16px 20px;
+    border-radius: 8px;
+    border-left: 5px solid #ff9800;
+    font-weight: 500;
+}
+
+.modified-row {
+    background-color: #fff3cd !important;
+}
+
+.status-badge {
+    font-size: 0.95rem;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.card-header {
+    font-weight: 600;
+}
+
+.card {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    transition: box-shadow 0.2s ease;
+}
+
+.card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+.table thead th {
+    background-color: #f1f3f5;
+    border-bottom: 2px solid #dee2e6;
+    font-weight: 600;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(13, 110, 253, 0.05);
+}
+
+code {
+    color: #d63384;
+    background-color: #f8f9fa;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+.hero-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.hero-section h1,
+.hero-section p {
+    color: white;
+}
+
+.btn-group .btn-check:checked + .btn {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+textarea:focus,
+input:focus,
+select:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+}
+
+.alert {
+    border-radius: 8px;
+}
+
+.badge {
+    font-weight: 500;
+}
+
+.fw-bold {
+    font-weight: 600 !important;
 }
