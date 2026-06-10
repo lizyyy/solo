@@ -1,0 +1,11 @@
+{
+  "name": "sunlit-volume-tracker",
+  "version": "1.0.0",
+  "description": "日照体量材料追踪系统",
+  "scripts": {
+    "install:all": "cd server && npm install && cd ../client && npm install",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "start": "cd server && npm start"
+  }
+}

@@ -1,0 +1,262 @@
+{
+  "materials": [
+    {
+      "id": "cf350705-d133-428d-84cc-d86b666bd7d5",
+      "materialNo": "RZ-001",
+      "name": "A栋南侧遮阳板铝合金型材",
+      "category": "铝合金型材",
+      "quantity": 320,
+      "unit": "根",
+      "specification": "6063-T5 壁厚2.0mm",
+      "status": "pending",
+      "source": "示例数据-1号会议",
+      "sourceId": null,
+      "remarks": "待碰撞复核",
+      "reviewer": "老叶",
+      "reviewConclusion": "",
+      "createdAt": "2026-06-10T07:25:05.525Z",
+      "updatedAt": "2026-06-10T07:25:05.525Z",
+      "history": [
+        {
+          "action": "创建",
+          "operator": "老叶",
+          "time": "2026-06-10T07:25:05.525Z",
+          "detail": "创建材料记录：A栋南侧遮阳板铝合金型材"
+        }
+      ]
+    },
+    {
+      "id": "f260cf2b-2b30-416e-89ac-c9f9558ecbde",
+      "materialNo": "RZ-002",
+      "name": "B栋西向Low-E中空玻璃",
+      "category": "玻璃",
+      "quantity": 0,
+      "unit": "㎡",
+      "specification": "",
+      "status": "need_supplement",
+      "source": "示例数据-材料追踪",
+      "sourceId": null,
+      "remarks": "需补充数量与规格",
+      "reviewer": "老叶",
+      "reviewConclusion": "缺少数量与规格参数",
+      "createdAt": "2026-06-10T07:25:05.525Z",
+      "updatedAt": "2026-06-10T07:25:05.525Z",
+      "history": [
+        {
+          "action": "创建",
+          "operator": "老叶",
+          "time": "2026-06-10T07:25:05.525Z",
+          "detail": "创建材料记录：B栋西向Low-E中空玻璃"
+        }
+      ]
+    },
+    {
+      "id": "62635853-8a9c-4a9d-8d1a-1e399013eada",
+      "materialNo": "RZ-003",
+      "name": "C栋屋面挑檐钢结构件",
+      "category": "钢结构",
+      "quantity": 48,
+      "unit": "件",
+      "specification": "Q345B 焊接H型钢",
+      "status": "pending",
+      "source": "示例数据",
+      "sourceId": null,
+      "remarks": "",
+      "reviewer": "",
+      "reviewConclusion": "",
+      "createdAt": "2026-06-10T07:25:05.526Z",
+      "updatedAt": "2026-06-10T07:25:05.526Z",
+      "history": [
+        {
+          "action": "创建",
+          "operator": "系统",
+          "time": "2026-06-10T07:25:05.526Z",
+          "detail": "创建材料记录：C栋屋面挑檐钢结构件"
+        }
+      ]
+    }
+  ],
+  "meetingMinutes": [
+    {
+      "id": "23f5cf7a-e037-420b-aefa-1ce6941450c3",
+      "title": "2026年6月第一周结构复核例会",
+      "meetingDate": "2026-06-03",
+      "location": "结构专业会议室",
+      "attendees": [
+        "老叶",
+        "张工",
+        "李工"
+      ],
+      "source": "示例导入",
+      "sourceType": "manual",
+      "rawFields": {
+        "会议主题": "结构复核",
+        "日期": "2026-06-03"
+      },
+      "keyMap": {
+        "会议主题": "会议主题",
+        "日期": "会议日期"
+      },
+      "items": [
+        {
+          "itemId": "7d8f43f0-cec6-4717-aba9-2156ac6ade1f",
+          "index": 1,
+          "materialNo": "RZ-001",
+          "content": "{\"编号\":\"RZ-001\",\"问题描述\":\"A栋3层/轴C-5与暖通风管穿过遮阳板主龙骨\",\"责任人\":\"老叶\",\"要求时间\":\"2026-06-10\",\"处理状态\":\"待处理\"}",
+          "collisionDesc": "A栋3层/轴C-5与暖通风管穿过遮阳板主龙骨",
+          "owner": "老叶",
+          "deadline": "",
+          "status": "待处理",
+          "processed": false,
+          "linkedMaterialId": null,
+          "rawItem": {
+            "编号": "RZ-001",
+            "问题描述": "A栋3层/轴C-5与暖通风管穿过遮阳板主龙骨",
+            "责任人": "老叶",
+            "要求时间": "2026-06-10",
+            "处理状态": "待处理"
+          }
+        },
+        {
+          "itemId": "59321794-929c-4c99-a24b-a4bde32d5ca0",
+          "index": 2,
+          "materialNo": "RZ-003",
+          "content": "{\"materialId\":\"RZ-003\",\"碰撞描述\":\"C栋屋面钢结构与幕墙埋件位置冲突，埋件偏位30mm\",\"owner\":\"老叶\",\"deadline\":\"2026-06-15\"}",
+          "collisionDesc": "C栋屋面钢结构与幕墙埋件位置冲突，埋件偏位30mm",
+          "owner": "老叶",
+          "deadline": "2026-06-15",
+          "status": "待处理",
+          "processed": false,
+          "linkedMaterialId": null,
+          "rawItem": {
+            "materialId": "RZ-003",
+            "碰撞描述": "C栋屋面钢结构与幕墙埋件位置冲突，埋件偏位30mm",
+            "owner": "老叶",
+            "deadline": "2026-06-15"
+          }
+        }
+      ],
+      "createdAt": "2026-06-10T07:25:05.526Z",
+      "importedBy": "老叶"
+    }
+  ],
+  "collisionPoints": [
+    {
+      "id": "a5000d02-ffad-4ee1-8372-2fdfe3ab7ff6",
+      "collisionKey": "a栋|3|C|5|cf350705-d133-428d-84cc-d86b666bd7d5|结构-暖通碰撞",
+      "materialId": "cf350705-d133-428d-84cc-d86b666bd7d5",
+      "materialNo": "RZ-001",
+      "buildingId": "A栋",
+      "floor": "3",
+      "axisX": "C",
+      "axisY": "5",
+      "type": "结构-暖通碰撞",
+      "severity": "critical",
+      "description": "暖通风管穿过遮阳板主龙骨，需调整龙骨走向",
+      "originalQuote": "A栋3层/轴C-5与暖通风管穿过遮阳板主龙骨",
+      "screenshot": null,
+      "cameraView": {
+        "eye": [
+          120.5,
+          45.2,
+          30.1
+        ]
+      },
+      "modelRef": "A-03-S-001 / Revit",
+      "sourceMinutesId": "23f5cf7a-e037-420b-aefa-1ce6941450c3",
+      "sourceItemId": "7d8f43f0-cec6-4717-aba9-2156ac6ade1f",
+      "sourceRef": "2026年6月第一周结构复核例会 · 第1条",
+      "processingStatus": "待处理",
+      "resolution": "",
+      "resolved": false,
+      "resolvedAt": null,
+      "assignedTo": "老叶",
+      "createdAt": "2026-06-10T07:25:05.526Z",
+      "updatedAt": "2026-06-10T07:25:05.526Z",
+      "createdBy": "老叶",
+      "history": [
+        {
+          "action": "创建",
+          "operator": "老叶",
+          "time": "2026-06-10T07:25:05.526Z",
+          "detail": "录入碰撞点，原始会议纪要说法：A栋3层/轴C-5与暖通风管穿过遮阳板主龙骨"
+        }
+      ]
+    },
+    {
+      "id": "2c438c86-3085-4a79-b1ef-4861f9974629",
+      "collisionKey": "c栋|屋面层|J|2-3|62635853-8a9c-4a9d-8d1a-1e399013eada|埋件偏位",
+      "materialId": "62635853-8a9c-4a9d-8d1a-1e399013eada",
+      "materialNo": "RZ-003",
+      "buildingId": "C栋",
+      "floor": "屋面层",
+      "axisX": "J",
+      "axisY": "2-3",
+      "type": "埋件偏位",
+      "severity": "warning",
+      "description": "幕墙埋件偏位30mm，需复核焊缝长度是否满足",
+      "originalQuote": "C栋屋面钢结构与幕墙埋件位置冲突，埋件偏位30mm",
+      "screenshot": null,
+      "cameraView": null,
+      "modelRef": "C-RF-S-012",
+      "sourceMinutesId": "23f5cf7a-e037-420b-aefa-1ce6941450c3",
+      "sourceItemId": "59321794-929c-4c99-a24b-a4bde32d5ca0",
+      "sourceRef": "2026年6月第一周结构复核例会 · 第2条",
+      "processingStatus": "待处理",
+      "resolution": "",
+      "resolved": false,
+      "resolvedAt": null,
+      "assignedTo": "老叶",
+      "createdAt": "2026-06-10T07:25:05.526Z",
+      "updatedAt": "2026-06-10T07:25:05.526Z",
+      "createdBy": "老叶",
+      "history": [
+        {
+          "action": "创建",
+          "operator": "老叶",
+          "time": "2026-06-10T07:25:05.526Z",
+          "detail": "录入碰撞点，原始会议纪要说法：C栋屋面钢结构与幕墙埋件位置冲突，埋件偏位30mm"
+        }
+      ]
+    }
+  ],
+  "fieldMappings": {
+    "会议日期": [
+      "meetingDate",
+      "date",
+      "日期",
+      "开会时间"
+    ],
+    "材料编号": [
+      "materialNo",
+      "materialId",
+      "编号",
+      "图号"
+    ],
+    "碰撞描述": [
+      "collisionDesc",
+      "问题描述",
+      "描述",
+      "collision"
+    ],
+    "负责人": [
+      "owner",
+      "处理人",
+      "责任人"
+    ],
+    "截止日期": [
+      "deadline",
+      "完成时间",
+      "要求日期"
+    ],
+    "状态": [
+      "status",
+      "处理状态",
+      "当前状态"
+    ]
+  },
+  "meta": {
+    "lastUpdated": "2026-06-10T07:25:05.526Z",
+    "version": 1
+  }
+}
