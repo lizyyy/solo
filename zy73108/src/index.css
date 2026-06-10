@@ -1,0 +1,101 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: "Noto Sans SC", -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.6;
+  font-weight: 400;
+  color: #09313A;
+  background-color: #FBF7F2;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  background-image:
+    radial-gradient(ellipse at 12% 8%, rgba(15,76,92,0.06), transparent 50%),
+    radial-gradient(ellipse at 88% 92%, rgba(227,100,20,0.04), transparent 50%);
+  background-attachment: fixed;
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-1.5 px-3.5 py-2 text-sm font-medium rounded border transition-all duration-150 select-none cursor-pointer;
+  }
+  .btn-primary {
+    @apply btn bg-ink text-white border-ink hover:bg-ink-600 hover:border-ink-600 active:translate-y-px shadow-card;
+  }
+  .btn-secondary {
+    @apply btn bg-white text-ink border-paper-line hover:bg-paper hover:border-ink-200 active:translate-y-px shadow-card;
+  }
+  .btn-ghost {
+    @apply btn bg-transparent text-ink-600 border-transparent hover:bg-paper hover:text-ink active:translate-y-px;
+  }
+  .btn-danger {
+    @apply btn bg-white text-ember-500 border-ember-200 hover:bg-ember-50 hover:border-ember-400 active:translate-y-px shadow-card;
+  }
+  .btn-success {
+    @apply btn bg-moss-500 text-white border-moss-500 hover:bg-moss-600 hover:border-moss-600 active:translate-y-px shadow-card;
+  }
+  .input {
+    @apply w-full px-3 py-2 text-sm bg-white border border-paper-line rounded text-ink placeholder-ink-300 focus:outline-none focus:border-ink-400 focus:ring-2 focus:ring-ink-100 transition-colors;
+  }
+  .card {
+    @apply bg-white rounded-md border border-paper-line shadow-card;
+  }
+  .card-interactive {
+    @apply card transition-all duration-200 hover:shadow-cardHover hover:-translate-y-0.5;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full border;
+  }
+  .chip-neutral {
+    @apply chip bg-paper text-ink-600 border-paper-line;
+  }
+  .chip-ink {
+    @apply chip bg-ink-50 text-ink-600 border-ink-100;
+  }
+  .chip-moss {
+    @apply chip bg-moss-50 text-moss-600 border-moss-200;
+  }
+  .chip-ember {
+    @apply chip bg-ember-50 text-ember-500 border-ember-200;
+  }
+  .stamp {
+    @apply inline-block px-2.5 py-1 border-2 font-bold text-xs tracking-wider rotate-[-4deg] animate-stamp;
+  }
+  .stamp-ember {
+    @apply stamp border-ember-400 text-ember-500;
+  }
+  .stamp-moss {
+    @apply stamp border-moss-500 text-moss-600;
+  }
+  .timeline-dot {
+    @apply absolute -left-[7px] top-5 w-3.5 h-3.5 rounded-full border-2 border-paper bg-ink-400 shadow-card;
+  }
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #CDE5EA;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #9BCBD4;
+}
