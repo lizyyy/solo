@@ -1,0 +1,106 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: '"JetBrains Mono"', ui-monospace, monospace;
+    background-color: #151D29;
+    color: #E4E9F0;
+  }
+  body {
+    background-image:
+      linear-gradient(rgba(30, 42, 58, 0.92), rgba(21, 29, 41, 0.96)),
+      repeating-linear-gradient(0deg, transparent 0, transparent 39px, rgba(74, 93, 112, 0.12) 39px, rgba(74, 93, 112, 0.12) 40px),
+      repeating-linear-gradient(90deg, transparent 0, transparent 39px, rgba(74, 93, 112, 0.08) 39px, rgba(74, 93, 112, 0.08) 40px);
+    min-height: 100vh;
+  }
+  ::selection {
+    background: #C0392B;
+    color: #fff;
+  }
+}
+
+@layer components {
+  .btn-steel {
+    @apply px-4 py-2 bg-steel-700 text-steel-100 border-2 border-steel-500
+           font-mono text-sm tracking-wide uppercase
+           hover:bg-steel-600 hover:border-steel-400
+           active:shadow-stamp active:translate-y-[1px]
+           transition-all duration-150 select-none;
+  }
+  .btn-danger {
+    @apply px-4 py-2 bg-[#7B241C] text-white border-2 border-[#C0392B]
+           font-mono text-sm tracking-wide uppercase
+           hover:bg-[#922B21] hover:border-[#E74C3C]
+           active:shadow-stamp active:translate-y-[1px]
+           transition-all duration-150 select-none;
+  }
+  .btn-warn {
+    @apply px-4 py-2 bg-[#784212] text-white border-2 border-[#E67E22]
+           font-mono text-sm tracking-wide uppercase
+           hover:bg-[#935116] hover:border-[#F39C12]
+           active:shadow-stamp active:translate-y-[1px]
+           transition-all duration-150 select-none;
+  }
+  .btn-success {
+    @apply px-4 py-2 bg-[#186A3B] text-white border-2 border-[#27AE60]
+           font-mono text-sm tracking-wide uppercase
+           hover:bg-[#1E8449] hover:border-[#2ECC71]
+           active:shadow-stamp active:translate-y-[1px]
+           transition-all duration-150 select-none;
+  }
+  .panel {
+    @apply bg-steel-800/80 backdrop-blur-sm border border-steel-600 shadow-panel;
+  }
+  .panel-bordered {
+    @apply bg-steel-800 border-2 border-steel-500 shadow-panel relative;
+  }
+  .stamp-badge {
+    @apply inline-flex items-center justify-center
+           px-2.5 py-1 border-2 border-dashed font-mono text-xs uppercase tracking-wider
+           transform rotate-[-2deg];
+  }
+  .grid-paper {
+    background-image:
+      linear-gradient(rgba(74, 93, 112, 0.18) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(74, 93, 112, 0.18) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+  .zebra-row:nth-child(odd) {
+    background-color: rgba(37, 51, 66, 0.5);
+  }
+  .zebra-row:nth-child(even) {
+    background-color: rgba(30, 42, 58, 0.5);
+  }
+  .input-steel {
+    @apply bg-steel-900 border border-steel-500 text-steel-100
+           px-3 py-2 font-mono text-sm
+           focus:outline-none focus:border-[#E67E22] focus:ring-1 focus:ring-[#E67E22]
+           placeholder-steel-400;
+  }
+}
+
+@layer utilities {
+  .font-display-cn {
+    font-family: '"Archivo Black"', '"Microsoft YaHei"', sans-serif;
+    letter-spacing: 0.02em;
+  }
+  .content-auto {
+    content-visibility: auto;
+  }
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: #1E2A3A;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #4A5D70;
+    border-radius: 0;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: #6D8092;
+  }
+}
