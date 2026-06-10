@@ -1,0 +1,73 @@
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: "Noto Sans SC", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.6;
+  font-weight: 400;
+  color-scheme: light;
+  color: #0f172a;
+  background-color: #f8fafc;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+}
+
+/* ===== 设计令牌辅助类 ===== */
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded-sm2 transition-colors duration-150 select-none focus:outline-none focus:ring-2 focus:ring-brand-400 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-primary {
+    @apply btn bg-brand-600 text-white shadow-inset border border-brand-700 hover:bg-brand-700;
+  }
+  .btn-ghost {
+    @apply btn bg-transparent text-ink-700 border border-ink-200 hover:bg-ink-100;
+  }
+  .btn-danger {
+    @apply btn bg-accent-returned text-white border border-red-800 hover:bg-red-700;
+  }
+  .btn-warn {
+    @apply btn bg-accent-suspended text-white border border-amber-800 hover:bg-amber-700;
+  }
+  .card {
+    @apply bg-white border border-ink-200 shadow-card rounded-sm2;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full;
+  }
+  .input-base {
+    @apply w-full px-3 py-2 text-sm border border-ink-300 rounded-sm2 bg-white text-ink-800 placeholder:text-ink-400 focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-brand-400 transition;
+  }
+  .label-base {
+    @apply block text-xs font-medium text-ink-600 mb-1.5 tracking-wide;
+  }
+  .section-title {
+    @apply font-serif text-base font-semibold text-ink-800 border-b border-ink-200 pb-2 mb-3 flex items-center gap-2;
+  }
+  .grid-bg {
+    background-image:
+      linear-gradient(to right, rgba(30,58,95,0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(30,58,95,0.06) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+}
+
+/* scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+::-webkit-scrollbar-track { background: transparent; }
