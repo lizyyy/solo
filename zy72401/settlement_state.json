@@ -1,0 +1,626 @@
+{
+  "runs": [
+    {
+      "run_id": "13031dd2-7b8d-4b3d-a978-deca34912971",
+      "run_no": 1,
+      "operator": "版权运营小鹿",
+      "source_files": [
+        "audio_remarks_sample.txt"
+      ],
+      "tickets": [
+        {
+          "id": "5245e2a9-44f1-4dd7-8e8f-84aee2f6e17b",
+          "batch_no": "B20260601",
+          "ticket_no": "T001",
+          "ticket_type": "赠票",
+          "artist_name": "乐队A",
+          "amount": 0.0,
+          "audio_remark": "赠票-艺人工作证-音乐节后台通行",
+          "original_remark": "赠票-艺人工作证-音乐节后台通行",
+          "auth_period": "2026-06-01至2026-12-31",
+          "source_file": "audio_remarks_sample.txt",
+          "created_at": "2026-06-12T01:44:14.595689",
+          "updated_at": "2026-06-12T01:44:44.725932"
+        },
+        {
+          "id": "29aa4fe8-3618-4b3e-ac7e-ca42bfc863e7",
+          "batch_no": "B20260601",
+          "ticket_no": "T002",
+          "ticket_type": "售票",
+          "artist_name": "乐队A",
+          "amount": 380.0,
+          "audio_remark": "售票-内场VIP区-歌迷正常购票",
+          "original_remark": "售票-内场VIP区-歌迷正常购票",
+          "auth_period": "2026-06-01至2026-08-31",
+          "source_file": "audio_remarks_sample.txt",
+          "created_at": "2026-06-12T01:44:14.595701",
+          "updated_at": "2026-06-12T01:44:51.025031"
+        },
+        {
+          "id": "40ffb3e8-cc01-4d32-828c-57ac4983866d",
+          "batch_no": "B20260601",
+          "ticket_no": "T003",
+          "ticket_type": "赠票",
+          "artist_name": "乐队B",
+          "amount": 0.0,
+          "audio_remark": "赠票-嘉宾票-乐队B成员及随行",
+          "original_remark": "赠票-嘉宾票-乐队B成员及随行",
+          "auth_period": "2026-06-01至2026-12-31",
+          "source_file": "audio_remarks_sample.txt",
+          "created_at": "2026-06-12T01:44:14.595708",
+          "updated_at": "2026-06-12T01:44:51.125122"
+        },
+        {
+          "id": "d1f9a3e5-6a38-4047-a7d8-644b1ded7dac",
+          "batch_no": "B20260602",
+          "ticket_no": "T004",
+          "ticket_type": "售票",
+          "artist_name": "歌手C",
+          "amount": 280.0,
+          "audio_remark": "售票-看台票-正常售票渠道",
+          "original_remark": "售票-看台票-正常售票渠道",
+          "auth_period": "2026-06-01至2026-09-30",
+          "source_file": "audio_remarks_sample.txt",
+          "created_at": "2026-06-12T01:44:14.595722",
+          "updated_at": "2026-06-12T01:44:51.210047"
+        },
+        {
+          "id": "4adaf5fb-616d-4e8f-898f-fa2eedd1288a",
+          "batch_no": "B20260602",
+          "ticket_no": "T005",
+          "ticket_type": "售票",
+          "artist_name": "组合D",
+          "amount": 320.0,
+          "audio_remark": "售票-看台票-正常售票渠道",
+          "original_remark": "售票-看台票-正常售票渠道",
+          "auth_period": "2026-06-01至2026-09-30",
+          "source_file": "audio_remarks_sample.txt",
+          "created_at": "2026-06-12T01:44:14.595728",
+          "updated_at": "2026-06-12T01:45:09.878952"
+        },
+        {
+          "id": "e15a6561-0c95-41c2-99a8-bd6dbbd01715",
+          "batch_no": "B20260603",
+          "ticket_no": "T006",
+          "ticket_type": "赠票",
+          "artist_name": "说唱艺人E",
+          "amount": 0.0,
+          "audio_remark": "赠票-工作人员证-演出团队",
+          "original_remark": "赠票-工作人员证-演出团队",
+          "auth_period": "2026-06-01至2026-12-31",
+          "source_file": "audio_remarks_sample.txt",
+          "created_at": "2026-06-12T01:44:14.595733",
+          "updated_at": "2026-06-12T01:44:51.345528"
+        },
+        {
+          "id": "53dc4319-bbae-4385-a678-996d5f37bc8b",
+          "batch_no": "B20260603",
+          "ticket_no": "T007",
+          "ticket_type": "赠票",
+          "artist_name": "说唱艺人E",
+          "amount": 0.0,
+          "audio_remark": "赠票-工作人员证-演出团队",
+          "original_remark": "赠票-工作人员证-演出团队",
+          "auth_period": "2026-06-01至2026-12-31",
+          "source_file": "audio_remarks_sample.txt",
+          "created_at": "2026-06-12T01:44:14.595739",
+          "updated_at": "2026-06-12T01:44:51.412798"
+        }
+      ],
+      "batches": {
+        "B20260601": {
+          "batch_no": "B20260601",
+          "total_tickets": 3,
+          "free_count": 2,
+          "paid_count": 1,
+          "unknown_count": 0,
+          "total_amount": 380.0,
+          "status": "赠票售票混批",
+          "needs_review": true,
+          "reviewer": null,
+          "reviewed_at": null
+        },
+        "B20260602": {
+          "batch_no": "B20260602",
+          "total_tickets": 2,
+          "free_count": 0,
+          "paid_count": 2,
+          "unknown_count": 0,
+          "total_amount": 600.0,
+          "status": "正常",
+          "needs_review": false,
+          "reviewer": null,
+          "reviewed_at": null
+        },
+        "B20260603": {
+          "batch_no": "B20260603",
+          "total_tickets": 2,
+          "free_count": 2,
+          "paid_count": 0,
+          "unknown_count": 0,
+          "total_amount": 0.0,
+          "status": "正常",
+          "needs_review": false,
+          "reviewer": null,
+          "reviewed_at": null
+        }
+      },
+      "alerts": [
+        {
+          "id": "c6824b4f-9944-4bc4-90f9-1778c81fafd0",
+          "batch_no": "B20260601",
+          "level": "阻断",
+          "title": "批次 B20260601 存在赠票售票混批",
+          "reason": "该批次共 3 张票，其中赠票 2 张、售票 1 张，两类票混在同一批次结算，可能影响餐补计算口径。",
+          "missing_materials": [
+            "录音师对该批次票种划分的确认说明",
+            "赠票对应的艺人授权期限页"
+          ],
+          "next_step": "请先转录音师复核确认票种归属，待确认后再由版权运营小鹿补充授权期限页。",
+          "assignee": "录音师",
+          "resolved": false,
+          "resolved_at": null,
+          "created_at": "2026-06-12T01:45:09.879012",
+          "updated_at": "2026-06-12T01:45:09.879015",
+          "trigger_ticket_nos": [
+            "T001",
+            "T002",
+            "T003"
+          ],
+          "trigger_remarks": [
+            "T001: 赠票-艺人工作证-音乐节后台通行",
+            "T002: 售票-内场VIP区-歌迷正常购票",
+            "T003: 赠票-嘉宾票-乐队B成员及随行"
+          ]
+        }
+      ],
+      "is_rerun": false,
+      "parent_run_id": null,
+      "created_at": "2026-06-12T01:44:14.595662"
+    },
+    {
+      "run_id": "bd5cf8db-dd88-4e95-bfa7-02f9555f19ef",
+      "run_no": 2,
+      "operator": "版权运营小鹿",
+      "source_files": [
+        "audio_remarks_sample.txt"
+      ],
+      "tickets": [
+        {
+          "id": "5245e2a9-44f1-4dd7-8e8f-84aee2f6e17b",
+          "batch_no": "B20260601",
+          "ticket_no": "T001",
+          "ticket_type": "赠票",
+          "artist_name": "乐队A",
+          "amount": 0.0,
+          "audio_remark": "赠票-艺人工作证-音乐节后台通行",
+          "original_remark": "赠票-艺人工作证-音乐节后台通行",
+          "auth_period": "2026-06-01至2026-12-31",
+          "source_file": "audio_remarks_sample.txt",
+          "created_at": "2026-06-12T01:44:14.595689",
+          "updated_at": "2026-06-12T01:44:44.725932"
+        },
+        {
+          "id": "29aa4fe8-3618-4b3e-ac7e-ca42bfc863e7",
+          "batch_no": "B20260601",
+          "ticket_no": "T002",
+          "ticket_type": "售票",
+          "artist_name": "乐队A",
+          "amount": 380.0,
+          "audio_remark": "售票-内场VIP区-歌迷正常购票",
+          "original_remark": "售票-内场VIP区-歌迷正常购票",
+          "auth_period": "2026-06-01至2026-08-31",
+          "source_file": "audio_remarks_sample.txt",
+          "created_at": "2026-06-12T01:44:14.595701",
+          "updated_at": "2026-06-12T01:44:51.025031"
+        },
+        {
+          "id": "40ffb3e8-cc01-4d32-828c-57ac4983866d",
+          "batch_no": "B20260601",
+          "ticket_no": "T003",
+          "ticket_type": "赠票",
+          "artist_name": "乐队B",
+          "amount": 0.0,
+          "audio_remark": "赠票-嘉宾票-乐队B成员及随行",
+          "original_remark": "赠票-嘉宾票-乐队B成员及随行",
+          "auth_period": "2026-06-01至2026-12-31",
+          "source_file": "audio_remarks_sample.txt",
+          "created_at": "2026-06-12T01:44:14.595708",
+          "updated_at": "2026-06-12T01:44:51.125122"
+        },
+        {
+          "id": "d1f9a3e5-6a38-4047-a7d8-644b1ded7dac",
+          "batch_no": "B20260602",
+          "ticket_no": "T004",
+          "ticket_type": "售票",
+          "artist_name": "歌手C",
+          "amount": 280.0,
+          "audio_remark": "售票-看台票-正常售票渠道",
+          "original_remark": "售票-看台票-正常售票渠道",
+          "auth_period": "2026-06-01至2026-09-30",
+          "source_file": "audio_remarks_sample.txt",
+          "created_at": "2026-06-12T01:44:14.595722",
+          "updated_at": "2026-06-12T01:44:51.210047"
+        },
+        {
+          "id": "4adaf5fb-616d-4e8f-898f-fa2eedd1288a",
+          "batch_no": "B20260602",
+          "ticket_no": "T005",
+          "ticket_type": "售票",
+          "artist_name": "组合D",
+          "amount": 320.0,
+          "audio_remark": "售票-看台票-正常售票渠道",
+          "original_remark": "售票-看台票-正常售票渠道",
+          "auth_period": "2026-06-01至2026-09-30",
+          "source_file": "audio_remarks_sample.txt",
+          "created_at": "2026-06-12T01:44:14.595728",
+          "updated_at": "2026-06-12T01:45:09.878952"
+        },
+        {
+          "id": "e15a6561-0c95-41c2-99a8-bd6dbbd01715",
+          "batch_no": "B20260603",
+          "ticket_no": "T006",
+          "ticket_type": "赠票",
+          "artist_name": "说唱艺人E",
+          "amount": 0.0,
+          "audio_remark": "赠票-工作人员证-演出团队",
+          "original_remark": "赠票-工作人员证-演出团队",
+          "auth_period": "2026-06-01至2026-12-31",
+          "source_file": "audio_remarks_sample.txt",
+          "created_at": "2026-06-12T01:44:14.595733",
+          "updated_at": "2026-06-12T01:44:51.345528"
+        },
+        {
+          "id": "53dc4319-bbae-4385-a678-996d5f37bc8b",
+          "batch_no": "B20260603",
+          "ticket_no": "T007",
+          "ticket_type": "赠票",
+          "artist_name": "说唱艺人E",
+          "amount": 0.0,
+          "audio_remark": "赠票-工作人员证-演出团队",
+          "original_remark": "赠票-工作人员证-演出团队",
+          "auth_period": "2026-06-01至2026-12-31",
+          "source_file": "audio_remarks_sample.txt",
+          "created_at": "2026-06-12T01:44:14.595739",
+          "updated_at": "2026-06-12T01:44:51.412798"
+        }
+      ],
+      "batches": {
+        "B20260601": {
+          "batch_no": "B20260601",
+          "total_tickets": 3,
+          "free_count": 2,
+          "paid_count": 1,
+          "unknown_count": 0,
+          "total_amount": 380.0,
+          "status": "赠票售票混批",
+          "needs_review": true,
+          "reviewer": null,
+          "reviewed_at": null
+        },
+        "B20260602": {
+          "batch_no": "B20260602",
+          "total_tickets": 2,
+          "free_count": 0,
+          "paid_count": 2,
+          "unknown_count": 0,
+          "total_amount": 600.0,
+          "status": "正常",
+          "needs_review": false,
+          "reviewer": null,
+          "reviewed_at": null
+        },
+        "B20260603": {
+          "batch_no": "B20260603",
+          "total_tickets": 2,
+          "free_count": 2,
+          "paid_count": 0,
+          "unknown_count": 0,
+          "total_amount": 0.0,
+          "status": "正常",
+          "needs_review": false,
+          "reviewer": null,
+          "reviewed_at": null
+        }
+      },
+      "alerts": [
+        {
+          "id": "7f059a20-cd39-4ec3-afe2-e5f571ebb64f",
+          "batch_no": "B20260601",
+          "level": "阻断",
+          "title": "批次 B20260601 存在赠票售票混批",
+          "reason": "该批次共 3 张票，其中赠票 2 张、售票 1 张，两类票混在同一批次结算，可能影响餐补计算口径。",
+          "missing_materials": [
+            "录音师对该批次票种划分的确认说明",
+            "赠票对应的艺人授权期限页"
+          ],
+          "next_step": "请先转录音师复核确认票种归属，待确认后再由版权运营小鹿补充授权期限页。",
+          "assignee": "录音师",
+          "resolved": false,
+          "resolved_at": null,
+          "created_at": "2026-06-12T01:45:36.351115",
+          "updated_at": "2026-06-12T01:45:36.351116",
+          "trigger_ticket_nos": [
+            "T001",
+            "T002",
+            "T003"
+          ],
+          "trigger_remarks": [
+            "T001: 赠票-艺人工作证-音乐节后台通行",
+            "T002: 售票-内场VIP区-歌迷正常购票",
+            "T003: 赠票-嘉宾票-乐队B成员及随行"
+          ]
+        }
+      ],
+      "is_rerun": true,
+      "parent_run_id": "13031dd2-7b8d-4b3d-a978-deca34912971",
+      "created_at": "2026-06-12T01:45:36.351092"
+    }
+  ],
+  "audit_logs": [
+    {
+      "id": "b0b33fd4-39ae-4bb0-96ac-cc4129486f09",
+      "action": "导入",
+      "operator": "版权运营小鹿",
+      "target_batch": null,
+      "target_ticket": null,
+      "target_ticket_no": null,
+      "before_text": "",
+      "after_text": "  票号T001 | 乐队A | 赠票 | 金额0.0 | 备注: 赠票-艺人工作证-音乐节后台通行\n  票号T002 | 乐队A | 售票 | 金额380.0 | 备注: 售票-内场VIP区-歌迷正常购票\n  票号T003 | 乐队B | 赠票 | 金额0.0 | 备注: 赠票-嘉宾票-乐队B成员及随行\n  票号T004 | 歌手C | 售票 | 金额280.0 | 备注: 售票-看台票-正常售票渠道\n  票号T005 | 组合D | 售票 | 金额280.0 | 备注: 售票-看台票-正常售票渠道\n  票号T006 | 说唱艺人E | 赠票 | 金额0.0 | 备注: 赠票-工作人员证-演出团队\n  票号T007 | 说唱艺人E | 赠票 | 金额0.0 | 备注: 赠票-工作人员证-演出团队",
+      "changes": {},
+      "reason": "从 audio_remarks_sample.txt 导入音频备注 7 条",
+      "affected_results": [
+        "创建批次: ['B20260601', 'B20260602', 'B20260603']"
+      ],
+      "timestamp": "2026-06-12T01:44:14.595808"
+    },
+    {
+      "id": "b1b95c57-1860-4496-bf66-9227f915f9f6",
+      "action": "复核",
+      "operator": "录音师老张",
+      "target_batch": "B20260601",
+      "target_ticket": null,
+      "target_ticket_no": null,
+      "before_text": "批次 B20260601 状态: 赠票售票混批\n混批票务明细:\n  T001 | 乐队A | 赠票 | 赠票-艺人工作证-音乐节后台通行\n  T002 | 乐队A | 售票 | 售票-内场VIP区-歌迷正常购票\n  T003 | 乐队B | 赠票 | 赠票-嘉宾票-乐队B成员及随行",
+      "after_text": "批次 B20260601 状态: 已复核\n复核意见: 确认T001和T003是赠票，T002是售票，分属不同艺人可以分开结算",
+      "changes": {
+        "status": {
+          "old": "赠票售票混批",
+          "new": "已复核"
+        }
+      },
+      "reason": "确认T001和T003是赠票，T002是售票，分属不同艺人可以分开结算",
+      "affected_results": [
+        "批次 B20260601 复核完成，解除阻断"
+      ],
+      "timestamp": "2026-06-12T01:44:24.597584"
+    },
+    {
+      "id": "adb0665f-92a9-4126-90ac-21440dc55734",
+      "action": "授权更新",
+      "operator": "版权运营小鹿",
+      "target_batch": null,
+      "target_ticket": "5245e2a9-44f1-4dd7-8e8f-84aee2f6e17b",
+      "target_ticket_no": "T001",
+      "before_text": "票号 T001(乐队A) 授权期限: (未补)",
+      "after_text": "票号 T001(乐队A) 授权期限: 2026-06-01至2026-12-31",
+      "changes": {
+        "auth_period": {
+          "old": "(未补)",
+          "new": "2026-06-01至2026-12-31"
+        }
+      },
+      "reason": "补录票号 T001 的授权期限: 2026-06-01至2026-12-31",
+      "affected_results": [
+        "所属批次: B20260601",
+        "原始备注: 赠票-艺人工作证-音乐节后台通行"
+      ],
+      "timestamp": "2026-06-12T01:44:44.725997"
+    },
+    {
+      "id": "6a9e7d6a-2b79-4126-a6ba-0d3112e2bf4d",
+      "action": "授权更新",
+      "operator": "版权运营小鹿",
+      "target_batch": null,
+      "target_ticket": "29aa4fe8-3618-4b3e-ac7e-ca42bfc863e7",
+      "target_ticket_no": "T002",
+      "before_text": "票号 T002(乐队A) 授权期限: (未补)",
+      "after_text": "票号 T002(乐队A) 授权期限: 2026-06-01至2026-08-31",
+      "changes": {
+        "auth_period": {
+          "old": "(未补)",
+          "new": "2026-06-01至2026-08-31"
+        }
+      },
+      "reason": "补录票号 T002 的授权期限: 2026-06-01至2026-08-31",
+      "affected_results": [
+        "所属批次: B20260601",
+        "原始备注: 售票-内场VIP区-歌迷正常购票"
+      ],
+      "timestamp": "2026-06-12T01:44:51.025081"
+    },
+    {
+      "id": "ad92532f-4366-4a53-9f93-ffe2c02faf58",
+      "action": "授权更新",
+      "operator": "版权运营小鹿",
+      "target_batch": null,
+      "target_ticket": "40ffb3e8-cc01-4d32-828c-57ac4983866d",
+      "target_ticket_no": "T003",
+      "before_text": "票号 T003(乐队B) 授权期限: (未补)",
+      "after_text": "票号 T003(乐队B) 授权期限: 2026-06-01至2026-12-31",
+      "changes": {
+        "auth_period": {
+          "old": "(未补)",
+          "new": "2026-06-01至2026-12-31"
+        }
+      },
+      "reason": "补录票号 T003 的授权期限: 2026-06-01至2026-12-31",
+      "affected_results": [
+        "所属批次: B20260601",
+        "原始备注: 赠票-嘉宾票-乐队B成员及随行"
+      ],
+      "timestamp": "2026-06-12T01:44:51.125180"
+    },
+    {
+      "id": "516cca95-be7b-4060-97c6-26d5123effd6",
+      "action": "授权更新",
+      "operator": "版权运营小鹿",
+      "target_batch": null,
+      "target_ticket": "d1f9a3e5-6a38-4047-a7d8-644b1ded7dac",
+      "target_ticket_no": "T004",
+      "before_text": "票号 T004(歌手C) 授权期限: (未补)",
+      "after_text": "票号 T004(歌手C) 授权期限: 2026-06-01至2026-09-30",
+      "changes": {
+        "auth_period": {
+          "old": "(未补)",
+          "new": "2026-06-01至2026-09-30"
+        }
+      },
+      "reason": "补录票号 T004 的授权期限: 2026-06-01至2026-09-30",
+      "affected_results": [
+        "所属批次: B20260602",
+        "原始备注: 售票-看台票-正常售票渠道"
+      ],
+      "timestamp": "2026-06-12T01:44:51.210107"
+    },
+    {
+      "id": "ca95ccbe-fc46-4de2-a452-6e0e57ddf984",
+      "action": "授权更新",
+      "operator": "版权运营小鹿",
+      "target_batch": null,
+      "target_ticket": "4adaf5fb-616d-4e8f-898f-fa2eedd1288a",
+      "target_ticket_no": "T005",
+      "before_text": "票号 T005(组合D) 授权期限: (未补)",
+      "after_text": "票号 T005(组合D) 授权期限: 2026-06-01至2026-09-30",
+      "changes": {
+        "auth_period": {
+          "old": "(未补)",
+          "new": "2026-06-01至2026-09-30"
+        }
+      },
+      "reason": "补录票号 T005 的授权期限: 2026-06-01至2026-09-30",
+      "affected_results": [
+        "所属批次: B20260602",
+        "原始备注: 售票-看台票-正常售票渠道"
+      ],
+      "timestamp": "2026-06-12T01:44:51.280363"
+    },
+    {
+      "id": "ef3ef0cb-fd3c-41de-b365-33e40c506394",
+      "action": "授权更新",
+      "operator": "版权运营小鹿",
+      "target_batch": "B20260602",
+      "target_ticket": null,
+      "target_ticket_no": null,
+      "before_text": "批次 B20260602 缺授权期限",
+      "after_text": "批次 B20260602 授权期限已全部补齐",
+      "changes": {
+        "alert_resolved": true
+      },
+      "reason": "批次 B20260602 授权期限已全部补齐",
+      "affected_results": [
+        "授权提醒已解决"
+      ],
+      "timestamp": "2026-06-12T01:44:51.280388"
+    },
+    {
+      "id": "3dccd71a-1373-43b9-bb2d-16e7dcbb4567",
+      "action": "授权更新",
+      "operator": "版权运营小鹿",
+      "target_batch": null,
+      "target_ticket": "e15a6561-0c95-41c2-99a8-bd6dbbd01715",
+      "target_ticket_no": "T006",
+      "before_text": "票号 T006(说唱艺人E) 授权期限: (未补)",
+      "after_text": "票号 T006(说唱艺人E) 授权期限: 2026-06-01至2026-12-31",
+      "changes": {
+        "auth_period": {
+          "old": "(未补)",
+          "new": "2026-06-01至2026-12-31"
+        }
+      },
+      "reason": "补录票号 T006 的授权期限: 2026-06-01至2026-12-31",
+      "affected_results": [
+        "所属批次: B20260603",
+        "原始备注: 赠票-工作人员证-演出团队"
+      ],
+      "timestamp": "2026-06-12T01:44:51.345571"
+    },
+    {
+      "id": "a9145ba3-b266-49df-a126-2a73382a0289",
+      "action": "授权更新",
+      "operator": "版权运营小鹿",
+      "target_batch": null,
+      "target_ticket": "53dc4319-bbae-4385-a678-996d5f37bc8b",
+      "target_ticket_no": "T007",
+      "before_text": "票号 T007(说唱艺人E) 授权期限: (未补)",
+      "after_text": "票号 T007(说唱艺人E) 授权期限: 2026-06-01至2026-12-31",
+      "changes": {
+        "auth_period": {
+          "old": "(未补)",
+          "new": "2026-06-01至2026-12-31"
+        }
+      },
+      "reason": "补录票号 T007 的授权期限: 2026-06-01至2026-12-31",
+      "affected_results": [
+        "所属批次: B20260603",
+        "原始备注: 赠票-工作人员证-演出团队"
+      ],
+      "timestamp": "2026-06-12T01:44:51.412848"
+    },
+    {
+      "id": "817fdb05-5798-4aa4-a4b1-887718452b78",
+      "action": "授权更新",
+      "operator": "版权运营小鹿",
+      "target_batch": "B20260603",
+      "target_ticket": null,
+      "target_ticket_no": null,
+      "before_text": "批次 B20260603 缺授权期限",
+      "after_text": "批次 B20260603 授权期限已全部补齐",
+      "changes": {
+        "alert_resolved": true
+      },
+      "reason": "批次 B20260603 授权期限已全部补齐",
+      "affected_results": [
+        "授权提醒已解决"
+      ],
+      "timestamp": "2026-06-12T01:44:51.412873"
+    },
+    {
+      "id": "fd0eb3f4-d91f-4d13-80bd-193b525f4502",
+      "action": "人工修正",
+      "operator": "版权运营小鹿",
+      "target_batch": null,
+      "target_ticket": "4adaf5fb-616d-4e8f-898f-fa2eedd1288a",
+      "target_ticket_no": "T005",
+      "before_text": "票号 T005 | amount = 280.0",
+      "after_text": "票号 T005 | amount = 320.0",
+      "changes": {
+        "amount": {
+          "old": "280.0",
+          "new": "320.0"
+        }
+      },
+      "reason": "核对纸质底单发现T005实际是内场票，金额应为320而非280",
+      "affected_results": [
+        "票号 T005 的 amount 变更: 280.0 → 320.0"
+      ],
+      "timestamp": "2026-06-12T01:45:09.879028"
+    },
+    {
+      "id": "0f047fd9-d875-45e1-abbd-c47ed24f0015",
+      "action": "重跑",
+      "operator": "版权运营小鹿",
+      "target_batch": null,
+      "target_ticket": null,
+      "target_ticket_no": null,
+      "before_text": "运行 #1 状态:\n  B20260601: 赠票售票混批 金额380.0\n  B20260602: 正常 金额600.0\n  B20260603: 正常 金额0.0",
+      "after_text": "运行 #2 状态:\n  B20260601: 赠票售票混批 金额380.0\n  B20260602: 正常 金额600.0\n  B20260603: 正常 金额0.0",
+      "changes": {},
+      "reason": "基于运行 #1 重跑",
+      "affected_results": [
+        "重跑后结果无变化"
+      ],
+      "timestamp": "2026-06-12T01:45:36.351133"
+    }
+  ]
+}
