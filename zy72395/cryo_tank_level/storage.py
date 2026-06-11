@@ -75,6 +75,32 @@ class JsonStorage:
             if v["import_batch_id"] == batch_id
         ]
 
+    def find_note_in_batch(self, batch_id: str, sensor_id: str, recorded_at: str) -> Optional[InspectionNote]:
+        data = self._load("inspection_notes")
+        for v in data.values():
+            if v["import_batch_id"] == batch_id and v["sensor_id"] == sensor_id:
+                note_ra = v.get("recorded_at", "")
+                if note_ra == recorded_at:
+                    return InspectionNote.from_dict(v)
+        return None
+
+    def find_record_by_note_id(self, note_id: str) -> Optional[LevelConversionRecord]:
+        data = self._load("level_records")
+        for v in data.values():
+            if v["original_note_id"] == note_id:
+                return LevelConversionRecord.from_dict(v)
+        return None
+
+    def delete_level_record(self, record_id: str):
+        data = self._load("level_records")
+        data.pop(record_id, None)
+        self._save("level_records", data)
+
+    def delete_inspection_note(self, note_id: str):
+        data = self._load("inspection_notes")
+        data.pop(note_id, None)
+        self._save("inspection_notes", data)
+
     def is_batch_imported(self, batch_id: str) -> bool:
         data = self._load("batch_imports")
         return batch_id in data

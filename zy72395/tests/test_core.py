@@ -396,6 +396,205 @@ class TestCryoTankLevelSystem(unittest.TestCase):
 
         print("✅ 测试通过：完整场景——传感器重启后编号变化→留给安全员复核→复核后继续流程")
 
+    def test_12_reimport_same_batch_updates_not_duplicates(self):
+        print("\n📋 断点补实：同批次改液位后重新导入，数量不翻倍")
+
+        batch1 = [
+            {
+                "sensor_id": "S-001",
+                "level_reading": 45.0,
+                "handwritten_note": "A罐液位正常",
+                "recorded_at": "2024-01-01T10:00:00",
+            }
+        ]
+        notes1, recs1, _ = self.system.import_inspection_notes("BATCH-REIMPORT", batch1, imported_by="老唐")
+        self.assertEqual(len(notes1), 1)
+        self.assertEqual(len(recs1), 1)
+        note_id = notes1[0].note_id
+        record_id = recs1[0].record_id
+        print("  ✅ 第一次导入: notes=1 records=1")
+
+        batch2 = [
+            {
+                "sensor_id": "S-001",
+                "level_reading": 46.0,
+                "handwritten_note": "A罐液位正常(修正)",
+                "recorded_at": "2024-01-01T10:00:00",
+            }
+        ]
+        notes2, recs2, _ = self.system.import_inspection_notes("BATCH-REIMPORT", batch2, imported_by="老唐")
+
+        total_recs = len(self.system.storage.get_all_level_records())
+        total_notes_data = self.system.storage._load("inspection_notes")
+        self.assertEqual(total_recs, 1, f"records should still be 1, got {total_recs}")
+        self.assertEqual(len(total_notes_data), 1, f"notes should still be 1, got {len(total_notes_data)}")
+        print("  ✅ 重导入后: 库中 notes=1 records=1 — 没有翻倍!")
+
+        updated_note = self.system.storage.get_inspection_note(note_id)
+        self.assertEqual(updated_note.level_reading, 46.0)
+        self.assertEqual(updated_note.handwritten_note, "A罐液位正常(修正)")
+
+        updated_record = self.system.storage.get_level_record(record_id)
+        self.assertEqual(updated_record.raw_level, 46.0)
+        print("  ✅ 原记录已更新: level=46.0, 备注=修正后文本")
+
+        note_history = self.system.storage.get_history_for_record(note_id)
+        level_hist = [h for h in note_history if h.field_name == "level_reading"]
+        self.assertGreaterEqual(len(level_hist), 1)
+        self.assertEqual(level_hist[0].old_value, 45.0)
+        self.assertEqual(level_hist[0].new_value, 46.0)
+        self.assertIn("同批次重导入更新", level_hist[0].change_reason)
+        self.assertEqual(level_hist[0].changed_by, "老唐")
+        print("  ✅ 历史可见: 改前=45.0 改后=46.0 原因=同批次重导入更新 操作人=老唐")
+
+        hw_hist = [h for h in note_history if h.field_name == "handwritten_note"]
+        self.assertGreaterEqual(len(hw_hist), 1)
+        self.assertEqual(hw_hist[0].old_value, "A罐液位正常")
+        self.assertEqual(hw_hist[0].new_value, "A罐液位正常(修正)")
+        print("  ✅ 备注历史: 改前文本='A罐液位正常' 改后文本='A罐液位正常(修正)'")
+
+        with self.assertRaises(CryoTankError) as ctx:
+            self.system.import_inspection_notes("BATCH-REIMPORT", batch2, imported_by="老唐")
+        self.assertEqual(ctx.exception.code, "DUPLICATE_IMPORT")
+        print("  ✅ 完全相同内容第三次导入: 正确拦截重复")
+
+        print("✅ 测试通过：同批次重导入不翻倍 + 历史完整可查")
+
+    def test_13_single_note_change_shows_before_after_reason(self):
+        print("\n📋 老唐只改一条备注，桌面上摊着手写巡检备注要看改前改后和原因")
+
+        batch = [
+            {
+                "sensor_id": "S-001",
+                "level_reading": 50.0,
+                "handwritten_note": "B罐液位偏低",
+                "recorded_at": "2024-01-01T10:00:00",
+            }
+        ]
+        notes, _, _ = self.system.import_inspection_notes("BATCH-SINGLE", batch)
+        note_id = notes[0].note_id
+
+        updated, hist = self.system.update_single_note(
+            note_id,
+            {"handwritten_note": "B罐液位正常(重新核实)"},
+            changed_by="老唐",
+            change_reason="原备注写错，实际看过了",
+        )
+
+        self.assertEqual(len(hist), 1)
+        h = hist[0]
+        self.assertEqual(h.field_name, "handwritten_note")
+        self.assertEqual(h.old_value, "B罐液位偏低")
+        self.assertEqual(h.new_value, "B罐液位正常(重新核实)")
+        self.assertEqual(h.change_reason, "原备注写错，实际看过了")
+        self.assertEqual(h.changed_by, "老唐")
+        print(f"  ✅ 改前文本='{h.old_value}' 改后文本='{h.new_value}' 为什么改='{h.change_reason}' 谁改的='{h.changed_by}'")
+
+        all_history = self.system.storage.get_history_for_record(note_id)
+        self.assertGreaterEqual(len(all_history), 1)
+        print("  ✅ 从历史中可以查到改前文本、改后文本和为什么改")
+
+        print("✅ 测试通过：单条备注修改留痕完整")
+
+    def test_14_rollback_history_traceable(self):
+        print("\n📋 回滚前后值、原因和处理人要从历史里查出来")
+
+        batch = [
+            {
+                "sensor_id": "S-001",
+                "level_reading": 55.0,
+                "handwritten_note": "原始备注",
+                "recorded_at": "2024-01-01T10:00:00",
+            }
+        ]
+        notes, records, _ = self.system.import_inspection_notes("BATCH-ROLLBACK", batch)
+        note_id = notes[0].note_id
+        record_id = records[0].record_id
+
+        self.system.update_single_note(
+            note_id,
+            {"level_reading": 60.0},
+            changed_by="老唐",
+            change_reason="看错了数字",
+        )
+
+        rolled = self.system.rollback_record(
+            record_id, reason="液位数据可疑需核实", rolled_back_by="老唐"
+        )
+        self.assertIsNotNone(rolled)
+
+        history = self.system.storage.get_history_for_record(record_id)
+        rollback_entries = [h for h in history if "rollback" in h.field_name]
+        self.assertGreaterEqual(len(rollback_entries), 1)
+
+        rb = rollback_entries[0]
+        self.assertIsNotNone(rb.old_value)
+        self.assertIsNotNone(rb.new_value)
+        self.assertIn("液位数据可疑需核实", rb.change_reason)
+        self.assertEqual(rb.changed_by, "老唐")
+        print(f"  ✅ 回滚记录: 字段={rb.field_name} 回滚前={rb.old_value} 回滚后={rb.new_value}")
+        print(f"     原因={rb.change_reason} 操作人={rb.changed_by}")
+
+        print("✅ 测试通过：回滚前后值、原因、处理人可查")
+
+    def test_15_e2e_first_import_then_reimport_then_single_edit_then_rollback(self):
+        print("\n📋 完整端到端：第一次导入→改液位重导入→查数量/历史→老唐改备注→回滚")
+
+        batch1 = [
+            {
+                "sensor_id": "S-001",
+                "level_reading": 45.0,
+                "handwritten_note": "A罐液位正常",
+                "recorded_at": "2024-01-01T10:00:00",
+            }
+        ]
+        notes1, recs1, _ = self.system.import_inspection_notes("BATCH-E2E", batch1, imported_by="老唐")
+        note_id = notes1[0].note_id
+        record_id = recs1[0].record_id
+        print("  ✅ Step1: 第一次导入 notes=1 records=1")
+
+        batch2 = [
+            {
+                "sensor_id": "S-001",
+                "level_reading": 46.0,
+                "handwritten_note": "A罐液位正常(修正)",
+                "recorded_at": "2024-01-01T10:00:00",
+            }
+        ]
+        self.system.import_inspection_notes("BATCH-E2E", batch2, imported_by="老唐")
+        total = len(self.system.storage.get_all_level_records())
+        self.assertEqual(total, 1)
+        print("  ✅ Step2: 改液位重导入 数量不翻倍(仍为1)")
+
+        note_hist = self.system.storage.get_history_for_record(note_id)
+        level_h = [h for h in note_hist if h.field_name == "level_reading"]
+        self.assertGreaterEqual(len(level_h), 1)
+        self.assertEqual(level_h[0].old_value, 45.0)
+        self.assertEqual(level_h[0].new_value, 46.0)
+        print("  ✅ Step3: 重导入历史 改前=45.0 改后=46.0 可查")
+
+        self.system.update_single_note(
+            note_id,
+            {"handwritten_note": "A罐液位正常(老唐核实修正)"},
+            changed_by="老唐",
+            change_reason="原备注不够准确",
+        )
+        hw_h = [h for h in self.system.storage.get_history_for_record(note_id) if h.field_name == "handwritten_note"]
+        latest_hw = hw_h[0] if hw_h else None
+        self.assertIsNotNone(latest_hw)
+        self.assertIn("老唐核实修正", str(latest_hw.new_value))
+        self.assertEqual(latest_hw.change_reason, "原备注不够准确")
+        print(f"  ✅ Step4: 老唐改备注 改前='{latest_hw.old_value}' 改后='{latest_hw.new_value}' 为什么改='{latest_hw.change_reason}'")
+
+        self.system.rollback_record(record_id, reason="液位数据有疑问", rolled_back_by="老唐")
+        rb_hist = [h for h in self.system.storage.get_history_for_record(record_id) if "rollback" in h.field_name]
+        self.assertGreaterEqual(len(rb_hist), 1)
+        self.assertEqual(rb_hist[0].changed_by, "老唐")
+        self.assertIn("液位数据有疑问", rb_hist[0].change_reason)
+        print(f"  ✅ Step5: 回滚 回滚前={rb_hist[0].old_value} 回滚后={rb_hist[0].new_value} 原因={rb_hist[0].change_reason} 操作人={rb_hist[0].changed_by}")
+
+        print("✅ 测试通过：完整端到端流程验证")
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

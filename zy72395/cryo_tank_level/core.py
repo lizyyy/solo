@@ -47,17 +47,16 @@ class CryoTankLevelSystem:
     ) -> Tuple[List[InspectionNote], List[LevelConversionRecord], List[SensorMapping]]:
         content_hash = self._compute_batch_hash(notes_data)
         existing_hash = self.storage.get_batch_hash(batch_id)
-        if existing_hash and existing_hash == content_hash:
+        is_reimport = existing_hash is not None
+
+        if is_reimport and existing_hash == content_hash:
             raise CryoTankError(error_message("DUPLICATE_IMPORT"), code="DUPLICATE_IMPORT")
-        if existing_hash and existing_hash != content_hash:
-            pass
 
         notes = []
         records = []
         mappings = []
 
         for note_data in notes_data:
-            note_id = note_data.get("note_id") or str(uuid.uuid4())
             sensor_id = note_data.get("sensor_id", "")
             level_reading = note_data.get("level_reading", 0.0)
 
@@ -75,10 +74,27 @@ class CryoTankLevelSystem:
 
             recorded_at = note_data.get("recorded_at")
             if isinstance(recorded_at, str):
-                recorded_at = datetime.fromisoformat(recorded_at)
+                recorded_at_dt = datetime.fromisoformat(recorded_at)
+                recorded_at_iso = recorded_at
             elif recorded_at is None:
-                recorded_at = datetime.now()
+                recorded_at_dt = datetime.now()
+                recorded_at_iso = recorded_at_dt.isoformat()
+            else:
+                recorded_at_dt = recorded_at
+                recorded_at_iso = recorded_at.isoformat()
 
+            if is_reimport:
+                existing_note = self.storage.find_note_in_batch(batch_id, sensor_id, recorded_at_iso)
+                if existing_note:
+                    updated_note, updated_record, note_histories = self._update_existing_note(
+                        existing_note, note_data, imported_by
+                    )
+                    notes.append(updated_note)
+                    if updated_record:
+                        records.append(updated_record)
+                    continue
+
+            note_id = note_data.get("note_id") or str(uuid.uuid4())
             note = InspectionNote(
                 note_id=note_id,
                 import_batch_id=batch_id,
@@ -87,7 +103,7 @@ class CryoTankLevelSystem:
                 temperature=note_data.get("temperature"),
                 pressure=note_data.get("pressure"),
                 handwritten_note=note_data.get("handwritten_note", ""),
-                recorded_at=recorded_at,
+                recorded_at=recorded_at_dt,
                 imported_by=imported_by,
                 content_hash=JsonStorage.compute_content_hash(str(note_data)),
             )
@@ -103,6 +119,73 @@ class CryoTankLevelSystem:
 
         self.storage.mark_batch_imported(batch_id, content_hash)
         return notes, records, mappings
+
+    def _update_existing_note(
+        self,
+        existing_note: InspectionNote,
+        new_data: Dict[str, Any],
+        imported_by: str,
+    ) -> Tuple[InspectionNote, Optional[LevelConversionRecord], List[ChangeHistory]]:
+        history_entries = []
+        note_dict = existing_note.to_dict()
+
+        updatable_fields = {
+            "level_reading": new_data.get("level_reading"),
+            "temperature": new_data.get("temperature"),
+            "pressure": new_data.get("pressure"),
+            "handwritten_note": new_data.get("handwritten_note"),
+        }
+
+        for field, new_value in updatable_fields.items():
+            if new_value is None:
+                continue
+            old_value = note_dict.get(field)
+            if old_value != new_value:
+                history = ChangeHistory(
+                    history_id=str(uuid.uuid4()),
+                    record_id=existing_note.note_id,
+                    field_name=field,
+                    old_value=old_value,
+                    new_value=new_value,
+                    changed_by=imported_by,
+                    change_reason=f"同批次重导入更新({existing_note.import_batch_id})",
+                )
+                self.storage.save_change_history(history)
+                history_entries.append(history)
+                setattr(existing_note, field, new_value)
+
+        existing_note.content_hash = JsonStorage.compute_content_hash(str(new_data))
+        self.storage.save_inspection_note(existing_note)
+
+        record = self.storage.find_record_by_note_id(existing_note.note_id)
+        if record and "level_reading" in new_data:
+            old_converted = record.converted_level
+            converted_level = float(new_data["level_reading"])
+            temp_compensation = 0.0
+            if existing_note.temperature is not None:
+                temp_compensation = (existing_note.temperature - 20) * 0.01
+                converted_level = float(new_data["level_reading"]) + temp_compensation
+                converted_level = max(0.0, min(100.0, converted_level))
+
+            record.raw_level = float(new_data["level_reading"])
+            record.converted_level = round(converted_level, 2)
+            record.temperature_compensation = round(temp_compensation, 4)
+            record.updated_at = datetime.now()
+            self.storage.save_level_record(record)
+
+            if old_converted != record.converted_level:
+                level_history = ChangeHistory(
+                    history_id=str(uuid.uuid4()),
+                    record_id=record.record_id,
+                    field_name="converted_level",
+                    old_value=old_converted,
+                    new_value=record.converted_level,
+                    changed_by=imported_by,
+                    change_reason=f"同批次重导入更新({existing_note.import_batch_id})",
+                )
+                self.storage.save_change_history(level_history)
+
+        return existing_note, record, history_entries
 
     def _detect_sensor_change(
         self, sensor_id: str, note: InspectionNote
@@ -209,11 +292,7 @@ class CryoTankLevelSystem:
                 code="NOTE_NOT_FOUND",
             )
 
-        record = None
-        for r in self.storage.get_all_level_records():
-            if r.original_note_id == note_id:
-                record = r
-                break
+        record = self.storage.find_record_by_note_id(note_id)
 
         if record and record.status == ReviewStatus.PENDING_REVIEW:
             raise CryoTankError(
@@ -243,26 +322,29 @@ class CryoTankLevelSystem:
         self.storage.save_inspection_note(note)
 
         if record and "level_reading" in updates:
+            old_converted = record.converted_level
             converted = updates["level_reading"]
             if note.temperature is not None:
                 temp_comp = (note.temperature - 20) * 0.01
                 converted = updates["level_reading"] + temp_comp
                 converted = max(0.0, min(100.0, converted))
+            new_converted = round(converted, 2)
             record.raw_level = updates["level_reading"]
-            record.converted_level = round(converted, 2)
+            record.converted_level = new_converted
             record.updated_at = datetime.now()
             self.storage.save_level_record(record)
 
-            level_history = ChangeHistory(
-                history_id=str(uuid.uuid4()),
-                record_id=record.record_id,
-                field_name="converted_level",
-                old_value=record.converted_level,
-                new_value=round(converted, 2),
-                changed_by=changed_by,
-                change_reason=change_reason or "关联备注修改",
-            )
-            self.storage.save_change_history(level_history)
+            if old_converted != new_converted:
+                level_history = ChangeHistory(
+                    history_id=str(uuid.uuid4()),
+                    record_id=record.record_id,
+                    field_name="converted_level",
+                    old_value=old_converted,
+                    new_value=new_converted,
+                    changed_by=changed_by,
+                    change_reason=change_reason or "关联备注修改",
+                )
+                self.storage.save_change_history(level_history)
 
         return note, history_entries
 
@@ -315,7 +397,7 @@ class CryoTankLevelSystem:
     def get_pending_mappings(self) -> List[SensorMapping]:
         return self.storage.get_sensor_mappings_pending()
 
-    def rollback_record(self, record_id: str, reason: str = "") -> Optional[LevelConversionRecord]:
+    def rollback_record(self, record_id: str, reason: str = "", rolled_back_by: str = "老唐") -> Optional[LevelConversionRecord]:
         record = self.storage.get_level_record(record_id)
         if not record:
             return None
@@ -329,8 +411,10 @@ class CryoTankLevelSystem:
                 raise CryoTankError(error_message("CANNOT_ROLLBACK"), code="CANNOT_ROLLBACK")
 
         last_change = history[0]
+        old_val = last_change.new_value
+        new_val = last_change.old_value
         if last_change.field_name in record.to_dict():
-            setattr(record, last_change.field_name, last_change.old_value)
+            setattr(record, last_change.field_name, new_val)
 
         record.updated_at = datetime.now()
         record.review_notes = f"回滚：{reason}" if reason else "回滚到上一版本"
@@ -339,10 +423,10 @@ class CryoTankLevelSystem:
         rollback_history = ChangeHistory(
             history_id=str(uuid.uuid4()),
             record_id=record_id,
-            field_name="rollback",
-            old_value=last_change.new_value,
-            new_value=last_change.old_value,
-            changed_by="系统",
+            field_name=f"rollback({last_change.field_name})",
+            old_value=old_val,
+            new_value=new_val,
+            changed_by=rolled_back_by,
             change_reason=f"回滚操作: {reason}" if reason else "回滚操作",
         )
         self.storage.save_change_history(rollback_history)

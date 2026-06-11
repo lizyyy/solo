@@ -41,14 +41,16 @@
 
 **现象**：老唐重复导入同一批手写巡检备注，导致液位换算数量翻倍。
 
-**判定逻辑**（见 [core.py](file:///Users/lzy/pro/solo/workspaces/zy72395/cryo_tank_level/core.py#L34-L40) `_compute_batch_hash` 方法）：
+**判定逻辑**（见 [core.py](file:///Users/lzy/pro/solo/workspaces/zy72395/cryo_tank_level/core.py#L42-L121) `import_inspection_notes` 方法）：
 1. 每批导入生成唯一 `batch_id`
 2. 对批次内所有记录（按传感器编号+记录时间排序）计算 SHA-256 内容哈希
-3. 若同一 `batch_id` 的哈希已存在且完全一致，拒绝导入
+3. 若同一 `batch_id` 的哈希已存在且**完全一致**，拒绝导入（抛出 `DUPLICATE_IMPORT`）
+4. 若同一 `batch_id` 但**内容不同**（如液位从 45 改成 46），按 `batch_id + sensor_id + recorded_at` 匹配已有记录并**原地更新**，不新建
 
 **处理方式**：
-- 抛出 `DUPLICATE_IMPORT` 错误，提示用户使用"修改单条备注"功能
-- 若同一 `batch_id` 但内容不同（真的是修改后重传），允许覆盖，但会保留修改历史
+- 内容完全相同 → 抛出 `DUPLICATE_IMPORT` 错误，提示使用"修改单条备注"功能
+- 内容有变化 → 匹配已有记录，逐字段差异更新，写入 `ChangeHistory`（改前值、改后值、原因="同批次重导入更新"）
+- 库中记录数量不变，不会翻倍
 
 ---
 
@@ -56,16 +58,16 @@
 
 **现象**：老唐只改了一条备注的某个数字，需要看出改前改后的差别。
 
-**处理逻辑**（见 [core.py](file:///Users/lzy/pro/solo/workspaces/zy72395/cryo_tank_level/core.py#L193-L262) `update_single_note` 方法）：
+**处理逻辑**（见 [core.py](file:///Users/lzy/pro/solo/workspaces/zy72395/cryo_tank_level/core.py#L281-L349) `update_single_note` 方法）：
 1. 每次修改前，对比每个字段的新旧值
 2. 对每个发生变化的字段，创建一条 `ChangeHistory` 记录，包含：
    - `field_name`：字段名
-   - `old_value` / `new_value`：修改前后的值
+   - `old_value` / `new_value`：修改前后的值（如改前文本="液位偏低"，改后文本="液位正常"）
    - `changed_by`：修改人（默认"老唐"）
-   - `change_reason`：修改原因
-3. 若修改的是 `level_reading`，自动同步更新换算后的液位值，并额外记录换算记录的变更历史
+   - `change_reason`：修改原因（如"原备注写错，实际看过了"）
+3. 若修改的是 `level_reading`，自动同步更新换算后的液位值，并额外记录换算记录的变更历史（old_value 是修改前的换算值，new_value 是修改后的换算值）
 
-**查看历史**：调用 `get_change_history(record_id)` 获取该记录的所有修改轨迹，按时间倒序排列。
+**查看历史**：调用 `get_change_history(record_id)` 获取该记录的所有修改轨迹，按时间倒序排列。每条历史都能看到**改前值、改后值、为什么改、谁改的**。
 
 ---
 
@@ -244,9 +246,9 @@ README.md                # 本文档（边界规则、操作流程全部写在�
 | 功能 | 文件 | 方法/行号 |
 |------|------|-----------|
 | 传感器重启编号检测 | [core.py](file:///Users/lzy/pro/solo/workspaces/zy72395/cryo_tank_level/core.py#L107-L159) | `_detect_sensor_change` |
-| 重复导入哈希校验 | [core.py](file:///Users/lzy/pro/solo/workspaces/zy72395/cryo_tank_level/core.py#L34-L53) | `_compute_batch_hash` + 导入校验 |
-| 单条修改历史记录 | [core.py](file:///Users/lzy/pro/solo/workspaces/zy72395/cryo_tank_level/core.py#L193-L262) | `update_single_note` |
-| 安全员复核接口 | [core.py](file:///Users/lzy/pro/solo/workspaces/zy72395/cryo_tank_level/core.py#L272-L308) | `review_sensor_mapping` |
+| 重复导入哈希校验 + 重导入更新 | [core.py](file:///Users/lzy/pro/solo/workspaces/zy72395/cryo_tank_level/core.py#L42-L121) | `import_inspection_notes` + `_update_existing_note` |
+| 单条修改历史记录 | [core.py](file:///Users/lzy/pro/solo/workspaces/zy72395/cryo_tank_level/core.py#L281-L349) | `update_single_note` |
+| 安全员复核接口 | [core.py](file:///Users/lzy/pro/solo/workspaces/zy72395/cryo_tank_level/core.py#L360-L395) | `review_sensor_mapping` |
 | 三步工作流 | [workflow.py](file:///Users/lzy/pro/solo/workspaces/zy72395/cryo_tank_level/workflow.py) | `ThreeStepWorkflow` 类 |
 | 点选回溯 | [visualization.py](file:///Users/lzy/pro/solo/workspaces/zy72395/cryo_tank_level/visualization.py#L108-L189) | `drilldown` + 各 `_drilldown_to_*` 方法 |
-| 回滚逻辑（含安全员确认保护） | [core.py](file:///Users/lzy/pro/solo/workspaces/zy72395/cryo_tank_level/core.py#L313-L345) | `rollback_record` |
+| 回滚逻辑（含安全员确认保护） | [core.py](file:///Users/lzy/pro/solo/workspaces/zy72395/cryo_tank_level/core.py#L400-L434) | `rollback_record` |
