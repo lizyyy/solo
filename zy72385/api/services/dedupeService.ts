@@ -6,15 +6,30 @@ export async function calculateFileHash(buffer: Buffer): Promise<string> {
   return crypto.createHash('sha256').update(buffer).digest('hex');
 }
 
-export async function checkDuplicate(fileHash: string, fileName?: string) {
+export async function checkDuplicate(fileHash: string, fileName?: string, currentBatchHashes?: string[]) {
   await db.read();
+  
+  const isCurrentBatchDuplicate = currentBatchHashes?.includes(fileHash) || false;
+  
+  if (isCurrentBatchDuplicate) {
+    const existingInBatch = db.data.screenshots.find((s) => s.fileHash === fileHash);
+    return {
+      isDuplicate: true,
+      duplicateType: 'exact',
+      repeatType: 'current_batch',
+      existingScreenshot: existingInBatch || null,
+      message: `本次导入重复：文件「${fileName}」已在当前批次中上传，不重复计入计算`,
+    };
+  }
   
   const exactMatch = db.data.screenshots.find((s) => s.fileHash === fileHash);
   if (exactMatch) {
     return {
       isDuplicate: true,
       duplicateType: 'exact',
+      repeatType: 'historical',
       existingScreenshot: exactMatch,
+      message: `历史重复：文件「${fileName}」已于 ${new Date(exactMatch.uploadTime).toLocaleString('zh-CN')} 由 ${exactMatch.uploader} 上传`,
     };
   }
 
@@ -26,7 +41,9 @@ export async function checkDuplicate(fileHash: string, fileName?: string) {
       return {
         isDuplicate: true,
         duplicateType: 'name',
+        repeatType: 'historical',
         existingScreenshot: nameMatch,
+        message: `历史重复：文件名「${fileName}」已存在，于 ${new Date(nameMatch.uploadTime).toLocaleString('zh-CN')} 由 ${nameMatch.uploader} 上传`,
       };
     }
   }
@@ -34,7 +51,9 @@ export async function checkDuplicate(fileHash: string, fileName?: string) {
   return {
     isDuplicate: false,
     duplicateType: null,
+    repeatType: 'new',
     existingScreenshot: null,
+    message: `新记录：文件「${fileName}」首次导入，已纳入计算`,
   };
 }
 

@@ -25,14 +25,14 @@ interface AppState {
   dataTraceInfo: DataTraceInfo | null;
   viewMode: ViewMode;
   isLoading: boolean;
-  notifications: { id: string; type: 'success' | 'error' | 'info'; message: string }[];
+  notifications: { id: string; type: 'success' | 'error' | 'info' | 'warning'; message: string }[];
 
   setCurrentUser: (user: User) => void;
   setViewMode: (mode: ViewMode) => void;
   setSelectedCalculation: (calc: CavitationCalculation | null) => void;
   setSelectedScreenshot: (shot: MaintenanceScreenshot | null) => void;
   setDataTraceInfo: (info: DataTraceInfo | null) => void;
-  addNotification: (type: 'success' | 'error' | 'info', message: string) => void;
+  addNotification: (type: 'success' | 'error' | 'info' | 'warning', message: string) => void;
   removeNotification: (id: string) => void;
 
   loadAllData: () => Promise<void>;
@@ -42,7 +42,7 @@ interface AppState {
   loadReviewTasks: () => Promise<void>;
   loadChangeRecords: (entityType?: string, entityId?: string) => Promise<void>;
 
-  uploadScreenshot: (file: File) => Promise<MaintenanceScreenshot | null>;
+  uploadScreenshot: (file: File, currentBatchHashes?: string[]) => Promise<MaintenanceScreenshot | null>;
   updateScreenshot: (id: string, data: any, reason: string) => Promise<void>;
   createCalculation: (data: any) => Promise<CavitationCalculation | null>;
   updateCalculation: (id: string, updates: any, reason: string) => Promise<void>;
@@ -153,7 +153,7 @@ export const useStore = create<AppState>((set, get) => ({
     set({ changeRecords: records });
   },
 
-  uploadScreenshot: async (file) => {
+  uploadScreenshot: async (file, currentBatchHashes?: string[]) => {
     try {
       const buffer = await file.arrayBuffer();
       const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
@@ -162,7 +162,7 @@ export const useStore = create<AppState>((set, get) => ({
 
       const duplicateCheck = await apiFetch<any>('/screenshots/check-duplicate', {
         method: 'POST',
-        body: JSON.stringify({ fileHash, fileName: file.name }),
+        body: JSON.stringify({ fileHash, fileName: file.name, currentBatchHashes }),
       });
 
       if (duplicateCheck.isDuplicate) {
@@ -175,11 +175,17 @@ export const useStore = create<AppState>((set, get) => ({
             fileHash,
             isDuplicate: true,
             duplicateOf: duplicateCheck.existingScreenshot.id,
+            repeatType: duplicateCheck.repeatType,
+            duplicateCheckResult: duplicateCheck,
           }),
         });
-        get().addNotification('info', result.message);
+        get().addNotification(
+          duplicateCheck.repeatType === 'current_batch' ? 'warning' : 'info', 
+          result.message
+        );
         await get().loadScreenshots();
-        return result.screenshot;
+        await get().loadChangeRecords('screenshot', duplicateCheck.existingScreenshot.id);
+        return { ...result.screenshot, repeatType: duplicateCheck.repeatType, duplicateCheckResult: duplicateCheck };
       }
 
       const result = await apiFetch<any>('/screenshots/upload', {
@@ -194,7 +200,7 @@ export const useStore = create<AppState>((set, get) => ({
 
       get().addNotification('success', result.message);
       await get().loadScreenshots();
-      return result.screenshot;
+      return { ...result.screenshot, repeatType: 'new' };
     } catch (error) {
       get().addNotification('error', '上传截图失败');
       return null;

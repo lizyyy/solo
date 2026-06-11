@@ -143,7 +143,8 @@ export const Layout: React.FC = () => {
               'px-4 py-3 rounded-xl shadow-2xl backdrop-blur-xl border animate-slide-in flex items-center gap-3 min-w-[320px]',
               notif.type === 'success' && 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300',
               notif.type === 'error' && 'bg-red-500/10 border-red-500/30 text-red-300',
-              notif.type === 'info' && 'bg-cyan-500/10 border-cyan-500/30 text-cyan-300'
+              notif.type === 'info' && 'bg-cyan-500/10 border-cyan-500/30 text-cyan-300',
+              notif.type === 'warning' && 'bg-amber-500/10 border-amber-500/30 text-amber-300'
             )}
           >
             <div
@@ -151,12 +152,14 @@ export const Layout: React.FC = () => {
                 'w-8 h-8 rounded-lg flex items-center justify-center',
                 notif.type === 'success' && 'bg-emerald-500/20',
                 notif.type === 'error' && 'bg-red-500/20',
-                notif.type === 'info' && 'bg-cyan-500/20'
+                notif.type === 'info' && 'bg-cyan-500/20',
+                notif.type === 'warning' && 'bg-amber-500/20'
               )}
             >
               {notif.type === 'success' && '✓'}
               {notif.type === 'error' && '✕'}
               {notif.type === 'info' && 'ℹ'}
+              {notif.type === 'warning' && '⚠'}
             </div>
             <span className="flex-1 text-sm">{notif.message}</span>
             <button

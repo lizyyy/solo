@@ -36,6 +36,8 @@ export const ImportCenter: React.FC = () => {
     intervalMinutes: 30,
     description: '',
   });
+  const [currentBatchHashes, setCurrentBatchHashes] = useState<string[]>([]);
+  const [uploadResults, setUploadResults] = useState<{fileName: string; repeatType: string; message: string}[]>([]);
 
   useEffect(() => {
     loadScreenshots();
@@ -64,16 +66,63 @@ export const ImportCenter: React.FC = () => {
       return;
     }
 
+    setUploadResults([]);
+    const batchHashes: string[] = [];
+    
     for (const file of files) {
-      await uploadScreenshot(file);
+      const buffer = await file.arrayBuffer();
+      const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const fileHash = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+      
+      const result = await uploadScreenshot(file, batchHashes);
+      if (result) {
+        const repeatType = (result as any).repeatType || 'new';
+        const message = (result as any).duplicateCheckResult?.message || 
+          (repeatType === 'new' ? '新记录导入成功' : '重复记录已处理');
+        
+        setUploadResults(prev => [...prev, {
+          fileName: file.name,
+          repeatType,
+          message,
+        }]);
+      }
+      
+      batchHashes.push(fileHash);
+      setCurrentBatchHashes([...batchHashes]);
     }
   };
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    
+    setUploadResults([]);
+    const batchHashes: string[] = [];
+    
     for (const file of files) {
-      await uploadScreenshot(file);
+      const buffer = await file.arrayBuffer();
+      const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const fileHash = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+      
+      const result = await uploadScreenshot(file, batchHashes);
+      if (result) {
+        const repeatType = (result as any).repeatType || 'new';
+        const message = (result as any).duplicateCheckResult?.message || 
+          (repeatType === 'new' ? '新记录导入成功' : '重复记录已处理');
+        
+        setUploadResults(prev => [...prev, {
+          fileName: file.name,
+          repeatType,
+          message,
+        }]);
+      }
+      
+      batchHashes.push(fileHash);
+      setCurrentBatchHashes([...batchHashes]);
     }
+    
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
@@ -209,6 +258,50 @@ export const ImportCenter: React.FC = () => {
             )}
           </div>
 
+          {uploadResults.length > 0 && (
+            <div className="p-4 bg-slate-900/50 border border-slate-700 rounded-xl">
+              <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-cyan-400" />
+                本次导入结果
+              </h4>
+              <div className="space-y-2">
+                {uploadResults.map((result, idx) => (
+                  <div 
+                    key={idx} 
+                    className={cn(
+                      'flex items-start gap-3 p-3 rounded-lg text-sm',
+                      result.repeatType === 'new' && 'bg-emerald-500/10 border border-emerald-500/20',
+                      result.repeatType === 'current_batch' && 'bg-amber-500/10 border border-amber-500/20',
+                      result.repeatType === 'historical' && 'bg-purple-500/10 border border-purple-500/20'
+                    )}
+                  >
+                    <div className="shrink-0 mt-0.5">
+                      {result.repeatType === 'new' && <CheckCircle className="w-4 h-4 text-emerald-400" />}
+                      {result.repeatType === 'current_batch' && <AlertTriangle className="w-4 h-4 text-amber-400" />}
+                      {result.repeatType === 'historical' && <Copy className="w-4 h-4 text-purple-400" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-medium truncate">{result.fileName}</span>
+                        <span className={cn(
+                          'text-xs px-2 py-0.5 rounded-full shrink-0',
+                          result.repeatType === 'new' && 'bg-emerald-500/20 text-emerald-300',
+                          result.repeatType === 'current_batch' && 'bg-amber-500/20 text-amber-300',
+                          result.repeatType === 'historical' && 'bg-purple-500/20 text-purple-300'
+                        )}>
+                          {result.repeatType === 'new' && '新记录'}
+                          {result.repeatType === 'current_batch' && '本次重复'}
+                          {result.repeatType === 'historical' && '历史重复'}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-400">{result.message}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl flex items-start gap-3">
             <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
             <div>
@@ -218,6 +311,20 @@ export const ImportCenter: React.FC = () => {
                 <span className="text-amber-300">不会新增"泵站汽蚀风险计算"数量</span>，
                 避免数据膨胀。
               </p>
+              <div className="flex gap-4 mt-2 text-xs">
+                <span className="flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                  <span className="text-slate-400">新记录：首次导入</span>
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-amber-400"></span>
+                  <span className="text-slate-400">本次重复：同一批次重复</span>
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-purple-400"></span>
+                  <span className="text-slate-400">历史重复：与历史文件重复</span>
+                </span>
+              </div>
             </div>
           </div>
 

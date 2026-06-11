@@ -8,6 +8,7 @@ import {
   generateHumanizedReport,
 } from '../services/reviewService.js';
 import { getCalculationById } from '../services/cavitationService.js';
+import { getChangeHistory } from '../services/auditService.js';
 import { db } from '../data/db.js';
 
 const router = Router();
@@ -78,10 +79,16 @@ router.post('/reviews', async (req: Request, res: Response) => {
     }
 
     await db.read();
+    
+    const relatedScreenshots = db.data.screenshots.filter(s => calc.screenshotIds.includes(s.id));
+    const changeHistory = await getChangeHistory('calculation', calculationId);
+    
     const reportContent = generateHumanizedReport(
       calc,
       decisions,
-      db.data.users
+      db.data.users,
+      relatedScreenshots,
+      changeHistory
     );
 
     const review = await createReview(
@@ -92,7 +99,8 @@ router.post('/reviews', async (req: Request, res: Response) => {
     );
     res.json(review);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to create review' });
+    console.error('Error creating review:', error);
+    res.status(500).json({ error: 'Failed to create review', details: (error as Error).message });
   }
 });
 
@@ -109,10 +117,16 @@ router.get('/reports/:calculationId', async (req: Request, res: Response) => {
     await db.read();
 
     const decisions = review?.decisions || [];
+    
+    const relatedScreenshots = db.data.screenshots.filter(s => calc.screenshotIds.includes(s.id));
+    const changeHistory = await getChangeHistory('calculation', calculationId);
+    
     const reportContent = generateHumanizedReport(
       calc,
       decisions,
-      db.data.users
+      db.data.users,
+      relatedScreenshots,
+      changeHistory
     );
 
     res.json({

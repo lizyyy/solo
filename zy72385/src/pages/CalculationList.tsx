@@ -53,15 +53,44 @@ export const CalculationList: React.FC = () => {
 
   const handleCreateCalculation = async () => {
     if (selectedScreenshots.length === 0) return;
+    
+    const selectedShots = screenshots.filter(s => selectedScreenshots.includes(s.id));
+    
+    const pressure: number[] = [];
+    const flowRate: number[] = [];
+    const temperatures: number[] = [];
+    const sampleTimes: string[] = [];
+    let pumpId = '';
+    
+    selectedShots.forEach(shot => {
+      if (shot.extractedData) {
+        if (shot.extractedData.pumpId && !pumpId) pumpId = shot.extractedData.pumpId;
+        if (shot.extractedData.pressure !== undefined) pressure.push(shot.extractedData.pressure);
+        if (shot.extractedData.flowRate !== undefined) flowRate.push(shot.extractedData.flowRate);
+        if (shot.extractedData.temperature !== undefined) temperatures.push(shot.extractedData.temperature);
+        if (shot.extractedData.sampleTime) sampleTimes.push(shot.extractedData.sampleTime);
+      }
+    });
+    
+    if (!pumpId) pumpId = 'PUMP-001';
+    
     const calc = await createCalculation({
       name: calcName || '汽蚀风险计算',
+      pumpId,
       screenshotIds: selectedScreenshots,
       samplingIntervalIds: selectedIntervals,
+      parameters: {
+        pressure,
+        flowRate,
+        temperatures,
+        sampleTimes,
+        missingIntervals: [],
+      },
     });
-      if (calc) {
-        setShowCreateModal(false);
-        navigate(`/calculations/${calc.id}`);
-      }
+    if (calc) {
+      setShowCreateModal(false);
+      navigate(`/calculations/${calc.id}`);
+    }
   };
 
   const toggleScreenshot = (id: string) => {

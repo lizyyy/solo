@@ -126,6 +126,7 @@ export function generateHumanizedReport(
     name: string;
     riskLevel: string;
     riskScore: number;
+    screenshotIds: string[];
     parameters: {
       sampleTimes: string[];
       missingIntervals: { start: string; end: string; duration: number }[];
@@ -148,7 +149,23 @@ export function generateHumanizedReport(
     nextAction: string;
     assignee?: string;
   }[],
-  users: { id: string; name: string; avatar?: string }[]
+  users: { id: string; name: string; avatar?: string }[],
+  screenshots?: {
+    id: string;
+    fileName: string;
+    status: string;
+    duplicateOf?: string;
+    uploadTime: string;
+    uploader: string;
+  }[],
+  changeRecords?: {
+    fieldName: string;
+    oldValue: any;
+    newValue: any;
+    changeReason: string;
+    changedBy: string;
+    changedAt: string;
+  }[]
 ): string {
   const riskLevelText: Record<string, string> = {
     low: '低',
@@ -160,6 +177,55 @@ export function generateHumanizedReport(
   const getUser = (id: string) => users.find((u) => u.id === id);
 
   let report = `## 实验复盘：${calc.name}\n\n`;
+
+  if (screenshots && screenshots.length > 0) {
+    report += `### 数据来源与去重处理\n`;
+    const uniqueScreenshots = screenshots.filter(s => s.status !== 'duplicate');
+    const duplicateScreenshots = screenshots.filter(s => s.status === 'duplicate');
+    
+    report += `本次计算共使用 **${uniqueScreenshots.length}张** 有效截图`;
+    if (duplicateScreenshots.length > 0) {
+      report += `，识别到 **${duplicateScreenshots.length}张** 重复截图（未计入计算，仅作记录）`;
+    }
+    report += `\n\n`;
+    
+    uniqueScreenshots.forEach((s, idx) => {
+      const uploader = users.find(u => u.id === s.uploader);
+      report += `${idx + 1}. ✅ **${s.fileName}**\n`;
+      report += `   - 上传人：${uploader?.name || s.uploader}\n`;
+      report += `   - 上传时间：${new Date(s.uploadTime).toLocaleString('zh-CN')}\n`;
+      report += `   - 状态：新记录，已纳入计算\n\n`;
+    });
+    
+    if (duplicateScreenshots.length > 0) {
+      report += `#### 重复导入处理记录\n`;
+      duplicateScreenshots.forEach((s, idx) => {
+        const original = screenshots.find(os => os.id === s.duplicateOf);
+        const uploader = users.find(u => u.id === s.uploader);
+        report += `${idx + 1}. ⚠️ **${s.fileName}**\n`;
+        report += `   - 上传人：${uploader?.name || s.uploader}\n`;
+        report += `   - 上传时间：${new Date(s.uploadTime).toLocaleString('zh-CN')}\n`;
+        report += `   - 重复来源：${original ? `与「${original.fileName}」内容重复` : '与历史记录重复'}\n`;
+        report += `   - 处理结论：已标记为重复，未纳入本次计算，不新增"泵站汽蚀风险计算"数量\n\n`;
+      });
+    }
+  }
+
+  if (changeRecords && changeRecords.length > 0) {
+    const remarkChanges = changeRecords.filter(c => c.fieldName === 'remark');
+    if (remarkChanges.length > 0) {
+      report += `### 备注变更历史\n`;
+      report += `> 林老师只改了一条备注，历史记录保留原话、修改人和修改原因\n\n`;
+      remarkChanges.forEach((c, idx) => {
+        const changer = users.find(u => u.id === c.changedBy);
+        report += `${idx + 1}. **修改时间**：${new Date(c.changedAt).toLocaleString('zh-CN')}\n`;
+        report += `   - **修改人**：${changer?.name || c.changedBy}\n`;
+        report += `   - **修改原因**：${c.changeReason}\n`;
+        report += `   - **改前**：${c.oldValue || '(空)'}\n`;
+        report += `   - **改后**：${c.newValue || '(空)'}\n\n`;
+      });
+    }
+  }
 
   report += `### 数据质量评估\n`;
   const validCount = calc.parameters.sampleTimes.length;
@@ -217,7 +283,8 @@ export function generateHumanizedReport(
       const assignee = decision?.assignee ? getUser(decision.assignee) : null;
       report += `- ${m}`;
       if (assignee) {
-        report += ` - 请${assignee.avatar} ${assignee.name}补充`;
+        const avatar = assignee.avatar || '';
+        report += ` - 请${avatar} ${assignee.name}补充`;
       }
       report += '\n';
     });
@@ -239,7 +306,8 @@ export function generateHumanizedReport(
           action.nextAction === 'teacher'
             ? '补充缺失数据或说明原因'
             : '复核计算结果';
-        report += `| ${assignee.avatar} ${assignee.name} | ${taskText} | ${dueStr} |\n`;
+        const avatar = assignee.avatar || '';
+        report += `| ${avatar} ${assignee.name} | ${taskText} | ${dueStr} |\n`;
       }
     });
     report += '\n';

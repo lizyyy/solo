@@ -37,8 +37,8 @@ router.get('/:id', async (req: Request, res: Response) => {
 
 router.post('/check-duplicate', async (req: Request, res: Response) => {
   try {
-    const { fileHash, fileName } = req.body;
-    const result = await checkDuplicate(fileHash, fileName);
+    const { fileHash, fileName, currentBatchHashes } = req.body;
+    const result = await checkDuplicate(fileHash, fileName, currentBatchHashes);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: 'Failed to check duplicate' });
@@ -47,7 +47,7 @@ router.post('/check-duplicate', async (req: Request, res: Response) => {
 
 router.post('/upload', async (req: Request, res: Response) => {
   try {
-    const { fileName, fileSize, uploader, fileContent, isDuplicate, duplicateOf } = req.body;
+    const { fileName, fileSize, uploader, fileContent, isDuplicate, duplicateOf, repeatType, duplicateCheckResult } = req.body;
 
     let fileHash = req.body.fileHash;
     if (!fileHash && fileContent) {
@@ -62,10 +62,24 @@ router.post('/upload', async (req: Request, res: Response) => {
         fileSize,
         uploader,
       });
+      
+      await recordChange(
+        'screenshot',
+        duplicateOf,
+        'duplicateRecords',
+        null,
+        duplicate.id,
+        repeatType === 'current_batch' ? '本次导入重复：同一批次中重复上传' : '历史重复：与历史上传文件重复',
+        uploader,
+        []
+      );
+      
       res.json({
         screenshot: duplicate,
         isDuplicate: true,
-        message: '已识别为重复截图，不会创建新的计算任务',
+        repeatType,
+        duplicateCheckResult,
+        message: duplicateCheckResult?.message || '已识别为重复截图，不会创建新的计算任务',
       });
       return;
     }
@@ -90,13 +104,26 @@ router.post('/upload', async (req: Request, res: Response) => {
       imageUrl: `/mock/shot${Math.floor(Math.random() * 4) + 1}.svg`,
     });
 
+    await recordChange(
+      'screenshot',
+      screenshot.id,
+      'status',
+      'pending',
+      'processed',
+      '维修群截图第一次导入完成，OCR识别成功',
+      uploader,
+      []
+    );
+
     res.json({
       screenshot,
       isDuplicate: false,
+      repeatType: 'new',
       message: '截图导入成功',
     });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to upload screenshot' });
+    console.error('Upload error:', error);
+    res.status(500).json({ error: 'Failed to upload screenshot', details: error instanceof Error ? error.message : 'Unknown error' });
   }
 });
 
