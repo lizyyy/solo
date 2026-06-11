@@ -163,39 +163,64 @@ class BoundaryRuleService:
         if operator != UserRole.COACH:
             return False, "Only coach can perform rollback"
 
-        if target_version < 0 or target_version >= len(photo.change_history):
+        if target_version < 0 or target_version >= len(photo.snapshots):
             return False, f"Invalid version: {target_version}"
 
-        target_change = photo.change_history[target_version]
+        snapshot_before = photo.get_snapshot_at_version(photo.version - 1)
 
-        status_before_target = ProcessingStatus.IMPORTED
-        for i in range(target_version + 1):
-            ch = photo.change_history[i]
-            if ch.change_type == ChangeType.STATUS_CHANGE:
-                if ch.new_value:
-                    try:
-                        status_before_target = ProcessingStatus(ch.new_value)
-                    except ValueError:
-                        pass
+        fields_before = ""
+        if snapshot_before:
+            fields_before = (
+                f"temp_unit={snapshot_before.temperature_unit.value}, "
+                f"temp_value={snapshot_before.temperature_value}, "
+                f"status={snapshot_before.error_status.value}, "
+                f"remark={snapshot_before.handwritten_remark}, "
+                f"report={snapshot_before.report_content}"
+            )
 
-        photo.error_status = status_before_target
-        photo.is_rollbacked = True
-        photo.rollback_to_version = target_version
+        success = photo.rollback_to(target_version)
+        if not success:
+            return False, "Rollback failed"
+
+        target_snapshot = photo.get_snapshot_at_version(target_version)
+        fields_after = ""
+        if target_snapshot:
+            fields_after = (
+                f"temp_unit={target_snapshot.temperature_unit.value}, "
+                f"temp_value={target_snapshot.temperature_value}, "
+                f"status={target_snapshot.error_status.value}, "
+                f"remark={target_snapshot.handwritten_remark}, "
+                f"report={target_snapshot.report_content}"
+            )
 
         rollback_change = ChangeRecord(
             operator=operator,
             change_type=ChangeType.ROLLBACK,
-            old_value=f"version={photo.version}, status={photo.error_status}",
-            new_value=f"rolled back to version={target_version}",
+            field_name="all fields via snapshot rollback",
+            old_value=fields_before,
+            new_value=f"rolled back to version={target_version}: {fields_after}",
             remark=rollback_remark,
         )
         photo.add_change(rollback_change)
 
-        return True, f"Rolled back to version {target_version}"
+        return True, f"Rolled back to version {target_version} - all fields restored from snapshot"
 
     def get_audit_trail(self, photo: WorkingConditionPhoto) -> List[Dict]:
         trail = []
         for idx, change in enumerate(photo.change_history):
+            snapshot = photo.get_snapshot_at_version(idx)
+            snapshot_data = None
+            if snapshot:
+                snapshot_data = {
+                    "temperature_value": snapshot.temperature_value,
+                    "temperature_unit": snapshot.temperature_unit.value,
+                    "has_mixed_units": snapshot.has_mixed_units,
+                    "error_status": snapshot.error_status.value,
+                    "handwritten_remark": snapshot.handwritten_remark,
+                    "report_content": snapshot.report_content,
+                    "balance_wheel_error": snapshot.balance_wheel_error,
+                }
+
             trail.append(
                 {
                     "version": idx,
@@ -206,6 +231,7 @@ class BoundaryRuleService:
                     "old_value": change.old_value,
                     "new_value": change.new_value,
                     "remark": change.remark,
+                    "snapshot_after": snapshot_data,
                 }
             )
         return trail
@@ -213,27 +239,70 @@ class BoundaryRuleService:
     def compare_versions(
         self, photo: WorkingConditionPhoto, v1: int, v2: int
     ) -> Optional[Dict]:
-        if v1 < 0 or v1 >= len(photo.change_history):
+        if v1 < 0 or v1 >= len(photo.snapshots):
             return None
-        if v2 < 0 or v2 >= len(photo.change_history):
+        if v2 < 0 or v2 >= len(photo.snapshots):
             return None
 
-        c1 = photo.change_history[v1]
-        c2 = photo.change_history[v2]
+        s1 = photo.get_snapshot_at_version(v1)
+        s2 = photo.get_snapshot_at_version(v2)
+        c1 = photo.get_change_at_version(v1)
+        c2 = photo.get_change_at_version(v2)
+
+        field_diff = photo.get_field_diff(v1, v2)
 
         return {
             "version_1": {
-                "timestamp": c1.timestamp.isoformat(),
-                "operator": c1.operator.value,
-                "change_type": c1.change_type.value,
-                "value": c1.new_value,
-                "remark": c1.remark,
+                "version": v1,
+                "timestamp": c1.timestamp.isoformat() if c1 else None,
+                "operator": c1.operator.value if c1 else None,
+                "change_type": c1.change_type.value if c1 else None,
+                "remark": c1.remark if c1 else None,
+                "snapshot": {
+                    "temperature_value": s1.temperature_value,
+                    "temperature_unit": s1.temperature_unit.value,
+                    "error_status": s1.error_status.value,
+                    "handwritten_remark": s1.handwritten_remark,
+                    "report_content": s1.report_content,
+                } if s1 else None,
             },
             "version_2": {
-                "timestamp": c2.timestamp.isoformat(),
-                "operator": c2.operator.value,
-                "change_type": c2.change_type.value,
-                "value": c2.new_value,
-                "remark": c2.remark,
+                "version": v2,
+                "timestamp": c2.timestamp.isoformat() if c2 else None,
+                "operator": c2.operator.value if c2 else None,
+                "change_type": c2.change_type.value if c2 else None,
+                "remark": c2.remark if c2 else None,
+                "snapshot": {
+                    "temperature_value": s2.temperature_value,
+                    "temperature_unit": s2.temperature_unit.value,
+                    "error_status": s2.error_status.value,
+                    "handwritten_remark": s2.handwritten_remark,
+                    "report_content": s2.report_content,
+                } if s2 else None,
             },
+            "field_differences": field_diff,
+        }
+
+    def get_evidence_summary(self, photo: WorkingConditionPhoto) -> Dict:
+        pending_versions = []
+        for idx, change in enumerate(photo.change_history):
+            if change.change_type == ChangeType.ROLLBACK:
+                pending_versions.append(idx)
+
+        return {
+            "photo_id": photo.photo_id,
+            "original_row": photo.original_row_number,
+            "file_name": photo.file_name,
+            "source_file": photo.source_file,
+            "temperature_raw": photo.temperature_raw,
+            "total_versions": photo.version,
+            "is_rollbacked": photo.is_rollbacked,
+            "rollback_to_version": photo.rollback_to_version,
+            "current_status": photo.error_status.value,
+            "current_temp_unit": photo.temperature_unit.value,
+            "has_mixed_units": photo.has_mixed_units,
+            "current_handwritten_remark": photo.handwritten_remark,
+            "current_report": photo.report_content,
+            "rollback_count": len(pending_versions),
+            "original_import_version": 0,
         }
