@@ -1,0 +1,42 @@
+[
+  {
+    "material_id": "D-002",
+    "material_type": "drawing",
+    "version": 2,
+    "title": "地下车库入口坡道变更图（第二版）",
+    "content": "图号：JD-02-改2，坡道宽度由3.6米调整为4.0米，增设挡水条。",
+    "submit_time": "2026-06-05 09:00",
+    "submitter": "阿宁",
+    "related_to": "V-002"
+  },
+  {
+    "material_id": "V-002",
+    "material_type": "visa",
+    "version": 2,
+    "title": "地下车库入口改坡道（修订）",
+    "content": "地下车库北入口由台阶改为坡道，坡度1:12，坡道宽度调整为4.0米（原3.6米），增设挡水条。",
+    "submit_time": "2026-06-05 09:30",
+    "submitter": "阿宁",
+    "related_to": "D-002"
+  },
+  {
+    "material_id": "V-003",
+    "material_type": "visa",
+    "version": 1,
+    "title": "外墙保温材料变更",
+    "content": "外墙保温材料由原设计的50mm岩棉板改为60mm挤塑聚苯板，B1级。",
+    "submit_time": "2026-06-05 10:00",
+    "submitter": "阿宁",
+    "related_to": "D-004"
+  },
+  {
+    "material_id": "D-004",
+    "material_type": "drawing",
+    "version": 1,
+    "title": "外墙保温变更图",
+    "content": "图号：JD-04-改1，外墙保温改为60mm挤塑聚苯板，做法参见国标图集XX。",
+    "submit_time": "2026-06-05 10:30",
+    "submitter": "阿宁",
+    "related_to": "V-003"
+  }
+]
