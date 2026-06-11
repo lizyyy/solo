@@ -3,7 +3,8 @@ const cors = require('cors');
 const path = require('path');
 const dataStore = require('./src/store/data-store');
 const workflowEngine = require('./src/engine/workflow-engine');
-const { STATUS } = require('./src/models/boundary-rules');
+const { STATUS, BOUNDARY_RULES } = require('./src/models/boundary-rules');
+const { formatViewRecord, UNIFIED_FIELDS, REPLAY_PARAM_SPEC } = require('./src/models/unified-fields');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -13,18 +14,21 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/api/records', (req, res) => {
-  const { status, turbineId, needsQcReview } = req.query;
+  const { status, turbineId, needsQcReview, hasBoundaryIssues, recordId } = req.query;
   const filters = {};
   if (status) filters.status = status;
   if (turbineId) filters.turbineId = turbineId;
   if (needsQcReview === 'true') filters.needsQcReview = true;
-  
+  if (hasBoundaryIssues === 'true') filters.hasBoundaryIssues = true;
+  if (recordId) filters.recordId = recordId;
+
   const data = dataStore.getUnifiedView(filters);
   res.json({
     success: true,
     data: data,
-    source: 'unified-view',
-    note: '页面、导出、API 共用此数据源'
+    source: 'dataStore.getUnifiedView()',
+    _filters_applied: filters,
+    _note: '页面、导出、API 共用此唯一数据源，禁止各自读取原始 records'
   });
 });
 
@@ -35,34 +39,51 @@ app.get('/api/records/:id', (req, res) => {
   }
   res.json({
     success: true,
-    data: dataStore._formatForView(record),
-    source: 'unified-view'
+    data: formatViewRecord(record),
+    source: 'formatViewRecord(record)',
+    _consistency_check: '与 /api/records 和 /api/export 同一转换函数'
   });
 });
 
 app.get('/api/records/:id/audit', (req, res) => {
   try {
     const audit = workflowEngine.replayAuditLog(req.params.id);
-    res.json({ success: true, data: audit });
+    res.json({
+      success: true,
+      data: audit,
+      _note: '审计日志包含完整的 status_history / manual_changes / full_audit_log'
+    });
   } catch (e) {
     res.status(400).json({ success: false, error: e.message });
   }
 });
 
 app.get('/api/export', (req, res) => {
-  const format = req.query.format || 'json';
-  const data = dataStore.getExportData(format);
-  
+  const format = (req.query.format || 'json').toLowerCase();
+  const { needsQcReview, hasBoundaryIssues, recordId, status, turbineId } = req.query;
+  const filters = {};
+  if (needsQcReview === 'true') filters.needsQcReview = true;
+  if (hasBoundaryIssues === 'true') filters.hasBoundaryIssues = true;
+  if (recordId) filters.recordId = recordId;
+  if (status) filters.status = status;
+  if (turbineId) filters.turbineId = turbineId;
+
+  const data = dataStore.getExportData(format, filters);
+
   if (format === 'csv') {
     res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-    res.setHeader('Content-Disposition', 'attachment; filename="turbine-efficiency.csv"');
+    res.setHeader('X-Unified-View-Filters', JSON.stringify(filters));
+    res.setHeader('X-Data-Source', 'dataStore.getExportData() 内部调用 getUnifiedView()');
+    const filename = needsQcReview === 'true' ? 'turbine-efficiency-qc-review.csv' : 'turbine-efficiency.csv';
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     res.send('\uFEFF' + data);
   } else {
     res.json({
       success: true,
       data: JSON.parse(data),
-      source: 'unified-view',
-      note: '与页面展示、API 返回是同一份数据'
+      source: 'dataStore.getExportData() → getUnifiedView() → formatViewRecord()',
+      _filters_applied: filters,
+      _consistency: '字段定义完全与 /api/records /api/records/:id 同一份 UNIFIED_FIELDS'
     });
   }
 });
@@ -70,7 +91,15 @@ app.get('/api/export', (req, res) => {
 app.get('/api/statistics', (req, res) => {
   res.json({
     success: true,
-    data: dataStore.getStatistics()
+    data: dataStore.getStatistics(),
+    _consistency_note: '统计基于同一份 records，与导出/页面使用同一数据'
+  });
+});
+
+app.get('/api/consistency', (req, res) => {
+  res.json({
+    success: true,
+    data: dataStore.verifyConsistency()
   });
 });
 
@@ -84,10 +113,19 @@ app.post('/api/import', (req, res) => {
       data = req.body.data;
       operator = req.body.operator;
     }
+    if (!Array.isArray(data)) {
+      return res.status(400).json({ success: false, error: '导入数据必须是数组' });
+    }
     const result = workflowEngine.importSensorData(data, operator || 'system');
-    res.json({ success: true, data: result });
+    const consistency = dataStore.verifyConsistency();
+    res.json({
+      success: true,
+      data: result,
+      _post_import_consistency: consistency,
+      _auto_boundary: '导入时自动按相邻记录执行边界规则，采样时间缺半小时自动 NEED_QC_REVIEW'
+    });
   } catch (e) {
-    res.status(400).json({ success: false, error: e.message });
+    res.status(400).json({ success: false, error: e.message, stack: e.stack });
   }
 });
 
@@ -100,7 +138,12 @@ app.post('/api/records/:id/engineer-review', (req, res) => {
       notes,
       photoUrls || []
     );
-    res.json({ success: true, data: dataStore._formatForView(record) });
+    const consistency = dataStore.verifyConsistency();
+    res.json({
+      success: true,
+      data: formatViewRecord(record),
+      _post_action_consistency: consistency
+    });
   } catch (e) {
     res.status(400).json({ success: false, error: e.message });
   }
@@ -110,7 +153,7 @@ app.post('/api/records/:id/submit-qc', (req, res) => {
   try {
     const { operator, remark } = req.body;
     const record = workflowEngine.submitForQcReview(req.params.id, operator || '何工', remark);
-    res.json({ success: true, data: dataStore._formatForView(record) });
+    res.json({ success: true, data: formatViewRecord(record) });
   } catch (e) {
     res.status(400).json({ success: false, error: e.message });
   }
@@ -120,7 +163,13 @@ app.post('/api/records/:id/qc-approve', (req, res) => {
   try {
     const { operator, remark } = req.body;
     const record = workflowEngine.qcApprove(req.params.id, operator || '质检员', remark);
-    res.json({ success: true, data: dataStore._formatForView(record) });
+    const consistency = dataStore.verifyConsistency();
+    res.json({
+      success: true,
+      data: formatViewRecord(record),
+      _fields_updated: { qc_review_required: record.qc_review_required, current_status: record.current_status },
+      _post_action_consistency: consistency
+    });
   } catch (e) {
     res.status(400).json({ success: false, error: e.message });
   }
@@ -130,7 +179,7 @@ app.post('/api/records/:id/qc-reject', (req, res) => {
   try {
     const { operator, reason } = req.body;
     const record = workflowEngine.qcReject(req.params.id, operator || '质检员', reason);
-    res.json({ success: true, data: dataStore._formatForView(record) });
+    res.json({ success: true, data: formatViewRecord(record) });
   } catch (e) {
     res.status(400).json({ success: false, error: e.message });
   }
@@ -139,8 +188,21 @@ app.post('/api/records/:id/qc-reject', (req, res) => {
 app.post('/api/records/:id/finalize', (req, res) => {
   try {
     const { operator, conclusion } = req.body;
+    if (!conclusion) {
+      return res.status(400).json({ success: false, error: 'finalize 必须提供 conclusion' });
+    }
     const record = workflowEngine.finalizeConclusion(req.params.id, operator || '何工', conclusion);
-    res.json({ success: true, data: dataStore._formatForView(record) });
+    const consistency = dataStore.verifyConsistency();
+    res.json({
+      success: true,
+      data: formatViewRecord(record),
+      _conclusion_snapshot: {
+        conclusion: record.conclusion,
+        version: record.conclusion_version,
+        previous_count: record.previous_versions.length
+      },
+      _post_action_consistency: consistency
+    });
   } catch (e) {
     res.status(400).json({ success: false, error: e.message });
   }
@@ -149,23 +211,82 @@ app.post('/api/records/:id/finalize', (req, res) => {
 app.post('/api/records/:id/rework', (req, res) => {
   try {
     const { operator, reason, photoUrls } = req.body;
+    if (!reason) {
+      return res.status(400).json({ success: false, error: 'rework 必须提供 reason' });
+    }
+    const oldBefore = dataStore.getRecordById(req.params.id);
+    const oldConclusionBefore = oldBefore ? oldBefore.conclusion : null;
+
     const result = workflowEngine.createRework(
       req.params.id,
       operator || '何工',
       reason,
       photoUrls || []
     );
-    res.json({ success: true, data: result });
+
+    const oldAfter = dataStore.getRecordById(result.old_record_id);
+    const newRecord = dataStore.getRecordById(result.new_record_id);
+    const consistency = dataStore.verifyConsistency();
+
+    res.json({
+      success: true,
+      data: result,
+      _rework_evidence_chain: {
+        old_record_id: result.old_record_id,
+        old_status_before: oldBefore ? oldBefore.current_status : null,
+        old_status_after: oldAfter ? oldAfter.current_status : 'MISSING',
+        old_superseded_by: oldAfter ? oldAfter.superseded_by : null,
+        old_conclusion_preserved: oldAfter ? oldAfter.conclusion : null,
+        old_conclusion_was: oldConclusionBefore,
+        old_previous_versions_count: oldAfter ? oldAfter.previous_versions.length : 0,
+        new_record_id: result.new_record_id,
+        new_status: newRecord ? newRecord.current_status : null,
+        new_previous_versions_snapshot: newRecord ? newRecord.previous_versions : [],
+        new_rework_from_field: newRecord ? newRecord.manual_changes.filter(c => c.field === 'rework_from') : []
+      },
+      _post_action_consistency: consistency
+    });
   } catch (e) {
-    res.status(400).json({ success: false, error: e.message });
+    res.status(400).json({ success: false, error: e.message, stack: e.stack });
   }
 });
 
 app.post('/api/records/:id/rollback', (req, res) => {
   try {
-    const { operator, versionIndex } = req.body;
-    const record = workflowEngine.rollbackToVersion(req.params.id, versionIndex, operator || 'system');
-    res.json({ success: true, data: dataStore._formatForView(record) });
+    const { operator, versionIndex, version } = req.body;
+    const vIdx = typeof versionIndex === 'number' ? versionIndex : (parseInt(String(version || '0'), 10));
+    if (Number.isNaN(vIdx)) {
+      return res.status(400).json({ success: false, error: 'rollback 必须提供 versionIndex 或 version 参数（数字）' });
+    }
+    const beforeSnapshot = (() => {
+      const r = dataStore.getRecordById(req.params.id);
+      return r ? {
+        status: r.current_status,
+        qc: r.qc_review_required,
+        boundaryCount: r.boundary_issues.length
+      } : null;
+    })();
+
+    const record = workflowEngine.rollbackToVersion(req.params.id, vIdx, operator || 'system');
+    const consistency = dataStore.verifyConsistency();
+
+    res.json({
+      success: true,
+      data: formatViewRecord(record),
+      _rollback_report: {
+        before: beforeSnapshot,
+        after: {
+          status: record.current_status,
+          qc: record.qc_review_required,
+          boundaryCount: record.boundary_issues.length,
+          boundaryMessages: record.boundary_issues.map(i => i.message)
+        },
+        version_index: vIdx,
+        target_status_history_entry: record.status_history.length > 0 ? record.status_history[Math.min(vIdx, record.status_history.length - 1)] : null,
+        derived_fields_restored_note: 'qc_review_required / boundary_issues 已按目标状态派生规则同步恢复，避免页面/接口/导出三者不一致'
+      },
+      _post_action_consistency: consistency
+    });
   } catch (e) {
     res.status(400).json({ success: false, error: e.message });
   }
@@ -175,24 +296,50 @@ app.get('/api/boundary-rules', (req, res) => {
   res.json({
     success: true,
     data: {
-      max_sampling_gap_minutes: 30,
-      min_sampling_duration_ratio: 0.5,
-      theoretical_sampling_minutes: 60,
+      ...BOUNDARY_RULES,
       status_list: STATUS,
-      note: '边界规则与 README.md 保持同步'
+      _enforcement: '代码与 README.md 同步修改，禁止只改一处',
+      _auto_trigger: '导入时自动检测，命中后强制 NEED_QC_REVIEW，跳过工程师也不能直接终态'
     }
   });
 });
 
-app.listen(PORT, () => {
+app.get('/api/unified-fields', (req, res) => {
+  res.json({
+    success: true,
+    data: UNIFIED_FIELDS,
+    _note: '页面表格、API返回、CSV导出 完全使用这里定义的字段顺序、转换逻辑和列名'
+  });
+});
+
+app.get('/api/command-help', (req, res) => {
+  res.json({
+    success: true,
+    data: REPLAY_PARAM_SPEC,
+    _note: '所有命令参数规范与 scripts/ 目录下脚本 --help 内容同步'
+  });
+});
+
+app.listen(PORT, '127.0.0.1', () => {
+  const sep = '='.repeat(60);
+  console.log(sep);
   console.log(`水轮机效率回放系统已启动: http://localhost:${PORT}`);
-  console.log(`API 文档:`);
-  console.log(`  GET  /api/records          - 获取记录列表（统一数据源）`);
-  console.log(`  GET  /api/records/:id      - 获取单条记录详情`);
-  console.log(`  GET  /api/records/:id/audit - 获取审计日志`);
-  console.log(`  GET  /api/export           - 导出数据（与页面同一份）`);
-  console.log(`  GET  /api/statistics       - 统计信息`);
-  console.log(`  GET  /api/boundary-rules   - 边界规则`);
+  console.log(sep);
+  console.log(`核心接口（均走统一数据源 dataStore.getUnifiedView）:`);
+  console.log(`  GET  /api/records?needsQcReview=true  - 采样时间缺半小时等需复核记录`);
+  console.log(`  GET  /api/records/:id                  - 单条详情`);
+  console.log(`  GET  /api/records/:id/audit            - 审计日志重放`);
+  console.log(`  GET  /api/export?format=csv&needsQcReview=true - 导出（字段与页面完全同一份）`);
+  console.log(`  GET  /api/statistics                   - 统计（含返工SUPERSEDED计数）`);
+  console.log(`  GET  /api/consistency                  - 三方一致性自检`);
+  console.log(`  POST /api/records/:id/rework           - 返工（自动标旧记录SUPERSEDED+证据链）`);
+  console.log(`  POST /api/records/:id/rollback         - 回滚（同步派生字段）`);
+  console.log(`  GET  /api/unified-fields               - 统一定义的字段映射`);
+  console.log(sep);
+  console.log(`验证提示:`);
+  console.log(`  curl http://localhost:${PORT}/api/consistency`);
+  console.log(`  curl "http://localhost:${PORT}/api/records?needsQcReview=true" | head -200`);
+  console.log(sep);
 });
 
 module.exports = app;

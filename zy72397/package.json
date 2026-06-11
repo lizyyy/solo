@@ -8,8 +8,10 @@
     "dev": "node server.js",
     "demo": "node scripts/run-demo-scenario.js",
     "replay": "node scripts/replay-audit-log.js",
+    "rollback": "node scripts/rollback-record.js",
     "import": "node scripts/import-sensor-data.js",
     "export": "node scripts/export-data.js",
+    "verify": "node scripts/verify-end-to-end.js",
     "test:boundary": "node scripts/test-boundary-rules.js"
   },
   "dependencies": {

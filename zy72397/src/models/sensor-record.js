@@ -1,4 +1,4 @@
-const { STATUS, canTransition, runAllBoundaryChecks } = require('./boundary-rules');
+const { STATUS, canTransition, runAllBoundaryChecks, deriveQcReviewRequired } = require('./boundary-rules');
 
 let recordCounter = 0;
 
@@ -32,7 +32,14 @@ function createSensorRecord(rawData, originalLineNo, importBatchId) {
       status: STATUS.STATUS_IMPORTED,
       timestamp: now,
       operator: 'system',
-      remark: '传感器数据导入'
+      remark: '传感器数据导入',
+      state_snapshot: {
+        qc_review_required: false,
+        boundary_issues: [],
+        conclusion: null,
+        superseded_by: null,
+        previous_versions_count: 0
+      }
     }],
     
     manual_changes: [],
@@ -65,24 +72,37 @@ function addManualChange(record, field, oldValue, newValue, operator, reason) {
 }
 
 function changeStatus(record, newStatus, operator, remark, extraData = {}) {
-  if (!canTransition(record.current_status, newStatus)) {
+  const { allowRollback, skipSnapshot = false } = extraData;
+  if (!canTransition(record.current_status, newStatus, { allowRollback })) {
     throw new Error(`状态流转不合法: ${record.current_status} → ${newStatus}`);
   }
   
-  record.status_history.push({
+  const transitionData = {
     status: newStatus,
     timestamp: new Date().toISOString(),
     operator,
     remark,
-    ...extraData
-  });
+    ...Object.fromEntries(
+      Object.entries(extraData).filter(([k]) => k !== 'allowRollback' && k !== 'skipSnapshot')
+    )
+  };
+  
+  if (!skipSnapshot) {
+    transitionData.state_snapshot = {
+      qc_review_required: deriveQcReviewRequired(newStatus, record),
+      boundary_issues: JSON.parse(JSON.stringify(record.boundary_issues || [])),
+      conclusion: record.conclusion,
+      superseded_by: record.superseded_by,
+      previous_versions_count: (record.previous_versions || []).length
+    };
+  }
+  
+  record.status_history.push(transitionData);
   
   record.current_status = newStatus;
   record.updated_at = new Date().toISOString();
   
-  if (newStatus === STATUS.NEED_QC_REVIEW) {
-    record.qc_review_required = true;
-  }
+  record.qc_review_required = deriveQcReviewRequired(newStatus, record);
   
   return record;
 }
@@ -101,6 +121,19 @@ function runBoundaryChecksOnRecord(record, previousRecord) {
         '边界规则检查发现问题，需质检员复核',
         { boundary_issues: result.issues }
       );
+    } else {
+      // 已处于 NEED_QC_REVIEW，仍要刷新 state_snapshot，把边界问题写入快照
+      // 做法：手动追加一条状态快照到末尾节点
+      const lastNode = record.status_history[record.status_history.length - 1];
+      if (lastNode && lastNode.status === STATUS.NEED_QC_REVIEW) {
+        lastNode.state_snapshot = {
+          qc_review_required: true,
+          boundary_issues: JSON.parse(JSON.stringify(record.boundary_issues || [])),
+          conclusion: record.conclusion,
+          superseded_by: record.superseded_by,
+          previous_versions_count: (record.previous_versions || []).length
+        };
+      }
     }
   }
   
@@ -142,34 +175,63 @@ function updateConclusion(record, newConclusion, operator, reason) {
 }
 
 function createReworkVersion(oldRecord, operator, reworkReason) {
+  const now = new Date().toISOString();
+  const newId = `${oldRecord.id}-V${oldRecord.conclusion_version + 1}`;
+
+  oldRecord.previous_versions.push({
+    conclusion: oldRecord.conclusion,
+    conclusion_version: oldRecord.conclusion_version,
+    timestamp: oldRecord.updated_at,
+    operator: oldRecord.status_history[oldRecord.status_history.length - 1]?.operator
+  });
+  oldRecord.superseded_by = newId;
+  oldRecord.manual_changes.push({
+    field: 'superseded_by',
+    old_value: null,
+    new_value: newId,
+    operator,
+    timestamp: now,
+    reason: `返工创建新记录替代本结论，原因: ${reworkReason}`
+  });
+  changeStatus(oldRecord, STATUS.SUPERSEDED, operator, `结论返工，被 ${newId} 替代`, {
+    reworkReason,
+    superseded_by: newId,
+    old_conclusion: oldRecord.conclusion
+  });
+
   const newRecord = JSON.parse(JSON.stringify(oldRecord));
-  
-  newRecord.id = `${oldRecord.id}-V${oldRecord.conclusion_version + 1}`;
-  newRecord.created_at = new Date().toISOString();
-  newRecord.updated_at = new Date().toISOString();
+  newRecord.id = newId;
+  newRecord.created_at = now;
+  newRecord.updated_at = now;
   newRecord.current_status = STATUS.STATUS_ENGINEER_REVIEWED;
   newRecord.conclusion_version = 1;
-  newRecord.previous_versions = [];
+  newRecord.previous_versions = [{
+    conclusion: oldRecord.conclusion,
+    conclusion_version: oldRecord.conclusion_version,
+    timestamp: oldRecord.updated_at,
+    operator: operator,
+    superseded_from: oldRecord.id
+  }];
   newRecord.superseded_by = null;
   newRecord.conclusion = null;
   newRecord.engineer_notes = null;
-  
   newRecord.status_history = [{
     status: STATUS.STATUS_ENGINEER_REVIEWED,
-    timestamp: new Date().toISOString(),
+    timestamp: now,
     operator,
-    remark: `返工创建，基于 ${oldRecord.id}，原因: ${reworkReason}`
+    remark: `返工创建，基于 ${oldRecord.id}，原因: ${reworkReason}`,
+    rework_from: oldRecord.id,
+    reworkReason
   }];
-  
   newRecord.manual_changes = [{
     field: 'rework_from',
     old_value: oldRecord.id,
     new_value: newRecord.id,
     operator,
-    timestamp: new Date().toISOString(),
+    timestamp: now,
     reason: reworkReason
   }];
-  
+
   return { newRecord, oldRecord };
 }
 

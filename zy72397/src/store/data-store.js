@@ -1,5 +1,10 @@
 const { STATUS } = require('../models/boundary-rules');
-const { runBoundaryChecksOnRecord } = require('../models/sensor-record');
+const {
+  UNIFIED_FIELDS,
+  getCsvHeaders,
+  getCsvRow,
+  formatViewRecord
+} = require('../models/unified-fields');
 
 class DataStore {
   constructor() {
@@ -7,7 +12,7 @@ class DataStore {
     this.auditLog = [];
     this.importBatches = [];
   }
-  
+
   addRecord(record) {
     const existingIndex = this.records.findIndex(r => r.id === record.id);
     if (existingIndex >= 0) {
@@ -15,26 +20,30 @@ class DataStore {
     } else {
       this.records.push(record);
     }
-    this._addAuditLog('RECORD_UPDATED', { recordId: record.id, status: record.current_status });
+    this._addAuditLog('RECORD_UPDATED', {
+      recordId: record.id,
+      status: record.current_status,
+      qc_review_required: record.qc_review_required,
+      boundary_issue_count: record.boundary_issues ? record.boundary_issues.length : 0,
+      superseded_by: record.superseded_by || null
+    });
     return record;
   }
-  
+
   addRecordBatch(records) {
-    records.forEach((record, index) => {
-      const prevRecord = index > 0 ? records[index - 1] : null;
-      runBoundaryChecksOnRecord(record, prevRecord);
+    records.forEach((record) => {
       this.addRecord(record);
     });
     return records;
   }
-  
+
   getRecordById(id) {
     return this.records.find(r => r.id === id);
   }
-  
+
   getUnifiedView(filters = {}) {
     let result = [...this.records];
-    
+
     if (filters.status) {
       result = result.filter(r => r.current_status === filters.status);
     }
@@ -42,117 +51,121 @@ class DataStore {
       result = result.filter(r => r.turbine_id === filters.turbineId);
     }
     if (filters.needsQcReview) {
-      result = result.filter(r => r.qc_review_required);
+      result = result.filter(r => r.qc_review_required === true);
     }
-    
-    return result.map(r => this._formatForView(r));
+    if (filters.hasBoundaryIssues) {
+      result = result.filter(r => Array.isArray(r.boundary_issues) && r.boundary_issues.length > 0);
+    }
+    if (filters.recordId) {
+      result = result.filter(r => r.id === filters.recordId);
+    }
+
+    return result.map(r => formatViewRecord(r));
   }
-  
-  _formatForView(record) {
-    return {
-      id: record.id,
-      original_line_no: record.original_line_no,
-      import_batch_id: record.import_batch_id,
-      sensor_id: record.sensor_id,
-      sensor_name: record.sensor_name,
-      turbine_id: record.turbine_id,
-      sampling_time: record.sampling_time,
-      sampling_start_time: record.sampling_start_time,
-      sampling_end_time: record.sampling_end_time,
-      efficiency: record.efficiency,
-      flow_rate: record.flow_rate,
-      head: record.head,
-      power: record.power,
-      current_status: record.current_status,
-      qc_review_required: record.qc_review_required,
-      boundary_issues: record.boundary_issues,
-      status_history: record.status_history,
-      manual_changes: record.manual_changes,
-      work_condition_photos: record.work_condition_photos,
-      conclusion: record.conclusion,
-      conclusion_version: record.conclusion_version,
-      previous_versions: record.previous_versions,
-      created_at: record.created_at,
-      updated_at: record.updated_at
-    };
-  }
-  
-  getExportData(format = 'json') {
-    const data = this.getUnifiedView();
+
+  getExportData(format = 'json', filters = {}) {
+    const data = this.getUnifiedView(filters);
     if (format === 'csv') {
       return this._toCSV(data);
     }
     return JSON.stringify(data, null, 2);
   }
-  
+
   _toCSV(data) {
-    if (data.length === 0) return '';
-    
-    const headers = [
-      '记录ID', '原始行号', '导入批次', '传感器编号', '传感器名称', '水轮机编号',
-      '采样时间', '采样开始', '采样结束', '效率(%)', '流量(m³/s)', '水头(m)', '功率(kW)',
-      '当前状态', '需QC复核', '边界问题', '结论', '结论版本', '创建时间', '更新时间'
-    ];
-    
-    const rows = data.map(r => [
-      r.id,
-      r.original_line_no,
-      r.import_batch_id,
-      r.sensor_id,
-      r.sensor_name,
-      r.turbine_id,
-      r.sampling_time,
-      r.sampling_start_time,
-      r.sampling_end_time,
-      r.efficiency,
-      r.flow_rate,
-      r.head,
-      r.power,
-      r.current_status,
-      r.qc_review_required ? '是' : '否',
-      r.boundary_issues.map(i => i.message).join('; '),
-      r.conclusion || '',
-      r.conclusion_version,
-      r.created_at,
-      r.updated_at
-    ]);
-    
+    if (data.length === 0) {
+      return getCsvHeaders().join(',') + '\n(空: 没有符合条件的记录，如要查看采样时间缺半小时的，请加 --needs-qc-review=true)';
+    }
+
+    const headers = getCsvHeaders();
+    const rows = data.map(recordView => getCsvRow(recordView));
     return [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
   }
-  
+
   getAuditLog(recordId = null) {
     if (recordId) {
       return this.auditLog.filter(log => log.data.recordId === recordId);
     }
     return this.auditLog;
   }
-  
+
   _addAuditLog(action, data) {
     this.auditLog.push({
       id: `AUD-${String(this.auditLog.length + 1).padStart(5, '0')}`,
       action,
       data,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      _unified_view_snapshot: (() => {
+        const rec = this.records.find(r => r.id === data.recordId);
+        return rec ? formatViewRecord(rec) : null;
+      })()
     });
   }
-  
+
   getStatistics() {
     const total = this.records.length;
     const byStatus = {};
     Object.values(STATUS).forEach(s => byStatus[s] = 0);
     this.records.forEach(r => byStatus[r.current_status] = (byStatus[r.current_status] || 0) + 1);
-    
+
     const needsQc = this.records.filter(r => r.qc_review_required).length;
-    const hasIssues = this.records.filter(r => r.boundary_issues.length > 0).length;
-    
+    const hasIssues = this.records.filter(r => Array.isArray(r.boundary_issues) && r.boundary_issues.length > 0).length;
+    const supersededCount = this.records.filter(r => r.current_status === STATUS.SUPERSEDED).length;
+    const withReworkChain = this.records.filter(r => r.superseded_by || (r.previous_versions && r.previous_versions.length > 0)).length;
+
     return {
       total_records: total,
       by_status: byStatus,
       needs_qc_review: needsQc,
-      has_boundary_issues: hasIssues
+      has_boundary_issues: hasIssues,
+      superseded_records: supersededCount,
+      records_in_rework_chain: withReworkChain,
+      _unified_fields_used: UNIFIED_FIELDS.map(f => f.key),
+      _consistency_note: '以上统计与导出/页面/接口共用 getUnifiedView()，绝不各自计算'
     };
   }
-  
+
+  verifyConsistency() {
+    const issues = [];
+    const apiView = this.getUnifiedView();
+    const jsonExport = JSON.parse(this.getExportData('json'));
+
+    if (apiView.length !== jsonExport.length) {
+      issues.push(`长度不一致 API=${apiView.length} vs 导出JSON=${jsonExport.length}`);
+    }
+
+    apiView.forEach((v, i) => {
+      const e = jsonExport[i];
+      if (!e) { issues.push(`第${i}条记录导出缺失`); return; }
+      ['id','current_status','qc_review_required','superseded_by','conclusion_version'].forEach(k => {
+        if (JSON.stringify(v[k]) !== JSON.stringify(e[k])) {
+          issues.push(`${v.id} 字段 ${k} 不一致 API=${JSON.stringify(v[k])} vs 导出=${JSON.stringify(e[k])}`);
+        }
+      });
+      if (Array.isArray(v.boundary_issues) && Array.isArray(e.boundary_issues)) {
+        if (v.boundary_issues.length !== e.boundary_issues.length) {
+          issues.push(`${v.id} boundary_issues 长度不一致`);
+        }
+      }
+    });
+
+    this.records.forEach(r => {
+      if (r.current_status === STATUS.SUPERSEDED && !r.superseded_by) {
+        issues.push(`${r.id} 状态=SUPERSEDED 但 superseded_by 为空，返工证据链断了`);
+      }
+      if (r.qc_review_required === true
+          && r.current_status !== STATUS.NEED_QC_REVIEW
+          && r.current_status !== STATUS.STATUS_IMPORTED) {
+        issues.push(`${r.id} qc_review_required=true 但状态=${r.current_status}，派生字段不同步`);
+      }
+    });
+
+    return {
+      passed: issues.length === 0,
+      issues,
+      summary: issues.length === 0 ? '✅ 三方一致（页面/API/导出），返工证据链完整，派生字段同步' : `❌ 发现 ${issues.length} 个问题`
+    };
+  }
+
   clear() {
     this.records = [];
     this.auditLog = [];

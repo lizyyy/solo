@@ -78,9 +78,27 @@ function runAllBoundaryChecks(record, previousRecord) {
   };
 }
 
-function canTransition(from, to) {
+function canTransition(from, to, options = {}) {
+  if (options.allowRollback) return true;
   const allowed = STATUS_FLOW[from] || [];
   return allowed.includes(to);
+}
+
+function deriveQcReviewRequired(status, record) {
+  switch (status) {
+    case STATUS.NEED_QC_REVIEW:
+      return true;
+    case STATUS.QC_APPROVED:
+    case STATUS.QC_REJECTED:
+    case STATUS.STATUS_FINALIZED:
+    case STATUS.STATUS_ENGINEER_REVIEWED:
+    case STATUS.SUPERSEDED:
+      return false;
+    case STATUS.STATUS_IMPORTED:
+      return !!(record && record.boundary_issues && record.boundary_issues.length > 0);
+    default:
+      return !!(record && record.boundary_issues && record.boundary_issues.length > 0);
+  }
 }
 
 module.exports = {
@@ -90,5 +108,6 @@ module.exports = {
   checkSamplingGap,
   checkSamplingDuration,
   runAllBoundaryChecks,
-  canTransition
+  canTransition,
+  deriveQcReviewRequired
 };

@@ -1,6 +1,6 @@
 const dataStore = require('../store/data-store');
-const { createSensorRecord, changeStatus, addWorkConditionPhoto, updateConclusion, createReworkVersion, addManualChange } = require('../models/sensor-record');
-const { STATUS } = require('../models/boundary-rules');
+const { createSensorRecord, changeStatus, addWorkConditionPhoto, updateConclusion, createReworkVersion, addManualChange, runBoundaryChecksOnRecord } = require('../models/sensor-record');
+const { STATUS, deriveQcReviewRequired } = require('../models/boundary-rules');
 
 let importBatchCounter = 0;
 
@@ -10,6 +10,11 @@ function importSensorData(rawDataList, operator = 'system') {
   
   const records = rawDataList.map((rawData, index) => {
     return createSensorRecord(rawData, index + 1, batchId);
+  });
+  
+  records.forEach((rec, i) => {
+    const prev = i > 0 ? records[i - 1] : null;
+    runBoundaryChecksOnRecord(rec, prev);
   });
   
   dataStore.addRecordBatch(records);
@@ -72,7 +77,7 @@ function qcApprove(recordId, operator, remark = '') {
   }
   
   changeStatus(record, STATUS.QC_APPROVED, operator, remark || '质检员复核通过');
-  record.qc_review_required = false;
+  // qc_review_required 由 changeStatus 内部调用 deriveQcReviewRequired() 自动同步，避免两套逻辑
   dataStore.addRecord(record);
   return record;
 }
@@ -149,25 +154,58 @@ function replayAuditLog(recordId) {
 function rollbackToVersion(recordId, statusIndex, operator) {
   const record = dataStore.getRecordById(recordId);
   if (!record) throw new Error(`记录不存在: ${recordId}`);
-  
+
   if (statusIndex < 0 || statusIndex >= record.status_history.length) {
-    throw new Error(`无效的历史版本索引`);
+    throw new Error(`无效的历史版本索引 [0, ${record.status_history.length - 1}]`);
   }
-  
-  const targetStatus = record.status_history[statusIndex];
-  
-  record.manual_changes.push({
-    field: 'rollback',
-    old_value: record.current_status,
-    new_value: targetStatus.status,
+
+  const beforeStatus = record.current_status;
+  const beforeQc = record.qc_review_required;
+  const beforeBoundaryCount = (record.boundary_issues || []).length;
+
+  const targetNode = record.status_history[statusIndex];
+  const targetStatus = targetNode.status;
+  const snap = targetNode.state_snapshot || {};
+
+  // 恢复派生字段（重点要求：回滚不能只改current_status）
+  // 1) qc_review_required: 先看快照，没快照就按状态派生
+  if (typeof snap.qc_review_required === 'boolean') {
+    record.qc_review_required = snap.qc_review_required;
+  } else {
+    record.qc_review_required = deriveQcReviewRequired(targetStatus, record);
+  }
+  // 2) boundary_issues: 快照中有的话就深拷贝还原（采样缺半小时的证据不能丢）
+  if (snap.boundary_issues && Array.isArray(snap.boundary_issues)) {
+    record.boundary_issues = JSON.parse(JSON.stringify(snap.boundary_issues));
+  }
+  // 3) conclusion: 还原
+  if ('conclusion' in snap && typeof snap.conclusion !== 'undefined') {
+    record.conclusion = snap.conclusion;
+  }
+  // 4) superseded_by: 还原
+  if ('superseded_by' in snap) {
+    record.superseded_by = snap.superseded_by || null;
+  }
+
+  // 审计追踪
+  addManualChange(record, 'rollback',
+    `${beforeStatus}|qc=${beforeQc}|issues=${beforeBoundaryCount}`,
+    `${targetStatus}|qc=${record.qc_review_required}|issues=${(record.boundary_issues||[]).length}`,
     operator,
-    timestamp: new Date().toISOString(),
-    reason: `回滚到版本 ${statusIndex} (${targetStatus.status})`
-  });
-  
-  record.current_status = targetStatus.status;
-  record.updated_at = new Date().toISOString();
-  
+    `回滚到索引=${statusIndex} 对应状态=${targetStatus}; 同步派生字段 qc_review_required=${record.qc_review_required}; boundary_issues.length=${(record.boundary_issues||[]).length}`);
+
+  // 最后走 changeStatus（allowRollback=true 允许跨状态跳），统一写入 status_history + state_snapshot
+  changeStatus(record, targetStatus, operator,
+    `执行回滚 (从 ${beforeStatus} 到 ${targetStatus})，目标索引=${statusIndex}; 节点备注=${targetNode.remark || ''}`,
+    {
+      allowRollback: true,
+      rollback_from: beforeStatus,
+      rollback_from_qc: beforeQc,
+      rollback_to_qc: record.qc_review_required,
+      rollback_index: statusIndex,
+      rollback_target_node_timestamp: targetNode.timestamp
+    });
+
   dataStore.addRecord(record);
   return record;
 }

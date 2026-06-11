@@ -3,127 +3,237 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>水轮机效率回放系统</title>
+  <title>水轮机效率回放系统 - 可复盘版</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f7fa; padding: 20px; }
-    .container { max-width: 1400px; margin: 0 auto; }
-    .header { background: #1e3a5f; color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-    .header h1 { font-size: 24px; }
-    .header .subtitle { opacity: 0.8; font-size: 14px; margin-top: 5px; }
-    .stats-bar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; margin-bottom: 20px; }
-    .stat-card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    .stat-card .number { font-size: 28px; font-weight: bold; color: #1e3a5f; }
-    .stat-card .label { font-size: 12px; color: #666; margin-top: 5px; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f7fa; padding: 20px; font-size: 13px; }
+    .container { max-width: 1600px; margin: 0 auto; }
+    .header { background: linear-gradient(135deg,#1e3a5f,#2980b9); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+    .header h1 { font-size: 22px; }
+    .header .subtitle { opacity: 0.9; font-size: 13px; margin-top: 6px; }
+    .header .badge-row { margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap; }
+    .mini-badge { background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 12px; font-size: 11px; }
+    .mini-badge a { color: #fff; }
+
+    .stats-bar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; margin-bottom: 20px; }
+    .stat-card { background: white; padding: 12px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.08); }
+    .stat-card .number { font-size: 24px; font-weight: bold; color: #1e3a5f; }
+    .stat-card .label { font-size: 11px; color: #666; margin-top: 3px; }
     .stat-card.warning .number { color: #e67e22; }
-    .workflow { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    .workflow h2 { font-size: 16px; margin-bottom: 15px; color: #1e3a5f; }
+    .stat-card.danger .number { color: #c0392b; }
+    .stat-card.info .number { color: #8e44ad; }
+
+    .workflow { background: white; padding: 18px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.08); }
+    .workflow h2 { font-size: 15px; margin-bottom: 12px; color: #1e3a5f; }
     .workflow-steps { display: flex; align-items: center; justify-content: space-between; }
     .step { flex: 1; text-align: center; position: relative; }
-    .step .step-icon { width: 50px; height: 50px; border-radius: 50%; background: #e0e0e0; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-weight: bold; color: #999; }
-    .step.active .step-icon { background: #3498db; color: white; }
+    .step .step-icon { width: 44px; height: 44px; border-radius: 50%; background: #ecf0f1; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; font-weight: bold; color: #7f8c8d; }
+    .step.active .step-icon { background: #3498db; color: white; box-shadow: 0 0 0 4px rgba(52,152,219,0.15); }
     .step.done .step-icon { background: #27ae60; color: white; }
-    .step .step-name { font-size: 13px; color: #666; }
-    .step.active .step-name { color: #3498db; font-weight: bold; }
-    .step-line { flex: 0.5; height: 3px; background: #e0e0e0; }
+    .step .step-name { font-size: 12px; color: #666; }
+    .step.active .step-name { color: #2c3e50; font-weight: 700; }
+    .step-line { flex: 0.4; height: 3px; background: #ecf0f1; }
     .step-line.done { background: #27ae60; }
-    .main-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
-    .panel { background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); padding: 20px; }
-    .panel h2 { font-size: 16px; margin-bottom: 15px; color: #1e3a5f; border-bottom: 2px solid #eee; padding-bottom: 10px; }
-    .record-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    .record-table th { background: #f8f9fa; padding: 10px; text-align: left; font-weight: 600; color: #555; border-bottom: 2px solid #eee; }
-    .record-table td { padding: 10px; border-bottom: 1px solid #eee; }
+
+    .action-bar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+    .action-bar .group-title { font-size: 12px; color: #666; margin-right: 6px; font-weight: 600; }
+
+    .main-grid { display: grid; grid-template-columns: 3fr 2fr; gap: 18px; }
+    .panel { background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.08); padding: 18px; }
+    .panel h2 { font-size: 15px; margin-bottom: 12px; color: #1e3a5f; border-bottom: 2px solid #ecf0f1; padding-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
+    .panel h2 .hint { font-size: 11px; color: #27ae60; font-weight: normal; }
+
+    .data-source-note { background: #eaf4fd; padding: 8px 12px; border-radius: 4px; font-size: 11px; color: #2a6496; margin-bottom: 10px; border-left: 3px solid #3498db; }
+    .data-source-note code { background: #fff; padding: 1px 5px; border-radius: 3px; font-size: 10px; }
+
+    .record-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .record-table th { background: #f8f9fa; padding: 8px 6px; text-align: left; font-weight: 600; color: #555; border-bottom: 2px solid #ecf0f1; position: sticky; top: 0; }
+    .record-table td { padding: 7px 6px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
     .record-table tr:hover { background: #f8f9fa; cursor: pointer; }
-    .record-table tr.selected { background: #e8f4fd; }
-    .status-badge { padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+    .record-table tr.selected { background: #e8f4fd; border-left: 3px solid #3498db; }
+    .record-table tr.superseded-row { opacity: 0.55; background: #fafafa; }
+    .record-table tr.superseded-row:hover { background: #f0ece0; opacity: 0.9; }
+
+    .status-badge { padding: 2px 7px; border-radius: 10px; font-size: 10px; font-weight: 700; white-space: nowrap; display: inline-block; }
     .status-IMPORTED { background: #e3f2fd; color: #1565c0; }
     .status-ENGINEER_REVIEWED { background: #fff3e0; color: #e65100; }
     .status-NEED_QC_REVIEW { background: #ffebee; color: #c62828; animation: pulse 2s infinite; }
     .status-QC_APPROVED { background: #e8f5e9; color: #2e7d32; }
+    .status-QC_REJECTED { background: #ffe0b2; color: #bf360c; }
     .status-FINALIZED { background: #f3e5f5; color: #6a1b9a; }
-    .status-SUPERSEDED { background: #eceff1; color: #546e7a; }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
-    .issue-badge { background: #ffebee; color: #c62828; padding: 2px 6px; border-radius: 4px; font-size: 10px; }
-    .detail-section { margin-bottom: 20px; }
-    .detail-section h3 { font-size: 14px; color: #333; margin-bottom: 10px; }
-    .timeline { border-left: 2px solid #e0e0e0; padding-left: 15px; margin-left: 10px; }
-    .timeline-item { position: relative; margin-bottom: 15px; }
-    .timeline-item::before { content: ''; position: absolute; left: -20px; top: 5px; width: 8px; height: 8px; border-radius: 50%; background: #3498db; }
-    .timeline-item .time { font-size: 11px; color: #999; }
-    .timeline-item .content { font-size: 13px; color: #333; margin-top: 2px; }
-    .timeline-item .operator { font-size: 11px; color: #666; }
-    .info-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
-    .info-row .label { color: #666; }
-    .info-row .value { color: #333; font-weight: 500; }
-    .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500; }
+    .status-SUPERSEDED { background: #eceff1; color: #455a64; text-decoration: line-through; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+
+    .issue-badge { background: #ffebee; color: #c62828; padding: 1px 5px; border-radius: 3px; font-size: 10px; font-weight: 600; }
+    .superseded-tag { background: #ffecb3; color: #e65100; padding: 1px 5px; border-radius: 3px; font-size: 10px; font-weight: 600; }
+    .qc-tag { background: #c8e6c9; color: #2e7d32; padding: 1px 5px; border-radius: 3px; font-size: 10px; font-weight: 600; }
+
+    .detail-section { margin-bottom: 16px; }
+    .detail-section h3 { font-size: 13px; color: #2c3e50; margin-bottom: 8px; padding-left: 8px; border-left: 3px solid #3498db; }
+
+    .timeline { border-left: 2px solid #dfe6e9; padding-left: 14px; margin-left: 8px; }
+    .timeline-item { position: relative; margin-bottom: 12px; }
+    .timeline-item::before { content: ''; position: absolute; left: -19px; top: 5px; width: 9px; height: 9px; border-radius: 50%; background: #3498db; border: 2px solid #fff; box-shadow: 0 0 0 2px #3498db; }
+    .timeline-item.rollback::before { background: #f39c12; box-shadow: 0 0 0 2px #f39c12; }
+    .timeline-item.qc::before { background: #27ae60; box-shadow: 0 0 0 2px #27ae60; }
+    .timeline-item.rework::before { background: #8e44ad; box-shadow: 0 0 0 2px #8e44ad; }
+    .timeline-item .time { font-size: 10px; color: #95a5a6; }
+    .timeline-item .content { font-size: 12px; color: #2c3e50; margin-top: 2px; font-weight: 500; }
+    .timeline-item .operator { font-size: 10px; color: #7f8c8d; margin-top: 2px; }
+    .timeline-item .extra { font-size: 10px; color: #c0392b; margin-top: 2px; background: #fdf6e3; padding: 3px 5px; border-radius: 3px; }
+
+    .info-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px dashed #ecf0f1; font-size: 12px; }
+    .info-row:last-child { border-bottom: none; }
+    .info-row .label { color: #7f8c8d; }
+    .info-row .value { color: #2c3e50; font-weight: 500; max-width: 55%; text-align: right; word-break: break-all; }
+
+    .btn { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; }
     .btn-primary { background: #3498db; color: white; }
     .btn-primary:hover { background: #2980b9; }
     .btn-success { background: #27ae60; color: white; }
+    .btn-success:hover { background: #219a52; }
     .btn-warning { background: #f39c12; color: white; }
     .btn-danger { background: #e74c3c; color: white; }
-    .btn-group { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
-    .rework-highlight { background: #fff3cd; border: 1px solid #ffeaa7; padding: 10px; border-radius: 4px; margin-bottom: 15px; font-size: 13px; }
-    .boundary-rule-note { background: #e8f5e9; padding: 10px; border-radius: 4px; font-size: 12px; color: #2e7d32; margin-bottom: 10px; }
-    .version-compare { background: #f8f9fa; padding: 10px; border-radius: 4px; margin-bottom: 10px; font-size: 12px; }
-    .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
-    .photo-item { background: #f0f0f0; height: 60px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #666; }
-    .data-source-note { background: #e3f2fd; padding: 8px 12px; border-radius: 4px; font-size: 12px; color: #1565c0; margin-bottom: 15px; }
+    .btn-info { background: #9b59b6; color: white; }
+    .btn-info:hover { background: #8e44ad; }
+    .btn-default { background: #95a5a6; color: white; }
+    .btn-group { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+
+    .rework-highlight { background: #fff3cd; border: 1px solid #ffeaa7; padding: 10px; border-radius: 4px; margin-bottom: 12px; font-size: 12px; }
+    .boundary-rule-note { background: #e8f5e9; padding: 8px 10px; border-radius: 4px; font-size: 11px; color: #2e7d32; margin-bottom: 8px; border-left: 3px solid #27ae60; }
+    .version-compare { background: #f5f6fa; border: 1px solid #dcdde1; padding: 10px; border-radius: 4px; margin-bottom: 10px; font-size: 11px; }
+    .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 8px; }
+    .photo-item { background: linear-gradient(135deg,#bdc3c7,#95a5a6); color: white; height: 54px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; text-align: center; padding: 4px; }
     .hidden { display: none; }
+
+    .consistency-panel { background: #f0fdf4; border: 1px solid #bbf7d0; padding: 10px; border-radius: 4px; font-size: 11px; margin-bottom: 12px; }
+    .consistency-panel.bad { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+    .diff-table { font-size: 11px; width: 100%; margin-top: 6px; }
+    .diff-table th { background: #fafafa; padding: 4px; text-align: left; border: 1px solid #eee; }
+    .diff-table td { padding: 3px 4px; border: 1px solid #eee; font-family: monospace; }
+
+    .chain-box { background: #faf5ff; border: 1px solid #e9d5ff; padding: 10px; border-radius: 4px; margin-bottom: 10px; font-size: 11px; }
+    .chain-box .chain-title { font-weight: 700; color: #6b21a8; margin-bottom: 5px; }
+    .chain-link { display: flex; align-items: center; gap: 6px; margin: 3px 0; }
+    .chain-link .arrow { color: #a855f7; font-weight: 700; }
+
+    .rollback-preview { background: #fffbeb; border: 1px dashed #f59e0b; padding: 8px; border-radius: 4px; font-size: 11px; margin-top: 6px; }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1>⚡ 水轮机效率回放系统</h1>
-      <div class="subtitle">带审计追踪的实验数据复盘平台 | 数据来源统一：页面 / API / 导出同一份</div>
+      <h1>⚡ 水轮机效率回放系统 <span style="font-size:13px;opacity:0.85;">· 可复盘版</span></h1>
+      <div class="subtitle">证据链闭环：页面 / API / 导出 完全同一份 dataStore.getUnifiedView()，含返工替代、回滚派生字段同步</div>
+      <div class="badge-row">
+        <span class="mini-badge">🎯 三步工作流强制</span>
+        <span class="mini-badge">⚠️ 采样缺半小时→强制QC复核</span>
+        <span class="mini-badge">🔁 返工证据链:旧记录SUPERSEDED+superseded_by</span>
+        <span class="mini-badge">⏪ 回滚同步qc_review_required</span>
+        <span class="mini-badge"><a href="#commands" style="text-decoration:none">📋 命令集</a></span>
+      </div>
     </div>
 
     <div class="stats-bar" id="statsBar">
       <div class="stat-card"><div class="number" id="statTotal">0</div><div class="label">总记录数</div></div>
       <div class="stat-card"><div class="number" id="statImported">0</div><div class="label">待工程师评审</div></div>
-      <div class="stat-card warning"><div class="number" id="statQc">0</div><div class="label">待质检员复核</div></div>
+      <div class="stat-card warning"><div class="number" id="statQc">0</div><div class="label">⚠️ 待质检员复核</div></div>
       <div class="stat-card"><div class="number" id="statFinal">0</div><div class="label">已终态</div></div>
-      <div class="stat-card warning"><div class="number" id="statIssues">0</div><div class="label">含边界问题</div></div>
+      <div class="stat-card danger"><div class="number" id="statIssues">0</div><div class="label">边界问题记录</div></div>
+      <div class="stat-card info"><div class="number" id="statSuperseded">0</div><div class="label">已被替代(返工)</div></div>
+      <div class="stat-card info"><div class="number" id="statChain">0</div><div class="label">在返工链中</div></div>
     </div>
 
     <div class="workflow">
-      <h2>📋 三步工作流（不能跳步，每步留痕）</h2>
+      <h2>📋 三步强制工作流（不能跳步；采样缺半小时强制停在待QC复核）</h2>
       <div class="workflow-steps">
-        <div class="step active" id="step1"><div class="step-icon">1</div><div class="step-name">传感器编号导入</div></div>
+        <div class="step" id="step1"><div class="step-icon">1</div><div class="step-name">① 传感器编号导入<br><small>自动边界检查</small></div></div>
         <div class="step-line" id="line1"></div>
-        <div class="step" id="step2"><div class="step-icon">2</div><div class="step-name">何工补看工况照片</div></div>
+        <div class="step" id="step2"><div class="step-icon">2</div><div class="step-name">② 何工补看工况照片<br><small>工程师评审+照片</small></div></div>
         <div class="step-line" id="line2"></div>
-        <div class="step" id="step3"><div class="step-icon">3</div><div class="step-name">实验复盘图更新</div></div>
+        <div class="step" id="step3"><div class="step-icon">3</div><div class="step-name">③ 实验复盘图更新<br><small>最终结论+版本留痕</small></div></div>
       </div>
     </div>
 
+    <div class="action-bar">
+      <span class="group-title">🧪演示:</span>
+      <button class="btn btn-primary" onclick="runFullDemo()">📥 一键跑导入→三步→返工</button>
+      <button class="btn btn-info" onclick="loadDemoData()">仅导入样例数据</button>
+      <span class="group-title">🔍核对:</span>
+      <button class="btn btn-success" onclick="checkConsistency()">✅ 三方一致性自检</button>
+      <button class="btn btn-warning" onclick="filterNeedQc()">⚠️ 仅看需QC复核</button>
+      <button class="btn btn-default" onclick="clearFilter()">清除筛选</button>
+      <span class="group-title">📤导出:</span>
+      <button class="btn btn-primary" onclick="exportCsv()">CSV(与页面同字段)</button>
+      <button class="btn btn-info" onclick="exportQcCsv()">仅需QC复核的CSV</button>
+    </div>
+
+    <div id="consistencyBox" class="consistency-panel hidden"></div>
+
     <div class="main-grid">
       <div class="panel">
-        <h2>📊 数据记录列表（与API、导出共用同一份数据源）</h2>
+        <h2>📊 数据记录列表 <span class="hint">字段完全同 /api/records 与 /api/export</span></h2>
         <div class="data-source-note">
-          ✅ 单一数据源保证：页面显示、API接口、文件导出都调用 <code>dataStore.getUnifiedView()</code>
+          ✅ 单一数据源：表格 / API / 导出 三方都调用 <code>dataStore.getUnifiedView() → formatViewRecord()</code><br>
+          🟣 返工链：旧记录标<span class="superseded-tag">SUPERSEDED</span>且写<code>superseded_by</code>；<span class="qc-tag">需QC</span>为采样时间缺半小时等边界问题，不会在任何视图消失
         </div>
-        <table class="record-table" id="recordTable">
-          <thead>
-            <tr>
-              <th>记录ID</th>
-              <th>原始行号</th>
-              <th>传感器编号</th>
-              <th>采样时间</th>
-              <th>效率(%)</th>
-              <th>状态</th>
-              <th>问题</th>
-            </tr>
-          </thead>
-          <tbody id="recordTableBody"></tbody>
-        </table>
+        <div style="max-height: 580px; overflow: auto;">
+          <table class="record-table" id="recordTable">
+            <thead>
+              <tr>
+                <th>记录ID</th>
+                <th>原始行号</th>
+                <th>传感器编号</th>
+                <th>采样时间</th>
+                <th>效率(%)</th>
+                <th>处理状态</th>
+                <th>被哪条替代</th>
+                <th>需QC复核</th>
+                <th>边界问题</th>
+              </tr>
+            </thead>
+            <tbody id="recordTableBody"></tbody>
+          </table>
+        </div>
       </div>
 
       <div>
-        <div class="panel" id="detailPanel">
-          <h2>🔍 记录详情 & 审计追踪</h2>
-          <div id="detailEmpty" style="text-align: center; color: #999; padding: 40px;">请选择一条记录查看详情</div>
+        <div class="panel" id="detailPanel" style="max-height: 760px; overflow: auto;">
+          <h2>🔍 记录详情 & 审计追踪 & 返工证据链</h2>
+          <div id="detailEmpty" style="text-align: center; color: #95a5a6; padding: 50px 10px;">
+            请先在左侧表格点击一条记录<br><small>建议先点 <b>一键跑导入→三步→返工</b> 按钮</small>
+          </div>
           <div id="detailContent" class="hidden"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" id="commands" style="margin-top: 20px;">
+      <h2>📋 可重新跑的命令集（参数规范写死在代码里，不靠口头）</h2>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 12px;">
+        <div class="version-compare">
+          <b>npm run demo</b> — 从0开始：导入→三步流程→(采样缺半小时QC复核)→结论→返工→回滚→核对导出<br>
+          <small style="color:#888">重点核对：REC-002(采样缺半小时) 旧结论 SUPERSEDED + superseded_by 写入</small>
+        </div>
+        <div class="version-compare">
+          <b>npm run verify</b> — 端到端核对（16项断言）：返工SUPERSEDED标记、回滚派生字段、三方字段一致性<br>
+          <small style="color:#888">失败会打印具体哪条记录哪一字段对不上</small>
+        </div>
+        <div class="version-compare">
+          <b>npm run replay -- --record-id=REC-002</b> — 重放指定记录审计日志<br>
+          <small style="color:#888">输出：状态流转时间线、人工改动、历史结论版本</small>
+        </div>
+        <div class="version-compare">
+          <b>npm run rollback -- --record-id=REC-002 --version=1</b> — 回滚到指定status_history索引<br>
+          <small style="color:#888">同步恢复 <code>qc_review_required</code> / <code>boundary_issues</code> 等派生字段</small>
+        </div>
+        <div class="version-compare">
+          <b>npm run export -- --format=csv --output=report.csv --needs-qc-review=true</b> — 导出需QC复核记录<br>
+          <small style="color:#888">字段与页面表格、/api/records 完全同一份 UNIFIED_FIELDS</small>
+        </div>
+        <div class="version-compare">
+          <b>npm run test:boundary</b> — 边界规则单元测试：间隔/时长阈值、综合判定<br>
+          <small style="color:#888">README 与 BOUNDARY_RULES 代码同步</small>
         </div>
       </div>
     </div>
@@ -132,9 +242,12 @@
   <script>
     let selectedRecordId = null;
     let allRecords = [];
+    let currentFilter = null;
 
     async function loadData() {
-      const res = await fetch('/api/records');
+      const res = await fetch(currentFilter
+        ? `/api/records?${currentFilter}`
+        : '/api/records');
       const data = await res.json();
       allRecords = data.data;
       renderTable(allRecords);
@@ -154,22 +267,44 @@
         document.getElementById('statQc').textContent = stats.needs_qc_review;
         document.getElementById('statFinal').textContent = stats.by_status.FINALIZED || 0;
         document.getElementById('statIssues').textContent = stats.has_boundary_issues;
+        document.getElementById('statSuperseded').textContent = stats.superseded_records || 0;
+        document.getElementById('statChain').textContent = stats.records_in_rework_chain || 0;
+
+        const step1 = (stats.by_status.IMPORTED || 0) > 0 ? 'active' : (((stats.by_status.ENGINEER_REVIEWED || 0) > 0 || (stats.by_status.FINALIZED || 0) > 0) ? 'done' : '');
+        const step2 = ((stats.by_status.ENGINEER_REVIEWED || 0) > 0 || stats.needs_qc_review > 0) ? 'active' : ((stats.by_status.FINALIZED || 0) > 0 ? 'done' : '');
+        const step3 = (stats.by_status.FINALIZED || 0) > 0 ? 'active' : '';
+        document.getElementById('step1').className = 'step ' + step1;
+        document.getElementById('step2').className = 'step ' + step2;
+        document.getElementById('step3').className = 'step ' + step3;
+        document.getElementById('line1').className = 'step-line ' + (step1 === 'done' ? 'done' : '');
+        document.getElementById('line2').className = 'step-line ' + (step2 === 'done' ? 'done' : '');
       });
     }
 
     function renderTable(records) {
       const tbody = document.getElementById('recordTableBody');
-      tbody.innerHTML = records.map(r => `
-        <tr class="${r.id === selectedRecordId ? 'selected' : ''}" onclick="selectRecord('${r.id}')">
-          <td><strong>${r.id}</strong></td>
-          <td>${r.original_line_no}</td>
-          <td>${r.sensor_id}</td>
-          <td style="font-size: 12px;">${r.sampling_time ? r.sampling_time.substring(5, 16) : '-'}</td>
-          <td>${r.efficiency ? r.efficiency.toFixed(1) : '-'}</td>
-          <td><span class="status-badge status-${r.current_status}">${statusLabel(r.current_status)}</span></td>
-          <td>${r.boundary_issues.length > 0 ? '<span class="issue-badge">⚠️ ' + r.boundary_issues.length + '项</span>' : '-'}</td>
-        </tr>
-      `).join('');
+      if (records.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding: 40px; color:#95a5a6;">暂无记录，点击上方 "一键跑导入→三步→返工" 按钮</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = records.map(r => {
+        const isSuperseded = r.current_status === 'SUPERSEDED';
+        return `
+          <tr class="${r.id === selectedRecordId ? 'selected' : ''} ${isSuperseded ? 'superseded-row' : ''}" onclick="selectRecord('${r.id}')">
+            <td><strong>${r.id}</strong></td>
+            <td>${r.original_line_no}</td>
+            <td>${r.sensor_id}</td>
+            <td style="font-size: 11px;">${r.sampling_time ? r.sampling_time.substring(5, 16) : '-'}</td>
+            <td>${r.efficiency != null ? Number(r.efficiency).toFixed(1) : '-'}</td>
+            <td><span class="status-badge status-${r.current_status}">${statusLabel(r.current_status)}</span></td>
+            <td style="font-size:11px;">${r.superseded_by ? `<span class="superseded-tag">→ ${r.superseded_by}</span>` : '-'}</td>
+            <td>${r.qc_review_required === true || r.qc_review_required === '是' ? '<span class="qc-tag">需QC</span>' : '-'}</td>
+            <td>${Array.isArray(r.boundary_issues) && r.boundary_issues.length > 0
+              ? `<span class="issue-badge" title="${r.boundary_issues.map(i => i.message).join('\n')}">⚠️ ${r.boundary_issues.length}</span>`
+              : '-'}</td>
+          </tr>
+        `;
+      }).join('');
     }
 
     function statusLabel(status) {
@@ -188,10 +323,9 @@
     async function selectRecord(id) {
       selectedRecordId = id;
       renderTable(allRecords);
-      
       const res = await fetch(`/api/records/${id}`);
       const data = await res.json();
-      renderDetail(data.data);
+      if (data.success) renderDetail(data.data);
     }
 
     function renderDetail(record) {
@@ -203,9 +337,36 @@
       if (record.boundary_issues && record.boundary_issues.length > 0) {
         boundaryIssuesHtml = `
           <div class="rework-highlight">
-            <strong>⚠️ 边界规则检查发现问题（采样时间缺半小时）</strong><br>
-            <small>根据边界规则：采样间隔 > 30分钟 或 采样时长不足理论值50%，自动标记为待QC复核，不自动归正常</small><br><br>
+            <strong>⚠️ 边界规则命中（采样时间缺半小时等）</strong>
+            <div class="boundary-rule-note">
+              判定依据：①采样间隔 > 30分钟 或 ②采样时长 < 理论值的50%（即<30分钟） → 自动 NEED_QC_REVIEW<br>
+              绝不自动归正常；页面/API/导出三处完全一致；必须质检员手动确认
+            </div>
             ${record.boundary_issues.map(i => `<div>• ${i.message}</div>`).join('')}
+          </div>
+        `;
+      }
+
+      let reworkChainHtml = '';
+      if (record.superseded_by || (record.previous_versions && record.previous_versions.length > 0)) {
+        reworkChainHtml = `
+          <div class="chain-box">
+            <div class="chain-title">🔗 返工证据链（质检员可复盘）</div>
+            ${record.superseded_by ? `
+              <div class="chain-link">
+                <span>本记录(${record.id})</span>
+                <span class="arrow">→被替代→</span>
+                <b style="color:#8e44ad;">${record.superseded_by}</b>
+                <span style="font-size:10px;color:#888;">（点击左侧${record.superseded_by}查看新结论）</span>
+              </div>` : ''}
+            ${record.previous_versions && record.previous_versions.length > 0 ? `
+              <div style="margin-top:6px;"><b>历史结论快照（旧结论不删除，仅标记替代）：</b></div>
+              ${record.previous_versions.map(v => `
+                <div style="margin-top:4px; padding: 4px 6px; background: white; border-left: 3px solid #c084fc; border-radius: 3px;">
+                  <b>V${v.conclusion_version}</b>: ${v.conclusion || '(空)'}
+                  <div style="font-size:10px; color:#888;">时间: ${(v.timestamp || '').slice(5, 16)}${v.superseded_from ? ' | 来自记录: ' + v.superseded_from : ''}</div>
+                </div>
+              `).join('')}` : ''}
           </div>
         `;
       }
@@ -214,11 +375,12 @@
       if (record.previous_versions && record.previous_versions.length > 0) {
         versionsHtml = `
           <div class="version-compare">
-            <strong>📜 历史结论版本（返工场景对比）</strong><br>
-            ${record.previous_versions.map((v, i) => `
-              <div style="margin-top: 5px; padding-left: 10px; border-left: 3px solid #ddd;">
-                版本 ${v.conclusion_version}: ${v.conclusion || '无'}<br>
-                <small>时间: ${v.timestamp ? v.timestamp.substring(5, 16) : '-'}</small>
+            <strong>📜 结论版本对比（何工可看到复盘图为什么变了）</strong><br>
+            当前结论版本: <b>V${record.conclusion_version}</b> ＝ ${record.conclusion || '(未定)'}
+            ${record.previous_versions.map(v => `
+              <div style="margin-top: 6px; padding: 6px; background: white; border: 1px solid #d1d5db; border-radius: 3px;">
+                <b>旧 V${v.conclusion_version}</b>: ${v.conclusion || '(空)'}<br>
+                <small>变更时间: ${(v.timestamp || '').slice(0,16)}${v.superseded_from ? ' | 返工源记录: ' + v.superseded_from : ''}</small>
               </div>
             `).join('')}
           </div>
@@ -227,12 +389,47 @@
 
       let photosHtml = '';
       if (record.work_condition_photos && record.work_condition_photos.length > 0) {
-        photosHtml = `
-          <div class="photo-grid">
-            ${record.work_condition_photos.map(p => `<div class="photo-item">📷 ${p.remark || '工况照片'}</div>`).join('')}
+        photosHtml = `<div class="photo-grid">${record.work_condition_photos.map(p => `<div class="photo-item">📷 ${p.remark || '工况照片'}<br><small style="opacity:0.8">${(p.uploaded_at || '').slice(5,16)}</small></div>`).join('')}</div>`;
+      } else {
+        photosHtml = '<div style="font-size:11px; color:#95a5a6;">暂无照片（工程师评审阶段补）</div>';
+      }
+
+      const statusHistory = record.status_history || [];
+      const statusTimeline = statusHistory.map((s, idx) => {
+        const cls = s.remark && (s.remark.includes('返工') || s.status === 'SUPERSEDED') ? 'rework'
+                   : s.status === 'QC_APPROVED' || s.status === 'QC_REJECTED' ? 'qc'
+                   : s.remark && s.remark.includes('回滚') ? 'rollback' : '';
+        const extra = s.rejectReason ? `<div class="extra">驳回原因: ${s.rejectReason}</div>`
+                      : s.rollback_from ? `<div class="extra">回滚: ${s.rollback_from} → ${s.rollback_to} (idx=${s.rollback_index}) 恢复派生字段: qc=${s.derived_fields_restored ? s.derived_fields_restored.qc_review_required : '-'}</div>`
+                      : s.boundary_issues && s.boundary_issues.length > 0 ? `<div class="extra">触发边界问题: ${s.boundary_issues.map(i => i.issueType).join(', ')}</div>`
+                      : s.superseded_by ? `<div class="extra">被记录 ${s.superseded_by} 替代 | 旧结论: ${s.old_conclusion || '-'}</div>`
+                      : s.rework_from ? `<div class="extra">返工源记录 ${s.rework_from} | 原因: ${s.reworkReason || '-'}</div>`
+                      : '';
+        return `
+          <div class="timeline-item ${cls}">
+            <div class="time">[${idx}] ${s.timestamp.slice(5, 16)}</div>
+            <div class="content"><span class="status-badge status-${s.status}">${statusLabel(s.status)}</span></div>
+            <div class="operator">操作人: ${s.operator}${s.remark ? ` | ${s.remark}` : ''}</div>
+            ${extra}
           </div>
         `;
-      }
+      }).join('');
+
+      const manualChanges = record.manual_changes || [];
+      const manualHtml = manualChanges.length > 0
+        ? `<div class="timeline">${manualChanges.map((c, idx) => `
+            <div class="timeline-item rollback">
+              <div class="time">[${idx}] ${c.timestamp.slice(5, 16)}</div>
+              <div class="content">字段 <code style="background:#f5f5f5;padding:1px 4px;">${c.field}</code></div>
+              <div class="operator">${c.old_value === null || c.old_value === '' ? '(空)' : String(c.old_value).slice(0, 60)} → ${String(c.new_value || '').slice(0, 60)}</div>
+              <div class="extra">操作人: ${c.operator} | 原因: ${c.reason || '-'}</div>
+            </div>
+          `).join('')}</div>`
+        : '<div style="font-size:11px; color:#95a5a6;">暂无人工改动</div>';
+
+      const rollbackTip = statusHistory.length > 1
+        ? `<div class="rollback-preview">💡 可回滚点: 索引 0..${statusHistory.length - 1}。<br>例如 <code style="background:#fff7ed;padding:1px 4px;">npm run rollback -- --record-id=${record.id} --version=1</code> 回到${statusHistory[1] ? statusHistory[1].status : ''}状态，同步恢复qc_review_required等派生字段</div>`
+        : '';
 
       content.innerHTML = `
         <div class="detail-section">
@@ -242,132 +439,252 @@
           <div class="info-row"><span class="label">传感器编号</span><span class="value">${record.sensor_id}</span></div>
           <div class="info-row"><span class="label">传感器名称</span><span class="value">${record.sensor_name || '-'}</span></div>
           <div class="info-row"><span class="label">水轮机编号</span><span class="value">${record.turbine_id || '-'}</span></div>
-          <div class="info-row"><span class="label">采样时间</span><span class="value">${record.sampling_time || '-'}</span></div>
-          <div class="info-row"><span class="label">采样开始</span><span class="value">${record.sampling_start_time || '-'}</span></div>
-          <div class="info-row"><span class="label">采样结束</span><span class="value">${record.sampling_end_time || '-'}</span></div>
-          <div class="info-row"><span class="label">效率</span><span class="value">${record.efficiency ? record.efficiency.toFixed(2) + '%' : '-'}</span></div>
-          <div class="info-row"><span class="label">当前状态</span><span class="value"><span class="status-badge status-${record.current_status}">${statusLabel(record.current_status)}</span></span></div>
-          <div class="info-row"><span class="label">结论版本</span><span class="value">v${record.conclusion_version}</span></div>
+          <div class="info-row"><span class="label">采样时间</span><span class="value">${(record.sampling_time || '-').slice(0,16)}</span></div>
+          <div class="info-row"><span class="label">采样 开始→结束</span><span class="value">${(record.sampling_start_time || '-').slice(11,16)} → ${(record.sampling_end_time || '-').slice(11,16)}</span></div>
+          <div class="info-row"><span class="label">效率</span><span class="value">${record.efficiency != null ? Number(record.efficiency).toFixed(2) + '%' : '-'}</span></div>
+          <div class="info-row"><span class="label">当前处理状态</span><span class="value"><span class="status-badge status-${record.current_status}">${statusLabel(record.current_status)}</span></span></div>
+          <div class="info-row"><span class="label">需质检员复核</span><span class="value">${record.qc_review_required === true || record.qc_review_required === '是' ? '🔴 是（采样时间缺半小时等）' : '⚪ 否'}</span></div>
+          <div class="info-row"><span class="label">返工后被哪条替代</span><span class="value">${record.superseded_by || '（未被替代）'}</span></div>
+          <div class="info-row"><span class="label">结论版本号</span><span class="value">v${record.conclusion_version}</span></div>
         </div>
 
         ${boundaryIssuesHtml}
-        ${versionsHtml}
+        ${reworkChainHtml}
 
         <div class="detail-section">
-          <h3>📝 结论</h3>
-          <div style="padding: 10px; background: #f8f9fa; border-radius: 4px; font-size: 13px;">
-            ${record.conclusion || '暂无结论'}
+          <h3>📝 当前结论</h3>
+          <div style="padding: 8px 10px; background: #f8f9fa; border-radius: 4px; font-size: 12px; min-height: 30px;">
+            ${record.conclusion || '<span style="color:#95a5a6;">（暂未给出）</span>'}
           </div>
+          ${versionsHtml}
         </div>
 
         <div class="detail-section">
-          <h3>📷 工况照片</h3>
-          ${photosHtml || '<div style="font-size: 12px; color: #999;">暂无照片</div>'}
+          <h3>📷 工况照片（何工补看）</h3>
+          ${photosHtml}
         </div>
 
         <div class="detail-section">
           <h3>⏱️ 状态流转时间线（审计追踪）</h3>
-          <div class="timeline">
-            ${record.status_history.map(s => `
-              <div class="timeline-item">
-                <div class="time">${s.timestamp.substring(5, 16)}</div>
-                <div class="content"><span class="status-badge status-${s.status}">${statusLabel(s.status)}</span></div>
-                <div class="operator">操作人: ${s.operator} | ${s.remark || ''}</div>
-              </div>
-            `).join('')}
-          </div>
+          ${statusHistory.length > 0 ? `<div class="timeline">${statusTimeline}</div>` : '<div style="font-size:11px; color:#95a5a6;">无流转记录</div>'}
+          ${rollbackTip}
         </div>
 
         <div class="detail-section">
-          <h3>✏️ 人工改动记录</h3>
-          <div class="timeline">
-            ${record.manual_changes.length > 0 ? record.manual_changes.map(c => `
-              <div class="timeline-item">
-                <div class="time">${c.timestamp.substring(5, 16)}</div>
-                <div class="content">字段: ${c.field}</div>
-                <div class="operator">${c.old_value || '(空)'} → ${c.new_value} | by ${c.operator}</div>
-                <div class="operator" style="color: #666;">原因: ${c.reason || '-'}</div>
-              </div>
-            `).join('') : '<div style="font-size: 12px; color: #999;">暂无人工改动</div>'}
-          </div>
+          <h3>✏️ 人工改动明细</h3>
+          ${manualHtml}
         </div>
 
         <div class="btn-group">
-          <button class="btn btn-primary" onclick="doEngineerReview('${record.id}')">工程师评审</button>
+          <button class="btn btn-primary" onclick="doEngineerReview('${record.id}')">工程师评审(何工)</button>
           <button class="btn btn-success" onclick="doQcApprove('${record.id}')">QC通过</button>
           <button class="btn btn-danger" onclick="doQcReject('${record.id}')">QC驳回</button>
-          <button class="btn btn-warning" onclick="doFinalize('${record.id}')">终态确认</button>
-          <button class="btn" style="background: #9b59b6; color: white;" onclick="doRework('${record.id}')">创建返工</button>
+          <button class="btn btn-warning" onclick="doFinalize('${record.id}')">最终结论(复盘图)</button>
+          <button class="btn btn-info" onclick="doRework('${record.id}')">🔄 返工(推翻重算)</button>
+          <button class="btn btn-default" onclick="doRollback('${record.id}', ${statusHistory.length - 2})">⏪回滚上一步</button>
         </div>
       `;
     }
 
     async function doEngineerReview(id) {
-      const notes = prompt('请输入工程师评审备注:', '何工已核查工况数据，补充照片');
+      const notes = prompt('何工评审备注:', '已核查传感器编号与工况照片，数据对应');
       if (notes === null) return;
-      await fetch(`/api/records/${id}/engineer-review`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ operator: '何工', notes, photoUrls: ['photo-1.jpg', 'photo-2.jpg'] })
+      const res = await fetch(`/api/records/${id}/engineer-review`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ operator: '何工', notes, photoUrls: ['工况现场A.jpg', '设备校准单.png'] })
       });
-      await loadData();
-      await selectRecord(id);
-      alert('工程师评审完成');
+      await handleActionResult(res, id);
     }
-
     async function doQcApprove(id) {
-      const remark = prompt('请输入QC复核意见:', '数据核查无误，边界问题已确认');
+      const remark = prompt('质检员复核意见（采样缺半小时类必须写）:', '现场确认采样中断属正常调试，数据本身有效');
       if (remark === null) return;
-      await fetch(`/api/records/${id}/qc-approve`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch(`/api/records/${id}/qc-approve`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ operator: '质检员', remark })
       });
-      await loadData();
-      await selectRecord(id);
-      alert('QC复核通过');
+      await handleActionResult(res, id);
     }
-
     async function doQcReject(id) {
-      const reason = prompt('请输入QC驳回原因:', '采样时间仍有疑问，需重新核查');
+      const reason = prompt('QC驳回原因:', '采样时间缺失，仍需补充现场说明');
       if (reason === null) return;
-      await fetch(`/api/records/${id}/qc-reject`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch(`/api/records/${id}/qc-reject`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ operator: '质检员', reason })
       });
-      await loadData();
-      await selectRecord(id);
-      alert('QC已驳回');
+      await handleActionResult(res, id);
     }
-
     async function doFinalize(id) {
-      const conclusion = prompt('请输入最终结论:', '效率测试合格，数据真实有效');
+      const conclusion = prompt('最终结论（实验复盘图更新）:', '效率测试合格，数据真实有效');
       if (conclusion === null) return;
-      await fetch(`/api/records/${id}/finalize`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch(`/api/records/${id}/finalize`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ operator: '何工', conclusion })
       });
-      await loadData();
-      await selectRecord(id);
-      alert('结论已确认，实验复盘图已更新');
+      await handleActionResult(res, id);
     }
-
     async function doRework(id) {
-      const reason = prompt('请输入返工原因:', '现场工况照片补充，原结论需修正');
+      const reason = prompt('返工原因（必须）:', '补到工况照片，发现阀门开度不足，原结论需修正');
       if (reason === null) return;
       const res = await fetch(`/api/records/${id}/rework`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ operator: '何工', reason, photoUrls: ['返工补充证据1.jpg', '阀门开度现场图.jpg'] })
+      });
+      const j = await res.json();
+      if (j.success) {
+        alert(`✅ 返工已创建\n旧记录: ${j.data.old_record_id} (应标SUPERSEDED+superseded_by=${j._rework_evidence_chain.old_superseded_by})\n新记录: ${j.data.new_record_id}\n\n一致性: ${j._post_action_consistency ? j._post_action_consistency.summary : '-'}`);
+        await loadData();
+        await selectRecord(j.data.new_record_id);
+      } else {
+        alert('失败: ' + j.error);
+      }
+    }
+    async function doRollback(id, defIdx) {
+      const v = prompt(`回滚到 status_history 索引 (0-based):`, String(Math.max(0, defIdx || 0)));
+      if (v === null) return;
+      const res = await fetch(`/api/records/${id}/rollback`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ operator: 'system', versionIndex: parseInt(v, 10) })
+      });
+      await handleActionResult(res, id);
+    }
+
+    async function handleActionResult(res, id) {
+      const j = await res.json();
+      if (j.success) {
+        const tip = j._post_action_consistency ? `\n\n一致性检查: ${j._post_action_consistency.summary}` : '';
+        if (!j._post_action_consistency || j._post_action_consistency.issues.length > 0) {
+          console.warn('一致性问题:', j._post_action_consistency);
+        }
+        if (j._rollback_report) {
+          const r = j._rollback_report;
+          alert(`✅ 回滚完成（已同步派生字段）\n\n前: status=${r.before ? r.before.status : '-'} qc=${r.before ? r.before.qc : '-'}\n后: status=${r.after.status} qc=${r.after.qc} 边界问题=${r.after.boundaryCount}` + tip);
+        } else {
+          alert('✅ 操作完成' + tip);
+        }
+        await loadData();
+        await selectRecord(id);
+      } else {
+        alert('❌ ' + (j.error || '失败'));
+      }
+    }
+
+    async function loadDemoData() {
+      const res = await fetch('/api/import', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ operator: '何工', reason, photoUrls: ['rework-photo-1.jpg'] })
+        body: JSON.stringify([
+          { sensor_id:'SEN-DEMO-001', sensor_name:'1号水轮机进口压力传感器', turbine_id:'TURBINE-A-01',
+            sampling_time:'2024-06-15T08:00:00.000Z', sampling_start_time:'2024-06-15T08:00:00.000Z', sampling_end_time:'2024-06-15T09:00:00.000Z',
+            efficiency:92.5, flow_rate:45.2, head:38.6, power:15800 },
+          { sensor_id:'SEN-DEMO-002', sensor_name:'1号水轮机出口压力传感器(采样缺半小时)', turbine_id:'TURBINE-A-01',
+            sampling_time:'2024-06-15T10:35:00.000Z', sampling_start_time:'2024-06-15T10:35:00.000Z', sampling_end_time:'2024-06-15T10:55:00.000Z',
+            efficiency:91.8, flow_rate:44.8, head:38.2, power:15600 },
+          { sensor_id:'SEN-DEMO-003', sensor_name:'2号水轮机进口压力传感器', turbine_id:'TURBINE-A-02',
+            sampling_time:'2024-06-15T11:00:00.000Z', sampling_start_time:'2024-06-15T11:00:00.000Z', sampling_end_time:'2024-06-15T12:00:00.000Z',
+            efficiency:93.1, flow_rate:46.5, head:39.1, power:16200 }
+        ])
       });
-      const data = await res.json();
+      const j = await res.json();
+      alert(j.success ? `✅ 导入完成: ${j.data.record_count} 条\n\nREC-DEMO-002 (采样间隔95分钟+时长20分钟) 应自动 NEED_QC_REVIEW\n一致性: ${j._post_import_consistency.summary}` : '失败: ' + j.error);
       await loadData();
-      alert(`返工已创建\n旧记录: ${data.data.old_record_id}\n新记录: ${data.data.new_record_id}`);
+    }
+
+    async function runFullDemo() {
+      const btn = event.target; btn.disabled = true; btn.textContent = '运行中…';
+      try {
+        await fetch('/api/import', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify([
+          { sensor_id:'SEN-AUTO-001', sensor_name:'1号水轮机进口', turbine_id:'TURBINE-A-01',
+            sampling_time:'2024-06-15T08:00:00.000Z', sampling_start_time:'2024-06-15T08:00:00.000Z', sampling_end_time:'2024-06-15T09:00:00.000Z',
+            efficiency:92.5, flow_rate:45.2, head:38.6, power:15800 },
+          { sensor_id:'SEN-AUTO-002', sensor_name:'1号水轮机出口【采样缺半小时】', turbine_id:'TURBINE-A-01',
+            sampling_time:'2024-06-15T10:35:00.000Z', sampling_start_time:'2024-06-15T10:35:00.000Z', sampling_end_time:'2024-06-15T10:55:00.000Z',
+            efficiency:91.8, flow_rate:44.8, head:38.2, power:15600 },
+          { sensor_id:'SEN-AUTO-003', sensor_name:'2号水轮机进口', turbine_id:'TURBINE-A-02',
+            sampling_time:'2024-06-15T11:00:00.000Z', sampling_start_time:'2024-06-15T11:00:00.000Z', sampling_end_time:'2024-06-15T12:00:00.000Z',
+            efficiency:93.1, flow_rate:46.5, head:39.1, power:16200 }
+        ])});
+
+        for (const id of ['REC-001','REC-002','REC-003']) {
+          await fetch(`/api/records/${id}/engineer-review`, { method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ operator:'何工', notes:`工程师核查记录 ${id}，补充工况照片`, photoUrls:['photo1.jpg','photo2.jpg'] }) });
+        }
+
+        await fetch('/api/records/REC-002/qc-approve', { method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ operator:'质检员', remark:'现场确认：当时设备调试中断35分钟，采样点稳定，数据有效' }) });
+
+        for (const id of ['REC-001','REC-002','REC-003']) {
+          await fetch(`/api/records/${id}/finalize`, { method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ operator:'何工', conclusion: `${id} 效率测试合格，数据真实有效，实验复盘图已更新` }) });
+        }
+
+        const rw = await (await fetch('/api/records/REC-002/rework', { method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ operator:'何工', reason:'补到阀门开度现场图，原结论低估出口损失，需返工重算', photoUrls:['rework-valve.jpg'] })
+        })).json();
+
+        if (rw.success && rw.data.new_record_id) {
+          await fetch(`/api/records/${rw.data.new_record_id}/qc-approve`, { method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ operator:'质检员', remark:'返工后证据充分，阀门照片说明损失来源' }) });
+          await fetch(`/api/records/${rw.data.new_record_id}/finalize`, { method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ operator:'何工', conclusion:`${rw.data.new_record_id} 效率偏低因出口阀门开度不足(证据已附)，需调整后复测，原结论已标记被替代` }) });
+        }
+
+        await loadData();
+        const r1 = await (await fetch('/api/records/REC-002')).json();
+        const chk = await (await fetch('/api/consistency')).json();
+
+        alert(`
+✅ 完整演示跑通！重点核对：
+
+1️⃣ REC-002 返工旧结论标记
+   旧记录当前状态: ${r1.data.current_status} (应为 SUPERSEDED)
+   被哪条记录替代: ${r1.data.superseded_by || '(空 - 错误!)'}
+   历史结论版本数: ${(r1.data.previous_versions || []).length}
+
+2️⃣ 三方一致性自检
+   ${chk.data.summary}
+   ${chk.data.issues.length > 0 ? '问题: ' + chk.data.issues.slice(0,3).join('\n') : ''}
+
+3️⃣ 在左侧表格点击 ${r1.data.superseded_by || rw.data.new_record_id || '新记录'}
+   → 可看到"历史结论版本对比"里旧结论 vs 新结论差异，何工可明白复盘图为何变了
+`);
+        if (r1.data.superseded_by) selectRecord(r1.data.superseded_by);
+      } finally {
+        btn.disabled = false; btn.textContent = '📥 一键跑导入→三步→返工';
+      }
+    }
+
+    async function checkConsistency() {
+      const res = await fetch('/api/consistency');
+      const j = await res.json();
+      const box = document.getElementById('consistencyBox');
+      box.classList.remove('hidden', 'bad');
+      if (!j.data.passed) box.classList.add('bad');
+      box.innerHTML = `
+        <b>三方一致性自检结果</b>：${j.data.summary}<br>
+        ${j.data.issues.length > 0 ? `
+          <table class="diff-table"><tr><th>#</th><th>问题明细</th></tr>
+          ${j.data.issues.map((x, i) => `<tr><td>${i + 1}</td><td>${x}</td></tr>`).join('')}
+          </table>` : '✅ 页面/API/导出字段映射完全一致；SUPERSEDED记录均有superseded_by；qc_review_required派生字段同步'}
+      `;
+    }
+
+    function filterNeedQc() {
+      currentFilter = 'needsQcReview=true';
+      loadData();
+    }
+    function clearFilter() {
+      currentFilter = null;
+      loadData();
+    }
+    function exportCsv() {
+      window.open('/api/export?format=csv', '_blank');
+    }
+    function exportQcCsv() {
+      window.open('/api/export?format=csv&needsQcReview=true', '_blank');
     }
 
     loadData();
+    setTimeout(checkConsistency, 500);
   </script>
 </body>
 </html>
