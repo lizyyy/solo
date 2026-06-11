@@ -3,6 +3,7 @@ from models import (
     TemperatureCalibration, SensorInfo, LeakRecord,
     CorrectionRecord, RunHistory, RecordStatus, CorrectionType
 )
+from leak_calculator import calculate_leakage, get_threshold, REFERENCE_DIAMETER_MM
 
 
 BASE_TIME = datetime(2026, 6, 5, 9, 0, 0)
@@ -70,6 +71,13 @@ def make_first_run_records() -> list[LeakRecord]:
     t0 = BASE_TIME + timedelta(minutes=0)
     t1 = BASE_TIME + timedelta(minutes=5)
     t2 = BASE_TIME + timedelta(minutes=10)
+    threshold = get_threshold()
+
+    rec001_leak = calculate_leakage(12.5, 23.5, 600.0, 2.0, 0.98)
+    rec002_leak = calculate_leakage(45.0, 24.2, 602.0, 2.5, 0.97)
+    rec003_leak = calculate_leakage(18.0, 23.9, 599.0, 2.5, 0.99)
+
+    rec002_status = RecordStatus.OVER_THRESHOLD if rec002_leak > threshold else RecordStatus.NORMAL
 
     return [
         LeakRecord(
@@ -81,7 +89,7 @@ def make_first_run_records() -> list[LeakRecord]:
             pressure_kpa=600.0,
             nozzle_diameter_mm=2.0,
             status=RecordStatus.NORMAL,
-            estimated_leak_lmin=3.2,
+            estimated_leak_lmin=rec001_leak,
             is_averaged=False,
             run_id="RUN-001"
         ),
@@ -93,8 +101,8 @@ def make_first_run_records() -> list[LeakRecord]:
             temp_c=24.2,
             pressure_kpa=602.0,
             nozzle_diameter_mm=2.5,
-            status=RecordStatus.OVER_THRESHOLD,
-            estimated_leak_lmin=28.5,
+            status=rec002_status,
+            estimated_leak_lmin=rec002_leak,
             is_averaged=False,
             run_id="RUN-001",
             original_diameter_mm=2.5
@@ -108,7 +116,7 @@ def make_first_run_records() -> list[LeakRecord]:
             pressure_kpa=599.0,
             nozzle_diameter_mm=2.5,
             status=RecordStatus.NORMAL,
-            estimated_leak_lmin=5.8,
+            estimated_leak_lmin=rec003_leak,
             is_averaged=False,
             run_id="RUN-001"
         ),
@@ -116,13 +124,23 @@ def make_first_run_records() -> list[LeakRecord]:
 
 
 def make_corrections() -> list[CorrectionRecord]:
+    first_run = make_first_run_records()
+    rec002 = first_run[1]
+    sensors = make_sensors()
+    sns_a02 = next(s for s in sensors if s.sensor_id == "SNS-A02")
+
+    corrected_leak = calculate_leakage(
+        rec002.raw_flow_rate, rec002.temp_c, rec002.pressure_kpa,
+        sns_a02.nozzle_diameter_mm, sns_a02.calibration_factor
+    )
+
     return [
         CorrectionRecord(
             correction_id="COR-001",
             correction_type=CorrectionType.SENSOR_ID_LOOKUP,
             record_id="REC-002",
-            old_value=28.5,
-            new_value=None,
+            old_value=rec002.estimated_leak_lmin,
+            new_value=corrected_leak,
             old_diameter=2.5,
             new_diameter=3.0,
             operator="林老师",
@@ -148,18 +166,37 @@ def make_corrections() -> list[CorrectionRecord]:
 
 def make_rerun_records() -> list[LeakRecord]:
     t1 = BASE_TIME + timedelta(minutes=30)
+    first_run = make_first_run_records()
+    threshold = get_threshold()
+
+    sensors = make_sensors()
+    sns_a02 = next(s for s in sensors if s.sensor_id == "SNS-A02")
+
+    rec002 = first_run[1]
+    corrected_leak = calculate_leakage(
+        rec002.raw_flow_rate, rec002.temp_c, rec002.pressure_kpa,
+        sns_a02.nozzle_diameter_mm, sns_a02.calibration_factor
+    )
+
+    other_values = [
+        r.estimated_leak_lmin for r in first_run
+        if r.record_id != rec002.record_id and r.estimated_leak_lmin is not None
+    ]
+    avg_value = round(sum(other_values) / len(other_values), 2) if other_values else 0.0
+
+    backfill_leak = calculate_leakage(26.5, 23.7, 600.0, 2.5, 0.97)
 
     return [
         LeakRecord(
             record_id="REC-002-R",
             sensor_id="SNS-A02",
             measured_at=t1,
-            raw_flow_rate=28.0,
-            temp_c=24.0,
+            raw_flow_rate=45.0,
+            temp_c=24.2,
             pressure_kpa=602.0,
             nozzle_diameter_mm=3.0,
             status=RecordStatus.AVERAGED,
-            estimated_leak_lmin=19.2,
+            estimated_leak_lmin=avg_value,
             is_averaged=True,
             source_run_id="RUN-001",
             run_id="RUN-002",
@@ -174,7 +211,7 @@ def make_rerun_records() -> list[LeakRecord]:
             pressure_kpa=600.0,
             nozzle_diameter_mm=2.5,
             status=RecordStatus.BACKFILLED,
-            estimated_leak_lmin=16.8,
+            estimated_leak_lmin=backfill_leak,
             is_averaged=False,
             is_backfilled=True,
             run_id="RUN-002",
@@ -206,22 +243,20 @@ def make_run_histories() -> list[RunHistory]:
     ]
 
 
-def get_threshold() -> float:
-    return 20.0
-
-
 def get_unit_explanation() -> dict:
     return {
         "raw_flow_rate": "原始流量读数，单位：L/min（升/分钟）",
         "temp_c": "环境温度，单位：°C（摄氏度）",
         "pressure_kpa": "系统压力，单位：kPa（千帕），换算为 bar 需乘以 0.01",
-        "nozzle_diameter_mm": "喷嘴口径，单位：mm（毫米），截面积 = π × (d/2)²",
-        "estimated_leak_lmin": "估算泄漏量，单位：L/min（升/分钟），经温度压力修正后的值",
+        "nozzle_diameter_mm": f"喷嘴口径，单位：mm（毫米），截面积 = π×(d/2)²，参考口径 {REFERENCE_DIAMETER_MM}mm",
+        "estimated_leak_lmin": f"估算泄漏量，单位：L/min，公式：Q = C × 原始流量 × (A_ref/A_nozzle) × √(T_std/T_actual)",
         "threshold": f"泄漏阈值：{get_threshold()} L/min，超过则判定为超阈值",
         "conversions": [
             "1 kPa = 0.01 bar",
             "1 mm² = 1 × 10^-6 m²",
-            "标准状态：20°C，101.325 kPa",
-            "泄漏量估算公式：Q = C × A × √(2ΔP/ρ)"
+            f"参考口径：{REFERENCE_DIAMETER_MM} mm（A_ref = π×({REFERENCE_DIAMETER_MM}/2)² mm²）",
+            f"面积比 A_ref/A_nozzle：口径越大，比值越小，估算泄漏越低",
+            "标准状态：20°C (293.15 K)，101.325 kPa",
+            "完整公式：Q = C × raw × (A_ref / A_nozzle) × √(T_std / T_actual)"
         ]
     }

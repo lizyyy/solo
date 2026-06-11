@@ -1,17 +1,22 @@
 import math
 from datetime import datetime
-from typing import Optional, Tuple, List
+from typing import Tuple, List
 from models import (
     LeakRecord, SensorInfo, TemperatureCalibration,
     CorrectionRecord, RecordStatus, CorrectionType
 )
-from demo_data import get_threshold
 
 
 STANDARD_TEMP_K = 293.15
 STANDARD_PRESSURE_KPA = 101.325
 AIR_DENSITY_KG_M3 = 1.204
 DISCHARGE_COEFFICIENT = 0.98
+REFERENCE_DIAMETER_MM = 2.0
+LEAK_THRESHOLD_LMIN = 20.0
+
+
+def get_threshold() -> float:
+    return LEAK_THRESHOLD_LMIN
 
 
 def kpa_to_bar(kpa: float) -> float:
@@ -22,9 +27,12 @@ def mm2_to_m2(mm2: float) -> float:
     return mm2 * 1e-6
 
 
+def nozzle_area_mm2(diameter_mm: float) -> float:
+    return math.pi * (diameter_mm / 2.0) ** 2
+
+
 def nozzle_area_m2(diameter_mm: float) -> float:
-    radius_m = (diameter_mm / 2.0) * 1e-3
-    return math.pi * radius_m * radius_m
+    return mm2_to_m2(nozzle_area_mm2(diameter_mm))
 
 
 def temp_c_to_k(temp_c: float) -> float:
@@ -38,18 +46,16 @@ def calculate_leakage(
     nozzle_diameter_mm: float,
     calibration_factor: float = DISCHARGE_COEFFICIENT
 ) -> float:
-    area = nozzle_area_m2(nozzle_diameter_mm)
-    temp_k = temp_c_to_k(temp_c)
-    pressure_ratio = pressure_kpa / STANDARD_PRESSURE_KPA
-    temp_ratio = STANDARD_TEMP_K / temp_k
-    corrected_flow = raw_flow_lmin * math.sqrt(pressure_ratio * temp_ratio)
-    leakage = calibration_factor * corrected_flow
-    return round(leakage, 2)
+    A_ref = nozzle_area_mm2(REFERENCE_DIAMETER_MM)
+    A_nozzle = nozzle_area_mm2(nozzle_diameter_mm)
+    area_ratio = A_ref / A_nozzle
+    temp_correction = math.sqrt(STANDARD_TEMP_K / temp_c_to_k(temp_c))
+    estimated = calibration_factor * raw_flow_lmin * area_ratio * temp_correction
+    return round(estimated, 2)
 
 
 def check_threshold(leakage_lmin: float) -> Tuple[bool, RecordStatus]:
-    threshold = get_threshold()
-    if leakage_lmin > threshold:
+    if leakage_lmin > LEAK_THRESHOLD_LMIN:
         return True, RecordStatus.OVER_THRESHOLD
     return False, RecordStatus.NORMAL
 
@@ -141,48 +147,3 @@ def apply_calibration_correction(
 def mark_for_review(record: LeakRecord) -> LeakRecord:
     record.status = RecordStatus.PENDING_REVIEW
     return record
-
-
-def process_first_import(
-    raw_records: List[dict],
-    calibrations: List[TemperatureCalibration]
-) -> List[LeakRecord]:
-    cal_map = {c.sensor_id: c for c in calibrations}
-    processed = []
-
-    for i, raw in enumerate(raw_records):
-        sensor_id = raw["sensor_id"]
-        cal = cal_map.get(sensor_id)
-
-        if cal:
-            temp_c = cal.temp_c
-            pressure_kpa = cal.pressure_kpa
-        else:
-            temp_c = raw.get("temp_c", 23.0)
-            pressure_kpa = raw.get("pressure_kpa", 600.0)
-
-        leakage = calculate_leakage(
-            raw["raw_flow_rate"],
-            temp_c,
-            pressure_kpa,
-            raw["nozzle_diameter_mm"]
-        )
-
-        is_over, status = check_threshold(leakage)
-
-        record = LeakRecord(
-            record_id=f"REC-{i+1:03d}",
-            sensor_id=sensor_id,
-            measured_at=raw.get("measured_at", datetime.now()),
-            raw_flow_rate=raw["raw_flow_rate"],
-            temp_c=temp_c,
-            pressure_kpa=pressure_kpa,
-            nozzle_diameter_mm=raw["nozzle_diameter_mm"],
-            status=status,
-            estimated_leak_lmin=leakage,
-            is_averaged=False,
-            run_id="RUN-001"
-        )
-        processed.append(record)
-
-    return processed
