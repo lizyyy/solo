@@ -8,13 +8,13 @@
       "operator": "数据员A"
     },
     "source_file": "test_data/sensors.json",
-    "import_batch_id": "BATCH-20260604175551",
+    "import_batch_id": "BATCH-20260612001705",
     "temperature_value": 25.0,
     "temperature_unit": "°C",
     "uniform_zone_flag": true,
     "processing_status": "已导入",
     "manual_edits": [],
-    "created_at": "2026-06-04T17:55:01.585140"
+    "created_at": "2026-06-12T00:17:05.652336"
   },
   {
     "sensor_id": "MAG-COIL-002",
@@ -25,13 +25,13 @@
       "operator": "数据员A"
     },
     "source_file": "test_data/sensors.json",
-    "import_batch_id": "BATCH-20260604175551",
+    "import_batch_id": "BATCH-20260612001705",
     "temperature_value": 298.15,
     "temperature_unit": "K",
     "uniform_zone_flag": true,
     "processing_status": "已导入",
     "manual_edits": [],
-    "created_at": "2026-06-04T17:55:01.585414"
+    "created_at": "2026-06-12T00:17:05.652652"
   },
   {
     "sensor_id": "MAG-COIL-003",
@@ -43,13 +43,13 @@
       "note": "疑似单位记录错误，25K明显不合理"
     },
     "source_file": "test_data/sensors.json",
-    "import_batch_id": "BATCH-20260604175551",
+    "import_batch_id": "BATCH-20260612001705",
     "temperature_value": 25.0,
     "temperature_unit": "K",
     "uniform_zone_flag": true,
     "processing_status": "已导入",
     "manual_edits": [],
-    "created_at": "2026-06-04T17:55:01.585651"
+    "created_at": "2026-06-12T00:17:05.653015"
   },
   {
     "sensor_id": "MAG-COIL-004",
@@ -60,13 +60,13 @@
       "operator": "数据员A"
     },
     "source_file": "test_data/sensors.json",
-    "import_batch_id": "BATCH-20260604175551",
+    "import_batch_id": "BATCH-20260612001705",
     "temperature_value": 24.5,
     "temperature_unit": "°C",
     "uniform_zone_flag": true,
     "processing_status": "已导入",
     "manual_edits": [],
-    "created_at": "2026-06-04T17:55:01.585927"
+    "created_at": "2026-06-12T00:17:05.653514"
   },
   {
     "sensor_id": "MAG-COIL-005",
@@ -78,12 +78,12 @@
       "note": "温度过高，不属于均匀区"
     },
     "source_file": "test_data/sensors.json",
-    "import_batch_id": "BATCH-20260604175551",
+    "import_batch_id": "BATCH-20260612001705",
     "temperature_value": 300,
     "temperature_unit": "°C",
     "uniform_zone_flag": false,
     "processing_status": "已导入",
     "manual_edits": [],
-    "created_at": "2026-06-04T17:55:01.586246"
+    "created_at": "2026-06-12T00:17:05.653909"
   }
 ]

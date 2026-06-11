@@ -106,6 +106,7 @@ class UniformZoneRecord:
     created_at: str = field(default_factory=lambda: datetime.now().isoformat())
     last_updated_at: str = field(default_factory=lambda: datetime.now().isoformat())
     import_batch_id: Optional[str] = None
+    duplicate_import_batches: List[str] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:
         data = asdict(self)

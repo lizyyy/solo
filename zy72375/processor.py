@@ -1,7 +1,7 @@
 import uuid
 import json
 import os
-from typing import List, Dict, Any, Optional, Tuple
+from typing import List, Dict, Any, Optional
 from datetime import datetime
 from models import (
     SensorRecord,
@@ -86,6 +86,7 @@ class UniformZoneProcessor:
                                 created_at=item.get("created_at", datetime.now().isoformat()),
                                 last_updated_at=item.get("last_updated_at", datetime.now().isoformat()),
                                 import_batch_id=item.get("import_batch_id"),
+                                duplicate_import_batches=item.get("duplicate_import_batches", []),
                             )
                             store[rec.uniform_zone_id] = rec
             except FileNotFoundError:
@@ -113,6 +114,7 @@ class UniformZoneProcessor:
         duplicate_count = 0
         updated_count = 0
         new_uniform_zone_ids: List[str] = []
+        duplicate_uniform_zone_ids: List[str] = []
         temp_check_records: List[Dict[str, Any]] = []
 
         for idx, data in enumerate(sensor_data_list, start=1):
@@ -139,8 +141,9 @@ class UniformZoneProcessor:
 
             key = sensor_rec.get_unique_key()
             command = (
-                f"python3 main.py import-sensors --source {source_file} "
-                f"--sensor-id {sensor_id} --line {sensor_rec.original_line_number}"
+                f"python3 main.py import-sensors "
+                f"--input-file {source_file} "
+                f"--operator \"{operator or ''}\""
             )
 
             if key in self.existing_keys:
@@ -167,19 +170,25 @@ class UniformZoneProcessor:
 
                     history_entry = self.history_manager.create_entry(
                         uniform_zone_id=existing_uz_id,
-                        change_type=ChangeType.MANUAL_EDIT,
+                        change_type=ChangeType.IMPORT,
                         before_value=before,
                         after_value=after,
                         operator=operator,
-                        reason=f"重复导入处理，批次: {batch_id}",
-                        evidence_ref=f"source_file={source_file}, line={sensor_rec.original_line_number}",
+                        reason=(
+                            f"重复导入处理: 传感器{sensor_id}已存在于首次导入批次{uz.import_batch_id}，"
+                            f"本次批次{batch_id}为重复导入。数据{'有差异已更新' if 'raw_data_updated' in rule_result['changes_applied'] else '无变化仅更新批次号'}"
+                        ),
+                        evidence_ref=(
+                            f"source_file={source_file}, line={sensor_rec.original_line_number}, "
+                            f"首次批次={uz.import_batch_id}, 重复批次={batch_id}"
+                        ),
                         command_used=command,
                     )
                     uz.history_ids.append(history_entry.entry_id)
                     uz.last_updated_at = datetime.now().isoformat()
+                    duplicate_uniform_zone_ids.append(existing_uz_id)
 
                 existing_sensor.raw_data = raw_data
-                existing_sensor.import_batch_id = batch_id
             else:
                 imported_count += 1
                 self.sensor_records[key] = sensor_rec
@@ -234,7 +243,7 @@ class UniformZoneProcessor:
                     rule_id = "TEMP_MIX_002"
                     details = issue
 
-                rule_result = self.rule_engine.execute_rule(
+                self.rule_engine.execute_rule(
                     rule_id,
                     uz,
                     operator="系统",
@@ -244,16 +253,18 @@ class UniformZoneProcessor:
                 after = uz.to_dict()
 
                 command = (
-                    f"python3 main.py check-temperature --uz-id {uz_id}"
+                    f"python3 main.py import-sensors "
+                    f"--input-file {source_file} "
+                    f"--operator \"{operator or ''}\""
                 )
 
                 history_entry = self.history_manager.create_entry(
                     uniform_zone_id=uz_id,
-                    change_type=ChangeType.MANUAL_EDIT,
+                    change_type=ChangeType.TEMP_CORRECTION,
                     before_value=before,
                     after_value=after,
                     operator="系统",
-                    reason=f"温度单位校验触发规则: {rule_id}",
+                    reason=f"温度单位校验自动触发规则: {rule_id}，{issue}。不自动修正，等待训练教练复核。",
                     evidence_ref=rule_id,
                     command_used=command,
                 )
@@ -281,6 +292,7 @@ class UniformZoneProcessor:
             "mixed_temperature_count": len(mixed_results),
             "mixed_temperature_details": mixed_results,
             "new_uniform_zone_ids": new_uniform_zone_ids,
+            "duplicate_uniform_zone_ids": duplicate_uniform_zone_ids,
             "summary": result_summary,
         }
 
@@ -332,11 +344,13 @@ class UniformZoneProcessor:
                 before = uz.to_dict()
 
                 command = (
-                    f"python3 main.py attach-photo --uz-id {uz_id} --photo-id {photo_id}"
+                    f"python3 main.py review-photos "
+                    f"--input-file {source_file} "
+                    f"--operator \"{operator}\""
                 )
 
                 if is_late_arrival:
-                    rule_result = self.rule_engine.execute_rule(
+                    self.rule_engine.execute_rule(
                         "LATE_ARRIVAL_001",
                         uz,
                         operator=operator,
@@ -354,6 +368,8 @@ class UniformZoneProcessor:
                     ).strip()
                     if uz.processing_status == ProcessingStatus.IMPORTED:
                         uz.processing_status = ProcessingStatus.PHOTO_REVIEWED
+                    elif uz.processing_status == ProcessingStatus.TEMP_MIXED:
+                        pass
                     change_type = ChangeType.PHOTO_ATTACH
                     reason = f"工况照片复核: {scene_description}"
 
@@ -424,6 +440,7 @@ class UniformZoneProcessor:
                 failed_count += 1
                 failed_details.append({
                     "uz_id": uz_id,
+                    "sensor_id": uz.sensor_id,
                     "reason": "温度单位混用待训练教练复核，不能更新交接报告",
                 })
                 continue
@@ -439,7 +456,10 @@ class UniformZoneProcessor:
             after = uz.to_dict()
 
             command = (
-                f"python3 main.py update-report --uz-id {uz_id} --notes '{report_notes[:50]}...'"
+                f"python3 main.py update-report "
+                f"--uz-ids {uz_id} "
+                f"--notes \"{report_notes[:80]}\" "
+                f"--operator \"{operator}\""
             )
 
             history_entry = self.history_manager.create_entry(
@@ -502,9 +522,12 @@ class UniformZoneProcessor:
         after = uz.to_dict()
 
         command = (
-            f"python3 main.py coach-review --uz-id {uniform_zone_id} "
-            f"--target-unit {target_unit} --correction-mode {correction_mode} "
-            f"--remark '{coach_remark}'"
+            f"python3 main.py coach-review "
+            f"--uz-id {uniform_zone_id} "
+            f"--target-unit {target_unit} "
+            f"--correction-mode {correction_mode} "
+            f"--remark \"{coach_remark[:80]}\" "
+            f"--operator \"{operator}\""
         )
 
         history_entry = self.history_manager.create_entry(
@@ -513,7 +536,7 @@ class UniformZoneProcessor:
             before_value=before,
             after_value=after,
             operator=operator,
-            reason=f"温度单位复核完成: {coach_remark}",
+            reason=f"温度单位复核完成[{correction_mode}]: {coach_remark}",
             evidence_ref="TEMP_CORR_001",
             command_used=command,
         )
@@ -524,6 +547,7 @@ class UniformZoneProcessor:
 
         return {
             "uniform_zone_id": uniform_zone_id,
+            "sensor_id": uz.sensor_id,
             "correction": rule_result["changes_applied"],
             "summary": "温度单位复核完成",
         }
@@ -551,8 +575,12 @@ class UniformZoneProcessor:
         after = uz.to_dict()
 
         command = (
-            f"python3 main.py manual-edit --uz-id {uniform_zone_id} "
-            f"--field {field_name} --value '{new_value}' --reason '{reason}'"
+            f"python3 main.py manual-edit "
+            f"--uz-id {uniform_zone_id} "
+            f"--field {field_name} "
+            f"--value \"{new_value}\" "
+            f"--reason \"{reason}\" "
+            f"--operator \"{operator}\""
         )
 
         history_entry = self.history_manager.create_entry(
@@ -561,7 +589,10 @@ class UniformZoneProcessor:
             before_value=before,
             after_value=after,
             operator=operator,
-            reason=reason,
+            reason=(
+                f"人工改动: {operator}将{field_name}从\"{old_value}\"改为\"{new_value}\"。"
+                f"原因: {reason}。影响结果: 均匀区记录{uniform_zone_id}({uz.sensor_id})"
+            ),
             evidence_ref=f"manual_edit: {field_name}: {old_value} -> {new_value}",
             command_used=command,
         )
@@ -572,9 +603,11 @@ class UniformZoneProcessor:
 
         return {
             "uniform_zone_id": uniform_zone_id,
+            "sensor_id": uz.sensor_id,
             "field": field_name,
             "old_value": old_value,
             "new_value": new_value,
+            "affected_result": f"均匀区记录{uniform_zone_id}({uz.sensor_id})",
             "history_entry_id": history_entry.entry_id,
         }
 
@@ -597,10 +630,25 @@ class UniformZoneProcessor:
             for h in history
         ]
 
+        duplicate_import_info = None
+        if uz.duplicate_import_batches:
+            duplicate_import_info = {
+                "is_duplicate_touched": True,
+                "first_import_batch": uz.import_batch_id,
+                "duplicate_batches": uz.duplicate_import_batches,
+                "total_import_attempts": 1 + len(uz.duplicate_import_batches),
+                "dedup_conclusion": (
+                    f"传感器{uz.sensor_id}首次导入批次{uz.import_batch_id}，"
+                    f"后续重复导入批次: {uz.duplicate_import_batches}。"
+                    f"去重后数量未翻倍，当前记录为首次导入的原始记录。"
+                ),
+            }
+
         return {
             "uniform_zone": uz.to_dict(),
             "sensor_evidence": sensor.to_dict() if sensor else None,
             "photo_evidences": photos,
+            "duplicate_import_info": duplicate_import_info,
             "history": [h.to_dict() for h in history],
             "change_comparisons": change_comparisons,
             "audit_summary": audit_summary,
@@ -623,7 +671,7 @@ class UniformZoneProcessor:
             "audit_logs": [l.to_dict() for l in self.history_manager.get_all_audit_logs()],
         }
 
-        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
         with open(output_path, "w", encoding="utf-8") as f:
             json.dump(report, f, ensure_ascii=False, indent=2)
 
@@ -642,7 +690,7 @@ class UniformZoneProcessor:
         uz.processing_status = ProcessingStatus.CONFIRMED
         after = uz.to_dict()
 
-        command = f"python3 main.py confirm --uz-id {uniform_zone_id}"
+        command = f"python3 main.py confirm --uz-id {uniform_zone_id} --operator \"{operator}\""
 
         history_entry = self.history_manager.create_entry(
             uniform_zone_id=uniform_zone_id,
@@ -674,5 +722,9 @@ class UniformZoneProcessor:
             "pending_coach_review": sum(
                 1 for uz in self.uniform_zone_records.values()
                 if uz.coach_review_required
+            ),
+            "duplicate_touched_count": sum(
+                1 for uz in self.uniform_zone_records.values()
+                if uz.duplicate_import_batches
             ),
         }

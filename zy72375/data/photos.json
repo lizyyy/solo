@@ -1,5 +1,57 @@
 [
   {
+    "photo_id": "PHOTO-2026-0604-001",
+    "scene_description": "A区中心磁场线圈安装照片，线圈排列整齐，无明显变形",
+    "source_file": "/photos/20260604/A-001.jpg",
+    "upload_time": "2026-06-04T10:30:00",
+    "related_sensor_ids": [
+      "MAG-COIL-001"
+    ],
+    "reviewer": "何工",
+    "review_notes": "现场确认线圈安装符合工艺要求，温度传感器位置正确",
+    "is_late_arrival": false,
+    "created_at": "2026-06-12T00:17:05.842053"
+  },
+  {
+    "photo_id": "PHOTO-2026-0604-002",
+    "scene_description": "A区边缘磁场线圈照片，可见轻微振动痕迹",
+    "source_file": "/photos/20260604/A-002.jpg",
+    "upload_time": "2026-06-04T10:35:00",
+    "related_sensor_ids": [
+      "MAG-COIL-002"
+    ],
+    "reviewer": "何工",
+    "review_notes": "振动痕迹在允许范围内，不影响磁场均匀性",
+    "is_late_arrival": false,
+    "created_at": "2026-06-12T00:17:05.843555"
+  },
+  {
+    "photo_id": "PHOTO-2026-0604-003",
+    "scene_description": "B区中心线圈照片，温度显示仪表读数25°C",
+    "source_file": "/photos/20260604/B-001.jpg",
+    "upload_time": "2026-06-04T10:40:00",
+    "related_sensor_ids": [
+      "MAG-COIL-003"
+    ],
+    "reviewer": "何工",
+    "review_notes": "照片显示现场仪表读数为25°C，确认传感器记录单位错误，应为摄氏度",
+    "is_late_arrival": false,
+    "created_at": "2026-06-12T00:17:05.844632"
+  },
+  {
+    "photo_id": "PHOTO-2026-0604-004",
+    "scene_description": "C区入口高温区域照片，可见散热风扇工作中",
+    "source_file": "/photos/20260604/C-001.jpg",
+    "upload_time": "2026-06-04T10:45:00",
+    "related_sensor_ids": [
+      "MAG-COIL-005"
+    ],
+    "reviewer": "何工",
+    "review_notes": "C区为高温过渡区，不属于均匀区范围，标记正确",
+    "is_late_arrival": false,
+    "created_at": "2026-06-12T00:17:05.845881"
+  },
+  {
     "photo_id": "PHOTO-2026-0604-005",
     "scene_description": "B区边缘线圈夜间补拍照片，确认无异常发热",
     "source_file": "/photos/20260604/B-002-LATE.jpg",
@@ -10,6 +62,6 @@
     "reviewer": "何工",
     "review_notes": "夜间现场复核，B区边缘温度稳定，无异常发热点。补充：当日下午对该区域进行了二次测温，确认24.5°C读数准确。",
     "is_late_arrival": true,
-    "created_at": "2026-06-04T17:56:01.827259"
+    "created_at": "2026-06-12T00:17:06.707583"
   }
 ]

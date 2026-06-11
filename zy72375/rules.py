@@ -329,7 +329,7 @@ class BoundaryRuleEngine:
         elif rule_id == "DUPLICATE_001":
             new_raw_data = kwargs.get("new_raw_data")
             new_batch_id = kwargs.get("new_batch_id")
-            record.import_batch_id = new_batch_id
+            record.duplicate_import_batches.append(new_batch_id)
             if new_raw_data and new_raw_data != kwargs.get("old_raw_data"):
                 record.manual_edits = kwargs.get("manual_edits", []) + [{
                     "field": "raw_data",
@@ -338,13 +338,13 @@ class BoundaryRuleEngine:
                     "operator": operator,
                 }]
                 result["changes_applied"] = {
-                    "import_batch_id": new_batch_id,
+                    "duplicate_import_batches": record.duplicate_import_batches,
                     "raw_data_updated": True,
                 }
             else:
                 result["changes_applied"] = {
-                    "import_batch_id": new_batch_id,
-                    "note": "数据无变化，仅更新批次号",
+                    "duplicate_import_batches": record.duplicate_import_batches,
+                    "note": "数据无变化，仅记录重复导入批次号",
                 }
 
         result["after"] = record.to_dict()
