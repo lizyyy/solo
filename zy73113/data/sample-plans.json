@@ -1,0 +1,234 @@
+{
+  "plans": [
+    {
+      "planNo": "BGC-2026-001",
+      "projectName": "北京国贸中心三期北塔外立面改造",
+      "originalOpinion": "原设计方案采用干挂石材，建议改为ALC轻质隔墙板以减轻结构荷载",
+      "originalSource": "2026年3月15日设计交底会议纪要第3条",
+      "currentRemark": "初步验算结构荷载可减少15%，需进一步确认防火等级",
+      "judgment": "pending",
+      "status": "normal",
+      "materialBatch": "MAT-2026-0315-001",
+      "createdBy": "现场工程师-李工"
+    },
+    {
+      "planNo": "BGC-2026-002",
+      "projectName": "上海陆家嘴金融中心地下车库扩容",
+      "originalOpinion": "地下三层原规划为设备层，建议调整为机械车库增加停车位",
+      "originalSource": "2026年4月2日业主协调会议纪要第7条（交底清单遗漏）",
+      "currentRemark": "业主要求增加80个停车位，需复核人防设计要求",
+      "judgment": "pending",
+      "status": "abnormal",
+      "materialBatch": null,
+      "createdBy": "现场工程师-王工"
+    },
+    {
+      "planNo": "BGC-2026-003",
+      "projectName": "深圳前海新区综合管廊工程",
+      "originalOpinion": "综合管廊燃气舱原设计采用混凝土结构，建议改为钢制波纹管",
+      "originalSource": "2026年4月10日专家评审会议纪要第5条",
+      "currentRemark": "钢制波纹管施工周期可缩短40%，但需解决防腐问题",
+      "judgment": "approved",
+      "status": "normal",
+      "materialBatch": "MAT-2026-0410-002, MAT-2026-0410-003",
+      "createdBy": "现场工程师-张工"
+    },
+    {
+      "planNo": "BGC-2026-004",
+      "projectName": "广州白云机场T3航站楼钢结构",
+      "originalOpinion": "大跨度屋面原设计采用Q355B钢材，建议升级为Q420GJC高建钢",
+      "originalSource": "2026年4月18日钢结构专题会议纪要第2条",
+      "currentRemark": "用钢量可减少8%，但材料成本增加12%，需经济性比选",
+      "judgment": "pending",
+      "status": "normal",
+      "materialBatch": "MAT-2026-0418-001",
+      "createdBy": "现场工程师-刘工"
+    },
+    {
+      "planNo": "BGC-2026-005",
+      "projectName": "成都天府新区CBD核心区地下空间",
+      "originalOpinion": "地下商业街原设计采用全空气系统，建议改为风机盘管加新风",
+      "originalSource": "2026年5月5日机电协调会议纪要第9条（原始记录字迹模糊）",
+      "currentRemark": "末端调节灵活性更好，运行费用可降低20%",
+      "judgment": "rejected",
+      "status": "abnormal",
+      "materialBatch": null,
+      "createdBy": "现场工程师-陈工"
+    },
+    {
+      "planNo": "BGC-2026-006",
+      "projectName": "杭州亚运会运动员村装配式建筑",
+      "originalOpinion": "外墙板原设计采用预制混凝土，建议改为GRC轻质挂板",
+      "originalSource": "2026年5月12日装配式建筑研讨会纪要第4条",
+      "currentRemark": "安装效率提高30%，已完成样板段验收",
+      "judgment": "approved",
+      "status": "normal",
+      "materialBatch": "MAT-2026-0512-001, MAT-2026-0512-002",
+      "createdBy": "现场工程师-赵工"
+    },
+    {
+      "planNo": "BGC-2026-007",
+      "projectName": "武汉长江新区跨江隧道",
+      "originalOpinion": "隧道衬砌原设计采用C50混凝土，建议添加玄武岩纤维",
+      "originalSource": "2026年5月20日隧道工程技术交底第6条",
+      "currentRemark": "抗裂性能提升显著，已委托第三方做耐久性试验",
+      "judgment": "pending",
+      "status": "abnormal",
+      "materialBatch": null,
+      "createdBy": "现场工程师-孙工"
+    },
+    {
+      "planNo": "BGC-2026-008",
+      "projectName": "西安高新区软件新城办公楼",
+      "originalOpinion": "玻璃幕墙原设计采用6+12A+6中空玻璃，建议改为三玻两腔",
+      "originalSource": "2026年5月28日绿色建筑评审会议纪要第3条",
+      "currentRemark": "节能率提升至65%，满足绿建三星要求，成本增加5%",
+      "judgment": "approved",
+      "status": "normal",
+      "materialBatch": "MAT-2026-0528-001",
+      "createdBy": "现场工程师-周工"
+    },
+    {
+      "planNo": "BGC-2026-009",
+      "projectName": "重庆江北嘴金融城4号楼",
+      "originalOpinion": "基础原设计采用人工挖孔桩，建议改为旋挖钻机成孔",
+      "originalSource": "2026年6月3日基础工程专项方案评审第8条",
+      "currentRemark": "施工安全风险降低，成孔效率提高2倍，已补录材料检测报告",
+      "judgment": "approved",
+      "status": "normal",
+      "materialBatch": "MAT-2026-0603-001, MAT-2026-0605-SUP-001",
+      "createdBy": "现场工程师-吴工"
+    },
+    {
+      "planNo": "BGC-2026-010",
+      "projectName": "南京江北新区市民中心",
+      "originalOpinion": "屋面原设计采用SBS改性沥青防水，建议改用TPO高分子防水",
+      "originalSource": "2026年6月8日防水工程技术交底第2条",
+      "currentRemark": "使用寿命从15年延长至25年，后期维护成本降低",
+      "judgment": "pending",
+      "status": "normal",
+      "materialBatch": "MAT-2026-0608-001",
+      "createdBy": "现场工程师-郑工"
+    }
+  ],
+  "historyRecords": [
+    {
+      "planNo": "BGC-2026-003",
+      "operations": [
+        {
+          "type": "remark_update",
+          "oldValue": "钢制波纹管施工周期可缩短40%",
+          "newValue": "钢制波纹管施工周期可缩短40%，但需解决防腐问题",
+          "reason": "补充防腐专题会议意见，设计方提出沿海地区防腐等级需提高",
+          "operator": "现场工程师-张工",
+          "timestamp": "2026-04-12T14:30:00Z"
+        },
+        {
+          "type": "judgment_change",
+          "oldValue": "pending",
+          "newValue": "approved",
+          "reason": "防腐方案已通过专家评审，采用环氧煤沥青+阴极保护联合防腐",
+          "operator": "建筑师-小赵",
+          "timestamp": "2026-04-15T10:00:00Z"
+        }
+      ]
+    },
+    {
+      "planNo": "BGC-2026-005",
+      "operations": [
+        {
+          "type": "status_change",
+          "oldValue": "normal",
+          "newValue": "abnormal",
+          "reason": "材料批次缺失，原始记录字迹模糊无法辨认",
+          "operator": "现场工程师-陈工",
+          "timestamp": "2026-05-08T09:15:00Z"
+        },
+        {
+          "type": "judgment_change",
+          "oldValue": "pending",
+          "newValue": "rejected",
+          "reason": "材料批次缺失，缺乏完整技术支撑，暂不采纳",
+          "operator": "建筑师-小赵",
+          "timestamp": "2026-05-10T16:45:00Z"
+        }
+      ]
+    },
+    {
+      "planNo": "BGC-2026-007",
+      "operations": [
+        {
+          "type": "status_change",
+          "oldValue": "normal",
+          "newValue": "abnormal",
+          "reason": "玄武岩纤维材料检测报告缺失，无法确认产品质量",
+          "operator": "现场工程师-孙工",
+          "timestamp": "2026-05-22T11:30:00Z"
+        },
+        {
+          "type": "remark_update",
+          "oldValue": "抗裂性能提升显著",
+          "newValue": "抗裂性能提升显著，已委托第三方做耐久性试验",
+          "reason": "补充试验进展，预计6月20日出试验报告",
+          "operator": "现场工程师-孙工",
+          "timestamp": "2026-06-05T08:00:00Z"
+        }
+      ]
+    },
+    {
+      "planNo": "BGC-2026-009",
+      "operations": [
+        {
+          "type": "status_change",
+          "oldValue": "normal",
+          "newValue": "abnormal",
+          "reason": "旋挖钻机成孔工艺相关材料检测报告缺失",
+          "operator": "现场工程师-吴工",
+          "timestamp": "2026-06-04T13:20:00Z"
+        },
+        {
+          "type": "material_add",
+          "oldValue": "MAT-2026-0603-001",
+          "newValue": "MAT-2026-0605-SUP-001",
+          "reason": "补录桩身混凝土强度检测报告及钻头磨损记录",
+          "operator": "现场工程师-吴工",
+          "timestamp": "2026-06-05T10:30:00Z"
+        },
+        {
+          "type": "status_change",
+          "oldValue": "abnormal",
+          "newValue": "normal",
+          "reason": "材料已补录，恢复正常",
+          "operator": "系统自动",
+          "timestamp": "2026-06-05T10:30:01Z"
+        },
+        {
+          "type": "judgment_change",
+          "oldValue": "pending",
+          "newValue": "approved",
+          "reason": "材料齐全，工艺可行，同意采用旋挖钻机成孔方案",
+          "operator": "建筑师-小赵",
+          "timestamp": "2026-06-06T15:00:00Z"
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "planNo": "BGC-2026-009",
+      "batchNo": "MAT-2026-0605-SUP-001",
+      "materialName": "C35混凝土抗压强度检测报告",
+      "quantity": 1,
+      "isSupplement": true,
+      "supplementReason": "原始材料遗漏，补录桩身混凝土强度检测报告，报告编号JC-2026-0605-003"
+    },
+    {
+      "planNo": "BGC-2026-003",
+      "batchNo": "MAT-2026-0410-003",
+      "materialName": "钢制波纹管防腐层厚度检测报告",
+      "quantity": 1,
+      "isSupplement": true,
+      "supplementReason": "补充防腐专题会议要求的检测数据"
+    }
+  ]
+}
