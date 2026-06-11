@@ -10,14 +10,99 @@ export class ReverberationService {
     this.importHistory = []
     this.missingTimeRecords = []
     this.conflicts = []
+    this.batches = []
+    this.currentBatchId = null
+    this.changeLogs = []
+    this._batchSeq = 0
+    this._changeLogSeq = 0
   }
 
-  importRecords(recordDataList) {
+  createBatch(batchName, operator = 'system') {
+    this._batchSeq++
+    const batch = {
+      id: 'BATCH_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+      name: batchName || '导入批次_' + new Date().toLocaleString('zh-CN'),
+      operator: operator,
+      createdAt: new Date().toISOString(),
+      status: 'in_progress',
+      recordIds: [],
+      noteIds: [],
+      supplementIds: [],
+      sequenceNumber: this._batchSeq
+    }
+    this.batches.push(batch)
+    this.currentBatchId = batch.id
+    return batch
+  }
+
+  getCurrentBatch() {
+    if (!this.currentBatchId) return null
+    return this.batches.find(b => b.id === this.currentBatchId) || null
+  }
+
+  finishBatch(batchId) {
+    const batch = this.batches.find(b => b.id === batchId)
+    if (batch) {
+      batch.status = 'completed'
+      batch.finishedAt = new Date().toISOString()
+    }
+    return batch
+  }
+
+  getBatches() {
+    return [...this.batches].sort((a, b) => b.sequenceNumber - a.sequenceNumber)
+  }
+
+  getBatchById(batchId) {
+    return this.batches.find(b => b.id === batchId) || null
+  }
+
+  addChangeLog(type, entityType, entityId, description, operator, details = {}) {
+    this._changeLogSeq++
+    const log = {
+      id: 'LOG_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+      type: type,
+      entityType: entityType,
+      entityId: entityId,
+      description: description,
+      operator: operator,
+      timestamp: new Date().toISOString(),
+      details: details,
+      batchId: this.currentBatchId,
+      sequenceNumber: this._changeLogSeq
+    }
+    this.changeLogs.push(log)
+    return log
+  }
+
+  getChangeLogs(filter = {}) {
+    let logs = [...this.changeLogs]
+    
+    if (filter.entityType) {
+      logs = logs.filter(l => l.entityType === filter.entityType)
+    }
+    if (filter.entityId) {
+      logs = logs.filter(l => l.entityId === filter.entityId)
+    }
+    if (filter.type) {
+      logs = logs.filter(l => l.type === filter.type)
+    }
+    if (filter.batchId) {
+      logs = logs.filter(l => l.batchId === filter.batchId)
+    }
+    
+    return logs.sort((a, b) => b.sequenceNumber - a.sequenceNumber)
+  }
+
+  importRecords(recordDataList, operator = 'system', batchName = null) {
+    const batch = this.createBatch(batchName, operator)
+    
     const results = {
       success: [],
       duplicates: [],
       errors: [],
-      warnings: []
+      warnings: [],
+      batchId: batch.id
     }
 
     for (const data of recordDataList) {
@@ -27,7 +112,8 @@ export class ReverberationService {
         results.duplicates.push({
           data: data,
           reason: checkResult.reason,
-          existingRecord: checkResult.existingRecord
+          existingRecord: checkResult.existingRecord,
+          existingBatchId: checkResult.existingBatchId
         })
         continue
       }
@@ -43,12 +129,26 @@ export class ReverberationService {
         continue
       }
 
+      record.batchId = batch.id
       this.records.push(record)
       this.importHistory.push({
         recordId: record.id,
         importTime: record.importTime,
-        action: 'import'
+        action: 'import',
+        batchId: batch.id
       })
+      
+      batch.recordIds.push(record.id)
+      
+      this.addChangeLog(
+        'create',
+        'record',
+        record.id,
+        `导入新记录：${record.location} ${record.frequency}Hz`,
+        operator,
+        { sampleTime: record.sampleTime, reverberationTime: record.reverberationTime }
+      )
+      
       results.success.push(record)
 
       const warnings = this.checkRecordWarnings(record)
@@ -61,6 +161,8 @@ export class ReverberationService {
     }
 
     this.detectMissingTimeGaps()
+    this.finishBatch(batch.id)
+    
     return results
   }
 
@@ -68,14 +170,17 @@ export class ReverberationService {
     const existing = this.records.find(r => 
       r.sampleTime === data.sampleTime &&
       r.location === data.location &&
-      r.frequency === data.frequency
+      r.frequency === data.frequency &&
+      !r.isSupplement
     )
 
     if (existing) {
+      const existingBatch = this.batches.find(b => b.recordIds.includes(existing.id))
       return {
         isDuplicate: true,
-        reason: '同一时间、同一地点、同一频率的记录已存在',
-        existingRecord: existing
+        reason: `同一时间、同一地点、同一频率的记录已存在（来自批次：${existingBatch ? existingBatch.name : '未知'}）`,
+        existingRecord: existing,
+        existingBatchId: existing ? existing.batchId : null
       }
     }
 
@@ -149,7 +254,11 @@ export class ReverberationService {
   }
 
   detectMissingTimeGaps() {
-    this.missingTimeRecords = []
+    const existingMissingIds = new Set(this.missingTimeRecords.map(m => {
+      return `${m.previousRecord?.id}_${m.nextRecord?.id}`
+    }))
+    
+    const newMissingRecords = []
     
     const sortedRecords = [...this.records]
       .filter(r => r.sampleTime)
@@ -161,27 +270,57 @@ export class ReverberationService {
       const diffMinutes = (currTime - prevTime) / (1000 * 60)
 
       if (diffMinutes > 35 && diffMinutes < 90) {
-        const missingRecord = {
-          id: 'MISSING_' + Date.now() + '_' + i,
-          type: 'time_gap',
-          previousRecord: sortedRecords[i - 1],
-          nextRecord: sortedRecords[i],
-          gapDuration: diffMinutes,
-          expectedTime: new Date(prevTime.getTime() + 30 * 60 * 1000).toISOString(),
-          status: 'pending_review',
-          keepReason: '',
-          reviewedBy: '',
-          reviewedAt: null
+        const key = `${sortedRecords[i - 1].id}_${sortedRecords[i].id}`
+        
+        const existing = this.missingTimeRecords.find(m => 
+          m.previousRecord?.id === sortedRecords[i - 1].id && 
+          m.nextRecord?.id === sortedRecords[i].id
+        )
+        
+        if (existing) {
+          newMissingRecords.push(existing)
+        } else {
+          const missingRecord = {
+            id: 'MISSING_' + Date.now() + '_' + i,
+            type: 'time_gap',
+            previousRecord: sortedRecords[i - 1],
+            nextRecord: sortedRecords[i],
+            gapDuration: diffMinutes,
+            expectedTime: new Date(prevTime.getTime() + 30 * 60 * 1000).toISOString(),
+            status: 'pending_review',
+            keepReason: '',
+            reviewedBy: '',
+            reviewedAt: null,
+            detectedAt: new Date().toISOString()
+          }
+          newMissingRecords.push(missingRecord)
+          
+          this.addChangeLog(
+            'detect',
+            'missing_time',
+            missingRecord.id,
+            `检测到 ${Math.round(diffMinutes)} 分钟采样间隔`,
+            'system',
+            {
+              previousTime: sortedRecords[i - 1].sampleTime,
+              nextTime: sortedRecords[i].sampleTime,
+              gapMinutes: Math.round(diffMinutes)
+            }
+          )
         }
-        this.missingTimeRecords.push(missingRecord)
       }
     }
 
+    this.missingTimeRecords = newMissingRecords
     return this.missingTimeRecords
   }
 
   getMissingTimeRecords() {
     return this.missingTimeRecords
+  }
+
+  getMissingTimeRecordById(missingId) {
+    return this.missingTimeRecords.find(m => m.id === missingId) || null
   }
 
   reviewMissingRecord(missingId, decision, reason, reviewer) {
@@ -191,6 +330,7 @@ export class ReverberationService {
       return { success: false, error: '未找到该缺失记录' }
     }
 
+    const oldStatus = missing.status
     missing.status = decision === 'keep' ? 'kept' : 'resolved'
     missing.keepReason = reason
     missing.reviewedBy = reviewer
@@ -201,10 +341,29 @@ export class ReverberationService {
         recordId: missing.previousRecord.id,
         noteContent: `保留${Math.round(missing.gapDuration)}分钟采样间隔，理由：${reason}`,
         author: reviewer,
-        isHandwritten: false
+        isHandwritten: false,
+        relatedMissingId: missingId
       })
       this.notes.push(keepNote)
+      
+      const batch = this.getCurrentBatch()
+      if (batch) {
+        batch.noteIds.push(keepNote.id)
+      }
     }
+
+    this.addChangeLog(
+      'update',
+      'missing_time',
+      missingId,
+      `${reviewer} 复核缺失记录：${decision === 'keep' ? '保留' : '解决'}`,
+      reviewer,
+      {
+        oldStatus: oldStatus,
+        newStatus: missing.status,
+        reason: reason
+      }
+    )
 
     return { success: true, record: missing }
   }
@@ -224,33 +383,148 @@ export class ReverberationService {
       originalRecordId: originalRecordId
     })
 
+    const batch = this.getCurrentBatch()
+    if (batch) {
+      supplementRecord.batchId = batch.id
+      batch.recordIds.push(supplementRecord.id)
+      batch.supplementIds.push(supplementRecord.id)
+    }
+
     this.records.push(supplementRecord)
     this.importHistory.push({
       recordId: supplementRecord.id,
       importTime: supplementRecord.importTime,
       action: 'supplement',
-      originalRecordId: originalRecordId
+      originalRecordId: originalRecordId,
+      batchId: supplementRecord.batchId
     })
 
-    this.recalculateRelatedRecords(originalRecordId)
+    this.addChangeLog(
+      'create',
+      'record',
+      supplementRecord.id,
+      `添加补录记录：${supplementRecord.location} ${supplementRecord.frequency}Hz`,
+      supplementedBy,
+      {
+        originalRecordId: originalRecordId,
+        reason: reason,
+        sampleTime: supplementRecord.sampleTime,
+        reverberationTime: supplementRecord.reverberationTime
+      }
+    )
 
-    return { success: true, record: supplementRecord }
+    const recalcResults = this.recalculateRelatedRecords(originalRecordId)
+
+    return { 
+      success: true, 
+      record: supplementRecord,
+      recalcResults: recalcResults
+    }
   }
 
   recalculateRelatedRecords(originalRecordId) {
+    const beforeMissingCount = this.missingTimeRecords.length
+    const beforeMissingIds = new Set(this.missingTimeRecords.map(m => m.id))
+    
     this.detectMissingTimeGaps()
+    
+    const afterMissingIds = new Set(this.missingTimeRecords.map(m => m.id))
+    
+    const resolved = [...beforeMissingIds].filter(id => !afterMissingIds.has(id))
+    const added = [...afterMissingIds].filter(id => !beforeMissingIds.has(id))
+    
+    return {
+      beforeCount: beforeMissingCount,
+      afterCount: this.missingTimeRecords.length,
+      resolvedMissingIds: resolved,
+      addedMissingIds: added
+    }
   }
 
   addInspectionNote(noteData) {
     const note = new InspectionNote(noteData)
+    
+    const batch = this.getCurrentBatch()
+    if (batch) {
+      note.batchId = batch.id
+      batch.noteIds.push(note.id)
+    }
+    
     this.notes.push(note)
+    
+    this.addChangeLog(
+      'create',
+      'note',
+      note.id,
+      `添加巡检备注：${note.noteContent.substring(0, 30)}${note.noteContent.length > 30 ? '...' : ''}`,
+      note.author || 'system',
+      {
+        recordId: note.recordId,
+        isHandwritten: note.isHandwritten,
+        content: note.noteContent
+      }
+    )
     
     const conflicts = this.detectNoteThresholdConflicts(note)
     if (conflicts.length > 0) {
       this.conflicts.push(...conflicts)
+      
+      conflicts.forEach(c => {
+        this.addChangeLog(
+          'detect',
+          'conflict',
+          c.id,
+          '检测到巡检备注与安全阈值冲突',
+          'system',
+          {
+            noteId: note.id,
+            recordId: note.recordId,
+            evidence: c.evidence
+          }
+        )
+      })
     }
 
     return { note, conflicts }
+  }
+
+  updateInspectionNote(noteId, newContent, updater) {
+    const note = this.notes.find(n => n.id === noteId)
+    
+    if (!note) {
+      return { success: false, error: '未找到该备注' }
+    }
+
+    const oldContent = note.noteContent
+    note.noteContent = newContent
+    note.updatedAt = new Date().toISOString()
+    note.updatedBy = updater
+
+    this.addChangeLog(
+      'update',
+      'note',
+      noteId,
+      '修改巡检备注',
+      updater,
+      {
+        oldContent: oldContent,
+        newContent: newContent,
+        recordId: note.recordId
+      }
+    )
+
+    const newConflicts = this.detectNoteThresholdConflicts(note)
+    
+    const existingConflictIndex = this.conflicts.findIndex(c => c.noteId === noteId)
+    if (existingConflictIndex >= 0) {
+      this.conflicts.splice(existingConflictIndex, 1)
+    }
+    
+    if (newConflicts.length > 0) {
+      this.conflicts.push(...newConflicts)
+    }
+
+    return { success: true, note, newConflicts }
   }
 
   detectNoteThresholdConflicts(note) {
@@ -274,7 +548,7 @@ export class ReverberationService {
 
     if (noteIndicatesNormal && !isWithinThreshold) {
       conflicts.push({
-        id: 'CONFLICT_' + Date.now(),
+        id: 'CONFLICT_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
         type: 'note_threshold_conflict',
         noteId: note.id,
         recordId: record.id,
@@ -286,7 +560,8 @@ export class ReverberationService {
           thresholdMeaning: '安全阈值显示超出范围'
         },
         status: 'pending',
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        batchId: this.currentBatchId
       })
     }
 
@@ -297,6 +572,10 @@ export class ReverberationService {
     return this.conflicts
   }
 
+  getConflictById(conflictId) {
+    return this.conflicts.find(c => c.id === conflictId) || null
+  }
+
   resolveConflict(conflictId, decision, resolvedBy) {
     const conflict = this.conflicts.find(c => c.id === conflictId)
     
@@ -304,9 +583,23 @@ export class ReverberationService {
       return { success: false, error: '未找到该冲突' }
     }
 
+    const oldStatus = conflict.status
     conflict.status = decision === 'confirm' ? 'confirmed' : 'rejected'
     conflict.resolvedBy = resolvedBy
     conflict.resolvedAt = new Date().toISOString()
+
+    this.addChangeLog(
+      'update',
+      'conflict',
+      conflictId,
+      `${resolvedBy} 处理冲突：${decision === 'confirm' ? '确认冲突' : '驳回冲突'}`,
+      resolvedBy,
+      {
+        oldStatus: oldStatus,
+        newStatus: conflict.status,
+        recordId: conflict.recordId
+      }
+    )
 
     return { success: true, conflict }
   }
@@ -327,15 +620,20 @@ export class ReverberationService {
       missingTimeCheck: this.missingTimeRecords.length > 0 ? {
         hasIssues: true,
         count: this.missingTimeRecords.length,
+        pendingCount: this.missingTimeRecords.filter(m => m.status === 'pending_review').length,
         details: this.missingTimeRecords.map(m => ({
+          id: m.id,
           gap: Math.round(m.gapDuration) + '分钟',
           between: `${m.previousRecord.sampleTime} 和 ${m.nextRecord.sampleTime}`,
-          status: m.status
+          status: m.status,
+          keepReason: m.keepReason,
+          reviewedBy: m.reviewedBy
         }))
-      } : { hasIssues: false },
+      } : { hasIssues: false, count: 0, pendingCount: 0 },
       supplementRecalcCheck: this.checkSupplementRecalculation(),
       exportConsistencyCheck: this.checkExportConsistency(),
-      noteThresholdConflicts: this.conflicts.filter(c => c.status === 'pending').length
+      noteThresholdConflicts: this.conflicts.filter(c => c.status === 'pending').length,
+      batchConsistencyCheck: this.checkBatchConsistency()
     }
 
     return results
@@ -378,26 +676,135 @@ export class ReverberationService {
     return {
       hasIssues: issues.length > 0,
       count: issues.length,
-      issues: issues
+      issues: issues,
+      supplementCount: supplements.length
     }
   }
 
   checkExportConsistency() {
-    const export1 = this.exportData()
-    const export2 = this.exportData()
+    const data1 = this.getDataSnapshot()
+    const data2 = this.getDataSnapshot()
+    
+    const consistent = JSON.stringify(data1) === JSON.stringify(data2)
     
     return {
-      consistent: JSON.stringify(export1) === JSON.stringify(export2),
-      recordCount: this.records.length
+      consistent: consistent,
+      recordCount: this.records.length,
+      noteCount: this.notes.length,
+      thresholdCount: this.thresholds.length
     }
   }
 
-  exportData() {
+  checkBatchConsistency() {
+    const issues = []
+    
+    for (const batch of this.batches) {
+      for (const recordId of batch.recordIds) {
+        const record = this.records.find(r => r.id === recordId)
+        if (!record) {
+          issues.push({
+            batchId: batch.id,
+            batchName: batch.name,
+            issue: `批次中的记录 ${recordId} 不存在`
+          })
+        }
+      }
+    }
+    
     return {
-      exportTime: new Date().toISOString(),
+      hasIssues: issues.length > 0,
+      count: issues.length,
+      issues: issues,
+      batchCount: this.batches.length
+    }
+  }
+
+  getDataSnapshot() {
+    return {
+      records: this.records.map(r => {
+        const json = r.toJSON()
+        delete json.importTime
+        return json
+      }).sort((a, b) => a.id.localeCompare(b.id)),
+      notes: this.notes.map(n => {
+        const json = n.toJSON()
+        delete json.createTime
+        return json
+      }).sort((a, b) => a.id.localeCompare(b.id)),
+      thresholds: this.thresholds.map(t => {
+        const json = t.toJSON()
+        delete json.updateTime
+        return json
+      }).sort((a, b) => a.id.localeCompare(b.id))
+    }
+  }
+
+  exportData(includeMetadata = true) {
+    const data = {
       records: this.records.map(r => r.toJSON()),
       notes: this.notes.map(n => n.toJSON()),
       thresholds: this.thresholds.map(t => t.toJSON())
+    }
+    
+    if (includeMetadata) {
+      data.exportTime = new Date().toISOString()
+      data.exportVersion = '1.0.0'
+      data.batches = this.batches.map(b => ({
+        id: b.id,
+        name: b.name,
+        operator: b.operator,
+        createdAt: b.createdAt,
+        status: b.status,
+        recordCount: b.recordIds.length,
+        noteCount: b.noteIds.length
+      }))
+    }
+    
+    return data
+  }
+
+  importData(data, operator = 'system') {
+    if (!data.records) {
+      return { success: false, error: '导入数据格式不正确' }
+    }
+    
+    const batch = this.createBatch('数据导入_' + new Date().toLocaleString('zh-CN'), operator)
+    
+    let recordCount = 0
+    let noteCount = 0
+    
+    for (const recordData of data.records) {
+      const record = new ReverberationRecord(recordData)
+      record.batchId = batch.id
+      this.records.push(record)
+      batch.recordIds.push(record.id)
+      recordCount++
+    }
+    
+    if (data.notes) {
+      for (const noteData of data.notes) {
+        const note = new InspectionNote(noteData)
+        note.batchId = batch.id
+        this.notes.push(note)
+        batch.noteIds.push(note.id)
+        noteCount++
+      }
+    }
+    
+    if (data.thresholds) {
+      for (const thresholdData of data.thresholds) {
+        this.addSafetyThreshold(thresholdData)
+      }
+    }
+    
+    this.finishBatch(batch.id)
+    this.detectMissingTimeGaps()
+    
+    return {
+      success: true,
+      batchId: batch.id,
+      recordCount,
+      noteCount
     }
   }
 
@@ -411,7 +818,8 @@ export class ReverberationService {
           normal: 0,
           supplement: 0,
           missing: 0,
-          conflict: 0
+          conflict: 0,
+          pendingMissing: 0
         }
       }
       
@@ -425,9 +833,12 @@ export class ReverberationService {
     for (const missing of this.missingTimeRecords) {
       const date = missing.expectedTime.split('T')[0]
       if (!byDate[date]) {
-        byDate[date] = { normal: 0, supplement: 0, missing: 0, conflict: 0 }
+        byDate[date] = { normal: 0, supplement: 0, missing: 0, conflict: 0, pendingMissing: 0 }
       }
       byDate[date].missing++
+      if (missing.status === 'pending_review') {
+        byDate[date].pendingMissing++
+      }
     }
 
     return {
@@ -444,23 +855,89 @@ export class ReverberationService {
           backgroundColor: '#FF9800'
         },
         {
-          label: '时间缺失',
-          data: Object.keys(byDate).sort().map(d => byDate[d].missing),
+          label: '时间缺失（待复核）',
+          data: Object.keys(byDate).sort().map(d => byDate[d].pendingMissing),
           backgroundColor: '#F44336'
+        },
+        {
+          label: '时间缺失（已处理）',
+          data: Object.keys(byDate).sort().map(d => byDate[d].missing - byDate[d].pendingMissing),
+          backgroundColor: '#9C27B0'
         }
       ]
     }
   }
 
-  getRecords() {
-    return this.records
+  getRecords(filter = {}) {
+    let records = [...this.records]
+    
+    if (filter.location) {
+      records = records.filter(r => r.location === filter.location)
+    }
+    if (filter.isSupplement !== undefined) {
+      records = records.filter(r => r.isSupplement === filter.isSupplement)
+    }
+    if (filter.batchId) {
+      records = records.filter(r => r.batchId === filter.batchId)
+    }
+    
+    return records.sort((a, b) => new Date(b.sampleTime) - new Date(a.sampleTime))
   }
 
-  getNotes() {
-    return this.notes
+  getRecordById(recordId) {
+    return this.records.find(r => r.id === recordId) || null
+  }
+
+  getNotes(filter = {}) {
+    let notes = [...this.notes]
+    
+    if (filter.recordId) {
+      notes = notes.filter(n => n.recordId === filter.recordId)
+    }
+    if (filter.batchId) {
+      notes = notes.filter(n => n.batchId === filter.batchId)
+    }
+    if (filter.isHandwritten !== undefined) {
+      notes = notes.filter(n => n.isHandwritten === filter.isHandwritten)
+    }
+    
+    return notes.sort((a, b) => new Date(b.createTime) - new Date(a.createTime))
   }
 
   getImportHistory() {
-    return this.importHistory
+    return [...this.importHistory].reverse()
+  }
+
+  getRecordDetail(recordId) {
+    const record = this.getRecordById(recordId)
+    if (!record) return null
+    
+    const notes = this.getNotes({ recordId })
+    const changeLogs = this.getChangeLogs({ entityType: 'record', entityId: recordId })
+    
+    let supplements = []
+    let originalRecord = null
+    
+    if (record.isSupplement) {
+      originalRecord = this.getRecordById(record.originalRecordId)
+    } else {
+      supplements = this.records.filter(r => r.originalRecordId === recordId)
+    }
+    
+    const relatedMissing = this.missingTimeRecords.filter(m => 
+      m.previousRecord?.id === recordId || m.nextRecord?.id === recordId
+    )
+    
+    const relatedConflicts = this.conflicts.filter(c => c.recordId === recordId)
+    
+    return {
+      record,
+      notes,
+      changeLogs,
+      supplements,
+      originalRecord,
+      relatedMissing,
+      relatedConflicts
+    }
   }
 }

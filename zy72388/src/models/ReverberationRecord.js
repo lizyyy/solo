@@ -13,6 +13,9 @@ export class ReverberationRecord {
     this.originalRecordId = data.originalRecordId || null
     this.keepMissingReason = data.keepMissingReason || ''
     this.status = data.status || 'pending'
+    this.batchId = data.batchId || null
+    this.updatedAt = data.updatedAt || null
+    this.updatedBy = data.updatedBy || ''
   }
 
   generateId() {
@@ -33,7 +36,10 @@ export class ReverberationRecord {
       supplementedBy: this.supplementedBy,
       originalRecordId: this.originalRecordId,
       keepMissingReason: this.keepMissingReason,
-      status: this.status
+      status: this.status,
+      batchId: this.batchId,
+      updatedAt: this.updatedAt,
+      updatedBy: this.updatedBy
     }
   }
 }

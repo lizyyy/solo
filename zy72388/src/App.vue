@@ -78,6 +78,12 @@
         <div class="card-header">
           <h2>📋 混响时间记录</h2>
           <div class="action-buttons">
+            <select v-model="selectedBatchId" class="form-control" style="width: 200px; margin-right: 8px;">
+              <option value="">全部批次</option>
+              <option v-for="batch in batches" :key="batch.id" :value="batch.id">
+                {{ batch.name }} ({{ batch.recordIds.length }}条)
+              </option>
+            </select>
             <button class="btn btn-primary" @click="showImportModal = true">
               导入记录
             </button>
@@ -95,12 +101,12 @@
               <th>频率</th>
               <th>混响时间 T60</th>
               <th>类型</th>
-              <th>状态</th>
+              <th>来源批次</th>
               <th>操作</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="record in records" :key="record.id" class="clickable">
+            <tr v-for="record in filteredRecords" :key="record.id" class="clickable" @click="showRecordDetail(record)">
               <td>{{ formatTime(record.sampleTime) }}</td>
               <td>{{ record.location }}</td>
               <td>{{ record.frequency }} Hz</td>
@@ -111,20 +117,23 @@
                 </span>
               </td>
               <td>
-                <span class="badge badge-info">{{ record.status }}</span>
+                <span class="badge badge-info">{{ getBatchName(record.batchId) }}</span>
               </td>
               <td>
                 <div class="action-buttons">
-                  <button class="btn btn-small btn-secondary" @click="addNoteToRecord(record)">
+                  <button class="btn btn-small btn-secondary" @click.stop="showRecordDetail(record)">
+                    详情
+                  </button>
+                  <button class="btn btn-small btn-secondary" @click.stop="addNoteToRecord(record)">
                     添加备注
                   </button>
-                  <button class="btn btn-small btn-warning" @click="addSupplementToRecord(record)">
+                  <button class="btn btn-small btn-warning" @click.stop="addSupplementToRecord(record)">
                     补录
                   </button>
                 </div>
               </td>
             </tr>
-            <tr v-if="records.length === 0">
+            <tr v-if="filteredRecords.length === 0">
               <td colspan="7">
                 <div class="empty-state">
                   <div class="empty-state-icon">📭</div>
@@ -383,6 +392,14 @@
         </div>
         
         <div class="form-group">
+          <label>批次名称</label>
+          <input type="text" v-model="importForm.batchName" class="form-control" placeholder="例如：2026年6月第一次测量">
+        </div>
+        <div class="form-group">
+          <label>操作人</label>
+          <input type="text" v-model="importForm.operator" class="form-control" placeholder="例如：老岑">
+        </div>
+        <div class="form-group">
           <label>采样时间</label>
           <input type="datetime-local" v-model="importForm.sampleTime" class="form-control">
         </div>
@@ -497,6 +514,123 @@
         </div>
       </div>
     </div>
+
+    <div v-if="showRecordDetailModal" class="modal-overlay" @click.self="showRecordDetailModal = null">
+      <div class="modal modal-large">
+        <div class="modal-header">
+          <h3>📋 记录详情</h3>
+          <button class="modal-close" @click="showRecordDetailModal = null">×</button>
+        </div>
+        
+        <div v-if="recordDetail" class="record-detail">
+          <div class="detail-section">
+            <h4>基本信息</h4>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <span class="detail-label">采样时间：</span>
+                <span class="detail-value">{{ formatTime(recordDetail.record.sampleTime) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">测量地点：</span>
+                <span class="detail-value">{{ recordDetail.record.location }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">频率：</span>
+                <span class="detail-value">{{ recordDetail.record.frequency }} Hz</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">混响时间：</span>
+                <span class="detail-value">{{ recordDetail.record.reverberationTime }} 秒</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">类型：</span>
+                <span class="detail-value">
+                  <span :class="['badge', recordDetail.record.isSupplement ? 'badge-warning' : 'badge-success']">
+                    {{ recordDetail.record.isSupplement ? '补录记录' : '正常记录' }}
+                  </span>
+                </span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">来源批次：</span>
+                <span class="detail-value">
+                  <span class="badge badge-info">{{ getBatchName(recordDetail.record.batchId) }}</span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div v-if="recordDetail.supplements.length > 0" class="detail-section">
+            <h4>📝 补录记录</h4>
+            <div v-for="sup in recordDetail.supplements" :key="sup.id" class="supplement-item">
+              <div class="supplement-header">
+                <span class="badge badge-warning">补录</span>
+                <span>{{ formatTime(sup.sampleTime) }} - {{ sup.reverberationTime }} 秒</span>
+              </div>
+              <div class="supplement-reason">补录原因：{{ sup.supplementReason }}</div>
+              <div class="supplement-operator">补录人：{{ sup.supplementedBy }}</div>
+            </div>
+          </div>
+
+          <div v-if="recordDetail.notes.length > 0" class="detail-section">
+            <h4>📝 巡检备注</h4>
+            <div v-for="note in recordDetail.notes" :key="note.id" class="note-item">
+              <div class="note-header">
+                <span class="badge" :class="note.isHandwritten ? 'badge-warning' : 'badge-info'">
+                  {{ note.isHandwritten ? '手写备注' : '系统备注' }}
+                </span>
+                <span class="note-author">{{ note.author }}</span>
+                <span class="note-time">{{ formatTime(note.createTime) }}</span>
+              </div>
+              <div class="note-content">{{ note.noteContent }}</div>
+            </div>
+          </div>
+
+          <div v-if="recordDetail.relatedMissing.length > 0" class="detail-section">
+            <h4>⏰ 关联的时间缺失</h4>
+            <div v-for="m in recordDetail.relatedMissing" :key="m.id" class="missing-item">
+              <span class="badge" :class="m.status === 'kept' ? 'badge-info' : m.status === 'resolved' ? 'badge-success' : 'badge-warning'">
+                {{ formatMissingStatus(m.status) }}
+              </span>
+              <span>间隔 {{ Math.round(m.gapDuration) }} 分钟</span>
+            </div>
+          </div>
+
+          <div v-if="recordDetail.relatedConflicts.length > 0" class="detail-section">
+            <h4>⚠️ 关联的冲突</h4>
+            <div v-for="c in recordDetail.relatedConflicts" :key="c.id" class="conflict-item">
+              <span class="badge" :class="c.status === 'pending' ? 'badge-danger' : c.status === 'confirmed' ? 'badge-warning' : 'badge-success'">
+                {{ c.status === 'pending' ? '待处理' : c.status === 'confirmed' ? '已确认' : '已驳回' }}
+              </span>
+              <span>备注与阈值冲突</span>
+            </div>
+          </div>
+
+          <div v-if="recordDetail.changeLogs.length > 0" class="detail-section">
+            <h4>📜 变更历史</h4>
+            <div class="change-log-list">
+              <div v-for="log in recordDetail.changeLogs" :key="log.id" class="change-log-item">
+                <div class="change-log-header">
+                  <span class="badge badge-info">{{ formatChangeLogType(log.type) }}</span>
+                  <span class="change-log-operator">{{ log.operator }}</span>
+                  <span class="change-log-time">{{ formatTime(log.timestamp) }}</span>
+                </div>
+                <div class="change-log-desc">{{ log.description }}</div>
+                <div v-if="log.details && Object.keys(log.details).length > 0" class="change-log-details">
+                  <details>
+                    <summary>查看详情</summary>
+                    <pre>{{ JSON.stringify(log.details, null, 2) }}</pre>
+                  </details>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-secondary" @click="showRecordDetailModal = null">关闭</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -515,6 +649,8 @@ export default {
     const activeTab = ref('records')
     const workflowStep = ref(1)
     const records = ref([])
+    const batches = ref([])
+    const selectedBatchId = ref('')
     const missingRecords = ref([])
     const conflicts = ref([])
     const recentMessages = ref([])
@@ -526,13 +662,17 @@ export default {
     const showKeepMissingModalData = ref(null)
     const showNoteModal = ref(null)
     const showMissingDetailModal = ref(null)
+    const showRecordDetailModal = ref(false)
+    const recordDetail = ref(null)
 
     const importForm = ref({
       sampleTime: '',
       location: '',
       frequency: 500,
       reverberationTime: 1.0,
-      materialType: 'normal'
+      materialType: 'normal',
+      batchName: '',
+      operator: ''
     })
 
     const keepReasonForm = ref({
@@ -551,9 +691,32 @@ export default {
       return conflicts.value.filter(c => c.status === 'pending')
     })
 
+    const filteredRecords = computed(() => {
+      if (!selectedBatchId.value) return records.value
+      return records.value.filter(r => r.batchId === selectedBatchId.value)
+    })
+
     const keptMissingRecords = computed(() => {
       return missingRecords.value.filter(m => m.status === 'kept')
     })
+
+    function getBatchName(batchId) {
+      if (!batchId) return '未知批次'
+      const batch = service.getBatchById(batchId)
+      return batch ? batch.name : '未知批次'
+    }
+
+    function formatChangeLogType(type) {
+      const map = {
+        'create': '创建',
+        'update': '更新',
+        'delete': '删除',
+        'detect': '检测',
+        'review': '复核',
+        'supplement': '补录'
+      }
+      return map[type] || type
+    }
 
     function formatTime(timeStr) {
       if (!timeStr) return '-'
@@ -577,6 +740,7 @@ export default {
 
     function refreshData() {
       records.value = service.getRecords()
+      batches.value = service.getBatches()
       missingRecords.value = service.getMissingTimeRecords()
       conflicts.value = service.getConflicts()
       recentMessages.value = messageService.getRecentMessages(5)
@@ -643,7 +807,7 @@ export default {
         { sampleTime: '2026-06-04T11:30:00', location: '会议室A', frequency: 500, reverberationTime: 1.0 }
       ]
 
-      const results = service.importRecords(demoRecords)
+      const results = service.importRecords(demoRecords, '演示用户', '首次导入演示数据')
       const messages = messageService.formatImportResults(results)
       messages.forEach(m => messageService.addCustomMessage(m))
       
@@ -661,12 +825,24 @@ export default {
         materialType: importForm.value.materialType
       }
 
-      const results = service.importRecords([data])
+      const results = service.importRecords(
+        [data],
+        importForm.value.operator || '系统用户',
+        importForm.value.batchName || null
+      )
       const messages = messageService.formatImportResults(results)
       messages.forEach(m => messageService.addCustomMessage(m))
       
       showImportModal.value = false
-      importForm.value = { sampleTime: '', location: '', frequency: 500, reverberationTime: 1.0, materialType: 'normal' }
+      importForm.value = { 
+        sampleTime: '', 
+        location: '', 
+        frequency: 500, 
+        reverberationTime: 1.0, 
+        materialType: 'normal',
+        batchName: '',
+        operator: ''
+      }
       refreshData()
     }
 
@@ -790,6 +966,11 @@ export default {
       showMissingDetailModal.value = missing
     }
 
+    function showRecordDetail(record) {
+      recordDetail.value = service.getRecordDetail(record.id)
+      showRecordDetailModal.value = true
+    }
+
     onMounted(() => {
       refreshData()
     })
@@ -807,6 +988,9 @@ export default {
       activeTab,
       workflowStep,
       records,
+      batches,
+      selectedBatchId,
+      filteredRecords,
       missingRecords,
       conflicts,
       recentMessages,
@@ -816,6 +1000,8 @@ export default {
       showKeepMissingModalData,
       showNoteModal,
       showMissingDetailModal,
+      showRecordDetailModal,
+      recordDetail,
       importForm,
       keepReasonForm,
       noteForm,
@@ -823,6 +1009,8 @@ export default {
       keptMissingRecords,
       formatTime,
       formatMissingStatus,
+      formatChangeLogType,
+      getBatchName,
       loadDemoData,
       importSingleRecord,
       detectMissingTime,
@@ -835,7 +1023,8 @@ export default {
       resolveConflict,
       runSelfCheck,
       exportData,
-      showMissingDetail
+      showMissingDetail,
+      showRecordDetail
     }
   }
 }

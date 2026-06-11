@@ -579,3 +579,140 @@ textarea.form-control {
 .clickable:hover {
   background: #f8f9fa;
 }
+
+.modal-large {
+  max-width: 800px;
+}
+
+.detail-section {
+  margin-bottom: 24px;
+}
+
+.detail-section h4 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #333;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #eee;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.detail-label {
+  font-size: 12px;
+  color: #999;
+}
+
+.detail-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.supplement-item,
+.note-item,
+.missing-item,
+.conflict-item {
+  padding: 12px;
+  background: #fafafa;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.supplement-header,
+.note-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.note-author {
+  font-weight: 500;
+  font-size: 13px;
+}
+
+.note-time {
+  font-size: 12px;
+  color: #999;
+  margin-left: auto;
+}
+
+.note-content,
+.supplement-reason,
+.supplement-operator {
+  font-size: 13px;
+  color: #666;
+}
+
+.supplement-reason {
+  margin-bottom: 4px;
+}
+
+.change-log-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.change-log-item {
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 3px solid #667eea;
+}
+
+.change-log-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.change-log-operator {
+  font-weight: 500;
+  font-size: 13px;
+}
+
+.change-log-time {
+  font-size: 12px;
+  color: #999;
+  margin-left: auto;
+}
+
+.change-log-desc {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.change-log-details details {
+  font-size: 12px;
+  color: #888;
+}
+
+.change-log-details pre {
+  margin-top: 8px;
+  padding: 8px;
+  background: #fff;
+  border-radius: 4px;
+  font-size: 11px;
+  overflow-x: auto;
+}
+
+@media (max-width: 768px) {
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+}

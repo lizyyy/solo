@@ -9,6 +9,10 @@ export class InspectionNote {
     this.confirmed = data.confirmed || false
     this.confirmedBy = data.confirmedBy || ''
     this.confirmedTime = data.confirmedTime || null
+    this.batchId = data.batchId || null
+    this.updatedAt = data.updatedAt || null
+    this.updatedBy = data.updatedBy || ''
+    this.relatedMissingId = data.relatedMissingId || null
   }
 
   generateId() {
@@ -25,7 +29,11 @@ export class InspectionNote {
       isHandwritten: this.isHandwritten,
       confirmed: this.confirmed,
       confirmedBy: this.confirmedBy,
-      confirmedTime: this.confirmedTime
+      confirmedTime: this.confirmedTime,
+      batchId: this.batchId,
+      updatedAt: this.updatedAt,
+      updatedBy: this.updatedBy,
+      relatedMissingId: this.relatedMissingId
     }
   }
 }
