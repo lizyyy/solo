@@ -14,6 +14,12 @@ const stepLabels: Record<number, string> = {
   3: '安全提醒更新',
 };
 
+const recordSourceMap: Record<string, { label: string; classes: string }> = {
+  new: { label: '🆕 新增', classes: 'bg-blue-100 text-blue-700' },
+  reused: { label: '♻️ 复用', classes: 'bg-gray-100 text-gray-600' },
+  id_changed: { label: '🔄 编号变更', classes: 'bg-amber-100 text-amber-700' },
+};
+
 export default function Review() {
   const [searchParams, setSearchParams] = useSearchParams();
   const importId = searchParams.get('importId');
@@ -133,6 +139,10 @@ export default function Review() {
   ).length;
   const anomalyCount = records.filter((r) => r.status === 'anomaly').length;
 
+  const newCount = records.filter((r) => r.record_source === 'new').length;
+  const reusedCount = records.filter((r) => r.record_source === 'reused').length;
+  const idChangedCount = records.filter((r) => r.record_source === 'id_changed').length;
+
   return (
     <div className="space-y-6">
       <StepIndicator currentStep={currentStep} />
@@ -176,6 +186,7 @@ export default function Review() {
                 <th className="px-4 py-3">原始行号</th>
                 <th className="px-4 py-3">传感器ID</th>
                 <th className="px-4 py-3">原传感器ID</th>
+                <th className="px-4 py-3">记录来源</th>
                 <th className="px-4 py-3">状态</th>
                 <th className="px-4 py-3">当前步骤</th>
                 <th className="px-4 py-3">铭牌参数</th>
@@ -210,6 +221,16 @@ export default function Review() {
                     </td>
                     <td className="px-4 py-3 font-mono text-xs">
                       {record.previous_sensor_id ?? '-'}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={cn(
+                          'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium',
+                          recordSourceMap[record.record_source]?.classes ?? 'bg-gray-100 text-gray-600'
+                        )}
+                      >
+                        {recordSourceMap[record.record_source]?.label ?? record.record_source}
+                      </span>
                     </td>
                     <td className="px-4 py-3">
                       <StatusBadge status={record.status} size="sm" />
@@ -411,6 +432,20 @@ export default function Review() {
                 </div>
               );
             })}
+          </div>
+        </div>
+        <div className="mt-4">
+          <div className="text-sm font-medium text-gray-600">记录来源分布</div>
+          <div className="mt-2 flex gap-6">
+            <div className="text-sm text-blue-600">
+              🆕 新增: <span className="font-medium">{newCount}</span> 条
+            </div>
+            <div className="text-sm text-gray-600">
+              ♻️ 复用: <span className="font-medium">{reusedCount}</span> 条
+            </div>
+            <div className="text-sm text-amber-600">
+              🔄 编号变更: <span className="font-medium">{idChangedCount}</span> 条
+            </div>
           </div>
         </div>
       </section>

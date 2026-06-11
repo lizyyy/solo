@@ -13,6 +13,26 @@ const SCOPE_OPTIONS: { value: ExportScope; label: string }[] = [
   { value: 'pending', label: '仅待复核' },
 ];
 
+const RECORD_SOURCE_LABELS: Record<string, string> = {
+  new: '新增',
+  reused: '复用',
+  id_changed: '编号变更',
+};
+
+const COLUMN_LABELS: Record<string, string> = {
+  id: 'ID',
+  import_id: '导入ID',
+  original_row_number: '原始行号',
+  sensor_id: '传感器ID',
+  previous_sensor_id: '原传感器ID',
+  nameplate_params: '铭牌参数',
+  status: '状态',
+  current_step: '当前步骤',
+  record_source: '记录来源',
+  created_at: '创建时间',
+  updated_at: '更新时间',
+};
+
 export default function Export() {
   const [searchParams, setSearchParams] = useSearchParams();
   const queryImportId = searchParams.get('importId') || '';
@@ -202,7 +222,7 @@ export default function Export() {
                     <tr>
                       {previewColumns.map((col) => (
                         <th key={col} className="text-left px-3 py-2 font-medium text-gray-600 whitespace-nowrap">
-                          {col}
+                          {COLUMN_LABELS[col] || col}
                         </th>
                       ))}
                     </tr>
@@ -212,7 +232,9 @@ export default function Export() {
                       <tr key={idx} className="hover:bg-gray-50">
                         {previewColumns.map((col) => (
                           <td key={col} className="px-3 py-2 text-gray-700 whitespace-nowrap">
-                            {(record as unknown as Record<string, unknown>)[col] != null ? String((record as unknown as Record<string, unknown>)[col]) : '-'}
+                            {col === 'record_source'
+                              ? RECORD_SOURCE_LABELS[(record as unknown as Record<string, unknown>)[col] as string] || String((record as unknown as Record<string, unknown>)[col])
+                              : ((record as unknown as Record<string, unknown>)[col] != null ? String((record as unknown as Record<string, unknown>)[col]) : '-')}
                           </td>
                         ))}
                       </tr>

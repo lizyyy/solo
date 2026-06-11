@@ -97,6 +97,8 @@ router.put('/sensor-change/:changeId/confirm', (req: Request, res: Response): vo
 
     const newStatus = action === 'confirm' ? 'confirmed' : 'rejected'
 
+    const record = db.prepare('SELECT * FROM records WHERE id = ?').get(change.record_id) as Record<string, unknown> | undefined
+
     db.prepare(
       "UPDATE sensor_id_changes SET status = ?, reviewed_by = ?, reviewed_at = datetime('now'), note = ? WHERE id = ?"
     ).run(newStatus, reviewed_by || 'unknown', note || null, changeId)
@@ -105,6 +107,33 @@ router.put('/sensor-change/:changeId/confirm', (req: Request, res: Response): vo
       db.prepare(
         "UPDATE records SET status = 'normal', current_step = 3, updated_at = datetime('now') WHERE id = ?"
       ).run(change.record_id)
+
+      if (record) {
+        db.prepare(
+          'INSERT INTO audit_log (id, record_id, import_id, action, field, old_value, new_value, operator) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+        ).run(
+          uuidv4(), change.record_id, change.import_id,
+          'status_updated', 'status', record.status, 'normal',
+          reviewed_by || 'unknown'
+        )
+        db.prepare(
+          'INSERT INTO audit_log (id, record_id, import_id, action, field, old_value, new_value, operator) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+        ).run(
+          uuidv4(), change.record_id, change.import_id,
+          'step_advanced', 'current_step', String(record.current_step), '3',
+          reviewed_by || 'unknown'
+        )
+      }
+    } else if (action === 'reject') {
+      if (record) {
+        db.prepare(
+          'INSERT INTO audit_log (id, record_id, import_id, action, field, old_value, new_value, operator) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+        ).run(
+          uuidv4(), change.record_id, change.import_id,
+          'sensor_change_rejected', 'status', record.status, record.status,
+          reviewed_by || 'unknown'
+        )
+      }
     }
 
     db.prepare(

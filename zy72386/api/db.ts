@@ -47,6 +47,7 @@ function initTables(db: Database.Database): void {
       nameplate_params TEXT NOT NULL DEFAULT '{}',
       status TEXT NOT NULL DEFAULT 'normal' CHECK(status IN ('normal','sensor_id_changed','anomaly','pending_review')),
       current_step INTEGER NOT NULL DEFAULT 1 CHECK(current_step BETWEEN 1 AND 3),
+      record_source TEXT NOT NULL DEFAULT 'new' CHECK(record_source IN ('new','reused','id_changed')),
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
       updated_at TEXT NOT NULL DEFAULT (datetime('now'))
     );

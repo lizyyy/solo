@@ -8,14 +8,22 @@ function escapeCsvField(value: string): string {
   return `"${String(value).replace(/"/g, '""')}"`
 }
 
+const SOURCE_LABELS: Record<string, string> = {
+  new: '新增',
+  reused: '复用',
+  id_changed: '编号变更',
+}
+
 function buildCsvRows(records: Record<string, unknown>[]): string {
-  const headers = ['序号', '传感器ID', '原传感器ID', '状态', '当前步骤', '铭牌参数', '创建时间', '更新时间']
+  const headers = ['序号', '传感器ID', '原传感器ID', '记录来源', '状态', '当前步骤', '铭牌参数', '创建时间', '更新时间']
   const rows = records.map(r => {
     const params = JSON.parse(String(r.nameplate_params || '{}'))
+    const source = String(r.record_source || 'new')
     return [
       r.original_row_number,
       r.sensor_id,
       r.previous_sensor_id || '',
+      SOURCE_LABELS[source] || source,
       r.status,
       r.current_step,
       JSON.stringify(params),

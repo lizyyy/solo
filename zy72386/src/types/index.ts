@@ -18,6 +18,7 @@ export interface ReviewRecord {
   nameplate_params: string;
   status: 'normal' | 'anomaly' | 'sensor_id_changed';
   current_step: number;
+  record_source: 'new' | 'reused' | 'id_changed';
   created_at: string;
   updated_at: string;
 }

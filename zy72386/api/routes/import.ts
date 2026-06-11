@@ -51,22 +51,42 @@ router.post('/upload', upload.single('file'), (req: Request, res: Response): voi
     let anomalyCount = 0
     const seenSensorIds = new Set<string>()
 
+    const allHistoryRecords = db.prepare(
+      'SELECT id, sensor_id, nameplate_params FROM records ORDER BY created_at ASC'
+    ).all() as { id: string; sensor_id: string; nameplate_params: string }[]
+
+    const findDeviceByKey = (installLocation: string, deviceName: string): { id: string; sensor_id: string } | null => {
+      for (const r of allHistoryRecords) {
+        try {
+          const params = JSON.parse(r.nameplate_params)
+          const loc = params['安装位置'] || ''
+          const name = params['设备名称'] || ''
+          if (installLocation && loc === installLocation) {
+            return { id: r.id, sensor_id: r.sensor_id }
+          }
+          if (deviceName && name && (deviceName === name || deviceName.startsWith(name) || name.startsWith(deviceName))) {
+            return { id: r.id, sensor_id: r.sensor_id }
+          }
+        } catch {
+          continue
+        }
+      }
+      return null
+    }
+
     const transaction = db.transaction(() => {
       db.prepare(
         'INSERT INTO imports (id, batch_label, file_name, total_rows, duplicate_rows, anomaly_count, operator) VALUES (?, ?, ?, ?, ?, ?, ?)'
       ).run(importId, batchLabel, file.originalname, rows.length, 0, 0, operator)
 
       const insertRecord = db.prepare(
-        'INSERT INTO records (id, import_id, original_row_number, sensor_id, previous_sensor_id, nameplate_params, status, current_step) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+        'INSERT INTO records (id, import_id, original_row_number, sensor_id, previous_sensor_id, nameplate_params, status, current_step, record_source) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
       )
       const insertSensorChange = db.prepare(
         'INSERT INTO sensor_id_changes (id, record_id, import_id, old_sensor_id, new_sensor_id, status, stuck_at_step) VALUES (?, ?, ?, ?, ?, ?, ?)'
       )
       const insertAudit = db.prepare(
         'INSERT INTO audit_log (id, record_id, import_id, action, field, old_value, new_value, operator) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
-      )
-      const findExistingSensor = db.prepare(
-        'SELECT id, sensor_id FROM records WHERE sensor_id = ? LIMIT 1'
       )
 
       for (let i = 0; i < rows.length; i++) {
@@ -87,21 +107,28 @@ router.post('/upload', upload.single('file'), (req: Request, res: Response): voi
           seenSensorIds.add(sensorId)
         }
 
-        const existing = findExistingSensor.get(sensorId) as { id: string; sensor_id: string } | undefined
-        if (existing) {
+        const installLocation = String(row['安装位置'] ?? '')
+        const deviceName = String(row['设备名称'] ?? '')
+        const existingDevice = findDeviceByKey(installLocation, deviceName)
+        let recordSource = 'new'
+
+        if (existingDevice && existingDevice.sensor_id !== sensorId) {
           status = 'sensor_id_changed'
-          previousSensorId = existing.sensor_id
+          previousSensorId = existingDevice.sensor_id
           currentStep = 2
           anomalyCount++
+          recordSource = 'id_changed'
+        } else if (existingDevice && existingDevice.sensor_id === sensorId) {
+          recordSource = 'reused'
         }
 
         const nameplateParams = JSON.stringify(row)
-        insertRecord.run(recordId, importId, i + 1, sensorId, previousSensorId, nameplateParams, status, currentStep)
+        insertRecord.run(recordId, importId, i + 1, sensorId, previousSensorId, nameplateParams, status, currentStep, recordSource)
 
-        if (existing) {
+        if (existingDevice && existingDevice.sensor_id !== sensorId) {
           const changeId = uuidv4()
-          insertSensorChange.run(changeId, recordId, importId, existing.sensor_id, sensorId, 'pending_review', 2)
-          insertAudit.run(uuidv4(), recordId, importId, 'sensor_id_changed', 'sensor_id', existing.sensor_id, sensorId, operator)
+          insertSensorChange.run(changeId, recordId, importId, existingDevice.sensor_id, sensorId, 'pending_review', 2)
+          insertAudit.run(uuidv4(), recordId, importId, 'sensor_id_changed', 'sensor_id', existingDevice.sensor_id, sensorId, operator)
         }
 
         insertAudit.run(uuidv4(), recordId, importId, 'record_created', null, null, null, operator)
