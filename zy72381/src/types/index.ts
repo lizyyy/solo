@@ -99,6 +99,7 @@ export interface OperationLog {
   timestamp: string
   oldValue?: unknown
   newValue?: unknown
+  reason?: string
 }
 
 export interface EstimationResult {

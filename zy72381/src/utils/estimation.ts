@@ -1,7 +1,7 @@
 import type { EstimationResult, TemperatureRecord } from '@/types'
 
 const STEEL_EXPANSION_COEFFICIENT = 0.000012
-const DEFAULT_BRIDGE_LENGTH = 1000
+const DEFAULT_BRIDGE_LENGTH = 100000
 
 export function calculateExpansion(
   tempDiff: number,
@@ -12,7 +12,7 @@ export function calculateExpansion(
 }
 
 export function performEstimation(
-  record: TemperatureRecord,
+  record: { tempDiff: number; directionMark?: string; normalizedDirection?: 'positive' | 'negative' } & Partial<TemperatureRecord>,
   manualDirection?: 'positive' | 'negative'
 ): EstimationResult {
   const expansionValue = calculateExpansion(record.tempDiff)

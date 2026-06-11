@@ -44,6 +44,22 @@ app.post('/api/records/import', (req, res) => {
     const recordNo = generateRecordNo(records.length + index + 1)
     const validation = validateDirection(record.directionMark || '')
 
+    let status: TemperatureRecord['status'] = 'imported'
+    let estimatedValue: number | undefined
+
+    if (validation.needsReview) {
+      status = 'pending_review'
+    } else if (validation.isValid) {
+      status = 'success'
+      const tempRecord = {
+        ...record,
+        tempDiff: record.tempDiff || (record.endTemp || 0) - (record.startTemp || 0),
+        normalizedDirection: validation.normalizedDirection
+      }
+      const result = performEstimation(tempRecord)
+      estimatedValue = result.expansionValue
+    }
+
     const newRecord: TemperatureRecord = {
       id: recordId,
       recordNo,
@@ -55,14 +71,15 @@ app.post('/api/records/import', (req, res) => {
       tempDiff: record.tempDiff || (record.endTemp || 0) - (record.startTemp || 0),
       directionMark: record.directionMark || '',
       sensorId: record.sensorId,
-      status: validation.needsReview ? 'pending_review' : 'success',
+      status,
       normalizedDirection: validation.normalizedDirection,
+      estimatedValue,
       operationHistory: [
         {
           id: generateId(),
           type: 'import',
           operator: '何工',
-          description: '通过API导入温度校准记录',
+          description: `通过API导入温度校准记录${estimatedValue ? `，估算伸缩量 ${estimatedValue.toFixed(2)}mm` : ''}`,
           timestamp: new Date().toISOString()
         }
       ],
@@ -79,6 +96,20 @@ app.post('/api/records/import', (req, res) => {
         status: 'pending_review',
         sensorId: record.sensorId,
         description: validation.warning || '方向口径不统一，需实验老师复核',
+        operator: '系统',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      })
+    }
+
+    if (!record.sensorId) {
+      exceptions.push({
+        id: generateId(),
+        recordId,
+        recordNo,
+        exceptionType: 'missing_sensor',
+        status: 'pending',
+        description: '缺失传感器编号，待何工补录',
         operator: '系统',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
@@ -137,6 +168,8 @@ app.post('/api/records/:id/supplement', (req, res) => {
     missingException.exceptionType = 'supplemented'
     missingException.status = 'supplemented'
     missingException.sensorId = sensorNo
+    missingException.description = `缺失传感器编号后补录${sensor.oldCalibrationData && sensor.oldCalibrationData.length > 0 ? '，已关联' + sensorNo + '的旧口径数据' : ''}`
+    missingException.operator = '何工'
     missingException.updatedAt = new Date().toISOString()
   }
 
@@ -186,6 +219,43 @@ app.post('/api/estimate/:id/rerun', (req, res) => {
   res.json(result)
 })
 
+app.post('/api/records/:id/correct', (req, res) => {
+  const { newDirection, reason } = req.body
+  const record = records.find((r) => r.id === req.params.id)
+  if (!record) {
+    return res.status(404).json({ error: '记录不存在' })
+  }
+
+  const oldDirection = record.directionMark
+
+  record.directionMark = newDirection
+  record.status = 'manual_corrected'
+  record.normalizedDirection = newDirection === '负方向' ? 'negative' : 'positive'
+  record.updatedAt = new Date().toISOString()
+  record.operationHistory.push({
+    id: generateId(),
+    type: 'correct',
+    operator: '何工',
+    description: `人工修正方向：${oldDirection} → ${newDirection}`,
+    timestamp: new Date().toISOString(),
+    oldValue: oldDirection,
+    newValue: newDirection,
+    reason: reason || '现场师傅口径不规范，何工根据实际情况修正'
+  })
+
+  const directionException = exceptions.find(
+    (e) => e.recordId === record.id && e.exceptionType === 'direction_mismatch'
+  )
+  if (directionException) {
+    directionException.status = 'resolved'
+    directionException.description = `何工人工修正：${oldDirection} → ${newDirection}${reason ? `，原因：${reason}` : ''}`
+    directionException.operator = '何工'
+    directionException.updatedAt = new Date().toISOString()
+  }
+
+  res.json(record)
+})
+
 app.post('/api/records/:id/review', (req, res) => {
   const { result } = req.body
   const record = records.find((r) => r.id === req.params.id)
@@ -209,6 +279,7 @@ app.post('/api/records/:id/review', (req, res) => {
   )
   if (directionException) {
     directionException.status = 'resolved'
+    directionException.description = `实验老师复核完成：${result === 'negative' ? '确认为负方向' : '判定为录入错误'}`
     directionException.operator = '实验老师'
     directionException.updatedAt = new Date().toISOString()
   }

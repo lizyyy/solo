@@ -28,7 +28,7 @@ interface AppActions {
   removeToast: (id: string) => void
   importRecords: (newRecords: Partial<TemperatureRecord>[]) => void
   supplementSensor: (recordId: string, sensorNo: string) => void
-  manualCorrectDirection: (recordId: string, newDirection: '正方向' | '负方向') => void
+  manualCorrectDirection: (recordId: string, newDirection: '正方向' | '负方向', reason?: string) => void
   rerunEstimation: (recordId: string) => void
   reviewRecord: (recordId: string, result: 'negative' | 'normal') => void
   resetDemoData: () => void
@@ -128,10 +128,19 @@ export const useAppStore = create<AppState & AppActions>((set, get) => ({
       const validation = validateDirection(record.directionMark || '')
       
       let status: RecordStatus = 'imported'
+      let estimatedValue: number | undefined
+      
       if (validation.needsReview) {
         status = 'pending_review'
       } else if (validation.isValid) {
         status = 'success'
+        const tempRecord = {
+          ...record,
+          tempDiff: record.tempDiff || (record.endTemp || 0) - (record.startTemp || 0),
+          normalizedDirection: validation.normalizedDirection
+        }
+        const result = performEstimation(tempRecord)
+        estimatedValue = result.expansionValue
       }
 
       const newRecord: TemperatureRecord = {
@@ -147,6 +156,7 @@ export const useAppStore = create<AppState & AppActions>((set, get) => ({
         sensorId: record.sensorId,
         status,
         normalizedDirection: validation.normalizedDirection,
+        estimatedValue,
         operationHistory: [],
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
@@ -186,12 +196,12 @@ export const useAppStore = create<AppState & AppActions>((set, get) => ({
       addOperationLog(r.id, {
         type: 'import',
         operator: currentOperator,
-        description: '导入温度校准记录'
+        description: `导入温度校准记录${r.estimatedValue ? `，估算伸缩量 ${r.estimatedValue.toFixed(2)}mm` : ''}`
       })
     })
 
     addToast('success', `成功导入 ${importedRecords.length} 条记录`)
-    set({ currentStep: 1 })
+    set({ currentStep: 1, showImportModal: false })
   },
 
   supplementSensor: (recordId, sensorNo) => {
@@ -248,8 +258,8 @@ export const useAppStore = create<AppState & AppActions>((set, get) => ({
     set({ currentStep: 2, showSensorPanel: false })
   },
 
-  manualCorrectDirection: (recordId, newDirection) => {
-    const { addOperationLog, addToast, currentOperator } = get()
+  manualCorrectDirection: (recordId, newDirection, reason = '') => {
+    const { addOperationLog, addToast, currentOperator, exceptions } = get()
     const record = get().records.find((r) => r.id === recordId)
     if (!record) return
 
@@ -272,8 +282,20 @@ export const useAppStore = create<AppState & AppActions>((set, get) => ({
       operator: currentOperator,
       description: `人工修正方向：${record.directionMark} → ${newDirection}`,
       oldValue: record.directionMark,
-      newValue: newDirection
+      newValue: newDirection,
+      reason: reason || '现场师傅口径不规范，何工根据实际情况修正'
     })
+
+    const directionException = exceptions.find(
+      (e) => e.recordId === recordId && e.exceptionType === 'direction_mismatch'
+    )
+    if (directionException) {
+      get().updateException(directionException.id, {
+        status: 'resolved',
+        description: `何工人工修正：${record.directionMark} → ${newDirection}${reason ? `，原因：${reason}` : ''}`,
+        operator: currentOperator
+      })
+    }
 
     addToast('success', `已修正方向：${newDirection}`)
   },
