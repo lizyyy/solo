@@ -1,0 +1,2374 @@
+{
+  "collision": [
+    {
+      "id": "CP-2026-06-00001",
+      "coordinateX": 8703,
+      "coordinateY": 11987,
+      "coordinateZ": -1235,
+      "floor": "F2",
+      "discipline": "机电",
+      "status": "pending",
+      "conclusion": "",
+      "remark": "【封账前最终版】月底张工亲自核对完成，同步后端+CSV。",
+      "isAbnormal": false,
+      "cameraPosition": {
+        "px": 2538,
+        "py": 1944,
+        "pz": 1329
+      },
+      "cameraTarget": {
+        "tx": 4374,
+        "ty": 3180,
+        "tz": -891
+      },
+      "cameraFov": 47,
+      "screenshotUrl": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=60",
+      "createdBy": "DS001",
+      "createdByName": "阿宁",
+      "createdAt": "2026-06-08T14:37:19.853Z",
+      "lastModifiedBy": "EN002",
+      "lastModifiedByName": "张工",
+      "lastModifiedAt": "2026-06-11T15:04:26.361Z",
+      "version": 3
+    },
+    {
+      "id": "CP-2026-06-00002",
+      "coordinateX": 16268,
+      "coordinateY": 13573,
+      "coordinateZ": 4914,
+      "floor": "B1",
+      "discipline": "结构",
+      "status": "pending",
+      "conclusion": "",
+      "remark": "发现阿宁改了BIM备注，需以最新版为准。",
+      "isAbnormal": false,
+      "cameraPosition": {
+        "px": 645,
+        "py": 845,
+        "pz": 1422
+      },
+      "cameraTarget": {
+        "tx": 15034,
+        "ty": 5081,
+        "tz": -5611
+      },
+      "cameraFov": 71,
+      "screenshotUrl": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=60",
+      "createdBy": "DS001",
+      "createdByName": "阿宁",
+      "createdAt": "2026-06-08T20:37:19.853Z",
+      "lastModifiedBy": "EN002",
+      "lastModifiedByName": "张工",
+      "lastModifiedAt": "2026-06-09T01:37:19.853Z",
+      "version": 3
+    },
+    {
+      "id": "CP-2026-06-00003",
+      "coordinateX": 4883,
+      "coordinateY": 3452,
+      "coordinateZ": 8206,
+      "floor": "F1",
+      "discipline": "机电",
+      "status": "waived",
+      "conclusion": "豁免，合并至CP-2026-06-00001。",
+      "remark": "",
+      "isAbnormal": true,
+      "abnormalReason": "该碰撞点与CP-2026-06-00001为同一构件同一问题，按重复记录豁免，不重复签发变更单。",
+      "cameraPosition": {
+        "px": 857,
+        "py": 2782,
+        "pz": 1497
+      },
+      "cameraTarget": {
+        "tx": 8335,
+        "ty": 5366,
+        "tz": -3267
+      },
+      "cameraFov": 69,
+      "screenshotUrl": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=60",
+      "createdBy": "DS001",
+      "createdByName": "阿宁",
+      "createdAt": "2026-06-09T02:37:19.853Z",
+      "lastModifiedBy": "EN002",
+      "lastModifiedByName": "张工",
+      "lastModifiedAt": "2026-06-09T05:37:19.853Z",
+      "version": 4
+    },
+    {
+      "id": "CP-2026-06-00004",
+      "coordinateX": 9430,
+      "coordinateY": 14787,
+      "coordinateZ": 11098,
+      "floor": "B2",
+      "discipline": "建筑",
+      "status": "resolved",
+      "conclusion": "留洞扩大为800x800，签变更B2-BG-017。",
+      "remark": "需等设计院回复留洞放大尺寸。",
+      "isAbnormal": false,
+      "cameraPosition": {
+        "px": 2301,
+        "py": 1021,
+        "pz": 1124
+      },
+      "cameraTarget": {
+        "tx": 16960,
+        "ty": 3223,
+        "tz": 4010
+      },
+      "cameraFov": 48,
+      "screenshotUrl": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=60",
+      "createdBy": "DS001",
+      "createdByName": "阿宁",
+      "createdAt": "2026-06-09T08:37:19.853Z",
+      "lastModifiedBy": "EN003",
+      "lastModifiedByName": "李工",
+      "lastModifiedAt": "2026-06-10T00:37:19.853Z",
+      "version": 5
+    },
+    {
+      "id": "CP-2026-06-00005",
+      "coordinateX": 9656,
+      "coordinateY": 8810,
+      "coordinateZ": 838,
+      "floor": "B1",
+      "discipline": "机电",
+      "status": "pending",
+      "conclusion": "施工误差范围内，豁免",
+      "remark": "已同步给设计院",
+      "isAbnormal": false,
+      "cameraPosition": {
+        "px": 823,
+        "py": 2729,
+        "pz": 1229
+      },
+      "cameraTarget": {
+        "tx": 6804,
+        "ty": 4087,
+        "tz": -1780
+      },
+      "cameraFov": 53,
+      "screenshotUrl": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=60",
+      "createdBy": "DS001",
+      "createdByName": "阿宁",
+      "createdAt": "2026-06-09T00:37:19.853Z",
+      "lastModifiedBy": "DS001",
+      "lastModifiedByName": "李工",
+      "lastModifiedAt": "2026-06-09T03:37:19.853Z",
+      "version": 1
+    },
+    {
+      "id": "CP-2026-06-00006",
+      "coordinateX": 14379,
+      "coordinateY": 9585,
+      "coordinateZ": -1075,
+      "floor": "B1",
+      "discipline": "建筑",
+      "status": "resolved",
+      "conclusion": "已通过设计院复核，按变更单处理",
+      "remark": "与施工队沟通中",
+      "isAbnormal": false,
+      "cameraPosition": {
+        "px": 2533,
+        "py": 1960,
+        "pz": 1204
+      },
+      "cameraTarget": {
+        "tx": 6659,
+        "ty": 3982,
+        "tz": -1974
+      },
+      "cameraFov": 68,
+      "screenshotUrl": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=60",
+      "createdBy": "DS001",
+      "createdByName": "阿宁",
+      "createdAt": "2026-06-09T02:37:19.853Z",
+      "lastModifiedBy": "DS001",
+      "lastModifiedByName": "李工",
+      "lastModifiedAt": "2026-06-09T05:37:19.853Z",
+      "version": 1
+    },
+    {
+      "id": "CP-2026-06-00007",
+      "coordinateX": 17655,
+      "coordinateY": 13389,
+      "coordinateZ": 8004,
+      "floor": "F3",
+      "discipline": "机电",
+      "status": "resolved",
+      "conclusion": "已通过设计院复核，按变更单处理",
+      "remark": "算法复核通过",
+      "isAbnormal": false,
+      "cameraPosition": {
+        "px": 2896,
+        "py": 1009,
+        "pz": 1664
+      },
+      "cameraTarget": {
+        "tx": 18346,
+        "ty": 5490,
+        "tz": -629
+      },
+      "cameraFov": 73,
+      "screenshotUrl": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=60",
+      "createdBy": "DS001",
+      "createdByName": "阿宁",
+      "createdAt": "2026-06-09T04:37:19.853Z",
+      "lastModifiedBy": "EN003",
+      "lastModifiedByName": "张工",
+      "lastModifiedAt": "2026-06-09T07:37:19.853Z",
+      "version": 3
+    },
+    {
+      "id": "CP-2026-06-00008",
+      "coordinateX": 16824,
+      "coordinateY": 14714,
+      "coordinateZ": -5154,
+      "floor": "B2",
+      "discipline": "结构",
+      "status": "pending",
+      "conclusion": "已通过设计院复核，按变更单处理",
+      "remark": "与施工队沟通中",
+      "isAbnormal": false,
+      "cameraPosition": {
+        "px": 1350,
+        "py": 2276,
+        "pz": 664
+      },
+      "cameraTarget": {
+        "tx": 11694,
+        "ty": 9924,
+        "tz": -2542
+      },
+      "cameraFov": 64,
+      "screenshotUrl": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=60",
+      "createdBy": "DS001",
+      "createdByName": "阿宁",
+      "createdAt": "2026-06-09T06:37:19.853Z",
+      "lastModifiedBy": "EN002",
+      "lastModifiedByName": "阿宁",
+      "lastModifiedAt": "2026-06-09T09:37:19.853Z",
+      "version": 3
+    },
+    {
+      "id": "CP-2026-06-00009",
+      "coordinateX": 11637,
+      "coordinateY": 10228,
+      "coordinateZ": 6791,
+      "floor": "F2",
+      "discipline": "建筑",
+      "status": "pending",
+      "conclusion": "施工误差范围内，豁免",
+      "remark": "算法复核通过",
+      "isAbnormal": false,
+      "cameraPosition": {
+        "px": 2877,
+        "py": 1691,
+        "pz": 1651
+      },
+      "cameraTarget": {
+        "tx": 13740,
+        "ty": 7776,
+        "tz": -880
+      },
+      "cameraFov": 62,
+      "screenshotUrl": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=60",
+      "createdBy": "DS001",
+      "createdByName": "阿宁",
+      "createdAt": "2026-06-09T08:37:19.853Z",
+      "lastModifiedBy": "EN003",
+      "lastModifiedByName": "李工",
+      "lastModifiedAt": "2026-06-09T11:37:19.853Z",
+      "version": 1
+    },
+    {
+      "id": "CP-2026-06-00010",
+      "coordinateX": 12371,
+      "coordinateY": 11564,
+      "coordinateZ": 3233,
+      "floor": "F1",
+      "discipline": "建筑",
+      "status": "resolved",
+      "conclusion": "施工误差范围内，豁免",
+      "remark": "已同步给设计院",
+      "isAbnormal": false,
+      "cameraPosition": {
+        "px": 2080,
+        "py": 1394,
+        "pz": 567
+      },
+      "cameraTarget": {
+        "tx": 13149,
+        "ty": 7318,
+        "tz": -2998
+      },
+      "cameraFov": 60,
+      "screenshotUrl": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=60",
+      "createdBy": "DS001",
+      "createdByName": "阿宁",
+      "createdAt": "2026-06-09T10:37:19.853Z",
+      "lastModifiedBy": "EN002",
+      "lastModifiedByName": "阿宁",
+      "lastModifiedAt": "2026-06-09T13:37:19.853Z",
+      "version": 1
+    },
+    {
+      "id": "CP-2026-06-00011",
+      "coordinateX": 16385,
+      "coordinateY": 10951,
+      "coordinateZ": 3354,
+      "floor": "F3",
+      "discipline": "结构",
+      "status": "pending",
+      "conclusion": "现场调整后满足规范",
+      "remark": "与施工队沟通中",
+      "isAbnormal": false,
+      "cameraPosition": {
+        "px": 2841,
+        "py": 2333,
+        "pz": 1324
+      },
+      "cameraTarget": {
+        "tx": 15693,
+        "ty": 2878,
+        "tz": -4077
+      },
+      "cameraFov": 62,
+      "screenshotUrl": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=60",
+      "createdBy": "DS001",
+      "createdByName": "阿宁",
+      "createdAt": "2026-06-09T12:37:19.853Z",
+      "lastModifiedBy": "EN002",
+      "lastModifiedByName": "阿宁",
+      "lastModifiedAt": "2026-06-09T15:37:19.853Z",
+      "version": 3
+    },
+    {
+      "id": "CP-2026-06-00012",
+      "coordinateX": 19658,
+      "coordinateY": 2996,
+      "coordinateZ": -1240,
+      "floor": "F2",
+      "discipline": "建筑",
+      "status": "resolved",
+      "conclusion": "施工误差范围内，豁免",
+      "remark": "算法复核通过",
+      "isAbnormal": false,
+      "cameraPosition": {
+        "px": 2985,
+        "py": 1677,
+        "pz": 795
+      },
+      "cameraTarget": {
+        "tx": 11567,
+        "ty": 12330,
+        "tz": -4844
+      },
+      "cameraFov": 74,
+      "screenshotUrl": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=60",
+      "createdBy": "DS001",
+      "createdByName": "阿宁",
+      "createdAt": "2026-06-09T14:37:19.853Z",
+      "lastModifiedBy": "DS001",
+      "lastModifiedByName": "阿宁",
+      "lastModifiedAt": "2026-06-09T17:37:19.853Z",
+      "version": 2
+    }
+  ],
+  "material": [
+    {
+      "id": "MT-mq9lq6i56950c59a",
+      "collisionId": "CP-2026-06-00001",
+      "type": "bim_note",
+      "content": "F2-07轴/C轴 机电水管 BIM备注：冷水管DN80穿梁预留洞已按图施工，与消防主管净距不满足规范要求，提请设计院确认。",
+      "md5": "8cf9e2d53d0cd7c442c835e47ff0fc45",
+      "uploader": "DS001",
+      "uploaderName": "阿宁",
+      "uploadedAt": "2026-06-08T14:37:19.853Z",
+      "version": 1
+    },
+    {
+      "id": "MT-mq9lq6i50454ba56",
+      "collisionId": "CP-2026-06-00001",
+      "type": "boundary_sample",
+      "content": "边界样本：轴线坐标X=12450,Y=8760；预留洞中心标高+4.250；梁宽300x600。",
+      "md5": "12505f74b0bb8dbe3ffcb45f2c9d8693",
+      "uploader": "DS001",
+      "uploaderName": "阿宁",
+      "uploadedAt": "2026-06-08T14:37:19.853Z",
+      "version": 1
+    },
+    {
+      "id": "MT-mq9lq6i58231d7c4",
+      "collisionId": "CP-2026-06-00001",
+      "type": "verbal_note",
+      "content": "阿宁口头说明：现场监理催单，请3日内回复处理意见。",
+      "md5": "8bd400640f180ebe3406891669866abb",
+      "uploader": "DS001",
+      "uploaderName": "阿宁",
+      "uploadedAt": "2026-06-08T14:37:19.853Z",
+      "version": 1
+    },
+    {
+      "id": "MT-mq9lq6i62907bfcc",
+      "collisionId": "CP-2026-06-00002",
+      "type": "bim_note",
+      "content": "B1-12轴/E轴 结构柱 BIM备注：KZ-5原定位X=16200,Y=9400，现场定位偏移约150mm。",
+      "md5": "bbbb373514a8880cf630acafb1558039",
+      "uploader": "DS001",
+      "uploaderName": "阿宁",
+      "uploadedAt": "2026-06-08T20:37:19.853Z",
+      "version": 1
+    },
+    {
+      "id": "MT-mq9lq6i662c62b33",
+      "collisionId": "CP-2026-06-00002",
+      "type": "boundary_sample",
+      "content": "边界样本：柱截面600x600；相关构件：桥架CT-400x200标高-2.800；相邻风管1250x500。",
+      "md5": "d108ab562641420ea83565a5934a27a0",
+      "uploader": "DS001",
+      "uploaderName": "阿宁",
+      "uploadedAt": "2026-06-08T20:37:19.853Z",
+      "version": 1
+    },
+    {
+      "id": "MT-mq9lq6i6613d7203",
+      "collisionId": "CP-2026-06-00002",
+      "type": "verbal_note",
+      "content": "口头说明：阿宁11:30来电说现场重新测了，改250mm。",
+      "md5": "c754a0b8e69bad7d406c785699ada1ac",
+      "uploader": "DS001",
+      "uploaderName": "阿宁",
+      "uploadedAt": "2026-06-08T20:37:19.853Z",
+      "version": 1
+    },
+    {
+      "id": "MT-mq9lq6i6c64717a0",
+      "collisionId": "CP-2026-06-00002",
+      "type": "bim_note",
+      "content": "【修改版】B1-12轴/E轴 结构柱 BIM备注：KZ-5原定位X=16200,Y=9400，现场定位偏移约250mm（施工队复核后确认是250mm，前版150mm有误），请按250mm处理。",
+      "md5": "9ffa387bd22fcf8bcb8616376da34cf5",
+      "uploader": "DS001",
+      "uploaderName": "阿宁",
+      "uploadedAt": "2026-06-09T00:37:19.853Z",
+      "version": 2,
+      "previousId": "MT-mq9lq6i62907bfcc"
+    },
+    {
+      "id": "MT-mq9lq6i6672a6b16",
+      "collisionId": "CP-2026-06-00003",
+      "type": "bim_note",
+      "content": "F1-04轴/B轴 暖通风管 BIM备注：送风风管1000x400与喷淋干管重叠，与CP-2026-06-00001相同。",
+      "md5": "1a9ac65ea2564b3d45c657c7fd2318ce",
+      "uploader": "DS001",
+      "uploaderName": "阿宁",
+      "uploadedAt": "2026-06-09T02:37:19.853Z",
+      "version": 1
+    },
+    {
+      "id": "MT-mq9lq6i64b8f6928",
+      "collisionId": "CP-2026-06-00003",
+      "type": "boundary_sample",
+      "content": "边界样本：X=6200,Y=3100;风管底标高+3.850；喷淋管DN150标高+3.800。",
+      "md5": "68ea773bb80aa6f21194c27d0d1805cd",
+      "uploader": "DS001",
+      "uploaderName": "阿宁",
+      "uploadedAt": "2026-06-09T02:37:19.853Z",
+      "version": 1
+    },
+    {
+      "id": "MT-mq9lq6i67f9501d2",
+      "collisionId": "CP-2026-06-00003",
+      "type": "verbal_note",
+      "content": "口头说明：阿宁说这条和CP-2026-06-00001是同一问题，不要重复开单。",
+      "md5": "975002821bbf5222e089cb5c1a15f096",
+      "uploader": "DS001",
+      "uploaderName": "阿宁",
+      "uploadedAt": "2026-06-09T02:37:19.853Z",
+      "version": 1
+    },
+    {
+      "id": "MT-mq9lq6i69d2d75df",
+      "collisionId": "CP-2026-06-00004",
+      "type": "bim_note",
+      "content": "B2-03轴/A轴 建筑墙体 BIM备注：人防隔墙预留洞口600x600，机电专业反馈不够，需放大。",
+      "md5": "4fd960155bfb87fef6320fc44bc4b5fd",
+      "uploader": "DS001",
+      "uploaderName": "阿宁",
+      "uploadedAt": "2026-06-09T08:37:19.853Z",
+      "version": 1
+    },
+    {
+      "id": "MT-mq9lq6i6096eb73b",
+      "collisionId": "CP-2026-06-00004",
+      "type": "boundary_sample",
+      "content": "边界样本：人防墙厚400；原洞中心标高-4.600；相关风管700x500穿洞。",
+      "md5": "2893e2d4445a46ead5a0937e219a096f",
+      "uploader": "DS001",
+      "uploaderName": "阿宁",
+      "uploadedAt": "2026-06-09T08:37:19.853Z",
+      "version": 1
+    },
+    {
+      "id": "MT-mq9lq6i61221c185",
+      "collisionId": "CP-2026-06-00004",
+      "type": "supplement",
+      "content": "设计院口头说明：阿宁23:15微信确认，留洞放大至800x800。",
+      "md5": "1cc1f1e1418db9cceeb29223df903de1",
+      "uploader": "EN003",
+      "uploaderName": "李工",
+      "uploadedAt": "2026-06-09T14:37:19.853Z",
+      "version": 1
+    },
+    {
+      "id": "MT-mq9lq6i61518fb95",
+      "collisionId": "CP-2026-06-00005",
+      "type": "bim_note",
+      "content": "B1层 机电专业 构件碰撞BIM备注。",
+      "md5": "4cc2beac7ee964214c6cfa27f1c5fe9d",
+      "uploader": "DS001",
+      "uploaderName": "阿宁",
+      "uploadedAt": "2026-06-09T00:37:19.853Z",
+      "version": 1
+    },
+    {
+      "id": "MT-mq9lq6i6dbeb3f21",
+      "collisionId": "CP-2026-06-00005",
+      "type": "boundary_sample",
+      "content": "边界样本：坐标X=9656,Y=8810,Z=838",
+      "md5": "7edfae0d8ee037fd5988902791065b11",
+      "uploader": "DS001",
+      "uploaderName": "阿宁",
+      "uploadedAt": "2026-06-09T00:37:19.853Z",
+      "version": 1
+    },
+    {
+      "id": "MT-mq9lq6i663163b09",
+      "collisionId": "CP-2026-06-00006",
+      "type": "bim_note",
+      "content": "B1层 建筑专业 构件碰撞BIM备注。",
+      "md5": "4218a45e4ae2985edb8e20f311944fdd",
+      "uploader": "DS001",
+      "uploaderName": "阿宁",
+      "uploadedAt": "2026-06-09T02:37:19.853Z",
+      "version": 1
+    },
+    {
+      "id": "MT-mq9lq6i6c27c3fb4",
+      "collisionId": "CP-2026-06-00006",
+      "type": "boundary_sample",
+      "content": "边界样本：坐标X=14379,Y=9585,Z=-1075",
+      "md5": "184c030aed79600565b1b88f466838c3",
+      "uploader": "DS001",
+      "uploaderName": "阿宁",
+      "uploadedAt": "2026-06-09T02:37:19.853Z",
+      "version": 1
+    },
+    {
+      "id": "MT-mq9lq6i617b972f4",
+      "collisionId": "CP-2026-06-00007",
+      "type": "bim_note",
+      "content": "F3层 机电专业 构件碰撞BIM备注。",
+      "md5": "c29023f25f80dec832ad139616979ca6",
+      "uploader": "DS001",
+      "uploaderName": "阿宁",
+      "uploadedAt": "2026-06-09T04:37:19.853Z",
+      "version": 1
+    },
+    {
+      "id": "MT-mq9lq6i688d2c005",
+      "collisionId": "CP-2026-06-00007",
+      "type": "boundary_sample",
+      "content": "边界样本：坐标X=17655,Y=13389,Z=8004",
+      "md5": "4f84738a9526f31151f39441aab12fd5",
+      "uploader": "DS001",
+      "uploaderName": "阿宁",
+      "uploadedAt": "2026-06-09T04:37:19.853Z",
+      "version": 1
+    },
+    {
+      "id": "MT-mq9lq6i6e82ab8dd",
+      "collisionId": "CP-2026-06-00008",
+      "type": "bim_note",
+      "content": "B2层 结构专业 构件碰撞BIM备注。",
+      "md5": "bca99fcb4a4ba486c0dd7b4f47e7aa92",
+      "uploader": "DS001",
+      "uploaderName": "阿宁",
+      "uploadedAt": "2026-06-09T06:37:19.853Z",
+      "version": 1
+    },
+    {
+      "id": "MT-mq9lq6i60edc8446",
+      "collisionId": "CP-2026-06-00008",
+      "type": "boundary_sample",
+      "content": "边界样本：坐标X=16824,Y=14714,Z=-5154",
+      "md5": "ef923294078103848f0b1be918f48fb5",
+      "uploader": "DS001",
+      "uploaderName": "阿宁",
+      "uploadedAt": "2026-06-09T06:37:19.853Z",
+      "version": 1
+    },
+    {
+      "id": "MT-mq9lq6i610a3890b",
+      "collisionId": "CP-2026-06-00009",
+      "type": "bim_note",
+      "content": "F2层 建筑专业 构件碰撞BIM备注。",
+      "md5": "ec1f9abaddcc7930c7357e82c8debfff",
+      "uploader": "DS001",
+      "uploaderName": "阿宁",
+      "uploadedAt": "2026-06-09T08:37:19.853Z",
+      "version": 1
+    },
+    {
+      "id": "MT-mq9lq6i6facf75e2",
+      "collisionId": "CP-2026-06-00009",
+      "type": "boundary_sample",
+      "content": "边界样本：坐标X=11637,Y=10228,Z=6791",
+      "md5": "11feaa2b74db6a6f8f800e72d46662d7",
+      "uploader": "DS001",
+      "uploaderName": "阿宁",
+      "uploadedAt": "2026-06-09T08:37:19.853Z",
+      "version": 1
+    },
+    {
+      "id": "MT-mq9lq6i666788e65",
+      "collisionId": "CP-2026-06-00010",
+      "type": "bim_note",
+      "content": "F1层 建筑专业 构件碰撞BIM备注。",
+      "md5": "938d9ed133ebfa2d7e76c2f69e19aaa1",
+      "uploader": "DS001",
+      "uploaderName": "阿宁",
+      "uploadedAt": "2026-06-09T10:37:19.853Z",
+      "version": 1
+    },
+    {
+      "id": "MT-mq9lq6i6872a1a94",
+      "collisionId": "CP-2026-06-00010",
+      "type": "boundary_sample",
+      "content": "边界样本：坐标X=12371,Y=11564,Z=3233",
+      "md5": "93423a173fddd4fe3fb5c7b371f975d6",
+      "uploader": "DS001",
+      "uploaderName": "阿宁",
+      "uploadedAt": "2026-06-09T10:37:19.853Z",
+      "version": 1
+    },
+    {
+      "id": "MT-mq9lq6i624a95fdf",
+      "collisionId": "CP-2026-06-00011",
+      "type": "bim_note",
+      "content": "F3层 结构专业 构件碰撞BIM备注。",
+      "md5": "19406c34b17819212bb4f37b23da682f",
+      "uploader": "DS001",
+      "uploaderName": "阿宁",
+      "uploadedAt": "2026-06-09T12:37:19.853Z",
+      "version": 1
+    },
+    {
+      "id": "MT-mq9lq6i61751c5ce",
+      "collisionId": "CP-2026-06-00011",
+      "type": "boundary_sample",
+      "content": "边界样本：坐标X=16385,Y=10951,Z=3354",
+      "md5": "ef7aa7be870033e7db3197250106541d",
+      "uploader": "DS001",
+      "uploaderName": "阿宁",
+      "uploadedAt": "2026-06-09T12:37:19.853Z",
+      "version": 1
+    },
+    {
+      "id": "MT-mq9lq6i6691d68e3",
+      "collisionId": "CP-2026-06-00012",
+      "type": "bim_note",
+      "content": "F2层 建筑专业 构件碰撞BIM备注。",
+      "md5": "ec1f9abaddcc7930c7357e82c8debfff",
+      "uploader": "DS001",
+      "uploaderName": "阿宁",
+      "uploadedAt": "2026-06-09T14:37:19.853Z",
+      "version": 1
+    },
+    {
+      "id": "MT-mq9lq6i62e37afd8",
+      "collisionId": "CP-2026-06-00012",
+      "type": "boundary_sample",
+      "content": "边界样本：坐标X=19658,Y=2996,Z=-1240",
+      "md5": "1715eba5a7376ac696d0801cacdaa107",
+      "uploader": "DS001",
+      "uploaderName": "阿宁",
+      "uploadedAt": "2026-06-09T14:37:19.853Z",
+      "version": 1
+    }
+  ],
+  "version_snapshot": [
+    {
+      "id": "VS-mq9lq6i5bf858939",
+      "collisionId": "CP-2026-06-00001",
+      "version": 1,
+      "changedBy": "DS001",
+      "changedByName": "阿宁",
+      "changedAt": "2026-06-08T14:37:19.853Z",
+      "changeType": "remark",
+      "changeReason": "阿宁提交初始材料",
+      "fieldDiffs": [
+        {
+          "field": "(创建)",
+          "oldValue": null,
+          "newValue": "初始记录 v1"
+        }
+      ],
+      "snapshot": {
+        "id": "CP-2026-06-00001",
+        "coordinateX": 8703,
+        "coordinateY": 11987,
+        "coordinateZ": -1235,
+        "floor": "F2",
+        "discipline": "机电",
+        "status": "pending",
+        "conclusion": "",
+        "remark": "",
+        "isAbnormal": false,
+        "cameraPosition": {
+          "px": 2538,
+          "py": 1944,
+          "pz": 1329
+        },
+        "cameraTarget": {
+          "tx": 4374,
+          "ty": 3180,
+          "tz": -891
+        },
+        "cameraFov": 47,
+        "screenshotUrl": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=60",
+        "createdBy": "DS001",
+        "createdByName": "阿宁",
+        "createdAt": "2026-06-08T14:37:19.853Z",
+        "lastModifiedBy": "DS001",
+        "lastModifiedByName": "阿宁",
+        "lastModifiedAt": "2026-06-08T14:37:19.853Z",
+        "version": 1
+      }
+    },
+    {
+      "id": "VS-mq9lq6i5c14f2113",
+      "collisionId": "CP-2026-06-00001",
+      "version": 2,
+      "changedBy": "EN002",
+      "changedByName": "张工",
+      "changedAt": "2026-06-08T15:37:19.853Z",
+      "changeType": "remark",
+      "fieldDiffs": [
+        {
+          "field": "remark",
+          "oldValue": "",
+          "newValue": "复核图纸后确认按原碰撞结论处理。"
+        },
+        {
+          "field": "version",
+          "oldValue": 1,
+          "newValue": 2
+        }
+      ],
+      "snapshot": {
+        "id": "CP-2026-06-00001",
+        "coordinateX": 8703,
+        "coordinateY": 11987,
+        "coordinateZ": -1235,
+        "floor": "F2",
+        "discipline": "机电",
+        "status": "pending",
+        "conclusion": "",
+        "remark": "复核图纸后确认按原碰撞结论处理。",
+        "isAbnormal": false,
+        "cameraPosition": {
+          "px": 2538,
+          "py": 1944,
+          "pz": 1329
+        },
+        "cameraTarget": {
+          "tx": 4374,
+          "ty": 3180,
+          "tz": -891
+        },
+        "cameraFov": 47,
+        "screenshotUrl": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=60",
+        "createdBy": "DS001",
+        "createdByName": "阿宁",
+        "createdAt": "2026-06-08T14:37:19.853Z",
+        "lastModifiedBy": "EN002",
+        "lastModifiedByName": "张工",
+        "lastModifiedAt": "2026-06-08T15:37:19.853Z",
+        "version": 2
+      }
+    },
+    {
+      "id": "VS-mq9lq6i6eb58a003",
+      "collisionId": "CP-2026-06-00002",
+      "version": 1,
+      "changedBy": "DS001",
+      "changedByName": "阿宁",
+      "changedAt": "2026-06-08T20:37:19.853Z",
+      "changeType": "remark",
+      "changeReason": "阿宁提交初始材料",
+      "fieldDiffs": [
+        {
+          "field": "(创建)",
+          "oldValue": null,
+          "newValue": "初始记录 v1"
+        }
+      ],
+      "snapshot": {
+        "id": "CP-2026-06-00002",
+        "coordinateX": 16268,
+        "coordinateY": 13573,
+        "coordinateZ": 4914,
+        "floor": "B1",
+        "discipline": "结构",
+        "status": "pending",
+        "conclusion": "",
+        "remark": "",
+        "isAbnormal": false,
+        "cameraPosition": {
+          "px": 645,
+          "py": 845,
+          "pz": 1422
+        },
+        "cameraTarget": {
+          "tx": 15034,
+          "ty": 5081,
+          "tz": -5611
+        },
+        "cameraFov": 71,
+        "screenshotUrl": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=60",
+        "createdBy": "DS001",
+        "createdByName": "阿宁",
+        "createdAt": "2026-06-08T20:37:19.853Z",
+        "lastModifiedBy": "DS001",
+        "lastModifiedByName": "阿宁",
+        "lastModifiedAt": "2026-06-08T20:37:19.853Z",
+        "version": 1
+      }
+    },
+    {
+      "id": "VS-mq9lq6i6cffff7d6",
+      "collisionId": "CP-2026-06-00002",
+      "version": 2,
+      "changedBy": "DS001",
+      "changedByName": "阿宁",
+      "changedAt": "2026-06-09T00:37:19.853Z",
+      "changeType": "material_modify",
+      "changeReason": "现场复核后偏移量有误，更正为250mm",
+      "fieldDiffs": [
+        {
+          "field": "content",
+          "oldValue": "B1-12轴/E轴 结构柱 BIM备注：KZ-5原定位X=16200,Y=9400，现场定位偏移约150mm。",
+          "newValue": "【修改版】B1-12轴/E轴 结构柱 BIM备注：KZ-5原定位X=16200,Y=9400，现场定位偏移约250mm（施工队复核后确认是250mm，前版150mm有误），请按250mm处理。"
+        }
+      ],
+      "snapshot": {
+        "id": "CP-2026-06-00002",
+        "coordinateX": 16268,
+        "coordinateY": 13573,
+        "coordinateZ": 4914,
+        "floor": "B1",
+        "discipline": "结构",
+        "status": "pending",
+        "conclusion": "",
+        "remark": "",
+        "isAbnormal": false,
+        "cameraPosition": {
+          "px": 645,
+          "py": 845,
+          "pz": 1422
+        },
+        "cameraTarget": {
+          "tx": 15034,
+          "ty": 5081,
+          "tz": -5611
+        },
+        "cameraFov": 71,
+        "screenshotUrl": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=60",
+        "createdBy": "DS001",
+        "createdByName": "阿宁",
+        "createdAt": "2026-06-08T20:37:19.853Z",
+        "lastModifiedBy": "DS001",
+        "lastModifiedByName": "阿宁",
+        "lastModifiedAt": "2026-06-09T00:37:19.853Z",
+        "version": 2
+      }
+    },
+    {
+      "id": "VS-mq9lq6i6b2d38aa2",
+      "collisionId": "CP-2026-06-00002",
+      "version": 3,
+      "changedBy": "EN002",
+      "changedByName": "张工",
+      "changedAt": "2026-06-09T01:37:19.853Z",
+      "changeType": "remark",
+      "fieldDiffs": [
+        {
+          "field": "remark",
+          "oldValue": "",
+          "newValue": "发现阿宁改了BIM备注，需以最新版为准。"
+        },
+        {
+          "field": "version",
+          "oldValue": 2,
+          "newValue": 3
+        }
+      ],
+      "snapshot": {
+        "id": "CP-2026-06-00002",
+        "coordinateX": 16268,
+        "coordinateY": 13573,
+        "coordinateZ": 4914,
+        "floor": "B1",
+        "discipline": "结构",
+        "status": "pending",
+        "conclusion": "",
+        "remark": "发现阿宁改了BIM备注，需以最新版为准。",
+        "isAbnormal": false,
+        "cameraPosition": {
+          "px": 645,
+          "py": 845,
+          "pz": 1422
+        },
+        "cameraTarget": {
+          "tx": 15034,
+          "ty": 5081,
+          "tz": -5611
+        },
+        "cameraFov": 71,
+        "screenshotUrl": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=60",
+        "createdBy": "DS001",
+        "createdByName": "阿宁",
+        "createdAt": "2026-06-08T20:37:19.853Z",
+        "lastModifiedBy": "EN002",
+        "lastModifiedByName": "张工",
+        "lastModifiedAt": "2026-06-09T01:37:19.853Z",
+        "version": 3
+      }
+    },
+    {
+      "id": "VS-mq9lq6i6f3c3a9af",
+      "collisionId": "CP-2026-06-00003",
+      "version": 1,
+      "changedBy": "DS001",
+      "changedByName": "阿宁",
+      "changedAt": "2026-06-09T02:37:19.853Z",
+      "changeType": "remark",
+      "changeReason": "阿宁提交初始材料",
+      "fieldDiffs": [
+        {
+          "field": "(创建)",
+          "oldValue": null,
+          "newValue": "初始记录 v1"
+        }
+      ],
+      "snapshot": {
+        "id": "CP-2026-06-00003",
+        "coordinateX": 4883,
+        "coordinateY": 3452,
+        "coordinateZ": 8206,
+        "floor": "F1",
+        "discipline": "机电",
+        "status": "pending",
+        "conclusion": "",
+        "remark": "",
+        "isAbnormal": false,
+        "cameraPosition": {
+          "px": 857,
+          "py": 2782,
+          "pz": 1497
+        },
+        "cameraTarget": {
+          "tx": 8335,
+          "ty": 5366,
+          "tz": -3267
+        },
+        "cameraFov": 69,
+        "screenshotUrl": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=60",
+        "createdBy": "DS001",
+        "createdByName": "阿宁",
+        "createdAt": "2026-06-09T02:37:19.853Z",
+        "lastModifiedBy": "DS001",
+        "lastModifiedByName": "阿宁",
+        "lastModifiedAt": "2026-06-09T02:37:19.853Z",
+        "version": 1
+      }
+    },
+    {
+      "id": "VS-mq9lq6i6413efe4c",
+      "collisionId": "CP-2026-06-00003",
+      "version": 2,
+      "changedBy": "EN002",
+      "changedByName": "张工",
+      "changedAt": "2026-06-09T03:37:19.853Z",
+      "changeType": "abnormal",
+      "changeReason": "同一构件同一问题，属重复记录",
+      "fieldDiffs": [
+        {
+          "field": "isAbnormal",
+          "oldValue": false,
+          "newValue": true
+        },
+        {
+          "field": "abnormalReason",
+          "oldValue": null,
+          "newValue": "该碰撞点与CP-2026-06-00001为同一构件同一问题，按重复记录豁免，不重复签发变更单。"
+        },
+        {
+          "field": "version",
+          "oldValue": 1,
+          "newValue": 2
+        }
+      ],
+      "snapshot": {
+        "id": "CP-2026-06-00003",
+        "coordinateX": 4883,
+        "coordinateY": 3452,
+        "coordinateZ": 8206,
+        "floor": "F1",
+        "discipline": "机电",
+        "status": "pending",
+        "conclusion": "",
+        "remark": "",
+        "isAbnormal": true,
+        "abnormalReason": "该碰撞点与CP-2026-06-00001为同一构件同一问题，按重复记录豁免，不重复签发变更单。",
+        "cameraPosition": {
+          "px": 857,
+          "py": 2782,
+          "pz": 1497
+        },
+        "cameraTarget": {
+          "tx": 8335,
+          "ty": 5366,
+          "tz": -3267
+        },
+        "cameraFov": 69,
+        "screenshotUrl": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=60",
+        "createdBy": "DS001",
+        "createdByName": "阿宁",
+        "createdAt": "2026-06-09T02:37:19.853Z",
+        "lastModifiedBy": "EN002",
+        "lastModifiedByName": "张工",
+        "lastModifiedAt": "2026-06-09T03:37:19.853Z",
+        "version": 2
+      }
+    },
+    {
+      "id": "VS-mq9lq6i61568f2c0",
+      "collisionId": "CP-2026-06-00003",
+      "version": 3,
+      "changedBy": "EN002",
+      "changedByName": "张工",
+      "changedAt": "2026-06-09T04:37:19.853Z",
+      "changeType": "conclusion",
+      "changeReason": "重复碰撞点合并处理",
+      "fieldDiffs": [
+        {
+          "field": "conclusion",
+          "oldValue": "",
+          "newValue": "豁免，合并至CP-2026-06-00001。"
+        },
+        {
+          "field": "version",
+          "oldValue": 2,
+          "newValue": 3
+        }
+      ],
+      "snapshot": {
+        "id": "CP-2026-06-00003",
+        "coordinateX": 4883,
+        "coordinateY": 3452,
+        "coordinateZ": 8206,
+        "floor": "F1",
+        "discipline": "机电",
+        "status": "pending",
+        "conclusion": "豁免，合并至CP-2026-06-00001。",
+        "remark": "",
+        "isAbnormal": true,
+        "abnormalReason": "该碰撞点与CP-2026-06-00001为同一构件同一问题，按重复记录豁免，不重复签发变更单。",
+        "cameraPosition": {
+          "px": 857,
+          "py": 2782,
+          "pz": 1497
+        },
+        "cameraTarget": {
+          "tx": 8335,
+          "ty": 5366,
+          "tz": -3267
+        },
+        "cameraFov": 69,
+        "screenshotUrl": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=60",
+        "createdBy": "DS001",
+        "createdByName": "阿宁",
+        "createdAt": "2026-06-09T02:37:19.853Z",
+        "lastModifiedBy": "EN002",
+        "lastModifiedByName": "张工",
+        "lastModifiedAt": "2026-06-09T04:37:19.853Z",
+        "version": 3
+      }
+    },
+    {
+      "id": "VS-mq9lq6i6c3afbc2e",
+      "collisionId": "CP-2026-06-00003",
+      "version": 4,
+      "changedBy": "EN002",
+      "changedByName": "张工",
+      "changedAt": "2026-06-09T05:37:19.853Z",
+      "changeType": "status",
+      "fieldDiffs": [
+        {
+          "field": "status",
+          "oldValue": "pending",
+          "newValue": "waived"
+        },
+        {
+          "field": "version",
+          "oldValue": 3,
+          "newValue": 4
+        }
+      ],
+      "snapshot": {
+        "id": "CP-2026-06-00003",
+        "coordinateX": 4883,
+        "coordinateY": 3452,
+        "coordinateZ": 8206,
+        "floor": "F1",
+        "discipline": "机电",
+        "status": "waived",
+        "conclusion": "豁免，合并至CP-2026-06-00001。",
+        "remark": "",
+        "isAbnormal": true,
+        "abnormalReason": "该碰撞点与CP-2026-06-00001为同一构件同一问题，按重复记录豁免，不重复签发变更单。",
+        "cameraPosition": {
+          "px": 857,
+          "py": 2782,
+          "pz": 1497
+        },
+        "cameraTarget": {
+          "tx": 8335,
+          "ty": 5366,
+          "tz": -3267
+        },
+        "cameraFov": 69,
+        "screenshotUrl": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=60",
+        "createdBy": "DS001",
+        "createdByName": "阿宁",
+        "createdAt": "2026-06-09T02:37:19.853Z",
+        "lastModifiedBy": "EN002",
+        "lastModifiedByName": "张工",
+        "lastModifiedAt": "2026-06-09T05:37:19.853Z",
+        "version": 4
+      }
+    },
+    {
+      "id": "VS-mq9lq6i637509a62",
+      "collisionId": "CP-2026-06-00004",
+      "version": 1,
+      "changedBy": "DS001",
+      "changedByName": "阿宁",
+      "changedAt": "2026-06-09T08:37:19.853Z",
+      "changeType": "remark",
+      "changeReason": "阿宁提交初始材料",
+      "fieldDiffs": [
+        {
+          "field": "(创建)",
+          "oldValue": null,
+          "newValue": "初始记录 v1"
+        }
+      ],
+      "snapshot": {
+        "id": "CP-2026-06-00004",
+        "coordinateX": 9430,
+        "coordinateY": 14787,
+        "coordinateZ": 11098,
+        "floor": "B2",
+        "discipline": "建筑",
+        "status": "pending",
+        "conclusion": "",
+        "remark": "",
+        "isAbnormal": false,
+        "cameraPosition": {
+          "px": 2301,
+          "py": 1021,
+          "pz": 1124
+        },
+        "cameraTarget": {
+          "tx": 16960,
+          "ty": 3223,
+          "tz": 4010
+        },
+        "cameraFov": 48,
+        "screenshotUrl": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=60",
+        "createdBy": "DS001",
+        "createdByName": "阿宁",
+        "createdAt": "2026-06-09T08:37:19.853Z",
+        "lastModifiedBy": "DS001",
+        "lastModifiedByName": "阿宁",
+        "lastModifiedAt": "2026-06-09T08:37:19.853Z",
+        "version": 1
+      }
+    },
+    {
+      "id": "VS-mq9lq6i62c1ee358",
+      "collisionId": "CP-2026-06-00004",
+      "version": 2,
+      "changedBy": "EN002",
+      "changedByName": "张工",
+      "changedAt": "2026-06-09T09:37:19.853Z",
+      "changeType": "remark",
+      "fieldDiffs": [
+        {
+          "field": "remark",
+          "oldValue": "",
+          "newValue": "需等设计院回复留洞放大尺寸。"
+        },
+        {
+          "field": "version",
+          "oldValue": 1,
+          "newValue": 2
+        }
+      ],
+      "snapshot": {
+        "id": "CP-2026-06-00004",
+        "coordinateX": 9430,
+        "coordinateY": 14787,
+        "coordinateZ": 11098,
+        "floor": "B2",
+        "discipline": "建筑",
+        "status": "pending",
+        "conclusion": "",
+        "remark": "需等设计院回复留洞放大尺寸。",
+        "isAbnormal": false,
+        "cameraPosition": {
+          "px": 2301,
+          "py": 1021,
+          "pz": 1124
+        },
+        "cameraTarget": {
+          "tx": 16960,
+          "ty": 3223,
+          "tz": 4010
+        },
+        "cameraFov": 48,
+        "screenshotUrl": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=60",
+        "createdBy": "DS001",
+        "createdByName": "阿宁",
+        "createdAt": "2026-06-09T08:37:19.853Z",
+        "lastModifiedBy": "EN002",
+        "lastModifiedByName": "张工",
+        "lastModifiedAt": "2026-06-09T09:37:19.853Z",
+        "version": 2
+      }
+    },
+    {
+      "id": "VS-mq9lq6i6b2e60de6",
+      "collisionId": "CP-2026-06-00004",
+      "version": 3,
+      "changedBy": "EN003",
+      "changedByName": "李工",
+      "changedAt": "2026-06-09T14:37:19.853Z",
+      "changeType": "material_add",
+      "fieldDiffs": [
+        {
+          "field": "version",
+          "oldValue": 2,
+          "newValue": 3
+        }
+      ],
+      "snapshot": {
+        "id": "CP-2026-06-00004",
+        "coordinateX": 9430,
+        "coordinateY": 14787,
+        "coordinateZ": 11098,
+        "floor": "B2",
+        "discipline": "建筑",
+        "status": "pending",
+        "conclusion": "",
+        "remark": "需等设计院回复留洞放大尺寸。",
+        "isAbnormal": false,
+        "cameraPosition": {
+          "px": 2301,
+          "py": 1021,
+          "pz": 1124
+        },
+        "cameraTarget": {
+          "tx": 16960,
+          "ty": 3223,
+          "tz": 4010
+        },
+        "cameraFov": 48,
+        "screenshotUrl": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=60",
+        "createdBy": "DS001",
+        "createdByName": "阿宁",
+        "createdAt": "2026-06-09T08:37:19.853Z",
+        "lastModifiedBy": "EN003",
+        "lastModifiedByName": "李工",
+        "lastModifiedAt": "2026-06-09T14:37:19.853Z",
+        "version": 3
+      }
+    },
+    {
+      "id": "VS-mq9lq6i6ceb4e29e",
+      "collisionId": "CP-2026-06-00004",
+      "version": 4,
+      "changedBy": "EN003",
+      "changedByName": "李工",
+      "changedAt": "2026-06-09T19:37:19.853Z",
+      "changeType": "conclusion",
+      "changeReason": "设计院助理阿宁23:15口头确认",
+      "fieldDiffs": [
+        {
+          "field": "conclusion",
+          "oldValue": "",
+          "newValue": "留洞扩大为800x800，签变更B2-BG-017。"
+        },
+        {
+          "field": "version",
+          "oldValue": 3,
+          "newValue": 4
+        }
+      ],
+      "snapshot": {
+        "id": "CP-2026-06-00004",
+        "coordinateX": 9430,
+        "coordinateY": 14787,
+        "coordinateZ": 11098,
+        "floor": "B2",
+        "discipline": "建筑",
+        "status": "pending",
+        "conclusion": "留洞扩大为800x800，签变更B2-BG-017。",
+        "remark": "需等设计院回复留洞放大尺寸。",
+        "isAbnormal": false,
+        "cameraPosition": {
+          "px": 2301,
+          "py": 1021,
+          "pz": 1124
+        },
+        "cameraTarget": {
+          "tx": 16960,
+          "ty": 3223,
+          "tz": 4010
+        },
+        "cameraFov": 48,
+        "screenshotUrl": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=60",
+        "createdBy": "DS001",
+        "createdByName": "阿宁",
+        "createdAt": "2026-06-09T08:37:19.853Z",
+        "lastModifiedBy": "EN003",
+        "lastModifiedByName": "李工",
+        "lastModifiedAt": "2026-06-09T19:37:19.853Z",
+        "version": 4
+      }
+    },
+    {
+      "id": "VS-mq9lq6i664fe3a67",
+      "collisionId": "CP-2026-06-00004",
+      "version": 5,
+      "changedBy": "EN003",
+      "changedByName": "李工",
+      "changedAt": "2026-06-10T00:37:19.853Z",
+      "changeType": "status",
+      "fieldDiffs": [
+        {
+          "field": "status",
+          "oldValue": "pending",
+          "newValue": "resolved"
+        },
+        {
+          "field": "version",
+          "oldValue": 4,
+          "newValue": 5
+        }
+      ],
+      "snapshot": {
+        "id": "CP-2026-06-00004",
+        "coordinateX": 9430,
+        "coordinateY": 14787,
+        "coordinateZ": 11098,
+        "floor": "B2",
+        "discipline": "建筑",
+        "status": "resolved",
+        "conclusion": "留洞扩大为800x800，签变更B2-BG-017。",
+        "remark": "需等设计院回复留洞放大尺寸。",
+        "isAbnormal": false,
+        "cameraPosition": {
+          "px": 2301,
+          "py": 1021,
+          "pz": 1124
+        },
+        "cameraTarget": {
+          "tx": 16960,
+          "ty": 3223,
+          "tz": 4010
+        },
+        "cameraFov": 48,
+        "screenshotUrl": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=60",
+        "createdBy": "DS001",
+        "createdByName": "阿宁",
+        "createdAt": "2026-06-09T08:37:19.853Z",
+        "lastModifiedBy": "EN003",
+        "lastModifiedByName": "李工",
+        "lastModifiedAt": "2026-06-10T00:37:19.853Z",
+        "version": 5
+      }
+    },
+    {
+      "id": "VS-mq9lq6i6e67feb91",
+      "collisionId": "CP-2026-06-00005",
+      "version": 1,
+      "changedBy": "DS001",
+      "changedByName": "阿宁",
+      "changedAt": "2026-06-09T00:37:19.853Z",
+      "changeType": "remark",
+      "fieldDiffs": [
+        {
+          "field": "(创建)",
+          "oldValue": null,
+          "newValue": "初始记录 v1"
+        }
+      ],
+      "snapshot": {
+        "id": "CP-2026-06-00005",
+        "coordinateX": 9656,
+        "coordinateY": 8810,
+        "coordinateZ": 838,
+        "floor": "B1",
+        "discipline": "机电",
+        "status": "pending",
+        "conclusion": "施工误差范围内，豁免",
+        "remark": "已同步给设计院",
+        "isAbnormal": false,
+        "cameraPosition": {
+          "px": 823,
+          "py": 2729,
+          "pz": 1229
+        },
+        "cameraTarget": {
+          "tx": 6804,
+          "ty": 4087,
+          "tz": -1780
+        },
+        "cameraFov": 53,
+        "screenshotUrl": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=60",
+        "createdBy": "DS001",
+        "createdByName": "阿宁",
+        "createdAt": "2026-06-09T00:37:19.853Z",
+        "lastModifiedBy": "DS001",
+        "lastModifiedByName": "李工",
+        "lastModifiedAt": "2026-06-09T03:37:19.853Z",
+        "version": 1
+      }
+    },
+    {
+      "id": "VS-mq9lq6i6559c83ee",
+      "collisionId": "CP-2026-06-00006",
+      "version": 1,
+      "changedBy": "DS001",
+      "changedByName": "阿宁",
+      "changedAt": "2026-06-09T02:37:19.853Z",
+      "changeType": "remark",
+      "fieldDiffs": [
+        {
+          "field": "(创建)",
+          "oldValue": null,
+          "newValue": "初始记录 v1"
+        }
+      ],
+      "snapshot": {
+        "id": "CP-2026-06-00006",
+        "coordinateX": 14379,
+        "coordinateY": 9585,
+        "coordinateZ": -1075,
+        "floor": "B1",
+        "discipline": "建筑",
+        "status": "resolved",
+        "conclusion": "已通过设计院复核，按变更单处理",
+        "remark": "与施工队沟通中",
+        "isAbnormal": false,
+        "cameraPosition": {
+          "px": 2533,
+          "py": 1960,
+          "pz": 1204
+        },
+        "cameraTarget": {
+          "tx": 6659,
+          "ty": 3982,
+          "tz": -1974
+        },
+        "cameraFov": 68,
+        "screenshotUrl": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=60",
+        "createdBy": "DS001",
+        "createdByName": "阿宁",
+        "createdAt": "2026-06-09T02:37:19.853Z",
+        "lastModifiedBy": "DS001",
+        "lastModifiedByName": "李工",
+        "lastModifiedAt": "2026-06-09T05:37:19.853Z",
+        "version": 1
+      }
+    },
+    {
+      "id": "VS-mq9lq6i694c7ec60",
+      "collisionId": "CP-2026-06-00007",
+      "version": 1,
+      "changedBy": "DS001",
+      "changedByName": "阿宁",
+      "changedAt": "2026-06-09T04:37:19.853Z",
+      "changeType": "remark",
+      "fieldDiffs": [
+        {
+          "field": "(创建)",
+          "oldValue": null,
+          "newValue": "初始记录 v1"
+        }
+      ],
+      "snapshot": {
+        "id": "CP-2026-06-00007",
+        "coordinateX": 17655,
+        "coordinateY": 13389,
+        "coordinateZ": 8004,
+        "floor": "F3",
+        "discipline": "机电",
+        "status": "resolved",
+        "conclusion": "已通过设计院复核，按变更单处理",
+        "remark": "算法复核通过",
+        "isAbnormal": false,
+        "cameraPosition": {
+          "px": 2896,
+          "py": 1009,
+          "pz": 1664
+        },
+        "cameraTarget": {
+          "tx": 18346,
+          "ty": 5490,
+          "tz": -629
+        },
+        "cameraFov": 73,
+        "screenshotUrl": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=60",
+        "createdBy": "DS001",
+        "createdByName": "阿宁",
+        "createdAt": "2026-06-09T04:37:19.853Z",
+        "lastModifiedBy": "EN003",
+        "lastModifiedByName": "张工",
+        "lastModifiedAt": "2026-06-09T07:37:19.853Z",
+        "version": 3
+      }
+    },
+    {
+      "id": "VS-mq9lq6i62f206c23",
+      "collisionId": "CP-2026-06-00007",
+      "version": 2,
+      "changedBy": "EN002",
+      "changedByName": "张工",
+      "changedAt": "2026-06-09T06:37:19.853Z",
+      "changeType": "remark",
+      "fieldDiffs": [
+        {
+          "field": "remark",
+          "oldValue": "",
+          "newValue": "算法复核通过"
+        }
+      ],
+      "snapshot": {
+        "id": "CP-2026-06-00007",
+        "coordinateX": 17655,
+        "coordinateY": 13389,
+        "coordinateZ": 8004,
+        "floor": "F3",
+        "discipline": "机电",
+        "status": "resolved",
+        "conclusion": "已通过设计院复核，按变更单处理",
+        "remark": "算法复核通过",
+        "isAbnormal": false,
+        "cameraPosition": {
+          "px": 2896,
+          "py": 1009,
+          "pz": 1664
+        },
+        "cameraTarget": {
+          "tx": 18346,
+          "ty": 5490,
+          "tz": -629
+        },
+        "cameraFov": 73,
+        "screenshotUrl": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=60",
+        "createdBy": "DS001",
+        "createdByName": "阿宁",
+        "createdAt": "2026-06-09T04:37:19.853Z",
+        "lastModifiedBy": "EN003",
+        "lastModifiedByName": "张工",
+        "lastModifiedAt": "2026-06-09T07:37:19.853Z",
+        "version": 3
+      }
+    },
+    {
+      "id": "VS-mq9lq6i64cf05bc8",
+      "collisionId": "CP-2026-06-00008",
+      "version": 1,
+      "changedBy": "DS001",
+      "changedByName": "阿宁",
+      "changedAt": "2026-06-09T06:37:19.853Z",
+      "changeType": "remark",
+      "fieldDiffs": [
+        {
+          "field": "(创建)",
+          "oldValue": null,
+          "newValue": "初始记录 v1"
+        }
+      ],
+      "snapshot": {
+        "id": "CP-2026-06-00008",
+        "coordinateX": 16824,
+        "coordinateY": 14714,
+        "coordinateZ": -5154,
+        "floor": "B2",
+        "discipline": "结构",
+        "status": "pending",
+        "conclusion": "已通过设计院复核，按变更单处理",
+        "remark": "与施工队沟通中",
+        "isAbnormal": false,
+        "cameraPosition": {
+          "px": 1350,
+          "py": 2276,
+          "pz": 664
+        },
+        "cameraTarget": {
+          "tx": 11694,
+          "ty": 9924,
+          "tz": -2542
+        },
+        "cameraFov": 64,
+        "screenshotUrl": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=60",
+        "createdBy": "DS001",
+        "createdByName": "阿宁",
+        "createdAt": "2026-06-09T06:37:19.853Z",
+        "lastModifiedBy": "EN002",
+        "lastModifiedByName": "阿宁",
+        "lastModifiedAt": "2026-06-09T09:37:19.853Z",
+        "version": 3
+      }
+    },
+    {
+      "id": "VS-mq9lq6i6e8c17278",
+      "collisionId": "CP-2026-06-00008",
+      "version": 2,
+      "changedBy": "EN002",
+      "changedByName": "张工",
+      "changedAt": "2026-06-09T08:37:19.853Z",
+      "changeType": "remark",
+      "fieldDiffs": [
+        {
+          "field": "remark",
+          "oldValue": "",
+          "newValue": "与施工队沟通中"
+        }
+      ],
+      "snapshot": {
+        "id": "CP-2026-06-00008",
+        "coordinateX": 16824,
+        "coordinateY": 14714,
+        "coordinateZ": -5154,
+        "floor": "B2",
+        "discipline": "结构",
+        "status": "pending",
+        "conclusion": "已通过设计院复核，按变更单处理",
+        "remark": "与施工队沟通中",
+        "isAbnormal": false,
+        "cameraPosition": {
+          "px": 1350,
+          "py": 2276,
+          "pz": 664
+        },
+        "cameraTarget": {
+          "tx": 11694,
+          "ty": 9924,
+          "tz": -2542
+        },
+        "cameraFov": 64,
+        "screenshotUrl": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=60",
+        "createdBy": "DS001",
+        "createdByName": "阿宁",
+        "createdAt": "2026-06-09T06:37:19.853Z",
+        "lastModifiedBy": "EN002",
+        "lastModifiedByName": "阿宁",
+        "lastModifiedAt": "2026-06-09T09:37:19.853Z",
+        "version": 3
+      }
+    },
+    {
+      "id": "VS-mq9lq6i6a9fbd3b4",
+      "collisionId": "CP-2026-06-00009",
+      "version": 1,
+      "changedBy": "DS001",
+      "changedByName": "阿宁",
+      "changedAt": "2026-06-09T08:37:19.853Z",
+      "changeType": "remark",
+      "fieldDiffs": [
+        {
+          "field": "(创建)",
+          "oldValue": null,
+          "newValue": "初始记录 v1"
+        }
+      ],
+      "snapshot": {
+        "id": "CP-2026-06-00009",
+        "coordinateX": 11637,
+        "coordinateY": 10228,
+        "coordinateZ": 6791,
+        "floor": "F2",
+        "discipline": "建筑",
+        "status": "pending",
+        "conclusion": "施工误差范围内，豁免",
+        "remark": "算法复核通过",
+        "isAbnormal": false,
+        "cameraPosition": {
+          "px": 2877,
+          "py": 1691,
+          "pz": 1651
+        },
+        "cameraTarget": {
+          "tx": 13740,
+          "ty": 7776,
+          "tz": -880
+        },
+        "cameraFov": 62,
+        "screenshotUrl": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=60",
+        "createdBy": "DS001",
+        "createdByName": "阿宁",
+        "createdAt": "2026-06-09T08:37:19.853Z",
+        "lastModifiedBy": "EN003",
+        "lastModifiedByName": "李工",
+        "lastModifiedAt": "2026-06-09T11:37:19.853Z",
+        "version": 1
+      }
+    },
+    {
+      "id": "VS-mq9lq6i6fca5d835",
+      "collisionId": "CP-2026-06-00010",
+      "version": 1,
+      "changedBy": "DS001",
+      "changedByName": "阿宁",
+      "changedAt": "2026-06-09T10:37:19.853Z",
+      "changeType": "remark",
+      "fieldDiffs": [
+        {
+          "field": "(创建)",
+          "oldValue": null,
+          "newValue": "初始记录 v1"
+        }
+      ],
+      "snapshot": {
+        "id": "CP-2026-06-00010",
+        "coordinateX": 12371,
+        "coordinateY": 11564,
+        "coordinateZ": 3233,
+        "floor": "F1",
+        "discipline": "建筑",
+        "status": "resolved",
+        "conclusion": "施工误差范围内，豁免",
+        "remark": "已同步给设计院",
+        "isAbnormal": false,
+        "cameraPosition": {
+          "px": 2080,
+          "py": 1394,
+          "pz": 567
+        },
+        "cameraTarget": {
+          "tx": 13149,
+          "ty": 7318,
+          "tz": -2998
+        },
+        "cameraFov": 60,
+        "screenshotUrl": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=60",
+        "createdBy": "DS001",
+        "createdByName": "阿宁",
+        "createdAt": "2026-06-09T10:37:19.853Z",
+        "lastModifiedBy": "EN002",
+        "lastModifiedByName": "阿宁",
+        "lastModifiedAt": "2026-06-09T13:37:19.853Z",
+        "version": 1
+      }
+    },
+    {
+      "id": "VS-mq9lq6i652cf15b8",
+      "collisionId": "CP-2026-06-00011",
+      "version": 1,
+      "changedBy": "DS001",
+      "changedByName": "阿宁",
+      "changedAt": "2026-06-09T12:37:19.853Z",
+      "changeType": "remark",
+      "fieldDiffs": [
+        {
+          "field": "(创建)",
+          "oldValue": null,
+          "newValue": "初始记录 v1"
+        }
+      ],
+      "snapshot": {
+        "id": "CP-2026-06-00011",
+        "coordinateX": 16385,
+        "coordinateY": 10951,
+        "coordinateZ": 3354,
+        "floor": "F3",
+        "discipline": "结构",
+        "status": "pending",
+        "conclusion": "现场调整后满足规范",
+        "remark": "与施工队沟通中",
+        "isAbnormal": false,
+        "cameraPosition": {
+          "px": 2841,
+          "py": 2333,
+          "pz": 1324
+        },
+        "cameraTarget": {
+          "tx": 15693,
+          "ty": 2878,
+          "tz": -4077
+        },
+        "cameraFov": 62,
+        "screenshotUrl": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=60",
+        "createdBy": "DS001",
+        "createdByName": "阿宁",
+        "createdAt": "2026-06-09T12:37:19.853Z",
+        "lastModifiedBy": "EN002",
+        "lastModifiedByName": "阿宁",
+        "lastModifiedAt": "2026-06-09T15:37:19.853Z",
+        "version": 3
+      }
+    },
+    {
+      "id": "VS-mq9lq6i6ac262abf",
+      "collisionId": "CP-2026-06-00011",
+      "version": 2,
+      "changedBy": "EN002",
+      "changedByName": "张工",
+      "changedAt": "2026-06-09T14:37:19.853Z",
+      "changeType": "remark",
+      "fieldDiffs": [
+        {
+          "field": "remark",
+          "oldValue": "",
+          "newValue": "与施工队沟通中"
+        }
+      ],
+      "snapshot": {
+        "id": "CP-2026-06-00011",
+        "coordinateX": 16385,
+        "coordinateY": 10951,
+        "coordinateZ": 3354,
+        "floor": "F3",
+        "discipline": "结构",
+        "status": "pending",
+        "conclusion": "现场调整后满足规范",
+        "remark": "与施工队沟通中",
+        "isAbnormal": false,
+        "cameraPosition": {
+          "px": 2841,
+          "py": 2333,
+          "pz": 1324
+        },
+        "cameraTarget": {
+          "tx": 15693,
+          "ty": 2878,
+          "tz": -4077
+        },
+        "cameraFov": 62,
+        "screenshotUrl": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=60",
+        "createdBy": "DS001",
+        "createdByName": "阿宁",
+        "createdAt": "2026-06-09T12:37:19.853Z",
+        "lastModifiedBy": "EN002",
+        "lastModifiedByName": "阿宁",
+        "lastModifiedAt": "2026-06-09T15:37:19.853Z",
+        "version": 3
+      }
+    },
+    {
+      "id": "VS-mq9lq6i605b21f77",
+      "collisionId": "CP-2026-06-00012",
+      "version": 1,
+      "changedBy": "DS001",
+      "changedByName": "阿宁",
+      "changedAt": "2026-06-09T14:37:19.853Z",
+      "changeType": "remark",
+      "fieldDiffs": [
+        {
+          "field": "(创建)",
+          "oldValue": null,
+          "newValue": "初始记录 v1"
+        }
+      ],
+      "snapshot": {
+        "id": "CP-2026-06-00012",
+        "coordinateX": 19658,
+        "coordinateY": 2996,
+        "coordinateZ": -1240,
+        "floor": "F2",
+        "discipline": "建筑",
+        "status": "resolved",
+        "conclusion": "施工误差范围内，豁免",
+        "remark": "算法复核通过",
+        "isAbnormal": false,
+        "cameraPosition": {
+          "px": 2985,
+          "py": 1677,
+          "pz": 795
+        },
+        "cameraTarget": {
+          "tx": 11567,
+          "ty": 12330,
+          "tz": -4844
+        },
+        "cameraFov": 74,
+        "screenshotUrl": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=60",
+        "createdBy": "DS001",
+        "createdByName": "阿宁",
+        "createdAt": "2026-06-09T14:37:19.853Z",
+        "lastModifiedBy": "DS001",
+        "lastModifiedByName": "阿宁",
+        "lastModifiedAt": "2026-06-09T17:37:19.853Z",
+        "version": 2
+      }
+    },
+    {
+      "id": "VS-mq9lq6i6abe7cf70",
+      "collisionId": "CP-2026-06-00012",
+      "version": 2,
+      "changedBy": "EN002",
+      "changedByName": "张工",
+      "changedAt": "2026-06-09T16:37:19.853Z",
+      "changeType": "remark",
+      "fieldDiffs": [
+        {
+          "field": "remark",
+          "oldValue": "",
+          "newValue": "算法复核通过"
+        }
+      ],
+      "snapshot": {
+        "id": "CP-2026-06-00012",
+        "coordinateX": 19658,
+        "coordinateY": 2996,
+        "coordinateZ": -1240,
+        "floor": "F2",
+        "discipline": "建筑",
+        "status": "resolved",
+        "conclusion": "施工误差范围内，豁免",
+        "remark": "算法复核通过",
+        "isAbnormal": false,
+        "cameraPosition": {
+          "px": 2985,
+          "py": 1677,
+          "pz": 795
+        },
+        "cameraTarget": {
+          "tx": 11567,
+          "ty": 12330,
+          "tz": -4844
+        },
+        "cameraFov": 74,
+        "screenshotUrl": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=60",
+        "createdBy": "DS001",
+        "createdByName": "阿宁",
+        "createdAt": "2026-06-09T14:37:19.853Z",
+        "lastModifiedBy": "DS001",
+        "lastModifiedByName": "阿宁",
+        "lastModifiedAt": "2026-06-09T17:37:19.853Z",
+        "version": 2
+      }
+    },
+    {
+      "id": "VS-mq9mp1iye6f01033",
+      "collisionId": "CP-2026-06-00001",
+      "version": 3,
+      "changedBy": "EN002",
+      "changedByName": "张工",
+      "changedAt": "2026-06-11T15:04:26.362Z",
+      "changeType": "remark",
+      "changeReason": "月底封账前复核——备注同步测试：后端+导出CSV即时生效",
+      "fieldDiffs": [
+        {
+          "field": "remark",
+          "oldValue": "复核图纸后确认按原碰撞结论处理。",
+          "newValue": "【封账前最终版】月底张工亲自核对完成，同步后端+CSV。"
+        }
+      ],
+      "snapshot": {
+        "id": "CP-2026-06-00001",
+        "coordinateX": 8703,
+        "coordinateY": 11987,
+        "coordinateZ": -1235,
+        "floor": "F2",
+        "discipline": "机电",
+        "status": "pending",
+        "conclusion": "",
+        "remark": "【封账前最终版】月底张工亲自核对完成，同步后端+CSV。",
+        "isAbnormal": false,
+        "cameraPosition": {
+          "px": 2538,
+          "py": 1944,
+          "pz": 1329
+        },
+        "cameraTarget": {
+          "tx": 4374,
+          "ty": 3180,
+          "tz": -891
+        },
+        "cameraFov": 47,
+        "screenshotUrl": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=60",
+        "createdBy": "DS001",
+        "createdByName": "阿宁",
+        "createdAt": "2026-06-08T14:37:19.853Z",
+        "lastModifiedBy": "EN002",
+        "lastModifiedByName": "张工",
+        "lastModifiedAt": "2026-06-11T15:04:26.361Z",
+        "version": 3
+      }
+    }
+  ],
+  "audit_log": [
+    {
+      "id": "AL-mq9lq6i516e6c73b",
+      "collisionId": "CP-2026-06-00001",
+      "action": "新增材料",
+      "actionBadgeColor": "#059669",
+      "operator": "DS001",
+      "operatorName": "阿宁",
+      "timestamp": "2026-06-08T14:37:19.853Z",
+      "detail": "阿宁上传BIM模型备注（v1）"
+    },
+    {
+      "id": "AL-mq9lq6i566c092fb",
+      "collisionId": "CP-2026-06-00001",
+      "action": "新增材料",
+      "actionBadgeColor": "#059669",
+      "operator": "DS001",
+      "operatorName": "阿宁",
+      "timestamp": "2026-06-08T14:37:19.853Z",
+      "detail": "阿宁上传边界样本"
+    },
+    {
+      "id": "AL-mq9lq6i57779fc15",
+      "collisionId": "CP-2026-06-00001",
+      "action": "新增材料",
+      "actionBadgeColor": "#059669",
+      "operator": "DS001",
+      "operatorName": "阿宁",
+      "timestamp": "2026-06-08T14:37:19.853Z",
+      "detail": "阿宁上传口头说明"
+    },
+    {
+      "id": "AL-mq9lq6i6c4b8fe52",
+      "collisionId": "CP-2026-06-00001",
+      "action": "修改备注",
+      "actionBadgeColor": "#2563eb",
+      "operator": "EN002",
+      "operatorName": "张工",
+      "timestamp": "2026-06-08T15:37:19.853Z",
+      "detail": "张工补充备注：复核图纸后确认按原碰撞结论处理。"
+    },
+    {
+      "id": "AL-mq9lq6i68bbe4003",
+      "collisionId": "CP-2026-06-00002",
+      "action": "新增材料",
+      "actionBadgeColor": "#059669",
+      "operator": "DS001",
+      "operatorName": "阿宁",
+      "timestamp": "2026-06-08T20:37:19.853Z",
+      "detail": "阿宁上传BIM模型备注（v1）"
+    },
+    {
+      "id": "AL-mq9lq6i62a387557",
+      "collisionId": "CP-2026-06-00002",
+      "action": "新增材料",
+      "actionBadgeColor": "#059669",
+      "operator": "DS001",
+      "operatorName": "阿宁",
+      "timestamp": "2026-06-08T20:37:19.853Z",
+      "detail": "阿宁上传边界样本"
+    },
+    {
+      "id": "AL-mq9lq6i6f94f491c",
+      "collisionId": "CP-2026-06-00002",
+      "action": "新增材料",
+      "actionBadgeColor": "#059669",
+      "operator": "DS001",
+      "operatorName": "阿宁",
+      "timestamp": "2026-06-08T20:37:19.853Z",
+      "detail": "阿宁上传口头说明"
+    },
+    {
+      "id": "AL-mq9lq6i6ca0edb4c",
+      "collisionId": "CP-2026-06-00002",
+      "action": "修改材料口径",
+      "actionBadgeColor": "#d97706",
+      "operator": "DS001",
+      "operatorName": "阿宁",
+      "timestamp": "2026-06-09T00:37:19.853Z",
+      "reason": "现场复核后偏移量有误，更正为250mm",
+      "detail": "阿宁修改BIM备注口径（v1→v2），MD5 8039→4cf5"
+    },
+    {
+      "id": "AL-mq9lq6i6dd3cbeae",
+      "collisionId": "CP-2026-06-00002",
+      "action": "修改备注",
+      "actionBadgeColor": "#2563eb",
+      "operator": "EN002",
+      "operatorName": "张工",
+      "timestamp": "2026-06-09T01:37:19.853Z",
+      "detail": "张工备注：发现阿宁改了BIM备注，需以最新版为准。"
+    },
+    {
+      "id": "AL-mq9lq6i691996d4a",
+      "collisionId": "CP-2026-06-00003",
+      "action": "新增材料",
+      "actionBadgeColor": "#059669",
+      "operator": "DS001",
+      "operatorName": "阿宁",
+      "timestamp": "2026-06-09T02:37:19.853Z",
+      "detail": "阿宁上传BIM模型备注（v1）"
+    },
+    {
+      "id": "AL-mq9lq6i6b04fe07b",
+      "collisionId": "CP-2026-06-00003",
+      "action": "新增材料",
+      "actionBadgeColor": "#059669",
+      "operator": "DS001",
+      "operatorName": "阿宁",
+      "timestamp": "2026-06-09T02:37:19.853Z",
+      "detail": "阿宁上传边界样本"
+    },
+    {
+      "id": "AL-mq9lq6i6b9a8792e",
+      "collisionId": "CP-2026-06-00003",
+      "action": "新增材料",
+      "actionBadgeColor": "#059669",
+      "operator": "DS001",
+      "operatorName": "阿宁",
+      "timestamp": "2026-06-09T02:37:19.853Z",
+      "detail": "阿宁上传口头说明"
+    },
+    {
+      "id": "AL-mq9lq6i688ab13a7",
+      "collisionId": "CP-2026-06-00003",
+      "action": "标记异常",
+      "actionBadgeColor": "#dc2626",
+      "operator": "EN002",
+      "operatorName": "张工",
+      "timestamp": "2026-06-09T03:37:19.853Z",
+      "reason": "同一构件同一问题，属重复记录",
+      "detail": "张工标记为异常（重复碰撞点），填写异常原因：与CP-2026-06-00001重复，不重复处理。"
+    },
+    {
+      "id": "AL-mq9lq6i6b6cf67ec",
+      "collisionId": "CP-2026-06-00003",
+      "action": "改判结论",
+      "actionBadgeColor": "#e67e22",
+      "operator": "EN002",
+      "operatorName": "张工",
+      "timestamp": "2026-06-09T04:37:19.853Z",
+      "reason": "重复碰撞点合并处理",
+      "detail": "张工改判结论：豁免，合并至CP-2026-06-00001。"
+    },
+    {
+      "id": "AL-mq9lq6i652c415b0",
+      "collisionId": "CP-2026-06-00003",
+      "action": "修改状态",
+      "actionBadgeColor": "#7c3aed",
+      "operator": "EN002",
+      "operatorName": "张工",
+      "timestamp": "2026-06-09T05:37:19.853Z",
+      "detail": "张工改状态：processing→waived。"
+    },
+    {
+      "id": "AL-mq9lq6i6fe601583",
+      "collisionId": "CP-2026-06-00004",
+      "action": "新增材料",
+      "actionBadgeColor": "#059669",
+      "operator": "DS001",
+      "operatorName": "阿宁",
+      "timestamp": "2026-06-09T08:37:19.853Z",
+      "detail": "阿宁上传BIM模型备注（v1）"
+    },
+    {
+      "id": "AL-mq9lq6i67af70f9a",
+      "collisionId": "CP-2026-06-00004",
+      "action": "新增材料",
+      "actionBadgeColor": "#059669",
+      "operator": "DS001",
+      "operatorName": "阿宁",
+      "timestamp": "2026-06-09T08:37:19.853Z",
+      "detail": "阿宁上传边界样本"
+    },
+    {
+      "id": "AL-mq9lq6i6eeeccf89",
+      "collisionId": "CP-2026-06-00004",
+      "action": "修改备注",
+      "actionBadgeColor": "#2563eb",
+      "operator": "EN002",
+      "operatorName": "张工",
+      "timestamp": "2026-06-09T09:37:19.853Z",
+      "detail": "张工（白班）备注：需等设计院回复留洞放大尺寸。"
+    },
+    {
+      "id": "AL-mq9lq6i6b28a95d8",
+      "collisionId": "CP-2026-06-00004",
+      "action": "新增材料",
+      "actionBadgeColor": "#059669",
+      "operator": "EN003",
+      "operatorName": "李工",
+      "timestamp": "2026-06-09T14:37:19.853Z",
+      "detail": "李工（夜班）补录设计院口头说明：阿宁23:15微信确认，留洞放大至800x800。"
+    },
+    {
+      "id": "AL-mq9lq6i641736cde",
+      "collisionId": "CP-2026-06-00004",
+      "action": "改判结论",
+      "actionBadgeColor": "#e67e22",
+      "operator": "EN003",
+      "operatorName": "李工",
+      "timestamp": "2026-06-09T19:37:19.853Z",
+      "reason": "设计院助理阿宁23:15口头确认",
+      "detail": "李工（夜班）改判结论：留洞扩大为800x800，签变更B2-BG-017。"
+    },
+    {
+      "id": "AL-mq9lq6i60e86f35c",
+      "collisionId": "CP-2026-06-00004",
+      "action": "修改状态",
+      "actionBadgeColor": "#7c3aed",
+      "operator": "EN003",
+      "operatorName": "李工",
+      "timestamp": "2026-06-10T00:37:19.853Z",
+      "detail": "李工（夜班）改状态：processing→resolved。"
+    },
+    {
+      "id": "AL-mq9lq6i6ebfaac19",
+      "collisionId": "CP-2026-06-00005",
+      "action": "新增材料",
+      "actionBadgeColor": "#059669",
+      "operator": "DS001",
+      "operatorName": "阿宁",
+      "timestamp": "2026-06-09T00:37:19.853Z",
+      "detail": "阿宁提交材料并创建碰撞点记录 v1"
+    },
+    {
+      "id": "AL-mq9lq6i65ba440cb",
+      "collisionId": "CP-2026-06-00006",
+      "action": "新增材料",
+      "actionBadgeColor": "#059669",
+      "operator": "DS001",
+      "operatorName": "阿宁",
+      "timestamp": "2026-06-09T02:37:19.853Z",
+      "detail": "阿宁提交材料并创建碰撞点记录 v1"
+    },
+    {
+      "id": "AL-mq9lq6i6600760cd",
+      "collisionId": "CP-2026-06-00007",
+      "action": "新增材料",
+      "actionBadgeColor": "#059669",
+      "operator": "DS001",
+      "operatorName": "阿宁",
+      "timestamp": "2026-06-09T04:37:19.853Z",
+      "detail": "阿宁提交材料并创建碰撞点记录 v1"
+    },
+    {
+      "id": "AL-mq9lq6i6702c165e",
+      "collisionId": "CP-2026-06-00007",
+      "action": "修改备注",
+      "actionBadgeColor": "#2563eb",
+      "operator": "EN002",
+      "operatorName": "张工",
+      "timestamp": "2026-06-09T06:37:19.853Z",
+      "detail": "张工补充备注：算法复核通过"
+    },
+    {
+      "id": "AL-mq9lq6i69419575a",
+      "collisionId": "CP-2026-06-00008",
+      "action": "新增材料",
+      "actionBadgeColor": "#059669",
+      "operator": "DS001",
+      "operatorName": "阿宁",
+      "timestamp": "2026-06-09T06:37:19.853Z",
+      "detail": "阿宁提交材料并创建碰撞点记录 v1"
+    },
+    {
+      "id": "AL-mq9lq6i6e578880d",
+      "collisionId": "CP-2026-06-00008",
+      "action": "修改备注",
+      "actionBadgeColor": "#2563eb",
+      "operator": "EN002",
+      "operatorName": "张工",
+      "timestamp": "2026-06-09T08:37:19.853Z",
+      "detail": "张工补充备注：与施工队沟通中"
+    },
+    {
+      "id": "AL-mq9lq6i6698de30e",
+      "collisionId": "CP-2026-06-00009",
+      "action": "新增材料",
+      "actionBadgeColor": "#059669",
+      "operator": "DS001",
+      "operatorName": "阿宁",
+      "timestamp": "2026-06-09T08:37:19.853Z",
+      "detail": "阿宁提交材料并创建碰撞点记录 v1"
+    },
+    {
+      "id": "AL-mq9lq6i6048f12c1",
+      "collisionId": "CP-2026-06-00010",
+      "action": "新增材料",
+      "actionBadgeColor": "#059669",
+      "operator": "DS001",
+      "operatorName": "阿宁",
+      "timestamp": "2026-06-09T10:37:19.853Z",
+      "detail": "阿宁提交材料并创建碰撞点记录 v1"
+    },
+    {
+      "id": "AL-mq9lq6i6aa2500a0",
+      "collisionId": "CP-2026-06-00011",
+      "action": "新增材料",
+      "actionBadgeColor": "#059669",
+      "operator": "DS001",
+      "operatorName": "阿宁",
+      "timestamp": "2026-06-09T12:37:19.853Z",
+      "detail": "阿宁提交材料并创建碰撞点记录 v1"
+    },
+    {
+      "id": "AL-mq9lq6i648916e6b",
+      "collisionId": "CP-2026-06-00011",
+      "action": "修改备注",
+      "actionBadgeColor": "#2563eb",
+      "operator": "EN002",
+      "operatorName": "张工",
+      "timestamp": "2026-06-09T14:37:19.853Z",
+      "detail": "张工补充备注：与施工队沟通中"
+    },
+    {
+      "id": "AL-mq9lq6i681b10bab",
+      "collisionId": "CP-2026-06-00012",
+      "action": "新增材料",
+      "actionBadgeColor": "#059669",
+      "operator": "DS001",
+      "operatorName": "阿宁",
+      "timestamp": "2026-06-09T14:37:19.853Z",
+      "detail": "阿宁提交材料并创建碰撞点记录 v1"
+    },
+    {
+      "id": "AL-mq9lq6i63be57842",
+      "collisionId": "CP-2026-06-00012",
+      "action": "修改备注",
+      "actionBadgeColor": "#2563eb",
+      "operator": "EN002",
+      "operatorName": "张工",
+      "timestamp": "2026-06-09T16:37:19.853Z",
+      "detail": "张工补充备注：算法复核通过"
+    },
+    {
+      "id": "AL-mq9mp1iy0fb29621",
+      "collisionId": "CP-2026-06-00001",
+      "action": "修改备注",
+      "actionBadgeColor": "#2563eb",
+      "operator": "EN002",
+      "operatorName": "张工",
+      "timestamp": "2026-06-11T15:04:26.362Z",
+      "reason": "月底封账前复核——备注同步测试：后端+导出CSV即时生效",
+      "detail": "remark: \"复核图纸后确认按原碰撞结论处理。\" → \"【封账前最终版】月底张工亲自核对完成，同步后端+CSV。\""
+    }
+  ]
+}

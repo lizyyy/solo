@@ -1,0 +1,111 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: '"Noto Sans SC"', '"Source Han Sans CN"', system-ui, sans-serif;
+  }
+  body {
+    @apply text-slate-800 bg-slate-50;
+  }
+  code,
+  .mono {
+    font-family: '"JetBrains Mono"', '"SF Mono"', Menlo, Consolas, monospace;
+  }
+  .title-font {
+    font-family: '"Noto Serif SC"', '"Source Han Serif CN"', Georgia, serif;
+  }
+}
+
+@layer components {
+  .panel {
+    @apply bg-white rounded-md border border-slate-200 shadow-panel;
+  }
+  .panel-header {
+    @apply border-b border-slate-200 bg-gradient-to-b from-slate-50 to-white px-4 py-2.5 flex items-center justify-between;
+  }
+  .panel-title {
+    @apply title-font text-engineering-navy font-semibold tracking-wide;
+  }
+  .eng-btn {
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-engineering-navy
+           border border-engineering-navy/40 bg-white rounded-none
+           hover:bg-engineering-navy hover:text-white hover:border-engineering-navy
+           transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .eng-btn-primary {
+    @apply eng-btn bg-engineering-navy text-white border-engineering-navy
+           hover:bg-engineering-navy-dark hover:border-engineering-navy-dark;
+  }
+  .eng-btn-warn {
+    @apply eng-btn text-caution-orange border-caution-orange/60
+           hover:bg-caution-orange hover:text-white hover:border-caution-orange;
+  }
+  .eng-input {
+    @apply w-full px-2.5 py-1.5 text-sm border border-slate-300 bg-white
+           focus:outline-none focus:border-engineering-navy focus:ring-1 focus:ring-engineering-navy/30
+           placeholder:text-slate-400;
+  }
+  .eng-tag {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-medium rounded-none border;
+  }
+  .striped-bg {
+    background-image: repeating-linear-gradient(
+      45deg,
+      rgba(30, 58, 95, 0.03) 0 8px,
+      transparent 8px 16px
+    );
+  }
+  .eng-table {
+    @apply w-full text-sm border-collapse;
+  }
+  .eng-table th {
+    @apply bg-slate-100 border-b border-slate-200 text-left px-3 py-2 text-[12px] font-semibold
+           text-engineering-navy/80 tracking-wide whitespace-nowrap;
+  }
+  .eng-table td {
+    @apply border-b border-slate-100 px-3 py-2 align-middle;
+  }
+  .eng-table tbody tr:hover td {
+    @apply bg-engineering-navy/5;
+  }
+  .eng-table tbody tr.row-abnormal td {
+    @apply bg-caution-orange-light/40;
+  }
+  .eng-table tbody tr.row-abnormal:hover td {
+    @apply bg-caution-orange-light/70;
+  }
+  .timeline-node {
+    @apply relative pl-8 pb-6 border-l-2 border-slate-200 last:border-l-0 last:pb-0;
+  }
+  .timeline-node::before {
+    content: '';
+    @apply absolute left-[-9px] top-0.5 w-4 h-4 rounded-full bg-white border-2 border-slate-300;
+  }
+  .timeline-node.active::before {
+    @apply border-caution-orange bg-caution-orange;
+  }
+  .diff-del {
+    @apply bg-red-100 text-red-700 line-through;
+  }
+  .diff-add {
+    @apply bg-green-100 text-green-700;
+  }
+}
+
+/* 工程风细滚动条 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: #c2cfde;
+  border-radius: 0;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a6bc;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
