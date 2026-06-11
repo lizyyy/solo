@@ -4,22 +4,22 @@ interface Props {
   state: ReturnType<typeof import('../store/useAppState')['useAppState']>
 }
 
-const CHECK_LABELS: Record<string, string> = {
-  duplicate_import: '重复导入检测',
-  missing_half_hour: '采样时间缺半小时',
-  recalc_after_supplement: '补录后重算',
-  export_consistency: '导出一致性',
-}
-
-const CHECK_DESCS: Record<string, string> = {
-  duplicate_import: '检测安全阈值表是否存在参数名称、数值、单位完全相同的重复记录',
-  missing_half_hour: '检测采样数据中是否存在半小时以上的时间间隔缺失',
-  recalc_after_supplement: '检测设备铭牌参数补录后是否需要重新计算挠度预警结果',
-  export_consistency: '验证导出明细、页面展示和接口返回是否读取同一份结果数据',
-}
-
 export function SelfCheckPanel({ state }: Props) {
-  const { selfCheckResults, runSelfCheck } = state
+  const { selfCheckResults, runSelfCheck, batches } = state
+
+  const CHECK_LABELS: Record<string, string> = {
+    duplicate_import: '重复导入检测',
+    missing_half_hour: '采样时间缺半小时',
+    recalc_after_supplement: '补录后重算',
+    export_consistency: '导出一致性',
+  }
+
+  const CHECK_DESCS: Record<string, string> = {
+    duplicate_import: '检测安全阈值表是否存在参数名称、数值、单位完全相同的重复记录，重跑同一批材料时采样缺失记录不能多出一份',
+    missing_half_hour: '检测采样数据中是否存在半小时以上的时间间隔缺失，来源和批次要标记清楚',
+    recalc_after_supplement: '检测设备铭牌参数补录后是否需要重新计算挠度预警结果',
+    export_consistency: '验证导出明细、页面展示和接口返回是否读取同一份结果数据',
+  }
 
   return (
     <>
@@ -30,10 +30,38 @@ export function SelfCheckPanel({ state }: Props) {
 
       <div className="card">
         <div className="card-header">
+          <h3>当前批次情况</h3>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>批次号</th>
+              <th>标签</th>
+              <th>类型</th>
+              <th>导入时间</th>
+              <th>操作人</th>
+              <th>记录数</th>
+            </tr>
+          </thead>
+          <tbody>
+            {batches.map(b => (
+              <tr key={b.id}>
+                <td style={{ fontFamily: 'monospace', fontSize: 12 }}>{b.id}</td>
+                <td>{b.label}</td>
+                <td>{b.type === 'threshold' ? '安全阈值表' : b.type === 'nameplate' ? '设备铭牌' : '采样数据'}</td>
+                <td>{new Date(b.importedAt).toLocaleString('zh-CN')}</td>
+                <td>{b.operator}</td>
+                <td>{b.recordCount}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="card">
+        <div className="card-header">
           <h3>自检项</h3>
-          <button className="btn btn-primary" onClick={runSelfCheck}>
-            🔄 运行自检
-          </button>
+          <button className="btn btn-primary" onClick={runSelfCheck}>🔄 运行自检</button>
         </div>
         <div className="selfcheck-grid">
           {Object.entries(CHECK_LABELS).map(([key, label]) => {
@@ -51,14 +79,10 @@ export function SelfCheckPanel({ state }: Props) {
                   <>
                     <div className="check-detail" style={{ marginTop: 8 }}>{result.message}</div>
                     <div className="check-detail">{result.details}</div>
-                    <div className="check-detail" style={{ marginTop: 4, fontSize: 11 }}>
-                      检查时间：{new Date(result.checkedAt).toLocaleString('zh-CN')}
-                    </div>
+                    <div className="check-detail" style={{ marginTop: 4, fontSize: 11 }}>检查时间：{new Date(result.checkedAt).toLocaleString('zh-CN')}</div>
                   </>
                 )}
-                {!result && (
-                  <div className="check-detail" style={{ marginTop: 8, color: '#475569' }}>尚未运行</div>
-                )}
+                {!result && <div className="check-detail" style={{ marginTop: 8, color: '#475569' }}>尚未运行</div>}
               </div>
             )
           })}
@@ -67,9 +91,7 @@ export function SelfCheckPanel({ state }: Props) {
 
       {selfCheckResults.length > 0 && (
         <div className="card">
-          <div className="card-header">
-            <h3>自检历史</h3>
-          </div>
+          <div className="card-header"><h3>自检历史</h3></div>
           <table>
             <thead>
               <tr>

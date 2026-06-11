@@ -6,9 +6,10 @@ import { DataConsistencyPanel } from './components/DataConsistencyPanel'
 import { WorkflowPanel } from './components/WorkflowPanel'
 import { AuditTrailPanel } from './components/AuditTrailPanel'
 import { DashboardPanel } from './components/DashboardPanel'
+import { ReportPanel } from './components/ReportPanel'
 import './styles.css'
 
-type Page = 'dashboard' | 'conflict' | 'selfcheck' | 'consistency' | 'workflow' | 'audit'
+type Page = 'dashboard' | 'conflict' | 'selfcheck' | 'consistency' | 'workflow' | 'audit' | 'report'
 
 const NAV_ITEMS: { key: Page; label: string }[] = [
   { key: 'dashboard', label: '预警总览' },
@@ -16,6 +17,7 @@ const NAV_ITEMS: { key: Page; label: string }[] = [
   { key: 'selfcheck', label: '系统自检' },
   { key: 'consistency', label: '数据一致性' },
   { key: 'workflow', label: '工作流管理' },
+  { key: 'report', label: '结果报告' },
   { key: 'audit', label: '追溯审计' },
 ]
 
@@ -27,18 +29,13 @@ export default function App() {
 
   const renderPage = () => {
     switch (currentPage) {
-      case 'dashboard':
-        return <DashboardPanel state={state} />
-      case 'conflict':
-        return <ConflictPanel state={state} />
-      case 'selfcheck':
-        return <SelfCheckPanel state={state} />
-      case 'consistency':
-        return <DataConsistencyPanel state={state} />
-      case 'workflow':
-        return <WorkflowPanel state={state} />
-      case 'audit':
-        return <AuditTrailPanel state={state} />
+      case 'dashboard': return <DashboardPanel state={state} />
+      case 'conflict': return <ConflictPanel state={state} />
+      case 'selfcheck': return <SelfCheckPanel state={state} />
+      case 'consistency': return <DataConsistencyPanel state={state} />
+      case 'workflow': return <WorkflowPanel state={state} />
+      case 'report': return <ReportPanel state={state} />
+      case 'audit': return <AuditTrailPanel state={state} />
     }
   }
 

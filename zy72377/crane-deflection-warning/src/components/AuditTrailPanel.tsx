@@ -13,8 +13,8 @@ const SEGMENT_LABELS: Record<Segment, string> = {
 }
 
 const SEGMENT_DESCS: Record<Segment, string> = {
-  threshold_source: '安全阈值表的导入、版本和来源追溯',
-  nameplate_supplement: '设备铭牌参数补录、冲突发现和重算记录',
+  threshold_source: '安全阈值表的导入、版本和来源追溯，含批次号',
+  nameplate_supplement: '设备铭牌参数补录、冲突发现和重算记录，含批次号',
   manual_confirmation: '维修师傅和质检员的人工确认与复核操作',
 }
 
@@ -39,11 +39,7 @@ export function AuditTrailPanel({ state }: Props) {
 
       <div className="segment-tabs">
         {allSegments.map(seg => (
-          <button
-            key={seg}
-            className={`segment-tab ${activeSegment === seg ? 'active' : ''}`}
-            onClick={() => setActiveSegment(seg)}
-          >
+          <button key={seg} className={`segment-tab ${activeSegment === seg ? 'active' : ''}`} onClick={() => setActiveSegment(seg)}>
             {SEGMENT_LABELS[seg]} ({counts[seg]})
           </button>
         ))}
@@ -56,10 +52,7 @@ export function AuditTrailPanel({ state }: Props) {
         </div>
 
         {segmentEntries.length === 0 ? (
-          <div className="empty-state">
-            <div className="empty-icon">📭</div>
-            <p>此段暂无审计记录</p>
-          </div>
+          <div className="empty-state"><div className="empty-icon">📭</div><p>此段暂无审计记录</p></div>
         ) : (
           <div className="audit-timeline">
             {segmentEntries.map(entry => (
@@ -67,16 +60,10 @@ export function AuditTrailPanel({ state }: Props) {
                 <div className="audit-action">{entry.action}</div>
                 <div className="audit-meta">
                   操作人：{entry.operator || '待定'} | 时间：{entry.timestamp ? new Date(entry.timestamp).toLocaleString('zh-CN') : '待定'}
-                  {entry.parameterVersion && (
-                    <span className="param-version-tag" style={{ marginLeft: 8 }}>{entry.parameterVersion}</span>
-                  )}
+                  {entry.parameterVersion && <span className="param-version-tag" style={{ marginLeft: 8 }}>{entry.parameterVersion}</span>}
+                  {entry.batchId && <span style={{ marginLeft: 8, fontSize: 11, color: '#64748b' }}>批次:{entry.batchId}</span>}
                 </div>
                 <div className="audit-details">{entry.details}</div>
-                {entry.relatedRecordId && (
-                  <div style={{ fontSize: 11, color: '#475569', marginTop: 4 }}>
-                    关联记录：{entry.relatedRecordId}
-                  </div>
-                )}
               </div>
             ))}
           </div>
@@ -97,6 +84,7 @@ export function AuditTrailPanel({ state }: Props) {
               <th>操作人</th>
               <th>详情</th>
               <th>参数版本</th>
+              <th>批次号</th>
             </tr>
           </thead>
           <tbody>
@@ -115,6 +103,7 @@ export function AuditTrailPanel({ state }: Props) {
                   <td>{entry.operator}</td>
                   <td style={{ fontSize: 12, color: '#94a3b8', maxWidth: 280 }}>{entry.details}</td>
                   <td>{entry.parameterVersion && <span className="param-version-tag">{entry.parameterVersion}</span>}</td>
+                  <td style={{ fontFamily: 'monospace', fontSize: 11, color: '#64748b' }}>{entry.batchId || '—'}</td>
                 </tr>
               ))}
           </tbody>
@@ -129,18 +118,15 @@ export function AuditTrailPanel({ state }: Props) {
         <div style={{ fontSize: 13, color: '#cbd5e1', lineHeight: 2 }}>
           <div>
             <strong style={{ color: '#6ee7b7' }}>第一段 · 安全阈值表来源</strong>
-            <br />
-            查看安全阈值表的导入时间、版本号和来源文件。确认所使用的阈值是否为最新版本，是否经过审批。
+            <br />查看安全阈值表的导入时间、版本号、批次号和来源文件。确认所使用的阈值是否为最新版本，重传是否被拦截。
           </div>
           <div style={{ marginTop: 12 }}>
             <strong style={{ color: '#fbbf24' }}>第二段 · 设备铭牌参数补录</strong>
-            <br />
-            查看设备铭牌参数的补录时间、补录人和参数版本。确认补录后是否发现冲突，冲突如何处理，是否已重算挠度预警结果。
+            <br />查看设备铭牌参数的补录时间、补录人、批次号和参数版本。确认补录后是否发现冲突，冲突如何处理，是否已重算，改前/改后内容是否可查。
           </div>
           <div style={{ marginTop: 12 }}>
             <strong style={{ color: '#93c5fd' }}>第三段 · 人工确认</strong>
-            <br />
-            查看维修师傅对冲突的确认/驳回记录、质检员对缺失数据的复核记录。确认所有人工决策是否留有理由备注。
+            <br />查看维修师傅对冲突的确认/驳回记录、质检员对缺失数据的复核记录。确认所有人工决策是否留有理由备注，改前/改后是否有据可查。
           </div>
         </div>
       </div>

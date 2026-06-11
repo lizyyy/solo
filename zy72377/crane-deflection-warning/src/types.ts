@@ -1,5 +1,16 @@
+export interface ImportBatch {
+  id: string
+  label: string
+  type: 'threshold' | 'nameplate' | 'sampling'
+  importedAt: string
+  operator: string
+  recordCount: number
+  checksum: string
+}
+
 export interface SafetyThresholdEntry {
   id: string
+  batchId: string
   parameterName: string
   thresholdValue: number
   unit: string
@@ -11,6 +22,7 @@ export interface SafetyThresholdEntry {
 
 export interface EquipmentNameplateParam {
   id: string
+  batchId: string
   parameterName: string
   ratedValue: number
   unit: string
@@ -38,20 +50,31 @@ export interface ConflictRecord {
   createdAt: string
 }
 
+export interface BeforeAfterSnapshot {
+  field: string
+  before: string
+  after: string
+  changedAt: string
+  changedBy: string
+}
+
 export interface SamplingRecord {
   id: string
+  batchId: string
   timestamp: string
   deflectionValue: number
   unit: string
   isMissingHalfHour: boolean
   missingPeriodStart: string | null
   missingPeriodEnd: string | null
+  missingSource: string
   calculationResult: CalculationResult | null
   status: 'normal' | 'abnormal' | 'pending_review'
   reviewStatus: 'none' | 'pending' | 'reviewed'
   reviewer: string
   reviewedAt: string
   reviewNote: string
+  beforeAfterSnapshots: BeforeAfterSnapshot[]
 }
 
 export interface CalculationResult {
@@ -91,6 +114,7 @@ export interface AuditTrailEntry {
   details: string
   relatedRecordId: string
   parameterVersion: string
+  batchId: string
 }
 
 export interface ExportRecord {
@@ -100,16 +124,25 @@ export interface ExportRecord {
   includesMissingHalfHour: boolean
   consistencyHash: string
   format: string
+  batchId: string
 }
 
-export type AppState = {
-  safetyThresholds: SafetyThresholdEntry[]
-  nameplateParams: EquipmentNameplateParam[]
-  conflicts: ConflictRecord[]
-  samplingRecords: SamplingRecord[]
-  selfCheckResults: SelfCheckResult[]
-  workflowSteps: WorkflowStep[]
-  auditTrail: AuditTrailEntry[]
-  exportRecords: ExportRecord[]
-  currentOperator: string
+export interface UnifiedResultRow {
+  recordId: string
+  samplingTime: string
+  deflectionValue: number
+  unit: string
+  isMissingHalfHour: boolean
+  missingSource: string
+  missingPeriod: string
+  status: string
+  reviewStatus: string
+  reviewer: string
+  reviewNote: string
+  safetyLevel: string
+  deflectionRatio: number
+  parameterVersion: string
+  tradeOffReason: string
+  conflictResolution: string
+  beforeAfterSnapshots: BeforeAfterSnapshot[]
 }

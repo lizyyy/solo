@@ -1,22 +1,14 @@
-import React, { useState, useEffect } from 'react'
-import type { ConflictRecord } from '../types'
+import React, { useState } from 'react'
 
 interface Props {
   state: ReturnType<typeof import('../store/useAppState')['useAppState']>
 }
 
 export function ConflictPanel({ state }: Props) {
-  const { thresholds, nameplateParams, conflicts, detectConflicts, resolveConflict, currentOperator } = state
+  const { thresholds, nameplateParams, conflicts, resolveConflict, currentOperator, reimportThresholds, batches } = state
   const [resolvingId, setResolvingId] = useState<string | null>(null)
   const [resolutionNote, setResolutionNote] = useState('')
-  const [autoDetected, setAutoDetected] = useState(false)
-
-  useEffect(() => {
-    if (!autoDetected) {
-      detectConflicts()
-      setAutoDetected(true)
-    }
-  }, [autoDetected, detectConflicts])
+  const [reimportResult, setReimportResult] = useState<{ success: boolean; reason: string } | null>(null)
 
   const handleResolve = (id: string, status: 'confirmed' | 'rejected') => {
     if (!resolutionNote.trim()) return
@@ -25,20 +17,65 @@ export function ConflictPanel({ state }: Props) {
     setResolutionNote('')
   }
 
+  const handleReimport = () => {
+    const result = reimportThresholds('安全阈值表v2.1')
+    setReimportResult(result)
+  }
+
   const pendingConflicts = conflicts.filter(c => c.status === 'pending')
   const resolvedConflicts = conflicts.filter(c => c.status !== 'pending')
+  const thresholdBatches = batches.filter(b => b.type === 'threshold')
 
   return (
     <>
       <div className="page-header">
         <h2>冲突检测</h2>
-        <p>安全阈值表与设备铭牌参数对比——发现矛盾时列出冲突证据，由维修师傅{currentOperator}确认或驳回，系统不自动拍板</p>
+        <p>安全阈值表与设备铭牌参数矛盾时，先列出冲突证据，由维修师傅{currentOperator}确认或驳回，系统不自动拍板</p>
+      </div>
+
+      <div className="card">
+        <div className="card-header">
+          <h3>重复导入防护测试</h3>
+          <button className="btn btn-primary" onClick={handleReimport}>
+            模拟重跑同一批安全阈值表
+          </button>
+        </div>
+        <div style={{ fontSize: 13, color: '#94a3b8', marginBottom: 12 }}>
+          重跑同一批材料时，尤其是采样时间缺了半小时这种记录不能再多出一份；历史批次和本次重传要分清
+        </div>
+        {reimportResult && (
+          <div style={{ padding: 12, borderRadius: 8, background: reimportResult.success ? '#064e3b' : '#7f1d1d', color: reimportResult.success ? '#6ee7b7' : '#fca5a5', fontSize: 13, marginBottom: 12 }}>
+            {reimportResult.success ? `✓ ${reimportResult.reason}` : `✗ ${reimportResult.reason}`}
+          </div>
+        )}
+        <table>
+          <thead>
+            <tr>
+              <th>批次号</th>
+              <th>批次标签</th>
+              <th>导入时间</th>
+              <th>操作人</th>
+              <th>实际入库数</th>
+            </tr>
+          </thead>
+          <tbody>
+            {thresholdBatches.map(b => (
+              <tr key={b.id}>
+                <td style={{ fontFamily: 'monospace', fontSize: 12 }}>{b.id}</td>
+                <td>{b.label}</td>
+                <td>{new Date(b.importedAt).toLocaleString('zh-CN')}</td>
+                <td>{b.operator}</td>
+                <td>{b.recordCount}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       <div className="card">
         <div className="card-header">
           <h3>参数对比表</h3>
-          <div className="meta">安全阈值表 vs 设备铭牌参数</div>
+          <div className="meta">安全阈值表 vs 设备铭牌参数 | 冲突已在数据初始化时主动检测</div>
         </div>
         <table>
           <thead>
@@ -123,30 +160,18 @@ export function ConflictPanel({ state }: Props) {
                     onChange={e => setResolutionNote(e.target.value)}
                   />
                   <div className="conflict-actions">
-                    <button
-                      className="btn btn-success"
-                      onClick={() => handleResolve(c.id, 'confirmed')}
-                      disabled={!resolutionNote.trim()}
-                    >
+                    <button className="btn btn-success" onClick={() => handleResolve(c.id, 'confirmed')} disabled={!resolutionNote.trim()}>
                       ✓ 确认（以安全阈值表为准）
                     </button>
-                    <button
-                      className="btn btn-danger"
-                      onClick={() => handleResolve(c.id, 'rejected')}
-                      disabled={!resolutionNote.trim()}
-                    >
+                    <button className="btn btn-danger" onClick={() => handleResolve(c.id, 'rejected')} disabled={!resolutionNote.trim()}>
                       ✗ 驳回（以设备铭牌为准）
                     </button>
-                    <button className="btn btn-ghost" onClick={() => { setResolvingId(null); setResolutionNote('') }}>
-                      取消
-                    </button>
+                    <button className="btn btn-ghost" onClick={() => { setResolvingId(null); setResolutionNote('') }}>取消</button>
                   </div>
                 </div>
               ) : (
                 <div className="conflict-actions">
-                  <button className="btn btn-primary" onClick={() => setResolvingId(c.id)}>
-                    处理此冲突
-                  </button>
+                  <button className="btn btn-primary" onClick={() => setResolvingId(c.id)}>处理此冲突</button>
                 </div>
               )}
             </div>
@@ -156,9 +181,7 @@ export function ConflictPanel({ state }: Props) {
 
       {resolvedConflicts.length > 0 && (
         <div className="card">
-          <div className="card-header">
-            <h3>已处理冲突</h3>
-          </div>
+          <div className="card-header"><h3>已处理冲突</h3></div>
           {resolvedConflicts.map(c => (
             <div key={c.id} className="conflict-card" style={{ borderColor: c.status === 'confirmed' ? '#10b981' : '#64748b', borderLeftColor: c.status === 'confirmed' ? '#10b981' : '#64748b' }}>
               <div className="conflict-title" style={{ color: c.status === 'confirmed' ? '#6ee7b7' : '#94a3b8' }}>
@@ -166,45 +189,10 @@ export function ConflictPanel({ state }: Props) {
               </div>
               <div className="conflict-detail">
                 处理人：{c.resolvedBy} | 处理时间：{new Date(c.resolvedAt).toLocaleString('zh-CN')}
-                <br />
-                处理理由：{c.resolutionNote}
+                <br />处理理由：{c.resolutionNote}
               </div>
             </div>
           ))}
-        </div>
-      )}
-
-      {conflicts.length === 0 && (
-        <div className="card">
-          <div className="empty-state">
-            <div className="empty-icon">✅</div>
-            <p>当前无冲突，安全阈值表与设备铭牌参数一致</p>
-          </div>
-        </div>
-      )}
-
-      {resolvingId && (
-        <div className="dialog-overlay">
-          <div className="dialog">
-            <h4>处理冲突</h4>
-            <p>
-              {conflicts.find(c => c.id === resolvingId)?.description}
-            </p>
-            <textarea
-              placeholder="请填写确认/驳回理由（必填）"
-              value={resolutionNote}
-              onChange={e => setResolutionNote(e.target.value)}
-            />
-            <div className="dialog-actions">
-              <button className="btn btn-success" onClick={() => handleResolve(resolvingId, 'confirmed')} disabled={!resolutionNote.trim()}>
-                ✓ 确认（以安全阈值表为准）
-              </button>
-              <button className="btn btn-danger" onClick={() => handleResolve(resolvingId, 'rejected')} disabled={!resolutionNote.trim()}>
-                ✗ 驳回（以设备铭牌为准）
-              </button>
-              <button className="btn btn-ghost" onClick={() => { setResolvingId(null); setResolutionNote('') }}>取消</button>
-            </div>
-          </div>
         </div>
       )}
     </>
