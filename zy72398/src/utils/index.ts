@@ -1,4 +1,4 @@
-import type { WorkPhoto, InspectionNote, Conflict, TemperatureUnit, ConflictType } from '@/types';
+import type { WorkPhoto, InspectionNote, Conflict, TemperatureUnit, ConflictType, DiffusionCalcResult, RecalcDiff, ExportMismatch } from '@/types';
 
 export function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).substr(2);
@@ -133,6 +133,172 @@ export function calculateDiffusionRate(doValue: number, tempC: number, timeHours
   const baseRate = 0.05;
   const tempFactor = 1 + (tempC - 20) * 0.02;
   return doValue * baseRate * tempFactor * timeHours;
+}
+
+export function computeDiffusionForPhoto(photo: WorkPhoto, refTime?: string): DiffusionCalcResult {
+  const tempC = convertTemperature(photo.temperature, photo.temperatureUnit, 'C');
+  const refMs = refTime ? new Date(refTime).getTime() : Date.now();
+  const recMs = new Date(photo.recordTime).getTime();
+  const timeHours = Math.max(0.5, Math.abs(refMs - recMs) / 3600000);
+  const diffusionRate = calculateDiffusionRate(photo.dissolvedOxygen, tempC, timeHours);
+  return {
+    workPhotoId: photo.id,
+    deviceNo: photo.deviceNo,
+    dissolvedOxygen: photo.dissolvedOxygen,
+    temperatureC: tempC,
+    timeHours,
+    diffusionRate,
+    batchType: photo.batchType,
+    calculatedAt: new Date().toISOString()
+  };
+}
+
+export function computeRecalcDiffs(
+  normalPhotos: WorkPhoto[],
+  supplementaryPhotos: WorkPhoto[],
+  refTime?: string
+): RecalcDiff[] {
+  const diffs: RecalcDiff[] = [];
+  const normalByDevice = new Map<string, WorkPhoto>();
+  normalPhotos.forEach(p => normalByDevice.set(p.deviceNo, p));
+  
+  supplementaryPhotos.forEach(sup => {
+    const normal = normalByDevice.get(sup.deviceNo);
+    if (!normal) return;
+    
+    const normalCalc = computeDiffusionForPhoto(normal, refTime);
+    const supCalc = computeDiffusionForPhoto(sup, refTime);
+    
+    const diffAbsolute = Math.abs(supCalc.diffusionRate - normalCalc.diffusionRate);
+    const diffPercent = normalCalc.diffusionRate > 0
+      ? (diffAbsolute / normalCalc.diffusionRate) * 100
+      : 0;
+    
+    diffs.push({
+      deviceNo: sup.deviceNo,
+      normalDiffusionRate: normalCalc.diffusionRate,
+      supplementaryDiffusionRate: supCalc.diffusionRate,
+      diffAbsolute,
+      diffPercent,
+      recordTime: sup.recordTime
+    });
+  });
+  
+  return diffs;
+}
+
+export function verifyExportConsistency(
+  photos: WorkPhoto[],
+  notes: InspectionNote[],
+  conflicts: Conflict[],
+  report: any
+): ExportMismatch[] {
+  const mismatches: ExportMismatch[] = [];
+  
+  if (!report || !report.items) return mismatches;
+  
+  report.items.forEach((item: any) => {
+    const photo = photos.find(p => p.id === item.workPhotoId);
+    if (!photo) {
+      mismatches.push({
+        category: '工况照片',
+        field: '记录存在性',
+        expectedValue: `应存在ID=${item.workPhotoId}`,
+        actualValue: '未找到',
+        recordId: item.workPhotoId
+      });
+      return;
+    }
+    
+    if (photo.deviceNo !== item.deviceNo) {
+      mismatches.push({
+        category: '工况照片',
+        field: '设备编号',
+        expectedValue: photo.deviceNo,
+        actualValue: item.deviceNo,
+        recordId: item.workPhotoId
+      });
+    }
+    if (Math.abs(photo.dissolvedOxygen - item.dissolvedOxygen) > 0.001) {
+      mismatches.push({
+        category: '工况照片',
+        field: '溶氧值',
+        expectedValue: String(photo.dissolvedOxygen),
+        actualValue: String(item.dissolvedOxygen),
+        recordId: item.workPhotoId
+      });
+    }
+    const photoTempC = convertTemperature(photo.temperature, photo.temperatureUnit, 'C');
+    const itemTempC = convertTemperature(item.temperature, item.temperatureUnit, 'C');
+    if (Math.abs(photoTempC - itemTempC) > 0.01) {
+      mismatches.push({
+        category: '工况照片',
+        field: '温度(转摄氏度后)',
+        expectedValue: `${photoTempC.toFixed(2)}°C`,
+        actualValue: `${itemTempC.toFixed(2)}°C`,
+        recordId: item.workPhotoId
+      });
+    }
+  });
+  
+  const exportedPhotoIds = new Set(report.items?.map((i: any) => i.workPhotoId) || []);
+  photos.forEach(p => {
+    if (!exportedPhotoIds.has(p.id)) {
+      mismatches.push({
+        category: '工况照片',
+        field: '导出完整性',
+        expectedValue: `照片 ${p.deviceNo} 应在报告中`,
+        actualValue: '报告中缺失',
+        recordId: p.id
+      });
+    }
+  });
+  
+  const reportNotes = report.inspectionNotes || [];
+  const exportedNoteIds = new Set(reportNotes.map((n: any) => n.id));
+  notes.forEach(n => {
+    if (!exportedNoteIds.has(n.id)) {
+      mismatches.push({
+        category: '巡检备注',
+        field: '导出完整性',
+        expectedValue: `备注 ${n.inspectorName} 应在导出中`,
+        actualValue: '导出中缺失',
+        recordId: n.id
+      });
+    }
+  });
+  
+  const reportConflicts = report.conflicts || [];
+  const exportedConflictIds = new Set(reportConflicts.map((c: any) => c.id));
+  conflicts.forEach(c => {
+    if (!exportedConflictIds.has(c.id)) {
+      mismatches.push({
+        category: '冲突记录',
+        field: '导出完整性',
+        expectedValue: `冲突 ${c.id} 应在导出中`,
+        actualValue: '导出中缺失',
+        recordId: c.id
+      });
+    }
+  });
+  
+  return mismatches;
+}
+
+export function deduplicatePhotosByDeviceTime(photos: WorkPhoto[]): WorkPhoto[] {
+  const seen = new Map<string, WorkPhoto>();
+  photos.forEach(p => {
+    const key = `${p.deviceNo}_${new Date(p.recordTime).getTime()}`;
+    if (!seen.has(key)) {
+      seen.set(key, p);
+    } else {
+      const existing = seen.get(key)!;
+      if (p.batchType === 'supplementary' && existing.batchType !== 'supplementary') {
+        seen.set(key, p);
+      }
+    }
+  });
+  return Array.from(seen.values());
 }
 
 export function downloadJSON(data: any, filename: string): void {

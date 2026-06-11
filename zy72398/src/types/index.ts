@@ -43,6 +43,17 @@ export interface Conflict {
   createdAt: string;
 }
 
+export interface DiffusionCalcResult {
+  workPhotoId: string;
+  deviceNo: string;
+  dissolvedOxygen: number;
+  temperatureC: number;
+  timeHours: number;
+  diffusionRate: number;
+  batchType: BatchType;
+  calculatedAt: string;
+}
+
 export interface ReportItem {
   workPhotoId: string;
   deviceNo: string;
@@ -53,6 +64,20 @@ export interface ReportItem {
   hasConflict: boolean;
   conflictResolved: boolean;
   temperatureMixed: boolean;
+  diffusionRate?: number;
+  reviewStatus: 'pending' | 'reviewed' | 'flagged';
+  supplementaryUpdated: boolean;
+}
+
+export interface HistoryEntry {
+  id: string;
+  reportId: string;
+  field: string;
+  oldValue: string;
+  newValue: string;
+  modifier: string;
+  reason: string;
+  modifiedAt: string;
 }
 
 export interface HandoverReport {
@@ -65,7 +90,28 @@ export interface HandoverReport {
   temperatureMixed: boolean;
   conflictCount: number;
   resolvedCount: number;
+  deduplicatedItemCount: number;
+  diffusionResults: DiffusionCalcResult[];
+  inspectionNotes: InspectionNote[];
+  conflicts: Conflict[];
   createdAt: string;
+}
+
+export interface RecalcDiff {
+  deviceNo: string;
+  normalDiffusionRate: number;
+  supplementaryDiffusionRate: number;
+  diffAbsolute: number;
+  diffPercent: number;
+  recordTime: string;
+}
+
+export interface ExportMismatch {
+  category: string;
+  field: string;
+  expectedValue: string;
+  actualValue: string;
+  recordId: string;
 }
 
 export interface SelfCheckResult {
@@ -83,6 +129,7 @@ export interface AppState {
   conflicts: Conflict[];
   reports: HandoverReport[];
   selfCheckResults: SelfCheckResult[];
+  historyEntries: HistoryEntry[];
   currentStep: number;
   currentBatchType: BatchType;
 }
