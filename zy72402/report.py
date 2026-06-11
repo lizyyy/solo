@@ -56,6 +56,8 @@ def generate_text_report(engine: WorkflowEngine, output_path: str = None) -> str
             if change.missing_materials:
                 lines.append(f"    还缺材料: {', '.join(change.missing_materials)}")
             lines.append(f"    下一步找谁: → {change.next_contact}")
+            if change.judgment_explanation:
+                lines.append(f"    判定说明: {change.judgment_explanation}")
             if change.notes:
                 lines.append(f"    备注详情:")
                 for note_line in change.notes.split('\n'):
@@ -92,8 +94,10 @@ def generate_dashboard_html(engine: WorkflowEngine, output_path: str) -> str:
 
     ticket_data = {tid: t.track_remark for tid, t in engine.tickets.items()}
     audio_data = {tid: af.audio_remark for tid, af in engine.audio_files.items()}
+    judgment_data = {tid: (c.judgment_explanation if c else "") for tid, c in engine.rehearsal_changes.items()}
     ticket_json = json.dumps(ticket_data, ensure_ascii=False)
     audio_json = json.dumps(audio_data, ensure_ascii=False)
+    judgment_json = json.dumps(judgment_data, ensure_ascii=False)
 
     rework_rows = ""
     for t in engine.get_tracks_with_rework():
@@ -125,6 +129,7 @@ def generate_dashboard_html(engine: WorkflowEngine, output_path: str) -> str:
             TrackStatus.APPROVED: "status-approved",
         }.get(c.status, "")
         status_text = STATUS_LABELS.get(c.status, c.status)
+        judgment_preview = c.judgment_explanation[:30] + "..." if len(c.judgment_explanation) > 30 else c.judgment_explanation
         change_rows += f"""
         <tr>
             <td>{c.track_id}</td>
@@ -132,6 +137,9 @@ def generate_dashboard_html(engine: WorkflowEngine, output_path: str) -> str:
             <td>{c.kept_why}</td>
             <td>{', '.join(c.missing_materials) if c.missing_materials else '-'}</td>
             <td><strong>{c.next_contact}</strong></td>
+            <td class="judgment-cell" onclick="showJudgment('{c.track_id}', this)">
+                {judgment_preview or '点击查看'}
+            </td>
             <td><span class="{status_class}">{status_text}</span></td>
         </tr>
         """
@@ -293,6 +301,16 @@ def generate_dashboard_html(engine: WorkflowEngine, output_path: str) -> str:
             color: #667eea;
         }
         .remark-cell:hover { text-decoration: underline; }
+        .judgment-cell {
+            cursor: pointer;
+            color: #667eea;
+            font-size: 13px;
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .judgment-cell:hover { text-decoration: underline; }
         .keyword-badge {
             display: inline-block;
             background: #fee2e2;
@@ -402,6 +420,7 @@ def generate_dashboard_html(engine: WorkflowEngine, output_path: str) -> str:
                     <th>为什么留下</th>
                     <th>还缺材料</th>
                     <th>下一步找谁</th>
+                    <th>判定说明（点击查看）</th>
                     <th>状态</th>
                 </tr>
             </thead>
@@ -422,6 +441,7 @@ def generate_dashboard_html(engine: WorkflowEngine, output_path: str) -> str:
     <script>
         const ticketRemarks = __TICKET_JSON__;
         const audioRemarks = __AUDIO_JSON__;
+        const judgmentData = __JUDGMENT_JSON__;
 
         function showDetail(trackId, type, el) {
             const modal = document.getElementById('modal');
@@ -435,6 +455,15 @@ def generate_dashboard_html(engine: WorkflowEngine, output_path: str) -> str:
                 title.textContent = '音频文件 - 备注';
                 content.textContent = audioRemarks[trackId] || '（未补录）';
             }
+            modal.classList.add('show');
+        }
+
+        function showJudgment(trackId, el) {
+            const modal = document.getElementById('modal');
+            const title = document.getElementById('modal-title');
+            const content = document.getElementById('modal-content');
+            title.textContent = '判定说明 - 为什么这样处理？';
+            content.textContent = judgmentData[trackId] || '暂无说明';
             modal.classList.add('show');
         }
 
@@ -461,6 +490,7 @@ def generate_dashboard_html(engine: WorkflowEngine, output_path: str) -> str:
     html = html.replace('__CHANGE_ROWS__', change_rows)
     html = html.replace('__TICKET_JSON__', ticket_json)
     html = html.replace('__AUDIO_JSON__', audio_json)
+    html = html.replace('__JUDGMENT_JSON__', judgment_json)
 
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, 'w', encoding='utf-8') as f:

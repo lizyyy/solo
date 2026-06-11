@@ -17,6 +17,31 @@ class NextContact(str, Enum):
     RECORDING_STUDIO = "录音棚"
 
 
+class RemarkSource(str, Enum):
+    TICKET = "票务导出表"
+    AUDIO = "音频文件备注"
+
+
+@dataclass
+class RemarkChangeLog:
+    track_id: str
+    source: RemarkSource
+    old_value: str
+    new_value: str
+    changed_by: str
+    changed_at: datetime
+    change_reason: str = ""
+
+
+@dataclass
+class DetectionDetail:
+    is_rework: bool
+    matched_keywords: List[str] = field(default_factory=list)
+    excluded_by_negation: List[str] = field(default_factory=list)
+    judgment_basis: str = ""
+    negation_contexts: List[str] = field(default_factory=list)
+
+
 @dataclass
 class TicketExport:
     track_id: str
@@ -27,6 +52,7 @@ class TicketExport:
     import_time: datetime = field(default_factory=datetime.now)
     has_rework_reason: bool = False
     rework_keywords: List[str] = field(default_factory=list)
+    detection_detail: Optional[DetectionDetail] = None
 
     @property
     def hour_diff(self) -> float:
@@ -54,6 +80,7 @@ class RehearsalChange:
     created_at: datetime = field(default_factory=datetime.now)
     updated_at: datetime = field(default_factory=datetime.now)
     notes: str = ""
+    judgment_explanation: str = ""
 
 
 @dataclass

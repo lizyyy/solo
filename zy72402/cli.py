@@ -133,6 +133,127 @@ def cmd_status(args):
         print(f"   待版权复核: {pending} 条")
 
 
+def cmd_detail(args):
+    engine = WorkflowEngine(data_dir=args.data_dir)
+    if not engine.load_state():
+        print("❌ 未找到工作流状态，请先运行 import 命令")
+        sys.exit(1)
+
+    try:
+        detail = engine.get_remark_detail(args.track_id)
+    except ValueError as e:
+        print(f"❌ {e}")
+        sys.exit(1)
+
+    print(f"🔍 轨道详情 - {detail['track_id']} {detail['track_name']}")
+    print("=" * 60)
+    print()
+    print(f"📝 票务导出表备注:")
+    print(f"   {detail['ticket_remark']}")
+    print()
+    print(f"🎵 音频文件备注:")
+    print(f"   {detail['audio_remark'] or '（未补录）'}")
+    print()
+
+    det = detail['detection_detail']
+    if det:
+        print(f"🔎 返工原因检测:")
+        print(f"   是否判定为返工: {'是' if det.is_rework else '否'}")
+        print(f"   匹配的关键词: {', '.join(det.matched_keywords) if det.matched_keywords else '无'}")
+        if det.excluded_by_negation:
+            print(f"   被否定语境排除: {', '.join(det.excluded_by_negation)}")
+            print(f"   否定语境: {'; '.join(det.negation_contexts)}")
+        print(f"   判定依据: {det.judgment_basis}")
+        print()
+
+    rc = detail['rehearsal_change']
+    if rc:
+        print(f"📋 排练变更记录:")
+        print(f"   状态: {rc.status}")
+        print(f"   为什么留下: {rc.kept_why}")
+        print(f"   还缺材料: {', '.join(rc.missing_materials) if rc.missing_materials else '无'}")
+        print(f"   下一步找谁: {rc.next_contact}")
+        if rc.judgment_explanation:
+            print(f"   判定说明: {rc.judgment_explanation}")
+        print()
+
+    logs = detail['change_logs']
+    if logs:
+        print(f"📜 变更历史（共 {len(logs)} 条）:")
+        for i, log in enumerate(logs, 1):
+            print(f"   {i}. [{log.changed_at.strftime('%Y-%m-%d %H:%M')}] {log.changed_by} 修改了{log.source}")
+            print(f"      旧值: {log.old_value or '（空）'}")
+            print(f"      新值: {log.new_value}")
+            if log.change_reason:
+                print(f"      原因: {log.change_reason}")
+    else:
+        print("📜 变更历史: 无")
+
+
+def cmd_edit(args):
+    engine = WorkflowEngine(data_dir=args.data_dir)
+    if not engine.load_state():
+        print("❌ 未找到工作流状态，请先运行 import 命令")
+        sys.exit(1)
+
+    try:
+        if args.type == "ticket":
+            log = engine.update_ticket_remark(
+                args.track_id, args.remark,
+                changed_by=args.by, change_reason=args.reason or ""
+            )
+            source = "票务导出表备注"
+        elif args.type == "audio":
+            log = engine.update_audio_remark(
+                args.track_id, args.remark,
+                changed_by=args.by, change_reason=args.reason or ""
+            )
+            source = "音频文件备注"
+
+        engine.save_state()
+        print(f"✅ {source}已更新")
+        print(f"   修改人: {log.changed_by}")
+        print(f"   旧值: {log.old_value or '（空）'}")
+        print(f"   新值: {log.new_value}")
+        if log.change_reason:
+            print(f"   修改原因: {log.change_reason}")
+
+        detail = engine.get_remark_detail(args.track_id)
+        det = detail['detection_detail']
+        if det:
+            print()
+            print(f"🔎 更新后的判定:")
+            print(f"   是否返工: {'是' if det.is_rework else '否'}")
+            print(f"   判定依据: {det.judgment_basis}")
+    except ValueError as e:
+        print(f"❌ {e}")
+        sys.exit(1)
+
+
+def cmd_history(args):
+    engine = WorkflowEngine(data_dir=args.data_dir)
+    if not engine.load_state():
+        print("❌ 未找到工作流状态")
+        sys.exit(1)
+
+    logs = engine.get_change_logs(args.track_id)
+    if not logs:
+        print("📜 暂无变更历史")
+        return
+
+    track_filter = f"（轨道 {args.track_id}）" if args.track_id else ""
+    print(f"📜 变更历史{track_filter} 共 {len(logs)} 条:")
+    print("-" * 60)
+    for i, log in enumerate(logs, 1):
+        print(f"{i}. [{log.changed_at.strftime('%Y-%m-%d %H:%M')}] {log.changed_by}")
+        print(f"   轨道 {log.track_id} - {log.source}")
+        print(f"   旧: {log.old_value or '（空）'}")
+        print(f"   新: {log.new_value}")
+        if log.change_reason:
+            print(f"   原因: {log.change_reason}")
+        print()
+
+
 def cmd_demo(args):
     print("🎬 运行完整演示流程...")
     print()
@@ -210,6 +331,11 @@ def main():
   3. update  - 生成/更新排练变更记录
   4. review  - 版权运营复核（含返工原因的不会自动归为正常）
 
+查看与编辑：
+  detail    - 查看某轨道完整详情（含判定依据和变更历史）
+  edit      - 人工补录/修改票务备注或音频备注
+  history   - 查看备注变更历史（谁改了什么）
+
 查看结果：
   status    - 查看当前工作流状态
   report    - 生成文本报告或HTML看板
@@ -239,6 +365,19 @@ def main():
 
     subparsers.add_parser("status", help="查看工作流状态")
 
+    p_detail = subparsers.add_parser("detail", help="查看某轨道完整详情")
+    p_detail.add_argument("--track-id", required=True, help="轨道编号")
+
+    p_edit = subparsers.add_parser("edit", help="人工补录/修改备注")
+    p_edit.add_argument("--track-id", required=True, help="轨道编号")
+    p_edit.add_argument("--type", required=True, choices=["ticket", "audio"], help="备注类型：ticket票务 / audio音频")
+    p_edit.add_argument("--remark", required=True, help="新的备注内容")
+    p_edit.add_argument("--by", required=True, help="修改人")
+    p_edit.add_argument("--reason", help="修改原因")
+
+    p_history = subparsers.add_parser("history", help="查看备注变更历史")
+    p_history.add_argument("--track-id", help="轨道编号（不填则查看全部）")
+
     p_demo = subparsers.add_parser("demo", help="运行完整演示")
     p_demo.add_argument("--ticket-csv", help="票务导出表CSV (默认: samples/ticket_export.csv)")
     p_demo.add_argument("--audio-csv", help="音频文件CSV (默认: samples/audio_files.csv)")
@@ -257,6 +396,12 @@ def main():
         cmd_report(args)
     elif args.command == "status":
         cmd_status(args)
+    elif args.command == "detail":
+        cmd_detail(args)
+    elif args.command == "edit":
+        cmd_edit(args)
+    elif args.command == "history":
+        cmd_history(args)
     elif args.command == "demo":
         cmd_demo(args)
     else:

@@ -13,11 +13,20 @@
       "planned_hours": 8.0,
       "actual_hours": 7.5,
       "track_remark": "正常录制，无返工",
-      "has_rework_reason": true,
-      "rework_keywords": [
-        "返工"
-      ],
-      "import_time": "2026-06-06T23:37:33.759646"
+      "has_rework_reason": false,
+      "rework_keywords": [],
+      "import_time": "2026-06-12T02:04:20.659050",
+      "detection_detail": {
+        "is_rework": false,
+        "matched_keywords": [],
+        "excluded_by_negation": [
+          "返工"
+        ],
+        "judgment_basis": "虽包含关键词 返工，但均为否定语境（正常录制，无返工），不判定为返工",
+        "negation_contexts": [
+          "正常录制，无返工"
+        ]
+      }
     },
     "TRK002": {
       "track_id": "TRK002",
@@ -27,11 +36,22 @@
       "track_remark": "歌手走音重录2次，副歌部分补录",
       "has_rework_reason": true,
       "rework_keywords": [
+        "走音重录",
         "重录",
-        "补录",
-        "走音重录"
+        "补录"
       ],
-      "import_time": "2026-06-06T23:37:33.759656"
+      "import_time": "2026-06-12T02:04:20.659062",
+      "detection_detail": {
+        "is_rework": true,
+        "matched_keywords": [
+          "走音重录",
+          "重录",
+          "补录"
+        ],
+        "excluded_by_negation": [],
+        "judgment_basis": "检测到返工关键词: 走音重录, 重录, 补录",
+        "negation_contexts": []
+      }
     },
     "TRK003": {
       "track_id": "TRK003",
@@ -41,7 +61,14 @@
       "track_remark": "正常",
       "has_rework_reason": false,
       "rework_keywords": [],
-      "import_time": "2026-06-06T23:37:33.759660"
+      "import_time": "2026-06-12T02:04:20.659065",
+      "detection_detail": {
+        "is_rework": false,
+        "matched_keywords": [],
+        "excluded_by_negation": [],
+        "judgment_basis": "未检测到返工相关关键词",
+        "negation_contexts": []
+      }
     },
     "TRK004": {
       "track_id": "TRK004",
@@ -51,13 +78,26 @@
       "track_remark": "背景噪音重录，后期返工调整，部分段落重新配音",
       "has_rework_reason": true,
       "rework_keywords": [
-        "返工",
-        "重录",
         "后期返工",
         "重新配音",
-        "噪音重录"
+        "噪音重录",
+        "返工",
+        "重录"
       ],
-      "import_time": "2026-06-06T23:37:33.759663"
+      "import_time": "2026-06-12T02:04:20.659073",
+      "detection_detail": {
+        "is_rework": true,
+        "matched_keywords": [
+          "后期返工",
+          "重新配音",
+          "噪音重录",
+          "返工",
+          "重录"
+        ],
+        "excluded_by_negation": [],
+        "judgment_basis": "检测到返工关键词: 后期返工, 重新配音, 噪音重录, 返工, 重录",
+        "negation_contexts": []
+      }
     },
     "TRK005": {
       "track_id": "TRK005",
@@ -67,7 +107,14 @@
       "track_remark": "无异常",
       "has_rework_reason": false,
       "rework_keywords": [],
-      "import_time": "2026-06-06T23:37:33.759666"
+      "import_time": "2026-06-12T02:04:20.659075",
+      "detection_detail": {
+        "is_rework": false,
+        "matched_keywords": [],
+        "excluded_by_negation": [],
+        "judgment_basis": "未检测到返工相关关键词",
+        "negation_contexts": []
+      }
     },
     "TRK006": {
       "track_id": "TRK006",
@@ -77,20 +124,41 @@
       "track_remark": "乐器瑕疵重录了一遍",
       "has_rework_reason": true,
       "rework_keywords": [
-        "重录",
-        "瑕疵重录"
+        "瑕疵重录",
+        "重录"
       ],
-      "import_time": "2026-06-06T23:37:33.759669"
+      "import_time": "2026-06-12T02:04:20.659080",
+      "detection_detail": {
+        "is_rework": true,
+        "matched_keywords": [
+          "瑕疵重录",
+          "重录"
+        ],
+        "excluded_by_negation": [],
+        "judgment_basis": "检测到返工关键词: 瑕疵重录, 重录",
+        "negation_contexts": []
+      }
     },
     "TRK007": {
       "track_id": "TRK007",
       "track_name": "青春纪念册",
       "planned_hours": 6.0,
       "actual_hours": 6.0,
-      "track_remark": "正常",
-      "has_rework_reason": false,
-      "rework_keywords": [],
-      "import_time": "2026-06-06T23:37:33.759671"
+      "track_remark": "正常，间奏有一段重录",
+      "has_rework_reason": true,
+      "rework_keywords": [
+        "重录"
+      ],
+      "import_time": "2026-06-12T02:04:20.659082",
+      "detection_detail": {
+        "is_rework": true,
+        "matched_keywords": [
+          "重录"
+        ],
+        "excluded_by_negation": [],
+        "judgment_basis": "检测到返工关键词: 重录",
+        "negation_contexts": []
+      }
     },
     "TRK008": {
       "track_id": "TRK008",
@@ -104,7 +172,18 @@
         "重拍",
         "修改"
       ],
-      "import_time": "2026-06-06T23:37:33.759674"
+      "import_time": "2026-06-12T02:04:20.659088",
+      "detection_detail": {
+        "is_rework": true,
+        "matched_keywords": [
+          "补录",
+          "重拍",
+          "修改"
+        ],
+        "excluded_by_negation": [],
+        "judgment_basis": "检测到返工关键词: 补录, 重拍, 修改",
+        "negation_contexts": []
+      }
     }
   },
   "audio_files": {
@@ -113,56 +192,56 @@
       "file_name": "TRK001_星辰大海_最终版.wav",
       "audio_remark": "音质清晰，已通过质检",
       "reviewed_by_amei": true,
-      "review_time": "2026-06-06T23:37:33.759945"
+      "review_time": "2026-06-12T02:04:20.720072"
     },
     "TRK002": {
       "track_id": "TRK002",
       "file_name": "TRK002_逆光奔跑_重录版.wav",
       "audio_remark": "重录后音质OK，走音问题已修正，待版权确认工时",
       "reviewed_by_amei": true,
-      "review_time": "2026-06-06T23:37:33.759952"
+      "review_time": "2026-06-12T02:04:20.720085"
     },
     "TRK003": {
       "track_id": "TRK003",
       "file_name": "TRK003_夏日回忆.wav",
       "audio_remark": "正常",
       "reviewed_by_amei": true,
-      "review_time": "2026-06-06T23:37:33.759959"
+      "review_time": "2026-06-12T02:04:20.720098"
     },
     "TRK004": {
       "track_id": "TRK004",
       "file_name": "TRK004_午夜旋律_返工V3.wav",
       "audio_remark": "三次返工后噪音问题解决，建议版权运营重点复核工时合理性",
       "reviewed_by_amei": true,
-      "review_time": "2026-06-06T23:37:33.759962"
+      "review_time": "2026-06-12T02:04:20.720102"
     },
     "TRK005": {
       "track_id": "TRK005",
       "file_name": "TRK005_梦想起航.wav",
       "audio_remark": "正常通过",
       "reviewed_by_amei": true,
-      "review_time": "2026-06-06T23:37:33.759964"
+      "review_time": "2026-06-12T02:04:20.720105"
     },
     "TRK006": {
       "track_id": "TRK006",
       "file_name": "TRK006_风的方向_重录.wav",
       "audio_remark": "乐器重录后效果达标，工时差异需备注",
       "reviewed_by_amei": true,
-      "review_time": "2026-06-06T23:37:33.759967"
+      "review_time": "2026-06-12T02:04:20.720108"
     },
     "TRK007": {
       "track_id": "TRK007",
       "file_name": "TRK007_青春纪念册.wav",
       "audio_remark": "一切正常",
       "reviewed_by_amei": true,
-      "review_time": "2026-06-06T23:37:33.759969"
+      "review_time": "2026-06-12T02:04:20.720111"
     },
     "TRK008": {
       "track_id": "TRK008",
       "file_name": "TRK008_远方的你_补录版.wav",
       "audio_remark": "情绪和歌词调整后效果好，补录部分已标记",
       "reviewed_by_amei": true,
-      "review_time": "2026-06-06T23:37:33.759971"
+      "review_time": "2026-06-12T02:04:20.720113"
     }
   },
   "rehearsal_changes": {
@@ -170,15 +249,14 @@
       "track_id": "TRK001",
       "track_name": "星辰大海",
       "change_reason": "正常录制，无返工",
-      "kept_why": "轨道备注包含返工原因，需版权运营复核后确认",
-      "missing_materials": [
-        "版权运营复核意见"
-      ],
+      "kept_why": "工时尾差在正常范围内，无返工记录",
+      "missing_materials": [],
       "next_contact": "版权运营",
-      "status": "pending_copyright_review",
-      "created_at": "2026-06-06T23:37:33.759951",
-      "updated_at": "2026-06-06T23:37:33.759952",
-      "notes": "票务备注: 正常录制，无返工\n音频备注: 音质清晰，已通过质检"
+      "status": "normal",
+      "created_at": "2026-06-12T02:04:20.720083",
+      "updated_at": "2026-06-12T02:04:20.720084",
+      "notes": "票务备注: 正常录制，无返工\n音频备注: 音质清晰，已通过质检",
+      "judgment_explanation": "判定依据: 虽包含关键词 返工，但均为否定语境（正常录制，无返工），不判定为返工；未检测到有效返工原因，判定为正常"
     },
     "TRK002": {
       "track_id": "TRK002",
@@ -190,9 +268,10 @@
       ],
       "next_contact": "版权运营",
       "status": "pending_copyright_review",
-      "created_at": "2026-06-06T23:37:33.759958",
-      "updated_at": "2026-06-06T23:37:33.759958",
-      "notes": "票务备注: 歌手走音重录2次，副歌部分补录\n音频备注: 重录后音质OK，走音问题已修正，待版权确认工时"
+      "created_at": "2026-06-12T02:04:20.720092",
+      "updated_at": "2026-06-12T02:04:20.720092",
+      "notes": "票务备注: 歌手走音重录2次，副歌部分补录\n音频备注: 重录后音质OK，走音问题已修正，待版权确认工时",
+      "judgment_explanation": "判定依据: 检测到返工关键词: 走音重录, 重录, 补录；因含返工原因，标记为待版权运营复核，不归为正常；工时尾差+3.5小时超过阈值，需关注"
     },
     "TRK003": {
       "track_id": "TRK003",
@@ -202,9 +281,10 @@
       "missing_materials": [],
       "next_contact": "版权运营",
       "status": "normal",
-      "created_at": "2026-06-06T23:37:33.759961",
-      "updated_at": "2026-06-06T23:37:33.759961",
-      "notes": "票务备注: 正常\n音频备注: 正常"
+      "created_at": "2026-06-12T02:04:20.720101",
+      "updated_at": "2026-06-12T02:04:20.720101",
+      "notes": "票务备注: 正常\n音频备注: 正常",
+      "judgment_explanation": "判定依据: 未检测到返工相关关键词；未检测到有效返工原因，判定为正常"
     },
     "TRK004": {
       "track_id": "TRK004",
@@ -216,9 +296,10 @@
       ],
       "next_contact": "版权运营",
       "status": "pending_copyright_review",
-      "created_at": "2026-06-06T23:37:33.759964",
-      "updated_at": "2026-06-06T23:37:33.759964",
-      "notes": "票务备注: 背景噪音重录，后期返工调整，部分段落重新配音\n音频备注: 三次返工后噪音问题解决，建议版权运营重点复核工时合理性"
+      "created_at": "2026-06-12T02:04:20.720105",
+      "updated_at": "2026-06-12T02:04:20.720105",
+      "notes": "票务备注: 背景噪音重录，后期返工调整，部分段落重新配音\n音频备注: 三次返工后噪音问题解决，建议版权运营重点复核工时合理性",
+      "judgment_explanation": "判定依据: 检测到返工关键词: 后期返工, 重新配音, 噪音重录, 返工, 重录；因含返工原因，标记为待版权运营复核，不归为正常；工时尾差+4.0小时超过阈值，需关注"
     },
     "TRK005": {
       "track_id": "TRK005",
@@ -228,9 +309,10 @@
       "missing_materials": [],
       "next_contact": "版权运营",
       "status": "normal",
-      "created_at": "2026-06-06T23:37:33.759966",
-      "updated_at": "2026-06-06T23:37:33.759966",
-      "notes": "票务备注: 无异常\n音频备注: 正常通过"
+      "created_at": "2026-06-12T02:04:20.720107",
+      "updated_at": "2026-06-12T02:04:20.720107",
+      "notes": "票务备注: 无异常\n音频备注: 正常通过",
+      "judgment_explanation": "判定依据: 未检测到返工相关关键词；未检测到有效返工原因，判定为正常"
     },
     "TRK006": {
       "track_id": "TRK006",
@@ -242,21 +324,25 @@
       ],
       "next_contact": "版权运营",
       "status": "pending_copyright_review",
-      "created_at": "2026-06-06T23:37:33.759968",
-      "updated_at": "2026-06-06T23:37:33.759969",
-      "notes": "票务备注: 乐器瑕疵重录了一遍\n音频备注: 乐器重录后效果达标，工时差异需备注"
+      "created_at": "2026-06-12T02:04:20.720110",
+      "updated_at": "2026-06-12T02:04:20.720110",
+      "notes": "票务备注: 乐器瑕疵重录了一遍\n音频备注: 乐器重录后效果达标，工时差异需备注",
+      "judgment_explanation": "判定依据: 检测到返工关键词: 瑕疵重录, 重录；因含返工原因，标记为待版权运营复核，不归为正常"
     },
     "TRK007": {
       "track_id": "TRK007",
       "track_name": "青春纪念册",
-      "change_reason": "正常",
-      "kept_why": "工时尾差在正常范围内，无返工记录",
-      "missing_materials": [],
+      "change_reason": "正常，间奏有一段重录",
+      "kept_why": "轨道备注包含返工原因，需版权运营复核后确认",
+      "missing_materials": [
+        "版权运营复核意见"
+      ],
       "next_contact": "版权运营",
-      "status": "normal",
-      "created_at": "2026-06-06T23:37:33.759971",
-      "updated_at": "2026-06-06T23:37:33.759971",
-      "notes": "票务备注: 正常\n音频备注: 一切正常"
+      "status": "pending_copyright_review",
+      "created_at": "2026-06-12T02:04:20.720112",
+      "updated_at": "2026-06-12T02:04:30.971633",
+      "notes": "票务备注: 正常，间奏有一段重录\n音频备注: 一切正常",
+      "judgment_explanation": "判定依据: 检测到返工关键词: 重录；因含返工原因，标记为待版权运营复核，不归为正常"
     },
     "TRK008": {
       "track_id": "TRK008",
@@ -268,9 +354,21 @@
       ],
       "next_contact": "版权运营",
       "status": "pending_copyright_review",
-      "created_at": "2026-06-06T23:37:33.759973",
-      "updated_at": "2026-06-06T23:37:33.759974",
-      "notes": "票务备注: 情绪不对重拍，歌词修改后补录\n音频备注: 情绪和歌词调整后效果好，补录部分已标记"
+      "created_at": "2026-06-12T02:04:20.720116",
+      "updated_at": "2026-06-12T02:04:20.720116",
+      "notes": "票务备注: 情绪不对重拍，歌词修改后补录\n音频备注: 情绪和歌词调整后效果好，补录部分已标记",
+      "judgment_explanation": "判定依据: 检测到返工关键词: 补录, 重拍, 修改；因含返工原因，标记为待版权运营复核，不归为正常；工时尾差+3.0小时超过阈值，需关注"
     }
-  }
+  },
+  "remark_change_logs": [
+    {
+      "track_id": "TRK007",
+      "source": "票务导出表",
+      "old_value": "正常",
+      "new_value": "正常，间奏有一段重录",
+      "changed_by": "巡演统筹阿梅",
+      "changed_at": "2026-06-12T02:04:30.971616",
+      "change_reason": "核对原始录音频发现间奏有返工"
+    }
+  ]
 }
