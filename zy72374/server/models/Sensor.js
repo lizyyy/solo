@@ -6,6 +6,7 @@ class Sensor {
     this.physicalId = data.physicalId;
     this.currentNumber = data.currentNumber;
     this.previousNumbers = data.previousNumbers || [];
+    this.rollbackHistory = data.rollbackHistory || [];
     this.location = data.location;
     this.type = data.type;
     this.status = data.status || 'active';
@@ -25,6 +26,7 @@ class Sensor {
       physicalId: this.physicalId,
       currentNumber: this.currentNumber,
       previousNumbers: this.previousNumbers,
+      rollbackHistory: this.rollbackHistory,
       location: this.location,
       type: this.type,
       status: this.status,
@@ -59,6 +61,50 @@ class Sensor {
       }
     }
     return this.currentNumber;
+  }
+
+  rollbackNumber(targetNumber, reason, operator) {
+    if (this.currentNumber === targetNumber) {
+      throw new Error('当前编号与目标编号相同，无需回滚');
+    }
+
+    const targetHistory = this.previousNumbers.find(h => h.number === targetNumber);
+    if (!targetHistory) {
+      throw new Error(`历史编号 ${targetNumber} 不存在`);
+    }
+
+    const oldNumber = this.currentNumber;
+    const oldStartTime = this.lastRestartTime || this.createdAt;
+
+    this.rollbackHistory.push({
+      oldNumber,
+      newNumber: targetNumber,
+      reason,
+      operator,
+      timestamp: new Date().toISOString()
+    });
+
+    this.previousNumbers.push({
+      number: this.currentNumber,
+      startTime: oldStartTime,
+      endTime: new Date().toISOString()
+    });
+
+    this.currentNumber = targetNumber;
+    this.lastRestartTime = new Date().toISOString();
+    this.updatedAt = new Date().toISOString();
+
+    return {
+      oldNumber,
+      newNumber: targetNumber,
+      reason,
+      operator,
+      timestamp: this.updatedAt
+    };
+  }
+
+  getRollbackHistory() {
+    return this.rollbackHistory;
   }
 }
 

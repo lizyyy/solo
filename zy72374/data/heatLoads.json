@@ -1,0 +1,144 @@
+[
+  {
+    "id": "e10e80c4-21c3-4ae9-881a-c155e21fa979",
+    "recordDate": "2026-06-11",
+    "poolId": "pool-main",
+    "poolArea": 500,
+    "targetTemp": 28,
+    "ambientTemp": 20,
+    "unit": "kW",
+    "sensorData": [
+      {
+        "sensorNumber": "T-201",
+        "inletTemp": 29.212757093323575,
+        "outletTemp": 36.300765962374975,
+        "flowRate": 10.586713876422882
+      },
+      {
+        "sensorNumber": "T-202",
+        "inletTemp": 26.306662630430154,
+        "outletTemp": 38.00617740727954,
+        "flowRate": 14.53427684300438
+      },
+      {
+        "sensorNumber": "P-101",
+        "inletTemp": 27.158908320745745,
+        "outletTemp": 39.11565084962127,
+        "flowRate": 12.171226039313051
+      }
+    ],
+    "photoIds": [
+      "f07f3ab5-fd13-48d9-96de-4c21397b705f",
+      "57dbc8a1-ac74-4a0c-a7d6-f3d78ce6fe22",
+      "c4634586-ff05-45af-bd28-ac415f04579f"
+    ],
+    "noteIds": [
+      "db7e8e51-f1a4-4bc0-897e-cbd39f3c0e2f"
+    ],
+    "importBatchId": "batch-20260611-001",
+    "calculationMethod": "standard",
+    "calculationFormula": "",
+    "status": "completed",
+    "hasSensorRestart": true,
+    "sensorRestartDetails": [],
+    "workflowStep": 4,
+    "createdBy": "何工",
+    "createdAt": "2026-06-11T00:41:07.713Z",
+    "updatedAt": "2026-06-11T00:42:30.642Z",
+    "engineerReviewedBy": "何工",
+    "engineerReviewedAt": "2026-06-11T00:42:22.884Z",
+    "safetyReviewedBy": "安全员",
+    "safetyReviewedAt": "2026-06-11T00:42:30.642Z",
+    "safetyReminders": [
+      "传感器重启编号变更已复核，已记录追溯链",
+      "下次巡检时重点关注T-201稳定性"
+    ],
+    "version": 4,
+    "history": [
+      {
+        "version": 1,
+        "status": "draft",
+        "workflowStep": 1,
+        "sensorData": [
+          {
+            "sensorNumber": "T-201",
+            "inletTemp": 29.212757093323575,
+            "outletTemp": 36.300765962374975,
+            "flowRate": 10.586713876422882
+          },
+          {
+            "sensorNumber": "T-202",
+            "inletTemp": 26.306662630430154,
+            "outletTemp": 38.00617740727954,
+            "flowRate": 14.53427684300438
+          },
+          {
+            "sensorNumber": "P-101",
+            "inletTemp": 27.158908320745745,
+            "outletTemp": 39.11565084962127,
+            "flowRate": 12.171226039313051
+          }
+        ],
+        "editor": "何工",
+        "changeDescription": "提交工程审核",
+        "timestamp": "2026-06-11T00:42:12.708Z"
+      },
+      {
+        "version": 2,
+        "status": "pending_engineer_review",
+        "workflowStep": 2,
+        "sensorData": [
+          {
+            "sensorNumber": "T-201",
+            "inletTemp": 29.212757093323575,
+            "outletTemp": 36.300765962374975,
+            "flowRate": 10.586713876422882
+          },
+          {
+            "sensorNumber": "T-202",
+            "inletTemp": 26.306662630430154,
+            "outletTemp": 38.00617740727954,
+            "flowRate": 14.53427684300438
+          },
+          {
+            "sensorNumber": "P-101",
+            "inletTemp": 27.158908320745745,
+            "outletTemp": 39.11565084962127,
+            "flowRate": 12.171226039313051
+          }
+        ],
+        "editor": "何工",
+        "changeDescription": "工程审核通过: 已复核工况照片和巡检备注，数据准确，传感器重启记录已备注需安全员复核",
+        "timestamp": "2026-06-11T00:42:22.884Z"
+      },
+      {
+        "version": 3,
+        "status": "pending_safety_review",
+        "workflowStep": 3,
+        "sensorData": [
+          {
+            "sensorNumber": "T-201",
+            "inletTemp": 29.212757093323575,
+            "outletTemp": 36.300765962374975,
+            "flowRate": 10.586713876422882
+          },
+          {
+            "sensorNumber": "T-202",
+            "inletTemp": 26.306662630430154,
+            "outletTemp": 38.00617740727954,
+            "flowRate": 14.53427684300438
+          },
+          {
+            "sensorNumber": "P-101",
+            "inletTemp": 27.158908320745745,
+            "outletTemp": 39.11565084962127,
+            "flowRate": 12.171226039313051
+          }
+        ],
+        "editor": "安全员",
+        "changeDescription": "安全复核通过",
+        "timestamp": "2026-06-11T00:42:30.642Z"
+      }
+    ]
+  }
+]

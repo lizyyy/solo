@@ -6,11 +6,15 @@ class HeatLoadRecord {
     this.recordDate = data.recordDate || new Date().toISOString().split('T')[0];
     this.poolId = data.poolId;
     this.poolName = data.poolName;
+    this.poolArea = data.poolArea || 500;
+    this.targetTemp = data.targetTemp || 28;
+    this.ambientTemp = data.ambientTemp || 20;
     this.heatLoad = data.heatLoad;
     this.unit = data.unit || 'kW';
     this.sensorData = data.sensorData || [];
     this.photoIds = data.photoIds || [];
     this.noteIds = data.noteIds || [];
+    this.importBatchId = data.importBatchId;
     this.calculationMethod = data.calculationMethod || 'standard';
     this.calculationFormula = data.calculationFormula || '';
     this.status = data.status || 'draft';
@@ -39,11 +43,15 @@ class HeatLoadRecord {
       recordDate: this.recordDate,
       poolId: this.poolId,
       poolName: this.poolName,
+      poolArea: this.poolArea,
+      targetTemp: this.targetTemp,
+      ambientTemp: this.ambientTemp,
       heatLoad: this.heatLoad,
       unit: this.unit,
       sensorData: this.sensorData,
       photoIds: this.photoIds,
       noteIds: this.noteIds,
+      importBatchId: this.importBatchId,
       calculationMethod: this.calculationMethod,
       calculationFormula: this.calculationFormula,
       status: this.status,

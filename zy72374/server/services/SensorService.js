@@ -114,6 +114,38 @@ class SensorService {
   static deactivateSensor(id) {
     return store.update('sensors', id, { status: 'inactive' });
   }
+
+  static rollbackSensorNumber(id, targetNumber, reason, operator) {
+    const sensorData = this.getSensorById(id);
+    if (!sensorData) {
+      return { error: '传感器未找到' };
+    }
+
+    try {
+      const sensor = new Sensor(sensorData);
+      const result = sensor.rollbackNumber(targetNumber, reason, operator);
+      store.update('sensors', id, sensor.toJSON());
+      return {
+        success: true,
+        ...result,
+        sensor: sensor.toJSON()
+      };
+    } catch (e) {
+      return { error: e.message };
+    }
+  }
+
+  static getSensorRollbackHistory(id) {
+    const sensorData = this.getSensorById(id);
+    if (!sensorData) return null;
+    
+    const sensor = new Sensor(sensorData);
+    return {
+      sensorId: id,
+      physicalId: sensor.physicalId,
+      rollbackHistory: sensor.getRollbackHistory()
+    };
+  }
 }
 
 module.exports = SensorService;

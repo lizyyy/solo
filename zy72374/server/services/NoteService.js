@@ -35,12 +35,12 @@ class NoteService {
     return store.findAll('notes');
   }
 
-  static updateNoteContent(id, newContent, editor) {
+  static updateNoteContent(id, newContent, editor, reason = '') {
     const noteData = this.getNoteById(id);
     if (!noteData) return null;
     
     const note = new InspectionNote(noteData);
-    note.updateContent(newContent, editor);
+    note.updateContent(newContent, editor, reason);
     return store.update('notes', id, note.toJSON());
   }
 
@@ -81,14 +81,15 @@ class NoteService {
     return store.update('notes', id, note.toJSON());
   }
 
-  static rollbackNote(id, toVersion, editor) {
+  static rollbackNote(id, toVersion, editor, reason = '') {
     const noteData = this.getNoteById(id);
     if (!noteData) return null;
     
     const note = new InspectionNote(noteData);
     try {
-      note.rollback(toVersion, editor);
-      return store.update('notes', id, note.toJSON());
+      const result = note.rollback(toVersion, editor, reason);
+      const updated = store.update('notes', id, note.toJSON());
+      return { ...updated, ...result };
     } catch (e) {
       return { error: e.message };
     }

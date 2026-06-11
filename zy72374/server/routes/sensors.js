@@ -69,4 +69,26 @@ router.delete('/:id', (req, res) => {
   res.json(sensor);
 });
 
+router.get('/:id/rollback-history', (req, res) => {
+  const history = SensorService.getSensorRollbackHistory(req.params.id);
+  if (!history) {
+    return res.status(404).json({ error: '传感器未找到' });
+  }
+  res.json(history);
+});
+
+router.post('/:id/rollback', (req, res) => {
+  const { targetNumber, reason, operator } = req.body;
+  const result = SensorService.rollbackSensorNumber(
+    req.params.id,
+    targetNumber,
+    reason,
+    operator
+  );
+  if (result.error) {
+    return res.status(400).json({ error: result.error });
+  }
+  res.json(result);
+});
+
 module.exports = router;

@@ -1,0 +1,35 @@
+[
+  {
+    "id": "e413e269-776e-4cbb-8d74-30c3772e62e2",
+    "physicalId": "PHY-TEST-001",
+    "currentNumber": "T-101",
+    "previousNumbers": [
+      {
+        "number": "T-101",
+        "startTime": "2026-06-10T15:55:28.742Z",
+        "endTime": "2026-06-11T00:37:41.204Z"
+      },
+      {
+        "number": "T-201",
+        "startTime": "2026-06-11T00:37:41.204Z",
+        "endTime": "2026-06-11T00:43:08.829Z"
+      }
+    ],
+    "rollbackHistory": [
+      {
+        "oldNumber": "T-201",
+        "newNumber": "T-101",
+        "reason": "经过安全员复核，确认传感器编号应恢复为T-101，原重启为误报",
+        "operator": "安全员",
+        "timestamp": "2026-06-11T00:43:08.829Z"
+      }
+    ],
+    "location": "游泳池换热站-进水口",
+    "type": "temperature",
+    "status": "active",
+    "lastRestartTime": "2026-06-11T00:43:08.829Z",
+    "restartCount": 1,
+    "createdAt": "2026-06-10T15:55:28.742Z",
+    "updatedAt": "2026-06-11T00:43:08.829Z"
+  }
+]

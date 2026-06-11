@@ -98,12 +98,42 @@ router.post('/', (req, res) => {
   res.status(201).json(record);
 });
 
+router.post('/from-photos', (req, res) => {
+  const { photoIds, batchId, createdBy } = req.body;
+  const record = HeatLoadService.createRecordFromPhotos(photoIds, batchId, createdBy);
+  if (record && record.error) {
+    return res.status(400).json({ error: record.error });
+  }
+  res.status(201).json(record);
+});
+
+router.post('/:id/submit-review', (req, res) => {
+  const { operator } = req.body;
+  const record = HeatLoadService.submitForEngineeringReview(req.params.id, operator);
+  if (record && record.error) {
+    return res.status(400).json({ error: record.error });
+  }
+  if (!record) {
+    return res.status(404).json({ error: '换热负荷记录未找到' });
+  }
+  res.json(record);
+});
+
 router.post('/:id/submit-engineering', (req, res) => {
   const { editor } = req.body;
   const record = HeatLoadService.submitForEngineeringReview(req.params.id, editor);
   if (record && record.error) {
     return res.status(400).json({ error: record.error });
   }
+  if (!record) {
+    return res.status(404).json({ error: '换热负荷记录未找到' });
+  }
+  res.json(record);
+});
+
+router.post('/:id/add-note', (req, res) => {
+  const { noteId } = req.body;
+  const record = HeatLoadService.addNoteToRecord(req.params.id, noteId);
   if (!record) {
     return res.status(404).json({ error: '换热负荷记录未找到' });
   }

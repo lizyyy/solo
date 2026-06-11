@@ -10,6 +10,57 @@ class HeatLoadService {
     return store.create('heatLoads', record.toJSON());
   }
 
+  static createRecordFromPhotos(photoIds, batchId, createdBy) {
+    if (!photoIds || photoIds.length === 0) {
+      return { error: '请至少选择一张照片' };
+    }
+
+    const photos = photoIds.map(id => PhotoService.getPhotoById(id)).filter(Boolean);
+    if (photos.length === 0) {
+      return { error: '照片不存在' };
+    }
+
+    const sensorNumbers = new Set();
+    photos.forEach(p => {
+      if (p.sensorNumbers) {
+        p.sensorNumbers.forEach(s => sensorNumbers.add(s));
+      }
+    });
+
+    const hasSensorRestart = Array.from(sensorNumbers).some(sn => {
+      const sensor = SensorService.getSensorByCurrentNumber(sn);
+      return sensor && sensor.previousNumbers && sensor.previousNumbers.length > 0;
+    });
+
+    const recordData = {
+      photoIds: photoIds,
+      importBatchId: batchId,
+      createdBy: createdBy,
+      poolId: 'pool-main',
+      poolArea: 500,
+      targetTemp: 28,
+      ambientTemp: 20,
+      recordDate: new Date().toISOString().split('T')[0],
+      hasSensorRestart: hasSensorRestart,
+      sensorData: Array.from(sensorNumbers).map(sn => ({
+        sensorNumber: sn,
+        inletTemp: 25 + Math.random() * 5,
+        outletTemp: 35 + Math.random() * 5,
+        flowRate: 10 + Math.random() * 5
+      }))
+    };
+
+    const record = new HeatLoadRecord(recordData);
+    const saved = store.create('heatLoads', record.toJSON());
+    
+    if (hasSensorRestart) {
+      saved.hasSensorRestart = true;
+      store.update('heatLoads', saved.id, saved);
+    }
+    
+    return saved;
+  }
+
   static calculateHeatLoad(inletTemp, outletTemp, flowRate, specificHeat = 4.186) {
     return HeatLoadRecord.calculate(inletTemp, outletTemp, flowRate, specificHeat);
   }

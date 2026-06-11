@@ -21,6 +21,7 @@ app.use('/api/sensors', sensorRoutes);
 app.use('/api/photos', photoRoutes);
 app.use('/api/notes', noteRoutes);
 app.use('/api/heat-loads', heatLoadRoutes);
+app.use('/api/heat-load', heatLoadRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ 

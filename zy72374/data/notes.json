@@ -1,0 +1,52 @@
+[
+  {
+    "id": "db7e8e51-f1a4-4bc0-897e-cbd39f3c0e2f",
+    "photoIds": [
+      "f07f3ab5-fd13-48d9-96de-4c21397b705f"
+    ],
+    "sensorIds": [
+      "e413e269-776e-4cbb-8d74-30c3772e62e2"
+    ],
+    "heatLoadRecordId": "e10e80c4-21c3-4ae9-881a-c155e21fa979",
+    "content": "巡检时发现T-201传感器有重启迹象，编号从T-101变更为T-201。现场核对温度读数正常，暂不影响换热负荷计算，已在照片中标记传感器位置。",
+    "author": "何工",
+    "lastEditor": "何工",
+    "authorRole": "engineer",
+    "timestamp": "2026-06-11T00:41:32.517Z",
+    "version": 3,
+    "previousVersions": [
+      {
+        "version": 1,
+        "content": "巡检时发现T-201传感器有重启迹象，编号从T-101变更为T-201。现场核对温度读数正常，暂不影响换热负荷计算，已在照片中标记传感器位置。",
+        "editor": "何工",
+        "editedAt": "2026-06-11T00:41:32.517Z",
+        "reason": "补充下午复查结果，确认传感器重启后校准正常"
+      },
+      {
+        "version": 2,
+        "content": "巡检时发现T-201传感器有重启迹象，编号从T-101变更为T-201。现场核对温度读数正常，暂不影响换热负荷计算，已在照片中标记传感器位置。补充：下午2点复查，读数稳定，传感器重启后校准正常。",
+        "editor": "何工",
+        "editedAt": "2026-06-11T00:41:47.648Z",
+        "isRollback": true,
+        "reason": "误添加了下午复查内容，实际还未进行复查，需要回滚"
+      }
+    ],
+    "rollbackHistory": [
+      {
+        "fromVersion": 2,
+        "toVersion": 1,
+        "oldContent": "巡检时发现T-201传感器有重启迹象，编号从T-101变更为T-201。现场核对温度读数正常，暂不影响换热负荷计算，已在照片中标记传感器位置。补充：下午2点复查，读数稳定，传感器重启后校准正常。",
+        "newContent": "巡检时发现T-201传感器有重启迹象，编号从T-101变更为T-201。现场核对温度读数正常，暂不影响换热负荷计算，已在照片中标记传感器位置。",
+        "reason": "误添加了下午复查内容，实际还未进行复查，需要回滚",
+        "operator": "何工",
+        "timestamp": "2026-06-11T00:41:53.389Z"
+      }
+    ],
+    "isManual": true,
+    "verificationStatus": "pending",
+    "verifiedBy": null,
+    "verifiedAt": null,
+    "createdAt": "2026-06-11T00:41:32.517Z",
+    "updatedAt": "2026-06-11T00:41:53.389Z"
+  }
+]

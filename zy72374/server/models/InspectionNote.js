@@ -4,13 +4,18 @@ class InspectionNote {
   constructor(data) {
     this.id = data.id || uuidv4();
     this.photoId = data.photoId;
+    this.photoIds = data.photoIds || (data.photoId ? [data.photoId] : []);
     this.sensorNumber = data.sensorNumber;
+    this.sensorIds = data.sensorIds || [];
+    this.heatLoadRecordId = data.heatLoadRecordId;
     this.content = data.content;
     this.author = data.author;
+    this.lastEditor = data.lastEditor;
     this.authorRole = data.authorRole || 'engineer';
     this.timestamp = data.timestamp || new Date().toISOString();
     this.version = data.version || 1;
     this.previousVersions = data.previousVersions || [];
+    this.rollbackHistory = data.rollbackHistory || [];
     this.isManual = data.isManual !== undefined ? data.isManual : true;
     this.verificationStatus = data.verificationStatus || 'pending';
     this.verifiedBy = data.verifiedBy || null;
@@ -27,13 +32,18 @@ class InspectionNote {
     return {
       id: this.id,
       photoId: this.photoId,
+      photoIds: this.photoIds,
       sensorNumber: this.sensorNumber,
+      sensorIds: this.sensorIds,
+      heatLoadRecordId: this.heatLoadRecordId,
       content: this.content,
       author: this.author,
+      lastEditor: this.lastEditor,
       authorRole: this.authorRole,
       timestamp: this.timestamp,
       version: this.version,
       previousVersions: this.previousVersions,
+      rollbackHistory: this.rollbackHistory,
       isManual: this.isManual,
       verificationStatus: this.verificationStatus,
       verifiedBy: this.verifiedBy,
@@ -43,14 +53,16 @@ class InspectionNote {
     };
   }
 
-  updateContent(newContent, editor) {
+  updateContent(newContent, editor, reason = '') {
     this.previousVersions.push({
       version: this.version,
       content: this.content,
       editor: editor,
-      editedAt: this.updatedAt
+      editedAt: this.updatedAt,
+      reason: reason
     });
     this.content = newContent;
+    this.lastEditor = editor;
     this.version += 1;
     this.updatedAt = new Date().toISOString();
     this.verificationStatus = 'pending';
@@ -101,23 +113,35 @@ class InspectionNote {
     return this;
   }
 
-  rollback(toVersion, editor) {
+  rollback(toVersion, editor, reason = '') {
     const targetVersion = this.getVersion(toVersion);
     if (!targetVersion) {
       throw new Error(`Version ${toVersion} not found`);
     }
+    const fromVersion = this.version;
+    this.rollbackHistory.push({
+      fromVersion: fromVersion,
+      toVersion: toVersion,
+      oldContent: this.content,
+      newContent: targetVersion.content,
+      reason: reason,
+      operator: editor,
+      timestamp: new Date().toISOString()
+    });
     this.previousVersions.push({
       version: this.version,
       content: this.content,
       editor: editor,
       editedAt: this.updatedAt,
-      isRollback: true
+      isRollback: true,
+      reason: reason
     });
     this.content = targetVersion.content;
+    this.lastEditor = editor;
     this.version += 1;
     this.updatedAt = new Date().toISOString();
     this.verificationStatus = 'pending';
-    return this;
+    return { fromVersion, toVersion, reason, operator: editor };
   }
 }
 

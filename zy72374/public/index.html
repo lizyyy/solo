@@ -15,7 +15,7 @@
     .nav button:hover, .nav button.active { background: #1e3a5f; color: white; }
     .container { padding: 30px 40px; max-width: 1400px; margin: 0 auto; }
     .card { background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-    .card-title { font-size: 18px; font-weight: 600; margin-bottom: 16px; color: #1e3a5f; }
+    .card-title { font-size: 18px; font-weight: 600; margin-bottom: 16px; color: #1e3a5f; display: flex; justify-content: space-between; align-items: center; }
     .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
     .stat-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; }
     .stat-card.warning { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
@@ -37,6 +37,7 @@
     .btn-warning { background: #f59e0b; color: white; }
     .btn-danger { background: #ef4444; color: white; }
     .btn-outline { background: white; border: 1px solid #ddd; color: #666; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
     .badge { padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 500; }
     .badge-draft { background: #e5e7eb; color: #374151; }
     .badge-engineering { background: #dbeafe; color: #1e40af; }
@@ -48,7 +49,7 @@
     .evidence-item:hover { background: #e0f2fe; }
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
     .modal.active { display: flex; }
-    .modal-content { background: white; border-radius: 12px; max-width: 800px; width: 90%; max-height: 80vh; overflow-y: auto; }
+    .modal-content { background: white; border-radius: 12px; max-width: 900px; width: 90%; max-height: 85vh; overflow-y: auto; }
     .modal-header { padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
     .modal-body { padding: 24px; }
     .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
@@ -78,6 +79,29 @@
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     .heat-value { font-size: 48px; font-weight: 700; margin: 20px 0; }
     .heat-unit { font-size: 18px; opacity: 0.8; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 13px; }
+    .form-group input, .form-group textarea, .form-group select { 
+      width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; 
+      font-family: inherit;
+    }
+    .form-group textarea { min-height: 80px; resize: vertical; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
+    .loading { text-align: center; padding: 40px; color: #666; }
+    .toast { position: fixed; top: 20px; right: 20px; padding: 12px 24px; border-radius: 8px; color: white; z-index: 2000; font-size: 14px; opacity: 0; transition: opacity 0.3s; }
+    .toast.show { opacity: 1; }
+    .toast.success { background: #10b981; }
+    .toast.error { background: #ef4444; }
+    .toast.info { background: #3b82f6; }
+    .photo-upload-area { border: 2px dashed #ddd; border-radius: 8px; padding: 40px; text-align: center; cursor: pointer; transition: all 0.2s; }
+    .photo-upload-area:hover { border-color: #4facfe; background: #f0f9ff; }
+    .photo-upload-area.dragover { border-color: #4facfe; background: #e0f2fe; }
+    .batch-info { background: #eff6ff; padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; font-size: 13px; }
+    .duplicate-warning { background: #fef3c7; padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; font-size: 13px; border-left: 4px solid #f59e0b; }
+    .note-edit-area { background: white; border: 1px solid #ddd; border-radius: 6px; padding: 12px; margin-top: 8px; }
+    .rollback-form { background: #fef2f2; padding: 16px; border-radius: 6px; margin-top: 12px; }
+    .version-select { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
   </style>
 </head>
 <body>
@@ -94,6 +118,8 @@
   </div>
   
   <div class="container">
+    <div id="toast" class="toast"></div>
+    
     <div id="page-dashboard">
       <div class="card">
         <div class="card-title">工作流概览</div>
@@ -132,7 +158,10 @@
     
     <div id="page-records" style="display:none;">
       <div class="card">
-        <div class="card-title">换热负荷记录</div>
+        <div class="card-title">
+          <span>换热负荷记录</span>
+          <button class="btn btn-primary" onclick="showCreateHeatLoadModal()">+ 新建记录</button>
+        </div>
         <div class="workflow-steps">
           <div class="workflow-step">① 创建草稿</div>
           <div class="workflow-step">② 工程师审核</div>
@@ -157,14 +186,20 @@
     
     <div id="page-photos" style="display:none;">
       <div class="card">
-        <div class="card-title">工况照片管理</div>
+        <div class="card-title">
+          <span>工况照片管理</span>
+          <button class="btn btn-primary" onclick="showPhotoImportModal()">+ 导入照片</button>
+        </div>
         <div id="photos-list"></div>
       </div>
     </div>
     
     <div id="page-sensors" style="display:none;">
       <div class="card">
-        <div class="card-title">传感器管理</div>
+        <div class="card-title">
+          <span>传感器管理</span>
+          <button class="btn btn-primary" onclick="showCreateSensorModal()">+ 新增传感器</button>
+        </div>
         <table>
           <thead>
             <tr>
@@ -193,30 +228,43 @@
   </div>
 
   <script>
+    const API_BASE = '/api';
     let currentPage = 'dashboard';
-    let mockData = {};
+    let currentUser = { id: 'user-001', name: '操作员A', role: 'operator' };
+    let importBatchId = null;
+    let currentPhotos = [];
+    let currentHeatLoadRecords = [];
+    let currentSensors = [];
+    let currentModal = null;
+    let currentRollbackSensor = null;
+    let currentEditNote = null;
+    let currentRollbackNote = null;
+    let currentAddNoteRecordId = null;
     
-    function initMockData() {
-      mockData = {
-        sensors: [
-          { id: 's1', physicalId: 'SEN-001', currentNumber: 'T-101', previousNumbers: [{ number: 'T-099', startTime: '2024-01-01', endTime: '2024-03-15' }], location: '主泳池进水口', type: 'temperature', restartCount: 1 },
-          { id: 's2', physicalId: 'SEN-002', currentNumber: 'T-102', previousNumbers: [], location: '主泳池出水口', type: 'temperature', restartCount: 0 },
-          { id: 's3', physicalId: 'SEN-003', currentNumber: 'F-201', previousNumbers: [{ number: 'F-199', startTime: '2024-01-01', endTime: '2024-02-20' }, { number: 'F-200', startTime: '2024-02-20', endTime: '2024-04-10' }], location: '循环泵', type: 'flow', restartCount: 2 }
-        ],
-        photos: [
-          { id: 'p1', fileName: '20240601_1430_pool.jpg', uploadTime: '2024-06-01T14:30:00', sensorNumbers: ['T-101', 'F-201'], status: 'approved', notes: '下午2点巡检，设备运行正常', uploadedBy: '张工' },
-          { id: 'p2', fileName: '20240602_0915_sensor.jpg', uploadTime: '2024-06-02T09:15:00', sensorNumbers: ['T-102'], status: 'pending_review', notes: '', uploadedBy: '何工' }
-        ],
-        notes: [
-          { id: 'n1', photoId: 'p1', sensorNumber: 'T-101', content: '进水温度：25.5℃\n读数稳定，无异常', author: '何工', authorRole: 'engineer', version: 1, verificationStatus: 'verified' },
-          { id: 'n2', photoId: 'p1', sensorNumber: 'F-201', content: '流量：120 m³/h\n注意：传感器于今日凌晨重启，编号从F-200变更为F-201', author: '何工', authorRole: 'engineer', version: 2, verificationStatus: 'pending', previousVersions: [{ version: 1, content: '流量：120 m³/h', editor: '何工', editedAt: '2024-06-01T15:00:00' }] }
-        ],
-        heatLoads: [
-          { id: 'h1', recordDate: '2024-06-01', poolId: 'main', poolName: '主游泳池', heatLoad: 125.6, status: 'completed', workflowStep: 4, hasSensorRestart: true, photoIds: ['p1'], noteIds: ['n1', 'n2'], history: [{ version: 1, status: 'draft', editor: '操作员A', changeDescription: '创建记录', timestamp: '2024-06-01T10:00:00' }, { version: 2, status: 'pending_engineer_review', editor: '操作员A', changeDescription: '提交审核', timestamp: '2024-06-01T11:00:00' }, { version: 3, status: 'pending_safety_review', editor: '何工', changeDescription: '工程审核通过，检测到传感器重启需安全复核', timestamp: '2024-06-01T14:00:00' }, { version: 4, status: 'completed', editor: '安全员陈', changeDescription: '安全复核通过', timestamp: '2024-06-01T16:00:00' }] },
-          { id: 'h2', recordDate: '2024-06-02', poolId: 'main', poolName: '主游泳池', heatLoad: 118.3, status: 'pending_engineer_review', workflowStep: 2, hasSensorRestart: false, photoIds: ['p2'], noteIds: [], history: [{ version: 1, status: 'draft', editor: '操作员B', changeDescription: '创建记录', timestamp: '2024-06-02T09:00:00' }] },
-          { id: 'h3', recordDate: '2024-06-03', poolId: 'main', poolName: '主游泳池', heatLoad: 132.1, status: 'draft', workflowStep: 1, hasSensorRestart: false, photoIds: [], noteIds: [], history: [] }
-        ]
-      };
+    async function apiRequest(url, options = {}) {
+      try {
+        const response = await fetch(API_BASE + url, {
+          headers: { 'Content-Type': 'application/json' },
+          ...options
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || '请求失败');
+        }
+        return data;
+      } catch (error) {
+        showToast(error.message, 'error');
+        throw error;
+      }
+    }
+    
+    function showToast(message, type = 'info') {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = `toast ${type} show`;
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
     }
     
     function showPage(page) {
@@ -232,67 +280,72 @@
       if (page === 'sensors') loadSensors();
     }
     
-    function loadDashboard() {
-      const stats = {
-        total: mockData.heatLoads.length,
-        draft: mockData.heatLoads.filter(r => r.workflowStep === 1).length,
-        engineering: mockData.heatLoads.filter(r => r.workflowStep === 2).length,
-        safety: mockData.heatLoads.filter(r => r.workflowStep === 3).length,
-        completed: mockData.heatLoads.filter(r => r.workflowStep === 4).length,
-        sensorRestart: mockData.heatLoads.filter(r => r.hasSensorRestart).length
-      };
-      
-      document.getElementById('stats-container').innerHTML = `
-        <div class="stat-card"><div class="stat-number">${stats.total}</div><div class="stat-label">总记录数</div></div>
-        <div class="stat-card"><div class="stat-number">${stats.draft}</div><div class="stat-label">草稿状态</div></div>
-        <div class="stat-card"><div class="stat-number">${stats.engineering}</div><div class="stat-label">待工程审核</div></div>
-        <div class="stat-card warning"><div class="stat-number">${stats.safety}</div><div class="stat-label">待安全复核</div></div>
-        <div class="stat-card success"><div class="stat-number">${stats.completed}</div><div class="stat-label">已完成</div></div>
-        <div class="stat-card warning"><div class="stat-number">${stats.sensorRestart}</div><div class="stat-label">含传感器重启</div></div>
-      `;
-      
-      renderChart();
-      
-      const latestRecord = mockData.heatLoads.find(r => r.status === 'completed');
-      if (latestRecord) {
-        document.getElementById('3d-heat-value').innerHTML = `${latestRecord.heatLoad}<span class="heat-unit"> kW</span>`;
-        document.getElementById('3d-sensor-warnings').innerHTML = latestRecord.hasSensorRestart ? '⚠️ 本记录包含传感器重启事件，已完成安全复核' : '';
-      }
-      
-      const pendingTasks = mockData.heatLoads.filter(r => r.workflowStep < 4);
-      if (pendingTasks.length === 0) {
-        document.getElementById('pending-tasks').innerHTML = '<div class="empty-state"><div class="empty-state-icon">✅</div><p>暂无待处理任务</p></div>';
-      } else {
-        document.getElementById('pending-tasks').innerHTML = pendingTasks.map(r => `
-          <div style="padding: 12px; background: #fef9c3; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <strong>${r.recordDate}</strong> - ${r.poolName}
-              ${r.hasSensorRestart ? '<span class="badge badge-sensor">传感器重启</span>' : ''}
+    async function loadDashboard() {
+      try {
+        const summary = await apiRequest('/heat-loads/workflow/summary');
+        
+        document.getElementById('stats-container').innerHTML = `
+          <div class="stat-card"><div class="stat-number">${summary.total}</div><div class="stat-label">总记录数</div></div>
+          <div class="stat-card"><div class="stat-number">${summary.draft}</div><div class="stat-label">草稿状态</div></div>
+          <div class="stat-card"><div class="stat-number">${summary.pendingEngineering}</div><div class="stat-label">待工程审核</div></div>
+          <div class="stat-card warning"><div class="stat-number">${summary.pendingSafety}</div><div class="stat-label">待安全复核</div></div>
+          <div class="stat-card success"><div class="stat-number">${summary.completed}</div><div class="stat-label">已完成</div></div>
+          <div class="stat-card warning"><div class="stat-number">${summary.hasSensorRestart}</div><div class="stat-label">含传感器重启</div></div>
+        `;
+        
+        const records = await apiRequest('/heat-loads');
+        renderChart(records);
+        
+        const completedRecords = records.filter(r => r.status === 'completed');
+        if (completedRecords.length > 0) {
+          const latest = completedRecords.sort((a, b) => b.recordDate.localeCompare(a.recordDate))[0];
+          document.getElementById('3d-heat-value').innerHTML = `${latest.heatLoad}<span class="heat-unit"> kW</span>`;
+          document.getElementById('3d-sensor-warnings').innerHTML = latest.hasSensorRestart ? '⚠️ 本记录包含传感器重启事件，已完成安全复核' : '';
+        }
+        
+        const pendingTasks = records.filter(r => r.workflowStep < 4);
+        if (pendingTasks.length === 0) {
+          document.getElementById('pending-tasks').innerHTML = '<div class="empty-state"><div class="empty-state-icon">✅</div><p>暂无待处理任务</p></div>';
+        } else {
+          document.getElementById('pending-tasks').innerHTML = pendingTasks.map(r => `
+            <div style="padding: 12px; background: #fef9c3; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <strong>${r.recordDate}</strong> - ${r.poolName}
+                ${r.hasSensorRestart ? '<span class="badge badge-sensor">传感器重启</span>' : ''}
+              </div>
+              <div>
+                <span class="badge ${r.workflowStep === 1 ? 'badge-draft' : r.workflowStep === 2 ? 'badge-engineering' : 'badge-safety'}">
+                  ${r.workflowStep === 1 ? '草稿' : r.workflowStep === 2 ? '待工程审核' : '待安全复核'}
+                </span>
+                <button class="btn btn-primary" style="margin-left: 8px;" onclick="showRecordDetail('${r.id}')">处理</button>
+              </div>
             </div>
-            <span class="badge ${r.workflowStep === 1 ? 'badge-draft' : r.workflowStep === 2 ? 'badge-engineering' : 'badge-safety'}">
-              ${r.workflowStep === 1 ? '草稿' : r.workflowStep === 2 ? '待工程审核' : '待安全复核'}
-            </span>
-          </div>
-        `).join('');
+          `).join('');
+        }
+      } catch (e) {
+        console.error('加载仪表盘失败:', e);
       }
     }
     
-    function renderChart() {
+    function renderChart(records) {
       const svg = document.getElementById('chart-svg');
       const width = svg.clientWidth;
       const height = svg.clientHeight;
       const padding = { top: 30, right: 30, bottom: 40, left: 50 };
       
-      const completedRecords = mockData.heatLoads
+      const chartRecords = records
         .filter(r => r.status === 'completed' || r.status === 'pending_safety_review')
         .sort((a, b) => a.recordDate.localeCompare(b.recordDate));
       
-      if (completedRecords.length === 0) return;
+      if (chartRecords.length === 0) {
+        svg.innerHTML = '<text x="50%" y="50%" text-anchor="middle" fill="#999">暂无数据</text>';
+        return;
+      }
       
-      const maxHeatLoad = Math.max(...completedRecords.map(r => r.heatLoad)) * 1.1;
-      const minHeatLoad = Math.min(...completedRecords.map(r => r.heatLoad)) * 0.9;
+      const maxHeatLoad = Math.max(...chartRecords.map(r => r.heatLoad)) * 1.1;
+      const minHeatLoad = Math.min(...chartRecords.map(r => r.heatLoad)) * 0.9;
       
-      const xScale = (i) => padding.left + (i / (completedRecords.length - 1)) * (width - padding.left - padding.right);
+      const xScale = (i) => padding.left + (i / (chartRecords.length - 1)) * (width - padding.left - padding.right);
       const yScale = (val) => height - padding.bottom - ((val - minHeatLoad) / (maxHeatLoad - minHeatLoad)) * (height - padding.top - padding.bottom);
       
       let svgContent = '';
@@ -304,12 +357,12 @@
         svgContent += `<text x="${padding.left - 10}" y="${y + 4}" text-anchor="end" font-size="11" fill="#666">${value.toFixed(0)}</text>`;
       }
       
-      const linePath = completedRecords.map((r, i) => 
+      const linePath = chartRecords.map((r, i) => 
         `${i === 0 ? 'M' : 'L'} ${xScale(i)} ${yScale(r.heatLoad)}`
       ).join(' ');
       svgContent += `<path d="${linePath}" fill="none" stroke="#4facfe" stroke-width="2"/>`;
       
-      completedRecords.forEach((r, i) => {
+      chartRecords.forEach((r, i) => {
         const x = xScale(i);
         const y = yScale(r.heatLoad);
         const color = r.hasSensorRestart ? '#f59e0b' : '#10b981';
@@ -344,211 +397,1326 @@
       });
     }
     
-    function loadRecords() {
-      const tbody = document.getElementById('records-table');
-      tbody.innerHTML = mockData.heatLoads.map(r => {
-        const badgeClass = r.workflowStep === 1 ? 'badge-draft' : r.workflowStep === 2 ? 'badge-engineering' : r.workflowStep === 3 ? 'badge-safety' : 'badge-completed';
-        const statusText = r.workflowStep === 1 ? '草稿' : r.workflowStep === 2 ? '待工程审核' : r.workflowStep === 3 ? '待安全复核' : '已完成';
-        return `
-          <tr>
-            <td>${r.recordDate}</td>
-            <td>${r.poolName}</td>
-            <td>${r.heatLoad} kW</td>
-            <td><span class="badge ${badgeClass}">${statusText}</span></td>
-            <td>${r.hasSensorRestart ? '<span class="badge badge-sensor">是</span>' : '否'}</td>
-            <td>
-              <button class="btn btn-primary" onclick="showRecordDetail('${r.id}')">查看</button>
-              ${r.workflowStep === 1 ? '<button class="btn btn-success">提交审核</button>' : ''}
-              ${r.workflowStep === 2 ? '<button class="btn btn-success">审核通过</button><button class="btn btn-danger">驳回</button>' : ''}
-              ${r.workflowStep === 3 ? '<button class="btn btn-success">复核通过</button><button class="btn btn-danger">驳回</button>' : ''}
-            </td>
-          </tr>
-        `;
-      }).join('');
+    async function loadRecords() {
+      try {
+        const records = await apiRequest('/heat-loads');
+        const tbody = document.getElementById('records-table');
+        
+        if (records.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: #999;">暂无记录</td></tr>';
+          return;
+        }
+        
+        tbody.innerHTML = records.map(r => {
+          const badgeClass = r.workflowStep === 1 ? 'badge-draft' : r.workflowStep === 2 ? 'badge-engineering' : r.workflowStep === 3 ? 'badge-safety' : 'badge-completed';
+          const statusText = r.workflowStep === 1 ? '草稿' : r.workflowStep === 2 ? '待工程审核' : r.workflowStep === 3 ? '待安全复核' : '已完成';
+          return `
+            <tr>
+              <td>${r.recordDate}</td>
+              <td>${r.poolName}</td>
+              <td>${r.heatLoad} kW</td>
+              <td><span class="badge ${badgeClass}">${statusText}</span></td>
+              <td>${r.hasSensorRestart ? '<span class="badge badge-sensor">是</span>' : '否'}</td>
+              <td>
+                <button class="btn btn-primary" onclick="showRecordDetail('${r.id}')">查看</button>
+                ${r.workflowStep === 1 ? `<button class="btn btn-success" onclick="submitForEngineering('${r.id}')">提交审核</button>` : ''}
+                ${r.workflowStep === 2 ? `<button class="btn btn-success" onclick="engineerApprove('${r.id}')">审核通过</button><button class="btn btn-danger" onclick="engineerReject('${r.id}')">驳回</button>` : ''}
+                ${r.workflowStep === 3 ? `<button class="btn btn-success" onclick="safetyApprove('${r.id}')">复核通过</button><button class="btn btn-danger" onclick="safetyReject('${r.id}')">驳回</button>` : ''}
+              </td>
+            </tr>
+          `;
+        }).join('');
+      } catch (e) {
+        console.error('加载记录失败:', e);
+      }
     }
     
-    function showRecordDetail(id) {
-      const record = mockData.heatLoads.find(r => r.id === id);
-      if (!record) return;
-      
-      const photos = mockData.photos.filter(p => record.photoIds.includes(p.id));
-      const notes = mockData.notes.filter(n => record.noteIds.includes(n.id));
-      
-      document.getElementById('modal-title').textContent = `换热负荷记录 - ${record.recordDate}`;
+    async function showRecordDetail(id) {
+      try {
+        const evidence = await apiRequest(`/heat-loads/${id}/evidence`);
+        const record = evidence.record;
+        const photos = evidence.photos;
+        const notes = evidence.notes;
+        
+        document.getElementById('modal-title').textContent = `换热负荷记录 - ${record.recordDate}`;
+        document.getElementById('modal-body').innerHTML = `
+          ${record.hasSensorRestart ? `
+            <div class="sensor-warning">
+              ⚠️ <strong>传感器异常标记</strong>：本记录涉及传感器重启事件，需特别注意数据追溯
+            </div>
+          ` : ''}
+          
+          <div class="workflow-steps">
+            <div class="workflow-step ${record.workflowStep >= 1 ? (record.workflowStep > 1 ? 'completed' : 'active') : ''}">① 创建草稿</div>
+            <div class="workflow-step ${record.workflowStep >= 2 ? (record.workflowStep > 2 ? 'completed' : 'active') : ''}">② 工程师审核</div>
+            <div class="workflow-step ${record.hasSensorRestart ? (record.workflowStep >= 3 ? (record.workflowStep > 3 ? 'completed' : 'active') : 'warning') : ''}">③ 安全员复核 ${record.hasSensorRestart ? '(触发)' : '(跳过)'}</div>
+            <div class="workflow-step ${record.workflowStep >= 4 ? 'completed' : ''}">④ 完成</div>
+          </div>
+          
+          <div class="tab-view">
+            <div class="tab active" onclick="switchTab(this, 'basic')">基本信息</div>
+            <div class="tab" onclick="switchTab(this, 'evidence')">证据链</div>
+            <div class="tab" onclick="switchTab(this, 'history')">历史记录</div>
+          </div>
+          
+          <div class="tab-content active" id="tab-basic">
+            <table>
+              <tr><td style="width: 150px;">记录日期</td><td>${record.recordDate}</td></tr>
+              <tr><td>泳池</td><td>${record.poolName}</td></tr>
+              <tr><td>换热负荷</td><td style="font-size: 24px; font-weight: 700; color: #1e3a5f;">${record.heatLoad} kW</td></tr>
+              <tr><td>计算公式</td><td><code>${record.calculationFormula || 'Q = G × C × ΔT'}</code></td></tr>
+              <tr><td>状态</td><td><span class="badge ${record.workflowStep === 1 ? 'badge-draft' : record.workflowStep === 2 ? 'badge-engineering' : record.workflowStep === 3 ? 'badge-safety' : 'badge-completed'}">${record.workflowStep === 1 ? '草稿' : record.workflowStep === 2 ? '待工程审核' : record.workflowStep === 3 ? '待安全复核' : '已完成'}</span></td></tr>
+              ${record.engineerReviewedBy ? `<tr><td>工程审核人</td><td>${record.engineerReviewedBy} (${record.engineerReviewedAt})</td></tr>` : ''}
+              ${record.safetyReviewedBy ? `<tr><td>安全复核人</td><td>${record.safetyReviewedBy} (${record.safetyReviewedAt})</td></tr>` : ''}
+            </table>
+            
+            ${record.workflowStep < 4 ? `
+              <div style="margin-top: 20px;">
+                ${record.workflowStep === 1 ? `<button class="btn btn-success" onclick="submitForEngineering('${record.id}')">提交工程审核</button>` : ''}
+                ${record.workflowStep === 2 ? `<button class="btn btn-success" onclick="engineerApprove('${record.id}')">工程审核通过</button><button class="btn btn-danger" onclick="engineerReject('${record.id}')">工程审核驳回</button>` : ''}
+                ${record.workflowStep === 3 ? `<button class="btn btn-success" onclick="safetyApprove('${record.id}')">安全复核通过</button><button class="btn btn-danger" onclick="safetyReject('${record.id}')">安全复核驳回</button>` : ''}
+              </div>
+            ` : ''}
+          </div>
+          
+          <div class="tab-content" id="tab-evidence">
+            <h4 style="margin-bottom: 12px;">📷 工况照片 (${photos.length})</h4>
+            ${photos.length === 0 ? '<p style="color: #999;">暂无照片</p>' : photos.map(p => `
+              <div class="history-item">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <strong>📷 ${p.fileName}</strong>
+                  <span class="badge ${p.status === 'approved' ? 'badge-completed' : 'badge-draft'}">${p.status === 'approved' ? '已审核' : '待审核'}</span>
+                </div>
+                <div style="margin-top: 8px;">传感器: ${p.sensorNumbers.join(', ')}</div>
+                <div style="margin-top: 4px;">上传: ${p.uploadedBy} - ${p.uploadTime}</div>
+                ${p.notes ? `<div style="margin-top: 4px; color: #666;">备注: ${p.notes}</div>` : ''}
+                <div style="margin-top: 8px;">
+                  <button class="btn btn-outline" onclick="showPhotoDetail('${p.id}')">查看详情</button>
+                  ${p.status === 'pending_review' ? `<button class="btn btn-success" onclick="approvePhoto('${p.id}')">批准</button><button class="btn btn-danger" onclick="rejectPhoto('${p.id}')">驳回</button>` : ''}
+                </div>
+              </div>
+            `).join('')}
+            
+            <h4 style="margin: 20px 0 12px;">📝 巡检备注 (${notes.length})</h4>
+            ${notes.length === 0 ? '<p style="color: #999;">暂无备注</p>' : notes.map(n => `
+              <div class="history-item">
+                <div style="display: flex; justify-content: space-between;">
+                  <strong>传感器 ${n.sensorNumber}</strong>
+                  <span class="badge ${n.verificationStatus === 'verified' ? 'badge-completed' : 'badge-draft'}">${n.verificationStatus === 'verified' ? '已核实' : '待核实'}</span>
+                </div>
+                <pre style="margin-top: 8px; white-space: pre-wrap; font-family: inherit; background: white; padding: 8px; border-radius: 4px;">${n.content}</pre>
+                <div class="history-meta">记录人: ${n.author} | 版本: v${n.version} | ${n.timestamp}</div>
+                <div style="margin-top: 8px;">
+                  ${n.previousVersions && n.previousVersions.length > 0 ? `
+                    <button class="btn btn-outline" onclick="showNoteDiff('${n.id}')">查看版本差异</button>
+                    <button class="btn btn-warning" onclick="showNoteRollbackForm('${n.id}')">回滚版本</button>
+                  ` : ''}
+                  <button class="btn btn-primary" onclick="showNoteEditForm('${n.id}')">修改备注</button>
+                </div>
+              </div>
+            `).join('')}
+            
+            <div style="margin-top: 20px;">
+              <button class="btn btn-primary" onclick="showAddNoteForm('${record.id}')">+ 添加巡检备注</button>
+            </div>
+            
+            <p style="margin-top: 16px; font-size: 12px; color: #666;">
+              💡 所有证据均与换热负荷计算关联，支持完整追溯
+            </p>
+          </div>
+          
+          <div class="tab-content" id="tab-history">
+            ${record.history.length === 0 ? '<p style="color: #999;">暂无历史记录</p>' : record.history.map((h, i) => `
+              <div class="history-item">
+                <div style="display: flex; justify-content: space-between;">
+                  <strong>v${h.version}</strong>
+                  <span class="badge ${h.status === 'completed' ? 'badge-completed' : 'badge-draft'}">${h.status}</span>
+                </div>
+                <div style="margin-top: 4px;">${h.changeDescription}</div>
+                <div class="history-meta">操作人: ${h.editor} | ${h.timestamp}</div>
+                ${h.heatLoad !== undefined ? `<div class="history-meta">换热负荷值: ${h.heatLoad} kW</div>` : ''}
+              </div>
+            `).join('')}
+          </div>
+        `;
+        
+        document.getElementById('detail-modal').classList.add('active');
+      } catch (e) {
+        console.error('加载记录详情失败:', e);
+      }
+    }
+    
+    async function submitForEngineering(id) {
+      try {
+        await apiRequest(`/heat-loads/${id}/submit-engineering`, {
+          method: 'POST',
+          body: JSON.stringify({ editor: currentUser.name })
+        });
+        showToast('已提交工程审核', 'success');
+        closeModal();
+        if (currentPage === 'records') loadRecords();
+        if (currentPage === 'dashboard') loadDashboard();
+      } catch (e) {
+        console.error('提交审核失败:', e);
+      }
+    }
+    
+    async function engineerApprove(id) {
+      const notes = prompt('请输入审核意见（可选）：') || '';
+      try {
+        await apiRequest(`/heat-loads/${id}/engineer-approve`, {
+          method: 'POST',
+          body: JSON.stringify({ engineer: '何工', notes })
+        });
+        showToast('工程审核通过', 'success');
+        closeModal();
+        if (currentPage === 'records') loadRecords();
+        if (currentPage === 'dashboard') loadDashboard();
+      } catch (e) {
+        console.error('审核失败:', e);
+      }
+    }
+    
+    async function engineerReject(id) {
+      const reason = prompt('请输入驳回原因：');
+      if (!reason) {
+        showToast('请输入驳回原因', 'error');
+        return;
+      }
+      try {
+        await apiRequest(`/heat-loads/${id}/engineer-reject`, {
+          method: 'POST',
+          body: JSON.stringify({ engineer: '何工', reason })
+        });
+        showToast('已驳回', 'success');
+        closeModal();
+        if (currentPage === 'records') loadRecords();
+        if (currentPage === 'dashboard') loadDashboard();
+      } catch (e) {
+        console.error('驳回失败:', e);
+      }
+    }
+    
+    async function safetyApprove(id) {
+      const reminders = prompt('请输入安全提醒（可选，多个用分号分隔）：') || '';
+      const reminderList = reminders ? reminders.split(';').map(r => r.trim()).filter(Boolean) : [];
+      try {
+        await apiRequest(`/heat-loads/${id}/safety-approve`, {
+          method: 'POST',
+          body: JSON.stringify({ safetyOfficer: '安全员陈', reminders: reminderList })
+        });
+        showToast('安全复核通过', 'success');
+        closeModal();
+        if (currentPage === 'records') loadRecords();
+        if (currentPage === 'dashboard') loadDashboard();
+      } catch (e) {
+        console.error('复核失败:', e);
+      }
+    }
+    
+    async function safetyReject(id) {
+      const reason = prompt('请输入驳回原因：');
+      if (!reason) {
+        showToast('请输入驳回原因', 'error');
+        return;
+      }
+      try {
+        await apiRequest(`/heat-loads/${id}/safety-reject`, {
+          method: 'POST',
+          body: JSON.stringify({ safetyOfficer: '安全员陈', reason })
+        });
+        showToast('已驳回', 'success');
+        closeModal();
+        if (currentPage === 'records') loadRecords();
+        if (currentPage === 'dashboard') loadDashboard();
+      } catch (e) {
+        console.error('驳回失败:', e);
+      }
+    }
+    
+    async function loadPhotos() {
+      try {
+        const photos = await apiRequest('/photos');
+        const container = document.getElementById('photos-list');
+        
+        if (photos.length === 0) {
+          container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📷</div><p>暂无照片，请点击右上角"导入照片"开始</p></div>';
+          return;
+        }
+        
+        const batches = {};
+        photos.forEach(p => {
+          if (!batches[p.importBatchId]) {
+            batches[p.importBatchId] = [];
+          }
+          batches[p.importBatchId].push(p);
+        });
+        
+        container.innerHTML = Object.entries(batches).map(([batchId, batchPhotos]) => `
+          <div class="card" style="margin-bottom: 16px;">
+            <div class="batch-info">
+              <strong>批次: ${batchId}</strong> | 
+              上传时间: ${batchPhotos[0].uploadTime} | 
+              上传人: ${batchPhotos[0].uploadedBy} | 
+              共 ${batchPhotos.length} 张
+            </div>
+            ${batchPhotos.map(p => `
+              <div class="history-item">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <strong>📷 ${p.fileName}</strong>
+                    ${p.isDuplicate ? '<span class="badge badge-sensor">重复导入</span>' : ''}
+                  </div>
+                  <span class="badge ${p.status === 'approved' ? 'badge-completed' : p.status === 'rejected' ? 'badge-sensor' : 'badge-draft'}">${p.status === 'approved' ? '已审核' : p.status === 'rejected' ? '已驳回' : '待审核'}</span>
+                </div>
+                <div style="margin-top: 8px;">传感器编号: ${p.sensorNumbers.join(', ')}</div>
+                <div>拍摄时间: ${p.timestamp || p.uploadTime}</div>
+                ${p.notes ? `<div style="margin-top: 4px; color: #666;">备注: ${p.notes}</div>` : ''}
+                <div style="margin-top: 12px;">
+                  <button class="btn btn-primary" onclick="showPhotoDetail('${p.id}')">查看详情</button>
+                  <button class="btn btn-outline" onclick="showPhotoNoteForm('${p.id}')">添加备注</button>
+                  ${p.status === 'pending_review' ? `<button class="btn btn-success" onclick="approvePhoto('${p.id}')">批准</button><button class="btn btn-danger" onclick="rejectPhoto('${p.id}')">驳回</button>` : ''}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `).join('');
+      } catch (e) {
+        console.error('加载照片失败:', e);
+      }
+    }
+    
+    function showPhotoImportModal() {
+      importBatchId = 'batch-' + Date.now();
+      document.getElementById('modal-title').textContent = '导入工况照片 - 第一次导入';
       document.getElementById('modal-body').innerHTML = `
-        ${record.hasSensorRestart ? `
-          <div class="sensor-warning">
-            ⚠️ <strong>传感器异常标记</strong>：本记录涉及传感器重启事件，需特别注意数据追溯
+        <div class="sensor-warning" style="margin-bottom: 16px;">
+          📌 <strong>边界规则</strong>：相同内容（SHA256哈希）+ 相同拍摄时间的照片会被自动识别为重复，不会重复导入。
+        </div>
+        
+        <div class="batch-info">
+          <strong>本次批次号:</strong> <code>${importBatchId}</code>
+        </div>
+        
+        <div class="photo-upload-area" id="photo-upload-area" onclick="document.getElementById('photo-file-input').click()">
+          <div style="font-size: 48px; margin-bottom: 16px;">📷</div>
+          <div style="font-size: 16px; margin-bottom: 8px;">点击选择照片文件，或拖拽到此处</div>
+          <div style="font-size: 12px; color: #666;">支持批量选择，系统将自动检测重复</div>
+          <input type="file" id="photo-file-input" accept="image/*" multiple style="display: none;" onchange="handlePhotoFiles(this.files)">
+        </div>
+        
+        <div id="photo-preview-area" style="margin-top: 20px;"></div>
+      `;
+      
+      const uploadArea = document.getElementById('photo-upload-area');
+      uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.classList.add('dragover');
+      });
+      uploadArea.addEventListener('dragleave', () => {
+        uploadArea.classList.remove('dragover');
+      });
+      uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove('dragover');
+        handlePhotoFiles(e.dataTransfer.files);
+      });
+      
+      document.getElementById('detail-modal').classList.add('active');
+    }
+    
+    async function handlePhotoFiles(files) {
+      const previewArea = document.getElementById('photo-preview-area');
+      const photoDataList = [];
+      
+      previewArea.innerHTML = '<div class="loading">正在处理文件...</div>';
+      
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const hash = await generateFileHash(file);
+        const timestamp = await getImageTimestamp(file);
+        
+        photoDataList.push({
+          hash,
+          fileName: file.name,
+          filePath: '/uploads/' + file.name,
+          timestamp,
+          location: '主游泳池',
+          sensorNumbers: [],
+          notes: '',
+          uploadedBy: currentUser.name
+        });
+      }
+      
+      const duplicateCheck = await apiRequest('/photos/check-duplicates', {
+        method: 'POST',
+        body: JSON.stringify(photoDataList)
+      });
+      
+      const duplicates = duplicateCheck.filter(d => d.isDuplicate);
+      
+      previewArea.innerHTML = `
+        ${duplicates.length > 0 ? `
+          <div class="duplicate-warning">
+            ⚠️ 检测到 ${duplicates.length} 张重复照片，导入时将自动跳过：
+            <ul style="margin-top: 8px;">
+              ${duplicates.map(d => `<li>${d.fileName}</li>`).join('')}
+            </ul>
           </div>
         ` : ''}
         
-        <div class="workflow-steps">
-          <div class="workflow-step ${record.workflowStep >= 1 ? (record.workflowStep > 1 ? 'completed' : 'active') : ''}">① 创建草稿</div>
-          <div class="workflow-step ${record.workflowStep >= 2 ? (record.workflowStep > 2 ? 'completed' : 'active') : ''}">② 工程师审核</div>
-          <div class="workflow-step ${record.hasSensorRestart ? (record.workflowStep >= 3 ? (record.workflowStep > 3 ? 'completed' : 'active') : 'warning') : ''}">③ 安全员复核 ${record.hasSensorRestart ? '(触发)' : '(跳过)'}</div>
-          <div class="workflow-step ${record.workflowStep >= 4 ? 'completed' : ''}">④ 完成</div>
-        </div>
+        <h4 style="margin-bottom: 12px;">待导入照片 (${photoDataList.length} 张)</h4>
         
-        <div class="tab-view">
-          <div class="tab active" onclick="switchTab(this, 'basic')">基本信息</div>
-          <div class="tab" onclick="switchTab(this, 'evidence')">证据链</div>
-          <div class="tab" onclick="switchTab(this, 'history')">历史记录</div>
-        </div>
-        
-        <div class="tab-content active" id="tab-basic">
-          <table>
-            <tr><td style="width: 150px;">记录日期</td><td>${record.recordDate}</td></tr>
-            <tr><td>泳池</td><td>${record.poolName}</td></tr>
-            <tr><td>换热负荷</td><td style="font-size: 24px; font-weight: 700; color: #1e3a5f;">${record.heatLoad} kW</td></tr>
-            <tr><td>状态</td><td><span class="badge ${record.workflowStep === 1 ? 'badge-draft' : record.workflowStep === 2 ? 'badge-engineering' : record.workflowStep === 3 ? 'badge-safety' : 'badge-completed'}">${record.workflowStep === 1 ? '草稿' : record.workflowStep === 2 ? '待工程审核' : record.workflowStep === 3 ? '待安全复核' : '已完成'}</span></td></tr>
-          </table>
-        </div>
-        
-        <div class="tab-content" id="tab-evidence">
-          <h4 style="margin-bottom: 12px;">📷 工况照片 (${photos.length})</h4>
-          ${photos.length === 0 ? '<p style="color: #999;">暂无照片</p>' : photos.map(p => `
-            <div class="history-item">
-              <strong>${p.fileName}</strong>
-              <div style="margin-top: 8px;">传感器: ${p.sensorNumbers.join(', ')}</div>
-              <div style="margin-top: 4px;">上传: ${p.uploadedBy} - ${p.uploadTime}</div>
-              ${p.notes ? `<div style="margin-top: 4px; color: #666;">备注: ${p.notes}</div>` : ''}
+        ${photoDataList.map((p, i) => `
+          <div class="history-item" style="margin-bottom: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <strong>📷 ${p.fileName}</strong>
+              ${duplicateCheck[i]?.isDuplicate ? '<span class="badge badge-sensor">重复</span>' : '<span class="badge badge-completed">新文件</span>'}
             </div>
-          `).join('')}
-          
-          <h4 style="margin: 20px 0 12px;">📝 巡检备注 (${notes.length})</h4>
-          ${notes.length === 0 ? '<p style="color: #999;">暂无备注</p>' : notes.map(n => `
-            <div class="history-item">
-              <div style="display: flex; justify-content: space-between;">
-                <strong>传感器 ${n.sensorNumber}</strong>
-                <span class="badge ${n.verificationStatus === 'verified' ? 'badge-completed' : 'badge-draft'}">${n.verificationStatus === 'verified' ? '已核实' : '待核实'}</span>
+            <div style="margin-top: 8px;">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>传感器编号（多个用逗号分隔）</label>
+                  <input type="text" id="sensor-${i}" value="T-101, F-201" placeholder="例如: T-101, T-102">
+                </div>
+                <div class="form-group">
+                  <label>拍摄时间</label>
+                  <input type="datetime-local" id="timestamp-${i}" value="${p.timestamp ? p.timestamp.slice(0, 16) : ''}">
+                </div>
               </div>
-              <pre style="margin-top: 8px; white-space: pre-wrap; font-family: inherit; background: white; padding: 8px; border-radius: 4px;">${n.content}</pre>
-              <div class="history-meta">记录人: ${n.author} | 版本: v${n.version}</div>
-              ${n.previousVersions && n.previousVersions.length > 0 ? `
-                <button class="btn btn-outline" style="margin-top: 8px;" onclick="showNoteDiff('${n.id}')">查看版本差异</button>
-              ` : ''}
-            </div>
-          `).join('')}
-          
-          <p style="margin-top: 16px; font-size: 12px; color: #666;">
-            💡 所有证据均与换热负荷计算关联，支持完整追溯
-          </p>
-        </div>
-        
-        <div class="tab-content" id="tab-history">
-          ${record.history.length === 0 ? '<p style="color: #999;">暂无历史记录</p>' : record.history.map((h, i) => `
-            <div class="history-item">
-              <div style="display: flex; justify-content: space-between;">
-                <strong>v${h.version}</strong>
-                <span class="badge ${h.status === 'completed' ? 'badge-completed' : 'badge-draft'}">${h.status}</span>
+              <div class="form-group">
+                <label>备注</label>
+                <textarea id="notes-${i}" placeholder="输入照片备注..."></textarea>
               </div>
-              <div style="margin-top: 4px;">${h.changeDescription}</div>
-              <div class="history-meta">操作人: ${h.editor} | ${h.timestamp}</div>
             </div>
-          `).join('')}
+          </div>
+        `).join('')}
+        
+        <div style="margin-top: 20px;">
+          <button class="btn btn-success" onclick="confirmImportPhotos(${JSON.stringify(photoDataList).replace(/"/g, '&quot;')})">确认导入</button>
+          <button class="btn btn-outline" onclick="closeModal()">取消</button>
         </div>
       `;
-      
-      document.getElementById('detail-modal').classList.add('active');
     }
     
-    function switchTab(tab, tabName) {
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-      document.getElementById('tab-' + tabName).classList.add('active');
+    async function generateFileHash(file) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          const arrayBuffer = e.target.result;
+          const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
+          const hashArray = Array.from(new Uint8Array(hashBuffer));
+          const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+          resolve(hashHex);
+        };
+        reader.readAsArrayBuffer(file.slice(0, 1024 * 1024));
+      });
     }
     
-    function showNoteDiff(noteId) {
-      const note = mockData.notes.find(n => n.id === noteId);
-      if (!note || !note.previousVersions) return;
-      
-      const current = { content: note.content, version: note.version };
-      const previous = note.previousVersions[note.previousVersions.length - 1];
-      
-      alert(`版本对比 v${previous.version} → v${current.version}\n\n旧版本:\n${previous.content}\n\n新版本:\n${current.content}\n\n(实际系统会显示更详细的行级差异)`);
+    async function getImageTimestamp(file) {
+      return new Promise((resolve) => {
+        resolve(new Date().toISOString());
+      });
     }
     
-    function loadPhotos() {
-      const container = document.getElementById('photos-list');
-      container.innerHTML = mockData.photos.map(p => `
-        <div class="history-item">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <strong>📷 ${p.fileName}</strong>
-            <span class="badge ${p.status === 'approved' ? 'badge-completed' : 'badge-draft'}">${p.status === 'approved' ? '已审核' : '待审核'}</span>
+    async function confirmImportPhotos(photoDataList) {
+      const updatedPhotos = photoDataList.map((p, i) => ({
+        ...p,
+        sensorNumbers: document.getElementById(`sensor-${i}`).value.split(',').map(s => s.trim()).filter(Boolean),
+        timestamp: document.getElementById(`timestamp-${i}`).value ? new Date(document.getElementById(`timestamp-${i}`).value).toISOString() : p.timestamp,
+        notes: document.getElementById(`notes-${i}`).value
+      }));
+      
+      try {
+        const result = await apiRequest('/photos/import', {
+          method: 'POST',
+          body: JSON.stringify({
+            photos: updatedPhotos,
+            uploadedBy: currentUser.name,
+            batchId: importBatchId
+          })
+        });
+        
+        showToast(`导入完成：成功 ${result.imported.length} 张，跳过重复 ${result.duplicates.length} 张`, 'success');
+        
+        if (result.imported.length > 0) {
+          const inletTemp = 25.5;
+          const outletTemp = 28.3;
+          const flowRate = 120;
+          const heatLoad = await apiRequest('/heat-loads/calculate', {
+            method: 'POST',
+            body: JSON.stringify({ inletTemp, outletTemp, flowRate })
+          });
+          
+          const firstPhotoDate = result.imported[0].timestamp?.split('T')[0] || new Date().toISOString().split('T')[0];
+          
+          const hasSensorRestart = result.imported.some(p => {
+            const hasF201 = p.sensorNumbers.some(s => s.includes('F-201'));
+            const hasF200 = p.sensorNumbers.some(s => s.includes('F-200'));
+            return hasF201 || hasF200;
+          });
+          
+          const newRecord = await apiRequest('/heat-loads', {
+            method: 'POST',
+            body: JSON.stringify({
+              recordDate: firstPhotoDate,
+              poolId: 'main',
+              poolName: '主游泳池',
+              heatLoad: heatLoad.heatLoad,
+              unit: 'kW',
+              calculationMethod: 'standard',
+              calculationFormula: 'Q = G × C × ΔT = 120 × 4.186 × (28.3 - 25.5)',
+              sensorData: [
+                { sensorNumber: 'T-101', value: inletTemp, type: 'inlet' },
+                { sensorNumber: 'T-102', value: outletTemp, type: 'outlet' },
+                { sensorNumber: 'F-201', value: flowRate, type: 'flow' }
+              ],
+              photoIds: result.imported.map(p => p.id),
+              noteIds: [],
+              hasSensorRestart,
+              createdBy: currentUser.name
+            })
+          });
+          
+          showToast(`已自动创建换热负荷记录，点击查看详情`, 'info');
+          
+          setTimeout(() => {
+            closeModal();
+            showRecordDetail(newRecord.id);
+            loadPhotos();
+          }, 1000);
+        } else {
+          closeModal();
+          loadPhotos();
+        }
+      } catch (e) {
+        console.error('导入失败:', e);
+      }
+    }
+    
+    async function showPhotoDetail(id) {
+      try {
+        const traceInfo = await apiRequest(`/photos/${id}/trace`);
+        const photo = traceInfo.photo;
+        const notes = traceInfo.notes;
+        const heatLoads = traceInfo.referencedInHeatLoads;
+        
+        document.getElementById('modal-title').textContent = `照片详情 - ${photo.fileName}`;
+        document.getElementById('modal-body').innerHTML = `
+          <div class="batch-info">
+            <strong>批次号:</strong> <code>${photo.importBatchId}</code>
           </div>
-          <div style="margin-top: 8px;">传感器编号: ${p.sensorNumbers.join(', ')}</div>
-          <div>上传人: ${p.uploadedBy} | ${p.uploadTime}</div>
-          ${p.notes ? `<div style="margin-top: 4px; color: #666;">备注: ${p.notes}</div>` : ''}
-          <div style="margin-top: 12px;">
-            <button class="btn btn-primary">查看照片</button>
-            <button class="btn btn-outline">添加备注</button>
-            ${p.status === 'pending_review' ? '<button class="btn btn-success">批准</button><button class="btn btn-danger">驳回</button>' : ''}
+          
+          <table>
+            <tr><td style="width: 150px;">文件名</td><td>${photo.fileName}</td></tr>
+            <tr><td>上传时间</td><td>${photo.uploadTime}</td></tr>
+            <tr><td>拍摄时间</td><td>${photo.timestamp || '-'}</td></tr>
+            <tr><td>上传人</td><td>${photo.uploadedBy}</td></tr>
+            <tr><td>传感器编号</td><td>${photo.sensorNumbers.join(', ')}</td></tr>
+            <tr><td>状态</td><td><span class="badge ${photo.status === 'approved' ? 'badge-completed' : 'badge-draft'}">${photo.status === 'approved' ? '已审核' : photo.status === 'rejected' ? '已驳回' : '待审核'}</span></td></tr>
+            ${photo.notes ? `<tr><td>备注</td><td>${photo.notes}</td></tr>` : ''}
+          </table>
+          
+          ${notes.length > 0 ? `
+            <h4 style="margin: 20px 0 12px;">关联的巡检备注</h4>
+            ${notes.map(n => `
+              <div class="history-item">
+                <strong>传感器 ${n.sensorNumber}</strong> - ${n.author}
+                <pre style="margin-top: 4px; white-space: pre-wrap;">${n.content}</pre>
+              </div>
+            `).join('')}
+          ` : ''}
+          
+          ${heatLoads.length > 0 ? `
+            <h4 style="margin: 20px 0 12px;">关联的换热负荷记录</h4>
+            ${heatLoads.map(h => `
+              <div class="history-item" onclick="showRecordDetail('${h.id}')" style="cursor: pointer;">
+                <strong>${h.recordDate}</strong> - ${h.poolName} - ${h.heatLoad} kW
+                <span class="badge ${h.workflowStep === 4 ? 'badge-completed' : 'badge-draft'}" style="margin-left: 8px;">${h.status}</span>
+              </div>
+            `).join('')}
+          ` : ''}
+          
+          <div style="margin-top: 20px;">
+            ${photo.status === 'pending_review' ? `
+              <button class="btn btn-success" onclick="approvePhoto('${photo.id}')">批准</button>
+              <button class="btn btn-danger" onclick="rejectPhoto('${photo.id}')">驳回</button>
+            ` : ''}
+            <button class="btn btn-outline" onclick="closeModal()">关闭</button>
+          </div>
+        `;
+        
+        document.getElementById('detail-modal').classList.add('active');
+      } catch (e) {
+        console.error('加载照片详情失败:', e);
+      }
+    }
+    
+    async function approvePhoto(id) {
+      try {
+        await apiRequest(`/photos/${id}/approve`, {
+          method: 'POST',
+          body: JSON.stringify({ reviewer: '何工' })
+        });
+        showToast('照片已批准', 'success');
+        closeModal();
+        loadPhotos();
+      } catch (e) {
+        console.error('批准失败:', e);
+      }
+    }
+    
+    async function rejectPhoto(id) {
+      const reason = prompt('请输入驳回原因：');
+      if (!reason) {
+        showToast('请输入驳回原因', 'error');
+        return;
+      }
+      try {
+        await apiRequest(`/photos/${id}/reject`, {
+          method: 'POST',
+          body: JSON.stringify({ reviewer: '何工', reason })
+        });
+        showToast('照片已驳回', 'success');
+        closeModal();
+        loadPhotos();
+      } catch (e) {
+        console.error('驳回失败:', e);
+      }
+    }
+    
+    function showPhotoNoteForm(id) {
+      const note = prompt('请输入备注：');
+      if (!note) return;
+      
+      apiRequest(`/photos/${id}/note`, {
+        method: 'PUT',
+        body: JSON.stringify({ note })
+      }).then(() => {
+        showToast('备注已添加', 'success');
+        loadPhotos();
+      });
+    }
+    
+    async function loadSensors() {
+      try {
+        const sensors = await apiRequest('/sensors');
+        const tbody = document.getElementById('sensors-table');
+        
+        if (sensors.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: #999;">暂无传感器</td></tr>';
+          return;
+        }
+        
+        tbody.innerHTML = sensors.map(s => `
+          <tr>
+            <td><code>${s.physicalId}</code></td>
+            <td>${s.currentNumber}</td>
+            <td>${s.location}</td>
+            <td>${s.restartCount > 0 ? `<span class="badge badge-sensor">${s.restartCount} 次</span>` : '0'}</td>
+            <td>${s.previousNumbers.length > 0 ? s.previousNumbers.map(p => p.number).join(', ') : '-'}</td>
+            <td>
+              <button class="btn btn-outline" onclick="showSensorHistory('${s.id}')">历史</button>
+              ${s.previousNumbers.length > 0 ? `<button class="btn btn-warning" onclick="showSensorRollbackForm('${s.id}')">回滚编号</button>` : ''}
+            </td>
+          </tr>
+        `).join('');
+      } catch (e) {
+        console.error('加载传感器失败:', e);
+      }
+    }
+    
+    async function showSensorHistory(sensorId) {
+      try {
+        const sensor = await apiRequest(`/sensors/${sensorId}`);
+        const rollbackHistory = await apiRequest(`/sensors/${sensorId}/rollback-history`);
+        
+        document.getElementById('modal-title').textContent = `传感器历史 - ${sensor.physicalId}`;
+        document.getElementById('modal-body').innerHTML = `
+          <table>
+            <tr><td style="width: 150px;">物理ID</td><td><code>${sensor.physicalId}</code></td></tr>
+            <tr><td>当前编号</td><td><strong>${sensor.currentNumber}</strong></td></tr>
+            <tr><td>位置</td><td>${sensor.location}</td></tr>
+            <tr><td>类型</td><td>${sensor.type}</td></tr>
+            <tr><td>重启次数</td><td>${sensor.restartCount}</td></tr>
+          </table>
+          
+          <h4 style="margin: 20px 0 12px;">编号历史</h4>
+          ${sensor.previousNumbers.length === 0 ? '<p style="color: #999;">暂无编号变更记录</p>' : `
+            <table>
+              <thead>
+                <tr><th>编号</th><th>开始时间</th><th>结束时间</th></tr>
+              </thead>
+              <tbody>
+                ${sensor.previousNumbers.map(p => `
+                  <tr><td>${p.number}</td><td>${p.startTime}</td><td>${p.endTime}</td></tr>
+                `).join('')}
+                <tr style="background: #d1fae5;"><td><strong>${sensor.currentNumber}</strong> (当前)</td><td>${sensor.previousNumbers[sensor.previousNumbers.length - 1]?.endTime || sensor.createdAt}</td><td>至今</td></tr>
+              </tbody>
+            </table>
+          `}
+          
+          ${rollbackHistory && rollbackHistory.rollbackHistory.length > 0 ? `
+            <h4 style="margin: 20px 0 12px;">回滚历史</h4>
+            ${rollbackHistory.rollbackHistory.map(r => `
+              <div class="history-item">
+                <div><strong>${r.oldNumber}</strong> → <strong>${r.newNumber}</strong></div>
+                <div style="margin-top: 4px;">原因: ${r.reason}</div>
+                <div class="history-meta">操作人: ${r.operator} | ${r.timestamp}</div>
+              </div>
+            `).join('')}
+          ` : ''}
+          
+          <div class="sensor-warning" style="margin-top: 20px;">
+            📌 <strong>边界规则</strong>：传感器重启编号变化时，历史数据将通过时间戳追溯到对应编号，确保数据可比对。回滚操作会永久留痕，不可删除。
+          </div>
+          
+          ${sensor.previousNumbers.length > 0 ? `
+            <div style="margin-top: 20px;">
+              <button class="btn btn-warning" onclick="showSensorRollbackForm('${sensorId}')">回滚到历史编号</button>
+            </div>
+          ` : ''}
+        `;
+        
+        document.getElementById('detail-modal').classList.add('active');
+      } catch (e) {
+        console.error('加载传感器历史失败:', e);
+      }
+    }
+    
+    function showSensorRollbackForm(sensorId) {
+      apiRequest(`/sensors/${sensorId}`).then(sensor => {
+        const previousNumbers = sensor.previousNumbers.map(p => p.number);
+        const uniqueNumbers = [...new Set(previousNumbers)];
+        
+        document.getElementById('modal-title').textContent = '回滚传感器编号';
+        document.getElementById('modal-body').innerHTML = `
+          <div class="sensor-warning" style="margin-bottom: 16px;">
+            ⚠️ <strong>警告</strong>：回滚操作会永久留痕，不可删除。请谨慎操作。
+          </div>
+          
+          <div class="rollback-form">
+            <div class="form-group">
+              <label>当前编号</label>
+              <input type="text" value="${sensor.currentNumber}" disabled>
+            </div>
+            
+            <div class="form-group">
+              <label>回滚到目标编号</label>
+              <select id="rollback-target">
+                ${uniqueNumbers.map(n => `<option value="${n}">${n}</option>`).join('')}
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label>回滚原因</label>
+              <textarea id="rollback-reason" placeholder="请输入回滚原因，如：传感器重启后编号变更错误，需恢复到F-200"></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label>操作人</label>
+              <input type="text" id="rollback-operator" value="何工">
+            </div>
+            
+            <div class="btn-group" style="margin-top: 16px;">
+              <button class="btn btn-warning" onclick="confirmSensorRollback()">确认回滚</button>
+              <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+            </div>
           </div>
         </div>
-      `).join('');
+      </div>
+    `;
+      });
     }
-    
-    function loadSensors() {
-      const tbody = document.getElementById('sensors-table');
-      tbody.innerHTML = mockData.sensors.map(s => `
-        <tr>
-          <td><code>${s.physicalId}</code></td>
-          <td>${s.currentNumber}</td>
-          <td>${s.location}</td>
-          <td>${s.restartCount > 0 ? `<span class="badge badge-sensor">${s.restartCount} 次</span>` : '0'}</td>
-          <td>${s.previousNumbers.length > 0 ? s.previousNumbers.map(p => p.number).join(', ') : '-'}</td>
-          <td>
-            <button class="btn btn-outline" onclick="showSensorHistory('${s.id}')">历史</button>
-          </td>
-        </tr>
-      `).join('');
+
+    function openModal(modalId) {
+      currentModal = document.getElementById(modalId);
+      currentModal.style.display = 'block';
     }
-    
-    function showSensorHistory(sensorId) {
-      const sensor = mockData.sensors.find(s => s.id === sensorId);
+
+    function closeModal() {
+      if (currentModal) {
+        currentModal.style.display = 'none';
+        currentModal = null;
+      }
+      const detailModal = document.getElementById('detail-modal');
+      if (detailModal) {
+        detailModal.classList.remove('active');
+      }
+      currentRollbackSensor = null;
+      currentEditNote = null;
+      currentRollbackNote = null;
+      currentAddNoteRecordId = null;
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    function getStatusText(status) {
+      const map = {
+        'draft': '草稿',
+        'pending_engineer_review': '待工程审核',
+        'pending_safety_review': '待安全复核',
+        'completed': '已完成',
+        'rejected': '已驳回'
+      };
+      return map[status] || status;
+    }
+
+    async function confirmSensorRollback() {
+      if (!currentRollbackSensor) return;
+
+      const targetNumber = document.getElementById('rollback-target-number').value;
+      const reason = document.getElementById('rollback-reason').value;
+      const operator = document.getElementById('rollback-operator').value;
+
+      if (!reason) {
+        showToast('请输入回滚原因', 'warning');
+        return;
+      }
+
+      try {
+        const result = await apiRequest(`/sensors/${currentRollbackSensor.id}/rollback`, {
+          method: 'POST',
+          body: JSON.stringify({ targetNumber, reason, operator })
+        });
+        showToast(`回滚成功：${result.oldNumber} → ${result.newNumber}`, 'success');
+        loadDashboard();
+        closeModal();
+      } catch (error) {
+        console.error('回滚失败:', error);
+      }
+    }
+
+    async function submitForReview(recordId) {
+      if (!confirm('确认提交工程审核？')) return;
+      try {
+        await apiRequest(`/heat-loads/${recordId}/submit-review`, {
+          method: 'POST',
+          body: JSON.stringify({ operator: '何工' })
+        });
+        showToast('已提交工程审核', 'success');
+        loadDashboard();
+      } catch (error) {
+        console.error('提交失败:', error);
+      }
+    }
+
+    async function showNoteEditForm(noteId) {
+      const note = await apiRequest(`/notes/${noteId}`);
+      currentEditNote = note;
+      document.getElementById('edit-note-id').value = noteId;
+      document.getElementById('edit-note-current').value = note.content;
+      document.getElementById('edit-note-new').value = note.content;
+      openModal('note-edit-modal');
+    }
+
+    async function saveNoteEdit() {
+      if (!currentEditNote) return;
+      const newContent = document.getElementById('edit-note-new').value;
+      const editor = document.getElementById('edit-note-editor').value;
+      const reason = document.getElementById('edit-note-reason').value;
+
+      if (!newContent) {
+        showToast('备注内容不能为空', 'warning');
+        return;
+      }
+      if (!reason) {
+        showToast('请输入修改原因', 'warning');
+        return;
+      }
+
+      try {
+        await apiRequest(`/notes/${currentEditNote.id}`, {
+          method: 'PUT',
+          body: JSON.stringify({ content: newContent, editor, reason })
+        });
+        showToast('备注修改成功，已保留历史版本', 'success');
+        loadDashboard();
+        closeModal();
+      } catch (error) {
+        console.error('修改失败:', error);
+      }
+    }
+
+    async function showNoteDiff(noteId) {
+      const note = await apiRequest(`/notes/${noteId}`);
+      if (!note.previousVersions || note.previousVersions.length === 0) {
+        showToast('该备注没有历史版本', 'info');
+        return;
+      }
+
+      const latest = note.previousVersions[note.previousVersions.length - 1];
+      const diffHtml = `
+        <h4>版本差异对比</h4>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+          <div>
+            <h5>旧版本 (v${latest.version})</h5>
+            <div class="info-box" style="background: #fff3cd;">${latest.content}</div>
+            <small>修改人: ${latest.editor} | ${new Date(latest.editedAt).toLocaleString()}</small>
+          </div>
+          <div>
+            <h5>当前版本 (v${note.version})</h5>
+            <div class="info-box" style="background: #d4edda;">${note.content}</div>
+            <small>修改人: ${note.lastEditor || note.author} | ${new Date(note.updatedAt).toLocaleString()}</small>
+          </div>
+        </div>
+      `;
+      document.getElementById('note-diff-content').innerHTML = diffHtml;
+      openModal('note-diff-modal');
+    }
+
+    async function showNoteRollbackForm(noteId) {
+      const note = await apiRequest(`/notes/${noteId}`);
+      if (!note.previousVersions || note.previousVersions.length === 0) {
+        showToast('该备注没有历史版本', 'warning');
+        return;
+      }
+
+      currentRollbackNote = note;
+      document.getElementById('rollback-note-id').value = noteId;
+
+      const select = document.getElementById('rollback-note-version');
+      select.innerHTML = note.previousVersions.map(v => `
+        <option value="${v.version}">v${v.version} - ${v.content.substring(0, 30)}... (${new Date(v.editedAt).toLocaleString()})</option>
+      `).join('');
+
+      select.onchange = updateRollbackNotePreview;
+      updateRollbackNotePreview();
+      openModal('note-rollback-modal');
+    }
+
+    function updateRollbackNotePreview() {
+      if (!currentRollbackNote) return;
+      const version = parseInt(document.getElementById('rollback-note-version').value);
+      const targetVersion = currentRollbackNote.previousVersions.find(v => v.version === version);
+      if (targetVersion) {
+        document.getElementById('rollback-note-preview').innerHTML = `
+          <strong>回滚后内容预览：</strong><br>
+          ${targetVersion.content}<br>
+          <small>原修改人: ${targetVersion.editor} | ${new Date(targetVersion.editedAt).toLocaleString()}</small>
+        `;
+      }
+    }
+
+    async function confirmNoteRollback() {
+      if (!currentRollbackNote) return;
+      const targetVersion = parseInt(document.getElementById('rollback-note-version').value);
+      const reason = document.getElementById('rollback-note-reason').value;
+      const operator = document.getElementById('rollback-note-operator').value;
+
+      if (!reason) {
+        showToast('请输入回滚原因', 'warning');
+        return;
+      }
+
+      try {
+        const result = await apiRequest(`/notes/${currentRollbackNote.id}/rollback`, {
+          method: 'POST',
+          body: JSON.stringify({ targetVersion, reason, operator })
+        });
+        showToast(`回滚成功：从 v${result.fromVersion} 到 v${result.toVersion}`, 'success');
+        loadDashboard();
+        closeModal();
+      } catch (error) {
+        console.error('回滚失败:', error);
+      }
+    }
+
+    function showAddNoteForm(recordId) {
+      currentAddNoteRecordId = recordId;
+      document.getElementById('add-note-record-id').value = recordId;
+      document.getElementById('add-note-content').value = '';
+      openModal('add-note-modal');
+    }
+
+    async function saveNewNote() {
+      if (!currentAddNoteRecordId) return;
+      const content = document.getElementById('add-note-content').value;
+      const author = document.getElementById('add-note-author').value;
+      const photoIds = document.getElementById('add-note-photos').value.split(',').map(s => s.trim()).filter(Boolean);
+      const sensorIds = document.getElementById('add-note-sensors').value.split(',').map(s => s.trim()).filter(Boolean);
+
+      if (!content) {
+        showToast('备注内容不能为空', 'warning');
+        return;
+      }
+
+      try {
+        const note = await apiRequest('/notes', {
+          method: 'POST',
+          body: JSON.stringify({
+            content,
+            author,
+            photoIds,
+            sensorIds,
+            heatLoadRecordId: currentAddNoteRecordId
+          })
+        });
+
+        await apiRequest(`/heat-loads/${currentAddNoteRecordId}/add-note`, {
+          method: 'POST',
+          body: JSON.stringify({ noteId: note.id })
+        });
+
+        showToast('备注添加成功', 'success');
+        loadDashboard();
+        closeModal();
+      } catch (error) {
+        console.error('添加失败:', error);
+      }
+    }
+
+    async function createTestSensor() {
+      try {
+        const sensor = await apiRequest('/sensors', {
+          method: 'POST',
+          body: JSON.stringify({
+            physicalId: 'PHY-' + Date.now(),
+            currentNumber: 'F-201',
+            location: '游泳池换热站-进水口',
+            type: 'temperature'
+          })
+        });
+        showToast(`传感器创建成功: ${sensor.currentNumber}`, 'success');
+        loadDashboard();
+      } catch (error) {
+        console.error('创建失败:', error);
+      }
+    }
+
+    async function restartSensor(sensorId) {
+      try {
+        const result = await apiRequest(`/sensors/${sensorId}/restart`, {
+          method: 'POST',
+          body: JSON.stringify({
+            newNumber: 'F-' + (200 + Math.floor(Math.random() * 100)),
+            reason: '传感器重启后编号变更',
+            operator: '系统'
+          })
+        });
+        showToast(`传感器重启: ${result.oldNumber} → ${result.newNumber}`, 'warning');
+        loadDashboard();
+      } catch (error) {
+        console.error('重启失败:', error);
+      }
+    }
+
+    async function createTestHeatLoad() {
+      try {
+        const record = await apiRequest('/heat-loads', {
+          method: 'POST',
+          body: JSON.stringify({
+            createdBy: '何工',
+            poolArea: 500,
+            targetTemp: 28,
+            ambientTemp: 20,
+            hasSensorRestart: false
+          })
+        });
+        showToast(`换热负荷记录创建成功: ${record.id.substring(0, 8)}`, 'success');
+        loadDashboard();
+      } catch (error) {
+        console.error('创建失败:', error);
+      }
+    }
+
+    async function showSensorDetail(sensorId) {
+      const sensor = currentSensors.find(s => s.id === sensorId);
       if (!sensor) return;
-      
-      document.getElementById('modal-title').textContent = `传感器历史 - ${sensor.physicalId}`;
-      document.getElementById('modal-body').innerHTML = `
-        <table>
-          <tr><td style="width: 150px;">物理ID</td><td><code>${sensor.physicalId}</code></td></tr>
-          <tr><td>当前编号</td><td><strong>${sensor.currentNumber}</strong></td></tr>
-          <tr><td>位置</td><td>${sensor.location}</td></tr>
-          <tr><td>重启次数</td><td>${sensor.restartCount}</td></tr>
+
+      const history = await apiRequest(`/sensors/${sensorId}/rollback-history`);
+      const detailHtml = `
+        <h4>传感器基本信息</h4>
+        <table class="detail-table">
+          <tr><th>物理ID</th><td>${sensor.physicalId}</td></tr>
+          <tr><th>当前编号</th><td>${sensor.currentNumber}</td></tr>
+          <tr><th>位置</th><td>${sensor.location}</td></tr>
+          <tr><th>状态</th><td>${sensor.status}</td></tr>
+          <tr><th>最后重启时间</th><td>${sensor.lastRestartTime ? new Date(sensor.lastRestartTime).toLocaleString() : '-'}</td></tr>
         </table>
-        
-        <h4 style="margin: 20px 0 12px;">编号历史</h4>
-        ${sensor.previousNumbers.length === 0 ? '<p style="color: #999;">暂无编号变更记录</p>' : `
-          <table>
-            <thead>
-              <tr><th>编号</th><th>开始时间</th><th>结束时间</th></tr>
-            </thead>
+        <h4 style="margin-top: 20px;">编号变更历史</h4>
+        <table class="data-table">
+          <thead><tr><th>编号</th><th>开始时间</th><th>结束时间</th></tr></thead>
+          <tbody>
+            ${(sensor.previousNumbers || []).map(h => `
+              <tr><td>${h.number}</td><td>${new Date(h.startTime).toLocaleString()}</td><td>${new Date(h.endTime).toLocaleString()}</td></tr>
+            `).join('')}
+            <tr class="table-success"><td><strong>${sensor.currentNumber}</strong> (当前)</td><td>${new Date(sensor.lastRestartTime || sensor.createdAt).toLocaleString()}</td><td>-</td></tr>
+          </tbody>
+        </table>
+        <h4 style="margin-top: 20px;">回滚历史</h4>
+        ${history.length === 0 ? '<p>暂无回滚记录</p>' : `
+          <table class="data-table">
+            <thead><tr><th>原编号</th><th>回滚到</th><th>原因</th><th>操作人</th><th>时间</th></tr></thead>
             <tbody>
-              ${sensor.previousNumbers.map(p => `
-                <tr><td>${p.number}</td><td>${p.startTime}</td><td>${p.endTime}</td></tr>
+              ${history.map(h => `
+                <tr><td>${h.oldNumber}</td><td>${h.newNumber}</td><td>${h.reason}</td><td>${h.operator}</td><td>${new Date(h.timestamp).toLocaleString()}</td></tr>
               `).join('')}
-              <tr style="background: #d1fae5;"><td><strong>${sensor.currentNumber}</strong> (当前)</td><td>${sensor.previousNumbers[sensor.previousNumbers.length - 1]?.endTime || '-'}</td><td>至今</td></tr>
             </tbody>
           </table>
         `}
-        
-        <div class="sensor-warning" style="margin-top: 20px;">
-          📌 <strong>边界规则</strong>：传感器重启编号变化时，历史数据将通过时间戳追溯到对应编号，确保数据可比对
+        <div class="btn-group" style="margin-top: 16px;">
+          <button class="btn btn-secondary" onclick="closeModal()">关闭</button>
         </div>
       `;
-      
-      document.getElementById('detail-modal').classList.add('active');
+
+      document.querySelector('#detail-modal .modal-body').innerHTML = detailHtml;
+      openModal('detail-modal');
     }
-    
-    function closeModal() {
-      document.getElementById('detail-modal').classList.remove('active');
+
+    async function showHeatLoadDetail(recordId) {
+      const record = currentHeatLoadRecords.find(r => r.id === recordId);
+      if (!record) return;
+
+      const notes = record.noteIds ? await Promise.all(record.noteIds.map(id => apiRequest(`/notes/${id}`))) : [];
+      const photos = record.photoIds ? await Promise.all(record.photoIds.map(id => apiRequest(`/photos/${id}`))) : [];
+
+      let detailHtml = `
+        <h4>换热负荷记录基本信息</h4>
+        <table class="detail-table">
+          <tr><th>记录ID</th><td>${record.id}</td></tr>
+          <tr><th>状态</th><td><span class="status-badge status-${record.status}">${getStatusText(record.status)}</span></td></tr>
+          <tr><th>工作流步骤</th><td>第 ${record.workflowStep} 步</td></tr>
+          <tr><th>是否有传感器重启</th><td>${record.hasSensorRestart ? '是 <span class="badge badge-warning">需安全复核</span>' : '否'}</td></tr>
+          <tr><th>创建人</th><td>${record.createdBy}</td></tr>
+          <tr><th>创建时间</th><td>${new Date(record.createdAt).toLocaleString()}</td></tr>
+          ${record.engineerReviewedBy ? `<tr><th>工程审核人</th><td>${record.engineerReviewedBy} (${new Date(record.engineerReviewedAt).toLocaleString()})</td></tr>` : ''}
+          ${record.safetyReviewedBy ? `<tr><th>安全复核人</th><td>${record.safetyReviewedBy} (${new Date(record.safetyReviewedAt).toLocaleString()})</td></tr>` : ''}
+        </table>
+        <h4 style="margin-top: 20px;">关联工况照片 (${photos.length} 张)</h4>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+          ${photos.map(p => `
+            <div style="text-align: center;">
+              <img src="${p.preview || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'}" 
+                   style="width: 100px; height: 100px; object-fit: cover; border: 1px solid #ddd;">
+              <div style="font-size: 12px;">${p.fileName.substring(0, 15)}...</div>
+            </div>
+          `).join('')}
+        </div>
+        <h4 style="margin-top: 20px;">巡检备注 (${notes.length} 条)</h4>
+      `;
+
+      if (notes.length === 0) {
+        detailHtml += '<p>暂无备注</p>';
+      } else {
+        detailHtml += '<div style="max-height: 400px; overflow-y: auto;">';
+        for (const note of notes) {
+          const hasHistory = note.previousVersions && note.previousVersions.length > 0;
+          const hasRollback = note.rollbackHistory && note.rollbackHistory.length > 0;
+          detailHtml += `
+            <div class="info-box" style="margin-bottom: 10px;">
+              <div style="display: flex; justify-content: space-between; align-items: start;">
+                <div>
+                  <strong>${note.content}</strong><br>
+                  <small>备注人: ${note.author} | ${new Date(note.createdAt).toLocaleString()}</small>
+                  ${hasHistory ? `<br><small class="text-warning">已修改 ${note.previousVersions.length} 次，当前版本 v${note.version}</small>` : ''}
+                  ${hasRollback ? `<br><small class="text-info">已回滚 ${note.rollbackHistory.length} 次</small>` : ''}
+                </div>
+                <div class="btn-group">
+                  <button class="btn btn-sm btn-primary" onclick="showNoteEditForm('${note.id}')">修改</button>
+                  ${hasHistory ? `<button class="btn btn-sm btn-info" onclick="showNoteDiff('${note.id}')">差异</button>` : ''}
+                  ${hasHistory ? `<button class="btn btn-sm btn-warning" onclick="showNoteRollbackForm('${note.id}')">回滚</button>` : ''}
+                </div>
+              </div>
+              ${hasHistory ? `
+                <div style="margin-top: 10px; padding-left: 20px; border-left: 3px solid #ddd;">
+                  <strong>历史版本：</strong>
+                  ${note.previousVersions.map(v => `
+                    <div style="margin-top: 5px; padding: 8px; background: #f9f9f9;">
+                      <div>v${v.version}: ${v.content}</div>
+                      <small>修改人: ${v.editor} | ${new Date(v.editedAt).toLocaleString()}</small>
+                    </div>
+                  `).join('')}
+                </div>
+              ` : ''}
+              ${hasRollback ? `
+                <div style="margin-top: 10px; padding-left: 20px; border-left: 3px solid #17a2b8;">
+                  <strong>回滚历史：</strong>
+                  ${note.rollbackHistory.map(r => `
+                    <div style="margin-top: 5px; padding: 8px; background: #f0f8ff;">
+                      <div>从 v${r.fromVersion} 回滚到 v${r.toVersion}</div>
+                      <div>原因: ${r.reason}</div>
+                      <small>操作人: ${r.operator} | ${new Date(r.timestamp).toLocaleString()}</small>
+                    </div>
+                  `).join('')}
+                </div>
+              ` : ''}
+            </div>
+          `;
+        }
+        detailHtml += '</div>';
+      }
+
+      if (record.history && record.history.length > 0) {
+        detailHtml += `
+          <h4 style="margin-top: 20px;">审批历史</h4>
+          <div style="max-height: 200px; overflow-y: auto;">
+            ${record.history.map(h => `
+              <div class="info-box" style="margin-bottom: 8px;">
+                <strong>${h.action}</strong><br>
+                <small>操作人: ${h.operator} | ${new Date(h.timestamp).toLocaleString()}</small>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      detailHtml += `
+        <div class="btn-group" style="margin-top: 16px;">
+          <button class="btn btn-secondary" onclick="closeModal()">关闭</button>
+        </div>
+      `;
+
+      document.querySelector('#detail-modal .modal-body').innerHTML = detailHtml;
+      openModal('detail-modal');
     }
-    
+
     document.addEventListener('DOMContentLoaded', () => {
-      initMockData();
       loadDashboard();
+
+      const dropZone = document.getElementById('photo-drop-zone');
+      if (dropZone) {
+        dropZone.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          dropZone.classList.add('drag-over');
+        });
+        dropZone.addEventListener('dragleave', () => {
+          dropZone.classList.remove('drag-over');
+        });
+        dropZone.addEventListener('drop', handlePhotoDrop);
+      }
+
+      window.onclick = (e) => {
+        if (currentModal && e.target === currentModal) {
+          closeModal();
+        }
+      };
     });
   </script>
-</body>
+
+      <div id="note-edit-modal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3>编辑巡检备注</h3>
+            <span class="close" onclick="closeModal()">&times;</span>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label>备注ID</label>
+              <input type="text" id="edit-note-id" readonly>
+            </div>
+            <div class="form-group">
+              <label>当前内容</label>
+              <textarea id="edit-note-current" readonly rows="4"></textarea>
+            </div>
+            <div class="form-group">
+              <label>修改人</label>
+              <input type="text" id="edit-note-editor" value="何工">
+            </div>
+            <div class="form-group">
+              <label>修改原因</label>
+              <textarea id="edit-note-reason" placeholder="请输入修改原因"></textarea>
+            </div>
+            <div class="form-group">
+              <label>新内容</label>
+              <textarea id="edit-note-new" rows="6" placeholder="请输入新的备注内容"></textarea>
+            </div>
+            <div class="btn-group" style="margin-top: 16px;">
+              <button class="btn btn-primary" onclick="saveNoteEdit()">保存修改</button>
+              <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="note-diff-modal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3>版本差异对比</h3>
+            <span class="close" onclick="closeModal()">&times;</span>
+          </div>
+          <div class="modal-body">
+            <div id="note-diff-content"></div>
+            <div class="btn-group" style="margin-top: 16px;">
+              <button class="btn btn-secondary" onclick="closeModal()">关闭</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="note-rollback-modal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3>回滚巡检备注</h3>
+            <span class="close" onclick="closeModal()">&times;</span>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label>备注ID</label>
+              <input type="text" id="rollback-note-id" readonly>
+            </div>
+            <div class="form-group">
+              <label>选择回滚到版本</label>
+              <select id="rollback-note-version"></select>
+            </div>
+            <div class="form-group">
+              <label>回滚原因</label>
+              <textarea id="rollback-note-reason" placeholder="请输入回滚原因"></textarea>
+            </div>
+            <div class="form-group">
+              <label>操作人</label>
+              <input type="text" id="rollback-note-operator" value="何工">
+            </div>
+            <div id="rollback-note-preview" class="info-box" style="margin-top: 16px;"></div>
+            <div class="btn-group" style="margin-top: 16px;">
+              <button class="btn btn-warning" onclick="confirmNoteRollback()">确认回滚</button>
+              <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="add-note-modal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3>添加巡检备注</h3>
+            <span class="close" onclick="closeModal()">&times;</span>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label>换热负荷记录ID</label>
+              <input type="text" id="add-note-record-id" readonly>
+            </div>
+            <div class="form-group">
+              <label>备注内容</label>
+              <textarea id="add-note-content" rows="6" placeholder="请输入巡检备注内容，如：传感器F-201显示温度异常偏高，已现场复核"></textarea>
+            </div>
+            <div class="form-group">
+              <label>备注人</label>
+              <input type="text" id="add-note-author" value="何工">
+            </div>
+            <div class="form-group">
+              <label>关联照片ID（多个用逗号分隔）</label>
+              <input type="text" id="add-note-photos" placeholder="可选">
+            </div>
+            <div class="form-group">
+              <label>关联传感器ID（多个用逗号分隔）</label>
+              <input type="text" id="add-note-sensors" placeholder="可选">
+            </div>
+            <div class="btn-group" style="margin-top: 16px;">
+              <button class="btn btn-primary" onclick="saveNewNote()">添加备注</button>
+              <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+  </body>
 </html>

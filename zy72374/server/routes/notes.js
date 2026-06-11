@@ -76,6 +76,15 @@ router.post('/', (req, res) => {
   res.status(201).json(note);
 });
 
+router.put('/:id', (req, res) => {
+  const { content, editor, reason } = req.body;
+  const note = NoteService.updateNoteContent(req.params.id, content, editor, reason);
+  if (!note) {
+    return res.status(404).json({ error: '备注未找到' });
+  }
+  res.json(note);
+});
+
 router.put('/:id/content', (req, res) => {
   const { content, editor } = req.body;
   const note = NoteService.updateNoteContent(req.params.id, content, editor);
@@ -95,8 +104,10 @@ router.post('/:id/verify', (req, res) => {
 });
 
 router.post('/:id/rollback', (req, res) => {
-  const { toVersion, editor } = req.body;
-  const note = NoteService.rollbackNote(req.params.id, parseInt(toVersion), editor);
+  const { targetVersion, toVersion, reason, operator, editor } = req.body;
+  const version = targetVersion || toVersion;
+  const op = operator || editor;
+  const note = NoteService.rollbackNote(req.params.id, parseInt(version), op, reason);
   if (note && note.error) {
     return res.status(400).json({ error: note.error });
   }
