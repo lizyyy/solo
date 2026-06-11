@@ -1,0 +1,1527 @@
+{
+  "records": [
+    {
+      "id": "1781197442099-1",
+      "nozzleId": "NZ-A01-修",
+      "flowRate": "130.0",
+      "pressure": "2.5",
+      "temperature": "25",
+      "temperatureUnit": "℃",
+      "originalRowNumber": 1,
+      "importBatch": "1781197442099",
+      "importFileName": "mixed-units.csv",
+      "fileHash": "15d88d1967be41bbff799791620e2bfa",
+      "importTime": "2026-06-11T17:04:02.100Z",
+      "manualChanges": [
+        {
+          "field": "nozzleId",
+          "oldValue": "NZ-A01",
+          "newValue": "NZ-A01-修",
+          "time": "2026-06-11T17:04:02.118Z",
+          "operator": "质检员小白"
+        },
+        {
+          "field": "flowRate",
+          "oldValue": "125.5",
+          "newValue": "130.0",
+          "time": "2026-06-11T17:04:02.118Z",
+          "operator": "质检员小白"
+        },
+        {
+          "field": "modifiedBy",
+          "newValue": "质检员小白",
+          "time": "2026-06-11T17:04:02.118Z",
+          "operator": "质检员小白"
+        },
+        {
+          "field": "operator",
+          "newValue": "质检员小白",
+          "time": "2026-06-11T17:04:02.118Z",
+          "operator": "质检员小白"
+        },
+        {
+          "field": "changeReason",
+          "newValue": "维修群20260612截图确认，喷嘴编号标错，流量重测",
+          "time": "2026-06-11T17:04:02.118Z",
+          "operator": "质检员小白"
+        }
+      ],
+      "duplicateType": "new",
+      "duplicateInfo": null,
+      "validationIssues": [],
+      "validationWarnings": [],
+      "flowCoefficient": null,
+      "processingReason": [
+        "温度单位混用：当前℃，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常",
+        "[2026-06-11T17:04:02.118Z] 质检员小白补录修改: nozzleId: NZ-A01→NZ-A01-修; flowRate: 125.5→130.0; modifiedBy: undefined→质检员小白; operator: undefined→质检员小白; changeReason: undefined→维修群20260612截图确认，喷嘴编号标错，流量重测",
+        "[2026-06-11T17:04:02.119Z] 训练教练复核: pending_review → reviewed，理由: 维修群20260612截图确认单位为℃，与铭牌一致，保留混用标记"
+      ],
+      "status": "reviewed",
+      "modifiedBy": "质检员小白",
+      "operator": "质检员小白",
+      "changeReason": "维修群20260612截图确认，喷嘴编号标错，流量重测",
+      "reviewerNote": "维修群20260612截图确认单位为℃，与铭牌一致，保留混用标记",
+      "reviewTime": "2026-06-11T17:04:02.119Z",
+      "reviewer": "训练教练"
+    },
+    {
+      "id": "1781197442099-2",
+      "nozzleId": "NZ-A02",
+      "flowRate": "118.3",
+      "pressure": "2.4",
+      "temperature": "298.15",
+      "temperatureUnit": "K",
+      "originalRowNumber": 2,
+      "importBatch": "1781197442099",
+      "importFileName": "mixed-units.csv",
+      "fileHash": "15d88d1967be41bbff799791620e2bfa",
+      "importTime": "2026-06-11T17:04:02.100Z",
+      "manualChanges": [],
+      "duplicateType": "new",
+      "duplicateInfo": null,
+      "validationIssues": [],
+      "validationWarnings": [],
+      "flowCoefficient": null,
+      "processingReason": [
+        "温度单位混用：当前K，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+      ],
+      "status": "pending_review"
+    },
+    {
+      "id": "1781197442099-3",
+      "nozzleId": "NZ-A03",
+      "flowRate": "122.7",
+      "pressure": "2.6",
+      "temperature": "27",
+      "temperatureUnit": "℃",
+      "originalRowNumber": 3,
+      "importBatch": "1781197442099",
+      "importFileName": "mixed-units.csv",
+      "fileHash": "15d88d1967be41bbff799791620e2bfa",
+      "importTime": "2026-06-11T17:04:02.100Z",
+      "manualChanges": [],
+      "duplicateType": "new",
+      "duplicateInfo": null,
+      "validationIssues": [],
+      "validationWarnings": [],
+      "flowCoefficient": null,
+      "processingReason": [
+        "温度单位混用：当前℃，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+      ],
+      "status": "pending_review"
+    },
+    {
+      "id": "1781197442099-4",
+      "nozzleId": "NZ-A04",
+      "flowRate": "119.8",
+      "pressure": "2.5",
+      "temperature": "300.15",
+      "temperatureUnit": "K",
+      "originalRowNumber": 4,
+      "importBatch": "1781197442099",
+      "importFileName": "mixed-units.csv",
+      "fileHash": "15d88d1967be41bbff799791620e2bfa",
+      "importTime": "2026-06-11T17:04:02.100Z",
+      "manualChanges": [],
+      "duplicateType": "new",
+      "duplicateInfo": null,
+      "validationIssues": [],
+      "validationWarnings": [],
+      "flowCoefficient": null,
+      "processingReason": [
+        "温度单位混用：当前K，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+      ],
+      "status": "pending_review"
+    },
+    {
+      "id": "1781197442099-5",
+      "nozzleId": "NZ-A05",
+      "flowRate": "121.2",
+      "pressure": "2.5",
+      "temperature": "24",
+      "temperatureUnit": "℃",
+      "originalRowNumber": 5,
+      "importBatch": "1781197442099",
+      "importFileName": "mixed-units.csv",
+      "fileHash": "15d88d1967be41bbff799791620e2bfa",
+      "importTime": "2026-06-11T17:04:02.100Z",
+      "manualChanges": [],
+      "duplicateType": "new",
+      "duplicateInfo": null,
+      "validationIssues": [],
+      "validationWarnings": [],
+      "flowCoefficient": null,
+      "processingReason": [
+        "温度单位混用：当前℃，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+      ],
+      "status": "pending_review"
+    },
+    {
+      "id": "1781197442099-6",
+      "nozzleId": "NZ-A06",
+      "flowRate": "117.9",
+      "pressure": "2.4",
+      "temperature": "295.15",
+      "temperatureUnit": "K",
+      "originalRowNumber": 6,
+      "importBatch": "1781197442099",
+      "importFileName": "mixed-units.csv",
+      "fileHash": "15d88d1967be41bbff799791620e2bfa",
+      "importTime": "2026-06-11T17:04:02.100Z",
+      "manualChanges": [],
+      "duplicateType": "new",
+      "duplicateInfo": null,
+      "validationIssues": [],
+      "validationWarnings": [],
+      "flowCoefficient": null,
+      "processingReason": [
+        "温度单位混用：当前K，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+      ],
+      "status": "pending_review"
+    },
+    {
+      "id": "1781197442099-7",
+      "nozzleId": "NZ-A07",
+      "flowRate": "123.1",
+      "pressure": "2.6",
+      "temperature": "26",
+      "temperatureUnit": "℃",
+      "originalRowNumber": 7,
+      "importBatch": "1781197442099",
+      "importFileName": "mixed-units.csv",
+      "fileHash": "15d88d1967be41bbff799791620e2bfa",
+      "importTime": "2026-06-11T17:04:02.100Z",
+      "manualChanges": [],
+      "duplicateType": "new",
+      "duplicateInfo": null,
+      "validationIssues": [],
+      "validationWarnings": [],
+      "flowCoefficient": null,
+      "processingReason": [
+        "温度单位混用：当前℃，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+      ],
+      "status": "pending_review"
+    },
+    {
+      "id": "1781197442099-8",
+      "nozzleId": "NZ-A08",
+      "flowRate": "120.0",
+      "pressure": "2.5",
+      "temperature": "297.15",
+      "temperatureUnit": "K",
+      "originalRowNumber": 8,
+      "importBatch": "1781197442099",
+      "importFileName": "mixed-units.csv",
+      "fileHash": "15d88d1967be41bbff799791620e2bfa",
+      "importTime": "2026-06-11T17:04:02.100Z",
+      "manualChanges": [],
+      "duplicateType": "new",
+      "duplicateInfo": null,
+      "validationIssues": [],
+      "validationWarnings": [],
+      "flowCoefficient": null,
+      "processingReason": [
+        "温度单位混用：当前K，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+      ],
+      "status": "pending_review"
+    },
+    {
+      "id": "1781197442102-1",
+      "nozzleId": "NZ-A01",
+      "flowRate": "125.5",
+      "pressure": "2.5",
+      "temperature": "25",
+      "temperatureUnit": "℃",
+      "originalRowNumber": 1,
+      "importBatch": "1781197442102",
+      "importFileName": "mixed-units.csv",
+      "fileHash": "15d88d1967be41bbff799791620e2bfa",
+      "importTime": "2026-06-11T17:04:02.103Z",
+      "manualChanges": [],
+      "duplicateType": "file_content_duplicate",
+      "duplicateInfo": "文件内容与历史批次442099(mixed-units.csv)完全相同 且 历史批次442099(mixed-units.csv)第1行已存在",
+      "validationIssues": [],
+      "validationWarnings": [],
+      "flowCoefficient": null,
+      "processingReason": [
+        "导入查重类型: file_content_duplicate - 文件内容与历史批次442099(mixed-units.csv)完全相同 且 历史批次442099(mixed-units.csv)第1行已存在",
+        "温度单位混用：当前℃，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+      ],
+      "status": "pending_review"
+    },
+    {
+      "id": "1781197442102-2",
+      "nozzleId": "NZ-A02",
+      "flowRate": "118.3",
+      "pressure": "2.4",
+      "temperature": "298.15",
+      "temperatureUnit": "K",
+      "originalRowNumber": 2,
+      "importBatch": "1781197442102",
+      "importFileName": "mixed-units.csv",
+      "fileHash": "15d88d1967be41bbff799791620e2bfa",
+      "importTime": "2026-06-11T17:04:02.103Z",
+      "manualChanges": [],
+      "duplicateType": "file_content_duplicate",
+      "duplicateInfo": "文件内容与历史批次442099(mixed-units.csv)完全相同 且 历史批次442099(mixed-units.csv)第2行已存在",
+      "validationIssues": [],
+      "validationWarnings": [],
+      "flowCoefficient": null,
+      "processingReason": [
+        "导入查重类型: file_content_duplicate - 文件内容与历史批次442099(mixed-units.csv)完全相同 且 历史批次442099(mixed-units.csv)第2行已存在",
+        "温度单位混用：当前K，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+      ],
+      "status": "pending_review"
+    },
+    {
+      "id": "1781197442102-3",
+      "nozzleId": "NZ-A03",
+      "flowRate": "122.7",
+      "pressure": "2.6",
+      "temperature": "27",
+      "temperatureUnit": "℃",
+      "originalRowNumber": 3,
+      "importBatch": "1781197442102",
+      "importFileName": "mixed-units.csv",
+      "fileHash": "15d88d1967be41bbff799791620e2bfa",
+      "importTime": "2026-06-11T17:04:02.103Z",
+      "manualChanges": [],
+      "duplicateType": "file_content_duplicate",
+      "duplicateInfo": "文件内容与历史批次442099(mixed-units.csv)完全相同 且 历史批次442099(mixed-units.csv)第3行已存在",
+      "validationIssues": [],
+      "validationWarnings": [],
+      "flowCoefficient": null,
+      "processingReason": [
+        "导入查重类型: file_content_duplicate - 文件内容与历史批次442099(mixed-units.csv)完全相同 且 历史批次442099(mixed-units.csv)第3行已存在",
+        "温度单位混用：当前℃，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+      ],
+      "status": "pending_review"
+    },
+    {
+      "id": "1781197442102-4",
+      "nozzleId": "NZ-A04",
+      "flowRate": "119.8",
+      "pressure": "2.5",
+      "temperature": "300.15",
+      "temperatureUnit": "K",
+      "originalRowNumber": 4,
+      "importBatch": "1781197442102",
+      "importFileName": "mixed-units.csv",
+      "fileHash": "15d88d1967be41bbff799791620e2bfa",
+      "importTime": "2026-06-11T17:04:02.103Z",
+      "manualChanges": [],
+      "duplicateType": "file_content_duplicate",
+      "duplicateInfo": "文件内容与历史批次442099(mixed-units.csv)完全相同 且 历史批次442099(mixed-units.csv)第4行已存在",
+      "validationIssues": [],
+      "validationWarnings": [],
+      "flowCoefficient": null,
+      "processingReason": [
+        "导入查重类型: file_content_duplicate - 文件内容与历史批次442099(mixed-units.csv)完全相同 且 历史批次442099(mixed-units.csv)第4行已存在",
+        "温度单位混用：当前K，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+      ],
+      "status": "pending_review"
+    },
+    {
+      "id": "1781197442102-5",
+      "nozzleId": "NZ-A05",
+      "flowRate": "121.2",
+      "pressure": "2.5",
+      "temperature": "24",
+      "temperatureUnit": "℃",
+      "originalRowNumber": 5,
+      "importBatch": "1781197442102",
+      "importFileName": "mixed-units.csv",
+      "fileHash": "15d88d1967be41bbff799791620e2bfa",
+      "importTime": "2026-06-11T17:04:02.103Z",
+      "manualChanges": [],
+      "duplicateType": "file_content_duplicate",
+      "duplicateInfo": "文件内容与历史批次442099(mixed-units.csv)完全相同 且 历史批次442099(mixed-units.csv)第5行已存在",
+      "validationIssues": [],
+      "validationWarnings": [],
+      "flowCoefficient": null,
+      "processingReason": [
+        "导入查重类型: file_content_duplicate - 文件内容与历史批次442099(mixed-units.csv)完全相同 且 历史批次442099(mixed-units.csv)第5行已存在",
+        "温度单位混用：当前℃，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+      ],
+      "status": "pending_review"
+    },
+    {
+      "id": "1781197442102-6",
+      "nozzleId": "NZ-A06",
+      "flowRate": "117.9",
+      "pressure": "2.4",
+      "temperature": "295.15",
+      "temperatureUnit": "K",
+      "originalRowNumber": 6,
+      "importBatch": "1781197442102",
+      "importFileName": "mixed-units.csv",
+      "fileHash": "15d88d1967be41bbff799791620e2bfa",
+      "importTime": "2026-06-11T17:04:02.103Z",
+      "manualChanges": [],
+      "duplicateType": "file_content_duplicate",
+      "duplicateInfo": "文件内容与历史批次442099(mixed-units.csv)完全相同 且 历史批次442099(mixed-units.csv)第6行已存在",
+      "validationIssues": [],
+      "validationWarnings": [],
+      "flowCoefficient": null,
+      "processingReason": [
+        "导入查重类型: file_content_duplicate - 文件内容与历史批次442099(mixed-units.csv)完全相同 且 历史批次442099(mixed-units.csv)第6行已存在",
+        "温度单位混用：当前K，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+      ],
+      "status": "pending_review"
+    },
+    {
+      "id": "1781197442102-7",
+      "nozzleId": "NZ-A07",
+      "flowRate": "123.1",
+      "pressure": "2.6",
+      "temperature": "26",
+      "temperatureUnit": "℃",
+      "originalRowNumber": 7,
+      "importBatch": "1781197442102",
+      "importFileName": "mixed-units.csv",
+      "fileHash": "15d88d1967be41bbff799791620e2bfa",
+      "importTime": "2026-06-11T17:04:02.103Z",
+      "manualChanges": [],
+      "duplicateType": "file_content_duplicate",
+      "duplicateInfo": "文件内容与历史批次442099(mixed-units.csv)完全相同 且 历史批次442099(mixed-units.csv)第7行已存在",
+      "validationIssues": [],
+      "validationWarnings": [],
+      "flowCoefficient": null,
+      "processingReason": [
+        "导入查重类型: file_content_duplicate - 文件内容与历史批次442099(mixed-units.csv)完全相同 且 历史批次442099(mixed-units.csv)第7行已存在",
+        "温度单位混用：当前℃，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+      ],
+      "status": "pending_review"
+    },
+    {
+      "id": "1781197442102-8",
+      "nozzleId": "NZ-A08",
+      "flowRate": "120.0",
+      "pressure": "2.5",
+      "temperature": "297.15",
+      "temperatureUnit": "K",
+      "originalRowNumber": 8,
+      "importBatch": "1781197442102",
+      "importFileName": "mixed-units.csv",
+      "fileHash": "15d88d1967be41bbff799791620e2bfa",
+      "importTime": "2026-06-11T17:04:02.103Z",
+      "manualChanges": [],
+      "duplicateType": "file_content_duplicate",
+      "duplicateInfo": "文件内容与历史批次442099(mixed-units.csv)完全相同 且 历史批次442099(mixed-units.csv)第8行已存在",
+      "validationIssues": [],
+      "validationWarnings": [],
+      "flowCoefficient": null,
+      "processingReason": [
+        "导入查重类型: file_content_duplicate - 文件内容与历史批次442099(mixed-units.csv)完全相同 且 历史批次442099(mixed-units.csv)第8行已存在",
+        "温度单位混用：当前K，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+      ],
+      "status": "pending_review"
+    },
+    {
+      "id": "1781197442105-1",
+      "nozzleId": "NZ-B01",
+      "flowRate": "125.5",
+      "pressure": "",
+      "temperature": "25",
+      "temperatureUnit": "℃",
+      "originalRowNumber": 1,
+      "importBatch": "1781197442105",
+      "importFileName": "incomplete-data.csv",
+      "fileHash": "9f6246cb5171a99e3b26f1ab986e3cc0",
+      "importTime": "2026-06-11T17:04:02.105Z",
+      "manualChanges": [],
+      "duplicateType": "new",
+      "duplicateInfo": null,
+      "validationIssues": [],
+      "validationWarnings": [],
+      "flowCoefficient": null,
+      "processingReason": [
+        "温度单位混用：当前℃，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+      ],
+      "status": "pending_review"
+    },
+    {
+      "id": "1781197442105-2",
+      "nozzleId": "NZ-B02",
+      "flowRate": "",
+      "pressure": "2.4",
+      "temperature": "298.15",
+      "temperatureUnit": "K",
+      "originalRowNumber": 2,
+      "importBatch": "1781197442105",
+      "importFileName": "incomplete-data.csv",
+      "fileHash": "9f6246cb5171a99e3b26f1ab986e3cc0",
+      "importTime": "2026-06-11T17:04:02.105Z",
+      "manualChanges": [],
+      "duplicateType": "new",
+      "duplicateInfo": null,
+      "validationIssues": [],
+      "validationWarnings": [],
+      "flowCoefficient": null,
+      "processingReason": [
+        "温度单位混用：当前K，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+      ],
+      "status": "pending_review"
+    },
+    {
+      "id": "1781197442105-3",
+      "nozzleId": "NZ-B03",
+      "flowRate": "122.7",
+      "pressure": "2.6",
+      "temperature": null,
+      "temperatureUnit": "",
+      "originalRowNumber": 3,
+      "importBatch": "1781197442105",
+      "importFileName": "incomplete-data.csv",
+      "fileHash": "9f6246cb5171a99e3b26f1ab986e3cc0",
+      "importTime": "2026-06-11T17:04:02.105Z",
+      "manualChanges": [],
+      "duplicateType": "new",
+      "duplicateInfo": null,
+      "validationIssues": [],
+      "validationWarnings": [],
+      "flowCoefficient": 69.3466,
+      "processingReason": [
+        "数据完整、单位一致，自动计算流量系数"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "1781197442105-4",
+      "nozzleId": "NZ-B04",
+      "flowRate": "119.8",
+      "pressure": "2.5",
+      "temperature": "300.15",
+      "temperatureUnit": "K",
+      "originalRowNumber": 4,
+      "importBatch": "1781197442105",
+      "importFileName": "incomplete-data.csv",
+      "fileHash": "9f6246cb5171a99e3b26f1ab986e3cc0",
+      "importTime": "2026-06-11T17:04:02.105Z",
+      "manualChanges": [],
+      "duplicateType": "new",
+      "duplicateInfo": null,
+      "validationIssues": [],
+      "validationWarnings": [],
+      "flowCoefficient": null,
+      "processingReason": [
+        "温度单位混用：当前K，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+      ],
+      "status": "pending_review"
+    },
+    {
+      "id": "1781197442105-5",
+      "nozzleId": "NZ-B05",
+      "flowRate": "",
+      "pressure": "2.5",
+      "temperature": "24",
+      "temperatureUnit": "℃",
+      "originalRowNumber": 5,
+      "importBatch": "1781197442105",
+      "importFileName": "incomplete-data.csv",
+      "fileHash": "9f6246cb5171a99e3b26f1ab986e3cc0",
+      "importTime": "2026-06-11T17:04:02.105Z",
+      "manualChanges": [],
+      "duplicateType": "new",
+      "duplicateInfo": null,
+      "validationIssues": [],
+      "validationWarnings": [],
+      "flowCoefficient": null,
+      "processingReason": [
+        "温度单位混用：当前℃，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+      ],
+      "status": "pending_review"
+    }
+  ],
+  "importHistory": [
+    {
+      "batchId": "1781197442099",
+      "fileName": "mixed-units.csv",
+      "fileHash": "15d88d1967be41bbff799791620e2bfa",
+      "importTime": "2026-06-11T17:04:02.100Z",
+      "recordCount": 8,
+      "newCount": 8,
+      "batchDuplicateCount": 0,
+      "globalDuplicateCount": 0,
+      "isFileDuplicate": false,
+      "duplicateOfBatch": null,
+      "hasTemperatureMix": true,
+      "summary": {
+        "newRecords": [
+          {
+            "row": 1,
+            "nozzleId": "NZ-A01"
+          },
+          {
+            "row": 2,
+            "nozzleId": "NZ-A02"
+          },
+          {
+            "row": 3,
+            "nozzleId": "NZ-A03"
+          },
+          {
+            "row": 4,
+            "nozzleId": "NZ-A04"
+          },
+          {
+            "row": 5,
+            "nozzleId": "NZ-A05"
+          },
+          {
+            "row": 6,
+            "nozzleId": "NZ-A06"
+          },
+          {
+            "row": 7,
+            "nozzleId": "NZ-A07"
+          },
+          {
+            "row": 8,
+            "nozzleId": "NZ-A08"
+          }
+        ],
+        "batchDuplicates": [],
+        "globalDuplicates": [],
+        "fileDuplicateOf": null
+      }
+    },
+    {
+      "batchId": "1781197442102",
+      "fileName": "mixed-units.csv",
+      "fileHash": "15d88d1967be41bbff799791620e2bfa",
+      "importTime": "2026-06-11T17:04:02.103Z",
+      "recordCount": 8,
+      "newCount": 0,
+      "batchDuplicateCount": 0,
+      "globalDuplicateCount": 8,
+      "isFileDuplicate": true,
+      "duplicateOfBatch": "1781197442099",
+      "hasTemperatureMix": true,
+      "summary": {
+        "newRecords": [],
+        "batchDuplicates": [],
+        "globalDuplicates": [
+          {
+            "rowNumber": 1,
+            "nozzleId": "NZ-A01",
+            "historyBatch": "1781197442099",
+            "historyFile": "mixed-units.csv",
+            "historyRow": 1
+          },
+          {
+            "rowNumber": 2,
+            "nozzleId": "NZ-A02",
+            "historyBatch": "1781197442099",
+            "historyFile": "mixed-units.csv",
+            "historyRow": 2
+          },
+          {
+            "rowNumber": 3,
+            "nozzleId": "NZ-A03",
+            "historyBatch": "1781197442099",
+            "historyFile": "mixed-units.csv",
+            "historyRow": 3
+          },
+          {
+            "rowNumber": 4,
+            "nozzleId": "NZ-A04",
+            "historyBatch": "1781197442099",
+            "historyFile": "mixed-units.csv",
+            "historyRow": 4
+          },
+          {
+            "rowNumber": 5,
+            "nozzleId": "NZ-A05",
+            "historyBatch": "1781197442099",
+            "historyFile": "mixed-units.csv",
+            "historyRow": 5
+          },
+          {
+            "rowNumber": 6,
+            "nozzleId": "NZ-A06",
+            "historyBatch": "1781197442099",
+            "historyFile": "mixed-units.csv",
+            "historyRow": 6
+          },
+          {
+            "rowNumber": 7,
+            "nozzleId": "NZ-A07",
+            "historyBatch": "1781197442099",
+            "historyFile": "mixed-units.csv",
+            "historyRow": 7
+          },
+          {
+            "rowNumber": 8,
+            "nozzleId": "NZ-A08",
+            "historyBatch": "1781197442099",
+            "historyFile": "mixed-units.csv",
+            "historyRow": 8
+          }
+        ],
+        "fileDuplicateOf": {
+          "batchId": "1781197442099",
+          "fileName": "mixed-units.csv"
+        }
+      }
+    },
+    {
+      "batchId": "1781197442105",
+      "fileName": "incomplete-data.csv",
+      "fileHash": "9f6246cb5171a99e3b26f1ab986e3cc0",
+      "importTime": "2026-06-11T17:04:02.105Z",
+      "recordCount": 5,
+      "newCount": 5,
+      "batchDuplicateCount": 0,
+      "globalDuplicateCount": 0,
+      "isFileDuplicate": false,
+      "duplicateOfBatch": null,
+      "hasTemperatureMix": true,
+      "summary": {
+        "newRecords": [
+          {
+            "row": 1,
+            "nozzleId": "NZ-B01"
+          },
+          {
+            "row": 2,
+            "nozzleId": "NZ-B02"
+          },
+          {
+            "row": 3,
+            "nozzleId": "NZ-B03"
+          },
+          {
+            "row": 4,
+            "nozzleId": "NZ-B04"
+          },
+          {
+            "row": 5,
+            "nozzleId": "NZ-B05"
+          }
+        ],
+        "batchDuplicates": [],
+        "globalDuplicates": [],
+        "fileDuplicateOf": null
+      }
+    }
+  ],
+  "handoverReport": {
+    "operator": "质检员小白",
+    "generatedTime": "2026-06-11T17:12:50.715Z",
+    "totalRecords": 21,
+    "normalCount": 1,
+    "reviewedCount": 1,
+    "pendingReviewCount": 19,
+    "temperatureMixRelatedCount": 20,
+    "consistencyCheck": {
+      "sameAsExport": "✅ 21条记录与/api/export导出CSV喷嘴编号+导入批次+流量系数完全一致",
+      "sameAsPage": "✅ 21条记录与页面记录明细calibrationData.records完全一致",
+      "sameAsApi": "✅ 同一份数据源，无分离副本"
+    },
+    "pendingReviewDetail": [
+      {
+        "id": "1781197442099-1",
+        "nozzleId": "NZ-A01-修",
+        "importBatch": "1781197442099",
+        "importBatchShort": "442099",
+        "importFileName": "mixed-units.csv",
+        "originalRowNumber": 1,
+        "temperature": "25",
+        "temperatureUnit": "℃",
+        "status": "reviewed",
+        "reviewerNote": "维修群20260612截图确认单位为℃，与铭牌一致，保留混用标记",
+        "reviewer": "训练教练",
+        "flowCoefficient": null,
+        "duplicateType": "new",
+        "processingReason": [
+          "温度单位混用：当前℃，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常",
+          "[2026-06-11T17:04:02.118Z] 质检员小白补录修改: nozzleId: NZ-A01→NZ-A01-修; flowRate: 125.5→130.0; modifiedBy: undefined→质检员小白; operator: undefined→质检员小白; changeReason: undefined→维修群20260612截图确认，喷嘴编号标错，流量重测",
+          "[2026-06-11T17:04:02.119Z] 训练教练复核: pending_review → reviewed，理由: 维修群20260612截图确认单位为℃，与铭牌一致，保留混用标记"
+        ],
+        "manualChangesCount": 5,
+        "isTemperatureMix": true,
+        "whyPendingReview": "温度单位混用：当前℃，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常 ➜ [2026-06-11T17:04:02.119Z] 训练教练复核: pending_review → reviewed，理由: 维修群20260612截图确认单位为℃，与铭牌一致，保留混用标记"
+      },
+      {
+        "id": "1781197442099-2",
+        "nozzleId": "NZ-A02",
+        "importBatch": "1781197442099",
+        "importBatchShort": "442099",
+        "importFileName": "mixed-units.csv",
+        "originalRowNumber": 2,
+        "temperature": "298.15",
+        "temperatureUnit": "K",
+        "status": "pending_review",
+        "reviewer": "",
+        "flowCoefficient": null,
+        "duplicateType": "new",
+        "processingReason": [
+          "温度单位混用：当前K，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+        ],
+        "manualChangesCount": 0,
+        "isTemperatureMix": true,
+        "whyPendingReview": "温度单位混用：当前K，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+      },
+      {
+        "id": "1781197442099-3",
+        "nozzleId": "NZ-A03",
+        "importBatch": "1781197442099",
+        "importBatchShort": "442099",
+        "importFileName": "mixed-units.csv",
+        "originalRowNumber": 3,
+        "temperature": "27",
+        "temperatureUnit": "℃",
+        "status": "pending_review",
+        "reviewer": "",
+        "flowCoefficient": null,
+        "duplicateType": "new",
+        "processingReason": [
+          "温度单位混用：当前℃，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+        ],
+        "manualChangesCount": 0,
+        "isTemperatureMix": true,
+        "whyPendingReview": "温度单位混用：当前℃，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+      },
+      {
+        "id": "1781197442099-4",
+        "nozzleId": "NZ-A04",
+        "importBatch": "1781197442099",
+        "importBatchShort": "442099",
+        "importFileName": "mixed-units.csv",
+        "originalRowNumber": 4,
+        "temperature": "300.15",
+        "temperatureUnit": "K",
+        "status": "pending_review",
+        "reviewer": "",
+        "flowCoefficient": null,
+        "duplicateType": "new",
+        "processingReason": [
+          "温度单位混用：当前K，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+        ],
+        "manualChangesCount": 0,
+        "isTemperatureMix": true,
+        "whyPendingReview": "温度单位混用：当前K，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+      },
+      {
+        "id": "1781197442099-5",
+        "nozzleId": "NZ-A05",
+        "importBatch": "1781197442099",
+        "importBatchShort": "442099",
+        "importFileName": "mixed-units.csv",
+        "originalRowNumber": 5,
+        "temperature": "24",
+        "temperatureUnit": "℃",
+        "status": "pending_review",
+        "reviewer": "",
+        "flowCoefficient": null,
+        "duplicateType": "new",
+        "processingReason": [
+          "温度单位混用：当前℃，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+        ],
+        "manualChangesCount": 0,
+        "isTemperatureMix": true,
+        "whyPendingReview": "温度单位混用：当前℃，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+      },
+      {
+        "id": "1781197442099-6",
+        "nozzleId": "NZ-A06",
+        "importBatch": "1781197442099",
+        "importBatchShort": "442099",
+        "importFileName": "mixed-units.csv",
+        "originalRowNumber": 6,
+        "temperature": "295.15",
+        "temperatureUnit": "K",
+        "status": "pending_review",
+        "reviewer": "",
+        "flowCoefficient": null,
+        "duplicateType": "new",
+        "processingReason": [
+          "温度单位混用：当前K，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+        ],
+        "manualChangesCount": 0,
+        "isTemperatureMix": true,
+        "whyPendingReview": "温度单位混用：当前K，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+      },
+      {
+        "id": "1781197442099-7",
+        "nozzleId": "NZ-A07",
+        "importBatch": "1781197442099",
+        "importBatchShort": "442099",
+        "importFileName": "mixed-units.csv",
+        "originalRowNumber": 7,
+        "temperature": "26",
+        "temperatureUnit": "℃",
+        "status": "pending_review",
+        "reviewer": "",
+        "flowCoefficient": null,
+        "duplicateType": "new",
+        "processingReason": [
+          "温度单位混用：当前℃，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+        ],
+        "manualChangesCount": 0,
+        "isTemperatureMix": true,
+        "whyPendingReview": "温度单位混用：当前℃，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+      },
+      {
+        "id": "1781197442099-8",
+        "nozzleId": "NZ-A08",
+        "importBatch": "1781197442099",
+        "importBatchShort": "442099",
+        "importFileName": "mixed-units.csv",
+        "originalRowNumber": 8,
+        "temperature": "297.15",
+        "temperatureUnit": "K",
+        "status": "pending_review",
+        "reviewer": "",
+        "flowCoefficient": null,
+        "duplicateType": "new",
+        "processingReason": [
+          "温度单位混用：当前K，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+        ],
+        "manualChangesCount": 0,
+        "isTemperatureMix": true,
+        "whyPendingReview": "温度单位混用：当前K，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+      },
+      {
+        "id": "1781197442102-1",
+        "nozzleId": "NZ-A01",
+        "importBatch": "1781197442102",
+        "importBatchShort": "442102",
+        "importFileName": "mixed-units.csv",
+        "originalRowNumber": 1,
+        "temperature": "25",
+        "temperatureUnit": "℃",
+        "status": "pending_review",
+        "reviewer": "",
+        "flowCoefficient": null,
+        "duplicateType": "file_content_duplicate",
+        "processingReason": [
+          "导入查重类型: file_content_duplicate - 文件内容与历史批次442099(mixed-units.csv)完全相同 且 历史批次442099(mixed-units.csv)第1行已存在",
+          "温度单位混用：当前℃，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+        ],
+        "manualChangesCount": 0,
+        "isTemperatureMix": true,
+        "whyPendingReview": "导入查重类型: file_content_duplicate - 文件内容与历史批次442099(mixed-units.csv)完全相同 且 历史批次442099(mixed-units.csv)第1行已存在 ➜ 温度单位混用：当前℃，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+      },
+      {
+        "id": "1781197442102-2",
+        "nozzleId": "NZ-A02",
+        "importBatch": "1781197442102",
+        "importBatchShort": "442102",
+        "importFileName": "mixed-units.csv",
+        "originalRowNumber": 2,
+        "temperature": "298.15",
+        "temperatureUnit": "K",
+        "status": "pending_review",
+        "reviewer": "",
+        "flowCoefficient": null,
+        "duplicateType": "file_content_duplicate",
+        "processingReason": [
+          "导入查重类型: file_content_duplicate - 文件内容与历史批次442099(mixed-units.csv)完全相同 且 历史批次442099(mixed-units.csv)第2行已存在",
+          "温度单位混用：当前K，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+        ],
+        "manualChangesCount": 0,
+        "isTemperatureMix": true,
+        "whyPendingReview": "导入查重类型: file_content_duplicate - 文件内容与历史批次442099(mixed-units.csv)完全相同 且 历史批次442099(mixed-units.csv)第2行已存在 ➜ 温度单位混用：当前K，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+      },
+      {
+        "id": "1781197442102-3",
+        "nozzleId": "NZ-A03",
+        "importBatch": "1781197442102",
+        "importBatchShort": "442102",
+        "importFileName": "mixed-units.csv",
+        "originalRowNumber": 3,
+        "temperature": "27",
+        "temperatureUnit": "℃",
+        "status": "pending_review",
+        "reviewer": "",
+        "flowCoefficient": null,
+        "duplicateType": "file_content_duplicate",
+        "processingReason": [
+          "导入查重类型: file_content_duplicate - 文件内容与历史批次442099(mixed-units.csv)完全相同 且 历史批次442099(mixed-units.csv)第3行已存在",
+          "温度单位混用：当前℃，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+        ],
+        "manualChangesCount": 0,
+        "isTemperatureMix": true,
+        "whyPendingReview": "导入查重类型: file_content_duplicate - 文件内容与历史批次442099(mixed-units.csv)完全相同 且 历史批次442099(mixed-units.csv)第3行已存在 ➜ 温度单位混用：当前℃，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+      },
+      {
+        "id": "1781197442102-4",
+        "nozzleId": "NZ-A04",
+        "importBatch": "1781197442102",
+        "importBatchShort": "442102",
+        "importFileName": "mixed-units.csv",
+        "originalRowNumber": 4,
+        "temperature": "300.15",
+        "temperatureUnit": "K",
+        "status": "pending_review",
+        "reviewer": "",
+        "flowCoefficient": null,
+        "duplicateType": "file_content_duplicate",
+        "processingReason": [
+          "导入查重类型: file_content_duplicate - 文件内容与历史批次442099(mixed-units.csv)完全相同 且 历史批次442099(mixed-units.csv)第4行已存在",
+          "温度单位混用：当前K，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+        ],
+        "manualChangesCount": 0,
+        "isTemperatureMix": true,
+        "whyPendingReview": "导入查重类型: file_content_duplicate - 文件内容与历史批次442099(mixed-units.csv)完全相同 且 历史批次442099(mixed-units.csv)第4行已存在 ➜ 温度单位混用：当前K，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+      },
+      {
+        "id": "1781197442102-5",
+        "nozzleId": "NZ-A05",
+        "importBatch": "1781197442102",
+        "importBatchShort": "442102",
+        "importFileName": "mixed-units.csv",
+        "originalRowNumber": 5,
+        "temperature": "24",
+        "temperatureUnit": "℃",
+        "status": "pending_review",
+        "reviewer": "",
+        "flowCoefficient": null,
+        "duplicateType": "file_content_duplicate",
+        "processingReason": [
+          "导入查重类型: file_content_duplicate - 文件内容与历史批次442099(mixed-units.csv)完全相同 且 历史批次442099(mixed-units.csv)第5行已存在",
+          "温度单位混用：当前℃，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+        ],
+        "manualChangesCount": 0,
+        "isTemperatureMix": true,
+        "whyPendingReview": "导入查重类型: file_content_duplicate - 文件内容与历史批次442099(mixed-units.csv)完全相同 且 历史批次442099(mixed-units.csv)第5行已存在 ➜ 温度单位混用：当前℃，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+      },
+      {
+        "id": "1781197442102-6",
+        "nozzleId": "NZ-A06",
+        "importBatch": "1781197442102",
+        "importBatchShort": "442102",
+        "importFileName": "mixed-units.csv",
+        "originalRowNumber": 6,
+        "temperature": "295.15",
+        "temperatureUnit": "K",
+        "status": "pending_review",
+        "reviewer": "",
+        "flowCoefficient": null,
+        "duplicateType": "file_content_duplicate",
+        "processingReason": [
+          "导入查重类型: file_content_duplicate - 文件内容与历史批次442099(mixed-units.csv)完全相同 且 历史批次442099(mixed-units.csv)第6行已存在",
+          "温度单位混用：当前K，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+        ],
+        "manualChangesCount": 0,
+        "isTemperatureMix": true,
+        "whyPendingReview": "导入查重类型: file_content_duplicate - 文件内容与历史批次442099(mixed-units.csv)完全相同 且 历史批次442099(mixed-units.csv)第6行已存在 ➜ 温度单位混用：当前K，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+      },
+      {
+        "id": "1781197442102-7",
+        "nozzleId": "NZ-A07",
+        "importBatch": "1781197442102",
+        "importBatchShort": "442102",
+        "importFileName": "mixed-units.csv",
+        "originalRowNumber": 7,
+        "temperature": "26",
+        "temperatureUnit": "℃",
+        "status": "pending_review",
+        "reviewer": "",
+        "flowCoefficient": null,
+        "duplicateType": "file_content_duplicate",
+        "processingReason": [
+          "导入查重类型: file_content_duplicate - 文件内容与历史批次442099(mixed-units.csv)完全相同 且 历史批次442099(mixed-units.csv)第7行已存在",
+          "温度单位混用：当前℃，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+        ],
+        "manualChangesCount": 0,
+        "isTemperatureMix": true,
+        "whyPendingReview": "导入查重类型: file_content_duplicate - 文件内容与历史批次442099(mixed-units.csv)完全相同 且 历史批次442099(mixed-units.csv)第7行已存在 ➜ 温度单位混用：当前℃，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+      },
+      {
+        "id": "1781197442102-8",
+        "nozzleId": "NZ-A08",
+        "importBatch": "1781197442102",
+        "importBatchShort": "442102",
+        "importFileName": "mixed-units.csv",
+        "originalRowNumber": 8,
+        "temperature": "297.15",
+        "temperatureUnit": "K",
+        "status": "pending_review",
+        "reviewer": "",
+        "flowCoefficient": null,
+        "duplicateType": "file_content_duplicate",
+        "processingReason": [
+          "导入查重类型: file_content_duplicate - 文件内容与历史批次442099(mixed-units.csv)完全相同 且 历史批次442099(mixed-units.csv)第8行已存在",
+          "温度单位混用：当前K，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+        ],
+        "manualChangesCount": 0,
+        "isTemperatureMix": true,
+        "whyPendingReview": "导入查重类型: file_content_duplicate - 文件内容与历史批次442099(mixed-units.csv)完全相同 且 历史批次442099(mixed-units.csv)第8行已存在 ➜ 温度单位混用：当前K，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+      },
+      {
+        "id": "1781197442105-1",
+        "nozzleId": "NZ-B01",
+        "importBatch": "1781197442105",
+        "importBatchShort": "442105",
+        "importFileName": "incomplete-data.csv",
+        "originalRowNumber": 1,
+        "temperature": "25",
+        "temperatureUnit": "℃",
+        "status": "pending_review",
+        "reviewer": "",
+        "flowCoefficient": null,
+        "duplicateType": "new",
+        "processingReason": [
+          "温度单位混用：当前℃，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+        ],
+        "manualChangesCount": 0,
+        "isTemperatureMix": true,
+        "whyPendingReview": "温度单位混用：当前℃，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+      },
+      {
+        "id": "1781197442105-2",
+        "nozzleId": "NZ-B02",
+        "importBatch": "1781197442105",
+        "importBatchShort": "442105",
+        "importFileName": "incomplete-data.csv",
+        "originalRowNumber": 2,
+        "temperature": "298.15",
+        "temperatureUnit": "K",
+        "status": "pending_review",
+        "reviewer": "",
+        "flowCoefficient": null,
+        "duplicateType": "new",
+        "processingReason": [
+          "温度单位混用：当前K，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+        ],
+        "manualChangesCount": 0,
+        "isTemperatureMix": true,
+        "whyPendingReview": "温度单位混用：当前K，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+      },
+      {
+        "id": "1781197442105-4",
+        "nozzleId": "NZ-B04",
+        "importBatch": "1781197442105",
+        "importBatchShort": "442105",
+        "importFileName": "incomplete-data.csv",
+        "originalRowNumber": 4,
+        "temperature": "300.15",
+        "temperatureUnit": "K",
+        "status": "pending_review",
+        "reviewer": "",
+        "flowCoefficient": null,
+        "duplicateType": "new",
+        "processingReason": [
+          "温度单位混用：当前K，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+        ],
+        "manualChangesCount": 0,
+        "isTemperatureMix": true,
+        "whyPendingReview": "温度单位混用：当前K，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+      },
+      {
+        "id": "1781197442105-5",
+        "nozzleId": "NZ-B05",
+        "importBatch": "1781197442105",
+        "importBatchShort": "442105",
+        "importFileName": "incomplete-data.csv",
+        "originalRowNumber": 5,
+        "temperature": "24",
+        "temperatureUnit": "℃",
+        "status": "pending_review",
+        "reviewer": "",
+        "flowCoefficient": null,
+        "duplicateType": "new",
+        "processingReason": [
+          "温度单位混用：当前℃，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+        ],
+        "manualChangesCount": 0,
+        "isTemperatureMix": true,
+        "whyPendingReview": "温度单位混用：当前℃，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+      }
+    ],
+    "records": [
+      {
+        "id": "1781197442099-1",
+        "nozzleId": "NZ-A01-修",
+        "importBatch": "1781197442099",
+        "importBatchShort": "442099",
+        "importFileName": "mixed-units.csv",
+        "originalRowNumber": 1,
+        "temperature": "25",
+        "temperatureUnit": "℃",
+        "status": "reviewed",
+        "reviewerNote": "维修群20260612截图确认单位为℃，与铭牌一致，保留混用标记",
+        "reviewer": "训练教练",
+        "flowCoefficient": null,
+        "duplicateType": "new",
+        "processingReason": [
+          "温度单位混用：当前℃，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常",
+          "[2026-06-11T17:04:02.118Z] 质检员小白补录修改: nozzleId: NZ-A01→NZ-A01-修; flowRate: 125.5→130.0; modifiedBy: undefined→质检员小白; operator: undefined→质检员小白; changeReason: undefined→维修群20260612截图确认，喷嘴编号标错，流量重测",
+          "[2026-06-11T17:04:02.119Z] 训练教练复核: pending_review → reviewed，理由: 维修群20260612截图确认单位为℃，与铭牌一致，保留混用标记"
+        ],
+        "manualChangesCount": 5
+      },
+      {
+        "id": "1781197442099-2",
+        "nozzleId": "NZ-A02",
+        "importBatch": "1781197442099",
+        "importBatchShort": "442099",
+        "importFileName": "mixed-units.csv",
+        "originalRowNumber": 2,
+        "temperature": "298.15",
+        "temperatureUnit": "K",
+        "status": "pending_review",
+        "reviewer": "",
+        "flowCoefficient": null,
+        "duplicateType": "new",
+        "processingReason": [
+          "温度单位混用：当前K，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+        ],
+        "manualChangesCount": 0
+      },
+      {
+        "id": "1781197442099-3",
+        "nozzleId": "NZ-A03",
+        "importBatch": "1781197442099",
+        "importBatchShort": "442099",
+        "importFileName": "mixed-units.csv",
+        "originalRowNumber": 3,
+        "temperature": "27",
+        "temperatureUnit": "℃",
+        "status": "pending_review",
+        "reviewer": "",
+        "flowCoefficient": null,
+        "duplicateType": "new",
+        "processingReason": [
+          "温度单位混用：当前℃，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+        ],
+        "manualChangesCount": 0
+      },
+      {
+        "id": "1781197442099-4",
+        "nozzleId": "NZ-A04",
+        "importBatch": "1781197442099",
+        "importBatchShort": "442099",
+        "importFileName": "mixed-units.csv",
+        "originalRowNumber": 4,
+        "temperature": "300.15",
+        "temperatureUnit": "K",
+        "status": "pending_review",
+        "reviewer": "",
+        "flowCoefficient": null,
+        "duplicateType": "new",
+        "processingReason": [
+          "温度单位混用：当前K，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+        ],
+        "manualChangesCount": 0
+      },
+      {
+        "id": "1781197442099-5",
+        "nozzleId": "NZ-A05",
+        "importBatch": "1781197442099",
+        "importBatchShort": "442099",
+        "importFileName": "mixed-units.csv",
+        "originalRowNumber": 5,
+        "temperature": "24",
+        "temperatureUnit": "℃",
+        "status": "pending_review",
+        "reviewer": "",
+        "flowCoefficient": null,
+        "duplicateType": "new",
+        "processingReason": [
+          "温度单位混用：当前℃，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+        ],
+        "manualChangesCount": 0
+      },
+      {
+        "id": "1781197442099-6",
+        "nozzleId": "NZ-A06",
+        "importBatch": "1781197442099",
+        "importBatchShort": "442099",
+        "importFileName": "mixed-units.csv",
+        "originalRowNumber": 6,
+        "temperature": "295.15",
+        "temperatureUnit": "K",
+        "status": "pending_review",
+        "reviewer": "",
+        "flowCoefficient": null,
+        "duplicateType": "new",
+        "processingReason": [
+          "温度单位混用：当前K，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+        ],
+        "manualChangesCount": 0
+      },
+      {
+        "id": "1781197442099-7",
+        "nozzleId": "NZ-A07",
+        "importBatch": "1781197442099",
+        "importBatchShort": "442099",
+        "importFileName": "mixed-units.csv",
+        "originalRowNumber": 7,
+        "temperature": "26",
+        "temperatureUnit": "℃",
+        "status": "pending_review",
+        "reviewer": "",
+        "flowCoefficient": null,
+        "duplicateType": "new",
+        "processingReason": [
+          "温度单位混用：当前℃，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+        ],
+        "manualChangesCount": 0
+      },
+      {
+        "id": "1781197442099-8",
+        "nozzleId": "NZ-A08",
+        "importBatch": "1781197442099",
+        "importBatchShort": "442099",
+        "importFileName": "mixed-units.csv",
+        "originalRowNumber": 8,
+        "temperature": "297.15",
+        "temperatureUnit": "K",
+        "status": "pending_review",
+        "reviewer": "",
+        "flowCoefficient": null,
+        "duplicateType": "new",
+        "processingReason": [
+          "温度单位混用：当前K，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+        ],
+        "manualChangesCount": 0
+      },
+      {
+        "id": "1781197442102-1",
+        "nozzleId": "NZ-A01",
+        "importBatch": "1781197442102",
+        "importBatchShort": "442102",
+        "importFileName": "mixed-units.csv",
+        "originalRowNumber": 1,
+        "temperature": "25",
+        "temperatureUnit": "℃",
+        "status": "pending_review",
+        "reviewer": "",
+        "flowCoefficient": null,
+        "duplicateType": "file_content_duplicate",
+        "processingReason": [
+          "导入查重类型: file_content_duplicate - 文件内容与历史批次442099(mixed-units.csv)完全相同 且 历史批次442099(mixed-units.csv)第1行已存在",
+          "温度单位混用：当前℃，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+        ],
+        "manualChangesCount": 0
+      },
+      {
+        "id": "1781197442102-2",
+        "nozzleId": "NZ-A02",
+        "importBatch": "1781197442102",
+        "importBatchShort": "442102",
+        "importFileName": "mixed-units.csv",
+        "originalRowNumber": 2,
+        "temperature": "298.15",
+        "temperatureUnit": "K",
+        "status": "pending_review",
+        "reviewer": "",
+        "flowCoefficient": null,
+        "duplicateType": "file_content_duplicate",
+        "processingReason": [
+          "导入查重类型: file_content_duplicate - 文件内容与历史批次442099(mixed-units.csv)完全相同 且 历史批次442099(mixed-units.csv)第2行已存在",
+          "温度单位混用：当前K，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+        ],
+        "manualChangesCount": 0
+      },
+      {
+        "id": "1781197442102-3",
+        "nozzleId": "NZ-A03",
+        "importBatch": "1781197442102",
+        "importBatchShort": "442102",
+        "importFileName": "mixed-units.csv",
+        "originalRowNumber": 3,
+        "temperature": "27",
+        "temperatureUnit": "℃",
+        "status": "pending_review",
+        "reviewer": "",
+        "flowCoefficient": null,
+        "duplicateType": "file_content_duplicate",
+        "processingReason": [
+          "导入查重类型: file_content_duplicate - 文件内容与历史批次442099(mixed-units.csv)完全相同 且 历史批次442099(mixed-units.csv)第3行已存在",
+          "温度单位混用：当前℃，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+        ],
+        "manualChangesCount": 0
+      },
+      {
+        "id": "1781197442102-4",
+        "nozzleId": "NZ-A04",
+        "importBatch": "1781197442102",
+        "importBatchShort": "442102",
+        "importFileName": "mixed-units.csv",
+        "originalRowNumber": 4,
+        "temperature": "300.15",
+        "temperatureUnit": "K",
+        "status": "pending_review",
+        "reviewer": "",
+        "flowCoefficient": null,
+        "duplicateType": "file_content_duplicate",
+        "processingReason": [
+          "导入查重类型: file_content_duplicate - 文件内容与历史批次442099(mixed-units.csv)完全相同 且 历史批次442099(mixed-units.csv)第4行已存在",
+          "温度单位混用：当前K，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+        ],
+        "manualChangesCount": 0
+      },
+      {
+        "id": "1781197442102-5",
+        "nozzleId": "NZ-A05",
+        "importBatch": "1781197442102",
+        "importBatchShort": "442102",
+        "importFileName": "mixed-units.csv",
+        "originalRowNumber": 5,
+        "temperature": "24",
+        "temperatureUnit": "℃",
+        "status": "pending_review",
+        "reviewer": "",
+        "flowCoefficient": null,
+        "duplicateType": "file_content_duplicate",
+        "processingReason": [
+          "导入查重类型: file_content_duplicate - 文件内容与历史批次442099(mixed-units.csv)完全相同 且 历史批次442099(mixed-units.csv)第5行已存在",
+          "温度单位混用：当前℃，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+        ],
+        "manualChangesCount": 0
+      },
+      {
+        "id": "1781197442102-6",
+        "nozzleId": "NZ-A06",
+        "importBatch": "1781197442102",
+        "importBatchShort": "442102",
+        "importFileName": "mixed-units.csv",
+        "originalRowNumber": 6,
+        "temperature": "295.15",
+        "temperatureUnit": "K",
+        "status": "pending_review",
+        "reviewer": "",
+        "flowCoefficient": null,
+        "duplicateType": "file_content_duplicate",
+        "processingReason": [
+          "导入查重类型: file_content_duplicate - 文件内容与历史批次442099(mixed-units.csv)完全相同 且 历史批次442099(mixed-units.csv)第6行已存在",
+          "温度单位混用：当前K，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+        ],
+        "manualChangesCount": 0
+      },
+      {
+        "id": "1781197442102-7",
+        "nozzleId": "NZ-A07",
+        "importBatch": "1781197442102",
+        "importBatchShort": "442102",
+        "importFileName": "mixed-units.csv",
+        "originalRowNumber": 7,
+        "temperature": "26",
+        "temperatureUnit": "℃",
+        "status": "pending_review",
+        "reviewer": "",
+        "flowCoefficient": null,
+        "duplicateType": "file_content_duplicate",
+        "processingReason": [
+          "导入查重类型: file_content_duplicate - 文件内容与历史批次442099(mixed-units.csv)完全相同 且 历史批次442099(mixed-units.csv)第7行已存在",
+          "温度单位混用：当前℃，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+        ],
+        "manualChangesCount": 0
+      },
+      {
+        "id": "1781197442102-8",
+        "nozzleId": "NZ-A08",
+        "importBatch": "1781197442102",
+        "importBatchShort": "442102",
+        "importFileName": "mixed-units.csv",
+        "originalRowNumber": 8,
+        "temperature": "297.15",
+        "temperatureUnit": "K",
+        "status": "pending_review",
+        "reviewer": "",
+        "flowCoefficient": null,
+        "duplicateType": "file_content_duplicate",
+        "processingReason": [
+          "导入查重类型: file_content_duplicate - 文件内容与历史批次442099(mixed-units.csv)完全相同 且 历史批次442099(mixed-units.csv)第8行已存在",
+          "温度单位混用：当前K，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+        ],
+        "manualChangesCount": 0
+      },
+      {
+        "id": "1781197442105-1",
+        "nozzleId": "NZ-B01",
+        "importBatch": "1781197442105",
+        "importBatchShort": "442105",
+        "importFileName": "incomplete-data.csv",
+        "originalRowNumber": 1,
+        "temperature": "25",
+        "temperatureUnit": "℃",
+        "status": "pending_review",
+        "reviewer": "",
+        "flowCoefficient": null,
+        "duplicateType": "new",
+        "processingReason": [
+          "温度单位混用：当前℃，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+        ],
+        "manualChangesCount": 0
+      },
+      {
+        "id": "1781197442105-2",
+        "nozzleId": "NZ-B02",
+        "importBatch": "1781197442105",
+        "importBatchShort": "442105",
+        "importFileName": "incomplete-data.csv",
+        "originalRowNumber": 2,
+        "temperature": "298.15",
+        "temperatureUnit": "K",
+        "status": "pending_review",
+        "reviewer": "",
+        "flowCoefficient": null,
+        "duplicateType": "new",
+        "processingReason": [
+          "温度单位混用：当前K，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+        ],
+        "manualChangesCount": 0
+      },
+      {
+        "id": "1781197442105-3",
+        "nozzleId": "NZ-B03",
+        "importBatch": "1781197442105",
+        "importBatchShort": "442105",
+        "importFileName": "incomplete-data.csv",
+        "originalRowNumber": 3,
+        "temperature": null,
+        "temperatureUnit": "",
+        "status": "pending",
+        "reviewer": "",
+        "flowCoefficient": 69.3466,
+        "duplicateType": "new",
+        "processingReason": [
+          "数据完整、单位一致，自动计算流量系数"
+        ],
+        "manualChangesCount": 0
+      },
+      {
+        "id": "1781197442105-4",
+        "nozzleId": "NZ-B04",
+        "importBatch": "1781197442105",
+        "importBatchShort": "442105",
+        "importFileName": "incomplete-data.csv",
+        "originalRowNumber": 4,
+        "temperature": "300.15",
+        "temperatureUnit": "K",
+        "status": "pending_review",
+        "reviewer": "",
+        "flowCoefficient": null,
+        "duplicateType": "new",
+        "processingReason": [
+          "温度单位混用：当前K，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+        ],
+        "manualChangesCount": 0
+      },
+      {
+        "id": "1781197442105-5",
+        "nozzleId": "NZ-B05",
+        "importBatch": "1781197442105",
+        "importBatchShort": "442105",
+        "importFileName": "incomplete-data.csv",
+        "originalRowNumber": 5,
+        "temperature": "24",
+        "temperatureUnit": "℃",
+        "status": "pending_review",
+        "reviewer": "",
+        "flowCoefficient": null,
+        "duplicateType": "new",
+        "processingReason": [
+          "温度单位混用：当前℃，本批次同时存在℃和K记录，已标记待复核，训练教练确认前不归正常"
+        ],
+        "manualChangesCount": 0
+      }
+    ]
+  }
+}
