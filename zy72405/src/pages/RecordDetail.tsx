@@ -243,12 +243,17 @@ export function RecordDetail() {
         <div className="space-y-6">
           <div className="bg-white rounded-xl border border-stone-200 p-5 shadow-sm">
             <h3 className="font-medium text-stone-800 mb-4">证据链</h3>
-            <EvidencePanel record={record} logs={[]} />
+            <EvidencePanel record={record} logs={logs.slice(0, 3)} showRollback />
           </div>
 
           <div className="bg-white rounded-xl border border-stone-200 p-5 shadow-sm">
-            <h3 className="font-medium text-stone-800 mb-4">完整变更历史</h3>
-            <ChangeTimeline logs={logs} />
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-medium text-stone-800">完整变更历史</h3>
+              <span className="text-xs text-stone-500">
+                非最新节点可回滚，回滚操作本身也会被记录
+              </span>
+            </div>
+            <ChangeTimeline logs={logs} recordId={record.id} />
           </div>
         </div>
       </div>

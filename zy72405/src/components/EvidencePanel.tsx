@@ -5,9 +5,10 @@ import { FileText, Hash, Calendar, User, AlertTriangle } from 'lucide-react';
 interface EvidencePanelProps {
   record: ShortageRecord;
   logs: ChangeLog[];
+  showRollback?: boolean;
 }
 
-export function EvidencePanel({ record, logs }: EvidencePanelProps) {
+export function EvidencePanel({ record, logs, showRollback = false }: EvidencePanelProps) {
   return (
     <div className="space-y-6">
       <div className="bg-stone-50 rounded-lg p-4 border border-stone-200">
@@ -53,7 +54,11 @@ export function EvidencePanel({ record, logs }: EvidencePanelProps) {
           <User className="w-4 h-4 text-amber-600" />
           人工改动历史（证据链）
         </h4>
-        <ChangeTimeline logs={logs} compact />
+        <ChangeTimeline
+          logs={logs}
+          compact
+          recordId={showRollback ? record.id : undefined}
+        />
       </div>
     </div>
   );
