@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import json
 import os
+import re
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 from models import ShockDataPoint, TempUnit, WorkflowStage
@@ -40,6 +41,17 @@ def load_template():
     )
     with open(template_path, "r", encoding="utf-8") as f:
         return f.read()
+
+
+def safe_template_render(template: str, context: dict) -> str:
+    def replace_match(m):
+        key = m.group(1)
+        if key in context:
+            return str(context[key])
+        return m.group(0)
+
+    pattern = re.compile(r'\{([a-zA-Z_][a-zA-Z0-9_]*)\}')
+    return pattern.sub(replace_match, template)
 
 
 class DashboardHandler(BaseHTTPRequestHandler):
@@ -174,21 +186,21 @@ class DashboardHandler(BaseHTTPRequestHandler):
         summary_coach = engine.state.handover_report.summary_for_coach if engine.state.handover_report else "暂无"
         summary_lin = engine.state.handover_report.summary_for_lin if engine.state.handover_report else "暂无"
 
-        html = template.format(
-            step1_class=step1_class,
-            step2_class=step2_class,
-            step3_class=step3_class,
-            banner_class=banner_class,
-            banner_text=banner_text,
-            total_points=len(engine.state.shock_data),
-            mixed_count=len(clickable),
-            cal_count=len(engine.state.calibration_records),
-            current_stage_text=engine.state.current_stage.value.split('：')[0],
-            chart_rows=chart_rows,
-            retention_items=retention_items,
-            summary_coach=summary_coach,
-            summary_lin=summary_lin
-        )
+        html = safe_template_render(template, {
+            "step1_class": step1_class,
+            "step2_class": step2_class,
+            "step3_class": step3_class,
+            "banner_class": banner_class,
+            "banner_text": banner_text,
+            "total_points": len(engine.state.shock_data),
+            "mixed_count": len(clickable),
+            "cal_count": len(engine.state.calibration_records),
+            "current_stage_text": engine.state.current_stage.value.split('：')[0],
+            "chart_rows": chart_rows,
+            "retention_items": retention_items,
+            "summary_coach": summary_coach,
+            "summary_lin": summary_lin
+        })
 
         self.send_response(200)
         self.send_header("Content-Type", "text/html; charset=utf-8")

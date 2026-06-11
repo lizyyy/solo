@@ -109,11 +109,22 @@ class Chart3D:
         link = self.state.clickable_links[point_idx]
         reading = link["shock_data"].temperature_reading
 
+        retention_note = None
+        if self.state.handover_report:
+            for n in self.state.handover_report.retention_notes:
+                if n.data_point_id == point_idx:
+                    retention_note = n
+                    break
+
         result = {
             "found": True,
             "point_idx": point_idx,
             "warning": "⚠️ 摄氏度/开尔文混用点",
             "explanation": explain_mixed_units(point_idx, self.state),
+            "retention_reason": retention_note.reason_kept if retention_note else "该点温度单位混用，保留原始数据供训练教练复核，不做自动归一化处理。",
+            "missing_materials": retention_note.missing_materials if retention_note else [],
+            "next_contact": retention_note.next_contact.value if retention_note else "训练教练",
+            "priority": retention_note.priority if retention_note else "高",
             "navigate_options": []
         }
 

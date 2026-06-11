@@ -291,12 +291,28 @@ function clickPoint(idx) {
                 }
             });
 
+            const priorityFlag = data.priority === '高' ? '🔴' : '🟡';
+            const missingHtml = data.missing_materials && data.missing_materials.length > 0
+                ? `<div class="missing">还缺什么材料: ❌ ${data.missing_materials.join('、')}<br>
+                   <span style="color:#555;font-size:12px;">为什么这样处理: 保留原始混用数据不做自动归一化，是为了让训练教练能看到真实采样情况；校准记录缺失则标记出来让林老师补录，确保每条数据都有完整的追溯链。</span></div>`
+                : `<div style="color:#28a745;font-size:13px;">还缺什么材料: 无（材料完整）<br>
+                   <span style="color:#555;font-size:12px;">为什么这样处理: 温度校准记录已补齐，留存原数据供教练做最终复核确认。</span></div>`;
+
             detailDiv.innerHTML = `
             <div class="click-detail">
-                <h4>📍 数据点 ${idx} - ${data.warning}</h4>
+                <h4>📍 数据点 ${idx} - ${data.warning} <span style="font-size:13px;font-weight:normal;">${priorityFlag} 优先级: ${data.priority}</span></h4>
                 <p>${data.explanation}</p>
+                <div class="summary-section" style="margin-top:10px;padding:10px;">
+                    <h4 style="margin-bottom:6px;">📌 数据留存说明（先服务复核）</h4>
+                    <div style="font-size:13px;color:#555;line-height:1.6;">
+                        <div><strong>留存原因:</strong> ${data.retention_reason}</div>
+                        ${missingHtml}
+                        <div style="margin-top:5px;"><strong>下一步对接:</strong> 👉 ${data.next_contact}</div>
+                    </div>
+                </div>
                 <h4 style="margin-top:15px;">🔗 可回溯到：</h4>
                 ${navHtml}
+                <p style="margin-top:10px;font-size:12px;color:#888;">💡 留存说明、缺失材料与交接报告保持同步，三处信息一致可交叉核对</p>
             </div>`;
         });
 }

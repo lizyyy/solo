@@ -138,8 +138,26 @@ class ReportRenderer:
         lines = ["\n" + "─" * 80]
         lines.append(f"📍 点击数据点 {click_result['point_idx']}")
         lines.append(f"   {click_result['warning']}")
+        priority = click_result.get("priority", "高")
+        priority_flag = "🔴" if priority == "高" else "🟡"
+        lines.append(f"   {priority_flag} 优先级: {priority}")
         lines.append("─" * 80)
         lines.append(f"💬 {click_result['explanation']}")
+
+        lines.append("\n📌 数据留存说明（先服务复核）：")
+        lines.append(f"   • 留存原因: {click_result.get('retention_reason', '未提供')}")
+
+        missing = click_result.get("missing_materials", [])
+        if missing:
+            lines.append(f"   • 还缺什么材料: {'、'.join(missing)}")
+            lines.append("     为什么这样处理: 保留原始混用数据不做自动归一化，是为了让训练教练能看到真实采样情况，")
+            lines.append("     校准记录缺失则标记出来让林老师补录，确保每条数据都有完整的追溯链。")
+        else:
+            lines.append("   • 还缺什么材料: 无（材料完整）")
+            lines.append("     为什么这样处理: 温度校准记录已补齐，留存原数据供教练做最终复核确认。")
+
+        lines.append(f"   • 下一步对接: → {click_result.get('next_contact', '未指定')}")
+
         lines.append("\n🔗 可回溯到：")
 
         for opt in click_result["navigate_options"]:
@@ -164,5 +182,6 @@ class ReportRenderer:
         lines.append("💡 操作建议:")
         lines.append("   • 如确认单位无误，可执行 update 推进到下一阶段")
         lines.append("   • 如需补充校准记录，请林老师执行 calibrate 命令")
+        lines.append("   • 留存说明、缺失材料与交接报告保持同步，三处信息一致可交叉核对")
         lines.append("─" * 80)
         return "\n".join(lines)
