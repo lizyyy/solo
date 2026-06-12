@@ -91,14 +91,133 @@ function findMatches(groupRecords, contractRecords) {
 function runReconciliation(store, operator, options = {}) {
     const state = store.getState();
     const { lateContractBatchId, preserveConfirmed = true } = options;
-    let groupRecords = state.groupRecords;
-    let contractRecords = state.contractRecords;
-    if (lateContractBatchId) {
-        contractRecords = contractRecords.filter((c) => c.importBatchId === lateContractBatchId);
-    }
+    const allGroupRecords = state.groupRecords;
+    const allContractRecords = state.contractRecords;
     let existingResults = state.results;
     let skipped = 0;
-    if (preserveConfirmed && lateContractBatchId) {
+    let created = 0;
+    let updated = 0;
+    if (lateContractBatchId) {
+        const lateContracts = allContractRecords.filter((c) => c.importBatchId === lateContractBatchId);
+        if (lateContracts.length === 0) {
+            return { created: 0, updated: 0, skipped: 0 };
+        }
+        const plans = [];
+        const touchedResultIds = new Set();
+        const usedLateContractIds = new Set();
+        for (const contract of lateContracts) {
+            let bestGroup = null;
+            for (const result of existingResults) {
+                if (touchedResultIds.has(result.id))
+                    continue;
+                if (preserveConfirmed && result.status === types_1.RecordStatus.CONFIRMED)
+                    continue;
+                const g = allGroupRecords.find((gr) => gr.id === result.groupRecordId);
+                if (!g)
+                    continue;
+                const score = (isNameMatch(g.performerName, contract.performerName) ? 50 : 0) +
+                    (isNameMatch(g.songName, contract.songName) ? 30 : 0);
+                if (score >= 30 && (!bestGroup || score > bestGroup.score)) {
+                    bestGroup = { record: g, result, score };
+                }
+            }
+            if (bestGroup) {
+                plans.push({
+                    kind: 'update',
+                    resultId: bestGroup.result.id,
+                    groupRecord: bestGroup.record,
+                    contractRecord: contract,
+                    candidateReviewReasons: bestGroup.record.isTemporarySubstitute
+                        ? [types_1.ReviewReason.TEMP_SUBSTITUTE_ONLY_IN_GROUP]
+                        : []
+                });
+                touchedResultIds.add(bestGroup.result.id);
+                usedLateContractIds.add(contract.id);
+            }
+        }
+        {
+            const unMatchedLate = lateContracts.filter((c) => !usedLateContractIds.has(c.id));
+            for (const contract of unMatchedLate) {
+                const orphanGroup = allGroupRecords.find((g) => {
+                    if (existingResults.some((r) => r.groupRecordId === g.id))
+                        return false;
+                    const score = (isNameMatch(g.performerName, contract.performerName) ? 50 : 0) +
+                        (isNameMatch(g.songName, contract.songName) ? 30 : 0);
+                    return score >= 30;
+                });
+                if (orphanGroup) {
+                    plans.push({
+                        kind: 'create',
+                        groupRecord: orphanGroup,
+                        contractRecord: contract,
+                        candidateReviewReasons: orphanGroup.isTemporarySubstitute
+                            ? [types_1.ReviewReason.TEMP_SUBSTITUTE_ONLY_IN_GROUP]
+                            : []
+                    });
+                    usedLateContractIds.add(contract.id);
+                }
+                else {
+                    plans.push({
+                        kind: 'create',
+                        contractRecord: contract,
+                        candidateReviewReasons: [types_1.ReviewReason.GROUP_RECORD_MISSING]
+                    });
+                }
+            }
+        }
+        skipped = existingResults.filter((r) => preserveConfirmed && r.status === types_1.RecordStatus.CONFIRMED && !touchedResultIds.has(r.id)).length;
+        for (const plan of plans) {
+            if (plan.kind === 'update' && plan.resultId) {
+                const oldResult = existingResults.find((r) => r.id === plan.resultId);
+                let mergedReasons = [...oldResult.reviewReasons];
+                if (plan.contractRecord) {
+                    mergedReasons = mergedReasons.filter((r) => r !== types_1.ReviewReason.CONTRACT_MISSING);
+                }
+                for (const reason of plan.candidateReviewReasons) {
+                    if (!mergedReasons.includes(reason))
+                        mergedReasons.push(reason);
+                }
+                const newStatus = oldResult.status === types_1.RecordStatus.CONFIRMED
+                    ? oldResult.status
+                    : mergedReasons.length > 0
+                        ? types_1.RecordStatus.NEEDS_REVIEW
+                        : types_1.RecordStatus.MATCHED;
+                store.updateResult(oldResult.id, {
+                    groupRecordId: plan.groupRecord?.id || oldResult.groupRecordId,
+                    contractRecordId: plan.contractRecord?.id || oldResult.contractRecordId,
+                    matchedPerformerName: plan.groupRecord?.performerName ||
+                        plan.contractRecord?.performerName ||
+                        oldResult.matchedPerformerName,
+                    matchedSongName: plan.groupRecord?.songName ||
+                        plan.contractRecord?.songName ||
+                        oldResult.matchedSongName,
+                    status: newStatus,
+                    reviewReasons: mergedReasons,
+                    isLateContractRefresh: true
+                }, operator, `晚到合同材料刷新: ${lateContractBatchId}`);
+                updated++;
+            }
+            else {
+                const status = plan.candidateReviewReasons.length > 0
+                    ? types_1.RecordStatus.NEEDS_REVIEW
+                    : types_1.RecordStatus.MATCHED;
+                store.addResult({
+                    groupRecordId: plan.groupRecord?.id,
+                    contractRecordId: plan.contractRecord?.id,
+                    matchedPerformerName: plan.groupRecord?.performerName || plan.contractRecord?.performerName,
+                    matchedSongName: plan.groupRecord?.songName || plan.contractRecord?.songName,
+                    status,
+                    reviewReasons: plan.candidateReviewReasons,
+                    isLateContractRefresh: true
+                }, operator);
+                created++;
+            }
+        }
+        return { created, updated, skipped };
+    }
+    let groupRecords = allGroupRecords;
+    let contractRecords = allContractRecords;
+    if (preserveConfirmed) {
         const confirmedGroupIds = new Set(existingResults
             .filter((r) => r.status === types_1.RecordStatus.CONFIRMED && r.groupRecordId)
             .map((r) => r.groupRecordId));
@@ -106,13 +225,20 @@ function runReconciliation(store, operator, options = {}) {
         skipped = existingResults.filter((r) => r.status === types_1.RecordStatus.CONFIRMED).length;
     }
     const candidates = findMatches(groupRecords, contractRecords);
-    let created = 0;
-    let updated = 0;
     for (const candidate of candidates) {
         const existing = existingResults.find((r) => (candidate.groupRecord && r.groupRecordId === candidate.groupRecord.id) ||
             (candidate.contractRecord && r.contractRecordId === candidate.contractRecord.id));
         const status = candidate.reviewReasons.length > 0 ? types_1.RecordStatus.NEEDS_REVIEW : types_1.RecordStatus.MATCHED;
         if (existing) {
+            let mergedReasons = [...candidate.reviewReasons];
+            for (const reason of existing.reviewReasons) {
+                if (reason === types_1.ReviewReason.TEMP_SUBSTITUTE_ONLY_IN_GROUP ||
+                    reason === types_1.ReviewReason.MANUAL_REVIEW_REQUIRED ||
+                    reason === types_1.ReviewReason.INFO_MISMATCH) {
+                    if (!mergedReasons.includes(reason))
+                        mergedReasons.push(reason);
+                }
+            }
             store.updateResult(existing.id, {
                 groupRecordId: candidate.groupRecord?.id || existing.groupRecordId,
                 contractRecordId: candidate.contractRecord?.id || existing.contractRecordId,
@@ -123,9 +249,9 @@ function runReconciliation(store, operator, options = {}) {
                     candidate.contractRecord?.songName ||
                     existing.matchedSongName,
                 status: existing.status === types_1.RecordStatus.CONFIRMED ? existing.status : status,
-                reviewReasons: [...new Set([...existing.reviewReasons, ...candidate.reviewReasons])],
-                isLateContractRefresh: !!lateContractBatchId || existing.isLateContractRefresh
-            }, operator, lateContractBatchId ? '晚到合同材料刷新' : '重新核对');
+                reviewReasons: mergedReasons,
+                isLateContractRefresh: existing.isLateContractRefresh
+            }, operator, '全量重新核对');
             updated++;
         }
         else {
@@ -136,7 +262,7 @@ function runReconciliation(store, operator, options = {}) {
                 matchedSongName: candidate.groupRecord?.songName || candidate.contractRecord?.songName,
                 status,
                 reviewReasons: candidate.reviewReasons,
-                isLateContractRefresh: !!lateContractBatchId
+                isLateContractRefresh: false
             }, operator);
             created++;
         }

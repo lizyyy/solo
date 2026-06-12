@@ -109,6 +109,8 @@ export class ReconciliationStore {
     }));
 
     this.state.groupRecords.push(...newRecords);
+    const batch = this.state.batches.find((b) => b.id === batchId);
+    if (batch) batch.recordCount = newRecords.length;
     this.logOperation('BULK_IMPORT', 'GroupSignupRecord', undefined, operator, undefined, { count: newRecords.length }, batchId);
     this.saveState();
     return newRecords;
@@ -128,6 +130,8 @@ export class ReconciliationStore {
     }));
 
     this.state.contractRecords.push(...newRecords);
+    const cbatch = this.state.batches.find((b) => b.id === batchId);
+    if (cbatch) cbatch.recordCount = newRecords.length;
     this.logOperation('BULK_IMPORT', 'ContractRecord', undefined, operator, undefined, { count: newRecords.length }, batchId);
     this.saveState();
     return newRecords;
@@ -240,12 +244,17 @@ export class ReconciliationStore {
     );
   }
 
-  getResultsWithDetails(): Array<{
+  getResultsWithDetails(options: { includeSuperseded?: boolean } = {}): Array<{
     result: ReconciliationResult;
     groupRecord?: GroupSignupRecord;
     contractRecord?: ContractRecord;
   }> {
-    return this.state.results.map((result) => ({
+    const { includeSuperseded = false } = options;
+    const activeResults = includeSuperseded
+      ? this.state.results
+      : this.state.results.filter((r) => r.status !== RecordStatus.SUPERSEDED);
+
+    return activeResults.map((result) => ({
       result,
       groupRecord: this.state.groupRecords.find((g) => g.id === result.groupRecordId),
       contractRecord: this.state.contractRecords.find((c) => c.id === result.contractRecordId)
@@ -272,6 +281,114 @@ export class ReconciliationStore {
     };
     this.logOperation('RESET_STATE', 'ReconciliationState', undefined, operator, oldState, this.state);
     this.saveState();
+  }
+
+  rollbackBatch(batchId: string, operator: string, reason?: string): {
+    affectedGroupRecords: number;
+    affectedContractRecords: number;
+    affectedResults: number;
+  } {
+    const batch = this.state.batches.find((b) => b.id === batchId);
+    if (!batch) {
+      throw new Error(`批次不存在: ${batchId}`);
+    }
+
+    let affectedGroupRecords = 0;
+    let affectedContractRecords = 0;
+    let affectedResults = 0;
+
+    const groupRecordIds = new Set<string>();
+    const contractRecordIds = new Set<string>();
+
+    for (let i = 0; i < this.state.groupRecords.length; i++) {
+      if (this.state.groupRecords[i].importBatchId === batchId && this.state.groupRecords[i].status !== RecordStatus.SUPERSEDED) {
+        const oldState = { ...this.state.groupRecords[i] };
+        this.state.groupRecords[i] = {
+          ...this.state.groupRecords[i],
+          status: RecordStatus.SUPERSEDED
+        };
+        groupRecordIds.add(this.state.groupRecords[i].id);
+        this.logOperation(
+          'ROLLBACK_BATCH',
+          'GroupSignupRecord',
+          this.state.groupRecords[i].id,
+          operator,
+          oldState,
+          this.state.groupRecords[i],
+          batchId,
+          reason
+        );
+        affectedGroupRecords++;
+      }
+    }
+
+    for (let i = 0; i < this.state.contractRecords.length; i++) {
+      if (this.state.contractRecords[i].importBatchId === batchId && this.state.contractRecords[i].status !== RecordStatus.SUPERSEDED) {
+        const oldState = { ...this.state.contractRecords[i] };
+        this.state.contractRecords[i] = {
+          ...this.state.contractRecords[i],
+          status: RecordStatus.SUPERSEDED
+        };
+        contractRecordIds.add(this.state.contractRecords[i].id);
+        this.logOperation(
+          'ROLLBACK_BATCH',
+          'ContractRecord',
+          this.state.contractRecords[i].id,
+          operator,
+          oldState,
+          this.state.contractRecords[i],
+          batchId,
+          reason
+        );
+        affectedContractRecords++;
+      }
+    }
+
+    for (let i = 0; i < this.state.results.length; i++) {
+      const r = this.state.results[i];
+      const affectsThis =
+        (r.groupRecordId && groupRecordIds.has(r.groupRecordId)) ||
+        (r.contractRecordId && contractRecordIds.has(r.contractRecordId));
+
+      if (affectsThis && r.status !== RecordStatus.SUPERSEDED) {
+        const oldState = { ...r };
+        this.state.results[i] = {
+          ...r,
+          status: RecordStatus.SUPERSEDED,
+          updatedAt: new Date().toISOString()
+        };
+        this.logOperation(
+          'ROLLBACK_BATCH',
+          'ReconciliationResult',
+          r.id,
+          operator,
+          oldState,
+          this.state.results[i],
+          batchId,
+          reason
+        );
+        affectedResults++;
+      }
+    }
+
+    const oldBatch = { ...batch };
+    const batchIdx = this.state.batches.findIndex((b) => b.id === batchId);
+    if (batchIdx !== -1) {
+      (this.state.batches[batchIdx] as any).status = 'superseded';
+    }
+    this.logOperation(
+      'ROLLBACK_BATCH',
+      'ImportBatch',
+      batchId,
+      operator,
+      oldBatch,
+      { ...batch, status: 'superseded' },
+      batchId,
+      reason
+    );
+
+    this.saveState();
+    return { affectedGroupRecords, affectedContractRecords, affectedResults };
   }
 }
 

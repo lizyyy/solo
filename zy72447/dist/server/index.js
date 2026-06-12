@@ -40,24 +40,28 @@ const express_1 = __importDefault(require("express"));
 const path = __importStar(require("path"));
 const store_1 = require("../store");
 const reconciliation_1 = require("../core/reconciliation");
+const presenter_1 = require("../shared/presenter");
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 3000;
 app.use(express_1.default.json());
 app.use(express_1.default.static(path.join(__dirname, 'public')));
 app.get('/api/status', (req, res) => {
     const state = store_1.defaultStore.getState();
-    const byStatus = state.results.reduce((acc, r) => {
-        acc[r.status] = (acc[r.status] || 0) + 1;
-        return acc;
-    }, {});
+    const details = store_1.defaultStore.getResultsWithDetails();
+    const summary = (0, presenter_1.buildSummary)(details);
+    const byStatus = {};
+    for (const item of summary) {
+        byStatus[item.key] = item.value;
+    }
     res.json({
-        groupRecords: state.groupRecords.length,
-        contractRecords: state.contractRecords.length,
-        results: state.results.length,
+        groupRecords: state.groupRecords.filter((g) => g.status !== 'superseded').length,
+        contractRecords: state.contractRecords.filter((c) => c.status !== 'superseded').length,
+        results: details.length,
         logs: state.logs.length,
         batches: state.batches.length,
         lastUpdated: state.lastUpdated,
-        byStatus
+        byStatus,
+        summary
     });
 });
 app.get('/api/results', (req, res) => {
@@ -66,7 +70,13 @@ app.get('/api/results', (req, res) => {
     if (status && typeof status === 'string') {
         details = details.filter((d) => d.result.status === status);
     }
-    res.json(details);
+    const rows = details.map(({ result, groupRecord, contractRecord }) => ({
+        ...(0, presenter_1.buildDetailRow)(result, groupRecord, contractRecord),
+        result,
+        groupRecord,
+        contractRecord
+    }));
+    res.json(rows);
 });
 app.get('/api/results/:id', (req, res) => {
     const { id } = req.params;
@@ -76,7 +86,16 @@ app.get('/api/results/:id', (req, res) => {
         return res.status(404).json({ error: '未找到该记录' });
     }
     const logs = store_1.defaultStore.getLogsForEntity(id);
-    res.json({ ...found, logs });
+    const detailRow = (0, presenter_1.buildDetailRow)(found.result, found.groupRecord, found.contractRecord);
+    const logRows = logs.map(presenter_1.buildLogRow);
+    res.json({
+        ...detailRow,
+        result: found.result,
+        groupRecord: found.groupRecord,
+        contractRecord: found.contractRecord,
+        logs: logRows,
+        rawLogs: logs
+    });
 });
 app.post('/api/results/:id/confirm', (req, res) => {
     const { id } = req.params;
@@ -113,13 +132,38 @@ app.post('/api/reconcile', (req, res) => {
     });
     res.json(result);
 });
+app.post('/api/batches/:id/rollback', (req, res) => {
+    const { id } = req.params;
+    const { operator = 'web', reason } = req.body;
+    try {
+        const result = store_1.defaultStore.rollbackBatch(id, operator, reason);
+        res.json(result);
+    }
+    catch (e) {
+        res.status(400).json({ error: e.message });
+    }
+});
 app.get('/api/logs', (req, res) => {
     const state = store_1.defaultStore.getState();
-    res.json(state.logs.slice().reverse());
+    const rows = state.logs.slice().reverse().map(presenter_1.buildLogRow);
+    res.json(rows);
 });
 app.get('/api/batches', (req, res) => {
     const state = store_1.defaultStore.getState();
     res.json(state.batches.slice().reverse());
+});
+app.get('/api/export-preview', (req, res) => {
+    const details = store_1.defaultStore.getResultsWithDetails();
+    const detailRows = details.map(({ result, groupRecord, contractRecord }) => (0, presenter_1.buildDetailRow)(result, groupRecord, contractRecord));
+    const exportRows = detailRows.map(presenter_1.detailRowToExportColumns);
+    const summaryItems = (0, presenter_1.buildSummary)(details);
+    res.json({
+        count: exportRows.length,
+        columns: Object.keys(exportRows[0] || {}),
+        rows: exportRows,
+        detailRows,
+        summary: summaryItems
+    });
 });
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));

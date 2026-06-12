@@ -60,12 +60,12 @@ program
     try {
         const store = options.data ? new store_1.ReconciliationStore(path.resolve(options.data)) : store_1.defaultStore;
         const result = (0, group_signup_1.importGroupSignupFile)(store, path.resolve(file), options.operator);
-        console.log(chalk_1.default.green(`✓ 导入成功`));
-        console.log(`  批次ID: ${chalk_1.default.cyan(result.batchId)}`);
-        console.log(`  记录数: ${chalk_1.default.cyan(result.recordCount)}`);
+        console.log(chalk_1.default.green('✓ 导入成功'));
+        console.log('  批次ID: ' + chalk_1.default.cyan(result.batchId));
+        console.log('  记录数: ' + chalk_1.default.cyan(String(result.recordCount)));
     }
     catch (e) {
-        console.error(chalk_1.default.red(`✗ 导入失败: ${e.message}`));
+        console.error(chalk_1.default.red('✗ 导入失败: ' + e.message));
         process.exit(1);
     }
 });
@@ -80,15 +80,16 @@ program
     try {
         const store = options.data ? new store_1.ReconciliationStore(path.resolve(options.data)) : store_1.defaultStore;
         const result = (0, contract_screenshot_1.importContractFile)(store, path.resolve(file), options.operator, options.late);
-        console.log(chalk_1.default.green(`✓ 导入成功${options.late ? ' (晚到材料模式)' : ''}`));
-        console.log(`  批次ID: ${chalk_1.default.cyan(result.batchId)}`);
-        console.log(`  记录数: ${chalk_1.default.cyan(result.recordCount)}`);
+        const suffix = options.late ? ' (晚到材料模式)' : '';
+        console.log(chalk_1.default.green('✓ 导入成功' + suffix));
+        console.log('  批次ID: ' + chalk_1.default.cyan(result.batchId));
+        console.log('  记录数: ' + chalk_1.default.cyan(String(result.recordCount)));
         if (options.late) {
-            console.log(chalk_1.default.yellow(`  提示: 请运行 amdc reconcile --late ${result.batchId} 进行增量核对`));
+            console.log(chalk_1.default.yellow('  提示: 请运行 amdc reconcile --late ' + result.batchId + ' 进行增量核对'));
         }
     }
     catch (e) {
-        console.error(chalk_1.default.red(`✗ 导入失败: ${e.message}`));
+        console.error(chalk_1.default.red('✗ 导入失败: ' + e.message));
         process.exit(1);
     }
 });
@@ -106,13 +107,13 @@ program
             lateContractBatchId: options.late,
             preserveConfirmed: !options.force
         });
-        console.log(chalk_1.default.green(`✓ 核对完成`));
-        console.log(`  新增: ${chalk_1.default.cyan(result.created)}`);
-        console.log(`  更新: ${chalk_1.default.cyan(result.updated)}`);
-        console.log(`  跳过(已确认): ${chalk_1.default.cyan(result.skipped)}`);
+        console.log(chalk_1.default.green('✓ 核对完成'));
+        console.log('  新增: ' + chalk_1.default.cyan(String(result.created)));
+        console.log('  更新: ' + chalk_1.default.cyan(String(result.updated)));
+        console.log('  跳过(已确认): ' + chalk_1.default.cyan(String(result.skipped)));
     }
     catch (e) {
-        console.error(chalk_1.default.red(`✗ 核对失败: ${e.message}`));
+        console.error(chalk_1.default.red('✗ 核对失败: ' + e.message));
         process.exit(1);
     }
 });
@@ -128,15 +129,15 @@ program
         const store = options.data ? new store_1.ReconciliationStore(path.resolve(options.data)) : store_1.defaultStore;
         const result = (0, reconciliation_1.confirmResult)(store, resultId, options.operator, options.notes);
         if (!result) {
-            console.error(chalk_1.default.red(`✗ 未找到结果: ${resultId}`));
+            console.error(chalk_1.default.red('✗ 未找到结果: ' + resultId));
             process.exit(1);
         }
-        console.log(chalk_1.default.green(`✓ 已确认`));
-        console.log(`  表演者: ${chalk_1.default.cyan(result.matchedPerformerName)}`);
-        console.log(`  曲目: ${chalk_1.default.cyan(result.matchedSongName)}`);
+        console.log(chalk_1.default.green('✓ 已确认'));
+        console.log('  表演者: ' + chalk_1.default.cyan(result.matchedPerformerName || ''));
+        console.log('  曲目: ' + chalk_1.default.cyan(result.matchedSongName || ''));
     }
     catch (e) {
-        console.error(chalk_1.default.red(`✗ 确认失败: ${e.message}`));
+        console.error(chalk_1.default.red('✗ 确认失败: ' + e.message));
         process.exit(1);
     }
 });
@@ -152,15 +153,15 @@ program
         const store = options.data ? new store_1.ReconciliationStore(path.resolve(options.data)) : store_1.defaultStore;
         const result = (0, reconciliation_1.rejectResult)(store, resultId, options.operator, options.notes);
         if (!result) {
-            console.error(chalk_1.default.red(`✗ 未找到结果: ${resultId}`));
+            console.error(chalk_1.default.red('✗ 未找到结果: ' + resultId));
             process.exit(1);
         }
-        console.log(chalk_1.default.green(`✓ 已驳回`));
-        console.log(`  表演者: ${chalk_1.default.cyan(result.matchedPerformerName)}`);
-        console.log(`  曲目: ${chalk_1.default.cyan(result.matchedSongName)}`);
+        console.log(chalk_1.default.green('✓ 已驳回'));
+        console.log('  表演者: ' + chalk_1.default.cyan(result.matchedPerformerName || ''));
+        console.log('  曲目: ' + chalk_1.default.cyan(result.matchedSongName || ''));
     }
     catch (e) {
-        console.error(chalk_1.default.red(`✗ 驳回失败: ${e.message}`));
+        console.error(chalk_1.default.red('✗ 驳回失败: ' + e.message));
         process.exit(1);
     }
 });
@@ -176,14 +177,14 @@ program
         const store = options.data ? new store_1.ReconciliationStore(path.resolve(options.data)) : store_1.defaultStore;
         const result = (0, reconciliation_1.rollbackResult)(store, resultId, options.operator, options.reason);
         if (!result) {
-            console.error(chalk_1.default.red(`✗ 未找到结果: ${resultId}`));
+            console.error(chalk_1.default.red('✗ 未找到结果: ' + resultId));
             process.exit(1);
         }
-        console.log(chalk_1.default.green(`✓ 已回滚`));
-        console.log(`  当前状态: ${chalk_1.default.cyan(result.status)}`);
+        console.log(chalk_1.default.green('✓ 已回滚'));
+        console.log('  当前状态: ' + chalk_1.default.cyan(result.status));
     }
     catch (e) {
-        console.error(chalk_1.default.red(`✗ 回滚失败: ${e.message}`));
+        console.error(chalk_1.default.red('✗ 回滚失败: ' + e.message));
         process.exit(1);
     }
 });
@@ -197,11 +198,11 @@ program
         const store = options.data ? new store_1.ReconciliationStore(path.resolve(options.data)) : store_1.defaultStore;
         const outPath = path.resolve(output);
         (0, exporters_1.exportResultsToExcel)(store, outPath);
-        console.log(chalk_1.default.green(`✓ 导出成功`));
-        console.log(`  文件: ${chalk_1.default.cyan(outPath)}`);
+        console.log(chalk_1.default.green('✓ 导出成功'));
+        console.log('  文件: ' + chalk_1.default.cyan(outPath));
     }
     catch (e) {
-        console.error(chalk_1.default.red(`✗ 导出失败: ${e.message}`));
+        console.error(chalk_1.default.red('✗ 导出失败: ' + e.message));
         process.exit(1);
     }
 });
@@ -215,11 +216,11 @@ program
         const store = options.data ? new store_1.ReconciliationStore(path.resolve(options.data)) : store_1.defaultStore;
         const outPath = path.resolve(output);
         (0, exporters_1.exportAuditLogToExcel)(store, outPath);
-        console.log(chalk_1.default.green(`✓ 日志导出成功`));
-        console.log(`  文件: ${chalk_1.default.cyan(outPath)}`);
+        console.log(chalk_1.default.green('✓ 日志导出成功'));
+        console.log('  文件: ' + chalk_1.default.cyan(outPath));
     }
     catch (e) {
-        console.error(chalk_1.default.red(`✗ 导出失败: ${e.message}`));
+        console.error(chalk_1.default.red('✗ 导出失败: ' + e.message));
         process.exit(1);
     }
 });
@@ -230,21 +231,22 @@ program
     .action((options) => {
     const store = options.data ? new store_1.ReconciliationStore(path.resolve(options.data)) : store_1.defaultStore;
     const state = store.getState();
+    const details = store.getResultsWithDetails();
     console.log(chalk_1.default.bold('当前状态'));
-    console.log(`  接龙记录: ${chalk_1.default.cyan(state.groupRecords.length)}`);
-    console.log(`  合同记录: ${chalk_1.default.cyan(state.contractRecords.length)}`);
-    console.log(`  核对结果: ${chalk_1.default.cyan(state.results.length)}`);
-    console.log(`  操作日志: ${chalk_1.default.cyan(state.logs.length)}`);
-    console.log(`  导入批次: ${chalk_1.default.cyan(state.batches.length)}`);
-    console.log(`  最后更新: ${chalk_1.default.gray(state.lastUpdated)}`);
-    const byStatus = state.results.reduce((acc, r) => {
-        acc[r.status] = (acc[r.status] || 0) + 1;
-        return acc;
-    }, {});
-    console.log();
+    console.log('  接龙记录: ' + chalk_1.default.cyan(String(state.groupRecords.length)));
+    console.log('  合同记录: ' + chalk_1.default.cyan(String(state.contractRecords.length)));
+    console.log('  核对结果: ' + chalk_1.default.cyan(String(details.length)));
+    console.log('  操作日志: ' + chalk_1.default.cyan(String(state.logs.length)));
+    console.log('  导入批次: ' + chalk_1.default.cyan(String(state.batches.length)));
+    console.log('  最后更新: ' + chalk_1.default.gray(state.lastUpdated));
+    const byStatus = {};
+    for (const d of details) {
+        byStatus[d.result.status] = (byStatus[d.result.status] || 0) + 1;
+    }
+    console.log('');
     console.log(chalk_1.default.bold('按状态统计'));
     for (const [status, count] of Object.entries(byStatus)) {
-        console.log(`  ${status}: ${chalk_1.default.cyan(count)}`);
+        console.log('  ' + status + ': ' + chalk_1.default.cyan(String(count)));
     }
 });
 program
@@ -258,27 +260,84 @@ program
     const filtered = options.status
         ? details.filter((d) => d.result.status === options.status)
         : details;
-    console.log(chalk_1.default.bold(`核对结果 (${filtered.length} 条)`));
-    console.log();
+    console.log(chalk_1.default.bold('核对结果 (' + filtered.length + ' 条)'));
+    console.log('');
     for (const { result, groupRecord, contractRecord } of filtered) {
-        const statusColor = result.status === 'confirmed'
-            ? chalk_1.default.green
-            : result.status === 'needs_review'
-                ? chalk_1.default.yellow
-                : result.status === 'rejected'
-                    ? chalk_1.default.red
-                    : chalk_1.default.gray;
-        console.log(`${statusColor(result.id)}  ${statusColor(`[${result.status}]`).padEnd(20)} ${chalk_1.default.bold(result.matchedPerformerName || '(未知)')} - ${result.matchedSongName || '(未知)'}`);
+        let statusColor;
+        if (result.status === 'confirmed') {
+            statusColor = chalk_1.default.green;
+        }
+        else if (result.status === 'needs_review') {
+            statusColor = chalk_1.default.yellow;
+        }
+        else if (result.status === 'rejected') {
+            statusColor = chalk_1.default.red;
+        }
+        else {
+            statusColor = chalk_1.default.gray;
+        }
+        const statusStr = '[' + result.status + ']';
+        const idPart = statusColor(result.id);
+        const statusPart = statusColor(statusStr).padEnd(20);
+        const namePart = chalk_1.default.bold(result.matchedPerformerName || '(未知)');
+        const songPart = result.matchedSongName || '(未知)';
+        console.log(idPart + '  ' + statusPart + ' ' + namePart + ' - ' + songPart);
         if (result.reviewReasons.length > 0) {
-            console.log(`  原因: ${chalk_1.default.yellow(result.reviewReasons.join(', '))}`);
+            console.log('  原因: ' + chalk_1.default.yellow(result.reviewReasons.join(', ')));
         }
         if (groupRecord) {
-            console.log(`  接龙行 #${groupRecord.originalRowNumber}: ${chalk_1.default.gray(groupRecord.rawContent.substring(0, 50))}`);
+            const preview = groupRecord.rawContent.substring(0, 50);
+            console.log('  接龙行 #' + groupRecord.originalRowNumber + ': ' + chalk_1.default.gray(preview));
         }
         if (contractRecord) {
-            console.log(`  合同: ${chalk_1.default.gray(contractRecord.rawContent.substring(0, 50))}`);
+            const preview = contractRecord.rawContent.substring(0, 50);
+            console.log('  合同: ' + chalk_1.default.gray(preview));
         }
-        console.log();
+        console.log('');
+    }
+});
+program
+    .command('batches')
+    .description('列出所有导入批次')
+    .option('-d, --data <file>', '数据文件路径')
+    .action((options) => {
+    const store = options.data ? new store_1.ReconciliationStore(path.resolve(options.data)) : store_1.defaultStore;
+    const state = store.getState();
+    console.log(chalk_1.default.bold('导入批次 (' + state.batches.length + ')'));
+    for (const batch of state.batches.slice().reverse()) {
+        const isSuperseded = batch.status === 'superseded';
+        const statusLabel = isSuperseded ? chalk_1.default.gray(' [已回滚]') : '';
+        console.log('  ' + chalk_1.default.cyan(batch.id) + statusLabel);
+        console.log('    来源: ' + batch.source + '  文件: ' + batch.fileName);
+        console.log('    记录数: ' + batch.recordCount + '  操作人: ' + batch.operator + '  时间: ' + batch.importedAt);
+        console.log('');
+    }
+});
+program
+    .command('rollback-batch')
+    .description('回滚一个导入批次（软删除，保留痕迹）')
+    .argument('<batchId>', '批次ID')
+    .option('-o, --operator <name>', '操作人', 'system')
+    .option('-r, --reason <text>', '回滚原因')
+    .option('-f, --force', '确认执行')
+    .option('-d, --data <file>', '数据文件路径')
+    .action((batchId, options) => {
+    if (!options.force) {
+        console.error(chalk_1.default.yellow('警告：此操作会标记该批次所有相关记录为已替换，相关核对结果也会被标记。'));
+        console.error(chalk_1.default.yellow('       请加 --force 确认执行。操作痕迹会保留在日志中，可用于复盘。'));
+        process.exit(1);
+    }
+    try {
+        const store = options.data ? new store_1.ReconciliationStore(path.resolve(options.data)) : store_1.defaultStore;
+        const result = store.rollbackBatch(batchId, options.operator, options.reason);
+        console.log(chalk_1.default.green('✓ 批次已回滚'));
+        console.log('  接龙记录: ' + chalk_1.default.cyan(String(result.affectedGroupRecords)));
+        console.log('  合同记录: ' + chalk_1.default.cyan(String(result.affectedContractRecords)));
+        console.log('  核对结果: ' + chalk_1.default.cyan(String(result.affectedResults)));
+    }
+    catch (e) {
+        console.error(chalk_1.default.red('✗ 回滚失败: ' + e.message));
+        process.exit(1);
     }
 });
 program

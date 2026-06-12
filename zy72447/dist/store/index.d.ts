@@ -15,7 +15,9 @@ export declare class ReconciliationStore {
     updateGroupRecord(recordId: string, updates: Partial<GroupSignupRecord>, operator: string, editReason?: string): GroupSignupRecord | undefined;
     updateContractRecord(recordId: string, updates: Partial<ContractRecord>, operator: string, editReason?: string): ContractRecord | undefined;
     findGroupRecordByRowAndBatch(rowNumber: number, batchId: string): GroupSignupRecord | undefined;
-    getResultsWithDetails(): Array<{
+    getResultsWithDetails(options?: {
+        includeSuperseded?: boolean;
+    }): Array<{
         result: ReconciliationResult;
         groupRecord?: GroupSignupRecord;
         contractRecord?: ContractRecord;
@@ -23,5 +25,10 @@ export declare class ReconciliationStore {
     getLogsForEntity(entityId: string): OperationLog[];
     exportState(): ReconciliationState;
     resetState(operator: string): void;
+    rollbackBatch(batchId: string, operator: string, reason?: string): {
+        affectedGroupRecords: number;
+        affectedContractRecords: number;
+        affectedResults: number;
+    };
 }
 export declare const defaultStore: ReconciliationStore;
