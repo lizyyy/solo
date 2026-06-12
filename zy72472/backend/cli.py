@@ -12,7 +12,7 @@ from models import (
     load_points, save_points, get_point_by_id,
     load_streets, load_bus_data, build_street_tree,
     detect_street_membership, calculate_score,
-    PointRecord, ScoreRecord
+    PointRecord, ScoreRecord, build_export_geojson
 )
 
 
@@ -240,153 +240,210 @@ def rerun(point_id):
     click.echo(f"✅ 已重跑评分: {point.current_score.total} ({point.current_score.level})")
 
 
+def run_export(output_path=None, show_trail=False):
+    """demo 用的简化导出函数"""
+    path, geojson = build_export_geojson(output_path=output_path)
+    summary = geojson['summary']
+
+    click.echo(f"✅ 已导出到 {path}")
+    click.echo()
+    click.echo("📊 导出摘要:")
+    click.echo(f"   总点位: {summary['total_points']}")
+    click.echo(f"   边界待复核: {summary['boundary_points']}")
+    click.echo(f"   已补公交: {summary['bus_added_points']}")
+    click.echo(f"   人工修正: {summary['manually_corrected']}")
+    click.echo(f"   旧口径数据: {summary['old_caliber_points']}")
+    click.echo(f"   评分分布: {summary['score_distribution']}")
+    click.echo()
+
+    if show_trail:
+        click.echo("🔍 追溯链详情:")
+        for feat in geojson['features']:
+            props = feat['properties']
+            click.echo(f"   {props['id']} {props['name']}:")
+            for t in props['audit_trail']:
+                click.echo(f"     [步骤{t['step']}] {t['event']}: {t['score']}分 ({t['level']})")
+        click.echo()
+
+    return path
+
+
 @cli.command()
 @click.option('--format', 'fmt', default='geojson', help='导出格式')
 @click.option('--output', help='输出文件路径')
-def export(fmt, output):
-    """导出地图数据"""
-    points = load_points()
-    features = []
-    for p in points:
-        feature = {
-            'type': 'Feature',
-            'geometry': {'type': 'Point', 'coordinates': [p.lng, p.lat]},
-            'properties': {
-                'id': p.id,
-                'name': p.name,
-                'is_boundary': p.is_boundary,
-                'score_total': p.current_score.total,
-                'score_level': p.current_score.level,
-                'score_method': p.current_score.method,
-                'status': p.status
-            }
-        }
-        features.append(feature)
-
-    geojson = {'type': 'FeatureCollection', 'features': features}
-
-    if output:
-        with open(output, 'w', encoding='utf-8') as f:
-            json.dump(geojson, f, ensure_ascii=False, indent=2)
-        click.echo(f"✅ 已导出到 {output}")
-    else:
-        click.echo(json.dumps(geojson, ensure_ascii=False, indent=2))
+@click.option('--show-trail', is_flag=True, help='显示追溯链信息')
+def export(fmt, output, show_trail):
+    """导出地图数据（含完整追溯链）"""
+    run_export(output, show_trail)
 
 
 @cli.command()
 def demo():
     """运行完整演示流程"""
-    click.echo("=" * 60)
-    click.echo("🎬 儿童友好街区评分 - 完整流程演示")
-    click.echo("=" * 60)
+    click.echo("=" * 70)
+    click.echo("🎬 儿童友好街区评分 - 完整流程演示（按实际操作路径复现）")
+    click.echo("=" * 70)
     click.echo()
 
-    click.echo("步骤 1: 初始化演示数据...")
+    click.echo("【第一步】初始化并导入路口照片...")
+    click.echo("-" * 70)
     from init_demo import init_demo_data
-    points = init_demo_data()
-    click.echo()
-
-    click.echo("步骤 2: 查看点位列表...")
-    click.echo("-" * 40)
+    init_demo_data()
     points = load_points()
-    for p in points:
-        boundary_icon = "🟡" if p.is_boundary else "🟢"
-        click.echo(f"  {boundary_icon} {p.id}: {p.name}")
-    click.echo()
 
-    click.echo("步骤 3: 查看点位详情 - point_002 (边界点位)...")
-    click.echo("-" * 40)
+    p1 = get_point_by_id(points, 'point_001')
     p2 = get_point_by_id(points, 'point_002')
-    click.echo(f"  {p2.name}")
-    click.echo(f"  边界: {'是 - 涉及: ' + ', '.join(p2.boundary_streets) if p2.is_boundary else '否'}")
-    click.echo(f"  状态: 待项目经理复核")
-    click.echo()
-
-    click.echo("步骤 4: 为 point_003 补录公交刷卡时段（旧口径）...")
-    click.echo("-" * 40)
     p3 = get_point_by_id(points, 'point_003')
-    old_score = p3.current_score.total
-    click.echo(f"  补录前评分: {old_score}")
 
-    bus_list = load_bus_data()
-    bus_data = None
-    for b in bus_list:
-        if b.get('point_id') == 'point_003':
-            bus_data = b
-            break
-
-    p3.bus_data_id = bus_data['id']
-    p3.bus_swipes_added = True
-    p3.status = 'bus_added'
-    p3.score_history.append(ScoreRecord(**p3.current_score.__dict__))
-    p3.current_score = calculate_score(p3, bus_data)
-    p3.updated_at = datetime.now().isoformat()
-    save_points(points)
-
-    click.echo(f"  补录后评分: {p3.current_score.total}")
-    click.echo(f"  计算方法: {p3.current_score.method}")
-    click.echo(f"  备注: {p3.current_score.note}")
+    click.echo(f"  ✅ 导入成功，共 {len(points)} 个点位")
+    click.echo(f"  📷 point_001: {p1.name} - 照片: {p1.photo_path}")
+    click.echo(f"  📷 point_002: {p2.name} - 照片: {p2.photo_path}")
+    click.echo(f"  📷 point_003: {p3.name} - 照片: {p3.photo_path}")
+    click.echo()
+    click.echo(f"  🔍 自动边界检测结果:")
+    for p in points:
+        if p.is_boundary:
+            click.echo(f"     ⚠️  {p.id}: 边界点位！涉及 {', '.join(p.boundary_streets)} - 标记待复核")
+        else:
+            click.echo(f"     ✅ {p.id}: 归属明确 - {', '.join(p.streets)}")
     click.echo()
 
-    click.echo("步骤 5: 人工修正 point_002...")
-    click.echo("-" * 40)
-    p2 = get_point_by_id(load_points(), 'point_002')
-    override = {'traffic_safety': 72.0, 'reason': '项目经理复核：边界点位实际归解放路街道'}
+    click.echo("【第二步】第一次地图导出（未补录公交）...")
+    click.echo("-" * 70)
+    export1_path = run_export(os.path.join(os.path.dirname(__file__), '..', 'exports', 'step2_export_before_bus.geojson'))
+    click.echo()
+
+    click.echo("【第三步】交通协管老马补录公交刷卡时段...")
+    click.echo("-" * 70)
+    bus_list = load_bus_data()
+
+    for target_pid in ['point_001', 'point_002', 'point_003']:
+        points = load_points()
+        p = get_point_by_id(points, target_pid)
+        old_total = p.current_score.total
+        old_traffic = p.current_score.traffic_safety
+        old_bus = p.current_score.bus_access
+
+        bus_data = None
+        for b in bus_list:
+            if b.get('point_id') == target_pid:
+                bus_data = b
+                break
+
+        if bus_data:
+            p.bus_data_id = bus_data['id']
+            p.bus_swipes_added = True
+            p.status = 'bus_added'
+            old_score = ScoreRecord(**p.current_score.__dict__)
+            p.score_history.append(old_score)
+            p.current_score = calculate_score(p, bus_data)
+            p.updated_at = datetime.now().isoformat()
+            save_points(points)
+
+            caliber = "旧口径" if bus_data.get('old_calculation') else "新口径"
+            click.echo(f"  🚌 {p.name}:")
+            click.echo(f"     线路: {bus_data['route']} | 站点: {bus_data['stop_name']}")
+            click.echo(f"     刷卡时段: {', '.join(bus_data['swipe_hours'])}")
+            click.echo(f"     统计口径: {caliber} | 高峰儿童: {bus_data['peak_children_count']}人")
+            click.echo(f"     评分变化: 公交分 {old_bus} → {p.current_score.bus_access}")
+            click.echo(f"     总分变化: {old_total} → {p.current_score.total} ({p.current_score.level})")
+            if p.current_score.note:
+                click.echo(f"     备注: {p.current_score.note}")
+            click.echo()
+
+    click.echo("【第四步】补录公交后的地图导出（验证数据同步）...")
+    click.echo("-" * 70)
+    export2_path = run_export(os.path.join(os.path.dirname(__file__), '..', 'exports', 'step4_export_after_bus.geojson'))
+    click.echo()
+
+    click.echo("【第五步】项目经理人工修正边界点位...")
+    click.echo("-" * 70)
+    points = load_points()
+    p2 = get_point_by_id(points, 'point_002')
+    old_traffic = p2.current_score.traffic_safety
+    old_total = p2.current_score.total
+    click.echo(f"  修正前: 交通安全={old_traffic}, 总分={old_total}")
+
+    override = {
+        'traffic_safety': 72.0,
+        'pedestrian_facility': 68.0,
+        'reason': '项目经理复核：边界点位实际归解放路街道，调整评分'
+    }
     p2.manual_correction = override
-    p2.score_history.append(ScoreRecord(**p2.current_score.__dict__))
-    p2.current_score = calculate_score(p2, None, override)
+    old_score = ScoreRecord(**p2.current_score.__dict__)
+    p2.score_history.append(old_score)
+    p2.current_score = calculate_score(p2, bus_by_id_from_list(bus_list, p2.bus_data_id), override)
     p2.status = 'manually_corrected'
     p2.updated_at = datetime.now().isoformat()
-    save_points(load_points())
-    click.echo(f"  修正后评分: {p2.current_score.total}")
-    click.echo(f"  状态: 已人工修正")
-    click.echo()
-
-    click.echo("步骤 6: 重跑 point_001 评分...")
-    click.echo("-" * 40)
-    points = load_points()
-    p1 = get_point_by_id(points, 'point_001')
-    p1.score_history.append(ScoreRecord(**p1.current_score.__dict__))
-    bus1 = None
-    for b in load_bus_data():
-        if b['id'] == p1.bus_data_id:
-            bus1 = b
-            break
-    p1.current_score = calculate_score(p1, bus1)
-    p1.status = 'completed'
     save_points(points)
-    click.echo(f"  重跑后评分: {p1.current_score.total} ({p1.current_score.level})")
+
+    points = load_points()
+    p2_check = get_point_by_id(points, 'point_002')
+    click.echo(f"  修正后: 交通安全={p2_check.current_score.traffic_safety}, 总分={p2_check.current_score.total}")
+    click.echo(f"  ✅ 验证: 人工修正分数已生效，交通安全 58.5 → {p2_check.current_score.traffic_safety}")
+    click.echo(f"  修正原因: {p2_check.manual_correction['reason']}")
     click.echo()
 
-    click.echo("步骤 7: 导出地图数据...")
-    click.echo("-" * 40)
-    export_path = os.path.join(os.path.dirname(__file__), '..', 'exports', 'demo_export.geojson')
-    points = load_points()
-    features = []
-    for p in points:
-        features.append({
-            'type': 'Feature',
-            'geometry': {'type': 'Point', 'coordinates': [p.lng, p.lat]},
-            'properties': {
-                'id': p.id, 'name': p.name,
-                'is_boundary': p.is_boundary,
-                'score': p.current_score.total,
-                'level': p.current_score.level
-            }
-        })
-    with open(export_path, 'w', encoding='utf-8') as f:
-        json.dump({'type': 'FeatureCollection', 'features': features}, f, ensure_ascii=False, indent=2)
-    click.echo(f"  已导出: {export_path}")
+    click.echo("【第六步】人工修正后的地图导出（含完整追溯链）...")
+    click.echo("-" * 70)
+    export3_path = run_export(os.path.join(os.path.dirname(__file__), '..', 'exports', 'step6_export_after_correction.geojson'), show_trail=True)
     click.echo()
 
-    click.echo("=" * 60)
-    click.echo("✅ 演示流程完成！三种处理结果对比：")
-    click.echo("=" * 60)
+    click.echo("【第七步】验证追溯链：从人工修正追回公交补录原始材料")
+    click.echo("-" * 70)
+    with open(export3_path, 'r', encoding='utf-8') as f:
+        export_data = json.load(f)
+
+    for feat in export_data['features']:
+        props = feat['properties']
+        pid = props['id']
+        click.echo(f"  📍 {pid} {props['name']}:")
+        click.echo(f"     当前评分: {props['score']['total']} ({props['score']['level']})")
+        click.echo(f"     交通安全: {props['score']['traffic_safety']}")
+
+        if props.get('bus_evidence'):
+            be = props['bus_evidence']
+            click.echo(f"     🚌 公交原始材料: {be['route']} {be['stop_name']}")
+            click.echo(f"        时段: {', '.join(be['swipe_hours'])} | 儿童数: {be['peak_children_count']}")
+            click.echo(f"        口径: {'旧' if be['old_calculation'] else '新'} | 备注: {be.get('note','')}")
+
+        if props.get('manual_correction'):
+            mc = props['manual_correction']
+            click.echo(f"     ✏️  人工修正: {mc.get('reason','')}")
+            overrides = {k:v for k,v in mc.items() if k != 'reason'}
+            if overrides:
+                click.echo(f"        调整字段: {overrides}")
+
+        if props.get('audit_trail'):
+            click.echo(f"     📜 完整操作痕迹 ({len(props['audit_trail'])} 步):")
+            for step in props['audit_trail']:
+                click.echo(f"        [{step['step']}] {step['event']} → {step['score']}分")
+
+        click.echo()
+
+    click.echo("=" * 70)
+    click.echo("✅ 流程完成！三种处理结果对比：")
+    click.echo("=" * 70)
     points = load_points()
     for p in points:
-        tag = "顺利" if p.id == 'point_001' else "边界" if p.id == 'point_002' else "旧口径"
-        click.echo(f"  [{tag}] {p.name}: {p.current_score.total} ({p.current_score.level}) - {p.current_score.method}")
+        tag = "顺利" if p.id == 'point_001' else "边界+修正" if p.id == 'point_002' else "旧口径"
+        click.echo(f"  [{tag:8s}] {p.name}: {p.current_score.total} ({p.current_score.level})")
+        click.echo(f"           交通安全={p.current_score.traffic_safety}, 方法={p.current_score.method}")
+        if p.current_score.note:
+            click.echo(f"           备注: {p.current_score.note}")
     click.echo()
+    click.echo("📁 导出文件清单:")
+    click.echo(f"  1. {export1_path}")
+    click.echo(f"  2. {export2_path}")
+    click.echo(f"  3. {export3_path}")
+    click.echo()
+
+
+def bus_by_id_from_list(bus_list, bus_id):
+    for b in bus_list:
+        if b['id'] == bus_id:
+            return b
+    return None
 
 
 if __name__ == '__main__':

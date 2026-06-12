@@ -164,9 +164,14 @@ def calculate_score(point: PointRecord, bus_data: Optional[Dict] = None, manual_
     if manual_override:
         record.method = "manual_correction"
         record.note = (record.note + "；" if record.note else "") + f"人工修正：{manual_override.get('reason', '')}"
-        for key in ['traffic_safety', 'pedestrian_facility', 'bus_access', 'play_space']:
-            if key in manual_override:
-                locals()[f'base_{key.split("_")[0]}'] = manual_override[key]
+        if 'traffic_safety' in manual_override:
+            base_traffic = manual_override['traffic_safety']
+        if 'pedestrian_facility' in manual_override:
+            base_pedestrian = manual_override['pedestrian_facility']
+        if 'bus_access' in manual_override:
+            base_bus = manual_override['bus_access']
+        if 'play_space' in manual_override:
+            base_play = manual_override['play_space']
 
     record.traffic_safety = round(base_traffic, 1)
     record.pedestrian_facility = round(base_pedestrian, 1)
@@ -219,3 +224,148 @@ def get_point_by_id(points: List[PointRecord], point_id: str) -> Optional[PointR
         if p.id == point_id:
             return p
     return None
+
+
+def build_export_geojson(points: List[PointRecord] = None, 
+                         bus_list: List[Dict] = None,
+                         output_path: str = None) -> tuple:
+    """构建导出的 GeoJSON 数据（含完整追溯链）
+
+    Returns:
+        tuple: (output_path, geojson_dict)
+    """
+    if points is None:
+        points = load_points()
+    if bus_list is None:
+        bus_list = load_bus_data()
+
+    bus_by_id = {b['id']: b for b in bus_list}
+    EXPORTS_DIR = os.path.join(os.path.dirname(__file__), '..', 'exports')
+
+    features = []
+    summary = {
+        'total_points': len(points),
+        'boundary_points': 0,
+        'bus_added_points': 0,
+        'manually_corrected': 0,
+        'old_caliber_points': 0,
+        'generated_at': datetime.now().isoformat(),
+        'score_distribution': {'优秀': 0, '良好': 0, '合格': 0, '待改进': 0, '待评': 0}
+    }
+
+    for p in points:
+        if p.is_boundary:
+            summary['boundary_points'] += 1
+        if p.bus_swipes_added:
+            summary['bus_added_points'] += 1
+        if p.manual_correction:
+            summary['manually_corrected'] += 1
+        if p.current_score.level in summary['score_distribution']:
+            summary['score_distribution'][p.current_score.level] += 1
+
+        bus_data = bus_by_id.get(p.bus_data_id) if p.bus_data_id else None
+        if bus_data and bus_data.get('old_calculation'):
+            summary['old_caliber_points'] += 1
+
+        audit_trail = []
+        all_scores = list(p.score_history) + [p.current_score]
+        for i, h in enumerate(all_scores):
+            trail_item = {
+                'step': i + 1,
+                'score': h.total,
+                'level': h.level,
+                'method': h.method,
+                'calculated_at': h.calculated_at,
+                'note': h.note
+            }
+            if h.method == 'initial':
+                trail_item['event'] = '路口照片首次导入，初始评分'
+            elif h.method == 'old_caliber':
+                trail_item['event'] = '补录公交刷卡时段（旧口径）'
+                if bus_data:
+                    trail_item['bus_evidence'] = {
+                        'route': bus_data['route'],
+                        'stop_name': bus_data['stop_name'],
+                        'swipe_hours': bus_data['swipe_hours'],
+                        'peak_children_count': bus_data['peak_children_count']
+                    }
+            elif h.method == 'new_caliber':
+                trail_item['event'] = '补录公交刷卡时段（新口径）'
+                if bus_data:
+                    trail_item['bus_evidence'] = {
+                        'route': bus_data['route'],
+                        'stop_name': bus_data['stop_name'],
+                        'swipe_hours': bus_data['swipe_hours'],
+                        'peak_children_count': bus_data['peak_children_count']
+                    }
+            elif h.method == 'manual_correction':
+                trail_item['event'] = '人工修正评分'
+                if i == len(all_scores) - 1 and p.manual_correction:
+                    trail_item['correction_evidence'] = {
+                        'reason': p.manual_correction.get('reason', ''),
+                        'override_fields': {k: v for k, v in p.manual_correction.items() if k != 'reason'}
+                    }
+                elif p.manual_correction:
+                    trail_item['note'] = (trail_item['note'] + '；' if trail_item['note'] else '') + '历史人工修正记录'
+            audit_trail.append(trail_item)
+
+        current_bus_evidence = None
+        if bus_data:
+            current_bus_evidence = {
+                'bus_data_id': p.bus_data_id,
+                'route': bus_data['route'],
+                'stop_name': bus_data['stop_name'],
+                'swipe_hours': bus_data['swipe_hours'],
+                'peak_children_count': bus_data['peak_children_count'],
+                'old_calculation': bus_data.get('old_calculation', False),
+                'note': bus_data.get('note', ''),
+                'updated_at': bus_data.get('updated_at', '')
+            }
+
+        feature = {
+            'type': 'Feature',
+            'geometry': {'type': 'Point', 'coordinates': [p.lng, p.lat]},
+            'properties': {
+                'id': p.id,
+                'name': p.name,
+                'cross_road': p.cross_road,
+                'photo_path': p.photo_path,
+                'streets': p.streets,
+                'is_boundary': p.is_boundary,
+                'boundary_streets': p.boundary_streets,
+                'score': {
+                    'total': p.current_score.total,
+                    'level': p.current_score.level,
+                    'method': p.current_score.method,
+                    'note': p.current_score.note,
+                    'traffic_safety': p.current_score.traffic_safety,
+                    'pedestrian_facility': p.current_score.pedestrian_facility,
+                    'bus_access': p.current_score.bus_access,
+                    'play_space': p.current_score.play_space
+                },
+                'bus_swipes_added': p.bus_swipes_added,
+                'bus_evidence': current_bus_evidence,
+                'manual_correction': p.manual_correction,
+                'status': p.status,
+                'audit_trail': audit_trail,
+                'history_count': len(p.score_history),
+                'created_at': p.created_at,
+                'updated_at': p.updated_at
+            }
+        }
+        features.append(feature)
+
+    geojson = {
+        'type': 'FeatureCollection',
+        'name': '儿童友好街区评分导出',
+        'summary': summary,
+        'features': features
+    }
+
+    final_output = output_path or os.path.join(EXPORTS_DIR, 
+                                               f"map_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.geojson")
+    os.makedirs(os.path.dirname(final_output), exist_ok=True)
+    with open(final_output, 'w', encoding='utf-8') as f:
+        json.dump(geojson, f, ensure_ascii=False, indent=2)
+
+    return final_output, geojson

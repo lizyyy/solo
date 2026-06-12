@@ -11,7 +11,7 @@ from models import (
     load_points, save_points, get_point_by_id,
     load_streets, load_bus_data, build_street_tree,
     detect_street_membership, calculate_score,
-    ScoreRecord
+    ScoreRecord, build_export_geojson
 )
 
 app = Flask(__name__, static_folder='../frontend', static_url_path='')
@@ -286,44 +286,20 @@ def export_map():
     data = request.json
     format_type = data.get('format', 'geojson')
     points = load_points()
+    bus_list = load_bus_data()
 
-    features = []
-    for p in points:
-        feature = {
-            'type': 'Feature',
-            'geometry': {
-                'type': 'Point',
-                'coordinates': [p.lng, p.lat]
-            },
-            'properties': {
-                'id': p.id,
-                'name': p.name,
-                'streets': p.streets,
-                'is_boundary': p.is_boundary,
-                'boundary_streets': p.boundary_streets,
-                'score_total': p.current_score.total,
-                'score_level': p.current_score.level,
-                'score_method': p.current_score.method,
-                'bus_added': p.bus_swipes_added,
-                'status': p.status
-            }
-        }
-        features.append(feature)
+    filename = f"map_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.geojson"
+    filepath = os.path.join(EXPORTS_DIR, filename)
 
-    geojson = {
-        'type': 'FeatureCollection',
-        'features': features
-    }
+    output_path, geojson = build_export_geojson(points, bus_list, filepath)
 
-    if format_type == 'geojson':
-        filename = f"map_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.geojson"
-        filepath = os.path.join(EXPORTS_DIR, filename)
-        import json
-        with open(filepath, 'w', encoding='utf-8') as f:
-            json.dump(geojson, f, ensure_ascii=False, indent=2)
-        return jsonify({'success': True, 'filename': filename, 'geojson': geojson})
-
-    return jsonify(geojson)
+    return jsonify({
+        'success': True,
+        'filename': filename,
+        'filepath': output_path,
+        'summary': geojson['summary'],
+        'geojson': geojson
+    })
 
 
 @app.route('/photos/<path:filename>')

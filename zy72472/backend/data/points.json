@@ -25,8 +25,8 @@
         "bus_access": 93.6,
         "play_space": 72.0,
         "level": "优秀",
-        "calculated_at": "2026-06-07T09:50:36.576159",
-        "method": "new_caliber",
+        "calculated_at": "2026-06-12T22:59:09.942601",
+        "method": "initial",
         "note": ""
       },
       "score_history": [
@@ -37,24 +37,13 @@
           "bus_access": 93.6,
           "play_space": 72.0,
           "level": "优秀",
-          "calculated_at": "2026-06-07T09:50:36.570845",
-          "method": "initial",
-          "note": ""
-        },
-        {
-          "total": 82.7,
-          "traffic_safety": 85.0,
-          "pedestrian_facility": 78.0,
-          "bus_access": 93.6,
-          "play_space": 72.0,
-          "level": "优秀",
-          "calculated_at": "2026-06-07T09:50:36.570845",
+          "calculated_at": "2026-06-12T22:59:09.942601",
           "method": "initial",
           "note": ""
         }
       ],
-      "created_at": "2026-06-07T09:50:36.570196",
-      "updated_at": "2026-06-07T09:50:36.570196"
+      "created_at": "2026-06-12T22:59:09.942134",
+      "updated_at": "2026-06-12T22:59:09.942134"
     },
     {
       "id": "point_002",
@@ -71,18 +60,22 @@
       ],
       "bus_data_id": "bus_003",
       "bus_swipes_added": true,
-      "manual_correction": null,
-      "status": "pending_review",
+      "manual_correction": {
+        "traffic_safety": 72.0,
+        "pedestrian_facility": 68.0,
+        "reason": "项目经理复核：边界点位实际归解放路街道，调整评分"
+      },
+      "status": "manually_corrected",
       "current_score": {
-        "total": 52.6,
-        "traffic_safety": 58.5,
-        "pedestrian_facility": 54.0,
+        "total": 61.5,
+        "traffic_safety": 72.0,
+        "pedestrian_facility": 68.0,
         "bus_access": 38.4,
         "play_space": 55.0,
         "level": "合格",
-        "calculated_at": "2026-06-07T09:50:36.570902",
-        "method": "new_caliber",
-        "note": "点位位于街道边界，需项目经理复核"
+        "calculated_at": "2026-06-12T22:59:14.331405",
+        "method": "manual_correction",
+        "note": "点位位于街道边界，需项目经理复核；人工修正：项目经理复核：边界点位实际归解放路街道，调整评分"
       },
       "score_history": [
         {
@@ -92,13 +85,24 @@
           "bus_access": 38.4,
           "play_space": 55.0,
           "level": "合格",
-          "calculated_at": "2026-06-07T09:50:36.570902",
+          "calculated_at": "2026-06-12T22:59:09.942653",
+          "method": "new_caliber",
+          "note": "点位位于街道边界，需项目经理复核"
+        },
+        {
+          "total": 52.6,
+          "traffic_safety": 58.5,
+          "pedestrian_facility": 54.0,
+          "bus_access": 38.4,
+          "play_space": 55.0,
+          "level": "合格",
+          "calculated_at": "2026-06-12T22:59:09.942653",
           "method": "new_caliber",
           "note": "点位位于街道边界，需项目经理复核"
         }
       ],
-      "created_at": "2026-06-07T09:50:36.570196",
-      "updated_at": "2026-06-07T09:50:36.570196"
+      "created_at": "2026-06-12T22:59:09.942134",
+      "updated_at": "2026-06-12T22:59:14.331418"
     },
     {
       "id": "point_003",
@@ -125,7 +129,7 @@
         "bus_access": 36.0,
         "play_space": 58.0,
         "level": "合格",
-        "calculated_at": "2026-06-07T09:50:36.573898",
+        "calculated_at": "2026-06-12T22:59:09.942704",
         "method": "old_caliber",
         "note": "使用旧口径公交数据，已标注待复核"
       },
@@ -137,7 +141,7 @@
           "bus_access": 45.0,
           "play_space": 58.0,
           "level": "合格",
-          "calculated_at": "2026-06-07T09:50:36.570954",
+          "calculated_at": "2026-06-12T22:59:09.942700",
           "method": "initial",
           "note": "初始评分，无公交数据"
         },
@@ -148,24 +152,13 @@
           "bus_access": 36.0,
           "play_space": 58.0,
           "level": "合格",
-          "calculated_at": "2026-06-07T09:50:36.570959",
-          "method": "old_caliber",
-          "note": "使用旧口径公交数据，已标注待复核"
-        },
-        {
-          "total": 59.9,
-          "traffic_safety": 70.0,
-          "pedestrian_facility": 65.0,
-          "bus_access": 36.0,
-          "play_space": 58.0,
-          "level": "合格",
-          "calculated_at": "2026-06-07T09:50:36.570959",
+          "calculated_at": "2026-06-12T22:59:09.942704",
           "method": "old_caliber",
           "note": "使用旧口径公交数据，已标注待复核"
         }
       ],
-      "created_at": "2026-06-07T09:50:36.570196",
-      "updated_at": "2026-06-07T09:50:36.573994"
+      "created_at": "2026-06-12T22:59:09.942134",
+      "updated_at": "2026-06-12T22:59:09.942134"
     }
   ]
 }

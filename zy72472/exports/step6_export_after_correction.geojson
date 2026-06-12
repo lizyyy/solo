@@ -1,0 +1,303 @@
+{
+  "type": "FeatureCollection",
+  "name": "儿童友好街区评分导出",
+  "summary": {
+    "total_points": 3,
+    "boundary_points": 1,
+    "bus_added_points": 3,
+    "manually_corrected": 1,
+    "old_caliber_points": 1,
+    "generated_at": "2026-06-12T22:44:24.763551",
+    "score_distribution": {
+      "优秀": 1,
+      "良好": 0,
+      "合格": 2,
+      "待改进": 0,
+      "待评": 0
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.418,
+          39.912
+        ]
+      },
+      "properties": {
+        "id": "point_001",
+        "name": "解放路小学路口",
+        "cross_road": "解放路与幸福路交叉口",
+        "photo_path": "photos/point_001.jpg",
+        "streets": [
+          "解放路街道"
+        ],
+        "is_boundary": false,
+        "boundary_streets": [
+          "解放路街道"
+        ],
+        "score": {
+          "total": 82.7,
+          "level": "优秀",
+          "method": "new_caliber",
+          "note": "",
+          "traffic_safety": 85.0,
+          "pedestrian_facility": 78.0,
+          "bus_access": 93.6,
+          "play_space": 72.0
+        },
+        "bus_swipes_added": true,
+        "bus_evidence": {
+          "bus_data_id": "bus_002",
+          "route": "8路",
+          "stop_name": "解放路小学",
+          "swipe_hours": [
+            "07:15-08:45",
+            "16:00-17:45"
+          ],
+          "peak_children_count": 78,
+          "old_calculation": false,
+          "note": "新口径：已按上下学时段精准统计",
+          "updated_at": "2026-06-01"
+        },
+        "manual_correction": null,
+        "status": "bus_added",
+        "audit_trail": [
+          {
+            "step": 1,
+            "score": 82.7,
+            "level": "优秀",
+            "method": "initial",
+            "calculated_at": "2026-06-12T22:44:24.758275",
+            "note": "",
+            "event": "路口照片首次导入，初始评分"
+          },
+          {
+            "step": 2,
+            "score": 82.7,
+            "level": "优秀",
+            "method": "initial",
+            "calculated_at": "2026-06-12T22:44:24.758275",
+            "note": "",
+            "event": "路口照片首次导入，初始评分"
+          }
+        ],
+        "history_count": 2,
+        "created_at": "2026-06-12T22:44:24.758179",
+        "updated_at": "2026-06-12T22:44:24.759567"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.41,
+          39.9125
+        ]
+      },
+      "properties": {
+        "id": "point_002",
+        "name": "朝阳解放交界路口",
+        "cross_road": "朝阳路与解放路交界口",
+        "photo_path": "photos/point_002.jpg",
+        "streets": [],
+        "is_boundary": true,
+        "boundary_streets": [
+          "朝阳路街道",
+          "解放路街道"
+        ],
+        "score": {
+          "total": 61.5,
+          "level": "合格",
+          "method": "manual_correction",
+          "note": "点位位于街道边界，需项目经理复核；人工修正：项目经理复核：边界点位实际归解放路街道，调整评分",
+          "traffic_safety": 72.0,
+          "pedestrian_facility": 68.0,
+          "bus_access": 38.4,
+          "play_space": 55.0
+        },
+        "bus_swipes_added": true,
+        "bus_evidence": {
+          "bus_data_id": "bus_003",
+          "route": "25路",
+          "stop_name": "和平路口",
+          "swipe_hours": [
+            "07:00-08:30",
+            "16:30-18:00"
+          ],
+          "peak_children_count": 32,
+          "old_calculation": false,
+          "note": "边界点位，公交数据归属待确认",
+          "updated_at": "2026-06-03"
+        },
+        "manual_correction": {
+          "traffic_safety": 72.0,
+          "pedestrian_facility": 68.0,
+          "reason": "项目经理复核：边界点位实际归解放路街道，调整评分"
+        },
+        "status": "manually_corrected",
+        "audit_trail": [
+          {
+            "step": 1,
+            "score": 52.6,
+            "level": "合格",
+            "method": "new_caliber",
+            "calculated_at": "2026-06-12T22:44:24.758332",
+            "note": "点位位于街道边界，需项目经理复核",
+            "event": "补录公交刷卡时段（新口径）",
+            "bus_evidence": {
+              "route": "25路",
+              "stop_name": "和平路口",
+              "swipe_hours": [
+                "07:00-08:30",
+                "16:30-18:00"
+              ],
+              "peak_children_count": 32
+            }
+          },
+          {
+            "step": 2,
+            "score": 52.6,
+            "level": "合格",
+            "method": "new_caliber",
+            "calculated_at": "2026-06-12T22:44:24.758332",
+            "note": "点位位于街道边界，需项目经理复核",
+            "event": "补录公交刷卡时段（新口径）",
+            "bus_evidence": {
+              "route": "25路",
+              "stop_name": "和平路口",
+              "swipe_hours": [
+                "07:00-08:30",
+                "16:30-18:00"
+              ],
+              "peak_children_count": 32
+            }
+          },
+          {
+            "step": 3,
+            "score": 52.6,
+            "level": "合格",
+            "method": "new_caliber",
+            "calculated_at": "2026-06-12T22:44:24.759971",
+            "note": "点位位于街道边界，需项目经理复核",
+            "event": "补录公交刷卡时段（新口径）",
+            "bus_evidence": {
+              "route": "25路",
+              "stop_name": "和平路口",
+              "swipe_hours": [
+                "07:00-08:30",
+                "16:30-18:00"
+              ],
+              "peak_children_count": 32
+            }
+          }
+        ],
+        "history_count": 3,
+        "created_at": "2026-06-12T22:44:24.758179",
+        "updated_at": "2026-06-12T22:44:24.761571"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.402,
+          39.91
+        ]
+      },
+      "properties": {
+        "id": "point_003",
+        "name": "朝阳路三小路口",
+        "cross_road": "朝阳路与育才路交叉口",
+        "photo_path": "photos/point_003.jpg",
+        "streets": [
+          "朝阳路街道"
+        ],
+        "is_boundary": false,
+        "boundary_streets": [
+          "朝阳路街道"
+        ],
+        "score": {
+          "total": 59.9,
+          "level": "合格",
+          "method": "old_caliber",
+          "note": "使用旧口径公交数据，已标注待复核",
+          "traffic_safety": 70.0,
+          "pedestrian_facility": 65.0,
+          "bus_access": 36.0,
+          "play_space": 58.0
+        },
+        "bus_swipes_added": true,
+        "bus_evidence": {
+          "bus_data_id": "bus_001",
+          "route": "12路",
+          "stop_name": "朝阳路口北",
+          "swipe_hours": [
+            "07:00-09:00",
+            "16:30-18:30"
+          ],
+          "peak_children_count": 45,
+          "old_calculation": true,
+          "note": "旧口径统计：按全天刷卡量估算，未区分时段",
+          "updated_at": "2026-05-15"
+        },
+        "manual_correction": null,
+        "status": "bus_added",
+        "audit_trail": [
+          {
+            "step": 1,
+            "score": 61.7,
+            "level": "合格",
+            "method": "initial",
+            "calculated_at": "2026-06-12T22:44:24.758378",
+            "note": "初始评分，无公交数据",
+            "event": "路口照片首次导入，初始评分"
+          },
+          {
+            "step": 2,
+            "score": 59.9,
+            "level": "合格",
+            "method": "old_caliber",
+            "calculated_at": "2026-06-12T22:44:24.758384",
+            "note": "使用旧口径公交数据，已标注待复核",
+            "event": "补录公交刷卡时段（旧口径）",
+            "bus_evidence": {
+              "route": "12路",
+              "stop_name": "朝阳路口北",
+              "swipe_hours": [
+                "07:00-09:00",
+                "16:30-18:30"
+              ],
+              "peak_children_count": 45
+            }
+          },
+          {
+            "step": 3,
+            "score": 59.9,
+            "level": "合格",
+            "method": "old_caliber",
+            "calculated_at": "2026-06-12T22:44:24.758384",
+            "note": "使用旧口径公交数据，已标注待复核",
+            "event": "补录公交刷卡时段（旧口径）",
+            "bus_evidence": {
+              "route": "12路",
+              "stop_name": "朝阳路口北",
+              "swipe_hours": [
+                "07:00-09:00",
+                "16:30-18:30"
+              ],
+              "peak_children_count": 45
+            }
+          }
+        ],
+        "history_count": 3,
+        "created_at": "2026-06-12T22:44:24.758179",
+        "updated_at": "2026-06-12T22:44:24.760390"
+      }
+    }
+  ]
+}
