@@ -1,0 +1,87 @@
+{
+  "scenario_name": "场景四：信息冲突（待版权运营确认）",
+  "scenario_key": "conflict",
+  "export_time": "2026-06-12T18:03:14.387767",
+  "final_status": "信息冲突待确认",
+  "steps": [
+    {
+      "step": "1. 创建版权到期提醒",
+      "record_id": "CR-9feaecc8"
+    },
+    {
+      "step": "2. 导入排练群接龙",
+      "status": "待处理"
+    },
+    {
+      "step": "3. 上传合同页截图 - 发现冲突",
+      "status": "信息冲突待确认",
+      "conflicts": [
+        {
+          "字段": "版权到期日",
+          "接龙值": "2026-07-01",
+          "截图值": "2026-10-01",
+          "描述": "接龙记录与合同截图的版权到期日期不一致"
+        }
+      ],
+      "note": "不自动拍板，由版权运营小鹿选择确认或驳回"
+    }
+  ],
+  "source_materials": {
+    "performer_name": "赵六",
+    "performance_date": "2026-06-18",
+    "program_name": "黄河大合唱",
+    "review_note": "",
+    "jielong_raw": "4. 赵六 黄河大合唱 2026-06-18\n版权到期日：2026-07-01\n备注：正常排期",
+    "jielong_copyright_status": "版权到期日：2026-07-01",
+    "jielong_remark": "备注：正常排期",
+    "jielong_import_time": "2026-06-12T18:03:14.387493",
+    "contract_no": "HT-2025-0200",
+    "contract_valid_until": "2026-10-01",
+    "contract_copyright_owner": "某乐团",
+    "contract_old_caliber": false,
+    "contract_uploader": "版权运营小鹿",
+    "contract_screenshot_ref": "screenshot_20260607_004.png"
+  },
+  "reminder": {
+    "record_id": "CR-9feaecc8",
+    "performer_name": "赵六",
+    "performance_date": "2026-06-18",
+    "program_name": "黄河大合唱",
+    "status": "信息冲突待确认",
+    "review_note": "",
+    "split_details": [],
+    "conflicts": [
+      {
+        "field_name": "版权到期日",
+        "jielong_value": "2026-07-01",
+        "screenshot_value": "2026-10-01",
+        "description": "接龙记录与合同截图的版权到期日期不一致"
+      }
+    ],
+    "history": [
+      {
+        "entry_id": "HIS-4ca90d1f",
+        "source": "排练群接龙",
+        "action": "接龙导入",
+        "operator": "排练群管理员",
+        "timestamp": "2026-06-12T18:03:14.387502",
+        "detail": "导入排练群接龙记录: 版权到期日：2026-07-01"
+      },
+      {
+        "entry_id": "HIS-c80f8647",
+        "source": "合同页截图补录",
+        "action": "合同截图上传-发现冲突",
+        "operator": "版权运营小鹿",
+        "timestamp": "2026-06-12T18:03:14.387563",
+        "detail": "发现 1 处信息冲突，待版权运营确认"
+      }
+    ]
+  },
+  "replay_commands": {
+    "scenario_key": "conflict",
+    "replay": "python main.py run --scenario conflict",
+    "replay_with_trace": "python main.py run --scenario conflict --trace",
+    "export_self": "python main.py run --scenario conflict --export replay_CR-9feaecc8.json",
+    "verify_match": "复盘记录 scenario_key 与命令 --scenario 参数一致，重跑可复现此场景"
+  }
+}

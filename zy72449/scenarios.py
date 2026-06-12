@@ -14,7 +14,7 @@ from models import ProcessingStatus
 
 def scenario_1_smooth() -> dict:
     """场景一：顺利记录 - 接龙与合同一致，正常流程走完"""
-    result = {"name": "场景一：顺利记录（正常流程）", "steps": []}
+    result = {"name": "场景一：顺利记录（正常流程）", "scenario_key": "smooth", "steps": []}
 
     reminder = create_reminder("张三", "2026-06-10", "天鹅湖")
     result["steps"].append({"step": "1. 创建版权到期提醒", "record_id": reminder.record_id})
@@ -64,7 +64,7 @@ def scenario_1_smooth() -> dict:
 
 def scenario_2_temp_substitute() -> dict:
     """场景二：临时替补只在群里说了一句，需票务复核"""
-    result = {"name": "场景二：临时替补（待票务复核）", "steps": []}
+    result = {"name": "场景二：临时替补（待票务复核）", "scenario_key": "temp", "steps": []}
 
     reminder = create_reminder("李四（临时替补）", "2026-06-12", "红色娘子军")
     result["steps"].append({"step": "1. 创建版权到期提醒", "record_id": reminder.record_id})
@@ -125,7 +125,7 @@ def scenario_2_temp_substitute() -> dict:
 
 def scenario_3_old_caliber() -> dict:
     """场景三：合同页截图补来的旧口径"""
-    result = {"name": "场景三：旧口径补录（合同截图补录）", "steps": []}
+    result = {"name": "场景三：旧口径补录（合同截图补录）", "scenario_key": "old", "steps": []}
 
     reminder = create_reminder("王五", "2026-06-15", "二泉映月")
     result["steps"].append({"step": "1. 创建版权到期提醒", "record_id": reminder.record_id})
@@ -183,7 +183,7 @@ def scenario_3_old_caliber() -> dict:
 
 def scenario_4_conflict_demo() -> dict:
     """场景四：接龙与截图矛盾，列出冲突证据待确认"""
-    result = {"name": "场景四：信息冲突（待版权运营确认）", "steps": []}
+    result = {"name": "场景四：信息冲突（待版权运营确认）", "scenario_key": "conflict", "steps": []}
 
     reminder = create_reminder("赵六", "2026-06-18", "黄河大合唱")
     result["steps"].append({"step": "1. 创建版权到期提醒", "record_id": reminder.record_id})

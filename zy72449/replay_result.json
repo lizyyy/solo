@@ -1,0 +1,111 @@
+{
+  "scenario_name": "场景三：旧口径补录（合同截图补录）",
+  "scenario_key": "old",
+  "export_time": "2026-06-12T18:05:26.104392",
+  "final_status": "已完成分账",
+  "steps": [
+    {
+      "step": "1. 创建版权到期提醒",
+      "record_id": "CR-777f1090"
+    },
+    {
+      "step": "2. 导入排练群接龙",
+      "status": "待处理"
+    },
+    {
+      "step": "3. 上传旧口径合同截图",
+      "status": "信息冲突待确认",
+      "conflicts": [
+        "合同截图为旧口径标准，需确认是否适用"
+      ]
+    },
+    {
+      "step": "4. 版权运营确认冲突处理",
+      "action": "确认适用旧口径",
+      "status": "已确认"
+    },
+    {
+      "step": "5. 按旧口径生成分账",
+      "amount": 2800.0,
+      "ratio": "5:5",
+      "caliber": "旧口径",
+      "status": "已完成分账"
+    }
+  ],
+  "source_materials": {
+    "performer_name": "王五",
+    "performance_date": "2026-06-15",
+    "program_name": "二泉映月",
+    "review_note": "",
+    "jielong_raw": "3. 王五 二泉映月 2026-06-15\n版权到期日：2026-08-15\n备注：正常排期",
+    "jielong_copyright_status": "版权到期日：2026-08-15",
+    "jielong_remark": "备注：正常排期",
+    "jielong_import_time": "2026-06-12T18:05:26.104248",
+    "contract_no": "HT-2023-0056",
+    "contract_valid_until": "2026-08-15",
+    "contract_copyright_owner": "某人工作室",
+    "contract_old_caliber": true,
+    "contract_uploader": "版权运营小鹿",
+    "contract_screenshot_ref": "screenshot_20260607_003_old.png"
+  },
+  "reminder": {
+    "record_id": "CR-777f1090",
+    "performer_name": "王五",
+    "performance_date": "2026-06-15",
+    "program_name": "二泉映月",
+    "status": "已完成分账",
+    "review_note": "",
+    "split_details": [
+      {
+        "detail_id": "SD-0d6ea395",
+        "amount": 2800.0,
+        "split_ratio": "5:5",
+        "payee": "某人工作室",
+        "version": 1,
+        "calculate_time": "2026-06-12T18:05:26.104341"
+      }
+    ],
+    "conflicts": [],
+    "history": [
+      {
+        "entry_id": "HIS-ceb4fcf9",
+        "source": "排练群接龙",
+        "action": "接龙导入",
+        "operator": "排练群管理员",
+        "timestamp": "2026-06-12T18:05:26.104256",
+        "detail": "导入排练群接龙记录: 版权到期日：2026-08-15"
+      },
+      {
+        "entry_id": "HIS-cfab0821",
+        "source": "合同页截图补录",
+        "action": "合同截图上传-发现冲突",
+        "operator": "版权运营小鹿",
+        "timestamp": "2026-06-12T18:05:26.104326",
+        "detail": "发现 1 处信息冲突，待版权运营确认"
+      },
+      {
+        "entry_id": "HIS-b21eebad",
+        "source": "人工确认",
+        "action": "冲突确认",
+        "operator": "版权运营小鹿",
+        "timestamp": "2026-06-12T18:05:26.104333",
+        "detail": "版权运营确认以合同截图为准。历史合同按旧口径执行"
+      },
+      {
+        "entry_id": "HIS-81dc24e7",
+        "source": "人工确认",
+        "action": "分账明细更新",
+        "operator": "系统",
+        "timestamp": "2026-06-12T18:05:26.104348",
+        "detail": "旧口径计算：金额2800.0，比例5:5，收款人某人工作室"
+      }
+    ]
+  },
+  "replay_commands": {
+    "scenario_key": "old",
+    "replay": "python main.py run --scenario old",
+    "replay_with_trace": "python main.py run --scenario old --trace",
+    "export_self": "python main.py run --scenario old --export replay_CR-777f1090.json",
+    "verify_match": "复盘记录 scenario_key 与命令 --scenario 参数一致，重跑可复现此场景"
+  }
+}
