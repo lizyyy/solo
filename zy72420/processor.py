@@ -213,6 +213,7 @@ class DepositRefundProcessor:
         """
         第三步：课时核销单更新
         根据签到照片和票务记录生成核销单，附带参数版本和取舍理由
+        【修复】先确定最终订单状态，再创建核销单，确保三者（订单状态/核销单状态/历史记录）一致
         """
         order.current_step = 3
 
@@ -220,6 +221,20 @@ class DepositRefundProcessor:
         total_verified = len(verified_lessons)
         total_fee = total_verified * self.LESSON_FEE_PER_HOUR
         refund_amount = order.deposit_amount * self.DEPOSIT_REFUND_RATE
+
+        if order.status == RefundStatus.AREA_MISMATCH:
+            final_status = "待店长确认后核销"
+            verification_status = "待确认"
+        elif order.status == RefundStatus.CALIBER_CONFLICT:
+            final_status = "待解决冲突后核销"
+            verification_status = "待确认"
+        else:
+            if order.status == RefundStatus.PENDING_REVIEW:
+                order.status = RefundStatus.NORMAL
+            elif order.status not in [RefundStatus.NORMAL, RefundStatus.CONFIRMED, RefundStatus.SUPPLEMENTED]:
+                order.status = RefundStatus.NORMAL
+            final_status = "已完成核销"
+            verification_status = "已核销"
 
         verification = LessonVerification(
             verification_id=f"VER-{order.refund_id}",
@@ -229,19 +244,11 @@ class DepositRefundProcessor:
             total_fee=total_fee,
             deposit_refund_amount=refund_amount,
             verification_time=datetime.now(),
-            status="已核销" if order.status in [RefundStatus.NORMAL, RefundStatus.CONFIRMED, RefundStatus.SUPPLEMENTED] else "待确认",
+            status=verification_status,
             params=self.calculation_params.copy()
         )
 
         order.lesson_verifications = [verification]
-
-        if order.status == RefundStatus.AREA_MISMATCH:
-            final_status = "待店长确认后核销"
-        elif order.status == RefundStatus.CALIBER_CONFLICT:
-            final_status = "待解决冲突后核销"
-        else:
-            order.status = RefundStatus.NORMAL if order.status == RefundStatus.PENDING_REVIEW else order.status
-            final_status = "已完成核销"
 
         order.add_history(
             operator="系统",

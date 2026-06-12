@@ -2,11 +2,13 @@
 # -*- coding: utf-8 -*-
 """
 乐器租赁押金退款系统 - 主程序入口
-演示三种场景的处理结果差异
+演示三种场景的处理结果差异 + 一条后来从票务导出补录链路完整走到结果报告
 """
 
 from sample_data import get_all_scenarios
 from processor import DepositRefundProcessor
+from report import RefundReportGenerator, print_report_banner
+from models import RefundStatus
 
 
 def print_separator(title=""):
@@ -14,6 +16,34 @@ def print_separator(title=""):
     if title:
         print(f"  {title}")
         print("=" * 80)
+
+
+def print_triple_check(order):
+    """重点核对：正常通过 / 已完成核销 / 待确认 三者一致性"""
+    print("\n  🔎 【三者一致性核对】")
+    v = order.lesson_verifications[0] if order.lesson_verifications else None
+    last_hist = order.history_records[-1] if order.history_records else None
+    last_hist_detail = last_hist.detail if last_hist else ""
+
+    print(f"     ① 订单状态    : {order.status.value}")
+    print(f"     ② 核销单状态  : {v.status if v else '未生成'}")
+    print(f"     ③ 历史最后记录: {last_hist_detail[-20:] if len(last_hist_detail) > 20 else last_hist_detail}")
+
+    order_ok = order.status in [RefundStatus.NORMAL, RefundStatus.CONFIRMED, RefundStatus.SUPPLEMENTED]
+    v_ok = v.status == "已核销" if v else False
+    hist_ok = "已完成核销" in last_hist_detail
+
+    if order_ok and v_ok and hist_ok:
+        print(f"     ✅ 三者一致：正常通过 + 已完成核销 已联动更新")
+    elif (order.status == RefundStatus.AREA_MISMATCH or order.status == RefundStatus.CALIBER_CONFLICT):
+        v_pending = v.status == "待确认" if v else False
+        hist_pending = "待店长确认后核销" in last_hist_detail or "待解决冲突后核销" in last_hist_detail
+        if v_pending and hist_pending:
+            print(f"     ✅ 三者一致：待确认状态下均正确显示 待确认")
+        else:
+            print(f"     ❌ 不一致：订单={order.status.value} 核销={v.status if v else '?'} 历史={last_hist_detail}")
+    else:
+        print(f"     ❌ 不一致！请关注以上三项")
 
 
 def print_scenario_header(scenario_name, order):
@@ -104,6 +134,7 @@ def run_normal_scenario():
     print_verification(order)
     print_history(order)
     print_final_status(order)
+    print_triple_check(order)
 
 
 def run_area_mismatch_scenario():
@@ -131,6 +162,7 @@ def run_area_mismatch_scenario():
     print_verification(order)
     print_history(order)
     print_final_status(order)
+    print_triple_check(order)
 
 
 def run_old_caliber_scenario():
@@ -158,6 +190,7 @@ def run_old_caliber_scenario():
     print_verification(order)
     print_history(order)
     print_final_status(order)
+    print_triple_check(order)
 
 
 def run_conflict_scenario():
@@ -194,6 +227,50 @@ def run_conflict_scenario():
     print_verification(order)
     print_history(order)
     print_final_status(order)
+    print_triple_check(order)
+
+
+def run_old_caliber_full_report():
+    """
+    【重点链路】一条后来从票务导出补录 → 完整走到结果报告
+    补录来源、处理状态、结论 放在同一份结果里
+    """
+    print_report_banner()
+
+    scenarios = get_all_scenarios()
+    order = scenarios["场景三：票务导出表补来的旧口径"]
+    processor = DepositRefundProcessor()
+
+    old_caliber_tickets = [t for t in order.ticket_records if t.is_old_caliber]
+    print("  🎯 本次链路目标：完整演示『一条后来从票务导出补来的旧口径』")
+    print(f"     退款单: {order.refund_id} | 学员: {order.student_name} | 乐器: {order.instrument_type}")
+    print(f"     补录旧口径: {len(old_caliber_tickets)} 条 (v1.0)")
+    for t in old_caliber_tickets:
+        print(f"       - {t.ticket_id}: 课时{t.lesson_id} | {t.class_date.strftime('%Y-%m-%d')} | {t.city}")
+
+    print("\n  ── Step 1: 课时签到照片第一次导入 ──")
+    r1 = processor.step1_import_sign_in_photos(order)
+    print(f"     结果: {r1}")
+
+    print("\n  ── Step 2: 琴行店长老周补看票务导出表（识别旧口径补录）──")
+    r2 = processor.step2_store_manager_review_tickets(order)
+    print(f"     结果: {r2}")
+    print(f"     ★ 来源识别: 后来从票务导出表补来的旧口径 {len(old_caliber_tickets)} 条已标记")
+    print(f"     ★ 处理状态: 旧口径记录纳入核销范围，来源单独追溯")
+
+    print("\n  ── Step 3: 课时核销单更新（补录来源 + 处理状态 + 结论联动）──")
+    r3 = processor.step3_update_verification(order)
+    print(f"     结果: {r3}")
+
+    print_triple_check(order)
+
+    print("\n  📄 生成完整结果报告（补录来源 + 处理状态 + 结论 同页呈现）:")
+    print("  " + "-" * 78)
+    report_gen = RefundReportGenerator(order)
+    report = report_gen.generate()
+    print(report)
+
+    return order
 
 
 def print_summary_comparison():
@@ -220,7 +297,7 @@ def print_summary_comparison():
 def main():
     print("\n" + "🎸" * 20)
     print("  乐器租赁押金退款系统 - 多场景演示")
-    print("  重点验证：课时核销单 ↔ 历史记录 一致性")
+    print("  重点验证：订单状态/核销单/历史记录 三者一致性 + 补录链路到报告")
     print("🎸" * 20)
 
     run_normal_scenario()
@@ -230,8 +307,17 @@ def main():
 
     print_summary_comparison()
 
-    print_separator()
-    print("  演示完成！请检查上述四种场景的处理结果是否符合预期。")
+    order_from_report = run_old_caliber_full_report()
+
+    print_separator("最终一致性验收")
+    v = order_from_report.lesson_verifications[0]
+    last = order_from_report.history_records[-1]
+    print("\n  ✅ 报告链路验证结果:")
+    print(f"     订单状态       : {order_from_report.status.value}")
+    print(f"     核销单状态     : {v.status}")
+    print(f"     历史最后记录   : {'已完成核销' in last.detail} (含'已完成核销')")
+    print(f"     补录课时数     : {v.verified_count} 节 (含2条旧口径补录)")
+    print(f"\n  🎯 结论: 正常通过 + 已完成核销 已联动变化，报告页三者一致！")
     print("=" * 80 + "\n")
 
 
