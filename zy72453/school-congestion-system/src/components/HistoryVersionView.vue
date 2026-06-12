@@ -6,7 +6,7 @@
 
         <div class="space-y-6">
           <div
-            v-for="(version, index) in record.historyVersions"
+            v-for="version in record.historyVersions"
             :key="version.id"
             class="relative pl-10"
           >

@@ -106,6 +106,18 @@
             <label class="block text-sm font-medium text-gray-700 mb-1">车辆数量</label>
             <input v-model.number="newInspector.vehicleCount" type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm" />
           </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">行人数量</label>
+            <input v-model.number="newInspector.pedestrianCount" type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">发现问题（逗号分隔）</label>
+            <input v-model="issuesText" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm" placeholder="如：违停,占道经营" />
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">整改建议</label>
+          <textarea v-model="newInspector.suggestions" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm" />
         </div>
         <button
           @click="handleAddInspector"
@@ -119,7 +131,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, watch, computed } from 'vue'
 import { useStore } from '../store'
 import type { CongestionRecord } from '../types'
 
@@ -129,9 +141,10 @@ const props = defineProps<{
 
 const { addGridInspectorRecord, reviewGridInspector, state } = useStore()
 
-const isManager = state.currentUser === 'manager'
+const isManager = computed(() => state.currentUser === 'manager')
 const showAddForm = ref(false)
 const managerNotes = ref('')
+const issuesText = ref('')
 
 const newInspector = reactive({
   inspectorName: '网格员-小张',
@@ -141,6 +154,10 @@ const newInspector = reactive({
   pedestrianCount: 0,
   issues: [] as string[],
   suggestions: ''
+})
+
+watch(issuesText, (val) => {
+  newInspector.issues = val.split(',').map(s => s.trim()).filter(s => s)
 })
 
 function handleAddInspector() {

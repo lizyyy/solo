@@ -123,7 +123,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue'
+import { ref, reactive, watch, computed } from 'vue'
 import { useStore } from '../store'
 import type { CongestionRecord } from '../types'
 
@@ -133,16 +133,23 @@ const props = defineProps<{
 
 const { updateSummary, state } = useStore()
 
-const isManager = state.currentUser === 'manager'
+const isManager = computed(() => state.currentUser === 'manager')
 const missingMaterialsText = ref('')
 
-const form = reactive({
+const form = reactive<{
+  title: string;
+  reasonKept: string;
+  missingMaterials: string[];
+  nextStep: 'inspector' | 'manager' | 'street';
+  nextStepPerson: string;
+  status: 'pending' | 'in_progress' | 'resolved';
+}>({
   title: '',
   reasonKept: '',
-  missingMaterials: [] as string[],
-  nextStep: 'inspector' as const,
+  missingMaterials: [],
+  nextStep: 'inspector',
   nextStepPerson: '市政巡检员',
-  status: 'pending' as const
+  status: 'pending'
 })
 
 watch(() => props.record.summary, (summary) => {

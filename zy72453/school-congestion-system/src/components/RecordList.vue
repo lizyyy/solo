@@ -33,7 +33,8 @@
       >
         <div class="flex items-start justify-between">
           <div class="flex-1">
-            <div class="flex items-center gap-3 mb-2">
+            <div class="flex items-center gap-3 mb-2 flex-wrap">
+              <code class="text-[10px] bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200 text-gray-500">{{ record.id }}</code>
               <span class="font-medium text-gray-800">{{ record.redLineNote.communityName }}</span>
               <span :class="['px-2 py-0.5 rounded text-xs font-medium border', getLevelClass(record.redLineNote.congestionLevel)]">
                 {{ getLevelText(record.redLineNote.congestionLevel) }}
@@ -117,7 +118,7 @@ function getLevelText(level: string) {
   return map[level] || '中度'
 }
 
-function getFlowStepClass(step: string, currentStep: string, index: number) {
+function getFlowStepClass(step: string, currentStep: string, _index: number) {
   const stepOrder = ['import', 'inspector_review', 'summary_update']
   const currentIndex = stepOrder.indexOf(currentStep)
   const stepIndex = stepOrder.indexOf(step)

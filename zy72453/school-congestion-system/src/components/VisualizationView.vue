@@ -133,7 +133,7 @@
 import { computed } from 'vue'
 import { useStore } from '../store'
 
-const { state, filteredRecords, setViewMode, setSelectedRecord, setActiveTab } = useStore()
+const { state, setViewMode, setSelectedRecord, setActiveTab } = useStore()
 
 const viewMode = computed(() => state.viewMode)
 const records = computed(() => state.records)
@@ -170,7 +170,7 @@ const flowDistribution = computed(() => {
   ]
 })
 
-function filterByLevel(level: string) {
+function filterByLevel(_level: string) {
   setActiveTab('all')
   setSelectedRecord(null)
 }

@@ -24,6 +24,13 @@
               </button>
             </div>
             <button
+              @click="handleExportCSV"
+              class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200 transition-colors flex items-center gap-2"
+            >
+              <span>📤</span>
+              导出CSV
+            </button>
+            <button
               @click="showImportModal = true"
               class="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 transition-colors flex items-center gap-2"
             >
@@ -45,7 +52,7 @@
           <div class="space-y-4">
             <div
               v-for="(step, index) in flowSteps"
-              :key="step.value"
+              :key="index"
               class="flex items-start gap-3"
             >
               <div :class="[
@@ -91,10 +98,21 @@ import RecordDetail from './components/RecordDetail.vue'
 import ImportModal from './components/ImportModal.vue'
 import VisualizationView from './components/VisualizationView.vue'
 
-const { state, setCurrentUser } = useStore()
+const { state, setCurrentUser, exportRecordsToCSV } = useStore()
 
 const showImportModal = ref(false)
 const currentUser = computed(() => state.currentUser)
+
+function handleExportCSV() {
+  const csv = exportRecordsToCSV()
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `学校周边接送拥堵_全部记录_${new Date().toISOString().slice(0, 10)}.csv`
+  a.click()
+  URL.revokeObjectURL(url)
+}
 
 const userRoles = [
   { value: 'manager' as const, label: '城更项目经理-阿宁' },

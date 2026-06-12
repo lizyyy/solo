@@ -12,6 +12,10 @@
     <div class="p-4 space-y-6">
       <div class="flex items-center justify-between">
         <div>
+          <div class="flex items-center gap-2 mb-1">
+            <code class="text-[11px] bg-gray-100 px-2 py-0.5 rounded border border-gray-200 text-gray-500">{{ record.id }}</code>
+            <span class="text-[11px] text-gray-400">批次: {{ record.redLineNote.importBatchId }}</span>
+          </div>
           <h4 class="text-xl font-semibold text-gray-800">{{ record.redLineNote.communityName }}</h4>
           <p class="text-sm text-gray-500 mt-1">{{ record.redLineNote.schoolName }} · 距离 {{ record.redLineNote.distanceToSchool }}米</p>
         </div>
@@ -95,7 +99,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useStore } from '../store'
 import RedLineNoteEditor from './RedLineNoteEditor.vue'
 import GridInspectorView from './GridInspectorView.vue'
@@ -106,7 +110,7 @@ import CalculationView from './CalculationView.vue'
 const { selectedRecord, setSelectedRecord, inspectorReview, state } = useStore()
 
 const record = selectedRecord
-const currentUser = state.currentUser
+const currentUser = computed(() => state.currentUser)
 
 const activeDetailTab = ref('redline')
 

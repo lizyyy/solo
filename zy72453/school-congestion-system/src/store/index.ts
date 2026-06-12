@@ -4,13 +4,29 @@ import type {
   Community,
   HistoryVersion,
   ModelParams,
-  ImportBatch,
-  FlowStep,
   RedLineNote,
   GridInspectorRecord,
   StreetSummary,
   CongestionCalculation
 } from '../types'
+
+export type ImportResultItem = {
+  index: number
+  communityName: string
+  schoolName: string
+  status: 'new' | 'duplicate_current' | 'duplicate_history'
+  duplicateRecordId?: string
+  duplicateRecordName?: string
+  recordId?: string
+}
+
+export type ImportResult = {
+  batchId: string
+  items: ImportResultItem[]
+  newCount: number
+  duplicateCurrentCount: number
+  duplicateHistoryCount: number
+}
 
 const generateId = () => Math.random().toString(36).substring(2, 11)
 
@@ -172,22 +188,22 @@ interface State {
   records: CongestionRecord[]
   communities: Community[]
   modelParams: ModelParams
-  importBatches: ImportBatch[]
   currentUser: 'inspector' | 'manager'
   selectedRecordId: string | null
   viewMode: 'list' | 'chart' | '3d'
   activeTab: 'all' | 'pending' | 'needsReview'
+  lastImportResult: ImportResult | null
 }
 
 const state = reactive<State>({
   records: mockRecords,
   communities: mockCommunities,
   modelParams: modelParams,
-  importBatches: [],
   currentUser: 'manager',
   selectedRecordId: null,
   viewMode: 'list',
-  activeTab: 'all'
+  activeTab: 'all',
+  lastImportResult: null
 })
 
 export function useStore() {
@@ -213,7 +229,7 @@ export function useStore() {
     pending: state.records.filter(r => r.flowStep !== 'summary_update').length
   }))
 
-  function findDuplicate(note: Partial<RedLineNote>): CongestionRecord | undefined {
+  function findDuplicateInHistory(note: Partial<RedLineNote>): CongestionRecord | undefined {
     return state.records.find(r => {
       const sameCommunity = r.redLineNote.communityId === note.communityId ||
         r.redLineNote.communityName === note.communityName
@@ -269,51 +285,91 @@ export function useStore() {
     }
   }
 
-  function importRedLineNotes(notes: Partial<RedLineNote>[]): { newCount: number; duplicateCount: number } {
-    let newCount = 0
-    let duplicateCount = 0
+  function importRedLineNotes(notes: Partial<RedLineNote>[]): ImportResult {
     const batchId = generateId()
-
-    for (const note of notes) {
-      const duplicate = findDuplicate(note)
-      if (duplicate) {
-        duplicateCount++
-        continue
-      }
-
-      const conflictCheck = checkCommunityNameConflict(note.communityName || '')
-
-      const newNote: RedLineNote = {
-        id: generateId(),
-        importBatchId: batchId,
-        communityId: note.communityId || generateId(),
-        communityName: note.communityName || '',
-        schoolName: note.schoolName || '',
-        distanceToSchool: note.distanceToSchool || 0,
-        noteContent: note.noteContent || '',
-        congestionLevel: note.congestionLevel || 'medium',
-        importTime: new Date().toLocaleString('zh-CN'),
-        importedBy: state.currentUser === 'manager' ? '城更项目经理-阿宁' : '市政巡检员',
-        isDuplicate: false
-      }
-
-      const newRecord: CongestionRecord = {
-        id: generateId(),
-        redLineNote: newNote,
-        flowStep: 'import',
-        needsReview: conflictCheck.needsReview,
-        reviewReason: conflictCheck.reason,
-        reviewedByInspector: false,
-        createdAt: new Date().toLocaleString('zh-CN'),
-        updatedAt: new Date().toLocaleString('zh-CN'),
-        historyVersions: []
-      }
-
-      state.records.push(newRecord)
-      newCount++
+    const result: ImportResult = {
+      batchId,
+      items: [],
+      newCount: 0,
+      duplicateCurrentCount: 0,
+      duplicateHistoryCount: 0
     }
+    const processedNamesInBatch = new Set<string>()
 
-    return { newCount, duplicateCount }
+    notes.forEach((note, index) => {
+      const dupKey = `${note.communityName || ''}_${note.schoolName || ''}_${note.noteContent || ''}`
+
+      const histDup = findDuplicateInHistory(note)
+      const currentDup = processedNamesInBatch.has(dupKey)
+
+      let status: ImportResultItem['status'] = 'new'
+      let duplicateRecordId: string | undefined
+      let duplicateRecordName: string | undefined
+
+      if (currentDup) {
+        status = 'duplicate_current'
+        const firstMatch = result.items.find(i => i.communityName === note.communityName && (i.status === 'new' || i.status === 'duplicate_history'))
+        duplicateRecordId = firstMatch?.duplicateRecordId || firstMatch?.recordId
+        duplicateRecordName = note.communityName || '(同批次)'
+        result.duplicateCurrentCount++
+      } else if (histDup) {
+        status = 'duplicate_history'
+        duplicateRecordId = histDup.id
+        duplicateRecordName = histDup.redLineNote.communityName
+        result.duplicateHistoryCount++
+        processedNamesInBatch.add(dupKey)
+      }
+
+      const item: ImportResultItem = {
+        index,
+        communityName: note.communityName || '(未填写)',
+        schoolName: note.schoolName || '(未填写)',
+        status,
+        duplicateRecordId,
+        duplicateRecordName
+      }
+
+      if (status === 'new') {
+        processedNamesInBatch.add(dupKey)
+
+        const conflictCheck = checkCommunityNameConflict(note.communityName || '')
+
+        const newNote: RedLineNote = {
+          id: generateId(),
+          importBatchId: batchId,
+          communityId: note.communityId || generateId(),
+          communityName: note.communityName || '',
+          schoolName: note.schoolName || '',
+          distanceToSchool: note.distanceToSchool || 0,
+          noteContent: note.noteContent || '',
+          congestionLevel: note.congestionLevel || 'medium',
+          importTime: new Date().toLocaleString('zh-CN'),
+          importedBy: state.currentUser === 'manager' ? '城更项目经理-阿宁' : '市政巡检员',
+          isDuplicate: false
+        }
+
+        const newRecord: CongestionRecord = {
+          id: generateId(),
+          redLineNote: newNote,
+          flowStep: 'import',
+          needsReview: conflictCheck.needsReview,
+          reviewReason: conflictCheck.reason,
+          reviewedByInspector: false,
+          createdAt: new Date().toLocaleString('zh-CN'),
+          updatedAt: new Date().toLocaleString('zh-CN'),
+          historyVersions: []
+        }
+
+        state.records.push(newRecord)
+        item.recordId = newRecord.id
+        result.newCount++
+      }
+
+      result.items.push(item)
+    })
+
+    state.lastImportResult = result
+    return result
   }
 
   function updateRedLineNote(recordId: string, updates: Partial<RedLineNote>, reason: string) {
@@ -435,7 +491,7 @@ export function useStore() {
     record.updatedAt = new Date().toLocaleString('zh-CN')
   }
 
-  function inspectorReview(recordId: string, approved: boolean, comments: string) {
+  function inspectorReview(recordId: string, approved: boolean, _comments: string) {
     const record = state.records.find(r => r.id === recordId)
     if (!record) return
 
@@ -459,18 +515,6 @@ export function useStore() {
     }
   }
 
-  function advanceFlow(recordId: string) {
-    const record = state.records.find(r => r.id === recordId)
-    if (!record) return
-
-    const flowOrder: FlowStep[] = ['import', 'inspector_review', 'summary_update']
-    const currentIndex = flowOrder.indexOf(record.flowStep)
-    if (currentIndex < flowOrder.length - 1) {
-      record.flowStep = flowOrder[currentIndex + 1]
-      record.updatedAt = new Date().toLocaleString('zh-CN')
-    }
-  }
-
   function setSelectedRecord(id: string | null) {
     state.selectedRecordId = id
   }
@@ -487,6 +531,30 @@ export function useStore() {
     state.currentUser = user
   }
 
+  function exportRecordsToCSV(): string {
+    const headers = [
+      '记录ID', '小区名称', '学校名称', '距离学校(米)', '拥堵等级',
+      '备注内容', '导入时间', '导入人', '流程步骤',
+      '是否待复核', '复核原因', '街道摘要标题', '下一步处理人'
+    ]
+    const rows = state.records.map(r => [
+      r.id,
+      r.redLineNote.communityName,
+      r.redLineNote.schoolName,
+      r.redLineNote.distanceToSchool,
+      r.redLineNote.congestionLevel,
+      r.redLineNote.noteContent.replace(/,/g, '，'),
+      r.redLineNote.importTime,
+      r.redLineNote.importedBy,
+      r.flowStep,
+      r.needsReview ? '是' : '否',
+      r.reviewReason || '',
+      r.summary?.title || '',
+      r.summary?.nextStepPerson || ''
+    ])
+    return [headers, ...rows].map(row => row.join(',')).join('\n')
+  }
+
   return {
     state,
     filteredRecords,
@@ -498,11 +566,11 @@ export function useStore() {
     reviewGridInspector,
     updateSummary,
     inspectorReview,
-    advanceFlow,
     setSelectedRecord,
     setViewMode,
     setActiveTab,
     setCurrentUser,
-    addHistoryVersion
+    addHistoryVersion,
+    exportRecordsToCSV
   }
 }
