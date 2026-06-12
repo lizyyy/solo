@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { Edit3, Clock, AlertTriangle, Save, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Edit3, Clock, AlertTriangle, Save, X, ChevronLeft, ChevronRight, MapPin, FileText } from 'lucide-react';
 import { useAppStore } from '@/store';
 import { showToast } from '@/utils/errorMessageUtils';
 import { getFieldDisplayName } from '@/utils/diffUtils';
@@ -10,6 +11,33 @@ export default function RedlineRemarkManagement() {
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState('');
   const [compareVersions, setCompareVersions] = useState<[number, number] | null>(null);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const locationState = location.state as {
+    fromMap?: boolean;
+    pointId?: string;
+    pointName?: string;
+    highlightRemarkIds?: string[];
+  } | null;
+
+  const [mapContext, setMapContext] = useState<{ pointName: string; pointId: string } | null>(null);
+  const [highlightRemarkIds, setHighlightRemarkIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (locationState?.fromMap && locationState?.pointId) {
+      setSelectedPointId(locationState.pointId);
+      if (locationState.pointName) {
+        setMapContext({ pointName: locationState.pointName, pointId: locationState.pointId });
+      }
+      if (locationState.highlightRemarkIds) {
+        setHighlightRemarkIds(locationState.highlightRemarkIds);
+      }
+      showToast(
+        `已从地图跳转，定位到「${locationState.pointName}」的备注记录`,
+        'info'
+      );
+    }
+  }, [locationState]);
 
   const selectedPoint = points.find((p) => p.id === selectedPointId);
   const remarks = getPointRemarks(selectedPointId);
@@ -58,6 +86,46 @@ export default function RedlineRemarkManagement() {
 
   return (
     <div className="space-y-6">
+      {mapContext && (
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+              <FileText size={20} className="text-blue-600" />
+            </div>
+            <div>
+              <p className="font-medium text-blue-800">
+                正在查看点位「{mapContext.pointName}」的红线图备注
+              </p>
+              <p className="text-sm text-blue-600 mt-0.5">
+                已自动定位到该点位，可与地图溯源互查
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() =>
+                navigate('/map-view', {
+                  state: { fromRedline: true, highlightPointId: mapContext.pointId },
+                })
+              }
+              className="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm flex items-center gap-1.5"
+            >
+              <MapPin size={14} />
+              返回地图
+            </button>
+            <button
+              onClick={() => {
+                setMapContext(null);
+                setHighlightRemarkIds([]);
+              }}
+              className="px-3 py-1.5 border border-blue-300 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors text-sm"
+            >
+              清除上下文
+            </button>
+          </div>
+        </div>
+      )}
+
       <div>
         <h2 className="text-2xl font-bold text-slate-800 font-serif">红线图备注管理</h2>
         <p className="text-slate-500 mt-1">编辑点位备注，查看修改历史和版本对比</p>
@@ -260,43 +328,58 @@ export default function RedlineRemarkManagement() {
               </div>
             ) : (
               <div className="divide-y divide-slate-100">
-                {remarks.map((remark) => (
-                  <div key={remark.id} className="p-4 hover:bg-slate-50 transition-colors">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs font-medium">
-                            v{remark.version}
-                          </span>
-                          <span className="text-sm font-medium text-slate-700">
-                            {remark.createdByName}
-                          </span>
-                        </div>
-                        <p className="text-slate-600 mt-2">{remark.content}</p>
-                      </div>
-                      <span className="text-xs text-slate-400 whitespace-nowrap">
-                        {new Date(remark.createdAt).toLocaleString('zh-CN')}
-                      </span>
-                    </div>
-                    {remark.diff && Object.keys(remark.diff).length > 0 && (
-                      <div className="mt-3 pt-3 border-t border-slate-100">
-                        <p className="text-xs text-slate-400 mb-2">本次修改内容：</p>
-                        {Object.entries(remark.diff).map(([field, values]) => (
-                          <div key={field} className="flex items-center gap-2 text-sm">
-                            <span className="text-slate-500">{getFieldDisplayName(field)}：</span>
-                            <span className="text-red-500 line-through">
-                              {String((values as { before: unknown }).before)}
+                {remarks.map((remark) => {
+                  const isHighlighted = highlightRemarkIds.includes(remark.id);
+                  return (
+                    <div
+                      key={remark.id}
+                      className={`p-4 transition-colors ${
+                        isHighlighted
+                          ? 'bg-amber-50 hover:bg-amber-100 border-l-4 border-l-amber-500'
+                          : 'hover:bg-slate-50'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs font-medium">
+                              v{remark.version}
                             </span>
-                            <ChevronRight size={12} className="text-slate-300" />
-                            <span className="text-green-600">
-                              {String((values as { after: unknown }).after)}
+                            <span className="text-sm font-medium text-slate-700">
+                              {remark.createdByName}
                             </span>
+                            {isHighlighted && (
+                              <span className="px-1.5 py-0.5 bg-amber-200 text-amber-800 rounded text-xs font-medium">
+                                关联
+                              </span>
+                            )}
                           </div>
-                        ))}
+                          <p className="text-slate-600 mt-2">{remark.content}</p>
+                        </div>
+                        <span className="text-xs text-slate-400 whitespace-nowrap">
+                          {new Date(remark.createdAt).toLocaleString('zh-CN')}
+                        </span>
                       </div>
-                    )}
-                  </div>
-                ))}
+                      {remark.diff && Object.keys(remark.diff).length > 0 && (
+                        <div className="mt-3 pt-3 border-t border-slate-100">
+                          <p className="text-xs text-slate-400 mb-2">本次修改内容：</p>
+                          {Object.entries(remark.diff).map(([field, values]) => (
+                            <div key={field} className="flex items-center gap-2 text-sm">
+                              <span className="text-slate-500">{getFieldDisplayName(field)}：</span>
+                              <span className="text-red-500 line-through">
+                                {String((values as { before: unknown }).before)}
+                              </span>
+                              <ChevronRight size={12} className="text-slate-300" />
+                              <span className="text-green-600">
+                                {String((values as { after: unknown }).after)}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>

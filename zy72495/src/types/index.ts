@@ -70,6 +70,7 @@ export interface OperationLog {
   afterData?: unknown;
   diff?: Record<string, { before: unknown; after: unknown }>;
   timestamp: string;
+  metadata?: Record<string, unknown>;
 }
 
 export interface User {

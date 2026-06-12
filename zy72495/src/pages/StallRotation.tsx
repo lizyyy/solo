@@ -13,9 +13,10 @@ import { useAppStore } from '@/store';
 import { showToast } from '@/utils/errorMessageUtils';
 
 export default function StallRotation() {
-  const { stallRotations, points, streets, rollbackToVersion, currentUser } = useAppStore();
+  const { stallRotations, points, streets, rollbackStallRotation, getStallRotationLogs, currentUser } = useAppStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [expandedStallId, setExpandedStallId] = useState<string | null>(null);
 
   const getPointById = (id: string) => points.find((p) => p.id === id);
   const getStreetName = (id: string) => streets.find((s) => s.id === id)?.name || id;
@@ -31,14 +32,41 @@ export default function StallRotation() {
   });
 
   const handleRollback = (stallId: string) => {
-    if (confirm('确定要回滚这条摊位记录吗？')) {
-      const success = rollbackToVersion(stallId, 'stallRotation', 0);
+    const logs = getStallRotationLogs(stallId);
+    const editLogs = logs.filter((l) => l.operationType === 'edit');
+
+    if (editLogs.length === 0) {
+      showToast('回滚失败，该摊位暂无修改记录', 'error');
+      return;
+    }
+
+    const lastEdit = editLogs[0];
+    const diffText = lastEdit.diff
+      ? Object.entries(lastEdit.diff)
+          .map(([field, values]) => {
+            const v = values as { before: unknown; after: unknown };
+            return `${field}: ${v.before} → ${v.after}`;
+          })
+          .join('，')
+      : '未知修改';
+
+    if (confirm(`确定要回滚这条摊位记录吗？\n\n将撤销以下修改：\n${diffText}`)) {
+      const success = rollbackStallRotation(stallId);
       if (success) {
-        showToast('回滚成功', 'success');
+        showToast('回滚成功，已恢复到修改前状态', 'success');
       } else {
-        showToast('回滚失败，无可回滚版本', 'error');
+        showToast('回滚失败，请重试', 'error');
       }
     }
+  };
+
+  const getRollbackButtonState = (stallId: string) => {
+    const logs = getStallRotationLogs(stallId);
+    const editLogs = logs.filter((l) => l.operationType === 'edit');
+    return {
+      disabled: editLogs.length === 0,
+      tooltip: editLogs.length === 0 ? '暂无修改记录，无法回滚' : `可回滚到上一个版本（共${editLogs.length}次修改）`,
+    };
   };
 
   const getStatusBadge = (status: string) => {
@@ -156,8 +184,13 @@ export default function StallRotation() {
                   {currentUser?.role !== 'staff' && (
                     <button
                       onClick={() => handleRollback(stall.id)}
-                      className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                      title="回滚"
+                      disabled={getRollbackButtonState(stall.id).disabled}
+                      className={`p-2 rounded-lg transition-colors ${
+                        getRollbackButtonState(stall.id).disabled
+                          ? 'text-slate-300 cursor-not-allowed'
+                          : 'text-slate-400 hover:text-blue-600 hover:bg-blue-50'
+                      }`}
+                      title={getRollbackButtonState(stall.id).tooltip}
                     >
                       <RotateCcw size={16} />
                     </button>

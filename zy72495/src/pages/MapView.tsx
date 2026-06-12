@@ -1,4 +1,5 @@
 import { useState, useRef, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
@@ -164,6 +165,7 @@ export default function MapView() {
   const [viewMode, setViewMode] = useState<'2d' | '3d' | 'chart'>('3d');
   const [selectedPointId, setSelectedPointId] = useState<string | null>(null);
   const mapRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   const selectedPoint = points.find((p) => p.id === selectedPointId);
   const pointRemarks = selectedPointId ? getPointRemarks(selectedPointId) : [];
@@ -465,21 +467,47 @@ export default function MapView() {
                 <div className="pt-3 space-y-2">
                   <button
                     onClick={() => {
-                      showToast('跳转到公交时段管理', 'success');
+                      navigate('/bus-time', {
+                        state: {
+                          fromMap: true,
+                          pointId: selectedPointId,
+                          pointName: selectedPoint?.name,
+                          highlightSlotIds: pointSlots.map((s) => s.id),
+                        },
+                      });
+                      showToast(`已跳转至公交时段管理，关联 ${pointSlots.length} 条记录`, 'success');
                     }}
-                    className="w-full py-2 px-3 border border-slate-200 rounded-lg text-sm text-slate-700 hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
+                    disabled={pointSlots.length === 0}
+                    className={`w-full py-2 px-3 border rounded-lg text-sm flex items-center justify-center gap-2 transition-colors ${
+                      pointSlots.length === 0
+                        ? 'border-slate-200 text-slate-400 cursor-not-allowed'
+                        : 'border-slate-200 text-slate-700 hover:bg-slate-50'
+                    }`}
                   >
                     <ExternalLink size={14} />
-                    查看关联时段
+                    查看关联时段 ({pointSlots.length})
                   </button>
                   <button
                     onClick={() => {
-                      showToast('跳转到红线备注管理', 'success');
+                      navigate('/redline-remark', {
+                        state: {
+                          fromMap: true,
+                          pointId: selectedPointId,
+                          pointName: selectedPoint?.name,
+                          highlightRemarkIds: pointRemarks.map((r) => r.id),
+                        },
+                      });
+                      showToast(`已跳转至红线备注管理，关联 ${pointRemarks.length} 条记录`, 'success');
                     }}
-                    className="w-full py-2 px-3 border border-slate-200 rounded-lg text-sm text-slate-700 hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
+                    disabled={pointRemarks.length === 0}
+                    className={`w-full py-2 px-3 border rounded-lg text-sm flex items-center justify-center gap-2 transition-colors ${
+                      pointRemarks.length === 0
+                        ? 'border-slate-200 text-slate-400 cursor-not-allowed'
+                        : 'border-slate-200 text-slate-700 hover:bg-slate-50'
+                    }`}
                   >
                     <ExternalLink size={14} />
-                    查看红线备注
+                    查看红线备注 ({pointRemarks.length})
                   </button>
                 </div>
               </div>

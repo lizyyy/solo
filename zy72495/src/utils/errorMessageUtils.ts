@@ -25,12 +25,13 @@ export function getErrorMessage(errorCode: string, params?: Record<string, strin
   return message;
 }
 
-export function showToast(message: string, type: 'success' | 'error' | 'warning' = 'error') {
+export function showToast(message: string, type: 'success' | 'error' | 'warning' | 'info' = 'error') {
   const toast = document.createElement('div');
   const colors = {
     success: 'bg-green-500',
     error: 'bg-red-500',
     warning: 'bg-amber-500',
+    info: 'bg-blue-500',
   };
   toast.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-lg text-white shadow-lg transform transition-all duration-300 translate-x-full ${colors[type]}`;
   toast.textContent = message;

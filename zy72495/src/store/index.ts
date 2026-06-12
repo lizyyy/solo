@@ -32,11 +32,15 @@ interface AppState {
   login: (username: string) => boolean;
   logout: () => void;
 
-  addBusTimeSlots: (slots: BusTimeSlot[]) => void;
+  addBusTimeSlots: (slots: BusTimeSlot[], batchId?: string) => { newCount: number; updateCount: number };
+  updateBusTimeSlot: (id: string, updates: Partial<BusTimeSlot>) => boolean;
   deleteBusTimeSlot: (id: string) => void;
 
   addRedlineRemark: (pointId: string, content: string, userId: string, userName: string) => void;
   getPointRemarks: (pointId: string) => RedlineRemark[];
+
+  updateStallRotation: (id: string, updates: Partial<StallRotation>) => boolean;
+  rollbackStallRotation: (stallId: string) => boolean;
 
   updatePointBoundaryStatus: (
     pointId: string,
@@ -53,15 +57,21 @@ interface AppState {
     targetType: OperationLog['targetType'],
     targetId: string,
     beforeData?: unknown,
-    afterData?: unknown
+    afterData?: unknown,
+    metadata?: Record<string, unknown>
   ) => void;
 
   rollbackToVersion: (targetId: string, targetType: OperationLog['targetType'], versionIndex: number) => boolean;
   getPendingReviewPoints: () => Point[];
+  getStallRotationLogs: (stallId: string) => OperationLog[];
 }
 
 function generateId(prefix: string): string {
   return prefix + Date.now() + Math.random().toString(36).substr(2, 9);
+}
+
+function generateBatchId(): string {
+  return 'batch-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6);
 }
 
 export const useAppStore = create<AppState>()(
@@ -88,23 +98,95 @@ export const useAppStore = create<AppState>()(
         set({ currentUser: null });
       },
 
-      addBusTimeSlots: (slots: BusTimeSlot[]) => {
+      addBusTimeSlots: (slots: BusTimeSlot[], batchId?: string) => {
         const beforeData = [...get().busTimeSlots];
-        set((state) => ({
-          busTimeSlots: [...state.busTimeSlots, ...slots],
-        }));
+        const existingSlots = get().busTimeSlots;
+        const newSlots: BusTimeSlot[] = [];
+        const updatedSlots: BusTimeSlot[] = [];
+        let updateCount = 0;
+        let newCount = 0;
+
+        const now = new Date().toISOString();
+        const actualBatchId = batchId || slots[0]?.importBatchId || generateBatchId();
+
+        slots.forEach((slot) => {
+          const existingIndex = existingSlots.findIndex(
+            (s) =>
+              s.routeName === slot.routeName &&
+              s.date === slot.date &&
+              s.startTime === slot.startTime &&
+              s.endTime === slot.endTime
+          );
+
+          if (existingIndex >= 0) {
+            const existing = existingSlots[existingIndex];
+            const updated = {
+              ...existing,
+              passengerCount: slot.passengerCount,
+              relatedPointIds: slot.relatedPointIds.length > 0 ? slot.relatedPointIds : existing.relatedPointIds,
+              updatedAt: now,
+              importBatchId: actualBatchId,
+            };
+            updatedSlots.push(updated);
+            updateCount++;
+          } else {
+            newSlots.push(slot);
+            newCount++;
+          }
+        });
+
+        set((state) => {
+          let newStateSlots = [...state.busTimeSlots];
+          updatedSlots.forEach((updated) => {
+            const idx = newStateSlots.findIndex((s) => s.id === updated.id);
+            if (idx >= 0) newStateSlots[idx] = updated;
+          });
+          newStateSlots = [...newStateSlots, ...newSlots];
+          return { busTimeSlots: newStateSlots };
+        });
+
         const user = get().currentUser;
         if (user) {
+          const allIds = [...updatedSlots.map((s) => s.id), ...newSlots.map((s) => s.id)];
+          const afterData = [...get().busTimeSlots];
           get().addOperationLog(
             user.id,
             user.name,
             'import',
             'busTimeSlot',
-            slots.map((s) => s.id).join(','),
+            allIds.join(','),
             beforeData,
-            [...beforeData, ...slots]
+            afterData,
+            {
+              batchId: actualBatchId,
+              newCount,
+              updateCount,
+              updateSlotIds: updatedSlots.map((s) => s.id),
+              newSlotIds: newSlots.map((s) => s.id),
+            }
           );
         }
+
+        return { newCount, updateCount };
+      },
+
+      updateBusTimeSlot: (id: string, updates: Partial<BusTimeSlot>) => {
+        const existing = get().busTimeSlots.find((s) => s.id === id);
+        if (!existing) return false;
+
+        const beforeData = { ...existing };
+        const now = new Date().toISOString();
+        const updated = { ...existing, ...updates, updatedAt: now };
+
+        set((state) => ({
+          busTimeSlots: state.busTimeSlots.map((s) => (s.id === id ? updated : s)),
+        }));
+
+        const user = get().currentUser;
+        if (user) {
+          get().addOperationLog(user.id, user.name, 'edit', 'busTimeSlot', id, beforeData, updated);
+        }
+        return true;
       },
 
       deleteBusTimeSlot: (id: string) => {
@@ -214,7 +296,8 @@ export const useAppStore = create<AppState>()(
         targetType: OperationLog['targetType'],
         targetId: string,
         beforeData?: unknown,
-        afterData?: unknown
+        afterData?: unknown,
+        metadata?: Record<string, unknown>
       ) => {
         const diff =
           beforeData && afterData
@@ -224,7 +307,7 @@ export const useAppStore = create<AppState>()(
               )
             : undefined;
 
-        const log: OperationLog = {
+        const log: OperationLog & { metadata?: Record<string, unknown> } = {
           id: generateId('log'),
           operatorId,
           operatorName,
@@ -235,11 +318,65 @@ export const useAppStore = create<AppState>()(
           afterData,
           diff,
           timestamp: new Date().toISOString(),
+          metadata,
         };
 
         set((state) => ({
           operationLogs: [log, ...state.operationLogs],
         }));
+      },
+
+      updateStallRotation: (id: string, updates: Partial<StallRotation>) => {
+        const existing = get().stallRotations.find((s) => s.id === id);
+        if (!existing) return false;
+
+        const beforeData = { ...existing };
+        const updated = { ...existing, ...updates };
+
+        set((state) => ({
+          stallRotations: state.stallRotations.map((s) => (s.id === id ? updated : s)),
+        }));
+
+        const user = get().currentUser;
+        if (user) {
+          get().addOperationLog(user.id, user.name, 'edit', 'stallRotation', id, beforeData, updated);
+        }
+        return true;
+      },
+
+      rollbackStallRotation: (stallId: string) => {
+        const logs = get().operationLogs.filter(
+          (l) => l.targetType === 'stallRotation' && l.targetId === stallId
+        );
+        if (logs.length === 0) return false;
+
+        const lastEditLog = logs.find((l) => l.operationType === 'edit');
+        if (!lastEditLog || !lastEditLog.beforeData) return false;
+
+        const user = get().currentUser;
+        if (!user) return false;
+
+        const beforeData = lastEditLog.beforeData as StallRotation;
+        const existing = get().stallRotations.find((s) => s.id === stallId);
+        if (!existing) return false;
+
+        const reverted = { ...existing, ...beforeData };
+        set((state) => ({
+          stallRotations: state.stallRotations.map((s) => (s.id === stallId ? reverted : s)),
+        }));
+
+        get().addOperationLog(
+          user.id,
+          user.name,
+          'rollback',
+          'stallRotation',
+          stallId,
+          existing,
+          reverted,
+          { rollbackFromVersion: lastEditLog.id }
+        );
+
+        return true;
       },
 
       rollbackToVersion: (targetId: string, targetType: OperationLog['targetType'], versionIndex: number) => {
@@ -263,11 +400,38 @@ export const useAppStore = create<AppState>()(
           return true;
         }
 
+        if (targetType === 'stallRotation' && targetLog.beforeData) {
+          return get().rollbackStallRotation(targetId);
+        }
+
+        if (targetType === 'busTimeSlot' && targetLog.beforeData) {
+          const beforeSlots = targetLog.beforeData as BusTimeSlot[];
+          const ids = targetId.split(',');
+          let success = false;
+          ids.forEach((id) => {
+            const beforeSlot = beforeSlots.find((s) => s.id === id);
+            if (beforeSlot) {
+              const ok = get().updateBusTimeSlot(id, {
+                passengerCount: beforeSlot.passengerCount,
+                relatedPointIds: beforeSlot.relatedPointIds,
+              });
+              if (ok) success = true;
+            }
+          });
+          return success;
+        }
+
         return false;
       },
 
       getPendingReviewPoints: () => {
         return get().points.filter((p) => p.boundaryStatus === 'pending');
+      },
+
+      getStallRotationLogs: (stallId: string) => {
+        return get().operationLogs.filter(
+          (l) => l.targetType === 'stallRotation' && l.targetId === stallId
+        );
       },
     }),
     {

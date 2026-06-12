@@ -1,23 +1,118 @@
-import { useState, useRef } from 'react';
-import { Upload, Trash2, Search, FileSpreadsheet, X, AlertCircle } from 'lucide-react';
+import { useState, useRef, useEffect, useMemo } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import * as XLSX from 'xlsx';
+import { Upload, Trash2, Search, FileSpreadsheet, X, AlertCircle, MapPin, Download, ChevronDown, Clock } from 'lucide-react';
 import { useAppStore } from '@/store';
 import { importFromFile, type ImportResult } from '@/services/ImportService';
 import { showToast } from '@/utils/errorMessageUtils';
+import { getFieldDisplayName } from '@/utils/diffUtils';
 
 export default function BusTimeManagement() {
-  const { busTimeSlots, addBusTimeSlots, deleteBusTimeSlot, currentUser } = useAppStore();
+  const { busTimeSlots, addBusTimeSlots, updateBusTimeSlot, deleteBusTimeSlot, operationLogs, currentUser } = useAppStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null);
+  const [showBatchFilter, setShowBatchFilter] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const locationState = location.state as {
+    fromMap?: boolean;
+    pointId?: string;
+    pointName?: string;
+    highlightSlotIds?: string[];
+  } | null;
 
-  const filteredSlots = busTimeSlots.filter(
-    (slot) =>
-      slot.routeName.includes(searchQuery) ||
-      slot.date.includes(searchQuery) ||
-      slot.startTime.includes(searchQuery)
-  );
+  const [highlightSlotIds, setHighlightSlotIds] = useState<string[]>([]);
+  const [mapContext, setMapContext] = useState<{ pointName: string; pointId: string } | null>(null);
+
+  useEffect(() => {
+    if (locationState?.fromMap && locationState?.highlightSlotIds) {
+      setHighlightSlotIds(locationState.highlightSlotIds);
+      if (locationState.pointName && locationState.pointId) {
+        setMapContext({ pointName: locationState.pointName, pointId: locationState.pointId });
+      }
+      showToast(
+        `已从地图跳转，高亮显示 ${locationState.highlightSlotIds.length} 条关联时段`,
+        'info'
+      );
+    }
+  }, [locationState]);
+
+  const batchIds = useMemo(() => {
+    const ids = new Set<string>();
+    busTimeSlots.forEach((slot) => ids.add(slot.importBatchId));
+    return Array.from(ids).sort((a, b) => {
+      const aTime = parseInt(a.split('-')[1] || '0');
+      const bTime = parseInt(b.split('-')[1] || '0');
+      return bTime - aTime;
+    });
+  }, [busTimeSlots]);
+
+  const importLogs = useMemo(() => {
+    return operationLogs
+      .filter((l) => l.operationType === 'import' && l.targetType === 'busTimeSlot')
+      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+  }, [operationLogs]);
+
+  const getBatchInfo = (batchId: string) => {
+    const log = importLogs.find((l) => l.metadata?.batchId === batchId);
+    if (log) {
+      return {
+        time: new Date(log.timestamp).toLocaleString('zh-CN'),
+        operator: log.operatorName,
+        newCount: (log.metadata?.newCount as number) || 0,
+        updateCount: (log.metadata?.updateCount as number) || 0,
+      };
+    }
+    return null;
+  };
+
+  const filteredSlots = useMemo(() => {
+    let slots = [...busTimeSlots];
+
+    if (selectedBatchId) {
+      slots = slots.filter((s) => s.importBatchId === selectedBatchId);
+    }
+
+    if (searchQuery) {
+      slots = slots.filter(
+        (slot) =>
+          slot.routeName.includes(searchQuery) ||
+          slot.date.includes(searchQuery) ||
+          slot.startTime.includes(searchQuery)
+      );
+    }
+
+    return slots;
+  }, [busTimeSlots, selectedBatchId, searchQuery]);
+
+  const handleExport = () => {
+    try {
+      const exportData = filteredSlots.map((slot) => ({
+        记录ID: slot.id,
+        线路名称: slot.routeName,
+        日期: slot.date,
+        开始时间: slot.startTime,
+        结束时间: slot.endTime,
+        客流数: slot.passengerCount,
+        关联点位数量: slot.relatedPointIds.length,
+        导入批次: slot.importBatchId,
+        创建时间: new Date(slot.createdAt).toLocaleString('zh-CN'),
+        更新时间: new Date(slot.updatedAt).toLocaleString('zh-CN'),
+      }));
+
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.json_to_sheet(exportData);
+      XLSX.utils.book_append_sheet(wb, ws, '公交时段数据');
+      XLSX.writeFile(wb, `公交刷卡时段_${new Date().toISOString().slice(0, 10)}.xlsx`);
+      showToast(`导出成功，共 ${exportData.length} 条记录`, 'success');
+    } catch (e) {
+      showToast('导出失败，请重试', 'error');
+    }
+  };
 
   const handleFileSelect = async (file: File) => {
     const result = await importFromFile(file, busTimeSlots);
@@ -34,8 +129,17 @@ export default function BusTimeManagement() {
 
   const handleConfirmImport = () => {
     if (importResult && importResult.data.length > 0) {
-      addBusTimeSlots(importResult.data);
-      showToast(`成功导入 ${importResult.newCount} 条数据`, 'success');
+      const batchId = importResult.data[0]?.importBatchId;
+      const result = addBusTimeSlots(importResult.data, batchId);
+      const total = result.newCount + result.updateCount;
+      if (result.updateCount > 0) {
+        showToast(
+          `导入完成：新增${result.newCount}条，更新${result.updateCount}条历史记录`,
+          'success'
+        );
+      } else {
+        showToast(`成功导入 ${result.newCount} 条数据`, 'success');
+      }
     }
     setShowPreview(false);
     setImportResult(null);
@@ -60,6 +164,46 @@ export default function BusTimeManagement() {
 
   return (
     <div className="space-y-6">
+      {mapContext && (
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+              <MapPin size={20} className="text-blue-600" />
+            </div>
+            <div>
+              <p className="font-medium text-blue-800">
+                正在查看点位「{mapContext.pointName}」的关联时段
+              </p>
+              <p className="text-sm text-blue-600 mt-0.5">
+                高亮显示 {highlightSlotIds.length} 条关联记录，可与地图溯源互查
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() =>
+                navigate('/map-view', {
+                  state: { fromBusTime: true, highlightPointId: mapContext.pointId },
+                })
+              }
+              className="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm flex items-center gap-1.5"
+            >
+              <MapPin size={14} />
+              返回地图
+            </button>
+            <button
+              onClick={() => {
+                setMapContext(null);
+                setHighlightSlotIds([]);
+              }}
+              className="px-3 py-1.5 border border-blue-300 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors text-sm"
+            >
+              清除上下文
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-slate-800 font-serif">公交刷卡时段管理</h2>
@@ -72,6 +216,13 @@ export default function BusTimeManagement() {
           >
             <FileSpreadsheet size={18} />
             下载模板
+          </button>
+          <button
+            onClick={handleExport}
+            className="px-4 py-2 border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-2"
+          >
+            <Download size={18} />
+            导出当前筛选
           </button>
           <button
             onClick={() => fileInputRef.current?.click()}
@@ -120,18 +271,88 @@ export default function BusTimeManagement() {
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-slate-100">
-        <div className="p-4 border-b border-slate-100 flex items-center justify-between">
-          <div className="relative">
-            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input
-              type="text"
-              placeholder="搜索线路、日期、时间..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-4 py-2 border border-slate-200 rounded-lg w-72 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-            />
+        <div className="p-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                type="text"
+                placeholder="搜索线路、日期、时间..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 pr-4 py-2 border border-slate-200 rounded-lg w-72 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+              />
+            </div>
+            <div className="relative">
+              <button
+                onClick={() => setShowBatchFilter(!showBatchFilter)}
+                className="px-4 py-2 border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-2"
+              >
+                <Clock size={16} />
+                {selectedBatchId ? '已选批次' : '按批次筛选'}
+                <ChevronDown size={16} className={showBatchFilter ? 'rotate-180' : ''} />
+              </button>
+              {showBatchFilter && (
+                <div className="absolute top-full left-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-slate-200 z-10 max-h-80 overflow-auto">
+                  <button
+                    onClick={() => {
+                      setSelectedBatchId(null);
+                      setShowBatchFilter(false);
+                    }}
+                    className={`w-full px-4 py-3 text-left hover:bg-slate-50 transition-colors border-b border-slate-100 text-left ${!selectedBatchId ? 'text-blue-600 bg-blue-50' : 'text-slate-700'}`}
+                  >
+                    全部批次
+                  </button>
+                  {batchIds.map((batchId) => {
+                    const info = getBatchInfo(batchId);
+                    return (
+                      <button
+                        key={batchId}
+                        onClick={() => {
+                          setSelectedBatchId(batchId);
+                          setShowBatchFilter(false);
+                        }}
+                        className={`w-full px-4 py-3 text-left hover:bg-slate-50 transition-colors border-b border-slate-100 ${
+                          selectedBatchId === batchId ? 'text-blue-600 bg-blue-50' : 'text-slate-700'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="font-mono text-xs">{batchId}</span>
+                          {info?.updateCount ? (
+                            <span className="text-xs px-2 py-0.5 bg-amber-100 text-amber-700 rounded">
+                              更新{info.updateCount}条
+                            </span>
+                          ) : null}
+                        </div>
+                        <div className="text-xs text-slate-500 mt-1">
+                          {info ? (
+                            <>
+                              {info.time} · {info.operator} · 新增{info.newCount}条
+                            </>
+                          ) : (
+                            <>初始导入批次</>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+            {selectedBatchId && (
+              <span className="text-sm text-slate-500">
+                当前批次：<span className="font-mono text-xs text-blue-600">{selectedBatchId}</span>
+              </span>
+            )}
           </div>
-          <span className="text-sm text-slate-500">共 {filteredSlots.length} 条记录</span>
+          <div className="flex items-center gap-4">
+            {highlightSlotIds.length > 0 && (
+              <span className="text-sm text-amber-600 bg-amber-50 px-3 py-1 rounded-lg">
+                已高亮 {highlightSlotIds.length} 条关联记录
+              </span>
+            )}
+            <span className="text-sm text-slate-500">共 {filteredSlots.length} 条记录</span>
+          </div>
         </div>
 
         <div className="overflow-x-auto">
@@ -156,40 +377,68 @@ export default function BusTimeManagement() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
                   关联点位
                 </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                  导入批次
+                </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">
                   操作
                 </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {filteredSlots.map((slot) => (
-                <tr key={slot.id} className="hover:bg-slate-50 transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="font-medium text-slate-800">{slot.routeName}</span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-slate-600">{slot.date}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-slate-600">{slot.startTime}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-slate-600">{slot.endTime}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded text-sm">
-                      {slot.passengerCount} 人
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-slate-500 text-sm">
-                    {slot.relatedPointIds.length} 个
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right">
-                    {currentUser?.role !== 'staff' && (
-                      <button
-                        onClick={() => handleDelete(slot.id)}
-                        className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
+              {filteredSlots.map((slot) => {
+                const isHighlighted = highlightSlotIds.includes(slot.id);
+                const batchInfo = getBatchInfo(slot.importBatchId);
+                return (
+                  <tr
+                    key={slot.id}
+                    className={`transition-colors ${
+                      isHighlighted
+                        ? 'bg-amber-50 hover:bg-amber-100 border-l-4 border-l-amber-500'
+                        : 'hover:bg-slate-50'
+                    }`}
+                  >
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="font-medium text-slate-800">{slot.routeName}</span>
+                      {isHighlighted && (
+                        <span className="ml-2 px-1.5 py-0.5 bg-amber-200 text-amber-800 rounded text-xs font-medium">
+                          关联
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-slate-600">{slot.date}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-slate-600">{slot.startTime}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-slate-600">{slot.endTime}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded text-sm">
+                        {slot.passengerCount} 人
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-slate-500 text-sm">
+                      {slot.relatedPointIds.length} 个
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-xs">
+                        <span className="font-mono text-slate-500">{slot.importBatchId.slice(-12)}</span>
+                        {batchInfo && (
+                          <p className="text-slate-400 mt-0.5">{batchInfo.time.split(' ')[0]}</p>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right">
+                      {currentUser?.role !== 'staff' && (
+                        <button
+                          onClick={() => handleDelete(slot.id)}
+                          className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                          title="删除"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
