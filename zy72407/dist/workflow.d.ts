@@ -1,10 +1,16 @@
 import { WorkflowState, StepName, ConsumptionRecord, ImportBatch } from './types';
 export declare function createInitialWorkflow(): WorkflowState;
 export declare function advanceStep(state: WorkflowState, stepName: StepName, operator: string): WorkflowState;
+export declare function finishWorkflow(state: WorkflowState, operator: string): WorkflowState;
+export declare function isWorkflowDone(state: WorkflowState): boolean;
 export declare function step1ImportTunerMessages(tunerLines: string[], operator: string): {
     records: ConsumptionRecord[];
     batch: ImportBatch;
     workflow: WorkflowState;
+    reuseReport: {
+        reused: number;
+        newlyAdded: number;
+    };
 };
 export declare function step2ReviewGroupSignup(groupLines: string[], operator: string, currentWorkflow: WorkflowState): {
     records: ConsumptionRecord[];

@@ -97,6 +97,63 @@ export function updateRecordStatus(
   }
 }
 
+export function confirmRecord(
+  record: ConsumptionRecord,
+  operator: string,
+  confirm: boolean,
+  reason?: string
+): ConsumptionRecord {
+  if (record.status !== RecordStatus.NEEDS_REVIEW) {
+    return record
+  }
+
+  if (confirm) {
+    const auditLog = createAuditLog(
+      operator,
+      'review_confirm',
+      'status',
+      record.status,
+      RecordStatus.CONFIRMED,
+      reason || '票务同事复核通过'
+    )
+
+    const reviewFlagLog = record.reviewFlag !== ReviewFlag.NONE
+      ? [createAuditLog(
+          operator,
+          'review_flag_cleared',
+          'reviewFlag',
+          record.reviewFlag,
+          ReviewFlag.NONE,
+          reason || '复核后清除标记'
+        )]
+      : []
+
+    return {
+      ...record,
+      status: RecordStatus.CONFIRMED,
+      reviewFlag: ReviewFlag.NONE,
+      manualEdits: [...record.manualEdits, auditLog, ...reviewFlagLog],
+      updatedAt: new Date().toISOString()
+    }
+  } else {
+    const auditLog = createAuditLog(
+      operator,
+      'review_reject',
+      undefined,
+      undefined,
+      undefined,
+      reason || '复核不予通过'
+    )
+
+    return {
+      ...record,
+      status: RecordStatus.ERROR,
+      manualEdits: [...record.manualEdits, auditLog],
+      updatedAt: new Date().toISOString()
+    }
+  }
+}
+
 export function confirmTempSubstitute(
   record: ConsumptionRecord,
   operator: string,

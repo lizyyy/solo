@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createAuditLog = createAuditLog;
 exports.addManualEdit = addManualEdit;
 exports.updateRecordStatus = updateRecordStatus;
+exports.confirmRecord = confirmRecord;
 exports.confirmTempSubstitute = confirmTempSubstitute;
 exports.settleRecords = settleRecords;
 exports.getRecordAuditTrail = getRecordAuditTrail;
@@ -50,6 +51,33 @@ function updateRecordStatus(record, newStatus, operator, reason) {
         manualEdits: [...record.manualEdits, auditLog],
         updatedAt: new Date().toISOString()
     };
+}
+function confirmRecord(record, operator, confirm, reason) {
+    if (record.status !== types_1.RecordStatus.NEEDS_REVIEW) {
+        return record;
+    }
+    if (confirm) {
+        const auditLog = createAuditLog(operator, 'review_confirm', 'status', record.status, types_1.RecordStatus.CONFIRMED, reason || '票务同事复核通过');
+        const reviewFlagLog = record.reviewFlag !== types_1.ReviewFlag.NONE
+            ? [createAuditLog(operator, 'review_flag_cleared', 'reviewFlag', record.reviewFlag, types_1.ReviewFlag.NONE, reason || '复核后清除标记')]
+            : [];
+        return {
+            ...record,
+            status: types_1.RecordStatus.CONFIRMED,
+            reviewFlag: types_1.ReviewFlag.NONE,
+            manualEdits: [...record.manualEdits, auditLog, ...reviewFlagLog],
+            updatedAt: new Date().toISOString()
+        };
+    }
+    else {
+        const auditLog = createAuditLog(operator, 'review_reject', undefined, undefined, undefined, reason || '复核不予通过');
+        return {
+            ...record,
+            status: types_1.RecordStatus.ERROR,
+            manualEdits: [...record.manualEdits, auditLog],
+            updatedAt: new Date().toISOString()
+        };
+    }
 }
 function confirmTempSubstitute(record, operator, confirm, reason) {
     if (record.reviewFlag !== types_1.ReviewFlag.TEMP_SUB_ONLY_IN_GROUP) {

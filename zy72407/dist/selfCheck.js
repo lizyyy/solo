@@ -70,18 +70,18 @@ function detectTempSubstitutes(records) {
 function detectMismatches(records) {
     const issues = [];
     records.forEach(record => {
-        if (record.status === types_1.RecordStatus.MATCHED) {
-            if (record.tunerMessageId && record.groupSignupId) {
-                const tunerTime = record.courseTime;
-                const groupTime = record.courseTime;
-                if (tunerTime !== groupTime && tunerTime && groupTime) {
-                    issues.push(generateIssue('mismatch', 'low', `记录时间口径不一致: ${record.studentName} ${record.courseDate}`, [record.id], {
-                        tunerTime,
-                        groupTime,
-                        tunerLine: record.tunerOriginalLineNumber,
-                        groupLine: record.groupOriginalLineNumber
-                    }));
-                }
+        if (record.tunerMessageId && record.groupSignupId && record.groupCourseTime) {
+            const tunerTime = record.courseTime;
+            const groupTime = record.groupCourseTime;
+            if (tunerTime !== groupTime && tunerTime && groupTime) {
+                issues.push(generateIssue('mismatch', 'high', `口径不一致: ${record.studentName} ${record.courseDate}，调音师留言记录${tunerTime}，群接龙记录${groupTime}`, [record.id], {
+                    tunerTime,
+                    groupTime,
+                    tunerLine: record.tunerOriginalLineNumber,
+                    groupLine: record.groupOriginalLineNumber,
+                    tunerRawContent: record.tunerRawContent,
+                    groupRawContent: record.groupRawContent
+                }));
             }
         }
     });
@@ -144,15 +144,17 @@ function verifyExportConsistency(records, exportedData) {
 function recalculateAfterSupplement(records) {
     const now = new Date().toISOString();
     return records.map(record => {
-        if (record.status === types_1.RecordStatus.NEEDS_REVIEW ||
-            record.reviewFlag !== types_1.ReviewFlag.NONE) {
-            return record;
-        }
         const updated = { ...record, updatedAt: now };
-        if (updated.tunerMessageId && updated.groupSignupId) {
+        if (record.status === types_1.RecordStatus.NEEDS_REVIEW && record.reviewFlag === types_1.ReviewFlag.MISMATCH) {
+            return updated;
+        }
+        if (record.status === types_1.RecordStatus.NEEDS_REVIEW && record.reviewFlag === types_1.ReviewFlag.TEMP_SUB_ONLY_IN_GROUP) {
+            return updated;
+        }
+        if (updated.tunerMessageId && updated.groupSignupId && updated.reviewFlag === types_1.ReviewFlag.NONE) {
             updated.status = types_1.RecordStatus.MATCHED;
         }
-        if (updated.durationMinutes > 0 && !updated.settlementAmount) {
+        if (updated.durationMinutes > 0 && !updated.settlementAmount && updated.status !== types_1.RecordStatus.NEEDS_REVIEW) {
             const ratePerMinute = 2;
             updated.settlementAmount = updated.durationMinutes * ratePerMinute;
         }

@@ -99,13 +99,26 @@ export class UnifiedResultStore {
       status: record.status,
       reviewFlag: record.reviewFlag,
       settlementAmount: record.settlementAmount,
-      tunerOriginalLineNumber: record.tunerOriginalLineNumber,
-      tunerRawContent: record.tunerRawContent,
-      groupOriginalLineNumber: record.groupOriginalLineNumber,
-      groupRawContent: record.groupRawContent,
-      manualEdits: record.manualEdits.length,
+      importSource: record.importSource || '',
+      importBatchLabel: record.importBatchLabel || '',
+      tunerOriginalLineNumber: record.tunerOriginalLineNumber ?? '',
+      tunerRawContent: record.tunerRawContent ?? '',
+      groupOriginalLineNumber: record.groupOriginalLineNumber ?? '',
+      groupRawContent: record.groupRawContent ?? '',
+      groupCourseTime: record.groupCourseTime ?? '',
+      manualEditsCount: record.manualEdits.length,
+      manualEditsDetail: record.manualEdits.map(e => ({
+        timestamp: e.timestamp,
+        operator: e.operator,
+        action: e.action,
+        field: e.fieldName ?? '',
+        oldValue: e.oldValue ?? '',
+        newValue: e.newValue ?? '',
+        reason: e.reason ?? ''
+      })),
       createdAt: record.createdAt,
-      updatedAt: record.updatedAt
+      updatedAt: record.updatedAt,
+      settledAt: record.settledAt ?? ''
     }))
   }
 
@@ -123,14 +136,23 @@ export class UnifiedResultStore {
         tunerMessage: record.tunerMessageId ? {
           id: record.tunerMessageId,
           originalLineNumber: record.tunerOriginalLineNumber,
-          rawContent: record.tunerRawContent
+          rawContent: record.tunerRawContent,
+          courseTime: record.courseTime
         } : null,
         groupSignup: record.groupSignupId ? {
           id: record.groupSignupId,
           originalLineNumber: record.groupOriginalLineNumber,
-          rawContent: record.groupRawContent
+          rawContent: record.groupRawContent,
+          courseTime: record.groupCourseTime
         } : null,
-        manualEdits: record.manualEdits
+        isMismatch: !!(record.groupCourseTime && record.courseTime && record.groupCourseTime !== record.courseTime),
+        mismatchDetail: (record.groupCourseTime && record.courseTime && record.groupCourseTime !== record.courseTime)
+          ? `调音师留言记录${record.courseTime}，群接龙记录${record.groupCourseTime}`
+          : null,
+        isTempSubOnlyInGroup: record.reviewFlag === ReviewFlag.TEMP_SUB_ONLY_IN_GROUP,
+        manualEdits: record.manualEdits,
+        importSource: record.importSource,
+        importBatchLabel: record.importBatchLabel
       }
     }
   }

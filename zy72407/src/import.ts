@@ -123,6 +123,7 @@ export function createConsumptionRecordsFromTuner(
     tunerMessageId: tuner.id,
     tunerOriginalLineNumber: tuner.originalLineNumber,
     tunerRawContent: tuner.rawContent,
+    importSource: 'tuner_first',
     
     manualEdits: [],
     createdAt: now,
@@ -135,30 +136,80 @@ export function mergeGroupSignupToRecords(
   groupRecords: GroupSignupRaw[]
 ): ConsumptionRecord[] {
   const now = new Date().toISOString()
-  const updatedRecords = [...existingRecords]
+  const updatedRecords = existingRecords.map(r => ({ ...r }))
   const usedGroupIds = new Set<string>()
 
   updatedRecords.forEach(record => {
-    const match = groupRecords.find(group => {
+    const exactMatch = groupRecords.find(group => {
       if (usedGroupIds.has(group.id)) return false
       return (
         group.studentName === record.studentName &&
         group.courseDate === record.courseDate &&
-        (group.courseTime === record.courseTime || 
-         group.teacherName === record.teacherName)
+        group.courseTime === record.courseTime &&
+        group.teacherName === record.teacherName
       )
     })
 
-    if (match) {
-      usedGroupIds.add(match.id)
-      record.groupSignupId = match.id
-      record.groupOriginalLineNumber = match.originalLineNumber
-      record.groupRawContent = match.rawContent
-      record.isOnSite = match.isOnSite
+    if (exactMatch) {
+      usedGroupIds.add(exactMatch.id)
+      record.groupSignupId = exactMatch.id
+      record.groupOriginalLineNumber = exactMatch.originalLineNumber
+      record.groupRawContent = exactMatch.rawContent
+      record.groupCourseTime = exactMatch.courseTime
+      record.isOnSite = exactMatch.isOnSite
       record.status = RecordStatus.MATCHED
+      record.reviewFlag = ReviewFlag.NONE
       record.matchedBy = 'auto'
       record.matchedAt = now
       record.updatedAt = now
+      record.manualEdits = [
+        ...record.manualEdits,
+        {
+          id: uuidv4(),
+          timestamp: now,
+          operator: 'system',
+          action: 'auto_match',
+          fieldName: 'groupSignupId',
+          newValue: exactMatch.id,
+          reason: '调音师留言与群接龙完全匹配(姓名+日期+时间+老师)'
+        }
+      ]
+      return
+    }
+
+    const fuzzyMatch = groupRecords.find(group => {
+      if (usedGroupIds.has(group.id)) return false
+      return (
+        group.studentName === record.studentName &&
+        group.courseDate === record.courseDate &&
+        group.teacherName === record.teacherName &&
+        group.courseTime !== record.courseTime
+      )
+    })
+
+    if (fuzzyMatch) {
+      usedGroupIds.add(fuzzyMatch.id)
+      record.groupSignupId = fuzzyMatch.id
+      record.groupOriginalLineNumber = fuzzyMatch.originalLineNumber
+      record.groupRawContent = fuzzyMatch.rawContent
+      record.groupCourseTime = fuzzyMatch.courseTime
+      record.isOnSite = fuzzyMatch.isOnSite
+      record.status = RecordStatus.NEEDS_REVIEW
+      record.reviewFlag = ReviewFlag.MISMATCH
+      record.updatedAt = now
+      record.manualEdits = [
+        ...record.manualEdits,
+        {
+          id: uuidv4(),
+          timestamp: now,
+          operator: 'system',
+          action: 'mismatch_detected',
+          fieldName: 'courseTime',
+          oldValue: `调音师留言: ${record.courseTime}`,
+          newValue: `群接龙: ${fuzzyMatch.courseTime}`,
+          reason: `口径不一致: 调音师留言记录${record.courseTime}，群接龙记录${fuzzyMatch.courseTime}，需票务同事复核`
+        }
+      ]
     }
   })
 
@@ -185,8 +236,16 @@ export function mergeGroupSignupToRecords(
         groupSignupId: group.id,
         groupOriginalLineNumber: group.originalLineNumber,
         groupRawContent: group.rawContent,
+        groupCourseTime: group.courseTime,
+        importSource: 'group_only',
         
-        manualEdits: [],
+        manualEdits: isTempSub ? [{
+          id: uuidv4(),
+          timestamp: now,
+          operator: 'system',
+          action: 'temp_sub_detected',
+          reason: '临时替补仅在群接龙中说了一句，调音师留言未提及，不自动归正常，留给票务同事复核'
+        }] : [],
         createdAt: now,
         updatedAt: now
       }

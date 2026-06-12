@@ -2,6 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createInitialWorkflow = createInitialWorkflow;
 exports.advanceStep = advanceStep;
+exports.finishWorkflow = finishWorkflow;
+exports.isWorkflowDone = isWorkflowDone;
 exports.step1ImportTunerMessages = step1ImportTunerMessages;
 exports.step2ReviewGroupSignup = step2ReviewGroupSignup;
 exports.step3UpdateSettlement = step3UpdateSettlement;
@@ -49,26 +51,80 @@ function advanceStep(state, stepName, operator) {
         }
         return step;
     });
+    const isLastStep = stepIndex === state.steps.length - 1;
     const nextStep = updatedSteps[stepIndex + 1];
     return {
         ...state,
-        currentStep: nextStep ? nextStep.name : stepName,
+        currentStep: isLastStep ? stepName : nextStep ? nextStep.name : stepName,
         steps: updatedSteps,
         updatedAt: now
     };
 }
+function finishWorkflow(state, operator) {
+    const now = new Date().toISOString();
+    return {
+        ...state,
+        currentStep: state.steps[state.steps.length - 1].name,
+        steps: state.steps.map(step => {
+            if (step.name === 'update_settlement' && step.status !== 'completed') {
+                return {
+                    ...step,
+                    status: 'completed',
+                    completedAt: now,
+                    operator
+                };
+            }
+            return step;
+        }),
+        updatedAt: now
+    };
+}
+function isWorkflowDone(state) {
+    return state.steps.every(s => s.status === 'completed');
+}
 function step1ImportTunerMessages(tunerLines, operator) {
     const batchId = (0, uuid_1.v4)();
     const { batch, records: tunerRecords } = (0, import_1.parseTunerMessage)(tunerLines, batchId, operator);
+    const existingRecords = unifiedResult_1.unifiedStore.getRecords();
+    const existingKeys = new Set(existingRecords
+        .filter(r => r.tunerMessageId)
+        .map(r => `${r.studentName}|${r.courseDate}|${r.courseTime}|${r.teacherName}`));
     let consumptionRecords = (0, import_1.createConsumptionRecordsFromTuner)(tunerRecords);
+    const reuseReport = { reused: 0, newlyAdded: 0 };
+    consumptionRecords = consumptionRecords.map(record => {
+        const key = `${record.studentName}|${record.courseDate}|${record.courseTime}|${record.teacherName}`;
+        if (existingKeys.has(key)) {
+            reuseReport.reused++;
+            return {
+                ...record,
+                importSource: 'reimport_reuse',
+                importBatchLabel: `复用(已有相同调音师留言): ${record.tunerRawContent}`,
+                manualEdits: [{
+                        id: (0, uuid_1.v4)(),
+                        timestamp: new Date().toISOString(),
+                        operator: 'system',
+                        action: 'reimport_detected',
+                        reason: `重复导入检测: 调音师留言"${record.tunerRawContent}"在系统中已存在，标记为复用记录`
+                    }]
+            };
+        }
+        reuseReport.newlyAdded++;
+        return record;
+    });
     consumptionRecords = (0, selfCheck_1.markDuplicates)(consumptionRecords);
-    unifiedResult_1.unifiedStore.setRecords(consumptionRecords);
+    if (existingRecords.length === 0) {
+        unifiedResult_1.unifiedStore.setRecords(consumptionRecords);
+    }
+    else {
+        unifiedResult_1.unifiedStore.setRecords([...existingRecords, ...consumptionRecords]);
+    }
     unifiedResult_1.unifiedStore.addBatch(batch);
     const workflow = createInitialWorkflow();
     return {
-        records: consumptionRecords,
+        records: unifiedResult_1.unifiedStore.getRecords(),
         batch,
-        workflow
+        workflow,
+        reuseReport
     };
 }
 function step2ReviewGroupSignup(groupLines, operator, currentWorkflow) {
@@ -90,8 +146,14 @@ function step2ReviewGroupSignup(groupLines, operator, currentWorkflow) {
 function step3UpdateSettlement(operator, currentWorkflow) {
     let records = unifiedResult_1.unifiedStore.getRecords();
     records = records.map(record => {
-        if (record.status === types_1.RecordStatus.MATCHED ||
-            (record.status === types_1.RecordStatus.IMPORTED && record.reviewFlag === 'none')) {
+        if (record.status === types_1.RecordStatus.MATCHED) {
+            return {
+                ...record,
+                status: types_1.RecordStatus.CONFIRMED,
+                updatedAt: new Date().toISOString()
+            };
+        }
+        if (record.status === types_1.RecordStatus.IMPORTED && record.reviewFlag === types_1.ReviewFlag.NONE) {
             return {
                 ...record,
                 status: types_1.RecordStatus.CONFIRMED,
@@ -103,7 +165,7 @@ function step3UpdateSettlement(operator, currentWorkflow) {
     records = (0, audit_1.settleRecords)(records, operator);
     records = (0, selfCheck_1.recalculateAfterSupplement)(records);
     unifiedResult_1.unifiedStore.setRecords(records);
-    const workflow = advanceStep(currentWorkflow, 'review_group', operator);
+    const workflow = finishWorkflow(advanceStep(currentWorkflow, 'review_group', operator), operator);
     return {
         records,
         workflow

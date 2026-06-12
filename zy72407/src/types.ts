@@ -83,6 +83,10 @@ export interface ConsumptionRecord {
   groupSignupId?: string
   groupOriginalLineNumber?: number
   groupRawContent?: string
+  groupCourseTime?: string
+  
+  importSource?: 'tuner_first' | 'group_only' | 'reimport_reuse'
+  importBatchLabel?: string
   
   manualEdits: AuditLogEntry[]
   createdAt: string

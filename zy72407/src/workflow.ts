@@ -5,6 +5,7 @@ import {
   StepName,
   ConsumptionRecord,
   RecordStatus,
+  ReviewFlag,
   ImportBatch
 } from './types'
 import {
@@ -59,35 +60,99 @@ export function advanceStep(
     return step
   })
 
+  const isLastStep = stepIndex === state.steps.length - 1
   const nextStep = updatedSteps[stepIndex + 1]
 
   return {
     ...state,
-    currentStep: nextStep ? nextStep.name : stepName,
+    currentStep: isLastStep ? stepName : nextStep ? nextStep.name : stepName,
     steps: updatedSteps,
     updatedAt: now
   }
 }
 
+export function finishWorkflow(
+  state: WorkflowState,
+  operator: string
+): WorkflowState {
+  const now = new Date().toISOString()
+  return {
+    ...state,
+    currentStep: state.steps[state.steps.length - 1].name,
+    steps: state.steps.map(step => {
+      if (step.name === 'update_settlement' && step.status !== 'completed') {
+        return {
+          ...step,
+          status: 'completed' as const,
+          completedAt: now,
+          operator
+        }
+      }
+      return step
+    }),
+    updatedAt: now
+  }
+}
+
+export function isWorkflowDone(state: WorkflowState): boolean {
+  return state.steps.every(s => s.status === 'completed')
+}
+
 export function step1ImportTunerMessages(
   tunerLines: string[],
   operator: string
-): { records: ConsumptionRecord[]; batch: ImportBatch; workflow: WorkflowState } {
+): { records: ConsumptionRecord[]; batch: ImportBatch; workflow: WorkflowState; reuseReport: { reused: number; newlyAdded: number } } {
   const batchId = uuidv4()
   const { batch, records: tunerRecords } = parseTunerMessage(tunerLines, batchId, operator)
+  
+  const existingRecords = unifiedStore.getRecords()
+  const existingKeys = new Set(
+    existingRecords
+      .filter(r => r.tunerMessageId)
+      .map(r => `${r.studentName}|${r.courseDate}|${r.courseTime}|${r.teacherName}`)
+  )
+  
   let consumptionRecords = createConsumptionRecordsFromTuner(tunerRecords)
+  
+  const reuseReport = { reused: 0, newlyAdded: 0 }
+  
+  consumptionRecords = consumptionRecords.map(record => {
+    const key = `${record.studentName}|${record.courseDate}|${record.courseTime}|${record.teacherName}`
+    if (existingKeys.has(key)) {
+      reuseReport.reused++
+      return {
+        ...record,
+        importSource: 'reimport_reuse' as const,
+        importBatchLabel: `复用(已有相同调音师留言): ${record.tunerRawContent}`,
+        manualEdits: [{
+          id: uuidv4(),
+          timestamp: new Date().toISOString(),
+          operator: 'system',
+          action: 'reimport_detected',
+          reason: `重复导入检测: 调音师留言"${record.tunerRawContent}"在系统中已存在，标记为复用记录`
+        }]
+      }
+    }
+    reuseReport.newlyAdded++
+    return record
+  })
   
   consumptionRecords = markDuplicates(consumptionRecords)
   
-  unifiedStore.setRecords(consumptionRecords)
+  if (existingRecords.length === 0) {
+    unifiedStore.setRecords(consumptionRecords)
+  } else {
+    unifiedStore.setRecords([...existingRecords, ...consumptionRecords])
+  }
   unifiedStore.addBatch(batch)
 
   const workflow = createInitialWorkflow()
 
   return {
-    records: consumptionRecords,
+    records: unifiedStore.getRecords(),
     batch,
-    workflow
+    workflow,
+    reuseReport
   }
 }
 
@@ -124,8 +189,14 @@ export function step3UpdateSettlement(
   let records = unifiedStore.getRecords()
   
   records = records.map(record => {
-    if (record.status === RecordStatus.MATCHED || 
-        (record.status === RecordStatus.IMPORTED && record.reviewFlag === 'none')) {
+    if (record.status === RecordStatus.MATCHED) {
+      return {
+        ...record,
+        status: RecordStatus.CONFIRMED,
+        updatedAt: new Date().toISOString()
+      }
+    }
+    if (record.status === RecordStatus.IMPORTED && record.reviewFlag === ReviewFlag.NONE) {
       return {
         ...record,
         status: RecordStatus.CONFIRMED,
@@ -140,7 +211,10 @@ export function step3UpdateSettlement(
   
   unifiedStore.setRecords(records)
 
-  const workflow = advanceStep(currentWorkflow, 'review_group', operator)
+  const workflow = finishWorkflow(
+    advanceStep(currentWorkflow, 'review_group', operator),
+    operator
+  )
 
   return {
     records,
