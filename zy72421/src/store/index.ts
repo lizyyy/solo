@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Batch, HistoryRecord, ToastMessage, Track } from '@/types';
+import { Batch, HistoryRecord, Photo, SupplementRecord, ToastMessage, Track } from '@/types';
 import { mockBatches, mockHistory, humanFriendlyErrors } from '@/data/mockData';
 
 interface AppState {
@@ -14,11 +14,11 @@ interface AppState {
   removeToast: (id: string) => void;
   showHumanError: (errorKey: string) => void;
   
-  importBatch: (tracks: Omit<Track, 'id' | 'status'>[]) => void;
-  correctTrack: (batchId: string, trackId: string, updates: Partial<Track>) => void;
+  importBatch: (tracks: Omit<Track, 'id' | 'status'>[], photos?: Photo[]) => void;
+  correctTrack: (batchId: string, trackId: string, updates: Partial<Track>, reason?: string) => void;
   rerunBatch: (batchId: string) => void;
   reviewMixedBatch: (batchId: string, approved: boolean) => void;
-  supplementFromPhoto: (batchId: string, trackId: string, photoRemark: string) => void;
+  supplementFromPhoto: (batchId: string, trackId: string, photoId: string, photoRemark: string, reason: string) => void;
 }
 
 const generateId = () => Math.random().toString(36).substring(2, 9);
@@ -47,7 +47,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     get().addToast('error', message);
   },
 
-  importBatch: (trackData) => {
+  importBatch: (trackData, photos = []) => {
     const { currentOperator, addToast } = get();
     const now = new Date().toLocaleString('zh-CN');
     const batchId = `B${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${generateId().slice(0, 3).toUpperCase()}`;
@@ -69,6 +69,8 @@ export const useAppStore = create<AppState>((set, get) => ({
     if (hasMixed) {
       sceneType = 'mixed_tickets';
       status = 'pending_review';
+    } else if (photos.some(p => p.hasOldStandard)) {
+      sceneType = 'old_standard';
     }
 
     const newBatch: Batch = {
@@ -77,7 +79,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       status,
       sceneType,
       tracks,
-      photos: [],
+      photos,
       createdAt: now,
       updatedAt: now,
       operator: currentOperator,
@@ -90,22 +92,45 @@ export const useAppStore = create<AppState>((set, get) => ({
       action: 'import',
       operator: currentOperator,
       beforeValue: '-',
-      afterValue: `导入曲目别名表：${tracks.map(t => `${t.name}(${t.alias})`).join('、')}`,
+      afterValue: `导入曲目别名表：${tracks.map(t => `${t.name}(${t.alias})`).join('、')}${photos.length > 0 ? `；关联 ${photos.length} 张课时签到照片` : ''}`,
       timestamp: now,
+      detail: {
+        fieldChanges: [
+          { field: '曲目数量', before: '0', after: String(tracks.length) },
+          { field: '签到照片', before: '0', after: String(photos.length) },
+        ],
+      },
     };
+
+    const photoHistoryRecords: HistoryRecord[] = photos.length > 0 ? [{
+      id: `h${generateId()}`,
+      targetId: batchId,
+      targetType: 'batch',
+      action: 'add_photo',
+      operator: currentOperator,
+      beforeValue: '无签到照片',
+      afterValue: `添加 ${photos.length} 张课时签到照片`,
+      timestamp: now,
+      detail: {
+        photoRemark: photos.map(p => p.remark).join('；'),
+      },
+    }] : [];
 
     set((state) => ({
       batches: [newBatch, ...state.batches],
-      history: [historyRecord, ...state.history],
+      history: [historyRecord, ...photoHistoryRecords, ...state.history],
     }));
 
     addToast('success', `批次 ${batchId} 导入成功`);
     if (hasMixed) {
       get().showHumanError('MIXED_TICKETS');
     }
+    if (photos.some(p => p.hasOldStandard)) {
+      get().showHumanError('OLD_STANDARD_DETECTED');
+    }
   },
 
-  correctTrack: (batchId, trackId, updates) => {
+  correctTrack: (batchId, trackId, updates, reason) => {
     const { currentOperator, addToast } = get();
     const now = new Date().toLocaleString('zh-CN');
     const batch = get().batches.find(b => b.id === batchId);
@@ -114,6 +139,15 @@ export const useAppStore = create<AppState>((set, get) => ({
     if (!track) return;
 
     const beforeValue = `状态：${track.status}，口径：${track.standard === 'new' ? '新口径' : '旧口径'}`;
+    const afterValue = `状态：${updates.status || track.status}，口径：${(updates.standard || track.standard) === 'new' ? '新口径' : '旧口径'}`;
+    
+    const fieldChanges: { field: string; before: string; after: string }[] = [];
+    if (updates.status && updates.status !== track.status) {
+      fieldChanges.push({ field: '状态', before: track.status, after: updates.status });
+    }
+    if (updates.standard && updates.standard !== track.standard) {
+      fieldChanges.push({ field: '口径', before: track.standard === 'new' ? '新口径' : '旧口径', after: updates.standard === 'new' ? '新口径' : '旧口径' });
+    }
     
     set((state) => ({
       batches: state.batches.map((b) => {
@@ -134,8 +168,12 @@ export const useAppStore = create<AppState>((set, get) => ({
           action: 'correct',
           operator: currentOperator,
           beforeValue,
-          afterValue: `状态：${updates.status || track.status}，口径：${(updates.standard || track.standard) === 'new' ? '新口径' : '旧口径'}`,
+          afterValue,
           timestamp: now,
+          detail: {
+            reason: reason || '人工修正',
+            fieldChanges,
+          },
         },
         ...get().history,
       ],
@@ -246,7 +284,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     addToast('success', approved ? '录音师复核通过' : '已标记需进一步确认');
   },
 
-  supplementFromPhoto: (batchId, trackId, photoRemark) => {
+  supplementFromPhoto: (batchId, trackId, photoId, photoRemark, reason) => {
     const { currentOperator, addToast, showHumanError } = get();
     const now = new Date().toLocaleString('zh-CN');
     const batch = get().batches.find(b => b.id === batchId);
@@ -254,7 +292,32 @@ export const useAppStore = create<AppState>((set, get) => ({
     
     if (!track) return;
 
-    const beforeValue = `状态：${track.status}，口径：${track.standard === 'new' ? '新口径' : '旧口径'}`;
+    const beforeStatus = track.status;
+    const beforeStandard = track.standard;
+    const beforeRemark = track.remark || '';
+
+    const afterStatus: Track['status'] = 'updated';
+    const afterStandard: Track['standard'] = 'old';
+
+    const supplementRecord: SupplementRecord = {
+      id: `s${generateId()}`,
+      photoRemark,
+      sourcePhotoId: photoId,
+      operator: currentOperator,
+      timestamp: now,
+      reason,
+      beforeStatus,
+      beforeStandard,
+      afterStatus,
+      afterStandard,
+    };
+
+    const newRemark = beforeRemark 
+      ? `${beforeRemark}\n\n【${now} ${currentOperator} 从签到照片补录】\n${photoRemark}\n原因：${reason}`
+      : `【${now} ${currentOperator} 从签到照片补录】\n${photoRemark}\n原因：${reason}`;
+
+    const beforeValue = `状态：${beforeStatus}，口径：${beforeStandard === 'new' ? '新口径' : '旧口径'}${beforeRemark ? `，备注：${beforeRemark.slice(0, 30)}...` : ''}`;
+    const afterValue = `状态：保留（已修正），口径：旧口径（从签到照片补录）`;
 
     set((state) => ({
       batches: state.batches.map((b) => {
@@ -265,7 +328,13 @@ export const useAppStore = create<AppState>((set, get) => ({
           updatedAt: now,
           tracks: b.tracks.map((t) => 
             t.id === trackId 
-              ? { ...t, status: 'updated', standard: 'old', remark: photoRemark }
+              ? { 
+                  ...t, 
+                  status: afterStatus, 
+                  standard: afterStandard, 
+                  remark: newRemark,
+                  supplementHistory: [...(t.supplementHistory || []), supplementRecord],
+                }
               : t
           ),
         };
@@ -278,14 +347,26 @@ export const useAppStore = create<AppState>((set, get) => ({
           action: 'supplement',
           operator: currentOperator,
           beforeValue,
-          afterValue: `状态：保留，口径：旧口径（从签到照片补录）`,
+          afterValue,
           timestamp: now,
+          detail: {
+            originalRemark: beforeRemark || '（无原始备注）',
+            photoRemark,
+            reason,
+            sourcePhotoId: photoId,
+            fieldChanges: [
+              { field: '状态', before: beforeStatus, after: afterStatus },
+              { field: '口径', before: beforeStandard === 'new' ? '新口径' : '旧口径', after: '旧口径' },
+              { field: '备注', before: beforeRemark || '空', after: newRemark },
+            ],
+          },
         },
         ...get().history,
       ],
     }));
 
     addToast('success', '已从签到照片补录旧口径信息');
+    addToast('info', '授权提醒已同步更新');
     showHumanError('OLD_STANDARD_DETECTED');
   },
 }));

@@ -48,7 +48,21 @@ export const mockTracks: Record<string, Track[]> = {
       hasMixedTickets: false,
       ticketType: 'paid',
       authorization: 'valid',
-      remark: '从课时签到照片补录旧口径，原判断下架，现修正为保留',
+      remark: '【2024-06-01 14:20:00 许老师 从签到照片补录】\n【旧口径备注】七里香：2023年之前入库曲目，按旧口径保留，不下架\n原因：课时签到照片显示为2023年之前入库，按旧口径应保留',
+      supplementHistory: [
+        {
+          id: 's1',
+          photoRemark: '【旧口径备注】七里香：2023年之前入库曲目，按旧口径保留，不下架',
+          sourcePhotoId: 'p3',
+          operator: '许老师',
+          timestamp: '2024-06-01 14:20:00',
+          reason: '课时签到照片显示为2023年之前入库，按旧口径应保留',
+          beforeStatus: 'removed',
+          beforeStandard: 'new',
+          afterStatus: 'updated',
+          afterStandard: 'old',
+        },
+      ],
     },
   ],
 };
@@ -169,16 +183,46 @@ export const mockHistory: HistoryRecord[] = [
     beforeValue: '-',
     afterValue: '导入曲目别名表：七里香(Qilx)',
     timestamp: '2024-06-01 11:00:00',
+    detail: {
+      fieldChanges: [
+        { field: '曲目数量', before: '0', after: '1' },
+        { field: '签到照片', before: '0', after: '0' },
+      ],
+    },
+  },
+  {
+    id: 'h5b',
+    targetId: 'B20240601-003',
+    targetType: 'batch',
+    action: 'add_photo',
+    operator: '许老师',
+    beforeValue: '无签到照片',
+    afterValue: '添加 1 张课时签到照片',
+    timestamp: '2024-06-01 11:05:00',
+    detail: {
+      photoRemark: '【旧口径备注】七里香：2023年之前入库曲目，按旧口径保留，不下架',
+    },
   },
   {
     id: 'h6',
     targetId: 't4',
     targetType: 'track',
-    action: 'correct',
+    action: 'supplement',
     operator: '许老师',
     beforeValue: '状态：下架，口径：新口径',
-    afterValue: '状态：保留，口径：旧口径（从签到照片补录）',
+    afterValue: '状态：保留（已修正），口径：旧口径（从签到照片补录）',
     timestamp: '2024-06-01 14:20:00',
+    detail: {
+      originalRemark: '（无原始备注）',
+      photoRemark: '【旧口径备注】七里香：2023年之前入库曲目，按旧口径保留，不下架',
+      reason: '课时签到照片显示为2023年之前入库，按旧口径应保留',
+      sourcePhotoId: 'p3',
+      fieldChanges: [
+        { field: '状态', before: 'removed', after: 'updated' },
+        { field: '口径', before: '新口径', after: '旧口径' },
+        { field: '备注', before: '空', after: '从签到照片补录旧口径信息' },
+      ],
+    },
   },
 ];
 

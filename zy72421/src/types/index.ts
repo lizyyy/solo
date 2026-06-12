@@ -10,6 +10,19 @@ export type AuthorizationStatus = 'valid' | 'expired' | 'pending';
 
 export type StandardType = 'new' | 'old';
 
+export interface SupplementRecord {
+  id: string;
+  photoRemark: string;
+  sourcePhotoId: string;
+  operator: string;
+  timestamp: string;
+  reason: string;
+  beforeStatus: TrackStatus;
+  beforeStandard: StandardType;
+  afterStatus: TrackStatus;
+  afterStandard: StandardType;
+}
+
 export interface Track {
   id: string;
   name: string;
@@ -20,6 +33,7 @@ export interface Track {
   ticketType: TicketType;
   authorization: AuthorizationStatus;
   remark?: string;
+  supplementHistory?: SupplementRecord[];
 }
 
 export interface Photo {
@@ -42,7 +56,19 @@ export interface Batch {
   operator?: string;
 }
 
-export type HistoryAction = 'import' | 'correct' | 'rerun' | 'review' | 'supplement';
+export type HistoryAction = 'import' | 'correct' | 'rerun' | 'review' | 'supplement' | 'add_photo';
+
+export interface HistoryDetail {
+  originalRemark?: string;
+  photoRemark?: string;
+  reason?: string;
+  sourcePhotoId?: string;
+  fieldChanges?: {
+    field: string;
+    before: string;
+    after: string;
+  }[];
+}
 
 export interface HistoryRecord {
   id: string;
@@ -53,6 +79,7 @@ export interface HistoryRecord {
   beforeValue: string;
   afterValue: string;
   timestamp: string;
+  detail?: HistoryDetail;
 }
 
 export interface ToastMessage {
