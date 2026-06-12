@@ -1,4 +1,9 @@
-SAMPLE_RECORDS_NORMAL = [
+import json
+import os
+from typing import List, Dict, Optional
+
+
+SAMPLE_RECORDS_NORMAL: List[Dict] = [
     {
         "house_number": "光明村12号",
         "address": "光明村正街12号",
@@ -9,7 +14,7 @@ SAMPLE_RECORDS_NORMAL = [
     },
 ]
 
-SAMPLE_RECORDS_DETOUR = [
+SAMPLE_RECORDS_DETOUR: List[Dict] = [
     {
         "house_number": "光明村23号",
         "address": "光明村后街23号",
@@ -20,7 +25,7 @@ SAMPLE_RECORDS_DETOUR = [
     },
 ]
 
-SAMPLE_RECORDS_SUPPLEMENTARY = [
+SAMPLE_RECORDS_SUPPLEMENTARY: List[Dict] = [
     {
         "house_number": "旧光明村5号",
         "address": "光明村旧区5号",
@@ -31,9 +36,9 @@ SAMPLE_RECORDS_SUPPLEMENTARY = [
     },
 ]
 
-SAMPLE_COMPLAINTS_ALL = SAMPLE_RECORDS_NORMAL + SAMPLE_RECORDS_DETOUR + SAMPLE_RECORDS_SUPPLEMENTARY
+SAMPLE_COMPLAINTS_ALL: List[Dict] = SAMPLE_RECORDS_NORMAL + SAMPLE_RECORDS_DETOUR + SAMPLE_RECORDS_SUPPLEMENTARY
 
-PHOTO_MAPPINGS_ALL = [
+PHOTO_MAPPINGS_ALL: List[Dict] = [
     {
         "record_id": "R-001",
         "photo_id": "PHOTO-2026-0607-001",
@@ -53,3 +58,48 @@ PHOTO_MAPPINGS_ALL = [
         "mark_old_standard": True,
     },
 ]
+
+SAMPLE_PHOTO_NORMAL: List[Dict] = [PHOTO_MAPPINGS_ALL[0]]
+SAMPLE_PHOTO_DETOUR: List[Dict] = [PHOTO_MAPPINGS_ALL[1]]
+SAMPLE_PHOTO_SUPPLEMENTARY: List[Dict] = [PHOTO_MAPPINGS_ALL[2]]
+
+
+_COMPLAINT_PRESETS = {
+    "normal": SAMPLE_RECORDS_NORMAL,
+    "detour": SAMPLE_RECORDS_DETOUR,
+    "supplementary": SAMPLE_RECORDS_SUPPLEMENTARY,
+    "all": SAMPLE_COMPLAINTS_ALL,
+}
+
+_PHOTO_PRESETS = {
+    "normal": SAMPLE_PHOTO_NORMAL,
+    "detour": SAMPLE_PHOTO_DETOUR,
+    "supplementary": SAMPLE_PHOTO_SUPPLEMENTARY,
+    "all": PHOTO_MAPPINGS_ALL,
+}
+
+
+def load_complaints(source: str) -> List[Dict]:
+    if source in _COMPLAINT_PRESETS:
+        return list(_COMPLAINT_PRESETS[source])
+    if os.path.exists(source):
+        with open(source, "r", encoding="utf-8") as f:
+            return json.load(f)
+    raise ValueError(f"无法加载投诉数据: {source} (既不是预设名也不是JSON文件路径)")
+
+
+def load_photo_mappings(source: str) -> List[Dict]:
+    if source in _PHOTO_PRESETS:
+        return list(_PHOTO_PRESETS[source])
+    if os.path.exists(source):
+        with open(source, "r", encoding="utf-8") as f:
+            return json.load(f)
+    raise ValueError(f"无法加载照片映射数据: {source} (既不是预设名也不是JSON文件路径)")
+
+
+def list_presets() -> Dict[str, List[str]]:
+    return {
+        "complaint_presets": list(_COMPLAINT_PRESETS.keys()),
+        "photo_presets": list(_PHOTO_PRESETS.keys()),
+    }
+

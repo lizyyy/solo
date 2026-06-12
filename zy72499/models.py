@@ -111,4 +111,4 @@ class MergeSession:
     replay_commands: List[str] = field(default_factory=list)
 
     def add_replay_command(self, cmd: str):
-        self.replay_commands.append(f"# [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] {cmd}")
+        self.replay_commands.append(cmd)

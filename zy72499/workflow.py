@@ -15,14 +15,24 @@ from engine import (
     process_conflict,
     resolve_conflict,
 )
+from sample_data import load_complaints, load_photo_mappings
+
+
+def _shell_quote(s: str) -> str:
+    if " " in s or "'" in s or '"' in s:
+        return "'" + s.replace("'", "'\\''") + "'"
+    return s
 
 
 def step1_import_complaints(
     session: MergeSession,
-    records_data: List[dict],
+    records_data_source: str,
 ) -> MergeSession:
-    cmd = f"python main.py import --session {session.session_id}"
+    records_data = load_complaints(records_data_source)
+
+    cmd = f"python3 main.py import --session {session.session_id} --data {_shell_quote(records_data_source)}"
     session.add_replay_command(cmd)
+    session.add_replay_command(f'echo "  [导入] 已载入 {len(records_data)} 条居民投诉记录"')
 
     for idx, data in enumerate(records_data):
         record = MergeRecord(
@@ -39,17 +49,22 @@ def step1_import_complaints(
         record.add_audit_log("系统", f"居民投诉编号导入: {record.resident_complaint_id}")
         session.records.append(record)
 
-    session.add_replay_command(f"# 已导入 {len(records_data)} 条居民投诉记录")
     return session
 
 
 def step2_review_photos(
     session: MergeSession,
-    photo_mappings: List[dict],
+    photo_mappings_source: str,
     reviewer: str = "周姐",
 ) -> MergeSession:
-    cmd = f"python main.py review-photos --session {session.session_id} --reviewer {reviewer}"
+    photo_mappings = load_photo_mappings(photo_mappings_source)
+
+    cmd = (
+        f"python3 main.py review-photos --session {session.session_id} "
+        f"--data {_shell_quote(photo_mappings_source)} --reviewer {_shell_quote(reviewer)}"
+    )
     session.add_replay_command(cmd)
+    session.add_replay_command(f'echo "  [审核] {reviewer} 已审核 {len(photo_mappings)} 张路口照片"')
 
     for mapping in photo_mappings:
         record_id = mapping["record_id"]
@@ -79,7 +94,6 @@ def step2_review_photos(
 
         record.update_status(RecordStatus.PENDING_REVIEW_PHOTO, reviewer, "路口照片审核完成")
 
-    session.add_replay_command(f"# 已审核 {len(photo_mappings)} 条路口照片")
     return session
 
 
@@ -87,7 +101,7 @@ def step3_update_points(
     session: MergeSession,
     operator: str = "系统",
 ) -> Tuple[MergeSession, List[dict]]:
-    cmd = f"python main.py update-points --session {session.session_id}"
+    cmd = f"python3 main.py update-points --session {session.session_id}"
     session.add_replay_command(cmd)
 
     results = []
@@ -140,7 +154,14 @@ def step3_update_points(
             )
 
     session.completed_at = datetime.now()
-    session.add_replay_command(f"# 点位清单更新完成，共处理 {len(results)} 条记录")
+    merged_count = sum(1 for r in session.records if r.status == RecordStatus.MERGED)
+    supp_count = sum(1 for r in session.records if r.status == RecordStatus.SUPPLEMENTED)
+    pending_count = sum(1 for r in session.records if r.status == RecordStatus.PENDING_RESIDENT_REVIEW)
+    conflict_count = sum(1 for r in session.records if r.status == RecordStatus.CONFLICT)
+    session.add_replay_command(
+        f'echo "  [更新点位] 已归并{merged_count}条，已补录{supp_count}条，'
+        f'待复核{pending_count}条，冲突{conflict_count}条"'
+    )
     return session, results
 
 
@@ -150,8 +171,15 @@ def resolve_conflict_interactive(
     confirm: bool,
     operator: str = "周姐",
 ) -> Tuple[MergeSession, Optional[Point]]:
-    cmd = f"python main.py resolve-conflict --session {session.session_id} --record {record_id} --{'confirm' if confirm else 'reject'}"
+    action = "confirm" if confirm else "reject"
+    cmd = (
+        f"python3 main.py resolve-conflict --session {session.session_id} "
+        f"--record {record_id} --{action} --operator {_shell_quote(operator)}"
+    )
     session.add_replay_command(cmd)
+    session.add_replay_command(
+        f'echo "  [冲突处理] {operator}对{record_id}{"确认" if confirm else "驳回"}"'
+    )
 
     record = None
     for r in session.records:
@@ -172,8 +200,15 @@ def resident_review_complete(
     approved: bool,
     operator: str = "居民代表",
 ) -> MergeSession:
-    cmd = f"python main.py resident-review --session {session.session_id} --record {record_id} --{'approve' if approved else 'reject'}"
+    action = "approve" if approved else "reject"
+    cmd = (
+        f"python3 main.py resident-review --session {session.session_id} "
+        f"--record {record_id} --{action} --operator {_shell_quote(operator)}"
+    )
     session.add_replay_command(cmd)
+    session.add_replay_command(
+        f'echo "  [居民复核] {operator}对{record_id}{"通过" if approved else "不通过"}"'
+    )
 
     record = None
     for r in session.records:
