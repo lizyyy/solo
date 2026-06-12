@@ -1,0 +1,62 @@
+{
+  "run_id": "20260612_233442_986371",
+  "run_time": "2026-06-12T23:34:42.988452",
+  "records_processed": [
+    "TS2024003"
+  ],
+  "changes_made": [
+    {
+      "complaint_id": "TS2024003",
+      "action": "photo_supplement",
+      "photo_remarks": "此路口为2019年历史遗留点位，按旧口径处理，现场有台阶但属于老城区改造范围",
+      "old_photo_remarks": "",
+      "new_score": 55,
+      "old_score": 55,
+      "old_caliber_applied": true,
+      "new_suggestions": [
+        "本记录适用旧口径标准，已标注",
+        "整改重点：存在台阶无坡道补偿"
+      ],
+      "run_id": "20260612_233442_986371"
+    }
+  ],
+  "run_command": "post_cabinet.py photo TS2024003 --remarks 此路口为2019年历史遗留点位，按旧口径处理，现场有台阶但属于老城区改造范围",
+  "before_snapshots": {
+    "TS2024003": {
+      "photo_remarks": "",
+      "ramp_exist": null,
+      "ramp_remarks": "",
+      "current_score": 55,
+      "initial_score": 55,
+      "suggestions": [
+        "快递柜选址存在无障碍通行障碍",
+        "需增设无障碍坡道或调整柜位",
+        "建议设置醒目标识指引视障人士",
+        "整改重点：坡道情况待确认"
+      ],
+      "status": "imported",
+      "review_needed": false,
+      "old_caliber_applied": false
+    }
+  },
+  "after_snapshots": {
+    "TS2024003": {
+      "photo_remarks": "此路口为2019年历史遗留点位，按旧口径处理，现场有台阶但属于老城区改造范围",
+      "ramp_exist": null,
+      "ramp_remarks": "",
+      "current_score": 55,
+      "initial_score": 55,
+      "suggestions": [
+        "快递柜选址存在无障碍通行障碍",
+        "需增设无障碍坡道或调整柜位",
+        "建议设置醒目标识指引视障人士",
+        "整改重点：坡道情况待确认",
+        "本记录适用旧口径标准，已标注",
+        "整改重点：存在台阶无坡道补偿"
+      ],
+      "status": "photo_supplemented",
+      "review_needed": false,
+      "old_caliber_applied": true
+    }
+  }
+}

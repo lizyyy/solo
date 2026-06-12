@@ -1,0 +1,61 @@
+{
+  "run_id": "20260612_233442_832800",
+  "run_time": "2026-06-12T23:34:42.851400",
+  "records_processed": [
+    "TS2024002"
+  ],
+  "changes_made": [
+    {
+      "complaint_id": "TS2024002",
+      "action": "ramp_supplement",
+      "ramp_exist": true,
+      "ramp_remarks": "坡道存在，但表面损坏严重、无扶手、坡度过陡",
+      "old_score": 45,
+      "new_score": 42,
+      "review_needed": true,
+      "run_id": "20260612_233442_832800"
+    }
+  ],
+  "run_command": "post_cabinet.py ramp TS2024002 --exist --remarks 坡道存在，但表面损坏严重、无扶手、坡度过陡",
+  "before_snapshots": {
+    "TS2024002": {
+      "photo_remarks": "居民反映轮椅取件困难",
+      "ramp_exist": null,
+      "ramp_remarks": "",
+      "current_score": 45,
+      "initial_score": 45,
+      "suggestions": [
+        "快递柜选址存在无障碍通行障碍",
+        "需增设无障碍坡道或调整柜位",
+        "建议设置醒目标识指引视障人士",
+        "整改重点：坡道情况待确认",
+        "整改重点：轮椅通行困难"
+      ],
+      "status": "imported",
+      "review_needed": false,
+      "old_caliber_applied": false
+    }
+  },
+  "after_snapshots": {
+    "TS2024002": {
+      "photo_remarks": "居民反映轮椅取件困难",
+      "ramp_exist": true,
+      "ramp_remarks": "坡道存在，但表面损坏严重、无扶手、坡度过陡",
+      "current_score": 42,
+      "initial_score": 45,
+      "suggestions": [
+        "快递柜选址存在无障碍通行障碍",
+        "需增设无障碍坡道或调整柜位",
+        "建议设置醒目标识指引视障人士",
+        "整改重点：轮椅通行困难",
+        "整改重点：坡道有损坏",
+        "整改重点：坡度过陡",
+        "整改重点：坡道无扶手",
+        "⚠️ 坡道补录后评分变化不明显，需人工复核"
+      ],
+      "status": "ramp_supplemented",
+      "review_needed": true,
+      "old_caliber_applied": false
+    }
+  }
+}

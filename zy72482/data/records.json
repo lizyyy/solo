@@ -20,23 +20,52 @@
     "old_caliber_applied": false,
     "review_needed": false,
     "review_by": null,
-    "created_at": "2026-06-07T10:09:23.653885",
-    "updated_at": "2026-06-07T10:09:23.653904",
+    "created_at": "2026-06-12T23:34:42.616232",
+    "updated_at": "2026-06-12T23:34:42.616264",
     "version": 3,
     "operation_log": [
       {
-        "timestamp": "2026-06-07T10:09:23.653893",
+        "timestamp": "2026-06-12T23:34:42.616247",
         "operator": "system",
         "action": "import",
         "details": "从 demo_data.json 导入，场景：顺利记录：导入后评分正常，照片备注完整，无需额外补录",
-        "version": 1
+        "version": 1,
+        "run_id": "20260612_233442_613927"
       },
       {
-        "timestamp": "2026-06-07T10:09:23.653903",
+        "timestamp": "2026-06-12T23:34:42.616263",
         "operator": "system",
         "action": "initial_score",
         "details": "初始评分：60",
-        "version": 2
+        "version": 2,
+        "run_id": "20260612_233442_613927",
+        "before": {
+          "photo_remarks": "路口视野开阔，快递柜已安装在人行道旁，周边通行顺畅，轮椅可通过",
+          "ramp_exist": null,
+          "ramp_remarks": "",
+          "current_score": null,
+          "initial_score": null,
+          "suggestions": [],
+          "status": "new",
+          "review_needed": false,
+          "old_caliber_applied": false
+        },
+        "after": {
+          "photo_remarks": "路口视野开阔，快递柜已安装在人行道旁，周边通行顺畅，轮椅可通过",
+          "ramp_exist": null,
+          "ramp_remarks": "",
+          "current_score": 60,
+          "initial_score": 60,
+          "suggestions": [
+            "快递柜选址符合无障碍通行要求",
+            "建议定期检查坡道维护情况",
+            "整改重点：坡道情况待确认"
+          ],
+          "status": "imported",
+          "review_needed": false,
+          "old_caliber_applied": false
+        },
+        "reason": "首次导入自动评分"
       }
     ]
   },
@@ -65,37 +94,149 @@
     "old_caliber_applied": false,
     "review_needed": false,
     "review_by": "老马",
-    "created_at": "2026-06-07T10:09:23.653920",
-    "updated_at": "2026-06-07T10:09:23.959609",
+    "created_at": "2026-06-12T23:34:42.616329",
+    "updated_at": "2026-06-12T23:34:43.148485",
     "version": 5,
     "operation_log": [
       {
-        "timestamp": "2026-06-07T10:09:23.653923",
+        "timestamp": "2026-06-12T23:34:42.616343",
         "operator": "system",
         "action": "import",
-        "details": "从 demo_data.json 导入，场景：坡道补录后评分没变化：首次评分40，补录坡道存在但问题很多后评分42，变化仅2分，触发人工复核",
-        "version": 1
+        "details": "从 demo_data.json 导入，场景：坡道补录后评分没变化：首次评分45，补录坡道存在但问题很多后评分42，变化仅3分，触发人工复核",
+        "version": 1,
+        "run_id": "20260612_233442_613927"
       },
       {
-        "timestamp": "2026-06-07T10:09:23.653928",
+        "timestamp": "2026-06-12T23:34:42.616360",
         "operator": "system",
         "action": "initial_score",
         "details": "初始评分：45",
-        "version": 2
+        "version": 2,
+        "run_id": "20260612_233442_613927",
+        "before": {
+          "photo_remarks": "居民反映轮椅取件困难",
+          "ramp_exist": null,
+          "ramp_remarks": "",
+          "current_score": null,
+          "initial_score": null,
+          "suggestions": [],
+          "status": "new",
+          "review_needed": false,
+          "old_caliber_applied": false
+        },
+        "after": {
+          "photo_remarks": "居民反映轮椅取件困难",
+          "ramp_exist": null,
+          "ramp_remarks": "",
+          "current_score": 45,
+          "initial_score": 45,
+          "suggestions": [
+            "快递柜选址存在无障碍通行障碍",
+            "需增设无障碍坡道或调整柜位",
+            "建议设置醒目标识指引视障人士",
+            "整改重点：坡道情况待确认",
+            "整改重点：轮椅通行困难"
+          ],
+          "status": "imported",
+          "review_needed": false,
+          "old_caliber_applied": false
+        },
+        "reason": "首次导入自动评分"
       },
       {
-        "timestamp": "2026-06-07T10:09:23.773804",
+        "timestamp": "2026-06-12T23:34:42.832907",
         "operator": "system",
         "action": "ramp_supplement",
-        "details": "坡道补录：存在=True，备注=坡道存在，但表面损坏严重、无扶手、坡度过陡，原评分=45，新评分=42",
-        "version": 3
+        "details": "原评分=45，新评分=42，变化=-3",
+        "version": 3,
+        "run_id": "20260612_233442_832800",
+        "before": {
+          "photo_remarks": "居民反映轮椅取件困难",
+          "ramp_exist": null,
+          "ramp_remarks": "",
+          "current_score": 45,
+          "initial_score": 45,
+          "suggestions": [
+            "快递柜选址存在无障碍通行障碍",
+            "需增设无障碍坡道或调整柜位",
+            "建议设置醒目标识指引视障人士",
+            "整改重点：坡道情况待确认",
+            "整改重点：轮椅通行困难"
+          ],
+          "status": "imported",
+          "review_needed": false,
+          "old_caliber_applied": false
+        },
+        "after": {
+          "photo_remarks": "居民反映轮椅取件困难",
+          "ramp_exist": true,
+          "ramp_remarks": "坡道存在，但表面损坏严重、无扶手、坡度过陡",
+          "current_score": 42,
+          "initial_score": 45,
+          "suggestions": [
+            "快递柜选址存在无障碍通行障碍",
+            "需增设无障碍坡道或调整柜位",
+            "建议设置醒目标识指引视障人士",
+            "整改重点：轮椅通行困难",
+            "整改重点：坡道有损坏",
+            "整改重点：坡度过陡",
+            "整改重点：坡道无扶手",
+            "⚠️ 坡道补录后评分变化不明显，需人工复核"
+          ],
+          "status": "ramp_supplemented",
+          "review_needed": true,
+          "old_caliber_applied": false
+        },
+        "reason": "坡道补录：存在=True，备注=坡道存在，但表面损坏严重、无扶手、坡度过陡；评分变化≤3分，不自动归正常，留待复核"
       },
       {
-        "timestamp": "2026-06-07T10:09:23.959602",
+        "timestamp": "2026-06-12T23:34:43.148481",
         "operator": "老马",
         "action": "review_confirm",
         "details": "人工复核通过",
-        "version": 4
+        "version": 4,
+        "run_id": "20260612_233443_148446",
+        "before": {
+          "photo_remarks": "居民反映轮椅取件困难",
+          "ramp_exist": true,
+          "ramp_remarks": "坡道存在，但表面损坏严重、无扶手、坡度过陡",
+          "current_score": 42,
+          "initial_score": 45,
+          "suggestions": [
+            "快递柜选址存在无障碍通行障碍",
+            "需增设无障碍坡道或调整柜位",
+            "建议设置醒目标识指引视障人士",
+            "整改重点：轮椅通行困难",
+            "整改重点：坡道有损坏",
+            "整改重点：坡度过陡",
+            "整改重点：坡道无扶手",
+            "⚠️ 坡道补录后评分变化不明显，需人工复核"
+          ],
+          "status": "ramp_supplemented",
+          "review_needed": true,
+          "old_caliber_applied": false
+        },
+        "after": {
+          "photo_remarks": "居民反映轮椅取件困难",
+          "ramp_exist": true,
+          "ramp_remarks": "坡道存在，但表面损坏严重、无扶手、坡度过陡",
+          "current_score": 42,
+          "initial_score": 45,
+          "suggestions": [
+            "快递柜选址存在无障碍通行障碍",
+            "需增设无障碍坡道或调整柜位",
+            "建议设置醒目标识指引视障人士",
+            "整改重点：轮椅通行困难",
+            "整改重点：坡道有损坏",
+            "整改重点：坡度过陡",
+            "整改重点：坡道无扶手",
+            "⚠️ 坡道补录后评分变化不明显，需人工复核"
+          ],
+          "status": "reviewed",
+          "review_needed": false,
+          "old_caliber_applied": false
+        },
+        "reason": "老马人工复核确认；坡道补录后评分变化不大的情况经人工确认"
       }
     ]
   },
@@ -104,9 +245,7 @@
     "location": "解放大道与沿河大道交叉口",
     "photo_urls": [
       "photo_003_1.jpg",
-      "photo_003_2.jpg",
-      "photo_003_3.jpg",
-      "photo_003_4.jpg"
+      "photo_003_2.jpg"
     ],
     "photo_remarks": "此路口为2019年历史遗留点位，按旧口径处理，现场有台阶但属于老城区改造范围",
     "ramp_exist": null,
@@ -125,30 +264,96 @@
     "old_caliber_applied": true,
     "review_needed": false,
     "review_by": null,
-    "created_at": "2026-06-07T10:09:23.653934",
-    "updated_at": "2026-06-07T10:09:23.897824",
+    "created_at": "2026-06-12T23:34:42.616376",
+    "updated_at": "2026-06-12T23:34:42.986401",
     "version": 4,
     "operation_log": [
       {
-        "timestamp": "2026-06-07T10:09:23.653937",
+        "timestamp": "2026-06-12T23:34:42.616381",
         "operator": "system",
         "action": "import",
         "details": "从 demo_data.json 导入，场景：旧口径记录：首次导入无照片备注，后续老马补看照片后发现适用2019年旧口径标准",
-        "version": 1
+        "version": 1,
+        "run_id": "20260612_233442_613927"
       },
       {
-        "timestamp": "2026-06-07T10:09:23.653940",
+        "timestamp": "2026-06-12T23:34:42.616388",
         "operator": "system",
         "action": "initial_score",
         "details": "初始评分：55",
-        "version": 2
+        "version": 2,
+        "run_id": "20260612_233442_613927",
+        "before": {
+          "photo_remarks": "",
+          "ramp_exist": null,
+          "ramp_remarks": "",
+          "current_score": null,
+          "initial_score": null,
+          "suggestions": [],
+          "status": "new",
+          "review_needed": false,
+          "old_caliber_applied": false
+        },
+        "after": {
+          "photo_remarks": "",
+          "ramp_exist": null,
+          "ramp_remarks": "",
+          "current_score": 55,
+          "initial_score": 55,
+          "suggestions": [
+            "快递柜选址存在无障碍通行障碍",
+            "需增设无障碍坡道或调整柜位",
+            "建议设置醒目标识指引视障人士",
+            "整改重点：坡道情况待确认"
+          ],
+          "status": "imported",
+          "review_needed": false,
+          "old_caliber_applied": false
+        },
+        "reason": "首次导入自动评分"
       },
       {
-        "timestamp": "2026-06-07T10:09:23.897813",
+        "timestamp": "2026-06-12T23:34:42.986398",
         "operator": "老马",
         "action": "photo_supplement",
-        "details": "照片补录备注：此路口为2019年历史遗留点位，按旧口径处理，现场有台阶但属于老城区改造范围...，新增整改建议：本记录适用旧口径标准，已标注; 整改重点：存在台阶无坡道补偿【检测到旧口径关键词】",
-        "version": 3
+        "details": "照片备注：此路口为2019年历史遗留点位，按旧口径处理，现场有台阶但属于老城区改造范围；新增整改建议：本记录适用旧口径标准，已标注; 整改重点：存在台阶无坡道补偿；检测到旧口径关键词",
+        "version": 3,
+        "run_id": "20260612_233442_986371",
+        "before": {
+          "photo_remarks": "",
+          "ramp_exist": null,
+          "ramp_remarks": "",
+          "current_score": 55,
+          "initial_score": 55,
+          "suggestions": [
+            "快递柜选址存在无障碍通行障碍",
+            "需增设无障碍坡道或调整柜位",
+            "建议设置醒目标识指引视障人士",
+            "整改重点：坡道情况待确认"
+          ],
+          "status": "imported",
+          "review_needed": false,
+          "old_caliber_applied": false
+        },
+        "after": {
+          "photo_remarks": "此路口为2019年历史遗留点位，按旧口径处理，现场有台阶但属于老城区改造范围",
+          "ramp_exist": null,
+          "ramp_remarks": "",
+          "current_score": 55,
+          "initial_score": 55,
+          "suggestions": [
+            "快递柜选址存在无障碍通行障碍",
+            "需增设无障碍坡道或调整柜位",
+            "建议设置醒目标识指引视障人士",
+            "整改重点：坡道情况待确认",
+            "本记录适用旧口径标准，已标注",
+            "整改重点：存在台阶无坡道补偿"
+          ],
+          "status": "photo_supplemented",
+          "review_needed": false,
+          "old_caliber_applied": true
+        },
+        "reason": "照片备注补录"
       }
     ]
   }

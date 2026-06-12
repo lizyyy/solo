@@ -1,4 +1,4 @@
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Dict, Any
 from models import ComplaintRecord
 
 
@@ -32,7 +32,6 @@ def calculate_score(record: ComplaintRecord) -> Tuple[int, List[str], bool, bool
         issues_found.append("坡道情况待确认")
 
     if record.photo_remarks:
-        photo_lower = record.photo_remarks.lower()
         if any(kw in record.photo_remarks for kw in OLD_CALIBER_KEYWORDS):
             old_caliber = True
             score += 10
@@ -87,8 +86,11 @@ def calculate_score(record: ComplaintRecord) -> Tuple[int, List[str], bool, bool
     return score, suggestions, review_needed, old_caliber
 
 
-def apply_ramp_supplement(record: ComplaintRecord, ramp_exist: bool, ramp_remarks: str = "") -> ComplaintRecord:
+def apply_ramp_supplement(record: ComplaintRecord, ramp_exist: bool,
+                          ramp_remarks: str = "", run_id: str = "") -> ComplaintRecord:
+    before = record.snapshot_fields()
     old_score = record.current_score
+
     record.ramp_exist = ramp_exist
     record.ramp_remarks = ramp_remarks
 
@@ -97,23 +99,44 @@ def apply_ramp_supplement(record: ComplaintRecord, ramp_exist: bool, ramp_remark
     if record.initial_score is None:
         record.initial_score = new_score
 
-    score_changed = old_score != new_score
+    score_diff = new_score - old_score if old_score is not None else 0
 
     record.current_score = new_score
     record.suggestions = suggestions
     record.review_needed = review_needed
+    old_status = record.status
     record.status = "ramp_supplemented"
 
-    details = f"坡道补录：存在={ramp_exist}，备注={ramp_remarks}，原评分={old_score}，新评分={new_score}"
-    if not score_changed and old_score is not None:
-        details += "【评分无变化，待复核】"
-    record.add_log("system", "ramp_supplement", details)
+    after = record.snapshot_fields()
+
+    reason = f"坡道补录：存在={ramp_exist}"
+    if ramp_remarks:
+        reason += f"，备注={ramp_remarks}"
+    if abs(score_diff) <= 3 and old_score is not None:
+        reason += "；评分变化≤3分，不自动归正常，留待复核"
+
+    details = f"原评分={old_score}，新评分={new_score}，变化={score_diff:+d}"
+
+    record.add_log(
+        operator="system",
+        action="ramp_supplement",
+        details=details,
+        before=before,
+        after=after,
+        reason=reason,
+        run_id=run_id
+    )
 
     return record
 
 
-def apply_photo_supplement(record: ComplaintRecord, photo_remarks: str, photo_urls: Optional[List[str]] = None) -> ComplaintRecord:
+def apply_photo_supplement(record: ComplaintRecord, photo_remarks: str,
+                           photo_urls: Optional[List[str]] = None,
+                           run_id: str = "") -> ComplaintRecord:
+    before = record.snapshot_fields()
     old_suggestions = record.suggestions.copy()
+
+    old_photo_remarks = record.photo_remarks
     record.photo_remarks = photo_remarks
     if photo_urls:
         record.photo_urls.extend(photo_urls)
@@ -123,31 +146,78 @@ def apply_photo_supplement(record: ComplaintRecord, photo_remarks: str, photo_ur
     if record.initial_score is None:
         record.initial_score = new_score
 
+    old_score = record.current_score
     record.current_score = new_score
     record.suggestions = suggestions
     record.old_caliber_applied = old_caliber
+    old_status = record.status
     record.status = "photo_supplemented"
 
-    details = f"照片补录备注：{photo_remarks[:50]}..."
+    after = record.snapshot_fields()
+
+    reason = "照片备注补录"
+    if old_photo_remarks:
+        reason += f"（覆盖原备注：{old_photo_remarks[:30]}）"
+
     suggestions_diff = [s for s in suggestions if s not in old_suggestions]
+    details = f"照片备注：{photo_remarks[:50]}"
     if suggestions_diff:
-        details += f"，新增整改建议：{'; '.join(suggestions_diff)}"
+        details += f"；新增整改建议：{'; '.join(suggestions_diff)}"
     if old_caliber:
-        details += "【检测到旧口径关键词】"
-    record.add_log("老马", "photo_supplement", details)
+        details += "；检测到旧口径关键词"
+
+    record.add_log(
+        operator="老马",
+        action="photo_supplement",
+        details=details,
+        before=before,
+        after=after,
+        reason=reason,
+        run_id=run_id
+    )
 
     return record
 
 
-def review_confirm(record: ComplaintRecord, reviewer: str = "老马") -> ComplaintRecord:
+def review_confirm(record: ComplaintRecord, reviewer: str = "老马",
+                   run_id: str = "") -> ComplaintRecord:
+    before = record.snapshot_fields()
+
     record.review_needed = False
     record.review_by = reviewer
+    old_status = record.status
     record.status = "reviewed"
-    record.add_log(reviewer, "review_confirm", "人工复核通过")
+
+    after = record.snapshot_fields()
+
+    reason = f"{reviewer}人工复核确认"
+    if before.get("review_needed"):
+        reason += "；坡道补录后评分变化不大的情况经人工确认"
+
+    record.add_log(
+        operator=reviewer,
+        action="review_confirm",
+        details="人工复核通过",
+        before=before,
+        after=after,
+        reason=reason,
+        run_id=run_id
+    )
+
     return record
 
 
-def finalize_record(record: ComplaintRecord) -> ComplaintRecord:
+def finalize_record(record: ComplaintRecord, run_id: str = "") -> ComplaintRecord:
+    before = record.snapshot_fields()
     record.status = "finalized"
-    record.add_log("system", "finalize", "记录已结案")
+    after = record.snapshot_fields()
+    record.add_log(
+        operator="system",
+        action="finalize",
+        details="记录已结案",
+        before=before,
+        after=after,
+        reason="结案",
+        run_id=run_id
+    )
     return record
