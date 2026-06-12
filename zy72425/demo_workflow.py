@@ -9,7 +9,7 @@ from datetime import datetime
 
 from piano_exam_prep.storage import Storage
 from piano_exam_prep.engine import PrepEngine
-from piano_exam_prep.models import ReviewStatus
+from piano_exam_prep.models import ReviewStatus, ImportResultType
 
 
 def banner(title):
@@ -36,19 +36,30 @@ def main():
         "4. 小李 - 梦中的婚礼",
         "5. 小张 - 童年的回忆",
     ]
-    added, skipped = engine.import_signups("BATCH_001", lines, "老周")
-    print(f"导入结果: 新增 {added} 条, 跳过 {skipped} 条")
+    results = engine.import_signups("BATCH_001", lines, "老周")
+    new_count = sum(1 for r in results if r.result_type == ImportResultType.NEW)
+    dup_count = sum(1 for r in results if r.result_type == ImportResultType.HISTORY_DUPLICATE)
+    print(f"导入结果: 新增 {new_count} 条, 历史重复 {dup_count} 条")
+
+    print("\n📋 导入明细:")
+    type_labels = {ImportResultType.NEW: "✅ 新记录", ImportResultType.HISTORY_DUPLICATE: "⚠️ 历史重复", ImportResultType.BATCH_DUPLICATE: "🔁 本次重复"}
+    for r in results:
+        label = type_labels.get(r.result_type, r.result_type.value)
+        print(f"  第{r.original_line_number}行 | {r.student_name} | {r.song_name_raw} | {label}")
 
     print("\n📋 当前记录列表:")
     for r in storage.list_records():
         print(f"  {r.record_id} | {r.student_name} | {r.song_display_name} | {r.workflow_stage.value}")
 
     banner("验证: 重复导入同一批，数量不翻倍")
-    added2, skipped2 = engine.import_signups("BATCH_001", lines, "老周")
-    print(f"第二次导入: 新增 {added2} 条, 跳过 {skipped2} 条")
+    results2 = engine.import_signups("BATCH_001", lines, "老周")
+    new2 = sum(1 for r in results2 if r.result_type == ImportResultType.NEW)
+    hist2 = sum(1 for r in results2 if r.result_type == ImportResultType.HISTORY_DUPLICATE)
+    print(f"第二次导入: 新记录 {new2} 条, 历史重复 {hist2} 条")
     total_records = len(storage.list_records())
     print(f"当前总记录数: {total_records} (应为 5)")
     assert total_records == 5, "防重复导入失败!"
+    assert new2 == 0, "第二次导入应该没有新记录!"
     print("✅ 防重复导入验证通过")
 
     banner("第二步: 老周补看合同页截图 (操作人: 老周)")
@@ -89,18 +100,35 @@ def main():
     print(f"   原因: {ming_record.discrepancy_note}")
     print(f"   规则: 现场名≠版权名时，不急着归正常，留给音乐老师复核")
 
-    banner("演示: 老周只改了一条备注，历史里能看出差别")
+    banner("演示: 老周只改了一条备注，历史里能看出差别(追加模式，原话保留)")
     engine.update_remark(
         record_id=ming_record.record_id,
         field_name="discrepancy_note",
-        new_value=f"{ming_record.discrepancy_note} | 老周补充: 家长说孩子平时就叫小星星",
+        new_value="家长说孩子平时就叫小星星",
         operator="老周",
         change_note="补充家长反馈信息",
+        append=True,
     )
-    print("✅ 备注已修改")
+    print("✅ 备注已修改（追加模式）")
+    ming_record = storage.load_record(ming_record.record_id)
+    print(f"\n📝 当前备注内容:")
+    for i, line in enumerate(ming_record.discrepancy_note.split("\n"), 1):
+        print(f"   {i}. {line}")
     print("\n📜 小明记录的变更历史:")
     for h in storage.list_history(ming_record.record_id):
-        print(h.human_readable())
+        print(f"📌 {h.history_id}  ({h.timestamp.strftime('%Y-%m-%d %H:%M:%S')})")
+        print(f"   操作人: {h.operator} | 操作: {h.operation}")
+        for c in h.changes[:2]:
+            old = c.old_value or "(空)"
+            new = c.new_value or "(空)"
+            if "\n" in old or "\n" in new:
+                old = old.split("\n")[0] + "..."
+                new = new.split("\n")[0] + "..."
+            print(f"   · {c.field_name}: {old} → {new}")
+        if len(h.changes) > 2:
+            print(f"   · ... 等 {len(h.changes)} 项变更")
+        if h.note:
+            print(f"   备注: {h.note}")
         print()
 
     banner("第三步: 音乐老师复核 (操作人: 王老师)")

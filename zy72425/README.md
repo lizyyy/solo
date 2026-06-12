@@ -30,16 +30,30 @@
 
 **怎么回滚？**
 ```bash
-python prep.py history --record-id REC_xxx  # 找到要回滚到的历史点ID
-# (回滚功能在引擎中已实现，CLI 接口可按需扩展)
+python prep.py history --record-id REC_xxx  # 找到要回滚到的历史点ID（HIST_xxx）
+python prep.py rollback --record-id REC_xxx --history-id HIST_xxx --operator 王老师
 ```
 
 ### 规则 2: 重复导入怎么判？
 
-**判定逻辑**（见 [engine.py](file:///Users/lzy/pro/solo/workspaces/zy72425/piano_exam_prep/engine.py#L32-L65)）：
+**判定逻辑**（见 [engine.py](file:///Users/lzy/pro/solo/workspaces/zy72425/piano_exam_prep/engine.py#L20-L94)）：
 - 每条接龙记录计算 `source_hash = sha256(batch_id:line_number:student:song)`
-- 哈希已存在 → 跳过，不新增
+- 三种结果，每条都标注清楚，不靠总数糊过去：
+  - ✅ **新记录 (NEW)** — 历史上没出现过，新增
+  - ⚠️  **历史重复 (HISTORY_DUPLICATE)** — 之前批次导入过，跳过，不翻倍
+  - 🔁 **本次重复 (BATCH_DUPLICATE)** — 同一批接龙里就重复了，跳过
 - 所以同一批接龙重复导入，数量不会翻倍
+
+**导入输出示例：**
+```
+行号   学生    曲目       类型         记录ID        备注
+------------------------------------------------------------------
+1     小明    小星星    ✅ 新记录     REC_xxx      新增记录
+2     小红    致爱丽丝   ⚠️  历史重复   REC_yyy      历史批次已导入，跳过
+3     小华    月光奏鸣曲  🔁 本次重复   (无)         同一批接龙内重复，跳过
+------------------------------------------------------------------
+总计 3 条 | 新记录 1 | 历史重复 1 | 本次重复 1
+```
 
 **验证命令：**
 ```bash
@@ -48,10 +62,53 @@ python prep.py reimport-test --batch-id BATCH_001 --input-file examples/signup_b
 
 ### 规则 3: 变更怎么留痕？
 
-**判定逻辑**（见 [engine.py](file:///Users/lzy/pro/solo/workspaces/zy72425/piano_exam_prep/engine.py#L257-L282)）：
-- 每一次操作（创建、补录、复核、改备注）都生成一条 `ChangeHistory`
-- 每条历史包含：操作人、时间、操作类型、每个字段的旧值→新值
+**判定逻辑**（见 [engine.py](file:///Users/lzy/pro/solo/workspaces/zy72425/piano_exam_prep/engine.py#L312-L334)）：
+- 每一次操作（创建、补录、复核、改备注、回滚）都生成一条 `ChangeHistory`
+- 每条历史包含：`history_id`、操作人、时间、操作类型、每个字段的旧值→新值
 - 即使只改一个备注字段，也能看出改前改后的差别
+- 回滚操作本身也会留下历史记录
+
+### 规则 4: 备注怎么改才不覆盖原话？
+
+**判定逻辑**（见 [engine.py](file:///Users/lzy/pro/solo/workspaces/zy72425/piano_exam_prep/engine.py#L336-L378)）：
+- 默认覆盖模式：直接替换原值
+- 追加模式（`--append`）：在原值后面追加，保留原话
+  - 格式：`原值\n[时间 操作人] 新内容（原因: 修改原因）`
+- `discrepancy_note` 等说明性字段，系统自动操作时也采用追加模式，不覆盖之前的人工备注
+- 历史记录里始终保留完整的 old→new，不怕覆盖
+
+**示例：**
+```bash
+# 追加模式改备注，原话保留
+python prep.py update \
+  --record-id REC_xxx \
+  --field discrepancy_note \
+  --value "家长说孩子平时就叫小星星" \
+  --operator 老周 \
+  --note "补充家长反馈" \
+  --append
+```
+
+### 规则 5: 回滚怎么用？
+
+**判定逻辑**（见 [engine.py](file:///Users/lzy/pro/solo/workspaces/zy72425/piano_exam_prep/engine.py#L392-L432)）：
+- 回滚到指定 `history_id` **之前**的状态，该历史点及之后的所有变更都会被撤销
+- 回滚操作本身也会留下一条历史记录，可追溯
+- 正确处理枚举类型（状态、阶段）、嵌套对象（合同信息）、时间字段
+- 回滚后，明细、历史、后续查询都读到同一条更新后的记录
+
+**怎么用：**
+```bash
+# 第一步：看历史，找到要回滚到哪个点之前
+python prep.py history --record-id REC_xxx
+# 输出里每条都有 HIST_xxx 格式的 history_id
+
+# 第二步：执行回滚
+python prep.py rollback \
+  --record-id REC_xxx \
+  --history-id HIST_xxx \
+  --operator 王老师
+```
 
 ---
 

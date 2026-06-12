@@ -9,21 +9,39 @@ from datetime import datetime
 
 from .storage import Storage
 from .engine import PrepEngine
-from .models import ReviewStatus, WorkflowStage
+from .models import ReviewStatus, WorkflowStage, ImportResultType
 
 
 def cmd_import(args):
-    """第一步：导入排练群接龙"""
+    """第一步：导入排练群接龙 - 输出每条明细，不靠总数糊过去"""
     storage = Storage(args.data_dir)
     engine = PrepEngine(storage)
 
     with open(args.input_file, "r", encoding="utf-8") as f:
         lines = [line.rstrip("\n") for line in f if line.strip()]
 
-    added, skipped = engine.import_signups(args.batch_id, lines, args.operator)
-    print(f"✅ 导入完成: 新增 {added} 条, 重复跳过 {skipped} 条")
-    print(f"   批次 ID: {args.batch_id}")
-    print(f"   操作人: {args.operator}")
+    results = engine.import_signups(args.batch_id, lines, args.operator)
+
+    type_labels = {
+        ImportResultType.NEW: "✅ 新记录",
+        ImportResultType.HISTORY_DUPLICATE: "⚠️  历史重复",
+        ImportResultType.BATCH_DUPLICATE: "🔁 本次重复",
+    }
+
+    print(f"导入完成: 批次 {args.batch_id}, 操作人: {args.operator}")
+    print("=" * 70)
+    print(f"{'行号':<6} {'学生':<8} {'曲目':<20} {'类型':<12} {'记录ID':<14} 备注")
+    print("-" * 70)
+    for r in results:
+        label = type_labels.get(r.result_type, r.result_type.value)
+        rec_id = r.record_id or "(无)"
+        note = r.note or ""
+        print(f"{r.original_line_number:<6} {r.student_name:<8} {r.song_name_raw:<20} {label:<12} {rec_id:<14} {note}")
+    print("-" * 70)
+    new_count = sum(1 for r in results if r.result_type == ImportResultType.NEW)
+    hist_count = sum(1 for r in results if r.result_type == ImportResultType.HISTORY_DUPLICATE)
+    batch_count = sum(1 for r in results if r.result_type == ImportResultType.BATCH_DUPLICATE)
+    print(f"总计 {len(results)} 条 | 新记录 {new_count} | 历史重复 {hist_count} | 本次重复 {batch_count}")
 
 
 def cmd_supplement_contract(args):
@@ -167,14 +185,24 @@ def cmd_history(args):
     history = storage.list_history(args.record_id)
 
     print(f"📜 变更历史 - 记录 {args.record_id if args.record_id else '(全部)'}")
-    print("=" * 60)
+    print("=" * 70)
     for h in history:
-        print(h.human_readable())
+        print(f"📌 {h.history_id}  ({h.timestamp.strftime('%Y-%m-%d %H:%M:%S')})")
+        print(f"   操作人: {h.operator} | 操作: {h.operation}")
+        for c in h.changes:
+            old = c.old_value or "(空)"
+            new = c.new_value or "(空)"
+            if "\n" in old or "\n" in new:
+                old = old.replace("\n", " ⏎ ")
+                new = new.replace("\n", " ⏎ ")
+            print(f"   · {c.field_name}: {old} → {new}")
+        if h.note:
+            print(f"   备注: {h.note}")
         print()
 
 
 def cmd_update_remark(args):
-    """修改备注 - 只改一条也能看出差别"""
+    """修改备注 - 只改一条也能看出差别，append 模式保留原话"""
     storage = Storage(args.data_dir)
     engine = PrepEngine(storage)
 
@@ -184,12 +212,32 @@ def cmd_update_remark(args):
         new_value=args.value,
         operator=args.operator,
         change_note=args.note,
+        append=args.append,
     )
-    print(f"✅ 修改完成: {args.field} = {args.value}")
+    mode = "追加模式" if args.append else "覆盖模式"
+    print(f"✅ 修改完成 ({mode}): {args.field}")
+    print(f"   当前值: {getattr(record, args.field, '')}")
+
+
+def cmd_rollback(args):
+    """回滚到指定历史点之前的状态"""
+    storage = Storage(args.data_dir)
+    engine = PrepEngine(storage)
+
+    record = engine.rollback(
+        record_id=args.record_id,
+        history_id=args.history_id,
+        operator=args.operator,
+    )
+    print(f"✅ 回滚完成")
+    print(f"   记录 ID: {record.record_id}")
+    print(f"   回滚至: {args.history_id} 之前")
+    print(f"   当前曲目: {record.song_display_name}")
+    print(f"   当前状态: {record.review_status.value}")
 
 
 def cmd_reimport_test(args):
-    """测试重复导入 - 验证数量不翻倍"""
+    """测试重复导入 - 明细到每条，不靠总数糊过去"""
     storage = Storage(args.data_dir)
     engine = PrepEngine(storage)
 
@@ -197,15 +245,18 @@ def cmd_reimport_test(args):
         lines = [line.rstrip("\n") for line in f if line.strip()]
 
     print("第一次导入...")
-    a1, s1 = engine.import_signups(args.batch_id, lines, args.operator)
-    print(f"  结果: 新增 {a1}, 跳过 {s1}")
+    r1 = engine.import_signups(args.batch_id, lines, args.operator)
+    new1 = sum(1 for r in r1 if r.result_type == ImportResultType.NEW)
+    print(f"  新记录 {new1} 条, 总计 {len(r1)} 条")
 
     print("\n第二次导入(同一批)...")
-    a2, s2 = engine.import_signups(args.batch_id, lines, args.operator)
-    print(f"  结果: 新增 {a2}, 跳过 {s2}")
+    r2 = engine.import_signups(args.batch_id, lines, args.operator)
+    new2 = sum(1 for r in r2 if r.result_type == ImportResultType.NEW)
+    hist2 = sum(1 for r in r2 if r.result_type == ImportResultType.HISTORY_DUPLICATE)
+    print(f"  新记录 {new2} 条, 历史重复 {hist2} 条, 总计 {len(r2)} 条")
 
-    if a2 == 0 and s2 == a1:
-        print("\n✅ 防重复导入验证通过: 第二次导入没有新增")
+    if new2 == 0 and hist2 == new1:
+        print("\n✅ 防重复导入验证通过: 第二次导入全为历史重复，数量不翻倍")
     else:
         print("\n❌ 防重复导入验证失败!")
 
@@ -267,7 +318,15 @@ def main():
     p_update.add_argument("--value", required=True, help="新值")
     p_update.add_argument("--operator", required=True)
     p_update.add_argument("--note", help="修改说明")
+    p_update.add_argument("--append", action="store_true", help="追加模式(保留原值)")
     p_update.set_defaults(func=cmd_update_remark)
+
+    # 回滚
+    p_rollback = subparsers.add_parser("rollback", help="回滚到指定历史点之前")
+    p_rollback.add_argument("--record-id", required=True)
+    p_rollback.add_argument("--history-id", required=True, help="要回滚到哪个历史点之前")
+    p_rollback.add_argument("--operator", required=True)
+    p_rollback.set_defaults(func=cmd_rollback)
 
     # 重复导入测试
     p_test = subparsers.add_parser("reimport-test", help="测试防重复导入")

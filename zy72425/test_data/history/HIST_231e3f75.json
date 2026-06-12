@@ -1,0 +1,75 @@
+{
+  "history_id": "HIST_231e3f75",
+  "record_id": "REC_391fd3a8",
+  "operator": "王老师",
+  "operation": "回滚至 HIST_8607c238 之前",
+  "changes": [
+    {
+      "field_name": "discrepancy_note",
+      "old_value": "现场名「小星星」与版权名「小星星变奏曲」不一致，需音乐老师复核\n[2026-06-12 09:14 老周] 家长说孩子平时就叫小星星，已和家长确认（原因: 补充家长反馈）\n[2026-06-12 09:14 王老师 复核通过] 统一为: 小星星变奏曲",
+      "new_value": "现场名「小星星」与版权名「小星星变奏曲」不一致，需音乐老师复核\n[2026-06-12 09:14 老周] 家长说孩子平时就叫小星星，已和家长确认（原因: 补充家长反馈）"
+    },
+    {
+      "field_name": "song_display_name",
+      "old_value": "小星星变奏曲",
+      "new_value": "小星星"
+    },
+    {
+      "field_name": "confirmed_at",
+      "old_value": "2026-06-12T09:14:57.058862",
+      "new_value": null
+    },
+    {
+      "field_name": "confirmed_by",
+      "old_value": "王老师",
+      "new_value": null
+    },
+    {
+      "field_name": "review_status",
+      "old_value": "confirmed",
+      "new_value": "needs_review"
+    },
+    {
+      "field_name": "discrepancy_note",
+      "old_value": "现场名「小星星」与版权名「小星星变奏曲」不一致，需音乐老师复核\n[2026-06-12 09:14 老周] 家长说孩子平时就叫小星星，已和家长确认（原因: 补充家长反馈）",
+      "new_value": "现场名「小星星」与版权名「小星星变奏曲」不一致，需音乐老师复核"
+    },
+    {
+      "field_name": "discrepancy_note",
+      "old_value": "现场名「小星星」与版权名「小星星变奏曲」不一致，需音乐老师复核",
+      "new_value": null
+    },
+    {
+      "field_name": "discrepancy_type",
+      "old_value": "name_mismatch",
+      "new_value": null
+    },
+    {
+      "field_name": "review_status",
+      "old_value": "needs_review",
+      "new_value": "pending"
+    },
+    {
+      "field_name": "workflow_stage",
+      "old_value": "contract_supplemented",
+      "new_value": "imported"
+    },
+    {
+      "field_name": "screenshot_path",
+      "old_value": "screenshots/ct_2024_001.png",
+      "new_value": null
+    },
+    {
+      "field_name": "song_copyright_name",
+      "old_value": "小星星变奏曲",
+      "new_value": null
+    },
+    {
+      "field_name": "contract_id",
+      "old_value": "CT-2024-001",
+      "new_value": null
+    }
+  ],
+  "timestamp": "2026-06-12T09:16:48.044621",
+  "note": "回滚操作，共撤销 3 条历史记录"
+}

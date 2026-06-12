@@ -1,0 +1,45 @@
+{
+  "history_id": "HIST_8607c238",
+  "record_id": "REC_391fd3a8",
+  "operator": "老周",
+  "operation": "补录合同信息",
+  "changes": [
+    {
+      "field_name": "contract_id",
+      "old_value": null,
+      "new_value": "CT-2024-001"
+    },
+    {
+      "field_name": "song_copyright_name",
+      "old_value": null,
+      "new_value": "小星星变奏曲"
+    },
+    {
+      "field_name": "screenshot_path",
+      "old_value": null,
+      "new_value": "screenshots/ct_2024_001.png"
+    },
+    {
+      "field_name": "workflow_stage",
+      "old_value": "imported",
+      "new_value": "contract_supplemented"
+    },
+    {
+      "field_name": "review_status",
+      "old_value": "pending",
+      "new_value": "needs_review"
+    },
+    {
+      "field_name": "discrepancy_type",
+      "old_value": null,
+      "new_value": "name_mismatch"
+    },
+    {
+      "field_name": "discrepancy_note",
+      "old_value": null,
+      "new_value": "现场名「小星星」与版权名「小星星变奏曲」不一致，需音乐老师复核"
+    }
+  ],
+  "timestamp": "2026-06-12T09:13:17.080946",
+  "note": "合同第3页截图"
+}

@@ -127,3 +127,22 @@ class WeeklyReportEntry:
     review_status: ReviewStatus
     discrepancy_note: Optional[str]
     has_contract: bool
+
+
+class ImportResultType(str, Enum):
+    """单条接龙导入结果类型"""
+    NEW = "new"
+    HISTORY_DUPLICATE = "history_duplicate"
+    BATCH_DUPLICATE = "batch_duplicate"
+
+
+@dataclass
+class ImportResultItem:
+    """单条接龙导入结果 - 明细到每一行，不靠总数糊过去"""
+    original_line_number: int
+    student_name: str
+    song_name_raw: str
+    result_type: ImportResultType
+    record_id: Optional[str] = None
+    source_hash: Optional[str] = None
+    note: Optional[str] = None

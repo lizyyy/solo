@@ -1,0 +1,25 @@
+{
+  "history_id": "HIST_32883478",
+  "record_id": "REC_74aad9ae",
+  "operator": "老周",
+  "operation": "创建记录",
+  "changes": [
+    {
+      "field_name": "student_name",
+      "old_value": null,
+      "new_value": "小华"
+    },
+    {
+      "field_name": "song_display_name",
+      "old_value": null,
+      "new_value": "月光奏鸣曲"
+    },
+    {
+      "field_name": "workflow_stage",
+      "old_value": null,
+      "new_value": "imported"
+    }
+  ],
+  "timestamp": "2026-06-12T09:11:32.823783",
+  "note": "从排练群接龙导入创建"
+}

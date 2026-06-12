@@ -1,0 +1,25 @@
+{
+  "history_id": "HIST_24e6e344",
+  "record_id": "REC_b65f46ce",
+  "operator": "老周",
+  "operation": "创建记录",
+  "changes": [
+    {
+      "field_name": "student_name",
+      "old_value": null,
+      "new_value": "小李"
+    },
+    {
+      "field_name": "song_display_name",
+      "old_value": null,
+      "new_value": "梦中的婚礼"
+    },
+    {
+      "field_name": "workflow_stage",
+      "old_value": null,
+      "new_value": "imported"
+    }
+  ],
+  "timestamp": "2026-06-12T09:29:55.707013",
+  "note": "从排练群接龙导入创建"
+}

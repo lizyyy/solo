@@ -147,7 +147,7 @@ class Storage:
 
     def list_history(self, record_id: Optional[str] = None) -> List[ChangeHistory]:
         history_list = []
-        for fname in sorted(os.listdir(self.history_dir)):
+        for fname in os.listdir(self.history_dir):
             if not fname.endswith(".json"):
                 continue
             path = os.path.join(self.history_dir, fname)
@@ -165,7 +165,7 @@ class Storage:
                 note=data.get("note"),
             )
             history_list.append(history)
-        return history_list
+        return sorted(history_list, key=lambda h: h.timestamp)
 
 
 def new_id(prefix: str) -> str:
