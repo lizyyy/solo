@@ -23,6 +23,7 @@ def api_get_checklist(audio_note_id):
     checklist = services.get_checklist(audio_note_id)
     auth = services.get_authorization_page(audio_note_id)
     records = services.get_rework_records(audio_note_id)
+    history = services.get_checklist_history(audio_note_id)
     
     if checklist:
         checklist['status_label'] = STATUS_LABELS.get(checklist['status'], checklist['status'])
@@ -32,7 +33,8 @@ def api_get_checklist(audio_note_id):
         'audio_note': note,
         'checklist': checklist,
         'authorization': auth,
-        'rework_records': records
+        'rework_records': records,
+        'checklist_history': history
     })
 
 @app.route('/api/import', methods=['POST'])

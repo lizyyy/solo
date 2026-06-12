@@ -17,6 +17,7 @@ body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
 .stat-card .label { font-size: 13px; color: #888; margin-top: 4px; }
 .stat-card.warning .num { color: #f59e0b; }
 .stat-card.danger .num { color: #ef4444; }
+.stat-card.success .num { color: #10b981; }
 .checklist-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 16px; }
 .card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-left: 4px solid #e5e7eb; transition: all 0.2s; cursor: pointer; }
 .card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
@@ -25,18 +26,24 @@ body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
 .card.auth-completed { border-left-color: #10b981; }
 .card.pending-review { border-left-color: #ef4444; }
 .card.completed { border-left-color: #10b981; opacity: 0.8; }
-.card .track-name { font-size: 16px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.card .track-name { font-size: 16px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .badge { font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: 500; }
 .badge.leave { background: #fef3c7; color: #92400e; }
 .badge.status { background: #eef2ff; color: #4338ca; }
+.badge.correction { background: #dbeafe; color: #1e40af; }
 .card .meta { font-size: 13px; color: #666; margin-bottom: 12px; }
 .card .section { margin-bottom: 10px; }
-.card .section-title { font-size: 12px; color: #888; margin-bottom: 4px; }
+.card .section-title { font-size: 12px; color: #888; margin-bottom: 4px; font-weight: 500; }
 .card .section-content { font-size: 13px; line-height: 1.6; }
+.card .section-source { font-size: 11px; color: #6b7280; margin-top: 4px; padding: 6px 8px; background: #f3f4f6; border-radius: 4px; border-left: 2px solid #d1d5db; }
 .next-owner { display: inline-block; background: #f0f9ff; color: #0369a1; padding: 4px 10px; border-radius: 12px; font-size: 12px; margin-top: 8px; }
+.leave-count-info { font-size: 12px; color: #6b7280; margin-top: 6px; }
+.leave-count-info strong { color: #dc2626; }
+.leave-count-info .original { color: #9ca3af; text-decoration: line-through; }
+.leave-count-info .corrected { color: #059669; font-weight: 600; }
 .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
 .modal.active { display: flex; }
-.modal-content { background: white; width: 90%; max-width: 800px; max-height: 85vh; overflow-y: auto; border-radius: 12px; padding: 28px; }
+.modal-content { background: white; width: 90%; max-width: 900px; max-height: 85vh; overflow-y: auto; border-radius: 12px; padding: 28px; }
 .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #eee; }
 .modal-header h2 { font-size: 20px; }
 .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #888; }
@@ -46,25 +53,38 @@ body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
 .info-item { font-size: 13px; }
 .info-item .label { color: #888; margin-bottom: 2px; }
 .info-item .value { font-weight: 500; }
+.info-item.full { grid-column: 1 / -1; }
 .rework-timeline { border-left: 2px solid #e5e7eb; margin-left: 12px; padding-left: 20px; }
 .rework-item { position: relative; margin-bottom: 20px; }
 .rework-item::before { content: ''; position: absolute; left: -29px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: #667eea; border: 3px solid white; box-shadow: 0 0 0 2px #667eea; }
+.rework-item.import::before { background: #10b981; box-shadow: 0 0 0 2px #10b981; }
+.rework-item.correction::before { background: #f59e0b; box-shadow: 0 0 0 2px #f59e0b; }
+.rework-item.rerun::before { background: #8b5cf6; box-shadow: 0 0 0 2px #8b5cf6; }
+.rework-item.auth::before { background: #3b82f6; box-shadow: 0 0 0 2px #3b82f6; }
+.rework-item.review::before { background: #059669; box-shadow: 0 0 0 2px #059669; }
 .rework-item .time { font-size: 12px; color: #888; margin-bottom: 4px; }
 .rework-item .operator { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 4px; }
 .rework-item .action { font-size: 13px; background: #f3f4f6; padding: 8px 12px; border-radius: 6px; margin-bottom: 6px; }
 .rework-item .reason { font-size: 13px; color: #666; }
 .rework-item .affected { font-size: 12px; color: #059669; margin-top: 4px; }
+.rework-item .source { font-size: 11px; color: #6b7280; margin-top: 6px; padding: 6px 8px; background: #fef3c7; border-radius: 4px; border-left: 2px solid #f59e0b; }
 .field-change { font-family: monospace; font-size: 12px; background: #fffbeb; padding: 2px 6px; border-radius: 4px; color: #92400e; }
+.history-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.history-tag { font-size: 11px; padding: 4px 10px; background: #f3f4f6; border-radius: 12px; color: #6b7280; }
+.history-tag.current { background: #dcfce7; color: #166534; font-weight: 600; }
+.data-source-tag { display: inline-block; font-size: 11px; padding: 2px 8px; background: #ede9fe; color: #5b21b6; border-radius: 4px; margin-left: 8px; }
 .empty-state { text-align: center; padding: 60px 20px; color: #888; }
 .empty-state p { margin-top: 12px; }
 .loading { text-align: center; padding: 40px; color: #888; }
+.trace-alert { background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 12px; margin-bottom: 16px; font-size: 13px; }
+.trace-alert strong { color: #dc2626; }
 </style>
 </head>
 <body>
 <div class="container">
   <div class="header">
     <h1>🎵 伴奏降噪返工记录</h1>
-    <p>曲目核对表 · 谁改了什么 · 为什么改 · 改完影响哪些结果</p>
+    <p>曲目核对表 · 谁改了什么 · 为什么改 · 改完影响哪些结果 · 原始材料可追溯</p>
   </div>
 
   <div class="stats">
@@ -72,6 +92,7 @@ body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
     <div class="stat-card warning"><div class="num" id="stat-leave">0</div><div class="label">请假课时待复核</div></div>
     <div class="stat-card"><div class="num" id="stat-auth">0</div><div class="label">缺授权期限页</div></div>
     <div class="stat-card danger"><div class="num" id="stat-review">0</div><div class="label">待巡演统筹复核</div></div>
+    <div class="stat-card success"><div class="num" id="stat-corrected">0</div><div class="label">已人工修正</div></div>
   </div>
 
   <div id="checklist-container" class="checklist-grid">
@@ -103,22 +124,40 @@ function renderList(checklists) {
   document.getElementById('stat-leave').textContent = checklists.filter(c => c.status === 'leave_marked').length;
   document.getElementById('stat-auth').textContent = checklists.filter(c => c.status === 'auth_missing').length;
   document.getElementById('stat-review').textContent = checklists.filter(c => c.status === 'pending_review').length;
+  document.getElementById('stat-corrected').textContent = checklists.filter(c => c.original_leave_hours_count && c.leave_hours_count !== c.original_leave_hours_count).length;
 
   if (checklists.length === 0) {
-    container.innerHTML = '<div class="empty-state"><h3>暂无数据</h3><p>请先运行 <code>python cli.py demo-setup</code> 初始化演示数据</p></div>';
+    container.innerHTML = '<div class="empty-state"><h3>暂无数据</h3><p>请先运行 <code>python3 cli.py demo-setup</code> 初始化演示数据</p></div>';
     return;
   }
 
   container.innerHTML = checklists.map(cl => {
     const statusClass = cl.status.replace('_', '-');
     const leaveBadge = cl.has_leave_hours ? '<span class="badge leave">⚠️ 请假课时异常</span>' : '';
+    
+    let correctionBadge = '';
+    let leaveCountHtml = '';
+    if (cl.original_leave_hours_count && cl.leave_hours_count !== cl.original_leave_hours_count) {
+      correctionBadge = `<span class="badge correction">✏️ 已修正 ${cl.original_leave_hours_count}→${cl.leave_hours_count}节</span>`;
+      leaveCountHtml = `<div class="leave-count-info">请假课时：<span class="original">原始${cl.original_leave_hours_count}节</span> → <span class="corrected">当前${cl.leave_hours_count}节</span></div>`;
+    } else if (cl.has_leave_hours) {
+      leaveCountHtml = `<div class="leave-count-info">请假课时：<strong>${cl.leave_hours_count}节</strong>（无修正记录）</div>`;
+    }
+    
+    let sourceHtml = '';
+    if (cl.missing_materials_source) {
+      sourceHtml = `<div class="section-source">📌 ${cl.missing_materials_source}</div>`;
+    }
+    
     return `
       <div class="card ${statusClass}" onclick="showDetail(${cl.audio_note_id})">
         <div class="track-name">
           ${cl.track_name}
           ${leaveBadge}
+          ${correctionBadge}
         </div>
         <div class="meta"><span class="badge status">${cl.status_label}</span></div>
+        ${leaveCountHtml}
         <div class="section">
           <div class="section-title">为什么被留下</div>
           <div class="section-content">${cl.reason_kept || '-'}</div>
@@ -126,6 +165,7 @@ function renderList(checklists) {
         <div class="section">
           <div class="section-title">还缺什么材料</div>
           <div class="section-content">${cl.missing_materials || '-'}</div>
+          ${sourceHtml}
         </div>
         <span class="next-owner">👉 ${cl.next_owner_label}：${cl.next_action || ''}</span>
       </div>
@@ -141,9 +181,40 @@ async function showDetail(audioNoteId) {
 }
 
 function renderDetail(data) {
-  const { audio_note, checklist, authorization, rework_records } = data;
+  const { audio_note, checklist, authorization, rework_records, checklist_history } = data;
   
   document.getElementById('modal-title').textContent = audio_note.track_name;
+  
+  let leaveTraceHtml = '';
+  let hasCorrection = audio_note.original_leave_hours_count && audio_note.leave_hours_count !== audio_note.original_leave_hours_count;
+  
+  if (audio_note.has_leave_hours) {
+    if (hasCorrection) {
+      leaveTraceHtml = `
+        <div class="info-item full">
+          <div class="label">⚠️ 请假课时被算进已消耗（<strong style="color:#dc2626">已人工修正</strong>）</div>
+          <div class="value">
+            <span style="color:#9ca3af;text-decoration:line-through;">原始：${audio_note.original_leave_hours_count}节</span>
+            <span style="margin:0 8px;">→</span>
+            <span style="color:#059669;font-weight:600;">修正后：${audio_note.leave_hours_count}节</span>
+          </div>
+          <div style="font-size:12px;color:#6b7280;margin-top:4px;">修正说明：${audio_note.leave_hours_correction_note || '-'}</div>
+          <div class="trace-alert" style="margin-top:8px;">
+            <strong>追溯说明：</strong>原始值${audio_note.original_leave_hours_count}节永久保留用于审计，当前使用修正后的${audio_note.leave_hours_count}节。
+            可通过返工记录查看谁改了什么、改完影响了哪条结果。
+          </div>
+        </div>
+      `;
+    } else {
+      leaveTraceHtml = `
+        <div class="info-item full">
+          <div class="label">⚠️ 请假课时被算进已消耗</div>
+          <div class="value" style="color:#dc2626;">${audio_note.leave_hours_count} 节，待巡演统筹复核</div>
+          <div style="font-size:12px;color:#6b7280;margin-top:4px;">原始记录：${audio_note.original_leave_hours_count || audio_note.leave_hours_count}节，暂无修正记录</div>
+        </div>
+      `;
+    }
+  }
   
   let authHtml = '';
   if (authorization) {
@@ -151,25 +222,56 @@ function renderDetail(data) {
       <div class="info-grid">
         <div class="info-item"><div class="label">授权编号</div><div class="value">${authorization.authorization_number}</div></div>
         <div class="info-item"><div class="label">有效期</div><div class="value">${authorization.valid_from} 至 ${authorization.valid_to}</div></div>
-        <div class="info-item" style="grid-column: 1 / -1;"><div class="label">授权内容</div><div class="value">${authorization.page_content || '-'}</div></div>
+        <div class="info-item full"><div class="label">授权内容</div><div class="value">${authorization.page_content || '-'}</div></div>
       </div>
     `;
   } else {
     authHtml = '<p style="color: #888; font-size: 13px;">暂未上传授权期限页</p>';
   }
+  
+  let historyHtml = '';
+  if (data.checklist_history && data.checklist_history.length > 0) {
+    historyHtml = `
+      <div class="info-item full">
+        <div class="label">历史版本追溯</div>
+        <div class="history-list">
+          ${data.checklist_history.map((h, i) => {
+            const isCurrent = h.id === checklist.id;
+            return `<span class="history-tag ${isCurrent ? 'current' : ''}">
+              v${h.id}${isCurrent ? ' (当前)' : ''} · ${h.leave_hours_count_used || '?'}节 · ${h.data_source || 'unknown'}
+            </span>`;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  const actionTypeClass = {
+    'import': 'import',
+    'manual_correction': 'correction',
+    'rerun': 'rerun',
+    'add_auth': 'auth',
+    'review_complete': 'review'
+  };
 
   const reworkHtml = rework_records.length > 0 ? rework_records.map(r => {
+    const cls = actionTypeClass[r.action_type] || '';
     let fieldChange = '';
     if (r.field_changed) {
       fieldChange = `<div class="field-change">${r.field_changed}: ${r.old_value} → ${r.new_value}</div>`;
     }
+    let sourceHtml = '';
+    if (r.source_material) {
+      sourceHtml = `<div class="source">📎 原始材料依据：${r.source_material}</div>`;
+    }
     return `
-      <div class="rework-item">
+      <div class="rework-item ${cls}">
         <div class="time">${r.created_at}</div>
         <div class="operator">${r.operator_name}</div>
         <div class="action">动作：${r.action_type} ${fieldChange}</div>
         <div class="reason">原因：${r.reason}</div>
         <div class="affected">📋 影响：${r.affected_results}</div>
+        ${sourceHtml}
       </div>
     `;
   }).join('') : '<p style="color: #888; font-size: 13px;">暂无返工记录</p>';
@@ -180,23 +282,28 @@ function renderDetail(data) {
       <div class="info-grid">
         <div class="info-item"><div class="label">文件路径</div><div class="value">${audio_note.file_path || '-'}</div></div>
         <div class="info-item"><div class="label">时长</div><div class="value">${audio_note.duration} 分钟</div></div>
-        <div class="info-item" style="grid-column: 1 / -1;"><div class="label">原始备注</div><div class="value">${audio_note.original_note || '-'}</div></div>
-        ${audio_note.has_leave_hours ? `
-        <div class="info-item" style="grid-column: 1 / -1;">
-          <div class="label">⚠️ 请假课时被算入已消耗</div>
-          <div class="value" style="color: #dc2626;">${audio_note.leave_hours_count} 节，待巡演统筹复核</div>
-        </div>` : ''}
+        <div class="info-item full"><div class="label">原始备注</div><div class="value">${audio_note.original_note || '-'}</div></div>
+        ${leaveTraceHtml}
       </div>
     </div>
 
     <div class="detail-section">
-      <h3>✅ 曲目核对表</h3>
+      <h3>✅ 曲目核对表 <span class="data-source-tag">来源：${checklist.data_source || 'unknown'}</span></h3>
       <div class="info-grid">
+        <div class="info-item"><div class="label">版本ID</div><div class="value">#${checklist.id}</div></div>
         <div class="info-item"><div class="label">当前状态</div><div class="value">${checklist.status_label}</div></div>
         <div class="info-item"><div class="label">下一步负责人</div><div class="value">${checklist.next_owner_label}</div></div>
-        <div class="info-item" style="grid-column: 1 / -1;"><div class="label">为什么被留下</div><div class="value">${checklist.reason_kept || '-'}</div></div>
-        <div class="info-item" style="grid-column: 1 / -1;"><div class="label">还缺什么材料</div><div class="value">${checklist.missing_materials || '-'}</div></div>
-        <div class="info-item" style="grid-column: 1 / -1;"><div class="label">下一步做什么</div><div class="value">${checklist.next_action || '-'}</div></div>
+        <div class="info-item"><div class="label">本次使用请假课时数</div><div class="value">${checklist.leave_hours_count_used || '-'}节</div></div>
+        <div class="info-item full"><div class="label">为什么被留下</div><div class="value">${checklist.reason_kept || '-'}</div></div>
+        <div class="info-item full"><div class="label">还缺什么材料</div><div class="value">${checklist.missing_materials || '-'}</div></div>
+        <div class="info-item full">
+          <div class="label">📌 材料来源依据</div>
+          <div class="value" style="font-size:12px;background:#fef3c7;padding:8px;border-radius:4px;border-left:3px solid #f59e0b;">
+            ${checklist.missing_materials_source || '未记录来源'}
+          </div>
+        </div>
+        <div class="info-item full"><div class="label">下一步做什么</div><div class="value">${checklist.next_action || '-'}</div></div>
+        ${historyHtml}
       </div>
     </div>
 

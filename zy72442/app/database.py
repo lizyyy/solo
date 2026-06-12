@@ -28,10 +28,15 @@ def init_db():
             duration REAL,
             has_leave_hours INTEGER DEFAULT 0,
             leave_hours_count INTEGER DEFAULT 0,
+            original_leave_hours_count INTEGER DEFAULT 0,
+            leave_hours_correction_note TEXT,
             original_note TEXT,
             imported_by INTEGER,
             imported_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (imported_by) REFERENCES users(id)
+            last_corrected_by INTEGER,
+            last_corrected_at TIMESTAMP,
+            FOREIGN KEY (imported_by) REFERENCES users(id),
+            FOREIGN KEY (last_corrected_by) REFERENCES users(id)
         )
     ''')
 
@@ -57,8 +62,11 @@ def init_db():
             status TEXT NOT NULL DEFAULT 'pending',
             reason_kept TEXT,
             missing_materials TEXT,
+            missing_materials_source TEXT,
+            leave_hours_count_used INTEGER,
             next_owner TEXT,
             next_action TEXT,
+            data_source TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (audio_note_id) REFERENCES audio_notes(id)
@@ -78,6 +86,7 @@ def init_db():
             operator_id INTEGER NOT NULL,
             operator_name TEXT NOT NULL,
             affected_results TEXT,
+            source_material TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (audio_note_id) REFERENCES audio_notes(id),
             FOREIGN KEY (checklist_id) REFERENCES track_checklists(id),
