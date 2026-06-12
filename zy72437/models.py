@@ -67,6 +67,22 @@ class AuditLog:
 
 
 @dataclass
+class RemarkHistory:
+    history_id: str
+    source: RecordSource
+    remark_text: str
+    modified_by: Optional[str] = None
+    modified_at: datetime = field(default_factory=datetime.now)
+    change_reason: Optional[str] = None
+
+
+class DuplicateType(Enum):
+    NEW = "new"
+    CURRENT_BATCH_DUPLICATE = "current_batch_duplicate"
+    HISTORICAL_DUPLICATE = "historical_duplicate"
+
+
+@dataclass
 class SelfCheckResult:
     check_id: str
     check_type: SelfCheckType
@@ -86,6 +102,10 @@ class ClaimRecord:
     song_copyright_name: Optional[str] = None
     attendance_count: Optional[int] = None
     raw_remark: str = ""
+    ticket_remark: str = ""
+    remark_histories: List[RemarkHistory] = field(default_factory=list)
+    duplicate_type: Optional[DuplicateType] = None
+    duplicate_of_record_id: Optional[str] = None
     status: RecordStatus = RecordStatus.PENDING_REVIEW
     source: RecordSource = RecordSource.SIGN_IN_PHOTO
     conflicts: List[ConflictEvidence] = field(default_factory=list)

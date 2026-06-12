@@ -24,6 +24,10 @@ class ExportService:
             "song_copyright_name",
             "attendance_count",
             "raw_remark",
+            "ticket_remark",
+            "duplicate_type",
+            "duplicate_type_text",
+            "has_song_alias",
             "status",
             "status_text",
             "has_conflicts",
@@ -49,6 +53,10 @@ class ExportService:
                     "song_copyright_name": row.get("song_copyright_name", ""),
                     "attendance_count": row.get("attendance_count", ""),
                     "raw_remark": row.get("raw_remark", ""),
+                    "ticket_remark": row.get("ticket_remark", ""),
+                    "duplicate_type": row.get("duplicate_type", ""),
+                    "duplicate_type_text": row.get("duplicate_type_text", ""),
+                    "has_song_alias": row.get("has_song_alias", ""),
                     "status": row.get("status", ""),
                     "status_text": row.get("status_text", ""),
                     "has_conflicts": row.get("has_conflicts", ""),
@@ -191,6 +199,30 @@ class APIHandler:
             operator=data["operator"],
         )
         return self.data_access.get_record_detail(record.record_id)
+
+    def confirm_song_alias(self, record_id: str, data: Dict) -> Dict:
+        return self.workflow_service.manually_confirm_song_alias(
+            record_id=record_id,
+            operator=data["operator"],
+            confirm_live_name_as_official=data.get("confirm_live_name_as_official", True),
+            decision_note=data["decision_note"],
+        )
+
+    def get_state_change_trail(self, record_id: str) -> Dict:
+        trail = self.data_access.get_state_change_trail(record_id)
+        return {
+            "record_id": record_id,
+            "count": len(trail),
+            "trail": trail,
+        }
+
+    def get_remark_histories(self, record_id: str) -> Dict:
+        histories = self.data_access.get_remark_histories(record_id)
+        return {
+            "record_id": record_id,
+            "count": len(histories),
+            "remark_histories": histories,
+        }
 
     def get_record(self, record_id: str) -> Dict:
         return self.data_access.get_record_detail(record_id)
