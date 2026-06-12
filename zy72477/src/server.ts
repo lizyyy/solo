@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import apiRoutes from './routes/api';
+import { initDemoData } from './seed';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -18,6 +19,8 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, () => {
+  console.log('正在初始化演示数据...');
+  initDemoData();
   console.log(`应急避难点容量校核系统已启动: http://localhost:${PORT}`);
 });
 

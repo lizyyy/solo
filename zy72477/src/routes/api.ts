@@ -163,12 +163,145 @@ router.post('/workflows/step3', (req: Request, res: Response) => {
   res.json(result);
 });
 
+router.get('/redlines', (req: Request, res: Response) => {
+  const { shelterId, batchNo } = req.query;
+  const result = unifiedDataLayer.getRedLineMaps(
+    shelterId as string | undefined,
+    batchNo as string | undefined
+  );
+  res.json(result);
+});
+
+router.get('/redlines/:id', (req: Request, res: Response) => {
+  const { redLineDao } = require('../dao/redLineDao');
+  const redLine = redLineDao.findById(req.params.id);
+  if (!redLine) {
+    return res.status(404).json({ error: '红线图不存在' });
+  }
+  res.json(redLine);
+});
+
+router.post('/redlines/:id/review', (req: Request, res: Response) => {
+  const { reviewStatus, reviewNote, reviewedBy } = req.body;
+  const result = workflowService.reviewRedLine(
+    req.params.id,
+    reviewStatus || 'reviewed',
+    reviewNote || '',
+    reviewedBy || '老马'
+  );
+  if (!result) {
+    return res.status(404).json({ error: '红线图不存在' });
+  }
+  res.json(result);
+});
+
+router.put('/redlines/:id/remarks', (req: Request, res: Response) => {
+  const { remarks, operator } = req.body;
+  const result = workflowService.updateRedLineRemarks(
+    req.params.id,
+    remarks || '',
+    operator || '操作员'
+  );
+  if (!result) {
+    return res.status(404).json({ error: '红线图不存在' });
+  }
+  res.json(result);
+});
+
+router.post('/redlines/reimport', (req: Request, res: Response) => {
+  const { workflowId, shelterId, version, remarks, areaRange, effectiveDate, importOperator, reimportNote, prevVersionId } = req.body;
+  const result = workflowService.step1_importRedLine(
+    workflowId, shelterId, version, remarks, areaRange, effectiveDate,
+    importOperator || '操作员',
+    { isReimport: true, reimportNote: reimportNote || '', prevVersionId }
+  );
+  if (!result.workflow) {
+    return res.status(400).json({ error: '工作流状态不正确或不存在' });
+  }
+  res.json(result);
+});
+
+router.get('/batches', (req: Request, res: Response) => {
+  const batches = unifiedDataLayer.getAllBatches();
+  res.json(batches);
+});
+
+router.get('/change-history', (req: Request, res: Response) => {
+  const { shelterId } = req.query;
+  const result = unifiedDataLayer.getChangeHistory(shelterId as string | undefined);
+  res.json(result);
+});
+
+router.get('/detour-records', (req: Request, res: Response) => {
+  const result = unifiedDataLayer.getDetourAffectedResults();
+  res.json(result);
+});
+
+router.get('/workflows/all/:shelterId', (req: Request, res: Response) => {
+  const workflows = workflowService.getAllWorkflowsForShelter(req.params.shelterId);
+  res.json(workflows);
+});
+
+router.post('/inspector-reports', (req: Request, res: Response) => {
+  const { shelterId, inspectorName, inspectionDate, actualCapacity, foundIssues, isTemporaryDetour, detourDescription, roadCondition, workflowId, operator } = req.body;
+  if (workflowId) {
+    const result = workflowService.step2_reviewInspectorReport(
+      workflowId, shelterId,
+      inspectorName || '网格员', inspectionDate, actualCapacity,
+      foundIssues || '', isTemporaryDetour || false, detourDescription || '',
+      roadCondition || 'normal', operator || '老马'
+    );
+    res.json(result);
+  } else {
+    const { inspectorDao } = require('../dao/inspectorDao');
+    const { generateReportNo, getCurrentTime } = require('../utils/common');
+    const report = inspectorDao.create({
+      reportNo: generateReportNo(),
+      shelterId,
+      inspectorName: inspectorName || '网格员',
+      inspectionDate,
+      actualCapacity,
+      foundIssues: foundIssues || '',
+      isTemporaryDetour: isTemporaryDetour || false,
+      detourDescription: detourDescription || '',
+      roadCondition: roadCondition || 'normal'
+    });
+    res.json(report);
+  }
+});
+
+router.post('/point-update', (req: Request, res: Response) => {
+  const { workflowId, shelterId, operator } = req.body;
+  const result = workflowService.step3_updatePointList(
+    workflowId, shelterId, operator || '系统'
+  );
+  if (!result.workflow) {
+    return res.status(400).json({ error: '工作流状态不正确或不存在' });
+  }
+  res.json(result);
+});
+
+router.post('/resident-review', (req: Request, res: Response) => {
+  const { workflowId, shelterId, operator } = req.body;
+  const result = workflowService.resumeAfterResidentReview(
+    workflowId, shelterId, operator || '居民代表'
+  );
+  if (!result) {
+    return res.status(400).json({ error: '工作流状态不正确或不存在' });
+  }
+  res.json(result);
+});
+
 router.get('/exports/:type', (req: Request, res: Response) => {
   const type = req.params.type as 'detail' | 'summary' | 'self_check';
   if (!['detail', 'summary', 'self_check'].includes(type)) {
     return res.status(400).json({ error: '无效的导出类型' });
   }
-  const result = unifiedDataLayer.generateExportData(type);
+  const { batchNo, includeDetourOnly } = req.query;
+  const result = unifiedDataLayer.generateExportData(type, {
+    batchNo: batchNo as string | undefined,
+    includeDetourOnly: includeDetourOnly === 'true'
+  });
   res.setHeader('Content-Type', 'application/json');
   res.setHeader('Content-Disposition', `attachment; filename="export_${type}_${Date.now()}.json"`);
   res.json(result);

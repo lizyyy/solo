@@ -25,6 +25,13 @@ export interface RedLineMap {
   importOperator: string;
   importTime: string;
   isLatest: boolean;
+  isReimport: boolean;
+  reimportNote: string | null;
+  reviewStatus: 'pending' | 'reviewed' | 'confirmed';
+  reviewNote: string | null;
+  reviewedBy: string | null;
+  reviewedAt: string | null;
+  prevVersionId: string | null;
 }
 
 export interface GridInspectorReport {
@@ -130,6 +137,25 @@ export interface ExportRecord {
   fileHash: string;
   recordCount: number;
   dataTimestamp: string;
+  batchNo: string;
+  exportScope: 'all' | 'by_batch';
+  sourceBatchNo: string | null;
+}
+
+export interface ChangeHistory {
+  id: string;
+  entityType: 'redline' | 'inspector_report' | 'capacity_check' | 'shelter' | 'conflict';
+  entityId: string;
+  shelterId: string;
+  shelterName: string;
+  changeType: 'create' | 'update' | 'reimport' | 'review' | 'recalc';
+  fieldName: string;
+  oldValue: string;
+  newValue: string;
+  operator: string;
+  changeTime: string;
+  remark: string;
+  affectedResultIds: string[];
 }
 
 export interface UnifiedDataResponse<T> {
@@ -137,4 +163,8 @@ export interface UnifiedDataResponse<T> {
   dataTimestamp: string;
   dataVersion: string;
   source: 'unified_datalayer';
+  batchInfo?: {
+    currentBatch: string | null;
+    historyBatches: string[];
+  };
 }

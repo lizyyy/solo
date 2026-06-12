@@ -1,6 +1,6 @@
 import {
   EmergencyShelter, RedLineMap, GridInspectorReport, ConflictRecord,
-  SelfCheckResult, CalculationParam, CapacityCheckResult, WorkflowRecord, ExportRecord
+  SelfCheckResult, CalculationParam, CapacityCheckResult, WorkflowRecord, ExportRecord, ChangeHistory
 } from '../types';
 
 export interface DataStore {
@@ -13,6 +13,7 @@ export interface DataStore {
   capacityCheckResults: CapacityCheckResult[];
   workflowRecords: WorkflowRecord[];
   exportRecords: ExportRecord[];
+  changeHistories: ChangeHistory[];
 }
 
 const store: DataStore = {
@@ -24,7 +25,8 @@ const store: DataStore = {
   calculationParams: [],
   capacityCheckResults: [],
   workflowRecords: [],
-  exportRecords: []
+  exportRecords: [],
+  changeHistories: []
 };
 
 export const getStore = (): DataStore => store;
@@ -39,4 +41,5 @@ export const resetStore = (): void => {
   store.capacityCheckResults = [];
   store.workflowRecords = [];
   store.exportRecords = [];
+  store.changeHistories = [];
 };

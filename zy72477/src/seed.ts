@@ -3,9 +3,14 @@ import { capacityCheckService } from './services/capacityCheckService';
 import { selfCheckService } from './services/selfCheckService';
 import { conflictDetectionService } from './services/conflictDetectionService';
 import { workflowService } from './services/workflowService';
+import { redLineDao } from './dao/redLineDao';
+import { changeHistoryDao } from './dao/changeHistoryDao';
+import { resetStore } from './database/memoryStore';
 
-const seedData = async () => {
-  console.log('开始初始化数据...');
+export const initDemoData = () => {
+  console.log('开始初始化演示数据...');
+
+  resetStore();
 
   capacityCheckService.initDefaultParams('system_init');
 
@@ -73,17 +78,17 @@ const seedData = async () => {
   ];
 
   const createdShelters = shelters.map(s => shelterDao.create(s));
-  console.log(`已创建 ${createdShelters.length} 个避难点`);
+  console.log(`  已创建 ${createdShelters.length} 个避难点`);
 
   for (const shelter of createdShelters) {
     workflowService.startWorkflow(shelter.id, '系统初始化');
   }
-  console.log('已启动所有避难点的工作流');
+  console.log('  已启动所有避难点的工作流');
 
   const step1Shelter = createdShelters[0];
   const wf1 = workflowService.getWorkflowForShelter(step1Shelter.id);
   if (wf1) {
-    workflowService.step1_importRedLine(
+    const result1 = workflowService.step1_importRedLine(
       wf1.id,
       step1Shelter.id,
       'v1.0',
@@ -92,7 +97,10 @@ const seedData = async () => {
       '2026-01-01',
       '规划科-小王'
     );
-    console.log(`已为 ${step1Shelter.name} 导入红线图`);
+    if (result1.redLine) {
+      workflowService.reviewRedLine(result1.redLine.id, 'reviewed', '已审核，容量数据合理', '老马');
+    }
+    console.log(`  已为 ${step1Shelter.name} 导入红线图并完成复核`);
   }
 
   const step2Shelter = createdShelters[1];
@@ -122,7 +130,13 @@ const seedData = async () => {
         'normal',
         '老马'
       );
-      console.log(`已为 ${step2Shelter.name} 完成巡查表审核`);
+      console.log(`  已为 ${step2Shelter.name} 完成巡查表审核`);
+    }
+
+    const wf2Step3 = workflowService.getWorkflowForShelter(step2Shelter.id);
+    if (wf2Step3 && wf2Step3.currentStep === 'point_update') {
+      workflowService.step3_updatePointList(wf2Step3.id, step2Shelter.id, '系统');
+      console.log(`  已为 ${step2Shelter.name} 完成点位清单更新`);
     }
   }
 
@@ -153,21 +167,27 @@ const seedData = async () => {
         'detour',
         '老马'
       );
-      console.log(`已为 ${detourShelter.name} 录入含临时改道的巡查表，工作流已挂起待居民代表复核`);
+      console.log(`  已为 ${detourShelter.name} 录入含临时改道的巡查表，工作流已挂起待居民代表复核`);
     }
   }
 
   capacityCheckService.calculateAll('system_init');
-  console.log('已完成所有避难点容量校核计算');
+  console.log('  已完成所有避难点容量校核计算');
 
   conflictDetectionService.detectAllConflicts();
-  console.log('已完成冲突检测');
+  console.log('  已完成冲突检测');
 
   selfCheckService.runAllChecks();
-  console.log('已完成系统自检');
+  console.log('  已完成系统自检');
 
-  console.log('数据初始化完成！');
-  console.log('访问 http://localhost:3000 查看系统');
+  const redLineCount = redLineDao.findAll().length;
+  const historyCount = changeHistoryDao.findAll().length;
+  console.log(`  红线图记录: ${redLineCount} 条`);
+  console.log(`  变更历史: ${historyCount} 条`);
+
+  console.log('✅ 演示数据初始化完成！');
 };
 
-seedData().catch(console.error);
+if (require.main === module) {
+  initDemoData();
+}
