@@ -209,23 +209,61 @@ def audit(notice_id, entity_type):
 
 
 def _show_audit_logs(notice_id: str, entity_type=None):
-    logs = store.get_audit_logs(entity_id=notice_id)
+    from .store import EnhancedAuditLog
+    ramp_ids = [r.id for r in store.get_ramp_records_for_notice(notice_id)]
+    sugg_ids = [s.id for s in store.get_all_suggestions(notice_id)]
+    all_related_ids = set()
+    all_related_ids.add(notice_id)
+    all_related_ids.update(ramp_ids)
+    all_related_ids.update(sugg_ids)
+    logs = [l for l in store.audit_logs if l.entity_id in all_related_ids]
+    logs = sorted(logs, key=lambda x: x.changed_at)
     if entity_type:
         logs = [l for l in logs if l.entity_type == entity_type]
 
-    _print_header(f"审计日志 - {notice_id}")
-    for log in logs:
+    _print_header(f"真实复核审计日志 - {notice_id}")
+    click.echo("格式：[时间] 谁 做了什么 → 改完影响哪些结果")
+    click.echo()
+    for i, log in enumerate(logs, 1):
         time_str = log.changed_at.strftime("%H:%M:%S")
-        click.echo(f"[{time_str}] {log.changed_by.value} {log.action} {log.entity_type}")
+        click.echo(f"{i:02d}. [{time_str}] 👤 {click.style(log.changed_by.value, fg='blue', bold=True)} "
+                   f"{click.style(log.action, fg='green')} {log.entity_type}")
         if log.reason:
-            click.echo(f"      原因: {log.reason}")
+            click.echo(f"    📌 为什么改: {click.style(log.reason, fg='yellow')}")
+
+        has_score = hasattr(log, 'score_before') and log.score_before is not None
+        has_status = hasattr(log, 'status_before') and log.status_before is not None
+        has_missing = hasattr(log, 'missing_materials_before') and log.missing_materials_before is not None
+        has_affected = hasattr(log, 'affected_results') and log.affected_results
+
+        if has_score or has_status or has_missing or has_affected:
+            click.echo("    🎯 改完影响了哪些结果:")
+        if has_score:
+            diff = ""
+            if log.score_after is not None:
+                d = log.score_after - log.score_before
+                diff_str = f"({d:+.1f}分)" if abs(d) > 0.001 else "(⚠️ 未变化，需复核)"
+                diff = f" → {log.score_after:.1f} {diff_str}"
+            click.echo(f"       • 评分: {log.score_before:.1f}{diff}")
+        if has_status:
+            status_diff = ""
+            if log.status_after and log.status_before != log.status_after:
+                status_diff = f" → {log.status_after.value}"
+            click.echo(f"       • 状态: {log.status_before.value if log.status_before else ''}{status_diff}")
+        if has_missing and (log.missing_materials_before or log.missing_materials_after):
+            before = "、".join(log.missing_materials_before) if log.missing_materials_before else "(空)"
+            after = "、".join(log.missing_materials_after) if log.missing_materials_after else "(空)"
+            click.echo(f"       • 还缺什么材料: [{before}] → [{after}]")
+        if has_affected:
+            for r in log.affected_results:
+                if r != "暂无直接影响":
+                    click.echo(f"       • {r}")
+
         if log.old_value or log.new_value:
             if log.old_value:
                 old_keys = [k for k in log.old_value.keys()][:3]
-                click.echo(f"      旧值字段: {', '.join(old_keys)}...")
-            if log.new_value:
-                new_keys = [k for k in log.new_value.keys()][:3]
-                click.echo(f"      新值字段: {', '.join(new_keys)}...")
+                click.echo(f"    📋 变更字段: {', '.join(old_keys)}...")
+        click.echo()
 
 
 @cli.command(name="list")
@@ -322,7 +360,7 @@ def rerun(notice_id):
 @click.argument("notice_id", required=False)
 @click.option("--output", "-o", help="输出文件路径")
 def report(notice_id, output):
-    """生成完整报告"""
+    """生成真实复核报告（含谁改了什么、影响哪些结果、还缺什么材料）"""
     if not notice_id:
         notices = store.list_notices()
         if not notices:
@@ -333,19 +371,158 @@ def report(notice_id, output):
     notice = store.get_notice(notice_id)
     workflow = store.get_workflow(notice_id)
     suggestion = store.get_latest_suggestion(notice_id)
+    all_suggestions = store.get_all_suggestions(notice_id)
     all_scores = store.get_all_scores(notice_id)
     ramp_records = store.get_ramp_records_for_notice(notice_id)
-    audit_logs = store.get_audit_logs(entity_id=notice_id)
+    ramp_ids = [r.id for r in ramp_records]
+    sugg_ids = [s.id for s in all_suggestions]
+    all_related_ids = set([notice_id]) | set(ramp_ids) | set(sugg_ids)
+    audit_logs = sorted(
+        [l for l in store.audit_logs if l.entity_id in all_related_ids],
+        key=lambda x: x.changed_at
+    )
+
+    audit_review = []
+    for l in audit_logs:
+        entry = {
+            "time": l.changed_at.isoformat(),
+            "who": l.changed_by.value,
+            "action": l.action,
+            "entity": l.entity_type,
+            "why": l.reason,
+            "impact": [],
+        }
+        if hasattr(l, 'score_before') and l.score_before is not None:
+            d = (l.score_after or l.score_before) - l.score_before
+            change_note = "未变化（需复核）" if abs(d) < 0.001 else f"{d:+.1f}分"
+            entry["impact"].append(f"评分: {l.score_before:.1f} → {l.score_after:.1f} ({change_note})")
+        if hasattr(l, 'status_after') and l.status_before is not None and l.status_after is not None and l.status_before != l.status_after:
+            entry["impact"].append(f"状态: {l.status_before.value} → {l.status_after.value}")
+        if hasattr(l, 'missing_materials_before') and (l.missing_materials_before or l.missing_materials_after):
+            b = "、".join(l.missing_materials_before) if l.missing_materials_before else "空"
+            a = "、".join(l.missing_materials_after) if l.missing_materials_after else "空"
+            if b != a:
+                entry["impact"].append(f"还缺什么材料: [{b}] → [{a}]")
+        if hasattr(l, 'affected_results') and l.affected_results:
+            for r in l.affected_results:
+                if r != "暂无直接影响":
+                    entry["impact"].append(r)
+        audit_review.append(entry)
+
+    material_tracking = []
+    for i, s in enumerate(all_suggestions):
+        material_tracking.append({
+            "suggestion_version": s.version,
+            "status": s.status.value,
+            "missing_materials": s.missing_materials,
+            "why_kept_at_this_stage": s.why_kept,
+            "next_person": s.next_action_person,
+            "generated_at": s.generated_at.isoformat(),
+        })
+
+    from .suggestions import _analyze_notes_for_missing as analyze
+
+    notes_analysis = []
+    if notice.raw_notes:
+        analysis = analyze(notice.raw_notes)
+        notes_analysis.append({
+            "source": "施工告示",
+            "raw_notes": notice.raw_notes,
+            "key_findings": analysis["key_findings"],
+            "inferred_missing": analysis["inferred_missing"],
+            "processing_logic": analysis["processing_explanations"],
+        })
+    ramp_records_report = []
+    for r in ramp_records:
+        record_entry = {
+            "id": r.id,
+            "location": r.location,
+            "has_ramp": r.has_ramp,
+            "ramp_condition": r.ramp_condition,
+            "width_cm": r.width_cm,
+            "raw_notes_preserved": r.raw_notes,
+            "recorded_by": r.recorded_by.value,
+            "is_supplement": r.is_supplement,
+            "recorded_at": r.recorded_at.isoformat(),
+        }
+        if r.raw_notes:
+            r_analysis = analyze(r.raw_notes)
+            record_entry["notes_analysis"] = {
+                "key_findings": r_analysis["key_findings"],
+                "why_treated_this_way": r_analysis["processing_explanations"],
+                "materials_inferred_from_notes": r_analysis["inferred_missing"],
+            }
+            notes_analysis.append({
+                "source": f"坡道记录[{r.location}]",
+                "raw_notes": r.raw_notes,
+                "key_findings": r_analysis["key_findings"],
+                "inferred_missing": r_analysis["inferred_missing"],
+                "processing_logic": r_analysis["processing_explanations"],
+                "recorded_by": r.recorded_by.value,
+                "is_supplement": r.is_supplement,
+            })
+        else:
+            record_entry["notes_analysis"] = "（无备注）"
+        ramp_records_report.append(record_entry)
+
+    score_changes_summary = []
+    for idx in range(1, len(all_scores)):
+        prev, curr = all_scores[idx - 1], all_scores[idx]
+        diff = curr.score - prev.score
+        score_changes_summary.append({
+            "from_version": prev.version,
+            "to_version": curr.version,
+            "score_from": prev.score,
+            "score_to": curr.score,
+            "difference": diff,
+            "is_unchanged": abs(diff) < 0.001,
+            "ramp_records_used": curr.ramp_records_used,
+        })
 
     report_data = {
-        "report_title": "公交夜班覆盖缺口 - 无障碍坡道复核报告",
+        "report_title": "公交夜班覆盖缺口 - 无障碍坡道真实复核报告",
         "generated_at": datetime.now().isoformat(),
-        "notice": notice.model_dump(mode="json"),
-        "workflow": workflow.model_dump(mode="json") if workflow else None,
-        "latest_suggestion": suggestion.model_dump(mode="json") if suggestion else None,
-        "score_history": [s.model_dump(mode="json") for s in all_scores],
-        "ramp_records": [r.model_dump(mode="json") for r in ramp_records],
-        "audit_logs": [l.model_dump(mode="json") for l in audit_logs],
+        "section_1_basic_info": {
+            "notice": {
+                "id": notice.id,
+                "road_name": notice.road_name,
+                "construction_type": notice.construction_type,
+                "start_date": notice.start_date,
+                "end_date": notice.end_date,
+                "raw_notes_preserved": notice.raw_notes,
+            },
+            "workflow_current": {
+                "step": workflow.step if workflow else 0,
+                "step_description": workflow.step_description if workflow else "",
+                "status": workflow.status.value if workflow else "unknown",
+                "current_assignee": workflow.current_assignee.value if workflow and workflow.current_assignee else "",
+            } if workflow else None,
+        },
+        "section_2_ramp_records_with_notes": ramp_records_report,
+        "section_3_material_tracking": material_tracking,
+        "section_4_score_evolution": {
+            "latest_score": all_scores[-1].score if all_scores else 0,
+            "changes": score_changes_summary,
+        },
+        "section_5_audit_review": {
+            "summary": f"共 {len(audit_review)} 条变更记录",
+            "detailed_logs": audit_review,
+        },
+        "section_6_final_suggestion": {
+            "version": suggestion.version if suggestion else 0,
+            "why_kept": suggestion.why_kept if suggestion else "",
+            "still_missing_materials_with_reasons": [
+                {
+                    "material": m,
+                    "in_report_notes": (lambda s=suggestion: s.notes if s else "")(),
+                }
+                for m in (suggestion.missing_materials if suggestion else [])
+            ],
+            "next_action_person": suggestion.next_action_person if suggestion else "",
+            "next_action": suggestion.next_action.value if suggestion else "",
+            "preserved_raw_notes": suggestion.notes if suggestion else "",
+        },
+        "section_7_notes_processing_explanations": notes_analysis,
     }
 
     report_str = json.dumps(report_data, ensure_ascii=False, indent=2)
@@ -353,10 +530,57 @@ def report(notice_id, output):
     if output:
         with open(output, "w", encoding="utf-8") as f:
             f.write(report_str)
-        click.echo(f"✅ 报告已保存到: {output}")
+        click.echo(f"✅ 真实复核报告已保存到: {output}")
+        click.echo(f"   报告包含7个章节：基本信息、坡道记录备注、材料追踪、评分演变、审计复核、最终建议、备注处理说明")
+        click.echo()
+        _print_report_summary(report_data)
     else:
-        _print_header("完整报告")
-        click.echo(report_str)
+        _print_header("真实复核报告摘要")
+        _print_report_summary(report_data)
+        click.echo()
+        click.echo("💡 使用 -o <路径> 保存完整JSON报告（包含全部7个章节）")
+
+
+def _print_report_summary(r: dict):
+    info = r["section_1_basic_info"]
+    click.echo(f"路段: {info['notice']['road_name']}")
+    click.echo(f"当前步骤: {info['workflow_current']['step']} - {info['workflow_current']['step_description']}")
+    click.echo(f"当前状态: {info['workflow_current']['status']}")
+    click.echo()
+
+    mats = r["section_3_material_tracking"]
+    click.echo(f"📦 还缺什么材料追踪（共 {len(mats)} 个整改建议版本）:")
+    for m in mats:
+        miss = "、".join(m["missing_materials"]) if m["missing_materials"] else "（无）"
+        click.echo(f"  v{m['suggestion_version']} [{m['status']}] → 缺: {miss}")
+    click.echo()
+
+    audit = r["section_5_audit_review"]["detailed_logs"]
+    click.echo(f"📋 真实复核 - 谁改了什么、影响哪些结果（共 {len(audit)} 条）:")
+    for entry in audit:
+        impact = "；".join(entry["impact"]) if entry["impact"] else "（无直接影响）"
+        click.echo(f"  • [{entry['time'][11:19]}] {entry['who']} {entry['action']}")
+        if entry["why"]:
+            click.echo(f"      为什么改: {entry['why']}")
+        if entry["impact"]:
+            click.echo(f"      影响: {impact}")
+    click.echo()
+
+    final = r["section_6_final_suggestion"]
+    click.echo(f"🎯 最终整改建议 (v{final['version']}):")
+    click.echo(f"  为什么留下: {final['why_kept'][:120]}...")
+    miss_list = [f"☐ {x['material']}" for x in final["still_missing_materials_with_reasons"]]
+    if miss_list:
+        click.echo(f"  还缺什么材料: {' '.join(miss_list)}")
+    click.echo(f"  下一步找谁: 👉 {final['next_action_person']}")
+
+
+@cli.command()
+def reset():
+    """清空所有数据（开始新的复核）"""
+    if click.confirm("确定要清空所有数据吗？此操作不可撤销。"):
+        store.clear()
+        click.echo("✅ 已清空所有数据，可开始新的复核流程")
 
 
 @cli.command()
