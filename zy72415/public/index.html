@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>耳返频段冲突记录</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f1e8; color: #333; padding: 24px; }
+.header { background: linear-gradient(135deg, #8B4513, #A0522D); color: #fff; padding: 24px; border-radius: 12px; margin-bottom: 24px; box-shadow: 0 4px 12px rgba(139,69,19,0.2); }
+.header h1 { font-size: 24px; margin-bottom: 8px; }
+.header p { font-size: 14px; opacity: 0.9; }
+.container { max-width: 1400px; margin: 0 auto; }
+.actions { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+.btn { background: #8B4513; color: #fff; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+.btn:hover { background: #6B3410; transform: translateY(-1px); }
+.btn.secondary { background: #D2B48C; color: #5C3317; }
+.btn.secondary:hover { background: #C4A576; }
+.btn.danger { background: #C0392B; }
+.btn.danger:hover { background: #962D22; }
+.btn.small { padding: 6px 12px; font-size: 12px; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.stat-card { background: #fff; padding: 20px; border-radius: 10px; border-left: 4px solid #8B4513; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.stat-card h3 { font-size: 13px; color: #888; margin-bottom: 8px; font-weight: normal; }
+.stat-card .num { font-size: 28px; font-weight: bold; color: #8B4513; }
+.stat-card.warn { border-left-color: #E67E22; }
+.stat-card.warn .num { color: #E67E22; }
+.stat-card.info { border-left-color: #2980B9; }
+.stat-card.info .num { color: #2980B9; }
+.stat-card.danger { border-left-color: #C0392B; }
+.stat-card.danger .num { color: #C0392B; }
+.data-section { background: #fff; border-radius: 10px; padding: 20px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.data-section h2 { font-size: 18px; margin-bottom: 16px; color: #5C3317; padding-bottom: 12px; border-bottom: 2px solid #f5f1e8; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { padding: 12px; text-align: left; border-bottom: 1px solid #f0ebe0; }
+th { background: #faf6ee; color: #5C3317; font-weight: 600; }
+tr:hover td { background: #fdfaf3; }
+.tag { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; }
+.tag.needs-review { background: #FFF3CD; color: #856404; }
+.tag.normal { background: #D4EDDA; color: #155724; }
+.tag.abnormal { background: #F8D7DA; color: #721C24; }
+.tag.teacher-review { background: #CCE5FF; color: #004085; }
+.tag.rolledback { background: #E2E3E5; color: #495057; text-decoration: line-through; }
+.tag.step-import { background: #E8DAEF; color: #6C3483; }
+.tag.step-message { background: #D5F5E3; color: #1E8449; }
+.tag.step-report { background: #FCF3CF; color: #7D6608; }
+.dual-badge { background: #F5B041; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-left: 6px; }
+.detail-row { display: none; }
+.detail-row.show { display: table-row; }
+.detail-row td { background: #fef9f0; padding: 16px; }
+.detail-box { background: #fff; padding: 16px; border-radius: 8px; border: 1px solid #e8e0d0; }
+.detail-box h4 { font-size: 14px; margin-bottom: 12px; color: #5C3317; }
+.detail-box ul { list-style: none; }
+.detail-box li { padding: 6px 0; border-bottom: 1px solid #f5f1e8; font-size: 13px; color: #666; }
+.detail-box li:last-child { border-bottom: none; }
+.empty { text-align: center; padding: 40px; color: #999; }
+.empty button { margin-top: 12px; }
+.log-box { background: #2C3E50; color: #ECF0F1; padding: 16px; border-radius: 8px; font-family: 'Monaco', 'Consolas', monospace; font-size: 12px; max-height: 300px; overflow-y: auto; margin-top: 16px; }
+.log-box .log-line { padding: 3px 0; }
+.log-box .log-info { color: #85C1E9; }
+.log-box .log-success { color: #82E0AA; }
+.log-box .log-warn { color: #F9E79F; }
+.source-tag { font-size: 11px; color: #999; background: #f5f1e8; padding: 2px 6px; border-radius: 4px; }
+.tabs { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 2px solid #f0ebe0; }
+.tab { padding: 10px 20px; cursor: pointer; background: transparent; border: none; font-size: 14px; color: #888; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+.tab.active { color: #8B4513; border-bottom-color: #8B4513; font-weight: 600; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.row-actions { display: flex; gap: 6px; }
+.modal-backdrop { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+.modal { background: #fff; padding: 24px; border-radius: 12px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; }
+.modal h3 { margin-bottom: 16px; color: #5C3317; }
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-size: 13px; color: #666; margin-bottom: 6px; }
+.form-group input, .form-group textarea, .form-group select { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; font-family: inherit; }
+.form-group textarea { min-height: 80px; resize: vertical; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>🎸 耳返频段冲突记录</h1>
+    <p>琴行店长老周专用 · 同一首歌双名自动标记待老师复核 · 三处数据同源可追溯</p>
+  </div>
+
+  <div class="actions">
+    <button class="btn" onclick="demoImport()">📥 演示：授权期限页第一次导入</button>
+    <button class="btn secondary" onclick="openImportModal()">➕ 手动导入数据</button>
+    <button class="btn secondary" onclick="exportCSV()">📤 导出 CSV 明细</button>
+    <button class="btn secondary" onclick="createReport()">📊 生成给店长的周报</button>
+    <button class="btn danger" onclick="rollbackReport()">↩️ 撤回上一版周报</button>
+  </div>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="data-section">
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('records', this)">📋 冲突记录</button>
+      <button class="tab" onclick="switchTab('batches', this)">📦 导入批次（可回滚）</button>
+      <button class="tab" onclick="switchTab('reports', this)">📊 周报版本</button>
+      <button class="tab" onclick="switchTab('verify', this)">🔍 三处同源验证</button>
+    </div>
+
+    <div id="tab-records" class="tab-content active">
+      <h2 style="border:none; padding:0; margin-bottom:12px;">冲突记录列表
+        <span class="source-tag">数据源：getAllUnifiedRecords()</span>
+      </h2>
+      <div id="records-table"></div>
+    </div>
+
+    <div id="tab-batches" class="tab-content">
+      <h2 style="border:none; padding:0; margin-bottom:12px;">导入批次历史</h2>
+      <div id="batches-table"></div>
+    </div>
+
+    <div id="tab-reports" class="tab-content">
+      <h2 style="border:none; padding:0; margin-bottom:12px;">周报版本历史</h2>
+      <div id="reports-table"></div>
+    </div>
+
+    <div id="tab-verify" class="tab-content">
+      <h2 style="border:none; padding:0; margin-bottom:12px;">🔍 页面 / 接口 / 导出 三处同源验证</h2>
+      <div style="background:#fef9f0; padding:16px; border-radius:8px; margin-bottom:16px; font-size:13px; line-height:1.8;">
+        <p><strong>验证逻辑：</strong>页面、接口、导出都调用 ConflictRecordService 中同一份底层数据：</p>
+        <ul style="margin-left:24px; margin-top:8px;">
+          <li>页面展示 → <code>getAllUnifiedRecords()</code></li>
+          <li>API 接口 → <code>getRecordsForApi()</code> → 内部还是 <code>getAllUnifiedRecords()</code></li>
+          <li>导出明细 → <code>exportRecords()</code> → 遍历同一份 store.records</li>
+        </ul>
+        <p style="margin-top:8px;"><strong>追踪方式：</strong>每条记录有唯一 <code>记录ID</code>，在页面表格、API JSON、导出 CSV 第一列中都能对应上。</p>
+      </div>
+      <div class="actions">
+        <button class="btn" onclick="verifyThreeSources()">▶ 运行三处同源比对</button>
+        <button class="btn secondary" onclick="window.open('/api/records','_blank')">🔗 打开 API 接口</button>
+        <button class="btn secondary" onclick="exportCSV()">📥 下载 CSV 对照</button>
+      </div>
+      <div id="verify-result"></div>
+    </div>
+  </div>
+
+  <div class="data-section">
+    <h2>📝 操作日志</h2>
+    <div class="log-box" id="log-box"></div>
+  </div>
+</div>
+
+<div id="modal-container"></div>
+
+<script>
+const STATUS_TEXT = {
+  'pending_review': '待复核',
+  'normal': '正常',
+  'abnormal': '异常',
+  'needs_teacher_review': '待音乐老师复核'
+};
+const STATUS_CLASS = {
+  'pending_review': 'needs-review',
+  'normal': 'normal',
+  'abnormal': 'abnormal',
+  'needs_teacher_review': 'teacher-review'
+};
+const STEP_TEXT = {
+  'initial_import': '第一步：已导入',
+  'engineer_message_added': '第二步：已补留言',
+  'weekly_report_updated': '第三步：已入周报'
+};
+const STEP_CLASS = {
+  'initial_import': 'step-import',
+  'engineer_message_added': 'step-message',
+  'weekly_report_updated': 'step-report'
+};
+
+function log(msg, type = 'info') {
+  const box = document.getElementById('log-box');
+  const line = document.createElement('div');
+  line.className = 'log-line log-' + type;
+  const time = new Date().toLocaleTimeString();
+  line.textContent = `[${time}] ${msg}`;
+  box.appendChild(line);
+  box.scrollTop = box.scrollHeight;
+}
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+async function loadAll() {
+  await loadRecords();
+  await loadBatches();
+  await loadReports();
+  await loadStats();
+}
+
+async function fetchJSON(url, method = 'GET', body = null) {
+  const opts = { method, headers: { 'Content-Type': 'application/json' } };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(url, opts);
+  return await res.json();
+}
+
+async function loadRecords() {
+  const res = await fetchJSON('/api/records');
+  const records = res.data || [];
+  const box = document.getElementById('records-table');
+  if (records.length === 0) {
+    box.innerHTML = '<div class="empty">还没有记录，点击上方"演示：授权期限页第一次导入"开始<br><button class="btn" onclick="demoImport()">开始演示</button></div>';
+    return;
+  }
+  let html = `<table>
+    <thead><tr>
+      <th>记录ID</th>
+      <th>原始行号</th>
+      <th>歌曲名</th>
+      <th>频段</th>
+      <th>冲突描述</th>
+      <th>处理状态</th>
+      <th>流程步骤</th>
+      <th>调音师留言</th>
+      <th>导入人</th>
+      <th>操作</th>
+    </tr></thead><tbody>`;
+  for (const r of records) {
+    const rolled = r.isRolledBack ? '<span class="tag rolledback">已撤回</span>' : '';
+    const dual = r.song.hasDualNames ? '<span class="dual-badge" title="同一首歌有现场名和版权名">双名</span>' : '';
+    const songDisplay = r.song.liveName === r.song.copyrightName
+      ? r.song.liveName
+      : `<div><div>🎤 现场: ${r.song.liveName}</div><div>📝 版权: ${r.song.copyrightName}</div></div>`;
+    html += `<tr>
+      <td style="font-family:monospace; font-size:11px; color:#888;">${r.id}</td>
+      <td>${r.originalRowNumber}</td>
+      <td>${songDisplay}${dual}${rolled}</td>
+      <td>${r.band}</td>
+      <td>${r.conflictDescription}</td>
+      <td><span class="tag ${STATUS_CLASS[r.processingStatus]}">${STATUS_TEXT[r.processingStatus]}</span></td>
+      <td><span class="tag ${STEP_CLASS[r.workflowStep]}">${STEP_TEXT[r.workflowStep]}</span></td>
+      <td>${r.engineerMessage || '<span style="color:#ccc;">无</span>'}</td>
+      <td>${r.importedBy}</td>
+      <td>
+        <div class="row-actions">
+          <button class="btn small" onclick="toggleDetail('${r.id}')">详情</button>
+          <button class="btn small secondary" onclick="openMessageModal('${r.id}')">补留言</button>
+          <button class="btn small secondary" onclick="openStatusModal('${r.id}')">改状态</button>
+          <button class="btn small danger" onclick="rollbackRecordStatus('${r.id}')">撤状态</button>
+        </div>
+      </td>
+    </tr>
+    <tr class="detail-row" id="detail-${r.id}"><td colspan="10"><div class="detail-box" id="detail-box-${r.id}">加载中...</div></td></tr>`;
+  }
+  html += '</tbody></table>';
+  box.innerHTML = html;
+}
+
+async function toggleDetail(id) {
+  const row = document.getElementById('detail-' + id);
+  if (!row) return;
+  if (row.classList.contains('show')) { row.classList.remove('show'); return; }
+  row.classList.add('show');
+  const res = await fetchJSON('/api/records/' + id);
+  const history = await fetchJSON('/api/records/' + id + '/history');
+  const r = res.data;
+  const box = document.getElementById('detail-box-' + id);
+  let histHtml = '';
+  if (history.data && history.data.length) {
+    histHtml = history.data.map(h =>
+      `<li>🕐 ${new Date(h.changedAt).toLocaleString()} · <strong>${h.changedBy}</strong> 改了【${h.field}】: "${h.oldValue}" → "${h.newValue}" <span style="color:#999;">(${h.reason})</span></li>`
+    ).join('');
+  } else {
+    histHtml = '<li style="color:#999;">暂无改动记录</li>';
+  }
+  box.innerHTML = `
+    <h4>📌 完整证据链（音乐老师追问时看这个）</h4>
+    <ul>
+      <li><strong>记录ID:</strong> <code style="background:#f5f1e8; padding:2px 6px;">${r.id}</code> · 同 ID 可在 API 和导出 CSV 中查到</li>
+      <li><strong>导入批次ID:</strong> <code style="background:#f5f1e8; padding:2px 6px;">${r.importBatchId}</code></li>
+      <li><strong>原始行号:</strong> 授权期限页第 ${r.originalRowNumber} 行</li>
+      <li><strong>歌曲信息:</strong> 现场名="${r.song.liveName}"，版权名="${r.song.copyrightName}"，是否双名=${r.song.hasDualNames ? '是' : '否'}</li>
+      <li><strong>频段 / 冲突:</strong> ${r.band} · ${r.conflictDescription}</li>
+      <li><strong>处理状态:</strong> ${STATUS_TEXT[r.processingStatus]} · 流程步骤: ${STEP_TEXT[r.workflowStep]}</li>
+      <li><strong>调音师留言:</strong> ${r.engineerMessage || '（无）'}</li>
+      <li><strong>导入时间:</strong> ${new Date(r.createdAt).toLocaleString()} · 导入人: ${r.importedBy}</li>
+      <li><strong>是否撤回:</strong> ${r.isRolledBack ? '是' : '否'}</li>
+    </ul>
+    <h4 style="margin-top:16px;">📝 人工改动历史</h4>
+    <ul>${histHtml}</ul>
+  `;
+}
+
+async function loadStats() {
+  const res = await fetchJSON('/api/records');
+  const records = res.data || [];
+  const normal = records.filter(r => r.processingStatus === 'normal').length;
+  const pending = records.filter(r => r.processingStatus === 'pending_review').length;
+  const abnormal = records.filter(r => r.processingStatus === 'abnormal').length;
+  const teacher = records.filter(r => r.processingStatus === 'needs_teacher_review').length;
+  const dual = records.filter(r => r.song.hasDualNames).length;
+  document.getElementById('stats').innerHTML = `
+    <div class="stat-card"><h3>总记录数</h3><div class="num">${records.length}</div></div>
+    <div class="stat-card"><h3>正常</h3><div class="num">${normal}</div></div>
+    <div class="stat-card info"><h3>待复核</h3><div class="num">${pending}</div></div>
+    <div class="stat-card danger"><h3>异常</h3><div class="num">${abnormal}</div></div>
+    <div class="stat-card warn"><h3>待老师复核（双名）</h3><div class="num">${teacher}</div></div>
+    <div class="stat-card warn"><h3>双名歌曲数</h3><div class="num">${dual}</div></div>
+  `;
+}
+
+async function loadBatches() {
+  const res = await fetchJSON('/api/import-batches');
+  const batches = res.data || [];
+  const box = document.getElementById('batches-table');
+  if (batches.length === 0) { box.innerHTML = '<div class="empty">暂无导入批次</div>'; return; }
+  let html = '<table><thead><tr><th>批次ID</th><th>导入来源</th><th>导入人</th><th>导入时间</th><th>记录数</th><th>状态</th><th>撤回信息</th><th>操作</th></tr></thead><tbody>';
+  for (const b of batches) {
+    const status = b.isRolledBack
+      ? '<span class="tag rolledback">已撤回</span>'
+      : '<span class="tag normal">有效</span>';
+    const rollbackInfo = b.isRolledBack
+      ? `${b.rolledBackBy} · ${new Date(b.rolledBackAt).toLocaleString()}<br><span style="color:#999;">原因: ${b.rollbackReason}</span>`
+      : '-';
+    const btn = b.isRolledBack
+      ? '<button class="btn small" disabled>已撤回</button>'
+      : `<button class="btn small danger" onclick="rollbackBatch('${b.id}')">撤回此批次</button>`;
+    html += `<tr>
+      <td style="font-family:monospace; font-size:11px; color:#888;">${b.id}</td>
+      <td>${b.source}</td>
+      <td>${b.importedBy}</td>
+      <td>${new Date(b.importedAt).toLocaleString()}</td>
+      <td>${b.recordIds.length} 条</td>
+      <td>${status}</td>
+      <td>${rollbackInfo}</td>
+      <td>${btn}</td>
+    </tr>`;
+  }
+  html += '</tbody></table>';
+  box.innerHTML = html;
+}
+
+async function loadReports() {
+  const res = await fetchJSON('/api/weekly-report/versions');
+  const curRes = await fetchJSON('/api/weekly-report');
+  const reports = res.data || [];
+  const cur = curRes.data;
+  const box = document.getElementById('reports-table');
+  if (reports.length === 0) { box.innerHTML = '<div class="empty">暂无周报，点"生成周报"创建第一版</div>'; return; }
+  let html = '<table><thead><tr><th>版本ID</th><th>创建人</th><th>创建时间</th><th>汇总</th><th>包含记录</th><th>状态</th></tr></thead><tbody>';
+  for (const r of reports) {
+    const isCurrent = cur && cur.id === r.id;
+    html += `<tr>
+      <td style="font-family:monospace; font-size:11px; color:#888;">${r.id}</td>
+      <td>${r.createdBy}</td>
+      <td>${new Date(r.createdAt).toLocaleString()}</td>
+      <td>${r.summary}</td>
+      <td>${r.recordIds.length} 条</td>
+      <td>${isCurrent ? '<span class="tag normal">当前版本</span>' : '<span class="tag needs-review">历史版本</span>'}</td>
+    </tr>`;
+  }
+  html += '</tbody></table>';
+  box.innerHTML = html;
+}
+
+function demoRows() {
+  return [
+    { originalRowNumber: 1, liveName: '青花瓷', copyrightName: '青花瓷', band: 'CH01', conflictDescription: '无线话筒 CH01 轻微干扰' },
+    { originalRowNumber: 2, liveName: '青花瓷(即兴版)', copyrightName: '青花瓷', band: 'CH02', conflictDescription: '同曲异名，频段与贝斯 CH17 冲突' },
+    { originalRowNumber: 3, liveName: '晴天', copyrightName: '晴天', band: 'CH05', conflictDescription: '无冲突' },
+    { originalRowNumber: 4, liveName: '七里香(现场版)', copyrightName: '七里香', band: 'CH08', conflictDescription: '耳返左右声道串频' },
+    { originalRowNumber: 5, liveName: '稻香', copyrightName: '稻香', band: 'CH12', conflictDescription: '与对讲机频段重叠' },
+  ];
+}
+
+async function demoImport() {
+  log('开始：授权期限页第一次导入（含双名歌曲）...', 'info');
+  const res = await fetchJSON('/api/import', 'POST', {
+    rows: demoRows(),
+    importedBy: '琴行店长老周',
+    source: '授权期限页'
+  });
+  if (res.success) {
+    log(`✓ 导入完成：批次 ${res.data.batch.id}，共 ${res.data.records.length} 条记录`, 'success');
+    const dual = res.data.records.filter(r => r.song.hasDualNames);
+    if (dual.length) {
+      log(`⚠ 自动检测到 ${dual.length} 首双名歌曲，已标记「待音乐老师复核」：`, 'warn');
+      dual.forEach(d => log(`   · ${d.song.liveName} / ${d.song.copyrightName}（记录ID: ${d.id}）`, 'warn'));
+    }
+    log('提示：别急着归正常，双名歌曲留给音乐老师复核。', 'warn');
+    await loadAll();
+  } else {
+    log('✗ 导入失败: ' + res.error, 'warn');
+  }
+}
+
+function openImportModal() {
+  const html = `<div class="modal-backdrop" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <h3>➕ 手动导入授权期限页数据</h3>
+      <div class="form-group"><label>每行一条，格式：原始行号,现场名,版权名,频段,冲突描述</label>
+        <textarea id="import-text" placeholder="1,青花瓷,青花瓷,CH01,话筒干扰
+2,青花瓷(即兴版),青花瓷,CH02,贝斯冲突"></textarea>
+      </div>
+      <div class="form-group"><label>导入人</label><input id="import-user" value="琴行店长老周"></div>
+      <div class="actions" style="justify-content:flex-end;">
+        <button class="btn secondary" onclick="closeModal()">取消</button>
+        <button class="btn" onclick="submitImport()">确定导入</button>
+      </div>
+    </div></div>`;
+  document.getElementById('modal-container').innerHTML = html;
+}
+
+async function submitImport() {
+  const text = document.getElementById('import-text').value.trim();
+  const user = document.getElementById('import-user').value.trim();
+  if (!text || !user) { alert('请填写完整'); return; }
+  const rows = text.split('\n').filter(l => l.trim()).map(line => {
+    const [n, ln, cn, b, d] = line.split(',').map(s => s.trim());
+    return { originalRowNumber: parseInt(n), liveName: ln, copyrightName: cn, band: b, conflictDescription: d };
+  });
+  const res = await fetchJSON('/api/import', 'POST', { rows, importedBy: user, source: '手动导入' });
+  if (res.success) {
+    log(`✓ 手动导入完成：${res.data.records.length} 条`, 'success');
+    closeModal();
+    await loadAll();
+  } else alert(res.error);
+}
+
+function openMessageModal(id) {
+  const html = `<div class="modal-backdrop" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <h3>📝 补看调音师留言</h3>
+      <div class="form-group"><label>留言内容</label><textarea id="msg-text" placeholder="例如：调音师小王说换 CH15 频段即可解决"></textarea></div>
+      <div class="form-group"><label>操作人</label><input id="msg-user" value="琴行店长老周"></div>
+      <div class="actions" style="justify-content:flex-end;">
+        <button class="btn secondary" onclick="closeModal()">取消</button>
+        <button class="btn" onclick="submitMessage('${id}')">保存留言</button>
+      </div>
+    </div></div>`;
+  document.getElementById('modal-container').innerHTML = html;
+}
+
+async function submitMessage(id) {
+  const msg = document.getElementById('msg-text').value.trim();
+  const user = document.getElementById('msg-user').value.trim();
+  if (!msg || !user) { alert('请填写完整'); return; }
+  const res = await fetchJSON(`/api/records/${id}/engineer-message`, 'POST', { message: msg, addedBy: user });
+  if (res.success) {
+    log(`✓ 留言已保存，记录 ${id} 进入「第二步：已补留言」`, 'success');
+    closeModal();
+    await loadAll();
+  } else alert(res.error);
+}
+
+function openStatusModal(id) {
+  const html = `<div class="modal-backdrop" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <h3>🔄 修改处理状态</h3>
+      <div class="form-group"><label>新状态</label>
+        <select id="status-select">
+          <option value="pending_review">待复核</option>
+          <option value="normal">正常</option>
+          <option value="abnormal">异常</option>
+          <option value="needs_teacher_review">待音乐老师复核</option>
+        </select>
+      </div>
+      <div class="form-group"><label>修改原因</label><input id="status-reason" placeholder="例如：音乐老师确认双名是同一首歌"></div>
+      <div class="form-group"><label>操作人</label><input id="status-user" value="琴行店长老周"></div>
+      <div class="actions" style="justify-content:flex-end;">
+        <button class="btn secondary" onclick="closeModal()">取消</button>
+        <button class="btn" onclick="submitStatus('${id}')">确定修改</button>
+      </div>
+    </div></div>`;
+  document.getElementById('modal-container').innerHTML = html;
+}
+
+async function submitStatus(id) {
+  const newStatus = document.getElementById('status-select').value;
+  const reason = document.getElementById('status-reason').value.trim();
+  const user = document.getElementById('status-user').value.trim();
+  if (!reason || !user) { alert('请填写原因和操作人'); return; }
+  const res = await fetchJSON(`/api/records/${id}/status`, 'POST', { newStatus, updatedBy: user, reason });
+  if (res.success) {
+    log(`✓ 状态已更新为「${STATUS_TEXT[newStatus]}」`, 'success');
+    closeModal();
+    await loadAll();
+  } else alert(res.error);
+}
+
+async function rollbackRecordStatus(id) {
+  const reason = prompt('请输入撤回原因：', '操作失误，撤回上一步状态改动');
+  if (!reason) return;
+  const res = await fetchJSON(`/api/records/${id}/rollback-status`, 'POST', { rolledBackBy: '琴行店长老周', reason });
+  if (res.success) {
+    log(`✓ 记录 ${id} 状态已撤回，当前：${STATUS_TEXT[res.data.processingStatus]}`, 'success');
+    await loadAll();
+  } else alert(res.error);
+}
+
+async function rollbackBatch(id) {
+  const reason = prompt('请输入撤回批次原因：', '导入的数据有误，整批撤回');
+  if (!reason) return;
+  const res = await fetchJSON(`/api/import-batches/${id}/rollback`, 'POST', { rolledBackBy: '琴行店长老周', reason });
+  if (res.success) {
+    log(`✓ 导入批次 ${id} 已撤回，可在历史中查到撤回原因和操作人`, 'success');
+    await loadAll();
+  } else alert(res.error);
+}
+
+async function createReport() {
+  log('生成给店长的周报...', 'info');
+  const res = await fetchJSON('/api/weekly-report', 'POST', { createdBy: '琴行店长老周' });
+  if (res.success) {
+    log(`✓ 周报已生成：${res.data.summary}`, 'success');
+    log(`  共收录 ${res.data.recordIds.length} 条正常记录`, 'info');
+    await loadAll();
+  } else { log('✗ ' + res.error, 'warn'); }
+}
+
+async function rollbackReport() {
+  const res = await fetchJSON('/api/weekly-report/rollback', 'POST', {});
+  if (res.success) {
+    log(`✓ 周报已撤回到上一版`, 'success');
+    await loadAll();
+  } else { log('✗ ' + res.error, 'warn'); alert(res.error); }
+}
+
+function exportCSV() {
+  log('导出 CSV 明细（与页面、API 同源）...', 'info');
+  window.open('/api/export', '_blank');
+}
+
+function closeModal() {
+  document.getElementById('modal-container').innerHTML = '';
+}
+
+async function verifyThreeSources() {
+  log('▶ 开始三处同源验证...', 'info');
+  const pageRes = await fetchJSON('/api/records');
+  const pageRecords = pageRes.data;
+  const apiRaw = await fetch('/api/records');
+  const apiRes = await apiRaw.json();
+  const apiRecords = apiRes.data;
+  let exportText = await (await fetch('/api/export')).text();
+  if (exportText.charCodeAt(0) === 0xFEFF) exportText = exportText.slice(1);
+  const exportLines = exportText.split(/\r?\n/).slice(1).filter(l => l.trim());
+
+  let ok = true;
+  const resultBox = document.getElementById('verify-result');
+
+  if (pageRecords.length !== apiRecords.length) {
+    log(`✗ 页面记录数(${pageRecords.length}) ≠ API记录数(${apiRecords.length})`, 'warn');
+    ok = false;
+  } else {
+    log(`✓ 页面与 API 记录数一致：${pageRecords.length} 条`, 'success');
+  }
+
+  if (pageRecords.length !== exportLines.length) {
+    log(`✗ 页面记录数(${pageRecords.length}) ≠ 导出CSV行数(${exportLines.length})`, 'warn');
+    ok = false;
+  } else {
+    log(`✓ 页面与导出 CSV 记录数一致：${pageRecords.length} 条`, 'success');
+  }
+
+  const exportIds = exportLines.map(l => l.split(',')[0]);
+  let idMatch = 0;
+  for (const r of pageRecords) {
+    if (exportIds.includes(r.id) && apiRecords.find(a => a.id === r.id)) idMatch++;
+  }
+  if (idMatch === pageRecords.length) {
+    log(`✓ 所有 ${idMatch} 条记录的 ID 在页面、API、导出 CSV 中完全对应！`, 'success');
+  } else {
+    log(`✗ 仅 ${idMatch}/${pageRecords.length} 条 ID 能对应上`, 'warn');
+    ok = false;
+  }
+
+  let sampleDual = pageRecords.find(r => r.song.hasDualNames);
+  if (sampleDual) {
+    const apiDual = apiRecords.find(a => a.id === sampleDual.id);
+    const exportLine = exportLines.find(l => l.startsWith(sampleDual.id));
+    const exportCols = exportLine ? exportLine.split(',') : [];
+    log(`📌 抽样检查双名歌曲「${sampleDual.song.liveName}/${sampleDual.song.copyrightName}」:`, 'info');
+    log(`   页面: 状态=${STATUS_TEXT[sampleDual.processingStatus]}, 是否双名=是`, 'info');
+    if (apiDual) log(`   API : 状态=${STATUS_TEXT[apiDual.processingStatus]}, 是否双名=${apiDual.song.hasDualNames ? '是' : '否'}`, 'info');
+    if (exportCols[5] === '是') log(`   导出: 是否双名=是, 状态=${exportCols[8]}`, 'info');
+    const allMatch = apiDual && apiDual.processingStatus === sampleDual.processingStatus && exportCols[5] === '是' && exportCols[8] === STATUS_TEXT[sampleDual.processingStatus];
+    if (allMatch) log('   ✓ 三处数据完全一致！', 'success');
+    else { log('   ✗ 数据不一致！', 'warn'); ok = false; }
+  }
+
+  resultBox.innerHTML = ok
+    ? `<div style="background:#D4EDDA; color:#155724; padding:16px; border-radius:8px; margin-top:16px;">
+        <strong>✅ 验证通过！</strong><br>
+        页面展示、API 接口、导出明细三处使用同一份数据源（ConflictRecordService），每条记录通过 ID 可以完全对应。
+       </div>`
+    : `<div style="background:#F8D7DA; color:#721C24; padding:16px; border-radius:8px; margin-top:16px;">
+        <strong>❌ 验证失败，存在数据不一致！</strong> 请查看日志。
+       </div>`;
+}
+
+log('系统就绪。点击「演示：授权期限页第一次导入」开始体验完整流程。', 'success');
+loadAll();
+</script>
+</body>
+</html>

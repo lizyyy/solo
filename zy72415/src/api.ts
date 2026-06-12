@@ -1,5 +1,5 @@
 import { ConflictRecordService } from './ConflictRecordService';
-import { ProcessingStatus, ConflictRecord, WeeklyReportVersion } from './types';
+import { ProcessingStatus, ConflictRecord, WeeklyReportVersion, ImportBatch } from './types';
 
 const service = new ConflictRecordService();
 
@@ -12,13 +12,26 @@ export const api = {
       band: string;
       conflictDescription: string;
     }>,
-    importedBy: string
-  ): ConflictRecord[] => {
-    return service.importRecords(rows, importedBy);
+    importedBy: string,
+    source?: string
+  ): { batch: ImportBatch; records: ConflictRecord[] } => {
+    return service.importRecords(rows, importedBy, source);
   },
 
-  getRecords: (): ConflictRecord[] => {
-    return service.getAllUnifiedRecords();
+  rollbackImportBatch: (batchId: string, rolledBackBy: string, reason: string): ImportBatch | null => {
+    return service.rollbackImportBatch(batchId, rolledBackBy, reason);
+  },
+
+  getImportBatches: (): ImportBatch[] => {
+    return service.getImportBatches();
+  },
+
+  getImportBatch: (batchId: string): ImportBatch | null => {
+    return service.getImportBatch(batchId);
+  },
+
+  getRecords: (includeRolledBack: boolean = false): ConflictRecord[] => {
+    return service.getAllUnifiedRecords(includeRolledBack);
   },
 
   getRecord: (recordId: string): ConflictRecord | null => {
@@ -29,12 +42,12 @@ export const api = {
     return service.getUnifiedRecordData(recordId);
   },
 
-  getRecordsForExport: (): string => {
-    return service.exportRecords();
+  getRecordsForExport: (includeRolledBack: boolean = false): string => {
+    return service.exportRecords(includeRolledBack);
   },
 
-  getRecordsForApi: (): ConflictRecord[] => {
-    return service.getAllUnifiedRecords();
+  getRecordsForApi: (includeRolledBack: boolean = false): ConflictRecord[] => {
+    return service.getAllUnifiedRecords(includeRolledBack);
   },
 
   addEngineerMessage: (
@@ -80,5 +93,9 @@ export const api = {
     reason: string
   ): ConflictRecord | null => {
     return service.rollbackRecordStatus(recordId, rolledBackBy, reason);
+  },
+
+  _getService: (): ConflictRecordService => {
+    return service;
   },
 };

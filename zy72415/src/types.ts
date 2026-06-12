@@ -28,6 +28,7 @@ export interface ManualChange {
 
 export interface ConflictRecord {
   id: string;
+  importBatchId: string;
   originalRowNumber: number;
   song: SongInfo;
   band: string;
@@ -39,6 +40,19 @@ export interface ConflictRecord {
   createdAt: Date;
   updatedAt: Date;
   importedBy: string;
+  isRolledBack: boolean;
+}
+
+export interface ImportBatch {
+  id: string;
+  importedBy: string;
+  importedAt: Date;
+  recordIds: string[];
+  source: string;
+  isRolledBack: boolean;
+  rolledBackAt?: Date;
+  rolledBackBy?: string;
+  rollbackReason?: string;
 }
 
 export interface WeeklyReportVersion {
@@ -47,10 +61,17 @@ export interface WeeklyReportVersion {
   createdBy: string;
   recordIds: string[];
   summary: string;
+  totalCount: number;
+  normalCount: number;
+  pendingCount: number;
+  abnormalCount: number;
+  teacherReviewCount: number;
+  content: string;
 }
 
 export interface ConflictRecordStore {
   records: ConflictRecord[];
+  importBatches: ImportBatch[];
   reportVersions: WeeklyReportVersion[];
   currentReportVersionId?: string;
 }

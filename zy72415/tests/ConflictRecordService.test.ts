@@ -10,8 +10,8 @@ describe('ConflictRecordService', () => {
   });
 
   describe('导入记录', () => {
-    it('应该正确导入单条记录并保留原始行号', () => {
-      const records = service.importRecords(
+    it('应该正确导入单条记录并保留原始行号、批次ID、撤回标记', () => {
+      const { batch, records } = service.importRecords(
         [
           {
             originalRowNumber: 1,
@@ -28,10 +28,13 @@ describe('ConflictRecordService', () => {
       expect(records[0].originalRowNumber).toBe(1);
       expect(records[0].importedBy).toBe('老周');
       expect(records[0].workflowStep).toBe(WorkflowStep.INITIAL_IMPORT);
+      expect(records[0].importBatchId).toBe(batch.id);
+      expect(records[0].isRolledBack).toBe(false);
+      expect(batch.recordIds).toContain(records[0].id);
     });
 
     it('应该自动检测双名歌曲并标记为待老师复核', () => {
-      const records = service.importRecords(
+      const { records } = service.importRecords(
         [
           {
             originalRowNumber: 1,
@@ -49,7 +52,7 @@ describe('ConflictRecordService', () => {
     });
 
     it('单名歌曲应该标记为待复核', () => {
-      const records = service.importRecords(
+      const { records } = service.importRecords(
         [
           {
             originalRowNumber: 1,
@@ -67,9 +70,49 @@ describe('ConflictRecordService', () => {
     });
   });
 
+  describe('导入批次回滚', () => {
+    it('应该能撤回整个导入批次并记录原因、处理人、时间', () => {
+      const { batch, records } = service.importRecords(
+        [
+          { originalRowNumber: 1, liveName: '晴天', copyrightName: '晴天', band: 'CH1', conflictDescription: '正常' },
+          { originalRowNumber: 2, liveName: '七里香(现场版)', copyrightName: '七里香', band: 'CH2', conflictDescription: '冲突' },
+        ],
+        '老周',
+        '授权期限页'
+      );
+
+      const rolledBack = service.rollbackImportBatch(batch.id, '老周', '导入的数据有误，整批撤回');
+
+      expect(rolledBack).not.toBeNull();
+      expect(rolledBack?.isRolledBack).toBe(true);
+      expect(rolledBack?.rolledBackBy).toBe('老周');
+      expect(rolledBack?.rollbackReason).toBe('导入的数据有误，整批撤回');
+      expect(rolledBack?.rolledBackAt).toBeDefined();
+
+      for (const recordId of batch.recordIds) {
+        const record = service.getUnifiedRecordData(recordId);
+        expect(record?.isRolledBack).toBe(true);
+        const history = service.getRecordChangeHistory(recordId);
+        const rollbackChange = history?.find((h) => h.field === 'isRolledBack');
+        expect(rollbackChange).toBeDefined();
+        expect(rollbackChange?.reason).toContain('导入的数据有误');
+        expect(rollbackChange?.changedBy).toBe('老周');
+      }
+    });
+
+    it('已撤回的批次不能再次撤回', () => {
+      const { batch } = service.importRecords(
+        [{ originalRowNumber: 1, liveName: '晴天', copyrightName: '晴天', band: 'CH1', conflictDescription: '正常' }],
+        '老周'
+      );
+      service.rollbackImportBatch(batch.id, '老周', '测试');
+      expect(() => service.rollbackImportBatch(batch.id, '老周', '再撤一次')).toThrow();
+    });
+  });
+
   describe('三步标准流程', () => {
     it('应该走完 第一次导入 → 补看留言 → 周报更新 三步', () => {
-      const records = service.importRecords(
+      const { records } = service.importRecords(
         [
           {
             originalRowNumber: 1,
@@ -100,7 +143,7 @@ describe('ConflictRecordService', () => {
     });
 
     it('双名歌曲在三步流程中应该保持待老师复核，不进入周报正常统计', () => {
-      const records = service.importRecords(
+      const { records } = service.importRecords(
         [
           {
             originalRowNumber: 1,
@@ -124,7 +167,11 @@ describe('ConflictRecordService', () => {
 
       const report = service.createWeeklyReport('老周');
       expect(report.summary).toContain('待音乐老师复核1条');
-      expect(report.recordIds).not.toContain(records[0].id);
+      expect(report.teacherReviewCount).toBe(1);
+      expect(report.normalCount).toBe(1);
+      expect(report.totalCount).toBe(2);
+      expect(report.content).toContain('七里香(现场版) / 七里香');
+      expect(report.content).toContain('待音乐老师复核');
     });
   });
 
@@ -175,7 +222,7 @@ describe('ConflictRecordService', () => {
     });
 
     it('撤回单条双名歌曲状态应该回到待老师复核', () => {
-      const records = service.importRecords(
+      const { records } = service.importRecords(
         [
           {
             originalRowNumber: 1,
@@ -197,7 +244,7 @@ describe('ConflictRecordService', () => {
   });
 
   describe('统一数据验证', () => {
-    it('页面展示、导出、API应该返回同一份数据', () => {
+    it('页面展示、导出、API应该返回同一份数据且ID可互查', () => {
       service.importRecords(
         [
           {
@@ -216,15 +263,20 @@ describe('ConflictRecordService', () => {
       const apiData = service.getAllUnifiedRecords();
 
       expect(pageData).toEqual(apiData);
+
+      const exportIds = exportData.split('\n').slice(1).filter(l => l.trim()).map(l => l.split(',')[0]);
+      expect(exportIds).toContain(pageData[0].id);
+
       expect(exportData).toContain('青花瓷(即兴版)');
       expect(exportData).toContain('青花瓷');
       expect(exportData).toContain('是');
+      expect(exportData).toContain('待音乐老师复核');
     });
   });
 
   describe('状态流转验证', () => {
     it('不允许非法的状态跳转', () => {
-      const records = service.importRecords(
+      const { records } = service.importRecords(
         [
           {
             originalRowNumber: 1,
@@ -256,7 +308,7 @@ describe('ConflictRecordService', () => {
 
   describe('人工改动留痕', () => {
     it('应该记录所有人工改动，包括谁改的、改了啥、为啥改', () => {
-      const records = service.importRecords(
+      const { records } = service.importRecords(
         [
           {
             originalRowNumber: 1,
