@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, PlainTextResponse
 from pydantic import BaseModel
 from typing import Optional, Dict, List
 from processor import RecordProcessor
@@ -28,6 +28,12 @@ class CorrectRequest(BaseModel):
     operator: str = "老周"
 
 
+class ReviewRequest(BaseModel):
+    decision: str
+    reason: str
+    operator: str = "巡演统筹"
+
+
 @app.on_event("startup")
 async def startup_event():
     load_demo_data(processor)
@@ -40,37 +46,20 @@ async def get_records():
 
 @app.get("/api/records/{record_id}")
 async def get_record(record_id: str):
-    record = next((r for r in processor.records if r.id == record_id), None)
-    if not record:
+    detail = processor.get_record_detail(record_id)
+    if not detail:
         raise HTTPException(status_code=404, detail="Record not found")
-    return {
-        "id": record.id,
-        "date": record.date,
-        "band_name": record.band_name,
-        "room": record.room,
-        "start_time": record.start_time,
-        "end_time": record.end_time,
-        "hours": record.hours,
-        "tuner_name": record.tuner_name,
-        "song_list": record.song_list,
-        "members": record.members,
-        "status": record.status.value,
-        "source": record.source.value,
-        "is_leave": record.is_leave,
-        "is_consumed": record.is_consumed,
-        "needs_review": record.needs_review,
-        "review_note": record.review_note,
-        "tuner_note": record.tuner_note,
-        "group_remark": record.group_remark,
-        "corrections": record.corrections,
-        "run_count": record.run_count
-    }
+    return detail
 
 
 @app.post("/api/records/import")
 async def import_tuner_message(req: ImportRequest):
     record = processor.import_tuner_message(req.raw_text, req.operator)
-    return {"id": record.id, "status": record.status.value}
+    return {
+        "id": record.id,
+        "status": record.status.value,
+        "needs_review": record.needs_review
+    }
 
 
 @app.post("/api/records/{record_id}/supplement")
@@ -78,7 +67,11 @@ async def supplement_signup(record_id: str, req: SupplementRequest):
     record = processor.supplement_group_signup(record_id, req.raw_text, req.operator)
     if not record:
         raise HTTPException(status_code=404, detail="Record not found")
-    return {"id": record.id, "song_list": record.song_list}
+    return {
+        "id": record.id,
+        "song_list": record.song_list,
+        "status": record.status.value
+    }
 
 
 @app.post("/api/records/{record_id}/correct")
@@ -89,12 +82,24 @@ async def correct_record(record_id: str, req: CorrectRequest):
     return {"id": record.id, "status": record.status.value}
 
 
+@app.post("/api/records/{record_id}/review")
+async def review_record_api(record_id: str, req: ReviewRequest):
+    record = processor.review_record(record_id, req.decision, req.reason, req.operator)
+    if not record:
+        raise HTTPException(status_code=404, detail="Record not found or not needs review")
+    return {
+        "id": record.id,
+        "status": record.status.value,
+        "review_decision": record.review_decision
+    }
+
+
 @app.post("/api/records/{record_id}/rerun")
 async def rerun_record(record_id: str, operator: str = "老周"):
     record = processor.rerun_record(record_id, operator)
     if not record:
         raise HTTPException(status_code=404, detail="Record not found")
-    return {"id": record.id, "run_count": record.run_count}
+    return {"id": record.id, "run_count": record.run_count, "needs_review": record.needs_review}
 
 
 @app.get("/api/checklist")
@@ -109,16 +114,18 @@ async def get_logs(record_id: Optional[str] = None):
 
 @app.get("/api/stats")
 async def get_stats():
-    records = processor.records
-    return {
-        "total": len(records),
-        "normal": sum(1 for r in records if r.status.value == "normal"),
-        "leave_consumed": sum(1 for r in records if r.status.value == "leave_consumed"),
-        "supplemented": sum(1 for r in records if r.status.value == "supplemented"),
-        "pending_review": sum(1 for r in records if r.needs_review),
-        "corrected": sum(1 for r in records if r.status.value == "corrected"),
-        "total_songs": len(processor.song_checklists)
-    }
+    report = processor.generate_report()
+    return report["stats"]
+
+
+@app.get("/api/report")
+async def get_report():
+    return processor.generate_report()
+
+
+@app.get("/api/report/text", response_class=PlainTextResponse)
+async def get_report_text():
+    return processor.export_report_text()
 
 
 @app.get("/")

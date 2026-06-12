@@ -19,39 +19,42 @@ body {
 }
 .header h1 { font-size: 24px; margin-bottom: 5px; }
 .header p { opacity: 0.9; font-size: 14px; }
-.container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+.container { max-width: 1400px; margin: 0 auto; padding: 20px; }
 .stats {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 15px;
-    margin-bottom: 25px;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
 }
 .stat-card {
     background: white;
     border-radius: 10px;
-    padding: 18px;
+    padding: 16px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     text-align: center;
 }
-.stat-card .num { font-size: 28px; font-weight: bold; color: #667eea; }
-.stat-card .label { font-size: 13px; color: #888; margin-top: 5px; }
+.stat-card .num { font-size: 26px; font-weight: bold; color: #667eea; }
+.stat-card .label { font-size: 12px; color: #888; margin-top: 4px; }
 .stat-card.warning .num { color: #f59e0b; }
 .stat-card.danger .num { color: #ef4444; }
 .stat-card.success .num { color: #10b981; }
+.stat-card.purple .num { color: #8b5cf6; }
 .tabs {
     display: flex;
     gap: 10px;
     margin-bottom: 20px;
     border-bottom: 2px solid #e5e7eb;
+    flex-wrap: wrap;
 }
 .tab {
-    padding: 10px 20px;
+    padding: 10px 18px;
     cursor: pointer;
     border-bottom: 3px solid transparent;
     margin-bottom: -2px;
     font-weight: 500;
     color: #666;
     transition: all 0.2s;
+    font-size: 14px;
 }
 .tab.active {
     color: #667eea;
@@ -60,31 +63,47 @@ body {
 .tab:hover { color: #667eea; }
 .tab-content { display: none; }
 .tab-content.active { display: block; }
+.main-layout {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 20px;
+}
+@media (max-width: 1000px) {
+    .main-layout { grid-template-columns: 1fr; }
+}
 .record-card {
     background: white;
     border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 15px;
+    padding: 16px;
+    margin-bottom: 12px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     border-left: 4px solid #667eea;
+    cursor: pointer;
+    transition: all 0.2s;
 }
+.record-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); transform: translateY(-1px); }
+.record-card.selected { box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2); border-color: #667eea; }
 .record-card.leave { border-left-color: #f59e0b; }
 .record-card.supplemented { border-left-color: #8b5cf6; }
 .record-card.corrected { border-left-color: #10b981; }
-.record-card.pending { border-left-color: #ef4444; }
+.record-card.pending { border-left-color: #ef4444; animation: pulse 2s infinite; }
+@keyframes pulse {
+    0%, 100% { box-shadow: 0 2px 8px rgba(239, 68, 68, 0.1); }
+    50% { box-shadow: 0 2px 16px rgba(239, 68, 68, 0.25); }
+}
 .record-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
 }
-.record-title { font-size: 17px; font-weight: 600; }
-.record-meta { font-size: 13px; color: #888; margin-top: 4px; }
+.record-title { font-size: 16px; font-weight: 600; }
+.record-meta { font-size: 12px; color: #888; margin-top: 3px; }
 .badge {
     display: inline-block;
-    padding: 4px 10px;
+    padding: 3px 10px;
     border-radius: 20px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 500;
 }
 .badge.normal { background: #d1fae5; color: #065f46; }
@@ -92,41 +111,99 @@ body {
 .badge.supplemented { background: #ede9fe; color: #5b21b6; }
 .badge.pending { background: #fee2e2; color: #991b1b; }
 .badge.corrected { background: #d1fae5; color: #065f46; }
+.badge.review-approved { background: #dbeafe; color: #1e40af; }
+.badge.review-rejected { background: #f3f4f6; color: #374151; }
 .record-details {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 10px;
-    font-size: 13px;
-    margin: 12px 0;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    font-size: 12px;
+    margin: 10px 0;
 }
 .detail-item {
     background: #f9fafb;
-    padding: 8px 12px;
+    padding: 6px 10px;
     border-radius: 6px;
 }
-.detail-item .label { color: #888; font-size: 11px; }
-.detail-item .value { font-weight: 500; margin-top: 2px; }
-.song-list {
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px solid #eee;
+.detail-item .label { color: #888; font-size: 10px; }
+.detail-item .value { font-weight: 500; margin-top: 2px; font-size: 12px; }
+.alert-box {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #b91c1c;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    margin-top: 8px;
 }
-.song-item {
+.alert-box.warning { background: #fffbeb; border-color: #fcd34d; color: #92400e; }
+.song-count {
+    font-size: 12px;
+    color: #888;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #f0f0f0;
+}
+.detail-panel {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    position: sticky;
+    top: 20px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+}
+.detail-panel h3 {
+    font-size: 16px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f3f4f6;
+}
+.detail-section { margin-bottom: 18px; }
+.detail-section h4 {
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    font-size: 13px;
+    border-bottom: 1px dashed #f3f4f6;
+}
+.detail-row .label { color: #888; }
+.detail-row .value { font-weight: 500; }
+.song-list-detail {
+    background: #f9fafb;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 12px;
+}
+.song-list-detail .song-item {
+    padding: 3px 0;
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 4px 0;
-    font-size: 13px;
+    gap: 6px;
 }
-.song-item .check { color: #10b981; }
-.song-item .cross { color: #ef4444; }
-.actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 12px;
-    padding-top: 12px;
-    border-top: 1px solid #eee;
+.log-list {
+    max-height: 200px;
+    overflow-y: auto;
+    background: #f9fafb;
+    padding: 10px;
+    border-radius: 6px;
 }
+.log-item {
+    padding: 6px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 11px;
+}
+.log-item:last-child { border-bottom: none; }
+.log-time { color: #999; }
+.log-action { color: #667eea; font-weight: 500; }
+.log-detail { color: #666; margin-top: 2px; }
 .btn {
     padding: 6px 14px;
     border: none;
@@ -142,6 +219,12 @@ body {
 .btn-secondary:hover { background: #d1d5db; }
 .btn-warning { background: #f59e0b; color: white; }
 .btn-warning:hover { background: #d97706; }
+.btn-danger { background: #ef4444; color: white; }
+.btn-danger:hover { background: #dc2626; }
+.btn-success { background: #10b981; color: white; }
+.btn-success:hover { background: #059669; }
+.btn-block { width: 100%; padding: 10px; }
+.btn-group { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
 .checklist-table {
     width: 100%;
     background: white;
@@ -158,58 +241,97 @@ body {
     border-bottom: 1px solid #eee;
 }
 .checklist-table td {
-    padding: 12px 16px;
+    padding: 10px 16px;
     font-size: 13px;
     border-bottom: 1px solid #f3f4f6;
 }
-.band-group { margin-bottom: 20px; }
-.band-group h3 {
-    font-size: 16px;
-    margin-bottom: 10px;
-    color: #4b5563;
+.band-header {
+    background: #f0f4ff !important;
+    font-weight: 600;
 }
-.log-item {
-    background: white;
-    padding: 12px 16px;
-    border-radius: 8px;
-    margin-bottom: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    font-size: 13px;
-}
-.log-time { color: #888; font-size: 11px; }
-.log-action { font-weight: 500; color: #667eea; }
-.log-detail { color: #666; margin-top: 4px; }
-.input-group { margin-bottom: 15px; }
+.input-group { margin-bottom: 12px; }
 .input-group label {
     display: block;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 500;
-    margin-bottom: 6px;
+    margin-bottom: 5px;
     color: #4b5563;
 }
-.input-group textarea, .input-group input {
+.input-group textarea, .input-group input, .input-group select {
     width: 100%;
-    padding: 10px 12px;
+    padding: 8px 10px;
     border: 1px solid #d1d5db;
-    border-radius: 8px;
+    border-radius: 6px;
     font-size: 13px;
     font-family: inherit;
 }
-.input-group textarea { min-height: 100px; resize: vertical; }
+.input-group textarea { min-height: 80px; resize: vertical; }
 .form-card {
+    background: white;
+    border-radius: 10px;
+    padding: 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    margin-bottom: 16px;
+}
+.form-card h3 { margin-bottom: 12px; font-size: 15px; }
+.report-section {
     background: white;
     border-radius: 10px;
     padding: 20px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    margin-bottom: 16px;
+}
+.report-section h3 { margin-bottom: 15px; font-size: 16px; }
+.report-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
     margin-bottom: 20px;
 }
-.form-card h3 { margin-bottom: 15px; font-size: 16px; }
+.report-stat {
+    background: #f9fafb;
+    padding: 14px;
+    border-radius: 8px;
+    text-align: center;
+}
+.report-stat .num { font-size: 22px; font-weight: bold; color: #667eea; }
+.report-stat .label { font-size: 12px; color: #888; margin-top: 4px; }
+.report-stat.danger .num { color: #ef4444; }
+.report-stat.warning .num { color: #f59e0b; }
+.report-stat.success .num { color: #10b981; }
+pre.report-text {
+    background: #1f2937;
+    color: #e5e7eb;
+    padding: 16px;
+    border-radius: 8px;
+    font-size: 12px;
+    overflow-x: auto;
+    line-height: 1.5;
+}
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #9ca3af;
+    font-size: 14px;
+}
+.review-section {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 10px;
+}
+.review-section h5 {
+    color: #b91c1c;
+    font-size: 13px;
+    margin-bottom: 8px;
+}
 </style>
 </head>
 <body>
 <div class="header">
     <h1>🎸 音响租赁调音记录</h1>
-    <p>琴行店长老周的调音记录管理小看板</p>
+    <p>琴行店长老周的调音记录管理小看板 · 请假课时留待巡演统筹复核</p>
 </div>
 
 <div class="container">
@@ -219,15 +341,28 @@ body {
         <div class="tab active" data-tab="records">📋 记录列表</div>
         <div class="tab" data-tab="checklist">🎵 曲目核对表</div>
         <div class="tab" data-tab="import">📥 导入操作</div>
+        <div class="tab" data-tab="report">📊 统计报告</div>
         <div class="tab" data-tab="logs">📜 操作日志</div>
     </div>
 
-    <div class="tab-content active" id="tab-records"></div>
+    <div class="tab-content active" id="tab-records">
+        <div class="main-layout">
+            <div id="record-list"></div>
+            <div class="detail-panel">
+                <h3>📝 记录详情</h3>
+                <div id="record-detail">
+                    <div class="empty-state">← 点击左侧记录查看详情</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <div class="tab-content" id="tab-checklist"></div>
     
     <div class="tab-content" id="tab-import">
         <div class="form-card">
-            <h3>1. 导入调音师留言</h3>
+            <h3>1️⃣ 导入调音师留言</h3>
+            <p style="font-size:12px;color:#888;margin-bottom:10px;">调音师留言看着像主材料，自动识别请假等关键词</p>
             <div class="input-group">
                 <label>调音师留言原文</label>
                 <textarea id="tuner-text" placeholder="例如：&#10;2025-06-05 录音室记录&#10;乐队：超音速乐队&#10;房间：3号录音室&#10;时间：14:00-17:00&#10;调音师：阿凯"></textarea>
@@ -236,20 +371,36 @@ body {
                 <label>操作人</label>
                 <input type="text" id="tuner-operator" value="老周">
             </div>
-            <button class="btn btn-primary" onclick="importTuner()">导入调音师留言</button>
+            <button class="btn btn-primary btn-block" onclick="importTuner()">📥 导入调音师留言</button>
         </div>
         
         <div class="form-card">
-            <h3>2. 补录排练群接龙</h3>
+            <h3>2️⃣ 补录排练群接龙</h3>
+            <p style="font-size:12px;color:#888;margin-bottom:10px;">排练群接龙藏着关键备注，补录后曲目核对表自动更新</p>
             <div class="input-group">
-                <label>记录ID</label>
-                <input type="text" id="record-id" placeholder="选择要补录的记录ID">
+                <label>选择记录</label>
+                <select id="record-select" onchange="onRecordSelectChange()">
+                    <option value="">-- 请先选择记录 --</option>
+                </select>
             </div>
             <div class="input-group">
                 <label>群接龙原文</label>
                 <textarea id="signup-text" placeholder="例如：&#10;【超音速乐队 6月5日排练接龙】&#10;曲目：《出发》、《逆风飞翔》&#10;备注：记得带效果器"></textarea>
             </div>
-            <button class="btn btn-primary" onclick="supplementSignup()">补录群接龙</button>
+            <button class="btn btn-primary btn-block" onclick="supplementSignup()">➕ 补录群接龙</button>
+        </div>
+    </div>
+
+    <div class="tab-content" id="tab-report">
+        <div class="report-section">
+            <h3>📊 统计报告</h3>
+            <div class="btn-group" style="margin-bottom:15px;">
+                <button class="btn btn-primary" onclick="refreshReport()">🔄 刷新报告</button>
+                <button class="btn btn-success" onclick="downloadReport()">💾 导出文本报告</button>
+            </div>
+            <div id="report-stats"></div>
+            <h4 style="margin:15px 0 10px;font-size:14px;">📋 文本格式报告</h4>
+            <pre class="report-text" id="report-text">加载中...</pre>
         </div>
     </div>
     
@@ -257,44 +408,38 @@ body {
 </div>
 
 <script>
-async function loadData() {
-    await Promise.all([loadStats(), loadRecords(), loadChecklist(), loadLogs()]);
+let currentRecordId = null;
+
+async function loadAll() {
+    await Promise.all([loadStats(), loadRecords(), loadChecklist(), loadLogs(), loadReport()]);
 }
 
 async function loadStats() {
     const res = await fetch('/api/stats');
-    const data = await res.json();
+    const s = await res.json();
     document.getElementById('stats').innerHTML = `
-        <div class="stat-card"><div class="num">${data.total}</div><div class="label">总记录</div></div>
-        <div class="stat-card success"><div class="num">${data.normal}</div><div class="label">正常记录</div></div>
-        <div class="stat-card warning"><div class="num">${data.leave_consumed}</div><div class="label">请假被算消耗</div></div>
-        <div class="stat-card"><div class="num">${data.supplemented}</div><div class="label">已补录</div></div>
-        <div class="stat-card danger"><div class="num">${data.pending_review}</div><div class="label">待复核</div></div>
-        <div class="stat-card success"><div class="num">${data.corrected}</div><div class="label">已修正</div></div>
-        <div class="stat-card"><div class="num">${data.total_songs}</div><div class="label">曲目总数</div></div>
+        <div class="stat-card"><div class="num">${s.total}</div><div class="label">总记录</div></div>
+        <div class="stat-card success"><div class="num">${s.normal}</div><div class="label">正常记录</div></div>
+        <div class="stat-card danger"><div class="num">${s.pending_review}</div><div class="label">待复核 ⚠️</div></div>
+        <div class="stat-card purple"><div class="num">${s.supplemented}</div><div class="label">已补录</div></div>
+        <div class="stat-card success"><div class="num">${s.corrected}</div><div class="label">已修正</div></div>
+        <div class="stat-card"><div class="num">${s.total_hours}</div><div class="label">总课时</div></div>
+        <div class="stat-card warning"><div class="num">${s.pending_hours}</div><div class="label">待复核课时</div></div>
+        <div class="stat-card"><div class="num">${s.review_approved + s.review_rejected}</div><div class="label">已复核</div></div>
     `;
 }
 
 function getBadgeClass(status) {
     const map = {
         'normal': 'normal',
-        'leave_consumed': 'leave',
+        'leave_consumed': 'pending',
         'supplemented': 'supplemented',
         'pending_review': 'pending',
-        'corrected': 'corrected'
+        'corrected': 'corrected',
+        'review_approved': 'review-approved',
+        'review_rejected': 'review-rejected'
     };
     return map[status] || 'normal';
-}
-
-function getStatusText(status) {
-    const map = {
-        'normal': '正常记录',
-        'leave_consumed': '请假被算消耗（待复核）',
-        'supplemented': '已补录群接龙',
-        'pending_review': '待复核',
-        'corrected': '已人工修正'
-    };
-    return map[status] || status;
 }
 
 function getCardClass(r) {
@@ -302,6 +447,7 @@ function getCardClass(r) {
     if (r.status === 'leave_consumed') return 'leave';
     if (r.status === 'supplemented') return 'supplemented';
     if (r.status === 'corrected') return 'corrected';
+    if (r.status === 'review_approved' || r.status === 'review_rejected') return 'corrected';
     return '';
 }
 
@@ -309,35 +455,171 @@ async function loadRecords() {
     const res = await fetch('/api/records');
     const data = await res.json();
     const html = data.records.map(r => `
-        <div class="record-card ${getCardClass(r)}">
+        <div class="record-card ${getCardClass(r)} ${currentRecordId === r.id ? 'selected' : ''}" 
+             onclick="selectRecord('${r.id}')">
             <div class="record-header">
                 <div>
                     <div class="record-title">${r.band_name}</div>
-                    <div class="record-meta">${r.date} · ${r.hours}小时 · ${r.status_text}</div>
+                    <div class="record-meta">${r.date} · ${r.hours}小时</div>
                 </div>
                 <span class="badge ${getBadgeClass(r.status)}">${r.status_text}</span>
             </div>
             <div class="record-details">
-                <div class="detail-item"><div class="label">房间</div><div class="value">${r.room || '-'}</div></div>
-                <div class="detail-item"><div class="label">时间</div><div class="value">${r.start_time || '-'}-${r.end_time || '-'}</div></div>
                 <div class="detail-item"><div class="label">请假</div><div class="value">${r.is_leave ? '是' : '否'}</div></div>
                 <div class="detail-item"><div class="label">已消耗</div><div class="value">${r.is_consumed ? '是' : '否'}</div></div>
-                <div class="detail-item"><div class="label">待复核</div><div class="value">${r.needs_review ? '是 ⚠️' : '否'}</div></div>
-                <div class="detail-item"><div class="label">运行次数</div><div class="value">第${r.run_count}次</div></div>
+                <div class="detail-item"><div class="label">重跑</div><div class="value">第${r.run_count}次</div></div>
             </div>
-            ${r.review_note ? `<div style="color:#ef4444;font-size:13px;padding:8px 12px;background:#fef2f2;border-radius:6px;margin-top:8px;">📌 ${r.review_note}</div>` : ''}
-            <div class="song-list">
-                <div style="font-size:12px;color:#888;margin-bottom:6px;">曲目 (${r.song_count}首):</div>
-                ${r.song_count > 0 ? '已补录曲目，查看核对表详情' : '⏳ 待补录排练群接龙'}
-            </div>
-            <div class="actions">
-                <button class="btn btn-secondary" onclick="selectRecord('${r.id}')">选择此记录</button>
-                <button class="btn btn-warning" onclick="rerunRecord('${r.id}')">重跑</button>
-            </div>
-            <div style="font-size:11px;color:#aaa;margin-top:8px;">ID: ${r.id}</div>
+            ${r.needs_review ? `<div class="alert-box">⚠️ 请假课时被算进已消耗，留给巡演统筹复核</div>` : ''}
+            <div class="song-count">🎵 曲目: ${r.song_count} 首 ${r.song_count === 0 ? '（待补录群接龙）' : ''}</div>
         </div>
     `).join('');
-    document.getElementById('tab-records').innerHTML = html;
+    document.getElementById('record-list').innerHTML = html;
+    populateRecordSelect(data.records);
+}
+
+function populateRecordSelect(records) {
+    const sel = document.getElementById('record-select');
+    const current = sel.value;
+    sel.innerHTML = '<option value="">-- 请选择记录 --</option>' + 
+        records.map(r => `<option value="${r.id}">${r.band_name} - ${r.date}</option>`).join('');
+    if (current) sel.value = current;
+}
+
+function onRecordSelectChange() {
+    const id = document.getElementById('record-select').value;
+    if (id) selectRecord(id);
+}
+
+async function selectRecord(id) {
+    currentRecordId = id;
+    document.getElementById('record-select').value = id;
+    const res = await fetch(`/api/records/${id}`);
+    const r = await res.json();
+    
+    let html = `
+        <div class="detail-section">
+            <h4>基本信息</h4>
+            <div class="detail-row"><span class="label">乐队</span><span class="value">${r.band_name}</span></div>
+            <div class="detail-row"><span class="label">日期</span><span class="value">${r.date}</span></div>
+            <div class="detail-row"><span class="label">房间</span><span class="value">${r.room || '-'}</span></div>
+            <div class="detail-row"><span class="label">时间</span><span class="value">${r.start_time || '-'}-${r.end_time || '-'}</span></div>
+            <div class="detail-row"><span class="label">课时</span><span class="value">${r.hours} 小时</span></div>
+            <div class="detail-row"><span class="label">调音师</span><span class="value">${r.tuner_name || '-'}</span></div>
+            <div class="detail-row"><span class="label">状态</span><span class="value">${r.status_text}</span></div>
+        </div>
+        <div class="detail-section">
+            <h4>课时状态</h4>
+            <div class="detail-row"><span class="label">请假</span><span class="value">${r.is_leave ? '✅ 是' : '否'}</span></div>
+            <div class="detail-row"><span class="label">已消耗</span><span class="value">${r.is_consumed ? '✅ 是' : '否'}</span></div>
+            <div class="detail-row"><span class="label">待复核</span><span class="value" style="color:${r.needs_review ? '#ef4444' : 'inherit'}">${r.needs_review ? '⚠️ 是' : '否'}</span></div>
+        </div>
+    `;
+    
+    if (r.review_note || r.review_reason) {
+        html += `
+            <div class="detail-section">
+                <h4>复核信息</h4>
+                ${r.review_note ? `<div class="alert-box warning">📝 ${r.review_note}</div>` : ''}
+                ${r.review_reason ? `
+                    <div class="detail-row"><span class="label">复核结果</span><span class="value">${r.review_decision === 'approve' ? '✅ 确认计入消耗' : '❌ 驳回不计消耗'}</span></div>
+                    <div class="detail-row"><span class="label">复核理由</span><span class="value">${r.review_reason}</span></div>
+                    <div class="detail-row"><span class="label">复核人</span><span class="value">${r.reviewed_by || '-'}</span></div>
+                ` : ''}
+            </div>
+        `;
+    }
+    
+    html += `
+        <div class="detail-section">
+            <h4>曲目 (${r.song_list.length}首)</h4>
+            <div class="song-list-detail">
+                ${r.song_list.length > 0 ? r.song_list.map(s => `<div class="song-item">🎵 ${s}</div>`).join('') : '<div style="color:#999;">暂无曲目，请补录群接龙</div>'}
+            </div>
+        </div>
+    `;
+    
+    if (r.members && r.members.length > 0) {
+        html += `
+            <div class="detail-section">
+                <h4>参与人员</h4>
+                <div class="song-list-detail">
+                    ${r.members.map(m => `<div class="song-item">👤 ${m}</div>`).join('')}
+                </div>
+            </div>
+        `;
+    }
+    
+    if (r.group_remark) {
+        html += `
+            <div class="detail-section">
+                <h4>群接龙备注</h4>
+                <div style="background:#f0f4ff;padding:8px 10px;border-radius:6px;font-size:12px;">${r.group_remark}</div>
+            </div>
+        `;
+    }
+    
+    if (r.needs_review) {
+        html += `
+            <div class="detail-section">
+                <h4>⚖️ 巡演统筹复核</h4>
+                <div class="review-section">
+                    <h5>请假课时被算进已消耗，请确认：</h5>
+                    <div class="input-group">
+                        <label>复核理由</label>
+                        <textarea id="review-reason" placeholder="请填写复核理由..."></textarea>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-success" onclick="doReview('approve')">✅ 确认计入消耗</button>
+                        <button class="btn btn-danger" onclick="doReview('reject')">❌ 驳回不计消耗</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    html += `
+        <div class="detail-section">
+            <h4>操作历史</h4>
+            <div id="record-logs" class="log-list">加载中...</div>
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-warning" onclick="rerunRecord('${r.id}')">🔄 重跑</button>
+            <span style="color:#888;font-size:12px;align-self:center;">第${r.run_count}次</span>
+        </div>
+    `;
+    
+    document.getElementById('record-detail').innerHTML = html;
+    loadRecordLogs(id);
+    loadRecords();
+}
+
+async function loadRecordLogs(recordId) {
+    const res = await fetch(`/api/logs?record_id=${recordId}`);
+    const data = await res.json();
+    const html = data.logs.slice().reverse().map(log => `
+        <div class="log-item">
+            <div class="log-time">${log.timestamp.replace('T', ' ').slice(0, 19)} · ${log.operator}</div>
+            <div class="log-action">${log.action}</div>
+            <div class="log-detail">${log.detail}</div>
+        </div>
+    `).join('');
+    const el = document.getElementById('record-logs');
+    if (el) el.innerHTML = html || '<div style="color:#999;font-size:12px;">暂无日志</div>';
+}
+
+async function doReview(decision) {
+    const reason = document.getElementById('review-reason').value;
+    if (!reason) { alert('请填写复核理由'); return; }
+    const res = await fetch(`/api/records/${currentRecordId}/review`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({decision, reason, operator: '巡演统筹'})
+    });
+    if (res.ok) {
+        alert('复核完成！');
+        selectRecord(currentRecordId);
+        loadAll();
+    }
 }
 
 async function loadChecklist() {
@@ -348,11 +630,11 @@ async function loadChecklist() {
         if (!bands[c.band_name]) bands[c.band_name] = [];
         bands[c.band_name].push(c);
     });
-    let html = '<div class="checklist-table"><table><thead><tr><th>乐队</th><th>曲目</th><th>计划</th><th>实际执行</th><th>备注</th></tr></thead><tbody>';
+    let html = '<div class="checklist-table"><table><thead><tr><th style="width:15%">乐队</th><th>曲目</th><th style="width:10%">计划</th><th style="width:12%">实际执行</th><th>备注</th></tr></thead><tbody>';
     for (const [band, songs] of Object.entries(bands)) {
         songs.forEach((c, i) => {
-            html += `<tr>
-                <td>${i === 0 ? '<strong>' + band + '</strong>' : ''}</td>
+            html += `<tr class="${i === 0 ? 'band-header' : ''}">
+                <td>${i === 0 ? '🎸 ' + band : ''}</td>
                 <td>🎵 ${c.song_name}</td>
                 <td>${c.planned ? '✅' : '❌'}</td>
                 <td>${c.actually_performed ? '<span style="color:#10b981">✓ 已排</span>' : '<span style="color:#ef4444">✗ 未执行</span>'}</td>
@@ -368,14 +650,48 @@ async function loadLogs() {
     const res = await fetch('/api/logs');
     const data = await res.json();
     const html = data.logs.slice().reverse().map(log => `
-        <div class="log-item">
+        <div class="log-item" style="background:white;padding:12px 16px;border-radius:8px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,0.05);">
             <div class="log-time">${log.timestamp.replace('T', ' ').slice(0, 19)} · ${log.operator}</div>
-            <div class="log-action">${log.action}</div>
-            <div class="log-detail">${log.detail}</div>
-            <div style="font-size:11px;color:#aaa;margin-top:4px;">记录: ${log.record_id.slice(0, 12)}...</div>
+            <div class="log-action" style="font-size:14px;">${log.action}</div>
+            <div class="log-detail" style="margin-top:4px;">${log.detail}</div>
         </div>
     `).join('');
     document.getElementById('tab-logs').innerHTML = html;
+}
+
+async function loadReport() {
+    const res = await fetch('/api/stats');
+    const s = await res.json();
+    document.getElementById('report-stats').innerHTML = `
+        <div class="report-stats">
+            <div class="report-stat"><div class="num">${s.total}</div><div class="label">总记录</div></div>
+            <div class="report-stat success"><div class="num">${s.normal}</div><div class="label">正常记录</div></div>
+            <div class="report-stat danger"><div class="num">${s.pending_review}</div><div class="label">待复核</div></div>
+            <div class="report-stat"><div class="num">${s.supplemented}</div><div class="label">已补录</div></div>
+            <div class="report-stat success"><div class="num">${s.corrected}</div><div class="label">已修正</div></div>
+            <div class="report-stat warning"><div class="num">${s.total_hours}</div><div class="label">总课时</div></div>
+            <div class="report-stat danger"><div class="num">${s.pending_hours}</div><div class="label">待复核课时</div></div>
+            <div class="report-stat success"><div class="num">${s.consumed_hours}</div><div class="label">已消耗课时</div></div>
+        </div>
+    `;
+    const textRes = await fetch('/api/report/text');
+    const text = await textRes.text();
+    document.getElementById('report-text').textContent = text;
+}
+
+async function refreshReport() {
+    await loadReport();
+    loadStats();
+}
+
+async function downloadReport() {
+    const text = document.getElementById('report-text').textContent;
+    const blob = new Blob([text], {type: 'text/plain;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = '调音记录报告_' + new Date().toISOString().slice(0,10) + '.txt';
+    a.click();
 }
 
 async function importTuner() {
@@ -388,24 +704,31 @@ async function importTuner() {
         body: JSON.stringify({raw_text: text, operator})
     });
     const data = await res.json();
-    alert('导入成功！记录ID: ' + data.id.slice(0, 8));
+    let msg = '导入成功！';
+    if (data.needs_review) {
+        msg += '\n\n⚠️ 注意：检测到请假关键词';
+        msg += '\n请假课时被算进已消耗，已标记待复核';
+        msg += '\n留给巡演统筹确认';
+    }
+    alert(msg);
     document.getElementById('tuner-text').value = '';
-    loadData();
+    loadAll();
 }
 
 async function supplementSignup() {
-    const recordId = document.getElementById('record-id').value;
+    const recordId = document.getElementById('record-select').value;
     const text = document.getElementById('signup-text').value;
-    if (!recordId || !text) { alert('请填写记录ID和群接龙内容'); return; }
+    if (!recordId || !text) { alert('请选择记录并填写群接龙内容'); return; }
     const res = await fetch(`/api/records/${recordId}/supplement`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({raw_text: text})
     });
     if (res.ok) {
-        alert('补录成功！曲目核对表已更新');
+        alert('补录成功！\n\n曲目核对表已自动更新');
         document.getElementById('signup-text').value = '';
-        loadData();
+        if (currentRecordId === recordId) selectRecord(recordId);
+        loadAll();
     } else {
         alert('补录失败，请检查记录ID');
     }
@@ -414,14 +737,15 @@ async function supplementSignup() {
 async function rerunRecord(id) {
     const res = await fetch(`/api/records/${id}/rerun`, {method: 'POST'});
     if (res.ok) {
-        alert('重跑完成！');
-        loadData();
+        const data = await res.json();
+        let msg = '重跑完成！';
+        if (data.needs_review) {
+            msg += '\n\n⚠️ 状态仍为待巡演统筹复核';
+        }
+        alert(msg);
+        if (currentRecordId === id) selectRecord(id);
+        loadAll();
     }
-}
-
-function selectRecord(id) {
-    document.getElementById('record-id').value = id;
-    document.querySelector('[data-tab="import"]').click();
 }
 
 document.querySelectorAll('.tab').forEach(tab => {
@@ -433,7 +757,7 @@ document.querySelectorAll('.tab').forEach(tab => {
     });
 });
 
-loadData();
+loadAll();
 </script>
 </body>
 </html>

@@ -10,6 +10,13 @@ class RecordStatus(str, Enum):
     SUPPLEMENTED = "supplemented"
     PENDING_REVIEW = "pending_review"
     CORRECTED = "corrected"
+    REVIEW_APPROVED = "review_approved"
+    REVIEW_REJECTED = "review_rejected"
+
+
+class ReviewDecision(str, Enum):
+    APPROVE = "approve"
+    REJECT = "reject"
 
 
 class DataSource(str, Enum):
@@ -63,6 +70,10 @@ class RehearsalRecord:
     is_consumed: bool = False
     needs_review: bool = False
     review_note: str = ""
+    review_decision: str = ""
+    review_reason: str = ""
+    reviewed_by: str = ""
+    reviewed_at: Optional[datetime] = None
     tuner_note: str = ""
     group_remark: str = ""
     corrections: List[Dict] = field(default_factory=list)

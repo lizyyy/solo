@@ -208,18 +208,23 @@ class RecordProcessor:
             record.members = signup.members
         record.group_remark = signup.remarks
         
-        if signup.remarks and "旧口径" in signup.remarks:
-            record.status = RecordStatus.SUPPLEMENTED
+        if not record.needs_review:
+            if signup.remarks and "旧口径" in signup.remarks:
+                record.status = RecordStatus.SUPPLEMENTED
         
         record.updated_at = datetime.now()
         record.run_count += 1
         
         self._update_song_checklist(record, old_songs)
         
+        remark_info = ""
+        if signup.remarks and "旧口径" in signup.remarks:
+            remark_info = "（旧口径）"
+        
         self._log(
             record.id,
             "补录排练群接龙",
-            f"补录群接龙信息，曲目从{old_songs}更新为{record.song_list}",
+            f"补录群接龙信息{remark_info}，曲目从{old_songs}更新为{record.song_list}",
             operator
         )
         
@@ -285,6 +290,34 @@ class RecordProcessor:
         
         return record
 
+    def review_record(self, record_id: str, decision: str, reason: str, operator: str = "巡演统筹") -> Optional[RehearsalRecord]:
+        record = next((r for r in self.records if r.id == record_id), None)
+        if not record:
+            return None
+        if not record.needs_review:
+            return None
+
+        record.review_decision = decision
+        record.review_reason = reason
+        record.reviewed_by = operator
+        record.reviewed_at = datetime.now()
+        record.needs_review = False
+
+        if decision == "approve":
+            record.status = RecordStatus.REVIEW_APPROVED
+            record.is_consumed = True
+            log_detail = f"复核通过：确认请假课时计入消耗，理由：{reason}"
+        else:
+            record.status = RecordStatus.REVIEW_REJECTED
+            record.is_consumed = False
+            log_detail = f"复核驳回：请假课时不计入消耗，理由：{reason}"
+
+        record.updated_at = datetime.now()
+
+        self._log(record.id, "巡演统筹复核", log_detail, operator)
+        
+        return record
+
     def rerun_record(self, record_id: str, operator: str = "老周") -> Optional[RehearsalRecord]:
         record = next((r for r in self.records if r.id == record_id), None)
         if not record:
@@ -293,8 +326,8 @@ class RecordProcessor:
         record.run_count += 1
         record.updated_at = datetime.now()
 
-        if record.status == RecordStatus.LEAVE_CONSUMED and record.needs_review:
-            self._log(record.id, "重跑", f"第{record.run_count}次重跑，状态仍为待复核", operator)
+        if record.needs_review:
+            self._log(record.id, "重跑", f"第{record.run_count}次重跑，状态仍为待巡演统筹复核", operator)
         else:
             self._log(record.id, "重跑", f"第{record.run_count}次重跑完成", operator)
 
@@ -321,10 +354,12 @@ class RecordProcessor:
     def _status_text(self, status: RecordStatus) -> str:
         mapping = {
             RecordStatus.NORMAL: "正常记录",
-            RecordStatus.LEAVE_CONSUMED: "请假被算消耗（待复核）",
+            RecordStatus.LEAVE_CONSUMED: "请假被算消耗（待巡演统筹复核）",
             RecordStatus.SUPPLEMENTED: "已补录群接龙",
             RecordStatus.PENDING_REVIEW: "待复核",
-            RecordStatus.CORRECTED: "已人工修正"
+            RecordStatus.CORRECTED: "已人工修正",
+            RecordStatus.REVIEW_APPROVED: "复核通过（请假计入消耗）",
+            RecordStatus.REVIEW_REJECTED: "复核驳回（请假不计消耗）"
         }
         return mapping.get(status, status.value)
 
@@ -358,3 +393,131 @@ class RecordProcessor:
             }
             for l in logs
         ]
+
+    def get_record_detail(self, record_id: str) -> Optional[Dict]:
+        record = next((r for r in self.records if r.id == record_id), None)
+        if not record:
+            return None
+        return {
+            "id": record.id,
+            "date": record.date,
+            "band_name": record.band_name,
+            "room": record.room,
+            "start_time": record.start_time,
+            "end_time": record.end_time,
+            "hours": record.hours,
+            "tuner_name": record.tuner_name,
+            "song_list": record.song_list,
+            "members": record.members,
+            "status": record.status.value,
+            "status_text": self._status_text(record.status),
+            "source": record.source.value,
+            "is_leave": record.is_leave,
+            "is_consumed": record.is_consumed,
+            "needs_review": record.needs_review,
+            "review_note": record.review_note,
+            "review_decision": record.review_decision,
+            "review_reason": record.review_reason,
+            "reviewed_by": record.reviewed_by,
+            "reviewed_at": record.reviewed_at.isoformat() if record.reviewed_at else None,
+            "tuner_note": record.tuner_note,
+            "group_remark": record.group_remark,
+            "corrections": record.corrections,
+            "run_count": record.run_count,
+            "created_at": record.created_at.isoformat(),
+            "updated_at": record.updated_at.isoformat()
+        }
+
+    def generate_report(self) -> Dict:
+        records = self.records
+        stats = {
+            "total": len(records),
+            "normal": 0,
+            "leave_consumed": 0,
+            "pending_review": 0,
+            "supplemented": 0,
+            "corrected": 0,
+            "review_approved": 0,
+            "review_rejected": 0,
+            "total_hours": 0.0,
+            "consumed_hours": 0.0,
+            "pending_hours": 0.0
+        }
+        for r in records:
+            stats["total_hours"] += r.hours
+            if r.status == RecordStatus.NORMAL:
+                stats["normal"] += 1
+            if r.status == RecordStatus.LEAVE_CONSUMED:
+                stats["leave_consumed"] += 1
+            if r.needs_review:
+                stats["pending_review"] += 1
+                stats["pending_hours"] += r.hours
+            if r.status == RecordStatus.SUPPLEMENTED:
+                stats["supplemented"] += 1
+            if r.status == RecordStatus.CORRECTED:
+                stats["corrected"] += 1
+            if r.status == RecordStatus.REVIEW_APPROVED:
+                stats["review_approved"] += 1
+            if r.status == RecordStatus.REVIEW_REJECTED:
+                stats["review_rejected"] += 1
+            if r.is_consumed:
+                stats["consumed_hours"] += r.hours
+
+        record_list = []
+        for r in records:
+            record_list.append({
+                "date": r.date,
+                "band_name": r.band_name,
+                "hours": r.hours,
+                "status": self._status_text(r.status),
+                "is_leave": r.is_leave,
+                "is_consumed": r.is_consumed,
+                "needs_review": r.needs_review,
+                "review_note": r.review_note,
+                "songs": r.song_list
+            })
+
+        return {
+            "generated_at": datetime.now().isoformat(),
+            "stats": stats,
+            "records": record_list,
+            "checklist": self.get_song_checklist()
+        }
+
+    def export_report_text(self) -> str:
+        report = self.generate_report()
+        s = report["stats"]
+        lines = []
+        lines.append("=" * 60)
+        lines.append("  音响租赁调音记录 - 统计报告")
+        lines.append("  生成时间: " + report["generated_at"])
+        lines.append("=" * 60)
+        lines.append("")
+        lines.append("【统计概览】")
+        lines.append(f"  总记录数: {s['total']}")
+        lines.append(f"  总课时: {s['total_hours']} 小时")
+        lines.append(f"  已消耗课时: {s['consumed_hours']} 小时")
+        lines.append(f"  待复核课时: {s['pending_hours']} 小时")
+        lines.append("")
+        lines.append("【状态分布】")
+        lines.append(f"  正常记录: {s['normal']} 条")
+        lines.append(f"  请假被算消耗(待复核): {s['pending_review']} 条 ⚠️")
+        lines.append(f"  已补录群接龙: {s['supplemented']} 条")
+        lines.append(f"  已人工修正: {s['corrected']} 条")
+        lines.append(f"  复核通过(计入消耗): {s['review_approved']} 条")
+        lines.append(f"  复核驳回(不计消耗): {s['review_rejected']} 条")
+        lines.append("")
+        lines.append("【记录明细】")
+        lines.append("-" * 60)
+        for i, r in enumerate(report["records"], 1):
+            flag = " ⚠️待复核" if r["needs_review"] else ""
+            lines.append(f"{i}. {r['band_name']} - {r['date']}")
+            lines.append(f"   状态: {r['status']}{flag}")
+            lines.append(f"   课时: {r['hours']}小时 | 请假: {'是' if r['is_leave'] else '否'} | 消耗: {'是' if r['is_consumed'] else '否'}")
+            if r["review_note"]:
+                lines.append(f"   复核说明: {r['review_note']}")
+            if r["songs"]:
+                lines.append(f"   曲目: {', '.join(r['songs'][:3])}{'...' if len(r['songs']) > 3 else ''}")
+            lines.append("")
+        lines.append("=" * 60)
+        return "\n".join(lines)
