@@ -44,7 +44,7 @@ def create_demo_records() -> list[UserFeedback]:
         UserFeedback(
             feedback_id="FB003",
             user_id="U2003",
-            content="打了三次电话都没人解决问题，你们客服态度太差了，投诉！",
+            content="你们客服态度太差了！打了三次电话都没人解决问题，我要投诉！！",
             timestamp=datetime(2024, 6, 1, 10, 22, 0),
             old_model_intent=IntentCategory.OTHER,
             new_model_intent=IntentCategory.COMPLAINT,

@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Set
 from collections import defaultdict
 from difflib import SequenceMatcher
 from models import UserFeedback, RecordStatus, IntentCategory, AnnotationNote
@@ -8,7 +8,8 @@ from models import UserFeedback, RecordStatus, IntentCategory, AnnotationNote
 class IntentComparator:
     def __init__(self):
         self.records: List[UserFeedback] = []
-        self.duplicate_threshold = 0.8
+        self.duplicate_threshold = 0.65
+        self.time_window_seconds = 300
 
     def load_records(self, records: List[UserFeedback]) -> None:
         self.records = records
@@ -20,15 +21,29 @@ class IntentComparator:
                 if r1.user_id == r2.user_id:
                     similarity = self._text_similarity(r1.content, r2.content)
                     time_diff = abs((r1.timestamp - r2.timestamp).total_seconds())
-                    if similarity > self.duplicate_threshold and time_diff < 300:
+                    if similarity > self.duplicate_threshold and time_diff < self.time_window_seconds:
                         duplicates.append((r1, r2, similarity))
                         if r1.status != RecordStatus.DUPLICATE and r2.status != RecordStatus.DUPLICATE:
                             r2.status = RecordStatus.DUPLICATE
                             r2.duplicate_of = r1.feedback_id
         return duplicates
 
+    def _char_ngrams(self, text: str, n: int = 2) -> Set[str]:
+        text = text.strip()
+        if len(text) < n:
+            return {text} if text else set()
+        return {text[i:i + n] for i in range(len(text) - n + 1)}
+
     def _text_similarity(self, a: str, b: str) -> float:
-        return SequenceMatcher(None, a, b).ratio()
+        ngrams_a = self._char_ngrams(a)
+        ngrams_b = self._char_ngrams(b)
+        if not ngrams_a or not ngrams_b:
+            return 0.0
+        intersection = len(ngrams_a & ngrams_b)
+        union = len(ngrams_a | ngrams_b)
+        jaccard = intersection / union if union > 0 else 0.0
+        seq_sim = SequenceMatcher(None, a, b).ratio()
+        return max(jaccard, seq_sim)
 
     def add_annotation_note(self, feedback_id: str, annotator: str, note: str,
                             is_official_caliber: bool = False) -> bool:
