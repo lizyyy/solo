@@ -438,13 +438,14 @@
                   <div class="evidence-value">${c.licenseValue}</div>
                 </div>
               </div>
+              ${evidence.record.status === 'needs_review' ? '<p style="color:#92400e;font-size:13px;margin-bottom:8px;">⏳ 此冲突因双名复核优先已延后，需先完成歌曲名复核后再处理</p>' : ''}
               <div class="form-group">
                 <label>处理理由</label>
-                <textarea id="resolve-reason-${i}" placeholder="请输入确认或驳回的理由..."></textarea>
+                <textarea id="resolve-reason-${i}" placeholder="请输入确认或驳回的理由..." ${evidence.record.status === 'needs_review' ? 'disabled' : ''}></textarea>
               </div>
               <div class="btn-group">
-                <button class="btn btn-success btn-sm" onclick="resolveConflict(${i}, 'confirm')">✅ 确认采用授权页数据</button>
-                <button class="btn btn-danger btn-sm" onclick="resolveConflict(${i}, 'reject')">❌ 驳回，保留音频备注</button>
+                <button class="btn btn-success btn-sm" onclick="resolveConflict(${i}, 'confirm')" ${evidence.record.status === 'needs_review' ? 'disabled' : ''}>✅ 确认采用授权页数据</button>
+                <button class="btn btn-danger btn-sm" onclick="resolveConflict(${i}, 'reject')" ${evidence.record.status === 'needs_review' ? 'disabled' : ''}>❌ 驳回，保留音频备注</button>
               </div>
             </div>
           `;
@@ -477,6 +478,7 @@
               <div class="timeline-time">${new Date(h.timestamp).toLocaleString('zh-CN')}</div>
               <div class="timeline-content">
                 <span class="operator">${h.operator}</span> ${h.reason}
+                ${h.action !== 'flag_for_review' && h.action !== 'detect_conflict_deferred' ? `<div style="font-size:12px;color:#888;margin-top:2px;">影响：${h.field} 从「${h.oldValue}」变为「${h.newValue}」</div>` : ''}
               </div>
             </div>
           `;
@@ -515,14 +517,18 @@
         return;
       }
       
-      await api('/review/song-name/review', {
+      const result = await api('/review/song-name/review', {
         method: 'POST',
         body: JSON.stringify({ recordId: selectedRecordId, decision, operator, reason })
       });
       
-      alert('处理成功！');
+      if (result.status === 'conflict') {
+        alert('名称复核完成！检测到延后的备注冲突已激活，需录音师小段继续处理。');
+      } else {
+        alert('复核完成！');
+      }
       loadPendingReviews();
-      document.getElementById('conflict-detail-card').style.display = 'none';
+      showConflictDetail(selectedRecordId);
     }
     
     async function generateCurrentWeekReport() {

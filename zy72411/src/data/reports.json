@@ -1,54 +1,58 @@
 [
   {
-    "id": "98d6fe60-5725-4709-a8b8-796ba8473662",
-    "weekStart": "2026-05-31",
-    "weekEnd": "2026-06-07",
-    "generatedAt": "2026-06-06T15:51:39.081Z",
+    "id": "6bd5fe3b-1854-4da9-a944-4591c5c8c077",
+    "weekStart": "2026-06-07",
+    "weekEnd": "2026-06-14",
+    "generatedAt": "2026-06-12T09:51:25.613Z",
     "generatedBy": "demo_user",
     "summary": {
       "totalRecords": 3,
       "normalRecords": 0,
-      "needReviewRecords": 0,
-      "conflictRecords": 2,
+      "needReviewRecords": 1,
+      "conflictRecords": 1,
       "supplementedRecords": 1,
       "reviewedRecords": 0
     },
     "recordSnapshots": [
       {
-        "id": "3b3f2840-0518-45c4-9c12-8ef249c2f6b9",
+        "id": "44e51e60-7b16-4eec-ae92-d8f9fe7f43d1",
         "songName": "小星星变奏曲",
         "status": "supplemented",
         "remarks": "学生作业完成度良好，节奏稳定。注意第16小节的附点节奏需要加强练习",
         "licenseRemarks": "学生作业完成度良好，节奏稳定。注意第16小节的附点节奏需要加强练习",
         "hasConflicts": false,
         "reviewCount": 1,
-        "updatedAt": "2026-06-06T15:51:39.078Z"
+        "updatedAt": "2026-06-12T09:51:25.612Z"
       },
       {
-        "id": "6199e022-0c56-431d-90c4-3ec43f7e2c15",
+        "id": "6d55f57f-6b50-4227-9174-985d3c6dd539",
         "songName": "月光奏鸣曲",
-        "status": "conflict",
+        "status": "needs_review",
         "remarks": "现场录音，现场气氛很好，但是第三乐章速度偏快",
         "licenseRemarks": "现场演出授权：北京音乐厅2024年12月25日，版权名：第十四钢琴奏鸣曲「月光」",
         "hasConflicts": true,
         "reviewCount": 2,
-        "updatedAt": "2026-06-06T15:51:39.079Z"
+        "updatedAt": "2026-06-12T09:51:25.612Z"
       },
       {
-        "id": "77622c8a-9550-4172-9de5-d0487724cb7b",
+        "id": "34949e94-90c5-47c6-bd0b-520c9924dd6d",
         "songName": "致爱丽丝",
         "status": "conflict",
         "remarks": "旧口径：2023年春季学期作业，节奏批改完成",
         "licenseRemarks": "【补录】旧口径修正：原备注为2024年春季学期作业，原批改记录有误，以授权期限页为准",
         "hasConflicts": true,
         "reviewCount": 1,
-        "updatedAt": "2026-06-06T15:51:39.079Z"
+        "updatedAt": "2026-06-12T09:51:25.612Z"
       }
     ],
     "highlights": [
       {
         "type": "warning",
-        "message": "有 2 条记录存在冲突，待录音师小段处理"
+        "message": "有 1 条记录存在冲突，待录音师小段处理"
+      },
+      {
+        "type": "info",
+        "message": "有 1 条记录待音乐老师复核（含现场名+版权名）"
       },
       {
         "type": "success",
@@ -58,11 +62,11 @@
     "notes": ""
   },
   {
-    "id": "015e42a5-fbdb-42f9-b294-b0bd6ccd9a82",
-    "weekStart": "2026-05-31",
-    "weekEnd": "2026-06-07",
-    "generatedAt": "2026-06-06T15:51:39.098Z",
-    "generatedBy": "test",
+    "id": "6a069d4d-b4cd-46da-93f7-672d0ce014eb",
+    "weekStart": "2026-06-07",
+    "weekEnd": "2026-06-14",
+    "generatedAt": "2026-06-12T10:06:25.616Z",
+    "generatedBy": "system",
     "summary": {
       "totalRecords": 3,
       "normalRecords": 0,
@@ -73,34 +77,34 @@
     },
     "recordSnapshots": [
       {
-        "id": "3b3f2840-0518-45c4-9c12-8ef249c2f6b9",
+        "id": "44e51e60-7b16-4eec-ae92-d8f9fe7f43d1",
         "songName": "小星星变奏曲",
         "status": "supplemented",
         "remarks": "学生作业完成度良好，节奏稳定。注意第16小节的附点节奏需要加强练习",
         "licenseRemarks": "学生作业完成度良好，节奏稳定。注意第16小节的附点节奏需要加强练习",
         "hasConflicts": false,
         "reviewCount": 1,
-        "updatedAt": "2026-06-06T15:51:39.078Z"
+        "updatedAt": "2026-06-12T09:51:25.612Z"
       },
       {
-        "id": "6199e022-0c56-431d-90c4-3ec43f7e2c15",
-        "songName": "月光奏鸣曲",
+        "id": "6d55f57f-6b50-4227-9174-985d3c6dd539",
+        "songName": "第十四钢琴奏鸣曲「月光」",
         "status": "conflict",
         "remarks": "现场录音，现场气氛很好，但是第三乐章速度偏快",
         "licenseRemarks": "现场演出授权：北京音乐厅2024年12月25日，版权名：第十四钢琴奏鸣曲「月光」",
         "hasConflicts": true,
-        "reviewCount": 2,
-        "updatedAt": "2026-06-06T15:51:39.079Z"
+        "reviewCount": 4,
+        "updatedAt": "2026-06-12T10:02:10.221Z"
       },
       {
-        "id": "77622c8a-9550-4172-9de5-d0487724cb7b",
+        "id": "34949e94-90c5-47c6-bd0b-520c9924dd6d",
         "songName": "致爱丽丝",
         "status": "conflict",
         "remarks": "旧口径：2023年春季学期作业，节奏批改完成",
         "licenseRemarks": "【补录】旧口径修正：原备注为2024年春季学期作业，原批改记录有误，以授权期限页为准",
         "hasConflicts": true,
         "reviewCount": 1,
-        "updatedAt": "2026-06-06T15:51:39.079Z"
+        "updatedAt": "2026-06-12T09:51:25.612Z"
       }
     ],
     "highlights": [

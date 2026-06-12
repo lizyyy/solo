@@ -86,16 +86,27 @@ class AudioRecord {
 
     if (conflicts.length > 0) {
       this.conflicts = conflicts;
-      this.status = RECORD_STATUS.CONFLICT;
-      this.assignedTo = 'audio_engineer_xiaoduan';
-      this.addReviewEntry({
-        action: 'detect_conflict',
-        field: 'conflicts',
-        oldValue: [],
-        newValue: conflicts,
-        reason: '授权期限页数据与音频备注存在冲突，需录音师小段确认',
-        operator: operator
-      });
+      if (this.status === RECORD_STATUS.NEEDS_REVIEW) {
+        this.addReviewEntry({
+          action: 'detect_conflict_deferred',
+          field: 'conflicts',
+          oldValue: [],
+          newValue: conflicts,
+          reason: '授权期限页备注与音频备注不一致，但因双名复核优先，冲突延后至名称复核后处理',
+          operator: operator
+        });
+      } else {
+        this.status = RECORD_STATUS.CONFLICT;
+        this.assignedTo = 'audio_engineer_xiaoduan';
+        this.addReviewEntry({
+          action: 'detect_conflict',
+          field: 'conflicts',
+          oldValue: [],
+          newValue: conflicts,
+          reason: '授权期限页数据与音频备注存在冲突，需录音师小段确认',
+          operator: operator
+        });
+      }
     } else {
       if (this.status === RECORD_STATUS.NORMAL) {
         this.status = RECORD_STATUS.SUPPLEMENTED;

@@ -1,6 +1,6 @@
 [
   {
-    "id": "3b3f2840-0518-45c4-9c12-8ef249c2f6b9",
+    "id": "44e51e60-7b16-4eec-ae92-d8f9fe7f43d1",
     "songName": "小星星变奏曲",
     "liveName": null,
     "copyrightName": null,
@@ -9,14 +9,14 @@
     "status": "supplemented",
     "dataSource": "license_page",
     "conflicts": [],
-    "createdAt": "2026-06-06T15:51:39.078Z",
-    "updatedAt": "2026-06-06T15:51:39.078Z",
+    "createdAt": "2026-06-12T09:51:25.611Z",
+    "updatedAt": "2026-06-12T09:51:25.612Z",
     "createdBy": "sample_loader",
     "updatedBy": "audio_engineer_xiaoduan",
     "reviewHistory": [
       {
-        "id": "2a5bb861-ca76-4f2b-8a70-58db6738327b",
-        "timestamp": "2026-06-06T15:51:39.078Z",
+        "id": "5e03bfda-efe4-4fb7-ae60-52e18d0f16a7",
+        "timestamp": "2026-06-12T09:51:25.612Z",
         "action": "supplement_license_data",
         "field": "licenseRemarks",
         "oldValue": "学生作业完成度良好，节奏稳定。注意第16小节的附点节奏需要加强练习",
@@ -29,8 +29,8 @@
     "assignedTo": null
   },
   {
-    "id": "6199e022-0c56-431d-90c4-3ec43f7e2c15",
-    "songName": "月光奏鸣曲",
+    "id": "6d55f57f-6b50-4227-9174-985d3c6dd539",
+    "songName": "第十四钢琴奏鸣曲「月光」",
     "liveName": "月光奏鸣曲（现场演奏版）",
     "copyrightName": "第十四钢琴奏鸣曲「月光」",
     "remarks": "现场录音，现场气氛很好，但是第三乐章速度偏快",
@@ -45,14 +45,14 @@
         "description": "音频文件备注与授权期限页备注不一致"
       }
     ],
-    "createdAt": "2026-06-06T15:51:39.078Z",
-    "updatedAt": "2026-06-06T15:51:39.079Z",
+    "createdAt": "2026-06-12T09:51:25.612Z",
+    "updatedAt": "2026-06-12T10:02:10.221Z",
     "createdBy": "sample_loader",
-    "updatedBy": "audio_engineer_xiaoduan",
+    "updatedBy": "music_teacher",
     "reviewHistory": [
       {
-        "id": "9e700a96-e1fe-4367-8437-6bcd61fb83aa",
-        "timestamp": "2026-06-06T15:51:39.078Z",
+        "id": "fc52d7d5-b719-4143-add0-c32a6522d6f8",
+        "timestamp": "2026-06-12T09:51:25.612Z",
         "action": "flag_for_review",
         "field": "status",
         "oldValue": "normal",
@@ -61,9 +61,9 @@
         "operator": "system"
       },
       {
-        "id": "219289c9-d497-4b8d-aac3-9e64e0d0439d",
-        "timestamp": "2026-06-06T15:51:39.079Z",
-        "action": "detect_conflict",
+        "id": "4e8bbf73-3484-4630-84af-3b5ac8cf79b3",
+        "timestamp": "2026-06-12T09:51:25.612Z",
+        "action": "detect_conflict_deferred",
         "field": "conflicts",
         "oldValue": [],
         "newValue": [
@@ -74,15 +74,35 @@
             "description": "音频文件备注与授权期限页备注不一致"
           }
         ],
-        "reason": "授权期限页数据与音频备注存在冲突，需录音师小段确认",
+        "reason": "授权期限页备注与音频备注不一致，但因双名复核优先，冲突延后至名称复核后处理",
         "operator": "audio_engineer_xiaoduan"
+      },
+      {
+        "id": "095cf992-f444-4326-b54d-662f7695efc9",
+        "timestamp": "2026-06-12T10:02:10.221Z",
+        "action": "review_song_name",
+        "field": "songName",
+        "oldValue": "月光奏鸣曲",
+        "newValue": "第十四钢琴奏鸣曲「月光」",
+        "reason": "音乐老师复核：采用版权名 - 版权名更正式，统一使用版权名",
+        "operator": "music_teacher"
+      },
+      {
+        "id": "580145e8-48db-4bfa-8814-af6a5155b2c1",
+        "timestamp": "2026-06-12T10:02:10.221Z",
+        "action": "deferred_conflict_activated",
+        "field": "status",
+        "oldValue": "needs_review",
+        "newValue": "conflict",
+        "reason": "名称复核完成，但存在延后的备注冲突，转交录音师小段处理",
+        "operator": "music_teacher"
       }
     ],
     "rhythmScore": null,
     "assignedTo": "audio_engineer_xiaoduan"
   },
   {
-    "id": "77622c8a-9550-4172-9de5-d0487724cb7b",
+    "id": "34949e94-90c5-47c6-bd0b-520c9924dd6d",
     "songName": "致爱丽丝",
     "liveName": null,
     "copyrightName": null,
@@ -98,14 +118,14 @@
         "description": "音频文件备注与授权期限页备注不一致"
       }
     ],
-    "createdAt": "2026-06-06T15:51:39.078Z",
-    "updatedAt": "2026-06-06T15:51:39.079Z",
+    "createdAt": "2026-06-12T09:51:25.612Z",
+    "updatedAt": "2026-06-12T09:51:25.612Z",
     "createdBy": "sample_loader",
     "updatedBy": "audio_engineer_xiaoduan",
     "reviewHistory": [
       {
-        "id": "aac91747-e857-48f7-bc8b-699bddbe5ddc",
-        "timestamp": "2026-06-06T15:51:39.079Z",
+        "id": "2fe266f4-8c6f-4991-88ff-55fb77e44f94",
+        "timestamp": "2026-06-12T09:51:25.612Z",
         "action": "detect_conflict",
         "field": "conflicts",
         "oldValue": [],

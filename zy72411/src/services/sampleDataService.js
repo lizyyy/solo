@@ -51,13 +51,15 @@ class SampleDataService {
 
     const licenseResults = ImportService.batchImportLicenseData(SAMPLE_LICENSE_DATA, 'audio_engineer_xiaoduan');
 
+    const freshRecords = dataStore.readRecords();
+
     return {
-      importedRecords,
+      importedRecords: freshRecords,
       licenseResults,
       summary: {
-        totalImported: importedRecords.length,
+        totalImported: freshRecords.length,
         withConflicts: licenseResults.conflicts.length,
-        needReview: importedRecords.filter(r => r.status === 'needs_review').length
+        needReview: freshRecords.filter(r => r.status === 'needs_review').length
       }
     };
   }
@@ -89,44 +91,31 @@ class SampleDataService {
   }
 
   static runDemoFlow() {
-    console.log('=== 音乐课作业节奏批改 - 演示流程');
-    console.log('');
-
     const records = dataStore.readRecords();
     
-    console.log('【第一步：音频文件备注第一次导入】');
+    console.log('【第一步：音频文件备注第一次导入 + 补看授权期限页】');
     console.log('----------------------------------------');
     records.forEach((r, i) => {
+      const statusLabel = {
+        'normal': '正常',
+        'needs_review': '待音乐老师复核（双名）',
+        'conflict': '备注冲突待录音师小段处理',
+        'supplemented': '已补充授权数据',
+        'reviewed': '已完成复核'
+      }[r.status] || r.status;
       console.log(`${i + 1}. ${r.songName}`);
-      console.log(`   状态: ${r.status}`);
-      console.log(`   备注: ${r.remarks}`);
+      console.log(`   状态: ${statusLabel}`);
+      console.log(`   音频备注: ${r.remarks}`);
+      if (r.licenseRemarks) {
+        console.log(`   授权备注: ${r.licenseRemarks}`);
+      }
+      if (r.conflicts && r.conflicts.length > 0) {
+        console.log(`   延后冲突: ${r.conflicts.length} 条（${r.status === 'needs_review' ? '双名复核优先，延后处理' : '待处理'}）`);
+      }
       console.log('');
     });
 
-    console.log('【第二步：录音师小段补看授权期限页】');
-    console.log('----------------------------------------');
-    const conflictRecords = records.filter(r => r.status === 'conflict');
-    conflictRecords.forEach(r => {
-      console.log(`冲突记录: ${r.songName}`);
-      console.log('冲突证据:');
-      r.conflicts.forEach((c, i) => {
-        console.log(`  ${i + 1}. ${c.description}`);
-        console.log(`     音频备注: ${c.audioValue}`);
-        console.log(`     授权页: ${c.licenseValue}`);
-      });
-      console.log('');
-    });
-
-    const needReviewRecords = records.filter(r => r.status === 'needs_review');
-    needReviewRecords.forEach(r => {
-      console.log(`待复核记录: ${r.songName}`);
-      console.log(`  现场名: ${r.liveName}`);
-      console.log(`  版权名: ${r.copyrightName}`);
-      console.log(`  分配给: 音乐老师`);
-      console.log('');
-    });
-
-    console.log('【第三步：给店长看的周报】');
+    console.log('【第二步：给店长看的周报】');
     console.log('----------------------------------------');
     const ReportService = require('./reportService');
     const report = ReportService.generateCurrentWeekReport('demo_user');
@@ -134,7 +123,7 @@ class SampleDataService {
     console.log('统计汇总:');
     console.log(`  总记录数: ${report.summary.totalRecords}`);
     console.log(`  正常: ${report.summary.normalRecords}`);
-    console.log(`  待复核: ${report.summary.needReviewRecords}`);
+    console.log(`  待复核(双名): ${report.summary.needReviewRecords}`);
     console.log(`  冲突: ${report.summary.conflictRecords}`);
     console.log(`  已补充: ${report.summary.supplementedRecords}`);
     console.log('');
@@ -154,7 +143,8 @@ class SampleDataService {
       console.log('');
     });
 
-    return { records, report };
+    const freshRecords = dataStore.readRecords();
+    return { records: freshRecords, report };
   }
 }
 

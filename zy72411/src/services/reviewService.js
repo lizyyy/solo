@@ -82,7 +82,6 @@ class ReviewService {
     }
 
     if (decision === 'use_live') {
-      record.songName = record.liveName;
       record.addReviewEntry({
         action: 'review_song_name',
         field: 'songName',
@@ -91,8 +90,8 @@ class ReviewService {
         reason: `音乐老师复核：采用现场名 - ${reason}`,
         operator
       });
+      record.songName = record.liveName;
     } else if (decision === 'use_copyright') {
-      record.songName = record.copyrightName;
       record.addReviewEntry({
         action: 'review_song_name',
         field: 'songName',
@@ -101,12 +100,13 @@ class ReviewService {
         reason: `音乐老师复核：采用版权名 - ${reason}`,
         operator
       });
+      record.songName = record.copyrightName;
     } else if (decision === 'keep_both') {
       record.addReviewEntry({
         action: 'review_song_name',
-        field: 'status',
-        oldValue: 'needs_review',
-        newValue: 'reviewed',
+        field: 'songName',
+        oldValue: record.songName,
+        newValue: `${record.liveName} / ${record.copyrightName}`,
         reason: `音乐老师复核：保留双名 - ${reason}`,
         operator
       });
@@ -114,8 +114,23 @@ class ReviewService {
       throw new Error('决策类型无效');
     }
 
-    record.status = 'reviewed';
-    record.assignedTo = null;
+    const hasUnresolvedConflicts = record.conflicts.some(c => !c.resolved);
+    if (hasUnresolvedConflicts) {
+      record.status = 'conflict';
+      record.assignedTo = 'audio_engineer_xiaoduan';
+      record.addReviewEntry({
+        action: 'deferred_conflict_activated',
+        field: 'status',
+        oldValue: 'needs_review',
+        newValue: 'conflict',
+        reason: '名称复核完成，但存在延后的备注冲突，转交录音师小段处理',
+        operator
+      });
+    } else {
+      record.status = 'reviewed';
+      record.assignedTo = null;
+    }
+
     record.updatedBy = operator;
     dataStore.updateRecord(record);
 
