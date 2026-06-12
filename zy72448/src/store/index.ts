@@ -10,6 +10,7 @@ import {
   SelfCheckResult,
   CheckItem,
   WeeklyReport,
+  TrackStatusChange,
 } from '../types';
 import { generateId, getWeekNumber, calculateAmountDiff } from '../utils/helpers';
 
@@ -29,13 +30,86 @@ const initialMockData = () => {
     { id: generateId(), contractNo: 'HT-2026-002', contractDate: '2026-06-03', totalAmount: 22000, status: 'reviewing', createdAt: now, step: 2 },
   ];
 
+  const makeInitialStatus = (reason: string): TrackStatusChange[] => ([{
+    fromStatus: '正常',
+    toStatus: '正常',
+    operator: '系统',
+    timestamp: now,
+    reason,
+  }]);
+
   const tracks: Track[] = [
-    { id: generateId(), contractId: contracts[0].id, trackName: '月光现场版', nameType: '现场名', amount: 5000, reviewStatus: '待复核', matchedCanonicalName: '月光奏鸣曲' },
-    { id: generateId(), contractId: contracts[0].id, trackName: '命运现场演奏版', nameType: '现场名', amount: 5000, reviewStatus: '正常', matchedCanonicalName: '命运交响曲' },
-    { id: generateId(), contractId: contracts[0].id, trackName: '致爱丽丝现场', nameType: '现场名', amount: 5000, reviewStatus: '正常', matchedCanonicalName: '致爱丽丝' },
-    { id: generateId(), contractId: contracts[1].id, trackName: 'Moonlight Sonata', nameType: '版权名', amount: 7000, reviewStatus: '待复核', matchedCanonicalName: '月光奏鸣曲' },
-    { id: generateId(), contractId: contracts[1].id, trackName: 'Symphony No.5', nameType: '版权名', amount: 8000, reviewStatus: '正常', matchedCanonicalName: '命运交响曲' },
-    { id: generateId(), contractId: contracts[1].id, trackName: '未知曲目X', nameType: '未知', amount: 7000, reviewStatus: '待复核' },
+    {
+      id: generateId(),
+      contractId: contracts[0].id,
+      trackName: '月光现场版',
+      nameType: '现场名',
+      amount: 5000,
+      reviewStatus: '待复核',
+      matchedCanonicalName: '月光奏鸣曲',
+      reviewReason: '同一标准名同时存在现场名和版权名，待音乐老师复核',
+      statusHistory: [
+        { fromStatus: '正常', toStatus: '待复核', operator: '系统', timestamp: now, reason: '检测到双重身份（同一首歌有现场名和版权名）' },
+      ],
+    },
+    {
+      id: generateId(),
+      contractId: contracts[0].id,
+      trackName: '命运现场演奏版',
+      nameType: '现场名',
+      amount: 5000,
+      reviewStatus: '正常',
+      matchedCanonicalName: '命运交响曲',
+      reviewReason: '合同导入时匹配别名表，仅单一类型映射，自动归正常',
+      statusHistory: makeInitialStatus('合同导入时匹配别名表，仅单一类型映射'),
+    },
+    {
+      id: generateId(),
+      contractId: contracts[0].id,
+      trackName: '致爱丽丝现场',
+      nameType: '现场名',
+      amount: 5000,
+      reviewStatus: '正常',
+      matchedCanonicalName: '致爱丽丝',
+      reviewReason: '合同导入时匹配别名表，仅单一类型映射，自动归正常',
+      statusHistory: makeInitialStatus('合同导入时匹配别名表，仅单一类型映射'),
+    },
+    {
+      id: generateId(),
+      contractId: contracts[1].id,
+      trackName: 'Moonlight Sonata',
+      nameType: '版权名',
+      amount: 7000,
+      reviewStatus: '待复核',
+      matchedCanonicalName: '月光奏鸣曲',
+      reviewReason: '同一标准名同时存在现场名和版权名，待音乐老师复核',
+      statusHistory: [
+        { fromStatus: '正常', toStatus: '待复核', operator: '系统', timestamp: now, reason: '检测到双重身份（同一首歌有现场名和版权名）' },
+      ],
+    },
+    {
+      id: generateId(),
+      contractId: contracts[1].id,
+      trackName: 'Symphony No.5',
+      nameType: '版权名',
+      amount: 8000,
+      reviewStatus: '正常',
+      matchedCanonicalName: '命运交响曲',
+      reviewReason: '合同导入时匹配别名表，仅单一类型映射，自动归正常',
+      statusHistory: makeInitialStatus('合同导入时匹配别名表，仅单一类型映射'),
+    },
+    {
+      id: generateId(),
+      contractId: contracts[1].id,
+      trackName: '未知曲目X',
+      nameType: '未知',
+      amount: 7000,
+      reviewStatus: '待复核',
+      reviewReason: '别名缺失，待补录曲目别名表后复核',
+      statusHistory: [
+        { fromStatus: '正常', toStatus: '待复核', operator: '系统', timestamp: now, reason: '别名表中无匹配记录，需补录后复核' },
+      ],
+    },
   ];
 
   const conflicts: Conflict[] = [
@@ -43,6 +117,7 @@ const initialMockData = () => {
       id: generateId(),
       type: '双重身份',
       trackId: tracks[0].id,
+      aliasId: trackAliases[0].id,
       evidence: {
         contractEvidence: '合同 HT-2026-001 中曲目"月光现场版"为现场名',
         aliasEvidence: '别名表中"月光奏鸣曲"同时存在现场名和版权名两种别名',
@@ -67,6 +142,26 @@ const initialMockData = () => {
 
 const mockData = initialMockData();
 
+const pushStatusHistory = (track: Track, fromStatus: Track['reviewStatus'], toStatus: Track['reviewStatus'], operator: string, reason: string): Track => {
+  const now = new Date().toISOString();
+  return {
+    ...track,
+    reviewStatus: toStatus,
+    reviewReason: reason,
+    statusHistory: [
+      ...track.statusHistory,
+      { fromStatus, toStatus, operator, timestamp: now, reason },
+    ],
+  };
+};
+
+const hasDualIdentity = (canonicalName: string, aliases: TrackAlias[]): boolean => {
+  const types = new Set(
+    aliases.filter(a => a.canonicalName === canonicalName).map(a => a.aliasType)
+  );
+  return types.size > 1;
+};
+
 export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
@@ -90,41 +185,91 @@ export const useAppStore = create<AppState>()(
           step: 1,
         };
 
+        const existingTrackNames = new Set(
+          get().tracks.map(t => t.trackName)
+        );
+
+        const existingConflictTrackIds = new Set(
+          get().conflicts.filter(c => c.type === '别名缺失' && c.status === '待处理').map(c => c.trackId)
+        );
+
         const newTracks: Track[] = trackData.map((t) => {
           const matchedAlias = get().trackAliases.find(a => a.aliasName === t.trackName);
-          const hasDualIdentity = matchedAlias && get().trackAliases.some(
-            a => a.canonicalName === matchedAlias.canonicalName && a.aliasType !== matchedAlias.aliasType
-          );
-          
+          const isDualIdentity = matchedAlias && hasDualIdentity(matchedAlias.canonicalName, get().trackAliases);
+
+          let reviewStatus: Track['reviewStatus'];
+          let reviewReason: string;
+          let statusHistory: TrackStatusChange[];
+
+          if (!matchedAlias) {
+            reviewStatus = '待复核';
+            reviewReason = '别名缺失，待补录曲目别名表后复核';
+            statusHistory = [{
+              fromStatus: '正常',
+              toStatus: '待复核',
+              operator: '系统',
+              timestamp: now,
+              reason: '别名表中无匹配记录，需补录后复核',
+            }];
+          } else if (isDualIdentity) {
+            reviewStatus = '待复核';
+            reviewReason = '同一标准名同时存在现场名和版权名，待音乐老师复核';
+            statusHistory = [{
+              fromStatus: '正常',
+              toStatus: '待复核',
+              operator: '系统',
+              timestamp: now,
+              reason: '检测到双重身份（同一首歌有现场名和版权名）',
+            }];
+          } else {
+            reviewStatus = '正常';
+            reviewReason = '合同导入时匹配别名表，仅单一类型映射，自动归正常';
+            statusHistory = [{
+              fromStatus: '正常',
+              toStatus: '正常',
+              operator: '系统',
+              timestamp: now,
+              reason: '合同导入时匹配别名表，仅单一类型映射',
+            }];
+          }
+
           return {
             ...t,
             id: generateId(),
             contractId,
-            reviewStatus: hasDualIdentity ? '待复核' : '正常',
+            reviewStatus,
+            reviewReason,
             matchedCanonicalName: matchedAlias?.canonicalName,
+            statusHistory,
           };
         });
 
         const newConflicts: Conflict[] = [];
         newTracks.forEach((track) => {
           const matchedAlias = get().trackAliases.find(a => a.aliasName === track.trackName);
-          
+
           if (!matchedAlias) {
-            newConflicts.push({
-              id: generateId(),
-              type: '别名缺失',
-              trackId: track.id,
-              evidence: {
-                contractEvidence: `合同 ${contractData.contractNo} 中曲目"${track.trackName}"无法在别名表中找到对应记录`,
-              },
-              status: '待处理',
-              createdAt: now,
-            });
-          } else {
-            const hasDualIdentity = get().trackAliases.some(
-              a => a.canonicalName === matchedAlias.canonicalName && a.aliasType !== matchedAlias.aliasType
+            const alreadyHasConflict = Array.from(existingConflictTrackIds).some(
+              existingTrackId => {
+                const existingTrack = get().tracks.find(t => t.id === existingTrackId);
+                return existingTrack?.trackName === track.trackName;
+              }
             );
-            if (hasDualIdentity) {
+            if (!alreadyHasConflict) {
+              newConflicts.push({
+                id: generateId(),
+                type: '别名缺失',
+                trackId: track.id,
+                evidence: {
+                  contractEvidence: `合同 ${contractData.contractNo} 中曲目"${track.trackName}"无法在别名表中找到对应记录`,
+                },
+                status: '待处理',
+                createdAt: now,
+              });
+            }
+          } else {
+            const isDual = hasDualIdentity(matchedAlias.canonicalName, get().trackAliases);
+            if (isDual) {
               newConflicts.push({
                 id: generateId(),
                 type: '双重身份',
@@ -151,6 +296,8 @@ export const useAppStore = create<AppState>()(
           operationType: '合同导入',
           operator: '录音师小段',
           targetId: contractId,
+          beforeData: JSON.stringify({ contractCount: get().contracts.length - 1, trackCount: get().tracks.length - newTracks.length }, null, 2),
+          afterData: JSON.stringify({ contractCount: get().contracts.length, trackCount: get().tracks.length }, null, 2),
           description: `导入合同 ${contractData.contractNo}，包含 ${trackData.length} 首曲目`,
         });
       },
@@ -168,54 +315,185 @@ export const useAppStore = create<AppState>()(
         }));
 
         const affectedTracks = get().tracks.filter(t => t.trackName === alias.aliasName);
+        const isDualIdentity = hasDualIdentity(alias.canonicalName, get().trackAliases);
+
         if (affectedTracks.length > 0) {
+
           set((state) => ({
-            tracks: state.tracks.map((t) =>
-              t.trackName === alias.aliasName
-                ? { ...t, matchedCanonicalName: alias.canonicalName, nameType: alias.aliasType, reviewStatus: '正常' }
-                : t
-            ),
-            conflicts: state.conflicts.map((c) =>
-              affectedTracks.some(t => t.id === c.trackId) && c.type === '别名缺失'
-                ? { ...c, status: '已确认', handler: '系统自动', handledAt: now, remarks: '别名已补录' }
-                : c
-            ),
+            tracks: state.tracks.map((t) => {
+              if (t.trackName !== alias.aliasName) return t;
+              const fromStatus = t.reviewStatus;
+              const toStatus: Track['reviewStatus'] = isDualIdentity ? '待复核' : '待复核';
+              const reason = isDualIdentity
+                ? '补录别名后检测到双重身份（同一首歌有现场名和版权名），待音乐老师复核'
+                : '补录别名后待复核，需人工确认映射正确';
+
+              return {
+                ...t,
+                matchedCanonicalName: alias.canonicalName,
+                nameType: alias.aliasType,
+                reviewStatus: toStatus,
+                reviewReason: reason,
+                statusHistory: [
+                  ...t.statusHistory,
+                  {
+                    fromStatus,
+                    toStatus,
+                    operator: '录音师小段',
+                    timestamp: now,
+                    reason: `补录别名映射：${alias.aliasName} → ${alias.canonicalName}（${alias.aliasType}）`,
+                  },
+                ],
+              };
+            }),
+
+            conflicts: state.conflicts.map((c) => {
+              const isAffected = affectedTracks.some(t => t.id === c.trackId);
+
+              if (isAffected && c.type === '别名缺失') {
+                return {
+                  ...c,
+                  status: '待处理' as const,
+                  evidence: {
+                    ...c.evidence,
+                    alias补录Evidence: {
+                      aliasName: alias.aliasName,
+                      canonicalName: alias.canonicalName,
+                      aliasType: alias.aliasType,
+                      source: alias.source,
+                     补录At: now,
+                      operator: '录音师小段',
+                     补录后是否触发双重身份: isDualIdentity,
+                    },
+                  },
+                };
+              }
+
+              if (isAffected && isDualIdentity && c.type === '双重身份') {
+                return c;
+              }
+
+              return c;
+            }),
           }));
+
+          if (isDualIdentity) {
+            set((state) => {
+              const newDualConflicts: Conflict[] = [];
+              affectedTracks.forEach((track) => {
+                const hasExistingDual = state.conflicts.some(
+                  c => c.trackId === track.id && c.type === '双重身份' && c.status === '待处理'
+                );
+                if (!hasExistingDual) {
+                  newDualConflicts.push({
+                    id: generateId(),
+                    type: '双重身份',
+                    trackId: track.id,
+                    aliasId: newAlias.id,
+                    evidence: {
+                      contractEvidence: `曲目"${track.trackName}"补录为${alias.aliasType}，归属标准名"${alias.canonicalName}"`,
+                      aliasEvidence: `别名表中"${alias.canonicalName}"同时存在现场名和版权名两种别名`,
+                      alias补录Evidence: {
+                        aliasName: alias.aliasName,
+                        canonicalName: alias.canonicalName,
+                        aliasType: alias.aliasType,
+                        source: alias.source,
+                       补录At: now,
+                        operator: '录音师小段',
+                       补录后是否触发双重身份: true,
+                      },
+                    },
+                    status: '待处理',
+                    createdAt: now,
+                  });
+                }
+              });
+              return {
+                conflicts: [...state.conflicts, ...newDualConflicts],
+              };
+            });
+          }
         }
+
+        const beforeData = JSON.stringify({
+          aliasCount: get().trackAliases.length - 1,
+          affectedTracks: affectedTracks.length,
+          affectedTrackNames: affectedTracks.map(t => t.trackName),
+        }, null, 2);
+
+        const afterData = JSON.stringify({
+          aliasCount: get().trackAliases.length,
+          affectedTracks: affectedTracks.length,
+          affectedTrackNames: affectedTracks.map(t => t.trackName),
+          isDualIdentity,
+        }, null, 2);
 
         get().addOperationLog({
           operationType: '别名添加',
           operator: '录音师小段',
-          description: `添加别名映射：${alias.aliasName} (${alias.aliasType}) → ${alias.canonicalName}`,
+          targetId: newAlias.id,
+          beforeData,
+          afterData,
+          description: `补录别名映射：${alias.aliasName} (${alias.aliasType}) → ${alias.canonicalName}`,
         });
       },
 
       resolveConflict: (id, action, handler, remarks) => {
         const now = new Date().toISOString();
         const conflict = get().conflicts.find((c) => c.id === id);
-        
+
         if (!conflict) return;
 
-        const newStatus = action === 'confirm' ? '已确认' : '已驳回';
-        
+        const track = get().tracks.find(t => t.id === conflict.trackId);
+        if (!track) return;
+
+        const newConflictStatus = action === 'confirm' ? '已确认' : '已驳回';
+        const newTrackStatus = action === 'confirm' ? '已确认' : '已驳回';
+
+        const resolvedReason = action === 'confirm'
+          ? (conflict.type === '别名缺失'
+              ? '别名缺失已补录并确认，映射关系经过人工复核'
+              : conflict.type === '双重身份'
+              ? '双重身份已确认，同一首歌的现场名和版权名均归集到同一标准名'
+              : '冲突已确认')
+          : '冲突已驳回，数据保持原样';
+
+        const beforeData = JSON.stringify({
+          conflict: { type: conflict.type, status: conflict.status },
+          track: { name: track.trackName, reviewStatus: track.reviewStatus, matchedCanonicalName: track.matchedCanonicalName },
+        }, null, 2);
+
         set((state) => ({
           conflicts: state.conflicts.map((c) =>
             c.id === id
-              ? { ...c, status: newStatus, handler, handledAt: now, remarks }
+              ? { ...c, status: newConflictStatus, handler, handledAt: now, remarks, resolvedReason }
               : c
           ),
           tracks: state.tracks.map((t) =>
             t.id === conflict.trackId
-              ? { ...t, reviewStatus: action === 'confirm' ? '已确认' : '已驳回' }
+              ? pushStatusHistory(
+                  t,
+                  t.reviewStatus,
+                  newTrackStatus,
+                  handler,
+                  resolvedReason
+                )
               : t
           ),
         }));
+
+        const afterData = JSON.stringify({
+          conflict: { type: conflict.type, status: newConflictStatus, handler },
+          track: { name: track.trackName, reviewStatus: newTrackStatus, matchedCanonicalName: track.matchedCanonicalName },
+        }, null, 2);
 
         get().addOperationLog({
           operationType: '冲突处理',
           operator: handler,
           targetId: id,
-          description: `${action === 'confirm' ? '确认' : '驳回'}冲突 #${id}${remarks ? `：${remarks}` : ''}`,
+          beforeData,
+          afterData,
+          description: `${action === 'confirm' ? '确认' : '驳回'}${conflict.type}冲突 #${id}${remarks ? `：${remarks}` : ''}`,
         });
       },
 
@@ -242,23 +520,20 @@ export const useAppStore = create<AppState>()(
               }
             });
 
-            const trackSignatures = new Map<string, number>();
-            get().tracks.forEach((t) => {
-              const contract = get().contracts.find(c => c.id === t.contractId);
-              const sig = `${t.trackName}-${contract?.contractDate}-${t.amount}`;
-              trackSignatures.set(sig, (trackSignatures.get(sig) || 0) + 1);
-            });
-            trackSignatures.forEach((count, sig) => {
-              if (count > 1) {
-                items.push({
-                  id: generateId(),
-                  resultId,
-                  level: '警告',
-                  description: `疑似重复曲目：${sig}`,
-                  evidence: `出现 ${count} 次`,
-                });
-              }
-            });
+            const aliasMissingConflictTracks = get().conflicts
+              .filter(c => c.type === '别名缺失' && c.status === '待处理')
+              .map(c => get().tracks.find(t => t.id === c.trackId)?.trackName)
+              .filter(Boolean);
+            const uniqueNames = new Set(aliasMissingConflictTracks);
+            if (aliasMissingConflictTracks.length > uniqueNames.size) {
+              items.push({
+                id: generateId(),
+                resultId,
+                level: '警告',
+                description: '别名缺失冲突存在重复，同一曲目名可能被多次计入',
+                evidence: `待处理别名缺失冲突 ${aliasMissingConflictTracks.length} 条，涉及唯一曲目名 ${uniqueNames.size} 个`,
+              });
+            }
             break;
           }
 
@@ -322,6 +597,17 @@ export const useAppStore = create<AppState>()(
               });
             }
 
+            const tracksWithDual = get().tracks.filter(t => t.reviewStatus === '待复核' && t.matchedCanonicalName);
+            if (tracksWithDual.length > 0) {
+              items.push({
+                id: generateId(),
+                resultId,
+                level: '警告',
+                description: `${tracksWithDual.length} 首曲目处于待复核状态（双重身份），周报暂不统计`,
+                evidence: `曲目: ${tracksWithDual.map(t => t.trackName).join(', ')}`,
+              });
+            }
+
             const beforeTotal = get().tracks.reduce((sum, t) => sum + t.amount, 0);
             const canonicalGroups = new Map<string, number>();
             get().tracks.forEach((t) => {
@@ -329,7 +615,7 @@ export const useAppStore = create<AppState>()(
               canonicalGroups.set(key, (canonicalGroups.get(key) || 0) + t.amount);
             });
             const afterTotal = Array.from(canonicalGroups.values()).reduce((a, b) => a + b, 0);
-            
+
             if (Math.abs(beforeTotal - afterTotal) > 0.01) {
               items.push({
                 id: generateId(),
@@ -429,15 +715,23 @@ export const useAppStore = create<AppState>()(
         const now = new Date().toISOString();
         const reportId = generateId();
 
-        const weekTracks = get().tracks.filter((t) => {
+        const allWeekTracks = get().tracks.filter((t) => {
           const contract = get().contracts.find((c) => c.id === t.contractId);
           if (!contract) return false;
           const { week, year: y } = getWeekNumber(new Date(contract.contractDate));
           return week === weekNumber && y === year;
         });
 
+        const confirmedTracks = allWeekTracks.filter(
+          (t) => t.reviewStatus === '正常' || t.reviewStatus === '已确认'
+        );
+
+        const pendingTracks = allWeekTracks.filter(
+          (t) => t.reviewStatus === '待复核' || t.reviewStatus === '已驳回'
+        );
+
         const canonicalGroups = new Map<string, { count: number; amount: number }>();
-        weekTracks.forEach((t) => {
+        confirmedTracks.forEach((t) => {
           const key = t.matchedCanonicalName || `未归类-${t.trackName}`;
           const existing = canonicalGroups.get(key) || { count: 0, amount: 0 };
           canonicalGroups.set(key, {
@@ -456,9 +750,9 @@ export const useAppStore = create<AppState>()(
           id: reportId,
           weekNumber,
           year,
-          totalAmount: weekTracks.reduce((s, t) => s + t.amount, 0),
-          trackCount: weekTracks.length,
-          contractCount: new Set(weekTracks.map((t) => t.contractId)).size,
+          totalAmount: confirmedTracks.reduce((s, t) => s + t.amount, 0),
+          trackCount: confirmedTracks.length,
+          contractCount: new Set(confirmedTracks.map((t) => t.contractId)).size,
           generatedAt: now,
           details,
         };
@@ -473,7 +767,19 @@ export const useAppStore = create<AppState>()(
           operationType: '周报生成',
           operator: '录音师小段',
           targetId: reportId,
-          description: `生成 ${year}年第${weekNumber}周 周报，总金额 ${report.totalAmount} 元`,
+          beforeData: JSON.stringify({
+            totalTracks: allWeekTracks.length,
+            confirmedTracks: confirmedTracks.length,
+            pendingTracks: pendingTracks.length,
+            totalAmount: allWeekTracks.reduce((s, t) => s + t.amount, 0),
+          }, null, 2),
+          afterData: JSON.stringify({
+            includedTracks: confirmedTracks.length,
+            excludedTracks: pendingTracks.length,
+            reportTotalAmount: report.totalAmount,
+            note: '仅包含状态为"正常"和"已确认"的曲目',
+          }, null, 2),
+          description: `生成 ${year}年第${weekNumber}周 周报，总金额 ${report.totalAmount} 元（已排除待复核/已驳回曲目 ${pendingTracks.length} 首）`,
         });
 
         return report;
@@ -516,7 +822,7 @@ export const useAppStore = create<AppState>()(
       },
     }),
     {
-      name: 'music-club-reimbursement',
+      name: 'music-club-reimbursement-v2',
     }
   )
 );

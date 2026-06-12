@@ -9,6 +9,14 @@ export interface Contract {
   step: 1 | 2 | 3;
 }
 
+export interface TrackStatusChange {
+  fromStatus: '正常' | '待复核' | '已确认' | '已驳回';
+  toStatus: '正常' | '待复核' | '已确认' | '已驳回';
+  operator: string;
+  timestamp: string;
+  reason: string;
+}
+
 export interface Track {
   id: string;
   contractId: string;
@@ -18,6 +26,8 @@ export interface Track {
   remarks?: string;
   reviewStatus: '正常' | '待复核' | '已确认' | '已驳回';
   matchedCanonicalName?: string;
+  reviewReason?: string;
+  statusHistory: TrackStatusChange[];
 }
 
 export interface TrackAlias {
@@ -40,12 +50,22 @@ export interface Conflict {
     contractEvidence?: string;
     aliasEvidence?: string;
     amountDiff?: number;
+    alias补录Evidence?: {
+      aliasName: string;
+      canonicalName: string;
+      aliasType: '现场名' | '版权名';
+      source: string;
+     补录At: string;
+      operator: string;
+     补录后是否触发双重身份: boolean;
+    };
   };
   status: '待处理' | '已确认' | '已驳回';
   handler?: string;
   handledAt?: string;
   remarks?: string;
   createdAt: string;
+  resolvedReason?: string;
 }
 
 export type CheckType = '重复导入' | '同名异曲' | '补录重算' | '导出一致';
@@ -102,7 +122,7 @@ export interface AppState {
   weeklyReports: WeeklyReport[];
   operationLogs: OperationLog[];
   
-  importContract: (data: Omit<Contract, 'id' | 'createdAt' | 'status' | 'step'>, tracks: Omit<Track, 'id' | 'contractId' | 'reviewStatus'>[]) => void;
+  importContract: (data: Omit<Contract, 'id' | 'createdAt' | 'status' | 'step'>, tracks: Omit<Track, 'id' | 'contractId' | 'reviewStatus' | 'reviewReason' | 'matchedCanonicalName' | 'statusHistory'>[]) => void;
   addTrackAlias: (alias: Omit<TrackAlias, 'id' | 'createdAt'>) => void;
   resolveConflict: (id: string, action: 'confirm' | 'reject', handler: string, remarks?: string) => void;
   runSelfCheck: (type: CheckType) => SelfCheckResult;
