@@ -6,7 +6,7 @@ import {
   OperationType,
 } from '../types';
 import { dataStore } from '../store';
-import { generateId, now } from '../utils';
+import { generateId, now, deepClone } from '../utils';
 import { StatusManager } from './status-manager';
 
 export class ImportService {
@@ -16,7 +16,9 @@ export class ImportService {
   ): ComplaintRecord {
     const existing = dataStore
       .getAllRecords()
-      .find(r => r.samplingPoint.pointId === rowData.pointId && !r.isDeleted);
+      .find(
+        r => r.samplingPoint.pointId === rowData.pointId && !r.isDeleted
+      );
 
     if (existing) {
       throw new Error(`采样点 ${rowData.pointId} 已存在`);
@@ -32,6 +34,25 @@ export class ImportService {
       lat: parseFloat(rowData.lat),
     };
 
+    const emptySnapshot: ComplaintRecord = {
+      id: '',
+      originalRowNumber: 0,
+      samplingPoint: {
+        pointId: '',
+        name: '',
+        address: '',
+        district: '',
+        street: '',
+        lng: 0,
+        lat: 0,
+      },
+      currentStatus: ComplaintStatus.IMPORTED,
+      statusLogs: [],
+      createdAt: '',
+      updatedAt: '',
+      isDeleted: false,
+    };
+
     const record: ComplaintRecord = {
       id: generateId(),
       originalRowNumber: rowData.rowNumber,
@@ -43,12 +64,13 @@ export class ImportService {
       isDeleted: false,
     };
 
-    const importLog = StatusManager.createStatusLog(
-      record,
+    const importLog = StatusManager.createLogWithDiff(
+      deepClone(emptySnapshot) as ComplaintRecord,
+      deepClone(record) as ComplaintRecord,
       ComplaintStatus.IMPORTED,
       OperationType.IMPORT,
       operator,
-      `第 ${rowData.rowNumber} 行导入`
+      `第 ${rowData.rowNumber} 行导入，来源: 夜间采样点主材料`
     );
 
     record.statusLogs.push(importLog);
@@ -61,7 +83,10 @@ export class ImportService {
   static batchImport(
     rows: ImportRowData[],
     operator: string
-  ): { success: ComplaintRecord[]; failed: { row: number; error: string }[] } {
+  ): {
+    success: ComplaintRecord[];
+    failed: { row: number; error: string }[];
+  } {
     const success: ComplaintRecord[] = [];
     const failed: { row: number; error: string }[] = [];
 

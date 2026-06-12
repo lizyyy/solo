@@ -46,6 +46,11 @@ export interface HeatmapInfo {
   reviewedAt?: string;
 }
 
+export interface FieldDiff {
+  before: unknown;
+  after: unknown;
+}
+
 export interface StatusChangeLog {
   id: string;
   recordId: string;
@@ -56,6 +61,8 @@ export interface StatusChangeLog {
   operationTime: string;
   remark?: string;
   snapshotBefore: Record<string, unknown>;
+  fieldsChanged: string[];
+  diff: Record<string, FieldDiff>;
 }
 
 export interface ComplaintRecord {

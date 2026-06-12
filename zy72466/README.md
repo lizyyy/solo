@@ -7,9 +7,10 @@
 ## 核心设计原则
 
 1. **单一数据源**：页面展示、明细导出、API接口返回统一读取同一份数据
-2. **证据可追溯**：保留原始行号、操作历史、人工改动记录
+2. **证据可追溯**：保留原始行号、操作历史、人工改动记录、字段级diff
 3. **异常不消失**：缺采样导致热力图偏低的记录不会自动归为正常，必须人工复核
-4. **边界规则代码化**：所有判定逻辑写在代码中，不靠口头约定
+4. **快照先于修改**：每次操作先拍快照再改字段，回滚时能真正恢复操作前数据
+5. **边界规则代码化**：所有判定逻辑写在代码中，不靠口头约定
 
 ---
 
@@ -33,9 +34,9 @@
 - 为每条记录分配唯一ID
 - 保留**原始行号**（originalRowNumber），用于追溯
 - 状态置为 `imported`（已导入）
-- 记录导入操作日志
+- 记录导入操作日志，diff记录从空到有
 
-**相关代码**：[ImportService.batchImport](file:///Users/lzy/pro/solo/workspaces/zy72466/src/services/import-service.ts#L61-L81)
+**相关代码**：[ImportService.batchImport](file:///Users/lzy/pro/solo/workspaces/zy72466/src/services/import-service.ts#L83-L107)
 
 ---
 
@@ -49,9 +50,12 @@
 - 校验投诉编号格式：`/^TS-\d{6,}$/`
 - 关联投诉人、投诉时间、投诉内容、备注等信息
 - 状态流转为 `complaint_linked`（已关联投诉）
-- 已关联的记录不允许重复关联，需回滚后重新操作
+- 已关联的记录不允许重复关联，需回滚后重新操作或使用 `relinkComplaint`
+- **快照在字段修改前生成**：snapshotBefore中complaint为空，diff准确记录变更
 
-**相关代码**：[ComplaintLinkService.linkComplaint](file:///Users/lzy/pro/solo/workspaces/zy72466/src/services/complaint-link-service.ts#L12-L41)
+**相关代码**：
+- [ComplaintLinkService.linkComplaint](file:///Users/lzy/pro/solo/workspaces/zy72466/src/services/complaint-link-service.ts#L12-L46)
+- [ComplaintLinkService.relinkComplaint](file:///Users/lzy/pro/solo/workspaces/zy72466/src/services/complaint-link-service.ts#L48-L78)（返工修改投诉编号）
 
 ---
 
@@ -71,12 +75,12 @@
 
 **关于"晚上缺采样导致热力图偏低"的处理**：
 
-- 判定函数：[isMissingSamplingCausingLow](file:///Users/lzy/pro/solo/workspaces/zy72466/src/boundary-rules.ts#L43-L45)
+- 判定函数：[isMissingSamplingCausingLow](file:///Users/lzy/pro/solo/workspaces/zy72466/src/boundary-rules.ts#L38-L40)
 - 阈值配置：`isLowDueToMissingThreshold = 2`
 - **核心原则**：缺采样导致的低值不能自动忽略，必须留给街道规划员复核
 - 待复核期间，热力图显示值固定为 `1`（而不是实际低值），避免误导
 
-**相关代码**：[HeatmapService.updateHeatmap](file:///Users/lzy/pro/solo/workspaces/zy72466/src/services/heatmap-service.ts#L17-L59)
+**相关代码**：[HeatmapService.updateHeatmap](file:///Users/lzy/pro/solo/workspaces/zy72466/src/services/heatmap-service.ts#L17-L55)
 
 ---
 
@@ -103,8 +107,49 @@
 | 热力图正常 | 否 | 实际 odorLevel |
 
 **相关代码**：
-- [HeatmapService.reviewHeatmap](file:///Users/lzy/pro/solo/workspaces/zy72466/src/services/heatmap-service.ts#L61-L94)
-- [HeatmapService.getDisplayOdorLevel](file:///Users/lzy/pro/solo/workspaces/zy72466/src/services/heatmap-service.ts#L96-L112)
+- [HeatmapService.reviewHeatmap](file:///Users/lzy/pro/solo/workspaces/zy72466/src/services/heatmap-service.ts#L57-L94)
+- [HeatmapService.getDisplayOdorLevel](file:///Users/lzy/pro/solo/workspaces/zy72466/src/services/heatmap-service.ts#L147-L163)
+
+---
+
+### 补录与返工流程
+
+#### 修改投诉备注/误差说明
+
+**责任人**：交通协管、数据录入员
+
+**操作**：修改已关联投诉的备注或误差说明
+
+**系统行为**：
+- 使用 `ComplaintLinkService.updateComplaintRemark`
+- 产生 `MANUAL_EDIT` 操作日志
+- diff记录变更前后值，导出时可见谁改了什么
+
+**相关代码**：[ComplaintLinkService.updateComplaintRemark](file:///Users/lzy/pro/solo/workspaces/zy72466/src/services/complaint-link-service.ts#L80-L103)
+
+#### 修改投诉编号（返工）
+
+**责任人**：交通协管
+
+**操作**：修改已关联的投诉编号
+
+**系统行为**：
+- 使用 `ComplaintLinkService.relinkComplaint`
+- 产生 `MANUAL_EDIT` 操作日志，备注记录返工原因
+- diff记录投诉编号变更前后
+
+**相关代码**：[ComplaintLinkService.relinkComplaint](file:///Users/lzy/pro/solo/workspaces/zy72466/src/services/complaint-link-service.ts#L48-L78)
+
+#### 回滚复核后补录新热力值
+
+**责任人**：交通协管、数据录入员
+
+**操作**：回滚复核后，补录新的采样数据
+
+**系统行为**：
+- 使用 `StatusManager.executeManualEdit` 修改热力值
+- 产生 `MANUAL_EDIT` 日志，备注记录补录原因
+- 状态保持 `heatmap_pending_review`，等待再次复核
 
 ---
 
@@ -116,22 +161,27 @@
 
 | 用途 | 方法 | 说明 |
 |------|------|------|
-| 页面列表 | [getPageList](file:///Users/lzy/pro/solo/workspaces/zy72466/src/services/unified-data-service.ts#L174-L194) | 分页查询 |
-| 热力图展示 | [getForHeatmapDisplay](file:///Users/lzy/pro/solo/workspaces/zy72466/src/services/unified-data-service.ts#L29-L52) | 包含计算后的显示热力值 |
-| CSV导出 | [exportToCSV](file:///Users/lzy/pro/solo/workspaces/zy72466/src/services/unified-data-service.ts#L154-L172) | 标准导出格式 |
-| 统计概览 | [getStatistics](file:///Users/lzy/pro/solo/workspaces/zy72466/src/services/unified-data-service.ts#L196-L217) | 各状态数量统计 |
+| 页面列表 | [getPageList](file:///Users/lzy/pro/solo/workspaces/zy72466/src/services/unified-data-service.ts#L417-L437) | 分页查询 |
+| 热力图展示 | [getForHeatmapDisplay](file:///Users/lzy/pro/solo/workspaces/zy72466/src/services/unified-data-service.ts#L141-L170) | 包含计算后的显示热力值、来源、结论 |
+| CSV导出 | [exportToCSV](file:///Users/lzy/pro/solo/workspaces/zy72466/src/services/unified-data-service.ts#L327-L348) | 标准导出格式 |
+| 变更日志CSV | [exportChangeLogsCSV](file:///Users/lzy/pro/solo/workspaces/zy72466/src/services/unified-data-service.ts#L350-L415) | 所有操作记录含字段级diff |
+| 统计概览 | [getStatistics](file:///Users/lzy/pro/solo/workspaces/zy72466/src/services/unified-data-service.ts#L457-L489) | 各状态数量统计 |
+| 单条详情 | [getRecordWithDetail](file:///Users/lzy/pro/solo/workspaces/zy72466/src/services/unified-data-service.ts#L439-L455) | 含来源、结论、变更人、diff |
 
 ### 导出字段定义
 
-共19个导出字段，包含：
-- 原始行号（可追溯到导入文件）
+共28个导出字段，包括：
+- 原始行号、数据来源（含"夜间采样点主材料"标记）
 - 采样点基础信息
-- 投诉关联信息
-- 热力图数据（含原始值和显示值）
-- 状态和复核信息
-- 创建时间
+- 投诉关联信息（含备注/误差说明）
+- 热力图数据（含原始值、显示值、缺采样标记）
+- 处理状态、处理结论说明（同屏展示来源、状态、结论）
+- 复核信息（复核人、时间、备注）
+- 最后修改人、最后修改操作、最后修改时间
+- 本次变更字段、本次变更前后值
+- 完整变更历史
 
-完整字段列表：[UnifiedDataService.getExportFields](file:///Users/lzy/pro/solo/workspaces/zy72466/src/services/unified-data-service.ts#L54-L152)
+完整字段列表：[UnifiedDataService.getExportFields](file:///Users/lzy/pro/solo/workspaces/zy72466/src/services/unified-data-service.ts#L172-L325)
 
 ---
 
@@ -153,10 +203,12 @@
 
 ```
 imported → complaint_linked → heatmap_normal → reviewed_normal → archived
-                           ↘ heatmap_pending_review → reviewed_abnormal ↗
+        ↘ heatmap_pending_review → reviewed_abnormal ↗
+                           ↗
+imported → heatmap_normal / heatmap_pending_review（可跳过关联投诉直接更新热力图）
 ```
 
-配置位置：[BoundaryRules.status.canTransition](file:///Users/lzy/pro/solo/workspaces/zy72466/src/boundary-rules.ts#L19-L29)
+配置位置：[BoundaryRules.status.canTransition](file:///Users/lzy/pro/solo/workspaces/zy72466/src/boundary-rules.ts#L10-L18)
 
 ---
 
@@ -170,9 +222,24 @@ imported → complaint_linked → heatmap_normal → reviewed_normal → archive
 - 操作人
 - 操作时间
 - 操作备注
-- **操作前数据快照**（snapshotBefore）
+- **操作前数据快照**（snapshotBefore）——在字段修改前拍摄
+- **变更字段列表**（fieldsChanged）
+- **字段级diff**（diff）：每个变更字段的前后值
 
-查询历史：[StatusManager.getOperationHistory](file:///Users/lzy/pro/solo/workspaces/zy72466/src/services/status-manager.ts#L109-L111)
+查询历史：[StatusManager.getOperationHistory](file:///Users/lzy/pro/solo/workspaces/zy72466/src/services/status-manager.ts#L269-L271)
+
+### 快照机制（关键修复点）
+
+**问题**：旧版本中业务服务先改字段再调 `transitionStatus`，导致 `snapshotBefore` 拍的是操作后的数据，回滚形同虚设。
+
+**修复**：引入 `executeWithTransition` 原子操作模式：
+1. 从数据源获取记录
+2. **立即深拷贝作为snapshotBefore**（此时字段还是操作前状态）
+3. 执行mutator修改字段
+4. 计算diff
+5. 保存记录和日志
+
+**相关代码**：[StatusManager.executeWithTransition](file:///Users/lzy/pro/solo/workspaces/zy72466/src/services/status-manager.ts#L98-L137)
 
 ### 回滚机制
 
@@ -183,7 +250,19 @@ imported → complaint_linked → heatmap_normal → reviewed_normal → archive
 - 回滚时限：操作后24小时内
 - 回滚后产生新的操作日志，记录回滚行为
 
-**回滚方法**：[StatusManager.rollbackToLog](file:///Users/lzy/pro/solo/workspaces/zy72466/src/services/status-manager.ts#L65-L107)
+**回滚行为**：
+- 从 `snapshotBefore` 恢复记录数据（状态和字段都恢复）
+- 截断该操作之后的所有日志
+- 产生 `ROLLBACK` 日志，包含回滚影响的字段列表
+
+**回滚方法**：[StatusManager.rollbackToLog](file:///Users/lzy/pro/solo/workspaces/zy72466/src/services/status-manager.ts#L171-L267)
+
+### 回滚后可重新操作
+
+回滚关联投诉后：
+- `complaint` 字段真的清空
+- 状态回到 `imported`
+- 可正常再次 `linkComplaint`，不会报"该记录已关联投诉编号"
 
 ---
 
@@ -223,18 +302,18 @@ validation.pointIdPattern = /^P\d{4,}$/        // 采样点编号格式
 
 ```
 src/
-├── types.ts                    # 类型定义
+├── types.ts                    # 类型定义（含FieldDiff）
 ├── boundary-rules.ts           # 边界规则配置
 ├── store.ts                    # 统一数据存储
 ├── utils.ts                    # 工具函数
 ├── index.ts                    # 统一导出入口
 ├── services/
-│   ├── status-manager.ts       # 状态管理与回滚
+│   ├── status-manager.ts       # 状态管理与回滚（原子操作+diff）
 │   ├── import-service.ts       # 采样点导入
-│   ├── complaint-link-service.ts  # 投诉编号关联
-│   ├── heatmap-service.ts      # 热力图处理与复核
-│   └── unified-data-service.ts # 统一数据查询/导出
-└── test-flow.ts                # 完整流程测试
+│   ├── complaint-link-service.ts  # 投诉编号关联+返工
+│   ├── heatmap-service.ts      # 热力图处理与复核+返工
+│   └── unified-data-service.ts # 统一数据查询/导出（含变更日志）
+└── test-flow.ts                # 14场景端到端回归测试
 ```
 
 ---
@@ -245,16 +324,18 @@ src/
 # 安装依赖
 npm install
 
-# 运行完整流程测试
+# 运行完整流程测试（14个场景）
 npm test
 ```
+
+测试覆盖：导入→关联投诉→回滚关联→重新关联→热力图更新→修改备注→复核→三处同数据源验证→CSV导出→夜间采样点核对→证据链追溯→快照验证→回滚复核→补录返工→最终复核
 
 ---
 
 ## 常见问题处理
 
 ### Q1：发现投诉编号关联错了怎么办？
-A：使用 `StatusManager.rollbackToLog` 回滚到关联操作之前，然后重新关联。
+A：使用 `StatusManager.rollbackToLog` 回滚到关联操作之前，然后重新关联。回滚后complaint字段真正清空，可正常再次linkComplaint。或直接使用 `relinkComplaint` 返工修改。
 
 ### Q2：缺采样导致的低值，复核时应该怎么判？
 A：
@@ -265,4 +346,13 @@ A：
 A：系统设计上三处共用数据源。如出现不一致，请检查是否使用了 `UnifiedDataService` 以外的读取方式。
 
 ### Q4：如何追溯某条记录的来源？
-A：查看 `originalRowNumber` 字段，对应导入文件的原始行号；再配合 `statusLogs` 查看完整操作历史。
+A：查看 `originalRowNumber` 字段，对应导入文件的原始行号；再配合 `statusLogs` 查看完整操作历史。导出CSV中"数据来源"列会标注"夜间采样点主材料（第N行）"。
+
+### Q5：回滚后投诉编号字段还在怎么办？
+A：这是已修复的bug。旧版本快照在字段修改后生成，回滚只恢复状态不恢复字段。新版本使用 `executeWithTransition` 原子操作，快照在修改前拍摄，回滚后字段和状态都真正恢复。
+
+### Q6：修改备注/误差说明后，导出能看出来谁改了什么吗？
+A：可以。导出CSV包含"最后修改人"、"本次变更字段"、"本次变更前后值"、"完整变更历史"列。单独的变更日志CSV（`exportChangeLogsCSV`）更详细，列出每条操作的diff。
+
+### Q7：夜间采样点记录和缺采样偏低记录怎么对上？
+A：导出CSV的"数据来源"列同时标注"夜间采样点主材料"和"缺采样致热力图偏低"，一条记录的来源、处理状态和结论在同一行可见。

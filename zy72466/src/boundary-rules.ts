@@ -8,7 +8,7 @@ export const BoundaryRules = {
 
   status: {
     canTransition: {
-      imported: ['complaint_linked', 'archived'],
+      imported: ['complaint_linked', 'heatmap_pending_review', 'heatmap_normal', 'archived'],
       complaint_linked: ['heatmap_pending_review', 'heatmap_normal', 'archived'],
       heatmap_pending_review: ['reviewed_normal', 'reviewed_abnormal', 'archived'],
       heatmap_normal: ['reviewed_normal', 'archived'],
@@ -44,6 +44,7 @@ export function shouldPendingReview(isMissingSampling: boolean, odorLevel: numbe
 }
 
 export function canTransitionStatus(from: string, to: string): boolean {
+  if (from === to) return true;
   const allowed = BoundaryRules.status.canTransition[from];
   return allowed ? allowed.includes(to) : false;
 }

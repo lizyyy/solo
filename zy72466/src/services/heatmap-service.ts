@@ -29,33 +29,29 @@ export class HeatmapService {
       isMissingSampling
     );
 
-    const heatmapInfo: HeatmapInfo = {
-      odorLevel,
-      samplingTime,
-      isMissingSampling,
-      isLowDueToMissing,
-    };
-
-    record.heatmap = heatmapInfo;
-    dataStore.saveRecord(record);
-
     const targetStatus = shouldPendingReview(isMissingSampling, odorLevel)
       ? ComplaintStatus.HEATMAP_PENDING_REVIEW
       : ComplaintStatus.HEATMAP_NORMAL;
 
     const remark = isLowDueToMissing
       ? `夜间缺采样，热力值偏低(${odorLevel})，待街道规划员复核`
-      : `热力值更新: ${odorLevel}`;
+      : `热力值更新: ${odorLevel}${isMissingSampling ? '（缺采样）' : ''}`;
 
-    const updated = StatusManager.transitionStatus(
+    return StatusManager.executeWithTransition(
       record.id,
       targetStatus,
       OperationType.UPDATE_HEATMAP,
       operator,
+      r => {
+        r.heatmap = {
+          odorLevel,
+          samplingTime,
+          isMissingSampling,
+          isLowDueToMissing,
+        };
+      },
       remark
     );
-
-    return updated;
   }
 
   static reviewHeatmap(
@@ -75,24 +71,77 @@ export class HeatmapService {
       throw new Error('该记录没有热力图数据');
     }
 
-    record.heatmap.reviewNote = reviewNote;
-    record.heatmap.reviewedBy = reviewer;
-    record.heatmap.reviewedAt = now();
-    dataStore.saveRecord(record);
-
     const targetStatus = isNormal
       ? ComplaintStatus.REVIEWED_NORMAL
       : ComplaintStatus.REVIEWED_ABNORMAL;
 
-    const updated = StatusManager.transitionStatus(
+    const reviewConclusion = isNormal ? '正常' : '异常';
+
+    return StatusManager.executeWithTransition(
       record.id,
       targetStatus,
       OperationType.REVIEW_HEATMAP,
       reviewer,
-      `复核结论: ${isNormal ? '正常' : '异常'}, 备注: ${reviewNote}`
+      r => {
+        if (r.heatmap) {
+          r.heatmap.reviewNote = reviewNote;
+          r.heatmap.reviewedBy = reviewer;
+          r.heatmap.reviewedAt = now();
+        }
+      },
+      `复核结论: ${reviewConclusion}, 备注: ${reviewNote}`
+    );
+  }
+
+  static reheatHeatmapAfterReview(
+    recordId: string,
+    odorLevel: number,
+    isMissingSampling: boolean,
+    samplingTime: string,
+    operator: string,
+    reason?: string
+  ): ComplaintRecord | null {
+    const record = dataStore.getRecord(recordId);
+    if (!record) return null;
+
+    const allowedForRework = [
+      ComplaintStatus.REVIEWED_NORMAL,
+      ComplaintStatus.REVIEWED_ABNORMAL,
+      ComplaintStatus.HEATMAP_NORMAL,
+    ];
+    if (!allowedForRework.includes(record.currentStatus)) {
+      throw new Error(
+        `该状态(${record.currentStatus})不支持返工修改热力值，请先回滚复核`
+      );
+    }
+
+    const isLowDueToMissing = isMissingSamplingCausingLow(
+      odorLevel,
+      isMissingSampling
     );
 
-    return updated;
+    const targetStatus = shouldPendingReview(isMissingSampling, odorLevel)
+      ? ComplaintStatus.HEATMAP_PENDING_REVIEW
+      : ComplaintStatus.HEATMAP_NORMAL;
+
+    const remark = isLowDueToMissing
+      ? `返工-夜间缺采样，热力值偏低(${odorLevel})，待复核`
+      : `返工-热力值更新为 ${odorLevel}${isMissingSampling ? '（缺采样）' : ''}${reason ? `，原因: ${reason}` : ''}`;
+
+    return StatusManager.executeManualEdit(
+      record.id,
+      operator,
+      r => {
+        r.heatmap = {
+          odorLevel,
+          samplingTime,
+          isMissingSampling,
+          isLowDueToMissing,
+        };
+        r.currentStatus = targetStatus;
+      },
+      remark
+    );
   }
 
   static getDisplayOdorLevel(record: ComplaintRecord): number {
