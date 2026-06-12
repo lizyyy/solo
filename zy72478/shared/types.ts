@@ -94,3 +94,36 @@ export interface TodoItem {
   status: 'pending' | 'done';
   relatedPage?: string;
 }
+
+export type ChangeTargetType = 'bus_swipe' | 'redline_note' | 'heatmap' | 'conflict';
+
+export interface FieldChange {
+  field: string;
+  fieldLabel: string;
+  before: string;
+  after: string;
+}
+
+export interface DataChangeRecord {
+  id: string;
+  projectId: string;
+  targetType: ChangeTargetType;
+  targetId: string;
+  action: 'create' | 'update' | 'delete' | 'import';
+  operator: string;
+  reason?: string;
+  changes: FieldChange[];
+  snapshotBefore?: any;
+  snapshotAfter?: any;
+  createdAt: string;
+}
+
+export interface ImportResult {
+  total: number;
+  imported: number;
+  duplicates: number;
+  duplicateIds: string[];
+  conflictsDetected: number;
+  heatmapRecalculated: boolean;
+  newHeatmapVersion?: string;
+}
