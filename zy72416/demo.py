@@ -39,25 +39,17 @@ def verify_consistency(source):
     """验证三个视图的数据一致性"""
     print_separator("验证数据一致性：页面/导出/API 读取同一份数据")
 
-    display_data = source.get_for_display()
-    export_data = source.get_for_export()
-    api_data = source.get_for_api()
+    result = source.verify_consistency()
 
-    print(f"页面展示记录数: {len(display_data)}")
-    print(f"导出明细记录数: {len(export_data)}")
-    print(f"API返回记录数: {len(api_data)}")
+    print(f"页面展示记录数: {result['total_display']}")
+    print(f"导出明细记录数: {result['total_export']}")
+    print(f"API返回记录数: {result['total_api']}")
 
-    assert len(display_data) == len(export_data) == len(api_data), "记录数不一致！"
+    print(f"\n异常记录数 - 页面: {result['abnormal_display']}")
+    print(f"异常记录数 - 导出: {result['abnormal_export']}")
+    print(f"异常记录数 - API: {result['abnormal_api']}")
 
-    abnormal_display = [r for r in display_data if r["is_abnormal"]]
-    abnormal_export = [r for r in export_data if r["状态"] not in ["正常", "待处理", "复核通过"]]
-    abnormal_api = [r for r in api_data if r["status"] not in ["pending", "normal", "review_approved"]]
-
-    print(f"\n异常记录数 - 页面: {len(abnormal_display)}")
-    print(f"异常记录数 - 导出: {len(abnormal_export)}")
-    print(f"异常记录数 - API: {len(abnormal_api)}")
-
-    assert len(abnormal_display) == len(abnormal_export) == len(abnormal_api), "异常记录数不一致！"
+    assert result['consistent'], "数据不一致！"
 
     print("\n✅ 数据一致性验证通过：三个视图读取同一份结果")
 
@@ -174,8 +166,8 @@ def main():
     print_separator("导出演示")
     from core.export import ExportService
     export_service = ExportService(source)
-    export_service.export_to_csv("data/demo_export.csv")
-    export_service.export_abnormal_only("data/demo_abnormal.csv")
+    export_service.export_to_csv("data/demo_export.csv", "演示导出员")
+    export_service.export_abnormal_only("data/demo_abnormal.csv", "演示导出员")
     print("已导出完整明细到 data/demo_export.csv")
     print("已导出异常记录到 data/demo_abnormal.csv")
 
