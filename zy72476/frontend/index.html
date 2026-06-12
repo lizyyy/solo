@@ -167,9 +167,10 @@
                 </div>
                 <table id="recordsTable">
                     <thead><tr>
-                        <th>原始行号</th><th>小区名称</th><th>出行方式</th>
-                        <th>出行次数</th><th>低碳得分</th><th>巡查日期</th>
-                        <th>网格员</th><th>人工改动</th><th>处理状态</th><th>操作</th>
+                        <th>原始行号</th><th>小区名称</th><th>规范名</th>
+                        <th>出行方式</th><th>出行次数</th><th>低碳得分</th>
+                        <th>网格员</th><th>人工改动</th><th>处理状态</th>
+                        <th>处理说明/结论</th><th>操作</th>
                     </tr></thead>
                     <tbody></tbody>
                 </table>
@@ -279,7 +280,7 @@
     </div>
 
     <script>
-        const API = 'http://localhost:5000/api';
+        const API = 'http://localhost:5001/api';
         let currentAliasFrom = null;
 
         function showSection(name) {
@@ -356,8 +357,28 @@
             const fd = new FormData();
             fd.append('file', file);
             const result = await api('/import', 'POST', fd);
-            document.getElementById('importResult').innerHTML = 
-                `<div class="alert check-pass">✅ 导入成功！批次号：${result.batch_id}，记录数：${result.record_count}</div>`;
+            let html = `<div class="alert check-pass">✅ 导入完成！批次号：${result.batch_id}，总行数：${result.total_rows}</div>`;
+            html += `<div class="card" style="margin-top:12px">
+                <h3>导入明细</h3>
+                <p><strong>新记录：</strong>${result.new_count} 条</p>
+                <p><strong>历史重复（之前批次已导入）：</strong>${result.history_duplicate_count} 条</p>
+                <p><strong>本次重复（本批次内重复）：</strong>${result.batch_duplicate_count} 条</p>`;
+            if (result.new_records && result.new_records.length > 0) {
+                html += `<h4>新增记录（前5条）：</h4><table style="font-size:12px"><thead><tr><th>原始行号</th><th>小区</th><th>出行次数</th><th>得分</th></tr></thead><tbody>`;
+                result.new_records.slice(0,5).forEach(r => {
+                    html += `<tr><td>${r.original_row}</td><td>${r.community_name}</td><td>${r.trip_count}</td><td>${r.low_carbon_score}</td></tr>`;
+                });
+                html += `</tbody></table>`;
+            }
+            if (result.history_duplicates && result.history_duplicates.length > 0) {
+                html += `<h4 style="color:#f57c00">历史重复记录：</h4><table style="font-size:12px"><thead><tr><th>原始行号</th><th>小区</th><th>已存在批次</th></tr></thead><tbody>`;
+                result.history_duplicates.slice(0,5).forEach(r => {
+                    html += `<tr><td>${r.original_row}</td><td>${r.community_name}</td><td>${r.existing_batches.join(', ')}</td></tr>`;
+                });
+                html += `</tbody></table>`;
+            }
+            html += `</div>`;
+            document.getElementById('importResult').innerHTML = html;
             loadSummary();
         }
 
@@ -370,7 +391,10 @@
                     <td class="${c.alias_id ? 'highlight' : ''}">${c.name}</td>
                     <td>${c.record_count}</td>
                     <td>${c.alias_name || '-'}</td>
-                    <td><span class="tag tag-${c.status}">${c.status === 'reviewed' ? '已复核' : '待复核'}</span></td>
+                    <td><span class="tag tag-${c.status}">${
+                        c.status === 'reviewed' ? '已复核' : 
+                        c.status === 'supplemented' ? '已补录' : '待复核'
+                    }</span></td>
                     <td><button class="btn" onclick="openAlias(${c.id}, '${c.name}')">设置别名</button></td>
                 </tr>
             `).join('');
@@ -423,13 +447,14 @@
                 <tr>
                     <td><strong>${r.original_row}</strong></td>
                     <td>${r.community_name}</td>
+                    <td class="${r.is_alias_merged ? 'highlight' : ''}">${r.canonical_community_name || '-'}</td>
                     <td>${r.travel_mode}</td>
                     <td>${r.trip_count}</td>
                     <td>${r.low_carbon_score}</td>
-                    <td>${r.patrol_date}</td>
                     <td>${r.grid_member}</td>
                     <td>${r.manual_edited ? '🔴 已改动' : '⚪ 原始'}</td>
-                    <td><span class="tag tag-${r.processing_status}">${getStatusText(r.processing_status)}</span></td>
+                    <td><span class="tag tag-${r.processing_status}">${r.processing_status_text || getStatusText(r.processing_status)}</span></td>
+                    <td style="font-size:12px;max-width:300px">${r.conclusion || '-'}</td>
                     <td><button class="btn" onclick="openEdit(${r.id})">编辑</button></td>
                 </tr>
             `).join('');

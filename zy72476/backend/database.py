@@ -14,6 +14,7 @@ def init_db():
                 name TEXT NOT NULL,
                 alias_id INTEGER,
                 status TEXT DEFAULT 'pending',
+                notes TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (alias_id) REFERENCES communities(id)
             );

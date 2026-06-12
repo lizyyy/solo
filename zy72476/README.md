@@ -33,7 +33,7 @@ cd backend
 pip3 install -r requirements.txt   # 首次运行安装依赖
 python3 app.py
 ```
-后端运行在 `http://localhost:5000`
+后端运行在 `http://localhost:5001`
 
 ### 2. 打开前端
 直接用浏览器打开文件：
