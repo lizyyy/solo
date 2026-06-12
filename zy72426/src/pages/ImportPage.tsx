@@ -4,12 +4,14 @@ import { FileUploader } from '@/components/import/FileUploader';
 import { ImportPreview } from '@/components/import/ImportPreview';
 import { ImportHistory } from '@/components/import/ImportHistory';
 import { useEmotionLabelStore } from '@/store/useEmotionLabelStore';
-import { Upload, Play, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Upload, Play, AlertCircle, CheckCircle2, RefreshCcw, Plus, FileDown, Info } from 'lucide-react';
 
 export const ImportPage = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const { previewCSV, importCSV, clearPreview, previewRows, importHistory, isLoading, runSelfCheck } =
-    useEmotionLabelStore();
+  const {
+    previewCSV, importCSV, clearPreview, previewRows, importHistory, isLoading,
+    runSelfCheck, lastImportInfo, runConsistencyCheck,
+  } = useEmotionLabelStore();
 
   const handleFileSelect = async (file: File) => {
     setSelectedFile(file);
@@ -28,6 +30,7 @@ export const ImportPage = () => {
       setSelectedFile(null);
       clearPreview();
       runSelfCheck();
+      runConsistencyCheck();
     } catch (error) {
       console.error('导入失败:', error);
       alert('导入失败，请检查文件格式');
@@ -46,6 +49,98 @@ export const ImportPage = () => {
           <p className="text-gray-500 mt-1">上传票务系统导出的CSV或Excel文件，系统将自动检测重复和同名记录</p>
         </div>
       </div>
+
+      {lastImportInfo && (
+        <Card
+          title={
+            <span className="flex items-center gap-2">
+              <CheckCircle2 className="w-5 h-5 text-green-600" />
+              上次导入结果详情
+            </span>
+          }
+          subtitle={`批次 #${lastImportInfo.importBatch} · 操作人：${lastImportInfo.operator} · ${new Date(lastImportInfo.importedAt).toLocaleString('zh-CN')}`}
+        >
+          <div className="grid grid-cols-4 gap-4 mb-4">
+            <div className="p-3 bg-gray-50 rounded">
+              <p className="text-xs text-gray-500">CSV原始行数</p>
+              <p className="text-2xl font-bold text-gray-800 mt-1">{lastImportInfo.rawRows}</p>
+            </div>
+            <div className="p-3 bg-blue-50 rounded border border-blue-100">
+              <p className="text-xs text-blue-600 flex items-center gap-1">
+                <RefreshCcw className="w-3 h-3" /> 复用记录（不重复入库）
+              </p>
+              <p className="text-2xl font-bold text-blue-700 mt-1">{lastImportInfo.reusedRows}</p>
+            </div>
+            <div className="p-3 bg-green-50 rounded border border-green-100">
+              <p className="text-xs text-green-600 flex items-center gap-1">
+                <Plus className="w-3 h-3" /> 真新增记录（首次出现）
+              </p>
+              <p className="text-2xl font-bold text-green-700 mt-1">{lastImportInfo.newRows}</p>
+            </div>
+            <div className="p-3 bg-amber-50 rounded border border-amber-100">
+              <p className="text-xs text-amber-600 flex items-center gap-1">
+                <AlertCircle className="w-3 h-3" /> 导入后待复核
+              </p>
+              <p className="text-2xl font-bold text-amber-700 mt-1">{lastImportInfo.resultingReviewCount}</p>
+            </div>
+          </div>
+
+          {(lastImportInfo.reusedPairs.length > 0 || lastImportInfo.rejectedDuplicates.length > 0) && (
+            <div className="space-y-3 mt-4 border-t pt-4">
+              {lastImportInfo.reusedPairs.length > 0 && (
+                <div className="p-3 bg-blue-50/50 rounded border border-blue-100">
+                  <p className="text-sm font-medium text-blue-800 mb-2 flex items-center gap-2">
+                    <RefreshCcw className="w-4 h-4" />
+                    以下 {lastImportInfo.reusedPairs.length} 条已存在，直接复用现有记录与之前的复核结果：
+                  </p>
+                  <ul className="space-y-1 max-h-32 overflow-y-auto text-xs">
+                    {lastImportInfo.reusedPairs.map((p) => (
+                      <li key={p.newKey} className="flex gap-3 text-gray-600 px-2 py-1 hover:bg-blue-50">
+                        <span className="font-mono text-blue-600">#{p.existingOriginalRow}</span>
+                        <span className="truncate flex-1">
+                          <span className="font-medium">{p.liveName || '(无现场名)'}</span>
+                          {p.liveName !== p.copyrightName && p.copyrightName && (
+                            <span className="text-gray-400"> → {p.copyrightName}</span>
+                          )}
+                        </span>
+                        <span className="text-amber-600 flex-shrink-0">
+                          组内记录数: {p.existingGroupCount}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {lastImportInfo.rejectedDuplicates.length > 0 && (
+                <div className="p-3 bg-red-50/50 rounded border border-red-100">
+                  <p className="text-sm font-medium text-red-800 mb-2 flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4" />
+                    以下 {lastImportInfo.rejectedDuplicates.length} 条完全重复已跳过：
+                  </p>
+                  <ul className="space-y-1 max-h-24 overflow-y-auto text-xs">
+                    {lastImportInfo.rejectedDuplicates.map((r) => (
+                      <li key={r.row} className="flex gap-3 text-gray-600 px-2 py-1">
+                        <span className="font-mono text-red-600">行{r.row}</span>
+                        <span>{r.liveName || '(无现场名)'}</span>
+                        <span className="text-gray-400">与 #{r.duplicateOfOriginalRow} 行完全相同</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
+
+          <div className="mt-4 p-3 bg-gray-50 rounded flex items-start gap-2">
+            <Info className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" />
+            <p className="text-xs text-gray-600">
+              复用判断逻辑：基于「现场名 + 版权名」组合唯一键匹配。同一首歌导入过第二次时，
+              之前的人工复核结果（情绪标签、误差说明、备注）会直接沿用，无需重复操作。
+              如需覆盖历史结果，请在第二步「情绪标签」页修改对应记录。
+            </p>
+          </div>
+        </Card>
+      )}
 
       <div className="grid grid-cols-3 gap-6">
         <div className="col-span-2 space-y-6">

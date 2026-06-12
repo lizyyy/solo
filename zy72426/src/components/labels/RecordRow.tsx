@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { SongRecord } from '@/types';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { ManualChangeMarker } from './ManualChangeMarker';
-import { Edit2, Check, X, ChevronRight, Users } from 'lucide-react';
+import { Edit2, Check, X, ChevronRight, Users, CheckSquare, Square } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useEmotionLabelStore } from '@/store/useEmotionLabelStore';
 
@@ -10,9 +10,19 @@ interface RecordRowProps {
   record: SongRecord;
   isGrouped?: boolean;
   showGroupIcon?: boolean;
+  showSelect?: boolean;
+  isSelected?: boolean;
+  onSelect?: (id: string) => void;
 }
 
-export const RecordRow = ({ record, isGrouped = false, showGroupIcon = false }: RecordRowProps) => {
+export const RecordRow = ({
+  record,
+  isGrouped = false,
+  showGroupIcon = false,
+  showSelect = false,
+  isSelected = false,
+  onSelect,
+}: RecordRowProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editField, setEditField] = useState<'audioNote' | 'emotionTag' | null>(null);
   const [editValue, setEditValue] = useState('');
@@ -48,6 +58,17 @@ export const RecordRow = ({ record, isGrouped = false, showGroupIcon = false }: 
         record.status === 'reviewing' && 'bg-amber-50/50'
       )}
     >
+      {showSelect && (
+        <td className="px-4 py-3">
+          <button onClick={() => onSelect?.(record.id)} className="text-gray-500 hover:text-gray-700">
+            {isSelected ? (
+              <CheckSquare className="w-4 h-4 text-[#1e3a5f]" />
+            ) : (
+              <Square className="w-4 h-4" />
+            )}
+          </button>
+        </td>
+      )}
       <td className="px-4 py-3 text-gray-400 font-mono text-xs whitespace-nowrap">
         {isGrouped && <ChevronRight className="w-3 h-3 inline mr-1 text-gray-400" />}
         #{record.originalRowNumber}

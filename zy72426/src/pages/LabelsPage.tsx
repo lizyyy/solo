@@ -9,7 +9,10 @@ import { exportCSV, exportExcel } from '@/utils/exporter';
 import type { RecordStatus } from '@/types';
 
 export const LabelsPage = () => {
-  const { records, groups, runSelfCheck, batchUpdateStatus, recalculateAllEmotions } = useEmotionLabelStore();
+  const { runSelfCheck, batchUpdateStatus, recalculateAllEmotions, getUnifiedView, runConsistencyCheck, consistencyCheckResult } = useEmotionLabelStore();
+  const view = getUnifiedView('page');
+  const records = view.records;
+  const groups = view.groups;
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<RecordStatus | 'all'>('all');
   const [showOnlyGrouped, setShowOnlyGrouped] = useState(false);
@@ -87,11 +90,13 @@ export const LabelsPage = () => {
   };
 
   const handleExportCSV = () => {
-    exportCSV(records, groups);
+    runConsistencyCheck();
+    exportCSV(view.records, view.groups);
   };
 
   const handleExportExcel = () => {
-    exportExcel(records, groups);
+    runConsistencyCheck();
+    exportExcel(view.records, view.groups);
   };
 
   const stats = {
@@ -109,9 +114,23 @@ export const LabelsPage = () => {
           <h1 className="text-2xl font-bold text-gray-800" style={{ fontFamily: '"Noto Serif SC", serif' }}>
             第二步：情绪标签管理
           </h1>
-          <p className="text-gray-500 mt-1">许老师补看音频文件备注，复核现场名/版权名关联</p>
+          <p className="text-gray-500 mt-1">
+            许老师补看音频文件备注，复核现场名/版权名关联
+            <span className="ml-2 font-mono text-xs text-gray-400">
+              数据快照: {view.dataHash.slice(0, 12)}...
+            </span>
+          </p>
         </div>
         <div className="flex items-center gap-3">
+          {consistencyCheckResult.passed ? (
+            <span className="inline-flex items-center gap-1 px-3 py-2 text-xs bg-green-50 border border-green-200 rounded text-green-700">
+              ✓ 页面/导出/报告 同源
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1 px-3 py-2 text-xs bg-red-50 border border-red-200 rounded text-red-700">
+              ⚠ 数据不一致
+            </span>
+          )}
           <button
             onClick={recalculateAllEmotions}
             className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
@@ -274,18 +293,13 @@ export const LabelsPage = () => {
                 </thead>
                 <tbody>
                   {filteredUngrouped.map((record) => (
-                    <tr key={record.id} className="border-t border-gray-100 hover:bg-gray-50">
-                      <td className="px-4 py-3">
-                        <button onClick={() => handleSelect(record.id)} className="text-gray-500 hover:text-gray-700">
-                          {selectedIds.includes(record.id) ? (
-                            <CheckSquare className="w-4 h-4 text-[#1e3a5f]" />
-                          ) : (
-                            <Square className="w-4 h-4" />
-                          )}
-                        </button>
-                      </td>
-                      <RecordRow record={record} />
-                    </tr>
+                    <RecordRow
+                      key={record.id}
+                      record={record}
+                      showSelect={true}
+                      isSelected={selectedIds.includes(record.id)}
+                      onSelect={handleSelect}
+                    />
                   ))}
                 </tbody>
               </table>

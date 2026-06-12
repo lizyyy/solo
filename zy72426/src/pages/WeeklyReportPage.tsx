@@ -3,10 +3,18 @@ import { Card } from '@/components/common/Card';
 import { StatsCard } from '@/components/report/StatsCard';
 import { useEmotionLabelStore } from '@/store/useEmotionLabelStore';
 import { exportWeeklyReport } from '@/utils/exporter';
-import { FileBarChart, Download, Users, Music, CheckCircle, AlertTriangle, Clock, TrendingUp } from 'lucide-react';
+import {
+  FileBarChart, Download, Users, Music, CheckCircle, AlertTriangle, Clock, TrendingUp,
+  Link2, Link2Off, Info,
+} from 'lucide-react';
 
 export const WeeklyReportPage = () => {
-  const { records, groups, runSelfCheck } = useEmotionLabelStore();
+  const { getUnifiedView, runSelfCheck, runConsistencyCheck, consistencyCheckResult } = useEmotionLabelStore();
+
+  const view = useMemo(() => getUnifiedView('report'), [getUnifiedView]);
+  const records = view.records;
+  const groups = view.groups;
+  const summary = view.summary;
 
   const emotionStats = useMemo(() => {
     const stats = new Map<string, number>();
@@ -19,12 +27,12 @@ export const WeeklyReportPage = () => {
   const statusStats = useMemo(() => {
     return {
       total: records.length,
-      confirmed: records.filter((r) => r.status === 'confirmed').length,
-      reviewing: records.filter((r) => r.status === 'reviewing').length,
-      pending: records.filter((r) => r.status === 'pending').length,
-      exception: records.filter((r) => r.status === 'exception').length,
+      confirmed: summary.confirmedCount,
+      reviewing: summary.pendingReviewCount,
+      pending: summary.pendingCount,
+      exception: summary.rejectedCount,
     };
-  }, [records]);
+  }, [records, summary]);
 
   const groupStats = useMemo(() => {
     return {
@@ -36,14 +44,26 @@ export const WeeklyReportPage = () => {
 
   const handleExport = () => {
     runSelfCheck();
+    runConsistencyCheck();
     setTimeout(() => {
-      exportWeeklyReport(records, groups);
+      exportWeeklyReport(view.records, view.groups);
     }, 300);
   };
 
-  const completionRate = statusStats.total > 0
-    ? ((statusStats.confirmed / statusStats.total) * 100).toFixed(1)
-    : '0';
+  const completionRate = summary.completionRate.toFixed(1);
+
+  const emotionColors: Record<string, string> = {
+    '欢快': 'bg-yellow-500',
+    '治愈': 'bg-green-500',
+    '热血': 'bg-red-500',
+    '抒情': 'bg-pink-500',
+    '悲伤': 'bg-blue-500',
+    '紧张': 'bg-purple-500',
+    '搞笑': 'bg-orange-500',
+    '悬疑': 'bg-gray-500',
+    '感动': 'bg-rose-500',
+    '其他': 'bg-slate-500',
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -53,7 +73,10 @@ export const WeeklyReportPage = () => {
             第三步：店长周报更新
           </h1>
           <p className="text-gray-500 mt-1">
-            给店长看的汇总视图，导出前自动运行自检确保数据一致性
+            给店长看的汇总视图，与页面/接口/导出读同一份数据快照
+            <span className="ml-2 font-mono text-xs text-gray-400">
+              哈希: {view.dataHash.slice(0, 12)}...
+            </span>
           </p>
         </div>
         <button
@@ -63,6 +86,42 @@ export const WeeklyReportPage = () => {
           <Download className="w-4 h-4" />
           导出周报Excel
         </button>
+      </div>
+
+      <div className={`p-4 rounded-lg border ${
+        consistencyCheckResult.passed ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
+      }`}>
+        <div className="flex items-start justify-between">
+          <div className="flex items-center gap-3">
+            {consistencyCheckResult.passed ? (
+              <>
+                <Link2 className="w-6 h-6 text-green-600" />
+                <div>
+                  <p className="font-medium text-green-800">周报与页面/导出 数据同源</p>
+                  <p className="text-xs text-green-700 mt-0.5">
+                    修改记录 → 自动重算 → 三方同步，店长看到的和音乐老师确认的完全一致
+                  </p>
+                </div>
+              </>
+            ) : (
+              <>
+                <Link2Off className="w-6 h-6 text-red-600" />
+                <div>
+                  <p className="font-medium text-red-800">检测到数据不同源！</p>
+                  <p className="text-xs text-red-700 mt-0.5">
+                    {consistencyCheckResult.diffs?.length || '?'} 处差异，请点击「运行校验」修复
+                  </p>
+                </div>
+              </>
+            )}
+          </div>
+          <button
+            onClick={runConsistencyCheck}
+            className="text-xs px-3 py-1 rounded bg-white border text-gray-600 hover:bg-gray-50"
+          >
+            运行校验
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-4 gap-4">
@@ -100,28 +159,28 @@ export const WeeklyReportPage = () => {
         <div className="col-span-2 space-y-6">
           <Card
             title={
-              <div className="flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-[#1e3a5f]" />
-                情绪标签分布
-              </div>
+              <span className="flex items-center gap-2">
+                <FileBarChart className="w-5 h-5 text-[#1e3a5f]" />
+                情绪分布进度条
+              </span>
             }
-            subtitle="按歌曲数量排序"
+            subtitle="各类情绪标签的歌曲数量分布，与CSV导出第11列情绪标签一致"
           >
-            <div className="space-y-3">
-              {emotionStats.map(([tag, count]) => {
-                const percentage = statusStats.total > 0 ? (count / statusStats.total) * 100 : 0;
+            <div className="space-y-4">
+              {emotionStats.map(([emotion, count]) => {
+                const pct = statusStats.total > 0
+                  ? ((count / statusStats.total) * 100).toFixed(1)
+                  : '0';
                 return (
-                  <div key={tag}>
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-medium text-gray-700">{tag}</span>
-                      <span className="text-sm text-gray-500">
-                        {count} 首 ({percentage.toFixed(1)}%)
-                      </span>
+                  <div key={emotion}>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="text-gray-700 font-medium">{emotion}</span>
+                      <span className="text-gray-500">{count} 首 ({pct}%)</span>
                     </div>
-                    <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
                       <div
-                        className="h-full bg-[#1e3a5f] rounded-full transition-all duration-500"
-                        style={{ width: `${percentage}%` }}
+                        className={`h-full rounded-full ${emotionColors[emotion] || 'bg-[#1e3a5f]'}`}
+                        style={{ width: `${pct}%` }}
                       />
                     </div>
                   </div>
@@ -132,111 +191,110 @@ export const WeeklyReportPage = () => {
 
           <Card
             title={
-              <div className="flex items-center gap-2">
-                <FileBarChart className="w-5 h-5 text-[#1e3a5f]" />
-                处理进度
-              </div>
+              <span className="flex items-center gap-2">
+                <Clock className="w-5 h-5 text-[#dd6b20]" />
+                改动可追溯清单
+              </span>
             }
-            subtitle="各状态记录统计"
+            subtitle="人工修改过情绪标签、备注、误差说明的记录，按时间倒序"
           >
-            <div className="grid grid-cols-4 gap-4">
-              <div className="text-center p-4 bg-gray-50 rounded">
-                <p className="text-3xl font-bold text-gray-800">{statusStats.total}</p>
-                <p className="text-sm text-gray-500 mt-1">总计</p>
+            {view.changeLog.filter((c) => c.actionType === 'update').length === 0 ? (
+              <div className="py-8 text-center text-gray-400 text-sm">
+                暂无人工改动
               </div>
-              <div className="text-center p-4 bg-green-50 rounded">
-                <p className="text-3xl font-bold text-green-700">{statusStats.confirmed}</p>
-                <p className="text-sm text-green-600 mt-1">已确认</p>
+            ) : (
+              <div className="space-y-2 max-h-96 overflow-y-auto">
+                {view.changeLog
+                  .filter((c) => c.actionType === 'update')
+                  .slice(0, 20)
+                  .map((log) => (
+                    <div
+                      key={log.id}
+                      className="p-3 bg-gray-50 rounded border-l-4 border-[#dd6b20] text-sm"
+                    >
+                      <div className="flex justify-between items-start">
+                        <p className="text-gray-700">{log.description}</p>
+                        <span className="ml-3 text-xs font-mono text-gray-400 flex-shrink-0">
+                          {new Date(log.timestamp).toLocaleString('zh-CN')}
+                        </span>
+                      </div>
+                      <div className="flex gap-3 mt-1 text-xs text-gray-500">
+                        <span>操作人: <span className="font-medium text-gray-700">{log.operator}</span></span>
+                        <span>影响记录: <span className="font-medium text-gray-700">{log.affectedRecordIds.length} 条</span></span>
+                        {log.reason && (
+                          <span>原因: <span className="text-[#dd6b20]">{log.reason}</span></span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
               </div>
-              <div className="text-center p-4 bg-amber-50 rounded">
-                <p className="text-3xl font-bold text-amber-700">{statusStats.reviewing}</p>
-                <p className="text-sm text-amber-600 mt-1">待复核</p>
-              </div>
-              <div className="text-center p-4 bg-gray-50 rounded">
-                <p className="text-3xl font-bold text-gray-700">{statusStats.pending}</p>
-                <p className="text-sm text-gray-500 mt-1">待处理</p>
-              </div>
-            </div>
-
-            <div className="mt-6">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-gray-600">整体完成进度</span>
-                <span className="text-sm font-medium text-gray-800">{completionRate}%</span>
-              </div>
-              <div className="w-full h-4 bg-gray-100 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-[#2c5282] to-[#1e3a5f] rounded-full transition-all duration-500"
-                  style={{ width: `${completionRate}%` }}
-                />
-              </div>
-            </div>
+            )}
           </Card>
         </div>
 
         <div className="space-y-6">
           <Card
             title={
-              <div className="flex items-center gap-2">
-                <Clock className="w-5 h-5 text-amber-600" />
-                待处理事项
-              </div>
+              <span className="flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-green-600" />
+                完成率
+              </span>
             }
+            subtitle="店长关注的整体进度"
           >
-            <div className="space-y-3">
+            <div className="text-center py-4">
+              <p className="text-5xl font-bold text-[#1e3a5f]" style={{ fontFamily: '"Noto Serif SC", serif' }}>
+                {completionRate}%
+              </p>
+              <p className="text-sm text-gray-500 mt-2">
+                {statusStats.confirmed + statusStats.exception} / {statusStats.total} 条记录已处理
+              </p>
+              <div className="mt-4 w-full bg-gray-100 rounded-full h-4 overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-green-500 to-emerald-500 rounded-full"
+                  style={{ width: `${completionRate}%` }}
+                />
+              </div>
               {statusStats.reviewing > 0 && (
-                <div className="flex items-start gap-3 p-3 bg-amber-50 rounded border border-amber-200">
-                  <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="text-sm font-medium text-amber-800">
-                      {statusStats.reviewing} 条记录待复核
-                    </p>
-                    <p className="text-xs text-amber-700 mt-0.5">
-                      需许老师确认现场名/版权名关联
-                    </p>
-                  </div>
-                </div>
-              )}
-              {statusStats.pending > 0 && (
-                <div className="flex items-start gap-3 p-3 bg-gray-50 rounded border border-gray-200">
-                  <Clock className="w-5 h-5 text-gray-600 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-800">
-                      {statusStats.pending} 条记录待处理
-                    </p>
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      尚未标注情绪标签或备注
-                    </p>
-                  </div>
-                </div>
-              )}
-              {groupStats.pending > 0 && (
-                <div className="flex items-start gap-3 p-3 bg-blue-50 rounded border border-blue-200">
-                  <Users className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="text-sm font-medium text-blue-800">
-                      {groupStats.pending} 个分组待确认
-                    </p>
-                    <p className="text-xs text-blue-700 mt-0.5">
-                      同名映射需要音乐老师复核
-                    </p>
-                  </div>
-                </div>
-              )}
-              {statusStats.reviewing === 0 && statusStats.pending === 0 && groupStats.pending === 0 && (
-                <div className="text-center py-4">
-                  <CheckCircle className="w-10 h-10 text-green-500 mx-auto mb-2" />
-                  <p className="text-sm text-green-700 font-medium">全部处理完毕！</p>
-                </div>
+                <p className="mt-3 text-xs text-amber-700 bg-amber-50 p-2 rounded">
+                  还有 <span className="font-bold">{statusStats.reviewing}</span> 条待许老师复核，
+                  复核后计入完成率
+                </p>
               )}
             </div>
           </Card>
 
-          <Card title="操作提示">
+          <Card
+            title={
+              <span className="flex items-center gap-2">
+                <Info className="w-5 h-5 text-[#1e3a5f]" />
+                本周重点提示
+              </span>
+            }
+            subtitle="同一首歌现场名/版权名的处理说明"
+          >
             <div className="space-y-3 text-sm text-gray-600">
-              <p>1. 导出周报前系统会自动运行自检，确保数据一致性</p>
-              <p>2. 周报包含：统计汇总、情绪分布、明细数据三个sheet</p>
-              <p>3. 所有导出数据与页面展示完全一致，可追溯原始行号</p>
-              <p>4. 如有待复核记录，建议先请许老师复核后再导出</p>
+              <div className="p-3 bg-amber-50 rounded border border-amber-100">
+                <p className="font-medium text-amber-800 mb-1">⚠ 不急着归正常</p>
+                <p className="text-xs text-amber-700">
+                  同一首歌有「现场名」和「版权名」两种写法，系统会自动归类为同一组，但保留"复核中"状态，
+                  留给音乐老师开会前确认，不做自动通过。
+                </p>
+              </div>
+              <div className="p-3 bg-blue-50 rounded border border-blue-100">
+                <p className="font-medium text-blue-800 mb-1">📎 原始行号保留</p>
+                <p className="text-xs text-blue-700">
+                  所有记录（包括已分组的）都会保留票务导出表中的原始行号，
+                  店长追问时可直接回到原始表格取证。
+                </p>
+              </div>
+              <div className="p-3 bg-green-50 rounded border border-green-100">
+                <p className="font-medium text-green-800 mb-1">✓ 导出一致</p>
+                <p className="text-xs text-green-700">
+                  本页看到的情绪分布、完成率、待处理数量，与第二步导出的CSV/Excel第1-10列完全一致，
+                  通过数据哈希校验。
+                </p>
+              </div>
             </div>
           </Card>
         </div>

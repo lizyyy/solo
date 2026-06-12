@@ -10,7 +10,7 @@ import { useEffect } from 'react';
 import { useEmotionLabelStore } from '@/store/useEmotionLabelStore';
 
 function AppContent() {
-  const { loadSampleData, records, runSelfCheck } = useEmotionLabelStore();
+  const { loadSampleData, records, runSelfCheck, runConsistencyCheck, clearAllData } = useEmotionLabelStore();
 
   useEffect(() => {
     if (records.length === 0) {
@@ -18,6 +18,7 @@ function AppContent() {
     } else {
       runSelfCheck();
     }
+    runConsistencyCheck();
   }, []);
 
   return (

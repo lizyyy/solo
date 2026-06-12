@@ -1,4 +1,5 @@
 import type { SongRecord, SongGroup, ImportLog } from '@/types';
+import type { ImportResultInfo } from '@/utils/unifiedDataApi';
 
 const now = Date.now();
 const dayMs = 24 * 60 * 60 * 1000;
@@ -257,3 +258,92 @@ export const sampleCSVContent = `现场名,版权名,情绪标签
 起风了,起风了,感伤
 起风了 (Live版),起风了,感伤
 平凡之路,平凡之路,平静`;
+
+export const sampleLastImportInfo: ImportResultInfo = {
+  importVersion: 'v20260605_02',
+  importBatch: 2,
+  importedAt: now - 1 * dayMs,
+  operator: '新人运营',
+  rawRows: 10,
+  totalRowsInFile: 10,
+  newRows: 1,
+  reusedRows: 9,
+  resultingReviewCount: 4,
+  newRecords: [sampleRecords[10]],
+  reusedRecords: sampleRecords.slice(0, 9).map((r, i) => ({
+    existingRecord: r,
+    matchedRowNumber: i + 2,
+  })),
+  reusedPairs: [
+    {
+      newKey: '夜空中最亮的星 (Live)|夜空中最亮的星',
+      liveName: '夜空中最亮的星 (Live)',
+      copyrightName: '夜空中最亮的星',
+      existingOriginalRow: 2,
+      existingGroupCount: 2,
+    },
+    {
+      newKey: '夜空中最亮的星|夜空中最亮的星 (Studio)',
+      liveName: '夜空中最亮的星',
+      copyrightName: '夜空中最亮的星 (Studio)',
+      existingOriginalRow: 3,
+      existingGroupCount: 2,
+    },
+    {
+      newKey: '晴天|晴天',
+      liveName: '晴天',
+      copyrightName: '晴天',
+      existingOriginalRow: 4,
+      existingGroupCount: 1,
+    },
+    {
+      newKey: '稻香 (演唱会版)|稻香',
+      liveName: '稻香 (演唱会版)',
+      copyrightName: '稻香',
+      existingOriginalRow: 5,
+      existingGroupCount: 2,
+    },
+    {
+      newKey: '稻香|稻香 (Original)',
+      liveName: '稻香',
+      copyrightName: '稻香 (Original)',
+      existingOriginalRow: 6,
+      existingGroupCount: 2,
+    },
+    {
+      newKey: '告白气球|告白气球',
+      liveName: '告白气球',
+      copyrightName: '告白气球',
+      existingOriginalRow: 7,
+      existingGroupCount: 1,
+    },
+    {
+      newKey: '孤勇者|孤勇者',
+      liveName: '孤勇者',
+      copyrightName: '孤勇者',
+      existingOriginalRow: 8,
+      existingGroupCount: 1,
+    },
+    {
+      newKey: '起风了|起风了',
+      liveName: '起风了',
+      copyrightName: '起风了',
+      existingOriginalRow: 9,
+      existingGroupCount: 2,
+    },
+    {
+      newKey: '起风了 (Live版)|起风了',
+      liveName: '起风了 (Live版)',
+      copyrightName: '起风了',
+      existingOriginalRow: 10,
+      existingGroupCount: 2,
+    },
+  ],
+  rejectedDuplicates: [],
+  duplicateWarnings: [],
+  nameMappingCandidates: [
+    { recordIds: ['rec_001', 'rec_002'], suggestedGroupName: '夜空中最亮的星' },
+    { recordIds: ['rec_004', 'rec_005'], suggestedGroupName: '稻香' },
+    { recordIds: ['rec_008', 'rec_009'], suggestedGroupName: '起风了' },
+  ],
+};

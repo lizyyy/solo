@@ -1,7 +1,8 @@
 import * as XLSX from 'xlsx';
 import type { SongRecord, SongGroup } from '@/types';
+import { buildUnifiedView, UnifiedDataView } from '@/utils/unifiedDataApi';
 
-const generateDataHash = (records: SongRecord[]): string => {
+export const getDataHash = (records: SongRecord[]): string => {
   const dataStr = JSON.stringify(
     records.map((r) => ({
       id: r.id,
@@ -9,6 +10,11 @@ const generateDataHash = (records: SongRecord[]): string => {
       copyrightName: r.copyrightName,
       emotionTag: r.emotionTag,
       status: r.status,
+      audioNote: r.audioNote,
+      originalRowNumber: r.originalRowNumber,
+      importVersion: r.importVersion,
+      emotionConfidence: r.emotionConfidence,
+      groupId: r.groupId,
     }))
   );
 
@@ -67,7 +73,7 @@ export const generateCSVContent = (records: SongRecord[], groups: SongGroup[]): 
     ];
   });
 
-  const dataHash = generateDataHash(records);
+  const dataHash = getDataHash(records);
   rows.push(['', '', '', '', '', '', '', '', '', '数据哈希', dataHash]);
 
   const csvContent = [
@@ -129,7 +135,7 @@ export const exportExcel = (records: SongRecord[], groups: SongGroup[]): void =>
     };
   });
 
-  const dataHash = generateDataHash(records);
+  const dataHash = getDataHash(records);
   data.push({
     原始行号: '' as unknown as number,
     现场名: '',
@@ -215,5 +221,3 @@ export const exportWeeklyReport = (records: SongRecord[], groups: SongGroup[]): 
 
   XLSX.writeFile(wb, `情绪标签周报_${new Date().toISOString().slice(0, 10)}.xlsx`);
 };
-
-export const getDataHash = generateDataHash;
