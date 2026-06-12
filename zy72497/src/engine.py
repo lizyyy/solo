@@ -8,6 +8,7 @@ from .models import (
     ClearanceRecord,
     ResidentComplaint,
     IntersectionPhoto,
+    AuditLog,
     ProcessingStatus,
     EvidenceSource,
     AbnormalType,
@@ -122,6 +123,8 @@ class ClearanceEngine:
 
         from .models import AuditLog
         for log_data in data.get("audit_logs", []):
+            snapshot_before = log_data.get("snapshot_before") or log_data.get("snapshot") or {}
+            snapshot_after = log_data.get("snapshot_after") or {}
             log = AuditLog(
                 log_id=log_data["log_id"],
                 complaint_id=log_data["complaint_id"],
@@ -132,6 +135,8 @@ class ClearanceEngine:
                 operator=log_data["operator"],
                 timestamp=datetime.fromisoformat(log_data["timestamp"]),
                 details=log_data.get("details", {}),
+                snapshot_before=snapshot_before,
+                snapshot_after=snapshot_after,
             )
             record.audit_logs.append(log)
 
@@ -278,14 +283,30 @@ class ClearanceEngine:
         logs = record.audit_logs
         if len(logs) < 2:
             target_status = ProcessingStatus.IMPORTED
+            target_snapshot_after = {}
         else:
             target_status = logs[-2].new_status
+            target_snapshot_after = logs[-2].snapshot_after
+
+        if target_snapshot_after:
+            if "complaint_content" in target_snapshot_after:
+                record.complaint.complaint_content = target_snapshot_after["complaint_content"]
+            if "location" in target_snapshot_after:
+                record.complaint.location = target_snapshot_after["location"]
+            if target_snapshot_after.get("abnormal_type"):
+                record.abnormal_type = AbnormalType(target_snapshot_after["abnormal_type"])
+            else:
+                record.abnormal_type = None
+            record.abnormal_note = target_snapshot_after.get("abnormal_note")
+            record.confirmed_by = target_snapshot_after.get("confirmed_by")
+            confirmed_at_str = target_snapshot_after.get("confirmed_at")
+            record.confirmed_at = datetime.fromisoformat(confirmed_at_str) if confirmed_at_str else None
 
         record.update_status(
             new_status=target_status,
             operator=operator,
             source=EvidenceSource.MANUAL_CONFIRMATION,
-            details={"action": "rollback", "reason": reason},
+            details={"action": "rollback", "reason": reason, "restored_from_snapshot": bool(target_snapshot_after)},
         )
         self._save_records()
         return record
@@ -310,14 +331,29 @@ class ClearanceEngine:
             "timestamp": datetime.now().isoformat(),
         }
         record.complaint.manual_changes.append(change)
+
+        saved_snapshot_before = record._capture_snapshot()
+
         setattr(record.complaint, field, new_value)
 
-        record.update_status(
-            new_status=record.current_status,
-            operator=operator,
+        snapshot_after_manual_edit = record._capture_snapshot()
+
+        previous_status = record.current_status
+        log = AuditLog(
+            log_id=str(uuid.uuid4()),
+            complaint_id=record.complaint_id,
             source=EvidenceSource.MANUAL_CONFIRMATION,
+            action=f"status_change:{previous_status.value}->{previous_status.value}",
+            previous_status=previous_status,
+            new_status=previous_status,
+            operator=operator,
+            timestamp=datetime.now(),
             details={"action": "manual_edit", "change": change},
+            snapshot_before=saved_snapshot_before,
+            snapshot_after=snapshot_after_manual_edit,
         )
+        record.add_audit_log(log)
+        record.updated_at = datetime.now()
         self._save_records()
         return record
 

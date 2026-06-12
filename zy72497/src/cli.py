@@ -241,15 +241,49 @@ def cmd_replayable(args):
                 },
             })
         for log in r.audit_logs:
-            if "confirm" in log.action:
-                is_normal = "normal" in log.action
+            log_action = log.details.get("action", "") if log.details else ""
+            if log_action == "manual_edit":
+                change = log.details.get("change", {})
                 steps.append({
-                    "name": f"确认 {r.complaint_id}",
+                    "name": f"人工修改 {r.complaint_id} - {change.get('field', '?')}",
+                    "action": "manual_edit",
+                    "params": {
+                        "complaint_id": r.complaint_id,
+                        "field": change.get("field", ""),
+                        "old_value": change.get("old_value", ""),
+                        "new_value": change.get("new_value", ""),
+                        "operator": log.operator,
+                    },
+                })
+            elif log_action == "rollback":
+                steps.append({
+                    "name": f"回滚 {r.complaint_id}",
+                    "action": "rollback",
+                    "params": {
+                        "complaint_id": r.complaint_id,
+                        "operator": log.operator,
+                        "reason": log.details.get("reason", ""),
+                    },
+                })
+            elif "confirm_normal" in log.action or (log_action == "confirm_normal"):
+                steps.append({
+                    "name": f"确认正常 {r.complaint_id}",
                     "action": "confirm",
                     "params": {
                         "complaint_id": r.complaint_id,
                         "operator": log.operator,
-                        "is_normal": is_normal,
+                        "is_normal": True,
+                        "note": log.details.get("note", ""),
+                    },
+                })
+            elif "confirm_abnormal" in log.action or (log_action == "confirm_abnormal"):
+                steps.append({
+                    "name": f"确认异常 {r.complaint_id}",
+                    "action": "confirm",
+                    "params": {
+                        "complaint_id": r.complaint_id,
+                        "operator": log.operator,
+                        "is_normal": False,
                         "note": log.details.get("note", ""),
                     },
                 })

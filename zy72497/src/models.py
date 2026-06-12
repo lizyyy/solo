@@ -72,6 +72,8 @@ class AuditLog:
     operator: str
     timestamp: datetime
     details: Dict[str, Any] = field(default_factory=dict)
+    snapshot_before: Dict[str, Any] = field(default_factory=dict)
+    snapshot_after: Dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
         data = asdict(self)
@@ -105,6 +107,16 @@ class ClearanceRecord:
         self.audit_logs.append(log)
         self.updated_at = datetime.now()
 
+    def _capture_snapshot(self) -> Dict[str, Any]:
+        return {
+            "complaint_content": self.complaint.complaint_content,
+            "location": self.complaint.location,
+            "abnormal_type": self.abnormal_type.value if self.abnormal_type else None,
+            "abnormal_note": self.abnormal_note,
+            "confirmed_by": self.confirmed_by,
+            "confirmed_at": self.confirmed_at.isoformat() if self.confirmed_at else None,
+        }
+
     def update_status(
         self,
         new_status: ProcessingStatus,
@@ -114,18 +126,9 @@ class ClearanceRecord:
         abnormal_type: Optional[AbnormalType] = None,
         abnormal_note: Optional[str] = None,
     ) -> None:
-        log = AuditLog(
-            log_id=str(uuid.uuid4()),
-            complaint_id=self.complaint_id,
-            source=source,
-            action=f"status_change:{self.current_status.value}->{new_status.value}",
-            previous_status=self.current_status,
-            new_status=new_status,
-            operator=operator,
-            timestamp=datetime.now(),
-            details=details or {},
-        )
-        self.add_audit_log(log)
+        previous_status = self.current_status
+        snapshot_before = self._capture_snapshot()
+
         self.current_status = new_status
         if abnormal_type:
             self.abnormal_type = abnormal_type
@@ -135,6 +138,23 @@ class ClearanceRecord:
             self.confirmed_by = operator
             self.confirmed_at = datetime.now()
         self.updated_at = datetime.now()
+
+        snapshot_after = self._capture_snapshot()
+
+        log = AuditLog(
+            log_id=str(uuid.uuid4()),
+            complaint_id=self.complaint_id,
+            source=source,
+            action=f"status_change:{previous_status.value}->{new_status.value}",
+            previous_status=previous_status,
+            new_status=new_status,
+            operator=operator,
+            timestamp=datetime.now(),
+            details=details or {},
+            snapshot_before=snapshot_before,
+            snapshot_after=snapshot_after,
+        )
+        self.add_audit_log(log)
 
     def to_dict(self) -> Dict[str, Any]:
         data = asdict(self)
