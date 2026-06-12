@@ -6,7 +6,8 @@ import {
   ApprovalStatus,
   DisplayMode,
   HumanReadableError,
-  ApprovalRecord
+  ApprovalRecord,
+  Snapshot
 } from '../types';
 import { BoundaryRulesEngine } from './BoundaryRulesEngine';
 import { ChangeHistoryService } from './ChangeHistoryService';
@@ -22,7 +23,7 @@ export class WorkflowEngine {
     this.historyService = new ChangeHistoryService();
   }
 
-  initializeWorkflow(trackId: string, createdBy: string): ApprovalRecord {
+  initializeWorkflow(trackId: string, createdBy: string, importBatchId?: string): ApprovalRecord {
     return this.store.createApprovalRecord({
       trackId,
       status: ApprovalStatus.PENDING,
@@ -30,7 +31,30 @@ export class WorkflowEngine {
       displayMode: DisplayMode.LIST,
       remarks: '曲目别名表已导入，等待审批',
       reviewedBy: undefined,
-      reviewedAt: undefined
+      reviewedAt: undefined,
+      importBatchId
+    });
+  }
+
+  takeSnapshot(approvalId: string, createdBy: string): Snapshot | undefined {
+    const approval = this.store.getApprovalRecord(approvalId);
+    if (!approval) return undefined;
+
+    const remarks = this.store.getTrackRemarksByTrackId(approval.trackId);
+    const trackRemarkSnapshots = remarks.map(r => ({
+      id: r.id,
+      content: r.content,
+      hasReworkReason: r.hasReworkReason,
+      reworkReason: r.reworkReason
+    }));
+
+    return this.store.createSnapshot({
+      approvalId,
+      step: approval.currentStep,
+      status: approval.status,
+      trackRemarkSnapshots,
+      importBatchId: approval.importBatchId,
+      createdBy
     });
   }
 
@@ -67,6 +91,8 @@ export class WorkflowEngine {
       }
     }
 
+    const snapshot = this.takeSnapshot(approvalId, operator);
+
     const oldStep = approval.currentStep;
     const updated = this.store.updateApprovalRecord(approvalId, {
       currentStep: nextStep,
@@ -81,7 +107,11 @@ export class WorkflowEngine {
         oldStep,
         nextStep,
         operator,
-        '工作流推进'
+        '工作流推进',
+        approval.importBatchId,
+        'approval_record',
+        approvalId,
+        snapshot?.id
       );
     }
 
@@ -109,6 +139,7 @@ export class WorkflowEngine {
       if (!this.rulesEngine.canMarkNormal(approval, operator)) {
         return { success: false, error: getHumanReadableError('rework_reason_pending') };
       }
+      const snapshot = this.takeSnapshot(approvalId, operator);
       const oldStatus = approval.status;
       updated = this.store.updateApprovalRecord(approvalId, {
         status: ApprovalStatus.NORMAL,
@@ -124,7 +155,11 @@ export class WorkflowEngine {
           oldStatus,
           ApprovalStatus.NORMAL,
           operator,
-          '审批完成，标记为正常'
+          '审批完成，标记为正常',
+          approval.importBatchId,
+          'approval_record',
+          approvalId,
+          snapshot?.id
         );
       }
     } else {
@@ -133,6 +168,161 @@ export class WorkflowEngine {
     }
 
     return { success: true, record: updated };
+  }
+
+  executeRollback(
+    approvalId: string,
+    operator: string,
+    reason: string
+  ): { success: boolean; record?: ApprovalRecord; restoredRemarks?: number; error?: HumanReadableError } {
+    const approval = this.store.getApprovalRecord(approvalId);
+    if (!approval) {
+      return { success: false, error: getHumanReadableError('track_not_found') };
+    }
+
+    if (approval.status === ApprovalStatus.NORMAL) {
+      return { success: false, error: getHumanReadableError('cannot_rollback_normal') };
+    }
+
+    if (!this.rulesEngine.canRollback(approval.status)) {
+      return { success: false, error: getHumanReadableError('invalid_status_transition') };
+    }
+
+    const snapshot = this.store.getLatestSnapshotForApproval(approvalId);
+    if (!snapshot) {
+      return { success: false, error: getHumanReadableError('rollback_no_snapshot') };
+    }
+
+    let restoredRemarks = 0;
+    for (const remarkSnapshot of snapshot.trackRemarkSnapshots) {
+      const currentRemark = this.store.getTrackRemark(remarkSnapshot.id);
+      if (currentRemark) {
+        this.store.updateTrackRemark(remarkSnapshot.id, {
+          content: remarkSnapshot.content,
+          hasReworkReason: remarkSnapshot.hasReworkReason,
+          reworkReason: remarkSnapshot.reworkReason
+        });
+        restoredRemarks++;
+      }
+    }
+
+    const oldStatus = approval.status;
+    const oldStep = approval.currentStep;
+    const updated = this.store.updateApprovalRecord(approvalId, {
+      status: snapshot.status,
+      currentStep: snapshot.step
+    });
+
+    if (updated) {
+      this.historyService.recordChange(
+        'approval_record',
+        approvalId,
+        'status',
+        oldStatus,
+        snapshot.status,
+        operator,
+        `回滚: ${reason}`,
+        approval.importBatchId,
+        'approval_record',
+        approvalId,
+        snapshot.id
+      );
+      this.historyService.recordChange(
+        'approval_record',
+        approvalId,
+        'currentStep',
+        oldStep,
+        snapshot.step,
+        operator,
+        `回滚: ${reason}`,
+        approval.importBatchId,
+        'approval_record',
+        approvalId,
+        snapshot.id
+      );
+    }
+
+    return { success: true, record: updated, restoredRemarks };
+  }
+
+  applyForRework(
+    approvalId: string,
+    reason: string,
+    appliedBy: string
+  ): { success: boolean; error?: HumanReadableError } {
+    const approval = this.store.getApprovalRecord(approvalId);
+    if (!approval) {
+      return { success: false, error: getHumanReadableError('track_not_found') };
+    }
+
+    if (!reason || reason.trim() === '') {
+      return { success: false, error: getHumanReadableError('rework_application_reason_required') };
+    }
+
+    const existingApps = this.store.getReworkApplicationsByApproval(approvalId);
+    const pendingApp = existingApps.find(a => a.status === 'pending_review');
+    if (pendingApp) {
+      return { success: false, error: getHumanReadableError('rework_application_already_exists') };
+    }
+
+    this.store.createReworkApplication({
+      approvalId,
+      trackId: approval.trackId,
+      reason,
+      appliedBy,
+      previousStatus: approval.status,
+      status: 'pending_review'
+    });
+
+    return { success: true };
+  }
+
+  approveReworkApplication(
+    applicationId: string,
+    approvedBy: string
+  ): { success: boolean; error?: HumanReadableError } {
+    const app = this.store.getReworkApplication(applicationId);
+    if (!app) {
+      return { success: false, error: getHumanReadableError('track_not_found') };
+    }
+
+    this.store.updateReworkApplication(applicationId, { status: 'approved' });
+
+    const snapshot = this.takeSnapshot(app.approvalId, approvedBy);
+
+    const oldStatus = app.previousStatus;
+    this.store.updateApprovalRecord(app.approvalId, {
+      status: ApprovalStatus.REWORK_REQUIRED
+    });
+
+    this.historyService.recordChange(
+      'approval_record',
+      app.approvalId,
+      'status',
+      oldStatus,
+      ApprovalStatus.REWORK_REQUIRED,
+      approvedBy,
+      `返工申请已批准: ${app.reason}`,
+      undefined,
+      'approval_record',
+      app.approvalId,
+      snapshot?.id
+    );
+
+    return { success: true };
+  }
+
+  rejectReworkApplication(
+    applicationId: string,
+    rejectedBy: string
+  ): { success: boolean; error?: HumanReadableError } {
+    const app = this.store.getReworkApplication(applicationId);
+    if (!app) {
+      return { success: false, error: getHumanReadableError('track_not_found') };
+    }
+
+    this.store.updateReworkApplication(applicationId, { status: 'rejected' });
+    return { success: true };
   }
 
   getCurrentStepInfo(approvalId: string): {
@@ -156,6 +346,13 @@ export class WorkflowEngine {
       const hasReviewedPhoto = photos.some(p => p.reviewed);
       if (!hasReviewedPhoto) {
         blockers.push(getHumanReadableError('missing_checkin_photo'));
+      }
+    }
+
+    if (approval.currentStep === WorkflowStep.REHEARSAL_UPDATE && BOUNDARY_RULES.workflow.requireRehearsalUpdate) {
+      const changes = this.store.getRehearsalChangesByTrack(approval.trackId);
+      if (changes.length === 0) {
+        blockers.push(getHumanReadableError('missing_rehearsal_change'));
       }
     }
 

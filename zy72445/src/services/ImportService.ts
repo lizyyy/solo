@@ -1,7 +1,8 @@
 import { DataStore } from '../store/DataStore';
 import { BOUNDARY_RULES } from '../constants/boundaryRules';
 import { getHumanReadableError } from '../constants/errorMessages';
-import { TrackAlias, ImportBatch, HumanReadableError } from '../types';
+import { TrackAlias, ImportBatch, HumanReadableError, ImportItemDetail, ImportItemCategory } from '../types';
+import { ChangeHistoryService } from './ChangeHistoryService';
 
 export interface ImportTrackData {
   trackId: string;
@@ -14,16 +15,22 @@ export interface ImportResult {
   batchId: string;
   importedCount: number;
   skippedCount: number;
+  newRecordCount: number;
+  thisTimeDuplicateCount: number;
+  historicalDuplicateCount: number;
   totalCount: number;
   errors: HumanReadableError[];
   importedTracks: TrackAlias[];
+  itemDetails: ImportItemDetail[];
 }
 
 export class ImportService {
   private store: DataStore;
+  private historyService: ChangeHistoryService;
 
   constructor() {
     this.store = DataStore.getInstance();
+    this.historyService = new ChangeHistoryService();
   }
 
   importTrackAliases(
@@ -33,7 +40,10 @@ export class ImportService {
   ): ImportResult {
     const errors: HumanReadableError[] = [];
     const importedTracks: TrackAlias[] = [];
-    let skippedCount = 0;
+    const itemDetails: ImportItemDetail[] = [];
+    let thisTimeDuplicateCount = 0;
+    let historicalDuplicateCount = 0;
+    let newRecordCount = 0;
 
     if (!batchIdentifier || batchIdentifier.trim() === '') {
       return {
@@ -41,24 +51,42 @@ export class ImportService {
         batchId: '',
         importedCount: 0,
         skippedCount: 0,
+        newRecordCount: 0,
+        thisTimeDuplicateCount: 0,
+        historicalDuplicateCount: 0,
         totalCount: trackDataList.length,
         errors: [getHumanReadableError('batch_identifier_required')],
-        importedTracks: []
+        importedTracks: [],
+        itemDetails: []
       };
     }
 
     const existingBatch = this.store.getImportBatchByIdentifier(batchIdentifier);
     if (existingBatch && BOUNDARY_RULES.importDeduplication.checkBatchIdentifier) {
       errors.push(getHumanReadableError('duplicate_import_batch'));
-      skippedCount = trackDataList.length;
+      for (const trackData of trackDataList) {
+        itemDetails.push({
+          trackId: trackData.trackId,
+          trackName: trackData.trackName,
+          aliases: trackData.aliases,
+          category: ImportItemCategory.THIS_TIME_DUPLICATE,
+          existingBatchId: existingBatch.id,
+          existingBatchIdentifier: existingBatch.batchIdentifier
+        });
+        thisTimeDuplicateCount++;
+      }
       return {
         success: true,
         batchId: existingBatch.id,
         importedCount: 0,
-        skippedCount,
+        skippedCount: trackDataList.length,
+        newRecordCount: 0,
+        thisTimeDuplicateCount,
+        historicalDuplicateCount: 0,
         totalCount: trackDataList.length,
         errors,
-        importedTracks: []
+        importedTracks: [],
+        itemDetails
       };
     }
 
@@ -71,8 +99,29 @@ export class ImportService {
 
     for (const trackData of trackDataList) {
       if (BOUNDARY_RULES.importDeduplication.checkTrackIdAndAliases) {
-        if (this.store.trackAliasExists(trackData.trackId, trackData.aliases)) {
-          skippedCount++;
+        const existing = this.store.findExistingTrackAlias(trackData.trackId, trackData.aliases);
+        if (existing) {
+          if (existing.batch.id === batch.id) {
+            itemDetails.push({
+              trackId: trackData.trackId,
+              trackName: trackData.trackName,
+              aliases: trackData.aliases,
+              category: ImportItemCategory.THIS_TIME_DUPLICATE,
+              existingBatchId: existing.batch.id,
+              existingBatchIdentifier: existing.batch.batchIdentifier
+            });
+            thisTimeDuplicateCount++;
+          } else {
+            itemDetails.push({
+              trackId: trackData.trackId,
+              trackName: trackData.trackName,
+              aliases: trackData.aliases,
+              category: ImportItemCategory.HISTORICAL_DUPLICATE,
+              existingBatchId: existing.batch.id,
+              existingBatchIdentifier: existing.batch.batchIdentifier
+            });
+            historicalDuplicateCount++;
+          }
           continue;
         }
       }
@@ -84,6 +133,28 @@ export class ImportService {
         importBatchId: batch.id
       });
       importedTracks.push(trackAlias);
+
+      itemDetails.push({
+        trackId: trackData.trackId,
+        trackName: trackData.trackName,
+        aliases: trackData.aliases,
+        category: ImportItemCategory.NEW_RECORD,
+        newRecordId: trackAlias.id
+      });
+      newRecordCount++;
+
+      this.historyService.recordChange(
+        'track_alias',
+        trackAlias.id,
+        'import',
+        '',
+        JSON.stringify({ trackId: trackData.trackId, trackName: trackData.trackName, aliases: trackData.aliases }),
+        importedBy,
+        '曲目别名表第一次导入',
+        batch.id,
+        'track_alias',
+        trackAlias.id
+      );
     }
 
     this.store.updateImportBatch(batch.id, {
@@ -95,10 +166,14 @@ export class ImportService {
       success: true,
       batchId: batch.id,
       importedCount: importedTracks.length,
-      skippedCount,
+      skippedCount: thisTimeDuplicateCount + historicalDuplicateCount,
+      newRecordCount,
+      thisTimeDuplicateCount,
+      historicalDuplicateCount,
       totalCount: trackDataList.length,
       errors,
-      importedTracks
+      importedTracks,
+      itemDetails
     };
   }
 

@@ -15,7 +15,11 @@ export class ChangeHistoryService {
     oldValue: string,
     newValue: string,
     changedBy: string,
-    changeReason?: string
+    changeReason?: string,
+    importBatchId?: string,
+    affectedEntityType?: 'approval_record' | 'track_alias',
+    affectedEntityId?: string,
+    snapshotId?: string
   ): ChangeHistory {
     return this.store.addChangeHistory({
       entityType,
@@ -24,7 +28,11 @@ export class ChangeHistoryService {
       oldValue,
       newValue,
       changedBy,
-      changeReason
+      changeReason,
+      importBatchId,
+      affectedEntityType,
+      affectedEntityId,
+      snapshotId
     });
   }
 
@@ -40,6 +48,14 @@ export class ChangeHistoryService {
     return this.store.getChangeHistoryByEntity('track_alias', aliasId);
   }
 
+  getHistoryByImportBatch(importBatchId: string): ChangeHistory[] {
+    return this.store.getChangeHistoryByBatch(importBatchId);
+  }
+
+  getHistoryByAffectedEntity(entityType: 'approval_record' | 'track_alias', entityId: string): ChangeHistory[] {
+    return this.store.getChangeHistoryByAffectedEntity(entityType, entityId);
+  }
+
   getDiffForEntity(entityType: ChangeHistory['entityType'], entityId: string): Array<{
     fieldName: string;
     oldValue: string;
@@ -47,6 +63,10 @@ export class ChangeHistoryService {
     changedBy: string;
     changedAt: string;
     changeReason?: string;
+    importBatchId?: string;
+    affectedEntityType?: 'approval_record' | 'track_alias';
+    affectedEntityId?: string;
+    snapshotId?: string;
   }> {
     const histories = this.store.getChangeHistoryByEntity(entityType, entityId);
     return histories.map(h => ({
@@ -55,7 +75,11 @@ export class ChangeHistoryService {
       newValue: h.newValue,
       changedBy: h.changedBy,
       changedAt: h.changedAt,
-      changeReason: h.changeReason
+      changeReason: h.changeReason,
+      importBatchId: h.importBatchId,
+      affectedEntityType: h.affectedEntityType,
+      affectedEntityId: h.affectedEntityId,
+      snapshotId: h.snapshotId
     }));
   }
 
@@ -64,6 +88,7 @@ export class ChangeHistoryService {
     newValue: string;
     changedBy: string;
     changedAt: string;
+    importBatchId?: string;
   }> {
     const histories = this.store.getChangeHistoryByEntity(entityType, entityId);
     return histories
@@ -72,7 +97,8 @@ export class ChangeHistoryService {
         oldValue: h.oldValue,
         newValue: h.newValue,
         changedBy: h.changedBy,
-        changedAt: h.changedAt
+        changedAt: h.changedAt,
+        importBatchId: h.importBatchId
       }));
   }
 }

@@ -13,7 +13,8 @@ import {
   ApprovalRecord,
   TrackRemark,
   ClassCheckinPhoto,
-  RehearsalChangeRecord
+  RehearsalChangeRecord,
+  ReworkApplication
 } from '../types';
 
 export class ApprovalService {
@@ -41,7 +42,7 @@ export class ApprovalService {
     const result = this.importService.importTrackAliases(batchIdentifier, trackDataList, importedBy);
     
     for (const track of result.importedTracks) {
-      this.workflowEngine.initializeWorkflow(track.trackId, importedBy);
+      this.workflowEngine.initializeWorkflow(track.trackId, importedBy, result.batchId);
     }
     
     return result;
@@ -64,8 +65,9 @@ export class ApprovalService {
 
     const result = this.rulesEngine.processTrackRemark(trackId, content, createdBy);
 
+    const approval = this.store.getApprovalRecordByTrackId(trackId);
+
     if (result.approvalImpact.shouldSetReworkRequired) {
-      const approval = this.store.getApprovalRecordByTrackId(trackId);
       if (approval) {
         const oldStatus = approval.status;
         this.store.updateApprovalRecord(approval.id, {
@@ -78,7 +80,10 @@ export class ApprovalService {
           oldStatus,
           ApprovalStatus.REWORK_REQUIRED,
           createdBy,
-          '检测到返工原因，自动标记为需返工'
+          '检测到返工原因，自动标记为需返工',
+          alias.importBatchId,
+          'approval_record',
+          approval.id
         );
       }
     }
@@ -113,6 +118,9 @@ export class ApprovalService {
     });
 
     if (updated) {
+      const alias = this.store.getTrackAliasByTrackId(oldRemark.trackId);
+      const approval = this.store.getApprovalRecordByTrackId(oldRemark.trackId);
+
       this.historyService.recordChange(
         'track_remark',
         remarkId,
@@ -120,11 +128,13 @@ export class ApprovalService {
         oldRemark.content,
         newContent,
         updatedBy,
-        '修改轨道备注'
+        '修改轨道备注',
+        alias?.importBatchId,
+        approval ? 'approval_record' : undefined,
+        approval?.id
       );
 
       if (detection.hasReworkReason && !oldRemark.hasReworkReason) {
-        const approval = this.store.getApprovalRecordByTrackId(oldRemark.trackId);
         if (approval) {
           const oldStatus = approval.status;
           this.store.updateApprovalRecord(approval.id, {
@@ -137,7 +147,10 @@ export class ApprovalService {
             oldStatus,
             ApprovalStatus.REWORK_REQUIRED,
             updatedBy,
-            '备注修改后检测到返工原因'
+            '备注修改后检测到返工原因',
+            alias?.importBatchId,
+            'approval_record',
+            approval.id
           );
         }
       }
@@ -180,19 +193,77 @@ export class ApprovalService {
     changeContent: string,
     createdBy: string
   ): RehearsalChangeRecord {
-    return this.store.createRehearsalChange({
+    const record = this.store.createRehearsalChange({
       trackId,
       changeType,
       changeContent,
       createdBy
     });
+
+    const alias = this.store.getTrackAliasByTrackId(trackId);
+    const approval = this.store.getApprovalRecordByTrackId(trackId);
+
+    this.historyService.recordChange(
+      'rehearsal_change',
+      record.id,
+      'add',
+      '',
+      JSON.stringify({ changeType, changeContent }),
+      createdBy,
+      '添加排练变更记录',
+      alias?.importBatchId,
+      approval ? 'approval_record' : undefined,
+      approval?.id
+    );
+
+    return record;
   }
 
   advanceWorkflow(
     approvalId: string,
     operator: string
-  ) {
+  ): { success: boolean; record?: ApprovalRecord; error?: HumanReadableError } {
+    const approval = this.store.getApprovalRecord(approvalId);
+    if (!approval) {
+      return { success: false, error: getHumanReadableError('track_not_found') };
+    }
+
+    if (approval.currentStep === WorkflowStep.REHEARSAL_UPDATE) {
+      const changes = this.store.getRehearsalChangesByTrack(approval.trackId);
+      if (changes.length === 0) {
+        return { success: false, error: getHumanReadableError('missing_rehearsal_change') };
+      }
+    }
+
     return this.workflowEngine.completeStep(approvalId, operator);
+  }
+
+  rollback(
+    approvalId: string,
+    operator: string,
+    reason: string
+  ) {
+    return this.workflowEngine.executeRollback(approvalId, operator, reason);
+  }
+
+  applyForRework(
+    approvalId: string,
+    reason: string,
+    appliedBy: string
+  ) {
+    return this.workflowEngine.applyForRework(approvalId, reason, appliedBy);
+  }
+
+  approveReworkApplication(applicationId: string, approvedBy: string) {
+    return this.workflowEngine.approveReworkApplication(applicationId, approvedBy);
+  }
+
+  rejectReworkApplication(applicationId: string, rejectedBy: string) {
+    return this.workflowEngine.rejectReworkApplication(applicationId, rejectedBy);
+  }
+
+  getReworkApplications(approvalId: string): ReworkApplication[] {
+    return this.store.getReworkApplicationsByApproval(approvalId);
   }
 
   getWorkflowStepInfo(approvalId: string) {
@@ -219,8 +290,16 @@ export class ApprovalService {
     return this.displayModeService.navigateToSource(trackId, targetType, targetId);
   }
 
-  getChangeHistory(entityType: 'track_alias' | 'track_remark' | 'approval_record', entityId: string) {
+  getChangeHistory(entityType: 'track_alias' | 'track_remark' | 'approval_record' | 'rehearsal_change', entityId: string) {
     return this.historyService.getDiffForEntity(entityType, entityId);
+  }
+
+  getChangeHistoryByBatch(importBatchId: string) {
+    return this.historyService.getHistoryByImportBatch(importBatchId);
+  }
+
+  getChangeHistoryByAffected(entityType: 'approval_record' | 'track_alias', entityId: string) {
+    return this.historyService.getHistoryByAffectedEntity(entityType, entityId);
   }
 
   getApprovalRecord(approvalId: string): ApprovalRecord | undefined {

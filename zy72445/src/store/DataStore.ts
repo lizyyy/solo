@@ -8,9 +8,8 @@ import {
   ApprovalRecord,
   ChangeHistory,
   ImportBatch,
-  ApprovalStatus,
-  WorkflowStep,
-  DisplayMode
+  Snapshot,
+  ReworkApplication
 } from '../types';
 
 export class DataStore {
@@ -21,6 +20,8 @@ export class DataStore {
   private approvalRecords: Map<string, ApprovalRecord> = new Map();
   private changeHistories: ChangeHistory[] = [];
   private importBatches: Map<string, ImportBatch> = new Map();
+  private snapshots: Map<string, Snapshot> = new Map();
+  private reworkApplications: Map<string, ReworkApplication> = new Map();
 
   private static instance: DataStore;
 
@@ -72,6 +73,15 @@ export class DataStore {
       t.trackId === trackId ||
       t.aliases.some(a => aliases.includes(a))
     );
+  }
+
+  findExistingTrackAlias(trackId: string, aliases: string[]): { alias: TrackAlias; batch: ImportBatch } | undefined {
+    const alias = Array.from(this.trackAliases.values()).find(t =>
+      t.trackId === trackId || t.aliases.some(a => aliases.includes(a))
+    );
+    if (!alias) return undefined;
+    const batch = this.importBatches.get(alias.importBatchId);
+    return batch ? { alias, batch } : undefined;
   }
 
   createTrackRemark(data: Omit<TrackRemark, 'id' | 'createdAt' | 'updatedAt'>): TrackRemark {
@@ -231,8 +241,63 @@ export class DataStore {
     return this.changeHistories.filter(h => h.entityType === entityType && h.entityId === entityId);
   }
 
+  getChangeHistoryByBatch(importBatchId: string): ChangeHistory[] {
+    return this.changeHistories.filter(h => h.importBatchId === importBatchId);
+  }
+
+  getChangeHistoryByAffectedEntity(entityType: 'approval_record' | 'track_alias', entityId: string): ChangeHistory[] {
+    return this.changeHistories.filter(h => h.affectedEntityType === entityType && h.affectedEntityId === entityId);
+  }
+
   getAllChangeHistory(): ChangeHistory[] {
     return [...this.changeHistories];
+  }
+
+  createSnapshot(data: Omit<Snapshot, 'id' | 'createdAt'>): Snapshot {
+    const snapshot: Snapshot = {
+      ...data,
+      id: this.generateId(),
+      createdAt: this.now()
+    };
+    this.snapshots.set(snapshot.id, snapshot);
+    return snapshot;
+  }
+
+  getSnapshot(id: string): Snapshot | undefined {
+    return this.snapshots.get(id);
+  }
+
+  getLatestSnapshotForApproval(approvalId: string): Snapshot | undefined {
+    const approvalSnapshots = Array.from(this.snapshots.values())
+      .filter(s => s.approvalId === approvalId)
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    return approvalSnapshots[0];
+  }
+
+  createReworkApplication(data: Omit<ReworkApplication, 'id' | 'appliedAt'>): ReworkApplication {
+    const application: ReworkApplication = {
+      ...data,
+      id: this.generateId(),
+      appliedAt: this.now()
+    };
+    this.reworkApplications.set(application.id, application);
+    return application;
+  }
+
+  getReworkApplication(id: string): ReworkApplication | undefined {
+    return this.reworkApplications.get(id);
+  }
+
+  getReworkApplicationsByApproval(approvalId: string): ReworkApplication[] {
+    return Array.from(this.reworkApplications.values()).filter(r => r.approvalId === approvalId);
+  }
+
+  updateReworkApplication(id: string, updates: Partial<ReworkApplication>): ReworkApplication | undefined {
+    const app = this.reworkApplications.get(id);
+    if (!app) return undefined;
+    const updated: ReworkApplication = { ...app, ...updates };
+    this.reworkApplications.set(id, updated);
+    return updated;
   }
 
   clearAll(): void {
@@ -243,5 +308,7 @@ export class DataStore {
     this.approvalRecords.clear();
     this.changeHistories = [];
     this.importBatches.clear();
+    this.snapshots.clear();
+    this.reworkApplications.clear();
   }
 }

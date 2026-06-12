@@ -19,6 +19,12 @@ export enum DisplayMode {
   THREE_D = 'three_d'
 }
 
+export enum ImportItemCategory {
+  NEW_RECORD = 'new_record',
+  THIS_TIME_DUPLICATE = 'this_time_duplicate',
+  HISTORICAL_DUPLICATE = 'historical_duplicate'
+}
+
 export interface TrackAlias {
   id: string;
   trackId: string;
@@ -35,6 +41,7 @@ export interface TrackRemark {
   content: string;
   hasReworkReason: boolean;
   reworkReason?: string;
+  importBatchId?: string;
   createdAt: string;
   updatedAt: string;
   createdBy: string;
@@ -70,13 +77,14 @@ export interface ApprovalRecord {
   reviewedBy?: string;
   reviewedAt?: string;
   remarks: string;
+  importBatchId?: string;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface ChangeHistory {
   id: string;
-  entityType: 'track_alias' | 'track_remark' | 'approval_record';
+  entityType: 'track_alias' | 'track_remark' | 'approval_record' | 'rehearsal_change';
   entityId: string;
   fieldName: string;
   oldValue: string;
@@ -84,6 +92,10 @@ export interface ChangeHistory {
   changedBy: string;
   changedAt: string;
   changeReason?: string;
+  importBatchId?: string;
+  affectedEntityType?: 'approval_record' | 'track_alias';
+  affectedEntityId?: string;
+  snapshotId?: string;
 }
 
 export interface ImportBatch {
@@ -92,7 +104,44 @@ export interface ImportBatch {
   importedAt: string;
   importedBy: string;
   trackCount: number;
-  status: 'processing' | 'completed' | 'failed';
+  status: 'processing' | 'completed' | 'failed' | 'rolled_back';
+}
+
+export interface ImportItemDetail {
+  trackId: string;
+  trackName: string;
+  aliases: string[];
+  category: ImportItemCategory;
+  existingBatchId?: string;
+  existingBatchIdentifier?: string;
+  newRecordId?: string;
+}
+
+export interface Snapshot {
+  id: string;
+  approvalId: string;
+  step: WorkflowStep;
+  status: ApprovalStatus;
+  trackRemarkSnapshots: Array<{
+    id: string;
+    content: string;
+    hasReworkReason: boolean;
+    reworkReason?: string;
+  }>;
+  importBatchId?: string;
+  createdAt: string;
+  createdBy: string;
+}
+
+export interface ReworkApplication {
+  id: string;
+  approvalId: string;
+  trackId: string;
+  reason: string;
+  appliedBy: string;
+  appliedAt: string;
+  previousStatus: ApprovalStatus;
+  status: 'pending_review' | 'approved' | 'rejected';
 }
 
 export interface HumanReadableError {
