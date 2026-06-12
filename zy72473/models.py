@@ -17,6 +17,7 @@ class Complaint:
     has_photo: bool = False
     need_review: bool = False
     review_note: str = ""
+    missing_materials: List[dict] = field(default_factory=list)
     created_at: str = field(default_factory=lambda: datetime.now().isoformat())
     updated_at: str = field(default_factory=lambda: datetime.now().isoformat())
 

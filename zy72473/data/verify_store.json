@@ -1,0 +1,181 @@
+{
+  "complaints": [
+    {
+      "id": "4e72f44d",
+      "complaint_no": "TS20260612-003",
+      "community_name": "阳光花园",
+      "content": "农贸市场北入口凌晨4点半开始装卸货，大货车喇叭声、卸货哐当声很大，3号楼5户居民都被吵醒。",
+      "raw_conclusion": "系统自动判定：该路段属于农贸市场正常装卸时段（4:00-7:00），投诉不成立。",
+      "status": "need_muni_review",
+      "has_photo": true,
+      "need_review": false,
+      "review_note": "已复核",
+      "missing_materials": [
+        {
+          "name": "路口现场照片",
+          "source": "投诉处理规范：需路口照片佐证现场情况",
+          "status": "已补",
+          "resolved_by": "周姐",
+          "resolved_at": "2026-06-12T22:41:56.009899",
+          "remark": "照片文件：农贸市场北入口_20260612_凌晨5点.jpg"
+        },
+        {
+          "name": "市政巡检员对小区名称的复核确认",
+          "source": "小区名'阳光花园'存在新旧名称映射，需复核确认",
+          "status": "已补",
+          "resolved_by": "市政巡检员王师傅",
+          "resolved_at": "2026-06-12T22:42:44.917499",
+          "remark": "阳光花园已于2025年12月更名为阳光佳苑，确认同一小区"
+        },
+        {
+          "name": "人工复核原始结论",
+          "source": "系统原始结论不能直接照抄，需人工复核确认",
+          "status": "待补",
+          "resolved_by": "",
+          "resolved_at": ""
+        }
+      ],
+      "created_at": "2026-06-12T22:40:54.570327",
+      "updated_at": "2026-06-12T22:42:44.917982"
+    }
+  ],
+  "photos": [
+    {
+      "id": "8fbae45d",
+      "complaint_id": "4e72f44d",
+      "file_name": "农贸市场北入口_20260612_凌晨5点.jpg",
+      "uploaded_by": "周姐",
+      "uploaded_at": "2026-06-12T22:41:56.009114"
+    }
+  ],
+  "communities": {
+    "阳光花园->阳光佳苑": {
+      "new_name": "阳光佳苑",
+      "old_name": "阳光花园",
+      "confirmed": false
+    }
+  },
+  "audit_log": [
+    {
+      "id": "71c9409f",
+      "action": "import",
+      "complaint_id": "4e72f44d",
+      "operator": "小李",
+      "detail": "导入投诉 TS20260612-003，小区：阳光花园",
+      "timestamp": "2026-06-12T22:40:54.570523"
+    },
+    {
+      "id": "29124322",
+      "action": "generate_summary",
+      "complaint_id": "4e72f44d",
+      "operator": "system",
+      "detail": "生成摘要 v1，下一步：请市政巡检员核实小区新旧名称对应关系，对接：市政巡检员",
+      "timestamp": "2026-06-12T22:40:54.570867"
+    },
+    {
+      "id": "fd3860c6",
+      "action": "rerun_summary",
+      "complaint_id": "4e72f44d",
+      "operator": "system",
+      "detail": "重跑摘要，照片状态：未补，待补材料：3项",
+      "timestamp": "2026-06-12T22:40:54.570982"
+    },
+    {
+      "id": "5476b6ae",
+      "action": "add_photo",
+      "complaint_id": "4e72f44d",
+      "operator": "周姐",
+      "detail": "补录路口照片：农贸市场北入口_20260612_凌晨5点.jpg",
+      "timestamp": "2026-06-12T22:41:56.009611"
+    },
+    {
+      "id": "2d6364e4",
+      "action": "resolve_material",
+      "complaint_id": "4e72f44d",
+      "operator": "周姐",
+      "detail": "补录缺失材料：路口现场照片（照片文件：农贸市场北入口_20260612_凌晨5点.jpg）",
+      "timestamp": "2026-06-12T22:41:56.010341"
+    },
+    {
+      "id": "525e04ea",
+      "action": "generate_summary",
+      "complaint_id": "4e72f44d",
+      "operator": "system",
+      "detail": "生成摘要 v2，下一步：请市政巡检员核实小区新旧名称对应关系，对接：市政巡检员",
+      "timestamp": "2026-06-12T22:41:56.011614"
+    },
+    {
+      "id": "1b47cb58",
+      "action": "rerun_summary",
+      "complaint_id": "4e72f44d",
+      "operator": "system",
+      "detail": "重跑摘要，照片状态：已补，待补材料：2项",
+      "timestamp": "2026-06-12T22:41:56.011762"
+    },
+    {
+      "id": "5f814a0f",
+      "action": "resolve_material",
+      "complaint_id": "4e72f44d",
+      "operator": "市政巡检员王师傅",
+      "detail": "补录缺失材料：市政巡检员对小区名称的复核确认（阳光花园已于2025年12月更名为阳光佳苑，确认同一小区）",
+      "timestamp": "2026-06-12T22:42:44.917820"
+    },
+    {
+      "id": "034a14dc",
+      "action": "generate_summary",
+      "complaint_id": "4e72f44d",
+      "operator": "system",
+      "detail": "生成摘要 v3，下一步：材料已补全，可提交街道或安排现场核查，对接：社区书记周姐 / 街道城管",
+      "timestamp": "2026-06-12T22:42:44.918291"
+    },
+    {
+      "id": "76877ba6",
+      "action": "rerun_summary",
+      "complaint_id": "4e72f44d",
+      "operator": "system",
+      "detail": "重跑摘要，照片状态：已补，待补材料：1项",
+      "timestamp": "2026-06-12T22:42:44.918453"
+    }
+  ],
+  "summaries": [
+    {
+      "id": "bf1773d4",
+      "complaint_id": "4e72f44d",
+      "why_kept": "小区名'阳光花园'存在新旧名称映射，需复核；缺少路口照片佐证",
+      "missing_materials": [
+        "路口现场照片",
+        "市政巡检员对小区名称的复核确认",
+        "人工复核原始结论"
+      ],
+      "next_step": "请市政巡检员核实小区新旧名称对应关系",
+      "next_contact": "市政巡检员",
+      "version": 1,
+      "created_at": "2026-06-12T22:40:54.570745"
+    },
+    {
+      "id": "49760ab5",
+      "complaint_id": "4e72f44d",
+      "why_kept": "小区名'阳光花园'存在新旧名称映射，需复核；已有路口照片佐证，需结合照片重新判断",
+      "missing_materials": [
+        "市政巡检员对小区名称的复核确认",
+        "人工复核原始结论"
+      ],
+      "next_step": "请市政巡检员核实小区新旧名称对应关系",
+      "next_contact": "市政巡检员",
+      "version": 2,
+      "created_at": "2026-06-12T22:41:56.011431"
+    },
+    {
+      "id": "ecb5f69a",
+      "complaint_id": "4e72f44d",
+      "why_kept": "结论与现场情况需核对，原始结论不能直接照抄；已有路口照片佐证，需结合照片重新判断",
+      "missing_materials": [
+        "人工复核原始结论"
+      ],
+      "next_step": "材料已补全，可提交街道或安排现场核查",
+      "next_contact": "社区书记周姐 / 街道城管",
+      "version": 3,
+      "created_at": "2026-06-12T22:42:44.918135"
+    }
+  ]
+}
