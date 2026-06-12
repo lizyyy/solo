@@ -1,15 +1,12 @@
-import { Train, User, Home, FileBarChart } from 'lucide-react'
+import { Train, User, Home, FileBarChart, FileText } from 'lucide-react'
 import { useLocation, Link } from 'react-router-dom'
 import StepProgress from './StepProgress'
 
-interface HeaderProps {
-  currentRole?: string
-}
-
-export default function Header({ currentRole = '交通协管 老马' }: HeaderProps) {
+export default function Header() {
   const location = useLocation()
 
   const links = [
+    { path: '/wizard', label: '三步流程', icon: FileText },
     { path: '/', label: '记录列表', icon: Home },
     { path: '/summary', label: '街道摘要', icon: FileBarChart },
   ]
@@ -53,11 +50,8 @@ export default function Header({ currentRole = '交通协管 老马' }: HeaderPr
 
           <div className="flex items-center space-x-2 bg-blue-800 px-4 py-2 rounded">
             <User className="w-5 h-5" />
-            <span className="text-sm font-medium">{currentRole}</span>
+            <span className="text-sm font-medium">交通协管 老马</span>
           </div>
-        </div>
-        <div className="mt-4">
-          <StepProgress />
         </div>
       </div>
     </header>
