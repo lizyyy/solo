@@ -29,6 +29,7 @@ class ChangeType(str, Enum):
     RAMP_SUPPLEMENTED = "ramp_supplemented"
     REVIEWED = "reviewed"
     ROLLED_BACK = "rolled_back"
+    REIMPORT_SKIPPED = "reimport_skipped"
 
 
 @dataclass
@@ -84,6 +85,11 @@ class ChangeRecord:
     changed_at: datetime
     remark: Optional[str] = None
     command_replay: Optional[str] = None
+    old_status: Optional[str] = None
+    new_status: Optional[str] = None
+    old_score: Optional[float] = None
+    new_score: Optional[float] = None
+    import_batch: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
         d = asdict(self)
@@ -138,6 +144,7 @@ class TreePoolInspection:
     updated_at: datetime = field(default_factory=datetime.now)
     assigned_to: Optional[str] = None
     reviewed_by: Optional[str] = None
+    import_batch: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
         d = asdict(self)

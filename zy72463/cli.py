@@ -24,12 +24,17 @@ def cmd_import(args):
             for cid in args.ids.split(",")
         ]
 
-    created, skipped = service.import_complaints(complaints, args.by or "system")
-    print(f"导入完成: 新增 {len(created)} 条, 跳过 {len(skipped)} 条")
+    batch_id = getattr(args, 'batch', None) or None
+    created, skipped_with_existing = service.import_complaints(complaints, args.by or "system", batch_id=batch_id)
+    print(f"导入完成: 新增 {len(created)} 条, 跳过 {len(skipped_with_existing)} 条")
     for insp in created:
-        print(f"  [创建] {insp.complaint_id} -> {insp.inspection_id}")
-    for cid in skipped:
-        print(f"  [跳过] {cid} (已存在)")
+        print(f"  [创建] {insp.complaint_id} -> {insp.inspection_id} (批次: {insp.import_batch})")
+    for cid, insp in skipped_with_existing:
+        print(f"  [跳过] {cid} (已存在, 状态: {insp.status.value}, 评分: {insp.score})")
+        reimport_records = [h for h in insp.history if h.change_type.value == "reimport_skipped"]
+        if reimport_records:
+            latest = reimport_records[-1]
+            print(f"         重复导入追踪: {latest.remark}")
 
 
 def cmd_add_photo(args):
@@ -134,6 +139,9 @@ def cmd_rollback(args):
     )
     if result:
         print(f"已回滚变更: {args.change}")
+        print(f"  当前状态: {result.status.value}")
+        print(f"  当前评分: {result.score}")
+        print(f"  坡道补录数: {len(result.ramp_supplements)}")
     else:
         print(f"未找到记录或变更", file=sys.stderr)
         sys.exit(1)
@@ -149,12 +157,61 @@ def cmd_history(args):
     for d in diffs:
         print(f"\n  [{d['at']}] {d['change_type']} by {d['by']}")
         print(f"      change_id: {d['change_id']}")
+        if d.get('old_status') or d.get('new_status'):
+            print(f"      状态: {d.get('old_status', '-')} → {d.get('new_status', '-')}")
+        if d.get('old_score') is not None or d.get('new_score') is not None:
+            print(f"      评分: {d.get('old_score', '-')} → {d.get('new_score', '-')}")
         if d['field']:
             print(f"      字段: {d['field']}")
-            print(f"      旧值: {d['old']}")
-            print(f"      新值: {d['new']}")
+            if d['change_type'] != 'ramp_supplemented':
+                print(f"      旧值: {d['old']}")
+                print(f"      新值: {d['new']}")
+        if d.get('import_batch'):
+            print(f"      批次: {d['import_batch']}")
         if d['remark']:
             print(f"      备注: {d['remark']}")
+
+
+def cmd_trace(args):
+    service = InspectionService()
+    trace = service.trace_from_complaint(args.complaint)
+    if not trace:
+        print(f"未找到记录: {args.complaint}", file=sys.stderr)
+        sys.exit(1)
+
+    print(f"=== 从投诉编号反查审计轨迹: {trace['complaint_id']} ===")
+    print(f"路口: {trace['intersection']}")
+    print(f"描述: {trace['description']}")
+    print(f"当前状态: {trace['current_status']}")
+    print(f"当前评分: {trace['current_score']}")
+    print(f"当前备注: {trace['current_remark']}")
+    print(f"当前建议: {trace['current_suggestion']}")
+    print(f"导入批次: {trace['import_batch']}")
+
+    if trace['photo_remarks']:
+        print(f"\n路口照片（关键备注）:")
+        for p in trace['photo_remarks']:
+            print(f"  📷 {p['file_path']} by {p['uploaded_by']}")
+            if p['remark']:
+                print(f"     备注: {p['remark']}")
+
+    if trace['ramp_supplements']:
+        print(f"\n坡道补录:")
+        for r in trace['ramp_supplements']:
+            mark = " ⚠️ 评分未变化" if r['score_unchanged'] else ""
+            print(f"  🏗️  {r['location']}: {r['description']}")
+            print(f"     评分: {r['old_score']} → {r['new_score']}{mark}")
+
+    print(f"\n完整时间线:")
+    for i, entry in enumerate(trace['timeline'], 1):
+        status_change = ""
+        if entry.get('old_status') and entry.get('new_status') and entry['old_status'] != entry['new_status']:
+            status_change = f" [{entry['old_status']} → {entry['new_status']}]"
+        score_change = ""
+        if entry.get('old_score') is not None or entry.get('new_score') is not None:
+            score_change = f" (评分: {entry.get('old_score', '-')} → {entry.get('new_score', '-')})"
+        print(f"  {i}. [{entry['at']}] {entry['change_type']} by {entry['by']}{status_change}{score_change}")
+        print(f"     {entry['detail']}")
 
 
 def cmd_replay(args):
@@ -178,7 +235,8 @@ def cmd_list(args):
         print(f"所有巡检记录 ({len(inspections)} 条):")
     for insp in inspections:
         status_mark = " ⚠️" if insp.status.value == "needs_review" else ""
-        print(f"  {insp.complaint_id} | {insp.status.value}{status_mark} | {insp.complaint.intersection}")
+        batch_info = f" (批次: {insp.import_batch})" if insp.import_batch else ""
+        print(f"  {insp.complaint_id} | {insp.status.value}{status_mark} | {insp.complaint.intersection}{batch_info}")
         if insp.photos:
             print(f"      照片: {len(insp.photos)} 张")
         if insp.ramp_supplements:
@@ -199,11 +257,12 @@ def cmd_show(args):
     print(f"评分: {insp.score}")
     print(f"备注: {insp.remark}")
     print(f"整改建议: {insp.suggestion}")
+    print(f"导入批次: {insp.import_batch}")
 
     if insp.photos:
         print(f"\n照片 ({len(insp.photos)} 张):")
         for p in insp.photos:
-            print(f"  - {p.file_path} (by {p.uploaded_at})" if hasattr(p, 'uploaded_at') else f"  - {p.file_path} (by {p.uploaded_by})")
+            print(f"  - {p.file_path} (by {p.uploaded_by})")
             if p.remark:
                 print(f"    备注: {p.remark}")
 
@@ -229,6 +288,7 @@ def main():
     p_import.add_argument("--intersection", help="路口")
     p_import.add_argument("--description", help="描述")
     p_import.add_argument("--by", help="操作人")
+    p_import.add_argument("--batch", help="导入批次号")
 
     p_add_photo = subparsers.add_parser("add-photo", help="添加路口照片")
     p_add_photo.add_argument("--complaint", required=True, help="投诉ID")
@@ -272,6 +332,9 @@ def main():
     p_history = subparsers.add_parser("history", help="查看历史变更")
     p_history.add_argument("--complaint", required=True, help="投诉ID")
 
+    p_trace = subparsers.add_parser("trace", help="从投诉编号反查完整审计轨迹")
+    p_trace.add_argument("--complaint", required=True, help="投诉ID")
+
     p_replay = subparsers.add_parser("replay", help="生成可重放命令")
     p_replay.add_argument("--complaint", required=True, help="投诉ID")
 
@@ -301,6 +364,8 @@ def main():
         cmd_rollback(args)
     elif args.command == "history":
         cmd_history(args)
+    elif args.command == "trace":
+        cmd_trace(args)
     elif args.command == "replay":
         cmd_replay(args)
     elif args.command == "list":
