@@ -40,13 +40,18 @@ def import_sampling_points(csv_path: str, operator: str = '阿宁') -> Dict:
         cursor.execute("SELECT id FROM import_batches WHERE batch_hash = ?", (batch_hash,))
         existing = cursor.fetchone()
         if existing:
+            cursor.execute("SELECT point_code FROM sampling_points WHERE batch_id = ?", (existing['id'],))
+            reused_codes = [r['point_code'] for r in cursor.fetchall()]
             return {
                 "success": True,
                 "skipped": True,
-                "message": f"该批次数据已导入过(批次ID:{existing['id']})，跳过避免数量翻倍",
+                "message": "该批次数据已导入过(批次ID:%d)，跳过避免数量翻倍" % existing['id'],
                 "batch_id": existing['id'],
                 "inserted": 0,
-                "updated": 0
+                "updated": 0,
+                "reused_codes": reused_codes,
+                "new_codes": [],
+                "detail": "全部 %d 条为复用记录，无真新增" % len(reused_codes)
             }
 
         cursor.execute("""
@@ -57,6 +62,8 @@ def import_sampling_points(csv_path: str, operator: str = '阿宁') -> Dict:
 
         inserted = 0
         updated = 0
+        new_codes = []
+        reused_codes = []
 
         for row in rows:
             original_row = row['_original_row']
@@ -88,23 +95,28 @@ def import_sampling_points(csv_path: str, operator: str = '阿宁') -> Dict:
                     updates.append("lighting_condition = ?")
                     params.append(lighting)
                     record_history(conn, point_id, "lighting_condition",
-                                   old['lighting_condition'], lighting, "重新导入更新", operator)
+                                   old['lighting_condition'], lighting,
+                                   "重复导入时字段变化, 保留原话: '%s'" % old['lighting_condition'], operator)
                 if old['safety_level'] != safety:
                     updates.append("safety_level = ?")
                     params.append(safety)
                     record_history(conn, point_id, "safety_level",
-                                   old['safety_level'], safety, "重新导入更新", operator)
+                                   old['safety_level'], safety,
+                                   "重复导入时字段变化, 保留原话: '%s'" % old['safety_level'], operator)
                 if old['remark'] != remark:
                     updates.append("remark = ?")
                     params.append(remark)
                     record_history(conn, point_id, "remark",
-                                   old['remark'], remark, "重新导入更新", operator)
+                                   old['remark'], remark,
+                                   "重复导入时备注变化, 原话: '%s', 修改人: %s, 修改原因: 重新导入携带不同备注" % (old['remark'], operator),
+                                   operator)
 
                 if updates:
                     updates.append("updated_at = CURRENT_TIMESTAMP")
                     params.append(point_id)
                     cursor.execute(f"UPDATE sampling_points SET {', '.join(updates)} WHERE id = ?", params)
                     updated += 1
+                reused_codes.append(point_code)
             else:
                 cursor.execute("""
                 INSERT INTO sampling_points (
@@ -119,8 +131,18 @@ def import_sampling_points(csv_path: str, operator: str = '阿宁') -> Dict:
                     safety, lighting, complaint, remark, PROCESS_STATUS_INITIAL
                 ))
                 inserted += 1
+                new_codes.append(point_code)
 
         cursor.execute("UPDATE import_batches SET record_count = ? WHERE id = ?", (inserted + updated, batch_id))
+
+        parts = []
+        if inserted > 0:
+            parts.append("真新增%d条" % inserted)
+        if updated > 0:
+            parts.append("复用更新%d条" % updated)
+        if not parts:
+            parts.append("无变化")
+        detail = "，".join(parts)
 
         return {
             "success": True,
@@ -128,7 +150,10 @@ def import_sampling_points(csv_path: str, operator: str = '阿宁') -> Dict:
             "batch_id": batch_id,
             "inserted": inserted,
             "updated": updated,
-            "message": f"导入完成: 新增{inserted}条, 更新{updated}条"
+            "new_codes": new_codes,
+            "reused_codes": reused_codes,
+            "detail": detail,
+            "message": "导入完成: %s" % detail
         }
 
 
@@ -175,3 +200,25 @@ def get_point_by_id(point_id: int) -> Dict:
         cursor.execute("SELECT * FROM sampling_points WHERE id = ?", (point_id,))
         row = cursor.fetchone()
         return dict(row) if row else None
+
+
+def lookup_point_by_remark(keyword: str) -> List[Dict]:
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+        SELECT * FROM sampling_points WHERE remark LIKE ? ORDER BY id
+        """, ("%%%s%%" % keyword,))
+        return [dict(row) for row in cursor.fetchall()]
+
+
+def lookup_point_with_history(keyword: str) -> List[Dict]:
+    points = lookup_point_by_remark(keyword)
+    results = []
+    for p in points:
+        from .database import get_point_history
+        history = get_point_history(p["id"])
+        results.append({
+            "point": p,
+            "history": history
+        })
+    return results

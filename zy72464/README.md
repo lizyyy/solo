@@ -20,9 +20,12 @@ BOUNDARY_THRESHOLD_METERS = 50.0  # 边界阈值：50米内算边界点位
 
 | 条件 | 结果 | 处理方式 |
 |------|------|----------|
-| 点位距离最近两个街道的距离差 ≤ 100米 | `is_boundary = 1` | 标记`boundary_review_status = 'pending'`，留项目经理复核 |
+| 命中多个街道且距离差 ≤ 100米 | `is_boundary = 1` | 标记`boundary_review_status = 'pending'`，留项目经理复核 |
+| 命中多个街道但距离差 > 100米 | `is_boundary = 0` | 归属最近街道，自动确认 `boundary_review_status = 'confirmed'` |
 | 只落在一个街道范围内 | `is_boundary = 0` | 自动确认 `boundary_review_status = 'confirmed'` |
 | 不在任何街道范围 | `street_name = '未知街道'` | 标记 `pending` 待人工处理 |
+
+> **关键修复**：命中多个街道但距离差不满足边界阈值时，必须归属最近街道并设为 `confirmed`，不能留空街道和 `pending` 状态。
 
 ### 1.2 边界点位复核规则
 
@@ -60,11 +63,18 @@ def compute_batch_hash(rows):
 
 - 同一批CSV的内容哈希后存入 `import_batches.batch_hash`
 - 重复导入同一文件 → 直接跳过，不会新增记录
+- 跳过时返回 `reused_codes`（复用点位编号列表）和 `new_codes`（空列表），明确说明哪些是复用
 
 ### 2.2 单点去重
 
 - 每个采样点有唯一标识 `point_code`
-- 同一点位再次导入 → 更新现有记录，不新增
+- 同一点位再次导入（不同批文件） → 更新现有记录，不新增
+- 更新时返回 `reused_codes` 和 `new_codes`，报告里明确区分复用记录和真新增
+
+### 2.3 重复导入的历史留痕规则
+
+- 重复导入导致备注变化时，`change_reason` 保留原话：`"重复导入时备注变化, 原话: '旧备注', 修改人: 阿宁, 修改原因: 重新导入携带不同备注"`
+- 不会把备注默默覆盖成最终值，历史里能看到改前原话、修改人和修改原因
 
 ---
 
@@ -160,6 +170,23 @@ history = get_point_history(point_id=5)
 - 安全等级 `safety_level`
 - 照明情况 `lighting_condition`
 - 处理状态 `process_status`
+
+### 4.3 按备注关键词反查
+
+文件位置：[importer.py](file:///Users/lzy/pro/solo/workspaces/zy72464/park_night_run/importer.py#L205-L224)
+
+```python
+from park_night_run.importer import lookup_point_with_history
+
+# 反查"望京公园正门"的改前改后和状态
+results = lookup_point_with_history("望京公园正门")
+for item in results:
+    print(item["point"]["remark"])      # 当前备注
+    print(item["point"]["process_status"])  # 当前处理状态
+    for h in item["history"]:           # 完整改动历史
+        print(h["old_value"], "->", h["new_value"])
+        print(h["change_reason"])       # 原话、修改人、修改原因
+```
 
 ---
 

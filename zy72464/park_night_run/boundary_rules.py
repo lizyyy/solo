@@ -75,6 +75,9 @@ def check_boundary_status(lng: float, lat: float) -> Dict:
             primary_street = streets[0][0]
             secondary_street = streets[1][0]
             review_status = BOUNDARY_REVIEW_PENDING
+        else:
+            primary_street = streets[0][0]
+            review_status = BOUNDARY_REVIEW_CONFIRMED
     elif len(streets) == 1:
         primary_street = streets[0][0]
         review_status = BOUNDARY_REVIEW_CONFIRMED
