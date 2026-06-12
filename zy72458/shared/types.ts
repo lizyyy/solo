@@ -8,6 +8,8 @@ export type SelfCheckType = 'duplicate_import' | 'missing_opinion' | 'recalc_aft
 
 export type CheckStatus = 'pass' | 'warning' | 'error';
 
+export type DuplicateType = 'none' | 'this_batch' | 'historical';
+
 export interface ResidentComplaint {
   id: string;
   complaintNo: string;
@@ -18,6 +20,9 @@ export interface ResidentComplaint {
   status: ComplaintStatus;
   isDuplicate?: boolean;
   duplicateOf?: string;
+  duplicateType?: DuplicateType;
+  reportNote?: string;
+  source: string;
   intersectionPhoto: {
     hasPhoto: boolean;
     photoUrl?: string;
@@ -32,6 +37,7 @@ export interface ResidentComplaint {
   reviewBy?: string;
   reviewTime?: string;
   reviewComment?: string;
+  reviewConclusion?: 'approved' | 'pending' | 'rejected';
   createdAt: string;
   updatedAt: string;
 }
@@ -73,6 +79,7 @@ export interface ImportComplaintDto {
   residentOpinionSummary: string;
   residentOpinionOriginal?: string;
   intersectionPhotoUrl?: string;
+  source?: string;
 }
 
 export interface ApiResponse<T> {
@@ -94,6 +101,9 @@ export interface DashboardStats {
   normal: number;
   resolved: number;
   duplicates: number;
+  newRecords: number;
+  thisBatchDuplicates: number;
+  historicalDuplicates: number;
 }
 
 export const STATUS_LABELS: Record<ComplaintStatus, string> = {
@@ -123,4 +133,16 @@ export const SELF_CHECK_NAMES: Record<SelfCheckType, string> = {
   missing_opinion: '居民意见缺失检测',
   recalc_after_add: '补录后重算校验',
   export_consistency: '导出一致性校验',
+};
+
+export const DUPLICATE_TYPE_LABELS: Record<DuplicateType, string> = {
+  none: '新记录',
+  this_batch: '本次重复',
+  historical: '历史重复',
+};
+
+export const DUPLICATE_TYPE_COLORS: Record<DuplicateType, string> = {
+  none: 'bg-emerald-100 text-emerald-800',
+  this_batch: 'bg-orange-100 text-orange-800',
+  historical: 'bg-violet-100 text-violet-800',
 };

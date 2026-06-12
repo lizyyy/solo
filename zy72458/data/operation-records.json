@@ -1,31 +1,80 @@
 [
   {
-    "id": "c76f76b4-a3ca-46d8-a072-9541e493c6a3",
+    "id": "9cdbdfb1-876f-4d49-85d2-451c3c3610fb",
+    "command": "import_complaints",
+    "operator": "阿宁（脚本复现）",
+    "timestamp": "2026-06-12T12:10:36.750Z",
+    "parameters": {
+      "count": 5,
+      "importedCount": 5,
+      "duplicateCount": 1,
+      "newCount": 3,
+      "thisBatchDuplicateCount": 1,
+      "historicalDuplicateCount": 1
+    },
+    "result": "success"
+  },
+  {
+    "id": "c470c5f9-31eb-4edc-85ad-edea22359fe8",
+    "command": "review_complaint",
+    "operator": "王书记（脚本复现）",
+    "timestamp": "2026-06-12T12:10:36.753Z",
+    "parameters": {
+      "complaintId": "b93c9a5f-cf6a-4592-a388-1583e5a0127f",
+      "approve": true
+    },
+    "result": "success"
+  },
+  {
+    "id": "4345c3d3-c224-4a97-85d3-2196ae7dece7",
+    "command": "review_complaint",
+    "operator": "王书记（脚本复现）",
+    "timestamp": "2026-06-12T12:10:36.754Z",
+    "parameters": {
+      "complaintId": "f43aaf60-6e5b-4238-b393-b04a02e1dca0",
+      "approve": false
+    },
+    "result": "success"
+  },
+  {
+    "id": "abf1289c-e6c9-4623-992d-d044b1dc5e01",
+    "command": "review_complaint",
+    "operator": "王书记（脚本复现）",
+    "timestamp": "2026-06-12T12:10:36.755Z",
+    "parameters": {
+      "complaintId": "60e44bd2-13da-4f2f-9fb3-9dcfc98bbd4c",
+      "approve": false
+    },
+    "result": "success"
+  },
+  {
+    "id": "3781cb15-971c-42d5-831c-a52066b3ed99",
+    "command": "review_complaint",
+    "operator": "王书记（脚本复现）",
+    "timestamp": "2026-06-12T12:10:36.755Z",
+    "parameters": {
+      "complaintId": "d14c817f-b3ac-41a0-a13f-888d2fb64999",
+      "approve": false
+    },
+    "result": "success"
+  },
+  {
+    "id": "30530150-b442-425a-bdbc-fdaf9e4cff07",
     "command": "run_self_check",
-    "operator": "命令行脚本",
-    "timestamp": "2026-06-07T01:24:11.070Z",
+    "operator": "脚本复现",
+    "timestamp": "2026-06-12T12:10:36.759Z",
     "parameters": {
       "checks": 4
     },
     "result": "success"
   },
   {
-    "id": "f77be3c5-587a-4829-a371-4c1a4ae78956",
+    "id": "691034a7-5dc9-4a6b-a35e-8f106d27edfe",
     "command": "export_data",
-    "operator": "命令行脚本",
-    "timestamp": "2026-06-07T01:24:17.288Z",
+    "operator": "脚本复现",
+    "timestamp": "2026-06-12T12:10:36.760Z",
     "parameters": {
-      "count": 7
-    },
-    "result": "success"
-  },
-  {
-    "id": "975fb3f7-be2e-4b43-9fb0-fcb48cd44d89",
-    "command": "run_self_check",
-    "operator": "命令行脚本",
-    "timestamp": "2026-06-07T01:24:37.647Z",
-    "parameters": {
-      "checks": 4
+      "count": 13
     },
     "result": "success"
   }

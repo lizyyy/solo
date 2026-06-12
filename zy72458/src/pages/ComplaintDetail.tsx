@@ -71,16 +71,27 @@ export default function ComplaintDetail() {
       </button>
 
       <div className="bg-white rounded-lg border border-slate-200 p-6">
-        <div className="flex items-start justify-between">
-          <div>
+        <div className="flex items-start justify-between gap-6">
+          <div className="flex-1">
             <h2 className="text-xl font-semibold text-slate-800">{c.complaintNo}</h2>
-            <div className="flex items-center gap-4 mt-2">
+            <div className="flex items-center gap-3 mt-2 flex-wrap">
               <StatusBadge status={c.status} isDuplicate={c.isDuplicate} />
-              <span className="text-sm text-slate-500">原始行号：{c.originalRowNo}</span>
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-700">
+                原始行号 #{c.originalRowNo}
+              </span>
               <span className="text-sm text-slate-500">
                 导入人：{c.importBy} · {new Date(c.importTime).toLocaleString('zh-CN')}
               </span>
+              <span className="text-sm text-slate-500">
+                来源：{c.source || '未标注'}
+              </span>
             </div>
+            {c.reportNote && (
+              <div className="mt-3 p-3 bg-blue-50 border border-blue-100 rounded-lg">
+                <p className="text-xs text-blue-600 font-medium mb-1">报告说明（与页面展示/接口返回/导出同源）</p>
+                <p className="text-sm text-blue-800">{c.reportNote}</p>
+              </div>
+            )}
           </div>
         </div>
 

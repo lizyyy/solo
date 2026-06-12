@@ -1,0 +1,248 @@
+{
+  "imported": [
+    {
+      "id": "acac2a6f-a6d6-4628-8718-533a8af07ab8",
+      "complaintNo": "TS-2026-201",
+      "originalRowNo": 201,
+      "importTime": "2026-06-12T12:10:36.747Z",
+      "importBy": "阿宁（脚本复现）",
+      "currentStep": 1,
+      "status": "pending_photo",
+      "duplicateType": "none",
+      "source": "居民投诉编号第一次导入",
+      "intersectionPhoto": {
+        "hasPhoto": false
+      },
+      "residentOpinion": {
+        "hasOriginal": true,
+        "summary": "201号摊位占道经营（新·带原文）",
+        "originalText": "201号摊位常年占用人行道经营，多次提醒无效，我们上下班都绕路。"
+      },
+      "createdAt": "2026-06-12T12:10:36.747Z",
+      "updatedAt": "2026-06-12T12:10:36.747Z",
+      "reportNote": "来源：居民投诉编号第一次导入 | 待补看路口照片 | 居民意见原文完整"
+    },
+    {
+      "id": "f65bcd2f-b410-40e0-aab6-274aa179f0ac",
+      "complaintNo": "TS-2026-202",
+      "originalRowNo": 202,
+      "importTime": "2026-06-12T12:10:36.747Z",
+      "importBy": "阿宁（脚本复现）",
+      "currentStep": 1,
+      "status": "missing_opinion",
+      "duplicateType": "none",
+      "source": "居民投诉编号第一次导入",
+      "intersectionPhoto": {
+        "hasPhoto": false
+      },
+      "residentOpinion": {
+        "hasOriginal": false,
+        "summary": "202号路口污水横流（新·缺原文·仅汇总）"
+      },
+      "createdAt": "2026-06-12T12:10:36.747Z",
+      "updatedAt": "2026-06-12T12:10:36.747Z",
+      "reportNote": "来源：居民投诉编号第一次导入 | 卡点：居民意见只剩汇总无原文，待社区书记复核 | 居民意见仅含汇总（缺原文）"
+    },
+    {
+      "id": "c9c59a49-7f46-4016-ab9f-25077ac4f924",
+      "complaintNo": "TS-2026-203",
+      "originalRowNo": 203,
+      "importTime": "2026-06-12T12:10:36.747Z",
+      "importBy": "阿宁（脚本复现）",
+      "currentStep": 1,
+      "status": "pending_photo",
+      "duplicateType": "none",
+      "source": "居民投诉编号第一次导入",
+      "intersectionPhoto": {
+        "hasPhoto": false
+      },
+      "residentOpinion": {
+        "hasOriginal": true,
+        "summary": "203号消防通道被堵（新·带原文）",
+        "originalText": "消防通道被泡沫箱和菜筐堆满，太危险了。"
+      },
+      "createdAt": "2026-06-12T12:10:36.747Z",
+      "updatedAt": "2026-06-12T12:10:36.747Z",
+      "reportNote": "来源：居民投诉编号第一次导入 | 待补看路口照片 | 居民意见原文完整"
+    },
+    {
+      "id": "d14c817f-b3ac-41a0-a13f-888d2fb64999",
+      "complaintNo": "TS-2026-203",
+      "originalRowNo": 204,
+      "importTime": "2026-06-12T12:10:36.747Z",
+      "importBy": "阿宁（脚本复现）",
+      "currentStep": 1,
+      "status": "missing_opinion",
+      "isDuplicate": true,
+      "duplicateOf": "",
+      "duplicateType": "this_batch",
+      "source": "居民投诉编号第一次导入",
+      "intersectionPhoto": {
+        "hasPhoto": false
+      },
+      "residentOpinion": {
+        "hasOriginal": false,
+        "summary": "203号消防通道被堵（本次批次内重复）"
+      },
+      "createdAt": "2026-06-12T12:10:36.747Z",
+      "updatedAt": "2026-06-12T12:10:36.747Z",
+      "reportNote": "来源：居民投诉编号第一次导入 | 本次导入重复记录 | 卡点：居民意见只剩汇总无原文，待社区书记复核 | 居民意见仅含汇总（缺原文）"
+    },
+    {
+      "id": "cdc8af14-7bf8-4cfa-9dd4-d29539987ae7",
+      "complaintNo": "TS-2026-005",
+      "originalRowNo": 205,
+      "importTime": "2026-06-12T12:10:36.747Z",
+      "importBy": "阿宁（脚本复现）",
+      "currentStep": 1,
+      "status": "pending_photo",
+      "isDuplicate": true,
+      "duplicateOf": "f43aaf60-6e5b-4238-b393-b04a02e1dca0",
+      "duplicateType": "historical",
+      "source": "居民投诉编号第一次导入",
+      "intersectionPhoto": {
+        "hasPhoto": false
+      },
+      "residentOpinion": {
+        "hasOriginal": true,
+        "summary": "TS-2026-005 污水问题（与历史重复·带原文）",
+        "originalText": "历史重复的这条有原文了，希望能处理。"
+      },
+      "createdAt": "2026-06-12T12:10:36.747Z",
+      "updatedAt": "2026-06-12T12:10:36.747Z",
+      "reportNote": "来源：居民投诉编号第一次导入 | 与历史数据重复 | 待补看路口照片 | 居民意见原文完整"
+    }
+  ],
+  "duplicates": [
+    {
+      "dto": {
+        "complaintNo": "TS-2026-005",
+        "originalRowNo": 205,
+        "residentOpinionSummary": "TS-2026-005 污水问题（与历史重复·带原文）",
+        "residentOpinionOriginal": "历史重复的这条有原文了，希望能处理。",
+        "source": "居民投诉编号第一次导入"
+      },
+      "existingId": "f43aaf60-6e5b-4238-b393-b04a02e1dca0"
+    }
+  ],
+  "breakdown": {
+    "newRecords": [
+      {
+        "id": "acac2a6f-a6d6-4628-8718-533a8af07ab8",
+        "complaintNo": "TS-2026-201",
+        "originalRowNo": 201,
+        "importTime": "2026-06-12T12:10:36.747Z",
+        "importBy": "阿宁（脚本复现）",
+        "currentStep": 1,
+        "status": "pending_photo",
+        "duplicateType": "none",
+        "source": "居民投诉编号第一次导入",
+        "intersectionPhoto": {
+          "hasPhoto": false
+        },
+        "residentOpinion": {
+          "hasOriginal": true,
+          "summary": "201号摊位占道经营（新·带原文）",
+          "originalText": "201号摊位常年占用人行道经营，多次提醒无效，我们上下班都绕路。"
+        },
+        "createdAt": "2026-06-12T12:10:36.747Z",
+        "updatedAt": "2026-06-12T12:10:36.747Z",
+        "reportNote": "来源：居民投诉编号第一次导入 | 待补看路口照片 | 居民意见原文完整"
+      },
+      {
+        "id": "f65bcd2f-b410-40e0-aab6-274aa179f0ac",
+        "complaintNo": "TS-2026-202",
+        "originalRowNo": 202,
+        "importTime": "2026-06-12T12:10:36.747Z",
+        "importBy": "阿宁（脚本复现）",
+        "currentStep": 1,
+        "status": "missing_opinion",
+        "duplicateType": "none",
+        "source": "居民投诉编号第一次导入",
+        "intersectionPhoto": {
+          "hasPhoto": false
+        },
+        "residentOpinion": {
+          "hasOriginal": false,
+          "summary": "202号路口污水横流（新·缺原文·仅汇总）"
+        },
+        "createdAt": "2026-06-12T12:10:36.747Z",
+        "updatedAt": "2026-06-12T12:10:36.747Z",
+        "reportNote": "来源：居民投诉编号第一次导入 | 卡点：居民意见只剩汇总无原文，待社区书记复核 | 居民意见仅含汇总（缺原文）"
+      },
+      {
+        "id": "c9c59a49-7f46-4016-ab9f-25077ac4f924",
+        "complaintNo": "TS-2026-203",
+        "originalRowNo": 203,
+        "importTime": "2026-06-12T12:10:36.747Z",
+        "importBy": "阿宁（脚本复现）",
+        "currentStep": 1,
+        "status": "pending_photo",
+        "duplicateType": "none",
+        "source": "居民投诉编号第一次导入",
+        "intersectionPhoto": {
+          "hasPhoto": false
+        },
+        "residentOpinion": {
+          "hasOriginal": true,
+          "summary": "203号消防通道被堵（新·带原文）",
+          "originalText": "消防通道被泡沫箱和菜筐堆满，太危险了。"
+        },
+        "createdAt": "2026-06-12T12:10:36.747Z",
+        "updatedAt": "2026-06-12T12:10:36.747Z",
+        "reportNote": "来源：居民投诉编号第一次导入 | 待补看路口照片 | 居民意见原文完整"
+      }
+    ],
+    "thisBatchDuplicates": [
+      {
+        "id": "d14c817f-b3ac-41a0-a13f-888d2fb64999",
+        "complaintNo": "TS-2026-203",
+        "originalRowNo": 204,
+        "importTime": "2026-06-12T12:10:36.747Z",
+        "importBy": "阿宁（脚本复现）",
+        "currentStep": 1,
+        "status": "missing_opinion",
+        "isDuplicate": true,
+        "duplicateOf": "",
+        "duplicateType": "this_batch",
+        "source": "居民投诉编号第一次导入",
+        "intersectionPhoto": {
+          "hasPhoto": false
+        },
+        "residentOpinion": {
+          "hasOriginal": false,
+          "summary": "203号消防通道被堵（本次批次内重复）"
+        },
+        "createdAt": "2026-06-12T12:10:36.747Z",
+        "updatedAt": "2026-06-12T12:10:36.747Z",
+        "reportNote": "来源：居民投诉编号第一次导入 | 本次导入重复记录 | 卡点：居民意见只剩汇总无原文，待社区书记复核 | 居民意见仅含汇总（缺原文）"
+      }
+    ],
+    "historicalDuplicates": [
+      {
+        "id": "cdc8af14-7bf8-4cfa-9dd4-d29539987ae7",
+        "complaintNo": "TS-2026-005",
+        "originalRowNo": 205,
+        "importTime": "2026-06-12T12:10:36.747Z",
+        "importBy": "阿宁（脚本复现）",
+        "currentStep": 1,
+        "status": "pending_photo",
+        "isDuplicate": true,
+        "duplicateOf": "f43aaf60-6e5b-4238-b393-b04a02e1dca0",
+        "duplicateType": "historical",
+        "source": "居民投诉编号第一次导入",
+        "intersectionPhoto": {
+          "hasPhoto": false
+        },
+        "residentOpinion": {
+          "hasOriginal": true,
+          "summary": "TS-2026-005 污水问题（与历史重复·带原文）",
+          "originalText": "历史重复的这条有原文了，希望能处理。"
+        },
+        "createdAt": "2026-06-12T12:10:36.747Z",
+        "updatedAt": "2026-06-12T12:10:36.747Z",
+        "reportNote": "来源：居民投诉编号第一次导入 | 与历史数据重复 | 待补看路口照片 | 居民意见原文完整"
+      }
+    ]
+  }
+}

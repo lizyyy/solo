@@ -54,6 +54,33 @@
     "reportNote": "来源：居民投诉编号第一次导入 | 待复核 | 居民意见原文完整"
   },
   {
+    "id": "5a986c28-599f-4bf0-9457-c66b8e4f6a22",
+    "complaintNo": "TS-2026-002",
+    "originalRowNo": 7,
+    "importTime": "2026-06-12T06:10:36.741Z",
+    "importBy": "阿宁",
+    "currentStep": 2,
+    "status": "pending_review",
+    "isDuplicate": true,
+    "duplicateOf": "44702830-1b69-4c97-89fa-35069d31ac61",
+    "duplicateType": "historical",
+    "source": "居民投诉编号第一次导入",
+    "intersectionPhoto": {
+      "hasPhoto": true,
+      "photoUrl": "/images/intersection-002-dup.jpg",
+      "reviewedBy": "阿宁",
+      "reviewTime": "2026-06-12T07:10:36.741Z"
+    },
+    "residentOpinion": {
+      "hasOriginal": true,
+      "summary": "早市噪音扰民，凌晨5点就开始吵闹（历史重复）",
+      "originalText": "重复导入的同一份投诉，内容同前。"
+    },
+    "createdAt": "2026-06-12T06:10:36.741Z",
+    "updatedAt": "2026-06-12T07:10:36.741Z",
+    "reportNote": "来源：居民投诉编号第一次导入 | 与历史数据重复 | 待复核 | 居民意见原文完整"
+  },
+  {
     "id": "b93c9a5f-cf6a-4592-a388-1583e5a0127f",
     "complaintNo": "TS-2026-003",
     "originalRowNo": 3,
@@ -132,55 +159,6 @@
     "reviewConclusion": "pending"
   },
   {
-    "id": "17dc19d1-7f00-414b-9c90-9269a584f8f0",
-    "complaintNo": "TS-2026-006",
-    "originalRowNo": 6,
-    "importTime": "2026-06-12T00:10:36.741Z",
-    "importBy": "阿宁",
-    "currentStep": 1,
-    "status": "pending_photo",
-    "duplicateType": "none",
-    "source": "居民投诉编号第一次导入",
-    "intersectionPhoto": {
-      "hasPhoto": false
-    },
-    "residentOpinion": {
-      "hasOriginal": true,
-      "summary": "流动摊贩太多，影响周边商户生意",
-      "originalText": "我们是菜市场周边的正规商户，现在外面流动摊贩越来越多，都不用交租金管理费，我们这些正规经营的反而没生意了，希望能管管。"
-    },
-    "createdAt": "2026-06-12T00:10:36.741Z",
-    "updatedAt": "2026-06-12T00:10:36.741Z",
-    "reportNote": "来源：居民投诉编号第一次导入 | 待补看路口照片 | 居民意见原文完整"
-  },
-  {
-    "id": "5a986c28-599f-4bf0-9457-c66b8e4f6a22",
-    "complaintNo": "TS-2026-002",
-    "originalRowNo": 7,
-    "importTime": "2026-06-12T06:10:36.741Z",
-    "importBy": "阿宁",
-    "currentStep": 2,
-    "status": "pending_review",
-    "isDuplicate": true,
-    "duplicateOf": "44702830-1b69-4c97-89fa-35069d31ac61",
-    "duplicateType": "historical",
-    "source": "居民投诉编号第一次导入",
-    "intersectionPhoto": {
-      "hasPhoto": true,
-      "photoUrl": "/images/intersection-002-dup.jpg",
-      "reviewedBy": "阿宁",
-      "reviewTime": "2026-06-12T07:10:36.741Z"
-    },
-    "residentOpinion": {
-      "hasOriginal": true,
-      "summary": "早市噪音扰民，凌晨5点就开始吵闹（历史重复）",
-      "originalText": "重复导入的同一份投诉，内容同前。"
-    },
-    "createdAt": "2026-06-12T06:10:36.741Z",
-    "updatedAt": "2026-06-12T07:10:36.741Z",
-    "reportNote": "来源：居民投诉编号第一次导入 | 与历史数据重复 | 待复核 | 居民意见原文完整"
-  },
-  {
     "id": "60e44bd2-13da-4f2f-9fb3-9dcfc98bbd4c",
     "complaintNo": "TS-2026-005",
     "originalRowNo": 8,
@@ -209,6 +187,52 @@
     "reviewTime": "2026-06-12T12:10:36.754Z",
     "reviewComment": "记录：TS-2026-005需继续跟踪原文，暂不结案",
     "reviewConclusion": "pending"
+  },
+  {
+    "id": "cdc8af14-7bf8-4cfa-9dd4-d29539987ae7",
+    "complaintNo": "TS-2026-005",
+    "originalRowNo": 205,
+    "importTime": "2026-06-12T12:10:36.747Z",
+    "importBy": "阿宁（脚本复现）",
+    "currentStep": 1,
+    "status": "pending_photo",
+    "isDuplicate": true,
+    "duplicateOf": "f43aaf60-6e5b-4238-b393-b04a02e1dca0",
+    "duplicateType": "historical",
+    "source": "居民投诉编号第一次导入",
+    "intersectionPhoto": {
+      "hasPhoto": false
+    },
+    "residentOpinion": {
+      "hasOriginal": true,
+      "summary": "TS-2026-005 污水问题（与历史重复·带原文）",
+      "originalText": "历史重复的这条有原文了，希望能处理。"
+    },
+    "createdAt": "2026-06-12T12:10:36.747Z",
+    "updatedAt": "2026-06-12T12:10:36.747Z",
+    "reportNote": "来源：居民投诉编号第一次导入 | 与历史数据重复 | 待补看路口照片 | 居民意见原文完整"
+  },
+  {
+    "id": "17dc19d1-7f00-414b-9c90-9269a584f8f0",
+    "complaintNo": "TS-2026-006",
+    "originalRowNo": 6,
+    "importTime": "2026-06-12T00:10:36.741Z",
+    "importBy": "阿宁",
+    "currentStep": 1,
+    "status": "pending_photo",
+    "duplicateType": "none",
+    "source": "居民投诉编号第一次导入",
+    "intersectionPhoto": {
+      "hasPhoto": false
+    },
+    "residentOpinion": {
+      "hasOriginal": true,
+      "summary": "流动摊贩太多，影响周边商户生意",
+      "originalText": "我们是菜市场周边的正规商户，现在外面流动摊贩越来越多，都不用交租金管理费，我们这些正规经营的反而没生意了，希望能管管。"
+    },
+    "createdAt": "2026-06-12T00:10:36.741Z",
+    "updatedAt": "2026-06-12T00:10:36.741Z",
+    "reportNote": "来源：居民投诉编号第一次导入 | 待补看路口照片 | 居民意见原文完整"
   },
   {
     "id": "acac2a6f-a6d6-4628-8718-533a8af07ab8",
@@ -311,29 +335,5 @@
     "reviewTime": "2026-06-12T12:10:36.755Z",
     "reviewComment": "记录：TS-2026-203需继续跟踪原文，暂不结案",
     "reviewConclusion": "pending"
-  },
-  {
-    "id": "cdc8af14-7bf8-4cfa-9dd4-d29539987ae7",
-    "complaintNo": "TS-2026-005",
-    "originalRowNo": 205,
-    "importTime": "2026-06-12T12:10:36.747Z",
-    "importBy": "阿宁（脚本复现）",
-    "currentStep": 1,
-    "status": "pending_photo",
-    "isDuplicate": true,
-    "duplicateOf": "f43aaf60-6e5b-4238-b393-b04a02e1dca0",
-    "duplicateType": "historical",
-    "source": "居民投诉编号第一次导入",
-    "intersectionPhoto": {
-      "hasPhoto": false
-    },
-    "residentOpinion": {
-      "hasOriginal": true,
-      "summary": "TS-2026-005 污水问题（与历史重复·带原文）",
-      "originalText": "历史重复的这条有原文了，希望能处理。"
-    },
-    "createdAt": "2026-06-12T12:10:36.747Z",
-    "updatedAt": "2026-06-12T12:10:36.747Z",
-    "reportNote": "来源：居民投诉编号第一次导入 | 与历史数据重复 | 待补看路口照片 | 居民意见原文完整"
   }
 ]
