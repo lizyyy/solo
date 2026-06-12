@@ -1,8 +1,22 @@
 import { useState, useEffect } from 'react';
-import { Play, CheckCircle, XCircle, AlertCircle, Database, UserCheck, ClipboardList, ChevronDown, ChevronRight } from 'lucide-react';
+import { Play, AlertCircle, Database, UserCheck, ClipboardList, ChevronDown, ChevronRight } from 'lucide-react';
 import { mergeAllData, getMatchResults } from '@/utils/mergeData';
-import { MatchResult, MatchConfidence } from '@/types';
+import { MatchResult, MatchConfidence, MatchMethod } from '@/types';
 import { getReviewStatusLabel, getReviewStatusColor } from '@/utils/export';
+
+const matchMethodLabels: Record<MatchMethod, string> = {
+  lamp_id: '编号匹配',
+  address: '地址兜底',
+  coordinate: '坐标匹配',
+  unmatched: '未匹配'
+};
+
+const matchMethodColors: Record<MatchMethod, string> = {
+  lamp_id: 'bg-blue-100 text-blue-800',
+  address: 'bg-teal-100 text-teal-800',
+  coordinate: 'bg-indigo-100 text-indigo-800',
+  unmatched: 'bg-gray-100 text-gray-600'
+};
 
 export default function Merge() {
   const [loading, setLoading] = useState(false);
@@ -115,6 +129,9 @@ export default function Merge() {
                         <span className="font-medium text-gray-800">{result.mergedRecord.lamp_id}</span>
                         <span className={`px-2 py-0.5 rounded text-xs font-medium ${confidenceColors[result.mergedRecord.match_confidence]}`}>
                           {confidenceLabels[result.mergedRecord.match_confidence]} {result.mergedRecord.match_score.toFixed(0)}%
+                        </span>
+                        <span className={`px-2 py-0.5 rounded text-xs font-medium ${matchMethodColors[result.mergedRecord.match_method]}`}>
+                          {matchMethodLabels[result.mergedRecord.match_method]}
                         </span>
                         <span className={`px-2 py-0.5 rounded text-xs font-medium ${getReviewStatusColor(result.mergedRecord.review_status)}`}>
                           {getReviewStatusLabel(result.mergedRecord.review_status)}

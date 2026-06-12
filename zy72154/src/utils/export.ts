@@ -1,5 +1,5 @@
 import * as XLSX from 'xlsx';
-import { MatchResult, ReviewStatus } from '@/types';
+import { MatchResult, ReviewStatus, Anomaly } from '@/types';
 import { getAnomalyTypeLabel, getSeverityLabel } from './anomaly';
 
 export interface ExportOptions {
@@ -19,14 +19,18 @@ export function exportToExcel(
   }
 
   const data = filteredResults.map(result => {
-    const { mergedRecord, gisPoint, feedback, inspection, anomalies } = result;
+    const { mergedRecord, gisPoint, feedback, inspection, anomalies, auditLogs } = result;
     
+    const capacityAnomalies = anomalies.filter(a => a.type === 'capacity_overload');
+    const timeAnomalies = anomalies.filter(a => a.type === 'time_conflict');
+
     const row: Record<string, any> = {
       '路灯编号': mergedRecord.lamp_id,
       '地址': mergedRecord.address,
       '坐标': mergedRecord.longitude && mergedRecord.latitude 
         ? `${mergedRecord.longitude.toFixed(6)}, ${mergedRecord.latitude.toFixed(6)}`
         : '',
+      '匹配方式': getMatchMethodLabel(mergedRecord.match_method),
       '匹配度': `${mergedRecord.match_score.toFixed(0)}%`,
       '复核状态': getReviewStatusLabel(mergedRecord.review_status),
       '复核备注': mergedRecord.review_note || '',
@@ -40,10 +44,28 @@ export function exportToExcel(
       '巡检备注': inspection?.manual_note || '',
     };
 
-    if (options.includeAnomalies && anomalies.length > 0) {
-      row['异常数量'] = anomalies.length;
-      row['异常类型'] = anomalies.map(a => getAnomalyTypeLabel(a.type)).join('; ');
-      row['异常说明'] = anomalies.map(a => a.human_readable).join('\n\n');
+    if (options.includeAnomalies) {
+      if (capacityAnomalies.length > 0) {
+        row['容量超限-来源'] = 'GIS点位数据';
+        row['容量超限-说明'] = capacityAnomalies.map(a => a.human_readable).join('\n');
+        row['容量超限-处理状态'] = getReviewStatusLabel(mergedRecord.review_status);
+        row['容量超限-结论'] = mergedRecord.review_note || '待复核';
+      }
+      if (timeAnomalies.length > 0) {
+        row['时间段冲突-来源'] = 'GIS点位数据';
+        row['时间段冲突-说明'] = timeAnomalies.map(a => a.human_readable).join('\n');
+        row['时间段冲突-处理状态'] = getReviewStatusLabel(mergedRecord.review_status);
+        row['时间段冲突-结论'] = mergedRecord.review_note || '待复核';
+      }
+      if (anomalies.length > 0) {
+        row['异常总数'] = anomalies.length;
+        row['异常类型'] = anomalies.map(a => getAnomalyTypeLabel(a.type)).join('; ');
+        row['异常说明'] = anomalies.map(a => a.human_readable).join('\n\n');
+      }
+    }
+
+    if (auditLogs && auditLogs.length > 0) {
+      row['变更记录'] = auditLogs.map(l => l.detail).join('\n');
     }
 
     return row;
@@ -102,6 +124,47 @@ export function generateReport(matchResults: MatchResult[]): string {
     });
   });
 
+  const capacityOrTimeRecords = matchResults.filter(r => 
+    r.anomalies.some(a => a.type === 'capacity_overload' || a.type === 'time_conflict')
+  );
+
+  let capacityOrTimeSection = '';
+  if (capacityOrTimeRecords.length > 0) {
+    capacityOrTimeSection = `
+三、容量超限/时间段冲突明细
+${capacityOrTimeRecords.map(r => {
+  const capAnomalies = r.anomalies.filter(a => a.type === 'capacity_overload');
+  const timeAnomalies = r.anomalies.filter(a => a.type === 'time_conflict');
+  const methodLabel = getMatchMethodLabel(r.mergedRecord.match_method);
+  let lines = `  【${r.mergedRecord.lamp_id}】${r.mergedRecord.address}（匹配方式：${methodLabel}，匹配度：${r.mergedRecord.match_score.toFixed(0)}%）`;
+  capAnomalies.forEach(a => {
+    lines += `\n    容量超限 - 来源：GIS点位数据`;
+    lines += `\n    说明：${a.human_readable}`;
+    lines += `\n    处理状态：${getReviewStatusLabel(r.mergedRecord.review_status)}`;
+    lines += `\n    结论：${r.mergedRecord.review_note || '待复核'}`;
+  });
+  timeAnomalies.forEach(a => {
+    lines += `\n    时间段冲突 - 来源：GIS点位数据`;
+    lines += `\n    说明：${a.human_readable}`;
+    lines += `\n    处理状态：${getReviewStatusLabel(r.mergedRecord.review_status)}`;
+    lines += `\n    结论：${r.mergedRecord.review_note || '待复核'}`;
+  });
+  return lines;
+}).join('\n\n')}
+`;
+  }
+
+  const auditRecords = matchResults.filter(r => r.auditLogs && r.auditLogs.length > 0);
+  let auditSection = '';
+  if (auditRecords.length > 0) {
+    auditSection = `
+四、复核变更记录
+${auditRecords.map(r => {
+  return `  【${r.mergedRecord.lamp_id}】${r.mergedRecord.address}\n${r.auditLogs.map(l => `    - ${l.detail}（${new Date(l.created_at).toLocaleString('zh-CN')}）`).join('\n')}`;
+}).join('\n\n')}
+`;
+  }
+
   const report = `
 城市照明能耗巡检报告
 生成时间: ${new Date().toLocaleString('zh-CN')}
@@ -115,15 +178,27 @@ export function generateReport(matchResults: MatchResult[]): string {
 
 二、异常统计
 ${Object.entries(anomalyTypeCounts).map(([type, count]) => `- ${type}: ${count}条`).join('\n')}
-
-三、重点关注
+${capacityOrTimeSection}${auditSection}
+五、重点关注
 ${matchResults.filter(r => r.anomalies.some(a => a.severity === 'high')).map(r => 
   `  - ${r.mergedRecord.lamp_id} ${r.mergedRecord.address}: 
-${r.anomalies.filter(a => a.severity === 'high').map(a => '    ' + a.human_readable).join('\n')}`
+${r.anomalies.filter(a => a.severity === 'high').map(a => '    ' + a.human_readable).join('\n')}
+    处理状态：${getReviewStatusLabel(r.mergedRecord.review_status)}
+    结论：${r.mergedRecord.review_note || '待复核'}`
 ).join('\n')}
 `;
 
   return report;
+}
+
+function getMatchMethodLabel(method: string): string {
+  const labels: Record<string, string> = {
+    lamp_id: '编号匹配',
+    address: '地址兜底匹配',
+    coordinate: '坐标匹配',
+    unmatched: '未匹配'
+  };
+  return labels[method] || method;
 }
 
 export function getReviewStatusLabel(status: ReviewStatus): string {

@@ -185,6 +185,20 @@ export default function Review() {
                   </div>
                 )}
 
+                {selectedRecord.auditLogs && selectedRecord.auditLogs.length > 0 && (
+                  <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                    <p className="text-xs font-medium text-gray-700 mb-2">📋 变更记录</p>
+                    <div className="space-y-1">
+                      {selectedRecord.auditLogs.map(log => (
+                        <div key={log.id} className="text-xs text-gray-600 flex items-start space-x-2">
+                          <span className="text-gray-400 flex-shrink-0">{new Date(log.created_at).toLocaleString('zh-CN')}</span>
+                          <span>{log.detail}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {selectedRecord.anomalies.length > 0 && (
                   <div className="p-3 bg-orange-50 rounded-lg border border-orange-100">
                     <p className="text-xs font-medium text-orange-700 mb-2">异常检测 ({selectedRecord.anomalies.length})</p>

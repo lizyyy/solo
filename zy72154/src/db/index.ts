@@ -1,5 +1,5 @@
 import Dexie, { Table } from 'dexie';
-import { GISPoint, ResidentFeedback, InspectionRecord, MergedRecord, Anomaly, ImportFile } from '@/types';
+import { GISPoint, ResidentFeedback, InspectionRecord, MergedRecord, Anomaly, ImportFile, AuditLog } from '@/types';
 
 export class InspectionDatabase extends Dexie {
   gisPoints!: Table<GISPoint>;
@@ -8,17 +8,19 @@ export class InspectionDatabase extends Dexie {
   mergedRecords!: Table<MergedRecord>;
   anomalies!: Table<Anomaly>;
   importFiles!: Table<ImportFile>;
+  auditLogs!: Table<AuditLog>;
 
   constructor() {
     super('CityLightInspectionDB');
     
-    this.version(1).stores({
+    this.version(2).stores({
       gisPoints: 'id, lamp_id, address, street, district',
       residentFeedbacks: 'id, feedback_id, lamp_id, address',
       inspectionRecords: 'id, record_id, lamp_id, address',
       mergedRecords: 'id, lamp_id, review_status, match_confidence, merged_at',
       anomalies: 'id, merged_record_id, type, severity',
-      importFiles: 'id, type, uploaded_at'
+      importFiles: 'id, type, uploaded_at',
+      auditLogs: 'id, record_id, action, created_at'
     });
   }
 
@@ -29,7 +31,8 @@ export class InspectionDatabase extends Dexie {
       this.inspectionRecords.clear(),
       this.mergedRecords.clear(),
       this.anomalies.clear(),
-      this.importFiles.clear()
+      this.importFiles.clear(),
+      this.auditLogs.clear()
     ]);
   }
 }

@@ -55,6 +55,8 @@ export interface InspectionRecord {
   created_at: Date;
 }
 
+export type MatchMethod = 'lamp_id' | 'address' | 'coordinate' | 'unmatched';
+
 export interface MergedRecord {
   id: string;
   lamp_id: string;
@@ -66,10 +68,22 @@ export interface MergedRecord {
   latitude?: number;
   match_confidence: MatchConfidence;
   match_score: number;
+  match_method: MatchMethod;
   review_status: ReviewStatus;
   review_note: string;
   merged_at: Date;
   reviewed_at?: Date;
+}
+
+export interface AuditLog {
+  id: string;
+  record_id: string;
+  action: string;
+  old_value: string;
+  new_value: string;
+  note: string;
+  detail: string;
+  created_at: Date;
 }
 
 export interface Anomaly {
@@ -97,4 +111,5 @@ export interface MatchResult {
   feedback?: ResidentFeedback;
   inspection?: InspectionRecord;
   anomalies: Anomaly[];
+  auditLogs: AuditLog[];
 }
