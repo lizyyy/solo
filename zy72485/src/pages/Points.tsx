@@ -177,22 +177,46 @@ export default function Points() {
                   )}
                 </div>
               </div>
-              <div className="flex items-start gap-2 ml-4">
-                {!point.detourSynced && (
+              <div className="flex items-start gap-2 ml-4 flex-col">
+                <div className="flex items-center gap-2">
+                  {!point.detourSynced && point.status !== 'pending_review' && (
+                    <button
+                      onClick={() => updatePointDetourSync(point.id, true)}
+                      className="flex items-center gap-1 px-3 py-1.5 text-xs bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors"
+                      title="不会直接变为正常，先提交居民代表现场复核"
+                    >
+                      <RefreshCw className="w-3.5 h-3.5" />
+                      标记已同步（待居民代表复核）
+                    </button>
+                  )}
+                  {point.status === 'pending_review' && (
+                    <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">等待居民代表复核中</span>
+                  )}
+                  {point.detourSynced && (
+                    <span className="text-xs text-emerald-600 bg-emerald-50 px-2 py-1 rounded flex items-center gap-1">
+                      <CheckCircle className="w-3 h-3" />
+                      改道已同步
+                    </span>
+                  )}
                   <button
-                    onClick={() => updatePointDetourSync(point.id, true)}
-                    className="flex items-center gap-1 px-3 py-1.5 text-xs bg-emerald-50 text-emerald-700 rounded-lg hover:bg-emerald-100 transition-colors"
+                    onClick={() => setSelectedPoint(point)}
+                    className="p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-600"
                   >
-                    <RefreshCw className="w-3.5 h-3.5" />
-                    标记已同步
+                    <Eye className="w-4 h-4" />
                   </button>
+                </div>
+                {!point.detourSynced && point.status === 'exception' && (
+                  <p className="text-[11px] text-rose-600 mt-1 flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3" />
+                    施工临时改道未同步地图，点位未自动归正常
+                  </p>
                 )}
-                <button
-                  onClick={() => setSelectedPoint(point)}
-                  className="p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-600"
-                >
-                  <Eye className="w-4 h-4" />
-                </button>
+                {point.status === 'pending_review' && (
+                  <p className="text-[11px] text-blue-600 mt-1 flex items-center gap-1">
+                    <Clock className="w-3 h-3" />
+                    居民代表复核中，复核通过前点位不会自动归正常
+                  </p>
+                )}
               </div>
             </div>
           </motion.div>

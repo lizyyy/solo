@@ -12,10 +12,18 @@ import {
   FileText,
   Calendar,
   MapPin,
+  Sparkles,
+  Clock,
+  Copy,
+  Edit3,
+  ChevronDown,
+  ChevronUp,
+  User,
+  Link2,
 } from 'lucide-react';
 import { useAppStore } from '../store';
 import { labelMap } from '../data/mockData';
-import type { ConstructionNotice } from '../types';
+import type { ConstructionNotice, ImportItemDetail } from '../types';
 
 export default function Notices() {
   const { notices, importNotices, updateNotice, getNoticeVersions, noticeVersions, importResult } = useAppStore();
@@ -33,13 +41,18 @@ export default function Notices() {
     n.location.includes(searchTerm)
   );
 
+  const [expandedDetail, setExpandedDetail] = useState<number | null>(null);
+
   const handleSimulateImport = () => {
     const testData = [
-      { title: '滨江步道翻新工程', noticeNo: 'SG-2024-006', location: '滨江步道 1-5 号', constructionType: 'road' as const, startDate: '2024-07-01', endDate: '2024-08-30', status: 'draft' as const },
+      { title: '滨江步道翻新工程', noticeNo: 'SG-2024-006', location: '滨江步道 1-5 号', constructionType: 'road' as const, startDate: '2024-07-01', endDate: '2024-08-30', status: 'draft' as const, description: '步道铺装翻新，增设夜间照明', remark: '与景观工程同步推进' },
       { title: '滨江东路人行道改造工程', noticeNo: 'SG-2024-001', location: '滨江东路 1-3 号段', constructionType: 'road' as const, startDate: '2024-06-10', endDate: '2024-07-20', status: 'active' as const },
+      { title: '滨江路污水管道改造', noticeNo: 'SG-2024-003', location: '滨江路 5-8 号段', constructionType: 'pipeline' as const, startDate: '2024-06-20', endDate: '2024-08-10', status: 'draft' as const, remark: '改道方案已确认：滨江支路绕行，地图已标注' },
+      { title: '滨水公园二期坡道', noticeNo: 'SG-2024-007', location: '滨水公园北入口', constructionType: 'ramp' as const, startDate: '2024-07-15', endDate: '2024-07-31', status: 'draft' as const, description: '二期新建北入口坡道，坡度1:12' },
       { title: '滨水公园二期坡道', noticeNo: 'SG-2024-007', location: '滨水公园北入口', constructionType: 'ramp' as const, startDate: '2024-07-15', endDate: '2024-07-31', status: 'draft' as const },
     ];
     importNotices(testData);
+    setExpandedDetail(null);
   };
 
   const handleViewDetail = (notice: ConstructionNotice) => {
@@ -94,28 +107,191 @@ export default function Notices() {
         </div>
       </div>
 
-      {importResult && (importResult.duplicate > 0 || importResult.success > 0) && (
+      {importResult && importResult.details.length > 0 && (
         <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-          className={`p-4 rounded-xl ${importResult.duplicate > 0 ? 'bg-amber-50 border border-amber-200' : 'bg-emerald-50 border border-emerald-200'}`}
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-2xl border overflow-hidden shadow-sm"
+          style={{ borderColor: importResult.duplicate > 0 ? '#fcd34d' : '#6ee7b7', background: importResult.duplicate > 0 ? '#fffbeb' : '#ecfdf5' }}
         >
-          <div className="flex items-center gap-3">
-            {importResult.duplicate > 0 ? (
-              <AlertCircle className="w-5 h-5 text-amber-600" />
-            ) : (
-              <Check className="w-5 h-5 text-emerald-600" />
-            )}
-            <div>
-              <p className={`font-medium ${importResult.duplicate > 0 ? 'text-amber-800' : 'text-emerald-800'}`}>
-                导入完成：成功 {importResult.success} 条，重复 {importResult.duplicate} 条
-              </p>
-              {importResult.duplicateItems.length > 0 && (
-                <p className="text-sm text-amber-700 mt-1">
-                  重复条目已自动跳过：{importResult.duplicateItems.join('、')}
-                </p>
+          <div className="p-5 border-b" style={{ borderColor: importResult.duplicate > 0 ? '#fde68a' : '#a7f3d0' }}>
+            <div className="flex items-start justify-between">
+              <div className="flex items-start gap-3">
+                {importResult.duplicate > 0 || importResult.remarkUpdated ? (
+                  <AlertCircle className="w-6 h-6 text-amber-600 mt-0.5 flex-shrink-0" />
+                ) : (
+                  <Check className="w-6 h-6 text-emerald-600 mt-0.5 flex-shrink-0" />
+                )}
+                <div>
+                  <p className="font-semibold text-lg text-slate-800">导入结果报告</p>
+                  <p className="text-sm text-slate-600 mt-1">
+                    批次号：<span className="font-mono text-xs bg-white/60 px-2 py-0.5 rounded">{importResult.sessionId}</span>
+                    <span className="mx-2 text-slate-400">|</span>
+                    发起时间：{new Date(importResult.importedAt).toLocaleString('zh-CN')}
+                    <span className="mx-2 text-slate-400">|</span>
+                    操作人：<span className="font-medium">{importResult.operatorName}</span>
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="text-center px-4 py-2 rounded-xl bg-white/70">
+                  <div className="flex items-center gap-1 text-emerald-600">
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span className="text-2xl font-bold">{importResult.success}</span>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-0.5">新增记录</p>
+                </div>
+                <div className="text-center px-4 py-2 rounded-xl bg-white/70">
+                  <div className="flex items-center gap-1 text-amber-600">
+                    <Copy className="w-3.5 h-3.5" />
+                    <span className="text-2xl font-bold">{importResult.duplicate}</span>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-0.5">重复跳过</p>
+                </div>
+                <div className="text-center px-4 py-2 rounded-xl bg-white/70">
+                  <div className="flex items-center gap-1 text-blue-600">
+                    <Edit3 className="w-3.5 h-3.5" />
+                    <span className="text-2xl font-bold">{importResult.remarkUpdated || 0}</span>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-0.5">备注更新</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4 flex flex-wrap gap-2">
+              {importResult.summary.newRecords.length > 0 && (
+                <span className="tag-emerald text-xs">新导入：{importResult.summary.newRecords.join('、')}</span>
+              )}
+              {importResult.summary.historicalDuplicates.length > 0 && (
+                <span className="tag-amber text-xs">历史重复：{importResult.summary.historicalDuplicates.join('、')}</span>
+              )}
+              {importResult.summary.sessionDuplicates.length > 0 && (
+                <span className="tag-rose text-xs">本次重复：{importResult.summary.sessionDuplicates.join('、')}</span>
+              )}
+              {importResult.summary.remarkUpdated && importResult.summary.remarkUpdated.length > 0 && (
+                <span className="tag-blue text-xs">备注变更：{importResult.summary.remarkUpdated.join('、')}</span>
               )}
             </div>
+          </div>
+
+          <div className="p-5 bg-white space-y-3">
+            <p className="text-sm font-medium text-slate-700 flex items-center gap-2">
+              <FileText className="w-4 h-4" />
+              逐条明细（点击展开查看结论和影响）
+            </p>
+            {importResult.details.map((d: ImportItemDetail, idx: number) => (
+              <div key={idx} className="border border-slate-200 rounded-xl overflow-hidden">
+                <button
+                  onClick={() => setExpandedDetail(expandedDetail === idx ? null : idx)}
+                  className="w-full p-4 flex items-center justify-between gap-4 hover:bg-slate-50 transition-colors text-left"
+                >
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                      d.status === 'new' ? 'bg-emerald-100 text-emerald-600'
+                      : d.status === 'remark_updated' ? 'bg-blue-100 text-blue-600'
+                      : d.duplicateType === 'current_session' ? 'bg-rose-100 text-rose-600'
+                      : 'bg-amber-100 text-amber-600'
+                    }`}>
+                      {d.status === 'new' ? <Sparkles className="w-4 h-4" />
+                      : d.status === 'remark_updated' ? <Edit3 className="w-4 h-4" />
+                      : d.duplicateType === 'current_session' ? <Copy className="w-4 h-4" />
+                      : <Clock className="w-4 h-4" />}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium text-slate-800 truncate">{d.title}</p>
+                        <span className={`flex-shrink-0 text-xs px-2 py-0.5 rounded ${
+                          d.status === 'new' ? 'bg-emerald-50 text-emerald-700'
+                          : d.status === 'remark_updated' ? 'bg-blue-50 text-blue-700'
+                          : d.duplicateType === 'current_session' ? 'bg-rose-50 text-rose-700'
+                          : 'bg-amber-50 text-amber-700'
+                        }`}>
+                          {d.status === 'new' ? '新记录'
+                          : d.status === 'remark_updated' ? '历史重复+备注变更'
+                          : d.duplicateType === 'current_session' ? '本次批次重复'
+                          : '历史重复跳过'}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-500 mt-1 truncate">
+                        编号：{d.noticeNo} · 位置：{d.location}
+                        {d.affectedPointName && <> · 关联点位：<span className="text-primary">{d.affectedPointName}</span></>}
+                      </p>
+                    </div>
+                  </div>
+                  {expandedDetail === idx ? <ChevronUp className="w-4 h-4 text-slate-400 flex-shrink-0" /> : <ChevronDown className="w-4 h-4 text-slate-400 flex-shrink-0" />}
+                </button>
+
+                <AnimatePresence>
+                  {expandedDetail === idx && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="p-4 pt-0 space-y-3 border-t border-slate-100 bg-slate-50/50">
+                        {d.duplicateWith && (
+                          <div className="p-3 bg-white rounded-lg border border-slate-200">
+                            <p className="text-xs font-medium text-slate-500 mb-2 flex items-center gap-1">
+                              <Clock className="w-3.5 h-3.5" />
+                              重复来源信息
+                            </p>
+                            <div className="text-sm text-slate-700 space-y-1">
+                              <p>已有记录 ID：<span className="font-mono text-xs bg-slate-100 px-1.5 py-0.5 rounded">{d.duplicateWith.id}</span></p>
+                              <p>首次导入时间：{new Date(d.duplicateWith.existedAt).toLocaleString('zh-CN')}</p>
+                              <p>原有备注：{d.duplicateWith.remark}</p>
+                            </div>
+                          </div>
+                        )}
+
+                        {d.remarkChanged && (
+                          <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                            <p className="text-xs font-medium text-blue-700 mb-2 flex items-center gap-1">
+                              <Edit3 className="w-3.5 h-3.5" />
+                              备注变更对比 · 操作人：{d.remarkChanged.operator}
+                            </p>
+                            <div className="grid grid-cols-2 gap-3 text-sm">
+                              <div className="p-3 bg-white rounded-lg border border-rose-200">
+                                <p className="text-xs text-rose-500 mb-1 font-medium">改前</p>
+                                <p className="text-rose-700 line-through">{d.remarkChanged.before}</p>
+                              </div>
+                              <div className="p-3 bg-white rounded-lg border border-emerald-200">
+                                <p className="text-xs text-emerald-600 mb-1 font-medium">改后</p>
+                                <p className="text-emerald-700 font-medium">{d.remarkChanged.after}</p>
+                              </div>
+                            </div>
+                            <p className="text-xs text-blue-600 mt-2">变更原因：{d.remarkChanged.reason}</p>
+                          </div>
+                        )}
+
+                        <div className="p-4 bg-primary/5 rounded-xl border border-primary/20">
+                          <p className="text-xs font-medium text-primary/80 mb-2 flex items-center gap-1">
+                            <Check className="w-3.5 h-3.5" />
+                            处理结论
+                          </p>
+                          <p className="text-sm text-slate-700 leading-relaxed">{d.conclusion}</p>
+                        </div>
+
+                        {d.affectedPointName && (
+                          <div className="flex items-center gap-2 text-xs text-slate-500">
+                            <Link2 className="w-3.5 h-3.5" />
+                            <span>影响点位：<span className="font-medium text-primary">{d.affectedPointName}</span>（{d.affectedPointId}）</span>
+                          </div>
+                        )}
+
+                        <div className="flex items-center gap-3 text-xs text-slate-500 pt-2 border-t border-slate-200">
+                          <span className="flex items-center gap-1">
+                            <User className="w-3 h-3" />
+                            处理人：{importResult.operatorName}
+                          </span>
+                          <span>来源批次：{importResult.sessionId}</span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ))}
           </div>
         </motion.div>
       )}

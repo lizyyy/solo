@@ -116,9 +116,46 @@ export interface User {
   avatar?: string;
 }
 
+export type DuplicateType = 'current_session' | 'historical';
+export type ImportStatus = 'new' | 'duplicate_skipped' | 'remark_updated' | 'failed';
+
+export interface ImportItemDetail {
+  title: string;
+  noticeNo: string;
+  location: string;
+  importHash: string;
+  status: ImportStatus;
+  duplicateType?: DuplicateType;
+  duplicateWith?: {
+    id: string;
+    existedAt: string;
+    remark?: string;
+  };
+  remarkChanged?: {
+    before: string;
+    after: string;
+    operator: string;
+    reason: string;
+  };
+  conclusion: string;
+  affectedPointId?: string;
+  affectedPointName?: string;
+}
+
 export interface ImportResult {
   success: number;
   duplicate: number;
+  remarkUpdated: number;
   failed: number;
-  duplicateItems: string[];
+  sessionId: string;
+  importedAt: string;
+  operatorId: string;
+  operatorName: string;
+  details: ImportItemDetail[];
+  summary: {
+    newRecords: string[];
+    historicalDuplicates: string[];
+    sessionDuplicates: string[];
+    remarkUpdated: string[];
+  };
 }
