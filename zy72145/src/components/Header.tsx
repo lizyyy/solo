@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTrackStore } from '../store/useTrackStore';
 import { exportToExcel } from '../utils/excelParser';
 import { generateSampleRecords } from '../data/sampleData';
+import { TrackRecord, STATUS_LABELS } from '../types';
 import { Music, Upload, Download, Database, Trash2, FileSpreadsheet } from 'lucide-react';
 import FileUpload from './FileUpload';
 
@@ -9,6 +10,7 @@ export default function Header() {
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const records = useTrackStore((state) => state.records);
+  const filters = useTrackStore((state) => state.filters);
   const addRecords = useTrackStore((state) => state.addRecords);
   const clearAll = useTrackStore((state) => state.clearAll);
   const getFilteredRecords = useTrackStore((state) => state.getFilteredRecords);
@@ -33,10 +35,31 @@ export default function Header() {
       showToast('没有可导出的数据', 'error');
       return;
     }
-    const today = new Date().toISOString().split('T')[0];
-    const filename = `音乐教师课时核销_${today}.xlsx`;
-    exportToExcel(filteredRecords, filename);
-    showToast(`已导出 ${filteredRecords.length} 条记录`);
+
+    const sourceFiles = Array.from(new Set(filteredRecords.map((r) => r.sourceFile).filter(Boolean)));
+    const exportedAt = Date.now();
+    const today = new Date(exportedAt).toISOString().split('T')[0];
+    const timestamp = new Date(exportedAt)
+      .toTimeString()
+      .slice(0, 5)
+      .replace(':', '');
+    const filename = `音乐教师课时核销_${today}_${timestamp}.xlsx`;
+
+    const filterStatusText = STATUS_LABELS[filters.status];
+    exportToExcel(filteredRecords, filename, {
+      filters,
+      exportedAt,
+      totalRecordsCount: records.length,
+      filteredRecordsCount: filteredRecords.length,
+      sourceFiles,
+    });
+
+    const details: string[] = [];
+    details.push(`共 ${filteredRecords.length} 条`);
+    details.push(`状态: ${filterStatusText}`);
+    if (filters.teacherName) details.push(`教师: ${filters.teacherName}`);
+    if (filters.trackName) details.push(`曲目: ${filters.trackName}`);
+    showToast(`已导出：${details.join('，')}`, 'success');
   };
 
   const handleClear = () => {
@@ -47,7 +70,7 @@ export default function Header() {
     }
   };
 
-  const handleUploadSuccess = (records: any[]) => {
+  const handleUploadSuccess = (records: TrackRecord[]) => {
     setShowUploadModal(false);
     showToast(`成功导入 ${records.length} 条记录`);
   };

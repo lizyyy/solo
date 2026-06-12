@@ -4,7 +4,7 @@ import FilterPanel from '../components/FilterPanel';
 import TrackTable from '../components/TrackTable';
 import ImportModal from '../components/ImportModal';
 import { useTrackStore } from '../store/useTrackStore';
-import { Info, Database, FileText, Clock, Shield } from 'lucide-react';
+import { Info, Database, Clock, Shield } from 'lucide-react';
 
 export default function TrackVerificationPage() {
   const records = useTrackStore((state) => state.records);
@@ -35,7 +35,7 @@ export default function TrackVerificationPage() {
                       <span>智能识别中英文表头</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm text-slate-600">
-                      <FileText size={16} className="text-amber-500" />
+                      <Clock size={16} className="text-amber-500" />
                       <span>备注历史可追溯</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm text-slate-600">

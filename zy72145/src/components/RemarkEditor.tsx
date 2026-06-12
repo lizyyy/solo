@@ -5,10 +5,9 @@ import { Edit3, Save, X, History, Clock, Check } from 'lucide-react';
 
 interface RemarkEditorProps {
   record: TrackRecord;
-  onClose?: () => void;
 }
 
-export default function RemarkEditor({ record, onClose }: RemarkEditorProps) {
+export default function RemarkEditor({ record }: RemarkEditorProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [newRemark, setNewRemark] = useState(record.remark);
   const [showHistory, setShowHistory] = useState(false);

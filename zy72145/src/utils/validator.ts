@@ -6,9 +6,12 @@ function normalizeText(str: string): string {
   return str
     .trim()
     .toLowerCase()
-    .replace(/[\s\-_/\\.，。、；：""''（）()【】\[\]《》<>〈〉「」『』]/g, '')
-    .replace(/[ａ-ｚＡ-Ｚ０-９]/g, function(s) {
-      return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
+    .replace(
+      /[\s\-_/\\.，。、；：""''（）()【】[\]《》<>〈〉「」『』]/g,
+      ''
+    )
+    .replace(/[ａ-ｚＡ-Ｚ０-９]/g, function (s) {
+      return String.fromCharCode(s.charCodeAt(0) - 0xfee0);
     });
 }
 

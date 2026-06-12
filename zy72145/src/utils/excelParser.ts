@@ -1,8 +1,19 @@
 import * as XLSX from 'xlsx';
-import { TrackRecord } from '../types';
+import { TrackRecord, FilterState, STATUS_LABELS } from '../types';
 import { v4 as uuidv4 } from '../utils/uuid';
 
-const FIELD_KEYWORDS: Record<keyof Omit<TrackRecord, 'id' | 'importedAt' | 'lastModifiedAt' | 'validationStatus' | 'validationErrors' | 'modifyHistory' | 'rawData' | 'duplicateGroupId'>, string[]> = {
+type MappedField =
+  | 'teacherName'
+  | 'trackName'
+  | 'authStart'
+  | 'authEnd'
+  | 'tcIn'
+  | 'tcOut'
+  | 'duration'
+  | 'remark'
+  | 'sourceFile';
+
+const FIELD_KEYWORDS: Record<MappedField, string[]> = {
   teacherName: ['教师姓名', 'teacher', '老师', '姓名', 'instructor'],
   trackName: ['曲目名称', '曲目', 'title', 'song', 'track', '歌曲名称', '作品'],
   authStart: ['授权开始日期', 'start date', '开始时间', 'start', '开始日期', '生效日期'],
@@ -34,7 +45,9 @@ function calculateMatchScore(header: string, keywords: string[]): number {
       return 1.0;
     }
     if (normalizedHeader.includes(normalizedKeyword) || normalizedKeyword.includes(normalizedHeader)) {
-      const overlap = Math.min(normalizedHeader.length, normalizedKeyword.length) / Math.max(normalizedHeader.length, normalizedKeyword.length);
+      const maxLen = Math.max(normalizedHeader.length, normalizedKeyword.length);
+      if (maxLen === 0) continue;
+      const overlap = Math.min(normalizedHeader.length, normalizedKeyword.length) / maxLen;
       maxScore = Math.max(maxScore, overlap * 0.8);
     }
   }
@@ -46,7 +59,7 @@ export function mapHeaders(headers: string[]): Map<string, number> {
   const mapping = new Map<string, number>();
   const usedIndices = new Set<number>();
 
-  const fields = Object.keys(FIELD_KEYWORDS) as Array<keyof typeof FIELD_KEYWORDS>;
+  const fields = Object.keys(FIELD_KEYWORDS) as MappedField[];
 
   for (const field of fields) {
     let bestIndex = -1;
@@ -71,7 +84,7 @@ export function mapHeaders(headers: string[]): Map<string, number> {
   return mapping;
 }
 
-function parseDate(value: any): string {
+function parseDate(value: unknown): string {
   if (!value) return '';
 
   if (typeof value === 'number') {
@@ -103,7 +116,7 @@ function parseDate(value: any): string {
   return strValue;
 }
 
-function parseTimecode(value: any): string {
+function parseTimecode(value: unknown): string {
   if (!value) return '';
   const str = String(value).trim();
 
@@ -121,12 +134,12 @@ function parseTimecode(value: any): string {
   return str;
 }
 
-function parseDuration(value: any): number {
+function parseDuration(value: unknown): number {
   if (!value) return 0;
   if (typeof value === 'number') return Math.round(value);
   const str = String(value).trim();
   const num = parseFloat(str);
-  return isNaN(num) ? 0 : Math.round(num);
+  return Number.isNaN(num) ? 0 : Math.round(num);
 }
 
 export function parseExcelFile(file: File): Promise<{ records: TrackRecord[]; headers: string[] }> {
@@ -139,14 +152,14 @@ export function parseExcelFile(file: File): Promise<{ records: TrackRecord[]; he
         const workbook = XLSX.read(data, { type: 'array' });
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
-        const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' }) as any[][];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' }) as unknown[][];
 
         if (jsonData.length === 0) {
           reject(new Error('Excel文件为空'));
           return;
         }
 
-        const headers = (jsonData[0] as string[]).map(h => String(h || ''));
+        const headers = (jsonData[0] as string[]).map((h) => String(h || ''));
         const headerMapping = mapHeaders(headers);
 
         const now = Date.now();
@@ -154,14 +167,14 @@ export function parseExcelFile(file: File): Promise<{ records: TrackRecord[]; he
 
         for (let rowIndex = 1; rowIndex < jsonData.length; rowIndex++) {
           const row = jsonData[rowIndex];
-          if (!row || row.every(cell => !cell || String(cell).trim() === '')) continue;
+          if (!row || row.every((cell) => !cell || String(cell).trim() === '')) continue;
 
-          const rawData: Record<string, any> = {};
+          const rawData: Record<string, unknown> = {};
           headers.forEach((h, i) => {
             rawData[h] = row[i];
           });
 
-          const getValue = (field: string): any => {
+          const getValue = (field: string): unknown => {
             const idx = headerMapping.get(field);
             return idx !== undefined ? row[idx] : '';
           };
@@ -199,8 +212,52 @@ export function parseExcelFile(file: File): Promise<{ records: TrackRecord[]; he
   });
 }
 
-export function exportToExcel(records: TrackRecord[], filename: string): void {
-  const exportData = records.map(r => ({
+function statusToText(status: TrackRecord['validationStatus']): string {
+  return STATUS_LABELS[status] || status;
+}
+
+function formatTimestamp(ts: number): string {
+  return new Date(ts).toLocaleString('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  });
+}
+
+export interface ExportContext {
+  filters: FilterState;
+  exportedAt: number;
+  totalRecordsCount: number;
+  filteredRecordsCount: number;
+  sourceFiles: string[];
+}
+
+function describeFilters(filters: FilterState): string {
+  const parts: string[] = [];
+  if (filters.status !== 'all') {
+    parts.push(`状态: ${STATUS_LABELS[filters.status]}`);
+  }
+  if (filters.teacherName) {
+    parts.push(`教师包含: "${filters.teacherName}"`);
+  }
+  if (filters.trackName) {
+    parts.push(`曲目包含: "${filters.trackName}"`);
+  }
+  if (filters.dateFrom) {
+    parts.push(`授权开始≥: ${filters.dateFrom}`);
+  }
+  if (filters.dateTo) {
+    parts.push(`授权结束≤: ${filters.dateTo}`);
+  }
+  return parts.length > 0 ? parts.join('； ') : '未设置筛选条件（导出全部数据）';
+}
+
+function buildMainSheetData(records: TrackRecord[]) {
+  return records.map((r, idx) => ({
+    '序号': idx + 1,
     '教师姓名': r.teacherName,
     '曲目名称': r.trackName,
     '授权开始日期': r.authStart,
@@ -208,36 +265,122 @@ export function exportToExcel(records: TrackRecord[], filename: string): void {
     '开始时码': r.tcIn,
     '结束时码': r.tcOut,
     '课时(分钟)': r.duration,
-    '备注': r.remark,
-    '校验状态': r.validationStatus === 'normal' ? '正常' :
-              r.validationStatus === 'auth_expired' ? '授权过期' :
-              r.validationStatus === 'tc_mismatch' ? '时码错位' :
-              r.validationStatus === 'duplicate' ? '重复曲目' : '脏数据',
-    '错误说明': r.validationErrors.map(e => e.message).join('; '),
-    '原始文件': r.sourceFile,
-    '导入时间': new Date(r.importedAt).toLocaleString('zh-CN'),
-    '最后修改': new Date(r.lastModifiedAt).toLocaleString('zh-CN'),
+    '当前备注': r.remark,
+    '备注修改次数': r.modifyHistory.length,
+    '最近一次备注修改':
+      r.modifyHistory.length > 0
+        ? formatTimestamp(r.modifyHistory[r.modifyHistory.length - 1].timestamp)
+        : '',
+    '校验状态': statusToText(r.validationStatus),
+    '问题详情': r.validationErrors.map((e) => e.message).join('； '),
+    '原始来源文件': r.sourceFile,
+    '导入时间': formatTimestamp(r.importedAt),
+    '数据最后修改时间': formatTimestamp(r.lastModifiedAt),
+    '记录唯一ID': r.id,
   }));
+}
 
-  const worksheet = XLSX.utils.json_to_sheet(exportData);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, '核销结果');
+function buildRemarkHistorySheetData(records: TrackRecord[]) {
+  const rows: Record<string, unknown>[] = [];
+  records.forEach((r) => {
+    if (r.modifyHistory.length === 0) {
+      rows.push({
+        '记录ID': r.id,
+        '教师姓名': r.teacherName,
+        '曲目名称': r.trackName,
+        '修改序号': '-',
+        '修改时间': '-',
+        '修改前文本': '',
+        '修改后文本': r.remark,
+        '变更差异说明': '初始备注' in r.rawData ? '导入时已有备注' : '无修改历史',
+      });
+    } else {
+      r.modifyHistory.forEach((entry, idx) => {
+        rows.push({
+          '记录ID': r.id,
+          '教师姓名': r.teacherName,
+          '曲目名称': r.trackName,
+          '修改序号': idx + 1,
+          '修改时间': formatTimestamp(entry.timestamp),
+          '修改前文本': entry.oldRemark || '(空)',
+          '修改后文本': entry.newRemark || '(空)',
+          '变更差异说明': entry.diff,
+        });
+      });
+    }
+  });
+  return rows;
+}
 
-  const colWidths = [
-    { wch: 12 },
-    { wch: 20 },
+function buildReportSheetData(ctx: ExportContext): Array<Array<Record<string, unknown>>> {
+  const rows: Array<Array<Record<string, unknown>>> = [];
+  rows.push([{ '核销导出报告': '音乐教师课时核销 — 导出报告' }]);
+  rows.push([{ '项目': '值' }]);
+  rows.push([{ '导出时间': formatTimestamp(ctx.exportedAt) }]);
+  rows.push([{ '导出记录数': ctx.filteredRecordsCount }]);
+  rows.push([{ '总记录数(含未筛选)': ctx.totalRecordsCount }]);
+  rows.push([{ '筛选条件说明': describeFilters(ctx.filters) }]);
+  rows.push([{ '状态筛选': STATUS_LABELS[ctx.filters.status] }]);
+  rows.push([{ '教师姓名搜索': ctx.filters.teacherName || '(未设置)' }]);
+  rows.push([{ '曲目名称搜索': ctx.filters.trackName || '(未设置)' }]);
+  rows.push([{ '授权开始日期从': ctx.filters.dateFrom || '(未设置)' }]);
+  rows.push([{ '授权结束日期至': ctx.filters.dateTo || '(未设置)' }]);
+  rows.push([{ '涉及原始文件': ctx.sourceFiles.join('； ') }]);
+  rows.push([{ '备注': '本Excel包含三个工作表：【核销结果】当前筛选清单、【备注修改历史】逐条改前改后差异、【导出报告】触发导出时的筛选条件与统计信息，便于后续复核与交接。' }]);
+
+  return rows;
+}
+
+export function exportToExcel(
+  records: TrackRecord[],
+  filename: string,
+  context: ExportContext
+): void {
+  const mainData = buildMainSheetData(records);
+  const historyData = buildRemarkHistorySheetData(records);
+  const reportData = buildReportSheetData(context);
+
+  const mainWs = XLSX.utils.json_to_sheet(mainData);
+  const historyWs = XLSX.utils.json_to_sheet(historyData);
+  const reportWs = XLSX.utils.aoa_to_sheet(reportData);
+
+  mainWs['!cols'] = [
+    { wch: 6 },
+    { wch: 14 },
+    { wch: 22 },
     { wch: 14 },
     { wch: 14 },
     { wch: 12 },
     { wch: 12 },
     { wch: 10 },
-    { wch: 30 },
-    { wch: 10 },
-    { wch: 30 },
-    { wch: 20 },
-    { wch: 20 },
+    { wch: 36 },
+    { wch: 12 },
+    { wch: 22 },
+    { wch: 12 },
+    { wch: 48 },
+    { wch: 28 },
+    { wch: 22 },
+    { wch: 22 },
+    { wch: 38 },
   ];
-  worksheet['!cols'] = colWidths;
+
+  historyWs['!cols'] = [
+    { wch: 38 },
+    { wch: 14 },
+    { wch: 22 },
+    { wch: 10 },
+    { wch: 22 },
+    { wch: 36 },
+    { wch: 36 },
+    { wch: 40 },
+  ];
+
+  reportWs['!cols'] = [{ wch: 30 }, { wch: 100 }];
+
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, mainWs, '核销结果');
+  XLSX.utils.book_append_sheet(workbook, historyWs, '备注修改历史');
+  XLSX.utils.book_append_sheet(workbook, reportWs, '导出报告');
 
   XLSX.writeFile(workbook, filename);
 }

@@ -1,15 +1,14 @@
-import { useState } from 'react';
-import { TrackRecord } from '../types';
+import { TrackRecord, ValidationStatus } from '../types';
 import StatusBadge from './StatusBadge';
 import RemarkEditor from './RemarkEditor';
-import { ChevronDown, ChevronUp, FileText, Clock, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 
 interface TrackRowProps {
   record: TrackRecord;
   index: number;
 }
 
-const statusBorderColors: Record<string, string> = {
+const statusBorderColors: Record<ValidationStatus, string> = {
   normal: 'border-l-emerald-500',
   auth_expired: 'border-l-amber-500',
   tc_mismatch: 'border-l-rose-500',
@@ -18,19 +17,7 @@ const statusBorderColors: Record<string, string> = {
 };
 
 export default function TrackRow({ record, index }: TrackRowProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
-
-  const formatTime = (timestamp: number) => {
-    return new Date(timestamp).toLocaleString('zh-CN', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
-
-  const borderColor = statusBorderColors[record.validationStatus] || 'border-l-transparent';
+  const borderColor = statusBorderColors[record.validationStatus];
 
   return (
     <tr
@@ -39,16 +26,8 @@ export default function TrackRow({ record, index }: TrackRowProps) {
         animation: `fadeInSlide 0.3s ease-out ${index * 0.03}s both`,
       }}
     >
-      <td className="px-4 py-3 align-top">
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="p-1 rounded hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition-colors"
-          >
-            {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-          </button>
-          <span className="text-xs text-slate-400 font-mono w-8">{index + 1}</span>
-        </div>
+      <td className="px-4 py-3 align-top w-16">
+        <span className="text-xs text-slate-400 font-mono">{index + 1}</span>
       </td>
 
       <td className="px-4 py-3 align-top">

@@ -51,13 +51,6 @@ export function validateTimecodeRange(tcIn: string, tcOut: string): { valid: boo
   return { valid: true };
 }
 
-export function formatDuration(seconds: number): string {
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = seconds % 60;
-  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-}
-
 export function calculateDuration(tcIn: string, tcOut: string): number {
   const inResult = parseTimecode(tcIn);
   const outResult = parseTimecode(tcOut);
