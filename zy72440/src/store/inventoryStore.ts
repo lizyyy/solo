@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { InventoryRecord, OperationLog, ProcessStep, StatisticsData, RecordStatus } from '@/types';
+import type { InventoryRecord, OperationLog, ProcessStep, StatisticsData, RecordStatus, VerificationOrder } from '@/types';
 import { demoRecords } from '@/data/demoData';
 
 interface InventoryState {
@@ -20,6 +20,23 @@ interface InventoryState {
   rerunValidation: (recordId: string) => void;
   managerReview: (recordId: string, missingCity: string) => void;
   addOperationLog: (recordId: string, log: Omit<OperationLog, 'id' | 'timestamp'>) => void;
+}
+
+function makeVerificationOrder(recordId: string, quantity: number, index: number): VerificationOrder {
+  const date = new Date();
+  const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  return {
+    id: `ver-${Date.now()}`,
+    orderNo: `HX-${dateStr}-${String(index).padStart(3, '0')}`,
+    recordId,
+    quantity,
+    amount: quantity * 50,
+    status: 'matched',
+    createdAt: new Date().toLocaleString('zh-CN', {
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: '2-digit'
+    }).replace(/\//g, '-')
+  };
 }
 
 export const useInventoryStore = create<InventoryState>((set, get) => ({
@@ -80,6 +97,11 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
   },
 
   reviewJietlong: (recordId, jietlongContent) => {
+    const record = get().records.find(r => r.id === recordId);
+    if (!record) return;
+
+    const newOrder = makeVerificationOrder(recordId, record.quantity, get().records.indexOf(record) + 1);
+
     set(state => ({
       records: state.records.map(r => {
         if (r.id === recordId) {
@@ -87,7 +109,8 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
             ...r,
             groupJietlong: jietlongContent,
             currentStep: 'update_verification',
-            status: (r.status === 'pending_review' ? 'pending_review' : 'normal') as RecordStatus
+            status: 'completed',
+            verificationOrder: newOrder
           };
           return updated;
         }
@@ -100,17 +123,30 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
       description: `查看排练群接龙：${jietlongContent.substring(0, 50)}...`,
       step: 'review_jietlong'
     });
+    get().addOperationLog(recordId, {
+      operator: '系统',
+      action: '生成核销单',
+      description: `课时核销单 ${newOrder.orderNo} 已生成，数量${record.quantity}件，金额${newOrder.amount}元`,
+      step: 'update_verification'
+    });
   },
 
   markSupplementary: (recordId, note) => {
     set(state => ({
       records: state.records.map(r => {
         if (r.id === recordId) {
+          const updatedVerification = r.verificationOrder ? {
+            ...r.verificationOrder,
+            status: 'mismatch' as const,
+            mismatchReason: note
+          } : undefined;
           return {
             ...r,
             status: 'supplementary',
+            currentStep: 'review_jietlong',
             hasSupplementary: true,
-            supplementaryNote: note
+            supplementaryNote: note,
+            verificationOrder: updatedVerification
           };
         }
         return r;
@@ -148,13 +184,13 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
     set(state => ({
       records: state.records.map(r => {
         if (r.id === recordId) {
-          const newVerificationOrder = r.verificationOrder ? {
+          const newVerificationOrder: VerificationOrder = r.verificationOrder ? {
             ...r.verificationOrder,
             quantity: r.quantity,
             amount: r.quantity * 50,
-            status: 'matched' as const,
+            status: 'matched',
             mismatchReason: undefined
-          } : undefined;
+          } : makeVerificationOrder(recordId, r.quantity, state.records.indexOf(r) + 1);
           
           return {
             ...r,
@@ -169,7 +205,7 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
     get().addOperationLog(recordId, {
       operator: '系统',
       action: '重跑校验',
-      description: '重跑校验通过，已更新核销单',
+      description: `重跑校验通过，核销单已更新，数量${get().records.find(r => r.id === recordId)?.quantity}件`,
       step: 'update_verification'
     });
   },
@@ -185,8 +221,8 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
                 ? { ...reg, isMissing: false }
                 : reg
             ),
-            status: 'normal',
-            currentStep: 'review_jietlong'
+            status: 'normal' as RecordStatus,
+            currentStep: 'review_jietlong' as ProcessStep
           };
         }
         return r;
@@ -195,7 +231,7 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
     get().addOperationLog(recordId, {
       operator: '店长',
       action: '复核补充地区',
-      description: `已补充授权地区：${missingCity}`,
+      description: `已补充授权地区：${missingCity}，记录转为正常，等待巡演统筹补看排练群接龙`,
       step: 'import'
     });
   }

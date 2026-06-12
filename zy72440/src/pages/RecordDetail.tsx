@@ -254,7 +254,7 @@ export function RecordDetail() {
           <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
             <h3 className="text-lg font-semibold text-slate-800 mb-4">操作</h3>
             <div className="space-y-3">
-              {!hasMissingRegion && !record.groupJietlong && record.currentStep === 'import' && (
+              {!hasMissingRegion && !record.groupJietlong && (record.currentStep === 'import' || record.currentStep === 'review_jietlong') && (
                 <button
                   onClick={() => setShowJietlongModal(true)}
                   className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
@@ -316,6 +316,15 @@ export function RecordDetail() {
                   <p className="text-sm text-emerald-700 flex items-center gap-2">
                     <CheckCircle2 className="w-5 h-5" />
                     流程已完成，所有步骤通过
+                  </p>
+                </div>
+              )}
+
+              {!hasMissingRegion && record.currentStep === 'review_jietlong' && !record.groupJietlong && (
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-sm text-blue-700 flex items-start gap-2">
+                    <Users className="w-5 h-5 flex-shrink-0" />
+                    <span>地区已完整，请补看排练群接龙以继续流程</span>
                   </p>
                 </div>
               )}
