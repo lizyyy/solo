@@ -50,7 +50,8 @@ def create_demo_points() -> list:
             lng=116.398,
             lat=39.908,
             address="和平街道人民公园东门",
-            point_type=PointType.NORMAL
+            point_type=PointType.NORMAL,
+            is_night_sampling=False
         ),
         Point(
             id="P-002",
@@ -58,7 +59,8 @@ def create_demo_points() -> list:
             lng=116.405,
             lat=39.910,
             address="和平街道与建设街道交界处夜市路口",
-            point_type=PointType.NIGHT_SAMPLING
+            point_type=PointType.NIGHT_SAMPLING,
+            is_night_sampling=True
         ),
         Point(
             id="P-003",
@@ -66,7 +68,8 @@ def create_demo_points() -> list:
             lng=116.410,
             lat=39.908,
             address="建设街道火车站西广场",
-            point_type=PointType.NORMAL
+            point_type=PointType.NORMAL,
+            is_night_sampling=False
         ),
         Point(
             id="P-004",
@@ -74,7 +77,8 @@ def create_demo_points() -> list:
             lng=116.400,
             lat=39.920,
             address="胜利街道老街社区12号",
-            point_type=PointType.NORMAL
+            point_type=PointType.NORMAL,
+            is_night_sampling=False
         ),
         Point(
             id="P-005",
@@ -82,7 +86,8 @@ def create_demo_points() -> list:
             lng=116.405,
             lat=39.915,
             address="和平、建设、胜利三街道交界三岔口",
-            point_type=PointType.NIGHT_SAMPLING
+            point_type=PointType.NIGHT_SAMPLING,
+            is_night_sampling=True
         )
     ]
 
@@ -142,5 +147,9 @@ def setup_demo_data(store: DataStore = None):
     point_p005 = store.get_point("P-005")
     point_p005.re_run("复核员小王")
     store.save_point(point_p005)
+
+    point_p001 = store.get_point("P-001")
+    point_p001.confirm_boundary("项目经理老张", "归属和平街道，无跨街道问题")
+    store.save_point(point_p001)
 
     return store

@@ -26,14 +26,6 @@ class MapExporter:
         }
         return color_map.get(status, '#95a5a6')
 
-    def _get_point_type_label(self, point_type: PointType) -> str:
-        label_map = {
-            PointType.NORMAL: '常规点位',
-            PointType.NIGHT_SAMPLING: '夜间采样点',
-            PointType.BOUNDARY: '边界点位'
-        }
-        return label_map.get(point_type, '未知')
-
     def _generate_point_note(self, point: Point, complaint: Optional[Complaint],
                               street_names: List[str]) -> dict:
         notes = []
@@ -42,7 +34,7 @@ class MapExporter:
         next_operator = ""
 
         if point.is_on_boundary:
-            notes.append(f"点位位于{ '、'.join(street_names) }街道交界处")
+            notes.append(f"点位位于{'、'.join(street_names)}街道交界处")
             notes.append("因跨街道边界，未自动归类，留待项目经理复核")
             missing_materials.append("需项目经理确认归属街道")
             next_step = "提交项目经理确认街道归属"
@@ -73,6 +65,15 @@ class MapExporter:
             "next_operator": next_operator
         }
 
+    def _generate_boundary_conclusion(self, point: Point, street_names: List[str]) -> Optional[dict]:
+        if not point.is_on_boundary:
+            return None
+        return {
+            "source": point.boundary_source or f"点位位于{'、'.join(street_names)}街道交界处",
+            "status": point.status.value,
+            "conclusion": point.boundary_conclusion or "待项目经理确认归属街道"
+        }
+
     def export_map(self, points: List[Point], streets: List[Street],
                     complaints: List[Complaint],
                     title: str = "公厕服务半径复核地图",
@@ -81,7 +82,6 @@ class MapExporter:
             filename = f"复核地图_{datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
 
         street_map = {s.id: s for s in streets}
-        complaint_map = {c.id: c for c in complaints}
         complaint_by_point = {c.point_id: c for c in complaints}
 
         points_data = []
@@ -89,6 +89,7 @@ class MapExporter:
             street_names = [street_map[sid].name for sid in point.street_ids if sid in street_map]
             complaint = complaint_by_point.get(point.id)
             note_info = self._generate_point_note(point, complaint, street_names)
+            boundary_conclusion = self._generate_boundary_conclusion(point, street_names)
 
             point_data = {
                 "id": point.id,
@@ -97,15 +98,19 @@ class MapExporter:
                 "lat": point.lat,
                 "address": point.address,
                 "point_type": point.point_type.value,
-                "point_type_label": self._get_point_type_label(point.point_type),
+                "is_night_sampling": point.is_night_sampling,
+                "type_label": point.type_label,
                 "status": point.status.value,
                 "status_color": self._get_status_color(point.status),
                 "is_on_boundary": point.is_on_boundary,
+                "boundary_source": point.boundary_source,
+                "boundary_conclusion": point.boundary_conclusion,
                 "street_names": street_names,
                 "complaint_no": complaint.complaint_no if complaint else None,
                 "complaint_desc": complaint.description if complaint else None,
                 "service_radius": point.service_radius,
                 "notes": note_info,
+                "boundary_review": boundary_conclusion,
                 "review_records": [
                     {
                         "action": r.action,
@@ -113,7 +118,9 @@ class MapExporter:
                         "timestamp": r.timestamp,
                         "note": r.note,
                         "before": r.before_status,
-                        "after": r.after_status
+                        "after": r.after_status,
+                        "field_changes": [fc.to_dict() for fc in r.field_changes],
+                        "affected_result": r.affected_result
                     }
                     for r in point.review_records
                 ]
@@ -134,7 +141,7 @@ class MapExporter:
             "total": len(points),
             "boundary": len([p for p in points if p.is_on_boundary]),
             "complaint": len([p for p in points if p.complaint_id]),
-            "night": len([p for p in points if p.point_type == PointType.NIGHT_SAMPLING]),
+            "night": len([p for p in points if p.is_night_sampling]),
             "pending": len([p for p in points if p.status == ReviewStatus.PENDING]),
             "boundary_pending": len([p for p in points if p.status == ReviewStatus.BOUNDARY_PENDING])
         }

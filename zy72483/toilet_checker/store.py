@@ -1,7 +1,7 @@
 import json
 import os
 from typing import Dict, List, Optional
-from .models import Point, Street, Complaint, ReviewStatus, PointType
+from .models import Point, Street, Complaint, ReviewStatus, PointType, FieldChange
 
 
 class DataStore:
@@ -115,8 +115,11 @@ class DataStore:
             'lat': point.lat,
             'address': point.address,
             'point_type': point.point_type.value,
+            'is_night_sampling': point.is_night_sampling,
             'street_ids': point.street_ids,
             'is_on_boundary': point.is_on_boundary,
+            'boundary_source': point.boundary_source,
+            'boundary_conclusion': point.boundary_conclusion,
             'status': point.status.value,
             'complaint_id': point.complaint_id,
             'notes': point.notes,
@@ -132,9 +135,12 @@ class DataStore:
             lng=d['lng'],
             lat=d['lat'],
             address=d['address'],
-            point_type=PointType(d['point_type']),
+            point_type=PointType(d.get('point_type', 'normal')),
+            is_night_sampling=d.get('is_night_sampling', d.get('point_type') == 'night_sampling'),
             street_ids=d.get('street_ids', []),
             is_on_boundary=d.get('is_on_boundary', False),
+            boundary_source=d.get('boundary_source', ''),
+            boundary_conclusion=d.get('boundary_conclusion', ''),
             status=ReviewStatus(d['status']),
             complaint_id=d.get('complaint_id'),
             notes=d.get('notes', []),
@@ -190,11 +196,14 @@ class DataStore:
             'timestamp': record.timestamp,
             'note': record.note,
             'before_status': record.before_status,
-            'after_status': record.after_status
+            'after_status': record.after_status,
+            'field_changes': [fc.to_dict() for fc in record.field_changes],
+            'affected_result': record.affected_result
         }
 
     def _dict_to_record(self, d: Dict):
         from .models import ReviewRecord
+        field_changes = [FieldChange.from_dict(fc) for fc in d.get('field_changes', [])]
         return ReviewRecord(
             id=d['id'],
             point_id=d['point_id'],
@@ -203,5 +212,7 @@ class DataStore:
             timestamp=d['timestamp'],
             note=d.get('note', ''),
             before_status=d.get('before_status'),
-            after_status=d.get('after_status')
+            after_status=d.get('after_status'),
+            field_changes=field_changes,
+            affected_result=d.get('affected_result', '')
         )

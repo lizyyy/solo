@@ -23,7 +23,7 @@
         .stat-item.night .num { color: #3498db; }
         .point-list { padding: 15px; }
         .point-card { background: #fff; border: 1px solid #e1e4e8; border-radius: 8px; margin-bottom: 12px; padding: 12px; cursor: pointer; transition: all 0.2s; }
-        .point-card:hover { border-color: #3498db; box-shadow: 0 2px 8px rgba(52, 152, 219, 0.15); }
+        .point-card:hover { border-color: #3498db; box-shadow: 0 2px 8px rgba(52,152,219,0.15); }
         .point-card.selected { border-color: #3498db; background: #f0f8ff; }
         .point-card .title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .point-card .name { font-weight: 600; color: #2c3e50; }
@@ -34,7 +34,7 @@
         .tag.boundary { background: #fdecea; color: #e74c3c; }
         .tag.night { background: #e8f4fd; color: #3498db; }
         .tag.complaint { background: #f5eefb; color: #9b59b6; }
-        .detail-panel { position: absolute; right: 20px; top: 20px; width: 360px; background: white; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); padding: 18px; max-height: calc(100% - 40px); overflow-y: auto; z-index: 100; }
+        .detail-panel { position: absolute; right: 20px; top: 20px; width: 400px; background: white; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); padding: 18px; max-height: calc(100% - 40px); overflow-y: auto; z-index: 100; }
         .detail-panel .close { position: absolute; right: 12px; top: 12px; cursor: pointer; color: #95a5a6; font-size: 18px; }
         .detail-panel h3 { color: #2c3e50; margin-bottom: 12px; padding-right: 24px; }
         .detail-section { margin-bottom: 16px; }
@@ -45,9 +45,19 @@
         .note-box.kept { background: #e8f8f5; border-left-color: #27ae60; }
         .note-box.missing { background: #fdecea; border-left-color: #e74c3c; }
         .note-box.next { background: #e8f4fd; border-left-color: #3498db; }
+        .note-box.conclusion { background: #f0f8ff; border-left-color: #2980b9; }
+        .boundary-row { display: flex; gap: 8px; margin-bottom: 6px; font-size: 12px; }
+        .boundary-row .b-label { color: #7f8c8d; min-width: 60px; }
+        .boundary-row .b-value { color: #2c3e50; }
+        .change-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 6px; }
+        .change-table th { background: #f8f9fa; padding: 4px 8px; text-align: left; color: #7f8c8d; border: 1px solid #ecf0f1; }
+        .change-table td { padding: 4px 8px; border: 1px solid #ecf0f1; }
+        .change-table .old-val { color: #e74c3c; text-decoration: line-through; }
+        .change-table .new-val { color: #27ae60; font-weight: 500; }
+        .affected { font-size: 12px; color: #e67e22; margin-top: 4px; font-style: italic; }
         .timeline { position: relative; padding-left: 20px; }
         .timeline::before { content: ''; position: absolute; left: 6px; top: 0; bottom: 0; width: 2px; background: #ecf0f1; }
-        .timeline-item { position: relative; margin-bottom: 12px; font-size: 12px; }
+        .timeline-item { position: relative; margin-bottom: 14px; font-size: 12px; }
         .timeline-item::before { content: ''; position: absolute; left: -20px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: #3498db; border: 2px solid white; box-shadow: 0 0 0 2px #3498db; }
         .timeline-item .action { font-weight: 600; color: #2c3e50; }
         .timeline-item .op-time { color: #7f8c8d; font-size: 11px; }
@@ -101,7 +111,7 @@
                         {% if point.is_on_boundary %}
                         <span class="tag boundary">⚠️ 边界点位</span>
                         {% endif %}
-                        {% if point.point_type == 'night_sampling' %}
+                        {% if point.is_night_sampling %}
                         <span class="tag night">🌙 夜间采样</span>
                         {% endif %}
                         {% if point.complaint_no %}
@@ -118,26 +128,12 @@
 
             <div class="legend">
                 <h4>图例说明</h4>
-                <div class="legend-item">
-                    <div class="legend-dot" style="background: #f39c12"></div>
-                    <span>待复核</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-dot" style="background: #e74c3c"></div>
-                    <span>边界待项目经理确认</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-dot" style="background: #9b59b6"></div>
-                    <span>已补录投诉</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-dot" style="background: #3498db"></div>
-                    <span>人工修正</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-dot" style="background: #2ecc71"></div>
-                    <span>重跑完成</span>
-                </div>
+                <div class="legend-item"><div class="legend-dot" style="background: #f39c12"></div><span>待复核</span></div>
+                <div class="legend-item"><div class="legend-dot" style="background: #e74c3c"></div><span>边界待项目经理确认</span></div>
+                <div class="legend-item"><div class="legend-dot" style="background: #9b59b6"></div><span>已补录投诉</span></div>
+                <div class="legend-item"><div class="legend-dot" style="background: #3498db"></div><span>人工修正</span></div>
+                <div class="legend-item"><div class="legend-dot" style="background: #2ecc71"></div><span>重跑完成</span></div>
+                <div class="legend-item"><div class="legend-dot" style="background: #27ae60"></div><span>已确认</span></div>
             </div>
 
             <div class="detail-panel" id="detailPanel" style="display: none;">
@@ -180,10 +176,8 @@
             });
             const padding = 0.002;
             return {
-                minLng: minLng - padding,
-                maxLng: maxLng + padding,
-                minLat: minLat - padding,
-                maxLat: maxLat + padding
+                minLng: minLng - padding, maxLng: maxLng + padding,
+                minLat: minLat - padding, maxLat: maxLat + padding
             };
         }
 
@@ -201,8 +195,7 @@
                 ctx.beginPath();
                 street.boundary.forEach((p, i) => {
                     const { x, y } = coordToCanvas(p[0], p[1], bounds);
-                    if (i === 0) ctx.moveTo(x, y);
-                    else ctx.lineTo(x, y);
+                    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
                 });
                 ctx.closePath();
                 ctx.fillStyle = street.color + '15';
@@ -211,8 +204,7 @@
                 ctx.lineWidth = 2;
                 ctx.setLineDash([]);
                 ctx.stroke();
-
-                const center = street.boundary.reduce((acc, p) => [acc[0] + p[0], acc[1] + p[1]], [0, 0]);
+                const center = street.boundary.reduce((acc, p) => [acc[0]+p[0], acc[1]+p[1]], [0,0]);
                 center[0] /= street.boundary.length;
                 center[1] /= street.boundary.length;
                 const centerPos = coordToCanvas(center[0], center[1], bounds);
@@ -224,7 +216,6 @@
 
             POINTS.forEach(point => {
                 const pos = coordToCanvas(point.lng, point.lat, bounds);
-
                 if (point.service_radius) {
                     ctx.beginPath();
                     ctx.arc(pos.x, pos.y, 30, 0, Math.PI * 2);
@@ -236,7 +227,6 @@
                     ctx.stroke();
                     ctx.setLineDash([]);
                 }
-
                 ctx.beginPath();
                 ctx.arc(pos.x, pos.y, point.is_on_boundary ? 10 : 7, 0, Math.PI * 2);
                 ctx.fillStyle = point.status_color;
@@ -244,7 +234,6 @@
                 ctx.strokeStyle = 'white';
                 ctx.lineWidth = 2;
                 ctx.stroke();
-
                 if (point.is_on_boundary) {
                     ctx.beginPath();
                     ctx.arc(pos.x, pos.y, 14, 0, Math.PI * 2);
@@ -254,12 +243,31 @@
                     ctx.stroke();
                     ctx.setLineDash([]);
                 }
-
+                if (point.is_night_sampling) {
+                    ctx.fillStyle = '#3498db';
+                    ctx.font = '9px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('🌙', pos.x, pos.y - 14);
+                }
                 ctx.fillStyle = '#2c3e50';
                 ctx.font = '11px sans-serif';
                 ctx.textAlign = 'center';
                 ctx.fillText(point.name, pos.x, pos.y + 22);
             });
+        }
+
+        function renderFieldChanges(changes) {
+            if (!changes || changes.length === 0) return '';
+            let html = '<table class="change-table"><tr><th>字段</th><th>改前</th><th>改后</th></tr>';
+            changes.forEach(c => {
+                html += `<tr>
+                    <td>${c.field_label}</td>
+                    <td class="old-val">${c.old_value || '(无)'}</td>
+                    <td class="new-val">${c.new_value || '(无)'}</td>
+                </tr>`;
+            });
+            html += '</table>';
+            return html;
         }
 
         function showDetail(pointId) {
@@ -270,6 +278,8 @@
             document.querySelector(`[data-point-id="${pointId}"]`).classList.add('selected');
 
             const notes = point.notes;
+            const br = point.boundary_review;
+
             let recordsHtml = '';
             if (point.review_records && point.review_records.length > 0) {
                 recordsHtml = '<div class="timeline">' +
@@ -279,10 +289,25 @@
                             <div class="op-time">${r.operator} · ${r.timestamp}</div>
                             ${r.note ? `<div class="note">${r.note}</div>` : ''}
                             ${r.before && r.after ? `<div class="status-change">${r.before} → ${r.after}</div>` : ''}
+                            ${renderFieldChanges(r.field_changes)}
+                            ${r.affected_result ? `<div class="affected">⚡ 影响：${r.affected_result}</div>` : ''}
                         </div>
                     `).join('') + '</div>';
             } else {
                 recordsHtml = '<div class="empty-hint">暂无复核记录</div>';
+            }
+
+            let boundarySection = '';
+            if (br) {
+                boundarySection = `
+                <div class="detail-section">
+                    <h4>🔴 边界复核结论（来源+状态+结论）</h4>
+                    <div class="note-box conclusion">
+                        <div class="boundary-row"><span class="b-label">来源：</span><span class="b-value">${br.source}</span></div>
+                        <div class="boundary-row"><span class="b-label">状态：</span><span class="b-value">${br.status}</span></div>
+                        <div class="boundary-row"><span class="b-label">结论：</span><span class="b-value">${br.conclusion}</span></div>
+                    </div>
+                </div>`;
             }
 
             const html = `
@@ -290,7 +315,7 @@
                     <h4>📌 基本信息</h4>
                     <div class="item"><span class="label">点位名称</span>${point.name}</div>
                     <div class="item"><span class="label">地址</span>${point.address}</div>
-                    <div class="item"><span class="label">类型</span>${point.point_type_label}</div>
+                    <div class="item"><span class="label">类型</span>${point.type_label}</div>
                     <div class="item"><span class="label">当前状态</span><span style="color:${point.status_color};font-weight:600">${point.status}</span></div>
                     <div class="item"><span class="label">所属街道</span>${point.street_names.join('、') || '待确认'}</div>
                 </div>
@@ -302,6 +327,8 @@
                     <div class="item"><span class="label">投诉内容</span>${point.complaint_desc || ''}</div>
                 </div>
                 ` : ''}
+
+                ${boundarySection}
 
                 <div class="detail-section">
                     <h4>💡 为什么这条被留下</h4>
@@ -325,7 +352,7 @@
                 </div>
 
                 <div class="detail-section">
-                    <h4>📝 复核轨迹</h4>
+                    <h4>📝 复核轨迹（含变更明细）</h4>
                     ${recordsHtml}
                 </div>
             `;

@@ -1,5 +1,5 @@
 from typing import List, Tuple, Optional
-from .models import Point, Street
+from .models import Point, Street, PointType
 
 
 class BoundaryChecker:
@@ -75,6 +75,8 @@ class BoundaryChecker:
     def process_point(self, point: Point) -> Point:
         is_boundary, streets = self.check_boundary(point)
         point.street_ids = [s.id for s in streets]
+        if point.point_type == PointType.NIGHT_SAMPLING:
+            point.is_night_sampling = True
         if is_boundary and not point.is_on_boundary:
             street_names = [s.name for s in streets]
             point.mark_boundary(street_names)
