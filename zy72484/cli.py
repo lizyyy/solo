@@ -210,6 +210,26 @@ def print_summary(system: FumeInspectionSystem, output_file: str = None):
     lines.append(f"  小区同名待确认：{summary.alias_issues} 条")
     lines.append(f"  缺坡道记录：{summary.missing_ramp_records} 条")
     lines.append(f"  缺夜间采样：{summary.missing_sampling_points} 条")
+
+    if summary.alias_details:
+        lines.append("")
+        lines.append("🔍 小区同名问题追溯（可追回原始材料）：")
+        lines.append("-" * 70)
+        for idx, alias in enumerate(summary.alias_details, 1):
+            lines.append(f"  {idx}. [{alias['reviewed']}] 「{alias['old_name']}」 ↔ 「{alias['new_name']}」")
+            if alias['触发坡道记录']:
+                lines.append(f"     📎 触发的无障碍坡道记录：")
+                for r in alias['触发坡道记录']:
+                    lines.append(f"        - [{r['id']}] {r['店铺']}（记录里写的小区名：{r['小区名']}），坡道：{r['有无坡道']}，{r['检查人']}，{r['检查日期']}")
+            if alias['触发采样记录']:
+                lines.append(f"     📎 触发的夜间采样记录：")
+                for s in alias['触发采样记录']:
+                    lines.append(f"        - [{s['id']}] {s['店铺']}（记录里写的小区名：{s['小区名']}），油烟{s['油烟浓度']}，{s['采样人']}，{s['采样日期']}")
+            if alias['reviewed'] == '已复核':
+                lines.append(f"     ✅ 复核人：{alias['reviewer']}，备注：{alias['review_note'] or '无'}")
+            else:
+                lines.append(f"     ⏳ 待市政巡检员复核确认")
+
     lines.append("")
     lines.append("📝 问题明细：")
     lines.append("-" * 70)
@@ -219,8 +239,12 @@ def print_summary(system: FumeInspectionSystem, output_file: str = None):
         lines.append(f"     📌 为什么留下：{issue['问题说明']}")
         lines.append(f"     📋 还缺什么：{'、'.join(issue['待补材料']) if issue['待补材料'] else '不缺'}")
         lines.append(f"     👉 下一步找：{issue['下一步对接']}")
-        if issue['是否有同名小区问题'] == '是':
-            lines.append(f"     ⚠️  注意：该小区有新旧名字待市政巡检员复核！")
+        if issue['是否有同名小区问题'] == '是' and issue.get('同名小区说明'):
+            lines.append(f"     ⚠️  注意：{issue['同名小区说明']}")
+        if issue.get('坡道记录ID'):
+            lines.append(f"     🔗 关联坡道记录ID：{issue['坡道记录ID']}")
+        if issue.get('采样记录ID'):
+            lines.append(f"     🔗 关联采样记录ID：{issue['采样记录ID']}")
         lines.append(f"     🕐 最后更新：{issue['更新时间']}  |  ID: {issue['id']}")
         lines.append("")
 

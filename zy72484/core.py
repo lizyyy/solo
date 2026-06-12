@@ -59,8 +59,8 @@ class FumeInspectionSystem:
             status=ReviewStatus.PENDING
         )
         self.store.ramp_records[rid] = record
-        self._detect_alias_issue(community_name)
         self._auto_create_issue(shop_id, community_name, ramp_record_id=rid)
+        self._detect_alias_issue(community_name, just_added_ramp_id=rid)
         return rid
 
     def import_sampling_point(self, shop_id: str, community_name: str,
@@ -83,8 +83,8 @@ class FumeInspectionSystem:
             status=ReviewStatus.PENDING
         )
         self.store.sampling_points[sid] = record
-        self._detect_alias_issue(community_name)
         self._auto_create_issue(shop_id, community_name, sampling_point_id=sid)
+        self._detect_alias_issue(community_name, just_added_sampling_id=sid)
         return sid
 
     def _find_community_by_name(self, name: str) -> Optional[Community]:
@@ -93,25 +93,81 @@ class FumeInspectionSystem:
                 return c
         return None
 
-    def _detect_alias_issue(self, community_name: str):
-        existing = self._find_community_by_name(community_name)
-        if not existing:
+    def _find_community_by_fuzzy(self, name: str) -> Optional[Community]:
+        exact = self._find_community_by_name(name)
+        if exact:
+            return exact
+        for c in self.store.communities.values():
+            if self._is_potential_alias(name, c.name):
+                return c
+            for alias in c.aliases:
+                if self._is_potential_alias(name, alias):
+                    return c
+        return None
+
+    def _detect_alias_issue(self, community_name: str, just_added_ramp_id: str = None,
+                            just_added_sampling_id: str = None):
+        matched_community = self._find_community_by_fuzzy(community_name)
+        if not matched_community:
             return
 
-        all_known_names = {existing.name} | set(existing.aliases)
-        for rec in list(self.store.ramp_records.values()) + list(self.store.sampling_points.values()):
-            if rec.community_name not in all_known_names:
-                if self._is_potential_alias(community_name, rec.community_name):
-                    if not any(a.old_name == rec.community_name and a.new_name == community_name
-                               for a in self.store.community_aliases):
-                        alias = CommunityAlias(
-                            community_id=existing.id,
-                            old_name=rec.community_name,
-                            new_name=community_name,
-                            reviewed=False
-                        )
-                        self.store.community_aliases.append(alias)
-                        self._mark_alias_on_issues(existing.id, rec.community_name, community_name)
+        all_records = [
+            (r, "ramp") for r in self.store.ramp_records.values()
+        ] + [
+            (s, "sampling") for s in self.store.sampling_points.values()
+        ]
+
+        seen_pairs = set()
+        for a in self.store.community_aliases:
+            seen_pairs.add(tuple(sorted([a.old_name, a.new_name])))
+
+        for rec, rec_type in all_records:
+            if rec.community_name == community_name:
+                continue
+            if not self._is_potential_alias(community_name, rec.community_name):
+                continue
+
+            pair_key = tuple(sorted([community_name, rec.community_name]))
+            if pair_key in seen_pairs:
+                existing_alias = None
+                for a in self.store.community_aliases:
+                    if tuple(sorted([a.old_name, a.new_name])) == pair_key:
+                        existing_alias = a
+                        break
+                if existing_alias:
+                    if just_added_ramp_id and just_added_ramp_id not in existing_alias.triggered_by_ramp_ids:
+                        existing_alias.triggered_by_ramp_ids.append(just_added_ramp_id)
+                    if just_added_sampling_id and just_added_sampling_id not in existing_alias.triggered_by_sampling_ids:
+                        existing_alias.triggered_by_sampling_ids.append(just_added_sampling_id)
+                    if rec_type == "ramp" and rec.id not in existing_alias.triggered_by_ramp_ids:
+                        existing_alias.triggered_by_ramp_ids.append(rec.id)
+                    if rec_type == "sampling" and rec.id not in existing_alias.triggered_by_sampling_ids:
+                        existing_alias.triggered_by_sampling_ids.append(rec.id)
+                continue
+
+            seen_pairs.add(pair_key)
+
+            ramp_ids = []
+            sampling_ids = []
+            if just_added_ramp_id:
+                ramp_ids.append(just_added_ramp_id)
+            if just_added_sampling_id:
+                sampling_ids.append(just_added_sampling_id)
+            if rec_type == "ramp":
+                ramp_ids.append(rec.id)
+            else:
+                sampling_ids.append(rec.id)
+
+            alias = CommunityAlias(
+                community_id=matched_community.id,
+                old_name=rec.community_name,
+                new_name=community_name,
+                triggered_by_ramp_ids=ramp_ids,
+                triggered_by_sampling_ids=sampling_ids,
+                reviewed=False
+            )
+            self.store.community_aliases.append(alias)
+            self._mark_alias_on_issues(matched_community.id, rec.community_name, community_name)
 
     def _is_potential_alias(self, name1: str, name2: str) -> bool:
         if name1 == name2:
@@ -125,8 +181,17 @@ class FumeInspectionSystem:
         return False
 
     def _mark_alias_on_issues(self, community_id: str, old_name: str, new_name: str):
+        alias_names = {old_name, new_name}
         for issue in self.store.issue_records.values():
-            if issue.community_name in [old_name, new_name]:
+            shop = self.store.shops.get(issue.shop_id)
+            shop_community_match = False
+            if shop:
+                comm = self.store.communities.get(shop.community_id)
+                if comm:
+                    shop_community_names = {comm.name} | set(comm.aliases)
+                    if shop_community_names & alias_names:
+                        shop_community_match = True
+            if issue.community_name in alias_names or shop_community_match:
                 issue.has_alias_issue = True
                 issue.alias_community_id = community_id
                 issue.status = ReviewStatus.PENDING
@@ -200,7 +265,7 @@ class FumeInspectionSystem:
             existing_issue.ramp_record_id = existing_issue.ramp_record_id or ramp_record_id
             existing_issue.sampling_point_id = existing_issue.sampling_point_id or sampling_point_id
             existing_issue.reason_kept = "；".join(reasons)
-            existing_issue.missing_materials = list(set(existing_issue.missing_materials + missing))
+            existing_issue.missing_materials = list(dict.fromkeys(missing))
             existing_issue.next_role = next_role
             existing_issue.updated_at = datetime.now()
             if existing_issue.status == ReviewStatus.RESOLVED:
@@ -254,11 +319,51 @@ class FumeInspectionSystem:
             return self.store.sampling_points.get(issue.sampling_point_id)
         return None
 
+    def _build_alias_trace(self, alias) -> Dict:
+        ramp_records = []
+        for rid in alias.triggered_by_ramp_ids:
+            r = self.store.ramp_records.get(rid)
+            if r:
+                ramp_records.append({
+                    "id": rid,
+                    "店铺": self.store.shops[r.shop_id].name if r.shop_id in self.store.shops else "未知",
+                    "小区名": r.community_name,
+                    "有无坡道": "有" if r.has_ramp else "无",
+                    "检查人": r.inspector or "未记录",
+                    "检查日期": r.inspection_date
+                })
+        sampling_records = []
+        for sid in alias.triggered_by_sampling_ids:
+            s = self.store.sampling_points.get(sid)
+            if s:
+                sampling_records.append({
+                    "id": sid,
+                    "店铺": self.store.shops[s.shop_id].name if s.shop_id in self.store.shops else "未知",
+                    "小区名": s.community_name,
+                    "油烟浓度": f"{s.fume_concentration} mg/m³",
+                    "采样人": s.sampler or "未记录",
+                    "采样日期": f"{s.sampling_date} {s.sampling_time}"
+                })
+        return {
+            "old_name": alias.old_name,
+            "new_name": alias.new_name,
+            "reviewed": "已复核" if alias.reviewed else "待复核",
+            "reviewer": alias.reviewer or "",
+            "review_note": alias.review_note or "",
+            "触发坡道记录": ramp_records,
+            "触发采样记录": sampling_records
+        }
+
     def generate_street_summary(self) -> StreetSummary:
         summary = StreetSummary()
         summary.total_shops = len(self.store.shops)
         summary.shops_with_issues = len(self.store.issue_records)
         summary.alias_issues = sum(1 for a in self.store.community_aliases if not a.reviewed)
+
+        alias_traces = []
+        for a in self.store.community_aliases:
+            alias_traces.append(self._build_alias_trace(a))
+        summary.alias_details = alias_traces
 
         for issue in self.store.issue_records.values():
             if issue.status in [ReviewStatus.PENDING, ReviewStatus.NEEDS_MORE_INFO]:
@@ -267,6 +372,13 @@ class FumeInspectionSystem:
                 summary.missing_ramp_records += 1
             if not issue.sampling_point_id:
                 summary.missing_sampling_points += 1
+
+            related_alias_info = ""
+            if issue.has_alias_issue:
+                for a in self.store.community_aliases:
+                    if a.community_id == issue.alias_community_id and not a.reviewed:
+                        related_alias_info = f"「{a.old_name}」与「{a.new_name}」疑似同一小区，待市政巡检员复核"
+                        break
 
             issue_dict = {
                 "id": issue.id,
@@ -277,6 +389,9 @@ class FumeInspectionSystem:
                 "下一步对接": issue.next_role.value,
                 "当前状态": issue.status.value,
                 "是否有同名小区问题": "是" if issue.has_alias_issue else "否",
+                "同名小区说明": related_alias_info,
+                "坡道记录ID": issue.ramp_record_id or "",
+                "采样记录ID": issue.sampling_point_id or "",
                 "更新时间": issue.updated_at.strftime("%Y-%m-%d %H:%M")
             }
             summary.issues.append(issue_dict)
@@ -305,13 +420,5 @@ class FumeInspectionSystem:
                 s.value: sum(1 for i in self.store.issue_records.values() if i.status == s)
                 for s in ReviewStatus
             },
-            "alias_list": [
-                {
-                    "old_name": a.old_name,
-                    "new_name": a.new_name,
-                    "reviewed": "已复核" if a.reviewed else "待复核",
-                    "reviewer": a.reviewer or ""
-                }
-                for a in self.store.community_aliases
-            ]
+            "alias_list": [self._build_alias_trace(a) for a in self.store.community_aliases]
         }

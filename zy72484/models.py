@@ -22,6 +22,8 @@ class CommunityAlias:
     community_id: str
     old_name: str
     new_name: str
+    triggered_by_ramp_ids: List[str] = field(default_factory=list)
+    triggered_by_sampling_ids: List[str] = field(default_factory=list)
     detected_at: datetime = field(default_factory=datetime.now)
     reviewed: bool = False
     reviewer: Optional[str] = None
@@ -107,6 +109,7 @@ class StreetSummary:
     missing_ramp_records: int = 0
     missing_sampling_points: int = 0
     issues: List[Dict[str, Any]] = field(default_factory=list)
+    alias_details: List[Dict[str, Any]] = field(default_factory=list)
     generated_at: datetime = field(default_factory=datetime.now)
 
 

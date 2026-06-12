@@ -103,6 +103,7 @@ async def get_summary():
         "alias_issues": summary.alias_issues,
         "missing_ramp_records": summary.missing_ramp_records,
         "missing_sampling_points": summary.missing_sampling_points,
+        "alias_details": summary.alias_details,
         "issues": summary.issues
     }
 

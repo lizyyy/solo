@@ -357,7 +357,11 @@
             renderStats();
             renderChart();
             renderIssues();
-            renderAliases(aliasRes.aliases);
+            const aliasesWithTrace = (summaryRes.alias_details || []).map((a, i) => {
+                const orig = aliasRes.aliases.find(x => x.old_name === a.old_name && x.new_name === a.new_name);
+                return { ...a, index: orig ? orig.index : i };
+            });
+            renderAliases(aliasesWithTrace.length ? aliasesWithTrace : chartRes.alias_list);
             renderSummary();
             init3D();
         }
@@ -433,7 +437,7 @@
         function renderAliases(aliases) {
             const panel = document.getElementById('alias-panel');
             const list = document.getElementById('alias-list');
-            const unreviewed = aliases.filter(a => !a.reviewed);
+            const unreviewed = aliases.filter(a => a.reviewed === false || a.reviewed === '待复核');
 
             if (unreviewed.length === 0) {
                 panel.style.display = 'none';
@@ -442,14 +446,24 @@
             panel.style.display = 'block';
             list.innerHTML = '';
 
-            unreviewed.forEach(a => {
+            unreviewed.forEach((a, realIdx) => {
+                const traceInfo = [];
+                if (a['触发坡道记录'] && a['触发坡道记录'].length) {
+                    traceInfo.push('坡道：' + a['触发坡道记录'].map(r => r['店铺'] + '(' + r['小区名'] + ')').join('、'));
+                }
+                if (a['触发采样记录'] && a['触发采样记录'].length) {
+                    traceInfo.push('采样：' + a['触发采样记录'].map(s => s['店铺'] + '(' + s['小区名'] + ')').join('、'));
+                }
                 const div = document.createElement('div');
                 div.className = 'alias-item';
                 div.innerHTML = `
-                    <span><strong>${a.old_name}</strong> ↔ <strong>${a.new_name}</strong></span>
+                    <div>
+                        <div><strong>${a.old_name}</strong> ↔ <strong>${a.new_name}</strong></div>
+                        <div style="font-size:12px;color:#666;margin-top:4px;">📎 触发原始材料：${traceInfo.join(' | ')}</div>
+                    </div>
                     <div class="alias-actions">
-                        <button onclick="reviewAlias(${a.index}, true)" style="background:#10b981;color:white;">确认是同一小区</button>
-                        <button onclick="reviewAlias(${a.index}, false)" style="background:#ef4444;color:white;">不是</button>
+                        <button onclick="reviewAlias(${a.index !== undefined ? a.index : realIdx}, true)" style="background:#10b981;color:white;">确认是同一小区</button>
+                        <button onclick="reviewAlias(${a.index !== undefined ? a.index : realIdx}, false)" style="background:#ef4444;color:white;">不是</button>
                     </div>
                 `;
                 list.appendChild(div);
