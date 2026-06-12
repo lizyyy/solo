@@ -35,6 +35,11 @@ app.post('/api/import/checkin', (req, res) => {
 
 app.post('/api/conflict/:id/resolve', (req, res) => {
   const { resolution, operator } = req.body;
+  const validResolutions: ('confirm' | 'reject' | 'update')[] = ['confirm', 'reject', 'update'];
+  if (!validResolutions.includes(resolution)) {
+    res.status(400).json({ success: false, error: '无效的决议类型' });
+    return;
+  }
   const success = backup.resolveConflict(req.params.id, resolution, operator || '录音师小段');
   res.json({ success });
 });

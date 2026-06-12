@@ -6,7 +6,10 @@ export interface TrackAlias {
   duration: number;
   fee: number;
   importTime: number;
+  importBatch: number;
   source: 'alias-table' | 'checkin-photo' | 'manual';
+  updatedAt?: number;
+  updatedBy?: string;
 }
 
 export interface CheckinRecord {
@@ -46,13 +49,16 @@ export interface ConflictItem {
   type: 'track-mismatch' | 'substitute-unverified' | 'fee-mismatch' | 'duplicate-import';
   severity: 'warning' | 'error' | 'info';
   message: string;
+  duplicateType?: 'current-batch' | 'historical';
+  existingTrackId?: string;
+  incomingData?: any;
   evidence: {
     aliasTable?: any;
     checkinPhoto?: any;
     detail?: string;
   };
   resolved: boolean;
-  resolution?: 'confirm' | 'reject' | 'manual';
+  resolution?: 'confirm' | 'reject' | 'manual' | 'update';
   resolver?: string;
   resolveTime?: number;
 }
@@ -61,8 +67,12 @@ export interface ImportResult {
   success: boolean;
   imported: number;
   duplicates: number;
+  duplicatesCurrentBatch: number;
+  duplicatesHistorical: number;
+  newRecords: number;
   conflicts: ConflictItem[];
   warnings: string[];
+  batchNumber: number;
 }
 
 export interface SelfCheckResult {

@@ -37,6 +37,7 @@ export class MidiControllerBackup {
   private conflicts: Map<string, ConflictItem> = new Map();
   private history: HistoryRecord[] = [];
   private importFingerprints: Set<string> = new Set();
+  private batchCounter: number = 0;
 
   constructor() {
     this.addHistory('system-init', '系统', '系统初始化完成');
@@ -107,25 +108,69 @@ export class MidiControllerBackup {
   }
 
   importTrackAliases(aliasData: any[]): ImportResult {
+    this.batchCounter++;
+    const currentBatch = this.batchCounter;
+
     const result: ImportResult = {
       success: true,
       imported: 0,
       duplicates: 0,
+      duplicatesCurrentBatch: 0,
+      duplicatesHistorical: 0,
+      newRecords: 0,
       conflicts: [],
       warnings: [],
+      batchNumber: currentBatch,
     };
+
+    const currentBatchFingerprints: Set<string> = new Set();
+    const currentBatchTracks: Map<string, TrackAlias> = new Map();
 
     for (const item of aliasData) {
       const fingerprint = `track:${item.trackName}:${item.artist || ''}`;
 
-      if (this.importFingerprints.has(fingerprint)) {
+      let duplicateType: 'current-batch' | 'historical' | null = null;
+      let existingTrack: TrackAlias | undefined;
+
+      if (currentBatchFingerprints.has(fingerprint)) {
+        duplicateType = 'current-batch';
+        existingTrack = currentBatchTracks.get(fingerprint);
+        result.duplicatesCurrentBatch++;
         result.duplicates++;
+      } else if (this.importFingerprints.has(fingerprint)) {
+        duplicateType = 'historical';
+        existingTrack = this.findTrackByFingerprint(fingerprint);
+        result.duplicatesHistorical++;
+        result.duplicates++;
+      }
+
+      if (duplicateType && existingTrack) {
         const conflict: ConflictItem = {
           id: generateId(),
           type: 'duplicate-import',
           severity: 'warning',
           message: getHumanError('duplicate-track'),
-          evidence: { detail: `曲目「${item.trackName}」重复导入` },
+          duplicateType,
+          existingTrackId: existingTrack.id,
+          incomingData: { ...item },
+          evidence: {
+            detail: `曲目「${item.trackName}」${duplicateType === 'current-batch' ? '本次导入内重复' : '与历史记录重复'}`,
+            aliasTable: {
+              existing: {
+                id: existingTrack.id,
+                trackName: existingTrack.trackName,
+                artist: existingTrack.artist,
+                fee: existingTrack.fee,
+                importBatch: existingTrack.importBatch,
+              },
+              incoming: {
+                trackName: item.trackName,
+                artist: item.artist,
+                fee: item.fee,
+                importBatch: currentBatch,
+              },
+            },
+          },
           resolved: false,
         };
         this.conflicts.set(conflict.id, conflict);
@@ -141,32 +186,57 @@ export class MidiControllerBackup {
         duration: item.duration || 0,
         fee: item.fee || 0,
         importTime: Date.now(),
+        importBatch: currentBatch,
         source: 'alias-table',
       };
 
       this.tracks.set(track.id, track);
       this.importFingerprints.add(fingerprint);
+      currentBatchFingerprints.add(fingerprint);
+      currentBatchTracks.set(fingerprint, track);
       result.imported++;
+      result.newRecords++;
     }
 
-    this.addHistory('import-alias', '录音师小段', `导入曲目别名表 ${result.imported} 条，重复 ${result.duplicates} 条`);
+    this.addHistory('import-alias', '录音师小段',
+      `第${currentBatch}批导入曲目别名表：新增${result.newRecords}条，本次重复${result.duplicatesCurrentBatch}条，历史重复${result.duplicatesHistorical}条`);
     return result;
   }
 
   importCheckinPhotos(checkinData: any[]): ImportResult {
+    this.batchCounter++;
+    const currentBatch = this.batchCounter;
+
     const result: ImportResult = {
       success: true,
       imported: 0,
       duplicates: 0,
+      duplicatesCurrentBatch: 0,
+      duplicatesHistorical: 0,
+      newRecords: 0,
       conflicts: [],
       warnings: [],
+      batchNumber: currentBatch,
     };
+
+    const currentBatchFingerprints: Set<string> = new Set();
 
     for (const item of checkinData) {
       const fingerprint = `checkin:${item.photoId || item.studentName}:${item.classDate}`;
 
-      if (this.importFingerprints.has(fingerprint)) {
+      let duplicateType: 'current-batch' | 'historical' | null = null;
+
+      if (currentBatchFingerprints.has(fingerprint)) {
+        duplicateType = 'current-batch';
+        result.duplicatesCurrentBatch++;
         result.duplicates++;
+      } else if (this.importFingerprints.has(fingerprint)) {
+        duplicateType = 'historical';
+        result.duplicatesHistorical++;
+        result.duplicates++;
+      }
+
+      if (duplicateType) {
         continue;
       }
 
@@ -190,7 +260,9 @@ export class MidiControllerBackup {
 
       this.checkins.set(checkin.id, checkin);
       this.importFingerprints.add(fingerprint);
+      currentBatchFingerprints.add(fingerprint);
       result.imported++;
+      result.newRecords++;
 
       if (checkin.isSubstitute && !checkin.verified) {
         const conflict: ConflictItem = {
@@ -232,7 +304,8 @@ export class MidiControllerBackup {
       }
     }
 
-    this.addHistory('import-checkin', '录音师小段', `导入签到照片 ${result.imported} 条，重复 ${result.duplicates} 条`);
+    this.addHistory('import-checkin', '录音师小段',
+      `第${currentBatch}批导入签到照片：新增${result.newRecords}条，本次重复${result.duplicatesCurrentBatch}条，历史重复${result.duplicatesHistorical}条`);
     return result;
   }
 
@@ -244,7 +317,19 @@ export class MidiControllerBackup {
     return undefined;
   }
 
-  resolveConflict(conflictId: string, resolution: 'confirm' | 'reject', operator: string): boolean {
+  private findTrackByFingerprint(fingerprint: string): TrackAlias | undefined {
+    for (const track of this.tracks.values()) {
+      const fp = `track:${track.trackName}:${track.artist}`;
+      if (fp === fingerprint) return track;
+    }
+    return undefined;
+  }
+
+  resolveConflict(
+    conflictId: string,
+    resolution: 'confirm' | 'reject' | 'update',
+    operator: string
+  ): boolean {
     const conflict = this.conflicts.get(conflictId);
     if (!conflict) return false;
 
@@ -267,12 +352,58 @@ export class MidiControllerBackup {
       }
     }
 
+    if (conflict.type === 'duplicate-import' && resolution === 'update' && conflict.existingTrackId) {
+      this.updateTrackFromConflict(conflict, operator);
+    }
+
     this.addHistory(
       'resolve-conflict',
       operator,
-      `${resolution === 'confirm' ? '确认' : '驳回'}冲突：${conflict.message}`
+      `${resolution === 'confirm' ? '确认' : resolution === 'reject' ? '驳回' : '补录更新'}冲突：${conflict.message}`
     );
     return true;
+  }
+
+  updateTrackFromConflict(conflict: ConflictItem, operator: string): TrackAlias | null {
+    if (!conflict.existingTrackId || !conflict.incomingData) return null;
+
+    const track = this.tracks.get(conflict.existingTrackId);
+    if (!track) return null;
+
+    const before = { ...track };
+
+    const oldFee = track.fee;
+    const newFee = conflict.incomingData.fee;
+
+    track.fee = newFee;
+    track.aliasNames = conflict.incomingData.aliasNames || track.aliasNames;
+    track.duration = conflict.incomingData.duration || track.duration;
+    track.updatedAt = Date.now();
+    track.updatedBy = operator;
+
+    const affectedSplits: string[] = [];
+    for (const split of this.splits.values()) {
+      if (split.trackId === track.id) {
+        const splitBefore = { ...split };
+        split.baseFee = newFee;
+        split.teacherShare = Math.round(newFee * 0.6);
+        split.platformShare = Math.round(newFee * 0.4);
+        split.totalFee = newFee + split.substituteAdjustment;
+        split.version++;
+        split.calcTime = Date.now();
+        split.remark = `曲目费用补录：¥${oldFee}→¥${newFee}`;
+        affectedSplits.push(split.id);
+      }
+    }
+
+    this.addHistory(
+      'update-track-from-conflict',
+      operator,
+      `补录更新「${track.trackName}」：费用¥${oldFee}→¥${newFee}，联动更新${affectedSplits.length}条分账`,
+      { before, after: track, affectedSplits }
+    );
+
+    return track;
   }
 
   verifySubstitute(checkinId: string, operator: string): boolean {
@@ -367,21 +498,54 @@ export class MidiControllerBackup {
 
   private checkDuplicateImport(): SelfCheckResult {
     const seen = new Set<string>();
-    let hasDuplicate = false;
+    let hasDuplicateInTracks = false;
+    const duplicateTracks: string[] = [];
 
     for (const track of this.tracks.values()) {
       const key = `${track.trackName}:${track.artist}`;
       if (seen.has(key)) {
-        hasDuplicate = true;
-        break;
+        hasDuplicateInTracks = true;
+        duplicateTracks.push(track.trackName);
       }
       seen.add(key);
+    }
+
+    const unresolvedDuplicateConflicts = Array.from(this.conflicts.values()).filter(
+      (c) => c.type === 'duplicate-import' && !c.resolved
+    );
+
+    const hasUnresolvedConflicts = unresolvedDuplicateConflicts.length > 0;
+    const hasDuplicate = hasDuplicateInTracks || hasUnresolvedConflicts;
+
+    const details: any = {
+      duplicateInTracks: hasDuplicateInTracks,
+      trackNames: duplicateTracks,
+      unresolvedConflicts: unresolvedDuplicateConflicts.map((c) => ({
+        id: c.id,
+        trackName: c.incomingData?.trackName || c.evidence?.aliasTable?.incoming?.trackName,
+        duplicateType: c.duplicateType,
+        existingFee: c.evidence?.aliasTable?.existing?.fee,
+        incomingFee: c.evidence?.aliasTable?.incoming?.fee,
+      })),
+    };
+
+    let message = '没有重复导入的曲目';
+    if (hasUnresolvedConflicts && hasDuplicateInTracks) {
+      message = `曲目表有${duplicateTracks.length}条重复，还有${unresolvedDuplicateConflicts.length}个重复冲突待处理`;
+    } else if (hasUnresolvedConflicts) {
+      const types = unresolvedDuplicateConflicts.map((c) =>
+        c.duplicateType === 'current-batch' ? '本次重复' : '历史重复'
+      );
+      message = `有${unresolvedDuplicateConflicts.length}个重复冲突待处理（${types.join('、')}）`;
+    } else if (hasDuplicateInTracks) {
+      message = `曲目表中发现${duplicateTracks.length}条重复：${duplicateTracks.join('、')}`;
     }
 
     return {
       name: '重复导入检测',
       passed: !hasDuplicate,
-      message: hasDuplicate ? '发现重复导入的曲目' : '没有重复导入的曲目',
+      message,
+      detail: details,
     };
   }
 
@@ -434,21 +598,41 @@ export class MidiControllerBackup {
 
   private checkExportConsistency(): SelfCheckResult {
     const splitArr = Array.from(this.splits.values());
-    const totalFromSplits = splitArr.reduce((sum, s) => sum + s.totalFee, 0);
-    const teacherTotal = splitArr.reduce((sum, s) => sum + s.teacherShare, 0);
-    const platformTotal = splitArr.reduce((sum, s) => sum + s.platformShare, 0);
-    const expectedTotal = teacherTotal + platformTotal;
+    let passed = true;
+    const issues: string[] = [];
 
-    const diff = Math.abs(totalFromSplits - (teacherTotal + platformTotal));
+    for (const split of splitArr) {
+      const expectedTotal = split.baseFee + split.substituteAdjustment;
+      if (split.totalFee !== expectedTotal) {
+        passed = false;
+        issues.push(
+          `${split.studentName}（${split.trackName}）：实收¥${split.totalFee}≠基础¥${split.baseFee}+替补调整¥${split.substituteAdjustment}`
+        );
+      }
+    }
+
+    const totalFromSplits = splitArr.reduce((sum, s) => sum + s.totalFee, 0);
+    const totalFromBasePlusAdj = splitArr.reduce(
+      (sum, s) => sum + s.baseFee + s.substituteAdjustment,
+      0
+    );
+
+    if (totalFromSplits !== totalFromBasePlusAdj) {
+      passed = false;
+      issues.push(`总额不一致：分账总和¥${totalFromSplits}，基础+替补调整总和¥${totalFromBasePlusAdj}`);
+    }
 
     return {
       name: '导出数据一致性检查',
-      passed: diff === 0,
-      message:
-        diff === 0
-          ? '导出数据一致'
-          : `导出数据不一致：分账总和 ${totalFromSplits}，教师+平台 ${expectedTotal}`,
-      detail: { totalFromSplits, teacherTotal, platformTotal, diff },
+      passed,
+      message: passed
+        ? '导出数据一致'
+        : `发现${issues.length}处不一致`,
+      detail: {
+        totalFromSplits,
+        totalFromBasePlusAdj,
+        issues,
+      },
     };
   }
 

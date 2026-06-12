@@ -242,9 +242,10 @@ function renderTracks(tracks) {
     document.getElementById('trackTable').innerHTML = '<div class="empty-state">还没有导入曲目别名表</div>';
     return;
   }
-  let html = '<table><thead><tr><th>曲目名称</th><th>艺术家</th><th>时长(秒)</th><th>费用(元)</th><th>别名</th></tr></thead><tbody>';
+  let html = '<table><thead><tr><th>曲目名称</th><th>艺术家</th><th>费用(元)</th><th>别名</th><th>批次</th><th>ID</th></tr></thead><tbody>';
   tracks.forEach(t => {
-    html += `<tr><td>${t.trackName}</td><td>${t.artist}</td><td>${t.duration}</td><td>¥${t.fee}</td><td>${t.aliasNames.join(', ') || '-'}</td></tr>`;
+    const updated = t.updatedAt ? `<br><span style="color:#667eea;font-size:12px;">更新于 ${new Date(t.updatedAt).toLocaleString()} by ${t.updatedBy}</span>` : '';
+    html += `<tr><td>${t.trackName}</td><td>${t.artist}</td><td>¥${t.fee}${updated}</td><td>${t.aliasNames.join(', ') || '-'}</td><td>第${t.importBatch}批</td><td style="font-family:monospace;font-size:11px;color:#8e8e93;">${t.id.slice(0, 8)}...</td></tr>`;
   });
   html += '</tbody></table>';
   document.getElementById('trackTable').innerHTML = html;
@@ -273,9 +274,10 @@ function renderSplits(splits) {
     document.getElementById('splitTable').innerHTML = '<div class="empty-state">还没有生成分账明细</div>';
     return;
   }
-  let html = '<table><thead><tr><th>曲目</th><th>学生</th><th>老师</th><th>日期</th><th>基础费用</th><th>教师分成</th><th>平台分成</th><th>替补调整</th><th>实收</th><th>版本</th></tr></thead><tbody>';
+  let html = '<table><thead><tr><th>曲目</th><th>学生</th><th>老师</th><th>日期</th><th>基础费用</th><th>实收</th><th>版本</th><th>曲目ID</th><th>分账ID</th></tr></thead><tbody>';
   splits.forEach(s => {
-    html += `<tr><td>${s.trackName}</td><td>${s.studentName}</td><td>${s.teacherName}</td><td>${s.classDate}</td><td>¥${s.baseFee}</td><td>¥${s.teacherShare}</td><td>¥${s.platformShare}</td><td style="color:${s.substituteAdjustment < 0 ? '#ff3b30' : '#34c759'}">${s.substituteAdjustment !== 0 ? '¥' + s.substituteAdjustment : '-'}</td><td><strong>¥${s.totalFee}</strong></td><td>v${s.version}</td></tr>`;
+    const remark = s.remark ? `<br><span style="color:#ff9500;font-size:12px;">${s.remark}</span>` : '';
+    html += `<tr><td>${s.trackName}</td><td>${s.studentName}</td><td>${s.teacherName}</td><td>${s.classDate}</td><td>¥${s.baseFee}</td><td><strong>¥${s.totalFee}</strong>${remark}</td><td>v${s.version}</td><td style="font-family:monospace;font-size:11px;color:#8e8e93;">${s.trackId.slice(0, 8)}...</td><td style="font-family:monospace;font-size:11px;color:#8e8e93;">${s.id.slice(0, 8)}...</td></tr>`;
   });
   html += '</tbody></table>';
   document.getElementById('splitTable').innerHTML = html;
@@ -290,16 +292,47 @@ function renderConflicts(conflicts) {
   let html = '';
   unresolved.forEach(c => {
     const sevTag = c.severity === 'error' ? 'tag-error' : c.severity === 'warning' ? 'tag-warning' : 'tag-info';
+    const typeLabel = c.duplicateType === 'current-batch' ? '<span class="tag tag-info">本次导入内重复</span>' :
+                      c.duplicateType === 'historical' ? '<span class="tag tag-info">与历史记录重复</span>' : '';
+    
+    let evidenceHtml = '';
+    if (c.type === 'duplicate-import' && c.evidence?.aliasTable) {
+      const ex = c.evidence.aliasTable.existing;
+      const inc = c.evidence.aliasTable.incoming;
+      const feeDiff = ex.fee !== inc.fee ? `<span style="color:#ff3b30;font-weight:bold;">费用不一致：¥${ex.fee} → ¥${inc.fee}</span>` : '费用一致';
+      evidenceHtml = `<div class="conflict-evidence">
+        <strong>已有记录</strong>（第${ex.importBatch}批）：${ex.trackName} - ¥${ex.fee}<br>
+        <strong>导入数据</strong>（第${inc.importBatch}批）：${inc.trackName} - ¥${inc.fee}<br>
+        ${feeDiff}<br>
+        <small>关联曲目ID: ${c.existingTrackId?.slice(0, 8)}...</small>
+      </div>`;
+    } else {
+      evidenceHtml = `<div class="conflict-evidence">证据: ${JSON.stringify(c.evidence)}</div>`;
+    }
+
+    let actionsHtml = '';
+    if (c.type === 'duplicate-import') {
+      const hasFeeDiff = c.evidence?.aliasTable?.existing?.fee !== c.evidence?.aliasTable?.incoming?.fee;
+      actionsHtml = `<div class="conflict-actions">
+        ${hasFeeDiff ? `<button class="btn btn-primary btn-sm" onclick="resolveConflict('${c.id}', 'update')">补录更新费用</button>` : ''}
+        <button class="btn btn-success btn-sm" onclick="resolveConflict('${c.id}', 'confirm')">确认重复，跳过</button>
+        <button class="btn btn-danger btn-sm" onclick="resolveConflict('${c.id}', 'reject')">驳回</button>
+      </div>`;
+    } else {
+      actionsHtml = `<div class="conflict-actions">
+        <button class="btn btn-success btn-sm" onclick="resolveConflict('${c.id}', 'confirm')">录音师确认</button>
+        <button class="btn btn-danger btn-sm" onclick="resolveConflict('${c.id}', 'reject')">驳回</button>
+      </div>`;
+    }
+
     html += `<div class="conflict-item">
       <div class="conflict-header">
         <span class="tag ${sevTag}">${c.severity === 'error' ? '错误' : c.severity === 'warning' ? '警告' : '提示'}</span>
+        ${typeLabel}
       </div>
       <div class="conflict-msg">⚠️ ${c.message}</div>
-      <div class="conflict-evidence">证据: ${JSON.stringify(c.evidence)}</div>
-      <div class="conflict-actions">
-        <button class="btn btn-success btn-sm" onclick="resolveConflict('${c.id}', 'confirm')">录音师确认</button>
-        <button class="btn btn-danger btn-sm" onclick="resolveConflict('${c.id}', 'reject')">驳回</button>
-      </div>
+      ${evidenceHtml}
+      ${actionsHtml}
     </div>`;
   });
   document.getElementById('conflictList').innerHTML = html;
@@ -328,7 +361,12 @@ async function importAlias() {
       body: JSON.stringify(data)
     });
     const result = await res.json();
-    alert(`导入完成！成功 ${result.imported} 条，重复 ${result.duplicates} 条，冲突 ${result.conflicts.length} 条`);
+    let msg = `第${result.batchNumber}批导入完成！\n`;
+    msg += `✅ 新增 ${result.newRecords} 条\n`;
+    if (result.duplicatesCurrentBatch > 0) msg += `⚠️ 本次导入内重复 ${result.duplicatesCurrentBatch} 条\n`;
+    if (result.duplicatesHistorical > 0) msg += `⚠️ 与历史重复 ${result.duplicatesHistorical} 条\n`;
+    if (result.conflicts.length > 0) msg += `❌ 产生 ${result.conflicts.length} 个冲突\n`;
+    alert(msg);
     fetchState();
   } catch (e) {
     alert('JSON格式错误：' + e.message);
