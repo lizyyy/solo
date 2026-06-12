@@ -147,8 +147,14 @@ class ImportResult(BaseModel):
     show_id: Optional[str] = None
     is_duplicate: bool = False
     existing_import_id: Optional[str] = None
+    existing_import_time: Optional[datetime] = None
+    existing_imported_by: Optional[str] = None
     batches_created: int = 0
     tickets_imported: int = 0
+    batches_reused: int = 0
+    tickets_reused: int = 0
+    reused_batch_names: List[str] = Field(default_factory=list)
+    new_batch_names: List[str] = Field(default_factory=list)
     mixed_batches_found: List[str] = Field(default_factory=list)
     warnings: List[str] = Field(default_factory=list)
     errors: List[str] = Field(default_factory=list)

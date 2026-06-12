@@ -135,9 +135,29 @@ class ImportEngine:
         if existing_import:
             result.is_duplicate = True
             result.existing_import_id = existing_import.id
+            result.existing_import_time = existing_import.imported_at
+            result.existing_imported_by = existing_import.imported_by
+
+            reused_batch_names = []
+            reused_ticket_count = 0
+            for batch_id in existing_import.batch_ids:
+                batch = next((b for b in show.batches if b.id == batch_id), None)
+                if batch:
+                    reused_batch_names.append(batch.name)
+                    reused_ticket_count += len(batch.tickets)
+
+            result.batches_reused = len(reused_batch_names)
+            result.tickets_reused = reused_ticket_count
+            result.reused_batch_names = reused_batch_names
+
             result.warnings.append(
                 f"检测到重复导入: 文件 {source_filename} 已于 "
-                f"{existing_import.imported_at.strftime('%Y-%m-%d %H:%M')} 导入，跳过以避免票量翻倍"
+                f"{existing_import.imported_at.strftime('%Y-%m-%d %H:%M')} 由 "
+                f"{existing_import.imported_by} 导入，跳过以避免票量翻倍"
+            )
+            result.warnings.append(
+                f"本次复用 {len(reused_batch_names)} 个批次共 {reused_ticket_count} 张票，"
+                f"未新增任何记录"
             )
             return result
 
@@ -163,6 +183,7 @@ class ImportEngine:
             rehearsal_import.batch_ids.append(batch.id)
             show.batches.append(batch)
             result.tickets_imported += len(batch.tickets)
+            result.new_batch_names.append(batch.name)
 
         show.rehearsal_imports.append(rehearsal_import)
         result.batches_created = len(new_batches)

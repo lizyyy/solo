@@ -1,0 +1,245 @@
+{
+  "id": "show_7ac8a217",
+  "name": "夏日电音节",
+  "date": "2026-07-15 00:00:00",
+  "venue": "上海体育馆",
+  "dj_name": "DJ MAX",
+  "workflow_stage": "stage_3_authorized",
+  "batches": [
+    {
+      "id": "batch_29a526f2",
+      "name": "A区VIP",
+      "show_id": "show_7ac8a217",
+      "tickets": [
+        {
+          "id": "ticket_b8f1ceeb",
+          "type": "paid",
+          "seat": "10排5座",
+          "price": 880.0,
+          "guest_name": "张三",
+          "source_ref": "import:demo_rehearsal.txt:35af75d3",
+          "note": "媒体嘉宾"
+        },
+        {
+          "id": "ticket_7cdb7777",
+          "type": "paid",
+          "seat": "10排6座",
+          "price": 880.0,
+          "guest_name": "李四",
+          "source_ref": "import:demo_rehearsal.txt:35af75d3",
+          "note": null
+        },
+        {
+          "id": "ticket_df9b9f5c",
+          "type": "complimentary",
+          "seat": "10排7座",
+          "price": null,
+          "guest_name": "王五",
+          "source_ref": "import:demo_rehearsal.txt:35af75d3",
+          "note": "主办方邀请"
+        }
+      ],
+      "status": "resolved",
+      "mixed_issue_found": true,
+      "review_note": "复盘自动送审",
+      "resolved_at": "2026-06-12 08:12:37.252621",
+      "rolled_back_at": null
+    },
+    {
+      "id": "batch_1f813ffd",
+      "name": "B区普通",
+      "show_id": "show_7ac8a217",
+      "tickets": [
+        {
+          "id": "ticket_06d068bc",
+          "type": "paid",
+          "seat": "20排1座",
+          "price": 380.0,
+          "guest_name": "赵六",
+          "source_ref": "import:demo_rehearsal.txt:35af75d3",
+          "note": null
+        },
+        {
+          "id": "ticket_526712b4",
+          "type": "paid",
+          "seat": "20排2座",
+          "price": 380.0,
+          "guest_name": "钱七",
+          "source_ref": "import:demo_rehearsal.txt:35af75d3",
+          "note": null
+        }
+      ],
+      "status": "normal",
+      "mixed_issue_found": null,
+      "review_note": null,
+      "resolved_at": null,
+      "rolled_back_at": null
+    },
+    {
+      "id": "batch_b566f3e0",
+      "name": "C区赠票",
+      "show_id": "show_7ac8a217",
+      "tickets": [
+        {
+          "id": "ticket_271a5c69",
+          "type": "complimentary",
+          "seat": "30排1座",
+          "price": null,
+          "guest_name": "孙八",
+          "source_ref": "import:demo_rehearsal.txt:35af75d3",
+          "note": "合作方"
+        },
+        {
+          "id": "ticket_674196ae",
+          "type": "complimentary",
+          "seat": "30排2座",
+          "price": null,
+          "guest_name": "周九",
+          "source_ref": "import:demo_rehearsal.txt:35af75d3",
+          "note": null
+        }
+      ],
+      "status": "normal",
+      "mixed_issue_found": null,
+      "review_note": null,
+      "resolved_at": null,
+      "rolled_back_at": null
+    }
+  ],
+  "energy_curve": {
+    "id": "curve_replay_show_7ac8a217",
+    "show_id": "show_7ac8a217",
+    "points": [
+      {
+        "track_name": "暖场曲1",
+        "track_order": 1,
+        "energy_level": 3.5,
+        "bpm": null,
+        "mood": null,
+        "note": null,
+        "source_ref": null
+      },
+      {
+        "track_name": "暖场曲2",
+        "track_order": 2,
+        "energy_level": 5.0,
+        "bpm": null,
+        "mood": null,
+        "note": null,
+        "source_ref": null
+      },
+      {
+        "track_name": "主场曲1",
+        "track_order": 3,
+        "energy_level": 8.5,
+        "bpm": null,
+        "mood": null,
+        "note": null,
+        "source_ref": null
+      },
+      {
+        "track_name": "主场曲2",
+        "track_order": 4,
+        "energy_level": 9.0,
+        "bpm": null,
+        "mood": null,
+        "note": null,
+        "source_ref": null
+      },
+      {
+        "track_name": "收尾曲",
+        "track_order": 5,
+        "energy_level": 6.0,
+        "bpm": null,
+        "mood": null,
+        "note": null,
+        "source_ref": null
+      }
+    ],
+    "created_at": "2026-06-12 08:12:37.252637",
+    "modified_at": "2026-06-12 08:12:37.252638",
+    "modified_by": "阿梅",
+    "version": 1
+  },
+  "rehearsal_imports": [
+    {
+      "id": "import_95bc51af",
+      "show_id": "show_7ac8a217",
+      "source_filename": "demo_rehearsal.txt",
+      "source_hash": "35af75d3c2850876d191754dda26830a18a41d6ae05c9985f400e4b225f098f4",
+      "imported_at": "2026-06-12 08:12:37.252503",
+      "imported_by": "阿梅",
+      "raw_content": "\n批次:A区VIP\n张三 售票 ¥880 10排5座 备注:媒体嘉宾\n李四 售票 ¥880 10排6座\n王五 赠票  10排7座 备注:主办方邀请\n\n批次:B区普通\n赵六 售票 ¥380 20排1座\n钱七 售票 ¥380 20排2座\n\n批次:C区赠票\n孙八 赠票  30排1座 备注:合作方\n周九 赠票  30排2座\n",
+      "batch_ids": [
+        "batch_29a526f2",
+        "batch_1f813ffd",
+        "batch_b566f3e0"
+      ],
+      "note": null
+    }
+  ],
+  "contract_screenshots": [
+    {
+      "id": "screenshot_38d6c48e",
+      "show_id": "show_7ac8a217",
+      "image_path": "data/contract_screenshot.jpg",
+      "uploaded_at": "2026-06-12 08:12:37.252582",
+      "uploaded_by": "阿梅",
+      "ocr_text": null,
+      "linked_batch_ids": [],
+      "note": "合同页第一页"
+    }
+  ],
+  "modification_history": [
+    {
+      "id": "mod_477712af",
+      "show_id": "show_7ac8a217",
+      "entity_type": "batch",
+      "entity_id": "batch_29a526f2",
+      "field_name": "status",
+      "old_value": "mixed",
+      "new_value": "pending_review",
+      "modified_at": "2026-06-12 08:12:37.252607",
+      "modified_by": "复盘脚本",
+      "reason": "送录音师复核"
+    },
+    {
+      "id": "mod_5df4a682",
+      "show_id": "show_7ac8a217",
+      "entity_type": "workflow",
+      "entity_id": "show_7ac8a217",
+      "field_name": "stage",
+      "old_value": "stage_1_imported",
+      "new_value": "stage_2_contract_reviewed",
+      "modified_at": "2026-06-12 08:12:37.252662",
+      "modified_by": "复盘脚本",
+      "reason": "复盘自动推进"
+    },
+    {
+      "id": "mod_c3740876",
+      "show_id": "show_7ac8a217",
+      "entity_type": "workflow",
+      "entity_id": "show_7ac8a217",
+      "field_name": "stage",
+      "old_value": "stage_2_contract_reviewed",
+      "new_value": "stage_3_authorized",
+      "modified_at": "2026-06-12 08:12:37.252684",
+      "modified_by": "复盘脚本",
+      "reason": "复盘自动推进"
+    }
+  ],
+  "review_decisions": [
+    {
+      "id": "review_ce54ad9e",
+      "batch_id": "batch_29a526f2",
+      "show_id": "show_7ac8a217",
+      "decided_at": "2026-06-12 08:12:37.252618",
+      "decided_by": "录音师老王",
+      "is_approved": true,
+      "resolution": "已确认，没问题",
+      "split_into_batches": null
+    }
+  ],
+  "created_at": "2026-06-12 08:12:37.252316",
+  "note": null
+}
