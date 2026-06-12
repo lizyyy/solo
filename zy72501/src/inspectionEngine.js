@@ -10,6 +10,22 @@ const {
 
 const PHONE_REGEX = /1[3-9]\d{9}/g;
 
+function getMatchContext(text, matchIndex, matchLength, contextLen = 30) {
+  if (!text || matchIndex === undefined) return null;
+  const start = Math.max(0, matchIndex - contextLen);
+  const end = Math.min(text.length, matchIndex + matchLength + contextLen);
+  let prefix = text.substring(start, matchIndex);
+  let suffix = text.substring(matchIndex + matchLength, end);
+  if (start > 0) prefix = '...' + prefix;
+  if (end < text.length) suffix = suffix + '...';
+  return {
+    prefix,
+    matched: text.substring(matchIndex, matchIndex + matchLength),
+    suffix,
+    fullContext: prefix + text.substring(matchIndex, matchIndex + matchLength) + suffix
+  };
+}
+
 function detectPhoneNumbers(text) {
   if (!text) return [];
   const matches = text.match(PHONE_REGEX);
@@ -46,12 +62,38 @@ function analyzeCitationGaps(rule, batches) {
     });
   }
 
-  const ruleKeywords = ['RAG', '引用', '证据', '来源', '出处'];
-  const hasRagReference = ruleKeywords.some(kw => 
-    (rule.remark || '').includes(kw) || 
-    (rule.mainProcess || '').includes(kw) ||
-    (rule.content || '').includes(kw)
-  );
+  const ragPatterns = [
+    /\bRAG\b/i,
+    /RAG[ _-]*(引用|证据|来源|出处|reference|cite)/i,
+    /(引用|证据|来源|出处)[ _-]*RAG/i,
+    /(RAG[ _-]*引用|RAG[ _-]*证据|RAG[ _-]*来源|RAG[ _-]*出处)/i,
+    /知识库第[^\s]+节/,
+    /引用来源[：:]/,
+    /RAG[ _-]*reference/i,
+    /\*RAG\*/,
+    /【RAG[ _-]*(引用|证据|来源|出处)】/,
+    /「RAG[ _-]*(引用|证据|来源|出处)」/,
+    /RAG[ _-]*引用[ _-]*来源/i,
+    /(引用|证据|来源|出处)[ _-]*\[RAG\]/i
+  ];
+  
+  const ruleText = `${rule.remark || ''}\n${rule.mainProcess || ''}\n${rule.content || ''}`;
+  const hasRagReference = ragPatterns.some(pattern => pattern.test(ruleText));
+  
+  let ragMatchDetails = null;
+  if (hasRagReference) {
+    ragMatchDetails = [];
+    ragPatterns.forEach((pattern, idx) => {
+      const match = ruleText.match(pattern);
+      if (match) {
+        ragMatchDetails.push({
+          patternIndex: idx,
+          matchedText: match[0],
+          context: getMatchContext(ruleText, match.index, match[0].length)
+        });
+      }
+    });
+  }
 
   if (!hasRagReference) {
     gaps.push({
@@ -60,24 +102,87 @@ function analyzeCitationGaps(rule, batches) {
       description: '脱敏规则中未明确标注 RAG 引用来源',
       missing: 'RAG 引用证据链',
       nextStep: '请算法同事核查并补充 RAG 引用来源',
-      owner: '算法同事'
+      owner: '算法同事',
+      rawMaterialSnapshot: {
+        remark: rule.remark || '',
+        mainProcess: rule.mainProcess || '',
+        content: rule.content || '',
+        checkedFields: ['remark', 'mainProcess', 'content'],
+        requiredPatterns: [
+          'RAG 引用', 'RAG引用', 'RAG 证据', 
+          '引用来源', '知识库第X节',
+          'RAG reference', 'RAG cite',
+          '【RAG引用】', '「RAG 引用」'
+        ]
+      },
+      traceId: generateId('trace')
+    });
+  } else if (ragMatchDetails) {
+    gaps.push({
+      type: 'rag_reference_found',
+      severity: 'info',
+      description: '脱敏规则中已检测到 RAG 引用标注',
+      owner: '系统',
+      ragMatchDetails,
+      rawMaterialSnapshot: {
+        remark: rule.remark || '',
+        mainProcess: rule.mainProcess || '',
+        content: rule.content || ''
+      },
+      traceId: generateId('trace')
     });
   }
 
   relatedBatches.forEach(batch => {
-    const batchHasRag = ruleKeywords.some(kw =>
-      (batch.sceneStatement || '').includes(kw) ||
-      (batch.content || '').includes(kw)
-    );
+    const batchText = `${batch.sceneStatement || ''}\n${batch.content || ''}`;
+    const batchHasRag = ragPatterns.some(pattern => pattern.test(batchText));
+    
+    let batchRagMatchDetails = null;
+    if (batchHasRag) {
+      batchRagMatchDetails = [];
+      ragPatterns.forEach((pattern, idx) => {
+        const match = batchText.match(pattern);
+        if (match) {
+          batchRagMatchDetails.push({
+            patternIndex: idx,
+            matchedText: match[0],
+            context: getMatchContext(batchText, match.index, match[0].length)
+          });
+        }
+      });
+    }
+    
     if (!batchHasRag) {
       gaps.push({
         type: 'batch_no_rag_evidence',
         severity: 'medium',
         batchNo: batch.batchNo,
+        batchId: batch.id,
         description: `灰度批次 ${batch.batchNo} 的现场说法中缺少 RAG 引用标注`,
         missing: '灰度批次 RAG 引用证据',
         nextStep: '请算法同事补充该批次的 RAG 引用来源',
-        owner: '算法同事'
+        owner: '算法同事',
+        rawMaterialSnapshot: {
+          sceneStatement: batch.sceneStatement || '',
+          content: batch.content || '',
+          checkedFields: ['sceneStatement', 'content']
+        },
+        traceId: generateId('trace')
+      });
+    } else {
+      gaps.push({
+        type: 'batch_rag_reference_found',
+        severity: 'info',
+        batchNo: batch.batchNo,
+        batchId: batch.id,
+        description: `灰度批次 ${batch.batchNo} 中已检测到 RAG 引用标注`,
+        owner: '系统',
+        ragMatchDetails: batchRagMatchDetails,
+        rawMaterialSnapshot: {
+          sceneStatement: batch.sceneStatement || '',
+          content: batch.content || ''
+        },
+        traceId: generateId('trace')
       });
     }
   });
@@ -91,6 +196,7 @@ function checkPhoneMasking(text, sourceType, sourceId, sourceName) {
   
   phones.forEach(phone => {
     if (!isPhoneMasked(phone)) {
+      const phoneIdx = text.indexOf(phone);
       issues.push({
         id: generateId('phone'),
         phoneNumber: phone,
@@ -99,7 +205,13 @@ function checkPhoneMasking(text, sourceType, sourceId, sourceName) {
         sourceName,
         status: 'pending_review',
         detectedAt: new Date().toISOString(),
-        note: '手机号在导出中漏遮，留待算法同事复核，暂不归为正常'
+        note: '手机号在导出中漏遮，留待算法同事复核，暂不归为正常',
+        rawMaterialSnapshot: {
+          fullText: text,
+          phoneContext: getMatchContext(text, phoneIdx, phone.length, 40),
+          position: phoneIdx
+        },
+        traceId: generateId('trace')
       });
     }
   });
@@ -110,40 +222,111 @@ function checkPhoneMasking(text, sourceType, sourceId, sourceName) {
 function generateFriendlyReport(inspection) {
   const lines = [];
   lines.push(`📋 RAG 引用缺失巡检报告`);
-  lines.push(`━━━━━━━━━━━━━━━━━━━━━━`);
+  lines.push(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
   lines.push(`巡检编号: ${inspection.id}`);
   lines.push(`巡检时间: ${inspection.createdAt}`);
   lines.push(`执行人: ${inspection.operator}`);
+  if (inspection.options?.rerunFrom) lines.push(`🔄 重跑来源: ${inspection.options.rerunFrom}`);
   lines.push('');
+  
+  const ragGaps = inspection.gaps.filter(g => g.type === 'no_rag_evidence' || g.type === 'batch_no_rag_evidence');
+  const ragFound = inspection.gaps.filter(g => g.type === 'rag_reference_found' || g.type === 'batch_rag_reference_found');
+  const otherGaps = inspection.gaps.filter(g => !g.type.includes('rag'));
   
   lines.push(`🔍 本次巡检范围:`);
   lines.push(`  - 脱敏规则: ${inspection.ruleCount} 条`);
   lines.push(`  - 灰度批次: ${inspection.batchCount} 条`);
-  lines.push(`  - 发现问题: ${inspection.gaps.length} 个`);
+  lines.push(`  - RAG 引用缺失: ${ragGaps.length} 个`);
+  lines.push(`  - RAG 引用已存在: ${ragFound.length} 个`);
+  lines.push(`  - 其他问题: ${otherGaps.length} 个`);
   lines.push(`  - 手机号漏遮: ${inspection.phoneIssues.length} 个`);
   lines.push('');
 
-  if (inspection.gaps.length > 0) {
-    lines.push(`⚠️  引用缺失问题详情:`);
+  if (ragGaps.length > 0) {
+    lines.push(`🔴 RAG 引用缺失问题详情 (可通过 traceId 追回原始材料):`);
     lines.push('');
-    inspection.gaps.forEach((gap, idx) => {
+    ragGaps.forEach((gap, idx) => {
       lines.push(`  ${idx + 1}. [${gap.severity === 'high' ? '🔴' : '🟡'} ${gap.description}`);
+      lines.push(`     🔍 Trace ID: ${gap.traceId}`);
       lines.push(`     ❓ 为什么留下: ${gap.description}`);
       lines.push(`     📦 还缺什么: ${gap.missing}`);
       lines.push(`     🎯 下一步找谁: ${gap.owner}`);
       lines.push(`     📝 具体行动: ${gap.nextStep}`);
+      if (gap.ruleName) lines.push(`     📜 关联规则: ${gap.ruleName}`);
+      if (gap.batchNo) lines.push(`     📦 关联批次: ${gap.batchNo}`);
+      if (gap.rawMaterialSnapshot) {
+        lines.push(`     📄 触发原始材料 (已快照保留):`);
+        if (gap.rawMaterialSnapshot.checkedFields) {
+          lines.push(`        已检查字段: ${gap.rawMaterialSnapshot.checkedFields.join(', ')}`);
+        }
+        if (gap.rawMaterialSnapshot.requiredPatterns) {
+          lines.push(`        期望匹配模式: ${gap.rawMaterialSnapshot.requiredPatterns.slice(0, 5).join(' | ')}${gap.rawMaterialSnapshot.requiredPatterns.length > 5 ? '...' : ''}`);
+        }
+        if (gap.rawMaterialSnapshot.remark && gap.rawMaterialSnapshot.remark.length > 0) {
+          const shortRemark = gap.rawMaterialSnapshot.remark.substring(0, 100) + (gap.rawMaterialSnapshot.remark.length > 100 ? '...' : '');
+          lines.push(`        备注原文: "${shortRemark}"`);
+        }
+        if (gap.rawMaterialSnapshot.mainProcess && gap.rawMaterialSnapshot.mainProcess.length > 0) {
+          const shortProcess = gap.rawMaterialSnapshot.mainProcess.substring(0, 100) + (gap.rawMaterialSnapshot.mainProcess.length > 100 ? '...' : '');
+          lines.push(`        主流程原文: "${shortProcess}"`);
+        }
+        if (gap.rawMaterialSnapshot.sceneStatement !== undefined) {
+          const shortScene = (gap.rawMaterialSnapshot.sceneStatement || '').substring(0, 100) + ((gap.rawMaterialSnapshot.sceneStatement || '').length > 100 ? '...' : '');
+          lines.push(`        现场说法原文: "${shortScene}"`);
+        }
+      }
+      lines.push('');
+    });
+  }
+
+  if (ragFound.length > 0) {
+    lines.push(`🟢 RAG 引用已检测到 (可通过 traceId 反查匹配内容):`);
+    lines.push('');
+    ragFound.forEach((gap, idx) => {
+      lines.push(`  ${idx + 1}. 🟢 ${gap.description}`);
+      lines.push(`     🔍 Trace ID: ${gap.traceId}`);
+      if (gap.ruleName) lines.push(`     📜 关联规则: ${gap.ruleName}`);
+      if (gap.batchNo) lines.push(`     📦 关联批次: ${gap.batchNo}`);
+      if (gap.ragMatchDetails && gap.ragMatchDetails.length > 0) {
+        lines.push(`     🎯 匹配到的 RAG 引用内容:`);
+        gap.ragMatchDetails.forEach((match, mIdx) => {
+          lines.push(`        ${mIdx + 1}. 匹配文本: "${match.matchedText}"`);
+          if (match.context) {
+            lines.push(`           上下文: ${match.context.fullContext}`);
+          }
+        });
+      }
+      lines.push('');
+    });
+  }
+
+  if (otherGaps.length > 0) {
+    lines.push(`⚠️  其他问题详情:`);
+    lines.push('');
+    otherGaps.forEach((gap, idx) => {
+      lines.push(`  ${idx + 1}. [${gap.severity === 'high' ? '🔴' : '🟡'} ${gap.description}`);
+      lines.push(`     🔍 Trace ID: ${gap.traceId || 'N/A'}`);
+      lines.push(`     ❓ 为什么留下: ${gap.description}`);
+      lines.push(`     📦 还缺什么: ${gap.missing}`);
+      lines.push(`     🎯 下一步找谁: ${gap.owner}`);
+      lines.push(`     📝 具体行动: ${gap.nextStep}`);
+      if (gap.ruleName) lines.push(`     📜 关联规则: ${gap.ruleName}`);
       if (gap.batchNo) lines.push(`     📦 关联批次: ${gap.batchNo}`);
       lines.push('');
     });
   }
 
   if (inspection.phoneIssues.length > 0) {
-    lines.push(`📱 手机号漏遮问题（待算法同事复核:`);
+    lines.push(`📱 手机号漏遮问题 (待算法同事复核，暂不归为正常):`);
     lines.push('');
     inspection.phoneIssues.forEach((issue, idx) => {
-      lines.push(`  ${idx + 1}. ${issue.phoneNumber} (来源: ${issue.sourceName})`);
+      lines.push(`  ${idx + 1}. 📱 ${issue.phoneNumber} (来源: ${issue.sourceName})`);
+      lines.push(`     🔍 Trace ID: ${issue.traceId}`);
       lines.push(`     状态: ${issue.status === 'pending_review' ? '⏳ 待算法同事复核' : issue.status}`);
       lines.push(`     说明: ${issue.note}`);
+      if (issue.rawMaterialSnapshot?.phoneContext) {
+        lines.push(`     📄 出现位置上下文: ${issue.rawMaterialSnapshot.phoneContext.fullContext}`);
+      }
       lines.push('');
     });
   }
@@ -152,8 +335,12 @@ function generateFriendlyReport(inspection) {
     lines.push(`✅ 本次巡检未发现问题，一切正常！`);
   }
 
-  lines.push(`━━━━━━━━━━━━━━━━━━━━━━`);
-  lines.push(`💡 提示: 所有修改操作均已记录审计日志，可追溯谁改了什么、为什么改`);
+  lines.push(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+  lines.push(`💡 反查说明:`);
+  lines.push(`   • 所有问题均已分配唯一 Trace ID，可用于反查修改历史`);
+  lines.push(`   • 修改前的原始材料已快照保留，不会被后续修改覆盖`);
+  lines.push(`   • 审计日志记录: 谁改了什么、改前内容、改后内容、修改原因`);
+  lines.push(`   • 可通过 traceId 在审计日志和历史版本中完整追溯`);
   
   return lines.join('\n');
 }

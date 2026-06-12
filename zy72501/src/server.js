@@ -5,15 +5,22 @@ const path = require('path');
 
 const {
   importDesensitizationRule,
+  updateDesensitizationRule,
   addGrayBatch,
+  updateGrayBatch,
   getDesensitizationRules,
+  getDesensitizationRuleById,
   getGrayBatches,
+  getGrayBatchById,
   getInspectionRecords,
+  getInspectionById,
   getExportResults,
   getPhoneMaskIssues,
   getAuditLogs,
   updatePhoneMaskIssue,
-  updateExportResult
+  updateExportResult,
+  traceBackByTraceId,
+  traceBackByRagReference
 } = require('./models');
 const { runInspection, rerunInspection, generateFriendlyReport } = require('./inspectionEngine');
 
@@ -104,6 +111,63 @@ app.put('/api/phone-issues/:id', (req, res) => {
 
 app.get('/api/audit-logs', (req, res) => {
   res.json(getAuditLogs());
+});
+
+app.get('/api/rules/:id', (req, res) => {
+  const rule = getDesensitizationRuleById(req.params.id);
+  if (!rule) return res.status(404).json({ error: '规则不存在' });
+  res.json(rule);
+});
+
+app.put('/api/rules/:id', (req, res) => {
+  const operator = getOperator(req);
+  const changeReason = req.body.changeReason || null;
+  const updates = {};
+  ['name', 'remark', 'mainProcess', 'content', 'status'].forEach(field => {
+    if (req.body[field] !== undefined) {
+      updates[field] = req.body[field];
+    }
+  });
+  const updated = updateDesensitizationRule(req.params.id, updates, operator, changeReason);
+  if (!updated) return res.status(404).json({ error: '规则不存在' });
+  res.json(updated);
+});
+
+app.get('/api/batches/:id', (req, res) => {
+  const batch = getGrayBatchById(req.params.id);
+  if (!batch) return res.status(404).json({ error: '批次不存在' });
+  res.json(batch);
+});
+
+app.put('/api/batches/:id', (req, res) => {
+  const operator = getOperator(req);
+  const changeReason = req.body.changeReason || null;
+  const updates = {};
+  ['batchNo', 'sceneStatement', 'relatedRuleId', 'content'].forEach(field => {
+    if (req.body[field] !== undefined) {
+      updates[field] = req.body[field];
+    }
+  });
+  const updated = updateGrayBatch(req.params.id, updates, operator, changeReason);
+  if (!updated) return res.status(404).json({ error: '批次不存在' });
+  res.json(updated);
+});
+
+app.get('/api/inspections/:id', (req, res) => {
+  const inspection = getInspectionById(req.params.id);
+  if (!inspection) return res.status(404).json({ error: '巡检记录不存在' });
+  res.json(inspection);
+});
+
+app.get('/api/trace/traceId/:traceId', (req, res) => {
+  const result = traceBackByTraceId(req.params.traceId);
+  if (!result.found) return res.status(404).json({ error: '未找到相关记录', ...result });
+  res.json(result);
+});
+
+app.get('/api/trace/rag/:searchTerm', (req, res) => {
+  const result = traceBackByRagReference(req.params.searchTerm);
+  res.json(result);
 });
 
 app.get('/api/dashboard', (req, res) => {

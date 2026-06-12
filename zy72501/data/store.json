@@ -1,53 +1,102 @@
 {
   "desensitizationRules": [
     {
-      "id": "rule_1780803969432_qxecmz",
-      "name": "Test Rule 1",
-      "remark": "Main process here",
-      "mainProcess": "Step 1, Step 2, Step 3 with RAG reference",
-      "content": "This is test content with RAG evidence",
-      "importedBy": "admin",
-      "importedAt": "2026-06-07T03:46:09.432Z",
-      "status": "imported"
-    },
-    {
-      "id": "rule_1780803969434_qhchxt",
-      "name": "Test Rule 2",
-      "remark": "",
-      "mainProcess": "",
-      "content": "Phone: 13800138000 is unmasked here",
-      "importedBy": "analyst",
-      "importedAt": "2026-06-07T03:46:09.434Z",
-      "status": "imported"
+      "id": "rule_1781284045177_6vxhzc",
+      "name": "客户咨询记录脱敏规则",
+      "remark": "主流程：客户进线 → 坐席记录 → 敏感字段识别 → 脱敏处理 → 存储归档",
+      "mainProcess": "1. 客户进线，系统自动抓取对话内容\n2. 坐席人工补充客户诉求\n3. 系统识别敏感字段进行脱敏\n4. /引用 只是路径标记，不是RAG引用\n5. RAG引用来源：知识库第3.2.1节「脱敏处理规范」\n6. 脱敏后数据存入知识库供检索",
+      "content": "本规则适用于所有客户咨询记录。敏感字段包括：手机号（11位，遮蔽中间4位）。测试手机号已修复。",
+      "importedBy": "系统管理员",
+      "importedAt": "2026-06-12T17:07:25.177Z",
+      "status": "imported",
+      "versionHistory": [
+        {
+          "version": 1,
+          "timestamp": "2026-06-12T17:07:25.178Z",
+          "modifiedBy": "系统管理员",
+          "changeReason": "首次导入",
+          "snapshot": {
+            "name": "客户咨询记录脱敏规则",
+            "remark": "主流程：客户进线 → 坐席记录 → 敏感字段识别 → 脱敏处理 → 存储归档",
+            "mainProcess": "1. 客户进线，系统自动抓取对话内容\n2. 坐席人工补充客户诉求\n3. 系统识别敏感字段进行脱敏\n4. 注意：/引用 只是路径标记\n5. 脱敏后数据存入知识库供检索",
+            "content": "本规则适用于所有客户咨询记录。敏感字段包括：手机号（11位，遮蔽中间4位）。注意测试手机号：13800138000 （故意漏遮）"
+          }
+        },
+        {
+          "version": 2,
+          "timestamp": "2026-06-12T17:07:25.180Z",
+          "modifiedBy": "算法运营老唐",
+          "changeReason": "补充RAG引用来源标注，修复主流程说明",
+          "changes": [
+            {
+              "field": "mainProcess",
+              "oldValue": "1. 客户进线，系统自动抓取对话内容\n2. 坐席人工补充客户诉求\n3. 系统识别敏感字段进行脱敏\n4. 注意：/引用 只是路径标记\n5. 脱敏后数据存入知识库供检索",
+              "newValue": "1. 客户进线，系统自动抓取对话内容\n2. 坐席人工补充客户诉求\n3. 系统识别敏感字段进行脱敏\n4. /引用 只是路径标记，不是RAG引用\n5. RAG引用来源：知识库第3.2.1节「脱敏处理规范」\n6. 脱敏后数据存入知识库供检索",
+              "changeReason": "补充RAG引用来源标注，修复主流程说明",
+              "changedAt": "2026-06-12T17:07:25.180Z",
+              "diff": {
+                "type": "text",
+                "oldLength": 82,
+                "newLength": 117
+              }
+            },
+            {
+              "field": "content",
+              "oldValue": "本规则适用于所有客户咨询记录。敏感字段包括：手机号（11位，遮蔽中间4位）。注意测试手机号：13800138000 （故意漏遮）",
+              "newValue": "本规则适用于所有客户咨询记录。敏感字段包括：手机号（11位，遮蔽中间4位）。测试手机号已修复。",
+              "changeReason": "补充RAG引用来源标注，修复主流程说明",
+              "changedAt": "2026-06-12T17:07:25.180Z",
+              "diff": {
+                "type": "text",
+                "oldLength": 64,
+                "newLength": 47
+              }
+            }
+          ],
+          "snapshot": {
+            "name": "客户咨询记录脱敏规则",
+            "remark": "主流程：客户进线 → 坐席记录 → 敏感字段识别 → 脱敏处理 → 存储归档",
+            "mainProcess": "1. 客户进线，系统自动抓取对话内容\n2. 坐席人工补充客户诉求\n3. 系统识别敏感字段进行脱敏\n4. /引用 只是路径标记，不是RAG引用\n5. RAG引用来源：知识库第3.2.1节「脱敏处理规范」\n6. 脱敏后数据存入知识库供检索",
+            "content": "本规则适用于所有客户咨询记录。敏感字段包括：手机号（11位，遮蔽中间4位）。测试手机号已修复。"
+          }
+        }
+      ],
+      "currentVersion": 2
     }
   ],
   "grayBatches": [
     {
-      "id": "batch_1780803969435_nlo7cy",
-      "batchNo": "BATCH-001",
-      "sceneStatement": "Scene statement with RAG reference: see section 3.2",
-      "relatedRuleId": "rule_1780803969432_qxecmz",
-      "content": "Batch content",
-      "addedBy": "老唐",
-      "addedAt": "2026-06-07T03:46:09.435Z"
-    },
-    {
-      "id": "batch_1780803969435_fkor62",
-      "batchNo": "BATCH-002",
-      "sceneStatement": "Scene statement without RAG, phone: 13900139000",
-      "relatedRuleId": "rule_1780803969432_qxecmz",
-      "content": "Batch content",
-      "addedBy": "老唐",
-      "addedAt": "2026-06-07T03:46:09.435Z"
+      "id": "batch_1781284045180_3kwcmy",
+      "batchNo": "GRAY-2024-001",
+      "sceneStatement": "现场说法：灰度批次001测试中，客户进线咨询快递进度，坐席记录时系统自动识别到手机号139******78，已正确遮蔽。",
+      "relatedRuleId": "rule_1781284045177_6vxhzc",
+      "content": "本批次共测试100条对话，涉及快递查询、投诉建议、产品咨询三类场景。",
+      "addedBy": "算法运营老唐",
+      "addedAt": "2026-06-12T17:07:25.180Z",
+      "versionHistory": [
+        {
+          "version": 1,
+          "timestamp": "2026-06-12T17:07:25.180Z",
+          "modifiedBy": "算法运营老唐",
+          "changeReason": "首次补录",
+          "snapshot": {
+            "batchNo": "GRAY-2024-001",
+            "sceneStatement": "现场说法：灰度批次001测试中，客户进线咨询快递进度，坐席记录时系统自动识别到手机号139******78，已正确遮蔽。",
+            "relatedRuleId": "rule_1781284045177_6vxhzc",
+            "content": "本批次共测试100条对话，涉及快递查询、投诉建议、产品咨询三类场景。"
+          }
+        }
+      ],
+      "currentVersion": 1
     }
   ],
   "inspectionRecords": [
     {
-      "id": "inspect_1780803969435_kr74m8",
-      "operator": "admin",
-      "createdAt": "2026-06-07T03:46:09.435Z",
-      "ruleCount": 2,
-      "batchCount": 2,
+      "id": "inspect_1781284045179_bhvswm",
+      "operator": "系统管理员",
+      "createdAt": "2026-06-12T17:07:25.179Z",
+      "ruleCount": 1,
+      "batchCount": 0,
       "gaps": [
         {
           "type": "missing_gray_batch",
@@ -56,18 +105,8 @@
           "missing": "灰度批次现场说法证据",
           "nextStep": "请算法运营老唐补录对应灰度批次",
           "owner": "算法运营老唐",
-          "ruleId": "rule_1780803969434_qhchxt",
-          "ruleName": "Test Rule 2"
-        },
-        {
-          "type": "missing_rule_remark",
-          "severity": "medium",
-          "description": "脱敏规则备注中缺少主流程说明",
-          "missing": "主流程说明",
-          "nextStep": "请补充脱敏规则的主流程备注信息",
-          "owner": "规则导入人",
-          "ruleId": "rule_1780803969434_qhchxt",
-          "ruleName": "Test Rule 2"
+          "ruleId": "rule_1781284045177_6vxhzc",
+          "ruleName": "客户咨询记录脱敏规则"
         },
         {
           "type": "no_rag_evidence",
@@ -76,50 +115,62 @@
           "missing": "RAG 引用证据链",
           "nextStep": "请算法同事核查并补充 RAG 引用来源",
           "owner": "算法同事",
-          "ruleId": "rule_1780803969434_qhchxt",
-          "ruleName": "Test Rule 2"
+          "rawMaterialSnapshot": {
+            "remark": "主流程：客户进线 → 坐席记录 → 敏感字段识别 → 脱敏处理 → 存储归档",
+            "mainProcess": "1. 客户进线，系统自动抓取对话内容\n2. 坐席人工补充客户诉求\n3. 系统识别敏感字段进行脱敏\n4. 注意：/引用 只是路径标记\n5. 脱敏后数据存入知识库供检索",
+            "content": "本规则适用于所有客户咨询记录。敏感字段包括：手机号（11位，遮蔽中间4位）。注意测试手机号：13800138000 （故意漏遮）",
+            "checkedFields": [
+              "remark",
+              "mainProcess",
+              "content"
+            ],
+            "requiredPatterns": [
+              "RAG 引用",
+              "RAG引用",
+              "RAG 证据",
+              "引用来源",
+              "知识库第X节",
+              "RAG reference",
+              "RAG cite",
+              "【RAG引用】",
+              "「RAG 引用」"
+            ]
+          },
+          "traceId": "trace_1781284045178_7yht12",
+          "ruleId": "rule_1781284045177_6vxhzc",
+          "ruleName": "客户咨询记录脱敏规则"
         }
       ],
       "phoneIssues": [
         {
-          "id": "phone_1780803969435_kzkq88",
+          "id": "phone_1781284045179_94dwg8",
           "phoneNumber": "13800138000",
           "sourceType": "desensitization_rule",
-          "sourceId": "rule_1780803969434_qhchxt",
-          "sourceName": "Test Rule 2",
+          "sourceId": "rule_1781284045177_6vxhzc",
+          "sourceName": "客户咨询记录脱敏规则",
           "status": "pending_review",
-          "detectedAt": "2026-06-07T03:46:09.435Z",
-          "note": "手机号在导出中漏遮，留待算法同事复核，暂不归为正常"
+          "detectedAt": "2026-06-12T17:07:25.179Z",
+          "note": "手机号在导出中漏遮，留待算法同事复核，暂不归为正常",
+          "rawMaterialSnapshot": {
+            "fullText": "本规则适用于所有客户咨询记录。敏感字段包括：手机号（11位，遮蔽中间4位）。注意测试手机号：13800138000 （故意漏遮）",
+            "phoneContext": {
+              "prefix": "...所有客户咨询记录。敏感字段包括：手机号（11位，遮蔽中间4位）。注意测试手机号：",
+              "matched": "13800138000",
+              "suffix": " （故意漏遮）",
+              "fullContext": "...所有客户咨询记录。敏感字段包括：手机号（11位，遮蔽中间4位）。注意测试手机号：13800138000 （故意漏遮）"
+            },
+            "position": 46
+          },
+          "traceId": "trace_1781284045179_jfkp6e"
         }
       ],
       "evidenceMap": {
-        "rule_1780803969432_qxecmz": {
+        "rule_1781284045177_6vxhzc": {
           "rule": {
-            "id": "rule_1780803969432_qxecmz",
-            "name": "Test Rule 1",
-            "remark": "Main process here",
-            "mainProcess": "Step 1, Step 2, Step 3 with RAG reference"
-          },
-          "grayBatches": [
-            {
-              "id": "batch_1780803969435_nlo7cy",
-              "batchNo": "BATCH-001",
-              "sceneStatement": "Scene statement with RAG reference: see section 3.2"
-            },
-            {
-              "id": "batch_1780803969435_fkor62",
-              "batchNo": "BATCH-002",
-              "sceneStatement": "Scene statement without RAG, phone: 13900139000"
-            }
-          ],
-          "gaps": []
-        },
-        "rule_1780803969434_qhchxt": {
-          "rule": {
-            "id": "rule_1780803969434_qhchxt",
-            "name": "Test Rule 2",
-            "remark": "",
-            "mainProcess": ""
+            "id": "rule_1781284045177_6vxhzc",
+            "name": "客户咨询记录脱敏规则",
+            "remark": "主流程：客户进线 → 坐席记录 → 敏感字段识别 → 脱敏处理 → 存储归档",
+            "mainProcess": "1. 客户进线，系统自动抓取对话内容\n2. 坐席人工补充客户诉求\n3. 系统识别敏感字段进行脱敏\n4. 注意：/引用 只是路径标记\n5. 脱敏后数据存入知识库供检索"
           },
           "grayBatches": [],
           "gaps": [
@@ -132,20 +183,34 @@
               "owner": "算法运营老唐"
             },
             {
-              "type": "missing_rule_remark",
-              "severity": "medium",
-              "description": "脱敏规则备注中缺少主流程说明",
-              "missing": "主流程说明",
-              "nextStep": "请补充脱敏规则的主流程备注信息",
-              "owner": "规则导入人"
-            },
-            {
               "type": "no_rag_evidence",
               "severity": "high",
               "description": "脱敏规则中未明确标注 RAG 引用来源",
               "missing": "RAG 引用证据链",
               "nextStep": "请算法同事核查并补充 RAG 引用来源",
-              "owner": "算法同事"
+              "owner": "算法同事",
+              "rawMaterialSnapshot": {
+                "remark": "主流程：客户进线 → 坐席记录 → 敏感字段识别 → 脱敏处理 → 存储归档",
+                "mainProcess": "1. 客户进线，系统自动抓取对话内容\n2. 坐席人工补充客户诉求\n3. 系统识别敏感字段进行脱敏\n4. 注意：/引用 只是路径标记\n5. 脱敏后数据存入知识库供检索",
+                "content": "本规则适用于所有客户咨询记录。敏感字段包括：手机号（11位，遮蔽中间4位）。注意测试手机号：13800138000 （故意漏遮）",
+                "checkedFields": [
+                  "remark",
+                  "mainProcess",
+                  "content"
+                ],
+                "requiredPatterns": [
+                  "RAG 引用",
+                  "RAG引用",
+                  "RAG 证据",
+                  "引用来源",
+                  "知识库第X节",
+                  "RAG reference",
+                  "RAG cite",
+                  "【RAG引用】",
+                  "「RAG 引用」"
+                ]
+              },
+              "traceId": "trace_1781284045178_7yht12"
             }
           ]
         }
@@ -153,245 +218,381 @@
       "options": {}
     },
     {
-      "id": "inspect_1780803969438_afuq79",
-      "operator": "老唐",
-      "createdAt": "2026-06-07T03:46:09.438Z",
-      "ruleCount": 2,
-      "batchCount": 2,
+      "id": "inspect_1781284045181_denk11",
+      "operator": "算法运营老唐",
+      "createdAt": "2026-06-12T17:07:25.181Z",
+      "ruleCount": 1,
+      "batchCount": 1,
       "gaps": [
         {
-          "type": "missing_gray_batch",
-          "severity": "high",
-          "description": "该脱敏规则尚未关联任何灰度批次现场说法",
-          "missing": "灰度批次现场说法证据",
-          "nextStep": "请算法运营老唐补录对应灰度批次",
-          "owner": "算法运营老唐",
-          "ruleId": "rule_1780803969434_qhchxt",
-          "ruleName": "Test Rule 2"
+          "type": "rag_reference_found",
+          "severity": "info",
+          "description": "脱敏规则中已检测到 RAG 引用标注",
+          "owner": "系统",
+          "ragMatchDetails": [
+            {
+              "patternIndex": 0,
+              "matchedText": "RAG",
+              "context": {
+                "prefix": "... 系统识别敏感字段进行脱敏\n4. /引用 只是路径标记，不是",
+                "matched": "RAG",
+                "suffix": "引用\n5. RAG引用来源：知识库第3.2.1节「脱敏处理规...",
+                "fullContext": "... 系统识别敏感字段进行脱敏\n4. /引用 只是路径标记，不是RAG引用\n5. RAG引用来源：知识库第3.2.1节「脱敏处理规..."
+              }
+            },
+            {
+              "patternIndex": 1,
+              "matchedText": "RAG引用",
+              "context": {
+                "prefix": "... 系统识别敏感字段进行脱敏\n4. /引用 只是路径标记，不是",
+                "matched": "RAG引用",
+                "suffix": "\n5. RAG引用来源：知识库第3.2.1节「脱敏处理规范」...",
+                "fullContext": "... 系统识别敏感字段进行脱敏\n4. /引用 只是路径标记，不是RAG引用\n5. RAG引用来源：知识库第3.2.1节「脱敏处理规范」..."
+              }
+            },
+            {
+              "patternIndex": 3,
+              "matchedText": "RAG引用",
+              "context": {
+                "prefix": "... 系统识别敏感字段进行脱敏\n4. /引用 只是路径标记，不是",
+                "matched": "RAG引用",
+                "suffix": "\n5. RAG引用来源：知识库第3.2.1节「脱敏处理规范」...",
+                "fullContext": "... 系统识别敏感字段进行脱敏\n4. /引用 只是路径标记，不是RAG引用\n5. RAG引用来源：知识库第3.2.1节「脱敏处理规范」..."
+              }
+            },
+            {
+              "patternIndex": 4,
+              "matchedText": "知识库第3.2.1节",
+              "context": {
+                "prefix": ".../引用 只是路径标记，不是RAG引用\n5. RAG引用来源：",
+                "matched": "知识库第3.2.1节",
+                "suffix": "「脱敏处理规范」\n6. 脱敏后数据存入知识库供检索\n本规则适...",
+                "fullContext": ".../引用 只是路径标记，不是RAG引用\n5. RAG引用来源：知识库第3.2.1节「脱敏处理规范」\n6. 脱敏后数据存入知识库供检索\n本规则适..."
+              }
+            },
+            {
+              "patternIndex": 5,
+              "matchedText": "引用来源：",
+              "context": {
+                "prefix": "...敏\n4. /引用 只是路径标记，不是RAG引用\n5. RAG",
+                "matched": "引用来源：",
+                "suffix": "知识库第3.2.1节「脱敏处理规范」\n6. 脱敏后数据存入知...",
+                "fullContext": "...敏\n4. /引用 只是路径标记，不是RAG引用\n5. RAG引用来源：知识库第3.2.1节「脱敏处理规范」\n6. 脱敏后数据存入知..."
+              }
+            },
+            {
+              "patternIndex": 10,
+              "matchedText": "RAG引用来源",
+              "context": {
+                "prefix": "...进行脱敏\n4. /引用 只是路径标记，不是RAG引用\n5. ",
+                "matched": "RAG引用来源",
+                "suffix": "：知识库第3.2.1节「脱敏处理规范」\n6. 脱敏后数据存入...",
+                "fullContext": "...进行脱敏\n4. /引用 只是路径标记，不是RAG引用\n5. RAG引用来源：知识库第3.2.1节「脱敏处理规范」\n6. 脱敏后数据存入..."
+              }
+            }
+          ],
+          "rawMaterialSnapshot": {
+            "remark": "主流程：客户进线 → 坐席记录 → 敏感字段识别 → 脱敏处理 → 存储归档",
+            "mainProcess": "1. 客户进线，系统自动抓取对话内容\n2. 坐席人工补充客户诉求\n3. 系统识别敏感字段进行脱敏\n4. /引用 只是路径标记，不是RAG引用\n5. RAG引用来源：知识库第3.2.1节「脱敏处理规范」\n6. 脱敏后数据存入知识库供检索",
+            "content": "本规则适用于所有客户咨询记录。敏感字段包括：手机号（11位，遮蔽中间4位）。测试手机号已修复。"
+          },
+          "traceId": "trace_1781284045181_cljvs8",
+          "ruleId": "rule_1781284045177_6vxhzc",
+          "ruleName": "客户咨询记录脱敏规则"
         },
         {
-          "type": "missing_rule_remark",
+          "type": "batch_no_rag_evidence",
           "severity": "medium",
-          "description": "脱敏规则备注中缺少主流程说明",
-          "missing": "主流程说明",
-          "nextStep": "请补充脱敏规则的主流程备注信息",
-          "owner": "规则导入人",
-          "ruleId": "rule_1780803969434_qhchxt",
-          "ruleName": "Test Rule 2"
-        },
-        {
-          "type": "no_rag_evidence",
-          "severity": "high",
-          "description": "脱敏规则中未明确标注 RAG 引用来源",
-          "missing": "RAG 引用证据链",
-          "nextStep": "请算法同事核查并补充 RAG 引用来源",
+          "batchNo": "GRAY-2024-001",
+          "batchId": "batch_1781284045180_3kwcmy",
+          "description": "灰度批次 GRAY-2024-001 的现场说法中缺少 RAG 引用标注",
+          "missing": "灰度批次 RAG 引用证据",
+          "nextStep": "请算法同事补充该批次的 RAG 引用来源",
           "owner": "算法同事",
-          "ruleId": "rule_1780803969434_qhchxt",
-          "ruleName": "Test Rule 2"
+          "rawMaterialSnapshot": {
+            "sceneStatement": "现场说法：灰度批次001测试中，客户进线咨询快递进度，坐席记录时系统自动识别到手机号139******78，已正确遮蔽。",
+            "content": "本批次共测试100条对话，涉及快递查询、投诉建议、产品咨询三类场景。",
+            "checkedFields": [
+              "sceneStatement",
+              "content"
+            ]
+          },
+          "traceId": "trace_1781284045181_m7z41x",
+          "ruleId": "rule_1781284045177_6vxhzc",
+          "ruleName": "客户咨询记录脱敏规则"
         }
       ],
-      "phoneIssues": [
-        {
-          "id": "phone_1780803969438_v9cn87",
-          "phoneNumber": "13800138000",
-          "sourceType": "desensitization_rule",
-          "sourceId": "rule_1780803969434_qhchxt",
-          "sourceName": "Test Rule 2",
-          "status": "pending_review",
-          "detectedAt": "2026-06-07T03:46:09.438Z",
-          "note": "手机号在导出中漏遮，留待算法同事复核，暂不归为正常"
-        }
-      ],
+      "phoneIssues": [],
       "evidenceMap": {
-        "rule_1780803969432_qxecmz": {
+        "rule_1781284045177_6vxhzc": {
           "rule": {
-            "id": "rule_1780803969432_qxecmz",
-            "name": "Test Rule 1",
-            "remark": "Main process here",
-            "mainProcess": "Step 1, Step 2, Step 3 with RAG reference"
+            "id": "rule_1781284045177_6vxhzc",
+            "name": "客户咨询记录脱敏规则",
+            "remark": "主流程：客户进线 → 坐席记录 → 敏感字段识别 → 脱敏处理 → 存储归档",
+            "mainProcess": "1. 客户进线，系统自动抓取对话内容\n2. 坐席人工补充客户诉求\n3. 系统识别敏感字段进行脱敏\n4. /引用 只是路径标记，不是RAG引用\n5. RAG引用来源：知识库第3.2.1节「脱敏处理规范」\n6. 脱敏后数据存入知识库供检索"
           },
           "grayBatches": [
             {
-              "id": "batch_1780803969435_nlo7cy",
-              "batchNo": "BATCH-001",
-              "sceneStatement": "Scene statement with RAG reference: see section 3.2"
-            },
-            {
-              "id": "batch_1780803969435_fkor62",
-              "batchNo": "BATCH-002",
-              "sceneStatement": "Scene statement without RAG, phone: 13900139000"
+              "id": "batch_1781284045180_3kwcmy",
+              "batchNo": "GRAY-2024-001",
+              "sceneStatement": "现场说法：灰度批次001测试中，客户进线咨询快递进度，坐席记录时系统自动识别到手机号139******78，已正确遮蔽。"
             }
           ],
-          "gaps": []
-        },
-        "rule_1780803969434_qhchxt": {
-          "rule": {
-            "id": "rule_1780803969434_qhchxt",
-            "name": "Test Rule 2",
-            "remark": "",
-            "mainProcess": ""
-          },
-          "grayBatches": [],
           "gaps": [
             {
-              "type": "missing_gray_batch",
-              "severity": "high",
-              "description": "该脱敏规则尚未关联任何灰度批次现场说法",
-              "missing": "灰度批次现场说法证据",
-              "nextStep": "请算法运营老唐补录对应灰度批次",
-              "owner": "算法运营老唐"
+              "type": "rag_reference_found",
+              "severity": "info",
+              "description": "脱敏规则中已检测到 RAG 引用标注",
+              "owner": "系统",
+              "ragMatchDetails": [
+                {
+                  "patternIndex": 0,
+                  "matchedText": "RAG",
+                  "context": {
+                    "prefix": "... 系统识别敏感字段进行脱敏\n4. /引用 只是路径标记，不是",
+                    "matched": "RAG",
+                    "suffix": "引用\n5. RAG引用来源：知识库第3.2.1节「脱敏处理规...",
+                    "fullContext": "... 系统识别敏感字段进行脱敏\n4. /引用 只是路径标记，不是RAG引用\n5. RAG引用来源：知识库第3.2.1节「脱敏处理规..."
+                  }
+                },
+                {
+                  "patternIndex": 1,
+                  "matchedText": "RAG引用",
+                  "context": {
+                    "prefix": "... 系统识别敏感字段进行脱敏\n4. /引用 只是路径标记，不是",
+                    "matched": "RAG引用",
+                    "suffix": "\n5. RAG引用来源：知识库第3.2.1节「脱敏处理规范」...",
+                    "fullContext": "... 系统识别敏感字段进行脱敏\n4. /引用 只是路径标记，不是RAG引用\n5. RAG引用来源：知识库第3.2.1节「脱敏处理规范」..."
+                  }
+                },
+                {
+                  "patternIndex": 3,
+                  "matchedText": "RAG引用",
+                  "context": {
+                    "prefix": "... 系统识别敏感字段进行脱敏\n4. /引用 只是路径标记，不是",
+                    "matched": "RAG引用",
+                    "suffix": "\n5. RAG引用来源：知识库第3.2.1节「脱敏处理规范」...",
+                    "fullContext": "... 系统识别敏感字段进行脱敏\n4. /引用 只是路径标记，不是RAG引用\n5. RAG引用来源：知识库第3.2.1节「脱敏处理规范」..."
+                  }
+                },
+                {
+                  "patternIndex": 4,
+                  "matchedText": "知识库第3.2.1节",
+                  "context": {
+                    "prefix": ".../引用 只是路径标记，不是RAG引用\n5. RAG引用来源：",
+                    "matched": "知识库第3.2.1节",
+                    "suffix": "「脱敏处理规范」\n6. 脱敏后数据存入知识库供检索\n本规则适...",
+                    "fullContext": ".../引用 只是路径标记，不是RAG引用\n5. RAG引用来源：知识库第3.2.1节「脱敏处理规范」\n6. 脱敏后数据存入知识库供检索\n本规则适..."
+                  }
+                },
+                {
+                  "patternIndex": 5,
+                  "matchedText": "引用来源：",
+                  "context": {
+                    "prefix": "...敏\n4. /引用 只是路径标记，不是RAG引用\n5. RAG",
+                    "matched": "引用来源：",
+                    "suffix": "知识库第3.2.1节「脱敏处理规范」\n6. 脱敏后数据存入知...",
+                    "fullContext": "...敏\n4. /引用 只是路径标记，不是RAG引用\n5. RAG引用来源：知识库第3.2.1节「脱敏处理规范」\n6. 脱敏后数据存入知..."
+                  }
+                },
+                {
+                  "patternIndex": 10,
+                  "matchedText": "RAG引用来源",
+                  "context": {
+                    "prefix": "...进行脱敏\n4. /引用 只是路径标记，不是RAG引用\n5. ",
+                    "matched": "RAG引用来源",
+                    "suffix": "：知识库第3.2.1节「脱敏处理规范」\n6. 脱敏后数据存入...",
+                    "fullContext": "...进行脱敏\n4. /引用 只是路径标记，不是RAG引用\n5. RAG引用来源：知识库第3.2.1节「脱敏处理规范」\n6. 脱敏后数据存入..."
+                  }
+                }
+              ],
+              "rawMaterialSnapshot": {
+                "remark": "主流程：客户进线 → 坐席记录 → 敏感字段识别 → 脱敏处理 → 存储归档",
+                "mainProcess": "1. 客户进线，系统自动抓取对话内容\n2. 坐席人工补充客户诉求\n3. 系统识别敏感字段进行脱敏\n4. /引用 只是路径标记，不是RAG引用\n5. RAG引用来源：知识库第3.2.1节「脱敏处理规范」\n6. 脱敏后数据存入知识库供检索",
+                "content": "本规则适用于所有客户咨询记录。敏感字段包括：手机号（11位，遮蔽中间4位）。测试手机号已修复。"
+              },
+              "traceId": "trace_1781284045181_cljvs8"
             },
             {
-              "type": "missing_rule_remark",
+              "type": "batch_no_rag_evidence",
               "severity": "medium",
-              "description": "脱敏规则备注中缺少主流程说明",
-              "missing": "主流程说明",
-              "nextStep": "请补充脱敏规则的主流程备注信息",
-              "owner": "规则导入人"
-            },
-            {
-              "type": "no_rag_evidence",
-              "severity": "high",
-              "description": "脱敏规则中未明确标注 RAG 引用来源",
-              "missing": "RAG 引用证据链",
-              "nextStep": "请算法同事核查并补充 RAG 引用来源",
-              "owner": "算法同事"
+              "batchNo": "GRAY-2024-001",
+              "batchId": "batch_1781284045180_3kwcmy",
+              "description": "灰度批次 GRAY-2024-001 的现场说法中缺少 RAG 引用标注",
+              "missing": "灰度批次 RAG 引用证据",
+              "nextStep": "请算法同事补充该批次的 RAG 引用来源",
+              "owner": "算法同事",
+              "rawMaterialSnapshot": {
+                "sceneStatement": "现场说法：灰度批次001测试中，客户进线咨询快递进度，坐席记录时系统自动识别到手机号139******78，已正确遮蔽。",
+                "content": "本批次共测试100条对话，涉及快递查询、投诉建议、产品咨询三类场景。",
+                "checkedFields": [
+                  "sceneStatement",
+                  "content"
+                ]
+              },
+              "traceId": "trace_1781284045181_m7z41x"
             }
           ]
         }
       },
       "options": {
-        "rerunFrom": "inspect_1780803969435_kr74m8"
+        "rerunFrom": "inspect_1781284045179_bhvswm"
       }
     }
   ],
   "exportResults": [
     {
-      "id": "export_1780803969436_ar3gm2",
-      "inspectionId": "inspect_1780803969435_kr74m8",
+      "id": "export_1781284045179_kuqa13",
+      "inspectionId": "inspect_1781284045179_bhvswm",
       "type": "inspection_export",
-      "content": "📋 RAG 引用缺失巡检报告\n━━━━━━━━━━━━━━━━━━━━━━\n巡检编号: inspect_1780803969435_kr74m8\n巡检时间: 2026-06-07T03:46:09.435Z\n执行人: admin\n\n🔍 本次巡检范围:\n  - 脱敏规则: 2 条\n  - 灰度批次: 2 条\n  - 发现问题: 3 个\n  - 手机号漏遮: 1 个\n\n⚠️  引用缺失问题详情:\n\n  1. [🔴 该脱敏规则尚未关联任何灰度批次现场说法\n     ❓ 为什么留下: 该脱敏规则尚未关联任何灰度批次现场说法\n     📦 还缺什么: 灰度批次现场说法证据\n     🎯 下一步找谁: 算法运营老唐\n     📝 具体行动: 请算法运营老唐补录对应灰度批次\n\n  2. [🟡 脱敏规则备注中缺少主流程说明\n     ❓ 为什么留下: 脱敏规则备注中缺少主流程说明\n     📦 还缺什么: 主流程说明\n     🎯 下一步找谁: 规则导入人\n     📝 具体行动: 请补充脱敏规则的主流程备注信息\n\n  3. [🔴 脱敏规则中未明确标注 RAG 引用来源\n     ❓ 为什么留下: 脱敏规则中未明确标注 RAG 引用来源\n     📦 还缺什么: RAG 引用证据链\n     🎯 下一步找谁: 算法同事\n     📝 具体行动: 请算法同事核查并补充 RAG 引用来源\n\n📱 手机号漏遮问题（待算法同事复核:\n\n  1. 13800138000 (来源: Test Rule 2)\n     状态: ⏳ 待算法同事复核\n     说明: 手机号在导出中漏遮，留待算法同事复核，暂不归为正常\n\n━━━━━━━━━━━━━━━━━━━━━━\n💡 提示: 所有修改操作均已记录审计日志，可追溯谁改了什么、为什么改",
-      "createdAt": "2026-06-07T03:46:09.436Z",
+      "content": "📋 RAG 引用缺失巡检报告\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n巡检编号: inspect_1781284045179_bhvswm\n巡检时间: 2026-06-12T17:07:25.179Z\n执行人: 系统管理员\n\n🔍 本次巡检范围:\n  - 脱敏规则: 1 条\n  - 灰度批次: 0 条\n  - RAG 引用缺失: 1 个\n  - RAG 引用已存在: 0 个\n  - 其他问题: 1 个\n  - 手机号漏遮: 1 个\n\n🔴 RAG 引用缺失问题详情 (可通过 traceId 追回原始材料):\n\n  1. [🔴 脱敏规则中未明确标注 RAG 引用来源\n     🔍 Trace ID: trace_1781284045178_7yht12\n     ❓ 为什么留下: 脱敏规则中未明确标注 RAG 引用来源\n     📦 还缺什么: RAG 引用证据链\n     🎯 下一步找谁: 算法同事\n     📝 具体行动: 请算法同事核查并补充 RAG 引用来源\n     📜 关联规则: 客户咨询记录脱敏规则\n     📄 触发原始材料 (已快照保留):\n        已检查字段: remark, mainProcess, content\n        期望匹配模式: RAG 引用 | RAG引用 | RAG 证据 | 引用来源 | 知识库第X节...\n        备注原文: \"主流程：客户进线 → 坐席记录 → 敏感字段识别 → 脱敏处理 → 存储归档\"\n        主流程原文: \"1. 客户进线，系统自动抓取对话内容\n2. 坐席人工补充客户诉求\n3. 系统识别敏感字段进行脱敏\n4. 注意：/引用 只是路径标记\n5. 脱敏后数据存入知识库供检索\"\n\n⚠️  其他问题详情:\n\n  1. [🔴 该脱敏规则尚未关联任何灰度批次现场说法\n     🔍 Trace ID: N/A\n     ❓ 为什么留下: 该脱敏规则尚未关联任何灰度批次现场说法\n     📦 还缺什么: 灰度批次现场说法证据\n     🎯 下一步找谁: 算法运营老唐\n     📝 具体行动: 请算法运营老唐补录对应灰度批次\n     📜 关联规则: 客户咨询记录脱敏规则\n\n📱 手机号漏遮问题 (待算法同事复核，暂不归为正常):\n\n  1. 📱 13800138000 (来源: 客户咨询记录脱敏规则)\n     🔍 Trace ID: trace_1781284045179_jfkp6e\n     状态: ⏳ 待算法同事复核\n     说明: 手机号在导出中漏遮，留待算法同事复核，暂不归为正常\n     📄 出现位置上下文: ...所有客户咨询记录。敏感字段包括：手机号（11位，遮蔽中间4位）。注意测试手机号：13800138000 （故意漏遮）\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n💡 反查说明:\n   • 所有问题均已分配唯一 Trace ID，可用于反查修改历史\n   • 修改前的原始材料已快照保留，不会被后续修改覆盖\n   • 审计日志记录: 谁改了什么、改前内容、改后内容、修改原因\n   • 可通过 traceId 在审计日志和历史版本中完整追溯",
+      "createdAt": "2026-06-12T17:07:25.179Z",
       "status": "generated"
     },
     {
-      "id": "export_1780803969439_ycctti",
-      "inspectionId": "inspect_1780803969438_afuq79",
+      "id": "export_1781284045182_jg8d8q",
+      "inspectionId": "inspect_1781284045181_denk11",
       "type": "inspection_export",
-      "content": "📋 RAG 引用缺失巡检报告\n━━━━━━━━━━━━━━━━━━━━━━\n巡检编号: inspect_1780803969438_afuq79\n巡检时间: 2026-06-07T03:46:09.438Z\n执行人: 老唐\n\n🔍 本次巡检范围:\n  - 脱敏规则: 2 条\n  - 灰度批次: 2 条\n  - 发现问题: 3 个\n  - 手机号漏遮: 1 个\n\n⚠️  引用缺失问题详情:\n\n  1. [🔴 该脱敏规则尚未关联任何灰度批次现场说法\n     ❓ 为什么留下: 该脱敏规则尚未关联任何灰度批次现场说法\n     📦 还缺什么: 灰度批次现场说法证据\n     🎯 下一步找谁: 算法运营老唐\n     📝 具体行动: 请算法运营老唐补录对应灰度批次\n\n  2. [🟡 脱敏规则备注中缺少主流程说明\n     ❓ 为什么留下: 脱敏规则备注中缺少主流程说明\n     📦 还缺什么: 主流程说明\n     🎯 下一步找谁: 规则导入人\n     📝 具体行动: 请补充脱敏规则的主流程备注信息\n\n  3. [🔴 脱敏规则中未明确标注 RAG 引用来源\n     ❓ 为什么留下: 脱敏规则中未明确标注 RAG 引用来源\n     📦 还缺什么: RAG 引用证据链\n     🎯 下一步找谁: 算法同事\n     📝 具体行动: 请算法同事核查并补充 RAG 引用来源\n\n📱 手机号漏遮问题（待算法同事复核:\n\n  1. 13800138000 (来源: Test Rule 2)\n     状态: ⏳ 待算法同事复核\n     说明: 手机号在导出中漏遮，留待算法同事复核，暂不归为正常\n\n━━━━━━━━━━━━━━━━━━━━━━\n💡 提示: 所有修改操作均已记录审计日志，可追溯谁改了什么、为什么改",
-      "createdAt": "2026-06-07T03:46:09.439Z",
+      "content": "📋 RAG 引用缺失巡检报告\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n巡检编号: inspect_1781284045181_denk11\n巡检时间: 2026-06-12T17:07:25.181Z\n执行人: 算法运营老唐\n🔄 重跑来源: inspect_1781284045179_bhvswm\n\n🔍 本次巡检范围:\n  - 脱敏规则: 1 条\n  - 灰度批次: 1 条\n  - RAG 引用缺失: 1 个\n  - RAG 引用已存在: 1 个\n  - 其他问题: 0 个\n  - 手机号漏遮: 0 个\n\n🔴 RAG 引用缺失问题详情 (可通过 traceId 追回原始材料):\n\n  1. [🟡 灰度批次 GRAY-2024-001 的现场说法中缺少 RAG 引用标注\n     🔍 Trace ID: trace_1781284045181_m7z41x\n     ❓ 为什么留下: 灰度批次 GRAY-2024-001 的现场说法中缺少 RAG 引用标注\n     📦 还缺什么: 灰度批次 RAG 引用证据\n     🎯 下一步找谁: 算法同事\n     📝 具体行动: 请算法同事补充该批次的 RAG 引用来源\n     📜 关联规则: 客户咨询记录脱敏规则\n     📦 关联批次: GRAY-2024-001\n     📄 触发原始材料 (已快照保留):\n        已检查字段: sceneStatement, content\n        现场说法原文: \"现场说法：灰度批次001测试中，客户进线咨询快递进度，坐席记录时系统自动识别到手机号139******78，已正确遮蔽。\"\n\n🟢 RAG 引用已检测到 (可通过 traceId 反查匹配内容):\n\n  1. 🟢 脱敏规则中已检测到 RAG 引用标注\n     🔍 Trace ID: trace_1781284045181_cljvs8\n     📜 关联规则: 客户咨询记录脱敏规则\n     🎯 匹配到的 RAG 引用内容:\n        1. 匹配文本: \"RAG\"\n           上下文: ... 系统识别敏感字段进行脱敏\n4. /引用 只是路径标记，不是RAG引用\n5. RAG引用来源：知识库第3.2.1节「脱敏处理规...\n        2. 匹配文本: \"RAG引用\"\n           上下文: ... 系统识别敏感字段进行脱敏\n4. /引用 只是路径标记，不是RAG引用\n5. RAG引用来源：知识库第3.2.1节「脱敏处理规范」...\n        3. 匹配文本: \"RAG引用\"\n           上下文: ... 系统识别敏感字段进行脱敏\n4. /引用 只是路径标记，不是RAG引用\n5. RAG引用来源：知识库第3.2.1节「脱敏处理规范」...\n        4. 匹配文本: \"知识库第3.2.1节\"\n           上下文: .../引用 只是路径标记，不是RAG引用\n5. RAG引用来源：知识库第3.2.1节「脱敏处理规范」\n6. 脱敏后数据存入知识库供检索\n本规则适...\n        5. 匹配文本: \"引用来源：\"\n           上下文: ...敏\n4. /引用 只是路径标记，不是RAG引用\n5. RAG引用来源：知识库第3.2.1节「脱敏处理规范」\n6. 脱敏后数据存入知...\n        6. 匹配文本: \"RAG引用来源\"\n           上下文: ...进行脱敏\n4. /引用 只是路径标记，不是RAG引用\n5. RAG引用来源：知识库第3.2.1节「脱敏处理规范」\n6. 脱敏后数据存入...\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n💡 反查说明:\n   • 所有问题均已分配唯一 Trace ID，可用于反查修改历史\n   • 修改前的原始材料已快照保留，不会被后续修改覆盖\n   • 审计日志记录: 谁改了什么、改前内容、改后内容、修改原因\n   • 可通过 traceId 在审计日志和历史版本中完整追溯",
+      "createdAt": "2026-06-12T17:07:25.182Z",
       "status": "generated"
     }
   ],
   "auditLogs": [
     {
-      "id": "audit_1780803969433_0qd08q",
+      "id": "audit_1781284045178_ahn0qe",
       "action": "import_rule",
-      "operator": "admin",
+      "operator": "系统管理员",
       "details": {
-        "ruleId": "rule_1780803969432_qxecmz",
-        "name": "Test Rule 1"
+        "ruleId": "rule_1781284045177_6vxhzc",
+        "name": "客户咨询记录脱敏规则",
+        "initialRemark": "主流程：客户进线 → 坐席记录 → 敏感字段识别 → 脱敏处理 → 存储归档",
+        "initialMainProcess": "1. 客户进线，系统自动抓取对话内容\n2. 坐席人工补充客户诉求\n3. 系统识别敏感字段进行脱敏\n4. 注意：/引用 只是路径标记\n5. 脱敏后数据存入知识库供检索"
       },
-      "timestamp": "2026-06-07T03:46:09.433Z"
+      "timestamp": "2026-06-12T17:07:25.178Z"
     },
     {
-      "id": "audit_1780803969434_rhmy9y",
-      "action": "import_rule",
-      "operator": "analyst",
-      "details": {
-        "ruleId": "rule_1780803969434_qhchxt",
-        "name": "Test Rule 2"
-      },
-      "timestamp": "2026-06-07T03:46:09.434Z"
-    },
-    {
-      "id": "audit_1780803969435_771vby",
-      "action": "add_gray_batch",
-      "operator": "老唐",
-      "details": {
-        "batchId": "batch_1780803969435_nlo7cy",
-        "batchNo": "BATCH-001"
-      },
-      "timestamp": "2026-06-07T03:46:09.435Z"
-    },
-    {
-      "id": "audit_1780803969435_2pkjhe",
-      "action": "add_gray_batch",
-      "operator": "老唐",
-      "details": {
-        "batchId": "batch_1780803969435_fkor62",
-        "batchNo": "BATCH-002"
-      },
-      "timestamp": "2026-06-07T03:46:09.435Z"
-    },
-    {
-      "id": "audit_1780803969436_7gibq7",
+      "id": "audit_1781284045179_kau0jf",
       "action": "run_inspection",
-      "operator": "admin",
+      "operator": "系统管理员",
       "details": {
-        "inspectionId": "inspect_1780803969435_kr74m8",
-        "gapCount": 3,
+        "inspectionId": "inspect_1781284045179_bhvswm",
+        "gapCount": 2,
         "phoneIssueCount": 1
       },
-      "timestamp": "2026-06-07T03:46:09.436Z"
+      "timestamp": "2026-06-12T17:07:25.179Z"
     },
     {
-      "id": "audit_1780803969437_392u81",
+      "id": "audit_1781284045180_dylb1e",
+      "action": "add_gray_batch",
+      "operator": "算法运营老唐",
+      "details": {
+        "batchId": "batch_1781284045180_3kwcmy",
+        "batchNo": "GRAY-2024-001",
+        "initialSceneStatement": "现场说法：灰度批次001测试中，客户进线咨询快递进度，坐席记录时系统自动识别到手机号139******78，已正确遮蔽。",
+        "relatedRuleId": "rule_1781284045177_6vxhzc"
+      },
+      "timestamp": "2026-06-12T17:07:25.180Z"
+    },
+    {
+      "id": "audit_1781284045180_0zjtnv",
+      "action": "update_rule",
+      "operator": "算法运营老唐",
+      "details": {
+        "ruleId": "rule_1781284045177_6vxhzc",
+        "oldName": "客户咨询记录脱敏规则",
+        "newName": "客户咨询记录脱敏规则",
+        "changeCount": 2,
+        "changeReason": "补充RAG引用来源标注，修复主流程说明"
+      },
+      "timestamp": "2026-06-12T17:07:25.180Z",
+      "changeHistory": [
+        {
+          "field": "mainProcess",
+          "oldValue": "1. 客户进线，系统自动抓取对话内容\n2. 坐席人工补充客户诉求\n3. 系统识别敏感字段进行脱敏\n4. 注意：/引用 只是路径标记\n5. 脱敏后数据存入知识库供检索",
+          "newValue": "1. 客户进线，系统自动抓取对话内容\n2. 坐席人工补充客户诉求\n3. 系统识别敏感字段进行脱敏\n4. /引用 只是路径标记，不是RAG引用\n5. RAG引用来源：知识库第3.2.1节「脱敏处理规范」\n6. 脱敏后数据存入知识库供检索",
+          "changeReason": "补充RAG引用来源标注，修复主流程说明",
+          "changedAt": "2026-06-12T17:07:25.180Z",
+          "diff": {
+            "type": "text",
+            "oldLength": 82,
+            "newLength": 117
+          }
+        },
+        {
+          "field": "content",
+          "oldValue": "本规则适用于所有客户咨询记录。敏感字段包括：手机号（11位，遮蔽中间4位）。注意测试手机号：13800138000 （故意漏遮）",
+          "newValue": "本规则适用于所有客户咨询记录。敏感字段包括：手机号（11位，遮蔽中间4位）。测试手机号已修复。",
+          "changeReason": "补充RAG引用来源标注，修复主流程说明",
+          "changedAt": "2026-06-12T17:07:25.180Z",
+          "diff": {
+            "type": "text",
+            "oldLength": 64,
+            "newLength": 47
+          }
+        }
+      ]
+    },
+    {
+      "id": "audit_1781284045180_b5thzf",
+      "action": "rerun_inspection",
+      "operator": "算法运营老唐",
+      "details": {
+        "previousInspectionId": "inspect_1781284045179_bhvswm"
+      },
+      "timestamp": "2026-06-12T17:07:25.180Z"
+    },
+    {
+      "id": "audit_1781284045181_ms7k79",
+      "action": "run_inspection",
+      "operator": "算法运营老唐",
+      "details": {
+        "inspectionId": "inspect_1781284045181_denk11",
+        "gapCount": 2,
+        "phoneIssueCount": 0
+      },
+      "timestamp": "2026-06-12T17:07:25.181Z"
+    },
+    {
+      "id": "audit_1781284045193_91bhlx",
       "action": "update_phone_issue",
       "operator": "算法同事小李",
       "details": {
-        "issueId": "phone_1780803969435_kzkq88",
+        "issueId": "phone_1781284045179_94dwg8",
         "oldStatus": "pending_review",
         "newStatus": "confirmed",
         "status": "confirmed",
         "reviewedBy": "算法同事小李",
-        "reviewNote": "Confirmed issue"
+        "reviewNote": "确认漏遮，已通知下游系统修复脱敏规则。该手机号在历史导出中出现过3次。",
+        "reviewedAt": "2026-06-12T17:07:25.192Z"
       },
-      "timestamp": "2026-06-07T03:46:09.437Z"
-    },
-    {
-      "id": "audit_1780803969438_kpt3xb",
-      "action": "rerun_inspection",
-      "operator": "老唐",
-      "details": {
-        "previousInspectionId": "inspect_1780803969435_kr74m8"
-      },
-      "timestamp": "2026-06-07T03:46:09.438Z"
-    },
-    {
-      "id": "audit_1780803969439_qlyk3x",
-      "action": "run_inspection",
-      "operator": "老唐",
-      "details": {
-        "inspectionId": "inspect_1780803969438_afuq79",
-        "gapCount": 3,
-        "phoneIssueCount": 1
-      },
-      "timestamp": "2026-06-07T03:46:09.439Z"
+      "timestamp": "2026-06-12T17:07:25.193Z"
     }
   ],
   "phoneMaskIssues": [
     {
-      "id": "phone_1780803969435_kzkq88",
+      "id": "phone_1781284045179_94dwg8",
       "phoneNumber": "13800138000",
       "sourceType": "desensitization_rule",
-      "sourceId": "rule_1780803969434_qhchxt",
-      "sourceName": "Test Rule 2",
+      "sourceId": "rule_1781284045177_6vxhzc",
+      "sourceName": "客户咨询记录脱敏规则",
       "status": "confirmed",
-      "detectedAt": "2026-06-07T03:46:09.435Z",
+      "detectedAt": "2026-06-12T17:07:25.179Z",
       "note": "手机号在导出中漏遮，留待算法同事复核，暂不归为正常",
+      "rawMaterialSnapshot": {
+        "fullText": "本规则适用于所有客户咨询记录。敏感字段包括：手机号（11位，遮蔽中间4位）。注意测试手机号：13800138000 （故意漏遮）",
+        "phoneContext": {
+          "prefix": "...所有客户咨询记录。敏感字段包括：手机号（11位，遮蔽中间4位）。注意测试手机号：",
+          "matched": "13800138000",
+          "suffix": " （故意漏遮）",
+          "fullContext": "...所有客户咨询记录。敏感字段包括：手机号（11位，遮蔽中间4位）。注意测试手机号：13800138000 （故意漏遮）"
+        },
+        "position": 46
+      },
+      "traceId": "trace_1781284045179_jfkp6e",
       "reviewedBy": "算法同事小李",
-      "reviewNote": "Confirmed issue"
-    },
-    {
-      "id": "phone_1780803969438_v9cn87",
-      "phoneNumber": "13800138000",
-      "sourceType": "desensitization_rule",
-      "sourceId": "rule_1780803969434_qhchxt",
-      "sourceName": "Test Rule 2",
-      "status": "pending_review",
-      "detectedAt": "2026-06-07T03:46:09.438Z",
-      "note": "手机号在导出中漏遮，留待算法同事复核，暂不归为正常"
+      "reviewNote": "确认漏遮，已通知下游系统修复脱敏规则。该手机号在历史导出中出现过3次。",
+      "reviewedAt": "2026-06-12T17:07:25.192Z"
     }
   ]
 }
