@@ -6,6 +6,7 @@ import type {
   AuthorizationAlert,
   ProcessStep,
   CalcParams,
+  ImportSession,
 } from '@/types';
 
 export const mockBatches: Batch[] = [
@@ -52,38 +53,40 @@ export const mockBatches: Batch[] = [
   },
 ];
 
+const now = '2024-03-15T09:05:00Z';
+
 export const mockAttendanceRecords: AttendanceRecord[] = [
-  { id: 'att-001', batchId: 'batch-001', name: '张小明', type: 'paid', sourcePhotoRef: 'photo-row-1-col-1', remark: '准时到达', createdAt: '2024-03-15T09:05:00Z' },
-  { id: 'att-002', batchId: 'batch-001', name: '李小红', type: 'free', sourcePhotoRef: 'photo-row-1-col-2', remark: '赠票-合作机构', createdAt: '2024-03-15T09:05:00Z' },
-  { id: 'att-003', batchId: 'batch-001', name: '王小刚', type: 'paid', sourcePhotoRef: 'photo-row-1-col-3', createdAt: '2024-03-15T09:05:00Z' },
-  { id: 'att-004', batchId: 'batch-001', name: '赵小美', type: 'free', sourcePhotoRef: 'photo-row-2-col-1', remark: '赠票-员工子女', createdAt: '2024-03-15T09:05:00Z' },
-  { id: 'att-005', batchId: 'batch-001', name: '陈小华', type: 'paid', sourcePhotoRef: 'photo-row-2-col-2', createdAt: '2024-03-15T09:05:00Z' },
-  { id: 'att-006', batchId: 'batch-001', name: '刘小军', type: 'paid', sourcePhotoRef: 'photo-row-2-col-3', createdAt: '2024-03-15T09:05:00Z' },
-  { id: 'att-007', batchId: 'batch-001', name: '孙小丽', type: 'free', sourcePhotoRef: 'photo-row-3-col-1', remark: '赠票-媒体', createdAt: '2024-03-15T09:05:00Z' },
-  { id: 'att-008', batchId: 'batch-001', name: '周小伟', type: 'paid', sourcePhotoRef: 'photo-row-3-col-2', createdAt: '2024-03-15T09:05:00Z' },
-  { id: 'att-009', batchId: 'batch-001', name: '吴小燕', type: 'paid', sourcePhotoRef: 'photo-row-3-col-3', createdAt: '2024-03-15T09:05:00Z' },
-  { id: 'att-010', batchId: 'batch-001', name: '郑小强', type: 'free', sourcePhotoRef: 'photo-row-4-col-1', remark: '赠票-合作机构', createdAt: '2024-03-15T09:05:00Z' },
-  { id: 'att-011', batchId: 'batch-001', name: '冯小芳', type: 'paid', sourcePhotoRef: 'photo-row-4-col-2', createdAt: '2024-03-15T09:05:00Z' },
-  { id: 'att-012', batchId: 'batch-001', name: '于小磊', type: 'paid', sourcePhotoRef: 'photo-row-4-col-3', createdAt: '2024-03-15T09:05:00Z' },
-  { id: 'att-013', batchId: 'batch-001', name: '董小晶', type: 'free', sourcePhotoRef: 'photo-row-5-col-1', remark: '赠票-员工子女', createdAt: '2024-03-15T09:05:00Z' },
-  { id: 'att-014', batchId: 'batch-001', name: '萧小鹏', type: 'paid', sourcePhotoRef: 'photo-row-5-col-2', createdAt: '2024-03-15T09:05:00Z' },
-  { id: 'att-015', batchId: 'batch-001', name: '程小雨', type: 'paid', sourcePhotoRef: 'photo-row-5-col-3', createdAt: '2024-03-15T09:05:00Z' },
-  { id: 'att-016', batchId: 'batch-001', name: '曹小阳', type: 'paid', sourcePhotoRef: 'photo-row-6-col-1', createdAt: '2024-03-15T09:05:00Z' },
-  { id: 'att-017', batchId: 'batch-001', name: '袁小欣', type: 'free', sourcePhotoRef: 'photo-row-6-col-2', remark: '赠票-媒体', createdAt: '2024-03-15T09:05:00Z' },
-  { id: 'att-018', batchId: 'batch-001', name: '邓小宇', type: 'paid', sourcePhotoRef: 'photo-row-6-col-3', createdAt: '2024-03-15T09:05:00Z' },
-  { id: 'att-019', batchId: 'batch-001', name: '许小婷', type: 'paid', sourcePhotoRef: 'photo-row-7-col-1', createdAt: '2024-03-15T09:05:00Z' },
-  { id: 'att-020', batchId: 'batch-001', name: '傅小杰', type: 'paid', sourcePhotoRef: 'photo-row-7-col-2', createdAt: '2024-03-15T09:05:00Z' },
-  { id: 'att-021', batchId: 'batch-001', name: '沈小琳', type: 'free', sourcePhotoRef: 'photo-row-7-col-3', remark: '赠票-合作机构', createdAt: '2024-03-15T09:05:00Z' },
-  { id: 'att-022', batchId: 'batch-001', name: '曾小浩', type: 'paid', sourcePhotoRef: 'photo-row-8-col-1', createdAt: '2024-03-15T09:05:00Z' },
-  { id: 'att-023', batchId: 'batch-001', name: '彭小雯', type: 'paid', sourcePhotoRef: 'photo-row-8-col-2', createdAt: '2024-03-15T09:05:00Z' },
-  { id: 'att-024', batchId: 'batch-001', name: '吕小博', type: 'free', sourcePhotoRef: 'photo-row-8-col-3', remark: '赠票-员工子女', createdAt: '2024-03-15T09:05:00Z' },
+  { id: 'att-001', batchId: 'batch-001', name: '张小明', type: 'paid', sourcePhotoRef: 'photo-row-1-col-1', remark: '准时到达', createdAt: now, updatedAt: now, dedupKey: 'batch-001|张小明|photo-row-1-col-1', importSessionId: 'sess-001' },
+  { id: 'att-002', batchId: 'batch-001', name: '李小红', type: 'free', sourcePhotoRef: 'photo-row-1-col-2', remark: '赠票', createdAt: now, updatedAt: '2024-03-15T11:20:00Z', dedupKey: 'batch-001|李小红|photo-row-1-col-2', importSessionId: 'sess-001' },
+  { id: 'att-003', batchId: 'batch-001', name: '王小刚', type: 'paid', sourcePhotoRef: 'photo-row-1-col-3', createdAt: now, updatedAt: now, dedupKey: 'batch-001|王小刚|photo-row-1-col-3', importSessionId: 'sess-001' },
+  { id: 'att-004', batchId: 'batch-001', name: '赵小美', type: 'free', sourcePhotoRef: 'photo-row-2-col-1', remark: '', createdAt: now, updatedAt: '2024-03-15T11:25:00Z', dedupKey: 'batch-001|赵小美|photo-row-2-col-1', importSessionId: 'sess-001' },
+  { id: 'att-005', batchId: 'batch-001', name: '陈小华', type: 'paid', sourcePhotoRef: 'photo-row-2-col-2', createdAt: now, updatedAt: now, dedupKey: 'batch-001|陈小华|photo-row-2-col-2', importSessionId: 'sess-001' },
+  { id: 'att-006', batchId: 'batch-001', name: '刘小军', type: 'paid', sourcePhotoRef: 'photo-row-2-col-3', createdAt: now, updatedAt: now, dedupKey: 'batch-001|刘小军|photo-row-2-col-3', importSessionId: 'sess-001' },
+  { id: 'att-007', batchId: 'batch-001', name: '孙小丽', type: 'free', sourcePhotoRef: 'photo-row-3-col-1', remark: '赠票-媒体', createdAt: now, updatedAt: now, dedupKey: 'batch-001|孙小丽|photo-row-3-col-1', importSessionId: 'sess-001' },
+  { id: 'att-008', batchId: 'batch-001', name: '周小伟', type: 'paid', sourcePhotoRef: 'photo-row-3-col-2', createdAt: now, updatedAt: now, dedupKey: 'batch-001|周小伟|photo-row-3-col-2', importSessionId: 'sess-001' },
+  { id: 'att-009', batchId: 'batch-001', name: '吴小燕', type: 'paid', sourcePhotoRef: 'photo-row-3-col-3', createdAt: now, updatedAt: now, dedupKey: 'batch-001|吴小燕|photo-row-3-col-3', importSessionId: 'sess-001' },
+  { id: 'att-010', batchId: 'batch-001', name: '郑小强', type: 'free', sourcePhotoRef: 'photo-row-4-col-1', remark: '赠票-合作机构', createdAt: now, updatedAt: now, dedupKey: 'batch-001|郑小强|photo-row-4-col-1', importSessionId: 'sess-001' },
+  { id: 'att-011', batchId: 'batch-001', name: '冯小芳', type: 'paid', sourcePhotoRef: 'photo-row-4-col-2', createdAt: now, updatedAt: now, dedupKey: 'batch-001|冯小芳|photo-row-4-col-2', importSessionId: 'sess-001' },
+  { id: 'att-012', batchId: 'batch-001', name: '于小磊', type: 'paid', sourcePhotoRef: 'photo-row-4-col-3', createdAt: now, updatedAt: now, dedupKey: 'batch-001|于小磊|photo-row-4-col-3', importSessionId: 'sess-001' },
+  { id: 'att-013', batchId: 'batch-001', name: '董小晶', type: 'free', sourcePhotoRef: 'photo-row-5-col-1', remark: '赠票-员工子女', createdAt: now, updatedAt: now, dedupKey: 'batch-001|董小晶|photo-row-5-col-1', importSessionId: 'sess-001' },
+  { id: 'att-014', batchId: 'batch-001', name: '萧小鹏', type: 'paid', sourcePhotoRef: 'photo-row-5-col-2', createdAt: now, updatedAt: now, dedupKey: 'batch-001|萧小鹏|photo-row-5-col-2', importSessionId: 'sess-001' },
+  { id: 'att-015', batchId: 'batch-001', name: '程小雨', type: 'paid', sourcePhotoRef: 'photo-row-5-col-3', createdAt: now, updatedAt: now, dedupKey: 'batch-001|程小雨|photo-row-5-col-3', importSessionId: 'sess-001' },
+  { id: 'att-016', batchId: 'batch-001', name: '曹小阳', type: 'paid', sourcePhotoRef: 'photo-row-6-col-1', createdAt: now, updatedAt: now, dedupKey: 'batch-001|曹小阳|photo-row-6-col-1', importSessionId: 'sess-001' },
+  { id: 'att-017', batchId: 'batch-001', name: '袁小欣', type: 'free', sourcePhotoRef: 'photo-row-6-col-2', remark: '赠票-媒体', createdAt: now, updatedAt: now, dedupKey: 'batch-001|袁小欣|photo-row-6-col-2', importSessionId: 'sess-001' },
+  { id: 'att-018', batchId: 'batch-001', name: '邓小宇', type: 'paid', sourcePhotoRef: 'photo-row-6-col-3', createdAt: now, updatedAt: now, dedupKey: 'batch-001|邓小宇|photo-row-6-col-3', importSessionId: 'sess-001' },
+  { id: 'att-019', batchId: 'batch-001', name: '许小婷', type: 'paid', sourcePhotoRef: 'photo-row-7-col-1', createdAt: now, updatedAt: now, dedupKey: 'batch-001|许小婷|photo-row-7-col-1', importSessionId: 'sess-001' },
+  { id: 'att-020', batchId: 'batch-001', name: '傅小杰', type: 'paid', sourcePhotoRef: 'photo-row-7-col-2', createdAt: now, updatedAt: now, dedupKey: 'batch-001|傅小杰|photo-row-7-col-2', importSessionId: 'sess-001' },
+  { id: 'att-021', batchId: 'batch-001', name: '沈小琳', type: 'free', sourcePhotoRef: 'photo-row-7-col-3', remark: '赠票-合作机构', createdAt: now, updatedAt: now, dedupKey: 'batch-001|沈小琳|photo-row-7-col-3', importSessionId: 'sess-001' },
+  { id: 'att-022', batchId: 'batch-001', name: '曾小浩', type: 'paid', sourcePhotoRef: 'photo-row-8-col-1', createdAt: now, updatedAt: now, dedupKey: 'batch-001|曾小浩|photo-row-8-col-1', importSessionId: 'sess-001' },
+  { id: 'att-023', batchId: 'batch-001', name: '彭小雯', type: 'paid', sourcePhotoRef: 'photo-row-8-col-2', createdAt: now, updatedAt: now, dedupKey: 'batch-001|彭小雯|photo-row-8-col-2', importSessionId: 'sess-001' },
+  { id: 'att-024', batchId: 'batch-001', name: '吕小博', type: 'free', sourcePhotoRef: 'photo-row-8-col-3', remark: '赠票-员工子女', createdAt: now, updatedAt: now, dedupKey: 'batch-001|吕小博|photo-row-8-col-3', importSessionId: 'sess-001' },
 ];
 
 export const mockTicketRecords: TicketRecord[] = [
-  { id: 'tkt-001', batchId: 'batch-001', ticketNo: 'T20240315001', type: 'paid', purchaser: '张先生', sourceExportRef: 'export-row-2', createdAt: '2024-03-10T14:30:00Z' },
-  { id: 'tkt-002', batchId: 'batch-001', ticketNo: 'F20240315001', type: 'free', purchaser: '合作机构A', sourceExportRef: 'export-row-3', createdAt: '2024-03-12T10:00:00Z' },
-  { id: 'tkt-003', batchId: 'batch-001', ticketNo: 'T20240315002', type: 'paid', purchaser: '王女士', sourceExportRef: 'export-row-4', createdAt: '2024-03-11T09:15:00Z' },
-  { id: 'tkt-004', batchId: 'batch-001', ticketNo: 'F20240315002', type: 'free', purchaser: '内部员工', sourceExportRef: 'export-row-5', createdAt: '2024-03-13T16:45:00Z' },
+  { id: 'tkt-001', batchId: 'batch-001', ticketNo: 'T20240315001', type: 'paid', purchaser: '张先生', sourceExportRef: 'export-row-2', createdAt: '2024-03-10T14:30:00Z', dedupKey: 'batch-001|T20240315001' },
+  { id: 'tkt-002', batchId: 'batch-001', ticketNo: 'F20240315001', type: 'free', purchaser: '合作机构A', sourceExportRef: 'export-row-3', createdAt: '2024-03-12T10:00:00Z', dedupKey: 'batch-001|F20240315001' },
+  { id: 'tkt-003', batchId: 'batch-001', ticketNo: 'T20240315002', type: 'paid', purchaser: '王女士', sourceExportRef: 'export-row-4', createdAt: '2024-03-11T09:15:00Z', dedupKey: 'batch-001|T20240315002' },
+  { id: 'tkt-004', batchId: 'batch-001', ticketNo: 'F20240315002', type: 'free', purchaser: '内部员工', sourceExportRef: 'export-row-5', createdAt: '2024-03-13T16:45:00Z', dedupKey: 'batch-001|F20240315002' },
 ];
 
 export const mockNoteHistories: NoteHistory[] = [
@@ -95,6 +98,8 @@ export const mockNoteHistories: NoteHistory[] = [
     newContent: '赠票-合作机构',
     modifiedBy: 'copyright',
     modifiedAt: '2024-03-15T11:20:00Z',
+    affectedResultFields: ['remark', '赠票来源统计'],
+    operatorName: '版权运营小鹿',
   },
   {
     id: 'nh-002',
@@ -104,6 +109,8 @@ export const mockNoteHistories: NoteHistory[] = [
     newContent: '赠票-员工子女',
     modifiedBy: 'copyright',
     modifiedAt: '2024-03-15T11:25:00Z',
+    affectedResultFields: ['remark', '赠票来源统计'],
+    operatorName: '版权运营小鹿',
   },
 ];
 
@@ -118,6 +125,8 @@ export const mockAuthorizationAlerts: AuthorizationAlert[] = [
     assignee: 'recorder',
     isResolved: false,
     createdAt: '2024-03-15T14:30:00Z',
+    traceImportSessionId: 'sess-001',
+    traceRecordIds: ['att-002', 'att-004', 'att-007', 'att-010', 'att-013', 'att-017', 'att-021', 'att-024'],
   },
 ];
 
@@ -167,3 +176,52 @@ export const mockCalcParams: CalcParams = {
   tradeOffReason: '选择dhash-128而非phash，原因是课时签到照片背景固定、文字较多，dhash对对比度变化更敏感，去重准确率提升12%，但CPU占用增加8%；在当前并发下可接受。相似阈值设为0.85而非0.9，可减少误判漏检，代价是偶尔需要人工二次确认。',
   createdAt: '2024-02-01T00:00:00Z',
 };
+
+export const mockImportSessions: ImportSession[] = [
+  {
+    id: 'sess-001',
+    batchId: 'batch-001',
+    sourceType: 'photo',
+    fileName: '第3周签到照片-0315.jpg',
+    fileHash: 'abc123xyz',
+    importedBy: 'copyright',
+    importedAt: '2024-03-15T09:05:00Z',
+    totalInputCount: 24,
+    newCount: 24,
+    duplicateThisSessionCount: 0,
+    duplicateHistoryCount: 0,
+    updatedCount: 0,
+    calcParamsVersion: 'v1.2.0',
+    details: mockAttendanceRecords.map((r, i) => ({
+      lineNo: i + 1,
+      dedupKey: r.dedupKey,
+      displayName: r.name,
+      status: 'new' as const,
+      newRecordId: r.id,
+      message: `新增：${r.name}（${r.type === 'free' ? '赠票' : '售票'}）`,
+    })),
+  },
+  {
+    id: 'sess-002',
+    batchId: 'batch-001',
+    sourceType: 'ticket',
+    fileName: '票务导出-2024W11.xlsx',
+    fileHash: 'def456uvw',
+    importedBy: 'copyright',
+    importedAt: '2024-03-15T11:30:00Z',
+    totalInputCount: 4,
+    newCount: 4,
+    duplicateThisSessionCount: 0,
+    duplicateHistoryCount: 0,
+    updatedCount: 0,
+    calcParamsVersion: 'v1.2.0',
+    details: mockTicketRecords.map((r, i) => ({
+      lineNo: i + 1,
+      dedupKey: r.dedupKey,
+      displayName: `${r.ticketNo} / ${r.purchaser}`,
+      status: 'new' as const,
+      newRecordId: r.id,
+      message: `新增：${r.ticketNo}（${r.type === 'free' ? '赠票' : '售票'}）`,
+    })),
+  },
+];

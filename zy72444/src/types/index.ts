@@ -4,6 +4,8 @@ export type BatchStatus = 'pending' | 'reviewing' | 'authorized' | 'rejected';
 
 export type UserRole = 'recorder' | 'copyright';
 
+export type ImportResultStatus = 'new' | 'duplicate-this-session' | 'duplicate-history' | 'updated';
+
 export interface Batch {
   id: string;
   name: string;
@@ -27,6 +29,9 @@ export interface AttendanceRecord {
   sourcePhotoRef: string;
   remark?: string;
   createdAt: string;
+  updatedAt: string;
+  importSessionId?: string;
+  dedupKey: string;
 }
 
 export interface TicketRecord {
@@ -37,6 +42,7 @@ export interface TicketRecord {
   purchaser: string;
   sourceExportRef: string;
   createdAt: string;
+  dedupKey: string;
 }
 
 export interface NoteHistory {
@@ -47,6 +53,8 @@ export interface NoteHistory {
   newContent: string;
   modifiedBy: UserRole;
   modifiedAt: string;
+  affectedResultFields: string[];
+  operatorName: string;
 }
 
 export interface AuthorizationAlert {
@@ -59,6 +67,8 @@ export interface AuthorizationAlert {
   assignee: UserRole;
   isResolved: boolean;
   createdAt: string;
+  traceImportSessionId?: string;
+  traceRecordIds?: string[];
 }
 
 export interface ProcessStep {
@@ -85,4 +95,45 @@ export interface CalcParams {
 export interface DiffSegment {
   type: 'same' | 'added' | 'removed';
   content: string;
+}
+
+export type ImportSourceType = 'photo' | 'ticket';
+
+export interface ImportDetailItem {
+  lineNo: number;
+  dedupKey: string;
+  displayName: string;
+  status: ImportResultStatus;
+  existingRecordId?: string;
+  newRecordId?: string;
+  message: string;
+}
+
+export interface ImportSession {
+  id: string;
+  batchId: string;
+  sourceType: ImportSourceType;
+  fileName: string;
+  fileHash: string;
+  importedBy: UserRole;
+  importedAt: string;
+  totalInputCount: number;
+  newCount: number;
+  duplicateThisSessionCount: number;
+  duplicateHistoryCount: number;
+  updatedCount: number;
+  details: ImportDetailItem[];
+  calcParamsVersion: string;
+}
+
+export interface ExportBundle {
+  exportVersion: string;
+  exportedAt: string;
+  batch: Batch;
+  records: AttendanceRecord[];
+  tickets: TicketRecord[];
+  importSessions: ImportSession[];
+  noteHistories: NoteHistory[];
+  processStep?: ProcessStep;
+  calcParams: CalcParams;
 }
