@@ -89,21 +89,69 @@ export function runWrongCaliberScenario() {
     console.log('\nℹ️  没有可自动修复的问题');
   }
 
-  console.log('\n🤝 模拟版权运营小鹿确认冲突...');
+  console.log('\n📋 冲突报告（处理前）：');
+  const conflictReportBefore = checklistService.getConflictReport();
+  console.table(conflictReportBefore.map(r => ({
+    冲突ID: r.conflictId.slice(0, 8),
+    类型: r.type,
+    艺人: r.performerName,
+    状态: r.status,
+    结论: r.conclusion || '-'
+  })));
+
+  console.log('\n🤝 模拟版权运营小鹿确认冲突（非统筹复核类）...');
   const checklistItems = dataStore.getAllChecklistItems();
-  const conflictItems = checklistItems.filter((item) => item.verificationResult === 'conflict');
-  
-  for (const item of conflictItems) {
-    if (item.conflictEvidence && !item.conflictEvidence.needsCoordinatorReview) {
-      workflowService.resolveConflict(workflow.batchId, item.id, true, '版权运营小鹿');
-      console.log(`   ✅ 小鹿已确认：${item.performerName} 的曲目冲突`);
-    }
+  const conflictItems = checklistItems.filter(
+    (item) => item.verificationResult === 'conflict' && item.conflictId
+  );
+
+  const nonCoordinatorConflicts = conflictItems.filter(
+    (item) => !item.conflictEvidence?.needsCoordinatorReview
+  );
+
+  for (const item of nonCoordinatorConflicts) {
+    workflowService.resolveConflict(workflow.batchId, item.id, true, '版权运营小鹿');
+    console.log(`   ✅ 小鹿已确认：${item.performerName} 的曲目冲突（冲突ID: ${item.conflictId?.slice(0, 8)}）`);
   }
 
   console.log('\n👑 模拟巡演统筹复核请假记录...');
-  for (const item of pendingLeaveReviews) {
+  const coordinatorConflicts = conflictItems.filter(
+    (item) => item.conflictEvidence?.needsCoordinatorReview
+  );
+
+  for (const item of coordinatorConflicts) {
+    workflowService.reviewLeaveByCoordinator(workflow.batchId, item.id, '巡演统筹老王');
+    console.log(`   ✅ 统筹已复核：${item.performerName} 的请假记录（冲突ID: ${item.conflictId?.slice(0, 8)}）`);
+  }
+
+  const pendingLeaveStill = dataStore
+    .getAllChecklistItems()
+    .filter((item) => item.isLeave && item.leaveReviewStatus === 'pending');
+  for (const item of pendingLeaveStill) {
     workflowService.reviewLeaveByCoordinator(workflow.batchId, item.id, '巡演统筹老王');
     console.log(`   ✅ 统筹已复核：${item.performerName} 的请假记录`);
+  }
+
+  console.log('\n📋 冲突报告（处理后）：');
+  const conflictReportAfter = checklistService.getConflictReport();
+  console.table(conflictReportAfter.map(r => ({
+    冲突ID: r.conflictId.slice(0, 8),
+    类型: r.type,
+    艺人: r.performerName,
+    状态: r.status,
+    处理人: r.handledBy || '-',
+    结论: r.conclusion || '-'
+  })));
+
+  console.log('\n📜 审计追踪（状态变化）：');
+  const auditLog = dataStore.getAuditLog('checklist-item');
+  const changeAudits = auditLog.filter((e) => e.action === 'conflict-resolve' || e.action === 'leave-review');
+  for (const entry of changeAudits) {
+    console.log(`  [${entry.action}] ${entry.description}`);
+    if (entry.before) {
+      console.log(`    改前：${JSON.stringify(entry.before)}`);
+    }
+    console.log(`    改后：${JSON.stringify(entry.after)}`);
   }
 
   const finalState = workflowService.getState(workflow.batchId);

@@ -13,6 +13,7 @@ export class AliasImportService {
   importAliases(inputs: AliasImportInput[]): ImportResult<TrackAlias> {
     const batchId = dataStore.generateBatchId();
     const imported: TrackAlias[] = [];
+    const reused: TrackAlias[] = [];
     const duplicates: TrackAlias[] = [];
     const errors: UserMessage[] = [];
     const warnings: UserMessage[] = [];
@@ -22,12 +23,26 @@ export class AliasImportService {
 
       if (duplicate) {
         duplicates.push(duplicate);
-        warnings.push(
-          createWarningMessage(
-            `曲目"${input.canonicalName}"已存在（标准名或别名重复）`,
-            `现有标准名：${duplicate.canonicalName}，别名：${duplicate.aliases.join('、')}`
-          )
-        );
+
+        const isFullyReused =
+          duplicate.canonicalName.trim().toLowerCase() === input.canonicalName.trim().toLowerCase() &&
+          duplicate.copyrightHolder.trim().toLowerCase() === input.copyrightHolder.trim().toLowerCase();
+
+        if (isFullyReused) {
+          reused.push(duplicate);
+          warnings.push(
+            createInfoMessage(
+              `曲目"${input.canonicalName}"复用已有记录（版权方：${duplicate.copyrightHolder}，别名：${duplicate.aliases.join('、')}）`
+            )
+          );
+        } else {
+          warnings.push(
+            createWarningMessage(
+              `曲目"${input.canonicalName}"已存在但信息不一致`,
+              `现有标准名：${duplicate.canonicalName}，版权方：${duplicate.copyrightHolder}，别名：${duplicate.aliases.join('、')}。请确认是否需要更新`
+            )
+          );
+        }
         continue;
       }
 
@@ -46,14 +61,20 @@ export class AliasImportService {
 
     if (imported.length > 0) {
       warnings.push(
-        createInfoMessage(`成功导入 ${imported.length} 条曲目别名记录`)
+        createInfoMessage(`成功导入 ${imported.length} 条新曲目别名记录`)
       );
     }
 
-    if (duplicates.length > 0) {
+    if (reused.length > 0) {
+      warnings.push(
+        createInfoMessage(`复用 ${reused.length} 条已有记录（内容完全一致）`)
+      );
+    }
+
+    if (duplicates.length > reused.length) {
       warnings.push(
         createWarningMessage(
-          `跳过 ${duplicates.length} 条重复记录`,
+          `跳过 ${duplicates.length - reused.length} 条信息不一致的重复记录`,
           '请检查是否需要合并或更新现有记录'
         )
       );
@@ -62,6 +83,7 @@ export class AliasImportService {
     return {
       success: errors.length === 0,
       imported,
+      reused,
       duplicates,
       errors,
       warnings,

@@ -19,6 +19,7 @@ export class ScheduleImportService {
   importSchedule(inputs: ScheduleImportInput[]): ImportResult<ScheduleRecord> {
     const batchId = dataStore.generateBatchId();
     const imported: ScheduleRecord[] = [];
+    const reused: ScheduleRecord[] = [];
     const duplicates: ScheduleRecord[] = [];
     const errors: UserMessage[] = [];
     const warnings: UserMessage[] = [];
@@ -76,6 +77,7 @@ export class ScheduleImportService {
     return {
       success: errors.length === 0,
       imported,
+      reused,
       duplicates,
       errors,
       warnings,

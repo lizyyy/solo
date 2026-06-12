@@ -61,6 +61,27 @@ export function runNormalScenario() {
   const exported = checklistService.exportChecklist('normal');
   console.table(exported);
 
+  console.log('\n📋 冲突报告：');
+  const conflictReport = checklistService.getConflictReport();
+  if (conflictReport.length === 0) {
+    console.log('  ✅ 无冲突记录');
+  } else {
+    console.table(conflictReport.map(r => ({
+      冲突ID: r.conflictId.slice(0, 8),
+      类型: r.type,
+      艺人: r.performerName,
+      状态: r.status,
+      结论: r.conclusion || '-'
+    })));
+  }
+
+  console.log('\n📜 审计追踪：');
+  const auditLog = dataStore.getAuditLog('checklist-item');
+  console.log(`  共 ${auditLog.length} 条审计记录`);
+  auditLog.slice(0, 3).forEach((entry, i) => {
+    console.log(`  ${i + 1}. [${entry.action}] ${entry.description}`);
+  });
+
   console.log('\n🧪 运行自检：');
   const report = selfCheckService.runFullCheck();
   console.log(selfCheckService.formatReport(report));

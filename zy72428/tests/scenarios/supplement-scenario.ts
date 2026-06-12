@@ -90,6 +90,16 @@ export function runSupplementScenario() {
   const exported = checklistService.exportChecklist('supplement');
   console.table(exported);
 
+  console.log('\n📋 冲突报告（处理前）：');
+  const conflictReportBefore = checklistService.getConflictReport();
+  console.table(conflictReportBefore.map(r => ({
+    冲突ID: r.conflictId.slice(0, 8),
+    类型: r.type,
+    艺人: r.performerName,
+    状态: r.status,
+    结论: r.conclusion || '-'
+  })));
+
   console.log('\n🧪 运行自检（补录前）：');
   const reportBefore = selfCheckService.runFullCheck();
   console.log(selfCheckService.formatReport(reportBefore));
@@ -118,16 +128,54 @@ export function runSupplementScenario() {
     });
   }
 
+  console.log('\n👑 巡演统筹复核所有请假记录...');
+  const allPendingLeave = dataStore
+    .getAllChecklistItems()
+    .filter((item) => item.isLeave && item.leaveReviewStatus === 'pending');
+  for (const item of allPendingLeave) {
+    workflowService.reviewLeaveByCoordinator(workflow.batchId, item.id, '巡演统筹老李');
+    console.log(`   ✅ 已复核：${item.performerName} 的请假记录`);
+  }
+
+  const allConflictItems = dataStore
+    .getAllChecklistItems()
+    .filter((item) => item.verificationResult === 'conflict' && item.conflictId);
+  for (const item of allConflictItems) {
+    if (item.conflictEvidence?.needsCoordinatorReview) {
+      workflowService.reviewLeaveByCoordinator(workflow.batchId, item.id, '巡演统筹老李');
+      console.log(`   ✅ 统筹已处理冲突项：${item.performerName}（冲突ID: ${item.conflictId?.slice(0, 8)}）`);
+    } else {
+      workflowService.resolveConflict(workflow.batchId, item.id, true, '版权运营小鹿');
+      console.log(`   ✅ 小鹿已确认：${item.performerName}（冲突ID: ${item.conflictId?.slice(0, 8)}）`);
+    }
+  }
+
+  console.log('\n📋 冲突报告（处理后）：');
+  const conflictReportAfter = checklistService.getConflictReport();
+  console.table(conflictReportAfter.map(r => ({
+    冲突ID: r.conflictId.slice(0, 8),
+    类型: r.type,
+    艺人: r.performerName,
+    状态: r.status,
+    处理人: r.handledBy || '-',
+    结论: r.conclusion || '-'
+  })));
+
+  console.log('\n� 审计追踪（补录相关状态变化）：');
+  const auditLog = dataStore.getAuditLog('checklist-item');
+  const changeAudits = auditLog.filter((e) => e.action === 'conflict-resolve' || e.action === 'leave-review');
+  for (const entry of changeAudits) {
+    console.log(`  [${entry.action}] ${entry.description}`);
+    if (entry.before) {
+      console.log(`    改前：${JSON.stringify(entry.before)}`);
+    }
+    console.log(`    改后：${JSON.stringify(entry.after)}`);
+  }
+
   console.log('\n✅ 验证导出一致性：');
   const finalReport = selfCheckService.runFullCheck();
   const exportCheck = finalReport.items.find((i) => i.checkType === 'export-consistency');
   console.log(`   导出一致性：${exportCheck?.status === 'pass' ? '✅ 通过' : '❌ 失败'}`);
-
-  console.log('\n👑 巡演统筹复核所有请假记录：');
-  for (const item of pendingLeaveReviews) {
-    workflowService.reviewLeaveByCoordinator(workflow.batchId, item.id, '巡演统筹老李');
-    console.log(`   ✅ 已复核：${item.performerName} 的请假记录`);
-  }
 
   const canComplete = workflowService.canComplete(workflow.batchId);
   console.log(`\n✅ 工作流完成状态：${canComplete.canComplete ? '可以完成' : '未完成 - ' + canComplete.reason}`);

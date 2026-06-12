@@ -52,6 +52,14 @@ export class WorkflowService {
     const messages: UserMessage[] = [...state.messages];
     messages.push(...aliasResult.warnings, ...scheduleResult.warnings);
 
+    if (aliasResult.reused.length > 0) {
+      messages.push(
+        createInfoMessage(
+          `曲目别名表复用 ${aliasResult.reused.length} 条已有记录，新增 ${aliasResult.imported.length} 条`
+        )
+      );
+    }
+
     if (scheduleResult.duplicates.length > 0) {
       messages.push(
         createWarningMessage(
@@ -185,6 +193,7 @@ export class WorkflowService {
     resolverName: string
   ): WorkflowStateType {
     const state = this.getState(batchId);
+    const itemBefore = dataStore.getChecklistItem(checklistItemId);
     const updated = checklistService.resolveConflict(checklistItemId, confirmed, resolverName);
 
     if (!updated) {
@@ -198,13 +207,19 @@ export class WorkflowService {
       )
     );
 
-    const pendingConflicts = state.pendingConflicts.filter(
-      (c) => c.id !== updated.conflictEvidence?.id
+    const resolvedConflictId = itemBefore?.conflictId || updated.conflictId;
+    const pendingConflicts = resolvedConflictId
+      ? state.pendingConflicts.filter((c) => c.id !== resolvedConflictId)
+      : state.pendingConflicts;
+
+    const pendingLeaveReviews = state.pendingLeaveReviews.filter(
+      (r) => r.id !== checklistItemId
     );
 
     const updatedState: WorkflowStateType = {
       ...state,
       pendingConflicts,
+      pendingLeaveReviews,
       messages,
     };
 
@@ -218,6 +233,7 @@ export class WorkflowService {
     coordinatorName: string
   ): WorkflowStateType {
     const state = this.getState(batchId);
+    const itemBefore = dataStore.getChecklistItem(checklistItemId);
     const updated = checklistService.reviewLeaveItem(checklistItemId, coordinatorName);
 
     if (!updated) {
@@ -231,12 +247,18 @@ export class WorkflowService {
       )
     );
 
+    const resolvedConflictId = itemBefore?.conflictId;
+    const pendingConflicts = resolvedConflictId
+      ? state.pendingConflicts.filter((c) => c.id !== resolvedConflictId)
+      : state.pendingConflicts;
+
     const pendingLeaveReviews = state.pendingLeaveReviews.filter(
       (r) => r.id !== checklistItemId
     );
 
     const updatedState: WorkflowStateType = {
       ...state,
+      pendingConflicts,
       pendingLeaveReviews,
       messages,
     };
@@ -257,16 +279,22 @@ export class WorkflowService {
     if (!state.checklistUpdated) {
       return { canComplete: false, reason: '尚未更新曲目核对表' };
     }
-    if (state.pendingConflicts.length > 0) {
+
+    const stillPending = checklistService.getPendingConflictIds();
+    if (stillPending.length > 0) {
       return {
         canComplete: false,
-        reason: `还有 ${state.pendingConflicts.length} 条冲突待确认/驳回`,
+        reason: `还有 ${stillPending.length} 条冲突待确认/驳回`,
       };
     }
-    if (state.pendingLeaveReviews.length > 0) {
+
+    const pendingLeave = dataStore
+      .getAllChecklistItems()
+      .filter((item) => item.isLeave && item.leaveReviewStatus === 'pending');
+    if (pendingLeave.length > 0) {
       return {
         canComplete: false,
-        reason: `还有 ${state.pendingLeaveReviews.length} 条请假记录待巡演统筹复核`,
+        reason: `还有 ${pendingLeave.length} 条请假记录待巡演统筹复核`,
       };
     }
 
@@ -283,19 +311,36 @@ export class WorkflowService {
 
   formatState(state: WorkflowStateType): string {
     const lines: string[] = [];
-    lines.push('=' .repeat(60));
+    lines.push('='.repeat(60));
     lines.push(`工作流批次：${state.batchId}`);
     lines.push(`数据来源：${this.getSourceText(state.source)}`);
     lines.push(`当前步骤：${this.getStepText(state.currentStep)}`);
-    lines.push('-' .repeat(60));
+    lines.push('-'.repeat(60));
     lines.push(`步骤进度：`);
     lines.push(`  ${state.aliasImported ? '✅' : '⬜'} 第一步：导入曲目别名表`);
     lines.push(`  ${state.photosReviewed ? '✅' : '⬜'} 第二步：审核课时签到照片`);
     lines.push(`  ${state.checklistUpdated ? '✅' : '⬜'} 第三步：更新曲目核对表`);
-    lines.push('-' .repeat(60));
-    lines.push(`待处理冲突：${state.pendingConflicts.length} 条`);
-    lines.push(`待统筹复核：${state.pendingLeaveReviews.length} 条`);
-    lines.push('-' .repeat(60));
+    lines.push('-'.repeat(60));
+
+    const stillPending = checklistService.getPendingConflictIds();
+    lines.push(`待处理冲突：${stillPending.length} 条`);
+    const pendingLeave = dataStore
+      .getAllChecklistItems()
+      .filter((item) => item.isLeave && item.leaveReviewStatus === 'pending');
+    lines.push(`待统筹复核：${pendingLeave.length} 条`);
+
+    if (stillPending.length > 0 || pendingLeave.length > 0) {
+      lines.push('');
+      lines.push('⚠️  未完成项：');
+      if (stillPending.length > 0) {
+        lines.push(`  - 还有 ${stillPending.length} 条冲突待确认/驳回`);
+      }
+      if (pendingLeave.length > 0) {
+        lines.push(`  - 还有 ${pendingLeave.length} 条请假记录待巡演统筹复核`);
+      }
+    }
+
+    lines.push('-'.repeat(60));
     lines.push('消息记录：');
     for (const msg of state.messages.slice(-5)) {
       const icon = msg.level === 'error' ? '❌' : msg.level === 'warning' ? '⚠️' : 'ℹ️';
@@ -304,7 +349,7 @@ export class WorkflowService {
         lines.push(`     建议：${msg.suggestion}`);
       }
     }
-    lines.push('=' .repeat(60));
+    lines.push('='.repeat(60));
     return lines.join('\n');
   }
 

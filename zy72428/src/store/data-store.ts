@@ -6,6 +6,7 @@ import {
   TrackChecklistItem,
   WorkflowState,
   MaterialSource,
+  AuditEntry,
 } from '../types';
 
 export class DataStore {
@@ -15,6 +16,7 @@ export class DataStore {
   private checklist: Map<string, TrackChecklistItem> = new Map();
   private workflowStates: Map<string, WorkflowState> = new Map();
   private importBatches: Set<string> = new Set();
+  private auditLog: AuditEntry[] = [];
 
   generateId(): string {
     return uuidv4();
@@ -28,6 +30,25 @@ export class DataStore {
 
   isBatchExists(batchId: string): boolean {
     return this.importBatches.has(batchId);
+  }
+
+  addAuditEntry(entry: AuditEntry): void {
+    this.auditLog.push(entry);
+  }
+
+  getAuditLog(entityType?: string, entityId?: string): AuditEntry[] {
+    let entries = this.auditLog;
+    if (entityType) {
+      entries = entries.filter((e) => e.entityType === entityType);
+    }
+    if (entityId) {
+      entries = entries.filter((e) => e.entityId === entityId);
+    }
+    return entries;
+  }
+
+  getAuditLogByBatch(batchId: string): AuditEntry[] {
+    return this.auditLog.filter((e) => e.batchId === batchId);
   }
 
   saveTrackAlias(alias: TrackAlias): void {
@@ -144,6 +165,7 @@ export class DataStore {
     this.checklist.clear();
     this.workflowStates.clear();
     this.importBatches.clear();
+    this.auditLog = [];
   }
 }
 

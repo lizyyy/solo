@@ -6,6 +6,8 @@ import {
   LeaveReviewStatus,
   MaterialSource,
   ScheduleRecord,
+  AuditEntry,
+  ConflictReportEntry,
 } from '../types';
 import { ErrorMessages } from '../utils/messages';
 
@@ -35,11 +37,13 @@ export class ChecklistService {
 
       let verificationResult: VerificationResult = 'match';
       let conflictEvidence: ConflictEvidence | undefined;
+      let conflictId: string | undefined;
       let leaveReviewStatus: LeaveReviewStatus = 'pending';
 
       if (!trackAlias) {
         verificationResult = 'conflict';
         conflictEvidence = this.createMissingAliasConflict(photo, matchingSchedule);
+        conflictId = conflictEvidence.id;
         conflicts.push(conflictEvidence);
       } else {
         const normalizedPhotoTrack = photo.trackName.trim().toLowerCase();
@@ -55,6 +59,7 @@ export class ChecklistService {
             trackAlias,
             matchingSchedule
           );
+          conflictId = conflictEvidence.id;
           conflicts.push(conflictEvidence);
         }
       }
@@ -63,6 +68,7 @@ export class ChecklistService {
         if (matchingSchedule && matchingSchedule.isConsumed) {
           verificationResult = 'conflict';
           conflictEvidence = this.createLeaveCountedConflict(photo, trackAlias, matchingSchedule);
+          conflictId = conflictEvidence.id;
           conflicts.push(conflictEvidence);
         }
         leaveReviewStatus = 'pending';
@@ -82,6 +88,7 @@ export class ChecklistService {
         canonicalTrackName: trackAlias?.canonicalName,
         verificationResult,
         conflictEvidence,
+        conflictId,
         isLeave: photo.isLeave,
         leaveReviewStatus,
         source: photo.source,
@@ -90,12 +97,182 @@ export class ChecklistService {
       dataStore.saveChecklistItem(item);
       checklist.push(item);
 
+      this.recordAudit(
+        'checklist-item',
+        item.id,
+        'create',
+        null,
+        { verificationResult, conflictId, isLeave: item.isLeave, leaveReviewStatus },
+        '系统',
+        `生成核对项：${item.performerName} ${item.sessionDate.toLocaleDateString()} ${item.locationName}`
+      );
+
       if (photo.isLeave && leaveReviewStatus === 'pending') {
         pendingLeaveReviews.push(item);
       }
     }
 
     return { checklist, conflicts, pendingLeaveReviews };
+  }
+
+  resolveConflict(
+    checklistItemId: string,
+    confirmed: boolean,
+    resolverName: string
+  ): TrackChecklistItem | undefined {
+    const item = dataStore.getChecklistItem(checklistItemId);
+    if (!item) return undefined;
+
+    const beforeSnapshot = {
+      verificationResult: item.verificationResult,
+      conflictEvidence: item.conflictEvidence ? { ...item.conflictEvidence } : null,
+      trackNameFromPhoto: item.trackNameFromPhoto,
+    };
+
+    const updated: TrackChecklistItem = {
+      ...item,
+      verificationResult: confirmed ? 'match' : 'pending-review',
+      reviewedBy: resolverName,
+      reviewedAt: new Date(),
+    };
+
+    if (confirmed && item.conflictEvidence) {
+      updated.trackNameFromPhoto = item.canonicalTrackName || item.trackNameFromAlias;
+      updated.conflictEvidence = undefined;
+    }
+
+    dataStore.saveChecklistItem(updated);
+
+    this.recordAudit(
+      'checklist-item',
+      item.id,
+      'conflict-resolve',
+      beforeSnapshot,
+      {
+        verificationResult: updated.verificationResult,
+        conflictId: item.conflictId,
+        confirmed,
+        trackNameFromPhoto: updated.trackNameFromPhoto,
+      },
+      resolverName,
+      `${resolverName} ${confirmed ? '确认' : '驳回'}冲突：${item.performerName} ${item.sessionDate.toLocaleDateString()}`
+    );
+
+    return updated;
+  }
+
+  reviewLeaveItem(
+    checklistItemId: string,
+    reviewerName: string
+  ): TrackChecklistItem | undefined {
+    const item = dataStore.getChecklistItem(checklistItemId);
+    if (!item) return undefined;
+
+    const beforeSnapshot = {
+      leaveReviewStatus: item.leaveReviewStatus,
+      isLeave: item.isLeave,
+      conflictId: item.conflictId,
+    };
+
+    const updated: TrackChecklistItem = {
+      ...item,
+      leaveReviewStatus: 'reviewed-by-coordinator',
+      reviewedBy: reviewerName,
+      reviewedAt: new Date(),
+    };
+
+    if (item.verificationResult === 'conflict' && item.conflictId) {
+      updated.verificationResult = 'match';
+      updated.conflictEvidence = undefined;
+    }
+
+    dataStore.saveChecklistItem(updated);
+
+    this.recordAudit(
+      'checklist-item',
+      item.id,
+      'leave-review',
+      beforeSnapshot,
+      {
+        leaveReviewStatus: updated.leaveReviewStatus,
+        verificationResult: updated.verificationResult,
+        conflictId: item.conflictId,
+      },
+      reviewerName,
+      `巡演统筹 ${reviewerName} 复核请假记录：${item.performerName} ${item.sessionDate.toLocaleDateString()}`
+    );
+
+    return updated;
+  }
+
+  getConflictReport(): ConflictReportEntry[] {
+    const items = dataStore.getAllChecklistItems();
+    const entries: ConflictReportEntry[] = [];
+
+    for (const item of items) {
+      if (!item.conflictId) continue;
+
+      let status: ConflictReportEntry['status'] = 'pending';
+      let conclusion: string | undefined;
+
+      if (item.verificationResult === 'match' && item.reviewedBy) {
+        status = 'confirmed';
+        conclusion = `已由${item.reviewedBy}确认，冲突已解决`;
+      } else if (item.verificationResult === 'pending-review' && item.reviewedBy) {
+        status = 'rejected';
+        conclusion = `已由${item.reviewedBy}驳回，保留原记录`;
+      } else if (item.isLeave && item.leaveReviewStatus === 'reviewed-by-coordinator') {
+        status = 'reviewed';
+        conclusion = `巡演统筹已复核，确认为请假`;
+      }
+
+      entries.push({
+        conflictId: item.conflictId,
+        checklistItemId: item.id,
+        type: item.conflictEvidence?.type || 'track-name-mismatch',
+        source: item.source,
+        performerName: item.performerName,
+        sessionDate: item.sessionDate,
+        locationName: item.locationName,
+        description: item.conflictEvidence?.description || `冲突ID: ${item.conflictId}`,
+        status,
+        handledBy: item.reviewedBy,
+        handledAt: item.reviewedAt,
+        conclusion,
+      });
+    }
+
+    return entries;
+  }
+
+  getPendingConflictIds(): string[] {
+    return dataStore
+      .getAllChecklistItems()
+      .filter((item) => item.verificationResult === 'conflict' && item.conflictId)
+      .map((item) => item.conflictId!);
+  }
+
+  private recordAudit(
+    entityType: AuditEntry['entityType'],
+    entityId: string,
+    action: AuditEntry['action'],
+    before: Record<string, any> | null,
+    after: Record<string, any>,
+    operator: string,
+    description: string
+  ): void {
+    const entry: AuditEntry = {
+      id: dataStore.generateId(),
+      entityType,
+      entityId,
+      action,
+      before,
+      after,
+      operator,
+      timestamp: new Date(),
+      description,
+    };
+    dataStore.addAuditEntry(entry);
   }
 
   private createMissingAliasConflict(
@@ -196,48 +373,6 @@ export class ChecklistService {
     };
   }
 
-  resolveConflict(
-    checklistItemId: string,
-    confirmed: boolean,
-    resolverName: string
-  ): TrackChecklistItem | undefined {
-    const item = dataStore.getChecklistItem(checklistItemId);
-    if (!item) return undefined;
-
-    const updated: TrackChecklistItem = {
-      ...item,
-      verificationResult: confirmed ? 'match' : 'pending-review',
-      reviewedBy: resolverName,
-      reviewedAt: new Date(),
-    };
-
-    if (confirmed && item.conflictEvidence) {
-      updated.trackNameFromPhoto = item.canonicalTrackName || item.trackNameFromAlias;
-      updated.conflictEvidence = undefined;
-    }
-
-    dataStore.saveChecklistItem(updated);
-    return updated;
-  }
-
-  reviewLeaveItem(
-    checklistItemId: string,
-    reviewerName: string
-  ): TrackChecklistItem | undefined {
-    const item = dataStore.getChecklistItem(checklistItemId);
-    if (!item) return undefined;
-
-    const updated: TrackChecklistItem = {
-      ...item,
-      leaveReviewStatus: 'reviewed-by-coordinator',
-      reviewedBy: reviewerName,
-      reviewedAt: new Date(),
-    };
-
-    dataStore.saveChecklistItem(updated);
-    return updated;
-  }
-
   exportChecklist(source?: MaterialSource): any[] {
     const items = source
       ? dataStore.getChecklistItemsBySource(source)
@@ -252,6 +387,9 @@ export class ChecklistService {
       核对结果: this.getVerificationResultText(item.verificationResult),
       是否请假: item.isLeave ? '是' : '否',
       请假复核状态: this.getLeaveReviewStatusText(item.leaveReviewStatus),
+      冲突状态: item.conflictId
+        ? (item.verificationResult === 'conflict' ? '待处理' : '已处理')
+        : '无冲突',
       数据来源: this.getSourceText(item.source),
     }));
   }

@@ -59,6 +59,7 @@ export interface TrackChecklistItem {
   canonicalTrackName?: string;
   verificationResult: VerificationResult;
   conflictEvidence?: ConflictEvidence;
+  conflictId?: string;
   isLeave: boolean;
   leaveReviewStatus: LeaveReviewStatus;
   reviewedBy?: string;
@@ -130,8 +131,37 @@ export interface UserMessage {
 export interface ImportResult<T> {
   success: boolean;
   imported: T[];
+  reused: T[];
   duplicates: T[];
   errors: UserMessage[];
   warnings: UserMessage[];
   batchId: string;
+}
+
+export interface AuditEntry {
+  id: string;
+  entityType: 'checklist-item' | 'schedule-record' | 'track-alias';
+  entityId: string;
+  action: 'create' | 'update' | 'conflict-resolve' | 'leave-review' | 'auto-fix';
+  before: Record<string, any> | null;
+  after: Record<string, any>;
+  operator: string;
+  timestamp: Date;
+  batchId?: string;
+  description: string;
+}
+
+export interface ConflictReportEntry {
+  conflictId: string;
+  checklistItemId: string;
+  type: ConflictEvidence['type'];
+  source: MaterialSource;
+  performerName: string;
+  sessionDate: Date;
+  locationName: string;
+  description: string;
+  status: 'pending' | 'confirmed' | 'rejected' | 'reviewed';
+  handledBy?: string;
+  handledAt?: Date;
+  conclusion?: string;
 }
