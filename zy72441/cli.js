@@ -108,6 +108,52 @@ function cmdRerun(batchId) {
   }
 }
 
+function cmdImport(filePath) {
+  printHeader();
+  const fs = require('fs');
+  const path = require('path');
+
+  if (!filePath) {
+    console.log('❌ 请指定要导入的 JSON 文件路径');
+    console.log('用法: node cli.js import <JSON文件路径>');
+    return;
+  }
+
+  const fullPath = path.resolve(filePath);
+  if (!fs.existsSync(fullPath)) {
+    console.log(`❌ 找不到文件: ${fullPath}`);
+    return;
+  }
+
+  try {
+    const authData = JSON.parse(fs.readFileSync(fullPath, 'utf8'));
+    console.log(`📥 正在读取授权期限页: ${fullPath}`);
+    console.log('');
+
+    const batch = comparator.importAuthorization(authData, authData.batchName);
+
+    console.log('✅ 授权期限页第一次导入完成');
+    console.log('');
+    console.log(comparator.formatBatchSummary(batch));
+    console.log('');
+    console.log(comparator.formatHistory(batch));
+    console.log('');
+
+    if (batch.flags && batch.flags.includes('mixed_tickets')) {
+      console.log('⚠️  系统检测到赠票和售票混在一个批次');
+      console.log('👉 按规则不归正常，留给录音师复核');
+      console.log('👉 JSON 文件已同步更新，状态为 pending_review');
+    } else {
+      console.log('✅ 纯售票批次，自动校验通过');
+      console.log('👉 JSON 文件已同步更新，状态为 verified');
+    }
+    console.log('');
+
+  } catch (e) {
+    console.log(`❌ 导入失败: ${e.message}`);
+  }
+}
+
 function cmdRunDemo() {
   printHeader();
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
@@ -194,6 +240,9 @@ switch (command) {
     break;
   case 'rerun':
     cmdRerun(args[1]);
+    break;
+  case 'import':
+    cmdImport(args[1]);
     break;
   case 'run-demo':
     cmdRunDemo();

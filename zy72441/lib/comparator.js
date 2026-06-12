@@ -98,35 +98,108 @@ class SynthPresetComparator {
     const batch = this.getBatch(batchId);
     if (!batch) throw new Error(`批次 ${batchId} 不存在`);
 
+    const previousStatus = batch.status;
     batch.engineerNotes = notes;
     batch.history.push({
       action: 'add_notes',
       timestamp: new Date().toISOString(),
       operator: '老周',
-      note: '补录调音师留言'
+      note: `补看调音师留言：${notes}`
     });
 
-    this.updateReminderFromNotes(batch);
+    this.updateReminderFromNotes(batch, previousStatus);
     this.saveBatches();
     return batch;
   }
 
-  updateReminderFromNotes(batch) {
+  updateReminderFromNotes(batch, previousStatus) {
     const notes = batch.engineerNotes;
+    const now = new Date().toISOString();
 
-    if (notes.includes('旧口径') || notes.includes('内部招待') || notes.includes('不计入')) {
+    const needsReview = batch.flags && batch.flags.includes('needs_engineer_review');
+    const isMixed = batch.flags && batch.flags.includes('mixed_tickets');
+
+    const hasOldCaliber = notes.includes('旧口径') || notes.includes('内部招待') || notes.includes('不计入');
+    const hasEngineerConfirm = notes.includes('确认') || notes.includes('复核') || notes.includes('同意') || notes.includes('已核');
+
+    if (needsReview && isMixed && (hasOldCaliber || hasEngineerConfirm)) {
+      batch.status = 'engineer_reviewed';
+      batch.history.push({
+        action: 'engineer_review_complete',
+        timestamp: now,
+        operator: '系统',
+        note: '录音师已复核，混批问题已确认'
+      });
+    }
+
+    if (hasOldCaliber) {
       batch.status = 'completed_amended';
       batch.reminder = '补录旧口径完成，授权余量重新核算，实际余量充足';
+      batch.report = {
+        generatedAt: now,
+        conclusion: '根据调音师留言补录旧口径修正',
+        originalCount: batch.authorization.ticketCount,
+        amendedCount: this.extractAmendedCount(notes, batch.authorization.ticketCount),
+        oldCaliberNotes: notes,
+        authorizationValid: true,
+        nextStep: '无需特殊处理，按修正后数量监控授权到期'
+      };
       batch.history.push({
         action: 'amend_complete',
-        timestamp: new Date().toISOString(),
+        timestamp: now,
         operator: '系统',
-        note: '根据调音师留言补录旧口径，授权提醒已更新'
+        note: '根据调音师留言补录旧口径，授权提醒、复核状态、报告说明已全部更新'
       });
       if (batch.flags) {
         batch.flags = batch.flags.filter(f => !['mixed_tickets', 'needs_engineer_review'].includes(f));
       }
+      batch.flags = batch.flags || [];
+      batch.flags.push('engineer_confirmed');
+    } else if (hasEngineerConfirm && isMixed) {
+      const paidCount = this.extractPaidCount(notes, batch.authorization.ticketCount);
+      batch.status = 'verified';
+      batch.reminder = `录音师已确认，按 ${paidCount} 张售票核算，授权将于 ${batch.authorization.validTo} 到期`;
+      batch.report = {
+        generatedAt: now,
+        conclusion: '录音师复核确认，赠票不计入授权计数',
+        originalCount: batch.authorization.ticketCount,
+        amendedCount: paidCount,
+        engineerConfirmNotes: notes,
+        authorizationValid: true,
+        nextStep: '按售票数量监控授权到期，提前两周续约'
+      };
+      batch.history.push({
+        action: 'verify_after_review',
+        timestamp: now,
+        operator: '系统',
+        note: '录音师复核完成，授权提醒、复核状态、报告说明已全部更新'
+      });
+      if (batch.flags) {
+        batch.flags = batch.flags.filter(f => !['mixed_tickets', 'needs_engineer_review'].includes(f));
+      }
+      batch.flags = batch.flags || [];
+      batch.flags.push('engineer_confirmed');
+    } else if (!needsReview && previousStatus === 'pending_review') {
+      batch.status = 'completed';
+      batch.reminder = `复核完成，授权将于 ${batch.authorization.validTo} 到期，提前两周续约`;
     }
+  }
+
+  extractAmendedCount(notes, fallback) {
+    const paidMatch = notes.match(/(\d+)\s*张售票|售票\s*(\d+)\s*张|按\s*(\d+)\s*张/);
+    if (paidMatch) {
+      return parseInt(paidMatch[1] || paidMatch[2] || paidMatch[3]);
+    }
+    const anyMatch = notes.match(/(\d+)\s*张/);
+    return anyMatch ? parseInt(anyMatch[1]) : fallback;
+  }
+
+  extractPaidCount(notes, fallback) {
+    const match = notes.match(/(\d+)\s*张售票|售票\s*(\d+)\s*张|按\s*(\d+)\s*张/);
+    if (match) {
+      return parseInt(match[1] || match[2] || match[3]);
+    }
+    return fallback;
   }
 
   manualCorrect(batchId, correction, operator = '老周') {
@@ -178,6 +251,7 @@ class SynthPresetComparator {
       'verified': '✅ 已校验',
       'completed': '✅ 已完成',
       'pending_review': '⚠️ 待复核',
+      'engineer_reviewed': '🔍 录音师已复核',
       'completed_amended': '📝 已补录修正'
     };
 
@@ -200,6 +274,15 @@ class SynthPresetComparator {
 
     if (batch.flags && batch.flags.length > 0) {
       lines.push(`标记: ${batch.flags.join(', ')}`);
+    }
+
+    if (batch.report) {
+      lines.push(``);
+      lines.push(`📄 报告说明:`);
+      lines.push(`   结论: ${batch.report.conclusion}`);
+      lines.push(`   原计数: ${batch.report.originalCount}张`);
+      lines.push(`   修正后: ${batch.report.amendedCount}张`);
+      lines.push(`   后续步骤: ${batch.report.nextStep}`);
     }
 
     return lines.join('\n');
