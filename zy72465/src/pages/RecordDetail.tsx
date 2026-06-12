@@ -44,6 +44,7 @@ export default function RecordDetail() {
   const [summaryText, setSummaryText] = useState(record?.summary?.content ?? '');
   const [finalName, setFinalName] = useState(record?.communityFinalName ?? '');
   const [rollbackConfirm, setRollbackConfirm] = useState<string | null>(null);
+  const [rollbackMessage, setRollbackMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   if (!record) {
     return (
@@ -88,14 +89,19 @@ export default function RecordDetail() {
   };
 
   const handleSaveFinalName = () => {
-    confirmFinalName(record.id, finalName, currentUser.name);
+    confirmFinalName(record.id, finalName);
     setIsEditingFinalName(false);
   };
 
   const handleRollback = (historyId: string) => {
     if (rollbackConfirm === historyId) {
-      rollbackToHistory(record.id, historyId, currentUser.name);
+      const result = rollbackToHistory(record.id, historyId);
+      setRollbackMessage({
+        type: result.success ? 'success' : 'error',
+        text: result.message,
+      });
       setRollbackConfirm(null);
+      setTimeout(() => setRollbackMessage(null), 4000);
     } else {
       setRollbackConfirm(historyId);
     }
@@ -437,7 +443,7 @@ export default function RecordDetail() {
           {rollbackConfirm && (
             <div className="mt-4 p-4 bg-orange-50 border border-orange-200 rounded-lg">
               <p className="text-sm text-orange-700">
-                确定要回滚到该状态吗？回滚操作本身也会被记录。
+                确定要回滚到该状态吗？回滚会连带坡道记录和所有状态回到同一份可解释快照，操作本身也会被记录。
                 <button
                   onClick={() => setRollbackConfirm(null)}
                   className="ml-3 text-xs text-gray-500 hover:text-gray-700"
@@ -445,6 +451,15 @@ export default function RecordDetail() {
                   取消
                 </button>
               </p>
+            </div>
+          )}
+          {rollbackMessage && (
+            <div className={`mt-4 p-4 rounded-lg border text-sm ${
+              rollbackMessage.type === 'success'
+                ? 'bg-green-50 border-green-200 text-green-700'
+                : 'bg-red-50 border-red-200 text-red-700'
+            }`}>
+              {rollbackMessage.text}
             </div>
           )}
         </div>

@@ -2,21 +2,32 @@ import { Link, Outlet, useLocation } from 'react-router-dom';
 import { 
   ClipboardList, 
   FileUp, 
-  FileText, 
   BookOpen, 
   Download,
-  Building2
+  Building2,
+  History
 } from 'lucide-react';
+import { useAppStore } from '@/store/useAppStore';
 
 const navItems = [
   { path: '/', label: '审批工作台', icon: ClipboardList },
   { path: '/import', label: '数据导入', icon: FileUp },
   { path: '/export', label: '摘要导出', icon: Download },
+  { path: '/export-logs', label: '导出结果追溯', icon: History },
   { path: '/rules', label: '边界规则', icon: BookOpen },
 ];
 
+const ROLE_LABEL: Record<string, string> = {
+  aning: '城更项目经理',
+  inspector: '市政巡检员',
+  street: '街道办事处',
+};
+
 export default function Layout() {
   const location = useLocation();
+  const { currentUser } = useAppStore();
+  const userInitial = currentUser.name.charAt(0);
+  const userRoleLabel = ROLE_LABEL[currentUser.role] || currentUser.role;
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -38,7 +49,9 @@ export default function Layout() {
         <nav className="flex-1 p-4 space-y-1">
           {navItems.map((item) => {
             const Icon = item.icon;
-            const isActive = location.pathname === item.path;
+            const isActive = location.pathname.startsWith(item.path) && item.path !== '/' 
+              ? true 
+              : location.pathname === item.path;
             return (
               <Link
                 key={item.path}
@@ -59,11 +72,11 @@ export default function Layout() {
         <div className="p-4 border-t border-gray-100">
           <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-lg">
             <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-              <span className="text-blue-700 text-sm font-medium">宁</span>
+              <span className="text-blue-700 text-sm font-medium">{userInitial}</span>
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-900">阿宁</p>
-              <p className="text-xs text-gray-500">城更项目经理</p>
+              <p className="text-sm font-medium text-gray-900">{currentUser.name}</p>
+              <p className="text-xs text-gray-500">{userRoleLabel}</p>
             </div>
           </div>
         </div>

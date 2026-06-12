@@ -1,10 +1,11 @@
 import { useState, useRef } from 'react';
-import { Upload, FileText, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Upload, FileText, AlertCircle, CheckCircle2, ArrowRight } from 'lucide-react';
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 import { useAppStore } from '@/store/useAppStore';
-import { NameConflictTag } from '@/components/StatusTag';
-import type { ApprovalRecord } from '@/types';
+import { NameConflictTag, StatusTag } from '@/components/StatusTag';
+import { STATUS_LABELS } from '@/types';
 
 interface ImportPreview {
   originalLineNumber: number;
@@ -17,15 +18,18 @@ interface ImportPreview {
 }
 
 export default function ImportPage() {
+  const navigate = useNavigate();
+  const { importBatchRecords, currentUser, resetAllRecords } = useAppStore();
+  
   const [preview, setPreview] = useState<ImportPreview[]>([]);
   const [fileName, setFileName] = useState('');
   const [isDragging, setIsDragging] = useState(false);
-  const [importSuccess, setImportSuccess] = useState(false);
+  const [importResult, setImportResult] = useState<{ batchId: string; count: number; conflictCount: number; newRecordIds: string[] } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = (file: File) => {
     setFileName(file.name);
-    setImportSuccess(false);
+    setImportResult(null);
     
     const reader = new FileReader();
     
@@ -103,68 +107,104 @@ export default function ImportPage() {
   };
 
   const handleImport = () => {
-    const { records: existingRecords } = useAppStore.getState();
-    const maxId = existingRecords.reduce((max, r) => {
-      const num = parseInt(r.id.replace('rec-', ''));
-      return num > max ? num : max;
-    }, 0);
-    
-    const newRecords: ApprovalRecord[] = preview.map((item, idx) => ({
-      id: `rec-${String(maxId + idx + 1).padStart(3, '0')}`,
-      originalLineNumber: item.originalLineNumber,
-      communityOldName: item.communityOldName,
-      communityNewName: item.communityNewName,
-      hasNameConflict: item.hasConflict,
-      rampRecord: {
-        exists: item.rampExists,
-        location: item.rampLocation,
-        condition: item.rampCondition,
-        source: 'import' as const,
-      },
-      status: item.hasConflict ? 'pending_review' : 'imported',
-      currentStep: 1,
-      assignee: item.hasConflict ? 'inspector' : 'aning',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    }));
-    
-    useAppStore.setState(state => ({
-      records: [...state.records, ...newRecords],
-    }));
-    
-    setImportSuccess(true);
-    setTimeout(() => {
-      setPreview([]);
-      setFileName('');
-    }, 2000);
+    const result = importBatchRecords(preview);
+    setImportResult({
+      batchId: result.batchId,
+      count: preview.length,
+      conflictCount: result.conflictCount,
+      newRecordIds: result.newRecordIds,
+    });
+  };
+
+  const handleLoadDemoData = () => {
+    resetAllRecords();
+    const demoData: ImportPreview[] = [
+      { originalLineNumber: 2, communityOldName: '翠园小区', communityNewName: '翠园社区', rampExists: true, rampLocation: '东门入口', rampCondition: '完好', hasConflict: true },
+      { originalLineNumber: 3, communityNewName: '海棠花园', rampExists: true, rampLocation: '南门右侧', rampCondition: '轻微破损', hasConflict: false },
+      { originalLineNumber: 4, communityOldName: '卫东村', communityNewName: '卫东花园', rampExists: false, rampLocation: '', rampCondition: '', hasConflict: true },
+      { originalLineNumber: 5, communityNewName: '紫荆苑', rampExists: true, rampLocation: '正门口', rampCondition: '完好', hasConflict: false },
+    ];
+    setPreview(demoData);
+    setFileName('【演示】无障碍坡道导入记录.xlsx');
+    setImportResult(null);
   };
 
   return (
     <div className="space-y-8 max-w-4xl">
-      <div>
-        <h1 
-          className="text-2xl font-bold text-gray-900"
-          style={{ fontFamily: 'Source Han Serif SC, serif' }}
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 
+            className="text-2xl font-bold text-gray-900"
+            style={{ fontFamily: 'Source Han Serif SC, serif' }}
+          >
+            数据导入
+          </h1>
+          <p className="mt-1 text-sm text-gray-500">
+            第一步：导入无障碍坡道记录，系统自动检测同一小区新旧名称冲突，保留原始行号和完整链路
+          </p>
+        </div>
+        <button
+          onClick={handleLoadDemoData}
+          className="px-4 py-2 text-sm text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
         >
-          数据导入
-        </h1>
-        <p className="mt-1 text-sm text-gray-500">
-          第一步：导入无障碍坡道记录，系统自动检测新旧名称冲突
-        </p>
+          加载演示数据（含新旧名称冲突）
+        </button>
       </div>
 
-      {importSuccess ? (
-        <div className="bg-green-50 border border-green-200 rounded-xl p-8 text-center">
+      {importResult ? (
+        <div className="bg-green-50 border border-green-200 rounded-xl p-8">
           <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto" />
-          <h3 className="mt-4 text-lg font-medium text-green-800">导入成功</h3>
-          <p className="mt-2 text-sm text-green-600">
-            共导入 {preview.length} 条记录，已添加到审批工作台
-          </p>
+          <h3 className="mt-4 text-lg font-medium text-green-800 text-center">导入成功</h3>
+          <div className="mt-4 space-y-2 text-sm text-green-700 bg-white rounded-lg p-4 border border-green-100">
+            <div className="flex justify-between">
+              <span>操作人：</span>
+              <span className="font-medium">{currentUser.name}（{currentUser.role === 'aning' ? '城更项目经理' : '市政巡检员'}）</span>
+            </div>
+            <div className="flex justify-between">
+              <span>导入批次号：</span>
+              <span className="font-mono font-medium">{importResult.batchId}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>导入记录数：</span>
+              <span className="font-medium">{importResult.count} 条</span>
+            </div>
+            <div className="flex justify-between">
+              <span>新旧名称冲突：</span>
+              <span className={`font-medium ${importResult.conflictCount > 0 ? 'text-amber-600' : 'text-gray-500'}`}>
+                {importResult.conflictCount > 0 ? `${importResult.conflictCount} 条，已标记待巡检员复核，不急着归正常` : '0 条'}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span>初始状态：</span>
+              <span className="font-medium">
+                无冲突 → {STATUS_LABELS['imported']}，有冲突 → {STATUS_LABELS['pending_review']}
+              </span>
+            </div>
+          </div>
+          <div className="mt-6 flex items-center justify-center gap-3">
+            <button
+              onClick={() => {
+                setPreview([]);
+                setFileName('');
+                setImportResult(null);
+              }}
+              className="px-5 py-2.5 text-gray-600 bg-white border border-gray-200 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+            >
+              继续导入
+            </button>
+            <button
+              onClick={() => navigate('/')}
+              className="px-5 py-2.5 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors flex items-center gap-2"
+            >
+              去审批工作台，继续走第二步
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       ) : (
         <>
           <div
-            className={`border-2 border-dashed rounded-2xl p-12 text-center transition-all ${
+            className={`border-2 border-dashed rounded-2xl p-12 text-center transition-all cursor-pointer ${
               isDragging 
                 ? 'border-blue-400 bg-blue-50' 
                 : 'border-gray-300 bg-gray-50 hover:border-gray-400'
@@ -186,91 +226,108 @@ export default function ImportPage() {
               拖拽文件到这里，或点击选择
             </p>
             <p className="mt-2 text-sm text-gray-400">
-              支持 CSV、Excel 格式，需包含小区名称、坡道信息等字段
+              支持 CSV、Excel 格式，需包含：小区旧名称/新名称、有无障碍坡道、坡道位置、坡道状况
             </p>
           </div>
 
           {preview.length > 0 && (
-            <>
-              <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <FileText className="w-5 h-5 text-blue-600" />
-                    <div>
-                      <h3 className="font-medium text-gray-900">{fileName}</h3>
-                      <p className="text-xs text-gray-500">共 {preview.length} 条记录</p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={handleImport}
-                    className="px-5 py-2.5 bg-blue-700 text-white rounded-lg text-sm font-medium hover:bg-blue-800 transition-colors shadow-sm"
-                  >
-                    确认导入
-                  </button>
-                </div>
-
-                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
-                  <div className="flex items-start gap-3">
-                    <AlertCircle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-sm font-medium text-amber-800">冲突检测结果</p>
-                      <p className="text-xs text-amber-600 mt-1">
-                        检测到 {preview.filter(p => p.hasConflict).length} 条记录存在新旧名称冲突，导入后将自动标记为「待巡检员复核」，不自动合并
-                      </p>
-                    </div>
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+              <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <FileText className="w-5 h-5 text-blue-600" />
+                  <div>
+                    <h3 className="font-medium text-gray-900">{fileName}</h3>
+                    <p className="text-xs text-gray-500">共 {preview.length} 条记录</p>
                   </div>
                 </div>
+                <button
+                  onClick={handleImport}
+                  className="px-5 py-2.5 bg-blue-700 text-white rounded-lg text-sm font-medium hover:bg-blue-800 transition-colors shadow-sm"
+                >
+                  确认导入（保留原始行号）
+                </button>
+              </div>
 
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-gray-200">
-                        <th className="text-left py-3 px-4 text-gray-500 font-medium">原始行号</th>
-                        <th className="text-left py-3 px-4 text-gray-500 font-medium">小区名称</th>
-                        <th className="text-left py-3 px-4 text-gray-500 font-medium">无障碍坡道</th>
-                        <th className="text-left py-3 px-4 text-gray-500 font-medium">状态</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                      {preview.slice(0, 10).map((item) => (
-                        <tr key={item.originalLineNumber}>
-                          <td className="py-3 px-4 font-mono text-gray-500">#{item.originalLineNumber}</td>
-                          <td className="py-3 px-4">
-                            <div className="flex items-center gap-2">
-                              <span className="text-gray-900">
-                                {item.communityNewName || item.communityOldName}
-                              </span>
-                              {item.hasConflict && <NameConflictTag hasConflict={true} />}
-                            </div>
-                            {item.communityOldName && item.communityNewName && (
-                              <p className="text-xs text-gray-400 mt-1">
-                                旧称: {item.communityOldName}
-                              </p>
-                            )}
-                          </td>
-                          <td className="py-3 px-4 text-gray-600">
-                            {item.rampExists ? '有' : '无'}
-                            {item.rampLocation && ` (${item.rampLocation})`}
-                          </td>
-                          <td className="py-3 px-4">
-                            {item.hasConflict ? (
-                              <span className="text-amber-600 text-xs">待复核</span>
-                            ) : (
-                              <span className="text-green-600 text-xs">正常</span>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                  {preview.length > 10 && (
-                    <p className="text-xs text-gray-400 text-center py-3">
-                      仅显示前 10 条，共 {preview.length} 条
+              <div className={`m-4 rounded-lg p-4 border ${
+                preview.filter(p => p.hasConflict).length > 0
+                  ? 'bg-amber-50 border-amber-200'
+                  : 'bg-green-50 border-green-200'
+              }`}>
+                <div className="flex items-start gap-3">
+                  <AlertCircle className={`w-5 h-5 shrink-0 mt-0.5 ${
+                    preview.filter(p => p.hasConflict).length > 0 ? 'text-amber-500' : 'text-green-500'
+                  }`} />
+                  <div>
+                    <p className={`text-sm font-medium ${
+                      preview.filter(p => p.hasConflict).length > 0 ? 'text-amber-800' : 'text-green-800'
+                    }`}>
+                      连续状态链路预览
                     </p>
-                  )}
+                    <p className={`text-xs mt-1 ${
+                      preview.filter(p => p.hasConflict).length > 0 ? 'text-amber-600' : 'text-green-600'
+                    }`}>
+                      检测到 <span className="font-bold">{preview.filter(p => p.hasConflict).length}</span> 条同一小区新旧名称冲突。
+                      导入后链路：<span className="font-mono bg-white px-1.5 py-0.5 rounded border">create（原始行号永久保留）</span>
+                      → 冲突记录额外 <span className="font-mono bg-white px-1.5 py-0.5 rounded border">update_status → pending_review</span>
+                      （留给巡检员复核）
+                    </p>
+                  </div>
                 </div>
               </div>
-            </>
+
+              <div className="overflow-x-auto max-h-[420px]">
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-50 sticky top-0">
+                    <tr className="border-b border-gray-200">
+                      <th className="text-left py-3 px-4 text-gray-500 font-medium whitespace-nowrap">原始行号</th>
+                      <th className="text-left py-3 px-4 text-gray-500 font-medium whitespace-nowrap">小区名称</th>
+                      <th className="text-left py-3 px-4 text-gray-500 font-medium whitespace-nowrap">无障碍坡道</th>
+                      <th className="text-left py-3 px-4 text-gray-500 font-medium whitespace-nowrap">导入后的初始状态</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {preview.map((item) => (
+                      <tr key={item.originalLineNumber}>
+                        <td className="py-3 px-4">
+                          <span className="font-mono text-gray-700 bg-gray-100 px-2 py-0.5 rounded">#{item.originalLineNumber}</span>
+                        </td>
+                        <td className="py-3 px-4">
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2">
+                              <span className="text-gray-900 font-medium">
+                                {item.communityNewName || item.communityOldName}
+                              </span>
+                              <NameConflictTag hasConflict={item.hasConflict} />
+                            </div>
+                            {item.communityOldName && item.communityNewName && (
+                              <p className="text-xs text-gray-400">
+                                旧称: {item.communityOldName} → 新称: {item.communityNewName}
+                              </p>
+                            )}
+                          </div>
+                        </td>
+                        <td className="py-3 px-4 text-gray-600">
+                          <div>
+                            {item.rampExists ? (
+                              <span className="text-green-600 font-medium">有</span>
+                            ) : (
+                              <span className="text-red-500 font-medium">无</span>
+                            )}
+                            {item.rampLocation && <span className="ml-1 text-gray-400">（{item.rampLocation}）</span>}
+                          </div>
+                          {item.rampCondition && (
+                            <p className="text-xs text-gray-400 mt-0.5">状况：{item.rampCondition}</p>
+                          )}
+                        </td>
+                        <td className="py-3 px-4">
+                          <StatusTag status={item.hasConflict ? 'pending_review' : 'imported'} />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           )}
         </>
       )}
