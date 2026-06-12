@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys
 from typing import List
-from models import EvaluationRecord, RecordStatus, DataSource
+from models import EvaluationRecord, RecordStatus, DataSource, VersionHistory
 from processor import RecordProcessor
 from data_import import (
     create_demo_data, create_night_supplement_points,
@@ -22,6 +22,7 @@ def print_separator(title: str = ""):
 def print_record(record: EvaluationRecord, show_details: bool = True):
     status_colors = {
         RecordStatus.SMOOTH: "\033[92m",
+        RecordStatus.RAMP_PENDING: "\033[93m",
         RecordStatus.RAMP_NO_CHANGE: "\033[93m",
         RecordStatus.NIGHT_SUPPLEMENT: "\033[94m",
         RecordStatus.PENDING_REVIEW: "\033[91m",
@@ -52,33 +53,47 @@ def print_record(record: EvaluationRecord, show_details: bool = True):
         print(f"  标签：{'、'.join(tags)}")
     else:
         print()
+    print(f"【最后修改】{record.last_operator} - {record.last_change_reason}")
 
     if show_details:
-        print(f"\n  采样点详情：")
+        print(f"\n  📍 采样点详情（{len(record.sampling_points)}个）：")
         for p in record.sampling_points:
             src_tag = f"[{p.data_source.value}]"
             remark_tag = " ⚠️有备注" if p.has_remarks else ""
             print(f"    - {p.name} {src_tag} 透水率：{p.permeability_rate:.2f}{remark_tag}")
             if p.remarks:
-                print(f"      备注：{p.remarks}")
+                print(f"      📝 备注：{p.remarks}")
 
         if record.ramp:
             ramp_status = "✅有坡道" if record.ramp.has_ramp else "❌无坡道"
-            print(f"\n  无障碍坡道：{ramp_status}（{record.ramp.location}）")
+            if record.ramp.is_incomplete:
+                ramp_status += " ⚠️信息不完整"
+            print(f"\n  ♿ 无障碍坡道：{ramp_status}（{record.ramp.location}）")
             if record.ramp.ramp_slope:
                 print(f"    坡度：{record.ramp.ramp_slope}%")
             if record.ramp.ramp_remarks:
-                print(f"    备注：{record.ramp.ramp_remarks}")
+                print(f"    📝 备注：{record.ramp.ramp_remarks}")
 
         if record.rectification_suggestions:
-            print(f"\n  整改建议：")
+            print(f"\n  ⚠️  当前整改建议：")
             for i, s in enumerate(record.rectification_suggestions, 1):
-                print(f"    {i}. {s}")
+                is_remark = "夜间采样备注" in s
+                prefix = "🟡" if is_remark else "🔴"
+                print(f"    {prefix} {i}. {s}")
 
         if record.previous_suggestions and record.previous_suggestions != record.rectification_suggestions:
-            print(f"\n  上版整改建议（已更新）：")
+            print(f"\n  📋 上版整改建议（已更新）：")
             for i, s in enumerate(record.previous_suggestions, 1):
-                print(f"    {i}. {s}")
+                print(f"       {i}. {s}")
+
+        if record.version_history and len(record.version_history) > 1:
+            print(f"\n  📜 版本历史（共{len(record.version_history)}版）：")
+            for v in reversed(record.version_history):
+                print(f"    v{v.version} [{v.change_type.value}] {v.operator}")
+                print(f"        评分：{v.score:.1f}分，状态：{v.status.value}")
+                print(f"        原因：{v.change_reason}")
+                if v.previous_ramp_remarks and v.ramp_remarks and v.previous_ramp_remarks != v.ramp_remarks:
+                    print(f"        坡道备注变更：{v.previous_ramp_remarks} → {v.ramp_remarks}")
 
     print()
 
@@ -103,47 +118,61 @@ def run_demo():
     records = create_demo_data()
 
     print_separator("第一步：首次导入（无障碍坡道记录第一次导入）")
-    print("  阿宁：先把白天正式表导进来，看看三条路的初步情况\n")
+    print("  阿宁：先把白天正式表导进来，看看三条路的初步情况")
+    print("  注意：导入后系统会自动标出哪些需要坡道补录，哪些等夜间数据\n")
 
     processed_records = []
     for rec in records:
         processed = processor.initial_import(rec)
         processed_records.append(processed)
-        print_record(processed)
+        print_record(processed, show_details=False)
 
     print("  阿宁：看到了吧？三条路三种开局：")
-    print("    ✅ REC-2025-001 幸福路 - 顺利，啥毛病没有")
-    print("    ⚠️ REC-2025-002 建设路 - 坡道没记录，回头得补")
+    print("    ✅ REC-2025-001 幸福路 - 顺利，数据完整啥毛病没有")
+    print("    ⚠️ REC-2025-002 建设路 - 坡道信息不完整，系统自动标「待坡道补录」")
     print("    ⏳ REC-2025-003 人民路 - 等夜间采样点回来再说")
 
-    print_separator("第二步：坡道补录")
-    print("  阿宁：建设路的坡道我去现场看过了，补录进去\n")
+    print_separator("第二步：坡道补录（断点：导入后能标出坡道补录）")
+    print("  阿宁：建设路的坡道我去现场看过了，补录进去")
+    print("  注意：补录后如果评分没变，系统不会自动归正常，留着等交通协管复核\n")
 
     case2 = processed_records[1]
+    print("  补录前看看原来的坡道备注（历史会留住原话）：")
+    print(f"    原备注：{case2.ramp.ramp_remarks}")
+    print()
+
     ramp_supplement = create_ramp_supplement()
     case2 = processor.supplement_ramp(case2, ramp_supplement)
     processed_records[1] = case2
 
     print_record(case2)
 
-    print("  阿宁：哎？你看这个情况——")
-    print("    坡道补录了，但评分没变（因为原来的扣分点是别的）")
-    print("    系统标成「坡道补录评分未变」，这时候别着急归正常")
-    print("    得留给交通协管复核确认一下是不是真的没问题")
+    print("  阿宁：看清楚了——")
+    print("    1. 坡道补录了，但评分没变")
+    print("    2. 系统标成「坡道补录评分未变」，这是第二个断点")
+    print("    3. 这时候别着急归正常，留给交通协管复核")
+    print("    4. 版本历史里能看到原来的坡道备注，不会被覆盖掉")
 
     print_separator("第三步：补看夜间采样点（阿宁补看夜间采样点）")
-    print("  阿宁：人民路的夜间采样点回来了，这里面备注很重要，不能洗\n")
+    print("  阿宁：人民路的夜间采样点回来了，这里面备注很重要，不能洗")
+    print("  注意：补录后整改建议自动更新，夜间备注直接带进去\n")
 
     case3 = processed_records[2]
+    print("  补录前整改建议：")
+    for i, s in enumerate(case3.rectification_suggestions, 1):
+        print(f"    {i}. {s}")
+    print()
+
     night_points = create_night_supplement_points()
     case3 = processor.supplement_night_sampling(case3, night_points)
     processed_records[2] = case3
 
     print_record(case3)
 
-    print("  阿宁：看到没？整改建议自动更新了——")
-    print("    原来只有透水率偏低的建议")
-    print("    现在把夜间采样的备注也带进来了：油污堵塞、洒水车影响")
+    print("  阿宁：看整改建议是不是自动更新了——")
+    print("    原来只有1条：透水率偏低点位需检查")
+    print("    现在有4条：透水率偏低的 + 2条夜间采样备注")
+    print("    备注原话都在：油污渗漏要冲洗、洒水车影响数据")
     print("    这些都是一线的实情，洗成一行干净数据就废了")
 
     print_separator("第四步：人工修正 + 重跑（演示数据里的一次人工修正和一次重跑）")
@@ -154,29 +183,30 @@ def run_demo():
         case3,
         new_score=48.0,
         new_suggestions=[
-            "透水率偏低点位（商业街北口测点、商业街南口测点）需检查铺装层堵塞情况",
+            "透水率偏低点位（商业街北口测点、商业街南口测点、商业街中段夜间测点、地铁口夜间测点）需检查铺装层堵塞情况",
             "【夜间采样备注】商业街中段夜间测点：晚高峰后发现油污渗漏，透水层疑似堵塞，需环卫冲洗后复测",
             "【夜间采样备注】地铁口夜间测点：夜间洒水车冲洗后数据，白天可能因浮尘影响略低",
             "综合现场情况，建议先安排环卫冲洗，3日后复测"
         ]
     )
     processed_records[2] = case3
-    print_record(case3, show_details=False)
     print(f"    人工修正后评分：{case3.score:.1f}分")
+    print(f"    修改人：{case3.last_operator}")
+    print(f"    修改原因：{case3.last_change_reason}")
 
     print("\n  → 幸福路数据复核一遍，重跑一次确认")
     case1 = processed_records[0]
     case1 = processor.rerun_evaluation(case1)
     processed_records[0] = case1
-    print_record(case1, show_details=False)
     print(f"    重跑后评分：{case1.score:.1f}分（与上次一致，没问题）")
 
     print_separator("第五步：交通协管复核")
-    print("  阿宁：建设路那笔坡道补录评分未变的，现在交通协管看完了\n")
+    print("  阿宁：建设路那笔坡道补录评分未变的，现在交通协管看完了")
+    print("  注意：必须人工点复核通过，状态才会改正常，系统不会自动跳\n")
 
     case2 = processor.confirm_ramp_review(case2)
     processed_records[1] = case2
-    print_record(case2)
+    print_record(case2, show_details=False)
 
     print("  阿宁：复核通过，状态改成「正常」了")
     print("    记住这个流程：系统标记 → 人工复核 → 最终确认")
@@ -186,7 +216,7 @@ def run_demo():
     print("  阿宁：最后再看一眼三条路的整改建议，三种处理结果完全不一样\n")
 
     for rec in processed_records:
-        print(f"\n  📋 {rec.road_name}（{rec.status.value}）")
+        print(f"\n  📋 {rec.road_name}（{rec.status.value}）- v{rec.version}")
         for i, s in enumerate(rec.rectification_suggestions, 1):
             print(f"    {i}. {s}")
 
@@ -197,12 +227,15 @@ def run_demo():
     print("     一次导入没问题，重跑确认就完事")
     print()
     print("  2️⃣  坡道补录评分没变化（建设路）：")
-    print("     系统标黄，别急着归正常，留交通协管复核")
+    print("     导入时先标「待坡道补录」→ 补录后评分没变标「坡道补录评分未变」")
+    print("     别急着归正常，留交通协管复核")
+    print("     坡道备注历史留住原话，不会被覆盖")
     print("     这是关键控制点，别省！")
     print()
     print("  3️⃣  夜间采样补录旧口径（人民路）：")
-    print("     备注原封不动带进来，整改建议跟着变")
-    print("     别把那些「油污堵塞」「洒水车影响」洗没了")
+    print("     补录夜间采样点后，整改建议自动更新")
+    print("     备注原封不动带进来，不会被洗掉")
+    print("     透水率偏低点位和夜间采样备注能互相解释")
     print()
     print("  就这三条，新人记牢了！")
     print_separator()
@@ -249,7 +282,7 @@ def main():
     elif cmd == "web":
         print("启动小看板Web界面...")
         from web_app import app
-        app.run(debug=False, port=5001, host='0.0.0.0')
+        app.run(debug=False, port=5005, host='0.0.0.0')
     elif cmd == "help":
         print("海绵城市透水铺装 - 城更项目管理工具")
         print()

@@ -1,11 +1,12 @@
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Any
 from enum import Enum
 
 
 class RecordStatus(str, Enum):
     SMOOTH = "顺利"
+    RAMP_PENDING = "待坡道补录"
     RAMP_NO_CHANGE = "坡道补录评分未变"
     NIGHT_SUPPLEMENT = "夜间采样补录"
     PENDING_REVIEW = "待交通协管复核"
@@ -18,6 +19,15 @@ class DataSource(str, Enum):
     RAMP_SUPPLEMENT = "坡道补录"
     MANUAL_CORRECTION = "人工修正"
     RERUN = "重跑"
+
+
+class ChangeType(str, Enum):
+    INITIAL = "首次导入"
+    RAMP_SUPPLEMENT = "坡道补录"
+    NIGHT_SUPPLEMENT = "夜间采样补录"
+    MANUAL = "人工修正"
+    RERUN = "重跑"
+    REVIEW_CONFIRM = "复核通过"
 
 
 @dataclass
@@ -38,6 +48,25 @@ class RampRecord:
     has_ramp: bool
     ramp_slope: Optional[float] = None
     ramp_remarks: Optional[str] = None
+    is_incomplete: bool = False
+
+
+@dataclass
+class VersionHistory:
+    version: int
+    change_type: ChangeType
+    operator: str
+    change_reason: str
+    timestamp: datetime
+    score: float
+    previous_score: Optional[float]
+    status: RecordStatus
+    rectification_suggestions: List[str] = field(default_factory=list)
+    ramp_remarks: Optional[str] = None
+    previous_ramp_remarks: Optional[str] = None
+    sampling_point_count: int = 0
+    night_sampling_added: List[str] = field(default_factory=list)
+    extra: Dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -59,6 +88,9 @@ class EvaluationRecord:
     is_rerun: bool = False
     has_manual_correction: bool = False
     review_night_supplemented: bool = False
+    version_history: List[VersionHistory] = field(default_factory=list)
+    last_operator: str = "系统"
+    last_change_reason: str = ""
 
 
 @dataclass

@@ -27,7 +27,8 @@ class DataImporter:
             location=data.get("location", ""),
             has_ramp=bool(data.get("has_ramp")),
             ramp_slope=float(data["ramp_slope"]) if data.get("ramp_slope") else None,
-            ramp_remarks=data.get("ramp_remarks")
+            ramp_remarks=data.get("ramp_remarks"),
+            is_incomplete=bool(data.get("is_incomplete", False))
         )
 
     @staticmethod
@@ -104,9 +105,10 @@ def create_demo_data() -> List[EvaluationRecord]:
     ]
     case2_ramp_initial = RampRecord(
         id="r2-initial",
-        location="未记录",
+        location="位置待确认",
         has_ramp=True,
-        ramp_remarks="坡道信息不完整，待现场补录"
+        ramp_remarks="坡道信息不完整，坡度、磨损情况待现场补录",
+        is_incomplete=True
     )
     case2 = EvaluationRecord(
         id="REC-2025-002",

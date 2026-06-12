@@ -51,7 +51,8 @@ def record_to_dict(record: EvaluationRecord) -> dict:
             'location': record.ramp.location,
             'has_ramp': record.ramp.has_ramp,
             'ramp_slope': record.ramp.ramp_slope,
-            'ramp_remarks': record.ramp.ramp_remarks
+            'ramp_remarks': record.ramp.ramp_remarks,
+            'is_incomplete': record.ramp.is_incomplete
         } if record.ramp else None,
         'rectification_suggestions': record.rectification_suggestions,
         'previous_suggestions': record.previous_suggestions,
@@ -59,6 +60,28 @@ def record_to_dict(record: EvaluationRecord) -> dict:
         'is_rerun': record.is_rerun,
         'has_manual_correction': record.has_manual_correction,
         'review_night_supplemented': record.review_night_supplemented,
+        'last_operator': record.last_operator,
+        'last_change_reason': record.last_change_reason,
+        'version_history': [
+            {
+                'version': v.version,
+                'change_type': v.change_type.value,
+                'change_type_code': v.change_type.name,
+                'operator': v.operator,
+                'change_reason': v.change_reason,
+                'timestamp': v.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
+                'score': round(v.score, 1),
+                'previous_score': round(v.previous_score, 1) if v.previous_score else None,
+                'status': v.status.value,
+                'status_code': v.status.name,
+                'rectification_suggestions': v.rectification_suggestions,
+                'ramp_remarks': v.ramp_remarks,
+                'previous_ramp_remarks': v.previous_ramp_remarks,
+                'sampling_point_count': v.sampling_point_count,
+                'night_sampling_added': v.night_sampling_added
+            }
+            for v in record.version_history
+        ],
         'updated_at': record.updated_at.strftime('%Y-%m-%d %H:%M'),
         'created_at': record.created_at.strftime('%Y-%m-%d %H:%M')
     }
@@ -92,7 +115,7 @@ def api_supplement_ramp(record_id):
     if not target:
         return jsonify({'error': '记录不存在'}), 404
     
-    ramp_data = request.json or {}
+    ramp_data = request.get_json(silent=True) or {}
     new_ramp = create_ramp_supplement()
     if ramp_data.get('location'):
         new_ramp.location = ramp_data['location']
@@ -177,5 +200,5 @@ def api_reset():
 
 if __name__ == '__main__':
     print("海绵城市透水铺装 - 小看板启动中...")
-    print("访问 http://localhost:5001 查看看板")
-    app.run(debug=False, port=5001, host='0.0.0.0')
+    print("访问 http://localhost:5005 查看看板")
+    app.run(debug=False, port=5005, host='0.0.0.0')
