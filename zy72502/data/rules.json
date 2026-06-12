@@ -1,24 +1,41 @@
 [
   {
-    "rule_id": "R1C78C1E6",
+    "rule_id": "R609C1B20",
     "sample_id": "SDEMO001",
-    "clause_id": null,
+    "clause_id": "C003",
     "rule_type": "desensitization",
-    "pattern": "公司全称",
+    "pattern": "XX科技有限公司",
     "replacement": "甲方",
-    "note": "此样本涉及客户公司名称脱敏，违约责任条款置信度低因脱敏后语义特征缺失",
+    "note": "此样本中'违约责任'条款原文包含客户全称'XX科技有限公司'，已做脱敏处理。脱敏后语义特征缺失导致模型置信度降低至0.55，但被其他高置信度条款的平均值(0.82)掩盖。",
+    "previous_note": "",
+    "change_reason": "响应知识库编辑质询，说明该样本低置信度被平均值掩盖的具体原因",
     "added_by": "小孟",
-    "created_at": "2026-06-07T11:49:56.279858"
+    "created_at": "2026-06-13T01:05:06.646764"
   },
   {
-    "rule_id": "RE9F68B56",
+    "rule_id": "R337BDDBB",
     "sample_id": "SDEMO001_V2",
+    "clause_id": "C003",
+    "rule_type": "desensitization",
+    "pattern": "XX科技有限公司",
+    "replacement": "甲方",
+    "note": "同SDEMO001，v1.1.0对脱敏样本的处理逻辑已优化，但该条款置信度(0.62)仍被平均值(0.85)掩盖。",
+    "previous_note": "",
+    "change_reason": "同步更新v1.1.0版本同一合同的脱敏说明",
+    "added_by": "小孟",
+    "created_at": "2026-06-13T01:05:06.646769"
+  },
+  {
+    "rule_id": "R871F3798",
+    "sample_id": "SDEMO002",
     "clause_id": null,
     "rule_type": "desensitization",
-    "pattern": "公司全称",
-    "replacement": "甲方",
-    "note": "此样本涉及客户公司名称脱敏，违约责任条款置信度低因脱敏后语义特征缺失",
+    "pattern": "",
+    "replacement": "",
+    "note": "服务协议中保密期限条款表述特殊，置信度低",
+    "previous_note": "",
+    "change_reason": "批量复核低置信度样本",
     "added_by": "小孟",
-    "created_at": "2026-06-07T11:49:56.281157"
+    "created_at": "2026-06-13T01:12:54.928683"
   }
 ]

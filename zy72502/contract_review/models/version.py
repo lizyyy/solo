@@ -21,6 +21,8 @@ class ModelVersionMetrics:
 class VersionComparisonItem:
     sample_id: str
     contract_name: str
+    v1_sample_id: Optional[str] = None
+    v2_sample_id: Optional[str] = None
     v1_confidence: Optional[float] = None
     v2_confidence: Optional[float] = None
     confidence_change: float = 0.0
@@ -29,6 +31,8 @@ class VersionComparisonItem:
     status_changed: bool = False
     was_masked_in_v1: bool = False
     was_masked_in_v2: bool = False
+    v1_low_confidence_count: int = 0
+    v2_low_confidence_count: int = 0
     has_ticket: bool = False
     ticket_count: int = 0
     has_desensitization_note: bool = False
@@ -41,6 +45,8 @@ class VersionComparisonItem:
         return {
             "sample_id": self.sample_id,
             "contract_name": self.contract_name,
+            "v1_sample_id": self.v1_sample_id,
+            "v2_sample_id": self.v2_sample_id,
             "v1_confidence": self.v1_confidence,
             "v2_confidence": self.v2_confidence,
             "confidence_change": self.confidence_change,
@@ -49,6 +55,8 @@ class VersionComparisonItem:
             "status_changed": self.status_changed,
             "was_masked_in_v1": self.was_masked_in_v1,
             "was_masked_in_v2": self.was_masked_in_v2,
+            "v1_low_confidence_count": self.v1_low_confidence_count,
+            "v2_low_confidence_count": self.v2_low_confidence_count,
             "has_ticket": self.has_ticket,
             "ticket_count": self.ticket_count,
             "has_desensitization_note": self.has_desensitization_note,

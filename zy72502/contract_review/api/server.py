@@ -48,7 +48,9 @@ def get_sample(sample_id):
 @app.route("/api/samples/<sample_id>", methods=["PUT"])
 def update_sample(sample_id):
     data = request.json
-    updated = store.update_sample(sample_id, **data)
+    changed_by = data.pop("changed_by", "system")
+    change_reason = data.pop("change_reason", "")
+    updated = store.update_sample(sample_id, changed_by=changed_by, change_reason=change_reason, **data)
     if not updated:
         return jsonify({"error": "样本不存在"}), 404
     return jsonify({"success": True})
@@ -61,6 +63,7 @@ def add_note(sample_id):
         return jsonify({"error": "样本不存在"}), 404
 
     data = request.json
+    change_reason = data.get("change_reason", "")
     rule = DesensitizationRule(
         sample_id=sample_id,
         rule_type=data.get("rule_type", "desensitization"),
@@ -69,8 +72,18 @@ def add_note(sample_id):
         note=data.get("note", ""),
         added_by=data.get("added_by", "小孟")
     )
-    store.add_rule(rule)
+    store.add_rule(rule, change_reason=change_reason)
     return jsonify({"success": True, "rule_id": rule.rule_id})
+
+
+@app.route("/api/samples/<sample_id>/history", methods=["GET"])
+def get_history(sample_id):
+    sample = store.get_sample(sample_id)
+    if not sample:
+        return jsonify({"error": "样本不存在"}), 404
+
+    logs = store.get_audit_logs_by_sample(sample_id)
+    return jsonify([l.to_dict() for l in logs])
 
 
 @app.route("/api/samples/<sample_id>/tickets", methods=["POST"])

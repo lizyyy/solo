@@ -5,7 +5,7 @@ from datetime import datetime
 from contract_review.models import (
     ContractSample, ExtractedClause, FeedbackTicket,
     DesensitizationRule, VersionComparisonReport, VersionComparisonItem,
-    ModelVersionMetrics
+    ModelVersionMetrics, AuditLog
 )
 
 
@@ -16,6 +16,7 @@ class ReviewStore:
         self.tickets: Dict[str, FeedbackTicket] = {}
         self.rules: Dict[str, DesensitizationRule] = {}
         self.reports: Dict[str, VersionComparisonReport] = {}
+        self.audit_logs: Dict[str, AuditLog] = {}
         self._load_all()
 
     def _path(self, name: str) -> str:
@@ -27,6 +28,7 @@ class ReviewStore:
         self._load_tickets()
         self._load_rules()
         self._load_reports()
+        self._load_audit_logs()
 
     def _load_samples(self):
         path = self._path("samples.json")
@@ -78,6 +80,15 @@ class ReviewStore:
                     report.v2_metrics = ModelVersionMetrics(**v2_metrics_data)
                 self.reports[report.report_id] = report
 
+    def _load_audit_logs(self):
+        path = self._path("audit_logs.json")
+        if os.path.exists(path):
+            with open(path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            for item in data:
+                log = AuditLog(**item)
+                self.audit_logs[log.log_id] = log
+
     def save_samples(self):
         path = self._path("samples.json")
         with open(path, "w", encoding="utf-8") as f:
@@ -98,11 +109,27 @@ class ReviewStore:
         with open(path, "w", encoding="utf-8") as f:
             json.dump([r.to_dict() for r in self.reports.values()], f, ensure_ascii=False, indent=2)
 
+    def save_audit_logs(self):
+        path = self._path("audit_logs.json")
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump([l.to_dict() for l in self.audit_logs.values()], f, ensure_ascii=False, indent=2)
+
     def save_all(self):
         self.save_samples()
         self.save_tickets()
         self.save_rules()
         self.save_reports()
+        self.save_audit_logs()
+
+    def add_audit_log(self, log: AuditLog) -> str:
+        self.audit_logs[log.log_id] = log
+        self.save_audit_logs()
+        return log.log_id
+
+    def get_audit_logs_by_sample(self, sample_id: str) -> List[AuditLog]:
+        logs = [l for l in self.audit_logs.values() if l.sample_id == sample_id]
+        logs.sort(key=lambda x: x.created_at, reverse=True)
+        return logs
 
     def add_sample(self, sample: ContractSample) -> str:
         self.samples[sample.sample_id] = sample
@@ -118,34 +145,106 @@ class ReviewStore:
     def get_masked_samples(self) -> List[ContractSample]:
         return [s for s in self.samples.values() if s.is_masked_by_avg]
 
-    def update_sample(self, sample_id: str, **kwargs) -> bool:
+    def get_samples_by_contract_name(self, contract_name: str) -> List[ContractSample]:
+        return [s for s in self.samples.values() if s.contract_name == contract_name]
+
+    def update_sample(self, sample_id: str, changed_by: str = "system", change_reason: str = "", **kwargs) -> bool:
         if sample_id not in self.samples:
             return False
         sample = self.samples[sample_id]
         for key, value in kwargs.items():
             if hasattr(sample, key):
-                setattr(sample, key, value)
+                old_value = str(getattr(sample, key))
+                new_value = str(value)
+                if old_value != new_value:
+                    log = AuditLog(
+                        sample_id=sample_id,
+                        field_name=key,
+                        old_value=old_value,
+                        new_value=new_value,
+                        change_reason=change_reason,
+                        changed_by=changed_by
+                    )
+                    self.add_audit_log(log)
+                    setattr(sample, key, value)
         sample.updated_at = datetime.now().isoformat()
         self.save_samples()
         return True
 
     def add_ticket(self, ticket: FeedbackTicket) -> str:
         self.tickets[ticket.ticket_id] = ticket
+        if ticket.sample_id and ticket.sample_id in self.samples:
+            sample = self.samples[ticket.sample_id]
+            if not sample.ticket_id:
+                self.update_sample(
+                    ticket.sample_id,
+                    changed_by=ticket.reporter,
+                    change_reason="关联线上反馈工单",
+                    ticket_id=ticket.ticket_id
+                )
         self.save_tickets()
         return ticket.ticket_id
 
     def get_tickets_by_sample(self, sample_id: str) -> List[FeedbackTicket]:
         return [t for t in self.tickets.values() if t.sample_id == sample_id]
 
-    def add_rule(self, rule: DesensitizationRule) -> str:
+    def get_tickets_by_contract_name(self, contract_name: str) -> List[FeedbackTicket]:
+        sample_ids = [s.sample_id for s in self.get_samples_by_contract_name(contract_name)]
+        return [t for t in self.tickets.values() if t.sample_id in sample_ids]
+
+    def add_rule(self, rule: DesensitizationRule, change_reason: str = "") -> str:
         self.rules[rule.rule_id] = rule
         if rule.sample_id and rule.sample_id in self.samples:
             sample = self.samples[rule.sample_id]
-            sample.desensitization_note = (sample.desensitization_note + "\n" if sample.desensitization_note else "") + f"[{rule.rule_id}] {rule.rule_type}: {rule.note}"
-            sample.updated_at = datetime.now().isoformat()
+            old_note = sample.desensitization_note
+            new_note_entry = f"[{rule.rule_id}] {rule.rule_type}: {rule.note}"
+            new_note = (old_note + "\n" if old_note else "") + new_note_entry
+            rule.previous_note = old_note
+            rule.change_reason = change_reason
+            self.update_sample(
+                rule.sample_id,
+                changed_by=rule.added_by,
+                change_reason=change_reason or "补录脱敏规则备注",
+                desensitization_note=new_note
+            )
         self.save_rules()
-        self.save_samples()
+        self._update_existing_reports_for_sample(rule.sample_id)
         return rule.rule_id
 
     def get_rules_by_sample(self, sample_id: str) -> List[DesensitizationRule]:
         return [r for r in self.rules.values() if r.sample_id == sample_id]
+
+    def get_rules_by_contract_name(self, contract_name: str) -> List[DesensitizationRule]:
+        sample_ids = [s.sample_id for s in self.get_samples_by_contract_name(contract_name)]
+        return [r for r in self.rules.values() if r.sample_id in sample_ids]
+
+    def _update_existing_reports_for_sample(self, sample_id: str):
+        sample = self.get_sample(sample_id)
+        if not sample:
+            return
+        contract_name = sample.contract_name
+        for report in self.reports.values():
+            for item in report.items:
+                if item.contract_name == contract_name:
+                    from contract_review.core.comparator import determine_next_action
+                    tickets = self.get_tickets_by_contract_name(contract_name)
+                    rules = self.get_rules_by_contract_name(contract_name)
+                    sample_for_determine = sample
+                    for ver_sample in self.get_samples_by_contract_name(contract_name):
+                        if ver_sample.model_version == report.v2:
+                            sample_for_determine = ver_sample
+                            break
+                    next_action, next_owner, missing, reason_kept = determine_next_action(
+                        sample_for_determine, self
+                    )
+                    item.has_ticket = len(tickets) > 0
+                    item.ticket_count = len(tickets)
+                    item.has_desensitization_note = len(rules) > 0 or any(
+                        bool(s.desensitization_note)
+                        for s in self.get_samples_by_contract_name(contract_name)
+                    )
+                    item.next_action = next_action
+                    item.next_owner = next_owner
+                    item.missing_materials = missing
+                    item.reason_kept = reason_kept
+        self.save_reports()

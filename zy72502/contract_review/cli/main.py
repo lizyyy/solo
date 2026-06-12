@@ -70,14 +70,16 @@ def import_tickets(ctx, file_path):
 @click.option("--note", required=True, help="脱敏规则备注")
 @click.option("--rule-type", default="desensitization", help="规则类型")
 @click.option("--added-by", default="小孟", help="添加人")
+@click.option("--reason", default="", help="修改原因")
 @click.pass_context
-def add_note(ctx, sample_id, note, rule_type, added_by):
+def add_note(ctx, sample_id, note, rule_type, added_by, reason):
     """补录脱敏规则备注（模型评测小孟用）"""
     sample = ctx.obj["store"].get_sample(sample_id)
     if not sample:
         click.echo(f"❌ 样本不存在: {sample_id}")
         return
 
+    old_note = sample.desensitization_note or "(空)"
     rule = DesensitizationRule(
         sample_id=sample_id,
         rule_type=rule_type,
@@ -86,9 +88,15 @@ def add_note(ctx, sample_id, note, rule_type, added_by):
         note=note,
         added_by=added_by
     )
-    ctx.obj["store"].add_rule(rule)
+    ctx.obj["store"].add_rule(rule, change_reason=reason)
+
     click.echo(f"✅ 已为样本 {sample_id} 添加脱敏备注")
-    click.echo(f"   当前备注: {sample.desensitization_note}")
+    click.echo(f"   修改人: {added_by}")
+    if reason:
+        click.echo(f"   修改原因: {reason}")
+    click.echo(f"   改前: {old_note[:50]}{'...' if len(old_note) > 50 else ''}")
+    click.echo(f"   改后: {sample.desensitization_note[:50]}{'...' if len(sample.desensitization_note) > 50 else ''}")
+    click.echo(f"   注意: 已自动联动更新所有相关版本对比报告")
 
 
 @cli.command()
@@ -202,6 +210,48 @@ def show(ctx, sample_id):
         click.echo(f"\n脱敏规则 ({len(rules)}):")
         for r in rules:
             click.echo(f"  {r.rule_id} - {r.rule_type}: {r.note} (by {r.added_by})")
+            if r.previous_note:
+                click.echo(f"      改前: {r.previous_note[:60]}{'...' if len(r.previous_note) > 60 else ''}")
+            if r.change_reason:
+                click.echo(f"      原因: {r.change_reason}")
+
+    logs = store.get_audit_logs_by_sample(sample_id)
+    if logs:
+        click.echo(f"\n修改历史 ({len(logs)}):")
+        for l in logs:
+            click.echo(f"  {l.created_at} - {l.changed_by} 修改 {l.field_name}")
+            if l.change_reason:
+                click.echo(f"      原因: {l.change_reason}")
+            old_short = l.old_value[:40] + ("..." if len(l.old_value) > 40 else "")
+            new_short = l.new_value[:40] + ("..." if len(l.new_value) > 40 else "")
+            click.echo(f"      {old_short} → {new_short}")
+
+
+@cli.command()
+@click.argument("sample_id")
+@click.pass_context
+def history(ctx, sample_id):
+    """查看样本的修改历史"""
+    store = ctx.obj["store"]
+    sample = store.get_sample(sample_id)
+    if not sample:
+        click.echo(f"❌ 样本不存在: {sample_id}")
+        return
+
+    logs = store.get_audit_logs_by_sample(sample_id)
+    if not logs:
+        click.echo(f"样本 {sample_id} 暂无修改历史")
+        return
+
+    click.echo(f"=== 样本 {sample_id} 修改历史 ({len(logs)} 条) ===")
+    for idx, l in enumerate(logs, 1):
+        click.echo(f"\n{idx}. {l.created_at}")
+        click.echo(f"   修改人: {l.changed_by}")
+        click.echo(f"   字段: {l.field_name}")
+        if l.change_reason:
+            click.echo(f"   原因: {l.change_reason}")
+        click.echo(f"   改前: {l.old_value}")
+        click.echo(f"   改后: {l.new_value}")
 
 
 if __name__ == "__main__":

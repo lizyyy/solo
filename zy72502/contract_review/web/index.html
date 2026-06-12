@@ -177,14 +177,17 @@
   <div class="modal">
     <h3>补录脱敏规则备注（小孟）</h3>
     <div class="form-row">
-      <textarea id="note-content" placeholder="输入脱敏规则备注..."></textarea>
+      <textarea id="note-content" placeholder="输入脱敏规则备注，说明低置信度原因..."></textarea>
+    </div>
+    <div class="form-row">
+      <input id="note-reason" placeholder="修改原因（必填，便于后续追溯）">
     </div>
     <div class="form-row">
       <input id="note-by" value="小孟" placeholder="添加人">
     </div>
     <div style="text-align: right;">
       <button class="btn btn-outline" onclick="closeModal('modal-note')">取消</button>
-      <button class="btn btn-primary" onclick="submitNote()">保存</button>
+      <button class="btn btn-primary" onclick="submitNote()">保存并联动更新报告</button>
     </div>
   </div>
 </div>
@@ -443,6 +446,13 @@ async function showDetail(sampleId) {
       </div>
 
       <div class="detail-section">
+        <h3>修改历史</h3>
+        <div id="history-area">
+          <div class="loading">加载中...</div>
+        </div>
+      </div>
+
+      <div class="detail-section">
         <h3>操作</h3>
         <div style="display: flex; gap: 8px;">
           <button class="btn btn-success" onclick="updateStatus('${data.sample_id}', 'approved')">通过</button>
@@ -452,6 +462,33 @@ async function showDetail(sampleId) {
       </div>
     </div>
   `;
+
+  loadHistory(data.sample_id);
+}
+
+async function loadHistory(sampleId) {
+  const logs = await api(`/api/samples/${sampleId}/history`);
+  const area = document.getElementById('history-area');
+  if (!logs || logs.length === 0) {
+    area.innerHTML = '<p style="color: #a0aec0; padding: 20px; text-align: center;">暂无修改历史</p>';
+    return;
+  }
+  area.innerHTML = logs.map(l => `
+    <div class="clause-item">
+      <div class="clause-header">
+        <span class="clause-type">${l.field_name}</span>
+        <span>
+          <span class="tag tag-info">${l.changed_by}</span>
+          <span class="tag tag-info">${new Date(l.created_at).toLocaleString()}</span>
+        </span>
+      </div>
+      ${l.change_reason ? `<div style="color: #718096; font-size: 13px; margin-bottom: 8px;">原因: ${l.change_reason}</div>` : ''}
+      <div style="font-size: 13px; line-height: 1.6;">
+        <div><strong>改前:</strong> ${l.old_value || '(空)'}</div>
+        <div><strong>改后:</strong> ${l.new_value || '(空)'}</div>
+      </div>
+    </div>
+  `).join('');
 }
 
 async function updateStatus(sampleId, status) {
@@ -484,16 +521,25 @@ function closeModal(id) {
 
 async function submitNote() {
   const note = document.getElementById('note-content').value;
+  const reason = document.getElementById('note-reason').value;
   const by = document.getElementById('note-by').value;
-  if (!note.trim()) return;
+  if (!note.trim()) {
+    alert('请输入备注内容');
+    return;
+  }
+  if (!reason.trim()) {
+    alert('请填写修改原因，便于后续追溯');
+    return;
+  }
 
-  await api(`/api/samples/${currentNoteSampleId}/notes`, {
+  const result = await api(`/api/samples/${currentNoteSampleId}/notes`, {
     method: 'POST',
-    body: { note, added_by: by }
+    body: { note, added_by: by, change_reason: reason }
   });
   closeModal('modal-note');
   await refreshAll();
   showDetail(currentNoteSampleId);
+  alert('✅ 备注已保存，已自动联动更新所有相关版本对比报告！');
 }
 
 async function submitTicket() {
@@ -547,14 +593,32 @@ async function runCompare() {
 
     return `
       <div class="compare-item-row ${maskedClass}">
-        <div class="sample-id">${item.sample_id}</div>
-        <div>${item.contract_name}</div>
-        <div>${item.v1_confidence ? (item.v1_confidence * 100).toFixed(1) + '%' : '-'}</div>
-        <div>${item.v2_confidence ? (item.v2_confidence * 100).toFixed(1) + '%' : '-'}</div>
+        <div class="sample-id">${item.contract_name.substring(0, 10)}${item.contract_name.length > 10 ? '...' : ''}</div>
+        <div>
+          <div style="font-weight: 500;">${item.contract_name}</div>
+          <div style="font-size: 11px; color: #718096; margin-top: 2px;">
+            v1: ${item.v1_sample_id || '无'} | v2: ${item.v2_sample_id || '无'}
+          </div>
+        </div>
+        <div style="text-align: right;">
+          ${item.v1_confidence ? (item.v1_confidence * 100).toFixed(1) + '%' : '-'}
+          ${item.was_masked_in_v1 ? '<span style="color:#d69e2e; margin-left:4px;">⚠️</span>' : ''}
+        </div>
+        <div style="text-align: right;">
+          ${item.v2_confidence ? (item.v2_confidence * 100).toFixed(1) + '%' : '-'}
+          ${item.was_masked_in_v2 ? '<span style="color:#d69e2e; margin-left:4px;">⚠️</span>' : ''}
+          ${change}
+        </div>
         <div>
           <div class="next-action">${item.next_action}</div>
-          ${item.was_masked_in_v1 || item.was_masked_in_v2 ? '<span class="tag tag-danger">被平均掩盖⚠️</span>' : ''}
-          ${item.has_ticket ? '<span class="tag tag-info">有工单</span>' : ''}
+          <div style="margin-top: 4px;">
+            ${item.was_masked_in_v1 || item.was_masked_in_v2 ? '<span class="tag tag-danger">被平均掩盖</span>' : ''}
+            ${item.has_ticket ? '<span class="tag tag-info">有工单</span>' : '<span class="tag tag-warning" style="background:#fed7d7;">缺工单</span>'}
+            ${item.has_desensitization_note ? '<span class="tag tag-info">有备注</span>' : '<span class="tag tag-warning" style="background:#fed7d7;">缺备注</span>'}
+          </div>
+          <div style="font-size: 11px; color: #718096; margin-top: 4px;">
+            缺: ${item.missing_materials.join(', ') || '无'}
+          </div>
         </div>
         <div class="next-owner ${ownerClass}">${item.next_owner}</div>
       </div>
@@ -567,8 +631,8 @@ async function runCompare() {
 
       <div class="compare-summary">
         <div class="stat-card">
-          <div class="label">样本数变化</div>
-          <div class="value">${report.summary.total_v1} → ${report.summary.total_v2}</div>
+          <div class="label">对比合同数</div>
+          <div class="value">${report.summary.total_contracts} 份</div>
         </div>
         <div class="stat-card">
           <div class="label">置信度提升</div>
@@ -579,19 +643,19 @@ async function runCompare() {
           <div class="value">${report.summary.masked_v1} → ${report.summary.masked_v2}</div>
         </div>
         <div class="stat-card">
-          <div class="label">待知识库编辑复核</div>
+          <div class="label">待知识库编辑</div>
           <div class="value" style="color: #805ad5;">${report.summary.need_knowledge_review} 个</div>
         </div>
       </div>
 
-      <h4 style="margin: 20px 0 12px;">样本明细</h4>
+      <h4 style="margin: 20px 0 12px;">样本明细（按合同名称对齐）</h4>
       <div style="border: 1px solid #e2e8f0; border-radius: 6px; overflow: hidden;">
         <div style="padding: 12px; background: #f7fafc; font-weight: 500; display: grid; grid-template-columns: 100px 1fr 100px 100px 1fr 120px; gap: 12px; border-bottom: 1px solid #e2e8f0;">
-          <span>样本ID</span>
-          <span>合同名称</span>
+          <span>合同</span>
+          <span>合同名称 / 样本ID</span>
           <span>${v1}置信度</span>
           <span>${v2}置信度</span>
-          <span>下一步行动</span>
+          <span>下一步行动 / 缺什么 / 为什么留下</span>
           <span>负责人</span>
         </div>
         ${itemsHtml}

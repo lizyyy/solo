@@ -1,17 +1,17 @@
 [
   {
-    "ticket_id": "TBC2F9ACC",
+    "ticket_id": "T4ED25300",
     "sample_id": "SDEMO001",
     "title": "违约责任条款抽取置信度偏低",
-    "description": "线上用户反馈该条款抽取结果不稳定，有时能抽到有时抽不到",
+    "description": "线上用户反馈：采购合同中的违约责任条款抽取结果不稳定，有时置信度只有0.5左右，用户疑问为什么整体置信度还是0.82",
     "reporter": "知识库编辑-小王",
     "status": "open",
-    "priority": "normal",
-    "feedback_type": "extraction_error",
+    "priority": "high",
+    "feedback_type": "low_confidence_masked_by_avg",
     "related_clause_ids": [
       "C003"
     ],
-    "created_at": "2026-06-07T11:49:56.279251",
-    "updated_at": "2026-06-07T11:49:56.279257"
+    "created_at": "2026-06-13T01:05:06.646196",
+    "updated_at": "2026-06-13T01:05:06.646197"
   }
 ]
