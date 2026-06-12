@@ -86,11 +86,24 @@ function renderSongDetail() {
   statusBadge.className = 'status-badge ' + (statusClassMap[currentSong.status] || 'status-pending');
   statusBadge.textContent = currentSong.status;
 
-  document.getElementById('authInfo').innerHTML = `
+  let authHtml = `
     <strong>授权期限：</strong>${currentSong.authorizedStart} 至 ${currentSong.authorizedEnd}<br>
-    <strong>登记页码：</strong>第 ${currentSong.pageNumber} 页
-    ${currentSong.pageNumber !== currentSong.correctPageNumber ? `<br><span style="color:#fa8c16"><strong>正确页码：</strong>第 ${currentSong.correctPageNumber} 页</span>` : ''}
   `;
+  
+  if (currentSong.originalPageNumber !== undefined && currentSong.originalPageNumber !== currentSong.pageNumber) {
+    authHtml += `
+      <strong>初始登记页码：</strong><span style="text-decoration: line-through; color:#999;">第 ${currentSong.originalPageNumber} 页</span><br>
+      <strong>当前有效页码：</strong><span style="color:#52c41a; font-weight:600;">第 ${currentSong.pageNumber} 页</span><br>
+      <span style="color:#1890ff; font-size:12px;">（已按${currentSong.isDemoType === 'supplement' ? '调音师留言' : '票务复核'}修正）</span>
+    `;
+  } else {
+    authHtml += `<strong>登记页码：</strong>第 ${currentSong.pageNumber} 页`;
+    if (currentSong.pageNumber !== currentSong.correctPageNumber) {
+      authHtml += `<br><span style="color:#fa8c16"><strong>正确页码：</strong>第 ${currentSong.correctPageNumber} 页（待复核）</span>`;
+    }
+  }
+  
+  document.getElementById('authInfo').innerHTML = authHtml;
 
   document.getElementById('noteInfo').textContent = currentSong.engineerNote;
 

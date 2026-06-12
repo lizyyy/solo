@@ -66,7 +66,7 @@ function initDemoData() {
     {
       id: 'S003',
       name: '旧时光回旋曲',
-      pageNumber: 22,
+      pageNumber: 18,
       correctPageNumber: 22,
       authorizedStart: '2024-06-01',
       authorizedEnd: '2025-05-31',
@@ -113,6 +113,7 @@ function addHistory(song, action, operator, note) {
 function step1_ImportAuthorization(song) {
   song.status = STATUS.PENDING;
   song.sourceType = SOURCE_TYPE.AUTHORIZATION_IMPORT;
+  song.originalPageNumber = song.pageNumber;
   return addHistory(
     song,
     '授权期限页导入',
@@ -129,10 +130,12 @@ function step2_CheckEngineerNote(song) {
     resultNote = '调音师留言确认无误，页码正常';
   } else if (song.isDemoType === 'group') {
     song.status = STATUS.NEED_REVIEW;
-    resultNote = '发现群内临时替补通知，页码与授权页不符，转票务同事复核';
+    resultNote = '发现群内临时替补通知，页码与授权页不符，转票务同事复核，暂不归为正常';
   } else if (song.isDemoType === 'supplement') {
+    const originalPage = song.pageNumber;
+    song.pageNumber = song.correctPageNumber;
     song.status = STATUS.SUPPLEMENTED;
-    resultNote = '从调音师留言中发现旧口径补记信息，页码需按留言修正';
+    resultNote = `从调音师留言中发现旧口径补记信息，原登记第${originalPage}页为旧口径，按留言修正为第${song.correctPageNumber}页`;
   }
   
   return addHistory(
@@ -144,13 +147,14 @@ function step2_CheckEngineerNote(song) {
 }
 
 function step3_ReviewByTicketing(song) {
+  const originalPage = song.pageNumber;
   song.status = STATUS.REVISED;
   song.pageNumber = song.correctPageNumber;
   return addHistory(
     song,
     '票务复核确认',
     '票务同事',
-    `复核确认：原第${song.pageNumber}页为错版，修正为第${song.correctPageNumber}页。来源：群内临时替补通知`
+    `复核确认：原第${originalPage}页为错版，修正为第${song.correctPageNumber}页。来源：群内临时替补通知`
   );
 }
 
