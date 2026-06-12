@@ -4,6 +4,7 @@ from models import (
     UserRole,
     OperationType,
     ReviewStatus,
+    RecordStatus,
 )
 from .data_repository import DataRepository
 from .audit_service import AuditService
@@ -78,15 +79,23 @@ class SelfCheckService:
 
         for notice in notices:
             if notice.temporary_detour and not notice.map_updated:
-                if notice.review_status != ReviewStatus.PENDING_RESIDENT_REVIEW:
+                valid_resolved_statuses = [
+                    ReviewStatus.APPROVED_BY_RESIDENT,
+                    ReviewStatus.REJECTED_BY_RESIDENT,
+                ]
+                if (
+                    notice.review_status != ReviewStatus.PENDING_RESIDENT_REVIEW
+                    and notice.review_status not in valid_resolved_statuses
+                ):
                     issues.append({
                         "type": "detour_status_inconsistent",
                         "notice_id": notice.id,
                         "notice_no": notice.notice_no,
-                        "description": f"施工告示 {notice.notice_no} 有临时改道且地图未同步，但状态未标记为待居民复核",
+                        "review_status": notice.review_status,
+                        "description": f"施工告示 {notice.notice_no} 有临时改道且地图未同步，但状态异常（当前: {notice.review_status}）",
                         "severity": "high",
                     })
-                else:
+                elif notice.review_status == ReviewStatus.PENDING_RESIDENT_REVIEW:
                     issues.append({
                         "type": "detour_needs_review",
                         "notice_id": notice.id,
@@ -94,6 +103,15 @@ class SelfCheckService:
                         "description": f"施工告示 {notice.notice_no} 临时改道未同步地图，待居民代表复核",
                         "severity": "medium",
                         "action_required": True,
+                    })
+                elif notice.review_status in valid_resolved_statuses:
+                    issues.append({
+                        "type": "detour_resolved",
+                        "notice_id": notice.id,
+                        "notice_no": notice.notice_no,
+                        "review_status": notice.review_status,
+                        "description": f"施工告示 {notice.notice_no} 改道未同步已由居民代表处理（{notice.review_status}），建议更新地图",
+                        "severity": "low",
                     })
 
         return {
@@ -151,22 +169,28 @@ class SelfCheckService:
 
         latest_pl = self.repo.get_latest_point_list()
         if latest_pl:
-            db_items = len(latest_pl.items)
             display_source = "single_source"
             export_source = "single_source"
 
             all_notices = self.repo.list_construction_notices()
-            all_ramps = self.repo.list_ramp_records()
 
-            notice_codes = {f"P-{n.notice_no}" for n in all_notices}
-            point_codes = {item.point_code for item in latest_pl.items}
-            orphan_notices = notice_codes - point_codes
+            active_notices = [
+                n for n in all_notices
+                if n.status not in [RecordStatus.REJECTED, RecordStatus.DRAFT]
+            ]
 
-            if orphan_notices and len(latest_pl.items) < len(all_notices):
+            point_notice_ids = set()
+            for item in latest_pl.items:
+                point_notice_ids.update(item.construction_notice_ids)
+
+            orphan_active = [
+                n for n in active_notices if n.id not in point_notice_ids]
+
+            if orphan_active:
                 issues.append({
                     "type": "orphan_notices_not_in_points",
-                    "orphan_notice_nos": [n.notice_no for n in all_notices if f"P-{n.notice_no}" not in point_codes],
-                    "description": f"有 {len(orphan_notices)} 个施工告示未在点位清单中体现",
+                    "orphan_notice_nos": [n.notice_no for n in orphan_active],
+                    "description": f"有 {len(orphan_active)} 个有效施工告示未在点位清单中体现（已排除被驳回的告示）",
                     "severity": "medium",
                 })
 

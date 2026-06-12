@@ -1,0 +1,14 @@
+INFO:     Started server process [51015]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 48] error while attempting to bind on address ('127.0.0.1', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+======================================================================
+社区充电桩容量排队系统 - FastAPI 后端服务
+======================================================================
+启动地址: http://127.0.0.1:8000
+API 文档: http://127.0.0.1:8000/docs
+模块清单: http://127.0.0.1:8000/api/v1/
+======================================================================
+

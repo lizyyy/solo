@@ -59,13 +59,63 @@ class ImportService:
         self,
         import_data_list: List[Dict[str, Any]],
         operator: str,
+        import_batch_no: str,
         operator_role: UserRole = UserRole.PLANNER,
-    ) -> List[ConstructionNotice]:
-        results = []
+    ) -> Dict[str, Any]:
+        new_records: List[ConstructionNotice] = []
+        history_duplicates: List[Dict[str, Any]] = []
+        current_batch_duplicates: List[Dict[str, Any]] = []
+        current_batch_nos: set = set()
+
         for data in import_data_list:
-            result = self.import_construction_notice(data, operator, operator_role)
-            results.append(result)
-        return results
+            notice_no = data.get("notice_no", "")
+
+            if notice_no in current_batch_nos:
+                current_batch_duplicates.append({
+                    "notice_no": notice_no,
+                    "row_data": data,
+                    "duplicate_type": "current_batch",
+                    "description": f"本次导入批次内重复：{notice_no}"
+                })
+                continue
+            current_batch_nos.add(notice_no)
+
+            existing = self.repo.get_construction_notice_by_no(notice_no)
+            if existing:
+                history_duplicates.append({
+                    "notice_no": notice_no,
+                    "existing_id": existing.id,
+                    "existing_batch_no": existing.import_batch_no,
+                    "row_data": data,
+                    "duplicate_type": "history",
+                    "description": f"历史批次已存在：{notice_no}（批次 {existing.import_batch_no}）"
+                })
+                continue
+
+            try:
+                data["import_batch_no"] = import_batch_no
+                result = self.import_construction_notice(data, operator, operator_role)
+                new_records.append(result)
+            except Exception as e:
+                current_batch_duplicates.append({
+                    "notice_no": notice_no,
+                    "row_data": data,
+                    "duplicate_type": "error",
+                    "error": str(e),
+                    "description": f"导入出错：{str(e)}"
+                })
+
+        return {
+            "import_batch_no": import_batch_no,
+            "total_input": len(import_data_list),
+            "new_records": [n.model_dump() for n in new_records],
+            "new_count": len(new_records),
+            "history_duplicates": history_duplicates,
+            "history_duplicate_count": len(history_duplicates),
+            "current_batch_duplicates": current_batch_duplicates,
+            "current_batch_duplicate_count": len(current_batch_duplicates),
+            "summary": f"导入完成：新增 {len(new_records)} 条，历史重复 {len(history_duplicates)} 条，本次重复 {len(current_batch_duplicates)} 条"
+        }
 
     def supplement_ramp_record(
         self,

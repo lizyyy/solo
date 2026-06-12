@@ -25,15 +25,16 @@ def create_services():
 
 
 if __name__ == "__main__":
-    print("社区充电桩容量排队系统")
-    print("=" * 50)
-    print("核心模块：")
-    print("  1. 施工告示导入")
-    print("  2. 无障碍坡道记录补录")
-    print("  3. 点位清单生成与重算")
-    print("  4. 冲突检测与人工确认")
-    print("  5. 施工临时改道未同步地图复核")
-    print("  6. 系统自检（重复导入/改道未同步/补录重算/导出一致）")
-    print("  7. 审计追踪（谁改了什么、为什么、影响哪些结果）")
-    print("  8. 统一数据源（页面/导出/接口共用同一份结果）")
-    print("=" * 50)
+    import uvicorn
+    from api.routes import create_app
+
+    app = create_app()
+    print("=" * 70)
+    print("社区充电桩容量排队系统 - FastAPI 后端服务")
+    print("=" * 70)
+    print("启动地址: http://127.0.0.1:8000")
+    print("API 文档: http://127.0.0.1:8000/docs")
+    print("模块清单: http://127.0.0.1:8000/api/v1/")
+    print("=" * 70)
+    print()
+    uvicorn.run(app, host="127.0.0.1", port=8000)

@@ -206,6 +206,34 @@ class PointService:
 
         return new_point_list
 
+    def _build_unified_point_item(self, item: Any, pl: Any) -> Dict[str, Any]:
+        item_dict = item.model_dump()
+        record_key = f"POINT-{item.id}-{pl.version}"
+        item_dict["record_key"] = record_key
+        item_dict["point_list_id"] = pl.id
+        item_dict["point_list_version"] = pl.version
+
+        notices = [
+            self.repo.get_construction_notice(nid)
+            for nid in item.construction_notice_ids
+        ]
+        item_dict["construction_notices"] = [
+            {"id": n.id, "record_key": f"NOTICE-{n.id}", "notice_no": n.notice_no,
+             "project_name": n.project_name, "temporary_detour": n.temporary_detour,
+             "map_updated": n.map_updated, "review_status": n.review_status,
+             "status": n.status}
+            for n in notices if n
+        ]
+        if item.ramp_record_id:
+            ramp = self.repo.get_ramp_record(item.ramp_record_id)
+            if ramp:
+                item_dict["ramp_record"] = {
+                    "id": ramp.id, "record_key": f"RAMP-{ramp.id}",
+                    "location": ramp.ramp_location, "accessible": ramp.accessible,
+                    "has_ramp": ramp.has_ramp, "status": ramp.status
+                }
+        return item_dict
+
     def get_point_list_for_display(self, point_list_id: Optional[str] = None) -> Dict[str, Any]:
         if point_list_id:
             pl = self.repo.get_point_list(point_list_id)
@@ -213,56 +241,96 @@ class PointService:
             pl = self.repo.get_latest_point_list()
 
         if not pl:
-            return {"version": 0, "items": [], "source": "single_source"}
+            return {"version": 0, "items": [], "source": "single_source", "record_key_prefix": "POINT"}
 
         items_display = []
         for item in pl.items:
-            item_dict = item.model_dump()
-            notices = [
-                self.repo.get_construction_notice(nid)
-                for nid in item.construction_notice_ids
-            ]
-            item_dict["construction_notices"] = [
-                {"id": n.id, "notice_no": n.notice_no, "project_name": n.project_name,
-                 "temporary_detour": n.temporary_detour, "map_updated": n.map_updated,
-                 "review_status": n.review_status}
-                for n in notices if n
-            ]
-            if item.ramp_record_id:
-                ramp = self.repo.get_ramp_record(item.ramp_record_id)
-                if ramp:
-                    item_dict["ramp_record"] = {
-                        "id": ramp.id, "location": ramp.ramp_location,
-                        "accessible": ramp.accessible, "has_ramp": ramp.has_ramp
-                    }
-            items_display.append(item_dict)
+            items_display.append(self._build_unified_point_item(item, pl))
 
         return {
             "id": pl.id,
+            "record_key": f"POINT-LIST-{pl.id}",
             "version": pl.version,
             "effective_date": pl.effective_date,
             "status": pl.status,
             "items": items_display,
             "recalculation_note": pl.recalculation_note,
             "source": "single_source",
+            "record_key_prefix": "POINT",
         }
 
     def export_point_list(self, point_list_id: Optional[str] = None) -> Dict[str, Any]:
-        display_data = self.get_point_list_for_display(point_list_id)
+        if point_list_id:
+            pl = self.repo.get_point_list(point_list_id)
+        else:
+            pl = self.repo.get_latest_point_list()
+
+        if not pl:
+            return {"version": 0, "items": [], "source": "single_source", "record_key_prefix": "POINT"}
+
+        export_items = []
+        for item in pl.items:
+            unified = self._build_unified_point_item(item, pl)
+            export_items.append(unified)
+
+        export_data = {
+            "id": pl.id,
+            "record_key": f"POINT-LIST-{pl.id}",
+            "version": pl.version,
+            "effective_date": pl.effective_date,
+            "status": pl.status,
+            "items": export_items,
+            "recalculation_note": pl.recalculation_note,
+            "source": "single_source",
+            "record_key_prefix": "POINT",
+            "export_format": "unified",
+            "export_note": "导出数据与页面展示、接口返回使用同一份数据源，每条记录带有唯一 record_key 可追踪",
+        }
 
         self.audit.log_operation(
             operation_type=OperationType.EXPORT,
             operator="system",
             operator_role=UserRole.SYSTEM,
             target_entity_type="PointList",
-            target_entity_id=display_data.get("id", "unknown"),
+            target_entity_id=pl.id,
             changes={},
             reason="导出点位清单明细",
-            impacted_results=[f"导出 {len(display_data['items'])} 条记录"],
+            impacted_results=[f"导出 {len(export_items)} 条记录"],
+        )
+
+        return export_data
+
+    def verify_display_export_consistency(self, point_list_id: Optional[str] = None) -> Dict[str, Any]:
+        display = self.get_point_list_for_display(point_list_id)
+        export = self.export_point_list(point_list_id)
+
+        display_keys = sorted([i["record_key"] for i in display["items"]])
+        export_keys = sorted([i["record_key"] for i in export["items"]])
+
+        detour_in_display = any(
+            n["map_updated"] is False and n["temporary_detour"] is True
+            for item in display["items"] for n in item.get("construction_notices", [])
+        )
+        detour_in_export = any(
+            n["map_updated"] is False and n["temporary_detour"] is True
+            for item in export["items"] for n in item.get("construction_notices", [])
         )
 
         return {
-            **display_data,
-            "export_format": "unified",
-            "export_note": "导出数据与页面展示、接口返回使用同一份数据源",
+            "same_source": display["source"] == export["source"],
+            "same_record_keys": display_keys == export_keys,
+            "same_item_count": len(display["items"]) == len(export["items"]),
+            "same_version": display["version"] == export["version"],
+            "detour_visible_in_both": detour_in_display == detour_in_export,
+            "detour_in_display": detour_in_display,
+            "detour_in_export": detour_in_export,
+            "display_record_keys": display_keys,
+            "export_record_keys": export_keys,
+            "consistent": all([
+                display["source"] == export["source"],
+                display_keys == export_keys,
+                len(display["items"]) == len(export["items"]),
+                display["version"] == export["version"],
+                detour_in_display == detour_in_export,
+            ])
         }

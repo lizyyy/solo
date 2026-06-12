@@ -64,3 +64,70 @@ class AuditService:
             if old_val != new_val:
                 changes[field] = {"old": old_val, "new": new_val}
         return changes
+
+    def get_notice_change_details(self, notice_id: str) -> List[Dict[str, Any]]:
+        notice = self.repo.get_construction_notice(notice_id)
+        if not notice:
+            return []
+
+        logs = self.get_entity_history("ConstructionNotice", notice_id)
+        details = []
+        for log in logs:
+            detail = {
+                "timestamp": log.timestamp.isoformat(),
+                "operator": log.operator,
+                "operator_role": log.operator_role,
+                "operation": log.operation_type,
+                "reason": log.reason,
+                "impacted_results": log.impacted_results,
+                "changes": [],
+            }
+            for field, change in log.changes.items():
+                detail["changes"].append({
+                    "field": field,
+                    "before": change.get("old"),
+                    "after": change.get("new"),
+                })
+            details.append(detail)
+        return details
+
+    def get_ramp_change_details(self, ramp_id: str) -> List[Dict[str, Any]]:
+        ramp = self.repo.get_ramp_record(ramp_id)
+        if not ramp:
+            return []
+
+        logs = self.get_entity_history("RampRecord", ramp_id)
+        details = []
+        for log in logs:
+            detail = {
+                "timestamp": log.timestamp.isoformat(),
+                "operator": log.operator,
+                "operator_role": log.operator_role,
+                "operation": log.operation_type,
+                "reason": log.reason,
+                "impacted_results": log.impacted_results,
+                "changes": [],
+            }
+            for field, change in log.changes.items():
+                detail["changes"].append({
+                    "field": field,
+                    "before": change.get("old"),
+                    "after": change.get("new"),
+                })
+            details.append(detail)
+        return details
+
+    def get_status_transitions(self, entity_type: str, entity_id: str) -> List[Dict[str, Any]]:
+        logs = self.get_entity_history(entity_type, entity_id)
+        transitions = []
+        for log in logs:
+            if "status" in log.changes:
+                transitions.append({
+                    "timestamp": log.timestamp.isoformat(),
+                    "operator": log.operator,
+                    "from_status": log.changes["status"].get("old"),
+                    "to_status": log.changes["status"].get("new"),
+                    "operation": log.operation_type,
+                    "reason": log.reason,
+                })
+        return transitions
