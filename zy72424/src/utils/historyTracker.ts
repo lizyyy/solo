@@ -1,10 +1,11 @@
 import { diff_match_patch } from 'diff-match-patch';
-import { ChangeHistory, ChangeType, DiffResult } from '../types';
+import { ChangeHistory, ChangeType, DiffResult, EntityType } from '../types';
 import { generateId } from './boundaryRules';
 
 const dmp = new diff_match_patch();
 
 export function recordChange<T>(
+  entityType: EntityType,
   recordId: string,
   oldData: T,
   newData: T,
@@ -21,6 +22,7 @@ export function recordChange<T>(
 
   return {
     id: generateId('history'),
+    entityType,
     recordId,
     fieldName: String(fieldName),
     oldValue,

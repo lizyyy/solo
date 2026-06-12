@@ -39,7 +39,7 @@ export default function Review() {
       reviewComment,
       reviewedBy: currentUser.name,
       reviewedAt: new Date(),
-    });
+    }, currentUser.name);
 
     if (status === 'approved') {
       updateRecord(recordId, { status: 'reviewed' }, currentUser.name);

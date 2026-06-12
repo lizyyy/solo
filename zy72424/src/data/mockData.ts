@@ -450,6 +450,7 @@ export const mockRecords: RehearsalRecord[] = [
 export const mockHistory: ChangeHistory[] = [
   {
     id: 'history-1',
+    entityType: 'track_alias',
     recordId: 'track-1',
     fieldName: 'remark',
     oldValue: '经典曲目，演奏难度大',
@@ -460,6 +461,7 @@ export const mockHistory: ChangeHistory[] = [
   },
   {
     id: 'history-2',
+    entityType: 'track_alias',
     recordId: 'track-3',
     fieldName: 'remark',
     oldValue: '合唱与乐队配合',
@@ -470,6 +472,7 @@ export const mockHistory: ChangeHistory[] = [
   },
   {
     id: 'history-3',
+    entityType: 'rehearsal_record',
     recordId: 'record-2',
     fieldName: 'status',
     oldValue: 'normal',
@@ -480,16 +483,18 @@ export const mockHistory: ChangeHistory[] = [
   },
   {
     id: 'history-4',
-    recordId: 'record-10',
-    fieldName: 'status',
-    oldValue: 'pending_review',
-    newValue: 'reviewed',
+    entityType: 'review_task',
+    recordId: 'review-4',
+    fieldName: 'reviewStatus',
+    oldValue: 'pending',
+    newValue: 'approved',
     changedBy: '张运营',
     changedAt: daysAgo(3),
     changeType: 'update',
   },
   {
     id: 'history-5',
+    entityType: 'rehearsal_record',
     recordId: 'record-10',
     fieldName: 'trackRemark',
     oldValue: '小提琴手，返工：上次人不齐重新安排',
@@ -500,6 +505,7 @@ export const mockHistory: ChangeHistory[] = [
   },
   {
     id: 'history-6',
+    entityType: 'track_alias',
     recordId: 'track-10',
     fieldName: 'remark',
     oldValue: '庄严宏大\n铜管声部需要有力的起奏',
@@ -510,6 +516,7 @@ export const mockHistory: ChangeHistory[] = [
   },
   {
     id: 'history-7',
+    entityType: 'rehearsal_record',
     recordId: 'record-15',
     fieldName: 'hasReworkReason',
     oldValue: 'false',
@@ -520,6 +527,7 @@ export const mockHistory: ChangeHistory[] = [
   },
   {
     id: 'history-8',
+    entityType: 'rehearsal_record',
     recordId: 'record-15',
     fieldName: 'status',
     oldValue: 'normal',
@@ -530,6 +538,7 @@ export const mockHistory: ChangeHistory[] = [
   },
   {
     id: 'history-9',
+    entityType: 'track_alias',
     recordId: 'track-6',
     fieldName: 'remark',
     oldValue: '大编制曲目\n需要全员到场',
@@ -540,6 +549,7 @@ export const mockHistory: ChangeHistory[] = [
   },
   {
     id: 'history-10',
+    entityType: 'track_alias',
     recordId: 'track-5',
     fieldName: 'remark',
     oldValue: '民族风格改编',
@@ -550,6 +560,7 @@ export const mockHistory: ChangeHistory[] = [
   },
   {
     id: 'history-11',
+    entityType: 'contract',
     recordId: 'contract-1',
     fieldName: 'importCount',
     oldValue: '1',
@@ -560,6 +571,7 @@ export const mockHistory: ChangeHistory[] = [
   },
   {
     id: 'history-12',
+    entityType: 'contract',
     recordId: 'contract-1',
     fieldName: 'lastImportTime',
     oldValue: daysAgo(10).toISOString(),
@@ -570,6 +582,7 @@ export const mockHistory: ChangeHistory[] = [
   },
   {
     id: 'history-13',
+    entityType: 'rehearsal_record',
     recordId: 'record-20',
     fieldName: 'hasReworkReason',
     oldValue: 'false',
@@ -580,6 +593,7 @@ export const mockHistory: ChangeHistory[] = [
   },
   {
     id: 'history-14',
+    entityType: 'rehearsal_record',
     recordId: 'record-20',
     fieldName: 'status',
     oldValue: 'normal',
@@ -590,6 +604,7 @@ export const mockHistory: ChangeHistory[] = [
   },
   {
     id: 'history-15',
+    entityType: 'rehearsal_record',
     recordId: 'record-4',
     fieldName: 'trackRemark',
     oldValue: '合唱指挥',

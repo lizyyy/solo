@@ -16,6 +16,7 @@ export default function Contracts() {
   const contracts = useStore((state) => state.contracts);
   const addContract = useStore((state) => state.addContract);
   const updateContract = useStore((state) => state.updateContract);
+  const currentUser = useStore((state) => state.currentUser);
 
   const [isDragging, setIsDragging] = useState(false);
   const [previewContract, setPreviewContract] = useState<ContractScreenshot | null>(null);
@@ -25,10 +26,14 @@ export default function Contracts() {
   const handleFileUpload = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
 
+    let successCount = 0;
+    let duplicateCount = 0;
+    let errorCount = 0;
+
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       if (!file.type.startsWith('image/')) {
-        setUploadMessage({ type: 'error', text: `文件 ${file.name} 不是图片格式` });
+        errorCount++;
         continue;
       }
 
@@ -38,8 +43,8 @@ export default function Contracts() {
 
         if (existing) {
           const { updated, message } = handleDuplicateImport(existing);
-          updateContract(existing.id, updated);
-          setUploadMessage({ type: 'warning', text: message });
+          updateContract(existing.id, updated, currentUser.name);
+          duplicateCount++;
         } else {
           const newContract: ContractScreenshot = {
             id: generateId('contract'),
@@ -52,11 +57,21 @@ export default function Contracts() {
             importCount: 1,
           };
           addContract(newContract);
-          setUploadMessage({ type: 'success', text: `成功导入 ${file.name}` });
+          successCount++;
         }
       } catch {
-        setUploadMessage({ type: 'error', text: `处理文件 ${file.name} 时出错` });
+        errorCount++;
       }
+    }
+
+    const messages: string[] = [];
+    if (successCount > 0) messages.push(`成功导入 ${successCount} 个新文件`);
+    if (duplicateCount > 0) messages.push(`${duplicateCount} 个重复文件（已更新导入时间，不重复统计）`);
+    if (errorCount > 0) messages.push(`${errorCount} 个文件处理失败`);
+
+    if (messages.length > 0) {
+      const type = errorCount > 0 ? 'error' : duplicateCount > 0 ? 'warning' : 'success';
+      setUploadMessage({ type, text: messages.join('；') });
     }
 
     setTimeout(() => setUploadMessage(null), 5000);

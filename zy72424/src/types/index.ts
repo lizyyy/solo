@@ -37,9 +37,11 @@ export interface RehearsalRecord {
 }
 
 export type ChangeType = 'create' | 'update' | 'delete' | 'rollback';
+export type EntityType = 'track_alias' | 'rehearsal_record' | 'contract' | 'review_task';
 
 export interface ChangeHistory {
   id: string;
+  entityType: EntityType;
   recordId: string;
   fieldName: string;
   oldValue: string;
