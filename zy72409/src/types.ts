@@ -38,6 +38,7 @@ export interface TicketRecord {
   id: number;
   batchId: number;
   source: DataSource;
+  importVersion: number;
   ticketType: TicketType;
   ticketNumber?: string;
   attendeeName?: string;
@@ -45,6 +46,22 @@ export interface TicketRecord {
   quantity: number;
   notes?: string;
   importedAt: string;
+}
+
+export interface CanonicalTicket {
+  id: number;
+  batchId: number;
+  conflictId?: number;
+  sourceOfTruth: DataSource | 'custom';
+  ticketType: TicketType;
+  ticketNumber?: string;
+  attendeeName?: string;
+  price: number;
+  quantity: number;
+  confirmedBy: string;
+  confirmedAt: string;
+  resolution: 'confirm_sound_engineer' | 'confirm_rehearsal_group' | 'custom';
+  notes?: string;
 }
 
 export interface ConflictEvidence {

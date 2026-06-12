@@ -11,6 +11,13 @@ interface TicketImportItem {
   notes?: string;
 }
 
+export function getLatestImportVersion(batchId: number, source: DataSource): number {
+  const row = db.prepare(`
+    SELECT MAX(import_version) as v FROM ticket_records WHERE batch_id = ? AND source = ?
+  `).get(batchId, source) as any;
+  return row?.v || 0;
+}
+
 export function importSoundEngineerRecords(
   batchId: number,
   tickets: TicketImportItem[]
@@ -35,40 +42,45 @@ function importTickets(
     throw new Error(`批次 ${batchId} 不存在`);
   }
 
+  const previousVersion = getLatestImportVersion(batchId, source);
+  const importVersion = previousVersion + 1;
+
   let recordsImported = 0;
   let duplicatesFound = 0;
   const warnings: string[] = [];
 
   const insertStmt = db.prepare(`
-    INSERT OR IGNORE INTO ticket_records 
-    (batch_id, source, ticket_type, ticket_number, attendee_name, price, quantity, notes)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO ticket_records 
+    (batch_id, source, import_version, ticket_type, ticket_number, attendee_name, price, quantity, notes)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
-  const checkDuplicateStmt = db.prepare(`
+  const checkSameVersionDuplicate = db.prepare(`
     SELECT id FROM ticket_records 
-    WHERE batch_id = ? AND source = ? AND ticket_number = ? AND attendee_name = ?
+    WHERE batch_id = ? AND source = ? AND import_version = ? AND ticket_number = ? AND attendee_name = ?
   `);
 
   const transaction = db.transaction(() => {
     for (const ticket of tickets) {
       if (ticket.ticketNumber || ticket.attendeeName) {
-        const existing = checkDuplicateStmt.get(
+        const existing = checkSameVersionDuplicate.get(
           batchId,
           source,
+          importVersion,
           ticket.ticketNumber || null,
           ticket.attendeeName || null
         );
         if (existing) {
           duplicatesFound++;
-          warnings.push(`重复记录: ${ticket.ticketNumber || ticket.attendeeName}`);
+          warnings.push(`本次导入内重复记录: ${ticket.ticketNumber || ticket.attendeeName}`);
           continue;
         }
       }
 
-      const result = insertStmt.run(
+      insertStmt.run(
         batchId,
         source,
+        importVersion,
         ticket.ticketType,
         ticket.ticketNumber || null,
         ticket.attendeeName || null,
@@ -76,16 +88,15 @@ function importTickets(
         ticket.quantity,
         ticket.notes || null
       );
-
-      if (result.changes > 0) {
-        recordsImported++;
-      } else {
-        duplicatesFound++;
-      }
+      recordsImported++;
     }
   });
 
   transaction();
+
+  if (previousVersion > 0) {
+    warnings.push(`检测到历史导入版本：本次为 v${importVersion}，历史版本 v${previousVersion} 已归档`);
+  }
 
   updateBatchStatusAfterImport(batchId);
 
@@ -109,11 +120,15 @@ function importTickets(
 
 function updateBatchStatusAfterImport(batchId: number) {
   const records = db.prepare(`
-    SELECT ticket_type, COUNT(*) as count 
-    FROM ticket_records 
-    WHERE batch_id = ?
+    SELECT ticket_type, SUM(quantity) as count 
+    FROM ticket_records tr
+    INNER JOIN (
+      SELECT source, MAX(import_version) as max_v 
+      FROM ticket_records WHERE batch_id = ? GROUP BY source
+    ) latest ON tr.source = latest.source AND tr.import_version = latest.max_v
+    WHERE tr.batch_id = ?
     GROUP BY ticket_type
-  `).all(batchId) as any[];
+  `).all(batchId, batchId) as any[];
 
   const hasPaid = records.some(r => r.ticket_type === TicketType.PAID);
   const hasComp = records.some(r => r.ticket_type === TicketType.COMP);

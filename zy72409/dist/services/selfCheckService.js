@@ -8,6 +8,7 @@ exports.checkExportConsistency = checkExportConsistency;
 const db_1 = require("../db");
 const types_1 = require("../types");
 const revenueService_1 = require("./revenueService");
+const conflictService_1 = require("./conflictService");
 function runAllChecks(batchId) {
     return [
         checkDuplicateImports(batchId),
@@ -18,10 +19,10 @@ function runAllChecks(batchId) {
 }
 function checkDuplicateImports(batchId) {
     const duplicates = db_1.db.prepare(`
-    SELECT source, ticket_number, attendee_name, COUNT(*) as cnt
+    SELECT source, import_version, ticket_number, attendee_name, COUNT(*) as cnt
     FROM ticket_records
     WHERE batch_id = ?
-    GROUP BY source, ticket_number, attendee_name
+    GROUP BY source, import_version, ticket_number, attendee_name
     HAVING cnt > 1
   `).all(batchId);
     if (duplicates.length > 0) {
@@ -32,10 +33,18 @@ function checkDuplicateImports(batchId) {
             details: duplicates
         };
     }
+    const versionCounts = db_1.db.prepare(`
+    SELECT source, COUNT(DISTINCT import_version) as versions
+    FROM ticket_records WHERE batch_id = ? GROUP BY source
+  `).all(batchId);
+    const reimported = versionCounts.filter(v => v.versions > 1);
     return {
         checkType: 'duplicate_imports',
         passed: true,
-        message: '无重复导入记录'
+        message: reimported.length > 0
+            ? `无同一版本内重复；检测到重传历史：${reimported.map(r => `${r.source} 有 v${r.versions}`).join('; ')}`
+            : '无重复导入记录',
+        details: reimported.length > 0 ? { historicalVersions: reimported } : undefined
     };
 }
 function checkMixedTicketTypes(batchId) {
@@ -47,27 +56,46 @@ function checkMixedTicketTypes(batchId) {
             message: '批次不存在'
         };
     }
-    const hasMixed = batch.has_mixed_tickets === 1;
+    const canonicalTickets = (0, conflictService_1.getCanonicalTickets)(batchId);
+    let compCount = 0;
+    let paidCount = 0;
+    let sourceLabel = 'canonical_tickets';
+    if (canonicalTickets.length > 0) {
+        compCount = canonicalTickets.filter(t => t.ticketType === types_1.TicketType.COMP).reduce((s, t) => s + t.quantity, 0);
+        paidCount = canonicalTickets.filter(t => t.ticketType === types_1.TicketType.PAID).reduce((s, t) => s + t.quantity, 0);
+    }
+    else {
+        sourceLabel = 'ticket_records(latest import_version)';
+        const compRow = db_1.db.prepare(`
+      SELECT SUM(tr.quantity) as cnt FROM ticket_records tr
+      INNER JOIN (
+        SELECT source, MAX(import_version) as max_v FROM ticket_records WHERE batch_id = ? GROUP BY source
+      ) latest ON tr.source = latest.source AND tr.import_version = latest.max_v
+      WHERE tr.batch_id = ? AND tr.ticket_type = ?
+    `).get(batchId, batchId, types_1.TicketType.COMP);
+        const paidRow = db_1.db.prepare(`
+      SELECT SUM(tr.quantity) as cnt FROM ticket_records tr
+      INNER JOIN (
+        SELECT source, MAX(import_version) as max_v FROM ticket_records WHERE batch_id = ? GROUP BY source
+      ) latest ON tr.source = latest.source AND tr.import_version = latest.max_v
+      WHERE tr.batch_id = ? AND tr.ticket_type = ?
+    `).get(batchId, batchId, types_1.TicketType.PAID);
+        compCount = compRow?.cnt || 0;
+        paidCount = paidRow?.cnt || 0;
+    }
+    const hasMixed = compCount > 0 && paidCount > 0;
     if (hasMixed) {
-        const compCount = db_1.db.prepare(`
-      SELECT SUM(quantity) as cnt FROM ticket_records 
-      WHERE batch_id = ? AND ticket_type = ?
-    `).get(batchId, types_1.TicketType.COMP);
-        const paidCount = db_1.db.prepare(`
-      SELECT SUM(quantity) as cnt FROM ticket_records 
-      WHERE batch_id = ? AND ticket_type = ?
-    `).get(batchId, types_1.TicketType.PAID);
         return {
             checkType: 'mixed_tickets',
             passed: false,
-            message: `批次存在赠票和售票混合，需录音师复核：赠票 ${compCount?.cnt || 0} 张，售票 ${paidCount?.cnt || 0} 张`,
-            details: { compCount: compCount?.cnt || 0, paidCount: paidCount?.cnt || 0 }
+            message: `[${sourceLabel}] 批次存在赠票和售票混合，需录音师复核：赠票 ${compCount} 张，售票 ${paidCount} 张`,
+            details: { compCount, paidCount, source: sourceLabel, needsAudioEngineerReview: true }
         };
     }
     return {
         checkType: 'mixed_tickets',
         passed: true,
-        message: '批次票务类型一致，无混合'
+        message: `[${sourceLabel}] 批次票务类型一致，无混合`
     };
 }
 function checkRecalculationConsistency(batchId) {
@@ -85,25 +113,27 @@ function checkRecalculationConsistency(batchId) {
     }
     const latest = results[0];
     const previous = results[1];
-    const fields = ['total_tickets', 'total_paid_tickets', 'total_comp_tickets', 'total_revenue'];
+    const fields = ['total_tickets', 'total_paid_tickets', 'total_comp_tickets', 'total_revenue', 'authoritative_source'];
     const differences = [];
     for (const field of fields) {
-        if (Math.abs(latest[field] - previous[field]) > 0.01) {
-            differences.push(`${field}: ${previous[field]} -> ${latest[field]}`);
+        const l = String(latest[field] ?? '');
+        const p = String(previous[field] ?? '');
+        if (l !== p) {
+            differences.push(`${field}: ${p} -> ${l}`);
         }
     }
     if (differences.length > 0) {
         return {
             checkType: 'recalculation_consistency',
             passed: false,
-            message: `补录后重算发现数据变动：${differences.join('; ')}`,
-            details: differences
+            message: `补录后重算发现数据变动（${differences.length} 项）：${differences.join('; ')}`,
+            details: { previousVersion: previous.version, latestVersion: latest.version, differences }
         };
     }
     return {
         checkType: 'recalculation_consistency',
         passed: true,
-        message: '重算结果一致'
+        message: `重算结果一致（v${previous.version} -> v${latest.version}），口径: ${latest.authoritative_source || '未设置'}`
     };
 }
 function checkExportConsistency(batchId) {
@@ -115,45 +145,67 @@ function checkExportConsistency(batchId) {
             message: '尚无分成计算结果'
         };
     }
-    const apiRecords = db_1.db.prepare(`
-    SELECT ticket_type, SUM(quantity) as qty, SUM(price * quantity) as revenue
-    FROM ticket_records 
-    WHERE batch_id = ?
-    GROUP BY ticket_type
-  `).all(batchId);
+    const canonicalTickets = (0, conflictService_1.getCanonicalTickets)(batchId);
+    const batch = db_1.db.prepare('SELECT authoritative_source FROM show_batches WHERE id = ?').get(batchId);
     let apiPaidQty = 0;
     let apiCompQty = 0;
     let apiRevenue = 0;
-    for (const record of apiRecords) {
-        if (record.ticket_type === types_1.TicketType.PAID) {
-            apiPaidQty = record.qty;
-            apiRevenue = record.revenue;
+    let sourceLabel = '';
+    if (canonicalTickets.length > 0) {
+        sourceLabel = `canonical_tickets (authoritative_source=${batch?.authoritative_source || 'N/A'})`;
+        for (const t of canonicalTickets) {
+            if (t.ticketType === types_1.TicketType.PAID) {
+                apiPaidQty += t.quantity;
+                apiRevenue += t.price * t.quantity;
+            }
+            else if (t.ticketType === types_1.TicketType.COMP) {
+                apiCompQty += t.quantity;
+            }
         }
-        else if (record.ticket_type === types_1.TicketType.COMP) {
-            apiCompQty = record.qty;
+    }
+    else {
+        sourceLabel = 'ticket_records (pre-canonical)';
+        const apiRecords = db_1.db.prepare(`
+      SELECT tr.ticket_type, SUM(tr.quantity) as qty, SUM(tr.price * tr.quantity) as revenue
+      FROM ticket_records tr
+      INNER JOIN (
+        SELECT source, MAX(import_version) as max_v FROM ticket_records WHERE batch_id = ? GROUP BY source
+      ) latest ON tr.source = latest.source AND tr.import_version = latest.max_v
+      WHERE tr.batch_id = ?
+      GROUP BY tr.ticket_type
+    `).all(batchId, batchId);
+        for (const record of apiRecords) {
+            if (record.ticket_type === types_1.TicketType.PAID) {
+                apiPaidQty = record.qty;
+                apiRevenue = record.revenue;
+            }
+            else if (record.ticket_type === types_1.TicketType.COMP) {
+                apiCompQty = record.qty;
+            }
         }
     }
     const issues = [];
     if (apiPaidQty !== latestSplit.totalPaidTickets) {
-        issues.push(`售票数量不一致：接口 ${apiPaidQty} / 结果 ${latestSplit.totalPaidTickets}`);
+        issues.push(`售票数量不一致：${sourceLabel}=${apiPaidQty} / revenue_split_results=${latestSplit.totalPaidTickets}`);
     }
     if (apiCompQty !== latestSplit.totalCompTickets) {
-        issues.push(`赠票数量不一致：接口 ${apiCompQty} / 结果 ${latestSplit.totalCompTickets}`);
+        issues.push(`赠票数量不一致：${sourceLabel}=${apiCompQty} / revenue_split_results=${latestSplit.totalCompTickets}`);
     }
     if (Math.abs(apiRevenue - latestSplit.totalRevenue) > 0.01) {
-        issues.push(`总金额不一致：接口 ${apiRevenue} / 结果 ${latestSplit.totalRevenue}`);
+        issues.push(`总金额不一致：${sourceLabel}=${apiRevenue} / revenue_split_results=${latestSplit.totalRevenue}`);
     }
     if (issues.length > 0) {
         return {
             checkType: 'export_consistency',
             passed: false,
             message: `导出一致性检查失败：${issues.join('; ')}`,
-            details: issues
+            details: { source: sourceLabel, issues, apiValues: { paid: apiPaidQty, comp: apiCompQty, revenue: apiRevenue } }
         };
     }
     return {
         checkType: 'export_consistency',
         passed: true,
-        message: '接口、页面、导出数据一致'
+        message: `[${sourceLabel}] 接口、页面、导出数据一致，同一条记录可追踪`,
+        details: { source: sourceLabel, authoritativeSource: batch?.authoritative_source }
     };
 }
