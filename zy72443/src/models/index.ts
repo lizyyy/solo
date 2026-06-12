@@ -89,6 +89,19 @@ export interface AnomalyRecord {
   };
 }
 
+export interface ChangeHistory {
+  id: string;
+  ticketId: string;
+  entityType: 'ticket' | 'audio_remark' | 'verification' | 'anomaly';
+  entityId: string;
+  fieldName: string;
+  oldValue: string;
+  newValue: string;
+  changedBy: string;
+  changeReason: string;
+  changedAt: string;
+}
+
 export interface SplitReport {
   reportId: string;
   generatedAt: string;
@@ -102,4 +115,11 @@ export interface SplitReport {
   };
   verificationList: LessonVerification[];
   anomalyList: AnomalyRecord[];
+  changeHistoryList: ChangeHistory[];
+  cityTraceability: Record<string, {
+    ticketIds: string[];
+    musicianNames: string[];
+    triggeredAnomalies: string[];
+    fixActions: string[];
+  }>;
 }

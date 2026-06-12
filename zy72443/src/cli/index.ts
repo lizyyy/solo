@@ -3,7 +3,7 @@ import Table from 'cli-table3';
 import chalk from 'chalk';
 import { importSampleTickets, RawTicketRow, importTicketRows } from '../core/ticketImporter';
 import { createSampleAudioRemarks, runFullDemoWorkflow, getReviewContext, managerReview, engineerUpdateAudioRemark, resolveAnomalyByManager } from '../core/workflow';
-import { generateHumanReadableReport, generateReport } from '../core/reportGenerator';
+import { generateHumanReadableReport, generateReport, traceCity } from '../core/reportGenerator';
 import { dataStore } from '../core/dataStore';
 import { processTicketWithAudio } from '../core/anomalyDetector';
 
@@ -120,7 +120,7 @@ program
       return;
     }
     
-    const { ticket, audioRemark, verification, anomalies } = context;
+    const { ticket, audioRemark, verification, anomalies, changeHistories } = context;
     
     console.log(chalk.blue(`\n📋 票单详情: ${ticketId}`));
     console.log(chalk.gray('=' .repeat(60)));
@@ -201,10 +201,30 @@ program
           ['状态', anomaly.resolved ? chalk.green('已解决') : chalk.red('待处理')],
           ['描述', anomaly.description],
           ['数据来源', `${anomaly.sourceData.source} -> ${anomaly.sourceData.fieldName}`],
-          ['原始值', chalk.red(anomaly.sourceData.originalValue)],
-          ['期望值', chalk.green(anomaly.sourceData.expectedValue || '-')]
+          ['原始值(票务)', chalk.red(anomaly.sourceData.originalValue)],
+          ['期望值(音频)', chalk.green(anomaly.sourceData.expectedValue || '-')],
+          ['解决人', anomaly.resolvedBy || '-'],
+          ['解决说明', anomaly.resolutionNotes || '-']
         );
         console.log(anomalyTable.toString());
+      }
+    }
+    
+    if (changeHistories && changeHistories.length > 0) {
+      console.log(chalk.yellow('\n📜 【修改历史时间线】'));
+      const entityLabel: Record<string, string> = {
+        ticket: '票务导出表',
+        audio_remark: '音频文件备注',
+        verification: '课时核销单',
+        anomaly: '异常记录'
+      };
+      for (const h of changeHistories) {
+        console.log(chalk.cyan(`  [${new Date(h.changedAt).toLocaleString('zh-CN')}] ${h.changedBy}`));
+        console.log(`    修改对象: ${entityLabel[h.entityType] || h.entityType} (${h.entityId})`);
+        console.log(`    修改字段: ${h.fieldName}`);
+        console.log(`    改前: ${chalk.red(`"${h.oldValue}"`)} → 改后: ${chalk.green(`"${h.newValue}"`)}`);
+        console.log(`    修改原因: ${h.changeReason}`);
+        console.log('');
       }
     }
     
@@ -310,6 +330,87 @@ program
   .action(() => {
     ensureDataInitialized();
     console.log(generateHumanReadableReport());
+  });
+
+program
+  .command('trace-city <city>')
+  .description('按城市追溯：反查该城市涉及的票单、异常、修改历史')
+  .action((city) => {
+    ensureDataInitialized();
+    console.log(traceCity(city));
+  });
+
+program
+  .command('reset')
+  .description('重置所有数据，清除持久化文件')
+  .action(() => {
+    dataStore.clear();
+    dataInitialized = false;
+    console.log(chalk.green('✅ 所有数据已重置，持久化文件已清空'));
+  });
+
+program
+  .command('run-complete-flow')
+  .description('端到端跑完完整流程：导入→店长复核→录音师补录→店长再复核→报告')
+  .action(() => {
+    dataStore.clear();
+    dataInitialized = false;
+    console.log(chalk.blue('\n🎵 音乐人直播打赏分账 - 端到端完整流程演示\n'));
+    console.log(chalk.gray('='.repeat(70)));
+    
+    console.log(chalk.yellow('\n📌 第0步：清理数据并重新初始化'));
+    const init = runFullDemoWorkflow(true);
+    console.log(chalk.green(`   初始化完成：${init.tickets.length}票单 / ${init.verifications.length}核销单 / ${init.anomalies.filter(a=>!a.resolved).length}未解决异常`));
+    
+    const targetTicketId = 'TK20250601002';
+    console.log(chalk.yellow(`\n📌 以票单 ${targetTicketId} (李南风) 为例走完整闭环`));
+    
+    console.log(chalk.cyan('\n   当前状态查看:'));
+    const ctx0 = getReviewContext(targetTicketId);
+    if (ctx0) {
+      console.log(`   核销单状态: ${ctx0.verification?.status}`);
+      console.log(`   票务授权地区: ${ctx0.ticket.authorizedCities.join('、')}`);
+      console.log(`   音频授权地区: ${ctx0.audioRemark?.actualAuthorizedCities.join('、')}`);
+      console.log(`   异常数: ${ctx0.anomalies.filter(a=>!a.resolved).length}`);
+    }
+    
+    console.log(chalk.yellow('\n📌 第1步：店长复核，发现异常转交给录音师小段'));
+    const r1 = managerReview(targetTicketId, 'escalate_to_audio', '发现授权地区异常，小段请核对杭州是否为合法授权地区');
+    console.log(chalk.green(`   结果: ${r1.message}`));
+    
+    console.log(chalk.yellow('\n📌 第2步：录音师小段补录音频备注，补全北京,上海,杭州'));
+    const r2 = engineerUpdateAudioRemark(
+      targetTicketId, 
+      ['北京', '上海', '杭州'], 
+      '已确认杭州为合同内合法授权地区，补全备注。原备注："音频正常，注意：实际授权地区包含杭州，票务表中可能遗漏"'
+    );
+    console.log(chalk.green(`   结果: ${r2.message}`));
+    if (r2.resolvedAnomalies && r2.resolvedAnomalies.length > 0) {
+      console.log(`   自动解决异常: ${r2.resolvedAnomalies.map(a => a.id).join(', ')}`);
+    }
+    
+    console.log(chalk.yellow('\n📌 第3步：店长再次复核，确认通过'));
+    const r3 = managerReview(targetTicketId, 'approve', '已核对北京,上海,杭州均为有效授权地区，同意核销');
+    console.log(chalk.green(`   结果: ${r3.message}`));
+    
+    console.log(chalk.yellow('\n📌 第4步：查看票单详情（含完整修改历史）'));
+    const ctxFinal = getReviewContext(targetTicketId);
+    if (ctxFinal) {
+      console.log(chalk.cyan(`   最终核销单状态: ${ctxFinal.verification?.status}`));
+      console.log(`   最终授权地区: ${ctxFinal.verification?.authorizedCities.join('、')}`);
+      console.log(`   未解决异常: ${ctxFinal.anomalies.filter(a=>!a.resolved).length}`);
+      console.log(`   修改历史记录数: ${ctxFinal.changeHistories?.length || 0}`);
+    }
+    
+    console.log(chalk.yellow('\n📌 第5步：按"杭州"城市反查追溯'));
+    console.log(traceCity('杭州'));
+    
+    console.log(chalk.yellow('\n📌 第6步：生成最终报告'));
+    console.log(generateHumanReadableReport());
+    
+    console.log(chalk.blue('\n✅ 端到端流程演示完成！数据已保存在 data/store.json'));
+    console.log(chalk.gray('   可运行 npm run start:cli -- detail TK20250601002 查看票单详情'));
+    console.log(chalk.gray('   可运行 npm run start:cli -- trace-city 杭州 按城市追溯\n'));
   });
 
 function printTicketsTable(tickets: any[]) {

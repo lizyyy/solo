@@ -1,0 +1,546 @@
+{
+  "tickets": [
+    {
+      "id": "TKT-1781253600924-82adyx640",
+      "ticketId": "TK20250601001",
+      "musicianName": "张小北",
+      "liveDate": "2025-06-01",
+      "totalTips": 12580,
+      "platformFee": 1258,
+      "splitRatio": 0.7,
+      "expectedRevenue": 7925.4,
+      "authorizedCities": [
+        "北京",
+        "上海",
+        "广州",
+        "深圳"
+      ],
+      "audioFileId": "AUD20250601001",
+      "importedAt": "2026-06-12T08:40:00.924Z",
+      "status": "audio_checked"
+    },
+    {
+      "id": "TKT-1781253600924-587bvfsod",
+      "ticketId": "TK20250601002",
+      "musicianName": "李南风",
+      "liveDate": "2025-06-01",
+      "totalTips": 8960,
+      "platformFee": 896,
+      "splitRatio": 0.65,
+      "expectedRevenue": 5241.6,
+      "authorizedCities": [
+        "北京",
+        "上海"
+      ],
+      "audioFileId": "AUD20250601002",
+      "importedAt": "2026-06-12T08:40:00.924Z",
+      "status": "manager_reviewed"
+    },
+    {
+      "id": "TKT-1781253600924-6auh855wn",
+      "ticketId": "TK20250602001",
+      "musicianName": "王夕阳",
+      "liveDate": "2025-06-02",
+      "totalTips": 15600,
+      "platformFee": 1560,
+      "splitRatio": 0.7,
+      "expectedRevenue": 9828,
+      "authorizedCities": [
+        "北京",
+        "上海",
+        "广州"
+      ],
+      "audioFileId": "AUD20250602001",
+      "importedAt": "2026-06-12T08:40:00.924Z",
+      "status": "anomaly_detected"
+    },
+    {
+      "id": "TKT-1781253600924-iyi6qyurd",
+      "ticketId": "TK20250602002",
+      "musicianName": "陈星辰",
+      "liveDate": "2025-06-02",
+      "totalTips": 6750,
+      "platformFee": 675,
+      "splitRatio": 0.6,
+      "expectedRevenue": 3645,
+      "authorizedCities": [
+        "北京"
+      ],
+      "audioFileId": "AUD20250602002",
+      "importedAt": "2026-06-12T08:40:00.924Z",
+      "status": "audio_checked"
+    },
+    {
+      "id": "TKT-1781253600924-sguq4s3s6",
+      "ticketId": "TK20250603001",
+      "musicianName": "赵云端",
+      "liveDate": "2025-06-03",
+      "totalTips": 23400,
+      "platformFee": 2340,
+      "splitRatio": 0.75,
+      "expectedRevenue": 15795,
+      "authorizedCities": [
+        "北京",
+        "上海",
+        "广州",
+        "深圳",
+        "杭州"
+      ],
+      "audioFileId": "AUD20250603001",
+      "importedAt": "2026-06-12T08:40:00.924Z",
+      "status": "anomaly_detected"
+    }
+  ],
+  "audioRemarks": [
+    {
+      "id": "AUD-1781253600924-1",
+      "audioFileId": "AUD20250601001",
+      "ticketId": "TK20250601001",
+      "musicianName": "张小北",
+      "actualAuthorizedCities": [
+        "北京",
+        "上海",
+        "广州",
+        "深圳"
+      ],
+      "audioDuration": 7200,
+      "qualityCheck": "pass",
+      "remark": "音频质量正常，授权地区与票务一致",
+      "updatedBy": "系统导入",
+      "updatedAt": "2026-06-12T08:40:00.924Z"
+    },
+    {
+      "id": "AUD-1781253600924-2",
+      "audioFileId": "AUD20250601002",
+      "ticketId": "TK20250601002",
+      "musicianName": "李南风",
+      "actualAuthorizedCities": [
+        "北京",
+        "上海",
+        "杭州"
+      ],
+      "audioDuration": 5400,
+      "qualityCheck": "pass",
+      "remark": "已确认杭州为合同内合法授权地区，补全备注。原备注：\"音频正常，注意：实际授权地区包含杭州，票务表中可能遗漏\"",
+      "updatedBy": "录音师小段",
+      "updatedAt": "2026-06-12T08:40:00.927Z"
+    },
+    {
+      "id": "AUD-1781253600924-3",
+      "audioFileId": "AUD20250602001",
+      "ticketId": "TK20250602001",
+      "musicianName": "王夕阳",
+      "actualAuthorizedCities": [
+        "北京",
+        "上海",
+        "广州",
+        "深圳",
+        "成都"
+      ],
+      "audioDuration": 8100,
+      "qualityCheck": "pass",
+      "remark": "音频质量良好，授权地区有新增：深圳、成都",
+      "updatedBy": "系统导入",
+      "updatedAt": "2026-06-12T08:40:00.924Z"
+    },
+    {
+      "id": "AUD-1781253600924-4",
+      "audioFileId": "AUD20250602002",
+      "ticketId": "TK20250602002",
+      "musicianName": "陈星辰",
+      "actualAuthorizedCities": [
+        "北京"
+      ],
+      "audioDuration": 3600,
+      "qualityCheck": "pass",
+      "remark": "音频正常，授权地区一致",
+      "updatedBy": "系统导入",
+      "updatedAt": "2026-06-12T08:40:00.924Z"
+    },
+    {
+      "id": "AUD-1781253600924-5",
+      "audioFileId": "AUD20250603001",
+      "ticketId": "TK20250603001",
+      "musicianName": "赵云端",
+      "actualAuthorizedCities": [
+        "北京",
+        "上海",
+        "广州",
+        "深圳",
+        "杭州",
+        "武汉"
+      ],
+      "audioDuration": 10800,
+      "qualityCheck": "pass",
+      "remark": "音频质量优秀，注意：武汉地区授权可能未在票务表中登记",
+      "updatedBy": "系统导入",
+      "updatedAt": "2026-06-12T08:40:00.924Z"
+    }
+  ],
+  "verifications": [
+    {
+      "id": "VER-1781253600925-b0bd3w5ea",
+      "verificationNo": "HX20250601001",
+      "ticketId": "TK20250601001",
+      "musicianName": "张小北",
+      "liveDate": "2025-06-01",
+      "totalTips": 12580,
+      "finalRevenue": 7925.4,
+      "authorizedCities": [
+        "北京",
+        "上海",
+        "广州",
+        "深圳"
+      ],
+      "status": "pending",
+      "reservedReason": "",
+      "missingMaterials": [],
+      "nextAction": "店长",
+      "actionNotes": "数据校验通过，等待店长复核",
+      "reviewedBy": null,
+      "verifiedAt": null,
+      "createdAt": "2026-06-12T08:40:00.925Z",
+      "updatedAt": "2026-06-12T08:40:00.925Z"
+    },
+    {
+      "id": "VER-1781253600925-ild81717v",
+      "verificationNo": "HX20250601002",
+      "ticketId": "TK20250601002",
+      "musicianName": "李南风",
+      "liveDate": "2025-06-01",
+      "totalTips": 8960,
+      "finalRevenue": 5241.6,
+      "authorizedCities": [
+        "北京",
+        "上海",
+        "杭州"
+      ],
+      "status": "verified",
+      "reservedReason": "",
+      "missingMaterials": [],
+      "nextAction": "系统",
+      "actionNotes": "店长复核通过：已核对北京,上海,杭州均为有效授权地区，同意核销",
+      "reviewedBy": "店长",
+      "verifiedAt": "2026-06-12T08:40:00.928Z",
+      "createdAt": "2026-06-12T08:40:00.925Z",
+      "updatedAt": "2026-06-12T08:40:00.928Z"
+    },
+    {
+      "id": "VER-1781253600925-6oiqc4416",
+      "verificationNo": "HX20250602001",
+      "ticketId": "TK20250602001",
+      "musicianName": "王夕阳",
+      "liveDate": "2025-06-02",
+      "totalTips": 15600,
+      "finalRevenue": 9828,
+      "authorizedCities": [
+        "北京",
+        "上海",
+        "广州"
+      ],
+      "status": "reserved",
+      "reservedReason": "授权地区不完整，缺少城市：深圳、成都",
+      "missingMaterials": [
+        "完整的授权地区列表",
+        "音频文件备注与票务导出表的一致性确认"
+      ],
+      "nextAction": "店长",
+      "actionNotes": "系统检测到授权地区异常，已标记为\"预留\"状态，请店长复核后决定是否转交录音师小段补全音频文件备注",
+      "reviewedBy": null,
+      "verifiedAt": null,
+      "createdAt": "2026-06-12T08:40:00.925Z",
+      "updatedAt": "2026-06-12T08:40:00.926Z"
+    },
+    {
+      "id": "VER-1781253600926-5x4gtmzcy",
+      "verificationNo": "HX20250602002",
+      "ticketId": "TK20250602002",
+      "musicianName": "陈星辰",
+      "liveDate": "2025-06-02",
+      "totalTips": 6750,
+      "finalRevenue": 3645,
+      "authorizedCities": [
+        "北京"
+      ],
+      "status": "pending",
+      "reservedReason": "",
+      "missingMaterials": [],
+      "nextAction": "店长",
+      "actionNotes": "数据校验通过，等待店长复核",
+      "reviewedBy": null,
+      "verifiedAt": null,
+      "createdAt": "2026-06-12T08:40:00.926Z",
+      "updatedAt": "2026-06-12T08:40:00.926Z"
+    },
+    {
+      "id": "VER-1781253600926-hy24zt65z",
+      "verificationNo": "HX20250603001",
+      "ticketId": "TK20250603001",
+      "musicianName": "赵云端",
+      "liveDate": "2025-06-03",
+      "totalTips": 23400,
+      "finalRevenue": 15795,
+      "authorizedCities": [
+        "北京",
+        "上海",
+        "广州",
+        "深圳",
+        "杭州"
+      ],
+      "status": "reserved",
+      "reservedReason": "授权地区不完整，缺少城市：武汉",
+      "missingMaterials": [
+        "完整的授权地区列表",
+        "音频文件备注与票务导出表的一致性确认"
+      ],
+      "nextAction": "店长",
+      "actionNotes": "系统检测到授权地区异常，已标记为\"预留\"状态，请店长复核后决定是否转交录音师小段补全音频文件备注",
+      "reviewedBy": null,
+      "verifiedAt": null,
+      "createdAt": "2026-06-12T08:40:00.926Z",
+      "updatedAt": "2026-06-12T08:40:00.926Z"
+    }
+  ],
+  "anomalies": [
+    {
+      "id": "ANM-1781253600925-e9z8u2gfn",
+      "ticketId": "TK20250601002",
+      "type": "missing_authorized_city",
+      "description": "票务导出表授权地区缺少城市：杭州。音频文件备注中包含这些城市，但票务表未记录。",
+      "severity": "high",
+      "detectedAt": "2026-06-12T08:40:00.925Z",
+      "detectedBy": "系统自动检测",
+      "resolved": true,
+      "resolvedAt": "2026-06-12T08:40:00.927Z",
+      "resolvedBy": "系统",
+      "resolutionNotes": "补录后重新校验：授权地区已对齐（北京、上海、杭州）",
+      "sourceData": {
+        "source": "ticket_export",
+        "fieldName": "authorizedCities",
+        "originalValue": "北京、上海",
+        "expectedValue": "北京、上海、杭州"
+      }
+    },
+    {
+      "id": "ANM-1781253600926-hnvobrysv",
+      "ticketId": "TK20250602001",
+      "type": "missing_authorized_city",
+      "description": "票务导出表授权地区缺少城市：深圳、成都。音频文件备注中包含这些城市，但票务表未记录。",
+      "severity": "high",
+      "detectedAt": "2026-06-12T08:40:00.926Z",
+      "detectedBy": "系统自动检测",
+      "resolved": false,
+      "resolvedAt": null,
+      "resolvedBy": null,
+      "resolutionNotes": null,
+      "sourceData": {
+        "source": "ticket_export",
+        "fieldName": "authorizedCities",
+        "originalValue": "北京、上海、广州",
+        "expectedValue": "北京、上海、广州、深圳、成都"
+      }
+    },
+    {
+      "id": "ANM-1781253600926-paiyitbdh",
+      "ticketId": "TK20250603001",
+      "type": "missing_authorized_city",
+      "description": "票务导出表授权地区缺少城市：武汉。音频文件备注中包含这些城市，但票务表未记录。",
+      "severity": "high",
+      "detectedAt": "2026-06-12T08:40:00.926Z",
+      "detectedBy": "系统自动检测",
+      "resolved": false,
+      "resolvedAt": null,
+      "resolvedBy": null,
+      "resolutionNotes": null,
+      "sourceData": {
+        "source": "ticket_export",
+        "fieldName": "authorizedCities",
+        "originalValue": "北京、上海、广州、深圳、杭州",
+        "expectedValue": "北京、上海、广州、深圳、杭州、武汉"
+      }
+    }
+  ],
+  "changeHistories": [
+    {
+      "id": "HIS-1781253600927-i17wn4pi7",
+      "ticketId": "TK20250601002",
+      "entityType": "verification",
+      "entityId": "HX20250601002",
+      "fieldName": "nextAction",
+      "oldValue": "店长",
+      "newValue": "录音师小段",
+      "changedBy": "店长",
+      "changeReason": "发现授权地区异常，小段请核对杭州是否为合法授权地区",
+      "changedAt": "2026-06-12T08:40:00.927Z"
+    },
+    {
+      "id": "HIS-1781253600927-08r316mfq",
+      "ticketId": "TK20250601002",
+      "entityType": "verification",
+      "entityId": "HX20250601002",
+      "fieldName": "actionNotes",
+      "oldValue": "系统检测到授权地区异常，已标记为\"预留\"状态，请店长复核后决定是否转交录音师小段补全音频文件备注",
+      "newValue": "店长复核意见：发现授权地区异常，小段请核对杭州是否为合法授权地区。已转交录音师小段补录音频文件备注。",
+      "changedBy": "店长",
+      "changeReason": "发现授权地区异常，小段请核对杭州是否为合法授权地区",
+      "changedAt": "2026-06-12T08:40:00.927Z"
+    },
+    {
+      "id": "HIS-1781253600927-zxk4j3ggj",
+      "ticketId": "TK20250601002",
+      "entityType": "audio_remark",
+      "entityId": "AUD20250601002",
+      "fieldName": "remark",
+      "oldValue": "音频正常，注意：实际授权地区包含杭州，票务表中可能遗漏",
+      "newValue": "已确认杭州为合同内合法授权地区，补全备注。原备注：\"音频正常，注意：实际授权地区包含杭州，票务表中可能遗漏\"",
+      "changedBy": "录音师小段",
+      "changeReason": "已确认杭州为合同内合法授权地区，补全备注。原备注：\"音频正常，注意：实际授权地区包含杭州，票务表中可能遗漏\"",
+      "changedAt": "2026-06-12T08:40:00.927Z"
+    },
+    {
+      "id": "HIS-1781253600927-6z6b41eq1",
+      "ticketId": "TK20250601002",
+      "entityType": "verification",
+      "entityId": "HX20250601002",
+      "fieldName": "authorizedCities",
+      "oldValue": "北京、上海",
+      "newValue": "北京、上海、杭州",
+      "changedBy": "录音师小段",
+      "changeReason": "已确认杭州为合同内合法授权地区，补全备注。原备注：\"音频正常，注意：实际授权地区包含杭州，票务表中可能遗漏\"",
+      "changedAt": "2026-06-12T08:40:00.927Z"
+    },
+    {
+      "id": "HIS-1781253600927-jciwl42ox",
+      "ticketId": "TK20250601002",
+      "entityType": "anomaly",
+      "entityId": "ANM-1781253600925-e9z8u2gfn",
+      "fieldName": "resolved",
+      "oldValue": "false",
+      "newValue": "true",
+      "changedBy": "系统",
+      "changeReason": "补录后重新校验：授权地区已对齐（北京、上海、杭州）",
+      "changedAt": "2026-06-12T08:40:00.927Z"
+    },
+    {
+      "id": "HIS-1781253600928-j4g1rqwib",
+      "ticketId": "TK20250601002",
+      "entityType": "verification",
+      "entityId": "HX20250601002",
+      "fieldName": "status",
+      "oldValue": "reserved",
+      "newValue": "pending",
+      "changedBy": "系统",
+      "changeReason": "补录后重新校验通过",
+      "changedAt": "2026-06-12T08:40:00.928Z"
+    },
+    {
+      "id": "HIS-1781253600928-mop3xd42q",
+      "ticketId": "TK20250601002",
+      "entityType": "verification",
+      "entityId": "HX20250601002",
+      "fieldName": "reservedReason",
+      "oldValue": "授权地区不完整，缺少城市：杭州",
+      "newValue": "",
+      "changedBy": "系统",
+      "changeReason": "补录后重新校验通过",
+      "changedAt": "2026-06-12T08:40:00.928Z"
+    },
+    {
+      "id": "HIS-1781253600928-w0m1k5uch",
+      "ticketId": "TK20250601002",
+      "entityType": "verification",
+      "entityId": "HX20250601002",
+      "fieldName": "missingMaterials",
+      "oldValue": "完整的授权地区列表、音频文件备注与票务导出表的一致性确认",
+      "newValue": "",
+      "changedBy": "系统",
+      "changeReason": "补录后重新校验通过",
+      "changedAt": "2026-06-12T08:40:00.928Z"
+    },
+    {
+      "id": "HIS-1781253600928-oc5wwgj95",
+      "ticketId": "TK20250601002",
+      "entityType": "verification",
+      "entityId": "HX20250601002",
+      "fieldName": "nextAction",
+      "oldValue": "录音师小段",
+      "newValue": "店长",
+      "changedBy": "系统",
+      "changeReason": "补录后重新校验通过",
+      "changedAt": "2026-06-12T08:40:00.928Z"
+    },
+    {
+      "id": "HIS-1781253600928-kde2lb9k9",
+      "ticketId": "TK20250601002",
+      "entityType": "verification",
+      "entityId": "HX20250601002",
+      "fieldName": "actionNotes",
+      "oldValue": "店长复核意见：发现授权地区异常，小段请核对杭州是否为合法授权地区。已转交录音师小段补录音频文件备注。",
+      "newValue": "录音师补录后重新校验通过，授权地区已对齐（北京、上海、杭州），等待店长复核",
+      "changedBy": "系统",
+      "changeReason": "补录后重新校验通过",
+      "changedAt": "2026-06-12T08:40:00.928Z"
+    },
+    {
+      "id": "HIS-1781253600928-iui0bvf01",
+      "ticketId": "TK20250601002",
+      "entityType": "verification",
+      "entityId": "HX20250601002",
+      "fieldName": "actionNotes",
+      "oldValue": "录音师补录后重新校验通过，授权地区已对齐（北京、上海、杭州），等待店长复核",
+      "newValue": "录音师小段已补全音频备注（原：北京、上海 → 新：北京、上海、杭州，原备注：\"音频正常，注意：实际授权地区包含杭州，票务表中可能遗漏\"），异常已解决，请店长复核。备注：已确认杭州为合同内合法授权地区，补全备注。原备注：\"音频正常，注意：实际授权地区包含杭州，票务表中可能遗漏\"",
+      "changedBy": "录音师小段",
+      "changeReason": "已确认杭州为合同内合法授权地区，补全备注。原备注：\"音频正常，注意：实际授权地区包含杭州，票务表中可能遗漏\"",
+      "changedAt": "2026-06-12T08:40:00.928Z"
+    },
+    {
+      "id": "HIS-1781253600928-z097qkg0a",
+      "ticketId": "TK20250601002",
+      "entityType": "verification",
+      "entityId": "HX20250601002",
+      "fieldName": "status",
+      "oldValue": "pending",
+      "newValue": "verified",
+      "changedBy": "店长",
+      "changeReason": "已核对北京,上海,杭州均为有效授权地区，同意核销",
+      "changedAt": "2026-06-12T08:40:00.928Z"
+    },
+    {
+      "id": "HIS-1781253600929-f6t53nw9h",
+      "ticketId": "TK20250601002",
+      "entityType": "verification",
+      "entityId": "HX20250601002",
+      "fieldName": "reviewedBy",
+      "oldValue": "null",
+      "newValue": "店长",
+      "changedBy": "店长",
+      "changeReason": "已核对北京,上海,杭州均为有效授权地区，同意核销",
+      "changedAt": "2026-06-12T08:40:00.929Z"
+    },
+    {
+      "id": "HIS-1781253600929-ucg4pqiig",
+      "ticketId": "TK20250601002",
+      "entityType": "verification",
+      "entityId": "HX20250601002",
+      "fieldName": "nextAction",
+      "oldValue": "店长",
+      "newValue": "系统",
+      "changedBy": "店长",
+      "changeReason": "已核对北京,上海,杭州均为有效授权地区，同意核销",
+      "changedAt": "2026-06-12T08:40:00.929Z"
+    },
+    {
+      "id": "HIS-1781253600930-u1jgekec3",
+      "ticketId": "TK20250601002",
+      "entityType": "verification",
+      "entityId": "HX20250601002",
+      "fieldName": "actionNotes",
+      "oldValue": "录音师小段已补全音频备注（原：北京、上海 → 新：北京、上海、杭州，原备注：\"音频正常，注意：实际授权地区包含杭州，票务表中可能遗漏\"），异常已解决，请店长复核。备注：已确认杭州为合同内合法授权地区，补全备注。原备注：\"音频正常，注意：实际授权地区包含杭州，票务表中可能遗漏\"",
+      "newValue": "店长复核通过：已核对北京,上海,杭州均为有效授权地区，同意核销",
+      "changedBy": "店长",
+      "changeReason": "已核对北京,上海,杭州均为有效授权地区，同意核销",
+      "changedAt": "2026-06-12T08:40:00.930Z"
+    }
+  ],
+  "initializedAt": "2026-06-12T08:40:00.931Z"
+}

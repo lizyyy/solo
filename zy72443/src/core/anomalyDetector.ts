@@ -12,16 +12,16 @@ import { dataStore } from './dataStore';
 const STANDARD_CITIES = ['北京', '上海', '广州', '深圳', '杭州', '成都', '武汉', '南京', '重庆', '西安'];
 
 export function detectMissingCities(
-  ticket: TicketExport,
-  audioRemark: AudioFileRemark
+  ticketCities: string[],
+  audioCities: string[]
 ): string[] {
-  const ticketCities = new Set(ticket.authorizedCities);
-  const audioCities = new Set(audioRemark.actualAuthorizedCities);
+  const ticketCitySet = new Set(ticketCities);
+  const audioCitySet = new Set(audioCities);
   
   const missingInTicket: string[] = [];
   
-  for (const city of audioCities) {
-    if (!ticketCities.has(city)) {
+  for (const city of audioCitySet) {
+    if (!ticketCitySet.has(city)) {
       missingInTicket.push(city);
     }
   }
@@ -98,44 +98,92 @@ export function flagVerificationAsReserved(
 
 export function processTicketWithAudio(
   ticket: TicketExport,
-  audioRemark: AudioFileRemark
+  audioRemark: AudioFileRemark,
+  opts?: { isRecheck?: boolean }
 ): { 
   verification: LessonVerification; 
-  anomalies: AnomalyRecord[] 
+  anomalies: AnomalyRecord[];
+  newlyCreatedAnomalies: AnomalyRecord[];
+  newlyResolvedAnomalies: AnomalyRecord[];
 } {
-  const verification = createInitialVerification(ticket);
-  dataStore.addVerification(verification);
+  const isRecheck = opts?.isRecheck || false;
   
-  const missingCities = detectMissingCities(ticket, audioRemark);
-  const anomalies: AnomalyRecord[] = [];
+  let verification = dataStore.getVerificationByTicket(ticket.ticketId);
+  if (!verification) {
+    verification = createInitialVerification(ticket);
+    dataStore.addVerification(verification);
+  }
+  
+  const baseCities = isRecheck ? verification.authorizedCities : ticket.authorizedCities;
+  const missingCities = detectMissingCities(baseCities, audioRemark.actualAuthorizedCities);
+  const existingAnomalies = dataStore.getAnomaliesByTicket(ticket.ticketId).filter(
+    a => a.type === AnomalyType.MISSING_AUTHORIZED_CITY
+  );
+  
+  const newlyCreatedAnomalies: AnomalyRecord[] = [];
+  const newlyResolvedAnomalies: AnomalyRecord[] = [];
   
   if (missingCities.length > 0) {
-    const anomaly = createMissingCityAnomaly(ticket, audioRemark, missingCities);
-    dataStore.addAnomaly(anomaly);
-    anomalies.push(anomaly);
+    const unresolvedExisting = existingAnomalies.filter(a => !a.resolved);
     
-    const updatedVerification = flagVerificationAsReserved(verification, anomaly, missingCities);
-    dataStore.updateVerification(verification.verificationNo, updatedVerification);
-    
-    ticket.status = SplitStatus.ANOMALY_DETECTED;
-    dataStore.addTicket(ticket);
-    
-    return { verification: updatedVerification, anomalies };
+    if (unresolvedExisting.length === 0) {
+      const anomaly = createMissingCityAnomaly(ticket, audioRemark, missingCities);
+      dataStore.addAnomaly(anomaly);
+      newlyCreatedAnomalies.push(anomaly);
+      
+      const updatedVerification = flagVerificationAsReserved(verification, anomaly, missingCities);
+      dataStore.updateVerification(
+        verification.verificationNo,
+        updatedVerification,
+        isRecheck ? { changedBy: '系统', changeReason: '重新校验发现授权地区异常' } : undefined
+      );
+      verification = updatedVerification;
+      
+      ticket.status = SplitStatus.ANOMALY_DETECTED;
+      dataStore.addTicket(ticket);
+      
+      return { verification, anomalies: [anomaly, ...existingAnomalies.filter(a => a.resolved)], newlyCreatedAnomalies, newlyResolvedAnomalies };
+    } else {
+      return { verification, anomalies: existingAnomalies, newlyCreatedAnomalies, newlyResolvedAnomalies };
+    }
+  }
+  
+  for (const anomaly of existingAnomalies) {
+    if (!anomaly.resolved) {
+      const resolved = dataStore.resolveAnomaly(
+        anomaly.id, 
+        '系统', 
+        `补录后重新校验：授权地区已对齐（${audioRemark.actualAuthorizedCities.join('、')}）`
+      );
+      if (resolved) {
+        newlyResolvedAnomalies.push(resolved);
+      }
+    }
   }
   
   ticket.status = SplitStatus.AUDIO_CHECKED;
-  dataStore.addTicket(ticket);
+  dataStore.addTicket(ticket, isRecheck ? { changedBy: '系统', changeReason: '补录后重新校验通过' } : undefined);
   
   const cleanVerification: LessonVerification = {
     ...verification,
     status: 'pending',
+    reservedReason: '',
+    missingMaterials: [],
     nextAction: NextActionOwner.MANAGER,
-    actionNotes: '数据校验通过，等待店长复核',
+    actionNotes: isRecheck 
+      ? `录音师补录后重新校验通过，授权地区已对齐（${audioRemark.actualAuthorizedCities.join('、')}），等待店长复核`
+      : '数据校验通过，等待店长复核',
     updatedAt: new Date().toISOString()
   };
-  dataStore.updateVerification(verification.verificationNo, cleanVerification);
+  dataStore.updateVerification(
+    verification.verificationNo,
+    cleanVerification,
+    isRecheck ? { changedBy: '系统', changeReason: '补录后重新校验通过' } : undefined
+  );
   
-  return { verification: cleanVerification, anomalies };
+  const allAnomalies = dataStore.getAnomaliesByTicket(ticket.ticketId);
+  
+  return { verification: cleanVerification, anomalies: allAnomalies, newlyCreatedAnomalies, newlyResolvedAnomalies };
 }
 
 export function getStandardCities(): string[] {

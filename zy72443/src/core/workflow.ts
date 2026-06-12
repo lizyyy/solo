@@ -4,7 +4,8 @@ import {
   LessonVerification, 
   AnomalyRecord,
   SplitStatus,
-  NextActionOwner
+  NextActionOwner,
+  ChangeHistory
 } from '../models';
 import { dataStore } from './dataStore';
 import { processTicketWithAudio } from './anomalyDetector';
@@ -14,6 +15,7 @@ export interface ReviewContext {
   audioRemark: AudioFileRemark | undefined;
   verification: LessonVerification | undefined;
   anomalies: AnomalyRecord[];
+  changeHistories: ChangeHistory[];
 }
 
 export function getReviewContext(ticketId: string): ReviewContext | null {
@@ -23,8 +25,9 @@ export function getReviewContext(ticketId: string): ReviewContext | null {
   const audioRemark = dataStore.getAudioRemarkByTicket(ticketId);
   const verification = dataStore.getVerificationByTicket(ticketId);
   const anomalies = dataStore.getAnomaliesByTicket(ticketId);
+  const changeHistories = dataStore.getChangeHistoriesByTicket(ticketId);
 
-  return { ticket, audioRemark, verification, anomalies };
+  return { ticket, audioRemark, verification, anomalies, changeHistories };
 }
 
 export function managerReview(
@@ -47,7 +50,7 @@ export function managerReview(
     if (unresolvedAnomalies.length > 0) {
       return { 
         success: false, 
-        message: `票单 ${ticketId} 存在未解决的异常，无法直接通过。请先处理异常或选择"转交录音师"。` 
+        message: `票单 ${ticketId} 存在 ${unresolvedAnomalies.length} 条未解决的异常（${unresolvedAnomalies.map(a => a.id).join(', ')}），无法直接通过。请先让录音师小段补录后再复核。` 
       };
     }
 
@@ -59,15 +62,16 @@ export function managerReview(
         nextAction: NextActionOwner.SYSTEM,
         actionNotes: `店长复核通过：${reviewNotes}`,
         verifiedAt: new Date().toISOString()
-      }
+      },
+      { changedBy: '店长', changeReason: reviewNotes }
     );
 
     ticket.status = SplitStatus.MANAGER_REVIEWED;
-    dataStore.addTicket(ticket);
+    dataStore.addTicket(ticket, { changedBy: '店长', changeReason: reviewNotes });
 
     return { 
       success: true, 
-      message: `票单 ${ticketId} 复核通过，课时核销单已确认`,
+      message: `票单 ${ticketId} 复核通过，课时核销单已确认（状态：已核销）`,
       verification: updatedVerification
     };
   }
@@ -78,12 +82,13 @@ export function managerReview(
       {
         nextAction: NextActionOwner.AUDIO_ENGINEER,
         actionNotes: `店长复核意见：${reviewNotes}。已转交录音师小段补录音频文件备注。`
-      }
+      },
+      { changedBy: '店长', changeReason: reviewNotes }
     );
 
     return { 
       success: true, 
-      message: `票单 ${ticketId} 已转交录音师小段处理`,
+      message: `票单 ${ticketId} 已转交录音师小段处理（下一步：录音师小段）`,
       verification: updatedVerification
     };
   }
@@ -166,7 +171,13 @@ export function engineerUpdateAudioRemark(
   ticketId: string,
   updatedCities: string[],
   remark: string
-): { success: boolean; message: string; audioRemark?: AudioFileRemark; verification?: LessonVerification } {
+): { 
+  success: boolean; 
+  message: string; 
+  audioRemark?: AudioFileRemark; 
+  verification?: LessonVerification;
+  resolvedAnomalies?: AnomalyRecord[];
+} {
   const context = getReviewContext(ticketId);
   if (!context) {
     return { success: false, message: `未找到票单 ${ticketId}` };
@@ -180,6 +191,9 @@ export function engineerUpdateAudioRemark(
     return { success: false, message: `票单 ${ticketId} 暂无课时核销单` };
   }
 
+  const oldCities = [...verification.authorizedCities];
+  const oldRemark = audioRemark.remark;
+
   const updatedAudioRemark: AudioFileRemark = {
     ...audioRemark,
     actualAuthorizedCities: updatedCities,
@@ -187,31 +201,45 @@ export function engineerUpdateAudioRemark(
     updatedBy: '录音师小段',
     updatedAt: new Date().toISOString()
   };
-  dataStore.addAudioRemark(updatedAudioRemark);
+  dataStore.addAudioRemark(updatedAudioRemark, { 
+    changedBy: '录音师小段', 
+    changeReason: remark 
+  });
 
-  const result = processTicketWithAudio(ticket, updatedAudioRemark);
+  dataStore.updateVerification(
+    verification.verificationNo,
+    { authorizedCities: [...updatedCities] },
+    { changedBy: '录音师小段', changeReason: remark }
+  );
 
+  const result = processTicketWithAudio(ticket, updatedAudioRemark, { isRecheck: true });
+
+  const hasUnresolved = result.anomalies.some(a => !a.resolved);
   const updatedVerification = dataStore.updateVerification(
     verification.verificationNo,
     {
-      ...result.verification,
-      nextAction: result.verification.status === 'reserved' 
-        ? NextActionOwner.MANAGER 
-        : NextActionOwner.MANAGER,
-      actionNotes: result.verification.status === 'reserved'
-        ? `录音师小段已更新音频备注，但仍存在异常，请店长再次复核。最新备注：${remark}`
-        : `录音师小段已补全音频备注，异常已解决，请店长复核。备注：${remark}`
-    }
+      nextAction: NextActionOwner.MANAGER,
+      actionNotes: hasUnresolved
+        ? `录音师小段已更新音频备注（原：${oldCities.join('、')} → 新：${updatedCities.join('、')}，原备注："${oldRemark}"），但仍存在异常，请店长再次复核。最新备注：${remark}`
+        : `录音师小段已补全音频备注（原：${oldCities.join('、')} → 新：${updatedCities.join('、')}，原备注："${oldRemark}"），异常已解决，请店长复核。备注：${remark}`,
+      reservedReason: hasUnresolved ? result.verification.reservedReason : '',
+      missingMaterials: hasUnresolved ? result.verification.missingMaterials : [],
+      status: hasUnresolved ? 'reserved' : 'pending'
+    },
+    { changedBy: '录音师小段', changeReason: remark }
   );
 
   ticket.status = SplitStatus.AUDIO_FIXED;
-  dataStore.addTicket(ticket);
+  dataStore.addTicket(ticket, { changedBy: '录音师小段', changeReason: remark });
 
   return {
     success: true,
-    message: `票单 ${ticketId} 音频备注已更新`,
+    message: hasUnresolved
+      ? `票单 ${ticketId} 音频备注已更新（${oldCities.join('、')} → ${updatedCities.join('、')}），但仍有异常待店长复核`
+      : `票单 ${ticketId} 音频备注已更新（${oldCities.join('、')} → ${updatedCities.join('、')}），异常已解决，等待店长最终复核`,
     audioRemark: updatedAudioRemark,
-    verification: updatedVerification
+    verification: updatedVerification,
+    resolvedAnomalies: result.newlyResolvedAnomalies
   };
 }
 
@@ -235,7 +263,7 @@ export function resolveAnomalyByManager(
         missingMaterials: [],
         nextAction: NextActionOwner.MANAGER,
         actionNotes: `异常已处理：${resolutionNotes}。等待店长最终复核。`
-      });
+      }, { changedBy: '店长', changeReason: resolutionNotes });
     }
   }
 
@@ -246,14 +274,24 @@ export function resolveAnomalyByManager(
   };
 }
 
-export function runFullDemoWorkflow(): {
+export function runFullDemoWorkflow(forceReset: boolean = true): {
   tickets: TicketExport[];
   audioRemarks: AudioFileRemark[];
   verifications: LessonVerification[];
   anomalies: AnomalyRecord[];
 } {
-  dataStore.clear();
+  if (forceReset) {
+    dataStore.clear();
+  } else if (dataStore.hasData()) {
+    return {
+      tickets: dataStore.getAllTickets(),
+      audioRemarks: dataStore.getAllAudioRemarks(),
+      verifications: dataStore.getAllVerifications(),
+      anomalies: dataStore.getAllAnomalies()
+    };
+  }
   
+  const { importSampleTickets } = require('./ticketImporter');
   const tickets = importSampleTickets();
   const audioRemarks = createSampleAudioRemarks();
 
@@ -270,9 +308,4 @@ export function runFullDemoWorkflow(): {
     verifications: dataStore.getAllVerifications(),
     anomalies: dataStore.getAllAnomalies()
   };
-}
-
-function importSampleTickets(): TicketExport[] {
-  const { importSampleTickets } = require('./ticketImporter');
-  return importSampleTickets();
 }
