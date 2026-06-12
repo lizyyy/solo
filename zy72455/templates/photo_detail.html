@@ -22,6 +22,42 @@
 </div>
 
 <div class="card">
+    <h2>人工改动记录</h2>
+    {% if photo.manual_changes %}
+    <table>
+        <thead>
+            <tr>
+                <th>修改时间</th>
+                <th>字段</th>
+                <th>改前值</th>
+                <th>改后值</th>
+                <th>操作人</th>
+                <th>修改原因</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for change in photo.manual_changes|reverse %}
+            <tr>
+                <td class="muted" style="font-size: 12px;">{{ change.change_timestamp|datetime_format }}</td>
+                <td>{{ change.field_name }}</td>
+                <td style="color: #c62828; font-family: monospace; font-size: 12px; max-width: 200px; word-break: break-all;">
+                    {{ change.old_value if change.old_value is not none else '(空)' }}
+                </td>
+                <td style="color: #2e7d32; font-family: monospace; font-size: 12px; max-width: 200px; word-break: break-all;">
+                    {{ change.new_value if change.new_value is not none else '(空)' }}
+                </td>
+                <td>{{ change.operator }}</td>
+                <td class="muted" style="font-size: 12px;">{{ change.reason }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="muted">暂无人工改动记录</div>
+    {% endif %}
+</div>
+
+<div class="card">
     <h2>原始数据溯源</h2>
     <div class="details">
         <div><strong>原始行号：</strong>第 {{ photo.original_row.row_number }} 行</div>

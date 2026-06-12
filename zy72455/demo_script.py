@@ -57,12 +57,12 @@ def demo():
     ]
     
     result = workflow.step1_import_photos(sample_data, "demo_batch_1.csv", "市政巡检员-小付")
-    print(f"✓ 第一次导入: 成功 {result['success_count']} 条，跳过 {result['skipped_count']} 条")
+    print(f"✓ 第一次导入: 成功 {result['new_count']} 条，跳过 {result['reused_count']} 条")
     print(f"  说明: {result['note']}")
     
     print("\n  测试重复导入同一批数据...")
     result2 = workflow.step1_import_photos(sample_data, "demo_batch_1.csv", "市政巡检员-小付")
-    print(f"✓ 第二次导入: 成功 {result2['success_count']} 条，跳过 {result2['skipped_count']} 条")
+    print(f"✓ 第二次导入: 成功 {result2['new_count']} 条，跳过 {result2['reused_count']} 条")
     print(f"  结论: 重复数据不会导致数量翻倍 ✓")
 
     print_separator("【第二步】市政巡检员小付补录公交刷卡时段")
@@ -167,10 +167,57 @@ def demo():
     print(f"✓ 回滚完成:")
     print(f"  从 {result['old_status']} → {result['new_status']}")
     print(f"  原因: {result['reason']}")
+    
+    photo_after_rollback = dm.get_photo(photo.photo_id)
+    print(f"  复核意见已清除: {photo_after_rollback.review_note is None}")
+
+    print_separator("【继续回滚测试 - 逐级回滚验证】")
+    
+    print(f"\n当前状态: {photo_after_rollback.current_status.value}")
+    
+    # 继续回滚到热力图已生成
+    result2 = workflow.rollback(photo.photo_id, "管理员", "继续回滚验证链路")
+    print(f"✓ 二级回滚: {result2['old_status']} → {result2['new_status']}")
+    
+    # 继续回滚到公交刷卡已补录
+    result3 = workflow.rollback(photo.photo_id, "管理员", "继续回滚验证链路")
+    print(f"✓ 三级回滚: {result3['old_status']} → {result3['new_status']}")
+    
+    # 继续回滚到已导入
+    result4 = workflow.rollback(photo.photo_id, "管理员", "继续回滚验证链路")
+    print(f"✓ 四级回滚: {result4['old_status']} → {result4['new_status']}")
+    
+    # 验证不可回滚
+    result5 = workflow.rollback(photo.photo_id, "管理员", "测试不可回滚")
+    print(f"✓ 已导入状态回滚尝试: success={result5['success']}, error={result5.get('error','')}")
 
     print_separator("【新同事验证：只看热力图找问题】")
     
-    photo_final = dm.get_photo(photo.photo_id)
+    photo_for_heatmap = dm.get_photos_by_status(ProcessingStatus.IMPORTED)[0]
+    
+    workflow.step2_add_bus_card_hours(
+        photo_for_heatmap.photo_id,
+        ["07:30-09:30", "16:30-18:30"],
+        "市政巡检员-新同事",
+        "新同事验证测试"
+    )
+    
+    low_sampling_heatmap = {
+        "hourly_samples": {
+            "0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 1, "6": 3,
+            "7": 90, "8": 110, "9": 85, "10": 75, "11": 70, "12": 72,
+            "13": 68, "14": 70, "15": 72, "16": 80, "17": 95, "18": 90,
+            "19": 30, "20": 2, "21": 1, "22": 0, "23": 0,
+        }
+    }
+    
+    workflow.step3_generate_heatmap(
+        photo_for_heatmap.photo_id,
+        low_sampling_heatmap,
+        "系统自动生成"
+    )
+    
+    photo_final = dm.get_photo(photo_for_heatmap.photo_id)
     grid = generate_heatmap_grid(photo_final.heatmap_data["hourly_samples"])
     has_anomaly, anomaly_msg = detect_anomaly_from_grid(grid)
     

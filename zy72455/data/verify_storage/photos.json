@@ -1,0 +1,185 @@
+{
+  "a8e369b4948332ff": {
+    "photo_id": "a8e369b4948332ff",
+    "intersection_name": "测试路口A",
+    "original_row": {
+      "row_number": 1,
+      "raw_data": {
+        "路口名称": "测试路口A",
+        "拍摄时间": "2024-06-12"
+      },
+      "source_file": "test_rollback.csv",
+      "import_timestamp": "2026-06-12T19:58:15.961542"
+    },
+    "current_status": "已导入",
+    "manual_changes": [],
+    "bus_card_hours": null,
+    "heatmap_data": null,
+    "heatmap_issue": "无异常",
+    "review_note": null,
+    "remark": null,
+    "created_at": "2026-06-12T19:58:15.961550",
+    "updated_at": "2026-06-12T19:58:15.964543"
+  },
+  "a43e4ddd699ca782": {
+    "photo_id": "a43e4ddd699ca782",
+    "intersection_name": "重复测试路口1",
+    "original_row": {
+      "row_number": 1,
+      "raw_data": {
+        "路口名称": "重复测试路口1",
+        "拍摄时间": "2024-06-12",
+        "备注": "第一条"
+      },
+      "source_file": "dedup_test.csv",
+      "import_timestamp": "2026-06-12T19:58:15.965035"
+    },
+    "current_status": "已导入",
+    "manual_changes": [],
+    "bus_card_hours": null,
+    "heatmap_data": null,
+    "heatmap_issue": "无异常",
+    "review_note": null,
+    "remark": null,
+    "created_at": "2026-06-12T19:58:15.965037",
+    "updated_at": "2026-06-12T19:58:15.965037"
+  },
+  "97cb8e83e5a04ba4": {
+    "photo_id": "97cb8e83e5a04ba4",
+    "intersection_name": "重复测试路口2",
+    "original_row": {
+      "row_number": 2,
+      "raw_data": {
+        "路口名称": "重复测试路口2",
+        "拍摄时间": "2024-06-12",
+        "备注": "第二条"
+      },
+      "source_file": "dedup_test.csv",
+      "import_timestamp": "2026-06-12T19:58:15.965046"
+    },
+    "current_status": "已导入",
+    "manual_changes": [],
+    "bus_card_hours": null,
+    "heatmap_data": null,
+    "heatmap_issue": "无异常",
+    "review_note": null,
+    "remark": null,
+    "created_at": "2026-06-12T19:58:15.965047",
+    "updated_at": "2026-06-12T19:58:15.965047"
+  },
+  "9a9bc33667ad04ed": {
+    "photo_id": "9a9bc33667ad04ed",
+    "intersection_name": "重复测试路口3",
+    "original_row": {
+      "row_number": 3,
+      "raw_data": {
+        "路口名称": "重复测试路口3",
+        "拍摄时间": "2024-06-12",
+        "备注": "第三条新增"
+      },
+      "source_file": "dedup_test.csv",
+      "import_timestamp": "2026-06-12T19:58:15.966115"
+    },
+    "current_status": "已导入",
+    "manual_changes": [],
+    "bus_card_hours": null,
+    "heatmap_data": null,
+    "heatmap_issue": "无异常",
+    "review_note": null,
+    "remark": null,
+    "created_at": "2026-06-12T19:58:15.966117",
+    "updated_at": "2026-06-12T19:58:15.966117"
+  },
+  "6f4e92e6438c5dde": {
+    "photo_id": "6f4e92e6438c5dde",
+    "intersection_name": "备注测试路口",
+    "original_row": {
+      "row_number": 1,
+      "raw_data": {
+        "路口名称": "备注测试路口",
+        "拍摄时间": "2024-06-12"
+      },
+      "source_file": "remark_test.csv",
+      "import_timestamp": "2026-06-12T19:58:15.967186"
+    },
+    "current_status": "复核通过-夜间缺采样",
+    "manual_changes": [
+      {
+        "field_name": "remark",
+        "old_value": null,
+        "new_value": "街口招牌有松动，需要重点关注，建议下周复查",
+        "operator": "市政巡检员-小付",
+        "change_timestamp": "2026-06-12T19:58:15.969822",
+        "reason": "现场复查后补充备注"
+      },
+      {
+        "field_name": "remark",
+        "old_value": "街口招牌有松动，需要重点关注，建议下周复查",
+        "new_value": "已通知施工队下周一进场维修招牌",
+        "operator": "市政巡检员-小付",
+        "change_timestamp": "2026-06-12T19:58:15.970627",
+        "reason": "跟进进度，更新备注"
+      }
+    ],
+    "bus_card_hours": [
+      "08:00-10:00"
+    ],
+    "heatmap_data": {
+      "hourly_samples": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 100,
+        "8": 100,
+        "9": 100,
+        "10": 100,
+        "11": 100,
+        "12": 100,
+        "13": 100,
+        "14": 100,
+        "15": 100,
+        "16": 100,
+        "17": 100,
+        "18": 100,
+        "19": 100,
+        "20": 100,
+        "21": 100,
+        "22": 0,
+        "23": 0
+      }
+    },
+    "heatmap_issue": "夜间缺采样导致热力图偏低",
+    "review_note": "确认夜间缺采样",
+    "remark": "已通知施工队下周一进场维修招牌",
+    "created_at": "2026-06-12T19:58:15.967193",
+    "updated_at": "2026-06-12T19:58:15.970629"
+  },
+  "bee7347e7d82dcf2": {
+    "photo_id": "bee7347e7d82dcf2",
+    "intersection_name": "历史追溯测试路口",
+    "original_row": {
+      "row_number": 1,
+      "raw_data": {
+        "路口名称": "历史追溯测试路口",
+        "拍摄时间": "2024-06-12"
+      },
+      "source_file": "history_test.csv",
+      "import_timestamp": "2026-06-12T19:58:15.971459"
+    },
+    "current_status": "公交刷卡时段已补录",
+    "manual_changes": [],
+    "bus_card_hours": [
+      "09:00-11:00"
+    ],
+    "heatmap_data": null,
+    "heatmap_issue": "无异常",
+    "review_note": null,
+    "remark": null,
+    "created_at": "2026-06-12T19:58:15.971461",
+    "updated_at": "2026-06-12T19:58:15.976471"
+  }
+}

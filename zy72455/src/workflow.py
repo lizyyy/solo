@@ -18,13 +18,30 @@ class WorkflowEngine:
         operator: str,
     ) -> Dict[str, Any]:
         imported, skipped = self.dm.import_photos(rows, source_file, operator)
+        
+        imported_details = [
+            {
+                "photo_id": p.photo_id,
+                "intersection_name": p.intersection_name,
+                "row_number": p.original_row.row_number,
+                "type": "新增",
+            }
+            for p in imported
+        ]
+        
+        skipped_details = [
+            {**s, "type": "复用（已存在）"}
+            for s in skipped
+        ]
+        
         return {
             "step": "步骤1: 路口照片导入",
-            "success_count": len(imported),
-            "skipped_count": len(skipped),
-            "skipped_ids": skipped,
-            "imported_ids": [p.photo_id for p in imported],
-            "note": "重复数据自动跳过，数量不翻倍（RULE_003）",
+            "total_input": len(rows),
+            "new_count": len(imported),
+            "reused_count": len(skipped),
+            "new_records": imported_details,
+            "reused_records": skipped_details,
+            "note": "重复数据自动跳过，数量不翻倍（RULE_003），复用记录保留原始状态和历史",
         }
 
     def step2_add_bus_card_hours(
@@ -201,6 +218,8 @@ class WorkflowEngine:
             photo.bus_card_hours = None
             photo.heatmap_data = None
             photo.heatmap_issue = HeatmapIssue.NONE
+            photo.review_note = None
+        elif target_status == ProcessingStatus.PENDING_REVIEW:
             photo.review_note = None
 
         self.dm._add_history_record(

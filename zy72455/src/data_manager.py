@@ -177,18 +177,24 @@ class DataManager:
         rows: List[Dict[str, Any]],
         source_file: str,
         operator: str,
-    ) -> Tuple[List[IntersectionPhoto], List[str]]:
+    ) -> Tuple[List[IntersectionPhoto], List[Dict[str, Any]]]:
         imported = []
-        skipped_ids = []
+        skipped = []
         
         for idx, row_data in enumerate(rows, start=1):
             photo_id = self._generate_photo_id(row_data, source_file)
+            intersection_name = row_data.get("路口名称", row_data.get("intersection_name", f"未知路口_{idx}"))
             
             if photo_id in self.photos:
-                skipped_ids.append(photo_id)
+                existing = self.photos[photo_id]
+                skipped.append({
+                    "photo_id": photo_id,
+                    "intersection_name": intersection_name,
+                    "row_number": idx,
+                    "original_import_time": existing.created_at.isoformat(),
+                    "current_status": existing.current_status.value,
+                })
                 continue
-            
-            intersection_name = row_data.get("路口名称", row_data.get("intersection_name", f"未知路口_{idx}"))
             
             original_row = OriginalRow(
                 row_number=idx,
@@ -215,7 +221,7 @@ class DataManager:
             imported.append(photo)
         
         self._save_data()
-        return imported, skipped_ids
+        return imported, skipped
 
     def update_field(
         self,

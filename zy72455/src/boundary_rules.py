@@ -115,6 +115,7 @@ class BoundaryRuleEngine:
             return False, "已处于回滚状态"
         
         if photo.current_status in [
+            ProcessingStatus.BUS_CARD_DATA_ADDED,
             ProcessingStatus.HEATMAP_GENERATED,
             ProcessingStatus.PENDING_REVIEW,
             ProcessingStatus.REVIEWED_NORMAL,
@@ -131,9 +132,15 @@ class BoundaryRuleEngine:
             ProcessingStatus.BUS_CARD_DATA_ADDED,
             ProcessingStatus.HEATMAP_GENERATED,
             ProcessingStatus.PENDING_REVIEW,
+        ]
+        
+        reviewed_statuses = [
             ProcessingStatus.REVIEWED_NORMAL,
             ProcessingStatus.REVIEWED_LOW_SAMPLING,
         ]
+        
+        if photo.current_status in reviewed_statuses:
+            return ProcessingStatus.PENDING_REVIEW
         
         current_idx = None
         for i, s in enumerate(status_flow):
