@@ -279,6 +279,9 @@
             to { transform: translateX(0); opacity: 1; }
         }
 
+        .badge-reused { background: #e6f7ff; color: #1890ff; }
+        .badge-new { background: #f6ffed; color: #52c41a; }
+
         .batch-list {
             display: flex;
             gap: 10px;
@@ -344,12 +347,13 @@
                     <thead>
                         <tr>
                             <th>原始行号</th>
+                            <th>来源</th>
                             <th>点位编号</th>
                             <th>点位名称</th>
                             <th>地址</th>
+                            <th>经度</th>
+                            <th>纬度</th>
                             <th>街道</th>
-                            <th>巡查员</th>
-                            <th>原始结论</th>
                             <th>当前结论</th>
                             <th>状态</th>
                             <th>标记</th>
@@ -469,6 +473,9 @@
                     ${batch.filename} (${batch.total_records}条)
                     ${batch.boundary_count > 0 ? `<span class="badge badge-boundary">边界${batch.boundary_count}</span>` : ''}
                     ${batch.duplicate_count > 0 ? `<span class="badge badge-duplicate">重复${batch.duplicate_count}</span>` : ''}
+                    ${batch.cross_batch_duplicate_count > 0 ? `<span class="badge badge-reused">跨批重复${batch.cross_batch_duplicate_count}</span>` : ''}
+                    ${batch.reused_count > 0 ? `<span class="badge badge-reused">复用${batch.reused_count}</span>` : ''}
+                    ${batch.new_added_count > 0 ? `<span class="badge badge-new">新增${batch.new_added_count}</span>` : ''}
                 </div>`;
             });
             container.innerHTML = html;
@@ -503,20 +510,32 @@
                 'duplicate': '重复'
             };
 
+            const sourceMap = {
+                'new_import': '新增',
+                'new_boundary': '新增边界',
+                'reused': '复用',
+                'batch_duplicate': '批次内重复'
+            };
+
             tbody.innerHTML = records.map(r => `
                 <tr>
                     <td>${r.original_row_number || '-'}</td>
+                    <td>
+                        ${r.is_reused ? '<span class="badge badge-reused">复用</span>' : '<span class="badge badge-new">新增</span>'}
+                        ${r.is_cross_batch_duplicate ? '<span class="badge badge-boundary">跨批重复</span>' : ''}
+                    </td>
                     <td>${r.point_id || '-'}</td>
                     <td>${r.point_name || '-'}</td>
                     <td>${r.address || '-'}</td>
+                    <td style="font-family: monospace; font-size: 12px;">${r.longitude ? r.longitude.toFixed(6) : '-'}</td>
+                    <td style="font-family: monospace; font-size: 12px;">${r.latitude ? r.latitude.toFixed(6) : '-'}</td>
                     <td>${r.street || '-'}</td>
-                    <td>${r.inspector || '-'}</td>
-                    <td style="color: #8c8c8c;">${r.original_conclusion || '-'}</td>
                     <td><strong>${r.current_conclusion || '-'}</strong></td>
                     <td><span class="status-tag status-${r.status}">${statusMap[r.status] || r.status}</span></td>
                     <td>
                         ${r.is_boundary_point ? '<span class="badge badge-boundary">边界</span>' : ''}
                         ${r.is_duplicate ? '<span class="badge badge-duplicate">重复</span>' : ''}
+                        ${r.reused_from_batch_id ? `<span class="badge badge-reused" title="来源批次">←${r.reused_from_batch_id.slice(-4)}</span>` : ''}
                     </td>
                     <td>
                         <button class="btn btn-sm btn-default" onclick="openEditModal(${r.id})">编辑</button>
