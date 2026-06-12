@@ -1,166 +1,284 @@
 {
   "records": [
     {
-      "record_id": "478fbea7-1b65-4419-af7a-f8db5094c128",
+      "record_id": "448d0de0-9163-4787-861e-3f77f4ade24f",
       "live_name": "夜曲",
       "copyright_name": "夜曲",
       "region": "中国大陆",
       "status": "imported",
       "import_source": "group_chat_import",
       "original_row_number": 1,
-      "import_time": "2026-06-06T23:38:30.516580",
-      "evidences": [],
+      "import_time": "2026-06-12T07:54:13.737749",
+      "evidences": [
+        {
+          "evidence_id": "0bc4a5ef-4d0a-4673-bc47-772b518cf96d",
+          "evidence_type": "group_chat",
+          "source": "sample_group_chat.json:行1",
+          "content": "排练群接龙第1行: 现场名=夜曲, 版权名=夜曲, 授权地域=中国大陆",
+          "recorded_at": "2026-06-12T07:54:13.737962",
+          "operator": "小助理"
+        }
+      ],
       "manual_changes": [],
       "status_history": [
         [
           "imported",
-          "2026-06-06T23:38:30.516588",
+          "2026-06-12T07:54:13.737757",
           "system"
         ]
       ],
-      "metadata": {}
+      "metadata": {
+        "original_row_data": {
+          "现场名": "夜曲",
+          "版权名": "夜曲",
+          "授权地域": "中国大陆"
+        }
+      }
     },
     {
-      "record_id": "cb969688-f67e-45f5-add8-2152b9d102a2",
+      "record_id": "5eec3c69-a234-4c5f-a59f-e762e1efe04e",
       "live_name": "七里香live",
       "copyright_name": "七里香",
       "region": "中国大陆",
-      "status": "name_conflict",
+      "status": "teacher_review",
       "import_source": "group_chat_import",
       "original_row_number": 2,
-      "import_time": "2026-06-06T23:38:30.516771",
-      "evidences": [],
+      "import_time": "2026-06-12T07:54:13.737969",
+      "evidences": [
+        {
+          "evidence_id": "c300c360-9445-4f1c-ae0d-85728f5710d7",
+          "evidence_type": "group_chat",
+          "source": "sample_group_chat.json:行2",
+          "content": "排练群接龙第2行: 现场名=七里香live, 版权名=七里香, 授权地域=中国大陆",
+          "recorded_at": "2026-06-12T07:54:13.738278",
+          "operator": "小助理"
+        },
+        {
+          "evidence_id": "70c860a3-892e-4816-bd8c-696440d63a0b",
+          "evidence_type": "contract_screenshot",
+          "source": "合同页_七里香.png",
+          "content": "合同第2页，授权地域中国大陆，版权方印章清晰",
+          "recorded_at": "2026-06-12T07:54:14.370912",
+          "operator": "小段"
+        }
+      ],
       "manual_changes": [],
       "status_history": [
         [
           "imported",
-          "2026-06-06T23:38:30.516773",
+          "2026-06-12T07:54:13.737971",
           "system"
         ],
         [
           "name_conflict",
-          "2026-06-06T23:38:30.516776",
+          "2026-06-12T07:54:13.737972",
           "小助理"
+        ],
+        [
+          "teacher_review",
+          "2026-06-12T07:54:14.370918",
+          "小段"
         ]
       ],
-      "metadata": {}
+      "metadata": {
+        "original_row_data": {
+          "现场名": "七里香live",
+          "版权名": "七里香",
+          "授权地域": "中国大陆"
+        }
+      }
     },
     {
-      "record_id": "35225b1d-226d-4409-9644-38c398f5f91c",
+      "record_id": "5c1587b9-f400-4cdf-b493-43fce8ad482f",
       "live_name": "稻香",
       "copyright_name": "稻香",
       "region": "全球",
       "status": "imported",
       "import_source": "group_chat_import",
       "original_row_number": 3,
-      "import_time": "2026-06-06T23:38:30.516940",
-      "evidences": [],
+      "import_time": "2026-06-12T07:54:13.738284",
+      "evidences": [
+        {
+          "evidence_id": "433082a9-4860-4f3f-846b-e0ea9c56f1a7",
+          "evidence_type": "group_chat",
+          "source": "sample_group_chat.json:行3",
+          "content": "排练群接龙第3行: 现场名=稻香, 版权名=稻香, 授权地域=全球",
+          "recorded_at": "2026-06-12T07:54:13.738530",
+          "operator": "小助理"
+        }
+      ],
       "manual_changes": [],
       "status_history": [
         [
           "imported",
-          "2026-06-06T23:38:30.516942",
+          "2026-06-12T07:54:13.738285",
           "system"
         ]
       ],
-      "metadata": {}
+      "metadata": {
+        "original_row_data": {
+          "现场名": "稻香",
+          "版权名": "稻香",
+          "授权地域": "全球"
+        }
+      }
     },
     {
-      "record_id": "493425b5-5262-4a6e-9e30-22f01c583f76",
+      "record_id": "97ba42d7-fbde-4742-bd30-3999932face1",
       "live_name": "晴天(现场版)",
       "copyright_name": "晴天",
       "region": "中国大陆",
       "status": "name_conflict",
       "import_source": "group_chat_import",
       "original_row_number": 4,
-      "import_time": "2026-06-06T23:38:30.517119",
-      "evidences": [],
+      "import_time": "2026-06-12T07:54:13.738535",
+      "evidences": [
+        {
+          "evidence_id": "17cd2ed7-9710-4d07-85ef-8f6abada489d",
+          "evidence_type": "group_chat",
+          "source": "sample_group_chat.json:行4",
+          "content": "排练群接龙第4行: 现场名=晴天(现场版), 版权名=晴天, 授权地域=中国大陆",
+          "recorded_at": "2026-06-12T07:54:13.738814",
+          "operator": "小助理"
+        }
+      ],
       "manual_changes": [],
       "status_history": [
         [
           "imported",
-          "2026-06-06T23:38:30.517121",
+          "2026-06-12T07:54:13.738536",
           "system"
         ],
         [
           "name_conflict",
-          "2026-06-06T23:38:30.517122",
+          "2026-06-12T07:54:13.738538",
           "小助理"
         ]
       ],
-      "metadata": {}
+      "metadata": {
+        "original_row_data": {
+          "现场名": "晴天(现场版)",
+          "版权名": "晴天",
+          "授权地域": "中国大陆"
+        }
+      }
     },
     {
-      "record_id": "c98336de-79de-4d4f-a65c-e6e866595662",
+      "record_id": "436bcabc-74b0-4bdd-ae77-3394ac2ec7d9",
       "live_name": "青花瓷",
       "copyright_name": "青花瓷",
       "region": "中国大陆",
       "status": "imported",
       "import_source": "group_chat_import",
       "original_row_number": 5,
-      "import_time": "2026-06-06T23:38:30.517345",
-      "evidences": [],
+      "import_time": "2026-06-12T07:54:13.738818",
+      "evidences": [
+        {
+          "evidence_id": "4c59934f-a51c-4232-bc99-87602954ad71",
+          "evidence_type": "group_chat",
+          "source": "sample_group_chat.json:行5",
+          "content": "排练群接龙第5行: 现场名=青花瓷, 版权名=青花瓷, 授权地域=中国大陆",
+          "recorded_at": "2026-06-12T07:54:13.739160",
+          "operator": "小助理"
+        }
+      ],
       "manual_changes": [],
       "status_history": [
         [
           "imported",
-          "2026-06-06T23:38:30.517346",
+          "2026-06-12T07:54:13.738820",
           "system"
         ]
       ],
-      "metadata": {}
+      "metadata": {
+        "original_row_data": {
+          "现场名": "青花瓷",
+          "版权名": "青花瓷",
+          "授权地域": "中国大陆"
+        }
+      }
     },
     {
-      "record_id": "c42eec3b-9cd7-459d-bc57-c04d126f2539",
+      "record_id": "701f4e12-5f1d-4c98-80b9-bc85d33665ae",
       "live_name": "双截棍演唱会版",
       "copyright_name": "双截棍",
       "region": "中国大陆",
       "status": "name_conflict",
       "import_source": "group_chat_import",
       "original_row_number": 6,
-      "import_time": "2026-06-06T23:38:30.517593",
-      "evidences": [],
+      "import_time": "2026-06-12T07:54:13.739165",
+      "evidences": [
+        {
+          "evidence_id": "550f55be-655a-4c99-bde2-9930cad5836c",
+          "evidence_type": "group_chat",
+          "source": "sample_group_chat.json:行6",
+          "content": "排练群接龙第6行: 现场名=双截棍演唱会版, 版权名=双截棍, 授权地域=中国大陆",
+          "recorded_at": "2026-06-12T07:54:13.739591",
+          "operator": "小助理"
+        }
+      ],
       "manual_changes": [],
       "status_history": [
         [
           "imported",
-          "2026-06-06T23:38:30.517594",
+          "2026-06-12T07:54:13.739166",
           "system"
         ],
         [
           "name_conflict",
-          "2026-06-06T23:38:30.517596",
+          "2026-06-12T07:54:13.739168",
           "小助理"
         ]
       ],
-      "metadata": {}
+      "metadata": {
+        "original_row_data": {
+          "现场名": "双截棍演唱会版",
+          "版权名": "双截棍",
+          "授权地域": "中国大陆"
+        }
+      }
     },
     {
-      "record_id": "cf466640-0d8c-47ca-9d66-9b9402fa1309",
+      "record_id": "b1862d66-4289-4201-84fb-32281507f50e",
       "live_name": "东风破",
       "copyright_name": "东风破",
       "region": "中国大陆及港澳台",
       "status": "imported",
       "import_source": "group_chat_import",
       "original_row_number": 7,
-      "import_time": "2026-06-06T23:38:30.517873",
-      "evidences": [],
+      "import_time": "2026-06-12T07:54:13.739595",
+      "evidences": [
+        {
+          "evidence_id": "e60843ab-61b8-4738-971b-868e9a61caed",
+          "evidence_type": "group_chat",
+          "source": "sample_group_chat.json:行7",
+          "content": "排练群接龙第7行: 现场名=东风破, 版权名=东风破, 授权地域=中国大陆及港澳台",
+          "recorded_at": "2026-06-12T07:54:13.740110",
+          "operator": "小助理"
+        }
+      ],
       "manual_changes": [],
       "status_history": [
         [
           "imported",
-          "2026-06-06T23:38:30.517875",
+          "2026-06-12T07:54:13.739597",
           "system"
         ]
       ],
-      "metadata": {}
+      "metadata": {
+        "original_row_data": {
+          "现场名": "东风破",
+          "版权名": "东风破",
+          "授权地域": "中国大陆及港澳台"
+        }
+      }
     }
   ],
   "audit_log": [
     {
-      "timestamp": "2026-06-06T23:38:30.516592",
+      "timestamp": "2026-06-12T07:54:13.737761",
       "action": "import",
-      "record_id": "478fbea7-1b65-4419-af7a-f8db5094c128",
+      "record_id": "448d0de0-9163-4787-861e-3f77f4ade24f",
       "operator": "小助理",
       "details": {
         "live_name": "夜曲",
@@ -171,9 +289,9 @@
       }
     },
     {
-      "timestamp": "2026-06-06T23:38:30.516777",
+      "timestamp": "2026-06-12T07:54:13.737974",
       "action": "import",
-      "record_id": "cb969688-f67e-45f5-add8-2152b9d102a2",
+      "record_id": "5eec3c69-a234-4c5f-a59f-e762e1efe04e",
       "operator": "小助理",
       "details": {
         "live_name": "七里香live",
@@ -184,9 +302,9 @@
       }
     },
     {
-      "timestamp": "2026-06-06T23:38:30.516944",
+      "timestamp": "2026-06-12T07:54:13.738287",
       "action": "import",
-      "record_id": "35225b1d-226d-4409-9644-38c398f5f91c",
+      "record_id": "5c1587b9-f400-4cdf-b493-43fce8ad482f",
       "operator": "小助理",
       "details": {
         "live_name": "稻香",
@@ -197,9 +315,9 @@
       }
     },
     {
-      "timestamp": "2026-06-06T23:38:30.517124",
+      "timestamp": "2026-06-12T07:54:13.738539",
       "action": "import",
-      "record_id": "493425b5-5262-4a6e-9e30-22f01c583f76",
+      "record_id": "97ba42d7-fbde-4742-bd30-3999932face1",
       "operator": "小助理",
       "details": {
         "live_name": "晴天(现场版)",
@@ -210,9 +328,9 @@
       }
     },
     {
-      "timestamp": "2026-06-06T23:38:30.517348",
+      "timestamp": "2026-06-12T07:54:13.738821",
       "action": "import",
-      "record_id": "c98336de-79de-4d4f-a65c-e6e866595662",
+      "record_id": "436bcabc-74b0-4bdd-ae77-3394ac2ec7d9",
       "operator": "小助理",
       "details": {
         "live_name": "青花瓷",
@@ -223,9 +341,9 @@
       }
     },
     {
-      "timestamp": "2026-06-06T23:38:30.517597",
+      "timestamp": "2026-06-12T07:54:13.739169",
       "action": "import",
-      "record_id": "c42eec3b-9cd7-459d-bc57-c04d126f2539",
+      "record_id": "701f4e12-5f1d-4c98-80b9-bc85d33665ae",
       "operator": "小助理",
       "details": {
         "live_name": "双截棍演唱会版",
@@ -236,9 +354,9 @@
       }
     },
     {
-      "timestamp": "2026-06-06T23:38:30.517877",
+      "timestamp": "2026-06-12T07:54:13.739598",
       "action": "import",
-      "record_id": "cf466640-0d8c-47ca-9d66-9b9402fa1309",
+      "record_id": "b1862d66-4289-4201-84fb-32281507f50e",
       "operator": "小助理",
       "details": {
         "live_name": "东风破",
@@ -249,12 +367,23 @@
       }
     },
     {
-      "timestamp": "2026-06-06T23:38:41.515249",
+      "timestamp": "2026-06-12T07:54:14.370922",
+      "action": "add_contract_evidence",
+      "record_id": "5eec3c69-a234-4c5f-a59f-e762e1efe04e",
+      "operator": "小段",
+      "details": {
+        "evidence_id": "70c860a3-892e-4816-bd8c-696440d63a0b",
+        "source": "合同页_七里香.png",
+        "new_status": "teacher_review"
+      }
+    },
+    {
+      "timestamp": "2026-06-12T07:54:34.329284",
       "action": "export_weekly_report",
       "record_id": null,
       "operator": "system",
       "details": {
-        "output_path": "reports/actual_weekly.json",
+        "output_path": "reports/user_test_weekly.json",
         "total_records": 7
       }
     }
@@ -265,5 +394,5 @@
     "ROLLBACK_PRESERVES_HISTORY": true,
     "MIN_EVIDENCE_FOR_APPROVAL": 2
   },
-  "last_saved": "2026-06-06T23:38:41.515406"
+  "last_saved": "2026-06-12T07:54:34.329583"
 }

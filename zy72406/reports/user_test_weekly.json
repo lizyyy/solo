@@ -1,106 +1,107 @@
 {
-  "report_id": "6f04033f-9588-4e5f-bb1d-da29940837a1",
-  "generated_at": "2026-06-06T23:38:41.515010",
+  "report_id": "3a587fd5-9649-4636-bada-38cd2a925f5a",
+  "generated_at": "2026-06-12T07:54:34.328995",
   "summary": {
     "total_records": 7,
     "status_breakdown": {
       "imported": 4,
-      "name_conflict": 3
+      "teacher_review": 1,
+      "name_conflict": 2
     },
     "conflict_count": 3,
-    "awaiting_review_count": 0
+    "awaiting_review_count": 1
   },
   "records": [
     {
-      "record_id": "478fbea7-1b65-4419-af7a-f8db5094c128",
+      "record_id": "448d0de0-9163-4787-861e-3f77f4ade24f",
       "display_name": "夜曲",
       "live_name": "夜曲",
       "copyright_name": "夜曲",
       "region": "中国大陆",
       "status": "imported",
       "original_row_number": 1,
-      "group_chat_evidence_count": 0,
+      "group_chat_evidence_count": 1,
       "contract_evidence_count": 0,
       "manual_change_count": 0,
-      "last_updated": "2026-06-06T23:38:30.516588"
+      "last_updated": "2026-06-12T07:54:13.737757"
     },
     {
-      "record_id": "cb969688-f67e-45f5-add8-2152b9d102a2",
+      "record_id": "5eec3c69-a234-4c5f-a59f-e762e1efe04e",
       "display_name": "七里香",
       "live_name": "七里香live",
       "copyright_name": "七里香",
       "region": "中国大陆",
-      "status": "name_conflict",
+      "status": "teacher_review",
       "original_row_number": 2,
-      "group_chat_evidence_count": 0,
-      "contract_evidence_count": 0,
+      "group_chat_evidence_count": 1,
+      "contract_evidence_count": 1,
       "manual_change_count": 0,
-      "last_updated": "2026-06-06T23:38:30.516776"
+      "last_updated": "2026-06-12T07:54:14.370918"
     },
     {
-      "record_id": "35225b1d-226d-4409-9644-38c398f5f91c",
+      "record_id": "5c1587b9-f400-4cdf-b493-43fce8ad482f",
       "display_name": "稻香",
       "live_name": "稻香",
       "copyright_name": "稻香",
       "region": "全球",
       "status": "imported",
       "original_row_number": 3,
-      "group_chat_evidence_count": 0,
+      "group_chat_evidence_count": 1,
       "contract_evidence_count": 0,
       "manual_change_count": 0,
-      "last_updated": "2026-06-06T23:38:30.516942"
+      "last_updated": "2026-06-12T07:54:13.738285"
     },
     {
-      "record_id": "493425b5-5262-4a6e-9e30-22f01c583f76",
+      "record_id": "97ba42d7-fbde-4742-bd30-3999932face1",
       "display_name": "晴天",
       "live_name": "晴天(现场版)",
       "copyright_name": "晴天",
       "region": "中国大陆",
       "status": "name_conflict",
       "original_row_number": 4,
-      "group_chat_evidence_count": 0,
+      "group_chat_evidence_count": 1,
       "contract_evidence_count": 0,
       "manual_change_count": 0,
-      "last_updated": "2026-06-06T23:38:30.517122"
+      "last_updated": "2026-06-12T07:54:13.738538"
     },
     {
-      "record_id": "c98336de-79de-4d4f-a65c-e6e866595662",
+      "record_id": "436bcabc-74b0-4bdd-ae77-3394ac2ec7d9",
       "display_name": "青花瓷",
       "live_name": "青花瓷",
       "copyright_name": "青花瓷",
       "region": "中国大陆",
       "status": "imported",
       "original_row_number": 5,
-      "group_chat_evidence_count": 0,
+      "group_chat_evidence_count": 1,
       "contract_evidence_count": 0,
       "manual_change_count": 0,
-      "last_updated": "2026-06-06T23:38:30.517346"
+      "last_updated": "2026-06-12T07:54:13.738820"
     },
     {
-      "record_id": "c42eec3b-9cd7-459d-bc57-c04d126f2539",
+      "record_id": "701f4e12-5f1d-4c98-80b9-bc85d33665ae",
       "display_name": "双截棍",
       "live_name": "双截棍演唱会版",
       "copyright_name": "双截棍",
       "region": "中国大陆",
       "status": "name_conflict",
       "original_row_number": 6,
-      "group_chat_evidence_count": 0,
+      "group_chat_evidence_count": 1,
       "contract_evidence_count": 0,
       "manual_change_count": 0,
-      "last_updated": "2026-06-06T23:38:30.517596"
+      "last_updated": "2026-06-12T07:54:13.739168"
     },
     {
-      "record_id": "cf466640-0d8c-47ca-9d66-9b9402fa1309",
+      "record_id": "b1862d66-4289-4201-84fb-32281507f50e",
       "display_name": "东风破",
       "live_name": "东风破",
       "copyright_name": "东风破",
       "region": "中国大陆及港澳台",
       "status": "imported",
       "original_row_number": 7,
-      "group_chat_evidence_count": 0,
+      "group_chat_evidence_count": 1,
       "contract_evidence_count": 0,
       "manual_change_count": 0,
-      "last_updated": "2026-06-06T23:38:30.517875"
+      "last_updated": "2026-06-12T07:54:13.739597"
     }
   ]
 }

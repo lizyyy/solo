@@ -92,7 +92,8 @@ class CopyrightCheckEngine:
         })
         return record
 
-    def batch_import_from_group_chat(self, rows: List[Dict], operator: str) -> Tuple[List[SongRecord], List[Dict]]:
+    def batch_import_from_group_chat(self, rows: List[Dict], operator: str,
+                                      source_file: str = "group_chat") -> Tuple[List[SongRecord], List[Dict]]:
         imported = []
         errors = []
 
@@ -110,6 +111,22 @@ class CopyrightCheckEngine:
                     original_row_number=idx,
                     operator=operator
                 )
+
+                evidence_content = (
+                    f"排练群接龙第{idx}行: "
+                    f"现场名={live_name or '无'}, "
+                    f"版权名={copyright_name or '无'}, "
+                    f"授权地域={region}"
+                )
+                record.add_evidence(
+                    evidence_type=EvidenceType.GROUP_CHAT,
+                    source=f"{source_file}:行{idx}",
+                    content=evidence_content,
+                    operator=operator
+                )
+
+                record.metadata["original_row_data"] = dict(row)
+
                 imported.append(record)
             except Exception as e:
                 errors.append({"row": idx, "error": str(e), "data": row})
@@ -256,27 +273,36 @@ class CopyrightCheckEngine:
         self._save()
         return True
 
-    def rollback(self, record_id: str, operator: str, reason: str) -> bool:
+    def rollback(self, record_id: str, operator: str, reason: str,
+                 steps: int = 1) -> bool:
         record = self.records.get(record_id)
         if not record:
             return False
 
-        if len(record.status_history) < 2:
+        if len(record.status_history) <= steps:
             return False
 
-        if not BoundaryRules.ROLLBACK_PRESERVES_HISTORY:
-            record.status_history.pop()
-            prev_status = record.status_history[-1][0]
-        else:
-            prev_status_idx = len(record.status_history) - 2
-            prev_status = record.status_history[prev_status_idx][0]
+        target_idx = len(record.status_history) - 1 - steps
+        target_status = record.status_history[target_idx][0]
 
-        record.update_status(SongStatus(prev_status), f"rollback:{operator}")
-        record.update_status(SongStatus.ROLLED_BACK, operator)
+        current_status = record.status.value
+
+        record.add_evidence(
+            evidence_type=EvidenceType.MANUAL_NOTE,
+            source="rollback",
+            content=f"从 {current_status} 回滚到 {target_status}，原因: {reason}",
+            operator=operator
+        )
+
+        record.update_status(SongStatus(target_status), f"rollback:{operator}")
+
+        record.metadata["rollback_count"] = record.metadata.get("rollback_count", 0) + 1
 
         self._log_audit("rollback", record_id, operator, {
             "reason": reason,
-            "rolled_back_to": prev_status
+            "rolled_back_from": current_status,
+            "rolled_back_to": target_status,
+            "steps": steps
         })
         self._save()
         return True

@@ -86,7 +86,8 @@ def cmd_import(args):
     print(f"待导入记录数: {len(rows)}")
     print()
 
-    imported, errors = engine.batch_import_from_group_chat(rows, operator)
+    source_file = os.path.basename(args.file)
+    imported, errors = engine.batch_import_from_group_chat(rows, operator, source_file=source_file)
 
     print(f"导入完成: 成功 {len(imported)} 条, 失败 {len(errors)} 条")
     print()
@@ -248,7 +249,8 @@ def cmd_rollback(args):
     if not reason:
         reason = input("请输入回滚原因: ").strip()
 
-    success = engine.rollback(args.record_id, operator, reason)
+    steps = getattr(args, 'steps', 1)
+    success = engine.rollback(args.record_id, operator, reason, steps=steps)
 
     if not success:
         print(f"错误: 回滚失败（记录不存在或历史不足）", file=sys.stderr)
@@ -308,7 +310,7 @@ def cmd_workflow(args):
     print(f"操作人: {operator}")
     print("-" * 40)
 
-    imported, errors = engine.batch_import_from_group_chat(sample_rows, operator)
+    imported, errors = engine.batch_import_from_group_chat(sample_rows, operator, source_file="workflow_demo")
     print(f"导入完成: 成功 {len(imported)} 条")
 
     conflicts = [r for r in imported if r.has_name_conflict()]
@@ -474,6 +476,7 @@ def main():
     rollback_parser = subparsers.add_parser("rollback", help="回滚操作")
     rollback_parser.add_argument("--record-id", required=True, help="记录ID")
     rollback_parser.add_argument("--reason", help="回滚原因")
+    rollback_parser.add_argument("--steps", type=int, default=1, help="回退步数（默认1步）")
     rollback_parser.add_argument("--operator", help="操作人")
     rollback_parser.set_defaults(func=cmd_rollback)
 
