@@ -13,6 +13,9 @@ export interface Case {
   createdAt: string;
   updatedAt: string;
   description: string;
+  conflictResolved?: boolean;
+  conflictResolution?: 'confirmed' | 'rejected' | null;
+  finalConclusion?: string;
 }
 
 export interface Evidence {

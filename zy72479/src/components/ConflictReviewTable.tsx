@@ -10,7 +10,7 @@ interface ConflictReviewTableProps {
 }
 
 export function ConflictReviewTable({ conflicts, evidences, caseId }: ConflictReviewTableProps) {
-  const { updateConflictStatus, addHistoryLog } = useCaseStore();
+  const { updateConflictStatus, simulateStep3ConflictReview } = useCaseStore();
   const [remark, setRemark] = useState('');
   const [activeConflictId, setActiveConflictId] = useState<string | null>(null);
 
@@ -18,24 +18,14 @@ export function ConflictReviewTable({ conflicts, evidences, caseId }: ConflictRe
 
   const handleConfirm = (conflictId: string) => {
     updateConflictStatus(conflictId, 'confirmed', '小姜', remark || undefined);
-    addHistoryLog(
-      caseId,
-      '冲突复核-确认',
-      '小姜',
-      `已确认冲突证据，复核通过。${remark ? `备注：${remark}` : ''}`
-    );
+    simulateStep3ConflictReview(caseId);
     setRemark('');
     setActiveConflictId(null);
   };
 
   const handleReject = (conflictId: string) => {
     updateConflictStatus(conflictId, 'rejected', '小姜', remark || undefined);
-    addHistoryLog(
-      caseId,
-      '冲突复核-驳回',
-      '小姜',
-      `已驳回冲突证据，需要补充材料。${remark ? `备注：${remark}` : ''}`
-    );
+    simulateStep3ConflictReview(caseId);
     setRemark('');
     setActiveConflictId(null);
   };

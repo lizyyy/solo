@@ -43,7 +43,7 @@ export const mockCases: Case[] = [
     currentStep: 3,
     createdAt: '2024-06-08 13:00:00',
     updatedAt: '2024-06-08 15:30:00',
-    description: '路口照片与公交刷卡时段证据存在矛盾，需人工复核',
+    description: '路口照片显示21:00噪声正常，但公交刷卡时段22:30后司机反映噪声严重，时间点不同导致结论矛盾，待人工复核确认',
   },
 ];
 
