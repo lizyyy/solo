@@ -21,6 +21,7 @@ class AbnormalStatus(str, Enum):
     PENDING = "待处理"
     NEEDS_MORE_INFO = "缺材料"
     READY_FOR_REVIEW = "待复核"
+    CONFIRMED_NORMAL = "已确认正常"
     RESOLVED = "已解决"
     DISPUTED = "有争议"
 
@@ -65,6 +66,8 @@ class AbnormalRecord:
     field_mention: str = ""
     direction_field_text: str = ""
     is_field_dispute: bool = False
+    trigger_source: str = ""
+    resolution_trace: List[Dict[str, str]] = field(default_factory=list)
 
 
 @dataclass

@@ -10,12 +10,20 @@ sys.path.insert(0, str(Path(__file__).parent))
 from core.storage import Storage
 from core.engine import InspectionEngine
 from core.report import ReportGenerator
+from core.models import AbnormalStatus
 
 
 def get_engine():
     data_dir = os.path.join(os.path.dirname(__file__), "data")
     storage = Storage(data_dir)
     return InspectionEngine(storage)
+
+
+def _count_abnormal(batch):
+    return sum(
+        1 for r in batch.abnormal_records
+        if r.status not in (AbnormalStatus.CONFIRMED_NORMAL, AbnormalStatus.RESOLVED)
+    )
 
 
 @click.group()
@@ -44,7 +52,9 @@ def list_batches():
         return
     click.echo(f"共 {len(batches)} 个批次：")
     for b in batches:
-        click.echo(f"  [{b['id']}] {b['name']} - {b['status']} - {b['abnormal_count']}条异常")
+        batch = engine.storage.load_batch(b['id'])
+        abn = _count_abnormal(batch) if batch else 0
+        click.echo(f"  [{b['id']}] {b['name']} - {b['status']} - {abn}条异常(共{b['abnormal_count']}条记录)")
 
 
 @cli.command()
@@ -73,8 +83,10 @@ def import_repair(batch_id, filename, data_file, uploader):
     batch, screenshot = engine.import_repair_screenshot(
         batch_id, filename, content, uploader=uploader
     )
+    abn = _count_abnormal(batch)
+    normal = sum(1 for r in batch.abnormal_records if r.status == AbnormalStatus.CONFIRMED_NORMAL)
     click.echo(f"✅ 已导入维修群截图：{filename}")
-    click.echo(f"   生成 {len(batch.abnormal_records)} 条异常记录")
+    click.echo(f"   异常{abn}条，已确认正常{normal}条，共{len(batch.abnormal_records)}条记录")
 
 
 @cli.command()
@@ -103,8 +115,10 @@ def import_sampling(batch_id, filename, data_file, uploader):
     batch, note = engine.import_sampling_note(
         batch_id, content, filename=filename, uploader=uploader
     )
+    abn = _count_abnormal(batch)
+    normal = sum(1 for r in batch.abnormal_records if r.status == AbnormalStatus.CONFIRMED_NORMAL)
     click.echo(f"✅ 已补录采样间隔说明")
-    click.echo(f"   更新后的异常记录：{len(batch.abnormal_records)} 条")
+    click.echo(f"   异常{abn}条，已确认正常{normal}条，共{len(batch.abnormal_records)}条记录")
 
 
 @cli.command()
@@ -132,7 +146,10 @@ def show(batch_id, output_format):
             "id": batch.id,
             "name": batch.name,
             "status": batch.status,
-            "abnormal_count": len(batch.abnormal_records),
+            "total_records": len(batch.abnormal_records),
+            "truly_abnormal": _count_abnormal(batch),
+            "confirmed_normal": sum(1 for r in batch.abnormal_records if r.status == AbnormalStatus.CONFIRMED_NORMAL),
+            "resolved": sum(1 for r in batch.abnormal_records if r.status == AbnormalStatus.RESOLVED),
             "abnormal_records": [
                 {
                     "point_id": r.point_id,
@@ -143,6 +160,8 @@ def show(batch_id, output_format):
                     "missing_materials": r.missing_materials,
                     "next_handler": r.next_handler.value,
                     "is_field_dispute": r.is_field_dispute,
+                    "trigger_source": r.trigger_source,
+                    "resolution_trace": r.resolution_trace,
                 }
                 for r in batch.abnormal_records
             ]
@@ -177,8 +196,10 @@ def rerun(batch_id, operator):
     """重跑质检分析"""
     engine = get_engine()
     batch = engine.rerun(batch_id, operator)
+    abn = _count_abnormal(batch)
+    normal = sum(1 for r in batch.abnormal_records if r.status == AbnormalStatus.CONFIRMED_NORMAL)
     click.echo(f"✅ 已重跑分析（第 {batch.run_count} 次）")
-    click.echo(f"   当前异常记录：{len(batch.abnormal_records)} 条")
+    click.echo(f"   异常{abn}条，已确认正常{normal}条，共{len(batch.abnormal_records)}条记录")
 
 
 @cli.command()
@@ -204,43 +225,51 @@ def demo(operator):
     engine = get_engine()
     demo_dir = os.path.join(os.path.dirname(__file__), "data", "demo")
 
-    click.echo("步骤 1/6：创建演示批次")
+    click.echo("步骤 1/7：创建演示批次")
     batch = engine.create_batch("演示批次-2024-光伏逆变器散热", operator)
     click.echo(f"  ✅ 批次ID：{batch.id}")
     click.echo("")
 
-    click.echo("步骤 2/6：导入维修群截图")
+    click.echo("步骤 2/7：导入维修群截图")
     repair_file = os.path.join(demo_dir, "repair_screenshot_demo.json")
     with open(repair_file, "r", encoding="utf-8") as f:
         repair_content = json.load(f)
     batch, _ = engine.import_repair_screenshot(
         batch.id, "维修群截图-20240601.png", repair_content, uploader=operator
     )
-    click.echo(f"  ✅ 导入成功，生成 {len(batch.abnormal_records)} 条异常")
+    abn = _count_abnormal(batch)
+    normal = sum(1 for r in batch.abnormal_records if r.status == AbnormalStatus.CONFIRMED_NORMAL)
+    click.echo(f"  ✅ 导入成功：异常{abn}条，已确认正常{normal}条")
     click.echo("")
 
-    click.echo("步骤 3/6：查看导入后的异常工况表")
+    click.echo("步骤 3/7：查看导入后的异常工况表")
     click.echo(ReportGenerator.generate_abnormal_table(batch))
     click.echo("")
-    click.echo("  🔍 注意：测点 T002 被标记为'现场表述争议'")
-    click.echo("     因为现场师傅把'负方向'说成了'向左'，留给实验老师复核")
+    click.echo("  🔍 T003 方向=正常方向、温度45℃、现场说正常 → 直接标记'已确认正常'")
+    click.echo("  🔍 T002 师傅把'负方向'说成'向左' → 标记'现场表述争议'，留给实验老师复核")
     click.echo("")
 
-    click.echo("步骤 4/6：补录采样间隔说明")
+    click.echo("步骤 4/7：补录采样间隔说明")
     sampling_file = os.path.join(demo_dir, "sampling_note_demo.json")
     with open(sampling_file, "r", encoding="utf-8") as f:
         sampling_content = json.load(f)
     batch, _ = engine.import_sampling_note(
         batch.id, sampling_content, filename="采样间隔说明.docx", uploader=operator
     )
-    click.echo(f"  ✅ 补录成功，更新了异常记录")
+    abn = _count_abnormal(batch)
+    normal = sum(1 for r in batch.abnormal_records if r.status == AbnormalStatus.CONFIRMED_NORMAL)
+    click.echo(f"  ✅ 补录成功：异常{abn}条，已确认正常{normal}条")
     click.echo("")
 
-    click.echo("步骤 5/6：查看补录后的异常工况表")
+    click.echo("步骤 5/7：查看补录后的异常工况表")
     click.echo(ReportGenerator.generate_abnormal_table(batch))
     click.echo("")
+    click.echo("  🔍 T001：采样说明确认异常 → 待复核")
+    click.echo("  🔍 T002：仍缺实验老师复核意见 → 有争议")
+    click.echo("  🔍 T003：采样说明进一步确认正常 → 已确认正常")
+    click.echo("")
 
-    click.echo("步骤 6/6：人工修正一次（演示修改备注）")
+    click.echo("步骤 6/7：人工修正一次（演示修改备注）")
     if batch.abnormal_records:
         record = batch.abnormal_records[0]
         batch = engine.manual_correct(
@@ -251,16 +280,28 @@ def demo(operator):
         click.echo(f"  ✅ 已修正 {record.point_name} 的备注")
     click.echo("")
 
+    click.echo("步骤 7/7：重跑分析")
+    batch = engine.rerun(batch.id, operator)
+    abn = _count_abnormal(batch)
+    normal = sum(1 for r in batch.abnormal_records if r.status == AbnormalStatus.CONFIRMED_NORMAL)
+    click.echo(f"  ✅ 重跑完成：异常{abn}条，已确认正常{normal}条")
+    click.echo("")
+
     click.echo("🎬 演示流程完成！")
     click.echo("")
     click.echo(f"📋 查看完整报告：python cli.py show {batch.id}")
     click.echo(f"📋 查看审计追踪：python cli.py show {batch.id} --format audit")
     click.echo(f"📋 查看异常表格：python cli.py show {batch.id} --format table")
+    click.echo(f"📋 查看JSON数据：python cli.py show {batch.id} --format json")
     click.echo("")
+    t002_record = None
+    for r in batch.abnormal_records:
+        if r.point_id == "T002":
+            t002_record = r
+            break
     click.echo("🧪 后续操作建议：")
-    click.echo(f"  1. 重跑分析：python cli.py rerun {batch.id}")
-    record_id = batch.abnormal_records[1].id if len(batch.abnormal_records) > 1 else batch.abnormal_records[0].id
-    click.echo(f"  2. 实验老师复核T002：python cli.py review {batch.id} --record-id {record_id} --resolution '方向表述为口误，实际为负方向，判定正常'")
+    if t002_record:
+        click.echo(f"  实验老师复核T002：python cli.py review {batch.id} --record-id {t002_record.id} --resolution '方向表述为口误，实际为负方向，判定正常'")
 
 
 if __name__ == "__main__":

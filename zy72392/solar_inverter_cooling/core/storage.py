@@ -79,6 +79,8 @@ class Storage:
                     "field_mention": r.field_mention,
                     "direction_field_text": r.direction_field_text,
                     "is_field_dispute": r.is_field_dispute,
+                    "trigger_source": r.trigger_source,
+                    "resolution_trace": r.resolution_trace,
                 }
                 for r in batch.abnormal_records
             ],
@@ -161,6 +163,8 @@ class Storage:
                 field_mention=r.get("field_mention", ""),
                 direction_field_text=r.get("direction_field_text", ""),
                 is_field_dispute=r.get("is_field_dispute", False),
+                trigger_source=r.get("trigger_source", ""),
+                resolution_trace=r.get("resolution_trace", []),
             )
             for r in data["abnormal_records"]
         ]

@@ -75,6 +75,7 @@ HTML_TEMPLATE = """
         .badge-dispute { background: #f8d7da; color: #721c24; }
         .badge-ready { background: #d1ecf1; color: #0c5460; }
         .badge-normal { background: #d4edda; color: #155724; }
+        .badge-confirmed { background: #e2e3e5; color: #383d41; }
         .detail-section {
             background: white;
             border-radius: 12px;
@@ -97,6 +98,7 @@ HTML_TEMPLATE = """
         .abnormal-card.dispute { border-left-color: #f39c12; }
         .abnormal-card.ready { border-left-color: #3498db; }
         .abnormal-card.resolved { border-left-color: #27ae60; }
+        .abnormal-card.confirmed-normal { border-left-color: #95a5a6; background: #fafafa; }
         .abnormal-header {
             display: flex;
             justify-content: space-between;
@@ -293,7 +295,8 @@ HTML_TEMPLATE = """
                     '缺材料': 'badge-pending',
                     '待复核': 'badge-ready',
                     '有争议': 'badge-dispute',
-                    '已解决': 'badge-normal'
+                    '已解决': 'badge-normal',
+                    '已确认正常': 'badge-confirmed'
                 };
                 return `<span class="badge ${map[s] || 'badge-pending'}">${s}</span>`;
             };
@@ -309,6 +312,7 @@ HTML_TEMPLATE = """
                 if (r.status === '有争议') cardClass = 'dispute';
                 else if (r.status === '待复核') cardClass = 'ready';
                 else if (r.status === '已解决') cardClass = 'resolved';
+                else if (r.status === '已确认正常') cardClass = 'confirmed-normal';
 
                 return `
                     <div class="abnormal-card ${cardClass}">
@@ -486,6 +490,8 @@ def api_batch(batch_id):
                 "direction_field_text": r.direction_field_text,
                 "field_mention": r.field_mention,
                 "notes": r.notes,
+                "trigger_source": r.trigger_source,
+                "resolution_trace": r.resolution_trace,
             }
             for r in batch.abnormal_records
         ],
