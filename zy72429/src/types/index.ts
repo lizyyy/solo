@@ -56,6 +56,13 @@ export interface ConflictItem {
   difference: string;
   resolved: boolean;
   resolution: Resolution;
+  changeDetail?: ChangeDetail;
+}
+
+export interface ChangeDetail {
+  before: string;
+  after: string;
+  reason: string;
 }
 
 export interface AppState {

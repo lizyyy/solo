@@ -117,30 +117,50 @@ export const useEvidenceStore = create<EvidenceState>((set, get) => ({
   },
 
   resolveConflict: (conflictId, resolution) => {
-    set((state) => ({
-      conflictItems: state.conflictItems.map((c) =>
-        c.id === conflictId ? { ...c, resolved: true, resolution } : c
-      ),
-    }));
     const conflict = get().conflictItems.find((c) => c.id === conflictId);
-    if (conflict) {
+    if (!conflict) return;
+
+    if (resolution === 'confirm') {
       const evidence = get().getEvidenceById(conflict.evidencePackId);
-      if (resolution === 'confirm' && evidence) {
-        get().addOperationLog(
-          conflict.evidencePackId,
-          '阿梅',
-          '确认冲突处理',
-          `确认采用别名表口径：${conflict.aliasContent}，来源于曲目别名表补录`
-        );
-      } else if (resolution === 'reject' && evidence) {
-        get().addOperationLog(
-          conflict.evidencePackId,
-          '阿梅',
-          '驳回冲突处理',
-          `驳回别名表口径，维持合同原文：${conflict.contractContent}`
-        );
-        get().updateEvidenceStep(conflict.evidencePackId, 1);
-      }
+      const trackAlias = get().getTrackAliasById(evidence?.trackAliasId);
+
+      const changeDetail = {
+        before: conflict.contractContent,
+        after: conflict.aliasContent,
+        reason: `${conflict.difference}；依据曲目别名表（生效日期：${trackAlias?.effectiveDate ?? '未知'}），由阿梅确认采用别名表口径`,
+      };
+
+      set((state) => ({
+        conflictItems: state.conflictItems.map((c) =>
+          c.id === conflictId ? { ...c, resolved: true, resolution, changeDetail } : c
+        ),
+        verificationOrders: state.verificationOrders.map((v) =>
+          v.evidencePackId === conflict.evidencePackId && trackAlias
+            ? { ...v, trackName: trackAlias.newName, sourceNote: `由合同旧名"${trackAlias.oldName}"更正为别名表标准名"${trackAlias.newName}"，${changeDetail.reason}` }
+            : v
+        ),
+      }));
+
+      get().addOperationLog(
+        conflict.evidencePackId,
+        '阿梅',
+        '确认冲突处理',
+        `曲目名称由"${trackAlias?.oldName ?? conflict.contractContent}"更正为"${trackAlias?.newName ?? conflict.aliasContent}"，${changeDetail.reason}`
+      );
+    } else {
+      set((state) => ({
+        conflictItems: state.conflictItems.map((c) =>
+          c.id === conflictId ? { ...c, resolved: true, resolution } : c
+        ),
+      }));
+
+      get().addOperationLog(
+        conflict.evidencePackId,
+        '阿梅',
+        '驳回冲突处理',
+        `驳回别名表口径，维持合同原文：${conflict.contractContent}`
+      );
+      get().updateEvidenceStep(conflict.evidencePackId, 1);
     }
   },
 
@@ -170,6 +190,10 @@ export const useEvidenceStore = create<EvidenceState>((set, get) => ({
   },
 
   confirmVerificationOrder: (evidenceId, sourceNote) => {
+    const evidence = get().getEvidenceById(evidenceId);
+    const verificationOrder = get().getVerificationOrderById(evidence?.verificationOrderId);
+    const trackAlias = get().getTrackAliasById(evidence?.trackAliasId);
+
     set((state) => ({
       verificationOrders: state.verificationOrders.map((v) =>
         v.evidencePackId === evidenceId
@@ -177,11 +201,19 @@ export const useEvidenceStore = create<EvidenceState>((set, get) => ({
           : v
       ),
     }));
+
+    const trackDisplay = verificationOrder
+      ? verificationOrder.trackName
+      : trackAlias?.newName ?? '未知';
+    const logDetail = evidence?.hasConflict
+      ? `核销单已确认，曲目名称：${trackDisplay}，备注：${sourceNote}`
+      : `核销单已确认，曲目名称：${trackDisplay}，备注：${sourceNote}`;
+
     get().addOperationLog(
       evidenceId,
       '阿梅',
       '更新课时核销单',
-      `核销单已确认，备注：${sourceNote}`
+      logDetail
     );
     get().updateEvidenceStatus(evidenceId, 'completed');
     get().updateEvidenceStep(evidenceId, 3);

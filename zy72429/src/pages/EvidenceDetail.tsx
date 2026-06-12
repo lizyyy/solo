@@ -10,6 +10,8 @@ import {
   Check,
   X,
   Music,
+  User,
+  Store as StoreIcon,
 } from 'lucide-react';
 import { useEvidenceStore } from '../store/useEvidenceStore';
 import { StepProgress } from '../components/StepProgress';
@@ -29,6 +31,7 @@ export function EvidenceDetail() {
     getTrackAliasById,
     getVerificationOrderById,
     currentRole,
+    setCurrentRole,
     resolveConflict,
     managerReview,
     confirmVerificationOrder,
@@ -78,9 +81,15 @@ export function EvidenceDetail() {
   };
 
   const handleConfirmOrder = () => {
-    const sourceNote = evidence.hasConflict
-      ? '曲目名称来源于曲目别名表补录，已由阿梅确认'
-      : '合同口径与别名表一致，正常核销';
+    const resolvedConflicts = conflicts.filter((c) => c.resolved && c.resolution === 'confirm');
+    let sourceNote: string;
+    if (resolvedConflicts.length > 0 && trackAlias) {
+      sourceNote = `由合同旧名"${trackAlias.oldName}"更正为别名表标准名"${trackAlias.newName}"，${resolvedConflicts[0].changeDetail?.reason ?? '由阿梅确认采用别名表口径'}`;
+    } else if (evidence.hasConflict) {
+      sourceNote = '曲目名称来源于曲目别名表补录，已由阿梅确认';
+    } else {
+      sourceNote = '合同口径与别名表一致，正常核销';
+    }
     confirmVerificationOrder(evidence.id, sourceNote);
     setShowConfirmModal(false);
   };
@@ -120,6 +129,28 @@ export function EvidenceDetail() {
               <p className="text-sm text-gray-500">
                 创建于 {evidence.createdAt} · 当前角色：{currentRole}
               </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setCurrentRole('阿梅')}
+                className={cn(
+                  'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
+                  currentRole === '阿梅' ? 'bg-slate-700 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                )}
+              >
+                <User className="w-3.5 h-3.5" />
+                阿梅
+              </button>
+              <button
+                onClick={() => setCurrentRole('店长')}
+                className={cn(
+                  'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
+                  currentRole === '店长' ? 'bg-amber-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                )}
+              >
+                <StoreIcon className="w-3.5 h-3.5" />
+                店长
+              </button>
             </div>
           </div>
         </div>
@@ -248,6 +279,11 @@ export function EvidenceDetail() {
                   <div className="bg-gray-50 rounded-lg p-4">
                     <p className="text-xs text-gray-500 mb-1">曲目名称</p>
                     <p className="text-base font-medium text-gray-800">{verificationOrder.trackName}</p>
+                    {evidence.hasConflict && trackAlias && verificationOrder.trackName === trackAlias.newName && (
+                      <p className="text-xs text-gray-400 mt-1">
+                        合同原用名「{trackAlias.oldName}」已更正
+                      </p>
+                    )}
                   </div>
                   <div className="bg-gray-50 rounded-lg p-4">
                     <p className="text-xs text-gray-500 mb-1">核销课时</p>
@@ -268,9 +304,22 @@ export function EvidenceDetail() {
                   </div>
                 </div>
                 {verificationOrder.sourceNote && (
-                  <div className="bg-emerald-50 rounded-lg p-4">
-                    <p className="text-xs text-emerald-600 mb-1">来源备注</p>
-                    <p className="text-sm text-emerald-700">{verificationOrder.sourceNote}</p>
+                  <div className={cn(
+                    'rounded-lg p-4',
+                    evidence.hasConflict ? 'bg-amber-50 border border-amber-200' : 'bg-emerald-50'
+                  )}>
+                    <p className={cn(
+                      'text-xs mb-1',
+                      evidence.hasConflict ? 'text-amber-600' : 'text-emerald-600'
+                    )}>
+                      {evidence.hasConflict ? '口径变更备注' : '来源备注'}
+                    </p>
+                    <p className={cn(
+                      'text-sm',
+                      evidence.hasConflict ? 'text-amber-800' : 'text-emerald-700'
+                    )}>
+                      {verificationOrder.sourceNote}
+                    </p>
                   </div>
                 )}
               </div>
