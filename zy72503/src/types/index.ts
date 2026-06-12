@@ -2,6 +2,8 @@ export type ConflictStatus = 'pending' | 'reviewing' | 'resolved' | 'dismissed';
 export type AssigneeRole = 'operator' | 'annotator' | 'product';
 export type ReviewStatus = 'open' | 'in_progress' | 'completed';
 
+export type ImportItemStatus = 'new' | 'duplicate' | 'model_changed' | 'no_conflict';
+
 export interface Conflict {
   id: string;
   sampleNumber: string;
@@ -16,8 +18,22 @@ export interface Conflict {
   ticketUrl?: string;
   currentRemark?: string;
   isModelVersionChanged: boolean;
+  importBatch: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface ImportResultItem {
+  sampleNumber: string;
+  modelVersion: string;
+  url: string;
+  status: ImportItemStatus;
+  previousModelVersion?: string;
+  previousLabel?: string;
+  newLabel?: string;
+  conflictId?: string;
+  duplicateSourceBatch?: string;
+  reason: string;
 }
 
 export interface RemarkHistory {
