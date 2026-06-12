@@ -106,6 +106,34 @@ class ReportGenerator:
             lines.append(f"  含备注: {summary.get('with_remarks_count', 0)}")
             lines.append("")
 
+        lines.append("五、状态映射结果")
+        lines.append("-" * 40)
+        if report.status_mapping_log:
+            for entry in report.status_mapping_log:
+                lines.append(f"  票号{entry.get('ticket_id', '')} | "
+                             f"原始={entry.get('raw_status', '')} → "
+                             f"映射={entry.get('normalized_status', '')} | "
+                             f"核验={entry.get('verification_status', '')}")
+        else:
+            lines.append("  无映射记录")
+        lines.append("")
+
+        lines.append("六、变更溯源")
+        lines.append("-" * 40)
+        if report.audit_entries:
+            for entry in report.audit_entries[:20]:
+                lines.append(f"  [{entry.get('timestamp', '')[:19]}] "
+                             f"{entry.get('action', '')} | "
+                             f"操作人={entry.get('operator', '')} | "
+                             f"票号={entry.get('affected_ticket_id', '')} | "
+                             f"字段={entry.get('affected_field', '')} | "
+                             f"改前={entry.get('before', '')} → 改后={entry.get('after', '')}")
+            if len(report.audit_entries) > 20:
+                lines.append(f"  ... 还有 {len(report.audit_entries) - 20} 条变更记录")
+        else:
+            lines.append("  无变更记录")
+        lines.append("")
+
         lines.append("=" * 60)
         lines.append("报告结束")
         lines.append("=" * 60)
@@ -150,7 +178,9 @@ class ReportGenerator:
                     "issues": r.issues
                 }
                 for r in report.self_check_results
-            ]
+            ],
+            "status_mapping_log": report.status_mapping_log,
+            "audit_entries": report.audit_entries
         }
 
         with open(output_path, 'w', encoding='utf-8') as f:

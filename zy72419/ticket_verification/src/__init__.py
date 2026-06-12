@@ -2,7 +2,9 @@ from .models import (
     TicketRecord, AudioRemark, Conflict, ConflictType,
     TicketStatus, LeaveStatus, RepertoireChecklist,
     ChecklistItem, VerificationReport, SelfCheckResult,
-    ImportBatch, HistoryRecord
+    ImportBatch, HistoryRecord, AuditTrail,
+    STATUS_MAPPING, TICKET_STATUS_TO_AUDIO, AUDIO_STATUS_TO_TICKET,
+    normalize_status, are_statuses_equivalent
 )
 from .ticket_importer import TicketImporter
 from .audio_parser import AudioRemarkParser
@@ -15,7 +17,9 @@ __all__ = [
     'TicketRecord', 'AudioRemark', 'Conflict', 'ConflictType',
     'TicketStatus', 'LeaveStatus', 'RepertoireChecklist',
     'ChecklistItem', 'VerificationReport', 'SelfCheckResult',
-    'ImportBatch', 'HistoryRecord',
+    'ImportBatch', 'HistoryRecord', 'AuditTrail',
+    'STATUS_MAPPING', 'TICKET_STATUS_TO_AUDIO', 'AUDIO_STATUS_TO_TICKET',
+    'normalize_status', 'are_statuses_equivalent',
     'TicketImporter', 'AudioRemarkParser', 'ConflictDetector',
     'ChecklistManager', 'SelfChecker', 'ReportGenerator'
 ]

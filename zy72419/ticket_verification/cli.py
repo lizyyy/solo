@@ -13,7 +13,9 @@ sys.path.insert(0, str(Path(__file__).parent))
 from src import (
     TicketImporter, AudioRemarkParser, ConflictDetector,
     ChecklistManager, SelfChecker, ReportGenerator,
-    TicketStatus, LeaveStatus, ConflictType
+    TicketStatus, LeaveStatus, ConflictType, AuditTrail,
+    normalize_status, are_statuses_equivalent,
+    STATUS_MAPPING, TICKET_STATUS_TO_AUDIO
 )
 
 
@@ -25,12 +27,18 @@ class TicketVerificationCLI:
         self.checklist_mgr = ChecklistManager()
         self.self_checker = SelfChecker()
         self.report_gen = ReportGenerator()
+        self.audit = AuditTrail()
 
         self.tickets = []
         self.audio_remarks = []
         self.conflicts = []
         self.checklist = None
         self.import_batches = []
+        self._seen_ticket_keys = set()
+
+    def _dedup_key(self, ticket):
+        return (ticket.ticket_id, ticket.student_name, ticket.repertoire,
+                ticket.performance_date, normalize_status(ticket.status))
 
     def print_header(self, title: str):
         print("\n" + "=" * 70)
@@ -46,27 +54,76 @@ class TicketVerificationCLI:
         self.print_step(1, "票务导出表第一次导入")
 
         tickets, batch = self.importer.import_from_csv(ticket_file, batch_id)
-        self.tickets.extend(tickets)
+
+        added = 0
+        skipped = 0
+        for ticket in tickets:
+            key = self._dedup_key(ticket)
+            if key in self._seen_ticket_keys:
+                skipped += 1
+                ticket.add_history(
+                    "重复导入跳过", "系统",
+                    details=f"与已有记录重复，跳过（映射口径: {normalize_status(ticket.status)}）",
+                    before_value=None, after_value=None,
+                    affected_field="dedup"
+                )
+                self.audit.add_entry(
+                    action="重复导入跳过",
+                    operator="系统",
+                    details=f"票号{ticket.ticket_id}映射后重复",
+                    before_value=None,
+                    after_value="跳过",
+                    affected_field="dedup",
+                    affected_ticket_id=ticket.ticket_id
+                )
+            else:
+                self._seen_ticket_keys.add(key)
+                self.tickets.append(ticket)
+                added += 1
+                ticket.add_history(
+                    "票务导入", "系统",
+                    details=f"原始状态={ticket.status}, 映射状态={ticket.normalized_status}",
+                    before_value=None,
+                    after_value=ticket.normalized_status,
+                    affected_field="status"
+                )
+                self.audit.add_entry(
+                    action="票务导入",
+                    operator="系统",
+                    details=f"原始状态={ticket.status} → 映射={ticket.normalized_status}",
+                    before_value=ticket.status,
+                    after_value=ticket.normalized_status,
+                    affected_field="status",
+                    affected_ticket_id=ticket.ticket_id
+                )
+
         self.import_batches.append(batch)
 
         print(f"✓ 成功导入文件: {batch.file_name}")
         print(f"  批次号: {batch.batch_id}")
-        print(f"  记录数: {batch.record_count}")
+        print(f"  文件记录数: {batch.record_count}")
+        print(f"  实际新增: {added}（去重跳过: {skipped}）")
 
         if batch.is_duplicate:
             print(f"  ⚠️  警告: 该文件与批次 {batch.duplicate_of} 重复!")
 
         duplicates = self.importer.find_duplicate_records(self.tickets)
         if duplicates:
-            print(f"\n⚠️  检测到 {len(duplicates)} 组重复记录:")
+            print(f"\n⚠️  检测到 {len(duplicates)} 组映射口径重复记录:")
             for t1, t2 in duplicates[:3]:
-                print(f"  - 票号 {t1.ticket_id} ({t1.student_name}) 在批次 {t1.import_batch} 和 {t2.import_batch} 重复")
+                print(f"  - 票号 {t1.ticket_id} ({t1.student_name}) "
+                      f"状态映射: {t1.status}→{normalize_status(t1.status)} / "
+                      f"{t2.status}→{normalize_status(t2.status)}")
 
-        print(f"\n导入完成，当前总票数: {len(self.tickets)}")
+        print(f"\n📊 状态映射结果:")
+        for ticket in self.tickets:
+            print(f"  票号{ticket.ticket_id}: {ticket.status} → {ticket.normalized_status}")
+
+        print(f"\n导入完成，当前有效票数: {len(self.tickets)}")
         return tickets, batch
 
-    def step2_review_audio_remarks(self, audio_file: str):
-        self.print_step(2, "琴行店长老周补看音频文件备注")
+    def step2_review_audio_remarks(self, audio_file: str, operator: str = "老周"):
+        self.print_step(2, f"琴行店长{operator}补看音频文件备注")
 
         self.audio_remarks = self.audio_parser.parse_file(audio_file)
         print(f"✓ 成功解析音频备注文件: {Path(audio_file).name}")
@@ -79,6 +136,8 @@ class TicketVerificationCLI:
             print(f"    学员: {remark.student_name}")
             print(f"    音频文件: {remark.audio_file}")
             print(f"    原始备注: {remark.raw_remark}")
+            if remark.parsed_status:
+                print(f"    解析状态: {remark.parsed_status} → 映射: {normalize_status(remark.parsed_status)}")
         if len(self.audio_remarks) > 3:
             print(f"\n  ... 还有 {len(self.audio_remarks) - 3} 条备注")
 
@@ -88,25 +147,48 @@ class TicketVerificationCLI:
             remarks = remarks_by_ticket.get(ticket.ticket_id, [])
             if remarks:
                 matched += 1
+                old_remarks = ticket.audio_remarks
                 all_raw = "\n".join([r.raw_remark for r in remarks])
                 ticket.audio_remarks = all_raw
-                ticket.add_history("音频备注补充", "老周", f"补充 {len(remarks)} 条音频备注")
+                ticket.add_history(
+                    "音频备注补充", operator,
+                    details=f"补充 {len(remarks)} 条音频备注",
+                    before_value=old_remarks,
+                    after_value=all_raw,
+                    affected_field="audio_remarks"
+                )
+                self.audit.add_entry(
+                    action="音频备注补充",
+                    operator=operator,
+                    details=f"补充 {len(remarks)} 条音频备注",
+                    before_value=old_remarks,
+                    after_value=all_raw[:200] + ("..." if len(all_raw) > 200 else ""),
+                    affected_field="audio_remarks",
+                    affected_ticket_id=ticket.ticket_id
+                )
 
         print(f"\n✓ 已为 {matched} 张票补充音频备注信息")
 
         self.conflicts = self.conflict_detector.detect_all_conflicts(self.tickets, self.audio_remarks)
 
         if self.conflicts:
-            print(f"\n⚠️  检测到 {len(self.conflicts)} 个冲突，请店长老周审核:")
-            for i, conflict in enumerate(self.conflicts[:5], 1):
+            real_conflicts = [c for c in self.conflicts if c.conflict_type != ConflictType.LEAVE_COUNTED]
+            leave_conflicts = [c for c in self.conflicts if c.conflict_type == ConflictType.LEAVE_COUNTED]
+
+            print(f"\n⚠️  检测到 {len(real_conflicts)} 个实质冲突 + {len(leave_conflicts)} 个请假课时异常:")
+
+            for i, conflict in enumerate(real_conflicts[:5], 1):
                 print(f"\n  冲突 #{i}: {conflict.description}")
                 print(f"    类型: {conflict.conflict_type.value}")
                 print(f"    票务表值: {conflict.ticket_value}")
                 print(f"    音频值: {conflict.audio_value}")
-                if conflict.evidence and 'audio_raw_remark' in conflict.evidence:
-                    print(f"    原始备注证据: {conflict.evidence['audio_raw_remark']}")
+                if conflict.evidence:
+                    if 'ticket_normalized_status' in conflict.evidence:
+                        print(f"    票务映射: {conflict.evidence.get('ticket_normalized_status')}")
+                        print(f"    音频映射: {conflict.evidence.get('audio_normalized_status')}")
+                    if 'audio_raw_remark' in conflict.evidence:
+                        print(f"    原始备注证据: {conflict.evidence['audio_raw_remark']}")
 
-            leave_conflicts = [c for c in self.conflicts if c.conflict_type == ConflictType.LEAVE_COUNTED]
             if leave_conflicts:
                 print(f"\n🚨 特别注意: {len(leave_conflicts)} 条请假课时被算进已消耗")
                 print(f"   已标记为【待巡演统筹复核】，不会自动归为正常")
@@ -114,11 +196,28 @@ class TicketVerificationCLI:
                     ticket = next((t for t in self.tickets if t.ticket_id == c.ticket_id), None)
                     if ticket:
                         ticket.verification_status = TicketStatus.NEED_REVIEW
+                        self.audit.add_entry(
+                            action="标记待巡演统筹复核",
+                            operator="系统",
+                            details="请假课时被算进已消耗",
+                            before_value=ticket.verification_status.value,
+                            after_value=TicketStatus.NEED_REVIEW.value,
+                            affected_field="verification_status",
+                            affected_ticket_id=ticket.ticket_id
+                        )
 
-            print(f"\n💡 请店长老周对每个冲突选择【确认】或【驳回】")
+            print(f"\n💡 请店长{operator}对每个冲突选择【确认】或【驳回】")
             print("   系统不会替业务同事自动拍板")
         else:
-            print("\n✓ 未检测到冲突")
+            print("\n✓ 状态映射后未检测到实质冲突")
+
+        status_summary = {}
+        for ticket in self.tickets:
+            vs = ticket.verification_status.value
+            status_summary[vs] = status_summary.get(vs, 0) + 1
+        print(f"\n📊 核对状态分布:")
+        for status, count in status_summary.items():
+            print(f"  {status}: {count}")
 
         return self.audio_remarks, self.conflicts
 
@@ -137,23 +236,79 @@ class TicketVerificationCLI:
 
         if self.audio_remarks:
             self.checklist = self.checklist_mgr.update_checklist_from_audio_remarks(
-                self.checklist, self.audio_remarks, operator
+                self.checklist, self.audio_remarks, operator, self.audit
             )
             print(f"\n✓ 已将音频备注更新到核对表")
 
         for ticket in self.tickets:
-            if ticket.verification_status == TicketStatus.PENDING and not ticket.conflicts:
+            if ticket.verification_status == TicketStatus.CONFIRMED and not ticket.conflicts:
                 self.checklist_mgr.mark_item_checked(self.checklist, ticket.ticket_id, operator)
-                ticket.verification_status = TicketStatus.CONFIRMED
-                ticket.add_history("核对通过", operator)
+                ticket.add_history("核对通过", operator,
+                                   before_value="待核对",
+                                   after_value="已确认",
+                                   affected_field="verification_status")
+                self.audit.add_entry(
+                    action="核对通过",
+                    operator=operator,
+                    details="状态映射后自动核对通过",
+                    before_value="待核对",
+                    after_value="已确认",
+                    affected_field="verification_status",
+                    affected_ticket_id=ticket.ticket_id
+                )
 
         summary = self.checklist_mgr.get_checklist_summary(self.checklist)
         print(f"\n📊 核对表状态:")
         print(f"  总项数: {summary['total_items']}")
         print(f"  已核对: {summary['checked_count']} ({summary['checked_percentage']:.1f}%)")
+        print(f"  待处理: {summary['unchecked_count']}")
         print(f"  含备注: {summary['with_remarks_count']}")
 
+        print(f"\n📋 逐条核对结果:")
+        for item in self.checklist.items:
+            ticket = next((t for t in self.tickets if t.ticket_id == item.ticket_id), None)
+            if ticket:
+                print(f"  票号{item.ticket_id} | {ticket.student_name} | "
+                      f"票务状态={ticket.status}→映射={ticket.normalized_status} | "
+                      f"核对={'✓' if item.is_checked else '✗'} | "
+                      f"核验状态={ticket.verification_status.value}")
+
         return self.checklist
+
+    def query_audit(self, ticket_id: str = None, operator: str = None, action: str = None):
+        self.print_header("变更溯源查询")
+
+        if ticket_id:
+            entries = self.audit.query_by_ticket(ticket_id)
+            print(f"票号 {ticket_id} 的变更历史:")
+        elif operator:
+            entries = self.audit.query_by_operator(operator)
+            print(f"操作人 {operator} 的变更记录:")
+        elif action:
+            entries = self.audit.query_by_action(action)
+            print(f"动作 {action} 的变更记录:")
+        else:
+            entries = self.audit.entries
+            print("全部变更记录:")
+
+        if not entries:
+            print("  无变更记录")
+            return entries
+
+        for i, entry in enumerate(entries[:20], 1):
+            print(f"\n  记录 #{i}:")
+            print(f"    动作: {entry.action}")
+            print(f"    操作人: {entry.operator}")
+            print(f"    关联票号: {entry.affected_ticket_id}")
+            print(f"    变更字段: {entry.affected_field}")
+            print(f"    改前: {entry.before_value}")
+            print(f"    改后: {entry.after_value}")
+            print(f"    时间: {entry.timestamp.strftime('%Y-%m-%d %H:%M:%S')}")
+
+        if len(entries) > 20:
+            print(f"\n  ... 还有 {len(entries) - 20} 条记录")
+
+        return entries
 
     def run_self_check(self, exported_file: str = None):
         self.print_header("系统自检")
@@ -193,11 +348,37 @@ class TicketVerificationCLI:
             [self.checklist] if self.checklist else None
         )
 
+        status_mapping_log = []
+        for ticket in self.tickets:
+            status_mapping_log.append({
+                "ticket_id": ticket.ticket_id,
+                "student_name": ticket.student_name,
+                "raw_status": ticket.status,
+                "normalized_status": ticket.normalized_status,
+                "mapped_status": ticket.mapped_status,
+                "verification_status": ticket.verification_status.value
+            })
+
+        audit_entries = []
+        for entry in self.audit.entries:
+            audit_entries.append({
+                "action": entry.action,
+                "operator": entry.operator,
+                "details": entry.details,
+                "affected_field": entry.affected_field,
+                "affected_ticket_id": entry.affected_ticket_id,
+                "before": entry.before_value,
+                "after": entry.after_value,
+                "timestamp": entry.timestamp.isoformat()
+            })
+
         report = self.report_gen.generate_report(
             self.tickets, self.conflicts,
             [self.checklist] if self.checklist else [],
             check_results
         )
+        report.status_mapping_log = status_mapping_log
+        report.audit_entries = audit_entries
 
         text_report_path = os.path.join(output_dir, f"verification_report_{timestamp}.txt")
         json_report_path = os.path.join(output_dir, f"verification_report_{timestamp}.json")
@@ -231,9 +412,12 @@ class TicketVerificationCLI:
         print(f"\n操作人员: {operator}")
         print(f"票务文件: {ticket_file}")
         print(f"音频备注文件: {audio_file}")
+        print(f"\n状态映射口径:")
+        for k, v in STATUS_MAPPING.items():
+            print(f"  {k} → {v}")
 
         self.step1_import_tickets(ticket_file, batch_id)
-        self.step2_review_audio_remarks(audio_file)
+        self.step2_review_audio_remarks(audio_file, operator)
         self.step3_update_checklist(operator)
         self.run_self_check()
         report, text_path, json_path = self.generate_final_report(output_dir)
@@ -242,6 +426,7 @@ class TicketVerificationCLI:
         print(f"\n✓ 三步流程执行完毕")
         print(f"✓ 文本报告: {text_path}")
         print(f"✓ JSON报告: {json_path}")
+        print(f"✓ 变更审计: {len(self.audit.entries)} 条记录")
 
         return report
 
@@ -273,7 +458,7 @@ def main():
     else:
         parser.print_help()
         print("\n示例:")
-        print("  python cli.py run --tickets data/samples/normal_tickets.csv --audio data/samples/normal_audio_remarks.csv")
+        print("  python3 cli.py run --tickets data/samples/normal_tickets.csv --audio data/samples/normal_audio_remarks.csv")
 
 
 if __name__ == "__main__":

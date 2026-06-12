@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import List, Tuple, Dict, Any
 from datetime import datetime
 
-from .models import TicketRecord, ImportBatch, LeaveStatus
+from .models import TicketRecord, ImportBatch, LeaveStatus, normalize_status
 
 
 class TicketImporter:
@@ -126,11 +126,13 @@ class TicketImporter:
         seen: Dict[str, TicketRecord] = {}
 
         for ticket in tickets:
+            norm_status = normalize_status(ticket.status)
             sig_fields = {
                 'ticket_id': ticket.ticket_id,
                 'student_name': ticket.student_name,
                 'repertoire': ticket.repertoire,
-                'performance_date': ticket.performance_date
+                'performance_date': ticket.performance_date,
+                'normalized_status': norm_status
             }
             sig = self._compute_record_signature(sig_fields)
             if sig in seen:

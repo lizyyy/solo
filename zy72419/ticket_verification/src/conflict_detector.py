@@ -3,7 +3,9 @@ from difflib import SequenceMatcher
 
 from .models import (
     TicketRecord, AudioRemark, Conflict, ConflictType,
-    TicketStatus, LeaveStatus
+    TicketStatus, LeaveStatus,
+    normalize_status, are_statuses_equivalent,
+    TICKET_STATUS_TO_AUDIO, AUDIO_STATUS_TO_TICKET
 )
 
 
@@ -21,11 +23,23 @@ class ConflictDetector:
 
         for ticket in tickets:
             ticket_conflicts = self.detect_ticket_conflicts(ticket, remarks_by_ticket)
-            all_conflicts.extend(ticket_conflicts)
             ticket.conflicts = ticket_conflicts
 
             if ticket_conflicts:
-                ticket.verification_status = TicketStatus.CONFLICT
+                has_real_conflict = any(
+                    c.conflict_type != ConflictType.LEAVE_COUNTED or c.resolved
+                    for c in ticket_conflicts
+                )
+                leave_only = all(
+                    c.conflict_type == ConflictType.LEAVE_COUNTED for c in ticket_conflicts
+                )
+                if leave_only:
+                    ticket.verification_status = TicketStatus.NEED_REVIEW
+                else:
+                    ticket.verification_status = TicketStatus.CONFLICT
+            else:
+                if ticket.verification_status == TicketStatus.PENDING:
+                    ticket.verification_status = TicketStatus.CONFIRMED
 
         return all_conflicts
 
@@ -70,9 +84,11 @@ class ConflictDetector:
                 conflicts.append(self._create_repertoire_conflict(ticket, remark))
 
         if remark.parsed_status and ticket.status:
-            sim = self._similarity(ticket.status, remark.parsed_status)
-            if sim < self.similarity_threshold:
-                conflicts.append(self._create_status_conflict(ticket, remark))
+            if not are_statuses_equivalent(ticket.status, remark.parsed_status):
+                ticket_norm = normalize_status(ticket.status)
+                audio_norm = normalize_status(remark.parsed_status)
+                if ticket_norm != audio_norm:
+                    conflicts.append(self._create_status_conflict(ticket, remark))
 
         if remark.parsed_date and ticket.performance_date:
             norm_ticket_date = self._normalize_date(ticket.performance_date)
@@ -124,19 +140,24 @@ class ConflictDetector:
         )
 
     def _create_status_conflict(self, ticket: TicketRecord, remark: AudioRemark) -> Conflict:
+        ticket_norm = normalize_status(ticket.status)
+        audio_norm = normalize_status(remark.parsed_status) if remark.parsed_status else ""
         return Conflict(
             conflict_type=ConflictType.STATUS_MISMATCH,
             ticket_id=ticket.ticket_id,
             field_name="状态",
             ticket_value=ticket.status,
             audio_value=remark.parsed_status,
-            description=f"票号{ticket.ticket_id}状态不一致",
+            description=f"票号{ticket.ticket_id}状态不一致（映射后: {ticket_norm} vs {audio_norm}）",
             evidence={
                 "ticket_source": "票务导出表",
-                "ticket_value": ticket.status,
+                "ticket_raw_status": ticket.status,
+                "ticket_normalized_status": ticket_norm,
                 "audio_file": remark.audio_file,
                 "audio_raw_remark": remark.raw_remark,
-                "audio_parsed_value": remark.parsed_status
+                "audio_parsed_status": remark.parsed_status,
+                "audio_normalized_status": audio_norm,
+                "status_mapping": TICKET_STATUS_TO_AUDIO
             }
         )
 

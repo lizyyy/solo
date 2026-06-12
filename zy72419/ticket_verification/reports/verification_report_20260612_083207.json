@@ -1,0 +1,206 @@
+{
+  "report_id": "c742cff8-e2f4-449c-9555-c7cb89380f4a",
+  "generated_time": "2026-06-12T08:32:07.870984",
+  "statistics": {
+    "total_tickets": 3,
+    "confirmed_count": 3,
+    "rejected_count": 0,
+    "conflict_count": 0,
+    "need_review_count": 0,
+    "leave_counted_count": 0
+  },
+  "conflicts": [],
+  "checklist_summary": {
+    "cc3fe0f3-8f34-45d7-bb76-67997affc8f0": {
+      "checklist_id": "cc3fe0f3-8f34-45d7-bb76-67997affc8f0",
+      "performance_date": "2026-06-08",
+      "total_items": 3,
+      "checked_count": 3,
+      "unchecked_count": 0,
+      "checked_percentage": 100.0,
+      "with_remarks_count": 3,
+      "created_time": "2026-06-12T08:32:07.870846",
+      "updated_time": "2026-06-12T08:32:07.870872"
+    }
+  },
+  "self_check_results": [
+    {
+      "check_name": "重复导入检测",
+      "passed": true,
+      "details": "无重复导入",
+      "issues": []
+    },
+    {
+      "check_name": "请假课时被算进已消耗检测",
+      "passed": true,
+      "details": "无请假课时被错误计算",
+      "issues": []
+    },
+    {
+      "check_name": "重复记录检测",
+      "passed": true,
+      "details": "无重复记录",
+      "issues": []
+    },
+    {
+      "check_name": "必填字段完整性检测",
+      "passed": true,
+      "details": "所有必填字段完整",
+      "issues": []
+    },
+    {
+      "check_name": "核对表与票务表一致性检测",
+      "passed": true,
+      "details": "核对表与票务表一致",
+      "issues": []
+    }
+  ],
+  "status_mapping_log": [
+    {
+      "ticket_id": "T003",
+      "student_name": "王小华",
+      "raw_status": "已核销",
+      "normalized_status": "已完成",
+      "mapped_status": "已完成",
+      "verification_status": "已确认"
+    },
+    {
+      "ticket_id": "T005",
+      "student_name": "刘小伟",
+      "raw_status": "已核销",
+      "normalized_status": "已完成",
+      "mapped_status": "已完成",
+      "verification_status": "已确认"
+    },
+    {
+      "ticket_id": "T007",
+      "student_name": "孙小美",
+      "raw_status": "已核销",
+      "normalized_status": "已完成",
+      "mapped_status": "已完成",
+      "verification_status": "已确认"
+    }
+  ],
+  "audit_entries": [
+    {
+      "action": "票务导入",
+      "operator": "系统",
+      "details": "原始状态=已核销 → 映射=已完成",
+      "affected_field": "status",
+      "affected_ticket_id": "T003",
+      "before": "已核销",
+      "after": "已完成",
+      "timestamp": "2026-06-12T08:32:07.870518"
+    },
+    {
+      "action": "票务导入",
+      "operator": "系统",
+      "details": "原始状态=已核销 → 映射=已完成",
+      "affected_field": "status",
+      "affected_ticket_id": "T005",
+      "before": "已核销",
+      "after": "已完成",
+      "timestamp": "2026-06-12T08:32:07.870521"
+    },
+    {
+      "action": "票务导入",
+      "operator": "系统",
+      "details": "原始状态=已核销 → 映射=已完成",
+      "affected_field": "status",
+      "affected_ticket_id": "T007",
+      "before": "已核销",
+      "after": "已完成",
+      "timestamp": "2026-06-12T08:32:07.870524"
+    },
+    {
+      "action": "音频备注补充",
+      "operator": "老周",
+      "details": "补充 1 条音频备注",
+      "affected_field": "audio_remarks",
+      "affected_ticket_id": "T003",
+      "before": null,
+      "after": "曲目：月光奏鸣曲，状态：已完成，老师：李老师，时长：7分钟，得分：90。补录场次，学员身体恢复后演出，表现不错。",
+      "timestamp": "2026-06-12T08:32:07.870787"
+    },
+    {
+      "action": "音频备注补充",
+      "operator": "老周",
+      "details": "补充 1 条音频备注",
+      "affected_field": "audio_remarks",
+      "affected_ticket_id": "T005",
+      "before": null,
+      "after": "曲目：梦中的婚礼，状态：已完成，老师：王老师，时长：5分钟，得分：87。补录场次，家里事情处理完后及时参加了演出。",
+      "timestamp": "2026-06-12T08:32:07.870789"
+    },
+    {
+      "action": "音频备注补充",
+      "operator": "老周",
+      "details": "补充 1 条音频备注",
+      "affected_field": "audio_remarks",
+      "affected_ticket_id": "T007",
+      "before": null,
+      "after": "曲目：秋日私语，状态：已完成，老师：张老师，时长：6分钟，得分：93。新学员首次演出，表现超出预期。",
+      "timestamp": "2026-06-12T08:32:07.870792"
+    },
+    {
+      "action": "音频备注补充到核对表",
+      "operator": "老周",
+      "details": "补充 1 条音频备注到核对表",
+      "affected_field": "remarks",
+      "affected_ticket_id": "T003",
+      "before": "",
+      "after": "曲目：月光奏鸣曲，状态：已完成，老师：李老师，时长：7分钟，得分：90。补录场次，学员身体恢复后演出，表现不错。",
+      "timestamp": "2026-06-12T08:32:07.870859"
+    },
+    {
+      "action": "音频备注补充到核对表",
+      "operator": "老周",
+      "details": "补充 1 条音频备注到核对表",
+      "affected_field": "remarks",
+      "affected_ticket_id": "T005",
+      "before": "",
+      "after": "曲目：梦中的婚礼，状态：已完成，老师：王老师，时长：5分钟，得分：87。补录场次，家里事情处理完后及时参加了演出。",
+      "timestamp": "2026-06-12T08:32:07.870861"
+    },
+    {
+      "action": "音频备注补充到核对表",
+      "operator": "老周",
+      "details": "补充 1 条音频备注到核对表",
+      "affected_field": "remarks",
+      "affected_ticket_id": "T007",
+      "before": "",
+      "after": "曲目：秋日私语，状态：已完成，老师：张老师，时长：6分钟，得分：93。新学员首次演出，表现超出预期。",
+      "timestamp": "2026-06-12T08:32:07.870862"
+    },
+    {
+      "action": "核对通过",
+      "operator": "老周",
+      "details": "状态映射后自动核对通过",
+      "affected_field": "verification_status",
+      "affected_ticket_id": "T003",
+      "before": "待核对",
+      "after": "已确认",
+      "timestamp": "2026-06-12T08:32:07.870868"
+    },
+    {
+      "action": "核对通过",
+      "operator": "老周",
+      "details": "状态映射后自动核对通过",
+      "affected_field": "verification_status",
+      "affected_ticket_id": "T005",
+      "before": "待核对",
+      "after": "已确认",
+      "timestamp": "2026-06-12T08:32:07.870871"
+    },
+    {
+      "action": "核对通过",
+      "operator": "老周",
+      "details": "状态映射后自动核对通过",
+      "affected_field": "verification_status",
+      "affected_ticket_id": "T007",
+      "before": "待核对",
+      "after": "已确认",
+      "timestamp": "2026-06-12T08:32:07.870874"
+    }
+  ]
+}

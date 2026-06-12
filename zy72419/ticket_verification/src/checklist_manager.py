@@ -4,7 +4,8 @@ from collections import defaultdict
 
 from .models import (
     TicketRecord, RepertoireChecklist, ChecklistItem,
-    TicketStatus, AudioRemark
+    TicketStatus, AudioRemark, normalize_status,
+    are_statuses_equivalent, AuditTrail
 )
 
 
@@ -30,6 +31,10 @@ class ChecklistManager:
                 student_name=ticket.student_name,
                 repertoire=ticket.repertoire
             )
+            if ticket.verification_status == TicketStatus.CONFIRMED:
+                item.is_checked = True
+                item.checked_by = "系统自动（状态映射后核对通过）"
+                item.checked_time = datetime.now()
             checklist.items.append(item)
 
         checklist_id = performance_date or checklist.checklist_id
@@ -41,7 +46,8 @@ class ChecklistManager:
         self,
         checklist: RepertoireChecklist,
         audio_remarks: List[AudioRemark],
-        operator: str
+        operator: str,
+        audit: AuditTrail = None
     ) -> RepertoireChecklist:
         remarks_by_ticket: Dict[str, List[AudioRemark]] = defaultdict(list)
         for remark in audio_remarks:
@@ -53,6 +59,7 @@ class ChecklistManager:
             remarks = remarks_by_ticket.get(item.ticket_id, [])
             if remarks:
                 raw_remarks_text = "\n".join([r.raw_remark for r in remarks])
+                old_remarks = item.remarks
                 if item.remarks:
                     item.remarks += "\n" + raw_remarks_text
                 else:
@@ -63,6 +70,17 @@ class ChecklistManager:
                         item.remarks += f"\n[曲目差异] 票务表: {item.repertoire} | 音频解析: {remark.parsed_repertoire}"
 
                 updated_count += 1
+
+                if audit:
+                    audit.add_entry(
+                        action="音频备注补充到核对表",
+                        operator=operator,
+                        details=f"补充 {len(remarks)} 条音频备注到核对表",
+                        before_value=old_remarks,
+                        after_value=item.remarks,
+                        affected_field="remarks",
+                        affected_ticket_id=item.ticket_id
+                    )
 
         checklist.updated_time = datetime.now()
         return checklist
