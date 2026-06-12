@@ -4,8 +4,12 @@ const BOUNDARY_RULES = {
   RULE_001: {
     id: 'RULE_001',
     name: '多街道归属判定',
-    description: '点位关联2个或以上街道时，自动标记为边界待复核',
-    condition: (point) => point.streets && point.streets.length > 1,
+    description: '点位关联2个或以上街道时，自动标记为边界待复核（已确认的边界点位不重复标记）',
+    condition: (point) => {
+      if (point.boundaryStatus === BOUNDARY_STATUS.BOUNDARY_CONFIRMED) return false;
+      if (point.boundaryStatus === BOUNDARY_STATUS.BOUNDARY_PENDING) return false;
+      return point.streets && point.streets.length > 1;
+    },
     action: (point) => {
       point.boundaryStatus = BOUNDARY_STATUS.BOUNDARY_PENDING;
       return {

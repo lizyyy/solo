@@ -378,34 +378,93 @@ function renderBusCards() {
 
 function renderVersions() {
     const point = currentPoint;
+    const reversedVersions = point.versions.slice().reverse();
+    
     return `
         <div style="margin-bottom: 16px;">
             <p class="hint">每次修改都保留完整历史，可对比、可回滚。阿宁修改一条备注也能看出改前改后的差别。</p>
         </div>
-        ${point.versions.slice().reverse().map((version, idx) => `
-            <div class="version-item">
-                <div class="version-header">
-                    <span class="version-action">${getVersionActionText(version.action)}</span>
-                    <span class="version-time">${formatTime(version.timestamp)}</span>
-                </div>
-                <div class="version-reason">${escapeHtml(version.reason)}</div>
-                <div style="font-size: 12px; color: #64748b; margin-bottom: 8px;">
-                    操作人: ${escapeHtml(version.modifiedBy || 'system')}
-                </div>
-                <div class="version-actions">
-                    ${idx < point.versions.length - 1 ? `
-                        <button class="btn-danger" onclick="rollbackToVersion('${point.id}', '${version.versionId}')">
-                            ↩ 回滚到此版本
-                        </button>
+        ${reversedVersions.map((version, displayIdx) => {
+            const realIdx = point.versions.length - 1 - displayIdx;
+            const prevVersion = realIdx > 0 ? point.versions[realIdx - 1] : null;
+            
+            let changeSummary = '';
+            if (prevVersion) {
+                const changes = [];
+                const fields = ['name', 'streets', 'boundaryStatus', 'assignedStreet', 'notes', 'matchCount'];
+                fields.forEach(f => {
+                    const before = JSON.stringify(prevVersion.current[f]);
+                    const after = JSON.stringify(version.current[f]);
+                    if (before !== after) {
+                        changes.push({
+                            field: f,
+                            before: prevVersion.current[f],
+                            after: version.current[f]
+                        });
+                    }
+                });
+                if (prevVersion.current.busCardPeriods?.length !== version.current.busCardPeriods?.length) {
+                    changes.push({
+                        field: 'busCardPeriods',
+                        before: `${prevVersion.current.busCardPeriods?.length || 0}条`,
+                        after: `${version.current.busCardPeriods?.length || 0}条`
+                    });
+                }
+                
+                if (changes.length > 0) {
+                    changeSummary = changes.map(c => `
+                        <div style="padding: 8px; background: white; border-radius: 4px; margin-top: 6px;">
+                            <div style="font-size: 12px; font-weight: 600; color: #1e40af; margin-bottom: 4px;">
+                                📌 ${getFieldLabel(c.field)}
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+                                <div style="padding: 4px; background: #fef2f2; border-radius: 3px; font-size: 11px;">
+                                    <span style="color: #dc2626; font-weight: 500;">✖ 改前：</span>
+                                    <span style="color: #991b1b; word-break: break-all;">${formatDiffValue(c.before)}</span>
+                                </div>
+                                <div style="padding: 4px; background: #f0fdf4; border-radius: 3px; font-size: 11px;">
+                                    <span style="color: #16a34a; font-weight: 500;">✔ 改后：</span>
+                                    <span style="color: #166534; word-break: break-all;">${formatDiffValue(c.after)}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            }
+            
+            return `
+                <div class="version-item">
+                    <div class="version-header">
+                        <span class="version-action">${getVersionActionText(version.action)}</span>
+                        <span class="version-time">${formatTime(version.timestamp)}</span>
+                    </div>
+                    <div class="version-reason">
+                        <strong>为什么改：</strong>${escapeHtml(version.reason)}
+                    </div>
+                    <div style="font-size: 12px; color: #64748b; margin-bottom: 8px;">
+                        操作人: <strong>${escapeHtml(version.modifiedBy || 'system')}</strong>
+                    </div>
+                    ${changeSummary ? `
+                        <div style="margin-bottom: 10px;">
+                            <div style="font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 4px;">改前改后对比：</div>
+                            ${changeSummary}
+                        </div>
                     ` : ''}
-                    ${idx < point.versions.length - 1 ? `
-                        <button class="btn-primary" onclick="compareWithPrevious('${point.id}', '${version.versionId}', '${point.versions[point.versions.length - 2 - idx].versionId}')">
-                            📊 与前一版本对比
-                        </button>
-                    ` : ''}
+                    <div class="version-actions">
+                        ${displayIdx < reversedVersions.length - 1 ? `
+                            <button class="btn-danger" onclick="rollbackToVersion('${point.id}', '${version.versionId}')">
+                                ↩ 回滚到此版本
+                            </button>
+                        ` : ''}
+                        ${displayIdx < reversedVersions.length - 1 ? `
+                            <button class="btn-primary" onclick="compareWithPrevious('${point.id}', '${version.versionId}', '${prevVersion.versionId}')">
+                                📊 详细对比
+                            </button>
+                        ` : ''}
+                    </div>
                 </div>
-            </div>
-        `).join('')}
+            `;
+        }).join('')}
     `;
 }
 
@@ -489,25 +548,45 @@ function showVersionCompare(result) {
     }
     
     let html = `
-        <div style="margin-bottom: 20px;">
-            <p><strong>版本1:</strong> ${result.version1.action} - ${formatTime(result.version1.timestamp)}</p>
-            <p><strong>版本2:</strong> ${result.version2.action} - ${formatTime(result.version2.timestamp)}</p>
+        <div style="padding: 16px; background: #f8fafc; border-radius: 8px; margin-bottom: 20px;">
+            <h4 style="margin-bottom: 12px; color: #1e40af;">📋 版本对比详情</h4>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div style="padding: 12px; background: white; border-radius: 6px; border-left: 4px solid #dc2626;">
+                    <p style="font-size: 13px; color: #64748b; margin-bottom: 4px;">改前版本（版本1）</p>
+                    <p style="font-weight: 600; color: #991b1b;">${getVersionActionText(result.version1.action)}</p>
+                    <p style="font-size: 12px; color: #64748b; margin-top: 4px;">${formatTime(result.version1.timestamp)}</p>
+                    ${result.version1.reason ? `<p style="font-size: 12px; color: #475569; margin-top: 6px;">原因：${escapeHtml(result.version1.reason)}</p>` : ''}
+                </div>
+                <div style="padding: 12px; background: white; border-radius: 6px; border-left: 4px solid #16a34a;">
+                    <p style="font-size: 13px; color: #64748b; margin-bottom: 4px;">改后版本（版本2）</p>
+                    <p style="font-weight: 600; color: #166534;">${getVersionActionText(result.version2.action)}</p>
+                    <p style="font-size: 12px; color: #64748b; margin-top: 4px;">${formatTime(result.version2.timestamp)}</p>
+                    ${result.version2.reason ? `<p style="font-size: 12px; color: #475569; margin-top: 6px;">原因：${escapeHtml(result.version2.reason)}</p>` : ''}
+                </div>
+            </div>
         </div>
-        <h4 style="margin-bottom: 16px;">差异对比：</h4>
+        
+        <h4 style="margin-bottom: 16px;">🔍 字段差异详情：</h4>
     `;
     
     for (const field of Object.keys(result.diff)) {
         const diff = result.diff[field];
+        const fieldLabel = getFieldLabel(field);
+        
         html += `
-            <div style="margin-bottom: 20px;">
-                <h5 style="margin-bottom: 8px; color: #475569;">${getFieldLabel(field)}</h5>
-                <div class="diff-item before">
-                    <div class="diff-label">改前 (版本1)</div>
-                    <div class="diff-value">${formatDiffValue(diff.before)}</div>
-                </div>
-                <div class="diff-item after">
-                    <div class="diff-label">改后 (版本2)</div>
-                    <div class="diff-value">${formatDiffValue(diff.after)}</div>
+            <div style="margin-bottom: 24px; padding: 16px; background: white; border-radius: 8px; border: 1px solid #e2e8f0;">
+                <h5 style="margin-bottom: 12px; color: #1e40af; font-size: 15px;">
+                    📌 ${fieldLabel}
+                </h5>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="diff-item before" style="margin: 0;">
+                        <div class="diff-label">✖ 改前文本</div>
+                        <div class="diff-value" style="white-space: pre-wrap; word-break: break-all;">${formatDiffValue(diff.before)}</div>
+                    </div>
+                    <div class="diff-item after" style="margin: 0;">
+                        <div class="diff-label">✔ 改后文本</div>
+                        <div class="diff-value" style="white-space: pre-wrap; word-break: break-all;">${formatDiffValue(diff.after)}</div>
+                    </div>
                 </div>
             </div>
         `;
@@ -625,6 +704,10 @@ function initWorkflowStep(step) {
     renderWorkflowStep(step);
 }
 
+let workflowPhotoFiles = [];
+let workflowBusCardData = null;
+let workflowStepResults = { step1: null, step2: null, step3: null };
+
 function renderWorkflowStep(step) {
     const container = document.getElementById('workflowContent');
     
@@ -632,17 +715,60 @@ function renderWorkflowStep(step) {
         container.innerHTML = `
             <div class="workflow-step-detail">
                 <h3>步骤1：路口照片导入</h3>
-                <p style="margin-bottom: 16px; color: #64748b;">选择点位导入照片。系统会自动检测重复照片（通过文件哈希），重复导入不会让匹配数量翻倍。</p>
+                <p style="margin-bottom: 16px; color: #64748b;">选择点位和照片文件。系统通过SHA256文件哈希自动检测重复照片，同一批照片重复导入不会让匹配数量翻倍。</p>
+                
                 <div id="workflowStep1Points"></div>
+                
+                <div id="photoUploadSection" style="margin-top: 20px; padding: 16px; background: #f8fafc; border-radius: 8px; display: ${selectedWorkflowPoints.length > 0 ? 'block' : 'none'};">
+                    <h4 style="margin-bottom: 12px;">📷 选择要导入的路口照片</h4>
+                    <input type="file" id="workflowPhotoInput" multiple accept="image/*" style="margin-bottom: 12px;">
+                    <div id="selectedPhotoList" style="margin-bottom: 12px;"></div>
+                    <div style="margin-top: 20px;">
+                        <button class="btn-primary" onclick="executeWorkflowStep(1)" style="width: 100%;">
+                            📷 开始导入照片
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="step1Result" style="margin-top: 20px;"></div>
             </div>
         `;
         loadWorkflowPoints(1);
+        initWorkflowPhotoUpload();
     } else if (step === 2) {
         container.innerHTML = `
             <div class="workflow-step-detail">
                 <h3>步骤2：补看公交刷卡时段</h3>
-                <p style="margin-bottom: 16px; color: #64748b;">选择点位补充公交刷卡数据。原始备注会完整保留，不会被清洗成一行干净数据。</p>
+                <p style="margin-bottom: 16px; color: #64748b;">选择点位补充公交刷卡数据。原始备注会完整保留在rawText字段，不会被清洗成一行干净数据。修改备注时历史版本会记录改前文本、改后文本和修改原因。</p>
+                
                 <div id="workflowStep2Points"></div>
+                
+                <div id="busCardSection" style="margin-top: 20px; padding: 16px; background: #f8fafc; border-radius: 8px; display: ${selectedWorkflowPoints.length > 0 ? 'block' : 'none'};">
+                    <h4 style="margin-bottom: 12px;">🚌 录入公交刷卡时段</h4>
+                    <div class="form-group">
+                        <label>时段</label>
+                        <input type="text" id="bcPeriod" placeholder="如：早高峰 7:00-9:00">
+                    </div>
+                    <div class="form-group">
+                        <label>客流量</label>
+                        <input type="text" id="bcVolume" placeholder="如：1200人次">
+                    </div>
+                    <div class="form-group">
+                        <label>原始备注（完整保留，不会被清洗）</label>
+                        <textarea id="bcNotes" rows="3" placeholder="阿宁备注：原始文本完整保留，包括换行、特殊字符等"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>修改原因（将记录到版本历史）</label>
+                        <input type="text" id="bcReason" placeholder="如：初次录入/补充备注/修正数据">
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <button class="btn-primary" onclick="executeWorkflowStep(2)" style="width: 100%;">
+                            🚌 补充公交刷卡数据
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="step2Result" style="margin-top: 20px;"></div>
             </div>
         `;
         loadWorkflowPoints(2);
@@ -650,12 +776,51 @@ function renderWorkflowStep(step) {
         container.innerHTML = `
             <div class="workflow-step-detail">
                 <h3>步骤3：地图导出更新</h3>
-                <p style="margin-bottom: 16px; color: #64748b;">选择点位导出地图数据。边界待复核的点位会被拦截，需项目经理先确认归属。</p>
+                <p style="margin-bottom: 16px; color: #64748b;">选择点位导出地图数据。边界待复核的点位会被拦截，需项目经理先确认归属。导出报告会包含重复导入来源、处理状态和结论。</p>
                 <div id="workflowStep3Points"></div>
+                <div style="margin-top: 20px;">
+                    <button class="btn-primary" onclick="executeWorkflowStep(3)" style="width: 100%;">
+                        🗺️ 导出地图数据
+                    </button>
+                </div>
+                <div id="step3Result" style="margin-top: 20px;"></div>
+                <div id="workflowFinalReport" style="margin-top: 30px;"></div>
             </div>
         `;
         loadWorkflowPoints(3);
     }
+}
+
+function initWorkflowPhotoUpload() {
+    const input = document.getElementById('workflowPhotoInput');
+    if (!input) return;
+    
+    input.addEventListener('change', (e) => {
+        workflowPhotoFiles = Array.from(e.target.files);
+        renderSelectedPhotos();
+    });
+}
+
+function renderSelectedPhotos() {
+    const list = document.getElementById('selectedPhotoList');
+    if (!list) return;
+    
+    if (workflowPhotoFiles.length === 0) {
+        list.innerHTML = '<p style="color: #94a3b8; font-size: 13px;">未选择照片</p>';
+        return;
+    }
+    
+    list.innerHTML = `
+        <p style="font-size: 13px; color: #475569; margin-bottom: 8px;">已选择 ${workflowPhotoFiles.length} 张照片：</p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px;">
+            ${workflowPhotoFiles.map((f, i) => `
+                <div style="padding: 8px; background: white; border-radius: 6px; font-size: 12px;">
+                    🖼️ ${escapeHtml(f.name)}<br>
+                    <span style="color: #94a3b8;">${(f.size / 1024).toFixed(1)} KB</span>
+                </div>
+            `).join('')}
+        </div>
+    `;
 }
 
 async function loadWorkflowPoints(step) {
@@ -664,36 +829,41 @@ async function loadWorkflowPoints(step) {
         const data = await res.json();
         let points = data.points;
         
-        if (step === 3) {
+        const container = document.getElementById(`workflowStep${step}Points`);
+        
+        if (points.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">📍</div>
+                    <p>暂无点位，请先在「点位列表」创建点位</p>
+                </div>
+            `;
+            return;
         }
         
-        const container = document.getElementById(`workflowStep${step}Points`);
         container.innerHTML = points.map(point => `
             <div class="point-select-item ${selectedWorkflowPoints.includes(point.id) ? 'selected' : ''}"
-                 onclick="toggleWorkflowPoint('${point.id}')">
+                 onclick="toggleWorkflowPoint('${point.id}', ${step})">
                 <div>
                     <strong>${escapeHtml(point.name)}</strong>
                     <span class="status-tag status-${point.boundaryStatus}" style="margin-left: 10px;">
                         ${getBoundaryText(point.boundaryStatus)}
                     </span>
                 </div>
-                <div>
+                <div style="text-align: right;">
                     <span class="stage-tag">${getStageText(point.workflowStage)}</span>
+                    <div style="font-size: 12px; color: #94a3b8; margin-top: 4px;">
+                        📷 ${point.photos.length}张 | 🚌 ${point.busCardPeriods.length}条
+                    </div>
                 </div>
             </div>
-        `).join('') + `
-            <div style="margin-top: 20px;">
-                <button class="btn-primary" onclick="executeWorkflowStep(${step})" style="width: 100%;">
-                    ${step === 1 ? '📷 导入选中点位的照片' : step === 2 ? '🚌 补充公交刷卡数据' : '🗺️ 导出地图数据'}
-                </button>
-            </div>
-        `;
+        `).join('');
     } catch (err) {
         console.error(err);
     }
 }
 
-function toggleWorkflowPoint(pointId) {
+function toggleWorkflowPoint(pointId, step) {
     const idx = selectedWorkflowPoints.indexOf(pointId);
     if (idx === -1) {
         selectedWorkflowPoints.push(pointId);
@@ -701,9 +871,15 @@ function toggleWorkflowPoint(pointId) {
         selectedWorkflowPoints.splice(idx, 1);
     }
     
-    const activeStep = document.querySelector('.step.active');
-    const stepNum = parseInt(activeStep.id.replace('step', ''));
-    loadWorkflowPoints(stepNum);
+    loadWorkflowPoints(step);
+    
+    if (step === 1) {
+        const section = document.getElementById('photoUploadSection');
+        if (section) section.style.display = selectedWorkflowPoints.length > 0 ? 'block' : 'none';
+    } else if (step === 2) {
+        const section = document.getElementById('busCardSection');
+        if (section) section.style.display = selectedWorkflowPoints.length > 0 ? 'block' : 'none';
+    }
 }
 
 async function executeWorkflowStep(step) {
@@ -713,32 +889,128 @@ async function executeWorkflowStep(step) {
     }
     
     if (step === 1) {
-        alert('照片导入功能演示：在实际场景中，这里会弹出文件选择器。\n\n当前系统已支持：\n- 通过SHA256文件哈希检测重复照片\n- 重复导入不会增加匹配数量\n- 原始照片完整保留在 rawMaterials.originalPhotos 中');
-        selectedWorkflowPoints = [];
-    } else if (step === 2) {
-        const period = prompt('请输入公交刷卡时段（如：早高峰 7:00-9:00）');
-        if (!period) return;
-        const volume = prompt('请输入客流量');
-        const rawNotes = prompt('请输入原始备注（将完整保留，不会被清洗）');
-        
-        for (const pointId of selectedWorkflowPoints) {
-            await fetch(`${API_BASE}/points/${pointId}/bus-cards`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    busCardData: {
-                        period,
-                        passengerVolume: volume,
-                        rawText: rawNotes,
-                        notes: rawNotes
-                    },
-                    supplementedBy: '阿宁'
-                })
-            });
+        if (workflowPhotoFiles.length === 0) {
+            alert('请先选择要上传的照片文件');
+            return;
         }
         
-        alert('公交刷卡数据已补充！原始备注已完整保留。');
-        selectedWorkflowPoints = [];
+        const step1Results = [];
+        
+        for (const pointId of selectedWorkflowPoints) {
+            const formData = new FormData();
+            formData.append('importedBy', '阿宁');
+            workflowPhotoFiles.forEach(f => formData.append('photos', f));
+            
+            try {
+                const res = await fetch(`${API_BASE}/points/${pointId}/photos`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await res.json();
+                step1Results.push({ pointId, result });
+            } catch (err) {
+                step1Results.push({ pointId, error: err.message });
+            }
+        }
+        
+        const totalImported = step1Results.reduce((s, r) => s + (r.result?.importedCount || 0), 0);
+        const totalDuplicated = step1Results.reduce((s, r) => s + (r.result?.duplicatedCount || 0), 0);
+        
+        workflowStepResults.step1 = {
+            timestamp: new Date().toISOString(),
+            pointsProcessed: selectedWorkflowPoints.length,
+            photosSubmitted: workflowPhotoFiles.length,
+            photosImported: totalImported,
+            photosDuplicated: totalDuplicated,
+            details: step1Results
+        };
+        
+        const resultDiv = document.getElementById('step1Result');
+        resultDiv.innerHTML = `
+            <div style="padding: 16px; background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px;">
+                <h4 style="color: #166534; margin-bottom: 12px;">✅ 步骤1完成：路口照片导入</h4>
+                <p><strong>处理位点数：</strong>${selectedWorkflowPoints.length} 个</p>
+                <p><strong>提交照片数：</strong>${workflowPhotoFiles.length} 张</p>
+                <p><strong>新导入：</strong><span style="color: #166534; font-weight: 600;">${totalImported} 张</span></p>
+                <p><strong>重复（已去重）：</strong><span style="color: #f59e0b; font-weight: 600;">${totalDuplicated} 张</span></p>
+                <p style="margin-top: 10px; font-size: 13px; color: #64748b;">
+                    💡 同一批照片重复导入不会让匹配数量翻倍，系统通过SHA256文件哈希自动去重
+                </p>
+            </div>
+        `;
+        
+        workflowPhotoFiles = [];
+        
+    } else if (step === 2) {
+        const period = document.getElementById('bcPeriod').value.trim();
+        const volume = document.getElementById('bcVolume').value.trim();
+        const notes = document.getElementById('bcNotes').value;
+        const reason = document.getElementById('bcReason').value.trim() || '补充公交刷卡时段';
+        
+        if (!period) {
+            alert('请填写时段');
+            return;
+        }
+        
+        const step2Results = [];
+        
+        for (const pointId of selectedWorkflowPoints) {
+            try {
+                const res = await fetch(`${API_BASE}/points/${pointId}/bus-cards`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        busCardData: {
+                            period,
+                            passengerVolume: volume,
+                            rawText: notes,
+                            notes
+                        },
+                        supplementedBy: '阿宁'
+                    })
+                });
+                const result = await res.json();
+                step2Results.push({ pointId, success: true, result });
+            } catch (err) {
+                step2Results.push({ pointId, success: false, error: err.message });
+            }
+        }
+        
+        const successCount = step2Results.filter(r => r.success).length;
+        
+        workflowStepResults.step2 = {
+            timestamp: new Date().toISOString(),
+            pointsProcessed: selectedWorkflowPoints.length,
+            successCount,
+            period,
+            volume,
+            rawNotes: notes,
+            reason,
+            details: step2Results
+        };
+        
+        const resultDiv = document.getElementById('step2Result');
+        resultDiv.innerHTML = `
+            <div style="padding: 16px; background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px;">
+                <h4 style="color: #166534; margin-bottom: 12px;">✅ 步骤2完成：补看公交刷卡时段</h4>
+                <p><strong>处理位点数：</strong>${successCount}/${selectedWorkflowPoints.length} 个</p>
+                <p><strong>时段：</strong>${escapeHtml(period)}</p>
+                ${volume ? `<p><strong>客流量：</strong>${escapeHtml(volume)}</p>` : ''}
+                ${notes ? `
+                    <div style="margin-top: 10px; padding: 10px; background: #fef3c7; border-radius: 6px;">
+                        <p style="font-weight: 600; color: #92400e; font-size: 13px;">📝 原始备注（完整保留，不会被清洗）：</p>
+                        <p style="color: #78350f; white-space: pre-wrap;">${escapeHtml(notes)}</p>
+                    </div>
+                ` : ''}
+                <p style="margin-top: 10px; font-size: 13px; color: #64748b;">
+                    修改原因：${escapeHtml(reason)} | 修改人：阿宁
+                </p>
+                <p style="margin-top: 8px; font-size: 13px; color: #64748b;">
+                    💡 版本历史已记录：改前文本、改后文本、修改原因、修改人、修改时间
+                </p>
+            </div>
+        `;
+        
     } else if (step === 3) {
         try {
             const res = await fetch(`${API_BASE}/map/export`, {
@@ -754,29 +1026,157 @@ async function executeWorkflowStep(step) {
             const successCount = result.exports.filter(e => e.success).length;
             const errorCount = result.exports.filter(e => e.error).length;
             
-            let msg = `导出完成！\n成功: ${successCount} 个\n失败: ${errorCount} 个\n`;
+            workflowStepResults.step3 = {
+                timestamp: new Date().toISOString(),
+                exportedBy: '阿宁',
+                successCount,
+                errorCount,
+                details: result.exports
+            };
             
-            const errors = result.exports.filter(e => e.error);
-            if (errors.length > 0) {
-                msg += '\n失败原因：\n';
-                errors.forEach(e => {
-                    msg += `- ${e.pointName}: ${e.error}\n`;
-                });
-            }
+            const resultDiv = document.getElementById('step3Result');
+            resultDiv.innerHTML = `
+                <div style="padding: 16px; background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px;">
+                    <h4 style="color: #166534; margin-bottom: 12px;">✅ 步骤3完成：地图导出更新</h4>
+                    <p><strong>导成功：</strong>${successCount} 个</p>
+                    <p><strong>导出失败：</strong>${errorCount} 个</p>
+                    ${errorCount > 0 ? `
+                        <div style="margin-top: 10px; padding: 10px; background: #fee2e2; border-radius: 6px;">
+                            <p style="font-weight: 600; color: #991b1b; font-size: 13px;">失败原因：</p>
+                            ${result.exports.filter(e => e.error).map(e => `
+                                <p style="color: #7f1d1d; font-size: 13px;">- ${escapeHtml(e.pointName)}: ${escapeHtml(e.error)}</p>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
             
-            alert(msg);
-            selectedWorkflowPoints = [];
+            renderWorkflowFinalReport();
+            
         } catch (err) {
             alert('导出失败: ' + err.message);
+            return;
         }
     }
     
     loadPoints();
     loadStats();
+    loadBoundaryPoints();
     
     if (step < 3) {
-        setTimeout(() => initWorkflowStep(step + 1), 500);
+        setTimeout(() => initWorkflowStep(step + 1), 1500);
     }
+}
+
+function renderWorkflowFinalReport() {
+    const s1 = workflowStepResults.step1;
+    const s2 = workflowStepResults.step2;
+    const s3 = workflowStepResults.step3;
+    
+    const container = document.getElementById('workflowFinalReport');
+    if (!container) return;
+    
+    let photoDuplicates = [];
+    if (s1 && s1.details) {
+        for (const d of s1.details) {
+            if (d.result && d.result.results) {
+                for (const r of d.result.results) {
+                    if (r.duplicated) {
+                        photoDuplicates.push({
+                            pointId: d.pointId,
+                            filename: r.photoRecord?.originalFilename || '未知文件',
+                            existingPhotoId: r.existingPhotoId,
+                            existingPointId: r.existingPointId
+                        });
+                    }
+                }
+            }
+        }
+    }
+    
+    container.innerHTML = `
+        <div style="padding: 24px; background: linear-gradient(135deg, #eff6ff, #dbeafe); border-radius: 12px; border: 2px solid #2563eb;">
+            <h3 style="color: #1e40af; margin-bottom: 16px; text-align: center;">📋 停车错峰共享匹配 - 三步工作流完成报告</h3>
+            
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px;">
+                <div style="padding: 12px; background: white; border-radius: 8px; text-align: center;">
+                    <div style="font-size: 24px; font-weight: 700; color: #2563eb;">1</div>
+                    <div style="font-size: 13px; color: #475569;">路口照片导入</div>
+                    <div style="font-size: 12px; color: #16a34a; font-weight: 600;">${s1 ? '✓ 已完成' : '○ 未执行'}</div>
+                </div>
+                <div style="padding: 12px; background: white; border-radius: 8px; text-align: center;">
+                    <div style="font-size: 24px; font-weight: 700; color: #2563eb;">2</div>
+                    <div style="font-size: 13px; color: #475569;">补看公交刷卡时段</div>
+                    <div style="font-size: 12px; color: #16a34a; font-weight: 600;">${s2 ? '✓ 已完成' : '○ 未执行'}</div>
+                </div>
+                <div style="padding: 12px; background: white; border-radius: 8px; text-align: center;">
+                    <div style="font-size: 24px; font-weight: 700; color: #2563eb;">3</div>
+                    <div style="font-size: 13px; color: #475569;">地图导出更新</div>
+                    <div style="font-size: 12px; color: #16a34a; font-weight: 600;">${s3 ? '✓ 已完成' : '○ 未执行'}</div>
+                </div>
+            </div>
+            
+            ${s1 ? `
+                <div style="padding: 16px; background: white; border-radius: 8px; margin-bottom: 12px;">
+                    <h4 style="color: #1e40af; margin-bottom: 10px;">📷 步骤1：路口照片导入</h4>
+                    <p style="font-size: 14px;"><strong>提交照片：</strong>${s1.photosSubmitted} 张</p>
+                    <p style="font-size: 14px;"><strong>新导入：</strong><span style="color: #16a34a;">${s1.photosImported} 张</span></p>
+                    <p style="font-size: 14px;"><strong>重复去重：</strong><span style="color: #f59e0b;">${s1.photosDuplicated} 张</span>（数量不翻倍）</p>
+                    <p style="font-size: 14px;"><strong>处理时间：</strong>${formatTime(s1.timestamp)}</p>
+                    <p style="font-size: 14px;"><strong>去重口径：</strong>SHA256文件哈希，同一文件重复上传自动识别</p>
+                    ${photoDuplicates.length > 0 ? `
+                        <div style="margin-top: 10px; padding: 10px; background: #fef3c7; border-radius: 6px;">
+                            <p style="font-size: 13px; font-weight: 600; color: #92400e;">重复导入明细：</p>
+                            ${photoDuplicates.map(d => `
+                                <p style="font-size: 12px; color: #78350f;">
+                                    • 文件 ${escapeHtml(d.filename)} → 已存在（照片ID: ${d.existingPhotoId?.substring(0, 8)}...）
+                                </p>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            ` : ''}
+            
+            ${s2 ? `
+                <div style="padding: 16px; background: white; border-radius: 8px; margin-bottom: 12px;">
+                    <h4 style="color: #1e40af; margin-bottom: 10px;">🚌 步骤2：补看公交刷卡时段</h4>
+                    <p style="font-size: 14px;"><strong>时段：</strong>${escapeHtml(s2.period)}</p>
+                    <p style="font-size: 14px;"><strong>客流量：</strong>${escapeHtml(s2.volume || '未填写')}</p>
+                    <p style="font-size: 14px;"><strong>修改原因：</strong>${escapeHtml(s2.reason)}</p>
+                    <p style="font-size: 14px;"><strong>处理时间：</strong>${formatTime(s2.timestamp)}</p>
+                    ${s2.rawNotes ? `
+                        <div style="margin-top: 10px; padding: 10px; background: #fef3c7; border-radius: 6px;">
+                            <p style="font-size: 13px; font-weight: 600; color: #92400e;">📝 原始备注（完整保留，未清洗）：</p>
+                            <p style="font-size: 13px; color: #78350f; white-space: pre-wrap;">${escapeHtml(s2.rawNotes)}</p>
+                        </div>
+                    ` : ''}
+                    <p style="margin-top: 8px; font-size: 12px; color: #64748b;">
+                        💡 版本历史可查：改前文本 → 改后文本 → 修改原因 → 修改人 → 修改时间
+                    </p>
+                </div>
+            ` : ''}
+            
+            ${s3 ? `
+                <div style="padding: 16px; background: white; border-radius: 8px; margin-bottom: 12px;">
+                    <h4 style="color: #1e40af; margin-bottom: 10px;">🗺️ 步骤3：地图导出更新</h4>
+                    <p style="font-size: 14px;"><strong>导出成功：</strong>${s3.successCount} 个点位</p>
+                    <p style="font-size: 14px;"><strong>导出失败：</strong>${s3.errorCount} 个点位</p>
+                    <p style="font-size: 14px;"><strong>导出人：</strong>${escapeHtml(s3.exportedBy)}</p>
+                    <p style="font-size: 14px;"><strong>导出时间：</strong>${formatTime(s3.timestamp)}</p>
+                </div>
+            ` : ''}
+            
+            <div style="padding: 16px; background: white; border-radius: 8px; border-left: 4px solid #2563eb;">
+                <h4 style="color: #1e40af; margin-bottom: 10px;">📌 结论</h4>
+                <p style="font-size: 14px; line-height: 1.8;">
+                    三步工作流${s1 && s2 && s3 ? '<strong style="color: #16a34a;">全部完成</strong>' : '<strong style="color: #f59e0b;">部分完成</strong>'}。
+                    ${s1 && s1.photosDuplicated > 0 ? `路口照片导入中检测到重复照片 <strong>${s1.photosDuplicated}</strong> 张，已通过SHA256哈希自动去重，匹配数量未翻倍。` : ''}
+                    ${s2 ? `公交刷卡时段原始备注已完整保留在 <code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px;">rawText</code> 字段，版本历史记录了改前改后差异。` : ''}
+                    ${s3 && s3.errorCount > 0 ? `地图导出中有 <strong>${s3.errorCount}</strong> 个点位失败（通常为边界待复核状态），需项目经理确认归属后重新导出。` : ''}
+                </p>
+            </div>
+        </div>
+    `;
 }
 
 document.querySelectorAll('.step').forEach(step => {
