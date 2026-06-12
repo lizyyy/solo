@@ -92,18 +92,32 @@ class ConflictService {
         }
         return conflicts;
     }
-    resolveConflict(conflictId, resolution, resolvedBy) {
+    resolveConflict(conflictId, resolution, resolvedBy, resolutionNote) {
         const now = new Date().toISOString();
-        const updated = (0, database_1.updateOne)('conflicts', (c) => c.id === conflictId, { resolution, resolvedBy, resolvedAt: now });
+        const updateData = { resolution, resolvedBy, resolvedAt: now };
+        if (resolutionNote) {
+            updateData.resolutionNote = resolutionNote;
+        }
+        const updated = (0, database_1.updateOne)('conflicts', (c) => c.id === conflictId, updateData);
         if (!updated)
             return null;
         const conflict = updated;
         const cardConflicts = this.getConflictsByCardId(conflict.cardId);
-        const unresolvedCount = cardConflicts.filter((c) => !c.resolution).length;
+        const unresolvedCount = cardConflicts.filter((c) => this.isUnresolved(c)).length;
         if (unresolvedCount === 0) {
             this.cardService.updateCardStatus(conflict.cardId, 'CONFLICT_RESOLVED', resolvedBy);
         }
+        else {
+            this.cardService.updateCardStatus(conflict.cardId, 'CONFLICT_DETECTED', resolvedBy);
+        }
         return conflict;
+    }
+    isUnresolved(conflict) {
+        if (!conflict.resolution)
+            return true;
+        if (conflict.resolution === 'PENDING_REVIEW')
+            return true;
+        return false;
     }
     getConflictById(conflictId) {
         const row = (0, database_1.findOne)('conflicts', (c) => c.id === conflictId);
@@ -114,7 +128,7 @@ class ConflictService {
             .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     }
     getUnresolvedConflicts(cardId) {
-        return this.getConflictsByCardId(cardId).filter((c) => !c.resolution);
+        return this.getConflictsByCardId(cardId).filter((c) => this.isUnresolved(c));
     }
 }
 exports.ConflictService = ConflictService;

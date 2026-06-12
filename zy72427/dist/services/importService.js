@@ -12,16 +12,50 @@ class ImportService {
         const batchId = (0, uuid_1.v4)();
         const now = new Date().toISOString();
         const importedRecords = [];
-        let duplicateCount = 0;
+        const details = [];
         const existingRecords = this.getAttendanceByCardId(cardId);
-        const existingKeys = new Set(existingRecords.map((r) => `${r.classDate}_${r.className}_${r.studentName}`));
+        const existingKeyToRecord = new Map();
+        for (const r of existingRecords) {
+            const key = `${r.classDate}_${r.className}_${r.studentName}`;
+            existingKeyToRecord.set(key, r);
+        }
+        const currentBatchKeys = new Set();
         const recordsToInsert = [];
         for (const record of records) {
             const key = `${record.classDate}_${record.className}_${record.studentName}`;
-            if (existingKeys.has(key)) {
-                duplicateCount++;
+            if (currentBatchKeys.has(key)) {
+                details.push({
+                    record: {
+                        id: '',
+                        cardId,
+                        ...record,
+                        isGroupMessageOnly: record.isGroupMessageOnly || false,
+                        importedAt: now,
+                        importBatchId: batchId,
+                    },
+                    importStatus: 'DUPLICATE_CURRENT_BATCH',
+                    duplicateOf: key,
+                });
                 continue;
             }
+            if (existingKeyToRecord.has(key)) {
+                const existing = existingKeyToRecord.get(key);
+                details.push({
+                    record: {
+                        id: '',
+                        cardId,
+                        ...record,
+                        isGroupMessageOnly: record.isGroupMessageOnly || false,
+                        importedAt: now,
+                        importBatchId: batchId,
+                    },
+                    importStatus: 'DUPLICATE_HISTORICAL',
+                    duplicateOf: `历史记录(${existing.importBatchId.substring(0, 8)}...)`,
+                });
+                currentBatchKeys.add(key);
+                continue;
+            }
+            currentBatchKeys.add(key);
             const id = (0, uuid_1.v4)();
             const attendanceRecord = {
                 id,
@@ -37,6 +71,10 @@ class ImportService {
             };
             recordsToInsert.push(attendanceRecord);
             importedRecords.push(attendanceRecord);
+            details.push({
+                record: attendanceRecord,
+                importStatus: 'NEW',
+            });
         }
         if (recordsToInsert.length > 0) {
             (0, database_1.insertMany)('attendance', recordsToInsert);
@@ -45,14 +83,76 @@ class ImportService {
             attendanceBatchId: batchId,
             status: 'ATTENDANCE_IMPORTED',
         });
-        return { batchId, records: importedRecords, duplicateCount };
+        const summary = {
+            newCount: details.filter(d => d.importStatus === 'NEW').length,
+            duplicateCurrentBatchCount: details.filter(d => d.importStatus === 'DUPLICATE_CURRENT_BATCH').length,
+            duplicateHistoricalCount: details.filter(d => d.importStatus === 'DUPLICATE_HISTORICAL').length,
+        };
+        return { batchId, records: importedRecords, details, summary };
     }
     supplementTickets(cardId, records, supplementedBy) {
         const batchId = (0, uuid_1.v4)();
         const now = new Date().toISOString();
         const importedRecords = [];
+        const details = [];
+        const existingRecords = this.getTicketsByCardId(cardId);
+        const existingKeyToRecord = new Map();
+        for (const r of existingRecords) {
+            const key = `${r.classDate}_${r.className}_${r.studentName}`;
+            existingKeyToRecord.set(key, r);
+        }
+        const currentBatchKeys = new Set();
         const recordsToInsert = [];
         for (const record of records) {
+            const key = `${record.classDate}_${record.className}_${record.studentName}`;
+            if (currentBatchKeys.has(key)) {
+                details.push({
+                    record: {
+                        id: '',
+                        cardId,
+                        ...record,
+                        exportedAt: now,
+                        exportBatchId: batchId,
+                    },
+                    importStatus: 'DUPLICATE_CURRENT_BATCH',
+                    duplicateOf: key,
+                });
+                continue;
+            }
+            const isManualSupplement = !!record.supplementNote;
+            if (existingKeyToRecord.has(key)) {
+                const existing = existingKeyToRecord.get(key);
+                if (isManualSupplement) {
+                    details.push({
+                        record: {
+                            id: '',
+                            cardId,
+                            ...record,
+                            exportedAt: now,
+                            exportBatchId: batchId,
+                        },
+                        importStatus: 'DUPLICATE_HISTORICAL',
+                        duplicateOf: `历史记录(${existing.exportBatchId.substring(0, 8)}...)`,
+                        supplementNote: record.supplementNote,
+                    });
+                }
+                else {
+                    details.push({
+                        record: {
+                            id: '',
+                            cardId,
+                            ...record,
+                            exportedAt: now,
+                            exportBatchId: batchId,
+                        },
+                        importStatus: 'DUPLICATE_HISTORICAL',
+                        duplicateOf: `历史记录(${existing.exportBatchId.substring(0, 8)}...)`,
+                    });
+                }
+                currentBatchKeys.add(key);
+                continue;
+            }
+            currentBatchKeys.add(key);
             const id = (0, uuid_1.v4)();
             const ticketRecord = {
                 id,
@@ -68,6 +168,12 @@ class ImportService {
             };
             recordsToInsert.push(ticketRecord);
             importedRecords.push(ticketRecord);
+            const status = isManualSupplement ? 'MANUAL_SUPPLEMENT' : 'NEW';
+            details.push({
+                record: ticketRecord,
+                importStatus: status,
+                supplementNote: record.supplementNote,
+            });
         }
         if (recordsToInsert.length > 0) {
             (0, database_1.insertMany)('tickets', recordsToInsert);
@@ -76,7 +182,13 @@ class ImportService {
             ticketBatchId: batchId,
             status: 'TICKET_SUPPLEMENTED',
         });
-        return { batchId, records: importedRecords };
+        const summary = {
+            newCount: details.filter(d => d.importStatus === 'NEW').length,
+            duplicateCurrentBatchCount: details.filter(d => d.importStatus === 'DUPLICATE_CURRENT_BATCH').length,
+            duplicateHistoricalCount: details.filter(d => d.importStatus === 'DUPLICATE_HISTORICAL').length,
+            manualSupplementCount: details.filter(d => d.importStatus === 'MANUAL_SUPPLEMENT').length,
+        };
+        return { batchId, records: importedRecords, details, summary };
     }
     getAttendanceByCardId(cardId) {
         return (0, database_1.findMany)('attendance', (a) => a.cardId === cardId)

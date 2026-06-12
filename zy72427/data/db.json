@@ -1,23 +1,13 @@
 {
   "cards": [
     {
-      "id": "73a6e0b6-e503-4632-92ec-e70db659661b",
-      "playlistName": "夏日清凉歌单",
+      "id": "7db0ac5f-1fa1-4c7d-8fcd-db3b9b28d1fe",
+      "playlistName": "2024春季演唱会歌单",
       "createdBy": "小段",
-      "createdAt": "2026-06-06T16:10:48.354Z",
-      "updatedAt": "2026-06-06T16:10:48.354Z",
-      "status": "DRAFT",
-      "currentVersion": 1,
-      "selfCheckResults": []
-    },
-    {
-      "id": "0b6b82ab-94bb-4718-8d59-ea788015074c",
-      "playlistName": "夏日清凉歌单",
-      "createdBy": "小段",
-      "createdAt": "2026-06-06T16:11:38.400Z",
-      "updatedAt": "2026-06-06T16:11:39.495Z",
-      "status": "CONFLICT_RESOLVED",
-      "currentVersion": 3,
+      "createdAt": "2026-06-12T01:15:18.361Z",
+      "updatedAt": "2026-06-12T01:15:19.115Z",
+      "status": "REVENUE_CALCULATED",
+      "currentVersion": 5,
       "selfCheckResults": [
         {
           "checkType": "DUPLICATE_IMPORT",
@@ -32,10 +22,10 @@
           "details": {
             "records": [
               {
-                "classDate": "2024-01-16",
-                "className": "钢琴进阶班",
-                "studentName": "钱七",
-                "sourceNote": "群里说临时替孙八"
+                "classDate": "2024-03-02",
+                "className": "钢琴伴奏课",
+                "studentName": "陈奕迅",
+                "sourceNote": "群里说临时替张学友"
               }
             ]
           },
@@ -47,7 +37,7 @@
           "message": "发现1条补录记录需要确认重算",
           "details": {
             "issues": [
-              "2024-01-16_钢琴进阶班_赵六: 补录记录无对应票务，需确认是否需要重算"
+              "2024-03-02_钢琴伴奏课_邓紫棋: 补录记录无对应票务，需确认是否需要重算"
             ]
           },
           "severity": "WARNING"
@@ -59,183 +49,425 @@
           "severity": "WARNING"
         }
       ],
-      "attendanceBatchId": "8d9922a4-2fee-40f3-a256-892e1c041c93",
-      "ticketBatchId": "f74aeacf-07ca-497c-b0d7-5224f7939874"
+      "attendanceBatchId": "c8976697-fbef-4639-9b43-2fdb59d3afa3",
+      "ticketBatchId": "62f96b2d-16f5-4505-8cdd-71a3f392e8c9",
+      "revenueVersion": 1
+    },
+    {
+      "id": "4dbec564-b495-43dc-ac12-6565de074107",
+      "playlistName": "2024春季演唱会歌单",
+      "createdBy": "小段",
+      "createdAt": "2026-06-12T01:16:55.582Z",
+      "updatedAt": "2026-06-12T01:16:56.409Z",
+      "status": "CONFLICT_RESOLVED",
+      "currentVersion": 5,
+      "selfCheckResults": [
+        {
+          "checkType": "DUPLICATE_IMPORT",
+          "passed": true,
+          "message": "无重复导入记录",
+          "severity": "INFO"
+        },
+        {
+          "checkType": "TEMP_SUBSTITUTE_WARNING",
+          "passed": false,
+          "message": "发现1条仅在群里提及的临时替补记录，需票务同事复核",
+          "details": {
+            "records": [
+              {
+                "classDate": "2024-03-02",
+                "className": "钢琴伴奏课",
+                "studentName": "陈奕迅",
+                "sourceNote": "群里说临时替张学友"
+              }
+            ]
+          },
+          "severity": "WARNING"
+        },
+        {
+          "checkType": "MAKUP_RECALCULATION",
+          "passed": false,
+          "message": "发现1条补录记录需要确认重算",
+          "details": {
+            "issues": [
+              "2024-03-02_钢琴伴奏课_邓紫棋: 补录记录无对应票务，需确认是否需要重算"
+            ]
+          },
+          "severity": "WARNING"
+        },
+        {
+          "checkType": "EXPORT_CONSISTENCY",
+          "passed": false,
+          "message": "暂无票务导出数据，无法校验一致性",
+          "severity": "WARNING"
+        }
+      ],
+      "attendanceBatchId": "d6c4fd2d-7859-4bc5-a730-0c0c137bf699",
+      "ticketBatchId": "f3bfd420-072b-4b75-84ea-1e918a4733f4"
     }
   ],
   "attendance": [
     {
-      "id": "124b16d9-37a0-4be0-9363-f762a046edb4",
-      "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
-      "classDate": "2024-01-15",
-      "className": "声乐入门班",
-      "studentName": "张三",
+      "id": "a0e415a3-292f-41e6-ae46-d74202fa448d",
+      "cardId": "7db0ac5f-1fa1-4c7d-8fcd-db3b9b28d1fe",
+      "classDate": "2024-03-01",
+      "className": "声乐大师班",
+      "studentName": "周杰伦",
       "status": "NORMAL",
       "isGroupMessageOnly": false,
-      "importedAt": "2026-06-06T16:11:38.570Z",
-      "importBatchId": "8d9922a4-2fee-40f3-a256-892e1c041c93"
+      "importedAt": "2026-06-12T01:15:18.468Z",
+      "importBatchId": "c8976697-fbef-4639-9b43-2fdb59d3afa3"
     },
     {
-      "id": "5bd5adf2-e722-49fe-945d-25d24c56d1ed",
-      "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
-      "classDate": "2024-01-15",
-      "className": "声乐入门班",
-      "studentName": "李四",
+      "id": "286d7108-2c91-485d-b15a-7888f5b9485f",
+      "cardId": "7db0ac5f-1fa1-4c7d-8fcd-db3b9b28d1fe",
+      "classDate": "2024-03-01",
+      "className": "声乐大师班",
+      "studentName": "林俊杰",
       "status": "NORMAL",
       "isGroupMessageOnly": false,
-      "importedAt": "2026-06-06T16:11:38.570Z",
-      "importBatchId": "8d9922a4-2fee-40f3-a256-892e1c041c93"
+      "importedAt": "2026-06-12T01:15:18.468Z",
+      "importBatchId": "c8976697-fbef-4639-9b43-2fdb59d3afa3"
     },
     {
-      "id": "b8f103d3-148d-4bb8-8366-903bd72995ff",
-      "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
-      "classDate": "2024-01-15",
-      "className": "声乐入门班",
-      "studentName": "王五",
+      "id": "f85a546e-adaa-4c6b-ae6d-e5cc5480694f",
+      "cardId": "7db0ac5f-1fa1-4c7d-8fcd-db3b9b28d1fe",
+      "classDate": "2024-03-02",
+      "className": "钢琴伴奏课",
+      "studentName": "邓紫棋",
+      "status": "MAKEUP",
+      "sourceNote": "上周生病请假补录",
+      "isGroupMessageOnly": false,
+      "importedAt": "2026-06-12T01:15:18.468Z",
+      "importBatchId": "c8976697-fbef-4639-9b43-2fdb59d3afa3"
+    },
+    {
+      "id": "d77b8dc9-2080-42fb-bd7c-111a5f995aa0",
+      "cardId": "7db0ac5f-1fa1-4c7d-8fcd-db3b9b28d1fe",
+      "classDate": "2024-03-02",
+      "className": "钢琴伴奏课",
+      "studentName": "陈奕迅",
+      "status": "TEMP_SUBSTITUTE",
+      "sourceNote": "群里说临时替张学友",
+      "isGroupMessageOnly": true,
+      "importedAt": "2026-06-12T01:15:18.468Z",
+      "importBatchId": "c8976697-fbef-4639-9b43-2fdb59d3afa3"
+    },
+    {
+      "id": "215c2f35-09d4-45be-a04d-4932044a96eb",
+      "cardId": "7db0ac5f-1fa1-4c7d-8fcd-db3b9b28d1fe",
+      "classDate": "2024-03-02",
+      "className": "钢琴伴奏课",
+      "studentName": "王菲",
       "status": "ABSENT",
       "isGroupMessageOnly": false,
-      "importedAt": "2026-06-06T16:11:38.570Z",
-      "importBatchId": "8d9922a4-2fee-40f3-a256-892e1c041c93"
+      "importedAt": "2026-06-12T01:15:18.468Z",
+      "importBatchId": "c8976697-fbef-4639-9b43-2fdb59d3afa3"
     },
     {
-      "id": "6886111d-6c41-46d0-8c21-2f455072b1b6",
-      "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
-      "classDate": "2024-01-16",
-      "className": "钢琴进阶班",
-      "studentName": "赵六",
-      "status": "MAKEUP",
-      "sourceNote": "上周请假补录",
+      "id": "6ff0b2b8-8ccf-48f3-9e53-77765016edc6",
+      "cardId": "4dbec564-b495-43dc-ac12-6565de074107",
+      "classDate": "2024-03-01",
+      "className": "声乐大师班",
+      "studentName": "周杰伦",
+      "status": "NORMAL",
       "isGroupMessageOnly": false,
-      "importedAt": "2026-06-06T16:11:38.570Z",
-      "importBatchId": "8d9922a4-2fee-40f3-a256-892e1c041c93"
+      "importedAt": "2026-06-12T01:16:55.681Z",
+      "importBatchId": "d6c4fd2d-7859-4bc5-a730-0c0c137bf699"
     },
     {
-      "id": "c2c7e95a-803e-4350-9780-3290efafc527",
-      "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
-      "classDate": "2024-01-16",
-      "className": "钢琴进阶班",
-      "studentName": "钱七",
+      "id": "6ee469de-2bd2-43db-88ea-d2184a71dd2a",
+      "cardId": "4dbec564-b495-43dc-ac12-6565de074107",
+      "classDate": "2024-03-01",
+      "className": "声乐大师班",
+      "studentName": "林俊杰",
+      "status": "NORMAL",
+      "isGroupMessageOnly": false,
+      "importedAt": "2026-06-12T01:16:55.681Z",
+      "importBatchId": "d6c4fd2d-7859-4bc5-a730-0c0c137bf699"
+    },
+    {
+      "id": "dec3bc63-1003-4f47-8eb0-fa53df3ef4cc",
+      "cardId": "4dbec564-b495-43dc-ac12-6565de074107",
+      "classDate": "2024-03-02",
+      "className": "钢琴伴奏课",
+      "studentName": "邓紫棋",
+      "status": "MAKEUP",
+      "sourceNote": "上周生病请假补录",
+      "isGroupMessageOnly": false,
+      "importedAt": "2026-06-12T01:16:55.681Z",
+      "importBatchId": "d6c4fd2d-7859-4bc5-a730-0c0c137bf699"
+    },
+    {
+      "id": "38812032-473a-4ef8-a0f6-6c9105379a2a",
+      "cardId": "4dbec564-b495-43dc-ac12-6565de074107",
+      "classDate": "2024-03-02",
+      "className": "钢琴伴奏课",
+      "studentName": "陈奕迅",
       "status": "TEMP_SUBSTITUTE",
-      "sourceNote": "群里说临时替孙八",
+      "sourceNote": "群里说临时替张学友",
       "isGroupMessageOnly": true,
-      "importedAt": "2026-06-06T16:11:38.570Z",
-      "importBatchId": "8d9922a4-2fee-40f3-a256-892e1c041c93"
+      "importedAt": "2026-06-12T01:16:55.681Z",
+      "importBatchId": "d6c4fd2d-7859-4bc5-a730-0c0c137bf699"
+    },
+    {
+      "id": "3a280a28-0ec1-4a80-9607-b242ae8ca3a9",
+      "cardId": "4dbec564-b495-43dc-ac12-6565de074107",
+      "classDate": "2024-03-02",
+      "className": "钢琴伴奏课",
+      "studentName": "王菲",
+      "status": "ABSENT",
+      "isGroupMessageOnly": false,
+      "importedAt": "2026-06-12T01:16:55.681Z",
+      "importBatchId": "d6c4fd2d-7859-4bc5-a730-0c0c137bf699"
     }
   ],
   "tickets": [
     {
-      "id": "7df67370-b9a2-4b10-a99c-1996f8044910",
-      "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
-      "classDate": "2024-01-15",
-      "className": "声乐入门班",
-      "studentName": "张三",
+      "id": "10442085-f84b-48e0-a44d-8836ce96086d",
+      "cardId": "7db0ac5f-1fa1-4c7d-8fcd-db3b9b28d1fe",
+      "classDate": "2024-03-01",
+      "className": "声乐大师班",
+      "studentName": "周杰伦",
       "ticketCount": 1,
       "ticketType": "常规课",
-      "exportedAt": "2026-06-06T16:11:38.792Z",
-      "exportBatchId": "f74aeacf-07ca-497c-b0d7-5224f7939874"
+      "exportedAt": "2026-06-12T01:15:18.578Z",
+      "exportBatchId": "62f96b2d-16f5-4505-8cdd-71a3f392e8c9"
     },
     {
-      "id": "cb2d2c1b-6309-426f-99bc-68a4cadef68c",
-      "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
-      "classDate": "2024-01-15",
-      "className": "声乐入门班",
-      "studentName": "李四",
+      "id": "07e75d9f-fc6c-47c7-8333-dd49edfa2e61",
+      "cardId": "7db0ac5f-1fa1-4c7d-8fcd-db3b9b28d1fe",
+      "classDate": "2024-03-01",
+      "className": "声乐大师班",
+      "studentName": "林俊杰",
       "ticketCount": 1,
       "ticketType": "常规课",
-      "exportedAt": "2026-06-06T16:11:38.792Z",
-      "exportBatchId": "f74aeacf-07ca-497c-b0d7-5224f7939874"
+      "exportedAt": "2026-06-12T01:15:18.578Z",
+      "exportBatchId": "62f96b2d-16f5-4505-8cdd-71a3f392e8c9"
     },
     {
-      "id": "c9d6a995-ec96-45f7-896a-a3d2881b8d4c",
-      "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
-      "classDate": "2024-01-15",
-      "className": "声乐入门班",
-      "studentName": "王五",
+      "id": "d44dd223-af6e-41a2-880b-b5a3403c47f2",
+      "cardId": "7db0ac5f-1fa1-4c7d-8fcd-db3b9b28d1fe",
+      "classDate": "2024-03-01",
+      "className": "声乐大师班",
+      "studentName": "王菲",
       "ticketCount": 1,
       "ticketType": "常规课",
-      "exportedAt": "2026-06-06T16:11:38.792Z",
-      "exportBatchId": "f74aeacf-07ca-497c-b0d7-5224f7939874"
+      "exportedAt": "2026-06-12T01:15:18.578Z",
+      "exportBatchId": "62f96b2d-16f5-4505-8cdd-71a3f392e8c9"
     },
     {
-      "id": "964bcbc7-a809-4dab-b00b-c4ad9a27df4c",
-      "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
-      "classDate": "2024-01-16",
-      "className": "钢琴进阶班",
-      "studentName": "赵六",
+      "id": "b85203d1-dde1-4d0a-aca5-870f4ac98e93",
+      "cardId": "7db0ac5f-1fa1-4c7d-8fcd-db3b9b28d1fe",
+      "classDate": "2024-03-02",
+      "className": "钢琴伴奏课",
+      "studentName": "邓紫棋",
       "ticketCount": 1,
       "ticketType": "补录课",
-      "exportedAt": "2026-06-06T16:11:38.792Z",
-      "exportBatchId": "f74aeacf-07ca-497c-b0d7-5224f7939874",
-      "supplementNote": "系统补录"
+      "exportedAt": "2026-06-12T01:15:18.578Z",
+      "exportBatchId": "62f96b2d-16f5-4505-8cdd-71a3f392e8c9",
+      "supplementNote": "人工补录，系统漏登，已核对原始签到表"
+    },
+    {
+      "id": "95cc3402-f870-4dd2-9e73-a00a451221a3",
+      "cardId": "7db0ac5f-1fa1-4c7d-8fcd-db3b9b28d1fe",
+      "classDate": "2024-03-02",
+      "className": "钢琴伴奏课",
+      "studentName": "陈奕迅",
+      "ticketCount": 0,
+      "ticketType": "无票",
+      "exportedAt": "2026-06-12T01:15:18.578Z",
+      "exportBatchId": "62f96b2d-16f5-4505-8cdd-71a3f392e8c9",
+      "supplementNote": "仅群内提及，无正式票务记录，待复核"
+    },
+    {
+      "id": "8df9ce31-e8c3-4dc2-86e4-a63474a0425e",
+      "cardId": "4dbec564-b495-43dc-ac12-6565de074107",
+      "classDate": "2024-03-01",
+      "className": "声乐大师班",
+      "studentName": "周杰伦",
+      "ticketCount": 1,
+      "ticketType": "常规课",
+      "exportedAt": "2026-06-12T01:16:55.779Z",
+      "exportBatchId": "f3bfd420-072b-4b75-84ea-1e918a4733f4"
+    },
+    {
+      "id": "a6e774da-c49c-4e8f-a2a6-8f0c46c80def",
+      "cardId": "4dbec564-b495-43dc-ac12-6565de074107",
+      "classDate": "2024-03-01",
+      "className": "声乐大师班",
+      "studentName": "林俊杰",
+      "ticketCount": 1,
+      "ticketType": "常规课",
+      "exportedAt": "2026-06-12T01:16:55.779Z",
+      "exportBatchId": "f3bfd420-072b-4b75-84ea-1e918a4733f4"
+    },
+    {
+      "id": "cb84c998-55fc-48e0-a62c-85484712599a",
+      "cardId": "4dbec564-b495-43dc-ac12-6565de074107",
+      "classDate": "2024-03-01",
+      "className": "声乐大师班",
+      "studentName": "王菲",
+      "ticketCount": 1,
+      "ticketType": "常规课",
+      "exportedAt": "2026-06-12T01:16:55.779Z",
+      "exportBatchId": "f3bfd420-072b-4b75-84ea-1e918a4733f4"
+    },
+    {
+      "id": "c87428b8-039c-4087-90b9-d9d6544a9466",
+      "cardId": "4dbec564-b495-43dc-ac12-6565de074107",
+      "classDate": "2024-03-02",
+      "className": "钢琴伴奏课",
+      "studentName": "邓紫棋",
+      "ticketCount": 1,
+      "ticketType": "补录课",
+      "exportedAt": "2026-06-12T01:16:55.779Z",
+      "exportBatchId": "f3bfd420-072b-4b75-84ea-1e918a4733f4",
+      "supplementNote": "人工补录，系统漏登，已核对原始签到表"
+    },
+    {
+      "id": "c21386bb-66c6-4814-b66c-3491cc083804",
+      "cardId": "4dbec564-b495-43dc-ac12-6565de074107",
+      "classDate": "2024-03-02",
+      "className": "钢琴伴奏课",
+      "studentName": "陈奕迅",
+      "ticketCount": 0,
+      "ticketType": "无票",
+      "exportedAt": "2026-06-12T01:16:55.779Z",
+      "exportBatchId": "f3bfd420-072b-4b75-84ea-1e918a4733f4",
+      "supplementNote": "仅群内提及，无正式票务记录，待复核"
     }
   ],
   "conflicts": [
     {
-      "id": "4b00b94b-4e12-4a29-a840-131aec6d81eb",
-      "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
-      "attendanceId": "b8f103d3-148d-4bb8-8366-903bd72995ff",
-      "ticketId": "c9d6a995-ec96-45f7-896a-a3d2881b8d4c",
-      "conflictType": "STATUS_TICKET_MISMATCH",
-      "description": "签到状态为缺席但票务显示有1张票",
-      "attendanceData": {
-        "id": "b8f103d3-148d-4bb8-8366-903bd72995ff",
-        "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
-        "classDate": "2024-01-15",
-        "className": "声乐入门班",
-        "studentName": "王五",
-        "status": "ABSENT",
-        "isGroupMessageOnly": false,
-        "importedAt": "2026-06-06T16:11:38.570Z",
-        "importBatchId": "8d9922a4-2fee-40f3-a256-892e1c041c93"
-      },
-      "ticketData": {
-        "id": "c9d6a995-ec96-45f7-896a-a3d2881b8d4c",
-        "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
-        "classDate": "2024-01-15",
-        "className": "声乐入门班",
-        "studentName": "王五",
-        "ticketCount": 1,
-        "ticketType": "常规课",
-        "exportedAt": "2026-06-06T16:11:38.792Z",
-        "exportBatchId": "f74aeacf-07ca-497c-b0d7-5224f7939874"
-      },
-      "createdAt": "2026-06-06T16:11:38.856Z",
-      "resolution": "PENDING_REVIEW",
-      "resolvedBy": "小段",
-      "resolvedAt": "2026-06-06T16:11:39.174Z"
-    },
-    {
-      "id": "253a39cd-2595-429d-8a6f-f99a3eb2998b",
-      "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
-      "attendanceId": "c2c7e95a-803e-4350-9780-3290efafc527",
+      "id": "872cb386-0b7d-497f-bec2-b619a5353bb8",
+      "cardId": "7db0ac5f-1fa1-4c7d-8fcd-db3b9b28d1fe",
+      "attendanceId": "d77b8dc9-2080-42fb-bd7c-111a5f995aa0",
+      "ticketId": "95cc3402-f870-4dd2-9e73-a00a451221a3",
       "conflictType": "GROUP_MESSAGE_ONLY_SUBSTITUTE",
       "description": "临时替补仅在群里提及，无正式票务记录，需票务同事复核",
       "attendanceData": {
-        "id": "c2c7e95a-803e-4350-9780-3290efafc527",
-        "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
-        "classDate": "2024-01-16",
-        "className": "钢琴进阶班",
-        "studentName": "钱七",
+        "id": "d77b8dc9-2080-42fb-bd7c-111a5f995aa0",
+        "cardId": "7db0ac5f-1fa1-4c7d-8fcd-db3b9b28d1fe",
+        "classDate": "2024-03-02",
+        "className": "钢琴伴奏课",
+        "studentName": "陈奕迅",
         "status": "TEMP_SUBSTITUTE",
-        "sourceNote": "群里说临时替孙八",
+        "sourceNote": "群里说临时替张学友",
         "isGroupMessageOnly": true,
-        "importedAt": "2026-06-06T16:11:38.570Z",
-        "importBatchId": "8d9922a4-2fee-40f3-a256-892e1c041c93"
+        "importedAt": "2026-06-12T01:15:18.468Z",
+        "importBatchId": "c8976697-fbef-4639-9b43-2fdb59d3afa3"
       },
-      "createdAt": "2026-06-06T16:11:38.856Z",
+      "ticketData": {
+        "id": "95cc3402-f870-4dd2-9e73-a00a451221a3",
+        "cardId": "7db0ac5f-1fa1-4c7d-8fcd-db3b9b28d1fe",
+        "classDate": "2024-03-02",
+        "className": "钢琴伴奏课",
+        "studentName": "陈奕迅",
+        "ticketCount": 0,
+        "ticketType": "无票",
+        "exportedAt": "2026-06-12T01:15:18.578Z",
+        "exportBatchId": "62f96b2d-16f5-4505-8cdd-71a3f392e8c9",
+        "supplementNote": "仅群内提及，无正式票务记录，待复核"
+      },
+      "createdAt": "2026-06-12T01:15:18.632Z",
+      "resolution": "CONFIRM_ATTENDANCE",
+      "resolvedBy": "票务小李",
+      "resolvedAt": "2026-06-12T01:15:19.056Z",
+      "resolutionNote": "票务同事复核确认：陈奕迅确实临时替张学友上课，情况属实，按签到计算"
+    },
+    {
+      "id": "07684ecd-4b0d-459b-b3a3-ef7ecaf42caa",
+      "cardId": "7db0ac5f-1fa1-4c7d-8fcd-db3b9b28d1fe",
+      "attendanceId": "215c2f35-09d4-45be-a04d-4932044a96eb",
+      "conflictType": "MISSING_TICKET",
+      "description": "签到记录存在但无对应票务导出记录",
+      "attendanceData": {
+        "id": "215c2f35-09d4-45be-a04d-4932044a96eb",
+        "cardId": "7db0ac5f-1fa1-4c7d-8fcd-db3b9b28d1fe",
+        "classDate": "2024-03-02",
+        "className": "钢琴伴奏课",
+        "studentName": "王菲",
+        "status": "ABSENT",
+        "isGroupMessageOnly": false,
+        "importedAt": "2026-06-12T01:15:18.468Z",
+        "importBatchId": "c8976697-fbef-4639-9b43-2fdb59d3afa3"
+      },
+      "createdAt": "2026-06-12T01:15:18.632Z",
       "resolution": "CONFIRM_TICKET",
       "resolvedBy": "小段",
-      "resolvedAt": "2026-06-06T16:11:39.273Z"
+      "resolvedAt": "2026-06-12T01:15:18.823Z",
+      "resolutionNote": "事后确认王菲实际到场，签到记录有误，以票务导出为准，不自动拍板"
+    },
+    {
+      "id": "161a71e0-1e00-4303-ae5b-793b9f17ea0a",
+      "cardId": "4dbec564-b495-43dc-ac12-6565de074107",
+      "attendanceId": "38812032-473a-4ef8-a0f6-6c9105379a2a",
+      "ticketId": "c21386bb-66c6-4814-b66c-3491cc083804",
+      "conflictType": "GROUP_MESSAGE_ONLY_SUBSTITUTE",
+      "description": "临时替补仅在群里提及，无正式票务记录，需票务同事复核",
+      "attendanceData": {
+        "id": "38812032-473a-4ef8-a0f6-6c9105379a2a",
+        "cardId": "4dbec564-b495-43dc-ac12-6565de074107",
+        "classDate": "2024-03-02",
+        "className": "钢琴伴奏课",
+        "studentName": "陈奕迅",
+        "status": "TEMP_SUBSTITUTE",
+        "sourceNote": "群里说临时替张学友",
+        "isGroupMessageOnly": true,
+        "importedAt": "2026-06-12T01:16:55.681Z",
+        "importBatchId": "d6c4fd2d-7859-4bc5-a730-0c0c137bf699"
+      },
+      "ticketData": {
+        "id": "c21386bb-66c6-4814-b66c-3491cc083804",
+        "cardId": "4dbec564-b495-43dc-ac12-6565de074107",
+        "classDate": "2024-03-02",
+        "className": "钢琴伴奏课",
+        "studentName": "陈奕迅",
+        "ticketCount": 0,
+        "ticketType": "无票",
+        "exportedAt": "2026-06-12T01:16:55.779Z",
+        "exportBatchId": "f3bfd420-072b-4b75-84ea-1e918a4733f4",
+        "supplementNote": "仅群内提及，无正式票务记录，待复核"
+      },
+      "createdAt": "2026-06-12T01:16:55.860Z",
+      "resolution": "CONFIRM_ATTENDANCE",
+      "resolvedBy": "票务小李",
+      "resolvedAt": "2026-06-12T01:16:56.186Z",
+      "resolutionNote": "票务同事复核确认：陈奕迅确实临时替张学友上课，情况属实，按签到计算"
+    },
+    {
+      "id": "d363f4d7-d7db-4b91-ba11-4dd654ac5423",
+      "cardId": "4dbec564-b495-43dc-ac12-6565de074107",
+      "attendanceId": "3a280a28-0ec1-4a80-9607-b242ae8ca3a9",
+      "conflictType": "MISSING_TICKET",
+      "description": "签到记录存在但无对应票务导出记录",
+      "attendanceData": {
+        "id": "3a280a28-0ec1-4a80-9607-b242ae8ca3a9",
+        "cardId": "4dbec564-b495-43dc-ac12-6565de074107",
+        "classDate": "2024-03-02",
+        "className": "钢琴伴奏课",
+        "studentName": "王菲",
+        "status": "ABSENT",
+        "isGroupMessageOnly": false,
+        "importedAt": "2026-06-12T01:16:55.681Z",
+        "importBatchId": "d6c4fd2d-7859-4bc5-a730-0c0c137bf699"
+      },
+      "createdAt": "2026-06-12T01:16:55.860Z",
+      "resolution": "CONFIRM_TICKET",
+      "resolvedBy": "小段",
+      "resolvedAt": "2026-06-12T01:16:56.043Z",
+      "resolutionNote": "事后确认王菲实际到场，签到记录有误，以票务导出为准，不自动拍板"
     }
   ],
   "revenue": [
     {
-      "id": "f383ae68-9a3a-466d-b379-2c37571a1796",
-      "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
+      "id": "eb677802-91eb-4aa8-8f4b-cebbaa2b626b",
+      "cardId": "7db0ac5f-1fa1-4c7d-8fcd-db3b9b28d1fe",
       "version": 1,
-      "classDate": "2024-01-15",
-      "className": "声乐入门班",
-      "studentName": "张三",
+      "classDate": "2024-03-01",
+      "className": "声乐大师班",
+      "studentName": "周杰伦",
       "baseAmount": 100,
       "adjustmentAmount": 0,
       "finalAmount": 100,
@@ -246,17 +478,17 @@
         ],
         "tradeoffs": []
       },
-      "calculatedAt": "2026-06-06T16:11:39.376Z",
+      "calculatedAt": "2026-06-12T01:15:19.114Z",
       "calculatedBy": "小段",
-      "isWithdrawn": true
+      "isWithdrawn": false
     },
     {
-      "id": "9f6aba00-47af-442c-8022-c98a0ba0f4f8",
-      "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
+      "id": "0cba983b-e0bd-4547-b448-7e9ea2b10387",
+      "cardId": "7db0ac5f-1fa1-4c7d-8fcd-db3b9b28d1fe",
       "version": 1,
-      "classDate": "2024-01-15",
-      "className": "声乐入门班",
-      "studentName": "李四",
+      "classDate": "2024-03-01",
+      "className": "声乐大师班",
+      "studentName": "林俊杰",
       "baseAmount": 100,
       "adjustmentAmount": 0,
       "finalAmount": 100,
@@ -267,39 +499,17 @@
         ],
         "tradeoffs": []
       },
-      "calculatedAt": "2026-06-06T16:11:39.376Z",
+      "calculatedAt": "2026-06-12T01:15:19.114Z",
       "calculatedBy": "小段",
-      "isWithdrawn": true
+      "isWithdrawn": false
     },
     {
-      "id": "5a90b402-25ad-4462-9ac2-68cd1b13ef8c",
-      "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
+      "id": "773f6df3-0e49-42e1-97e6-a29a5e1870ba",
+      "cardId": "7db0ac5f-1fa1-4c7d-8fcd-db3b9b28d1fe",
       "version": 1,
-      "classDate": "2024-01-15",
-      "className": "声乐入门班",
-      "studentName": "王五",
-      "baseAmount": 0,
-      "adjustmentAmount": 0,
-      "finalAmount": 0,
-      "calculationParams": {
-        "formulaVersion": "v2.1.0",
-        "assumptions": [
-          "基础费率: 100元/课时 (公式版本 v2.1.0)",
-          "缺席课时不计费"
-        ],
-        "tradeoffs": []
-      },
-      "calculatedAt": "2026-06-06T16:11:39.376Z",
-      "calculatedBy": "小段",
-      "isWithdrawn": true
-    },
-    {
-      "id": "b4a69037-3d2b-4de4-baf8-94b5e008c7b2",
-      "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
-      "version": 1,
-      "classDate": "2024-01-16",
-      "className": "钢琴进阶班",
-      "studentName": "赵六",
+      "classDate": "2024-03-02",
+      "className": "钢琴伴奏课",
+      "studentName": "邓紫棋",
       "baseAmount": 120,
       "adjustmentAmount": 0,
       "finalAmount": 120,
@@ -313,17 +523,17 @@
           "补录课时多计20%以补偿额外协调成本"
         ]
       },
-      "calculatedAt": "2026-06-06T16:11:39.376Z",
+      "calculatedAt": "2026-06-12T01:15:19.114Z",
       "calculatedBy": "小段",
-      "isWithdrawn": true
+      "isWithdrawn": false
     },
     {
-      "id": "d1c3b2bf-5ce4-44de-a239-c95c3d300c3b",
-      "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
+      "id": "44ae3f69-606f-4fff-b9f3-2882dfa273f0",
+      "cardId": "7db0ac5f-1fa1-4c7d-8fcd-db3b9b28d1fe",
       "version": 1,
-      "classDate": "2024-01-16",
-      "className": "钢琴进阶班",
-      "studentName": "钱七",
+      "classDate": "2024-03-02",
+      "className": "钢琴伴奏课",
+      "studentName": "陈奕迅",
       "baseAmount": 100,
       "adjustmentAmount": -20,
       "finalAmount": 80,
@@ -332,69 +542,186 @@
         "assumptions": [
           "基础费率: 100元/课时 (公式版本 v2.1.0)",
           "临时替补扣减 20元",
-          "此记录为群内提及的临时替补，未经票务系统确认",
-          "无对应票务记录，按签到状态正常计费"
+          "此记录为群内提及的临时替补，未经票务系统确认"
         ],
         "tradeoffs": [
           "临时替补扣减以覆盖培训成本",
           "保留异常标记，待票务同事复核后可调整"
         ]
       },
-      "calculatedAt": "2026-06-06T16:11:39.376Z",
+      "calculatedAt": "2026-06-12T01:15:19.114Z",
+      "calculatedBy": "小段",
+      "isWithdrawn": false
+    },
+    {
+      "id": "6d789d9a-0966-41c1-b0f8-22fd3c8edf3f",
+      "cardId": "7db0ac5f-1fa1-4c7d-8fcd-db3b9b28d1fe",
+      "version": 1,
+      "classDate": "2024-03-02",
+      "className": "钢琴伴奏课",
+      "studentName": "王菲",
+      "baseAmount": 0,
+      "adjustmentAmount": 0,
+      "finalAmount": 0,
+      "calculationParams": {
+        "formulaVersion": "v2.1.0",
+        "assumptions": [
+          "基础费率: 100元/课时 (公式版本 v2.1.0)",
+          "缺席课时不计费"
+        ],
+        "tradeoffs": []
+      },
+      "calculatedAt": "2026-06-12T01:15:19.114Z",
+      "calculatedBy": "小段",
+      "isWithdrawn": false
+    },
+    {
+      "id": "c17a54c9-4b58-43cd-8e1e-17840ce4a289",
+      "cardId": "4dbec564-b495-43dc-ac12-6565de074107",
+      "version": 1,
+      "classDate": "2024-03-01",
+      "className": "声乐大师班",
+      "studentName": "周杰伦",
+      "baseAmount": 100,
+      "adjustmentAmount": 0,
+      "finalAmount": 100,
+      "calculationParams": {
+        "formulaVersion": "v2.1.0",
+        "assumptions": [
+          "基础费率: 100元/课时 (公式版本 v2.1.0)"
+        ],
+        "tradeoffs": []
+      },
+      "calculatedAt": "2026-06-12T01:16:56.233Z",
+      "calculatedBy": "小段",
+      "isWithdrawn": true
+    },
+    {
+      "id": "73c16bc4-26df-49af-a9c0-a15d71eae5d2",
+      "cardId": "4dbec564-b495-43dc-ac12-6565de074107",
+      "version": 1,
+      "classDate": "2024-03-01",
+      "className": "声乐大师班",
+      "studentName": "林俊杰",
+      "baseAmount": 100,
+      "adjustmentAmount": 0,
+      "finalAmount": 100,
+      "calculationParams": {
+        "formulaVersion": "v2.1.0",
+        "assumptions": [
+          "基础费率: 100元/课时 (公式版本 v2.1.0)"
+        ],
+        "tradeoffs": []
+      },
+      "calculatedAt": "2026-06-12T01:16:56.233Z",
+      "calculatedBy": "小段",
+      "isWithdrawn": true
+    },
+    {
+      "id": "cb89443d-d00f-450b-b616-5a9526eb2bd7",
+      "cardId": "4dbec564-b495-43dc-ac12-6565de074107",
+      "version": 1,
+      "classDate": "2024-03-02",
+      "className": "钢琴伴奏课",
+      "studentName": "邓紫棋",
+      "baseAmount": 120,
+      "adjustmentAmount": 0,
+      "finalAmount": 120,
+      "calculationParams": {
+        "formulaVersion": "v2.1.0",
+        "assumptions": [
+          "基础费率: 100元/课时 (公式版本 v2.1.0)",
+          "补录课时按 1.2x 倍率计算"
+        ],
+        "tradeoffs": [
+          "补录课时多计20%以补偿额外协调成本"
+        ]
+      },
+      "calculatedAt": "2026-06-12T01:16:56.233Z",
+      "calculatedBy": "小段",
+      "isWithdrawn": true
+    },
+    {
+      "id": "212d90f9-8865-458a-9448-d35c7c670271",
+      "cardId": "4dbec564-b495-43dc-ac12-6565de074107",
+      "version": 1,
+      "classDate": "2024-03-02",
+      "className": "钢琴伴奏课",
+      "studentName": "陈奕迅",
+      "baseAmount": 100,
+      "adjustmentAmount": -20,
+      "finalAmount": 80,
+      "calculationParams": {
+        "formulaVersion": "v2.1.0",
+        "assumptions": [
+          "基础费率: 100元/课时 (公式版本 v2.1.0)",
+          "临时替补扣减 20元",
+          "此记录为群内提及的临时替补，未经票务系统确认"
+        ],
+        "tradeoffs": [
+          "临时替补扣减以覆盖培训成本",
+          "保留异常标记，待票务同事复核后可调整"
+        ]
+      },
+      "calculatedAt": "2026-06-12T01:16:56.233Z",
+      "calculatedBy": "小段",
+      "isWithdrawn": true
+    },
+    {
+      "id": "5f42d92a-fd92-4bb2-a40b-3e7cb45bd9b1",
+      "cardId": "4dbec564-b495-43dc-ac12-6565de074107",
+      "version": 1,
+      "classDate": "2024-03-02",
+      "className": "钢琴伴奏课",
+      "studentName": "王菲",
+      "baseAmount": 0,
+      "adjustmentAmount": 0,
+      "finalAmount": 0,
+      "calculationParams": {
+        "formulaVersion": "v2.1.0",
+        "assumptions": [
+          "基础费率: 100元/课时 (公式版本 v2.1.0)",
+          "缺席课时不计费"
+        ],
+        "tradeoffs": []
+      },
+      "calculatedAt": "2026-06-12T01:16:56.233Z",
       "calculatedBy": "小段",
       "isWithdrawn": true
     }
   ],
   "snapshots": [
     {
-      "id": "14aa82c7-9eb7-4ae4-8141-fe56a59f2e90",
-      "cardId": "73a6e0b6-e503-4632-92ec-e70db659661b",
+      "id": "1cb61986-7572-493b-a767-afd92ce65877",
+      "cardId": "7db0ac5f-1fa1-4c7d-8fcd-db3b9b28d1fe",
       "version": 1,
       "status": "DRAFT",
       "snapshotData": {
-        "id": "73a6e0b6-e503-4632-92ec-e70db659661b",
-        "playlistName": "夏日清凉歌单",
+        "id": "7db0ac5f-1fa1-4c7d-8fcd-db3b9b28d1fe",
+        "playlistName": "2024春季演唱会歌单",
         "createdBy": "小段",
-        "createdAt": "2026-06-06T16:10:48.354Z",
-        "updatedAt": "2026-06-06T16:10:48.354Z",
+        "createdAt": "2026-06-12T01:15:18.361Z",
+        "updatedAt": "2026-06-12T01:15:18.361Z",
         "status": "DRAFT",
         "currentVersion": 1,
         "selfCheckResults": []
       },
-      "createdAt": "2026-06-06T16:10:48.354Z",
+      "createdAt": "2026-06-12T01:15:18.361Z",
       "createdBy": "小段"
     },
     {
-      "id": "d1e3a61f-58d0-4172-befd-bc246783129f",
-      "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
-      "version": 1,
-      "status": "DRAFT",
-      "snapshotData": {
-        "id": "0b6b82ab-94bb-4718-8d59-ea788015074c",
-        "playlistName": "夏日清凉歌单",
-        "createdBy": "小段",
-        "createdAt": "2026-06-06T16:11:38.400Z",
-        "updatedAt": "2026-06-06T16:11:38.400Z",
-        "status": "DRAFT",
-        "currentVersion": 1,
-        "selfCheckResults": []
-      },
-      "createdAt": "2026-06-06T16:11:38.400Z",
-      "createdBy": "小段"
-    },
-    {
-      "id": "01d4fad9-33d7-4f80-abf0-f48c93f326fe",
-      "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
+      "id": "fb234724-586e-4334-894f-bae5391bc146",
+      "cardId": "7db0ac5f-1fa1-4c7d-8fcd-db3b9b28d1fe",
       "version": 2,
       "status": "CONFLICT_DETECTED",
-      "attendanceBatchId": "8d9922a4-2fee-40f3-a256-892e1c041c93",
-      "ticketBatchId": "f74aeacf-07ca-497c-b0d7-5224f7939874",
+      "attendanceBatchId": "c8976697-fbef-4639-9b43-2fdb59d3afa3",
+      "ticketBatchId": "62f96b2d-16f5-4505-8cdd-71a3f392e8c9",
       "snapshotData": {
-        "id": "0b6b82ab-94bb-4718-8d59-ea788015074c",
-        "playlistName": "夏日清凉歌单",
+        "id": "7db0ac5f-1fa1-4c7d-8fcd-db3b9b28d1fe",
+        "playlistName": "2024春季演唱会歌单",
         "createdBy": "小段",
-        "createdAt": "2026-06-06T16:11:38.400Z",
-        "updatedAt": "2026-06-06T16:11:38.856Z",
+        "createdAt": "2026-06-12T01:15:18.361Z",
+        "updatedAt": "2026-06-12T01:15:18.633Z",
         "status": "CONFLICT_DETECTED",
         "currentVersion": 2,
         "selfCheckResults": [
@@ -411,10 +738,10 @@
             "details": {
               "records": [
                 {
-                  "classDate": "2024-01-16",
-                  "className": "钢琴进阶班",
-                  "studentName": "钱七",
-                  "sourceNote": "群里说临时替孙八"
+                  "classDate": "2024-03-02",
+                  "className": "钢琴伴奏课",
+                  "studentName": "陈奕迅",
+                  "sourceNote": "群里说临时替张学友"
                 }
               ]
             },
@@ -426,7 +753,7 @@
             "message": "发现1条补录记录需要确认重算",
             "details": {
               "issues": [
-                "2024-01-16_钢琴进阶班_赵六: 补录记录无对应票务，需确认是否需要重算"
+                "2024-03-02_钢琴伴奏课_邓紫棋: 补录记录无对应票务，需确认是否需要重算"
               ]
             },
             "severity": "WARNING"
@@ -438,26 +765,26 @@
             "severity": "WARNING"
           }
         ],
-        "attendanceBatchId": "8d9922a4-2fee-40f3-a256-892e1c041c93",
-        "ticketBatchId": "f74aeacf-07ca-497c-b0d7-5224f7939874"
+        "attendanceBatchId": "c8976697-fbef-4639-9b43-2fdb59d3afa3",
+        "ticketBatchId": "62f96b2d-16f5-4505-8cdd-71a3f392e8c9"
       },
-      "createdAt": "2026-06-06T16:11:38.856Z",
+      "createdAt": "2026-06-12T01:15:18.633Z",
       "createdBy": "system"
     },
     {
-      "id": "73ebc848-d55f-4674-8032-273cbcadb6f6",
-      "cardId": "0b6b82ab-94bb-4718-8d59-ea788015074c",
+      "id": "9eedd9f8-b00d-4534-8d39-a80fdbbd6fa5",
+      "cardId": "7db0ac5f-1fa1-4c7d-8fcd-db3b9b28d1fe",
       "version": 3,
-      "status": "CONFLICT_RESOLVED",
-      "attendanceBatchId": "8d9922a4-2fee-40f3-a256-892e1c041c93",
-      "ticketBatchId": "f74aeacf-07ca-497c-b0d7-5224f7939874",
+      "status": "CONFLICT_DETECTED",
+      "attendanceBatchId": "c8976697-fbef-4639-9b43-2fdb59d3afa3",
+      "ticketBatchId": "62f96b2d-16f5-4505-8cdd-71a3f392e8c9",
       "snapshotData": {
-        "id": "0b6b82ab-94bb-4718-8d59-ea788015074c",
-        "playlistName": "夏日清凉歌单",
+        "id": "7db0ac5f-1fa1-4c7d-8fcd-db3b9b28d1fe",
+        "playlistName": "2024春季演唱会歌单",
         "createdBy": "小段",
-        "createdAt": "2026-06-06T16:11:38.400Z",
-        "updatedAt": "2026-06-06T16:11:39.274Z",
-        "status": "CONFLICT_RESOLVED",
+        "createdAt": "2026-06-12T01:15:18.361Z",
+        "updatedAt": "2026-06-12T01:15:18.774Z",
+        "status": "CONFLICT_DETECTED",
         "currentVersion": 3,
         "selfCheckResults": [
           {
@@ -473,10 +800,10 @@
             "details": {
               "records": [
                 {
-                  "classDate": "2024-01-16",
-                  "className": "钢琴进阶班",
-                  "studentName": "钱七",
-                  "sourceNote": "群里说临时替孙八"
+                  "classDate": "2024-03-02",
+                  "className": "钢琴伴奏课",
+                  "studentName": "陈奕迅",
+                  "sourceNote": "群里说临时替张学友"
                 }
               ]
             },
@@ -488,7 +815,7 @@
             "message": "发现1条补录记录需要确认重算",
             "details": {
               "issues": [
-                "2024-01-16_钢琴进阶班_赵六: 补录记录无对应票务，需确认是否需要重算"
+                "2024-03-02_钢琴伴奏课_邓紫棋: 补录记录无对应票务，需确认是否需要重算"
               ]
             },
             "severity": "WARNING"
@@ -500,11 +827,401 @@
             "severity": "WARNING"
           }
         ],
-        "attendanceBatchId": "8d9922a4-2fee-40f3-a256-892e1c041c93",
-        "ticketBatchId": "f74aeacf-07ca-497c-b0d7-5224f7939874"
+        "attendanceBatchId": "c8976697-fbef-4639-9b43-2fdb59d3afa3",
+        "ticketBatchId": "62f96b2d-16f5-4505-8cdd-71a3f392e8c9"
       },
-      "createdAt": "2026-06-06T16:11:39.274Z",
+      "createdAt": "2026-06-12T01:15:18.774Z",
       "createdBy": "小段"
+    },
+    {
+      "id": "61e83cce-fdc5-4f01-8620-00b79560c27d",
+      "cardId": "7db0ac5f-1fa1-4c7d-8fcd-db3b9b28d1fe",
+      "version": 4,
+      "status": "CONFLICT_DETECTED",
+      "attendanceBatchId": "c8976697-fbef-4639-9b43-2fdb59d3afa3",
+      "ticketBatchId": "62f96b2d-16f5-4505-8cdd-71a3f392e8c9",
+      "snapshotData": {
+        "id": "7db0ac5f-1fa1-4c7d-8fcd-db3b9b28d1fe",
+        "playlistName": "2024春季演唱会歌单",
+        "createdBy": "小段",
+        "createdAt": "2026-06-12T01:15:18.361Z",
+        "updatedAt": "2026-06-12T01:15:18.823Z",
+        "status": "CONFLICT_DETECTED",
+        "currentVersion": 4,
+        "selfCheckResults": [
+          {
+            "checkType": "DUPLICATE_IMPORT",
+            "passed": true,
+            "message": "无重复导入记录",
+            "severity": "INFO"
+          },
+          {
+            "checkType": "TEMP_SUBSTITUTE_WARNING",
+            "passed": false,
+            "message": "发现1条仅在群里提及的临时替补记录，需票务同事复核",
+            "details": {
+              "records": [
+                {
+                  "classDate": "2024-03-02",
+                  "className": "钢琴伴奏课",
+                  "studentName": "陈奕迅",
+                  "sourceNote": "群里说临时替张学友"
+                }
+              ]
+            },
+            "severity": "WARNING"
+          },
+          {
+            "checkType": "MAKUP_RECALCULATION",
+            "passed": false,
+            "message": "发现1条补录记录需要确认重算",
+            "details": {
+              "issues": [
+                "2024-03-02_钢琴伴奏课_邓紫棋: 补录记录无对应票务，需确认是否需要重算"
+              ]
+            },
+            "severity": "WARNING"
+          },
+          {
+            "checkType": "EXPORT_CONSISTENCY",
+            "passed": false,
+            "message": "暂无票务导出数据，无法校验一致性",
+            "severity": "WARNING"
+          }
+        ],
+        "attendanceBatchId": "c8976697-fbef-4639-9b43-2fdb59d3afa3",
+        "ticketBatchId": "62f96b2d-16f5-4505-8cdd-71a3f392e8c9"
+      },
+      "createdAt": "2026-06-12T01:15:18.823Z",
+      "createdBy": "小段"
+    },
+    {
+      "id": "5ebf4f37-27bc-4ba3-87b1-ccc6fe426b14",
+      "cardId": "7db0ac5f-1fa1-4c7d-8fcd-db3b9b28d1fe",
+      "version": 5,
+      "status": "CONFLICT_RESOLVED",
+      "attendanceBatchId": "c8976697-fbef-4639-9b43-2fdb59d3afa3",
+      "ticketBatchId": "62f96b2d-16f5-4505-8cdd-71a3f392e8c9",
+      "snapshotData": {
+        "id": "7db0ac5f-1fa1-4c7d-8fcd-db3b9b28d1fe",
+        "playlistName": "2024春季演唱会歌单",
+        "createdBy": "小段",
+        "createdAt": "2026-06-12T01:15:18.361Z",
+        "updatedAt": "2026-06-12T01:15:19.057Z",
+        "status": "CONFLICT_RESOLVED",
+        "currentVersion": 5,
+        "selfCheckResults": [
+          {
+            "checkType": "DUPLICATE_IMPORT",
+            "passed": true,
+            "message": "无重复导入记录",
+            "severity": "INFO"
+          },
+          {
+            "checkType": "TEMP_SUBSTITUTE_WARNING",
+            "passed": false,
+            "message": "发现1条仅在群里提及的临时替补记录，需票务同事复核",
+            "details": {
+              "records": [
+                {
+                  "classDate": "2024-03-02",
+                  "className": "钢琴伴奏课",
+                  "studentName": "陈奕迅",
+                  "sourceNote": "群里说临时替张学友"
+                }
+              ]
+            },
+            "severity": "WARNING"
+          },
+          {
+            "checkType": "MAKUP_RECALCULATION",
+            "passed": false,
+            "message": "发现1条补录记录需要确认重算",
+            "details": {
+              "issues": [
+                "2024-03-02_钢琴伴奏课_邓紫棋: 补录记录无对应票务，需确认是否需要重算"
+              ]
+            },
+            "severity": "WARNING"
+          },
+          {
+            "checkType": "EXPORT_CONSISTENCY",
+            "passed": false,
+            "message": "暂无票务导出数据，无法校验一致性",
+            "severity": "WARNING"
+          }
+        ],
+        "attendanceBatchId": "c8976697-fbef-4639-9b43-2fdb59d3afa3",
+        "ticketBatchId": "62f96b2d-16f5-4505-8cdd-71a3f392e8c9"
+      },
+      "createdAt": "2026-06-12T01:15:19.057Z",
+      "createdBy": "票务小李"
+    },
+    {
+      "id": "1d7151b6-0b02-45ba-b2e2-ba410c024325",
+      "cardId": "4dbec564-b495-43dc-ac12-6565de074107",
+      "version": 1,
+      "status": "DRAFT",
+      "snapshotData": {
+        "id": "4dbec564-b495-43dc-ac12-6565de074107",
+        "playlistName": "2024春季演唱会歌单",
+        "createdBy": "小段",
+        "createdAt": "2026-06-12T01:16:55.582Z",
+        "updatedAt": "2026-06-12T01:16:55.582Z",
+        "status": "DRAFT",
+        "currentVersion": 1,
+        "selfCheckResults": []
+      },
+      "createdAt": "2026-06-12T01:16:55.583Z",
+      "createdBy": "小段"
+    },
+    {
+      "id": "cb6eafb6-8f9d-4c11-a6b6-b9b875ada199",
+      "cardId": "4dbec564-b495-43dc-ac12-6565de074107",
+      "version": 2,
+      "status": "CONFLICT_DETECTED",
+      "attendanceBatchId": "d6c4fd2d-7859-4bc5-a730-0c0c137bf699",
+      "ticketBatchId": "f3bfd420-072b-4b75-84ea-1e918a4733f4",
+      "snapshotData": {
+        "id": "4dbec564-b495-43dc-ac12-6565de074107",
+        "playlistName": "2024春季演唱会歌单",
+        "createdBy": "小段",
+        "createdAt": "2026-06-12T01:16:55.582Z",
+        "updatedAt": "2026-06-12T01:16:55.860Z",
+        "status": "CONFLICT_DETECTED",
+        "currentVersion": 2,
+        "selfCheckResults": [
+          {
+            "checkType": "DUPLICATE_IMPORT",
+            "passed": true,
+            "message": "无重复导入记录",
+            "severity": "INFO"
+          },
+          {
+            "checkType": "TEMP_SUBSTITUTE_WARNING",
+            "passed": false,
+            "message": "发现1条仅在群里提及的临时替补记录，需票务同事复核",
+            "details": {
+              "records": [
+                {
+                  "classDate": "2024-03-02",
+                  "className": "钢琴伴奏课",
+                  "studentName": "陈奕迅",
+                  "sourceNote": "群里说临时替张学友"
+                }
+              ]
+            },
+            "severity": "WARNING"
+          },
+          {
+            "checkType": "MAKUP_RECALCULATION",
+            "passed": false,
+            "message": "发现1条补录记录需要确认重算",
+            "details": {
+              "issues": [
+                "2024-03-02_钢琴伴奏课_邓紫棋: 补录记录无对应票务，需确认是否需要重算"
+              ]
+            },
+            "severity": "WARNING"
+          },
+          {
+            "checkType": "EXPORT_CONSISTENCY",
+            "passed": false,
+            "message": "暂无票务导出数据，无法校验一致性",
+            "severity": "WARNING"
+          }
+        ],
+        "attendanceBatchId": "d6c4fd2d-7859-4bc5-a730-0c0c137bf699",
+        "ticketBatchId": "f3bfd420-072b-4b75-84ea-1e918a4733f4"
+      },
+      "createdAt": "2026-06-12T01:16:55.860Z",
+      "createdBy": "system"
+    },
+    {
+      "id": "dcd6eaa7-dfb5-46ad-b710-ecdde5f50169",
+      "cardId": "4dbec564-b495-43dc-ac12-6565de074107",
+      "version": 3,
+      "status": "CONFLICT_DETECTED",
+      "attendanceBatchId": "d6c4fd2d-7859-4bc5-a730-0c0c137bf699",
+      "ticketBatchId": "f3bfd420-072b-4b75-84ea-1e918a4733f4",
+      "snapshotData": {
+        "id": "4dbec564-b495-43dc-ac12-6565de074107",
+        "playlistName": "2024春季演唱会歌单",
+        "createdBy": "小段",
+        "createdAt": "2026-06-12T01:16:55.582Z",
+        "updatedAt": "2026-06-12T01:16:55.996Z",
+        "status": "CONFLICT_DETECTED",
+        "currentVersion": 3,
+        "selfCheckResults": [
+          {
+            "checkType": "DUPLICATE_IMPORT",
+            "passed": true,
+            "message": "无重复导入记录",
+            "severity": "INFO"
+          },
+          {
+            "checkType": "TEMP_SUBSTITUTE_WARNING",
+            "passed": false,
+            "message": "发现1条仅在群里提及的临时替补记录，需票务同事复核",
+            "details": {
+              "records": [
+                {
+                  "classDate": "2024-03-02",
+                  "className": "钢琴伴奏课",
+                  "studentName": "陈奕迅",
+                  "sourceNote": "群里说临时替张学友"
+                }
+              ]
+            },
+            "severity": "WARNING"
+          },
+          {
+            "checkType": "MAKUP_RECALCULATION",
+            "passed": false,
+            "message": "发现1条补录记录需要确认重算",
+            "details": {
+              "issues": [
+                "2024-03-02_钢琴伴奏课_邓紫棋: 补录记录无对应票务，需确认是否需要重算"
+              ]
+            },
+            "severity": "WARNING"
+          },
+          {
+            "checkType": "EXPORT_CONSISTENCY",
+            "passed": false,
+            "message": "暂无票务导出数据，无法校验一致性",
+            "severity": "WARNING"
+          }
+        ],
+        "attendanceBatchId": "d6c4fd2d-7859-4bc5-a730-0c0c137bf699",
+        "ticketBatchId": "f3bfd420-072b-4b75-84ea-1e918a4733f4"
+      },
+      "createdAt": "2026-06-12T01:16:55.997Z",
+      "createdBy": "小段"
+    },
+    {
+      "id": "0191f1e9-9c59-4377-8e5b-e1ea35c3979a",
+      "cardId": "4dbec564-b495-43dc-ac12-6565de074107",
+      "version": 4,
+      "status": "CONFLICT_DETECTED",
+      "attendanceBatchId": "d6c4fd2d-7859-4bc5-a730-0c0c137bf699",
+      "ticketBatchId": "f3bfd420-072b-4b75-84ea-1e918a4733f4",
+      "snapshotData": {
+        "id": "4dbec564-b495-43dc-ac12-6565de074107",
+        "playlistName": "2024春季演唱会歌单",
+        "createdBy": "小段",
+        "createdAt": "2026-06-12T01:16:55.582Z",
+        "updatedAt": "2026-06-12T01:16:56.044Z",
+        "status": "CONFLICT_DETECTED",
+        "currentVersion": 4,
+        "selfCheckResults": [
+          {
+            "checkType": "DUPLICATE_IMPORT",
+            "passed": true,
+            "message": "无重复导入记录",
+            "severity": "INFO"
+          },
+          {
+            "checkType": "TEMP_SUBSTITUTE_WARNING",
+            "passed": false,
+            "message": "发现1条仅在群里提及的临时替补记录，需票务同事复核",
+            "details": {
+              "records": [
+                {
+                  "classDate": "2024-03-02",
+                  "className": "钢琴伴奏课",
+                  "studentName": "陈奕迅",
+                  "sourceNote": "群里说临时替张学友"
+                }
+              ]
+            },
+            "severity": "WARNING"
+          },
+          {
+            "checkType": "MAKUP_RECALCULATION",
+            "passed": false,
+            "message": "发现1条补录记录需要确认重算",
+            "details": {
+              "issues": [
+                "2024-03-02_钢琴伴奏课_邓紫棋: 补录记录无对应票务，需确认是否需要重算"
+              ]
+            },
+            "severity": "WARNING"
+          },
+          {
+            "checkType": "EXPORT_CONSISTENCY",
+            "passed": false,
+            "message": "暂无票务导出数据，无法校验一致性",
+            "severity": "WARNING"
+          }
+        ],
+        "attendanceBatchId": "d6c4fd2d-7859-4bc5-a730-0c0c137bf699",
+        "ticketBatchId": "f3bfd420-072b-4b75-84ea-1e918a4733f4"
+      },
+      "createdAt": "2026-06-12T01:16:56.044Z",
+      "createdBy": "小段"
+    },
+    {
+      "id": "fd57c1ea-db10-46c2-b96f-808c9b358ab7",
+      "cardId": "4dbec564-b495-43dc-ac12-6565de074107",
+      "version": 5,
+      "status": "CONFLICT_RESOLVED",
+      "attendanceBatchId": "d6c4fd2d-7859-4bc5-a730-0c0c137bf699",
+      "ticketBatchId": "f3bfd420-072b-4b75-84ea-1e918a4733f4",
+      "snapshotData": {
+        "id": "4dbec564-b495-43dc-ac12-6565de074107",
+        "playlistName": "2024春季演唱会歌单",
+        "createdBy": "小段",
+        "createdAt": "2026-06-12T01:16:55.582Z",
+        "updatedAt": "2026-06-12T01:16:56.187Z",
+        "status": "CONFLICT_RESOLVED",
+        "currentVersion": 5,
+        "selfCheckResults": [
+          {
+            "checkType": "DUPLICATE_IMPORT",
+            "passed": true,
+            "message": "无重复导入记录",
+            "severity": "INFO"
+          },
+          {
+            "checkType": "TEMP_SUBSTITUTE_WARNING",
+            "passed": false,
+            "message": "发现1条仅在群里提及的临时替补记录，需票务同事复核",
+            "details": {
+              "records": [
+                {
+                  "classDate": "2024-03-02",
+                  "className": "钢琴伴奏课",
+                  "studentName": "陈奕迅",
+                  "sourceNote": "群里说临时替张学友"
+                }
+              ]
+            },
+            "severity": "WARNING"
+          },
+          {
+            "checkType": "MAKUP_RECALCULATION",
+            "passed": false,
+            "message": "发现1条补录记录需要确认重算",
+            "details": {
+              "issues": [
+                "2024-03-02_钢琴伴奏课_邓紫棋: 补录记录无对应票务，需确认是否需要重算"
+              ]
+            },
+            "severity": "WARNING"
+          },
+          {
+            "checkType": "EXPORT_CONSISTENCY",
+            "passed": false,
+            "message": "暂无票务导出数据，无法校验一致性",
+            "severity": "WARNING"
+          }
+        ],
+        "attendanceBatchId": "d6c4fd2d-7859-4bc5-a730-0c0c137bf699",
+        "ticketBatchId": "f3bfd420-072b-4b75-84ea-1e918a4733f4"
+      },
+      "createdAt": "2026-06-12T01:16:56.188Z",
+      "createdBy": "票务小李"
     }
   ]
 }

@@ -5,6 +5,7 @@ import {
   ClassAttendanceRecord,
   TicketExportRecord,
   AttendanceStatus,
+  ImportResultDetail,
 } from '../types';
 
 export class ImportService {
@@ -21,26 +22,69 @@ export class ImportService {
       isGroupMessageOnly?: boolean;
     }>,
     importedBy: string
-  ): { batchId: string; records: ClassAttendanceRecord[]; duplicateCount: number } {
+  ): { 
+    batchId: string; 
+    records: ClassAttendanceRecord[]; 
+    details: ImportResultDetail[];
+    summary: {
+      newCount: number;
+      duplicateCurrentBatchCount: number;
+      duplicateHistoricalCount: number;
+    };
+  } {
     const batchId = uuidv4();
     const now = new Date().toISOString();
     const importedRecords: ClassAttendanceRecord[] = [];
-    let duplicateCount = 0;
+    const details: ImportResultDetail[] = [];
 
     const existingRecords = this.getAttendanceByCardId(cardId);
-    const existingKeys = new Set(
-      existingRecords.map((r) => `${r.classDate}_${r.className}_${r.studentName}`)
-    );
+    const existingKeyToRecord = new Map<string, ClassAttendanceRecord>();
+    for (const r of existingRecords) {
+      const key = `${r.classDate}_${r.className}_${r.studentName}`;
+      existingKeyToRecord.set(key, r);
+    }
 
+    const currentBatchKeys = new Set<string>();
     const recordsToInsert: ClassAttendanceRecord[] = [];
 
     for (const record of records) {
       const key = `${record.classDate}_${record.className}_${record.studentName}`;
-      if (existingKeys.has(key)) {
-        duplicateCount++;
+      
+      if (currentBatchKeys.has(key)) {
+        details.push({
+          record: {
+            id: '',
+            cardId,
+            ...record,
+            isGroupMessageOnly: record.isGroupMessageOnly || false,
+            importedAt: now,
+            importBatchId: batchId,
+          },
+          importStatus: 'DUPLICATE_CURRENT_BATCH',
+          duplicateOf: key,
+        });
         continue;
       }
 
+      if (existingKeyToRecord.has(key)) {
+        const existing = existingKeyToRecord.get(key)!;
+        details.push({
+          record: {
+            id: '',
+            cardId,
+            ...record,
+            isGroupMessageOnly: record.isGroupMessageOnly || false,
+            importedAt: now,
+            importBatchId: batchId,
+          },
+          importStatus: 'DUPLICATE_HISTORICAL',
+          duplicateOf: `历史记录(${existing.importBatchId.substring(0, 8)}...)`,
+        });
+        currentBatchKeys.add(key);
+        continue;
+      }
+
+      currentBatchKeys.add(key);
       const id = uuidv4();
       const attendanceRecord: ClassAttendanceRecord = {
         id,
@@ -57,6 +101,10 @@ export class ImportService {
 
       recordsToInsert.push(attendanceRecord);
       importedRecords.push(attendanceRecord);
+      details.push({
+        record: attendanceRecord,
+        importStatus: 'NEW',
+      });
     }
 
     if (recordsToInsert.length > 0) {
@@ -68,7 +116,13 @@ export class ImportService {
       status: 'ATTENDANCE_IMPORTED',
     });
 
-    return { batchId, records: importedRecords, duplicateCount };
+    const summary = {
+      newCount: details.filter(d => d.importStatus === 'NEW').length,
+      duplicateCurrentBatchCount: details.filter(d => d.importStatus === 'DUPLICATE_CURRENT_BATCH').length,
+      duplicateHistoricalCount: details.filter(d => d.importStatus === 'DUPLICATE_HISTORICAL').length,
+    };
+
+    return { batchId, records: importedRecords, details, summary };
   }
 
   supplementTickets(
@@ -82,14 +136,90 @@ export class ImportService {
       supplementNote?: string;
     }>,
     supplementedBy: string
-  ): { batchId: string; records: TicketExportRecord[] } {
+  ): { 
+    batchId: string; 
+    records: TicketExportRecord[];
+    details: Array<{
+      record: TicketExportRecord;
+      importStatus: 'NEW' | 'DUPLICATE_CURRENT_BATCH' | 'DUPLICATE_HISTORICAL' | 'MANUAL_SUPPLEMENT';
+      duplicateOf?: string;
+      supplementNote?: string;
+    }>;
+    summary: {
+      newCount: number;
+      duplicateCurrentBatchCount: number;
+      duplicateHistoricalCount: number;
+      manualSupplementCount: number;
+    };
+  } {
     const batchId = uuidv4();
     const now = new Date().toISOString();
     const importedRecords: TicketExportRecord[] = [];
+    const details: any[] = [];
 
+    const existingRecords = this.getTicketsByCardId(cardId);
+    const existingKeyToRecord = new Map<string, TicketExportRecord>();
+    for (const r of existingRecords) {
+      const key = `${r.classDate}_${r.className}_${r.studentName}`;
+      existingKeyToRecord.set(key, r);
+    }
+
+    const currentBatchKeys = new Set<string>();
     const recordsToInsert: TicketExportRecord[] = [];
 
     for (const record of records) {
+      const key = `${record.classDate}_${record.className}_${record.studentName}`;
+      
+      if (currentBatchKeys.has(key)) {
+        details.push({
+          record: {
+            id: '',
+            cardId,
+            ...record,
+            exportedAt: now,
+            exportBatchId: batchId,
+          },
+          importStatus: 'DUPLICATE_CURRENT_BATCH',
+          duplicateOf: key,
+        });
+        continue;
+      }
+
+      const isManualSupplement = !!record.supplementNote;
+      
+      if (existingKeyToRecord.has(key)) {
+        const existing = existingKeyToRecord.get(key)!;
+        if (isManualSupplement) {
+          details.push({
+            record: {
+              id: '',
+              cardId,
+              ...record,
+              exportedAt: now,
+              exportBatchId: batchId,
+            },
+            importStatus: 'DUPLICATE_HISTORICAL',
+            duplicateOf: `历史记录(${existing.exportBatchId.substring(0, 8)}...)`,
+            supplementNote: record.supplementNote,
+          });
+        } else {
+          details.push({
+            record: {
+              id: '',
+              cardId,
+              ...record,
+              exportedAt: now,
+              exportBatchId: batchId,
+            },
+            importStatus: 'DUPLICATE_HISTORICAL',
+            duplicateOf: `历史记录(${existing.exportBatchId.substring(0, 8)}...)`,
+          });
+        }
+        currentBatchKeys.add(key);
+        continue;
+      }
+
+      currentBatchKeys.add(key);
       const id = uuidv4();
       const ticketRecord: TicketExportRecord = {
         id,
@@ -106,6 +236,13 @@ export class ImportService {
 
       recordsToInsert.push(ticketRecord);
       importedRecords.push(ticketRecord);
+      
+      const status = isManualSupplement ? 'MANUAL_SUPPLEMENT' : 'NEW';
+      details.push({
+        record: ticketRecord,
+        importStatus: status,
+        supplementNote: record.supplementNote,
+      });
     }
 
     if (recordsToInsert.length > 0) {
@@ -117,7 +254,14 @@ export class ImportService {
       status: 'TICKET_SUPPLEMENTED',
     });
 
-    return { batchId, records: importedRecords };
+    const summary = {
+      newCount: details.filter(d => d.importStatus === 'NEW').length,
+      duplicateCurrentBatchCount: details.filter(d => d.importStatus === 'DUPLICATE_CURRENT_BATCH').length,
+      duplicateHistoricalCount: details.filter(d => d.importStatus === 'DUPLICATE_HISTORICAL').length,
+      manualSupplementCount: details.filter(d => d.importStatus === 'MANUAL_SUPPLEMENT').length,
+    };
+
+    return { batchId, records: importedRecords, details, summary };
   }
 
   getAttendanceByCardId(cardId: string): ClassAttendanceRecord[] {

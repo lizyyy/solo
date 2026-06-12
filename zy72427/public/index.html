@@ -207,6 +207,10 @@
 
     function renderCardInfo(data) {
       const { card } = data;
+      const conflictWarning = card.unresolvedConflictCount > 0 
+        ? `<div style="color:#f56c6c"><strong>⚠️ 未解决冲突：</strong>${card.unresolvedConflictCount} 条，${card.canCalculateRevenue ? '可计算' : '不可计算'}分账</div>`
+        : `<div style="color:#67c23a"><strong>✅ 无未解决冲突：</strong>可以计算分账</div>`;
+      
       document.getElementById('cardInfo').innerHTML = `
         <div class="grid-3">
           <div><strong>歌单名称：</strong>${card.playlistName}</div>
@@ -215,6 +219,9 @@
           <div><strong>创建人：</strong>${card.createdBy}</div>
           <div><strong>创建时间：</strong><span class="timestamp">${card.createdAt}</span></div>
           <div><strong>更新时间：</strong><span class="timestamp">${card.updatedAt}</span></div>
+        </div>
+        <div style="margin-top:10px;padding:10px;background:#f5f7fa;border-radius:4px;">
+          ${conflictWarning}
         </div>
       `;
     }
@@ -240,15 +247,27 @@
         document.getElementById('attendanceTable').innerHTML = '<p style="color:#909399">暂无签到记录</p>';
         return;
       }
-      let html = '<table><tr><th>日期</th><th>课程</th><th>学员</th><th>状态</th><th>备注</th><th>仅群消息</th><th>导入时间</th></tr>';
+      let html = '<table><tr><th>日期</th><th>课程</th><th>学员</th><th>状态</th><th>备注</th><th>仅群消息</th><th>冲突</th><th>导入时间</th></tr>';
       records.forEach(r => {
-        html += `<tr>
+        let conflictTag = '<span style="color:#67c23a">无</span>';
+        let rowStyle = '';
+        if (r.hasConflict) {
+          if (r.isUnresolved) {
+            conflictTag = '<span style="color:#f56c6c">⚠️ 未解决</span>';
+            rowStyle = 'background:#fef0f0';
+          } else {
+            conflictTag = '<span style="color:#e6a23c">已处理</span>';
+            rowStyle = 'background:#fdf6ec';
+          }
+        }
+        html += `<tr style="${rowStyle}">
           <td>${r.classDate}</td>
           <td>${r.className}</td>
           <td>${r.studentName}</td>
           <td>${r.status}</td>
           <td>${r.sourceNote || '-'}</td>
           <td>${r.isGroupMessageOnly ? '<span style="color:#e6a23c">⚠️ 是</span>' : '否'}</td>
+          <td>${conflictTag}</td>
           <td class="timestamp">${r.importedAt}</td>
         </tr>`;
       });
@@ -261,15 +280,31 @@
         document.getElementById('ticketsTable').innerHTML = '<p style="color:#909399">暂无票务记录</p>';
         return;
       }
-      let html = '<table><tr><th>日期</th><th>课程</th><th>学员</th><th>票数</th><th>票种</th><th>补充说明</th><th>导出时间</th></tr>';
+      let html = '<table><tr><th>日期</th><th>课程</th><th>学员</th><th>票数</th><th>票种</th><th>补充说明</th><th>冲突</th><th>导出时间</th></tr>';
       records.forEach(r => {
-        html += `<tr>
+        let conflictTag = '<span style="color:#67c23a">无</span>';
+        let rowStyle = '';
+        if (r.hasConflict) {
+          if (r.isUnresolved) {
+            conflictTag = '<span style="color:#f56c6c">⚠️ 未解决</span>';
+            rowStyle = 'background:#fef0f0';
+          } else {
+            conflictTag = '<span style="color:#e6a23c">已处理</span>';
+            rowStyle = 'background:#fdf6ec';
+          }
+        }
+        let supplementTag = r.supplementNote || '-';
+        if (r.supplementNote) {
+          supplementTag = `<span style="color:#409eff">📝 ${r.supplementNote}</span>`;
+        }
+        html += `<tr style="${rowStyle}">
           <td>${r.classDate}</td>
           <td>${r.className}</td>
           <td>${r.studentName}</td>
           <td>${r.ticketCount}</td>
           <td>${r.ticketType}</td>
-          <td>${r.supplementNote || '-'}</td>
+          <td>${supplementTag}</td>
+          <td>${conflictTag}</td>
           <td class="timestamp">${r.exportedAt}</td>
         </tr>`;
       });
@@ -284,19 +319,37 @@
       }
       let html = '';
       conflicts.forEach(c => {
-        const resolved = c.resolution ? `<span class="status-badge status-CONFLICT_RESOLVED">已解决: ${c.resolution}</span>` : '<span class="status-badge status-CONFLICT_DETECTED">待处理</span>';
-        html += `<div class="conflict-card">
-          <h4>${c.description} ${resolved}</h4>
+        let statusBadge = '';
+        let cardClass = 'conflict-card';
+        if (!c.resolution) {
+          statusBadge = '<span class="status-badge status-CONFLICT_DETECTED">待处理</span>';
+        } else if (c.resolution === 'PENDING_REVIEW') {
+          statusBadge = '<span class="status-badge status-TICKET_SUPPLEMENTED">⏳ 待票务复核</span>';
+          cardClass = 'warning-card';
+        } else {
+          statusBadge = `<span class="status-badge status-CONFLICT_RESOLVED">✓ 已解决: ${c.resolution}</span>`;
+          cardClass = 'info-card';
+        }
+        
+        html += `<div class="${cardClass}">
+          <h4>${c.description} ${statusBadge}</h4>
           <p><strong>冲突类型：</strong>${c.conflictType}</p>
-          <p><strong>签到数据：</strong><code>${JSON.stringify(c.attendanceData).substring(0, 150)}...</code></p>
-          ${c.ticketData ? `<p><strong>票务数据：</strong><code>${JSON.stringify(c.ticketData).substring(0, 150)}...</code></p>` : ''}
-          ${!c.resolution ? `
+          <p><strong>签到记录：</strong>${c.attendanceData.classDate} | ${c.attendanceData.className} | ${c.attendanceData.studentName} | 状态: ${c.attendanceData.status}</p>
+          ${c.ticketData ? `<p><strong>票务记录：</strong>${c.ticketData.classDate} | ${c.ticketData.className} | ${c.ticketData.studentName} | 票数: ${c.ticketData.ticketCount}</p>` : '<p><strong>票务记录：</strong>无对应票务导出记录</p>'}
+          ${c.resolutionNote ? `<div class="info-card" style="margin:8px 0;padding:8px;"><strong>处理说明：</strong>${c.resolutionNote}</div>` : ''}
+          ${c.isUnresolved ? `
             <div style="margin-top:8px;">
               <button class="btn btn-success" onclick="resolveConflict('${c.id}', 'CONFIRM_ATTENDANCE')">确认以签到为准</button>
               <button class="btn btn-warning" onclick="resolveConflict('${c.id}', 'CONFIRM_TICKET')">确认以票务为准</button>
               <button class="btn btn-info" onclick="resolveConflict('${c.id}', 'PENDING_REVIEW')">转票务复核</button>
             </div>
-          ` : `<p class="timestamp">解决人: ${c.resolvedBy} | 时间: ${c.resolvedAt}</p>`}
+          ` : `
+            <p class="timestamp">
+              处理方式: ${c.resolution} | 
+              处理人: ${c.resolvedBy} | 
+              时间: ${c.resolvedAt}
+            </p>
+          `}
         </div>`;
       });
       document.getElementById('conflictsList').innerHTML = html;
@@ -372,12 +425,24 @@
         { classDate: '2024-01-15', className: '声乐入门班', studentName: '张三', status: 'NORMAL' },
         { classDate: '2024-01-15', className: '声乐入门班', studentName: '李四', status: 'NORMAL' },
         { classDate: '2024-01-15', className: '声乐入门班', studentName: '王五', status: 'ABSENT' },
+        { classDate: '2024-01-15', className: '声乐入门班', studentName: '王五', status: 'ABSENT' },
         { classDate: '2024-01-16', className: '钢琴进阶班', studentName: '赵六', status: 'MAKEUP', sourceNote: '上周请假补录' },
         { classDate: '2024-01-16', className: '钢琴进阶班', studentName: '钱七', status: 'TEMP_SUBSTITUTE', sourceNote: '群里说临时替孙八', isGroupMessageOnly: true },
       ];
-      await api(`/cards/${currentCardId}/import-attendance`, 'POST', { records: sampleData, importedBy: by });
+      const result = await api(`/cards/${currentCardId}/import-attendance`, 'POST', { records: sampleData, importedBy: by });
       await loadCardDetails();
-      alert('签到数据导入成功！');
+      
+      let detailsMsg = `导入完成！\n\n`;
+      detailsMsg += `✅ 新记录: ${result.summary.newCount} 条\n`;
+      detailsMsg += `⚠️ 本次导入重复: ${result.summary.duplicateCurrentBatchCount} 条\n`;
+      detailsMsg += `🔄 历史重复: ${result.summary.duplicateHistoricalCount} 条\n`;
+      
+      const newRecords = result.details.filter(d => d.importStatus === 'NEW').map(d => `${d.record.classDate} ${d.record.studentName}`);
+      if (newRecords.length > 0) {
+        detailsMsg += `\n新增记录:\n${newRecords.slice(0, 5).join('\n')}${newRecords.length > 5 ? '\n...' : ''}`;
+      }
+      
+      alert(detailsMsg);
     }
 
     async function importSampleTickets() {
@@ -386,11 +451,24 @@
         { classDate: '2024-01-15', className: '声乐入门班', studentName: '张三', ticketCount: 1, ticketType: '常规课' },
         { classDate: '2024-01-15', className: '声乐入门班', studentName: '李四', ticketCount: 1, ticketType: '常规课' },
         { classDate: '2024-01-15', className: '声乐入门班', studentName: '王五', ticketCount: 1, ticketType: '常规课' },
-        { classDate: '2024-01-16', className: '钢琴进阶班', studentName: '赵六', ticketCount: 1, ticketType: '补录课', supplementNote: '系统补录' },
+        { classDate: '2024-01-16', className: '钢琴进阶班', studentName: '赵六', ticketCount: 1, ticketType: '补录课', supplementNote: '人工补录，系统漏登' },
+        { classDate: '2024-01-16', className: '钢琴进阶班', studentName: '钱七', ticketCount: 0, ticketType: '无票', supplementNote: '群里说临时替孙八，无票' },
       ];
-      await api(`/cards/${currentCardId}/supplement-tickets`, 'POST', { records: sampleData, supplementedBy: by });
+      const result = await api(`/cards/${currentCardId}/supplement-tickets`, 'POST', { records: sampleData, supplementedBy: by });
       await loadCardDetails();
-      alert('票务数据补充成功！');
+      
+      let detailsMsg = `票务补充完成！\n\n`;
+      detailsMsg += `✅ 新记录: ${result.summary.newCount} 条\n`;
+      detailsMsg += `📝 人工补录: ${result.summary.manualSupplementCount} 条\n`;
+      detailsMsg += `⚠️ 本次导入重复: ${result.summary.duplicateCurrentBatchCount} 条\n`;
+      detailsMsg += `🔄 历史重复: ${result.summary.duplicateHistoricalCount} 条\n`;
+      
+      const manualRecords = result.details.filter(d => d.importStatus === 'MANUAL_SUPPLEMENT').map(d => `${d.record.classDate} ${d.record.studentName}: ${d.supplementNote}`);
+      if (manualRecords.length > 0) {
+        detailsMsg += `\n人工补录记录:\n${manualRecords.join('\n')}`;
+      }
+      
+      alert(detailsMsg);
     }
 
     async function detectConflicts() {

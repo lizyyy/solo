@@ -48,6 +48,7 @@ export interface ConflictRecord {
   attendanceData: any;
   ticketData?: any;
   resolution?: ConflictResolution;
+  resolutionNote?: string;
   resolvedBy?: string;
   resolvedAt?: string;
   createdAt: string;
@@ -80,6 +81,12 @@ export interface SelfCheckResult {
   message: string;
   details?: any;
   severity: 'INFO' | 'WARNING' | 'ERROR';
+}
+
+export interface ImportResultDetail {
+  record: ClassAttendanceRecord;
+  importStatus: 'NEW' | 'DUPLICATE_CURRENT_BATCH' | 'DUPLICATE_HISTORICAL';
+  duplicateOf?: string;
 }
 
 export interface PlaylistColdStartCard {

@@ -105,25 +105,38 @@ export class ConflictService {
   resolveConflict(
     conflictId: string,
     resolution: ConflictResolution,
-    resolvedBy: string
+    resolvedBy: string,
+    resolutionNote?: string
   ): ConflictRecord | null {
     const now = new Date().toISOString();
+    const updateData: any = { resolution, resolvedBy, resolvedAt: now };
+    if (resolutionNote) {
+      updateData.resolutionNote = resolutionNote;
+    }
     const updated = updateOne(
       'conflicts',
       (c: any) => c.id === conflictId,
-      { resolution, resolvedBy, resolvedAt: now }
+      updateData
     );
 
     if (!updated) return null;
 
     const conflict = updated as ConflictRecord;
     const cardConflicts = this.getConflictsByCardId(conflict.cardId);
-    const unresolvedCount = cardConflicts.filter((c) => !c.resolution).length;
+    const unresolvedCount = cardConflicts.filter((c) => this.isUnresolved(c)).length;
     if (unresolvedCount === 0) {
       this.cardService.updateCardStatus(conflict.cardId, 'CONFLICT_RESOLVED', resolvedBy);
+    } else {
+      this.cardService.updateCardStatus(conflict.cardId, 'CONFLICT_DETECTED', resolvedBy);
     }
 
     return conflict;
+  }
+
+  isUnresolved(conflict: ConflictRecord): boolean {
+    if (!conflict.resolution) return true;
+    if (conflict.resolution === 'PENDING_REVIEW') return true;
+    return false;
   }
 
   getConflictById(conflictId: string): ConflictRecord | null {
@@ -137,6 +150,6 @@ export class ConflictService {
   }
 
   getUnresolvedConflicts(cardId: string): ConflictRecord[] {
-    return this.getConflictsByCardId(cardId).filter((c) => !c.resolution);
+    return this.getConflictsByCardId(cardId).filter((c) => this.isUnresolved(c));
   }
 }

@@ -114,14 +114,27 @@ router.get('/cards/:cardId/conflicts', (req: Request, res: Response) => {
 
 router.post('/conflicts/:conflictId/resolve', (req: Request, res: Response) => {
   try {
-    const { resolution, resolvedBy } = req.body;
+    const { resolution, resolvedBy, resolutionNote } = req.body;
     if (!resolution || !resolvedBy) {
       return res.status(400).json({ error: 'resolution 和 resolvedBy 必填' });
     }
+    
+    let note = resolutionNote;
+    if (!note) {
+      if (resolution === 'CONFIRM_ATTENDANCE') {
+        note = '确认以课时签到照片记录为准，不自动拍板，已人工核对';
+      } else if (resolution === 'CONFIRM_TICKET') {
+        note = '确认以票务导出表记录为准，不自动拍板，已人工核对';
+      } else if (resolution === 'PENDING_REVIEW') {
+        note = '转票务同事复核，留给票务同事复核，不自动拍板';
+      }
+    }
+    
     const conflict = conflictService.resolveConflict(
       req.params.conflictId,
       resolution as ConflictResolution,
-      resolvedBy
+      resolvedBy,
+      note
     );
     if (!conflict) {
       return res.status(404).json({ error: '冲突记录不存在' });
@@ -238,14 +251,39 @@ router.get('/cards/:cardId/full-details', (req: Request, res: Response) => {
     const tickets = importService.getTicketsByCardId(cardId);
     const conflicts = conflictService.getConflictsByCardId(cardId);
     const revenue = revenueService.getLatestRevenue(cardId);
+    const revenueExport = revenueService.getRevenueExportData(cardId);
     const versionHistory = withdrawService.getVersionHistory(cardId);
+    const unresolvedConflicts = conflictService.getUnresolvedConflicts(cardId);
+    
+    const attendanceWithFlags = attendance.map(a => ({
+      ...a,
+      hasConflict: conflicts.some(c => c.attendanceId === a.id),
+      isUnresolved: unresolvedConflicts.some(c => c.attendanceId === a.id),
+    }));
+    
+    const ticketsWithFlags = tickets.map(t => {
+      const relatedConflict = conflicts.find(c => c.ticketId === t.id);
+      return {
+        ...t,
+        hasConflict: !!relatedConflict,
+        isUnresolved: relatedConflict ? conflictService.isUnresolved(relatedConflict) : false,
+      };
+    });
 
     res.json({
-      card,
-      attendance,
-      tickets,
-      conflicts,
+      card: {
+        ...card,
+        unresolvedConflictCount: unresolvedConflicts.length,
+        canCalculateRevenue: unresolvedConflicts.length === 0,
+      },
+      attendance: attendanceWithFlags,
+      tickets: ticketsWithFlags,
+      conflicts: conflicts.map(c => ({
+        ...c,
+        isUnresolved: conflictService.isUnresolved(c),
+      })),
       revenue,
+      revenueExport,
       versionHistory,
     });
   } catch (err: any) {
