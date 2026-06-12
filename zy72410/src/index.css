@@ -1,0 +1,170 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    font-family: 'JetBrains Mono', monospace;
+    line-height: 1.5;
+    font-weight: 400;
+    color-scheme: dark;
+    color: #ffffff;
+    background-color: #121212;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0F0F0F 0%, #1A1A1A 50%, #121212 100%);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #1A1A1A;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #D4AF37;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #E8C872;
+  }
+}
+
+@layer components {
+  .btn-studio {
+    @apply px-6 py-3 bg-studio-gold text-studio-black font-semibold 
+           transition-all duration-300
+           hover:bg-studio-goldLight hover:shadow-lg hover:shadow-studio-gold/20
+           active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  }
+
+  .btn-outline {
+    @apply px-6 py-3 border-2 border-studio-gold text-studio-gold font-semibold
+           transition-all duration-300
+           hover:bg-studio-gold hover:text-studio-black;
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  }
+
+  .btn-danger {
+    @apply px-6 py-3 bg-studio-red text-white font-semibold
+           transition-all duration-300
+           hover:bg-red-600;
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  }
+
+  .btn-confirm {
+    @apply px-6 py-3 bg-status-new text-white font-semibold
+           transition-all duration-300
+           hover:bg-emerald-600;
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  }
+
+  .card-studio {
+    @apply bg-studio-dark border border-studio-gray rounded-lg
+           shadow-lg shadow-black/30 transition-all duration-300
+           hover:border-studio-gold/50 hover:shadow-studio-gold/10;
+  }
+
+  .card-glow {
+    box-shadow: 0 0 30px rgba(212, 175, 55, 0.15);
+  }
+
+  .input-studio {
+    @apply w-full px-4 py-3 bg-studio-darker border border-studio-gray rounded
+           text-white font-mono text-sm transition-all duration-300
+           focus:outline-none focus:border-studio-gold focus:ring-1 focus:ring-studio-gold
+           placeholder:text-gray-500;
+  }
+
+  .label-studio {
+    @apply block text-sm font-medium text-studio-silver mb-2;
+  }
+
+  .status-badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold;
+  }
+
+  .status-reused {
+    @apply bg-status-reused/20 text-status-reused border border-status-reused/30;
+  }
+
+  .status-new {
+    @apply bg-status-new/20 text-status-new border border-status-new/30;
+  }
+
+  .status-conflict {
+    @apply bg-status-conflict/20 text-status-conflict border border-status-conflict/30;
+  }
+
+  .status-rework {
+    @apply bg-status-rework/20 text-status-rework border border-status-rework/30;
+  }
+
+  .status-normal {
+    @apply bg-status-normal/20 text-status-normal border border-status-normal/30;
+  }
+
+  .status-completed {
+    @apply bg-status-completed/20 text-status-completed border border-status-completed/30;
+  }
+
+  .status-pending {
+    @apply bg-status-pending/20 text-status-pending border border-status-pending/30;
+  }
+
+  .waveform-bar {
+    @apply w-1 bg-studio-gold rounded-full origin-bottom;
+    animation: waveform 1.2s ease-in-out infinite;
+  }
+
+  .waveform-bar:nth-child(2) { animation-delay: 0.1s; }
+  .waveform-bar:nth-child(3) { animation-delay: 0.2s; }
+  .waveform-bar:nth-child(4) { animation-delay: 0.3s; }
+  .waveform-bar:nth-child(5) { animation-delay: 0.4s; }
+
+  .divider-wave {
+    height: 2px;
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      #D4AF37 20%, #D4AF37 25%, transparent 25%, transparent 30%,
+      #D4AF37 35%, #D4AF37 40%, transparent 40%, transparent 45%,
+      #D4AF37 50%, #D4AF37 55%, transparent 55%, transparent 60%,
+      #D4AF37 65%, #D4AF37 70%, transparent 70%, transparent 75%,
+      #D4AF37 80%, transparent 100%
+    );
+  }
+
+  .timeline-dot {
+    @apply w-4 h-4 rounded-full border-2 border-studio-gold bg-studio-dark;
+  }
+
+  .timeline-dot.active {
+    @apply bg-studio-gold shadow-lg shadow-studio-gold/50;
+  }
+
+  .vinyl-bg {
+    background-image: 
+      radial-gradient(circle at center, #2A2A2A 0%, #2A2A2A 10%, transparent 10%),
+      repeating-radial-gradient(circle at center, #1A1A1A 0, #1A1A1A 1px, #252525 1px, #252525 2px),
+      radial-gradient(circle at center, #1A1A1A 0%, #121212 100%);
+  }
+}
