@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useRecordsStore } from '@/store/useRecordsStore';
 import { RecordStatus } from '@/types';
 import { StatusBadge } from '@/components/StatusBadge';
@@ -14,11 +14,15 @@ import {
   FileText,
   Eye,
   ArrowLeft,
+  History,
+  Layers,
+  RefreshCw,
+  Users,
 } from 'lucide-react';
 
 export default function SummaryPage() {
   const navigate = useNavigate();
-  const { records, selectRecord } = useRecordsStore();
+  const { records, selectRecord, getFieldHistory, getRecordHistory } = useRecordsStore();
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
   const stats = useMemo(() => {
@@ -54,14 +58,28 @@ export default function SummaryPage() {
 
   const RecordExpandableRow = ({ record }: { record: any }) => {
     const isExpanded = expandedIds.has(record.id);
+    const recordHistory = getRecordHistory(record.id);
+    const remarkHistory = getFieldHistory(record.id, 'plannerRemark');
+    const plannerRemarkChanges = remarkHistory.length;
+    const totalChanges = recordHistory.length;
+    const duplicateCovered = recordHistory.some((h) =>
+      h.changeReason?.startsWith('重复导入覆盖')
+    );
+
+    const matchedNames = record.suspectedMatchedRecordIds
+      ?.map((id: string) => {
+        const m = records.find((r) => r.id === id);
+        return m ? m.communityName : null;
+      })
+      .filter(Boolean);
 
     return (
       <div className="border border-slate-200 rounded-lg overflow-hidden mb-2">
         <button
           onClick={() => toggleExpand(record.id)}
-          className="w-full px-4 py-3 flex items-center justify-between hover:bg-slate-50 transition-colors text-left"
+          className="w-full px-4 py-3 flex items-center justify-between hover:bg-slate-50 transition-colors text-left gap-3"
         >
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
             {record.isSuspectedDuplicateName && (
               <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0" />
             )}
@@ -71,15 +89,38 @@ export default function SummaryPage() {
             {record.status === RecordStatus.NORMAL && (
               <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
             )}
-            <div>
-              <p className="font-medium text-slate-800">{record.communityName}</p>
-              <p className="text-xs text-slate-500 flex items-center gap-1">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <p className="font-medium text-slate-800 truncate">{record.communityName}</p>
+                {duplicateCovered && (
+                  <span className="flex-shrink-0 inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] bg-indigo-50 text-indigo-700 border border-indigo-200">
+                    <RefreshCw className="w-3 h-3" />
+                    复用记录
+                  </span>
+                )}
+                {totalChanges > 0 && (
+                  <span className="flex-shrink-0 inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] bg-slate-100 text-slate-600">
+                    <History className="w-3 h-3" />
+                    {totalChanges} 次变更
+                  </span>
+                )}
+                {plannerRemarkChanges > 1 && (
+                  <span className="flex-shrink-0 inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] bg-amber-50 text-amber-700 border border-amber-200">
+                    <Users className="w-3 h-3" />
+                    备注改前改后可查
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
                 <MapPin className="w-3 h-3" />
                 {record.stationName}
+                <span className="text-slate-300 mx-1">·</span>
+                <FileText className="w-3 h-3" />
+                原始行号: {record.originalRowNumber}
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-shrink-0">
             <StatusBadge status={record.status} size="sm" />
             {isExpanded ? (
               <ChevronUp className="w-5 h-5 text-slate-400" />
@@ -95,9 +136,18 @@ export default function SummaryPage() {
               <div>
                 <p className="text-xs text-slate-500 mb-1 flex items-center gap-1">
                   <FileText className="w-3 h-3" />
-                  原始行号
+                  原始行号（不可变）
                 </p>
                 <p className="text-sm text-slate-800 font-mono">{record.originalRowNumber}</p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-500 mb-1 flex items-center gap-1">
+                  <Layers className="w-3 h-3" />
+                  来源批次（导入文件）
+                </p>
+                <p className="text-sm text-slate-800 truncate">
+                  {record.importFileName || '未知'}
+                </p>
               </div>
               <div>
                 <p className="text-xs text-slate-500 mb-1 flex items-center gap-1">
@@ -106,14 +156,45 @@ export default function SummaryPage() {
                 </p>
                 <p className="text-sm text-slate-800">{record.busSwipeTime || '未填写'}</p>
               </div>
+              <div>
+                <p className="text-xs text-slate-500 mb-1 flex items-center gap-1">
+                  <History className="w-3 h-3" />
+                  变更记录统计
+                </p>
+                <p className="text-sm text-slate-800">
+                  共 {totalChanges} 次 · 规划员备注修改 {plannerRemarkChanges} 次
+                  {duplicateCovered && ' · 曾被重复导入覆盖过'}
+                </p>
+              </div>
               <div className="md:col-span-2">
                 <p className="text-xs text-slate-500 mb-1">路口照片描述</p>
-                <p className="text-sm text-slate-800">{record.photoDescription || '无'}</p>
+                <p className="text-sm text-slate-800 bg-white p-2.5 rounded border border-slate-200">
+                  {record.photoDescription || '无'}
+                </p>
               </div>
+
+              {record.isSuspectedDuplicateName && matchedNames && matchedNames.length > 0 && (
+                <div className="md:col-span-2">
+                  <p className="text-xs text-amber-600 mb-1 font-medium flex items-center gap-1">
+                    <AlertTriangle className="w-3.5 h-3.5" />
+                    市政巡检员复核提示：疑似与以下为同一小区新旧名称
+                  </p>
+                  <p className="text-sm text-slate-800 bg-amber-50 p-2.5 rounded border border-amber-200">
+                    可能匹配：{matchedNames.join('、')}
+                  </p>
+                </div>
+              )}
+
               {record.plannerRemark && (
                 <div className="md:col-span-2">
-                  <p className="text-xs text-amber-600 mb-1 font-medium">
-                    街道规划员小姜保留理由：
+                  <p className="text-xs text-amber-700 mb-1 font-medium flex items-center gap-1">
+                    <Users className="w-3.5 h-3.5" />
+                    街道规划员小姜当时保留它的理由：
+                    {plannerRemarkChanges > 1 && (
+                      <span className="ml-auto inline-flex items-center gap-1 text-[11px] bg-amber-100 px-1.5 py-0.5 rounded">
+                        该备注已修改 {plannerRemarkChanges} 次，点下方历史可查看改前改后
+                      </span>
+                    )}
                   </p>
                   <p className="text-sm text-slate-800 bg-amber-50 p-3 rounded border border-amber-200">
                     {record.plannerRemark}
@@ -129,7 +210,14 @@ export default function SummaryPage() {
                 </div>
               )}
             </div>
-            <div className="mt-3 flex justify-end">
+            <div className="mt-4 flex items-center justify-end gap-2 flex-wrap">
+              <Link
+                to={`/history/${record.id}`}
+                className="inline-flex items-center gap-1 px-3 py-1.5 text-xs text-slate-700 bg-slate-100 rounded hover:bg-slate-200 transition-colors"
+              >
+                <History className="w-3 h-3" />
+                查看变更历史 / 回滚
+              </Link>
               <button
                 onClick={() => {
                   selectRecord(record.id);
@@ -138,7 +226,7 @@ export default function SummaryPage() {
                 className="inline-flex items-center gap-1 px-3 py-1.5 text-xs text-blue-600 bg-blue-50 rounded hover:bg-blue-100 transition-colors"
               >
                 <Eye className="w-3 h-3" />
-                查看完整记录
+                打开工作区查看完整记录
               </button>
             </div>
           </div>

@@ -10,6 +10,17 @@ import {
 } from '@/types';
 import { isSuspectedSameCommunity } from '@/utils/boundaryRules';
 
+export interface EnhancedImportResult extends ImportResult {
+  reusedCount: number;
+  overwrittenCount: number;
+  reusedRecordIds: string[];
+  overwrittenRecordIds: string[];
+}
+
+export interface DuplicateImportOption {
+  mode: 'skip' | 'overwrite_keep_history' | 'overwrite_all';
+}
+
 interface RecordsState {
   records: CanopyRecord[];
   history: HistoryRecord[];
@@ -22,21 +33,42 @@ interface RecordsState {
   selectRecord: (id: string | null) => void;
   setOperator: (role: OperatorRole, name: string) => void;
 
-  addRecords: (newRecords: CanopyRecord[]) => ImportResult;
+  addRecords: (
+    newRecords: CanopyRecord[],
+    importOptions?: DuplicateImportOption
+  ) => EnhancedImportResult;
+
+  findDuplicateRecords: (
+    communityName: string,
+    stationName: string,
+    originalRowNumber: number
+  ) => CanopyRecord | undefined;
+
   updateRecordField: (
     recordId: string,
     fieldName: keyof CanopyRecord,
     newValue: string,
     changeReason?: string
   ) => void;
+
   updateRecordStatus: (
     recordId: string,
     newStatus: RecordStatus,
     changeReason?: string
   ) => void;
-  rollbackToHistory: (historyId: string) => void;
+
+  rollbackToHistory: (historyId: string, reason?: string) => void;
+
   getRecordHistory: (recordId: string) => HistoryRecord[];
+
+  getFieldHistory: (recordId: string, fieldName: string) => HistoryRecord[];
+
+  getHistoryById: (historyId: string) => HistoryRecord | undefined;
+
+  getRollbackChain: (historyId: string) => HistoryRecord[];
+
   clearAllData: () => void;
+
   importMockData: () => void;
 }
 
@@ -50,7 +82,8 @@ function addHistoryEntry(
   fieldName: string,
   oldValue: string,
   newValue: string,
-  changeReason?: string
+  changeReason?: string,
+  extraMeta?: Partial<HistoryRecord>
 ): HistoryRecord {
   return {
     id: generateId(),
@@ -62,6 +95,7 @@ function addHistoryEntry(
     operatorName: state.currentOperatorName,
     timestamp: new Date().toISOString(),
     changeReason,
+    ...extraMeta,
   };
 }
 
@@ -85,6 +119,8 @@ function detectDuplicateNames(
   };
 }
 
+const FIELDS_NOT_TO_OVERWRITE = ['plannerRemark', 'inspectorRemark', 'status', 'busSwipeTime'];
+
 export const useRecordsStore = create<RecordsState>()(
   persist(
     (set, get) => ({
@@ -99,29 +135,77 @@ export const useRecordsStore = create<RecordsState>()(
       selectRecord: (id) => set({ selectedRecordId: id }),
       setOperator: (role, name) => set({ currentOperator: role, currentOperatorName: name }),
 
-      addRecords: (newRecords) => {
+      findDuplicateRecords: (communityName, stationName, originalRowNumber) => {
+        return get().records.find(
+          (r) =>
+            r.communityName === communityName &&
+            r.stationName === stationName &&
+            r.originalRowNumber === originalRowNumber
+        );
+      },
+
+      addRecords: (newRecords, importOptions = { mode: 'skip' }) => {
         const state = get();
         const batchId = generateId();
-        const finalRecords: CanopyRecord[] = [];
+        const newAddedRecords: CanopyRecord[] = [];
+        const reusedRecordIds: string[] = [];
+        const overwrittenRecordIds: string[] = [];
         let duplicateCount = 0;
         let newCount = 0;
+        let overwrittenCount = 0;
+        const newHistoryEntries: HistoryRecord[] = [];
+        const updatedRecords: CanopyRecord[] = [...state.records];
 
         for (const record of newRecords) {
-          const existing = state.records.find(
+          const existingIdx = updatedRecords.findIndex(
             (r) =>
               r.communityName === record.communityName &&
               r.stationName === record.stationName &&
               r.originalRowNumber === record.originalRowNumber
           );
 
-          if (existing) {
+          if (existingIdx >= 0) {
             duplicateCount++;
+            const existing = updatedRecords[existingIdx];
+            reusedRecordIds.push(existing.id);
+
+            if (importOptions.mode === 'overwrite_keep_history' || importOptions.mode === 'overwrite_all') {
+              const now = new Date().toISOString();
+              const updated = { ...existing, updatedAt: now };
+
+              const fieldsToCompare: (keyof CanopyRecord)[] = ['photoDescription', 'photoUrl'];
+              if (importOptions.mode === 'overwrite_all') {
+                fieldsToCompare.push('busSwipeTime');
+              }
+
+              for (const field of fieldsToCompare) {
+                const oldVal = String((existing as any)[field] ?? '');
+                const newVal = String((record as any)[field] ?? '');
+                if (oldVal !== newVal && newVal !== '') {
+                  newHistoryEntries.push(
+                    addHistoryEntry(
+                      state,
+                      existing.id,
+                      field as string,
+                      oldVal,
+                      newVal,
+                      `重复导入覆盖${importOptions.mode === 'overwrite_all' ? '(全部模式)' : '(保留备注/状态模式)'}`
+                    )
+                  );
+                  (updated as any)[field] = newVal;
+                }
+              }
+
+              updatedRecords[existingIdx] = updated;
+              overwrittenRecordIds.push(existing.id);
+              overwrittenCount++;
+            }
             continue;
           }
 
           const { isSuspected, matchedIds } = detectDuplicateNames(
             { ...record, id: generateId() },
-            [...state.records, ...finalRecords]
+            [...updatedRecords, ...newAddedRecords]
           );
 
           const now = new Date().toISOString();
@@ -135,21 +219,50 @@ export const useRecordsStore = create<RecordsState>()(
             createdAt: now,
             updatedAt: now,
           };
-          finalRecords.push(newRecord);
+          newAddedRecords.push(newRecord);
           newCount++;
         }
 
+        const finalRecords = [...updatedRecords, ...newAddedRecords];
+
+        for (const newRec of newAddedRecords) {
+          if (newRec.isSuspectedDuplicateName && newRec.suspectedMatchedRecordIds) {
+            for (const matchId of newRec.suspectedMatchedRecordIds) {
+              const idx = finalRecords.findIndex((r) => r.id === matchId);
+              if (idx >= 0) {
+                const matched = finalRecords[idx];
+                const newMatchIds = new Set([
+                  ...(matched.suspectedMatchedRecordIds || []),
+                  newRec.id,
+                ]);
+                finalRecords[idx] = {
+                  ...matched,
+                  suspectedMatchedRecordIds: Array.from(newMatchIds),
+                  isSuspectedDuplicateName: true,
+                  status: matched.status === RecordStatus.PENDING ? RecordStatus.REVIEWING : matched.status,
+                  updatedAt: new Date().toISOString(),
+                };
+              }
+            }
+          }
+        }
+
         set({
-          records: [...state.records, ...finalRecords],
+          records: finalRecords,
+          history: [...state.history, ...newHistoryEntries],
         });
 
         return {
           totalCount: newRecords.length,
           newCount,
           duplicateCount,
-          skippedCount: newRecords.length - newCount - duplicateCount,
+          reusedCount: reusedRecordIds.length,
+          overwrittenCount,
+          reusedRecordIds,
+          overwrittenRecordIds,
+          skippedCount: newRecords.length - newCount - overwrittenCount,
           batchId,
-          records: finalRecords,
+          records: newAddedRecords,
         };
       },
 
@@ -204,7 +317,7 @@ export const useRecordsStore = create<RecordsState>()(
         });
       },
 
-      rollbackToHistory: (historyId) => {
+      rollbackToHistory: (historyId, reason) => {
         const state = get();
         const historyEntry = state.history.find((h) => h.id === historyId);
         if (!historyEntry) return;
@@ -212,13 +325,22 @@ export const useRecordsStore = create<RecordsState>()(
         const record = state.records.find((r) => r.id === historyEntry.recordId);
         if (!record) return;
 
+        const currentValue = String((record as any)[historyEntry.fieldName] ?? '');
+        const targetValue = historyEntry.oldValue;
+
+        const rollbackMeta: Partial<HistoryRecord> = {
+          id: generateId(),
+          timestamp: new Date().toISOString(),
+        };
+
         const rollbackHistory = addHistoryEntry(
           state,
           historyEntry.recordId,
           historyEntry.fieldName,
-          String((record as any)[historyEntry.fieldName] ?? ''),
-          historyEntry.oldValue,
-          `回滚到之前版本`
+          currentValue,
+          targetValue,
+          reason || `回滚至 [${new Date(historyEntry.timestamp).toLocaleString('zh-CN')}] 的版本：从 "${historyEntry.newValue}" 还原为 "${historyEntry.oldValue}"`,
+          rollbackMeta
         );
 
         set({
@@ -226,7 +348,7 @@ export const useRecordsStore = create<RecordsState>()(
             r.id === historyEntry.recordId
               ? {
                   ...r,
-                  [historyEntry.fieldName]: historyEntry.oldValue,
+                  [historyEntry.fieldName]: targetValue,
                   updatedAt: new Date().toISOString(),
                 }
               : r
@@ -239,6 +361,45 @@ export const useRecordsStore = create<RecordsState>()(
         return get()
           .history.filter((h) => h.recordId === recordId)
           .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+      },
+
+      getFieldHistory: (recordId, fieldName) => {
+        return get()
+          .history.filter((h) => h.recordId === recordId && h.fieldName === fieldName)
+          .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+      },
+
+      getHistoryById: (historyId) => {
+        return get().history.find((h) => h.id === historyId);
+      },
+
+      getRollbackChain: (historyId) => {
+        const history = get().history;
+        const chain: HistoryRecord[] = [];
+        let current = history.find((h) => h.id === historyId);
+        if (!current) return chain;
+        chain.push(current);
+
+        for (let limit = 0; limit < 50; limit++) {
+          const target = current.oldValue;
+          const field = current.fieldName;
+          const prev = history
+            .filter(
+              (h) =>
+                h.recordId === current!.recordId &&
+                h.fieldName === field &&
+                h.newValue === target &&
+                new Date(h.timestamp).getTime() < new Date(current!.timestamp).getTime()
+            )
+            .sort(
+              (a, b) =>
+                new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+            )[0];
+          if (!prev) break;
+          chain.unshift(prev);
+          current = prev;
+        }
+        return chain;
       },
 
       clearAllData: () => set({ records: [], history: [], selectedRecordId: null }),
