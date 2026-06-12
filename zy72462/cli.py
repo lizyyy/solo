@@ -7,8 +7,8 @@ from bike_dispatch import (
     create_case, import_grid_inspection, supplement_ramp,
     import_construction_notice, review_ramp, generate_report,
     get_ramp_by_id, set_display_mode,
-    GridInspection, ConstructionNotice, ReviewStatus,
-    RectificationSuggestion, Evidence, EvidenceSource, ResponsibleRole
+    GridInspection, ConstructionNotice, ReviewStatus, Ramp,
+    RectificationSuggestion, Evidence, EvidenceSource, ResponsibleRole, DispatchCase
 )
 
 
@@ -44,6 +44,7 @@ def main():
     review_parser.add_argument("case_id", help="案件ID")
     review_parser.add_argument("ramp_id", help="坡道ID")
     review_parser.add_argument("--status", required=True, choices=["confirmed", "needs_supplement", "escalated", "pending"], help="复核状态")
+    review_parser.add_argument("--note", default="", help="复核备注（可补充勘查记录、数量统计等说明，会自动识别为已提供材料）")
 
     report_parser = subparsers.add_parser("report", help="生成报告")
     report_parser.add_argument("case_id", help="案件ID")
@@ -171,7 +172,7 @@ def main():
             "pending": ReviewStatus.PENDING
         }
         
-        ramp = review_ramp(case, args.ramp_id, status_map[args.status])
+        ramp = review_ramp(case, args.ramp_id, status_map[args.status], note=args.note)
         if not ramp:
             print(f"❌ 坡道不存在: {args.ramp_id}")
             sys.exit(1)
@@ -180,6 +181,8 @@ def main():
         print(f"✅ 复核完成")
         print(f"坡道位置: {ramp.location}")
         print(f"新状态: {ramp.review_status.value}")
+        if ramp.provided_materials:
+            print(f"累计已提供材料: {', '.join(ramp.provided_materials)}")
 
     elif args.command == "report":
         case = store.load(args.case_id)
@@ -225,11 +228,27 @@ def main():
         for notice in case.construction_notices:
             print(f"  - {notice.title} @ {notice.location} (书记审阅: {'是' if notice.reviewed_by_secretary else '否'})")
         print(f"")
-        print(f"坡道: {len(case.ramps)} 处")
+        print(f"坡道: {len(case.ramps)} 处（含先服务复核、材料对账）")
         for ramp in case.ramps:
             status_icon = "⚠️" if ramp.review_status == ReviewStatus.ESCALATED else "✓" if ramp.review_status == ReviewStatus.CONFIRMED else "🔍"
             changed = "有变" if ramp.score_changed else "不变"
-            print(f"  {status_icon} [{ramp.id}] {ramp.location} - {ramp.review_status.value} - 评分{changed}")
+            esc_tag = "[先服务复核→交通协管]" if ramp.review_status == ReviewStatus.ESCALATED else "[先服务复核→网格员补证]" if ramp.review_status == ReviewStatus.PENDING else ""
+            print(f"  {status_icon} [{ramp.id}] {ramp.location} - {ramp.review_status.value} - 评分{changed} {esc_tag}")
+            if ramp.provided_materials:
+                print(f"      ✅ 已提供: {', '.join(ramp.provided_materials)}")
+            for s in case.suggestions:
+                if s.ramp_id == ramp.id:
+                    if s.missing_materials:
+                        print(f"      ❌ 还缺:  {', '.join(s.missing_materials)}")
+                    if s.provided_materials and not ramp.provided_materials:
+                        print(f"      ✅ 已提供: {', '.join(s.provided_materials)}")
+                    print(f"      👤 责任人: {s.responsible_role.value} | 下一步: {s.next_step[:50]}...")
+                    if s.evidence_trace:
+                        print(f"      🔗 原始追溯（共{len(s.evidence_trace)}条）:")
+                        for t in s.evidence_trace[:2]:
+                            print(f"         - {t}")
+                        if len(s.evidence_trace) > 2:
+                            print(f"         - （还有 {len(s.evidence_trace)-2} 条，report 命令查看完整）")
 
     else:
         parser.print_help()
@@ -304,6 +323,7 @@ class CaseStore:
                     "score_after": r.score_after,
                     "score_changed": r.score_changed,
                     "supplementary_note": r.supplementary_note,
+                    "provided_materials": getattr(r, "provided_materials", []),
                     "review_status": r.review_status.value
                 } for r in case.ramps
             ],
@@ -314,6 +334,8 @@ class CaseStore:
                     "issue_description": s.issue_description,
                     "why_kept": s.why_kept,
                     "missing_materials": s.missing_materials,
+                    "provided_materials": getattr(s, "provided_materials", []),
+                    "evidence_trace": getattr(s, "evidence_trace", []),
                     "next_step": s.next_step,
                     "responsible_role": s.responsible_role.value,
                     "priority": s.priority,
@@ -375,8 +397,9 @@ class CaseStore:
                 score_before=r["score_before"],
                 score_after=r["score_after"],
                 score_changed=r["score_changed"],
-                supplementary_note=r["supplementary_note"],
-                review_status=ReviewStatus(r["review_status"])
+                supplementary_note=r.get("supplementary_note", ""),
+                provided_materials=r.get("provided_materials", []),
+                review_status=ReviewStatus(r.get("review_status", "待复核"))
             ))
         
         for s in data.get("suggestions", []):
@@ -386,9 +409,11 @@ class CaseStore:
                 issue_description=s["issue_description"],
                 why_kept=s["why_kept"],
                 missing_materials=s["missing_materials"],
+                provided_materials=s.get("provided_materials", []),
+                evidence_trace=s.get("evidence_trace", []),
                 next_step=s["next_step"],
                 responsible_role=ResponsibleRole(s["responsible_role"]),
-                priority=s["priority"],
+                priority=s.get("priority", 2),
                 updated_at=datetime.fromisoformat(s["updated_at"])
             ))
         

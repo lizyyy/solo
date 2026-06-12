@@ -65,6 +65,7 @@ def _save_case(case: DispatchCase):
                 "score_after": r.score_after,
                 "score_changed": r.score_changed,
                 "supplementary_note": r.supplementary_note,
+                "provided_materials": getattr(r, "provided_materials", []),
                 "review_status": r.review_status.value
             } for r in case.ramps
         ],
@@ -75,6 +76,8 @@ def _save_case(case: DispatchCase):
                 "issue_description": s.issue_description,
                 "why_kept": s.why_kept,
                 "missing_materials": s.missing_materials,
+                "provided_materials": getattr(s, "provided_materials", []),
+                "evidence_trace": getattr(s, "evidence_trace", []),
                 "next_step": s.next_step,
                 "responsible_role": s.responsible_role.value,
                 "priority": s.priority,
@@ -144,8 +147,9 @@ def _load_case(case_id: str) -> DispatchCase:
             score_before=r["score_before"],
             score_after=r["score_after"],
             score_changed=r["score_changed"],
-            supplementary_note=r["supplementary_note"],
-            review_status=ReviewStatus(r["review_status"])
+            supplementary_note=r.get("supplementary_note", ""),
+            provided_materials=r.get("provided_materials", []),
+            review_status=ReviewStatus(r.get("review_status", "待复核"))
         ))
     
     for s in data.get("suggestions", []):
@@ -155,9 +159,11 @@ def _load_case(case_id: str) -> DispatchCase:
             issue_description=s["issue_description"],
             why_kept=s["why_kept"],
             missing_materials=s["missing_materials"],
+            provided_materials=s.get("provided_materials", []),
+            evidence_trace=s.get("evidence_trace", []),
             next_step=s["next_step"],
             responsible_role=ResponsibleRole(s["responsible_role"]),
-            priority=s["priority"],
+            priority=s.get("priority", 2),
             updated_at=datetime.fromisoformat(s["updated_at"])
         ))
     
@@ -259,11 +265,16 @@ async def add_construction_notice(case_id: str, notice: dict):
 async def review_ramp_endpoint(case_id: str, ramp_id: str, data: dict):
     case = _load_case(case_id)
     status = ReviewStatus(data.get("status", "pending"))
-    ramp = review_ramp(case, ramp_id, status)
+    note = data.get("note", "")
+    ramp = review_ramp(case, ramp_id, status, note=note)
     if not ramp:
         raise HTTPException(status_code=404, detail="坡道不存在")
     _save_case(case)
-    return {"ramp_id": ramp.id, "review_status": ramp.review_status.value}
+    return {
+        "ramp_id": ramp.id,
+        "review_status": ramp.review_status.value,
+        "provided_materials": getattr(ramp, "provided_materials", [])
+    }
 
 
 @app.get("/cases/{case_id}/report")
@@ -287,7 +298,8 @@ async def get_report(case_id: str, format: str = "json"):
                     "score_after": r.score_after,
                     "score_changed": r.score_changed,
                     "review_status": r.review_status.value,
-                    "issues": r.issues
+                    "issues": r.issues,
+                    "provided_materials": getattr(r, "provided_materials", [])
                 } for r in case.ramps
             ],
             "suggestions": [
@@ -297,6 +309,8 @@ async def get_report(case_id: str, format: str = "json"):
                     "issue_description": s.issue_description,
                     "why_kept": s.why_kept,
                     "missing_materials": s.missing_materials,
+                    "provided_materials": getattr(s, "provided_materials", []),
+                    "evidence_trace": getattr(s, "evidence_trace", []),
                     "next_step": s.next_step,
                     "responsible_role": s.responsible_role.value
                 } for s in case.suggestions
@@ -314,6 +328,7 @@ async def get_report(case_id: str, format: str = "json"):
 @app.get("/cases/{case_id}/ramps")
 async def list_ramps(case_id: str):
     case = _load_case(case_id)
+    suggestions_map = {s.ramp_id: s for s in case.suggestions}
     return {
         "ramps": [
             {
@@ -324,7 +339,10 @@ async def list_ramps(case_id: str):
                 "score_changed": r.score_changed,
                 "review_status": r.review_status.value,
                 "issues": r.issues,
-                "supplementary_note": r.supplementary_note
+                "supplementary_note": r.supplementary_note,
+                "provided_materials": getattr(r, "provided_materials", []),
+                "missing_materials": suggestions_map[r.id].missing_materials if r.id in suggestions_map else [],
+                "need_priority_review": r.review_status == ReviewStatus.ESCALATED
             } for r in case.ramps
         ]
     }

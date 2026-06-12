@@ -20,29 +20,45 @@ def _generate_text_report(case: DispatchCase) -> str:
     lines.append("=" * 60)
     lines.append("")
     
-    lines.append("一、证据汇总（网格员巡查 + 施工告示）")
+    lines.append("一、证据汇总（网格员巡查 + 施工告示 + 坡道补录）")
     lines.append("-" * 40)
+    lines.append("【追溯说明】以下每条证据均可在整改建议中通过「证据#N」编号追回原始来源")
+    lines.append("")
     for i, evidence in enumerate(case.evidences, 1):
-        lines.append(f"  {i}. [{evidence.source.value}]")
+        lines.append(f"  证据#{i}. [{evidence.source.value}]")
         lines.append(f"     记录人：{evidence.recorded_by}")
         lines.append(f"     时间：{evidence.recorded_at.strftime('%Y-%m-%d %H:%M')}")
         lines.append(f"     内容：{evidence.description}")
         lines.append("")
     
-    lines.append("二、坡道情况一览")
+    lines.append("二、坡道情况一览（先服务复核优先展示）")
     lines.append("-" * 40)
-    for ramp in case.ramps:
+    escalated_ramps = [r for r in case.ramps if r.review_status == ReviewStatus.ESCALATED]
+    other_ramps = [r for r in case.ramps if r.review_status != ReviewStatus.ESCALATED]
+    ordered_ramps = escalated_ramps + other_ramps
+    
+    for ramp in ordered_ramps:
         status_icon = "⚠️" if ramp.review_status == ReviewStatus.ESCALATED else "✓" if ramp.review_status == ReviewStatus.CONFIRMED else "🔍"
-        lines.append(f"  {status_icon} 坡道：{ramp.location}")
-        lines.append(f"     评分变化：{ramp.score_before:.1f} → {ramp.score_after:.1f} {'✅' if ramp.score_changed else '❌ 无变化'}")
+        esc_tag = "【先服务复核→交通协管优先】" if ramp.review_status == ReviewStatus.ESCALATED else "【先服务复核→网格员/书记跟进】" if ramp.review_status == ReviewStatus.PENDING else "【已确认】"
+        lines.append(f"  {status_icon} 坡道：{ramp.location} {esc_tag}")
+        lines.append(f"     评分变化：{ramp.score_before:.1f} → {ramp.score_after:.1f} {'✅' if ramp.score_changed else '❌ 无变化（触发优先复核）'}")
         lines.append(f"     复核状态：{ramp.review_status.value}")
         if ramp.issues:
             lines.append(f"     存在问题：{', '.join(ramp.issues)}")
         if ramp.supplementary_note:
             lines.append(f"     补录备注：{ramp.supplementary_note}")
+        if ramp.provided_materials:
+            lines.append(f"     ✅ 已提供材料：{', '.join(ramp.provided_materials)}")
+        
+        suggestion = next((s for s in case.suggestions if s.ramp_id == ramp.id), None)
+        if suggestion:
+            if suggestion.missing_materials:
+                lines.append(f"     ❌ 还缺材料：{', '.join(suggestion.missing_materials)}")
+            if hasattr(suggestion, "provided_materials") and suggestion.provided_materials and not ramp.provided_materials:
+                lines.append(f"     ✅ 已提供材料（对账）：{', '.join(suggestion.provided_materials)}")
         lines.append("")
     
-    lines.append("三、整改建议")
+    lines.append("三、整改建议（含材料对账 + 原始证据追溯）")
     lines.append("-" * 40)
     for i, suggestion in enumerate(case.suggestions, 1):
         role_color = {
@@ -51,16 +67,47 @@ def _generate_text_report(case: DispatchCase) -> str:
             ResponsibleRole.GRID_INSPECTOR: "🧑‍🔧"
         }.get(suggestion.responsible_role, "📋")
         
-        lines.append(f"  建议 #{i}")
+        esc_header = ""
+        if "先服务复核" in suggestion.why_kept:
+            esc_header = "【先服务复核 · 高优先级】"
+        elif suggestion.priority == 1:
+            esc_header = "【高优先级】"
+        else:
+            esc_header = "【常规跟进】"
+        
+        lines.append(f"  ╔═══════════════════════════════════════╗")
+        lines.append(f"  ║ 建议 #{i} {esc_header}")
+        lines.append(f"  ╚═══════════════════════════════════════╝")
         lines.append(f"  问题：{suggestion.issue_description}")
         lines.append("")
         lines.append(f"  💡 为什么这条被留下：")
         lines.append(f"     {suggestion.why_kept}")
         lines.append("")
-        lines.append(f"  📦 还缺什么材料：")
-        for mat in suggestion.missing_materials:
-            lines.append(f"     • {mat}")
+        
+        lines.append(f"  📦 材料对账：")
+        provided = getattr(suggestion, "provided_materials", [])
+        missing = suggestion.missing_materials
+        if provided:
+            lines.append(f"     ✅ 已提供（{len(provided)}项）：")
+            for p in provided:
+                lines.append(f"       · {p}")
+        else:
+            lines.append(f"     ⚪ 尚未提供任何材料")
+        if missing:
+            lines.append(f"     ❌ 还缺什么（{len(missing)}项）：")
+            for m in missing:
+                lines.append(f"       · {m}")
+        else:
+            lines.append(f"     ✅ 材料已齐全，等待下一步操作")
         lines.append("")
+        
+        evidence_trace = getattr(suggestion, "evidence_trace", [])
+        if evidence_trace:
+            lines.append(f"  🔗 原始证据追溯（触发本建议的依据，点击对应证据编号可追回）：")
+            for t in evidence_trace:
+                lines.append(f"     {t}")
+            lines.append("")
+        
         lines.append(f"  {role_color} 下一步该找谁：{suggestion.responsible_role.value}")
         lines.append(f"     具体行动：{suggestion.next_step}")
         lines.append(f"     更新时间：{suggestion.updated_at.strftime('%Y-%m-%d %H:%M')}")
@@ -68,15 +115,29 @@ def _generate_text_report(case: DispatchCase) -> str:
         lines.append("  · · · · · · · · · · · · · · · · · · · ·")
         lines.append("")
     
-    lines.append("四、温馨提示")
+    lines.append("四、统计与对账小结（不只报总数）")
     lines.append("-" * 40)
     lines.append("  这份报告不是冷冰冰的系统日志。")
     lines.append("  每一条记录背后都是街坊邻居的日常出行，")
     lines.append("  每一次整改都是为了更安全、更便利的社区环境。")
     lines.append("")
-    lines.append(f"  本报告共涉及 {len(case.ramps)} 处坡道，")
-    lines.append(f"  其中 {len([r for r in case.ramps if r.review_status == ReviewStatus.ESCALATED])} 处需交通协管紧急复核，")
-    lines.append(f"  {len(case.suggestions)} 条整改建议等待落实。")
+    lines.append(f"  本报告共涉及 {len(case.ramps)} 处坡道：")
+    lines.append(f"    · ⚠️  需交通协管紧急复核（先服务）：{len(escalated_ramps)} 处")
+    lines.append(f"    · 🔍 待网格员/社区书记跟进：{len([r for r in case.ramps if r.review_status == ReviewStatus.PENDING])} 处")
+    lines.append(f"    · ✓ 已确认正常：{len([r for r in case.ramps if r.review_status == ReviewStatus.CONFIRMED])} 处")
+    lines.append("")
+    lines.append(f"  共 {len(case.suggestions)} 条整改建议：")
+    total_provided = sum(len(getattr(s, "provided_materials", [])) for s in case.suggestions)
+    total_missing = sum(len(s.missing_materials) for s in case.suggestions)
+    lines.append(f"    · ✅ 累计已提供材料项数：{total_provided}")
+    lines.append(f"    · ❌ 累计还缺材料项数：{total_missing}")
+    
+    traffic_count = len([s for s in case.suggestions if s.responsible_role == ResponsibleRole.TRAFFIC_ASSISTANT])
+    sec_count = len([s for s in case.suggestions if s.responsible_role == ResponsibleRole.COMMUNITY_SECRETARY])
+    grid_count = len([s for s in case.suggestions if s.responsible_role == ResponsibleRole.GRID_INSPECTOR])
+    lines.append(f"    · 👮 交通协管负责：{traffic_count} 条")
+    lines.append(f"    · 👩‍💼 社区书记周姐负责：{sec_count} 条")
+    lines.append(f"    · 🧑‍🔧 网格员负责：{grid_count} 条")
     lines.append("")
     lines.append("  辛苦了，我们一起把社区变得更好！💪")
     lines.append("")

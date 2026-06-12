@@ -44,6 +44,7 @@ class Ramp:
     score_after: float = 0.0
     score_changed: bool = False
     supplementary_note: str = ""
+    provided_materials: List[str] = field(default_factory=list)
     review_status: ReviewStatus = ReviewStatus.PENDING
 
 
@@ -81,6 +82,8 @@ class RectificationSuggestion:
     issue_description: str
     why_kept: str
     missing_materials: List[str]
+    provided_materials: List[str]
+    evidence_trace: List[str]
     next_step: str
     responsible_role: ResponsibleRole
     priority: int = 1
