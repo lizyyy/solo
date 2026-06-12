@@ -5,7 +5,7 @@ from models import (
     ConflictResolution,
     RecordSource,
 )
-from core import get_point_records
+from core import get_point_records, get_audit_for_record, get_audit_for_conflict
 
 
 def format_conflict_evidence(
@@ -31,6 +31,8 @@ def format_conflict_evidence(
 
     def format_bool(v):
         return "是" if v else "否"
+
+    audit_trail = get_audit_for_conflict(session, conflict.conflict_id)
 
     return {
         "conflict_id": conflict.conflict_id,
@@ -62,6 +64,9 @@ def format_conflict_evidence(
             },
         ],
         "resolution": conflict.resolution.value,
+        "resolved_by": conflict.resolved_by,
+        "resolved_time": conflict.resolved_time.isoformat() if conflict.resolved_time else None,
+        "audit_trail": [a.to_dict() for a in audit_trail],
     }
 
 
@@ -69,12 +74,27 @@ def generate_handover_report(session: ReviewSession) -> Dict[str, Any]:
     pending_conflicts = [
         c for c in session.conflicts if c.resolution == ConflictResolution.PENDING
     ]
+    resolved_conflicts = [
+        c for c in session.conflicts if c.resolution != ConflictResolution.PENDING
+    ]
     boundary_points = [
         p for p in session.inspection_points.values() if p.location.is_boundary
     ]
 
     conflict_reports = [
-        format_conflict_evidence(session, c) for c in pending_conflicts
+        format_conflict_evidence(session, c) for c in session.conflicts
+    ]
+
+    audit_traces = [a.to_dict() for a in session.audit_log]
+
+    import_audit = [
+        a.to_dict() for a in session.audit_log
+        if a.action_type.value in ("导入", "补录回看")
+    ]
+
+    resolution_audit = [
+        a.to_dict() for a in session.audit_log
+        if a.action_type.value == "冲突处理"
     ]
 
     return {
@@ -85,13 +105,15 @@ def generate_handover_report(session: ReviewSession) -> Dict[str, Any]:
             "total_points": len(session.inspection_points),
             "total_records": len(session.records),
             "pending_conflicts": len(pending_conflicts),
+            "resolved_conflicts": len(resolved_conflicts),
             "boundary_points": len(boundary_points),
             "export_count": len(session.export_history),
+            "audit_count": len(session.audit_log),
         },
         "action_items": {
             "inspector_actions": [
-                f"请确认/驳回冲突 {c['conflict_id']}（点位：{c['point_info']['name']}）"
-                for c in conflict_reports
+                f"请确认/驳回冲突 {c.conflict_id}（点位：{session.inspection_points.get(c.point_id, c.point_id).name if c.point_id in session.inspection_points else c.point_id}）"
+                for c in pending_conflicts
             ],
             "manager_actions": [
                 f"请复核边界点位 {p.point_id}（{p.name}，位于 {p.location.street} 与 {', '.join(p.location.adjacent_streets)} 交界）"
@@ -107,6 +129,21 @@ def generate_handover_report(session: ReviewSession) -> Dict[str, Any]:
                 "adjacent_streets": p.location.adjacent_streets,
             }
             for p in boundary_points
+        ],
+        "audit_traces": audit_traces,
+        "import_trace": import_audit,
+        "resolution_trace": resolution_audit,
+        "export_history": [
+            {
+                "export_id": e.export_id,
+                "export_time": e.export_time.isoformat(),
+                "file_hash": e.file_hash,
+                "file_path": e.file_path,
+                "point_count": e.point_count,
+                "boundary_points": e.boundary_points,
+                "conflict_points": e.conflict_points,
+            }
+            for e in session.export_history
         ],
     }
 
@@ -124,3 +161,64 @@ def get_step_description(step: int) -> str:
         3: "第三步：地图导出更新",
     }
     return steps.get(step, "未知步骤")
+
+
+def trace_record_to_export(session: ReviewSession, record_id: str) -> Dict[str, Any]:
+    audits = get_audit_for_record(session, record_id)
+    export_ids = list(set(
+        a.related_export_id for a in audits if a.related_export_id
+    ))
+    related_exports = [
+        e.to_dict() for e in session.export_history if e.export_id in export_ids
+    ]
+    related_conflicts = [
+        c.to_dict() for c in session.conflicts
+        if c.ramp_record_id == record_id or c.night_sampling_id == record_id
+    ]
+    return {
+        "record_id": record_id,
+        "audit_entries": [a.to_dict() for a in audits],
+        "related_exports": related_exports,
+        "related_conflicts": related_conflicts,
+    }
+
+
+def trace_conflict_to_source(session: ReviewSession, conflict_id: str) -> Dict[str, Any]:
+    conflict = next((c for c in session.conflicts if c.conflict_id == conflict_id), None)
+    if not conflict:
+        return {"conflict_id": conflict_id, "error": "未找到该冲突"}
+
+    audits = get_audit_for_conflict(session, conflict_id)
+    ramp_record = next(
+        (r for r in session.records if r.record_id == conflict.ramp_record_id), None
+    )
+    night_record = next(
+        (r for r in session.records if r.record_id == conflict.night_sampling_id), None
+    )
+
+    export_ids = list(set(
+        a.related_export_id for a in audits if a.related_export_id
+    ))
+    related_exports = [
+        {
+            "export_id": e.export_id,
+            "export_time": e.export_time.isoformat(),
+            "file_hash": e.file_hash,
+            "file_path": e.file_path,
+        }
+        for e in session.export_history if e.export_id in export_ids
+    ]
+
+    return {
+        "conflict_id": conflict_id,
+        "conflict_field": conflict.field_name,
+        "point_id": conflict.point_id,
+        "resolution": conflict.resolution.value,
+        "resolved_by": conflict.resolved_by,
+        "before_state": audits[0].before_state if audits else None,
+        "after_state": audits[-1].after_state if audits else None,
+        "ramp_record": ramp_record.to_dict() if ramp_record else None,
+        "night_record": night_record.to_dict() if night_record else None,
+        "audit_trail": [a.to_dict() for a in audits],
+        "related_exports": related_exports,
+    }

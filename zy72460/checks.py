@@ -10,7 +10,9 @@ from models import (
     MapExport,
     RecordSource,
     ConflictResolution,
+    AuditActionType,
 )
+from persistence import write_map_export_file, save_session
 
 
 def run_all_checks(session: ReviewSession) -> Tuple[ReviewSession, List[SelfCheckResult]]:
@@ -190,7 +192,9 @@ def check_export_consistency(session: ReviewSession) -> Tuple[ReviewSession, Sel
     return session, result
 
 
-def generate_map_export(session: ReviewSession, exported_by: str) -> Tuple[ReviewSession, MapExport]:
+def generate_map_export(
+    session: ReviewSession, exported_by: str
+) -> Tuple[ReviewSession, MapExport]:
     boundary_points = [
         p.point_id for p in session.inspection_points.values() if p.location.is_boundary
     ]
@@ -201,6 +205,22 @@ def generate_map_export(session: ReviewSession, exported_by: str) -> Tuple[Revie
             if c.resolution == ConflictResolution.PENDING
         )
     )
+
+    records_snapshot = [r.to_dict() for r in session.records]
+    conflicts_snapshot = [c.to_dict() for c in session.conflicts]
+    audit_snapshot = [a.to_dict() for a in session.audit_log]
+
+    points_detail = {
+        pid: {
+            "name": p.name,
+            "lat": p.location.lat,
+            "lng": p.location.lng,
+            "street": p.location.street,
+            "is_boundary": p.location.is_boundary,
+            "adjacent_streets": p.location.adjacent_streets,
+        }
+        for pid, p in session.inspection_points.items()
+    }
 
     content_str = (
         f"point_count:{len(session.inspection_points)}|"
@@ -218,7 +238,40 @@ def generate_map_export(session: ReviewSession, exported_by: str) -> Tuple[Revie
         boundary_points=boundary_points,
         conflict_points=conflict_points,
         file_hash=file_hash,
+        records_snapshot=records_snapshot,
+        conflicts_snapshot=conflicts_snapshot,
+        audit_snapshot=audit_snapshot,
     )
 
+    export_data = export.to_dict()
+    export_data["points_detail"] = points_detail
+
+    file_path = write_map_export_file(session, export_data, export.export_id)
+    export.file_path = file_path
+
     session.export_history.append(export)
+
+    for entry in session.audit_log:
+        if entry.related_export_id is None:
+            entry.related_export_id = export.export_id
+
+    from core import _add_audit
+    _add_audit(
+        session,
+        AuditActionType.MAP_EXPORT,
+        exported_by,
+        f"地图导出 {export.export_id}，含 {len(records_snapshot)} 条记录、{len(conflicts_snapshot)} 个冲突",
+        after_state={
+            "export_id": export.export_id,
+            "file_hash": file_hash,
+            "file_path": file_path,
+            "point_count": export.point_count,
+            "boundary_count": len(boundary_points),
+            "conflict_count": len(conflict_points),
+        },
+        related_export_id=export.export_id,
+    )
+
+    save_session(session)
+
     return session, export
