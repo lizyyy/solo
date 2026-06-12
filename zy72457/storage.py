@@ -45,17 +45,22 @@ class DataStore:
     def update_point(self, point_id: str, **kwargs) -> NightSamplingPoint:
         point = self.points[point_id]
         before = point.model_dump()
+
+        audit_operator = kwargs.pop("operator", None)
+        audit_action = kwargs.pop("action", None)
+        audit_remark = kwargs.pop("remark", None)
+
         for key, value in kwargs.items():
             if hasattr(point, key):
                 setattr(point, key, value)
         point.updated_at = datetime.now()
-        if "operator" in kwargs and "action" in kwargs:
+        if audit_operator and audit_action:
             audit = AuditLog(
-                operator=kwargs["operator"],
-                action=kwargs["action"],
+                operator=audit_operator,
+                action=audit_action,
                 before=before,
                 after=point.model_dump(),
-                remark=kwargs.get("remark"),
+                remark=audit_remark,
             )
             point.audit_logs.append(audit)
         if point.complaint_id:

@@ -1,6 +1,6 @@
 import uuid
 import pandas as pd
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from datetime import datetime
 
 from models import (
@@ -23,22 +23,25 @@ class WorkflowService:
         batch_id = f"batch_{datetime.now().strftime('%Y%m%d%H%M%S')}_{uuid.uuid4().hex[:6]}"
 
         df = pd.read_excel(file_path)
+        df = df.fillna("")
         points = []
 
         for idx, row in df.iterrows():
             point_id = f"pt_{uuid.uuid4().hex[:12]}"
+            raw_note = str(row.get("施工备注", "")).strip()
+            construction_note = raw_note if raw_note else None
             point = NightSamplingPoint(
                 id=point_id,
                 original_row_number=idx + 2,
-                name=str(row.get("点位名称", "")),
-                address=str(row.get("地址", "")),
-                longitude=float(row.get("经度", 0)),
-                latitude=float(row.get("纬度", 0)),
-                service_radius=float(row.get("服务半径", 500)),
+                name=str(row.get("点位名称", "")).strip(),
+                address=str(row.get("地址", "")).strip(),
+                longitude=float(row.get("经度", 0) or 0),
+                latitude=float(row.get("纬度", 0) or 0),
+                service_radius=float(row.get("服务半径", 500) or 500),
                 complaint_id=None,
                 status=PointStatus.PENDING_REVIEW,
                 import_batch_id=batch_id,
-                construction_note=str(row.get("施工备注", "")) or None,
+                construction_note=construction_note,
             )
 
             original_radius = point.service_radius
@@ -166,3 +169,67 @@ class WorkflowService:
     @staticmethod
     def get_points_for_resident_review() -> List[NightSamplingPoint]:
         return store.get_points_by_status(PointStatus.RESIDENT_REVIEW)
+
+    @staticmethod
+    def update_construction_note(
+        point_id: str,
+        new_note: str,
+        operator: str,
+        change_reason: str,
+    ) -> NightSamplingPoint:
+        point = store.get_point(point_id)
+        if not point:
+            raise ValueError(f"点位{point_id}不存在")
+
+        old_note = point.construction_note or ""
+
+        point = store.update_point(
+            point_id,
+            construction_note=new_note or None,
+            is_manual_modified=True,
+            operator=operator,
+            action="修改施工备注",
+            remark=f"改前: {old_note} | 改后: {new_note} | 原因: {change_reason}",
+        )
+
+        had_construction_issue = AbnormalType.CONSTRUCTION_NOT_SYNCED in point.abnormal_types
+        now_has_issue = SelfChecker.check_construction_not_synced(point)
+
+        if had_construction_issue and not now_has_issue:
+            point.abnormal_types = [
+                t for t in point.abnormal_types if t != AbnormalType.CONSTRUCTION_NOT_SYNCED
+            ]
+            if point.status == PointStatus.RESIDENT_REVIEW:
+                point.status = PointStatus.PENDING_REVIEW
+
+        if not had_construction_issue and now_has_issue:
+            point.status = PointStatus.RESIDENT_REVIEW
+
+        SelfChecker.recalculate_radius_after_supplement(
+            point_id, operator, mark_abnormal=False
+        )
+
+        return point
+
+    @staticmethod
+    def get_construction_note_history(point_id: str) -> List[Dict[str, Any]]:
+        point = store.get_point(point_id)
+        if not point:
+            return []
+
+        history = []
+        for log in point.audit_logs:
+            before_note = log.before.get("construction_note") if log.before else None
+            after_note = log.after.get("construction_note") if log.after else None
+            if before_note != after_note or log.action in ["导入点位", "修改施工备注", "点位清单更新"]:
+                history.append({
+                    "timestamp": log.timestamp.isoformat(),
+                    "operator": log.operator,
+                    "action": log.action,
+                    "construction_note_before": before_note or "",
+                    "construction_note_after": after_note or "",
+                    "remark": log.remark or "",
+                    "status_before": log.before.get("status") if log.before else "",
+                    "status_after": log.after.get("status") if log.after else "",
+                })
+        return history
