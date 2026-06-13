@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>记录详情 - {{ view.sample_id }}</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+               background: #f5f7fa; color: #2c3e50; line-height: 1.6; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;
+                  padding: 20px 32px; }
+        .header a { color: rgba(255,255,255,0.85); text-decoration: none; font-size: 14px; }
+        .header h1 { font-size: 22px; margin: 8px 0 4px; }
+        .header p { opacity: 0.85; font-size: 14px; }
+        .container { max-width: 1100px; margin: 24px auto; padding: 0 24px; }
+        .card { background: white; border-radius: 8px; padding: 20px 24px;
+                margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+        .card h3 { font-size: 15px; margin-bottom: 12px; padding-bottom: 10px;
+                   border-bottom: 1px solid #eef2f5; display: flex; align-items: center; gap: 8px; }
+        .blocked-card { background: #fff8e1; border: 1px solid #ffe082; border-radius: 8px;
+                        padding: 18px 22px; margin-bottom: 20px; }
+        .blocked-card h3 { color: #f57f17; border-bottom: none; padding: 0; margin-bottom: 8px; }
+        .blocked-card .step { font-size: 16px; font-weight: bold; color: #e65100; margin-bottom: 6px; }
+        .blocked-card .reason { color: #5d4037; font-size: 14px; }
+        .consistency-banner { background: #e8f5e9; border-left: 4px solid #4caf50;
+                              padding: 12px 16px; border-radius: 4px; margin-bottom: 20px; font-size: 13px; }
+        .consistency-banner strong { color: #2e7d32; }
+        .meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                     gap: 12px; font-size: 14px; }
+        .meta-item label { display: block; color: #95a5a6; font-size: 12px; margin-bottom: 3px; }
+        .meta-item .value { color: #2c3e50; font-weight: 500; }
+        .evidence-block { background: #f8f9fb; border-radius: 6px; padding: 14px 16px; margin-bottom: 10px; }
+        .evidence-block .label { color: #95a5a6; font-size: 12px; margin-bottom: 4px; }
+        .evidence-block .content { color: #2c3e50; white-space: pre-wrap; word-break: break-all; }
+        .review-block { border-left: 3px solid #667eea; padding-left: 14px; margin-bottom: 12px; }
+        .review-block.op { border-left-color: #f57c00; }
+        .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+        .btn { padding: 8px 18px; border: 1px solid #d0d7de; background: white;
+               border-radius: 4px; cursor: pointer; font-size: 14px; }
+        .btn-primary { background: #667eea; color: white; border-color: #667eea; }
+        .btn-success { background: #43a047; color: white; border-color: #43a047; }
+        .btn-danger { background: #e53935; color: white; border-color: #e53935; }
+        .btn-warn { background: #fb8c00; color: white; border-color: #fb8c00; }
+        .btn:hover { opacity: 0.88; }
+        .input-group { display: flex; gap: 10px; margin-top: 10px; align-items: center; flex-wrap: wrap; }
+        .input-group input { padding: 8px 12px; border: 1px solid #d0d7de;
+                             border-radius: 4px; flex: 1; min-width: 200px; font-size: 14px; }
+        .timeline { border-left: 2px solid #e0e0e0; padding-left: 18px; margin-left: 6px; }
+        .timeline-item { position: relative; margin-bottom: 14px; }
+        .timeline-item::before { content: ''; position: absolute; left: -25px; top: 4px;
+                                 width: 12px; height: 12px; border-radius: 50%;
+                                 background: #667eea; border: 2px solid white; box-shadow: 0 0 0 2px #667eea; }
+        .timeline-item .t-time { font-size: 12px; color: #95a5a6; }
+        .timeline-item .t-content { font-size: 14px; margin-top: 2px; }
+        .timeline-item .t-meta { font-size: 12px; color: #5a6c7d; margin-top: 3px; }
+        code { background: #f5f7fa; padding: 2px 6px; border-radius: 3px; font-size: 12px; }
+        .explanation-item { padding: 8px 0; border-bottom: 1px dashed #eef2f5; font-size: 14px; }
+        .explanation-item:last-child { border-bottom: none; }
+        .explanation-item .rule-tag { display: inline-block; background: #e3f2fd; color: #1565c0;
+                                      font-size: 11px; padding: 1px 8px; border-radius: 8px; margin-right: 6px; }
+        .decision-item { padding: 8px 12px; background: #f1f8e9; border-left: 3px solid #7cb342;
+                         border-radius: 4px; margin-bottom: 6px; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="/batch/{{ view.batch_id }}">← 返回批次详情</a>
+        <h1>记录详情: <code style="background: rgba(255,255,255,0.2); color: white;">{{ view.sample_id }}</code></h1>
+        <p>批次ID: <code style="background: rgba(255,255,255,0.2); color: white;">{{ view.batch_id }}</code>
+           · 记录ID: <code style="background: rgba(255,255,255,0.2); color: white;">{{ view.record_id }}</code></p>
+    </div>
+
+    <div class="container">
+        <div class="consistency-banner">
+            <strong>✅ 三端一致：</strong>
+            此详情与 CLI <code>show</code>、Excel 导出、<code>/api/v1/records/&lt;id&gt;</code> 接口
+            返回的是同一份 SQLite 数据，经 <code>engine.get_record_for_review()</code> 统一转换。
+        </div>
+
+        {% if view.blocked_step %}
+        <div class="blocked-card">
+            <h3>⏳ 当前进度（运营复核人无需追问即可了解）</h3>
+            <div class="step">卡在：{{ view.blocked_step }}</div>
+            <div class="reason">原因：{{ view.blocked_reason }}</div>
+        </div>
+        {% endif %}
+
+        <div class="card">
+            <h3>📊 基本信息</h3>
+            <div class="meta-grid">
+                <div class="meta-item">
+                    <label>当前状态</label>
+                    <div class="value">{{ view.status_display }}</div>
+                </div>
+                <div class="meta-item">
+                    <label>冲突类型</label>
+                    <div class="value">{{ view.conflict_display }}</div>
+                </div>
+                <div class="meta-item">
+                    <label>模型版本</label>
+                    <div class="value">
+                        {% if view.previous_model_version %}
+                        <code>{{ view.previous_model_version }}</code> → <code style="color:#e53935">{{ view.current_model_version }}</code>
+                        {% else %}
+                        <code>{{ view.current_model_version }}</code>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="meta-item">
+                    <label>最后更新</label>
+                    <div class="value">{{ view.updated_at[:19] }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🔍 处理解释（工单摘要 ↔ 最终结果可互相解释）</h3>
+            {% if explanation %}
+                <div style="margin-bottom: 14px;">
+                    <h4 style="font-size: 14px; color: #5a6c7d; margin-bottom: 8px;">📝 处理依据</h4>
+                    {% for reason in explanation.reasons %}
+                    <div class="explanation-item">
+                        <span class="rule-tag">依据{{ loop.index }}</span>{{ reason }}
+                    </div>
+                    {% endfor %}
+                </div>
+                <div style="margin-bottom: 14px;">
+                    <h4 style="font-size: 14px; color: #5a6c7d; margin-bottom: 8px;">🎯 决策链</h4>
+                    {% for decision in explanation.decisions %}
+                    <div class="decision-item">{{ decision }}</div>
+                    {% endfor %}
+                </div>
+                <div>
+                    <h4 style="font-size: 14px; color: #5a6c7d; margin-bottom: 8px;">📖 应用的边界规则</h4>
+                    {% for rule in explanation.boundary_rules_applied %}
+                    <div class="explanation-item"><span class="rule-tag">规则</span>{{ rule }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <h3>📄 模型输出片段（证据·原始行号可追溯）</h3>
+            <div class="evidence-block">
+                <div class="label">原始行号（导入的 Excel 行）</div>
+                <div class="content">第 {{ view.original_row_number }} 行</div>
+            </div>
+            <div class="evidence-block">
+                <div class="label">模型输出</div>
+                <div class="content">{{ view.model_output }}</div>
+            </div>
+            <div class="evidence-block">
+                <div class="label">标准答案（期望摘要）</div>
+                <div class="content">{{ view.expected_summary }}</div>
+            </div>
+            <div class="evidence-block">
+                <div class="label">事实校验结果</div>
+                <div class="content">{{ view.fact_check_result }}</div>
+            </div>
+        </div>
+
+        {% if view.manual_judgement %}
+        <div class="card">
+            <h3>✏️ 人工改判（证据·改判行号可追溯）</h3>
+            <div class="evidence-block">
+                <div class="label">人工改判表行号</div>
+                <div class="content">第 {{ view.manual_judgement.judge_row_number }} 行</div>
+            </div>
+            <div class="evidence-block">
+                <div class="label">是否正确</div>
+                <div class="content">
+                    {% if view.manual_judgement.is_correct %}
+                    <span style="color: #43a047; font-weight: bold;">✅ 正确</span>
+                    {% else %}
+                    <span style="color: #e53935; font-weight: bold;">❌ 不正确</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% if view.manual_judgement.corrected_summary %}
+            <div class="evidence-block">
+                <div class="label">人工修正摘要</div>
+                <div class="content">{{ view.manual_judgement.corrected_summary }}</div>
+            </div>
+            {% endif %}
+            {% if view.manual_judgement.judge_comment %}
+            <div class="evidence-block">
+                <div class="label">改判说明</div>
+                <div class="content">{{ view.manual_judgement.judge_comment }}</div>
+            </div>
+            {% endif %}
+            <div class="evidence-block">
+                <div class="label">改判人</div>
+                <div class="content">{{ view.manual_judgement.judged_by }}</div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if view.ai_pm_review.reviewed_by %}
+        <div class="card">
+            <h3>👩‍💼 AI产品经理复核（阿宁）</h3>
+            <div class="review-block">
+                <div style="font-size: 13px; color: #95a5a6;">
+                    {{ view.ai_pm_review.reviewed_at[:19] }} · {{ view.ai_pm_review.reviewed_by }}
+                </div>
+                <div style="margin-top: 6px; font-size: 14px;">
+                    <strong>意见：</strong>{{ view.ai_pm_review.comment or '无' }}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if view.operation_review.reviewed_by %}
+        <div class="card">
+            <h3>🧐 运营复核</h3>
+            <div class="review-block op">
+                <div style="font-size: 13px; color: #95a5a6;">
+                    {{ view.operation_review.reviewed_at[:19] }} · {{ view.operation_review.reviewed_by }}
+                </div>
+                <div style="margin-top: 6px; font-size: 14px;">
+                    <strong>意见：</strong>{{ view.operation_review.comment or '无' }}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="card">
+            <h3>⚡ 操作面板</h3>
+            <div class="actions" id="actions-panel">
+                {% if view.status == 'pending_ai_pm_review' %}
+                <div style="width: 100%;">
+                    <p style="font-size: 13px; color: #5a6c7d; margin-bottom: 8px;">AI产品经理阿宁复核：</p>
+                    <div class="input-group">
+                        <input type="text" id="ai-comment" placeholder="复核意见（可选）">
+                        <button class="btn btn-success" onclick="doAction('ai-review', true)">✅ 批准（→运营复核）</button>
+                        <button class="btn btn-warn" onclick="doAction('ai-review', false)">⏭️ 驳回（无需运营）</button>
+                    </div>
+                </div>
+                {% endif %}
+                {% if view.status == 'pending_operation_review' %}
+                <div style="width: 100%;">
+                    <p style="font-size: 13px; color: #5a6c7d; margin-bottom: 8px;">运营复核：</p>
+                    <div class="input-group">
+                        <input type="text" id="op-comment" placeholder="复核意见（可选）">
+                        <button class="btn btn-success" onclick="doAction('operation-review', true)">✅ 通过</button>
+                        <button class="btn btn-danger" onclick="doAction('operation-review', false)">❌ 驳回</button>
+                    </div>
+                </div>
+                {% endif %}
+                {% if view.status in ['ai_pm_reviewed', 'operation_approved', 'operation_rejected'] %}
+                <div style="width: 100%;">
+                    <p style="font-size: 13px; color: #5a6c7d; margin-bottom: 8px;">第三步：产品复盘页已更新？</p>
+                    <div class="input-group">
+                        <input type="text" id="page-comment" placeholder="更新说明，如'已更新到复盘页v3'">
+                        <button class="btn btn-primary" onclick="doAction('mark-page-updated', true)">✅ 标记已更新（完成）</button>
+                    </div>
+                </div>
+                {% endif %}
+                <div style="width: 100%; margin-top: 12px; padding-top: 12px; border-top: 1px dashed #eef2f5;">
+                    <p style="font-size: 13px; color: #5a6c7d; margin-bottom: 8px;">回滚（恢复到对应快照版本，导出明细和报告也会恢复）：</p>
+                    <div class="input-group">
+                        <input type="text" id="rollback-reason" placeholder="回滚原因">
+                        <button class="btn btn-warn" onclick="doAction('rollback', null)">↩️ 标记回滚</button>
+                        {% if view.status_history|length > 1 %}
+                        <select id="rollback-step" style="padding: 8px 10px; border-radius: 4px; border: 1px solid #d0d7de;">
+                            <option value="">回滚到步骤...</option>
+                            {% for h in view.status_history[:-1] %}
+                            <option value="{{ loop.index }}">步骤{{ loop.index }}: {{ h.old_status }} → {{ h.new_status }}</option>
+                            {% endfor %}
+                        </select>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>⏳ 状态流转历史（可复盘·含快照）</h3>
+            <div class="timeline">
+                {% for h in view.status_history %}
+                <div class="timeline-item">
+                    <div class="t-time">步骤{{ loop.index }} · {{ h.timestamp[:19] }} · {{ h.operator }}</div>
+                    <div class="t-content">
+                        <code>{{ h.old_status }}</code> → <code>{{ h.new_status }}</code>
+                    </div>
+                    <div class="t-meta">{{ h.comment }}</div>
+                    {% if h.snapshot %}
+                    <div style="margin-top: 6px; background: #f8f9fb; padding: 6px 10px;
+                                border-radius: 4px; font-size: 12px; color: #7f8c8d;">
+                        📸 快照: status={{ h.snapshot.status }}, conflict={{ h.snapshot.conflict_type }},
+                        model={{ h.snapshot.current_model_version }},
+                        manual_judgement={{ '已关联' if h.snapshot.has_manual_judgement else '未关联' }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+<script>
+const RECORD_ID = "{{ view.record_id }}";
+
+async function doAction(action, approve) {
+    let url = '';
+    let body = {};
+    const operator = prompt("请输入操作人姓名", action === 'ai-review' ? '阿宁' : (action === 'operation-review' ? '运营李四' : 'system')) || 'system';
+
+    if (action === 'ai-review') {
+        url = `/api/v1/records/${RECORD_ID}/ai-review`;
+        body = { approve: approve, comment: document.getElementById('ai-comment').value, operator };
+    } else if (action === 'operation-review') {
+        url = `/api/v1/records/${RECORD_ID}/operation-review`;
+        body = { approve: approve, comment: document.getElementById('op-comment').value, operator };
+    } else if (action === 'mark-page-updated') {
+        url = `/api/v1/records/${RECORD_ID}/mark-page-updated`;
+        body = { comment: document.getElementById('page-comment').value, operator };
+    } else if (action === 'rollback') {
+        url = `/api/v1/records/${RECORD_ID}/rollback`;
+        const stepSel = document.getElementById('rollback-step');
+        const stepVal = stepSel ? stepSel.value : '';
+        body = {
+            reason: document.getElementById('rollback-reason').value,
+            operator,
+            rollback_to_step: stepVal ? parseInt(stepVal) : null
+        };
+    }
+
+    const resp = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+    });
+    const json = await resp.json();
+    alert(json.msg);
+    if (json.code === 0) location.reload();
+}
+</script>
+</body>
+</html>

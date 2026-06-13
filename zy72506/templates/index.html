@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工单摘要事实校验系统</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+               background: #f5f7fa; color: #2c3e50; line-height: 1.6; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;
+                  padding: 24px 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .header h1 { font-size: 24px; margin-bottom: 6px; }
+        .header p { opacity: 0.9; font-size: 14px; }
+        .container { max-width: 1200px; margin: 32px auto; padding: 0 24px; }
+        .consistency-banner { background: #e8f5e9; border-left: 4px solid #4caf50;
+                              padding: 16px 20px; border-radius: 4px; margin-bottom: 24px; }
+        .consistency-banner strong { color: #2e7d32; }
+        .section-title { font-size: 18px; margin-bottom: 16px; padding-left: 12px;
+                         border-left: 4px solid #667eea; }
+        .batch-card { background: white; border-radius: 8px; padding: 20px 24px;
+                      margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+                      transition: transform 0.15s, box-shadow 0.15s; }
+        .batch-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .batch-card a { text-decoration: none; color: inherit; display: block; }
+        .batch-meta { display: flex; flex-wrap: wrap; gap: 24px; margin-top: 12px;
+                      font-size: 14px; color: #5a6c7d; }
+        .batch-meta span strong { color: #2c3e50; }
+        .badge { display: inline-block; padding: 2px 10px; border-radius: 12px;
+                 font-size: 12px; margin-left: 8px; }
+        .badge-info { background: #e3f2fd; color: #1565c0; }
+        .footer { text-align: center; padding: 24px; color: #95a5a6; font-size: 13px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📋 工单摘要事实校验系统</h1>
+        <p>模型版本换了但样本编号没变？自动检测、留痕、三步流转、三端一致</p>
+    </div>
+
+    <div class="container">
+        <div class="consistency-banner">
+            <strong>✅ 三端数据一致性保证：</strong>
+            本页面 / CLI 命令 / Excel 导出 / REST API 全部从同一个 SQLite 数据库读取，
+            经 <code>engine.get_record_for_review()</code> 统一转换，确保导出明细、页面展示、接口返回完全一致。
+        </div>
+
+        <h2 class="section-title">批次列表</h2>
+        {% if batches %}
+            {% for batch in batches %}
+            <div class="batch-card">
+                <a href="/batch/{{ batch.batch_id }}">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div>
+                            <h3 style="font-size: 16px; color: #2c3e50;">
+                                {{ batch.name }}
+                                <span class="badge badge-info">v{{ batch.model_version }}</span>
+                            </h3>
+                            <div style="font-size: 13px; color: #95a5a6; margin-top: 4px;">
+                                ID: <code>{{ batch.batch_id }}</code>
+                            </div>
+                        </div>
+                        <div style="text-align: right; font-size: 13px; color: #5a6c7d;">
+                            共 {{ batch.total_samples }} 条样本<br>
+                            创建人: {{ batch.created_by }}
+                        </div>
+                    </div>
+                    <div class="batch-meta">
+                        {% if batch.description %}
+                        <span><strong>描述:</strong> {{ batch.description }}</span>
+                        {% endif %}
+                        <span><strong>创建时间:</strong> {{ batch.created_at }}</span>
+                        <span style="color: #667eea;">→ 点击查看详情</span>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div style="background: white; padding: 40px; border-radius: 8px; text-align: center; color: #95a5a6;">
+                暂无批次数据，请先通过 CLI 导入模型输出：<br>
+                <code style="background: #f5f7fa; padding: 4px 10px; border-radius: 4px;">
+                    python cli.py create-example && python cli.py import-model examples/model_output_v1.xlsx -n 测试v1 -v v1 -o 阿宁
+                </code>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="footer">
+        工单摘要事实校验 · 数据唯一来源: SQLite (data/verification.db) · engine.get_record_for_review() 统一转换
+    </div>
+</body>
+</html>

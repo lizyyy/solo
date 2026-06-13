@@ -64,8 +64,8 @@ AI_PM_REVIEWED                    OPERATION_APPROVED / OPERATION_REJECTED
 |------|--------|----------|
 | CLI 列表/详情 | SQLite 数据库 → `storage.py` → `engine.get_record_for_review()` | [storage.py](file:///Users/lzy/pro/solo/workspaces/zy72506/src/storage.py) |
 | Excel 导出 | 同一个 SQLite 数据库 → `result_reader.get_batch_results()` | [result_reader.py](file:///Users/lzy/pro/solo/workspaces/zy72506/src/result_reader.py#L10-L25) |
-| 页面展示（未来接入） | 同样调用 `engine.get_record_for_review()` | [engine.py](file:///Users/lzy/pro/solo/workspaces/zy72506/src/engine.py#L237-L291) |
-| API 接口（未来接入） | 同样调用 `engine.get_record_for_review()` | 同上 |
+| Web 页面展示 | Flask templates → 同样调用 `engine.get_record_for_review()` | [server.py](file:///Users/lzy/pro/solo/workspaces/zy72506/server.py) |
+| REST API 接口 | `/api/v1/*` → 同样调用 `engine.get_record_for_review()` | [server.py](file:///Users/lzy/pro/solo/workspaces/zy72506/server.py) |
 
 **保证**：版本冲突的记录，不会在一个地方显示异常、另一个地方消失。
 

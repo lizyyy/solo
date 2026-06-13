@@ -179,13 +179,16 @@ def mark_page_updated(record_id, comment, operator):
 @click.argument("record_id")
 @click.option("--reason", "-r", default="", help="回滚原因")
 @click.option("--operator", "-o", default="system", help="操作人")
-def rollback(record_id, reason, operator):
-    """回滚一条记录"""
+@click.option("--to-step", type=int, default=None, help="回滚到指定步骤编号（从1开始）")
+def rollback(record_id, reason, operator, to_step):
+    """回滚一条记录（恢复导出明细和报告到对应快照版本）"""
     try:
-        record = engine.rollback_record(record_id, operator, reason)
-        console.print(f"[green]已回滚[/green]")
+        record = engine.rollback_record(record_id, operator, reason, to_step)
+        console.print(f"[green]已回滚[/green]（导出明细和关联报告已恢复到对应版本快照）")
         console.print(f"  样本编号: {record.sample_id}")
         console.print(f"  新状态: {record.status}")
+        if to_step:
+            console.print(f"  回滚到步骤: {to_step}")
     except Exception as e:
         console.print(f"[red]操作失败:[/red] {e}")
 
@@ -451,6 +454,52 @@ def create_example(output_dir):
     console.print(f"  7. 标记复盘页更新: python cli.py mark-page-updated <record_id>")
     console.print(f"  8. 导出明细: python cli.py export -b <batch_id_v2> -o ./output/export.xlsx")
     console.print(f"  9. 查看单条记录: python cli.py show <record_id>")
+    console.print(f"  10. 启动网页服务: python cli.py serve")
+
+
+@cli.command()
+@click.argument("record_id")
+def explain(record_id):
+    """查看处理解释：导出的明细为什么被这样处理"""
+    data = engine.get_processing_explanation(record_id)
+    if not data:
+        console.print("[red]未找到记录[/red]")
+        return
+
+    console.print(Panel(
+        f"[bold]样本编号:[/bold] {data['sample_id']}\n"
+        f"[bold]当前状态:[/bold] {data['current_status_display']}\n"
+        f"[bold]状态流转次数:[/bold] {data['status_history_count']} 次",
+        title="处理概览", border_style="blue"
+    ))
+
+    if data["reasons"]:
+        console.print(Panel(
+            "\n".join(f"{i+1}. {r}" for i, r in enumerate(data["reasons"])),
+            title="📝 处理依据（导出明细被这样处理的原因）", border_style="cyan"
+        ))
+
+    if data["decisions"]:
+        console.print(Panel(
+            "\n".join(f"{i+1}. {d}" for i, d in enumerate(data["decisions"])),
+            title="🎯 决策链（工单摘要 ↔ 最终结果可互相解释）", border_style="green"
+        ))
+
+    console.print(Panel(
+        "\n".join(f"• {r}" for r in data["boundary_rules_applied"]),
+        title="📖 应用的边界规则（写在代码和README里）", border_style="magenta"
+    ))
+
+    console.print(f"\n[dim]{data['export_consistency_note']}[/dim]")
+
+
+@cli.command()
+@click.option("--port", "-p", default=5000, help="端口")
+@click.option("--host", "-h", default="0.0.0.0", help="监听地址")
+def serve(port, host):
+    """启动 Web 服务（页面展示 + REST API，与CLI/导出读同一份数据）"""
+    from server import run_server
+    run_server(host=host, port=port, debug=False)
 
 
 if __name__ == "__main__":

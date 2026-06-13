@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ batch.name }} - 批次详情</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+               background: #f5f7fa; color: #2c3e50; line-height: 1.6; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;
+                  padding: 20px 32px; }
+        .header a { color: rgba(255,255,255,0.85); text-decoration: none; font-size: 14px; }
+        .header h1 { font-size: 22px; margin: 8px 0 4px; }
+        .header p { opacity: 0.85; font-size: 14px; }
+        .container { max-width: 1300px; margin: 24px auto; padding: 0 24px; }
+        .card { background: white; border-radius: 8px; padding: 20px 24px;
+                margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+        .consistency-banner { background: #e8f5e9; border-left: 4px solid #4caf50;
+                              padding: 14px 18px; border-radius: 4px; margin-bottom: 20px; font-size: 14px; }
+        .consistency-banner strong { color: #2e7d32; }
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                        gap: 16px; margin: 16px 0; }
+        .summary-item { background: #f5f7fa; border-radius: 6px; padding: 16px; text-align: center; }
+        .summary-item .num { font-size: 28px; font-weight: bold; color: #667eea; }
+        .summary-item.warn .num { color: #f57c00; }
+        .summary-item.danger .num { color: #e53935; }
+        .summary-item.success .num { color: #43a047; }
+        .summary-item .label { font-size: 13px; color: #5a6c7d; margin-top: 4px; }
+        .section-title { font-size: 16px; margin-bottom: 14px; padding-left: 10px;
+                         border-left: 4px solid #667eea; display: flex; justify-content: space-between;
+                         align-items: center; }
+        .section-title .actions button { padding: 6px 14px; border: 1px solid #d0d7de;
+                      background: white; border-radius: 4px; cursor: pointer; font-size: 13px;
+                      margin-left: 8px; }
+        .section-title .actions button.primary { background: #667eea; color: white; border-color: #667eea; }
+        .section-title .actions button:hover { opacity: 0.85; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #eef2f5; }
+        th { background: #f8f9fb; font-weight: 600; color: #5a6c7d; font-size: 13px; }
+        tr:hover td { background: #f8f9fb; }
+        .tag { display: inline-block; padding: 2px 10px; border-radius: 10px; font-size: 12px; }
+        .tag-conflict { background: #fff3e0; color: #e65100; }
+        .tag-normal { background: #e8f5e9; color: #2e7d32; }
+        .tag-blocked { background: #ffebee; color: #c62828; }
+        .tag-progress { background: #e3f2fd; color: #1565c0; }
+        .tag-done { background: #f3e5f5; color: #6a1b9a; }
+        .step-indicator { display: inline-flex; align-items: center; gap: 4px; font-size: 12px;
+                          padding: 4px 10px; border-radius: 12px; background: #fff8e1; color: #f57f17; }
+        code { background: #f5f7fa; padding: 2px 6px; border-radius: 3px; font-size: 12px; }
+        a.link { color: #667eea; text-decoration: none; }
+        a.link:hover { text-decoration: underline; }
+        .filter-bar { display: flex; gap: 10px; margin-bottom: 14px; align-items: center; flex-wrap: wrap; }
+        .filter-bar select, .filter-bar input { padding: 6px 10px; border: 1px solid #d0d7de;
+                                                 border-radius: 4px; font-size: 13px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="/">← 返回批次列表</a>
+        <h1>{{ batch.name }}</h1>
+        <p>批次ID: <code style="background: rgba(255,255,255,0.2); color: white;">{{ batch.batch_id }}</code>
+           · 模型版本: v{{ batch.model_version }} · 创建人: {{ batch.created_by }}</p>
+    </div>
+
+    <div class="container">
+        <div class="consistency-banner">
+            <strong>✅ 数据一致性保证：</strong>
+            本页面的批次汇总、记录列表与 CLI <code>summary</code>/<code>list</code>、
+            Excel 导出 <code>export</code>、REST API <code>/api/v1/batches/&lt;id&gt;</code>
+            读取同一份 SQLite 数据。
+        </div>
+
+        <div class="card">
+            <h2 class="section-title">按流程步骤分布</h2>
+            <div class="summary-grid">
+                <div class="summary-item warn">
+                    <div class="num">{{ summary.by_step.get('第一步_模型输出导入', 0) }}</div>
+                    <div class="label">第一步：模型输出导入</div>
+                </div>
+                <div class="summary-item warn">
+                    <div class="num">{{ summary.by_step.get('第二步_AI产品经理复核', 0) }}</div>
+                    <div class="label">第二步：AI PM 复核</div>
+                </div>
+                <div class="summary-item danger">
+                    <div class="num">{{ summary.by_step.get('第二步后_运营复核', 0) }}</div>
+                    <div class="label">第二步后：运营复核</div>
+                </div>
+                <div class="summary-item">
+                    <div class="num">{{ summary.by_step.get('第三步_复盘页更新', 0) }}</div>
+                    <div class="label">第三步：复盘页更新</div>
+                </div>
+                <div class="summary-item success">
+                    <div class="num">{{ summary.by_step.get('已完成', 0) }}</div>
+                    <div class="label">已完成</div>
+                </div>
+                <div class="summary-item">
+                    <div class="num">{{ summary.total_samples }}</div>
+                    <div class="label">总计样本</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 class="section-title">
+                校验记录明细
+                <div class="actions">
+                    <select id="filter-status" onchange="applyFilter()">
+                        <option value="">全部状态</option>
+                        <option value="model_version_conflict">模型版本冲突</option>
+                        <option value="pending_ai_pm_review">待AI产品经理复核</option>
+                        <option value="pending_operation_review">待运营复核</option>
+                        <option value="completed">已完成</option>
+                    </select>
+                    <select id="filter-conflict" onchange="applyFilter()">
+                        <option value="">全部冲突</option>
+                        <option value="model_version_changed_same_sample">版本变更样本不变</option>
+                        <option value="no_conflict">无冲突</option>
+                    </select>
+                    <button class="primary" onclick="exportExcel()">📥 导出Excel</button>
+                </div>
+            </h2>
+            <div id="records-table"></div>
+        </div>
+    </div>
+
+<script>
+const BATCH_ID = "{{ batch.batch_id }}";
+
+function statusTag(status) {
+    const map = {
+        'imported': ['已导入', 'tag-normal'],
+        'model_version_conflict': ['模型版本冲突', 'tag-conflict'],
+        'pending_ai_pm_review': ['待AI产品经理复核', 'tag-blocked'],
+        'ai_pm_reviewed': ['AI PM已复核', 'tag-progress'],
+        'pending_operation_review': ['待运营复核', 'tag-blocked'],
+        'operation_approved': ['运营复核通过', 'tag-progress'],
+        'operation_rejected': ['运营复核驳回', 'tag-danger'],
+        'completed': ['已完成', 'tag-done'],
+        'rollbacked': ['已回滚', 'tag-conflict']
+    };
+    const [text, cls] = map[status] || [status, ''];
+    return `<span class="tag ${cls}">${text}</span>`;
+}
+
+function conflictTag(ct) {
+    if (ct === 'model_version_changed_same_sample')
+        return '<span class="tag tag-conflict">版本变更样本不变</span>';
+    return '<span class="tag tag-normal">无冲突</span>';
+}
+
+async function loadRecords() {
+    const s = document.getElementById('filter-status').value;
+    const c = document.getElementById('filter-conflict').value;
+    let url = `/api/v1/batches/${BATCH_ID}/records`;
+    const params = [];
+    if (s) params.push(`status=${s}`);
+    if (c) params.push(`conflict=${c}`);
+    if (params.length) url += '?' + params.join('&');
+
+    const resp = await fetch(url);
+    const json = await resp.json();
+    const records = json.data;
+
+    let html = '<table><thead><tr><th>样本编号</th><th>原始行号</th><th>状态</th>' +
+               '<th>冲突类型</th><th>卡在哪一步</th><th>版本变更</th><th>操作</th></tr></thead><tbody>';
+
+    for (const r of records) {
+        const ver = r.previous_model_version
+            ? `${r.previous_model_version} → ${r.current_model_version}`
+            : r.current_model_version;
+        const blocked = r.blocked_step
+            ? `<span class="step-indicator">⏳ ${r.blocked_step}</span><br><small style="color:#95a5a6">${r.blocked_reason || ''}</small>`
+            : '<span style="color:#43a047">✅ 无阻塞</span>';
+        html += `<tr>
+            <td><code>${r.sample_id}</code></td>
+            <td>第 ${r.original_row_number} 行</td>
+            <td>${statusTag(r.status)}</td>
+            <td>${conflictTag(r.conflict_type)}</td>
+            <td>${blocked}</td>
+            <td><code>${ver}</code></td>
+            <td><a class="link" href="/record/${r.record_id}">查看详情 →</a></td>
+        </tr>`;
+    }
+    html += `</tbody></table><p style="margin-top:10px; color:#95a5a6; font-size:13px;">
+             共 ${records.length} 条 · ${json.consistency_note}</p>`;
+    document.getElementById('records-table').innerHTML = html;
+}
+
+function applyFilter() { loadRecords(); }
+
+function exportExcel() {
+    const s = document.getElementById('filter-status').value;
+    const c = document.getElementById('filter-conflict').value;
+    let url = `/api/v1/batches/${BATCH_ID}/export`;
+    const params = [];
+    if (s) params.push(`status=${s}`);
+    if (c) params.push(`conflict=${c}`);
+    if (params.length) url += '?' + params.join('&');
+    window.location.href = url;
+}
+
+loadRecords();
+</script>
+</body>
+</html>

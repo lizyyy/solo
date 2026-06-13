@@ -68,15 +68,29 @@ class VerificationRecord(BaseModel):
     updated_at: datetime = Field(default_factory=datetime.now)
 
     def add_status_history(self, old_status: VerificationStatus, new_status: VerificationStatus,
-                           operator: str, comment: str = ""):
+                           operator: str, comment: str = "", snapshot: Optional[Dict[str, Any]] = None):
         self.status_history.append({
             "old_status": old_status,
             "new_status": new_status,
             "operator": operator,
             "comment": comment,
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
+            "snapshot": snapshot or self._make_snapshot()
         })
         self.updated_at = datetime.now()
+
+    def _make_snapshot(self) -> Dict[str, Any]:
+        return {
+            "status": self.status,
+            "conflict_type": self.conflict_type,
+            "current_model_version": self.current_model_version,
+            "previous_model_version": self.previous_model_version,
+            "ai_pm_review_comment": self.ai_pm_review_comment,
+            "ai_pm_reviewed_by": self.ai_pm_reviewed_by,
+            "operation_review_comment": self.operation_review_comment,
+            "operation_reviewed_by": self.operation_reviewed_by,
+            "has_manual_judgement": self.manual_judgement is not None
+        }
 
 
 class BatchInfo(BaseModel):
