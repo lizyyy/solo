@@ -1,0 +1,689 @@
+{
+  "batches": [
+    {
+      "id": "gray-normal-20260613",
+      "name": "广告文案审核-正常批次",
+      "modelVersionA": "ad-model-v2.3.1",
+      "modelVersionB": "ad-model-v2.4.0",
+      "importedAt": 1781307973902,
+      "sampleIds": [
+        "normal-001",
+        "normal-002",
+        "normal-003",
+        "normal-004",
+        "normal-005",
+        "test-suppl-001"
+      ],
+      "duplicateSkipped": 0,
+      "recalcVersion": 2
+    },
+    {
+      "id": "gray-wrong-20260613",
+      "name": "广告文案审核-错口径批次",
+      "modelVersionA": "ad-model-v2.3.1",
+      "modelVersionB": "ad-model-v2.4.0",
+      "importedAt": 1781307973904,
+      "sampleIds": [
+        "wrong-001",
+        "wrong-002",
+        "wrong-003",
+        "wrong-004",
+        "wrong-005"
+      ],
+      "duplicateSkipped": 0,
+      "recalcVersion": 1
+    },
+    {
+      "id": "gray-supplement-20260613",
+      "name": "广告文案审核-补录批次",
+      "modelVersionA": "ad-model-v2.3.1",
+      "modelVersionB": "ad-model-v2.4.0",
+      "importedAt": 1781307973905,
+      "sampleIds": [
+        "suppl-001",
+        "suppl-002",
+        "suppl-003",
+        "sp-test-1",
+        "sp-test-2",
+        "sp-test-3"
+      ],
+      "duplicateSkipped": 0,
+      "recalcVersion": 2
+    }
+  ],
+  "samples": [
+    {
+      "id": "normal-001",
+      "batchId": "gray-normal-20260613",
+      "content": "【限时秒杀】正宗阳澄湖大闸蟹，买8只送4只，今日下单立减200元！",
+      "confidenceA": 0.88,
+      "confidenceB": 0.91,
+      "labelA": "pass",
+      "labelB": "pass",
+      "grayLabel": "pass",
+      "isLowConfidence": false,
+      "md5": "1acf9d6ddc48e3c8802d3c85129f7a7a",
+      "history": [
+        {
+          "id": "799e40fe-3033-43da-8b5d-494df0171609",
+          "sampleId": "normal-001",
+          "action": "import",
+          "operator": "知识库编辑小乔",
+          "at": 1781307973903,
+          "snapshot": {
+            "confidenceA": 0.88,
+            "confidenceB": 0.91,
+            "labelA": "pass",
+            "labelB": "pass",
+            "grayLabel": "pass",
+            "isLowConfidence": false
+          }
+        },
+        {
+          "id": "dac3bcc4-1e9e-4f5c-851f-9063aecbe635",
+          "sampleId": "normal-001",
+          "action": "review",
+          "operator": "测试员",
+          "at": 1781308048528,
+          "note": "审核通过",
+          "snapshot": {
+            "finalLabel": "pass",
+            "isLowConfidence": false
+          }
+        }
+      ],
+      "finalLabel": "pass",
+      "reviewedBy": "测试员",
+      "reviewedAt": 1781308048528
+    },
+    {
+      "id": "normal-002",
+      "batchId": "gray-normal-20260613",
+      "content": "本产品采用纯天然草本配方，无副作用，三天见效。",
+      "confidenceA": 0.42,
+      "confidenceB": 0.38,
+      "labelA": "reject",
+      "labelB": "reject",
+      "grayLabel": "reject",
+      "annotatorNote": "含绝对化用语\"三天见效\"，应拒绝",
+      "isLowConfidence": true,
+      "md5": "7dc785f5e9d5bf7e278c0b98f51f3bdd",
+      "history": [
+        {
+          "id": "448c099a-bccb-4913-9729-f8c074c3adaa",
+          "sampleId": "normal-002",
+          "action": "import",
+          "operator": "知识库编辑小乔",
+          "at": 1781307973903,
+          "snapshot": {
+            "confidenceA": 0.42,
+            "confidenceB": 0.38,
+            "labelA": "reject",
+            "labelB": "reject",
+            "grayLabel": "reject",
+            "isLowConfidence": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "normal-003",
+      "batchId": "gray-normal-20260613",
+      "content": "全新一代智能手机，搭载旗舰芯片，性能提升50%，续航更持久。",
+      "confidenceA": 0.82,
+      "confidenceB": 0.79,
+      "labelA": "pass",
+      "labelB": "pass",
+      "grayLabel": "pass",
+      "isLowConfidence": false,
+      "md5": "c3806853dc1ce2a2b4d70c628e6fb4ef",
+      "history": [
+        {
+          "id": "c4c61062-00d3-4a8f-ba97-6895135485de",
+          "sampleId": "normal-003",
+          "action": "import",
+          "operator": "知识库编辑小乔",
+          "at": 1781307973903,
+          "snapshot": {
+            "confidenceA": 0.82,
+            "confidenceB": 0.79,
+            "labelA": "pass",
+            "labelB": "pass",
+            "grayLabel": "pass",
+            "isLowConfidence": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "normal-004",
+      "batchId": "gray-normal-20260613",
+      "content": "专业教师一对一辅导，孩子成绩快速提高，家长零负担。",
+      "confidenceA": 0.52,
+      "confidenceB": 0.48,
+      "labelA": "uncertain",
+      "labelB": "reject",
+      "grayLabel": "uncertain",
+      "annotatorNote": "\"快速提高\"涉嫌夸大宣传，应拒绝",
+      "isLowConfidence": true,
+      "md5": "98923aaa3efaa2a49140ee49af27e4bc",
+      "history": [
+        {
+          "id": "eb87d321-7e5f-4ee2-8d46-3692102b0d32",
+          "sampleId": "normal-004",
+          "action": "import",
+          "operator": "知识库编辑小乔",
+          "at": 1781307973903,
+          "snapshot": {
+            "confidenceA": 0.52,
+            "confidenceB": 0.48,
+            "labelA": "uncertain",
+            "labelB": "reject",
+            "grayLabel": "uncertain",
+            "isLowConfidence": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "normal-005",
+      "batchId": "gray-normal-20260613",
+      "content": "春季新款女装上市，面料舒适，版型修身，多色可选。",
+      "confidenceA": 0.93,
+      "confidenceB": 0.95,
+      "labelA": "pass",
+      "labelB": "pass",
+      "grayLabel": "pass",
+      "isLowConfidence": false,
+      "md5": "cf276c717d9c470d159c7f680a72084d",
+      "history": [
+        {
+          "id": "b97f6c10-0d3d-4968-80c7-48fe57308da2",
+          "sampleId": "normal-005",
+          "action": "import",
+          "operator": "知识库编辑小乔",
+          "at": 1781307973903,
+          "snapshot": {
+            "confidenceA": 0.93,
+            "confidenceB": 0.95,
+            "labelA": "pass",
+            "labelB": "pass",
+            "grayLabel": "pass",
+            "isLowConfidence": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "wrong-001",
+      "batchId": "gray-wrong-20260613",
+      "content": "百年老字号药膏，根治腰椎间盘突出，永不复发！",
+      "confidenceA": 0.35,
+      "confidenceB": 0.58,
+      "labelA": "reject",
+      "labelB": "uncertain",
+      "grayLabel": "pass",
+      "annotatorNote": "\"根治\"\"永不复发\"绝对化用语+医疗宣称，应拒绝",
+      "isLowConfidence": true,
+      "md5": "69c5bdd2bc3873ba2654dba16d44cef3",
+      "history": [
+        {
+          "id": "2b583011-e942-4bf1-981a-2d6f2c0281bc",
+          "sampleId": "wrong-001",
+          "action": "import",
+          "operator": "知识库编辑小乔",
+          "at": 1781307973904,
+          "snapshot": {
+            "confidenceA": 0.35,
+            "confidenceB": 0.58,
+            "labelA": "reject",
+            "labelB": "uncertain",
+            "grayLabel": "pass",
+            "isLowConfidence": true
+          }
+        },
+        {
+          "id": "973aed48-798a-444b-b028-2b2490bbb125",
+          "sampleId": "wrong-001",
+          "action": "reject",
+          "operator": "测试员",
+          "at": 1781308063514,
+          "note": "测试解决冲突",
+          "snapshot": {
+            "finalLabel": "reject"
+          }
+        }
+      ],
+      "finalLabel": "reject",
+      "reviewedBy": "测试员",
+      "reviewedAt": 1781308063514
+    },
+    {
+      "id": "wrong-002",
+      "batchId": "gray-wrong-20260613",
+      "content": "本店减肥茶，一月瘦30斤，不反弹，无效退款。",
+      "confidenceA": 0.3,
+      "confidenceB": 0.45,
+      "labelA": "reject",
+      "labelB": "reject",
+      "grayLabel": "pass",
+      "annotatorNote": "承诺疗效+绝对化，应拒绝",
+      "isLowConfidence": true,
+      "md5": "75632de2a28073e6181b8b3dfa98eda7",
+      "history": [
+        {
+          "id": "d287a62f-6093-4c5e-915c-d130e7c468ed",
+          "sampleId": "wrong-002",
+          "action": "import",
+          "operator": "知识库编辑小乔",
+          "at": 1781307973904,
+          "snapshot": {
+            "confidenceA": 0.3,
+            "confidenceB": 0.45,
+            "labelA": "reject",
+            "labelB": "reject",
+            "grayLabel": "pass",
+            "isLowConfidence": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "wrong-003",
+      "batchId": "gray-wrong-20260613",
+      "content": "AI智能炒股系统，年化收益200%，稳赚不赔。",
+      "confidenceA": 0.28,
+      "confidenceB": 0.33,
+      "labelA": "reject",
+      "labelB": "reject",
+      "grayLabel": "uncertain",
+      "annotatorNote": "金融承诺收益，应拒绝",
+      "isLowConfidence": true,
+      "md5": "a0a96835d7a860b4bec31e6c9d222331",
+      "history": [
+        {
+          "id": "587e5634-bff0-49d3-a332-387e26a876ff",
+          "sampleId": "wrong-003",
+          "action": "import",
+          "operator": "知识库编辑小乔",
+          "at": 1781307973904,
+          "snapshot": {
+            "confidenceA": 0.28,
+            "confidenceB": 0.33,
+            "labelA": "reject",
+            "labelB": "reject",
+            "grayLabel": "uncertain",
+            "isLowConfidence": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "wrong-004",
+      "batchId": "gray-wrong-20260613",
+      "content": "进口婴幼儿配方奶粉，全球最好，妈妈最放心的选择。",
+      "confidenceA": 0.55,
+      "confidenceB": 0.62,
+      "labelA": "uncertain",
+      "labelB": "pass",
+      "grayLabel": "pass",
+      "annotatorNote": "\"全球最好\"绝对化，应拒绝",
+      "isLowConfidence": true,
+      "md5": "bc58d4632bbbe362013e4c826a7ef58f",
+      "history": [
+        {
+          "id": "f7d9876c-aa1d-4460-81f3-30466a9f60d5",
+          "sampleId": "wrong-004",
+          "action": "import",
+          "operator": "知识库编辑小乔",
+          "at": 1781307973904,
+          "snapshot": {
+            "confidenceA": 0.55,
+            "confidenceB": 0.62,
+            "labelA": "uncertain",
+            "labelB": "pass",
+            "grayLabel": "pass",
+            "isLowConfidence": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "wrong-005",
+      "batchId": "gray-wrong-20260613",
+      "content": "有机蔬菜直供，无农药无化肥，国家认证，健康首选。",
+      "confidenceA": 0.57,
+      "confidenceB": 0.59,
+      "labelA": "uncertain",
+      "labelB": "uncertain",
+      "grayLabel": "pass",
+      "annotatorNote": "\"首选\"绝对化，需复核，应通过",
+      "isLowConfidence": true,
+      "md5": "8f1ee4236014b0e9fe4c117ceeb85ff2",
+      "history": [
+        {
+          "id": "bb072458-6554-4c24-a16d-1fe5a9161190",
+          "sampleId": "wrong-005",
+          "action": "import",
+          "operator": "知识库编辑小乔",
+          "at": 1781307973904,
+          "snapshot": {
+            "confidenceA": 0.57,
+            "confidenceB": 0.59,
+            "labelA": "uncertain",
+            "labelB": "uncertain",
+            "grayLabel": "pass",
+            "isLowConfidence": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "suppl-001",
+      "batchId": "gray-supplement-20260613",
+      "content": "高端全屋定制家具，环保E0级板材，安装后即可入住。",
+      "confidenceA": 0.54,
+      "confidenceB": 0.49,
+      "labelA": "uncertain",
+      "labelB": "reject",
+      "grayLabel": "uncertain",
+      "annotatorNote": "\"即可入住\"可能误导，应拒绝",
+      "isLowConfidence": true,
+      "md5": "b2245e193c85416ef8d46167f8e85bd9",
+      "history": [
+        {
+          "id": "176be49b-cb45-4f6f-97a5-a2c488b08065",
+          "sampleId": "suppl-001",
+          "action": "import",
+          "operator": "知识库编辑小乔",
+          "at": 1781307973905,
+          "snapshot": {
+            "confidenceA": 0.54,
+            "confidenceB": 0.49,
+            "labelA": "uncertain",
+            "labelB": "reject",
+            "grayLabel": "uncertain",
+            "isLowConfidence": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "suppl-002",
+      "batchId": "gray-supplement-20260613",
+      "content": "正宗土特产，产地直发，纯天然，零添加。",
+      "confidenceA": 0.58,
+      "confidenceB": 0.61,
+      "labelA": "uncertain",
+      "labelB": "pass",
+      "grayLabel": "pass",
+      "annotatorNote": "\"零添加\"需资质，应拒绝",
+      "isLowConfidence": true,
+      "md5": "2b22627399161282b6a84ce3ff714240",
+      "history": [
+        {
+          "id": "52620356-9e7e-4999-b411-06920e0d179a",
+          "sampleId": "suppl-002",
+          "action": "import",
+          "operator": "知识库编辑小乔",
+          "at": 1781307973905,
+          "snapshot": {
+            "confidenceA": 0.58,
+            "confidenceB": 0.61,
+            "labelA": "uncertain",
+            "labelB": "pass",
+            "grayLabel": "pass",
+            "isLowConfidence": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "suppl-003",
+      "batchId": "gray-supplement-20260613",
+      "content": "新款蓝牙耳机，音质出众，续航48小时，IPX7防水。",
+      "confidenceA": 0.85,
+      "confidenceB": 0.87,
+      "labelA": "pass",
+      "labelB": "pass",
+      "grayLabel": "pass",
+      "isLowConfidence": false,
+      "md5": "39ea2e7888ede0d4bcf53f57d99f38e9",
+      "history": [
+        {
+          "id": "f5d954b7-1954-466b-bf72-15209510109b",
+          "sampleId": "suppl-003",
+          "action": "import",
+          "operator": "知识库编辑小乔",
+          "at": 1781307973905,
+          "snapshot": {
+            "confidenceA": 0.85,
+            "confidenceB": 0.87,
+            "labelA": "pass",
+            "labelB": "pass",
+            "grayLabel": "pass",
+            "isLowConfidence": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "test-suppl-001",
+      "batchId": "gray-normal-20260613",
+      "content": "测试补录样本",
+      "confidenceA": 0.5,
+      "confidenceB": 0.5,
+      "labelA": "uncertain",
+      "labelB": "uncertain",
+      "grayLabel": "uncertain",
+      "isLowConfidence": true,
+      "md5": "0f578f1c0dabed816c73d169ec63f649",
+      "history": [
+        {
+          "id": "180d698d-081a-4b17-b697-d41f3a9c79e4",
+          "sampleId": "test-suppl-001",
+          "action": "supplement",
+          "operator": "知识库编辑小乔",
+          "at": 1781308066071,
+          "note": "补录样本",
+          "snapshot": {
+            "confidenceA": 0.5,
+            "confidenceB": 0.5,
+            "labelA": "uncertain",
+            "labelB": "uncertain",
+            "grayLabel": "uncertain",
+            "isLowConfidence": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "sp-test-1",
+      "batchId": "gray-supplement-20260613",
+      "content": "Supplement-most-nutrition",
+      "confidenceA": 0.46,
+      "confidenceB": 0.51,
+      "labelA": "reject",
+      "labelB": "uncertain",
+      "grayLabel": "pass",
+      "annotatorNote": "absolutes",
+      "isLowConfidence": true,
+      "md5": "4d8a32290135a1b2bec342f3053dadf8",
+      "history": [
+        {
+          "id": "b1e67561-2245-4527-9e87-37eddcba7380",
+          "sampleId": "sp-test-1",
+          "action": "supplement",
+          "operator": "知识库编辑小乔",
+          "at": 1781370227037,
+          "note": "补录样本",
+          "snapshot": {
+            "confidenceA": 0.46,
+            "confidenceB": 0.51,
+            "labelA": "reject",
+            "labelB": "uncertain",
+            "grayLabel": "pass",
+            "isLowConfidence": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "sp-test-2",
+      "batchId": "gray-supplement-20260613",
+      "content": "Supplement-normal-clean",
+      "confidenceA": 0.85,
+      "confidenceB": 0.83,
+      "labelA": "pass",
+      "labelB": "pass",
+      "grayLabel": "pass",
+      "isLowConfidence": false,
+      "md5": "8e2ce17b303c3ed131bcf7260a02f374",
+      "history": [
+        {
+          "id": "ffafad66-8710-43c3-ad9f-225af2b30a0b",
+          "sampleId": "sp-test-2",
+          "action": "supplement",
+          "operator": "知识库编辑小乔",
+          "at": 1781370227037,
+          "note": "补录样本",
+          "snapshot": {
+            "confidenceA": 0.85,
+            "confidenceB": 0.83,
+            "labelA": "pass",
+            "labelB": "pass",
+            "grayLabel": "pass",
+            "isLowConfidence": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "sp-test-3",
+      "batchId": "gray-supplement-20260613",
+      "content": "Supplement-national-cert",
+      "confidenceA": 0.35,
+      "confidenceB": 0.42,
+      "labelA": "reject",
+      "labelB": "reject",
+      "grayLabel": "pass",
+      "annotatorNote": "national guarantee",
+      "isLowConfidence": true,
+      "md5": "20c8d7cf98e7dd90db76717bb35191e7",
+      "history": [
+        {
+          "id": "ee3d33f3-9421-4c4e-9d45-208969c3601e",
+          "sampleId": "sp-test-3",
+          "action": "supplement",
+          "operator": "知识库编辑小乔",
+          "at": 1781370227037,
+          "note": "补录样本",
+          "snapshot": {
+            "confidenceA": 0.35,
+            "confidenceB": 0.42,
+            "labelA": "reject",
+            "labelB": "reject",
+            "grayLabel": "pass",
+            "isLowConfidence": true
+          }
+        }
+      ]
+    }
+  ],
+  "conflicts": [
+    {
+      "id": "cfb0176a-51f7-44c7-a81a-dff812a478aa",
+      "sampleId": "wrong-001",
+      "batchId": "gray-wrong-20260613",
+      "type": "label_mismatch",
+      "graySide": "灰度批次判定：通过（模型A:拒绝 / 模型B:待定）",
+      "annotatorSide": "标注员留言：\"根治\"\"永不复发\"绝对化用语+医疗宣称，应拒绝",
+      "resolved": true,
+      "resolution": "reject_gray",
+      "resolvedBy": "测试员",
+      "resolvedReason": "测试解决冲突",
+      "resolvedAt": 1781308063514
+    },
+    {
+      "id": "274e7475-c5d9-47d8-bbd0-b2862fa63eac",
+      "sampleId": "wrong-002",
+      "batchId": "gray-wrong-20260613",
+      "type": "label_mismatch",
+      "graySide": "灰度批次判定：通过（模型A:拒绝 / 模型B:拒绝）",
+      "annotatorSide": "标注员留言：承诺疗效+绝对化，应拒绝",
+      "resolved": false
+    },
+    {
+      "id": "9a095b0e-9b22-4a52-a0fc-bd6bd6796f55",
+      "sampleId": "wrong-003",
+      "batchId": "gray-wrong-20260613",
+      "type": "label_mismatch",
+      "graySide": "灰度批次判定：待定（模型A:拒绝 / 模型B:拒绝）",
+      "annotatorSide": "标注员留言：金融承诺收益，应拒绝",
+      "resolved": false
+    },
+    {
+      "id": "cc8e3d92-5f19-46b7-8c96-bf78f78e4ec4",
+      "sampleId": "wrong-004",
+      "batchId": "gray-wrong-20260613",
+      "type": "label_mismatch",
+      "graySide": "灰度批次判定：通过（模型A:待定 / 模型B:通过）",
+      "annotatorSide": "标注员留言：\"全球最好\"绝对化，应拒绝",
+      "resolved": false
+    },
+    {
+      "id": "e3aeb856-2738-424e-8ee7-2f2f9197e943",
+      "sampleId": "wrong-005",
+      "batchId": "gray-wrong-20260613",
+      "type": "label_mismatch",
+      "graySide": "灰度批次判定：通过（模型A:待定 / 模型B:待定）",
+      "annotatorSide": "标注员留言：\"首选\"绝对化，需复核，应通过",
+      "resolved": false
+    },
+    {
+      "id": "086ab21e-77c9-420b-ba43-e16dcd3460a3",
+      "sampleId": "normal-004",
+      "batchId": "gray-normal-20260613",
+      "type": "label_mismatch",
+      "graySide": "灰度批次判定：待定（模型A:待定 / 模型B:拒绝）",
+      "annotatorSide": "标注员留言：\"快速提高\"涉嫌夸大宣传，应拒绝",
+      "resolved": false
+    },
+    {
+      "id": "d0520c79-a901-4c88-8590-2f5ed6d6d98c",
+      "sampleId": "suppl-001",
+      "batchId": "gray-supplement-20260613",
+      "type": "label_mismatch",
+      "graySide": "灰度批次判定：待定（模型A:待定 / 模型B:拒绝）",
+      "annotatorSide": "标注员留言：\"即可入住\"可能误导，应拒绝",
+      "resolved": false
+    },
+    {
+      "id": "6e261c3d-ed32-405d-8c0d-b0e22eb7ca61",
+      "sampleId": "suppl-002",
+      "batchId": "gray-supplement-20260613",
+      "type": "label_mismatch",
+      "graySide": "灰度批次判定：通过（模型A:待定 / 模型B:通过）",
+      "annotatorSide": "标注员留言：\"零添加\"需资质，应拒绝",
+      "resolved": false
+    },
+    {
+      "id": "75af08b1-7e7e-4df8-9547-c38a5111ea14",
+      "sampleId": "sp-test-1",
+      "batchId": "gray-supplement-20260613",
+      "type": "label_mismatch",
+      "graySide": "灰度批次判定：通过（模型A:拒绝 / 模型B:待定）",
+      "annotatorSide": "标注员留言：absolutes",
+      "resolved": false
+    },
+    {
+      "id": "3875052a-6e88-4ef1-8f2a-ace168722042",
+      "sampleId": "sp-test-3",
+      "batchId": "gray-supplement-20260613",
+      "type": "label_mismatch",
+      "graySide": "灰度批次判定：通过（模型A:拒绝 / 模型B:拒绝）",
+      "annotatorSide": "标注员留言：national guarantee",
+      "resolved": false
+    }
+  ]
+}
