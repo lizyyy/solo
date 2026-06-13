@@ -15,6 +15,7 @@ import {
   Popconfirm,
   Modal,
   Form,
+  Badge
   Input
 } from 'antd'
 import {
@@ -328,7 +329,7 @@ const ReviewDashboard = () => {
 
         <Table
           columns={modelChangeColumns}
-          data={data.modelVersionChangedSamples}
+          dataSource={data.modelVersionChangedSamples}
           rowKey="id"
           loading={loading}
           scroll={{ x: 1500 }}

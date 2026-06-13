@@ -6,7 +6,7 @@ const sampleRoutes = require('./routes/samples')
 const dashboardRoutes = require('./routes/dashboard')
 
 const app = express()
-const PORT = 3001
+const PORT = 3002
 
 app.use(cors())
 app.use(express.json({ limit: '50mb' }))

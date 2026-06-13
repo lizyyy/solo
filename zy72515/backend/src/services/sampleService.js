@@ -100,8 +100,15 @@ const rollbackSample = (sampleId, operator, reason) => {
 
   const beforeState = { status: sample.status }
 
+  const isModelVersionChanged = sample.matchedRules && sample.matchedRules.some(
+    function(r) { return r.code === 'MODEL_VERSION_CHANGED_SAME_ID' }
+  )
+  const rollbackToStatus = isModelVersionChanged 
+    ? SAMPLE_STATUS.MODEL_VERSION_CHANGED 
+    : SAMPLE_STATUS.PENDING_REVIEW
+
   const updatedSample = store.updateSample(sampleId, {
-    status: SAMPLE_STATUS.ROLLED_BACK
+    status: rollbackToStatus
   })
 
   store.addOperationLog({
@@ -110,9 +117,9 @@ const rollbackSample = (sampleId, operator, reason) => {
     type: OPERATION_TYPE.ROLLBACK,
     operator,
     operatorRole: ROLES.OPERATION_REVIEWER,
-    detail: `回滚操作，原因：${reason || '未说明'}`,
-    beforeState,
-    afterState: { status: SAMPLE_STATUS.ROLLED_BACK }
+    detail: '回滚操作（' + sample.status + ' → ' + rollbackToStatus + '），原因：' + (reason || '未说明'),
+    beforeState: beforeState,
+    afterState: { status: rollbackToStatus, previousStatus: sample.status }
   })
 
   return updatedSample
