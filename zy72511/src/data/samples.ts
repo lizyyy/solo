@@ -57,7 +57,7 @@ export const initialSamples: AttributionSample[] = [
     id: 's002',
     sampleNo: 'S002',
     type: SampleType.VERSION_CONFLICT,
-    status: AttributionStatus.PENDING_REVIEW,
+    status: AttributionStatus.CONFLICT,
     modelVersion: 'V2.3.1',
     originalModelVersion: 'V2.3.0',
     originalText: '王经理请将下季度的销售报表发送给市场部李总监，抄送财务部。',
@@ -119,7 +119,7 @@ export const initialSamples: AttributionSample[] = [
       ]
     },
     createdAt: '2026-06-04 11:30:00',
-    updatedAt: '2026-06-06 15:45:00',
+    updatedAt: '2026-06-06 10:00:00',
     currentStep: 2
   },
   {

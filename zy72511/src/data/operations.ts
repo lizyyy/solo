@@ -73,19 +73,6 @@ export const initialOperations: OperationLog[] = [
     affectedSamples: ['s002']
   },
   {
-    id: 'op006',
-    sampleId: 's002',
-    operationType: OperationType.SUBMIT_REVIEW,
-    operator: '阿宁',
-    operatorRole: 'AI产品经理',
-    operationTime: '2026-06-06 15:45:00',
-    description: '提交运营复核',
-    reason: '模型版本冲突，无法自动判定，提交运营复核确认',
-    beforeState: { status: 'conflict' },
-    afterState: { status: 'pending_review' },
-    affectedSamples: ['s002']
-  },
-  {
     id: 'op007',
     sampleId: 's003',
     operationType: OperationType.IMPORT,

@@ -167,9 +167,28 @@ const Conflicts: React.FC = () => {
 
                 {sample.status === AttributionStatus.PENDING_REVIEW && (
                   <div className="pt-4 border-t border-slate-200">
-                    <div className="flex items-center gap-2 text-amber-600">
+                    <div className="flex items-center gap-2 text-amber-600 mb-3">
                       <Send size={16} />
-                      <span className="text-sm">已提交运营复核，等待复核人处理</span>
+                      <span className="text-sm font-medium">已提交运营复核，请运营复核人最终确认：</span>
+                    </div>
+                    <p className="text-sm text-slate-600 mb-3">
+                      模型版本换了但样本编号没变，您来拍板最终以哪方为准：
+                    </p>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => openModal('confirm', sample.id)}
+                        className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white text-sm rounded hover:bg-emerald-700 transition-colors"
+                      >
+                        <Check size={16} />
+                        运营确认：以脱敏规则为准
+                      </button>
+                      <button
+                        onClick={() => openModal('reject', sample.id)}
+                        className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition-colors"
+                      >
+                        <X size={16} />
+                        运营确认：以灰度批次为准
+                      </button>
                     </div>
                   </div>
                 )}

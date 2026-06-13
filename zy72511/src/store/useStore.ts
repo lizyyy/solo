@@ -93,15 +93,24 @@ export const useStore = create<StoreState>()(
         const sample = get().getSampleById(sampleId);
         if (!sample) return;
 
-        const beforeState = { ...sample };
+        const beforeState = JSON.parse(JSON.stringify(sample));
+        
+        const finalModelVersion = sample.desensitizationRule 
+          ? sample.originalModelVersion || sample.modelVersion 
+          : sample.modelVersion;
+        
         const afterState = {
           ...sample,
           status: AttributionStatus.CONFIRMED,
+          modelVersion: finalModelVersion,
           reviewBy: operator,
           reviewTime: getCurrentTime(),
-          decisionRemark: remark,
+          decisionRemark: `【确认脱敏规则主张】${remark}。最终模型版本：${finalModelVersion}`,
           currentStep: 3,
-          updatedAt: getCurrentTime()
+          updatedAt: getCurrentTime(),
+          hasConflict: true,
+          conflictEvidence: sample.conflictEvidence,
+          originalModelVersion: sample.originalModelVersion || sample.modelVersion
         };
 
         set((state) => ({
@@ -115,7 +124,7 @@ export const useStore = create<StoreState>()(
           operationType: OperationType.CONFIRM,
           operator,
           operatorRole,
-          description: `确认样本 ${sample.sampleNo} 归因结果`,
+          description: `确认样本 ${sample.sampleNo} 归因结果（以脱敏规则主张为准）`,
           reason: remark,
           beforeState,
           afterState,
@@ -128,15 +137,24 @@ export const useStore = create<StoreState>()(
         const sample = get().getSampleById(sampleId);
         if (!sample) return;
 
-        const beforeState = { ...sample };
+        const beforeState = JSON.parse(JSON.stringify(sample));
+        
+        const finalModelVersion = sample.grayBatch 
+          ? sample.grayBatch.modelVersion 
+          : sample.modelVersion;
+        
         const afterState = {
           ...sample,
-          status: AttributionStatus.REJECTED,
+          status: AttributionStatus.CONFIRMED,
+          modelVersion: finalModelVersion,
           reviewBy: operator,
           reviewTime: getCurrentTime(),
-          decisionRemark: remark,
+          decisionRemark: `【确认灰度批次主张】${remark}。最终模型版本：${finalModelVersion}`,
           currentStep: 3,
-          updatedAt: getCurrentTime()
+          updatedAt: getCurrentTime(),
+          hasConflict: true,
+          conflictEvidence: sample.conflictEvidence,
+          originalModelVersion: sample.originalModelVersion || sample.modelVersion
         };
 
         set((state) => ({
@@ -150,7 +168,7 @@ export const useStore = create<StoreState>()(
           operationType: OperationType.REJECT,
           operator,
           operatorRole,
-          description: `驳回样本 ${sample.sampleNo} 归因结果`,
+          description: `确认样本 ${sample.sampleNo} 归因结果（以灰度批次主张为准）`,
           reason: remark,
           beforeState,
           afterState,
@@ -163,11 +181,13 @@ export const useStore = create<StoreState>()(
         const sample = get().getSampleById(sampleId);
         if (!sample) return;
 
-        const beforeState = { ...sample };
+        const beforeState = JSON.parse(JSON.stringify(sample));
         const afterState = {
           ...sample,
           status: AttributionStatus.PENDING_REVIEW,
-          updatedAt: getCurrentTime()
+          updatedAt: getCurrentTime(),
+          hasConflict: true,
+          conflictEvidence: sample.conflictEvidence
         };
 
         set((state) => ({
@@ -182,7 +202,7 @@ export const useStore = create<StoreState>()(
           operator,
           operatorRole,
           description: `提交样本 ${sample.sampleNo} 运营复核`,
-          reason: '存在冲突，需运营复核确认',
+          reason: '模型版本换了但样本编号没变，存在冲突，需运营复核最终确认',
           beforeState,
           afterState,
           affectedSamples: [sampleId]

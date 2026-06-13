@@ -74,11 +74,23 @@ export const ConflictPanel: React.FC<ConflictPanelProps> = ({
           </ul>
         </div>
 
-        {status === 'conflict' && (
+        {(status === 'conflict' || status === 'pending_review') && (
           <div className="pt-4 border-t border-slate-200">
-            <p className="text-sm text-slate-600 mb-3">
-              请 AI 产品经理阿宁选择：确认或驳回，不要自动拍板
-            </p>
+            {status === 'conflict' && (
+              <p className="text-sm text-slate-600 mb-3">
+                请 AI 产品经理阿宁选择：确认或驳回，不要自动拍板
+              </p>
+            )}
+            {status === 'pending_review' && (
+              <div className="mb-3">
+                <p className="text-sm text-amber-600 font-medium">
+                  已提交运营复核，请运营复核人最终确认：
+                </p>
+                <p className="text-sm text-slate-600 mt-1">
+                  模型版本换了但样本编号没变，您来拍板最终以哪方为准
+                </p>
+              </div>
+            )}
             <div className="space-y-3">
               <div>
                 <label className="text-xs text-slate-500 mb-1 block">
@@ -88,7 +100,7 @@ export const ConflictPanel: React.FC<ConflictPanelProps> = ({
                 <textarea
                   value={remark}
                   onChange={(e) => setRemark(e.target.value)}
-                  placeholder="请输入确认或驳回的原因..."
+                  placeholder="请输入决策原因，该原因将记录到历史中..."
                   className="w-full px-3 py-2 text-sm border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                   rows={2}
                 />
@@ -99,14 +111,14 @@ export const ConflictPanel: React.FC<ConflictPanelProps> = ({
                   className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-emerald-600 text-white text-sm rounded hover:bg-emerald-700 transition-colors"
                 >
                   <Check size={16} />
-                  确认脱敏规则主张
+                  {status === 'pending_review' ? '运营确认：以脱敏规则为准' : '确认脱敏规则主张'}
                 </button>
                 <button
                   onClick={() => setShowConfirmModal('reject')}
                   className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition-colors"
                 >
                   <X size={16} />
-                  确认灰度批次主张
+                  {status === 'pending_review' ? '运营确认：以灰度批次为准' : '确认灰度批次主张'}
                 </button>
               </div>
             </div>
