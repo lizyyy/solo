@@ -102,7 +102,7 @@ router.get('/export', (req: Request, res: Response) => {
   const buffer = exportRecords(recordIds);
 
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-  res.setHeader('Content-Disposition', `attachment; filename="越权拦截记录_${Date.now()}.xlsx"`);
+  res.setHeader('Content-Disposition', `attachment; filename="interception_records_${Date.now()}.xlsx"`);
   res.send(buffer);
 });
 

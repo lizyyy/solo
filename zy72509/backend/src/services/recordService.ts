@@ -3,7 +3,17 @@ import * as XLSX from 'xlsx';
 import { records } from '../database';
 import { AnnotationRecord, ReviewStatus, ImportResult } from '../types';
 import { detectConflict } from './conflictDetector';
-import { maskPhone, maskText, checkPhoneLeaked } from './maskService';
+import {
+  maskPhone,
+  maskText,
+  checkPhoneLeaked,
+  auditRecordPhones,
+  getPhoneLast4,
+} from './maskService';
+
+function readAllRecords(): AnnotationRecord[] {
+  return records.getAll();
+}
 
 export function getRecords(params: {
   page?: number;
@@ -12,7 +22,7 @@ export function getRecords(params: {
   keyword?: string;
 }): { records: AnnotationRecord[]; total: number } {
   const { page = 1, pageSize = 20, status, keyword } = params;
-  let allRecords = records.getAll();
+  let allRecords = readAllRecords();
 
   if (status) {
     allRecords = allRecords.filter((r) => r.review_status === status);
@@ -155,36 +165,76 @@ export function importFromExcel(buffer: Buffer, fileName: string): ImportResult 
 }
 
 export function exportRecords(recordIds?: string[]): Buffer {
-  let allRecords = records.getAll();
+  let allRecords = readAllRecords();
   if (recordIds && recordIds.length > 0) {
     allRecords = allRecords.filter((r) => recordIds.includes(r.id));
   }
 
   allRecords.sort((a, b) => b.created_at - a.created_at);
 
-  const exportData = allRecords.map((r) => {
-    const hasPhoneLeak = checkPhoneLeaked(r.annotator_comment || '') ||
-                         checkPhoneLeaked(r.model_output || '') ||
-                         checkPhoneLeaked(r.user_query || '');
+  const seenMaskedPhones = new Map<string, AnnotationRecord>();
+  const duplicatePhoneRecords: string[] = [];
+
+  allRecords.forEach((r) => {
+    const masked = maskPhone(r.phone_number || '');
+    if (masked && masked.includes('****')) {
+      if (seenMaskedPhones.has(masked)) {
+        duplicatePhoneRecords.push(r.id);
+      } else {
+        seenMaskedPhones.set(masked, r);
+      }
+    }
+  });
+
+  const dedupedRecords = allRecords.filter((r) => !duplicatePhoneRecords.includes(r.id));
+
+  let phoneLeakCount = 0;
+  const exportData = dedupedRecords.map((r) => {
+    const phoneAudits = auditRecordPhones({
+      phone_number: r.phone_number,
+      user_query: r.user_query,
+      annotator_comment: r.annotator_comment,
+      model_output: r.model_output,
+    });
+    const hasPhoneLeak = phoneAudits.length > 0;
+    if (hasPhoneLeak) phoneLeakCount++;
+    const leakLocations = phoneAudits.map((a) => `${a.fieldName}(${a.occurrences.length}个)`).join('、');
+    const allLeakedLast4 = Array.from(
+      new Set(phoneAudits.flatMap((a) => a.occurrences.map((o) => o.last4)))
+    ).join(',');
 
     return {
+      '记录ID': r.id,
       '会话ID': r.session_id,
-      '用户问题': maskText(r.user_query || ''),
-      '标注员留言': maskText(r.annotator_comment || ''),
-      '模型输出片段': maskText(r.model_output || ''),
+      '用户问题（已脱敏）': maskText(r.user_query || ''),
+      '标注员留言（已脱敏）': maskText(r.annotator_comment || ''),
+      '模型输出片段（已脱敏）': maskText(r.model_output || ''),
       '手机号脱敏': maskPhone(r.phone_number || ''),
+      '原始手机号后4位': getPhoneLast4(r.phone_number || ''),
       '是否拦截': r.is_intercepted ? '是' : '否',
       '审核状态': statusText(r.review_status),
       '是否存在手机号漏遮风险': hasPhoneLeak ? '是（需算法复核）' : '否',
+      '漏遮溯源位置': leakLocations || '-',
+      '漏遮手机号后4位汇总': allLeakedLast4 || '-',
       '导入来源': r.imported_from,
       '版本': r.version,
       '创建时间': new Date(r.created_at).toLocaleString('zh-CN'),
+      '更新时间': new Date(r.updated_at).toLocaleString('zh-CN'),
     };
   });
 
-  const ws = XLSX.utils.json_to_sheet(exportData);
+  const summaryData = [
+    { '汇总项': '原始记录总数', '数值': allRecords.length },
+    { '汇总项': '按脱敏手机号去重后导出数', '数值': dedupedRecords.length },
+    { '汇总项': '因同手机号重复被去重的记录数', '数值': duplicatePhoneRecords.length },
+    { '汇总项': '存在手机号漏遮需算法复核数', '数值': phoneLeakCount },
+  ];
+
+  const wsRecords = XLSX.utils.json_to_sheet(exportData);
+  const wsSummary = XLSX.utils.json_to_sheet(summaryData);
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, '越权拦截记录');
+  XLSX.utils.book_append_sheet(wb, wsSummary, '导出汇总');
+  XLSX.utils.book_append_sheet(wb, wsRecords, '越权拦截明细');
   return XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
 }
 
@@ -200,7 +250,7 @@ function statusText(status: ReviewStatus): string {
 }
 
 export function getConflicts(): { record: AnnotationRecord; evidence: string[] }[] {
-  const allRecords = records.getAll();
+  const allRecords = readAllRecords();
   return allRecords
     .filter((r) => r.review_status === ReviewStatus.CONFLICT)
     .map((r) => ({

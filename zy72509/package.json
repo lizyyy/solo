@@ -8,11 +8,15 @@
     "frontend"
   ],
   "scripts": {
+    "install:all": "npm install && (cd backend && npm install) && (cd frontend && npm install)",
+    "seed": "cd backend && npx ts-node src/seed.ts",
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:backend": "cd backend && npm run dev",
     "dev:frontend": "cd frontend && npm run dev",
     "build": "cd frontend && npm run build",
-    "start": "cd backend && npm start"
+    "start": "cd backend && npm start",
+    "selfcheck:run": "curl -X POST http://localhost:3001/api/self-check/run",
+    "export:run": "curl -o export_test.xlsx http://localhost:3001/api/export"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
