@@ -288,6 +288,65 @@ class UnifiedDataStore:
         except Exception:
             return False
 
+    def check_export_consistency(self) -> Dict[str, Any]:
+        """校验导出一致性 - 页面/API/CSV 是否读取同一份结果"""
+        from collections import Counter as _Counter
+
+        record_list = list(self.records.values())
+        df = self.to_dataframe()
+
+        if df.empty and not record_list:
+            return {
+                "export_consistent": True,
+                "data_source": "unified",
+                "check_time": datetime.now().isoformat(),
+                "details": "无记录",
+            }
+
+        df_dicts = df.to_dict(orient="records")
+
+        obj_status = _Counter(r.status.value for r in record_list)
+        df_status = _Counter(d["status"] for d in df_dicts)
+        status_match = dict(obj_status) == dict(df_status)
+
+        obj_issue = _Counter(r.issue_type.value for r in record_list)
+        df_issue = _Counter(d["issue_type"] for d in df_dicts)
+        issue_match = dict(obj_issue) == dict(df_issue)
+
+        obj_dup_fb = sum(1 for r in record_list if r.is_duplicate_user_feedback)
+        df_dup_fb = sum(1 for d in df_dicts if d.get("is_duplicate_user_feedback"))
+        dup_match = obj_dup_fb == df_dup_fb
+
+        obj_reimport = sum(1 for r in record_list if r.is_reimport)
+        df_reimport = sum(1 for d in df_dicts if d.get("is_reimport"))
+        reimport_match = obj_reimport == df_reimport
+
+        api_response = self.get_api_response()
+        api_count = api_response["total"]
+        api_records = api_response["records"]
+        api_status = _Counter(r["status"] for r in api_records)
+        api_match = dict(api_status) == dict(df_status)
+
+        all_consistent = status_match and issue_match and dup_match and reimport_match and api_match
+
+        return {
+            "export_consistent": all_consistent,
+            "data_source": "unified",
+            "check_time": datetime.now().isoformat(),
+            "details": {
+                "status_match": status_match,
+                "issue_match": issue_match,
+                "duplicate_feedback_match": dup_match,
+                "reimport_match": reimport_match,
+                "api_match": api_match,
+                "obj_status_counts": dict(obj_status),
+                "df_status_counts": dict(df_status),
+                "obj_total": len(record_list),
+                "df_total": len(df_dicts),
+                "api_total": api_count,
+            },
+        }
+
     def generate_review_summary(self) -> Dict[str, Any]:
         """生成复核总览"""
         total = len(self.records)

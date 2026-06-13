@@ -1,11 +1,11 @@
 """数据导入模块 - 处理模型输出片段和人工改判表导入"""
 
-import csv
 import json
 import uuid
+from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
-from typing import List, Dict, Any, Tuple, Optional
+from typing import List, Dict, Any, Tuple, Optional, Set
 
 import pandas as pd
 
@@ -27,17 +27,18 @@ class DataImporter:
 
     def __init__(self):
         self.import_history: List[Dict[str, Any]] = []
-        self.imported_record_ids: set = set()
-        self.imported_user_feedback_ids: set = set()
+        self.imported_record_ids: Set[str] = set()
+        self._existing_content_keys: Dict[str, str] = {}
 
     def import_model_output(
         self,
         file_path: str,
+        existing_records: Optional[Dict[str, TrackingRecord]] = None,
         batch_id: Optional[str] = None,
     ) -> Tuple[List[TrackingRecord], List[str], List[str]]:
         """导入模型输出片段
 
-        返回: (追踪记录列表, 警告列表, 错误列表)
+        同一批数据第二次导入时，标记哪些是复用记录、哪些是真新增。
         """
         warnings: List[str] = []
         errors: List[str] = []
@@ -71,6 +72,11 @@ class DataImporter:
             errors.append(f"缺少必要列: {', '.join(missing_cols)}")
             return records, warnings, errors
 
+        if existing_records:
+            for rid, r in existing_records.items():
+                key = f"{r.user_feedback_id}|{r.kb_link}|{r.user_id}|{r.initial_model_fragment.raw_line_number}"
+                self._existing_content_keys[key] = rid
+
         for idx, row in df.iterrows():
             raw_line_number = idx + 2
 
@@ -78,6 +84,32 @@ class DataImporter:
             if not user_feedback_id:
                 warnings.append(f"第{raw_line_number}行: user_feedback_id为空，跳过")
                 continue
+
+            content_key = f"{user_feedback_id}|{row.get('kb_link', '')}|{row.get('user_id', '')}|{raw_line_number}"
+
+            is_reimport = False
+            reimport_source_record_id = None
+
+            if existing_records:
+                existing_rid = self._existing_content_keys.get(content_key)
+                if existing_rid:
+                    is_reimport = True
+                    reimport_source_record_id = existing_rid
+                    warnings.append(
+                        f"第{raw_line_number}行: 复用已有记录 {existing_rid} "
+                        f"(user_feedback_id={user_feedback_id}, kb_link={row.get('kb_link', '')})"
+                    )
+                else:
+                    partial_key = f"{user_feedback_id}|{row.get('kb_link', '')}|{row.get('user_id', '')}"
+                    partial_matches = [
+                        k for k in self._existing_content_keys
+                        if k.startswith(partial_key + "|")
+                    ]
+                    if partial_matches:
+                        warnings.append(
+                            f"第{raw_line_number}行: 同一 user_feedback_id+kb_link+user_id 已有记录，"
+                            f"本条为真新增（行号不同）"
+                        )
 
             record_id = generate_id("rec")
 
@@ -105,6 +137,7 @@ class DataImporter:
                     "source_file": path.name,
                     "raw_line_number": raw_line_number,
                     "batch_id": batch_id,
+                    "is_reimport": is_reimport,
                 },
             )
 
@@ -117,16 +150,23 @@ class DataImporter:
                 evidence_logs=[log],
                 status=RecordStatus.IMPORTED,
                 current_link_status=str(row.get("link_status", "")),
+                is_reimport=is_reimport,
+                reimport_source_record_id=reimport_source_record_id,
             )
+
+            if is_reimport:
+                record.manual_judgment_summary = f"复用记录，源记录: {reimport_source_record_id}"
 
             records.append(record)
             self.imported_record_ids.add(record_id)
-            self.imported_user_feedback_ids.add(user_feedback_id)
+            self._existing_content_keys[content_key] = record_id
 
         self.import_history.append({
             "batch_id": batch_id,
             "file": str(path),
             "record_count": len(records),
+            "reimport_count": sum(1 for r in records if r.is_reimport),
+            "new_count": sum(1 for r in records if not r.is_reimport),
             "timestamp": datetime.now(),
             "type": "model_output",
         })
@@ -141,7 +181,11 @@ class DataImporter:
     ) -> Tuple[List[str], List[str], List[str]]:
         """导入人工改判表，补录到现有记录中
 
-        返回: (更新的记录ID列表, 警告列表, 错误列表)
+        核心修复: 每条人工改判必须精确匹配到**一条**记录。
+        匹配策略:
+          1. user_feedback_id + kb_link 完全一致 → 按顺序分配给未匹配的记录
+          2. user_feedback_id 一致但 kb_link 不同 → 按 kb_link 精确匹配
+          3. 无匹配 → 创建新记录
         """
         warnings: List[str] = []
         errors: List[str] = []
@@ -172,6 +216,12 @@ class DataImporter:
             errors.append(f"缺少必要列: {', '.join(missing_cols)}")
             return updated_record_ids, warnings, errors
 
+        feedback_to_records: Dict[str, List[TrackingRecord]] = defaultdict(list)
+        for r in existing_records.values():
+            feedback_to_records[r.user_feedback_id].append(r)
+
+        matched_record_ids: Set[str] = set()
+
         for idx, row in df.iterrows():
             raw_line_number = idx + 2
 
@@ -180,14 +230,50 @@ class DataImporter:
                 warnings.append(f"第{raw_line_number}行: user_feedback_id为空，跳过")
                 continue
 
-            matched_records = [
-                r for r in existing_records.values()
-                if r.user_feedback_id == user_feedback_id
-            ]
+            judgment_kb_link = str(row.get("kb_link", ""))
 
-            if not matched_records:
+            candidates = feedback_to_records.get(user_feedback_id, [])
+
+            target_record = None
+
+            if candidates:
+                kb_matched = [
+                    r for r in candidates
+                    if r.kb_link == judgment_kb_link
+                ]
+
+                unmatched_kb = [
+                    r for r in kb_matched
+                    if r.record_id not in matched_record_ids
+                ]
+
+                if unmatched_kb:
+                    target_record = unmatched_kb[0]
+                elif kb_matched:
+                    warnings.append(
+                        f"第{raw_line_number}行: user_feedback_id={user_feedback_id} "
+                        f"kb_link={judgment_kb_link} 的记录已全部匹配过改判，"
+                        f"本条改判追加到最后一条匹配记录"
+                    )
+                    target_record = kb_matched[-1]
+                else:
+                    unmatched_any = [
+                        r for r in candidates
+                        if r.record_id not in matched_record_ids
+                    ]
+                    if unmatched_any:
+                        target_record = unmatched_any[0]
+                    else:
+                        target_record = candidates[-1]
+                        warnings.append(
+                            f"第{raw_line_number}行: user_feedback_id={user_feedback_id} "
+                            f"所有记录均已匹配过改判，本条追加到最后一条"
+                        )
+
+            if not target_record:
                 warnings.append(
-                    f"第{raw_line_number}行: 未找到匹配的记录 user_feedback_id={user_feedback_id}，创建新记录"
+                    f"第{raw_line_number}行: 未找到匹配的记录 "
+                    f"user_feedback_id={user_feedback_id}，创建新记录"
                 )
                 record_id = generate_id("rec")
                 fragment = ModelOutputFragment(
@@ -195,7 +281,7 @@ class DataImporter:
                     raw_line_number=raw_line_number,
                     user_feedback_id=user_feedback_id,
                     user_id=str(row.get("user_id", "")),
-                    kb_link=str(row.get("kb_link", "")),
+                    kb_link=judgment_kb_link,
                     link_status=str(row.get("link_status", "")),
                     confidence=float(row.get("confidence", 0.0)),
                     raw_content=row.to_dict(),
@@ -205,50 +291,59 @@ class DataImporter:
                     record_id=record_id,
                     user_feedback_id=user_feedback_id,
                     user_id=str(row.get("user_id", "")),
-                    kb_link=str(row.get("kb_link", "")),
+                    kb_link=judgment_kb_link,
                     initial_model_fragment=fragment,
                     status=RecordStatus.IMPORTED,
                 )
                 existing_records[record_id] = record
-                matched_records = [record]
+                feedback_to_records[user_feedback_id].append(record)
+                target_record = record
 
-            for record in matched_records:
-                judgment = ManualJudgment(
-                    judgment_id=generate_id("jud"),
-                    record_id=record.record_id,
-                    user_feedback_id=user_feedback_id,
-                    user_id=record.user_id,
-                    judge_name=judge_name,
-                    judgment_result=str(row.get("judgment_result", "")),
-                    judgment_reason=str(row.get("judgment_reason", "")),
-                    judgment_timestamp=datetime.now(),
-                    raw_line_number=raw_line_number,
-                    raw_content=row.to_dict(),
-                )
+            matched_record_ids.add(target_record.record_id)
 
-                record.manual_judgments.append(judgment)
+            judgment = ManualJudgment(
+                judgment_id=generate_id("jud"),
+                record_id=target_record.record_id,
+                user_feedback_id=user_feedback_id,
+                user_id=target_record.user_id,
+                judge_name=judge_name,
+                judgment_result=str(row.get("judgment_result", "")),
+                judgment_reason=str(row.get("judgment_reason", "")),
+                judgment_timestamp=datetime.now(),
+                raw_line_number=raw_line_number,
+                raw_content=row.to_dict(),
+            )
 
-                log = EvidenceLog(
-                    log_id=generate_id("log"),
-                    record_id=record.record_id,
-                    action="add_manual_judgment",
-                    operator=judge_name,
-                    before_status=record.status,
-                    after_status=RecordStatus.REVIEW_REQUIRED,
-                    reason=f"补录人工改判，来自 {path.name} 第{raw_line_number}行",
-                    metadata={
-                        "source_file": path.name,
-                        "raw_line_number": raw_line_number,
-                        "judgment_result": judgment.judgment_result,
-                    },
-                )
+            target_record.manual_judgments.append(judgment)
 
-                record.evidence_logs.append(log)
-                record.status = RecordStatus.REVIEW_REQUIRED
-                record.updated_at = datetime.now()
-                record.review_by = judge_name
+            target_record.manual_judgment_summary = "; ".join(
+                f"{j.judgment_result}({j.judgment_reason[:20]})"
+                for j in target_record.manual_judgments
+            )
 
-                updated_record_ids.append(record.record_id)
+            log = EvidenceLog(
+                log_id=generate_id("log"),
+                record_id=target_record.record_id,
+                action="add_manual_judgment",
+                operator=judge_name,
+                before_status=target_record.status,
+                after_status=RecordStatus.REVIEW_REQUIRED,
+                reason=f"补录人工改判，来自 {path.name} 第{raw_line_number}行",
+                metadata={
+                    "source_file": path.name,
+                    "raw_line_number": raw_line_number,
+                    "judgment_result": judgment.judgment_result,
+                    "judgment_reason": judgment.judgment_reason,
+                    "matched_kb_link": judgment_kb_link,
+                },
+            )
+
+            target_record.evidence_logs.append(log)
+            target_record.status = RecordStatus.REVIEW_REQUIRED
+            target_record.updated_at = datetime.now()
+            target_record.review_by = judge_name
+
+            updated_record_ids.append(target_record.record_id)
 
         self.import_history.append({
             "file": str(path),

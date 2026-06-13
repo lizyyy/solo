@@ -87,9 +87,16 @@ class TrackingRecord:
     review_timestamp: Optional[datetime] = None
     is_duplicate_user_feedback: bool = False
     duplicate_group_id: Optional[str] = None
+    is_reimport: bool = False
+    reimport_source_record_id: Optional[str] = None
+    manual_judgment_summary: str = ""
     created_at: datetime = field(default_factory=datetime.now)
     updated_at: datetime = field(default_factory=datetime.now)
     metadata: Dict[str, Any] = field(default_factory=dict)
+
+    @property
+    def judgment_key(self) -> str:
+        return f"{self.user_feedback_id}|{self.kb_link}"
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -102,14 +109,26 @@ class TrackingRecord:
             "issue_note": self.issue_note,
             "current_link_status": self.current_link_status,
             "review_by": self.review_by,
-            "review_reason": self.review_reason,
+            "review_reason": self.review_reason or "",
             "review_timestamp": self.review_timestamp.isoformat() if self.review_timestamp else None,
             "is_duplicate_user_feedback": self.is_duplicate_user_feedback,
             "duplicate_group_id": self.duplicate_group_id,
+            "is_reimport": self.is_reimport,
+            "reimport_source_record_id": self.reimport_source_record_id,
+            "manual_judgment_summary": self.manual_judgment_summary,
             "raw_line_number": self.initial_model_fragment.raw_line_number,
             "import_batch_id": self.initial_model_fragment.import_batch_id,
             "confidence": self.initial_model_fragment.confidence,
             "manual_judgment_count": len(self.manual_judgments),
+            "manual_judgments_detail": [
+                {
+                    "judgment_result": j.judgment_result,
+                    "judgment_reason": j.judgment_reason,
+                    "judge_name": j.judge_name,
+                    "raw_line_number": j.raw_line_number,
+                }
+                for j in self.manual_judgments
+            ],
             "evidence_log_count": len(self.evidence_logs),
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),

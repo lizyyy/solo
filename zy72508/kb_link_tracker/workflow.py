@@ -49,6 +49,7 @@ class ThreeStepWorkflow:
 
         records, warnings, errors = self.importer.import_model_output(
             model_output_file,
+            existing_records=self.store.get_all_records(),
             batch_id=batch_id,
         )
 

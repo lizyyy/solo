@@ -43,6 +43,36 @@ def print_result_summary(result: dict):
     console.print(table)
 
 
+def build_review_decisions(store, judge_name="周姐"):
+    """根据每条记录自己的唯一改判结果决定保留/剔除
+
+    核心修复: 不再用 last_judgment，而是看这条记录唯一收到的改判。
+    FB001第一条: 只收到"确认失效" → 保留
+    FB001第二条: 只收到"重复记录，第二条剔除" → 剔除
+    """
+    duplicate_records = store.get_duplicate_feedback_records()
+    review_decisions = {}
+
+    for record in duplicate_records:
+        if not record.manual_judgments:
+            continue
+
+        judgment = record.manual_judgments[-1].judgment_result
+        reason = record.manual_judgments[-1].judgment_reason
+
+        if "剔除" in judgment or "重复记录" in judgment:
+            keep = False
+        else:
+            keep = True
+
+        review_decisions[record.record_id] = {
+            "keep": keep,
+            "reason": f"{judge_name}复核: {reason}",
+        }
+
+    return review_decisions
+
+
 @click.group()
 def cli():
     """知识库失效链接追踪系统"""
@@ -50,31 +80,11 @@ def cli():
 
 
 @cli.command()
-@click.option(
-    "--model-output", "-m",
-    default="./sample_data/model_output.csv",
-    help="模型输出文件路径",
-)
-@click.option(
-    "--manual-judgments", "-j",
-    default="./sample_data/manual_judgments.csv",
-    help="人工改判表文件路径",
-)
-@click.option(
-    "--output-dir", "-o",
-    default="./output",
-    help="输出目录",
-)
-@click.option(
-    "--judge-name",
-    default="周姐",
-    help="标注负责人姓名",
-)
-@click.option(
-    "--reviewer",
-    default="周姐",
-    help="复核人姓名",
-)
+@click.option("--model-output", "-m", default="./sample_data/model_output.csv", help="模型输出文件路径")
+@click.option("--manual-judgments", "-j", default="./sample_data/manual_judgments.csv", help="人工改判表文件路径")
+@click.option("--output-dir", "-o", default="./output", help="输出目录")
+@click.option("--judge-name", default="周姐", help="标注负责人姓名")
+@click.option("--reviewer", default="周姐", help="复核人姓名")
 def run(model_output, manual_judgments, output_dir, judge_name, reviewer):
     """运行完整三步流程"""
 
@@ -96,61 +106,47 @@ def run(model_output, manual_judgments, output_dir, judge_name, reviewer):
     print_result_summary(step1)
 
     print_step_header(2, f"标注负责人{judge_name}补看人工改判表")
-    step2 = workflow.step2_supplement_manual_judgments(
-        manual_judgments,
-        judge_name=judge_name,
-    )
+    step2 = workflow.step2_supplement_manual_judgments(manual_judgments, judge_name=judge_name)
     console.print(f"更新记录数: [bold]{step2['updated_count']}[/bold]")
     if step2["warnings"]:
         console.print(f"[yellow]警告: {len(step2['warnings'])} 条[/yellow]")
         for w in step2["warnings"]:
             console.print(f"  - {w}")
     console.print(f"[cyan]提示: {step2['note']}[/cyan]")
+
+    console.print("\n[bold]各记录收到的人工改判:[/bold]")
+    for rid, record in workflow.store.get_all_records().items():
+        if record.manual_judgments:
+            for j in record.manual_judgments:
+                console.print(
+                    f"  {rid[:16]}... (FB{record.user_feedback_id}): "
+                    f"[green]{j.judgment_result}[/green] - {j.judgment_reason[:40]}..."
+                )
+
     print_result_summary(step2)
 
     print_step_header(3, "证据回放更新")
-    duplicate_records = workflow.store.get_duplicate_feedback_records()
+    review_decisions = build_review_decisions(workflow.store, judge_name)
 
-    review_decisions = {}
-    if duplicate_records:
-        console.print(f"\n[bold yellow]发现 {len(duplicate_records)} 条重复用户反馈记录[/bold yellow]")
-        console.print("[cyan]根据人工改判表自动生成复核决定...[/cyan]")
+    if review_decisions:
+        console.print(f"\n[bold yellow]复核决定:[/bold yellow]")
+        for rid, dec in review_decisions.items():
+            record = workflow.store.get_record(rid)
+            console.print(
+                f"  {rid[:16]}... (FB{record.user_feedback_id if record else '?'}): "
+                f"{'[green]保留[/green]' if dec['keep'] else '[red]剔除[/red]'} "
+                f"- {dec['reason'][:40]}..."
+            )
 
-        for record in duplicate_records:
-            if record.manual_judgments:
-                last_judgment = record.manual_judgments[-1]
-                judgment = last_judgment.judgment_result
-                reason = last_judgment.judgment_reason
-
-                if "剔除" in judgment or "重复" in judgment:
-                    keep = False
-                else:
-                    keep = True
-
-                review_decisions[record.record_id] = {
-                    "keep": keep,
-                    "reason": f"{judge_name}复核: {reason}",
-                }
-
-                console.print(
-                    f"  记录 {record.record_id}: "
-                    f"{'[green]保留[/green]' if keep else '[red]剔除[/red]'} "
-                    f"- {reason[:30]}..."
-                )
-
-    step3 = workflow.step3_evidence_playback_update(
-        review_decisions=review_decisions,
-        reviewer=reviewer,
-    )
+    step3 = workflow.step3_evidence_playback_update(review_decisions=review_decisions, reviewer=reviewer)
     print_result_summary(step3)
 
-    summary = workflow.store.generate_review_summary()
-    console.print(f"\n[bold]复核总览:[/bold]")
-    console.print(f"  总记录数: {summary['total_records']}")
-    console.print(f"  重复用户反馈记录: {summary['duplicate_user_feedback_count']}")
-    console.print(f"  重复分组数: {summary['duplicate_group_count']}")
-    console.print(f"  待复核: {summary['review_required_count']}")
-    console.print(f"  已复核: {summary['reviewed_count']}")
+    consistency = workflow.store.check_export_consistency()
+    console.print(f"\n[bold]导出一致性校验:[/bold]")
+    console.print(f"  {'[green]✓ 通过[/green]' if consistency['export_consistent'] else '[red]✗ 失败[/red]'}")
+    console.print(f"  对象总数={consistency['details']['obj_total']} "
+                  f"DataFrame总数={consistency['details']['df_total']} "
+                  f"API总数={consistency['details']['api_total']}")
 
     console.print(f"\n[bold cyan]导出结果中...[/bold cyan]")
     export_files = workflow.export_results(output_dir=output_dir)
@@ -160,30 +156,19 @@ def run(model_output, manual_judgments, output_dir, judge_name, reviewer):
         f"导出文件:\n"
         f"  明细CSV: {export_files['detail_csv']}\n"
         f"  明细JSON: {export_files['detail_json']}\n"
-        f"  汇总JSON: {export_files['summary_json']}\n"
-        f"  状态文件: {export_files['state_pkl']}\n"
-        f"  流程日志: {export_files['workflow_log_json']}\n\n"
+        f"  状态文件: {export_files['state_pkl']}\n\n"
         f"[bold]复盘/重跑命令:[/bold]\n"
-        f"  {export_files['replay_command']}",
+        f"  {export_files['replay_command']}\n\n"
+        f"[bold]启动Web服务核对页面/API一致性:[/bold]\n"
+        f"  python3 cli.py serve -s {export_files['state_pkl']}",
         border_style="green",
     ))
 
 
 @cli.command()
-@click.option(
-    "--state", "-s",
-    required=True,
-    help="状态文件路径 (.pkl)",
-)
-@click.option(
-    "--record-id", "-r",
-    help="查看指定记录的证据链",
-)
-@click.option(
-    "--list-duplicates", "-d",
-    is_flag=True,
-    help="列出所有重复用户反馈分组",
-)
+@click.option("--state", "-s", required=True, help="状态文件路径 (.pkl)")
+@click.option("--record-id", "-r", help="查看指定记录的证据链")
+@click.option("--list-duplicates", "-d", is_flag=True, help="列出所有重复用户反馈分组")
 def replay(state, record_id, list_duplicates):
     """复盘和证据回放"""
 
@@ -219,22 +204,22 @@ def replay(state, record_id, list_duplicates):
 
             detail = store.get_duplicate_group_detail(group["group_id"])
             for rec in detail.get("records", []):
-                status = rec["status"]
-                if status == RecordStatus.REVIEWED.value:
-                    status_str = f"[green]已复核[/green]"
-                elif status == RecordStatus.REJECTED.value:
-                    status_str = f"[red]已剔除[/red]"
+                s = rec["status"]
+                if s == RecordStatus.REVIEWED.value:
+                    status_str = "[green]已复核(保留)[/green]"
+                elif s == RecordStatus.REJECTED.value:
+                    status_str = "[red]已剔除[/red]"
                 else:
-                    status_str = f"[yellow]待复核[/yellow]"
+                    status_str = "[yellow]待复核[/yellow]"
 
                 console.print(
                     f"    - {rec['record_id']}: "
                     f"{rec['kb_link']} {status_str}"
                 )
                 if rec.get("review_reason"):
-                    console.print(
-                        f"      [dim]复核理由: {rec['review_reason']}[/dim]"
-                    )
+                    console.print(f"      [dim]复核理由: {rec['review_reason']}[/dim]")
+                for j in rec.get("manual_judgments", []):
+                    console.print(f"      [dim]改判: {j['judge_name']}: {j['judgment_result']} - {j['judgment_reason'][:30]}[/dim]")
 
     if record_id:
         evidence = store.get_evidence_trail(record_id)
@@ -250,6 +235,8 @@ def replay(state, record_id, list_duplicates):
         console.print(f"  链接: {record.kb_link}")
         console.print(f"  状态: {record.status.value}")
         console.print(f"  问题类型: {record.issue_type.value}")
+        if record.manual_judgment_summary:
+            console.print(f"  改判摘要: {record.manual_judgment_summary}")
         if record.review_reason:
             console.print(f"  复核理由: {record.review_reason}")
 
@@ -281,16 +268,8 @@ def replay(state, record_id, list_duplicates):
 
 
 @cli.command()
-@click.option(
-    "--state", "-s",
-    required=True,
-    help="状态文件路径 (.pkl)",
-)
-@click.option(
-    "--group-id", "-g",
-    required=True,
-    help="重复分组ID",
-)
+@click.option("--state", "-s", required=True, help="状态文件路径 (.pkl)")
+@click.option("--group-id", "-g", required=True, help="重复分组ID")
 def show_group(state, group_id):
     """查看重复分组详情"""
 
@@ -335,6 +314,45 @@ def show_group(state, group_id):
 
 
 @cli.command()
+@click.option("--state", "-s", default=None, help="状态文件路径 (.pkl)，不指定则先运行完整流程")
+@click.option("--model-output", "-m", default="./sample_data/model_output.csv", help="模型输出文件")
+@click.option("--manual-judgments", "-j", default="./sample_data/manual_judgments.csv", help="人工改判表")
+@click.option("--port", "-p", default=5000, help="端口号")
+def serve(state, model_output, manual_judgments, port):
+    """启动Web服务 - 页面展示+API接口，与导出明细读同一份数据"""
+
+    from kb_link_tracker.web_api import create_app
+
+    store = UnifiedDataStore()
+
+    if state:
+        if not store.load_state(state):
+            console.print(f"[red]加载状态文件失败: {state}[/red]")
+            sys.exit(1)
+        console.print(f"[green]✓ 从状态文件加载: {len(store.records)} 条记录[/green]")
+    else:
+        console.print("[cyan]未指定状态文件，先运行完整流程...[/cyan]")
+        workflow = ThreeStepWorkflow(data_dir="./data")
+        workflow.step1_import_model_output(model_output)
+        workflow.step2_supplement_manual_judgments(manual_judgments, "周姐")
+
+        review_decisions = build_review_decisions(workflow.store, "周姐")
+        workflow.step3_evidence_playback_update(review_decisions, "周姐")
+
+        store = workflow.store
+        console.print(f"[green]✓ 流程完成，共 {len(store.records)} 条记录[/green]")
+
+    app = create_app(store)
+    console.print(f"\n[bold green]Web服务启动中...[/bold green]")
+    console.print(f"  页面: http://localhost:{port}/")
+    console.print(f"  API全部记录: http://localhost:{port}/api/records")
+    console.print(f"  API一致性校验: http://localhost:{port}/api/consistency")
+    console.print(f"  API重复分组: http://localhost:{port}/api/duplicate-groups")
+    console.print(f"  API单条记录: http://localhost:{port}/api/record/<record_id>")
+    app.run(host="0.0.0.0", port=port, debug=False)
+
+
+@cli.command()
 def demo():
     """运行演示 - 使用示例数据"""
 
@@ -360,32 +378,47 @@ def demo():
     step1 = workflow.step1_import_model_output(str(model_file))
     print_step_header(1, "模型输出导入")
     console.print(f"导入了 {step1['imported_count']} 条记录")
-    console.print(f"注意: FB001 和 FB002 是重复的 user_feedback_id")
+    console.print(f"注意: FB001(行2,行5) 和 FB002(行3,行8) 是重复的 user_feedback_id")
     print_result_summary(step1)
 
     step2 = workflow.step2_supplement_manual_judgments(str(judgment_file), "周姐")
     print_step_header(2, "周姐补看人工改判表")
     console.print(f"更新了 {step2['updated_count']} 条记录")
     console.print("[cyan]补录后自动重算，重复记录保留待复核状态[/cyan]")
+
+    console.print("\n[bold]各记录收到的人工改判（每条记录只收到一条改判）:[/bold]")
+    for rid, record in workflow.store.get_all_records().items():
+        if record.manual_judgments:
+            for j in record.manual_judgments:
+                console.print(
+                    f"  {rid[:16]}... (FB{record.user_feedback_id}, 行{record.initial_model_fragment.raw_line_number}): "
+                    f"[green]{j.judgment_result}[/green] - {j.judgment_reason[:50]}"
+                )
+        else:
+            console.print(f"  {rid[:16]}... (FB{record.user_feedback_id}): 无改判")
+
     print_result_summary(step2)
 
-    duplicate_records = workflow.store.get_duplicate_feedback_records()
-    review_decisions = {}
-    for record in duplicate_records:
-        if record.manual_judgments:
-            last_judgment = record.manual_judgments[-1]
-            judgment = last_judgment.judgment_result
-            reason = last_judgment.judgment_reason
-            keep = "剔除" not in judgment and "重复" not in judgment
-            review_decisions[record.record_id] = {
-                "keep": keep,
-                "reason": f"周姐复核: {reason}",
-            }
+    review_decisions = build_review_decisions(workflow.store, "周姐")
+
+    console.print(f"\n[bold]复核决定:[/bold]")
+    for rid, dec in review_decisions.items():
+        record = workflow.store.get_record(rid)
+        fb_id = record.user_feedback_id if record else "?"
+        line_no = record.initial_model_fragment.raw_line_number if record else "?"
+        console.print(
+            f"  {rid[:16]}... (FB{fb_id}, 行{line_no}): "
+            f"{'[green]保留[/green]' if dec['keep'] else '[red]剔除[/red]'} "
+            f"- {dec['reason'][:50]}"
+        )
 
     step3 = workflow.step3_evidence_playback_update(review_decisions, "周姐")
     print_step_header(3, "证据回放更新")
     console.print(f"处理了 {len(review_decisions)} 条复核决定")
     print_result_summary(step3)
+
+    consistency = workflow.store.check_export_consistency()
+    console.print(f"\n[bold]导出一致性校验:[/bold] {'[green]✓ 通过[/green]' if consistency['export_consistent'] else '[red]✗ 失败[/red]'}")
 
     export_files = workflow.export_results()
     state_file = export_files["state_pkl"]
@@ -393,9 +426,10 @@ def demo():
     console.print(Panel.fit(
         "[bold green]演示完成![/bold green]\n\n"
         "接下来可以执行:\n"
-        f"  [bold]查看所有重复分组:[/bold] kb-link-tracker replay -s {state_file} -d\n"
-        f"  [bold]查看指定分组详情:[/bold] kb-link-tracker show-group -s {state_file} -g <group_id>\n"
-        f"  [bold]查看单条证据链:[/bold] kb-link-tracker replay -s {state_file} -r <record_id>",
+        f"  [bold]查看所有重复分组:[/bold] python3 cli.py replay -s {state_file} -d\n"
+        f"  [bold]查看指定分组详情:[/bold] python3 cli.py show-group -s {state_file} -g <group_id>\n"
+        f"  [bold]查看单条证据链:[/bold] python3 cli.py replay -s {state_file} -r <record_id>\n"
+        f"  [bold]启动Web服务核对:[/bold] python3 cli.py serve -s {state_file}",
         border_style="green",
     ))
 

@@ -1,0 +1,649 @@
+[
+  {
+    "step": 1,
+    "name": "模型输出片段导入",
+    "start_time": "2026-06-13 07:43:43.193790",
+    "input_file": "sample_data/model_output.csv",
+    "imported_count": 8,
+    "warnings": [],
+    "errors": [],
+    "check_result": {
+      "total_records": 8,
+      "normal_count": 4,
+      "duplicate_user_feedback_count": 4,
+      "duplicate_import_count": 0,
+      "review_required_count": 4,
+      "export_consistent": true
+    },
+    "end_time": "2026-06-13 07:43:43.197751"
+  },
+  {
+    "step": 2,
+    "name": "补看人工改判表",
+    "start_time": "2026-06-13 07:43:43.199427",
+    "input_file": "sample_data/manual_judgments.csv",
+    "judge_name": "周姐",
+    "updated_count": 8,
+    "updated_record_ids": [
+      "rec_123e4afa270a",
+      "rec_158e98d96a01",
+      "rec_473638017ee6",
+      "rec_68af7ec0a0c0",
+      "rec_41bd79f0b028",
+      "rec_e3cd3fda92c9",
+      "rec_d835324c3c40",
+      "rec_dd083b928573"
+    ],
+    "warnings": [],
+    "errors": [],
+    "check_result": {
+      "total_records": 8,
+      "normal_count": 0,
+      "duplicate_user_feedback_count": 4,
+      "duplicate_import_count": 0,
+      "review_required_count": 8,
+      "export_consistent": true
+    },
+    "note": "补录后已自动重算，重复用户反馈记录保留为待复核状态，未自动归为正常",
+    "end_time": "2026-06-13 07:43:43.200669"
+  },
+  {
+    "step": 3,
+    "name": "证据回放更新",
+    "start_time": "2026-06-13 07:43:43.206617",
+    "reviewer": "周姐",
+    "summary_before": {
+      "total_records": 8,
+      "duplicate_user_feedback_count": 4,
+      "duplicate_group_count": 2,
+      "review_required_count": 8,
+      "reviewed_count": 0,
+      "duplicate_groups": [
+        {
+          "group_id": "dup_grp_g_bad183ca0e63",
+          "user_feedback_id": "FB001",
+          "record_count": 2,
+          "status": "pending_review"
+        },
+        {
+          "group_id": "dup_grp_g_fe519e4aed39",
+          "user_feedback_id": "FB002",
+          "record_count": 2,
+          "status": "pending_review"
+        }
+      ]
+    },
+    "summary_after": {
+      "total_records": 8,
+      "duplicate_user_feedback_count": 4,
+      "duplicate_group_count": 2,
+      "review_required_count": 4,
+      "reviewed_count": 3,
+      "duplicate_groups": [
+        {
+          "group_id": "dup_grp_g_bad183ca0e63",
+          "user_feedback_id": "FB001",
+          "record_count": 2,
+          "status": "reviewed"
+        },
+        {
+          "group_id": "dup_grp_g_fe519e4aed39",
+          "user_feedback_id": "FB002",
+          "record_count": 2,
+          "status": "reviewed"
+        }
+      ]
+    },
+    "processed_decisions": [
+      {
+        "record_id": "rec_123e4afa270a",
+        "keep": true,
+        "reason": "周姐复核: 用户反馈的链接经人工核实确实无法访问，保留记录",
+        "success": true
+      },
+      {
+        "record_id": "rec_158e98d96a01",
+        "keep": true,
+        "reason": "周姐复核: 该链接实际可以正常访问，模型误判",
+        "success": true
+      },
+      {
+        "record_id": "rec_68af7ec0a0c0",
+        "keep": false,
+        "reason": "周姐复核: 同一条用户反馈被重复导入，第二条予以剔除，但保留证据用于复盘",
+        "success": true
+      },
+      {
+        "record_id": "rec_d835324c3c40",
+        "keep": true,
+        "reason": "周姐复核: 虽然是同一用户反馈，但对应不同的KB链接，两条都保留",
+        "success": true
+      }
+    ],
+    "check_result": {
+      "total_records": 8,
+      "normal_count": 0,
+      "duplicate_user_feedback_count": 4,
+      "duplicate_import_count": 0,
+      "review_required_count": 4,
+      "reviewed_count": 3,
+      "export_consistent": true
+    },
+    "duplicate_groups_detail": [
+      {
+        "group_id": "dup_grp_g_bad183ca0e63",
+        "user_feedback_id": "FB001",
+        "record_count": 2,
+        "records": [
+          {
+            "record_id": "rec_123e4afa270a",
+            "user_id": "U001",
+            "kb_link": "https://kb.example.com/article/1001",
+            "status": "reviewed",
+            "review_by": "周姐",
+            "review_reason": "周姐复核: 用户反馈的链接经人工核实确实无法访问，保留记录",
+            "review_timestamp": "2026-06-13T07:43:43.206710",
+            "raw_line_number": 2,
+            "import_batch_id": "batch_20260613_074343",
+            "evidence_trail": [
+              {
+                "type": "model_output",
+                "raw_line_number": 2,
+                "import_batch_id": "batch_20260613_074343",
+                "content": {
+                  "user_feedback_id": "FB001",
+                  "user_id": "U001",
+                  "kb_link": "https://kb.example.com/article/1001",
+                  "link_status": "invalid",
+                  "confidence": 0.95
+                },
+                "timestamp": "2026-06-13T07:43:43.197286",
+                "description": "模型输出原始行号: 2"
+              },
+              {
+                "type": "status_change",
+                "action": "import_model_output",
+                "operator": "system",
+                "before_status": null,
+                "after_status": "imported",
+                "reason": "从文件 model_output.csv 第2行导入模型输出",
+                "timestamp": "2026-06-13T07:43:43.197303",
+                "metadata": {
+                  "source_file": "model_output.csv",
+                  "raw_line_number": 2,
+                  "batch_id": "batch_20260613_074343",
+                  "is_reimport": false
+                },
+                "description": "system 执行 import_model_output: 初始 → imported"
+              },
+              {
+                "type": "status_change",
+                "action": "mark_duplicate_feedback",
+                "operator": "system_self_check",
+                "before_status": "imported",
+                "after_status": "review_required",
+                "reason": "检测到同一用户反馈被重复计入，共2条记录",
+                "timestamp": "2026-06-13T07:43:43.197693",
+                "metadata": {
+                  "duplicate_count": 2,
+                  "group_id": "dup_grp_g_bad183ca0e63",
+                  "user_ids": [
+                    "U001"
+                  ],
+                  "kb_links": [
+                    "https://kb.example.com/article/1001"
+                  ]
+                },
+                "description": "system_self_check 执行 mark_duplicate_feedback: imported → review_required"
+              },
+              {
+                "type": "manual_judgment",
+                "judgment_index": 1,
+                "judge_name": "周姐",
+                "judgment_result": "确认失效",
+                "judgment_reason": "用户反馈的链接经人工核实确实无法访问，保留记录",
+                "raw_line_number": 2,
+                "timestamp": "2026-06-13T07:43:43.200298",
+                "description": "人工改判 #1: 周姐 判定为 确认失效"
+              },
+              {
+                "type": "status_change",
+                "action": "add_manual_judgment",
+                "operator": "周姐",
+                "before_status": "review_required",
+                "after_status": "review_required",
+                "reason": "补录人工改判，来自 manual_judgments.csv 第2行",
+                "timestamp": "2026-06-13T07:43:43.200318",
+                "metadata": {
+                  "source_file": "manual_judgments.csv",
+                  "raw_line_number": 2,
+                  "judgment_result": "确认失效",
+                  "judgment_reason": "用户反馈的链接经人工核实确实无法访问，保留记录",
+                  "matched_kb_link": "https://kb.example.com/article/1001"
+                },
+                "description": "周姐 执行 add_manual_judgment: review_required → review_required"
+              },
+              {
+                "type": "status_change",
+                "action": "recalculate_after_supplement",
+                "operator": "system",
+                "before_status": "review_required",
+                "after_status": "review_required",
+                "reason": "补录人工改判后重新计算",
+                "timestamp": "2026-06-13T07:43:43.200598",
+                "metadata": {},
+                "description": "system 执行 recalculate_after_supplement: review_required → review_required"
+              },
+              {
+                "type": "status_change",
+                "action": "review_duplicate",
+                "operator": "周姐",
+                "before_status": "review_required",
+                "after_status": "reviewed",
+                "reason": "周姐复核: 用户反馈的链接经人工核实确实无法访问，保留记录",
+                "timestamp": "2026-06-13T07:43:43.206704",
+                "metadata": {
+                  "keep": true,
+                  "original_issue_type": "duplicate_user_feedback",
+                  "is_duplicate_user_feedback": true
+                },
+                "description": "周姐 执行 review_duplicate: review_required → reviewed"
+              }
+            ],
+            "manual_judgments": [
+              {
+                "judge_name": "周姐",
+                "judgment_result": "确认失效",
+                "judgment_reason": "用户反馈的链接经人工核实确实无法访问，保留记录",
+                "raw_line_number": 2
+              }
+            ]
+          },
+          {
+            "record_id": "rec_68af7ec0a0c0",
+            "user_id": "U001",
+            "kb_link": "https://kb.example.com/article/1001",
+            "status": "rejected",
+            "review_by": "周姐",
+            "review_reason": "周姐复核: 同一条用户反馈被重复导入，第二条予以剔除，但保留证据用于复盘",
+            "review_timestamp": "2026-06-13T07:43:43.206762",
+            "raw_line_number": 5,
+            "import_batch_id": "batch_20260613_074343",
+            "evidence_trail": [
+              {
+                "type": "model_output",
+                "raw_line_number": 5,
+                "import_batch_id": "batch_20260613_074343",
+                "content": {
+                  "user_feedback_id": "FB001",
+                  "user_id": "U001",
+                  "kb_link": "https://kb.example.com/article/1001",
+                  "link_status": "invalid",
+                  "confidence": 0.95
+                },
+                "timestamp": "2026-06-13T07:43:43.197466",
+                "description": "模型输出原始行号: 5"
+              },
+              {
+                "type": "status_change",
+                "action": "import_model_output",
+                "operator": "system",
+                "before_status": null,
+                "after_status": "imported",
+                "reason": "从文件 model_output.csv 第5行导入模型输出",
+                "timestamp": "2026-06-13T07:43:43.197471",
+                "metadata": {
+                  "source_file": "model_output.csv",
+                  "raw_line_number": 5,
+                  "batch_id": "batch_20260613_074343",
+                  "is_reimport": false
+                },
+                "description": "system 执行 import_model_output: 初始 → imported"
+              },
+              {
+                "type": "status_change",
+                "action": "mark_duplicate_feedback",
+                "operator": "system_self_check",
+                "before_status": "imported",
+                "after_status": "review_required",
+                "reason": "检测到同一用户反馈被重复计入，共2条记录",
+                "timestamp": "2026-06-13T07:43:43.197700",
+                "metadata": {
+                  "duplicate_count": 2,
+                  "group_id": "dup_grp_g_bad183ca0e63",
+                  "user_ids": [
+                    "U001"
+                  ],
+                  "kb_links": [
+                    "https://kb.example.com/article/1001"
+                  ]
+                },
+                "description": "system_self_check 执行 mark_duplicate_feedback: imported → review_required"
+              },
+              {
+                "type": "manual_judgment",
+                "judgment_index": 1,
+                "judge_name": "周姐",
+                "judgment_result": "重复记录",
+                "judgment_reason": "同一条用户反馈被重复导入，第二条予以剔除，但保留证据用于复盘",
+                "raw_line_number": 5,
+                "timestamp": "2026-06-13T07:43:43.200429",
+                "description": "人工改判 #1: 周姐 判定为 重复记录"
+              },
+              {
+                "type": "status_change",
+                "action": "add_manual_judgment",
+                "operator": "周姐",
+                "before_status": "review_required",
+                "after_status": "review_required",
+                "reason": "补录人工改判，来自 manual_judgments.csv 第5行",
+                "timestamp": "2026-06-13T07:43:43.200441",
+                "metadata": {
+                  "source_file": "manual_judgments.csv",
+                  "raw_line_number": 5,
+                  "judgment_result": "重复记录",
+                  "judgment_reason": "同一条用户反馈被重复导入，第二条予以剔除，但保留证据用于复盘",
+                  "matched_kb_link": "https://kb.example.com/article/1001"
+                },
+                "description": "周姐 执行 add_manual_judgment: review_required → review_required"
+              },
+              {
+                "type": "status_change",
+                "action": "recalculate_after_supplement",
+                "operator": "system",
+                "before_status": "review_required",
+                "after_status": "review_required",
+                "reason": "补录人工改判后重新计算",
+                "timestamp": "2026-06-13T07:43:43.200610",
+                "metadata": {},
+                "description": "system 执行 recalculate_after_supplement: review_required → review_required"
+              },
+              {
+                "type": "status_change",
+                "action": "review_duplicate",
+                "operator": "周姐",
+                "before_status": "review_required",
+                "after_status": "rejected",
+                "reason": "周姐复核: 同一条用户反馈被重复导入，第二条予以剔除，但保留证据用于复盘",
+                "timestamp": "2026-06-13T07:43:43.206761",
+                "metadata": {
+                  "keep": false,
+                  "original_issue_type": "duplicate_user_feedback",
+                  "is_duplicate_user_feedback": true
+                },
+                "description": "周姐 执行 review_duplicate: review_required → rejected"
+              }
+            ],
+            "manual_judgments": [
+              {
+                "judge_name": "周姐",
+                "judgment_result": "重复记录",
+                "judgment_reason": "同一条用户反馈被重复导入，第二条予以剔除，但保留证据用于复盘",
+                "raw_line_number": 5
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "group_id": "dup_grp_g_fe519e4aed39",
+        "user_feedback_id": "FB002",
+        "record_count": 2,
+        "records": [
+          {
+            "record_id": "rec_158e98d96a01",
+            "user_id": "U002",
+            "kb_link": "https://kb.example.com/article/1002",
+            "status": "reviewed",
+            "review_by": "周姐",
+            "review_reason": "周姐复核: 该链接实际可以正常访问，模型误判",
+            "review_timestamp": "2026-06-13T07:43:43.206750",
+            "raw_line_number": 3,
+            "import_batch_id": "batch_20260613_074343",
+            "evidence_trail": [
+              {
+                "type": "model_output",
+                "raw_line_number": 3,
+                "import_batch_id": "batch_20260613_074343",
+                "content": {
+                  "user_feedback_id": "FB002",
+                  "user_id": "U002",
+                  "kb_link": "https://kb.example.com/article/1002",
+                  "link_status": "valid",
+                  "confidence": 0.87
+                },
+                "timestamp": "2026-06-13T07:43:43.197365",
+                "description": "模型输出原始行号: 3"
+              },
+              {
+                "type": "status_change",
+                "action": "import_model_output",
+                "operator": "system",
+                "before_status": null,
+                "after_status": "imported",
+                "reason": "从文件 model_output.csv 第3行导入模型输出",
+                "timestamp": "2026-06-13T07:43:43.197372",
+                "metadata": {
+                  "source_file": "model_output.csv",
+                  "raw_line_number": 3,
+                  "batch_id": "batch_20260613_074343",
+                  "is_reimport": false
+                },
+                "description": "system 执行 import_model_output: 初始 → imported"
+              },
+              {
+                "type": "status_change",
+                "action": "mark_duplicate_feedback",
+                "operator": "system_self_check",
+                "before_status": "imported",
+                "after_status": "review_required",
+                "reason": "检测到同一用户反馈被重复计入，共2条记录",
+                "timestamp": "2026-06-13T07:43:43.197709",
+                "metadata": {
+                  "duplicate_count": 2,
+                  "group_id": "dup_grp_g_fe519e4aed39",
+                  "user_ids": [
+                    "U002"
+                  ],
+                  "kb_links": [
+                    "https://kb.example.com/article/1006",
+                    "https://kb.example.com/article/1002"
+                  ]
+                },
+                "description": "system_self_check 执行 mark_duplicate_feedback: imported → review_required"
+              },
+              {
+                "type": "manual_judgment",
+                "judgment_index": 1,
+                "judge_name": "周姐",
+                "judgment_result": "链接有效",
+                "judgment_reason": "该链接实际可以正常访问，模型误判",
+                "raw_line_number": 3,
+                "timestamp": "2026-06-13T07:43:43.200349",
+                "description": "人工改判 #1: 周姐 判定为 链接有效"
+              },
+              {
+                "type": "status_change",
+                "action": "add_manual_judgment",
+                "operator": "周姐",
+                "before_status": "review_required",
+                "after_status": "review_required",
+                "reason": "补录人工改判，来自 manual_judgments.csv 第3行",
+                "timestamp": "2026-06-13T07:43:43.200361",
+                "metadata": {
+                  "source_file": "manual_judgments.csv",
+                  "raw_line_number": 3,
+                  "judgment_result": "链接有效",
+                  "judgment_reason": "该链接实际可以正常访问，模型误判",
+                  "matched_kb_link": "https://kb.example.com/article/1002"
+                },
+                "description": "周姐 执行 add_manual_judgment: review_required → review_required"
+              },
+              {
+                "type": "status_change",
+                "action": "recalculate_after_supplement",
+                "operator": "system",
+                "before_status": "review_required",
+                "after_status": "review_required",
+                "reason": "补录人工改判后重新计算",
+                "timestamp": "2026-06-13T07:43:43.200602",
+                "metadata": {},
+                "description": "system 执行 recalculate_after_supplement: review_required → review_required"
+              },
+              {
+                "type": "status_change",
+                "action": "review_duplicate",
+                "operator": "周姐",
+                "before_status": "review_required",
+                "after_status": "reviewed",
+                "reason": "周姐复核: 该链接实际可以正常访问，模型误判",
+                "timestamp": "2026-06-13T07:43:43.206747",
+                "metadata": {
+                  "keep": true,
+                  "original_issue_type": "duplicate_user_feedback",
+                  "is_duplicate_user_feedback": true
+                },
+                "description": "周姐 执行 review_duplicate: review_required → reviewed"
+              }
+            ],
+            "manual_judgments": [
+              {
+                "judge_name": "周姐",
+                "judgment_result": "链接有效",
+                "judgment_reason": "该链接实际可以正常访问，模型误判",
+                "raw_line_number": 3
+              }
+            ]
+          },
+          {
+            "record_id": "rec_d835324c3c40",
+            "user_id": "U002",
+            "kb_link": "https://kb.example.com/article/1006",
+            "status": "reviewed",
+            "review_by": "周姐",
+            "review_reason": "周姐复核: 虽然是同一用户反馈，但对应不同的KB链接，两条都保留",
+            "review_timestamp": "2026-06-13T07:43:43.206768",
+            "raw_line_number": 8,
+            "import_batch_id": "batch_20260613_074343",
+            "evidence_trail": [
+              {
+                "type": "model_output",
+                "raw_line_number": 8,
+                "import_batch_id": "batch_20260613_074343",
+                "content": {
+                  "user_feedback_id": "FB002",
+                  "user_id": "U002",
+                  "kb_link": "https://kb.example.com/article/1006",
+                  "link_status": "invalid",
+                  "confidence": 0.88
+                },
+                "timestamp": "2026-06-13T07:43:43.197604",
+                "description": "模型输出原始行号: 8"
+              },
+              {
+                "type": "status_change",
+                "action": "import_model_output",
+                "operator": "system",
+                "before_status": null,
+                "after_status": "imported",
+                "reason": "从文件 model_output.csv 第8行导入模型输出",
+                "timestamp": "2026-06-13T07:43:43.197609",
+                "metadata": {
+                  "source_file": "model_output.csv",
+                  "raw_line_number": 8,
+                  "batch_id": "batch_20260613_074343",
+                  "is_reimport": false
+                },
+                "description": "system 执行 import_model_output: 初始 → imported"
+              },
+              {
+                "type": "status_change",
+                "action": "mark_duplicate_feedback",
+                "operator": "system_self_check",
+                "before_status": "imported",
+                "after_status": "review_required",
+                "reason": "检测到同一用户反馈被重复计入，共2条记录",
+                "timestamp": "2026-06-13T07:43:43.197714",
+                "metadata": {
+                  "duplicate_count": 2,
+                  "group_id": "dup_grp_g_fe519e4aed39",
+                  "user_ids": [
+                    "U002"
+                  ],
+                  "kb_links": [
+                    "https://kb.example.com/article/1006",
+                    "https://kb.example.com/article/1002"
+                  ]
+                },
+                "description": "system_self_check 执行 mark_duplicate_feedback: imported → review_required"
+              },
+              {
+                "type": "manual_judgment",
+                "judgment_index": 1,
+                "judge_name": "周姐",
+                "judgment_result": "不同链接",
+                "judgment_reason": "虽然是同一用户反馈，但对应不同的KB链接，两条都保留",
+                "raw_line_number": 8,
+                "timestamp": "2026-06-13T07:43:43.200540",
+                "description": "人工改判 #1: 周姐 判定为 不同链接"
+              },
+              {
+                "type": "status_change",
+                "action": "add_manual_judgment",
+                "operator": "周姐",
+                "before_status": "review_required",
+                "after_status": "review_required",
+                "reason": "补录人工改判，来自 manual_judgments.csv 第8行",
+                "timestamp": "2026-06-13T07:43:43.200551",
+                "metadata": {
+                  "source_file": "manual_judgments.csv",
+                  "raw_line_number": 8,
+                  "judgment_result": "不同链接",
+                  "judgment_reason": "虽然是同一用户反馈，但对应不同的KB链接，两条都保留",
+                  "matched_kb_link": "https://kb.example.com/article/1006"
+                },
+                "description": "周姐 执行 add_manual_judgment: review_required → review_required"
+              },
+              {
+                "type": "status_change",
+                "action": "recalculate_after_supplement",
+                "operator": "system",
+                "before_status": "review_required",
+                "after_status": "review_required",
+                "reason": "补录人工改判后重新计算",
+                "timestamp": "2026-06-13T07:43:43.200621",
+                "metadata": {},
+                "description": "system 执行 recalculate_after_supplement: review_required → review_required"
+              },
+              {
+                "type": "status_change",
+                "action": "review_duplicate",
+                "operator": "周姐",
+                "before_status": "review_required",
+                "after_status": "reviewed",
+                "reason": "周姐复核: 虽然是同一用户反馈，但对应不同的KB链接，两条都保留",
+                "timestamp": "2026-06-13T07:43:43.206768",
+                "metadata": {
+                  "keep": true,
+                  "original_issue_type": "duplicate_user_feedback",
+                  "is_duplicate_user_feedback": true
+                },
+                "description": "周姐 执行 review_duplicate: review_required → reviewed"
+              }
+            ],
+            "manual_judgments": [
+              {
+                "judge_name": "周姐",
+                "judgment_result": "不同链接",
+                "judgment_reason": "虽然是同一用户反馈，但对应不同的KB链接，两条都保留",
+                "raw_line_number": 8
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "note": "所有重复用户反馈记录保留完整证据链，可通过record_id或group_id查看周姐当时保留/拒绝的理由",
+    "end_time": "2026-06-13 07:43:43.206902"
+  }
+]
