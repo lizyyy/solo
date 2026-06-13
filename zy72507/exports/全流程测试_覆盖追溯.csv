@@ -1,0 +1,3 @@
+﻿comment_id,store_id,status_code,status,original_line_no,annotator_source_file,annotator_content,annotator_sentiment,fragment_text,model_sentiment,old_sentiment,new_sentiment,current_sentiment,adjusted_by,adjusted_at,note,overridden,overridden_by,overridden_at
+CMT_10002,S001,reviewed,安全审核已复核,2,标注员留言_第一批_20260601.csv,这家店人太多了，排队排了整整两个小时，进去之后环境也很嘈杂，说话都听不清，菜量还偏小，性价比一般。,负面,排队两个小时，环境嘈杂，菜量偏小,中性,中性,负面,负面,老唐,2026-06-12 23:45:16,现场说法：标注员行2判断正确，模型置信度仅0.68，采信标注,是,批跑任务_v2.2_20260607,2026-06-12 23:45:16
+CMT_10004,S001,reviewed,安全审核已复核,4,标注员留言_第一批_20260601.csv,超级难吃！点的招牌烤鱼又腥又咸，找了店员也只是说就是这个味道，态度非常不好，再也不会来了！,负面,超级难吃，烤鱼又腥又咸，店员态度不好,正面,正面,负面,负面,老唐,2026-06-12 23:45:16,现场说法：标注员行4判断正确，模型置信度仅0.55，采信标注,是,批跑任务_v2.2_20260607,2026-06-12 23:45:16
