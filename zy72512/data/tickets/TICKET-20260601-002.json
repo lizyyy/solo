@@ -12,16 +12,22 @@
       "mask_pattern": null,
       "ocr_confidence": 0.96,
       "leak_detected": false,
-      "leak_note": null
+      "leak_note": null,
+      "last_reviewed_by": null,
+      "last_reviewed_at": null,
+      "missing_materials": []
     },
     {
       "field_name": "seller_bank_account",
-      "field_value": "6222021234567890123",
-      "is_masked": false,
-      "mask_pattern": null,
+      "field_value": "6222********0123",
+      "is_masked": true,
+      "mask_pattern": "6222********0123",
       "ocr_confidence": 0.65,
       "leak_detected": false,
-      "leak_note": null
+      "leak_note": null,
+      "last_reviewed_by": null,
+      "last_reviewed_at": null,
+      "missing_materials": []
     },
     {
       "field_name": "seller_name",
@@ -30,24 +36,33 @@
       "mask_pattern": null,
       "ocr_confidence": 0.93,
       "leak_detected": false,
-      "leak_note": null
+      "leak_note": null,
+      "last_reviewed_by": null,
+      "last_reviewed_at": null,
+      "missing_materials": []
     },
     {
       "field_name": "contact_email",
-      "field_value": "contact@example.com",
-      "is_masked": false,
-      "mask_pattern": null,
+      "field_value": "cont********.com",
+      "is_masked": true,
+      "mask_pattern": "cont********.com",
       "ocr_confidence": 0.88,
       "leak_detected": false,
-      "leak_note": null
+      "leak_note": null,
+      "last_reviewed_by": null,
+      "last_reviewed_at": null,
+      "missing_materials": []
     }
   ],
   "status": "imported",
   "assignee": null,
   "rule_notes": [],
   "algorithm_notes": [],
-  "export_history": [],
+  "export_history": [
+    "EXPORT-20260613-E98E2B52"
+  ],
   "ocr_confidence_score": 0.85,
-  "updated_at": "2026-06-07T12:16:31.262521",
+  "updated_at": "2026-06-13T07:46:40.434360",
+  "change_logs": [],
   "metadata": {}
 }

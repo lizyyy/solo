@@ -1,7 +1,7 @@
 {
-  "export_id": "EXPORT-20260607-2D9CE2BE",
+  "export_id": "EXPORT-20260613-3CCF0812",
   "ticket_id": "TICKET-20260601-001",
-  "generated_at": "2026-06-07T12:17:41.583847",
+  "generated_at": "2026-06-13T07:48:26.581484",
   "generated_by": "system",
   "fields": [
     {
@@ -28,14 +28,14 @@
     },
     {
       "field_name": "buyer_phone",
-      "original_value": "13812345678",
+      "original_value": "138*********5678",
       "masked_value": "138*********5678",
       "is_masked": true,
       "mask_rule_applied": "中国大陆手机号脱敏",
-      "leak_risk": "high",
-      "explanation": "该字段检测到敏感数据但未完成复核。检测到phone泄露: 应使用规则 中国大陆手机号脱敏 进行脱敏",
-      "next_step": "请运营老唐补充脱敏规则备注，确认后再导出",
-      "responsible_role": "operation"
+      "leak_risk": "none",
+      "explanation": "该字段检测到敏感数据泄露风险，已由人工复核并标记处理，脱敏已生效",
+      "next_step": "已完成复核处理，可确认导出",
+      "responsible_role": ""
     },
     {
       "field_name": "buyer_tax_id",
@@ -61,14 +61,14 @@
     },
     {
       "field_name": "seller_phone",
-      "original_value": "联系电话: 13987654321",
+      "original_value": "联系电话********4321",
       "masked_value": "联系电话********4321",
       "is_masked": true,
       "mask_rule_applied": "中国大陆手机号脱敏",
-      "leak_risk": "high",
-      "explanation": "该字段检测到敏感数据但未完成复核。检测到phone泄露: 应使用规则 中国大陆手机号脱敏 进行脱敏",
-      "next_step": "请运营老唐补充脱敏规则备注，确认后再导出",
-      "responsible_role": "operation"
+      "leak_risk": "none",
+      "explanation": "该字段检测到敏感数据泄露风险，已由人工复核并标记处理，脱敏已生效",
+      "next_step": "已完成复核处理，可确认导出",
+      "responsible_role": ""
     }
   ],
   "status": "generated",
@@ -76,15 +76,15 @@
   "summary": {
     "total_fields": 6,
     "masked_fields": 2,
-    "leak_fields": 2,
+    "leak_fields": 0,
     "needs_algorithm": 0,
-    "needs_operation": 2,
-    "ticket_status": "detected_leak"
+    "needs_operation": 0,
+    "ticket_status": "reviewed_by_operation"
   },
   "output_paths": {
-    "json": "output/EXPORT-20260607-2D9CE2BE_data.json",
-    "report": "output/EXPORT-20260607-2D9CE2BE_report.txt",
-    "summary": "output/EXPORT-20260607-2D9CE2BE_summary.txt"
+    "json": "output/EXPORT-20260613-3CCF0812_data.json",
+    "report": "output/EXPORT-20260613-3CCF0812_report.txt",
+    "summary": "output/EXPORT-20260613-3CCF0812_summary.txt"
   },
   "mask_version": "1.0",
   "metadata": {}

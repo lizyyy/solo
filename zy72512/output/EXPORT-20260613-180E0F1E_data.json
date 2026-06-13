@@ -1,0 +1,107 @@
+{
+  "export_id": "EXPORT-20260613-180E0F1E",
+  "ticket_id": "TICKET-20260601-003",
+  "generated_at": "2026-06-13T07:46:40.436942",
+  "generated_by": "demo",
+  "status": "generated",
+  "summary": {
+    "total_fields": 4,
+    "masked_fields": 0,
+    "leak_fields": 1,
+    "needs_algorithm": 0,
+    "needs_operation": 1,
+    "ticket_status": "reviewed_by_operation"
+  },
+  "fields": [
+    {
+      "field_name": "invoice_number",
+      "value": "11223344",
+      "is_masked": false,
+      "leak_risk": "none",
+      "explanation": "该字段未检测到敏感数据，无需脱敏",
+      "next_step": "可直接导出",
+      "responsible_role": ""
+    },
+    {
+      "field_name": "buyer_id_card",
+      "value": "1101********1234",
+      "is_masked": false,
+      "leak_risk": "none",
+      "explanation": "该字段未检测到敏感数据，无需脱敏",
+      "next_step": "可直接导出",
+      "responsible_role": ""
+    },
+    {
+      "field_name": "buyer_phone",
+      "value": "135****2222",
+      "is_masked": false,
+      "leak_risk": "none",
+      "explanation": "该字段未检测到敏感数据，无需脱敏",
+      "next_step": "可直接导出",
+      "responsible_role": "",
+      "last_reviewed_by": "老唐",
+      "last_reviewed_at": "2026-06-13T07:46:40.436401",
+      "change_history": [
+        {
+          "change_id": "CHG-97172A7C",
+          "change_type": "rule_note_added",
+          "timestamp": "2026-06-13T07:46:40.436413",
+          "author": "老唐"
+        }
+      ]
+    },
+    {
+      "field_name": "remarks",
+      "value": "客户备注********11确认",
+      "is_masked": false,
+      "leak_risk": "high",
+      "explanation": "该字段检测到敏感数据但未完成复核。检测到phone泄露: 字段 'remarks' 不在现有手机号脱敏规则的适用范围内，需要补充规则",
+      "next_step": "请运营老唐补充脱敏规则备注，确认后再导出",
+      "responsible_role": "operation"
+    }
+  ],
+  "export_history": [],
+  "change_logs": [
+    {
+      "change_id": "CHG-E7A7B2B6",
+      "change_type": "status_changed",
+      "author": "system",
+      "field_name": null,
+      "timestamp": "2026-06-13T07:46:40.434908",
+      "old_value_summary": "imported",
+      "new_value_summary": "detected_leak",
+      "affected_exports": [],
+      "note": "assignee=operation"
+    },
+    {
+      "change_id": "CHG-97172A7C",
+      "change_type": "rule_note_added",
+      "author": "老唐",
+      "field_name": "buyer_phone",
+      "timestamp": "2026-06-13T07:46:40.436413",
+      "old_value_summary": "masked=True",
+      "new_value_summary": "masked=True",
+      "affected_exports": [],
+      "note": "已补充脱敏规则，该字段需按手机号规则遮蔽"
+    },
+    {
+      "change_id": "CHG-95846E30",
+      "change_type": "status_changed",
+      "author": "system",
+      "field_name": null,
+      "timestamp": "2026-06-13T07:46:40.436426",
+      "old_value_summary": "detected_leak",
+      "new_value_summary": "reviewed_by_operation",
+      "affected_exports": [],
+      "note": null
+    }
+  ],
+  "traceability": {
+    "report_file": "output/EXPORT-20260613-180E0F1E_report.txt",
+    "summary_file": "output/EXPORT-20260613-180E0F1E_summary.txt",
+    "data_file": "output/EXPORT-20260613-180E0F1E_data.json",
+    "storage_file": "data/exports/EXPORT-20260613-180E0F1E.json",
+    "ticket_file": "data/tickets/TICKET-20260601-003.json"
+  },
+  "audit_notes": []
+}

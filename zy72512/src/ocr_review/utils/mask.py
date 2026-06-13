@@ -43,6 +43,9 @@ def mask_email(email: str) -> str:
 def mask_text(text: str) -> str:
     if not text:
         return text
+    has, _ = has_sensitive_data(text)
+    if not has:
+        return text
     result = mask_phone(text)
     result = mask_id_card(result)
     result = mask_bank_card(result)

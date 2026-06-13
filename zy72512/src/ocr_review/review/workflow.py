@@ -248,8 +248,16 @@ class ReviewWorkflow:
         for status in statuses:
             tickets.extend(self.store.list_tickets(status=status))
 
-        return [
-            {
+        result = []
+        for t in tickets:
+            missing = []
+            for f in t.fields:
+                if f.leak_detected and not f.last_reviewed_by:
+                    if f.ocr_confidence and f.ocr_confidence < 0.7:
+                        missing.append(f"{f.field_name}需OCR二次校验")
+                    if not f.mask_pattern:
+                        missing.append(f"{f.field_name}需脱敏规则配置")
+            result.append({
                 "ticket_id": t.ticket_id,
                 "title": t.title,
                 "status": t.status.value,
@@ -258,6 +266,6 @@ class ReviewWorkflow:
                 "leak_count": len(t.get_leaking_fields()),
                 "created_at": t.created_at.isoformat(),
                 "ocr_confidence": t.ocr_confidence_score,
-            }
-            for t in tickets
-        ]
+                "missing_materials": missing,
+            })
+        return result

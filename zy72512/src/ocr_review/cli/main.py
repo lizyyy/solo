@@ -114,7 +114,10 @@ def cmd_review(args):
         else:
             print(f"📋 待运营老唐处理的工单 ({len(tickets)}):")
             for t in tickets:
-                print(f"   [{t['ticket_id']}] {t['title']} - 泄露字段: {t['leak_count']}")
+                missing_info = ""
+                if t.get("missing_materials"):
+                    missing_info = f" - 还缺: {', '.join(t['missing_materials'])}"
+                print(f"   [{t['ticket_id']}] {t['title']} - 泄露字段: {t['leak_count']}{missing_info}")
         return
 
     if not args.ticket_id:
@@ -127,10 +130,24 @@ def cmd_review(args):
         notes = [{"field_name": None, "note": args.note or "运营已查看，需补充脱敏规则"}]
 
     result = workflow.operation_review(args.ticket_id, notes, reviewer="老唐")
+
+    ticket = store.load_ticket(args.ticket_id)
+    if args.set_missing:
+        missing_map = json.loads(args.set_missing)
+        for field_name, materials in missing_map.items():
+            ticket.set_missing_materials(field_name, materials, author="老唐")
+        store.save_ticket(ticket)
+        print(f"   ✅ 已更新 {len(missing_map)} 个字段的缺材料清单")
+
     print(f"\n📝 复核结果:")
     print(f"   工单: {result.ticket_id}")
     print(f"   状态: {result.previous_status.value} → {result.new_status.value}")
     print(f"   消息: {result.message}")
+    if ticket.change_logs:
+        latest = ticket.change_logs[-1]
+        print(f"   变更ID: {latest.change_id} ({latest.change_type})")
+        if latest.affected_exports:
+            print(f"   影响导出: {', '.join(latest.affected_exports)}")
 
 
 def cmd_algorithm(args):
@@ -314,6 +331,7 @@ def build_parser():
     p_review.add_argument("--ticket-id", help="工单ID")
     p_review.add_argument("--note", help="备注内容")
     p_review.add_argument("--notes", help="JSON格式的备注数组")
+    p_review.add_argument("--set-missing", help="JSON格式的缺材料补录，如 {\"buyer_phone\":[\"脱敏规则截图\",\"审批单\"]}")
     p_review.set_defaults(func=cmd_review)
 
     # algorithm (算法)

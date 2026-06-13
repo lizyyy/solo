@@ -60,7 +60,7 @@ class ExportManager:
 
         self.store.save_export(export)
 
-        json_path = self._write_json(export)
+        json_path = self._write_json(export, ticket)
         report_path = self._write_report(export, ticket)
         summary_path = self._write_summary(export, ticket)
 
@@ -91,7 +91,8 @@ class ExportManager:
 
         for field in ticket.fields:
             masked_value = self._apply_mask(field, active_rules, ticket)
-            is_masked = masked_value != field.field_value
+            value_changed = masked_value != field.field_value
+            is_masked = field.is_masked or value_changed
 
             has_human_note = self._has_human_review_note(field.field_name, ticket)
 
@@ -159,7 +160,26 @@ class ExportManager:
                 return rule.rule_name
         return None
 
+    def _determine_missing_materials(self, field: TicketField, has_human_note: bool) -> List[str]:
+        if not field.leak_detected or has_human_note:
+            return []
+        missing = []
+        if field.ocr_confidence and field.ocr_confidence < 0.7:
+            missing.append("OCR识别结果人工二次校验")
+            missing.append("OCR模型参数调整建议")
+        if not field.mask_pattern:
+            missing.append("脱敏规则配置（字段级pattern）")
+        if not field.leak_note:
+            missing.append("运营/算法补充的复核备注")
+        if field.missing_materials:
+            for m in field.missing_materials:
+                if m not in missing:
+                    missing.append(m)
+        return missing
+
     def _build_field_explanation(self, field: TicketField, is_masked: bool, masked_value: str, has_human_note: bool):
+        missing = self._determine_missing_materials(field, has_human_note)
+
         if field.leak_detected:
             if has_human_note:
                 explanation = "该字段检测到敏感数据泄露风险，已由人工复核并标记处理"
@@ -173,12 +193,16 @@ class ExportManager:
                         f"该字段检测到敏感数据但未完成复核。OCR置信度较低({field.ocr_confidence:.2f})，"
                         f"可能存在识别偏差。{field.leak_note or '需确认是否为真实手机号。'}"
                     )
+                    if missing:
+                        explanation += f" 还缺: {', '.join(missing)}"
                     next_step = "留给算法同事复核OCR识别准确性，确认后再进行脱敏处理"
                     responsible = "algorithm"
                 else:
                     explanation = (
                         f"该字段检测到敏感数据但未完成复核。{field.leak_note or '检测到手机号等敏感信息。'}"
                     )
+                    if missing:
+                        explanation += f" 还缺: {', '.join(missing)}"
                     next_step = "请运营老唐补充脱敏规则备注，确认后再导出"
                     responsible = "operation"
         else:
@@ -198,11 +222,58 @@ class ExportManager:
 
         return explanation, next_step, responsible
 
-    def _write_json(self, export: ExportRecord) -> str:
+    def _write_json(self, export: ExportRecord, ticket: Ticket) -> str:
         path = self.output_dir / f"{export.export_id}_data.json"
 
         def sanitize_value(value: str) -> str:
             return mask_text(value)
+
+        field_map = {f.field_name: f for f in ticket.fields}
+
+        fields_data = []
+        for f in export.fields:
+            tf = field_map.get(f.field_name)
+            field_entry = {
+                "field_name": f.field_name,
+                "value": sanitize_value(f.masked_value) if f.is_masked else sanitize_value(f.original_value),
+                "is_masked": f.is_masked,
+                "leak_risk": f.leak_risk,
+                "explanation": f.explanation,
+                "next_step": f.next_step,
+                "responsible_role": f.responsible_role,
+            }
+            if tf and tf.missing_materials:
+                field_entry["missing_materials"] = list(tf.missing_materials)
+            if tf and tf.last_reviewed_by:
+                field_entry["last_reviewed_by"] = tf.last_reviewed_by
+                field_entry["last_reviewed_at"] = tf.last_reviewed_at
+            relevant_changes = [
+                {
+                    "change_id": log.change_id,
+                    "change_type": log.change_type,
+                    "timestamp": log.timestamp,
+                    "author": log.author,
+                }
+                for log in ticket.change_logs
+                if log.field_name == f.field_name
+            ]
+            if relevant_changes:
+                field_entry["change_history"] = relevant_changes
+            fields_data.append(field_entry)
+
+        change_logs_data = []
+        for log in ticket.change_logs:
+            change_logs_data.append({
+                "change_id": log.change_id,
+                "change_type": log.change_type,
+                "author": log.author,
+                "field_name": log.field_name,
+                "timestamp": log.timestamp,
+                "old_value_summary": log.old_value_summary,
+                "new_value_summary": log.new_value_summary,
+                "affected_exports": list(log.affected_exports),
+                "note": log.note,
+            })
 
         data = {
             "export_id": export.export_id,
@@ -211,18 +282,16 @@ class ExportManager:
             "generated_by": export.generated_by,
             "status": export.status.value,
             "summary": export.summary,
-            "fields": [
-                {
-                    "field_name": f.field_name,
-                    "value": sanitize_value(f.masked_value) if f.is_masked else sanitize_value(f.original_value),
-                    "is_masked": f.is_masked,
-                    "leak_risk": f.leak_risk,
-                    "explanation": f.explanation,
-                    "next_step": f.next_step,
-                    "responsible_role": f.responsible_role,
-                }
-                for f in export.fields
-            ],
+            "fields": fields_data,
+            "export_history": list(ticket.export_history),
+            "change_logs": change_logs_data,
+            "traceability": {
+                "report_file": f"output/{export.export_id}_report.txt",
+                "summary_file": f"output/{export.export_id}_summary.txt",
+                "data_file": f"output/{export.export_id}_data.json",
+                "storage_file": f"data/exports/{export.export_id}.json",
+                "ticket_file": f"data/tickets/{ticket.ticket_id}.json",
+            },
             "audit_notes": export.audit_notes,
         }
 
@@ -292,6 +361,50 @@ class ExportManager:
                 field_info = f" (字段: {note['field_name']})" if note.get('field_name') else ""
                 lines.append(f"  [{note['timestamp']}] {note['author']}{field_info}: {note['note']}")
             lines.append("")
+
+        if ticket.change_logs:
+            lines.append("-" * 70)
+            lines.append("变更历史（谁改了什么、影响了哪条导出）")
+            lines.append("-" * 70)
+            for log in ticket.change_logs:
+                type_map = {
+                    "status_changed": "状态变更",
+                    "rule_note_added": "运营备注",
+                    "algorithm_note_added": "算法备注",
+                    "missing_materials_updated": "缺材料更新",
+                    "leak_detected": "泄露检测",
+                }
+                type_display = type_map.get(log.change_type, log.change_type)
+                field_info = f" → 字段 {log.field_name}" if log.field_name else " → 工单级别"
+                affected = f"（影响导出: {', '.join(log.affected_exports)}）" if log.affected_exports else ""
+                lines.append(f"  [{log.change_id}] {type_display}{field_info}")
+                lines.append(f"      时间: {log.timestamp}")
+                lines.append(f"      操作人: {log.author}")
+                lines.append(f"      变化: {log.old_value_summary} → {log.new_value_summary}")
+                if log.note:
+                    lines.append(f"      备注: {log.note}")
+                if affected:
+                    lines.append(f"      追溯 {affected}")
+                lines.append("")
+
+        if ticket.export_history:
+            lines.append("-" * 70)
+            lines.append("导出历史（与报告中导出ID一一对应）")
+            lines.append("-" * 70)
+            for eid in ticket.export_history:
+                marker = " ← 本报告" if eid == export.export_id else ""
+                lines.append(f"  • {eid}{marker}")
+            lines.append("")
+
+        lines.append("-" * 70)
+        lines.append("导出追溯链接（导出文件 ↔ 报告 ↔ 看板 使用同一ID）")
+        lines.append("-" * 70)
+        lines.append(f"  数据文件: output/{export.export_id}_data.json")
+        lines.append(f"  详细报告: output/{export.export_id}_report.txt")
+        lines.append(f"  快速摘要: output/{export.export_id}_summary.txt")
+        lines.append(f"  看板数据: data/exports/{export.export_id}.json")
+        lines.append(f"  工单记录: data/tickets/{ticket.ticket_id}.json")
+        lines.append("")
 
         lines.append("=" * 70)
         lines.append("报告结束")

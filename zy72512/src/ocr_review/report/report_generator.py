@@ -111,17 +111,91 @@ class ReportGenerator:
     def generate_html_report(self) -> str:
         dashboard = self.generate_dashboard()
         tickets = self.store.list_tickets()
+        exports = self.store.list_exports()
+        export_map = {}
+        for e in exports:
+            if e.ticket_id not in export_map:
+                export_map[e.ticket_id] = []
+            export_map[e.ticket_id].append(e)
         report_id = f"REPORT-{datetime.now().strftime('%Y%m%d')}-{uuid.uuid4().hex[:8].upper()}"
         path = self.output_dir / f"{report_id}_dashboard.html"
 
-        html = self._build_html(dashboard, tickets, report_id)
+        html = self._build_html(dashboard, tickets, export_map, report_id)
 
         with open(path, "w", encoding="utf-8") as f:
             f.write(html)
 
         return str(path)
 
-    def _build_html(self, dashboard: DashboardData, tickets: List[Ticket], report_id: str) -> str:
+    def _build_ticket_detail_json(self, tickets: List[Ticket], export_map: Dict[str, List]) -> str:
+        result = {}
+        for ticket in tickets:
+            ticket_exports = export_map.get(ticket.ticket_id, [])
+            ticket_export_info = []
+            for e in sorted(ticket_exports, key=lambda x: x.generated_at, reverse=True):
+                ticket_export_info.append({
+                    "export_id": e.export_id,
+                    "generated_at": e.generated_at.strftime('%Y-%m-%d %H:%M:%S'),
+                    "summary": e.summary,
+                    "report_file": f"{e.export_id}_report.txt",
+                    "data_file": f"{e.export_id}_data.json",
+                })
+            fields_info = []
+            for f in ticket.fields:
+                display_value = f.get_display_value() if hasattr(f, "get_display_value") else (f.mask_pattern if f.is_masked and f.mask_pattern else f.field_value)
+                has_sensitive, _ = hasattr(self, "_dummy") and (False, []) or (False, [])
+                fields_info.append({
+                    "field_name": f.field_name,
+                    "value": mask_text(display_value),
+                    "is_masked": f.is_masked,
+                    "leak_detected": f.leak_detected,
+                    "leak_risk": f.leak_detected and ("high" if not (f.last_reviewed_by) else "none") or "none",
+                    "ocr_confidence": f.ocr_confidence,
+                    "leak_note": mask_text(f.leak_note) if f.leak_note else None,
+                    "missing_materials": list(getattr(f, "missing_materials", []) or []),
+                    "last_reviewed_by": getattr(f, "last_reviewed_by", None),
+                    "last_reviewed_at": getattr(f, "last_reviewed_at", None),
+                })
+            changes_info = []
+            for log in ticket.change_logs:
+                type_map = {
+                    "status_changed": "状态变更",
+                    "rule_note_added": "运营备注",
+                    "algorithm_note_added": "算法备注",
+                    "missing_materials_updated": "缺材料更新",
+                    "leak_detected": "泄露检测",
+                }
+                changes_info.append({
+                    "change_id": log.change_id,
+                    "change_type": type_map.get(log.change_type, log.change_type),
+                    "field_name": log.field_name,
+                    "author": log.author,
+                    "timestamp": log.timestamp,
+                    "old_value": log.old_value_summary,
+                    "new_value": log.new_value_summary,
+                    "note": mask_text(log.note) if log.note else None,
+                    "affected_exports": list(log.affected_exports),
+                })
+            result[ticket.ticket_id] = {
+                "ticket_id": ticket.ticket_id,
+                "title": mask_text(ticket.title),
+                "source": ticket.source,
+                "status": ticket.status.value,
+                "assignee": ticket.assignee,
+                "description": mask_text(ticket.description),
+                "fields": fields_info,
+                "rule_notes": [
+                    {**n, "note": mask_text(n["note"])} for n in ticket.rule_notes
+                ],
+                "algorithm_notes": [
+                    {**n, "note": mask_text(n["note"])} for n in ticket.algorithm_notes
+                ],
+                "change_logs": changes_info,
+                "export_history": ticket_export_info,
+            }
+        return json.dumps(result, ensure_ascii=False)
+
+    def _build_html(self, dashboard: DashboardData, tickets: List[Ticket], export_map: Dict[str, List], report_id: str) -> str:
         ticket_rows = []
         for ticket in tickets[:20]:
             leak_count = len(ticket.get_leaking_fields())
@@ -134,11 +208,14 @@ class ReportGenerator:
                 "resolved": "#10b981",
                 "closed": "#6b7280",
             }.get(ticket.status.value, "#6b7280")
+            latest_exports = export_map.get(ticket.ticket_id, [])
+            latest_export = sorted(latest_exports, key=lambda x: x.generated_at, reverse=True)[0] if latest_exports else None
+            latest_export_link = f'<br><span class="text-xs text-blue-500 font-mono">→ {latest_export.export_id}</span>' if latest_export else ""
 
             ticket_rows.append(f"""
             <tr class="hover:bg-gray-50 cursor-pointer" onclick="showTicketDetail('{ticket.ticket_id}')">
                 <td class="px-4 py-3 text-sm font-mono text-blue-600">{ticket.ticket_id}</td>
-                <td class="px-4 py-3 text-sm">{mask_text(ticket.title)}</td>
+                <td class="px-4 py-3 text-sm">{mask_text(ticket.title)}{latest_export_link}</td>
                 <td class="px-4 py-3">
                     <span class="px-2 py-1 text-xs rounded-full text-white" style="background-color: {status_color}">
                         {ticket.status.value}
@@ -269,14 +346,29 @@ class ReportGenerator:
             <h3 class="font-semibold text-blue-800 mb-2">📖 说明</h3>
             <ul class="text-sm text-blue-700 space-y-1">
                 <li>• <strong>点到工单</strong>：点击任意工单可追溯到原始线上反馈工单和脱敏规则备注</li>
+                <li>• <strong>点到字段</strong>：点击字段行可跳转对应的脱敏导出报告（EXPORT-xxxx）</li>
                 <li>• <strong>泄露风险</strong>：手机号等敏感数据未脱敏时会被标记为高风险，不自动归为"正常"</li>
+                <li>• <strong>还缺什么材料</strong>：未复核字段会明确列出缺失的补录项</li>
+                <li>• <strong>变更追溯</strong>：可查看谁改了什么、影响了哪条导出</li>
                 <li>• <strong>责任分工</strong>：OCR置信度低的找<strong>算法同事</strong>，规则配置问题找<strong>运营老唐</strong></li>
                 <li>• <strong>脱敏复查</strong>：本报告所有输出均已自动脱敏，不会留存原始手机号</li>
             </ul>
         </div>
     </main>
 
+    <!-- 工单详情模态框 -->
+    <div id="ticketModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col">
+            <div class="px-6 py-4 border-b flex items-center justify-between">
+                <h2 id="modalTitle" class="text-lg font-bold text-gray-800">工单详情</h2>
+                <button onclick="closeTicketDetail()" class="text-gray-500 hover:text-gray-800 text-2xl leading-none">&times;</button>
+            </div>
+            <div id="modalBody" class="overflow-y-auto p-6 flex-1"></div>
+        </div>
+    </div>
+
     <script>
+        var ALL_TICKET_DATA = {self._build_ticket_detail_json(tickets, export_map)};
         // 状态饼图
         var statusChart = echarts.init(document.getElementById('statusChart'));
         statusChart.setOption({{
@@ -338,8 +430,114 @@ class ReportGenerator:
             ]
         }});
 
+        function closeTicketDetail() {{
+            document.getElementById('ticketModal').classList.add('hidden');
+        }}
+
         function showTicketDetail(ticketId) {{
-            alert('正在打开工单: ' + ticketId + '\\n\\n实际场景中会跳转到: 线上反馈工单系统 / 脱敏规则配置页面');
+            var t = ALL_TICKET_DATA[ticketId];
+            if (!t) {{
+                alert('未找到工单: ' + ticketId);
+                return;
+            }}
+            document.getElementById('modalTitle').textContent = t.ticket_id + ' - ' + t.title;
+
+            var html = '';
+            html += '<div class="mb-4">';
+            html += '<div class="text-sm text-gray-600">来源: <strong>' + t.source + '</strong> | 状态: <strong>' + t.status + '</strong> | 指派人: <strong>' + (t.assignee || '未指定') + '</strong></div>';
+            if (t.description) {{
+                html += '<div class="mt-2 text-sm bg-gray-50 p-3 rounded">' + t.description + '</div>';
+            }}
+            html += '</div>';
+
+            html += '<h3 class="font-semibold text-gray-800 mb-2 mt-4">📋 字段明细（点击跳转到最新导出报告）</h3>';
+            html += '<div class="overflow-x-auto border rounded-lg mb-4">';
+            html += '<table class="w-full text-sm"><thead class="bg-gray-100"><tr>';
+            html += '<th class="px-3 py-2 text-left">字段</th><th class="px-3 py-2 text-left">导出值</th>';
+            html += '<th class="px-3 py-2 text-left">泄露</th><th class="px-3 py-2 text-left">OCR置信度</th>';
+            html += '<th class="px-3 py-2 text-left">还缺什么材料</th><th class="px-3 py-2 text-left">复核人</th>';
+            html += '</tr></thead><tbody>';
+            t.fields.forEach(function(f) {{
+                var riskColor = f.leak_risk === 'high' ? '#dc2626' : (f.leak_risk === 'medium' ? '#f59e0b' : '#16a34a');
+                var riskTxt = f.leak_risk === 'none' ? '无' : (f.leak_risk || '无');
+                var missingHtml = (f.missing_materials && f.missing_materials.length > 0)
+                    ? '<span class="text-orange-600 text-xs">' + f.missing_materials.join('<br>') + '</span>'
+                    : '<span class="text-green-600 text-xs">齐全</span>';
+                html += '<tr class="border-t hover:bg-blue-50 cursor-pointer" onclick="jumpToLatestExport(\\'' + ticketId + '\\', \\'' + f.field_name + '\\')">';
+                html += '<td class="px-3 py-2 font-mono text-blue-600">' + f.field_name + '</td>';
+                html += '<td class="px-3 py-2">' + f.value + '</td>';
+                html += '<td class="px-3 py-2"><span style="color:' + riskColor + '">' + riskTxt + '</span></td>';
+                html += '<td class="px-3 py-2">' + (f.ocr_confidence != null ? f.ocr_confidence.toFixed(2) : '-') + '</td>';
+                html += '<td class="px-3 py-2">' + missingHtml + '</td>';
+                html += '<td class="px-3 py-2">' + (f.last_reviewed_by || '<span class="text-gray-400">未复核</span>') + '</td>';
+                html += '</tr>';
+            }});
+            html += '</tbody></table></div>';
+
+            if (t.rule_notes && t.rule_notes.length > 0) {{
+                html += '<h3 class="font-semibold text-gray-800 mb-2">📝 运营老唐的备注</h3>';
+                t.rule_notes.forEach(function(n) {{
+                    html += '<div class="bg-purple-50 border-l-4 border-purple-500 p-3 mb-2 text-sm">';
+                    html += '<div class="text-xs text-purple-700 mb-1">' + n.timestamp + ' · ' + n.author + (n.field_name ? ' · 字段: ' + n.field_name : '') + '</div>';
+                    html += '<div>' + n.note + '</div></div>';
+                }});
+            }}
+
+            if (t.change_logs && t.change_logs.length > 0) {{
+                html += '<h3 class="font-semibold text-gray-800 mb-2 mt-4">📜 变更历史（谁改了什么 / 影响了哪条导出）</h3>';
+                html += '<div class="space-y-2">';
+                t.change_logs.forEach(function(c) {{
+                    html += '<div class="border rounded-lg p-3 text-sm">';
+                    html += '<div class="flex items-center justify-between mb-1">';
+                    html += '<span class="font-semibold text-gray-800">[' + c.change_id + '] ' + c.change_type + '</span>';
+                    html += '<span class="text-xs text-gray-500">' + c.timestamp + ' · ' + c.author + '</span>';
+                    html += '</div>';
+                    if (c.field_name) html += '<div class="text-xs text-blue-600 mb-1">字段: ' + c.field_name + '</div>';
+                    html += '<div class="text-gray-700">变化: <span class="text-red-600">' + c.old_value + '</span> → <span class="text-green-600">' + c.new_value + '</span></div>';
+                    if (c.note) html += '<div class="text-gray-600 mt-1">备注: ' + c.note + '</div>';
+                    if (c.affected_exports && c.affected_exports.length > 0) {{
+                        html += '<div class="text-xs text-purple-600 mt-1">影响导出: ' + c.affected_exports.map(function(e) {{ return '<span class="font-mono">' + e + '</span>'; }}).join(', ') + '</div>';
+                    }}
+                    html += '</div>';
+                }});
+                html += '</div>';
+            }}
+
+            if (t.export_history && t.export_history.length > 0) {{
+                html += '<h3 class="font-semibold text-gray-800 mb-2 mt-4">📤 导出历史（点击查看对应报告）</h3>';
+                html += '<div class="overflow-x-auto border rounded-lg">';
+                html += '<table class="w-full text-sm"><thead class="bg-gray-100"><tr>';
+                html += '<th class="px-3 py-2 text-left">导出ID</th><th class="px-3 py-2 text-left">时间</th>';
+                html += '<th class="px-3 py-2 text-left">泄露字段</th><th class="px-3 py-2 text-left">报告文件</th>';
+                html += '</tr></thead><tbody>';
+                t.export_history.forEach(function(e) {{
+                    var leakCount = (e.summary && e.summary.leak_fields != null) ? e.summary.leak_fields : '-';
+                    html += '<tr class="border-t hover:bg-blue-50 cursor-pointer" onclick="openExportReport(\\'' + e.report_file + '\\')">';
+                    html += '<td class="px-3 py-2 font-mono text-blue-600">' + e.export_id + '</td>';
+                    html += '<td class="px-3 py-2">' + e.generated_at + '</td>';
+                    html += '<td class="px-3 py-2">' + (leakCount > 0 ? '<span class="text-red-600 font-bold">' + leakCount + '</span>' : leakCount) + '</td>';
+                    html += '<td class="px-3 py-2 text-xs font-mono">' + e.report_file + '</td>';
+                    html += '</tr>';
+                }});
+                html += '</tbody></table></div>';
+            }}
+
+            document.getElementById('modalBody').innerHTML = html;
+            document.getElementById('ticketModal').classList.remove('hidden');
+        }}
+
+        function jumpToLatestExport(ticketId, fieldName) {{
+            var t = ALL_TICKET_DATA[ticketId];
+            if (!t || !t.export_history || t.export_history.length === 0) {{
+                alert('该工单暂无导出记录，请先生成导出。\\n字段: ' + fieldName);
+                return;
+            }}
+            var latest = t.export_history[0];
+            alert('字段 ' + fieldName + ' 对应的最新导出报告为:\\n\\n' + latest.report_file + '\\n\\n请在 output 目录下打开该文件，或使用命令:\\ncat output/' + latest.report_file);
+        }}
+
+        function openExportReport(fileName) {{
+            alert('请在 output 目录下打开报告文件:\\n\\noutput/' + fileName);
         }}
 
         window.addEventListener('resize', function() {{

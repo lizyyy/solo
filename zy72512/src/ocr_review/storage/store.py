@@ -7,11 +7,12 @@ from typing import Dict, List, Optional, Any
 from dataclasses import asdict
 
 from ..models import (
-    Ticket, TicketStatus,
+    Ticket, TicketStatus, ChangeLog,
     MaskRule, RuleStatus,
     OCRRecord,
     ExportRecord, ExportStatus
 )
+from ..utils.mask import mask_text, has_sensitive_data
 
 
 class DataStore:
@@ -39,10 +40,63 @@ class DataStore:
                 result[key] = value
         return result
 
+    def _sanitize_ticket_fields(self, data: Dict) -> Dict:
+        if "fields" in data:
+            for f in data["fields"]:
+                if isinstance(f, dict):
+                    field_value = f.get("field_value", "")
+                    if field_value:
+                        has, _ = has_sensitive_data(field_value)
+                        if has:
+                            if f.get("is_masked") and f.get("mask_pattern"):
+                                masked_val = f["mask_pattern"]
+                            else:
+                                masked_val = mask_text(field_value)
+                                f["mask_pattern"] = masked_val
+                                f["is_masked"] = True
+                            f["field_value"] = masked_val
+                    if f.get("leak_note"):
+                        f["leak_note"] = mask_text(f["leak_note"])
+        for key in ["rule_notes", "algorithm_notes"]:
+            if key in data and isinstance(data[key], list):
+                for note_entry in data[key]:
+                    if isinstance(note_entry, dict) and note_entry.get("note"):
+                        note_entry["note"] = mask_text(note_entry["note"])
+        if "change_logs" in data and isinstance(data["change_logs"], list):
+            for log in data["change_logs"]:
+                if isinstance(log, dict):
+                    for k in ["old_value_summary", "new_value_summary", "note"]:
+                        if log.get(k):
+                            log[k] = mask_text(log[k])
+        if "description" in data and isinstance(data["description"], str):
+            data["description"] = mask_text(data["description"])
+        return data
+
+    def _sanitize_export_fields(self, data: Dict) -> Dict:
+        if "fields" in data:
+            for f in data["fields"]:
+                if isinstance(f, dict):
+                    orig = f.get("original_value", "")
+                    if orig:
+                        has, _ = has_sensitive_data(orig)
+                        if has:
+                            f["original_value"] = mask_text(orig)
+                    if f.get("masked_value"):
+                        f["masked_value"] = mask_text(f["masked_value"])
+                    if f.get("explanation"):
+                        f["explanation"] = mask_text(f["explanation"])
+        if "audit_notes" in data:
+            for i, note in enumerate(data["audit_notes"]):
+                if isinstance(note, dict) and note.get("note"):
+                    data["audit_notes"][i]["note"] = mask_text(note["note"])
+        return data
+
     def save_ticket(self, ticket: Ticket) -> str:
         path = self.tickets_dir / f"{ticket.ticket_id}.json"
+        data = self._serialize(ticket)
+        data = self._sanitize_ticket_fields(data)
         with open(path, "w", encoding="utf-8") as f:
-            json.dump(self._serialize(ticket), f, ensure_ascii=False, indent=2)
+            json.dump(data, f, ensure_ascii=False, indent=2)
         return str(path)
 
     def load_ticket(self, ticket_id: str) -> Optional[Ticket]:
@@ -55,11 +109,18 @@ class DataStore:
 
     def _dict_to_ticket(self, data: Dict) -> Ticket:
         from ..models.ticket import TicketField
-        fields = [TicketField(**f) for f in data.pop("fields")]
+        fields_data = data.pop("fields", [])
+        fields = []
+        for f in fields_data:
+            fields.append(TicketField(**f))
+        change_logs_data = data.pop("change_logs", [])
+        change_logs = []
+        for cl in change_logs_data:
+            change_logs.append(ChangeLog(**cl))
         data["created_at"] = datetime.fromisoformat(data["created_at"])
         data["updated_at"] = datetime.fromisoformat(data["updated_at"])
         data["status"] = TicketStatus(data["status"])
-        return Ticket(fields=fields, **data)
+        return Ticket(fields=fields, change_logs=change_logs, **data)
 
     def list_tickets(self, status: Optional[TicketStatus] = None) -> List[Ticket]:
         tickets = []
@@ -99,12 +160,21 @@ class DataStore:
 
     def save_ocr_record(self, record: OCRRecord) -> str:
         path = self.ocr_dir / f"{record.record_id}.json"
+        data = self._serialize(record)
+        if "fields" in data:
+            for f in data["fields"]:
+                if isinstance(f, dict):
+                    for k in ["original_text", "recognized_text", "corrected_text"]:
+                        if f.get(k):
+                            has, _ = has_sensitive_data(f[k])
+                            if has:
+                                f[k] = mask_text(f[k])
         with open(path, "w", encoding="utf-8") as f:
-            json.dump(self._serialize(record), f, ensure_ascii=False, indent=2)
+            json.dump(data, f, ensure_ascii=False, indent=2)
         return str(path)
 
     def load_ocr_record(self, record_id: str) -> Optional[OCRRecord]:
-        path = self.ocr_dir / f"{record_id}.json"
+        path = self.ocr_dir / f"{record.record_id}.json"
         if not path.exists():
             return None
         with open(path, "r", encoding="utf-8") as f:
@@ -116,8 +186,10 @@ class DataStore:
 
     def save_export(self, export: ExportRecord) -> str:
         path = self.exports_dir / f"{export.export_id}.json"
+        data = self._serialize(export)
+        data = self._sanitize_export_fields(data)
         with open(path, "w", encoding="utf-8") as f:
-            json.dump(self._serialize(export), f, ensure_ascii=False, indent=2)
+            json.dump(data, f, ensure_ascii=False, indent=2)
         return str(path)
 
     def load_export(self, export_id: str) -> Optional[ExportRecord]:

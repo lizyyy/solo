@@ -1,7 +1,7 @@
 📋 发票 OCR 置信度复核 - 快速摘要
 ==================================================
 工单: TICKET-20260601-003 - OCR置信度较低字段复核
-状态: review_pending
+状态: reviewed_by_operation
 
 ⚠️  发现 1 个字段存在泄露风险:
    - remarks: 该字段检测到敏感数据但未完成复核。检测到phone泄露: 字段 'remarks' 不在现有手机号脱...
@@ -11,5 +11,5 @@
 
 📊 OCR整体置信度: 0.77
 
-🔗 详情报告: EXPORT-20260607-DD1EBEB2_report.txt
-🔗 数据文件: EXPORT-20260607-DD1EBEB2_data.json
+🔗 详情报告: EXPORT-20260613-180E0F1E_report.txt
+🔗 数据文件: EXPORT-20260613-180E0F1E_data.json

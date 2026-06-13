@@ -54,10 +54,14 @@ class TicketImporter:
 
     def _import_tickets(self, tickets_data: List[Dict[str, Any]]) -> ImportResult:
         result = ImportResult(success=True)
+        from ..detector.phone_leak_detector import LeakDetector
+
+        detector = LeakDetector(self.store)
 
         for ticket_data in tickets_data:
             try:
                 ticket = self._parse_ticket(ticket_data)
+                detector.detect_ticket(ticket, auto_mark=True)
                 self.store.save_ticket(ticket)
                 result.imported_count += 1
                 result.ticket_ids.append(ticket.ticket_id)
