@@ -51,6 +51,14 @@
     {% endif %}
 </div>
 
+{% if record.current_status == 'pending_prompt' %}
+<div style="background: #cce5ff; border: 1px solid #b8daff; border-radius: 4px; padding: 1rem; margin-bottom: 1.5rem;">
+    <strong>🔔 当前状态：待补充提示词版本号</strong><br>
+    在下方「提示词版本号」字段填写版本号后保存，系统会<strong>自动流转</strong>到下一状态。<br>
+    <small>（如果同时存在404链接或结论冲突，会优先流转到对应的产品经理复核状态）</small>
+</div>
+{% endif %}
+
 <div class="card">
     <h2>✏️ 编辑记录（知识库编辑小乔操作）</h2>
     <form method="post" action="{{ url_for('edit_record', record_id=record.id) }}">
@@ -60,8 +68,8 @@
                 <textarea name="manual_remark" rows="2">{{ record.manual_remark or '' }}</textarea>
             </div>
             <div class="form-group">
-                <label>提示词版本号（小乔补看后填写）</label>
-                <input type="text" name="prompt_version" value="{{ record.prompt_version or '' }}" placeholder="例如：v2.3.1">
+                <label>提示词版本号（小乔补看后填写，必填项）</label>
+                <input type="text" name="prompt_version" value="{{ record.prompt_version or '' }}" placeholder="例如：v2.3.1 — 填完保存后状态自动流转">
             </div>
             <div class="form-group">
                 <label>人工改判结论</label>
@@ -76,47 +84,58 @@
                 <select name="reference_url_status">
                     <option value="">不修改</option>
                     <option value="200" {% if record.reference_url_status == '200' %}selected{% endif %}>200 - 正常</option>
-                    <option value="404" {% if record.reference_url_status == '404' %}selected{% endif %}>404 - 失效</option>
+                    <option value="404" {% if record.reference_url_status == '404' %}selected{% endif %}>404 - 失效（注意：404+通过结论自动进入产品经理复核）</option>
                     <option value="unknown" {% if record.reference_url_status == 'unknown' %}selected{% endif %}>未知</option>
                 </select>
             </div>
             <div class="form-group">
-                <label>操作人</label>
+                <label>操作人（必填，留痕）</label>
                 <input type="text" name="operator" value="小乔" placeholder="操作人姓名">
             </div>
+            <div class="form-group">
+                <label>为什么改？（必填，产品经理追问时看）</label>
+                <input type="text" name="change_reason" placeholder="例如：补看群里补的提示词版本号v2.3.1 / 改备注说明理由">
+            </div>
         </div>
-        <button type="submit" class="btn btn-primary">保存修改</button>
+        <div style="background: #fff3cd; padding: 0.75rem; border-radius: 4px; margin-bottom: 1rem; font-size: 0.85rem;">
+            <strong>💡 保存后自动执行：</strong>重新评估状态 → 触发边界规则 → 404/结论冲突自动归入冲突样本 → 写入历史记录（含改前改后、为什么改、谁改的）
+        </div>
+        <button type="submit" class="btn btn-primary">保存修改并触发状态流转</button>
     </form>
 </div>
 
 <div class="card">
     <h2>📜 历史变更记录（改前改后完整留存，产品经理追问可回溯）</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>时间</th>
-                <th>操作人</th>
-                <th>变更字段</th>
-                <th>改前值</th>
-                <th>改后值</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for h in history %}
-            <tr>
-                <td style="font-size: 0.8rem;">{{ h.changed_at }}</td>
-                <td>{{ h.operator }}</td>
-                <td><code>{{ h.field_name }}</code></td>
-                <td style="color: #e74c3c; font-family: monospace;">{{ h.old_value or '(空)' }}</td>
-                <td style="color: #27ae60; font-family: monospace;">{{ h.new_value or '(空)' }}</td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="5" style="text-align: center; color: #999;">暂无变更记录</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>时间</th>
+                    <th>操作人</th>
+                    <th>变更字段</th>
+                    <th>改前文本</th>
+                    <th>改后文本</th>
+                    <th>为什么改</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for h in history %}
+                <tr>
+                    <td style="font-size: 0.75rem;">{{ h.changed_at }}</td>
+                    <td>{{ h.operator }}</td>
+                    <td><code>{{ h.field_name }}</code></td>
+                    <td style="color: #e74c3c; font-family: monospace; font-size: 0.75rem; max-width: 200px; word-break: break-all;">{{ h.old_value or '(空)' }}</td>
+                    <td style="color: #27ae60; font-family: monospace; font-size: 0.75rem; max-width: 200px; word-break: break-all;">{{ h.new_value or '(空)' }}</td>
+                    <td style="font-size: 0.75rem; color: #666;">{{ h.change_reason or '（未填写原因）' }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" style="text-align: center; color: #999;">暂无变更记录</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
 {% endblock %}

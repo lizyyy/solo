@@ -69,7 +69,10 @@
                 <td>{{ batch.total_records }}</td>
                 <td>{{ batch.imported_by }}</td>
                 <td>{{ batch.imported_at }}</td>
-                <td><a href="{{ url_for('records', batch_id=batch.batch_id) }}" class="btn btn-primary">查看记录</a></td>
+                <td>
+                    <a href="{{ url_for('batch_detail', batch_id=batch.batch_id) }}" class="btn btn-primary">批次详情/回滚</a>
+                    <a href="{{ url_for('records', batch_id=batch.batch_id) }}" class="btn btn-warning">查看记录</a>
+                </td>
             </tr>
             {% else %}
             <tr>

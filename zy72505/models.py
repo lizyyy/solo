@@ -44,8 +44,27 @@ def init_db():
             old_value TEXT,
             new_value TEXT,
             operator TEXT,
+            change_reason TEXT,
             changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (record_id) REFERENCES manual_review_records(id)
+        )
+    """)
+
+    try:
+        c.execute("ALTER TABLE review_history ADD COLUMN change_reason TEXT")
+    except sqlite3.OperationalError:
+        pass
+
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS batch_rollback_log (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            batch_id TEXT NOT NULL,
+            rollback_type TEXT NOT NULL,
+            snapshot_before TEXT,
+            snapshot_after TEXT,
+            rollback_reason TEXT,
+            operator TEXT,
+            rolled_back_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
 
@@ -178,8 +197,8 @@ class ManualReviewRecord:
                 record_id = c.lastrowid
 
                 c.execute("""
-                    INSERT INTO review_history (record_id, field_name, old_value, new_value, operator)
-                    VALUES (?, 'initial_import', NULL, ?, ?)
+                    INSERT INTO review_history (record_id, field_name, old_value, new_value, operator, change_reason)
+                    VALUES (?, 'initial_import', NULL, ?, ?, '批次首次导入，记录原始快照')
                 """, (record_id, json.dumps(record, ensure_ascii=False), imported_by or 'system'))
 
                 inserted += 1
@@ -239,8 +258,8 @@ class ManualReviewRecord:
                                   (new_val, datetime.now().isoformat(), record_id))
 
                         c.execute("""
-                            INSERT INTO review_history (record_id, field_name, old_value, new_value, operator)
-                            VALUES (?, ?, ?, ?, 'reimport')
+                            INSERT INTO review_history (record_id, field_name, old_value, new_value, operator, change_reason)
+                            VALUES (?, ?, ?, ?, 'reimport', '同一批次重复导入，字段内容更新')
                         """, (record_id, field_name, str(old_val), str(new_val)))
                         changes.append(field_name)
 
@@ -267,8 +286,8 @@ class ManualReviewRecord:
                             """, (new_status, datetime.now().isoformat(), record_id))
 
                             c.execute("""
-                                INSERT INTO review_history (record_id, field_name, old_value, new_value, operator)
-                                VALUES (?, 'current_status', ?, ?, 'auto')
+                                INSERT INTO review_history (record_id, field_name, old_value, new_value, operator, change_reason)
+                                VALUES (?, 'current_status', ?, ?, 'auto', '重复导入后触发状态自动流转')
                             """, (record_id, existing['current_status'], new_status))
                 else:
                     unchanged += 1
@@ -397,13 +416,14 @@ class ManualReviewRecord:
         return rows
 
     @staticmethod
-    def update_record(record_id: int, updates: Dict, operator: str = 'system') -> bool:
+    def update_record(record_id: int, updates: Dict, operator: str = 'system', change_reason: str = None) -> bool:
         conn = get_conn()
         c = conn.cursor()
 
         try:
             c.execute("SELECT * FROM manual_review_records WHERE id = ?", (record_id,))
             existing = dict(c.fetchone())
+            old_status = existing['current_status']
 
             allowed_fields = ['manual_remark', 'prompt_version', 'manual_conclusion',
                               'reference_url_status', 'current_status']
@@ -417,19 +437,47 @@ class ManualReviewRecord:
                               (new_val, datetime.now().isoformat(), record_id))
 
                     c.execute("""
-                        INSERT INTO review_history (record_id, field_name, old_value, new_value, operator)
-                        VALUES (?, ?, ?, ?, ?)
-                    """, (record_id, field, str(old_val), str(new_val), operator))
+                        INSERT INTO review_history (record_id, field_name, old_value, new_value, operator, change_reason)
+                        VALUES (?, ?, ?, ?, ?, ?)
+                    """, (record_id, field, str(old_val), str(new_val), operator, change_reason))
 
-            if 'reference_url_status' in updates and updates['reference_url_status'] == '404':
-                c.execute("""
-                    UPDATE manual_review_records SET current_status = 'pending_product_review', updated_at = ?
-                    WHERE id = ? AND manual_conclusion = '通过'
-                """, (datetime.now().isoformat(), record_id))
+            c.execute("SELECT * FROM manual_review_records WHERE id = ?", (record_id,))
+            merged = dict(c.fetchone())
 
+            needs_status_recalc = any(f in updates for f in ['prompt_version', 'manual_conclusion', 'reference_url_status'])
+            status_was_set_manually = 'current_status' in updates
+
+            if needs_status_recalc and not status_was_set_manually:
+                recalc_record = {
+                    'prompt_version': merged.get('prompt_version'),
+                    'reference_url_status': merged.get('reference_url_status', 'unknown'),
+                    'manual_conclusion': merged.get('manual_conclusion'),
+                    'original_conclusion': merged.get('original_conclusion'),
+                }
+                new_status = ManualReviewRecord._determine_initial_status(recalc_record)
+
+                if new_status != old_status:
+                    c.execute("""
+                        UPDATE manual_review_records SET current_status = ?, updated_at = ? WHERE id = ?
+                    """, (new_status, datetime.now().isoformat(), record_id))
+
+                    reason = change_reason or f"自动流转：修改触发状态重新评估"
+                    c.execute("""
+                        INSERT INTO review_history (record_id, field_name, old_value, new_value, operator, change_reason)
+                        VALUES (?, 'current_status', ?, ?, ?, ?)
+                    """, (record_id, old_status, new_status, operator, reason))
+
+            if merged.get('reference_url_status') == '404' and merged.get('manual_conclusion') == '通过':
                 c.execute("""
                     INSERT OR IGNORE INTO conflict_samples (record_id, conflict_type, product_review_status)
                     SELECT ?, 'REF_404_PASS', 'pending'
+                    WHERE NOT EXISTS (SELECT 1 FROM conflict_samples WHERE record_id = ?)
+                """, (record_id, record_id))
+
+            if merged.get('original_conclusion') != merged.get('manual_conclusion'):
+                c.execute("""
+                    INSERT OR IGNORE INTO conflict_samples (record_id, conflict_type, product_review_status)
+                    SELECT ?, 'CONCLUSION_CONFLICT', 'pending'
                     WHERE NOT EXISTS (SELECT 1 FROM conflict_samples WHERE record_id = ?)
                 """, (record_id, record_id))
 
@@ -457,15 +505,23 @@ class ManualReviewRecord:
             row = c.fetchone()
             if row:
                 record_id = row['record_id']
+                c.execute("SELECT current_status FROM manual_review_records WHERE id = ?", (record_id,))
+                old_main_status = c.fetchone()['current_status']
                 new_status = 'reviewed' if status == 'approved' else 'rejected' if status == 'rejected' else 'pending_product_review'
                 c.execute("""
                     UPDATE manual_review_records SET current_status = ?, updated_at = ? WHERE id = ?
                 """, (new_status, datetime.now().isoformat(), record_id))
 
                 c.execute("""
-                    INSERT INTO review_history (record_id, field_name, old_value, new_value, operator)
-                    VALUES (?, 'product_review', NULL, ?, ?)
+                    INSERT INTO review_history (record_id, field_name, old_value, new_value, operator, change_reason)
+                    VALUES (?, 'product_review', NULL, ?, ?, '产品经理复核冲突样本并更新状态')
                 """, (record_id, f"status={status}, remark={remark}", operator))
+
+                if new_status != old_main_status:
+                    c.execute("""
+                        INSERT INTO review_history (record_id, field_name, old_value, new_value, operator, change_reason)
+                        VALUES (?, 'current_status', ?, ?, ?, '产品经理复核触发状态流转')
+                    """, (record_id, old_main_status, new_status, operator))
 
             conn.commit()
             return True
@@ -480,6 +536,138 @@ class ManualReviewRecord:
         conn = get_conn()
         c = conn.cursor()
         c.execute("SELECT * FROM import_batches ORDER BY imported_at DESC")
+        rows = [dict(row) for row in c.fetchall()]
+        conn.close()
+        return rows
+
+    @staticmethod
+    def get_batch_detail(batch_id: str) -> Dict:
+        conn = get_conn()
+        c = conn.cursor()
+        c.execute("SELECT * FROM import_batches WHERE batch_id = ?", (batch_id,))
+        batch = dict(c.fetchone()) if c.fetchone() else None
+        if not batch:
+            conn.close()
+            return None
+        c.execute("SELECT COUNT(*) as cnt FROM manual_review_records WHERE batch_id = ?", (batch_id,))
+        batch['record_count'] = c.fetchone()['cnt']
+        c.execute("SELECT current_status, COUNT(*) as cnt FROM manual_review_records WHERE batch_id = ? GROUP BY current_status", (batch_id,))
+        batch['status_distribution'] = {row['current_status']: row['cnt'] for row in c.fetchall()}
+        c.execute("SELECT COUNT(*) as cnt FROM conflict_samples cs JOIN manual_review_records mrr ON cs.record_id = mrr.id WHERE mrr.batch_id = ?", (batch_id,))
+        batch['conflict_count'] = c.fetchone()['cnt']
+        c.execute("SELECT * FROM batch_rollback_log WHERE batch_id = ? ORDER BY rolled_back_at DESC", (batch_id,))
+        batch['rollback_logs'] = [dict(row) for row in c.fetchall()]
+        conn.close()
+        return batch
+
+    @staticmethod
+    def rollback_batch(batch_id: str, rollback_type: str, reason: str, operator: str) -> Dict:
+        conn = get_conn()
+        c = conn.cursor()
+        try:
+            c.execute("SELECT * FROM import_batches WHERE batch_id = ?", (batch_id,))
+            batch_row = c.fetchone()
+            if not batch_row:
+                raise ValueError(f"批次 {batch_id} 不存在")
+
+            c.execute("SELECT * FROM manual_review_records WHERE batch_id = ?", (batch_id,))
+            all_records = [dict(row) for row in c.fetchall()]
+            snapshot_before = json.dumps({
+                'batch': dict(batch_row),
+                'records': all_records
+            }, ensure_ascii=False)
+
+            if rollback_type == 'clear_last_reimport':
+                c.execute("DELETE FROM review_history WHERE record_id IN (SELECT id FROM manual_review_records WHERE batch_id = ?) AND operator = 'reimport'", (batch_id,))
+                for rec in all_records:
+                    c.execute("""
+                        SELECT rh.new_value FROM review_history rh
+                        WHERE rh.record_id = ? AND rh.field_name != 'current_status' AND rh.field_name != 'initial_import'
+                        ORDER BY rh.changed_at ASC LIMIT 1
+                    """, (rec['id'],))
+                    first_change = c.fetchone()
+                    if first_change:
+                        pass
+                affected = len(all_records)
+                result_msg = f"清除批次 {batch_id} 的重复导入痕迹（仅保留首次导入状态），涉及 {affected} 条记录"
+
+            elif rollback_type == 'delete_batch':
+                c.execute("DELETE FROM conflict_samples WHERE record_id IN (SELECT id FROM manual_review_records WHERE batch_id = ?)", (batch_id,))
+                c.execute("DELETE FROM review_history WHERE record_id IN (SELECT id FROM manual_review_records WHERE batch_id = ?)", (batch_id,))
+                c.execute("DELETE FROM manual_review_records WHERE batch_id = ?", (batch_id,))
+                c.execute("DELETE FROM import_batches WHERE batch_id = ?", (batch_id,))
+                result_msg = f"彻底删除批次 {batch_id}（含所有记录、历史、冲突样本）"
+                snapshot_after = json.dumps({'batch': None, 'records': []}, ensure_ascii=False)
+            else:
+                raise ValueError(f"未知的回滚类型: {rollback_type}")
+
+            if rollback_type == 'clear_last_reimport':
+                for rec in all_records:
+                    c.execute("SELECT * FROM review_history WHERE record_id = ? AND field_name = 'initial_import'", (rec['id'],))
+                    initial_row = c.fetchone()
+                    if initial_row:
+                        try:
+                            initial_data = json.loads(initial_row['new_value'])
+                        except Exception:
+                            continue
+                        c.execute("""
+                            UPDATE manual_review_records SET
+                                question_id = ?, question = ?, original_conclusion = ?,
+                                manual_conclusion = ?, manual_remark = ?, prompt_version = ?,
+                                reference_url = ?, reference_url_status = ?,
+                                current_status = ?, updated_at = ?
+                            WHERE id = ?
+                        """, (
+                            initial_data.get('question_id'),
+                            initial_data.get('question'),
+                            initial_data.get('original_conclusion'),
+                            initial_data.get('manual_conclusion'),
+                            initial_data.get('manual_remark'),
+                            initial_data.get('prompt_version'),
+                            initial_data.get('reference_url'),
+                            initial_data.get('reference_url_status', 'unknown'),
+                            ManualReviewRecord._determine_initial_status(initial_data),
+                            datetime.now().isoformat(),
+                            rec['id']
+                        ))
+                        c.execute("""
+                            INSERT INTO review_history (record_id, field_name, old_value, new_value, operator, change_reason)
+                            VALUES (?, 'rollback', ?, ?, ?, ?)
+                        """, (
+                            rec['id'],
+                            json.dumps(rec, ensure_ascii=False),
+                            f"回滚至首次导入状态",
+                            operator,
+                            reason
+                        ))
+                c.execute("SELECT * FROM manual_review_records WHERE batch_id = ?", (batch_id,))
+                after_records = [dict(row) for row in c.fetchall()]
+                snapshot_after = json.dumps({
+                    'batch': dict(batch_row),
+                    'records': after_records
+                }, ensure_ascii=False)
+
+            c.execute("""
+                INSERT INTO batch_rollback_log (batch_id, rollback_type, snapshot_before, snapshot_after, rollback_reason, operator)
+                VALUES (?, ?, ?, ?, ?, ?)
+            """, (batch_id, rollback_type, snapshot_before, snapshot_after, reason, operator))
+
+            conn.commit()
+            return {'success': True, 'message': result_msg, 'batch_id': batch_id}
+        except Exception as e:
+            conn.rollback()
+            raise e
+        finally:
+            conn.close()
+
+    @staticmethod
+    def get_rollback_logs(batch_id: str = None) -> List[Dict]:
+        conn = get_conn()
+        c = conn.cursor()
+        if batch_id:
+            c.execute("SELECT * FROM batch_rollback_log WHERE batch_id = ? ORDER BY rolled_back_at DESC", (batch_id,))
+        else:
+            c.execute("SELECT * FROM batch_rollback_log ORDER BY rolled_back_at DESC")
         rows = [dict(row) for row in c.fetchall()]
         conn.close()
         return rows

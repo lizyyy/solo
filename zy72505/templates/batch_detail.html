@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card">
+    <h2>📦 批次详情：<code>{{ batch.batch_id }}</code></h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+        <div class="stat-card" style="background: #f8f9fa;">
+            <div class="number">{{ batch.record_count }}</div>
+            <div class="label">记录总数</div>
+        </div>
+        <div class="stat-card" style="background: #f8f9fa;">
+            <div class="number">{{ batch.conflict_count }}</div>
+            <div class="label">冲突样本数</div>
+        </div>
+        <div class="stat-card" style="background: #f8f9fa;">
+            <div class="number">{{ batch.imported_at }}</div>
+            <div class="label">导入时间</div>
+        </div>
+        <div class="stat-card" style="background: #f8f9fa;">
+            <div class="number">{{ batch.imported_by }}</div>
+            <div class="label">导入人</div>
+        </div>
+    </div>
+    <div>
+        <strong>状态分布：</strong>
+        {% for status, count in batch.status_distribution.items() %}
+            <span class="status status-{{ status.replace('_', '-') }}">{{ status }}: {{ count }}</span>
+        {% endfor %}
+    </div>
+    <div style="margin-top: 1rem;">
+        <a href="{{ url_for('records', batch_id=batch.batch_id) }}" class="btn btn-primary">查看本批次所有记录</a>
+        <a href="{{ url_for('conflicts', batch_id=batch.batch_id) }}" class="btn btn-warning">查看本批次冲突样本</a>
+    </div>
+</div>
+
+<div class="card">
+    <h2>⏪ 批次回滚（谨慎操作，回滚后可从历史查前后快照）</h2>
+    <div style="background: #f8d7da; border: 1px solid #f5c6cb; border-radius: 4px; padding: 1rem; margin-bottom: 1rem;">
+        <strong>⚠️ 操作前请确认：</strong>回滚会影响该批次所有记录，但<strong>前后快照和原因会完整写入 batch_rollback_log</strong>，可追溯。
+    </div>
+    <form method="post" action="{{ url_for('rollback_batch', batch_id=batch.batch_id) }}" onsubmit="return confirm('确认执行此回滚操作？');">
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+                <label>回滚类型</label>
+                <select name="rollback_type" required>
+                    <option value="">请选择</option>
+                    <option value="clear_last_reimport">① 清除重复导入痕迹，回滚到首次导入状态</option>
+                    <option value="delete_batch">② 彻底删除本批次（含所有记录/历史/冲突）</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>处理人</label>
+                <input type="text" name="operator" required placeholder="您的姓名">
+            </div>
+            <div class="form-group">
+                <label>回滚原因（必填，产品经理查证据时看）</label>
+                <input type="text" name="reason" required placeholder="例如：重复导入了同一批，需要清除多余的更新记录">
+            </div>
+        </div>
+        <div style="font-size: 0.8rem; color: #666; margin-bottom: 1rem;">
+            <strong>① 清除重复导入痕迹：</strong>保留批次，但把所有记录恢复到首次导入时的内容和状态，适合"重传了同一批想撤销"的场景。<br>
+            <strong>② 彻底删除批次：</strong>整个批次从系统里消失，适合"导错了批次"的场景。
+        </div>
+        <button type="submit" class="btn btn-danger">执行回滚</button>
+    </form>
+</div>
+
+<div class="card">
+    <h2>📜 本批次回滚历史（回滚前后值、原因、处理人可查）</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>时间</th>
+                <th>回滚类型</th>
+                <th>处理人</th>
+                <th>回滚原因</th>
+                <th>前后快照</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in rollback_logs %}
+            <tr>
+                <td style="font-size: 0.75rem;">{{ log.rolled_back_at }}</td>
+                <td>
+                    {% if log.rollback_type == 'clear_last_reimport' %}
+                    <span class="badge badge-warning">清除重导痕迹</span>
+                    {% else %}
+                    <span class="badge badge-danger">彻底删除</span>
+                    {% endif %}
+                </td>
+                <td>{{ log.operator }}</td>
+                <td style="font-size: 0.8rem;">{{ log.rollback_reason }}</td>
+                <td>
+                    <details>
+                        <summary style="cursor: pointer;">查看前后快照</summary>
+                        <div style="margin-top: 0.5rem; padding: 0.5rem; background: #f8f9fa; border-radius: 4px;">
+                            <p style="color: #e74c3c;"><strong>回滚前快照：</strong></p>
+                            <pre style="font-size: 0.7rem; max-height: 200px; overflow: auto; white-space: pre-wrap;">{{ log.snapshot_before }}</pre>
+                            <p style="color: #27ae60; margin-top: 0.5rem;"><strong>回滚后快照：</strong></p>
+                            <pre style="font-size: 0.7rem; max-height: 200px; overflow: auto; white-space: pre-wrap;">{{ log.snapshot_after }}</pre>
+                        </div>
+                    </details>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5" style="text-align: center; color: #999;">暂无回滚记录</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="card">
+    <h2>📝 本批次记录概览（共 {{ records|length }} 条）</h2>
+    <div style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>原始行号</th>
+                    <th>问题ID</th>
+                    <th>原结论</th>
+                    <th>人工结论</th>
+                    <th>提示词版本</th>
+                    <th>链接</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in records[:50] %}
+                <tr>
+                    <td><span class="badge badge-info">行{{ r.original_row_number }}</span></td>
+                    <td>{{ r.question_id }}</td>
+                    <td>{{ r.original_conclusion }}</td>
+                    <td>{{ r.manual_conclusion }}</td>
+                    <td>
+                        {% if r.prompt_version %}
+                        <span class="badge badge-info">{{ r.prompt_version }}</span>
+                        {% else %}
+                        <span class="badge badge-danger">缺失</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if r.reference_url_status == '404' %}
+                        <span class="badge badge-danger">404</span>
+                        {% elif r.reference_url_status == '200' %}
+                        <span class="badge badge-info">200</span>
+                        {% endif %}
+                    </td>
+                    <td><span class="status status-{{ r.current_status.replace('_', '-') }}">{{ r.current_status }}</span></td>
+                    <td><a href="{{ url_for('record_detail', record_id=r.id) }}" class="btn btn-primary">查证据</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% if records|length > 50 %}
+        <p style="margin-top: 0.5rem; color: #666; font-size: 0.85rem;">仅显示前 50 条，<a href="{{ url_for('records', batch_id=batch.batch_id) }}">查看全部 &raquo;</a></p>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

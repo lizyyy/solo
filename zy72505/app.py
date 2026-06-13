@@ -55,16 +55,42 @@ def record_detail(record_id):
 def edit_record(record_id):
     updates = {}
     operator = request.form.get('operator', 'system')
+    change_reason = request.form.get('change_reason', None)
 
     for field in ['manual_remark', 'prompt_version', 'manual_conclusion', 'reference_url_status', 'current_status']:
         if field in request.form and request.form[field] != '':
             updates[field] = request.form[field]
 
     if updates:
-        ManualReviewRecord.update_record(record_id, updates, operator)
-        flash('记录更新成功', 'success')
+        ManualReviewRecord.update_record(record_id, updates, operator, change_reason)
+        flash('记录更新成功，已触发状态重新评估', 'success')
 
     return redirect(url_for('record_detail', record_id=record_id))
+
+
+@app.route('/batch/<batch_id>')
+def batch_detail(batch_id):
+    batch = ManualReviewRecord.get_batch_detail(batch_id)
+    if not batch:
+        return "批次不存在", 404
+    records = ManualReviewRecord.get_records(batch_id=batch_id, limit=1000)
+    rollback_logs = ManualReviewRecord.get_rollback_logs(batch_id)
+    return render_template('batch_detail.html', batch=batch, records=records, rollback_logs=rollback_logs)
+
+
+@app.route('/batch/<batch_id>/rollback', methods=['POST'])
+def rollback_batch(batch_id):
+    rollback_type = request.form.get('rollback_type')
+    reason = request.form.get('reason', '未填写原因')
+    operator = request.form.get('operator', '系统管理员')
+
+    result = ManualReviewRecord.rollback_batch(batch_id, rollback_type, reason, operator)
+    if result['success']:
+        flash(result['message'], 'success')
+    else:
+        flash('回滚失败：' + result.get('message', '未知错误'), 'error')
+
+    return redirect(url_for('batch_detail', batch_id=batch_id))
 
 
 @app.route('/conflicts')
