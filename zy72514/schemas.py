@@ -18,42 +18,53 @@ class SampleStatus(str, Enum):
 
 
 class ChangeType(str, Enum):
+    CREATE = "create"
     STATUS_CHANGE = "status_change"
     ANNOTATION_EDIT = "annotation_edit"
+    MANAGER_REVIEW = "manager_review"
     MODEL_OUTPUT_ADD = "model_output_add"
     MODEL_VERSION_UPDATE = "model_version_update"
     COMMENT_ADD = "comment_add"
+    DUPLICATE_DETECTED = "duplicate_detected"
     ROLLBACK = "rollback"
 
 
 @dataclass
 class OriginalAnnotation:
+    source_file: str
     line_number: int
     raw_content: str
-    annotator_name: str
-    import_timestamp: datetime
-    source_file: str
+    annotator_conclusion: str
+    model_version: str = "v1"
+    source_url: Optional[str] = None
+    business_note: Optional[str] = None
+    annotation_hash: Optional[str] = None
+    annotator_name: Optional[str] = None
+    import_timestamp: datetime = field(default_factory=datetime.now)
     conclusion: Optional[str] = None
 
 
 @dataclass
 class ModelOutput:
     version: str
-    timestamp: datetime
     violation_score: float
     confidence: float
     raw_fragment: str
+    operator: str
+    timestamp: datetime = field(default_factory=datetime.now)
     model_metadata: Dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
 class ManualEdit:
-    editor: str
-    edit_timestamp: datetime
-    field_changed: str
+    field: str
     old_value: Any
     new_value: Any
+    operator: str
     reason: str
+    editor: Optional[str] = None
+    edit_timestamp: datetime = field(default_factory=datetime.now)
+    field_changed: Optional[str] = None
 
 
 @dataclass

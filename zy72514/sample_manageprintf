@@ -1,0 +1,1 @@
+            'samples_without_model_output': sum(1 for s in self.samples.values() if len(s.model_outputs) == 0),
