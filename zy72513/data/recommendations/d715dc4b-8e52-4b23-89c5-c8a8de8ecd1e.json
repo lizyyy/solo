@@ -1,0 +1,22 @@
+{
+  "id": "d715dc4b-8e52-4b23-89c5-c8a8de8ecd1e",
+  "content": "推荐学习路径：Python 基础 → 数据分析 → 机器学习。联系老师请拨打 13812345678 获取更多资料。",
+  "source_model_output": "模型原始输出片段：推荐学习路径 Python 基础 数据分析 机器学习，电话 13812345678",
+  "source_manual_review": "人工改判备注：该生编程基础较弱，建议先补充计算机导论，学习周期延长2周。手机号已确认是咨询热线，需要脱敏处理。",
+  "model_output_id": "MODEL_001",
+  "manual_review_id": "REVIEW_001",
+  "batch_id": "batch_001",
+  "masking_status": "needs_review",
+  "has_unmasked_phone": true,
+  "review_status": "reviewed",
+  "reviewer": "xiaomeng",
+  "review_comment": "小孟复核：确认学习路径合理，但需补充前置课程",
+  "created_at": "2026-06-14T18:56:54.020498",
+  "updated_at": "2026-06-14T18:58:39.946926",
+  "version": 2,
+  "metadata": {
+    "import_source": "model_output",
+    "content_hash": "c923a7f92f645eb51d5d69ef3e5be7a7df808d90f08fcd93527176ecacb85384"
+  },
+  "is_active": true
+}

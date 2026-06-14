@@ -1,4 +1,4 @@
-import hashlib
+content = '''import hashlib
 from typing import List, Dict, Any, Tuple, Optional
 from datetime import datetime
 from ..models import Recommendation, ImportRecord
@@ -268,7 +268,7 @@ class Importer:
                     change_reason="manual_review_status_update",
                     source=f"manual_review_batch:{batch_id}",
                 )
-                if not has_changes:
+                if not has_changes and rec.version == 1:
                     rec.version += 1
                     self.storage.save_recommendation(rec)
 
@@ -284,3 +284,11 @@ class Importer:
                 )
 
         return updated, not_found, unchanged
+'''
+
+with open('/Users/lzy/pro/solo/workspaces/zy72513/learning_path_recommender/core/importer.py', 'w', encoding='utf-8') as f:
+    f.write(content)
+
+import os
+print(f"File written, size: {os.path.getsize('/Users/lzy/pro/solo/workspaces/zy72513/learning_path_recommender/core/importer.py')} bytes")
+print(f"Lines: {len(content.splitlines())}")

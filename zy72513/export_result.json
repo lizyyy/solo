@@ -1,0 +1,63 @@
+[
+  {
+    "id": "040dfe69-8b25-46f3-bd7b-02ca3467e646",
+    "content": "推荐学习路径：算法基础 → 数据结构 → 高级算法。学习过程中注意多练习。",
+    "source_model_output": "模型原始输出片段：算法学习路径推荐",
+    "source_manual_review": "人工改判备注：算法学习路径正常，无需调整。可推荐 LeetCode 刷题辅助。",
+    "model_output_id": "MODEL_003",
+    "manual_review_id": "REVIEW_003",
+    "batch_id": "BATCH_TEST",
+    "masking_status": "clean",
+    "has_unmasked_phone": false,
+    "review_status": "reviewed",
+    "reviewer": "xiaomeng",
+    "review_comment": "小孟复核：学习路径合理",
+    "created_at": "2026-06-14T18:37:21.591556",
+    "updated_at": "2026-06-14T18:40:15.757592",
+    "version": 2,
+    "metadata": {
+      "import_source": "model_output",
+      "content_hash": "e21766b9429e340420b62f0ab71950748e734924e8d3fe369eb7d454bc7c7282"
+    },
+    "is_active": true,
+    "masked_content": "推荐学习路径：算法基础 → 数据结构 → 高级算法。学习过程中注意多练习。",
+    "masking_violations": [],
+    "exported_at": "2026-06-14T18:40:46.228913",
+    "exported_by": "xiaomeng"
+  },
+  {
+    "id": "a6fc946d-3200-4bb1-8c5d-af23e7d67bf6",
+    "content": "推荐学习路径：前端三件套 → React → 全栈开发。邮箱 contact@example.com 可咨询详情。",
+    "source_model_output": "模型原始输出片段：前端学习路径推荐，邮箱 contact@example.com",
+    "source_manual_review": "人工改判备注：前端学习路径可以增加 TypeScript 环节，放在 React 之前学习效果更好。",
+    "model_output_id": "MODEL_002",
+    "manual_review_id": "REVIEW_002",
+    "batch_id": "BATCH_TEST",
+    "masking_status": "violations_found",
+    "has_unmasked_phone": false,
+    "review_status": "reviewed",
+    "reviewer": "xiaomeng",
+    "review_comment": "小孟复核：建议优化学习顺序",
+    "created_at": "2026-06-14T18:37:21.591373",
+    "updated_at": "2026-06-14T18:40:15.758252",
+    "version": 2,
+    "metadata": {
+      "import_source": "model_output",
+      "content_hash": "7f3172399789e76a2f2890d96f5138a67c30b25cc2a0ede4f80e0a85f72f373f"
+    },
+    "is_active": true,
+    "masked_content": "推荐学习路径：前端三件套 → React → 全栈开发。邮箱 ***@***.com 可咨询详情。",
+    "masking_violations": [
+      {
+        "rule_id": "c1055ac9-0f6a-4bd8-837c-4622d112d0bf",
+        "rule_name": "email_general",
+        "severity": "medium",
+        "category": "pii",
+        "matched_text": "contact@example.com",
+        "description": "邮箱地址脱敏"
+      }
+    ],
+    "exported_at": "2026-06-14T18:40:46.229278",
+    "exported_by": "xiaomeng"
+  }
+]

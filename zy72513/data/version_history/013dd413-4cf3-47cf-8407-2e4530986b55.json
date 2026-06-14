@@ -1,0 +1,15 @@
+{
+  "id": "013dd413-4cf3-47cf-8407-2e4530986b55",
+  "recommendation_id": "d715dc4b-8e52-4b23-89c5-c8a8de8ecd1e",
+  "version": 2,
+  "previous_version": 1,
+  "field_name": "review_status",
+  "old_value": "pending",
+  "new_value": "reviewed",
+  "change_summary": "review_status: pending -> reviewed",
+  "changed_by": "xiaomeng",
+  "changed_at": "2026-06-14T18:56:59.996863",
+  "change_reason": "manual_review_status_update",
+  "source": "manual_review_batch:batch_001",
+  "metadata": {}
+}
