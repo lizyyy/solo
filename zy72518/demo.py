@@ -152,12 +152,17 @@ def demo():
 
         print_separator("第二步：模型评测同事小孟补看灰度批次")
         print("（自动检测脱敏规则备注与灰度批次的冲突）")
-        batch, conflicts, self_check_summary = step2_xiaomeng_review_gray_batch(
+        batch, conflicts, self_check_summary, conflict_summary, reconcile_result = step2_xiaomeng_review_gray_batch(
             db, gray_batch.id, "模型评测-小孟", "审阅完成，发现冲突需确认"
         )
         print(f"✓ 审阅人: {batch.reviewed_by}")
         print(f"✓ 审阅时间: {batch.reviewed_at}")
         print(f"✓ 发现冲突: {len(conflicts)} 个")
+        utp = conflict_summary['unique_todos_with_pending']
+        print("✓ 待办冲突汇总: " + str(utp) + " 条待办有未处理冲突")
+        ar = reconcile_result['auto_resolved']
+        if ar > 0:
+            print("✓ 自动对齐过期冲突: " + str(ar) + " 条")
         for i, conflict in enumerate(conflicts, 1):
             print(f"\n  冲突 #{i}:")
             print(f"    类型: {conflict.conflict_type}")
@@ -175,25 +180,29 @@ def demo():
         print_separator("小孟处理冲突：不自动拍板，人工确认或驳回")
         if conflicts:
             print("处理第一个冲突：确认按脱敏规则备注执行（需安全审核）")
-            resolved = resolve_conflict(
+            resolved, sibling_resolved = resolve_conflict(
                 db, conflicts[0].id, "confirm",
                 "确认按业务备注的例外处理，提交安全审核",
                 "模型评测-小孟"
             )
             print(f"✓ 冲突 #{conflicts[0].id} 已确认")
             print(f"  处理方式: {resolved.resolution}")
+            if sibling_resolved:
+                print(f"  自动关闭同待办其他冲突: {len(sibling_resolved)} 条")
             print(f"  处理人: {resolved.resolved_by}")
             print(f"  备注: {resolved.resolution_note}")
 
             if len(conflicts) > 1:
                 print("\n处理第二个冲突：驳回，按灰度批次期望执行")
-                resolved2 = resolve_conflict(
+                resolved2, sibling_resolved2 = resolve_conflict(
                     db, conflicts[1].id, "reject",
                     "按灰度批次降低脱敏级别，此条无需例外",
                     "模型评测-小孟"
                 )
                 print(f"✓ 冲突 #{conflicts[1].id} 已驳回")
                 print(f"  处理方式: {resolved2.resolution}")
+                if sibling_resolved2:
+                    print(f"  自动关闭同待办其他冲突: {len(sibling_resolved2)} 条")
                 print(f"  处理人: {resolved2.resolved_by}")
 
         print_separator("人工改判场景演示")

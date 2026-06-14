@@ -48,7 +48,7 @@ def review_batch(
     db: Session = Depends(get_db)
 ):
     try:
-        batch, conflicts, self_check_summary = step2_xiaomeng_review_gray_batch(
+        batch, conflicts, self_check_summary, conflict_summary, reconcile_result = step2_xiaomeng_review_gray_batch(
             db, batch_id, request.reviewed_by, request.review_note
         )
         return {
@@ -72,6 +72,8 @@ def review_batch(
                     for c in conflicts
                 ],
                 "self_check": self_check_summary,
+                "conflict_summary": conflict_summary,
+                "reconcile_result": reconcile_result,
                 "note": "请小孟确认或驳回冲突，不要自动拍板"
             }
         }
@@ -128,7 +130,7 @@ def resolve_conflict_api(
         if request.resolution not in ["confirm", "reject"]:
             raise HTTPException(status_code=400, detail="resolution must be 'confirm' or 'reject'")
         
-        conflict = resolve_conflict(
+        conflict, sibling_resolved = resolve_conflict(
             db, conflict_id, request.resolution,
             request.resolution_note, request.operator
         )
@@ -139,7 +141,8 @@ def resolve_conflict_api(
                 "conflict_id": conflict.id,
                 "resolution": conflict.resolution,
                 "resolved_by": conflict.resolved_by,
-                "note": request.resolution == "confirm" and "已按脱敏规则备注执行，需安全审核" or "已按灰度批次期望执行"
+                "note": request.resolution == "confirm" and "已按脱敏规则备注执行，需安全审核" or "已按灰度批次期望执行",
+                "auto_resolved_sibling_count": len(sibling_resolved),
             }
         }
     except ValueError as e:

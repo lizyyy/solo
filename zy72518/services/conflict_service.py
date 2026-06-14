@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from models import ConflictRecord, TodoExtract, DesensitizationRule, GrayBatch
 from datetime import datetime
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Tuple
 
 
 def detect_desensitization_conflicts(db: Session, batch_id: int) -> List[ConflictRecord]:
@@ -26,7 +26,7 @@ def detect_desensitization_conflicts(db: Session, batch_id: int) -> List[Conflic
                     ConflictRecord.todo_id == todo.id,
                     ConflictRecord.rule_id == rule.id,
                     ConflictRecord.batch_id == batch_id,
-                    ConflictRecord.status == "pending"
+                    ConflictRecord.status.in_(["pending", "resolved"])
                 ).first()
 
                 if not existing:
@@ -89,7 +89,7 @@ def resolve_conflict(
     resolution: str,
     resolution_note: str,
     operator: str
-) -> ConflictRecord:
+) -> Tuple[ConflictRecord, List[ConflictRecord]]:
     conflict = db.query(ConflictRecord).filter(ConflictRecord.id == conflict_id).first()
     if not conflict:
         raise ValueError(f"Conflict {conflict_id} not found")
@@ -111,8 +111,115 @@ def resolve_conflict(
         if todo:
             todo.desensitization_level = conflict.batch_value
 
+    sibling_resolved = _auto_resolve_sibling_conflicts(
+        db, conflict.todo_id, conflict.batch_id, operator, resolution
+    )
+
     db.commit()
-    return conflict
+    return conflict, sibling_resolved
+
+
+def _auto_resolve_sibling_conflicts(
+    db: Session,
+    todo_id: int,
+    batch_id: int,
+    operator: str,
+    trigger_resolution: str
+) -> List[ConflictRecord]:
+    todo = db.query(TodoExtract).filter(TodoExtract.id == todo_id).first()
+    if not todo:
+        return []
+
+    siblings = db.query(ConflictRecord).filter(
+        ConflictRecord.todo_id == todo_id,
+        ConflictRecord.batch_id == batch_id,
+        ConflictRecord.status == "pending"
+    ).all()
+
+    resolved = []
+    for sibling in siblings:
+        if _is_conflict_stale(sibling, todo):
+            sibling.status = "resolved"
+            sibling.resolution = "auto_resolved_by_sibling"
+            sibling.resolution_note = (
+                f"同一待办已被{operator}以'{trigger_resolution}'方式处理主冲突，"
+                f"当前待办脱敏级别为{todo.desensitization_level}，"
+                f"此条冲突不再适用，自动关闭"
+            )
+            sibling.resolved_by = f"auto({operator})"
+            sibling.resolved_at = datetime.utcnow()
+            resolved.append(sibling)
+
+    return resolved
+
+
+def _is_conflict_stale(conflict: ConflictRecord, todo: TodoExtract) -> bool:
+    recorded_level = conflict.evidence.get("todo_desensitization_level") if conflict.evidence else None
+    if recorded_level and todo.desensitization_level != recorded_level:
+        return True
+    return False
+
+
+def reconcile_stale_conflicts(db: Session, batch_id: int) -> Dict[str, Any]:
+    pending_conflicts = db.query(ConflictRecord).filter(
+        ConflictRecord.batch_id == batch_id,
+        ConflictRecord.status == "pending"
+    ).all()
+
+    auto_resolved = []
+    still_pending = []
+
+    for conflict in pending_conflicts:
+        todo = db.query(TodoExtract).filter(TodoExtract.id == conflict.todo_id).first()
+        if not todo:
+            conflict.status = "resolved"
+            conflict.resolution = "auto_resolved_orphan"
+            conflict.resolution_note = "关联待办已删除，自动关闭"
+            conflict.resolved_by = "auto_reconcile"
+            conflict.resolved_at = datetime.utcnow()
+            auto_resolved.append(conflict)
+            continue
+
+        if _is_conflict_stale(conflict, todo):
+            conflict.status = "resolved"
+            conflict.resolution = "auto_resolved_stale"
+            conflict.resolution_note = (
+                f"待办脱敏级别已变更为{todo.desensitization_level}，"
+                f"与冲突记录时的{conflict.evidence.get('todo_desensitization_level')}不同，"
+                f"此条冲突不再适用，自动关闭"
+            )
+            conflict.resolved_by = "auto_reconcile"
+            conflict.resolved_at = datetime.utcnow()
+            auto_resolved.append(conflict)
+        else:
+            still_pending.append(conflict)
+
+    db.commit()
+
+    return {
+        "batch_id": batch_id,
+        "checked_pending": len(pending_conflicts),
+        "auto_resolved": len(auto_resolved),
+        "still_pending": len(still_pending),
+        "auto_resolved_details": [
+            {
+                "conflict_id": c.id,
+                "todo_id": c.todo_id,
+                "resolution": c.resolution,
+                "resolution_note": c.resolution_note
+            }
+            for c in auto_resolved
+        ],
+        "still_pending_details": [
+            {
+                "conflict_id": c.id,
+                "todo_id": c.todo_id,
+                "rule_value": c.rule_value,
+                "batch_value": c.batch_value
+            }
+            for c in still_pending
+        ]
+    }
 
 
 def get_pending_conflicts(db: Session, batch_id: int = None) -> List[ConflictRecord]:
@@ -120,3 +227,19 @@ def get_pending_conflicts(db: Session, batch_id: int = None) -> List[ConflictRec
     if batch_id:
         query = query.filter(ConflictRecord.batch_id == batch_id)
     return query.all()
+
+
+def get_conflicts_by_todo(db: Session, todo_id: int) -> List[ConflictRecord]:
+    return db.query(ConflictRecord).filter(
+        ConflictRecord.todo_id == todo_id
+    ).order_by(ConflictRecord.created_at).all()
+
+
+def get_conflict_summary_for_batch(db: Session, batch_id: int) -> Dict[str, Any]:
+    from models import TodoExtract
+    conflicts = db.query(ConflictRecord).filter(ConflictRecord.batch_id == batch_id).all()
+    current_todo_ids = set(t.id for t in db.query(TodoExtract).filter(TodoExtract.gray_batch_id == batch_id).all())
+    pending = [c for c in conflicts if c.status == "pending" and c.todo_id in current_todo_ids]
+    resolved = [c for c in conflicts if c.status == "resolved" and c.todo_id in current_todo_ids]
+    todos_with_pending = set(c.todo_id for c in pending)
+    return {"batch_id": batch_id, "total_conflicts": len(conflicts), "pending_conflicts": len(pending), "resolved_conflicts": len(resolved), "unique_todos_with_pending": len(todos_with_pending), "unique_todos_affected": len(set(c.todo_id for c in conflicts if c.todo_id in current_todo_ids)), "pending_by_todo": {str(tid): len([c for c in pending if c.todo_id == tid]) for tid in todos_with_pending}}
