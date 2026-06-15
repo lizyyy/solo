@@ -4,7 +4,7 @@
 import json
 import os
 from pathlib import Path
-from typing import List, Dict, Optional, Tuple, Any
+from typing import List, Dict, Optional, Tuple, Any, TYPE_CHECKING
 from datetime import datetime
 import hashlib
 
@@ -15,14 +15,21 @@ from .models import (
     WorkflowState,
 )
 
+if TYPE_CHECKING:
+    from .history_tracker import HistoryTracker
+
 
 class SnapshotManager:
-    def __init__(self, data_dir: str = "data/snapshots"):
+    def __init__(self, data_dir: str = "data/snapshots", history_tracker: Optional["HistoryTracker"] = None):
         self.data_dir = Path(data_dir)
         self.data_dir.mkdir(parents=True, exist_ok=True)
         self.records_file = self.data_dir / "records.json"
         self._records: Dict[str, SnapshotRecord] = {}
+        self._history_tracker = history_tracker
         self._load_records()
+
+    def set_history_tracker(self, history_tracker: "HistoryTracker"):
+        self._history_tracker = history_tracker
 
     def _load_records(self):
         if self.records_file.exists():
@@ -106,6 +113,7 @@ class SnapshotManager:
             return None
 
         record = self._records[snapshot_id]
+        old_record_copy = SnapshotRecord.from_dict(record.to_dict())
         old_values = {}
 
         for key, value in updates.items():
@@ -118,6 +126,20 @@ class SnapshotManager:
         record.custom_fields["last_change_reason"] = change_reason
 
         self._save_records()
+
+        if self._history_tracker is not None and old_values:
+            self._history_tracker.record_changes_from_update(
+                old_record_copy, record, updated_by, change_reason
+            )
+            self._history_tracker.record_audit(
+                snapshot_id,
+                action="snapshot_updated",
+                actor=updated_by,
+                details={"changes": old_values, "reason": change_reason},
+                before_state=old_record_copy.to_dict(),
+                after_state=record.to_dict(),
+            )
+
         return record
 
     def mark_for_review(

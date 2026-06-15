@@ -25,6 +25,7 @@ class WorkflowEngine:
         self.snapshot_manager = snapshot_manager
         self.history_tracker = history_tracker
         self.rule_engine = rule_engine
+        self.snapshot_manager.set_history_tracker(history_tracker)
 
     def _transition_step(
         self,

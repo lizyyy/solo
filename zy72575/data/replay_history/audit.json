@@ -3,9 +3,9 @@
     {
       "snapshot_id": "SNAP001",
       "action": "step_1_import_complete",
-      "actor": "林姐",
-      "audit_id": "35215444-786a-4eae-bdc2-4eeb9e27aa50",
-      "timestamp": "2026-06-15T13:23:37.276023",
+      "actor": "数据科学家林姐",
+      "audit_id": "aecc4182-97b3-46dc-a1db-25343e859426",
+      "timestamp": "2026-06-15T13:23:37.366033",
       "details": {
         "notes": "6月15日线上特征快照，共3条，格式正常",
         "rules_applied": {
@@ -26,8 +26,8 @@
           "source": "online_traffic",
           "date": "2026-06-01"
         },
-        "imported_at": "2026-06-15T13:23:37.274838",
-        "import_batch_id": "a17324ad-cd72-41be-86c8-e0621242d063",
+        "imported_at": "2026-06-15T13:23:37.365211",
+        "import_batch_id": "b7b03d91-3390-4e42-aa24-1615d340e776",
         "status": "imported",
         "notes": "",
         "click_bias_score": null,
@@ -55,8 +55,8 @@
           "source": "online_traffic",
           "date": "2026-06-01"
         },
-        "imported_at": "2026-06-15T13:23:37.274838",
-        "import_batch_id": "a17324ad-cd72-41be-86c8-e0621242d063",
+        "imported_at": "2026-06-15T13:23:37.365211",
+        "import_batch_id": "b7b03d91-3390-4e42-aa24-1615d340e776",
         "status": "imported",
         "notes": "6月15日线上特征快照，共3条，格式正常",
         "click_bias_score": null,
@@ -77,8 +77,8 @@
       "snapshot_id": "SNAP001",
       "action": "snapshot_updated",
       "actor": "林姐",
-      "audit_id": "f03fb3d3-fc58-496a-aca0-3544dcd1c0bd",
-      "timestamp": "2026-06-15T13:23:37.277668",
+      "audit_id": "b7a2a053-0e34-457c-b45b-6ca22899846c",
+      "timestamp": "2026-06-15T13:23:37.367296",
       "details": {
         "changes": {
           "notes": "6月15日线上特征快照，共3条，格式正常"
@@ -97,8 +97,8 @@
           "source": "online_traffic",
           "date": "2026-06-01"
         },
-        "imported_at": "2026-06-15T13:23:37.274838",
-        "import_batch_id": "a17324ad-cd72-41be-86c8-e0621242d063",
+        "imported_at": "2026-06-15T13:23:37.365211",
+        "import_batch_id": "b7b03d91-3390-4e42-aa24-1615d340e776",
         "status": "imported",
         "notes": "6月15日线上特征快照，共3条，格式正常",
         "click_bias_score": null,
@@ -126,8 +126,8 @@
           "source": "online_traffic",
           "date": "2026-06-01"
         },
-        "imported_at": "2026-06-15T13:23:37.274838",
-        "import_batch_id": "a17324ad-cd72-41be-86c8-e0621242d063",
+        "imported_at": "2026-06-15T13:23:37.365211",
+        "import_batch_id": "b7b03d91-3390-4e42-aa24-1615d340e776",
         "status": "imported",
         "notes": "初步检查发现 feature_003 有空值，后续需关注",
         "click_bias_score": null,
@@ -142,7 +142,7 @@
           "import_source": "online_20260615",
           "imported_by": "数据科学家林姐",
           "last_updated_by": "林姐",
-          "last_updated_at": "2026-06-15T13:23:37.276561",
+          "last_updated_at": "2026-06-15T13:23:37.366440",
           "last_change_reason": "补充特征异常说明"
         }
       }
@@ -151,8 +151,8 @@
       "snapshot_id": "SNAP001",
       "action": "step_2_logs_reviewed",
       "actor": "林姐",
-      "audit_id": "d1e8bfbc-ca4e-426f-bf54-1d6045e6a5fc",
-      "timestamp": "2026-06-15T13:23:37.280256",
+      "audit_id": "28fe8ec8-74aa-497b-b87f-2b7b6c796e2c",
+      "timestamp": "2026-06-15T13:23:37.369432",
       "details": {
         "training_log_analysis": "训练曲线收敛正常，AUC从0.71稳步提升至0.86，第15轮后稳定。验证集与训练集gap约0.03，无明显过拟合。",
         "curve_findings": "loss曲线平滑下降，无震荡。AUC提升符合预期。注意第8轮有轻微波动但很快恢复。"
@@ -169,8 +169,8 @@
           "source": "online_traffic",
           "date": "2026-06-01"
         },
-        "imported_at": "2026-06-15T13:23:37.274838",
-        "import_batch_id": "a17324ad-cd72-41be-86c8-e0621242d063",
+        "imported_at": "2026-06-15T13:23:37.365211",
+        "import_batch_id": "b7b03d91-3390-4e42-aa24-1615d340e776",
         "status": "imported",
         "notes": "初步检查发现 feature_003 有空值，后续需关注",
         "click_bias_score": null,
@@ -185,7 +185,7 @@
           "import_source": "online_20260615",
           "imported_by": "数据科学家林姐",
           "last_updated_by": "林姐",
-          "last_updated_at": "2026-06-15T13:23:37.276561",
+          "last_updated_at": "2026-06-15T13:23:37.366440",
           "last_change_reason": "补充特征异常说明"
         }
       },
@@ -201,8 +201,8 @@
           "source": "online_traffic",
           "date": "2026-06-01"
         },
-        "imported_at": "2026-06-15T13:23:37.274838",
-        "import_batch_id": "a17324ad-cd72-41be-86c8-e0621242d063",
+        "imported_at": "2026-06-15T13:23:37.365211",
+        "import_batch_id": "b7b03d91-3390-4e42-aa24-1615d340e776",
         "status": "logs_reviewed",
         "notes": "初步检查发现 feature_003 有空值，后续需关注",
         "click_bias_score": null,
@@ -217,12 +217,12 @@
           "import_source": "online_20260615",
           "imported_by": "数据科学家林姐",
           "last_updated_by": "林姐",
-          "last_updated_at": "2026-06-15T13:23:37.276561",
+          "last_updated_at": "2026-06-15T13:23:37.366440",
           "last_change_reason": "补充特征异常说明",
           "training_log_analysis": "训练曲线收敛正常，AUC从0.71稳步提升至0.86，第15轮后稳定。验证集与训练集gap约0.03，无明显过拟合。",
           "curve_findings": "loss曲线平滑下降，无震荡。AUC提升符合预期。注意第8轮有轻微波动但很快恢复。",
           "logs_reviewed_by": "林姐",
-          "logs_reviewed_at": "2026-06-15T13:23:37.278223"
+          "logs_reviewed_at": "2026-06-15T13:23:37.367763"
         }
       }
     },
@@ -230,8 +230,8 @@
       "snapshot_id": "SNAP001",
       "action": "step_3_summary_updated",
       "actor": "林姐",
-      "audit_id": "9c98c441-9425-44ec-b512-8e7d28d4a5f0",
-      "timestamp": "2026-06-15T13:23:37.286454",
+      "audit_id": "66397f51-ac45-4aa1-a740-0a7526f53a78",
+      "timestamp": "2026-06-15T13:23:37.376694",
       "details": {
         "explainable_summary": "该样本点击偏差评分为0.16，主要影响因素：位置偏置贡献58%，曝光时间贡献27%，用户历史行为贡献15%。特别说明：feature_003（商品类目深度特征）缺失，使用了全局默认分0.5填充，可能对偏差评分有±0.03的影响。",
         "click_bias_score": 0.16,
@@ -243,7 +243,7 @@
         "rules_applied": {
           "triggered_rules": [
             {
-              "rule_id": "364ee00e-9ddb-4b4b-8630-fb304af37c49",
+              "rule_id": "174916fe-6352-4f53-850b-0561c421ccf4",
               "rule_name": "线上特征缺失却给了默认分",
               "rule_type": "missing_feature_default_score",
               "action": "record.status = ProcessingStatus.NEEDS_REVIEW; record.assigned_to = '推荐负责人'",
@@ -252,9 +252,9 @@
           ],
           "applied_actions": [
             {
-              "rule_id": "364ee00e-9ddb-4b4b-8630-fb304af37c49",
+              "rule_id": "174916fe-6352-4f53-850b-0561c421ccf4",
               "rule_name": "线上特征缺失却给了默认分",
-              "applied_at": "2026-06-15T13:23:37.281207",
+              "applied_at": "2026-06-15T13:23:37.370234",
               "applied_by": "林姐"
             }
           ],
@@ -273,8 +273,8 @@
           "source": "online_traffic",
           "date": "2026-06-01"
         },
-        "imported_at": "2026-06-15T13:23:37.274838",
-        "import_batch_id": "a17324ad-cd72-41be-86c8-e0621242d063",
+        "imported_at": "2026-06-15T13:23:37.365211",
+        "import_batch_id": "b7b03d91-3390-4e42-aa24-1615d340e776",
         "status": "logs_reviewed",
         "notes": "初步检查发现 feature_003 有空值，后续需关注",
         "click_bias_score": null,
@@ -289,12 +289,12 @@
           "import_source": "online_20260615",
           "imported_by": "数据科学家林姐",
           "last_updated_by": "林姐",
-          "last_updated_at": "2026-06-15T13:23:37.276561",
+          "last_updated_at": "2026-06-15T13:23:37.366440",
           "last_change_reason": "补充特征异常说明",
           "training_log_analysis": "训练曲线收敛正常，AUC从0.71稳步提升至0.86，第15轮后稳定。验证集与训练集gap约0.03，无明显过拟合。",
           "curve_findings": "loss曲线平滑下降，无震荡。AUC提升符合预期。注意第8轮有轻微波动但很快恢复。",
           "logs_reviewed_by": "林姐",
-          "logs_reviewed_at": "2026-06-15T13:23:37.278223"
+          "logs_reviewed_at": "2026-06-15T13:23:37.367763"
         }
       },
       "after_state": {
@@ -309,8 +309,8 @@
           "source": "online_traffic",
           "date": "2026-06-01"
         },
-        "imported_at": "2026-06-15T13:23:37.274838",
-        "import_batch_id": "a17324ad-cd72-41be-86c8-e0621242d063",
+        "imported_at": "2026-06-15T13:23:37.365211",
+        "import_batch_id": "b7b03d91-3390-4e42-aa24-1615d340e776",
         "status": "needs_review",
         "notes": "初步检查发现 feature_003 有空值，后续需关注",
         "click_bias_score": 0.16,
@@ -327,15 +327,15 @@
           "import_source": "online_20260615",
           "imported_by": "数据科学家林姐",
           "last_updated_by": "林姐",
-          "last_updated_at": "2026-06-15T13:23:37.276561",
+          "last_updated_at": "2026-06-15T13:23:37.366440",
           "last_change_reason": "补充特征异常说明",
           "training_log_analysis": "训练曲线收敛正常，AUC从0.71稳步提升至0.86，第15轮后稳定。验证集与训练集gap约0.03，无明显过拟合。",
           "curve_findings": "loss曲线平滑下降，无震荡。AUC提升符合预期。注意第8轮有轻微波动但很快恢复。",
           "logs_reviewed_by": "林姐",
-          "logs_reviewed_at": "2026-06-15T13:23:37.278223",
+          "logs_reviewed_at": "2026-06-15T13:23:37.367763",
           "explainable_summary": "该样本点击偏差评分为0.16，主要影响因素：位置偏置贡献58%，曝光时间贡献27%，用户历史行为贡献15%。特别说明：feature_003（商品类目深度特征）缺失，使用了全局默认分0.5填充，可能对偏差评分有±0.03的影响。",
           "summary_updated_by": "林姐",
-          "summary_updated_at": "2026-06-15T13:23:37.281143"
+          "summary_updated_at": "2026-06-15T13:23:37.370183"
         }
       }
     },
@@ -343,8 +343,8 @@
       "snapshot_id": "SNAP001",
       "action": "review_approved",
       "actor": "推荐负责人王哥",
-      "audit_id": "0e27bd22-4800-4333-aa17-3584e85727fa",
-      "timestamp": "2026-06-15T13:23:37.295856",
+      "audit_id": "b3b26701-96fe-40c5-93fa-44a049444a5a",
+      "timestamp": "2026-06-15T13:23:37.381359",
       "details": {
         "notes": "已确认feature_003缺失为上游类目系统临时故障导致，故障已修复。默认分填充方式合理，对整体偏差评估影响在可接受范围内。同意标记为正常。",
         "mark_as_normal": true
@@ -361,8 +361,8 @@
           "source": "online_traffic",
           "date": "2026-06-01"
         },
-        "imported_at": "2026-06-15T13:23:37.274838",
-        "import_batch_id": "a17324ad-cd72-41be-86c8-e0621242d063",
+        "imported_at": "2026-06-15T13:23:37.365211",
+        "import_batch_id": "b7b03d91-3390-4e42-aa24-1615d340e776",
         "status": "needs_review",
         "notes": "初步检查发现 feature_003 有空值，后续需关注",
         "click_bias_score": 0.16,
@@ -379,15 +379,15 @@
           "import_source": "online_20260615",
           "imported_by": "数据科学家林姐",
           "last_updated_by": "林姐",
-          "last_updated_at": "2026-06-15T13:23:37.276561",
+          "last_updated_at": "2026-06-15T13:23:37.366440",
           "last_change_reason": "补充特征异常说明",
           "training_log_analysis": "训练曲线收敛正常，AUC从0.71稳步提升至0.86，第15轮后稳定。验证集与训练集gap约0.03，无明显过拟合。",
           "curve_findings": "loss曲线平滑下降，无震荡。AUC提升符合预期。注意第8轮有轻微波动但很快恢复。",
           "logs_reviewed_by": "林姐",
-          "logs_reviewed_at": "2026-06-15T13:23:37.278223",
+          "logs_reviewed_at": "2026-06-15T13:23:37.367763",
           "explainable_summary": "该样本点击偏差评分为0.16，主要影响因素：位置偏置贡献58%，曝光时间贡献27%，用户历史行为贡献15%。特别说明：feature_003（商品类目深度特征）缺失，使用了全局默认分0.5填充，可能对偏差评分有±0.03的影响。",
           "summary_updated_by": "林姐",
-          "summary_updated_at": "2026-06-15T13:23:37.281143"
+          "summary_updated_at": "2026-06-15T13:23:37.370183"
         }
       },
       "after_state": {
@@ -402,8 +402,8 @@
           "source": "online_traffic",
           "date": "2026-06-01"
         },
-        "imported_at": "2026-06-15T13:23:37.274838",
-        "import_batch_id": "a17324ad-cd72-41be-86c8-e0621242d063",
+        "imported_at": "2026-06-15T13:23:37.365211",
+        "import_batch_id": "b7b03d91-3390-4e42-aa24-1615d340e776",
         "status": "normal",
         "notes": "已确认feature_003缺失为上游类目系统临时故障导致，故障已修复。默认分填充方式合理，对整体偏差评估影响在可接受范围内。同意标记为正常。",
         "click_bias_score": 0.16,
@@ -413,22 +413,22 @@
         ],
         "assigned_to": "推荐负责人",
         "reviewed_by": "推荐负责人王哥",
-        "reviewed_at": "2026-06-15T13:23:37.288301",
+        "reviewed_at": "2026-06-15T13:23:37.377829",
         "workflow_step": "step_3_update_summary",
         "workflow_state": "completed",
         "custom_fields": {
           "import_source": "online_20260615",
           "imported_by": "数据科学家林姐",
           "last_updated_by": "林姐",
-          "last_updated_at": "2026-06-15T13:23:37.276561",
+          "last_updated_at": "2026-06-15T13:23:37.366440",
           "last_change_reason": "补充特征异常说明",
           "training_log_analysis": "训练曲线收敛正常，AUC从0.71稳步提升至0.86，第15轮后稳定。验证集与训练集gap约0.03，无明显过拟合。",
           "curve_findings": "loss曲线平滑下降，无震荡。AUC提升符合预期。注意第8轮有轻微波动但很快恢复。",
           "logs_reviewed_by": "林姐",
-          "logs_reviewed_at": "2026-06-15T13:23:37.278223",
+          "logs_reviewed_at": "2026-06-15T13:23:37.367763",
           "explainable_summary": "该样本点击偏差评分为0.16，主要影响因素：位置偏置贡献58%，曝光时间贡献27%，用户历史行为贡献15%。特别说明：feature_003（商品类目深度特征）缺失，使用了全局默认分0.5填充，可能对偏差评分有±0.03的影响。",
           "summary_updated_by": "林姐",
-          "summary_updated_at": "2026-06-15T13:23:37.281143"
+          "summary_updated_at": "2026-06-15T13:23:37.370183"
         }
       }
     }

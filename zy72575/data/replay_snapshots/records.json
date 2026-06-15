@@ -1,0 +1,43 @@
+{
+  "SNAP001": {
+    "snapshot_id": "SNAP001",
+    "original_line_number": 1,
+    "raw_data": {
+      "snapshot_id": "SNAP001",
+      "feature_001": 0.52,
+      "feature_002": 0.78,
+      "feature_003": null,
+      "feature_004": 0.34,
+      "source": "online_traffic",
+      "date": "2026-06-01"
+    },
+    "imported_at": "2026-06-15T13:23:37.365211",
+    "import_batch_id": "b7b03d91-3390-4e42-aa24-1615d340e776",
+    "status": "normal",
+    "notes": "已确认feature_003缺失为上游类目系统临时故障导致，故障已修复。默认分填充方式合理，对整体偏差评估影响在可接受范围内。同意标记为正常。",
+    "click_bias_score": 0.16,
+    "default_score_applied": true,
+    "missing_features": [
+      "feature_003"
+    ],
+    "assigned_to": "推荐负责人",
+    "reviewed_by": "推荐负责人王哥",
+    "reviewed_at": "2026-06-15T13:23:37.377829",
+    "workflow_step": "step_3_update_summary",
+    "workflow_state": "completed",
+    "custom_fields": {
+      "import_source": "online_20260615",
+      "imported_by": "数据科学家林姐",
+      "last_updated_by": "林姐",
+      "last_updated_at": "2026-06-15T13:23:37.366440",
+      "last_change_reason": "补充特征异常说明",
+      "training_log_analysis": "训练曲线收敛正常，AUC从0.71稳步提升至0.86，第15轮后稳定。验证集与训练集gap约0.03，无明显过拟合。",
+      "curve_findings": "loss曲线平滑下降，无震荡。AUC提升符合预期。注意第8轮有轻微波动但很快恢复。",
+      "logs_reviewed_by": "林姐",
+      "logs_reviewed_at": "2026-06-15T13:23:37.367763",
+      "explainable_summary": "该样本点击偏差评分为0.16，主要影响因素：位置偏置贡献58%，曝光时间贡献27%，用户历史行为贡献15%。特别说明：feature_003（商品类目深度特征）缺失，使用了全局默认分0.5填充，可能对偏差评分有±0.03的影响。",
+      "summary_updated_by": "林姐",
+      "summary_updated_at": "2026-06-15T13:23:37.370183"
+    }
+  }
+}

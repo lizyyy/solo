@@ -5,9 +5,9 @@
       "field_name": "notes",
       "old_value": "",
       "new_value": "6月15日线上特征快照，共3条，格式正常",
-      "changed_by": "林姐",
-      "change_id": "04d19a31-b48e-42c2-8fe4-c37d79dfefba",
-      "changed_at": "2026-06-15T13:23:37.275528",
+      "changed_by": "数据科学家林姐",
+      "change_id": "3d69c4e7-9c6e-4ea3-a23f-3661b21ab50c",
+      "changed_at": "2026-06-15T13:23:37.365513",
       "change_reason": "完成第一步：特征快照导入"
     },
     {
@@ -15,9 +15,9 @@
       "field_name": "workflow_state",
       "old_value": "in_progress",
       "new_value": "completed",
-      "changed_by": "林姐",
-      "change_id": "e21ec6d8-8220-4207-b41f-b1805583b92d",
-      "changed_at": "2026-06-15T13:23:37.275735",
+      "changed_by": "数据科学家林姐",
+      "change_id": "33a7f4d8-847e-4fb3-bdef-5b17f7cc4392",
+      "changed_at": "2026-06-15T13:23:37.365745",
       "change_reason": "完成第一步：特征快照导入"
     },
     {
@@ -26,8 +26,8 @@
       "old_value": "6月15日线上特征快照，共3条，格式正常",
       "new_value": "初步检查发现 feature_003 有空值，后续需关注",
       "changed_by": "林姐",
-      "change_id": "6c22210e-b0b4-41bd-b77b-ded06ba49ac2",
-      "changed_at": "2026-06-15T13:23:37.276953",
+      "change_id": "6fd4ab60-ea13-4859-814f-ab843bc32056",
+      "changed_at": "2026-06-15T13:23:37.366627",
       "change_reason": "补充特征异常说明"
     },
     {
@@ -41,12 +41,12 @@
         "import_source": "online_20260615",
         "imported_by": "数据科学家林姐",
         "last_updated_by": "林姐",
-        "last_updated_at": "2026-06-15T13:23:37.276561",
+        "last_updated_at": "2026-06-15T13:23:37.366440",
         "last_change_reason": "补充特征异常说明"
       },
       "changed_by": "林姐",
-      "change_id": "1a845fbe-f29f-44c7-974d-9d4022786e00",
-      "changed_at": "2026-06-15T13:23:37.277288",
+      "change_id": "ff33e83e-9b50-4448-a5c4-8917849f28fe",
+      "changed_at": "2026-06-15T13:23:37.366916",
       "change_reason": "补充特征异常说明"
     },
     {
@@ -55,8 +55,8 @@
       "old_value": "imported",
       "new_value": "logs_reviewed",
       "changed_by": "林姐",
-      "change_id": "80359a99-c2ed-4616-aa1f-e296c069f944",
-      "changed_at": "2026-06-15T13:23:37.278493",
+      "change_id": "3d876495-8deb-43d9-a1bf-2b9e62bc63aa",
+      "changed_at": "2026-06-15T13:23:37.367841",
       "change_reason": "完成第二步：训练日志曲线审阅"
     },
     {
@@ -65,8 +65,8 @@
       "old_value": "step_1_import",
       "new_value": "step_2_review_logs",
       "changed_by": "林姐",
-      "change_id": "e0a6b8b4-8d8d-4631-bece-8bec8981265e",
-      "changed_at": "2026-06-15T13:23:37.279143",
+      "change_id": "7477d083-b9ee-4100-9348-1f536303cd6c",
+      "changed_at": "2026-06-15T13:23:37.368248",
       "change_reason": "完成第二步：训练日志曲线审阅"
     },
     {
@@ -76,23 +76,23 @@
         "import_source": "online_20260615",
         "imported_by": "数据科学家林姐",
         "last_updated_by": "林姐",
-        "last_updated_at": "2026-06-15T13:23:37.276561",
+        "last_updated_at": "2026-06-15T13:23:37.366440",
         "last_change_reason": "补充特征异常说明"
       },
       "new_value": {
         "import_source": "online_20260615",
         "imported_by": "数据科学家林姐",
         "last_updated_by": "林姐",
-        "last_updated_at": "2026-06-15T13:23:37.276561",
+        "last_updated_at": "2026-06-15T13:23:37.366440",
         "last_change_reason": "补充特征异常说明",
         "training_log_analysis": "训练曲线收敛正常，AUC从0.71稳步提升至0.86，第15轮后稳定。验证集与训练集gap约0.03，无明显过拟合。",
         "curve_findings": "loss曲线平滑下降，无震荡。AUC提升符合预期。注意第8轮有轻微波动但很快恢复。",
         "logs_reviewed_by": "林姐",
-        "logs_reviewed_at": "2026-06-15T13:23:37.278223"
+        "logs_reviewed_at": "2026-06-15T13:23:37.367763"
       },
       "changed_by": "林姐",
-      "change_id": "7546afe5-e637-4cdc-b322-d9baedc52ce3",
-      "changed_at": "2026-06-15T13:23:37.279571",
+      "change_id": "969bea53-4d4c-4f19-8b27-fb80b6a76c95",
+      "changed_at": "2026-06-15T13:23:37.368803",
       "change_reason": "完成第二步：训练日志曲线审阅"
     },
     {
@@ -101,8 +101,8 @@
       "old_value": "logs_reviewed",
       "new_value": "needs_review",
       "changed_by": "林姐",
-      "change_id": "bbb45232-b9f2-41c9-b37e-a44726ff2292",
-      "changed_at": "2026-06-15T13:23:37.281300",
+      "change_id": "55b29dd3-9c9c-4b23-92e0-126936b30972",
+      "changed_at": "2026-06-15T13:23:37.370324",
       "change_reason": "完成第三步：可解释摘要更新"
     },
     {
@@ -111,8 +111,8 @@
       "old_value": null,
       "new_value": 0.16,
       "changed_by": "林姐",
-      "change_id": "8e50001e-ef71-4894-9651-c8372d9bdf94",
-      "changed_at": "2026-06-15T13:23:37.281946",
+      "change_id": "2922128e-6489-4e3e-ad2f-b1f507a4a32c",
+      "changed_at": "2026-06-15T13:23:37.370930",
       "change_reason": "完成第三步：可解释摘要更新"
     },
     {
@@ -121,8 +121,8 @@
       "old_value": false,
       "new_value": true,
       "changed_by": "林姐",
-      "change_id": "f189042b-aaaf-4eb9-ada6-b9ce9f92e873",
-      "changed_at": "2026-06-15T13:23:37.282621",
+      "change_id": "dc26b39c-d70c-4618-a80b-41b2790d9be6",
+      "changed_at": "2026-06-15T13:23:37.371593",
       "change_reason": "完成第三步：可解释摘要更新"
     },
     {
@@ -133,8 +133,8 @@
         "feature_003"
       ],
       "changed_by": "林姐",
-      "change_id": "940f2826-8ee1-4df1-97f1-ae3fa4247182",
-      "changed_at": "2026-06-15T13:23:37.283470",
+      "change_id": "3021cf56-3e35-446e-b631-4580e2fd7b57",
+      "changed_at": "2026-06-15T13:23:37.372896",
       "change_reason": "完成第三步：可解释摘要更新"
     },
     {
@@ -143,8 +143,8 @@
       "old_value": null,
       "new_value": "推荐负责人",
       "changed_by": "林姐",
-      "change_id": "ee3525ea-7362-4903-ac21-b8a4a6411fd0",
-      "changed_at": "2026-06-15T13:23:37.284157",
+      "change_id": "a67664cb-0a80-4f32-a674-0468aa928e56",
+      "changed_at": "2026-06-15T13:23:37.374241",
       "change_reason": "完成第三步：可解释摘要更新"
     },
     {
@@ -153,8 +153,8 @@
       "old_value": "step_2_review_logs",
       "new_value": "step_3_update_summary",
       "changed_by": "林姐",
-      "change_id": "1c213adc-460a-4a1b-9bab-9de1757bd8da",
-      "changed_at": "2026-06-15T13:23:37.284867",
+      "change_id": "6d906609-68c1-4cf2-aa31-cd60f58f660b",
+      "changed_at": "2026-06-15T13:23:37.375053",
       "change_reason": "完成第三步：可解释摘要更新"
     },
     {
@@ -164,30 +164,30 @@
         "import_source": "online_20260615",
         "imported_by": "数据科学家林姐",
         "last_updated_by": "林姐",
-        "last_updated_at": "2026-06-15T13:23:37.276561",
+        "last_updated_at": "2026-06-15T13:23:37.366440",
         "last_change_reason": "补充特征异常说明",
         "training_log_analysis": "训练曲线收敛正常，AUC从0.71稳步提升至0.86，第15轮后稳定。验证集与训练集gap约0.03，无明显过拟合。",
         "curve_findings": "loss曲线平滑下降，无震荡。AUC提升符合预期。注意第8轮有轻微波动但很快恢复。",
         "logs_reviewed_by": "林姐",
-        "logs_reviewed_at": "2026-06-15T13:23:37.278223"
+        "logs_reviewed_at": "2026-06-15T13:23:37.367763"
       },
       "new_value": {
         "import_source": "online_20260615",
         "imported_by": "数据科学家林姐",
         "last_updated_by": "林姐",
-        "last_updated_at": "2026-06-15T13:23:37.276561",
+        "last_updated_at": "2026-06-15T13:23:37.366440",
         "last_change_reason": "补充特征异常说明",
         "training_log_analysis": "训练曲线收敛正常，AUC从0.71稳步提升至0.86，第15轮后稳定。验证集与训练集gap约0.03，无明显过拟合。",
         "curve_findings": "loss曲线平滑下降，无震荡。AUC提升符合预期。注意第8轮有轻微波动但很快恢复。",
         "logs_reviewed_by": "林姐",
-        "logs_reviewed_at": "2026-06-15T13:23:37.278223",
+        "logs_reviewed_at": "2026-06-15T13:23:37.367763",
         "explainable_summary": "该样本点击偏差评分为0.16，主要影响因素：位置偏置贡献58%，曝光时间贡献27%，用户历史行为贡献15%。特别说明：feature_003（商品类目深度特征）缺失，使用了全局默认分0.5填充，可能对偏差评分有±0.03的影响。",
         "summary_updated_by": "林姐",
-        "summary_updated_at": "2026-06-15T13:23:37.281143"
+        "summary_updated_at": "2026-06-15T13:23:37.370183"
       },
       "changed_by": "林姐",
-      "change_id": "c449b4c9-8a30-4eb9-83fc-4dabddc8c261",
-      "changed_at": "2026-06-15T13:23:37.285568",
+      "change_id": "81f9972f-7037-48ea-af11-2048813558fe",
+      "changed_at": "2026-06-15T13:23:37.375823",
       "change_reason": "完成第三步：可解释摘要更新"
     },
     {
@@ -196,8 +196,8 @@
       "old_value": "needs_review",
       "new_value": "normal",
       "changed_by": "推荐负责人王哥",
-      "change_id": "916fdb84-21ff-4ffc-a56b-64e12c00f5ea",
-      "changed_at": "2026-06-15T13:23:37.288398",
+      "change_id": "b9bba3b2-76e6-48b2-b941-cad3ee2b9f6a",
+      "changed_at": "2026-06-15T13:23:37.377924",
       "change_reason": "复核通过"
     },
     {
@@ -206,8 +206,8 @@
       "old_value": "初步检查发现 feature_003 有空值，后续需关注",
       "new_value": "已确认feature_003缺失为上游类目系统临时故障导致，故障已修复。默认分填充方式合理，对整体偏差评估影响在可接受范围内。同意标记为正常。",
       "changed_by": "推荐负责人王哥",
-      "change_id": "bfbcab1a-04de-4010-a9f7-7bf49847171c",
-      "changed_at": "2026-06-15T13:23:37.290106",
+      "change_id": "07e4313d-2d15-41d7-9f13-8ff5ac784717",
+      "changed_at": "2026-06-15T13:23:37.378930",
       "change_reason": "复核通过"
     },
     {
@@ -216,8 +216,8 @@
       "old_value": null,
       "new_value": "推荐负责人王哥",
       "changed_by": "推荐负责人王哥",
-      "change_id": "6f5c5f06-24fe-4a45-a39f-a3d647939296",
-      "changed_at": "2026-06-15T13:23:37.293549",
+      "change_id": "4f9b653d-50cc-4981-91a3-3f61babaf121",
+      "changed_at": "2026-06-15T13:23:37.380220",
       "change_reason": "复核通过"
     }
   ]
