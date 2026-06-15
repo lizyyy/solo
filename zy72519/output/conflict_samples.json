@@ -1,6 +1,6 @@
 [
   {
-    "id": "CONF_20260607121136_dd40fceb",
+    "id": "CONF_20260615083932_f81bee81",
     "work_order_id": "WO_002",
     "conflict_type": "category_mismatch",
     "status": "confirmed",
@@ -17,14 +17,75 @@
         }
       }
     ],
-    "detect_time": "2026-06-07T12:11:36.349694",
+    "detect_time": "2026-06-15T08:39:32.803985",
     "handler": "周姐",
-    "handle_time": "2026-06-07T12:11:37.236130",
+    "handle_time": "2026-06-15T08:39:34.994297",
     "handle_notes": "经核实，此冲突确实存在，需要重新分类",
     "resolution": null
   },
   {
-    "id": "CONF_20260607121136_210ee48c",
+    "id": "CONF_20260615083933_2a05e42a",
+    "work_order_id": "WO_002",
+    "conflict_type": "link_404_passed",
+    "status": "need_product_review",
+    "evidence": [
+      {
+        "type": "link_404_passed",
+        "description": "工单引用了 1 个无效链接，但工单已被标记为完成",
+        "source": "link_check",
+        "details": {
+          "broken_links": [
+            {
+              "url": "https://example.com/ticket/12346",
+              "status_code": 404,
+              "reason": "status_404"
+            }
+          ],
+          "work_order_status": "classified"
+        }
+      }
+    ],
+    "detect_time": "2026-06-15T08:39:33.329339",
+    "handler": null,
+    "handle_time": null,
+    "handle_notes": "",
+    "resolution": null
+  },
+  {
+    "id": "CONF_20260615083934_16f922fb",
+    "work_order_id": "WO_006",
+    "conflict_type": "link_404_passed",
+    "status": "need_product_review",
+    "evidence": [
+      {
+        "type": "link_404_passed",
+        "description": "工单引用了 2 个无效链接，但工单已被标记为完成",
+        "source": "link_check",
+        "details": {
+          "broken_links": [
+            {
+              "url": "https://example.com/ticket/12349",
+              "status_code": 404,
+              "reason": "status_404"
+            },
+            {
+              "url": "https://example.com/invalid-logistics-page",
+              "status_code": 404,
+              "reason": "status_404"
+            }
+          ],
+          "work_order_status": "resolved"
+        }
+      }
+    ],
+    "detect_time": "2026-06-15T08:39:34.378615",
+    "handler": null,
+    "handle_time": null,
+    "handle_notes": "",
+    "resolution": null
+  },
+  {
+    "id": "CONF_20260615083934_6bbf3be9",
     "work_order_id": "WO_004",
     "conflict_type": "category_mismatch",
     "status": "rejected",
@@ -41,9 +102,9 @@
         }
       }
     ],
-    "detect_time": "2026-06-07T12:11:36.800135",
+    "detect_time": "2026-06-15T08:39:34.378656",
     "handler": "周姐",
-    "handle_time": "2026-06-07T12:11:37.236717",
+    "handle_time": "2026-06-15T08:39:34.994752",
     "handle_notes": "经核实，分类是正确的，备注描述有误",
     "resolution": null
   }

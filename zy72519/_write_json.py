@@ -1,4 +1,6 @@
-[
+import json
+
+data = [
   {
     "id": "WO_001",
     "title": "用户反馈APP登录异常",
@@ -48,3 +50,8 @@
     "review_notes": "已联系物流商核实，工单标记为已解决"
   }
 ]
+
+with open("data/samples/normal_work_orders.json", "w", encoding="utf-8") as f:
+    json.dump(data, f, ensure_ascii=False, indent=2)
+
+print("normal_work_orders.json 写入成功")

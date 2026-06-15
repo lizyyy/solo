@@ -100,7 +100,10 @@ class WorkflowEngine:
                 if remark.is_important:
                     if work_order.status == WorkOrderStatus.PENDING:
                         work_order.status = WorkOrderStatus.NEED_REVIEW
-                    work_order.review_notes = f"周姐已审阅，重要备注: {remark.remark_content[:50]}..."
+                    if not work_order.review_notes:
+                        work_order.review_notes = f"周姐已审阅，重要备注: {remark.remark_content[:50]}..."
+                    else:
+                        work_order.review_notes += f" | 周姐审阅备注: {remark.remark_content[:50]}..."
 
                 from models import HistoryRecord, OperationType
                 self.importer.history.append(HistoryRecord(
@@ -226,6 +229,25 @@ class WorkflowEngine:
         csv_rows = []
         for c in self.detector.conflicts.values():
             wo = self.importer.work_orders.get(c.work_order_id)
+
+            broken_links_detail = ""
+            interception_reason = ""
+            for ev in c.evidence:
+                details = ev.details or {}
+                if "broken_links" in details and details["broken_links"]:
+                    bl_list = []
+                    for bl in details["broken_links"]:
+                        url = bl.get("url", "")
+                        sc = bl.get("status_code", "")
+                        reason = bl.get("reason", "")
+                        bl_list.append(f"{url} (状态码:{sc}, 原因:{reason})")
+                    broken_links_detail = " | ".join(bl_list)
+                    interception_reason = ev.description
+
+            is_confirmed = "否"
+            if c.status.value in ("confirmed", "resolved", "rejected"):
+                is_confirmed = "是"
+
             csv_rows.append({
                 "冲突ID": c.id,
                 "工单ID": c.work_order_id,
@@ -237,6 +259,10 @@ class WorkflowEngine:
                 "处理时间": c.handle_time.isoformat() if c.handle_time else "",
                 "处理备注": c.handle_notes,
                 "解决方案": c.resolution or "",
+                "失效链接": broken_links_detail,
+                "拦截原因说明": interception_reason,
+                "当前责任方": c.handler or "",
+                "是否完成确认": is_confirmed,
             })
         save_csv(csv_rows, str(self.output_dir / "conflict_samples.csv"))
 

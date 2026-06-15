@@ -44,7 +44,7 @@ class SelfChecker:
         self.results = []
 
         self.results.append(self._check_duplicate_imports(work_orders))
-        self.results.append(self._check_link_404_passed(work_orders))
+        self.results.append(self._check_link_404_passed(work_orders, conflicts))
         self.results.append(self._check_supplementary_recalculation(work_orders, conflicts))
         self.results.append(self._check_export_consistency(work_orders, remarks, conflicts))
         self.results.append(self._check_history_consistency(work_orders, remarks, conflicts))
@@ -83,32 +83,100 @@ class SelfChecker:
             details={"batch_counts": batch_counts},
         )
 
-    def _check_link_404_passed(self, work_orders: Dict[str, WorkOrder]) -> CheckResult:
+    def _check_link_404_passed(
+        self,
+        work_orders: Dict[str, WorkOrder],
+        conflicts: Dict[str, ConflictSample],
+    ) -> CheckResult:
         problematic = []
+        severity = "warning"
+        has_missing_conflict = False
+
+        link_404_conflicts = {}
+        for c in conflicts.values():
+            if c.conflict_type == ConflictType.LINK_404_PASSED:
+                if c.work_order_id not in link_404_conflicts:
+                    link_404_conflicts[c.work_order_id] = []
+                link_404_conflicts[c.work_order_id].append(c)
+
         for wo in work_orders.values():
             if not wo.reference_links:
                 continue
-            if wo.status.value not in ("classified", "resolved"):
-                continue
 
+            broken_links_in_wo = []
             for link in wo.reference_links:
                 is_valid, status_code, reason = self.link_checker.check_link(link)
                 if not is_valid:
-                    problematic.append({
-                        "work_order_id": wo.id,
-                        "work_order_title": wo.title,
-                        "broken_link": link,
+                    broken_links_in_wo.append({
+                        "url": link,
                         "status_code": status_code,
                         "reason": reason,
-                        "work_order_status": wo.status.value,
                     })
+
+            if not broken_links_in_wo:
+                continue
+
+            related_conflicts = link_404_conflicts.get(wo.id, [])
+            need_review_conflicts = [
+                c for c in related_conflicts
+                if c.status == ConflictStatus.NEED_PRODUCT_REVIEW
+            ]
+
+            should_report = False
+            conflict_status_to_add = None
+            issue_type = ""
+
+            if wo.status.value in ("classified", "resolved"):
+                should_report = True
+                issue_type = "已完成工单含失效链接"
+                if need_review_conflicts:
+                    conflict_status_to_add = need_review_conflicts[0].status.value
+                elif related_conflicts:
+                    conflict_status_to_add = related_conflicts[0].status.value
+
+            if need_review_conflicts:
+                should_report = True
+                issue_type = "LINK_404冲突待产品复核"
+                conflict_status_to_add = ConflictStatus.NEED_PRODUCT_REVIEW.value
+
+            if should_report:
+                for bl in broken_links_in_wo:
+                    entry = {
+                        "work_order_id": wo.id,
+                        "work_order_title": wo.title,
+                        "broken_link": bl["url"],
+                        "status_code": bl["status_code"],
+                        "reason": bl["reason"],
+                        "work_order_status": wo.status.value,
+                        "issue_type": issue_type,
+                    }
+                    if conflict_status_to_add:
+                        entry["conflict_status"] = conflict_status_to_add
+                    problematic.append(entry)
+
+            if broken_links_in_wo and not related_conflicts:
+                has_missing_conflict = True
+                for bl in broken_links_in_wo:
+                    entry = {
+                        "work_order_id": wo.id,
+                        "work_order_title": wo.title,
+                        "broken_link": bl["url"],
+                        "status_code": bl["status_code"],
+                        "reason": bl["reason"],
+                        "work_order_status": wo.status.value,
+                        "issue_type": "检测到失效链接但未生成冲突",
+                    }
+                    problematic.append(entry)
+
+        if has_missing_conflict:
+            severity = "error"
 
         if problematic:
             return CheckResult(
                 check_name="引用链接404仍被判通过检测",
                 passed=False,
-                message=f"发现 {len(problematic)} 个工单存在无效链接但已被标记为完成",
-                severity="warning",
+                message=f"发现 {len(problematic)} 个链接问题",
+                severity=severity,
                 details={"problematic_orders": problematic},
             )
 

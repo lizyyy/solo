@@ -1,9 +1,9 @@
 {
-  "workflow_time": "2026-06-07T12:11:37.234915",
+  "workflow_time": "2026-06-15T08:39:34.993403",
   "step_results": {
     "step1": {
       "normal": {
-        "count": 3,
+        "count": 4,
         "warnings": []
       },
       "wrong_caliber": {
@@ -14,7 +14,7 @@
         "count": 2,
         "warnings": []
       },
-      "total": 5
+      "total": 6
     },
     "step2": {
       "remarks_count": 4,
@@ -22,12 +22,12 @@
       "affected_work_orders": 4
     },
     "step3": {
-      "total_detected": 2,
+      "total_detected": 4,
       "pending_confirmation": 2,
-      "need_product_review": 0,
+      "need_product_review": 2,
       "conflicts": [
         {
-          "id": "CONF_20260607121136_dd40fceb",
+          "id": "CONF_20260615083932_f81bee81",
           "work_order_id": "WO_002",
           "conflict_type": "category_mismatch",
           "status": "pending_confirm",
@@ -44,14 +44,75 @@
               }
             }
           ],
-          "detect_time": "2026-06-07T12:11:36.349694",
+          "detect_time": "2026-06-15T08:39:32.803985",
           "handler": null,
           "handle_time": null,
           "handle_notes": "",
           "resolution": null
         },
         {
-          "id": "CONF_20260607121136_210ee48c",
+          "id": "CONF_20260615083933_2a05e42a",
+          "work_order_id": "WO_002",
+          "conflict_type": "link_404_passed",
+          "status": "need_product_review",
+          "evidence": [
+            {
+              "type": "link_404_passed",
+              "description": "工单引用了 1 个无效链接，但工单已被标记为完成",
+              "source": "link_check",
+              "details": {
+                "broken_links": [
+                  {
+                    "url": "https://example.com/ticket/12346",
+                    "status_code": 404,
+                    "reason": "status_404"
+                  }
+                ],
+                "work_order_status": "classified"
+              }
+            }
+          ],
+          "detect_time": "2026-06-15T08:39:33.329339",
+          "handler": null,
+          "handle_time": null,
+          "handle_notes": "",
+          "resolution": null
+        },
+        {
+          "id": "CONF_20260615083934_16f922fb",
+          "work_order_id": "WO_006",
+          "conflict_type": "link_404_passed",
+          "status": "need_product_review",
+          "evidence": [
+            {
+              "type": "link_404_passed",
+              "description": "工单引用了 2 个无效链接，但工单已被标记为完成",
+              "source": "link_check",
+              "details": {
+                "broken_links": [
+                  {
+                    "url": "https://example.com/ticket/12349",
+                    "status_code": 404,
+                    "reason": "status_404"
+                  },
+                  {
+                    "url": "https://example.com/invalid-logistics-page",
+                    "status_code": 404,
+                    "reason": "status_404"
+                  }
+                ],
+                "work_order_status": "resolved"
+              }
+            }
+          ],
+          "detect_time": "2026-06-15T08:39:34.378615",
+          "handler": null,
+          "handle_time": null,
+          "handle_notes": "",
+          "resolution": null
+        },
+        {
+          "id": "CONF_20260615083934_6bbf3be9",
           "work_order_id": "WO_004",
           "conflict_type": "category_mismatch",
           "status": "pending_confirm",
@@ -68,7 +129,7 @@
               }
             }
           ],
-          "detect_time": "2026-06-07T12:11:36.800135",
+          "detect_time": "2026-06-15T08:39:34.378656",
           "handler": null,
           "handle_time": null,
           "handle_notes": "",
@@ -78,19 +139,23 @@
     }
   },
   "work_order_summary": {
-    "total": 5,
+    "total": 6,
     "by_status": {
-      "need_review": 2,
-      "pending": 3
+      "need_review": 1,
+      "classified": 1,
+      "pending": 3,
+      "resolved": 1
     }
   },
   "conflict_summary": {
-    "total": 2,
+    "total": 4,
     "by_status": {
-      "pending_confirm": 2
+      "pending_confirm": 2,
+      "need_product_review": 2
     },
     "by_type": {
-      "category_mismatch": 2
+      "category_mismatch": 2,
+      "link_404_passed": 2
     }
   }
 }

@@ -1,10 +1,10 @@
 {
-  "check_time": "2026-06-07T12:11:37.237805",
+  "check_time": "2026-06-15T08:39:37.974118",
   "summary": {
     "total": 5,
-    "passed": 5,
-    "failed": 0,
-    "errors": 0,
+    "passed": 4,
+    "failed": 1,
+    "errors": 1,
     "warnings": 0
   },
   "results": [
@@ -15,16 +15,76 @@
       "severity": "info",
       "details": {
         "batch_counts": {
-          "BATCH_20260607121135": 5
+          "BATCH_20260615083931": 6
         }
       }
     },
     {
       "check_name": "引用链接404仍被判通过检测",
-      "passed": true,
-      "message": "未发现链接问题",
-      "severity": "info",
-      "details": {}
+      "passed": false,
+      "message": "发现 6 个链接问题",
+      "severity": "error",
+      "details": {
+        "problematic_orders": [
+          {
+            "work_order_id": "WO_001",
+            "work_order_title": "用户反馈APP登录异常-补充",
+            "broken_link": "https://example.com/ticket/12345",
+            "status_code": 404,
+            "reason": "status_404",
+            "work_order_status": "need_review",
+            "issue_type": "检测到失效链接但未生成冲突"
+          },
+          {
+            "work_order_id": "WO_001",
+            "work_order_title": "用户反馈APP登录异常-补充",
+            "broken_link": "https://example.com/wiki/login-issue",
+            "status_code": 404,
+            "reason": "status_404",
+            "work_order_status": "need_review",
+            "issue_type": "检测到失效链接但未生成冲突"
+          },
+          {
+            "work_order_id": "WO_002",
+            "work_order_title": "支付页面加载缓慢",
+            "broken_link": "https://example.com/ticket/12346",
+            "status_code": 404,
+            "reason": "status_404",
+            "work_order_status": "conflict",
+            "issue_type": "LINK_404冲突待产品复核",
+            "conflict_status": "need_product_review"
+          },
+          {
+            "work_order_id": "WO_006",
+            "work_order_title": "物流信息长时间不更新",
+            "broken_link": "https://example.com/ticket/12349",
+            "status_code": 404,
+            "reason": "status_404",
+            "work_order_status": "resolved",
+            "issue_type": "LINK_404冲突待产品复核",
+            "conflict_status": "need_product_review"
+          },
+          {
+            "work_order_id": "WO_006",
+            "work_order_title": "物流信息长时间不更新",
+            "broken_link": "https://example.com/invalid-logistics-page",
+            "status_code": 404,
+            "reason": "status_404",
+            "work_order_status": "resolved",
+            "issue_type": "LINK_404冲突待产品复核",
+            "conflict_status": "need_product_review"
+          },
+          {
+            "work_order_id": "WO_004",
+            "work_order_title": "客服态度问题投诉",
+            "broken_link": "https://example.com/ticket/12348",
+            "status_code": 404,
+            "reason": "status_404",
+            "work_order_status": "pending",
+            "issue_type": "检测到失效链接但未生成冲突"
+          }
+        ]
+      }
     },
     {
       "check_name": "补录后重算检测",
@@ -41,9 +101,9 @@
       "message": "数据引用一致",
       "severity": "info",
       "details": {
-        "work_order_count": 5,
+        "work_order_count": 6,
         "remark_count": 4,
-        "conflict_count": 2
+        "conflict_count": 4
       }
     },
     {

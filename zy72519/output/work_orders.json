@@ -6,7 +6,7 @@
     "category": "功能异常",
     "source": "补录",
     "feedback_time": "2026-06-01T10:30:00",
-    "import_time": "2026-06-07T12:11:35.199778",
+    "import_time": "2026-06-15T08:39:31.731540",
     "status": "need_review",
     "reference_links": [
       "https://example.com/ticket/12345",
@@ -22,10 +22,10 @@
       "reference_links": "https://example.com/ticket/12345|https://example.com/wiki/login-issue",
       "original_note": "补充了版本信息和影响范围"
     },
-    "import_batch": "BATCH_20260607121135",
+    "import_batch": "BATCH_20260615083931",
     "is_supplementary": true,
     "reviewer": "周姐",
-    "review_time": "2026-06-07T12:11:35.201850",
+    "review_time": "2026-06-15T08:39:31.734753",
     "review_notes": "周姐已审阅，重要备注: 此工单涉及用户登录日志，包含手机号等敏感信息。导出时需脱敏处理，不对外公开原始数据。重要：此问题涉及..."
   },
   {
@@ -35,7 +35,7 @@
     "category": "性能问题",
     "source": "线上反馈",
     "feedback_time": "2026-06-02T14:20:00",
-    "import_time": "2026-06-07T12:11:35.199877",
+    "import_time": "2026-06-15T08:39:31.731589",
     "status": "conflict",
     "reference_links": [
       "https://example.com/ticket/12346"
@@ -48,12 +48,16 @@
       "source": "线上反馈",
       "feedback_time": "2026-06-02T14:20:00",
       "reference_links": "https://example.com/ticket/12346",
-      "original_note": "涉及金额敏感，需要谨慎处理相关日志"
+      "original_note": "涉及金额敏感，需要谨慎处理相关日志",
+      "status": "classified",
+      "reviewer": "标注员A",
+      "review_time": "2026-06-02T17:00:00",
+      "review_notes": "初判为性能问题，已完成分类标注"
     },
-    "import_batch": "BATCH_20260607121135",
+    "import_batch": "BATCH_20260615083931",
     "is_supplementary": false,
     "reviewer": "周姐",
-    "review_time": "2026-06-07T12:11:37.236138",
+    "review_time": "2026-06-15T08:39:34.994304",
     "review_notes": "冲突已确认: category_mismatch"
   },
   {
@@ -63,7 +67,7 @@
     "category": "展示问题",
     "source": "线上反馈",
     "feedback_time": "2026-06-03T09:15:00",
-    "import_time": "2026-06-07T12:11:35.199907",
+    "import_time": "2026-06-15T08:39:31.731606",
     "status": "pending",
     "reference_links": [],
     "original_raw_data": {
@@ -76,11 +80,44 @@
       "reference_links": "",
       "original_note": ""
     },
-    "import_batch": "BATCH_20260607121135",
+    "import_batch": "BATCH_20260615083931",
     "is_supplementary": false,
     "reviewer": null,
     "review_time": null,
     "review_notes": ""
+  },
+  {
+    "id": "WO_006",
+    "title": "物流信息长时间不更新",
+    "content": "用户下单后物流信息3天未更新，多次查询物流单号均显示404或异常。用户怀疑丢件要求赔偿。",
+    "category": "物流问题",
+    "source": "线上反馈",
+    "feedback_time": "2026-06-04T08:00:00",
+    "import_time": "2026-06-15T08:39:31.731619",
+    "status": "resolved",
+    "reference_links": [
+      "https://example.com/ticket/12349",
+      "https://example.com/invalid-logistics-page"
+    ],
+    "original_raw_data": {
+      "id": "WO_006",
+      "title": "物流信息长时间不更新",
+      "content": "用户下单后物流信息3天未更新，多次查询物流单号均显示404或异常。用户怀疑丢件要求赔偿。",
+      "category": "物流问题",
+      "source": "线上反馈",
+      "feedback_time": "2026-06-04T08:00:00",
+      "reference_links": "https://example.com/ticket/12349|https://example.com/invalid-logistics-page",
+      "original_note": "引用的物流追踪链接已失效，但标注员仍判为通过",
+      "status": "resolved",
+      "reviewer": "标注员B",
+      "review_time": "2026-06-04T12:30:00",
+      "review_notes": "已联系物流商核实，工单标记为已解决"
+    },
+    "import_batch": "BATCH_20260615083931",
+    "is_supplementary": false,
+    "reviewer": "标注员B",
+    "review_time": "2026-06-04T12:30:00",
+    "review_notes": "已联系物流商核实，工单标记为已解决"
   },
   {
     "id": "WO_004",
@@ -89,7 +126,7 @@
     "category": "功能异常",
     "source": "线上反馈",
     "feedback_time": "2026-06-04T16:45:00",
-    "import_time": "2026-06-07T12:11:35.200459",
+    "import_time": "2026-06-15T08:39:31.732986",
     "status": "pending",
     "reference_links": [
       "https://example.com/ticket/12348"
@@ -104,10 +141,10 @@
       "reference_links": "https://example.com/ticket/12348",
       "original_note": "此工单被错误归类为功能异常，实际应为服务投诉"
     },
-    "import_batch": "BATCH_20260607121135",
+    "import_batch": "BATCH_20260615083931",
     "is_supplementary": false,
     "reviewer": "周姐",
-    "review_time": "2026-06-07T12:11:35.201880",
+    "review_time": "2026-06-15T08:39:31.734782",
     "review_notes": ""
   },
   {
@@ -117,7 +154,7 @@
     "category": "功能异常",
     "source": "补录",
     "feedback_time": "2026-06-05T11:00:00",
-    "import_time": "2026-06-07T12:11:35.200876",
+    "import_time": "2026-06-15T08:39:31.733707",
     "status": "pending",
     "reference_links": [],
     "original_raw_data": {
@@ -130,10 +167,10 @@
       "reference_links": "",
       "original_note": "遗漏工单补录"
     },
-    "import_batch": "BATCH_20260607121135",
+    "import_batch": "BATCH_20260615083931",
     "is_supplementary": true,
     "reviewer": "周姐",
-    "review_time": "2026-06-07T12:11:35.201892",
+    "review_time": "2026-06-15T08:39:31.734793",
     "review_notes": ""
   }
 ]

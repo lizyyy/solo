@@ -29,6 +29,23 @@ class DataImporter:
         work_order_id = row.get("id") or generate_id("WO")
         existing = self.work_orders.get(work_order_id)
 
+        status_value = row.get("status")
+        if status_value:
+            try:
+                parsed_status = WorkOrderStatus(status_value)
+            except ValueError:
+                parsed_status = WorkOrderStatus.PENDING
+        else:
+            parsed_status = WorkOrderStatus.PENDING
+
+        reviewer = row.get("reviewer")
+        review_time = None
+        if row.get("review_time"):
+            try:
+                review_time = datetime.fromisoformat(row["review_time"])
+            except (ValueError, TypeError):
+                review_time = None
+
         work_order = WorkOrder(
             id=work_order_id,
             title=row.get("title", ""),
@@ -37,16 +54,24 @@ class DataImporter:
             source=row.get("source", ""),
             feedback_time=datetime.fromisoformat(row["feedback_time"]) if row.get("feedback_time") else datetime.now(),
             import_time=datetime.now(),
-            status=WorkOrderStatus.PENDING,
+            status=parsed_status,
             reference_links=row.get("reference_links", "").split("|") if row.get("reference_links") else [],
             original_raw_data=dict(row),
             import_batch=batch_id,
             is_supplementary=(import_type == ImportType.SUPPLEMENTARY),
+            reviewer=reviewer,
+            review_time=review_time,
+            review_notes=row.get("review_notes", ""),
         )
 
         if existing and import_type == ImportType.SUPPLEMENTARY:
             work_order.import_time = existing.import_time
-            work_order.status = existing.status
+            if not status_value:
+                work_order.status = existing.status
+            if existing.reviewer and not reviewer:
+                work_order.reviewer = existing.reviewer
+            if existing.review_time and not review_time:
+                work_order.review_time = existing.review_time
 
         return work_order
 
