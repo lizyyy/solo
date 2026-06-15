@@ -1,0 +1,15 @@
+material_type: "补录材料"
+material_id: "MAT-SUPP-001"
+scenario: "因果 uplift 人群圈选"
+description: "从参数YAML补录旧口径/线上特征缺失给默认分的样例集合"
+target_samples:
+  - "SAMPLE-002"
+  - "SAMPLE-003"
+expected:
+  SAMPLE-002:
+    status: "FEATURE_MISSING_DEFAULT"
+    need_review_by: "推荐负责人"
+    default_score_applied: true
+  SAMPLE-003:
+    status: "YAML_SUPPLEMENT_OLD_CALIBER"
+    supplemented_from_yaml: true

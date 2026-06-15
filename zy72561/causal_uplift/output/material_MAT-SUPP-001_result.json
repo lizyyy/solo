@@ -1,0 +1,77 @@
+{
+  "material": {
+    "material_type": "补录材料",
+    "material_id": "MAT-SUPP-001",
+    "scenario": "因果 uplift 人群圈选",
+    "description": "从参数YAML补录旧口径/线上特征缺失给默认分的样例集合",
+    "target_samples": [
+      "SAMPLE-002",
+      "SAMPLE-003"
+    ],
+    "expected": {
+      "SAMPLE-002": {
+        "status": "FEATURE_MISSING_DEFAULT",
+        "need_review_by": "推荐负责人",
+        "default_score_applied": true
+      },
+      "SAMPLE-003": {
+        "status": "YAML_SUPPLEMENT_OLD_CALIBER",
+        "supplemented_from_yaml": true
+      }
+    }
+  },
+  "records": {
+    "SAMPLE-002": {
+      "status": "REVIEW_COMPLETED",
+      "uplift_score": 0.5,
+      "summary": "[推荐复核完成] sample_id=SAMPLE-002，决策=accept_default_score，由林川处理，理由: [材料MAT-SUPP-001] 推荐负责人按材料规则接受默认分。最终 uplift_score=0.5。",
+      "history": [
+        {
+          "sample_id": "SAMPLE-002",
+          "role": "推荐负责人",
+          "actor": "林川",
+          "action": "AUTO_PENDING",
+          "reason": "线上特征缺失（avg_purchase_30d/ctr_7d），已给默认分，不急着归正常，留给推荐负责人复核",
+          "timestamp": "2026-06-15T13:11:51.475176",
+          "before_status": "FEATURE_MISSING_DEFAULT",
+          "after_status": "PENDING_REVIEW",
+          "field_changes": {}
+        },
+        {
+          "sample_id": "SAMPLE-002",
+          "role": "推荐负责人",
+          "actor": "林川",
+          "action": "REVIEW_ACCEPT_DEFAULT",
+          "reason": "[材料MAT-SUPP-001] 推荐负责人按材料规则接受默认分",
+          "timestamp": "2026-06-15T13:11:51.476146",
+          "before_status": "PENDING_REVIEW",
+          "after_status": "REVIEW_COMPLETED",
+          "field_changes": {
+            "decision": "accept_default_score"
+          }
+        }
+      ]
+    },
+    "SAMPLE-003": {
+      "status": "CONFIRMED",
+      "uplift_score": 0.675,
+      "summary": "[已确认] sample_id=SAMPLE-003，由阿越确认，理由: [材料MAT-SUPP-001] 阿越按材料规则确认。最终 uplift_score=0.675。",
+      "history": [
+        {
+          "sample_id": "SAMPLE-003",
+          "role": "实验平台负责人",
+          "actor": "阿越",
+          "action": "CONFIRM",
+          "reason": "[材料MAT-SUPP-001] 阿越按材料规则确认",
+          "timestamp": "2026-06-15T13:11:51.476157",
+          "before_status": "YAML_SUPPLEMENT_OLD_CALIBER",
+          "after_status": "CONFIRMED",
+          "field_changes": {
+            "confirmed_caliber_source": "yaml_supplement",
+            "confirmed_uplift_score": 0.675
+          }
+        }
+      ]
+    }
+  }
+}

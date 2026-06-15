@@ -1,0 +1,17 @@
+{
+  "step": "STEP 4 - 推荐负责人对特征缺失默认分进行复核",
+  "timestamp": "2026-06-15T13:11:25.073863",
+  "review_actions": [
+    {
+      "sample_id": "SAMPLE-002",
+      "before_status": "PENDING_REVIEW",
+      "after_status": "REVIEW_COMPLETED",
+      "actor": "林川",
+      "decision": "ACCEPT_DEFAULT",
+      "reason": "核查线上特征SLA，该时段确实出现特征服务降级，默认分0.500可接受，无需覆盖",
+      "field_changes": {
+        "decision": "accept_default_score"
+      }
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "material": {
+    "material_type": "正常材料",
+    "material_id": "MAT-NORMAL-001",
+    "scenario": "因果 uplift 人群圈选",
+    "description": "线上特征齐全、口径匹配、无冲突的标准样例",
+    "target_samples": [
+      "SAMPLE-001"
+    ],
+    "expected": {
+      "status": "NORMAL",
+      "caliber": "v2",
+      "need_review": false
+    }
+  },
+  "records": {
+    "SAMPLE-001": {
+      "status": "NORMAL",
+      "uplift_score": 0.782,
+      "summary": "[正常记录] sample_id=SAMPLE-001，线上特征齐全，uplift_score=0.782，口径来源=online，无需复核。",
+      "history": []
+    }
+  }
+}

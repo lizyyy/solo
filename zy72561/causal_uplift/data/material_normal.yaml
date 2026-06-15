@@ -1,0 +1,10 @@
+material_type: "正常材料"
+material_id: "MAT-NORMAL-001"
+scenario: "因果 uplift 人群圈选"
+description: "线上特征齐全、口径匹配、无冲突的标准样例"
+target_samples:
+  - "SAMPLE-001"
+expected:
+  status: "NORMAL"
+  caliber: "v2"
+  need_review: false

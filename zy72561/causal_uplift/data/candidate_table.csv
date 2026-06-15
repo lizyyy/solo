@@ -1,0 +1,4 @@
+sample_id,user_id,scene,online_uplift_score,feature_avg_purchase_30d,feature_ctr_7d,feature_category_pref,caliber_version,remark
+SAMPLE-001,U10086,home_feed_recommend,0.782,156.5,0.128,electronics,v2,正常记录:线上特征齐全
+SAMPLE-002,U20391,home_feed_recommend,0.500,,,clothing,v2,特征缺失:avg_purchase_30d 和 ctr_7d 线上未返回，给了默认分0.5
+SAMPLE-003,U38472,search_result,0.641,89.2,0.055,beauty,v1,旧口径:候选表里仍标 v1，参数YAML已升级到v2，需补录

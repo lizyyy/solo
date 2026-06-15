@@ -1,0 +1,42 @@
+{
+  "material": {
+    "material_type": "错口径材料",
+    "material_id": "MAT-WRONG-001",
+    "scenario": "因果 uplift 人群圈选",
+    "description": "召回候选表口径与参数YAML不一致（候选表v1，YAML补录v2）的冲突样例",
+    "target_samples": [
+      "SAMPLE-003"
+    ],
+    "expected": {
+      "detect_conflict": true,
+      "fields": [
+        "caliber_version",
+        "uplift_score"
+      ],
+      "need_confirm_by": "实验平台负责人阿越"
+    }
+  },
+  "records": {
+    "SAMPLE-003": {
+      "status": "CONFIRMED",
+      "uplift_score": 0.675,
+      "summary": "[已确认] sample_id=SAMPLE-003，由阿越确认，理由: [材料MAT-WRONG-001] 阿越按材料规则确认。最终 uplift_score=0.675。",
+      "history": [
+        {
+          "sample_id": "SAMPLE-003",
+          "role": "实验平台负责人",
+          "actor": "阿越",
+          "action": "CONFIRM",
+          "reason": "[材料MAT-WRONG-001] 阿越按材料规则确认",
+          "timestamp": "2026-06-15T13:11:51.337747",
+          "before_status": "YAML_SUPPLEMENT_OLD_CALIBER",
+          "after_status": "CONFIRMED",
+          "field_changes": {
+            "confirmed_caliber_source": "yaml_supplement",
+            "confirmed_uplift_score": 0.675
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,41 @@
+pipeline:
+  name: "causal_uplift_audience_selection"
+  scene: "因果 uplift 人群圈选"
+  current_caliber_version: "v2"
+  default_score: 0.500
+
+caliber_definitions:
+  v1:
+    description: "旧口径：仅使用30天购买金额+7天CTR做uplift预测（2024年Q1前使用）"
+    feature_weights:
+      avg_purchase_30d: 0.6
+      ctr_7d: 0.4
+    threshold: 0.60
+  v2:
+    description: "新口径：加入品类偏好特征，权重调整（2024年Q2起生效）"
+    feature_weights:
+      avg_purchase_30d: 0.4
+      ctr_7d: 0.3
+      category_pref: 0.3
+    threshold: 0.55
+
+supplemented_records:
+  SAMPLE-003:
+    supplemented_by: "实验平台-阿越"
+    supplemented_at: "2026-06-05T14:22:00"
+    caliber_version: "v2"
+    uplift_score_recalc: 0.675
+    reason: "参数YAML升级到v2后补录，按新口径重算，候选表中v1为历史遗留值"
+    features:
+      avg_purchase_30d: 89.2
+      ctr_7d: 0.055
+      category_pref: "beauty"
+
+review_settings:
+  roles:
+    experiment_platform_owner: "阿越"
+    recommend_lead: "林川"
+  require_review_when:
+    - "feature_missing_default"
+    - "caliber_conflict"
+    - "yaml_supplement"

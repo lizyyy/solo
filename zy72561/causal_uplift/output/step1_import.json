@@ -1,0 +1,34 @@
+{
+  "step": "STEP 1 - 召回候选表第一次导入",
+  "timestamp": "2026-06-15T13:11:51.474634",
+  "imported_count": 3,
+  "records": [
+    {
+      "sample_id": "SAMPLE-001",
+      "import_status": "IMPORTED",
+      "initial_status": "NORMAL",
+      "feature_missing": false,
+      "default_score_applied": false,
+      "uplift_score": 0.782,
+      "remark": "正常记录:线上特征齐全"
+    },
+    {
+      "sample_id": "SAMPLE-002",
+      "import_status": "IMPORTED",
+      "initial_status": "FEATURE_MISSING_DEFAULT",
+      "feature_missing": true,
+      "default_score_applied": true,
+      "uplift_score": 0.5,
+      "remark": "特征缺失:avg_purchase_30d 和 ctr_7d 线上未返回，给了默认分0.5"
+    },
+    {
+      "sample_id": "SAMPLE-003",
+      "import_status": "IMPORTED",
+      "initial_status": "NORMAL",
+      "feature_missing": false,
+      "default_score_applied": false,
+      "uplift_score": 0.641,
+      "remark": "旧口径:候选表里仍标 v1，参数YAML已升级到v2，需补录"
+    }
+  ]
+}

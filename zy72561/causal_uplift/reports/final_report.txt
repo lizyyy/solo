@@ -1,0 +1,94 @@
+================================================================================
+因果 uplift 人群圈选 - 最终报告
+生成时间: 2026-06-15T13:11:25.074493
+================================================================================
+
+一、三条样例处理结果对比
+--------------------------------------------------------------------------------
+[样例 SAMPLE-001]
+  user_id       : U10086
+  scene         : home_feed_recommend
+  final_status  : NORMAL
+  uplift_score  : 0.782
+  caliber_source: online
+  feature_missing: False
+  default_score : False
+  摘要          : [正常记录] sample_id=SAMPLE-001，线上特征齐全，uplift_score=0.782，口径来源=online，无需复核。
+
+[样例 SAMPLE-002]
+  user_id       : U20391
+  scene         : home_feed_recommend
+  final_status  : REVIEW_COMPLETED
+  uplift_score  : 0.5
+  caliber_source: online
+  feature_missing: True
+  default_score : True
+  摘要          : [推荐复核完成] sample_id=SAMPLE-002，决策=accept_default_score，由林川处理，理由: 核查线上特征SLA，该时段确实出现特征服务降级，默认分0.500可接受，无需覆盖。最终 uplift_score=0.5。
+
+[样例 SAMPLE-003]
+  user_id       : U38472
+  scene         : search_result
+  final_status  : CONFIRMED
+  uplift_score  : 0.675
+  caliber_source: yaml_supplement
+  feature_missing: False
+  default_score : False
+  摘要          : [已确认] sample_id=SAMPLE-003，由阿越确认，理由: 补看参数YAML后确认：候选表SAMPLE-003的v1为历史遗留值，以YAML补录的v2口径和重算分0.675为准。最终 uplift_score=0.675。
+
+二、冲突与补录证据（供阿越确认/驳回）
+--------------------------------------------------------------------------------
+sample_id=SAMPLE-003
+  - caliber_version:
+      召回候选表值: v1
+      参数YAML值 : v2
+      说明       : 召回候选表口径版本=v1，参数YAML当前口径版本=v2
+  - caliber_version (supplemented):
+      召回候选表值: v1
+      参数YAML值 : v2
+      说明       : 召回候选表口径=v1，YAML补录口径=v2，补录理由: 参数YAML升级到v2后补录，按新口径重算，候选表中v1为历史遗留值
+  - uplift_score:
+      召回候选表值: 0.641
+      参数YAML值 : 0.675
+      说明       : 候选表线上分=0.641，YAML按补录口径重算分=0.675
+
+三、复核历史（谁改了什么、为什么、影响哪些结果）
+--------------------------------------------------------------------------------
+[2026-06-15T13:11:25.073459] 推荐负责人/林川 执行 AUTO_PENDING
+  sample_id    : SAMPLE-002
+  before_status: FEATURE_MISSING_DEFAULT
+  after_status : PENDING_REVIEW
+  reason       : 线上特征缺失（avg_purchase_30d/ctr_7d），已给默认分，不急着归正常，留给推荐负责人复核
+
+[2026-06-15T13:11:25.073718] 实验平台负责人/阿越 执行 CONFIRM
+  sample_id    : SAMPLE-003
+  before_status: YAML_SUPPLEMENT_OLD_CALIBER
+  after_status : CONFIRMED
+  reason       : 补看参数YAML后确认：候选表SAMPLE-003的v1为历史遗留值，以YAML补录的v2口径和重算分0.675为准
+  field_changes: {"confirmed_caliber_source": "yaml_supplement", "confirmed_uplift_score": 0.675}
+
+[2026-06-15T13:11:25.073858] 推荐负责人/林川 执行 REVIEW_ACCEPT_DEFAULT
+  sample_id    : SAMPLE-002
+  before_status: PENDING_REVIEW
+  after_status : REVIEW_COMPLETED
+  reason       : 核查线上特征SLA，该时段确实出现特征服务降级，默认分0.500可接受，无需覆盖
+  field_changes: {"decision": "accept_default_score"}
+
+四、可解释摘要与历史记录核对
+--------------------------------------------------------------------------------
+SAMPLE-001:
+  摘要文字   : [正常记录] sample_id=SAMPLE-001，线上特征齐全，uplift_score=0.782，口径来源=online，无需复核。
+  历史记录数 : 0
+  数据源     : 召回候选表(online)
+  refs 可反查: 是
+
+SAMPLE-002:
+  摘要文字   : [推荐复核完成] sample_id=SAMPLE-002，决策=accept_default_score，由林川处理，理由: 核查线上特征SLA，该时段确实出现特征服务降级，默认分0.500可接受，无需覆盖。最终 uplift_score=0.5。
+  历史记录数 : 2
+  数据源     : 召回候选表(online), 默认分兜底
+  refs 可反查: 是
+
+SAMPLE-003:
+  摘要文字   : [已确认] sample_id=SAMPLE-003，由阿越确认，理由: 补看参数YAML后确认：候选表SAMPLE-003的v1为历史遗留值，以YAML补录的v2口径和重算分0.675为准。最终 uplift_score=0.675。
+  历史记录数 : 1
+  数据源     : 召回候选表(online), 参数YAML补录
+  refs 可反查: 是

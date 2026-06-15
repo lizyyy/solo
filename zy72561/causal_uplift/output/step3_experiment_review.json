@@ -1,0 +1,17 @@
+{
+  "step": "STEP 3 - 实验平台负责人阿越补看参数YAML并确认/驳回",
+  "timestamp": "2026-06-15T13:11:25.073721",
+  "review_actions": [
+    {
+      "sample_id": "SAMPLE-003",
+      "before_status": "YAML_SUPPLEMENT_OLD_CALIBER",
+      "after_status": "CONFIRMED",
+      "actor": "阿越",
+      "reason": "补看参数YAML后确认：候选表SAMPLE-003的v1为历史遗留值，以YAML补录的v2口径和重算分0.675为准",
+      "field_changes": {
+        "confirmed_caliber_source": "yaml_supplement",
+        "confirmed_uplift_score": 0.675
+      }
+    }
+  ]
+}
