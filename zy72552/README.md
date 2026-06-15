@@ -22,31 +22,159 @@
 pip install -r requirements.txt
 ```
 
-### 方式一：命令行完整流程（推荐先跑这个）
+### 方式一：命令行完整流程（推荐先跑这个，每一步拆清楚）
+
+下面每一步都把 `实验ID`、`记录ID`、`报告路径` 分开说明，照抄即可跑通。
+
+---
+
+#### 第一步：负样本列表第一次导入
+
+**输入**：`samples/negative_samples.csv`（20 条负样本，包含 `sample_id, offline_score, online_score`）  
+**输出**：`my_report.json`（实验对比报告，同时打印实验ID）
 
 ```bash
-# 第一步：导入负样本列表，自动标出差1桶的记录
-python -m threshold_drift.cli detect -i samples/negative_samples.csv -o my_report.json
-
-# 输出示例：
-# ✅ 检测完成，共 20 条记录
-#    差1桶: 12 条
-#    差多桶: 1 条
-#    报告已保存到: my_report.json
-#    实验ID: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-
-# 第二步：算法工程师小乔补录召回候选表
-# 把上面的实验ID替换到下面
-python -m threshold_drift.cli supplement -e <实验ID> -c samples/recall_candidates.csv -r my_report.json
-
-# 第三步：评测运营复核一条差1桶的记录（先别急着归正常！）
-# 先看报告里的记录ID，选一条差1桶的
-python -m threshold_drift.cli review -e <实验ID> -r <记录ID> -s reviewed_by_op -n "已复核，样本特征无异常" -w "评测运营A" -r my_report.json
-
-# 生成3D可视化看板
-python -m threshold_drift.cli dashboard -r my_report.json -o my_dashboard.html
-# 用浏览器打开 my_dashboard.html 查看
+python3 -m threshold_drift.cli detect \
+  --input     samples/negative_samples.csv \
+  --output    my_report.json
 ```
+
+**输出示例**：
+```
+✅ 检测完成，共 20 条记录
+   差1桶: 9 条
+   差多桶: 0 条
+   报告已保存到: my_report.json
+   实验ID: a1b2c3d4-1234-5678-90ab-cdef01234567   ← 记下这个实验ID
+```
+
+这一步跑完后，系统已经把"离线和线上分数差了一个桶"的 9 条记录标出来了。
+想立刻看到是哪几条，可以从报告里快速提取：
+
+```bash
+cat my_report.json | python3 -c "
+import sys, json
+d = json.load(sys.stdin)
+print('=== 差1桶的记录（留给评测运营复核）===')
+for r in d['details']:
+    if r['bucket_diff'] == 'one_bucket':
+        print(f\"  样本 {r['sample_id']}  |  离线分桶 {r['offline_bucket']} → 线上分桶 {r['online_bucket']}  |  记录ID = {r['record_id']}\")
+        print(f\"    离线分数 {r['offline_score']:.3f}，线上分数 {r['online_score']:.3f}，差了刚好一个桶\")
+"
+```
+
+**为什么这些记录要留给评测运营复核？**
+> 因为它们的离线分桶和线上分桶刚好差 1 个桶位（比如离线是桶1、线上是桶2），
+> 刚好卡在分桶边界上，不能简单当成"正常"忽略。系统会在 `why_kept` 字段自动写：
+> _"离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常"_，
+> 并且 `next_owner` 直接指向 **评测运营**。
+
+---
+
+#### 第二步：算法工程师小乔补看召回候选表 → 实验对比自动更新
+
+**输入**：
+- 实验ID（上一步输出的 `a1b2c3d4-1234-5678-90ab-cdef01234567`）
+- 报告路径：`my_report.json`
+- 召回候选表：`samples/recall_candidates.csv`
+
+```bash
+python3 -m threshold_drift.cli supplement \
+  --experiment a1b2c3d4-1234-5678-90ab-cdef01234567 \
+  --candidates samples/recall_candidates.csv \
+  --report     my_report.json
+```
+
+**输出示例**：
+```
+📥 加载了 20 条召回候选
+✅ 已为 12 条记录补录召回候选
+   实验对比已更新，报告已保存到: my_report.json
+```
+
+这一步跑完后，`my_report.json` 已经自动更新：
+- 有召回候选的记录状态从 `pending_review` → `supplemented_by_algo`
+- `missing_materials` 里去掉了"召回候选表待算法工程师小乔补录"
+- `next_owner` 依然指向 **评测运营**（等运营复核）
+
+---
+
+#### 第三步：评测运营复核 —— 先别急着归正常
+
+这一步需要 `记录ID`（不是样本ID！），可以从第一步的命令里查。
+假设我们要复核样本 **S001**，先拿到它的 `记录ID`：
+
+```bash
+cat my_report.json | python3 -c "
+import sys, json
+d = json.load(sys.stdin)
+for r in d['details']:
+    if r['sample_id'] == 'S001':
+        print(f\"样本 S001 的记录ID = {r['record_id']}\")
+        print(f\"  离线分数 {r['offline_score']:.3f} / 线上分数 {r['online_score']:.3f}\")
+        print(f\"  为什么留给运营复核：{r['why_kept']}\")
+"
+```
+
+拿到记录ID（例如 `e5f6a7b8-1111-2222-3333-abcdef123456`）后，执行复核。
+**注意：先别急着归为正常**，先标成"已复核（运营）"即可：
+
+| 参数 | 说明 | 示例值 |
+|------|------|--------|
+| `--experiment` | 实验ID | `a1b2c3d4-1234-5678-90ab-cdef01234567` |
+| `--record` | **记录ID**（不是样本ID！） | `e5f6a7b8-1111-2222-3333-abcdef123456` |
+| `--status` | `reviewed_by_op`（已复核，不急着归正常） / `confirmed_normal` / `needs_investigation` | `reviewed_by_op` |
+| `--notes` | 复核备注 | `"已复核，S001 离在线确实差1桶，特征无异常，待算法确认"` |
+| `--reviewer` | 复核人 | `"评测运营A"` |
+| `--report` | 报告路径 | `my_report.json` |
+
+执行命令：
+
+```bash
+python3 -m threshold_drift.cli review \
+  --experiment a1b2c3d4-1234-5678-90ab-cdef01234567 \
+  --record     e5f6a7b8-1111-2222-3333-abcdef123456 \
+  --status     reviewed_by_op \
+  --notes      "已复核，S001 离在线确实差1桶，特征无异常，待算法确认" \
+  --reviewer   "评测运营A" \
+  --report     my_report.json
+```
+
+**输出示例**：
+```
+✅ 记录 e5f6a7b8-1111-2222-3333-abcdef123456 状态已更新为 reviewed_by_op
+   备注: 已复核，S001 离在线确实差1桶，特征无异常，待算法确认
+```
+
+复核后看最终的实验对比摘要：
+
+```bash
+cat my_report.json | python3 -c "
+import sys, json
+d = json.load(sys.stdin)
+print('=== 实验对比摘要 ===')
+print(f\"  总记录数：{d['total_records']}\")
+print(f\"  差1桶：{d['one_bucket_diff_count']} 条（需评测运营复核，别急着归正常）\")
+print(f\"  待复核：{d['pending_review']} 条\")
+print(f\"  已运营复核：{d['reviewed_by_op']} 条\")
+print(f\"  已补录召回：{d['supplemented_by_algo']} 条\")
+"
+```
+
+---
+
+#### 生成 3D 可视化看板（点击数据点可回到负样本列表/召回候选表）
+
+```bash
+python3 -m threshold_drift.cli dashboard \
+  --report my_report.json \
+  --output my_dashboard.html
+```
+
+用浏览器打开 `my_dashboard.html`：
+- 点击 **散点图** 或 **3D图** 中的数据点 → 页面自动滚动到对应记录，并展开详情
+- 点击表格中的 **样本ID** → 展开该条负样本的完整详情：真实离线/线上分数、为什么留下、缺什么材料、召回候选表（小乔补的）、下一步找谁
+- 差 1 桶的记录行是 **橙色背景**，排在最前面，提醒评测运营重点看
 
 ### 方式二：Web小看板（可视化交互）
 
@@ -131,9 +259,19 @@ print(f"差1桶: {report['one_bucket_diff_count']} 条")
 
 ### 关于图表不是空壳
 
-- 点击3D图/散点图的数据点，会弹出记录ID
-- 可对接实际的负样本列表或召回候选表页面
-- 记录表格中样本ID可点击跳转
+- **HTML 静态看板**（`dashboard` 命令生成）：点击 3D 图/散点图的数据点 → 页面自动滚动到该记录，**展开完整详情**（真实离线分数、线上分数、分桶差、为什么被留下、缺什么材料、召回候选表、下一步找谁）
+- **Web 小看板**（`web` 命令启动）：点击 3D 图/散点图的数据点 → **直接跳转到 `/record/<实验ID>/<记录ID>` 单条记录详情页**，完整展示负样本信息 + 召回候选表，面包屑可回到报告页
+- 记录表格中的 **样本ID** 可点击跳转，不再只是展示漂亮画面
+
+## 命令行参数速查
+
+| 命令 | 关键参数（长选项） | 说明 |
+|------|--------------------|------|
+| `detect` | `--input`（负样本CSV）, `--output`（报告路径）, `--boundaries`（分桶边界） | 第一步：导入负样本，检测差桶 |
+| `supplement` | `--experiment`（实验ID）, `--candidates`（召回候选CSV）, `--report`（报告路径） | 第二步：小乔补录召回候选，更新实验对比 |
+| `review` | `--experiment`（实验ID）, `--record`（记录ID，不是样本ID）, `--status`, `--notes`, `--reviewer`, `--report` | 第三步：评测运营复核 |
+| `dashboard` | `--report`（报告路径）, `--output`（HTML输出路径）, `--boundaries` | 生成3D可视化HTML看板 |
+| `web` | `--port`（端口，默认5000） | 启动Web小看板服务 |
 
 ## 📁 项目结构
 

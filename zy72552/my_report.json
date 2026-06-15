@@ -1,5 +1,5 @@
 {
-  "experiment_id": "57a30164-d9f7-4695-a3d6-3446238ab00b",
+  "experiment_id": "92d33405-02c3-48e2-bf7b-8ddb6ccabd89",
   "experiment_name": "检测_negative_samples.csv",
   "baseline_version": "",
   "current_version": "",
@@ -11,21 +11,51 @@
   "supplemented_by_algo": 11,
   "details": [
     {
-      "record_id": "59f59317-3bd3-4036-934a-9bfbd4c29070",
+      "record_id": "7ae58b3c-fdf4-4de2-a6cf-e98888efe7ba",
       "sample_id": "S001",
+      "offline_score": 0.25,
+      "online_score": 0.35,
       "offline_bucket": 0,
       "online_bucket": 1,
       "bucket_diff": "one_bucket",
       "status": "reviewed_by_op",
       "why_kept": "离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常",
       "missing_materials": [],
-      "next_owner": "operation",
-      "recall_candidates_count": 0,
-      "review_notes": "已复核，样本S001离线和线上确实差1桶，特征无异常，待算法工程师进一步分析"
+      "next_owner": "algorithm",
+      "recall_candidates_count": 3,
+      "recall_candidates": [
+        {
+          "candidate_id": "C001",
+          "rank": 1,
+          "score": 0.88,
+          "is_related": true,
+          "reason": "特征高度相似",
+          "supplemented_by": "小乔"
+        },
+        {
+          "candidate_id": "C002",
+          "rank": 2,
+          "score": 0.76,
+          "is_related": true,
+          "reason": "同类别召回",
+          "supplemented_by": "小乔"
+        },
+        {
+          "candidate_id": "C003",
+          "rank": 3,
+          "score": 0.65,
+          "is_related": false,
+          "reason": "分数较低",
+          "supplemented_by": "小乔"
+        }
+      ],
+      "review_notes": "已复核，S001离在线确实差1桶，分数刚好跨边界，待算法进一步确认"
     },
     {
-      "record_id": "d808801c-ea4f-4038-b0d5-1ae7b0e4323b",
+      "record_id": "e5d4a445-c316-48f4-a513-eefdb5b8ebd3",
       "sample_id": "S002",
+      "offline_score": 0.45,
+      "online_score": 0.48,
       "offline_bucket": 1,
       "online_bucket": 1,
       "bucket_diff": "same",
@@ -34,11 +64,14 @@
       "missing_materials": [],
       "next_owner": "operation",
       "recall_candidates_count": 0,
+      "recall_candidates": [],
       "review_notes": ""
     },
     {
-      "record_id": "0e61c2a1-cb35-47aa-91c0-f173b8143bfa",
+      "record_id": "b0f3cc35-973d-4395-9c3d-5dd0f8450700",
       "sample_id": "S003",
+      "offline_score": 0.55,
+      "online_score": 0.65,
       "offline_bucket": 2,
       "online_bucket": 2,
       "bucket_diff": "same",
@@ -48,12 +81,32 @@
         "复核意见待评测运营填写"
       ],
       "next_owner": "operation",
-      "recall_candidates_count": 0,
+      "recall_candidates_count": 2,
+      "recall_candidates": [
+        {
+          "candidate_id": "C011",
+          "rank": 1,
+          "score": 0.92,
+          "is_related": true,
+          "reason": "top1召回命中",
+          "supplemented_by": "小乔"
+        },
+        {
+          "candidate_id": "C012",
+          "rank": 2,
+          "score": 0.85,
+          "is_related": true,
+          "reason": "相关内容",
+          "supplemented_by": "小乔"
+        }
+      ],
       "review_notes": ""
     },
     {
-      "record_id": "bfbb0018-5ace-42a5-b7ff-033d26cdc73c",
+      "record_id": "10f80f4f-8f71-410e-9dc9-f3d590d1b76e",
       "sample_id": "S004",
+      "offline_score": 0.32,
+      "online_score": 0.44,
       "offline_bucket": 1,
       "online_bucket": 1,
       "bucket_diff": "same",
@@ -62,11 +115,14 @@
       "missing_materials": [],
       "next_owner": "operation",
       "recall_candidates_count": 0,
+      "recall_candidates": [],
       "review_notes": ""
     },
     {
-      "record_id": "8f376f48-d749-4178-8e79-584a4b3be05f",
+      "record_id": "c5d77f64-e3b2-48ac-8ea3-974499f1c227",
       "sample_id": "S005",
+      "offline_score": 0.78,
+      "online_score": 0.82,
       "offline_bucket": 3,
       "online_bucket": 3,
       "bucket_diff": "same",
@@ -75,11 +131,14 @@
       "missing_materials": [],
       "next_owner": "operation",
       "recall_candidates_count": 0,
+      "recall_candidates": [],
       "review_notes": ""
     },
     {
-      "record_id": "a3bdfc81-8a0c-407c-b1e6-70db7238509c",
+      "record_id": "539c10b8-22ff-4b8a-9b3a-f4e1731f4992",
       "sample_id": "S006",
+      "offline_score": 0.6,
+      "online_score": 0.72,
       "offline_bucket": 2,
       "online_bucket": 3,
       "bucket_diff": "one_bucket",
@@ -89,12 +148,32 @@
         "复核意见待评测运营填写"
       ],
       "next_owner": "operation",
-      "recall_candidates_count": 0,
+      "recall_candidates_count": 2,
+      "recall_candidates": [
+        {
+          "candidate_id": "C021",
+          "rank": 1,
+          "score": 0.78,
+          "is_related": true,
+          "reason": "近似匹配",
+          "supplemented_by": "小乔"
+        },
+        {
+          "candidate_id": "C022",
+          "rank": 2,
+          "score": 0.72,
+          "is_related": false,
+          "reason": "不相关",
+          "supplemented_by": "小乔"
+        }
+      ],
       "review_notes": ""
     },
     {
-      "record_id": "085d5782-a549-4313-953a-a09ee3d91ae6",
+      "record_id": "6eb9be2c-6540-4361-9ea1-74770e091e59",
       "sample_id": "S007",
+      "offline_score": 0.15,
+      "online_score": 0.18,
       "offline_bucket": 0,
       "online_bucket": 0,
       "bucket_diff": "same",
@@ -103,11 +182,14 @@
       "missing_materials": [],
       "next_owner": "operation",
       "recall_candidates_count": 0,
+      "recall_candidates": [],
       "review_notes": ""
     },
     {
-      "record_id": "42768e61-5350-4a23-b373-1682e18241b3",
+      "record_id": "85af29ce-6900-4cff-b5f3-97be6e83ebb0",
       "sample_id": "S008",
+      "offline_score": 0.88,
+      "online_score": 0.92,
       "offline_bucket": 3,
       "online_bucket": 4,
       "bucket_diff": "one_bucket",
@@ -119,11 +201,14 @@
       ],
       "next_owner": "operation",
       "recall_candidates_count": 0,
+      "recall_candidates": [],
       "review_notes": ""
     },
     {
-      "record_id": "f92f1871-31d6-4130-89dd-1c17113254ee",
+      "record_id": "301f8dc3-1f7b-46bf-88ef-0da328f8dc7a",
       "sample_id": "S009",
+      "offline_score": 0.42,
+      "online_score": 0.53,
       "offline_bucket": 1,
       "online_bucket": 2,
       "bucket_diff": "one_bucket",
@@ -133,12 +218,40 @@
         "复核意见待评测运营填写"
       ],
       "next_owner": "operation",
-      "recall_candidates_count": 0,
+      "recall_candidates_count": 3,
+      "recall_candidates": [
+        {
+          "candidate_id": "C031",
+          "rank": 1,
+          "score": 0.95,
+          "is_related": true,
+          "reason": "高相关",
+          "supplemented_by": "小乔"
+        },
+        {
+          "candidate_id": "C032",
+          "rank": 2,
+          "score": 0.82,
+          "is_related": true,
+          "reason": "相关",
+          "supplemented_by": "小乔"
+        },
+        {
+          "candidate_id": "C033",
+          "rank": 3,
+          "score": 0.7,
+          "is_related": true,
+          "reason": "边缘相关",
+          "supplemented_by": "小乔"
+        }
+      ],
       "review_notes": ""
     },
     {
-      "record_id": "a110d670-3234-46e3-939f-344103040216",
+      "record_id": "f3e94307-5eb4-4529-93c5-ebccb8d8c258",
       "sample_id": "S010",
+      "offline_score": 0.7,
+      "online_score": 0.58,
       "offline_bucket": 3,
       "online_bucket": 2,
       "bucket_diff": "one_bucket",
@@ -148,12 +261,24 @@
         "复核意见待评测运营填写"
       ],
       "next_owner": "operation",
-      "recall_candidates_count": 0,
+      "recall_candidates_count": 1,
+      "recall_candidates": [
+        {
+          "candidate_id": "C041",
+          "rank": 1,
+          "score": 0.68,
+          "is_related": false,
+          "reason": "不相关",
+          "supplemented_by": "小乔"
+        }
+      ],
       "review_notes": ""
     },
     {
-      "record_id": "4399b6df-7286-4efc-9fc2-14c2c23edc8e",
+      "record_id": "a4b92b97-4b6b-4899-a438-d9d0bb5aec29",
       "sample_id": "S011",
+      "offline_score": 0.38,
+      "online_score": 0.41,
       "offline_bucket": 1,
       "online_bucket": 1,
       "bucket_diff": "same",
@@ -162,11 +287,14 @@
       "missing_materials": [],
       "next_owner": "operation",
       "recall_candidates_count": 0,
+      "recall_candidates": [],
       "review_notes": ""
     },
     {
-      "record_id": "bf4bd57f-aac4-4bd0-a23c-34d1dcdae76b",
+      "record_id": "50203e80-c9dc-4193-9530-5d2f5cfc681c",
       "sample_id": "S012",
+      "offline_score": 0.65,
+      "online_score": 0.78,
       "offline_bucket": 2,
       "online_bucket": 3,
       "bucket_diff": "one_bucket",
@@ -176,12 +304,32 @@
         "复核意见待评测运营填写"
       ],
       "next_owner": "operation",
-      "recall_candidates_count": 0,
+      "recall_candidates_count": 2,
+      "recall_candidates": [
+        {
+          "candidate_id": "C051",
+          "rank": 1,
+          "score": 0.9,
+          "is_related": true,
+          "reason": "强相关",
+          "supplemented_by": "小乔"
+        },
+        {
+          "candidate_id": "C052",
+          "rank": 2,
+          "score": 0.84,
+          "is_related": true,
+          "reason": "相关",
+          "supplemented_by": "小乔"
+        }
+      ],
       "review_notes": ""
     },
     {
-      "record_id": "812d2f8a-a82a-4433-b4fe-a3e8842ab742",
+      "record_id": "977b57fa-3522-4226-8be4-ba4801abe8d8",
       "sample_id": "S013",
+      "offline_score": 0.28,
+      "online_score": 0.31,
       "offline_bucket": 0,
       "online_bucket": 1,
       "bucket_diff": "one_bucket",
@@ -193,11 +341,14 @@
       ],
       "next_owner": "operation",
       "recall_candidates_count": 0,
+      "recall_candidates": [],
       "review_notes": ""
     },
     {
-      "record_id": "f37f1ef2-dc43-48fa-903f-9bc4f97c36fe",
+      "record_id": "425a6a1e-b882-4040-99bc-16cc009ad7a6",
       "sample_id": "S014",
+      "offline_score": 0.52,
+      "online_score": 0.64,
       "offline_bucket": 2,
       "online_bucket": 2,
       "bucket_diff": "same",
@@ -207,12 +358,24 @@
         "复核意见待评测运营填写"
       ],
       "next_owner": "operation",
-      "recall_candidates_count": 0,
+      "recall_candidates_count": 1,
+      "recall_candidates": [
+        {
+          "candidate_id": "C061",
+          "rank": 1,
+          "score": 0.88,
+          "is_related": true,
+          "reason": "匹配",
+          "supplemented_by": "小乔"
+        }
+      ],
       "review_notes": ""
     },
     {
-      "record_id": "317edf9b-b956-4ada-9046-498233b167ef",
+      "record_id": "7954c31d-fcea-49ef-bd14-72da5189058d",
       "sample_id": "S015",
+      "offline_score": 0.91,
+      "online_score": 0.87,
       "offline_bucket": 4,
       "online_bucket": 3,
       "bucket_diff": "one_bucket",
@@ -224,11 +387,14 @@
       ],
       "next_owner": "operation",
       "recall_candidates_count": 0,
+      "recall_candidates": [],
       "review_notes": ""
     },
     {
-      "record_id": "7c7bb8b0-cfad-4874-8e63-a8824c6d26eb",
+      "record_id": "5778b548-3d1e-4437-b659-f490b56ed92c",
       "sample_id": "S016",
+      "offline_score": 0.2,
+      "online_score": 0.33,
       "offline_bucket": 0,
       "online_bucket": 1,
       "bucket_diff": "one_bucket",
@@ -238,12 +404,24 @@
         "复核意见待评测运营填写"
       ],
       "next_owner": "operation",
-      "recall_candidates_count": 0,
+      "recall_candidates_count": 1,
+      "recall_candidates": [
+        {
+          "candidate_id": "C071",
+          "rank": 1,
+          "score": 0.75,
+          "is_related": false,
+          "reason": "召回无关联",
+          "supplemented_by": "小乔"
+        }
+      ],
       "review_notes": ""
     },
     {
-      "record_id": "dea0535a-3116-4c60-b603-d581544753f6",
+      "record_id": "b0681611-733c-4694-ba5e-b687f73e2c08",
       "sample_id": "S017",
+      "offline_score": 0.75,
+      "online_score": 0.88,
       "offline_bucket": 3,
       "online_bucket": 3,
       "bucket_diff": "same",
@@ -253,12 +431,32 @@
         "复核意见待评测运营填写"
       ],
       "next_owner": "operation",
-      "recall_candidates_count": 0,
+      "recall_candidates_count": 2,
+      "recall_candidates": [
+        {
+          "candidate_id": "C081",
+          "rank": 1,
+          "score": 0.92,
+          "is_related": true,
+          "reason": "高置信",
+          "supplemented_by": "小乔"
+        },
+        {
+          "candidate_id": "C082",
+          "rank": 2,
+          "score": 0.85,
+          "is_related": true,
+          "reason": "相关",
+          "supplemented_by": "小乔"
+        }
+      ],
       "review_notes": ""
     },
     {
-      "record_id": "ba869a5a-416a-4190-9b19-eaf5b22cd500",
+      "record_id": "9a85477a-2bce-4714-99e0-883858f13939",
       "sample_id": "S018",
+      "offline_score": 0.48,
+      "online_score": 0.36,
       "offline_bucket": 1,
       "online_bucket": 1,
       "bucket_diff": "same",
@@ -268,12 +466,24 @@
         "复核意见待评测运营填写"
       ],
       "next_owner": "operation",
-      "recall_candidates_count": 0,
+      "recall_candidates_count": 1,
+      "recall_candidates": [
+        {
+          "candidate_id": "C091",
+          "rank": 1,
+          "score": 0.8,
+          "is_related": true,
+          "reason": "部分相关",
+          "supplemented_by": "小乔"
+        }
+      ],
       "review_notes": ""
     },
     {
-      "record_id": "4b430ebb-bff8-485b-a1d4-d9c6dac43408",
+      "record_id": "2c861771-0a36-4dfa-9c4a-0f00966db08f",
       "sample_id": "S019",
+      "offline_score": 0.62,
+      "online_score": 0.55,
       "offline_bucket": 2,
       "online_bucket": 2,
       "bucket_diff": "same",
@@ -283,12 +493,24 @@
         "复核意见待评测运营填写"
       ],
       "next_owner": "operation",
-      "recall_candidates_count": 0,
+      "recall_candidates_count": 1,
+      "recall_candidates": [
+        {
+          "candidate_id": "C101",
+          "rank": 1,
+          "score": 0.77,
+          "is_related": false,
+          "reason": "不相关",
+          "supplemented_by": "小乔"
+        }
+      ],
       "review_notes": ""
     },
     {
-      "record_id": "3392e778-8421-4204-ac75-c7a69d91544b",
+      "record_id": "cc87b293-7f8d-4b07-b8fe-4b60d35f2177",
       "sample_id": "S020",
+      "offline_score": 0.35,
+      "online_score": 0.46,
       "offline_bucket": 1,
       "online_bucket": 1,
       "bucket_diff": "same",
@@ -298,7 +520,17 @@
         "复核意见待评测运营填写"
       ],
       "next_owner": "operation",
-      "recall_candidates_count": 0,
+      "recall_candidates_count": 1,
+      "recall_candidates": [
+        {
+          "candidate_id": "C111",
+          "rank": 1,
+          "score": 0.83,
+          "is_related": true,
+          "reason": "相关",
+          "supplemented_by": "小乔"
+        }
+      ],
       "review_notes": ""
     }
   ]

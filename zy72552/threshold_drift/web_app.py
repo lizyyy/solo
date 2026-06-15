@@ -246,7 +246,7 @@ def create_app():
                 <title>实验报告 - {{ report.experiment_name }}</title>
                 <style>
                     body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
-                    .container { max-width: 1200px; margin: 0 auto; }
+                    .container { max-width: 1300px; margin: 0 auto; }
                     .card { background: white; padding: 20px; margin: 20px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
                     h1, h2 { color: #333; }
                     .stats { display: flex; gap: 20px; flex-wrap: wrap; }
@@ -267,6 +267,11 @@ def create_app():
                     .badge-normal { background: #28a745; }
                     .badge-investigate { background: #dc3545; }
                     .back-link { color: #007bff; text-decoration: none; }
+                    a.sample-link { color: #007bff; text-decoration: none; font-weight: bold; }
+                    a.sample-link:hover { text-decoration: underline; }
+                    .score-box { display: inline-block; background: #e7f1ff; padding: 3px 8px; border-radius: 4px; font-family: monospace; font-size: 13px; }
+                    .alert-box { background: #fff3cd; border: 1px solid #ffc107; padding: 12px 16px; border-radius: 6px; margin: 10px 0; color: #856404; }
+                    .alert-box strong { color: #721c24; }
                 </style>
             </head>
             <body>
@@ -300,16 +305,20 @@ def create_app():
 
                     <div class="card">
                         <h2>⚠️ 差1桶记录重点（共 {{ one_bucket|length }} 条）</h2>
-                        <p><strong>说明：</strong>这些记录离线和线上分数差了一个桶，需要评测运营复核，别急着归正常</p>
+                        <div class="alert-box">
+                            <strong>评测运营请注意：</strong>这些记录离线和线上分数差了一个桶，<strong>别急着归为正常</strong>，
+                            请点<strong>样本ID</strong>查看详情，结合召回候选表判断是否需要进一步调查。
+                        </div>
                         <table>
                             <thead>
                                 <tr>
                                     <th>样本ID</th>
+                                    <th>离线分数</th>
+                                    <th>线上分数</th>
                                     <th>离线分桶</th>
                                     <th>线上分桶</th>
                                     <th>状态</th>
                                     <th>为什么留下</th>
-                                    <th>缺什么材料</th>
                                     <th>下一步找谁</th>
                                     <th>召回候选数</th>
                                 </tr>
@@ -317,12 +326,13 @@ def create_app():
                             <tbody>
                                 {% for r in one_bucket %}
                                 <tr class="one-bucket">
-                                    <td>{{ r.sample_id }}</td>
+                                    <td><a class="sample-link" href="/record/{{ report.experiment_id }}/{{ r.record_id }}">{{ r.sample_id }} →</a></td>
+                                    <td><span class="score-box">{{ "%.3f"|format(r.offline_score) }}</span></td>
+                                    <td><span class="score-box">{{ "%.3f"|format(r.online_score) }}</span></td>
                                     <td>{{ r.offline_bucket }}</td>
                                     <td>{{ r.online_bucket }}</td>
                                     <td><span class="badge badge-{{ r.status.value.replace('_', '-') }}">{{ r.status.value }}</span></td>
                                     <td>{{ r.why_kept or '-' }}</td>
-                                    <td>{{ ', '.join(r.missing_materials) if r.missing_materials else '-' }}</td>
                                     <td>{{ r.next_owner.value }}</td>
                                     <td>{{ r.recall_candidates|length }}</td>
                                 </tr>
@@ -333,16 +343,18 @@ def create_app():
 
                     <div class="card">
                         <h2>📋 全部记录详情</h2>
+                        <p>💡 点击<strong>样本ID</strong>可跳转到该记录的完整详情（含负样本列表、召回候选表、为什么留给运营复核等）</p>
                         <table>
                             <thead>
                                 <tr>
                                     <th>样本ID</th>
+                                    <th>离线分数</th>
+                                    <th>线上分数</th>
                                     <th>离线分桶</th>
                                     <th>线上分桶</th>
                                     <th>差异</th>
                                     <th>状态</th>
                                     <th>为什么留下</th>
-                                    <th>缺什么材料</th>
                                     <th>下一步找谁</th>
                                     <th>复核备注</th>
                                 </tr>
@@ -350,13 +362,14 @@ def create_app():
                             <tbody>
                                 {% for d in report.details %}
                                 <tr class="{{ 'one-bucket' if d.bucket_diff == 'one_bucket' else ('multi-bucket' if d.bucket_diff == 'multi_bucket' else '') }}">
-                                    <td>{{ d.sample_id }}</td>
+                                    <td><a class="sample-link" href="/record/{{ report.experiment_id }}/{{ d.record_id }}">{{ d.sample_id }} →</a></td>
+                                    <td><span class="score-box">{{ "%.3f"|format(d.offline_score) }}</span></td>
+                                    <td><span class="score-box">{{ "%.3f"|format(d.online_score) }}</span></td>
                                     <td>{{ d.offline_bucket }}</td>
                                     <td>{{ d.online_bucket }}</td>
                                     <td>{{ d.bucket_diff }}</td>
                                     <td><span class="badge badge-{{ d.status.replace('_', '-') }}">{{ d.status }}</span></td>
                                     <td>{{ d.why_kept or '-' }}</td>
-                                    <td>{{ ', '.join(d.missing_materials) if d.missing_materials else '-' }}</td>
                                     <td>{{ d.next_owner }}</td>
                                     <td>{{ d.review_notes or '-' }}</td>
                                 </tr>
@@ -370,6 +383,198 @@ def create_app():
             """,
             report=report_data,
             one_bucket=one_bucket_records,
+        )
+
+    @app.route("/record/<experiment_id>/<record_id>")
+    def record_detail(experiment_id, record_id):
+        if experiment_id not in exp_manager.experiments:
+            return "实验不存在", 404
+        exp = exp_manager.experiments[experiment_id]
+        record = None
+        for r in exp.drift_records:
+            if r.record_id == record_id:
+                record = r
+                break
+        if not record:
+            return "记录不存在", 404
+
+        if record.bucket_diff.value == "same":
+            bucket_box_class, bucket_text = "background:#d4edda;color:#155724;", "同桶"
+        elif record.bucket_diff.value == "one_bucket":
+            bucket_box_class, bucket_text = "background:#fff3cd;color:#856404;", "差1桶"
+        else:
+            bucket_box_class, bucket_text = "background:#f8d7da;color:#721c24;", "差多桶"
+
+        if record.next_owner.value == "operation":
+            owner_text = "评测运营"
+            owner_class = "background:#007bff;color:white;"
+        elif record.next_owner.value == "algorithm":
+            owner_text = "算法工程师小乔"
+            owner_class = "background:#fd7e14;color:white;"
+        else:
+            owner_text = "评测运营 + 小乔"
+            owner_class = "background:#6f42c1;color:white;"
+
+        material_items = ""
+        if record.missing_materials:
+            material_items = "".join(f"<li>{m}</li>" for m in record.missing_materials)
+        else:
+            material_items = '<li style="color:#28a745;">无缺失材料</li>'
+
+        recall_rows = ""
+        if record.recall_candidates:
+            for rc in record.recall_candidates:
+                if rc.is_related:
+                    related_html = '<span style="color:#28a745;font-weight:bold;">相关</span>'
+                else:
+                    related_html = '<span style="color:#6c757d;">不相关</span>'
+                recall_rows += f"""
+                <tr>
+                    <td>{rc.rank}</td>
+                    <td>{rc.candidate_id}</td>
+                    <td>{rc.score:.3f}</td>
+                    <td>{related_html}</td>
+                    <td>{rc.reason or '-'}</td>
+                    <td>{rc.supplemented_by or '-'}</td>
+                </tr>
+                """
+        else:
+            recall_rows = '<tr><td colspan="6" style="text-align:center;color:#6c757d;font-style:italic;">暂无召回候选数据，需算法工程师小乔补录</td></tr>'
+
+        review_notes_html = ""
+        if record.review_notes:
+            review_notes_html = f"""
+            <div style="background:#d1ecf1;padding:12px;border-radius:6px;margin-top:10px;color:#0c5460;">
+                📝 <strong>评测运营复核备注：</strong>{record.review_notes}
+            </div>
+            """
+
+        why_kept_html = record.why_kept or "（未说明）"
+        if record.bucket_diff.value == "one_bucket":
+            why_kept_html = f"""
+            <div style="background:#fff3cd;padding:12px;border-radius:6px;color:#856404;border:1px solid #ffc107;">
+                ⚠️ {why_kept_html}<br><br>
+                <strong>👉 这就是为什么这条被留给评测运营复核：</strong>
+                离线分桶 {record.offline_bucket}，线上分桶 {record.online_bucket}，刚好差1个桶位，
+                处于边界地带，不能简单归为正常，需要人工确认。
+            </div>
+            """
+
+        return render_template_string(
+            """
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>记录详情 - {{ record.sample_id }}</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+                    .container { max-width: 1100px; margin: 0 auto; }
+                    .card { background: white; padding: 24px; margin: 20px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+                    h1, h2, h3 { color: #333; margin-top: 0; }
+                    .back-link { color: #007bff; text-decoration: none; }
+                    .breadcrumbs { color: #666; margin-bottom: 20px; }
+                    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 32px; }
+                    .detail-item .label { display: block; color: #666; font-size: 13px; font-weight: bold; margin-bottom: 4px; }
+                    .detail-item .value { color: #222; font-size: 15px; }
+                    .score-box { display: inline-block; background: #e7f1ff; padding: 5px 12px; border-radius: 4px; font-family: monospace; font-size: 15px; }
+                    .section-title { color: #007bff; font-weight: bold; margin: 22px 0 8px 0; padding-bottom: 4px; border-bottom: 1px solid #dee2e6; font-size: 15px; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+                    th, td { padding: 10px; border: 1px solid #dee2e6; text-align: left; font-size: 14px; }
+                    th { background: #e9ecef; }
+                    ul.material-list { margin: 5px 0; padding-left: 22px; }
+                    ul.material-list li { margin: 4px 0; color: #dc3545; }
+                    .tag { display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 13px; }
+                    .breadcrumb-link { color: #007bff; text-decoration: none; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <p class="breadcrumbs">
+                        <a href="/" class="breadcrumb-link">首页</a> /
+                        <a href="/report/{{ experiment_id }}" class="breadcrumb-link">实验报告</a> /
+                        <strong>记录详情 {{ record.sample_id }}</strong>
+                    </p>
+
+                    <div class="card">
+                        <h1>🔍 负样本记录详情 — {{ record.sample_id }}</h1>
+                        <p style="color:#666;">记录ID: {{ record.record_id }} | 实验ID: {{ experiment_id }}</p>
+
+                        <div class="section-title">📊 离线 vs 线上分数对比（回到负样本列表）</div>
+                        <div class="detail-grid">
+                            <div class="detail-item">
+                                <span class="label">离线分数</span>
+                                <span class="value"><span class="score-box">{{ "%.3f"|format(record.offline_score) }}</span> → 分桶 <strong>{{ record.offline_bucket }}</strong></span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="label">线上分数</span>
+                                <span class="value"><span class="score-box">{{ "%.3f"|format(record.online_score) }}</span> → 分桶 <strong>{{ record.online_bucket }}</strong></span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="label">分桶差异</span>
+                                <span class="value"><span class="tag" style="{{ bucket_box_class }}">{{ bucket_text }}</span></span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="label">当前状态</span>
+                                <span class="value"><span class="tag" style="background:#6c757d;color:white;">{{ record.status.value }}</span></span>
+                            </div>
+                        </div>
+
+                        <div class="section-title">❓ 为什么这条记录被留下</div>
+                        {{ why_kept_html|safe }}
+
+                        <div class="section-title">📋 还缺什么材料</div>
+                        <ul class="material-list">{{ material_items|safe }}</ul>
+
+                        <div class="section-title">👤 下一步该找谁</div>
+                        <p>
+                            <span class="tag" style="{{ owner_class }}">{{ owner_text }}</span>
+                            {% if record.next_owner.value in ('operation', 'both') %}
+                            <span style="margin-left:10px;color:#007bff;">→ 评测运营需先进行复核确认（别急着归正常）</span>
+                            {% endif %}
+                            {% if record.next_owner.value in ('algorithm', 'both') %}
+                            <span style="margin-left:10px;color:#fd7e14;">→ 算法工程师小乔需补查召回候选或特征日志</span>
+                            {% endif %}
+                        </p>
+
+                        {{ review_notes_html|safe }}
+
+                        <div class="section-title">🔗 召回候选表（回到召回候选表）</div>
+                        <p style="color:#666;font-size:13px;">以下由算法工程师小乔补录，评测运营可对照判断该负样本的阈值漂移是否合理。</p>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>排名</th>
+                                    <th>候选ID</th>
+                                    <th>分数</th>
+                                    <th>是否相关</th>
+                                    <th>原因</th>
+                                    <th>补录人</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{ recall_rows|safe }}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <p style="text-align:center;margin-top:30px;">
+                        <a href="/report/{{ experiment_id }}" class="back-link">← 返回实验报告</a>
+                    </p>
+                </div>
+            </body>
+            </html>
+            """,
+            record=record,
+            experiment_id=experiment_id,
+            bucket_box_class=bucket_box_class,
+            bucket_text=bucket_text,
+            owner_class=owner_class,
+            owner_text=owner_text,
+            material_items=material_items,
+            recall_rows=recall_rows,
+            review_notes_html=review_notes_html,
+            why_kept_html=why_kept_html,
         )
 
     @app.route("/dashboard/<experiment_id>")
@@ -406,7 +611,7 @@ def create_app():
                     <p><a href="/" class="back-link">← 返回首页</a></p>
                     <h1>🧊 3D可视化看板</h1>
                     <div class="hint">
-                        💡 <strong>提示：</strong>点击图表中的数据点可查看记录ID，差1桶的橙色点需要评测运营复核
+                        💡 <strong>提示：</strong>点击图表中的<strong>数据点</strong>会直接跳转到该记录的完整详情页（含负样本列表、召回候选表、为什么留给评测运营复核）。差1桶的橙色点需要重点复核。
                     </div>
 
                     <div class="card">
@@ -416,13 +621,13 @@ def create_app():
 
                     <div class="card">
                         <h2>📈 离线vs线上分桶分布</h2>
-                        <p>橙色=差1桶，红色=差多桶，绿色=同桶。对角线上为无偏差样本。</p>
+                        <p>橙色=差1桶，红色=差多桶，绿色=同桶。对角线上为无偏差样本。<strong>点击数据点可跳转详情。</strong></p>
                         {{ fig1.to_html(full_html=False, include_plotlyjs=False)|safe }}
                     </div>
 
                     <div class="card">
                         <h2>🧊 3D视图：离线分数 × 线上分数 × 分桶差</h2>
-                        <p>Z轴为分桶差，越高表示偏差越大。点击数据点可查看记录ID。</p>
+                        <p>Z轴为分桶差，越高表示偏差越大。<strong>点击数据点直接跳转到该记录详情。</strong></p>
                         {{ fig2.to_html(full_html=False, include_plotlyjs=False)|safe }}
                     </div>
 
@@ -433,7 +638,7 @@ def create_app():
                                 plot.on('plotly_click', function(data) {
                                     const point = data.points[0];
                                     const recordId = point.customdata;
-                                    alert('记录ID: ' + recordId + '\\n\\n可跳转到负样本列表或召回候选表查看详情\\n(功能已预留，可对接实际数据表)');
+                                    window.location.href = '/record/' + '{{ experiment_id }}' + '/' + recordId;
                                 });
                             });
                         });

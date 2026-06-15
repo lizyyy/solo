@@ -10,274 +10,1737 @@
                 .card { background: white; padding: 20px; margin: 20px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
                 h1 { color: #333; }
                 h2 { color: #555; margin-top: 30px; }
+                h3 { color: #444; margin-top: 20px; }
                 .record-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-                .record-table th, .record-table td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+                .record-table th, .record-table td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; cursor: pointer; }
                 .record-table th { background: #f0f0f0; }
+                .record-table tr:hover { background: #eef5ff; }
                 .one-bucket { background: #fff3cd; }
                 .multi-bucket { background: #f8d7da; }
+                .highlighted { background: #b3d9ff !important; animation: pulse 1.5s ease-in-out infinite; }
+                @keyframes pulse {
+                    0%, 100% { box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.6); }
+                    50% { box-shadow: 0 0 0 8px rgba(0, 123, 255, 0); }
+                }
                 .status-badge { padding: 3px 8px; border-radius: 12px; font-size: 12px; color: white; }
                 .status-pending { background: #6c757d; }
                 .status-reviewed { background: #17a2b8; }
                 .status-supplemented { background: #ffc107; color: #333; }
                 .status-normal { background: #28a745; }
                 .status-investigate { background: #dc3545; }
+                .detail-panel {
+                    display: none;
+                    background: #f8f9fa;
+                    border-left: 4px solid #007bff;
+                    padding: 15px 20px;
+                    margin: 10px 0;
+                    border-radius: 0 6px 6px 0;
+                }
+                .detail-panel.open { display: block; }
+                .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 24px; margin-bottom: 15px; }
+                .detail-label { font-weight: bold; color: #555; display: block; font-size: 13px; }
+                .detail-value { color: #222; font-size: 15px; }
+                .score-box { display: inline-block; background: #e7f1ff; padding: 4px 10px; border-radius: 4px; font-family: monospace; font-size: 14px; }
+                .bucket-box { display: inline-block; padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 14px; }
+                .bucket-same { background: #d4edda; color: #155724; }
+                .bucket-one { background: #fff3cd; color: #856404; }
+                .bucket-multi { background: #f8d7da; color: #721c24; }
+                .owner-tag { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 13px; }
+                .owner-operation { background: #007bff; color: white; }
+                .owner-algorithm { background: #fd7e14; color: white; }
+                .owner-both { background: #6f42c1; color: white; }
+                .section-title { font-weight: bold; color: #007bff; margin: 15px 0 8px 0; font-size: 14px; border-bottom: 1px solid #dee2e6; padding-bottom: 4px; }
+                .material-list { margin: 5px 0; padding-left: 20px; }
+                .material-list li { margin: 3px 0; color: #dc3545; }
+                .material-list li.empty { color: #28a745; }
+                .recall-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 13px; }
+                .recall-table th, .recall-table td { padding: 8px; border: 1px solid #dee2e6; text-align: left; }
+                .recall-table th { background: #e9ecef; }
+                .related-yes { color: #28a745; font-weight: bold; }
+                .related-no { color: #6c757d; }
+                .hint { background: #d1ecf1; padding: 10px; border-radius: 4px; margin: 10px 0; color: #0c5460; }
+                .alert-box { background: #fff3cd; border: 1px solid #ffc107; padding: 12px 16px; border-radius: 6px; margin: 10px 0; color: #856404; }
+                .alert-box strong { color: #721c24; }
+                .review-notes { background: #d1ecf1; padding: 10px; border-radius: 4px; margin-top: 8px; color: #0c5460; font-style: italic; }
+                .expand-hint { color: #007bff; font-size: 12px; margin-left: 8px; }
+                a.record-link { color: #007bff; text-decoration: none; font-weight: bold; }
+                a.record-link:hover { text-decoration: underline; }
             </style>
         </head>
         <body>
             <h1>🔍 异常检测阈值漂移分析看板</h1>
-            <p>点击图表中的数据点可查看对应记录详情，差1桶的样本需要评测运营复核。</p>
+            <div class="hint">
+                💡 <strong>使用说明：</strong>
+                点击下方散点图或3D图中的<strong>数据点</strong>可直接跳转到对应记录；
+                点击表格中的<strong>样本ID</strong>可展开/收起该记录的完整详情（含负样本分数、召回候选表、为什么留给评测运营复核等）。
+                橙色行 = 差1桶的记录，需要评测运营重点复核，别急着归正常。
+            </div>
 
             <div class="card">
                 <h2>📊 分桶差异分布</h2>
-                <div id="chart3"><div>                            <div id="17abae0e-9ab1-41d5-b0b3-a49701e28dc8" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("17abae0e-9ab1-41d5-b0b3-a49701e28dc8")) {                    Plotly.newPlot(                        "17abae0e-9ab1-41d5-b0b3-a49701e28dc8",                        [{"marker":{"color":["green","orange","red"]},"text":["11","9","0"],"textposition":"auto","x":["同桶","差1桶","差多桶"],"y":[11,9,0],"type":"bar"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmapgl":[{"type":"heatmapgl","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"title":{"text":"分桶差异分布统计"},"yaxis":{"title":{"text":"样本数量"}},"bargap":0.4},                        {"responsive": true}                    )                };                            </script>        </div></div>
+                <div id="chart3"><div>                            <div id="24fa4525-bd4b-4c85-9f7b-1f9548306c80" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("24fa4525-bd4b-4c85-9f7b-1f9548306c80")) {                    Plotly.newPlot(                        "24fa4525-bd4b-4c85-9f7b-1f9548306c80",                        [{"marker":{"color":["green","orange","red"]},"text":["11","9","0"],"textposition":"auto","x":["同桶","差1桶","差多桶"],"y":[11,9,0],"type":"bar"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmapgl":[{"type":"heatmapgl","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"title":{"text":"分桶差异分布统计"},"yaxis":{"title":{"text":"样本数量"}},"bargap":0.4},                        {"responsive": true}                    )                };                            </script>        </div></div>
             </div>
 
             <div class="card">
                 <h2>📈 离线vs线上分桶分布</h2>
-                <p class="hint">💡 橙色点表示差1桶的样本，需要评测运营重点复核</p>
-                <div id="chart1"><div>                            <div id="f7e3252c-6f23-4f49-9955-b0bc6418f110" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("f7e3252c-6f23-4f49-9955-b0bc6418f110")) {                    Plotly.newPlot(                        "f7e3252c-6f23-4f49-9955-b0bc6418f110",                        [{"customdata":["59f59317-3bd3-4036-934a-9bfbd4c29070","d808801c-ea4f-4038-b0d5-1ae7b0e4323b","0e61c2a1-cb35-47aa-91c0-f173b8143bfa","bfbb0018-5ace-42a5-b7ff-033d26cdc73c","8f376f48-d749-4178-8e79-584a4b3be05f","a3bdfc81-8a0c-407c-b1e6-70db7238509c","085d5782-a549-4313-953a-a09ee3d91ae6","42768e61-5350-4a23-b373-1682e18241b3","f92f1871-31d6-4130-89dd-1c17113254ee","a110d670-3234-46e3-939f-344103040216","4399b6df-7286-4efc-9fc2-14c2c23edc8e","bf4bd57f-aac4-4bd0-a23c-34d1dcdae76b","812d2f8a-a82a-4433-b4fe-a3e8842ab742","f37f1ef2-dc43-48fa-903f-9bc4f97c36fe","317edf9b-b956-4ada-9046-498233b167ef","7c7bb8b0-cfad-4874-8e63-a8824c6d26eb","dea0535a-3116-4c60-b603-d581544753f6","ba869a5a-416a-4190-9b19-eaf5b22cd500","4b430ebb-bff8-485b-a1d4-d9c6dac43408","3392e778-8421-4204-ac75-c7a69d91544b"],"hoverinfo":"text","marker":{"color":["orange","green","green","green","green","orange","green","orange","orange","orange","green","orange","orange","green","orange","orange","green","green","green","green"],"line":{"width":1},"size":12},"mode":"markers","name":"样本点","text":["样本: S001\u003cbr\u003e离线分桶: 0\u003cbr\u003e线上分桶: 1\u003cbr\u003e差异: one_bucket\u003cbr\u003e状态: reviewed_by_op\u003cbr\u003e点击查看详情→","样本: S002\u003cbr\u003e离线分桶: 1\u003cbr\u003e线上分桶: 1\u003cbr\u003e差异: same\u003cbr\u003e状态: pending_review\u003cbr\u003e点击查看详情→","样本: S003\u003cbr\u003e离线分桶: 2\u003cbr\u003e线上分桶: 2\u003cbr\u003e差异: same\u003cbr\u003e状态: supplemented_by_algo\u003cbr\u003e点击查看详情→","样本: S004\u003cbr\u003e离线分桶: 1\u003cbr\u003e线上分桶: 1\u003cbr\u003e差异: same\u003cbr\u003e状态: pending_review\u003cbr\u003e点击查看详情→","样本: S005\u003cbr\u003e离线分桶: 3\u003cbr\u003e线上分桶: 3\u003cbr\u003e差异: same\u003cbr\u003e状态: pending_review\u003cbr\u003e点击查看详情→","样本: S006\u003cbr\u003e离线分桶: 2\u003cbr\u003e线上分桶: 3\u003cbr\u003e差异: one_bucket\u003cbr\u003e状态: supplemented_by_algo\u003cbr\u003e点击查看详情→","样本: S007\u003cbr\u003e离线分桶: 0\u003cbr\u003e线上分桶: 0\u003cbr\u003e差异: same\u003cbr\u003e状态: pending_review\u003cbr\u003e点击查看详情→","样本: S008\u003cbr\u003e离线分桶: 3\u003cbr\u003e线上分桶: 4\u003cbr\u003e差异: one_bucket\u003cbr\u003e状态: pending_review\u003cbr\u003e点击查看详情→","样本: S009\u003cbr\u003e离线分桶: 1\u003cbr\u003e线上分桶: 2\u003cbr\u003e差异: one_bucket\u003cbr\u003e状态: supplemented_by_algo\u003cbr\u003e点击查看详情→","样本: S010\u003cbr\u003e离线分桶: 3\u003cbr\u003e线上分桶: 2\u003cbr\u003e差异: one_bucket\u003cbr\u003e状态: supplemented_by_algo\u003cbr\u003e点击查看详情→","样本: S011\u003cbr\u003e离线分桶: 1\u003cbr\u003e线上分桶: 1\u003cbr\u003e差异: same\u003cbr\u003e状态: pending_review\u003cbr\u003e点击查看详情→","样本: S012\u003cbr\u003e离线分桶: 2\u003cbr\u003e线上分桶: 3\u003cbr\u003e差异: one_bucket\u003cbr\u003e状态: supplemented_by_algo\u003cbr\u003e点击查看详情→","样本: S013\u003cbr\u003e离线分桶: 0\u003cbr\u003e线上分桶: 1\u003cbr\u003e差异: one_bucket\u003cbr\u003e状态: pending_review\u003cbr\u003e点击查看详情→","样本: S014\u003cbr\u003e离线分桶: 2\u003cbr\u003e线上分桶: 2\u003cbr\u003e差异: same\u003cbr\u003e状态: supplemented_by_algo\u003cbr\u003e点击查看详情→","样本: S015\u003cbr\u003e离线分桶: 4\u003cbr\u003e线上分桶: 3\u003cbr\u003e差异: one_bucket\u003cbr\u003e状态: pending_review\u003cbr\u003e点击查看详情→","样本: S016\u003cbr\u003e离线分桶: 0\u003cbr\u003e线上分桶: 1\u003cbr\u003e差异: one_bucket\u003cbr\u003e状态: supplemented_by_algo\u003cbr\u003e点击查看详情→","样本: S017\u003cbr\u003e离线分桶: 3\u003cbr\u003e线上分桶: 3\u003cbr\u003e差异: same\u003cbr\u003e状态: supplemented_by_algo\u003cbr\u003e点击查看详情→","样本: S018\u003cbr\u003e离线分桶: 1\u003cbr\u003e线上分桶: 1\u003cbr\u003e差异: same\u003cbr\u003e状态: supplemented_by_algo\u003cbr\u003e点击查看详情→","样本: S019\u003cbr\u003e离线分桶: 2\u003cbr\u003e线上分桶: 2\u003cbr\u003e差异: same\u003cbr\u003e状态: supplemented_by_algo\u003cbr\u003e点击查看详情→","样本: S020\u003cbr\u003e离线分桶: 1\u003cbr\u003e线上分桶: 1\u003cbr\u003e差异: same\u003cbr\u003e状态: supplemented_by_algo\u003cbr\u003e点击查看详情→"],"x":[0,1,2,1,3,2,0,3,1,3,1,2,0,2,4,0,3,1,2,1],"y":[1,1,2,1,3,3,0,4,2,2,1,3,1,2,3,1,3,1,2,1],"type":"scatter"},{"line":{"color":"gray","dash":"dash"},"mode":"lines","name":"y=x (无偏差)","x":[-0.5,4.5],"y":[-0.5,4.5],"type":"scatter"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmapgl":[{"type":"heatmapgl","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"title":{"text":"离线分桶"},"tickmode":"linear","tick0":0,"dtick":1},"yaxis":{"title":{"text":"线上分桶"},"tickmode":"linear","tick0":0,"dtick":1},"title":{"text":"离线vs线上分桶分布图（橙色=差1桶，红色=差多桶）"},"showlegend":true,"clickmode":"event+select"},                        {"responsive": true}                    )                };                            </script>        </div></div>
+                <div class="alert-box">
+                    ⚠️ <strong>差1桶的橙色点需要评测运营复核</strong>：这些记录离线和线上分数刚好差了一个桶，别急着归为正常，
+                    请点开查看详情，结合召回候选表判断是否需要进一步调查。
+                </div>
+                <div id="chart1"><div>                            <div id="baafa4a6-36c7-4089-8a1b-78fd0d463a12" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("baafa4a6-36c7-4089-8a1b-78fd0d463a12")) {                    Plotly.newPlot(                        "baafa4a6-36c7-4089-8a1b-78fd0d463a12",                        [{"customdata":["7ae58b3c-fdf4-4de2-a6cf-e98888efe7ba","e5d4a445-c316-48f4-a513-eefdb5b8ebd3","b0f3cc35-973d-4395-9c3d-5dd0f8450700","10f80f4f-8f71-410e-9dc9-f3d590d1b76e","c5d77f64-e3b2-48ac-8ea3-974499f1c227","539c10b8-22ff-4b8a-9b3a-f4e1731f4992","6eb9be2c-6540-4361-9ea1-74770e091e59","85af29ce-6900-4cff-b5f3-97be6e83ebb0","301f8dc3-1f7b-46bf-88ef-0da328f8dc7a","f3e94307-5eb4-4529-93c5-ebccb8d8c258","a4b92b97-4b6b-4899-a438-d9d0bb5aec29","50203e80-c9dc-4193-9530-5d2f5cfc681c","977b57fa-3522-4226-8be4-ba4801abe8d8","425a6a1e-b882-4040-99bc-16cc009ad7a6","7954c31d-fcea-49ef-bd14-72da5189058d","5778b548-3d1e-4437-b659-f490b56ed92c","b0681611-733c-4694-ba5e-b687f73e2c08","9a85477a-2bce-4714-99e0-883858f13939","2c861771-0a36-4dfa-9c4a-0f00966db08f","cc87b293-7f8d-4b07-b8fe-4b60d35f2177"],"hoverinfo":"text","marker":{"color":["orange","green","green","green","green","orange","green","orange","orange","orange","green","orange","orange","green","orange","orange","green","green","green","green"],"line":{"width":1},"size":12},"mode":"markers","name":"样本点","text":["样本: S001\u003cbr\u003e离线分桶: 0\u003cbr\u003e线上分桶: 1\u003cbr\u003e差异: one_bucket\u003cbr\u003e状态: reviewed_by_op\u003cbr\u003e点击查看详情→","样本: S002\u003cbr\u003e离线分桶: 1\u003cbr\u003e线上分桶: 1\u003cbr\u003e差异: same\u003cbr\u003e状态: pending_review\u003cbr\u003e点击查看详情→","样本: S003\u003cbr\u003e离线分桶: 2\u003cbr\u003e线上分桶: 2\u003cbr\u003e差异: same\u003cbr\u003e状态: supplemented_by_algo\u003cbr\u003e点击查看详情→","样本: S004\u003cbr\u003e离线分桶: 1\u003cbr\u003e线上分桶: 1\u003cbr\u003e差异: same\u003cbr\u003e状态: pending_review\u003cbr\u003e点击查看详情→","样本: S005\u003cbr\u003e离线分桶: 3\u003cbr\u003e线上分桶: 3\u003cbr\u003e差异: same\u003cbr\u003e状态: pending_review\u003cbr\u003e点击查看详情→","样本: S006\u003cbr\u003e离线分桶: 2\u003cbr\u003e线上分桶: 3\u003cbr\u003e差异: one_bucket\u003cbr\u003e状态: supplemented_by_algo\u003cbr\u003e点击查看详情→","样本: S007\u003cbr\u003e离线分桶: 0\u003cbr\u003e线上分桶: 0\u003cbr\u003e差异: same\u003cbr\u003e状态: pending_review\u003cbr\u003e点击查看详情→","样本: S008\u003cbr\u003e离线分桶: 3\u003cbr\u003e线上分桶: 4\u003cbr\u003e差异: one_bucket\u003cbr\u003e状态: pending_review\u003cbr\u003e点击查看详情→","样本: S009\u003cbr\u003e离线分桶: 1\u003cbr\u003e线上分桶: 2\u003cbr\u003e差异: one_bucket\u003cbr\u003e状态: supplemented_by_algo\u003cbr\u003e点击查看详情→","样本: S010\u003cbr\u003e离线分桶: 3\u003cbr\u003e线上分桶: 2\u003cbr\u003e差异: one_bucket\u003cbr\u003e状态: supplemented_by_algo\u003cbr\u003e点击查看详情→","样本: S011\u003cbr\u003e离线分桶: 1\u003cbr\u003e线上分桶: 1\u003cbr\u003e差异: same\u003cbr\u003e状态: pending_review\u003cbr\u003e点击查看详情→","样本: S012\u003cbr\u003e离线分桶: 2\u003cbr\u003e线上分桶: 3\u003cbr\u003e差异: one_bucket\u003cbr\u003e状态: supplemented_by_algo\u003cbr\u003e点击查看详情→","样本: S013\u003cbr\u003e离线分桶: 0\u003cbr\u003e线上分桶: 1\u003cbr\u003e差异: one_bucket\u003cbr\u003e状态: pending_review\u003cbr\u003e点击查看详情→","样本: S014\u003cbr\u003e离线分桶: 2\u003cbr\u003e线上分桶: 2\u003cbr\u003e差异: same\u003cbr\u003e状态: supplemented_by_algo\u003cbr\u003e点击查看详情→","样本: S015\u003cbr\u003e离线分桶: 4\u003cbr\u003e线上分桶: 3\u003cbr\u003e差异: one_bucket\u003cbr\u003e状态: pending_review\u003cbr\u003e点击查看详情→","样本: S016\u003cbr\u003e离线分桶: 0\u003cbr\u003e线上分桶: 1\u003cbr\u003e差异: one_bucket\u003cbr\u003e状态: supplemented_by_algo\u003cbr\u003e点击查看详情→","样本: S017\u003cbr\u003e离线分桶: 3\u003cbr\u003e线上分桶: 3\u003cbr\u003e差异: same\u003cbr\u003e状态: supplemented_by_algo\u003cbr\u003e点击查看详情→","样本: S018\u003cbr\u003e离线分桶: 1\u003cbr\u003e线上分桶: 1\u003cbr\u003e差异: same\u003cbr\u003e状态: supplemented_by_algo\u003cbr\u003e点击查看详情→","样本: S019\u003cbr\u003e离线分桶: 2\u003cbr\u003e线上分桶: 2\u003cbr\u003e差异: same\u003cbr\u003e状态: supplemented_by_algo\u003cbr\u003e点击查看详情→","样本: S020\u003cbr\u003e离线分桶: 1\u003cbr\u003e线上分桶: 1\u003cbr\u003e差异: same\u003cbr\u003e状态: supplemented_by_algo\u003cbr\u003e点击查看详情→"],"x":[0,1,2,1,3,2,0,3,1,3,1,2,0,2,4,0,3,1,2,1],"y":[1,1,2,1,3,3,0,4,2,2,1,3,1,2,3,1,3,1,2,1],"type":"scatter"},{"line":{"color":"gray","dash":"dash"},"mode":"lines","name":"y=x (无偏差)","x":[-0.5,4.5],"y":[-0.5,4.5],"type":"scatter"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmapgl":[{"type":"heatmapgl","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"title":{"text":"离线分桶"},"tickmode":"linear","tick0":0,"dtick":1},"yaxis":{"title":{"text":"线上分桶"},"tickmode":"linear","tick0":0,"dtick":1},"title":{"text":"离线vs线上分桶分布图（橙色=差1桶，红色=差多桶）"},"showlegend":true,"clickmode":"event+select"},                        {"responsive": true}                    )                };                            </script>        </div></div>
             </div>
 
             <div class="card">
-                <h2>🧊 3D视图：分数×分桶差</h2>
-                <div id="chart2"><div>                            <div id="cc3118e9-ed98-4ac9-8951-d5846f44e1b2" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("cc3118e9-ed98-4ac9-8951-d5846f44e1b2")) {                    Plotly.newPlot(                        "cc3118e9-ed98-4ac9-8951-d5846f44e1b2",                        [{"customdata":["59f59317-3bd3-4036-934a-9bfbd4c29070","d808801c-ea4f-4038-b0d5-1ae7b0e4323b","0e61c2a1-cb35-47aa-91c0-f173b8143bfa","bfbb0018-5ace-42a5-b7ff-033d26cdc73c","8f376f48-d749-4178-8e79-584a4b3be05f","a3bdfc81-8a0c-407c-b1e6-70db7238509c","085d5782-a549-4313-953a-a09ee3d91ae6","42768e61-5350-4a23-b373-1682e18241b3","f92f1871-31d6-4130-89dd-1c17113254ee","a110d670-3234-46e3-939f-344103040216","4399b6df-7286-4efc-9fc2-14c2c23edc8e","bf4bd57f-aac4-4bd0-a23c-34d1dcdae76b","812d2f8a-a82a-4433-b4fe-a3e8842ab742","f37f1ef2-dc43-48fa-903f-9bc4f97c36fe","317edf9b-b956-4ada-9046-498233b167ef","7c7bb8b0-cfad-4874-8e63-a8824c6d26eb","dea0535a-3116-4c60-b603-d581544753f6","ba869a5a-416a-4190-9b19-eaf5b22cd500","4b430ebb-bff8-485b-a1d4-d9c6dac43408","3392e778-8421-4204-ac75-c7a69d91544b"],"hoverinfo":"text","marker":{"color":["orange","green","green","green","green","orange","green","orange","orange","orange","green","orange","orange","green","orange","orange","green","green","green","green"],"opacity":0.8,"size":6},"mode":"markers","text":["样本: S001\u003cbr\u003e离线分数: 0.000\u003cbr\u003e线上分数: 0.000\u003cbr\u003e分桶差: 1\u003cbr\u003e记录ID: 59f59317-3bd3-4036-934a-9bfbd4c29070","样本: S002\u003cbr\u003e离线分数: 0.000\u003cbr\u003e线上分数: 0.000\u003cbr\u003e分桶差: 0\u003cbr\u003e记录ID: d808801c-ea4f-4038-b0d5-1ae7b0e4323b","样本: S003\u003cbr\u003e离线分数: 0.000\u003cbr\u003e线上分数: 0.000\u003cbr\u003e分桶差: 0\u003cbr\u003e记录ID: 0e61c2a1-cb35-47aa-91c0-f173b8143bfa","样本: S004\u003cbr\u003e离线分数: 0.000\u003cbr\u003e线上分数: 0.000\u003cbr\u003e分桶差: 0\u003cbr\u003e记录ID: bfbb0018-5ace-42a5-b7ff-033d26cdc73c","样本: S005\u003cbr\u003e离线分数: 0.000\u003cbr\u003e线上分数: 0.000\u003cbr\u003e分桶差: 0\u003cbr\u003e记录ID: 8f376f48-d749-4178-8e79-584a4b3be05f","样本: S006\u003cbr\u003e离线分数: 0.000\u003cbr\u003e线上分数: 0.000\u003cbr\u003e分桶差: 1\u003cbr\u003e记录ID: a3bdfc81-8a0c-407c-b1e6-70db7238509c","样本: S007\u003cbr\u003e离线分数: 0.000\u003cbr\u003e线上分数: 0.000\u003cbr\u003e分桶差: 0\u003cbr\u003e记录ID: 085d5782-a549-4313-953a-a09ee3d91ae6","样本: S008\u003cbr\u003e离线分数: 0.000\u003cbr\u003e线上分数: 0.000\u003cbr\u003e分桶差: 1\u003cbr\u003e记录ID: 42768e61-5350-4a23-b373-1682e18241b3","样本: S009\u003cbr\u003e离线分数: 0.000\u003cbr\u003e线上分数: 0.000\u003cbr\u003e分桶差: 1\u003cbr\u003e记录ID: f92f1871-31d6-4130-89dd-1c17113254ee","样本: S010\u003cbr\u003e离线分数: 0.000\u003cbr\u003e线上分数: 0.000\u003cbr\u003e分桶差: 1\u003cbr\u003e记录ID: a110d670-3234-46e3-939f-344103040216","样本: S011\u003cbr\u003e离线分数: 0.000\u003cbr\u003e线上分数: 0.000\u003cbr\u003e分桶差: 0\u003cbr\u003e记录ID: 4399b6df-7286-4efc-9fc2-14c2c23edc8e","样本: S012\u003cbr\u003e离线分数: 0.000\u003cbr\u003e线上分数: 0.000\u003cbr\u003e分桶差: 1\u003cbr\u003e记录ID: bf4bd57f-aac4-4bd0-a23c-34d1dcdae76b","样本: S013\u003cbr\u003e离线分数: 0.000\u003cbr\u003e线上分数: 0.000\u003cbr\u003e分桶差: 1\u003cbr\u003e记录ID: 812d2f8a-a82a-4433-b4fe-a3e8842ab742","样本: S014\u003cbr\u003e离线分数: 0.000\u003cbr\u003e线上分数: 0.000\u003cbr\u003e分桶差: 0\u003cbr\u003e记录ID: f37f1ef2-dc43-48fa-903f-9bc4f97c36fe","样本: S015\u003cbr\u003e离线分数: 0.000\u003cbr\u003e线上分数: 0.000\u003cbr\u003e分桶差: 1\u003cbr\u003e记录ID: 317edf9b-b956-4ada-9046-498233b167ef","样本: S016\u003cbr\u003e离线分数: 0.000\u003cbr\u003e线上分数: 0.000\u003cbr\u003e分桶差: 1\u003cbr\u003e记录ID: 7c7bb8b0-cfad-4874-8e63-a8824c6d26eb","样本: S017\u003cbr\u003e离线分数: 0.000\u003cbr\u003e线上分数: 0.000\u003cbr\u003e分桶差: 0\u003cbr\u003e记录ID: dea0535a-3116-4c60-b603-d581544753f6","样本: S018\u003cbr\u003e离线分数: 0.000\u003cbr\u003e线上分数: 0.000\u003cbr\u003e分桶差: 0\u003cbr\u003e记录ID: ba869a5a-416a-4190-9b19-eaf5b22cd500","样本: S019\u003cbr\u003e离线分数: 0.000\u003cbr\u003e线上分数: 0.000\u003cbr\u003e分桶差: 0\u003cbr\u003e记录ID: 4b430ebb-bff8-485b-a1d4-d9c6dac43408","样本: S020\u003cbr\u003e离线分数: 0.000\u003cbr\u003e线上分数: 0.000\u003cbr\u003e分桶差: 0\u003cbr\u003e记录ID: 3392e778-8421-4204-ac75-c7a69d91544b"],"x":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"y":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"z":[1,0,0,0,0,1,0,1,1,1,0,1,1,0,1,1,0,0,0,0],"type":"scatter3d"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmapgl":[{"type":"heatmapgl","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"title":{"text":"3D视图：离线分数×线上分数×分桶差"},"scene":{"xaxis":{"title":{"text":"离线分数"}},"yaxis":{"title":{"text":"线上分数"}},"zaxis":{"title":{"text":"分桶差"}}},"clickmode":"event+select"},                        {"responsive": true}                    )                };                            </script>        </div></div>
+                <h2>🧊 3D视图：离线分数 × 线上分数 × 分桶差</h2>
+                <p>Z轴为分桶差，越高表示偏差越大。点击数据点自动跳转到对应负样本记录。</p>
+                <div id="chart2"><div>                            <div id="15f2efcd-b548-4b24-8376-0188dd79ab3f" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("15f2efcd-b548-4b24-8376-0188dd79ab3f")) {                    Plotly.newPlot(                        "15f2efcd-b548-4b24-8376-0188dd79ab3f",                        [{"customdata":["7ae58b3c-fdf4-4de2-a6cf-e98888efe7ba","e5d4a445-c316-48f4-a513-eefdb5b8ebd3","b0f3cc35-973d-4395-9c3d-5dd0f8450700","10f80f4f-8f71-410e-9dc9-f3d590d1b76e","c5d77f64-e3b2-48ac-8ea3-974499f1c227","539c10b8-22ff-4b8a-9b3a-f4e1731f4992","6eb9be2c-6540-4361-9ea1-74770e091e59","85af29ce-6900-4cff-b5f3-97be6e83ebb0","301f8dc3-1f7b-46bf-88ef-0da328f8dc7a","f3e94307-5eb4-4529-93c5-ebccb8d8c258","a4b92b97-4b6b-4899-a438-d9d0bb5aec29","50203e80-c9dc-4193-9530-5d2f5cfc681c","977b57fa-3522-4226-8be4-ba4801abe8d8","425a6a1e-b882-4040-99bc-16cc009ad7a6","7954c31d-fcea-49ef-bd14-72da5189058d","5778b548-3d1e-4437-b659-f490b56ed92c","b0681611-733c-4694-ba5e-b687f73e2c08","9a85477a-2bce-4714-99e0-883858f13939","2c861771-0a36-4dfa-9c4a-0f00966db08f","cc87b293-7f8d-4b07-b8fe-4b60d35f2177"],"hoverinfo":"text","marker":{"color":["orange","green","green","green","green","orange","green","orange","orange","orange","green","orange","orange","green","orange","orange","green","green","green","green"],"opacity":0.8,"size":6},"mode":"markers","text":["样本: S001\u003cbr\u003e离线分数: 0.250\u003cbr\u003e线上分数: 0.350\u003cbr\u003e分桶差: 1\u003cbr\u003e记录ID: 7ae58b3c-fdf4-4de2-a6cf-e98888efe7ba","样本: S002\u003cbr\u003e离线分数: 0.450\u003cbr\u003e线上分数: 0.480\u003cbr\u003e分桶差: 0\u003cbr\u003e记录ID: e5d4a445-c316-48f4-a513-eefdb5b8ebd3","样本: S003\u003cbr\u003e离线分数: 0.550\u003cbr\u003e线上分数: 0.650\u003cbr\u003e分桶差: 0\u003cbr\u003e记录ID: b0f3cc35-973d-4395-9c3d-5dd0f8450700","样本: S004\u003cbr\u003e离线分数: 0.320\u003cbr\u003e线上分数: 0.440\u003cbr\u003e分桶差: 0\u003cbr\u003e记录ID: 10f80f4f-8f71-410e-9dc9-f3d590d1b76e","样本: S005\u003cbr\u003e离线分数: 0.780\u003cbr\u003e线上分数: 0.820\u003cbr\u003e分桶差: 0\u003cbr\u003e记录ID: c5d77f64-e3b2-48ac-8ea3-974499f1c227","样本: S006\u003cbr\u003e离线分数: 0.600\u003cbr\u003e线上分数: 0.720\u003cbr\u003e分桶差: 1\u003cbr\u003e记录ID: 539c10b8-22ff-4b8a-9b3a-f4e1731f4992","样本: S007\u003cbr\u003e离线分数: 0.150\u003cbr\u003e线上分数: 0.180\u003cbr\u003e分桶差: 0\u003cbr\u003e记录ID: 6eb9be2c-6540-4361-9ea1-74770e091e59","样本: S008\u003cbr\u003e离线分数: 0.880\u003cbr\u003e线上分数: 0.920\u003cbr\u003e分桶差: 1\u003cbr\u003e记录ID: 85af29ce-6900-4cff-b5f3-97be6e83ebb0","样本: S009\u003cbr\u003e离线分数: 0.420\u003cbr\u003e线上分数: 0.530\u003cbr\u003e分桶差: 1\u003cbr\u003e记录ID: 301f8dc3-1f7b-46bf-88ef-0da328f8dc7a","样本: S010\u003cbr\u003e离线分数: 0.700\u003cbr\u003e线上分数: 0.580\u003cbr\u003e分桶差: 1\u003cbr\u003e记录ID: f3e94307-5eb4-4529-93c5-ebccb8d8c258","样本: S011\u003cbr\u003e离线分数: 0.380\u003cbr\u003e线上分数: 0.410\u003cbr\u003e分桶差: 0\u003cbr\u003e记录ID: a4b92b97-4b6b-4899-a438-d9d0bb5aec29","样本: S012\u003cbr\u003e离线分数: 0.650\u003cbr\u003e线上分数: 0.780\u003cbr\u003e分桶差: 1\u003cbr\u003e记录ID: 50203e80-c9dc-4193-9530-5d2f5cfc681c","样本: S013\u003cbr\u003e离线分数: 0.280\u003cbr\u003e线上分数: 0.310\u003cbr\u003e分桶差: 1\u003cbr\u003e记录ID: 977b57fa-3522-4226-8be4-ba4801abe8d8","样本: S014\u003cbr\u003e离线分数: 0.520\u003cbr\u003e线上分数: 0.640\u003cbr\u003e分桶差: 0\u003cbr\u003e记录ID: 425a6a1e-b882-4040-99bc-16cc009ad7a6","样本: S015\u003cbr\u003e离线分数: 0.910\u003cbr\u003e线上分数: 0.870\u003cbr\u003e分桶差: 1\u003cbr\u003e记录ID: 7954c31d-fcea-49ef-bd14-72da5189058d","样本: S016\u003cbr\u003e离线分数: 0.200\u003cbr\u003e线上分数: 0.330\u003cbr\u003e分桶差: 1\u003cbr\u003e记录ID: 5778b548-3d1e-4437-b659-f490b56ed92c","样本: S017\u003cbr\u003e离线分数: 0.750\u003cbr\u003e线上分数: 0.880\u003cbr\u003e分桶差: 0\u003cbr\u003e记录ID: b0681611-733c-4694-ba5e-b687f73e2c08","样本: S018\u003cbr\u003e离线分数: 0.480\u003cbr\u003e线上分数: 0.360\u003cbr\u003e分桶差: 0\u003cbr\u003e记录ID: 9a85477a-2bce-4714-99e0-883858f13939","样本: S019\u003cbr\u003e离线分数: 0.620\u003cbr\u003e线上分数: 0.550\u003cbr\u003e分桶差: 0\u003cbr\u003e记录ID: 2c861771-0a36-4dfa-9c4a-0f00966db08f","样本: S020\u003cbr\u003e离线分数: 0.350\u003cbr\u003e线上分数: 0.460\u003cbr\u003e分桶差: 0\u003cbr\u003e记录ID: cc87b293-7f8d-4b07-b8fe-4b60d35f2177"],"x":[0.25,0.45,0.55,0.32,0.78,0.6,0.15,0.88,0.42,0.7,0.38,0.65,0.28,0.52,0.91,0.2,0.75,0.48,0.62,0.35],"y":[0.35,0.48,0.65,0.44,0.82,0.72,0.18,0.92,0.53,0.58,0.41,0.78,0.31,0.64,0.87,0.33,0.88,0.36,0.55,0.46],"z":[1,0,0,0,0,1,0,1,1,1,0,1,1,0,1,1,0,0,0,0],"type":"scatter3d"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmapgl":[{"type":"heatmapgl","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"title":{"text":"3D视图：离线分数×线上分数×分桶差"},"scene":{"xaxis":{"title":{"text":"离线分数"}},"yaxis":{"title":{"text":"线上分数"}},"zaxis":{"title":{"text":"分桶差"}}},"clickmode":"event+select"},                        {"responsive": true}                    )                };                            </script>        </div></div>
             </div>
 
             <div class="card">
                 <h2>📋 漂移记录详情（差1桶优先展示）</h2>
+                <p>点击 <span class="expand-hint">👉样本ID</span> 展开完整详情：负样本分数、为什么留下、缺什么材料、召回候选表……</p>
                 <table class="record-table">
                     <thead>
                         <tr>
                             <th>样本ID</th>
+                            <th>离线分数</th>
+                            <th>线上分数</th>
                             <th>离线分桶</th>
                             <th>线上分桶</th>
                             <th>差异</th>
                             <th>状态</th>
                             <th>为什么留下</th>
-                            <th>缺什么材料</th>
                             <th>下一步找谁</th>
                         </tr>
                     </thead>
                     <tbody>
                         
-                <tr class="one-bucket">
-                    <td><a href="#sample-S001">S001</a></td>
+                <tr id="row-7ae58b3c-fdf4-4de2-a6cf-e98888efe7ba" class="one-bucket" onclick="toggleDetail('7ae58b3c-fdf4-4de2-a6cf-e98888efe7ba')">
+                    <td id="sample-S001">
+                        <a class="record-link" href="#sample-S001" onclick="event.stopPropagation(); toggleDetail('7ae58b3c-fdf4-4de2-a6cf-e98888efe7ba')">
+                            S001
+                        </a>
+                        <span class="expand-hint">👆点我展开</span>
+                    </td>
+                    <td><span class="score-box">0.250</span></td>
+                    <td><span class="score-box">0.350</span></td>
                     <td>0</td>
                     <td>1</td>
-                    <td>one_bucket</td>
+                    <td><span class="bucket-box bucket-one">one_bucket</span></td>
                     <td><span class="status-badge status-reviewed-by-op">reviewed_by_op</span></td>
                     <td>离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常</td>
-                    <td>-</td>
-                    <td>operation</td>
+                    <td><span class="owner-tag owner-algorithm">算法工程师小乔</span></td>
+                </tr>
+                <tr>
+                    <td colspan="9" style="padding:0;border:none;">
+                        <div id="detail-7ae58b3c-fdf4-4de2-a6cf-e98888efe7ba" class="detail-panel" onclick="event.stopPropagation()">
+                            <h3>🔍 负样本详情 — S001</h3>
+
+                            <div class="section-title">📊 离线 vs 线上分数对比</div>
+                            <div class="detail-grid">
+                                <div>
+                                    <span class="detail-label">离线分数</span>
+                                    <span class="detail-value"><span class="score-box">0.250</span> → 分桶 0</span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">线上分数</span>
+                                    <span class="detail-value"><span class="score-box">0.350</span> → 分桶 1</span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">分桶差异</span>
+                                    <span class="detail-value"><span class="bucket-box bucket-one">one_bucket</span></span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">当前状态</span>
+                                    <span class="detail-value"><span class="status-badge status-reviewed-by-op">reviewed_by_op</span></span>
+                                </div>
+                            </div>
+
+                            <div class="section-title">❓ 为什么这条记录被留下</div>
+                            <div class="detail-value" style="background:#fff3cd;padding:10px;border-radius:4px;">
+                                离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常
+                            </div>
+
+                            <div class="section-title">📋 还缺什么材料</div>
+                            <ul class="material-list"><li class="empty">无缺失材料</li></ul>
+
+                            <div class="section-title">👤 下一步该找谁</div>
+                            <div class="detail-value">
+                                <span class="owner-tag owner-algorithm">算法工程师小乔</span>
+                                
+                                 → 算法工程师小乔需补查召回候选或特征日志
+                            </div>
+
+                            <div class="review-notes">📝 评测运营复核备注：已复核，S001离在线确实差1桶，分数刚好跨边界，待算法进一步确认</div>
+
+                            <div class="section-title">🔗 召回候选表（小乔补录）</div>
+                            
+                <table class="recall-table">
+                    <thead>
+                        <tr>
+                            <th>排名</th>
+                            <th>候选ID</th>
+                            <th>分数</th>
+                            <th>是否相关</th>
+                            <th>原因</th>
+                            <th>补录人</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>C001</td>
+                        <td>0.880</td>
+                        <td class="related-yes">相关</td>
+                        <td>特征高度相似</td>
+                        <td>小乔</td>
+                    </tr>
+                    
+                    <tr>
+                        <td>2</td>
+                        <td>C002</td>
+                        <td>0.760</td>
+                        <td class="related-yes">相关</td>
+                        <td>同类别召回</td>
+                        <td>小乔</td>
+                    </tr>
+                    
+                    <tr>
+                        <td>3</td>
+                        <td>C003</td>
+                        <td>0.650</td>
+                        <td class="related-no">不相关</td>
+                        <td>分数较低</td>
+                        <td>小乔</td>
+                    </tr>
+                    </tbody>
+                </table>
+                
+                        </div>
+                    </td>
                 </tr>
                 
-                <tr class="one-bucket">
-                    <td><a href="#sample-S006">S006</a></td>
+                <tr id="row-539c10b8-22ff-4b8a-9b3a-f4e1731f4992" class="one-bucket" onclick="toggleDetail('539c10b8-22ff-4b8a-9b3a-f4e1731f4992')">
+                    <td id="sample-S006">
+                        <a class="record-link" href="#sample-S006" onclick="event.stopPropagation(); toggleDetail('539c10b8-22ff-4b8a-9b3a-f4e1731f4992')">
+                            S006
+                        </a>
+                        <span class="expand-hint">👆点我展开</span>
+                    </td>
+                    <td><span class="score-box">0.600</span></td>
+                    <td><span class="score-box">0.720</span></td>
                     <td>2</td>
                     <td>3</td>
-                    <td>one_bucket</td>
+                    <td><span class="bucket-box bucket-one">one_bucket</span></td>
                     <td><span class="status-badge status-supplemented-by-algo">supplemented_by_algo</span></td>
                     <td>离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常</td>
-                    <td>复核意见待评测运营填写</td>
-                    <td>operation</td>
+                    <td><span class="owner-tag owner-operation">评测运营</span></td>
+                </tr>
+                <tr>
+                    <td colspan="9" style="padding:0;border:none;">
+                        <div id="detail-539c10b8-22ff-4b8a-9b3a-f4e1731f4992" class="detail-panel" onclick="event.stopPropagation()">
+                            <h3>🔍 负样本详情 — S006</h3>
+
+                            <div class="section-title">📊 离线 vs 线上分数对比</div>
+                            <div class="detail-grid">
+                                <div>
+                                    <span class="detail-label">离线分数</span>
+                                    <span class="detail-value"><span class="score-box">0.600</span> → 分桶 2</span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">线上分数</span>
+                                    <span class="detail-value"><span class="score-box">0.720</span> → 分桶 3</span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">分桶差异</span>
+                                    <span class="detail-value"><span class="bucket-box bucket-one">one_bucket</span></span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">当前状态</span>
+                                    <span class="detail-value"><span class="status-badge status-supplemented-by-algo">supplemented_by_algo</span></span>
+                                </div>
+                            </div>
+
+                            <div class="section-title">❓ 为什么这条记录被留下</div>
+                            <div class="detail-value" style="background:#fff3cd;padding:10px;border-radius:4px;">
+                                离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常
+                            </div>
+
+                            <div class="section-title">📋 还缺什么材料</div>
+                            <ul class="material-list"><li>复核意见待评测运营填写</li></ul>
+
+                            <div class="section-title">👤 下一步该找谁</div>
+                            <div class="detail-value">
+                                <span class="owner-tag owner-operation">评测运营</span>
+                                 → 评测运营需先进行复核确认（别急着归正常）
+                                
+                            </div>
+
+                            
+
+                            <div class="section-title">🔗 召回候选表（小乔补录）</div>
+                            
+                <table class="recall-table">
+                    <thead>
+                        <tr>
+                            <th>排名</th>
+                            <th>候选ID</th>
+                            <th>分数</th>
+                            <th>是否相关</th>
+                            <th>原因</th>
+                            <th>补录人</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>C021</td>
+                        <td>0.780</td>
+                        <td class="related-yes">相关</td>
+                        <td>近似匹配</td>
+                        <td>小乔</td>
+                    </tr>
+                    
+                    <tr>
+                        <td>2</td>
+                        <td>C022</td>
+                        <td>0.720</td>
+                        <td class="related-no">不相关</td>
+                        <td>不相关</td>
+                        <td>小乔</td>
+                    </tr>
+                    </tbody>
+                </table>
+                
+                        </div>
+                    </td>
                 </tr>
                 
-                <tr class="one-bucket">
-                    <td><a href="#sample-S008">S008</a></td>
+                <tr id="row-85af29ce-6900-4cff-b5f3-97be6e83ebb0" class="one-bucket" onclick="toggleDetail('85af29ce-6900-4cff-b5f3-97be6e83ebb0')">
+                    <td id="sample-S008">
+                        <a class="record-link" href="#sample-S008" onclick="event.stopPropagation(); toggleDetail('85af29ce-6900-4cff-b5f3-97be6e83ebb0')">
+                            S008
+                        </a>
+                        <span class="expand-hint">👆点我展开</span>
+                    </td>
+                    <td><span class="score-box">0.880</span></td>
+                    <td><span class="score-box">0.920</span></td>
                     <td>3</td>
                     <td>4</td>
-                    <td>one_bucket</td>
+                    <td><span class="bucket-box bucket-one">one_bucket</span></td>
                     <td><span class="status-badge status-pending-review">pending_review</span></td>
                     <td>离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常</td>
-                    <td>召回候选表待算法工程师小乔补录, 复核意见待评测运营填写</td>
-                    <td>operation</td>
+                    <td><span class="owner-tag owner-operation">评测运营</span></td>
+                </tr>
+                <tr>
+                    <td colspan="9" style="padding:0;border:none;">
+                        <div id="detail-85af29ce-6900-4cff-b5f3-97be6e83ebb0" class="detail-panel" onclick="event.stopPropagation()">
+                            <h3>🔍 负样本详情 — S008</h3>
+
+                            <div class="section-title">📊 离线 vs 线上分数对比</div>
+                            <div class="detail-grid">
+                                <div>
+                                    <span class="detail-label">离线分数</span>
+                                    <span class="detail-value"><span class="score-box">0.880</span> → 分桶 3</span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">线上分数</span>
+                                    <span class="detail-value"><span class="score-box">0.920</span> → 分桶 4</span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">分桶差异</span>
+                                    <span class="detail-value"><span class="bucket-box bucket-one">one_bucket</span></span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">当前状态</span>
+                                    <span class="detail-value"><span class="status-badge status-pending-review">pending_review</span></span>
+                                </div>
+                            </div>
+
+                            <div class="section-title">❓ 为什么这条记录被留下</div>
+                            <div class="detail-value" style="background:#fff3cd;padding:10px;border-radius:4px;">
+                                离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常
+                            </div>
+
+                            <div class="section-title">📋 还缺什么材料</div>
+                            <ul class="material-list"><li>召回候选表待算法工程师小乔补录</li><li>复核意见待评测运营填写</li></ul>
+
+                            <div class="section-title">👤 下一步该找谁</div>
+                            <div class="detail-value">
+                                <span class="owner-tag owner-operation">评测运营</span>
+                                 → 评测运营需先进行复核确认（别急着归正常）
+                                
+                            </div>
+
+                            
+
+                            <div class="section-title">🔗 召回候选表（小乔补录）</div>
+                            <p style='color:#6c757d;font-style:italic;'>暂无召回候选数据，需算法工程师小乔补录。</p>
+                        </div>
+                    </td>
                 </tr>
                 
-                <tr class="one-bucket">
-                    <td><a href="#sample-S009">S009</a></td>
+                <tr id="row-301f8dc3-1f7b-46bf-88ef-0da328f8dc7a" class="one-bucket" onclick="toggleDetail('301f8dc3-1f7b-46bf-88ef-0da328f8dc7a')">
+                    <td id="sample-S009">
+                        <a class="record-link" href="#sample-S009" onclick="event.stopPropagation(); toggleDetail('301f8dc3-1f7b-46bf-88ef-0da328f8dc7a')">
+                            S009
+                        </a>
+                        <span class="expand-hint">👆点我展开</span>
+                    </td>
+                    <td><span class="score-box">0.420</span></td>
+                    <td><span class="score-box">0.530</span></td>
                     <td>1</td>
                     <td>2</td>
-                    <td>one_bucket</td>
+                    <td><span class="bucket-box bucket-one">one_bucket</span></td>
                     <td><span class="status-badge status-supplemented-by-algo">supplemented_by_algo</span></td>
                     <td>离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常</td>
-                    <td>复核意见待评测运营填写</td>
-                    <td>operation</td>
+                    <td><span class="owner-tag owner-operation">评测运营</span></td>
+                </tr>
+                <tr>
+                    <td colspan="9" style="padding:0;border:none;">
+                        <div id="detail-301f8dc3-1f7b-46bf-88ef-0da328f8dc7a" class="detail-panel" onclick="event.stopPropagation()">
+                            <h3>🔍 负样本详情 — S009</h3>
+
+                            <div class="section-title">📊 离线 vs 线上分数对比</div>
+                            <div class="detail-grid">
+                                <div>
+                                    <span class="detail-label">离线分数</span>
+                                    <span class="detail-value"><span class="score-box">0.420</span> → 分桶 1</span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">线上分数</span>
+                                    <span class="detail-value"><span class="score-box">0.530</span> → 分桶 2</span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">分桶差异</span>
+                                    <span class="detail-value"><span class="bucket-box bucket-one">one_bucket</span></span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">当前状态</span>
+                                    <span class="detail-value"><span class="status-badge status-supplemented-by-algo">supplemented_by_algo</span></span>
+                                </div>
+                            </div>
+
+                            <div class="section-title">❓ 为什么这条记录被留下</div>
+                            <div class="detail-value" style="background:#fff3cd;padding:10px;border-radius:4px;">
+                                离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常
+                            </div>
+
+                            <div class="section-title">📋 还缺什么材料</div>
+                            <ul class="material-list"><li>复核意见待评测运营填写</li></ul>
+
+                            <div class="section-title">👤 下一步该找谁</div>
+                            <div class="detail-value">
+                                <span class="owner-tag owner-operation">评测运营</span>
+                                 → 评测运营需先进行复核确认（别急着归正常）
+                                
+                            </div>
+
+                            
+
+                            <div class="section-title">🔗 召回候选表（小乔补录）</div>
+                            
+                <table class="recall-table">
+                    <thead>
+                        <tr>
+                            <th>排名</th>
+                            <th>候选ID</th>
+                            <th>分数</th>
+                            <th>是否相关</th>
+                            <th>原因</th>
+                            <th>补录人</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>C031</td>
+                        <td>0.950</td>
+                        <td class="related-yes">相关</td>
+                        <td>高相关</td>
+                        <td>小乔</td>
+                    </tr>
+                    
+                    <tr>
+                        <td>2</td>
+                        <td>C032</td>
+                        <td>0.820</td>
+                        <td class="related-yes">相关</td>
+                        <td>相关</td>
+                        <td>小乔</td>
+                    </tr>
+                    
+                    <tr>
+                        <td>3</td>
+                        <td>C033</td>
+                        <td>0.700</td>
+                        <td class="related-yes">相关</td>
+                        <td>边缘相关</td>
+                        <td>小乔</td>
+                    </tr>
+                    </tbody>
+                </table>
+                
+                        </div>
+                    </td>
                 </tr>
                 
-                <tr class="one-bucket">
-                    <td><a href="#sample-S010">S010</a></td>
+                <tr id="row-f3e94307-5eb4-4529-93c5-ebccb8d8c258" class="one-bucket" onclick="toggleDetail('f3e94307-5eb4-4529-93c5-ebccb8d8c258')">
+                    <td id="sample-S010">
+                        <a class="record-link" href="#sample-S010" onclick="event.stopPropagation(); toggleDetail('f3e94307-5eb4-4529-93c5-ebccb8d8c258')">
+                            S010
+                        </a>
+                        <span class="expand-hint">👆点我展开</span>
+                    </td>
+                    <td><span class="score-box">0.700</span></td>
+                    <td><span class="score-box">0.580</span></td>
                     <td>3</td>
                     <td>2</td>
-                    <td>one_bucket</td>
+                    <td><span class="bucket-box bucket-one">one_bucket</span></td>
                     <td><span class="status-badge status-supplemented-by-algo">supplemented_by_algo</span></td>
                     <td>离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常</td>
-                    <td>复核意见待评测运营填写</td>
-                    <td>operation</td>
+                    <td><span class="owner-tag owner-operation">评测运营</span></td>
+                </tr>
+                <tr>
+                    <td colspan="9" style="padding:0;border:none;">
+                        <div id="detail-f3e94307-5eb4-4529-93c5-ebccb8d8c258" class="detail-panel" onclick="event.stopPropagation()">
+                            <h3>🔍 负样本详情 — S010</h3>
+
+                            <div class="section-title">📊 离线 vs 线上分数对比</div>
+                            <div class="detail-grid">
+                                <div>
+                                    <span class="detail-label">离线分数</span>
+                                    <span class="detail-value"><span class="score-box">0.700</span> → 分桶 3</span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">线上分数</span>
+                                    <span class="detail-value"><span class="score-box">0.580</span> → 分桶 2</span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">分桶差异</span>
+                                    <span class="detail-value"><span class="bucket-box bucket-one">one_bucket</span></span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">当前状态</span>
+                                    <span class="detail-value"><span class="status-badge status-supplemented-by-algo">supplemented_by_algo</span></span>
+                                </div>
+                            </div>
+
+                            <div class="section-title">❓ 为什么这条记录被留下</div>
+                            <div class="detail-value" style="background:#fff3cd;padding:10px;border-radius:4px;">
+                                离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常
+                            </div>
+
+                            <div class="section-title">📋 还缺什么材料</div>
+                            <ul class="material-list"><li>复核意见待评测运营填写</li></ul>
+
+                            <div class="section-title">👤 下一步该找谁</div>
+                            <div class="detail-value">
+                                <span class="owner-tag owner-operation">评测运营</span>
+                                 → 评测运营需先进行复核确认（别急着归正常）
+                                
+                            </div>
+
+                            
+
+                            <div class="section-title">🔗 召回候选表（小乔补录）</div>
+                            
+                <table class="recall-table">
+                    <thead>
+                        <tr>
+                            <th>排名</th>
+                            <th>候选ID</th>
+                            <th>分数</th>
+                            <th>是否相关</th>
+                            <th>原因</th>
+                            <th>补录人</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>C041</td>
+                        <td>0.680</td>
+                        <td class="related-no">不相关</td>
+                        <td>不相关</td>
+                        <td>小乔</td>
+                    </tr>
+                    </tbody>
+                </table>
+                
+                        </div>
+                    </td>
                 </tr>
                 
-                <tr class="one-bucket">
-                    <td><a href="#sample-S012">S012</a></td>
+                <tr id="row-50203e80-c9dc-4193-9530-5d2f5cfc681c" class="one-bucket" onclick="toggleDetail('50203e80-c9dc-4193-9530-5d2f5cfc681c')">
+                    <td id="sample-S012">
+                        <a class="record-link" href="#sample-S012" onclick="event.stopPropagation(); toggleDetail('50203e80-c9dc-4193-9530-5d2f5cfc681c')">
+                            S012
+                        </a>
+                        <span class="expand-hint">👆点我展开</span>
+                    </td>
+                    <td><span class="score-box">0.650</span></td>
+                    <td><span class="score-box">0.780</span></td>
                     <td>2</td>
                     <td>3</td>
-                    <td>one_bucket</td>
+                    <td><span class="bucket-box bucket-one">one_bucket</span></td>
                     <td><span class="status-badge status-supplemented-by-algo">supplemented_by_algo</span></td>
                     <td>离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常</td>
-                    <td>复核意见待评测运营填写</td>
-                    <td>operation</td>
+                    <td><span class="owner-tag owner-operation">评测运营</span></td>
+                </tr>
+                <tr>
+                    <td colspan="9" style="padding:0;border:none;">
+                        <div id="detail-50203e80-c9dc-4193-9530-5d2f5cfc681c" class="detail-panel" onclick="event.stopPropagation()">
+                            <h3>🔍 负样本详情 — S012</h3>
+
+                            <div class="section-title">📊 离线 vs 线上分数对比</div>
+                            <div class="detail-grid">
+                                <div>
+                                    <span class="detail-label">离线分数</span>
+                                    <span class="detail-value"><span class="score-box">0.650</span> → 分桶 2</span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">线上分数</span>
+                                    <span class="detail-value"><span class="score-box">0.780</span> → 分桶 3</span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">分桶差异</span>
+                                    <span class="detail-value"><span class="bucket-box bucket-one">one_bucket</span></span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">当前状态</span>
+                                    <span class="detail-value"><span class="status-badge status-supplemented-by-algo">supplemented_by_algo</span></span>
+                                </div>
+                            </div>
+
+                            <div class="section-title">❓ 为什么这条记录被留下</div>
+                            <div class="detail-value" style="background:#fff3cd;padding:10px;border-radius:4px;">
+                                离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常
+                            </div>
+
+                            <div class="section-title">📋 还缺什么材料</div>
+                            <ul class="material-list"><li>复核意见待评测运营填写</li></ul>
+
+                            <div class="section-title">👤 下一步该找谁</div>
+                            <div class="detail-value">
+                                <span class="owner-tag owner-operation">评测运营</span>
+                                 → 评测运营需先进行复核确认（别急着归正常）
+                                
+                            </div>
+
+                            
+
+                            <div class="section-title">🔗 召回候选表（小乔补录）</div>
+                            
+                <table class="recall-table">
+                    <thead>
+                        <tr>
+                            <th>排名</th>
+                            <th>候选ID</th>
+                            <th>分数</th>
+                            <th>是否相关</th>
+                            <th>原因</th>
+                            <th>补录人</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>C051</td>
+                        <td>0.900</td>
+                        <td class="related-yes">相关</td>
+                        <td>强相关</td>
+                        <td>小乔</td>
+                    </tr>
+                    
+                    <tr>
+                        <td>2</td>
+                        <td>C052</td>
+                        <td>0.840</td>
+                        <td class="related-yes">相关</td>
+                        <td>相关</td>
+                        <td>小乔</td>
+                    </tr>
+                    </tbody>
+                </table>
+                
+                        </div>
+                    </td>
                 </tr>
                 
-                <tr class="one-bucket">
-                    <td><a href="#sample-S013">S013</a></td>
+                <tr id="row-977b57fa-3522-4226-8be4-ba4801abe8d8" class="one-bucket" onclick="toggleDetail('977b57fa-3522-4226-8be4-ba4801abe8d8')">
+                    <td id="sample-S013">
+                        <a class="record-link" href="#sample-S013" onclick="event.stopPropagation(); toggleDetail('977b57fa-3522-4226-8be4-ba4801abe8d8')">
+                            S013
+                        </a>
+                        <span class="expand-hint">👆点我展开</span>
+                    </td>
+                    <td><span class="score-box">0.280</span></td>
+                    <td><span class="score-box">0.310</span></td>
                     <td>0</td>
                     <td>1</td>
-                    <td>one_bucket</td>
+                    <td><span class="bucket-box bucket-one">one_bucket</span></td>
                     <td><span class="status-badge status-pending-review">pending_review</span></td>
                     <td>离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常</td>
-                    <td>召回候选表待算法工程师小乔补录, 复核意见待评测运营填写</td>
-                    <td>operation</td>
+                    <td><span class="owner-tag owner-operation">评测运营</span></td>
+                </tr>
+                <tr>
+                    <td colspan="9" style="padding:0;border:none;">
+                        <div id="detail-977b57fa-3522-4226-8be4-ba4801abe8d8" class="detail-panel" onclick="event.stopPropagation()">
+                            <h3>🔍 负样本详情 — S013</h3>
+
+                            <div class="section-title">📊 离线 vs 线上分数对比</div>
+                            <div class="detail-grid">
+                                <div>
+                                    <span class="detail-label">离线分数</span>
+                                    <span class="detail-value"><span class="score-box">0.280</span> → 分桶 0</span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">线上分数</span>
+                                    <span class="detail-value"><span class="score-box">0.310</span> → 分桶 1</span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">分桶差异</span>
+                                    <span class="detail-value"><span class="bucket-box bucket-one">one_bucket</span></span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">当前状态</span>
+                                    <span class="detail-value"><span class="status-badge status-pending-review">pending_review</span></span>
+                                </div>
+                            </div>
+
+                            <div class="section-title">❓ 为什么这条记录被留下</div>
+                            <div class="detail-value" style="background:#fff3cd;padding:10px;border-radius:4px;">
+                                离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常
+                            </div>
+
+                            <div class="section-title">📋 还缺什么材料</div>
+                            <ul class="material-list"><li>召回候选表待算法工程师小乔补录</li><li>复核意见待评测运营填写</li></ul>
+
+                            <div class="section-title">👤 下一步该找谁</div>
+                            <div class="detail-value">
+                                <span class="owner-tag owner-operation">评测运营</span>
+                                 → 评测运营需先进行复核确认（别急着归正常）
+                                
+                            </div>
+
+                            
+
+                            <div class="section-title">🔗 召回候选表（小乔补录）</div>
+                            <p style='color:#6c757d;font-style:italic;'>暂无召回候选数据，需算法工程师小乔补录。</p>
+                        </div>
+                    </td>
                 </tr>
                 
-                <tr class="one-bucket">
-                    <td><a href="#sample-S015">S015</a></td>
+                <tr id="row-7954c31d-fcea-49ef-bd14-72da5189058d" class="one-bucket" onclick="toggleDetail('7954c31d-fcea-49ef-bd14-72da5189058d')">
+                    <td id="sample-S015">
+                        <a class="record-link" href="#sample-S015" onclick="event.stopPropagation(); toggleDetail('7954c31d-fcea-49ef-bd14-72da5189058d')">
+                            S015
+                        </a>
+                        <span class="expand-hint">👆点我展开</span>
+                    </td>
+                    <td><span class="score-box">0.910</span></td>
+                    <td><span class="score-box">0.870</span></td>
                     <td>4</td>
                     <td>3</td>
-                    <td>one_bucket</td>
+                    <td><span class="bucket-box bucket-one">one_bucket</span></td>
                     <td><span class="status-badge status-pending-review">pending_review</span></td>
                     <td>离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常</td>
-                    <td>召回候选表待算法工程师小乔补录, 复核意见待评测运营填写</td>
-                    <td>operation</td>
+                    <td><span class="owner-tag owner-operation">评测运营</span></td>
+                </tr>
+                <tr>
+                    <td colspan="9" style="padding:0;border:none;">
+                        <div id="detail-7954c31d-fcea-49ef-bd14-72da5189058d" class="detail-panel" onclick="event.stopPropagation()">
+                            <h3>🔍 负样本详情 — S015</h3>
+
+                            <div class="section-title">📊 离线 vs 线上分数对比</div>
+                            <div class="detail-grid">
+                                <div>
+                                    <span class="detail-label">离线分数</span>
+                                    <span class="detail-value"><span class="score-box">0.910</span> → 分桶 4</span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">线上分数</span>
+                                    <span class="detail-value"><span class="score-box">0.870</span> → 分桶 3</span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">分桶差异</span>
+                                    <span class="detail-value"><span class="bucket-box bucket-one">one_bucket</span></span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">当前状态</span>
+                                    <span class="detail-value"><span class="status-badge status-pending-review">pending_review</span></span>
+                                </div>
+                            </div>
+
+                            <div class="section-title">❓ 为什么这条记录被留下</div>
+                            <div class="detail-value" style="background:#fff3cd;padding:10px;border-radius:4px;">
+                                离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常
+                            </div>
+
+                            <div class="section-title">📋 还缺什么材料</div>
+                            <ul class="material-list"><li>召回候选表待算法工程师小乔补录</li><li>复核意见待评测运营填写</li></ul>
+
+                            <div class="section-title">👤 下一步该找谁</div>
+                            <div class="detail-value">
+                                <span class="owner-tag owner-operation">评测运营</span>
+                                 → 评测运营需先进行复核确认（别急着归正常）
+                                
+                            </div>
+
+                            
+
+                            <div class="section-title">🔗 召回候选表（小乔补录）</div>
+                            <p style='color:#6c757d;font-style:italic;'>暂无召回候选数据，需算法工程师小乔补录。</p>
+                        </div>
+                    </td>
                 </tr>
                 
-                <tr class="one-bucket">
-                    <td><a href="#sample-S016">S016</a></td>
+                <tr id="row-5778b548-3d1e-4437-b659-f490b56ed92c" class="one-bucket" onclick="toggleDetail('5778b548-3d1e-4437-b659-f490b56ed92c')">
+                    <td id="sample-S016">
+                        <a class="record-link" href="#sample-S016" onclick="event.stopPropagation(); toggleDetail('5778b548-3d1e-4437-b659-f490b56ed92c')">
+                            S016
+                        </a>
+                        <span class="expand-hint">👆点我展开</span>
+                    </td>
+                    <td><span class="score-box">0.200</span></td>
+                    <td><span class="score-box">0.330</span></td>
                     <td>0</td>
                     <td>1</td>
-                    <td>one_bucket</td>
+                    <td><span class="bucket-box bucket-one">one_bucket</span></td>
                     <td><span class="status-badge status-supplemented-by-algo">supplemented_by_algo</span></td>
                     <td>离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常</td>
-                    <td>复核意见待评测运营填写</td>
-                    <td>operation</td>
+                    <td><span class="owner-tag owner-operation">评测运营</span></td>
+                </tr>
+                <tr>
+                    <td colspan="9" style="padding:0;border:none;">
+                        <div id="detail-5778b548-3d1e-4437-b659-f490b56ed92c" class="detail-panel" onclick="event.stopPropagation()">
+                            <h3>🔍 负样本详情 — S016</h3>
+
+                            <div class="section-title">📊 离线 vs 线上分数对比</div>
+                            <div class="detail-grid">
+                                <div>
+                                    <span class="detail-label">离线分数</span>
+                                    <span class="detail-value"><span class="score-box">0.200</span> → 分桶 0</span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">线上分数</span>
+                                    <span class="detail-value"><span class="score-box">0.330</span> → 分桶 1</span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">分桶差异</span>
+                                    <span class="detail-value"><span class="bucket-box bucket-one">one_bucket</span></span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">当前状态</span>
+                                    <span class="detail-value"><span class="status-badge status-supplemented-by-algo">supplemented_by_algo</span></span>
+                                </div>
+                            </div>
+
+                            <div class="section-title">❓ 为什么这条记录被留下</div>
+                            <div class="detail-value" style="background:#fff3cd;padding:10px;border-radius:4px;">
+                                离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常
+                            </div>
+
+                            <div class="section-title">📋 还缺什么材料</div>
+                            <ul class="material-list"><li>复核意见待评测运营填写</li></ul>
+
+                            <div class="section-title">👤 下一步该找谁</div>
+                            <div class="detail-value">
+                                <span class="owner-tag owner-operation">评测运营</span>
+                                 → 评测运营需先进行复核确认（别急着归正常）
+                                
+                            </div>
+
+                            
+
+                            <div class="section-title">🔗 召回候选表（小乔补录）</div>
+                            
+                <table class="recall-table">
+                    <thead>
+                        <tr>
+                            <th>排名</th>
+                            <th>候选ID</th>
+                            <th>分数</th>
+                            <th>是否相关</th>
+                            <th>原因</th>
+                            <th>补录人</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>C071</td>
+                        <td>0.750</td>
+                        <td class="related-no">不相关</td>
+                        <td>召回无关联</td>
+                        <td>小乔</td>
+                    </tr>
+                    </tbody>
+                </table>
+                
+                        </div>
+                    </td>
                 </tr>
                 
-                <tr class="">
-                    <td><a href="#sample-S002">S002</a></td>
+                <tr id="row-e5d4a445-c316-48f4-a513-eefdb5b8ebd3" class="" onclick="toggleDetail('e5d4a445-c316-48f4-a513-eefdb5b8ebd3')">
+                    <td id="sample-S002">
+                        <a class="record-link" href="#sample-S002" onclick="event.stopPropagation(); toggleDetail('e5d4a445-c316-48f4-a513-eefdb5b8ebd3')">
+                            S002
+                        </a>
+                        <span class="expand-hint">👆点我展开</span>
+                    </td>
+                    <td><span class="score-box">0.450</span></td>
+                    <td><span class="score-box">0.480</span></td>
                     <td>1</td>
                     <td>1</td>
-                    <td>same</td>
+                    <td><span class="bucket-box bucket-same">same</span></td>
                     <td><span class="status-badge status-pending-review">pending_review</span></td>
                     <td>-</td>
-                    <td>-</td>
-                    <td>operation</td>
+                    <td><span class="owner-tag owner-operation">评测运营</span></td>
+                </tr>
+                <tr>
+                    <td colspan="9" style="padding:0;border:none;">
+                        <div id="detail-e5d4a445-c316-48f4-a513-eefdb5b8ebd3" class="detail-panel" onclick="event.stopPropagation()">
+                            <h3>🔍 负样本详情 — S002</h3>
+
+                            <div class="section-title">📊 离线 vs 线上分数对比</div>
+                            <div class="detail-grid">
+                                <div>
+                                    <span class="detail-label">离线分数</span>
+                                    <span class="detail-value"><span class="score-box">0.450</span> → 分桶 1</span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">线上分数</span>
+                                    <span class="detail-value"><span class="score-box">0.480</span> → 分桶 1</span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">分桶差异</span>
+                                    <span class="detail-value"><span class="bucket-box bucket-same">same</span></span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">当前状态</span>
+                                    <span class="detail-value"><span class="status-badge status-pending-review">pending_review</span></span>
+                                </div>
+                            </div>
+
+                            <div class="section-title">❓ 为什么这条记录被留下</div>
+                            <div class="detail-value" style="background:#fff3cd;padding:10px;border-radius:4px;">
+                                （未说明）
+                            </div>
+
+                            <div class="section-title">📋 还缺什么材料</div>
+                            <ul class="material-list"><li class="empty">无缺失材料</li></ul>
+
+                            <div class="section-title">👤 下一步该找谁</div>
+                            <div class="detail-value">
+                                <span class="owner-tag owner-operation">评测运营</span>
+                                 → 评测运营需先进行复核确认（别急着归正常）
+                                
+                            </div>
+
+                            
+
+                            <div class="section-title">🔗 召回候选表（小乔补录）</div>
+                            <p style='color:#6c757d;font-style:italic;'>暂无召回候选数据，需算法工程师小乔补录。</p>
+                        </div>
+                    </td>
                 </tr>
                 
-                <tr class="">
-                    <td><a href="#sample-S003">S003</a></td>
+                <tr id="row-b0f3cc35-973d-4395-9c3d-5dd0f8450700" class="" onclick="toggleDetail('b0f3cc35-973d-4395-9c3d-5dd0f8450700')">
+                    <td id="sample-S003">
+                        <a class="record-link" href="#sample-S003" onclick="event.stopPropagation(); toggleDetail('b0f3cc35-973d-4395-9c3d-5dd0f8450700')">
+                            S003
+                        </a>
+                        <span class="expand-hint">👆点我展开</span>
+                    </td>
+                    <td><span class="score-box">0.550</span></td>
+                    <td><span class="score-box">0.650</span></td>
                     <td>2</td>
                     <td>2</td>
-                    <td>same</td>
+                    <td><span class="bucket-box bucket-same">same</span></td>
                     <td><span class="status-badge status-supplemented-by-algo">supplemented_by_algo</span></td>
                     <td>-</td>
-                    <td>复核意见待评测运营填写</td>
-                    <td>operation</td>
+                    <td><span class="owner-tag owner-operation">评测运营</span></td>
+                </tr>
+                <tr>
+                    <td colspan="9" style="padding:0;border:none;">
+                        <div id="detail-b0f3cc35-973d-4395-9c3d-5dd0f8450700" class="detail-panel" onclick="event.stopPropagation()">
+                            <h3>🔍 负样本详情 — S003</h3>
+
+                            <div class="section-title">📊 离线 vs 线上分数对比</div>
+                            <div class="detail-grid">
+                                <div>
+                                    <span class="detail-label">离线分数</span>
+                                    <span class="detail-value"><span class="score-box">0.550</span> → 分桶 2</span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">线上分数</span>
+                                    <span class="detail-value"><span class="score-box">0.650</span> → 分桶 2</span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">分桶差异</span>
+                                    <span class="detail-value"><span class="bucket-box bucket-same">same</span></span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">当前状态</span>
+                                    <span class="detail-value"><span class="status-badge status-supplemented-by-algo">supplemented_by_algo</span></span>
+                                </div>
+                            </div>
+
+                            <div class="section-title">❓ 为什么这条记录被留下</div>
+                            <div class="detail-value" style="background:#fff3cd;padding:10px;border-radius:4px;">
+                                （未说明）
+                            </div>
+
+                            <div class="section-title">📋 还缺什么材料</div>
+                            <ul class="material-list"><li>复核意见待评测运营填写</li></ul>
+
+                            <div class="section-title">👤 下一步该找谁</div>
+                            <div class="detail-value">
+                                <span class="owner-tag owner-operation">评测运营</span>
+                                 → 评测运营需先进行复核确认（别急着归正常）
+                                
+                            </div>
+
+                            
+
+                            <div class="section-title">🔗 召回候选表（小乔补录）</div>
+                            
+                <table class="recall-table">
+                    <thead>
+                        <tr>
+                            <th>排名</th>
+                            <th>候选ID</th>
+                            <th>分数</th>
+                            <th>是否相关</th>
+                            <th>原因</th>
+                            <th>补录人</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>C011</td>
+                        <td>0.920</td>
+                        <td class="related-yes">相关</td>
+                        <td>top1召回命中</td>
+                        <td>小乔</td>
+                    </tr>
+                    
+                    <tr>
+                        <td>2</td>
+                        <td>C012</td>
+                        <td>0.850</td>
+                        <td class="related-yes">相关</td>
+                        <td>相关内容</td>
+                        <td>小乔</td>
+                    </tr>
+                    </tbody>
+                </table>
+                
+                        </div>
+                    </td>
                 </tr>
                 
-                <tr class="">
-                    <td><a href="#sample-S004">S004</a></td>
+                <tr id="row-10f80f4f-8f71-410e-9dc9-f3d590d1b76e" class="" onclick="toggleDetail('10f80f4f-8f71-410e-9dc9-f3d590d1b76e')">
+                    <td id="sample-S004">
+                        <a class="record-link" href="#sample-S004" onclick="event.stopPropagation(); toggleDetail('10f80f4f-8f71-410e-9dc9-f3d590d1b76e')">
+                            S004
+                        </a>
+                        <span class="expand-hint">👆点我展开</span>
+                    </td>
+                    <td><span class="score-box">0.320</span></td>
+                    <td><span class="score-box">0.440</span></td>
                     <td>1</td>
                     <td>1</td>
-                    <td>same</td>
+                    <td><span class="bucket-box bucket-same">same</span></td>
                     <td><span class="status-badge status-pending-review">pending_review</span></td>
                     <td>-</td>
-                    <td>-</td>
-                    <td>operation</td>
+                    <td><span class="owner-tag owner-operation">评测运营</span></td>
+                </tr>
+                <tr>
+                    <td colspan="9" style="padding:0;border:none;">
+                        <div id="detail-10f80f4f-8f71-410e-9dc9-f3d590d1b76e" class="detail-panel" onclick="event.stopPropagation()">
+                            <h3>🔍 负样本详情 — S004</h3>
+
+                            <div class="section-title">📊 离线 vs 线上分数对比</div>
+                            <div class="detail-grid">
+                                <div>
+                                    <span class="detail-label">离线分数</span>
+                                    <span class="detail-value"><span class="score-box">0.320</span> → 分桶 1</span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">线上分数</span>
+                                    <span class="detail-value"><span class="score-box">0.440</span> → 分桶 1</span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">分桶差异</span>
+                                    <span class="detail-value"><span class="bucket-box bucket-same">same</span></span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">当前状态</span>
+                                    <span class="detail-value"><span class="status-badge status-pending-review">pending_review</span></span>
+                                </div>
+                            </div>
+
+                            <div class="section-title">❓ 为什么这条记录被留下</div>
+                            <div class="detail-value" style="background:#fff3cd;padding:10px;border-radius:4px;">
+                                （未说明）
+                            </div>
+
+                            <div class="section-title">📋 还缺什么材料</div>
+                            <ul class="material-list"><li class="empty">无缺失材料</li></ul>
+
+                            <div class="section-title">👤 下一步该找谁</div>
+                            <div class="detail-value">
+                                <span class="owner-tag owner-operation">评测运营</span>
+                                 → 评测运营需先进行复核确认（别急着归正常）
+                                
+                            </div>
+
+                            
+
+                            <div class="section-title">🔗 召回候选表（小乔补录）</div>
+                            <p style='color:#6c757d;font-style:italic;'>暂无召回候选数据，需算法工程师小乔补录。</p>
+                        </div>
+                    </td>
                 </tr>
                 
-                <tr class="">
-                    <td><a href="#sample-S005">S005</a></td>
+                <tr id="row-c5d77f64-e3b2-48ac-8ea3-974499f1c227" class="" onclick="toggleDetail('c5d77f64-e3b2-48ac-8ea3-974499f1c227')">
+                    <td id="sample-S005">
+                        <a class="record-link" href="#sample-S005" onclick="event.stopPropagation(); toggleDetail('c5d77f64-e3b2-48ac-8ea3-974499f1c227')">
+                            S005
+                        </a>
+                        <span class="expand-hint">👆点我展开</span>
+                    </td>
+                    <td><span class="score-box">0.780</span></td>
+                    <td><span class="score-box">0.820</span></td>
                     <td>3</td>
                     <td>3</td>
-                    <td>same</td>
+                    <td><span class="bucket-box bucket-same">same</span></td>
                     <td><span class="status-badge status-pending-review">pending_review</span></td>
                     <td>-</td>
-                    <td>-</td>
-                    <td>operation</td>
+                    <td><span class="owner-tag owner-operation">评测运营</span></td>
+                </tr>
+                <tr>
+                    <td colspan="9" style="padding:0;border:none;">
+                        <div id="detail-c5d77f64-e3b2-48ac-8ea3-974499f1c227" class="detail-panel" onclick="event.stopPropagation()">
+                            <h3>🔍 负样本详情 — S005</h3>
+
+                            <div class="section-title">📊 离线 vs 线上分数对比</div>
+                            <div class="detail-grid">
+                                <div>
+                                    <span class="detail-label">离线分数</span>
+                                    <span class="detail-value"><span class="score-box">0.780</span> → 分桶 3</span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">线上分数</span>
+                                    <span class="detail-value"><span class="score-box">0.820</span> → 分桶 3</span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">分桶差异</span>
+                                    <span class="detail-value"><span class="bucket-box bucket-same">same</span></span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">当前状态</span>
+                                    <span class="detail-value"><span class="status-badge status-pending-review">pending_review</span></span>
+                                </div>
+                            </div>
+
+                            <div class="section-title">❓ 为什么这条记录被留下</div>
+                            <div class="detail-value" style="background:#fff3cd;padding:10px;border-radius:4px;">
+                                （未说明）
+                            </div>
+
+                            <div class="section-title">📋 还缺什么材料</div>
+                            <ul class="material-list"><li class="empty">无缺失材料</li></ul>
+
+                            <div class="section-title">👤 下一步该找谁</div>
+                            <div class="detail-value">
+                                <span class="owner-tag owner-operation">评测运营</span>
+                                 → 评测运营需先进行复核确认（别急着归正常）
+                                
+                            </div>
+
+                            
+
+                            <div class="section-title">🔗 召回候选表（小乔补录）</div>
+                            <p style='color:#6c757d;font-style:italic;'>暂无召回候选数据，需算法工程师小乔补录。</p>
+                        </div>
+                    </td>
                 </tr>
                 
-                <tr class="">
-                    <td><a href="#sample-S007">S007</a></td>
+                <tr id="row-6eb9be2c-6540-4361-9ea1-74770e091e59" class="" onclick="toggleDetail('6eb9be2c-6540-4361-9ea1-74770e091e59')">
+                    <td id="sample-S007">
+                        <a class="record-link" href="#sample-S007" onclick="event.stopPropagation(); toggleDetail('6eb9be2c-6540-4361-9ea1-74770e091e59')">
+                            S007
+                        </a>
+                        <span class="expand-hint">👆点我展开</span>
+                    </td>
+                    <td><span class="score-box">0.150</span></td>
+                    <td><span class="score-box">0.180</span></td>
                     <td>0</td>
                     <td>0</td>
-                    <td>same</td>
+                    <td><span class="bucket-box bucket-same">same</span></td>
                     <td><span class="status-badge status-pending-review">pending_review</span></td>
                     <td>-</td>
-                    <td>-</td>
-                    <td>operation</td>
+                    <td><span class="owner-tag owner-operation">评测运营</span></td>
+                </tr>
+                <tr>
+                    <td colspan="9" style="padding:0;border:none;">
+                        <div id="detail-6eb9be2c-6540-4361-9ea1-74770e091e59" class="detail-panel" onclick="event.stopPropagation()">
+                            <h3>🔍 负样本详情 — S007</h3>
+
+                            <div class="section-title">📊 离线 vs 线上分数对比</div>
+                            <div class="detail-grid">
+                                <div>
+                                    <span class="detail-label">离线分数</span>
+                                    <span class="detail-value"><span class="score-box">0.150</span> → 分桶 0</span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">线上分数</span>
+                                    <span class="detail-value"><span class="score-box">0.180</span> → 分桶 0</span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">分桶差异</span>
+                                    <span class="detail-value"><span class="bucket-box bucket-same">same</span></span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">当前状态</span>
+                                    <span class="detail-value"><span class="status-badge status-pending-review">pending_review</span></span>
+                                </div>
+                            </div>
+
+                            <div class="section-title">❓ 为什么这条记录被留下</div>
+                            <div class="detail-value" style="background:#fff3cd;padding:10px;border-radius:4px;">
+                                （未说明）
+                            </div>
+
+                            <div class="section-title">📋 还缺什么材料</div>
+                            <ul class="material-list"><li class="empty">无缺失材料</li></ul>
+
+                            <div class="section-title">👤 下一步该找谁</div>
+                            <div class="detail-value">
+                                <span class="owner-tag owner-operation">评测运营</span>
+                                 → 评测运营需先进行复核确认（别急着归正常）
+                                
+                            </div>
+
+                            
+
+                            <div class="section-title">🔗 召回候选表（小乔补录）</div>
+                            <p style='color:#6c757d;font-style:italic;'>暂无召回候选数据，需算法工程师小乔补录。</p>
+                        </div>
+                    </td>
                 </tr>
                 
-                <tr class="">
-                    <td><a href="#sample-S011">S011</a></td>
+                <tr id="row-a4b92b97-4b6b-4899-a438-d9d0bb5aec29" class="" onclick="toggleDetail('a4b92b97-4b6b-4899-a438-d9d0bb5aec29')">
+                    <td id="sample-S011">
+                        <a class="record-link" href="#sample-S011" onclick="event.stopPropagation(); toggleDetail('a4b92b97-4b6b-4899-a438-d9d0bb5aec29')">
+                            S011
+                        </a>
+                        <span class="expand-hint">👆点我展开</span>
+                    </td>
+                    <td><span class="score-box">0.380</span></td>
+                    <td><span class="score-box">0.410</span></td>
                     <td>1</td>
                     <td>1</td>
-                    <td>same</td>
+                    <td><span class="bucket-box bucket-same">same</span></td>
                     <td><span class="status-badge status-pending-review">pending_review</span></td>
                     <td>-</td>
-                    <td>-</td>
-                    <td>operation</td>
+                    <td><span class="owner-tag owner-operation">评测运营</span></td>
+                </tr>
+                <tr>
+                    <td colspan="9" style="padding:0;border:none;">
+                        <div id="detail-a4b92b97-4b6b-4899-a438-d9d0bb5aec29" class="detail-panel" onclick="event.stopPropagation()">
+                            <h3>🔍 负样本详情 — S011</h3>
+
+                            <div class="section-title">📊 离线 vs 线上分数对比</div>
+                            <div class="detail-grid">
+                                <div>
+                                    <span class="detail-label">离线分数</span>
+                                    <span class="detail-value"><span class="score-box">0.380</span> → 分桶 1</span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">线上分数</span>
+                                    <span class="detail-value"><span class="score-box">0.410</span> → 分桶 1</span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">分桶差异</span>
+                                    <span class="detail-value"><span class="bucket-box bucket-same">same</span></span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">当前状态</span>
+                                    <span class="detail-value"><span class="status-badge status-pending-review">pending_review</span></span>
+                                </div>
+                            </div>
+
+                            <div class="section-title">❓ 为什么这条记录被留下</div>
+                            <div class="detail-value" style="background:#fff3cd;padding:10px;border-radius:4px;">
+                                （未说明）
+                            </div>
+
+                            <div class="section-title">📋 还缺什么材料</div>
+                            <ul class="material-list"><li class="empty">无缺失材料</li></ul>
+
+                            <div class="section-title">👤 下一步该找谁</div>
+                            <div class="detail-value">
+                                <span class="owner-tag owner-operation">评测运营</span>
+                                 → 评测运营需先进行复核确认（别急着归正常）
+                                
+                            </div>
+
+                            
+
+                            <div class="section-title">🔗 召回候选表（小乔补录）</div>
+                            <p style='color:#6c757d;font-style:italic;'>暂无召回候选数据，需算法工程师小乔补录。</p>
+                        </div>
+                    </td>
                 </tr>
                 
-                <tr class="">
-                    <td><a href="#sample-S014">S014</a></td>
+                <tr id="row-425a6a1e-b882-4040-99bc-16cc009ad7a6" class="" onclick="toggleDetail('425a6a1e-b882-4040-99bc-16cc009ad7a6')">
+                    <td id="sample-S014">
+                        <a class="record-link" href="#sample-S014" onclick="event.stopPropagation(); toggleDetail('425a6a1e-b882-4040-99bc-16cc009ad7a6')">
+                            S014
+                        </a>
+                        <span class="expand-hint">👆点我展开</span>
+                    </td>
+                    <td><span class="score-box">0.520</span></td>
+                    <td><span class="score-box">0.640</span></td>
                     <td>2</td>
                     <td>2</td>
-                    <td>same</td>
+                    <td><span class="bucket-box bucket-same">same</span></td>
                     <td><span class="status-badge status-supplemented-by-algo">supplemented_by_algo</span></td>
                     <td>-</td>
-                    <td>复核意见待评测运营填写</td>
-                    <td>operation</td>
+                    <td><span class="owner-tag owner-operation">评测运营</span></td>
+                </tr>
+                <tr>
+                    <td colspan="9" style="padding:0;border:none;">
+                        <div id="detail-425a6a1e-b882-4040-99bc-16cc009ad7a6" class="detail-panel" onclick="event.stopPropagation()">
+                            <h3>🔍 负样本详情 — S014</h3>
+
+                            <div class="section-title">📊 离线 vs 线上分数对比</div>
+                            <div class="detail-grid">
+                                <div>
+                                    <span class="detail-label">离线分数</span>
+                                    <span class="detail-value"><span class="score-box">0.520</span> → 分桶 2</span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">线上分数</span>
+                                    <span class="detail-value"><span class="score-box">0.640</span> → 分桶 2</span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">分桶差异</span>
+                                    <span class="detail-value"><span class="bucket-box bucket-same">same</span></span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">当前状态</span>
+                                    <span class="detail-value"><span class="status-badge status-supplemented-by-algo">supplemented_by_algo</span></span>
+                                </div>
+                            </div>
+
+                            <div class="section-title">❓ 为什么这条记录被留下</div>
+                            <div class="detail-value" style="background:#fff3cd;padding:10px;border-radius:4px;">
+                                （未说明）
+                            </div>
+
+                            <div class="section-title">📋 还缺什么材料</div>
+                            <ul class="material-list"><li>复核意见待评测运营填写</li></ul>
+
+                            <div class="section-title">👤 下一步该找谁</div>
+                            <div class="detail-value">
+                                <span class="owner-tag owner-operation">评测运营</span>
+                                 → 评测运营需先进行复核确认（别急着归正常）
+                                
+                            </div>
+
+                            
+
+                            <div class="section-title">🔗 召回候选表（小乔补录）</div>
+                            
+                <table class="recall-table">
+                    <thead>
+                        <tr>
+                            <th>排名</th>
+                            <th>候选ID</th>
+                            <th>分数</th>
+                            <th>是否相关</th>
+                            <th>原因</th>
+                            <th>补录人</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>C061</td>
+                        <td>0.880</td>
+                        <td class="related-yes">相关</td>
+                        <td>匹配</td>
+                        <td>小乔</td>
+                    </tr>
+                    </tbody>
+                </table>
+                
+                        </div>
+                    </td>
                 </tr>
                 
-                <tr class="">
-                    <td><a href="#sample-S017">S017</a></td>
+                <tr id="row-b0681611-733c-4694-ba5e-b687f73e2c08" class="" onclick="toggleDetail('b0681611-733c-4694-ba5e-b687f73e2c08')">
+                    <td id="sample-S017">
+                        <a class="record-link" href="#sample-S017" onclick="event.stopPropagation(); toggleDetail('b0681611-733c-4694-ba5e-b687f73e2c08')">
+                            S017
+                        </a>
+                        <span class="expand-hint">👆点我展开</span>
+                    </td>
+                    <td><span class="score-box">0.750</span></td>
+                    <td><span class="score-box">0.880</span></td>
                     <td>3</td>
                     <td>3</td>
-                    <td>same</td>
+                    <td><span class="bucket-box bucket-same">same</span></td>
                     <td><span class="status-badge status-supplemented-by-algo">supplemented_by_algo</span></td>
                     <td>-</td>
-                    <td>复核意见待评测运营填写</td>
-                    <td>operation</td>
+                    <td><span class="owner-tag owner-operation">评测运营</span></td>
+                </tr>
+                <tr>
+                    <td colspan="9" style="padding:0;border:none;">
+                        <div id="detail-b0681611-733c-4694-ba5e-b687f73e2c08" class="detail-panel" onclick="event.stopPropagation()">
+                            <h3>🔍 负样本详情 — S017</h3>
+
+                            <div class="section-title">📊 离线 vs 线上分数对比</div>
+                            <div class="detail-grid">
+                                <div>
+                                    <span class="detail-label">离线分数</span>
+                                    <span class="detail-value"><span class="score-box">0.750</span> → 分桶 3</span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">线上分数</span>
+                                    <span class="detail-value"><span class="score-box">0.880</span> → 分桶 3</span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">分桶差异</span>
+                                    <span class="detail-value"><span class="bucket-box bucket-same">same</span></span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">当前状态</span>
+                                    <span class="detail-value"><span class="status-badge status-supplemented-by-algo">supplemented_by_algo</span></span>
+                                </div>
+                            </div>
+
+                            <div class="section-title">❓ 为什么这条记录被留下</div>
+                            <div class="detail-value" style="background:#fff3cd;padding:10px;border-radius:4px;">
+                                （未说明）
+                            </div>
+
+                            <div class="section-title">📋 还缺什么材料</div>
+                            <ul class="material-list"><li>复核意见待评测运营填写</li></ul>
+
+                            <div class="section-title">👤 下一步该找谁</div>
+                            <div class="detail-value">
+                                <span class="owner-tag owner-operation">评测运营</span>
+                                 → 评测运营需先进行复核确认（别急着归正常）
+                                
+                            </div>
+
+                            
+
+                            <div class="section-title">🔗 召回候选表（小乔补录）</div>
+                            
+                <table class="recall-table">
+                    <thead>
+                        <tr>
+                            <th>排名</th>
+                            <th>候选ID</th>
+                            <th>分数</th>
+                            <th>是否相关</th>
+                            <th>原因</th>
+                            <th>补录人</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>C081</td>
+                        <td>0.920</td>
+                        <td class="related-yes">相关</td>
+                        <td>高置信</td>
+                        <td>小乔</td>
+                    </tr>
+                    
+                    <tr>
+                        <td>2</td>
+                        <td>C082</td>
+                        <td>0.850</td>
+                        <td class="related-yes">相关</td>
+                        <td>相关</td>
+                        <td>小乔</td>
+                    </tr>
+                    </tbody>
+                </table>
+                
+                        </div>
+                    </td>
                 </tr>
                 
-                <tr class="">
-                    <td><a href="#sample-S018">S018</a></td>
+                <tr id="row-9a85477a-2bce-4714-99e0-883858f13939" class="" onclick="toggleDetail('9a85477a-2bce-4714-99e0-883858f13939')">
+                    <td id="sample-S018">
+                        <a class="record-link" href="#sample-S018" onclick="event.stopPropagation(); toggleDetail('9a85477a-2bce-4714-99e0-883858f13939')">
+                            S018
+                        </a>
+                        <span class="expand-hint">👆点我展开</span>
+                    </td>
+                    <td><span class="score-box">0.480</span></td>
+                    <td><span class="score-box">0.360</span></td>
                     <td>1</td>
                     <td>1</td>
-                    <td>same</td>
+                    <td><span class="bucket-box bucket-same">same</span></td>
                     <td><span class="status-badge status-supplemented-by-algo">supplemented_by_algo</span></td>
                     <td>-</td>
-                    <td>复核意见待评测运营填写</td>
-                    <td>operation</td>
+                    <td><span class="owner-tag owner-operation">评测运营</span></td>
+                </tr>
+                <tr>
+                    <td colspan="9" style="padding:0;border:none;">
+                        <div id="detail-9a85477a-2bce-4714-99e0-883858f13939" class="detail-panel" onclick="event.stopPropagation()">
+                            <h3>🔍 负样本详情 — S018</h3>
+
+                            <div class="section-title">📊 离线 vs 线上分数对比</div>
+                            <div class="detail-grid">
+                                <div>
+                                    <span class="detail-label">离线分数</span>
+                                    <span class="detail-value"><span class="score-box">0.480</span> → 分桶 1</span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">线上分数</span>
+                                    <span class="detail-value"><span class="score-box">0.360</span> → 分桶 1</span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">分桶差异</span>
+                                    <span class="detail-value"><span class="bucket-box bucket-same">same</span></span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">当前状态</span>
+                                    <span class="detail-value"><span class="status-badge status-supplemented-by-algo">supplemented_by_algo</span></span>
+                                </div>
+                            </div>
+
+                            <div class="section-title">❓ 为什么这条记录被留下</div>
+                            <div class="detail-value" style="background:#fff3cd;padding:10px;border-radius:4px;">
+                                （未说明）
+                            </div>
+
+                            <div class="section-title">📋 还缺什么材料</div>
+                            <ul class="material-list"><li>复核意见待评测运营填写</li></ul>
+
+                            <div class="section-title">👤 下一步该找谁</div>
+                            <div class="detail-value">
+                                <span class="owner-tag owner-operation">评测运营</span>
+                                 → 评测运营需先进行复核确认（别急着归正常）
+                                
+                            </div>
+
+                            
+
+                            <div class="section-title">🔗 召回候选表（小乔补录）</div>
+                            
+                <table class="recall-table">
+                    <thead>
+                        <tr>
+                            <th>排名</th>
+                            <th>候选ID</th>
+                            <th>分数</th>
+                            <th>是否相关</th>
+                            <th>原因</th>
+                            <th>补录人</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>C091</td>
+                        <td>0.800</td>
+                        <td class="related-yes">相关</td>
+                        <td>部分相关</td>
+                        <td>小乔</td>
+                    </tr>
+                    </tbody>
+                </table>
+                
+                        </div>
+                    </td>
                 </tr>
                 
-                <tr class="">
-                    <td><a href="#sample-S019">S019</a></td>
+                <tr id="row-2c861771-0a36-4dfa-9c4a-0f00966db08f" class="" onclick="toggleDetail('2c861771-0a36-4dfa-9c4a-0f00966db08f')">
+                    <td id="sample-S019">
+                        <a class="record-link" href="#sample-S019" onclick="event.stopPropagation(); toggleDetail('2c861771-0a36-4dfa-9c4a-0f00966db08f')">
+                            S019
+                        </a>
+                        <span class="expand-hint">👆点我展开</span>
+                    </td>
+                    <td><span class="score-box">0.620</span></td>
+                    <td><span class="score-box">0.550</span></td>
                     <td>2</td>
                     <td>2</td>
-                    <td>same</td>
+                    <td><span class="bucket-box bucket-same">same</span></td>
                     <td><span class="status-badge status-supplemented-by-algo">supplemented_by_algo</span></td>
                     <td>-</td>
-                    <td>复核意见待评测运营填写</td>
-                    <td>operation</td>
+                    <td><span class="owner-tag owner-operation">评测运营</span></td>
+                </tr>
+                <tr>
+                    <td colspan="9" style="padding:0;border:none;">
+                        <div id="detail-2c861771-0a36-4dfa-9c4a-0f00966db08f" class="detail-panel" onclick="event.stopPropagation()">
+                            <h3>🔍 负样本详情 — S019</h3>
+
+                            <div class="section-title">📊 离线 vs 线上分数对比</div>
+                            <div class="detail-grid">
+                                <div>
+                                    <span class="detail-label">离线分数</span>
+                                    <span class="detail-value"><span class="score-box">0.620</span> → 分桶 2</span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">线上分数</span>
+                                    <span class="detail-value"><span class="score-box">0.550</span> → 分桶 2</span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">分桶差异</span>
+                                    <span class="detail-value"><span class="bucket-box bucket-same">same</span></span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">当前状态</span>
+                                    <span class="detail-value"><span class="status-badge status-supplemented-by-algo">supplemented_by_algo</span></span>
+                                </div>
+                            </div>
+
+                            <div class="section-title">❓ 为什么这条记录被留下</div>
+                            <div class="detail-value" style="background:#fff3cd;padding:10px;border-radius:4px;">
+                                （未说明）
+                            </div>
+
+                            <div class="section-title">📋 还缺什么材料</div>
+                            <ul class="material-list"><li>复核意见待评测运营填写</li></ul>
+
+                            <div class="section-title">👤 下一步该找谁</div>
+                            <div class="detail-value">
+                                <span class="owner-tag owner-operation">评测运营</span>
+                                 → 评测运营需先进行复核确认（别急着归正常）
+                                
+                            </div>
+
+                            
+
+                            <div class="section-title">🔗 召回候选表（小乔补录）</div>
+                            
+                <table class="recall-table">
+                    <thead>
+                        <tr>
+                            <th>排名</th>
+                            <th>候选ID</th>
+                            <th>分数</th>
+                            <th>是否相关</th>
+                            <th>原因</th>
+                            <th>补录人</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>C101</td>
+                        <td>0.770</td>
+                        <td class="related-no">不相关</td>
+                        <td>不相关</td>
+                        <td>小乔</td>
+                    </tr>
+                    </tbody>
+                </table>
+                
+                        </div>
+                    </td>
                 </tr>
                 
-                <tr class="">
-                    <td><a href="#sample-S020">S020</a></td>
+                <tr id="row-cc87b293-7f8d-4b07-b8fe-4b60d35f2177" class="" onclick="toggleDetail('cc87b293-7f8d-4b07-b8fe-4b60d35f2177')">
+                    <td id="sample-S020">
+                        <a class="record-link" href="#sample-S020" onclick="event.stopPropagation(); toggleDetail('cc87b293-7f8d-4b07-b8fe-4b60d35f2177')">
+                            S020
+                        </a>
+                        <span class="expand-hint">👆点我展开</span>
+                    </td>
+                    <td><span class="score-box">0.350</span></td>
+                    <td><span class="score-box">0.460</span></td>
                     <td>1</td>
                     <td>1</td>
-                    <td>same</td>
+                    <td><span class="bucket-box bucket-same">same</span></td>
                     <td><span class="status-badge status-supplemented-by-algo">supplemented_by_algo</span></td>
                     <td>-</td>
-                    <td>复核意见待评测运营填写</td>
-                    <td>operation</td>
+                    <td><span class="owner-tag owner-operation">评测运营</span></td>
+                </tr>
+                <tr>
+                    <td colspan="9" style="padding:0;border:none;">
+                        <div id="detail-cc87b293-7f8d-4b07-b8fe-4b60d35f2177" class="detail-panel" onclick="event.stopPropagation()">
+                            <h3>🔍 负样本详情 — S020</h3>
+
+                            <div class="section-title">📊 离线 vs 线上分数对比</div>
+                            <div class="detail-grid">
+                                <div>
+                                    <span class="detail-label">离线分数</span>
+                                    <span class="detail-value"><span class="score-box">0.350</span> → 分桶 1</span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">线上分数</span>
+                                    <span class="detail-value"><span class="score-box">0.460</span> → 分桶 1</span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">分桶差异</span>
+                                    <span class="detail-value"><span class="bucket-box bucket-same">same</span></span>
+                                </div>
+                                <div>
+                                    <span class="detail-label">当前状态</span>
+                                    <span class="detail-value"><span class="status-badge status-supplemented-by-algo">supplemented_by_algo</span></span>
+                                </div>
+                            </div>
+
+                            <div class="section-title">❓ 为什么这条记录被留下</div>
+                            <div class="detail-value" style="background:#fff3cd;padding:10px;border-radius:4px;">
+                                （未说明）
+                            </div>
+
+                            <div class="section-title">📋 还缺什么材料</div>
+                            <ul class="material-list"><li>复核意见待评测运营填写</li></ul>
+
+                            <div class="section-title">👤 下一步该找谁</div>
+                            <div class="detail-value">
+                                <span class="owner-tag owner-operation">评测运营</span>
+                                 → 评测运营需先进行复核确认（别急着归正常）
+                                
+                            </div>
+
+                            
+
+                            <div class="section-title">🔗 召回候选表（小乔补录）</div>
+                            
+                <table class="recall-table">
+                    <thead>
+                        <tr>
+                            <th>排名</th>
+                            <th>候选ID</th>
+                            <th>分数</th>
+                            <th>是否相关</th>
+                            <th>原因</th>
+                            <th>补录人</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>C111</td>
+                        <td>0.830</td>
+                        <td class="related-yes">相关</td>
+                        <td>相关</td>
+                        <td>小乔</td>
+                    </tr>
+                    </tbody>
+                </table>
+                
+                        </div>
+                    </td>
                 </tr>
                 
                     </tbody>
@@ -285,13 +1748,39 @@
             </div>
 
             <script>
+                const ALL_RECORDS = [{"record_id": "7ae58b3c-fdf4-4de2-a6cf-e98888efe7ba", "sample_id": "S001", "offline_score": 0.25, "online_score": 0.35, "offline_bucket": 0, "online_bucket": 1, "bucket_diff": "one_bucket", "status": "reviewed_by_op", "why_kept": "离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常", "missing_materials": [], "next_owner": "algorithm", "review_notes": "已复核，S001离在线确实差1桶，分数刚好跨边界，待算法进一步确认", "recall_candidates": [{"candidate_id": "C001", "rank": 1, "score": 0.88, "is_related": true, "reason": "特征高度相似", "supplemented_by": "小乔"}, {"candidate_id": "C002", "rank": 2, "score": 0.76, "is_related": true, "reason": "同类别召回", "supplemented_by": "小乔"}, {"candidate_id": "C003", "rank": 3, "score": 0.65, "is_related": false, "reason": "分数较低", "supplemented_by": "小乔"}]}, {"record_id": "e5d4a445-c316-48f4-a513-eefdb5b8ebd3", "sample_id": "S002", "offline_score": 0.45, "online_score": 0.48, "offline_bucket": 1, "online_bucket": 1, "bucket_diff": "same", "status": "pending_review", "why_kept": "", "missing_materials": [], "next_owner": "operation", "review_notes": "", "recall_candidates": []}, {"record_id": "b0f3cc35-973d-4395-9c3d-5dd0f8450700", "sample_id": "S003", "offline_score": 0.55, "online_score": 0.65, "offline_bucket": 2, "online_bucket": 2, "bucket_diff": "same", "status": "supplemented_by_algo", "why_kept": "", "missing_materials": ["复核意见待评测运营填写"], "next_owner": "operation", "review_notes": "", "recall_candidates": [{"candidate_id": "C011", "rank": 1, "score": 0.92, "is_related": true, "reason": "top1召回命中", "supplemented_by": "小乔"}, {"candidate_id": "C012", "rank": 2, "score": 0.85, "is_related": true, "reason": "相关内容", "supplemented_by": "小乔"}]}, {"record_id": "10f80f4f-8f71-410e-9dc9-f3d590d1b76e", "sample_id": "S004", "offline_score": 0.32, "online_score": 0.44, "offline_bucket": 1, "online_bucket": 1, "bucket_diff": "same", "status": "pending_review", "why_kept": "", "missing_materials": [], "next_owner": "operation", "review_notes": "", "recall_candidates": []}, {"record_id": "c5d77f64-e3b2-48ac-8ea3-974499f1c227", "sample_id": "S005", "offline_score": 0.78, "online_score": 0.82, "offline_bucket": 3, "online_bucket": 3, "bucket_diff": "same", "status": "pending_review", "why_kept": "", "missing_materials": [], "next_owner": "operation", "review_notes": "", "recall_candidates": []}, {"record_id": "539c10b8-22ff-4b8a-9b3a-f4e1731f4992", "sample_id": "S006", "offline_score": 0.6, "online_score": 0.72, "offline_bucket": 2, "online_bucket": 3, "bucket_diff": "one_bucket", "status": "supplemented_by_algo", "why_kept": "离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常", "missing_materials": ["复核意见待评测运营填写"], "next_owner": "operation", "review_notes": "", "recall_candidates": [{"candidate_id": "C021", "rank": 1, "score": 0.78, "is_related": true, "reason": "近似匹配", "supplemented_by": "小乔"}, {"candidate_id": "C022", "rank": 2, "score": 0.72, "is_related": false, "reason": "不相关", "supplemented_by": "小乔"}]}, {"record_id": "6eb9be2c-6540-4361-9ea1-74770e091e59", "sample_id": "S007", "offline_score": 0.15, "online_score": 0.18, "offline_bucket": 0, "online_bucket": 0, "bucket_diff": "same", "status": "pending_review", "why_kept": "", "missing_materials": [], "next_owner": "operation", "review_notes": "", "recall_candidates": []}, {"record_id": "85af29ce-6900-4cff-b5f3-97be6e83ebb0", "sample_id": "S008", "offline_score": 0.88, "online_score": 0.92, "offline_bucket": 3, "online_bucket": 4, "bucket_diff": "one_bucket", "status": "pending_review", "why_kept": "离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常", "missing_materials": ["召回候选表待算法工程师小乔补录", "复核意见待评测运营填写"], "next_owner": "operation", "review_notes": "", "recall_candidates": []}, {"record_id": "301f8dc3-1f7b-46bf-88ef-0da328f8dc7a", "sample_id": "S009", "offline_score": 0.42, "online_score": 0.53, "offline_bucket": 1, "online_bucket": 2, "bucket_diff": "one_bucket", "status": "supplemented_by_algo", "why_kept": "离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常", "missing_materials": ["复核意见待评测运营填写"], "next_owner": "operation", "review_notes": "", "recall_candidates": [{"candidate_id": "C031", "rank": 1, "score": 0.95, "is_related": true, "reason": "高相关", "supplemented_by": "小乔"}, {"candidate_id": "C032", "rank": 2, "score": 0.82, "is_related": true, "reason": "相关", "supplemented_by": "小乔"}, {"candidate_id": "C033", "rank": 3, "score": 0.7, "is_related": true, "reason": "边缘相关", "supplemented_by": "小乔"}]}, {"record_id": "f3e94307-5eb4-4529-93c5-ebccb8d8c258", "sample_id": "S010", "offline_score": 0.7, "online_score": 0.58, "offline_bucket": 3, "online_bucket": 2, "bucket_diff": "one_bucket", "status": "supplemented_by_algo", "why_kept": "离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常", "missing_materials": ["复核意见待评测运营填写"], "next_owner": "operation", "review_notes": "", "recall_candidates": [{"candidate_id": "C041", "rank": 1, "score": 0.68, "is_related": false, "reason": "不相关", "supplemented_by": "小乔"}]}, {"record_id": "a4b92b97-4b6b-4899-a438-d9d0bb5aec29", "sample_id": "S011", "offline_score": 0.38, "online_score": 0.41, "offline_bucket": 1, "online_bucket": 1, "bucket_diff": "same", "status": "pending_review", "why_kept": "", "missing_materials": [], "next_owner": "operation", "review_notes": "", "recall_candidates": []}, {"record_id": "50203e80-c9dc-4193-9530-5d2f5cfc681c", "sample_id": "S012", "offline_score": 0.65, "online_score": 0.78, "offline_bucket": 2, "online_bucket": 3, "bucket_diff": "one_bucket", "status": "supplemented_by_algo", "why_kept": "离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常", "missing_materials": ["复核意见待评测运营填写"], "next_owner": "operation", "review_notes": "", "recall_candidates": [{"candidate_id": "C051", "rank": 1, "score": 0.9, "is_related": true, "reason": "强相关", "supplemented_by": "小乔"}, {"candidate_id": "C052", "rank": 2, "score": 0.84, "is_related": true, "reason": "相关", "supplemented_by": "小乔"}]}, {"record_id": "977b57fa-3522-4226-8be4-ba4801abe8d8", "sample_id": "S013", "offline_score": 0.28, "online_score": 0.31, "offline_bucket": 0, "online_bucket": 1, "bucket_diff": "one_bucket", "status": "pending_review", "why_kept": "离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常", "missing_materials": ["召回候选表待算法工程师小乔补录", "复核意见待评测运营填写"], "next_owner": "operation", "review_notes": "", "recall_candidates": []}, {"record_id": "425a6a1e-b882-4040-99bc-16cc009ad7a6", "sample_id": "S014", "offline_score": 0.52, "online_score": 0.64, "offline_bucket": 2, "online_bucket": 2, "bucket_diff": "same", "status": "supplemented_by_algo", "why_kept": "", "missing_materials": ["复核意见待评测运营填写"], "next_owner": "operation", "review_notes": "", "recall_candidates": [{"candidate_id": "C061", "rank": 1, "score": 0.88, "is_related": true, "reason": "匹配", "supplemented_by": "小乔"}]}, {"record_id": "7954c31d-fcea-49ef-bd14-72da5189058d", "sample_id": "S015", "offline_score": 0.91, "online_score": 0.87, "offline_bucket": 4, "online_bucket": 3, "bucket_diff": "one_bucket", "status": "pending_review", "why_kept": "离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常", "missing_materials": ["召回候选表待算法工程师小乔补录", "复核意见待评测运营填写"], "next_owner": "operation", "review_notes": "", "recall_candidates": []}, {"record_id": "5778b548-3d1e-4437-b659-f490b56ed92c", "sample_id": "S016", "offline_score": 0.2, "online_score": 0.33, "offline_bucket": 0, "online_bucket": 1, "bucket_diff": "one_bucket", "status": "supplemented_by_algo", "why_kept": "离线和线上分数差了一个桶，需要评测运营复核，暂不归为正常", "missing_materials": ["复核意见待评测运营填写"], "next_owner": "operation", "review_notes": "", "recall_candidates": [{"candidate_id": "C071", "rank": 1, "score": 0.75, "is_related": false, "reason": "召回无关联", "supplemented_by": "小乔"}]}, {"record_id": "b0681611-733c-4694-ba5e-b687f73e2c08", "sample_id": "S017", "offline_score": 0.75, "online_score": 0.88, "offline_bucket": 3, "online_bucket": 3, "bucket_diff": "same", "status": "supplemented_by_algo", "why_kept": "", "missing_materials": ["复核意见待评测运营填写"], "next_owner": "operation", "review_notes": "", "recall_candidates": [{"candidate_id": "C081", "rank": 1, "score": 0.92, "is_related": true, "reason": "高置信", "supplemented_by": "小乔"}, {"candidate_id": "C082", "rank": 2, "score": 0.85, "is_related": true, "reason": "相关", "supplemented_by": "小乔"}]}, {"record_id": "9a85477a-2bce-4714-99e0-883858f13939", "sample_id": "S018", "offline_score": 0.48, "online_score": 0.36, "offline_bucket": 1, "online_bucket": 1, "bucket_diff": "same", "status": "supplemented_by_algo", "why_kept": "", "missing_materials": ["复核意见待评测运营填写"], "next_owner": "operation", "review_notes": "", "recall_candidates": [{"candidate_id": "C091", "rank": 1, "score": 0.8, "is_related": true, "reason": "部分相关", "supplemented_by": "小乔"}]}, {"record_id": "2c861771-0a36-4dfa-9c4a-0f00966db08f", "sample_id": "S019", "offline_score": 0.62, "online_score": 0.55, "offline_bucket": 2, "online_bucket": 2, "bucket_diff": "same", "status": "supplemented_by_algo", "why_kept": "", "missing_materials": ["复核意见待评测运营填写"], "next_owner": "operation", "review_notes": "", "recall_candidates": [{"candidate_id": "C101", "rank": 1, "score": 0.77, "is_related": false, "reason": "不相关", "supplemented_by": "小乔"}]}, {"record_id": "cc87b293-7f8d-4b07-b8fe-4b60d35f2177", "sample_id": "S020", "offline_score": 0.35, "online_score": 0.46, "offline_bucket": 1, "online_bucket": 1, "bucket_diff": "same", "status": "supplemented_by_algo", "why_kept": "", "missing_materials": ["复核意见待评测运营填写"], "next_owner": "operation", "review_notes": "", "recall_candidates": [{"candidate_id": "C111", "rank": 1, "score": 0.83, "is_related": true, "reason": "相关", "supplemented_by": "小乔"}]}];
+
+                function showRecordDetail(recordId) {
+                    const record = ALL_RECORDS.find(r => r.record_id === recordId);
+                    if (!record) return;
+
+                    document.querySelectorAll('.detail-panel').forEach(p => p.classList.remove('open'));
+                    document.querySelectorAll('tr.highlighted').forEach(tr => tr.classList.remove('highlighted'));
+
+                    const panel = document.getElementById('detail-' + recordId);
+                    if (panel) panel.classList.add('open');
+
+                    const row = document.getElementById('row-' + recordId);
+                    if (row) {
+                        row.classList.add('highlighted');
+                        row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+
+                function toggleDetail(recordId) {
+                    const panel = document.getElementById('detail-' + recordId);
+                    if (panel) panel.classList.toggle('open');
+                    const row = document.getElementById('row-' + recordId);
+                    if (row) row.classList.toggle('highlighted');
+                }
+
                 document.addEventListener('DOMContentLoaded', function() {
                     const plotlyElements = document.querySelectorAll('.js-plotly-plot');
                     plotlyElements.forEach(function(plot) {
                         plot.on('plotly_click', function(data) {
                             const point = data.points[0];
                             const recordId = point.customdata;
-                            alert('点击了记录: ' + recordId + '\n可跳转到负样本列表或召回候选表查看详情');
+                            showRecordDetail(recordId);
                         });
                     });
                 });

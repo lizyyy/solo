@@ -118,10 +118,22 @@ class ExperimentManager:
         }
 
         for record in exp.drift_records:
+            recall_candidates_data = []
+            for rc in record.recall_candidates:
+                recall_candidates_data.append({
+                    "candidate_id": rc.candidate_id,
+                    "rank": rc.rank,
+                    "score": rc.score,
+                    "is_related": rc.is_related,
+                    "reason": rc.reason,
+                    "supplemented_by": rc.supplemented_by,
+                })
             report["details"].append(
                 {
                     "record_id": record.record_id,
                     "sample_id": record.sample_id,
+                    "offline_score": record.offline_score,
+                    "online_score": record.online_score,
                     "offline_bucket": record.offline_bucket,
                     "online_bucket": record.online_bucket,
                     "bucket_diff": record.bucket_diff.value,
@@ -130,6 +142,7 @@ class ExperimentManager:
                     "missing_materials": record.missing_materials,
                     "next_owner": record.next_owner.value,
                     "recall_candidates_count": len(record.recall_candidates),
+                    "recall_candidates": recall_candidates_data,
                     "review_notes": record.review_notes,
                 }
             )
@@ -144,23 +157,38 @@ class ExperimentManager:
 
     def load_experiment_from_report(self, report_data: dict) -> ExperimentComparison:
         from datetime import datetime
+        from .models import RecallCandidate
 
         records = []
         for d in report_data.get("details", []):
+            recall_candidates = []
+            for rc_data in d.get("recall_candidates", []):
+                recall_candidates.append(
+                    RecallCandidate(
+                        sample_id=d["sample_id"],
+                        candidate_id=rc_data["candidate_id"],
+                        rank=rc_data["rank"],
+                        score=rc_data["score"],
+                        is_related=rc_data.get("is_related", False),
+                        reason=rc_data.get("reason", ""),
+                        supplemented_by=rc_data.get("supplemented_by", ""),
+                        supplemented_at=datetime.now(),
+                    )
+                )
             record = DriftRecord(
                 record_id=d["record_id"],
                 sample_id=d["sample_id"],
                 offline_bucket=d["offline_bucket"],
                 online_bucket=d["online_bucket"],
                 bucket_diff=BucketDiff(d["bucket_diff"]),
-                offline_score=0,
-                online_score=0,
+                offline_score=d.get("offline_score", 0.0),
+                online_score=d.get("online_score", 0.0),
                 status=Status(d["status"]),
                 why_kept=d.get("why_kept", ""),
                 missing_materials=d.get("missing_materials", []),
                 next_owner=NextOwner(d["next_owner"]),
                 review_notes=d.get("review_notes", ""),
-                recall_candidates=[],
+                recall_candidates=recall_candidates,
                 updated_at=datetime.now(),
             )
             records.append(record)
