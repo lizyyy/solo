@@ -44,50 +44,57 @@ export const useReviewStore = create<ReviewState>((set, get) => ({
       hour12: false
     }).replace(/\//g, '-');
     
-    set((state) => ({
-      records: state.records.map(record => {
+    const timestamp = Date.now();
+    const newLog = {
+      id: `LOG-${timestamp}`,
+      operator,
+      action: status === 'confirmed' ? '确认通过' : '驳回',
+      detail: comment || (status === 'confirmed' ? '标注负责人复核通过' : '标注负责人驳回'),
+      timestamp: now,
+    };
+    
+    const newEvidence = status === 'confirmed' ? {
+      id: `EVD-${timestamp}`,
+      type: 'review' as const,
+      title: '标注负责人确认',
+      content: comment || '证据链复核通过，确认处理结果',
+      source: '标注系统',
+      timestamp: now,
+      operator,
+    } : {
+      id: `EVD-${timestamp + 1}`,
+      type: 'review' as const,
+      title: '标注负责人驳回',
+      content: comment || '证据不足或存在疑问，驳回处理',
+      source: '标注系统',
+      timestamp: now,
+      operator,
+    };
+    
+    set((state) => {
+      const newRecords = state.records.map(record => {
         if (record.id === id) {
-          const newLog = {
-            id: `LOG-${Date.now()}`,
-            operator,
-            action: status === 'confirmed' ? '确认通过' : '驳回',
-            detail: comment || (status === 'confirmed' ? '标注负责人复核通过' : '标注负责人驳回'),
-            timestamp: now,
-          };
-          
-          const newEvidence = status === 'confirmed' ? {
-            id: `EVD-${Date.now()}`,
-            type: 'review' as const,
-            title: '标注负责人确认',
-            content: comment || '证据链复核通过，确认处理结果',
-            source: '标注系统',
-            timestamp: now,
-            operator,
-          } : {
-            id: `EVD-${Date.now()}`,
-            type: 'review' as const,
-            title: '标注负责人驳回',
-            content: comment || '证据不足或存在疑问，驳回处理',
-            source: '标注系统',
-            timestamp: now,
-            operator,
-          };
-          
           return {
             ...record,
             status,
             updatedAt: now,
-            currentStep: 'step3',
+            currentStep: 'step3' as const,
             operationLogs: [...record.operationLogs, newLog],
             evidences: [...record.evidences, newEvidence],
           };
         }
         return record;
-      }),
-      selectedRecord: state.selectedRecord?.id === id 
-        ? get().records.find(r => r.id === id) || null
-        : state.selectedRecord,
-    }));
+      });
+      
+      const updatedRecord = newRecords.find(r => r.id === id) || null;
+      
+      return {
+        records: newRecords,
+        selectedRecord: state.selectedRecord?.id === id 
+          ? updatedRecord 
+          : state.selectedRecord,
+      };
+    });
   },
   
   resolveConflict: (recordId, conflictId, resolution, operator) => {
@@ -103,27 +110,28 @@ export const useReviewStore = create<ReviewState>((set, get) => ({
       reject_both: '驳回两方，重新核实',
     };
     
-    set((state) => ({
-      records: state.records.map(record => {
+    const timestamp = Date.now();
+    const newLog = {
+      id: `LOG-${timestamp}`,
+      operator,
+      action: '处理冲突',
+      detail: `${resolutionLabels[resolution || '']}`,
+      timestamp: now,
+    };
+    
+    const newEvidence = {
+      id: `EVD-${timestamp}`,
+      type: 'review' as const,
+      title: '冲突处理结果',
+      content: `标注负责人选择：${resolutionLabels[resolution || '']}`,
+      source: '标注系统',
+      timestamp: now,
+      operator,
+    };
+    
+    set((state) => {
+      const newRecords = state.records.map(record => {
         if (record.id === recordId && record.conflicts) {
-          const newLog = {
-            id: `LOG-${Date.now()}`,
-            operator,
-            action: '处理冲突',
-            detail: `${resolutionLabels[resolution || '']}`,
-            timestamp: now,
-          };
-          
-          const newEvidence = {
-            id: `EVD-${Date.now()}`,
-            type: 'review' as const,
-            title: '冲突处理结果',
-            content: `标注负责人选择：${resolutionLabels[resolution || '']}`,
-            source: '标注系统',
-            timestamp: now,
-            operator,
-          };
-          
           return {
             ...record,
             updatedAt: now,
@@ -137,28 +145,40 @@ export const useReviewStore = create<ReviewState>((set, get) => ({
           };
         }
         return record;
-      }),
-      selectedRecord: state.selectedRecord?.id === recordId 
-        ? get().records.find(r => r.id === recordId) || null
-        : state.selectedRecord,
-    }));
+      });
+      
+      const updatedRecord = newRecords.find(r => r.id === recordId) || null;
+      
+      return {
+        records: newRecords,
+        selectedRecord: state.selectedRecord?.id === recordId 
+          ? updatedRecord 
+          : state.selectedRecord,
+      };
+    });
   },
   
   advanceStep: (recordId) => {
-    set((state) => ({
-      records: state.records.map(record => {
+    set((state) => {
+      const stepOrder: Array<'step1' | 'step2' | 'step3'> = ['step1', 'step2', 'step3'];
+      const newRecords = state.records.map(record => {
         if (record.id === recordId) {
-          const stepOrder: Array<'step1' | 'step2' | 'step3'> = ['step1', 'step2', 'step3'];
           const currentIndex = stepOrder.indexOf(record.currentStep);
           const nextStep = stepOrder[Math.min(currentIndex + 1, 2)];
           return { ...record, currentStep: nextStep };
         }
         return record;
-      }),
-      selectedRecord: state.selectedRecord?.id === recordId 
-        ? get().records.find(r => r.id === recordId) || null
-        : state.selectedRecord,
-    }));
+      });
+      
+      const updatedRecord = newRecords.find(r => r.id === recordId) || null;
+      
+      return {
+        records: newRecords,
+        selectedRecord: state.selectedRecord?.id === recordId 
+          ? updatedRecord 
+          : state.selectedRecord,
+      };
+    });
   },
   
   getFilteredRecords: () => {
