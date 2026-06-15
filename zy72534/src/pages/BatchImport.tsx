@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Upload, FileText, AlertTriangle, CheckCircle, Eye, ArrowRight, X } from 'lucide-react';
 import { StatusBadge } from '../components/StatusBadge';
 import { useAppStore } from '../store/useAppStore';
-import { formatDate } from '../utils/formatters';
+import { formatDate, generateId } from '../utils/formatters';
 import { detectAnomalies } from '../utils/anomalyDetector';
 import { Sample } from '../types';
 
@@ -27,37 +27,56 @@ export default function BatchImport() {
 
   const handleDemoImport = () => {
     const lines = demoCsvContent.trim().split('\n').slice(1);
-    const rawSamples = lines.map(line => {
+
+    const csvRows = lines.map(line => {
       const [sampleNo, currentModelVersion, category, style, scene] = line.split(',');
-      return {
-        sampleNo,
-        currentModelVersion,
-        batchId: 'demo-batch',
-        status: 'confirmed_normal' as const,
-        createdAt: new Date().toISOString(),
-        isAnomaly: false,
-        versions: [{
-          id: `v-${Math.random().toString(36).slice(2, 8)}`,
-          modelVersion: currentModelVersion,
-          tags: { category, style, scene },
-          timestamp: new Date().toISOString(),
-        }],
-        comments: [],
-      };
+      return { sampleNo, currentModelVersion, category, style, scene };
     });
 
-    const detected = detectAnomalies(rawSamples as unknown as Sample[]);
-    const anomalyCount = detected.filter(s => s.isAnomaly).length;
+    const groupedBySampleNo = new Map<string, typeof csvRows>();
+    csvRows.forEach(row => {
+      const existing = groupedBySampleNo.get(row.sampleNo) || [];
+      groupedBySampleNo.set(row.sampleNo, [...existing, row]);
+    });
 
-    addBatch({
+    const newBatch = addBatch({
       name: newBatchName,
       importTime: new Date().toISOString(),
       modelVersion: newModelVersion,
-      totalSamples: rawSamples.length,
+      totalSamples: 0,
     });
 
+    const mergedSamples: Omit<Sample, 'id' | 'isAnomaly'>[] = [];
+
+    groupedBySampleNo.forEach((rows, sampleNo) => {
+      const versions = rows.map((row, idx) => ({
+        id: `v-${generateId()}`,
+        modelVersion: row.currentModelVersion,
+        tags: { category: row.category, style: row.style, scene: row.scene },
+        timestamp: new Date(Date.now() + idx * 60000).toISOString(),
+      }));
+
+      const lastRow = rows[rows.length - 1];
+
+      mergedSamples.push({
+        sampleNo,
+        batchId: newBatch.id,
+        currentModelVersion: lastRow.currentModelVersion,
+        status: 'confirmed_normal',
+        createdAt: new Date().toISOString(),
+        versions,
+        comments: [],
+      });
+    });
+
+    const detected = detectAnomalies(mergedSamples as unknown as Sample[]);
+    const anomalyCount = detected.filter(s => s.isAnomaly).length;
+    const totalUnique = mergedSamples.length;
+
+    addSamples(mergedSamples);
+
     setTimeout(() => {
-      setImportResult({ total: rawSamples.length, anomalies: anomalyCount });
+      setImportResult({ total: totalUnique, anomalies: anomalyCount });
       setImported(true);
     }, 500);
   };

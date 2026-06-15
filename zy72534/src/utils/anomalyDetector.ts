@@ -1,18 +1,10 @@
 import { Sample } from '../types';
 
 export function detectAnomalies(samples: Sample[]): Sample[] {
-  const sampleNoGroups = new Map<string, Sample[]>();
-  
-  samples.forEach(sample => {
-    const existing = sampleNoGroups.get(sample.sampleNo) || [];
-    sampleNoGroups.set(sample.sampleNo, [...existing, sample]);
-  });
-
   return samples.map(sample => {
-    const group = sampleNoGroups.get(sample.sampleNo) || [];
-    const uniqueVersions = new Set(group.map(s => s.currentModelVersion));
+    const uniqueVersions = new Set(sample.versions.map(v => v.modelVersion));
     const isAnomaly = uniqueVersions.size > 1;
-    
+
     return {
       ...sample,
       isAnomaly,
