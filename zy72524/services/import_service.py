@@ -7,6 +7,8 @@ from config import Config
 
 class ImportService:
     
+    BATCH_NAME_KEY = 'sheet_name'
+    
     @staticmethod
     def calculate_file_hash(file_content):
         return hashlib.sha256(file_content).hexdigest()
@@ -21,12 +23,11 @@ class ImportService:
         return hashlib.md5(combined.encode('utf-8')).hexdigest()
     
     @staticmethod
-    def check_duplicate_sheet(file_hash):
-        existing = ManualCorrectionSheet.query.filter_by(
-            file_hash=file_hash, 
+    def get_existing_batch_by_name(sheet_name):
+        return ManualCorrectionSheet.query.filter_by(
+            sheet_name=sheet_name,
             is_current=True
-        ).first()
-        return existing is not None
+        ).order_by(ManualCorrectionSheet.version.desc()).first()
     
     @staticmethod
     def get_existing_sheet_by_hash(file_hash):
@@ -42,20 +43,22 @@ class ImportService:
             with open(file_path, 'rb') as f:
                 file_hash = ImportService.calculate_file_hash(f.read())
         
-        existing_sheet = ImportService.get_existing_sheet_by_hash(file_hash)
-        if existing_sheet and existing_sheet.is_current:
+        exact_hash_match = ImportService.get_existing_sheet_by_hash(file_hash)
+        if exact_hash_match and exact_hash_match.is_current:
             return {
                 'success': False,
-                'message': '该改判表已存在，请勿重复导入',
-                'existing_sheet_id': existing_sheet.id,
+                'message': f'该文件已作为「{exact_hash_match.sheet_name}」v{exact_hash_match.version}导入过，内容完全相同，请勿重复导入',
+                'existing_sheet_id': exact_hash_match.id,
                 'is_duplicate': True
             }
         
+        batch_match = ImportService.get_existing_batch_by_name(sheet_name)
+        
         df = pd.read_excel(file_path)
         
-        if existing_sheet:
-            return ImportService._update_existing_sheet(
-                existing_sheet, df, file_hash, imported_by, sheet_name
+        if batch_match:
+            return ImportService._update_existing_batch(
+                batch_match, df, file_hash, imported_by, sheet_name
             )
         else:
             return ImportService._create_new_sheet(
@@ -89,11 +92,12 @@ class ImportService:
         }
     
     @staticmethod
-    def _update_existing_sheet(existing_sheet, df, file_hash, imported_by, sheet_name):
+    def _update_existing_batch(existing_sheet, df, file_hash, imported_by, sheet_name):
         existing_samples = {s.unique_key: s for s in existing_sheet.samples}
         
         updated_count = 0
         added_count = 0
+        remark_changed_count = 0
         changes = []
         
         for _, row in df.iterrows():
@@ -104,6 +108,8 @@ class ImportService:
                 changed_fields = ImportService._update_sample_fields(sample, row, imported_by, changes)
                 if changed_fields:
                     updated_count += 1
+                    if 'raw_remark' in changed_fields:
+                        remark_changed_count += 1
             else:
                 ImportService._create_sample_from_row(row, existing_sheet, imported_by, unique_key)
                 added_count += 1
@@ -111,9 +117,10 @@ class ImportService:
         if updated_count > 0 or added_count > 0:
             old_version = existing_sheet.version
             existing_sheet.version = old_version + 1
+            existing_sheet.file_hash = file_hash
             existing_sheet.total_samples = len(existing_sheet.samples)
             
-            change_summary = f'更新{updated_count}条，新增{added_count}条'
+            change_summary = f'更新{updated_count}条（含备注变更{remark_changed_count}条），新增{added_count}条'
             history = SheetChangeHistory(
                 sheet_id=existing_sheet.id,
                 changed_by=imported_by,
@@ -126,11 +133,13 @@ class ImportService:
         
         return {
             'success': True,
-            'message': f'更新版本{existing_sheet.version}：更新{updated_count}条，新增{added_count}条',
+            'message': f'同一批次「{sheet_name}」更新至版本{existing_sheet.version}：更新{updated_count}条（含备注变更{remark_changed_count}条），新增{added_count}条',
             'sheet_id': existing_sheet.id,
             'updated_count': updated_count,
+            'remark_changed_count': remark_changed_count,
             'added_count': added_count,
             'is_duplicate': False,
+            'is_batch_update': True,
             'version': existing_sheet.version
         }
     

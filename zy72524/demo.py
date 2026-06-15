@@ -11,7 +11,7 @@ import pandas as pd
 import os
 import requests
 
-BASE_URL = 'http://localhost:5000'
+BASE_URL = 'http://localhost:5001'
 
 def generate_demo_excel():
     """生成演示用的人工改判表"""

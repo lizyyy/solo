@@ -30,11 +30,32 @@ class WorkflowService:
             return False, '工作流未初始化'
         
         step_order = Config.REVIEW_WORKFLOW_STEPS
-        current_idx = step_order.index(workflow.current_step)
+        
+        if target_step not in step_order:
+            return False, f'无效的步骤: {target_step}'
+        
         target_idx = step_order.index(target_step)
         
-        if target_idx != current_idx + 1:
-            return False, f'必须按顺序推进：当前是第{current_idx+1}步，不能直接跳到第{target_idx+1}步'
+        for i in range(target_idx):
+            step = step_order[i]
+            is_done = False
+            if step == 'step1_import':
+                is_done = workflow.step1_completed
+            elif step == 'step2_review_prompt':
+                is_done = workflow.step2_completed
+            elif step == 'step3_model_update':
+                is_done = workflow.step3_completed
+            if not is_done:
+                return False, f'必须按顺序推进：第{i+1}步（{step}）尚未完成，不能跳到第{target_idx+1}步'
+        
+        if workflow.current_step == 'completed':
+            return False, '工作流已全部完成，无需再推进'
+        
+        current_idx = step_order.index(workflow.current_step)
+        if target_idx < current_idx:
+            return False, f'第{target_idx+1}步已完成，不能回退'
+        if target_idx > current_idx + 1:
+            return False, f'必须按顺序推进：当前在第{current_idx+1}步，不能直接跳到第{target_idx+1}步'
         
         if target_step == 'step1_import':
             if user_role not in ['annotator', 'lead_annotator']:

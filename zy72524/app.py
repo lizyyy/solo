@@ -36,7 +36,8 @@ def create_app():
             'imported_by': s.imported_by,
             'imported_at': s.imported_at.isoformat(),
             'total_samples': s.total_samples,
-            'is_current': s.is_current
+            'is_current': s.is_current,
+            'change_history_count': len(s.change_history)
         } for s in sheets])
     
     @app.route('/api/sheets/<int:sheet_id>', methods=['GET'])
@@ -80,10 +81,11 @@ def create_app():
                 temp_path, sheet_name, imported_by
             )
             
-            if result['success'] and not result.get('is_duplicate'):
-                WorkflowService.init_workflow(result['sheet_id'])
-                ConfidenceService.detect_low_confidence_samples(result['sheet_id'])
-                ConfidenceService.check_average_masking(result['sheet_id'])
+            if result['success']:
+                sheet_id = result['sheet_id']
+                WorkflowService.init_workflow(sheet_id)
+                ConfidenceService.detect_low_confidence_samples(sheet_id)
+                ConfidenceService.check_average_masking(sheet_id)
             
             return jsonify(result)
         finally:
@@ -272,4 +274,4 @@ def create_app():
 
 if __name__ == '__main__':
     app = create_app()
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5001)

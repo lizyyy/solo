@@ -10,7 +10,7 @@ class ManualCorrectionSheet(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     sheet_name = db.Column(db.String(255), nullable=False)
-    file_hash = db.Column(db.String(64), unique=True, nullable=False)
+    file_hash = db.Column(db.String(64), nullable=False)
     imported_by = db.Column(db.String(100), nullable=False)
     imported_at = db.Column(db.DateTime, default=datetime.utcnow)
     total_samples = db.Column(db.Integer, default=0)
