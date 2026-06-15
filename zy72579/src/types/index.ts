@@ -101,3 +101,19 @@ export const typeLabelMap: Record<RecordType, string> = {
   duplicate_training: '重复训练',
   old_caliber: '旧口径补录',
 };
+
+export interface ReconcileItem {
+  id: string;
+  label: string;
+  match: boolean;
+  left: string;
+  right: string;
+  detail?: string;
+}
+
+export interface ReconcileResult {
+  status: 'ok' | 'warn' | 'blocked' | 'pending';
+  summary: string;
+  items: ReconcileItem[];
+  nextAction?: string;
+}

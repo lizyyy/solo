@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Filter, ListChecks } from 'lucide-react';
+import { Filter, ListChecks, RefreshCw } from 'lucide-react';
 import { RecordCard } from '@/components/RecordCard';
 import { useRecordStore } from '@/store/recordStore';
 import type { RecordStatus } from '@/types';
@@ -13,17 +13,32 @@ const statusFilters: { value: RecordStatus | 'all'; label: string }[] = [
 ];
 
 export default function RecordList() {
-  const { records } = useRecordStore();
+  const { records, resetRecords } = useRecordStore();
   const [statusFilter, setStatusFilter] = useState<RecordStatus | 'all'>('all');
+  const [showToast, setShowToast] = useState<string | null>(null);
 
   const filteredRecords = statusFilter === 'all'
     ? records
     : records.filter((r) => r.status === statusFilter);
 
+  const handleReset = () => {
+    if (confirm('确定要重置所有记录到初始状态吗？此操作不可撤销。')) {
+      resetRecords();
+      setShowToast('所有数据已重置到初始状态');
+      setTimeout(() => setShowToast(null), 2500);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 relative">
+      {showToast && (
+        <div className="fixed top-4 right-4 z-50 animate-pulse px-4 py-3 text-sm font-medium border-2 shadow-lg bg-emerald-50 border-emerald-300 text-emerald-800">
+          {showToast}
+        </div>
+      )}
+
       <header className="bg-white border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-6 py-6">
+        <div className="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-teal-600 flex items-center justify-center">
               <ListChecks className="w-6 h-6 text-white" />
@@ -33,6 +48,14 @@ export default function RecordList() {
               <p className="text-sm text-slate-500 mt-0.5">追踪特征版本变更，确保批流数据训练结果一致</p>
             </div>
           </div>
+          <button
+            onClick={handleReset}
+            className="px-3 py-2 text-sm font-medium text-slate-700 bg-white border-2 border-slate-300 hover:border-red-400 hover:text-red-700 transition-colors flex items-center gap-1.5"
+            title="重置所有数据到初始状态"
+          >
+            <RefreshCw className="w-4 h-4" />
+            重置所有数据
+          </button>
         </div>
       </header>
 
