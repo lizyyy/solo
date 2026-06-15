@@ -222,4 +222,8 @@ const db = {
   pragma() {}
 };
 
-module.exports = db;
+module.exports = {
+  ...db,
+  loadDB,
+  saveDB
+};

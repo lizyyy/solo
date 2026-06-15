@@ -1,7 +1,9 @@
-const db = require('./db');
+const dbModule = require('./db');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+
+const db = dbModule;
 
 const BUCKET_THRESHOLDS = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9];
 const dbPath = path.join(__dirname, '..', 'data', 'db.json');

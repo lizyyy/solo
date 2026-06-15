@@ -102,6 +102,7 @@ const API = '/api';
 let currentView = 'list';
 let currentReportId = null;
 let currentTab = 'samples';
+let currentExportId = null;
 
 async function api(url, options = {}) {
   const res = await fetch(API + url, {
@@ -154,6 +155,8 @@ function render() {
     renderReportList(app);
   } else if (currentView === 'detail') {
     renderReportDetail(app);
+  } else if (currentView === 'export-detail') {
+    renderExportDetail(app);
   }
 }
 
@@ -275,14 +278,33 @@ async function renderReportDetail(container) {
       `}
     </div>
 
-    <div class="card">
+    <div class="card" id="tabCard">
       <div class="tabs">
         <div class="tab ${currentTab === 'samples' ? 'active' : ''}" onclick="switchTab('samples')">负样本列表</div>
         <div class="tab ${currentTab === 'recalls' ? 'active' : ''}" onclick="switchTab('recalls')">召回候选表</div>
+        <div class="tab ${currentTab === 'export-history' ? 'active' : ''}" onclick="switchTab('export-history')">导出历史</div>
       </div>
-      ${currentTab === 'samples' ? renderSamplesTab(samples) : renderRecallsTab(recalls, samples)}
+      <div id="tabContent">
+        <p style="color: #94a3b8; text-align: center; padding: 40px;">加载中...</p>
+      </div>
     </div>
   `;
+
+  renderTabContent(samples, recalls);
+}
+
+async function renderTabContent(samples, recalls) {
+  const tabContent = document.getElementById('tabContent');
+  if (!tabContent) return;
+
+  if (currentTab === 'samples') {
+    tabContent.innerHTML = renderSamplesTab(samples);
+  } else if (currentTab === 'recalls') {
+    tabContent.innerHTML = renderRecallsTab(recalls, samples);
+  } else if (currentTab === 'export-history') {
+    tabContent.innerHTML = '<p style="color: #94a3b8; text-align: center; padding: 40px;">加载中...</p>';
+    tabContent.innerHTML = await renderExportHistoryTab();
+  }
 }
 
 function renderCheckItem(type, title, result, isInfo = false) {
@@ -377,35 +399,400 @@ function renderRecallsTab(recalls, samples) {
   `;
 }
 
-async function viewSampleDetail(sampleId) {
-  const [sample, audits] = await Promise.all([
-    api(`/samples/${sampleId}`).catch(() => null),
-    api(`/samples/${sampleId}/audit`)
-  ]);
+async function renderExportHistoryTab() {
+  const exports = await api(`/reports/${currentReportId}/export-history`);
+  return `
+    <div style="margin-bottom: 12px;">
+      <p style="font-size: 12px; color: #64748b;">每次导出都会保存完整快照，包含当时的状态历史和证据链。点击"查看明细"追溯导出时的状态。</p>
+    </div>
+    ${exports.length === 0 ? '<div style="text-align: center; padding: 60px; color: #94a3b8;"><div style="font-size: 48px; margin-bottom: 12px;">📤</div><p>暂无导出记录</p><p style="font-size: 12px;">点击右上角"导出CSV"生成第一条导出记录</p></div>' : `
+    <table>
+      <thead>
+        <tr>
+          <th>导出ID</th>
+          <th>导出时间</th>
+          <th>导出人</th>
+          <th>样本数</th>
+          <th>分差一桶异常数</th>
+          <th>内容哈希</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${exports.map((e, i) => `
+          <tr>
+            <td><strong>#${e.id}</strong>${i === 0 ? ' <span class="badge badge-info">最新</span>' : ''}</td>
+            <td>${e.exported_at}</td>
+            <td>${e.exported_by}</td>
+            <td>${e.sample_count != null ? e.sample_count : '-'}</td>
+            <td>${e.anomaly_count != null ? `<span class="badge ${e.anomaly_count > 0 ? 'badge-danger' : 'badge-success'}">${e.anomaly_count}</span>` : '-'}</td>
+            <td><code style="font-size: 11px;">${e.content_hash?.substring(0, 8)}...</code></td>
+            <td>
+              ${e.snapshot_data ? `<button class="btn btn-primary btn-sm" onclick="viewExportDetail(${e.id})">查看明细</button>` : '<span class="badge badge-default">无快照</span>'}
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+    `}
+  `;
+}
 
-  let sampleData;
-  if (!sample) {
-    const samples = await api(`/reports/${currentReportId}/samples`);
-    sampleData = samples.find(s => s.id === sampleId);
-  } else {
-    sampleData = sample;
-  }
+function fieldLabel(field) {
+  const map = {
+    'processing_status': '处理状态',
+    'manual_remark': '人工备注',
+    'is_bucket_diff_anomaly': '分差一桶异常',
+    'recall_candidate_added': '关联召回候选',
+    'offline_bucket': '离线分桶',
+    'online_bucket': '线上分桶'
+  };
+  return map[field] || field;
+}
 
-  showModal(`
-    <h3>样本详情 - ${sampleData.item_id}</h3>
-    <div style="margin-bottom: 16px;">
-      <p style="margin-bottom: 8px;"><strong>原始行号:</strong> #${sampleData.original_line_no}</p>
-      <p style="margin-bottom: 8px;"><strong>标题:</strong> ${sampleData.item_title}</p>
-      <p style="margin-bottom: 8px;"><strong>离线分数:</strong> ${sampleData.offline_score?.toFixed(2) || '-'} (桶 ${sampleData.offline_bucket || '-'})</p>
-      <p style="margin-bottom: 8px;"><strong>线上分数:</strong> ${sampleData.online_score?.toFixed(2) || '-'} (桶 ${sampleData.online_bucket || '-'})</p>
-      <p style="margin-bottom: 8px;"><strong>桶差值:</strong> ${sampleData.bucket_diff != null ? sampleData.bucket_diff : '-'} 
-        ${sampleData.is_bucket_diff_anomaly ? '<span class="badge badge-danger">分差一桶异常</span>' : ''}</p>
-      <p style="margin-bottom: 8px;"><strong>当前处理状态:</strong> ${processingStatusLabel(sampleData.processing_status)}</p>
-      <p style="margin-bottom: 8px;"><strong>人工备注:</strong> ${sampleData.manual_remark || '（无）'}</p>
+function formatChangeValue(field, value) {
+  if (field === 'processing_status') return processingStatusLabel(value);
+  if (field === 'is_bucket_diff_anomaly') return value == 1 ? '是' : '否';
+  if (field === 'recall_candidate_added') return value == 1 ? '是' : '否';
+  return value != null ? String(value) : '-';
+}
+
+async function renderExportDetail(container) {
+  const data = await api(`/exports/${currentExportId}`);
+  const { export: exp, report, samples, diff, anomaly_summary } = data;
+
+  container.innerHTML = `
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <div>
+        <button class="btn btn-outline btn-sm" onclick="backToReport()">&larr; 返回周报详情</button>
+        <h2 style="margin-top: 12px;">📤 导出明细 #${exp.id}</h2>
+        <p style="font-size: 13px; color: #64748b; margin-top: 4px;">
+          周报: ${report.title} · 导出人: ${exp.exported_by} · ${exp.exported_at}
+        </p>
+      </div>
+      <div>
+        <button class="btn btn-secondary btn-sm" onclick="reexportCSV(${currentExportId})">⬇️ 重新导出该快照</button>
+      </div>
     </div>
 
+    <div class="card" style="background: #eff6ff; border: 1px solid #93c5fd;">
+      <h2>📌 结果说明</h2>
+      <p style="font-size: 13px; line-height: 1.8;">
+        本页面展示导出时刻的<strong>完整证据快照</strong>。<br>
+        <strong>导出明细、页面展示、接口返回均来自同一份数据</strong>，确保不会出现"一处显示异常、另一处消失"的问题。<br>
+        尤其是<strong style="color: #ef4444;">离线和线上分数差了一个桶</strong>的记录，已全部保留，留待评测运营复核。
+      </p>
+      <div style="margin-top: 12px; display: flex; gap: 16px; flex-wrap: wrap;">
+        <div style="background: #fff; padding: 12px; border-radius: 6px;">
+          <div style="font-size: 24px; font-weight: 700; color: #667eea;">${samples.length}</div>
+          <div style="font-size: 12px; color: #64748b;">负样本总数</div>
+        </div>
+        <div style="background: #fff; padding: 12px; border-radius: 6px;">
+          <div style="font-size: 24px; font-weight: 700; color: #ef4444;">${anomaly_summary.length}</div>
+          <div style="font-size: 12px; color: #64748b;">分差一桶异常</div>
+        </div>
+        <div style="background: #fff; padding: 12px; border-radius: 6px;">
+          <div style="font-size: 14px; font-weight: 600; color: #374151; font-family: monospace;">${exp.content_hash?.substring(0, 16)}...</div>
+          <div style="font-size: 12px; color: #64748b;">内容哈希</div>
+        </div>
+      </div>
+    </div>
+
+    ${anomaly_summary.length > 0 ? `
+    <div class="card">
+      <h2>⚠️ 分差一桶异常记录（导出时快照，留待评测运营复核）</h2>
+      <p style="font-size: 12px; color: #64748b; margin-bottom: 12px;">以下记录导出时状态为"分差一桶异常"，已保留原始行号和分数，不归正常。</p>
+      <table>
+        <thead>
+          <tr>
+            <th>原始行号</th>
+            <th>物料ID</th>
+            <th>标题</th>
+            <th>离线分</th>
+            <th>线上分</th>
+            <th>离线桶</th>
+            <th>线上桶</th>
+            <th>桶差</th>
+            <th>处理状态</th>
+            <th>人工备注</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${anomaly_summary.map(s => `
+            <tr class="anomaly-row">
+              <td><strong>#${s.original_line_no}</strong></td>
+              <td>${s.item_id}</td>
+              <td>${s.item_title}</td>
+              <td>${s.offline_score?.toFixed(2) || '-'}</td>
+              <td>${s.online_score?.toFixed(2) || '-'}</td>
+              <td>${s.offline_bucket || '-'}</td>
+              <td>${s.online_bucket || '-'}</td>
+              <td><strong>${Math.abs(s.offline_bucket - s.online_bucket)}</strong></td>
+              <td>${processingStatusLabel(s.processing_status)}</td>
+              <td>${s.manual_remark || '-'}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+    ` : ''}
+
+    ${diff ? `
+    <div class="card">
+      <h2>🔄 与上次导出的差异</h2>
+      <p style="font-size: 12px; color: #64748b; margin-bottom: 12px;">
+        对比导出 #${diff.prev_export_id} (${diff.prev_exported_at})
+      </p>
+      ${diff.changes.length > 0 ? `
+        <h4 style="font-size: 14px; margin: 12px 0;">变更的记录（${diff.changes.length} 条）</h4>
+        ${diff.changes.map(c => `
+          <div style="background: #fef3c7; padding: 12px; border-radius: 6px; margin-bottom: 8px;">
+            <div style="font-weight: 600; margin-bottom: 4px;">${c.item_id} · ${c.item_title}</div>
+            ${c.changes.map(ch => `
+              <div style="font-size: 13px; margin-left: 16px; color: #92400e;">
+                ${fieldLabel(ch.field)}: ${formatChangeValue(ch.field, ch.from)} → <strong>${formatChangeValue(ch.field, ch.to)}</strong>
+              </div>
+            `).join('')}
+          </div>
+        `).join('')}
+      ` : '<p style="color: #10b981;">✓ 字段值无变更</p>'}
+      ${diff.added.length > 0 ? `<p style="color: #059669; margin-top: 8px;">+ 新增 ${diff.added.length} 条记录</p>` : ''}
+      ${diff.removed.length > 0 ? `<p style="color: #ef4444; margin-top: 8px;">- 移除 ${diff.removed.length} 条记录</p>` : ''}
+    </div>
+    ` : ''}
+
+    <div class="card">
+      <h2>📋 完整导出明细（含证据链快照）</h2>
+      <p style="font-size: 12px; color: #64748b; margin-bottom: 12px;">
+        点击"查看证据链"查看该条记录在导出时刻的完整历史留痕
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>原始行号</th>
+            <th>物料ID</th>
+            <th>标题</th>
+            <th>离线桶</th>
+            <th>线上桶</th>
+            <th>桶差</th>
+            <th>异常</th>
+            <th>处理状态</th>
+            <th>关联召回</th>
+            <th>审计记录</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${samples.map(s => `
+            <tr class="${s.is_bucket_diff_anomaly ? 'anomaly-row' : ''}">
+              <td><strong>#${s.original_line_no}</strong></td>
+              <td>${s.item_id}</td>
+              <td>${s.item_title}</td>
+              <td>${s.offline_bucket || '-'}</td>
+              <td>${s.online_bucket || '-'}</td>
+              <td>${s.bucket_diff != null ? s.bucket_diff : '-'}</td>
+              <td>${s.is_bucket_diff_anomaly ? '<span class="badge badge-danger">是</span>' : '<span class="badge badge-success">否</span>'}</td>
+              <td>${processingStatusLabel(s.processing_status)}</td>
+              <td>${s.recall_candidate_added ? '<span class="badge badge-success">已关联</span>' : '<span class="badge badge-default">未关联</span>'}</td>
+              <td>${s.evidence_snapshot?.audit_count || 0} 条</td>
+              <td>
+                <button class="btn btn-outline btn-sm" onclick='viewExportSampleEvidence(${JSON.stringify(s)})'>查看证据链</button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function viewExportSampleEvidence(sample) {
+  const evidence = sample.evidence_snapshot || {};
+  showModal(`
+    <h3>🔍 导出时证据链快照 - ${sample.item_id}</h3>
+    <div class="card" style="background: #fef3c7; padding: 12px; margin-bottom: 16px; border-radius: 8px;">
+      <strong>📌 说明：</strong>这是导出时刻 (#${currentExportId}) 的证据快照。即使后续数据有变动，此处留痕不变。
+    </div>
+
+    <h4 style="margin-bottom: 12px; font-size: 15px;">📊 导出时的状态</h4>
+    <div style="background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 16px;">
+      <p style="margin-bottom: 6px;"><strong>原始行号:</strong> #${sample.original_line_no}</p>
+      <p style="margin-bottom: 6px;"><strong>离线分数:</strong> ${sample.offline_score?.toFixed(2)} → 桶 ${sample.offline_bucket}</p>
+      <p style="margin-bottom: 6px;"><strong>线上分数:</strong> ${sample.online_score?.toFixed(2)} → 桶 ${sample.online_bucket}</p>
+      <p style="margin-bottom: 6px;"><strong>桶差值:</strong> ${sample.bucket_diff}
+        ${sample.is_bucket_diff_anomaly ? '<span class="badge badge-danger">分差一桶异常</span>' : ''}</p>
+      <p style="margin-bottom: 6px;"><strong>处理状态:</strong> ${processingStatusLabel(sample.processing_status)}</p>
+      <p style="margin-bottom: 6px;"><strong>人工备注:</strong> ${sample.manual_remark || '（无）'}</p>
+    </div>
+
+    <h4 style="margin-bottom: 12px; font-size: 15px;">🔄 导出时的状态流转历史</h4>
+    <div style="margin-bottom: 16px;">
+      ${(evidence.status_history || []).length === 0 ? '<p style="color: #94a3b8;">暂无</p>' :
+        evidence.status_history.map((h, i) => `
+          <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 8px;">
+            <div style="width: 24px; height: 24px; border-radius: 50%; background: #667eea; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;">${i + 1}</div>
+            <div style="flex: 1;">
+              <div style="font-size: 13px;">
+                ${h.from ? processingStatusLabel(h.from) : '<span class="badge badge-default">无</span>'}
+                <span style="margin: 0 8px;">→</span>
+                ${processingStatusLabel(h.to)}
+              </div>
+              <div style="font-size: 12px; color: #64748b; margin-top: 2px;">
+                ${h.operator} · ${h.time} · ${h.remark || ''}
+              </div>
+            </div>
+          </div>
+        `).join('')
+      }
+    </div>
+
+    <h4 style="margin-bottom: 12px; font-size: 15px;">📜 导出时的完整审计日志（${evidence.audit_count || 0} 条）</h4>
+    <div style="max-height: 200px; overflow-y: auto; border: 1px solid #f0f0f0; border-radius: 6px; padding: 8px;">
+      ${(evidence.audits || []).map(a => `
+        <div class="audit-log">
+          <div>
+            <span class="audit-action">${a.action}</span>
+            <span class="audit-time">${a.created_at} · ${a.operator}</span>
+          </div>
+          ${a.remark ? `<div class="audit-detail">${a.remark}</div>` : ''}
+          ${a.old_value != null || a.new_value != null ? `
+            <div class="audit-detail">
+              ${a.old_value != null ? `旧: ${a.old_value}` : ''}
+              ${a.old_value != null && a.new_value != null ? ' → ' : ''}
+              ${a.new_value != null ? `新: ${a.new_value}` : ''}
+            </div>
+          ` : ''}
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="hideModal()">关闭</button>
+    </div>
+  `);
+}
+
+function viewExportDetail(exportId) {
+  currentExportId = exportId;
+  currentView = 'export-detail';
+  render();
+}
+
+function backToReport() {
+  currentView = 'detail';
+  currentExportId = null;
+  render();
+}
+
+function reexportCSV(exportId) {
+  window.open(`${API}/exports/${exportId}/csv`, '_blank');
+}
+
+async function viewSampleDetail(sampleId) {
+  const result = await api(`/samples/${sampleId}/evidence`);
+  const sampleData = result.sample;
+  const evidence = result.evidence;
+
+  showModal(`
+    <h3>📋 样本证据链 - ${sampleData.item_id}</h3>
+    
+    <div class="card" style="background: #fef3c7; padding: 12px; margin-bottom: 16px; border-radius: 8px;">
+      <strong>⚠️ 证据链说明：</strong>本页面展示从导入到当前的完整历史，所有改动均可追溯。评测运营追问时可对照此证据链回复。
+    </div>
+
+    <h4 style="margin-bottom: 12px; font-size: 15px;">📊 基本信息</h4>
+    <div style="background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 16px;">
+      <p style="margin-bottom: 6px;"><strong>原始行号:</strong> <span style="font-family: monospace;">#${sampleData.original_line_no}</span></p>
+      <p style="margin-bottom: 6px;"><strong>标题:</strong> ${sampleData.item_title}</p>
+      <p style="margin-bottom: 6px;"><strong>离线分数:</strong> ${sampleData.offline_score?.toFixed(2) || '-'} → <strong>桶 ${sampleData.offline_bucket || '-'}</strong></p>
+      <p style="margin-bottom: 6px;"><strong>线上分数:</strong> ${sampleData.online_score?.toFixed(2) || '-'} → <strong>桶 ${sampleData.online_bucket || '-'}</strong></p>
+      <p style="margin-bottom: 6px;"><strong>桶差值:</strong> ${sampleData.bucket_diff != null ? sampleData.bucket_diff : '-'} 
+        ${sampleData.is_bucket_diff_anomaly ? '<span class="badge badge-danger">分差一桶异常！需运营复核</span>' : '<span class="badge badge-success">正常</span>'}</p>
+      <p style="margin-bottom: 6px;"><strong>当前处理状态:</strong> ${processingStatusLabel(sampleData.processing_status)}</p>
+      <p style="margin-bottom: 6px;"><strong>人工备注:</strong> ${sampleData.manual_remark || '（无）'}</p>
+    </div>
+
+    <h4 style="margin-bottom: 12px; font-size: 15px;">🔄 状态流转历史</h4>
+    <div style="margin-bottom: 16px;">
+      ${evidence.status_history.length === 0 ? '<p style="color: #94a3b8;">暂无状态记录</p>' :
+        evidence.status_history.map((h, i) => `
+          <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 8px;">
+            <div style="width: 24px; height: 24px; border-radius: 50%; background: #667eea; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;">${i + 1}</div>
+            <div style="flex: 1;">
+              <div style="font-size: 13px;">
+                ${h.from ? processingStatusLabel(h.from) : '<span class="badge badge-default">无</span>'}
+                <span style="margin: 0 8px;">→</span>
+                ${processingStatusLabel(h.to)}
+              </div>
+              <div style="font-size: 12px; color: #64748b; margin-top: 2px;">
+                ${h.operator} · ${h.time} · ${h.remark || ''}
+              </div>
+            </div>
+          </div>
+        `).join('')
+      }
+    </div>
+
+    ${evidence.recall_link_history.length > 0 ? `
+    <h4 style="margin-bottom: 12px; font-size: 15px;">🔗 关联召回候选历史</h4>
+    <div style="margin-bottom: 16px;">
+      ${evidence.recall_link_history.map(h => `
+        <div class="audit-log">
+          <div><span class="audit-action">关联召回</span><span class="audit-time">${h.time} · ${h.operator}</span></div>
+          <div class="audit-detail">${h.remark}: ${h.data}</div>
+        </div>
+      `).join('')}
+    </div>
+    ` : ''}
+
+    ${evidence.recalc_history.length > 0 ? `
+    <h4 style="margin-bottom: 12px; font-size: 15px;">🔢 重算历史</h4>
+    <div style="margin-bottom: 16px;">
+      ${evidence.recalc_history.map(h => `
+        <div class="audit-log">
+          <div><span class="audit-action">重算分桶</span><span class="audit-time">${h.time} · ${h.operator}</span></div>
+          <div class="audit-detail">${h.remark}: 异常标记 ${h.old_anomaly} → ${h.new_anomaly}</div>
+        </div>
+      `).join('')}
+    </div>
+    ` : ''}
+
+    ${evidence.manual_remark_history.length > 0 ? `
+    <h4 style="margin-bottom: 12px; font-size: 15px;">📝 人工备注历史</h4>
+    <div style="margin-bottom: 16px;">
+      ${evidence.manual_remark_history.map(h => `
+        <div class="audit-log">
+          <div><span class="audit-action">更新备注</span><span class="audit-time">${h.time} · ${h.operator}</span></div>
+          <div class="audit-detail">${h.old || '（空）'} → ${h.new || '（空）'}</div>
+        </div>
+      `).join('')}
+    </div>
+    ` : ''}
+
+    <h4 style="margin-bottom: 12px; font-size: 15px;">📜 完整审计日志（${evidence.audit_count} 条）</h4>
+    <div style="max-height: 180px; overflow-y: auto; border: 1px solid #f0f0f0; border-radius: 6px; padding: 8px;">
+      ${evidence.audits.map(a => `
+        <div class="audit-log">
+          <div>
+            <span class="audit-action">${a.action}</span>
+            <span class="audit-time">${a.created_at} · ${a.operator}</span>
+          </div>
+          ${a.remark ? `<div class="audit-detail">${a.remark}</div>` : ''}
+          ${a.old_value != null || a.new_value != null ? `
+            <div class="audit-detail">
+              ${a.old_value != null ? `旧: ${a.old_value}` : ''}
+              ${a.old_value != null && a.new_value != null ? ' → ' : ''}
+              ${a.new_value != null ? `新: ${a.new_value}` : ''}
+            </div>
+          ` : ''}
+        </div>
+      `).join('')}
+    </div>
+
+    <hr style="margin: 20px 0; border: none; border-top: 1px solid #f0f0f0;">
+
+    <h4 style="margin-bottom: 12px; font-size: 15px;">✏️ 更新处理状态</h4>
     <div class="form-group">
-      <label>更新处理状态</label>
       <select id="updateStatus">
         <option value="imported" ${sampleData.processing_status === 'imported' ? 'selected' : ''}>已导入</option>
         <option value="reviewing" ${sampleData.processing_status === 'reviewing' ? 'selected' : ''}>复核中</option>
@@ -417,28 +804,6 @@ async function viewSampleDetail(sampleId) {
     <div class="form-group">
       <label>人工备注（评测运营追问时留证）</label>
       <textarea id="updateRemark" placeholder="输入备注...">${sampleData.manual_remark || ''}</textarea>
-    </div>
-
-    <h4 style="margin: 20px 0 12px; font-size: 14px;">📜 审计追踪（${audits.length} 条记录）</h4>
-    <div style="max-height: 200px; overflow-y: auto; border: 1px solid #f0f0f0; border-radius: 6px; padding: 8px;">
-      ${audits.length === 0 ? '<p style="color: #94a3b8; text-align: center; padding: 20px;">暂无审计记录</p>' : 
-        audits.map(a => `
-          <div class="audit-log">
-            <div>
-              <span class="audit-action">${a.action}</span>
-              <span class="audit-time">${a.created_at} · ${a.operator}</span>
-            </div>
-            ${a.remark ? `<div class="audit-detail">${a.remark}</div>` : ''}
-            ${a.old_value != null || a.new_value != null ? `
-              <div class="audit-detail">
-                ${a.old_value != null ? `旧值: ${a.old_value}` : ''}
-                ${a.old_value != null && a.new_value != null ? ' → ' : ''}
-                ${a.new_value != null ? `新值: ${a.new_value}` : ''}
-              </div>
-            ` : ''}
-          </div>
-        `).join('')
-      }
     </div>
 
     <div class="modal-footer">
@@ -508,9 +873,22 @@ function goBack() {
   render();
 }
 
-function switchTab(tab) {
+async function switchTab(tab) {
   currentTab = tab;
-  render();
+  if (currentView === 'detail') {
+    const [samples, recalls] = await Promise.all([
+      api(`/reports/${currentReportId}/samples`),
+      api(`/reports/${currentReportId}/recalls`)
+    ]);
+    const tabs = document.querySelectorAll('.tab');
+    tabs.forEach((t, i) => {
+      const tabNames = ['samples', 'recalls', 'export-history'];
+      t.classList.toggle('active', tabNames[i] === tab);
+    });
+    renderTabContent(samples, recalls);
+  } else {
+    render();
+  }
 }
 
 async function filterSamples(type) {
@@ -518,7 +896,10 @@ async function filterSamples(type) {
     ? `/reports/${currentReportId}/samples?anomaly_only=1`
     : `/reports/${currentReportId}/samples`;
   const samples = await api(url);
-  document.querySelector('.card:nth-of-type(4) tbody').parentNode.parentNode.innerHTML = renderSamplesTab(samples);
+  const tabContent = document.getElementById('tabContent');
+  if (tabContent) {
+    tabContent.innerHTML = renderSamplesTab(samples);
+  }
 }
 
 async function runSelfCheck() {

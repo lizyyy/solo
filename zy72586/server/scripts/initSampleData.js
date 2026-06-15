@@ -1,11 +1,14 @@
-const db = require('../db');
+const dbModule = require('../db');
 const fs = require('fs');
 const path = require('path');
 const { calculateBucketForSample } = require('../selfCheck');
 
+const db = dbModule;
+const loadJSON = dbModule.loadDB;
+
 const dbPath = path.join(__dirname, '..', '..', 'data', 'db.json');
 
-function loadJSON() {
+function loadJSONOld() {
   if (!fs.existsSync(dbPath)) return {};
   try { return JSON.parse(fs.readFileSync(dbPath, 'utf-8')); } catch(e) { return {}; }
 }
