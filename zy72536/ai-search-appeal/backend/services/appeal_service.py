@@ -1,11 +1,30 @@
 import pandas as pd
+import math
 import json
-from typing import List, Tuple
+from typing import List, Tuple, Dict, Any
 from sqlalchemy.orm import Session
 from .. import models, schemas
 
 
 LOW_CONFIDENCE_THRESHOLD = 0.6
+
+
+def _safe_int(val):
+    if val is None or (isinstance(val, float) and math.isnan(val)):
+        return None
+    try:
+        return int(val)
+    except (ValueError, TypeError):
+        return None
+
+
+def _safe_float(val):
+    if val is None or (isinstance(val, float) and math.isnan(val)):
+        return None
+    try:
+        return float(val)
+    except (ValueError, TypeError):
+        return None
 
 
 def parse_csv_content(content: str) -> pd.DataFrame:
@@ -53,6 +72,7 @@ def import_ticket_from_df(
         confidence = float(row.get("confidence", 0.8))
         is_low = confidence < LOW_CONFIDENCE_THRESHOLD
         sample_no = row.get("sample_no", f"{ticket_no}-{idx+1}")
+        expected_rank = _safe_int(row.get("expected_rank"))
 
         sample = models.Sample(
             ticket_id=ticket.id,
@@ -61,7 +81,7 @@ def import_ticket_from_df(
             doc_title=str(row.get("doc_title", "")),
             doc_url=str(row.get("doc_url", "")),
             original_rank=int(row.get("original_rank", idx + 1)),
-            expected_rank=row.get("expected_rank"),
+            expected_rank=expected_rank,
             confidence=confidence,
             is_low_confidence=is_low,
             is_hidden_by_avg=False,
@@ -155,7 +175,6 @@ def check_recalculate_consistency(db: Session, ticket_id: int) -> dict:
 
 def check_export_consistency(db: Session, ticket_id: int) -> dict:
     samples = db.query(models.Sample).filter(models.Sample.ticket_id == ticket_id).all()
-    ticket = db.query(models.AppealTicket).filter(models.AppealTicket.id == ticket_id).first()
 
     issues = []
     for s in samples:
@@ -211,6 +230,7 @@ def recalculate_ranks(db: Session, ticket_id: int, operator: str) -> dict:
     for s in samples:
         old_rank = s.current_rank
         old_hidden = s.is_hidden_by_avg
+        old_status = s.status
 
         if s.expected_rank is not None:
             s.current_rank = s.expected_rank
@@ -226,14 +246,14 @@ def recalculate_ranks(db: Session, ticket_id: int, operator: str) -> dict:
             else:
                 s.is_hidden_by_avg = False
 
-        if old_rank != s.current_rank or old_hidden != s.is_hidden_by_avg:
+        if old_rank != s.current_rank or old_hidden != s.is_hidden_by_avg or old_status != s.status:
             audit = models.AuditLog(
                 ticket_id=ticket_id,
                 sample_id=s.id,
                 action="重算排名",
                 operator=operator,
-                before_value={"rank": old_rank, "is_hidden_by_avg": old_hidden},
-                after_value={"rank": s.current_rank, "is_hidden_by_avg": s.is_hidden_by_avg}
+                before_value={"rank": old_rank, "is_hidden_by_avg": old_hidden, "status": old_status},
+                after_value={"rank": s.current_rank, "is_hidden_by_avg": s.is_hidden_by_avg, "status": s.status}
             )
             db.add(audit)
 
@@ -246,10 +266,10 @@ def recalculate_ranks(db: Session, ticket_id: int, operator: str) -> dict:
     }
 
 
-def export_ticket(db: Session, ticket_id: int) -> pd.DataFrame:
+def build_export_rows(db: Session, ticket_id: int) -> List[Dict[str, Any]]:
     ticket = db.query(models.AppealTicket).filter(models.AppealTicket.id == ticket_id).first()
     if not ticket:
-        return pd.DataFrame()
+        return []
 
     rows = []
     for s in ticket.samples:
@@ -266,12 +286,88 @@ def export_ticket(db: Session, ticket_id: int) -> pd.DataFrame:
             "置信度": s.confidence,
             "低置信度": "是" if s.is_low_confidence else "否",
             "被平均指标盖住": "是" if s.is_hidden_by_avg else "否",
-            "状态": s.status,
+            "处理状态": s.status,
             "来源": ticket.source,
+            "处理人": ticket.handler or "",
+            "脱敏规则备注": ticket.desensitization_note or "",
             "人工备注": s.manual_note or ""
         })
 
+    return rows
+
+
+def export_ticket_excel(db: Session, ticket_id: int) -> pd.DataFrame:
+    rows = build_export_rows(db, ticket_id)
+    if not rows:
+        return pd.DataFrame()
     return pd.DataFrame(rows)
+
+
+def export_ticket_json(db: Session, ticket_id: int) -> Dict[str, Any]:
+    ticket = db.query(models.AppealTicket).filter(models.AppealTicket.id == ticket_id).first()
+    if not ticket:
+        return {}
+
+    samples = []
+    for s in ticket.samples:
+        samples.append({
+            "id": s.id,
+            "sample_no": s.sample_no,
+            "query": s.query,
+            "doc_title": s.doc_title,
+            "doc_url": s.doc_url,
+            "original_rank": s.original_rank,
+            "expected_rank": s.expected_rank,
+            "current_rank": s.current_rank,
+            "confidence": s.confidence,
+            "is_low_confidence": s.is_low_confidence,
+            "is_hidden_by_avg": s.is_hidden_by_avg,
+            "status": s.status,
+            "manual_note": s.manual_note
+        })
+
+    audit_logs = []
+    for l in db.query(models.AuditLog).filter(
+        models.AuditLog.ticket_id == ticket_id
+    ).order_by(models.AuditLog.created_at).all():
+        audit_logs.append({
+            "id": l.id,
+            "action": l.action,
+            "operator": l.operator,
+            "sample_id": l.sample_id,
+            "before_value": l.before_value,
+            "after_value": l.after_value,
+            "note": l.note,
+            "created_at": l.created_at.isoformat() if l.created_at else None
+        })
+
+    self_checks = []
+    for c in db.query(models.SelfCheckResult).filter(
+        models.SelfCheckResult.ticket_id == ticket_id
+    ).order_by(models.SelfCheckResult.created_at.desc()).all():
+        self_checks.append({
+            "check_type": c.check_type,
+            "passed": c.passed,
+            "details": c.details
+        })
+
+    return {
+        "ticket": {
+            "id": ticket.id,
+            "ticket_no": ticket.ticket_no,
+            "source": ticket.source,
+            "original_row_no": ticket.original_row_no,
+            "status": ticket.status,
+            "handler": ticket.handler,
+            "desensitization_note": ticket.desensitization_note,
+            "created_at": ticket.created_at.isoformat() if ticket.created_at else None,
+            "updated_at": ticket.updated_at.isoformat() if ticket.updated_at else None,
+        },
+        "samples": samples,
+        "audit_logs": audit_logs,
+        "self_checks": self_checks,
+        "export_rows": build_export_rows(db, ticket_id)
+    }
 
 
 def compare_versions(db: Session, version1_id: int, version2_id: int) -> schemas.VersionCompareResult:
@@ -326,7 +422,7 @@ def compare_versions(db: Session, version1_id: int, version2_id: int) -> schemas
 
         v1_rank = v1_map.get(sample_id)
         v2_rank = v2_map.get(sample_id)
-        rank_change = v2_rank - v1_rank if v1_rank and v2_rank else None
+        rank_change = v2_rank - v1_rank if v1_rank is not None and v2_rank is not None else None
 
         items.append(schemas.VersionCompareItem(
             sample_id=sample.id,

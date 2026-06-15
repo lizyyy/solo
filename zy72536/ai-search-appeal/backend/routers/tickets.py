@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, JSONResponse
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from io import BytesIO
@@ -128,8 +128,8 @@ def recalculate_ranks(
 
 
 @router.get("/{ticket_id}/export")
-def export_ticket(ticket_id: int, db: Session = Depends(get_db)):
-    df = appeal_service.export_ticket(db, ticket_id)
+def export_ticket_excel(ticket_id: int, db: Session = Depends(get_db)):
+    df = appeal_service.export_ticket_excel(db, ticket_id)
     if df.empty:
         raise HTTPException(status_code=404, detail="工单不存在或无数据")
 
@@ -146,6 +146,14 @@ def export_ticket(ticket_id: int, db: Session = Depends(get_db)):
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         headers={"Content-Disposition": f"attachment; filename={filename}"}
     )
+
+
+@router.get("/{ticket_id}/export/json")
+def export_ticket_json(ticket_id: int, db: Session = Depends(get_db)):
+    result = appeal_service.export_ticket_json(db, ticket_id)
+    if not result:
+        raise HTTPException(status_code=404, detail="工单不存在或无数据")
+    return JSONResponse(content=result)
 
 
 @router.get("/{ticket_id}/audit-logs", response_model=List[schemas.AuditLog])

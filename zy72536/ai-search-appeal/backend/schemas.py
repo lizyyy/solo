@@ -1,5 +1,5 @@
-from pydantic import BaseModel, Field
-from typing import Optional, List, Dict, Any
+from pydantic import BaseModel, ConfigDict, Field
+from typing import Optional, List, Dict, Any, Union
 from datetime import datetime
 
 
@@ -24,23 +24,14 @@ class SampleCreate(SampleBase):
 
 class SampleUpdate(BaseModel):
     expected_rank: Optional[int] = None
+    current_rank: Optional[int] = None
     status: Optional[str] = None
     manual_note: Optional[str] = None
     is_hidden_by_avg: Optional[bool] = None
 
 
-class Sample(SampleBase):
-    id: int
-    ticket_id: int
-    created_at: datetime
-    updated_at: datetime
-    versions: List["SampleVersion"] = []
-
-    class Config:
-        from_attributes = True
-
-
 class SampleVersionBase(BaseModel):
+    model_config = ConfigDict(protected_namespaces=())
     rank: int
     score: float
     is_manual_modified: bool = False
@@ -51,20 +42,27 @@ class SampleVersionCreate(SampleVersionBase):
 
 
 class SampleVersion(SampleVersionBase):
+    model_config = ConfigDict(from_attributes=True, protected_namespaces=())
     id: int
     sample_id: int
     model_version_id: int
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+
+class Sample(SampleBase):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    ticket_id: int
+    created_at: datetime
+    updated_at: datetime
+    versions: List[SampleVersion] = []
 
 
 class AppealTicketBase(BaseModel):
     ticket_no: str
     source: str = "线上反馈工单"
     original_row_no: int
-    raw_content: Dict[str, Any]
+    raw_content: Union[List[Dict[str, Any]], Dict[str, Any]]
     status: str = "待处理"
     handler: Optional[str] = None
     desensitization_note: Optional[str] = None
@@ -81,13 +79,11 @@ class AppealTicketUpdate(BaseModel):
 
 
 class AppealTicket(AppealTicketBase):
+    model_config = ConfigDict(from_attributes=True)
     id: int
     created_at: datetime
     updated_at: datetime
     samples: List[Sample] = []
-
-    class Config:
-        from_attributes = True
 
 
 class ModelVersionBase(BaseModel):
@@ -100,18 +96,16 @@ class ModelVersionCreate(ModelVersionBase):
 
 
 class ModelVersion(ModelVersionBase):
+    model_config = ConfigDict(from_attributes=True)
     id: int
     created_at: datetime
-
-    class Config:
-        from_attributes = True
 
 
 class AuditLogBase(BaseModel):
     action: str
     operator: str
-    before_value: Optional[Dict[str, Any]] = None
-    after_value: Optional[Dict[str, Any]] = None
+    before_value: Optional[Any] = None
+    after_value: Optional[Any] = None
     note: Optional[str] = None
 
 
@@ -121,28 +115,24 @@ class AuditLogCreate(AuditLogBase):
 
 
 class AuditLog(AuditLogBase):
+    model_config = ConfigDict(from_attributes=True)
     id: int
     ticket_id: int
     sample_id: Optional[int]
     created_at: datetime
-
-    class Config:
-        from_attributes = True
 
 
 class SelfCheckResultBase(BaseModel):
     ticket_id: int
     check_type: str
     passed: bool
-    details: Optional[Dict[str, Any]] = None
+    details: Optional[Any] = None
 
 
 class SelfCheckResult(SelfCheckResultBase):
+    model_config = ConfigDict(from_attributes=True)
     id: int
     created_at: datetime
-
-    class Config:
-        from_attributes = True
 
 
 class ImportResult(BaseModel):
@@ -181,6 +171,26 @@ class VersionCompareResult(BaseModel):
     total_count: int
     pending_review_count: int
     from_ticket_count: int
+
+
+class ExportRow(BaseModel):
+    工单编号: str
+    原始行号: int
+    样本编号: str
+    查询词: str
+    文档标题: str
+    文档URL: str
+    原始排名: int
+    预期排名: Optional[int]
+    当前排名: Optional[int]
+    置信度: float
+    低置信度: str
+    被平均指标盖住: str
+    处理状态: str
+    来源: str
+    处理人: str
+    脱敏规则备注: str
+    人工备注: str
 
 
 Sample.model_rebuild()
