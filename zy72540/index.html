@@ -109,17 +109,82 @@
                     </div>
 
                     <div class="right-panel">
-                        <div class="panel">
+                        <div class="panel evidence-panel">
                             <div class="panel-header">
-                                <h3>证据回放</h3>
+                                <h3>证据回放 <span class="sub-title">（分阶段关键分析）</span></h3>
                                 <span id="evidenceStepBadge" class="step-badge disabled">步骤 3/3</span>
                             </div>
                             <div class="panel-body">
-                                <div id="evidencePlayback" class="evidence-area">
-                                    <p class="placeholder">完成前两步后查看证据回放</p>
+                                <div id="evidencePlayback" class="evidence-timeline">
+                                    <div class="evidence-stage" data-stage="base">
+                                        <div class="evidence-stage-header">
+                                            <span class="stage-dot"></span>
+                                            <span class="stage-title">① 基础信息</span>
+                                            <span class="stage-status" id="stageBaseStatus">已加载</span>
+                                        </div>
+                                        <div class="evidence-stage-body" id="stageBaseContent">
+                                            <p class="placeholder">异常记录基础信息将在此展示</p>
+                                        </div>
+                                    </div>
+                                    <div class="evidence-stage" data-stage="annotator">
+                                        <div class="evidence-stage-header">
+                                            <span class="stage-dot"></span>
+                                            <span class="stage-title">② 标注员分析</span>
+                                            <span class="stage-status" id="stageAnnotatorStatus">待导入</span>
+                                        </div>
+                                        <div class="evidence-stage-body" id="stageAnnotatorContent">
+                                            <p class="placeholder">完成「导入标注员留言」后，展示标注员的关键分析结论</p>
+                                        </div>
+                                    </div>
+                                    <div class="evidence-stage" data-stage="model">
+                                        <div class="evidence-stage-header">
+                                            <span class="stage-dot"></span>
+                                            <span class="stage-title">③ 模型输出分析</span>
+                                            <span class="stage-status" id="stageModelStatus">待查看</span>
+                                        </div>
+                                        <div class="evidence-stage-body" id="stageModelContent">
+                                            <p class="placeholder">完成「查看模型输出片段」后，展示模型的关键分析结论</p>
+                                        </div>
+                                    </div>
+                                    <div class="evidence-stage" data-stage="conclusion">
+                                        <div class="evidence-stage-header">
+                                            <span class="stage-dot"></span>
+                                            <span class="stage-title">④ 综合结论与结果说明</span>
+                                            <span class="stage-status" id="stageConclusionStatus">待更新</span>
+                                        </div>
+                                        <div class="evidence-stage-body" id="stageConclusionContent">
+                                            <p class="placeholder">完成「更新证据回放」后，展示综合分析结论、状态变化和结果说明</p>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="panel-actions">
-                                    <button id="refreshEvidenceBtn" class="btn btn-secondary" disabled>更新证据回放</button>
+                                    <button id="refreshEvidenceBtn" class="btn btn-secondary" disabled>更新证据回放（汇总分析）</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel links-panel">
+                            <div class="panel-header">
+                                <h3>关联入口</h3>
+                            </div>
+                            <div class="panel-body">
+                                <div class="link-grid">
+                                    <button class="btn btn-link-card" id="oldNewCompareBtn" disabled>
+                                        <span class="link-icon">📋</span>
+                                        <div class="link-info">
+                                            <div class="link-title">新旧记录对比</div>
+                                            <div class="link-desc">对比原始记录与修正后的差异</div>
+                                        </div>
+                                        <span class="link-tag">待接入</span>
+                                    </button>
+                                    <button class="btn btn-link-card" id="reportBtn" disabled>
+                                        <span class="link-icon">📊</span>
+                                        <div class="link-info">
+                                            <div class="link-title">分析报告</div>
+                                            <div class="link-desc">生成完整的异常解释报告</div>
+                                        </div>
+                                        <span class="link-tag">待接入</span>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -162,12 +227,12 @@
 
                 <div class="history-panel">
                     <div class="panel-header">
-                        <h3>历史操作记录</h3>
+                        <h3>历史操作记录 <span class="sub-title">（含状态变化、分析摘要、结果说明）</span></h3>
                         <span id="historyCount" class="history-count">0 条记录</span>
                     </div>
                     <div class="panel-body">
                         <div id="historyList" class="history-list">
-                            <p class="placeholder">暂无操作记录</p>
+                            <p class="placeholder">暂无操作记录。完成三步流程后，每一步操作都会在此留痕：包含操作前后状态、关键分析摘要、结果说明。</p>
                         </div>
                     </div>
                 </div>
