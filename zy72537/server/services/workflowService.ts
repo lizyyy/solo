@@ -182,9 +182,35 @@ export class WorkflowService {
     recordId: string,
     content: string,
     operator: string
-  ): CheckRecord | undefined {
+  ): CheckRecord | undefined | { error: string } {
     const record = dataStore.getRecordById(recordId);
     if (!record) return undefined;
+
+    if (record.conflicts.length > 0) {
+      return { error: `存在 ${record.conflicts.length} 项未解决的冲突，请先确认或驳回所有冲突后再更新产品复盘` };
+    }
+
+    const hasModelVersionWarning = selfCheckService.hasModelVersionWarning(record.selfCheckResults);
+    if (hasModelVersionWarning && record.status === 'pending_review') {
+      return { error: '存在模型版本换了但样本编号没变的警告，请先完成运营复核后再更新产品复盘' };
+    }
+
+    if (hasModelVersionWarning && record.status !== 'rechecked' && record.status !== 'review_confirmed' && record.status !== 'review_rejected') {
+      return { error: '存在模型版本变更警告，需运营复核通过后才能更新产品复盘' };
+    }
+
+    const allowedStatuses: CheckStatus[] = [
+      'imported',
+      'review_confirmed',
+      'review_rejected',
+      'pending_recheck',
+      'rechecked',
+    ];
+    if (!allowedStatuses.includes(record.status) && !hasModelVersionWarning) {
+      if (record.status === 'conflict_detected') {
+        return { error: '当前状态为检测到冲突，请先处理完所有冲突后再更新产品复盘' };
+      }
+    }
 
     const updatedRecord = dataStore.updateRecord(recordId, {
       status: 'completed',
@@ -200,6 +226,9 @@ export class WorkflowService {
           action: '产品复盘页更新',
           operator,
           timestamp: Date.now(),
+          comment: hasModelVersionWarning 
+            ? '已完成模型版本变更警告的运营复核后更新复盘' 
+            : undefined,
         },
       ],
     });

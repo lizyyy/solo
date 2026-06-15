@@ -27,6 +27,7 @@ const CheckDetail: React.FC = () => {
 
   const [reviewContent, setReviewContent] = useState('');
   const [reviewOperator, setReviewOperator] = useState('产品经理');
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -86,6 +87,7 @@ const CheckDetail: React.FC = () => {
 
   const handleUpdateReview = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitError(null);
     try {
       if (!id) return;
       const updated = await checkApi.updateReview(id, {
@@ -94,8 +96,10 @@ const CheckDetail: React.FC = () => {
       });
       setRecord(updated);
       setShowReviewModal(false);
-    } catch (error) {
-      console.error('Failed to update review:', error);
+      setReviewContent('');
+    } catch (error: any) {
+      const errMsg = error?.response?.data?.error || '更新失败，请稍后重试';
+      setSubmitError(errMsg);
     }
   };
 
@@ -131,6 +135,37 @@ const CheckDetail: React.FC = () => {
 
   const steps = ['导入知识库引用', '补看线上工单', '产品复盘更新'];
   const scorePercent = `${record.calculationResult.consistencyScore * 100}%`;
+
+  const hasConflicts = record.conflicts.length > 0;
+  const modelVersionCheck = record.selfCheckResults.find(r => r.type === 'model_version_changed');
+  const hasModelVersionWarning = modelVersionCheck?.status === 'warning';
+
+  const canUpdateReview = (() => {
+    if (record.productReviewUpdate) return false;
+    if (record.currentStep < 2) return false;
+    if (hasConflicts) return false;
+    if (hasModelVersionWarning) {
+      const allowedAfterReview = ['rechecked', 'review_confirmed', 'review_rejected'];
+      if (!allowedAfterReview.includes(record.status)) return false;
+    }
+    if (record.status === 'conflict_detected') return false;
+    return true;
+  })();
+
+  const getBlockReason = (): string | null => {
+    if (record.currentStep < 2) return '请先完成第二步：关联线上反馈工单';
+    if (hasConflicts) return `存在 ${record.conflicts.length} 项未解决的冲突，请先处理所有冲突`;
+    if (hasModelVersionWarning && record.status === 'pending_review') {
+      return '存在「模型版本换了但样本编号没变」警告，需运营复核人完成复核后才能继续';
+    }
+    if (hasModelVersionWarning && !['rechecked', 'review_confirmed', 'review_rejected'].includes(record.status)) {
+      return '存在模型版本变更警告，需完成运营复核（状态为已重检/已确认/已驳回）';
+    }
+    if (record.status === 'conflict_detected') return '当前状态为检测到冲突，请先完成冲突处理';
+    return null;
+  };
+
+  const blockReason = getBlockReason();
 
   return (
     <div className="container">
@@ -390,10 +425,50 @@ const CheckDetail: React.FC = () => {
         </div>
       )}
 
+      {(hasConflicts || hasModelVersionWarning) && !record.productReviewUpdate && (
+        <div className="card" style={{ borderLeft: '4px solid #ff4d4f', background: '#fffbf0' }}>
+          <h2 style={{ color: '#ff4d4f', marginBottom: 12 }}>第三步阻断提示</h2>
+          {blockReason && (
+            <div style={{ 
+              padding: '12px 16px', 
+              background: '#fff2f0', 
+              borderRadius: 4, 
+              marginBottom: 12,
+              color: '#ff4d4f',
+              fontWeight: 500
+            }}>
+              ⚠️ {blockReason}
+            </div>
+          )}
+          <div style={{ fontSize: 14, color: '#333' }}>
+            <div style={{ marginBottom: 8 }}>
+              <strong>当前待处理项：</strong>
+            </div>
+            <ul style={{ paddingLeft: 20, lineHeight: 1.8 }}>
+              {hasConflicts && (
+                <li style={{ color: '#ff4d4f' }}>
+                  有 {record.conflicts.length} 项冲突证据待确认/驳回
+                </li>
+              )}
+              {hasModelVersionWarning && record.status === 'pending_review' && (
+                <li style={{ color: '#faad14' }}>
+                  存在模型版本变更警告（{modelVersionCheck?.details?.oldVersion || '?'} → {modelVersionCheck?.details?.newVersion || '?'}），需运营复核人点击「完成复核」
+                </li>
+              )}
+              {hasModelVersionWarning && !['rechecked', 'review_confirmed', 'review_rejected', 'pending_review'].includes(record.status) && (
+                <li style={{ color: '#faad14' }}>
+                  模型版本变更警告尚未走完复核流程，当前状态：{getStatusText(record.status)}
+                </li>
+              )}
+            </ul>
+          </div>
+        </div>
+      )}
+
       <div className="card">
         <div className="flex justify-between items-center mb-4">
           <h2 style={{ marginBottom: 0 }}>操作记录</h2>
-          {record.currentStep >= 2 && !record.productReviewUpdate && (
+          {canUpdateReview && (
             <button 
               className="btn btn-primary btn-sm"
               onClick={() => setShowReviewModal(true)}
@@ -402,6 +477,19 @@ const CheckDetail: React.FC = () => {
             </button>
           )}
         </div>
+        {blockReason && !record.productReviewUpdate && (
+          <div style={{ 
+            padding: '8px 12px', 
+            background: '#fffbe6', 
+            borderRadius: 4, 
+            marginBottom: 16,
+            fontSize: 13,
+            color: '#d48806',
+            border: '1px dashed #ffe58f'
+          }}>
+            🔒 {blockReason}。完成以上处理后可进行产品复盘更新。
+          </div>
+        )}
         <div className="timeline">
           {[...record.reviewHistory].reverse().map((item, index) => (
             <div key={index} className="timeline-item">
@@ -409,12 +497,66 @@ const CheckDetail: React.FC = () => {
               <div className="timeline-content">{item.action}</div>
               {item.comment && (
                 <div style={{ fontSize: 12, color: '#666', marginTop: 4 }}>
-                  意见：{item.comment}
+                  💬 {item.comment}
                 </div>
               )}
               <div className="timeline-operator">操作人：{item.operator}</div>
             </div>
           ))}
+        </div>
+      </div>
+
+      <div className="card">
+        <h2>结果说明与留痕</h2>
+        <div className="grid grid-2" style={{ gap: 16 }}>
+          <div>
+            <div style={{ fontSize: 13, color: '#999', marginBottom: 6 }}>最终一致性结论</div>
+            <div style={{ fontSize: 16, fontWeight: 500 }}>
+              {record.calculationResult.isConsistent ? (
+                <span className="text-success">✓ 字幕与图像一致（得分 {(record.calculationResult.consistencyScore * 100).toFixed(0)}）</span>
+              ) : (
+                <span className="text-danger">✕ 字幕与图像不一致（得分 {(record.calculationResult.consistencyScore * 100).toFixed(0)}）</span>
+              )}
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: 13, color: '#999', marginBottom: 6 }}>流程状态</div>
+            <div>
+              <span className={`status-badge ${getStatusClass(record.status)}`}>
+                {getStatusText(record.status)}
+              </span>
+              <span style={{ fontSize: 12, color: '#999', marginLeft: 8 }}>
+                第 {record.currentStep} / 3 步
+              </span>
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: 13, color: '#999', marginBottom: 6 }}>冲突处理</div>
+            <div>
+              {record.conflicts.length > 0 ? (
+                <span className="text-danger">{record.conflicts.length} 项未处理</span>
+              ) : (
+                <span className="text-success">全部处理完成</span>
+              )}
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: 13, color: '#999', marginBottom: 6 }}>模型版本变更警告</div>
+            <div>
+              {hasModelVersionWarning ? (
+                <div>
+                  <span className="text-warning">⚠️ 存在</span>
+                  {['rechecked', 'review_confirmed', 'review_rejected'].includes(record.status) ? (
+                    <span className="text-success" style={{ marginLeft: 8 }}>（已复核）</span>
+                  ) : (
+                    <span className="text-danger" style={{ marginLeft: 8 }}>（待复核）</span>
+                  )}
+                </div>
+              ) : (
+                <span className="text-success">无异常</span>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -547,6 +689,19 @@ const CheckDetail: React.FC = () => {
           <div className="card" style={{ width: 500 }}>
             <h2>更新产品复盘</h2>
             <form onSubmit={handleUpdateReview}>
+              {submitError && (
+                <div style={{
+                  padding: '10px 12px',
+                  background: '#fff2f0',
+                  border: '1px solid #ffccc7',
+                  borderRadius: 4,
+                  marginBottom: 16,
+                  color: '#ff4d4f',
+                  fontSize: 13,
+                }}>
+                  ❌ {submitError}
+                </div>
+              )}
               <div className="form-group">
                 <label>复盘内容</label>
                 <textarea
@@ -569,7 +724,10 @@ const CheckDetail: React.FC = () => {
                 <button 
                   type="button" 
                   className="btn btn-default"
-                  onClick={() => setShowReviewModal(false)}
+                  onClick={() => {
+                    setShowReviewModal(false);
+                    setSubmitError(null);
+                  }}
                 >
                   取消
                 </button>

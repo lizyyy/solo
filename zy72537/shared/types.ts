@@ -119,5 +119,7 @@ export interface ExportDetail {
   conflictCount: number;
   selfCheckWarnings: number;
   selfCheckErrors: number;
+  hasModelVersionWarning: boolean;
+  modelVersionWarningDetail?: string;
   updatedAt: number;
 }

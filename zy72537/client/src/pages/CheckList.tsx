@@ -76,7 +76,7 @@ const CheckList: React.FC = () => {
     try {
       const details = await checkApi.getExportDetails();
       const csvContent = [
-        ['样本编号', '样本名称', '一致性得分', '是否一致', '状态', '模型版本', '冲突数量', '更新时间'],
+        ['样本编号', '样本名称', '一致性得分', '是否一致', '状态', '模型版本', '模型版本换了但样本编号没变', '模型版本警告详情', '冲突数量', '自检警告数', '自检错误数', '当前步骤', '更新时间'],
         ...details.map(d => [
           d.sampleId,
           d.sampleName,
@@ -84,10 +84,15 @@ const CheckList: React.FC = () => {
           d.isConsistent ? '是' : '否',
           getStatusText(d.status),
           d.modelVersion,
+          d.hasModelVersionWarning ? '是(⚠️需复核)' : '否',
+          d.modelVersionWarningDetail || '-',
           d.conflictCount,
+          d.selfCheckWarnings,
+          d.selfCheckErrors,
+          d.status === 'completed' ? '3/3(完成)' : d.status === 'conflict_detected' || d.ticketNo ? '2/3(进行中)' : '1/3(进行中)',
           formatDate(d.updatedAt),
         ])
-      ].map(row => row.join(',')).join('\n');
+      ].map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
       
       const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
@@ -138,50 +143,73 @@ const CheckList: React.FC = () => {
               <th>一致性得分</th>
               <th>状态</th>
               <th>模型版本</th>
-              <th>冲突</th>
+              <th>模型版本变号警告</th>
+              <th>冲突/警告</th>
               <th>当前步骤</th>
               <th>更新时间</th>
               <th>操作</th>
             </tr>
           </thead>
           <tbody>
-            {records.map(record => (
-              <tr key={record.id}>
-                <td>{record.sampleId}</td>
-                <td>{record.sampleName}</td>
-                <td>
-                  <span className={record.calculationResult.consistencyScore >= 0.9 ? 'text-success' : 
-                        record.calculationResult.consistencyScore >= 0.7 ? 'text-warning' : 'text-danger'}>
-                  {(record.calculationResult.consistencyScore * 100).toFixed(0)}分
-                </span>
-              </td>
-                <td>
-                  <span className={`status-badge ${getStatusClass(record.status)}`}>
-                    {getStatusText(record.status)}
+            {records.map(record => {
+              const mvCheck = record.selfCheckResults.find(r => r.type === 'model_version_changed');
+              const hasMVWarning = mvCheck?.status === 'warning';
+              const warningCount = record.selfCheckResults.filter(r => r.status === 'warning').length;
+              const isReviewed = ['rechecked', 'review_confirmed', 'review_rejected', 'completed'].includes(record.status);
+              
+              return (
+                <tr key={record.id}>
+                  <td>{record.sampleId}</td>
+                  <td>{record.sampleName}</td>
+                  <td>
+                    <span className={record.calculationResult.consistencyScore >= 0.9 ? 'text-success' : 
+                          record.calculationResult.consistencyScore >= 0.7 ? 'text-warning' : 'text-danger'}>
+                    {(record.calculationResult.consistencyScore * 100).toFixed(0)}分
                   </span>
                 </td>
-                <td>{record.modelVersionInfo.version}</td>
-                <td>
-                  {record.conflicts.length > 0 ? (
-                    <span className="text-danger">{record.conflicts.length} 项</span>
-                  ) : (
-                    <span className="text-muted">无</span>
-                  )}
-                </td>
-                <td>第 {record.currentStep} 步</td>
-                <td className="text-muted" style={{ fontSize: 12 }}>
-                  {formatDate(record.updatedAt)}
-                </td>
-                <td>
-                  <button 
-                    className="btn btn-default btn-sm"
-                    onClick={() => navigate(`/checks/${record.id}`)}
-                  >
-                    查看详情
-                  </button>
-                </td>
-              </tr>
-            ))}
+                  <td>
+                    <span className={`status-badge ${getStatusClass(record.status)}`}>
+                      {getStatusText(record.status)}
+                    </span>
+                  </td>
+                  <td>{record.modelVersionInfo.version}</td>
+                  <td>
+                    {hasMVWarning ? (
+                      isReviewed ? (
+                        <span className="text-success" title={mvCheck?.message}>⚠️ 已复核</span>
+                      ) : (
+                        <span className="text-warning" title={mvCheck?.message}>⚠️ 待复核</span>
+                      )
+                    ) : (
+                      <span className="text-muted">—</span>
+                    )}
+                  </td>
+                  <td>
+                    {record.conflicts.length > 0 && (
+                      <div className="text-danger">冲突 {record.conflicts.length} 项</div>
+                    )}
+                    {warningCount > 0 && (
+                      <div className="text-warning">警告 {warningCount} 项</div>
+                    )}
+                    {record.conflicts.length === 0 && warningCount === 0 && (
+                      <span className="text-success">正常</span>
+                    )}
+                  </td>
+                  <td>第 {record.currentStep}/3 步</td>
+                  <td className="text-muted" style={{ fontSize: 12 }}>
+                    {formatDate(record.updatedAt)}
+                  </td>
+                  <td>
+                    <button 
+                      className="btn btn-default btn-sm"
+                      onClick={() => navigate(`/checks/${record.id}`)}
+                    >
+                      查看详情
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

@@ -83,6 +83,10 @@ export class ResultService {
   private mapToExportDetail(record: CheckRecord): ExportDetail {
     const warningCount = record.selfCheckResults.filter(r => r.status === 'warning').length;
     const errorCount = record.selfCheckResults.filter(r => r.status === 'error').length;
+    
+    const modelVersionCheck = record.selfCheckResults.find(r => r.type === 'model_version_changed');
+    const hasModelVersionWarning = modelVersionCheck?.status === 'warning';
+    const modelVersionWarningDetail = hasModelVersionWarning ? modelVersionCheck?.message : undefined;
 
     return {
       sampleId: record.sampleId,
@@ -98,6 +102,8 @@ export class ResultService {
       conflictCount: record.conflicts.length,
       selfCheckWarnings: warningCount,
       selfCheckErrors: errorCount,
+      hasModelVersionWarning,
+      modelVersionWarningDetail,
       updatedAt: record.updatedAt,
     };
   }

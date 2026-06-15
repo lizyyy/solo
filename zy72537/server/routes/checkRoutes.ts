@@ -109,17 +109,21 @@ router.post('/:id/update-review', (req, res) => {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
-  const record = workflowService.step3_updateProductReview(
+  const result = workflowService.step3_updateProductReview(
     req.params.id,
     content,
     operator
   );
 
-  if (!record) {
+  if (!result) {
     return res.status(404).json({ error: 'Record not found' });
   }
 
-  res.json(record);
+  if ('error' in result) {
+    return res.status(400).json({ error: result.error, blocked: true });
+  }
+
+  res.json(result);
 });
 
 router.post('/:id/request-recheck', (req, res) => {
