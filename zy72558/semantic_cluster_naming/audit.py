@@ -35,6 +35,23 @@ class AuditTrail:
             details=details,
             ip_address=self.ip_address,
         )
+        if run_db_id and (not snapshot_id or not snapshot_db_id):
+            from .models import ClusteringRun
+            run = self.db.query(ClusteringRun).filter(ClusteringRun.id == run_db_id).first()
+            if run:
+                if not snapshot_id:
+                    log.snapshot_id = run.snapshot_id
+                if not snapshot_db_id:
+                    log.snapshot_db_id = run.snapshot_db_id
+        elif run_id and (not snapshot_id or not snapshot_db_id):
+            from .models import ClusteringRun
+            run = self.db.query(ClusteringRun).filter(ClusteringRun.run_id == run_id).first()
+            if run:
+                if not snapshot_id:
+                    log.snapshot_id = run.snapshot_id
+                if not snapshot_db_id:
+                    log.snapshot_db_id = run.snapshot_db_id
+                log.run_db_id = run.id
         self.db.add(log)
         self.db.flush()
         return log

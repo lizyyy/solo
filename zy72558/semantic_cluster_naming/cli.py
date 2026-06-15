@@ -642,6 +642,20 @@ def replay(run_id, snapshot_id):
         console.print("[yellow]请指定 --run-id 或 --snapshot-id[/yellow]")
 
 
+@cli.command("serve")
+@click.option("--host", default="127.0.0.1", help="监听地址")
+@click.option("--port", default=8765, type=int, help="监听端口")
+@click.option("--db", "db_path", default=None, help="数据库路径")
+def serve(host, port, db_path):
+    """启动 HTTP 页面和 API 服务"""
+    from .api import run_server
+    console.print(f"[green]启动语义向量聚类命名服务:[/green] http://{host}:{port}")
+    console.print(f"  页面入口: http://{host}:{port}/")
+    console.print(f"  API 健康检查: http://{host}:{port}/health")
+    console.print(f"  数据库: {db_path or os.environ.get('SCN_DB_PATH', 'semantic_cluster.db')}")
+    run_server(host=host, port=port, db_path=db_path)
+
+
 def main():
     cli()
 

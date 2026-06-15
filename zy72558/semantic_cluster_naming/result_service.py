@@ -158,6 +158,7 @@ class ResultService:
             "format": format,
             "row_count": len(results),
             "consistency_verified": consistency_ok,
+            "content_hash": content_hash,
         }
     
     def edit_cluster_name(
@@ -271,13 +272,18 @@ class ResultService:
         else:
             raise ValueError(f"无效的复核决定: {decision}，请使用 'approve' 或 'reject'")
         
-        self.audit.log_review_decision(
-            run_id=run_id,
-            run_db_id=run.id,
-            decision=decision,
-            reviewed_by=reviewed_by,
-            comments=comments,
-        )
+        old_actor = self.audit.actor
+        self.audit.actor = reviewed_by
+        try:
+            self.audit.log_review_decision(
+                run_id=run_id,
+                run_db_id=run.id,
+                decision=decision,
+                reviewed_by=reviewed_by,
+                comments=comments,
+            )
+        finally:
+            self.audit.actor = old_actor
         
         self.db.commit()
         return True
