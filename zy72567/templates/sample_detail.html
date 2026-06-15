@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>样本详情 - 历史留痕</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: #f5f6f8;
+            color: #333;
+            font-size: 14px;
+        }
+        .header {
+            background: linear-gradient(135deg, #4a6cf7, #6b8cff);
+            color: white;
+            padding: 16px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 { font-size: 18px; font-weight: 500; }
+        .header .back {
+            color: white;
+            text-decoration: none;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .header .back:hover { opacity: 1; }
+        
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+        .card-title {
+            padding: 14px 20px;
+            border-bottom: 1px solid #eee;
+            font-size: 15px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card-body { padding: 16px 20px; }
+        
+        .basic-info {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px 24px;
+        }
+        .info-item .label {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 4px;
+        }
+        .info-item .value {
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .status-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-imported { background: #e0e7ff; color: #4338ca; }
+        .status-slice_viewed { background: #dbeafe; color: #1e40af; }
+        .status-feature_updated { background: #d1fae5; color: #065f46; }
+        .status-pending_review { background: #fef3c7; color: #92400e; }
+        .status-normal { background: #d1fae5; color: #065f46; }
+        .status-abnormal { background: #fee2e2; color: #991b1b; }
+        
+        .anomaly-tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-right: 6px;
+        }
+        .anomaly-tag.duplicate_train { background: #fce7f3; color: #9d174d; }
+        .anomaly-tag.duplicate_import { background: #ffedd5; color: #9a3412; }
+        .anomaly-tag.supplement_recalc { background: #e0e7ff; color: #4338ca; }
+        .anomaly-tag.export_inconsistent { background: #fef3c7; color: #92400e; }
+        
+        /* 状态流时间线 */
+        .timeline {
+            position: relative;
+            padding-left: 24px;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 4px;
+            bottom: 4px;
+            width: 2px;
+            background: #e5e7eb;
+        }
+        .timeline-item {
+            position: relative;
+            padding-bottom: 20px;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -21px;
+            top: 4px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ddd;
+            border: 2px solid white;
+            box-shadow: 0 0 0 2px #ddd;
+        }
+        .timeline-item.active::before {
+            background: #4a6cf7;
+            box-shadow: 0 0 0 2px #4a6cf7;
+        }
+        .timeline-item.done::before {
+            background: #10b981;
+            box-shadow: 0 0 0 2px #10b981;
+        }
+        .timeline-item.warn::before {
+            background: #f59e0b;
+            box-shadow: 0 0 0 2px #f59e0b;
+        }
+        .timeline-title {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        .timeline-time {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 6px;
+        }
+        .timeline-desc {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.5;
+        }
+        .timeline-operator {
+            font-size: 12px;
+            color: #888;
+            margin-top: 4px;
+        }
+        
+        /* YAML行展示 */
+        .yaml-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 12px 16px;
+            border-radius: 6px;
+            font-family: 'SF Mono', Menlo, Consolas, monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            overflow-x: auto;
+        }
+        .yaml-line {
+            display: flex;
+            align-items: flex-start;
+        }
+        .yaml-line-num {
+            display: inline-block;
+            width: 40px;
+            color: #666;
+            text-align: right;
+            padding-right: 12px;
+            user-select: none;
+        }
+        .yaml-line.modified .yaml-line-num {
+            color: #f59e0b;
+        }
+        .yaml-line.modified .yaml-content {
+            background: rgba(245, 158, 11, 0.15);
+        }
+        .yaml-content {
+            flex: 1;
+            white-space: pre;
+            padding: 0 4px;
+            border-radius: 2px;
+        }
+        .modified-badge {
+            display: inline-block;
+            margin-left: 8px;
+            padding: 1px 6px;
+            background: #f59e0b;
+            color: white;
+            border-radius: 3px;
+            font-size: 10px;
+        }
+        
+        .diff-info {
+            background: #fffbeb;
+            border-left: 3px solid #f59e0b;
+            padding: 10px 14px;
+            margin-top: 12px;
+            font-size: 13px;
+        }
+        .diff-info p { margin: 4px 0; }
+        .diff-info .original { text-decoration: line-through; color: #999; }
+        .diff-info .current { color: #92400e; font-weight: 500; }
+        
+        /* 评测切片 */
+        .slice-block {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 12px 16px;
+            margin-bottom: 10px;
+        }
+        .slice-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: #888;
+        }
+        .slice-content {
+            white-space: pre-wrap;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #444;
+            font-family: monospace;
+        }
+        .slice-remark {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed #ddd;
+            font-size: 13px;
+            color: #555;
+        }
+        .viewed-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            background: #d1fae5;
+            color: #065f46;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+        
+        /* 特征版本 */
+        .feature-item {
+            padding: 10px 0;
+            border-bottom: 1px dashed #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+        .feature-item:last-child { border-bottom: none; }
+        .feature-version {
+            font-weight: 500;
+            font-family: monospace;
+            color: #4338ca;
+        }
+        .feature-meta {
+            font-size: 12px;
+            color: #888;
+            margin-top: 4px;
+        }
+        
+        .text-content-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 12px 16px;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+        .category-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 12px;
+        }
+        .category-box {
+            flex: 1;
+            padding: 10px 14px;
+            border-radius: 6px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+        }
+        .category-box.predict { border-left: 3px solid #3b82f6; }
+        .category-box.actual { border-left: 3px solid #10b981; }
+        .category-label { font-size: 12px; color: #888; margin-bottom: 4px; }
+        .category-value { font-size: 14px; font-weight: 500; }
+        
+        .evidence-tip {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 6px;
+            padding: 10px 14px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: #1e40af;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .evidence-tip .icon { font-size: 16px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📋 样本详情 · 历史留痕</h1>
+        <a class="back" href="/">← 返回列表</a>
+    </div>
+    
+    <div class="container">
+        <div id="loading" style="text-align:center; padding:40px; color:#999;">加载中...</div>
+        <div id="content" style="display:none;">
+            
+            <!-- 基本信息 -->
+            <div class="card">
+                <div class="card-title">📝 基本信息</div>
+                <div class="card-body">
+                    <div class="text-content-box" id="textContent"></div>
+                    <div class="category-row">
+                        <div class="category-box predict">
+                            <div class="category-label">预测分类</div>
+                            <div class="category-value" id="predictCategory"></div>
+                        </div>
+                        <div class="category-box actual">
+                            <div class="category-label">实际分类</div>
+                            <div class="category-value" id="actualCategory"></div>
+                        </div>
+                    </div>
+                    <div class="basic-info">
+                        <div class="info-item">
+                            <div class="label">样本Key</div>
+                            <div class="value" id="sampleKey" style="font-family:monospace;"></div>
+                        </div>
+                        <div class="info-item">
+                            <div class="label">数据批次</div>
+                            <div class="value" id="batchId"></div>
+                        </div>
+                        <div class="info-item">
+                            <div class="label">处理状态</div>
+                            <div class="value" id="statusValue"></div>
+                        </div>
+                        <div class="info-item">
+                            <div class="label">异常类型</div>
+                            <div class="value" id="anomalyTypes"></div>
+                        </div>
+                        <div class="info-item">
+                            <div class="label">YAML原始行号</div>
+                            <div class="value" id="yamlLine" style="font-family:monospace; color:#f59e0b;"></div>
+                        </div>
+                        <div class="info-item">
+                            <div class="label">最后更新</div>
+                            <div class="value" id="updateTime" style="font-size:12px; color:#888;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 证据链提示 -->
+            <div class="evidence-tip">
+                <span class="icon">🔍</span>
+                <span>所有改动都留痕：YAML原始行号、人工改动记录、评测切片查看记录、特征版本更新记录、状态变更审计日志。策略产品追问时可回到证据，不只是看汇总数。</span>
+            </div>
+            
+            <!-- 状态流转时间线 -->
+            <div class="card">
+                <div class="card-title">🔄 状态流转 · 处理历史</div>
+                <div class="card-body">
+                    <div class="timeline" id="timeline"></div>
+                </div>
+            </div>
+            
+            <!-- YAML证据 -->
+            <div class="card">
+                <div class="card-title">📄 YAML原始证据 <span style="font-size:12px; color:#888; font-weight:normal;">（保留原始行号和改动记录）</span></div>
+                <div class="card-body">
+                    <div class="yaml-block" id="yamlBlock"></div>
+                    <div id="diffInfo" style="display:none;" class="diff-info"></div>
+                </div>
+            </div>
+            
+            <!-- 评测切片 -->
+            <div class="card">
+                <div class="card-title">🔬 评测切片记录</div>
+                <div class="card-body" id="slicesContainer">
+                    <div style="color:#999;">暂无评测切片记录</div>
+                </div>
+            </div>
+            
+            <!-- 特征版本 -->
+            <div class="card">
+                <div class="card-title">📊 特征版本表记录</div>
+                <div class="card-body" id="featureContainer">
+                    <div style="color:#999;">暂无特征版本记录</div>
+                </div>
+            </div>
+            
+            <!-- 审计日志 -->
+            <div class="card">
+                <div class="card-title">📜 完整审计日志</div>
+                <div class="card-body" id="auditContainer">
+                    <div style="color:#999;">暂无审计日志</div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    
+    <script>
+        const sampleId = window.location.pathname.split('/').pop();
+        
+        function loadDetail() {
+            fetch(`/api/samples/${sampleId}`)
+                .then(r => r.json())
+                .then(res => {
+                    if (res.code === 0) {
+                        document.getElementById('loading').style.display = 'none';
+                        document.getElementById('content').style.display = 'block';
+                        renderDetail(res.data, res.evidence, res.audit_logs);
+                    }
+                });
+        }
+        
+        function renderDetail(data, evidence, auditLogs) {
+            // 基本信息
+            document.getElementById('textContent').textContent = data.text_content;
+            document.getElementById('predictCategory').textContent = data.predicted_category;
+            document.getElementById('actualCategory').textContent = data.actual_category;
+            document.getElementById('sampleKey').textContent = data.sample_key;
+            document.getElementById('batchId').textContent = data.batch_id;
+            document.getElementById('statusValue').innerHTML = `<span class="status-tag status-${data.status}">${data.status_label}</span>`;
+            
+            const anomalyHtml = data.anomaly_types.map((a, i) => 
+                `<span class="anomaly-tag ${a}">${data.anomaly_labels[i]}</span>`
+            ).join('');
+            document.getElementById('anomalyTypes').innerHTML = anomalyHtml || '<span style="color:#aaa;">无</span>';
+            
+            document.getElementById('yamlLine').textContent = `第 ${data.yaml_line_number} 行`;
+            document.getElementById('updateTime').textContent = data.updated_at;
+            
+            // 时间线
+            renderTimeline(data, auditLogs);
+            
+            // YAML证据
+            renderYaml(evidence);
+            
+            // 评测切片
+            renderSlices(data.slices);
+            
+            // 特征版本
+            renderFeatures(data.feature_versions);
+            
+            // 审计日志
+            renderAudit(auditLogs);
+        }
+        
+        function renderTimeline(data, auditLogs) {
+            // 按时间排序的事件
+            const events = [];
+            
+            // 导入事件
+            events.push({
+                status: 'imported',
+                title: '参数YAML导入',
+                desc: '第一步：YAML文件导入系统',
+                time: data.created_at,
+                operator: data.last_updated_by,
+                done: true
+            });
+            
+            // 看切片事件（如果有）
+            if (data.slices.length > 0) {
+                const s = data.slices[0];
+                events.push({
+                    status: 'slice_viewed',
+                    title: '老唐补看评测切片',
+                    desc: s.viewer_remark || '老唐已查看评测切片',
+                    time: s.viewed_at || data.updated_at,
+                    operator: s.viewed_by || '老唐',
+                    done: true
+                });
+            }
+            
+            // 特征版本更新
+            if (data.feature_versions.length > 0) {
+                const f = data.feature_versions[0];
+                events.push({
+                    status: 'feature_updated',
+                    title: '特征版本表更新',
+                    desc: f.update_remark || `特征版本：${f.feature_version}`,
+                    time: f.updated_at,
+                    operator: f.updated_by,
+                    done: true
+                });
+            }
+            
+            // 异常事件
+            if (data.is_abnormal) {
+                events.push({
+                    status: 'pending_review',
+                    title: '系统检测异常，待产品复核',
+                    desc: '检测到异常：' + data.anomaly_labels.join('、'),
+                    time: data.updated_at,
+                    operator: '系统自检',
+                    warn: true
+                });
+            }
+            
+            // 最终状态
+            if (data.status === 'normal') {
+                events.push({
+                    status: 'normal',
+                    title: '策略产品复核通过',
+                    desc: '确认正常',
+                    time: data.updated_at,
+                    operator: data.last_updated_by,
+                    done: true
+                });
+            } else if (data.status === 'abnormal') {
+                events.push({
+                    status: 'abnormal',
+                    title: '策略产品确认异常',
+                    desc: '确认异常',
+                    time: data.updated_at,
+                    operator: data.last_updated_by,
+                    warn: true
+                });
+            }
+            
+            // 按时间排序
+            events.sort((a, b) => new Date(a.time) - new Date(b.time));
+            
+            const timelineHtml = events.map((e, i) => {
+                let cls = '';
+                if (e.done) cls = 'done';
+                if (e.warn) cls = 'warn';
+                if (i === events.length - 1) cls = cls || 'active';
+                
+                return `
+                <div class="timeline-item ${cls}">
+                    <div class="timeline-title">${e.title}</div>
+                    <div class="timeline-time">${e.time}</div>
+                    <div class="timeline-desc">${e.desc}</div>
+                    <div class="timeline-operator">操作人：${e.operator || '系统'}</div>
+                </div>
+                `;
+            }).join('');
+            
+            document.getElementById('timeline').innerHTML = timelineHtml;
+        }
+        
+        function renderYaml(evidence) {
+            const yamlData = evidence.yaml_evidence;
+            const lineNum = yamlData.original_line_number;
+            const original = yamlData.original_line_content;
+            const current = yamlData.current_line_content;
+            const isModified = yamlData.line_modified;
+            
+            // 只展示相关行及前后几行
+            let html = '';
+            html += `<div class="yaml-line ${isModified ? 'modified' : ''}">`;
+            html += `<span class="yaml-line-num">${lineNum}</span>`;
+            html += `<span class="yaml-content">${escapeHtml(current || original)}</span>`;
+            if (isModified) {
+                html += `<span class="modified-badge">已修改</span>`;
+            }
+            html += '</div>';
+            
+            document.getElementById('yamlBlock').innerHTML = html;
+            
+            // 改动详情
+            if (isModified && yamlData.all_modifications_in_version) {
+                const myMod = yamlData.all_modifications_in_version.find(m => m.line_number === lineNum);
+                if (myMod) {
+                    document.getElementById('diffInfo').style.display = 'block';
+                    document.getElementById('diffInfo').innerHTML = `
+                        <p><strong>改动记录：</strong></p>
+                        <p class="original">原始内容：${escapeHtml(myMod.original)}</p>
+                        <p class="current">当前内容：${escapeHtml(myMod.current)}</p>
+                        <p style="color:#888; font-size:12px; margin-top:6px;">
+                            修改人：${myMod.modified_by} · 修改时间：${myMod.modified_at}
+                            ${myMod.remark ? '· 备注：' + myMod.remark : ''}
+                        </p>
+                    `;
+                }
+            }
+        }
+        
+        function renderSlices(slices) {
+            if (!slices || slices.length === 0) return;
+            
+            const html = slices.map(s => `
+                <div class="slice-block">
+                    <div class="slice-header">
+                        <span>评测切片 #${s.id}</span>
+                        <span>${s.viewed_by ? `<span class="viewed-badge">✓ 已查看 (${s.viewed_by})</span>` : '<span style="color:#f59e0b;">待查看</span>'}</span>
+                    </div>
+                    <div class="slice-content">${escapeHtml(s.slice_data)}</div>
+                    ${s.viewer_remark ? `<div class="slice-remark">💬 老唐备注：${escapeHtml(s.viewer_remark)}</div>` : ''}
+                    ${s.viewed_at ? `<div style="font-size:11px; color:#aaa; margin-top:4px;">查看时间：${s.viewed_at}</div>` : ''}
+                </div>
+            `).join('');
+            
+            document.getElementById('slicesContainer').innerHTML = html;
+        }
+        
+        function renderFeatures(features) {
+            if (!features || features.length === 0) return;
+            
+            const html = features.map(f => `
+                <div class="feature-item">
+                    <div>
+                        <div class="feature-version">v${f.feature_version.replace(/^v/, '')}</div>
+                        <div class="feature-meta">更新人：${f.updated_by} · ${f.updated_at}</div>
+                        ${f.update_remark ? `<div style="font-size:12px; color:#666; margin-top:4px;">备注：${escapeHtml(f.update_remark)}</div>` : ''}
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('featureContainer').innerHTML = html;
+        }
+        
+        function renderAudit(logs) {
+            if (!logs || logs.length === 0) return;
+            
+            const html = logs.map(l => `
+                <div class="timeline-item">
+                    <div class="timeline-title">${escapeHtml(l.action)}</div>
+                    <div class="timeline-time">${l.operate_time}</div>
+                    ${l.old_status ? `<div class="timeline-desc">${statusLabel(l.old_status)} → ${statusLabel(l.new_status)}</div>` : ''}
+                    ${l.remark ? `<div class="timeline-desc" style="color:#888;">备注：${escapeHtml(l.remark)}</div>` : ''}
+                    <div class="timeline-operator">操作人：${l.operator}</div>
+                </div>
+            `).join('');
+            
+            document.getElementById('auditContainer').innerHTML = `<div class="timeline">${html}</div>`;
+        }
+        
+        function statusLabel(s) {
+            const labels = {
+                'imported': '已导入',
+                'slice_viewed': '已看切片',
+                'feature_updated': '已更特征',
+                'pending_review': '待产品复核',
+                'normal': '确认正常',
+                'abnormal': '确认异常'
+            };
+            return labels[s] || s;
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        loadDetail();
+    </script>
+</body>
+</html>
