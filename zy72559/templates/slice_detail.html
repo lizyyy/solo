@@ -40,7 +40,7 @@
         </div>
 
         <div class="card" id="conflictCard" style="display:none">
-            <h2>⚠️ 待处理冲突</h2>
+            <h2 id="conflictCardTitle">冲突记录</h2>
             <div id="conflictList"></div>
         </div>
 
@@ -61,7 +61,11 @@
 
             <div id="expandSection" style="display:none">
                 <h3 style="margin-bottom:16px;font-size:15px;">执行相似用户扩展</h3>
-                <button class="btn btn-success" onclick="runExpand()">开始扩展</button>
+                <div id="expandBlocked" style="display:none" class="conflict-alert">
+                    <h4>⚠️ 存在未确认的冲突，无法执行扩展</h4>
+                    <p style="font-size:13px;color:#555">请先在上方冲突记录中确认或驳回所有冲突，才能继续执行扩展。系统不会替业务自动拍板。</p>
+                </div>
+                <button id="expandBtn" class="btn btn-success" onclick="runExpand()">开始扩展</button>
                 <p style="margin-top:12px;font-size:13px;color:#888">扩展完成后将自动执行自检，并生成异常样本列表</p>
                 <hr style="margin:20px 0;border:none;border-top:1px solid #eee">
             </div>
@@ -77,6 +81,7 @@
                 <h3 style="margin-bottom:16px;font-size:15px;">导出数据</h3>
                 <button class="btn btn-primary btn-small" onclick="exportResults()">导出全部结果</button>
                 <button class="btn btn-warning btn-small" onclick="exportAbnormal()">仅导出异常样本</button>
+                <p style="margin-top:8px;font-size:12px;color:#888">导出含冲突处理记录、操作日志、自检报告，确保与页面展示一致</p>
             </div>
         </div>
 
@@ -102,6 +107,11 @@
                 <div id="abnormalTable"></div>
                 <div id="abnormalPagination" class="pagination"></div>
             </div>
+        </div>
+
+        <div class="card" id="logCard" style="display:none">
+            <h2>操作留痕</h2>
+            <div id="logTable"></div>
         </div>
     </div>
 
@@ -179,9 +189,12 @@
                 </div>
             `;
 
-            if (data.pending_conflicts && data.pending_conflicts.length > 0) {
+            if (data.all_conflicts && data.all_conflicts.length > 0) {
                 document.getElementById('conflictCard').style.display = 'block';
-                renderConflicts(data.pending_conflicts);
+                const pendingCount = data.all_conflicts.filter(c => c.status === 'pending').length;
+                document.getElementById('conflictCardTitle').textContent = 
+                    `冲突记录（共${data.all_conflicts.length}条，${pendingCount > 0 ? pendingCount + '条待确认' : '全部已处理'}）`;
+                renderAllConflicts(data.all_conflicts);
             } else {
                 document.getElementById('conflictCard').style.display = 'none';
             }
@@ -200,6 +213,9 @@
 
             if (s.status === 'snapshot_supplemented') {
                 document.getElementById('expandSection').style.display = 'block';
+                const hasPending = s.has_pending_conflicts;
+                document.getElementById('expandBtn').disabled = hasPending;
+                document.getElementById('expandBlocked').style.display = hasPending ? 'block' : 'none';
             } else {
                 document.getElementById('expandSection').style.display = 'none';
             }
@@ -214,23 +230,49 @@
                 document.getElementById('resultCard').style.display = 'none';
                 document.getElementById('exportSection').style.display = 'none';
             }
+
+            if (data.operation_logs && data.operation_logs.length > 0) {
+                document.getElementById('logCard').style.display = 'block';
+                renderOperationLogs(data.operation_logs);
+            } else {
+                document.getElementById('logCard').style.display = 'none';
+            }
         }
 
-        function renderConflicts(conflicts) {
+        function renderAllConflicts(conflicts) {
             let html = '';
             conflicts.forEach(c => {
+                const isPending = c.status === 'pending';
+                const borderColor = isPending ? '#e74c3c' : '#27ae60';
+                const statusLabel = isPending ? '待确认' : '已处理';
+                const resolutionLabel = c.resolution === 'confirmed' ? '已确认' : (c.resolution === 'rejected' ? '已驳回' : '');
+                
                 html += `
-                    <div class="conflict-alert">
-                        <h4>⚠️ ${c.description}</h4>
-                        <p><strong>冲突类型:</strong> ${c.conflict_type}</p>
+                    <div class="conflict-alert" style="border-left-color:${borderColor}">
+                        <h4>${isPending ? '⚠️' : '✅'} ${c.description}</h4>
+                        <p><strong>冲突类型:</strong> ${c.conflict_type}　<strong>状态:</strong> ${statusLabel}</p>
                         <div class="conflict-evidence">${JSON.stringify(c.evidence, null, 2)}</div>
+                `;
+                
+                if (isPending) {
+                    html += `
                         <p style="color:#e74c3c;font-size:13px;font-weight:500">请评测运营小孟确认或驳回，系统不会自动处理</p>
                         <div class="conflict-actions">
                             <button class="btn btn-success btn-small" onclick="resolveConflict(${c.id}, 'confirmed')">确认（按此执行）</button>
                             <button class="btn btn-danger btn-small" onclick="resolveConflict(${c.id}, 'rejected')">驳回（重新设置）</button>
                         </div>
-                    </div>
-                `;
+                    `;
+                } else {
+                    html += `
+                        <p style="color:#27ae60;font-size:13px">
+                            <strong>处理结果:</strong> ${resolutionLabel}　
+                            <strong>处理人:</strong> ${c.resolved_by || '-'}　
+                            <strong>处理时间:</strong> ${c.resolved_at ? new Date(c.resolved_at).toLocaleString('zh-CN') : '-'}
+                        </p>
+                    `;
+                }
+                
+                html += `</div>`;
             });
             document.getElementById('conflictList').innerHTML = html;
         }
@@ -250,6 +292,26 @@
                 `;
             });
             document.getElementById('selfCheckList').innerHTML = html;
+        }
+
+        function renderOperationLogs(logs) {
+            let html = '<table><thead><tr><th>操作人</th><th>操作</th><th>操作详情</th><th>操作时间</th></tr></thead><tbody>';
+            logs.forEach(log => {
+                let detailStr = '';
+                if (log.details) {
+                    detailStr = Object.entries(log.details).map(([k, v]) => `${k}=${v}`).join('; ');
+                }
+                html += `
+                    <tr>
+                        <td>${log.operator}</td>
+                        <td>${log.operation}</td>
+                        <td style="max-width:400px;font-size:12px;word-break:break-all">${detailStr}</td>
+                        <td>${new Date(log.created_at).toLocaleString('zh-CN')}</td>
+                    </tr>
+                `;
+            });
+            html += '</tbody></table>';
+            document.getElementById('logTable').innerHTML = html;
         }
 
         async function loadSnapshots() {
@@ -287,7 +349,7 @@
                 if (data.success) {
                     showToast('特征快照编号补录成功');
                     if (data.conflicts && data.conflicts.length > 0) {
-                        showToast(`检测到 ${data.conflicts.length} 个冲突，请处理`, 'warning');
+                        showToast(`检测到 ${data.conflicts.length} 个冲突，请先处理冲突再执行扩展`, 'warning');
                     }
                     loadDetail();
                 } else {
@@ -305,7 +367,7 @@
                 const data = await res.json();
                 
                 if (data.success) {
-                    showToast('冲突处理成功');
+                    showToast(resolution === 'confirmed' ? '冲突已确认' : '冲突已驳回');
                     loadDetail();
                 } else {
                     showToast(data.detail || '处理失败', 'error');
@@ -355,10 +417,6 @@
                 const res = await fetch(`${API_BASE}/slices/${SLICE_ID}/results?page=${currentResultPage}&page_size=50`);
                 const data = await res.json();
                 renderResultsTable(data);
-                renderPagination('resultsPagination', data.total, currentResultPage, 50, (p) => {
-                    currentResultPage = p;
-                    loadResults();
-                });
             } catch (e) {
                 console.error('加载结果失败', e);
             }
@@ -390,10 +448,6 @@
                 const res = await fetch(`${API_BASE}/slices/${SLICE_ID}/abnormal-samples?page=${currentAbnormalPage}&page_size=50&only_need_review=${onlyNeedReview}`);
                 const data = await res.json();
                 renderAbnormalTable(data);
-                renderPagination('abnormalPagination', data.total, currentAbnormalPage, 50, (p) => {
-                    currentAbnormalPage = p;
-                    loadAbnormalSamples();
-                });
             } catch (e) {
                 console.error('加载异常样本失败', e);
             }
@@ -415,7 +469,7 @@
                 const reviewActions = r.need_review && r.review_status === 'pending' ? `
                     <button class="btn btn-success btn-small" onclick="reviewSample(${r.id}, 'confirmed_normal')">标记正常</button>
                     <button class="btn btn-danger btn-small" onclick="reviewSample(${r.id}, 'confirmed_abnormal')">确认异常</button>
-                ` : '-';
+                ` : (r.review_status !== 'pending' ? `<span style="font-size:12px;color:#888">${r.reviewed_by || ''} ${r.reviewed_at ? new Date(r.reviewed_at).toLocaleString('zh-CN') : ''}</span>` : '-');
                 
                 html += `
                     <tr class="abnormal-row">
@@ -451,25 +505,6 @@
             } catch (e) {
                 showToast('操作失败: ' + e.message, 'error');
             }
-        }
-
-        function renderPagination(containerId, total, currentPage, pageSize, onChange) {
-            const totalPages = Math.ceil(total / pageSize);
-            let html = '';
-            
-            html += `<button ${currentPage === 1 ? 'disabled' : ''} onclick="(${onChange})(${currentPage - 1})">上一页</button>`;
-            
-            for (let i = 1; i <= totalPages; i++) {
-                if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
-                    html += `<button class="${i === currentPage ? 'active' : ''}" onclick="(function(p){${onChange.toString().match(/\{([\s\S]*)\}/)[1]}})(${i})">${i}</button>`;
-                } else if (i === currentPage - 3 || i === currentPage + 3) {
-                    html += '<span>...</span>';
-                }
-            }
-            
-            html += `<button ${currentPage === totalPages ? 'disabled' : ''} onclick="(${onChange})(${currentPage + 1})">下一页</button>`;
-            
-            document.getElementById(containerId).innerHTML = html;
         }
 
         function switchTab(tab) {

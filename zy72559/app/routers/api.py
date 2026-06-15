@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from typing import Optional, List
 from datetime import datetime
 from app.database import get_db
-from app.models import EvalSlice, FeatureSnapshot, ConflictRecord, ExpandResult, SelfCheckRecord
+from app.models import EvalSlice, FeatureSnapshot, ConflictRecord, ExpandResult, SelfCheckRecord, OperationLog
 from app.services.expand_service import (
     import_eval_slice,
     supplement_feature_snapshot,
@@ -13,7 +13,7 @@ from app.services.expand_service import (
     get_all_results,
     review_abnormal_sample,
 )
-from app.services.conflict_detector import resolve_conflict, get_pending_conflicts
+from app.services.conflict_detector import resolve_conflict, get_pending_conflicts, get_all_conflicts
 from app.services.self_checker import run_all_checks, get_latest_checks
 from app.services.export_service import export_results
 
@@ -47,6 +47,7 @@ def get_slice(slice_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="评测切片不存在")
     
     pending_conflicts = get_pending_conflicts(db, slice_id)
+    all_conflicts = get_all_conflicts(db, slice_id)
     self_checks = get_latest_checks(db, slice_id)
     
     results_count = db.query(ExpandResult).filter(ExpandResult.eval_slice_id == slice_id).count()
@@ -58,6 +59,10 @@ def get_slice(slice_id: int, db: Session = Depends(get_db)):
         ExpandResult.eval_slice_id == slice_id,
         ExpandResult.need_review == True
     ).count()
+    
+    operation_logs = db.query(OperationLog).filter(
+        OperationLog.target_id == str(slice_obj.slice_id)
+    ).order_by(OperationLog.created_at.desc()).limit(50).all()
     
     return {
         "data": {
@@ -74,6 +79,7 @@ def get_slice(slice_id: int, db: Session = Depends(get_db)):
             "results_count": results_count,
             "abnormal_count": abnormal_count,
             "need_review_count": need_review_count,
+            "has_pending_conflicts": len(pending_conflicts) > 0,
         },
         "pending_conflicts": [
             {
@@ -85,6 +91,20 @@ def get_slice(slice_id: int, db: Session = Depends(get_db)):
             }
             for c in pending_conflicts
         ],
+        "all_conflicts": [
+            {
+                "id": c.id,
+                "conflict_type": c.conflict_type,
+                "description": c.description,
+                "evidence": c.evidence,
+                "status": c.status,
+                "resolution": c.resolution,
+                "resolved_by": c.resolved_by,
+                "resolved_at": c.resolved_at.isoformat() if c.resolved_at else None,
+                "created_at": c.created_at.isoformat(),
+            }
+            for c in all_conflicts
+        ],
         "self_checks": [
             {
                 "id": s.id,
@@ -95,6 +115,16 @@ def get_slice(slice_id: int, db: Session = Depends(get_db)):
                 "details": s.details,
             }
             for s in self_checks
+        ],
+        "operation_logs": [
+            {
+                "id": log.id,
+                "operator": log.operator,
+                "operation": log.operation,
+                "details": log.details,
+                "created_at": log.created_at.isoformat(),
+            }
+            for log in operation_logs
         ],
     }
 

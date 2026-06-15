@@ -1,7 +1,7 @@
 from typing import List, Dict, Any, Optional, Tuple
 from datetime import datetime
 from sqlalchemy.orm import Session
-from app.models import EvalSlice, FeatureSnapshot, ConflictRecord, ExpandResult
+from app.models import EvalSlice, FeatureSnapshot, ConflictRecord, ExpandResult, OperationLog
 
 
 CONFLICT_TYPES = {
@@ -81,6 +81,8 @@ def detect_conflicts(db: Session, eval_slice: EvalSlice) -> List[ConflictRecord]
     for conflict in conflicts:
         db.add(conflict)
     db.commit()
+    for conflict in conflicts:
+        db.refresh(conflict)
     
     return conflicts
 
@@ -114,6 +116,24 @@ def resolve_conflict(
     conflict.resolution = resolution
     conflict.resolved_by = operator
     conflict.resolved_at = datetime.now()
+    
+    eval_slice = db.query(EvalSlice).filter(EvalSlice.id == conflict.eval_slice_id).first()
+    slice_id_str = eval_slice.slice_id if eval_slice else str(conflict.eval_slice_id)
+    
+    log = OperationLog(
+        operator=operator,
+        operation=f"处理冲突-{('确认' if resolution == 'confirmed' else '驳回')}",
+        target_type="conflict",
+        target_id=slice_id_str,
+        details={
+            "conflict_id": conflict_id,
+            "conflict_type": conflict.conflict_type,
+            "resolution": resolution,
+            "description": conflict.description
+        }
+    )
+    db.add(log)
+    
     db.commit()
     db.refresh(conflict)
     
@@ -125,3 +145,9 @@ def get_pending_conflicts(db: Session, eval_slice_id: Optional[int] = None) -> L
     if eval_slice_id:
         query = query.filter(ConflictRecord.eval_slice_id == eval_slice_id)
     return query.order_by(ConflictRecord.created_at.desc()).all()
+
+
+def get_all_conflicts(db: Session, eval_slice_id: int) -> List[ConflictRecord]:
+    return db.query(ConflictRecord).filter(
+        ConflictRecord.eval_slice_id == eval_slice_id
+    ).order_by(ConflictRecord.created_at.desc()).all()

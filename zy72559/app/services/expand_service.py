@@ -90,14 +90,25 @@ def run_expand(
     if not eval_slice:
         raise ValueError(f"评测切片不存在")
     
-    pending_conflicts = db.query(ExpandResult).filter(
+    pending_conflict_records = db.query(ConflictRecord).filter(
+        ConflictRecord.eval_slice_id == eval_slice_id,
+        ConflictRecord.status == "pending"
+    ).count()
+    
+    if pending_conflict_records > 0:
+        raise ValueError(
+            f"存在 {pending_conflict_records} 条未确认的冲突记录，"
+            f"请评测运营小孟先确认或驳回冲突后再执行扩展"
+        )
+    
+    pending_review_results = db.query(ExpandResult).filter(
         ExpandResult.eval_slice_id == eval_slice_id,
         ExpandResult.need_review == True,
         ExpandResult.review_status == "pending"
     ).count()
     
-    if pending_conflicts > 0:
-        raise ValueError(f"存在 {pending_conflicts} 条待复核记录，请先处理后再执行扩展")
+    if pending_review_results > 0:
+        raise ValueError(f"存在 {pending_review_results} 条待复核记录，请先处理后再执行扩展")
     
     db.query(ExpandResult).filter(ExpandResult.eval_slice_id == eval_slice_id).delete()
     
