@@ -200,18 +200,31 @@ def test_supplementary_material():
         StratificationMetric(layer_name="分层B", auc=0.81, sample_count=8000),
         StratificationMetric(layer_name="分层C", auc=0.72, sample_count=3000),
     ]
-    new_record_id = detector.recalculate_after_supplement(original_record_id, new_metrics)
+    new_record_id = detector.recalculate_after_supplement(
+        original_record_id, new_metrics, supplementary_note_id=supp_note_id
+    )
     print(f"✓ 补录后重算，新记录ID: {new_record_id}")
 
     new_record = detector.get_metrics_record(new_record_id)
     assert new_record.is_recalculated == True
     assert new_record.original_record_id == original_record_id
-    print(f"✓ 验证: is_recalculated={new_record.is_recalculated}, 关联原始记录正确")
+    assert new_record.note_id == supp_note_id, "重算后的记录应关联补录笔记ID"
+    print(f"✓ 验证: is_recalculated={new_record.is_recalculated}, 关联原始记录正确, 关联补录笔记正确")
 
-    print("\n补录后的分层指标:")
+    print("\n==== 【查看点1】补录后重算的分层指标（含判定依据） ====")
     for m in new_record.metrics:
         status = "⚠️ 反常" if m.is_anomaly else "✅ 正常"
         print(f"  {m.layer_name}: AUC={m.auc:.4f} {status}")
+        print(f"    └─ 判定依据: 阈值={m.threshold_value}, 阈值版本=v{m.threshold_version}, 来源笔记={m.threshold_source_note_id}")
+        print(f"    └─ 结果说明: {m.anomaly_reason}")
+        if m.layer_name == "分层C":
+            assert m.is_anomaly == True, "分层C AUC=0.72 < 阈值=0.75，必须判定为反常"
+            assert m.threshold_value == 0.75, "分层C阈值应为补录笔记的0.75"
+            print(f"    └─ ✅ 验证通过：分层C AUC=0.72 < 阈值=0.75，正确标记为反常")
+
+    print("\n==== 【查看点2】完整历史留痕 ====")
+    for dt, action, detail in detector.get_history():
+        print(f"  [{dt.strftime('%H:%M:%S')}] {action}: {detail}")
 
     print("✅ 补录材料流程测试通过\n")
 
@@ -362,6 +375,143 @@ def test_duplicate_import_protection():
     print("✅ 重复导入保护测试通过\n")
 
 
+def test_focus_supplementary_status_and_history():
+    print("=" * 70)
+    print("【聚焦场景】补录材料：分层指标 + 历史记录查看（停在此处）")
+    print("  复现现场问题：补录新增阈值 0.75，AUC=0.72 原显示 ✅ 正常")
+    print("  期望：现在应正确判定 ⚠️ 反常，且有完整留痕")
+    print("=" * 70)
+
+    detector = AUCLayerAnomalyDetector()
+
+    # ---------- 第一步：阈值调参笔记第一次导入 ----------
+    print("\n▶ 第一步：阈值调参笔记第一次导入")
+    note_v1 = ThresholdNote(
+        note_id="NOTE-FOCUS",
+        version=1,
+        thresholds={"分层A": 0.85, "分层B": 0.80},
+        reporter="数据科学家小张",
+        report_time=datetime(2024, 1, 17, 10, 0)
+    )
+    note_id_v1, import_checks = detector.import_threshold_note(note_v1)
+    print(f"  笔记ID: {note_id_v1}, 版本: v{note_v1.version}")
+    print(f"  导入时阈值: {note_v1.thresholds}")
+    for c in import_checks:
+        print(f"  自检- {c.check_name}: {'✅' if c.passed else '❌'} {c.message}")
+
+    # ---------- 第二步：实验平台负责人阿越补看线上实验桶 ----------
+    print("\n▶ 第二步：实验平台负责人阿越补看线上实验桶")
+    bucket_v1 = ExperimentBucket(
+        bucket_id="BUCKET-FOCUS",
+        bucket_name="线上实验桶FOCUS",
+        thresholds={"分层A": 0.85, "分层B": 0.80},
+        update_time=datetime(2024, 1, 17, 10, 30)
+    )
+    bucket_id, conflicts = detector.review_experiment_bucket(bucket_v1, reviewer="阿越")
+    print(f"  桶ID: {bucket_id}, 审核人: {bucket_v1.reviewer}")
+    print(f"  桶内阈值: {bucket_v1.thresholds}")
+    print(f"  冲突检测数: {len(conflicts)}")
+
+    # ---------- 第三步：分层指标更新（原始） ----------
+    print("\n▶ 第三步：分层指标更新（原始 v1 阈值）")
+    metrics_v1 = [
+        StratificationMetric(layer_name="分层A", auc=0.87, sample_count=10000),
+        StratificationMetric(layer_name="分层B", auc=0.81, sample_count=8000),
+    ]
+    record_id_v1, metric_checks = detector.update_stratification_metrics(
+        note_id_v1, metrics_v1, MaterialType.NORMAL, bucket_id
+    )
+    print(f"  记录ID: {record_id_v1}")
+    for m in metrics_v1:
+        status = "⚠️ 反常" if m.is_anomaly else "✅ 正常"
+        print(f"    {m.layer_name}: AUC={m.auc:.4f} {status} (阈值={m.threshold_value}, v{m.threshold_version})")
+    for c in metric_checks:
+        print(f"  自检- {c.check_name}: {'✅' if c.passed else '❌'} {c.message}")
+
+    # ---------- 触发补录：发现漏了分层C，阈值 0.75 ----------
+    print("\n" + "-" * 70)
+    print("⚠️  业务发现：漏了分层C，执行补录流程")
+    print("-" * 70)
+
+    print("\n▶ 补录步骤1：导入补录笔记（新增分层C 阈值=0.75）")
+    note_v2 = ThresholdNote(
+        note_id="NOTE-FOCUS",
+        version=2,
+        thresholds={"分层A": 0.85, "分层B": 0.80, "分层C": 0.75},
+        reporter="数据科学家小张",
+        report_time=datetime(2024, 1, 17, 14, 0),
+        comment="补充分层C阈值0.75，现场问题样例"
+    )
+    note_id_v2, _ = detector.import_supplementary_note(note_v2, note_id_v1)
+    print(f"  补录笔记ID: {note_id_v2}, 版本: v{note_v2.version}")
+    print(f"  补录后阈值: {note_v2.thresholds}")
+
+    print("\n▶ 补录步骤2：阿越重新补看线上实验桶（含分层C）")
+    bucket_v2 = ExperimentBucket(
+        bucket_id="BUCKET-FOCUS",
+        bucket_name="线上实验桶FOCUS",
+        thresholds={"分层A": 0.85, "分层B": 0.80, "分层C": 0.75},
+        update_time=datetime(2024, 1, 17, 14, 30)
+    )
+    bucket_id2, conflicts2 = detector.review_experiment_bucket(bucket_v2, reviewer="阿越")
+    print(f"  重新补看冲突数: {len(conflicts2)}")
+    for c in conflicts2:
+        detector.handle_conflict(c.conflict_id, ConflictStatus.CONFIRMED, "阿越", "补录分层C确认")
+        print(f"  冲突 {c.conflict_id} 已由阿越确认")
+
+    print("\n▶ 补录步骤3：补录后重算（新增分层C AUC=0.72）")
+    print("   关键断言：AUC=0.72 < 阈值=0.75 应判定为 ⚠️ 反常")
+    metrics_v2 = [
+        StratificationMetric(layer_name="分层A", auc=0.87, sample_count=10000),
+        StratificationMetric(layer_name="分层B", auc=0.81, sample_count=8000),
+        StratificationMetric(layer_name="分层C", auc=0.72, sample_count=3000),
+    ]
+    record_id_v2 = detector.recalculate_after_supplement(
+        record_id_v1, metrics_v2, supplementary_note_id=note_id_v2
+    )
+    print(f"  重算后记录ID: {record_id_v2}")
+
+    # ========== 停在此处：查看分层指标（带判定依据） ==========
+    print("\n" + "=" * 70)
+    print("【查看点1】分层指标状态变化（原始 v1 → 重算 v2）")
+    print("=" * 70)
+    record_v2 = detector.get_metrics_record(record_id_v2)
+    for m in record_v2.metrics:
+        status = "⚠️ 反常" if m.is_anomaly else "✅ 正常"
+        print(f"\n  📊 {m.layer_name}")
+        print(f"     AUC值:       {m.auc:.4f}")
+        print(f"     判定状态:    {status}")
+        print(f"     判定阈值:    {m.threshold_value}")
+        print(f"     阈值版本:    v{m.threshold_version}")
+        print(f"     阈值来源:    {m.threshold_source_note_id}")
+        print(f"     判定时间:    {m.evaluated_at.strftime('%H:%M:%S') if m.evaluated_at else 'N/A'}")
+        print(f"     结果说明:    {m.anomaly_reason}")
+
+    layer_c = next(m for m in record_v2.metrics if m.layer_name == "分层C")
+    assert layer_c.is_anomaly == True, "BUG修复验证：分层C AUC=0.72必须 < 阈值0.75，应为反常"
+    assert layer_c.threshold_value == 0.75, "BUG修复验证：分层C阈值应为补录笔记中的0.75"
+    assert layer_c.threshold_version == 2, "BUG修复验证：分层C阈值版本应为v2"
+    print("\n  ✅ 核心BUG修复验证通过：分层C AUC=0.72 < 阈值=0.75 → ⚠️ 反常")
+
+    # ========== 停在此处：查看完整历史留痕 ==========
+    print("\n" + "=" * 70)
+    print("【查看点2】完整历史操作留痕")
+    print("=" * 70)
+    for idx, (dt, action, detail) in enumerate(detector.get_history(), 1):
+        print(f"  [{idx:02d}] {dt.strftime('%H:%M:%S')} | {action:<24} | {detail}")
+
+    print("\n" + "=" * 70)
+    print("【查看点3】阈值版本历史变更记录")
+    print("=" * 70)
+    for base_id, history in detector._threshold_history.items():
+        print(f"  笔记基准ID: {base_id}")
+        for ver, thresholds in history:
+            print(f"    v{ver}: {thresholds}")
+
+    print("\n🎯 聚焦测试完成：停在分层指标与历史记录查看点")
+    print("=" * 70 + "\n")
+
+
 if __name__ == "__main__":
     test_normal_material_flow()
     test_wrong_caliber_material()
@@ -371,5 +521,6 @@ if __name__ == "__main__":
     test_duplicate_import_protection()
 
     print("=" * 60)
-    print("🎉 所有测试场景执行完毕!")
-    print("=" * 60)
+    print("🎉 基础场景测试完毕，下面运行聚焦测试（停在查看点）")
+    print("=" * 60 + "\n")
+    test_focus_supplementary_status_and_history()

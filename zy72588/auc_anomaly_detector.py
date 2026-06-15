@@ -139,16 +139,29 @@ class AUCLayerAnomalyDetector:
         self._current_step = 3
         return record_id, check_results
 
-    def recalculate_after_supplement(self, original_record_id: str, new_metrics: List[StratificationMetric]) -> str:
+    def recalculate_after_supplement(
+        self,
+        original_record_id: str,
+        new_metrics: List[StratificationMetric],
+        supplementary_note_id: Optional[str] = None
+    ) -> str:
         if original_record_id not in self._metrics_records:
             raise ValueError(f"原始指标记录 {original_record_id} 不存在")
 
         original = self._metrics_records[original_record_id]
+
+        effective_note_id = supplementary_note_id if supplementary_note_id else original.note_id
+        if effective_note_id not in self._threshold_notes:
+            raise ValueError(f"阈值调参笔记 {effective_note_id} 不存在")
+
+        effective_note = self._threshold_notes[effective_note_id]
+        eval_result = self._evaluate_metrics_against_note(new_metrics, effective_note)
+
         new_record_id = f"metrics_recalc_{uuid.uuid4().hex[:12]}"
 
         new_record = StratificationMetricsRecord(
             record_id=new_record_id,
-            note_id=original.note_id,
+            note_id=effective_note_id,
             bucket_id=original.bucket_id,
             metrics=new_metrics,
             calc_time=datetime.now(),
@@ -158,7 +171,25 @@ class AUCLayerAnomalyDetector:
         )
         self._metrics_records[new_record_id] = new_record
 
-        self._log_history("补录后重算", f"原始记录ID: {original_record_id}, 新记录ID: {new_record_id}")
+        history_detail = (
+            f"原始记录ID: {original_record_id}, 新记录ID: {new_record_id}, "
+            f"使用笔记: {effective_note_id} (版本{effective_note.version}), "
+            f"判定结果: 正常{eval_result['normal']}层, 反常{eval_result['anomaly']}层"
+        )
+        if supplementary_note_id:
+            history_detail += f"（基于补录笔记重算）"
+        self._log_history("补录后重算", history_detail)
+
+        for metric in new_metrics:
+            if metric.layer_name in effective_note.thresholds:
+                threshold = effective_note.thresholds[metric.layer_name]
+                action = "标记反常" if metric.is_anomaly else "判定正常"
+                self._log_history(
+                    f"分层指标重算-{action}",
+                    f"{metric.layer_name}: AUC={metric.auc:.4f}, 阈值={threshold:.4f}, "
+                    f"依据笔记{effective_note_id}版本{effective_note.version}"
+                )
+
         return new_record_id
 
     def export_metrics(self, record_id: str) -> Dict:
@@ -259,24 +290,57 @@ class AUCLayerAnomalyDetector:
 
         return mismatches
 
-    def _check_metrics_match_thresholds(self, note: ThresholdNote, record: StratificationMetricsRecord) -> SelfCheckResult:
-        matched_layers = set()
-        for metric in record.metrics:
-            if metric.layer_name in note.thresholds:
-                matched_layers.add(metric.layer_name)
-                threshold = note.thresholds[metric.layer_name]
-                if metric.auc < threshold and not metric.is_anomaly:
-                    metric.is_anomaly = True
-                    metric.anomaly_reason = f"AUC({metric.auc:.4f}) 低于阈值({threshold:.4f})"
+    def _evaluate_metrics_against_note(self, metrics: List[StratificationMetric], note: ThresholdNote) -> Dict[str, int]:
+        now = datetime.now()
+        normal_count = 0
+        anomaly_count = 0
+        missing_layers = []
 
-        all_layers = set(note.thresholds.keys())
-        missing = all_layers - matched_layers
-        passed = len(missing) == 0
+        for metric in metrics:
+            if metric.layer_name not in note.thresholds:
+                missing_layers.append(metric.layer_name)
+                continue
+
+            threshold = note.thresholds[metric.layer_name]
+            metric.threshold_value = threshold
+            metric.threshold_version = note.version
+            metric.threshold_source_note_id = note.note_id
+            metric.evaluated_at = now
+
+            if metric.auc < threshold:
+                metric.is_anomaly = True
+                metric.anomaly_reason = (
+                    f"AUC({metric.auc:.4f}) 低于阈值({threshold:.4f})，"
+                    f"依据笔记 {note.note_id} 版本{note.version}"
+                )
+                anomaly_count += 1
+            else:
+                metric.is_anomaly = False
+                metric.anomaly_reason = (
+                    f"AUC({metric.auc:.4f}) 不低于阈值({threshold:.4f})，"
+                    f"依据笔记 {note.note_id} 版本{note.version}"
+                )
+                normal_count += 1
+
+        return {
+            "normal": normal_count,
+            "anomaly": anomaly_count,
+            "missing": len(missing_layers),
+            "missing_layers": missing_layers,
+        }
+
+    def _check_metrics_match_thresholds(self, note: ThresholdNote, record: StratificationMetricsRecord) -> SelfCheckResult:
+        result = self._evaluate_metrics_against_note(record.metrics, note)
+        passed = result["missing"] == 0
         return SelfCheckResult(
             check_name="分层指标与阈值匹配检查",
             passed=passed,
-            message="所有分层都有对应指标" if passed else f"缺少分层: {', '.join(missing)}",
-            details={"missing_layers": list(missing)}
+            message=(
+                f"所有分层都有对应指标（正常{result['normal']}层，反常{result['anomaly']}层）"
+                if passed
+                else f"缺少分层: {', '.join(result['missing_layers'])}"
+            ),
+            details=result
         )
 
     def _check_history_consistency(self, record: StratificationMetricsRecord) -> SelfCheckResult:

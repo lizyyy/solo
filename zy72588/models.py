@@ -43,6 +43,10 @@ class StratificationMetric(BaseModel):
     sample_count: int
     is_anomaly: bool = False
     anomaly_reason: Optional[str] = None
+    threshold_value: Optional[float] = None
+    threshold_version: Optional[int] = None
+    threshold_source_note_id: Optional[str] = None
+    evaluated_at: Optional[datetime] = None
 
 
 class StratificationMetricsRecord(BaseModel):
