@@ -301,6 +301,42 @@ data/
 
 ---
 
+## Web 服务 / 页面入口
+
+启动 Web 服务：
+```bash
+resampler serve --host 0.0.0.0 --port 5000
+# 或指定数据目录
+resampler --data-dir ./demo_data serve --port 5001
+```
+
+### 页面路由
+
+| 路由 | 页面 | 说明 |
+|------|------|------|
+| `/` | 会话列表 | 所有重采样会话概览 |
+| `/sessions/<id>` | 会话详情 | 状态分布、三步流程、可疑记录（特征缺失+默认分）重点展示、全量记录列表 |
+| `/sessions/<id>/records/<rid>` | **记录详情**（关键） | 证据留存页：原始行号、特征缺失详情、阿越保留理由、完整审计时间轴、边界规则、原始特征数据 |
+| `/sessions/<id>/export` | **导出明细**（关键） | 数据一致性承诺、7条可疑记录表格、状态变化汇总、CSV预览 |
+
+### REST API 路由
+
+| 路由 | 方法 | 说明 |
+|------|------|------|
+| `/health` | GET | 健康检查 |
+| `/api/sessions` | GET | 会话列表 |
+| `/api/sessions/<id>` | GET | 会话统计摘要 |
+| `/api/sessions/<id>/records` | GET | 记录列表（支持 `status` / `suspicious_only=1` 过滤） |
+| `/api/sessions/<id>/records/<rid>` | GET | 单条记录完整详情 |
+| `/api/sessions/<id>/suspicious` | GET | **可疑记录列表**（特征缺失+默认分） |
+| `/api/sessions/<id>/export.csv` | GET | **导出CSV**（和页面/CLI同一份数据） |
+| `/api/sessions/<id>/review` | POST | 阿越审查训练日志 |
+| `/api/sessions/<id>/leader-review` | POST | 推荐负责人复核 |
+| `/api/sessions/<id>/rollback` | POST | 回滚指定记录到审计节点 |
+| `/api/boundary-rules` | GET | 边界规则（代码同源） |
+
+---
+
 ## 快速演示
 
 生成演示数据和一键运行脚本：

@@ -1,0 +1,37 @@
+{
+  "rec_23083ab936": {
+    "curve_ok": true,
+    "keep_suspicious": true,
+    "note": "训练日志曲线auc稳定在0.82，loss收敛正常。但user_click_rate_7d和item_ctr_7d同时出现线上缺失，已确认是流量切割问题，留给推荐负责人复核是否需要剔除"
+  },
+  "rec_f80e636142": {
+    "curve_ok": true,
+    "keep_suspicious": true,
+    "note": "训练曲线正常，验证集precision/recall平衡。category_heat_score和user_tag_match_score缺失原因未明，不急于归正常，留给推荐负责人看是否需要重新取特征"
+  },
+  "rec_2a0806aa8f": {
+    "curve_ok": false,
+    "exclude": true,
+    "note": "训练曲线出现过拟合（训练acc高但验证acc突降），且price_sensitivity缺失直接给默认分，样本质量差，建议排除"
+  },
+  "rec_54c6adb4bd": {
+    "curve_ok": true,
+    "keep_suspicious": true,
+    "note": "time_decay_factor + item_ctr_7d 双缺失，训练曲线正常但特征来源不确定，留给推荐负责人确认是否属于正常样本分布"
+  },
+  "rec_6a16299df8": {
+    "curve_ok": true,
+    "keep_suspicious": true,
+    "note": "已知线上bug样本（user_click + time_decay缺失），bug已修复但样本已入库，留给推荐负责人决定是否保留这部分历史数据用于训练"
+  },
+  "rec_f338bdf6bb": {
+    "curve_ok": true,
+    "keep_suspicious": true,
+    "note": "三特征缺失（user_click + category_heat + user_tag_match）给默认分，缺失特征数过多，建议推荐负责人仔细评估其对类别平衡权重的影响"
+  },
+  "rec_daeaa3b56c": {
+    "curve_ok": true,
+    "confirm_normal": true,
+    "note": "item_ctr + time_decay缺失，但这两个特征在此样本所属类目本身就属于稀疏特征，训练分布中常见，且训练曲线正常，可以确认正常"
+  }
+}

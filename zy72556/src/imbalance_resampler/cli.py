@@ -445,5 +445,34 @@ echo "========================================="
     os.chmod(output_path / "run_demo.sh", 0o755)
 
 
+@main.command()
+@click.option("--host", default="0.0.0.0", help="监听地址")
+@click.option("--port", default=5000, type=int, help="监听端口")
+@click.option("--debug", is_flag=True, help="调试模式")
+@click.pass_context
+def serve(
+    ctx: click.Context,
+    host: str,
+    port: int,
+    debug: bool,
+):
+    """启动Web服务 - 页面入口和REST API"""
+    from .webapp import run_server
+
+    data_dir = ctx.parent.params.get("data_dir", "./data")
+    click.echo(f"🌐 类别不平衡重采样服务启动")
+    click.echo(f"   数据目录: {data_dir}")
+    click.echo(f"   页面地址: http://{host}:{port}/")
+    click.echo(f"   API文档: http://{host}:{port}/api/boundary-rules")
+    click.echo(f"   健康检查: http://{host}:{port}/health")
+    click.echo("")
+    click.echo("页面入口:")
+    click.echo("  /                      会话列表")
+    click.echo("  /sessions/<id>         会话详情(状态分布+记录列表)")
+    click.echo("  /sessions/<id>/export  导出明细查看")
+    click.echo("  /sessions/<id>/records/<rid>   单条记录详情(证据+留痕)")
+    run_server(host=host, port=port, data_dir=data_dir, debug=debug)
+
+
 if __name__ == "__main__":
     main()

@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+{% block title %}会话详情 - {{ session.session_id }}{% endblock %}
+{% block content %}
+
+<div class="mb-6">
+  <div class="flex items-center gap-3 mb-2">
+    <a href="{{ url_for('index') }}" class="text-slate-500 hover:text-slate-700 text-sm">← 会话列表</a>
+  </div>
+  <div class="flex items-start justify-between flex-wrap gap-4">
+    <div>
+      <div class="flex items-center gap-3 mb-1">
+        <h1 class="text-2xl font-bold text-slate-800 mono">{{ session.session_id }}</h1>
+        <span class="px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-xs">
+          步骤 {{ session.config.get('step', '-') }}：{{ session.config.get('step_name', '') }}
+        </span>
+      </div>
+      <div class="flex items-center gap-4 text-sm text-slate-500">
+        <span>创建人: <span class="font-medium text-slate-700">{{ session.created_by }}</span></span>
+        <span>共 <span class="font-semibold text-slate-700 mono">{{ summary.total_records }}</span> 条记录</span>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <a href="{{ url_for('export_page', session_id=session.session_id) }}"
+         class="px-4 py-2 bg-slate-700 hover:bg-slate-800 text-white text-sm rounded-lg transition flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        导出明细
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- 三步流程进度条 -->
+<div class="bg-white rounded-xl border border-slate-200 p-5 mb-6">
+  <h3 class="text-sm font-semibold text-slate-700 mb-4">标准处理流程</h3>
+  <div class="grid grid-cols-3 gap-4">
+    {% set step = session.config.get('step', 0) | int %}
+    {% for i in [1,2,3] %}
+    <div class="relative {% if i <= step %}opacity-100{% else %}opacity-40{% endif %}">
+      <div class="flex items-center gap-3 mb-2">
+        <div class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm
+          {% if i < step %}bg-green-500 text-white{% elif i == step %}bg-blue-600 text-white ring-4 ring-blue-100{% else %}bg-slate-200 text-slate-500{% endif %}">
+          {% if i < step %}✓{% else %}{{ i }}{% endif %}
+        </div>
+        <div>
+          <div class="text-sm font-semibold {% if i == step %}text-blue-700{% else %}text-slate-700{% endif %}">
+            {% if i == 1 %}特征快照导入
+            {% elif i == 2 %}阿越审查训练日志
+            {% else %}可解释摘要更新{% endif %}
+          </div>
+          <div class="text-xs text-slate-500">
+            {% if i == 1 %}自动检测特征缺失+默认分
+            {% elif i == 2 %}可疑记录留待推荐负责人
+            {% else %}摘要生成 + 结果说明{% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- 状态分布卡片 -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+  <div class="bg-white rounded-xl border border-slate-200 p-4">
+    <div class="text-xs text-slate-500 mb-1">总记录数</div>
+    <div class="text-2xl font-bold text-slate-800 mono">{{ summary.total_records }}</div>
+  </div>
+  <div class="bg-white rounded-xl border-2 border-red-200 bg-red-50/30 p-4">
+    <div class="text-xs text-red-600 mb-1 font-medium">⚠ 可疑(特征缺失+默认分)</div>
+    <div class="text-2xl font-bold text-red-700 mono">{{ summary.suspicious_default_score_count }}</div>
+  </div>
+  <div class="bg-white rounded-xl border-2 border-orange-200 bg-orange-50/30 p-4">
+    <div class="text-xs text-orange-700 mb-1 font-medium">待推荐负责人复核</div>
+    <div class="text-2xl font-bold text-orange-700 mono">{{ overview.needs_recheck_count }}</div>
+  </div>
+  <div class="bg-white rounded-xl border border-slate-200 p-4">
+    <div class="text-xs text-slate-500 mb-1">已排除</div>
+    <div class="text-2xl font-bold text-slate-600 mono">{{ summary.status_distribution.get('excluded', 0) }}</div>
+  </div>
+</div>
+
+<!-- 状态分布明细 -->
+<div class="bg-white rounded-xl border border-slate-200 p-5 mb-6">
+  <h3 class="text-sm font-semibold text-slate-700 mb-4">状态分布明细</h3>
+  <div class="flex flex-wrap gap-2">
+    {% for s in status_rows %}
+    <div class="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-50 border border-slate-200">
+      <span class="px-2 py-0.5 text-white text-xs rounded {{ s.badge }}">{{ s.label }}</span>
+      <span class="text-sm font-semibold text-slate-700 mono">{{ s.count }}</span>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- 可疑记录重点区域 -->
+{% if suspicious_records %}
+<div class="bg-gradient-to-br from-red-50 via-white to-orange-50 rounded-xl border-2 border-red-200 p-5 mb-6">
+  <div class="flex items-center justify-between mb-4">
+    <div>
+      <h3 class="text-red-700 font-bold flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+        线上特征缺失却给了默认分 - 共 {{ suspicious_records|length }} 条
+      </h3>
+      <p class="text-xs text-slate-600 mt-1">这些记录特征缺失时使用默认分，不会自动归正常，阿越审查后留待推荐负责人复核</p>
+    </div>
+  </div>
+
+  <div class="space-y-3">
+    {% for r in suspicious_records %}
+    <a href="{{ url_for('record_detail', session_id=session.session_id, record_id=r.record_id) }}"
+       class="block bg-white rounded-lg border border-red-200 p-4 hover:shadow-md transition">
+      <div class="flex items-start justify-between gap-4 flex-wrap">
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-3 mb-2 flex-wrap">
+            <span class="mono text-sm font-semibold text-blue-700">{{ r.record_id }}</span>
+            <span class="px-2 py-0.5 bg-slate-100 text-slate-600 text-xs rounded mono">行#{{ r.original_line_number }}</span>
+            <span class="px-2 py-0.5 {{ r.status_badge }} text-white text-xs rounded">{{ r.status_label }}</span>
+            <span class="px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded font-medium">
+              模型分 = {{ r.model_score }} (默认分阈值)
+            </span>
+          </div>
+          <div class="text-xs text-slate-600 mb-2">
+            <span class="font-medium text-red-600">缺失特征({{ r.missing_count }}):</span>
+            {% for mf in r.missing_features %}
+            <span class="inline-block px-1.5 py-0.5 bg-red-50 border border-red-200 rounded mono mr-1 mb-1">{{ mf }}</span>
+            {% endfor %}
+          </div>
+          {% if r.ayue_review_note %}
+          <div class="text-xs bg-blue-50 border-l-2 border-blue-400 p-2 rounded text-blue-800">
+            <span class="font-semibold">阿越意见:</span> {{ r.ayue_review_note }}
+          </div>
+          {% endif %}
+          {% if r.explanation_summary %}
+          <div class="text-xs text-slate-600 mt-2 mono break-words">{{ r.explanation_summary }}</div>
+          {% endif %}
+        </div>
+        <div class="text-right shrink-0">
+          <div class="text-xs text-slate-500 mb-1">审计日志</div>
+          <div class="text-lg font-bold text-slate-700 mono">{{ r.audit_log_count }} 条</div>
+          <div class="text-xs text-blue-600 mt-1">查看证据 →</div>
+        </div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<!-- 完整记录列表 -->
+<div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+  <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
+    <h3 class="font-semibold text-slate-700">全部记录 ({{ records|length }})</h3>
+    <span class="text-xs text-slate-500">点击记录ID查看详情和完整证据链</span>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-50 border-b border-slate-200 text-xs uppercase tracking-wider text-slate-600">
+        <tr>
+          <th class="px-4 py-3 text-left">记录ID / 行号</th>
+          <th class="px-4 py-3 text-left">状态</th>
+          <th class="px-4 py-3 text-right">模型分</th>
+          <th class="px-4 py-3 text-center">缺失特征</th>
+          <th class="px-4 py-3 text-center">用默认分</th>
+          <th class="px-4 py-3 text-right">权重</th>
+          <th class="px-4 py-3 text-center">审计</th>
+          <th class="px-4 py-3 text-left">可解释摘要</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        {% for r in records %}
+        <tr class="{% if r.is_suspicious %}bg-red-50/40{% else %}hover:bg-slate-50{% endif %} transition">
+          <td class="px-4 py-3">
+            <a href="{{ url_for('record_detail', session_id=session.session_id, record_id=r.record_id) }}"
+               class="mono text-xs text-blue-700 font-medium hover:underline">{{ r.record_id }}</a>
+            <div class="text-xs text-slate-400 mono">行#{{ r.original_line_number }}</div>
+          </td>
+          <td class="px-4 py-3">
+            <span class="px-2 py-0.5 {{ r.status_badge }} text-white text-xs rounded whitespace-nowrap">
+              {{ r.status_label }}
+            </span>
+          </td>
+          <td class="px-4 py-3 text-right mono text-xs {{ 'text-red-600 font-bold' if r.used_default_score else 'text-slate-700' }}">
+            {{ r.model_score }}
+          </td>
+          <td class="px-4 py-3 text-center">
+            {% if r.has_missing_features %}
+            <span class="text-xs px-2 py-0.5 bg-red-100 text-red-700 rounded">{{ r.missing_count }} 个</span>
+            {% else %}
+            <span class="text-xs text-slate-400">-</span>
+            {% endif %}
+          </td>
+          <td class="px-4 py-3 text-center">
+            {% if r.used_default_score %}
+            <span class="text-xs font-bold text-red-600">⚠ 是</span>
+            {% else %}
+            <span class="text-xs text-slate-400">否</span>
+            {% endif %}
+          </td>
+          <td class="px-4 py-3 text-right mono text-xs text-slate-700">{{ r.final_weight }}</td>
+          <td class="px-4 py-3 text-center mono text-xs">
+            <a href="{{ url_for('record_detail', session_id=session.session_id, record_id=r.record_id) }}#audit"
+               class="text-slate-600 hover:text-blue-600">{{ r.audit_log_count }}</a>
+          </td>
+          <td class="px-4 py-3 text-xs text-slate-600 max-w-xs truncate" title="{{ r.explanation_summary or '' }}">
+            {{ r.explanation_summary or '-' }}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

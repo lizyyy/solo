@@ -1,0 +1,296 @@
+{% extends "base.html" %}
+{% block title %}记录详情 - {{ rec_view.record_id }}{% endblock %}
+{% block content %}
+
+<style>
+  .timeline:before {
+    content: "";
+    position: absolute;
+    left: 13px;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: linear-gradient(180deg, #dbeafe 0%, #e2e8f0 100%);
+  }
+</style>
+
+<div class="mb-6">
+  <div class="flex items-center gap-3 mb-2 text-sm">
+    <a href="{{ url_for('index') }}" class="text-slate-500 hover:text-slate-700">会话列表</a>
+    <span class="text-slate-300">/</span>
+    <a href="{{ url_for('session_detail', session_id=session_id) }}" class="text-slate-500 hover:text-slate-700 mono">{{ session_id }}</a>
+    <span class="text-slate-300">/</span>
+    <span class="text-slate-700 font-medium mono">{{ rec_view.record_id }}</span>
+  </div>
+  <div class="flex items-start justify-between gap-4 flex-wrap">
+    <div>
+      <div class="flex items-center gap-3 flex-wrap mb-2">
+        <h1 class="text-2xl font-bold text-slate-800 mono">{{ rec_view.record_id }}</h1>
+        <span class="px-3 py-1 {{ rec_view.status_badge }} text-white text-sm rounded-full font-medium">
+          {{ rec_view.status_label }}
+        </span>
+        {% if rec_view.is_suspicious %}
+        <span class="px-3 py-1 bg-red-100 border border-red-300 text-red-700 text-sm rounded-full font-semibold">
+          ⚠ 特征缺失 + 使用默认分
+        </span>
+        {% endif %}
+      </div>
+      <div class="flex items-center gap-4 text-sm text-slate-500 flex-wrap">
+        <span>特征快照: <span class="mono text-slate-700">{{ rec_view.snapshot_id }}</span></span>
+        <span>原始行号: <span class="mono text-slate-700 font-semibold">#{{ rec_view.original_line_number }}</span></span>
+      </div>
+    </div>
+    <a href="{{ url_for('session_detail', session_id=session_id) }}"
+       class="px-4 py-2 border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg text-sm">
+      ← 返回会话
+    </a>
+  </div>
+</div>
+
+<!-- 证据卡片区 -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
+
+  <!-- 核心证据：特征缺失 + 默认分 -->
+  <div class="lg:col-span-2 space-y-5">
+
+    {% if rec_view.is_suspicious %}
+    <div class="bg-gradient-to-br from-red-50 to-orange-50 rounded-xl border-2 border-red-300 p-5">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center text-white">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M4.93 19h14.14c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.2 16c-.77 1.33.19 3 1.73 3z"/></svg>
+        </div>
+        <div>
+          <h3 class="font-bold text-red-800 text-lg">线上特征缺失，却给了默认分</h3>
+          <p class="text-xs text-red-600">这是推荐负责人需要重点复核的记录</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div class="bg-white rounded-lg border border-red-200 p-3">
+          <div class="text-xs text-red-600 font-semibold mb-2">❌ 缺失的特征 ({{ rec_view.missing_count }} 个)</div>
+          <div class="flex flex-wrap gap-1.5">
+            {% for mf in rec_view.missing_features %}
+            <span class="px-2 py-1 bg-red-50 border border-red-200 text-red-700 rounded mono text-xs font-medium">{{ mf }}</span>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="bg-white rounded-lg border border-red-200 p-3">
+          <div class="text-xs text-red-600 font-semibold mb-2">⚠ 模型分精确命中默认分阈值</div>
+          <div class="flex items-baseline gap-2">
+            <span class="text-2xl font-bold text-red-700 mono">{{ rec_view.model_score }}</span>
+            <span class="text-xs text-slate-500">(默认分阈值 = 0.5)</span>
+          </div>
+          {% if rec_view.default_score_reason %}
+          <div class="text-xs text-slate-600 mt-2 bg-red-50 p-2 rounded border border-red-100">
+            {{ rec_view.default_score_reason }}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- 阿越审查意见 -->
+    <div class="bg-blue-50 rounded-xl border-2 border-blue-200 p-5">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center text-white font-bold">
+          阿越
+        </div>
+        <div>
+          <h3 class="font-bold text-blue-900">实验平台负责人阿越的审查意见</h3>
+          <p class="text-xs text-blue-600">
+            训练日志曲线检查：
+            {% if record.training_log_curve_check == True %}
+            <span class="font-semibold text-green-700">✓ 通过</span>
+            {% elif record.training_log_curve_check == False %}
+            <span class="font-semibold text-red-700">✗ 未通过</span>
+            {% else %}
+            <span class="font-semibold text-slate-500">未检查</span>
+            {% endif %}
+          </p>
+        </div>
+      </div>
+      {% if rec_view.ayue_review_note %}
+      <div class="bg-white rounded-lg border border-blue-200 p-4 text-blue-900 text-sm leading-relaxed">
+        "{{ rec_view.ayue_review_note }}"
+      </div>
+      {% else %}
+      <div class="text-xs text-blue-500 italic">阿越尚未填写审查意见</div>
+      {% endif %}
+    </div>
+
+    <!-- 可解释摘要 -->
+    <div class="bg-white rounded-xl border border-slate-200 p-5">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="font-semibold text-slate-700">📝 可解释摘要</h3>
+        <span class="text-xs text-slate-400">导出明细、接口、页面展示内容一致</span>
+      </div>
+      <div class="bg-slate-50 rounded-lg border border-slate-200 p-4 text-slate-700 text-sm mb-3">
+        {{ rec_view.explanation_summary or '<span class="text-slate-400 italic">未生成</span>' | safe }}
+      </div>
+      {% if record.explanation_detail %}
+      <details class="text-xs">
+        <summary class="cursor-pointer text-slate-500 hover:text-slate-700 mb-2">展开详细说明</summary>
+        <pre class="bg-slate-900 text-green-300 rounded-lg p-4 overflow-x-auto whitespace-pre-wrap text-xs mono">{{ record.explanation_detail }}</pre>
+      </details>
+      {% endif %}
+    </div>
+
+  </div>
+
+  <!-- 右侧：基础信息 + 边界规则 -->
+  <div class="space-y-5">
+
+    <div class="bg-white rounded-xl border border-slate-200 p-5">
+      <h3 class="font-semibold text-slate-700 mb-3">基础信息</h3>
+      <dl class="space-y-2 text-sm">
+        <div class="flex justify-between">
+          <dt class="text-slate-500">真实标签</dt>
+          <dd class="mono font-medium text-slate-700">{{ rec_view.true_label or '-' }}</dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-slate-500">模型分</dt>
+          <dd class="mono font-medium {{ 'text-red-600' if rec_view.used_default_score else 'text-slate-700' }}">{{ rec_view.model_score }}</dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-slate-500">最终权重</dt>
+          <dd class="mono font-bold text-blue-700">{{ rec_view.final_weight }}</dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-slate-500">人工改动</dt>
+          <dd class="mono font-medium text-slate-700">{{ rec_view.manual_edits_count }} 次</dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-slate-500">审计记录</dt>
+          <dd class="mono font-medium text-slate-700">{{ rec_view.audit_log_count }} 条</dd>
+        </div>
+      </dl>
+    </div>
+
+    <div class="bg-slate-900 rounded-xl p-5 text-slate-100">
+      <h3 class="font-semibold text-slate-200 mb-3 text-sm">📋 边界规则（代码同源）</h3>
+      <pre class="text-xs mono text-green-300 whitespace-pre-wrap leading-relaxed">{{ boundary_rules_text }}</pre>
+    </div>
+
+    <div class="bg-slate-50 rounded-xl border border-dashed border-slate-300 p-4 text-xs text-slate-500 leading-relaxed">
+      <div class="font-medium text-slate-700 mb-1">💡 证据留存说明</div>
+      本页面所有数据来自单一 JSON 会话文件。导出 CSV、REST API、页面展示读取同一份数据，保证一致。原始行号已锁定，回滚不删除原记录，仅生成新记录并标记排除。
+    </div>
+
+  </div>
+
+</div>
+
+<!-- 审计日志时间轴 -->
+<div id="audit" class="bg-white rounded-xl border border-slate-200 p-5 mb-6">
+  <div class="flex items-center justify-between mb-5">
+    <div>
+      <h3 class="font-bold text-slate-800 text-lg">📜 完整审计时间轴 · 历史留痕</h3>
+      <p class="text-xs text-slate-500 mt-1">从导入到当前的每一步操作，支持回滚到任意节点</p>
+    </div>
+    <span class="px-2 py-1 bg-slate-100 text-slate-600 text-xs rounded mono">
+      共 {{ audit_log|length }} 条记录
+    </span>
+  </div>
+
+  <div class="relative timeline pl-10">
+    {% for log in audit_log %}
+    <div class="relative pb-6 last:pb-0">
+      <div class="absolute -left-10 top-0 flex flex-col items-center">
+        <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ring-4 ring-white
+          {% if log.action == 'import' %}bg-green-500 text-white
+          {% elif log.action == 'status_change' %}bg-blue-500 text-white
+          {% elif log.action == 'manual_edit' %}bg-purple-500 text-white
+          {% elif log.action == 'review_comment' %}bg-indigo-500 text-white
+          {% elif log.action == 'summary_update' %}bg-amber-500 text-white
+          {% elif log.action == 'rollback' %}bg-red-500 text-white
+          {% else %}bg-slate-400 text-white{% endif %}">
+          {{ log.index }}
+        </div>
+      </div>
+
+      <div class="bg-slate-50 rounded-lg border border-slate-200 p-4">
+        <div class="flex items-center gap-3 flex-wrap mb-2">
+          <span class="px-2 py-0.5 bg-slate-700 text-white text-xs rounded">
+            {{ log.action }}
+          </span>
+          <span class="text-xs text-slate-500 mono">{{ log.timestamp }}</span>
+          <span class="text-xs text-slate-500">操作人：</span>
+          <span class="px-2 py-0.5 text-xs rounded
+            {% if log.operator == 'ayue' %}bg-blue-100 text-blue-700 font-medium
+            {% elif log.operator == 'recommend_leader' %}bg-green-100 text-green-700 font-medium
+            {% elif log.operator == 'system' %}bg-slate-200 text-slate-700
+            {% else %}bg-slate-100 text-slate-700{% endif %}">
+            {{ log.operator }}
+          </span>
+        </div>
+
+        {% if log.comment %}
+        <div class="text-sm text-slate-700 bg-white rounded border border-slate-200 p-3 mb-2">
+          {{ log.comment }}
+        </div>
+        {% endif %}
+
+        {% if log.field_name %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+          <div class="bg-slate-100 rounded p-2">
+            <div class="text-slate-500 mb-0.5">字段: <span class="mono font-medium text-slate-700">{{ log.field_name }}</span></div>
+            {% if log.old_value or log.old_value == 0 or log.old_value == False %}
+            <div class="mt-1">
+              <span class="text-slate-500">原值:</span>
+              <span class="mono text-red-600 ml-1">{{ log.old_value }}</span>
+            </div>
+            {% endif %}
+            {% if log.new_value or log.new_value == 0 or log.new_value == False %}
+            <div class="mt-1">
+              <span class="text-slate-500">新值:</span>
+              <span class="mono text-green-700 ml-1">{{ log.new_value }}</span>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- 原始数据 -->
+<details class="bg-white rounded-xl border border-slate-200 p-5">
+  <summary class="cursor-pointer font-semibold text-slate-700 hover:text-slate-900">
+    🔎 查看特征快照原始数据 (行#{{ rec_view.original_line_number }})
+  </summary>
+  <div class="mt-4 overflow-x-auto">
+    <table class="text-xs w-full">
+      <thead class="text-left">
+        <tr class="border-b border-slate-200">
+          <th class="px-3 py-2 text-slate-500">特征/字段</th>
+          <th class="px-3 py-2 text-slate-500">值</th>
+          <th class="px-3 py-2 text-slate-500">状态</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        {% for k, v in record.snapshot.raw_data.items() %}
+        <tr>
+          <td class="px-3 py-2 mono text-slate-700 font-medium">{{ k }}</td>
+          <td class="px-3 py-2 mono
+            {% if k in rec_view.missing_features %}text-red-600 font-bold bg-red-50
+            {% else %}text-slate-600{% endif %}">
+            {{ v }}
+          </td>
+          <td class="px-3 py-2">
+            {% if k in rec_view.missing_features %}
+            <span class="px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded">缺失</span>
+            {% else %}
+            <span class="text-slate-400 text-xs">正常</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</details>
+
+{% endblock %}

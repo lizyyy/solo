@@ -24,4 +24,13 @@ __all__ = [
     "DataStore",
     "WorkflowEngine",
     "ExplanationGenerator",
+    "create_app",
+    "run_server",
 ]
+
+
+def __getattr__(name):
+    if name in ("create_app", "run_server"):
+        from .webapp import create_app, run_server
+        return create_app if name == "create_app" else run_server
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
