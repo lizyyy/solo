@@ -116,27 +116,46 @@ def demo_3_workflow_and_threshold():
     )
     print(f"  生成分层: {step3['total_items']} 条")
     print(f"  状态统计: {step3['summary']['status_counts']}")
+    print(f"  第三步后工作流状态: {ctx.current_step.value}")
 
     # ===== 模拟: 阈值被改了但报告还是旧值 =====
     print("\n⚠️  模拟: 阈值从 0.5 改成 0.7，但分层报告还是按 0.5 生成的")
+    print("  修改前参数YAML阈值:", params.get_threshold("anomaly_score"))
     params.update_threshold("anomaly_score", 0.7, "xiaoqiao", "调整阈值")
+    print("  修改后参数YAML阈值:", params.get_threshold("anomaly_score"))
 
-    checker = ThresholdChecker()
-    scan = checker.scan_all_items_for_mismatch(ctx.layer_result, params, "system", auto_suspend=True)
-    print(f"  检测到阈值不一致: {scan['mismatch_count']} 条")
-    for m in scan['mismatches']:
-        print(f"    - 记录{m['record_id']}: 报告阈值={m['reported_threshold']}, 当前阈值={m['actual_threshold']}")
+    print("\n🔍 通过工作流引擎检测阈值不一致（不再直接调用底层checker）")
+    mismatch_result = engine.handle_detected_mismatches(
+        ctx, "system", reason="参数YAML阈值被修改，与分层报告不一致")
+
+    print(f"  检测到阈值不一致: {mismatch_result['mismatch_count']} 条")
+    print(f"  不一致来源统计: {mismatch_result['source_counts']}")
+    for m in mismatch_result['mismatches']:
+        source_label = {
+            "params_yaml_changed": "参数YAML变更",
+            "candidate_table_changed": "召回候选表变更",
+            "both_changed": "两者都变了",
+            "unknown": "未知",
+        }.get(m['mismatch_source'], m['mismatch_source'])
+        print(f"    - 记录{m['record_id']}: 报告阈值={m['reported_threshold']}, 当前阈值={m['actual_threshold']}, 来源: {source_label}")
 
     print(f"\n  📌 当前工作流状态: {ctx.current_step.value}")
     print(f"  📌 待数据科学家复核: {ctx.pending_review_items}")
+    assert ctx.current_step.value == "review_by_data_scientist", f"工作流状态应为review_by_data_scientist，实际为{ctx.current_step.value}"
+    assert len(ctx.pending_review_items) == 3, f"待复核列表应为3条，实际为{len(ctx.pending_review_items)}"
+    print("  ✅ 不一致记录已正确进入数据科学家复核队列")
 
     # ===== 数据科学家复核 =====
     print("\n👨‍🔬 数据科学家复核:")
     for rec_id in ctx.pending_review_items.copy():
-        result = engine.scientist_review(ctx, rec_id, "confirm_normal", "data_scientist", "阈值调整后确认正常")
-        print(f"  记录{rec_id}: {result['new_status']}")
+        item = ctx.layer_result.get_item(rec_id)
+        print(f"  处理记录{rec_id}: 状态={item.status.value}, 不一致来源={item.mismatch_source.value}")
+        result = engine.scientist_review(ctx, rec_id, "confirm_normal", "data_scientist", f"阈值调整后确认正常，来源为参数YAML变更")
+        print(f"    → 复核结果: {result['new_status']}, 剩余待复核: {result['pending_count']}")
 
     print(f"\n  ✅ 复核完成，工作流状态: {ctx.current_step.value}")
+    assert ctx.current_step.value == "completed", f"工作流状态应为completed，实际为{ctx.current_step.value}"
+    assert len(ctx.pending_review_items) == 0, f"待复核列表应为空，实际为{ctx.pending_review_items}"
     print("✅ 验证通过: 三步工作流 + 阈值不一致自动悬置 + 科学家复核")
 
     return ctx

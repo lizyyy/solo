@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-from models.layer import LayerResult, LayerItem, LayerStatus, ResponsibleRole
+from models.layer import LayerResult, LayerItem, LayerStatus, ResponsibleRole, MismatchSource
 from models.candidate import CandidateTable
 from models.params import ParamsYAML
 from core.history_tracer import HistoryTracer
@@ -92,7 +92,14 @@ class ReportGenerator:
                 lines.append(f"   🎯 具体动作：{item.reason.next_action}")
 
         if item.threshold_mismatch:
+            source_label = {
+                "params_yaml_changed": "参数YAML被修改",
+                "candidate_table_changed": "召回候选表被修改",
+                "both_changed": "参数YAML和召回候选表都被修改",
+                "unknown": "来源未知",
+            }.get(item.mismatch_source.value, item.mismatch_source.value)
             lines.append(f"   ⚠️  【警告】阈值不一致！报告时={item.reported_threshold}，当前={item.actual_threshold}")
+            lines.append(f"      → 不一致来源：{source_label}")
             lines.append(f"      → 已悬置，等待数据科学家复核")
 
         if candidate_table:

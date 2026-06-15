@@ -20,6 +20,13 @@ class LayerStatus(str, Enum):
     SUSPENDED = "suspended"
 
 
+class MismatchSource(str, Enum):
+    CANDIDATE_TABLE_CHANGED = "candidate_table_changed"
+    PARAMS_YAML_CHANGED = "params_yaml_changed"
+    BOTH_CHANGED = "both_changed"
+    UNKNOWN = "unknown"
+
+
 @dataclass
 class DecisionReason:
     why_kept: str = ""
@@ -69,16 +76,19 @@ class LayerItem(VersionedModel):
         self.reason: DecisionReason = DecisionReason()
         self.lineage: LineageRef = LineageRef()
         self.threshold_mismatch: bool = False
+        self.mismatch_source: MismatchSource = MismatchSource.UNKNOWN
         self.reported_threshold: Optional[float] = None
         self.actual_threshold: Optional[float] = None
 
-    def mark_threshold_mismatch(self, reported: float, actual: float, operator: str) -> None:
+    def mark_threshold_mismatch(self, reported: float, actual: float, operator: str,
+                                 source: MismatchSource = MismatchSource.PARAMS_YAML_CHANGED) -> None:
         self.update({
             "threshold_mismatch": True,
             "reported_threshold": reported,
             "actual_threshold": actual,
             "status": LayerStatus.SUSPENDED,
-        }, operator, reason="检测到阈值不一致，悬置等待数据科学家复核")
+            "mismatch_source": source,
+        }, operator, reason=f"检测到阈值不一致（来源: {source.value}），悬置等待数据科学家复核")
 
     def set_decision(self, reason: DecisionReason, status: LayerStatus, operator: str) -> List:
         return self.update({
@@ -92,6 +102,7 @@ class LayerItem(VersionedModel):
             "reason": self.reason.to_dict(),
             "lineage": self.lineage.to_dict(),
             "status": self.status.value,
+            "mismatch_source": self.mismatch_source.value,
         })
         return base
 

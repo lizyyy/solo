@@ -1,46 +1,97 @@
 from typing import Any, Dict, List, Optional, Tuple
 from models.params import ParamsYAML
-from models.layer import LayerItem, LayerResult, LayerStatus
+from models.candidate import CandidateTable
+from models.layer import LayerItem, LayerResult, LayerStatus, MismatchSource
 
 
 class ThresholdChecker:
     @staticmethod
+    def detect_mismatch_source(
+        item: LayerItem,
+        current_params: ParamsYAML,
+        original_params: Optional[ParamsYAML] = None,
+        current_candidate_table: Optional[CandidateTable] = None,
+        original_candidate_table: Optional[CandidateTable] = None,
+    ) -> MismatchSource:
+        params_changed = False
+        candidate_changed = False
+
+        if original_params and current_params:
+            if original_params.version != current_params.version:
+                params_changed = True
+            elif original_params.get_threshold(item.lineage.threshold_name) != current_params.get_threshold(item.lineage.threshold_name):
+                params_changed = True
+
+        if current_candidate_table and original_candidate_table:
+            if original_candidate_table.version != current_candidate_table.version:
+                candidate_changed = True
+            else:
+                record = current_candidate_table.get_record(item.record_id)
+                orig_record = original_candidate_table.get_record(item.record_id)
+                if record and orig_record:
+                    if record.get_record_hash() != orig_record.get_record_hash():
+                        candidate_changed = True
+
+        if params_changed and candidate_changed:
+            return MismatchSource.BOTH_CHANGED
+        elif params_changed:
+            return MismatchSource.PARAMS_YAML_CHANGED
+        elif candidate_changed:
+            return MismatchSource.CANDIDATE_TABLE_CHANGED
+        else:
+            return MismatchSource.UNKNOWN
+
+    @staticmethod
     def check_threshold_consistency(
         item: LayerItem,
         current_params: ParamsYAML,
-        operator: str
-    ) -> Tuple[bool, Optional[float], Optional[float]]:
+        operator: str,
+        original_params: Optional[ParamsYAML] = None,
+        current_candidate_table: Optional[CandidateTable] = None,
+        original_candidate_table: Optional[CandidateTable] = None,
+    ) -> Tuple[bool, Optional[float], Optional[float], MismatchSource]:
         threshold_name = item.lineage.threshold_name
         if not threshold_name:
-            return True, None, None
+            return True, None, None, MismatchSource.UNKNOWN
 
         actual_threshold = current_params.get_threshold(threshold_name)
         reported_threshold = item.lineage.threshold_value_at_time
 
+        mismatch_source = MismatchSource.UNKNOWN
+        is_consistent = True
+
         if actual_threshold is not None and reported_threshold is not None:
             if actual_threshold != reported_threshold:
-                return False, reported_threshold, actual_threshold
+                is_consistent = False
+                mismatch_source = ThresholdChecker.detect_mismatch_source(
+                    item, current_params, original_params,
+                    current_candidate_table, original_candidate_table
+                )
 
-        return True, reported_threshold, actual_threshold
+        return is_consistent, reported_threshold, actual_threshold, mismatch_source
 
     @staticmethod
     def scan_all_items_for_mismatch(
         layer_result: LayerResult,
         current_params: ParamsYAML,
         operator: str,
-        auto_suspend: bool = True
+        auto_suspend: bool = True,
+        original_params: Optional[ParamsYAML] = None,
+        current_candidate_table: Optional[CandidateTable] = None,
+        original_candidate_table: Optional[CandidateTable] = None,
     ) -> Dict[str, Any]:
         mismatches = []
         ok_count = 0
 
         for item in layer_result.items.values():
-            is_consistent, reported, actual = ThresholdChecker.check_threshold_consistency(
-                item, current_params, operator
+            is_consistent, reported, actual, source = ThresholdChecker.check_threshold_consistency(
+                item, current_params, operator,
+                original_params, current_candidate_table, original_candidate_table
             )
 
             if not is_consistent:
                 if auto_suspend and not item.threshold_mismatch:
-                    item.mark_threshold_mismatch(reported, actual, operator)
+                    item.mark_threshold_mismatch(reported, actual, operator, source)
 
                 mismatches.append({
                     "record_id": item.record_id,
@@ -49,15 +100,22 @@ class ThresholdChecker:
                     "actual_threshold": actual,
                     "score": item.score,
                     "status": item.status.value,
+                    "mismatch_source": source.value,
                 })
             else:
                 ok_count += 1
+
+        source_counts = {}
+        for m in mismatches:
+            src = m["mismatch_source"]
+            source_counts[src] = source_counts.get(src, 0) + 1
 
         return {
             "total_items": len(layer_result.items),
             "ok_count": ok_count,
             "mismatch_count": len(mismatches),
             "mismatches": mismatches,
+            "source_counts": source_counts,
             "auto_suspended": auto_suspend,
         }
 

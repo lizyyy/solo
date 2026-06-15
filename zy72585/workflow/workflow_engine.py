@@ -1,3 +1,4 @@
+from copy import deepcopy
 from enum import Enum
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -5,7 +6,7 @@ from typing import Any, Dict, List, Optional, Callable
 
 from models.candidate import CandidateTable, CandidateRecord
 from models.params import ParamsYAML
-from models.layer import LayerResult, LayerItem, LayerStatus, DecisionReason, ResponsibleRole
+from models.layer import LayerResult, LayerItem, LayerStatus, DecisionReason, ResponsibleRole, MismatchSource
 from core.dedup_engine import DedupEngine
 from core.threshold_checker import ThresholdChecker
 
@@ -27,6 +28,8 @@ class WorkflowContext:
     threshold_mismatches_found: bool = False
     pending_review_items: List[str] = field(default_factory=list)
     step_logs: List[Dict[str, Any]] = field(default_factory=list)
+    _original_params_snapshot: Optional[ParamsYAML] = None
+    _original_candidate_snapshot: Optional[CandidateTable] = None
 
     def log_step(self, step: WorkflowStep, operator: str, details: Dict[str, Any] = None) -> None:
         self.step_logs.append({
@@ -153,8 +156,14 @@ class WorkflowEngine:
         ctx.layer_result = layer_result
         ctx.current_step = WorkflowStep.STEP_3_UPDATE_LAYERS
 
+        ctx._original_params_snapshot = deepcopy(ctx.params_yaml)
+        ctx._original_candidate_snapshot = deepcopy(ctx.candidate_table)
+
         scan_result = self.threshold_checker.scan_all_items_for_mismatch(
-            layer_result, ctx.params_yaml, operator, auto_suspend=True
+            layer_result, ctx.params_yaml, operator, auto_suspend=True,
+            original_params=ctx._original_params_snapshot,
+            original_candidate_table=ctx._original_candidate_snapshot,
+            current_candidate_table=ctx.candidate_table,
         )
 
         if scan_result["mismatch_count"] > 0:
@@ -177,6 +186,39 @@ class WorkflowEngine:
             "total_items": layer_result.get_item_count(),
             "threshold_scan": scan_result,
             "summary": layer_result.get_summary(),
+        }
+
+    def handle_detected_mismatches(
+        self,
+        ctx: WorkflowContext,
+        operator: str,
+        reason: str = "后续检测到阈值不一致"
+    ) -> Dict[str, Any]:
+        assert ctx.layer_result is not None, "请先生成分层结果"
+        assert ctx._original_params_snapshot is not None, "未找到原始参数快照，请先完成第三步"
+
+        scan_result = self.threshold_checker.scan_all_items_for_mismatch(
+            ctx.layer_result, ctx.params_yaml, operator, auto_suspend=True,
+            original_params=ctx._original_params_snapshot,
+            original_candidate_table=ctx._original_candidate_snapshot,
+            current_candidate_table=ctx.candidate_table,
+        )
+
+        if scan_result["mismatch_count"] > 0:
+            ctx.threshold_mismatches_found = True
+            ctx.pending_review_items = [m["record_id"] for m in scan_result["mismatches"]]
+            ctx.current_step = WorkflowStep.REVIEW_BY_SCIENTIST
+            ctx.log_step(WorkflowStep.REVIEW_BY_SCIENTIST, operator, {
+                "reason": reason,
+                "scan_result": scan_result,
+            })
+
+        return {
+            "mismatch_count": scan_result["mismatch_count"],
+            "source_counts": scan_result.get("source_counts", {}),
+            "pending_review_items": ctx.pending_review_items.copy(),
+            "current_step": ctx.current_step.value,
+            "mismatches": scan_result["mismatches"],
         }
 
     def scientist_review(
