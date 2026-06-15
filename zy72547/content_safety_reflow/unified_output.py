@@ -102,6 +102,23 @@ class UnifiedOutput:
                 "remarks": result.active_manual_judgment.remarks,
             }
 
+        overridden_judgments = [mj for mj in result.manual_judgments if mj.is_overridden]
+        if overridden_judgments:
+            data["overridden_manual"] = [
+                {
+                    "judgment_id": mj.judgment_id,
+                    "judge_person": mj.judge_person,
+                    "final_label": mj.final_label,
+                    "on_site_statement": mj.on_site_statement,
+                    "change_type": mj.change_type.value,
+                    "is_overridden": True,
+                    "override_batch_id": mj.override_batch_id,
+                    "override_time": mj.override_time.isoformat() if mj.override_time else None,
+                    "remarks": mj.remarks,
+                }
+                for mj in overridden_judgments
+            ]
+
         if result.manual_judgments:
             data["manual_history"] = [
                 {
@@ -115,7 +132,38 @@ class UnifiedOutput:
                 for mj in result.manual_judgments
             ]
 
+        data["result_explanation"] = self._build_explanation(result)
+
         return data
+
+    def _build_explanation(self, result: UnifiedResult) -> str:
+        parts = []
+        if result.model_output:
+            parts.append(
+                f"模型输出(batch={result.model_output.batch_id}, 行号={result.model_output.original_line_number}): "
+                f"预测标签={result.model_output.predicted_label}"
+            )
+        if result.is_covered:
+            parts.append(
+                f"此样本人工改判被新批跑({result.covered_by_batch_id})覆盖，当前状态为待复核"
+            )
+        if result.active_manual_judgment:
+            parts.append(
+                f"生效人工改判({result.active_manual_judgment.judgment_id}, "
+                f"判单人={result.active_manual_judgment.judge_person}): "
+                f"最终标签={result.active_manual_judgment.final_label}"
+            )
+        overridden = [mj for mj in result.manual_judgments if mj.is_overridden]
+        if overridden:
+            ids = ", ".join(mj.judgment_id for mj in overridden)
+            parts.append(
+                f"被覆盖的人工改判: {ids}（由批跑{overridden[0].override_batch_id}覆盖）"
+            )
+        if result.review_person:
+            parts.append(f"复核人={result.review_person}")
+        if not parts:
+            parts.append("尚无处理记录")
+        return "; ".join(parts)
 
     def _result_to_page_format(self, result: UnifiedResult) -> Dict[str, Any]:
         status_display = {
@@ -145,11 +193,21 @@ class UnifiedOutput:
         if result.active_manual_judgment:
             evidence_sections.append(
                 {
-                    "source": "现场说法",
+                    "source": "现场说法(生效)",
                     "judge": result.active_manual_judgment.judge_person,
                     "items": [result.active_manual_judgment.on_site_statement],
                 }
             )
+        overridden_judgments = [mj for mj in result.manual_judgments if mj.is_overridden]
+        if overridden_judgments:
+            for mj in overridden_judgments:
+                evidence_sections.append(
+                    {
+                        "source": f"现场说法(被覆盖, 覆盖批跑={mj.override_batch_id})",
+                        "judge": mj.judge_person,
+                        "items": [mj.on_site_statement],
+                    }
+                )
 
         api_data["evidence_sections"] = evidence_sections
         return api_data

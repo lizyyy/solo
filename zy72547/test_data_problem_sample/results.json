@@ -1,0 +1,106 @@
+{
+  "SAMPLE-COVERED": {
+    "sample_id": "SAMPLE-COVERED",
+    "status": "review_approved",
+    "model_output": {
+      "sample_id": "SAMPLE-COVERED",
+      "original_line_number": 42,
+      "batch_id": "BATCH-001",
+      "model_version": "v2.3.1",
+      "content": "文本包含暴力隐喻表达",
+      "predicted_label": "violent",
+      "confidence": 0.87,
+      "risk_tags": [
+        "暴力"
+      ],
+      "evidence_snippets": [
+        "检测到暴力词汇",
+        "上下文符合暴力特征"
+      ],
+      "import_time": "2026-06-15 09:22:54.857374",
+      "raw_data": {}
+    },
+    "manual_judgments": [
+      {
+        "sample_id": "SAMPLE-COVERED",
+        "judgment_id": "JUDGE-COVERED-001",
+        "judge_person": "周姐",
+        "judgment_time": "2026-06-15 09:22:54.858183",
+        "final_label": "violent",
+        "on_site_statement": "周姐现场确认：文本确实包含暴力隐喻，模型判断正确，需回流训练集",
+        "change_type": "label_change",
+        "changed_fields": [
+          "predicted_label"
+        ],
+        "original_values": {
+          "predicted_label": "normal"
+        },
+        "new_values": {
+          "predicted_label": "violent"
+        },
+        "remarks": "周姐现场确认，该样本需回流到训练集",
+        "is_overridden": true,
+        "override_batch_id": "BATCH-002",
+        "override_time": "2026-06-15 09:22:54.858526"
+      }
+    ],
+    "active_manual_judgment": null,
+    "is_covered": false,
+    "covered_by_batch_id": null,
+    "current_label": "violent",
+    "final_evidence": [
+      "检测到暴力词汇",
+      "上下文符合暴力特征"
+    ],
+    "change_history": [
+      {
+        "timestamp": "2026-06-15 09:22:54.857401",
+        "operator": "工程师A",
+        "action": "model_import",
+        "field_name": "model_output",
+        "old_value": null,
+        "new_value": "batch=BATCH-001, line=42",
+        "reason": "首次导入模型输出片段"
+      },
+      {
+        "timestamp": "2026-06-15 09:22:54.858215",
+        "operator": "周姐",
+        "action": "manual_judgment_update",
+        "field_name": "active_manual_judgment",
+        "old_value": null,
+        "new_value": "JUDGE-COVERED-001",
+        "reason": "标注负责人补看人工改判表"
+      },
+      {
+        "timestamp": "2026-06-15 09:22:54.858515",
+        "operator": "工程师B",
+        "action": "batch_override_detected",
+        "field_name": "model_output.batch_id",
+        "old_value": "BATCH-001",
+        "new_value": "BATCH-002",
+        "reason": "新批跑覆盖旧批跑，旧批=BATCH-001, 新批=BATCH-002"
+      },
+      {
+        "timestamp": "2026-06-15 09:22:54.858529",
+        "operator": "工程师B",
+        "action": "manual_judgment_overridden",
+        "field_name": "active_manual_judgment",
+        "old_value": "JUDGE-COVERED-001",
+        "new_value": null,
+        "reason": "人工改判被新批跑覆盖，等待安全审核同事复核"
+      },
+      {
+        "timestamp": "2026-06-15 09:22:54.859024",
+        "operator": "安全审核同事",
+        "action": "covered_review_approve",
+        "field_name": null,
+        "old_value": null,
+        "new_value": null,
+        "reason": "人工改判有效，模型新版本漏检"
+      }
+    ],
+    "last_updated": "2026-06-15 09:22:54.859026",
+    "review_person": "安全审核同事",
+    "review_time": "2026-06-15 09:22:54.859021"
+  }
+}

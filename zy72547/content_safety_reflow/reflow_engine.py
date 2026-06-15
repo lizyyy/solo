@@ -1,6 +1,8 @@
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple
 from collections import defaultdict
+import json
+import os
 
 from .models import (
     ModelOutput,
@@ -14,10 +16,60 @@ from .models import (
 
 
 class ReflowEngine:
-    def __init__(self):
+    def __init__(self, data_dir: Optional[str] = None):
         self._results: Dict[str, UnifiedResult] = {}
         self._model_outputs_by_batch: Dict[str, List[ModelOutput]] = defaultdict(list)
         self._manual_judgments_by_sample: Dict[str, List[ManualJudgment]] = defaultdict(list)
+        self.data_dir = data_dir
+        if data_dir:
+            os.makedirs(data_dir, exist_ok=True)
+            self._load_from_disk()
+
+    def _load_from_disk(self) -> None:
+        results_path = os.path.join(self.data_dir, "results.json")
+        if os.path.exists(results_path):
+            with open(results_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            for sid, item in data.items():
+                self._results[sid] = UnifiedResult(**item)
+
+    def save_to_disk(self) -> None:
+        if not self.data_dir:
+            return
+        results_path = os.path.join(self.data_dir, "results.json")
+        data = {sid: r.model_dump() for sid, r in self._results.items()}
+        with open(results_path, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2, default=str)
+
+    def replay_sample(self, sample_id: str) -> Dict:
+        if sample_id not in self._results:
+            return {"error": f"样本 {sample_id} 不存在，无法重跑"}
+        result = self._results[sample_id]
+        replay_inputs = {"sample_id": sample_id}
+        if result.model_output:
+            replay_inputs["model_output"] = result.model_output.model_dump()
+        replay_inputs["manual_judgments"] = [mj.model_dump() for mj in result.manual_judgments]
+        replay_inputs["current_status"] = result.status.value
+        replay_inputs["replay_commands"] = self._generate_replay_commands(result)
+        return replay_inputs
+
+    def _generate_replay_commands(self, result: UnifiedResult) -> List[str]:
+        commands = []
+        if result.model_output:
+            mo = result.model_output
+            commands.append(
+                f"python -m content_safety_reflow.cli import <model_file.json> "
+                f"--operator <操作人>  # sample_id={mo.sample_id}, batch={mo.batch_id}, line={mo.original_line_number}"
+            )
+        for mj in result.manual_judgments:
+            commands.append(
+                f"python -m content_safety_reflow.cli supplement <judgment_file.json> "
+                f"--operator {mj.judge_person}  # judgment_id={mj.judgment_id}"
+            )
+        commands.append(
+            f"python -m content_safety_reflow.cli export --sample-id {result.sample_id}  # 查看当前状态"
+        )
+        return commands
 
     def import_model_output(self, output: ModelOutput, operator: str) -> UnifiedResult:
         self._model_outputs_by_batch[output.batch_id].append(output)
@@ -62,6 +114,7 @@ class ReflowEngine:
                 )
 
         result.last_updated = datetime.now()
+        self.save_to_disk()
         return result
 
     def _handle_batch_override(
@@ -177,6 +230,7 @@ class ReflowEngine:
             )
 
         result.last_updated = datetime.now()
+        self.save_to_disk()
         return result
 
     def review_covered_sample(
@@ -238,6 +292,7 @@ class ReflowEngine:
             )
 
         result.last_updated = datetime.now()
+        self.save_to_disk()
         return result
 
     def get_result(self, sample_id: str) -> Optional[UnifiedResult]:
@@ -309,9 +364,19 @@ class ReflowEngine:
 
         return report
 
-    def export_details(self) -> List[Dict]:
+    def export_details(self, sample_id: Optional[str] = None) -> List[Dict]:
+        results = (
+            [self._results[sample_id]] if sample_id and sample_id in self._results else list(self._results.values())
+        )
         details = []
-        for result in self._results.values():
+        for result in results:
+            overridden_judgments = [
+                mj for mj in result.manual_judgments if mj.is_overridden
+            ]
+            active_judgments = [
+                mj for mj in result.manual_judgments if not mj.is_overridden
+            ]
+
             detail = {
                 "sample_id": result.sample_id,
                 "status": result.status.value,
@@ -327,10 +392,59 @@ class ReflowEngine:
                     if result.active_manual_judgment
                     else None
                 ),
-                "change_history_count": len(result.change_history),
                 "last_updated": result.last_updated.isoformat(),
                 "review_person": result.review_person,
                 "review_time": result.review_time.isoformat() if result.review_time else None,
+                "manual_judgments": [
+                    {
+                        "judgment_id": mj.judgment_id,
+                        "judge_person": mj.judge_person,
+                        "final_label": mj.final_label,
+                        "on_site_statement": mj.on_site_statement,
+                        "change_type": mj.change_type.value,
+                        "changed_fields": mj.changed_fields,
+                        "original_values": mj.original_values,
+                        "new_values": mj.new_values,
+                        "remarks": mj.remarks,
+                        "is_overridden": mj.is_overridden,
+                        "override_batch_id": mj.override_batch_id,
+                        "override_time": mj.override_time.isoformat() if mj.override_time else None,
+                    }
+                    for mj in result.manual_judgments
+                ],
+                "overridden_judgments": [
+                    {
+                        "judgment_id": mj.judgment_id,
+                        "judge_person": mj.judge_person,
+                        "final_label": mj.final_label,
+                        "on_site_statement": mj.on_site_statement,
+                        "override_batch_id": mj.override_batch_id,
+                        "override_time": mj.override_time.isoformat() if mj.override_time else None,
+                    }
+                    for mj in overridden_judgments
+                ],
+                "active_judgments": [
+                    {
+                        "judgment_id": mj.judgment_id,
+                        "judge_person": mj.judge_person,
+                        "final_label": mj.final_label,
+                        "on_site_statement": mj.on_site_statement,
+                    }
+                    for mj in active_judgments
+                ],
+                "change_history": [
+                    {
+                        "time": c.timestamp.isoformat(),
+                        "operator": c.operator,
+                        "action": c.action,
+                        "field": c.field_name,
+                        "old": c.old_value,
+                        "new": c.new_value,
+                        "reason": c.reason,
+                    }
+                    for c in result.change_history
+                ],
+                "result_explanation": self._build_result_explanation(result),
             }
 
             if result.model_output:
@@ -345,3 +459,32 @@ class ReflowEngine:
 
             details.append(detail)
         return details
+
+    def _build_result_explanation(self, result: UnifiedResult) -> str:
+        parts = []
+        if result.model_output:
+            parts.append(
+                f"模型输出(batch={result.model_output.batch_id}, 行号={result.model_output.original_line_number}): "
+                f"预测标签={result.model_output.predicted_label}"
+            )
+        if result.is_covered:
+            parts.append(
+                f"此样本人工改判被新批跑({result.covered_by_batch_id})覆盖，当前状态为待复核"
+            )
+        if result.active_manual_judgment:
+            parts.append(
+                f"生效人工改判({result.active_manual_judgment.judgment_id}, "
+                f"判单人={result.active_manual_judgment.judge_person}): "
+                f"最终标签={result.active_manual_judgment.final_label}"
+            )
+        overridden = [mj for mj in result.manual_judgments if mj.is_overridden]
+        if overridden:
+            ids = ", ".join(mj.judgment_id for mj in overridden)
+            parts.append(
+                f"被覆盖的人工改判: {ids}（由批跑{overridden[0].override_batch_id}覆盖）"
+            )
+        if result.review_person:
+            parts.append(f"复核人={result.review_person}")
+        if not parts:
+            parts.append("尚无处理记录")
+        return "; ".join(parts)
